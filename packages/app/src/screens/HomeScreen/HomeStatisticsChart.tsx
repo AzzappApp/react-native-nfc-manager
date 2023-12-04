@@ -2,7 +2,7 @@ import MaskedView from '@react-native-masked-view/masked-view';
 import { LinearGradient } from 'expo-linear-gradient';
 import { memo, useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
-import { View, StyleSheet } from 'react-native';
+import { View } from 'react-native';
 import Animated, {
   interpolate,
   runOnJS,
@@ -11,17 +11,22 @@ import Animated, {
 } from 'react-native-reanimated';
 import { useFragment, graphql } from 'react-relay';
 import { colors } from '#theme';
+import {
+  createVariantsStyleSheet,
+  useVariantStyleSheet,
+} from '#helpers/createStyles';
 import Text from '#ui/Text';
-import type { HomeStatisticsChart_user$key } from '@azzapp/relay/artifacts/HomeStatisticsChart_user.graphql';
+import type { HomeStatisticsChart_profiles$key } from '@azzapp/relay/artifacts/HomeStatisticsChart_profiles.graphql';
 import type { SharedValue } from 'react-native-reanimated';
 
 type HomeStatisticsChartProps = {
-  user: HomeStatisticsChart_user$key;
+  user: HomeStatisticsChart_profiles$key;
   width: number;
   height: number;
   statsScrollIndex: SharedValue<number>;
   currentProfileIndexSharedValue: SharedValue<number>;
   currentUserIndex: number;
+  variant?: 'primary' | 'secondary';
 };
 // * TODO: using SKIA here would have been great, but need to be validated by dev team.
 // Until we have reanimated3, some part of skia a running on JS thread , so can wait
@@ -32,21 +37,20 @@ const HomeStatisticsChart = ({
   statsScrollIndex,
   currentProfileIndexSharedValue,
   currentUserIndex,
+  variant = 'primary',
 }: HomeStatisticsChartProps) => {
-  const { profiles } = useFragment(
+  const profiles = useFragment(
     graphql`
-      fragment HomeStatisticsChart_user on User {
-        profiles {
+      fragment HomeStatisticsChart_profiles on Profile @relay(plural: true) {
+        statsSummary {
+          day
+          contactCardScans
+        }
+        webCard {
           statsSummary {
             day
-            contactCardScans
-          }
-          webCard {
-            statsSummary {
-              day
-              webCardViews
-              likes
-            }
+            webCardViews
+            likes
           }
         }
       }
@@ -158,6 +162,8 @@ const HomeStatisticsChart = ({
     return result;
   }, [intl]);
 
+  const styles = useVariantStyleSheet(stylesheet, variant);
+
   return (
     <View>
       <MaskedView
@@ -230,6 +236,7 @@ type AnimatedBarChartItemProps = {
   statsScrollIndex: SharedValue<number>;
   currentProfileIndexSharedValue: SharedValue<number>;
   currentUserIndex: number;
+  variant?: 'primary' | 'secondary';
 };
 const AnimatedBarChartItem = ({
   item,
@@ -239,6 +246,7 @@ const AnimatedBarChartItem = ({
   chartBarWidth,
   maxValues,
   currentUserIndex,
+  variant = 'primary',
 }: AnimatedBarChartItemProps) => {
   //we need to flatten the matrixTransform, cannot find a way to interpolate a matrix
   const flattenedData = item.data.flatMap(obj => [
@@ -309,6 +317,8 @@ const AnimatedBarChartItem = ({
       }%`,
     };
   });
+  const styles = useVariantStyleSheet(stylesheet, variant);
+
   return (
     <View
       style={{
@@ -320,23 +330,21 @@ const AnimatedBarChartItem = ({
         style={[
           {
             width: chartBarWidth - CHART_BAR_SEPARATOR,
-            backgroundColor: colors.white,
             borderTopLeftRadius: chartBarWidth / 2,
             borderTopRightRadius: chartBarWidth / 2,
-            height: '5%',
-            position: 'absolute',
           },
+          styles.barTop,
         ]}
       />
       <Animated.View
         style={[
           {
             width: chartBarWidth - CHART_BAR_SEPARATOR,
-            backgroundColor: colors.white,
             borderTopLeftRadius: chartBarWidth / 2,
             borderTopRightRadius: chartBarWidth / 2,
           },
           animatedStyle,
+          styles.bar,
         ]}
       />
     </View>
@@ -355,16 +363,43 @@ export type StatsDataGroup = {
   data: StatsData[];
 };
 
-const styles = StyleSheet.create({
-  textDate: {
-    opacity: 0.4,
-    color: 'white',
-    fontSize: 9,
-    position: 'absolute',
-    bottom: 0,
+const stylesheet = createVariantsStyleSheet(() => ({
+  default: {
+    textDate: {
+      opacity: 0.4,
+      fontSize: 9,
+      position: 'absolute',
+      bottom: 0,
+    },
+    dateContainer: {
+      position: 'absolute',
+      bottom: 0,
+    },
+    barTop: {
+      height: '5%',
+      position: 'absolute',
+    },
   },
-  dateContainer: {
-    position: 'absolute',
-    bottom: 0,
+  primary: {
+    textDate: {
+      color: colors.white,
+    },
+    bar: {
+      backgroundColor: colors.white,
+    },
+    barTop: {
+      backgroundColor: colors.white,
+    },
   },
-});
+  secondary: {
+    textDate: {
+      color: colors.black,
+    },
+    bar: {
+      backgroundColor: colors.black,
+    },
+    barTop: {
+      backgroundColor: colors.black,
+    },
+  },
+}));

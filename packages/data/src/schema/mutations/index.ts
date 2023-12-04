@@ -33,6 +33,7 @@ import toggleFollowing from './toggleFollowing';
 import updateModulesVisibility from './updateModulesVisibility';
 import updateMultiUser from './updateMultiUser';
 import updatePost from './updatePost';
+import updateProfile from './updateProfile';
 import {
   updateContactCardScans,
   updateLikes,
@@ -84,4 +85,5 @@ export const Mutation: MutationResolvers = {
   declineOwnership,
   inviteUser,
   updateWebCardUserName,
+  updateProfile,
 };

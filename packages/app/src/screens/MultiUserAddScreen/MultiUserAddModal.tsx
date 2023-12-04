@@ -28,13 +28,12 @@ type MultiUserAddModalProps = {
   beforeClose: () => void;
 };
 
-type UserToAdd = {
+export type UserToAdd = {
   firstName: string;
   lastName: string;
   phoneNumbers: string[];
   emails: string[];
   contactCard: ContactCard;
-  userId?: string;
 };
 
 export type AssociatedUser = {
@@ -81,7 +80,7 @@ const MultiUserAddModal = (
     [user, intl],
   );
 
-  const { control, setValue, watch, handleSubmit, reset } =
+  const { control, watch, handleSubmit, reset } =
     useForm<MultiUserAddFormValues>({
       defaultValues: {
         contact: contacts[0].id,
@@ -257,7 +256,6 @@ const MultiUserAddModal = (
             showImagePicker={() => setShowImagePicker(true)}
             imagePickerVisible={showImagePicker}
             isMultiUser={true}
-            setAvatar={avatar => setValue('avatar', avatar)}
           >
             <MultiUserAddForm
               contacts={contacts}

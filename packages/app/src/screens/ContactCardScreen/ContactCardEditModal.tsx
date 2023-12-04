@@ -179,7 +179,6 @@ const ContactCardEditModal = ({
     control,
     handleSubmit,
     formState: { isSubmitting },
-    setValue,
   } = useForm<ContactCardEditFormValues>({
     mode: 'onBlur',
     resolver: zodResolver(contactCardEditSchema),
@@ -310,7 +309,6 @@ const ContactCardEditModal = ({
           control={control}
           showImagePicker={() => setShowImagePicker(true)}
           hideImagePicker={() => setShowImagePicker(false)}
-          setAvatar={avatar => setValue('avatar', avatar)}
           imagePickerVisible={showImagePicker}
         />
         <ScreenModal visible={!!progressIndicator}>

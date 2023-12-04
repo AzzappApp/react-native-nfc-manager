@@ -1,4 +1,5 @@
-import { Fragment } from 'react';
+import { fromGlobalId } from 'graphql-relay';
+import { Fragment, useRef } from 'react';
 import { useIntl } from 'react-intl';
 import { StyleSheet, View } from 'react-native';
 import { graphql, useFragment } from 'react-relay';
@@ -10,20 +11,30 @@ import PressableNative from '#ui/PressableNative';
 import Separation from '#ui/Separation';
 import Text from '#ui/Text';
 import Avatar from './Avatar';
+import MultiUserDetailModal from './MultiUserDetailModal';
+import type { MultiUserDetailModalActions } from './MultiUserDetailModal';
 import type { ProfileRole } from '@azzapp/relay/artifacts/MultiUserScreenQuery.graphql';
 import type { MultiUserScreenUserList_currentUser$key } from '@azzapp/relay/artifacts/MultiUserScreenUserList_currentUser.graphql';
+import type { ContactCard } from '@azzapp/shared/contactCardHelpers';
 
 type UserInformation = {
   firstName: string;
   lastName: string;
   email: string;
   phoneNumber: string;
+  avatar: {
+    id: string;
+    uri: string;
+  } | null;
+  contactCard: ContactCard;
+  profileId: string;
 };
 
 export type MultiUserScreenListProps = {
   usersByRole: Record<ProfileRole, UserInformation[]>;
   currentUser: MultiUserScreenUserList_currentUser$key;
   toggleCommonInfosForm: () => void;
+  profileId: string;
 };
 
 const MultiUserScreenUserList = (props: MultiUserScreenListProps) => {
@@ -31,10 +42,7 @@ const MultiUserScreenUserList = (props: MultiUserScreenListProps) => {
   const intl = useIntl();
   const router = useRouter();
 
-  const {
-    currentUser,
-    viewer: { profile },
-  } = useFragment(
+  const data = useFragment(
     graphql`
       fragment MultiUserScreenUserList_currentUser on Query {
         currentUser {
@@ -44,6 +52,11 @@ const MultiUserScreenUserList = (props: MultiUserScreenListProps) => {
         viewer {
           profile {
             webCard {
+              ...MultiUserDetailModal_webcard
+              profiles {
+                id
+                ...HomeStatistics_profiles
+              }
               commonInformation {
                 company
                 addresses {
@@ -70,6 +83,11 @@ const MultiUserScreenUserList = (props: MultiUserScreenListProps) => {
     currentUserKey,
   );
 
+  const {
+    currentUser,
+    viewer: { profile },
+  } = data;
+
   // @TODO
   const nbCommonInformation =
     (profile?.webCard.commonInformation?.company ? 1 : 0) +
@@ -86,6 +104,8 @@ const MultiUserScreenUserList = (props: MultiUserScreenListProps) => {
   const onAddUsers = () => {
     router.push({ route: 'MULTI_USER_ADD' });
   };
+
+  const detail = useRef<MultiUserDetailModalActions>(null);
 
   return (
     <View style={styles.content}>
@@ -117,8 +137,16 @@ const MultiUserScreenUserList = (props: MultiUserScreenListProps) => {
 
             return (
               <PressableNative
-                // eslint-disable-next-line no-alert
-                onPress={() => alert('TODO')}
+                onPress={() => {
+                  detail.current?.open(
+                    {
+                      email: user.email,
+                      phoneNumber: user.phoneNumber,
+                    },
+                    user.contactCard,
+                    fromGlobalId(user.profileId).id,
+                  );
+                }}
                 key={user.email}
                 style={styles.user}
               >
@@ -135,6 +163,9 @@ const MultiUserScreenUserList = (props: MultiUserScreenListProps) => {
           })}
         </Fragment>
       ))}
+      {profile?.webCard.profiles && (
+        <MultiUserDetailModal user={profile.webCard} ref={detail} />
+      )}
     </View>
   );
 };

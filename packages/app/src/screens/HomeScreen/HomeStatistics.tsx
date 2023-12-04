@@ -1,13 +1,7 @@
 import _ from 'lodash';
 import { memo, useMemo } from 'react';
 import { useIntl } from 'react-intl';
-import {
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  View,
-  useWindowDimensions,
-} from 'react-native';
+import { Pressable, ScrollView, View, useWindowDimensions } from 'react-native';
 import Animated, {
   type SharedValue,
   useAnimatedScrollHandler,
@@ -20,18 +14,23 @@ import Animated, {
 import { useFragment, graphql } from 'react-relay';
 import { colors, fontFamilies } from '#theme';
 import AnimatedText from '#components/AnimatedText';
+import {
+  createVariantsStyleSheet,
+  useVariantStyleSheet,
+} from '#helpers/createStyles';
 import Text from '#ui/Text';
 import { format } from './HomeInformations';
 import HomeStatisticsChart from './HomeStatisticsChart';
-import type { HomeStatistics_user$key } from '@azzapp/relay/artifacts/HomeStatistics_user.graphql';
+import type { HomeStatistics_profiles$key } from '@azzapp/relay/artifacts/HomeStatistics_profiles.graphql';
 
 const AnimatedScrollView = Animated.createAnimatedComponent(ScrollView);
 
 type HomeInformationsProps = {
-  user: HomeStatistics_user$key;
+  user: HomeStatistics_profiles$key;
   height: number;
   currentProfileIndexSharedValue: SharedValue<number>;
   currentUserIndex: number;
+  variant?: 'primary' | 'secondary';
 };
 
 const HomeStatistics = ({
@@ -39,26 +38,27 @@ const HomeStatistics = ({
   height,
   currentUserIndex,
   currentProfileIndexSharedValue,
+  variant = 'primary',
 }: HomeInformationsProps) => {
   //TODO: backend part .
 
-  const data = useFragment(
+  const profiles = useFragment(
     graphql`
-      fragment HomeStatistics_user on User {
-        profiles {
+      fragment HomeStatistics_profiles on Profile @relay(plural: true) {
+        id
+        webCard {
           id
-          webCard {
-            id
-            nbLikes
-            nbWebCardViews
-          }
-          nbContactCardScans
+          nbLikes
+          nbWebCardViews
         }
-        ...HomeStatisticsChart_user
+        nbContactCardScans
+        ...HomeStatisticsChart_profiles
       }
     `,
     user,
   );
+
+  const styles = useVariantStyleSheet(stylesheet, variant);
 
   const { width } = useWindowDimensions();
   const intl = useIntl();
@@ -70,8 +70,7 @@ const HomeStatistics = ({
   const totalLikes = useSharedValue(format(0));
   const totalScans = useSharedValue(format(0));
   const totalViews = useSharedValue(format(0));
-  const inputRange = _.range(0, data.profiles?.length);
-  const { profiles } = data;
+  const inputRange = _.range(0, profiles?.length);
 
   const likes = useMemo(
     () => profiles?.map(profile => profile.webCard.nbLikes) ?? [],
@@ -133,7 +132,8 @@ const HomeStatistics = ({
         statsScrollIndex={scrollIndexOffset}
         currentUserIndex={currentUserIndex}
         currentProfileIndexSharedValue={currentProfileIndexSharedValue}
-        user={data}
+        user={profiles}
+        variant={variant}
       />
       <AnimatedScrollView
         ref={scrollViewRef}
@@ -158,6 +158,7 @@ const HomeStatistics = ({
         onScroll={scrollHandler}
       >
         <StatisticItems
+          variant={variant}
           value={totalViews}
           title={
             intl.formatMessage(
@@ -179,6 +180,7 @@ const HomeStatistics = ({
           onSelect={onSelectStat}
         />
         <StatisticItems
+          variant={variant}
           value={totalScans}
           title={intl.formatMessage({
             defaultMessage: 'Contact card scans',
@@ -189,6 +191,7 @@ const HomeStatistics = ({
           onSelect={onSelectStat}
         />
         <StatisticItems
+          variant={variant}
           value={totalLikes}
           title={intl.formatMessage({
             defaultMessage: 'Total Likes',
@@ -215,13 +218,15 @@ type StatisticItemsProps = {
   title: string;
   index: number;
   onSelect: (index: number) => void;
+  variant: 'primary' | 'secondary';
 };
-const StatisticItems = ({
+export const StatisticItems = ({
   value,
   scrollIndex,
   title,
   index,
   onSelect,
+  variant = 'primary',
 }: StatisticItemsProps) => {
   const animatedTextStyle = useAnimatedStyle(() => {
     return {
@@ -258,6 +263,8 @@ const StatisticItems = ({
     onSelect(index);
   };
 
+  const styles = useVariantStyleSheet(stylesheet, variant);
+
   return (
     <Animated.View style={[styles.boxContainer, animatedOpacity]}>
       <Pressable onPress={onPress}>
@@ -273,34 +280,53 @@ const StatisticItems = ({
   );
 };
 
-const styles = StyleSheet.create({
-  boxContainer: {
-    width: BOX_NUMBER_WIDTH,
-    height: BOX_NUMBER_HEIGHT,
-    justifyContent: 'flex-end',
-    alignItems: 'center',
-    overflow: 'visible',
-    paddingTop: 4,
+const stylesheet = createVariantsStyleSheet(() => ({
+  default: {
+    boxContainer: {
+      width: BOX_NUMBER_WIDTH,
+      height: BOX_NUMBER_HEIGHT,
+      justifyContent: 'flex-end',
+      alignItems: 'center',
+      overflow: 'visible',
+      paddingTop: 4,
+    },
+    container: {
+      justifyContent: 'center',
+      alignItems: 'flex-end',
+      paddingHorizontal: PADDING_HORIZONTAL,
+      width: '100%',
+      overflow: 'visible',
+      flex: 1,
+    },
+    largetText: {
+      ...fontFamilies.extrabold,
+      textAlign: 'center',
+      fontSize: 42,
+    },
+    smallText: {
+      textAlign: 'center',
+    },
   },
-  container: {
-    justifyContent: 'center',
-    alignItems: 'flex-end',
-    paddingHorizontal: PADDING_HORIZONTAL,
-    width: '100%',
-    overflow: 'visible',
-    flex: 1,
+  primary: {
+    icon: {
+      color: colors.white,
+    },
+    smallText: {
+      color: colors.white,
+    },
+    largetText: {
+      color: colors.white,
+    },
   },
-  largetText: {
-    ...fontFamilies.extrabold,
-    color: colors.white,
-    textAlign: 'center',
-    fontSize: 42,
+  secondary: {
+    icon: {
+      color: colors.black,
+    },
+    smallText: {
+      color: colors.black,
+    },
+    largetText: {
+      color: colors.black,
+    },
   },
-  smallText: {
-    color: colors.white,
-    textAlign: 'center',
-  },
-  icon: {
-    color: colors.white,
-  },
-});
+}));

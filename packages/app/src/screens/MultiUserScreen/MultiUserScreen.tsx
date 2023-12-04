@@ -1,3 +1,4 @@
+import { fromGlobalId } from 'graphql-relay';
 import { useCallback, useMemo, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { StyleSheet, View } from 'react-native';
@@ -27,12 +28,14 @@ import type {
   MultiUserScreenQuery,
   ProfileRole,
 } from '@azzapp/relay/artifacts/MultiUserScreenQuery.graphql';
+import type { ContactCard } from '@azzapp/shared/contactCardHelpers';
 
 const multiUserScreenQuery = graphql`
   query MultiUserScreenQuery {
     ...MultiUserScreenUserList_currentUser
     viewer {
       profile {
+        id
         webCard {
           id
           isMultiUser
@@ -45,12 +48,57 @@ const multiUserScreenQuery = graphql`
             contactCard {
               firstName
               lastName
+              title
+              company
+              emails {
+                label
+                address
+                selected
+              }
+              phoneNumbers {
+                label
+                number
+                selected
+              }
+              urls {
+                address
+                selected
+              }
+              addresses {
+                address
+                label
+                selected
+              }
+              birthday {
+                birthday
+                selected
+              }
+              socials {
+                url
+                label
+                selected
+              }
             }
             user {
               email
               phoneNumber
             }
             profileRole
+            avatar {
+              id
+              uri
+            }
+            statsSummary {
+              day
+              contactCardScans
+            }
+            webCard {
+              statsSummary {
+                day
+                webCardViews
+                likes
+              }
+            }
           }
         }
       }
@@ -83,13 +131,16 @@ const MultiUserScreen = ({
 
     return data.viewer.profile.webCard.profiles.reduce(
       (accumulator, currentValue) => {
-        const { user, contactCard } = currentValue!;
+        const { user, contactCard, avatar, id } = currentValue!;
 
         accumulator[currentValue!.profileRole].push({
           email: user.email!,
           firstName: contactCard?.firstName ?? '',
           lastName: contactCard?.lastName ?? '',
           phoneNumber: user?.phoneNumber ?? '',
+          contactCard: (contactCard ?? {}) as ContactCard,
+          avatar,
+          profileId: id,
         });
         return accumulator;
       },
@@ -213,6 +264,7 @@ const MultiUserScreen = ({
                 usersByRole={userProfilesByRole}
                 currentUser={data}
                 toggleCommonInfosForm={toggleCommonInfoForm}
+                profileId={fromGlobalId(data.viewer.profile.id).id}
               />
             )}
           </View>

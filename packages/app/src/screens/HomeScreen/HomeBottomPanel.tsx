@@ -68,8 +68,8 @@ const HomeBottomPanel = ({
       fragment HomeBottomPanel_user on User {
         ...HomeContactCard_user
         ...HomeInformations_user
-        ...HomeStatistics_user
         profiles {
+          ...HomeStatistics_profiles
           webCard {
             id
           }
@@ -767,7 +767,7 @@ const HomeBottomPanel = ({
         )}
         {selectedPanel === 'STATS' && (
           <HomeStatistics
-            user={user}
+            user={user.profiles!}
             height={panelHeight}
             currentProfileIndexSharedValue={currentProfileIndexSharedValue}
             currentUserIndex={currentProfileIndex}

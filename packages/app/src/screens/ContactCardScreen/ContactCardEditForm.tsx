@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import { Controller } from 'react-hook-form';
+import { Controller, useController } from 'react-hook-form';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { View } from 'react-native';
 import { AVATAR_MAX_WIDTH } from '@azzapp/shared/contactCardHelpers';
@@ -35,10 +35,10 @@ type ContactCardEditFormProps = {
   showImagePicker: () => void;
   hideImagePicker: () => void;
   imagePickerVisible: boolean;
-  setAvatar: (avatar: ContactCardEditFormValues['avatar']) => void;
   control: Control<ContactCardEditFormValues>;
   commonInformation: ContactCardEditModal_card$data['webCard']['commonInformation'];
   children?: ReactNode;
+  footer?: ReactNode;
 };
 
 const ContactCardEditForm = (props: ContactCardEditFormProps) => {
@@ -47,14 +47,19 @@ const ContactCardEditForm = (props: ContactCardEditFormProps) => {
     showImagePicker,
     hideImagePicker,
     imagePickerVisible,
-    setAvatar,
     control,
     commonInformation,
     children,
+    footer,
   } = props;
 
   const styles = useStyleSheet(styleSheet);
   const intl = useIntl();
+
+  const { field } = useController({
+    control,
+    name: 'avatar',
+  });
 
   const onImagePickerFinished = useCallback(
     async ({
@@ -81,7 +86,7 @@ const ContactCardEditForm = (props: ContactCardEditFormProps) => {
         ],
       });
 
-      setAvatar({
+      field.onChange({
         local: true,
         id: localPath,
         uri: `file://${localPath.replace('file://', '')}`,
@@ -89,7 +94,7 @@ const ContactCardEditForm = (props: ContactCardEditFormProps) => {
 
       hideImagePicker();
     },
-    [setAvatar, hideImagePicker],
+    [field, hideImagePicker],
   );
 
   return (
@@ -283,6 +288,7 @@ const ContactCardEditForm = (props: ContactCardEditFormProps) => {
           ))}
           <ContactCardEditModalSocials control={control} />
         </View>
+        {footer}
       </FormDeleteFieldOverlay>
 
       <ScreenModal visible={imagePickerVisible} animationType="slide">
