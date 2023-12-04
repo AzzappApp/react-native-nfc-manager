@@ -1,5 +1,6 @@
-## 0.5.2-canary.28
+## 0.5.2-canary.29
 
+* **fix:**  - clear error on submit
 * **fix:**  - update error handler change username
 * **feat:**  - multi user detail ([#1837](https://github.com/AzzappApp/azzapp/pull/1837))
 * **fix:**  - 🐛 use working revalidatePage ([#1886](https://github.com/AzzappApp/azzapp/pull/1886))
