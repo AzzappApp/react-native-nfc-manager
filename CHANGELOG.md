@@ -1,5 +1,6 @@
-## 0.5.2-canary.27
+## 0.5.2-canary.28
 
+* **fix:**  - update error handler change username
 * **feat:**  - multi user detail ([#1837](https://github.com/AzzappApp/azzapp/pull/1837))
 * **fix:**  - 🐛 use working revalidatePage ([#1886](https://github.com/AzzappApp/azzapp/pull/1886))
 * **fix:**  - clear error message after typing new phone number
