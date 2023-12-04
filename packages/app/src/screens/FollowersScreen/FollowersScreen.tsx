@@ -19,9 +19,9 @@ const followersScreenQuery = graphql`
     viewer {
       profile {
         id
-        contactCardIsPrivate
         webCard {
           id
+          cardIsPrivate
           ...FollowersScreenList_webCard
         }
       }
@@ -82,7 +82,7 @@ const FollowerScreenInner = ({
 
   return (
     <FollowersScreenList
-      isPublic={!viewer?.profile?.contactCardIsPrivate ?? false}
+      isPublic={!viewer?.profile?.webCard.cardIsPrivate ?? false}
       currentWebCardId={viewer.profile?.webCard?.id ?? ''}
       webCard={viewer.profile?.webCard ?? null}
     />

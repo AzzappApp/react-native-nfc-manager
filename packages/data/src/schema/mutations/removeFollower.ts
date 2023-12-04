@@ -20,16 +20,17 @@ const removeFollowerMutation: MutationResolvers['removeFollower'] = async (
     throw new GraphQLError(ERRORS.INVALID_REQUEST);
   }
 
-  const { id: targetId, type } = fromGlobalId(removedFollowerId);
-  const webCard = await loaders.WebCard.load(targetId);
-  if (type !== 'WebCard' || !webCard) {
-    throw new GraphQLError(ERRORS.INVALID_REQUEST);
-  }
+  const webCard = await loaders.WebCard.load(profile.webCardId);
 
-  if (!webCard.cardIsPrivate) {
+  if (!webCard?.cardIsPrivate) {
     throw new GraphQLError(ERRORS.FORBIDDEN);
   }
 
+  const { id: targetId, type } = fromGlobalId(removedFollowerId);
+
+  if (type !== 'WebCard') {
+    throw new GraphQLError(ERRORS.INVALID_REQUEST);
+  }
   try {
     await unfollows(targetId, profile.webCardId);
   } catch (e) {
