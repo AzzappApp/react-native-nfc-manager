@@ -79,7 +79,7 @@ const DownloadVCard = ({ webCard }: { webCard: WebCard }) => {
         className={opened ? styles.openedDialog : styles.dialog}
         role="dialog"
       >
-        <span className={styles.message}>{`You can download the contact card ${
+        <span className={styles.message}>{`You can download the Contact Card ${
           contact
             ? `of ${
                 `${contact.firstName ?? ''}  ${
@@ -94,7 +94,7 @@ const DownloadVCard = ({ webCard }: { webCard: WebCard }) => {
           href={fileUrl}
           download={`${webCard.userName}.vcf`}
         >
-          Download the contact card
+          Download the Contact Card
         </LinkButton>
 
         <button
