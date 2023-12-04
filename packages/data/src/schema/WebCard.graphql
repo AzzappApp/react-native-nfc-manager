@@ -63,6 +63,10 @@ type WebCard implements Node {
   """
   cardIsPublished: Boolean!
   """
+  Is the webCard private
+  """
+  cardIsPrivate: Boolean!
+  """
   Is the webcard was already published
   """
   alreadyPublished: Boolean!
