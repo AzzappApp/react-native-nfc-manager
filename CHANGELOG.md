@@ -1,5 +1,6 @@
-## 0.5.2-canary.25
+## 0.5.2-canary.26
 
+* **fix:**  - 🐛 use working revalidatePage ([#1886](https://github.com/AzzappApp/azzapp/pull/1886))
 * **fix:**  - clear error message after typing new phone number
 * **fix:**  - renaming request
 * **fix:**  - simplify
