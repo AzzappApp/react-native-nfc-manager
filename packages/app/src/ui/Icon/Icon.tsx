@@ -328,6 +328,9 @@ const icons = {
   get search() {
     return require('./assets/search.png');
   },
+  get secret() {
+    return require('./assets/secret.png');
+  },
   get settings() {
     return require('./assets/settings.png');
   },

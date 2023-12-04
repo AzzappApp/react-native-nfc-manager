@@ -104,7 +104,7 @@ const CoverEditorSuggestionButton = ({
 
             <Icon
               style={styles.mediaHideButtonIcon}
-              icon={mediaVisible ? 'display' : 'hide'}
+              icon={mediaVisible ? 'preview' : 'hide'}
             />
           </PressableOpacity>
         )}
@@ -134,8 +134,7 @@ const styleSheet = createStyleSheet(appearance => ({
   },
   mediaHideButtonIcon: {
     position: 'absolute',
-    top: (FLOATING_BUTTON_SIZE - 24) / 2,
-    left: (FLOATING_BUTTON_SIZE - 24) / 2,
+    margin: 'auto',
     width: 24,
     height: 24,
   },

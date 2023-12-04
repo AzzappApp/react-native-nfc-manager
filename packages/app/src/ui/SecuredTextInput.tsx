@@ -67,7 +67,7 @@ const SecuredTextInput = (
         })}
       >
         <Icon
-          icon={!showPassword ? 'display' : 'hide'}
+          icon={!showPassword ? 'display' : 'secret'}
           style={{
             width: 11,
             height,
