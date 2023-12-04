@@ -1,5 +1,6 @@
-## 0.5.2-canary.26
+## 0.5.2-canary.27
 
+* **feat:**  - multi user detail ([#1837](https://github.com/AzzappApp/azzapp/pull/1837))
 * **fix:**  - 🐛 use working revalidatePage ([#1886](https://github.com/AzzappApp/azzapp/pull/1886))
 * **fix:**  - clear error message after typing new phone number
 * **fix:**  - renaming request
