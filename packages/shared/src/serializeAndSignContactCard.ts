@@ -10,7 +10,6 @@ const serializeAndSignContactCard = async (
   commonInformation?: CommonInformation | null,
 ) => {
   const serializedContactCard = serializeContactCard(
-    userName,
     profileId,
     webCardId,
     card,

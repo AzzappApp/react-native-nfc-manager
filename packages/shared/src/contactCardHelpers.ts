@@ -81,7 +81,6 @@ type ParsedContactCard = [
  * Serializes a contact card to a string
  */
 export const serializeContactCard = (
-  username: string,
   profileId: string,
   webCardId: string,
   card: ContactCard | null,

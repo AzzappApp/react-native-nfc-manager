@@ -8,6 +8,11 @@ import Button from '#ui/Button';
 import type { ContactCardExportVcf_card$key } from '@azzapp/relay/artifacts/ContactCardExportVcf_card.graphql';
 import type { ContactCard } from '@azzapp/shared/contactCardHelpers';
 
+export type ContactCardExportVcfProps = {
+  userName: string;
+  profile: ContactCardExportVcf_card$key;
+};
+
 const ContactCardExportVcf = ({
   userName,
   profile: profileKey,

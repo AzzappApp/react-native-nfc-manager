@@ -73,7 +73,7 @@ const defaultTimingParam = {
   easing: Easing.inOut(Easing.ease), //Easing.bezier(0.25, 0.1, 0.25, 1),
 };
 
-const ContactCardScreen = ({
+export const ContactCardScreen = ({
   preloadedQuery,
 }: RelayScreenProps<ContactCardRoute, ContactCardScreenQuery>) => {
   const { viewer } = usePreloadedQuery(
@@ -302,6 +302,7 @@ const ContactCardScreen = ({
 
           <View style={styles.buttons}>
             <PressableNative
+              testID="add-to-wallet-button"
               disabled={loadingPass}
               style={styles.addToWalletButton}
               onPress={async () => {

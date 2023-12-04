@@ -24,15 +24,17 @@ import CommonInformationSocials from './CommonInformationSocials';
 import CommonInformationUrls from './CommonInformationUrls';
 import type { CommonInformationForm_data$key } from '@azzapp/relay/artifacts/CommonInformationForm_data.graphql';
 
+export type CommonInformationFormProps = {
+  commonInfoFormIsOpened: boolean;
+  toggleCommonInfoForm: () => void;
+  commonInformation: CommonInformationForm_data$key | null;
+};
+
 const CommonInformationForm = ({
   commonInfoFormIsOpened,
   toggleCommonInfoForm,
   commonInformation,
-}: {
-  commonInfoFormIsOpened: boolean;
-  toggleCommonInfoForm: () => void;
-  commonInformation: CommonInformationForm_data$key | null;
-}) => {
+}: CommonInformationFormProps) => {
   const commonInfo = useFragment(
     graphql`
       fragment CommonInformationForm_data on CommonInformation {
@@ -163,6 +165,7 @@ const CommonInformationForm = ({
       }
       headerRightButton={
         <Button
+          testID="save-common-information"
           label={intl.formatMessage({
             defaultMessage: 'Save',
             description: 'Edit common information save button label',
