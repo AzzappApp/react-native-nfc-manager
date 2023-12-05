@@ -46,7 +46,8 @@ export const buildVCard = (contactCardData: string) => {
     vcard.addAddress(address[0], address[1].replace(/;/g, '\\;'));
   });
 
-  if (contactCard.birthday) vcard.addBirthday(contactCard.birthday);
+  if (contactCard.birthday && !isNaN(Date.parse(contactCard.birthday)))
+    vcard.addBirthday(contactCard.birthday.split('T')[0]);
 
   contactCard.socials.forEach(social => {
     vcard.addSocial(social[1], social[0]);
