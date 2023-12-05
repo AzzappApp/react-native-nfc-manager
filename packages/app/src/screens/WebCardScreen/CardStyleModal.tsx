@@ -1,7 +1,7 @@
 import { pick } from 'lodash';
 import { Suspense, useCallback, useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
-import { StyleSheet, View, useWindowDimensions } from 'react-native';
+import { View, useWindowDimensions } from 'react-native';
 import { FlatList } from 'react-native-gesture-handler';
 import Toast from 'react-native-toast-message';
 import {
@@ -18,6 +18,7 @@ import { colors } from '#theme';
 import { useModulesData } from '#components/cardModules/ModuleData';
 import ScreenModal from '#components/ScreenModal';
 import WebCardPreview from '#components/WebCardPreview';
+import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import useScreenInsets from '#hooks/useScreenInsets';
 import ActivityIndicator from '#ui/ActivityIndicator';
 import Container from '#ui/Container';
@@ -79,6 +80,8 @@ const CardStyleModal = ({ visible, onRequestClose }: CardStyleModalProps) => {
     {},
   );
   const intl = useIntl();
+
+  const styles = useStyleSheet(styleSheet);
 
   const currentCardStyle = useMemo<CardStyleItem>(
     () => ({
@@ -163,6 +166,7 @@ const CardStyleModal = ({ visible, onRequestClose }: CardStyleModalProps) => {
     insets.top -
     HEADER_HEIGHT -
     CARD_STYLE_LIST_HEIGHT -
+    CARD_STYLE_BORDER_HEIGHT -
     insets.bottom;
 
   return (
@@ -300,6 +304,8 @@ const CardStyleList = ({
   selectedCardStyle,
   onSelectCardStyle,
 }: CardStyleListProps) => {
+  const styles = useStyleSheet(styleSheet);
+
   const {
     data: { cardStyles },
     loadNext,
@@ -370,7 +376,12 @@ const CardStyleList = ({
         </Text>
       </PressableNative>
     ),
-    [onSelectCardStyle, selectedCardStyle.id],
+    [
+      onSelectCardStyle,
+      selectedCardStyle.id,
+      styles.cardStyleItem,
+      styles.cardStyleItemLabel,
+    ],
   );
 
   return (
@@ -393,7 +404,9 @@ const CURRENT_STYLE_ID = 'CURRENT_STYLE_ID';
 
 const CARD_STYLE_LIST_HEIGHT = 90;
 
-const styles = StyleSheet.create({
+const CARD_STYLE_BORDER_HEIGHT = 1;
+
+const styleSheet = createStyleSheet(appearance => ({
   root: {
     flex: 1,
   },
@@ -404,8 +417,9 @@ const styles = StyleSheet.create({
   },
   cardStyleList: {
     height: CARD_STYLE_LIST_HEIGHT,
-    borderTopColor: colors.grey100,
-    borderTopWidth: 1,
+    borderTopColor: appearance === 'dark' ? colors.grey900 : colors.grey100,
+    borderTopWidth: CARD_STYLE_BORDER_HEIGHT,
+    backgroundColor: appearance === 'dark' ? colors.black : colors.white,
   },
   cardStyleListContainer: {
     paddingHorizontal: 20,
@@ -418,4 +432,4 @@ const styles = StyleSheet.create({
   cardStyleItemLabel: {
     fontSize: 22,
   },
-});
+}));
