@@ -135,6 +135,12 @@ const ColorPicker = ({
       editedColorPaletteProperty.current = null;
       onColorChange(colorName);
     } else {
+      setColorsToRemove(colorsToRemove => {
+        const newColorsToRemove = new Set(colorsToRemove);
+        newColorsToRemove.delete(selectedColorValue);
+        return newColorsToRemove;
+      });
+
       onUpdateColorList(
         uniq(
           colorList ? [...colorList, selectedColorValue] : [selectedColorValue],
@@ -152,13 +158,20 @@ const ColorPicker = ({
   ]);
 
   const [colorsToRemove, setColorsToRemove] = useState(new Set<string>());
-  const onRemoveColor = useCallback((color: string) => {
-    setColorsToRemove(colorsToRemove => {
-      const newColorsToRemove = new Set(colorsToRemove);
-      newColorsToRemove.add(color);
-      return newColorsToRemove;
-    });
-  }, []);
+  const onRemoveColor = useCallback(
+    (color: string) => {
+      setColorsToRemove(colorsToRemove => {
+        const newColorsToRemove = new Set(colorsToRemove);
+        newColorsToRemove.add(color);
+        return newColorsToRemove;
+      });
+
+      if (selectedColor === color) {
+        onColorChange(colorPalette.primary);
+      }
+    },
+    [colorPalette.primary, onColorChange, selectedColor],
+  );
 
   const onSaveEditedColorList = useCallback(() => {
     onUpdateColorList((colorList ?? []).filter(c => !colorsToRemove.has(c)));
