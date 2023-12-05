@@ -29,6 +29,7 @@ type PostListProps = ViewProps & {
   refreshing?: boolean;
   loading?: boolean;
   contentContainerStyle?: ContentStyle;
+  onPressAuthor?: () => void;
 };
 
 const viewabilityConfig = {
@@ -45,6 +46,7 @@ const PostList = ({
   loading = false,
   onEndReached,
   onRefresh,
+  onPressAuthor,
   ...props
 }: PostListProps) => {
   const posts = useFragment(
@@ -149,11 +151,12 @@ const PostList = ({
           post={item}
           videoDisabled={!extraData.canPlay}
           width={windowWidth}
+          onPressAuthor={onPressAuthor}
           author={item.webCard ?? extraData.author!}
         />
       );
     },
-    [windowWidth],
+    [onPressAuthor, windowWidth],
   );
 
   const extraData = useMemo(() => ({ canPlay, author }), [canPlay, author]);

@@ -373,6 +373,7 @@ const WebCardScreen = ({
             >
               <Suspense>
                 <WebCardPostsList
+                  toggleFlip={toggleFlip}
                   isViewer={isViewer}
                   webCard={data.webCard}
                   hasFocus={hasFocus && showPost && ready}

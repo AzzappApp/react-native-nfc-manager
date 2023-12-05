@@ -14,6 +14,7 @@ type WebCardPostsListProps = {
   isViewer: boolean;
   hasFocus: boolean;
   userName: string;
+  toggleFlip: () => void;
 };
 
 const WebCardPostsList = ({
@@ -21,6 +22,7 @@ const WebCardPostsList = ({
   isViewer,
   hasFocus,
   userName,
+  toggleFlip,
 }: WebCardPostsListProps) => {
   const intl = useIntl();
 
@@ -60,7 +62,11 @@ const WebCardPostsList = ({
             />
           }
         />
-        <PostList webCard={webCard} canPlay={hasFocus} />
+        <PostList
+          webCard={webCard}
+          canPlay={hasFocus}
+          onPressAuthor={toggleFlip}
+        />
       </SafeAreaView>
     </Container>
   );

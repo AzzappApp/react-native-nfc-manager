@@ -41,6 +41,11 @@ type AuthorCartoucheProps = ViewProps & {
    * @type {boolean}
    */
   activeLink?: boolean;
+
+  /**
+   * callback when the cartouche is pressed
+   */
+  onPress?: () => void;
 };
 /**
  * Author cartouche
@@ -52,6 +57,7 @@ const AuthorCartouche = ({
   author: authorKey,
   activeLink = false,
   hideUserName = false,
+  onPress,
   ...props
 }: AuthorCartoucheProps) => {
   const author = useFragment(
@@ -118,6 +124,26 @@ const AuthorCartouche = ({
         : null,
     [foreground?.id, foreground?.uri],
   );
+
+  if (onPress) {
+    return (
+      <PressableOpacity
+        style={[styles.container, style]}
+        onPress={onPress}
+        {...props}
+      >
+        <AuthorCartoucheContent
+          mediaSource={mediaSource}
+          foregroundSource={foregroundSource}
+          foregroundColor={foregroundColor}
+          hideUserName={hideUserName}
+          variant={variant}
+          cardColors={cardColors}
+          author={author}
+        />
+      </PressableOpacity>
+    );
+  }
 
   if (activeLink) {
     return (

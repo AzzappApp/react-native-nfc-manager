@@ -62,11 +62,16 @@ export type PostRendererProps = ViewProps & {
    */
   paused?: boolean;
   /**
-   * iniital time of the video
+   * initial time of the video
    *
    * @type {(number | null)}
    */
   initialTime?: number | null;
+
+  /**
+   * callback when the author cartouche is pressed
+   */
+  onPressAuthor?: () => void;
 };
 
 export type PostRendererHandle = {
@@ -84,6 +89,7 @@ const PostRenderer = (
     videoDisabled = false,
     paused = false,
     initialTime,
+    onPressAuthor,
     ...props
   }: PostRendererProps,
   forwardedRef: ForwardedRef<PostRendererHandle>,
@@ -142,6 +148,7 @@ const PostRenderer = (
           author={author}
           style={styles.authorCartoucheStyle}
           activeLink
+          onPress={onPressAuthor}
         />
 
         <IconButton

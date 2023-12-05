@@ -9,9 +9,11 @@ import type { WebCardPostsList_webCard$key } from '@azzapp/relay/artifacts/WebCa
 const WebCardPostsList = ({
   webCard,
   canPlay,
+  onPressAuthor,
 }: {
   webCard: PostRendererFragment_author$key & WebCardPostsList_webCard$key;
   canPlay: boolean;
+  onPressAuthor: () => void;
 }) => {
   const { data, loadNext, refetch, hasNext, isLoadingNext } =
     usePaginationFragment(
@@ -72,6 +74,7 @@ const WebCardPostsList = ({
   return (
     <PostList
       posts={posts}
+      onPressAuthor={onPressAuthor}
       author={webCard}
       canPlay={canPlay}
       refreshing={refreshing}
