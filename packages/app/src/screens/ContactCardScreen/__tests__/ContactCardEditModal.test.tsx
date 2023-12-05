@@ -123,7 +123,7 @@ describe('ContactCardEditModal', () => {
     act(() => {
       expect(
         screen.getAllByTestId('contact-card-edit-modal-field'),
-      ).toHaveLength(7);
+      ).toHaveLength(6);
 
       const newPhoneInput = screen.getByDisplayValue('');
       if (newPhoneInput) {
