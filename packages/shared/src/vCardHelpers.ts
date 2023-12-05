@@ -50,7 +50,10 @@ export const buildVCard = (contactCardData: string) => {
     vcard.addBirthday(contactCard.birthday.split('T')[0]);
 
   contactCard.socials.forEach(social => {
-    vcard.addSocial(social[1], social[0]);
+    vcard.addSocial(
+      `https://${social[1].replace(/^https?:\/\//, '')}`,
+      social[0],
+    );
   });
 
   return {
