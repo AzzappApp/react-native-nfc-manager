@@ -25,12 +25,15 @@ const saveContactCard: MutationResolvers['saveContactCard'] = async (
     throw new GraphQLError(ERRORS.INVALID_REQUEST);
   }
 
+  if ('birthday' in data) {
+    data.birthday = data.birthday ?? undefined;
+  }
+
   const updates: Partial<Profile> = {
     contactCard: {
       ...(profile.contactCard ??
         (await buildDefaultContactCard(webCard, userId))),
-      ...data,
-      birthday: data.birthday ?? undefined,
+      ...(data as Partial<Profile['contactCard']>),
     },
     lastContactCardUpdate: new Date(),
     contactCardIsPrivate: !!isPrivate,
