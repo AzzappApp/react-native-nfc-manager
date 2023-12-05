@@ -49,6 +49,16 @@ const FollowersScreenList = ({
       webCardKey,
     );
 
+  useEffect(() => {
+    // We need to refetch to see new coming followers (specially when we follow another webCard we have)
+    refetch(
+      { first: 10, after: null },
+      {
+        fetchPolicy: 'store-and-network',
+      },
+    );
+  }, [refetch]);
+
   const [isRefreshing, setIsRefreshing] = useState(false);
 
   const onEndReached = useCallback(() => {
