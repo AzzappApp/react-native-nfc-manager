@@ -251,6 +251,7 @@ const SocialInputComponent = ({
             {mask}
           </Text>
         }
+        placeholder={icon === 'website' ? 'https://' : undefined}
         clearButtonMode="always"
         value={localValue}
         onChangeText={onChangeText}
