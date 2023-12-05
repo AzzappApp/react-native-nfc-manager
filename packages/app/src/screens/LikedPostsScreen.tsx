@@ -29,6 +29,7 @@ const likedPostsScreenQuery = graphql`
 
 const LikedPostsScreen = ({
   preloadedQuery,
+  hasFocus,
 }: RelayScreenProps<LikedPostsRoute, LikedPostsScreenQuery>) => {
   const styles = useStyleSheet(styleSheet);
   const intl = useIntl();
@@ -115,7 +116,7 @@ const LikedPostsScreen = ({
       />
       <PostList
         posts={posts}
-        canPlay
+        canPlay={hasFocus}
         refreshing={refreshing}
         onEndReached={onEndReached}
         onRefresh={onRefresh}
