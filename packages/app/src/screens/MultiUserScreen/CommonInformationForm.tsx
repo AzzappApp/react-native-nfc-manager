@@ -191,9 +191,9 @@ const CommonInformationForm = ({
             name="company"
             render={({ field: { onChange, onBlur, value } }) => (
               <View style={styles.field}>
-                <Text variant="smallbold">
+                <Text variant="smallbold" style={styles.fieldName}>
                   <FormattedMessage
-                    defaultMessage="Company name"
+                    defaultMessage="Company"
                     description="Company name field registered for the contact card"
                   />
                 </Text>
@@ -243,6 +243,7 @@ const styleSheet = createStyleSheet(appearance => ({
     textAlign: 'center',
     paddingHorizontal: 40,
   },
+  fieldName: { minWidth: 100 },
   ...buildContactCardModalStyleSheet(appearance),
 }));
 

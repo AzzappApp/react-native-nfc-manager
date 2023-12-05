@@ -108,7 +108,12 @@ const ContactCardEditField = <TFieldValues extends FieldValues>({
         //   originX: -50,
         // }).withCallback(callback)}
       >
-        <View style={styles.fieldContainer}>
+        <View
+          style={[
+            styles.fieldContainer,
+            { minWidth: labelValues && labelValues.length > 0 ? 100 : 0 },
+          ]}
+        >
           <IconButton
             variant="icon"
             icon="delete_filled"

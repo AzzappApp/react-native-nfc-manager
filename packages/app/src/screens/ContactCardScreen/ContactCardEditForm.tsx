@@ -136,7 +136,7 @@ const ContactCardEditForm = (props: ContactCardEditFormProps) => {
             name="firstName"
             render={({ field: { onChange, onBlur, value } }) => (
               <View style={styles.field}>
-                <Text variant="smallbold">
+                <Text variant="smallbold" style={styles.fieldTitle}>
                   <FormattedMessage
                     defaultMessage="First name"
                     description="First name registered for the contact card"
@@ -163,7 +163,7 @@ const ContactCardEditForm = (props: ContactCardEditFormProps) => {
             name="lastName"
             render={({ field: { onChange, onBlur, value } }) => (
               <View style={styles.field}>
-                <Text variant="smallbold">
+                <Text variant="smallbold" style={styles.fieldTitle}>
                   <FormattedMessage
                     defaultMessage="Last name"
                     description="Last name field registered for the contact card"
@@ -189,7 +189,7 @@ const ContactCardEditForm = (props: ContactCardEditFormProps) => {
             name="title"
             render={({ field: { onChange, onBlur, value } }) => (
               <View style={styles.field}>
-                <Text variant="smallbold">
+                <Text variant="smallbold" style={styles.fieldTitle}>
                   <FormattedMessage
                     defaultMessage="Title"
                     description="Job title field registered for the contact card"
@@ -221,9 +221,9 @@ const ContactCardEditForm = (props: ContactCardEditFormProps) => {
               name="company"
               render={({ field: { onChange, onBlur, value } }) => (
                 <View style={styles.field}>
-                  <Text variant="smallbold">
+                  <Text variant="smallbold" style={styles.fieldTitle}>
                     <FormattedMessage
-                      defaultMessage="Company name"
+                      defaultMessage="Company"
                       description="Company name field registered for the contact card"
                     />
                   </Text>
@@ -354,6 +354,7 @@ const styleSheet = createStyleSheet(appearance => ({
     borderColor: appearance === 'dark' ? colors.black : colors.white,
     overflow: 'visible',
   },
+  fieldTitle: { minWidth: 100 },
   avatarContainer: [{ overflow: 'visible' }, shadow(appearance, 'bottom')],
   ...buildContactCardModalStyleSheet(appearance),
 }));

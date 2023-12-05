@@ -40,9 +40,8 @@ export const buildContactCardModalStyleSheet = (appareance: ColorSchemeName) =>
       padding: 0,
       backgroundColor: 'transparent',
       borderWidth: 0,
-      paddingLeft: 0,
+      paddingLeft: 16,
       paddingRight: 0,
-      textAlign: 'right',
       ...textStyles.medium,
     },
   }) as const;
