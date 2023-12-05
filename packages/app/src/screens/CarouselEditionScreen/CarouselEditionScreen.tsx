@@ -365,11 +365,10 @@ const CarouselEditionScreen = ({
     async ({
       uri,
       width,
-      height,
       editionParameters,
       filter,
+      aspectRatio,
     }: ImagePickerResult) => {
-      const aspectRatio = width / height;
       const exportWidth = Math.min(MODULE_IMAGE_MAX_WIDTH, width);
       const exportHeight = exportWidth / aspectRatio;
       const localPath = await exportLayersToImage({

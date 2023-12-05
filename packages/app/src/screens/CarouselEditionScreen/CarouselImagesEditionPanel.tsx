@@ -80,7 +80,7 @@ const CarouselImagesEditionPanel = ({
       />
       <View style={styles.content}>
         <IconButton
-          icon={squareRatio ? 'carroussel_square' : 'carrousel_original_ratio'}
+          icon={squareRatio ? 'carrousel_square' : 'carrousel_original_ratio'}
           onPress={() => onSquareRatioChange(!squareRatio)}
           style={styles.squareRatioButton}
           accessibilityRole="togglebutton"

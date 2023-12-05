@@ -82,10 +82,10 @@ const icons = {
   get carrousel_original_ratio() {
     return require('./assets/carroussel_original_ratio.png');
   },
-  get carroussel_square() {
+  get carrousel_square() {
     return require('./assets/carroussel_square.png');
   },
-  get carroussel_webcards() {
+  get carrousel_webcards() {
     return require('./assets/carroussel_webcards.png');
   },
   get chat() {
