@@ -13,7 +13,7 @@ const WebCardPostsList = ({
 }: {
   webCard: PostRendererFragment_author$key & WebCardPostsList_webCard$key;
   canPlay: boolean;
-  onPressAuthor: () => void;
+  onPressAuthor?: () => void;
 }) => {
   const { data, loadNext, refetch, hasNext, isLoadingNext } =
     usePaginationFragment(
