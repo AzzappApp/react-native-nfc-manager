@@ -209,13 +209,13 @@ const WebCardColorPicker = ({
     if (optimisticUpdate.current || editedColor) {
       Alert.alert(
         intl.formatMessage({
-          defaultMessage: 'Cancel changes?',
+          defaultMessage: 'Cancel changes on colors?',
           description:
             'Webcard ColorPicker component unsaved changes alert title',
         }),
         intl.formatMessage({
           defaultMessage:
-            'You have unsaved changes, do you really want to cancel?',
+            'You have unsaved changes on colors, do you really want to cancel?',
           description:
             'Webcard ColorPicker component unsaved changes alert message',
         }),
