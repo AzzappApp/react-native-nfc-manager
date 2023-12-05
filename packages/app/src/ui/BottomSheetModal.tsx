@@ -203,7 +203,7 @@ const BottomSheetModal = ({
       <>
         {!disableGestureInteraction && showGestureIndicator && (
           <View
-            style={styles.gestureInteractionIndicator}
+            style={[styles.gestureInteractionIndicator]}
             pointerEvents="box-none"
           />
         )}

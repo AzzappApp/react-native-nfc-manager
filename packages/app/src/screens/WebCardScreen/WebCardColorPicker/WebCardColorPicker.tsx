@@ -8,7 +8,7 @@ import {
   useState,
 } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { View } from 'react-native';
+import { Alert, View } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { useRelayEnvironment } from 'react-relay';
 import { useDebouncedCallback } from 'use-debounce';
@@ -203,11 +203,53 @@ const WebCardColorPicker = ({
   ]);
 
   const onRequestCloseInner = useCallback(() => {
-    if (optimisticUpdate.current || editedColor || saving) {
+    if (saving) {
+      return;
+    }
+    if (optimisticUpdate.current || editedColor) {
+      Alert.alert(
+        intl.formatMessage({
+          defaultMessage: 'Cancel changes?',
+          description:
+            'Webcard ColorPicker component unsaved changes alert title',
+        }),
+        intl.formatMessage({
+          defaultMessage:
+            'You have unsaved changes, do you really want to cancel?',
+          description:
+            'Webcard ColorPicker component unsaved changes alert message',
+        }),
+        [
+          {
+            text: intl.formatMessage({
+              defaultMessage: 'No',
+              description:
+                'Webcard ColorPicker component unsaved changes alert Cancel button label',
+            }),
+            onPress: () => void 0,
+            style: 'cancel',
+          },
+          {
+            text: intl.formatMessage({
+              defaultMessage: 'Yes',
+              description:
+                'Webcard ColorPicker component unsaved changes alert Yes button label',
+            }),
+            onPress: () => {
+              if (optimisticUpdate.current) {
+                environment.revertUpdate(optimisticUpdate.current);
+                optimisticUpdate.current = null;
+              }
+              onRequestClose();
+            },
+          },
+        ],
+      );
+
       return;
     }
     onRequestClose();
-  }, [editedColor, onRequestClose, saving]);
+  }, [editedColor, environment, intl, onRequestClose, saving]);
 
   const onDone = useCallback(() => {
     if (!editedColor) {
