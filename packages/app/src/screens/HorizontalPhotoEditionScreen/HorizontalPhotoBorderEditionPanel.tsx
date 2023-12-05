@@ -3,6 +3,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import { StyleSheet, View } from 'react-native';
 import { graphql, useFragment } from 'react-relay';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
+import { swapColor } from '@azzapp/shared/cardHelpers';
 import {
   HORIZONTAL_PHOTO_MAX_BORDER_RADIUS,
   HORIZONTAL_PHOTO_MAX_BORDER_WIDTH,
@@ -73,6 +74,11 @@ const HorizontalPhotoBorderEditionPanel = ({
     graphql`
       fragment HorizontalPhotoBorderEditionPanel_webCard on WebCard {
         ...WebCardColorPicker_webCard
+        cardColors {
+          primary
+          dark
+          light
+        }
       }
     `,
     webCardKey,
@@ -99,11 +105,14 @@ const HorizontalPhotoBorderEditionPanel = ({
             description: 'Border color tab label in HorizontalPhoto edition',
           }),
           rightElement: (
-            <ColorPreview color={borderColor} style={{ marginLeft: 5 }} />
+            <ColorPreview
+              color={swapColor(borderColor, webCard?.cardColors)}
+              style={{ marginLeft: 5 }}
+            />
           ),
         },
       ]),
-    [borderColor, intl],
+    [borderColor, intl, webCard?.cardColors],
   );
 
   return (
