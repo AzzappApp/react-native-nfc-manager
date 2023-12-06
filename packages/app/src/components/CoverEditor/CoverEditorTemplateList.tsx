@@ -624,15 +624,7 @@ const CoverEditorTemplateList = ({
         {cardColors && (
           <>
             {renderTryptich({ item: cardColors!, index: -1 })}
-            <View
-              style={{
-                width: 5,
-                height: 5,
-                backgroundColor: colors.black,
-                borderRadius: 5,
-                marginLeft: GAP,
-              }}
-            />
+            <View style={styles.separator} />
           </>
         )}
         <MaskedView
@@ -896,5 +888,12 @@ const styleSheet = createStyleSheet(appearance => ({
   colorPaletteSelected: {
     borderColor: appearance === 'dark' ? colors.white : colors.black,
     transform: [{ scale: 1 }],
+  },
+  separator: {
+    width: 5,
+    height: 5,
+    backgroundColor: appearance === 'light' ? colors.black : colors.white,
+    borderRadius: 5,
+    marginLeft: GAP,
   },
 }));
