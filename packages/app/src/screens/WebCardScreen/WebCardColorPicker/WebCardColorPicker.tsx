@@ -1,9 +1,17 @@
 import { pick } from 'lodash';
-import { Suspense, useEffect, useMemo, useRef, useState } from 'react';
+import {
+  Suspense,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { View } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { useRelayEnvironment } from 'react-relay';
+import { useDebouncedCallback } from 'use-debounce';
 import {
   DEFAULT_COLOR_PALETTE,
   type ColorPalette,
@@ -73,7 +81,9 @@ const WebCardColorPicker = ({
   const environment = useRelayEnvironment();
   const optimisticUpdate = useRef<OptimisticUpdateFunction | null>(null);
 
-  const onSave = () => {
+  const intl = useIntl();
+
+  const onSave = useCallback(() => {
     if (saving) {
       return;
     }
@@ -106,50 +116,71 @@ const WebCardColorPicker = ({
         });
       },
     });
-  };
+  }, [
+    saving,
+    webCard?.cardColors,
+    webCard?.id,
+    commit,
+    colorPalette,
+    onRequestClose,
+    intl,
+  ]);
 
-  const onUpdateColorPalette = (newPalette: ColorPalette) => {
-    if (webCard?.id) {
-      const update = {
-        storeUpdater: cardColorsStoreUpdater(webCard.id, newPalette),
-      };
+  const onUpdateColorPalette = useCallback(
+    (newPalette: ColorPalette) => {
+      if (webCard?.id) {
+        const update = {
+          storeUpdater: cardColorsStoreUpdater(webCard.id, newPalette),
+        };
 
-      if (optimisticUpdate.current) {
-        environment.replaceUpdate(optimisticUpdate.current, update);
-      } else {
-        environment.applyUpdate(update);
+        if (optimisticUpdate.current) {
+          environment.replaceUpdate(optimisticUpdate.current, update);
+        } else {
+          environment.applyUpdate(update);
+        }
+        optimisticUpdate.current = update;
       }
-      optimisticUpdate.current = update;
-    }
-  };
+    },
+    [environment, webCard?.id],
+  );
 
-  const intl = useIntl();
-  const onChangeColorInPalette = (color: string) => {
-    const newPalette = { ...colorPalette };
-    switch (editedColor) {
-      case 'dark':
-        newPalette.dark = color;
-        break;
-      case 'light':
-        newPalette.light = color;
-        break;
-      case 'primary':
-        newPalette.primary = color;
-        break;
-      default:
-        break;
-    }
-    onUpdateColorPalette(newPalette);
-  };
+  const onChangeColorInPalette = useCallback(
+    (color: string) => {
+      const newPalette = { ...colorPalette };
+      switch (editedColor) {
+        case 'dark':
+          newPalette.dark = color;
+          break;
+        case 'light':
+          newPalette.light = color;
+          break;
+        case 'primary':
+          newPalette.primary = color;
+          break;
+        default:
+          break;
+      }
+      onUpdateColorPalette(newPalette);
+    },
+    [colorPalette, editedColor, onUpdateColorPalette],
+  );
+
+  const onChangeColorInPaletteDebounced = useDebouncedCallback(
+    onChangeColorInPalette,
+    150,
+  );
 
   const previousEditedColorValueRef = useRef<string | null>(null);
 
-  const onEditColor = (color: 'dark' | 'light' | 'primary') => {
-    setEditedColor(color);
-    previousEditedColorValueRef.current = colorPalette[color];
-  };
+  const onEditColor = useCallback(
+    (color: 'dark' | 'light' | 'primary') => {
+      setEditedColor(color);
+      previousEditedColorValueRef.current = colorPalette[color];
+    },
+    [colorPalette],
+  );
 
-  const onCancelInner = () => {
+  const onCancelInner = useCallback(() => {
     if (!editedColor) {
       if (optimisticUpdate.current) {
         environment.revertUpdate(optimisticUpdate.current);
@@ -163,22 +194,28 @@ const WebCardColorPicker = ({
       });
       setEditedColor(null);
     }
-  };
+  }, [
+    colorPalette,
+    editedColor,
+    environment,
+    onRequestClose,
+    onUpdateColorPalette,
+  ]);
 
-  const onRequestCloseInner = () => {
+  const onRequestCloseInner = useCallback(() => {
     if (optimisticUpdate.current || editedColor || saving) {
       return;
     }
     onRequestClose();
-  };
+  }, [editedColor, onRequestClose, saving]);
 
-  const onDone = () => {
+  const onDone = useCallback(() => {
     if (!editedColor) {
       onSave();
     } else {
       setEditedColor(null);
     }
-  };
+  }, [editedColor, onSave]);
 
   return (
     <BottomSheetModal
@@ -188,7 +225,7 @@ const WebCardColorPicker = ({
         <Text variant="large">
           {editedColor ? (
             <FormattedMessage
-              defaultMessage="Edit linked coor"
+              defaultMessage="Edit linked color"
               description="Webcard ColorPicker component header Edit"
             />
           ) : (
@@ -240,7 +277,7 @@ const WebCardColorPicker = ({
       {editedColor ? (
         <ColorChooser
           value={colorPalette[editedColor]}
-          onColorChange={onChangeColorInPalette}
+          onColorChange={onChangeColorInPaletteDebounced}
         />
       ) : (
         <Suspense
