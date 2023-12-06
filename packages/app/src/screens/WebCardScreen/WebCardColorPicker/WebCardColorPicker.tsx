@@ -185,7 +185,7 @@ const WebCardColorPicker = ({
       height={height}
       visible={visible}
       headerTitle={
-        <Text>
+        <Text variant="large">
           {editedColor ? (
             <FormattedMessage
               defaultMessage="Edit linked coor"
