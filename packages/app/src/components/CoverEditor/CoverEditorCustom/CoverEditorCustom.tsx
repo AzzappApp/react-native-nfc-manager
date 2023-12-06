@@ -449,7 +449,7 @@ const CoverEditorCustom = ({
             <CoverPreviewRenderer
               kind={kind}
               uri={uri}
-              maskUri={segmented ? maskMedia?.uri : null}
+              maskUri={segmentationEnabled && segmented ? maskMedia?.uri : null}
               foregroundId={foreground?.id}
               foregroundImageUri={foreground?.uri}
               foregroundImageTintColor={foregroundColor}
