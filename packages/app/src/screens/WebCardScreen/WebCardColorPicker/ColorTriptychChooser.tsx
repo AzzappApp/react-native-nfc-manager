@@ -81,10 +81,21 @@ const ColorTriptychChooser = ({
           item={item}
           onSelectTripTych={onSelectTriptychColor}
           disabled={saving}
+          selected={
+            item.primary === colorPalette.primary &&
+            item.dark === colorPalette.dark &&
+            item.light === colorPalette.light
+          }
         />
       );
     },
-    [onSelectTriptychColor, saving],
+    [
+      colorPalette.dark,
+      colorPalette.light,
+      colorPalette.primary,
+      onSelectTriptychColor,
+      saving,
+    ],
   );
 
   const colorPalettesList: ColorPaletteItem[] = useMemo(() => {
@@ -235,6 +246,7 @@ const ColorTriptychChooser = ({
           data={colorPalettesList}
           keyExtractor={paletteKeyExtract}
           renderItem={renderTryptich}
+          extraData={colorPalette}
         />
       </View>
     </View>
@@ -306,10 +318,12 @@ const TriptychItemComponent = ({
   item,
   onSelectTripTych,
   disabled,
+  selected,
 }: {
   item: ColorPaletteItem;
   onSelectTripTych: (colorPalette: ColorPaletteItem) => void;
   disabled?: boolean;
+  selected?: boolean;
 }) => {
   const styles = useStyleSheet(stylesheet);
 
@@ -327,7 +341,10 @@ const TriptychItemComponent = ({
       }}
     >
       <PressableOpacity
-        style={[styles.colorPaletteContainer]}
+        style={[
+          styles.colorPaletteContainer,
+          selected && styles.colorPaletteSelected,
+        ]}
         onPress={onPress}
         disabled={disabled}
         disabledOpacity={1}
@@ -366,6 +383,10 @@ const stylesheet = createStyleSheet(appearance => ({
     transform: [{ scale: 0.8 }],
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  colorPaletteSelected: {
+    borderColor: appearance === 'dark' ? colors.white : colors.black,
+    transform: [{ scale: 1 }],
   },
   separatingDot: {
     marginLeft: 5,
