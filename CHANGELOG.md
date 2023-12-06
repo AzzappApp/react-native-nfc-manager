@@ -1,5 +1,12 @@
-## 0.5.2-canary.30
+## 0.5.2-canary.31
 
+* **fix:**  - **Media:** [#1790](https://github.com/AzzappApp/azzapp/pull/1790) media screen is not updated when actor is changed ([#1889](https://github.com/AzzappApp/azzapp/pull/1889))
+* **fix:**  - **webCard:** [#1834](https://github.com/AzzappApp/azzapp/pull/1834) separate font size & spacing sliders
+* **fix:**  - **posts:** [#1822](https://github.com/AzzappApp/azzapp/pull/1822) case with fast tapping on allow
+* **ui:**  - **ContactCard:** [#1703](https://github.com/AzzappApp/azzapp/pull/1703) Contact Card with capital letters
+* **fix:**  - update schema
+* **fix:**  - **webCard:** [#1788](https://github.com/AzzappApp/azzapp/pull/1788) use isPrivate field from webCard
+* **fix:**  - **contactCard:** [#1668](https://github.com/AzzappApp/azzapp/pull/1668) align text to the left on contact card form
 * **fix:**  - **contactCard:** [#1720](https://github.com/AzzappApp/azzapp/pull/1720) protocol is needed in vcard to be seen as whole url
 * **fix:**  - **post:** [#1794](https://github.com/AzzappApp/azzapp/pull/1794) don’t play video when screen isn’t focused
 * **fix:**  - test
