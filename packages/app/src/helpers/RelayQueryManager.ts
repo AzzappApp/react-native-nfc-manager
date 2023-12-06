@@ -130,20 +130,22 @@ const resetQueries = () => {
  * @returns a preloaded query or null if the query is not in the cache
  */
 export const useManagedQuery = (screenId: string) => {
-  const [queryInfos, setQueryInfos] = useState(activeQueries.get(screenId));
+  const [queryInfos, setQueryInfos] = useState(() => {
+    const { preloadedQuery, actorId } = activeQueries.get(screenId) ?? {};
+    return preloadedQuery && actorId ? { preloadedQuery, actorId } : null;
+  });
   useEffect(
     () =>
       addListener(screenId, () => {
-        setQueryInfos(activeQueries.get(screenId));
+        setQueryInfos(() => {
+          const { preloadedQuery, actorId } = activeQueries.get(screenId) ?? {};
+          return preloadedQuery && actorId ? { preloadedQuery, actorId } : null;
+        });
       }),
     [screenId],
   );
-  return queryInfos
-    ? {
-        preloadedQuery: queryInfos.preloadedQuery,
-        actorId: queryInfos.actorId,
-      }
-    : null;
+
+  return queryInfos;
 };
 
 /**
