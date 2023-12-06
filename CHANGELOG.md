@@ -1,5 +1,6 @@
-## 0.5.2-canary.32
+## 0.5.2-canary.33
 
+* **ui:**  - [#1767](https://github.com/AzzappApp/azzapp/pull/1767) center preview/hide icon
 * **tests:**  - add unit tests on contact card + multi user
 * **fix:**  - add missing address label
 * **fix:**  - missing social profiles
