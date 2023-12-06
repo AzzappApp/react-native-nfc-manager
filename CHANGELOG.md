@@ -1,4 +1,4 @@
-## 0.5.2-canary.33
+## 0.5.2-canary.34
 
 * **ui:**  - [#1767](https://github.com/AzzappApp/azzapp/pull/1767) center preview/hide icon
 * **tests:**  - add unit tests on contact card + multi user
