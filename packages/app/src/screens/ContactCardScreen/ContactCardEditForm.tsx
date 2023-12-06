@@ -336,7 +336,7 @@ const styleSheet = createStyleSheet(appearance => ({
     alignItems: 'center',
     paddingTop: 10,
     paddingBottom: 20,
-    backgroundColor: 'white',
+    backgroundColor: appearance === 'dark' ? colors.black : colors.white,
   },
   noAvatar: {
     width: AVATAR_WIDTH,

@@ -49,10 +49,19 @@ export type GraphQLContext = {
   locale: string;
   loaders: Loaders;
   sessionMemoized: <T>(t: () => T) => T;
+  sendMail: (p: {
+    email: string;
+    subject: string;
+    text: string;
+    html: string;
+  }) => Promise<void>;
+  sendSms: (p: { phoneNumber: string; body: string }) => Promise<void>;
 };
 
 export const createGraphQLContext = (
-  locale: string = DEFAULT_LOCALE,
+  sendMail: GraphQLContext['sendMail'],
+  sendSms: GraphQLContext['sendSms'],
+  locale = DEFAULT_LOCALE,
 ): Omit<GraphQLContext, 'auth'> => {
   const loaders = createLoaders();
 
@@ -68,6 +77,8 @@ export const createGraphQLContext = (
 
   return {
     locale,
+    sendMail,
+    sendSms,
     cardUsernamesToRevalidate: new Set<string>(),
     loaders,
     sessionMemoized,

@@ -203,7 +203,48 @@ const { handleRequest } = createYoga({
   context: ({ request }) => {
     const locale = request.headers.get('azzapp-locale');
 
-    return createGraphQLContext(locale ?? undefined);
+    const sendMail = async (p: {
+      email: string;
+      subject: string;
+      text: string;
+      html: string;
+    }) => {
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API_ENDPOINT}/sendMail`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            authorization: process.env.API_SERVER_TOKEN ?? '',
+          },
+          body: JSON.stringify(p),
+        },
+      );
+
+      if (!res.ok) {
+        throw new Error('Error sending email');
+      }
+    };
+
+    const sendSms = async (p: { phoneNumber: string; body: string }) => {
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API_ENDPOINT}/sendSms`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            authorization: process.env.API_SERVER_TOKEN ?? '',
+          },
+          body: JSON.stringify(p),
+        },
+      );
+
+      if (!res.ok) {
+        throw new Error('Error sending sms');
+      }
+    };
+
+    return createGraphQLContext(sendMail, sendSms, locale ?? undefined);
   },
 });
 

@@ -50,3 +50,10 @@ export const getSessionData = async (): Promise<SessionData | null> => {
   }
   return null;
 };
+
+export const checkServerAuth = () => {
+  const token = headers().get('authorization') ?? null;
+  if (token !== process.env.API_SERVER_TOKEN) {
+    throw new Error(ERRORS.INVALID_TOKEN);
+  }
+};

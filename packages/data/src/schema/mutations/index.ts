@@ -8,6 +8,7 @@ import declineOwnership from './declineOwnership';
 import deleteModules from './deleteModules';
 import deletePostComment from './deletePostComment';
 import duplicateModule from './duplicateModule';
+import inviteUser from './inviteUser';
 import loadCardTemplate from './loadCardTemplate';
 import {
   saveBlockTextModule,
@@ -84,4 +85,5 @@ export const Mutation: MutationResolvers = {
   declineOwnership,
   updateWebCardUserName,
   updateProfile,
+  inviteUser,
 };

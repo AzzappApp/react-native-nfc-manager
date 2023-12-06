@@ -1,18 +1,17 @@
-import { fromGlobalId } from 'graphql-relay';
 import { forwardRef, useImperativeHandle, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useIntl } from 'react-intl';
 import * as mime from 'react-native-mime-types';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
+import { graphql, useMutation } from 'react-relay';
 import { type ContactCard } from '@azzapp/shared/contactCardHelpers';
 import { encodeMediaId } from '@azzapp/shared/imagesHelpers';
 import { textStyles } from '#theme';
 import ScreenModal from '#components/ScreenModal';
-import { getAuthState } from '#helpers/authStore';
 import { getFileName } from '#helpers/fileHelpers';
 import { addLocalCachedMediaFile } from '#helpers/mediaHelpers';
-import { inviteUser, uploadMedia, uploadSign } from '#helpers/MobileWebAPI';
+import { uploadMedia, uploadSign } from '#helpers/MobileWebAPI';
 import ContactCardEditForm from '#screens/ContactCardScreen/ContactCardEditForm';
 import Button from '#ui/Button';
 import Container from '#ui/Container';
@@ -21,8 +20,10 @@ import Text from '#ui/Text';
 import MultiUserAddForm from './MultiUserAddForm';
 import type { ContactCardEditFormValues } from '#screens/ContactCardScreen/ContactCardEditModalSchema';
 import type { MultiUserAddFormValues } from './MultiUserAddForm';
+import type { MultiUserAddModal_InviteUserMutation } from '@azzapp/relay/artifacts/MultiUserAddModal_InviteUserMutation.graphql';
 import type { ForwardedRef } from 'react';
 import type { Control } from 'react-hook-form';
+
 // eslint-disable-next-line @typescript-eslint/ban-types
 type MultiUserAddModalProps = {
   beforeClose: () => void;
@@ -116,6 +117,16 @@ const MultiUserAddModal = (
 
   const currentContact = watch('contact');
 
+  const [commit] = useMutation<MultiUserAddModal_InviteUserMutation>(graphql`
+    mutation MultiUserAddModal_InviteUserMutation($input: InviteUserInput!) {
+      inviteUser(input: $input) {
+        profile {
+          id
+        }
+      }
+    }
+  `);
+
   const submit = handleSubmit(
     async ({ avatar, ...data }) => {
       let avatarId: string | undefined = undefined;
@@ -152,14 +163,9 @@ const MultiUserAddModal = (
         socials,
       } = data;
 
-      const webCardId = getAuthState().webCardId;
-
-      const id = webCardId ? fromGlobalId(webCardId).id : null;
-
       const input = {
         email: user.email,
         phoneNumber: user.phoneNumber,
-        webCardId: id,
         profileRole: data.role,
         contactCard: {
           firstName,
@@ -176,29 +182,34 @@ const MultiUserAddModal = (
       };
 
       // @TODO retrieve local user information to generate webcard (phone with label isntead of just number, etc.)
-      try {
-        await inviteUser(input);
+      commit({
+        variables: {
+          input,
+        },
+        onCompleted: () => {
+          if (avatarId && avatar?.uri) {
+            addLocalCachedMediaFile(
+              `${'image'.slice(0, 1)}:${avatarId}`,
+              'image',
+              avatar.uri,
+            );
+          }
 
-        if (avatarId && avatar?.uri) {
-          addLocalCachedMediaFile(
-            `${'image'.slice(0, 1)}:${avatarId}`,
-            'image',
-            avatar.uri,
-          );
-        }
-
-        beforeClose();
-        setVisible(false);
-      } catch {
-        Toast.show({
-          type: 'error',
-          text1: intl.formatMessage({
-            defaultMessage: 'Error, could invite user. Please try again.',
-            description:
-              'Error toast message when inviting user from MultiUserAddModal',
-          }),
-        });
-      }
+          beforeClose();
+          setVisible(false);
+        },
+        onError: e => {
+          console.error(e);
+          Toast.show({
+            type: 'error',
+            text1: intl.formatMessage({
+              defaultMessage: 'Error, could invite user. Please try again.',
+              description:
+                'Error toast message when inviting user from MultiUserAddModal',
+            }),
+          });
+        },
+      });
     },
     error => {
       console.log(error);
