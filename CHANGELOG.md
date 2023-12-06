@@ -1,5 +1,30 @@
-## 0.5.2-canary.29
+## 0.5.2-canary.30
 
+* **fix:**  - **contactCard:** [#1720](https://github.com/AzzappApp/azzapp/pull/1720) protocol is needed in vcard to be seen as whole url
+* **fix:**  - **post:** [#1794](https://github.com/AzzappApp/azzapp/pull/1794) don’t play video when screen isn’t focused
+* **fix:**  - test
+* **fix:**  - birthday may be removed without editing it
+* **fix:**  - **contactCard:** [#1326](https://github.com/AzzappApp/azzapp/pull/1326) add date picker for birthday
+* **fix:**  - unit test
+* **fix:**  - **signup:** [#1755](https://github.com/AzzappApp/azzapp/pull/1755) precise that you can type at most 32 characters
+* **fix:**  - **webCard:** [#1791](https://github.com/AzzappApp/azzapp/pull/1791) update followers list when we open the screen
+* **fix:**  - **webCard:** [#1783](https://github.com/AzzappApp/azzapp/pull/1783) keep chosen aspect ratio in image picker
+* **fix:**  - **webCard:** [#1785](https://github.com/AzzappApp/azzapp/pull/1785) swap colors to see correct one in border edition
+* **fix:**  - **webCard:** [#1717](https://github.com/AzzappApp/azzapp/pull/1717) case when we re-add same color + remove current used color
+* **fix:**  - **webCard:** [#1786](https://github.com/AzzappApp/azzapp/pull/1786) missing top/bottom labels
+* **fix:**  - **webCard:** [#1782](https://github.com/AzzappApp/azzapp/pull/1782) limit number of shown digits in sliders
+* **fix:**  - **webCard:** [#1447](https://github.com/AzzappApp/azzapp/pull/1447) cancel confirmation when tapping outside bottom sheet
+* **fix:**  - types
+* **fix:**  - **webCard:** [#1518](https://github.com/AzzappApp/azzapp/pull/1518) flip card when author is pressed
+* **fix:**  - **webCard:** [#1738](https://github.com/AzzappApp/azzapp/pull/1738) border overlap content
+* **fix:**  - **webCard:** [#1647](https://github.com/AzzappApp/azzapp/pull/1647) add different placeholders
+* **fix:**  - **webCard:** [#1461](https://github.com/AzzappApp/azzapp/pull/1461) add placeholder for website
+* **fix:**  - **webCard:** [#1737](https://github.com/AzzappApp/azzapp/pull/1737) show selected tryptich
+* **fix:**  - **webCard:** [#1723](https://github.com/AzzappApp/azzapp/pull/1723) wrong color in dark mode for bullet separator
+* **fix:**  - **webCard:** [#1756](https://github.com/AzzappApp/azzapp/pull/1756) remove background opacity transition
+* **perf:**  - **webCard:** [#1773](https://github.com/AzzappApp/azzapp/pull/1773) debounce color change to fix laggy color chooser
+* **fix:**  - **cover:** [#1805](https://github.com/AzzappApp/azzapp/pull/1805) don’t apply mask when segmentation is not enabled
+* **fix:**  - **webCard:** [#1672](https://github.com/AzzappApp/azzapp/pull/1672) wrong font size on webcard color picker
 * **fix:**  - clear error on submit
 * **fix:**  - update error handler change username
 * **feat:**  - multi user detail ([#1837](https://github.com/AzzappApp/azzapp/pull/1837))
