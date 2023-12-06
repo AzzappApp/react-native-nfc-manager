@@ -9,6 +9,7 @@ import {
   uniqueIndex,
 } from 'drizzle-orm/mysql-core';
 import db, { cols } from './db';
+import { FilteredWebCardSuggestionTable } from './filteredWebCardSuggestions';
 import { FollowTable } from './follows';
 import { WebCardTable } from './webCards';
 import type { DbTransaction } from './db';
@@ -151,8 +152,9 @@ export const updateProfile = async (
 };
 export const getRecommendedWebCards = async (
   profileId: string,
-): Promise<WebCard[]> =>
-  db
+  webCardId: string,
+): Promise<WebCard[]> => {
+  return db
     .selectDistinct({
       WebCard: WebCardTable,
     })
@@ -162,15 +164,24 @@ export const getRecommendedWebCards = async (
       FollowTable,
       and(
         eq(FollowTable.followingId, WebCardTable.id),
-        eq(FollowTable.followerId, ProfileTable.webCardId),
+        eq(FollowTable.followerId, webCardId),
+      ),
+    )
+    .leftJoin(
+      FilteredWebCardSuggestionTable,
+      and(
+        eq(FilteredWebCardSuggestionTable.profileId, profileId),
+        eq(FilteredWebCardSuggestionTable.webCardId, WebCardTable.id),
       ),
     )
     .where(
       and(
         ne(ProfileTable.id, profileId),
         isNull(FollowTable.followerId),
+        isNull(FilteredWebCardSuggestionTable.profileId),
         eq(WebCardTable.cardIsPublished, true),
       ),
     )
     .orderBy(desc(WebCardTable.createdAt))
     .then(res => res.map(({ WebCard }) => WebCard));
+};

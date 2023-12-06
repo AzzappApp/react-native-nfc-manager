@@ -8,6 +8,7 @@ import declineOwnership from './declineOwnership';
 import deleteModules from './deleteModules';
 import deletePostComment from './deletePostComment';
 import duplicateModule from './duplicateModule';
+import filterWebCardSuggestion from './filterWebCardSuggestion';
 import inviteUser from './inviteUser';
 import loadCardTemplate from './loadCardTemplate';
 import {
@@ -86,4 +87,5 @@ export const Mutation: MutationResolvers = {
   updateWebCardUserName,
   updateProfile,
   inviteUser,
+  filterWebCardSuggestion,
 };

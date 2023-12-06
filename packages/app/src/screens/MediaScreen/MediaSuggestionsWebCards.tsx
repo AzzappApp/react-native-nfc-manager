@@ -10,9 +10,14 @@ import { useIntl } from 'react-intl';
 import { View } from 'react-native';
 import Animated, { FadeOut } from 'react-native-reanimated';
 import Toast from 'react-native-toast-message';
-import { graphql, useFragment, usePaginationFragment } from 'react-relay';
+import {
+  ConnectionHandler,
+  graphql,
+  useFragment,
+  useMutation,
+  usePaginationFragment,
+} from 'react-relay';
 import CoverLink_webCardFragment from '@azzapp/relay/artifacts/CoverLink_webCard.graphql';
-
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
 import { isEditor } from '@azzapp/shared/profileHelpers';
 import { colors, shadow } from '#theme';
@@ -23,6 +28,7 @@ import useAuthState from '#hooks/useAuthState';
 import useToggleFollow from '#hooks/useToggleFollow';
 import ActivityIndicator from '#ui/ActivityIndicator';
 import Button from '#ui/Button';
+import IconButton from '#ui/IconButton';
 import type { CoverLinkProps } from '#components/CoverLink';
 import type { MediaSuggestionsWebCards_viewer$key } from '@azzapp/relay/artifacts/MediaSuggestionsWebCards_viewer.graphql';
 import type { StyleProp, ViewStyle } from 'react-native';
@@ -168,6 +174,18 @@ const CoverLinkWithOptions = ({
 
   const intl = useIntl();
 
+  const [commit] = useMutation(graphql`
+    mutation MediaSuggestionsWebCardsListMutation(
+      $input: FilterWebCardSuggestionInput!
+    ) {
+      filterWebCardSuggestion(input: $input) {
+        webCard {
+          id
+        }
+      }
+    }
+  `);
+
   return (
     <Animated.View style={styles.coverContainerStyle} exiting={FadeOut}>
       <CoverLink {...props} width={135} />
@@ -210,6 +228,48 @@ const CoverLinkWithOptions = ({
                 }),
               });
             }
+          }}
+        />
+        <IconButton
+          icon="close"
+          size={29}
+          onPress={() => {
+            commit({
+              variables: {
+                input: {
+                  webCardId: props.webCardId,
+                },
+              },
+              updater: store => {
+                const viewer = store.getRoot().getLinkedRecord('viewer');
+                if (viewer) {
+                  const connectionRecordSuggestions =
+                    ConnectionHandler.getConnection(
+                      viewer,
+                      'Viewer_recommendedWebCards',
+                    );
+
+                  if (connectionRecordSuggestions) {
+                    ConnectionHandler.deleteNode(
+                      connectionRecordSuggestions,
+                      props.webCardId,
+                    );
+                  }
+                }
+              },
+              onError: e => {
+                console.error(e);
+                Toast.show({
+                  type: 'error',
+                  text1: intl.formatMessage({
+                    defaultMessage:
+                      'Error, could not remove this WebCard. Please try again.',
+                    description:
+                      'Error message when trying to remove a WebCard from suggestions',
+                  }),
+                });
+              },
+            });
           }}
         />
       </View>

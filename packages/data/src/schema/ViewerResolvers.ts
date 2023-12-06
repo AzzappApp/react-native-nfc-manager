@@ -140,13 +140,24 @@ export const Viewer: ViewerResolvers = {
       args,
     );
   },
-  recommendedWebCards: async (_, args, { auth }) => {
+  recommendedWebCards: async (_, args, { auth, loaders }) => {
     const { profileId } = auth;
+
     if (!profileId) {
       return connectionFromArray([], args);
     }
+
+    const profile = await loaders.Profile.load(profileId);
+
+    if (!profile) {
+      return connectionFromArray([], args);
+    }
+
     // TODO dummy implementation just to test frontend
-    return connectionFromArray(await getRecommendedWebCards(profileId), args);
+    return connectionFromArray(
+      await getRecommendedWebCards(profile.id, profile.webCardId),
+      args,
+    );
   },
   searchPosts: async (_, args) => {
     const posts = await db

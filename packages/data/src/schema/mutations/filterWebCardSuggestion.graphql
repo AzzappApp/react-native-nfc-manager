@@ -1,0 +1,13 @@
+extend type Mutation {
+  filterWebCardSuggestion(
+    input: FilterWebCardSuggestionInput!
+  ): FilterWebCardSuggestionPayload!
+}
+
+input FilterWebCardSuggestionInput {
+  webCardId: ID!
+}
+
+type FilterWebCardSuggestionPayload {
+  webCard: WebCard!
+}
