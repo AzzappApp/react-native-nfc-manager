@@ -1,5 +1,11 @@
-## 0.5.2-canary.31
+## 0.5.2-canary.32
 
+* **tests:**  - add unit tests on contact card + multi user
+* **fix:**  - add missing address label
+* **fix:**  - missing social profiles
+* **fix:**  - test
+* **fix:**  - unit test
+* **fix:**  - reduce qr code size
 * **fix:**  - **Media:** [#1790](https://github.com/AzzappApp/azzapp/pull/1790) media screen is not updated when actor is changed ([#1889](https://github.com/AzzappApp/azzapp/pull/1889))
 * **fix:**  - **webCard:** [#1834](https://github.com/AzzappApp/azzapp/pull/1834) separate font size & spacing sliders
 * **fix:**  - **posts:** [#1822](https://github.com/AzzappApp/azzapp/pull/1822) case with fast tapping on allow
