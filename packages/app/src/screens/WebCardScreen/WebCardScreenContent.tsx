@@ -276,7 +276,7 @@ const WebCardScreenContent = ({
 
   const backgroundStyle = useAnimatedStyle(() => {
     return {
-      opacity: 1 - (editTransiton?.value ?? 0),
+      opacity: editTransiton?.value ? 0 : 1,
     };
   }, []);
 
