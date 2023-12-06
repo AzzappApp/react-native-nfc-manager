@@ -87,10 +87,42 @@ const SocialLinksLinksEditionPanel = ({
     for (let index = 0; index < SOCIAL_LINKS.length; index++) {
       const link = SOCIAL_LINKS[index];
       const value = links.find(item => item?.socialId === link.id);
+
+      let placeholder: string | undefined = undefined;
+
+      if (link.id === 'website') {
+        placeholder = intl.formatMessage({
+          defaultMessage: 'Enter an URL',
+          description: 'Placeholder for the website link',
+        });
+      }
+
+      if (link.id === 'phone') {
+        placeholder = intl.formatMessage({
+          defaultMessage: 'Enter a phone number',
+          description: 'Placeholder for the phone link',
+        });
+      }
+
+      if (link.id === 'sms') {
+        placeholder = intl.formatMessage({
+          defaultMessage: 'Enter a phone number',
+          description: 'Placeholder for the sms link',
+        });
+      }
+
+      if (link.id === 'mail') {
+        placeholder = intl.formatMessage({
+          defaultMessage: 'Enter an email',
+          description: 'Placeholder for the mail link',
+        });
+      }
+
       consolidatedLinks.push({
         ...link,
         position: NO_POSITION_INDEX,
         ...value,
+        placeholder,
       });
     }
     return consolidatedLinks.sort((a, b) => {
@@ -100,7 +132,7 @@ const SocialLinksLinksEditionPanel = ({
         return a.position - b.position;
       }
     });
-  }, [links]);
+  }, [intl, links]);
 
   const renderItem = (
     item: {
@@ -108,6 +140,7 @@ const SocialLinksLinksEditionPanel = ({
       link?: string | undefined;
       position: number;
       mask: string;
+      placeholder?: string;
     },
     panGesture: PanGesture,
   ) => {
@@ -116,6 +149,7 @@ const SocialLinksLinksEditionPanel = ({
       <SocialInput
         icon={item.id}
         mask={item.mask}
+        placeholder={item.placeholder}
         value={value}
         onChangeLink={onChangeLink}
         panGesture={panGesture}
@@ -186,10 +220,12 @@ const SocialInputComponent = ({
   value,
   onChangeLink,
   panGesture,
+  placeholder,
 }: {
   icon: SocialIcons;
   link?: string | undefined;
   mask: string;
+  placeholder?: string;
   value: string;
   onChangeLink: (id: SocialIcons, value: string) => void;
   panGesture: PanGesture;
@@ -251,7 +287,7 @@ const SocialInputComponent = ({
             {mask}
           </Text>
         }
-        placeholder={icon === 'website' ? 'https://' : undefined}
+        placeholder={placeholder}
         clearButtonMode="always"
         value={localValue}
         onChangeText={onChangeText}
