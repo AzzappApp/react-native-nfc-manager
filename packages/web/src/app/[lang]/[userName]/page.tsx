@@ -29,7 +29,8 @@ type ProfilePageProps = {
   };
 };
 
-const ProfilePage = async ({ params: { userName } }: ProfilePageProps) => {
+const ProfilePage = async ({ params }: ProfilePageProps) => {
+  const userName = params.userName.toLowerCase();
   const webCard = await getWebCardByUserName(userName);
 
   if (!webCard?.cardIsPublished) {
@@ -105,6 +106,7 @@ const ProfilePage = async ({ params: { userName } }: ProfilePageProps) => {
       cover={<CoverRenderer webCard={webCard} media={media} />}
       cardBackgroundColor={cardBackgroundColor}
       lastModuleBackgroundColor={lastModuleBackgroundColor}
+      userName={params.userName}
     />
   );
 };
