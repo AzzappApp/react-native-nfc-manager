@@ -9,14 +9,20 @@ import {
 } from '@azzapp/shared/coverHelpers';
 import ERRORS from '@azzapp/shared/errors';
 import { isEditor } from '@azzapp/shared/profileHelpers';
-import { checkMedias, db, referencesMedias, updateWebCard } from '#domains';
+import {
+  checkMedias,
+  db,
+  getProfilesPosts,
+  referencesMedias,
+  updateWebCard,
+} from '#domains';
 import type { WebCard } from '#domains';
 import type { MutationResolvers } from '#schema/__generated__/types';
 
 const saveCover: MutationResolvers['saveCover'] = async (
   _,
   { input },
-  { auth, cardUsernamesToRevalidate, loaders },
+  { auth, cardUsernamesToRevalidate, postsToRevalidate, loaders },
 ) => {
   const { profileId } = auth;
   if (!profileId) {
@@ -122,6 +128,11 @@ const saveCover: MutationResolvers['saveCover'] = async (
     });
 
     cardUsernamesToRevalidate.add(webCard.userName);
+    const posts = await getProfilesPosts(webCard.id);
+    posts.forEach(post =>
+      postsToRevalidate.add({ id: post.id, userName: webCard.userName }),
+    );
+
     return { webCard: updatedWebCard };
   } catch (error) {
     console.log(error);
