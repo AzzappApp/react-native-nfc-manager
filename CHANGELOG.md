@@ -1,5 +1,6 @@
-## 0.5.2-canary.36
+## 0.5.2-canary.37
 
+* **feat:**  - **media:** [#1080](https://github.com/AzzappApp/azzapp/pull/1080) filter suggested webcards
 * **feat:**  - add bunch of color luts
 * **fix:**  - 🐛 soft redirect to username lowercase ([#1925](https://github.com/AzzappApp/azzapp/pull/1925))
 * **fix:**  - 🐛 add revalidation for post page on publish webcard ([#1927](https://github.com/AzzappApp/azzapp/pull/1927))
