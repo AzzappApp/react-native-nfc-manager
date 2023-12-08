@@ -211,12 +211,16 @@ const WebCardForm = (
       return;
     }
 
+    const defaultActivity = companyActivities[0];
+    const defaultActivityId = defaultActivity ? defaultActivity.id : undefined;
+
     return new Promise<void>((resolve, reject) => {
       commit({
         variables: {
           input: {
             ...data,
             webCardCategoryId,
+            companyActivityId: data.companyActivityId || defaultActivityId,
           },
         },
         updater: store => {
