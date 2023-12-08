@@ -143,6 +143,7 @@ const SimpleTextRenderer = ({
   return (
     <CardModuleBackground
       {...props}
+      key={background?.uri}
       backgroundUri={background?.uri}
       backgroundColor={swapColor(
         backgroundStyle?.backgroundColor,
