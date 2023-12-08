@@ -1,5 +1,8 @@
-## 0.5.2-canary.34
+## 0.5.2-canary.35
 
+* **fix:**  - 🐛 soft redirect to username lowercase ([#1925](https://github.com/AzzappApp/azzapp/pull/1925))
+* **fix:**  - 🐛 add revalidation for post page on publish webcard ([#1927](https://github.com/AzzappApp/azzapp/pull/1927))
+* **fix:**  - 🐛 use default activity when creating webcard ([#1922](https://github.com/AzzappApp/azzapp/pull/1922))
 * **ui:**  - [#1767](https://github.com/AzzappApp/azzapp/pull/1767) center preview/hide icon
 * **tests:**  - add unit tests on contact card + multi user
 * **fix:**  - add missing address label
