@@ -1,13 +1,13 @@
 import { GraphQLError } from 'graphql';
 import ERRORS from '@azzapp/shared/errors';
 import { isAdmin } from '@azzapp/shared/profileHelpers';
-import { updateWebCard } from '#domains';
+import { getProfilesPosts, updateWebCard } from '#domains';
 import type { MutationResolvers } from '#schema/__generated__/types';
 
 const publishCard: MutationResolvers['publishCard'] = async (
   _,
   _args,
-  { auth, cardUsernamesToRevalidate, loaders },
+  { auth, cardUsernamesToRevalidate, postsToRevalidate, loaders },
 ) => {
   const { profileId } = auth;
   if (!profileId) {
@@ -41,6 +41,12 @@ const publishCard: MutationResolvers['publishCard'] = async (
   }
 
   cardUsernamesToRevalidate.add(webCard.userName);
+
+  const posts = await getProfilesPosts(webCard.id);
+  posts.forEach(post =>
+    postsToRevalidate.add({ id: post.id, userName: webCard.userName }),
+  );
+
   return {
     webCard: {
       ...webCard,
@@ -52,7 +58,7 @@ const publishCard: MutationResolvers['publishCard'] = async (
 const unpublishCard: MutationResolvers['unpublishCard'] = async (
   _,
   _args,
-  { auth, loaders, cardUsernamesToRevalidate },
+  { auth, loaders, cardUsernamesToRevalidate, postsToRevalidate },
 ) => {
   const profileId = auth.profileId;
   if (!profileId) {
@@ -82,6 +88,12 @@ const unpublishCard: MutationResolvers['unpublishCard'] = async (
   }
 
   cardUsernamesToRevalidate.add(webCard.userName);
+
+  const posts = await getProfilesPosts(webCard.id);
+  posts.forEach(post =>
+    postsToRevalidate.add({ id: post.id, userName: webCard.userName }),
+  );
+
   return {
     webCard: {
       ...webCard,

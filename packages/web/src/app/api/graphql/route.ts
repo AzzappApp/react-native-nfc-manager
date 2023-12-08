@@ -36,6 +36,11 @@ function useRevalidatePages(): Plugin<GraphQLContext> {
               revalidatePath(`/${username}`, 'page');
             },
           );
+          payload.args.contextValue.postsToRevalidate.forEach(
+            ({ userName, id }) => {
+              revalidatePath(`/${userName}/${id}`, 'page');
+            },
+          );
         },
       };
     },

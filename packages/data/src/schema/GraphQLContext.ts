@@ -42,6 +42,7 @@ import type {
 
 export type GraphQLContext = {
   cardUsernamesToRevalidate: Set<string>;
+  postsToRevalidate: Set<{ userName: string; id: string }>;
   auth: {
     userId?: string;
     profileId?: string;
@@ -80,6 +81,7 @@ export const createGraphQLContext = (
     sendMail,
     sendSms,
     cardUsernamesToRevalidate: new Set<string>(),
+    postsToRevalidate: new Set<{ userName: string; id: string }>(),
     loaders,
     sessionMemoized,
   };

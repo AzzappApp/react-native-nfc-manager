@@ -130,17 +130,20 @@ export const getWebCardsPostsWithMedias = async (
  */
 export const getProfilesPosts = async (
   webCardId: string,
-  limit: number,
-  offset: number,
+  limit?: number,
+  offset?: number,
 ) => {
-  const res = await db
+  const query = db
     .select()
     .from(PostTable)
     .where(eq(PostTable.webCardId, webCardId))
-    .orderBy(desc(PostTable.createdAt))
-    .limit(limit)
-    .offset(offset);
-  return res;
+    .orderBy(desc(PostTable.createdAt));
+
+  if (limit) {
+    return query.limit(limit).offset(offset ?? 0);
+  }
+
+  return query;
 };
 
 /**
