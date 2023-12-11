@@ -1,5 +1,10 @@
-## 0.5.2-canary.39
+## 0.5.2-canary.40
 
+* **fix:**  - **post:** [#1676](https://github.com/AzzappApp/azzapp/pull/1676) update `Post I liked` list on like
+* **fix:**  - **account:** [#1755](https://github.com/AzzappApp/azzapp/pull/1755) change error message everywhere
+* **fix:**  - **webcard:** [#1523](https://github.com/AzzappApp/azzapp/pull/1523) wrong preview height on desktop
+* **fix:**  - **modules:** [#1745](https://github.com/AzzappApp/azzapp/pull/1745) svg backgrounds with repeat are mixed
+* **fix:**  - **post:** [#1822](https://github.com/AzzappApp/azzapp/pull/1822) separate allowLikes & allowComments to avoid side effects on fast clicking
 * **fix:**  - 🐛 only allow owner to access webcard parameter ([#1959](https://github.com/AzzappApp/azzapp/pull/1959))
 * **fix:**  - **home:** [#1762](https://github.com/AzzappApp/azzapp/pull/1762) wrong case in contactCard field ([#1946](https://github.com/AzzappApp/azzapp/pull/1946))
 * **feat:**  - **media:** [#1080](https://github.com/AzzappApp/azzapp/pull/1080) filter suggested webcards
