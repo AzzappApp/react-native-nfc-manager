@@ -1,4 +1,4 @@
-## 0.5.2-canary.40
+## 0.5.2-canary.41
 
 * **fix:**  - **post:** [#1676](https://github.com/AzzappApp/azzapp/pull/1676) update `Post I liked` list on like
 * **fix:**  - **account:** [#1755](https://github.com/AzzappApp/azzapp/pull/1755) change error message everywhere
