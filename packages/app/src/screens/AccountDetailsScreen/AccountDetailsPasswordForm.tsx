@@ -197,7 +197,7 @@ const AccountDetailsPasswordForm = ({
               {errors.newPassword ? (
                 <Text variant="error">
                   <FormattedMessage
-                    defaultMessage="Password should contain at least 8 characters, a number, an uppercase letter and a lowercase letter"
+                    defaultMessage="Password should contain at least 8 characters and at most 32 characters, a number, an uppercase letter and a lowercase letter"
                     description="Account details - error message when password is not compliant with our rules"
                   />
                 </Text>

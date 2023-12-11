@@ -184,7 +184,7 @@ const ResetPasswordScreen = ({
             {errors.password && (
               <Text variant="error" style={{ textAlign: 'center' }}>
                 <FormattedMessage
-                  defaultMessage="Password should contain at least 8 characters, a number, an uppercase letter and a lowercase letter"
+                  defaultMessage="Password should contain at least 8 characters and at most 32 characters, a number, an uppercase letter and a lowercase letter"
                   description="Reset password Screen - error message when password is not compliant with our rules"
                 />
               </Text>
