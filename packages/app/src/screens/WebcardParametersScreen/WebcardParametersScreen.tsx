@@ -385,8 +385,11 @@ const WebcardParametersScreen = ({
 
         <Text variant="xsmall" style={styles.descriptionText}>
           <FormattedMessage
-            defaultMessage="Changing the WebCarda category will not impact your current WebCarda, but it will change what suggested photos and videos you are offered for your WebCarda Cover."
+            defaultMessage="Changing the WebCard{azzappA} category will not impact your current WebCard{azzappA}, but it will change what suggested photos and videos you are offered for your WebCard{azzappA} Cover."
             description="Description message for category and activity field in webcard parameters"
+            values={{
+              azzappA: <Text variant="azzapp">a</Text>,
+            }}
           />
         </Text>
         {profile && (
