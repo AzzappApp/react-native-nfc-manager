@@ -1,5 +1,6 @@
-## 0.5.2-canary.38
+## 0.5.2-canary.39
 
+* **fix:**  - 🐛 only allow owner to access webcard parameter ([#1959](https://github.com/AzzappApp/azzapp/pull/1959))
 * **fix:**  - **home:** [#1762](https://github.com/AzzappApp/azzapp/pull/1762) wrong case in contactCard field ([#1946](https://github.com/AzzappApp/azzapp/pull/1946))
 * **feat:**  - **media:** [#1080](https://github.com/AzzappApp/azzapp/pull/1080) filter suggested webcards
 * **feat:**  - add bunch of color luts
