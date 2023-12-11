@@ -61,12 +61,9 @@ const updater = (
       'nbFollowers',
     );
   }
-
-  const viewer = store.getRoot().getLinkedRecord('viewer');
-
-  if (viewer) {
+  if (currentWebCard) {
     const connectionRecord = ConnectionHandler.getConnection(
-      viewer,
+      currentWebCard,
       'Account_followings',
       { userName: userNameFilter ?? '' },
     );
@@ -81,7 +78,7 @@ const updater = (
     }
 
     const connectionRecordHome = ConnectionHandler.getConnection(
-      viewer,
+      currentWebCard,
       'WebCard_followings',
     );
 
@@ -95,7 +92,7 @@ const updater = (
     }
 
     ConnectionHandler.getConnection(
-      viewer,
+      currentWebCard,
       'WebCard_followingsPosts',
     )?.invalidateRecord();
   }

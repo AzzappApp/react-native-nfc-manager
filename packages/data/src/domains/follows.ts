@@ -33,8 +33,12 @@ export type NewFollow = InferInsertModel<typeof FollowTable>;
  * @param targetId - The id of the potential followed webCard
  * @returns true if the webCard is following the target, false otherwise
  */
-export const isFollowing = async (webCardId: string, targetId: string) =>
-  db
+export const isFollowing = async (
+  webCardId: string,
+  targetId: string,
+  trx: DbTransaction = db,
+) =>
+  trx
     .select()
     .from(FollowTable)
     .where(
@@ -43,7 +47,6 @@ export const isFollowing = async (webCardId: string, targetId: string) =>
         eq(FollowTable.followingId, targetId),
       ),
     )
-
     .then(res => Boolean(res.pop()));
 
 /**
@@ -87,3 +90,24 @@ export const unfollows = (
     )
 
     .then(() => void 0);
+/**
+ *
+ *
+ * @param {string} followerId
+ * @param {string} followingId
+ * @param {DbTransaction} [trx=db]
+ */
+export const getFollows = (
+  followerId: string,
+  followingId: string,
+  trx: DbTransaction = db,
+) =>
+  trx
+    .select()
+    .from(FollowTable)
+    .where(
+      and(
+        eq(FollowTable.followerId, followerId),
+        eq(FollowTable.followingId, followingId),
+      ),
+    );

@@ -55,6 +55,16 @@ const FollowingsScreenList = ({ webCard: webCardKey }: FollowingsListProps) => {
   const toggleFollow = useToggleFollow(debouncedSearch);
 
   useEffect(() => {
+    // We need to refetch to see new coming followers (specially when we follow another webCard we have)
+    refetch(
+      { first: 10, after: null },
+      {
+        fetchPolicy: 'store-and-network',
+      },
+    );
+  }, [refetch]);
+
+  useEffect(() => {
     if (debouncedSearch) {
       setIsRefreshing(true);
       const { dispose } = refetch(

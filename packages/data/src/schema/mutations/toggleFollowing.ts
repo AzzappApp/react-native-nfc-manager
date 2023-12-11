@@ -3,7 +3,7 @@ import { GraphQLError } from 'graphql';
 import { fromGlobalId } from 'graphql-relay';
 import ERRORS from '@azzapp/shared/errors';
 import { isEditor } from '@azzapp/shared/profileHelpers';
-import { WebCardTable, db, follows, unfollows } from '#domains';
+import { WebCardTable, db, follows, isFollowing, unfollows } from '#domains';
 import type { WebCard } from '#domains';
 import type { MutationResolvers } from '#schema/__generated__/types';
 
@@ -43,6 +43,16 @@ const toggleFollowing: MutationResolvers['toggleFollowing'] = async (
 
   try {
     await db.transaction(async trx => {
+      //fix: https://github.com/AzzappApp/azzapp/issues/1931 && https://github.com/AzzappApp/azzapp/issues/1930
+      // if the frontend allows spamming add or remove, this will cause the nbFollowers and nbFollowings to be negative (or opposite)
+      // is chking the actual status not enough, we can imaging splitting the function in 2 add/remove
+      const currentlyFollowing = await isFollowing(profile.webCardId, targetId);
+      if (follow && currentlyFollowing) {
+        return;
+      }
+      if (!follow && !currentlyFollowing) {
+        return;
+      }
       await trx
         .update(WebCardTable)
         .set({
