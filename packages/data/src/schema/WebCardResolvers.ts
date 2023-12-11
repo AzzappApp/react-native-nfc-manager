@@ -105,22 +105,21 @@ export const WebCard: WebCardResolvers = {
     const first = args.first ?? 50;
     const offset = args.after ? cursorToDate(args.after) : null;
 
-    const followersProfiles = await getFollowerProfiles(webCard.id, {
+    const followersWebcard = await getFollowerProfiles(webCard.id, {
       limit: first + 1,
       after: offset,
       userName: args.userName,
     });
-
+    const sizedWebCard = followersWebcard.slice(0, first);
     return connectionFromDateSortedItems(
-      followersProfiles.map(p => ({
-        ...p.UserProfile,
-        ...p.Profile,
+      sizedWebCard.map(p => ({
+        ...p.webCard,
         followCreatedAt: p.followCreatedAt,
       })),
       {
         getDate: post => post.followCreatedAt,
         // approximations that should be good enough, and avoid a query
-        hasNextPage: followersProfiles.length > first,
+        hasNextPage: followersWebcard.length > first,
         hasPreviousPage: offset !== null,
       },
     );
@@ -135,11 +134,10 @@ export const WebCard: WebCardResolvers = {
       userName: args.userName,
     });
 
-    const sizedProfile = followingsWebCard.slice(0, first);
+    const sizedWebCard = followingsWebCard.slice(0, first);
     return connectionFromDateSortedItems(
-      sizedProfile.map(p => ({
-        ...p.UserProfile,
-        ...p.Profile,
+      sizedWebCard.map(p => ({
+        ...p.webCard,
         followCreatedAt: p.followCreatedAt,
       })),
       {

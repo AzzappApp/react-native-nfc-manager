@@ -156,12 +156,10 @@ export const getFollowerProfiles = async (
 ) =>
   db
     .select({
-      UserProfile: ProfileTable,
-      Profile: WebCardTable,
+      webCard: WebCardTable,
       followCreatedAt: FollowTable.createdAt,
     })
-    .from(ProfileTable)
-    .innerJoin(WebCardTable, eq(WebCardTable.id, ProfileTable.webCardId))
+    .from(WebCardTable)
     .innerJoin(FollowTable, eq(FollowTable.followerId, WebCardTable.id))
     .where(
       and(
@@ -194,12 +192,10 @@ export const getFollowingsWebCard = async (
 ) =>
   db
     .select({
-      Profile: WebCardTable,
-      UserProfile: ProfileTable,
+      webCard: WebCardTable,
       followCreatedAt: FollowTable.createdAt,
     })
-    .from(ProfileTable)
-    .innerJoin(WebCardTable, eq(WebCardTable.id, ProfileTable.webCardId))
+    .from(WebCardTable)
     .innerJoin(FollowTable, eq(FollowTable.followingId, WebCardTable.id))
     .where(
       and(
@@ -210,6 +206,7 @@ export const getFollowingsWebCard = async (
           : undefined,
       ),
     )
+    .groupBy(WebCardTable.id)
     .orderBy(desc(FollowTable.createdAt))
     .limit(limit);
 
