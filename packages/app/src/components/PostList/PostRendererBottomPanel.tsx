@@ -170,9 +170,12 @@ const PostRendererBottomPanel = ({
 
   const updatePost = useCallback(
     (input: { allowComments: boolean } | { allowLikes: boolean }) => {
-      ('allowComments' in input
-        ? commitUpdatePostComments
-        : commitUpdatePostLikes)({
+      const update =
+        'allowComments' in input
+          ? commitUpdatePostComments
+          : commitUpdatePostLikes;
+
+      update({
         variables: {
           input: {
             postId: post.id,
