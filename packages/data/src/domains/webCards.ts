@@ -206,7 +206,6 @@ export const getFollowingsWebCard = async (
           : undefined,
       ),
     )
-    .groupBy(WebCardTable.id)
     .orderBy(desc(FollowTable.createdAt))
     .limit(limit);
 
