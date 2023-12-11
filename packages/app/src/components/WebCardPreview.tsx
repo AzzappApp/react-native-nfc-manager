@@ -152,7 +152,7 @@ const WebCardPreview = (
           style={[{ flex: 1 }, style]}
           contentOffset={contentOffset}
           contentContainerStyle={{
-            paddingBottom: contentPaddingBottom * scale,
+            paddingBottom: contentPaddingBottom / scale,
           }}
         >
           <View ref={contentRef}>
@@ -160,14 +160,7 @@ const WebCardPreview = (
               webCard={webCard}
               overrideCardStyle={cardStyle}
               overrideLastModule={cardModules.at(-1)}
-              style={{
-                position: 'absolute',
-                width: '100%',
-                height: '150%',
-                top: '-25%',
-                left: 0,
-                zIndex: -1,
-              }}
+              style={styles.webCardBackground}
             />
             {viewMode === 'desktop' ? (
               <CoverRendererPreviewDesktop webCard={webCard} videoEnabled />
@@ -205,6 +198,14 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     flexDirection: 'row',
     gap: 10,
+  },
+  webCardBackground: {
+    position: 'absolute',
+    width: '100%',
+    height: '150%',
+    top: '-25%',
+    left: 0,
+    zIndex: -1,
   },
 });
 
