@@ -68,12 +68,13 @@ const HomeStatisticsChart = ({
         return {
           day: d.toISOString(),
           data: Array(profiles?.length ?? 0).fill({
-            contactcardScans: 0,
+            contactCardScans: 0,
             webCardViews: 0,
             likes: 0,
           }),
         };
       });
+
       profiles.forEach((profile, indexProfile) => {
         if (profile.statsSummary) {
           profile.statsSummary.forEach(stats => {
@@ -110,12 +111,12 @@ const HomeStatisticsChart = ({
     const filtered = chartsData.reduce((acc: StatsData[], group) => {
       group.data.forEach((data, index) => {
         if (!acc[index]) {
-          acc[index] = { contactcardScans: 0, webCardViews: 0, likes: 0 };
+          acc[index] = { contactCardScans: 0, webCardViews: 0, likes: 0 };
         }
 
-        acc[index].contactcardScans = Math.max(
-          acc[index].contactcardScans,
-          data.contactcardScans,
+        acc[index].contactCardScans = Math.max(
+          acc[index].contactCardScans,
+          data.contactCardScans,
         );
         acc[index].webCardViews = Math.max(
           acc[index].webCardViews,
@@ -128,7 +129,7 @@ const HomeStatisticsChart = ({
     }, []);
     return filtered.flatMap(obj => [
       obj.webCardViews,
-      obj.contactcardScans,
+      obj.contactCardScans,
       obj.likes,
     ]);
   }, [chartsData]);
@@ -251,7 +252,7 @@ const AnimatedBarChartItem = ({
   //we need to flatten the matrixTransform, cannot find a way to interpolate a matrix
   const flattenedData = item.data.flatMap(obj => [
     obj.webCardViews,
-    obj.contactcardScans,
+    obj.contactCardScans,
     obj.likes,
   ]);
   const animatedStyle = useAnimatedStyle(() => {
@@ -353,7 +354,7 @@ const AnimatedBarChartItem = ({
 const AnimatedBarChart = memo(AnimatedBarChartItem);
 
 export type StatsData = {
-  contactcardScans: number;
+  contactCardScans: number;
   webCardViews: number;
   likes: number;
 };
