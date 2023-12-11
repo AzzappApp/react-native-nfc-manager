@@ -1,5 +1,9 @@
-## 0.5.2-canary.41
+## 0.5.2-canary.42
 
+* **feat:**  - 🎸 revalidate pages for posts on cover save
+* **fix:**  - typo
+* **fix:**  - remove unecessary groupBy
+* **fix:**  - simplify followers/followings request. ProfileTable out of the scope
 * **fix:**  - **post:** [#1676](https://github.com/AzzappApp/azzapp/pull/1676) update `Post I liked` list on like
 * **fix:**  - **account:** [#1755](https://github.com/AzzappApp/azzapp/pull/1755) change error message everywhere
 * **fix:**  - **webcard:** [#1523](https://github.com/AzzappApp/azzapp/pull/1523) wrong preview height on desktop
