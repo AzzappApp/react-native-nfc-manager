@@ -5,3 +5,5 @@ export const isEditor = (profileRole: string) =>
 
 export const isAdmin = (profileRole: string) =>
   profileRole === 'admin' || profileRole === 'owner';
+
+export const isOwner = (profileRole: string) => profileRole === 'owner';

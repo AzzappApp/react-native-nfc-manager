@@ -1,9 +1,9 @@
 import * as Sentry from '@sentry/react-native';
-import { memo, useCallback } from 'react';
+import { memo, useCallback, useMemo } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { Platform, StyleSheet, View, Share } from 'react-native';
 import { graphql, useFragment } from 'react-relay';
-import { isAdmin } from '@azzapp/shared/profileHelpers';
+import { isAdmin, isOwner } from '@azzapp/shared/profileHelpers';
 import { buildUserUrl } from '@azzapp/shared/urlHelpers';
 import Link from '#components/Link';
 import { dispatchGlobalEvent } from '#helpers/globalEvents';
@@ -108,10 +108,21 @@ const HomeBottomSheetPanel = ({
     }
   };
 
+  const modalHeight = useMemo(() => {
+    let height = 270;
+
+    if (!withProfile || !profileRole) return height;
+
+    if (isOwner(profileRole)) height += 50;
+    if (isAdmin(profileRole)) height += 50;
+
+    return height;
+  }, [profileRole, withProfile]);
+
   return (
     <BottomSheetModal
       visible={visible}
-      height={bottom + (withProfile ? 330 : 220)}
+      height={bottom + modalHeight}
       contentContainerStyle={styles.bottomSheetContainer}
       onDismiss={onDismiss}
       onRequestClose={close}
@@ -137,7 +148,7 @@ const HomeBottomSheetPanel = ({
               </View>
             </PressableNative>
           </Link>
-          {withProfile && profileRole && isAdmin(profileRole) && (
+          {withProfile && profileRole && isOwner(profileRole) && (
             <Link route="WEBCARD_PARAMETERS">
               <PressableNative
                 style={styles.bottomSheetOptionButton}

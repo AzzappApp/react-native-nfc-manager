@@ -2,7 +2,7 @@
 import { GraphQLError } from 'graphql';
 import { fromGlobalId } from 'graphql-relay';
 import ERRORS from '@azzapp/shared/errors';
-import { isEditor } from '@azzapp/shared/profileHelpers';
+import { isEditor, isOwner } from '@azzapp/shared/profileHelpers';
 import { updateWebCard, type Profile, type WebCard } from '#domains';
 import type { MutationResolvers } from '#schema/__generated__/types';
 import type { GraphQLContext } from '../GraphQLContext';
@@ -66,6 +66,13 @@ const updateWebCardMutation: MutationResolvers['updateWebCard'] = async (
         throw new GraphQLError(ERRORS.INVALID_REQUEST);
       }
       partialWebCard.companyActivityId = companyActivityId;
+    }
+
+    if (
+      webCard.companyActivityId !== partialWebCard.companyActivityId &&
+      !isOwner(profile.profileRole)
+    ) {
+      throw new GraphQLError(ERRORS.UNAUTHORIZED);
     }
 
     await updateWebCard(profile.webCardId, partialWebCard);
