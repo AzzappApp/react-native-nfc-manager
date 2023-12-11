@@ -1,5 +1,6 @@
-## 0.5.2-canary.37
+## 0.5.2-canary.38
 
+* **fix:**  - **home:** [#1762](https://github.com/AzzappApp/azzapp/pull/1762) wrong case in contactCard field ([#1946](https://github.com/AzzappApp/azzapp/pull/1946))
 * **feat:**  - **media:** [#1080](https://github.com/AzzappApp/azzapp/pull/1080) filter suggested webcards
 * **feat:**  - add bunch of color luts
 * **fix:**  - 🐛 soft redirect to username lowercase ([#1925](https://github.com/AzzappApp/azzapp/pull/1925))
