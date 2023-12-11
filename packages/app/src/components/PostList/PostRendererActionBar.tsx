@@ -4,7 +4,12 @@ import { memo, useCallback, useEffect, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { View, StyleSheet, Share } from 'react-native';
 import Toast from 'react-native-toast-message';
-import { useMutation, graphql, useFragment } from 'react-relay';
+import {
+  useMutation,
+  graphql,
+  useFragment,
+  ConnectionHandler,
+} from 'react-relay';
 import { useDebouncedCallback } from 'use-debounce';
 import { isEditor } from '@azzapp/shared/profileHelpers';
 import { buildPostUrl } from '@azzapp/shared/urlHelpers';
@@ -113,6 +118,29 @@ const PostRendererActionBar = ({
             const counter = webCard?.getValue('nbPostsLiked');
             if (typeof counter === 'number') {
               webCard?.setValue(counter + (add ? 1 : -1), 'nbPostsLiked');
+            }
+
+            if (webCard) {
+              const postILiked = ConnectionHandler.getConnection(
+                webCard,
+                'LikedPostsScreen_likedPosts',
+              );
+
+              if (postILiked) {
+                if (add) {
+                  if (post) {
+                    const edge = ConnectionHandler.createEdge(
+                      store,
+                      postILiked,
+                      post,
+                      'PostEdge',
+                    );
+                    ConnectionHandler.insertEdgeAfter(postILiked, edge);
+                  }
+                } else {
+                  ConnectionHandler.deleteNode(postILiked, postId);
+                }
+              }
             }
           }
         },
