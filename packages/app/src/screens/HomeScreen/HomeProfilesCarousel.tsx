@@ -274,7 +274,6 @@ const ItemRenderComponent = ({
   const isCurrent = index === currentUserIndex;
 
   const hasFocus = useScreenHasFocus();
-
   return (
     <View
       style={[
@@ -317,7 +316,7 @@ const ItemRenderComponent = ({
         <Link
           route="NEW_WEBCARD"
           params={{
-            webCardId: profile.id,
+            webCardId: profile.webCard.id,
           }}
         >
           <PressableOpacity
