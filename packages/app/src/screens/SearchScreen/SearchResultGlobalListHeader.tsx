@@ -80,6 +80,7 @@ const SearchResultGlobalListHeader = ({
           containerStyle={styles.containerStyle}
           coverStyle={styles.coverStyle}
           style={styles.coverListStyle}
+          withShadow
         />
         <Button
           variant="little_round"
@@ -149,6 +150,7 @@ const styles = StyleSheet.create({
   },
   coverListStyle: {
     height: 128,
+    overflow: 'visible',
   },
   seeAll: {
     position: 'absolute',
