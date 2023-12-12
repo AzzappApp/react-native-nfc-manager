@@ -1,5 +1,6 @@
-## 0.5.2-canary.45
+## 0.5.2-canary.46
 
+* **feat:**  - add shadow on cover  in all result
 * **fix:**  - 🐛 correctly save common information
 * **fix:**  - new webcard navigation param (id was not properly pass) ([#1972](https://github.com/AzzappApp/azzapp/pull/1972))
 * **fix:**  - **webCard:** [#1926](https://github.com/AzzappApp/azzapp/pull/1926) put in common web & mobile social links configura… ([#1961](https://github.com/AzzappApp/azzapp/pull/1961))
