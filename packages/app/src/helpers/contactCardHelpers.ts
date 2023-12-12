@@ -1,8 +1,8 @@
 import { useMemo } from 'react';
 import { useIntl } from 'react-intl';
+import { SOCIAL_NETWORK_LINKS } from '@azzapp/shared/socialLinkHelpers';
 import { colors, textStyles } from '#theme';
 import { createStyleSheet } from '#helpers/createStyles';
-import { SOCIAL_NETWORK_LINKS } from './socialLinkHelpers';
 import type { ColorSchemeName } from 'react-native';
 
 export const DELETE_BUTTON_WIDTH = 70;

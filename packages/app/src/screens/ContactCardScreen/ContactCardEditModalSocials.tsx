@@ -1,6 +1,7 @@
 import { useFieldArray } from 'react-hook-form';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { View } from 'react-native';
+import { SOCIAL_NETWORK_LINKS } from '@azzapp/shared/socialLinkHelpers';
 import { colors } from '#theme';
 import ContactCardEditModalField from '#components/ContactCard/ContactCardEditField';
 import {
@@ -8,7 +9,6 @@ import {
   useSocialLinkLabels,
 } from '#helpers/contactCardHelpers';
 import { useStyleSheet } from '#helpers/createStyles';
-import { SOCIAL_NETWORK_LINKS } from '#helpers/socialLinkHelpers';
 import Icon from '#ui/Icon';
 import PressableNative from '#ui/PressableNative';
 import Text from '#ui/Text';

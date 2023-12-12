@@ -5,7 +5,7 @@ import {
   SOCIAL_LINKS_DEFAULT_VALUES,
   getModuleDataValues,
 } from '@azzapp/shared/cardModuleHelpers';
-import { SOCIAL_LINKS } from '#helpers/socialLinkHelpers';
+import { SOCIAL_LINKS } from '@azzapp/shared/socialLinkHelpers';
 import { SocialIcon } from '#ui/Icon';
 import PressableOpacity from '#ui/PressableOpacity';
 import CardModuleBackground from './CardModuleBackground';
