@@ -1,5 +1,6 @@
-## 0.5.2-canary.42
+## 0.5.2-canary.43
 
+* **fix:**  - **webCard:** [#1926](https://github.com/AzzappApp/azzapp/pull/1926) put in common web & mobile social links configura… ([#1961](https://github.com/AzzappApp/azzapp/pull/1961))
 * **feat:**  - 🎸 revalidate pages for posts on cover save
 * **fix:**  - typo
 * **fix:**  - remove unecessary groupBy
