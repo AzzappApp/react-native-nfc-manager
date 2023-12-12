@@ -23,7 +23,7 @@ const saveCommonInformation: MutationResolvers['saveCommonInformation'] =
     };
     try {
       await db.transaction(async trx => {
-        await updateWebCard(profileId, updates, trx);
+        await updateWebCard(profile.webCardId, updates, trx);
 
         trx
           .update(ProfileTable)
