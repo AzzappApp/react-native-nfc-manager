@@ -233,6 +233,7 @@ const MultiUserDetailModal = (
 
   const firstName = watch('firstName');
   const lastName = watch('lastName');
+  const role = watch('role');
 
   const index = useSharedValue(0);
 
@@ -265,7 +266,7 @@ const MultiUserDetailModal = (
               />
             }
             middleElement={
-              <Text style={textStyles.large}>
+              <Text style={[textStyles.large, styles.name]}>
                 ~{firstName} {lastName}
               </Text>
             }
@@ -347,10 +348,24 @@ const MultiUserDetailModal = (
                 )}
               />
               <Text style={[styles.description, textStyles.xsmall]}>
-                <FormattedMessage
-                  defaultMessage="A user has a ContactCard linked to the shared webcard but cannot publish posts or edit the WebCard."
-                  description="MultiUserDetailModal - Main description for contact card"
-                />
+                {role === 'user' && (
+                  <FormattedMessage
+                    defaultMessage="A user has a ContactCard linked to the shared webcard but cannot publish posts or edit the WebCard."
+                    description="MultiUserDetailModal - User description"
+                  />
+                )}
+                {role === 'editor' && (
+                  <FormattedMessage
+                    defaultMessage="An editor can create and publish posts, edit the WebCard, but they cannot manage other aspects of the WebCard, such as settings and permissions."
+                    description="MultiUserDetailModal - Editor description"
+                  />
+                )}
+                {role === 'admin' && (
+                  <FormattedMessage
+                    defaultMessage="The admin has full control over the WebCard, including the ability to add and remove collaborators. "
+                    description="MultiUserDetailModal - admin description"
+                  />
+                )}
               </Text>
               <View style={styles.stats}>
                 {data.profiles && (
@@ -411,7 +426,10 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingVertical: 10,
   },
-  removeText: { color: colors.red400 },
+  removeText: {
+    color: colors.red400,
+    paddingBottom: 15,
+  },
   field: {
     marginTop: 10,
   },
@@ -438,6 +456,10 @@ const styles = StyleSheet.create({
     display: 'flex',
     flexDirection: 'row',
     justifyContent: 'center',
+  },
+  name: {
+    maxWidth: '50%',
+    textAlign: 'center',
   },
 });
 

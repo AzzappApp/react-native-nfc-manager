@@ -1,4 +1,4 @@
-import { Controller } from 'react-hook-form';
+import { Controller, useController } from 'react-hook-form';
 import { FormattedMessage } from 'react-intl';
 import { StyleSheet, View } from 'react-native';
 import { colors, textStyles } from '#theme';
@@ -26,6 +26,8 @@ type MultiUserAddFormProps = {
 
 const MultiUserAddForm = (props: MultiUserAddFormProps) => {
   const { contacts, currentContact, control } = props;
+
+  const { field } = useController({ control, name: 'role' });
 
   return (
     <View style={styles.form}>
@@ -106,10 +108,24 @@ const MultiUserAddForm = (props: MultiUserAddFormProps) => {
         )}
       />
       <Text style={styles.avatarLabel}>
-        <FormattedMessage
-          defaultMessage="A user has a ContactCard linked to the shared webcard but cannot publish posts or edit the WebCard."
-          description="MultiUserAddModal - Contact Card section"
-        />
+        {field.value === 'user' && (
+          <FormattedMessage
+            defaultMessage="A user has a ContactCard linked to the shared webcard but cannot publish posts or edit the WebCard."
+            description="MultiUserDetailModal - User description"
+          />
+        )}
+        {field.value === 'editor' && (
+          <FormattedMessage
+            defaultMessage="An editor can create and publish posts, edit the WebCard, but they cannot manage other aspects of the WebCard, such as settings and permissions."
+            description="MultiUserDetailModal - Editor description"
+          />
+        )}
+        {field.value === 'admin' && (
+          <FormattedMessage
+            defaultMessage="The admin has full control over the WebCard, including the ability to add and remove collaborators. "
+            description="MultiUserDetailModal - admin description"
+          />
+        )}
       </Text>
     </View>
   );
