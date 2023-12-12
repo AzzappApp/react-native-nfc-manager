@@ -470,7 +470,8 @@ const WebCardForm = (
               label={
                 intl.formatMessage(
                   {
-                    defaultMessage: 'Webcard{azzappA} name*',
+                    defaultMessage:
+                      'Webcard{azzappA} name* (You can modify it later)',
                     description: 'ProfileForm username textinput label',
                   },
                   {
@@ -487,7 +488,7 @@ const WebCardForm = (
                 accessibilityLabelledBy="userNameLabel"
                 ref={userNameInputRef}
                 placeholder={intl.formatMessage({
-                  defaultMessage: 'Choose an username',
+                  defaultMessage: 'Choose a name',
                   description: 'ProfileForm username textinput placeholder',
                 })}
                 isErrored={Boolean(error)}
