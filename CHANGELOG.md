@@ -1,4 +1,4 @@
-## 0.5.2-canary.47
+## 0.5.2-canary.48
 
 * **fix:**  - **webcard builder:** disabled header buttons when showing colors ([#1979](https://github.com/AzzappApp/azzapp/pull/1979))
 * **fix:**  - properly remove current webcard when loading a new template ([#1978](https://github.com/AzzappApp/azzapp/pull/1978))
