@@ -1,5 +1,10 @@
-## 0.5.2-canary.46
+## 0.5.2-canary.47
 
+* **fix:**  - **webcard builder:** disabled header buttons when showing colors ([#1979](https://github.com/AzzappApp/azzapp/pull/1979))
+* **fix:**  - properly remove current webcard when loading a new template ([#1978](https://github.com/AzzappApp/azzapp/pull/1978))
+* **fix:**  - saveCardStyle wrong param from before multi user ([#1976](https://github.com/AzzappApp/azzapp/pull/1976))
+* **fix:**  - text measure with empty line containing \n ([#1974](https://github.com/AzzappApp/azzapp/pull/1974))
+* **fix:**  - 🐛 sync multi user ui
 * **feat:**  - add shadow on cover  in all result
 * **fix:**  - 🐛 correctly save common information
 * **fix:**  - new webcard navigation param (id was not properly pass) ([#1972](https://github.com/AzzappApp/azzapp/pull/1972))
