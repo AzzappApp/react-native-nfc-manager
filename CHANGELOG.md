@@ -1,5 +1,6 @@
-## 0.5.2-canary.49
+## 0.5.2-canary.50
 
+* **fix:**  - **post:** [#1521](https://github.com/AzzappApp/azzapp/pull/1521) make comments scrollable on desktop ([#1990](https://github.com/AzzappApp/azzapp/pull/1990))
 * **fix:**  - configure eas env
 * **fix:**  - **webcard builder:** disabled header buttons when showing colors ([#1979](https://github.com/AzzappApp/azzapp/pull/1979))
 * **fix:**  - properly remove current webcard when loading a new template ([#1978](https://github.com/AzzappApp/azzapp/pull/1978))
