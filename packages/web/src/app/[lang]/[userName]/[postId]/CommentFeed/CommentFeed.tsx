@@ -29,12 +29,14 @@ const CommentFeed = (props: CommentFeedProps) => {
           media={media}
         />
         <CommentFeedHeader webCard={webCard} media={media} />
-        <CommentFeedItems
-          webCard={webCard}
-          post={post}
-          defaultComments={comments}
-          media={media}
-        />
+        <div className={styles.commentsContainer}>
+          <CommentFeedItems
+            webCard={webCard}
+            post={post}
+            defaultComments={comments}
+            media={media}
+          />
+        </div>
       </div>
     </>
   );

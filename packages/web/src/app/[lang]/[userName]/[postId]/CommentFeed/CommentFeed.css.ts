@@ -19,8 +19,14 @@ const feed = style({
   },
 });
 
+const commentsContainer = style({
+  flexGrow: 1,
+  position: 'relative',
+});
+
 const styles = {
   feed,
+  commentsContainer,
 };
 
 export default styles;
