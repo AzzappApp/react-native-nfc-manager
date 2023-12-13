@@ -23,7 +23,6 @@ const saveCardStyle: MutationResolvers['saveCardStyle'] = async (
     cardStyle: input,
     updatedAt: new Date(),
     lastCardUpdate: new Date(),
-    lastContactCardUpdate: new Date(),
   };
   try {
     await updateWebCard(profile.webCardId, updates);
