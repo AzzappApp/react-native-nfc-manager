@@ -1,11 +1,12 @@
 import { useCallback, useEffect } from 'react';
 import { Linking } from 'react-native';
+import { useRouter } from '#components/NativeRouter';
 import { matchUrlWithRoute } from '#helpers/deeplinkHelpers';
 import useAuthState from './useAuthState';
-import type { NativeRouter } from '#components/NativeRouter';
 
-export const useDeepLink = (router: NativeRouter) => {
+export const useDeepLink = () => {
   const { authenticated } = useAuthState();
+  const router = useRouter();
   const deeplinkHandler = useCallback(
     async (url: string) => {
       if (authenticated) {

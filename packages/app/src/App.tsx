@@ -51,7 +51,6 @@ import {
 } from '#helpers/ScreenPrefetcher';
 import useApplicationFonts from '#hooks/useApplicationFonts';
 import useAuthState from '#hooks/useAuthState';
-import { useDeepLink } from '#hooks/useDeepLink';
 import AboutScreen from '#screens/AboutScreen';
 import AccountDetailsScreen from '#screens/AccountDetailsScreen';
 import CardModuleEditionScreen from '#screens/CardModuleEditionScreen';
@@ -332,8 +331,6 @@ const AppRouter = () => {
       screenIdToDispose.push(id);
     });
   }, [router, screenIdToDispose, screenPrefetcher]);
-
-  useDeepLink(router);
 
   const onScreenDismissed = useCallback(
     (id: string) => {
