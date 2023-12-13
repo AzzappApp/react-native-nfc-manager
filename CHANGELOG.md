@@ -1,5 +1,6 @@
-## 0.5.2-canary.48
+## 0.5.2-canary.49
 
+* **fix:**  - configure eas env
 * **fix:**  - **webcard builder:** disabled header buttons when showing colors ([#1979](https://github.com/AzzappApp/azzapp/pull/1979))
 * **fix:**  - properly remove current webcard when loading a new template ([#1978](https://github.com/AzzappApp/azzapp/pull/1978))
 * **fix:**  - saveCardStyle wrong param from before multi user ([#1976](https://github.com/AzzappApp/azzapp/pull/1976))
