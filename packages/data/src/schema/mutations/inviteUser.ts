@@ -1,3 +1,4 @@
+import * as Sentry from '@sentry/nextjs';
 import { and, eq } from 'drizzle-orm';
 import { GraphQLError } from 'graphql';
 import ERRORS from '@azzapp/shared/errors';
@@ -98,6 +99,8 @@ const inviteUserMutation: MutationResolvers['inviteUser'] = async (
       });
     }
   } catch (e) {
+    Sentry.captureException(e);
+    console.error(e);
     throw new GraphQLError(ERRORS.INTERNAL_SERVER_ERROR);
   }
 
