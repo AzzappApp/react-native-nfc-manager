@@ -1,4 +1,4 @@
-## 0.5.2-canary.50
+## 0.5.2-canary.51
 
 * **fix:**  - **post:** [#1521](https://github.com/AzzappApp/azzapp/pull/1521) make comments scrollable on desktop ([#1990](https://github.com/AzzappApp/azzapp/pull/1990))
 * **fix:**  - configure eas env
