@@ -23,7 +23,7 @@ import {
   referencesMedias,
   updateCardModule,
   createCardModule,
-  getCardModuleCount,
+  getCardModuleNextPosition,
 } from '#domains';
 import type { GraphQLContext } from '#index';
 import type { MutationResolvers } from '#schema/__generated__/types';
@@ -97,7 +97,7 @@ const createModuleSavingMutation =
             {
               webCardId: profile.webCardId,
               kind: moduleKind,
-              position: await getCardModuleCount(profile.webCardId),
+              position: await getCardModuleNextPosition(profile.webCardId),
               data,
               visible: true,
             },

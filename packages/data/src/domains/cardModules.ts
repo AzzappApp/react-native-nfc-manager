@@ -185,12 +185,26 @@ export const getCardModules = async (
  */
 export const getCardModuleCount = async (webCardId: string) =>
   db
-
     .select({ count: sql`count(*)`.mapWith(Number) })
     .from(CardModuleTable)
     .where(eq(CardModuleTable.webCardId, webCardId))
-
     .then(res => res[0].count);
+
+/**
+ * find the last position the a new card module.
+ *
+ * @param values - the card fields, excluding the id and the cardDate
+ * @param qc - The query creator to use (profile for transactions)
+ * @returns The created card
+ */
+export const getCardModuleNextPosition = async (webCardId: string) =>
+  db
+    .select({
+      maxPosition: sql`max(${CardModuleTable.position})`.mapWith(Number),
+    })
+    .from(CardModuleTable)
+    .where(eq(CardModuleTable.webCardId, webCardId))
+    .then(res => res[0].maxPosition + 1);
 
 /**
  * Create a cardmodule.
