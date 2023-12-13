@@ -27,6 +27,7 @@
       "env": {
         "NEXT_PUBLIC_URL": "https://azzapp-dev.vercel.app/",
         "NEXT_PUBLIC_API_ENDPOINT": "https://azzapp-dev.vercel.app/api",
+        "USERNAME_CHANGE_DELAY_DAY": "1",
         "DEPLOYMENT_ENVIRONMENT": "development"
       }
     },
@@ -40,6 +41,7 @@
       "env": {
         "NEXT_PUBLIC_URL": "https://azzapp-staging.vercel.app/",
         "NEXT_PUBLIC_API_ENDPOINT": "https://azzapp-staging.vercel.app/api",
+        "USERNAME_CHANGE_DELAY_DAY": "4",
         "DEPLOYMENT_ENVIRONMENT": "staging"
       }
     },
@@ -52,6 +54,7 @@
       "env": {
         "NEXT_PUBLIC_URL": "https://azzapp.vercel.app/",
         "NEXT_PUBLIC_API_ENDPOINT": "https://azzapp.vercel.app/api",
+        "USERNAME_CHANGE_DELAY_DAY": "30",
         "DEPLOYMENT_ENVIRONMENT": "production"
       }
     }
