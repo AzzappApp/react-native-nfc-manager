@@ -296,6 +296,7 @@ const WebCardScreenContent = ({
           onCancelEditModules={onToggleSelectionMode}
           onSelectAllModules={onSelectAllModules}
           onUnSelectAllModules={onUnSelectAllModules}
+          disabledButtons={showWebcardColorPicker}
         />
         <WebCardScreenScrollView
           editing={editing}

@@ -50,6 +50,10 @@ export type WebCardScreenHeaderProps = {
    * Called when the user press the unselect all button in selection mode
    */
   onUnSelectAllModules: () => void;
+  /*
+   * Disable all button
+   */
+  disabledButtons: boolean;
 };
 
 /**
@@ -68,6 +72,7 @@ const WebCardScrenHeader = ({
   onCancelEditModules,
   onSelectAllModules,
   onUnSelectAllModules,
+  disabledButtons,
 }: WebCardScreenHeaderProps) => {
   const editTransition = useEditTransition();
   const inset = useScreenInsets();
@@ -111,6 +116,7 @@ const WebCardScrenHeader = ({
           leftElement={
             selectionMode ? (
               <HeaderButton
+                disabled={disabledButtons}
                 variant="secondary"
                 onPress={onCancelEditModules}
                 label={intl.formatMessage({
@@ -121,6 +127,7 @@ const WebCardScrenHeader = ({
               />
             ) : (
               <HeaderButton
+                disabled={disabledButtons}
                 variant="secondary"
                 onPress={onEditModules}
                 label={intl.formatMessage({
@@ -135,6 +142,7 @@ const WebCardScrenHeader = ({
             selectionMode ? (
               selectionContainsAllModules ? (
                 <HeaderButton
+                  disabled={disabledButtons}
                   onPress={onUnSelectAllModules}
                   variant="secondary"
                   label={intl.formatMessage({
@@ -145,6 +153,7 @@ const WebCardScrenHeader = ({
                 />
               ) : (
                 <HeaderButton
+                  disabled={disabledButtons}
                   onPress={onSelectAllModules}
                   variant="secondary"
                   label={intl.formatMessage({
@@ -156,6 +165,7 @@ const WebCardScrenHeader = ({
               )
             ) : (
               <HeaderButton
+                disabled={disabledButtons}
                 onPress={onDone}
                 label={intl.formatMessage({
                   defaultMessage: 'Done',
