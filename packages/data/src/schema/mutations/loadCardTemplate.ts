@@ -46,7 +46,8 @@ const loadCardTemplateMutation: MutationResolvers['loadCardTemplate'] = async (
 
   try {
     await db.transaction(async trx => {
-      const currentModules = await getCardModules(profileId, true, trx);
+      const currentModules = await getCardModules(profile.webCardId, true, trx);
+
       const currentMedias = currentModules.flatMap(m => {
         const saveRules = MODULES_SAVE_RULES[m.kind];
         if (saveRules && 'getMedias' in saveRules) {
