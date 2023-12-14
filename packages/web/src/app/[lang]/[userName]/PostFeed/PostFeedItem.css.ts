@@ -13,6 +13,8 @@ const postHeader = style({
   justifyContent: 'flex-start',
   alignItems: 'center',
   padding: '10px',
+  background: 'none',
+  border: 'none',
 });
 
 const postMedias = style({

@@ -55,7 +55,11 @@ const PostPage = async (props: PostPageProps) => {
   return (
     <div className={styles.background}>
       <div className={styles.postFeedHeader}>
-        <PostFeedHeader webCard={author} postsCount={0} media={media} />
+        <PostFeedHeader
+          webCard={author}
+          postsCount={author.nbPosts}
+          media={media}
+        />
       </div>
       <div className={styles.center}>
         <main className={styles.wrapper}>

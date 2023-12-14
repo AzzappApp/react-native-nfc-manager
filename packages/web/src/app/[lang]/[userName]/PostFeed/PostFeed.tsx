@@ -22,6 +22,7 @@ type PostFeedProps = {
   postsCount: number;
   media: Media;
   onClose: () => void;
+  onPressAuthor: () => void;
 };
 
 const PostFeed = (props: PostFeedProps) => {
@@ -105,6 +106,7 @@ const PostFeed = (props: PostFeedProps) => {
             onDownload={() => download.current?.open()}
             onPlay={() => onVideoPlay(i)}
             onMuteChanged={muted => onMuteChanged(muted)}
+            onPressAuthor={props.onPressAuthor}
           />
         ))}
       </div>

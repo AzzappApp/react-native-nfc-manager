@@ -110,6 +110,10 @@ const WebCardPageLayout = (props: ProfilePageLayoutProps) => {
               defaultPosts={posts}
               media={media}
               webCard={webCard}
+              onPressAuthor={() => {
+                setDisplay('card');
+                setPostsOpen(false);
+              }}
               onClose={() => setPostsOpen(false)}
             />
           </aside>

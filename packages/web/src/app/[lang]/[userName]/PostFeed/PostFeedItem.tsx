@@ -25,6 +25,7 @@ type PostFeedItemProps = {
   onDownload: () => void;
   onPlay: () => void;
   onMuteChanged: (muted: boolean) => void;
+  onPressAuthor: () => void;
 };
 
 const PostFeedItem = (
@@ -42,7 +43,7 @@ const PostFeedItem = (
   return (
     <>
       <div className={styles.post}>
-        <div className={styles.postHeader}>
+        <button className={styles.postHeader} onClick={props.onPressAuthor}>
           {media && (
             <div
               style={{
@@ -57,7 +58,7 @@ const PostFeedItem = (
             </div>
           )}
           <span>{webCard.userName}</span>
-        </div>
+        </button>
         {postMedia && (
           <div
             className={styles.postMedias}
