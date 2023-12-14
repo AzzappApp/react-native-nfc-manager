@@ -99,7 +99,7 @@ const PostRendererActionBar = ({
             post: {
               id: postId,
               viewerPostReaction: reaction,
-              counterReactions: countReactions,
+              counterReactions: Math.max(0, countReactions),
             },
           },
         },
@@ -109,7 +109,10 @@ const PostRendererActionBar = ({
             const counter = post?.getValue('counterReactions');
 
             if (typeof counter === 'number') {
-              post?.setValue(counter + (add ? 1 : -1), 'counterReactions');
+              post?.setValue(
+                Math.max(counter + (add ? 1 : -1), 0),
+                'counterReactions',
+              );
             }
             post.setValue(add ? reaction : null, 'viewerPostReaction');
           }
@@ -117,7 +120,10 @@ const PostRendererActionBar = ({
             const webCard = store.get(webCardId);
             const counter = webCard?.getValue('nbPostsLiked');
             if (typeof counter === 'number') {
-              webCard?.setValue(counter + (add ? 1 : -1), 'nbPostsLiked');
+              webCard?.setValue(
+                Math.max(counter + (add ? 1 : -1), 0),
+                'nbPostsLiked',
+              );
             }
 
             if (webCard) {

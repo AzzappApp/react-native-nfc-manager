@@ -55,21 +55,21 @@ const togglePostReaction: MutationResolvers['togglePostReaction'] = async (
         .update(PostTable)
         .set({
           //prettier-ignore
-          counterReactions:removeReaction? sql`${PostTable.counterReactions} -  1`: sql`${PostTable.counterReactions} +  1`,
+          counterReactions:removeReaction? sql`GREATEST(${PostTable.counterReactions} - 1, 0)`: sql`${PostTable.counterReactions} +  1`,
         })
         .where(eq(PostTable.id, targetId));
       await trx
         .update(WebCardTable)
         .set({
           //prettier-ignore
-          nbLikes: removeReaction? sql`${WebCardTable.nbLikes} - 1`: sql`${WebCardTable.nbLikes} + 1`,
+          nbLikes: removeReaction? sql`GREATEST(${WebCardTable.nbLikes} - 1, 0)`: sql`${WebCardTable.nbLikes} + 1`,
         })
         .where(eq(WebCardTable.id, post.webCardId));
       await trx
         .update(WebCardTable)
         .set({
           //prettier-ignore
-          nbPostsLiked: removeReaction? sql`${WebCardTable.nbPostsLiked} - 1`: sql`${WebCardTable.nbPostsLiked} + 1`,
+          nbPostsLiked: removeReaction? sql`GREATEST(${WebCardTable.nbPostsLiked} - 1, 0)`: sql`${WebCardTable.nbPostsLiked} + 1`,
         })
         .where(eq(WebCardTable.id, post.webCardId));
       await updateStatistics(post.webCardId, 'likes', !removeReaction, trx);
