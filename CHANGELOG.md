@@ -1,5 +1,6 @@
-## 0.5.2-canary.56
+## 0.5.2-canary.57
 
+* **fix:**  - avoid negativ value on like counter ([#2010](https://github.com/AzzappApp/azzapp/pull/2010))
 * **fix:**  - refresh user list ([#2008](https://github.com/AzzappApp/azzapp/pull/2008))
 * **feat:**  -  Mobile App > Add new font [#1949](https://github.com/AzzappApp/azzapp/pull/1949) && web ([#2006](https://github.com/AzzappApp/azzapp/pull/2006))
 * **fix:**  - **home:** [#1762](https://github.com/AzzappApp/azzapp/pull/1762) increase total contact card scans ([#2000](https://github.com/AzzappApp/azzapp/pull/2000))
