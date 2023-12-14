@@ -343,7 +343,11 @@ const MultiUserAddScreen = () => {
           </ScrollView>
         </SafeAreaView>
       </Container>
-      <MultiUserAddModal beforeClose={() => setSearchValue('')} ref={ref} />
+      <MultiUserAddModal
+        onCompleted={router.back}
+        beforeClose={() => setSearchValue('')}
+        ref={ref}
+      />
     </>
   );
 };

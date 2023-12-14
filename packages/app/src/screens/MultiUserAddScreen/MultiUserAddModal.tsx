@@ -27,6 +27,7 @@ import type { Control } from 'react-hook-form';
 // eslint-disable-next-line @typescript-eslint/ban-types
 type MultiUserAddModalProps = {
   beforeClose: () => void;
+  onCompleted: () => void;
 };
 
 export type UserToAdd = {
@@ -50,7 +51,7 @@ const MultiUserAddModal = (
   props: MultiUserAddModalProps,
   ref: ForwardedRef<MultiUserAddModalActions>,
 ) => {
-  const { beforeClose } = props;
+  const { beforeClose, onCompleted } = props;
   const [visible, setVisible] = useState(false);
 
   const intl = useIntl();
@@ -122,6 +123,60 @@ const MultiUserAddModal = (
       inviteUser(input: $input) {
         profile {
           id
+          contactCard {
+            firstName
+            lastName
+            title
+            company
+            emails {
+              label
+              address
+              selected
+            }
+            phoneNumbers {
+              label
+              number
+              selected
+            }
+            urls {
+              address
+              selected
+            }
+            addresses {
+              address
+              label
+              selected
+            }
+            birthday {
+              birthday
+              selected
+            }
+            socials {
+              url
+              label
+              selected
+            }
+          }
+          user {
+            email
+            phoneNumber
+          }
+          profileRole
+          avatar {
+            id
+            uri
+          }
+          statsSummary {
+            day
+            contactCardScans
+          }
+          webCard {
+            statsSummary {
+              day
+              webCardViews
+              likes
+            }
+          }
         }
       }
     }
@@ -196,7 +251,8 @@ const MultiUserAddModal = (
           }
 
           beforeClose();
-          setVisible(false);
+          onClose();
+          onCompleted();
         },
         onError: e => {
           console.error(e);
@@ -208,6 +264,26 @@ const MultiUserAddModal = (
                 'Error toast message when inviting user from MultiUserAddModal',
             }),
           });
+        },
+        updater: (store, data) => {
+          const invitedProfile = data.inviteUser?.profile;
+
+          if (invitedProfile) {
+            const root = store.getRoot();
+            const viewer = root.getLinkedRecord('viewer');
+            const profile = viewer?.getLinkedRecord('profile');
+            const webcard = profile?.getLinkedRecord('webCard');
+            const profiles = webcard?.getLinkedRecords('profiles');
+
+            const newProfileRecord = store.get(invitedProfile.id);
+
+            if (newProfileRecord) {
+              webcard?.setLinkedRecords(
+                profiles?.concat(newProfileRecord),
+                'profiles',
+              );
+            }
+          }
         },
       });
     },
