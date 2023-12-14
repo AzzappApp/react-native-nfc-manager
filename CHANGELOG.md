@@ -1,5 +1,7 @@
-## 0.5.2-canary.59
+## 0.5.2-canary.60
 
+* **fix:**  - show staticMedia if tint and bg color are white ([#2015](https://github.com/AzzappApp/azzapp/pull/2015))
+* **feat:**  - remove user multi ([#1963](https://github.com/AzzappApp/azzapp/pull/1963))
 * **fix:**  - **post:** [#1679](https://github.com/AzzappApp/azzapp/pull/1679) set correct number of posts + set author clickable ([#2009](https://github.com/AzzappApp/azzapp/pull/2009))
 * **fix:**  - **webCard:** [#1768](https://github.com/AzzappApp/azzapp/pull/1768) 🎨 wrong text padding on cover ([#2001](https://github.com/AzzappApp/azzapp/pull/2001))
 * **fix:**  - **post:** [#1509](https://github.com/AzzappApp/azzapp/pull/1509) make cover of comment author clickable ([#2011](https://github.com/AzzappApp/azzapp/pull/2011))
