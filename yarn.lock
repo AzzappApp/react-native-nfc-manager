@@ -1893,6 +1893,11 @@
   resolved "https://registry.yarnpkg.com/@eslint/js/-/js-8.47.0.tgz#5478fdf443ff8158f9de171c704ae45308696c7d"
   integrity sha512-P6omY1zv5MItm93kLM8s2vr1HICJH8v0dvddDhysbIuZ+vcjOHg5Zbkf1mTkcmi2JA9oBG2anOkRnW8WJTS8Og==
 
+"@expo-google-fonts/amatic-sc@^0.2.3":
+  version "0.2.3"
+  resolved "https://registry.yarnpkg.com/@expo-google-fonts/amatic-sc/-/amatic-sc-0.2.3.tgz#00b353b58c42315a9c5248f288c76ebc15ec8a35"
+  integrity sha512-6fGot7aV2IhTijktewelFscSKyA//2w3unhWbpEO/C3Stc0jNM4VsOGV8l5gTf79nwQ6kEKEzRybcRukRmH1vQ==
+
 "@expo-google-fonts/anton@^0.2.3":
   version "0.2.3"
   resolved "https://registry.yarnpkg.com/@expo-google-fonts/anton/-/anton-0.2.3.tgz#babfcd675ad6a0c74ab12aa48957b6654fa6fa71"
@@ -1903,10 +1908,25 @@
   resolved "https://registry.yarnpkg.com/@expo-google-fonts/archivo/-/archivo-0.2.3.tgz#0acf86c8e182545c27af4f2382299f9eaba63269"
   integrity sha512-WD3Ad+oMOqCCBwJDPJcmFWyhqT2tF1aPOtKPT0xZejYMExcHCiqbog1om/mAupR1A+7q2f5qt1lEBecDiG+ClA==
 
+"@expo-google-fonts/bebas-neue@^0.2.3":
+  version "0.2.3"
+  resolved "https://registry.yarnpkg.com/@expo-google-fonts/bebas-neue/-/bebas-neue-0.2.3.tgz#41df66599a96dd9ba208f2c59ac86e7a24fa7bcf"
+  integrity sha512-FrFjb2gShHLM/XTL0nYcxRt4dHjbVPmg6HzcJRoIIVt+HJQU6Nbh7Nan8KeeEny8wQFDEVCdJATnofS5xaDxqA==
+
+"@expo-google-fonts/cardo@^0.2.3":
+  version "0.2.3"
+  resolved "https://registry.yarnpkg.com/@expo-google-fonts/cardo/-/cardo-0.2.3.tgz#5d30c29ee2049fa9face4b37411d6ec0c894f7a2"
+  integrity sha512-VUxR7cm0LV0VJfiDgV9Duzwy0SAZyY8WEx5QjWAUn8KfSW6UzURru0zcDbFLGb5L/DPM2p45sXFV/e0a1Q3eEw==
+
 "@expo-google-fonts/cinzel@^0.2.3":
   version "0.2.3"
   resolved "https://registry.yarnpkg.com/@expo-google-fonts/cinzel/-/cinzel-0.2.3.tgz#0fe277cc2c26e99ae3b5d647841f4bc587681dce"
   integrity sha512-fGSiWMAHJfXvkGQBJ2sWw6c0hSx2hgtMtN7cuFe6o6H/0nL4ttZG/SoEAJXQJU9YjMdduj/1uKkFm5CfRtorGw==
+
+"@expo-google-fonts/cormorant-garamond@^0.2.3":
+  version "0.2.3"
+  resolved "https://registry.yarnpkg.com/@expo-google-fonts/cormorant-garamond/-/cormorant-garamond-0.2.3.tgz#a331180f40d1bbb72957a40c0dba880323627318"
+  integrity sha512-VYflr5/DLX8JEA47x0KUGuH5wNstQ6AO1EJhTRacVQ7UxYKwylEMefUYNvimSVPc/d3RkPZT9Uw7TCjRUP28JA==
 
 "@expo-google-fonts/courier-prime@^0.2.3":
   version "0.2.3"
@@ -1927,6 +1947,16 @@
   version "0.2.3"
   resolved "https://registry.yarnpkg.com/@expo-google-fonts/fraunces/-/fraunces-0.2.3.tgz#73e6ae22193315deaad7cf4caad6ca5204bc9606"
   integrity sha512-krgIGxViwYutW+egNHfSfc8u10ZpP+UL10MZHxbQ8C4LwEKA4HWuWLEiqSsbj1Kq3OoiXnbR+x9ERWgdhuoB1A==
+
+"@expo-google-fonts/gilda-display@^0.2.3":
+  version "0.2.3"
+  resolved "https://registry.yarnpkg.com/@expo-google-fonts/gilda-display/-/gilda-display-0.2.3.tgz#50c26a9d61af8f1892911e00110de96a03cac4a9"
+  integrity sha512-RlZSUeDDcPGWXTh3Wpdy7o06jJMBxNYWKDP3rmQBHlQ9n3NUgjTvHeFXdVBFRXrRMnvrPZM+GCD1NBDvyzCYlg==
+
+"@expo-google-fonts/gloock@^0.2.3":
+  version "0.2.3"
+  resolved "https://registry.yarnpkg.com/@expo-google-fonts/gloock/-/gloock-0.2.3.tgz#7842d0ee8ea96614481b499e88a481e9b4e6d282"
+  integrity sha512-e9rJfiE3yi9N2rEJugqeMZNRk9ACL3/JU5ViEu/NxT7917KKtD4Pn6GFflc66lTBRlchwjlSa0V0q4UJjIhUFg==
 
 "@expo-google-fonts/great-vibes@^0.2.3":
   version "0.2.3"
@@ -1957,6 +1987,21 @@
   version "0.2.3"
   resolved "https://registry.yarnpkg.com/@expo-google-fonts/koulen/-/koulen-0.2.3.tgz#a6a7283dd0177db8be18d7aea1cb15746b5af262"
   integrity sha512-cxQlCSePbvzrkD43Z6nRoHkc4ODMnYVO9yNDDvNIob257Cltk7XYIPoQpHsL1g1Vzde9BOro/8anMKEzmp1jTQ==
+
+"@expo-google-fonts/lexend@^0.2.3":
+  version "0.2.3"
+  resolved "https://registry.yarnpkg.com/@expo-google-fonts/lexend/-/lexend-0.2.3.tgz#05991a5a20266cd2436072872ec73dcd4de2d073"
+  integrity sha512-GtEv1oYYAZ0+bdVbvmR640dsOuQAPAZFDgBL2p8zGDnz0oGcNxQVxwml8k8We6BnRLyJmM43WshgxZvQ4i6TeA==
+
+"@expo-google-fonts/libre-baskerville@^0.2.3":
+  version "0.2.3"
+  resolved "https://registry.yarnpkg.com/@expo-google-fonts/libre-baskerville/-/libre-baskerville-0.2.3.tgz#37d6109700396d69b49a68027c5cd3382a6cf956"
+  integrity sha512-gXPzip1lzPOsbsVQbkb8XrCjgx7R73jZno407RucFo615ojT9bi7rAT+h5JOp9NbMY6zJm0g8UPntUtlywVE1w==
+
+"@expo-google-fonts/libre-caslon-display@^0.2.3":
+  version "0.2.3"
+  resolved "https://registry.yarnpkg.com/@expo-google-fonts/libre-caslon-display/-/libre-caslon-display-0.2.3.tgz#12dda2dc9b95b7df7d01b758f12138f28b677461"
+  integrity sha512-tiPTqYylMayyqBn8u0eGr6pahoTHH7qe04rUJQ2PyJljuodHxEIwZjbR99X3xvm/mvIgmsJaSNI3FVERf697lA==
 
 "@expo-google-fonts/libre-caslon-text@^0.2.3":
   version "0.2.3"
@@ -1998,6 +2043,11 @@
   resolved "https://registry.yarnpkg.com/@expo-google-fonts/open-sans/-/open-sans-0.2.3.tgz#63b9f9a555f8764718d3370757431ee084ca66ec"
   integrity sha512-HjEue5908n2yTtNSo47lAN3UFi2sAp00u6E3tx9nSEr0P2SDFDjYgsA89nPaAYOyxDN0EPGtNTa2K/VUe3jgmA==
 
+"@expo-google-fonts/outfit@^0.2.3":
+  version "0.2.3"
+  resolved "https://registry.yarnpkg.com/@expo-google-fonts/outfit/-/outfit-0.2.3.tgz#63d7acd2c96f5a9763a20d64dab5ae68b54eac6a"
+  integrity sha512-uLW3n6WwtrF33IBDyuHKPgBNcJKe3O8+YXS1f7SLYdb5jEgXP2udNzzhmiw7OYvIAjfS+XDOw0uTELSB36VzOQ==
+
 "@expo-google-fonts/playfair-display@^0.2.3":
   version "0.2.3"
   resolved "https://registry.yarnpkg.com/@expo-google-fonts/playfair-display/-/playfair-display-0.2.3.tgz#892805793743fc5d110a39d31442ae269d43de47"
@@ -2023,6 +2073,11 @@
   resolved "https://registry.yarnpkg.com/@expo-google-fonts/righteous/-/righteous-0.2.3.tgz#3d1b8ee8ff9b43cf99ef1363900636d8bc5b3d8e"
   integrity sha512-GUw0Q0jLLOkqdJuzquyPDn4iPLuqMOB0VP1rSG+AcoFk0A72BwHdzDBum6QySMUHL93/1RiPLNYwBCg2jFw2pQ==
 
+"@expo-google-fonts/rubik@^0.2.3":
+  version "0.2.3"
+  resolved "https://registry.yarnpkg.com/@expo-google-fonts/rubik/-/rubik-0.2.3.tgz#2acd302508d25155a87811f88f1dae313cc48c2b"
+  integrity sha512-6qqK3qgBDtjqjfDfgzh7mcduRLp5AuKCkOfafde+VaA+q0S/6levqCLg27st5vNWGGcsRLgT4xWtm2+Fv+agJQ==
+
 "@expo-google-fonts/rye@^0.2.3":
   version "0.2.3"
   resolved "https://registry.yarnpkg.com/@expo-google-fonts/rye/-/rye-0.2.3.tgz#829a6ec9a93011285f8c38801a26de6271995583"
@@ -2033,10 +2088,25 @@
   resolved "https://registry.yarnpkg.com/@expo-google-fonts/seaweed-script/-/seaweed-script-0.2.3.tgz#d99443faee75a602d847ac44915a0f8b350a82c5"
   integrity sha512-7YI7Chw5pHGaN0dDtAOub0+sqcbgy9e3QFl0Ny/cMzUgsCoPHhCX4NTD6QdHCQyjBa8c1JOENTZOmlFWWy11+Q==
 
+"@expo-google-fonts/six-caps@^0.2.3":
+  version "0.2.3"
+  resolved "https://registry.yarnpkg.com/@expo-google-fonts/six-caps/-/six-caps-0.2.3.tgz#2a61ed3f49ba1a6f4e15de356329bd54c11634cb"
+  integrity sha512-hzw1xcetFpLUKKTKhBSz0FnCbap4qWSEYKEH1Od0UkeECzB/FpJ+qznzeb4TJJDftjKE1pK8OWx9DiYVb8Fg9A==
+
 "@expo-google-fonts/source-sans-pro@^0.2.3":
   version "0.2.3"
   resolved "https://registry.yarnpkg.com/@expo-google-fonts/source-sans-pro/-/source-sans-pro-0.2.3.tgz#e667c909d04bb676c1066562be763395fc4b00b4"
   integrity sha512-/vDE5/vECqJT4Xdi1QiKG6rL8+mdrvqu3OlSe2dMPB7B9BR+cWsu0fSHTqRa1cQY03bXSPSIwOiHG4fy/CHBJg==
+
+"@expo-google-fonts/ultra@^0.2.3":
+  version "0.2.3"
+  resolved "https://registry.yarnpkg.com/@expo-google-fonts/ultra/-/ultra-0.2.3.tgz#e58440f0e70da6675e4a67b14bd1ca8958e85bbb"
+  integrity sha512-qhgIXK6Zrbm6kPf8C1KPH1izKUdmGTxfJXk9zhH79njsK8SJz+12qRSSCO6eZ14ck4Q0ZqvFQyXKEsSiGDwIRQ==
+
+"@expo-google-fonts/water-brush@^0.2.3":
+  version "0.2.3"
+  resolved "https://registry.yarnpkg.com/@expo-google-fonts/water-brush/-/water-brush-0.2.3.tgz#52506d1a4e5aee354af61ef8924dcb423b7b64b2"
+  integrity sha512-Hi37uVzO95aNiA0mM6YhFFqCfC65JAG2b5S6drmEdh+6j0vptLdkL/Hfslf0/DHl+jyFV+joNB6HXERsgUZy8g==
 
 "@expo-google-fonts/yeseva-one@^0.2.3":
   version "0.2.3"
