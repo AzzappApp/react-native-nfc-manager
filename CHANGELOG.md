@@ -1,5 +1,8 @@
-## 0.5.2-canary.58
+## 0.5.2-canary.59
 
+* **fix:**  - **post:** [#1679](https://github.com/AzzappApp/azzapp/pull/1679) set correct number of posts + set author clickable ([#2009](https://github.com/AzzappApp/azzapp/pull/2009))
+* **fix:**  - **webCard:** [#1768](https://github.com/AzzappApp/azzapp/pull/1768) 🎨 wrong text padding on cover ([#2001](https://github.com/AzzappApp/azzapp/pull/2001))
+* **fix:**  - **post:** [#1509](https://github.com/AzzappApp/azzapp/pull/1509) make cover of comment author clickable ([#2011](https://github.com/AzzappApp/azzapp/pull/2011))
 * **fix:**  - **SocialLinks:** test website url with http and https to format the … ([#1956](https://github.com/AzzappApp/azzapp/pull/1956))
 * **fix:**  - **post:** with small posts scroll bar is on the middle ([#2012](https://github.com/AzzappApp/azzapp/pull/2012))
 * **fix:**  - avoid negativ value on like counter ([#2010](https://github.com/AzzappApp/azzapp/pull/2010))
