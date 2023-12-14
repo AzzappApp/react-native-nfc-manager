@@ -55,9 +55,9 @@ const updateWebCardUserNameMutation: MutationResolvers['updateWebCardUserName'] 
     // Convert lastUpdate to a Date object
     const lastUpdateDate = new Date(webCard.lastUserNameUpdate);
     // Get the time MINIMUM_DAYS_BETWEEN_CHANGING_USERNAME days ago
-    const nextChangeDate = new Date();
+    const nextChangeDate = new Date(lastUpdateDate);
     nextChangeDate.setDate(
-      lastUpdateDate.getDate() + USERNAME_CHANGE_DELAY_DAY,
+      nextChangeDate.getDate() + USERNAME_CHANGE_DELAY_DAY,
     );
     // Check if lastUpdate is earlier than thirtyDaysAgo;
     if (nextChangeDate > now) {
@@ -78,7 +78,11 @@ const updateWebCardUserNameMutation: MutationResolvers['updateWebCardUserName'] 
 
     try {
       await db.transaction(async trx => {
-        await updateWebCard(webCard.id, { userName }, trx);
+        await updateWebCard(
+          webCard.id,
+          { userName, lastUserNameUpdate: now },
+          trx,
+        );
         await trx.insert(RedirectWebCardTable).values({
           fromUserName: webCard.userName,
           toUserName: userName,
@@ -108,7 +112,7 @@ const updateWebCardUserNameMutation: MutationResolvers['updateWebCardUserName'] 
     }
     cardUsernamesToRevalidate.add(userName);
     return {
-      webCard: { ...webCard, userName },
+      webCard: { ...webCard, userName, lastUserNameUpdate: now },
     };
   };
 

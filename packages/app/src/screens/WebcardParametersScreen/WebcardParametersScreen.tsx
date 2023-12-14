@@ -1,4 +1,4 @@
-import { useCallback, useMemo } from 'react';
+import { useCallback, useEffect, useMemo } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -124,12 +124,21 @@ const WebcardParametersScreen = ({
     [publish, unpublish],
   );
 
+  useEffect(() => {
+    //TODO: remove this later,
+    // the already published flag was initalized at false and does not reflect the cardIsPublished actual flag
+    if (webCard && webCard.cardIsPublished && !webCard.alreadyPublished) {
+      publish({ variables: {} });
+    }
+  }, [publish, webCard, webCard?.alreadyPublished, webCard?.cardIsPublished]);
+
   const [commit] = useMutation<WebcardParametersScreenMutation>(graphql`
     mutation WebcardParametersScreenMutation($input: UpdateWebCardInput!) {
       updateWebCard(input: $input) {
         webCard {
           id
           webCardKind
+          lastUserNameUpdate
           webCardCategory {
             id
           }
@@ -179,13 +188,10 @@ const WebcardParametersScreen = ({
     // Get the current date and time
     const now = new Date();
 
-    // Convert lastUpdate to a Date object
-    const lastUpdateDate = new Date(webCard.lastUserNameUpdate);
-
     // Get the time MINIMUM_DAYS_BETWEEN_CHANGING_USERNAME days ago
-    const nextChangeDate = new Date();
+    const nextChangeDate = new Date(webCard.lastUserNameUpdate);
     nextChangeDate.setDate(
-      lastUpdateDate.getDate() + USERNAME_CHANGE_DELAY_DAY,
+      nextChangeDate.getDate() + USERNAME_CHANGE_DELAY_DAY,
     );
 
     // Check if lastUpdate is earlier than USERNAME_CHANGE_DELAY_DAY day
@@ -199,18 +205,17 @@ const WebcardParametersScreen = ({
   const nextChangeDay = useMemo(() => {
     // Calculate the next available date for changing the username
     if (webCard) {
-      const lastUpdateDate = new Date(webCard.lastUserNameUpdate);
       // Get the time MINIMUM_DAYS_BETWEEN_CHANGING_USERNAME days ago
-      const nextChangeDate = new Date();
+      const nextChangeDate = new Date(webCard.lastUserNameUpdate);
       nextChangeDate.setDate(
-        lastUpdateDate.getDate() + USERNAME_CHANGE_DELAY_DAY,
+        nextChangeDate.getDate() + USERNAME_CHANGE_DELAY_DAY,
       );
       // Get the current date
       const currentDate = new Date();
 
       // Calculate the difference in days
       const diffTime = Math.abs(
-        lastUpdateDate.getTime() - currentDate.getTime(),
+        nextChangeDate.getTime() - currentDate.getTime(),
       );
 
       return Math.round(diffTime / (1000 * 60 * 60 * 24));
