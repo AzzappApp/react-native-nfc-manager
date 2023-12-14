@@ -1,5 +1,7 @@
-## 0.5.2-canary.57
+## 0.5.2-canary.58
 
+* **fix:**  - **SocialLinks:** test website url with http and https to format the … ([#1956](https://github.com/AzzappApp/azzapp/pull/1956))
+* **fix:**  - **post:** with small posts scroll bar is on the middle ([#2012](https://github.com/AzzappApp/azzapp/pull/2012))
 * **fix:**  - avoid negativ value on like counter ([#2010](https://github.com/AzzappApp/azzapp/pull/2010))
 * **fix:**  - refresh user list ([#2008](https://github.com/AzzappApp/azzapp/pull/2008))
 * **feat:**  -  Mobile App > Add new font [#1949](https://github.com/AzzappApp/azzapp/pull/1949) && web ([#2006](https://github.com/AzzappApp/azzapp/pull/2006))
