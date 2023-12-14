@@ -263,13 +263,15 @@ export const GET = async (
                   paddingTop: '30%',
                 }}
                 className={cx(
-                  coverTextStyle.converTextContainer,
+                  coverTextStyle.coverTextContainer,
                   orientation !== 'horizontal' &&
-                    coverTextStyle.converTextContainerVertical,
+                    coverTextStyle.coverTextContainerVertical,
+                  orientation === 'horizontal' &&
+                    coverTextStyle.coverTextContainerHorizontal,
                   orientation === 'topToBottom' &&
-                    coverTextStyle.converTextContainerTopToBottom,
+                    coverTextStyle.coverTextContainerTopToBottom,
                   orientation === 'bottomToTop' &&
-                    coverTextStyle.converTextContainerBottomToTop,
+                    coverTextStyle.coverTextContainerBottomToTop,
                 )}
               >
                 <div style={{ fontFamily: titleFontFamily, ...titleTextStyle }}>

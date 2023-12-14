@@ -160,12 +160,11 @@ const CoverTextRenderer = ({
           justifyContent: overlayJustifyContent,
         }}
         className={cx(
-          styles.converTextContainer,
-          orientation !== 'horizontal' && styles.converTextContainerVertical,
-          orientation === 'topToBottom' &&
-            styles.converTextContainerTopToBottom,
-          orientation === 'bottomToTop' &&
-            styles.converTextContainerBottomToTop,
+          styles.coverTextContainer,
+          orientation !== 'horizontal' && styles.coverTextContainerVertical,
+          orientation === 'horizontal' && styles.coverTextContainerHorizontal,
+          orientation === 'topToBottom' && styles.coverTextContainerTopToBottom,
+          orientation === 'bottomToTop' && styles.coverTextContainerBottomToTop,
         )}
       >
         <div
