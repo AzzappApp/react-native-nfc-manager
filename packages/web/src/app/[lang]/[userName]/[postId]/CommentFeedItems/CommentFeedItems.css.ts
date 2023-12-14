@@ -94,6 +94,10 @@ const empty = style({
 
 const emptyText = style([textXXSmall, { color: vars.color.grey400 }]);
 
+const coverLink = style({
+  marginBottom: 'auto',
+});
+
 const styles = {
   feed,
   item,
@@ -104,6 +108,7 @@ const styles = {
   button,
   empty,
   emptyText,
+  coverLink,
 };
 
 export default styles;
