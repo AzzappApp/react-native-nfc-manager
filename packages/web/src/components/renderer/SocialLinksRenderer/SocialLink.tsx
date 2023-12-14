@@ -58,6 +58,7 @@ const generateLink = (mask: string, content: string, type: string) => {
   if (type === 'phone') link = `tel:`;
   if (type === 'sms') link = 'sms:';
   if (type === 'mail') link = 'mailto:';
+  if (type === 'website') return content;
 
   return `${link}${mask}${content}`;
 };

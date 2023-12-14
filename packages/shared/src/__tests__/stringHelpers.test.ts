@@ -6,6 +6,7 @@ import {
   isValidHex,
   formatDuration,
   formatDisplayName,
+  isValidUrl,
 } from '../stringHelpers';
 
 describe('stringHelper', () => {
@@ -98,26 +99,70 @@ describe('stringHelper', () => {
   });
 
   describe('formatDisplayName', () => {
-    it('should return formatted name when both firstName and lastName have truthy string values', () => {
+    test('should return formatted name when both firstName and lastName have truthy string values', () => {
       expect(formatDisplayName('John', 'Doe')).toBe('John Doe');
     });
 
-    it('should return firstName when it has a truthy string value and lastName is falsy', () => {
+    test('should return firstName when it has a truthy string value and lastName is falsy', () => {
       expect(formatDisplayName('John', null)).toBe('John');
       expect(formatDisplayName('John', undefined)).toBe('John');
       expect(formatDisplayName('John', '')).toBe('John');
     });
 
-    it('should return lastName when it has a truthy string value and firstName is falsy', () => {
+    test('should return lastName when it has a truthy string value and firstName is falsy', () => {
       expect(formatDisplayName(null, 'Doe')).toBe('Doe');
       expect(formatDisplayName(undefined, 'Doe')).toBe('Doe');
       expect(formatDisplayName('', 'Doe')).toBe('Doe');
     });
 
-    it('should return null when both firstName and lastName are falsy', () => {
+    test('should return null when both firstName and lastName are falsy', () => {
       expect(formatDisplayName(null, null)).toBe(undefined);
       expect(formatDisplayName(undefined, undefined)).toBe(undefined);
       expect(formatDisplayName('', '')).toBe(undefined);
     });
+  });
+});
+
+describe('isValidUrl', () => {
+  // Returns true for a valid URL with http protocol
+  test('should return true for a valid URL with http protocol', () => {
+    const url = 'http://www.example.com';
+    const result = isValidUrl(url);
+    expect(result).toBe(true);
+  });
+
+  // Returns true for a valid URL with https protocol
+  test('should return true for a valid URL with https protocol', () => {
+    const url = 'https://www.example.com';
+    const result = isValidUrl(url);
+    expect(result).toBe(true);
+  });
+
+  // Returns true for a valid URL with www subdomain
+  test('should return true for a valid URL with www subdomain', () => {
+    const url = 'http://www.example.com';
+    const result = isValidUrl(url);
+    expect(result).toBe(true);
+  });
+
+  // Returns false for an empty string
+  test('should return false for an empty string', () => {
+    const url = '';
+    const result = isValidUrl(url);
+    expect(result).toBe(false);
+  });
+
+  // Returns false for a URL without a protocol
+  test('should return false for a URL without a protocol', () => {
+    const url = 'www.example.com';
+    const result = isValidUrl(url);
+    expect(result).toBe(false);
+  });
+
+  // Returns false for a URL with an invalid protocol
+  test('should return false for a URL with an invalid protocol', () => {
+    const url = 'ftp://www.example.com';
+    const result = isValidUrl(url);
+    expect(result).toBe(false);
   });
 });

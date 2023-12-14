@@ -2,8 +2,9 @@ import { memo, useCallback, useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { StyleSheet, View, useColorScheme } from 'react-native';
 import { GestureDetector } from 'react-native-gesture-handler';
+import Toast from 'react-native-toast-message';
 import { SOCIAL_LINKS } from '@azzapp/shared/socialLinkHelpers';
-import { isNotFalsyString } from '@azzapp/shared/stringHelpers';
+import { isNotFalsyString, isValidUrl } from '@azzapp/shared/stringHelpers';
 import { colors } from '#theme';
 import SortableList from '#components/SortableScrollView/SortableScrollView';
 import useEditorLayout from '#hooks/useEditorLayout';
@@ -117,6 +118,12 @@ const SocialLinksLinksEditionPanel = ({
           description: 'Placeholder for the mail link',
         });
       }
+      if (link.id === 'website') {
+        placeholder = intl.formatMessage({
+          defaultMessage: 'Enter a website url',
+          description: 'Placeholder for the website link',
+        });
+      }
 
       consolidatedLinks.push({
         ...link,
@@ -215,7 +222,6 @@ const SocialLinksLinksEditionPanel = ({
 
 const SocialInputComponent = ({
   icon,
-  link,
   mask,
   value,
   onChangeLink,
@@ -223,7 +229,6 @@ const SocialInputComponent = ({
   placeholder,
 }: {
   icon: SocialIcons;
-  link?: string | undefined;
   mask: string;
   placeholder?: string;
   value: string;
@@ -246,16 +251,28 @@ const SocialInputComponent = ({
     setLocalValue(filterText);
   };
 
-  const onFocus = () => {
-    if (icon === 'website' && !isNotFalsyString(link)) {
-      onChangeLink(icon, 'https://');
-    }
-  };
+  const intl = useIntl();
 
-  const onEndEditing = (
+  const onEndEditing = async (
     e: NativeSyntheticEvent<TextInputEndEditingEventData>,
   ) => {
-    onChangeLink(icon, e.nativeEvent.text);
+    if (icon === 'website') {
+      if (isValidUrl(e.nativeEvent.text)) {
+        onChangeLink(icon, e.nativeEvent.text);
+      } else {
+        Toast.show({
+          type: 'error',
+          text1: intl.formatMessage({
+            defaultMessage:
+              'The Website Url you entered is not valid. Please check it again.',
+            description:
+              'Error toast message when a website url sociallink is not valid.',
+          }),
+        });
+      }
+    } else {
+      onChangeLink(icon, e.nativeEvent.text);
+    }
   };
 
   return (
@@ -294,7 +311,6 @@ const SocialInputComponent = ({
         onEndEditing={onEndEditing}
         autoCapitalize="none"
         inputStyle={styles.inputStyleSocial}
-        onPressIn={onFocus}
       />
       <GestureDetector gesture={panGesture}>
         <Icon icon="menu" style={{ tintColor: colors.grey400 }} />

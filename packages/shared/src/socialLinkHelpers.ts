@@ -31,7 +31,10 @@ export const SOCIAL_NETWORK_LINKS = [
 
 export const SOCIAL_LINKS = [
   ...SOCIAL_NETWORK_LINKS,
-  { id: 'website', mask: '' },
+  {
+    id: 'website',
+    mask: '',
+  },
   { id: 'phone', mask: '' },
   { id: 'mail', mask: '' },
   { id: 'sms', mask: '' },
