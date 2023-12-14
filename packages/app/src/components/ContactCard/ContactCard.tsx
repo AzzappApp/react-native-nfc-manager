@@ -34,7 +34,6 @@ const ContactCard = ({
           userName
           cardColors {
             primary
-            light
           }
           commonInformation {
             company
@@ -56,6 +55,7 @@ const ContactCard = ({
   );
 
   const backgroundColor = cardColors?.primary ?? colors.black;
+
   const readableColor = useMemo(
     () => getTextColor(backgroundColor),
     [backgroundColor],
