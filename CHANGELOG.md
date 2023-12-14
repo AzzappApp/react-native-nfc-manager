@@ -1,5 +1,6 @@
-## 0.5.2-canary.53
+## 0.5.2-canary.54
 
+* **fix:**  - **home:** [#1762](https://github.com/AzzappApp/azzapp/pull/1762) increase total contact card scans ([#2000](https://github.com/AzzappApp/azzapp/pull/2000))
 * **fix:**  - remove unused color on contact card ([#1994](https://github.com/AzzappApp/azzapp/pull/1994))
 * **fix:**  - changeusername, fix the lastUpdateUsername handling ([#1989](https://github.com/AzzappApp/azzapp/pull/1989))
 * **fix:**  - 🐛 do not display remove user button for current user ([#1988](https://github.com/AzzappApp/azzapp/pull/1988))
