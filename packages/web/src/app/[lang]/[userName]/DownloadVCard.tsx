@@ -68,7 +68,7 @@ const DownloadVCard = ({ webCard }: { webCard: WebCard }) => {
         })
         .catch(() => void 0);
     }
-  }, [webCard, searchParams]);
+  }, [webCard.userName, webCard.id, searchParams]);
 
   return (
     <div

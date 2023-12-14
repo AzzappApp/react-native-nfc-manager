@@ -5,6 +5,8 @@ import {
   updateStatistics,
   incrementWebCardViews,
   incrementContactCardScans,
+  db,
+  updateContactCardTotalScans,
 } from '#domains';
 import type { MutationResolvers } from '#schema/__generated__/types';
 
@@ -42,7 +44,10 @@ const updateContactCardScans: MutationResolvers['updateContactCardScans'] =
 
     try {
       if (profileId !== auth.profileId) {
-        await incrementContactCardScans(profileId, true);
+        await db.transaction(async tx => {
+          await updateContactCardTotalScans(profileId, tx);
+          await incrementContactCardScans(profileId, true, tx);
+        });
       }
 
       return true;

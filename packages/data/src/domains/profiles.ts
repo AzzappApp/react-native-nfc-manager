@@ -1,5 +1,5 @@
 import { createId } from '@paralleldrive/cuid2';
-import { and, asc, desc, eq, isNull, ne } from 'drizzle-orm';
+import { and, asc, desc, eq, isNull, ne, sql } from 'drizzle-orm';
 import {
   boolean,
   json,
@@ -184,4 +184,16 @@ export const getRecommendedWebCards = async (
     )
     .orderBy(desc(WebCardTable.createdAt))
     .then(res => res.map(({ WebCard }) => WebCard));
+};
+
+export const updateContactCardTotalScans = async (
+  profileId: string,
+  tx: DbTransaction = db,
+) => {
+  await tx
+    .update(ProfileTable)
+    .set({
+      nbContactCardScans: sql`${ProfileTable.nbContactCardScans} + 1`,
+    })
+    .where(eq(ProfileTable.id, profileId));
 };
