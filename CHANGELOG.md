@@ -1,5 +1,6 @@
-## 0.5.2-canary.51
+## 0.5.2-canary.52
 
+* **fix:**  - 🐛 do not display remove user button for current user ([#1988](https://github.com/AzzappApp/azzapp/pull/1988))
 * **fix:**  - **post:** [#1521](https://github.com/AzzappApp/azzapp/pull/1521) make comments scrollable on desktop ([#1990](https://github.com/AzzappApp/azzapp/pull/1990))
 * **fix:**  - configure eas env
 * **fix:**  - **webcard builder:** disabled header buttons when showing colors ([#1979](https://github.com/AzzappApp/azzapp/pull/1979))

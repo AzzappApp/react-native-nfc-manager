@@ -1,6 +1,6 @@
 {
   "name": "@azzapp/backoffice",
-  "version": "0.5.2-canary.51",
+  "version": "0.5.2-canary.52",
   "private": true,
   "scripts": {
     "dev": "next dev -p 3005",
@@ -13,8 +13,8 @@
     "dev"
   ],
   "dependencies": {
-    "@azzapp/data": "0.5.2-canary.51",
-    "@azzapp/shared": "0.5.2-canary.51",
+    "@azzapp/data": "0.5.2-canary.52",
+    "@azzapp/shared": "0.5.2-canary.52",
     "@emotion/cache": "latest",
     "@emotion/react": "latest",
     "@emotion/styled": "latest",
