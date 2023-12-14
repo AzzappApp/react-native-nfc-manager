@@ -1,4 +1,5 @@
 import { GraphQLError } from 'graphql';
+import { fromGlobalId } from 'graphql-relay';
 import ERRORS from '@azzapp/shared/errors';
 import { isAdmin } from '@azzapp/shared/profileHelpers';
 import { updateProfile } from '#domains';
@@ -16,17 +17,23 @@ const updateProfileMutation: MutationResolvers['updateProfile'] = async (
     throw new GraphQLError(ERRORS.UNAUTHORIZED);
   }
 
+  const { id: targetProfileId, type } = fromGlobalId(input.profileId);
+
+  if (type !== 'Profile') {
+    throw new GraphQLError(ERRORS.INVALID_REQUEST);
+  }
+
   if (input.profileRole === 'owner')
     throw new GraphQLError(ERRORS.INVALID_REQUEST);
 
   const [author, target] = await Promise.all([
     loaders.Profile.load(profileId),
-    loaders.Profile.load(input.profileId),
+    loaders.Profile.load(targetProfileId),
   ]);
 
   if (!author || !target) throw new GraphQLError(ERRORS.INVALID_REQUEST);
 
-  if (profileId !== input.profileId || input.profileRole) {
+  if (profileId !== targetProfileId || input.profileRole) {
     if (
       !author ||
       !target ||

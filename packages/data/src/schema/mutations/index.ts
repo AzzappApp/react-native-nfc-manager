@@ -24,6 +24,7 @@ import {
 import togglePostReaction from './postReaction';
 import { publishCard, unpublishCard } from './publishCard';
 import removeFollower from './removeFollower';
+import removeUserFromWebcard from './removeUserFromWebcard';
 import reorderModules from './reorderModules';
 import saveCardColors from './saveCardColors';
 import saveCardStyle from './saveCardStyle';
@@ -88,4 +89,5 @@ export const Mutation: MutationResolvers = {
   updateProfile,
   inviteUser,
   filterWebCardSuggestion,
+  removeUserFromWebcard,
 };

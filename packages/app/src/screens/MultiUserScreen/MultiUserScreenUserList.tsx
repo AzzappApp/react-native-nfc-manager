@@ -1,4 +1,3 @@
-import { fromGlobalId } from 'graphql-relay';
 import { Fragment, useRef } from 'react';
 import { useIntl } from 'react-intl';
 import { StyleSheet, View } from 'react-native';
@@ -145,7 +144,7 @@ const MultiUserScreenUserList = (props: MultiUserScreenListProps) => {
                       phoneNumber: user.phoneNumber,
                     },
                     user.contactCard,
-                    fromGlobalId(user.profileId).id,
+                    user.profileId,
                   );
                 }}
                 key={user.email}

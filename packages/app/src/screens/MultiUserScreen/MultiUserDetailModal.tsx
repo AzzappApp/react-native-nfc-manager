@@ -1,4 +1,3 @@
-import { fromGlobalId } from 'graphql-relay';
 import { forwardRef, useEffect, useImperativeHandle, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { FormattedMessage, useIntl } from 'react-intl';
@@ -24,6 +23,7 @@ import Text from '#ui/Text';
 import TextInput from '#ui/TextInput';
 import type { ContactCardEditFormValues } from '#screens/ContactCardScreen/ContactCardEditModalSchema';
 import type { AssociatedUser } from '#screens/MultiUserAddScreen/MultiUserAddModal';
+import type { MultiUserDetailModal_RemoveUserMutation } from '@azzapp/relay/artifacts/MultiUserDetailModal_RemoveUserMutation.graphql';
 import type { MultiUserDetailModal_UpdateProfileMutation } from '@azzapp/relay/artifacts/MultiUserDetailModal_UpdateProfileMutation.graphql';
 import type { MultiUserDetailModal_webcard$key } from '@azzapp/relay/artifacts/MultiUserDetailModal_webcard.graphql';
 import type { ProfileRole } from '@azzapp/relay/artifacts/MultiUserScreenQuery.graphql';
@@ -240,15 +240,62 @@ const MultiUserDetailModal = (
 
   useEffect(() => {
     const profileIndex =
-      data.profiles?.findIndex(
-        profile => fromGlobalId(profile.id).id === profileId,
-      ) ?? 0;
+      data.profiles?.findIndex(profile => profile.id === profileId) ?? 0;
 
     index.value = profileIndex;
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [profileId, data.profiles]);
 
-  const isCurrentProfile = profileId === fromGlobalId(currentProfileId).id;
+  const isCurrentProfile = profileId === currentProfileId;
+  const [commitDelete] = useMutation<MultiUserDetailModal_RemoveUserMutation>(
+    graphql`
+      mutation MultiUserDetailModal_RemoveUserMutation(
+        $input: RemoveUserFromWebcardInput!
+      ) {
+        removeUserFromWebcard(input: $input) {
+          profileId
+        }
+      }
+    `,
+  );
+
+  const onRemoveUser = () => {
+    commitDelete({
+      variables: {
+        input: {
+          profileId,
+        },
+      },
+      onCompleted: () => {
+        setVisible(false);
+      },
+      onError: e => {
+        console.error(e);
+        Toast.show({
+          type: 'error',
+          text1: intl.formatMessage({
+            defaultMessage: 'Error, could not remove user. Please try again.',
+            description:
+              'Error toast message when removing user from MultiUserDetailModal',
+          }),
+        });
+      },
+      updater: store => {
+        const root = store.getRoot();
+        const viewer = root.getLinkedRecord('viewer');
+        const profile = viewer?.getLinkedRecord('profile');
+        const webcard = profile?.getLinkedRecord('webCard');
+        const profiles = webcard?.getLinkedRecords('profiles');
+
+        webcard?.setLinkedRecords(
+          profiles?.filter(
+            profile => profile.getValue('id')?.toString() !== profileId,
+          ),
+          'profiles',
+        );
+      },
+    });
+  };
 
   return (
     <ScreenModal visible={visible} animationType="slide">
@@ -292,7 +339,10 @@ const MultiUserDetailModal = (
             isMultiUser={true}
             footer={
               !isCurrentProfile && (
-                <PressableNative style={styles.removeButton}>
+                <PressableNative
+                  style={styles.removeButton}
+                  onPress={onRemoveUser}
+                >
                   <Text style={[styles.removeText, textStyles.button]}>
                     <FormattedMessage
                       defaultMessage="Remove user"
