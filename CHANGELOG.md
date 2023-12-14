@@ -1,5 +1,7 @@
-## 0.5.2-canary.52
+## 0.5.2-canary.53
 
+* **fix:**  - remove unused color on contact card ([#1994](https://github.com/AzzappApp/azzapp/pull/1994))
+* **fix:**  - changeusername, fix the lastUpdateUsername handling ([#1989](https://github.com/AzzappApp/azzapp/pull/1989))
 * **fix:**  - 🐛 do not display remove user button for current user ([#1988](https://github.com/AzzappApp/azzapp/pull/1988))
 * **fix:**  - **post:** [#1521](https://github.com/AzzappApp/azzapp/pull/1521) make comments scrollable on desktop ([#1990](https://github.com/AzzappApp/azzapp/pull/1990))
 * **fix:**  - configure eas env
