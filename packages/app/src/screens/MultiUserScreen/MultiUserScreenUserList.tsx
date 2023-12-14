@@ -51,6 +51,7 @@ const MultiUserScreenUserList = (props: MultiUserScreenListProps) => {
         }
         viewer {
           profile {
+            id
             webCard {
               ...MultiUserDetailModal_webcard
               profiles {
@@ -164,7 +165,11 @@ const MultiUserScreenUserList = (props: MultiUserScreenListProps) => {
         </Fragment>
       ))}
       {profile?.webCard.profiles && (
-        <MultiUserDetailModal user={profile.webCard} ref={detail} />
+        <MultiUserDetailModal
+          user={profile.webCard}
+          ref={detail}
+          currentProfileId={data.viewer.profile?.id ?? ''}
+        />
       )}
     </View>
   );

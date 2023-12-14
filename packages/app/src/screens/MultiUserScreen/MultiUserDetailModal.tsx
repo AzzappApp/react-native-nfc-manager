@@ -33,6 +33,7 @@ import type { Control } from 'react-hook-form';
 
 type MultiUserDetailModalProps = {
   user: MultiUserDetailModal_webcard$key;
+  currentProfileId: string;
 };
 
 export type MultiUserDetailFormValues = ContactCardEditFormValues & {
@@ -52,7 +53,7 @@ const MultiUserDetailModal = (
   props: MultiUserDetailModalProps,
   ref: ForwardedRef<MultiUserDetailModalActions>,
 ) => {
-  const { user } = props;
+  const { user, currentProfileId } = props;
   const [visible, setVisible] = useState(false);
   const [showImagePicker, setShowImagePicker] = useState(false);
   const [profileId, setProfileId] = useState('');
@@ -247,6 +248,8 @@ const MultiUserDetailModal = (
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [profileId, data.profiles]);
 
+  const isCurrentProfile = profileId === fromGlobalId(currentProfileId).id;
+
   return (
     <ScreenModal visible={visible} animationType="slide">
       <Container style={{ flex: 1 }}>
@@ -288,14 +291,16 @@ const MultiUserDetailModal = (
             imagePickerVisible={showImagePicker}
             isMultiUser={true}
             footer={
-              <PressableNative style={styles.removeButton}>
-                <Text style={[styles.removeText, textStyles.button]}>
-                  <FormattedMessage
-                    defaultMessage="Remove user"
-                    description="label for button to remove user from multi-user profile"
-                  />
-                </Text>
-              </PressableNative>
+              !isCurrentProfile && (
+                <PressableNative style={styles.removeButton}>
+                  <Text style={[styles.removeText, textStyles.button]}>
+                    <FormattedMessage
+                      defaultMessage="Remove user"
+                      description="label for button to remove user from multi-user profile"
+                    />
+                  </Text>
+                </PressableNative>
+              )
             }
           >
             <View style={{ paddingHorizontal: 10 }}>
