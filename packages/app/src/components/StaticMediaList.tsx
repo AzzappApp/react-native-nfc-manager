@@ -237,6 +237,13 @@ const StaticMediaListItem = ({
     onSelectMedia(item.id);
   }, [item.id, onSelectMedia]);
 
+  const visiblebackgroundColor = useMemo(() => {
+    if (tintColor === colors.white && backgroundColor === colors.white) {
+      return colors.grey200;
+    }
+    return backgroundColor;
+  }, [backgroundColor, tintColor]);
+
   return (
     <Animated.View style={[itemAnimatedStyle]}>
       <PressableNative
@@ -244,7 +251,7 @@ const StaticMediaListItem = ({
           styles.button,
           {
             borderRadius: dimension.width * COVER_CARD_RADIUS,
-            backgroundColor,
+            backgroundColor: visiblebackgroundColor,
           },
         ]}
         onPress={onPress}
@@ -274,7 +281,7 @@ const StaticMediaListItem = ({
                 style={[
                   styles.image,
                   {
-                    backgroundColor,
+                    backgroundColor: visiblebackgroundColor,
                     tintColor,
                     aspectRatio: imageRatio,
                   },
