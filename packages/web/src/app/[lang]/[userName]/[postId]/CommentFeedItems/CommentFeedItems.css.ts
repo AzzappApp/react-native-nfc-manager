@@ -12,6 +12,7 @@ const feed = style({
     [MediaQuery.Desktop]: {
       overflowY: 'scroll',
       height: '100%',
+      width: '100%',
       position: 'absolute',
     },
     [MediaQuery.Mobile]: {
