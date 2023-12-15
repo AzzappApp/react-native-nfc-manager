@@ -44,14 +44,9 @@ const updateProfileMutation: MutationResolvers['updateProfile'] = async (
     }
   }
 
-  const {
-    profileId: profileIdToUpdate,
-    profileRole,
-    contactCard,
-    avatarId,
-  } = input;
+  const { profileRole, contactCard, avatarId } = input;
 
-  await updateProfile(profileIdToUpdate, {
+  await updateProfile(targetProfileId, {
     profileRole: profileRole ?? undefined,
     contactCard: {
       ...contactCard,

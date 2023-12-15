@@ -36,6 +36,7 @@ const multiUserScreenQuery = graphql`
     viewer {
       profile {
         id
+        profileRole
         webCard {
           id
           isMultiUser
@@ -246,19 +247,21 @@ const MultiUserScreen = ({
                 />
               )}
             </Text>
-            <View style={styles.switchSection}>
-              <Text style={[textStyles.large]}>
-                <FormattedMessage
-                  defaultMessage="Multi User"
-                  description="Title for switch section in MultiUserScreen"
+            {data.viewer.profile?.profileRole === 'owner' && (
+              <View style={styles.switchSection}>
+                <Text style={[textStyles.large]}>
+                  <FormattedMessage
+                    defaultMessage="Multi User"
+                    description="Title for switch section in MultiUserScreen"
+                  />
+                </Text>
+                <Switch
+                  variant="large"
+                  value={data.viewer.profile?.webCard.isMultiUser}
+                  onValueChange={toggleMultiUser}
                 />
-              </Text>
-              <Switch
-                variant="large"
-                value={data.viewer.profile?.webCard.isMultiUser}
-                onValueChange={toggleMultiUser}
-              />
-            </View>
+              </View>
+            )}
             {data.viewer.profile?.webCard.isMultiUser && (
               <MultiUserScreenUserList
                 usersByRole={userProfilesByRole}
