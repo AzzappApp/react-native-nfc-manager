@@ -71,19 +71,31 @@ export type CoverMediaPreviewProps = Omit<ViewProps, 'children'> & {
    * Called when the GPUView starts loading the media
    */
   onLoadingStart?: () => void;
-
   /**
    * Called when the GPUView finishes loading the media
    */
   onLoadingEnd?: () => void;
-
   /**
    * Called when the GPUView fails to load the media
    */
   onLoadingError?: (error: Error | null) => void;
+  /**
+   * Called when the video is ready to play (in case of video)
+   */
+  onVideoLoaded?: () => void;
+  /**
+   * Called when the GPUView fails to load the media
+   */
+  onProgress?: ({
+    currentTime,
+    duration,
+  }: {
+    currentTime: number;
+    duration: number;
+  }) => void;
 
   /**
-   * Pause the video
+   * Pause the video and the animations
    */
   paused?: boolean;
 };
@@ -109,6 +121,8 @@ const CoverMediaPreview = ({
   onLoadingStart,
   onLoadingEnd,
   onLoadingError,
+  onProgress,
+  onVideoLoaded,
   ...props
 }: CoverMediaPreviewProps) => {
   const pausedOnFirstLoad = useRef(paused).current;
@@ -150,39 +164,43 @@ const CoverMediaPreview = ({
   }, [onLoadingStart]);
 
   const [playerReady, setPlayerReady] = useState(false);
-  const onProgress = useCallback(
-    (event: NativeSyntheticEvent<{ currentTime: number }>) => {
+  const onProgressInner = useCallback(
+    (
+      event: NativeSyntheticEvent<{ currentTime: number; duration: number }>,
+    ) => {
+      const { currentTime, duration } = event.nativeEvent;
       // wait the first frame to be displayed before considering the player ready
-      if (event.nativeEvent.currentTime > 0.04) {
+      if (currentTime > 0.04) {
         setPlayerReady(true);
       }
+      onProgress?.({ currentTime, duration });
     },
-    [],
+    [onProgress],
   );
 
   const onPlayerReady = useCallback(() => {
+    onVideoLoaded?.();
     videoViewReadyState.current.playerReady = true;
     const hasImages = !!backgroundImageUri || !!maskUri;
     if (videoViewReadyState.current.imagesLoaded || !hasImages) {
       onLoadingEnd?.();
     }
-  }, [backgroundImageUri, maskUri, onLoadingEnd]);
+  }, [backgroundImageUri, maskUri, onLoadingEnd, onVideoLoaded]);
 
-  const loadingHandlers =
-    kind === 'video'
-      ? {
-          onImagesLoadingStart: onVideoViewImagesLoadingStart,
-          onImagesLoaded: onVideoViewImagesLoaded,
-          onPlayerStartBuffing,
-          onPlayerReady,
-          onProgress,
-          onError: onLoadingError,
-        }
-      : {
-          onLoad: onLoadingEnd,
-          onLoadStart: onLoadingStart,
-          onError: onLoadingError,
-        };
+  const videoLoadingHandlers = {
+    onImagesLoadingStart: onVideoViewImagesLoadingStart,
+    onImagesLoaded: onVideoViewImagesLoaded,
+    onPlayerStartBuffing,
+    onPlayerReady,
+    onProgress: onProgressInner,
+    onError: onLoadingError,
+  };
+
+  const imageLoadingHandlers = {
+    onLoad: onLoadingEnd,
+    onLoadStart: onLoadingStart,
+    onError: onLoadingError,
+  };
 
   const mainGPULayerProps = {
     uri,
@@ -198,7 +216,7 @@ const CoverMediaPreview = ({
     <View style={style} {...props}>
       {kind === 'video' && (
         <GPUImageView
-          {...loadingHandlers}
+          {...imageLoadingHandlers}
           style={[
             StyleSheet.absoluteFill,
             { backgroundColor: backgroundColor ?? '#000' },
@@ -215,7 +233,7 @@ const CoverMediaPreview = ({
       )}
       {(kind !== 'video' || !paused) && (
         <GPUView
-          {...loadingHandlers}
+          {...(kind === 'video' ? videoLoadingHandlers : imageLoadingHandlers)}
           paused={paused}
           style={[
             {

@@ -102,6 +102,7 @@ const useSaveCover = (
         ...extractLayoutParameters(coverStyle.mediaParameters)[1],
         ...mediaCropParameters,
       };
+
       try {
         saveCoverInput = {
           backgroundId: coverStyle.background?.id ?? null,
@@ -110,6 +111,7 @@ const useSaveCover = (
           foregroundId: coverStyle.foreground?.id ?? null,
           foregroundColor: coverStyle.foregroundColor,
           mediaFilter: coverStyle.mediaFilter,
+          mediaAnimation: coverStyle.mediaAnimation,
           mediaParameters,
           merged: coverStyle.merged,
           segmented: coverStyle.segmented,
@@ -117,6 +119,7 @@ const useSaveCover = (
           subTitleStyle: coverStyle.subTitleStyle,
           textOrientation: coverStyle.textOrientation,
           textPosition: coverStyle.textPosition,
+          textAnimation: coverStyle.textAnimation,
           title,
           titleStyle: coverStyle.titleStyle,
         };
@@ -224,7 +227,7 @@ const useSaveCover = (
                   mime.lookup(fileName) || media.kind === 'image'
                     ? isPNG(media.uri)
                       ? 'image/png'
-                      : 'image/jpg'
+                      : 'image/jpeg'
                     : 'video/mp4',
               } as any,
               uploadURL,

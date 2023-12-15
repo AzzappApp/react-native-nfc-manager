@@ -256,7 +256,7 @@ const CarouselEditionScreen = ({
               {
                 name: getFileName(uri),
                 uri,
-                type: 'image/jpg',
+                type: 'image/jpeg',
               } as any,
               uploadURL,
               uploadParameters,

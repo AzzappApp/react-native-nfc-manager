@@ -27,6 +27,10 @@ type CardCover {
   """
   textPosition: CardCoverTextPosition
   """
+  The animation of the card cover
+  """
+  textAnimation: String
+  """
   The media of the card cover generated from the source media
   """
   media: Media
@@ -46,6 +50,10 @@ type CardCover {
   The transform applied to the source media to generate the media
   """
   mediaParameters: JSON
+  """
+  The media animation of the card cover
+  """
+  mediaAnimation: String
   """
   The background image of the card cover
   """

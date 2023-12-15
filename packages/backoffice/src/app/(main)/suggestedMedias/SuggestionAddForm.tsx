@@ -100,7 +100,7 @@ const SuggesionAddForm = ({
           <MediasListInput
             label="Medias"
             value={medias}
-            kind="mixed"
+            accept="image/jpeg,video/mp4"
             name="medias"
             onChange={setMedias as any}
             error={!!mediaErrors}

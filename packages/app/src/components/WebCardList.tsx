@@ -36,7 +36,7 @@ const WebCardListItemMemoized = memo(function ProfileListItem({
           <CoverRenderer
             webCard={webCard}
             width={COVER_WIDTH}
-            videoEnabled={false}
+            animationEnabled={false}
           />
           <Text variant="large" numberOfLines={1}>
             {webCard.userName}

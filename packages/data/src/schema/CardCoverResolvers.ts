@@ -8,6 +8,7 @@ export const CardCover: CardCoverResolvers = {
   subTitleStyle: webCard => webCard.coverData?.subTitleStyle ?? null,
   textOrientation: webCard => webCard.coverData?.textOrientation ?? null,
   textPosition: webCard => webCard.coverData?.textPosition ?? null,
+  textAnimation: webCard => webCard.coverData?.textAnimation ?? null,
   media: webCard =>
     webCard.coverData?.mediaId
       ? {
@@ -31,6 +32,7 @@ export const CardCover: CardCoverResolvers = {
       : null,
   mediaFilter: webCard => webCard.coverData?.mediaFilter ?? null,
   mediaParameters: webCard => webCard.coverData?.mediaParameters ?? null,
+  mediaAnimation: webCard => webCard.coverData?.mediaAnimation ?? null,
   background: async webCard =>
     webCard.coverData?.backgroundId
       ? {

@@ -1,11 +1,21 @@
-import { useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { View, useWindowDimensions } from 'react-native';
+import {
+  useSharedValue,
+  withRepeat,
+  withTiming,
+} from 'react-native-reanimated';
 import { swapColor } from '@azzapp/shared/cardHelpers';
-import { COVER_CARD_RADIUS, COVER_RATIO } from '@azzapp/shared/coverHelpers';
+import {
+  COVER_ANIMATION_DURATION,
+  COVER_CARD_RADIUS,
+  COVER_RATIO,
+} from '@azzapp/shared/coverHelpers';
 import { shadow } from '#theme';
+import CoverStaticMediaLayer from '#components/CoverRenderer/CoverStaticMediaLayer';
 import CoverTextRenderer from '#components/CoverRenderer/CoverTextRenderer';
-import { MediaImageRenderer } from '#components/medias';
+import MediaAnimator from '#components/CoverRenderer/MediaAnimator';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import ActivityIndicator from '#ui/ActivityIndicator';
 import Button from '#ui/Button';
@@ -25,9 +35,17 @@ type CoverPreviewRendererProps = CoverTextRendererProps &
      */
     uri?: string | null;
     /**
+     * the animation to apply on the  media
+     */
+    mediaAnimation?: string | null;
+    /**
      * The foreground image id
      */
     foregroundId?: string | null;
+    /**
+     * The foreground image id
+     */
+    foregroundKind?: string | null;
     /**
      * the foreground image uri
      */
@@ -74,11 +92,13 @@ const CoverPreviewRenderer = ({
   time,
   startTime,
   duration,
+  mediaAnimation,
   backgroundColor,
   maskUri,
   backgroundImageUri,
   backgroundImageTintColor,
   foregroundId,
+  foregroundKind,
   foregroundImageUri,
   foregroundImageTintColor,
   backgroundMultiply,
@@ -91,6 +111,7 @@ const CoverPreviewRenderer = ({
   subTitleStyle,
   textOrientation,
   textPosition,
+  textAnimation,
   // other props
   colorPalette,
   computing,
@@ -103,48 +124,58 @@ const CoverPreviewRenderer = ({
 }: CoverPreviewRendererProps) => {
   const borderRadius = height * COVER_RATIO * COVER_CARD_RADIUS;
 
-  const [isLoading, setIsLoading] = useState(false);
   const [loadingFailed, setLoadingFailed] = useState(false);
+  const [isLoading, setIsLoading] = useState(!!uri || !!backgroundImageUri);
+  useEffect(() => {
+    setForegroundLoading(!!foregroundId);
+  }, [foregroundId]);
 
-  const intl = useIntl();
+  const [foregroundLoading, setForegroundLoading] = useState(!!foregroundId);
+  useEffect(() => {
+    setIsLoading(!!uri || !!backgroundImageUri);
+  }, [uri, backgroundImageUri]);
 
-  const onLoadStart = () => {
-    setIsLoading(true);
-  };
+  const [videoReady, setVideoReady] = useState(kind !== 'video');
+  useEffect(() => {
+    setVideoReady(kind !== 'video');
+  }, [kind]);
 
-  const onLoad = () => {
-    // A delay to avoid flickering
-    setTimeout(() => {
-      setIsLoading(false);
+  const mediasReadyHandler = useCallback(() => {
+    if ((!foregroundId || !foregroundLoading) && !isLoading) {
       onReady?.();
-    }, 50);
-  };
+    }
+  }, [foregroundId, foregroundLoading, isLoading, onReady]);
 
-  const onLoadingError = () => {
+  const onMediaLoad = useCallback(() => {
+    setIsLoading(false);
+    mediasReadyHandler();
+  }, [mediasReadyHandler]);
+
+  const onMediaLoadingError = useCallback(() => {
     setLoadingFailed(true);
     onError?.();
-  };
+  }, [onError]);
 
-  const onRetry = () => {
+  const onForegroundLoad = useCallback(() => {
+    setForegroundLoading(false);
+    mediasReadyHandler();
+  }, [mediasReadyHandler]);
+
+  const onForegroundLoadingError = useCallback(() => {
+    setForegroundLoading(false);
+  }, []);
+
+  const onVideoLoaded = useCallback(() => {
+    setVideoReady(true);
+  }, []);
+
+  const onRetry = useCallback(() => {
     setLoadingFailed(false);
-  };
+  }, []);
 
   const styles = useStyleSheet(styleSheet);
 
   const { width: windowWidth } = useWindowDimensions();
-
-  const foregroundSource = useMemo(
-    () =>
-      foregroundImageUri && foregroundId
-        ? {
-            uri: foregroundImageUri,
-            mediaId: foregroundId,
-            requestedSize: windowWidth,
-          }
-        : null,
-    [foregroundImageUri, foregroundId, windowWidth],
-  );
-
   const foregroundStyle = useMemo(
     () => ({
       position: 'absolute' as const,
@@ -157,103 +188,174 @@ const CoverPreviewRenderer = ({
     [height],
   );
 
+  const animationSharedValue = useSharedValue(0);
+
+  const onProgress = useCallback(
+    (event: { currentTime: number; duration: number }) => {
+      const { currentTime, duration } = event;
+      if (!paused) {
+        if (currentTime / duration <= 0.1 / duration) {
+          animationSharedValue.value = 0;
+        } else {
+          animationSharedValue.value = withTiming(
+            currentTime / duration + 0.1 / duration,
+            { duration: 100 },
+          );
+        }
+      }
+    },
+    [animationSharedValue, paused],
+  );
+
+  useEffect(() => {
+    animationSharedValue.value = 0;
+    if (
+      !paused &&
+      !loadingFailed &&
+      !computing &&
+      !isLoading &&
+      !foregroundLoading &&
+      videoReady
+    ) {
+      // we setup the animations even for the video cover
+      // to avoid flickering of the animation due to the delay
+      // of inProgress event on the first frames
+      animationSharedValue.value = withRepeat(
+        withTiming(1, { duration: COVER_ANIMATION_DURATION }),
+        -1,
+        false,
+      );
+    }
+    // we want to restart the animation when the text animation or the media animation change
+  }, [
+    animationSharedValue,
+    paused,
+    textAnimation,
+    mediaAnimation,
+    loadingFailed,
+    computing,
+    isLoading,
+    foregroundLoading,
+    videoReady,
+  ]);
+
+  const intl = useIntl();
+
+  let content: React.ReactNode = null;
+  if (loadingFailed) {
+    content = (
+      <View style={styles.errorContainer}>
+        <Text variant="error" style={styles.errorMessage}>
+          <FormattedMessage
+            defaultMessage="Failed to load the informations of your cover"
+            description="Error message displayed when cover image failed to load"
+          />
+        </Text>
+        <Button
+          onPress={onRetry}
+          label={intl.formatMessage({
+            defaultMessage: 'Retry',
+            description:
+              'label of the button allowing  to retry loading cover image',
+          })}
+        />
+      </View>
+    );
+  } else {
+    content = (
+      <>
+        <View
+          style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            height,
+            width: height * COVER_RATIO,
+            backgroundColor: swapColor(backgroundColor, colorPalette) as any,
+          }}
+        />
+        {uri && (
+          <MediaAnimator
+            animation={mediaAnimation}
+            animationSharedValue={paused ? null : animationSharedValue}
+            width={height * COVER_RATIO}
+            height={height}
+            style={styles.cover}
+          >
+            <CoverMediaPreview
+              key={uri}
+              uri={uri}
+              kind={kind}
+              time={time}
+              startTime={startTime}
+              duration={duration}
+              maskUri={maskUri}
+              backgroundColor={swapColor(backgroundColor, colorPalette)}
+              backgroundMultiply={backgroundMultiply}
+              backgroundImageUri={backgroundImageUri}
+              backgroundImageTintColor={swapColor(
+                backgroundImageTintColor,
+                colorPalette,
+              )}
+              filter={filter}
+              editionParameters={editionParameters}
+              paused={paused || foregroundLoading}
+              onLoadingEnd={onMediaLoad}
+              onLoadingError={onMediaLoadingError}
+              onVideoLoaded={onVideoLoaded}
+              style={styles.cover}
+              testID="cover-edition-screen-cover-preview"
+              onProgress={onProgress}
+            />
+          </MediaAnimator>
+        )}
+        {foregroundId && foregroundImageUri && (
+          <CoverStaticMediaLayer
+            testID="cover-foreground-preview"
+            mediaId={foregroundId}
+            uri={foregroundImageUri}
+            requestedSize={windowWidth}
+            tintColor={swapColor(foregroundImageTintColor, colorPalette)}
+            kind={foregroundKind ?? 'png'}
+            animationSharedValue={paused ? null : animationSharedValue}
+            onReady={onForegroundLoad}
+            onError={onForegroundLoadingError}
+            style={foregroundStyle}
+          />
+        )}
+        <CoverTextRenderer
+          key={`${title}-${subTitle}-${textAnimation}`}
+          title={title}
+          subTitle={subTitle}
+          titleStyle={titleStyle}
+          subTitleStyle={subTitleStyle}
+          textOrientation={textOrientation}
+          textPosition={textPosition}
+          textAnimation={textAnimation}
+          pointerEvents="none"
+          style={styles.titleOverlayContainer}
+          colorPalette={colorPalette}
+          height={height}
+          animationSharedValue={paused ? null : animationSharedValue}
+        />
+
+        {(computing || isLoading) && (
+          <Delay delay={computing ? 0 : 100}>
+            <View style={styles.maskComputingOverlay}>
+              <ActivityIndicator color="white" />
+            </View>
+          </Delay>
+        )}
+      </>
+    );
+  }
+
   return (
     <View
       style={[styles.root, { borderRadius, height }, styles.coverShadow, style]}
       {...props}
     >
-      <View style={[styles.topPanelContent, { borderRadius }]}>
-        {loadingFailed ? (
-          <View style={styles.errorContainer}>
-            <Text variant="error" style={styles.errorMessage}>
-              <FormattedMessage
-                defaultMessage="Failed to load the informations of your cover"
-                description="Error message displayed when cover image failed to load"
-              />
-            </Text>
-            <Button
-              onPress={onRetry}
-              label={intl.formatMessage({
-                defaultMessage: 'Retry',
-                description:
-                  'label of the button allowing  to retry loading cover image',
-              })}
-            />
-          </View>
-        ) : (
-          <>
-            <View
-              style={{
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                height,
-                width: height * COVER_RATIO,
-                backgroundColor: swapColor(
-                  backgroundColor,
-                  colorPalette,
-                ) as any,
-              }}
-            />
-            {uri && (
-              <CoverMediaPreview
-                key={uri}
-                uri={uri}
-                kind={kind}
-                time={time}
-                startTime={startTime}
-                duration={duration}
-                maskUri={maskUri}
-                backgroundColor={swapColor(backgroundColor, colorPalette)}
-                backgroundMultiply={backgroundMultiply}
-                backgroundImageUri={backgroundImageUri}
-                backgroundImageTintColor={swapColor(
-                  backgroundImageTintColor,
-                  colorPalette,
-                )}
-                filter={filter}
-                editionParameters={editionParameters}
-                paused={paused}
-                onLoadingStart={onLoadStart}
-                onLoadingEnd={onLoad}
-                onLoadingError={onLoadingError}
-                style={styles.cover}
-                testID="cover-edition-screen-cover-preview"
-              />
-            )}
-            {foregroundSource && (
-              <MediaImageRenderer
-                testID="cover-foreground-preview"
-                pointerEvents="none"
-                source={foregroundSource}
-                tintColor={swapColor(foregroundImageTintColor, colorPalette)}
-                style={foregroundStyle}
-                alt={'Cover edition foreground'}
-              />
-            )}
-            <CoverTextRenderer
-              title={title}
-              subTitle={subTitle}
-              titleStyle={titleStyle}
-              subTitleStyle={subTitleStyle}
-              textOrientation={textOrientation}
-              textPosition={textPosition}
-              pointerEvents="none"
-              style={styles.titleOverlayContainer}
-              colorPalette={colorPalette}
-              height={height}
-            />
-
-            {(computing || isLoading) && (
-              <Delay delay={computing ? 0 : 100}>
-                <View style={styles.maskComputingOverlay}>
-                  <ActivityIndicator color="white" />
-                </View>
-              </Delay>
-            )}
-          </>
-        )}
-      </View>
+      <View style={[styles.topPanelContent, { borderRadius }]}>{content}</View>
     </View>
   );
 };

@@ -149,6 +149,7 @@ const CoverEditorTemplateList = ({
           subTitleStyle,
           textOrientation,
           textPosition,
+          textAnimation,
           background,
           backgroundColor,
           backgroundPatternColor,
@@ -156,6 +157,7 @@ const CoverEditorTemplateList = ({
           foregroundColor,
           mediaFilter,
           mediaParameters,
+          mediaAnimation,
           merged,
         },
         colorPalette,
@@ -191,11 +193,13 @@ const CoverEditorTemplateList = ({
               backgroundPatternColor
               foreground {
                 id
+                kind
                 uri
               }
               foregroundColor
               mediaFilter
               mediaParameters
+              mediaAnimation
               merged
               subTitleStyle {
                 color
@@ -204,6 +208,7 @@ const CoverEditorTemplateList = ({
               }
               textOrientation
               textPosition
+              textAnimation
               titleStyle {
                 color
                 fontFamily
@@ -240,6 +245,7 @@ const CoverEditorTemplateList = ({
         subTitleStyle,
         textOrientation: textOrientationOrDefaut(textOrientation),
         textPosition: textPositionOrDefaut(textPosition),
+        textAnimation,
         media: media
           ? media
           : {
@@ -257,6 +263,7 @@ const CoverEditorTemplateList = ({
               ...mediaCropParameters,
             }
           : (templateEditionParameters as EditionParameters | null) ?? {},
+        mediaAnimation: mediaAnimation ?? null,
         maskUri: kind === 'people' ? maskUri : null,
         background: background ?? null,
         backgroundColor,
@@ -368,8 +375,10 @@ const CoverEditorTemplateList = ({
       subTitleStyle,
       textOrientation,
       textPosition,
+      textAnimation,
       mediaFilter,
       mediaParameters,
+      mediaAnimation,
       background,
       backgroundColor,
       backgroundPatternColor,
@@ -385,8 +394,10 @@ const CoverEditorTemplateList = ({
         subTitleStyle,
         textOrientation,
         textPosition,
+        textAnimation,
         mediaFilter,
         mediaParameters,
+        mediaAnimation,
         background: background ?? null,
         backgroundColor,
         backgroundPatternColor,
@@ -497,6 +508,7 @@ const CoverEditorTemplateList = ({
             backgroundImageUri={item.background?.uri}
             backgroundImageTintColor={item.backgroundPatternColor}
             foregroundId={item.foreground?.id}
+            foregroundKind={item.foreground?.kind}
             foregroundImageUri={item.foreground?.uri}
             foregroundImageTintColor={item.foregroundColor}
             backgroundMultiply={item.merged}
@@ -508,6 +520,7 @@ const CoverEditorTemplateList = ({
             subTitleStyle={item.subTitleStyle}
             textOrientation={item.textOrientation}
             textPosition={item.textPosition}
+            textAnimation={item.textAnimation}
             // other props
             colorPalette={
               colorPaletteIndex === -1
@@ -842,8 +855,10 @@ type TemplateListItem = {
   subTitleStyle: TextStyle;
   textOrientation: TextOrientation;
   textPosition: TextPosition;
+  textAnimation: string | null;
   mediaFilter: string | null;
   mediaParameters: EditionParameters;
+  mediaAnimation: string | null;
   maskUri: string | null;
   background: {
     readonly id: string;
@@ -853,6 +868,7 @@ type TemplateListItem = {
   backgroundPatternColor: string | null;
   foreground: {
     readonly id: string;
+    readonly kind: string;
     readonly uri: string;
   } | null;
   foregroundColor: string | null;

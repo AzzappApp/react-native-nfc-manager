@@ -1,3 +1,4 @@
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Text, View } from 'react-native';
 import { swapColor } from '@azzapp/shared/cardHelpers';
 import {
@@ -9,12 +10,23 @@ import {
   DEFAULT_COVER_FONT_SIZE,
   DEFAULT_COVER_TEXT_COLOR,
 } from '@azzapp/shared/coverHelpers';
+import useLatestCallback from '#hooks/useLatestCallback';
+import { getTextAnimator } from './coverTextAnimators';
 import type {
   TextOrientation,
   TextPosition,
   TextStyle,
 } from '@azzapp/shared/coverHelpers';
-import type { ViewProps, ViewStyle } from 'react-native';
+import type {
+  ViewProps,
+  ViewStyle,
+  TextLayoutEventData,
+  NativeSyntheticEvent,
+  TextLayoutLine,
+  LayoutChangeEvent,
+  LayoutRectangle,
+} from 'react-native';
+import type { SharedValue } from 'react-native-reanimated';
 
 export type CoverTextRendererProps = Omit<ViewProps, 'children'> & {
   /**
@@ -42,9 +54,9 @@ export type CoverTextRendererProps = Omit<ViewProps, 'children'> & {
    */
   textPosition: TextPosition | null | undefined;
   /**
-   * the height of the cover
+   * The animation of the text
    */
-  height: number;
+  textAnimation?: string | null | undefined;
   /**
    * The color palette of the cover
    */
@@ -53,6 +65,19 @@ export type CoverTextRendererProps = Omit<ViewProps, 'children'> & {
     light: string;
     dark: string;
   };
+  /**
+   * the height of the cover
+   */
+  height: number;
+  /**
+   * animation shared value
+   */
+  animationSharedValue?: SharedValue<number> | null | undefined;
+
+  /**
+   * onReadyToAnimate callback
+   */
+  onReadyToAnimate?: () => void;
 };
 
 const CoverTextRenderer = ({
@@ -65,6 +90,9 @@ const CoverTextRenderer = ({
   height,
   style,
   colorPalette,
+  textAnimation,
+  animationSharedValue,
+  onReadyToAnimate,
   ...props
 }: CoverTextRendererProps) => {
   const width = height * COVER_RATIO;
@@ -189,17 +217,112 @@ const CoverTextRenderer = ({
     textAlign,
   } as const;
 
+  const [textContainerLayout, setTextContainerLayout] =
+    useState<LayoutRectangle | null>(null);
+  const [titleLayout, setTitleLayout] = useState<TextLayoutLine[] | null>(null);
+  const [subTitleLayout, setSubTitleLayout] = useState<TextLayoutLine[] | null>(
+    null,
+  );
+
+  const currentTitle = useRef(title);
+  const currentSubTitle = useRef(subTitle);
+  const readyToAnimated = useRef(false);
+
+  if (currentTitle.current !== title) {
+    currentTitle.current = title;
+    setTitleLayout(null);
+    setTextContainerLayout(null);
+    readyToAnimated.current = false;
+  }
+  if (currentSubTitle.current !== subTitle) {
+    currentSubTitle.current = subTitle;
+    setSubTitleLayout(null);
+    setTextContainerLayout(null);
+    readyToAnimated.current = false;
+  }
+
+  const onTitleLayout = useCallback(
+    (event: NativeSyntheticEvent<TextLayoutEventData>) => {
+      setTitleLayout(event.nativeEvent.lines);
+    },
+    [],
+  );
+
+  const onSubTitleLayout = useCallback(
+    (event: NativeSyntheticEvent<TextLayoutEventData>) => {
+      setSubTitleLayout(event.nativeEvent.lines);
+    },
+    [],
+  );
+
+  const onTextContainerLayout = useCallback((event: LayoutChangeEvent) => {
+    setTextContainerLayout(event.nativeEvent.layout);
+  }, []);
+
+  const layoutMeasurementReady =
+    !!textContainerLayout &&
+    (!title || !!titleLayout) &&
+    (!subTitle || !!subTitleLayout);
+
+  const onReadyToAnimateRef = useLatestCallback(onReadyToAnimate);
+  useEffect(() => {
+    if (layoutMeasurementReady && !readyToAnimated.current) {
+      onReadyToAnimateRef?.();
+      readyToAnimated.current = true;
+    }
+  }, [layoutMeasurementReady, onReadyToAnimateRef]);
+
+  if (!title && !subTitle) {
+    return null;
+  }
+
+  const CoverTextAnimator = textAnimation
+    ? getTextAnimator(textAnimation)
+    : null;
+
   return (
     <View style={[style, { height, width }]} {...props}>
       <View style={titleOverlayStyles}>
-        <Text allowFontScaling={false} style={titleTextStyle}>
-          {title ?? ''}
-        </Text>
-        {!!subTitle && (
-          <Text allowFontScaling={false} style={subTitleTextStyle}>
-            {subTitle}
+        <View
+          onLayout={onTextContainerLayout}
+          style={{
+            opacity: animationSharedValue && CoverTextAnimator ? 0 : 1,
+          }}
+        >
+          <Text
+            allowFontScaling={false}
+            style={titleTextStyle}
+            onTextLayout={onTitleLayout}
+          >
+            {title}
           </Text>
-        )}
+          {!!subTitle && (
+            <Text
+              allowFontScaling={false}
+              style={subTitleTextStyle}
+              onTextLayout={onSubTitleLayout}
+            >
+              {subTitle}
+            </Text>
+          )}
+        </View>
+        {animationSharedValue &&
+          CoverTextAnimator &&
+          layoutMeasurementReady && (
+            <CoverTextAnimator
+              title={title}
+              titleLayout={titleLayout}
+              titleTextStyle={titleTextStyle}
+              subTitle={subTitle}
+              subTitleLayout={subTitleLayout}
+              subTitleTextStyle={subTitleTextStyle}
+              textContainerLayout={textContainerLayout}
+              orientation={orientation}
+              animation={textAnimation!}
+              animationSharedValue={animationSharedValue}
+              height={height}
+            />
+          )}
       </View>
     </View>
   );

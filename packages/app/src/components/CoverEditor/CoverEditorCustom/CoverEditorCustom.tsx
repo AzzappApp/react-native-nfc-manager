@@ -115,10 +115,12 @@ const CoverEditorCustom = ({
         }
         coverBackgrounds {
           id
+          kind
           uri
         }
         coverForegrounds {
           id
+          kind
           uri
         }
       }
@@ -243,6 +245,10 @@ const CoverEditorCustom = ({
   const onTextOrientationChange = createStyleFieldUpdater('textOrientation');
 
   const onTextPositionChange = createStyleFieldUpdater('textPosition');
+
+  const onTextAnimationChange = createStyleFieldUpdater('textAnimation');
+
+  const onMediaAnimationChange = createStyleFieldUpdater('mediaAnimation');
 
   const onBackgroundChange = useCallback(
     (id: string | null) => {
@@ -402,11 +408,13 @@ const CoverEditorCustom = ({
     foreground,
     foregroundColor,
     mediaFilter,
+    mediaAnimation,
     merged,
     segmented,
     subTitleStyle,
     textOrientation,
     textPosition,
+    textAnimation,
     titleStyle,
   } = coverStyle;
 
@@ -422,6 +430,9 @@ const CoverEditorCustom = ({
   } = useCoverEditorCustomLayout();
 
   const intl = useIntl();
+
+  const tabViewHeight =
+    bottomPanelHeight - insetBottom - BOTTOM_MENU_HEIGHT - 10;
 
   return (
     //ths container on top avoid some weid feeling when transitionning with transparent backgorund
@@ -451,6 +462,7 @@ const CoverEditorCustom = ({
               uri={uri}
               maskUri={segmentationEnabled && segmented ? maskMedia?.uri : null}
               foregroundId={foreground?.id}
+              foregroundKind={foreground?.kind}
               foregroundImageUri={foreground?.uri}
               foregroundImageTintColor={foregroundColor}
               backgroundImageUri={background?.uri}
@@ -465,6 +477,8 @@ const CoverEditorCustom = ({
               subTitleStyle={subTitleStyle}
               textOrientation={textOrientationOrDefaut(textOrientation)}
               textPosition={textPositionOrDefaut(textPosition)}
+              textAnimation={textAnimation}
+              mediaAnimation={mediaAnimation}
               computing={mediaComputing}
               // onReady={onCoverPreviewReady}
               onError={onMediaError}
@@ -526,7 +540,7 @@ const CoverEditorCustom = ({
           currentTab={currentTab}
           style={{
             marginTop: 10,
-            height: bottomPanelHeight - insetBottom - BOTTOM_MENU_HEIGHT,
+            height: tabViewHeight,
             width: windowWidth,
           }}
           tabs={[
@@ -538,9 +552,11 @@ const CoverEditorCustom = ({
                   kind={kind}
                   filter={mediaFilter}
                   editionParameters={editionParameters}
+                  mediaAnimation={mediaAnimation}
                   merged={merged}
                   onFilterChange={onFilterChange}
                   onStartParameterEdition={onStartParameterEdition}
+                  onMediaAnimationChange={onMediaAnimationChange}
                   style={{ flex: 1 }}
                 />
               ),
@@ -555,6 +571,7 @@ const CoverEditorCustom = ({
                   subTitleStyle={subTitleStyle}
                   textOrientation={textOrientation}
                   textPosition={textPosition}
+                  textAnimation={textAnimation}
                   colorPalette={colorPalette}
                   otherColors={otherColors}
                   onTitleChange={onTitleChange}
@@ -563,6 +580,7 @@ const CoverEditorCustom = ({
                   onSubTitleStyleChange={onSubTitleStyleChange}
                   onTextOrientationChange={onTextOrientationChange}
                   onTextPositionChange={onTextPositionChange}
+                  onTextAnimationChange={onTextAnimationChange}
                   onUpdateColorList={setOtherColors}
                   onUpdateColorPalette={setColorPalette}
                   bottomSheetHeights={bottomSheetHeights}

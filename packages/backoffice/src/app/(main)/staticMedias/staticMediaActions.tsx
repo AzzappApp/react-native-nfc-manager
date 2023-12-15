@@ -1,20 +1,45 @@
 'use server';
-
-import { eq, sql, inArray } from 'drizzle-orm';
+import { createId } from '@paralleldrive/cuid2';
+import { eq, sql } from 'drizzle-orm';
 import { revalidatePath } from 'next/cache';
-import { StaticMediaTable, db, MediaTable } from '@azzapp/data/domains';
+import { StaticMediaTable, db } from '@azzapp/data/domains';
+import { createPresignedUpload } from '@azzapp/shared/cloudinaryHelpers';
+import { COVER_ASSET_SIZES } from '@azzapp/shared/coverHelpers';
 import { encodeMediaId } from '@azzapp/shared/imagesHelpers';
 import { ADMIN } from '#roles';
+import getCurrentUser from '#helpers/getCurrentUser';
 import { currentUserHasRole } from '#helpers/roleHelpers';
+
+export const getStaticMediaSignedUpload = async (
+  fileKind: 'lottie' | 'png' | 'svg',
+  usage: 'coverBackground' | 'coverForeground' | 'moduleBackground',
+) => {
+  if (!(await currentUserHasRole(ADMIN))) {
+    throw new Error('Unauthorized');
+  }
+  const userId = (await getCurrentUser())?.id;
+  const mediaId = createId();
+  const pregeneratedSizes =
+    usage !== 'moduleBackground' && fileKind === 'png'
+      ? COVER_ASSET_SIZES
+      : null;
+
+  return createPresignedUpload(
+    mediaId,
+    fileKind === 'lottie' ? 'raw' : 'image',
+    pregeneratedSizes,
+    `userId=${userId}|backoffice=true`,
+  );
+};
 
 export const addStaticMedias = async ({
   medias,
   usage,
   resizeMode,
 }: {
-  medias: string[];
+  medias: Array<{ kind: 'lottie' | 'png' | 'svg'; id: string }>;
   usage: 'coverBackground' | 'coverForeground' | 'moduleBackground';
-  resizeMode: 'center' | 'contain' | 'cover' | 'repeat' | 'stretch';
+  resizeMode: 'center' | 'contain' | 'cover' | 'repeat' | 'stretch' | null;
 }) => {
   if (!(await currentUserHasRole(ADMIN))) {
     throw new Error('Unauthorized');
@@ -27,17 +52,10 @@ export const addStaticMedias = async ({
       .where(eq(StaticMediaTable.usage, usage))
       .then(rows => rows[0].order);
 
-    await trx.delete(MediaTable).where(
-      inArray(
-        MediaTable.id,
-        medias.map(id => encodeMediaId(id, 'image')),
-      ),
-    );
-
     const staticMedias = medias.map(
       (media, index) =>
         ({
-          id: media,
+          id: encodeMediaId(media.id, media.kind),
           usage,
           resizeMode,
           order: maxOrder + index,

@@ -99,6 +99,7 @@ const CoverEditor = (
               subTitle
               mediaParameters
               mediaFilter
+              mediaAnimation
               sourceMedia {
                 __typename
                 id
@@ -117,6 +118,7 @@ const CoverEditor = (
               }
               foreground {
                 id
+                kind
                 uri
               }
               backgroundColor
@@ -126,6 +128,7 @@ const CoverEditor = (
               merged
               textOrientation
               textPosition
+              textAnimation
               titleStyle {
                 fontFamily
                 fontSize
@@ -242,7 +245,9 @@ const CoverEditor = (
         cardCover.subTitleStyle ?? DEFAULT_COVER_SUBTITLE_TEXT_STYLE,
       textOrientation: textOrientationOrDefaut(cardCover.textOrientation),
       textPosition: textPositionOrDefaut(cardCover.textPosition),
+      textAnimation: cardCover?.textAnimation ?? null,
       mediaFilter: cardCover.mediaFilter ?? null,
+      mediaAnimation: cardCover.mediaAnimation ?? null,
       mediaParameters: cardCover.mediaParameters
         ? extractLayoutParameters(
             cardCover.mediaParameters as EditionParameters,
@@ -841,10 +846,12 @@ const DEFAULT_COVER_STYLE: CoverStyleData = {
   foregroundColor: 'primary',
   mediaFilter: null,
   mediaParameters: {},
+  mediaAnimation: null,
   merged: false,
   segmented: false,
   subTitleStyle: DEFAULT_COVER_SUBTITLE_TEXT_STYLE,
   textOrientation: 'horizontal',
   textPosition: 'bottomLeft',
+  textAnimation: null,
   titleStyle: DEFAULT_COVER_TEXT_STYLE,
 };

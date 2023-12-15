@@ -231,7 +231,7 @@ const WebCardCategoryForm = ({
         <MediasListInput
           label="Medias"
           name="medias"
-          kind="image"
+          accept="image/jpeg"
           {...fieldProps('medias')}
         />
         <FormControlLabel

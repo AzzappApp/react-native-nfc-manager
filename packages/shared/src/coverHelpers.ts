@@ -8,6 +8,11 @@
 export const COVER_RATIO = 0.625;
 
 /**
+ * The duration of the cover animation in milliseconds
+ */
+export const COVER_ANIMATION_DURATION = 5000;
+
+/**
  * Cover video maxium duration in seconds
  */
 export const COVER_MAX_VIDEO_DURATTION = 12;
@@ -169,3 +174,8 @@ export const textOrientationOrDefaut = (
  * the list of possible cover asset pre generated sizes
  */
 export const COVER_ASSET_SIZES = [128, 256, 512, 1024];
+
+/**
+ * The color to replace in foreground lottie animation
+ */
+export const COVER_FOREGROUND_BASE_COLOR = '#010101';

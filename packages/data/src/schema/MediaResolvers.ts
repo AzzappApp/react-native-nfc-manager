@@ -165,66 +165,64 @@ export const MediaVideo: MediaVideoResolvers = {
   ...MediaResolversBase,
 };
 
-export type DefferedStaticMedia = StaticMediaModel | string;
-
-export type StaticMediaWithAssetKind = {
-  staticMedia: DefferedStaticMedia;
+export type StaticMediaResolverBaseType = {
+  staticMedia: StaticMediaModel | string;
   assetKind: 'cover' | 'module';
 };
-
-export type StaticMediaResolverBaseType =
-  | DefferedStaticMedia
-  | StaticMediaWithAssetKind;
 
 const getActualStaticMedia = async (
   staticMedia: StaticMediaResolverBaseType,
   loader: DataLoader<string, StaticMediaModel | null>,
 ) => {
-  if (typeof staticMedia === 'object' && 'assetKind' in staticMedia) {
-    staticMedia = staticMedia.staticMedia;
-  }
-  if (typeof staticMedia === 'string') {
-    const dbMedia = await loader.load(staticMedia);
+  const actualMedia = staticMedia.staticMedia;
+  if (typeof actualMedia === 'string') {
+    const dbMedia = await loader.load(actualMedia);
     if (!dbMedia) {
-      console.warn(`StaticMedia ${staticMedia} not found`);
+      console.warn(`StaticMedia ${actualMedia} not found`);
     }
     return dbMedia;
   } else {
-    return staticMedia;
+    return actualMedia;
   }
 };
 
-const getStaticMediaId = (staticMedia: DefferedStaticMedia) =>
-  typeof staticMedia === 'string' ? staticMedia : staticMedia.id;
+const getStaticMediaId = (staticMedia: StaticMediaResolverBaseType) => {
+  return typeof staticMedia.staticMedia === 'string'
+    ? staticMedia.staticMedia
+    : staticMedia.staticMedia.id;
+};
+
+const getStaticMediaKind = (staticMedia: StaticMediaResolverBaseType) => {
+  const id = getStaticMediaId(staticMedia);
+  if (id.startsWith('s:')) {
+    return 'svg';
+  } else if (id.startsWith('l:')) {
+    return 'lottie';
+  }
+  return 'png';
+};
 
 export const StaticMedia: StaticMediaResolvers = {
-  id: staticMedia => {
-    if (typeof staticMedia === 'object' && 'assetKind' in staticMedia) {
-      staticMedia = staticMedia.staticMedia;
-    }
-    return getStaticMediaId(staticMedia);
-  },
+  id: getStaticMediaId,
+  kind: getStaticMediaKind,
   uri: (staticMedia, { width, pixelRatio }) => {
-    let id: string;
-    let assetKind: 'cover' | 'module' | null;
-    if (typeof staticMedia === 'object' && 'assetKind' in staticMedia) {
-      id = getStaticMediaId(staticMedia.staticMedia);
-      assetKind = staticMedia.assetKind;
-    } else {
-      id = getStaticMediaId(staticMedia);
-      assetKind = null;
-    }
-    id = decodeMediaId(id);
-    if (assetKind === 'cover') {
+    const cloudinaryId = decodeMediaId(getStaticMediaId(staticMedia));
+    const kind = getStaticMediaKind(staticMedia);
+    if (kind === 'png') {
       return getImageURLForSize(
-        id,
+        cloudinaryId,
         width,
         undefined,
         pixelRatio,
-        COVER_ASSET_SIZES,
+        staticMedia.assetKind === 'cover'
+          ? COVER_ASSET_SIZES
+          : MODULE_IMAGES_SIZES,
       );
+    } else if (kind === 'svg') {
+      return getCloudinaryAssetURL(cloudinaryId, 'image');
+    } else {
+      return getCloudinaryAssetURL(cloudinaryId, 'raw');
     }
-    return getCloudinaryAssetURL(id, 'image');
   },
   resizeMode: async (staticMedia, _, { loaders }) =>
     getActualStaticMedia(staticMedia, loaders.StaticMedia).then(

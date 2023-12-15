@@ -189,5 +189,11 @@ export const CardModuleBlockText: CardModuleBlockTextResolvers = {
   backgroundStyle: module => module.data.backgroundStyle ?? null,
   textBackgroundStyle: module => module.data.textBackgroundStyle ?? null,
   background,
-  textBackground: module => module.data.textBackgroundId ?? null,
+  textBackground: module =>
+    module.data.textBackgroundId
+      ? {
+          staticMedia: module.data.textBackgroundId,
+          assetKind: 'module',
+        }
+      : null,
 };

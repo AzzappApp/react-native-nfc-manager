@@ -1,3 +1,4 @@
+/* eslint-disable no-bitwise */
 import {
   Box,
   Button,
@@ -18,6 +19,7 @@ type StaticMediaAddFormProps = {
   label: string;
   open: boolean;
   error: any;
+  usage: 'coverBackground' | 'coverForeground' | 'moduleBackground';
   handleClose: () => void;
   onAdd: (
     medias: File[],
@@ -27,6 +29,7 @@ type StaticMediaAddFormProps = {
 
 const StaticMediaAddForm = ({
   label,
+  usage,
   open,
   error,
   handleClose,
@@ -68,28 +71,37 @@ const StaticMediaAddForm = ({
             label="Medias"
             value={medias}
             name="medias"
+            accept={
+              usage === 'moduleBackground'
+                ? 'image/svg+xml'
+                : usage === 'coverForeground'
+                ? 'image/png,application/json'
+                : 'image/png'
+            }
             onChange={setMedias as any}
             error={!!mediaErrors}
             helperText={mediaErrors}
           />
 
-          <FormControl sx={{ maxWidth: 300 }}>
-            <InputLabel id="webCardKind-label">Resize Mode</InputLabel>
-            <Select
-              labelId={'resizeMode-label'}
-              id="resizeMode"
-              name="resizeMode"
-              value={resizeMode}
-              label="Profile Kind"
-              onChange={e => setResizeMode(e.target.value as any)}
-            >
-              <MenuItem value="center">Center</MenuItem>
-              <MenuItem value="contain">Contain</MenuItem>
-              <MenuItem value="cover">Cover</MenuItem>
-              <MenuItem value="repeat">Repeat</MenuItem>
-              <MenuItem value="stretch">Stretch</MenuItem>
-            </Select>
-          </FormControl>
+          {usage === 'moduleBackground' && (
+            <FormControl sx={{ maxWidth: 300 }}>
+              <InputLabel id="webCardKind-label">Resize Mode</InputLabel>
+              <Select
+                labelId={'resizeMode-label'}
+                id="resizeMode"
+                name="resizeMode"
+                value={resizeMode}
+                label="Profile Kind"
+                onChange={e => setResizeMode(e.target.value as any)}
+              >
+                <MenuItem value="center">Center</MenuItem>
+                <MenuItem value="contain">Contain</MenuItem>
+                <MenuItem value="cover">Cover</MenuItem>
+                <MenuItem value="repeat">Repeat</MenuItem>
+                <MenuItem value="stretch">Stretch</MenuItem>
+              </Select>
+            </FormControl>
+          )}
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose}>Cancel</Button>

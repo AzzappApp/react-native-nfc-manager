@@ -204,7 +204,13 @@ export const Viewer: ViewerResolvers = {
         assetKind: 'cover',
       })),
     ),
-  moduleBackgrounds: async () => getStaticMediasByUsage('moduleBackground'),
+  moduleBackgrounds: async () =>
+    getStaticMediasByUsage('moduleBackground').then(medias =>
+      medias.map(media => ({
+        staticMedia: media,
+        assetKind: 'module',
+      })),
+    ),
   coverTemplates: async (
     _,
     { kind, after, first },

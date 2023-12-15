@@ -29,7 +29,11 @@ input SaveCoverInput {
   """
   The position of the text in the card cover
   """
-  textPosition: CardCoverTextPosition
+  textPosition: CardCoverTextPosition 
+  """
+  The animation of the card cover
+  """
+  textAnimation: String
   """
   The media of the card cover generated from the source media
   """
@@ -50,6 +54,10 @@ input SaveCoverInput {
   The transform applied to the source media to generate the media
   """
   mediaParameters: JSON
+  """
+  The animation of the media
+  """
+  mediaAnimation: String
   """
   The background image of the card cover
   """

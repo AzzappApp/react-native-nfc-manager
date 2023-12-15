@@ -318,7 +318,7 @@ const WebCardScreenContent = ({
             <CoverRenderer
               webCard={webCard}
               width={windowSize}
-              videoEnabled={ready && hasFocus}
+              animationEnabled={ready && hasFocus}
               hideBorderRadius
             />
           </WebCardBlockContainer>

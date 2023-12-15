@@ -85,7 +85,7 @@ const CoverRendererPreviewDesktop = ({
         webCard={coverKey}
         width={windowWidth}
         hideBorderRadius
-        videoEnabled={videoEnabled}
+        animationEnabled={videoEnabled}
       />
     </View>
   );

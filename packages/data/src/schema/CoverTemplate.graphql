@@ -27,6 +27,7 @@ type CoverTemplateData {
   subTitleStyle: CardCoverTextStyle!
   textOrientation: CardCoverTextOrientation!
   textPosition: CardCoverTextPosition!
+  textAnimation: String
   background: StaticMedia
   backgroundColor: String
   backgroundPatternColor: String
@@ -34,6 +35,7 @@ type CoverTemplateData {
   foregroundColor: String
   mediaFilter: String
   mediaParameters: JSON
+  mediaAnimation: String
   merged: Boolean!
 }
 

@@ -13,10 +13,15 @@ import {
   useSortable,
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
+import { DotLottiePlayer } from '@dotlottie/react-player';
 import DisableIcon from '@mui/icons-material/HideImage';
 import { IconButton, Box } from '@mui/material';
 import { useState } from 'react';
-import { getImageURL } from '@azzapp/shared/imagesHelpers';
+import {
+  decodeMediaId,
+  getCloudinaryAssetURL,
+  getImageURL,
+} from '@azzapp/shared/imagesHelpers';
 import type { StaticMedia } from '@azzapp/data/domains';
 import type { DragStartEvent, DragEndEvent } from '@dnd-kit/core';
 import type { BoxProps } from '@mui/material';
@@ -115,13 +120,45 @@ export const SortableItem: React.FC<SortableItemProps> = ({
   };
 
   return (
-    <Box ref={setNodeRef} style={{ ...style, position: 'relative' }}>
-      <img
-        src={getImageURL(media.id)}
-        style={{ maxWidth: 120, opacity: media.enabled ? 1 : 0.5 }}
-        {...attributes}
-        {...listeners}
-      />
+    <Box
+      ref={setNodeRef}
+      style={{
+        ...style,
+        border: '1px solid black',
+        position: 'relative',
+      }}
+    >
+      {media.id.startsWith('l:') ? (
+        <div
+          style={{
+            height: 400,
+            width: 250,
+          }}
+          {...attributes}
+          {...listeners}
+        >
+          <DotLottiePlayer
+            src={getCloudinaryAssetURL(decodeMediaId(media.id), 'raw')}
+            style={{
+              height: 400,
+              width: 250,
+            }}
+            autoplay
+            loop
+          />
+        </div>
+      ) : (
+        <img
+          src={getImageURL(media.id)}
+          style={{
+            maxWidth: 120,
+            maxHeight: 400,
+            opacity: media.enabled ? 1 : 0.5,
+          }}
+          {...attributes}
+          {...listeners}
+        />
+      )}
       <IconButton
         onClick={() => onSetEnabled?.(media.id, !media.enabled)}
         sx={{

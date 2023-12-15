@@ -63,13 +63,22 @@ export type MediaVideoRendererProps = ViewProps & {
    */
   onReadyForDisplay?: () => void;
   /**
+   * A callback called when either the video is ready to be played or
+   * that the thumbnail is ready to be displayed
+   */
+  onVideoReady?: () => void;
+  /**
+   * A callback called when the video loading failed
+   */
+  onError?: (error: any) => void;
+  /**
    * A callback called when the video has reached the end (before looping)
    */
   onEnd?: () => void;
   /**
    * A callback called while the video is playing, allowing to track the current time
    */
-  onProgress?: (event: { currentTime: number }) => void;
+  onProgress?: (event: { currentTime: number; duration: number }) => void;
   /**
    * true if the video is enabled
    */

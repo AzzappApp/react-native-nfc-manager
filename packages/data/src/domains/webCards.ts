@@ -66,6 +66,7 @@ export const WebCardTable = mysqlTable(
       subTitleStyle: TextStyle;
       textOrientation: TextOrientation;
       textPosition: TextPosition;
+      textAnimation?: string | null;
       backgroundId?: string | null;
       backgroundColor?: string | null;
       backgroundPatternColor?: string | null;
@@ -74,6 +75,7 @@ export const WebCardTable = mysqlTable(
       sourceMediaId: string | null;
       maskMediaId?: string | null;
       mediaFilter?: string | null;
+      mediaAnimation?: string | null;
       mediaParameters?: Record<string, any> | null;
       mediaId?: string | null;
       merged: boolean;

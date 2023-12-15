@@ -1,26 +1,18 @@
-import { memo, useCallback, useMemo, useState } from 'react';
-import { Image, View, FlatList } from 'react-native';
-import Animated, {
-  interpolate,
-  useAnimatedStyle,
-} from 'react-native-reanimated';
+import { memo, useCallback } from 'react';
+import { Image, View, StyleSheet } from 'react-native';
 import { graphql, useFragment } from 'react-relay';
 import { COVER_CARD_RADIUS, COVER_RATIO } from '@azzapp/shared/coverHelpers';
-import { colors, shadow } from '#theme';
-import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
-import useAnimatedState from '#hooks/useAnimatedState';
-import PressableNative from '#ui/PressableNative';
+import { colors } from '#theme';
+import BoxSelectionList from './BoxSelectionList';
 import CardModuleBackgroundImage from './cardModules/CardModuleBackgroundImage';
+import CoverLottiePlayer from './CoverRenderer/CoverLottiePlayer';
+import type { BoxButtonItemInfo } from './BoxSelectionList';
 import type {
   StaticMediaList_staticMedias$data,
   StaticMediaList_staticMedias$key,
 } from '@azzapp/relay/artifacts/StaticMediaList_staticMedias.graphql';
 import type { ArrayItemType } from '@azzapp/shared/arrayHelpers';
-import type {
-  LayoutChangeEvent,
-  ColorValue,
-  ListRenderItemInfo,
-} from 'react-native';
+import type { ColorValue } from 'react-native';
 
 import type { ViewProps } from 'react-native-svg/lib/typescript/fabric/utils';
 
@@ -42,10 +34,6 @@ type StaticMediaListProps = ViewProps & {
    */
   tintColor?: ColorValue;
   /**
-   * if true, the medias will be displayed using svg.
-   */
-  svgMode?: boolean;
-  /**
    * the aspect ratio of the media buttons.
    */
   imageRatio?: number;
@@ -66,7 +54,6 @@ const StaticMediaList = ({
   backgroundColor = '#FFFFFF',
   tintColor = '#000000',
   imageRatio = COVER_RATIO,
-  svgMode = false,
   testID = 'cover-media-list',
   style,
 }: StaticMediaListProps) => {
@@ -75,6 +62,7 @@ const StaticMediaList = ({
       fragment StaticMediaList_staticMedias on StaticMedia
       @relay(plural: true) {
         id
+        kind
         # we use arbitrary values here, but it should be good enough
         smallURI: uri(width: 125, pixelRatio: 2)
         resizeMode
@@ -83,25 +71,8 @@ const StaticMediaList = ({
     mediasKey,
   );
 
-  const styles = useStyleSheet(styleSheet);
-  const [itemDimension, setItemDimension] = useState({ width: 0, height: 0 });
-  const onLayout = useCallback(
-    (e: LayoutChangeEvent) => {
-      //when scalling up the item, it is calling the onLayout.Limit rerender
-      if (e.nativeEvent.layout.height !== itemDimension.height) {
-        setItemDimension({
-          height: e.nativeEvent.layout.height,
-          width: e.nativeEvent.layout.height * imageRatio,
-        });
-      }
-    },
-    [imageRatio, itemDimension.height],
-  );
-
   const renderItem = useCallback(
-    ({
-      item,
-    }: ListRenderItemInfo<ArrayItemType<StaticMediaList_staticMedias$data> | null>) => {
+    ({ item, height, width }: BoxButtonItemInfo<StaticMediaItem>) => {
       if (item) {
         return (
           <StaticMediaListItemMemo
@@ -109,82 +80,146 @@ const StaticMediaList = ({
             imageRatio={imageRatio}
             isSelected={selectedMedia === item.id}
             resizeMode={item.resizeMode}
+            kind={item.kind}
             backgroundColor={backgroundColor}
             onSelectMedia={onSelectMedia}
-            svgMode={svgMode}
             tintColor={tintColor}
-            dimension={itemDimension}
+            height={height}
+            width={width}
           />
         );
       }
       return null;
     },
-    [
-      backgroundColor,
-      imageRatio,
-      itemDimension,
-      onSelectMedia,
-      selectedMedia,
-      svgMode,
-      tintColor,
-    ],
+    [backgroundColor, imageRatio, onSelectMedia, selectedMedia, tintColor],
   );
 
-  const data = useMemo(() => {
-    if (itemDimension.height !== 0) {
-      return [null, ...staticMedias];
-    }
-  }, [itemDimension.height, staticMedias]);
-
-  const getItemLayout = useCallback(
-    (_data: any, index: number) => {
-      return {
-        length: itemDimension.width + 10,
-        offset: itemDimension.width * index,
-        index,
-      };
+  const onSelect = useCallback(
+    (item: StaticMediaItem | null) => {
+      onSelectMedia(item?.id ?? null);
     },
-    [itemDimension.width],
+    [onSelectMedia],
   );
 
   return (
-    <FlatList
-      onLayout={onLayout}
-      data={data}
-      horizontal
-      showsHorizontalScrollIndicator={false}
-      style={[styles.flatListStyle, style]}
+    <BoxSelectionList
+      data={staticMedias}
       renderItem={renderItem}
+      keyExtractor={keyExtractor}
       testID={testID}
       accessibilityRole="list"
-      keyExtractor={keyExtractor}
-      getItemLayout={getItemLayout}
-      ItemSeparatorComponent={ItemSeparatorComponent}
-      contentInset={{ left: 30 }}
-      contentOffset={{ x: -30, y: 0 }}
-      maxToRenderPerBatch={2}
+      onSelect={onSelect}
+      imageRatio={imageRatio}
+      selectedItem={
+        staticMedias.find(item => item.id === selectedMedia) ?? null
+      }
+      style={style}
     />
   );
 };
 
-const ItemSeparatorComponent = () => <View style={{ width: 10 }} />;
+type StaticMediaItem = ArrayItemType<StaticMediaList_staticMedias$data>;
 
-const keyExtractor = (
-  item: ArrayItemType<StaticMediaList_staticMedias$data> | null,
-) => item?.id ?? 'first_item_key';
+const keyExtractor = (item: StaticMediaItem) => item.id;
 
 export default StaticMediaList;
 
-const styleSheet = createStyleSheet(appearance => ({
-  flatListStyle: { overflow: 'visible' },
+type StaticMediaListItemProps = {
+  item: ArrayItemType<StaticMediaList_staticMedias$data> | null;
+  imageRatio: number;
+  isSelected: boolean;
+  backgroundColor: ColorValue;
+  onSelectMedia: (id: string) => void;
+  tintColor: ColorValue | string;
+  width: number;
+  height: number;
+  /**
+   *
+   *
+   * @type {('center' | 'contain' | 'cover' | 'repeat' | 'stretch' | null)}
+   */
+  resizeMode: string | null;
+  kind: string;
+};
 
-  button: [
-    {
-      flex: 1,
-      overflow: 'visible',
-    },
-    shadow(appearance),
-  ],
+const StaticMediaListItem = ({
+  item,
+  imageRatio,
+  backgroundColor,
+  tintColor,
+  resizeMode,
+  kind,
+  width,
+  height,
+}: StaticMediaListItemProps) =>
+  item?.smallURI ? (
+    <View
+      style={[
+        {
+          borderRadius: width * COVER_CARD_RADIUS,
+          overflow: 'hidden',
+          aspectRatio: imageRatio,
+          backgroundColor: 'blue',
+        },
+      ]}
+    >
+      {kind === 'svg' ? (
+        <CardModuleBackgroundImage
+          layout={{
+            width,
+            height,
+          }}
+          resizeMode={resizeMode}
+          backgroundUri={item.smallURI}
+          patternColor={tintColor}
+          backgroundOpacity={1}
+        />
+      ) : kind === 'lottie' ? (
+        <CoverLottiePlayer
+          src={item.smallURI}
+          tintColor={tintColor as string}
+          autoPlay
+          loop
+          hardwareAccelerationAndroid
+          style={[
+            styles.image,
+            {
+              backgroundColor,
+              aspectRatio: imageRatio,
+            },
+          ]}
+        />
+      ) : (
+        <Image
+          source={{ uri: item?.smallURI }}
+          style={[
+            styles.image,
+            {
+              backgroundColor,
+              tintColor,
+              aspectRatio: imageRatio,
+            },
+          ]}
+        />
+      )}
+    </View>
+  ) : (
+    <View
+      style={[
+        styles.image,
+        styles.nullImage,
+        {
+          borderRadius: width * COVER_CARD_RADIUS,
+          backgroundColor,
+          aspectRatio: imageRatio,
+        },
+      ]}
+    />
+  );
+
+const StaticMediaListItemMemo = memo(StaticMediaListItem);
+
+const styles = StyleSheet.create({
   image: {
     height: '100%',
   },
@@ -192,119 +227,4 @@ const styleSheet = createStyleSheet(appearance => ({
     borderWidth: 2,
     borderColor: colors.black,
   },
-}));
-
-type StaticMediaListItemProps = {
-  item: ArrayItemType<StaticMediaList_staticMedias$data>;
-  imageRatio: number;
-  isSelected: boolean;
-  backgroundColor: ColorValue;
-  onSelectMedia: (id: string) => void;
-  svgMode: boolean;
-  tintColor: ColorValue | string;
-  dimension: { width: number; height: number };
-  /**
-   *
-   *
-   * @type {('center' | 'contain' | 'cover' | 'repeat' | 'stretch' | null)}
-   */
-  resizeMode: string | null;
-};
-
-const StaticMediaListItem = ({
-  item,
-  imageRatio,
-  isSelected,
-  backgroundColor,
-  tintColor,
-  onSelectMedia,
-  svgMode,
-  resizeMode,
-  dimension,
-}: StaticMediaListItemProps) => {
-  const timing = useAnimatedState(isSelected, { duration: 120 });
-
-  const itemAnimatedStyle = useAnimatedStyle(() => {
-    return {
-      height: dimension.height,
-      aspectRatio: imageRatio,
-      transform: [{ scale: interpolate(timing.value, [0, 1], [1, 1.1]) }],
-    };
-  }, [dimension, imageRatio, timing]);
-  const styles = useStyleSheet(styleSheet);
-
-  const onPress = useCallback(() => {
-    onSelectMedia(item.id);
-  }, [item.id, onSelectMedia]);
-
-  const visiblebackgroundColor = useMemo(() => {
-    if (tintColor === colors.white && backgroundColor === colors.white) {
-      return colors.grey200;
-    }
-    return backgroundColor;
-  }, [backgroundColor, tintColor]);
-
-  return (
-    <Animated.View style={[itemAnimatedStyle]}>
-      <PressableNative
-        style={[
-          styles.button,
-          {
-            borderRadius: dimension.width * COVER_CARD_RADIUS,
-            backgroundColor: visiblebackgroundColor,
-          },
-        ]}
-        onPress={onPress}
-        accessibilityRole="button"
-      >
-        {item?.smallURI ? (
-          <View
-            style={[
-              {
-                borderRadius: dimension.width * COVER_CARD_RADIUS,
-                overflow: 'hidden',
-                aspectRatio: imageRatio,
-              },
-            ]}
-          >
-            {svgMode ? (
-              <CardModuleBackgroundImage
-                layout={dimension}
-                resizeMode={resizeMode}
-                backgroundUri={item.smallURI}
-                patternColor={tintColor}
-                backgroundOpacity={1}
-              />
-            ) : (
-              <Image
-                source={{ uri: item?.smallURI }}
-                style={[
-                  styles.image,
-                  {
-                    backgroundColor: visiblebackgroundColor,
-                    tintColor,
-                    aspectRatio: imageRatio,
-                  },
-                ]}
-              />
-            )}
-          </View>
-        ) : (
-          <View
-            style={[
-              styles.image,
-              styles.nullImage,
-              {
-                borderRadius: dimension.width * COVER_CARD_RADIUS,
-                backgroundColor,
-                aspectRatio: imageRatio,
-              },
-            ]}
-          />
-        )}
-      </PressableNative>
-    </Animated.View>
-  );
-};
-
-const StaticMediaListItemMemo = memo(StaticMediaListItem);
+});

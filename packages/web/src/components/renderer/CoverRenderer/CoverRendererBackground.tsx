@@ -2,7 +2,6 @@ import cn from 'classnames';
 import { DEFAULT_COLOR_PALETTE, swapColor } from '@azzapp/shared/cardHelpers';
 import { getImageURL } from '@azzapp/shared/imagesHelpers';
 import CloudinaryImage from '#ui/CloudinaryImage';
-import CloudinaryVideo from '#ui/CloudinaryVideo';
 import styles from './CoverRenderer.css';
 import type { Media, WebCard } from '@azzapp/data/domains';
 
@@ -43,28 +42,16 @@ const CoverRendererBackground = ({
           className={styles.layerMedia}
         />
       )}
-      {media.kind === 'image' ? (
-        <CloudinaryImage
-          mediaId={media.id}
-          assetKind="cover"
-          alt="background"
-          fill
-          priority
-          className={cn(styles.coverMedia, styles.backgroundMedia)}
-        />
-      ) : (
-        <CloudinaryVideo
-          media={media}
-          assetKind="cover"
-          alt="background"
-          className={cn(styles.coverMedia, styles.backgroundMedia)}
-          muted
-          fluid
-          playsInline
-          autoPlay
-        />
-      )}
-      {coverData?.foregroundId && (
+      <CloudinaryImage
+        mediaId={media.id}
+        assetKind="cover"
+        alt="background"
+        fill
+        priority
+        videoThumbnail={media.kind === 'video'}
+        className={cn(styles.coverMedia, styles.backgroundMedia)}
+      />
+      {coverData?.foregroundId && !coverData?.foregroundId.startsWith('l:') && (
         <div
           style={{
             backgroundColor:

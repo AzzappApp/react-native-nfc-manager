@@ -9,7 +9,10 @@ const CLOUDINARY_BASE_URL = `https://res.cloudinary.com/${CLOUDINARY_CLOUDNAME}`
  * @param id the id of the cloudinary file
  * @returns
  */
-export const getCloudinaryAssetURL = (id: string, kind: 'image' | 'video') => {
+export const getCloudinaryAssetURL = (
+  id: string,
+  kind: 'image' | 'raw' | 'video',
+) => {
   assetNotRN('getCloudinaryAssetURL');
   const ext = kind === 'video' ? '.mp4' : '';
   return `${CLOUDINARY_BASE_URL}/${kind}/upload/${id}${ext}`;
@@ -171,8 +174,8 @@ export const resizeTransforms = (
 /**
  * Create a database id from a media id
  */
-export const encodeMediaId = (mediaId: string, kind: 'image' | 'video') => {
-  return `${kind === 'video' ? 'v' : 'i'}:${mediaId}`;
+export const encodeMediaId = (mediaId: string, kind: string) => {
+  return `${kind.charAt(0)}:${mediaId}`;
 };
 
 const assetNotRN = (funcName: string) => {

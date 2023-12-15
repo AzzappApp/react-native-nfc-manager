@@ -91,6 +91,7 @@ const saveCover: MutationResolvers['saveCover'] = async (
         updates.coverSubTitle = subTitle;
         hasUpdates = true;
       }
+
       if (Object.keys(coverData).length > 0) {
         const coverDataUpdated = {
           ...webCard.coverData,
@@ -110,9 +111,11 @@ const saveCover: MutationResolvers['saveCover'] = async (
             DEFAULT_COVER_DATA.textOrientation,
           textPosition:
             coverDataUpdated.textPosition ?? DEFAULT_COVER_DATA.textPosition,
+          textAnimation: coverDataUpdated.textAnimation ?? null,
           sourceMediaId: coverDataUpdated.sourceMediaId,
           merged: coverDataUpdated.merged ?? false,
           segmented: coverDataUpdated.segmented ?? false,
+          mediaAnimation: coverDataUpdated.mediaAnimation ?? null,
           kind: coverDataUpdated.kind ?? null,
         };
         if (input.cardColors) {

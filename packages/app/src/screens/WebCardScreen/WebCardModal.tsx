@@ -136,7 +136,7 @@ const WebCardModal = ({
             <CoverRenderer
               webCard={webCard}
               width={windowsWith / 3}
-              videoEnabled={false}
+              animationEnabled={false}
             />
           </View>
         </View>

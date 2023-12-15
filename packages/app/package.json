@@ -92,7 +92,7 @@
     "i18n-iso-countries": "^7.7.0",
     "libphonenumber-js": "^1.10.51",
     "lodash": "^4.17.21",
-    "lottie-react-native": "6.3.1",
+    "lottie-react-native": "6.4.1",
     "lz-string": "^1.5.0",
     "react": "^18.2.0",
     "react-hook-form": "^7.46.2",

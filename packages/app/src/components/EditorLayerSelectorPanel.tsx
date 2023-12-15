@@ -199,7 +199,6 @@ const EditorLayerSelectorPanel = ({
         onSelectMedia={onMediaChange}
         style={styles.content}
         imageRatio={imageRatio}
-        svgMode={svgMode}
         testID="cover-layer-list-background"
       />
       <ColorPicker

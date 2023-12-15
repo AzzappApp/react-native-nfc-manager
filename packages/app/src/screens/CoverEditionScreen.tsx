@@ -152,7 +152,12 @@ export default relayScreen(CoverEditionScreen, {
         viewer.profile.webCard.cardCover;
       const medias = convertToNonNullArray([
         background && { kind: 'image', uri: background.uri },
-        foreground && { kind: 'image', uri: foreground.uri },
+        foreground && foreground.kind !== 'lottie'
+          ? {
+              kind: 'image',
+              uri: foreground.uri,
+            }
+          : null,
         sourceMedia && {
           kind: sourceMedia.__typename === 'MediaVideo' ? 'video' : 'image',
           uri: sourceMedia.uri,

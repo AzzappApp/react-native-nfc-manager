@@ -169,7 +169,7 @@ const WebCardPreview = (
                 webCard={webCard}
                 width={windowWidth}
                 hideBorderRadius
-                videoEnabled
+                animationEnabled
               />
             )}
             {cardModules.map((module, index) => (

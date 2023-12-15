@@ -31,6 +31,8 @@ const MediaVideoRenderer = (
     onProgress,
     onEnd,
     onReadyForDisplay,
+    onVideoReady,
+    onError,
     videoEnabled,
     style,
     ...props
@@ -53,7 +55,8 @@ const MediaVideoRenderer = (
   const onVideoReadyForDisplay = useCallback(() => {
     cleanSnapshots();
     dispatchReady();
-  }, [cleanSnapshots, dispatchReady]);
+    onVideoReady?.();
+  }, [cleanSnapshots, dispatchReady, onVideoReady]);
 
   const onSeekComplete = useCallback(() => {
     cleanSnapshots();
@@ -62,8 +65,12 @@ const MediaVideoRenderer = (
   const onProgressInner = useMemo(
     () =>
       onProgress
-        ? (event: NativeSyntheticEvent<{ currentTime: number }>) =>
-            onProgress?.(event.nativeEvent)
+        ? (
+            event: NativeSyntheticEvent<{
+              currentTime: number;
+              duration: number;
+            }>,
+          ) => onProgress?.(event.nativeEvent)
         : null,
     [onProgress],
   );
@@ -159,6 +166,7 @@ const MediaVideoRenderer = (
             onSeekComplete={onSeekComplete}
             onProgress={onProgressInner}
             onEnd={onEnd}
+            onError={onError}
           />
         </View>
       ) : null}
