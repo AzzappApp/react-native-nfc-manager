@@ -1,6 +1,7 @@
-import { useEffect, useMemo, useState } from 'react';
-import { useIntl } from 'react-intl';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { FormattedMessage } from 'react-intl';
 import { LayoutAnimation, Pressable } from 'react-native';
+import { colors } from '#theme';
 import Text from '#ui/Text';
 import type { TextProps } from '#ui/Text';
 import type { NativeSyntheticEvent, TextLayoutEventData } from 'react-native';
@@ -30,27 +31,27 @@ const ExpendableText = ({
     });
   }, [expanded]);
 
-  const onTextLayout = ({
-    nativeEvent,
-  }: NativeSyntheticEvent<TextLayoutEventData>) => {
-    const { lines } = nativeEvent;
-    if (lines.length > numberOfLines) {
-      //we need to clip
-      const clippedText = lines
-        .splice(0, numberOfLines)
-        .map(line => line.text)
-        .join('');
-      setClippedText(clippedText);
-    }
-  };
+  const onTextLayout = useCallback(
+    ({ nativeEvent }: NativeSyntheticEvent<TextLayoutEventData>) => {
+      const { lines } = nativeEvent;
+
+      if (lines.length > numberOfLines) {
+        //we need to clip
+        const clippedText = lines
+          .splice(0, numberOfLines)
+          .map(line => line.text)
+          .join('');
+        setClippedText(clippedText);
+      }
+    },
+    [numberOfLines],
+  );
 
   const toggleExpand = () => {
     if (clippedText) {
       setExpanded(prev => !prev);
     }
   };
-
-  const intl = useIntl();
 
   useEffect(() => {
     if (label) {
@@ -61,25 +62,33 @@ const ExpendableText = ({
 
   const text = useMemo(() => {
     if (expanded) {
-      return intl.formatMessage(
-        {
-          defaultMessage: '{text}...less',
-          description: 'ExpendableText  with less keyword to collapse the text',
-        },
-        { text: label },
+      return (
+        <>
+          {label}
+          <Text {...props} style={[props.style, { color: colors.grey400 }]}>
+            <FormattedMessage
+              defaultMessage="... less"
+              description="ExpendableText  with more keyword to collapse the text"
+            />
+          </Text>
+        </>
       );
     }
     if (clippedText) {
-      return intl.formatMessage(
-        {
-          defaultMessage: '{text}... more',
-          description: 'ExpendableText  with more keyword to expand the text',
-        },
-        { text: clippedText.substring(0, clippedText.length - 9) },
+      return (
+        <>
+          {clippedText.substring(0, clippedText.length - 9)}
+          <Text {...props} style={[props.style, { color: colors.grey400 }]}>
+            <FormattedMessage
+              defaultMessage="... more"
+              description="ExpendableText  with more keyword to collapse the text"
+            />
+          </Text>
+        </>
       );
     }
     return label;
-  }, [clippedText, expanded, intl, label]);
+  }, [clippedText, expanded, label, props]);
 
   return (
     //using a pressable without feedback to avoid the ripple effect on all the text container

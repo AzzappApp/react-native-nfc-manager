@@ -262,7 +262,7 @@ const PostRendererBottomPanel = ({
         )}
         <PressableOpacity onPress={goToComments}>
           {post.previewComment && (
-            <Text variant="small">
+            <Text variant="small" numberOfLines={2} ellipsizeMode="tail">
               <Text variant="smallbold">
                 {post.previewComment.webCard.userName}{' '}
               </Text>
