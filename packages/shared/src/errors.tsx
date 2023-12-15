@@ -84,6 +84,11 @@ const ERRORS = {
    * This may happen when the user is using an old version of the app that is not supported anymore.
    */
   UPDATE_APP_VERSION: 'UPDATE_APP_VERSION',
+  /**
+   * The profile already exist.
+   * This may happen when a user is invited to a multi-user webcard, but is already a member.
+   */
+  PROFILE_ALREADY_EXISTS: 'PROFILE_ALREADY_EXISTS',
 } as const;
 
 export default ERRORS;

@@ -6,6 +6,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
 import { graphql, useMutation } from 'react-relay';
 import { type ContactCard } from '@azzapp/shared/contactCardHelpers';
+import ERRORS from '@azzapp/shared/errors';
 import { encodeMediaId } from '@azzapp/shared/imagesHelpers';
 import { textStyles } from '#theme';
 import ScreenModal from '#components/ScreenModal';
@@ -255,15 +256,26 @@ const MultiUserAddModal = (
           onCompleted();
         },
         onError: e => {
-          console.error(e);
-          Toast.show({
-            type: 'error',
-            text1: intl.formatMessage({
-              defaultMessage: 'Error, could invite user. Please try again.',
-              description:
-                'Error toast message when inviting user from MultiUserAddModal',
-            }),
-          });
+          if (e.message === ERRORS.PROFILE_ALREADY_EXISTS) {
+            Toast.show({
+              type: 'error',
+              text1: intl.formatMessage({
+                defaultMessage: 'Error, this user is already invited',
+                description:
+                  'Error toast message when inviting user that is already a member from MultiUserAddModal',
+              }),
+            });
+          } else {
+            Toast.show({
+              type: 'error',
+              text1: intl.formatMessage({
+                defaultMessage:
+                  'Error, could not invite user. Please try again.',
+                description:
+                  'Error toast message when inviting user from MultiUserAddModal',
+              }),
+            });
+          }
         },
         updater: (store, data) => {
           const invitedProfile = data.inviteUser?.profile;

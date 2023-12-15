@@ -77,7 +77,11 @@ const inviteUserMutation: MutationResolvers['inviteUser'] = async (
       promotedAsOwner: false,
     };
 
-    createdProfileId = await createProfile(payload, trx);
+    try {
+      createdProfileId = await createProfile(payload, trx);
+    } catch (e) {
+      throw new GraphQLError(ERRORS.PROFILE_ALREADY_EXISTS);
+    }
   });
 
   if (!createdProfileId) throw new GraphQLError(ERRORS.INTERNAL_SERVER_ERROR);
