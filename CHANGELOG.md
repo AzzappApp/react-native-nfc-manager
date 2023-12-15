@@ -1,5 +1,7 @@
-## 0.5.2-canary.60
+## 0.5.2-canary.61
 
+* **fix:**  - 🐛 don't reset contact card on invitation accepted ([#2024](https://github.com/AzzappApp/azzapp/pull/2024))
+* **fix:**  - admin multi screen ([#2025](https://github.com/AzzappApp/azzapp/pull/2025))
 * **fix:**  - show staticMedia if tint and bg color are white ([#2015](https://github.com/AzzappApp/azzapp/pull/2015))
 * **feat:**  - remove user multi ([#1963](https://github.com/AzzappApp/azzapp/pull/1963))
 * **fix:**  - **post:** [#1679](https://github.com/AzzappApp/azzapp/pull/1679) set correct number of posts + set author clickable ([#2009](https://github.com/AzzappApp/azzapp/pull/2009))
