@@ -56,14 +56,18 @@ const toggleFollowing: MutationResolvers['toggleFollowing'] = async (
       await trx
         .update(WebCardTable)
         .set({
-          nbFollowers: follow ? sql`nbFollowers + 1` : sql`nbFollowers - 1`,
+          nbFollowers: follow
+            ? sql`nbFollowers + 1`
+            : sql`GREATEST(nbFollowers - 1, 0)`,
         })
         .where(eq(WebCardTable.id, targetId));
 
       await trx
         .update(WebCardTable)
         .set({
-          nbFollowings: follow ? sql`nbFollowings + 1` : sql`nbFollowings - 1`,
+          nbFollowings: follow
+            ? sql`nbFollowings + 1`
+            : sql`GREATEST(nbFollowings - 1, 0)`,
         })
         .where(eq(WebCardTable.id, profile.webCardId));
 

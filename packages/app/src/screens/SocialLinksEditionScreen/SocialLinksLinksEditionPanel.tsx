@@ -263,8 +263,7 @@ const SocialInputComponent = ({
         Toast.show({
           type: 'error',
           text1: intl.formatMessage({
-            defaultMessage:
-              'The Website Url you entered is not valid. Please check it again.',
+            defaultMessage: 'The Website url is not valid.',
             description:
               'Error toast message when a website url sociallink is not valid.',
           }),

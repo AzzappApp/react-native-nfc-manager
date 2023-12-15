@@ -124,7 +124,10 @@ const LikedPostsScreen = ({
     </SafeAreaView>
   );
 };
-export default relayScreen(LikedPostsScreen, { query: likedPostsScreenQuery });
+export default relayScreen(LikedPostsScreen, {
+  query: likedPostsScreenQuery,
+  fetchPolicy: 'store-and-network',
+});
 
 const styleSheet = createStyleSheet(appearance => ({
   safeAreaView: {

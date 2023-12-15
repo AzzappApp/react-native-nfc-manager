@@ -71,7 +71,7 @@ const togglePostReaction: MutationResolvers['togglePostReaction'] = async (
           //prettier-ignore
           nbPostsLiked: removeReaction? sql`GREATEST(${WebCardTable.nbPostsLiked} - 1, 0)`: sql`${WebCardTable.nbPostsLiked} + 1`,
         })
-        .where(eq(WebCardTable.id, post.webCardId));
+        .where(eq(WebCardTable.id, profile.webCardId));
       await updateStatistics(post.webCardId, 'likes', !removeReaction, trx);
     });
   } catch (e) {

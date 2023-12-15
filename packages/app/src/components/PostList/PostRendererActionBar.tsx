@@ -143,9 +143,9 @@ const PostRendererActionBar = ({
                     );
                     ConnectionHandler.insertEdgeAfter(postILiked, edge);
                   }
-                } else {
-                  ConnectionHandler.deleteNode(postILiked, postId);
                 }
+                //don't handle remove for postILiked.remove in real time inside the list postILiked(when displayed) will trigger some side effect while user scrolling
+                // using a fetch policy to refresh the data when displaying the page initially seems to be a better solution for the user experience
               }
             }
           }
