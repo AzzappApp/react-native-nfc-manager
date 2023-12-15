@@ -1,5 +1,6 @@
-## 0.5.2-canary.63
+## 0.5.2-canary.64
 
+* **feat:**  - **Cover:** animations ([#2029](https://github.com/AzzappApp/azzapp/pull/2029))
 * **fix:**  - 🐛 display specific messsage when inviting user ([#1998](https://github.com/AzzappApp/azzapp/pull/1998))
 * **fix:**  - 🐛 don't reset contact card on invitation accepted ([#2024](https://github.com/AzzappApp/azzapp/pull/2024))
 * **fix:**  - admin multi screen ([#2025](https://github.com/AzzappApp/azzapp/pull/2025))
