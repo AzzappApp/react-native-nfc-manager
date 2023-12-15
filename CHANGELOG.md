@@ -1,5 +1,6 @@
-## 0.5.2-canary.65
+## 0.5.2-canary.66
 
+* **fix:**  - Post I Liked screen behavior and mutation ([#2019](https://github.com/AzzappApp/azzapp/pull/2019))
 * **fix:**  - **post:** [#1630](https://github.com/AzzappApp/azzapp/pull/1630) load posts on scroll ([#2031](https://github.com/AzzappApp/azzapp/pull/2031))
 * **feat:**  - **Cover:** animations ([#2029](https://github.com/AzzappApp/azzapp/pull/2029))
 * **fix:**  - 🐛 display specific messsage when inviting user ([#1998](https://github.com/AzzappApp/azzapp/pull/1998))
