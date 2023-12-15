@@ -1,4 +1,4 @@
-## 0.5.2-canary.61
+## 0.5.2-canary.62
 
 * **fix:**  - 🐛 don't reset contact card on invitation accepted ([#2024](https://github.com/AzzappApp/azzapp/pull/2024))
 * **fix:**  - admin multi screen ([#2025](https://github.com/AzzappApp/azzapp/pull/2025))
