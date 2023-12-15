@@ -1,7 +1,7 @@
 import { eq } from 'drizzle-orm';
 import { GraphQLError } from 'graphql';
 import ERRORS from '@azzapp/shared/errors';
-import { ProfileTable, buildDefaultContactCard, db } from '#domains';
+import { ProfileTable, db } from '#domains';
 import type { MutationResolvers } from '#schema/__generated__/types';
 
 const acceptInvitationMutation: MutationResolvers['acceptInvitation'] = async (
@@ -27,16 +27,14 @@ const acceptInvitationMutation: MutationResolvers['acceptInvitation'] = async (
     throw new GraphQLError(ERRORS.INVALID_REQUEST);
   }
 
-  const contactCard = await buildDefaultContactCard(webCard, userId);
   await db
     .update(ProfileTable)
-    .set({ invited: false, contactCard })
+    .set({ invited: false })
     .where(eq(ProfileTable.id, profileId));
 
   return {
     profile: {
       ...profile,
-      contactCard,
       invited: false,
     },
   };
