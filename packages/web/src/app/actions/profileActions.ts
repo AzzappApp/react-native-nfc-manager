@@ -8,6 +8,7 @@ import {
   getPostByIdWithMedia,
   getPostById,
   getWebCardById,
+  getWebCardsPostsWithMedias,
 } from '@azzapp/data/domains';
 
 export const loadProfilePosts = async (
@@ -18,6 +19,17 @@ export const loadProfilePosts = async (
   // @TODO: make this function dynamic with a better mechanism than headers
   headers();
   return getProfilesPosts(profileId, limit, offset);
+};
+
+export const loadOtherPosts = async (
+  webCardId: string,
+  limit: number,
+  excludedId?: string,
+  before?: Date,
+) => {
+  // @TODO: make this function dynamic with a better mechanism than headers
+  headers();
+  return getWebCardsPostsWithMedias(webCardId, limit, excludedId, before);
 };
 
 export const loadProfilePostsWithTopComment = async (

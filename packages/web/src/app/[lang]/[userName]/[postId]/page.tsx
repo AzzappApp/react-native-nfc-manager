@@ -34,7 +34,7 @@ const PostPage = async (props: PostPageProps) => {
   const author = post ? await getWebCardById(post.webCardId) : null;
   const seeMorePosts =
     author && post
-      ? await getWebCardsPostsWithMedias(author.id, 3, 0, post.id)
+      ? await getWebCardsPostsWithMedias(author.id, 3, post.id)
       : [];
   const comments = post?.allowComments
     ? await getPostCommentsWithWebCard(post.id, 5)
@@ -107,6 +107,7 @@ const PostPage = async (props: PostPageProps) => {
           posts={seeMorePosts}
           media={media}
           webCard={author}
+          postId={postId}
         />
       </aside>
     </div>

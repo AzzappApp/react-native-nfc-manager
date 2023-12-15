@@ -79,15 +79,15 @@ export const getPostByIdWithMedia = async (id: string) => {
  *
  * @param webCardId  The id of the webCard
  * @param limit The maximum number of post to retrieve
- * @param offset The offset of the first post to retrieve
  * @param excludedId The id of a post to exclude from the search
+ * @param before The date of the first post to retrieve
  * @returns A list of post
  */
 export const getWebCardsPostsWithMedias = async (
   webCardId: string,
   limit: number,
-  offset: number,
   excludedId?: string,
+  before?: Date,
 ) => {
   const conditions: SQL[] = [eq(PostTable.webCardId, webCardId)];
 
@@ -98,10 +98,14 @@ export const getWebCardsPostsWithMedias = async (
   const posts = await db
     .select()
     .from(PostTable)
-    .where(and(...conditions))
+    .where(
+      and(
+        ...conditions,
+        before ? sql`${PostTable.createdAt} < ${before}` : undefined,
+      ),
+    )
     .orderBy(desc(PostTable.createdAt))
-    .limit(limit)
-    .offset(offset);
+    .limit(limit);
 
   const mediasIds = posts.reduce<string[]>((mediasIds, post) => {
     return [...mediasIds, ...post.medias];
