@@ -514,6 +514,7 @@ const CoverEditorTemplateList = ({
             backgroundMultiply={item.merged}
             editionParameters={item.mediaParameters}
             filter={item.mediaFilter}
+            mediaAnimation={item.mediaAnimation}
             title={item.title}
             titleStyle={item.titleStyle}
             subTitle={item.subTitle}

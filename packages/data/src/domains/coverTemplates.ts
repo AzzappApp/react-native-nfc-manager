@@ -14,6 +14,7 @@ export type CoverTemplateData = {
   subTitleStyle?: TextStyle | null;
   textOrientation: TextOrientation;
   textPosition: TextPosition;
+  textAnimation?: string | null;
   backgroundId?: string | null;
   backgroundColor?: string | null;
   backgroundPatternColor?: string | null;
@@ -21,6 +22,7 @@ export type CoverTemplateData = {
   foregroundColor?: string | null;
   mediaFilter?: string | null;
   mediaParameters?: Record<string, any> | null;
+  mediaAnimation?: string | null;
   merged: boolean;
 };
 
