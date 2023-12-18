@@ -612,4 +612,5 @@ const mediaAnimations = [
   'appearZoomIn',
   'fadeInOut',
   'pop',
+  'rotate',
 ];

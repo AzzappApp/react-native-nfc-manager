@@ -233,6 +233,36 @@ const Pop = createSimpleAnimation('Pop', animationSharedValue => {
   };
 });
 
+const Rotate = createSimpleAnimation('Rotate', animationSharedValue => {
+  'worklet';
+
+  const animationProgress = getCoverAnimationProgress(
+    animationSharedValue.value,
+    {
+      duration: 0.1,
+      easing: Easing.inOut(Easing.ease),
+    },
+    {
+      duration: 0.9,
+      easing: Easing.inOut(Easing.ease),
+    },
+  );
+  return {
+    transform: [
+      {
+        rotate: `${interpolate(animationProgress, [0, 1, 2], [90, 0, 0])}deg`,
+      },
+      {
+        scale: interpolate(
+          animationProgress,
+          [0, 0.7, 0.8, 1, 2],
+          [2, 1.8, 1.6, 1.1, 1],
+        ),
+      },
+    ],
+  };
+});
+
 const ANIMATORS: Record<string, React.ComponentType<AnimationProps>> = {
   smoothZoomOut: SmoothZoomOut,
   linearZoomOut: LinearZoomOut,
@@ -242,6 +272,7 @@ const ANIMATORS: Record<string, React.ComponentType<AnimationProps>> = {
   appearZoomIn: AppearZoomIn,
   fadeInOut: FadeInOut,
   pop: Pop,
+  rotate: Rotate,
 };
 
 export const MEDIA_ANIMATIONS = Object.keys(ANIMATORS);
