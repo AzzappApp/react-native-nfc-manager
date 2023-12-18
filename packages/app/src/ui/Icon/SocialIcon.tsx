@@ -1,6 +1,7 @@
 import { Image } from 'react-native';
 import { colors } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
+import type { SocialLinkId } from '@azzapp/shared/socialLinkHelpers';
 import type { ImageProps } from 'react-native';
 
 const socialIcons = {
@@ -102,10 +103,8 @@ const socialIcons = {
   },
 } as const;
 
-export type SocialIcons = keyof typeof socialIcons;
-
 export type SocialIconProps = Omit<ImageProps, 'source'> & {
-  icon: SocialIcons;
+  icon: SocialLinkId;
 };
 
 const SocialIcon = ({ icon, ...props }: SocialIconProps) => {

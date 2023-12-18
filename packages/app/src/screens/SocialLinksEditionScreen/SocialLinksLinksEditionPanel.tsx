@@ -14,8 +14,8 @@ import SocialIcon from '#ui/Icon/SocialIcon';
 import Input from '#ui/Input';
 import Text from '#ui/Text';
 import TitleWithLine from '#ui/TitleWithLine';
-import type { SocialIcons } from '#ui/Icon/SocialIcon';
 import type { SocialLinkInput } from '@azzapp/relay/artifacts/SocialLinksEditionScreenUpdateModuleMutation.graphql';
+import type { SocialLinkId } from '@azzapp/shared/socialLinkHelpers';
 import type {
   ViewProps,
   LayoutChangeEvent,
@@ -55,7 +55,7 @@ const SocialLinksLinksEditionPanel = ({
   const intl = useIntl();
   const { insetBottom } = useEditorLayout();
 
-  const onChangeLink = (id: SocialIcons, value: string) => {
+  const onChangeLink = (id: SocialLinkId, value: string) => {
     if (isNotFalsyString(value)) {
       const item = links.find(link => link?.socialId === id);
 
@@ -143,7 +143,7 @@ const SocialLinksLinksEditionPanel = ({
 
   const renderItem = (
     item: {
-      id: SocialIcons;
+      id: SocialLinkId;
       link?: string | undefined;
       position: number;
       mask: string;
@@ -200,7 +200,7 @@ const SocialLinksLinksEditionPanel = ({
         })}
       />
       <SortableList<{
-        id: SocialIcons;
+        id: SocialLinkId;
         link?: string | undefined;
         position: number;
         mask: string;
@@ -228,11 +228,11 @@ const SocialInputComponent = ({
   panGesture,
   placeholder,
 }: {
-  icon: SocialIcons;
+  icon: SocialLinkId;
   mask: string;
   placeholder?: string;
   value: string;
-  onChangeLink: (id: SocialIcons, value: string) => void;
+  onChangeLink: (id: SocialLinkId, value: string) => void;
   panGesture: PanGesture;
 }) => {
   const colorScheme = useColorScheme();
@@ -284,7 +284,7 @@ const SocialInputComponent = ({
       }}
     >
       <SocialIcon
-        icon={icon as SocialIcons}
+        icon={icon}
         style={{
           width: 30,
           height: 30,

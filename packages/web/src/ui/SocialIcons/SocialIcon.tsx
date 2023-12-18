@@ -30,10 +30,11 @@ import website from './assets/website.svg';
 import whatsapp from './assets/whatsapp.svg';
 import yelp from './assets/yelp.svg';
 import youtube from './assets/youtube.svg';
+import type { SocialLinkId } from '@azzapp/shared/socialLinkHelpers';
 import type { ImageProps } from 'next/image';
 
 type SocialIconProps = Omit<ImageProps, 'alt' | 'src'> & {
-  icon: SocialIcons;
+  icon: SocialLinkId;
 };
 
 const SocialIcon = ({ icon, ...props }: SocialIconProps) => {
@@ -79,5 +80,3 @@ const socialIcons = {
   phone,
   sms,
 };
-
-export type SocialIcons = keyof typeof socialIcons;

@@ -39,3 +39,5 @@ export const SOCIAL_LINKS = [
   { id: 'mail', mask: '' },
   { id: 'sms', mask: '' },
 ] as const;
+
+export type SocialLinkId = (typeof SOCIAL_LINKS)[number]['id'];

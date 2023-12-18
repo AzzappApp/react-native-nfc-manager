@@ -1,6 +1,6 @@
 import { SOCIAL_LINKS } from '@azzapp/shared/socialLinkHelpers';
 import SocialIcon from '#ui/SocialIcons/SocialIcon';
-import type { SocialIcons } from '#ui/SocialIcons/SocialIcon';
+import type { SocialLinkId } from '@azzapp/shared/socialLinkHelpers';
 
 type SocialLinkProps = {
   link: SocialLinkType;
@@ -47,7 +47,7 @@ const SocialLink = (props: SocialLinkProps) => {
 };
 
 export type SocialLinkType = {
-  socialId: SocialIcons;
+  socialId: SocialLinkId;
   link: string;
   position: number;
 };
