@@ -179,6 +179,17 @@ export const WebCard: WebCardResolvers = {
 
     return profiles;
   },
+  nextChangeUsernameAllowedAt: async webCard => {
+    // Convert lastUpdate to a Date object
+    const lastUpdateDate = new Date(webCard.lastUserNameUpdate);
+    // Get the time MINIMUM_DAYS_BETWEEN_CHANGING_USERNAME days ago
+    //TODO: update in case of premium/vip specific settings
+    const nextChangeDate = new Date(lastUpdateDate);
+    nextChangeDate.setDate(
+      nextChangeDate.getDate() + USERNAME_CHANGE_FREQUENCY_DAY,
+    );
+    return nextChangeDate;
+  },
 };
 
 export const WebCardCategory: WebCardCategoryResolvers = {
@@ -194,3 +205,8 @@ export const CompanyActivity: CompanyActivityResolvers = {
   id: idResolver('CompanyActivity'),
   label: getLabel,
 };
+
+const USERNAME_CHANGE_FREQUENCY_DAY = parseInt(
+  process.env.USERNAME_CHANGE_FREQUENCY_DAY ?? '30',
+  10,
+);

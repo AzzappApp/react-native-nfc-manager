@@ -13,8 +13,8 @@ import {
 import type { MutationResolvers } from '#schema/__generated__/types';
 import type { GraphQLContext } from '../GraphQLContext';
 
-const USERNAME_CHANGE_DELAY_DAY = parseInt(
-  process.env.USERNAME_CHANGE_DELAY_DAY ?? '30',
+const USERNAME_CHANGE_FREQUENCY_DAY = parseInt(
+  process.env.USERNAME_CHANGE_FREQUENCY_DAY ?? '30',
   10,
 );
 
@@ -57,11 +57,15 @@ const updateWebCardUserNameMutation: MutationResolvers['updateWebCardUserName'] 
     // Get the time MINIMUM_DAYS_BETWEEN_CHANGING_USERNAME days ago
     const nextChangeDate = new Date(lastUpdateDate);
     nextChangeDate.setDate(
-      nextChangeDate.getDate() + USERNAME_CHANGE_DELAY_DAY,
+      nextChangeDate.getDate() + USERNAME_CHANGE_FREQUENCY_DAY,
     );
     // Check if lastUpdate is earlier than thirtyDaysAgo;
     if (nextChangeDate > now) {
-      throw new GraphQLError(ERRORS.USERNAME_CHANGE_NOT_ALLOWED_DELAY);
+      throw new GraphQLError(ERRORS.USERNAME_CHANGE_NOT_ALLOWED_DELAY, {
+        extensions: {
+          alloweChangeUserNameDate: nextChangeDate,
+        },
+      });
     }
 
     const { userName } = args.input;

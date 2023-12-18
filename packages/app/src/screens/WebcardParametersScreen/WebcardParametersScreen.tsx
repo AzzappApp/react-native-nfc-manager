@@ -28,11 +28,6 @@ import type {
 import type { WebcardParametersScreenUnPublishMutation } from '@azzapp/relay/artifacts/WebcardParametersScreenUnPublishMutation.graphql';
 import type { ArrayItemType } from '@azzapp/shared/arrayHelpers';
 
-const USERNAME_CHANGE_DELAY_DAY = parseInt(
-  process.env.USERNAME_CHANGE_DELAY_DAY ?? '30',
-  10,
-);
-
 const webcardParametersScreenQuery = graphql`
   query WebcardParametersScreenQuery {
     viewer {
@@ -45,6 +40,7 @@ const webcardParametersScreenQuery = graphql`
           webCardKind
           alreadyPublished
           lastUserNameUpdate
+          nextChangeUsernameAllowedAt
           webCardCategory {
             id
           }
@@ -64,6 +60,9 @@ const webcardParametersScreenQuery = graphql`
         label
       }
     }
+    webCardParameters {
+      userNameChangeFrequencyDay
+    }
   }
 `;
 
@@ -73,13 +72,13 @@ const WebcardParametersScreen = ({
   const {
     viewer: { profile },
     webCardCategories,
+    webCardParameters: { userNameChangeFrequencyDay },
   } = usePreloadedQuery(webcardParametersScreenQuery, preloadedQuery);
   const webCard = profile?.webCard ?? null;
 
   const intl = useIntl();
   const styles = useStyleSheet(styleSheet);
   const [userNameFormVisible, toggleUserNameFormVisible] = useToggle(false);
-
   const activities = useMemo(
     () =>
       webCardCategories?.find(a => a.id === webCard?.webCardCategory?.id)
@@ -187,40 +186,14 @@ const WebcardParametersScreen = ({
     }
     // Get the current date and time
     const now = new Date();
-
-    // Get the time MINIMUM_DAYS_BETWEEN_CHANGING_USERNAME days ago
-    const nextChangeDate = new Date(webCard.lastUserNameUpdate);
-    nextChangeDate.setDate(
-      nextChangeDate.getDate() + USERNAME_CHANGE_DELAY_DAY,
-    );
-
-    // Check if lastUpdate is earlier than USERNAME_CHANGE_DELAY_DAY day
-    if (nextChangeDate < now) {
+    if (
+      webCard?.nextChangeUsernameAllowedAt &&
+      webCard?.nextChangeUsernameAllowedAt < now
+    ) {
       return true;
     } else {
       return false;
     }
-  }, [webCard]);
-
-  const nextChangeDay = useMemo(() => {
-    // Calculate the next available date for changing the username
-    if (webCard) {
-      // Get the time MINIMUM_DAYS_BETWEEN_CHANGING_USERNAME days ago
-      const nextChangeDate = new Date(webCard.lastUserNameUpdate);
-      nextChangeDate.setDate(
-        nextChangeDate.getDate() + USERNAME_CHANGE_DELAY_DAY,
-      );
-      // Get the current date
-      const currentDate = new Date();
-
-      // Calculate the difference in days
-      const diffTime = Math.abs(
-        nextChangeDate.getTime() - currentDate.getTime(),
-      );
-
-      return Math.round(diffTime / (1000 * 60 * 60 * 24));
-    }
-    return 0;
   }, [webCard]);
 
   const onPressUserName = useCallback(() => {
@@ -232,20 +205,38 @@ const WebcardParametersScreen = ({
         text1: intl.formatMessage(
           {
             defaultMessage:
-              'You can change your WebCard{azzappA} name in {nextChange} days',
+              'You will be able to change your WebCard{azzappA} name',
             description:
               'WebcardParameters Screen : Toast Error message when not authorize to change the Webcard name',
           },
           {
             azzappA: <Text variant="azzapp">a</Text>,
-            nextChange: nextChangeDay,
           },
         ) as string,
-
+        text2: intl.formatMessage(
+          {
+            defaultMessage: 'The {dateChange} at {timeChange}',
+            description:
+              'WebcardParameters Screen : Toast Error message when not authorize to change the Webcard name',
+          },
+          {
+            dateChange: webCard?.nextChangeUsernameAllowedAt
+              ? intl.formatDate(webCard?.nextChangeUsernameAllowedAt)
+              : 'unknwon date',
+            timeChange: webCard?.nextChangeUsernameAllowedAt
+              ? intl.formatTime(webCard?.nextChangeUsernameAllowedAt)
+              : 'unknwon date',
+          },
+        ),
         visibilityTime: 5000,
       });
     }
-  }, [canChangeUserName, intl, nextChangeDay, toggleUserNameFormVisible]);
+  }, [
+    canChangeUserName,
+    intl,
+    toggleUserNameFormVisible,
+    webCard?.nextChangeUsernameAllowedAt,
+  ]);
 
   if (!webCard) {
     return null;
@@ -299,7 +290,7 @@ const WebcardParametersScreen = ({
             defaultMessage="You can only change your WebCard{azzappA} name every {dayInterval} days."
             description="Description message for userName field in webcard parameters"
             values={{
-              dayInterval: USERNAME_CHANGE_DELAY_DAY,
+              dayInterval: userNameChangeFrequencyDay,
               azzappA: <Text variant="azzapp">a</Text>,
             }}
           />
@@ -445,6 +436,7 @@ const styleSheet = createStyleSheet(appearance => ({
 export default relayScreen(WebcardParametersScreen, {
   query: webcardParametersScreenQuery,
   fallback: WebcardParametersScreenFallback,
+  fetchPolicy: 'store-and-network',
 });
 
 type WebCardCategory = ArrayItemType<

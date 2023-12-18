@@ -21,11 +21,6 @@ import TextInput from '#ui/TextInput';
 import type { WebcardParametersNameFormQuery } from '@azzapp/relay/artifacts/WebcardParametersNameFormQuery.graphql';
 import type { GraphQLError } from 'graphql';
 
-const USERNAME_CHANGE_DELAY_DAY = parseInt(
-  process.env.USERNAME_CHANGE_DELAY_DAY ?? '30',
-  10,
-);
-
 const userNameFormSchema = z.object({
   userName: z.string().refine(userName => isValidUserName(userName), {
     message: 'Username can’t contain space or special caracters',
@@ -170,11 +165,13 @@ const WebcardParametersNameForm = ({
           )
         ) {
           //it should not happen unless we have different value between server and client
+          const error = response?.errors.find(
+            r => r.message === ERRORS.USERNAME_CHANGE_NOT_ALLOWED_DELAY,
+          );
           setError('root.server', {
             message: intl.formatMessage(
               {
-                defaultMessage:
-                  'You can only change your WebCard{azzappA} name every {dayInterval} days.',
+                defaultMessage: `You will be able to change your WebCard{azzappA} name after {dateChange}.`,
                 description:
                   'WebcardParameters Name form - Error This userName is already used ',
               },
@@ -184,7 +181,13 @@ const WebcardParametersNameForm = ({
                     a
                   </Text>
                 ),
-                dayInterval: USERNAME_CHANGE_DELAY_DAY,
+                dateChange: error?.extensions.alloweChangeUserNameDate
+                  ? `${intl.formatDate(
+                      error?.extensions.alloweChangeUserNameDate as string,
+                    )} at ${intl.formatTime(
+                      error?.extensions.alloweChangeUserNameDate as string,
+                    )}`
+                  : 'unknown date',
               },
             ) as string,
           });

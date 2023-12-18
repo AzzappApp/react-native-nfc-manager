@@ -28,6 +28,12 @@ export const Query: QueryResolvers = {
   webCard: async (_, { userName }) => {
     return getWebCardByUserNameWithRedirection(userName);
   },
+  webCardParameters: async () => {
+    //use a single source of truth for settings. Those settings can also be dependant on vip/premium status
+    return {
+      userNameChangeFrequencyDay: USERNAME_CHANGE_FREQUENCY_DAY,
+    };
+  },
   userNameAvailable: async (_, { userName }) => {
     const profile = await getWebCardByUserName(userName);
     const redirection = await getRedirectWebCardByUserName(userName);
@@ -37,3 +43,8 @@ export const Query: QueryResolvers = {
     return false;
   },
 };
+
+const USERNAME_CHANGE_FREQUENCY_DAY = parseInt(
+  process.env.USERNAME_CHANGE_FREQUENCY_DAY ?? '30',
+  10,
+);

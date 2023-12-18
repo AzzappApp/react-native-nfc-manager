@@ -198,6 +198,10 @@ type WebCard implements Node {
     """
     first: Int
   ): PostConnection!
+  """
+  Return the datetime when the webCard can change its username
+  """
+  nextChangeUsernameAllowedAt: DateTime
 }
 
 type WebCardStyle {
