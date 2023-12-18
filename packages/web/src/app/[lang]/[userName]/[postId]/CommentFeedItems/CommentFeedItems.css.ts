@@ -48,6 +48,8 @@ const comment = style({
 
 const name = style({
   fontWeight: vars.fontWeight.semiBold,
+  textDecoration: 'none',
+  color: 'black',
 });
 
 const content = style({
