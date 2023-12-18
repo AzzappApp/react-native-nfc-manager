@@ -57,7 +57,10 @@ export type SignUpParams = {
 /**
  * API call to signup a new user.
  */
-export const signup: APIMethod<SignUpParams, TokensResponse> = (data, init) =>
+export const signup: APIMethod<
+  SignUpParams,
+  TokensResponse & { webCardId?: string; profileRole?: string }
+> = (data, init) =>
   apiFetch(`${API_ENDPOINT}/signup`, {
     ...init,
     method: 'POST',
