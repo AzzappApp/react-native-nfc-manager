@@ -96,6 +96,8 @@ export type ImagePickerProps = {
    * A component used to wrap the top panel of the wizard
    */
   TopPanelWrapper?: ComponentType<any>;
+
+  cameraButtonsLeftRightPosition?: number;
 };
 /**
  * A component used to select an image or a video and edit it
@@ -114,6 +116,7 @@ const ImagePicker = ({
   onFinished,
   onCancel,
   TopPanelWrapper = Fragment,
+  cameraButtonsLeftRightPosition,
 }: ImagePickerProps) => {
   const [stepIndex, setStepIndex] = useState(0);
   const [media, setMedia] = useState<Media | null>(null);
@@ -181,6 +184,7 @@ const ImagePicker = ({
       exporting={exporting}
       kind={kind}
       onMediaChange={setMedia}
+      cameraButtonsLeftRightPosition={cameraButtonsLeftRightPosition}
     >
       <ImagePickerWizardContainer
         onBack={onBack}

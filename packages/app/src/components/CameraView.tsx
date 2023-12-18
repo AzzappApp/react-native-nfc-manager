@@ -47,6 +47,8 @@ export type CameraViewProps = ViewProps & {
    * Note: If you want to use `video` and `frameProcessor` simultaneously, make sure [`supportsParallelVideoProcessing`](https://mrousavy.github.io/react-native-vision-camera/docs/guides/devices#the-supportsparallelvideoprocessing-prop) is `true`.
    */
   video?: boolean;
+
+  cameraButtonsLeftRightPosition?: number;
 };
 
 /**
@@ -92,6 +94,7 @@ const CameraView = (
     initialCameraPosition = 'back',
     photo,
     video,
+    cameraButtonsLeftRightPosition,
     ...props
   }: CameraViewProps,
   ref: ForwardedRef<CameraViewHandle>,
@@ -287,7 +290,10 @@ const CameraView = (
               ? 'flash_auto'
               : 'flash_on'
           }
-          style={styles.flashButton}
+          style={[
+            styles.flashButton,
+            { left: cameraButtonsLeftRightPosition ?? 25 },
+          ]}
           size={40}
           onPress={onFlashPressed}
           accessibilityRole="togglebutton"
@@ -321,7 +327,10 @@ const CameraView = (
       {supportsCameraFlipping && (
         <FloatingIconButton
           icon="revert"
-          style={styles.flipButton}
+          style={[
+            styles.flipButton,
+            { right: cameraButtonsLeftRightPosition ?? 25 },
+          ]}
           size={40}
           onPress={onFlipCameraPressed}
           accessibilityLabel={intl.formatMessage({
@@ -358,12 +367,10 @@ const styles = StyleSheet.create({
   },
   flashButton: {
     position: 'absolute',
-    left: 25,
     bottom: 20,
   },
   flipButton: {
     position: 'absolute',
-    right: 25,
     bottom: 20,
   },
 });

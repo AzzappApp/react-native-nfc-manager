@@ -298,6 +298,7 @@ const ContactCardEditForm = (props: ContactCardEditFormProps) => {
           TopPanelWrapper={ImagePickerContactCardMediaWrapper}
           onFinished={onImagePickerFinished}
           onCancel={hideImagePicker}
+          cameraButtonsLeftRightPosition={70}
         />
       </ScreenModal>
     </>

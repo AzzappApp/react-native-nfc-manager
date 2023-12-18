@@ -46,6 +46,7 @@ const SelectImageStep = ({
     onAspectRatioChange,
     onEditionParametersChange,
     clearMedia,
+    cameraButtonsLeftRightPosition,
   } = useImagePickerState();
 
   const [pickerMode, setPickerMode] = useState<'gallery' | 'photo' | 'video'>(
@@ -290,6 +291,7 @@ const SelectImageStep = ({
               initialCameraPosition={initialCameraPosition}
               photo={pickerMode === 'photo'}
               video={pickerMode === 'video'}
+              cameraButtonsLeftRightPosition={cameraButtonsLeftRightPosition}
             />
           ) : null
         }
