@@ -1,4 +1,4 @@
-## 0.5.2-canary.72
+## 0.5.2-canary.73
 
 * **fix:**  - **webCard:** [#1692](https://github.com/AzzappApp/azzapp/pull/1692) display cover everywhere ([#2021](https://github.com/AzzappApp/azzapp/pull/2021))
 * **fix:**  - webcardparameter single source of truth for change date ([#2042](https://github.com/AzzappApp/azzapp/pull/2042))
