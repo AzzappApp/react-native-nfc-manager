@@ -141,9 +141,6 @@ const CECImageEditionPanel = ({
                 selectedFilter={filter}
                 onChange={onFilterChange}
                 style={styles.filterSelectionList}
-                contentContainerStyle={
-                  styles.filterSelectionListContentContainer
-                }
                 cardRadius={COVER_CARD_RADIUS}
               />
             ),
@@ -171,6 +168,7 @@ const CECImageEditionPanel = ({
                 accessibilityRole="list"
                 onSelect={onMediaAnimationChange}
                 selectedItem={mediaAnimation ?? null}
+                style={styles.animationList}
               />
             ),
           },
@@ -257,5 +255,8 @@ const styles = StyleSheet.create({
   imageEditionParametersListContainer: {
     flex: 1,
     justifyContent: 'center',
+  },
+  animationList: {
+    marginVertical: 15,
   },
 });

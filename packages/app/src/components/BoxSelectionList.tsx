@@ -1,15 +1,11 @@
-import { memo, useCallback, useMemo, useRef, useState } from 'react';
+import { memo, useCallback, useMemo, useState } from 'react';
 import { View } from 'react-native';
 import { FlatList } from 'react-native-gesture-handler';
-import Animated, {
-  interpolate,
-  useAnimatedStyle,
-} from 'react-native-reanimated';
 import { COVER_CARD_RADIUS, COVER_RATIO } from '@azzapp/shared/coverHelpers';
 import { colors, shadow } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
-import useAnimatedState from '#hooks/useAnimatedState';
 import PressableNative from '#ui/PressableNative';
+import Text from '#ui/Text';
 import type {
   LayoutChangeEvent,
   ListRenderItemInfo,
@@ -28,6 +24,7 @@ export type BoxSelectionListProps<T> = ViewProps & {
   selectedItem: T | null;
   imageRatio?: number;
   renderItem: (params: BoxButtonItemInfo<T>) => React.ReactNode;
+  renderLabel?: (params: BoxButtonItemInfo<T>) => React.ReactNode;
   keyExtractor: (item: T) => string;
   onSelect: (item: T | null) => void;
 };
@@ -37,6 +34,7 @@ const BoxSelectionList = <T,>({
   selectedItem,
   imageRatio = COVER_RATIO,
   renderItem,
+  renderLabel,
   keyExtractor,
   onSelect,
   onLayout,
@@ -55,7 +53,7 @@ const BoxSelectionList = <T,>({
     [onLayout],
   );
 
-  const renderAnimationButton = useCallback(
+  const renderbutton = useCallback(
     ({ item, index }: ListRenderItemInfo<T | null>) => {
       if (height === null) {
         return null;
@@ -65,6 +63,7 @@ const BoxSelectionList = <T,>({
           item={item}
           index={index}
           renderItem={renderItem}
+          renderLabel={renderLabel}
           imageRatio={imageRatio}
           // eslint-disable-next-line eqeqeq
           isSelected={selectedItem == item}
@@ -74,20 +73,15 @@ const BoxSelectionList = <T,>({
         />
       );
     },
-    [renderItem, imageRatio, selectedItem, height, onSelect, props],
-  );
-
-  const width = (height ?? 0) * COVER_RATIO;
-
-  const getItemLayout = useCallback(
-    (_data: any, index: number) => {
-      return {
-        length: width + 10,
-        offset: (width + 10) * index,
-        index,
-      };
-    },
-    [width],
+    [
+      height,
+      renderItem,
+      renderLabel,
+      imageRatio,
+      selectedItem,
+      onSelect,
+      props,
+    ],
   );
 
   const innerKeyExtractor = useCallback(
@@ -100,23 +94,15 @@ const BoxSelectionList = <T,>({
     [data, height],
   );
 
-  const contentInset = useRef({ left: 30 }).current;
-  const contentOffset = useRef({ x: -30, y: 0 }).current;
-
   return (
     <FlatList
       {...props}
       data={innerData}
-      renderItem={renderAnimationButton}
-      getItemLayout={getItemLayout}
+      renderItem={renderbutton}
       keyExtractor={innerKeyExtractor}
       horizontal
       showsHorizontalScrollIndicator={false}
-      contentContainerStyle={styles.animationListContentContainer}
-      ItemSeparatorComponent={ItemSeparatorComponent}
-      contentInset={contentInset}
-      contentOffset={contentOffset}
-      maxToRenderPerBatch={2}
+      contentContainerStyle={styles.listContentContainer}
       onLayout={onLayoutInner}
     />
   );
@@ -127,6 +113,7 @@ export default BoxSelectionList;
 type BoxButtonProps<T> = {
   item: T | null;
   index: number;
+  renderLabel?: (params: BoxButtonItemInfo<T>) => React.ReactNode;
   renderItem: (params: BoxButtonItemInfo<T>) => React.ReactNode;
   isSelected: boolean;
   height: number;
@@ -139,59 +126,83 @@ const BoxButton = <T,>({
   index,
   isSelected,
   height,
+  renderLabel,
   imageRatio,
   onSelect,
   renderItem,
 }: BoxButtonProps<T>) => {
-  const timing = useAnimatedState(isSelected, { duration: 120 });
-
-  const itemAnimatedStyle = useAnimatedStyle(() => {
-    return {
-      transform: [{ scale: interpolate(timing.value, [0, 1], [1, 1.1]) }],
-    };
-  }, [height, timing]);
-
-  const width = height * imageRatio;
-
-  const styles = useStyleSheet(styleSheet);
-
   const onPress = useCallback(() => {
     onSelect(item);
   }, [onSelect, item]);
 
+  const itemHeight = height - 12 - (renderLabel ? 25 : 0);
+  const itemWidth = itemHeight * imageRatio;
+  const width = itemWidth + 12;
+  const borderRadius = itemWidth * COVER_CARD_RADIUS;
+
+  const itemInfos = { item, index, width: itemWidth, height: itemHeight };
+
+  const styles = useStyleSheet(styleSheet);
+
   return (
-    <Animated.View
-      style={[
-        {
-          height,
-          aspectRatio: imageRatio,
-        },
-        itemAnimatedStyle,
-      ]}
-    >
+    <View style={{ height, width }}>
       <PressableNative
         style={[
-          styles.animationButton,
+          styles.button,
           {
-            borderRadius: width * COVER_CARD_RADIUS,
+            width: itemWidth,
+            height: itemHeight,
+            borderRadius,
           },
         ]}
         onPress={onPress}
         accessibilityRole="button"
+        hitSlop={{ top: 6, bottom: 6, left: 6, right: 6 }}
       >
         <View
-          style={[
-            {
-              borderRadius: width * COVER_CARD_RADIUS,
-              overflow: 'hidden',
-              aspectRatio: COVER_RATIO,
-            },
-          ]}
+          style={{
+            width: itemWidth,
+            height: itemHeight,
+            borderRadius,
+            overflow: 'hidden',
+            borderCurve: 'continuous',
+          }}
         >
-          {renderItem({ item, index, width, height })}
+          {renderItem(itemInfos)}
         </View>
       </PressableNative>
-    </Animated.View>
+      {isSelected && (
+        <>
+          <View
+            style={[
+              styles.buttonOuterBorder,
+              {
+                height: itemHeight + 12,
+                width: itemWidth + 12,
+                borderRadius: borderRadius + 6,
+              },
+            ]}
+            pointerEvents="none"
+          />
+          <View
+            style={[
+              styles.buttonInnerBorder,
+              {
+                height: itemHeight + 4,
+                width: itemWidth + 4,
+                borderRadius: borderRadius + 2,
+              },
+            ]}
+            pointerEvents="none"
+          />
+        </>
+      )}
+      {renderLabel && (
+        <Text variant="small" style={styles.label}>
+          {renderLabel(itemInfos)}
+        </Text>
+      )}
+    </View>
   );
 };
 
@@ -199,22 +210,45 @@ const BoxButtonMemo: <T>(props: BoxButtonProps<T>) => React.ReactNode = memo(
   BoxButton,
 ) as any;
 
-const ItemSeparatorComponent = () =>
-  useMemo(() => <View style={{ width: 10 }} />, []);
-
 const VERTICAL_PADDING = 15;
 
 const styleSheet = createStyleSheet(appearance => ({
-  animationListContentContainer: {
+  listContentContainer: {
     paddingHorizontal: 20,
     paddingVertical: VERTICAL_PADDING,
   },
-  animationButton: [
+  button: [
     {
-      flex: 1,
+      position: 'absolute',
+      top: 6,
+      left: 6,
       overflow: 'visible',
       backgroundColor: appearance === 'dark' ? colors.grey900 : colors.grey200,
+      borderCurve: 'continuous',
     },
     shadow(appearance),
   ],
+  buttonInnerBorder: {
+    position: 'absolute',
+    top: 4,
+    left: 4,
+    borderWidth: 2,
+    borderColor: appearance === 'dark' ? colors.black : colors.white,
+    borderCurve: 'continuous',
+  },
+  buttonOuterBorder: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    borderWidth: 4,
+    borderColor: appearance === 'dark' ? colors.white : colors.black,
+    borderCurve: 'continuous',
+  },
+  label: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    width: '100%',
+    textAlign: 'center',
+  },
 }));

@@ -1,4 +1,5 @@
-import { memo, useCallback } from 'react';
+import chroma from 'chroma-js';
+import { memo, useCallback, useMemo } from 'react';
 import { Image, View, StyleSheet } from 'react-native';
 import { graphql, useFragment } from 'react-relay';
 import { COVER_CARD_RADIUS, COVER_RATIO } from '@azzapp/shared/coverHelpers';
@@ -71,6 +72,22 @@ const StaticMediaList = ({
     mediasKey,
   );
 
+  const visiblebackgroundColor = useMemo(() => {
+    if (tintColor === backgroundColor) {
+      const color = chroma(backgroundColor as string);
+      if (color.luminance() > 0.5) {
+        return chroma(backgroundColor as string)
+          .darken(0.3)
+          .hex();
+      } else {
+        return chroma(backgroundColor as string)
+          .brighten(0.3)
+          .hex();
+      }
+    }
+    return backgroundColor;
+  }, [backgroundColor, tintColor]);
+
   const renderItem = useCallback(
     ({ item, height, width }: BoxButtonItemInfo<StaticMediaItem>) => {
       if (item) {
@@ -78,11 +95,9 @@ const StaticMediaList = ({
           <StaticMediaListItemMemo
             item={item}
             imageRatio={imageRatio}
-            isSelected={selectedMedia === item.id}
             resizeMode={item.resizeMode}
             kind={item.kind}
-            backgroundColor={backgroundColor}
-            onSelectMedia={onSelectMedia}
+            backgroundColor={visiblebackgroundColor}
             tintColor={tintColor}
             height={height}
             width={width}
@@ -91,7 +106,7 @@ const StaticMediaList = ({
       }
       return null;
     },
-    [backgroundColor, imageRatio, onSelectMedia, selectedMedia, tintColor],
+    [visiblebackgroundColor, imageRatio, tintColor],
   );
 
   const onSelect = useCallback(
@@ -127,9 +142,7 @@ export default StaticMediaList;
 type StaticMediaListItemProps = {
   item: ArrayItemType<StaticMediaList_staticMedias$data> | null;
   imageRatio: number;
-  isSelected: boolean;
   backgroundColor: ColorValue;
-  onSelectMedia: (id: string) => void;
   tintColor: ColorValue | string;
   width: number;
   height: number;
@@ -159,7 +172,6 @@ const StaticMediaListItem = ({
           borderRadius: width * COVER_CARD_RADIUS,
           overflow: 'hidden',
           aspectRatio: imageRatio,
-          backgroundColor: 'blue',
         },
       ]}
     >

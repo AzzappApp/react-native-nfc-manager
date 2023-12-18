@@ -1,7 +1,7 @@
 import { identity } from 'lodash';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { Image, View } from 'react-native';
+import { Image, StyleSheet, View } from 'react-native';
 import {
   useSharedValue,
   withRepeat,
@@ -18,11 +18,10 @@ import {
   TEXT_POSITIONS,
   COVER_ANIMATION_DURATION,
 } from '@azzapp/shared/coverHelpers';
-import { colors, shadow } from '#theme';
+import { colors } from '#theme';
 import BoxSelectionList from '#components/BoxSelectionList';
 import { TEXT_ANIMATIONS } from '#components/CoverRenderer/coverTextAnimators';
 import CoverTextRenderer from '#components/CoverRenderer/CoverTextRenderer';
-import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import { ColorDropDownPicker } from '#ui/ColorDropDownPicker';
 import FloatingButton from '#ui/FloatingButton';
 import FontDropDownPicker from '#ui/FontDropDownPicker';
@@ -165,8 +164,6 @@ const CECTitlePanel = ({
 
   const placementsLabels = usePlacementsLabels();
   const orientationsLabel = useOrientationsLabels();
-
-  const styles = useStyleSheet(styleSheet);
 
   const renderTextAnimationSample = useCallback(
     ({ item, height }: BoxButtonItemInfo<string>) => {
@@ -356,6 +353,7 @@ const CECTitlePanel = ({
                 accessibilityRole="list"
                 onSelect={onTextAnimationChange}
                 selectedItem={textAnimation ?? null}
+                style={styles.animationList}
               />
             ),
           },
@@ -411,7 +409,7 @@ const AnimationSample = ({
   );
 };
 
-const styleSheet = createStyleSheet(appearance => ({
+const styles = StyleSheet.create({
   contentContainer: {
     flex: 1,
     paddingHorizontal: 20,
@@ -431,22 +429,10 @@ const styleSheet = createStyleSheet(appearance => ({
     width: '90%',
     alignSelf: 'center',
   },
-  animationListContentContaienr: {
-    gap: 10,
-
-    paddingHorizontal: 20,
-    paddingVertical: 15,
-    justifyContent: 'space-between',
+  animationList: {
+    marginVertical: 15,
   },
-  animationButton: [
-    {
-      flex: 1,
-      overflow: 'visible',
-      backgroundColor: appearance === 'dark' ? colors.grey900 : colors.grey200,
-    },
-    shadow(appearance),
-  ],
-}));
+});
 
 const usePlacementsLabels = (): Record<string, string> => {
   const intl = useIntl();

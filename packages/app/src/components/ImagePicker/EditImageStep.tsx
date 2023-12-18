@@ -261,14 +261,13 @@ const EditImageStep = () => {
                   aspectRatio={aspectRatio}
                   selectedFilter={mediaFilter}
                   onChange={onMediaFilterChange}
-                  contentContainerStyle={styles.filterSelectionContentContainer}
                   style={styles.filterSelectionStyle}
                 />
               )}
               {currentTab === 'edit' && (
                 <ImageEditionParametersList
                   style={styles.filterSelectionStyle}
-                  contentContainerStyle={styles.filterSelectionContentContainer}
+                  contentContainerStyle={styles.editImageStepContentContainer}
                   onSelectParam={onEditionStart}
                 />
               )}
@@ -366,7 +365,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   filterSelectionStyle: { flex: 1, flexShrink: 0 },
-  filterSelectionContentContainer: {
+  editImageStepContentContainer: {
     paddingHorizontal: 20,
     maxHeight: 113,
     alignSelf: 'center',
