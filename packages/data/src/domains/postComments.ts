@@ -3,11 +3,10 @@ import { eq, sql, and, desc, inArray } from 'drizzle-orm';
 import { text, index, mysqlTable } from 'drizzle-orm/mysql-core';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
 import db, { cols } from './db';
-import { getMediasByIds } from './medias';
+import { getMediasByIds, type Media } from './medias';
 import { PostTable } from './posts';
 import { WebCardTable, type WebCard } from './webCards';
 import type { DbTransaction } from './db';
-import type { Media } from './medias';
 import type { InferInsertModel, InferSelectModel } from 'drizzle-orm';
 
 export const PostCommentTable = mysqlTable(
@@ -28,8 +27,11 @@ export const PostCommentTable = mysqlTable(
 
 export type PostComment = InferSelectModel<typeof PostCommentTable>;
 export type NewPostComment = InferInsertModel<typeof PostCommentTable>;
-export type PostCommentWithWebCard = Pick<WebCard, 'userName'> &
-  PostComment & { media: Media };
+export type PostCommentWithWebCard = {
+  PostComment: PostComment;
+  WebCard: WebCard;
+  media: Media;
+};
 
 /**
  * insert a post comment
@@ -100,11 +102,12 @@ export const getPostCommentsWithWebCard = async (
     const media = mediasMap.get(WebCard.coverData?.mediaId ?? '');
     if (!media) continue;
     result.push({
-      ...PostComment,
-      userName: WebCard.userName,
+      PostComment,
+      WebCard,
       media,
     });
   }
+
   return result;
 };
 

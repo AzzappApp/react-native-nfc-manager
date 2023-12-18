@@ -17,6 +17,15 @@ const postHeader = style({
   border: 'none',
 });
 
+const postAuthorCover = style({
+  marginRight: 5,
+  borderRadius: 3,
+  overflow: 'hidden',
+  width: '20px',
+  height: '32px',
+  position: 'relative',
+});
+
 const postMedias = style({
   position: 'relative',
   width: '100%',
@@ -80,6 +89,7 @@ const styles = {
   postCommentName,
   postSeeMore,
   postElapsedTime,
+  postAuthorCover,
 };
 
 export default styles;

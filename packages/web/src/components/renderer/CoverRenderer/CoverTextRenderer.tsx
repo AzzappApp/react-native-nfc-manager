@@ -1,6 +1,10 @@
+'use client';
+
 import cx from 'classnames';
+import useResizeObserver from 'use-resize-observer';
 import { swapColor } from '@azzapp/shared/cardHelpers';
 import {
+  COVER_BASE_WIDTH,
   DEFAULT_COVER_CONTENT_ORTIENTATION,
   DEFAULT_COVER_CONTENT_POSITION,
   DEFAULT_COVER_FONT_FAMILY,
@@ -65,6 +69,10 @@ const CoverTextRenderer = ({
   className,
   ...props
 }: CoverTextRendererProps) => {
+  const { ref, width = 0 } = useResizeObserver<HTMLDivElement>({
+    round: Math.floor,
+  });
+
   const orientation = textOrientation ?? DEFAULT_COVER_CONTENT_ORTIENTATION;
   const position = textPosition ?? DEFAULT_COVER_CONTENT_POSITION;
 
@@ -133,12 +141,15 @@ const CoverTextRenderer = ({
   }
 
   const titleFontFamily = titleStyle?.fontFamily ?? DEFAULT_COVER_FONT_FAMILY;
+
+  const scale = width / COVER_BASE_WIDTH;
+
   const titleTextStyle = {
     color: swapColor(
       titleStyle?.color ?? DEFAULT_COVER_TEXT_COLOR,
       colorPalette,
     ),
-    fontSize: `${titleStyle?.fontSize ?? DEFAULT_COVER_FONT_SIZE}em`,
+    fontSize: `${(titleStyle?.fontSize ?? DEFAULT_COVER_FONT_SIZE) * scale}px`,
     textAlign,
   } as const;
 
@@ -149,12 +160,14 @@ const CoverTextRenderer = ({
       subTitleStyle?.color ?? DEFAULT_COVER_TEXT_COLOR,
       colorPalette,
     ),
-    fontSize: `${subTitleStyle?.fontSize ?? DEFAULT_COVER_FONT_SIZE}em`,
+    fontSize: `${
+      (subTitleStyle?.fontSize ?? DEFAULT_COVER_FONT_SIZE) * scale
+    }px`,
     textAlign,
   } as const;
 
   return (
-    <div className={cx(styles.coverTextRender, className)} {...props}>
+    <div className={cx(styles.coverTextRender, className)} ref={ref} {...props}>
       <h1
         style={{
           justifyContent: overlayJustifyContent,

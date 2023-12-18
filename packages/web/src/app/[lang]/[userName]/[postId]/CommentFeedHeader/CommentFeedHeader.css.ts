@@ -27,9 +27,19 @@ const feedHeaderProfile = style({
   color: vars.color.black,
 });
 
+const feedHeaderProfileCover = style({
+  marginRight: 5,
+  borderRadius: 3,
+  overflow: 'hidden',
+  width: '20px',
+  height: '32px',
+  position: 'relative',
+});
+
 const styles = {
   feedHeader,
   feedHeaderProfile,
+  feedHeaderProfileCover,
 };
 
 export default styles;

@@ -13,22 +13,22 @@ import type {
   PostWithCommentAndAuthor,
   WebCard,
 } from '@azzapp/data/domains';
+import type { PropsWithChildren } from 'react';
 
-type ProfilePageLayoutProps = {
+type ProfilePageLayoutProps = PropsWithChildren<{
   webCard: WebCard;
-  modules: React.ReactNode;
   cover: React.ReactNode;
   posts: PostWithCommentAndAuthor[];
   media: Media;
   cardBackgroundColor: string;
   lastModuleBackgroundColor: string;
   userName: string;
-};
+}>;
 
 const WebCardPageLayout = (props: ProfilePageLayoutProps) => {
   const {
     webCard,
-    modules,
+    children,
     cover,
     posts,
     media,
@@ -95,7 +95,7 @@ const WebCardPageLayout = (props: ProfilePageLayoutProps) => {
           <div
             style={{ display: 'flex', flexDirection: 'column', width: '100%' }}
           >
-            {modules}
+            {children}
           </div>
         </main>
         {hasPosts && (

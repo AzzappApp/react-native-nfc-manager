@@ -1,10 +1,9 @@
-'use client';
 import cn from 'classnames';
 import { type HTMLAttributes, useEffect, useRef } from 'react';
 import { ArrowRightIcon, ShareIcon } from '#assets';
 import { generateShareProfileLink } from '#helpers';
 import { ButtonIcon } from '#ui';
-import CoverPreview from '#components/renderer/CoverRenderer/CoverPreview';
+import CoverRenderer from '#components/renderer/CoverRenderer';
 import ShareModal from '#components/ShareModal';
 import styles from './WebCardPostNavigation.css';
 import type { ModalActions } from '#ui/Modal';
@@ -81,11 +80,7 @@ const ProfilePostNavigation = (props: WebCardPostNavigationProps) => {
           <span className={styles.text}>Posts</span>
         </button>
         <button className={styles.coverContainer} onClick={onClickCover}>
-          <CoverPreview
-            media={cover}
-            webCard={webCard}
-            style={{ borderRadius: '6px', overflow: 'hidden' }}
-          />
+          <CoverRenderer media={cover} webCard={webCard} staticCover />
         </button>
         <ButtonIcon
           Icon={ShareIcon}

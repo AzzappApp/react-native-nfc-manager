@@ -4,7 +4,7 @@ import { getFormatedElapsedTime } from '@azzapp/shared/timeHelpers';
 import { CommentIcon, HearthIcon, ShareIcon } from '#assets';
 import { generateSharePostLink } from '#helpers';
 import { ButtonIcon } from '#ui';
-import CoverPreview from '#components/renderer/CoverRenderer/CoverPreview';
+import CoverRenderer from '#components/renderer/CoverRenderer';
 import ShareModal from '#components/ShareModal';
 import CloudinaryImage from '#ui/CloudinaryImage';
 import CloudinaryVideoPlayer from '#ui/CloudinaryVideoPlayer';
@@ -45,16 +45,8 @@ const PostFeedItem = (
       <div className={styles.post}>
         <button className={styles.postHeader} onClick={props.onPressAuthor}>
           {media && (
-            <div
-              style={{
-                marginRight: 5,
-                borderRadius: 3,
-                overflow: 'hidden',
-                width: '20px',
-                height: '32px',
-              }}
-            >
-              <CoverPreview media={media} webCard={webCard} />
+            <div className={styles.postAuthorCover}>
+              <CoverRenderer media={media} webCard={webCard} />
             </div>
           )}
           <span>{webCard.userName}</span>

@@ -53,6 +53,9 @@ const coverContainer = style({
   cursor: 'pointer',
   border: 'none',
   backgroundColor: 'transparent',
+  borderRadius: '6px',
+  overflow: 'hidden',
+  padding: 0,
 });
 
 const cover = style({

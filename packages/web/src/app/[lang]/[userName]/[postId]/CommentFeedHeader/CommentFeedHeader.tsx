@@ -1,10 +1,8 @@
-'use client';
-
 import Link from 'next/link';
 import { useRef } from 'react';
 import { Button } from '#ui';
 import DownloadAppModal from '#components/DownloadAppModal';
-import CoverPreview from '#components/renderer/CoverRenderer/CoverPreview';
+import CoverRenderer from '#components/renderer/CoverRenderer';
 import styles from './CommentFeedHeader.css';
 import type { ModalActions } from '#ui/Modal';
 import type { Media, WebCard } from '@azzapp/data/domains';
@@ -26,16 +24,8 @@ const CommentFeedHeader = (props: CommentFeedHeaderProps) => {
           className={styles.feedHeaderProfile}
         >
           {media && (
-            <div
-              style={{
-                marginRight: 5,
-                borderRadius: 3,
-                overflow: 'hidden',
-                width: '20px',
-                height: '32px',
-              }}
-            >
-              <CoverPreview media={media} webCard={webCard} />
+            <div className={styles.feedHeaderProfileCover}>
+              <CoverRenderer media={media} webCard={webCard} staticCover />
             </div>
           )}
           <span>{webCard.userName}</span>

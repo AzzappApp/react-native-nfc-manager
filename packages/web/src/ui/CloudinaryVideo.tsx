@@ -1,4 +1,3 @@
-'use client';
 import { forwardRef, type ForwardedRef } from 'react';
 import { COVER_ASSET_SIZES } from '@azzapp/shared/coverHelpers';
 import {

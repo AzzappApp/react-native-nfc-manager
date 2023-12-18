@@ -9,10 +9,10 @@ import { vars } from '#app/theme.css';
 import CommentFeedItem from './CommentFeedItem';
 import styles from './CommentFeedItems.css';
 import type {
+  WebCard,
   Media,
   PostCommentWithWebCard,
   PostWithMedias,
-  WebCard,
 } from '@azzapp/data/domains';
 
 type CommentFeedItemsProps = {
@@ -35,7 +35,7 @@ const CommentFeedItems = (props: CommentFeedItemsProps) => {
         post.id,
         COUNT_COMMENTS_TO_FETCH,
         comments && comments.length > 0
-          ? new Date(comments[comments.length - 1].createdAt)
+          ? new Date(comments[comments.length - 1].PostComment.createdAt)
           : undefined,
       );
 
@@ -66,18 +66,22 @@ const CommentFeedItems = (props: CommentFeedItemsProps) => {
         {post.content && (
           <CommentFeedItem
             comment={{
-              id: '',
-              comment: post.content,
-              createdAt: post.createdAt,
-              userName: webCard.userName,
-              postId: post.id,
-              webCardId: webCard.id,
+              PostComment: {
+                id: '',
+                comment: post.content,
+                createdAt: post.createdAt,
+                postId: post.id,
+                webCardId: webCard.id,
+              },
+              WebCard: webCard,
               media,
             }}
           />
         )}
         {comments.map(comment => {
-          return <CommentFeedItem key={comment.id} comment={comment} />;
+          return (
+            <CommentFeedItem key={comment.PostComment.id} comment={comment} />
+          );
         })}
         {post.allowComments && comments.length === 0 && (
           <div className={styles.empty}>

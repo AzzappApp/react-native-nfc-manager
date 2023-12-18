@@ -1,8 +1,6 @@
-'use client';
-
 import { forwardRef } from 'react';
 import { Button, Modal, type ModalProps } from '#ui';
-import CloudinaryImage from '#ui/CloudinaryImage';
+import CoverRenderer from '#components/renderer/CoverRenderer';
 import styles from './DownloadAppModal.css';
 import type { ModalActions } from '#ui/Modal';
 import type { Media, WebCard } from '@azzapp/data/domains';
@@ -17,17 +15,11 @@ type DownloadAppModalProps = Omit<ModalProps, 'children'> & {
 const DownloadAppModal = forwardRef(
   (props: DownloadAppModalProps, ref: ForwardedRef<ModalActions>) => {
     const { media, webCard, ...others } = props;
+
     return (
       <Modal ref={ref} {...others}>
         <div className={styles.coverWrapper}>
-          <CloudinaryImage
-            mediaId={media.id}
-            assetKind="cover"
-            videoThumbnail={media.kind === 'video'}
-            alt="cover"
-            fill
-            className={styles.cover}
-          />
+          <CoverRenderer webCard={webCard} media={media} />
         </div>
         <div className={styles.stats}>
           <div className={styles.stat}>

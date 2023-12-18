@@ -18,7 +18,9 @@ import {
   MODULES_STYLES_VALUES,
   getModuleDataValues,
 } from '@azzapp/shared/cardModuleHelpers';
-import { CoverRenderer, ModuleRenderer } from '#components';
+import CoverRenderer from '#components/renderer/CoverRenderer';
+import CoverRendererBackground from '#components/renderer/CoverRenderer/CoverRendererBackground';
+import ModuleRenderer from '#components/renderer/ModuleRenderer';
 import { getMetaData } from '#helpers/seo';
 import WebCardPageLayout from './WebCardPageLayout';
 import type { Metadata } from 'next';
@@ -88,26 +90,28 @@ const ProfilePage = async ({ params }: ProfilePageProps) => {
   return (
     <WebCardPageLayout
       webCard={webCard}
-      modules={
-        <>
-          {modules.map(module => (
-            <ModuleRenderer
-              resizeModes={resizeModes}
-              module={module}
-              key={module.id}
-              colorPalette={webCard.cardColors ?? DEFAULT_COLOR_PALETTE}
-              cardStyle={webCard.cardStyle ?? DEFAULT_CARD_STYLE}
-            />
-          ))}
-        </>
-      }
       posts={posts}
       media={media}
-      cover={<CoverRenderer webCard={webCard} media={media} />}
+      cover={
+        <div style={{ position: 'relative', overflow: 'hidden' }}>
+          <CoverRendererBackground media={media} webCard={webCard} />{' '}
+          <CoverRenderer webCard={webCard} media={media} />
+        </div>
+      }
       cardBackgroundColor={cardBackgroundColor}
       lastModuleBackgroundColor={lastModuleBackgroundColor}
       userName={params.userName}
-    />
+    >
+      {modules.map(module => (
+        <ModuleRenderer
+          resizeModes={resizeModes}
+          module={module}
+          key={module.id}
+          colorPalette={webCard.cardColors ?? DEFAULT_COLOR_PALETTE}
+          cardStyle={webCard.cardStyle ?? DEFAULT_CARD_STYLE}
+        />
+      ))}
+    </WebCardPageLayout>
   );
 };
 

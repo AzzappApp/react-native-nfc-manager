@@ -1,4 +1,5 @@
 import { style } from '@vanilla-extract/css';
+import { COVER_RATIO } from '@azzapp/shared/coverHelpers';
 import {
   MediaQuery,
   textButton,
@@ -97,7 +98,12 @@ const empty = style({
 const emptyText = style([textXXSmall, { color: vars.color.grey400 }]);
 
 const coverLink = style({
-  marginBottom: 'auto',
+  minWidth: 20,
+  aspectRatio: `${COVER_RATIO}`,
+  height: 32,
+  position: 'relative',
+  overflow: 'hidden',
+  borderRadius: 3,
 });
 
 const styles = {
