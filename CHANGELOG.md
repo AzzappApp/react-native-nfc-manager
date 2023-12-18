@@ -1,5 +1,6 @@
-## 0.5.2-canary.74
+## 0.5.2-canary.75
 
+* **feat:**  - **CoverEdition:** uniform UI for all list (medias, animations, etc ...) ([#2048](https://github.com/AzzappApp/azzapp/pull/2048))
 * **build:**  - remove useless display name
 * **build:**  - update for jdk 17 and rn 0.73
 * **fix:**  - **webCard:** [#1692](https://github.com/AzzappApp/azzapp/pull/1692) display cover everywhere ([#2021](https://github.com/AzzappApp/azzapp/pull/2021))
