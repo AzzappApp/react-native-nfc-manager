@@ -1,5 +1,7 @@
-## 0.5.2-canary.71
+## 0.5.2-canary.72
 
+* **fix:**  - **webCard:** [#1692](https://github.com/AzzappApp/azzapp/pull/1692) display cover everywhere ([#2021](https://github.com/AzzappApp/azzapp/pull/2021))
+* **fix:**  - webcardparameter single source of truth for change date ([#2042](https://github.com/AzzappApp/azzapp/pull/2042))
 * **feat:**  - 🎸 add button to remove avatar ([#2045](https://github.com/AzzappApp/azzapp/pull/2045))
 * **fix:**  - **signup:** [#1982](https://github.com/AzzappApp/azzapp/pull/1982) missing profileRole while signin through signup screen ([#2039](https://github.com/AzzappApp/azzapp/pull/2039))
 * **fix:**  - **contactCard:** [#1853](https://github.com/AzzappApp/azzapp/pull/1853) adapt camera buttons position ([#2037](https://github.com/AzzappApp/azzapp/pull/2037))
