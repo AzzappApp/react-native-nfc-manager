@@ -1,5 +1,10 @@
-## 0.5.2-canary.69
+## 0.5.2-canary.70
 
+* **fix:**  - **signup:** [#1982](https://github.com/AzzappApp/azzapp/pull/1982) missing profileRole while signin through signup screen ([#2039](https://github.com/AzzappApp/azzapp/pull/2039))
+* **fix:**  - **contactCard:** [#1853](https://github.com/AzzappApp/azzapp/pull/1853) adapt camera buttons position ([#2037](https://github.com/AzzappApp/azzapp/pull/2037))
+* **fix:**  - **post:** [#1679](https://github.com/AzzappApp/azzapp/pull/1679) make username clickable ([#2034](https://github.com/AzzappApp/azzapp/pull/2034))
+* **fix:**  - **post:** [#1894](https://github.com/AzzappApp/azzapp/pull/1894) display cover in author cartouche ([#2035](https://github.com/AzzappApp/azzapp/pull/2035))
+* **fix:**  - **webcard:** [#1734](https://github.com/AzzappApp/azzapp/pull/1734) replace 🐦 with 𝕏 ([#2033](https://github.com/AzzappApp/azzapp/pull/2033))
 * **feat:**  - **CoverEdition:** Add media rotate animation
 * **feat:**  - **Backoffice:** cover template animation form fields
 * **fix:**  - Post I Liked screen behavior and mutation ([#2019](https://github.com/AzzappApp/azzapp/pull/2019))
