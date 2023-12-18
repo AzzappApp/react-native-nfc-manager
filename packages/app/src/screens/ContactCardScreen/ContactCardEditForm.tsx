@@ -15,6 +15,7 @@ import ScreenModal from '#components/ScreenModal';
 import { buildContactCardModalStyleSheet } from '#helpers/contactCardHelpers';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import Icon from '#ui/Icon';
+import IconButton from '#ui/IconButton';
 import PressableNative from '#ui/PressableNative';
 import Text from '#ui/Text';
 import TextInput from '#ui/TextInput';
@@ -118,6 +119,13 @@ const ContactCardEditForm = (props: ContactCardEditFormProps) => {
                             requestedSize: MEDIA_WIDTH,
                           }}
                           style={styles.avatar}
+                        />
+                        <IconButton
+                          icon="delete_filled"
+                          variant="icon"
+                          iconStyle={styles.removeAvatarIcon}
+                          style={styles.removeAvatarButton}
+                          onPress={() => field.onChange(undefined)}
                         />
                       </View>
                     ) : (
@@ -331,6 +339,7 @@ const CommonInformationField = ({
 };
 
 const AVATAR_WIDTH = 112;
+const ICON_WIDTH = 24;
 
 const styleSheet = createStyleSheet(appearance => ({
   avatarSection: {
@@ -356,7 +365,18 @@ const styleSheet = createStyleSheet(appearance => ({
     overflow: 'visible',
   },
   fieldTitle: { minWidth: 100 },
-  avatarContainer: [{ overflow: 'visible' }, shadow(appearance, 'bottom')],
+  avatarContainer: [
+    { overflow: 'visible', position: 'relative' },
+    shadow(appearance, 'bottom'),
+  ],
+  removeAvatarButton: {
+    position: 'absolute',
+    top: AVATAR_WIDTH / 2 - ICON_WIDTH / 2,
+    left: -ICON_WIDTH - 20,
+  },
+  removeAvatarIcon: {
+    tintColor: colors.red400,
+  },
   ...buildContactCardModalStyleSheet(appearance),
 }));
 
