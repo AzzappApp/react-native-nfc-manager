@@ -30,6 +30,6 @@
   "devDependencies": {
     "@types/relay-runtime": "^14.1.12",
     "@types/validator": "^13.11.1",
-    "@types/chroma-js": "^2.4.1"
+    "@types/chroma-js": "^2.4.3"
   }
 }

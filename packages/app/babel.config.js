@@ -8,7 +8,7 @@ const relayArtifactDirectory = path.join(
 module.exports = {
   presets: [
     [
-      'module:metro-react-native-babel-preset',
+      'module:@react-native/babel-preset',
       {
         unstable_transformProfile: 'hermes-stable',
       },

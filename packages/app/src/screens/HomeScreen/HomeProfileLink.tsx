@@ -105,7 +105,7 @@ export const PROFILE_LINK_MARGIN_TOP = 21;
 const styles = StyleSheet.create({
   container: {
     height: PROFILE_LINK_HEIGHT,
-    wdith: '100%',
+    width: '100%',
     alignItems: 'center',
     marginTop: PROFILE_LINK_MARGIN_TOP,
   },

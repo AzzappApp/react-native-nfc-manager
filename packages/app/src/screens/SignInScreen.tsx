@@ -271,7 +271,6 @@ const styles = StyleSheet.create({
   },
   content: {
     justifyContent: 'center',
-    alignItem: 'center',
     borderTopLeftRadius: 16,
     borderTopRightRadius: 16,
   },

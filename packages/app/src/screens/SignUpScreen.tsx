@@ -389,7 +389,6 @@ const styles = StyleSheet.create({
   },
   body: {
     justifyContent: 'center',
-    alignItem: 'center',
     borderTopLeftRadius: 16,
     borderTopRightRadius: 16,
   },

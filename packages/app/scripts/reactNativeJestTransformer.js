@@ -6,7 +6,7 @@ const relayArtifactDirectory = path.join(
   'artifacts',
 );
 module.exports = createTransformer({
-  presets: ['module:metro-react-native-babel-preset'],
+  presets: ['module:@react-native/babel-preset'],
   plugins: [
     ['@babel/plugin-transform-react-jsx', { runtime: 'automatic' }],
     '@babel/plugin-proposal-export-namespace-from',

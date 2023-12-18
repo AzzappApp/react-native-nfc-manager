@@ -8,7 +8,7 @@ import {
   useImperativeHandle,
 } from 'react';
 import { useIntl } from 'react-intl';
-import { StyleSheet, View } from 'react-native';
+import { Platform, StyleSheet, View } from 'react-native';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import Animated, {
   runOnJS,
@@ -16,7 +16,12 @@ import Animated, {
   useSharedValue,
   withTiming,
 } from 'react-native-reanimated';
-import { useCameraDevices, Camera } from 'react-native-vision-camera';
+import {
+  useCameraDevices,
+  Camera,
+  useCameraDevice,
+  useCameraFormat,
+} from 'react-native-vision-camera';
 import { createDeffered } from '@azzapp/shared/asyncHelpers';
 import useIsForeground from '#hooks/useIsForeground';
 import FloatingIconButton from '#ui/FloatingIconButton';
@@ -102,21 +107,15 @@ const CameraView = (
   // #region camera state
   const camera = useRef<Camera>(null);
   const devices = useCameraDevices();
-  const supportsCameraFlipping = devices.back != null && devices.front != null;
+
   const [cameraPosition, setCameraPosition] = useState<'back' | 'front'>(
-    'back',
+    devices.length ? initialCameraPosition : 'back',
   );
 
-  useEffect(() => {
-    if (devices) {
-      //we can force the camera position once devices are loaded.
-      //we cannot use onCameraInitialize because it is called after switching camera position
-      setCameraPosition(devices.front != null ? initialCameraPosition : 'back');
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [devices]);
+  const device = useCameraDevice(cameraPosition);
 
-  const device = devices[cameraPosition];
+  const supportsCameraFlipping = devices.length > 1;
+
   const [flash, setFlash] = useState<'auto' | 'off' | 'on'>('off');
   const supportsFlash = device?.hasFlash ?? false;
 
@@ -125,7 +124,7 @@ const CameraView = (
 
   useEffect(() => {
     Camera.getMicrophonePermissionStatus().then(
-      status => setHasMicrophonePermission(status === 'authorized'),
+      status => setHasMicrophonePermission(status === 'granted'),
       () => setHasMicrophonePermission(false),
     );
   }, []);
@@ -141,11 +140,11 @@ const CameraView = (
         }
         const photo = await camera.current.takePhoto({
           flash: supportsFlash ? flash : 'off',
+          qualityPrioritization: 'balanced',
           // TODO investigate those parameters
           // enableAutoDistortionCorrection: true,
           // enableAutoRedEyeReduction: true,
           // enableAutoStabilization: true,
-          skipMetadata: true,
         });
         return photo.path;
       },
@@ -160,7 +159,8 @@ const CameraView = (
         }>();
         let recording = true;
         camera.current.startRecording({
-          flash,
+          flash: flash === 'auto' ? 'off' : flash,
+          videoBitRate: 'low',
           onRecordingError(error) {
             recording = false;
             resultDeffered.reject(error);
@@ -250,6 +250,12 @@ const CameraView = (
 
   const intl = useIntl();
 
+  // see https://github.com/mrousavy/react-native-vision-camera/issues/2208#issuecomment-1850856762
+  const format = useCameraFormat(device, [
+    { videoResolution: { width: 1280, height: 720 } },
+    { fps: 30 },
+  ]);
+
   return (
     <View {...props}>
       {device != null && (
@@ -258,8 +264,8 @@ const CameraView = (
             ref={camera}
             style={styles.cameraStyle}
             device={device}
-            preset={video ? 'high' : 'photo'}
             fps={30}
+            format={Platform.OS === 'android' ? format : undefined}
             isActive={isActive}
             onInitialized={onInitialized}
             onError={onError}
