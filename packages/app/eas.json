@@ -11,7 +11,7 @@
         "image": "latest"
       },
       "android": {
-        "image": "default"
+        "image": "latest"
       }
     },
     "development": {
