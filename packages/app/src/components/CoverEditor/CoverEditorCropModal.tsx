@@ -149,6 +149,7 @@ const CoverEditorCropModal = ({
               duration={timeRange?.duration}
               backgroundColor={coverStyle?.backgroundColor}
               maskUri={maskMedia?.uri}
+              backgroundId={coverStyle?.background?.id}
               backgroundImageUri={coverStyle?.background?.uri}
               backgroundImageTintColor={coverStyle?.backgroundPatternColor}
               foregroundId={coverStyle?.foreground?.id}

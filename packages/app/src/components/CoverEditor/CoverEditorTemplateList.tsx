@@ -2,7 +2,7 @@ import MaskedView from '@react-native-masked-view/masked-view';
 import { LinearGradient } from 'expo-linear-gradient';
 import { isEqual, omit } from 'lodash';
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { View, useWindowDimensions } from 'react-native';
+import { PixelRatio, View, useWindowDimensions } from 'react-native';
 import { FlatList } from 'react-native-gesture-handler';
 import {
   graphql,
@@ -235,12 +235,79 @@ const CoverEditorTemplateList = ({
         cardColors,
       );
 
+      const templateMedia =
+        media && mediaVisible
+          ? media
+          : ({
+              uri: previewMedia.uri,
+              rawUri: previewMedia.rawUri,
+              kind:
+                previewMedia.__typename === 'MediaImage' ? 'image' : 'video',
+              width: previewMedia.width,
+              height: previewMedia.height,
+            } as const);
+
       const templateEditionParameters =
         mediaParameters as EditionParameters | null;
 
       const templateStyleParameters = templateEditionParameters
         ? extractLayoutParameters(templateEditionParameters)[1]
         : null;
+
+      let itemMediaParameters =
+        media && mediaVisible
+          ? { ...templateStyleParameters, ...mediaCropParameters }
+          : (templateEditionParameters as EditionParameters | null) ?? {};
+
+      if (
+        !itemMediaParameters?.cropData &&
+        Math.abs(templateMedia.width / templateMedia.height - COVER_RATIO) >
+          0.05
+      ) {
+        // if the media doesn't have the right ratio, and there is no cropData in the template
+        // we compute the cropData to have the right ratio
+        let cropData: EditionParameters['cropData'];
+        const { width: mediaWidth, height: mediaHeight } = templateMedia;
+        if (mediaWidth / mediaHeight > COVER_RATIO) {
+          cropData = {
+            originX: (mediaWidth - mediaHeight * COVER_RATIO) / 2,
+            originY: 0,
+            height: mediaHeight,
+            width: mediaHeight * COVER_RATIO,
+          };
+        } else {
+          cropData = {
+            originX: 0,
+            originY: (mediaHeight - mediaWidth / COVER_RATIO) / 2,
+            height: mediaWidth / COVER_RATIO,
+            width: mediaWidth,
+          };
+        }
+        itemMediaParameters = {
+          ...itemMediaParameters,
+          cropData,
+        };
+      }
+
+      if (templateMedia.rawUri && itemMediaParameters?.cropData) {
+        // if the media uri is a scaled version (demo media and suggested media)
+        // we need to scale the cropData to match the original media size
+        const { originX, originY, width, height } =
+          itemMediaParameters.cropData;
+
+        const scale =
+          templateMedia.width / (256 * Math.min(2, PixelRatio.get()));
+        itemMediaParameters = {
+          ...itemMediaParameters,
+          cropData: {
+            originX: originX / scale,
+            originY: originY / scale,
+            width: width / scale,
+            height: height / scale,
+          },
+        };
+      }
+
       return {
         id,
         title,
@@ -250,22 +317,9 @@ const CoverEditorTemplateList = ({
         textOrientation: textOrientationOrDefaut(textOrientation),
         textPosition: textPositionOrDefaut(textPosition),
         textAnimation,
-        media:
-          media && mediaVisible
-            ? media
-            : {
-                uri: previewMedia.uri,
-                rawUri: previewMedia.rawUri,
-                kind:
-                  previewMedia.__typename === 'MediaImage' ? 'image' : 'video',
-                width: previewMedia.width,
-                height: previewMedia.height,
-              },
+        media: templateMedia,
         mediaFilter,
-        mediaParameters:
-          media && mediaVisible
-            ? { ...templateStyleParameters, ...mediaCropParameters }
-            : (templateEditionParameters as EditionParameters | null) ?? {},
+        mediaParameters: itemMediaParameters,
         mediaAnimation: mediaAnimation ?? null,
         maskUri: kind === 'people' ? maskUri : null,
         background: background ?? null,
@@ -392,6 +446,23 @@ const CoverEditorTemplateList = ({
       segmented,
     } = selectedItem;
 
+    let parameters = mediaParameters ?? {};
+
+    if (selectedItem.media.rawUri && mediaParameters?.cropData) {
+      const scale =
+        selectedItem.media.width / (256 * Math.min(2, PixelRatio.get()));
+
+      parameters = {
+        ...parameters,
+        cropData: {
+          originX: mediaParameters.cropData.originX * scale,
+          originY: mediaParameters.cropData.originY * scale,
+          width: mediaParameters.cropData.width * scale,
+          height: mediaParameters.cropData.height * scale,
+        },
+      };
+    }
+
     onSelectedItemChange({
       id: selectedItem.id,
       style: {
@@ -401,7 +472,7 @@ const CoverEditorTemplateList = ({
         textPosition,
         textAnimation,
         mediaFilter,
-        mediaParameters,
+        mediaParameters: parameters,
         mediaAnimation,
         background: background ?? null,
         backgroundColor,
@@ -509,6 +580,7 @@ const CoverEditorTemplateList = ({
             startTime={timeRange?.startTime}
             duration={timeRange?.duration}
             backgroundColor={item.backgroundColor}
+            backgroundId={item.background?.id}
             backgroundImageUri={item.background?.uri}
             backgroundImageTintColor={item.backgroundPatternColor}
             foregroundId={item.foreground?.id}

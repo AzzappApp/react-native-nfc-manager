@@ -455,6 +455,7 @@ const CoverEditorCustom = ({
               foregroundKind={foreground?.kind}
               foregroundImageUri={foreground?.uri}
               foregroundImageTintColor={foregroundColor}
+              backgroundId={background?.id}
               backgroundImageUri={background?.uri}
               backgroundColor={backgroundColor}
               backgroundImageTintColor={backgroundPatternColor}

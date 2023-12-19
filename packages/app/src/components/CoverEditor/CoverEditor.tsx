@@ -501,7 +501,7 @@ const CoverEditor = (
     }
     let media: SourceMedia | null = null;
     let cropParameters: EditionParameters = {};
-    if (mediaVisible || isSelectedTemplateCover.current) {
+    if (mediaVisible || (isSelectedTemplateCover.current && !suggestedMedia)) {
       media = sourceMedia;
       cropParameters = mediaCropParameters ?? {};
     }
@@ -603,6 +603,8 @@ const CoverEditor = (
     ? sourceMedia ?? suggestedMedia
     : suggestedMedia;
 
+  const isSuggestedMediaDisplayed = displayedMedia === suggestedMedia;
+
   return (
     <>
       <Container style={[styles.root]}>
@@ -640,7 +642,9 @@ const CoverEditor = (
               videoPaused={!!progressIndicator}
               width={templateListWidth}
               height={templateListHeight}
-              mediaCropParameters={mediaCropParameters}
+              mediaCropParameters={
+                !isSuggestedMediaDisplayed ? mediaCropParameters : null
+              }
               timeRange={timeRange}
               currentCoverMedia={sourceMedia}
               currentCoverStyle={
@@ -652,7 +656,7 @@ const CoverEditor = (
               onColorPaletteChange={setColorPalette}
               onSelectedIndexChange={onSelectedIndexChange}
               mediaComputing={mediaComputing}
-              mediaVisible={mediaVisible || !!suggestedMedia}
+              mediaVisible={mediaVisible || isSuggestedMediaDisplayed}
             />
           </Suspense>
         </View>
