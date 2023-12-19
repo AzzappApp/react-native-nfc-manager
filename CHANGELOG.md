@@ -1,5 +1,6 @@
-## 0.5.2-canary.80
+## 0.5.2-canary.81
 
+* **fix:**  - **CoverEdition:** saving current cover when media visible
 * **fix:**  - **CoverEdition:** Media display and background animation ([#2065](https://github.com/AzzappApp/azzapp/pull/2065))
 * **fix:**  - **CoverEdition:** no reset at the end of suggested media list during loading ([#2054](https://github.com/AzzappApp/azzapp/pull/2054))
 * **fix:**  - **CoverEdition:** display current cover when media is hidden ([#2052](https://github.com/AzzappApp/azzapp/pull/2052))
