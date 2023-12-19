@@ -350,10 +350,11 @@ const CoverEditor = (
   // #endregion
 
   // #region Suggested Media
-  const { suggestedMedia, onNextSuggestedMedia } = useSuggestedMedias(
-    viewer,
-    templateKind,
-  );
+  const {
+    suggestedMedia,
+    busy: suggededMediaLoaderBusy,
+    onNextSuggestedMedia,
+  } = useSuggestedMedias(viewer, templateKind);
 
   // #region Save cover
   const { progressIndicator, saveCover } = useSaveCover(
@@ -651,7 +652,7 @@ const CoverEditor = (
               onColorPaletteChange={setColorPalette}
               onSelectedIndexChange={onSelectedIndexChange}
               mediaComputing={mediaComputing}
-              mediaVisible={mediaVisible}
+              mediaVisible={mediaVisible || !!suggestedMedia}
             />
           </Suspense>
         </View>
@@ -671,7 +672,8 @@ const CoverEditor = (
             templateKind={templateKind}
             mediaVisible={mediaVisible}
             toggleMediaVisibility={toggleMediaVisibility}
-            onSelectSuggestedMedia={onNextSuggestedMedia}
+            suggededMediaLoaderBusy={suggededMediaLoaderBusy}
+            onNextSuggestedMedia={onNextSuggestedMedia}
             hasSuggestedMedia={!!suggestedMedia}
           />
           {sourceMedia && (

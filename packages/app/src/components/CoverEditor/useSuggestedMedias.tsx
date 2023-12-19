@@ -93,7 +93,7 @@ const useSuggestedMedias = (
 
   const mediaKind = templateKind === 'video' ? 'video' : 'image';
 
-  const index = suggestedMediaIndexes[mediaKind];
+  const currentIndex = suggestedMediaIndexes[mediaKind];
   const list =
     mediaKind === 'image'
       ? suggestedImagesData?.suggestedImages ?? null
@@ -107,37 +107,36 @@ const useSuggestedMedias = (
   const loadNext =
     mediaKind === 'image' ? loadNextSuggestedImages : loadNextSuggestedVideos;
 
-  const currentItem = list?.edges?.[index]?.node ?? null;
+  const nbSuggestedMedias = list?.edges?.length ?? 0;
+  const currentItem = list?.edges?.[currentIndex]?.node ?? null;
 
   const onNextSuggestedMedia = useCallback(() => {
     setSuggesteMediaIndex(prev => {
       const currentIndex = prev[mediaKind];
 
+      if (currentIndex >= nbSuggestedMedias - 1) {
+        if (isLoadingNext) {
+          return prev;
+        } else {
+          return {
+            ...prev,
+            [mediaKind]: 0,
+          };
+        }
+      }
+
       return {
         ...prev,
-        [mediaKind]:
-          currentIndex >= (list?.edges?.length ?? 0) - 1 ? 0 : currentIndex + 1,
+        [mediaKind]: currentIndex + 1,
       };
     });
-  }, [list?.edges?.length, mediaKind]);
+  }, [isLoadingNext, nbSuggestedMedias, mediaKind]);
 
   useEffect(() => {
-    const currentIndex = suggestedMediaIndexes[mediaKind];
-    if (
-      currentIndex >= (list?.edges?.length ?? 0) / 2 &&
-      hasNext &&
-      !isLoadingNext
-    ) {
+    if (currentIndex % 50 >= 25 && hasNext && !isLoadingNext) {
       loadNext(50);
     }
-  }, [
-    hasNext,
-    isLoadingNext,
-    list?.edges?.length,
-    loadNext,
-    mediaKind,
-    suggestedMediaIndexes,
-  ]);
+  }, [hasNext, isLoadingNext, loadNext, mediaKind, currentIndex]);
 
   const suggestedMedia = useMemo<SourceMedia | null>(() => {
     if (templateKind === 'people' || !currentItem) {
@@ -154,6 +153,10 @@ const useSuggestedMedias = (
 
   return {
     suggestedMedia,
+    busy:
+      templateKind !== 'people' &&
+      isLoadingNext &&
+      currentIndex >= nbSuggestedMedias - 1,
     onNextSuggestedMedia: useMemo(() => {
       if (templateKind === 'people') {
         return noop;

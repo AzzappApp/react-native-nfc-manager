@@ -19,8 +19,9 @@ type CoverEditorSuggestionButtonProps = {
   iconHeight?: number;
   templateKind: TemplateKind;
   hasSuggestedMedia: boolean;
+  suggededMediaLoaderBusy: boolean;
   toggleMediaVisibility: () => void;
-  onSelectSuggestedMedia: () => void;
+  onNextSuggestedMedia: () => void;
 };
 
 const CoverEditorSuggestionButton = ({
@@ -28,8 +29,9 @@ const CoverEditorSuggestionButton = ({
   templateKind,
   mediaVisible,
   hasSuggestedMedia,
+  suggededMediaLoaderBusy,
   toggleMediaVisibility,
-  onSelectSuggestedMedia,
+  onNextSuggestedMedia,
 }: CoverEditorSuggestionButtonProps) => {
   const timing = useAnimatedState(
     sourceMedia != null && !mediaVisible && hasSuggestedMedia,
@@ -76,7 +78,8 @@ const CoverEditorSuggestionButton = ({
             templateKind === 'video' ? 'suggested_video' : 'suggested_photo'
           }
           iconSize={30}
-          onPress={onSelectSuggestedMedia}
+          onPress={onNextSuggestedMedia}
+          loading={suggededMediaLoaderBusy}
         />
       </Animated.View>
       <Animated.View
