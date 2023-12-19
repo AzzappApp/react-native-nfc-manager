@@ -45,7 +45,11 @@ export type AssociatedUser = {
 };
 
 export type MultiUserAddModalActions = {
-  open: (associated: AssociatedUser, user: UserToAdd) => void;
+  open: (
+    associated: AssociatedUser,
+    user: UserToAdd,
+    isManual: boolean,
+  ) => void;
 };
 
 const MultiUserAddModal = (
@@ -65,13 +69,17 @@ const MultiUserAddModal = (
     contactCard: {},
   });
 
+  const [isManual, setIsManual] = useState(false);
+
   const onClose = () => {
     setVisible(false);
   };
 
-  const contacts = useMemo(
-    () => [
-      ...getUserContacts(user),
+  const contacts = useMemo(() => {
+    const baseContacts = getUserContacts(user);
+    if (isManual) return baseContacts;
+    return [
+      ...baseContacts,
       {
         id: 'manual',
         label: intl.formatMessage({
@@ -79,14 +87,13 @@ const MultiUserAddModal = (
           description: 'MultiUserAddModal - Label for manual entry',
         }),
       },
-    ],
-    [user, intl],
-  );
+    ];
+  }, [user, intl, isManual]);
 
   const { control, watch, handleSubmit, reset } =
     useForm<MultiUserAddFormValues>({
       defaultValues: {
-        contact: contacts[0].id,
+        contact: contacts[0]?.id,
         manualContact: '',
         role: 'user',
       },
@@ -94,7 +101,7 @@ const MultiUserAddModal = (
     });
 
   useImperativeHandle(ref, () => ({
-    open: (associated: AssociatedUser, user: UserToAdd) => {
+    open: (associated: AssociatedUser, user: UserToAdd, isManual: boolean) => {
       setUser({ ...associated, ...user });
 
       reset({
@@ -110,6 +117,8 @@ const MultiUserAddModal = (
         birthday: user.contactCard['birthday'],
         socials: user.contactCard['socials'] ?? [],
       });
+
+      setIsManual(isManual);
 
       setVisible(true);
     },

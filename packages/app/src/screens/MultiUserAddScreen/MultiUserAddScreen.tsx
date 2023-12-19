@@ -203,7 +203,11 @@ const MultiUserAddScreen = () => {
     };
   }, [disposeFetchAzzappContacts]);
 
-  const onAddSingleUser = (associated: AssociatedUser, contact: Contact) => {
+  const onAddSingleUser = (
+    associated: AssociatedUser,
+    contact: Contact,
+    isManual = false,
+  ) => {
     const user = {
       emails: contact.emails.map(({ email }) => email),
       firstName: contact.firstName,
@@ -239,7 +243,7 @@ const MultiUserAddScreen = () => {
       },
     };
 
-    ref.current?.open(associated, user);
+    ref.current?.open(associated, user, isManual);
   };
 
   return (
@@ -335,6 +339,7 @@ const MultiUserAddScreen = () => {
                           ? [{ label: 'Main', number: searchValue }]
                           : [],
                       },
+                      true,
                     )
                   }
                 />
