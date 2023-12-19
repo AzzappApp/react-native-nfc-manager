@@ -385,7 +385,7 @@ const CoverEditor = (
     }
     let media: SourceMedia | null = null;
     let cropParameters: EditionParameters = {};
-    if (mediaVisible) {
+    if (mediaVisible || (isSelectedTemplateCover.current && !suggestedMedia)) {
       media = sourceMedia;
       cropParameters = mediaCropParameters ?? {};
     }
@@ -603,7 +603,8 @@ const CoverEditor = (
     ? sourceMedia ?? suggestedMedia
     : suggestedMedia;
 
-  const isSuggestedMediaDisplayed = displayedMedia === suggestedMedia;
+  const isSuggestedMediaDisplayed =
+    !!suggestedMedia && (!sourceMedia || !mediaVisible);
 
   return (
     <>
