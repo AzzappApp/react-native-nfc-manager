@@ -1,4 +1,4 @@
-## 0.5.2-canary.75
+## 0.5.2-canary.76
 
 * **feat:**  - **CoverEdition:** uniform UI for all list (medias, animations, etc ...) ([#2048](https://github.com/AzzappApp/azzapp/pull/2048))
 * **build:**  - remove useless display name
