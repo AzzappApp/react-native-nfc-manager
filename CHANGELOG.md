@@ -1,5 +1,7 @@
-## 0.5.2-canary.77
+## 0.5.2-canary.78
 
+* **fix:**  - **CoverEdition:** display current cover when media is hidden ([#2052](https://github.com/AzzappApp/azzapp/pull/2052))
+* **fix:**  - improve reaction (avoiding error while spamming) ([#2049](https://github.com/AzzappApp/azzapp/pull/2049))
 * **build:**  - try to force Hermes-engine version
 * **feat:**  - **CoverEdition:** uniform UI for all list (medias, animations, etc ...) ([#2048](https://github.com/AzzappApp/azzapp/pull/2048))
 * **build:**  - remove useless display name
