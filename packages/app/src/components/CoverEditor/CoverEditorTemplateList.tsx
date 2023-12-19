@@ -54,10 +54,12 @@ export type CoverEditorProps = {
   viewer: CoverEditorTemplateList_viewer$key;
   templateKind: CoverTemplateKind;
   media: SourceMedia | null;
+  mediaCropParameters: EditionParameters | null;
+  mediaVisible: boolean;
   maskUri: string | null;
   title: string | null;
   subTitle: string | null;
-  mediaCropParameters: EditionParameters | null;
+  currentCoverMedia: SourceMedia | null;
   currentCoverStyle: CoverStyleData | null;
   cardColors: ColorPalette | null;
   timeRange: TimeRange | null;
@@ -66,8 +68,10 @@ export type CoverEditorProps = {
   height: number;
   initialSelectedIndex: number;
   videoPaused: boolean;
+
   onSelectedIndexChange: (index: number) => void;
   onSelectedItemChange: (template: {
+    id: string;
     style: CoverStyleData;
     media: SourceMedia;
   }) => void;
@@ -80,11 +84,13 @@ const CoverEditorTemplateList = ({
   media,
   maskUri,
   mediaCropParameters,
+  mediaVisible,
   timeRange,
   title,
   subTitle,
   width,
   height,
+  currentCoverMedia,
   currentCoverStyle,
   cardColors,
   mediaComputing,
@@ -244,23 +250,22 @@ const CoverEditorTemplateList = ({
         textOrientation: textOrientationOrDefaut(textOrientation),
         textPosition: textPositionOrDefaut(textPosition),
         textAnimation,
-        media: media
-          ? media
-          : {
-              uri: previewMedia.uri,
-              rawUri: previewMedia.rawUri,
-              kind:
-                previewMedia.__typename === 'MediaImage' ? 'image' : 'video',
-              width: previewMedia.width,
-              height: previewMedia.height,
-            },
+        media:
+          media && mediaVisible
+            ? media
+            : {
+                uri: previewMedia.uri,
+                rawUri: previewMedia.rawUri,
+                kind:
+                  previewMedia.__typename === 'MediaImage' ? 'image' : 'video',
+                width: previewMedia.width,
+                height: previewMedia.height,
+              },
         mediaFilter,
-        mediaParameters: media
-          ? {
-              ...templateStyleParameters,
-              ...mediaCropParameters,
-            }
-          : (templateEditionParameters as EditionParameters | null) ?? {},
+        mediaParameters:
+          media && mediaVisible
+            ? { ...templateStyleParameters, ...mediaCropParameters }
+            : (templateEditionParameters as EditionParameters | null) ?? {},
         mediaAnimation: mediaAnimation ?? null,
         maskUri: kind === 'people' ? maskUri : null,
         background: background ?? null,
@@ -272,7 +277,8 @@ const CoverEditorTemplateList = ({
       };
     });
 
-    if (currentCoverStyle && media) {
+    const coverMedia = media ?? currentCoverMedia;
+    if (currentCoverStyle && coverMedia) {
       let colorPalette: ColorPalette;
       let colorPaletteIndex: number;
       if (cardColors) {
@@ -300,10 +306,10 @@ const CoverEditorTemplateList = ({
         currentCoverStyle.mediaParameters,
       )[1];
       items.unshift({
-        id: 'cover',
+        id: CURRENT_COVER_ID,
         title,
         subTitle: subTitle!,
-        media,
+        media: coverMedia,
         maskUri,
         ...currentCoverStyle,
         mediaParameters: {
@@ -317,12 +323,14 @@ const CoverEditorTemplateList = ({
     return items;
   }, [
     coverTemplates?.edges,
-    currentCoverStyle,
     media,
+    currentCoverMedia,
+    currentCoverStyle,
     colorPalettes,
     cardColors,
     title,
     subTitle,
+    mediaVisible,
     mediaCropParameters,
     maskUri,
   ]);
@@ -385,6 +393,7 @@ const CoverEditorTemplateList = ({
     } = selectedItem;
 
     onSelectedItemChange({
+      id: selectedItem.id,
       style: {
         titleStyle,
         subTitleStyle,
@@ -830,10 +839,12 @@ const computeTemplatesPalettes = (
   return result;
 };
 
+export const CURRENT_COVER_ID = 'cover';
+
 const templateKeyExtractor = (item: TemplateListItem) => item.id;
 
 const paletteKeyExtract = (item: ColorPalette & { id?: string }) =>
-  item.id ?? 'cover';
+  item.id ?? CURRENT_COVER_ID;
 
 type TemplateListItem = {
   id: string;

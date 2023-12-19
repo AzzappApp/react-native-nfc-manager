@@ -40,7 +40,9 @@ import CoverEditorCropModal from './CoverEditorCropModal';
 import CoverEditorCustom from './CoverEditorCustom/CoverEditorCustom';
 import CoverEditiorImagePicker from './CoverEditorImagePicker';
 import CoverEditorSuggestionButton from './CoverEditorSuggestionButton';
-import CoverEditorTemplateList from './CoverEditorTemplateList';
+import CoverEditorTemplateList, {
+  CURRENT_COVER_ID,
+} from './CoverEditorTemplateList';
 import MediaRequiredModal from './MediaRequiredModal';
 import { useTemplateSwitcherCoverMediaEditor } from './useCoverMediaEditor';
 import useSaveCover from './useSaveCover';
@@ -336,10 +338,12 @@ const CoverEditor = (
   );
 
   const currentDemoMediaRef = useRef<SourceMedia | null>(null);
+  const isSelectedTemplateCover = useRef<boolean>(false);
   const onSelectedTemplateChange = useCallback(
-    (template: { style: CoverStyleData; media: SourceMedia }) => {
+    (template: { id: string; style: CoverStyleData; media: SourceMedia }) => {
       setCoverStyle(template.style);
       currentDemoMediaRef.current = template.media;
+      isSelectedTemplateCover.current = template.id === CURRENT_COVER_ID;
     },
     [setCoverStyle],
   );
@@ -496,7 +500,7 @@ const CoverEditor = (
     }
     let media: SourceMedia | null = null;
     let cropParameters: EditionParameters = {};
-    if (mediaVisible) {
+    if (mediaVisible || isSelectedTemplateCover.current) {
       media = sourceMedia;
       cropParameters = mediaCropParameters ?? {};
     }
@@ -628,17 +632,16 @@ const CoverEditor = (
               templateKind={templateKind}
               media={displayedMedia ?? null}
               maskUri={
-                mediaVisible && templateKind === 'people'
-                  ? maskMedia?.uri ?? null
-                  : null
+                templateKind === 'people' ? maskMedia?.uri ?? null : null
               }
               title={title}
               subTitle={subTitle}
               videoPaused={!!progressIndicator}
               width={templateListWidth}
               height={templateListHeight}
-              mediaCropParameters={mediaVisible ? mediaCropParameters : null}
+              mediaCropParameters={mediaCropParameters}
               timeRange={timeRange}
+              currentCoverMedia={sourceMedia}
               currentCoverStyle={
                 initialTemplateKind === templateKind ? initialCoverStyle : null
               }
@@ -648,6 +651,7 @@ const CoverEditor = (
               onColorPaletteChange={setColorPalette}
               onSelectedIndexChange={onSelectedIndexChange}
               mediaComputing={mediaComputing}
+              mediaVisible={mediaVisible}
             />
           </Suspense>
         </View>
