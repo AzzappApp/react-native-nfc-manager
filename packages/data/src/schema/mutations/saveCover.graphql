@@ -83,10 +83,6 @@ input SaveCoverInput {
   """
   segmented: Boolean
   """
-  if true, the card cover media is merged with the background using multiply blending
-  """
-  merged: Boolean
-  """
   updated user card colors
   """
   cardColors: SaveCardColorsInput

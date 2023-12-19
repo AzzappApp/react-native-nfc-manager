@@ -22,7 +22,6 @@ export type CoverStyleData = {
   backgroundPatternColor: string | null;
   foreground: { id: string; kind: string; uri: string } | null;
   foregroundColor: string | null;
-  merged: boolean;
   segmented: boolean;
 };
 

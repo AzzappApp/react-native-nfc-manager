@@ -52,5 +52,4 @@ export const CardCover: CardCoverResolvers = {
       : null,
   foregroundColor: webCard => webCard.coverData?.foregroundColor ?? null,
   segmented: webCard => webCard.coverData?.segmented ?? false,
-  merged: webCard => webCard.coverData?.merged ?? false,
 };

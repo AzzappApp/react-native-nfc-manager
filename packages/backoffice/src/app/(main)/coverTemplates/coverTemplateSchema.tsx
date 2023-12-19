@@ -43,7 +43,6 @@ export const coverTemplateSchema = z.object({
   foregroundColor: colorValidatorWithPalette.nullable(),
   mediaFilter: z.string().optional().nullable(),
   mediaParameters: z.unknown().optional().nullable(),
-  merged: z.boolean(),
 });
 
 export type CoverTemplateFormValue = z.infer<typeof coverTemplateSchema>;

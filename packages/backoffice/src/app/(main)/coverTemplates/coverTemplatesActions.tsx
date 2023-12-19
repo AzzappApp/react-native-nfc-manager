@@ -65,7 +65,6 @@ export const saveCoverTemplate = async (
         mediaFilter: data.mediaFilter,
         mediaAnimation: data.mediaAnimation,
         mediaParameters: data.mediaParameters as any,
-        merged: data.merged,
       },
     };
 
@@ -152,6 +151,5 @@ export const getCoverData = async (username: string) => {
     mediaFilter: webCard.coverData.mediaFilter,
     mediaAnimation: webCard.coverData.mediaAnimation,
     mediaParameters: webCard.coverData.mediaParameters,
-    merged: webCard.coverData.merged,
   } as const;
 };

@@ -78,7 +78,6 @@ export const WebCardTable = mysqlTable(
       mediaAnimation?: string | null;
       mediaParameters?: Record<string, any> | null;
       mediaId?: string | null;
-      merged: boolean;
       segmented: boolean;
     }>(),
 

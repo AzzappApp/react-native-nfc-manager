@@ -53,7 +53,6 @@ const useSaveCover = (
             id
           }
           segmented
-          merged
         }
       }
     `,
@@ -113,7 +112,6 @@ const useSaveCover = (
           mediaFilter: coverStyle.mediaFilter,
           mediaAnimation: coverStyle.mediaAnimation,
           mediaParameters,
-          merged: coverStyle.merged,
           segmented: coverStyle.segmented,
           subTitle: subTitle ?? null,
           subTitleStyle: coverStyle.subTitleStyle,

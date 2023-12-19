@@ -158,7 +158,6 @@ const CoverEditorTemplateList = ({
           mediaFilter,
           mediaParameters,
           mediaAnimation,
-          merged,
         },
         colorPalette,
       } = readInlineData(
@@ -200,7 +199,6 @@ const CoverEditorTemplateList = ({
               mediaFilter
               mediaParameters
               mediaAnimation
-              merged
               subTitleStyle {
                 color
                 fontFamily
@@ -270,7 +268,6 @@ const CoverEditorTemplateList = ({
         backgroundPatternColor,
         foreground: foreground ?? null,
         foregroundColor,
-        merged,
         colorPalettes: templateColorPalettes,
       };
     });
@@ -385,7 +382,6 @@ const CoverEditorTemplateList = ({
       foreground,
       foregroundColor,
       segmented,
-      merged,
     } = selectedItem;
 
     onSelectedItemChange({
@@ -403,7 +399,6 @@ const CoverEditorTemplateList = ({
         backgroundPatternColor,
         foreground: foreground ?? null,
         foregroundColor,
-        merged,
         segmented: segmented ?? templateKind === 'people',
       },
       media: selectedItem.media,
@@ -511,7 +506,6 @@ const CoverEditorTemplateList = ({
             foregroundKind={item.foreground?.kind}
             foregroundImageUri={item.foreground?.uri}
             foregroundImageTintColor={item.foregroundColor}
-            backgroundMultiply={item.merged}
             editionParameters={item.mediaParameters}
             filter={item.mediaFilter}
             mediaAnimation={item.mediaAnimation}
@@ -873,7 +867,6 @@ type TemplateListItem = {
     readonly uri: string;
   } | null;
   foregroundColor: string | null;
-  merged: boolean;
   segmented?: boolean;
   colorPalettes: Array<ColorPalette & { id?: string }>;
 };

@@ -23,7 +23,6 @@ export type CoverTemplateData = {
   mediaFilter?: string | null;
   mediaParameters?: Record<string, any> | null;
   mediaAnimation?: string | null;
-  merged: boolean;
 };
 
 export const CoverTemplateTable = mysqlTable('CoverTemplate', {

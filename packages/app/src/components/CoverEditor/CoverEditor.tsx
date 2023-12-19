@@ -125,7 +125,6 @@ const CoverEditor = (
               backgroundPatternColor
               foregroundColor
               segmented
-              merged
               textOrientation
               textPosition
               textAnimation
@@ -258,7 +257,6 @@ const CoverEditor = (
       backgroundPatternColor: cardCover.backgroundPatternColor ?? '#000',
       foreground: cardCover.foreground ?? null,
       foregroundColor: cardCover.foregroundColor ?? '#FFF',
-      merged: cardCover.merged ?? false,
       segmented: cardCover.segmented ?? false,
     };
 
@@ -847,7 +845,6 @@ const DEFAULT_COVER_STYLE: CoverStyleData = {
   mediaFilter: null,
   mediaParameters: {},
   mediaAnimation: null,
-  merged: false,
   segmented: false,
   subTitleStyle: DEFAULT_COVER_SUBTITLE_TEXT_STYLE,
   textOrientation: 'horizontal',

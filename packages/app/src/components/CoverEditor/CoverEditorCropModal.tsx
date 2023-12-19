@@ -154,7 +154,6 @@ const CoverEditorCropModal = ({
               foregroundId={coverStyle?.foreground?.id}
               foregroundImageUri={coverStyle?.foreground?.uri}
               foregroundImageTintColor={coverStyle?.foregroundColor}
-              backgroundMultiply={coverStyle?.merged}
               editionParameters={{
                 ...coverStyle?.mediaParameters,
                 ...editionParameters,

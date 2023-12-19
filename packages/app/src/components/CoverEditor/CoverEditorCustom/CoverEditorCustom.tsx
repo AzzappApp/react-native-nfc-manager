@@ -377,15 +377,6 @@ const CoverEditorCustom = ({
     }));
   }, [setCoverStyle]);
 
-  // TODO reenable merge when we support it again
-  // const onToggleMerge = useCallback(() => {
-  //   setCoverStyle(coverStyle => ({
-  //     ...coverStyle,
-  //     merged: !coverStyle.merged,
-  //   }));
-  // }, [setCoverStyle]);
-  //#endregion
-
   const [currentTab, setCurrentTab] = useState('image');
   const navigateToPanel = useCallback((menu: string) => {
     setCurrentTab(menu);
@@ -409,7 +400,6 @@ const CoverEditorCustom = ({
     foregroundColor,
     mediaFilter,
     mediaAnimation,
-    merged,
     segmented,
     subTitleStyle,
     textOrientation,
@@ -467,7 +457,6 @@ const CoverEditorCustom = ({
               foregroundImageTintColor={foregroundColor}
               backgroundImageUri={background?.uri}
               backgroundColor={backgroundColor}
-              backgroundMultiply={merged}
               backgroundImageTintColor={backgroundPatternColor}
               editionParameters={editionParameters}
               filter={mediaFilter}
@@ -520,19 +509,6 @@ const CoverEditorCustom = ({
                 })}
               />
             )}
-            {/*
-              We for the moment disable merging since we don't supporting it anymore with
-              background extraction
-            */}
-            {/* <SwitchLabel
-              variant="small"
-              value={merged ?? false}
-              onValueChange={onToggleMerge}
-              label={intl.formatMessage({
-                defaultMessage: 'Merge',
-                description: 'Label of the merge switch in cover edition',
-              })}
-            /> */}
           </CECToolBar>
         </View>
 
@@ -553,7 +529,6 @@ const CoverEditorCustom = ({
                   filter={mediaFilter}
                   editionParameters={editionParameters}
                   mediaAnimation={mediaAnimation}
-                  merged={merged}
                   onFilterChange={onFilterChange}
                   onStartParameterEdition={onStartParameterEdition}
                   onMediaAnimationChange={onMediaAnimationChange}

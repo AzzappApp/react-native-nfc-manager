@@ -96,10 +96,9 @@ const CoverTemplateForm = ({
           mediaFilter: coverTemplate.data.mediaFilter,
           mediaParameters: coverTemplate.data.mediaParameters,
           mediaAnimation: coverTemplate.data.mediaAnimation,
-          merged: coverTemplate.data.merged,
         };
       }
-      return { businessEnabled: true, personalEnabled: true, merged: false };
+      return { businessEnabled: true, personalEnabled: true };
     },
     formErrors?.fieldErrors,
     [coverTemplate, previewMedia],
@@ -496,23 +495,6 @@ const CoverTemplateForm = ({
           {...fieldProps('subTitleFontFamily')}
         />
 
-        <FormControlLabel
-          control={
-            <Switch
-              name="merged"
-              checked={!!data.merged}
-              disabled={saving}
-              {...omit(
-                fieldProps('merged', {
-                  format: value => value ?? null,
-                }),
-                'error',
-                'helperText',
-              )}
-            />
-          }
-          label="Merged"
-        />
         <FormControlLabel
           control={
             <Switch

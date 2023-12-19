@@ -45,7 +45,6 @@ type CECImageEditionPanelProps = {
   filter: string | null;
   editionParameters: EditionParameters;
   mediaAnimation: string | null;
-  merged: boolean;
   onFilterChange(filter: string): void;
   onStartParameterEdition(parameter: string): void;
   onMediaAnimationChange(animation: string | null): void;

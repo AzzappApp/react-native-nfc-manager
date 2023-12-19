@@ -113,7 +113,6 @@ const saveCover: MutationResolvers['saveCover'] = async (
             coverDataUpdated.textPosition ?? DEFAULT_COVER_DATA.textPosition,
           textAnimation: coverDataUpdated.textAnimation ?? null,
           sourceMediaId: coverDataUpdated.sourceMediaId,
-          merged: coverDataUpdated.merged ?? false,
           segmented: coverDataUpdated.segmented ?? false,
           mediaAnimation: coverDataUpdated.mediaAnimation ?? null,
           kind: coverDataUpdated.kind ?? null,
