@@ -1,5 +1,6 @@
-## 0.5.2-canary.81
+## 0.5.2-canary.82
 
+* **fix:**  - 🐛 don't display option for manual entry ([#2055](https://github.com/AzzappApp/azzapp/pull/2055))
 * **fix:**  - **CoverEdition:** saving current cover when media visible
 * **fix:**  - **CoverEdition:** Media display and background animation ([#2065](https://github.com/AzzappApp/azzapp/pull/2065))
 * **fix:**  - **CoverEdition:** no reset at the end of suggested media list during loading ([#2054](https://github.com/AzzappApp/azzapp/pull/2054))
