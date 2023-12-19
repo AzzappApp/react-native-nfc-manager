@@ -1,5 +1,6 @@
-## 0.5.2-canary.76
+## 0.5.2-canary.77
 
+* **build:**  - try to force Hermes-engine version
 * **feat:**  - **CoverEdition:** uniform UI for all list (medias, animations, etc ...) ([#2048](https://github.com/AzzappApp/azzapp/pull/2048))
 * **build:**  - remove useless display name
 * **build:**  - update for jdk 17 and rn 0.73
