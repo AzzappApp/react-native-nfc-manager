@@ -4,12 +4,7 @@ import { memo, useCallback, useEffect, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { View, StyleSheet, Share } from 'react-native';
 import Toast from 'react-native-toast-message';
-import {
-  useMutation,
-  graphql,
-  useFragment,
-  ConnectionHandler,
-} from 'react-relay';
+import { useMutation, graphql, useFragment } from 'react-relay';
 import { useDebouncedCallback } from 'use-debounce';
 import { isEditor } from '@azzapp/shared/profileHelpers';
 import { buildPostUrl } from '@azzapp/shared/urlHelpers';
@@ -22,8 +17,12 @@ import type {
   PostRendererActionBar_post$key,
   ReactionKind,
 } from '@azzapp/relay/artifacts/PostRendererActionBar_post.graphql';
-
+import type {
+  PostRendererActionBarReactionMutation,
+  PostRendererActionBarReactionMutation$data,
+} from '@azzapp/relay/artifacts/PostRendererActionBarReactionMutation.graphql';
 import type { ViewProps } from 'react-native';
+
 export type PostRendererActionBarProps = ViewProps & {
   postKey: PostRendererActionBar_post$key;
 };
@@ -59,7 +58,7 @@ const PostRendererActionBar = ({
     postKey,
   );
 
-  const [commit] = useMutation(graphql`
+  const [commit] = useMutation<PostRendererActionBarReactionMutation>(graphql`
     mutation PostRendererActionBarReactionMutation(
       $input: TogglePostReactionInput!
     ) {
@@ -86,105 +85,100 @@ const PostRendererActionBar = ({
 
   const { webCardId, profileRole } = useAuthState();
   const debouncedCommit = useDebouncedCallback(
-    (add: boolean) => {
-      commit({
-        variables: {
-          input: {
-            postId,
-            reactionKind: 'like',
-          },
-        },
-        optimisticResponse: {
-          togglePostReaction: {
-            post: {
-              id: postId,
-              viewerPostReaction: reaction,
-              counterReactions: Math.max(0, countReactions),
+    () => {
+      if (viewerPostReaction !== reaction) {
+        const add = viewerPostReaction !== reaction;
+        commit({
+          variables: {
+            input: {
+              postId,
+              reactionKind: 'like',
             },
           },
-        },
-        updater: store => {
-          const post = store.get<{ counterReactions: number }>(postId);
-          if (post) {
-            const counter = post?.getValue('counterReactions');
+          optimisticResponse: {
+            togglePostReaction: {
+              post: {
+                id: postId,
+                viewerPostReaction: add ? reaction : null,
+                counterReactions: Math.max(
+                  0,
+                  add ? countReactions + 1 : countReactions - 1,
+                ),
+              },
+            },
+          },
+          updater: (
+            store,
+            response: PostRendererActionBarReactionMutation$data,
+          ) => {
+            const reaction = response.togglePostReaction;
+            const added =
+              response.togglePostReaction.post.viewerPostReaction != null;
 
-            if (typeof counter === 'number') {
-              post?.setValue(
-                Math.max(counter + (add ? 1 : -1), 0),
-                'counterReactions',
+            const post = store.get<{ counterReactions: number }>(
+              reaction.post.id,
+            );
+            if (post) {
+              const counter = post?.getValue('counterReactions');
+
+              if (typeof counter === 'number') {
+                post?.setValue(
+                  reaction.post.counterReactions,
+                  'counterReactions',
+                );
+              }
+              post.setValue(
+                reaction.post.viewerPostReaction,
+                'viewerPostReaction',
               );
             }
-            post.setValue(add ? reaction : null, 'viewerPostReaction');
-          }
-          if (webCardId) {
-            const webCard = store.get(webCardId);
-            const counter = webCard?.getValue('nbPostsLiked');
-            if (typeof counter === 'number') {
-              webCard?.setValue(
-                Math.max(counter + (add ? 1 : -1), 0),
-                'nbPostsLiked',
-              );
-            }
-
-            if (webCard) {
-              const postILiked = ConnectionHandler.getConnection(
-                webCard,
-                'LikedPostsScreen_likedPosts',
-              );
-
-              if (postILiked) {
-                if (add) {
-                  if (post) {
-                    const edge = ConnectionHandler.createEdge(
-                      store,
-                      postILiked,
-                      post,
-                      'PostEdge',
-                    );
-                    ConnectionHandler.insertEdgeAfter(postILiked, edge);
-                  }
-                }
-                //don't handle remove for postILiked.remove in real time inside the list postILiked(when displayed) will trigger some side effect while user scrolling
-                // using a fetch policy to refresh the data when displaying the page initially seems to be a better solution for the user experience
+            if (webCardId) {
+              const webCard = store.get(webCardId);
+              const counter = webCard?.getValue('nbPostsLiked');
+              if (typeof counter === 'number') {
+                webCard?.setValue(
+                  Math.max(counter + (added ? 1 : -1), 0),
+                  'nbPostsLiked',
+                );
               }
             }
-          }
-        },
-        onError: error => {
-          console.log(error);
-          //add manual capture exception for testing issue
-          Sentry.captureException(error, { extra: { tag: 'PostReaction' } });
+          },
+          onError: error => {
+            console.log(error);
+            //add manual capture exception for testing issue
+            Sentry.captureException(error, { extra: { tag: 'PostReaction' } });
 
-          setCountReactions(prevReactions =>
-            add ? prevReactions + 1 : prevReactions - 1,
-          );
+            setCountReactions(prevReactions =>
+              add ? prevReactions + 1 : prevReactions - 1,
+            );
 
-          Toast.show({
-            type: 'error',
-            text1: intl.formatMessage({
-              defaultMessage: 'Error, we were unable to like this post',
-              description: 'Error toast message when liking a post failed.',
-            }),
-          });
-        },
-      });
+            Toast.show({
+              type: 'error',
+              text1: intl.formatMessage({
+                defaultMessage: 'Error, we were unable to like this post',
+                description: 'Error toast message when liking a post failed.',
+              }),
+            });
+          },
+        });
+      }
     },
     // delay in ms
-    600,
+    700,
     { trailing: true, leading: false },
   );
+
   // toggle the value locally
   const toggleReaction = useCallback(() => {
     if (profileRole && isEditor(profileRole)) {
       if (reaction) {
         setCountReactions(countReactions - 1);
         setReaction(null);
-        debouncedCommit(false);
       } else {
         setCountReactions(countReactions + 1);
         setReaction('like');
-        debouncedCommit(true);
       }
+      debouncedCommit();
     } else {
       Toast.show({
         type: 'error',
