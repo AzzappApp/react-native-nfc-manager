@@ -1,5 +1,6 @@
-## 0.5.2-canary.78
+## 0.5.2-canary.79
 
+* **fix:**  - **CoverEdition:** no reset at the end of suggested media list during loading ([#2054](https://github.com/AzzappApp/azzapp/pull/2054))
 * **fix:**  - **CoverEdition:** display current cover when media is hidden ([#2052](https://github.com/AzzappApp/azzapp/pull/2052))
 * **fix:**  - improve reaction (avoiding error while spamming) ([#2049](https://github.com/AzzappApp/azzapp/pull/2049))
 * **build:**  - try to force Hermes-engine version
