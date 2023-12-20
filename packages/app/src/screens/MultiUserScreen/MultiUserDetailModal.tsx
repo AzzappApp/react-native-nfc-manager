@@ -1,7 +1,7 @@
 import { forwardRef, useEffect, useImperativeHandle, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet, View, useColorScheme } from 'react-native';
 import * as mime from 'react-native-mime-types';
 import { useSharedValue } from 'react-native-reanimated';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -50,10 +50,9 @@ export type MultiUserDetailModalActions = {
 };
 
 const MultiUserDetailModal = (
-  props: MultiUserDetailModalProps,
+  { user, currentProfileId }: MultiUserDetailModalProps,
   ref: ForwardedRef<MultiUserDetailModalActions>,
 ) => {
-  const { user, currentProfileId } = props;
   const [visible, setVisible] = useState(false);
   const [showImagePicker, setShowImagePicker] = useState(false);
   const [profileId, setProfileId] = useState('');
@@ -298,6 +297,8 @@ const MultiUserDetailModal = (
     });
   };
 
+  const colorScheme = useColorScheme();
+
   return (
     <ScreenModal visible={visible} animationType="slide">
       <Container style={{ flex: 1 }}>
@@ -430,7 +431,7 @@ const MultiUserDetailModal = (
                     height={400}
                     currentUserIndex={0}
                     currentProfileIndexSharedValue={index}
-                    variant="secondary"
+                    variant={colorScheme === 'dark' ? 'dark' : 'light'}
                   />
                 )}
               </View>

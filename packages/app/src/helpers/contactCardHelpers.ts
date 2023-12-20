@@ -30,10 +30,10 @@ export const buildContactCardModalStyleSheet = (appareance: ColorSchemeName) =>
     sectionsContainer: {
       rowGap: 1,
       paddingBottom: 20,
-      backgroundColor: colors.grey50,
     },
     separator: {
       height: 30,
+      backgroundColor: appareance === 'light' ? colors.grey50 : colors.black,
     },
     input: {
       flex: 1,

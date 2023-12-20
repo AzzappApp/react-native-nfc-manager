@@ -346,14 +346,13 @@ const styleSheet = createStyleSheet(appearance => ({
     alignItems: 'center',
     paddingTop: 10,
     paddingBottom: 20,
-    backgroundColor: appearance === 'dark' ? colors.black : colors.white,
   },
   noAvatar: {
     width: AVATAR_WIDTH,
     height: AVATAR_WIDTH,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: colors.grey50,
+    backgroundColor: appearance === 'dark' ? colors.grey900 : colors.grey50,
     borderRadius: AVATAR_WIDTH / 2,
   },
   avatar: {

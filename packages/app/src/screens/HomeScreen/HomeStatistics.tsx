@@ -30,7 +30,7 @@ type HomeInformationsProps = {
   height: number;
   currentProfileIndexSharedValue: SharedValue<number>;
   currentUserIndex: number;
-  variant?: 'primary' | 'secondary';
+  variant?: 'dark' | 'light';
 };
 
 const HomeStatistics = ({
@@ -38,7 +38,7 @@ const HomeStatistics = ({
   height,
   currentUserIndex,
   currentProfileIndexSharedValue,
-  variant = 'primary',
+  variant = 'dark',
 }: HomeInformationsProps) => {
   //TODO: backend part .
 
@@ -218,7 +218,7 @@ type StatisticItemsProps = {
   title: string;
   index: number;
   onSelect: (index: number) => void;
-  variant: 'primary' | 'secondary';
+  variant: 'dark' | 'light';
 };
 export const StatisticItems = ({
   value,
@@ -226,7 +226,7 @@ export const StatisticItems = ({
   title,
   index,
   onSelect,
-  variant = 'primary',
+  variant = 'dark',
 }: StatisticItemsProps) => {
   const animatedTextStyle = useAnimatedStyle(() => {
     return {
@@ -307,7 +307,7 @@ const stylesheet = createVariantsStyleSheet(() => ({
       textAlign: 'center',
     },
   },
-  primary: {
+  dark: {
     icon: {
       color: colors.white,
     },
@@ -318,7 +318,7 @@ const stylesheet = createVariantsStyleSheet(() => ({
       color: colors.white,
     },
   },
-  secondary: {
+  light: {
     icon: {
       color: colors.black,
     },

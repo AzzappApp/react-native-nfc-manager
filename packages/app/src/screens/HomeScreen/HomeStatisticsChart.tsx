@@ -26,7 +26,7 @@ type HomeStatisticsChartProps = {
   statsScrollIndex: SharedValue<number>;
   currentProfileIndexSharedValue: SharedValue<number>;
   currentUserIndex: number;
-  variant?: 'primary' | 'secondary';
+  variant?: 'dark' | 'light';
 };
 // * TODO: using SKIA here would have been great, but need to be validated by dev team.
 // Until we have reanimated3, some part of skia a running on JS thread , so can wait
@@ -37,7 +37,7 @@ const HomeStatisticsChart = ({
   statsScrollIndex,
   currentProfileIndexSharedValue,
   currentUserIndex,
-  variant = 'primary',
+  variant = 'dark',
 }: HomeStatisticsChartProps) => {
   const profiles = useFragment(
     graphql`
@@ -237,7 +237,7 @@ type AnimatedBarChartItemProps = {
   statsScrollIndex: SharedValue<number>;
   currentProfileIndexSharedValue: SharedValue<number>;
   currentUserIndex: number;
-  variant?: 'primary' | 'secondary';
+  variant?: 'dark' | 'light';
 };
 const AnimatedBarChartItem = ({
   item,
@@ -247,7 +247,7 @@ const AnimatedBarChartItem = ({
   chartBarWidth,
   maxValues,
   currentUserIndex,
-  variant = 'primary',
+  variant = 'dark',
 }: AnimatedBarChartItemProps) => {
   //we need to flatten the matrixTransform, cannot find a way to interpolate a matrix
   const flattenedData = item.data.flatMap(obj => [
@@ -381,7 +381,7 @@ const stylesheet = createVariantsStyleSheet(() => ({
       position: 'absolute',
     },
   },
-  primary: {
+  dark: {
     textDate: {
       color: colors.white,
     },
@@ -392,7 +392,7 @@ const stylesheet = createVariantsStyleSheet(() => ({
       backgroundColor: colors.white,
     },
   },
-  secondary: {
+  light: {
     textDate: {
       color: colors.black,
     },
