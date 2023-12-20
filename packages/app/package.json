@@ -77,7 +77,7 @@
     "@types/chroma-js": "^2.4.3",
     "chroma-js": "^2.4.2",
     "events": "^3.3.0",
-    "expo": "^50.0.0-preview.4",
+    "expo": "^50.0.0-preview.6",
     "expo-av": "^13.6.0",
     "expo-blur": "^12.6.0",
     "expo-clipboard": "~4.5.0",

@@ -16,13 +16,13 @@ PODS:
     - glog
     - RCT-Folly (= 2022.05.16.00)
     - React-Core
-  - Expo (50.0.0-preview.4):
+  - Expo (50.0.0-preview.6):
     - ExpoModulesCore
   - ExpoBlur (12.6.0):
     - ExpoModulesCore
   - ExpoClipboard (4.5.0):
     - ExpoModulesCore
-  - ExpoFileSystem (16.0.1):
+  - ExpoFileSystem (16.0.2):
     - ExpoModulesCore
   - ExpoHaptics (12.6.0):
     - ExpoModulesCore
@@ -36,7 +36,7 @@ PODS:
     - ExpoModulesCore
   - ExpoLinearGradient (12.5.0):
     - ExpoModulesCore
-  - ExpoModulesCore (1.11.2):
+  - ExpoModulesCore (1.11.3):
     - glog
     - RCT-Folly (= 2022.05.16.00)
     - React-Core
@@ -1609,15 +1609,15 @@ SPEC CHECKSUMS:
   EXContacts: afd38f7adacef9a76d6d0bc479f30051736f068f
   EXFont: b3ca70589cdbdfd725b154f280dc507c3b56749a
   EXMediaLibrary: d180845895d8ffca624aef62ec2c08c6dfeb3bd8
-  Expo: 00eaae3d5de1f2e9af393abf1b2c9efb57b3b599
+  Expo: 176bd02bafd9e62c765f4f557a746457596a1387
   ExpoBlur: 9e6da7c2bd4a0c5de7e57124694d0a380d7962f7
   ExpoClipboard: d2f0e44d50e5ba07b02f5fb7bd280178b420e24e
-  ExpoFileSystem: ebbbe77366bff2e66876e3b3bf09e61d3bb72c70
+  ExpoFileSystem: fb4c94cc5ec5c50cb2663d2f6d503a1960b95a1d
   ExpoHaptics: 604aca02e942d1d43c139cae7cf397b26f85476f
   ExpoImage: bbd451559f49f78d858592fe1d4d74aedb3d900b
   ExpoKeepAwake: ed71bfe0e6ecd38e337586ba6e1ba27a56eb373b
   ExpoLinearGradient: 5d18293f89c063036121281175c4653d6a7c34a2
-  ExpoModulesCore: 94238d9653114ff9786634541688e1fdb7ed95e3
+  ExpoModulesCore: e117a47cb3b1138eaa8833f13ab45b0f8a1daaaf
   EXSensors: 4cc75cb16c97809bc055c64881d2e149c18e89c5
   FBLazyVector: 2296bacb2fa157a43991048b0a9d71c1c8b65083
   FBReactNativeSpec: 1325cb72940f00e2a61129c2ccd0a2947927b42a
@@ -1716,7 +1716,7 @@ SPEC CHECKSUMS:
   SentryPrivate: 839b1e58addf58624087a80b2628e543193fa8ef
   SocketRocket: f32cd54efbe0f095c4d7594881e52619cfe80b17
   VisionCamera: b236f548d6507923857dade542c7e0a148ed3492
-  Yoga: 2b33a7ac96c58cdaa7b810948fc6a2a76ed2d108
+  Yoga: 4f53dc50008d626fa679c7a1cb4bed898f8c0bde
 
 PODFILE CHECKSUM: 12a372b1bfae73bb427f1900e5ad20006b112d12
 
