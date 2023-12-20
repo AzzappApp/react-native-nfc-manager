@@ -22,10 +22,6 @@ input UpdateWebCardViewsInput {
 
 input UpdateContactCardScansInput {
   """
-  The userId of the contact card that was scan
-  """
-  userId: ID!
-  """
   The profileID of the contact card that was scan
   """
   profileId: ID!

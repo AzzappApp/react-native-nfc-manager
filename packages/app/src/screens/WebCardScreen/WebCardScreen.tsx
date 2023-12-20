@@ -1,3 +1,4 @@
+import { fromGlobalId } from 'graphql-relay';
 import {
   Suspense,
   useCallback,
@@ -81,7 +82,13 @@ const WebCardScreen = ({
   WebCardScreenByIdQuery | WebCardScreenByUserNameQuery
 >) => {
   const data = usePreloadedQuery(getQuery(params), preloadedQuery);
-  useWebCardViewStatistic(params.webCardId ?? data.webCard?.id);
+
+  useWebCardViewStatistic(
+    params.webCardId ?? data.webCard?.id
+      ? fromGlobalId(data.webCard!.id).id
+      : undefined,
+  );
+
   const [ready, setReady] = useState(false);
   useNativeNavigationEvent('appear', () => {
     setReady(true);
@@ -103,9 +110,10 @@ const WebCardScreen = ({
   // contact card scan
   const [commit] = useMutation(UPDATE_CONTACT_CARD_SCANS);
   useEffect(() => {
-    if (params.contactData) {
+    if (params.contactData && data.webCard?.id) {
       const contactData = parseContactCard(params.contactData);
-      if (contactData.webCardId === data.webCard?.id) {
+
+      if (contactData.webCardId === fromGlobalId(data.webCard?.id).id) {
         // the profile is open from a scan contact card with the phone
         commit({
           variables: {

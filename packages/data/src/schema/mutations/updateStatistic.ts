@@ -22,12 +22,13 @@ const updateWebCardViews: MutationResolvers['updateWebCardViews'] = async (
   }
 
   const { id: targetId, type } = fromGlobalId(id);
-  if (type !== 'Profile') {
+
+  if (type !== 'WebCard') {
     throw new GraphQLError(ERRORS.INVALID_REQUEST);
   }
   try {
     if (targetId !== profileId) {
-      await incrementWebCardViews(profileId);
+      await incrementWebCardViews(targetId);
     }
 
     return true;
