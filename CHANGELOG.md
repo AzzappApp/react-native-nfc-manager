@@ -1,4 +1,4 @@
-## 0.5.2-canary.86
+## 0.5.2-canary.87
 
 * **perf:**  - web - enhance image / video sizes ([#2074](https://github.com/AzzappApp/azzapp/pull/2074))
 * **build:**  - update expo version ([#2080](https://github.com/AzzappApp/azzapp/pull/2080))
