@@ -1,5 +1,6 @@
-## 0.5.2-canary.84
+## 0.5.2-canary.85
 
+* **build:**  - update expo version ([#2080](https://github.com/AzzappApp/azzapp/pull/2080))
 * **fix:**  - multi user dark mode && graph ([#2066](https://github.com/AzzappApp/azzapp/pull/2066))
 * **fix:**  - 🐛 add missing adress in multi user ([#2067](https://github.com/AzzappApp/azzapp/pull/2067))
 * **fix:**  - WebView and contact card scan counter  ([#2069](https://github.com/AzzappApp/azzapp/pull/2069))
