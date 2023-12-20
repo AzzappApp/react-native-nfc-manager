@@ -44,8 +44,7 @@ const inviteUserMutation: MutationResolvers['inviteUser'] = async (
   )
     throw new GraphQLError(ERRORS.INVALID_REQUEST);
 
-  let createdProfileId;
-  await db.transaction(async trx => {
+  const createdProfileId = await db.transaction(async trx => {
     const userId =
       invitedUser?.id ??
       (await createUser(
@@ -78,7 +77,8 @@ const inviteUserMutation: MutationResolvers['inviteUser'] = async (
     };
 
     try {
-      createdProfileId = await createProfile(payload, trx);
+      const userId = await createProfile(payload, trx);
+      return userId;
     } catch (e) {
       throw new GraphQLError(ERRORS.PROFILE_ALREADY_EXISTS);
     }
