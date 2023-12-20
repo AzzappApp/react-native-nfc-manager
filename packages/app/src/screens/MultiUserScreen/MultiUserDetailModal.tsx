@@ -46,6 +46,7 @@ export type MultiUserDetailModalActions = {
     associated: AssociatedUser,
     contactCard: ContactCard,
     profileId: string,
+    role: ProfileRole,
   ) => void;
 };
 
@@ -210,9 +211,10 @@ const MultiUserDetailModal = (
       associated: AssociatedUser,
       contactCard: ContactCard,
       profileId: string,
+      role: ProfileRole,
     ) => {
       reset({
-        role: 'user',
+        role,
         contact: associated.email ?? associated.phoneNumber,
         firstName: contactCard['firstName'],
         lastName: contactCard['lastName'],

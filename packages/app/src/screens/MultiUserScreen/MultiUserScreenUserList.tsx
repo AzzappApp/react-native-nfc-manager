@@ -127,42 +127,47 @@ const MultiUserScreenUserList = (props: MultiUserScreenListProps) => {
         })} (${nbCommonInformation})`}
         onPress={props.toggleCommonInfosForm}
       />
-      {Object.entries(usersByRole).map(([role, users]) => (
-        <Fragment key={role}>
-          <Separation style={styles.separation}>{role}</Separation>
-          {users.map(user => {
-            const isCurrentUser =
-              user.email === currentUser.email ||
-              user.phoneNumber === currentUser.phoneNumber;
+      {Object.entries(usersByRole).map(([key, users]) => {
+        const profileRole = key as ProfileRole; // ts infers the key type as string
+        return (
+          <Fragment key={profileRole}>
+            <Separation style={styles.separation}>{profileRole}</Separation>
+            {users.map(user => {
+              const isCurrentUser =
+                user.email === currentUser.email ||
+                user.phoneNumber === currentUser.phoneNumber;
 
-            return (
-              <PressableNative
-                onPress={() => {
-                  detail.current?.open(
-                    {
-                      email: user.email,
-                      phoneNumber: user.phoneNumber,
-                    },
-                    user.contactCard,
-                    user.profileId,
-                  );
-                }}
-                key={user.email}
-                style={styles.user}
-              >
-                <Avatar firstName={user.firstName} lastName={user.lastName} />
-                <View style={styles.userInfos}>
-                  <Text style={textStyles.large}>
-                    ~{user.firstName} {user.lastName} {isCurrentUser && '(me)'}
-                  </Text>
-                  <Text style={[styles.contact]}>{user.email}</Text>
-                </View>
-                <Icon icon="arrow_right" />
-              </PressableNative>
-            );
-          })}
-        </Fragment>
-      ))}
+              return (
+                <PressableNative
+                  onPress={() => {
+                    detail.current?.open(
+                      {
+                        email: user.email,
+                        phoneNumber: user.phoneNumber,
+                      },
+                      user.contactCard,
+                      user.profileId,
+                      profileRole,
+                    );
+                  }}
+                  key={user.email}
+                  style={styles.user}
+                >
+                  <Avatar firstName={user.firstName} lastName={user.lastName} />
+                  <View style={styles.userInfos}>
+                    <Text style={textStyles.large}>
+                      ~{user.firstName} {user.lastName}{' '}
+                      {isCurrentUser && '(me)'}
+                    </Text>
+                    <Text style={[styles.contact]}>{user.email}</Text>
+                  </View>
+                  <Icon icon="arrow_right" />
+                </PressableNative>
+              );
+            })}
+          </Fragment>
+        );
+      })}
       {profile?.webCard.profiles && (
         <MultiUserDetailModal
           user={profile.webCard}
