@@ -1,5 +1,6 @@
-## 0.5.2-canary.83
+## 0.5.2-canary.84
 
+* **fix:**  - multi user dark mode && graph ([#2066](https://github.com/AzzappApp/azzapp/pull/2066))
 * **fix:**  - 🐛 add missing adress in multi user ([#2067](https://github.com/AzzappApp/azzapp/pull/2067))
 * **fix:**  - WebView and contact card scan counter  ([#2069](https://github.com/AzzappApp/azzapp/pull/2069))
 * **fix:**  - 🐛 don't display option for manual entry ([#2055](https://github.com/AzzappApp/azzapp/pull/2055))
