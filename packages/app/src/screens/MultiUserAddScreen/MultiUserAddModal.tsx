@@ -8,6 +8,7 @@ import { graphql, useMutation } from 'react-relay';
 import { type ContactCard } from '@azzapp/shared/contactCardHelpers';
 import ERRORS from '@azzapp/shared/errors';
 import { encodeMediaId } from '@azzapp/shared/imagesHelpers';
+import { isValidEmail } from '@azzapp/shared/stringHelpers';
 import { textStyles } from '#theme';
 import ScreenModal from '#components/ScreenModal';
 import { getFileName } from '#helpers/fileHelpers';
@@ -229,9 +230,14 @@ const MultiUserAddModal = (
         addresses,
       } = data;
 
+      const contact =
+        data.contact === 'manual' ? data.manualContact : data.contact;
+      const email = isValidEmail(contact) ? contact : undefined;
+      const phoneNumber = isValidEmail(contact) ? undefined : contact;
+
       const input = {
-        email: user.email,
-        phoneNumber: user.phoneNumber,
+        email,
+        phoneNumber,
         profileRole: data.role,
         contactCard: {
           firstName,
