@@ -226,6 +226,7 @@ const MultiUserAddModal = (
         urls,
         birthday,
         socials,
+        addresses,
       } = data;
 
       const input = {
@@ -243,6 +244,7 @@ const MultiUserAddModal = (
           birthday: birthday ?? { birthday: '', selected: null },
           socials,
           avatarId: avatarId ? encodeMediaId(avatarId, 'image') : avatarId,
+          addresses,
         },
       };
 

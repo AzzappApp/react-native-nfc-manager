@@ -224,6 +224,7 @@ const MultiUserDetailModal = (
         urls: contactCard['urls'] ?? [],
         birthday: contactCard['birthday'],
         socials: contactCard['socials'] ?? [],
+        addresses: contactCard['addresses'] ?? [],
       });
 
       setProfileId(profileId);
