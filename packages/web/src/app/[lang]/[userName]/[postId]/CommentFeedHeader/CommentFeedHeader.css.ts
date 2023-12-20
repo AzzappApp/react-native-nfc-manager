@@ -31,7 +31,6 @@ const feedHeaderProfileCover = style({
   marginRight: 5,
   borderRadius: 3,
   overflow: 'hidden',
-  width: '20px',
   height: '32px',
   position: 'relative',
 });

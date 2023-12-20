@@ -23,10 +23,9 @@
     "@envelop/sentry": "^6.0.1",
     "@graphql-yoga/plugin-persisted-operations": "^2.0.4",
     "@paralleldrive/cuid2": "^2.2.2",
-    "use-resize-observer": "^9.1.0",
     "@sendgrid/mail": "^7.4.6",
-    "@sentry/nextjs": "^7.70.0",
-    "@sentry/tracing": "^7.70.0",
+    "@sentry/nextjs": "^7.89.0",
+    "@sentry/tracing": "^7.89.0",
     "@vercel/og": "^0.5.17",
     "bcrypt-ts": "^4.0.0",
     "classnames": "^2.3.2",
@@ -38,6 +37,7 @@
     "lottie-web": "^5.12.2",
     "lz-string": "^1.5.0",
     "next": "^14.0.4",
+    "next-cloudinary": "^5.13.0",
     "os-browserify": "^0.3.0",
     "passkit-generator": "^3.1.11",
     "path-browserify": "^1.0.1",
@@ -55,7 +55,7 @@
     "@types/node": "^18.15.11",
     "@types/react": "^18.2.37",
     "@types/react-dom": "^18.2.15",
-    "@vanilla-extract/dynamic": "^2.0.3",
-    "@vanilla-extract/next-plugin": "^2.3.0"
+    "@vanilla-extract/dynamic": "^2.1.0",
+    "@vanilla-extract/next-plugin": "^2.3.2"
   }
 }

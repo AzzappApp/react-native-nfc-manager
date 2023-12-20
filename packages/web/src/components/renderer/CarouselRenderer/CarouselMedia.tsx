@@ -33,18 +33,23 @@ const CarouselMedia = (props: CarouselMediaProps) => {
   useExactClick(button, onClick);
 
   return (
-    <Button.Empty ref={button}>
+    <Button.Empty
+      ref={button}
+      style={{
+        minWidth: width,
+        height: imageHeight,
+      }}
+    >
       <CloudinaryImage
         mediaId={media.id}
-        assetKind="module"
         draggable={false}
         key={media.id}
-        width={width}
-        height={imageHeight}
+        width={width * 2}
+        height={imageHeight * 2}
         alt="todo"
         style={{
-          minWidth: width,
-          minHeight: imageHeight,
+          width: '100%',
+          height: '100%',
           borderRadius,
           borderColor,
           borderWidth,

@@ -6,7 +6,9 @@ const relayArtifactDirectory = path.join(
   'artifacts',
 );
 
-const withVanillaExtract = createVanillaExtractPlugin();
+const withVanillaExtract = createVanillaExtractPlugin({
+  identifiers: 'short',
+});
 
 /** @type {import('next').NextConfig} */
 const config = {

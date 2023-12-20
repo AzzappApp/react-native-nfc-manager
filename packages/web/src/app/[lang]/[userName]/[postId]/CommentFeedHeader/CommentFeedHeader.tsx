@@ -25,7 +25,12 @@ const CommentFeedHeader = (props: CommentFeedHeaderProps) => {
         >
           {media && (
             <div className={styles.feedHeaderProfileCover}>
-              <CoverRenderer media={media} webCard={webCard} staticCover />
+              <CoverRenderer
+                width={20}
+                media={media}
+                webCard={webCard}
+                staticCover
+              />
             </div>
           )}
           <span>{webCard.userName}</span>

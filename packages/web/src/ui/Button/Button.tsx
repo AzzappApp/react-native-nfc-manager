@@ -1,4 +1,3 @@
-'use client';
 import cn from 'classnames';
 import styles from './Button.css';
 import EmptyButton from './EmptyButton';

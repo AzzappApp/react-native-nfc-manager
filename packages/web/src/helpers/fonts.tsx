@@ -151,6 +151,7 @@ const Gloock_Regular = Gloock({
   weight: '400',
   display: 'swap',
   subsets: ['latin-ext'],
+  adjustFontFallback: false,
 });
 const GreatVibes_Regular = Great_Vibes({
   weight: '400',

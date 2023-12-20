@@ -28,6 +28,7 @@ const PostFeedHeader = (props: PostFeedHeaderProps) => {
           Icon={CloseIcon}
           onClick={onClose}
           className={styles.close}
+          aria-label="close"
         />
         <div className={styles.headerData}>
           <span className={styles.headerName}>{webCard.userName}</span>
@@ -40,7 +41,11 @@ const PostFeedHeader = (props: PostFeedHeaderProps) => {
             Follow
           </Button>
         </div>
-        <ButtonIcon Icon={ShareIcon} onClick={() => share.current?.open()} />
+        <ButtonIcon
+          Icon={ShareIcon}
+          aria-label="Share post"
+          onClick={() => share.current?.open()}
+        />
       </div>
       <DownloadAppModal ref={download} webCard={webCard} media={media} />
       <ShareModal

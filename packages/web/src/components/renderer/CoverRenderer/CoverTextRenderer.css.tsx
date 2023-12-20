@@ -1,5 +1,6 @@
 import { style } from '@vanilla-extract/css';
 import { COVER_RATIO } from '@azzapp/shared/coverHelpers';
+import { MediaQuery } from '#app/theme.css';
 
 const coverTextRender = style({
   position: 'absolute',
@@ -20,10 +21,10 @@ const coverTextContainer = style({
   display: 'flex',
   flexDirection: 'column',
   '@media': {
-    'screen and (max-width: 375px)': {
+    [MediaQuery.Mobile]: {
       fontSize: '0.8vw',
     },
-    'screen and (min-width: 376px)': {
+    [MediaQuery.Desktop]: {
       fontSize: '3px',
     },
   },

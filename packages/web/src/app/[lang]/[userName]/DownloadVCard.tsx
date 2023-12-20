@@ -84,6 +84,7 @@ const DownloadVCard = ({ webCard }: { webCard: WebCard }) => {
       <div
         className={opened ? styles.openedDialog : styles.dialog}
         role="dialog"
+        aria-label="Modal with contact card download link"
       >
         <span className={styles.message}>{`You can download the Contact Card ${
           contact
@@ -95,13 +96,15 @@ const DownloadVCard = ({ webCard }: { webCard: WebCard }) => {
             : ''
         }`}</span>
 
-        <LinkButton
-          size="medium"
-          href={fileUrl}
-          download={`${webCard.userName}.vcf`}
-        >
-          Download the Contact Card
-        </LinkButton>
+        {fileUrl && (
+          <LinkButton
+            size="medium"
+            href={fileUrl}
+            download={`${webCard.userName}.vcf`}
+          >
+            Download the Contact Card
+          </LinkButton>
+        )}
 
         <button
           className={styles.closeButton}

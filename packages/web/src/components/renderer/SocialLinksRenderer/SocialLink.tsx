@@ -34,6 +34,7 @@ const SocialLink = (props: SocialLinkProps) => {
           alignItems: 'center',
           justifyContent: 'center',
         }}
+        aria-label={link.socialId}
       >
         <SocialIcon
           icon={id}

@@ -1,6 +1,8 @@
 import cn from 'classnames';
+import { getCldImageUrl } from 'next-cloudinary';
 import { DEFAULT_COLOR_PALETTE, swapColor } from '@azzapp/shared/cardHelpers';
-import { getImageURL } from '@azzapp/shared/imagesHelpers';
+import { COVER_RATIO } from '@azzapp/shared/coverHelpers';
+import { decodeMediaId } from '@azzapp/shared/imagesHelpers';
 import CloudinaryImage from '#ui/CloudinaryImage';
 import styles from './CoverRenderer.css';
 import type { Media, WebCard } from '@azzapp/data/domains';
@@ -9,6 +11,8 @@ type CoverRendererBackgroundProps = {
   media: Media | null;
   webCard: WebCard;
 };
+
+const BACKGROUND_IMAGE_SIZE = 320;
 
 const CoverRendererBackground = ({
   media,
@@ -34,8 +38,18 @@ const CoverRendererBackground = ({
                 coverData.backgroundPatternColor,
                 cardColors ?? DEFAULT_COLOR_PALETTE,
               ) ?? '#000',
-            WebkitMaskImage: `url(${getImageURL(coverData.backgroundId)})`,
-            maskImage: `url(${getImageURL(coverData.backgroundId)})`,
+            WebkitMaskImage: `url(${getCldImageUrl({
+              src: decodeMediaId(coverData.backgroundId),
+              width: BACKGROUND_IMAGE_SIZE,
+              height: BACKGROUND_IMAGE_SIZE / COVER_RATIO,
+              format: 'auto',
+            })})`,
+            maskImage: `url(${getCldImageUrl({
+              src: decodeMediaId(coverData.backgroundId),
+              width: BACKGROUND_IMAGE_SIZE,
+              height: BACKGROUND_IMAGE_SIZE / COVER_RATIO,
+              format: 'auto',
+            })})`,
             maskPosition: 'bottom',
             WebkitMaskPosition: 'bottom',
           }}
@@ -44,10 +58,10 @@ const CoverRendererBackground = ({
       )}
       <CloudinaryImage
         mediaId={media.id}
-        assetKind="cover"
         alt="background"
+        quality={1}
         fill
-        priority
+        sizes="100vw"
         videoThumbnail={media.kind === 'video'}
         className={cn(styles.coverMedia, styles.backgroundMedia)}
       />
@@ -59,8 +73,18 @@ const CoverRendererBackground = ({
                 coverData.foregroundColor,
                 cardColors ?? DEFAULT_COLOR_PALETTE,
               ) ?? '#000',
-            WebkitMaskImage: `url(${getImageURL(coverData.foregroundId)})`,
-            maskImage: `url(${getImageURL(coverData.foregroundId)})`,
+            WebkitMaskImage: `url(${getCldImageUrl({
+              src: decodeMediaId(coverData.foregroundId),
+              width: BACKGROUND_IMAGE_SIZE,
+              height: BACKGROUND_IMAGE_SIZE / COVER_RATIO,
+              format: 'auto',
+            })})`,
+            maskImage: `url(${getCldImageUrl({
+              src: decodeMediaId(coverData.foregroundId),
+              width: BACKGROUND_IMAGE_SIZE,
+              height: BACKGROUND_IMAGE_SIZE / COVER_RATIO,
+              format: 'auto',
+            })})`,
             maskPosition: 'bottom',
             WebkitMaskPosition: 'bottom',
           }}

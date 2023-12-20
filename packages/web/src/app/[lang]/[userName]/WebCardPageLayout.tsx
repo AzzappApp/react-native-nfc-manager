@@ -127,6 +127,7 @@ const WebCardPageLayout = (props: ProfilePageLayoutProps) => {
             width={50}
             className={styles.switchContent}
             color="white"
+            aria-label='Switch to "posts" / "card" view'
             onClick={() => {
               setDisplay(prevDisplay =>
                 prevDisplay === 'card' ? 'posts' : 'card',

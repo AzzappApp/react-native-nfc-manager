@@ -18,6 +18,7 @@ const CommentFeedItem = (props: CommentFeedItemProps) => {
     <div className={styles.item}>
       <Link href={`/${comment.WebCard.userName}`} className={styles.coverLink}>
         <CoverRenderer
+          width={20}
           webCard={comment.WebCard}
           media={comment.media}
           staticCover

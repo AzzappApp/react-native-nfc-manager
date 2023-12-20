@@ -1,5 +1,6 @@
 import { capitalize } from 'lodash';
 import { notFound, redirect } from 'next/navigation';
+import { getCldOgImageUrl } from 'next-cloudinary';
 import {
   getMediasByIds,
   getPostByIdWithMedia,
@@ -7,7 +8,7 @@ import {
   getWebCardById,
   getWebCardsPostsWithMedias,
 } from '@azzapp/data/domains';
-import { getImageURLForSize } from '@azzapp/shared/imagesHelpers';
+import { decodeMediaId } from '@azzapp/shared/imagesHelpers';
 import { getMetaData } from '#helpers/seo';
 import CloudinaryImage from '#ui/CloudinaryImage';
 import CloudinaryVideoPlayer from '#ui/CloudinaryVideoPlayer';
@@ -84,9 +85,9 @@ const PostPage = async (props: PostPageProps) => {
               ) : (
                 <CloudinaryImage
                   mediaId={postMedia.id}
-                  assetKind="post"
                   alt="post"
                   fill
+                  sizes="100vw"
                   style={{
                     objectFit: 'contain',
                   }}
@@ -126,7 +127,9 @@ export async function generateMetadata({
   } as SocialMetas;
 
   if (post?.medias && post.medias.length > 0) {
-    metaData.ogImage = getImageURLForSize(post.medias[0].id, 1200, null);
+    metaData.ogImage = getCldOgImageUrl({
+      src: decodeMediaId(post.medias[0].id),
+    });
   }
   return getMetaData(metaData);
 }

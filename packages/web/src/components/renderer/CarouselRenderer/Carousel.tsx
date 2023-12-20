@@ -112,9 +112,11 @@ const Carousel = (props: CarouselProps) => {
                 top: 'calc(50% - 18px)',
                 cursor: 'pointer',
                 transform: 'rotate(180deg)',
+                padding: 12,
               }}
               onClick={onClickLeft}
-              size={36}
+              size={48}
+              aria-label="see prev photo"
             />
             <ButtonIcon
               Icon={ArrowRightIcon}
@@ -123,9 +125,11 @@ const Carousel = (props: CarouselProps) => {
                 right: 10,
                 top: 'calc(50% - 18px)',
                 cursor: 'pointer',
+                padding: 12,
               }}
+              aria-label="see next photo"
               onClick={onClickRight}
-              size={36}
+              size={48}
             />
           </>
         )}

@@ -45,11 +45,13 @@ const CommentFeedActions = (props: CommentFeedActionsProps) => {
               <ButtonIcon
                 Icon={HearthIcon}
                 onClick={() => download.current?.open()}
+                aria-label="Like post"
               />
             )}
             <ButtonIcon
               Icon={ShareIcon}
               onClick={() => share.current?.open()}
+              aria-label="Comment post"
             />
           </div>
           {post.allowLikes && (

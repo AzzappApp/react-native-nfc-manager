@@ -28,7 +28,7 @@ const RootLayout = ({
       <head>
         <meta
           name="viewport"
-          content="width=device-width, initial-scale=1, maximum-scale=1"
+          content="width=device-width, initial-scale=1, maximum-scale=5"
         />
         <meta charSet="utf-8" />
         {/* todo better colors */}
@@ -62,7 +62,7 @@ const RootLayout = ({
         <ClientWrapper locale={lang} messages={messages}>
           {children}
         </ClientWrapper>
-        <Script id="vh-fix">
+        <Script id="vh-fix" async>
           {`
             function applyVH() {
               document.documentElement.style.setProperty('--vh', window.innerHeight * 0.01 + 'px');

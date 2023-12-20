@@ -1,4 +1,3 @@
-'use client';
 import cn from 'classnames';
 import { forwardRef } from 'react';
 import styles from './Button.css';

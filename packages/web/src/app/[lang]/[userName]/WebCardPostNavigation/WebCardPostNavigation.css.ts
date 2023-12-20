@@ -1,6 +1,6 @@
 import { style } from '@vanilla-extract/css';
 import { COVER_RATIO } from '@azzapp/shared/coverHelpers';
-import { textLarge, textXXSmall } from '#app/theme.css';
+import { MediaQuery, textLarge, textXXSmall } from '#app/theme.css';
 
 const navigation = style({
   width: '60px',
@@ -11,6 +11,14 @@ const navigation = style({
   flexDirection: 'column',
   alignItems: 'center',
   boxShadow: '0px 0px 20px 0px rgba(0, 0, 0, 0.20)',
+  '@media': {
+    [MediaQuery.Mobile]: {
+      display: 'none',
+    },
+    [MediaQuery.Desktop]: {
+      display: 'flex',
+    },
+  },
 });
 
 const postsCountWrapper = style({
@@ -47,7 +55,6 @@ const text = style([textXXSmall, { textAlign: 'center' }]);
 
 const coverContainer = style({
   margin: '10px 0',
-  width: '40px',
   position: 'relative',
   aspectRatio: `${COVER_RATIO}`,
   cursor: 'pointer',

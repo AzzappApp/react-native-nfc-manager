@@ -46,7 +46,7 @@ const PostFeedItem = (
         <button className={styles.postHeader} onClick={props.onPressAuthor}>
           {media && (
             <div className={styles.postAuthorCover}>
-              <CoverRenderer media={media} webCard={webCard} />
+              <CoverRenderer media={media} webCard={webCard} width={20} />
             </div>
           )}
           <span>{webCard.userName}</span>
@@ -78,9 +78,9 @@ const PostFeedItem = (
             ) : (
               <CloudinaryImage
                 mediaId={postMedia.id}
-                assetKind="post"
                 alt="cover"
                 fill
+                sizes="100vw"
                 style={{
                   objectFit: 'cover',
                 }}
@@ -91,13 +91,22 @@ const PostFeedItem = (
         <div className={styles.postFooter}>
           <div className={styles.postActions}>
             {post.allowLikes && (
-              <ButtonIcon Icon={HearthIcon} onClick={onDownload} />
+              <ButtonIcon
+                Icon={HearthIcon}
+                onClick={onDownload}
+                aria-label="Like post"
+              />
             )}
             {post.allowComments && (
-              <ButtonIcon Icon={CommentIcon} onClick={onDownload} />
+              <ButtonIcon
+                Icon={CommentIcon}
+                onClick={onDownload}
+                aria-label="Comment post"
+              />
             )}
             <ButtonIcon
               Icon={ShareIcon}
+              aria-label="Share post"
               onClick={() => share.current?.open()}
             />
           </div>
@@ -126,7 +135,7 @@ const PostFeedItem = (
             className={styles.postSeeMore}
             href={`/${webCard.userName}/${post.id}`}
           >
-            See more
+            See post details
           </Link>
           <span className={styles.postElapsedTime}>{elapsedTime}</span>
         </div>

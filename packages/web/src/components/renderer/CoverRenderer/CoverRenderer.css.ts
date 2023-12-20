@@ -1,4 +1,5 @@
 import { style } from '@vanilla-extract/css';
+import { MediaQuery } from '#app/theme.css';
 
 const wrapper = style({
   filter: 'blur(15px)',
@@ -21,12 +22,28 @@ const coverMedia = style({
 const backgroundMedia = style({
   objectFit: 'cover',
   objectPosition: 'bottom',
+  '@media': {
+    [MediaQuery.Mobile]: {
+      display: 'none',
+    },
+    [MediaQuery.Desktop]: {
+      display: 'block',
+    },
+  },
 });
 
 const content = style({
   position: 'relative',
   margin: 'auto',
-  maxWidth: '375px',
+
+  '@media': {
+    [MediaQuery.Mobile]: {
+      width: '100vw',
+    },
+    [MediaQuery.Desktop]: {
+      maxWidth: '375px',
+    },
+  },
 });
 
 const layerMedia = style({

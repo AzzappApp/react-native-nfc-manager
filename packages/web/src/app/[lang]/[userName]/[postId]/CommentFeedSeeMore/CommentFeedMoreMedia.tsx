@@ -39,9 +39,9 @@ const CommentFeedMoreMedia = (props: CommentFeedMoreMediaProps) => {
       ) : (
         <CloudinaryImage
           mediaId={media.id}
-          assetKind="cover"
           alt="cover"
           fill
+          sizes="100vw"
           style={{
             objectFit: 'cover',
           }}

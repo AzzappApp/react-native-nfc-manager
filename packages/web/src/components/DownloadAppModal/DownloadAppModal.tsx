@@ -19,7 +19,7 @@ const DownloadAppModal = forwardRef(
     return (
       <Modal ref={ref} {...others}>
         <div className={styles.coverWrapper}>
-          <CoverRenderer webCard={webCard} media={media} />
+          <CoverRenderer webCard={webCard} media={media} width={125} />
         </div>
         <div className={styles.stats}>
           <div className={styles.stat}>

@@ -191,8 +191,8 @@ const assembleCloudinaryUrl = (
   id: string,
   kind: 'image' | 'video',
   transforms: string,
-  extention?: string,
+  extension?: string,
 ) => {
   // prettier-ignore
-  return `${CLOUDINARY_BASE_URL}/${kind}/upload/${transforms}/${id}${extention?`.${extention}`:''}`;
+  return `${CLOUDINARY_BASE_URL}/${kind}/upload/${transforms}/${id}${extension ? `.${extension}` : ''}`;
 };

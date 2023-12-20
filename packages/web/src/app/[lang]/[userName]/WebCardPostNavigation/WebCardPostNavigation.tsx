@@ -79,8 +79,17 @@ const ProfilePostNavigation = (props: WebCardPostNavigationProps) => {
           </div>
           <span className={styles.text}>Posts</span>
         </button>
-        <button className={styles.coverContainer} onClick={onClickCover}>
-          <CoverRenderer media={cover} webCard={webCard} staticCover />
+        <button
+          className={styles.coverContainer}
+          onClick={onClickCover}
+          aria-label={`Go to top of ${webCard.coverTitle} ${webCard.coverSubTitle} webCard`}
+        >
+          <CoverRenderer
+            width={40}
+            media={cover}
+            webCard={webCard}
+            staticCover
+          />
         </button>
         <ButtonIcon
           Icon={ShareIcon}

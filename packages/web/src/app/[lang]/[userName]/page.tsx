@@ -94,8 +94,8 @@ const ProfilePage = async ({ params }: ProfilePageProps) => {
       media={media}
       cover={
         <div style={{ position: 'relative', overflow: 'hidden' }}>
-          <CoverRendererBackground media={media} webCard={webCard} />{' '}
-          <CoverRenderer webCard={webCard} media={media} />
+          <CoverRendererBackground media={media} webCard={webCard} />
+          <CoverRenderer webCard={webCard} media={media} priority />
         </div>
       }
       cardBackgroundColor={cardBackgroundColor}
