@@ -1,5 +1,9 @@
-## 0.5.2-canary.87
+## 0.5.2-canary.88
 
+* **fix:**  - avoid double press on take photo ([#2084](https://github.com/AzzappApp/azzapp/pull/2084))
+* **fix:**  - 🐛 use manual entry ([#2058](https://github.com/AzzappApp/azzapp/pull/2058))
+* **fix:**  - 🐛 restore behavior for avoidingKeyboardScroll on modal ([#2081](https://github.com/AzzappApp/azzapp/pull/2081))
+* **fix:**  - mutiUserdetailModal was using a hardcoded role value ([#2089](https://github.com/AzzappApp/azzapp/pull/2089))
 * **perf:**  - web - enhance image / video sizes ([#2074](https://github.com/AzzappApp/azzapp/pull/2074))
 * **build:**  - update expo version ([#2080](https://github.com/AzzappApp/azzapp/pull/2080))
 * **fix:**  - multi user dark mode && graph ([#2066](https://github.com/AzzappApp/azzapp/pull/2066))
