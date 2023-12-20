@@ -1,5 +1,7 @@
-## 0.5.2-canary.82
+## 0.5.2-canary.83
 
+* **fix:**  - 🐛 add missing adress in multi user ([#2067](https://github.com/AzzappApp/azzapp/pull/2067))
+* **fix:**  - WebView and contact card scan counter  ([#2069](https://github.com/AzzappApp/azzapp/pull/2069))
 * **fix:**  - 🐛 don't display option for manual entry ([#2055](https://github.com/AzzappApp/azzapp/pull/2055))
 * **fix:**  - **CoverEdition:** saving current cover when media visible
 * **fix:**  - **CoverEdition:** Media display and background animation ([#2065](https://github.com/AzzappApp/azzapp/pull/2065))
