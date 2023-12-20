@@ -238,7 +238,7 @@ const BottomSheetModal = ({
       flex: 1,
       transform: [
         {
-          translateY: keyboardHeight.value,
+          translateY: disableKeyboardAvoidingView ? 0 : keyboardHeight.value,
         },
       ],
     };
