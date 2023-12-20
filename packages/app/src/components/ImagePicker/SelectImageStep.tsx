@@ -3,6 +3,7 @@ import { useCallback, useMemo, useRef, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { StyleSheet } from 'react-native';
 import { RESULTS } from 'react-native-permissions';
+import { useDebouncedCallback } from 'use-debounce';
 import { getImageSize, getVideoSize } from '#helpers/mediaHelpers';
 import { usePermissionContext } from '#helpers/PermissionContext';
 import useEditorLayout from '#hooks/useEditorLayout';
@@ -91,7 +92,7 @@ const SelectImageStep = ({
     // TODO
   }, []);
 
-  const onTakePhoto = useCallback(async () => {
+  const takePhoto = useCallback(async () => {
     if (!cameraRef.current) {
       // TODO
       return;
@@ -146,6 +147,8 @@ const SelectImageStep = ({
     onMediaChange,
     onNext,
   ]);
+
+  const onTakePhoto = useDebouncedCallback(takePhoto, 400);
 
   const captureSession = useRef<RecordSession | null>(null);
   const onStartRecording = useCallback(() => {
