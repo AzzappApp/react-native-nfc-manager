@@ -14,12 +14,12 @@ import type { MutationResolvers } from '#schema/__generated__/types';
 import type { GraphQLContext } from '../GraphQLContext';
 
 const USERNAME_CHANGE_FREQUENCY_DAY = parseInt(
-  process.env.USERNAME_CHANGE_FREQUENCY_DAY ?? '30',
+  process.env.USERNAME_CHANGE_FREQUENCY_DAY ?? '1',
   10,
 );
 
 const USERNAME_REDIRECTION_AVAILABILITY_DAY = parseInt(
-  process.env.USERNAME_REDIRECTION_AVAILABILITY_DAY ?? '30',
+  process.env.USERNAME_REDIRECTION_AVAILABILITY_DAY ?? '2',
   10,
 );
 

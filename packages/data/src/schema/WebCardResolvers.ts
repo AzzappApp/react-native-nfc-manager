@@ -207,6 +207,6 @@ export const CompanyActivity: CompanyActivityResolvers = {
 };
 
 const USERNAME_CHANGE_FREQUENCY_DAY = parseInt(
-  process.env.USERNAME_CHANGE_FREQUENCY_DAY ?? '30',
+  process.env.USERNAME_CHANGE_FREQUENCY_DAY ?? '1',
   10,
 );
