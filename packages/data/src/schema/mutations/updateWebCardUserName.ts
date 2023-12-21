@@ -59,8 +59,9 @@ const updateWebCardUserNameMutation: MutationResolvers['updateWebCardUserName'] 
     nextChangeDate.setDate(
       nextChangeDate.getDate() + USERNAME_CHANGE_FREQUENCY_DAY,
     );
-    // Check if lastUpdate is earlier than thirtyDaysAgo;
-    if (nextChangeDate > now) {
+
+    //user can change if it was never published nor updated
+    if (webCard.alreadyPublished && nextChangeDate > now) {
       throw new GraphQLError(ERRORS.USERNAME_CHANGE_NOT_ALLOWED_DELAY, {
         extensions: {
           alloweChangeUserNameDate: nextChangeDate,
@@ -96,14 +97,17 @@ const updateWebCardUserNameMutation: MutationResolvers['updateWebCardUserName'] 
         // and we can have different option for premium or not,  try to handle different case
         // existing profile with expiresAt date not expired
         const currentDate = new Date();
-        await trx
-          .delete(RedirectWebCardTable)
-          .where(
-            and(
-              eq(RedirectWebCardTable.toUserName, userName),
-              lt(RedirectWebCardTable.expiresAt, currentDate),
-            ),
-          );
+        //create a redirection only if it was published
+        if (webCard.alreadyPublished) {
+          await trx
+            .delete(RedirectWebCardTable)
+            .where(
+              and(
+                eq(RedirectWebCardTable.toUserName, userName),
+                lt(RedirectWebCardTable.expiresAt, currentDate),
+              ),
+            );
+        }
         // existing profile with expiresAt date expired
         await trx
           .update(RedirectWebCardTable)
