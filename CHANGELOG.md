@@ -1,5 +1,6 @@
-## 0.5.2-canary.88
+## 0.5.2-canary.89
 
+* **fix:**  - change default value of env
 * **fix:**  - avoid double press on take photo ([#2084](https://github.com/AzzappApp/azzapp/pull/2084))
 * **fix:**  - 🐛 use manual entry ([#2058](https://github.com/AzzappApp/azzapp/pull/2058))
 * **fix:**  - 🐛 restore behavior for avoidingKeyboardScroll on modal ([#2081](https://github.com/AzzappApp/azzapp/pull/2081))
