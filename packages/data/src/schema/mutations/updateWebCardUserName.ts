@@ -88,17 +88,18 @@ const updateWebCardUserNameMutation: MutationResolvers['updateWebCardUserName'] 
           { userName, lastUserNameUpdate: now },
           trx,
         );
-        await trx.insert(RedirectWebCardTable).values({
-          fromUserName: webCard.userName,
-          toUserName: userName,
-          expiresAt,
-        });
-        //remove or udpate prevous redirection. As the specification are not fully detailled
-        // and we can have different option for premium or not,  try to handle different case
-        // existing profile with expiresAt date not expired
-        const currentDate = new Date();
-        //create a redirection only if it was published
         if (webCard.alreadyPublished) {
+          await trx.insert(RedirectWebCardTable).values({
+            fromUserName: webCard.userName,
+            toUserName: userName,
+            expiresAt,
+          });
+          //remove or udpate prevous redirection. As the specification are not fully detailled
+          // and we can have different option for premium or not,  try to handle different case
+          // existing profile with expiresAt date not expired
+          const currentDate = new Date();
+          //create a redirection only if it was published
+
           await trx
             .delete(RedirectWebCardTable)
             .where(
@@ -107,12 +108,13 @@ const updateWebCardUserNameMutation: MutationResolvers['updateWebCardUserName'] 
                 lt(RedirectWebCardTable.expiresAt, currentDate),
               ),
             );
+
+          // existing profile with expiresAt date expired
+          await trx
+            .update(RedirectWebCardTable)
+            .set({ toUserName: userName })
+            .where(and(eq(RedirectWebCardTable.toUserName, webCard.userName)));
         }
-        // existing profile with expiresAt date expired
-        await trx
-          .update(RedirectWebCardTable)
-          .set({ toUserName: userName })
-          .where(and(eq(RedirectWebCardTable.toUserName, webCard.userName)));
       });
     } catch (error) {
       console.log(error);
