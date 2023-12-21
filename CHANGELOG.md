@@ -1,5 +1,6 @@
-## 0.5.2-canary.90
+## 0.5.2-canary.91
 
+* **fix:**  - dont redirect if the card cas never publish ([#2105](https://github.com/AzzappApp/azzapp/pull/2105))
 * **fix:**  - **change username:** if never publish, the username can be changed wiuthtout control
 * **fix:**  - change default value of env
 * **fix:**  - avoid double press on take photo ([#2084](https://github.com/AzzappApp/azzapp/pull/2084))
