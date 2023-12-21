@@ -1,5 +1,6 @@
-## 0.5.2-canary.89
+## 0.5.2-canary.90
 
+* **fix:**  - **change username:** if never publish, the username can be changed wiuthtout control
 * **fix:**  - change default value of env
 * **fix:**  - avoid double press on take photo ([#2084](https://github.com/AzzappApp/azzapp/pull/2084))
 * **fix:**  - 🐛 use manual entry ([#2058](https://github.com/AzzappApp/azzapp/pull/2058))
