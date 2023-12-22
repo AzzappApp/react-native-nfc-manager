@@ -83,11 +83,7 @@ const WebCardScreen = ({
 >) => {
   const data = usePreloadedQuery(getQuery(params), preloadedQuery);
 
-  useWebCardViewStatistic(
-    params.webCardId ?? data.webCard?.id
-      ? fromGlobalId(data.webCard!.id).id
-      : undefined,
-  );
+  useWebCardViewStatistic(params.webCardId ?? data.webCard?.id);
 
   const [ready, setReady] = useState(false);
   useNativeNavigationEvent('appear', () => {
