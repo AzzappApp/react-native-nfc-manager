@@ -1,5 +1,6 @@
-## 0.5.2-canary.93
+## 0.5.2-canary.94
 
+* **feat:**  - add lottie animation on cover on web ([#2094](https://github.com/AzzappApp/azzapp/pull/2094))
 * **fix:**  - webcard scan view counter ([#2106](https://github.com/AzzappApp/azzapp/pull/2106))
 * **fix:**  - add action on multiuser header right element cover ([#2092](https://github.com/AzzappApp/azzapp/pull/2092))
 * **fix:**  - dont redirect if the card cas never publish ([#2105](https://github.com/AzzappApp/azzapp/pull/2105))
