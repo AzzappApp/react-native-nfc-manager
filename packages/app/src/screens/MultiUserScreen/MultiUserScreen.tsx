@@ -16,6 +16,7 @@ import Container from '#ui/Container';
 import Header from '#ui/Header';
 import Icon from '#ui/Icon';
 import IconButton from '#ui/IconButton';
+import PressableNative from '#ui/PressableNative';
 import Switch from '#ui/Switch';
 import Text from '#ui/Text';
 import CommonInformationForm from './CommonInformationForm';
@@ -209,11 +210,20 @@ const MultiUserScreen = ({
             description: 'MultiUserScreen - Multi user title',
           })}
           rightElement={
-            <CoverRenderer
-              webCard={data.viewer.profile?.webCard}
-              width={COVER_WIDTH}
-              style={{ marginBottom: -1 }}
-            />
+            <PressableNative
+              onPress={router.back}
+              accessibilityRole="link"
+              accessibilityLabel={intl.formatMessage({
+                defaultMessage: 'Go back',
+                description: 'Go back button in multi user header',
+              })}
+            >
+              <CoverRenderer
+                webCard={data.viewer.profile?.webCard}
+                width={COVER_WIDTH}
+                style={{ marginBottom: -1 }}
+              />
+            </PressableNative>
           }
           leftElement={
             <IconButton
