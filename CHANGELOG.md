@@ -1,5 +1,6 @@
-## 0.5.2-canary.91
+## 0.5.2-canary.92
 
+* **fix:**  - add action on multiuser header right element cover ([#2092](https://github.com/AzzappApp/azzapp/pull/2092))
 * **fix:**  - dont redirect if the card cas never publish ([#2105](https://github.com/AzzappApp/azzapp/pull/2105))
 * **fix:**  - **change username:** if never publish, the username can be changed wiuthtout control
 * **fix:**  - change default value of env
