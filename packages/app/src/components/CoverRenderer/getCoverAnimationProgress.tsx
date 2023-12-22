@@ -11,7 +11,7 @@ function getCoverAnimationProgress(
   exitAnimationSpec?: { duration: number; easing: EasingFunction },
 ) {
   'worklet';
-  let textAnimationProgress = exitAnimationSpec
+  let resultAnimationProgress = exitAnimationSpec
     ? interpolate(
         animationProgress,
         [
@@ -34,13 +34,15 @@ function getCoverAnimationProgress(
         [0, 0, 1, 1],
       );
 
-  if (textAnimationProgress < 1) {
-    textAnimationProgress = enterAnimationSpec.easing(textAnimationProgress);
-  } else if (textAnimationProgress > 1 && exitAnimationSpec) {
-    textAnimationProgress =
-      exitAnimationSpec.easing(textAnimationProgress - 1) + 1;
+  if (resultAnimationProgress < 1) {
+    resultAnimationProgress = enterAnimationSpec.easing(
+      resultAnimationProgress,
+    );
+  } else if (resultAnimationProgress > 1 && exitAnimationSpec) {
+    resultAnimationProgress =
+      exitAnimationSpec.easing(resultAnimationProgress - 1) + 1;
   }
-  return textAnimationProgress;
+  return resultAnimationProgress;
 }
 
 export default getCoverAnimationProgress;

@@ -35,7 +35,7 @@ const backgroundMedia = style({
 const content = style({
   position: 'relative',
   margin: 'auto',
-
+  overflow: 'hidden',
   '@media': {
     [MediaQuery.Mobile]: {
       width: '100vw',
@@ -44,6 +44,22 @@ const content = style({
       maxWidth: '375px',
     },
   },
+});
+
+const appearZoomIn = style({
+  transformOrigin: 'top center',
+});
+
+const appearZoomOut = style({
+  transformOrigin: 'top center',
+});
+
+const smoothZoomIn = style({
+  transformOrigin: 'top center',
+});
+
+const smoothZoomOut = style({
+  transformOrigin: 'top center',
 });
 
 const layerMedia = style({
@@ -63,6 +79,10 @@ const styles = {
   backgroundMedia,
   content,
   layerMedia,
+  appearZoomIn,
+  appearZoomOut,
+  smoothZoomIn,
+  smoothZoomOut,
 };
 
 export default styles;

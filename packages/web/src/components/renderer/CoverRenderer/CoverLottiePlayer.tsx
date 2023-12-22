@@ -1,25 +1,42 @@
 'use client';
 import memoize from 'lodash/memoize';
 import lottie from 'lottie-web';
-import React, { use, useCallback, useEffect, useRef } from 'react';
+import React, {
+  forwardRef,
+  use,
+  useEffect,
+  useImperativeHandle,
+  useRef,
+} from 'react';
 import { COVER_FOREGROUND_BASE_COLOR } from '@azzapp/shared/coverHelpers';
 import { replaceColor } from '@azzapp/shared/lottieHelpers';
 import type { AnimationItem } from 'lottie-web';
+import type { ForwardedRef } from 'react';
 
-const CoverLottiePlayer = ({
-  src,
-  tintColor,
-  paused,
-  duration,
-  reset,
-  ...props
-}: React.HTMLProps<HTMLDivElement> & {
-  tintColor: string;
-  paused: boolean;
-  src: string;
-  duration: number;
-  reset: number;
-}) => {
+const COVER_ANIMATION_NAME = 'cover';
+
+export type CoverLottiePlayerHandle = {
+  setSpeed(speed: number): void;
+  play(loop?: boolean): void;
+};
+
+const CoverLottiePlayer = (
+  {
+    src,
+    tintColor,
+    staticCover,
+    onLoaded,
+    onLoop,
+    ...props
+  }: React.HTMLProps<HTMLDivElement> & {
+    tintColor: string;
+    staticCover?: boolean;
+    src: string;
+    onLoaded?: (duration: number) => void;
+    onLoop?: () => void;
+  },
+  ref: ForwardedRef<CoverLottiePlayerHandle>,
+) => {
   const animationData = replaceColor(
     COVER_FOREGROUND_BASE_COLOR,
     tintColor,
@@ -29,76 +46,85 @@ const CoverLottiePlayer = ({
   const containerRef = useRef<HTMLDivElement | null>(null);
   const animationItemRef = useRef<AnimationItem | null>(null);
 
-  const createAnimation = useCallback(() => {
+  useEffect(() => {
     if (!containerRef.current) {
       return;
     }
+
+    if (animationItemRef.current) {
+      return;
+    }
+
     const animationItem = lottie.loadAnimation({
       container: containerRef.current,
       animationData,
-      autoplay: false,
       loop: false,
       renderer: 'svg',
+      name: COVER_ANIMATION_NAME,
+      autoplay: false,
     });
+
     animationItemRef.current = animationItem;
   }, [animationData]);
 
   useEffect(() => {
-    createAnimation();
-  }, [createAnimation]);
+    animationItemRef.current?.addEventListener('DOMLoaded', () => {
+      onLoaded?.(animationItemRef.current?.getDuration() ?? 0);
+    });
+    return () => {
+      animationItemRef.current?.removeEventListener('DOMLoaded');
+    };
+  }, [onLoaded]);
 
-  const resetRef = useRef(reset);
-  const isPlaying = useRef(!paused);
+  useEffect(() => {
+    animationItemRef.current?.addEventListener('loopComplete', () => {
+      onLoop?.();
+    });
+
+    return () => {
+      animationItemRef.current?.removeEventListener('loopComplete');
+    };
+  }, [onLoop]);
 
   useEffect(() => {
     const animationItem = animationItemRef.current;
     if (!animationItem) {
       return;
     }
-    if (paused) {
-      animationItem.pause();
-      isPlaying.current = false;
-    } else {
-      animationItem.play();
-      isPlaying.current = true;
-    }
-  }, [paused]);
 
-  const setSpeed = useCallback(() => {
-    const animationItem = animationItemRef.current;
-    if (!animationItem) {
-      return;
+    if (staticCover) {
+      animationItem.goToAndStop(
+        animationItem.totalFrames * 0.5,
+        true,
+        COVER_ANIMATION_NAME,
+      );
     }
-    const speed = (animationItem.getDuration() * 1000) / duration;
-    animationItem.setSpeed(speed);
-  }, [duration]);
+  }, [staticCover]);
 
-  useEffect(() => {
-    setSpeed();
-  }, [setSpeed]);
+  useImperativeHandle(
+    ref,
+    () => ({
+      setSpeed(speed: number) {
+        animationItemRef.current?.setSpeed(speed);
+      },
+      play(loop) {
+        if (staticCover) {
+          throw new Error('Cannot play static cover');
+        }
 
-  useEffect(() => {
-    const animationItem = animationItemRef.current;
-    if (!animationItem) {
-      return;
-    }
-    if (resetRef.current === reset) {
-      return;
-    }
-    resetRef.current = reset;
-    // TODO: it's the only way to reset animation that I found (goToAnd(Stop/Play)(0) doesn't work)
-    animationItem.destroy();
-    createAnimation();
-    setSpeed();
-    if (isPlaying.current) {
-      animationItemRef.current?.play();
-    }
-  }, [createAnimation, setSpeed, reset]);
+        animationItemRef.current?.goToAndPlay(0, true, COVER_ANIMATION_NAME);
+        if (loop) {
+          animationItemRef.current?.setLoop(true);
+        }
+      },
+    }),
+    [staticCover],
+  );
 
   return <div ref={containerRef} {...props} />;
 };
 
-export default CoverLottiePlayer;
+export default forwardRef(CoverLottiePlayer);
 
 const fetchLottie = memoize((src: string) =>
   fetch(src).then(res => res.json()),

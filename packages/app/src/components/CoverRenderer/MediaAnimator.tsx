@@ -53,7 +53,7 @@ const createZoomTransform = (
 
 const createSimpleAnimation = (
   displayName: string,
-  animanedStyleWorklet: (
+  animatedStyleWorklet: (
     animationSharedValue: SharedValue<number>,
     width: number,
     height: number,
@@ -67,7 +67,7 @@ const createSimpleAnimation = (
     ...props
   }: AnimationProps) => {
     const animatedStyle = useAnimatedStyle(() => {
-      return animanedStyleWorklet(animationSharedValue, width, height);
+      return animatedStyleWorklet(animationSharedValue, width, height);
     });
     return <Animated.View style={[style, animatedStyle]} {...props} />;
   };

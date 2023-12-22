@@ -46,7 +46,12 @@ const PostFeedItem = (
         <button className={styles.postHeader} onClick={props.onPressAuthor}>
           {media && (
             <div className={styles.postAuthorCover}>
-              <CoverRenderer media={media} webCard={webCard} width={20} />
+              <CoverRenderer
+                media={media}
+                webCard={webCard}
+                width={20}
+                staticCover
+              />
             </div>
           )}
           <span>{webCard.userName}</span>
@@ -66,6 +71,7 @@ const PostFeedItem = (
                   media={postMedia}
                   alt="cover"
                   fluid
+                  sizes="100vw"
                   style={{
                     objectFit: 'cover',
                     width: '100%',
