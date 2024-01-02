@@ -1,5 +1,7 @@
-## 0.5.2-canary.97
+## 0.5.2-canary.98
 
+* **fix:**  - **CoverEdition:** prevent rerendering of media when paused/unpaused ([#2116](https://github.com/AzzappApp/azzapp/pull/2116))
+* **feat:**  - add text animations ([#2112](https://github.com/AzzappApp/azzapp/pull/2112))
 * **fix:**  - **account:** [#2110](https://github.com/AzzappApp/azzapp/pull/2110) remove webcard from account details screen header ([#2115](https://github.com/AzzappApp/azzapp/pull/2115))
 * **build:**  - remove patch for next-cloudinary ([#2113](https://github.com/AzzappApp/azzapp/pull/2113))
 * **fix:**  - **CoverEdition:** don't apply mask on demo media ([#2114](https://github.com/AzzappApp/azzapp/pull/2114))
