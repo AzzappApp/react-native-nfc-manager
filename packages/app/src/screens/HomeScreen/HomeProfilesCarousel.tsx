@@ -7,7 +7,7 @@ import {
   useRef,
   useState,
 } from 'react';
-import { useIntl } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 import {
   View,
   useWindowDimensions,
@@ -18,11 +18,12 @@ import {
 import { graphql, useFragment } from 'react-relay';
 import { COVER_CARD_RADIUS, COVER_RATIO } from '@azzapp/shared/coverHelpers';
 import { colors, shadow } from '#theme';
+import CoverErrorRenderer from '#components/CoverErrorRenderer';
 import CoverLink from '#components/CoverLink';
+import CoverLoadingIndicator from '#components/CoverLoadingIndicator';
 import CoverRenderer from '#components/CoverRenderer';
 import Link from '#components/Link';
 import { useScreenHasFocus } from '#components/NativeRouter';
-import Skeleton from '#components/Skeleton';
 import WebCardBoundRelayEnvironmentProvider from '#helpers/WebCardBoundRelayEnvironmentProvider';
 import CarouselSelectList from '#ui/CarouselSelectList';
 import Icon from '#ui/Icon';
@@ -259,9 +260,19 @@ const ItemRenderComponent = ({
   );
 
   const [ready, setReady] = useState(!profile?.webCard?.cardCover);
-
+  const [loadingFailed, setLoadingFailed] = useState(false);
   const onReady = useCallback(() => {
     setReady(true);
+  }, []);
+
+  const onError = useCallback(() => {
+    setReady(false);
+    setLoadingFailed(true);
+  }, []);
+
+  const onRetry = useCallback(() => {
+    setLoadingFailed(false);
+    setReady(false);
   }, []);
 
   const onPress = (event: GestureResponderEvent) => {
@@ -286,7 +297,18 @@ const ItemRenderComponent = ({
         },
       ]}
     >
-      {profile.invited ? (
+      {loadingFailed ? (
+        <CoverErrorRenderer
+          label={
+            <FormattedMessage
+              defaultMessage="An error occured"
+              description="Error message displayed when a cover failed to load in HomeScreen"
+            />
+          }
+          width={coverWidth}
+          onRetry={onRetry}
+        />
+      ) : profile.invited ? (
         <View
           style={{
             width: coverWidth,
@@ -311,6 +333,7 @@ const ItemRenderComponent = ({
           onPress={onPress}
           animationEnabled={isCurrent && hasFocus}
           onReadyForDisplay={onReady}
+          onError={onError}
         />
       ) : (
         <Link
@@ -337,20 +360,15 @@ const ItemRenderComponent = ({
               width={coverWidth}
               webCard={profile.webCard}
               onReadyForDisplay={onReady}
+              onError={onError}
             />
           </PressableOpacity>
         </Link>
       )}
-      {!ready && !profile.invited && (
-        <Skeleton
-          style={{
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            width: coverWidth,
-            height: coverHeight,
-            borderRadius: coverWidth * COVER_CARD_RADIUS,
-          }}
+      {!ready && !profile.invited && !loadingFailed && (
+        <CoverLoadingIndicator
+          width={coverWidth}
+          style={StyleSheet.absoluteFill}
         />
       )}
     </View>

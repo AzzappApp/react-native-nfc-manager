@@ -1,6 +1,6 @@
 import { memoize } from 'lodash';
 import { useCallback, useMemo, useRef, useState } from 'react';
-import { useIntl } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 import { KeyboardAvoidingView, StyleSheet, View } from 'react-native';
 import { graphql, useFragment } from 'react-relay';
 import { DEFAULT_COLOR_LIST } from '@azzapp/shared/cardHelpers';
@@ -10,16 +10,19 @@ import {
   textPositionOrDefaut,
 } from '@azzapp/shared/coverHelpers';
 import { CameraButton, CropButton } from '#components/commonsButtons';
+import CoverLoadingIndicator from '#components/CoverLoadingIndicator';
 import CoverPreviewRenderer from '#components/CoverPreviewRenderer';
 import ImageEditionFooter from '#components/ImageEditionFooter';
 import ImageEditionParameterControl from '#components/ImageEditionParameterControl';
 import ScreenModal from '#components/ScreenModal';
 import { BOTTOM_MENU_HEIGHT } from '#ui/BottomMenu';
 import Container from '#ui/Container';
+import Delay from '#ui/Delay';
 import PressableNative from '#ui/PressableNative';
 import SwitchLabel from '#ui/SwitchLabel';
 import TabView from '#ui/TabView';
 import UploadProgressModal from '#ui/UploadProgressModal';
+import CoverErrorRenderer from '../../CoverErrorRenderer';
 import CoverEditorCropModal from '../CoverEditorCropModal';
 import CoverEditiorImagePicker from '../CoverEditorImagePicker';
 import useCoverMediaEditor from '../useCoverMediaEditor';
@@ -69,14 +72,6 @@ export type CoverEditorCustomProps = {
    */
   style?: StyleProp<ViewStyle>;
   /**
-   * callback called when the screen is ready to be displayed
-   */
-  onReady?: () => void;
-  /**
-   *  callback called when the image fails to load
-   */
-  onError?: () => void;
-  /**
    * callback when to save the cover
    */
   onCoverSaved: () => void;
@@ -94,8 +89,6 @@ const CoverEditorCustom = ({
   initialData,
   initialColorPalette,
   style,
-  // onReady,
-  onError,
   onCoverSaved,
   onCancel,
 }: CoverEditorCustomProps) => {
@@ -318,6 +311,31 @@ const CoverEditorCustom = ({
   ]);
   // #endregion
 
+  // #region Media loading
+  const [loading, setLoading] = useState(true);
+  const [loadingFailed, setLoadingFailed] = useState(false);
+
+  const onStartLoading = useCallback(() => {
+    setLoading(true);
+    setLoadingFailed(false);
+  }, []);
+
+  const onLoad = useCallback(() => {
+    setLoading(false);
+    setLoadingFailed(false);
+  }, []);
+
+  const onError = useCallback(() => {
+    setLoading(false);
+    setLoadingFailed(true);
+  }, []);
+
+  const onRetry = useCallback(() => {
+    setLoadingFailed(false);
+    setLoading(true);
+  }, []);
+  // #endregion
+
   // #region Image picker
   const [showImagePicker, setShowImagePicker] = useState(false);
   const openImagePicker = useCallback(() => {
@@ -335,14 +353,6 @@ const CoverEditorCustom = ({
     },
     [setSourceMediaFromImagePicker],
   );
-
-  const errorDispatched = useRef(false);
-  const onMediaError = useCallback(() => {
-    if (!errorDispatched.current) {
-      errorDispatched.current = true;
-      onError?.();
-    }
-  }, [onError]);
   // #endregion
 
   // #region Crop mode
@@ -419,6 +429,8 @@ const CoverEditorCustom = ({
     bottomSheetHeights,
   } = useCoverEditorCustomLayout();
 
+  const coverWidth = coverHeight * COVER_RATIO;
+
   const intl = useIntl();
 
   const tabViewHeight =
@@ -446,36 +458,61 @@ const CoverEditorCustom = ({
           <PressableNative
             style={{ height: coverHeight, aspectRatio: COVER_RATIO }}
             onPress={openImagePicker}
+            disabled={mediaComputing || loading || loadingFailed}
+            disabledOpacity={1}
           >
-            <CoverPreviewRenderer
-              kind={kind}
-              uri={uri}
-              maskUri={segmentationEnabled && segmented ? maskMedia?.uri : null}
-              foregroundId={foreground?.id}
-              foregroundKind={foreground?.kind}
-              foregroundImageUri={foreground?.uri}
-              foregroundImageTintColor={foregroundColor}
-              backgroundId={background?.id}
-              backgroundImageUri={background?.uri}
-              backgroundColor={backgroundColor}
-              backgroundImageTintColor={backgroundPatternColor}
-              editionParameters={editionParameters}
-              filter={mediaFilter}
-              title={title}
-              subTitle={subTitle}
-              titleStyle={titleStyle}
-              subTitleStyle={subTitleStyle}
-              textOrientation={textOrientationOrDefaut(textOrientation)}
-              textPosition={textPositionOrDefaut(textPosition)}
-              textAnimation={textAnimation}
-              mediaAnimation={mediaAnimation}
-              computing={mediaComputing}
-              // onReady={onCoverPreviewReady}
-              onError={onMediaError}
-              height={coverHeight}
-              colorPalette={colorPalette}
-              paused={!!progressIndicator}
-            />
+            {loadingFailed ? (
+              <CoverErrorRenderer
+                label={
+                  <FormattedMessage
+                    defaultMessage="An error occured"
+                    description="Error message displayed when a the custom cover editor failed to load the cover preview"
+                  />
+                }
+                width={coverWidth}
+                onRetry={onRetry}
+              />
+            ) : (
+              <CoverPreviewRenderer
+                kind={kind}
+                uri={uri}
+                maskUri={
+                  segmentationEnabled && segmented ? maskMedia?.uri : null
+                }
+                foregroundId={foreground?.id}
+                foregroundKind={foreground?.kind}
+                foregroundImageUri={foreground?.uri}
+                foregroundImageTintColor={foregroundColor}
+                backgroundId={background?.id}
+                backgroundImageUri={background?.uri}
+                backgroundColor={backgroundColor}
+                backgroundImageTintColor={backgroundPatternColor}
+                editionParameters={editionParameters}
+                filter={mediaFilter}
+                title={title}
+                subTitle={subTitle}
+                titleStyle={titleStyle}
+                subTitleStyle={subTitleStyle}
+                textOrientation={textOrientationOrDefaut(textOrientation)}
+                textPosition={textPositionOrDefaut(textPosition)}
+                textAnimation={textAnimation}
+                mediaAnimation={mediaAnimation}
+                onStartLoading={onStartLoading}
+                onLoad={onLoad}
+                onError={onError}
+                width={coverWidth}
+                colorPalette={colorPalette}
+                paused={!!progressIndicator || mediaComputing}
+              />
+            )}
+            {loading && (
+              <Delay delay={50}>
+                <CoverLoadingIndicator
+                  width={coverWidth}
+                  style={StyleSheet.absoluteFill}
+                />
+              </Delay>
+            )}
           </PressableNative>
           {sourceMedia && !editedParameter && (
             <CropButton

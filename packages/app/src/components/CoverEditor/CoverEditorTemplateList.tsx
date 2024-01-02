@@ -2,7 +2,13 @@ import MaskedView from '@react-native-masked-view/masked-view';
 import { LinearGradient } from 'expo-linear-gradient';
 import { isEqual, omit } from 'lodash';
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { PixelRatio, View, useWindowDimensions } from 'react-native';
+import { FormattedMessage } from 'react-intl';
+import {
+  PixelRatio,
+  StyleSheet,
+  View,
+  useWindowDimensions,
+} from 'react-native';
 import { FlatList } from 'react-native-gesture-handler';
 import {
   graphql,
@@ -20,6 +26,7 @@ import {
 } from '@azzapp/shared/coverHelpers';
 import { colors, shadow } from '#theme';
 import ColorTriptychRenderer from '#components/ColorTriptychRenderer';
+import CoverLoadingIndicator from '#components/CoverLoadingIndicator';
 import CoverPreviewRenderer from '#components/CoverPreviewRenderer';
 import {
   extractLayoutParameters,
@@ -30,6 +37,7 @@ import ActivityIndicator from '#ui/ActivityIndicator';
 import CarouselSelectList from '#ui/CarouselSelectList';
 import PressableOpacity from '#ui/PressableOpacity';
 import PressableScaleHighlight from '#ui/PressableScaleHighlight';
+import CoverErrorRenderer from '../CoverErrorRenderer';
 import type { TimeRange } from '#components/ImagePicker/imagePickerTypes';
 import type { CarouselSelectListHandle } from '#ui/CarouselSelectList';
 import type { CoverStyleData, SourceMedia } from './coverEditorTypes';
@@ -562,66 +570,29 @@ const CoverEditorTemplateList = ({
           scrollToIndex(index);
         }
       };
-      const { uri, kind } = item.media;
-      const colorPaletteIndex = colorPalettesIndexes[item.id] ?? 0;
 
       return (
-        <PressableScaleHighlight
-          style={{
-            overflow: 'visible',
-            borderRadius: COVER_CARD_RADIUS * templateWidth,
-          }}
+        <CoverEditorTemplateRenderer
+          item={item}
+          isSelectedItem={isSelectedItem}
           onPress={onPress}
-        >
-          <CoverPreviewRendererMemo
-            uri={uri}
-            kind={kind}
-            maskUri={item.maskUri}
-            startTime={timeRange?.startTime}
-            duration={timeRange?.duration}
-            backgroundColor={item.backgroundColor}
-            backgroundId={item.background?.id}
-            backgroundImageUri={item.background?.uri}
-            backgroundImageTintColor={item.backgroundPatternColor}
-            foregroundId={item.foreground?.id}
-            foregroundKind={item.foreground?.kind}
-            foregroundImageUri={item.foreground?.uri}
-            foregroundImageTintColor={item.foregroundColor}
-            editionParameters={item.mediaParameters}
-            filter={item.mediaFilter}
-            mediaAnimation={item.mediaAnimation}
-            title={item.title}
-            titleStyle={item.titleStyle}
-            subTitle={item.subTitle}
-            subTitleStyle={item.subTitleStyle}
-            textOrientation={item.textOrientation}
-            textPosition={item.textPosition}
-            textAnimation={item.textAnimation}
-            // other props
-            colorPalette={
-              colorPaletteIndex === -1
-                ? cardColors!
-                : item.colorPalettes[colorPaletteIndex]
-            }
-            computing={mediaComputing}
-            height={carouselHeight}
-            paused={!isSelectedItem || videoPaused}
-            style={styles.templateItemContainer}
-          />
-        </PressableScaleHighlight>
+          colorPalettesIndexes={colorPalettesIndexes}
+          mediaComputing={mediaComputing}
+          width={templateWidth}
+          videoPaused={videoPaused}
+          cardColors={cardColors}
+          timeRange={timeRange}
+        />
       );
     },
     [
       selectedItemId,
       colorPalettesIndexes,
-      templateWidth,
-      timeRange?.startTime,
-      timeRange?.duration,
-      cardColors,
       mediaComputing,
-      carouselHeight,
+      templateWidth,
       videoPaused,
-      styles.templateItemContainer,
+      cardColors,
+      timeRange,
       onNextColorPalette,
       scrollToIndex,
     ],
@@ -874,6 +845,124 @@ const useCoverTemplates = (
         ...omit(othersFragmentResult, 'data'),
       };
   }
+};
+
+const CoverEditorTemplateRenderer = ({
+  item,
+  isSelectedItem,
+  colorPalettesIndexes,
+  width,
+  onPress,
+  timeRange,
+  cardColors,
+  mediaComputing,
+  videoPaused,
+}: {
+  item: TemplateListItem;
+  timeRange: TimeRange | null;
+  isSelectedItem: boolean;
+  colorPalettesIndexes: Record<string, number>;
+  cardColors: ColorPalette | null;
+  mediaComputing: boolean;
+  width: number;
+  videoPaused: boolean;
+  onPress: () => void;
+}) => {
+  const { uri, kind } = item.media;
+  const colorPaletteIndex = colorPalettesIndexes[item.id] ?? 0;
+
+  const [loading, setLoading] = useState(true);
+  const [loadingFailed, setLoadingFailed] = useState(false);
+
+  const loadingTimeout = useRef<any>(null);
+  const onStartLoading = useCallback(() => {
+    loadingTimeout.current = setTimeout(() => {
+      setLoading(true);
+    }, 50);
+  }, []);
+
+  const onLoad = useCallback(() => {
+    clearTimeout(loadingTimeout.current);
+    setLoading(false);
+    setLoadingFailed(false);
+  }, []);
+
+  const onError = useCallback(() => {
+    clearTimeout(loadingTimeout.current);
+    setLoading(false);
+    setLoadingFailed(true);
+  }, []);
+
+  const onRetry = useCallback(() => {
+    setLoadingFailed(false);
+    setLoading(true);
+  }, []);
+
+  const styles = useStyleSheet(styleSheet);
+
+  const borderRadius = COVER_CARD_RADIUS * width;
+
+  return (
+    <PressableScaleHighlight
+      style={{ overflow: 'visible', borderRadius }}
+      onPress={loading || loadingFailed ? null : onPress}
+      disabled={loading || loadingFailed}
+      disabledOpacity={1}
+    >
+      {loadingFailed ? (
+        <CoverErrorRenderer
+          label={
+            <FormattedMessage
+              defaultMessage="An error occured while loading this template"
+              description="Error message displayed when a template failed to load in CoverEditor"
+            />
+          }
+          width={width}
+          onRetry={onRetry}
+        />
+      ) : (
+        <CoverPreviewRendererMemo
+          uri={uri}
+          kind={kind}
+          maskUri={item.maskUri}
+          startTime={timeRange?.startTime}
+          duration={timeRange?.duration}
+          backgroundColor={item.backgroundColor}
+          backgroundId={item.background?.id}
+          backgroundImageUri={item.background?.uri}
+          backgroundImageTintColor={item.backgroundPatternColor}
+          foregroundId={item.foreground?.id}
+          foregroundKind={item.foreground?.kind}
+          foregroundImageUri={item.foreground?.uri}
+          foregroundImageTintColor={item.foregroundColor}
+          editionParameters={item.mediaParameters}
+          filter={item.mediaFilter}
+          mediaAnimation={item.mediaAnimation}
+          title={item.title}
+          titleStyle={item.titleStyle}
+          subTitle={item.subTitle}
+          subTitleStyle={item.subTitleStyle}
+          textOrientation={item.textOrientation}
+          textPosition={item.textPosition}
+          textAnimation={item.textAnimation}
+          colorPalette={
+            colorPaletteIndex === -1
+              ? cardColors!
+              : item.colorPalettes[colorPaletteIndex]
+          }
+          width={width}
+          paused={!isSelectedItem || videoPaused || mediaComputing}
+          style={styles.templateItemContainer}
+          onStartLoading={onStartLoading}
+          onLoad={onLoad}
+          onError={onError}
+        />
+      )}
+      {loading && (
+        <CoverLoadingIndicator width={width} style={StyleSheet.absoluteFill} />
+      )}
+    </PressableScaleHighlight>
+  );
 };
 
 const CoverPreviewRendererMemo = memo(

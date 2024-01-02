@@ -1,5 +1,10 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { FormattedMessage, useIntl } from 'react-intl';
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import { Platform, View, useWindowDimensions } from 'react-native';
 import {
   useSharedValue,
@@ -17,19 +22,15 @@ import CoverStaticMediaLayer from '#components/CoverRenderer/CoverStaticMediaLay
 import CoverTextRenderer from '#components/CoverRenderer/CoverTextRenderer';
 import MediaAnimator from '#components/CoverRenderer/MediaAnimator';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
-import ActivityIndicator from '#ui/ActivityIndicator';
-import Button from '#ui/Button';
-import Delay from '#ui/Delay';
-import Text from '#ui/Text';
 import CoverMediaPreview from './CoverMediaPreview';
 import type { CoverTextRendererProps } from '#components/CoverRenderer/CoverTextRenderer';
 import type { CoverMediaPreviewProps } from './CoverMediaPreview';
 
-type CoverPreviewRendererProps = CoverTextRendererProps &
-  Omit<
-    CoverMediaPreviewProps,
-    'onLoadingEnd' | 'onLoadingError' | 'onLoadingStart' | 'uri'
-  > & {
+type CoverPreviewRendererProps = Omit<
+  CoverMediaPreviewProps,
+  'onLoadingEnd' | 'onLoadingError' | 'onLoadingStart' | 'uri'
+> &
+  Omit<CoverTextRendererProps, 'height'> & {
     /**
      * the source media uri
      */
@@ -67,21 +68,21 @@ type CoverPreviewRendererProps = CoverTextRendererProps &
       dark: string;
     };
     /**
-     * if true, a loading indicator will be displayed after a delay
+     * Callback called when the cover starts loading
      */
-    computing?: boolean | null;
+    onStartLoading?: () => void;
     /**
-     * Callback called when the cover preview is ready
+     * Callback called when the cover preview has loaded all its medias
      */
-    onReady?: () => void;
+    onLoad?: () => void;
     /**
-     * Callback called when the cover preview failed to load
+     * Callback called when the cover preview failed to load a media
      */
     onError?: () => void;
     /**
-     * the height of the cover
+     * the width of the cover
      */
-    height: number;
+    width: number;
   };
 
 /**
@@ -119,36 +120,64 @@ const CoverPreviewRenderer = ({
   textAnimation,
   // other props
   colorPalette,
-  computing,
-  height,
-  onReady,
-  onError,
-  style,
   paused,
+  width,
+  style,
+  onStartLoading,
+  onLoad,
+  onError,
   ...props
 }: CoverPreviewRendererProps) => {
-  const borderRadius = height * COVER_RATIO * COVER_CARD_RADIUS;
+  const height = width / COVER_RATIO;
+  const borderRadius = width * COVER_CARD_RADIUS;
 
-  const [loadingFailed, setLoadingFailed] = useState(false);
-  const willLoad = !!uri || (Platform.OS === 'android' && !!backgroundImageUri);
-  const [isLoading, setIsLoading] = useState(willLoad);
-  useEffect(() => {
-    setIsLoading(willLoad);
-  }, [willLoad]);
+  const loadingStatus = useRef({
+    mediaLoading: !!uri || (Platform.OS === 'android' && !!backgroundImageUri),
+    foregroundLoading: !!foregroundImageUri,
+    backgroundLoading: !!backgroundImageUri && Platform.OS !== 'android',
+  });
 
-  const willForegroundLoad = !!foregroundId;
-  const [foregroundLoading, setForegroundLoading] =
-    useState(willForegroundLoad);
-  useEffect(() => {
-    setForegroundLoading(willForegroundLoad);
-  }, [willForegroundLoad]);
+  const prevProps = useRef({
+    uri,
+    foregroundImageUri,
+    backgroundImageUri,
+  });
 
-  const willBackgroundLoad = !!backgroundId && Platform.OS !== 'android';
-  const [backgroundLoading, setBackgroundLoading] =
-    useState(willBackgroundLoad);
+  const [allMediaLoaded, setAllMediaLoaded] = useState(
+    !loadingStatus.current.mediaLoading &&
+      !loadingStatus.current.foregroundLoading &&
+      !loadingStatus.current.backgroundLoading,
+  );
+
   useEffect(() => {
-    setForegroundLoading(willBackgroundLoad);
-  }, [willBackgroundLoad]);
+    if (prevProps.current.uri !== uri) {
+      const mediaLoading = !!uri;
+      loadingStatus.current.mediaLoading = mediaLoading;
+      if (mediaLoading) {
+        setAllMediaLoaded(false);
+      }
+    }
+    if (prevProps.current.foregroundImageUri !== foregroundImageUri) {
+      const foregroundLoading = !!foregroundImageUri;
+      loadingStatus.current.foregroundLoading = foregroundLoading;
+      if (foregroundLoading) {
+        setAllMediaLoaded(false);
+      }
+    }
+    if (prevProps.current.backgroundImageUri !== backgroundImageUri) {
+      const mediaLoading =
+        loadingStatus.current.mediaLoading ||
+        (Platform.OS === 'android' && !!backgroundImageUri);
+      const backgroundLoading =
+        !!backgroundImageUri && Platform.OS !== 'android';
+
+      loadingStatus.current.mediaLoading = mediaLoading;
+      loadingStatus.current.backgroundLoading = backgroundLoading;
+      if (backgroundLoading || mediaLoading) {
+        setAllMediaLoaded(false);
+      }
+    }
+  }, [backgroundImageUri, foregroundImageUri, uri]);
 
   const [videoReady, setVideoReady] = useState(kind !== 'video');
   useEffect(() => {
@@ -156,45 +185,37 @@ const CoverPreviewRenderer = ({
   }, [kind]);
 
   const mediasReadyHandler = useCallback(() => {
-    if (!foregroundLoading && !backgroundLoading && !isLoading) {
-      onReady?.();
+    const { mediaLoading, foregroundLoading, backgroundLoading } =
+      loadingStatus.current;
+    if (!mediaLoading && !foregroundLoading && !backgroundLoading) {
+      onLoad?.();
+      setAllMediaLoaded(true);
     }
-  }, [backgroundLoading, foregroundLoading, isLoading, onReady]);
+  }, [onLoad]);
+
+  useEffect(() => {
+    if (!allMediaLoaded) {
+      onStartLoading?.();
+    }
+  }, [allMediaLoaded, onStartLoading]);
 
   const onMediaLoad = useCallback(() => {
-    setIsLoading(false);
+    loadingStatus.current.mediaLoading = false;
     mediasReadyHandler();
   }, [mediasReadyHandler]);
-
-  const onMediaLoadingError = useCallback(() => {
-    setLoadingFailed(true);
-    onError?.();
-  }, [onError]);
 
   const onForegroundLoad = useCallback(() => {
-    setForegroundLoading(false);
+    loadingStatus.current.foregroundLoading = false;
     mediasReadyHandler();
   }, [mediasReadyHandler]);
-
-  const onForegroundLoadingError = useCallback(() => {
-    setForegroundLoading(false);
-  }, []);
 
   const onBackgroundLoad = useCallback(() => {
-    setBackgroundLoading(false);
+    loadingStatus.current.backgroundLoading = false;
     mediasReadyHandler();
   }, [mediasReadyHandler]);
-
-  const onBackgroundLoadingError = useCallback(() => {
-    setBackgroundLoading(false);
-  }, []);
 
   const onVideoLoaded = useCallback(() => {
     setVideoReady(true);
-  }, []);
-
-  const onRetry = useCallback(() => {
-    setLoadingFailed(false);
   }, []);
 
   const styles = useStyleSheet(styleSheet);
@@ -206,10 +227,9 @@ const CoverPreviewRenderer = ({
       top: 0,
       left: 0,
       height,
-      width: height * COVER_RATIO,
-      aspectRatio: COVER_RATIO,
+      width,
     }),
-    [height],
+    [height, width],
   );
 
   const animationSharedValue = useSharedValue(0);
@@ -233,15 +253,7 @@ const CoverPreviewRenderer = ({
 
   useEffect(() => {
     animationSharedValue.value = 0;
-    if (
-      !paused &&
-      !loadingFailed &&
-      !computing &&
-      !isLoading &&
-      !foregroundLoading &&
-      !backgroundLoading &&
-      videoReady
-    ) {
+    if (!paused && allMediaLoaded && videoReady) {
       // we setup the animations even for the video cover
       // to avoid flickering of the animation due to the delay
       // of inProgress event on the first frames
@@ -251,52 +263,29 @@ const CoverPreviewRenderer = ({
         false,
       );
     }
-    // we want to restart the animation when the text animation or the media animation change
   }, [
     animationSharedValue,
     paused,
+    videoReady,
+    allMediaLoaded,
+    // we want to restart the animation when the text animation or the media animation change
     textAnimation,
     mediaAnimation,
-    loadingFailed,
-    computing,
-    isLoading,
-    foregroundLoading,
-    videoReady,
-    backgroundLoading,
   ]);
 
-  const intl = useIntl();
-
-  let content: React.ReactNode = null;
-  if (loadingFailed) {
-    content = (
-      <View style={styles.errorContainer}>
-        <Text variant="error" style={styles.errorMessage}>
-          <FormattedMessage
-            defaultMessage="Failed to load the informations of your cover"
-            description="Error message displayed when cover image failed to load"
-          />
-        </Text>
-        <Button
-          onPress={onRetry}
-          label={intl.formatMessage({
-            defaultMessage: 'Retry',
-            description:
-              'label of the button allowing  to retry loading cover image',
-          })}
-        />
-      </View>
-    );
-  } else {
-    content = (
-      <>
+  return (
+    <View
+      style={[styles.root, { borderRadius, height }, styles.coverShadow, style]}
+      {...props}
+    >
+      <View style={[styles.topPanelContent, { borderRadius }]}>
         <View
           style={{
             position: 'absolute',
             top: 0,
             left: 0,
             height,
-            width: height * COVER_RATIO,
+            width,
             backgroundColor: swapColor(backgroundColor, colorPalette) as any,
           }}
         />
@@ -310,7 +299,7 @@ const CoverPreviewRenderer = ({
             kind="png"
             animationSharedValue={paused ? null : animationSharedValue}
             onReady={onBackgroundLoad}
-            onError={onBackgroundLoadingError}
+            onError={onError}
             style={layerStyle}
           />
         )}
@@ -318,7 +307,7 @@ const CoverPreviewRenderer = ({
           <MediaAnimator
             animation={mediaAnimation}
             animationSharedValue={paused ? null : animationSharedValue}
-            width={height * COVER_RATIO}
+            width={width}
             height={height}
             style={styles.cover}
           >
@@ -345,9 +334,9 @@ const CoverPreviewRenderer = ({
               )}
               filter={filter}
               editionParameters={editionParameters}
-              paused={paused || foregroundLoading}
+              paused={paused || !allMediaLoaded}
               onLoadingEnd={onMediaLoad}
-              onLoadingError={onMediaLoadingError}
+              onLoadingError={onError}
               onVideoLoaded={onVideoLoaded}
               style={styles.cover}
               testID="cover-edition-screen-cover-preview"
@@ -365,7 +354,7 @@ const CoverPreviewRenderer = ({
             kind={foregroundKind ?? 'png'}
             animationSharedValue={paused ? null : animationSharedValue}
             onReady={onForegroundLoad}
-            onError={onForegroundLoadingError}
+            onError={onError}
             style={layerStyle}
           />
         )}
@@ -384,24 +373,7 @@ const CoverPreviewRenderer = ({
           height={height}
           animationSharedValue={paused ? null : animationSharedValue}
         />
-
-        {(computing || isLoading) && (
-          <Delay delay={computing ? 0 : 100}>
-            <View style={styles.maskComputingOverlay}>
-              <ActivityIndicator color="white" />
-            </View>
-          </Delay>
-        )}
-      </>
-    );
-  }
-
-  return (
-    <View
-      style={[styles.root, { borderRadius, height }, styles.coverShadow, style]}
-      {...props}
-    >
-      <View style={[styles.topPanelContent, { borderRadius }]}>{content}</View>
+      </View>
     </View>
   );
 };

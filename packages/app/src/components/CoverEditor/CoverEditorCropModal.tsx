@@ -170,7 +170,7 @@ const CoverEditorCropModal = ({
               textPosition={coverStyle?.textPosition}
               // other props
               colorPalette={colorPalette!}
-              height={coverHeight}
+              width={coverHeight * COVER_RATIO}
               style={{ flex: 1, shadowOpacity: 0 }}
             />
           )}
