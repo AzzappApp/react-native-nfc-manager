@@ -1,5 +1,6 @@
-## 0.5.2-canary.98
+## 0.5.2-canary.99
 
+* **fix:**  - **home:** [#2107](https://github.com/AzzappApp/azzapp/pull/2107) adapt bottom menu on home on new profile case ([#2117](https://github.com/AzzappApp/azzapp/pull/2117))
 * **fix:**  - **CoverEdition:** prevent rerendering of media when paused/unpaused ([#2116](https://github.com/AzzappApp/azzapp/pull/2116))
 * **feat:**  - add text animations ([#2112](https://github.com/AzzappApp/azzapp/pull/2112))
 * **fix:**  - **account:** [#2110](https://github.com/AzzappApp/azzapp/pull/2110) remove webcard from account details screen header ([#2115](https://github.com/AzzappApp/azzapp/pull/2115))
