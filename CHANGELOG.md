@@ -1,5 +1,6 @@
-## 0.5.2-canary.94
+## 0.5.2-canary.95
 
+* **feat:**  - **CoverEdition:** new loading/error indicator system ([#2100](https://github.com/AzzappApp/azzapp/pull/2100))
 * **feat:**  - add lottie animation on cover on web ([#2094](https://github.com/AzzappApp/azzapp/pull/2094))
 * **fix:**  - webcard scan view counter ([#2106](https://github.com/AzzappApp/azzapp/pull/2106))
 * **fix:**  - add action on multiuser header right element cover ([#2092](https://github.com/AzzappApp/azzapp/pull/2092))
