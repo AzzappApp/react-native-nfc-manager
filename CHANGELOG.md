@@ -1,5 +1,7 @@
-## 0.5.2-canary.95
+## 0.5.2-canary.96
 
+* **fix:**  - **CoverEdition:** don't apply mask on demo media ([#2114](https://github.com/AzzappApp/azzapp/pull/2114))
+* **fix:**  - **CoverEdition:** Easing of animations ([#2111](https://github.com/AzzappApp/azzapp/pull/2111))
 * **feat:**  - **CoverEdition:** new loading/error indicator system ([#2100](https://github.com/AzzappApp/azzapp/pull/2100))
 * **feat:**  - add lottie animation on cover on web ([#2094](https://github.com/AzzappApp/azzapp/pull/2094))
 * **fix:**  - webcard scan view counter ([#2106](https://github.com/AzzappApp/azzapp/pull/2106))
