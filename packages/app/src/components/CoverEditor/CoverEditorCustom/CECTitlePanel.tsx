@@ -3,6 +3,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { Image, StyleSheet, View } from 'react-native';
 import {
+  Easing,
   useSharedValue,
   withRepeat,
   withTiming,
@@ -165,6 +166,18 @@ const CECTitlePanel = ({
   const placementsLabels = usePlacementsLabels();
   const orientationsLabel = useOrientationsLabels();
 
+  const animationSharedValue = useSharedValue(0);
+  useEffect(() => {
+    animationSharedValue.value = withRepeat(
+      withTiming(1, {
+        duration: COVER_ANIMATION_DURATION,
+        easing: Easing.linear,
+      }),
+      -1,
+      false,
+    );
+  }, [animationSharedValue]);
+
   const renderTextAnimationSample = useCallback(
     ({ item, height }: BoxButtonItemInfo<string>) => {
       return (
@@ -178,6 +191,7 @@ const CECTitlePanel = ({
           textPosition={textPosition}
           colorPalette={colorPalette}
           height={height}
+          animationSharedValue={animationSharedValue}
         />
       );
     },
@@ -189,6 +203,7 @@ const CECTitlePanel = ({
       textOrientation,
       textPosition,
       colorPalette,
+      animationSharedValue,
     ],
   );
 
@@ -369,15 +384,6 @@ const AnimationSample = ({
   textAnimation,
   ...props
 }: CoverTextRendererProps) => {
-  const animationSharedValue = useSharedValue(0);
-  useEffect(() => {
-    animationSharedValue.value = withRepeat(
-      withTiming(1, { duration: COVER_ANIMATION_DURATION }),
-      -1,
-      false,
-    );
-  }, [animationSharedValue]);
-
   const titleStyle = useMemo(
     () => ({
       fontFamily: DEFAULT_COVER_FONT_FAMILY,
@@ -404,7 +410,6 @@ const AnimationSample = ({
       titleStyle={titleStyle}
       subTitleStyle={subTitleStyle}
       textAnimation={textAnimation}
-      animationSharedValue={animationSharedValue}
     />
   );
 };

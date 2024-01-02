@@ -10,6 +10,7 @@ import {
   useSharedValue,
   withRepeat,
   withTiming,
+  Easing,
 } from 'react-native-reanimated';
 import { swapColor } from '@azzapp/shared/cardHelpers';
 import {
@@ -243,7 +244,7 @@ const CoverPreviewRenderer = ({
         } else {
           animationSharedValue.value = withTiming(
             currentTime / duration + 0.1 / duration,
-            { duration: 100 },
+            { duration: 100, easing: Easing.linear },
           );
         }
       }
@@ -258,7 +259,10 @@ const CoverPreviewRenderer = ({
       // to avoid flickering of the animation due to the delay
       // of inProgress event on the first frames
       animationSharedValue.value = withRepeat(
-        withTiming(1, { duration: COVER_ANIMATION_DURATION }),
+        withTiming(1, {
+          duration: COVER_ANIMATION_DURATION,
+          easing: Easing.linear,
+        }),
         -1,
         false,
       );

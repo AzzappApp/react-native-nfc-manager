@@ -3,6 +3,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { StyleSheet, View } from 'react-native';
 import {
+  Easing,
   useSharedValue,
   withRepeat,
   withTiming,
@@ -28,6 +29,7 @@ import TabsBar from '#ui/TabsBar';
 import TabView from '#ui/TabView';
 import type { BoxButtonItemInfo } from '#components/BoxSelectionList';
 import type { StyleProp, ViewStyle } from 'react-native';
+import type { SharedValue } from 'react-native-reanimated';
 
 type CECImageEditionPanelProps = {
   /**
@@ -71,6 +73,18 @@ const CECImageEditionPanel = ({
 
   const intl = useIntl();
 
+  const animationSharedValue = useSharedValue(0);
+  useEffect(() => {
+    animationSharedValue.value = withRepeat(
+      withTiming(1, {
+        duration: COVER_ANIMATION_DURATION,
+        easing: Easing.linear,
+      }),
+      -1,
+      false,
+    );
+  }, [animationSharedValue]);
+
   const renderAnimationSample = useCallback(
     ({ item, height }: BoxButtonItemInfo<string>) => {
       return (
@@ -82,10 +96,11 @@ const CECImageEditionPanel = ({
           filter={filter}
           editionParameters={editionParameters}
           height={height}
+          animationSharedValue={animationSharedValue}
         />
       );
     },
-    [uri, kind, time, filter, editionParameters],
+    [uri, kind, time, filter, editionParameters, animationSharedValue],
   );
 
   if (!uri) {
@@ -196,6 +211,7 @@ type AnimationSampleProps = {
   editionParameters: EditionParameters;
   animation: string | null;
   height: number;
+  animationSharedValue: SharedValue<number>;
 };
 
 const AnimationSample = ({
@@ -206,15 +222,8 @@ const AnimationSample = ({
   editionParameters,
   animation,
   height,
+  animationSharedValue,
 }: AnimationSampleProps) => {
-  const animationSharedValue = useSharedValue(0);
-  useEffect(() => {
-    animationSharedValue.value = withRepeat(
-      withTiming(1, { duration: COVER_ANIMATION_DURATION }),
-      -1,
-      false,
-    );
-  }, [animationSharedValue]);
   if (!uri || !kind) {
     return null;
   }

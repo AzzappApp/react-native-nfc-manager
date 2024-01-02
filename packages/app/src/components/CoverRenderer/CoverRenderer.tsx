@@ -11,6 +11,7 @@ import {
   useSharedValue,
   withRepeat,
   withTiming,
+  Easing,
 } from 'react-native-reanimated';
 import { graphql, useFragment } from 'react-relay';
 import { DEFAULT_COLOR_PALETTE, swapColor } from '@azzapp/shared/cardHelpers';
@@ -288,6 +289,7 @@ const CoverRenderer = (
           currentTime / duration + 0.1 / duration,
           {
             duration: 100,
+            easing: Easing.linear,
           },
         );
       }
@@ -309,7 +311,10 @@ const CoverRenderer = (
         // to avoid flickering of the animation due to the delay
         // of inProgress event on the first frames
         animationSharedValue.value = withRepeat(
-          withTiming(1, { duration: COVER_ANIMATION_DURATION }),
+          withTiming(1, {
+            duration: COVER_ANIMATION_DURATION,
+            easing: Easing.linear,
+          }),
           -1,
           false,
         );

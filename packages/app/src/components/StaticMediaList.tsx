@@ -1,8 +1,19 @@
 import chroma from 'chroma-js';
-import { memo, useCallback, useMemo } from 'react';
+import { memo, useCallback, useEffect, useMemo } from 'react';
 import { Image, View, StyleSheet } from 'react-native';
+import {
+  useAnimatedProps,
+  useSharedValue,
+  withRepeat,
+  withTiming,
+  Easing,
+} from 'react-native-reanimated';
 import { graphql, useFragment } from 'react-relay';
-import { COVER_CARD_RADIUS, COVER_RATIO } from '@azzapp/shared/coverHelpers';
+import {
+  COVER_ANIMATION_DURATION,
+  COVER_CARD_RADIUS,
+  COVER_RATIO,
+} from '@azzapp/shared/coverHelpers';
 import { colors } from '#theme';
 import BoxSelectionList from './BoxSelectionList';
 import CardModuleBackgroundImage from './cardModules/CardModuleBackgroundImage';
@@ -14,6 +25,7 @@ import type {
 } from '@azzapp/relay/artifacts/StaticMediaList_staticMedias.graphql';
 import type { ArrayItemType } from '@azzapp/shared/arrayHelpers';
 import type { ColorValue } from 'react-native';
+import type { SharedValue } from 'react-native-reanimated';
 
 import type { ViewProps } from 'react-native-svg/lib/typescript/fabric/utils';
 
@@ -88,6 +100,18 @@ const StaticMediaList = ({
     return backgroundColor;
   }, [backgroundColor, tintColor]);
 
+  const animationSharedValue = useSharedValue(0);
+  useEffect(() => {
+    animationSharedValue.value = withRepeat(
+      withTiming(1, {
+        duration: COVER_ANIMATION_DURATION,
+        easing: Easing.linear,
+      }),
+      -1,
+      false,
+    );
+  }, [animationSharedValue]);
+
   const renderItem = useCallback(
     ({ item, height, width }: BoxButtonItemInfo<StaticMediaItem>) => {
       if (item) {
@@ -101,12 +125,13 @@ const StaticMediaList = ({
             tintColor={tintColor}
             height={height}
             width={width}
+            animationSharedValue={animationSharedValue}
           />
         );
       }
       return null;
     },
-    [visiblebackgroundColor, imageRatio, tintColor],
+    [visiblebackgroundColor, imageRatio, tintColor, animationSharedValue],
   );
 
   const onSelect = useCallback(
@@ -152,6 +177,7 @@ type StaticMediaListItemProps = {
    * @type {('center' | 'contain' | 'cover' | 'repeat' | 'stretch' | null)}
    */
   resizeMode: string | null;
+  animationSharedValue: SharedValue<number>;
   kind: string;
 };
 
@@ -164,8 +190,15 @@ const StaticMediaListItem = ({
   kind,
   width,
   height,
-}: StaticMediaListItemProps) =>
-  item?.smallURI ? (
+  animationSharedValue,
+}: StaticMediaListItemProps) => {
+  const animationProps = useAnimatedProps(() => {
+    return {
+      progress: animationSharedValue.value,
+    };
+  }, [animationSharedValue]);
+
+  return item?.smallURI ? (
     <View
       style={[
         {
@@ -190,8 +223,7 @@ const StaticMediaListItem = ({
         <CoverLottiePlayer
           src={item.smallURI}
           tintColor={tintColor as string}
-          autoPlay
-          loop
+          animatedProps={animationProps}
           hardwareAccelerationAndroid
           style={[
             styles.image,
@@ -228,6 +260,7 @@ const StaticMediaListItem = ({
       ]}
     />
   );
+};
 
 const StaticMediaListItemMemo = memo(StaticMediaListItem);
 
