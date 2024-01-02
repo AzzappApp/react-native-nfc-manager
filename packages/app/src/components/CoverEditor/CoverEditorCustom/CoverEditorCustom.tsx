@@ -6,8 +6,8 @@ import { graphql, useFragment } from 'react-relay';
 import { DEFAULT_COLOR_LIST } from '@azzapp/shared/cardHelpers';
 import {
   COVER_RATIO,
-  textOrientationOrDefaut,
-  textPositionOrDefaut,
+  textOrientationOrDefault,
+  textPositionOrDefault,
 } from '@azzapp/shared/coverHelpers';
 import { CameraButton, CropButton } from '#components/commonsButtons';
 import CoverLoadingIndicator from '#components/CoverLoadingIndicator';
@@ -493,8 +493,8 @@ const CoverEditorCustom = ({
                 subTitle={subTitle}
                 titleStyle={titleStyle}
                 subTitleStyle={subTitleStyle}
-                textOrientation={textOrientationOrDefaut(textOrientation)}
-                textPosition={textPositionOrDefaut(textPosition)}
+                textOrientation={textOrientationOrDefault(textOrientation)}
+                textPosition={textPositionOrDefault(textPosition)}
                 textAnimation={textAnimation}
                 mediaAnimation={mediaAnimation}
                 onStartLoading={onStartLoading}

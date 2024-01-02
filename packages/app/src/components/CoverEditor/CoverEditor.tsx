@@ -22,8 +22,8 @@ import {
   COVER_RATIO,
   DEFAULT_COVER_SUBTITLE_TEXT_STYLE,
   DEFAULT_COVER_TEXT_STYLE,
-  textOrientationOrDefaut,
-  textPositionOrDefaut,
+  textOrientationOrDefault,
+  textPositionOrDefault,
 } from '@azzapp/shared/coverHelpers';
 import { extractLayoutParameters } from '#components/gpu';
 import ScreenModal from '#components/ScreenModal';
@@ -244,8 +244,8 @@ const CoverEditor = (
       titleStyle: cardCover.titleStyle ?? DEFAULT_COVER_TEXT_STYLE,
       subTitleStyle:
         cardCover.subTitleStyle ?? DEFAULT_COVER_SUBTITLE_TEXT_STYLE,
-      textOrientation: textOrientationOrDefaut(cardCover.textOrientation),
-      textPosition: textPositionOrDefaut(cardCover.textPosition),
+      textOrientation: textOrientationOrDefault(cardCover.textOrientation),
+      textPosition: textPositionOrDefault(cardCover.textPosition),
       textAnimation: cardCover?.textAnimation ?? null,
       mediaFilter: cardCover.mediaFilter ?? null,
       mediaAnimation: cardCover.mediaAnimation ?? null,
@@ -352,7 +352,7 @@ const CoverEditor = (
   // #region Suggested Media
   const {
     suggestedMedia,
-    busy: suggededMediaLoaderBusy,
+    busy: suggestedMediaLoaderBusy,
     onNextSuggestedMedia,
   } = useSuggestedMedias(viewer, templateKind);
 
@@ -677,7 +677,7 @@ const CoverEditor = (
             templateKind={templateKind}
             mediaVisible={mediaVisible}
             toggleMediaVisibility={toggleMediaVisibility}
-            suggededMediaLoaderBusy={suggededMediaLoaderBusy}
+            suggestedMediaLoaderBusy={suggestedMediaLoaderBusy}
             onNextSuggestedMedia={onNextSuggestedMedia}
             hasSuggestedMedia={!!suggestedMedia}
           />

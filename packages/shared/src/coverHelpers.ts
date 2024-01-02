@@ -134,7 +134,7 @@ export const TEXT_ORIENTATIONS = [
 /**
  * An helper function that returns the given position if it is valid, otherwise it returns the default one
  */
-export const textPositionOrDefaut = (
+export const textPositionOrDefault = (
   position: string | null | undefined,
 ): TextPosition =>
   TEXT_POSITIONS.includes(position as any)
@@ -164,7 +164,7 @@ export type TextOrientation = (typeof TEXT_ORIENTATIONS)[number];
  * An helper function that returns the given orientation if it is valid, otherwise it returns the default one
  *
  */
-export const textOrientationOrDefaut = (
+export const textOrientationOrDefault = (
   orientation: string | null | undefined,
 ): TextOrientation =>
   TEXT_ORIENTATIONS.includes(orientation as any)

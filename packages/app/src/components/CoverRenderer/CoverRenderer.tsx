@@ -20,8 +20,8 @@ import {
   COVER_BASE_WIDTH,
   COVER_CARD_RADIUS,
   COVER_RATIO,
-  textOrientationOrDefaut,
-  textPositionOrDefaut,
+  textOrientationOrDefault,
+  textPositionOrDefault,
 } from '@azzapp/shared/coverHelpers';
 import { colors } from '#theme';
 import useLatestCallback from '#hooks/useLatestCallback';
@@ -445,8 +445,8 @@ const CoverRenderer = (
             <CoverTextRenderer
               title={title}
               subTitle={subTitle}
-              textOrientation={textOrientationOrDefaut(textOrientation)}
-              textPosition={textPositionOrDefaut(textPosition)}
+              textOrientation={textOrientationOrDefault(textOrientation)}
+              textPosition={textPositionOrDefault(textPosition)}
               textAnimation={textAnimation}
               titleStyle={titleStyle}
               subTitleStyle={subTitleStyle}

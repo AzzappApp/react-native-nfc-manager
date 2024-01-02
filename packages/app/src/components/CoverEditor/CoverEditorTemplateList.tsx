@@ -21,8 +21,8 @@ import { DEFAULT_COLOR_PALETTE } from '@azzapp/shared/cardHelpers';
 import {
   COVER_CARD_RADIUS,
   COVER_RATIO,
-  textOrientationOrDefaut,
-  textPositionOrDefaut,
+  textOrientationOrDefault,
+  textPositionOrDefault,
 } from '@azzapp/shared/coverHelpers';
 import { colors, shadow } from '#theme';
 import ColorTriptychRenderer from '#components/ColorTriptychRenderer';
@@ -322,14 +322,14 @@ const CoverEditorTemplateList = ({
         titleStyle,
         subTitle,
         subTitleStyle,
-        textOrientation: textOrientationOrDefaut(textOrientation),
-        textPosition: textPositionOrDefaut(textPosition),
+        textOrientation: textOrientationOrDefault(textOrientation),
+        textPosition: textPositionOrDefault(textPosition),
         textAnimation,
         media: templateMedia,
         mediaFilter,
         mediaParameters: itemMediaParameters,
         mediaAnimation: mediaAnimation ?? null,
-        maskUri: kind === 'people' ? maskUri : null,
+        maskUri: kind === 'people' && mediaVisible ? maskUri : null,
         background: background ?? null,
         backgroundColor,
         backgroundPatternColor,
