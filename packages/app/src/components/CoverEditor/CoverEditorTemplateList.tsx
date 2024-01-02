@@ -411,7 +411,7 @@ const CoverEditorTemplateList = ({
   >({ cover: cardColors ? -1 : 0 });
 
   const carouselRef = useRef<CarouselSelectListHandle>(null);
-  const colorPalletesListRef = useRef<FlatList<ColorPalette> | null>(null);
+  const colorPalettesListRef = useRef<FlatList<ColorPalette> | null>(null);
   const onSelectedIndexChangeInner = useCallback(
     (index: number) => {
       onSelectedIndexChange?.(index);
@@ -419,7 +419,7 @@ const CoverEditorTemplateList = ({
       setSelectedItem(selectedItem);
       const colorPaletteIndex = colorPalettesIndexes[selectedItem.id] ?? 0;
       if (colorPaletteIndex !== -1) {
-        colorPalletesListRef.current?.scrollToIndex({
+        colorPalettesListRef.current?.scrollToIndex({
           index: colorPaletteIndex,
           viewOffset: 16,
           animated: false,
@@ -517,7 +517,7 @@ const CoverEditorTemplateList = ({
     if (viewableIndexRef.current.includes(nextIndex)) {
       return;
     }
-    colorPalletesListRef.current?.scrollToIndex({
+    colorPalettesListRef.current?.scrollToIndex({
       index: nextIndex,
       viewOffset: 16,
     });
@@ -706,7 +706,7 @@ const CoverEditorTemplateList = ({
           }
         >
           <FlatList
-            ref={colorPalletesListRef}
+            ref={colorPalettesListRef}
             horizontal
             showsHorizontalScrollIndicator={false}
             style={{
@@ -913,7 +913,7 @@ const CoverEditorTemplateRenderer = ({
         <CoverErrorRenderer
           label={
             <FormattedMessage
-              defaultMessage="An error occured while loading this template"
+              defaultMessage="An error occurred while loading this template"
               description="Error message displayed when a template failed to load in CoverEditor"
             />
           }

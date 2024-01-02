@@ -3,6 +3,7 @@ import Animated, {
   interpolate,
   useAnimatedStyle,
   Easing,
+  useDerivedValue,
 } from 'react-native-reanimated';
 import getCoverAnimationProgress from './getCoverAnimationProgress';
 import type { TransformsStyle, ViewProps, ViewStyle } from 'react-native';
@@ -21,10 +22,19 @@ const MediaAnimator = ({
   ...props
 }: MediaAnimatorProps) => {
   const Animator = animation && ANIMATORS[animation];
-  if (!Animator || !animationSharedValue) {
+  const forwardAnimationSharedValue = useDerivedValue(() => {
+    if (animationSharedValue) {
+      return animationSharedValue.value;
+    }
+    return -1;
+  }, [animationSharedValue]);
+
+  if (!Animator) {
     return <View {...props} />;
   }
-  return <Animator animationSharedValue={animationSharedValue} {...props} />;
+  return (
+    <Animator animationSharedValue={forwardAnimationSharedValue} {...props} />
+  );
 };
 
 export default MediaAnimator;
@@ -67,6 +77,9 @@ const createSimpleAnimation = (
     ...props
   }: AnimationProps) => {
     const animatedStyle = useAnimatedStyle(() => {
+      if (animationSharedValue.value === -1) {
+        return {};
+      }
       return animatedStyleWorklet(animationSharedValue, width, height);
     });
     return <Animated.View style={[style, animatedStyle]} {...props} />;
