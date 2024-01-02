@@ -1,38 +1,15 @@
 import { FormattedMessage, useIntl } from 'react-intl';
 import { View, StyleSheet, Linking, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { graphql, usePreloadedQuery } from 'react-relay';
 
 import AccountHeader from '#components/AccountHeader';
-import relayScreen from '#helpers/relayScreen';
 
 import Container from '#ui/Container';
 import Icon from '#ui/Icon';
 import PressableNative from '#ui/PressableNative';
 import Text from '#ui/Text';
 
-import type { RelayScreenProps } from '#helpers/relayScreen';
-import type { AboutRoute } from '#routes';
-import type { AboutScreenWebCardQuery } from '@azzapp/relay/artifacts/AboutScreenWebCardQuery.graphql';
-
-const aboutScreenWebCardQuery = graphql`
-  query AboutScreenWebCardQuery {
-    viewer {
-      profile {
-        webCard {
-          userName
-          ...AccountHeader_webCard
-        }
-      }
-    }
-  }
-`;
-
-const AboutScreen = ({
-  preloadedQuery,
-}: RelayScreenProps<AboutRoute, AboutScreenWebCardQuery>) => {
-  const { viewer } = usePreloadedQuery(aboutScreenWebCardQuery, preloadedQuery);
-
+const AboutScreen = () => {
   const intl = useIntl();
 
   return (
@@ -44,7 +21,7 @@ const AboutScreen = ({
         }}
       >
         <AccountHeader
-          webCard={viewer?.profile?.webCard ?? null}
+          webCard={null}
           title={intl.formatMessage({
             defaultMessage: 'About',
             description: 'Title of the about screen',
@@ -112,9 +89,7 @@ const AboutScreen = ({
   );
 };
 
-export default relayScreen(AboutScreen, {
-  query: aboutScreenWebCardQuery,
-});
+export default AboutScreen;
 
 const styles = StyleSheet.create({
   aboutIcon: { width: 50, height: 50, alignSelf: 'center' },

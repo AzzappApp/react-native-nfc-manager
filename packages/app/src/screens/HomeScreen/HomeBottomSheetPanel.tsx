@@ -129,7 +129,7 @@ const HomeBottomSheetPanel = ({
     >
       <View style={styles.bottomSheetOptionsContainer}>
         <>
-          <Link route="ACCOUNT_DETAILS" params={{ withProfile }}>
+          <Link route="ACCOUNT_DETAILS">
             <PressableNative
               style={styles.bottomSheetOptionButton}
               onPress={close}
@@ -192,26 +192,28 @@ const HomeBottomSheetPanel = ({
               </View>
             </PressableNative>
           )}
-          <Link route="INVITE_FRIENDS">
-            <PressableNative
-              style={styles.bottomSheetOptionButton}
-              onPress={close}
-            >
-              <View style={styles.bottomSheetOptionContainer}>
-                <View style={styles.bottomSheetOptionIconLabel}>
-                  <Icon icon="invite" />
-                  <Text>
-                    <FormattedMessage
-                      defaultMessage="Invite friends"
-                      description="Invite friends to join the app"
-                    />
-                  </Text>
+          {withProfile ? (
+            <Link route="INVITE_FRIENDS">
+              <PressableNative
+                style={styles.bottomSheetOptionButton}
+                onPress={close}
+              >
+                <View style={styles.bottomSheetOptionContainer}>
+                  <View style={styles.bottomSheetOptionIconLabel}>
+                    <Icon icon="invite" />
+                    <Text>
+                      <FormattedMessage
+                        defaultMessage="Invite friends"
+                        description="Invite friends to join the app"
+                      />
+                    </Text>
+                  </View>
+                  <Icon icon="arrow_right" />
                 </View>
-                <Icon icon="arrow_right" />
-              </View>
-            </PressableNative>
-          </Link>
-          {profileRole && isAdmin(profileRole) ? (
+              </PressableNative>
+            </Link>
+          ) : null}
+          {withProfile && profileRole && isAdmin(profileRole) ? (
             <Link route="MULTI_USER">
               <PressableNative
                 style={styles.bottomSheetOptionButton}
@@ -233,7 +235,7 @@ const HomeBottomSheetPanel = ({
             </Link>
           ) : null}
         </>
-        <Link route="ABOUT" params={{ withProfile }}>
+        <Link route="ABOUT">
           <PressableNative
             style={styles.bottomSheetOptionButton}
             onPress={close}

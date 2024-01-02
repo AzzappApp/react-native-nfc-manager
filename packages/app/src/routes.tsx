@@ -5,9 +5,7 @@ import type { LayoutRectangle } from 'react-native';
 
 export type AboutRoute = {
   route: 'ABOUT';
-  params: {
-    withProfile: boolean;
-  };
+  params?: never;
 };
 
 export type HomeRoute = {
@@ -122,9 +120,7 @@ export type LikedPostsRoute = {
 
 export type AccountDetailsRoute = {
   route: 'ACCOUNT_DETAILS';
-  params: {
-    withProfile: boolean;
-  };
+  params?: never;
 };
 
 export type InviteFriendsRoute = {

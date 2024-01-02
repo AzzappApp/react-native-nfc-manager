@@ -271,7 +271,7 @@ const HomeScreenContent = ({ user: userKey }: HomeScreenContentProps) => {
         <HomeBottomSheetPanel
           visible={showMenu}
           close={toggleShowMenu}
-          withProfile
+          withProfile={currentProfileIndex !== -1}
           profile={currentProfile ?? null}
         />
       </WebCardBoundRelayEnvironmentProvider>

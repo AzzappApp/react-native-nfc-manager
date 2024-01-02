@@ -18,20 +18,10 @@ import AccountDetailsPhoneNumberForm from './AccountDetailsPhoneNumberForm';
 import AccountDetailsScreenFallback from './AccountDetailsScreenFallback';
 import type { RelayScreenProps } from '#helpers/relayScreen';
 import type { AccountDetailsRoute } from '#routes';
-import type { AccountDetailsScreenWithoutProfileQuery } from '@azzapp/relay/artifacts/AccountDetailsScreenWithoutProfileQuery.graphql';
-import type { AccountDetailsScreenWithProfileQuery } from '@azzapp/relay/artifacts/AccountDetailsScreenWithProfileQuery.graphql';
+import type { AccountDetailsScreenQuery } from '@azzapp/relay/artifacts/AccountDetailsScreenQuery.graphql';
 
-const accountDetailsScreenWithProfileQuery = graphql`
-  query AccountDetailsScreenWithProfileQuery {
-    currentUser {
-      email
-      phoneNumber
-    }
-  }
-`;
-
-const accountDetailsScreenWithoutProfileQuery = graphql`
-  query AccountDetailsScreenWithoutProfileQuery {
+const accountDetailsScreenQuery = graphql`
+  query AccountDetailsScreenQuery {
     currentUser {
       email
       phoneNumber
@@ -41,15 +31,9 @@ const accountDetailsScreenWithoutProfileQuery = graphql`
 
 const AccountDetailsScreen = ({
   preloadedQuery,
-  route: { params },
-}: RelayScreenProps<
-  AccountDetailsRoute,
-  AccountDetailsScreenWithoutProfileQuery | AccountDetailsScreenWithProfileQuery
->) => {
+}: RelayScreenProps<AccountDetailsRoute, AccountDetailsScreenQuery>) => {
   const preloaded = usePreloadedQuery(
-    params.withProfile
-      ? accountDetailsScreenWithProfileQuery
-      : accountDetailsScreenWithoutProfileQuery,
+    accountDetailsScreenQuery,
     preloadedQuery,
   );
 
@@ -202,10 +186,7 @@ const styleSheet = createStyleSheet(appearance => ({
 }));
 
 export default relayScreen(AccountDetailsScreen, {
-  query: params =>
-    params.withProfile
-      ? accountDetailsScreenWithProfileQuery
-      : accountDetailsScreenWithoutProfileQuery,
-  webCardBound: params => params.withProfile,
+  query: accountDetailsScreenQuery,
+  webCardBound: false,
   fallback: AccountDetailsScreenFallback,
 });
