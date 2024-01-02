@@ -1,5 +1,7 @@
-## 0.5.2-canary.96
+## 0.5.2-canary.97
 
+* **fix:**  - **account:** [#2110](https://github.com/AzzappApp/azzapp/pull/2110) remove webcard from account details screen header ([#2115](https://github.com/AzzappApp/azzapp/pull/2115))
+* **build:**  - remove patch for next-cloudinary ([#2113](https://github.com/AzzappApp/azzapp/pull/2113))
 * **fix:**  - **CoverEdition:** don't apply mask on demo media ([#2114](https://github.com/AzzappApp/azzapp/pull/2114))
 * **fix:**  - **CoverEdition:** Easing of animations ([#2111](https://github.com/AzzappApp/azzapp/pull/2111))
 * **feat:**  - **CoverEdition:** new loading/error indicator system ([#2100](https://github.com/AzzappApp/azzapp/pull/2100))
