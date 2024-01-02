@@ -654,6 +654,7 @@ const CoverEditorTemplateList = ({
         initialScrollIndex={initialSelectedIndex}
         onSelectedIndexChange={onSelectedIndexChangeInner}
         onEndReached={onEndTemplateReached}
+        onEndReachedThreshold={1}
         extraData={selectedItemId}
       />
       {isLoadingNext && (
@@ -666,6 +667,7 @@ const CoverEditorTemplateList = ({
             top: 0,
             alignItems: 'center',
             justifyContent: 'center',
+            zIndex: -1,
           }}
         >
           <ActivityIndicator />
