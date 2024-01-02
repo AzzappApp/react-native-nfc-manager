@@ -27,13 +27,6 @@ const accountDetailsScreenWithProfileQuery = graphql`
       email
       phoneNumber
     }
-    viewer {
-      profile {
-        webCard {
-          ...AccountHeader_webCard
-        }
-      }
-    }
   }
 `;
 
@@ -60,9 +53,7 @@ const AccountDetailsScreen = ({
     preloadedQuery,
   );
 
-  const viewer = 'viewer' in preloaded ? preloaded.viewer : null;
   const currentUser = preloaded.currentUser;
-  const profile = viewer?.profile;
 
   const [emailsFormVisible, toggleEmailsFormVisible] = useToggle(false);
   const [phoneNumberFormVisible, togglePhoneNumberFormVisible] =
@@ -79,7 +70,7 @@ const AccountDetailsScreen = ({
           rowGap: 15,
         }}
       >
-        <AccountDetailsHeader webCard={profile?.webCard ?? null} />
+        <AccountDetailsHeader />
         <Icon icon="information" style={styles.warningIcon} />
         <View style={{ rowGap: 20, paddingHorizontal: 10 }}>
           <Text variant="xsmall" style={styles.warningMessage}>
