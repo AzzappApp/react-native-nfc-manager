@@ -109,7 +109,7 @@ export const getLastWebCardStatisticsFor = (
     .where(
       and(
         eq(WebCardStatisticTable.webCardId, webCardId),
-        sql`${WebCardStatisticTable.day} >= DATE_SUB(CURDATE(), INTERVAL ${days} DAY)`,
+        sql`${WebCardStatisticTable.day} > DATE_SUB(CURDATE(), INTERVAL ${days} DAY)`,
       ),
     );
 };

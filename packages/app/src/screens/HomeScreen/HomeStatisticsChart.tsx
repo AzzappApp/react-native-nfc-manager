@@ -81,8 +81,9 @@ const HomeStatisticsChart = ({
             if (stats) {
               const index = result.findIndex(item => item.day === stats.day);
               //find the stats in webcard stats for the day
-
-              result[index].data[indexProfile] = stats;
+              if (index !== -1) {
+                result[index].data[indexProfile] = stats;
+              }
             }
           });
           profile.webCard?.statsSummary?.forEach(stats => {
