@@ -2,14 +2,16 @@ import { DESKTOP_WIDTH } from '#helpers/devices';
 
 const fadeIn: Keyframe[] = [
   { opacity: 0, offset: 0, easing: 'ease-in-out' },
+  { opacity: 0, offset: 0.1 },
   { opacity: 1, offset: 0.2 },
   { opacity: 1, offset: 0.8 },
   { opacity: 0, offset: 1 },
 ];
 
 const appear: Keyframe[] = [
-  { opacity: 0, offset: 0 },
-  { opacity: 1, offset: 0.2 },
+  { visibility: 'hidden', offset: 0 },
+  { visibility: 'hidden', offset: 0.1 },
+  { visibility: 'visible', offset: 0.2 },
 ];
 
 const fadeInByLetter = (letterAnimPosition: number): Keyframe[] => [
@@ -20,8 +22,10 @@ const fadeInByLetter = (letterAnimPosition: number): Keyframe[] => [
 ];
 
 const appearByLetter = (letterAnimPosition: number): Keyframe[] => [
-  { opacity: 0, offset: 0 },
-  { opacity: 1, offset: 0.2 + letterAnimPosition * 0.2 },
+  { visibility: 'hidden', offset: 0 },
+  { visibility: 'hidden', offset: letterAnimPosition * 0.2 },
+  { visibility: 'visible', offset: letterAnimPosition * 0.2 + 0.2 },
+  { visibility: 'visible', offset: 1 },
 ];
 
 const bounce: Keyframe[] = [
@@ -29,11 +33,6 @@ const bounce: Keyframe[] = [
     opacity: 0,
     scale: 0.5,
     offset: 0,
-  },
-  {
-    opacity: 0,
-    scale: 0.5,
-    offset: 0.1,
     easing: 'cubic-bezier(0.175, 0.885, 0.32, 1.275)',
   },
   {
@@ -93,8 +92,8 @@ const slideBuilder = (vertical: boolean, minus: boolean) => [
   },
 ];
 
-const slideBottom: Keyframe[] = slideBuilder(true, true);
-const slideTop: Keyframe[] = slideBuilder(true, false);
+const slideBottom: Keyframe[] = slideBuilder(true, false);
+const slideUp: Keyframe[] = slideBuilder(true, true);
 const slideLeft: Keyframe[] = slideBuilder(false, true);
 const slideRight: Keyframe[] = slideBuilder(false, false);
 
@@ -123,8 +122,8 @@ const smoothBuilder = (vertical: boolean, minus: boolean) => [
   },
 ];
 
-const smoothBottom: Keyframe[] = smoothBuilder(true, true);
-const smoothTop: Keyframe[] = smoothBuilder(true, false);
+const smoothBottom: Keyframe[] = smoothBuilder(true, false);
+const smoothUp: Keyframe[] = smoothBuilder(true, true);
 const smoothLeft: Keyframe[] = smoothBuilder(false, true);
 const smoothRight: Keyframe[] = smoothBuilder(false, false);
 
@@ -149,8 +148,8 @@ const slideLettersBuilder =
     },
   ];
 
-const slideLettersBottom = slideLettersBuilder(true, true);
-const slideLettersTop = slideLettersBuilder(true, false);
+const slideLettersBottom = slideLettersBuilder(true, false);
+const slideLettersUp = slideLettersBuilder(true, true);
 const slideLettersLeft = slideLettersBuilder(false, true);
 const slideLettersRight = slideLettersBuilder(false, false);
 
@@ -184,8 +183,8 @@ const smoothLettersBuilder =
     },
   ];
 
-const smoothLettersBottom = smoothLettersBuilder(true, true);
-const smoothLettersTop = smoothLettersBuilder(true, false);
+const smoothLettersBottom = smoothLettersBuilder(true, false);
+const smoothLettersUp = smoothLettersBuilder(true, true);
 const smoothLettersLeft = smoothLettersBuilder(false, true);
 const smoothLettersRight = smoothLettersBuilder(false, false);
 
@@ -199,17 +198,17 @@ export const textAnimations = {
   slideLeft,
   slideRight,
   slideBottom,
-  slideTop,
+  slideUp,
   slideLettersLeft,
   slideLettersRight,
   slideLettersBottom,
-  slideLettersTop,
+  slideLettersUp,
   smoothLeft,
   smoothRight,
   smoothBottom,
-  smoothTop,
+  smoothUp,
   smoothLettersLeft,
   smoothLettersRight,
   smoothLettersBottom,
-  smoothLettersTop,
+  smoothLettersUp,
 };
