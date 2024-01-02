@@ -60,6 +60,7 @@ const CoverRendererBackground = ({
         mediaId={media.id}
         alt="background"
         quality={1}
+        priority
         fill
         sizes="100vw"
         videoThumbnail={media.kind === 'video'}

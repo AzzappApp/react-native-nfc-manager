@@ -19,6 +19,7 @@ import styles from './CoverRenderer.css';
 import { animations } from './CoverRendererAnimations';
 import CoverTextRenderer from './CoverTextRenderer';
 import type { CoverLottiePlayerHandle } from './CoverLottiePlayer';
+import type { CoverTextRenderHandler } from './CoverTextRenderer';
 import type { Media, WebCard } from '@azzapp/data/domains';
 
 type CoverRendererProps = Omit<
@@ -70,6 +71,10 @@ const CoverRenderer = ({
 
   const videoReady = useRef(false);
 
+  const textRef = useRef<CoverTextRenderHandler | null>(null);
+
+  const hasLottie = coverData?.foregroundId?.startsWith('l:') ?? false;
+
   const playJsAnimation = useCallback(
     (animationDuration?: number) => {
       if (mediaAnimation && mediaAnimation in animations && !staticCover) {
@@ -78,12 +83,20 @@ const CoverRenderer = ({
           animations[mediaAnimation as keyof typeof animations],
           {
             duration: (animationDuration ?? duration ?? 0) * 1000,
-            iterations: 1,
+            iterations:
+              hasLottie || media.kind === 'video'
+                ? 1
+                : Number.POSITIVE_INFINITY,
           },
         );
       }
+
+      textRef.current?.playJsAnimation(
+        (animationDuration ?? duration ?? 0) * 1000,
+        hasLottie || media.kind === 'video' ? 1 : Number.POSITIVE_INFINITY,
+      );
     },
-    [duration, mediaAnimation, staticCover],
+    [duration, hasLottie, media.kind, mediaAnimation, staticCover],
   );
 
   const onImageLoad = useCallback(() => {
@@ -124,8 +137,6 @@ const CoverRenderer = ({
     videoRef.current?.play();
     playJsAnimation();
   }, [playJsAnimation]);
-
-  const hasLottie = coverData?.foregroundId?.startsWith('l:') ?? false;
 
   if (!coverData) {
     return null;
@@ -252,6 +263,7 @@ const CoverRenderer = ({
         ) : null}
       </div>
       <CoverTextRenderer
+        ref={textRef}
         title={coverTitle}
         titleStyle={coverData.titleStyle}
         subTitle={coverSubTitle}
@@ -260,6 +272,7 @@ const CoverRenderer = ({
         textOrientation={coverData.textOrientation}
         textPosition={coverData.textPosition}
         width={width}
+        textAnimation={coverData.textAnimation}
       />
     </div>
   );

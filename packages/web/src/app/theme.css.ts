@@ -1,4 +1,5 @@
 import { createTheme, style, globalStyle } from '@vanilla-extract/css';
+import { DESKTOP_WIDTH } from '#helpers/devices';
 
 export const [themeClass, vars] = createTheme({
   color: {
@@ -82,7 +83,7 @@ export const textHyperLink = style({
 });
 
 export enum MediaQuery {
-  Desktop = 'screen and (min-width: 750px)',
+  Desktop = `screen and (min-width: ${DESKTOP_WIDTH}px)`,
   Mobile = 'screen and (max-width: 749.9px)',
   AtLeastSmallMobile = 'screen and (min-width: 640px)',
   BelowSmallMobile = 'screen and (max-width: 639.9px)',

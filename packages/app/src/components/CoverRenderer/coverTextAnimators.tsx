@@ -10,6 +10,7 @@ import Animated, {
   useDerivedValue,
 } from 'react-native-reanimated';
 import { COVER_RATIO, type TextOrientation } from '@azzapp/shared/coverHelpers';
+import { extractLetters } from '@azzapp/shared/stringHelpers';
 import getCoverAnimationProgress from './getCoverAnimationProgress';
 import type { ComponentType } from 'react';
 import type { LayoutRectangle, TextLayoutLine, TextStyle } from 'react-native';
@@ -269,11 +270,7 @@ const LettersSplitRenderer = ({
   );
 };
 
-const extractLetters = (text: string) => {
-  return text.split(/(?=.)/);
-};
-
-const createSlideStyleTranform = (
+const createSlideStyleTransform = (
   slideProgress: number,
   slideDirection: 'fromBottom' | 'fromLeft' | 'fromRight' | 'fromTop',
   axisSize: number,
@@ -321,7 +318,7 @@ const createSlideAnimation = (
       );
       return {
         transform: [
-          createSlideStyleTranform(
+          createSlideStyleTransform(
             textAnimationProgress,
             slideDirection,
             slideDirection === 'fromTop' || slideDirection === 'fromBottom'
@@ -393,7 +390,7 @@ const createSmoothAnimation = (
       return {
         opacity: interpolate(textAnimationProgress, [0, 1, 2], [0, 1, 0]),
         transform: [
-          createSlideStyleTranform(
+          createSlideStyleTransform(
             slideAnimationProgress,
             slideDirection,
             slideDirection === 'fromTop' || slideDirection === 'fromBottom'
@@ -510,7 +507,11 @@ const SmoothLetterAnimationLetterRenderer = ({
         [0, 1, 1, 1, 0],
       ),
       transform: [
-        createSlideStyleTranform(translationProgress, slideDirection, axisSize),
+        createSlideStyleTransform(
+          translationProgress,
+          slideDirection,
+          axisSize,
+        ),
       ],
     };
   }, [textAnimationProgress]);
@@ -614,7 +615,11 @@ const SlideLetterAnimationLetterRenderer = ({
     );
     return {
       transform: [
-        createSlideStyleTranform(translationProgress, slideDirection, axisSize),
+        createSlideStyleTransform(
+          translationProgress,
+          slideDirection,
+          axisSize,
+        ),
       ],
     };
   }, [textAnimationProgress]);

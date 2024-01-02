@@ -36,7 +36,7 @@ const ProfilePostNavigation = (props: WebCardPostNavigationProps) => {
       return false;
     };
 
-    el?.addEventListener('wheel', onWheel);
+    el?.addEventListener('wheel', onWheel, { passive: true });
     return () => el?.removeEventListener('wheel', onWheel);
   }, []);
 

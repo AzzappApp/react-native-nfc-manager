@@ -167,3 +167,7 @@ export const URL_REGEX =
 export const isValidUrl = (url: string): boolean => {
   return !!URL_REGEX.test(url);
 };
+
+export const extractLetters = (text: string) => {
+  return text.split(/(?=.)/);
+};

@@ -10,16 +10,14 @@ const coverTextRender = style({
   left: 0,
 });
 
-const coverTextContainer = style({
-  position: 'absolute',
-  width: '100%',
-  height: '100%',
-  top: 0,
-  left: 0,
-  padding: '5%',
+const coverTextContentContainer = style({
+  overflow: 'hidden',
+});
+
+const coverTextContent = style({
+  position: 'relative',
+  overflow: 'hidden',
   margin: 0,
-  display: 'flex',
-  flexDirection: 'column',
   '@media': {
     [MediaQuery.Mobile]: {
       fontSize: '0.8vw',
@@ -28,6 +26,17 @@ const coverTextContainer = style({
       fontSize: '3px',
     },
   },
+});
+
+const coverTextContainer = style({
+  position: 'absolute',
+  width: '100%',
+  height: '100%',
+  top: 0,
+  left: 0,
+  padding: '5%',
+  display: 'flex',
+  flexDirection: 'column',
 });
 
 const coverTextContainerVertical = style({
@@ -51,11 +60,19 @@ const coverTextContainerBottomToTop = style({
   paddingRight: '15%',
 });
 
+const coverTextLetter = style({
+  display: 'inline-block',
+  position: 'relative',
+});
+
 export default {
   coverTextRender,
+  coverTextContent,
+  coverTextContentContainer,
   coverTextContainer,
   coverTextContainerVertical,
   coverTextContainerHorizontal,
   coverTextContainerTopToBottom,
   coverTextContainerBottomToTop,
+  coverTextLetter,
 };
