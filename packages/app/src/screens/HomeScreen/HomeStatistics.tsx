@@ -106,12 +106,10 @@ const HomeStatistics = ({
             webCardViews,
           ),
         );
-      } else if (actual >= 0 && Math.trunc(actual) === actual) {
-        //use to hide animation if not show. few perf gain
-        const prevIndex = Math.floor(actual);
-        totalLikes.value = format(likes[prevIndex] ?? 0);
-        totalScans.value = format(contactCardScans[prevIndex] ?? 0);
-        totalViews.value = format(webCardViews[prevIndex] ?? 0);
+      } else if (actual >= 0) {
+        totalLikes.value = format(likes[0] ?? 0);
+        totalScans.value = format(contactCardScans[0] ?? 0);
+        totalViews.value = format(webCardViews[0] ?? 0);
       }
     },
 

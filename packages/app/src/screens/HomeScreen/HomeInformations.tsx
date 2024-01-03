@@ -156,12 +156,10 @@ const HomeInformations = ({
           ),
         );
       } else if (actual >= 0) {
-        nbPosts.value = format(infosShared.value[actual].nbPosts ?? 0);
-        nbLikes.value = format(infosShared.value[actual].nbLikes ?? 0);
-        nbFollowers.value = format(infosShared.value[actual].nbFollowers ?? 0);
-        nbFollowings.value = format(
-          infosShared.value[actual].nbFollowings ?? 0,
-        );
+        nbPosts.value = format(infosShared.value[0].nbPosts ?? 0);
+        nbLikes.value = format(infosShared.value[0].nbLikes ?? 0);
+        nbFollowers.value = format(infosShared.value[0].nbFollowers ?? 0);
+        nbFollowings.value = format(infosShared.value[0].nbFollowings ?? 0);
       }
     },
     [webCards],
