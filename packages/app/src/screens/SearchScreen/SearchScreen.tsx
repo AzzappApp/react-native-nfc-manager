@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { View } from 'react-native';
 import Animated, { useAnimatedStyle } from 'react-native-reanimated';
@@ -47,16 +47,19 @@ export const SearchScreen = ({ hasFocus = true }: { hasFocus: boolean }) => {
     useRecentSearch();
 
   // searchOnSubmit button is used to trigger the search.  (can change to on typing text wiht debounce if needed)
-  const onSubmittedSearch = async (search: string | undefined) => {
-    setShowTabView(true);
-
-    setSearchValueSubmitted(search);
-    await addRecentSearchItem(search);
-    if (search !== searchValue) {
-      // used in case the search value is press on recent search
-      setSearchValue(search);
-    }
-  };
+  const onSubmittedSearch = useCallback(
+    async (search: string | undefined) => {
+      setShowTabView(true);
+      const searchTrimmed = search?.trim();
+      setSearchValueSubmitted(searchTrimmed);
+      await addRecentSearchItem(searchTrimmed);
+      if (search !== searchValue) {
+        // used in case the search value is press on recent search
+        setSearchValue(search);
+      }
+    },
+    [addRecentSearchItem, searchValue],
+  );
 
   const insets = useScreenInsets();
 
