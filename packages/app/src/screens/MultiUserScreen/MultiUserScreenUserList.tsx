@@ -170,7 +170,7 @@ const MultiUserScreenUserList = (props: MultiUserScreenListProps) => {
       })}
       {profile?.webCard.profiles && (
         <MultiUserDetailModal
-          user={profile.webCard}
+          webCard={profile.webCard}
           ref={detail}
           currentProfileId={data.viewer.profile?.id ?? ''}
         />

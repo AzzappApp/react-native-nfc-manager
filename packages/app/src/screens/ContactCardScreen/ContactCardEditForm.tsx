@@ -220,7 +220,15 @@ const ContactCardEditForm = ({
 
           {commonInformation?.company ? (
             <View style={styles.field}>
-              <Icon icon="locked" />
+              <View style={styles.fieldTitleWithLock}>
+                <Icon icon="locked" />
+                <Text variant="smallbold" style={styles.fieldTitle}>
+                  <FormattedMessage
+                    defaultMessage="Company"
+                    description="Company name field registered for the contact card"
+                  />
+                </Text>
+              </View>
               <Text variant="medium">{commonInformation.company}</Text>
             </View>
           ) : (
@@ -364,6 +372,7 @@ const styleSheet = createStyleSheet(appearance => ({
     overflow: 'visible',
   },
   fieldTitle: { minWidth: 100 },
+  fieldTitleWithLock: { flexDirection: 'row', gap: 5, alignItems: 'center' },
   avatarContainer: [
     { overflow: 'visible', position: 'relative' },
     shadow(appearance, 'bottom'),

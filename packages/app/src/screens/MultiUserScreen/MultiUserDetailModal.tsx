@@ -32,7 +32,7 @@ import type { ForwardedRef, ReactNode } from 'react';
 import type { Control } from 'react-hook-form';
 
 type MultiUserDetailModalProps = {
-  user: MultiUserDetailModal_webcard$key;
+  webCard: MultiUserDetailModal_webcard$key;
   currentProfileId: string;
 };
 
@@ -51,7 +51,7 @@ export type MultiUserDetailModalActions = {
 };
 
 const MultiUserDetailModal = (
-  { user, currentProfileId }: MultiUserDetailModalProps,
+  { webCard, currentProfileId }: MultiUserDetailModalProps,
   ref: ForwardedRef<MultiUserDetailModalActions>,
 ) => {
   const [visible, setVisible] = useState(false);
@@ -69,13 +69,35 @@ const MultiUserDetailModal = (
   const data = useFragment(
     graphql`
       fragment MultiUserDetailModal_webcard on WebCard {
+        commonInformation {
+          company
+          addresses {
+            label
+            address
+          }
+          emails {
+            label
+            address
+          }
+          phoneNumbers {
+            label
+            number
+          }
+          urls {
+            address
+          }
+          socials {
+            label
+            url
+          }
+        }
         profiles {
           id
           ...HomeStatistics_profiles
         }
       }
     `,
-    user,
+    webCard,
   );
 
   const [commit] = useMutation<MultiUserDetailModal_UpdateProfileMutation>(
@@ -216,16 +238,16 @@ const MultiUserDetailModal = (
       reset({
         role,
         contact: associated.email ?? associated.phoneNumber,
-        firstName: contactCard['firstName'],
-        lastName: contactCard['lastName'],
-        phoneNumbers: contactCard['phoneNumbers'] ?? [],
-        emails: contactCard['emails'] ?? [],
-        title: contactCard['title'],
-        company: contactCard['company'] ?? undefined,
-        urls: contactCard['urls'] ?? [],
-        birthday: contactCard['birthday'],
-        socials: contactCard['socials'] ?? [],
-        addresses: contactCard['addresses'] ?? [],
+        firstName: contactCard.firstName,
+        lastName: contactCard.lastName,
+        phoneNumbers: contactCard.phoneNumbers ?? [],
+        emails: contactCard.emails ?? [],
+        title: contactCard.title,
+        company: contactCard.company ?? undefined,
+        urls: contactCard.urls ?? [],
+        birthday: contactCard.birthday,
+        socials: contactCard.socials ?? [],
+        addresses: contactCard.addresses ?? [],
       });
 
       setProfileId(profileId);
@@ -335,7 +357,7 @@ const MultiUserDetailModal = (
             }
           />
           <ContactCardEditForm
-            commonInformation={null}
+            commonInformation={data.commonInformation}
             control={control as unknown as Control<ContactCardEditFormValues>}
             hideImagePicker={() => setShowImagePicker(false)}
             showImagePicker={() => setShowImagePicker(true)}
