@@ -106,7 +106,7 @@ const LikedPostsScreen = ({
         })}
         leftElement={
           <IconButton
-            icon="arrow_down"
+            icon="arrow_left"
             onPress={onClose}
             iconSize={30}
             size={47}
