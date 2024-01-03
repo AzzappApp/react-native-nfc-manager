@@ -1,5 +1,7 @@
-## 0.5.2-canary.104
+## 0.5.2-canary.105
 
+* **fix:**  - **multiUser:** [#2095](https://github.com/AzzappApp/azzapp/pull/2095) missing common infos in user details modal ([#2127](https://github.com/AzzappApp/azzapp/pull/2127))
+* **fix:**  - **home:** [#1953](https://github.com/AzzappApp/azzapp/pull/1953) don’t display contact card on invitations ([#2135](https://github.com/AzzappApp/azzapp/pull/2135))
 * **fix:**  - **media:** [#1953](https://github.com/AzzappApp/azzapp/pull/1953) trim search string ([#2134](https://github.com/AzzappApp/azzapp/pull/2134))
 * **fix:**  - **multiUser:** [#2091](https://github.com/AzzappApp/azzapp/pull/2091) add loading indicator on saving ([#2128](https://github.com/AzzappApp/azzapp/pull/2128))
 * **fix:**  - replace the close button with arrow left ([#2133](https://github.com/AzzappApp/azzapp/pull/2133))
