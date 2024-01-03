@@ -1,5 +1,6 @@
-## 0.5.2-canary.100
+## 0.5.2-canary.101
 
+* **fix:**  - **ImagePicker:** correctly compute cropData for forced aspect ratio ([#2123](https://github.com/AzzappApp/azzapp/pull/2123))
 * **fix:**  - **CoverEdition:** on end reached dispatched too late ([#2126](https://github.com/AzzappApp/azzapp/pull/2126))
 * **fix:**  - **home:** [#2108](https://github.com/AzzappApp/azzapp/pull/2108) issue on returned date on server that are unexpected on client ([#2122](https://github.com/AzzappApp/azzapp/pull/2122))
 * **fix:**  - wrong animation names + small fixes ([#2124](https://github.com/AzzappApp/azzapp/pull/2124))
