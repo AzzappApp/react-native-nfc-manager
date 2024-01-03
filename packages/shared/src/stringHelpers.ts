@@ -164,8 +164,11 @@ export const simpleHash = (str: string) => {
 export const URL_REGEX =
   /^https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,63}\b(?:[-a-zA-Z0-9()@:%_+.~#?&/=]*)$/;
 
-export const isValidUrl = (url: string): boolean => {
-  return !!URL_REGEX.test(url);
+export const isValidUrl = (url: string | null | undefined): boolean => {
+  if (!url) {
+    return false;
+  }
+  return !!URL_REGEX.test(url.toLocaleLowerCase());
 };
 
 export const extractLetters = (text: string) => {

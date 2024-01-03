@@ -34,16 +34,9 @@ const WebCardPageLayout = (props: ProfilePageLayoutProps) => {
     media,
     cardBackgroundColor,
     lastModuleBackgroundColor,
-    userName,
   } = props;
   const [display, setDisplay] = useState<'card' | 'posts'>('card');
   const [postsOpen, setPostsOpen] = useState(false);
-
-  useEffect(() => {
-    if (userName !== userName.toLowerCase()) {
-      window.history.pushState({}, '', userName.toLowerCase());
-    }
-  }, [userName]);
 
   const hasPosts = posts.length > 0;
 

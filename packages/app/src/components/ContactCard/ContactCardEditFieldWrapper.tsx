@@ -1,11 +1,5 @@
 import { useEffect, useState } from 'react';
-import {
-  Controller,
-  type Control,
-  type FieldPath,
-  useWatch,
-  type FieldValues,
-} from 'react-hook-form';
+import { Controller, useWatch } from 'react-hook-form';
 import { FormattedMessage } from 'react-intl';
 import { View } from 'react-native';
 import Animated, {
@@ -29,6 +23,7 @@ import Switch from '#ui/Switch';
 import Text from '#ui/Text';
 import { useFormDeleteContext } from './FormDeleteFieldOverlay';
 import type { PropsWithChildren } from 'react';
+import type { FieldValues, Control, FieldPath } from 'react-hook-form';
 import type { LayoutRectangle } from 'react-native';
 
 const ContactCardEditField = <TFieldValues extends FieldValues>({
@@ -39,6 +34,7 @@ const ContactCardEditField = <TFieldValues extends FieldValues>({
   labelValues,
   onChangeLabel,
   children,
+  errorMessage,
 }: PropsWithChildren<{
   labelKey?: FieldPath<TFieldValues>;
   deleteField: () => void;
@@ -46,6 +42,7 @@ const ContactCardEditField = <TFieldValues extends FieldValues>({
   control: Control<TFieldValues>;
   labelValues?: Array<{ key: string; value: string }>;
   onChangeLabel?: (label: string) => void;
+  errorMessage?: string;
 }>) => {
   const deleteMode = useSharedValue(false);
 
@@ -56,6 +53,8 @@ const ContactCardEditField = <TFieldValues extends FieldValues>({
   } = useFormDeleteContext();
 
   const style = useAnimatedStyle(() => ({
+    paddingHorizontal: 0,
+    flexDirection: 'column',
     transform: [
       {
         translateX: withTiming(deleteMode.value ? -DELETE_BUTTON_WIDTH : 0, {
@@ -109,64 +108,77 @@ const ContactCardEditField = <TFieldValues extends FieldValues>({
         // }).withCallback(callback)}
       >
         <View
-          style={[
-            styles.fieldContainer,
-            { minWidth: labelValues && labelValues.length > 0 ? 100 : 0 },
-          ]}
+          style={{
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            paddingHorizontal: 20,
+          }}
         >
-          <IconButton
-            variant="icon"
-            icon="delete_filled"
-            iconStyle={{ tintColor: colors.red400 }}
-            onPress={() => {
-              deleteMode.value = !deleteMode.value;
-              if (layout) {
-                openDeleteButton(layout);
-              }
-            }}
-          />
-          {labelValues && labelValues.length > 0 && (
-            <PressableNative
-              style={styles.labelSelector}
-              onPress={() => setVisible(true)}
-            >
-              <Text variant="smallbold">
-                {labelValues.find(
-                  l => typeof label === 'string' && l.key === label,
-                )?.value ?? (typeof label === 'string' ? label : '')}
-              </Text>
-              <Icon icon="arrow_down" />
-            </PressableNative>
-          )}
-        </View>
-        {children}
-        {selectedKey && (
-          <Controller
-            control={control}
-            name={selectedKey}
-            render={({ field: { onChange, value } }) => (
-              <Switch
-                value={Boolean(value)}
-                onValueChange={onChange}
-                style={styles.switch}
-              />
-            )}
-          />
-        )}
-        <PressableNative
-          style={styles.deleteButton}
-          pointerEvents="auto"
-          onPress={deleteField}
-        >
-          <Text variant="button" style={{ color: colors.white }}>
-            <FormattedMessage
-              defaultMessage="Delete"
-              description="Delete email or phone number"
+          <View
+            style={[
+              styles.fieldContainer,
+              { minWidth: labelValues && labelValues.length > 0 ? 100 : 0 },
+            ]}
+          >
+            <IconButton
+              variant="icon"
+              icon="delete_filled"
+              iconStyle={{ tintColor: colors.red400 }}
+              onPress={() => {
+                deleteMode.value = !deleteMode.value;
+                if (layout) {
+                  openDeleteButton(layout);
+                }
+              }}
             />
+            {labelValues && labelValues.length > 0 && (
+              <PressableNative
+                style={styles.labelSelector}
+                onPress={() => setVisible(true)}
+              >
+                <Text variant="smallbold">
+                  {labelValues.find(
+                    l => typeof label === 'string' && l.key === label,
+                  )?.value ?? (typeof label === 'string' ? label : '')}
+                </Text>
+                <Icon icon="arrow_down" />
+              </PressableNative>
+            )}
+          </View>
+          {children}
+          {selectedKey && (
+            <Controller
+              control={control}
+              name={selectedKey}
+              render={({ field: { onChange, value } }) => (
+                <Switch
+                  value={Boolean(value)}
+                  onValueChange={onChange}
+                  style={styles.switch}
+                />
+              )}
+            />
+          )}
+          <PressableNative
+            style={styles.deleteButton}
+            pointerEvents="auto"
+            onPress={deleteField}
+          >
+            <Text variant="button" style={{ color: colors.white }}>
+              <FormattedMessage
+                defaultMessage="Delete"
+                description="Delete email or phone number"
+              />
+            </Text>
+          </PressableNative>
+        </View>
+        {errorMessage && (
+          <Text variant="error" style={{ paddingHorizontal: 20 }}>
+            {errorMessage}
           </Text>
-        </PressableNative>
+        )}
       </Animated.View>
-
       {labelKey && (
         <BottomSheetModal
           visible={visible}

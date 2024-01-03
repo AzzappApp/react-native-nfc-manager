@@ -1,15 +1,11 @@
-import {
-  Controller,
-  type Control,
-  type FieldPath,
-  type FieldValues,
-} from 'react-hook-form';
+import { Controller } from 'react-hook-form';
+import { type TextInputProps } from 'react-native';
 import { buildContactCardModalStyleSheet } from '#helpers/contactCardHelpers';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
-import TextInput from '#ui/TextInput';
 
+import TextInput from '#ui/TextInput';
 import ContactCardEditFieldWrapper from './ContactCardEditFieldWrapper';
-import type { TextInputProps } from 'react-native';
+import type { Control, FieldPath, FieldValues } from 'react-hook-form';
 
 const ContactCardEditField = <TFieldValues extends FieldValues>({
   labelKey,
@@ -22,6 +18,7 @@ const ContactCardEditField = <TFieldValues extends FieldValues>({
   placeholder,
   onChangeLabel,
   autoCapitalize,
+  errorMessage,
 }: {
   labelKey?: FieldPath<TFieldValues>;
   keyboardType: TextInputProps['keyboardType'];
@@ -33,6 +30,7 @@ const ContactCardEditField = <TFieldValues extends FieldValues>({
   labelValues?: Array<{ key: string; value: string }>;
   placeholder?: string;
   onChangeLabel?: (label: string) => void;
+  errorMessage?: string;
 }) => {
   const styles = useStyleSheet(stylesheet);
 
@@ -44,6 +42,7 @@ const ContactCardEditField = <TFieldValues extends FieldValues>({
       onChangeLabel={onChangeLabel}
       deleteField={deleteField}
       selectedKey={selectedKey}
+      errorMessage={errorMessage}
     >
       <Controller
         control={control}
@@ -59,6 +58,7 @@ const ContactCardEditField = <TFieldValues extends FieldValues>({
             testID="contact-card-edit-modal-field"
             placeholder={placeholder}
             autoCapitalize={autoCapitalize}
+            isErrored={!!errorMessage}
           />
         )}
       />

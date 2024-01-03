@@ -46,6 +46,14 @@ describe('ContactCardEditModal', () => {
                   selected: true,
                 },
               ],
+              urls: [
+                // Add this
+                {
+                  label: 'Work',
+                  address: 'http://test.com',
+                  selected: true,
+                },
+              ],
             },
             commonInformation: {
               company: '',
@@ -191,8 +199,8 @@ describe('ContactCardEditModal', () => {
       ],
       urls: [
         {
-          address: '<mock-value-for-field-"address">',
-          selected: false,
+          address: 'http://test.com',
+          selected: true,
         },
       ],
     });

@@ -29,7 +29,7 @@ import type { ImagePickerResult } from '#components/ImagePicker';
 import type { ContactCardEditFormValues } from './ContactCardEditModalSchema';
 import type { ContactCardEditModal_card$data } from '@azzapp/relay/artifacts/ContactCardEditModal_card.graphql';
 import type { ReactNode } from 'react';
-import type { Control } from 'react-hook-form';
+import type { Control, FieldErrors } from 'react-hook-form';
 
 type ContactCardEditFormProps = {
   isMultiUser: boolean;
@@ -40,20 +40,20 @@ type ContactCardEditFormProps = {
   commonInformation: ContactCardEditModal_card$data['webCard']['commonInformation'];
   children?: ReactNode;
   footer?: ReactNode;
+  errors?: FieldErrors<ContactCardEditFormValues>;
 };
 
-const ContactCardEditForm = (props: ContactCardEditFormProps) => {
-  const {
-    isMultiUser,
-    showImagePicker,
-    hideImagePicker,
-    imagePickerVisible,
-    control,
-    commonInformation,
-    children,
-    footer,
-  } = props;
-
+const ContactCardEditForm = ({
+  isMultiUser,
+  showImagePicker,
+  hideImagePicker,
+  imagePickerVisible,
+  control,
+  commonInformation,
+  children,
+  footer,
+  errors,
+}: ContactCardEditFormProps) => {
   const styles = useStyleSheet(styleSheet);
   const intl = useIntl();
 
@@ -274,7 +274,7 @@ const ContactCardEditForm = (props: ContactCardEditFormProps) => {
           {commonInformation?.urls?.map((url, index) => (
             <CommonInformationField key={index} value={url.address} />
           ))}
-          <ContactCardEditModalUrls control={control} />
+          <ContactCardEditModalUrls control={control} errors={errors} />
           <View style={styles.separator} />
           {commonInformation?.addresses?.map((address, index) => (
             <CommonInformationField

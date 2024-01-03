@@ -9,12 +9,14 @@ import Icon from '#ui/Icon';
 import PressableNative from '#ui/PressableNative';
 import Text from '#ui/Text';
 import type { ContactCardEditFormValues } from './ContactCardEditModalSchema';
-import type { Control } from 'react-hook-form';
+import type { Control, FieldErrors } from 'react-hook-form';
 
 const ContactCardEditModalUrls = ({
   control,
+  errors,
 }: {
   control: Control<ContactCardEditFormValues>;
+  errors?: FieldErrors<ContactCardEditFormValues>;
 }) => {
   const { fields, append, remove } = useFieldArray({
     control,
@@ -39,6 +41,15 @@ const ContactCardEditModalUrls = ({
             defaultMessage: 'Enter a URL',
             description: 'Placeholder for URL inside contact card',
           })}
+          errorMessage={
+            errors?.urls?.[index]?.root
+              ? intl.formatMessage({
+                  defaultMessage: 'Please enter a valid url',
+                  description:
+                    'Edit Contact Card - Error message when a url is wrongly formatted',
+                })
+              : undefined
+          }
         />
       ))}
       <View>

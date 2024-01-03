@@ -1,4 +1,5 @@
 import * as z from 'zod';
+import { isValidUrl } from '@azzapp/shared/stringHelpers';
 
 export const contactCardEditSchema = z.object({
   firstName: z.string().nullable(),
@@ -20,10 +21,12 @@ export const contactCardEditSchema = z.object({
     }),
   ),
   urls: z.array(
-    z.object({
-      address: z.string(),
-      selected: z.boolean().nullable().optional(),
-    }),
+    z
+      .object({
+        address: z.string(),
+        selected: z.boolean().nullable().optional(),
+      })
+      .refine(url => isValidUrl(url.address)),
   ),
   addresses: z.array(
     z.object({
