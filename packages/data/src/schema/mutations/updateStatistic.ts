@@ -13,7 +13,7 @@ import type { MutationResolvers } from '#schema/__generated__/types';
 const updateWebCardViews: MutationResolvers['updateWebCardViews'] = async (
   _,
   { input: { id } },
-  { auth },
+  { auth, loaders },
 ) => {
   const { profileId } = auth;
 
@@ -21,14 +21,21 @@ const updateWebCardViews: MutationResolvers['updateWebCardViews'] = async (
     throw new GraphQLError(ERRORS.UNAUTHORIZED);
   }
 
-  const { id: targetId, type } = fromGlobalId(id);
+  const profile = await loaders.Profile.load(profileId);
+
+  if (!profile) {
+    throw new GraphQLError(ERRORS.INVALID_REQUEST);
+  }
+
+  const { id: targetWebcardIdId, type } = fromGlobalId(id);
 
   if (type !== 'WebCard') {
     throw new GraphQLError(ERRORS.INVALID_REQUEST);
   }
+
   try {
-    if (targetId !== profileId) {
-      await incrementWebCardViews(targetId);
+    if (targetWebcardIdId !== profile.webCardId) {
+      await incrementWebCardViews(targetWebcardIdId);
     }
 
     return true;
