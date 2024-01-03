@@ -4,6 +4,7 @@ import { useIntl } from 'react-intl';
 import { StyleSheet } from 'react-native';
 import { RESULTS } from 'react-native-permissions';
 import { useDebouncedCallback } from 'use-debounce';
+import { cropDataForAspectRatio } from '#components/gpu';
 import { getImageSize, getVideoSize } from '#helpers/mediaHelpers';
 import { usePermissionContext } from '#helpers/PermissionContext';
 import useEditorLayout from '#hooks/useEditorLayout';
@@ -88,7 +89,7 @@ const SelectImageStep = ({
   }, []);
 
   const onCameraError = useCallback((error: CameraRuntimeError) => {
-    console.log(error);
+    console.warn(error);
     // TODO
   }, []);
 
@@ -115,29 +116,9 @@ const SelectImageStep = ({
       forceCameraRatio,
     );
     if (forceAspectRatio) {
-      let editionParameters = {};
-      if (forceAspectRatio < 1) {
-        const wantedWidth = height * forceAspectRatio;
-        editionParameters = {
-          cropData: {
-            height,
-            originX: (width - wantedWidth) / 2,
-            originY: 0,
-            width: wantedWidth,
-          },
-        };
-      } else if (forceAspectRatio >= 1) {
-        const wantedHeight = width / forceAspectRatio;
-        editionParameters = {
-          cropData: {
-            height: wantedHeight,
-            originX: 0,
-            originY: (height - wantedHeight) / 2,
-            width,
-          },
-        };
-      }
-      onEditionParametersChange(editionParameters);
+      onEditionParametersChange({
+        cropData: cropDataForAspectRatio(width, height, forceAspectRatio),
+      });
     }
     onNext();
   }, [
