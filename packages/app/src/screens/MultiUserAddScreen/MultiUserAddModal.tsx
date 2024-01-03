@@ -1,6 +1,7 @@
 import { forwardRef, useImperativeHandle, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useIntl } from 'react-intl';
+import { View, StyleSheet } from 'react-native';
 import * as mime from 'react-native-mime-types';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
@@ -91,15 +92,20 @@ const MultiUserAddModal = (
     ];
   }, [user, intl, isManual]);
 
-  const { control, watch, handleSubmit, reset } =
-    useForm<MultiUserAddFormValues>({
-      defaultValues: {
-        contact: contacts[0]?.id,
-        manualContact: '',
-        role: 'user',
-      },
-      mode: 'onSubmit',
-    });
+  const {
+    control,
+    watch,
+    handleSubmit,
+    reset,
+    formState: { isSubmitting },
+  } = useForm<MultiUserAddFormValues>({
+    defaultValues: {
+      contact: contacts[0]?.id,
+      manualContact: '',
+      role: 'user',
+    },
+    mode: 'onSubmit',
+  });
 
   useImperativeHandle(ref, () => ({
     open: (associated: AssociatedUser, user: UserToAdd, isManual: boolean) => {
@@ -129,69 +135,71 @@ const MultiUserAddModal = (
 
   const currentContact = watch('contact');
 
-  const [commit] = useMutation<MultiUserAddModal_InviteUserMutation>(graphql`
-    mutation MultiUserAddModal_InviteUserMutation($input: InviteUserInput!) {
-      inviteUser(input: $input) {
-        profile {
-          id
-          contactCard {
-            firstName
-            lastName
-            title
-            company
-            emails {
-              label
-              address
-              selected
-            }
-            phoneNumbers {
-              label
-              number
-              selected
-            }
-            urls {
-              address
-              selected
-            }
-            addresses {
-              address
-              label
-              selected
-            }
-            birthday {
-              birthday
-              selected
-            }
-            socials {
-              url
-              label
-              selected
-            }
-          }
-          user {
-            email
-            phoneNumber
-          }
-          profileRole
-          avatar {
+  const [commit, saving] = useMutation<MultiUserAddModal_InviteUserMutation>(
+    graphql`
+      mutation MultiUserAddModal_InviteUserMutation($input: InviteUserInput!) {
+        inviteUser(input: $input) {
+          profile {
             id
-            uri
-          }
-          statsSummary {
-            day
-            contactCardScans
-          }
-          webCard {
+            contactCard {
+              firstName
+              lastName
+              title
+              company
+              emails {
+                label
+                address
+                selected
+              }
+              phoneNumbers {
+                label
+                number
+                selected
+              }
+              urls {
+                address
+                selected
+              }
+              addresses {
+                address
+                label
+                selected
+              }
+              birthday {
+                birthday
+                selected
+              }
+              socials {
+                url
+                label
+                selected
+              }
+            }
+            user {
+              email
+              phoneNumber
+            }
+            profileRole
+            avatar {
+              id
+              uri
+            }
             statsSummary {
               day
-              webCardViews
-              likes
+              contactCardScans
+            }
+            webCard {
+              statsSummary {
+                day
+                webCardViews
+                likes
+              }
             }
           }
         }
       }
-    }
-  `);
+    `,
+  );
 
   const submit = handleSubmit(
     async ({ avatar, ...data }) => {
@@ -351,6 +359,7 @@ const MultiUserAddModal = (
                   description: 'MultiUserAddModal - Save button label',
                 })}
                 onPress={submit}
+                loading={isSubmitting || saving}
               />
             }
           />
@@ -369,6 +378,10 @@ const MultiUserAddModal = (
             />
           </ContactCardEditForm>
         </SafeAreaView>
+        {isSubmitting || saving ? (
+          /* Used to prevent user from interacting with the screen while saving */
+          <View style={StyleSheet.absoluteFill} />
+        ) : null}
       </Container>
     </ScreenModal>
   );
