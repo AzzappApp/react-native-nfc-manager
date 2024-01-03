@@ -1,5 +1,7 @@
-## 0.5.2-canary.102
+## 0.5.2-canary.103
 
+* **fix:**  - **multiUser:** [#2091](https://github.com/AzzappApp/azzapp/pull/2091) add loading indicator on saving ([#2128](https://github.com/AzzappApp/azzapp/pull/2128))
+* **fix:**  - replace the close button with arrow left ([#2133](https://github.com/AzzappApp/azzapp/pull/2133))
 * **fix:**  - don't self increment webcardView (wrong comparison profileId and webcardId) ([#2129](https://github.com/AzzappApp/azzapp/pull/2129))
 * **fix:**  - display of stats/info with one Card  could crash when sliding from new webcard ([#2130](https://github.com/AzzappApp/azzapp/pull/2130))
 * **fix:**  - **ImagePicker:** correctly compute cropData for forced aspect ratio ([#2123](https://github.com/AzzappApp/azzapp/pull/2123))
