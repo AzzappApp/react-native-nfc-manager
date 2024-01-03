@@ -103,6 +103,8 @@ const ContactCardItem = ({
           userName
           cardIsPublished
         }
+        invited
+        promotedAsOwner
         ...ContactCard_profile
       }
     `,
@@ -120,23 +122,25 @@ const ContactCardItem = ({
         positionStyle,
       ]}
     >
-      {profile.webCard.cardIsPublished && (
-        <Link route="CONTACT_CARD">
-          <PressableNative
-            style={{
-              width: cardHeight * CONTACT_CARD_RATIO,
-              height: cardHeight,
-              overflow: 'visible',
-            }}
-          >
-            <ContactCard
-              profile={profile}
-              height={Math.min(height, maxHeight)}
-              style={styles.card}
-            />
-          </PressableNative>
-        </Link>
-      )}
+      {profile.webCard.cardIsPublished &&
+        !profile.invited &&
+        !profile.promotedAsOwner && (
+          <Link route="CONTACT_CARD">
+            <PressableNative
+              style={{
+                width: cardHeight * CONTACT_CARD_RATIO,
+                height: cardHeight,
+                overflow: 'visible',
+              }}
+            >
+              <ContactCard
+                profile={profile}
+                height={Math.min(height, maxHeight)}
+                style={styles.card}
+              />
+            </PressableNative>
+          </Link>
+        )}
     </Animated.View>
   );
 };
