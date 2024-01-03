@@ -128,6 +128,7 @@ const WebcardParametersNameForm = ({
           id
           userName
           lastUserNameUpdate
+          nextChangeUsernameAllowedAt
         }
       }
     }

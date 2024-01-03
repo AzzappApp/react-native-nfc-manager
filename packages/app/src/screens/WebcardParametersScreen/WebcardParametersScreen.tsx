@@ -75,7 +75,6 @@ const WebcardParametersScreen = ({
     webCardParameters: { userNameChangeFrequencyDay },
   } = usePreloadedQuery(webcardParametersScreenQuery, preloadedQuery);
   const webCard = profile?.webCard ?? null;
-
   const intl = useIntl();
   const styles = useStyleSheet(styleSheet);
   const [userNameFormVisible, toggleUserNameFormVisible] = useToggle(false);
@@ -188,7 +187,7 @@ const WebcardParametersScreen = ({
     const now = new Date();
     if (
       webCard?.nextChangeUsernameAllowedAt &&
-      webCard?.nextChangeUsernameAllowedAt < now
+      new Date(webCard?.nextChangeUsernameAllowedAt) < now
     ) {
       return true;
     } else {
