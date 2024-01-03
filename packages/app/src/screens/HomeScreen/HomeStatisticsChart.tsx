@@ -197,6 +197,7 @@ const HomeStatisticsChart = ({
                     currentProfileIndexSharedValue
                   }
                   currentUserIndex={currentUserIndex}
+                  variant={variant}
                 />
               );
             })}
@@ -204,7 +205,11 @@ const HomeStatisticsChart = ({
         }
       >
         <LinearGradient
-          colors={[colors.white, '#ffffff00']}
+          colors={
+            variant === 'dark'
+              ? [colors.white, '#ffffff00']
+              : [colors.black, '#ffffff']
+          }
           style={{
             width,
             height,

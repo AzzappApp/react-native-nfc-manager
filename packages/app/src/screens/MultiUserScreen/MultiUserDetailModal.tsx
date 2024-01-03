@@ -452,10 +452,11 @@ const MultiUserDetailModal = (
                 {data.profiles && (
                   <HomeStatistics
                     user={data.profiles}
-                    height={400}
+                    height={250}
                     currentUserIndex={0}
                     currentProfileIndexSharedValue={index}
                     variant={colorScheme === 'dark' ? 'dark' : 'light'}
+                    initialStatsIndex={1}
                   />
                 )}
               </View>

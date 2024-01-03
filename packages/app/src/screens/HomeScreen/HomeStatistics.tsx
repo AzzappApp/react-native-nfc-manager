@@ -31,6 +31,7 @@ type HomeInformationsProps = {
   currentProfileIndexSharedValue: SharedValue<number>;
   currentUserIndex: number;
   variant?: 'dark' | 'light';
+  initialStatsIndex?: number;
 };
 
 const HomeStatistics = ({
@@ -39,6 +40,7 @@ const HomeStatistics = ({
   currentUserIndex,
   currentProfileIndexSharedValue,
   variant = 'dark',
+  initialStatsIndex = 0,
 }: HomeInformationsProps) => {
   //TODO: backend part .
 
@@ -63,7 +65,7 @@ const HomeStatistics = ({
   const { width } = useWindowDimensions();
   const intl = useIntl();
 
-  const scrollIndexOffset = useSharedValue(0);
+  const scrollIndexOffset = useSharedValue(initialStatsIndex);
   const scrollHandler = useAnimatedScrollHandler(event => {
     scrollIndexOffset.value = event.contentOffset.x / BOX_NUMBER_WIDTH;
   });
@@ -121,6 +123,7 @@ const HomeStatistics = ({
   const onSelectStat = (index: number) => {
     scrollViewRef?.current?.scrollTo({ x: index * BOX_NUMBER_WIDTH, y: 0 });
   };
+
   //TODO: if performance issue, inquiry a more complex way to do the chart(skia, D3 etc). it is the simpler using only animated view.
   return (
     <View style={styles.container}>
@@ -139,6 +142,7 @@ const HomeStatistics = ({
           height: BOX_NUMBER_HEIGHT,
           width: '100%',
           overflow: 'visible',
+          paddingTop: 5,
         }}
         pagingEnabled
         snapToInterval={BOX_NUMBER_WIDTH}
@@ -154,6 +158,7 @@ const HomeStatistics = ({
         scrollEventThrottle={16}
         horizontal
         onScroll={scrollHandler}
+        contentOffset={{ x: initialStatsIndex * BOX_NUMBER_WIDTH, y: 0 }}
       >
         <StatisticItems
           variant={variant}
@@ -299,7 +304,7 @@ const stylesheet = createVariantsStyleSheet(() => ({
     largetText: {
       ...fontFamilies.extrabold,
       textAlign: 'center',
-      fontSize: 42,
+      fontSize: 40,
     },
     smallText: {
       textAlign: 'center',
