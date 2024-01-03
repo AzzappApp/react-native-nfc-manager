@@ -1,5 +1,6 @@
-## 0.5.2-canary.103
+## 0.5.2-canary.104
 
+* **fix:**  - **media:** [#1953](https://github.com/AzzappApp/azzapp/pull/1953) trim search string ([#2134](https://github.com/AzzappApp/azzapp/pull/2134))
 * **fix:**  - **multiUser:** [#2091](https://github.com/AzzappApp/azzapp/pull/2091) add loading indicator on saving ([#2128](https://github.com/AzzappApp/azzapp/pull/2128))
 * **fix:**  - replace the close button with arrow left ([#2133](https://github.com/AzzappApp/azzapp/pull/2133))
 * **fix:**  - don't self increment webcardView (wrong comparison profileId and webcardId) ([#2129](https://github.com/AzzappApp/azzapp/pull/2129))
