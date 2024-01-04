@@ -1,5 +1,8 @@
-## 0.5.2-canary.106
+## 0.5.2-canary.107
 
+* **fix:**  - **cover:** [#2125](https://github.com/AzzappApp/azzapp/pull/2125) sync lottie with video and hacks for safari support ([#2137](https://github.com/AzzappApp/azzapp/pull/2137))
+* **fix:**  - **post:** [#1987](https://github.com/AzzappApp/azzapp/pull/1987) prevent users without editor role to edit posts ([#2131](https://github.com/AzzappApp/azzapp/pull/2131))
+* **fix:**  - **webcard:** [#2030](https://github.com/AzzappApp/azzapp/pull/2030) break big words ([#2138](https://github.com/AzzappApp/azzapp/pull/2138))
 * **fix:**  - hide the publish web card for not owner ([#2136](https://github.com/AzzappApp/azzapp/pull/2136))
 * **fix:**  - **multiUser:** [#2095](https://github.com/AzzappApp/azzapp/pull/2095) missing common infos in user details modal ([#2127](https://github.com/AzzappApp/azzapp/pull/2127))
 * **fix:**  - **home:** [#1953](https://github.com/AzzappApp/azzapp/pull/1953) don’t display contact card on invitations ([#2135](https://github.com/AzzappApp/azzapp/pull/2135))
