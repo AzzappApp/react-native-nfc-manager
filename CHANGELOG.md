@@ -1,5 +1,10 @@
-## 0.5.2-canary.107
+## 0.5.2-canary.108
 
+* **fix:**  - **webCard:** [#2027](https://github.com/AzzappApp/azzapp/pull/2027) background overlaps content ([#2153](https://github.com/AzzappApp/azzapp/pull/2153))
+* **fix:**  - **multiUser:** [#2095](https://github.com/AzzappApp/azzapp/pull/2095) add common infos on add user modal as well ([#2148](https://github.com/AzzappApp/azzapp/pull/2148))
+* **fix:**  - **multiUser:** [#2022](https://github.com/AzzappApp/azzapp/pull/2022) you can’t remove owner ([#2145](https://github.com/AzzappApp/azzapp/pull/2145))
+* **fix:**  - **multiUser:** [#2047](https://github.com/AzzappApp/azzapp/pull/2047) missing avatar in multi-user list ([#2144](https://github.com/AzzappApp/azzapp/pull/2144))
+* **fix:**  - **WebcardEdition:** refactor the animation system ([#2139](https://github.com/AzzappApp/azzapp/pull/2139))
 * **fix:**  - **cover:** [#2125](https://github.com/AzzappApp/azzapp/pull/2125) sync lottie with video and hacks for safari support ([#2137](https://github.com/AzzappApp/azzapp/pull/2137))
 * **fix:**  - **post:** [#1987](https://github.com/AzzappApp/azzapp/pull/1987) prevent users without editor role to edit posts ([#2131](https://github.com/AzzappApp/azzapp/pull/2131))
 * **fix:**  - **webcard:** [#2030](https://github.com/AzzappApp/azzapp/pull/2030) break big words ([#2138](https://github.com/AzzappApp/azzapp/pull/2138))
