@@ -363,7 +363,8 @@ const MultiUserDetailModal = (
             imagePickerVisible={showImagePicker}
             isMultiUser={true}
             footer={
-              !isCurrentProfile && (
+              !isCurrentProfile &&
+              role !== 'owner' && (
                 <PressableNative
                   style={styles.removeButton}
                   onPress={onRemoveUser}
