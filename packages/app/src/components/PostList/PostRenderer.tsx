@@ -2,15 +2,20 @@ import {
   Suspense,
   forwardRef,
   memo,
+  useCallback,
   useContext,
   useImperativeHandle,
   useRef,
 } from 'react';
 
+import { useIntl } from 'react-intl';
 import { StyleSheet, View } from 'react-native';
+import Toast from 'react-native-toast-message';
 import { graphql, useFragment } from 'react-relay';
+import { isEditor } from '@azzapp/shared/profileHelpers';
 import { colors } from '#theme';
 import AuthorCartouche from '#components/AuthorCartouche';
+import useAuthState from '#hooks/useAuthState';
 import useToggle from '#hooks/useToggle';
 import IconButton from '#ui/IconButton';
 
@@ -136,10 +141,30 @@ const PostRenderer = (
     }),
     [],
   );
+
+  const { profileRole } = useAuthState();
+
   const [showModal, toggleModal] = useToggle();
   const context = useContext(PostListContext);
   const shouldPlayVideo = context.played === post.id;
   const shouldPauseVideo = context.paused.includes(post.id) && !shouldPlayVideo;
+
+  const intl = useIntl();
+
+  const openModal = useCallback(() => {
+    if (profileRole && isEditor(profileRole)) {
+      toggleModal();
+    } else {
+      Toast.show({
+        type: 'error',
+        text1: intl.formatMessage({
+          defaultMessage: 'Only admins can edit a post',
+          description:
+            'Error message when a user tries to edit a post but is not an admin',
+        }),
+      });
+    }
+  }, [intl, profileRole, toggleModal]);
 
   return (
     <View {...props}>
@@ -172,7 +197,7 @@ const PostRenderer = (
       </View>
       <Suspense fallback={<PostRendererBottomPanelSkeleton />}>
         <PostRendererBottomPanel
-          toggleModal={toggleModal}
+          toggleModal={openModal}
           showModal={showModal}
           post={post}
         />
