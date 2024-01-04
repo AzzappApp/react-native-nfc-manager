@@ -49,7 +49,7 @@ const ContactCardEditModalSocials = ({
           })}
           onChangeLabel={label => {
             update(index, {
-              ...social,
+              selected: social.selected,
               label,
               url:
                 SOCIAL_NETWORK_LINKS.find(socialLink => socialLink.id === label)
