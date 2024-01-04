@@ -15,6 +15,7 @@ const label = style({
   textOverflow: 'ellipsis',
   overflow: 'hidden',
   whiteSpace: 'nowrap',
+  wordBreak: 'break-word',
 });
 
 const styles = {

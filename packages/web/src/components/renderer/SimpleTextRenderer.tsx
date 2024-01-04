@@ -70,6 +70,7 @@ const SimpleTextRenderer = ({
             paddingBottom: marginVertical,
             flexShrink: 0,
             whiteSpace: 'pre-wrap',
+            wordBreak: 'break-word',
           }}
           className={fontsMap[fontFamily].className}
         >
