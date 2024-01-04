@@ -1,5 +1,6 @@
-## 0.5.2-canary.105
+## 0.5.2-canary.106
 
+* **fix:**  - hide the publish web card for not owner ([#2136](https://github.com/AzzappApp/azzapp/pull/2136))
 * **fix:**  - **multiUser:** [#2095](https://github.com/AzzappApp/azzapp/pull/2095) missing common infos in user details modal ([#2127](https://github.com/AzzappApp/azzapp/pull/2127))
 * **fix:**  - **home:** [#1953](https://github.com/AzzappApp/azzapp/pull/1953) don’t display contact card on invitations ([#2135](https://github.com/AzzappApp/azzapp/pull/2135))
 * **fix:**  - **media:** [#1953](https://github.com/AzzappApp/azzapp/pull/1953) trim search string ([#2134](https://github.com/AzzappApp/azzapp/pull/2134))
