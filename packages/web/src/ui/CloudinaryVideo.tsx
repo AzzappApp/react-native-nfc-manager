@@ -71,6 +71,7 @@ const CloudinaryVideo = (
         width,
         height: width && media.height * (width / media.width),
         aspectRatio: `${media.width / media.height}`,
+        format: 'mp4', // for safari
       })}
       autoPlay={autoPlay}
       loop={loop}
@@ -86,6 +87,7 @@ const CloudinaryVideo = (
           src: decodeMediaId(media.id),
           width: size,
           height: media.height * (size / media.width),
+          format: 'mp4',
         });
         const mediaAttr = `all and (max-width: ${size}px)`;
         return (
@@ -98,6 +100,7 @@ const CloudinaryVideo = (
           src: decodeMediaId(media.id),
           width: maxSize,
           height: maxSize && media.height * (maxSize / media.width),
+          format: 'mp4',
         })}
         media="all"
       />

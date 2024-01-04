@@ -99,6 +99,15 @@ const CoverRenderer = ({
     [duration, hasLottie, media.kind, mediaAnimation, staticCover],
   );
 
+  useEffect(() => {
+    //to start video we want to be sure that lottie and video are charged
+    if (media.kind === 'video' && duration && (!hasLottie || lottieDuration)) {
+      videoRef.current?.play();
+      coverLottieRef.current?.play();
+      playJsAnimation();
+    }
+  }, [duration, hasLottie, lottieDuration, media.kind, playJsAnimation]);
+
   const onImageLoad = useCallback(() => {
     if (!staticCover) {
       setDuration(COVER_ANIMATION_DURATION / 1000);
@@ -116,11 +125,8 @@ const CoverRenderer = ({
     if (isNaN(duration)) {
       duration = COVER_ANIMATION_DURATION;
     }
-    coverLottieRef.current?.play();
-    videoRef.current.play();
     setDuration(duration);
-    playJsAnimation(duration);
-  }, [playJsAnimation]);
+  }, []);
 
   const videoRefCallback = useCallback(
     (node: HTMLVideoElement | null) => {
@@ -128,6 +134,9 @@ const CoverRenderer = ({
       if (videoRef.current && videoRef.current.readyState >= 4) {
         onVideoReady();
       }
+
+      // needed for safari on iOS (without video is not loaded and onCanPlayThrough is not called)
+      videoRef.current?.load();
     },
     [onVideoReady],
   );
