@@ -101,8 +101,8 @@ const ContactCardEditForm = ({
   return (
     <>
       <FormDeleteFieldOverlay>
-        {children}
         <View style={styles.sectionsContainer}>
+          {children}
           {isMultiUser ? (
             <View style={styles.avatarSection}>
               <PressableNative onPress={showImagePicker}>

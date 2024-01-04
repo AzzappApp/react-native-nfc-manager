@@ -2,7 +2,7 @@ import { createContext, useCallback, useContext, useReducer } from 'react';
 import { Pressable, ScrollView, StyleSheet } from 'react-native';
 import { DELETE_BUTTON_WIDTH } from '#helpers/contactCardHelpers';
 import type { PropsWithChildren } from 'react';
-import type { LayoutRectangle } from 'react-native';
+import type { GestureResponderEvent, LayoutRectangle } from 'react-native';
 
 type Context = {
   deleted: boolean;
@@ -75,6 +75,28 @@ const FormDeleteFieldOverlay = ({ children }: PropsWithChildren) => {
     });
   }, []);
 
+  const onPress = useCallback(
+    (event: GestureResponderEvent) => {
+      if (
+        state.rect &&
+        event.nativeEvent.locationY >= state.rect.y &&
+        event.nativeEvent.locationY <= state.rect.y + state.rect.height &&
+        event.nativeEvent.locationX >=
+          state.rect.x + state.rect.width - DELETE_BUTTON_WIDTH &&
+        event.nativeEvent.locationX <= state.rect.x + state.rect.width
+      ) {
+        dispatch({
+          type: 'DELETE_FIELD',
+        });
+      } else {
+        dispatch({
+          type: 'CLOSE_DELETION_OPTION',
+        });
+      }
+    },
+    [state.rect],
+  );
+
   return (
     <FormDeleteContext.Provider
       value={{ ...state, openDeleteButton, closeDeleteButton }}
@@ -82,28 +104,7 @@ const FormDeleteFieldOverlay = ({ children }: PropsWithChildren) => {
       <ScrollView automaticallyAdjustKeyboardInsets scrollEnabled={!state.rect}>
         {children}
         {state.rect && (
-          <Pressable
-            style={StyleSheet.absoluteFill}
-            onPress={event => {
-              if (
-                state.rect &&
-                event.nativeEvent.locationY >= state.rect.y &&
-                event.nativeEvent.locationY <=
-                  state.rect.y + state.rect.height &&
-                event.nativeEvent.locationX >=
-                  state.rect.x + state.rect.width - DELETE_BUTTON_WIDTH &&
-                event.nativeEvent.locationX <= state.rect.x + state.rect.width
-              ) {
-                dispatch({
-                  type: 'DELETE_FIELD',
-                });
-              } else {
-                dispatch({
-                  type: 'CLOSE_DELETION_OPTION',
-                });
-              }
-            }}
-          />
+          <Pressable style={StyleSheet.absoluteFill} onPress={onPress} />
         )}
       </ScrollView>
     </FormDeleteContext.Provider>
