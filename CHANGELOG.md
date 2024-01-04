@@ -1,5 +1,6 @@
-## 0.5.2-canary.108
+## 0.5.2-canary.109
 
+* **fix:**  - do not include id (conflict with input mutation params) ([#2158](https://github.com/AzzappApp/azzapp/pull/2158))
 * **fix:**  - **webCard:** [#2027](https://github.com/AzzappApp/azzapp/pull/2027) background overlaps content ([#2153](https://github.com/AzzappApp/azzapp/pull/2153))
 * **fix:**  - **multiUser:** [#2095](https://github.com/AzzappApp/azzapp/pull/2095) add common infos on add user modal as well ([#2148](https://github.com/AzzappApp/azzapp/pull/2148))
 * **fix:**  - **multiUser:** [#2022](https://github.com/AzzappApp/azzapp/pull/2022) you can’t remove owner ([#2145](https://github.com/AzzappApp/azzapp/pull/2145))
