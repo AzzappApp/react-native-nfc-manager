@@ -1,8 +1,4 @@
-import {
-  DEFAULT_CARD_STYLE,
-  type CardStyle,
-  type ColorPalette,
-} from '@azzapp/shared/cardHelpers';
+import { type CardStyle, type ColorPalette } from '@azzapp/shared/cardHelpers';
 import {
   HORIZONTAL_PHOTO_DEFAULT_VALUES,
   HORIZONTAL_PHOTO_STYLE_VALUES,
@@ -17,38 +13,26 @@ import {
   MODULE_KIND_SOCIAL_LINKS,
   getModuleDataValues,
 } from '@azzapp/shared/cardModuleHelpers';
-import BlockTextRenderer, {
-  measureBlockTextHeight,
-  readBlockTextData,
-} from './BlockTextRenderer';
+import BlockTextRenderer, { readBlockTextData } from './BlockTextRenderer';
 import CarouselRenderer from './CarouselRenderer';
-import {
-  measureCarouselHeight,
-  readCarouselData,
-} from './CarouselRenderer/CarouselRenderer';
+import { readCarouselData } from './CarouselRenderer/CarouselRenderer';
 import HorizontalPhotoRenderer, {
-  measureHorizontalPhotoHeight,
   readHorizontalPhotoData,
 } from './HorizontalPhotoRenderer';
 import LineDividerRenderer, {
-  measureLineDividerHeight,
   readLineDividerData,
 } from './LineDividerRenderer';
 import PhotoWithTextAndTitleRenderer, {
-  measurePhotoWithTextAndTitleHeight,
   readPhotoWithTextAndTitleData,
 } from './PhotoWithTextAndTitleRenderer';
 import SimpleButtonRenderer, {
-  measureSimpleButtonHeight,
   readSimpleButtonData,
 } from './SimpleButtonRenderer';
 import SimpleTextRenderer, {
-  measureSimpleTextHeight,
   readSimpleTextData,
   readSimpleTitleData,
 } from './SimpleTextRenderer';
 import SocialLinksRenderer, {
-  measureSocialLinksHeight,
   readSocialLinksData,
 } from './SocialLinksRenderer';
 import type {
@@ -299,36 +283,3 @@ const MODULE_RENDERERS_DESKTOP = {
 } as const;
 
 const DESKTOP_CONTENT_MAX_WIDTH = 800;
-
-export const measureModuleHeight = async (
-  module: ModuleRenderInfo,
-  cardStyle: CardStyle | null | undefined,
-  maxWidth: number,
-) => {
-  cardStyle = cardStyle ?? DEFAULT_CARD_STYLE;
-  switch (module.kind) {
-    case MODULE_KIND_BLOCK_TEXT:
-      return measureBlockTextHeight(module.data, cardStyle, maxWidth);
-    case MODULE_KIND_CAROUSEL:
-      return measureCarouselHeight(module.data, cardStyle, maxWidth);
-    case MODULE_KIND_HORIZONTAL_PHOTO:
-      return measureHorizontalPhotoHeight(module.data, cardStyle, maxWidth);
-    case MODULE_KIND_LINE_DIVIDER:
-      return measureLineDividerHeight(module.data, cardStyle, maxWidth);
-    case MODULE_KIND_PHOTO_WITH_TEXT_AND_TITLE:
-      return measurePhotoWithTextAndTitleHeight(
-        module.data,
-        cardStyle,
-        maxWidth,
-      );
-    case MODULE_KIND_SIMPLE_BUTTON:
-      return measureSimpleButtonHeight(module.data, cardStyle, maxWidth);
-    case MODULE_KIND_SIMPLE_TEXT:
-    case MODULE_KIND_SIMPLE_TITLE:
-      return measureSimpleTextHeight(module.data, cardStyle, maxWidth);
-    case MODULE_KIND_SOCIAL_LINKS:
-      return measureSocialLinksHeight(module.data, cardStyle, maxWidth);
-    default:
-      return 0;
-  }
-};

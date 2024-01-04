@@ -1,35 +1,31 @@
-import {
-  createContext,
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
+import { createContext, useCallback, useMemo, useRef, useState } from 'react';
 import { Dimensions, StyleSheet } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import Animated, {
+  enableLayoutAnimations,
   interpolate,
-  scrollTo,
-  useAnimatedReaction,
+  measure,
   useAnimatedRef,
   useAnimatedStyle,
-  useSharedValue,
 } from 'react-native-reanimated';
-import { COVER_RATIO } from '@azzapp/shared/coverHelpers';
 import useScreenInsets from '#hooks/useScreenInsets';
 import { BOTTOM_MENU_HEIGHT } from '#ui/BottomMenu';
 import { HEADER_HEIGHT } from '#ui/Header';
-import { BUTTON_SIZE, useWebCardEditScale } from './webCardScreenHelpers';
+import {
+  BUTTON_SIZE,
+  EDIT_BLOCK_GAP,
+  useWebCardEditScale,
+} from './webCardScreenHelpers';
 import {
   useEditTransition,
   useEditTransitionListeners,
 } from './WebCardScreenTransitions';
 import type { ReactNode } from 'react';
 import type {
-  ScrollViewProps,
-  NativeSyntheticEvent,
   NativeScrollEvent,
+  NativeSyntheticEvent,
+  ScrollViewProps,
+  View,
 } from 'react-native';
 
 export type WebCardScreenScrollViewProps = ScrollViewProps & {
@@ -64,270 +60,138 @@ const WebCardScreenScrollView = ({
   ...props
 }: WebCardScreenScrollViewProps) => {
   const editScale = useWebCardEditScale();
+  const editTransition = useEditTransition();
+  const [editTransitionActive, setEditTransitionActive] = useState(false);
 
-  const coverHeight = Dimensions.get('window').width / COVER_RATIO;
+  const scrollViewRef = useRef<ScrollView>(null);
 
-  const blockInfos = useRef(
-    new Map<string, { index: number; visible: boolean; height: number }>([
-      [
-        'cover',
-        {
-          index: 0,
-          visible: true,
-          height: coverHeight,
-        },
-      ],
-    ]),
-  );
+  const blockContainerRef = useAnimatedRef<View>();
+  const blocks = useRef<{
+    [key: string]: {
+      index: number;
+      height: number;
+      visible: boolean;
+    };
+  }>({});
 
-  const layoutInitialized = useRef(false);
-  const [layoutReady, setLayoutReady] = useState(false);
-  const layoutChangedListeners = useRef(new Set<() => void>());
-  const blockContainerDimensions = useSharedValue({
-    height: coverHeight,
-    editingHeight: (coverHeight + 2 * EDIT_BLOCK_GAP) * editScale,
+  const scrollPositionInfos = useRef<{
+    position: number;
+    editPosition: number;
+  }>({
+    position: 0,
+    editPosition: 0,
   });
 
-  const blockPositions = useRef(
-    new Map<
-      string,
-      {
-        editPosition: number;
-        position: number;
-      }
-    >([
-      [
-        'cover',
-        {
-          editPosition: EDIT_BLOCK_GAP,
-          position: 0,
-        },
-      ],
-    ]),
-  );
-
-  const computeLayoutTimeout = useRef<any>();
-
-  // it should not change during the lifetime of the component
-  const buttonSize = useRef(BUTTON_SIZE / editScale);
-
-  const allBlockLoadedRef = useRef(allBlockLoaded);
-
-  const computeLayout = useCallback(() => {
-    const allBlocksMeasured = Object.values(blockInfos).every(
-      block => block.height !== -1,
-    );
-
-    if (
-      (!allBlocksMeasured && !layoutInitialized.current) ||
-      !allBlockLoadedRef.current
-    ) {
-      return;
-    }
-    const blocks = [...blockInfos.current.entries()]
-      .sort(([, a], [, b]) => a.index - b.index)
-      .map(([id, block]) => ({
-        id,
-        ...block,
-      }));
-    blockPositions.current.clear();
-    let currentPosition = 0;
-    let currentPositionEditing = 0;
-    for (const block of blocks) {
-      currentPositionEditing += EDIT_BLOCK_GAP;
-      blockPositions.current.set(block.id, {
-        editPosition: currentPositionEditing,
-        position: currentPosition,
-      });
-      currentPosition += block.visible ? block.height : 0;
-      currentPositionEditing += Math.max(block.height, buttonSize.current);
-      currentPositionEditing += EDIT_BLOCK_GAP;
-    }
-
-    blockContainerDimensions.value = {
-      height: currentPosition,
-      editingHeight: currentPositionEditing,
-    };
-    layoutInitialized.current = true;
-    setTimeout(() => {
-      // we need to wait for the height to be applied on container before displaying the other elements
-      setLayoutReady(true);
-      layoutChangedListeners.current.forEach(listener => listener());
-    }, 10);
-  }, [blockContainerDimensions]);
-
-  const scheduleLayout = useCallback(() => {
-    clearTimeout(computeLayoutTimeout.current);
-    computeLayoutTimeout.current = setTimeout(() => {
-      computeLayoutTimeout.current = undefined;
-      computeLayout();
-    }, 10);
-  }, [computeLayout]);
-
-  useEffect(() => {
-    if (allBlockLoadedRef.current !== allBlockLoaded) {
-      allBlockLoadedRef.current = allBlockLoaded;
-      scheduleLayout();
-    }
-  }, [allBlockLoaded, scheduleLayout]);
-
-  const registerBlock = useCallback(
-    (id: string, infos: { index: number; visible: boolean }) => {
-      if (blockInfos.current.has(id)) {
-        return;
-      }
-      blockInfos.current.set(id, {
-        ...infos,
-        height: -1,
-      });
-      scheduleLayout();
-      return () => {
-        blockInfos.current.delete(id);
-        scheduleLayout();
-      };
-    },
-    [scheduleLayout],
-  );
-
-  const getBlockPositions = useCallback(
-    (id: string) => {
-      return blockPositions.current.get(id);
-    },
-    [blockPositions],
-  );
-
-  const setBlockInfos = useCallback(
-    (
-      id: string,
-      updates: Partial<{ index: number; visible: boolean; height: number }>,
-    ) => {
-      const block = blockInfos.current.get(id);
-      if (!block) {
-        return;
-      }
-      if (
-        Object.keys(updates).every(
-          key => (block as any)[key] === (updates as any)[key],
-        )
-      ) {
-        return;
-      }
-      Object.assign(block, updates);
-      scheduleLayout();
-    },
-    [scheduleLayout],
-  );
-
-  const addLayoutChangedListener = useCallback((listener: () => void) => {
-    layoutChangedListeners.current.add(listener);
-    return () => {
-      layoutChangedListeners.current.delete(listener);
-    };
-  }, []);
-
-  const contextValue = useMemo(
-    () => ({
-      registerBlock,
-      getBlockPositions,
-      setBlockInfos,
-      addLayoutChangedListener,
-      isLayoutReady: () => layoutInitialized.current,
-    }),
-    [addLayoutChangedListener, getBlockPositions, registerBlock, setBlockInfos],
-  );
-
-  const editTransiton = useEditTransition();
-
-  // it's important that we control this value during the animation process
-  // otherwise the scrollview will jump, that's why we use a shared value
-  // even though it's not animated
-  const transitioning = useRef(false);
-
-  const scrollYRef = useRef(0);
   const onScrollInner = useCallback(
-    (e: NativeSyntheticEvent<NativeScrollEvent>) => {
-      onScroll?.(e);
-      scrollYRef.current = e.nativeEvent.contentOffset.y;
-    },
-    [onScroll],
-  );
+    (scrollEvent: NativeSyntheticEvent<NativeScrollEvent>) => {
+      if (editTransitionActive) {
+        return;
+      }
+      const editing = editTransition?.value ?? 0 > 0;
+      const blockSortedByIndex = Object.entries(blocks.current)
+        .sort(([, a], [, b]) => a.index - b.index)
+        .map(([id, value]) => ({ id, ...value }));
 
-  const scrollViewRef = useAnimatedRef<ScrollView>();
-  const scrollAnimationContext = useSharedValue({
-    from: 0,
-    to: 0,
-    editing,
-    active: false,
-  });
+      // TODO we assume the height of the scroll view
+      // it would be better to get it from the layout but the value will change between
+      // editing and not editing
+      const scrollViewHeight = Dimensions.get('window').height;
+      const scrollViewEditingHeight = scrollViewHeight - editFooterHeight;
+      const y =
+        scrollEvent.nativeEvent.contentOffset.y +
+        (editing ? scrollViewEditingHeight : scrollViewHeight) / 2;
+
+      let middleBlockPosition = 0;
+      let middleBlockEditPosition = 20;
+      let middleBlockHeight = 0;
+      let middleBlockEditHeight = 0;
+      for (const block of blockSortedByIndex) {
+        const nextBlockHeight = block.visible ? block.height : 0;
+        const nextBlockEditHeight =
+          (Math.max(block.height, BUTTON_SIZE) +
+            (EDIT_BLOCK_GAP / editScale) * 2) *
+          editScale;
+        const nextPosition = middleBlockPosition + nextBlockHeight;
+        const nextEditPosition = middleBlockEditPosition + nextBlockEditHeight;
+
+        if ((editing ? nextEditPosition : nextPosition) >= y) {
+          break;
+        }
+        middleBlockPosition = nextPosition;
+        middleBlockEditPosition = nextEditPosition;
+        middleBlockHeight = nextBlockHeight;
+        middleBlockEditHeight = nextBlockEditHeight;
+      }
+
+      scrollPositionInfos.current = {
+        position: Math.max(
+          middleBlockPosition - scrollViewHeight / 2 + middleBlockHeight / 2,
+          0,
+        ),
+        editPosition: Math.max(
+          middleBlockEditPosition -
+            scrollViewEditingHeight / 2 +
+            middleBlockEditHeight / 2 -
+            HEADER_HEIGHT,
+          0,
+        ),
+      };
+      onScroll?.(scrollEvent);
+    },
+    [
+      editTransitionActive,
+      editTransition,
+      editFooterHeight,
+      onScroll,
+      editScale,
+    ],
+  );
 
   useEditTransitionListeners({
     start: editing => {
-      const { height: contentHeight, editingHeight } =
-        blockContainerDimensions.value;
-      transitioning.current = true;
-      const scrollY = scrollYRef.current;
-      const editScrollContentHeight =
-        editingHeight * editScale + editFooterHeight;
-      const ratio = editScrollContentHeight / contentHeight;
-      scrollAnimationContext.value = {
-        from: scrollY,
-        to: editing ? scrollY * ratio : scrollY / ratio,
-        editing,
-        active: true,
-      };
+      setEditTransitionActive(true);
+      enableLayoutAnimations(false);
+
+      // TODO we launch the scroll animation in this event but it would be better to do it
+      // with a controlled useAnimatedProps (or something like it) once reanimated allows it
+      // in the meantime using scrollTo multiple time in a row in a reaction create flickering
+      // in the animation, so this is a workaround that at least keeps the animation smooth
+      const { position, editPosition } = scrollPositionInfos.current;
+      scrollViewRef.current?.scrollTo({
+        y: editing ? editPosition : position,
+        animated: true,
+      });
     },
-    end: editing => {
-      transitioning.current = false;
-      scrollAnimationContext.value = {
-        from: 0,
-        to: 0,
-        editing,
-        active: false,
-      };
+    end: () => {
+      setEditTransitionActive(false);
+      enableLayoutAnimations(true);
     },
   });
-
-  useAnimatedReaction(
-    () => [editTransiton?.value, scrollAnimationContext.value] as const,
-    ([editTransiton, { from, to, editing, active }]) => {
-      if (!active || editTransiton === undefined) {
-        return;
-      }
-
-      const scrollY = interpolate(editTransiton, editing ? [0, 1] : [1, 0], [
-        from,
-        to,
-      ]);
-      const startValue = editing ? from : to;
-      if (scrollY === startValue) {
-        // initial value might cause a glitch
-        return;
-      }
-      scrollTo(scrollViewRef, 0, scrollY, false);
-    },
-  );
 
   const insets = useScreenInsets();
   const containerStyle = useAnimatedStyle(() => {
     return {
-      top: (editTransiton?.value ?? 0) * (insets.top + HEADER_HEIGHT),
+      top: (editTransition?.value ?? 0) * (insets.top + HEADER_HEIGHT),
     };
   });
 
   const contentContainerStyle = useAnimatedStyle(() => {
     return {
-      paddingTop: (editTransiton?.value ?? 0) * 20,
+      paddingTop: (editTransition?.value ?? 0) * 20,
     };
   });
 
-  const innerContainerStyle = useAnimatedStyle(() => {
-    const { height, editingHeight } = blockContainerDimensions.value;
+  const outerBlockContainerStyle = useAnimatedStyle(() => {
+    if ((editTransition?.value ?? 0) <= 0.98) {
+      return { height: 'auto' };
+    }
+
+    const measurement = measure(blockContainerRef);
+    if (!measurement) {
+      return { height: 'auto' };
+    }
     return {
-      height: interpolate(
-        editTransiton?.value ?? 0,
-        [0, 1],
-        [height, editingHeight * editScale],
-      ),
+      height: measurement.height,
     };
   });
 
@@ -335,11 +199,36 @@ const WebCardScreenScrollView = ({
     return {
       transform: [
         {
-          scale: interpolate(editTransiton?.value ?? 0, [0, 1], [1, editScale]),
+          scale: interpolate(
+            editTransition?.value ?? 0,
+            [0, 1],
+            [1, editScale],
+          ),
         },
       ],
     };
   });
+
+  const contextValue = useMemo(
+    () => ({
+      registerBlock: (
+        id: string,
+        index: number,
+        height: number,
+        visible: boolean,
+      ) => {
+        blocks.current[id] = {
+          index,
+          height,
+          visible,
+        };
+      },
+      unregisterBlock: (id: string) => {
+        delete blocks.current[id];
+      },
+    }),
+    [blocks],
+  );
 
   return (
     <Animated.View style={[StyleSheet.absoluteFill, containerStyle]}>
@@ -350,27 +239,28 @@ const WebCardScreenScrollView = ({
         }}
         contentInsetAdjustmentBehavior="never"
         ref={scrollViewRef}
-        scrollEventThrottle={16}
-        onScroll={onScrollInner}
         scrollToOverflowEnabled
+        onScroll={onScrollInner}
+        scrollEventThrottle={16}
         {...props}
       >
         <Animated.View
           style={[
             contentContainerStyle,
-            {
-              marginBottom: insets.bottom + BOTTOM_MENU_HEIGHT + 20,
-            },
+            { marginBottom: insets.bottom + BOTTOM_MENU_HEIGHT + 20 },
           ]}
         >
-          <Animated.View style={innerContainerStyle}>
-            <Animated.View style={blocksContainerStyle}>
-              <ProfileScreenScrollViewContext.Provider value={contextValue}>
+          <Animated.View style={outerBlockContainerStyle}>
+            <Animated.View
+              ref={blockContainerRef}
+              style={[blocksContainerStyle, { transformOrigin: 'top' }]}
+            >
+              <WebCardScreenScrollViewContext.Provider value={contextValue}>
                 {children}
-              </ProfileScreenScrollViewContext.Provider>
+              </WebCardScreenScrollViewContext.Provider>
             </Animated.View>
           </Animated.View>
-          {editing && layoutReady && editFooter}
+          {editing && editFooter}
         </Animated.View>
       </ScrollView>
     </Animated.View>
@@ -379,30 +269,14 @@ const WebCardScreenScrollView = ({
 
 export default WebCardScreenScrollView;
 
-export const ProfileScreenScrollViewContext = createContext<{
+/* eslint-disable @typescript-eslint/no-unused-vars */
+export const WebCardScreenScrollViewContext = createContext({
   registerBlock: (
     id: string,
-    infos: {
-      index: number;
-      visible: boolean;
-    },
-  ) => void;
-  getBlockPositions: (id: string) =>
-    | {
-        editPosition: number;
-        position: number;
-      }
-    | undefined;
-  setBlockInfos: (
-    id: string,
-    updates: Partial<{
-      index: number;
-      visible: boolean;
-      height: number;
-    }>,
-  ) => void;
-  addLayoutChangedListener: (listener: () => void) => () => void;
-  isLayoutReady(): boolean;
-} | null>(null);
-
-export const EDIT_BLOCK_GAP = 20;
+    index: number,
+    height: number,
+    visible: boolean,
+  ) => {},
+  unregisterBlock: (id: string) => {},
+});
+/* eslint-enable @typescript-eslint/no-unused-vars */

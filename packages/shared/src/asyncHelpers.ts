@@ -54,13 +54,13 @@ type Deferred<T> = {
 /**
  * Creates a deferred promise
  */
-export const createDeffered = <T>(): Deferred<T> => {
-  const deffered = {} as Deferred<T>;
-  deffered.promise = new Promise<T>((resolve, reject) => {
-    deffered.resolve = resolve;
-    deffered.reject = reject;
+export const createDeferred = <T>(): Deferred<T> => {
+  const deferred = {} as Deferred<T>;
+  deferred.promise = new Promise<T>((resolve, reject) => {
+    deferred.resolve = resolve;
+    deferred.reject = reject;
   });
-  return deffered;
+  return deferred;
 };
 
 /**
@@ -98,7 +98,7 @@ export const createConcurrentQueue = <T>(
     execute();
   };
   return (task: () => Promise<T>) => {
-    const deferred = createDeffered<T>();
+    const deferred = createDeferred<T>();
     queue.push({ task, deferred });
     void execute();
     return deferred.promise;

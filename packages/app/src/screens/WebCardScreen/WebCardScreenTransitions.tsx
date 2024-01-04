@@ -14,7 +14,7 @@ import {
 } from 'react-native-reanimated';
 import { EDIT_TRANSITION_DURATION } from './webCardScreenHelpers';
 
-const EditTranstionContext = createContext<{
+const EditTransitionContext = createContext<{
   edit: SharedValue<number>;
   addEditTransitionStartListener: (
     callback: (editing: boolean) => void,
@@ -25,14 +25,14 @@ const EditTranstionContext = createContext<{
   selection: SharedValue<number>;
 } | null>(null);
 
-export const useEditTransition = () => useContext(EditTranstionContext)?.edit;
+export const useEditTransition = () => useContext(EditTransitionContext)?.edit;
 
 export const useEditTransitionListeners = (callbacks: {
   start?: (editing: boolean) => void;
   end?: (editing: boolean) => void;
 }) => {
   const { addEditTransitionStartListener, addEditTransitionEndListener } =
-    useContext(EditTranstionContext)!;
+    useContext(EditTransitionContext)!;
 
   const startRef = useRef(callbacks.start);
   const endRef = useRef(callbacks.end);
@@ -58,7 +58,7 @@ export const useEditTransitionListeners = (callbacks: {
 };
 
 export const useSelectionModeTransition = () =>
-  useContext(EditTranstionContext)?.selection;
+  useContext(EditTransitionContext)?.selection;
 
 export type WebCardScreenEditTransitionProviderProps = {
   editing: boolean;
@@ -72,18 +72,18 @@ export const WebCardScreenTransitionsProvider = ({
   children,
 }: WebCardScreenEditTransitionProviderProps) => {
   const editTransition = useSharedValue(0);
-  const editTransitionEndlisteners = useRef(
+  const editTransitionEndListeners = useRef(
     new Set<(editing: boolean) => void>(),
   );
-  const editTransitionStartlisteners = useRef(
+  const editTransitionStartListeners = useRef(
     new Set<(editing: boolean) => void>(),
   );
 
   const onTransitionEnd = useCallback(
     (editing: boolean) => {
-      editTransitionEndlisteners.current.forEach(listener => listener(editing));
+      editTransitionEndListeners.current.forEach(listener => listener(editing));
     },
-    [editTransitionEndlisteners],
+    [editTransitionEndListeners],
   );
 
   const init = useRef(false);
@@ -95,7 +95,7 @@ export const WebCardScreenTransitionsProvider = ({
       return;
     }
 
-    editTransitionStartlisteners.current.forEach(listener => listener(editing));
+    editTransitionStartListeners.current.forEach(listener => listener(editing));
     editTransition.value = withTiming(
       editing ? 1 : 0,
       {
@@ -109,9 +109,9 @@ export const WebCardScreenTransitionsProvider = ({
 
   const addEditTransitionEndListener = useCallback(
     (callback: (editing: boolean) => void) => {
-      editTransitionEndlisteners.current.add(callback);
+      editTransitionEndListeners.current.add(callback);
       return () => {
-        editTransitionEndlisteners.current.delete(callback);
+        editTransitionEndListeners.current.delete(callback);
       };
     },
     [],
@@ -119,9 +119,9 @@ export const WebCardScreenTransitionsProvider = ({
 
   const addEditTransitionStartListener = useCallback(
     (callback: (editing: boolean) => void) => {
-      editTransitionStartlisteners.current.add(callback);
+      editTransitionStartListeners.current.add(callback);
       return () => {
-        editTransitionStartlisteners.current.delete(callback);
+        editTransitionStartListeners.current.delete(callback);
       };
     },
     [],
@@ -149,8 +149,8 @@ export const WebCardScreenTransitionsProvider = ({
     ],
   );
   return (
-    <EditTranstionContext.Provider value={contextValue}>
+    <EditTransitionContext.Provider value={contextValue}>
       {children}
-    </EditTranstionContext.Provider>
+    </EditTransitionContext.Provider>
   );
 };

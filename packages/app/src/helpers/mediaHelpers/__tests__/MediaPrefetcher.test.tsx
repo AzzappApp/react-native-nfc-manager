@@ -1,4 +1,4 @@
-import { createDeffered } from '@azzapp/shared/asyncHelpers';
+import { createDeferred } from '@azzapp/shared/asyncHelpers';
 import { flushPromises } from '@azzapp/shared/jestHelpers';
 import { createPrefetecher } from '../MediaPrefetcher';
 
@@ -134,7 +134,7 @@ describe('MediaPrefetcher', () => {
 
   test('should cancel the prefetch when the observable is unsubscribed before the `prefetch` promise resolve', async () => {
     const uri = 'https://www.example.com/image.png';
-    const prefetchDeferred = createDeffered();
+    const prefetchDeferred = createDeferred();
     prefetch.mockReturnValueOnce(prefetchDeferred);
     prefetch.mockResolvedValueOnce(true);
     observePrefetchResult.mockResolvedValueOnce(undefined);
@@ -162,7 +162,7 @@ describe('MediaPrefetcher', () => {
   test('should cancel the prefetch when the observable is unsubscribed before the `observePrefetchResult` promise resolves', async () => {
     const uri = 'https://www.example.com/image.png';
     prefetch.mockResolvedValueOnce(true);
-    const observerPrefetchDeferred = createDeffered();
+    const observerPrefetchDeferred = createDeferred();
     observePrefetchResult.mockReturnValueOnce(observerPrefetchDeferred.promise);
 
     const observable = prefetcher(uri);

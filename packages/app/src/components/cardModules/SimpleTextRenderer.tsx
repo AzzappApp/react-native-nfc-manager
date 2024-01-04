@@ -10,7 +10,6 @@ import {
   getModuleDataValues,
   textAlignmentOrDefault,
 } from '@azzapp/shared/cardModuleHelpers';
-import measureText from '#helpers/measureText';
 import CardModuleBackground from './CardModuleBackground';
 import type {
   SimpleTextRenderer_simpleTextModule$data,
@@ -182,44 +181,3 @@ const SimpleTextRenderer = ({
 };
 
 export default SimpleTextRenderer;
-
-export const measureSimpleTextHeight = async (
-  data: SimpleTextRendererData,
-  cardStyle: CardStyle,
-  maxWidth: number,
-) => {
-  const {
-    text,
-    fontFamily,
-    fontSize,
-    verticalSpacing,
-    marginHorizontal,
-    marginVertical,
-  } = getModuleDataValues({
-    data,
-    styleValuesMap:
-      data.kind === MODULE_KIND_SIMPLE_TITLE
-        ? SIMPLE_TITLE_STYLE_VALUES
-        : SIMPLE_TEXT_STYLE_VALUES,
-    cardStyle,
-    defaultValues:
-      data.kind === MODULE_KIND_SIMPLE_TITLE
-        ? SIMPLE_TITLE_DEFAULT_VALUES
-        : SIMPLE_TEXT_DEFAULT_VALUES,
-  });
-
-  const textMaxWidth = maxWidth - (marginHorizontal ?? 0) * 2;
-
-  const textSize = await measureText({
-    text: text ?? '',
-    fontFamily: fontFamily ?? undefined,
-    fontSize,
-    width: textMaxWidth,
-    lineHeight:
-      fontSize && verticalSpacing
-        ? fontSize * 1.2 + verticalSpacing
-        : undefined,
-  });
-
-  return marginVertical * 2 + textSize;
-};

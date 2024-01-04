@@ -5,22 +5,28 @@ import Toast from 'react-native-toast-message';
 import { graphql, useFragment } from 'react-relay';
 import { swapColor } from '@azzapp/shared/cardHelpers';
 import { MODULE_KINDS } from '@azzapp/shared/cardModuleHelpers';
+import { COVER_RATIO } from '@azzapp/shared/coverHelpers';
 import { colors } from '#theme';
 import CoverRenderer from '#components/CoverRenderer';
-import { useRouter, useScreenHasFocus } from '#components/NativeRouter';
+import {
+  ScreenDidAppear,
+  useRouter,
+  useScreenHasFocus,
+} from '#components/NativeRouter';
 import WebCardBackground from '#components/WebCardBackgroundPreview';
+import ActivityIndicator from '#ui/ActivityIndicator';
 import CardStyleModal from './CardStyleModal';
 import LoadCardTemplateModal from './LoadCardTemplateModal';
 import ModuleSelectionListModal from './ModuleSelectionListModal';
 import PreviewModal from './PreviewModal';
 import WebCardBlockContainer from './WebCardBlockContainer';
 import WebCardColorPicker from './WebCardColorPicker';
-import ProfileScreenBody from './WebCardScreenBody';
+import WebCardScreenBody from './WebCardScreenBody';
 import WebCardScreenEditModeFooter, {
   WEBCARD_SCREEN_EDIT_MODE_FOOTER_HEIGHT,
 } from './WebCardScreenEditModeFooter';
 import WebCardScreenFooter from './WebCardScreenFooter';
-import WebCardScrenHeader from './WebCardScreenHeader';
+import WebCardScreenHeader from './WebCardScreenHeader';
 import WebCardScreenScrollView from './WebCardScreenScrollView';
 import { useEditTransition } from './WebCardScreenTransitions';
 import type {
@@ -129,7 +135,7 @@ const WebCardScreenContent = ({
     setShowWebcardColorPicker(true);
   }, []);
 
-  const onClosWebcardeColorPicker = useCallback(() => {
+  const onClosWebcardColorPicker = useCallback(() => {
     setShowWebcardColorPicker(false);
   }, []);
 
@@ -266,17 +272,17 @@ const WebCardScreenContent = ({
     [onContentPositionChange],
   );
 
-  const { width: windowSize } = useWindowDimensions();
+  const { width: windowWidth, height: windowHeight } = useWindowDimensions();
   const coverBackgroundColor =
     swapColor(webCard.cardCover?.backgroundColor, webCard.cardColors) ??
     webCard.cardColors?.light ??
     colors.white;
 
-  const editTransiton = useEditTransition();
+  const editTransition = useEditTransition();
 
   const backgroundStyle = useAnimatedStyle(() => {
     return {
-      opacity: editTransiton?.value ? 0 : 1,
+      opacity: editTransition?.value ? 0 : 1,
     };
   }, []);
 
@@ -285,7 +291,7 @@ const WebCardScreenContent = ({
   return (
     <>
       <View style={{ flex: 1 }}>
-        <WebCardScrenHeader
+        <WebCardScreenHeader
           editing={editing}
           nbSelectedModules={nbSelectedModules}
           selectionMode={selectionMode}
@@ -317,21 +323,44 @@ const WebCardScreenContent = ({
           >
             <CoverRenderer
               webCard={webCard}
-              width={windowSize}
+              width={windowWidth}
               animationEnabled={ready && hasFocus}
               hideBorderRadius
             />
           </WebCardBlockContainer>
-          <Suspense fallback={null}>
-            <ProfileScreenBody
-              ref={webCardBodyRef}
-              webCard={webCard}
-              editing={editing}
-              selectionMode={selectionMode}
-              onEditModule={onEditModule}
-              onSelectionStateChange={onSelectionStateChange}
-              onLoad={onProfileBodyLoad}
-            />
+          <Suspense
+            fallback={
+              <View
+                style={{
+                  height: 60,
+                  maxHeight: windowHeight - windowWidth / COVER_RATIO,
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                }}
+              >
+                <ActivityIndicator />
+              </View>
+            }
+          >
+            {/* TODO: We need to wrap the body in a ScreenDidAppear component
+             * To avoid a reanimated bug preventing layout transition
+             * if web card block are mounted during the transition
+             * @see https://github.com/software-mansion/react-native-reanimated/issues/4516
+             *
+             * Could be solved directly in WebCardBlockContainer once this PR is merged :
+             * https://github.com/software-mansion/react-native-reanimated/pull/5371
+             */}
+            <ScreenDidAppear>
+              <WebCardScreenBody
+                ref={webCardBodyRef}
+                webCard={webCard}
+                editing={editing}
+                selectionMode={selectionMode}
+                onEditModule={onEditModule}
+                onSelectionStateChange={onSelectionStateChange}
+                onLoad={onProfileBodyLoad}
+              />
+            </ScreenDidAppear>
           </Suspense>
         </WebCardScreenScrollView>
         <Suspense fallback={null}>
@@ -404,7 +433,7 @@ const WebCardScreenContent = ({
             <WebCardColorPicker
               webCard={webCard}
               visible={showWebcardColorPicker}
-              onRequestClose={onClosWebcardeColorPicker}
+              onRequestClose={onClosWebcardColorPicker}
             />
           </Suspense>
         </>

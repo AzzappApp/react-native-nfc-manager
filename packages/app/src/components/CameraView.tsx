@@ -22,7 +22,7 @@ import {
   useCameraDevice,
   useCameraFormat,
 } from 'react-native-vision-camera';
-import { createDeffered } from '@azzapp/shared/asyncHelpers';
+import { createDeferred } from '@azzapp/shared/asyncHelpers';
 import useIsForeground from '#hooks/useIsForeground';
 import FloatingIconButton from '#ui/FloatingIconButton';
 import type { ForwardedRef } from 'react';
@@ -153,7 +153,7 @@ const CameraView = (
         if (!camera.current || !isActive) {
           return null;
         }
-        const resultDeffered = createDeffered<{
+        const resultDeffered = createDeferred<{
           path: string;
           duration: number;
         }>();

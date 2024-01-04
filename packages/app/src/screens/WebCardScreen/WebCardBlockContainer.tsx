@@ -1,7 +1,6 @@
-import { useState, useEffect, useMemo, useContext } from 'react';
+import { useState, useEffect, useMemo, useContext, useCallback } from 'react';
 import { useIntl } from 'react-intl';
 import {
-  PixelRatio,
   StyleSheet,
   View,
   useColorScheme,
@@ -11,6 +10,7 @@ import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import Animated, {
   FadeIn,
   FadeOut,
+  LinearTransition,
   interpolate,
   runOnJS,
   useAnimatedReaction,
@@ -20,23 +20,20 @@ import Animated, {
 } from 'react-native-reanimated';
 import { COVER_CARD_RADIUS } from '@azzapp/shared/coverHelpers';
 import { colors, shadow } from '#theme';
-import {
-  type ModuleRenderInfo,
-  measureModuleHeight,
-} from '#components/cardModules/CardModuleRenderer';
 import Icon from '#ui/Icon';
 import IconButton from '#ui/IconButton';
 import {
   BUTTON_SIZE,
+  EDIT_BLOCK_GAP,
   EDIT_TRANSITION_DURATION,
   useWebCardEditScale,
 } from './webCardScreenHelpers';
-import { ProfileScreenScrollViewContext } from './WebCardScreenScrollView';
+import { WebCardScreenScrollViewContext } from './WebCardScreenScrollView';
 import {
   useEditTransition,
   useSelectionModeTransition,
 } from './WebCardScreenTransitions';
-import type { CardStyle } from '@azzapp/shared/cardHelpers';
+import type { LayoutChangeEvent } from 'react-native';
 
 export type ProfileBlockContainerProps = {
   /**
@@ -108,8 +105,6 @@ export type ProfileBlockContainerProps = {
    */
   backgroundColor: string;
 
-  moduleRenderInfo?: ModuleRenderInfo;
-  cardStyle?: CardStyle | null;
   /**
    * Called when the user press a module, only enabled in edit mode
    */
@@ -160,8 +155,6 @@ const WebCardBlockContainer = ({
   selected,
   backgroundColor,
   children,
-  moduleRenderInfo,
-  cardStyle,
   onModulePress,
   onMoveUp,
   onMoveDown,
@@ -173,117 +166,41 @@ const WebCardBlockContainer = ({
   const intl = useIntl();
 
   const { width: windowWidth } = useWindowDimensions();
-  const [measuredHeight, setMeasuredHeight] = useState(0);
 
   const editScale = useWebCardEditScale();
 
   const buttonSize = BUTTON_SIZE / editScale;
   const iconSize = 24 / editScale;
 
-  const editingHeight =
-    measuredHeight < buttonSize ? buttonSize : measuredHeight;
-
   const editingTransition = useEditTransition();
-
-  const {
-    registerBlock,
-    addLayoutChangedListener,
-    getBlockPositions,
-    setBlockInfos,
-    isLayoutReady,
-  } = useContext(ProfileScreenScrollViewContext)!;
-
-  useEffect(
-    () =>
-      registerBlock(id, {
-        index,
-        visible,
-      }),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [id, registerBlock],
-  );
-
-  useEffect(() => {
-    let cancelled = false;
-    if (moduleRenderInfo) {
-      measureModuleHeight(moduleRenderInfo, cardStyle, windowWidth).then(
-        height => {
-          if (!cancelled) {
-            setMeasuredHeight(PixelRatio.roundToNearestPixel(height));
-          }
-        },
-      );
-    }
-    return () => {
-      cancelled = true;
-    };
-  }, [moduleRenderInfo, cardStyle, windowWidth]);
-
-  useEffect(() => {
-    if (measuredHeight === 0) {
-      return;
-    }
-    setBlockInfos(id, {
-      index,
-      visible,
-      height: measuredHeight,
-    });
-  }, [measuredHeight, id, index, setBlockInfos, visible]);
-
-  const { position, editPosition } = getBlockPositions(id) ?? {};
-  const positionSharedValue = useSharedValue(position);
-  const editPositionSharedValue = useSharedValue(editPosition);
-  const layoutReadySharedValue = useSharedValue(
-    id === 'cover' || isLayoutReady() ? 1 : 0,
-  );
-  const [hasBeenDisplayed, setHasBeenDisplayed] = useState(id === 'cover');
-  useEffect(
-    () =>
-      addLayoutChangedListener(() => {
-        const positions = getBlockPositions(id);
-        if (
-          !positions ||
-          positionSharedValue.value === undefined ||
-          editPositionSharedValue.value === undefined ||
-          !editingTransition?.value ||
-          !isLayoutReady() ||
-          id === 'cover'
-        ) {
-          positionSharedValue.value = positions?.position;
-          editPositionSharedValue.value = positions?.editPosition;
-        } else {
-          positionSharedValue.value = withTiming(positions.position, {
-            duration: EDIT_TRANSITION_DURATION,
-          });
-          editPositionSharedValue.value = withTiming(positions.editPosition, {
-            duration: EDIT_TRANSITION_DURATION,
-          });
-        }
-        if (isLayoutReady() && id !== 'cover') {
-          layoutReadySharedValue.value = withTiming(
-            1,
-            { duration: EDIT_TRANSITION_DURATION },
-            () => {
-              runOnJS(setHasBeenDisplayed)(true);
-            },
-          );
-        }
-      }),
-    [
-      addLayoutChangedListener,
-      editPositionSharedValue,
-      getBlockPositions,
-      id,
-      positionSharedValue,
-      isLayoutReady,
-      layoutReadySharedValue,
-      editingTransition,
-    ],
-  );
 
   const dragX = useSharedValue(0);
   const dragRightLimit = (windowWidth * (1 - editScale)) / 2;
   const dragLeftLimit = (windowWidth * (editScale - 1)) / 2;
+
+  const [height, setHeight] = useState(-1);
+  const { registerBlock, unregisterBlock } = useContext(
+    WebCardScreenScrollViewContext,
+  );
+  const onLayout = useCallback(
+    ({
+      nativeEvent: {
+        layout: { height },
+      },
+    }: LayoutChangeEvent) => {
+      setHeight(height);
+    },
+    [],
+  );
+
+  useEffect(() => {
+    if (height === -1) {
+      return;
+    }
+
+    registerBlock(id, index, height, visible);
+    return () => unregisterBlock(id);
+  }, [height, id, index, registerBlock, unregisterBlock, visible]);
 
   useEffect(() => {
     if (selectionMode && editing) {
@@ -382,32 +299,14 @@ const WebCardBlockContainer = ({
   );
 
   const blockStyle = useAnimatedStyle(() => {
-    const position = positionSharedValue.value;
-    const editPosition = editPositionSharedValue.value;
-    if (position === undefined || editPosition === undefined) {
-      return {
-        display: 'none',
-      };
-    }
     const editTransitionValue = editingTransition?.value ?? 0;
     return {
       display: 'flex',
-      position: 'absolute',
-      width: windowWidth,
-      height: interpolate(
-        editingTransition?.value ?? 0,
-        [0, 1],
-        [measuredHeight, editingHeight],
-      ),
       zIndex: visible ? 0 : editTransitionValue > 0 ? 0 : -1,
-      left: 0,
-      top: interpolate(
-        editingTransition?.value ?? 0,
-        [0, 1],
-        [position, editPosition],
-      ),
-      opacity:
-        layoutReadySharedValue.value * (visible ? 1 : editTransitionValue),
+      opacity: visible ? 1 : editTransitionValue,
+      marginVertical: editTransitionValue * (EDIT_BLOCK_GAP / editScale),
+      minHeight: editTransitionValue * BUTTON_SIZE,
+      height: visible || editTransitionValue > 0 ? 'auto' : 0,
     };
   });
 
@@ -418,7 +317,6 @@ const WebCardBlockContainer = ({
     overflow: 'visible',
     backgroundColor,
     transform: [{ translateX: dragX.value }],
-    position: 'absolute',
     width: windowWidth,
   }));
 
@@ -431,9 +329,9 @@ const WebCardBlockContainer = ({
 
   const actionSectionBaseStyle = {
     position: 'absolute',
-    top: Math.max(0, measuredHeight / 2 - buttonSize / 2),
     alignItems: 'center',
     flexDirection: 'row',
+    height: '100%',
     gap: 20,
   } as const;
 
@@ -462,14 +360,20 @@ const WebCardBlockContainer = ({
   return (
     <Animated.View
       style={blockStyle}
-      exiting={id !== 'cover' && hasBeenDisplayed ? FadeOut : undefined}
-      entering={id !== 'cover' && hasBeenDisplayed ? FadeIn : undefined}
+      entering={
+        id !== 'cover' ? FadeIn.duration(EDIT_TRANSITION_DURATION) : undefined
+      }
+      exiting={
+        id !== 'cover' ? FadeOut.duration(EDIT_TRANSITION_DURATION) : undefined
+      }
+      layout={LinearTransition.duration(EDIT_TRANSITION_DURATION)}
     >
       <GestureDetector gesture={Gesture.Race(tapGesture, panGesture)}>
         <Animated.View
           style={[moduleContainerStyle, editing && shadow(appearance)]}
+          onLayout={onLayout}
         >
-          {/** this View is only here because ios bug with shadow and overlow hidden */}
+          {/** this View is only here because ios bug with shadow and overflow hidden */}
           <Animated.View
             style={moduleInnerContainerStyle}
             accessibilityHint={

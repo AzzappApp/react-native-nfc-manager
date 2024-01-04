@@ -14115,11 +14115,6 @@ rimraf@~2.6.2:
   dependencies:
     glob "^7.1.3"
 
-rn-text-size@4.0.0-rc.3:
-  version "4.0.0-rc.3"
-  resolved "https://registry.yarnpkg.com/rn-text-size/-/rn-text-size-4.0.0-rc.3.tgz#1966737222647884f3969f05ad7487be45c31875"
-  integrity sha512-yoo7J3Um3MMQf89sxb4p/MwVvGA8KTwJYU6uayDccM7bQ9zMI3N/wWMdAVyvqe8xh24A3Plv4cGPlvC4elastw==
-
 rollup@2.78.0:
   version "2.78.0"
   resolved "https://registry.yarnpkg.com/rollup/-/rollup-2.78.0.tgz#00995deae70c0f712ea79ad904d5f6b033209d9e"

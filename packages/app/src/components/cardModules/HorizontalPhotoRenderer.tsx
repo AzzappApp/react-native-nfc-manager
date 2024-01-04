@@ -144,18 +144,3 @@ const HorizontalPhotoRenderer = ({
 };
 
 export default HorizontalPhotoRenderer;
-
-export const measureHorizontalPhotoHeight = async (
-  data: HorizontalPhotoRendererData,
-  cardStyle: CardStyle,
-  _maxWidth: number,
-) => {
-  const { marginVertical, imageHeight } = getModuleDataValues({
-    data,
-    cardStyle,
-    defaultValues: HORIZONTAL_PHOTO_DEFAULT_VALUES,
-    styleValuesMap: HORIZONTAL_PHOTO_STYLE_VALUES,
-  });
-
-  return marginVertical * 2 + imageHeight;
-};
