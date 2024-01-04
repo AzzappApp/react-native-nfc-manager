@@ -86,6 +86,7 @@ const HomeBottomPanel = ({
       fragment HomeBottomPanel_profiles on Profile {
         id
         invited
+        profileRole
         promotedAsOwner
         webCard {
           id
@@ -369,6 +370,13 @@ const HomeBottomPanel = ({
     [profiles],
   );
 
+  const profilesIsOwner = useMemo(
+    () =>
+      profiles?.map(profile => (profile?.profileRole === 'owner' ? 1 : 0)) ??
+      [],
+    [profiles],
+  );
+
   const profilesIsPromotedAsOwner = useMemo(
     () => profiles?.map(profile => (profile?.promotedAsOwner ? 1 : 0)) ?? [],
     [profiles],
@@ -387,6 +395,8 @@ const HomeBottomPanel = ({
     const nextIsInvitation = !!profilesIsInvitation[next];
     const prevIsPromotedAsOwner = !!profilesIsPromotedAsOwner[prev];
     const nextIsPromotedAsOwner = !!profilesIsPromotedAsOwner[next];
+    const prevIsOwner = !!profilesIsOwner[prev];
+    const nextIsOwner = !!profilesIsOwner[next];
 
     const prevIsNewProfile = prev === -1;
 
@@ -416,6 +426,12 @@ const HomeBottomPanel = ({
           : 1,
         nextWebCardPublished || !nextHasWebCover || nextIsInvitation ? 0 : 1,
       ],
+    );
+
+    const webCardPublishButtonVisible = interpolate(
+      currentProfileIndexSharedValue.value,
+      [prev, prev + 0.2, next - 0.2, next],
+      [prevIsOwner ? 1 : 0, 0, 0, nextIsOwner ? 1 : 0],
     );
 
     const invitationPanelVisible = interpolate(
@@ -457,6 +473,7 @@ const HomeBottomPanel = ({
       bottomPanelVisible,
       invitationPanelVisible,
       promotionPanelVisible,
+      webCardPublishButtonVisible,
     };
   });
 
@@ -496,6 +513,11 @@ const HomeBottomPanel = ({
   const promotionPanelStyle = useAnimatedStyle(() => ({
     opacity: panelVisibilities.value.promotionPanelVisible,
     zIndex: panelVisibilities.value.promotionPanelVisible,
+  }));
+
+  const webCardPublishButtonStyle = useAnimatedStyle(() => ({
+    opacity: panelVisibilities.value.webCardPublishButtonVisible,
+    zIndex: panelVisibilities.value.webCardPublishButtonVisible,
   }));
 
   const bottomPanelStyle = useAnimatedStyle(() => ({
@@ -628,25 +650,28 @@ const HomeBottomPanel = ({
             }}
           />
         </Text>
-        <Button
-          variant="secondary"
-          appearance="dark"
-          label={
-            <FormattedMessage
-              defaultMessage="Publish this WebCard{azzappA}"
-              description="Home Screen - webcard not published button"
-              values={{
-                azzappA: (
-                  <Text style={styles.icon} variant="azzapp">
-                    a
-                  </Text>
-                ),
-              }}
-            />
-          }
-          style={styles.informationPanelButton}
-          onPress={onPublish}
-        />
+
+        <Animated.View style={webCardPublishButtonStyle}>
+          <Button
+            variant="secondary"
+            appearance="dark"
+            label={
+              <FormattedMessage
+                defaultMessage="Publish this WebCard{azzappA}"
+                description="Home Screen - webcard not published button"
+                values={{
+                  azzappA: (
+                    <Text style={styles.icon} variant="azzapp">
+                      a
+                    </Text>
+                  ),
+                }}
+              />
+            }
+            style={styles.informationPanelButton}
+            onPress={onPublish}
+          />
+        </Animated.View>
       </Animated.View>
 
       <Animated.View style={[styles.informationPanel, invitationPanelStyle]}>
