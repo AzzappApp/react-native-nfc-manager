@@ -11,6 +11,7 @@ import CoverRenderer from '#components/CoverRenderer';
 import { useRouter } from '#components/NativeRouter';
 import ScreenModal from '#components/ScreenModal';
 import relayScreen from '#helpers/relayScreen';
+import useScreenInsets from '#hooks/useScreenInsets';
 import useToggle from '#hooks/useToggle';
 import Button from '#ui/Button';
 import Container from '#ui/Container';
@@ -199,6 +200,8 @@ const MultiUserScreen = ({
     [setAllowMultiUser],
   );
 
+  const { bottom } = useScreenInsets();
+
   return (
     <Container style={{ flex: 1 }}>
       <SafeAreaView
@@ -235,7 +238,10 @@ const MultiUserScreen = ({
             />
           }
         />
-        <ScrollView style={{ flex: 1 }}>
+        <ScrollView
+          style={{ flex: 1 }}
+          contentContainerStyle={{ paddingBottom: bottom }}
+        >
           <View style={styles.content}>
             <Icon style={styles.sharedIcon} icon="multi_user" />
             <Text style={[textStyles.xsmall, styles.description]}>
@@ -385,6 +391,7 @@ const styles = StyleSheet.create({
 
 export default relayScreen(MultiUserScreen, {
   query: multiUserScreenQuery,
+  fetchPolicy: 'store-and-network',
   getVariables: () => ({
     pixelRatio: CappedPixelRatio(),
   }),
