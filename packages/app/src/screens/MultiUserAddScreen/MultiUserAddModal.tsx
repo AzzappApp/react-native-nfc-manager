@@ -5,7 +5,7 @@ import { View, StyleSheet } from 'react-native';
 import * as mime from 'react-native-mime-types';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
-import { graphql, useMutation } from 'react-relay';
+import { graphql, useFragment, useMutation } from 'react-relay';
 import { type ContactCard } from '@azzapp/shared/contactCardHelpers';
 import ERRORS from '@azzapp/shared/errors';
 import { encodeMediaId } from '@azzapp/shared/imagesHelpers';
@@ -24,6 +24,7 @@ import MultiUserAddForm from './MultiUserAddForm';
 import type { ContactCardEditFormValues } from '#screens/ContactCardScreen/ContactCardEditModalSchema';
 import type { MultiUserAddFormValues } from './MultiUserAddForm';
 import type { MultiUserAddModal_InviteUserMutation } from '@azzapp/relay/artifacts/MultiUserAddModal_InviteUserMutation.graphql';
+import type { MultiUserAddModal_webCard$key } from '@azzapp/relay/artifacts/MultiUserAddModal_webCard.graphql';
 import type { ForwardedRef } from 'react';
 import type { Control } from 'react-hook-form';
 
@@ -31,6 +32,7 @@ import type { Control } from 'react-hook-form';
 type MultiUserAddModalProps = {
   beforeClose: () => void;
   onCompleted: () => void;
+  webCard: MultiUserAddModal_webCard$key;
 };
 
 export type UserToAdd = {
@@ -58,6 +60,36 @@ const MultiUserAddModal = (
   props: MultiUserAddModalProps,
   ref: ForwardedRef<MultiUserAddModalActions>,
 ) => {
+  const { commonInformation } = useFragment(
+    graphql`
+      fragment MultiUserAddModal_webCard on WebCard {
+        commonInformation {
+          company
+          addresses {
+            label
+            address
+          }
+          emails {
+            label
+            address
+          }
+          phoneNumbers {
+            label
+            number
+          }
+          urls {
+            address
+          }
+          socials {
+            label
+            url
+          }
+        }
+      }
+    `,
+    props.webCard,
+  );
+
   const { beforeClose, onCompleted } = props;
   const [visible, setVisible] = useState(false);
 
@@ -364,7 +396,7 @@ const MultiUserAddModal = (
             }
           />
           <ContactCardEditForm
-            commonInformation={null}
+            commonInformation={commonInformation}
             control={control as unknown as Control<ContactCardEditFormValues>}
             hideImagePicker={() => setShowImagePicker(false)}
             showImagePicker={() => setShowImagePicker(true)}

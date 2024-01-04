@@ -4,7 +4,7 @@ import { Suspense, useEffect, useMemo, useRef, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { graphql, useQueryLoader } from 'react-relay';
+import { graphql, usePreloadedQuery, useQueryLoader } from 'react-relay';
 import { formatBirthday } from '@azzapp/shared/timeHelpers';
 import { textStyles } from '#theme';
 import { useRouter } from '#components/NativeRouter';
@@ -17,11 +17,14 @@ import Separation from '#ui/Separation';
 import Text from '#ui/Text';
 import MultiUserAddList from './MultiUserAddList';
 import MultiUserAddModal from './MultiUserAddModal';
+import type { RelayScreenProps } from '#helpers/relayScreen';
+import type { MultiUserAddRoute } from '#routes';
 import type {
   AssociatedUser,
   MultiUserAddModalActions,
 } from './MultiUserAddModal';
 import type { MultiUserAddScreen_FindContactsQuery as Query } from '@azzapp/relay/artifacts/MultiUserAddScreen_FindContactsQuery.graphql';
+import type { MultiUserAddScreenQuery } from '@azzapp/relay/artifacts/MultiUserAddScreenQuery.graphql';
 
 export type Contact = {
   lastName: string;
@@ -63,17 +66,21 @@ export const MultiUserAddScreen_FindContactsQuery = graphql`
   }
 `;
 
-export const multiUserAddScreenQuery = graphql`
+const multiUserAddScreenQuery = graphql`
   query MultiUserAddScreenQuery {
     viewer {
       profile {
-        id
+        webCard {
+          ...MultiUserAddModal_webCard
+        }
       }
     }
   }
 `;
 
-const MultiUserAddScreen = () => {
+const MultiUserAddScreen = ({
+  preloadedQuery,
+}: RelayScreenProps<MultiUserAddRoute, MultiUserAddScreenQuery>) => {
   const intl = useIntl();
   const router = useRouter();
 
@@ -81,6 +88,8 @@ const MultiUserAddScreen = () => {
   const isSearchPhoneNumber = useMemo(() => {
     return isValidPhoneNumber(searchValue ?? '');
   }, [searchValue]);
+
+  const data = usePreloadedQuery(multiUserAddScreenQuery, preloadedQuery);
 
   const [localContacts, setLocalContacts] = useState<Contact[]>([]);
   const [azzappContacts, fetchAzzappContacts, disposeFetchAzzappContacts] =
@@ -348,11 +357,14 @@ const MultiUserAddScreen = () => {
           </ScrollView>
         </SafeAreaView>
       </Container>
-      <MultiUserAddModal
-        onCompleted={router.back}
-        beforeClose={() => setSearchValue('')}
-        ref={ref}
-      />
+      {data.viewer.profile ? (
+        <MultiUserAddModal
+          onCompleted={router.back}
+          webCard={data.viewer.profile.webCard}
+          beforeClose={() => setSearchValue('')}
+          ref={ref}
+        />
+      ) : null}
     </>
   );
 };
