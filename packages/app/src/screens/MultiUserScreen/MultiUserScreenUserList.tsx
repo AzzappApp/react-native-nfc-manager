@@ -3,6 +3,8 @@ import { useIntl } from 'react-intl';
 import { StyleSheet, View } from 'react-native';
 import { graphql, useFragment } from 'react-relay';
 import { colors, textStyles } from '#theme';
+import { MEDIA_WIDTH } from '#components/AuthorCartouche';
+import { MediaImageRenderer } from '#components/medias';
 import { useRouter } from '#components/NativeRouter';
 import Button from '#ui/Button';
 import Icon from '#ui/Icon';
@@ -148,12 +150,27 @@ const MultiUserScreenUserList = (props: MultiUserScreenListProps) => {
                       user.contactCard,
                       user.profileId,
                       profileRole,
+                      user.avatar,
                     );
                   }}
                   key={user.email}
                   style={styles.user}
                 >
-                  <Avatar firstName={user.firstName} lastName={user.lastName} />
+                  {user.avatar ? (
+                    <MediaImageRenderer
+                      source={{
+                        uri: user.avatar.uri,
+                        mediaId: user.avatar.id ?? '',
+                        requestedSize: MEDIA_WIDTH,
+                      }}
+                      style={styles.avatar}
+                    />
+                  ) : (
+                    <Avatar
+                      firstName={user.firstName}
+                      lastName={user.lastName}
+                    />
+                  )}
                   <View style={styles.userInfos}>
                     <Text style={textStyles.large}>
                       ~{user.firstName} {user.lastName}{' '}
@@ -205,6 +222,11 @@ const styles = StyleSheet.create({
   },
   contact: {
     color: colors.grey400,
+  },
+  avatar: {
+    width: 56,
+    height: 56,
+    borderRadius: 28,
   },
 });
 

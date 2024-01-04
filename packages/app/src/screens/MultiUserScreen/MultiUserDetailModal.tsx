@@ -7,6 +7,7 @@ import { useSharedValue } from 'react-native-reanimated';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
 import { graphql, useFragment, useMutation } from 'react-relay';
+import { get as CappedPixelRatio } from '@azzapp/relay/providers/CappedPixelRatio.relayprovider';
 import { colors, textStyles } from '#theme';
 import ScreenModal from '#components/ScreenModal';
 import { getFileName } from '#helpers/fileHelpers';
@@ -47,6 +48,7 @@ export type MultiUserDetailModalActions = {
     contactCard: ContactCard,
     profileId: string,
     role: ProfileRole,
+    avatar: { uri: string; id: string } | null,
   ) => void;
 };
 
@@ -104,6 +106,7 @@ const MultiUserDetailModal = (
     graphql`
       mutation MultiUserDetailModal_UpdateProfileMutation(
         $input: UpdateProfileInput!
+        $pixelRatio: Float!
       ) {
         updateProfile(input: $input) {
           profile {
@@ -144,7 +147,7 @@ const MultiUserDetailModal = (
             }
             avatar {
               id
-              uri
+              uri: uri(width: 56, pixelRatio: $pixelRatio)
             }
             user {
               email
@@ -197,7 +200,7 @@ const MultiUserDetailModal = (
             profileId,
             contactCard,
           },
-          // pixelRatio: CappedPixelRatio(),
+          pixelRatio: CappedPixelRatio(),
         },
         onCompleted: () => {
           if (avatar && avatar?.uri) {
@@ -229,12 +232,7 @@ const MultiUserDetailModal = (
   );
 
   useImperativeHandle(ref, () => ({
-    open: (
-      associated: AssociatedUser,
-      contactCard: ContactCard,
-      profileId: string,
-      role: ProfileRole,
-    ) => {
+    open: (associated, contactCard, profileId, role, avatar) => {
       reset({
         role,
         contact: associated.email ?? associated.phoneNumber,
@@ -248,6 +246,7 @@ const MultiUserDetailModal = (
         birthday: contactCard.birthday,
         socials: contactCard.socials ?? [],
         addresses: contactCard.addresses ?? [],
+        avatar,
       });
 
       setProfileId(profileId);

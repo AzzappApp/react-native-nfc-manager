@@ -5,6 +5,7 @@ import { StyleSheet, View } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { graphql, useMutation, usePreloadedQuery } from 'react-relay';
+import { get as CappedPixelRatio } from '@azzapp/relay/providers/CappedPixelRatio.relayprovider';
 import { colors, textStyles } from '#theme';
 import CoverRenderer from '#components/CoverRenderer';
 import { useRouter } from '#components/NativeRouter';
@@ -32,7 +33,7 @@ import type {
 import type { ContactCard } from '@azzapp/shared/contactCardHelpers';
 
 const multiUserScreenQuery = graphql`
-  query MultiUserScreenQuery {
+  query MultiUserScreenQuery($pixelRatio: Float!) {
     ...MultiUserScreenUserList_currentUser
     viewer {
       profile {
@@ -88,7 +89,7 @@ const multiUserScreenQuery = graphql`
             profileRole
             avatar {
               id
-              uri
+              uri: uri(width: 56, pixelRatio: $pixelRatio)
             }
             statsSummary {
               day
@@ -382,4 +383,9 @@ const styles = StyleSheet.create({
   },
 });
 
-export default relayScreen(MultiUserScreen, { query: multiUserScreenQuery });
+export default relayScreen(MultiUserScreen, {
+  query: multiUserScreenQuery,
+  getVariables: () => ({
+    pixelRatio: CappedPixelRatio(),
+  }),
+});
