@@ -216,6 +216,7 @@ const MODULE_RENDERERS_DESKTOP = {
       {...props}
       contentStyle={{
         maxWidth: DESKTOP_CONTENT_MAX_WIDTH,
+        width: '80%',
         alignSelf: 'center',
       }}
     />
