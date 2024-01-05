@@ -58,6 +58,7 @@ const BlockTextRenderer = ({
     >
       <div style={{ maxWidth: '800px', margin: 'auto' }}>
         <CardModuleBackground
+          {...props}
           backgroundId={textBackgroundId}
           backgroundStyle={textBackgroundStyle}
           colorPalette={colorPalette}
