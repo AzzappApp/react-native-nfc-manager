@@ -52,14 +52,6 @@ const HorizontalPhotoEditionBottomMenu = (
                 'HorizontalPhoto bottom menu label for background tab',
             }),
           },
-          {
-            key: 'preview',
-            icon: 'preview',
-            label: intl.formatMessage({
-              defaultMessage: 'Preview',
-              description: 'HorizontalPhoto bottom menu label for Preview tab',
-            }),
-          },
         ],
         [intl],
       )}

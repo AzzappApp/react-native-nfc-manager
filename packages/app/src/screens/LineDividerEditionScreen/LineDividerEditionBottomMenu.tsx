@@ -80,14 +80,6 @@ const LineDividerEditionBottomMenu = ({
                 'Line Divider bottom menu label for bottom color tab',
             }),
           },
-          {
-            key: 'preview',
-            icon: 'preview',
-            label: intl.formatMessage({
-              defaultMessage: 'Preview',
-              description: 'Line Divider bottom menu label for Preview tab',
-            }),
-          },
         ],
         [colorBottom, colorTop, intl, colorPalette],
       )}

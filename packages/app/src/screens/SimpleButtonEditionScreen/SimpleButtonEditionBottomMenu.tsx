@@ -51,14 +51,6 @@ const SimpleButtonEditionBottomMenu = (
               description: 'SimpleButton bottom menu label for Background tab',
             }),
           },
-          {
-            key: 'preview',
-            icon: 'preview',
-            label: intl.formatMessage({
-              defaultMessage: 'Preview',
-              description: 'SimpleButton bottom menu label for Preview tab',
-            }),
-          },
         ],
         [intl],
       )}
