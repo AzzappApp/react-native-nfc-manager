@@ -1,5 +1,7 @@
-## 0.5.2-canary.111
+## 0.5.2-canary.112
 
+* **fix:**  - **WebCardEdition:** remove Webcard module preview ([#2160](https://github.com/AzzappApp/azzapp/pull/2160))
+* **fix:**  - **media:** [#1983](https://github.com/AzzappApp/azzapp/pull/1983) don’t suggest same webCard ([#2176](https://github.com/AzzappApp/azzapp/pull/2176))
 * **fix:**  - fix empty text block renderer ine desktop preview ([#2173](https://github.com/AzzappApp/azzapp/pull/2173))
 * **fix:**  - **multiUser:** [#2088](https://github.com/AzzappApp/azzapp/pull/2088) force logout when user is using a webcard he has no more access ([#2172](https://github.com/AzzappApp/azzapp/pull/2172))
 * **fix:**  - crash when leaving app for permission and going back on app. (update package to match RN 0.73.*) ([#2157](https://github.com/AzzappApp/azzapp/pull/2157))
