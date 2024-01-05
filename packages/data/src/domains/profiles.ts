@@ -176,7 +176,7 @@ export const getRecommendedWebCards = async (
     )
     .where(
       and(
-        ne(ProfileTable.id, profileId),
+        ne(WebCardTable.id, webCardId),
         isNull(FollowTable.followerId),
         isNull(FilteredWebCardSuggestionTable.profileId),
         eq(WebCardTable.cardIsPublished, true),

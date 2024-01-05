@@ -41,6 +41,10 @@ const toggleFollowing: MutationResolvers['toggleFollowing'] = async (
   }
   const { follow } = input;
 
+  if (profile.webCardId === targetId) {
+    throw new GraphQLError(ERRORS.INVALID_REQUEST);
+  }
+
   try {
     await db.transaction(async trx => {
       //fix: https://github.com/AzzappApp/azzapp/issues/1931 && https://github.com/AzzappApp/azzapp/issues/1930
