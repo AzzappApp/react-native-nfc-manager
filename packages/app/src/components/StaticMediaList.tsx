@@ -1,6 +1,6 @@
 import chroma from 'chroma-js';
 import { memo, useCallback, useEffect, useMemo } from 'react';
-import { Image, View, StyleSheet } from 'react-native';
+import { Image, View } from 'react-native';
 import {
   useAnimatedProps,
   useSharedValue,
@@ -14,7 +14,6 @@ import {
   COVER_CARD_RADIUS,
   COVER_RATIO,
 } from '@azzapp/shared/coverHelpers';
-import { colors } from '#theme';
 import BoxSelectionList from './BoxSelectionList';
 import CardModuleBackgroundImage from './cardModules/CardModuleBackgroundImage';
 import CoverLottiePlayer from './CoverRenderer/CoverLottiePlayer';
@@ -84,7 +83,7 @@ const StaticMediaList = ({
     mediasKey,
   );
 
-  const visiblebackgroundColor = useMemo(() => {
+  const visibleBackgroundColor = useMemo(() => {
     if (tintColor === backgroundColor) {
       const color = chroma(backgroundColor as string);
       if (color.luminance() > 0.5) {
@@ -114,24 +113,19 @@ const StaticMediaList = ({
 
   const renderItem = useCallback(
     ({ item, height, width }: BoxButtonItemInfo<StaticMediaItem>) => {
-      if (item) {
-        return (
-          <StaticMediaListItemMemo
-            item={item}
-            imageRatio={imageRatio}
-            resizeMode={item.resizeMode}
-            kind={item.kind}
-            backgroundColor={visiblebackgroundColor}
-            tintColor={tintColor}
-            height={height}
-            width={width}
-            animationSharedValue={animationSharedValue}
-          />
-        );
-      }
-      return null;
+      return (
+        <StaticMediaListItemMemo
+          item={item}
+          imageRatio={imageRatio}
+          backgroundColor={visibleBackgroundColor}
+          tintColor={tintColor}
+          height={height}
+          width={width}
+          animationSharedValue={animationSharedValue}
+        />
+      );
     },
-    [visiblebackgroundColor, imageRatio, tintColor, animationSharedValue],
+    [visibleBackgroundColor, imageRatio, tintColor, animationSharedValue],
   );
 
   const onSelect = useCallback(
@@ -171,14 +165,7 @@ type StaticMediaListItemProps = {
   tintColor: ColorValue | string;
   width: number;
   height: number;
-  /**
-   *
-   *
-   * @type {('center' | 'contain' | 'cover' | 'repeat' | 'stretch' | null)}
-   */
-  resizeMode: string | null;
   animationSharedValue: SharedValue<number>;
-  kind: string;
 };
 
 const StaticMediaListItem = ({
@@ -186,8 +173,6 @@ const StaticMediaListItem = ({
   imageRatio,
   backgroundColor,
   tintColor,
-  resizeMode,
-  kind,
   width,
   height,
   animationSharedValue,
@@ -198,78 +183,54 @@ const StaticMediaListItem = ({
     };
   }, [animationSharedValue]);
 
-  return item?.smallURI ? (
+  return (
     <View
       style={[
         {
+          height: '100%',
           borderRadius: width * COVER_CARD_RADIUS,
           overflow: 'hidden',
           aspectRatio: imageRatio,
+          backgroundColor,
         },
       ]}
     >
-      {kind === 'svg' ? (
+      {item?.kind === 'svg' ? (
         <CardModuleBackgroundImage
           layout={{
             width,
             height,
           }}
-          resizeMode={resizeMode}
+          resizeMode={item.resizeMode}
           backgroundUri={item.smallURI}
           patternColor={tintColor}
           backgroundOpacity={1}
         />
-      ) : kind === 'lottie' ? (
+      ) : item?.kind === 'lottie' ? (
         <CoverLottiePlayer
           src={item.smallURI}
           tintColor={tintColor as string}
           animatedProps={animationProps}
           hardwareAccelerationAndroid
-          style={[
-            styles.image,
-            {
-              backgroundColor,
-              aspectRatio: imageRatio,
-            },
-          ]}
+          style={{
+            height: '100%',
+            backgroundColor,
+            aspectRatio: imageRatio,
+          }}
         />
-      ) : (
+      ) : item?.kind === 'png' ? (
         <Image
           source={{ uri: item?.smallURI }}
-          style={[
-            styles.image,
-            {
-              backgroundColor,
-              tintColor,
-              aspectRatio: imageRatio,
-            },
-          ]}
+          style={{
+            height: '100%',
+            backgroundColor,
+            tintColor,
+            aspectRatio: imageRatio,
+          }}
         />
-      )}
+      ) : null}
     </View>
-  ) : (
-    <View
-      style={[
-        styles.image,
-        styles.nullImage,
-        {
-          borderRadius: width * COVER_CARD_RADIUS,
-          backgroundColor,
-          aspectRatio: imageRatio,
-        },
-      ]}
-    />
   );
 };
 
 const StaticMediaListItemMemo = memo(StaticMediaListItem);
-
-const styles = StyleSheet.create({
-  image: {
-    height: '100%',
-  },
-  nullImage: {
-    borderWidth: 2,
-    borderColor: colors.black,
-  },
-});
