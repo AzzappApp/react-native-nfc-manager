@@ -215,7 +215,7 @@ const MultiUserAddScreen = ({
     };
 
     getContacts();
-  }, [fetchAzzappContacts]);
+  }, [fetchAzzappContacts, labelValues]);
 
   useEffect(() => {
     return () => {

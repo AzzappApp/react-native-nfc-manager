@@ -1,5 +1,6 @@
 import { isValidPhoneNumber, parsePhoneNumber } from 'libphonenumber-js';
 import isEmail from 'validator/lib/isEmail';
+import isURL from 'validator/lib/isURL';
 import type { CountryCode } from 'libphonenumber-js';
 
 /**
@@ -161,14 +162,15 @@ export const simpleHash = (str: string) => {
 };
 /* eslint-enable no-bitwise*/
 
-export const URL_REGEX =
-  /^https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,63}\b(?:[-a-zA-Z0-9()@:%_+.~#?&/=]*)$/;
-
 export const isValidUrl = (url: string | null | undefined): boolean => {
   if (!url) {
     return false;
   }
-  return !!URL_REGEX.test(url.toLocaleLowerCase());
+  return isURL(url, {
+    protocols: ['http', 'https'],
+    require_valid_protocol: true,
+    require_protocol: true,
+  });
 };
 
 export const extractLetters = (text: string) => {

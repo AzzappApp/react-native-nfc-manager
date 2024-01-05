@@ -9,7 +9,7 @@ import {
   MODULE_KIND_SOCIAL_LINKS,
   SOCIAL_LINKS_DEFAULT_VALUES,
 } from '@azzapp/shared/cardModuleHelpers';
-import { URL_REGEX } from '@azzapp/shared/stringHelpers';
+import { isValidUrl } from '@azzapp/shared/stringHelpers';
 import { useRouter } from '#components/NativeRouter';
 import WebCardModulePreview from '#components/WebCardModulePreview';
 import useEditorLayout from '#hooks/useEditorLayout';
@@ -47,10 +47,12 @@ export type SocialLinksEditionScreenProps = ViewProps & {
 const socialLinkSchema = z
   .array(
     z.union([
-      z.object({
-        socialId: z.literal('website'),
-        link: z.string().regex(URL_REGEX).nonempty(),
-      }),
+      z
+        .object({
+          socialId: z.literal('website'),
+          link: z.string().nonempty(),
+        })
+        .refine(item => isValidUrl(item.link)),
       z.object({
         socialId: z.custom<string>(value => value !== 'website'),
         link: z.string().nonempty(),

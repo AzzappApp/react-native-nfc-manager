@@ -45,9 +45,6 @@ const HomeContactCardLandscape = ({
     [visibleSharedValue],
   );
   useEffect(() => {
-    // could be improve using a hook to know if this is the current display screen
-    // maybe to much battery consuming
-    DeviceMotion.setUpdateInterval(1000);
     const subscription = DeviceMotion.addListener(({ orientation }) => {
       if (orientation !== orientationRef.current) {
         const visible = Math.abs(orientation) === 90;

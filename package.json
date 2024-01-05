@@ -94,7 +94,7 @@
     "typescript": "^5.3.3"
   },
   "resolutions": {
-    "@types/react": "^18.2.37",
+    "@types/react": "^18.2.45",
     "graphql": "^16.8.0",
     "node-pty": "1.0.0",
     "cliui": "^8.0.1"

@@ -2,31 +2,31 @@ PODS:
   - boost (1.83.0)
   - CocoaAsyncSocket (7.6.5)
   - DoubleConversion (1.1.6)
-  - EXAV (13.6.0):
+  - EXAV (13.10.1):
     - ExpoModulesCore
     - ReactCommon/turbomodule/core
   - EXConstants (15.4.0):
     - ExpoModulesCore
-  - EXContacts (12.4.0):
+  - EXContacts (12.8.2):
     - ExpoModulesCore
-  - EXFont (11.6.0):
+  - EXFont (11.10.0):
     - ExpoModulesCore
-  - EXMediaLibrary (15.6.0):
+  - EXMediaLibrary (15.9.1):
     - ExpoModulesCore
     - glog
     - RCT-Folly (= 2022.05.16.00)
     - React-Core
-  - Expo (50.0.0-preview.6):
+  - Expo (50.0.0-preview.7):
     - ExpoModulesCore
-  - ExpoBlur (12.6.0):
+  - ExpoBlur (12.9.1):
     - ExpoModulesCore
-  - ExpoClipboard (4.5.0):
+  - ExpoClipboard (5.0.1):
     - ExpoModulesCore
   - ExpoFileSystem (16.0.2):
     - ExpoModulesCore
-  - ExpoHaptics (12.6.0):
+  - ExpoHaptics (12.8.1):
     - ExpoModulesCore
-  - ExpoImage (1.5.1):
+  - ExpoImage (1.10.1):
     - ExpoModulesCore
     - SDWebImage (~> 5.17.0)
     - SDWebImageAVIFCoder (~> 0.10.1)
@@ -34,16 +34,16 @@ PODS:
     - SDWebImageWebPCoder (~> 0.13.0)
   - ExpoKeepAwake (12.8.0):
     - ExpoModulesCore
-  - ExpoLinearGradient (12.5.0):
+  - ExpoLinearGradient (12.7.0):
     - ExpoModulesCore
-  - ExpoModulesCore (1.11.3):
+  - ExpoModulesCore (1.11.4):
     - glog
     - RCT-Folly (= 2022.05.16.00)
     - React-Core
     - React-NativeModulesApple
     - React-RCTAppDelegate
     - ReactCommon/turbomodule/core
-  - EXSensors (12.5.0):
+  - ExpoSensors (12.9.0):
     - ExpoModulesCore
   - FBLazyVector (0.73.1)
   - FBReactNativeSpec (0.73.1):
@@ -1022,7 +1022,7 @@ PODS:
     - React-Core
   - react-native-encrypted-storage (4.0.3):
     - React-Core
-  - react-native-keyboard-controller (1.9.5):
+  - react-native-keyboard-controller (1.10.0):
     - React-Core
   - react-native-mmkv (2.11.0):
     - MMKV (>= 1.2.13)
@@ -1226,7 +1226,7 @@ PODS:
     - React-Core
   - RNLocalize (3.0.4):
     - React-Core
-  - RNPermissions (3.10.1):
+  - RNPermissions (4.0.2):
     - React-Core
   - RNReactNativeHapticFeedback (2.2.0):
     - React-Core
@@ -1286,7 +1286,7 @@ DEPENDENCIES:
   - ExpoKeepAwake (from `../../../node_modules/expo-keep-awake/ios`)
   - ExpoLinearGradient (from `../../../node_modules/expo-linear-gradient/ios`)
   - ExpoModulesCore (from `../../../node_modules/expo-modules-core`)
-  - EXSensors (from `../../../node_modules/expo-sensors/ios`)
+  - ExpoSensors (from `../../../node_modules/expo-sensors/ios`)
   - FBLazyVector (from `../../../node_modules/react-native/Libraries/FBLazyVector`)
   - FBReactNativeSpec (from `../../../node_modules/react-native/React/FBReactNativeSpec`)
   - Flipper (= 0.201.0)
@@ -1447,7 +1447,7 @@ EXTERNAL SOURCES:
     :path: "../../../node_modules/expo-linear-gradient/ios"
   ExpoModulesCore:
     :path: "../../../node_modules/expo-modules-core"
-  EXSensors:
+  ExpoSensors:
     :path: "../../../node_modules/expo-sensors/ios"
   FBLazyVector:
     :path: "../../../node_modules/react-native/Libraries/FBLazyVector"
@@ -1599,21 +1599,21 @@ SPEC CHECKSUMS:
   boost: 26fad476bfa736552bbfa698a06cc530475c1505
   CocoaAsyncSocket: 065fd1e645c7abab64f7a6a2007a48038fdc6a99
   DoubleConversion: fea03f2699887d960129cc54bba7e52542b6f953
-  EXAV: 523cd6969ca53b3b2762f18fb5450b76f84df44f
+  EXAV: 4f5b0cf437b5c9dfde3c29089760047daacd50b7
   EXConstants: 72036156769fff0ec37d0385ce9cd47e0042e7a0
-  EXContacts: afd38f7adacef9a76d6d0bc479f30051736f068f
-  EXFont: b3ca70589cdbdfd725b154f280dc507c3b56749a
-  EXMediaLibrary: d180845895d8ffca624aef62ec2c08c6dfeb3bd8
-  Expo: 176bd02bafd9e62c765f4f557a746457596a1387
-  ExpoBlur: 9e6da7c2bd4a0c5de7e57124694d0a380d7962f7
-  ExpoClipboard: d2f0e44d50e5ba07b02f5fb7bd280178b420e24e
+  EXContacts: 5fcab84e1f1a562934e688d422117f9a33169c37
+  EXFont: 9ae7e8e2e4825cef04a45dca74512a3f711e2fe9
+  EXMediaLibrary: 5a74f7d9cce776ca07cb3090b948cedd7d4841a1
+  Expo: cd2dc043dd1cc3d9e8e4e035fb9a41b421e8f13f
+  ExpoBlur: 2eb7f7ac50c0818ee7d596996e4c0112b3d225f6
+  ExpoClipboard: b597982124f067ff9f5b89093eb3d97898d5d877
   ExpoFileSystem: fb4c94cc5ec5c50cb2663d2f6d503a1960b95a1d
-  ExpoHaptics: 604aca02e942d1d43c139cae7cf397b26f85476f
-  ExpoImage: bbd451559f49f78d858592fe1d4d74aedb3d900b
+  ExpoHaptics: 28a771b630353cd6e8dcf1b1e3e693e38ad7c3c3
+  ExpoImage: 1cdaa65a6a70bb01067e21ad1347ff2d973885f5
   ExpoKeepAwake: ed71bfe0e6ecd38e337586ba6e1ba27a56eb373b
-  ExpoLinearGradient: 5d18293f89c063036121281175c4653d6a7c34a2
-  ExpoModulesCore: e117a47cb3b1138eaa8833f13ab45b0f8a1daaaf
-  EXSensors: 4cc75cb16c97809bc055c64881d2e149c18e89c5
+  ExpoLinearGradient: 6ff7b35f824f18f77d9c3ad3ee09fe0b4229e669
+  ExpoModulesCore: 01c0abfa6cd9c41c4bd76d8a1a079e6b591db10f
+  ExpoSensors: 773adb32167d5d3c28280697ceee342b88f606ab
   FBLazyVector: 2296bacb2fa157a43991048b0a9d71c1c8b65083
   FBReactNativeSpec: 1325cb72940f00e2a61129c2ccd0a2947927b42a
   Flipper: c7a0093234c4bdd456e363f2f19b2e4b27652d44
@@ -1661,7 +1661,7 @@ SPEC CHECKSUMS:
   react-native-blob-jsi-helper: 13c10135af4614dbc0712afba5960784cd44f043
   react-native-blob-util: d8fa1a7f726867907a8e43163fdd8b441d4489ea
   react-native-encrypted-storage: db300a3f2f0aba1e818417c1c0a6be549038deb7
-  react-native-keyboard-controller: b0d78d3a1576aa57bb62a295ff42150e1f25ee7d
+  react-native-keyboard-controller: 406734a0d0a011d583307faa5004e5e88b430bf1
   react-native-mmkv: e97c0c79403fb94577e5d902ab1ebd42b0715b43
   react-native-pager-view: d81ab2060b9caf57ca8c3a0d57467ff407cdb825
   react-native-passkit: 067931f891bb3a18adb32b497c40d344bdc8dad6
@@ -1695,7 +1695,7 @@ SPEC CHECKSUMS:
   RNFlashList: 4b4b6b093afc0df60ae08f9cbf6ccd4c836c667a
   RNGestureHandler: 61bfdfc05db9b79dd61f894dcd29d3dcc6db3c02
   RNLocalize: 1ce4263770515f53d3de442ce7657b3661b16a37
-  RNPermissions: d417c176cfcf47565a3cf92c50aa06f7fc58e443
+  RNPermissions: a98d4461686a94a7b19b9da99589dbd049b101c7
   RNReactNativeHapticFeedback: ec56a5f81c3941206fd85625fa669ffc7b4545f9
   RNReanimated: 18faeee6e1d8eb9a60f1a62488bb357354569051
   RNScreens: b582cb834dc4133307562e930e8fa914b8c04ef2

@@ -10,7 +10,7 @@ import {
   SIMPLE_BUTTON_DEFAULT_VALUES,
   SIMPLE_BUTTON_STYLE_VALUES,
 } from '@azzapp/shared/cardModuleHelpers';
-import { URL_REGEX, isPhoneNumber } from '@azzapp/shared/stringHelpers';
+import { isValidUrl, isPhoneNumber } from '@azzapp/shared/stringHelpers';
 import { useRouter } from '#components/NativeRouter';
 import WebCardModulePreview from '#components/WebCardModulePreview';
 import useEditorLayout from '#hooks/useEditorLayout';
@@ -53,10 +53,12 @@ const actionTypeSchema = z.intersection(
       actionType: z.literal('email'),
       actionLink: z.string().email().nonempty(),
     }),
-    z.object({
-      actionType: z.literal('link'),
-      actionLink: z.string().regex(URL_REGEX).nonempty(),
-    }),
+    z
+      .object({
+        actionType: z.literal('link'),
+        actionLink: z.string().nonempty(),
+      })
+      .refine(item => isValidUrl(item.actionLink)),
     z
       .object({
         actionType: z.custom<string>(
