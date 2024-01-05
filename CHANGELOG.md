@@ -1,5 +1,9 @@
-## 0.5.2-canary.109
+## 0.5.2-canary.110
 
+* **fix:**  - crash when leaving app for permission and going back on app. (update package to match RN 0.73.*) ([#2157](https://github.com/AzzappApp/azzapp/pull/2157))
+* **fix:**  - **webCard:** [#2028](https://github.com/AzzappApp/azzapp/pull/2028) background resize mode was always set to cover ([#2161](https://github.com/AzzappApp/azzapp/pull/2161))
+* **fix:**  - **multiUser:** [#2090](https://github.com/AzzappApp/azzapp/pull/2090) filter social profiles to known ones ([#2155](https://github.com/AzzappApp/azzapp/pull/2155))
+* **fix:**  - **multiUser:** [#1870](https://github.com/AzzappApp/azzapp/pull/1870) implement deletion on avatar ([#2150](https://github.com/AzzappApp/azzapp/pull/2150))
 * **fix:**  - do not include id (conflict with input mutation params) ([#2158](https://github.com/AzzappApp/azzapp/pull/2158))
 * **fix:**  - **webCard:** [#2027](https://github.com/AzzappApp/azzapp/pull/2027) background overlaps content ([#2153](https://github.com/AzzappApp/azzapp/pull/2153))
 * **fix:**  - **multiUser:** [#2095](https://github.com/AzzappApp/azzapp/pull/2095) add common infos on add user modal as well ([#2148](https://github.com/AzzappApp/azzapp/pull/2148))
