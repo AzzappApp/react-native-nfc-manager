@@ -8,6 +8,7 @@ import { graphql, usePreloadedQuery, useQueryLoader } from 'react-relay';
 import { formatBirthday } from '@azzapp/shared/timeHelpers';
 import { textStyles } from '#theme';
 import { useRouter } from '#components/NativeRouter';
+import { useSocialLinkLabels } from '#helpers/contactCardHelpers';
 import relayScreen from '#helpers/relayScreen';
 import Container from '#ui/Container';
 import Header from '#ui/Header';
@@ -97,6 +98,8 @@ const MultiUserAddScreen = ({
 
   const ref = useRef<MultiUserAddModalActions>(null);
 
+  const labelValues = useSocialLinkLabels();
+
   useEffect(() => {
     const getContacts = async () => {
       const { status } = await Contacts.requestPermissionsAsync();
@@ -140,11 +143,19 @@ const MultiUserAddScreen = ({
               ) ?? [];
 
             const socials = currentValue.socialProfiles
-              ?.filter(({ url }) => url)
-              .map(({ url, label }) => ({
-                url,
-                label: label ?? url,
-              })) as Contact['socials'];
+              ?.map(({ url, service, label: _label }) => {
+                const label = labelValues.find(
+                  ({ key, value }) =>
+                    value === service?.toLowerCase() ||
+                    key === service?.toLowerCase(),
+                );
+
+                return {
+                  url,
+                  label: label?.key,
+                };
+              })
+              .filter(({ url, label }) => url && label) as Contact['socials'];
 
             const urls = currentValue.urlAddresses
               ?.filter(({ url }) => url)

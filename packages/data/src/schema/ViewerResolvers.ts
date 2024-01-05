@@ -1,4 +1,4 @@
-import { and, desc, eq, inArray, like, notInArray, or } from 'drizzle-orm';
+import { and, desc, eq, inArray, isNull, like, ne, or } from 'drizzle-orm';
 import { connectionFromArray } from 'graphql-relay';
 import { shuffle } from '@azzapp/shared/arrayHelpers';
 import { simpleHash } from '@azzapp/shared/stringHelpers';
@@ -57,11 +57,18 @@ export const Viewer: ViewerResolvers = {
     ];
 
     if (user.phoneNumber) {
-      filters.push(notInArray(UserTable.phoneNumber, [user.phoneNumber]));
+      filters.push(
+        or(
+          isNull(UserTable.phoneNumber),
+          ne(UserTable.phoneNumber, user.phoneNumber),
+        ),
+      );
     }
 
     if (user.email) {
-      filters.push(notInArray(UserTable.email, [user.email]));
+      filters.push(
+        or(isNull(UserTable.email), ne(UserTable.email, user.email)),
+      );
     }
 
     const result = await db
