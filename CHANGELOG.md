@@ -1,5 +1,7 @@
-## 0.5.2-canary.110
+## 0.5.2-canary.111
 
+* **fix:**  - fix empty text block renderer ine desktop preview ([#2173](https://github.com/AzzappApp/azzapp/pull/2173))
+* **fix:**  - **multiUser:** [#2088](https://github.com/AzzappApp/azzapp/pull/2088) force logout when user is using a webcard he has no more access ([#2172](https://github.com/AzzappApp/azzapp/pull/2172))
 * **fix:**  - crash when leaving app for permission and going back on app. (update package to match RN 0.73.*) ([#2157](https://github.com/AzzappApp/azzapp/pull/2157))
 * **fix:**  - **webCard:** [#2028](https://github.com/AzzappApp/azzapp/pull/2028) background resize mode was always set to cover ([#2161](https://github.com/AzzappApp/azzapp/pull/2161))
 * **fix:**  - **multiUser:** [#2090](https://github.com/AzzappApp/azzapp/pull/2090) filter social profiles to known ones ([#2155](https://github.com/AzzappApp/azzapp/pull/2155))
