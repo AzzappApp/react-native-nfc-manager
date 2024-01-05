@@ -166,7 +166,7 @@ const { handleRequest } = createYoga({
               context.loaders.Profile.prime(profile.id, profile);
             }
 
-            if (profile && profile.userId !== res.userId) {
+            if (!profile || profile.userId !== res.userId) {
               throw new Error('Invalid profile');
             }
 
@@ -187,7 +187,7 @@ const { handleRequest } = createYoga({
       contextFieldName: 'auth',
       validateUser: params => {
         if (!params.user?.userId) {
-          return new UnauthenticatedError(`Unauthenticated`, {
+          return new UnauthenticatedError(ERRORS.INVALID_TOKEN, {
             extensions: {
               code: ERRORS.INVALID_TOKEN,
             },

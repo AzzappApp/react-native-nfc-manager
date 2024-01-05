@@ -9,11 +9,13 @@ import {
 import { MultiActorEnvironment } from 'relay-runtime/lib/multi-actor-environment';
 // @ts-expect-error not typed
 import { create as createRelayOptimisticRecordSource } from 'relay-runtime/lib/store/RelayOptimisticRecordSource';
+import ERRORS from '@azzapp/shared/errors';
 import { fetchJSON, isAbortError } from '@azzapp/shared/networkHelpers';
 import { version as APP_VERSION } from '../../package.json';
 import { addAuthStateListener, getAuthState } from './authStore';
 import fetchWithAuthTokens from './fetchWithAuthTokens';
 import fetchWithGlobalEvents from './fetchWithGlobalEvents';
+import { dispatchGlobalEvent } from './globalEvents';
 import { getCurrentLocale } from './localeHelpers';
 import type {
   MissingFieldHandler,
@@ -124,7 +126,7 @@ export const createNetwork = (actorId: string) => {
         signal: abortController.signal,
       })
         .then(
-          result => {
+          async result => {
             if (sink.closed) {
               return;
             }
@@ -133,7 +135,16 @@ export const createNetwork = (actorId: string) => {
               'errors' in result ||
               ('data' in result && result.data == null)
             ) {
-              sink.error(new GraphQLError(result, request));
+              const error = new GraphQLError(result, request);
+              await dispatchGlobalEvent({
+                type: 'NETWORK_ERROR',
+                payload: { error, params: [request, variables] },
+              });
+              if (error.message === ERRORS.INVALID_TOKEN) {
+                sink.complete();
+              } else {
+                sink.error(error);
+              }
             } else {
               sink.next(result);
             }
