@@ -7,6 +7,7 @@ import { useSharedValue } from 'react-native-reanimated';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
 import { graphql, useFragment, useMutation } from 'react-relay';
+import { encodeMediaId } from '@azzapp/shared/imagesHelpers';
 import { get as CappedPixelRatio } from '@azzapp/relay/providers/CappedPixelRatio.relayprovider';
 import { colors, textStyles } from '#theme';
 import ScreenModal from '#components/ScreenModal';
@@ -165,7 +166,7 @@ const MultiUserDetailModal = (
       const { avatar, contact, role, ...contactCard } = data;
 
       const input = {};
-      let avatarId: string | undefined = undefined;
+      let avatarId: string | null = avatar?.id ?? null;
 
       if (formState.dirtyFields.avatar) {
         if (avatar?.local && avatar.uri) {
@@ -186,8 +187,7 @@ const MultiUserDetailModal = (
             uploadMedia(file, uploadURL, uploadParameters);
           // setProgressIndicator(uploadProgress);
           const { public_id } = await uploadPromise;
-          avatarId = public_id;
-          Object.assign(input, { avatarId });
+          avatarId = encodeMediaId(public_id, 'image');
         }
       }
       if (formState.dirtyFields.role)
@@ -197,6 +197,7 @@ const MultiUserDetailModal = (
         variables: {
           input: {
             ...input,
+            avatarId,
             profileId,
             contactCard,
           },

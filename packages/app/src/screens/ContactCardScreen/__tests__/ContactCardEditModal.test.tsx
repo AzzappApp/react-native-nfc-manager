@@ -160,6 +160,7 @@ describe('ContactCardEditModal', () => {
       lastName: 'Doe 2',
       title: 'Software Engineer 2',
       company: 'Facebook 2',
+      avatarId: '<mock-value-for-field-"id">',
       emails: [
         {
           label: 'Work',

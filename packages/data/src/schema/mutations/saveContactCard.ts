@@ -40,9 +40,7 @@ const saveContactCard: MutationResolvers['saveContactCard'] = async (
     contactCardDisplayedOnWebCard: !!displayedOnWebCard,
   };
 
-  if (avatarId) {
-    updates.avatarId = avatarId;
-  }
+  updates.avatarId = avatarId;
 
   try {
     await updateProfile(profileId, updates);

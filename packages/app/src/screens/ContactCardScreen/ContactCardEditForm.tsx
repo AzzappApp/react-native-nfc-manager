@@ -109,7 +109,7 @@ const ContactCardEditForm = ({
                 <Controller
                   control={control}
                   name="avatar"
-                  render={({ field: { value } }) =>
+                  render={({ field: { value, onChange } }) =>
                     value?.uri ? (
                       <View style={styles.avatarContainer}>
                         <MediaImageRenderer
@@ -125,7 +125,7 @@ const ContactCardEditForm = ({
                           variant="icon"
                           iconStyle={styles.removeAvatarIcon}
                           style={styles.removeAvatarButton}
-                          onPress={() => field.onChange(undefined)}
+                          onPress={() => onChange(null)}
                         />
                       </View>
                     ) : (

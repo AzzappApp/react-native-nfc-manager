@@ -200,7 +200,7 @@ const ContactCardEditModal = ({
 
   const submit = handleSubmit(
     async ({ avatar, ...data }) => {
-      let avatarId: string | undefined = undefined;
+      let avatarId: string | null = avatar?.id ?? null;
       if (avatar?.local && avatar.uri) {
         setProgressIndicator(Observable.from(0));
 
@@ -219,7 +219,7 @@ const ContactCardEditModal = ({
           uploadMedia(file, uploadURL, uploadParameters);
         setProgressIndicator(uploadProgress);
         const { public_id } = await uploadPromise;
-        avatarId = public_id;
+        avatarId = encodeMediaId(public_id, 'image');
       }
 
       commit({
@@ -234,7 +234,7 @@ const ContactCardEditModal = ({
             addresses: data.addresses.filter(address => address.address),
             birthday: data.birthday,
             socials: data.socials.filter(social => social.url),
-            avatarId: avatarId ? encodeMediaId(avatarId, 'image') : avatarId,
+            avatarId,
           },
           pixelRatio: CappedPixelRatio(),
         },

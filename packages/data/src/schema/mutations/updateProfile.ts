@@ -57,7 +57,7 @@ const updateProfileMutation: MutationResolvers['updateProfile'] = async (
 
   const profile = { ...target };
   if (profileRole) Object.assign(profile, { profileRole });
-  if (avatarId) Object.assign(profile, { avatarId });
+  Object.assign(profile, { avatarId });
   if (contactCard) Object.assign(profile, { contactCard });
 
   return {
