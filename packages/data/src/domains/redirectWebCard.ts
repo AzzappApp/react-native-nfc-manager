@@ -22,4 +22,10 @@ export const getRedirectWebCardByUserName = async (userName: string) => {
     .where(eq(RedirectWebCardTable.fromUserName, userName));
 };
 
+export const deleteRedirection = async (fromUserName: string) => {
+  return db
+    .delete(RedirectWebCardTable)
+    .where(eq(RedirectWebCardTable.fromUserName, fromUserName));
+};
+
 export type RedirectWebCard = InferSelectModel<typeof RedirectWebCardTable>;
