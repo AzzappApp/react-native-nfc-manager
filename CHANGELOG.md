@@ -1,5 +1,9 @@
-## 0.5.2-canary.114
+## 0.5.2-canary.115
 
+* **fix:**  - **multiUser:** [#1987](https://github.com/AzzappApp/azzapp/pull/1987) missed option in post ([#2180](https://github.com/AzzappApp/azzapp/pull/2180))
+* **fix:**  - **authent:** [#1722](https://github.com/AzzappApp/azzapp/pull/1722) avoid double reset password submission ([#2182](https://github.com/AzzappApp/azzapp/pull/2182))
+* **fix:**  - **account:** [#2120](https://github.com/AzzappApp/azzapp/pull/2120) don’t submit on done ([#2183](https://github.com/AzzappApp/azzapp/pull/2183))
+* **fix:**  - **account:** [#2119](https://github.com/AzzappApp/azzapp/pull/2119) missing toast confirmation after updating password ([#2185](https://github.com/AzzappApp/azzapp/pull/2185))
 * **fix:**  - **webcard:** improve behaviour with footer  when switching edition mode ([#2167](https://github.com/AzzappApp/azzapp/pull/2167))
 * **fix:**  - change username invitation label faster (at half transition) ([#2184](https://github.com/AzzappApp/azzapp/pull/2184))
 * **fix:**  - avoid unstable state when calculated index is over the max  and a decimal after EndMomentum is called ([#2179](https://github.com/AzzappApp/azzapp/pull/2179))
