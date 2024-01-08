@@ -179,7 +179,7 @@ const PostRenderer = (
         <IconButton
           variant="icon"
           icon="more"
-          onPress={toggleModal}
+          onPress={openModal}
           style={{ marginRight: 20 }}
         />
       </View>
