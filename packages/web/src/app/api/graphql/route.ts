@@ -14,6 +14,7 @@ import {
   getDatabaseConnectionsInfos,
   startDatabaseConnectionMonitoring,
 } from '@azzapp/data/domains/databaseMonitorer';
+import { SUPPORTED_LOCALES } from '@azzapp/i18n';
 import queryMap from '@azzapp/relay/query-map.json';
 import ERRORS from '@azzapp/shared/errors';
 import { getSessionData } from '#helpers/tokens';
@@ -33,14 +34,18 @@ function useRevalidatePages(): Plugin<GraphQLContext> {
         onExecuteDone(payload) {
           payload.args.contextValue.cardUsernamesToRevalidate.forEach(
             username => {
-              console.log('Revalidation: path - ', `/${username}`);
-              revalidatePath(`/${username}`, 'page');
+              SUPPORTED_LOCALES.forEach(lang => {
+                console.log('revalidate', `/${lang}/${username}`);
+                revalidatePath(`/${lang}/${username}`, 'page');
+              });
             },
           );
           payload.args.contextValue.postsToRevalidate.forEach(
             ({ userName, id }) => {
-              console.log('Revalidation: path - ', `/${userName}/${id}`);
-              revalidatePath(`/${userName}/${id}`, 'page');
+              SUPPORTED_LOCALES.forEach(lang => {
+                console.log('revalidate', `/${lang}/${userName}/${id}`);
+                revalidatePath(`/${lang}/${userName}/${id}`, 'page');
+              });
             },
           );
         },

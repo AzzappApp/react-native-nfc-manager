@@ -37,7 +37,7 @@ export async function middleware(request: NextRequest) {
     const nextPath = `/${pathComponents.join('/')}${request.nextUrl.search}`;
     return NextResponse.redirect(new URL(nextPath, request.url));
   }
-  url.pathname = `${nextUrl.pathname.toLowerCase()}`;
+  url.pathname = `/${locale}${nextUrl.pathname.toLowerCase()}`;
   return NextResponse.rewrite(url);
 }
 
