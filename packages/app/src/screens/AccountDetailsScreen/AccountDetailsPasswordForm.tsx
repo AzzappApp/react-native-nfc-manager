@@ -3,6 +3,7 @@ import { useEffect, useRef } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { View, StyleSheet } from 'react-native';
+import Toast from 'react-native-toast-message';
 import { z } from 'zod';
 import ERRORS from '@azzapp/shared/errors';
 import { REGEX_PWD } from '@azzapp/shared/stringHelpers';
@@ -33,7 +34,7 @@ const AccountDetailsPasswordForm = ({
     control,
     handleSubmit,
     setError,
-    formState: { isSubmitting, errors },
+    formState: { isSubmitting, errors, isSubmitSuccessful },
     reset,
   } = useForm<PasswordForm>({
     resolver: zodResolver(passwordFormSchema),
@@ -64,7 +65,15 @@ const AccountDetailsPasswordForm = ({
         },
       },
       onCompleted: () => {
-        toggleBottomSheet();
+        Toast.show({
+          type: 'success',
+          position: 'bottom',
+          text1: intl.formatMessage({
+            defaultMessage: 'Password changed successfully',
+            description: 'Toast success message when updating password',
+          }),
+          onHide: toggleBottomSheet,
+        });
       },
       onError: error => {
         const response = ('response' in error ? error.response : undefined) as
@@ -118,7 +127,7 @@ const AccountDetailsPasswordForm = ({
       }
       headerRightButton={
         <Button
-          disabled={isSubmitting}
+          disabled={isSubmitting || isSubmitSuccessful}
           loading={isSubmitting}
           label={intl.formatMessage({
             defaultMessage: 'Save',
