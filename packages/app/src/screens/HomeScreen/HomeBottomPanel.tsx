@@ -4,6 +4,8 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import { StyleSheet, View } from 'react-native';
 import Animated, {
   interpolate,
+  runOnJS,
+  useAnimatedReaction,
   useAnimatedStyle,
   useDerivedValue,
 } from 'react-native-reanimated';
@@ -382,6 +384,30 @@ const HomeBottomPanel = ({
     [profiles],
   );
 
+  const webCardOwnerName = useMemo(
+    () =>
+      profiles?.map(profile => ({
+        email: profile?.webCard?.owner?.email ?? '',
+        company: profile?.webCard?.userName ?? '',
+      })) ?? [],
+    [profiles],
+  );
+
+  const [invitationLabel, setInvitationLabel] = useState<{
+    company: string;
+    email: string;
+  }>({ company: '', email: '' });
+
+  //Formatted message does not handle well using SharedValue for dynamic content
+  useAnimatedReaction(
+    () => currentProfileIndexSharedValue.value,
+    actual => {
+      const index = Math.round(actual);
+      runOnJS(setInvitationLabel)(webCardOwnerName[index]);
+    },
+    [],
+  );
+
   const panelVisibilities = useDerivedValue(() => {
     const currentProfileIndex = currentProfileIndexSharedValue.value;
     const prev = Math.floor(currentProfileIndex);
@@ -686,13 +712,12 @@ const HomeBottomPanel = ({
             defaultMessage={`{email} invited you to the WebCard{azzappA} {company}`}
             description="Home bottom panel invitation"
             values={{
-              email: currentProfile?.webCard?.owner?.email ?? '',
+              ...invitationLabel,
               azzappA: (
                 <Text style={styles.icon} variant="azzapp">
                   a
                 </Text>
               ),
-              company: currentProfile?.webCard?.userName,
             }}
           />
         </Text>
