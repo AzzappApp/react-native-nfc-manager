@@ -1,4 +1,4 @@
-## 0.5.2-canary.117
+## 0.5.2-canary.118
 
 * **fix:**  - hide common information is  multiUser disabled ([#2194](https://github.com/AzzappApp/azzapp/pull/2194))
 * **fix:**  - **post:** [#658](https://github.com/AzzappApp/azzapp/pull/658) add sms and mail options ([#2192](https://github.com/AzzappApp/azzapp/pull/2192))
