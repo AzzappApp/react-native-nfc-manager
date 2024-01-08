@@ -26,7 +26,7 @@ const ContactCard = ({
   const {
     contactCard,
     serializedContactCard,
-    webCard: { userName, cardColors, commonInformation },
+    webCard: { userName, cardColors, commonInformation, isMultiUser },
   } = useFragment(
     graphql`
       fragment ContactCard_profile on Profile {
@@ -35,6 +35,7 @@ const ContactCard = ({
           cardColors {
             primary
           }
+          isMultiUser
           commonInformation {
             company
           }
@@ -68,6 +69,14 @@ const ContactCard = ({
     const { data, signature } = serializedContactCard;
     return buildUserUrlWithContactCard(userName, data, signature);
   }, [contactCard, serializedContactCard, userName]);
+
+  const company = useMemo(() => {
+    if (isMultiUser) {
+      return commonInformation?.company ?? contactCard?.company;
+    } else {
+      return contactCard?.company;
+    }
+  }, [commonInformation?.company, contactCard?.company, isMultiUser]);
 
   if (!contactCard) {
     return null;
@@ -142,12 +151,12 @@ const ContactCard = ({
                 {contactCard.title}
               </Text>
             )}
-            {(commonInformation?.company || contactCard.company) && (
+            {company && (
               <Text
                 variant="large"
                 style={[styles.webCardLabel, { color: readableColor }]}
               >
-                {commonInformation?.company ?? contactCard.company}
+                {company}
               </Text>
             )}
           </View>
