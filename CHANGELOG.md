@@ -1,5 +1,6 @@
-## 0.5.2-canary.118
+## 0.5.2-canary.119
 
+* **fix:**  - using profileRole on profile to show multiUser menu ([#2196](https://github.com/AzzappApp/azzapp/pull/2196))
 * **fix:**  - hide common information is  multiUser disabled ([#2194](https://github.com/AzzappApp/azzapp/pull/2194))
 * **fix:**  - **post:** [#658](https://github.com/AzzappApp/azzapp/pull/658) add sms and mail options ([#2192](https://github.com/AzzappApp/azzapp/pull/2192))
 * **fix:**  - **multiUser:** [#1987](https://github.com/AzzappApp/azzapp/pull/1987) missed option in post ([#2180](https://github.com/AzzappApp/azzapp/pull/2180))
