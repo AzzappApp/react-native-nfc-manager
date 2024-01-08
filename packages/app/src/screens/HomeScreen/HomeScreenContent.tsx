@@ -114,9 +114,19 @@ const HomeScreenContent = ({ user: userKey }: HomeScreenContentProps) => {
   const onCurrentProfileIndexChangeAnimated = useCallback(
     (index: number) => {
       'worklet';
-      currentProfileIndexSharedValue.value = index;
+      // on the last item, with no bounce, the onScroll is to be called even after the onMomentumScrollEnd
+      //resulting in a final index value being a decimal over the limit number, causing issue on the last items
+      //giving an unstable state
+      if (user?.profiles?.length) {
+        currentProfileIndexSharedValue.value = Math.min(
+          index,
+          user.profiles.length - 1,
+        );
+      } else {
+        currentProfileIndexSharedValue.value = index;
+      }
     },
-    [currentProfileIndexSharedValue],
+    [currentProfileIndexSharedValue, user?.profiles?.length],
   );
 
   useOnFocus(() => {
