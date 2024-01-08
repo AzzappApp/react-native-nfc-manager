@@ -1,5 +1,6 @@
-## 0.5.2-canary.112
+## 0.5.2-canary.113
 
+* **fix:**  - avoid unstable state when calculated index is over the max  and a decimal after EndMomentum is called ([#2179](https://github.com/AzzappApp/azzapp/pull/2179))
 * **fix:**  - **WebCardEdition:** remove Webcard module preview ([#2160](https://github.com/AzzappApp/azzapp/pull/2160))
 * **fix:**  - **media:** [#1983](https://github.com/AzzappApp/azzapp/pull/1983) don’t suggest same webCard ([#2176](https://github.com/AzzappApp/azzapp/pull/2176))
 * **fix:**  - fix empty text block renderer ine desktop preview ([#2173](https://github.com/AzzappApp/azzapp/pull/2173))
