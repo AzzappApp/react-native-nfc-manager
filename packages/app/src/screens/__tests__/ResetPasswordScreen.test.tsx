@@ -109,10 +109,10 @@ describe('ChangePasswordScreen Screen', () => {
     fireEvent.press(buttonComponent);
 
     await waitFor(() => {
-      expect(buttonComponent).toBeEnabled();
+      expect(changePasswordMock).toHaveBeenCalled();
     });
 
-    expect(changePasswordMock).toHaveBeenCalled();
+    expect(buttonComponent).toBeDisabled();
 
     cleanup();
   });
