@@ -2,6 +2,8 @@ import { createContext, useCallback, useMemo, useRef, useState } from 'react';
 import { Dimensions, StyleSheet } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import Animated, {
+  FadeIn,
+  FadeOut,
   enableLayoutAnimations,
   interpolate,
   measure,
@@ -14,6 +16,7 @@ import { HEADER_HEIGHT } from '#ui/Header';
 import {
   BUTTON_SIZE,
   EDIT_BLOCK_GAP,
+  EDIT_TRANSITION_DURATION,
   useWebCardEditScale,
 } from './webCardScreenHelpers';
 import {
@@ -207,7 +210,22 @@ const WebCardScreenScrollView = ({
         },
       ],
     };
-  });
+  }, [editTransition, editScale]);
+
+  const footerStyle = useAnimatedStyle(() => {
+    return {
+      opacity: editTransition?.value ?? 0,
+      transform: [
+        {
+          scale: interpolate(
+            editTransition?.value ?? 0,
+            [0, 1],
+            [1, 1 / editScale],
+          ),
+        },
+      ],
+    };
+  }, [editTransition, editScale]);
 
   const contextValue = useMemo(
     () => ({
@@ -258,9 +276,17 @@ const WebCardScreenScrollView = ({
               <WebCardScreenScrollViewContext.Provider value={contextValue}>
                 {children}
               </WebCardScreenScrollViewContext.Provider>
+              {editing && (
+                <Animated.View
+                  style={footerStyle}
+                  entering={FadeIn.duration(EDIT_TRANSITION_DURATION)}
+                  exiting={FadeOut.duration(EDIT_TRANSITION_DURATION)}
+                >
+                  {editFooter}
+                </Animated.View>
+              )}
             </Animated.View>
           </Animated.View>
-          {editing && editFooter}
         </Animated.View>
       </ScrollView>
     </Animated.View>
