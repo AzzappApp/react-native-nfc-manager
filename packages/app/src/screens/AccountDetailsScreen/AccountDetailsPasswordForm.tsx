@@ -199,7 +199,6 @@ const AccountDetailsPasswordForm = ({
                   onChangeText={onChange}
                   onBlur={onBlur}
                   isErrored={errors.newPassword != null}
-                  onSubmitEditing={submit}
                   returnKeyType="done"
                 />
               </View>
