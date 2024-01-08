@@ -7,7 +7,6 @@ import { isAdmin, isOwner } from '@azzapp/shared/profileHelpers';
 import { buildUserUrl } from '@azzapp/shared/urlHelpers';
 import Link from '#components/Link';
 import { dispatchGlobalEvent } from '#helpers/globalEvents';
-import useAuthState from '#hooks/useAuthState';
 import useScreenInsets from '#hooks/useScreenInsets';
 import useToggle from '#hooks/useToggle';
 import BottomSheetModal from '#ui/BottomSheetModal';
@@ -42,11 +41,11 @@ const HomeBottomSheetPanel = ({
   withProfile,
   profile: profileKey,
 }: HomeBottomSheetPanel) => {
-  const { profileRole } = useAuthState();
   const profile = useFragment(
     graphql`
       fragment HomeBottomSheetPanel_profile on Profile {
         id
+        profileRole
         webCard {
           userName
           cardIsPublished
@@ -107,6 +106,7 @@ const HomeBottomSheetPanel = ({
       }
     }
   };
+  const profileRole = profile?.profileRole;
 
   const modalHeight = useMemo(() => {
     let height = 270;
