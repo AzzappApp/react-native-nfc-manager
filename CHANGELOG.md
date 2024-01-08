@@ -1,5 +1,7 @@
-## 0.5.2-canary.113
+## 0.5.2-canary.114
 
+* **fix:**  - **webcard:** improve behaviour with footer  when switching edition mode ([#2167](https://github.com/AzzappApp/azzapp/pull/2167))
+* **fix:**  - change username invitation label faster (at half transition) ([#2184](https://github.com/AzzappApp/azzapp/pull/2184))
 * **fix:**  - avoid unstable state when calculated index is over the max  and a decimal after EndMomentum is called ([#2179](https://github.com/AzzappApp/azzapp/pull/2179))
 * **fix:**  - **WebCardEdition:** remove Webcard module preview ([#2160](https://github.com/AzzappApp/azzapp/pull/2160))
 * **fix:**  - **media:** [#1983](https://github.com/AzzappApp/azzapp/pull/1983) don’t suggest same webCard ([#2176](https://github.com/AzzappApp/azzapp/pull/2176))
