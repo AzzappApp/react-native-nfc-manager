@@ -271,8 +271,8 @@ const MultiUserDetailModal = (
   }, [profileId, data.profiles]);
 
   const isCurrentProfile = profileId === currentProfileId;
-  const [commitDelete] = useMutation<MultiUserDetailModal_RemoveUserMutation>(
-    graphql`
+  const [commitDelete, deletionIsActive] =
+    useMutation<MultiUserDetailModal_RemoveUserMutation>(graphql`
       mutation MultiUserDetailModal_RemoveUserMutation(
         $input: RemoveUserFromWebcardInput!
       ) {
@@ -280,8 +280,7 @@ const MultiUserDetailModal = (
           profileId
         }
       }
-    `,
-  );
+    `);
 
   const onRemoveUser = () => {
     commitDelete({
@@ -369,6 +368,7 @@ const MultiUserDetailModal = (
                 <PressableNative
                   style={styles.removeButton}
                   onPress={onRemoveUser}
+                  disabled={deletionIsActive}
                 >
                   <Text style={[styles.removeText, textStyles.button]}>
                     <FormattedMessage
