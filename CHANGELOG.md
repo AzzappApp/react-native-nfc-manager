@@ -1,5 +1,6 @@
-## 0.5.2-canary.122
+## 0.5.2-canary.123
 
+* **fix:**  - avoid instable state in  toggle publish switch using optimisticResponse ([#2207](https://github.com/AzzappApp/azzapp/pull/2207))
 * **fix:**  - remove expired redirection when checking is username is avaialbe ([#2190](https://github.com/AzzappApp/azzapp/pull/2190))
 * **fix:**  - using profileRole on profile to show multiUser menu ([#2196](https://github.com/AzzappApp/azzapp/pull/2196))
 * **fix:**  - hide common information is  multiUser disabled ([#2194](https://github.com/AzzappApp/azzapp/pull/2194))
