@@ -26,7 +26,7 @@
     "@sendgrid/mail": "^7.4.6",
     "@sentry/nextjs": "^7.89.0",
     "@sentry/tracing": "^7.89.0",
-    "@vercel/og": "^0.5.17",
+    "@vercel/og": "^0.6.2",
     "bcrypt-ts": "^4.0.0",
     "classnames": "^2.3.2",
     "encoding": "^0.1.13",
