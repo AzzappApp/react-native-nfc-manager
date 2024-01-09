@@ -39,6 +39,7 @@ const Text = ({ variant = 'none', appearance, ...props }: TextProps) => {
   return createElement(NativeText, {
     ...props,
     style: [styles.text, props.style],
+    maxFontSizeMultiplier: 1,
     accessible: true, // this is needed, accessible was lost with createElement
   });
 };
