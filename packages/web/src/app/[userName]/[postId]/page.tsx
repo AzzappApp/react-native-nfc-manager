@@ -137,3 +137,7 @@ export async function generateMetadata({
 export default PostPage;
 
 export const dynamic = 'force-static';
+
+export const generateStaticParams = () => [];
+
+export const dynamicParams = true;

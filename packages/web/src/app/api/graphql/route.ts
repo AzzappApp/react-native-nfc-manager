@@ -5,7 +5,6 @@ import { UnauthenticatedError, useGenericAuth } from '@envelop/generic-auth';
 import { useSentry } from '@envelop/sentry';
 import { usePersistedOperations } from '@graphql-yoga/plugin-persisted-operations';
 import { createYoga } from 'graphql-yoga';
-import { revalidatePath } from 'next/cache';
 import { headers } from 'next/headers';
 import { compare } from 'semver';
 import { createGraphQLContext, schema } from '@azzapp/data';
@@ -30,19 +29,32 @@ function useRevalidatePages(): Plugin<GraphQLContext> {
   return {
     onExecute: () => {
       return {
-        onExecuteDone(payload) {
-          payload.args.contextValue.cardUsernamesToRevalidate.forEach(
-            username => {
-              console.log('revalidate', `/${username}`);
-              revalidatePath(`/${username}`);
-            },
-          );
-          payload.args.contextValue.postsToRevalidate.forEach(
-            ({ userName, id }) => {
-              console.log('revalidate', `/${userName}/${id}`);
-              revalidatePath(`/${userName}/${id}`);
-            },
-          );
+        async onExecuteDone(payload) {
+          const cards = [
+            ...payload.args.contextValue.cardUsernamesToRevalidate.values(),
+          ];
+          const posts = [
+            ...payload.args.contextValue.postsToRevalidate.values(),
+          ];
+          if (cards.length || posts.length) {
+            const res = await fetch(
+              `${process.env.NEXT_PUBLIC_API_ENDPOINT}/revalidate`,
+              {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                  authorization: process.env.API_SERVER_TOKEN ?? '',
+                },
+                body: JSON.stringify({
+                  cards,
+                  posts,
+                }),
+              },
+            );
+            if (!res.ok) {
+              console.error('Error revalidating pages');
+            }
+          }
         },
       };
     },
