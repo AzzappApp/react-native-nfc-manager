@@ -1,5 +1,5 @@
 import { style } from '@vanilla-extract/css';
-import { MediaQuery, vars } from '#app/theme.css';
+import { MediaQuery, vars } from '#app/[userName]/theme.css';
 
 const feed = style({
   display: 'flex',

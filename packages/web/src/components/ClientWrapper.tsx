@@ -1,4 +1,5 @@
 'use client';
+
 import React from 'react';
 import { IntlProvider } from 'react-intl';
 import { DEFAULT_LOCALE } from '@azzapp/i18n';

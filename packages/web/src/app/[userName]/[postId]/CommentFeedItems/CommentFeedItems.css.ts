@@ -6,7 +6,7 @@ import {
   textXSmall,
   textXXSmall,
   vars,
-} from '#app/theme.css';
+} from '#app/[userName]/theme.css';
 
 const feed = style({
   '@media': {

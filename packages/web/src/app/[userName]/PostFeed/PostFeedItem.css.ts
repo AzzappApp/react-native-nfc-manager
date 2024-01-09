@@ -1,5 +1,10 @@
 import { style } from '@vanilla-extract/css';
-import { textMedium, textSmall, textSmallBold, vars } from '#app/theme.css';
+import {
+  textMedium,
+  textSmall,
+  textSmallBold,
+  vars,
+} from '#app/[userName]/theme.css';
 
 const post = style({
   borderWidth: '1px',

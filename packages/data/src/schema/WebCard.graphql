@@ -140,6 +140,11 @@ type WebCard implements Node {
   owner: User
 
   """
+  The locale of the WebCard
+  """
+  locale: String
+
+  """
   The associated profiles to the WebCard
   """
   profiles: [Profile!]

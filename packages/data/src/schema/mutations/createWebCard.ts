@@ -71,6 +71,8 @@ const createWebCardMutation: MutationResolvers['createWebCard'] = async (
     throw new GraphQLError(ERRORS.USERNAME_ALREADY_EXISTS);
   }
 
+  const user = await loaders.User.load(userId);
+
   const inputWebCard = {
     userName,
     firstName: firstName ?? null,
@@ -80,6 +82,7 @@ const createWebCardMutation: MutationResolvers['createWebCard'] = async (
     companyActivityId: companyActivityId ?? null,
     companyName: companyName ?? null,
     lastUserNameUpdate: new Date(),
+    locale: user?.locale ?? null,
   };
 
   const contactCard = await buildDefaultContactCard(inputWebCard, userId);

@@ -1,5 +1,5 @@
 import { style, createVar } from '@vanilla-extract/css';
-import { MediaQuery } from '#app/theme.css';
+import { MediaQuery } from '#app/[userName]/theme.css';
 
 export const wrapperMarginTop = createVar();
 

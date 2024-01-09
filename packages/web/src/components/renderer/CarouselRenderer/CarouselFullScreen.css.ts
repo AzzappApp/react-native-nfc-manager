@@ -1,6 +1,6 @@
 import { style } from '@vanilla-extract/css';
 import { convertHexToRGBA } from '#helpers';
-import { MediaQuery, vars } from '#app/theme.css';
+import { MediaQuery, vars } from '#app/[userName]/theme.css';
 
 const wrapper = style({
   position: 'fixed',

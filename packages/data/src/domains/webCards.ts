@@ -44,7 +44,9 @@ export const WebCardTable = mysqlTable(
     createdAt: cols.dateTime('createdAt').notNull(),
     updatedAt: cols.dateTime('updatedAt').notNull(),
     isMultiUser: boolean('isMultiUser').default(false).notNull(),
+
     /* Cards infos */
+    locale: cols.defaultVarchar('locale'),
     cardColors: json('cardColors').$type<{
       primary: string;
       light: string;

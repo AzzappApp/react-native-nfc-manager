@@ -1,6 +1,11 @@
 import { style } from '@vanilla-extract/css';
 import { COVER_RATIO } from '@azzapp/shared/coverHelpers';
-import { textLarge, textMedium, textXLarge, vars } from '#app/theme.css';
+import {
+  textLarge,
+  textMedium,
+  textXLarge,
+  vars,
+} from '#app/[userName]/theme.css';
 
 const coverWrapper = style({
   position: 'relative',

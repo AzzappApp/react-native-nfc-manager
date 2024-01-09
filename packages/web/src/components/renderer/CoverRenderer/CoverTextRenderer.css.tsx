@@ -1,6 +1,6 @@
 import { style } from '@vanilla-extract/css';
 import { COVER_RATIO } from '@azzapp/shared/coverHelpers';
-import { MediaQuery } from '#app/theme.css';
+import { MediaQuery } from '#app/[userName]/theme.css';
 
 const coverTextRender = style({
   position: 'absolute',

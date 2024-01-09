@@ -16,6 +16,7 @@ export const UserTable = mysqlTable(
     updatedAt: cols.dateTime('updatedAt').notNull(),
     roles: json('roles').$type<string[]>(),
     invited: boolean('invited').default(false).notNull(),
+    locale: cols.defaultVarchar('locale'),
   },
   table => {
     return {

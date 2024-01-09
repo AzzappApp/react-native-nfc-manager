@@ -1,9 +1,11 @@
 import cn from 'classnames';
 import { Plus_Jakarta_Sans } from 'next/font/google';
+import { headers } from 'next/headers';
 import Script from 'next/script';
 import { DEFAULT_LOCALE, SUPPORTED_LOCALES } from '@azzapp/i18n';
+import ClientWrapper from '#components/ClientWrapper';
 import { getTranslationMessages } from '#helpers/i18nHelpers';
-import ClientWrapper from './ClientWrapper';
+import { cachedGetWebCardByUserName } from './dataAccess';
 import { themeClass } from './theme.css';
 import './styles.css';
 
@@ -12,19 +14,32 @@ const plusJakarta = Plus_Jakarta_Sans({
   preload: false,
 });
 
-const RootLayout = ({
+const RootLayout = async ({
   children,
-  params: { lang } = {},
+  params: { userName } = {},
 }: {
   children: React.ReactNode;
-  params?: { lang?: string };
+  params?: { userName?: string };
 }) => {
-  lang = lang ?? DEFAULT_LOCALE;
+  const webCard = userName ? await cachedGetWebCardByUserName(userName) : null;
 
-  const messages = getTranslationMessages(lang);
+  let locale = webCard?.locale;
+  if (locale == null) {
+    locale =
+      headers()
+        .get('accept-language')
+        ?.split(',')?.[0]
+        .split('-')?.[0]
+        .toLowerCase() ?? DEFAULT_LOCALE;
+  }
+  if (!SUPPORTED_LOCALES.includes(locale)) {
+    locale = DEFAULT_LOCALE;
+  }
+
+  const messages = getTranslationMessages(locale);
 
   return (
-    <html lang={lang} className={cn(plusJakarta.className, themeClass)}>
+    <html lang={locale} className={cn(plusJakarta.className, themeClass)}>
       <head>
         <meta
           name="viewport"
@@ -59,7 +74,7 @@ const RootLayout = ({
         <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#ef3962" />
       </head>
       <body>
-        <ClientWrapper locale={lang} messages={messages}>
+        <ClientWrapper locale={locale} messages={messages}>
           {children}
         </ClientWrapper>
         <Script id="vh-fix" async>
@@ -77,6 +92,3 @@ const RootLayout = ({
 };
 
 export default RootLayout;
-
-export const generateStaticParams = () =>
-  SUPPORTED_LOCALES.map(lang => ({ lang }));

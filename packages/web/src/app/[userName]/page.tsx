@@ -5,7 +5,6 @@ import {
   getMediasByIds,
   getProfilesPostsWithTopComment,
   getStaticMediasByIds,
-  getWebCardByUserName,
 } from '@azzapp/data/domains';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
 import {
@@ -22,6 +21,7 @@ import CoverRenderer from '#components/renderer/CoverRenderer';
 import CoverRendererBackground from '#components/renderer/CoverRenderer/CoverRendererBackground';
 import ModuleRenderer from '#components/renderer/ModuleRenderer';
 import { getMetaData } from '#helpers/seo';
+import { cachedGetWebCardByUserName } from './dataAccess';
 import WebCardPageLayout from './WebCardPageLayout';
 import type { Metadata } from 'next';
 
@@ -33,7 +33,7 @@ type ProfilePageProps = {
 
 const ProfilePage = async ({ params }: ProfilePageProps) => {
   const userName = params.userName.toLowerCase();
-  const webCard = await getWebCardByUserName(userName);
+  const webCard = await cachedGetWebCardByUserName(userName);
 
   if (!webCard?.cardIsPublished) {
     return notFound();
@@ -116,6 +116,8 @@ const ProfilePage = async ({ params }: ProfilePageProps) => {
 };
 
 export default ProfilePage;
+
+export const dynamic = 'force-static';
 
 export async function generateMetadata({
   params,

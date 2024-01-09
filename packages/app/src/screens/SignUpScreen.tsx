@@ -14,6 +14,7 @@ import { colors } from '#theme';
 import EmailOrPhoneInput from '#components/EmailOrPhoneInput';
 import Link from '#components/Link';
 import { dispatchGlobalEvent } from '#helpers/globalEvents';
+import { getCurrentLocale } from '#helpers/localeHelpers';
 import { signup } from '#helpers/MobileWebAPI';
 import useAnimatedKeyboardHeight from '#hooks/useAnimatedKeyboardHeight';
 import useScreenInsets from '#hooks/useScreenInsets';
@@ -90,14 +91,20 @@ const SignupScreen = () => {
       };
       try {
         setIsSubmitting(true);
+        const locale = getCurrentLocale();
         if (countryCodeOrEmail === 'email') {
-          tokens = await signup({ email: emailOrPhoneNumber, password });
+          tokens = await signup({
+            email: emailOrPhoneNumber,
+            password,
+            locale,
+          });
         } else {
           tokens = await signup({
             phoneNumber: parsePhoneNumber(
               emailOrPhoneNumber,
               countryCodeOrEmail,
             ).formatInternational(),
+            locale,
             password,
           });
         }

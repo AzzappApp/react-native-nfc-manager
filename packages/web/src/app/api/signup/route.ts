@@ -22,6 +22,7 @@ type SignupBody = {
   email?: string | null;
   phoneNumber?: string | null;
   password?: string;
+  locale?: string;
 };
 
 const handleExistingUser = async (user: User, password: string) => {
@@ -55,7 +56,7 @@ const handleExistingUser = async (user: User, password: string) => {
 };
 
 export const POST = async (req: Request) => {
-  const { email, phoneNumber, password } =
+  const { email, phoneNumber, password, locale } =
     ((await req.json()) as SignupBody) || {};
 
   //we need at least one email or one phone number
@@ -91,6 +92,7 @@ export const POST = async (req: Request) => {
       email: email ?? null,
       phoneNumber: phoneNumber?.replace(/\s/g, '') ?? null,
       password: bcrypt.hashSync(password, 12),
+      locale: locale ?? null,
       roles: null,
     });
 

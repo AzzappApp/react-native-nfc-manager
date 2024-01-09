@@ -39,6 +39,10 @@ export type SignUpParams = {
    * The user's chosen password.
    */
   password: string;
+  /**
+   * The user's locale.
+   */
+  locale?: string;
 } & (
   | {
       /**

@@ -54,13 +54,13 @@ const WebCardPageLayout = (props: ProfilePageLayoutProps) => {
           className={styles.background}
           style={{
             background: `
-          linear-gradient(
-            180deg,
-            ${cardBackgroundColor} 0%,
-            ${cardBackgroundColor} 50%,
-            ${lastModuleBackgroundColor} 50%
-          )
-        `,
+            linear-gradient(
+              180deg,
+              ${cardBackgroundColor} 0%,
+              ${cardBackgroundColor} 50%,
+              ${lastModuleBackgroundColor} 50%
+            )
+          `,
           }}
         />
         {posts.length > 0 && (
