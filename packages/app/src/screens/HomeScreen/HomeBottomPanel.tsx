@@ -123,6 +123,12 @@ const HomeBottomPanel = ({
     if (!webCardId || webCardId !== currentProfile?.webCard?.id) {
       return;
     }
+    // using disable state with current profile show a disabled style during maybe one secdon
+    // (currentProfile is not animated so need to be updated)
+    // avoid adding a new interpolation by using this condition
+    if (currentProfile.profileRole !== 'owner') {
+      return;
+    }
 
     if (profileRole && isAdmin(profileRole)) {
       const environment = getRelayEnvironment().forActor(webCardId);
