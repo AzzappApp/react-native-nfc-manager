@@ -21,14 +21,17 @@ import type {
   PostRendererActionBarReactionMutation,
   PostRendererActionBarReactionMutation$data,
 } from '@azzapp/relay/artifacts/PostRendererActionBarReactionMutation.graphql';
+import type { PostRendererBottomPanel_webCard$key } from '@azzapp/relay/artifacts/PostRendererBottomPanel_webCard.graphql';
 import type { ViewProps } from 'react-native';
 
 export type PostRendererActionBarProps = ViewProps & {
   postKey: PostRendererActionBar_post$key;
+  viewerWebCardKey?: PostRendererBottomPanel_webCard$key;
 };
 
 const PostRendererActionBar = ({
   postKey,
+  viewerWebCardKey,
   style,
   ...props
 }: PostRendererActionBarProps) => {

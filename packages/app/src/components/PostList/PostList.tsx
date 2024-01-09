@@ -15,14 +15,15 @@ import type {
   PostList_posts$data,
   PostList_posts$key,
 } from '@azzapp/relay/artifacts/PostList_posts.graphql';
+import type { PostRendererBottomPanel_webCard$key } from '@azzapp/relay/artifacts/PostRendererBottomPanel_webCard.graphql';
 import type { PostRendererFragment_author$key } from '@azzapp/relay/artifacts/PostRendererFragment_author.graphql';
 import type { ArrayItemType } from '@azzapp/shared/arrayHelpers';
 import type { ContentStyle, ListRenderItemInfo } from '@shopify/flash-list';
 import type { ViewProps, ViewToken } from 'react-native';
-
 type PostListProps = ViewProps & {
   posts: PostList_posts$key;
   author?: PostRendererFragment_author$key;
+  webCard?: PostRendererBottomPanel_webCard$key;
   canPlay?: boolean;
   onEndReached?: () => void;
   onRefresh?: () => void;
@@ -41,6 +42,7 @@ const viewabilityConfig = {
 const PostList = ({
   posts: postKey,
   author,
+  webCard,
   canPlay = true,
   refreshing = false,
   loading = false,
@@ -153,10 +155,11 @@ const PostList = ({
           width={windowWidth}
           onPressAuthor={onPressAuthor}
           author={item.webCard ?? extraData.author!}
+          webCardKey={webCard}
         />
       );
     },
-    [onPressAuthor, windowWidth],
+    [onPressAuthor, webCard, windowWidth],
   );
 
   const extraData = useMemo(() => ({ canPlay, author }), [canPlay, author]);

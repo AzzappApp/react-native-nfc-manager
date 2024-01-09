@@ -40,6 +40,13 @@ const postScreenQuery = graphql`
       ...PostList_posts @arguments(includeAuthor: true)
       ...PostScreenFragment_relatedPosts
     }
+    viewer {
+      profile {
+        webCard {
+          ...PostRendererBottomPanel_webCard
+        }
+      }
+    }
   }
 `;
 
@@ -53,7 +60,10 @@ const PostScreen = ({
     router.back();
   };
 
-  const { node: post } = usePreloadedQuery(postScreenQuery, preloadedQuery);
+  const { node: post, viewer } = usePreloadedQuery(
+    postScreenQuery,
+    preloadedQuery,
+  );
   const [ready, setReady] = useState(false);
 
   useNativeNavigationEvent('appear', () => {
@@ -162,6 +172,7 @@ const PostScreen = ({
         style={{ flex: 1 }}
         canPlay={ready && hasFocus}
         posts={posts}
+        webCard={viewer?.profile?.webCard}
         onEndReached={onEndReached}
         loading={loading}
       />

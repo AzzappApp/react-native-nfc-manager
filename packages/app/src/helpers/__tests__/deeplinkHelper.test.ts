@@ -12,7 +12,7 @@ describe('deeplinkHelpers', () => {
   });
 
   test('should redirect to profile', async () => {
-    const res = await matchUrlWithRoute('https://fake-azzapp.com/123');
+    const res = await matchUrlWithRoute(`${process.env.NEXT_PUBLIC_URL}123`);
 
     expect(res).toEqual({
       route: 'WEBCARD',
@@ -46,7 +46,7 @@ describe('deeplinkHelpers', () => {
     );
 
     const res = await matchUrlWithRoute(
-      `https://fake-azzapp.com/123?c=${compressedCard}`,
+      `${process.env.NEXT_PUBLIC_URL}/123?c=${compressedCard}`,
     );
 
     expect(verifySignMock).toBeCalledTimes(1);
@@ -88,7 +88,7 @@ describe('deeplinkHelpers', () => {
     );
 
     const res = await matchUrlWithRoute(
-      `https://fake-azzapp.com/124?c=${compressedCard}`,
+      `${process.env.NEXT_PUBLIC_URL}124?c=${compressedCard}`,
     );
 
     expect(verifySignMock).toBeCalledTimes(1);
