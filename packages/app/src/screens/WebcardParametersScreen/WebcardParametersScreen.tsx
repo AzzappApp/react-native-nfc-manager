@@ -114,12 +114,30 @@ const WebcardParametersScreen = ({
   const onChangeIsPublished = useCallback(
     (value: boolean) => {
       if (value) {
-        publish({ variables: {} });
+        publish({
+          variables: {},
+          optimisticResponse: {
+            publishCard: {
+              id: webCard?.id,
+              cardIsPublished: true,
+              alreadyPublished: webCard?.alreadyPublished,
+            },
+          },
+        });
       } else {
-        unpublish({ variables: {} });
+        unpublish({
+          variables: {},
+          optimisticResponse: {
+            publishCard: {
+              id: webCard?.id,
+              cardIsPublished: false,
+              alreadyPublished: webCard?.alreadyPublished,
+            },
+          },
+        });
       }
     },
-    [publish, unpublish],
+    [publish, unpublish, webCard?.alreadyPublished, webCard?.id],
   );
 
   useEffect(() => {
