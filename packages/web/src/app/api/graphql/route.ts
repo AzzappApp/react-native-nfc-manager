@@ -34,13 +34,13 @@ function useRevalidatePages(): Plugin<GraphQLContext> {
           payload.args.contextValue.cardUsernamesToRevalidate.forEach(
             username => {
               console.log('revalidate', `/${username}`);
-              revalidatePath(`/${username}`, 'page');
+              revalidatePath(`/${username}`);
             },
           );
           payload.args.contextValue.postsToRevalidate.forEach(
             ({ userName, id }) => {
               console.log('revalidate', `/${userName}/${id}`);
-              revalidatePath(`/${userName}/${id}`, 'page');
+              revalidatePath(`/${userName}/${id}`);
             },
           );
         },
