@@ -875,6 +875,18 @@ export const ScreenDidAppear = ({ children }: { children: ReactNode }) => {
   );
 };
 
+export const useRouteWillChange = (route: string, cb: () => void) => {
+  const router = useRouter();
+
+  useEffect(() => {
+    const { dispose } = router.addRouteWillChangeListener(routeEvent => {
+      if (routeEvent.route === route) cb();
+    });
+
+    return dispose;
+  });
+};
+
 const ScreenDidAppearInner = ({
   screenDidAppear,
   promise,

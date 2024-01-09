@@ -11,7 +11,7 @@ import { useSharedValue } from 'react-native-reanimated';
 import { graphql, useFragment } from 'react-relay';
 import { useDebouncedCallback } from 'use-debounce';
 import { CONTACT_CARD_RATIO } from '#components/ContactCard/ContactCard';
-import { useOnFocus } from '#components/NativeRouter';
+import { useOnFocus, useRouteWillChange } from '#components/NativeRouter';
 import { dispatchGlobalEvent } from '#helpers/globalEvents';
 import { ROOT_ACTOR_ID, getRelayEnvironment } from '#helpers/relayEnvironment';
 import { usePrefetchRoute } from '#helpers/ScreenPrefetcher';
@@ -82,6 +82,15 @@ const HomeScreenContent = ({ user: userKey }: HomeScreenContentProps) => {
   const currentProfileIndexRef = useRef(initialProfileIndex);
   const currentProfileIndexSharedValue = useSharedValue(currentProfileIndex);
   const currentProfile = user.profiles?.[currentProfileIndex];
+
+  useRouteWillChange('HOME', () => {
+    const roundedProfileIndexSharedValue = Math.round(
+      currentProfileIndexSharedValue.value,
+    );
+
+    if (roundedProfileIndexSharedValue !== currentProfileIndexSharedValue.value)
+      currentProfileIndexSharedValue.value = roundedProfileIndexSharedValue;
+  });
 
   const switchWebCard = useDebouncedCallback(
     (webCardId: string, profileRole: string) => {
