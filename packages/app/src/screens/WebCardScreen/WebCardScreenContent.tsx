@@ -132,6 +132,7 @@ const WebCardScreenContent = ({
   // #region Color picker
   const [showWebcardColorPicker, setShowWebcardColorPicker] = useState(false);
   const onRequestWebcardColorPicker = useCallback(() => {
+    Toast.hide();
     setShowWebcardColorPicker(true);
   }, []);
 
@@ -144,6 +145,7 @@ const WebCardScreenContent = ({
   // #region New Module
   const [showModulePicker, setShowModulePicker] = useState(false);
   const onRequestNewModule = useCallback(() => {
+    Toast.hide();
     setShowModulePicker(true);
   }, []);
 
@@ -164,6 +166,11 @@ const WebCardScreenContent = ({
   // #endregion
 
   // #region Module edition
+  const onEditModules = () => {
+    Toast.hide();
+    onToggleSelectionMode();
+  };
+
   const [allBlockLoaded, setAllBlockLoaded] = useState(false);
   const onProfileBodyLoad = useCallback(() => {
     setAllBlockLoaded(true);
@@ -247,6 +254,7 @@ const WebCardScreenContent = ({
   // #region Card style
   const [showCardStyleModal, setShowCardStyleModal] = useState(false);
   const openCardStyleModal = useCallback(() => {
+    Toast.hide();
     setShowCardStyleModal(true);
   }, []);
   const closeCardStyleModal = useCallback(() => {
@@ -257,6 +265,7 @@ const WebCardScreenContent = ({
   // #region preview
   const [showPreviewModal, setShowPreviewModal] = useState(false);
   const openPreviewModal = useCallback(() => {
+    Toast.hide();
     setShowPreviewModal(true);
   }, []);
   const closePreviewModal = useCallback(() => {
@@ -298,7 +307,7 @@ const WebCardScreenContent = ({
           selectionContainsAllModules={selectionContainsAllModules}
           onDone={onDone}
           onClose={onClose}
-          onEditModules={onToggleSelectionMode}
+          onEditModules={onEditModules}
           onCancelEditModules={onToggleSelectionMode}
           onSelectAllModules={onSelectAllModules}
           onUnSelectAllModules={onUnSelectAllModules}
