@@ -1,5 +1,10 @@
-## 0.5.2-canary.126
+## 0.5.2-canary.127
 
+* **fix:**  - **multiUser:** [#2178](https://github.com/AzzappApp/azzapp/pull/2178) avoid multiple click on delete ([#2219](https://github.com/AzzappApp/azzapp/pull/2219))
+* **fix:**  - **cover:** [#2032](https://github.com/AzzappApp/azzapp/pull/2032) add missing fonts in cover image generation ([#2216](https://github.com/AzzappApp/azzapp/pull/2216))
+* **fix:**  - 🐛 properly slide to completion on home contact card ([#2202](https://github.com/AzzappApp/azzapp/pull/2202))
+* **fix:**  - don't use a null webcardId for plural env ([#2227](https://github.com/AzzappApp/azzapp/pull/2227))
+* **fix:**  - 🐛 hide toast when action is taken on webcard builder ([#2212](https://github.com/AzzappApp/azzapp/pull/2212))
 * **fix:**  - **multiUser:** add title birthday on contact card filed form ([#2215](https://github.com/AzzappApp/azzapp/pull/2215))
 * **fix:**  - **post:** [#2097](https://github.com/AzzappApp/azzapp/pull/2097) prevent users from commenting or liking posts of unpublished webcards ([#2181](https://github.com/AzzappApp/azzapp/pull/2181))
 * **fix:**  - hide post action bar when opening a post through Deeplink with unpublished webcard ([#2203](https://github.com/AzzappApp/azzapp/pull/2203))
