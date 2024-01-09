@@ -31,6 +31,11 @@ const updateUserMutation: MutationResolvers['updateUser'] = async (
     partialUser.email = email;
   }
 
+  if (email === null) {
+    //voluntary remove email
+    partialUser.email = null;
+  }
+
   if (phoneNumber && isInternationalPhoneNumber(phoneNumber)) {
     const existingUser = await getUserByPhoneNumber(
       formatPhoneNumber(phoneNumber),
@@ -39,6 +44,10 @@ const updateUserMutation: MutationResolvers['updateUser'] = async (
       throw new GraphQLError(ERRORS.PHONENUMBER_ALREADY_EXISTS);
     }
     partialUser.phoneNumber = phoneNumber?.replace(/\s/g, '');
+  }
+  if (phoneNumber === null) {
+    //voluntary remove phone number
+    partialUser.phoneNumber = null;
   }
 
   const dbUser = await loaders.User.load(userId);
@@ -57,6 +66,12 @@ const updateUserMutation: MutationResolvers['updateUser'] = async (
     }
 
     partialUser.password = bcrypt.hashSync(newPassword, 12);
+  }
+
+  const mergedUser = { ...dbUser, ...partialUser };
+  if (!mergedUser.email && !mergedUser.phoneNumber) {
+    //user should have at least one email or one phone number
+    throw new GraphQLError(ERRORS.INVALID_REQUEST);
   }
 
   try {
