@@ -1,4 +1,4 @@
-## 0.5.2-canary.120
+## 0.5.2-canary.121
 
 * **fix:**  - remove expired redirection when checking is username is avaialbe ([#2190](https://github.com/AzzappApp/azzapp/pull/2190))
 * **fix:**  - using profileRole on profile to show multiUser menu ([#2196](https://github.com/AzzappApp/azzapp/pull/2196))
