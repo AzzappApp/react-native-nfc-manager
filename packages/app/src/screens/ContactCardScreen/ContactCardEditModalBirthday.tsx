@@ -1,5 +1,5 @@
 import { useController } from 'react-hook-form';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 import { View } from 'react-native';
 import { colors } from '#theme';
 import ContactCardEditDateField from '#components/ContactCard/ContactCardEditDateField';
@@ -20,6 +20,7 @@ const ContactCardEditModalBirthdays = ({
     control,
     name: 'birthday',
   });
+  const intl = useIntl();
 
   const styles = useStyleSheet(contactCardEditModalStyleSheet);
 
@@ -31,6 +32,10 @@ const ContactCardEditModalBirthdays = ({
           valueKey={`birthday.birthday`}
           selectedKey={`birthday.selected`}
           deleteField={() => field.onChange(null)}
+          title={intl.formatMessage({
+            defaultMessage: 'Birthday',
+            description: 'Contact Card Birthday title',
+          })}
         />
       )}
       {!field.value && (

@@ -8,7 +8,7 @@ import {
   type FieldValues,
 } from 'react-hook-form';
 import { FormattedMessage } from 'react-intl';
-import { Platform } from 'react-native';
+import { Platform, View } from 'react-native';
 import { buildContactCardModalStyleSheet } from '#helpers/contactCardHelpers';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import PressableNative from '#ui/PressableNative';
@@ -23,6 +23,7 @@ const ContactCardEditDateField = <TFieldValues extends FieldValues>({
   control,
   labelValues,
   onChangeLabel,
+  title,
 }: {
   labelKey?: FieldPath<TFieldValues>;
   deleteField: () => void;
@@ -31,6 +32,7 @@ const ContactCardEditDateField = <TFieldValues extends FieldValues>({
   control: Control<TFieldValues>;
   labelValues?: Array<{ key: string; value: string }>;
   onChangeLabel?: (label: string) => void;
+  title: string;
 }) => {
   const styles = useStyleSheet(stylesheet);
 
@@ -46,53 +48,68 @@ const ContactCardEditDateField = <TFieldValues extends FieldValues>({
       <Controller
         control={control}
         name={valueKey}
-        render={({ field: { onChange, value } }) =>
-          Platform.OS === 'android' ? (
-            <PressableNative
-              style={{
-                marginLeft: 'auto',
-              }}
-              onPress={() => {
-                DateTimePickerAndroid.open({
-                  value:
+        render={({ field: { onChange, value } }) => {
+          return (
+            <View
+              style={[
+                {
+                  flex: 1,
+                  alignItems: 'center',
+                  flexDirection: 'row',
+                  marginLeft: 6,
+                  marginTop: 2,
+                },
+              ]}
+            >
+              <Text variant="smallbold">{title}</Text>
+              {Platform.OS === 'android' ? (
+                <PressableNative
+                  style={{
+                    marginLeft: 'auto',
+                  }}
+                  onPress={() => {
+                    DateTimePickerAndroid.open({
+                      value:
+                        !value || isNaN(Date.parse(value))
+                          ? new Date()
+                          : new Date(Date.parse(value)),
+                      onChange: (_, date) => {
+                        if (date) {
+                          onChange(date.toISOString());
+                        }
+                      },
+                      mode: 'date',
+                    });
+                  }}
+                >
+                  <Text variant="medium">
+                    {value && !isNaN(Date.parse(value)) ? (
+                      new Date(Date.parse(value)).toLocaleDateString()
+                    ) : (
+                      <FormattedMessage
+                        defaultMessage="Select a date"
+                        description="default message for date picker"
+                      />
+                    )}
+                  </Text>
+                </PressableNative>
+              ) : (
+                <DateTimePicker
+                  value={
                     !value || isNaN(Date.parse(value))
                       ? new Date()
-                      : new Date(Date.parse(value)),
-                  onChange: (_, date) => {
-                    if (date) {
-                      onChange(date.toISOString());
-                    }
-                  },
-                  mode: 'date',
-                });
-              }}
-            >
-              <Text variant="medium">
-                {value && !isNaN(Date.parse(value)) ? (
-                  new Date(Date.parse(value)).toLocaleDateString()
-                ) : (
-                  <FormattedMessage
-                    defaultMessage="Select a date"
-                    description="default message for date picker"
-                  />
-                )}
-              </Text>
-            </PressableNative>
-          ) : (
-            <DateTimePicker
-              value={
-                !value || isNaN(Date.parse(value))
-                  ? new Date()
-                  : new Date(Date.parse(value))
-              }
-              onChange={(_, date) => date && onChange(date.toISOString())}
-              style={styles.input}
-              mode="date"
-              display="default"
-              maximumDate={new Date()}
-            />
-          )
-        }
+                      : new Date(Date.parse(value))
+                  }
+                  onChange={(_, date) => date && onChange(date.toISOString())}
+                  style={styles.input}
+                  mode="date"
+                  display="default"
+                  maximumDate={new Date()}
+                />
+              )}
+            </View>
+          );
+        }}
       />
     </ContactCardEditFieldWrapper>
   );
