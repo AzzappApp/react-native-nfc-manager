@@ -1,5 +1,6 @@
-## 0.5.2-canary.125
+## 0.5.2-canary.126
 
+* **fix:**  - **multiUser:** add title birthday on contact card filed form ([#2215](https://github.com/AzzappApp/azzapp/pull/2215))
 * **fix:**  - **post:** [#2097](https://github.com/AzzappApp/azzapp/pull/2097) prevent users from commenting or liking posts of unpublished webcards ([#2181](https://github.com/AzzappApp/azzapp/pull/2181))
 * **fix:**  - hide post action bar when opening a post through Deeplink with unpublished webcard ([#2203](https://github.com/AzzappApp/azzapp/pull/2203))
 * **fix:**  - allow to delete one contact element (phone, email) if both are present ([#2209](https://github.com/AzzappApp/azzapp/pull/2209))
