@@ -6,6 +6,7 @@ import { View, StyleSheet, Share } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { useMutation, graphql, useFragment } from 'react-relay';
 import { useDebouncedCallback } from 'use-debounce';
+import ERRORS from '@azzapp/shared/errors';
 import { isEditor } from '@azzapp/shared/profileHelpers';
 import { buildPostUrl } from '@azzapp/shared/urlHelpers';
 import { useRouter } from '#components/NativeRouter';
@@ -148,20 +149,34 @@ const PostRendererActionBar = ({
           },
           onError: error => {
             console.log(error);
-            //add manual capture exception for testing issue
-            Sentry.captureException(error, { extra: { tag: 'PostReaction' } });
 
-            setCountReactions(prevReactions =>
-              add ? prevReactions + 1 : prevReactions - 1,
-            );
+            if (error.message === ERRORS.UNPUBLISHED_WEB_CARD) {
+              Toast.show({
+                type: 'error',
+                text1: intl.formatMessage({
+                  defaultMessage: 'Error, the related webCard is unpublished',
+                  description:
+                    'Error when a user tries to like a post from an unpublished webCard',
+                }),
+              });
+            } else {
+              //add manual capture exception for testing issue
+              Sentry.captureException(error, {
+                extra: { tag: 'PostReaction' },
+              });
 
-            Toast.show({
-              type: 'error',
-              text1: intl.formatMessage({
-                defaultMessage: 'Error, we were unable to like this post',
-                description: 'Error toast message when liking a post failed.',
-              }),
-            });
+              setCountReactions(prevReactions =>
+                add ? prevReactions + 1 : prevReactions - 1,
+              );
+
+              Toast.show({
+                type: 'error',
+                text1: intl.formatMessage({
+                  defaultMessage: 'Error, we were unable to like this post',
+                  description: 'Error toast message when liking a post failed.',
+                }),
+              });
+            }
           },
         });
       }

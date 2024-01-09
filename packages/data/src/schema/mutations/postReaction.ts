@@ -36,6 +36,16 @@ const togglePostReaction: MutationResolvers['togglePostReaction'] = async (
     throw new GraphQLError(ERRORS.INVALID_REQUEST);
   }
 
+  const webCard = await loaders.WebCard.load(post.webCardId);
+
+  if (!webCard) {
+    throw new GraphQLError(ERRORS.INVALID_REQUEST);
+  }
+
+  if (!webCard.cardIsPublished) {
+    throw new GraphQLError(ERRORS.UNPUBLISHED_WEB_CARD);
+  }
+
   try {
     await db.transaction(async trx => {
       const reaction = await getPostReaction(profile.webCardId, targetId, trx);

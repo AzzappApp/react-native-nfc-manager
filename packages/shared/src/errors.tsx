@@ -89,6 +89,10 @@ const ERRORS = {
    * This may happen when a user is invited to a multi-user webcard, but is already a member.
    */
   PROFILE_ALREADY_EXISTS: 'PROFILE_ALREADY_EXISTS',
+  /**
+   * The webCard is not published.
+   */
+  UNPUBLISHED_WEB_CARD: 'UNPUBLISHED_WEB_CARD',
 } as const;
 
 export default ERRORS;

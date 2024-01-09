@@ -16,6 +16,7 @@ import {
   usePaginationFragment,
 } from 'react-relay';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
+import ERRORS from '@azzapp/shared/errors';
 import { isEditor } from '@azzapp/shared/profileHelpers';
 import { isNotFalsyString } from '@azzapp/shared/stringHelpers';
 import { colors } from '#theme';
@@ -158,15 +159,26 @@ const PostCommentsList = ({
             }
           },
           onError(error) {
-            console.error(error);
-            Toast.show({
-              type: 'error',
-              text1: intl.formatMessage({
-                defaultMessage:
-                  'Error, could not save your comment, try again later',
-                description: 'Post comment screen - error toast',
-              }),
-            });
+            if (error.message === ERRORS.UNPUBLISHED_WEB_CARD) {
+              Toast.show({
+                type: 'error',
+                text1: intl.formatMessage({
+                  defaultMessage: 'Error, the related webCard is unpublished',
+                  description:
+                    'Error when a user tries to comment a post from an unpublished webCard',
+                }),
+              });
+            } else {
+              console.error(error);
+              Toast.show({
+                type: 'error',
+                text1: intl.formatMessage({
+                  defaultMessage:
+                    'Error, could not save your comment, try again later',
+                  description: 'Post comment screen - error toast',
+                }),
+              });
+            }
           },
         });
       } else {

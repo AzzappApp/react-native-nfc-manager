@@ -25,10 +25,21 @@ const createPostComment: MutationResolvers['createPostComment'] = async (
   if (type !== 'Post') {
     throw new GraphQLError(ERRORS.INVALID_REQUEST);
   }
-  try {
-    const post = await getPostByIdWithMedia(targetId);
-    if (!post?.allowComments) throw new GraphQLError(ERRORS.INVALID_REQUEST);
 
+  const post = await getPostByIdWithMedia(targetId);
+  if (!post?.allowComments) throw new GraphQLError(ERRORS.INVALID_REQUEST);
+
+  const webCard = await loaders.WebCard.load(post.webCardId);
+
+  if (!webCard) {
+    throw new GraphQLError(ERRORS.INVALID_REQUEST);
+  }
+
+  if (!webCard.cardIsPublished) {
+    throw new GraphQLError(ERRORS.UNPUBLISHED_WEB_CARD);
+  }
+
+  try {
     const postComment = {
       webCardId: profile.webCardId,
       postId: targetId,
