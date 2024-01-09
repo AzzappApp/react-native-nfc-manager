@@ -274,17 +274,19 @@ const HomeScreenContent = ({ user: userKey }: HomeScreenContentProps) => {
           currentProfileIndex={currentProfileIndex}
         />
       </View>
-      <WebCardBoundRelayEnvironmentProvider
-        webCardId={currentProfile?.webCard?.id ?? null}
-      >
-        <HomeContactCardLandscape profile={currentProfile ?? null} />
-        <HomeBottomSheetPanel
-          visible={showMenu}
-          close={toggleShowMenu}
-          withProfile={currentProfileIndex !== -1}
-          profile={currentProfile ?? null}
-        />
-      </WebCardBoundRelayEnvironmentProvider>
+      {currentProfile?.webCard?.id && (
+        <WebCardBoundRelayEnvironmentProvider
+          webCardId={currentProfile.webCard.id}
+        >
+          <HomeContactCardLandscape profile={currentProfile ?? null} />
+          <HomeBottomSheetPanel
+            visible={showMenu}
+            close={toggleShowMenu}
+            withProfile={currentProfileIndex !== -1}
+            profile={currentProfile ?? null}
+          />
+        </WebCardBoundRelayEnvironmentProvider>
+      )}
     </View>
   );
 };

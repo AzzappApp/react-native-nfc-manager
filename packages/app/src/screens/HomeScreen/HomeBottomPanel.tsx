@@ -54,7 +54,11 @@ type HomeBottomPanelProps = {
    * @type {SharedValue<number>}
    */
   currentProfileIndexSharedValue: SharedValue<number>;
-
+  /**
+   * the current profile index
+   *
+   * @type {number}
+   */
   currentProfileIndex: number;
 };
 
