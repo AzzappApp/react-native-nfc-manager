@@ -150,6 +150,10 @@ const PostRendererActionBar = ({
           onError: error => {
             console.log(error);
 
+            setCountReactions(prevReactions =>
+              add ? prevReactions - 1 : prevReactions + 1,
+            );
+
             if (error.message === ERRORS.UNPUBLISHED_WEB_CARD) {
               Toast.show({
                 type: 'error',
@@ -164,10 +168,6 @@ const PostRendererActionBar = ({
               Sentry.captureException(error, {
                 extra: { tag: 'PostReaction' },
               });
-
-              setCountReactions(prevReactions =>
-                add ? prevReactions + 1 : prevReactions - 1,
-              );
 
               Toast.show({
                 type: 'error',
