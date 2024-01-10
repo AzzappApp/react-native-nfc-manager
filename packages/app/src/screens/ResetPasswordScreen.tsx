@@ -155,7 +155,6 @@ const ResetPasswordScreen = ({
                       defaultMessage: 'Confirm password',
                       description: 'Confirm password input placeholder',
                     })}
-                    onEndEditing={onSubmit}
                   />
                 );
               }}
