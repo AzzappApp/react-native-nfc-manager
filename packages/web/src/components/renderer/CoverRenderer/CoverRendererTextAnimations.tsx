@@ -2,7 +2,7 @@ import { DESKTOP_WIDTH } from '#helpers/devices';
 
 const fadeIn: Keyframe[] = [
   { opacity: 0, offset: 0, easing: 'ease-in-out' },
-  { opacity: 0, offset: 0.1 },
+  { opacity: 0.5, offset: 0.1 },
   { opacity: 1, offset: 0.2 },
   { opacity: 1, offset: 0.8 },
   { opacity: 0, offset: 1 },
@@ -16,7 +16,7 @@ const appear: Keyframe[] = [
 
 const fadeInByLetter = (letterAnimPosition: number): Keyframe[] => [
   { opacity: 0, offset: 0, easing: 'ease-in-out' },
-  { opacity: 0, offset: letterAnimPosition * 0.2 },
+  { opacity: 0.5, offset: letterAnimPosition * 0.2 },
   { opacity: 1, offset: letterAnimPosition * 0.8 },
   { opacity: 1, offset: 1 },
 ];
@@ -31,9 +31,19 @@ const appearByLetter = (letterAnimPosition: number): Keyframe[] => [
 const bounce: Keyframe[] = [
   {
     opacity: 0,
-    scale: 0.5,
+    scale: 0.2,
     offset: 0,
-    easing: 'cubic-bezier(0.175, 0.885, 0.32, 1.275)',
+    easing: 'ease-in-out',
+  },
+  {
+    opacity: 1,
+    scale: 1,
+    offset: 0.2,
+  },
+  {
+    opacity: 1,
+    scale: 0.92,
+    offset: 0.25,
   },
   {
     opacity: 1,
@@ -42,22 +52,52 @@ const bounce: Keyframe[] = [
   },
   {
     opacity: 1,
+    scale: 0.96,
+    offset: 0.325,
+  },
+  {
+    opacity: 1,
+    scale: 0.96,
+    offset: 0.35,
+  },
+  {
+    opacity: 1,
     scale: 1,
     offset: 0.8,
   },
   {
     opacity: 0.1,
+    scale: 0.3,
+    offset: 0.95,
+  },
+  {
+    opacity: 0.2,
     scale: 0.5,
+    offset: 0.97,
+  },
+  {
+    opacity: 0.05,
+    scale: 0.3,
+    offset: 0.98,
+  },
+  {
+    opacity: 0,
+    scale: 0.2,
     offset: 1,
   },
 ];
 
 const neon: Keyframe[] = [
   { opacity: 0, offset: 0 },
+  { opacity: 0, offset: 0.199 },
   { opacity: 1, offset: 0.2 },
+  { opacity: 1, offset: 0.224 },
   { opacity: 0, offset: 0.225 },
+  { opacity: 0, offset: 0.249 },
   { opacity: 1, offset: 0.25 },
+  { opacity: 1, offset: 0.274 },
   { opacity: 0, offset: 0.275 },
+  { opacity: 0, offset: 0.299 },
   { opacity: 1, offset: 0.3 },
   { opacity: 1, offset: 1 },
 ];
@@ -115,7 +155,6 @@ const smoothBuilder = (vertical: boolean, minus: boolean) => [
     opacity: 1,
   },
   {
-    transform: `${slideDirection(vertical)}(${slide(!minus)})`,
     offset: 1,
     easing: 'ease-in-out',
     opacity: 0,
@@ -174,7 +213,7 @@ const smoothLettersBuilder =
     },
     {
       opacity: 0,
-      offset: 0.96 - (1 - letterAnimPosition) * 0.2,
+      offset: 0.98 - (1 - letterAnimPosition) * 0.01,
       easing: 'ease-in-out',
     },
     {
@@ -185,8 +224,6 @@ const smoothLettersBuilder =
 
 const smoothLettersBottom = smoothLettersBuilder(true, false);
 const smoothLettersUp = smoothLettersBuilder(true, true);
-const smoothLettersLeft = smoothLettersBuilder(false, true);
-const smoothLettersRight = smoothLettersBuilder(false, false);
 
 export const textAnimations = {
   fadeIn,
@@ -207,8 +244,6 @@ export const textAnimations = {
   smoothRight,
   smoothBottom,
   smoothUp,
-  smoothLettersLeft,
-  smoothLettersRight,
   smoothLettersBottom,
   smoothLettersUp,
 };
