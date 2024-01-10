@@ -1,5 +1,8 @@
-## 0.5.2-canary.127
+## 0.5.2-canary.128
 
+* **fix:**  - **post:** [#2097](https://github.com/AzzappApp/azzapp/pull/2097) wrong count update on error ([#2221](https://github.com/AzzappApp/azzapp/pull/2221))
+* **fix:**  - **account:** [#1722](https://github.com/AzzappApp/azzapp/pull/1722) don’t submit form on end editing confirm password ([#2220](https://github.com/AzzappApp/azzapp/pull/2220))
+* **fix:**  - **cover:** [#2200](https://github.com/AzzappApp/azzapp/pull/2200) improve text animation on web to look similar to native ([#2218](https://github.com/AzzappApp/azzapp/pull/2218))
 * **fix:**  - **multiUser:** [#2178](https://github.com/AzzappApp/azzapp/pull/2178) avoid multiple click on delete ([#2219](https://github.com/AzzappApp/azzapp/pull/2219))
 * **fix:**  - **cover:** [#2032](https://github.com/AzzappApp/azzapp/pull/2032) add missing fonts in cover image generation ([#2216](https://github.com/AzzappApp/azzapp/pull/2216))
 * **fix:**  - 🐛 properly slide to completion on home contact card ([#2202](https://github.com/AzzappApp/azzapp/pull/2202))
