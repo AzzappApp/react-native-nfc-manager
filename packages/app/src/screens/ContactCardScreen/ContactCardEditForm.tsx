@@ -218,7 +218,7 @@ const ContactCardEditForm = ({
             )}
           />
 
-          {commonInformation?.company ? (
+          {isMultiUser && commonInformation?.company ? (
             <View style={styles.field}>
               <View style={styles.fieldTitleWithLock}>
                 <Icon icon="locked" />
@@ -261,47 +261,52 @@ const ContactCardEditForm = ({
           )}
 
           <View style={styles.separator} />
-          {commonInformation?.phoneNumbers?.map((phoneNumber, index) => (
-            <CommonInformationField
-              key={index}
-              label={phoneNumber.label}
-              value={phoneNumber.number}
-            />
-          ))}
+          {isMultiUser &&
+            commonInformation?.phoneNumbers?.map((phoneNumber, index) => (
+              <CommonInformationField
+                key={index}
+                label={phoneNumber.label}
+                value={phoneNumber.number}
+              />
+            ))}
           <ContactCardEditModalPhones control={control} />
           <View style={styles.separator} />
-          {commonInformation?.emails?.map((email, index) => (
-            <CommonInformationField
-              key={index}
-              label={email.label}
-              value={email.address}
-            />
-          ))}
+          {isMultiUser &&
+            commonInformation?.emails?.map((email, index) => (
+              <CommonInformationField
+                key={index}
+                label={email.label}
+                value={email.address}
+              />
+            ))}
           <ContactCardEditModalEmails control={control} />
           <View style={styles.separator} />
-          {commonInformation?.urls?.map((url, index) => (
-            <CommonInformationField key={index} value={url.address} />
-          ))}
+          {isMultiUser &&
+            commonInformation?.urls?.map((url, index) => (
+              <CommonInformationField key={index} value={url.address} />
+            ))}
           <ContactCardEditModalUrls control={control} errors={errors} />
           <View style={styles.separator} />
-          {commonInformation?.addresses?.map((address, index) => (
-            <CommonInformationField
-              key={index}
-              label={address.label}
-              value={address.address}
-            />
-          ))}
+          {isMultiUser &&
+            commonInformation?.addresses?.map((address, index) => (
+              <CommonInformationField
+                key={index}
+                label={address.label}
+                value={address.address}
+              />
+            ))}
           <ContactCardEditModalAddresses control={control} />
           <View style={styles.separator} />
           <ContactCardEditModalBirthdays control={control} />
           <View style={styles.separator} />
-          {commonInformation?.socials?.map((social, index) => (
-            <CommonInformationField
-              key={index}
-              label={social.label}
-              value={social.url}
-            />
-          ))}
+          {isMultiUser &&
+            commonInformation?.socials?.map((social, index) => (
+              <CommonInformationField
+                key={index}
+                label={social.label}
+                value={social.url}
+              />
+            ))}
           <ContactCardEditModalSocials control={control} />
         </View>
         {footer}
