@@ -4,6 +4,7 @@ import { fromGlobalId } from 'graphql-relay';
 import {
   Component,
   Fragment,
+  Suspense,
   useCallback,
   useEffect,
   useMemo,
@@ -29,6 +30,7 @@ import {
   ScreensRenderer,
   RouterProvider,
 } from '#components/NativeRouter';
+import ShakeShare from '#components/ShakeShare';
 import Toast from '#components/Toast';
 import { getAuthState, init as initAuthStore } from '#helpers/authStore';
 import { addGlobalEventListener } from '#helpers/globalEvents';
@@ -49,6 +51,7 @@ import {
   ScreenPrefetcherProvider,
   createScreenPrefetcher,
 } from '#helpers/ScreenPrefetcher';
+import WebCardBoundRelayEnvironmentProvider from '#helpers/WebCardBoundRelayEnvironmentProvider';
 import useApplicationFonts from '#hooks/useApplicationFonts';
 import useAuthState from '#hooks/useAuthState';
 import AboutScreen from '#screens/AboutScreen';
@@ -418,6 +421,11 @@ const AppRouter = () => {
             />
           </RouterProvider>
           <Toast />
+          <Suspense>
+            <WebCardBoundRelayEnvironmentProvider webCardId={webCardId}>
+              <ShakeShare />
+            </WebCardBoundRelayEnvironmentProvider>
+          </Suspense>
           <LoadingScreen visible={showLoadingScreen} />
         </SafeAreaProvider>
       </ScreenPrefetcherProvider>
