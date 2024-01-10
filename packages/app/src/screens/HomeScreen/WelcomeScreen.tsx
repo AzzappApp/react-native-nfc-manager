@@ -103,6 +103,7 @@ const WelcomeScreen = () => {
         visible={showMenu}
         close={toggleShowMenu}
         withProfile={false}
+        profileRole={null}
       />
     </Container>
   );

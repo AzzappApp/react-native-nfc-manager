@@ -31,6 +31,12 @@ type HomeBottomSheetPanel = {
    * User has a profile
    */
   withProfile: boolean;
+  /**
+   * The profile role of the active webCard / profile
+   *
+   * @type {(string | null)}
+   */
+  profileRole: string | null;
 
   profile?: HomeBottomSheetPanel_profile$key | null;
 };
@@ -38,6 +44,7 @@ type HomeBottomSheetPanel = {
 const HomeBottomSheetPanel = ({
   visible,
   close,
+  profileRole,
   withProfile,
   profile: profileKey,
 }: HomeBottomSheetPanel) => {
@@ -45,7 +52,6 @@ const HomeBottomSheetPanel = ({
     graphql`
       fragment HomeBottomSheetPanel_profile on Profile {
         id
-        profileRole
         webCard {
           userName
           cardIsPublished
@@ -106,7 +112,6 @@ const HomeBottomSheetPanel = ({
       }
     }
   };
-  const profileRole = profile?.profileRole;
 
   const modalHeight = useMemo(() => {
     let height = 270;
