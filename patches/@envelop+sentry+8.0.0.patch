@@ -12,39 +12,36 @@ index 42259d6..707b47a 100644
  const useSentry = (options = {}) => {
      function pick(key, defaultValue) {
 diff --git a/node_modules/@envelop/sentry/esm/index.js b/node_modules/@envelop/sentry/esm/index.js
-index 3de73bd..68fa4ff 100644
+index 3de73bd..b5aed07 100644
 --- a/node_modules/@envelop/sentry/esm/index.js
 +++ b/node_modules/@envelop/sentry/esm/index.js
-@@ -1,6 +1,7 @@
+@@ -1,6 +1,6 @@
  import { Kind, print } from 'graphql';
-+import * as Sentry from '@sentry/nextjs';
  import { getDocumentString, handleStreamOrSingleExecutionResult, isOriginalGraphQLError, } from '@envelop/core';
 -import * as Sentry from '@sentry/node';
-+
++import * as Sentry from '@sentry/nextjs';
  export const defaultSkipError = isOriginalGraphQLError;
  export const useSentry = (options = {}) => {
      function pick(key, defaultValue) {
 diff --git a/node_modules/@envelop/sentry/typings/index.d.cts b/node_modules/@envelop/sentry/typings/index.d.cts
-index 0497826..c50eb80 100644
+index 53c1f3d..d82c1ef 100644
 --- a/node_modules/@envelop/sentry/typings/index.d.cts
 +++ b/node_modules/@envelop/sentry/typings/index.d.cts
-@@ -1,6 +1,6 @@
- import { ExecutionArgs } from 'graphql';
- import { isOriginalGraphQLError, type Plugin } from '@envelop/core';
+@@ -1,5 +1,5 @@
+ import { isOriginalGraphQLError, TypedExecutionArgs, type Plugin } from '@envelop/core';
 -import * as Sentry from '@sentry/node';
 +import * as Sentry from '@sentry/nextjs';
  import type { TraceparentData } from '@sentry/types';
- export type SentryPluginOptions = {
+ export type SentryPluginOptions<PluginContext extends Record<string, any>> = {
      /**
 diff --git a/node_modules/@envelop/sentry/typings/index.d.ts b/node_modules/@envelop/sentry/typings/index.d.ts
-index 0497826..c50eb80 100644
+index 53c1f3d..d82c1ef 100644
 --- a/node_modules/@envelop/sentry/typings/index.d.ts
 +++ b/node_modules/@envelop/sentry/typings/index.d.ts
-@@ -1,6 +1,6 @@
- import { ExecutionArgs } from 'graphql';
- import { isOriginalGraphQLError, type Plugin } from '@envelop/core';
+@@ -1,5 +1,5 @@
+ import { isOriginalGraphQLError, TypedExecutionArgs, type Plugin } from '@envelop/core';
 -import * as Sentry from '@sentry/node';
 +import * as Sentry from '@sentry/nextjs';
  import type { TraceparentData } from '@sentry/types';
- export type SentryPluginOptions = {
+ export type SentryPluginOptions<PluginContext extends Record<string, any>> = {
      /**
