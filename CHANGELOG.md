@@ -1,5 +1,6 @@
-## 0.5.2-canary.128
+## 0.5.2-canary.129
 
+* **feat:**  - Shake and share ([#2226](https://github.com/AzzappApp/azzapp/pull/2226))
 * **fix:**  - **post:** [#2097](https://github.com/AzzappApp/azzapp/pull/2097) wrong count update on error ([#2221](https://github.com/AzzappApp/azzapp/pull/2221))
 * **fix:**  - **account:** [#1722](https://github.com/AzzappApp/azzapp/pull/1722) don’t submit form on end editing confirm password ([#2220](https://github.com/AzzappApp/azzapp/pull/2220))
 * **fix:**  - **cover:** [#2200](https://github.com/AzzappApp/azzapp/pull/2200) improve text animation on web to look similar to native ([#2218](https://github.com/AzzappApp/azzapp/pull/2218))
