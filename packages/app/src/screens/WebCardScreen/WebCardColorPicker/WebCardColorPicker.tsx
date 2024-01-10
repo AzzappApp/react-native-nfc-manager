@@ -102,6 +102,10 @@ const WebCardColorPicker = ({
         : undefined,
       onCompleted: _ => {
         setCurrentPalette(pick(input, ['primary', 'light', 'dark']));
+        if (optimisticUpdate.current) {
+          environment.revertUpdate(optimisticUpdate.current);
+          optimisticUpdate.current = null;
+        }
         onRequestClose();
       },
       onError: error => {
@@ -123,6 +127,7 @@ const WebCardColorPicker = ({
     commit,
     colorPalette,
     onRequestClose,
+    environment,
     intl,
   ]);
 
