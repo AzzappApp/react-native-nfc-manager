@@ -1,5 +1,6 @@
-## 0.5.2-canary.129
+## 0.5.2-canary.130
 
+* **build:**  - upgrade yoga server ([#2195](https://github.com/AzzappApp/azzapp/pull/2195))
 * **feat:**  - Shake and share ([#2226](https://github.com/AzzappApp/azzapp/pull/2226))
 * **fix:**  - **post:** [#2097](https://github.com/AzzappApp/azzapp/pull/2097) wrong count update on error ([#2221](https://github.com/AzzappApp/azzapp/pull/2221))
 * **fix:**  - **account:** [#1722](https://github.com/AzzappApp/azzapp/pull/1722) don’t submit form on end editing confirm password ([#2220](https://github.com/AzzappApp/azzapp/pull/2220))
