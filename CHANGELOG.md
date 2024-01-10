@@ -1,5 +1,6 @@
-## 0.5.2-canary.131
+## 0.5.2-canary.132
 
+* **fix:**  - **cover:** [#2225](https://github.com/AzzappApp/azzapp/pull/2225) clear optimisticUpdate on complete ([#2242](https://github.com/AzzappApp/azzapp/pull/2242))
 * **fix:**  - [#2210](https://github.com/AzzappApp/azzapp/pull/2210) enhance sentry configuration on web ([#2234](https://github.com/AzzappApp/azzapp/pull/2234))
 * **fix:**  - profileRole appeears to be undefined ([#2236](https://github.com/AzzappApp/azzapp/pull/2236))
 * **build:**  - upgrade yoga server ([#2195](https://github.com/AzzappApp/azzapp/pull/2195))
