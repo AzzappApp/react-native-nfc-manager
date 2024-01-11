@@ -415,8 +415,21 @@ const MultiUserDetailModal = (
                     </Text>
                     <Select
                       nativeID="role"
+                      disabled={isCurrentProfile}
                       accessibilityLabelledBy="roleLabel"
-                      data={roles}
+                      data={
+                        role === 'owner'
+                          ? roles.concat({
+                              id: 'owner',
+                              label: (
+                                <FormattedMessage
+                                  defaultMessage="Owner"
+                                  description="MultiUserDetailModal - Label for owner select input"
+                                />
+                              ),
+                            })
+                          : roles
+                      }
                       selectedItemKey={value}
                       keyExtractor={role => role.id}
                       onItemSelected={item => onChange(item.id)}
@@ -444,7 +457,13 @@ const MultiUserDetailModal = (
                 )}
                 {role === 'admin' && (
                   <FormattedMessage
-                    defaultMessage="The admin has full control over the WebCard, including the ability to add and remove collaborators. "
+                    defaultMessage="The admin has full control over the WebCard, including the ability to add and remove collaborators."
+                    description="MultiUserDetailModal - admin description"
+                  />
+                )}
+                {role === 'owner' && (
+                  <FormattedMessage
+                    defaultMessage="The owner has full control over the WebCard, including the ability to add and remove collaborators. This is also the person who will be billed for multi-user."
                     description="MultiUserDetailModal - admin description"
                   />
                 )}

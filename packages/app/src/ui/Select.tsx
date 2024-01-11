@@ -84,6 +84,11 @@ type SelectProps<ItemT> = Omit<ViewProps, 'children'> & {
    * Style of the input text line
    * */
   inputTextStyle?: StyleProp<TextStyle>;
+
+  /**
+   * Whether the select is disabled
+   */
+  disabled?: boolean;
 };
 
 /**
