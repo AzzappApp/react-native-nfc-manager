@@ -206,7 +206,7 @@ const styleSheet = createStyleSheet(appearance => ({
     height: 12,
     width: 1,
     borderRadius: 3,
-    backgroundColor: appearance === 'light' ? colors.grey200 : colors.white,
+    backgroundColor: appearance === 'light' ? colors.grey200 : colors.grey800,
   },
   thumb: {
     height: 20,
