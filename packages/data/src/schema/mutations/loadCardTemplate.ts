@@ -4,6 +4,7 @@ import { fromGlobalId } from 'graphql-relay';
 import { omit } from 'lodash';
 import { DEFAULT_CARD_STYLE } from '@azzapp/shared/cardHelpers';
 import ERRORS from '@azzapp/shared/errors';
+import { isEditor } from '@azzapp/shared/profileHelpers';
 import {
   CardModuleTable,
   db,
@@ -28,7 +29,7 @@ const loadCardTemplateMutation: MutationResolvers['loadCardTemplate'] = async (
   }
 
   const profile = await loaders.Profile.load(profileId);
-  if (!profile) {
+  if (!profile || !isEditor(profile.profileRole)) {
     throw new GraphQLError(ERRORS.UNAUTHORIZED);
   }
 
