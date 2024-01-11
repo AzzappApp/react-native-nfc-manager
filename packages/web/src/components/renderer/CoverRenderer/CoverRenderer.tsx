@@ -173,6 +173,30 @@ const CoverRenderer = ({
         }}
         className={styles.content}
       >
+        {coverData.backgroundId && (
+          <div
+            style={{
+              backgroundColor:
+                swapColor(
+                  coverData.backgroundPatternColor,
+                  cardColors ?? DEFAULT_COLOR_PALETTE,
+                ) ?? '#000',
+              WebkitMaskImage: `url(${getCldImageUrl({
+                src: decodeMediaId(coverData.backgroundId),
+                width: coverWidth,
+                height: coverHeight,
+                format: 'auto',
+              })})`,
+              maskImage: `url(${getCldImageUrl({
+                src: decodeMediaId(coverData.backgroundId),
+                width: coverWidth,
+                height: coverHeight,
+                format: 'auto',
+              })})`,
+            }}
+            className={styles.layerMedia}
+          />
+        )}
         {media != null &&
           (media.kind === 'image' ? (
             <CloudinaryImage
