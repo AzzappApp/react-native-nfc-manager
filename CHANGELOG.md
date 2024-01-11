@@ -1,5 +1,6 @@
-## 0.5.2-canary.132
+## 0.5.2-canary.133
 
+* **fix:**  - block action on post list if unpublishd web (with deepLinking) ([#2233](https://github.com/AzzappApp/azzapp/pull/2233))
 * **fix:**  - **cover:** [#2225](https://github.com/AzzappApp/azzapp/pull/2225) clear optimisticUpdate on complete ([#2242](https://github.com/AzzappApp/azzapp/pull/2242))
 * **fix:**  - [#2210](https://github.com/AzzappApp/azzapp/pull/2210) enhance sentry configuration on web ([#2234](https://github.com/AzzappApp/azzapp/pull/2234))
 * **fix:**  - profileRole appeears to be undefined ([#2236](https://github.com/AzzappApp/azzapp/pull/2236))
