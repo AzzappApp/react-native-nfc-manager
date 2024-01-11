@@ -106,15 +106,18 @@ const CoverRenderer = ({
       coverLottieRef.current?.play();
       playJsAnimation();
     }
+
+    if (media.kind === 'image' && duration) {
+      coverLottieRef.current?.play(true);
+      playJsAnimation(COVER_ANIMATION_DURATION / 1000);
+    }
   }, [duration, hasLottie, lottieDuration, media.kind, playJsAnimation]);
 
   const onImageLoad = useCallback(() => {
     if (!staticCover) {
       setDuration(COVER_ANIMATION_DURATION / 1000);
-      coverLottieRef.current?.play(true);
-      playJsAnimation(COVER_ANIMATION_DURATION / 1000);
     }
-  }, [staticCover, playJsAnimation]);
+  }, [staticCover]);
 
   const onVideoReady = useCallback(() => {
     if (!videoRef.current || videoReady.current) {

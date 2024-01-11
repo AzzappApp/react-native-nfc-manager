@@ -24,12 +24,20 @@ export const colorify = (
   return newLottie;
 };
 
-const convertColorToLottieColor = (color: number[] | string | undefined) => {
-  if (
-    typeof color === 'string' &&
-    color.match(/^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i)
-  ) {
-    const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(color);
+const shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
+const hexRegex = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i;
+
+const convertColorToLottieColor = (_color: number[] | string | undefined) => {
+  let color = _color;
+
+  if (typeof _color === 'string' && _color.match(shorthandRegex)) {
+    color = _color.replace(shorthandRegex, (m, r, g, b) => {
+      return r + r + g + g + b + b;
+    });
+  }
+
+  if (typeof color === 'string' && color.match(hexRegex)) {
+    const result = hexRegex.exec(color);
     if (!result) {
       throw new Error('Color can be only hex or rgb array (ex. [10,20,30])');
     }

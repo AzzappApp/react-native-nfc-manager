@@ -197,7 +197,7 @@ const CoverRenderer = (
     mediaId == null && foregroundId == null && backgroundId == null,
   );
   const [textAnimationReady, setTextAnimationReady] = useState(
-    title === null && subTitle === null,
+    !title && !subTitle,
   );
   const [videoReady, setVideoReady] = useState(!isVideoMedia);
 

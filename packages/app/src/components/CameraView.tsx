@@ -123,10 +123,8 @@ const CameraView = (
   const [hasMicrophonePermission, setHasMicrophonePermission] = useState(false);
 
   useEffect(() => {
-    Camera.getMicrophonePermissionStatus().then(
-      status => setHasMicrophonePermission(status === 'granted'),
-      () => setHasMicrophonePermission(false),
-    );
+    const status = Camera.getMicrophonePermissionStatus();
+    setHasMicrophonePermission(status === 'granted');
   }, []);
   // #endregion
 

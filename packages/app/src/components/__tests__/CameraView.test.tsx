@@ -244,14 +244,14 @@ describe('CameraView', () => {
       id: 'back',
       hasFlash: true,
     });
-    (Camera.getMicrophonePermissionStatus as jest.Mock).mockResolvedValueOnce(
+    (Camera.getMicrophonePermissionStatus as jest.Mock).mockReturnValue(
       'granted',
     );
     const { unmount } = await renderCameraView();
     expect(screen.getByTestId('camera')).toHaveProp('audio', true);
     unmount();
 
-    (Camera.getMicrophonePermissionStatus as jest.Mock).mockResolvedValueOnce(
+    (Camera.getMicrophonePermissionStatus as jest.Mock).mockReturnValue(
       'denied',
     );
 
