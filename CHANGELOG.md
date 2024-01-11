@@ -1,5 +1,6 @@
-## 0.5.2-canary.134
+## 0.5.2-canary.135
 
+* **fix:**  - **cover:** [#2051](https://github.com/AzzappApp/azzapp/pull/2051) background is missing in cover ([#2231](https://github.com/AzzappApp/azzapp/pull/2231))
 * **fix:**  - 🐛 only display account details for owners ([#2248](https://github.com/AzzappApp/azzapp/pull/2248))
 * **fix:**  - block action on post list if unpublishd web (with deepLinking) ([#2233](https://github.com/AzzappApp/azzapp/pull/2233))
 * **fix:**  - **cover:** [#2225](https://github.com/AzzappApp/azzapp/pull/2225) clear optimisticUpdate on complete ([#2242](https://github.com/AzzappApp/azzapp/pull/2242))
