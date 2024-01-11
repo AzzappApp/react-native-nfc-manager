@@ -231,10 +231,10 @@ export const GET = async (
               )}/fl_relative,w_1.0,e_colorize,co_rgb:${swapColor(
                 coverData.foregroundColor ?? '#FFF',
                 cardColors,
-              ).replace('#', '')}/fl_layer_apply/`
+              ).replace('#', '')}/fl_layer_apply`
             : ''
         }${
-          keepAspectRatio === 'left_pad' ? 'c_lpad' : 'c_fit'
+          keepAspectRatio === 'left_pad' ? '/c_lpad' : '/c_fit'
         },g_east,w_${width},h_${height},ar_1:1/${decodeMediaId(mediaId)}.png`;
 
       const orientation =
