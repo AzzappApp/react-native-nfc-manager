@@ -25,7 +25,6 @@ import PostRendererBottomPanel, {
 } from './PostRendererBottomPanel';
 import PostRendererMedia from './PostRendererMedia';
 import type { MediaVideoRendererHandle } from '#components/medias';
-import type { PostRendererBottomPanel_webCard$key } from '@azzapp/relay/artifacts/PostRendererBottomPanel_webCard.graphql';
 import type { PostRendererFragment_author$key } from '@azzapp/relay/artifacts/PostRendererFragment_author.graphql';
 import type { PostRendererFragment_post$key } from '@azzapp/relay/artifacts/PostRendererFragment_post.graphql';
 import type { ForwardedRef } from 'react';
@@ -44,12 +43,6 @@ export type PostRendererProps = ViewProps & {
    * @type {PostRendererFragment_author$key}
    */
   author: PostRendererFragment_author$key;
-  /**
-   *  the viewer webcard
-   *
-   * @type {PostRendererFragment_author$key}
-   */
-  webCardKey?: PostRendererBottomPanel_webCard$key;
   /**
    *
    *
@@ -96,7 +89,6 @@ const PostRenderer = (
   {
     post: postKey,
     author: authorKey,
-    webCardKey,
     width,
     muted = false,
     videoDisabled = false,
@@ -208,7 +200,6 @@ const PostRenderer = (
           toggleModal={openModal}
           showModal={showModal}
           post={post}
-          webCardKey={webCardKey}
         />
       </Suspense>
     </View>

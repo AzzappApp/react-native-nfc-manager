@@ -43,7 +43,7 @@ const postScreenQuery = graphql`
     viewer {
       profile {
         webCard {
-          ...PostRendererBottomPanel_webCard
+          ...PostList_webCard
         }
       }
     }

@@ -23,7 +23,6 @@ import PostRendererActionBar, {
   PostRendererActionBarSkeleton,
 } from './PostRendererActionBar';
 import type { PostRendererActionBar_post$key } from '@azzapp/relay/artifacts/PostRendererActionBar_post.graphql';
-import type { PostRendererBottomPanel_webCard$key } from '@azzapp/relay/artifacts/PostRendererBottomPanel_webCard.graphql';
 import type { PostRendererBottomPanelFragment_post$key } from '@azzapp/relay/artifacts/PostRendererBottomPanelFragment_post.graphql';
 import type { PostRendererBottomPanelUpdateAllowLikesPostMutation } from '@azzapp/relay/artifacts/PostRendererBottomPanelUpdateAllowLikesPostMutation.graphql';
 import type { PostRendererBottomPanelUpdatePostAllowCommentsMutation } from '@azzapp/relay/artifacts/PostRendererBottomPanelUpdatePostAllowCommentsMutation.graphql';
@@ -48,20 +47,12 @@ type PostRendererBottomPanelProps = {
    */
   post: PostRendererActionBar_post$key &
     PostRendererBottomPanelFragment_post$key;
-
-  /**
-   * the viewer web card
-   *
-   * @type {PostRendererBottomPanel_webCard$key}
-   */
-  webCardKey?: PostRendererBottomPanel_webCard$key;
 };
 
 const PostRendererBottomPanel = ({
   showModal,
   toggleModal,
   post: postKey,
-  webCardKey,
 }: PostRendererBottomPanelProps) => {
   const router = useRouter();
   const post = useFragment(
@@ -257,22 +248,10 @@ const PostRendererBottomPanel = ({
     }
   };
 
-  const viewerWebCard = useFragment(
-    graphql`
-      fragment PostRendererBottomPanel_webCard on WebCard {
-        id
-        cardIsPublished
-      }
-    `,
-    webCardKey ?? null,
-  );
-
   return (
     <>
       <View style={styles.bottomContainerPost}>
-        {((webCardKey && viewerWebCard?.cardIsPublished) || !webCardKey) && (
-          <PostRendererActionBar style={{ marginTop: 10 }} postKey={postKey} />
-        )}
+        <PostRendererActionBar style={{ marginTop: 10 }} postKey={postKey} />
         {!!post.content && (
           <ExpendableText
             style={styles.content}
