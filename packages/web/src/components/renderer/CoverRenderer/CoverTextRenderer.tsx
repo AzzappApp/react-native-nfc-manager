@@ -168,6 +168,7 @@ const CoverTextRenderer = (
       : `${titleStyle?.fontSize ?? DEFAULT_COVER_FONT_SIZE}em`,
     textAlign,
     position: 'relative',
+    wordWrap: 'break-word',
   } as const;
 
   const subTitleFontFamily =
@@ -182,6 +183,7 @@ const CoverTextRenderer = (
       : `${subTitleStyle?.fontSize ?? DEFAULT_COVER_FONT_SIZE}em`,
     textAlign,
     position: 'relative',
+    wordWrap: 'break-word',
   } as const;
 
   const foundAnimation =
