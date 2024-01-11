@@ -83,7 +83,11 @@ const HomeProfileLink = ({
 
   return (
     <Animated.View style={[styles.container, opacityStyle]}>
-      <PressableOpacity accessibilityRole="button" onPress={onPress}>
+      <PressableOpacity
+        accessibilityRole="button"
+        onPress={onPress}
+        disabled={currentProfileIndex === -1}
+      >
         <View style={styles.containerText}>
           <Icon icon="earth" style={styles.iconLink} />
           <Text variant="button" numberOfLines={1} style={styles.url}>
