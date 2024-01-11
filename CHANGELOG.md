@@ -1,5 +1,12 @@
-## 0.5.2-canary.135
+## 0.5.2-canary.136
 
+* **fix:**  - **cover:** [#2168](https://github.com/AzzappApp/azzapp/pull/2168) issue on cover without title/subtitle on mobile and… ([#2251](https://github.com/AzzappApp/azzapp/pull/2251))
+* **fix:**  - wrong url generated when no foreground is set ([#2243](https://github.com/AzzappApp/azzapp/pull/2243))
+* **fix:**  - **home:** [#2142](https://github.com/AzzappApp/azzapp/pull/2142) disable profile link on new webcard ([#2253](https://github.com/AzzappApp/azzapp/pull/2253))
+* **fix:**  - **webCard:** [#2191](https://github.com/AzzappApp/azzapp/pull/2191) check role on changing webCard template ([#2254](https://github.com/AzzappApp/azzapp/pull/2254))
+* **fix:**  - **cover:** [#2223](https://github.com/AzzappApp/azzapp/pull/2223) break word to wrap content in cover ([#2252](https://github.com/AzzappApp/azzapp/pull/2252))
+* **fix:**  - **multiUser:** [#2214](https://github.com/AzzappApp/azzapp/pull/2214) display owner value + disable field when user is current one ([#2255](https://github.com/AzzappApp/azzapp/pull/2255))
+* **style:**  - [#2189](https://github.com/AzzappApp/azzapp/pull/2189) adapt sliders in dark mode ([#2256](https://github.com/AzzappApp/azzapp/pull/2256))
 * **fix:**  - **cover:** [#2051](https://github.com/AzzappApp/azzapp/pull/2051) background is missing in cover ([#2231](https://github.com/AzzappApp/azzapp/pull/2231))
 * **fix:**  - 🐛 only display account details for owners ([#2248](https://github.com/AzzappApp/azzapp/pull/2248))
 * **fix:**  - block action on post list if unpublishd web (with deepLinking) ([#2233](https://github.com/AzzappApp/azzapp/pull/2233))
