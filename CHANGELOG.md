@@ -1,5 +1,7 @@
-## 0.5.2-canary.138
+## 0.5.2-canary.139
 
+* **fix:**  - **multiUser:** [#2214](https://github.com/AzzappApp/azzapp/pull/2214) remove arrow on disabled + check that admin user can’t try to update owner role ([#2268](https://github.com/AzzappApp/azzapp/pull/2268))
+* **fix:**  - **cover:** [#2264](https://github.com/AzzappApp/azzapp/pull/2264) missing styles in cover text + revalidate on change ([#2266](https://github.com/AzzappApp/azzapp/pull/2266))
 * **fix:**  - 🐛 don't use a default birthday on multi-user invite ([#2267](https://github.com/AzzappApp/azzapp/pull/2267))
 * **test:**  - **modules:** [#2147](https://github.com/AzzappApp/azzapp/pull/2147) try to change classNames call ([#2260](https://github.com/AzzappApp/azzapp/pull/2260))
 * **fix:**  - **cover:** [#2168](https://github.com/AzzappApp/azzapp/pull/2168) issue on cover without title/subtitle on mobile and… ([#2251](https://github.com/AzzappApp/azzapp/pull/2251))
