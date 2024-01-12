@@ -40,7 +40,8 @@ const CardModuleBackground = ({
       ? resizeModes?.get?.(backgroundId)
       : 'cover';
 
-  const classnames = cx(styles.background, {
+  const classnames = cx({
+    [styles.background]: true,
     [styles.backgroundCover]: resizeMode === 'cover',
     [styles.backgroundContain]: resizeMode === 'contain',
     [styles.backgroundCenter]: resizeMode === 'center',
