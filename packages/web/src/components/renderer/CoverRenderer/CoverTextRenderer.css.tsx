@@ -28,37 +28,47 @@ const coverTextContent = style({
   },
 });
 
-const coverTextContainer = style({
+const coverTextContainerStyle = {
   position: 'absolute',
   width: '100%',
   height: '100%',
   top: 0,
-  left: 0,
+  right: 0, //we prefer to use right instead of left, because on /api/cover we use left padding to keep ratio
   padding: '5%',
   display: 'flex',
   flexDirection: 'column',
-});
+} as const;
 
-const coverTextContainerVertical = style({
+const coverTextContainer = style(coverTextContainerStyle);
+
+const coverTextContainerVerticalStyle = {
   width: `${100 / COVER_RATIO}%`,
   height: `${100 * COVER_RATIO}%`,
   top: `${(100 - 100 * COVER_RATIO) / 2}%`,
   left: `${(100 - 100 / COVER_RATIO) / 2}%`,
-});
+};
 
-const coverTextContainerHorizontal = style({
+const coverTextContainerVertical = style(coverTextContainerVerticalStyle);
+
+const coverTextContainerHorizontalStyle = {
   paddingTop: '15%',
-});
+};
 
-const coverTextContainerTopToBottom = style({
+const coverTextContainerHorizontal = style(coverTextContainerHorizontalStyle);
+
+const coverTextContainerTopToBottomStyle = {
   transform: 'rotate(90deg)',
   paddingLeft: '15%',
-});
+};
 
-const coverTextContainerBottomToTop = style({
+const coverTextContainerTopToBottom = style(coverTextContainerTopToBottomStyle);
+
+const coverTextContainerBottomToTopStyle = {
   transform: 'rotate(-90deg)',
   paddingRight: '15%',
-});
+};
+
+const coverTextContainerBottomToTop = style(coverTextContainerBottomToTopStyle);
 
 const coverTextLetter = style({
   display: 'inline-block',
@@ -70,9 +80,14 @@ export default {
   coverTextContent,
   coverTextContentContainer,
   coverTextContainer,
+  coverTextContainerStyle,
   coverTextContainerVertical,
+  coverTextContainerVerticalStyle,
   coverTextContainerHorizontal,
+  coverTextContainerHorizontalStyle,
   coverTextContainerTopToBottom,
+  coverTextContainerTopToBottomStyle,
   coverTextContainerBottomToTop,
+  coverTextContainerBottomToTopStyle,
   coverTextLetter,
 };

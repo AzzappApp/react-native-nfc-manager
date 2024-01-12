@@ -1,6 +1,5 @@
 import * as Sentry from '@sentry/nextjs';
-import { ImageResponse } from '@vercel/og';
-import cx from 'classnames';
+import { ImageResponse } from 'next/og';
 import { NextResponse, type NextRequest } from 'next/server';
 import {
   getMediasByIds,
@@ -21,7 +20,6 @@ import ERRORS from '@azzapp/shared/errors';
 import { decodeMediaId } from '@azzapp/shared/imagesHelpers';
 import coverTextStyle from '#components/renderer/CoverRenderer/CoverTextRenderer.css';
 import { fontsMap } from '#helpers/fonts';
-import styles from '../../../../components/renderer/CoverRenderer/CoverRenderer.css';
 
 export const runtime = 'edge';
 
@@ -399,8 +397,10 @@ export const GET = async (
               style={{
                 display: 'flex',
                 flex: 1,
+                position: 'relative',
+                margin: 'auto',
+                overflow: 'hidden',
               }}
-              className={styles.content}
             >
               <div
                 style={{
@@ -420,31 +420,25 @@ export const GET = async (
               <img src={url(width, height)} />
               <div
                 style={{
-                  display: 'flex',
-                  height: '100%',
-                  width: '100%',
                   maxWidth: imageWidth,
-                  position: 'absolute',
-                  top: 0,
-                  right: 0, // To avoid the text to be on the left with keepAspectRatio
                   fontSize: '5px',
-                  flexDirection: 'column',
                   alignItems: textAlign,
                   justifyContent: overlayJustifyContent,
-                  padding: '5%',
                   paddingTop: '30%',
+                  ...coverTextStyle.coverTextContainerStyle,
+                  ...(orientation === 'horizontal'
+                    ? coverTextStyle.coverTextContainerHorizontalStyle
+                    : {}),
+                  ...(orientation !== 'horizontal'
+                    ? coverTextStyle.coverTextContainerVerticalStyle
+                    : {}),
+                  ...(orientation === 'topToBottom'
+                    ? coverTextStyle.coverTextContainerTopToBottomStyle
+                    : {}),
+                  ...(orientation === 'bottomToTop'
+                    ? coverTextStyle.coverTextContainerBottomToTopStyle
+                    : {}),
                 }}
-                className={cx(
-                  coverTextStyle.coverTextContainer,
-                  orientation !== 'horizontal' &&
-                    coverTextStyle.coverTextContainerVertical,
-                  orientation === 'horizontal' &&
-                    coverTextStyle.coverTextContainerHorizontal,
-                  orientation === 'topToBottom' &&
-                    coverTextStyle.coverTextContainerTopToBottom,
-                  orientation === 'bottomToTop' &&
-                    coverTextStyle.coverTextContainerBottomToTop,
-                )}
               >
                 <div style={{ fontFamily: titleFontFamily, ...titleTextStyle }}>
                   {coverTitle}
