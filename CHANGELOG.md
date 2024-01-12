@@ -1,5 +1,6 @@
-## 0.5.2-canary.136
+## 0.5.2-canary.137
 
+* **test:**  - **modules:** [#2147](https://github.com/AzzappApp/azzapp/pull/2147) try to change classNames call ([#2260](https://github.com/AzzappApp/azzapp/pull/2260))
 * **fix:**  - **cover:** [#2168](https://github.com/AzzappApp/azzapp/pull/2168) issue on cover without title/subtitle on mobile and… ([#2251](https://github.com/AzzappApp/azzapp/pull/2251))
 * **fix:**  - wrong url generated when no foreground is set ([#2243](https://github.com/AzzappApp/azzapp/pull/2243))
 * **fix:**  - **home:** [#2142](https://github.com/AzzappApp/azzapp/pull/2142) disable profile link on new webcard ([#2253](https://github.com/AzzappApp/azzapp/pull/2253))
