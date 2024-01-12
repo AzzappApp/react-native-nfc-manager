@@ -46,6 +46,15 @@ const updateProfileMutation: MutationResolvers['updateProfile'] = async (
 
   const { profileRole, contactCard, avatarId } = input;
 
+  if (
+    profileId === targetProfileId &&
+    profileRole &&
+    profileRole !== author.profileRole
+  ) {
+    // we don't allow to change profile role of the profile you are logged in
+    throw new GraphQLError(ERRORS.INVALID_REQUEST);
+  }
+
   await updateProfile(targetProfileId, {
     profileRole: profileRole ?? undefined,
     contactCard: {

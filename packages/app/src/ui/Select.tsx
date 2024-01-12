@@ -172,15 +172,17 @@ const Select = <ItemT,>({
         ) : (
           <View />
         )}
-        <Icon
-          icon="arrow_down"
-          style={{
-            width: 11,
-            height: 43,
-            marginLeft: 10,
-            marginRight: 10,
-          }}
-        />
+        {props.disabled ? null : (
+          <Icon
+            icon="arrow_down"
+            style={{
+              width: 11,
+              height: 43,
+              marginLeft: 10,
+              marginRight: 10,
+            }}
+          />
+        )}
       </PressableNative>
       <BottomSheetModal
         visible={showDropDown}

@@ -415,19 +415,21 @@ const MultiUserDetailModal = (
                     </Text>
                     <Select
                       nativeID="role"
-                      disabled={isCurrentProfile}
+                      disabled={isCurrentProfile || role === 'owner'}
                       accessibilityLabelledBy="roleLabel"
                       data={
                         role === 'owner'
-                          ? roles.concat({
-                              id: 'owner',
-                              label: (
-                                <FormattedMessage
-                                  defaultMessage="Owner"
-                                  description="MultiUserDetailModal - Label for owner select input"
-                                />
-                              ),
-                            })
+                          ? [
+                              {
+                                id: 'owner',
+                                label: (
+                                  <FormattedMessage
+                                    defaultMessage="Owner"
+                                    description="MultiUserDetailModal - Label for owner select input"
+                                  />
+                                ),
+                              },
+                            ]
                           : roles
                       }
                       selectedItemKey={value}
