@@ -114,11 +114,11 @@ const HomeBottomSheetPanel = ({
   };
 
   const modalHeight = useMemo(() => {
-    let height = 220;
+    let height = 270;
 
     if (!withProfile || !profileRole) return height;
 
-    if (isOwner(profileRole)) height += 100;
+    if (isOwner(profileRole)) height += 50;
     if (isAdmin(profileRole)) height += 50;
 
     return height;
@@ -134,50 +134,48 @@ const HomeBottomSheetPanel = ({
     >
       <View style={styles.bottomSheetOptionsContainer}>
         <>
+          <Link route="ACCOUNT_DETAILS">
+            <PressableNative
+              style={styles.bottomSheetOptionButton}
+              onPress={close}
+            >
+              <View style={styles.bottomSheetOptionContainer}>
+                <View style={styles.bottomSheetOptionIconLabel}>
+                  <Icon icon="information" />
+                  <Text>
+                    <FormattedMessage
+                      defaultMessage="Account details"
+                      description="Link to open account details form to change email, phone number, etc."
+                    />
+                  </Text>
+                </View>
+                <Icon icon="arrow_right" />
+              </View>
+            </PressableNative>
+          </Link>
           {withProfile && profileRole && isOwner(profileRole) && (
-            <>
-              <Link route="ACCOUNT_DETAILS">
-                <PressableNative
-                  style={styles.bottomSheetOptionButton}
-                  onPress={close}
-                >
-                  <View style={styles.bottomSheetOptionContainer}>
-                    <View style={styles.bottomSheetOptionIconLabel}>
-                      <Icon icon="information" />
-                      <Text>
-                        <FormattedMessage
-                          defaultMessage="Account details"
-                          description="Link to open account details form to change email, phone number, etc."
-                        />
-                      </Text>
-                    </View>
-                    <Icon icon="arrow_right" />
+            <Link route="WEBCARD_PARAMETERS">
+              <PressableNative
+                style={styles.bottomSheetOptionButton}
+                onPress={close}
+              >
+                <View style={styles.bottomSheetOptionContainer}>
+                  <View style={styles.bottomSheetOptionIconLabel}>
+                    <Icon icon="parameters" />
+                    <Text>
+                      <FormattedMessage
+                        defaultMessage="WebCard{azzappA} parameters"
+                        description="Link to open webcard parameters form to change webcard parameters"
+                        values={{
+                          azzappA: <Text variant="azzapp">a</Text>,
+                        }}
+                      />
+                    </Text>
                   </View>
-                </PressableNative>
-              </Link>
-              <Link route="WEBCARD_PARAMETERS">
-                <PressableNative
-                  style={styles.bottomSheetOptionButton}
-                  onPress={close}
-                >
-                  <View style={styles.bottomSheetOptionContainer}>
-                    <View style={styles.bottomSheetOptionIconLabel}>
-                      <Icon icon="parameters" />
-                      <Text>
-                        <FormattedMessage
-                          defaultMessage="WebCard{azzappA} parameters"
-                          description="Link to open webcard parameters form to change webcard parameters"
-                          values={{
-                            azzappA: <Text variant="azzapp">a</Text>,
-                          }}
-                        />
-                      </Text>
-                    </View>
-                    <Icon icon="arrow_right" />
-                  </View>
-                </PressableNative>
-              </Link>
-            </>
+                  <Icon icon="arrow_right" />
+                </View>
+              </PressableNative>
+            </Link>
           )}
           {withProfile && profile && profile?.webCard.cardIsPublished && (
             <PressableNative
