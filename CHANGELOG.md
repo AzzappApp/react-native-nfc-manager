@@ -1,5 +1,6 @@
-## 0.5.2-canary.137
+## 0.5.2-canary.138
 
+* **fix:**  - 🐛 don't use a default birthday on multi-user invite ([#2267](https://github.com/AzzappApp/azzapp/pull/2267))
 * **test:**  - **modules:** [#2147](https://github.com/AzzappApp/azzapp/pull/2147) try to change classNames call ([#2260](https://github.com/AzzappApp/azzapp/pull/2260))
 * **fix:**  - **cover:** [#2168](https://github.com/AzzappApp/azzapp/pull/2168) issue on cover without title/subtitle on mobile and… ([#2251](https://github.com/AzzappApp/azzapp/pull/2251))
 * **fix:**  - wrong url generated when no foreground is set ([#2243](https://github.com/AzzappApp/azzapp/pull/2243))
