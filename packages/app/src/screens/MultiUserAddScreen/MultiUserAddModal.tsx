@@ -287,7 +287,7 @@ const MultiUserAddModal = (
           title,
           company,
           urls,
-          birthday: birthday ?? { birthday: '', selected: null },
+          birthday,
           socials,
           avatarId: avatarId ? encodeMediaId(avatarId, 'image') : avatarId,
           addresses,
