@@ -1,0 +1,11 @@
+extend type Mutation {
+  transferOwnership(input: TransferOwnershipInput!): TransferOwnershipPayload
+}
+
+type TransferOwnershipPayload {
+  profile: Profile
+}
+
+input TransferOwnershipInput {
+  profileId: ID!
+}

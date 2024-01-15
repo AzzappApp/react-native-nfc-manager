@@ -33,6 +33,19 @@ import type {
 } from '@azzapp/relay/artifacts/MultiUserScreenQuery.graphql';
 import type { ContactCard } from '@azzapp/shared/contactCardHelpers';
 
+export type UserInformation = {
+  firstName: string;
+  lastName: string;
+  email: string;
+  phoneNumber: string;
+  avatar: {
+    id: string;
+    uri: string;
+  } | null;
+  contactCard: ContactCard;
+  profileId: string;
+};
+
 const multiUserScreenQuery = graphql`
   query MultiUserScreenQuery($pixelRatio: Float!) {
     ...MultiUserScreenUserList_currentUser

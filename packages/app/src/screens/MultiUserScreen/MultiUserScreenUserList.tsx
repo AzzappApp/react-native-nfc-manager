@@ -14,22 +14,9 @@ import Text from '#ui/Text';
 import Avatar from './Avatar';
 import MultiUserDetailModal from './MultiUserDetailModal';
 import type { MultiUserDetailModalActions } from './MultiUserDetailModal';
+import type { UserInformation } from './MultiUserScreen';
 import type { ProfileRole } from '@azzapp/relay/artifacts/MultiUserScreenQuery.graphql';
 import type { MultiUserScreenUserList_currentUser$key } from '@azzapp/relay/artifacts/MultiUserScreenUserList_currentUser.graphql';
-import type { ContactCard } from '@azzapp/shared/contactCardHelpers';
-
-type UserInformation = {
-  firstName: string;
-  lastName: string;
-  email: string;
-  phoneNumber: string;
-  avatar: {
-    id: string;
-    uri: string;
-  } | null;
-  contactCard: ContactCard;
-  profileId: string;
-};
 
 export type MultiUserScreenListProps = {
   usersByRole: Record<ProfileRole, UserInformation[]>;
@@ -190,6 +177,7 @@ const MultiUserScreenUserList = (props: MultiUserScreenListProps) => {
           webCard={profile.webCard}
           ref={detail}
           currentProfileId={data.viewer.profile?.id ?? ''}
+          usersByRole={usersByRole}
         />
       )}
     </View>

@@ -1,5 +1,6 @@
 import acceptInvitation from './acceptInvitation';
 import acceptOwnership from './acceptOwnership';
+import cancelTransferOwnership from './cancelTransferOwnership';
 import createPost from './createPost';
 import createPostComment from './createPostComment';
 import createWebCard from './createWebCard';
@@ -32,6 +33,7 @@ import saveCommonInformation from './saveCommonInformation';
 import saveContactCard from './saveContactCard';
 import saveCover from './saveCover';
 import toggleFollowing from './toggleFollowing';
+import transferOwnership from './transferOwnership';
 import updateModulesVisibility from './updateModulesVisibility';
 import updateMultiUser from './updateMultiUser';
 import updatePost from './updatePost';
@@ -90,4 +92,6 @@ export const Mutation: MutationResolvers = {
   inviteUser,
   filterWebCardSuggestion,
   removeUserFromWebcard,
+  transferOwnership,
+  cancelTransferOwnership,
 };

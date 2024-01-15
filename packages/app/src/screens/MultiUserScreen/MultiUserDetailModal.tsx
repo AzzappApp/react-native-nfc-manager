@@ -1,4 +1,10 @@
-import { forwardRef, useEffect, useImperativeHandle, useState } from 'react';
+import {
+  forwardRef,
+  useEffect,
+  useImperativeHandle,
+  useRef,
+  useState,
+} from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { StyleSheet, View, useColorScheme } from 'react-native';
@@ -9,6 +15,7 @@ import Toast from 'react-native-toast-message';
 import { graphql, useFragment, useMutation } from 'react-relay';
 import { get as CappedPixelRatio } from '@azzapp/relay/providers/CappedPixelRatio.relayprovider';
 import { encodeMediaId } from '@azzapp/shared/imagesHelpers';
+import { isOwner } from '@azzapp/shared/profileHelpers';
 import { colors, textStyles } from '#theme';
 import ScreenModal from '#components/ScreenModal';
 import { getFileName } from '#helpers/fileHelpers';
@@ -23,8 +30,12 @@ import PressableNative from '#ui/PressableNative';
 import Select from '#ui/Select';
 import Text from '#ui/Text';
 import TextInput from '#ui/TextInput';
+import MultiUserTransferOwnershipModal from './MultiUserTransferOwnershipModal';
 import type { ContactCardEditFormValues } from '#screens/ContactCardScreen/ContactCardEditModalSchema';
 import type { AssociatedUser } from '#screens/MultiUserAddScreen/MultiUserAddModal';
+import type { UserInformation } from './MultiUserScreen';
+import type { MultiUserTransferOwnershipModalActions } from './MultiUserTransferOwnershipModal';
+import type { MultiUserDetailModal_CancelTransferOwnershipMutation } from '@azzapp/relay/artifacts/MultiUserDetailModal_CancelTransferOwnershipMutation.graphql';
 import type { MultiUserDetailModal_RemoveUserMutation } from '@azzapp/relay/artifacts/MultiUserDetailModal_RemoveUserMutation.graphql';
 import type { MultiUserDetailModal_UpdateProfileMutation } from '@azzapp/relay/artifacts/MultiUserDetailModal_UpdateProfileMutation.graphql';
 import type { MultiUserDetailModal_webcard$key } from '@azzapp/relay/artifacts/MultiUserDetailModal_webcard.graphql';
@@ -36,6 +47,7 @@ import type { Control } from 'react-hook-form';
 type MultiUserDetailModalProps = {
   webCard: MultiUserDetailModal_webcard$key;
   currentProfileId: string;
+  usersByRole: Record<ProfileRole, UserInformation[]>;
 };
 
 export type MultiUserDetailFormValues = ContactCardEditFormValues & {
@@ -54,12 +66,13 @@ export type MultiUserDetailModalActions = {
 };
 
 const MultiUserDetailModal = (
-  { webCard, currentProfileId }: MultiUserDetailModalProps,
+  { webCard, currentProfileId, usersByRole }: MultiUserDetailModalProps,
   ref: ForwardedRef<MultiUserDetailModalActions>,
 ) => {
   const [visible, setVisible] = useState(false);
   const [showImagePicker, setShowImagePicker] = useState(false);
   const [profileId, setProfileId] = useState('');
+  const transfer = useRef<MultiUserTransferOwnershipModalActions>(null);
 
   const onClose = () => setVisible(false);
   const intl = useIntl();
@@ -72,6 +85,7 @@ const MultiUserDetailModal = (
   const data = useFragment(
     graphql`
       fragment MultiUserDetailModal_webcard on WebCard {
+        ...MultiUserTransferOwnershipModal_webcard
         commonInformation {
           company
           addresses {
@@ -97,6 +111,10 @@ const MultiUserDetailModal = (
         profiles {
           id
           ...HomeStatistics_profiles
+          promotedAsOwner
+          user {
+            email
+          }
         }
       }
     `,
@@ -160,6 +178,20 @@ const MultiUserDetailModal = (
       }
     `,
   );
+
+  const [commitCancelTransfer, savingCancelTransfer] =
+    useMutation<MultiUserDetailModal_CancelTransferOwnershipMutation>(graphql`
+      mutation MultiUserDetailModal_CancelTransferOwnershipMutation(
+        $input: CancelTransferOwnershipInput!
+      ) {
+        cancelTransferOwnership(input: $input) {
+          profile {
+            id
+            promotedAsOwner
+          }
+        }
+      }
+    `);
 
   const submit = handleSubmit(
     async data => {
@@ -271,6 +303,7 @@ const MultiUserDetailModal = (
   }, [profileId, data.profiles]);
 
   const isCurrentProfile = profileId === currentProfileId;
+
   const [commitDelete, deletionIsActive] =
     useMutation<MultiUserDetailModal_RemoveUserMutation>(graphql`
       mutation MultiUserDetailModal_RemoveUserMutation(
@@ -321,6 +354,10 @@ const MultiUserDetailModal = (
   };
 
   const colorScheme = useColorScheme();
+
+  const userPendingOwnership = data.profiles?.find(
+    profile => profile.promotedAsOwner,
+  );
 
   return (
     <ScreenModal visible={visible} animationType="slide">
@@ -444,32 +481,90 @@ const MultiUserDetailModal = (
                   </View>
                 )}
               />
-              <Text style={[styles.description, textStyles.xsmall]}>
-                {role === 'user' && (
+              {isOwner(role) && !userPendingOwnership && (
+                <Button
+                  style={styles.transfer}
+                  variant="secondary"
+                  label={intl.formatMessage({
+                    defaultMessage: 'Transfer Ownership',
+                    description:
+                      'MultiUserDetailModal - Label for transfer ownership button',
+                  })}
+                  onPress={() => transfer.current?.open()}
+                />
+              )}
+              {isOwner(role) && userPendingOwnership && (
+                <>
+                  <Text style={styles.pending}>
+                    <FormattedMessage
+                      defaultMessage="Pending Ownership transfer to"
+                      description="MultiUserDetailModal - Title for ownership transfer pending"
+                    />
+                  </Text>
+
+                  <Text style={styles.pendingEmail}>
+                    {userPendingOwnership.user.email}
+                  </Text>
+
+                  <View style={styles.cancel}>
+                    <Button
+                      disabled={savingCancelTransfer}
+                      onPress={() =>
+                        commitCancelTransfer({
+                          variables: {
+                            input: {
+                              profileId: userPendingOwnership.id,
+                            },
+                          },
+                        })
+                      }
+                      label={intl.formatMessage({
+                        defaultMessage: 'Cancel transfer',
+                        description:
+                          'MultiUserDetailModal - Cancel transfer button label',
+                      })}
+                      variant="little_round"
+                      style={styles.cancelButton}
+                    />
+                  </View>
+                </>
+              )}
+              {!userPendingOwnership && (
+                <Text style={[styles.description, textStyles.xsmall]}>
+                  {role === 'user' && (
+                    <FormattedMessage
+                      defaultMessage="A user has a ContactCard linked to the shared webcard but cannot publish posts or edit the WebCard."
+                      description="MultiUserDetailModal - User description"
+                    />
+                  )}
+                  {role === 'editor' && (
+                    <FormattedMessage
+                      defaultMessage="An editor can create and publish posts, edit the WebCard, but they cannot manage other aspects of the WebCard, such as settings and permissions."
+                      description="MultiUserDetailModal - Editor description"
+                    />
+                  )}
+                  {role === 'admin' && (
+                    <FormattedMessage
+                      defaultMessage="The admin has full control over the WebCard, including the ability to add and remove collaborators."
+                      description="MultiUserDetailModal - admin description"
+                    />
+                  )}
+                  {role === 'owner' && (
+                    <FormattedMessage
+                      defaultMessage="The owner has full control over the WebCard, including the ability to add and remove collaborators. This is also the person who will be billed for multi-user."
+                      description="MultiUserDetailModal - admin description"
+                    />
+                  )}
+                </Text>
+              )}
+              {userPendingOwnership && (
+                <Text style={[styles.description, textStyles.xsmall]}>
                   <FormattedMessage
-                    defaultMessage="A user has a ContactCard linked to the shared webcard but cannot publish posts or edit the WebCard."
-                    description="MultiUserDetailModal - User description"
+                    defaultMessage="An ownership request has been sent. Ownership will be transfered as soon as the request is accepted."
+                    description="MultiUserDetailModal - Description for pending ownership transfer"
                   />
-                )}
-                {role === 'editor' && (
-                  <FormattedMessage
-                    defaultMessage="An editor can create and publish posts, edit the WebCard, but they cannot manage other aspects of the WebCard, such as settings and permissions."
-                    description="MultiUserDetailModal - Editor description"
-                  />
-                )}
-                {role === 'admin' && (
-                  <FormattedMessage
-                    defaultMessage="The admin has full control over the WebCard, including the ability to add and remove collaborators."
-                    description="MultiUserDetailModal - admin description"
-                  />
-                )}
-                {role === 'owner' && (
-                  <FormattedMessage
-                    defaultMessage="The owner has full control over the WebCard, including the ability to add and remove collaborators. This is also the person who will be billed for multi-user."
-                    description="MultiUserDetailModal - admin description"
-                  />
-                )}
-              </Text>
+                </Text>
+              )}
               <View style={styles.stats}>
                 {data.profiles && (
                   <HomeStatistics
@@ -486,6 +581,11 @@ const MultiUserDetailModal = (
           </ContactCardEditForm>
         </SafeAreaView>
       </Container>
+      <MultiUserTransferOwnershipModal
+        ref={transfer}
+        usersByRole={usersByRole}
+        webCard={data}
+      />
     </ScreenModal>
   );
 };
@@ -564,6 +664,27 @@ const styles = StyleSheet.create({
   name: {
     maxWidth: '50%',
     textAlign: 'center',
+  },
+  transfer: {
+    marginTop: 20,
+  },
+  pending: {
+    color: colors.green,
+    textAlign: 'center',
+    marginTop: 20,
+  },
+  pendingEmail: {
+    marginTop: 20,
+    textAlign: 'center',
+  },
+  cancel: {
+    display: 'flex',
+    justifyContent: 'center',
+    flexDirection: 'row',
+    marginTop: 20,
+  },
+  cancelButton: {
+    width: 136,
   },
 });
 

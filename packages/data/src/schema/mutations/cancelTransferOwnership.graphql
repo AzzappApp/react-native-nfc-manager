@@ -1,0 +1,13 @@
+extend type Mutation {
+  cancelTransferOwnership(
+    input: CancelTransferOwnershipInput!
+  ): CancelTransferOwnershipPayload
+}
+
+type CancelTransferOwnershipPayload {
+  profile: Profile
+}
+
+input CancelTransferOwnershipInput {
+  profileId: ID!
+}
