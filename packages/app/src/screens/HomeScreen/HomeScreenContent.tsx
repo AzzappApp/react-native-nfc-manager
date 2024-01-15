@@ -140,7 +140,7 @@ const HomeScreenContent = ({ user: userKey }: HomeScreenContentProps) => {
 
   useOnFocus(() => {
     const authProfileIndex = user.profiles?.findIndex(
-      profile => profile.id === auth.webCardId,
+      profile => profile.webCard.id === auth.webCardId,
     );
     if (
       authProfileIndex !== undefined &&
