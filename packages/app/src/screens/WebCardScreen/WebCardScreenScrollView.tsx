@@ -77,6 +77,19 @@ const WebCardScreenScrollView = ({
     };
   }>({});
 
+  const [blockCount, setBlockCount] = useState(0);
+
+  const blockCountsUpdateTimeout = useRef<any>(null);
+  const updateBlockCounts = useCallback(() => {
+    if (blockCountsUpdateTimeout.current) {
+      clearTimeout(blockCountsUpdateTimeout.current);
+    }
+    blockCountsUpdateTimeout.current = setTimeout(() => {
+      blockCountsUpdateTimeout.current = null;
+      setBlockCount(Object.keys(blocks.current).length);
+    }, 100);
+  }, []);
+
   const scrollPositionInfos = useRef<{
     position: number;
     editPosition: number;
@@ -180,7 +193,7 @@ const WebCardScreenScrollView = ({
 
   const contentContainerStyle = useAnimatedStyle(() => {
     return {
-      paddingTop: (editTransition?.value ?? 0) * 20,
+      paddingVertical: (editTransition?.value ?? 0) * 20,
     };
   });
 
@@ -196,7 +209,8 @@ const WebCardScreenScrollView = ({
     return {
       height: measurement.height,
     };
-  });
+    // we add blockCount to the deps because we want to recompute the height when the children change
+  }, [editTransition, blockCount]);
 
   const blocksContainerStyle = useAnimatedStyle(() => {
     return {
@@ -240,9 +254,11 @@ const WebCardScreenScrollView = ({
           height,
           visible,
         };
+        updateBlockCounts();
       },
       unregisterBlock: (id: string) => {
         delete blocks.current[id];
+        updateBlockCounts();
       },
     }),
     [blocks],
