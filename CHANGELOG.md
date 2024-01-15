@@ -1,5 +1,6 @@
-## 0.5.2-canary.142
+## 0.5.2-canary.143
 
+* **fix:**  - **WebCardEdition:** recompute scroll height after element added ([#2290](https://github.com/AzzappApp/azzapp/pull/2290))
 * **fix:**  - **router:** [#1741](https://github.com/AzzappApp/azzapp/pull/1741) manage unauthenticated case on deeplink ([#2273](https://github.com/AzzappApp/azzapp/pull/2273))
 * **fix:**  - **CoverEdition:** invalid loading state in custom edition ([#2287](https://github.com/AzzappApp/azzapp/pull/2287))
 * **fix:**  - **CoverEdition:** properly handle crop parameters on demo media ([#2286](https://github.com/AzzappApp/azzapp/pull/2286))
