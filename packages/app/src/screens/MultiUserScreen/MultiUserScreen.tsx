@@ -150,7 +150,7 @@ const MultiUserScreen = ({
       },
       indexedRoles,
     );
-  }, [data]);
+  }, [data.viewer?.profile?.webCard.profiles]);
 
   const [commonInfoFormIsOpened, toggleCommonInfoForm] = useToggle(false);
 
@@ -181,12 +181,26 @@ const MultiUserScreen = ({
             },
           },
         },
+        updater: store => {
+          if (!value && data.viewer.profile?.webCard?.id) {
+            const webCard = store.get(data.viewer.profile?.webCard?.id);
+            if (webCard) {
+              const profiles = webCard.getLinkedRecords('profiles');
+              webCard.setLinkedRecords(
+                profiles?.filter(
+                  p => p.getDataID() === data.viewer.profile?.id,
+                ) ?? [],
+                'profiles',
+              );
+            }
+          }
+        },
         onCompleted: () => {
           setConfirmDeleteMultiUser(false);
         },
       });
     },
-    [commit, data.viewer.profile?.webCard?.id],
+    [commit, data.viewer.profile?.id, data.viewer.profile?.webCard?.id],
   );
 
   const toggleMultiUser = useCallback(
