@@ -45,7 +45,7 @@ export const buildVCard = (
     );
   });
 
-  vcard.addURL(buildUserUrl(userName), 'type=azzapp');
+  vcard.addURL(buildUserUrl(userName), 'type=azzapp WebCard');
   additionalData?.urls?.forEach(url => {
     vcard.addURL(url.address, '');
   });
