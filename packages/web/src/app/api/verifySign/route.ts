@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { getProfileById } from '@azzapp/data/domains';
+import { getProfileById, getWebCardById } from '@azzapp/data/domains';
 import { parseContactCard } from '@azzapp/shared/contactCardHelpers';
 import { verifyHmacWithPassword } from '@azzapp/shared/crypto';
 import ERRORS from '@azzapp/shared/errors';
@@ -29,11 +29,17 @@ const verifySignApi = async (req: Request) => {
 
     const storedProfile = await getProfileById(foundContactCard.profileId);
 
+    const webCard = await getWebCardById(foundContactCard.webCardId);
+
     return NextResponse.json(
       {
-        urls: storedProfile?.contactCard?.urls?.filter(url => url.selected),
-        socials: storedProfile?.contactCard?.socials?.filter(
-          social => social.selected,
+        urls: (webCard?.commonInformation?.urls ?? []).concat(
+          storedProfile?.contactCard?.urls?.filter(url => url.selected) ?? [],
+        ),
+        socials: (webCard?.commonInformation?.socials ?? []).concat(
+          storedProfile?.contactCard?.socials?.filter(
+            social => social.selected,
+          ) ?? [],
         ),
       },
       { status: 200 },

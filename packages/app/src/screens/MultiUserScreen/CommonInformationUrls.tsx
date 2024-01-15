@@ -33,6 +33,7 @@ const ContactCardEditModalUrls = ({
           control={control}
           valueKey={`urls.${index}.address`}
           deleteField={() => remove(index)}
+          autoCapitalize="none"
           keyboardType="url"
           placeholder={intl.formatMessage({
             defaultMessage: 'Enter a URL',
