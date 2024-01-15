@@ -1,5 +1,10 @@
-## 0.5.2-canary.139
+## 0.5.2-canary.140
 
+* **fix:**  - **cover:** [#2264](https://github.com/AzzappApp/azzapp/pull/2264) properly fix cache issue on cover api ([#2284](https://github.com/AzzappApp/azzapp/pull/2284))
+* **fix:**  - **contactCard:** [#2238](https://github.com/AzzappApp/azzapp/pull/2238) adding type= to have the label intrepreted ([#2283](https://github.com/AzzappApp/azzapp/pull/2283))
+* **fix:**  - **home:** [#2237](https://github.com/AzzappApp/azzapp/pull/2237) wrong update of carousel on webcard creation ([#2281](https://github.com/AzzappApp/azzapp/pull/2281))
+* **fix:**  - **contactCard:** [#2250](https://github.com/AzzappApp/azzapp/pull/2250) make camera preview bigger ([#2278](https://github.com/AzzappApp/azzapp/pull/2278))
+* **fix:**  - animated foreground are not supported ([#2276](https://github.com/AzzappApp/azzapp/pull/2276))
 * **fix:**  - **multiUser:** [#2214](https://github.com/AzzappApp/azzapp/pull/2214) remove arrow on disabled + check that admin user can’t try to update owner role ([#2268](https://github.com/AzzappApp/azzapp/pull/2268))
 * **fix:**  - **cover:** [#2264](https://github.com/AzzappApp/azzapp/pull/2264) missing styles in cover text + revalidate on change ([#2266](https://github.com/AzzappApp/azzapp/pull/2266))
 * **fix:**  - 🐛 don't use a default birthday on multi-user invite ([#2267](https://github.com/AzzappApp/azzapp/pull/2267))
