@@ -31,6 +31,7 @@ import CoverPreviewRenderer from '#components/CoverPreviewRenderer';
 import {
   extractLayoutParameters,
   type EditionParameters,
+  cropDataForAspectRatio,
 } from '#components/gpu';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import ActivityIndicator from '#ui/ActivityIndicator';
@@ -40,7 +41,7 @@ import PressableScaleHighlight from '#ui/PressableScaleHighlight';
 import CoverErrorRenderer from '../CoverErrorRenderer';
 import type { TimeRange } from '#components/ImagePicker/imagePickerTypes';
 import type { CarouselSelectListHandle } from '#ui/CarouselSelectList';
-import type { CoverStyleData, SourceMedia } from './coverEditorTypes';
+import type { CoverStyleData, MediaInfos } from './coverEditorTypes';
 import type { CoverEditorTemplateList_templates$key } from '@azzapp/relay/artifacts/CoverEditorTemplateList_templates.graphql';
 import type { CoverEditorTemplateList_templatesOthers$key } from '@azzapp/relay/artifacts/CoverEditorTemplateList_templatesOthers.graphql';
 import type { CoverEditorTemplateList_templatesPeople$key } from '@azzapp/relay/artifacts/CoverEditorTemplateList_templatesPeople.graphql';
@@ -51,25 +52,19 @@ import type {
   CoverTemplateKind,
 } from '@azzapp/relay/artifacts/CoverEditorTemplateListItem_coverTemplate.graphql';
 import type { ColorPalette } from '@azzapp/shared/cardHelpers';
-import type {
-  TextOrientation,
-  TextPosition,
-  TextStyle,
-} from '@azzapp/shared/coverHelpers';
 import type { ListRenderItemInfo, ViewToken } from 'react-native';
 
 export type CoverEditorProps = {
   viewer: CoverEditorTemplateList_viewer$key;
   templateKind: CoverTemplateKind;
-  media: SourceMedia | null;
-  mediaCropParameters: EditionParameters | null;
-  mediaVisible: boolean;
-  maskUri: string | null;
+  mediaInfos: MediaInfos | null;
   title: string | null;
   subTitle: string | null;
-  currentCoverMedia: SourceMedia | null;
-  currentCoverStyle: CoverStyleData | null;
   cardColors: ColorPalette | null;
+  currentCoverInfos: {
+    mediaInfos: MediaInfos;
+    style: CoverStyleData;
+  } | null;
   timeRange: TimeRange | null;
   mediaComputing: boolean;
   width: number;
@@ -81,7 +76,7 @@ export type CoverEditorProps = {
   onSelectedItemChange: (template: {
     id: string;
     style: CoverStyleData;
-    media: SourceMedia;
+    mediaInfos: MediaInfos;
   }) => void;
   onColorPaletteChange: (palette: ColorPalette) => void;
 };
@@ -89,17 +84,13 @@ export type CoverEditorProps = {
 const CoverEditorTemplateList = ({
   viewer: viewerKey,
   templateKind = 'people',
-  media,
-  maskUri,
-  mediaCropParameters,
-  mediaVisible,
+  mediaInfos,
   timeRange,
   title,
   subTitle,
   width,
   height,
-  currentCoverMedia,
-  currentCoverStyle,
+  currentCoverInfos,
   cardColors,
   mediaComputing,
   initialSelectedIndex,
@@ -142,7 +133,7 @@ const CoverEditorTemplateList = ({
     }
   }, [hasNext, isLoadingNext, loadNext]);
 
-  //in some casser viewer.colorPalette seems to be null (sentry crash
+  //in some case viewer.colorPalette seems to be null (sentry crash
   const colorPalettes = useMemo(() => {
     return convertToNonNullArray(
       (viewer?.colorPalettes?.edges ?? []).map(edge => edge?.node ?? null),
@@ -153,7 +144,7 @@ const CoverEditorTemplateList = ({
     const templates = convertToNonNullArray(
       (coverTemplates?.edges ?? []).map(edge => edge?.node ?? null),
     );
-    const items: TemplateListItem[] = templates.map((item, index) => {
+    const items = templates.map((item, index): TemplateListItem => {
       const {
         id,
         previewMedia,
@@ -243,104 +234,76 @@ const CoverEditorTemplateList = ({
         cardColors,
       );
 
-      const templateMedia =
-        media && mediaVisible
-          ? media
-          : ({
-              uri: previewMedia.uri,
-              rawUri: previewMedia.rawUri,
-              kind:
-                previewMedia.__typename === 'MediaImage' ? 'image' : 'video',
-              width: previewMedia.width,
-              height: previewMedia.height,
-            } as const);
-
       const templateEditionParameters =
         mediaParameters as EditionParameters | null;
 
-      const templateStyleParameters = templateEditionParameters
-        ? extractLayoutParameters(templateEditionParameters)[1]
-        : null;
+      const [templateCropParameters, templateStyleParameter] =
+        extractLayoutParameters(templateEditionParameters);
 
-      let itemMediaParameters =
-        media && mediaVisible
-          ? { ...templateStyleParameters, ...mediaCropParameters }
-          : (templateEditionParameters as EditionParameters | null) ?? {};
+      let templateMediaInfos = mediaInfos;
+      if (!templateMediaInfos) {
+        const templateMedia = {
+          id: previewMedia.id,
+          uri: previewMedia.uri,
+          rawUri: previewMedia.rawUri,
+          kind: previewMedia.__typename === 'MediaImage' ? 'image' : 'video',
+          width: previewMedia.width,
+          height: previewMedia.height,
+        } as const;
 
-      if (
-        !itemMediaParameters?.cropData &&
-        Math.abs(templateMedia.width / templateMedia.height - COVER_RATIO) >
-          0.05
-      ) {
-        // if the media doesn't have the right ratio, and there is no cropData in the template
-        // we compute the cropData to have the right ratio
-        let cropData: EditionParameters['cropData'];
-        const { width: mediaWidth, height: mediaHeight } = templateMedia;
-        if (mediaWidth / mediaHeight > COVER_RATIO) {
-          cropData = {
-            originX: (mediaWidth - mediaHeight * COVER_RATIO) / 2,
-            originY: 0,
-            height: mediaHeight,
-            width: mediaHeight * COVER_RATIO,
-          };
-        } else {
-          cropData = {
-            originX: 0,
-            originY: (mediaHeight - mediaWidth / COVER_RATIO) / 2,
-            height: mediaWidth / COVER_RATIO,
-            width: mediaWidth,
+        let mediaCropParameters = templateCropParameters;
+
+        if (
+          !mediaCropParameters.cropData &&
+          Math.abs(templateMedia.width / templateMedia.height - COVER_RATIO) >
+            0.05
+        ) {
+          // if the media doesn't have the right ratio, and there is no cropData in the template
+          // we compute the cropData to have the right ratio
+          const cropData: EditionParameters['cropData'] =
+            cropDataForAspectRatio(
+              templateMedia.width,
+              templateMedia.height,
+              COVER_RATIO,
+            );
+          mediaCropParameters = {
+            ...templateCropParameters,
+            cropData,
           };
         }
-        itemMediaParameters = {
-          ...itemMediaParameters,
-          cropData,
-        };
-      }
 
-      if (templateMedia.rawUri && itemMediaParameters?.cropData) {
-        // if the media uri is a scaled version (demo media and suggested media)
-        // we need to scale the cropData to match the original media size
-        const { originX, originY, width, height } =
-          itemMediaParameters.cropData;
-
-        const scale =
-          templateMedia.width / (256 * Math.min(2, PixelRatio.get()));
-        itemMediaParameters = {
-          ...itemMediaParameters,
-          cropData: {
-            originX: originX / scale,
-            originY: originY / scale,
-            width: width / scale,
-            height: height / scale,
-          },
+        templateMediaInfos = {
+          sourceMedia: templateMedia,
+          mediaCropParameters,
+          maskMedia: null,
         };
       }
 
       return {
         id,
         title,
-        titleStyle,
         subTitle,
-        subTitleStyle,
-        textOrientation: textOrientationOrDefault(textOrientation),
-        textPosition: textPositionOrDefault(textPosition),
-        textAnimation,
-        media: templateMedia,
-        mediaFilter,
-        mediaParameters: itemMediaParameters,
-        mediaAnimation: mediaAnimation ?? null,
-        maskUri: kind === 'people' && mediaVisible ? maskUri : null,
-        background: background ?? null,
-        backgroundColor,
-        backgroundPatternColor,
-        foreground: foreground ?? null,
-        foregroundColor,
+        mediaInfos: templateMediaInfos,
+        style: {
+          titleStyle,
+          subTitleStyle,
+          textOrientation: textOrientationOrDefault(textOrientation),
+          textPosition: textPositionOrDefault(textPosition),
+          textAnimation,
+          mediaFilter,
+          mediaParameters: templateStyleParameter,
+          mediaAnimation: mediaAnimation ?? null,
+          background: background ?? null,
+          backgroundColor,
+          backgroundPatternColor,
+          foreground: foreground ?? null,
+          foregroundColor,
+          segmented: kind === 'people' && !!templateMediaInfos?.maskMedia?.uri,
+        },
         colorPalettes: templateColorPalettes,
       };
     });
-
-    const coverMedia = media ?? currentCoverMedia;
-    if (currentCoverStyle && coverMedia) {
+    if (currentCoverInfos) {
       let colorPalette: ColorPalette;
       let colorPaletteIndex: number;
       if (cardColors) {
@@ -364,20 +327,11 @@ const CoverEditorTemplateList = ({
         cardColors,
       );
 
-      const coverStyleParameters = extractLayoutParameters(
-        currentCoverStyle.mediaParameters,
-      )[1];
       items.unshift({
         id: CURRENT_COVER_ID,
         title,
-        subTitle: subTitle!,
-        media: coverMedia,
-        maskUri,
-        ...currentCoverStyle,
-        mediaParameters: {
-          ...coverStyleParameters,
-          ...mediaCropParameters,
-        },
+        subTitle,
+        ...currentCoverInfos,
         colorPalettes: coverColorPalettes,
       });
     }
@@ -385,16 +339,12 @@ const CoverEditorTemplateList = ({
     return items;
   }, [
     coverTemplates?.edges,
-    media,
-    currentCoverMedia,
-    currentCoverStyle,
+    currentCoverInfos,
     colorPalettes,
     cardColors,
+    mediaInfos,
     title,
     subTitle,
-    mediaVisible,
-    mediaCropParameters,
-    maskUri,
   ]);
 
   const [selectedItem, setSelectedItem] = useState<TemplateListItem | null>(
@@ -437,61 +387,8 @@ const CoverEditorTemplateList = ({
     if (selectedItem == null) {
       return;
     }
-    const {
-      titleStyle,
-      subTitleStyle,
-      textOrientation,
-      textPosition,
-      textAnimation,
-      mediaFilter,
-      mediaParameters,
-      mediaAnimation,
-      background,
-      backgroundColor,
-      backgroundPatternColor,
-      foreground,
-      foregroundColor,
-      segmented,
-    } = selectedItem;
-
-    let parameters = mediaParameters ?? {};
-
-    if (selectedItem.media.rawUri && mediaParameters?.cropData) {
-      const scale =
-        selectedItem.media.width / (256 * Math.min(2, PixelRatio.get()));
-
-      parameters = {
-        ...parameters,
-        cropData: {
-          originX: mediaParameters.cropData.originX * scale,
-          originY: mediaParameters.cropData.originY * scale,
-          width: mediaParameters.cropData.width * scale,
-          height: mediaParameters.cropData.height * scale,
-        },
-      };
-    }
-
-    onSelectedItemChange({
-      id: selectedItem.id,
-      style: {
-        titleStyle,
-        subTitleStyle,
-        textOrientation,
-        textPosition,
-        textAnimation,
-        mediaFilter,
-        mediaParameters: parameters,
-        mediaAnimation,
-        background: background ?? null,
-        backgroundColor,
-        backgroundPatternColor,
-        foreground: foreground ?? null,
-        foregroundColor,
-        segmented: segmented ?? templateKind === 'people',
-      },
-      media: selectedItem.media,
-    });
-  }, [media, onSelectedItemChange, selectedItem, templateKind]);
+    onSelectedItemChange(selectedItem);
+  }, [onSelectedItemChange, selectedItem, templateKind]);
 
   const selectedItemId = useMemo(() => selectedItem?.id, [selectedItem?.id]);
 
@@ -582,6 +479,7 @@ const CoverEditorTemplateList = ({
           videoPaused={videoPaused}
           cardColors={cardColors}
           timeRange={timeRange}
+          templateKind={templateKind}
         />
       );
     },
@@ -593,12 +491,13 @@ const CoverEditorTemplateList = ({
       videoPaused,
       cardColors,
       timeRange,
+      templateKind,
       onNextColorPalette,
       scrollToIndex,
     ],
   );
 
-  const renderTryptich = useCallback(
+  const renderTriptych = useCallback(
     ({ item, index }: Omit<ListRenderItemInfo<ColorPalette>, 'separators'>) => {
       const currentColorPaletteIndex = selectedItemId
         ? colorPalettesIndexes[selectedItemId] ?? 0
@@ -685,7 +584,7 @@ const CoverEditorTemplateList = ({
       >
         {cardColors && (
           <>
-            {renderTryptich({ item: cardColors!, index: -1 })}
+            {renderTriptych({ item: cardColors!, index: -1 })}
             <View style={styles.separator} />
           </>
         )}
@@ -717,8 +616,8 @@ const CoverEditorTemplateList = ({
             }}
             data={selectedItem?.colorPalettes ?? []}
             keyExtractor={paletteKeyExtract}
-            renderItem={renderTryptich}
-            contentContainerStyle={styles.colorPalettContainer}
+            renderItem={renderTriptych}
+            contentContainerStyle={styles.colorPaletteListContainer}
             onViewableItemsChanged={onViewableItemsChanged}
             getItemLayout={(_, index) => ({
               length: 30 + GAP,
@@ -859,6 +758,7 @@ const CoverEditorTemplateRenderer = ({
   cardColors,
   mediaComputing,
   videoPaused,
+  templateKind,
 }: {
   item: TemplateListItem;
   timeRange: TimeRange | null;
@@ -868,9 +768,11 @@ const CoverEditorTemplateRenderer = ({
   mediaComputing: boolean;
   width: number;
   videoPaused: boolean;
+  templateKind: CoverTemplateKind;
   onPress: () => void;
 }) => {
-  const { uri, kind } = item.media;
+  const { mediaInfos, style } = item;
+  const { uri, kind } = mediaInfos.sourceMedia;
   const colorPaletteIndex = colorPalettesIndexes[item.id] ?? 0;
 
   const [loading, setLoading] = useState(true);
@@ -904,6 +806,28 @@ const CoverEditorTemplateRenderer = ({
 
   const borderRadius = COVER_CARD_RADIUS * width;
 
+  const editionParameters = useMemo(() => {
+    const { sourceMedia } = mediaInfos;
+    let { mediaCropParameters } = mediaInfos;
+    if (sourceMedia.rawUri && mediaCropParameters?.cropData) {
+      const { originX, originY, width, height } = mediaCropParameters.cropData;
+      const scale = (256 * Math.min(2, PixelRatio.get())) / sourceMedia.width;
+      mediaCropParameters = {
+        ...mediaCropParameters,
+        cropData: {
+          originX: originX * scale,
+          originY: originY * scale,
+          width: width * scale,
+          height: height * scale,
+        },
+      };
+    }
+    return {
+      ...style.mediaParameters,
+      ...mediaCropParameters,
+    };
+  }, [mediaInfos, style]);
+
   return (
     <PressableScaleHighlight
       style={{ overflow: 'visible', borderRadius }}
@@ -926,27 +850,27 @@ const CoverEditorTemplateRenderer = ({
         <CoverPreviewRendererMemo
           uri={uri}
           kind={kind}
-          maskUri={item.maskUri}
+          maskUri={templateKind === 'people' ? mediaInfos.maskMedia?.uri : null}
           startTime={timeRange?.startTime}
           duration={timeRange?.duration}
-          backgroundColor={item.backgroundColor}
-          backgroundId={item.background?.id}
-          backgroundImageUri={item.background?.uri}
-          backgroundImageTintColor={item.backgroundPatternColor}
-          foregroundId={item.foreground?.id}
-          foregroundKind={item.foreground?.kind}
-          foregroundImageUri={item.foreground?.uri}
-          foregroundImageTintColor={item.foregroundColor}
-          editionParameters={item.mediaParameters}
-          filter={item.mediaFilter}
-          mediaAnimation={item.mediaAnimation}
+          backgroundColor={style.backgroundColor}
+          backgroundId={style.background?.id}
+          backgroundImageUri={style.background?.uri}
+          backgroundImageTintColor={style.backgroundPatternColor}
+          foregroundId={style.foreground?.id}
+          foregroundKind={style.foreground?.kind}
+          foregroundImageUri={style.foreground?.uri}
+          foregroundImageTintColor={style.foregroundColor}
+          editionParameters={editionParameters}
+          filter={style.mediaFilter}
+          mediaAnimation={style.mediaAnimation}
           title={item.title}
-          titleStyle={item.titleStyle}
+          titleStyle={style.titleStyle}
           subTitle={item.subTitle}
-          subTitleStyle={item.subTitleStyle}
-          textOrientation={item.textOrientation}
-          textPosition={item.textPosition}
-          textAnimation={item.textAnimation}
+          subTitleStyle={style.subTitleStyle}
+          textOrientation={style.textOrientation}
+          textPosition={style.textPosition}
+          textAnimation={style.textAnimation}
           colorPalette={
             colorPaletteIndex === -1
               ? cardColors!
@@ -975,7 +899,7 @@ const CoverPreviewRendererMemo = memo(
 const computeTemplatesPalettes = (
   itemIndex: number,
   colorPaletteIndex: number,
-  colorPlalette: ColorPalette | null,
+  colorPalette: ColorPalette | null,
   colorPalettes: ColorPalette[],
   currentColorPalette: ColorPalette | null,
 ) => {
@@ -984,8 +908,8 @@ const computeTemplatesPalettes = (
     result.splice(colorPaletteIndex, 1);
   }
   result = shuffle(result, itemIndex);
-  if (colorPlalette !== null) {
-    result.unshift(colorPlalette);
+  if (colorPalette !== null) {
+    result.unshift(colorPalette);
   }
 
   if (currentColorPalette) {
@@ -1011,37 +935,10 @@ const paletteKeyExtract = (item: ColorPalette & { id?: string }) =>
 
 type TemplateListItem = {
   id: string;
+  mediaInfos: MediaInfos;
   title: string | null;
-  titleStyle: TextStyle;
-  media: {
-    uri: string;
-    rawUri?: string;
-    kind: 'image' | 'video';
-    width: number;
-    height: number;
-  };
   subTitle: string | null;
-  subTitleStyle: TextStyle;
-  textOrientation: TextOrientation;
-  textPosition: TextPosition;
-  textAnimation: string | null;
-  mediaFilter: string | null;
-  mediaParameters: EditionParameters;
-  mediaAnimation: string | null;
-  maskUri: string | null;
-  background: {
-    readonly id: string;
-    readonly uri: string;
-  } | null;
-  backgroundColor: string | null;
-  backgroundPatternColor: string | null;
-  foreground: {
-    readonly id: string;
-    readonly kind: string;
-    readonly uri: string;
-  } | null;
-  foregroundColor: string | null;
-  segmented?: boolean;
+  style: CoverStyleData;
   colorPalettes: Array<ColorPalette & { id?: string }>;
 };
 
@@ -1055,7 +952,7 @@ const styleSheet = createStyleSheet(appearance => ({
     backgroundColor: appearance === 'light' ? '#fff' : '#000',
     ...shadow(appearance, 'center'),
   },
-  colorPalettContainer: {
+  colorPaletteListContainer: {
     paddingHorizontal: GAP,
     gap: GAP,
   },

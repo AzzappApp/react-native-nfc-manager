@@ -291,9 +291,9 @@ const CoverEditorCustom = ({
       title,
       subTitle,
       coverStyle,
-      maskMedia,
-      mediaCropParameters ?? {},
       sourceMedia,
+      maskMedia,
+      mediaCropParameters,
       colorPalette,
       cardColors?.otherColors ?? DEFAULT_COLOR_LIST,
     );

@@ -39,3 +39,9 @@ export type MaskMedia = {
   uri: string;
   source?: string;
 };
+
+export type MediaInfos = {
+  sourceMedia: SourceMedia;
+  mediaCropParameters?: EditionParameters | null;
+  maskMedia?: MaskMedia | null;
+};

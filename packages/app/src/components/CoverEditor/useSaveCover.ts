@@ -17,7 +17,6 @@ import {
   FILTERS,
   exportLayersToImage,
   exportLayersToVideo,
-  extractLayoutParameters,
   isFilter,
 } from '#components/gpu';
 import { getFileName } from '#helpers/fileHelpers';
@@ -86,9 +85,9 @@ const useSaveCover = (
       title: string | null,
       subTitle: string | null,
       coverStyle: CoverStyleData,
-      maskMedia: MaskMedia | null,
-      mediaCropParameters: EditionParameters,
       sourceMedia: SourceMedia,
+      maskMedia: MaskMedia | null | undefined,
+      mediaCropParameters: EditionParameters | null | undefined,
       colorPalette: ColorPalette,
       otherColors: readonly string[],
     ) => {
@@ -98,7 +97,7 @@ const useSaveCover = (
       let mediaPath: string | null = null;
 
       const mediaParameters = {
-        ...extractLayoutParameters(coverStyle.mediaParameters)[1],
+        ...coverStyle.mediaParameters,
         ...mediaCropParameters,
       };
 
