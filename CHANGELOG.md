@@ -1,4 +1,4 @@
-## 0.5.2-canary.145
+## 0.5.2-canary.146
 
 * **feat:**  - 🎸 add transfer ownership ([#2293](https://github.com/AzzappApp/azzapp/pull/2293))
 * **fix:**  - **contactCard:** [#2238](https://github.com/AzzappApp/azzapp/pull/2238) update azzapp label ([#2289](https://github.com/AzzappApp/azzapp/pull/2289))
