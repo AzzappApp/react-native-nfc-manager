@@ -1,5 +1,6 @@
-## 0.5.2-canary.146
+## 0.5.2-canary.147
 
+* **fix:**  - **contactCard:** [#2229](https://github.com/AzzappApp/azzapp/pull/2229) missing common infos for urls and socials ([#2302](https://github.com/AzzappApp/azzapp/pull/2302))
 * **feat:**  - 🎸 add transfer ownership ([#2293](https://github.com/AzzappApp/azzapp/pull/2293))
 * **fix:**  - **contactCard:** [#2238](https://github.com/AzzappApp/azzapp/pull/2238) update azzapp label ([#2289](https://github.com/AzzappApp/azzapp/pull/2289))
 * **fix:**  - **WebCardEdition:** recompute scroll height after element added ([#2290](https://github.com/AzzappApp/azzapp/pull/2290))
