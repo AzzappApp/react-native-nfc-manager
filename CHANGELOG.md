@@ -1,5 +1,8 @@
-## 0.5.2-canary.141
+## 0.5.2-canary.142
 
+* **fix:**  - **router:** [#1741](https://github.com/AzzappApp/azzapp/pull/1741) manage unauthenticated case on deeplink ([#2273](https://github.com/AzzappApp/azzapp/pull/2273))
+* **fix:**  - **CoverEdition:** invalid loading state in custom edition ([#2287](https://github.com/AzzappApp/azzapp/pull/2287))
+* **fix:**  - **CoverEdition:** properly handle crop parameters on demo media ([#2286](https://github.com/AzzappApp/azzapp/pull/2286))
 * **fix:**  - **multiUser:** [#2232](https://github.com/AzzappApp/azzapp/pull/2232) update cache when multi user is removed ([#2275](https://github.com/AzzappApp/azzapp/pull/2275))
 * **fix:**  - **cover:** [#2264](https://github.com/AzzappApp/azzapp/pull/2264) properly fix cache issue on cover api ([#2284](https://github.com/AzzappApp/azzapp/pull/2284))
 * **fix:**  - **contactCard:** [#2238](https://github.com/AzzappApp/azzapp/pull/2238) adding type= to have the label intrepreted ([#2283](https://github.com/AzzappApp/azzapp/pull/2283))
