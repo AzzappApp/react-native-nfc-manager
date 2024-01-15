@@ -3,7 +3,7 @@ import { graphql, usePreloadedQuery } from 'react-relay';
 import { useMainTabBarVisibilityController } from '#components/MainTabBar';
 import { dispatchGlobalEvent } from '#helpers/globalEvents';
 import relayScreen from '#helpers/relayScreen';
-import { useDeepLink } from '#hooks/useDeepLink';
+import { useDeepLinkStoredRoute } from '#hooks/useDeepLink';
 import ActivityIndicator from '#ui/ActivityIndicator';
 import Container from '#ui/Container';
 import HomeScreenContent from './HomeScreenContent';
@@ -27,7 +27,7 @@ const HomeScreen = ({
   hasFocus,
 }: RelayScreenProps<HomeRoute, HomeScreenQuery>) => {
   //we need to wait the initial screen to be load before doing any deep link
-  useDeepLink();
+  useDeepLinkStoredRoute();
   // dat
   const { currentUser } = usePreloadedQuery(homeScreenQuery, preloadedQuery);
 

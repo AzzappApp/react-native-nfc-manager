@@ -54,6 +54,7 @@ import {
 import WebCardBoundRelayEnvironmentProvider from '#helpers/WebCardBoundRelayEnvironmentProvider';
 import useApplicationFonts from '#hooks/useApplicationFonts';
 import useAuthState from '#hooks/useAuthState';
+import { useDeepLink } from '#hooks/useDeepLink';
 import AboutScreen from '#screens/AboutScreen';
 import AccountDetailsScreen from '#screens/AccountDetailsScreen';
 import CardModuleEditionScreen from '#screens/CardModuleEditionScreen';
@@ -293,13 +294,13 @@ const AppRouter = () => {
   // #endregion
 
   // #region Relay Query Management and Screen Prefetching
-  const environmentReseted = useRef(false);
+  const environmentReset = useRef(false);
   const [environment, setEnvironment] = useState(getRelayEnvironment());
   useEffect(
     () =>
       addEnvironmentListener(event => {
         if (event === 'reset') {
-          environmentReseted.current = true;
+          environmentReset.current = true;
         }
       }),
     [],
@@ -349,9 +350,9 @@ const AppRouter = () => {
   const onFinishTransitioning = useCallback(() => {
     // We reset the environment only here
     // To avoid resetting it when old screens are still visible
-    if (environmentReseted.current) {
+    if (environmentReset.current) {
       setEnvironment(getRelayEnvironment());
-      environmentReseted.current = false;
+      environmentReset.current = false;
     }
     screenIdToDispose.forEach(screen =>
       RelayQueryManager.disposeQueryFor(screen),
@@ -385,6 +386,8 @@ const AppRouter = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   // #endregion
+
+  useDeepLink(router);
 
   const colorScheme = useColorScheme();
 
