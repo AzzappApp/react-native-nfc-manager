@@ -14,8 +14,10 @@ import logo from '@azzapp/web/public/pass/LOGO_PADDING_0-40.png';
 import logo2x from '@azzapp/web/public/pass/LOGO_PADDING_0-40@2x.png';
 import { convertHexToRGBA } from '../color';
 
-const getCoverUrl = (userName: string, size: number) =>
-  `${process.env.NEXT_PUBLIC_URL}api/cover/${userName}?width=${size}&height=${size}&keepAspectRatio=left_pad`;
+const getCoverUrl = (userName: string, size: number, updatedAt: Date) =>
+  `${
+    process.env.NEXT_PUBLIC_URL
+  }api/cover/${userName}?width=${size}&height=${size}&keepAspectRatio=left_pad&updatedAt=${updatedAt.toISOString()}`;
 
 export const buildApplePass = async (profileId: string, locale: string) => {
   const res = await getProfileWithWebCardById(profileId);
@@ -29,15 +31,15 @@ export const buildApplePass = async (profileId: string, locale: string) => {
     if (media) {
       const [thumbnailUrl, thumbnail2xUrl, thumbnail3xUrl] =
         await Promise.allSettled([
-          fetch(getCoverUrl(res.WebCard.userName, 90)).then(res =>
-            res.arrayBuffer(),
-          ),
-          fetch(getCoverUrl(res.WebCard.userName, 90 * 2)).then(res =>
-            res.arrayBuffer(),
-          ),
-          fetch(getCoverUrl(res.WebCard.userName, 90 * 3)).then(res =>
-            res.arrayBuffer(),
-          ),
+          fetch(
+            getCoverUrl(res.WebCard.userName, 90, res.WebCard.updatedAt),
+          ).then(res => res.arrayBuffer()),
+          fetch(
+            getCoverUrl(res.WebCard.userName, 90 * 2, res.WebCard.updatedAt),
+          ).then(res => res.arrayBuffer()),
+          fetch(
+            getCoverUrl(res.WebCard.userName, 90 * 3, res.WebCard.updatedAt),
+          ).then(res => res.arrayBuffer()),
         ]);
 
       if (thumbnailUrl.status === 'fulfilled') {

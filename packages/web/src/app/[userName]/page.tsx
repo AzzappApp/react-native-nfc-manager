@@ -122,9 +122,12 @@ export const dynamic = 'force-static';
 export async function generateMetadata({
   params,
 }: ProfilePageProps): Promise<Metadata> {
+  const userName = params.userName.toLowerCase();
+  const webCard = await cachedGetWebCardByUserName(userName);
+
   const imageUrl = `${process.env.NEXT_PUBLIC_URL}api/cover/${
     params.userName
-  }?width=${1200}&height=${1200}&keepAspectRatio=left_pad`;
+  }?width=${1200}&height=${1200}&keepAspectRatio=left_pad&updatedAt=${webCard?.updatedAt.toISOString()}`;
 
   const meta = getMetaData({
     url: params.userName,

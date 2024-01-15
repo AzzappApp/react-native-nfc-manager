@@ -19,7 +19,6 @@ export const POST = async (req: Request) => {
 
     cards?.forEach(username => {
       revalidatePath(`/${username}`);
-      revalidatePath(`/api/cover/${username}`);
     });
 
     posts?.forEach(({ userName, id }) => {
