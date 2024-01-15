@@ -47,8 +47,8 @@ const styleSheet = createStyleSheet(appearance => ({
   ],
   container: {
     flex: 1,
-    marginBottom: 39,
-    marginTop: 17,
+    maxHeight: 300,
+    marginBottom: 20,
     justifyContent: 'center',
     alignItems: 'center',
   },
