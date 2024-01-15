@@ -154,11 +154,13 @@ const CoverPreviewRenderer = ({
     if (prevProps.current.uri !== uri) {
       const mediaLoading = !!uri;
       loadingStatus.current.mediaLoading = mediaLoading;
+      prevProps.current.uri = uri;
       if (mediaLoading) {
         setAllMediaLoaded(false);
       }
     }
     if (prevProps.current.foregroundImageUri !== foregroundImageUri) {
+      prevProps.current.foregroundImageUri = foregroundImageUri;
       const foregroundLoading = !!foregroundImageUri;
       loadingStatus.current.foregroundLoading = foregroundLoading;
       if (foregroundLoading) {
@@ -166,6 +168,7 @@ const CoverPreviewRenderer = ({
       }
     }
     if (prevProps.current.backgroundImageUri !== backgroundImageUri) {
+      prevProps.current.backgroundImageUri = backgroundImageUri;
       const mediaLoading =
         loadingStatus.current.mediaLoading ||
         (Platform.OS === 'android' && !!backgroundImageUri);
