@@ -2,7 +2,11 @@ import { GraphQLError } from 'graphql';
 import React, { Suspense, useCallback, useEffect, useRef } from 'react';
 import { useIntl } from 'react-intl';
 import { Alert, Appearance } from 'react-native';
-import { RelayEnvironmentProvider, type PreloadedQuery } from 'react-relay';
+import {
+  RelayEnvironmentProvider,
+  type PreloadedQuery,
+  fetchQuery,
+} from 'react-relay';
 // @ts-expect-error not typed
 import useRelayActorEnvironment from 'react-relay/lib/multi-actor/useRelayActorEnvironment';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
@@ -14,12 +18,16 @@ import {
 import { useRouter, type NativeScreenProps } from '#components/NativeRouter';
 import useAuthState from '#hooks/useAuthState';
 import { ROOT_ACTOR_ID, getRelayEnvironment } from './relayEnvironment';
-import { loadQueryFor, useManagedQuery } from './RelayQueryManager';
+import {
+  getLoadQueryInfo,
+  loadQueryFor,
+  useManagedQuery,
+} from './RelayQueryManager';
 import type { Route } from '#routes';
 import type { LoadQueryOptions } from './RelayQueryManager';
 import type { ScreenPrefetchOptions } from './ScreenPrefetcher';
 import type { ComponentType } from 'react';
-import type { OperationType } from 'relay-runtime';
+import type { OperationType, Subscription } from 'relay-runtime';
 
 export type RelayScreenOptions<TRoute extends Route> = LoadQueryOptions<
   TRoute['params']
@@ -39,6 +47,16 @@ export type RelayScreenOptions<TRoute extends Route> = LoadQueryOptions<
      * @default true
      */
     canGoBack?: boolean;
+
+    /**
+     * The interval in milliseconds to poll the query.
+     */
+    pollInterval?: number;
+    /**
+     * If true, the screen will stop polling when it is not focused.
+     * @default true
+     */
+    stopPollingWhenNotFocused?: boolean;
   };
 
 /**
@@ -77,8 +95,10 @@ function relayScreen<TRoute extends Route>(
   {
     fallback: Fallback,
     errorFallback: ErrorFallback,
-    canGoBack: canGoback = true,
+    canGoBack = true,
     webCardBound = true,
+    pollInterval,
+    stopPollingWhenNotFocused = true,
     ...options
   }: RelayScreenOptions<TRoute>,
 ): ComponentType<Omit<RelayScreenProps<TRoute, any>, 'preloadedQuery'>> &
@@ -104,6 +124,53 @@ function relayScreen<TRoute extends Route>(
         loadQueryFor(screenId, options, params);
       }
     }, [screenId, params, preloadedQuery]);
+
+    useEffect(() => {
+      let currentTimeout: any;
+      let currentSubscription: Subscription | null;
+      let cancelled = false;
+      let retryCount = 0;
+      if (
+        Number.isInteger(pollInterval) &&
+        (props.hasFocus || !stopPollingWhenNotFocused)
+      ) {
+        const poll = () => {
+          currentTimeout = setTimeout(() => {
+            const { query, variables } = getLoadQueryInfo(options, params);
+            currentSubscription = fetchQuery(environment, query, variables, {
+              fetchPolicy: 'network-only',
+              networkCacheConfig: { force: true },
+            }).subscribe({
+              complete: () => {
+                retryCount = 0;
+                if (cancelled) {
+                  return;
+                }
+                poll();
+              },
+              error: () => {
+                retryCount += 1;
+                setTimeout(
+                  () => {
+                    if (cancelled) {
+                      return;
+                    }
+                    poll();
+                  },
+                  2 ** Math.min(retryCount, 5) * 1000,
+                );
+              },
+            });
+          }, pollInterval);
+        };
+        poll();
+      }
+      return () => {
+        cancelled = true;
+        currentSubscription?.unsubscribe();
+        clearTimeout(currentTimeout);
+      };
+    }, [environment, params, props.hasFocus, screenId]);
 
     const intl = useIntl();
     const router = useRouter();
@@ -131,7 +198,7 @@ function relayScreen<TRoute extends Route>(
           description: 'Screen Alert message loading error',
         }),
         convertToNonNullArray([
-          canGoback
+          canGoBack
             ? {
                 text: intl.formatMessage({
                   defaultMessage: 'Cancel',

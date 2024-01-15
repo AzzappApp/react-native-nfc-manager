@@ -174,7 +174,24 @@ export type LoadQueryOptions<TParams> = {
 };
 
 /**
- * Preloload a query for a given screen
+ * Return the query and variables for a given set of LoadQueryOptions and route params
+ * @param options
+ * @param params
+ * @returns
+ */
+export const getLoadQueryInfo = <T>(
+  options: LoadQueryOptions<T>,
+  params: T = {} as T,
+) => {
+  const query =
+    typeof options.query === 'function' ? options.query(params) : options.query;
+  const variables = options.getVariables?.(params) ?? {};
+
+  return { query, variables };
+};
+
+/**
+ * Preload a query for a given screen
  * @param screenId screen id
  * @param options query options
  * @param params the route params
@@ -187,11 +204,7 @@ export const loadQueryFor = <T>(
   refresh = false,
 ) => {
   if (!activeQueries.has(screenId) || refresh) {
-    const query =
-      typeof options.query === 'function'
-        ? options.query(params)
-        : options.query;
-    const variables = options.getVariables?.(params) ?? {};
+    const { query, variables } = getLoadQueryInfo(options, params);
 
     const multiActorEnvironment = getRelayEnvironment();
     const actorId =

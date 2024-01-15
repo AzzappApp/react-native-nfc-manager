@@ -61,4 +61,5 @@ export default relayScreen(HomeScreen, {
   webCardBound: false,
   fallback: HomeScreenFallback,
   canGoBack: false,
+  pollInterval: 30000,
 });
