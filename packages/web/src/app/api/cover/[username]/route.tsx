@@ -223,7 +223,7 @@ export const GET = async (
               ).replace('#', '')}/fl_layer_apply`
             : ''
         }${
-          coverData.foregroundId
+          coverData.foregroundId && !coverData.foregroundId.startsWith('l:')
             ? `/l_${decodeMediaId(
                 coverData.foregroundId,
               )}/fl_relative,w_1.0,e_colorize,co_rgb:${swapColor(
