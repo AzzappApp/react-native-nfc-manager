@@ -77,7 +77,7 @@ const DeletableCommentItem = (props: DeletableCommentItemProps) => {
         Toast.show({
           type: 'error',
           text1: intl.formatMessage({
-            defaultMessage: 'Only admins can delete a comment',
+            defaultMessage: 'Only admins & editors can delete a comment',
             description: 'Error message when trying to delete a comment',
           }),
         });

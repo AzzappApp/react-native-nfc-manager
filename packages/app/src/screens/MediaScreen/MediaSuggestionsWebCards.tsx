@@ -213,7 +213,8 @@ const CoverLinkWithOptions = ({
               Toast.show({
                 type: 'error',
                 text1: intl.formatMessage({
-                  defaultMessage: 'Only admins can stop following a WebCard',
+                  defaultMessage:
+                    'Only admins & editors can stop following a WebCard',
                   description:
                     'Error message when trying to unfollow a WebCard without being an admin',
                 }),
@@ -222,7 +223,7 @@ const CoverLinkWithOptions = ({
               Toast.show({
                 type: 'error',
                 text1: intl.formatMessage({
-                  defaultMessage: 'Only admins can follow a WebCard',
+                  defaultMessage: 'Only admins & editors can follow a WebCard',
                   description:
                     'Error message when trying to follow a WebCard without being an admin',
                 }),

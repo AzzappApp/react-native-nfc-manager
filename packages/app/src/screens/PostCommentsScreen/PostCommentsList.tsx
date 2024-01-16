@@ -185,7 +185,7 @@ const PostCommentsList = ({
         Toast.show({
           type: 'error',
           text1: intl.formatMessage({
-            defaultMessage: 'Only admins can comment a post',
+            defaultMessage: 'Only admins & editors can comment a post',
             description: 'Error message when trying to comment a post',
           }),
         });

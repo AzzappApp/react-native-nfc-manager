@@ -85,7 +85,7 @@ const MainTabBar = ({
       Toast.show({
         type: 'error',
         text1: intl.formatMessage({
-          defaultMessage: 'Only admins can create a post',
+          defaultMessage: 'Only admins & editors can create a post',
           description: 'Error message when trying to create a post',
         }),
       });

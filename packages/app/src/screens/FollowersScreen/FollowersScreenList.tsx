@@ -125,7 +125,7 @@ const FollowersScreenList = ({
         Toast.show({
           type: 'error',
           text1: intl.formatMessage({
-            defaultMessage: 'Only admins can remove a follower',
+            defaultMessage: 'Only admins & editors can remove a follower',
             description:
               'Error message displayed when the user is not allowed to remove a follower',
           }),

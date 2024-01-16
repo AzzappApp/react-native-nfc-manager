@@ -182,7 +182,7 @@ const WebCardScreen = ({
         Toast.show({
           type: 'error',
           text1: intl.formatMessage({
-            defaultMessage: 'Only admins can follow a WebCard',
+            defaultMessage: 'Only admins & editors can follow a WebCard',
             description: 'Error message when trying to follow a WebCard',
           }),
         });
@@ -190,7 +190,8 @@ const WebCardScreen = ({
         Toast.show({
           type: 'error',
           text1: intl.formatMessage({
-            defaultMessage: 'Only admins can stop following a WebCard',
+            defaultMessage:
+              'Only admins & editors can stop following a WebCard',
             description: 'Error message when trying to unfollow a WebCard',
           }),
         });
@@ -330,7 +331,7 @@ const WebCardScreen = ({
       Toast.show({
         type: 'error',
         text1: intl.formatMessage({
-          defaultMessage: 'Only admins can edit the WebCard',
+          defaultMessage: 'Only admins & editors can edit the WebCard',
           description:
             'Error message when trying to edit the WebCard without being an admin',
         }),

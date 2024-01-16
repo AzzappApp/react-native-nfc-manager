@@ -199,9 +199,9 @@ const HomeBottomPanel = ({
       Toast.show({
         type: 'error',
         text1: intl.formatMessage({
-          defaultMessage: 'Only admins can publish a webCard',
+          defaultMessage: 'Only owners can publish a webCard',
           description:
-            'Error message when a user tries to publish a webCard but is not an admin',
+            'Error message when a user tries to publish a webCard but is not an owner',
         }),
       });
     }

@@ -158,7 +158,7 @@ const PostRenderer = (
       Toast.show({
         type: 'error',
         text1: intl.formatMessage({
-          defaultMessage: 'Only admins can edit a post',
+          defaultMessage: 'Only admins & editors can edit a post',
           description:
             'Error message when a user tries to edit a post but is not an admin',
         }),
