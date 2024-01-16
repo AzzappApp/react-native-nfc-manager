@@ -151,13 +151,10 @@ The application use a [GraphQL](https://graphql.org/) API to communicate between
 
 - The workspace build system is based on [Turbo Repo](https://turbo.build/)
 - The CI/CD Process is based on [Github Actions](https://github.com/features/actions)
-- The natives applications are built [FastLane](https://fastlane.tools/). A [match](https://docs.fastlane.tools/actions/match/) repository is used to synchronize the IOS application certificate. 
+- The natives applications are built [EAS](https://expo.dev/). 
 
 ### List of environement variables during the build process:
 
-- `FASTLANE_APPSTORE_API_KEY`: a base 64 encoded of a [Faslane JSON API Key](https://docs.fastlane.tools/app-store-connect-api/)
-- `FASTLANE_GIT_BASIC_AUTH`: [Git basic auth](https://docs.fastlane.tools/actions/match/#git-storage-on-github) used by fastlane match
-- `FASTLANE_MATCH_PASSWORD`: password of the fastlane match repository
 - `VERCEL_TOKEN`: vercel api token
 
 Valid environments are `DEV`, `STAGING` and `PRODUCTION` (the later is omitted in env variable name).
