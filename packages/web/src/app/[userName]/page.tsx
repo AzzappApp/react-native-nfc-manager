@@ -22,6 +22,7 @@ import CoverRendererBackground from '#components/renderer/CoverRenderer/CoverRen
 import ModuleRenderer from '#components/renderer/ModuleRenderer';
 import { getMetaData } from '#helpers/seo';
 import { cachedGetWebCardByUserName } from './dataAccess';
+import styles from './WebCardPage.css';
 import WebCardPageLayout from './WebCardPageLayout';
 import type { Metadata } from 'next';
 
@@ -87,16 +88,38 @@ const ProfilePage = async ({ params }: ProfilePageProps) => {
     );
   }
 
+  const colorPalette = webCard.cardColors ?? DEFAULT_COLOR_PALETTE;
+
   return (
     <WebCardPageLayout
       webCard={webCard}
       posts={posts}
       media={media}
       cover={
-        <div style={{ position: 'relative', overflow: 'hidden' }}>
+        <>
           <CoverRendererBackground media={media} webCard={webCard} />
-          <CoverRenderer webCard={webCard} media={media} priority />
-        </div>
+          <div
+            className={styles.coverContainer}
+            style={{
+              background: `linear-gradient(to bottom, rgb(255 237 209 / 0%) 0%, ${
+                modules.length
+                  ? swapColor(
+                      (
+                        modules[0].data as {
+                          backgroundStyle?: {
+                            backgroundColor?: string | null;
+                          } | null;
+                        }
+                      )?.backgroundStyle?.backgroundColor,
+                      colorPalette,
+                    ) ?? '#FFF'
+                  : '#FFF'
+              } 95%)`,
+            }}
+          >
+            <CoverRenderer webCard={webCard} media={media} priority />
+          </div>
+        </>
       }
       cardBackgroundColor={cardBackgroundColor}
       lastModuleBackgroundColor={lastModuleBackgroundColor}
@@ -107,7 +130,7 @@ const ProfilePage = async ({ params }: ProfilePageProps) => {
           resizeModes={resizeModes}
           module={module}
           key={module.id}
-          colorPalette={webCard.cardColors ?? DEFAULT_COLOR_PALETTE}
+          colorPalette={colorPalette}
           cardStyle={webCard.cardStyle ?? DEFAULT_CARD_STYLE}
         />
       ))}
