@@ -119,7 +119,9 @@ jobs:
 
       - name: Copy the the previous query-map.json file
         if: github.ref == 'refs/heads/staging' || github.ref == 'refs/heads/main' || github.ref == 'refs/heads/stable'
-        run: cp -R azzapp-precompiled-queries/${{ github.ref_name }}/persisted-query-map.json packages/web/src  
+        run: |
+          touch azzapp-precompiled-queries/${{ github.ref_name }}/persisted-query-map.json 
+          cp -R azzapp-precompiled-queries/${{ github.ref_name }}/persisted-query-map.json packages/web/src 
 
       # use manual command instead of build command for passing --repersist option to relay
       - name: Force rebuild the query-map.json
