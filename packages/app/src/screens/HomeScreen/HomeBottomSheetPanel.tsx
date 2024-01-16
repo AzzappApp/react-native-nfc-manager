@@ -15,7 +15,7 @@ import PressableNative from '#ui/PressableNative';
 import Text from '#ui/Text';
 import type { HomeBottomSheetPanel_profile$key } from '#relayArtifacts/HomeBottomSheetPanel_profile.graphql';
 
-type HomeBottomSheetPanel = {
+type HomeBottomSheetPanelProps = {
   /**
    *
    *
@@ -47,7 +47,7 @@ const HomeBottomSheetPanel = ({
   profileRole,
   withProfile,
   profile: profileKey,
-}: HomeBottomSheetPanel) => {
+}: HomeBottomSheetPanelProps) => {
   const profile = useFragment(
     graphql`
       fragment HomeBottomSheetPanel_profile on Profile {
@@ -56,6 +56,7 @@ const HomeBottomSheetPanel = ({
           userName
           cardIsPublished
         }
+        invited
       }
     `,
     profileKey ?? null,
@@ -114,15 +115,16 @@ const HomeBottomSheetPanel = ({
   };
 
   const modalHeight = useMemo(() => {
-    let height = 270;
+    let height = 220;
+    if (!profile?.invited) height += 50;
 
     if (!withProfile || !profileRole) return height;
 
     if (isOwner(profileRole)) height += 50;
-    if (isAdmin(profileRole)) height += 50;
+    if (isAdmin(profileRole) && !profile?.invited) height += 50;
 
     return height;
-  }, [profileRole, withProfile]);
+  }, [profile?.invited, profileRole, withProfile]);
 
   return (
     <BottomSheetModal
@@ -134,25 +136,27 @@ const HomeBottomSheetPanel = ({
     >
       <View style={styles.bottomSheetOptionsContainer}>
         <>
-          <Link route="ACCOUNT_DETAILS">
-            <PressableNative
-              style={styles.bottomSheetOptionButton}
-              onPress={close}
-            >
-              <View style={styles.bottomSheetOptionContainer}>
-                <View style={styles.bottomSheetOptionIconLabel}>
-                  <Icon icon="information" />
-                  <Text>
-                    <FormattedMessage
-                      defaultMessage="Account details"
-                      description="Link to open account details form to change email, phone number, etc."
-                    />
-                  </Text>
+          {!profile?.invited && (
+            <Link route="ACCOUNT_DETAILS">
+              <PressableNative
+                style={styles.bottomSheetOptionButton}
+                onPress={close}
+              >
+                <View style={styles.bottomSheetOptionContainer}>
+                  <View style={styles.bottomSheetOptionIconLabel}>
+                    <Icon icon="information" />
+                    <Text>
+                      <FormattedMessage
+                        defaultMessage="Account details"
+                        description="Link to open account details form to change email, phone number, etc."
+                      />
+                    </Text>
+                  </View>
+                  <Icon icon="arrow_right" />
                 </View>
-                <Icon icon="arrow_right" />
-              </View>
-            </PressableNative>
-          </Link>
+              </PressableNative>
+            </Link>
+          )}
           {withProfile && profileRole && isOwner(profileRole) && (
             <Link route="WEBCARD_PARAMETERS">
               <PressableNative
@@ -218,7 +222,10 @@ const HomeBottomSheetPanel = ({
               </PressableNative>
             </Link>
           ) : null}
-          {withProfile && profileRole && isAdmin(profileRole) ? (
+          {withProfile &&
+          profileRole &&
+          !profile?.invited &&
+          isAdmin(profileRole) ? (
             <Link route="MULTI_USER">
               <PressableNative
                 style={styles.bottomSheetOptionButton}
