@@ -1,5 +1,6 @@
-## 0.5.2-canary.155
+## 0.5.2-canary.156
 
+* **style:**  - **cover:** enhance cover display on web ([#2322](https://github.com/AzzappApp/azzapp/pull/2322))
 * **style:**  - **cover:** enhance cover display on web ([#2321](https://github.com/AzzappApp/azzapp/pull/2321))
 * **fix:**  - **contactCard:** [#2229](https://github.com/AzzappApp/azzapp/pull/2229) missing common information in share from the app ([#2319](https://github.com/AzzappApp/azzapp/pull/2319))
 * **build:**  - fix yarn.lock
