@@ -1,5 +1,6 @@
-## 0.5.2-canary.157
+## 0.5.2-canary.158
 
+* **docs:**  - update minimum node version
 * **feat:**  - rework user invit to use the contact folder and fix the matching ([#2320](https://github.com/AzzappApp/azzapp/pull/2320))
 * **perf:**  - lazy load posts on webCard ([#2291](https://github.com/AzzappApp/azzapp/pull/2291))
 * **style:**  - **cover:** enhance cover display on web ([#2322](https://github.com/AzzappApp/azzapp/pull/2322))
