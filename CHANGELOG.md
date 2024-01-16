@@ -1,5 +1,6 @@
-## 0.5.2-canary.152
+## 0.5.2-canary.153
 
+* **build:**  - try to install vercel cli before install
 * **docs:**  - remove fastlane configuration
 * **build:**  - create file if missing
 * **build:**  - query-map has been moved
