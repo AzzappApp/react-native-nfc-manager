@@ -1,5 +1,7 @@
-## 0.5.2-canary.156
+## 0.5.2-canary.157
 
+* **feat:**  - rework user invit to use the contact folder and fix the matching ([#2320](https://github.com/AzzappApp/azzapp/pull/2320))
+* **perf:**  - lazy load posts on webCard ([#2291](https://github.com/AzzappApp/azzapp/pull/2291))
 * **style:**  - **cover:** enhance cover display on web ([#2322](https://github.com/AzzappApp/azzapp/pull/2322))
 * **style:**  - **cover:** enhance cover display on web ([#2321](https://github.com/AzzappApp/azzapp/pull/2321))
 * **fix:**  - **contactCard:** [#2229](https://github.com/AzzappApp/azzapp/pull/2229) missing common information in share from the app ([#2319](https://github.com/AzzappApp/azzapp/pull/2319))
