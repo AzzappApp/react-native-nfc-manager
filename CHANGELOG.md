@@ -1,5 +1,6 @@
-## 0.5.2-canary.150
+## 0.5.2-canary.151
 
+* **build:**  - create file if missing
 * **build:**  - query-map has been moved
 * **build:**  - query-map has been moved
 * **fix:**  - 🐛 correctly defines which role access features ([#2299](https://github.com/AzzappApp/azzapp/pull/2299))
