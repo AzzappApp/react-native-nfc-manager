@@ -50,7 +50,9 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-yarn-
       
-
+      - name: Install Vercel CLI
+        run: yarn global add vercel@latest
+        
       - name: Install dependencies
         run: yarn install --frozen-lockfile  --immutable
 
@@ -270,9 +272,6 @@ jobs:
       # Deploy the web app to Vercel 
       #
       ############################################
-      - name: Install Vercel CLI
-        run: npm i -g vercel@latest
-
       - name: Azzapp Web - Pull Vercel configuration 
         env:
           VERCEL_PROJECT_ID: "azzapp"
