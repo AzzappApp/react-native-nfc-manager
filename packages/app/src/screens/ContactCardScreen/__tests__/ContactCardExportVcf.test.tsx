@@ -85,6 +85,16 @@ describe('ContactCardExportVcf', () => {
       return MockPayloadGenerator.generate(operation, {
         Profile() {
           return {
+            webCard: {
+              commonInformation: {
+                socials: [],
+                urls: [
+                  {
+                    address: 'https://www.test.com',
+                  },
+                ],
+              },
+            },
             contactCard,
             serializedContactCard: {
               data: serializeContactCard('profileId', 'webCardId', contactCard),
@@ -149,7 +159,10 @@ describe('ContactCardExportVcf', () => {
     const { vCard } = buildVCard(
       'userNameTest',
       serializeContactCard('profileId', 'webCardId', contactCard),
-      contactCard,
+      {
+        urls: [{ address: 'https://www.test.com' }, ...contactCard.urls],
+        socials: [...contactCard.socials],
+      },
     );
 
     expect(writeFileMock).toHaveBeenCalledWith(

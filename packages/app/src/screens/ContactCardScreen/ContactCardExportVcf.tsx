@@ -23,6 +23,17 @@ const ContactCardExportVcf = ({
   const profile = useFragment(
     graphql`
       fragment ContactCardExportVcf_card on Profile {
+        webCard {
+          commonInformation {
+            socials {
+              url
+              label
+            }
+            urls {
+              address
+            }
+          }
+        }
         contactCard {
           firstName
           lastName
@@ -56,7 +67,16 @@ const ContactCardExportVcf = ({
         const { vCard } = buildVCard(
           userName,
           profile.serializedContactCard.data,
-          profile.contactCard as Pick<ContactCard, 'socials' | 'urls'>,
+          {
+            urls: [
+              ...(profile.webCard.commonInformation?.urls ?? []),
+              ...(profile.contactCard?.urls ?? []),
+            ],
+            socials: [
+              ...(profile.webCard.commonInformation?.socials ?? []),
+              ...(profile.contactCard?.socials ?? []),
+            ],
+          } as Pick<ContactCard, 'socials' | 'urls'>,
         );
         const docPath = ReactNativeBlobUtil.fs.dirs.CacheDir;
         const filePath = `${docPath}/${userName}.vcf`;
