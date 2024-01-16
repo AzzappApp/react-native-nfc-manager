@@ -380,7 +380,7 @@ const WebCardScreen = ({
                 <WebCardPostsList
                   toggleFlip={toggleFlip}
                   isViewer={isViewer}
-                  webCard={data.webCard}
+                  webCardId={data.webCard.id}
                   hasFocus={hasFocus && showPost && ready}
                   userName={data.webCard.userName!}
                 />
@@ -431,8 +431,6 @@ const webCardScreenByIdQuery = graphql`
         userName
       }
       ...WebCardScreenContent_webCard
-      ...WebCardPostsList_webCard
-      ...PostRendererFragment_author
       ...WebCardScreenButtonBar_webCard
       ...WebCardScreenPublishHelper_webCard
       ...WebCardBackground_webCard
@@ -447,8 +445,6 @@ const webCardScreenByNameQuery = graphql`
       id
       userName
       ...WebCardScreenContent_webCard
-      ...WebCardPostsList_webCard
-      ...PostRendererFragment_author
       ...WebCardScreenButtonBar_webCard
       ...WebCardScreenPublishHelper_webCard
       ...WebCardBackground_webCard

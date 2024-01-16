@@ -1,16 +1,17 @@
 import { memo } from 'react';
 import { useIntl } from 'react-intl';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { graphql } from 'react-relay';
+import { useLazyLoadQuery } from 'react-relay/hooks';
 import { useRouter } from '#components/NativeRouter';
 import PostList from '#components/WebCardPostsList';
 import Container from '#ui/Container';
 import Header from '#ui/Header';
 import IconButton from '#ui/IconButton';
-import type { PostRendererFragment_author$key } from '#relayArtifacts/PostRendererFragment_author.graphql';
-import type { WebCardPostsList_webCard$key } from '#relayArtifacts/WebCardPostsList_webCard.graphql';
+import type { WebCardPostsListQuery } from '#relayArtifacts/WebCardPostsListQuery.graphql';
 
 type WebCardPostsListProps = {
-  webCard: PostRendererFragment_author$key & WebCardPostsList_webCard$key;
+  webCardId: string;
   isViewer: boolean;
   hasFocus: boolean;
   userName: string;
@@ -18,13 +19,28 @@ type WebCardPostsListProps = {
 };
 
 const WebCardPostsList = ({
-  webCard,
+  webCardId,
   isViewer,
   hasFocus,
   userName,
   toggleFlip,
 }: WebCardPostsListProps) => {
   const intl = useIntl();
+
+  const { webCard } = useLazyLoadQuery<WebCardPostsListQuery>(
+    graphql`
+      query WebCardPostsListQuery($id: ID!) {
+        webCard: node(id: $id) {
+          ... on WebCard {
+            ...WebCardPostsList_webCard
+            ...PostRendererFragment_author
+          }
+        }
+      }
+    `,
+    { id: webCardId },
+    { fetchPolicy: 'store-and-network' },
+  );
 
   const router = useRouter();
   const onClose = () => {
@@ -62,11 +78,13 @@ const WebCardPostsList = ({
             />
           }
         />
-        <PostList
-          webCard={webCard}
-          canPlay={hasFocus}
-          onPressAuthor={toggleFlip}
-        />
+        {webCard && (
+          <PostList
+            webCard={webCard}
+            canPlay={hasFocus}
+            onPressAuthor={toggleFlip}
+          />
+        )}
       </SafeAreaView>
     </Container>
   );
