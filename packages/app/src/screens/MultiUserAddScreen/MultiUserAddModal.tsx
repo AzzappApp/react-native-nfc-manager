@@ -1,17 +1,24 @@
+import { zodResolver } from '@hookform/resolvers/zod';
+import parsePhoneNumberFromString from 'libphonenumber-js';
+import capitalize from 'lodash/capitalize';
 import { forwardRef, useImperativeHandle, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useIntl } from 'react-intl';
 import { View, StyleSheet } from 'react-native';
 import * as mime from 'react-native-mime-types';
 import { SafeAreaView } from 'react-native-safe-area-context';
+
 import Toast from 'react-native-toast-message';
 import { graphql, useFragment, useMutation } from 'react-relay';
-import { type ContactCard } from '@azzapp/shared/contactCardHelpers';
+import * as z from 'zod';
+import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
+
 import ERRORS from '@azzapp/shared/errors';
 import { encodeMediaId } from '@azzapp/shared/imagesHelpers';
 import { isValidEmail } from '@azzapp/shared/stringHelpers';
 import { textStyles } from '#theme';
 import ScreenModal from '#components/ScreenModal';
+import { CardPhoneLabels } from '#helpers/contactCardHelpers';
 import { getFileName } from '#helpers/fileHelpers';
 import { addLocalCachedMediaFile } from '#helpers/mediaHelpers';
 import { uploadMedia, uploadSign } from '#helpers/MobileWebAPI';
@@ -21,12 +28,87 @@ import Container from '#ui/Container';
 import Header from '#ui/Header';
 import Text from '#ui/Text';
 import MultiUserAddForm from './MultiUserAddForm';
+import type { EmailPhoneInput } from '#components/EmailOrPhoneInput';
 import type { MultiUserAddModal_InviteUserMutation } from '#relayArtifacts/MultiUserAddModal_InviteUserMutation.graphql';
 import type { MultiUserAddModal_webCard$key } from '#relayArtifacts/MultiUserAddModal_webCard.graphql';
 import type { ContactCardEditFormValues } from '#screens/ContactCardScreen/ContactCardEditModalSchema';
 import type { MultiUserAddFormValues } from './MultiUserAddForm';
+import type { Contact } from 'expo-contacts';
+import type { CountryCode } from 'libphonenumber-js';
 import type { ForwardedRef } from 'react';
 import type { Control } from 'react-hook-form';
+
+const multiUserAddFormSchema = z.object({
+  selectedContact: z
+    .object({
+      countryCodeOrEmail: z.string(),
+      value: z.string(),
+    })
+    .refine(contact => {
+      if (contact.countryCodeOrEmail === 'email') {
+        return isValidEmail(contact.value);
+      } else if (contact.countryCodeOrEmail) {
+        return parsePhoneNumberFromString(
+          contact.value,
+          contact.countryCodeOrEmail as CountryCode,
+        )?.isValid();
+      }
+    }),
+  role: z.enum(['user', 'admin', 'editor']),
+  firstName: z.string().optional(),
+  lastName: z.string().optional(),
+  emails: z.array(
+    z
+      .object({
+        label: z.string(),
+        address: z.string(),
+        selected: z.boolean().nullable().optional(),
+      })
+      .refine(email => isValidEmail(email.address)),
+  ),
+  phoneNumbers: z.array(
+    z.object({
+      label: z.string(),
+      number: z.string(),
+      selected: z.boolean().nullable().optional(),
+    }),
+  ),
+  title: z.string().optional(),
+  company: z.string().optional(),
+  urls: z.array(
+    z.object({
+      address: z.string(),
+      selected: z.boolean().nullable().optional(),
+    }),
+  ),
+  birthday: z
+    .object({
+      birthday: z.string(),
+      selected: z.boolean().nullable().optional(),
+    })
+    .optional(),
+  socials: z.array(
+    z.object({
+      url: z.string(),
+      label: z.string(),
+      selected: z.boolean().nullable().optional(),
+    }),
+  ),
+  addresses: z.array(
+    z.object({
+      address: z.string(),
+      label: z.string(),
+      selected: z.boolean().nullable().optional(),
+    }),
+  ),
+  avatar: z
+    .object({
+      uri: z.string(),
+      id: z.string(),
+      local: z.boolean(),
+    })
+    .optional(),
+});
 
 // eslint-disable-next-line @typescript-eslint/ban-types
 type MultiUserAddModalProps = {
@@ -35,25 +117,8 @@ type MultiUserAddModalProps = {
   webCard: MultiUserAddModal_webCard$key;
 };
 
-export type UserToAdd = {
-  firstName: string;
-  lastName: string;
-  phoneNumbers: string[];
-  emails: string[];
-  contactCard: ContactCard;
-};
-
-export type AssociatedUser = {
-  email?: string;
-  phoneNumber?: string;
-};
-
 export type MultiUserAddModalActions = {
-  open: (
-    associated: AssociatedUser,
-    user: UserToAdd,
-    isManual: boolean,
-  ) => void;
+  open: (contact?: Contact | undefined) => void;
 };
 
 const MultiUserAddModal = (
@@ -95,13 +160,7 @@ const MultiUserAddModal = (
 
   const intl = useIntl();
 
-  const [user, setUser] = useState<AssociatedUser & UserToAdd>({
-    firstName: '',
-    lastName: '',
-    phoneNumbers: [],
-    emails: [],
-    contactCard: {},
-  });
+  const [contact, setContact] = useState<Contact>();
 
   const [isManual, setIsManual] = useState(false);
 
@@ -109,63 +168,98 @@ const MultiUserAddModal = (
     setVisible(false);
   };
 
-  const contacts = useMemo(() => {
-    const baseContacts = getUserContacts(user);
-    if (isManual) return baseContacts;
-    return [
-      ...baseContacts,
-      {
-        id: 'manual',
-        label: intl.formatMessage({
-          defaultMessage: 'Manual entry',
-          description: 'MultiUserAddModal - Label for manual entry',
-        }),
-      },
-    ];
-  }, [user, intl, isManual]);
+  const contacts: Array<{
+    id: string;
+    label: string;
+    countryCodeOrEmail: CountryCode | 'email';
+  }> = useMemo(() => {
+    if (contact) {
+      const baseContacts = getUserContacts(contact);
+      return baseContacts;
+    }
+    return [];
+  }, [contact]);
 
   const {
     control,
-    watch,
     handleSubmit,
     reset,
     formState: { isSubmitting },
   } = useForm<MultiUserAddFormValues>({
+    resolver: zodResolver(multiUserAddFormSchema),
     defaultValues: {
-      contact: contacts[0]?.id,
-      manualContact: '',
       role: 'user',
     },
     mode: 'onSubmit',
   });
 
   useImperativeHandle(ref, () => ({
-    open: (associated: AssociatedUser, user: UserToAdd, isManual: boolean) => {
-      setUser({ ...associated, ...user });
-
-      reset({
-        role: 'user',
-        contact: getUserContacts(user)[0].id,
-        firstName: user.contactCard['firstName'],
-        lastName: user.contactCard['lastName'],
-        phoneNumbers: user.contactCard['phoneNumbers'] ?? [],
-        emails: user.contactCard['emails'] ?? [],
-        title: user.contactCard['title'],
-        company: user.contactCard['company'] ?? undefined,
-        urls: user.contactCard['urls'] ?? [],
-        birthday: user.contactCard['birthday'],
-        socials: user.contactCard['socials'] ?? [],
-      });
-
-      setIsManual(isManual);
-
+    open: (contact: Contact | undefined) => {
+      if (contact) {
+        setContact(contact);
+        setIsManual(false);
+        let selectedContact: EmailPhoneInput = {
+          countryCodeOrEmail: 'email',
+          value: '',
+        };
+        const ctc = getUserContacts(contact);
+        if (ctc.length > 0) {
+          selectedContact = {
+            countryCodeOrEmail: ctc[0].countryCodeOrEmail as
+              | CountryCode
+              | 'email',
+            value: ctc[0].id,
+          };
+        }
+        reset(
+          {
+            role: 'user',
+            selectedContact,
+            firstName: contact.firstName,
+            lastName: contact.lastName,
+            phoneNumbers:
+              contact.phoneNumbers?.map(a => ({
+                label: normalizePhoneMailLabel(a.label),
+                number: a.number,
+              })) ?? [],
+            emails:
+              contact.emails?.map(a => ({
+                label: normalizePhoneMailLabel(a.label),
+                address: a.email,
+              })) ?? [],
+            title: contact.jobTitle,
+            company: contact.company ?? undefined,
+            urls: contact.urlAddresses?.map(a => ({ address: a.url })) ?? [],
+            birthday: contact.birthday
+              ? {
+                  birthday: new Date(
+                    contact.birthday.year!,
+                    contact.birthday.month!,
+                    contact.birthday.day!,
+                  ).toISOString(),
+                }
+              : undefined,
+            avatar: contact?.image?.uri
+              ? {
+                  uri: contact?.image?.uri,
+                  id: contact?.image.uri,
+                  local: true,
+                }
+              : undefined,
+          },
+          { keepDirty: true },
+        );
+      } else {
+        reset({
+          role: 'user',
+        });
+        setIsManual(isManual);
+      }
       setVisible(true);
     },
   }));
 
   const [showImagePicker, setShowImagePicker] = useState(false);
-
-  const currentContact = watch('contact');
 
   const [commit, saving] = useMutation<MultiUserAddModal_InviteUserMutation>(
     graphql`
@@ -234,8 +328,9 @@ const MultiUserAddModal = (
   );
 
   const submit = handleSubmit(
-    async ({ avatar, ...data }) => {
+    async value => {
       let avatarId: string | undefined = undefined;
+      const { avatar, ...data } = value;
       if (avatar?.local && avatar.uri) {
         // setProgressIndicator(Observable.from(0));
 
@@ -258,6 +353,7 @@ const MultiUserAddModal = (
       }
 
       const {
+        selectedContact,
         firstName,
         lastName,
         phoneNumbers,
@@ -270,10 +366,15 @@ const MultiUserAddModal = (
         addresses,
       } = data;
 
-      const contact =
-        data.contact === 'manual' ? data.manualContact : data.contact;
-      const email = isValidEmail(contact) ? contact : undefined;
-      const phoneNumber = isValidEmail(contact) ? undefined : contact;
+      const email =
+        selectedContact.countryCodeOrEmail === 'email'
+          ? selectedContact.value
+          : undefined;
+
+      const phoneNumber =
+        selectedContact.countryCodeOrEmail !== 'email'
+          ? selectedContact.value
+          : undefined;
 
       const input = {
         email,
@@ -287,14 +388,13 @@ const MultiUserAddModal = (
           title,
           company,
           urls,
-          birthday,
+          birthday: birthday ?? undefined,
           socials,
           avatarId: avatarId ? encodeMediaId(avatarId, 'image') : avatarId,
           addresses,
         },
       };
 
-      // @TODO retrieve local user information to generate webcard (phone with label isntead of just number, etc.)
       commit({
         variables: {
           input,
@@ -371,7 +471,7 @@ const MultiUserAddModal = (
           <Header
             middleElement={
               <Text style={textStyles.large}>
-                {user.firstName} {user.lastName}
+                {contact?.firstName} {contact?.lastName}
               </Text>
             }
             leftElement={
@@ -403,11 +503,7 @@ const MultiUserAddModal = (
             imagePickerVisible={showImagePicker}
             isMultiUser={true}
           >
-            <MultiUserAddForm
-              contacts={contacts}
-              control={control}
-              currentContact={currentContact}
-            />
+            <MultiUserAddForm contacts={contacts} control={control} />
           </ContactCardEditForm>
         </SafeAreaView>
         {isSubmitting || saving ? (
@@ -418,18 +514,68 @@ const MultiUserAddModal = (
     </ScreenModal>
   );
 };
+/**
+ * This is a hack because of the way the contact object is structured
+ *
+ * @param {Contact} user
+ * @param {boolean} withLabel: Hack to get the label of contact only in one part of react hook form, or use the number as label for another part instead of building 2 functions
+ * @return {*}
+ */
+const getUserContacts = (user: Contact) => {
+  const phoneNumber = convertToNonNullArray(
+    (user.phoneNumbers ?? []).map(a => {
+      if (a.digits) {
+        let formattedNumber = a.digits;
+        if (a.digits.startsWith('+') && parsePhoneNumberFromString(a.digits)) {
+          formattedNumber = parsePhoneNumberFromString(
+            a.digits,
+          )!.formatInternational();
+        } else if (
+          a.countryCode &&
+          parsePhoneNumberFromString(
+            a.digits,
+            a.countryCode?.toUpperCase() as CountryCode,
+          )
+        ) {
+          formattedNumber = parsePhoneNumberFromString(
+            a.digits,
+            a.countryCode?.toUpperCase() as CountryCode,
+          )!.formatInternational();
+        }
+        return {
+          id: formattedNumber,
+          label: normalizePhoneMailLabel(a.label),
+          countryCodeOrEmail: a.countryCode?.toUpperCase() as CountryCode,
+        };
+      }
+      return null;
+    }),
+  );
+  const emails = convertToNonNullArray(
+    (user.emails ?? []).map(a => {
+      if (a.email)
+        return { id: a.email!, label: a.email!, countryCodeOrEmail: 'email' };
+      return null;
+    }),
+  );
+  return [...phoneNumber, ...emails] as Array<{
+    id: string;
+    label: string;
+    countryCodeOrEmail: CountryCode | 'email';
+  }>;
+};
 
-const getUserContacts = (user: UserToAdd) => {
-  return [
-    ...user.emails.map(email => ({
-      id: email,
-      label: email,
-    })),
-    ...user.phoneNumbers.map(phoneNumber => ({
-      id: phoneNumber,
-      label: phoneNumber,
-    })),
-  ];
+const normalizePhoneMailLabel = (label?: string) => {
+  if (!label) return 'Other';
+  if (CardPhoneLabels.includes(label)) {
+    return label;
+  }
+  //try with capitalization of the first letter
+  const capitalizedLabel = capitalize(label);
+  if (CardPhoneLabels.includes(capitalizedLabel)) {
+    return capitalizedLabel;
+  }
+  return 'Other';
 };
 
 export default forwardRef(MultiUserAddModal);

@@ -51,7 +51,7 @@ export const contactCardEditSchema = z.object({
   avatar: z
     .object({
       uri: z.string(),
-      id: z.string(),
+      id: z.string().optional(),
       local: z.boolean().optional(),
     })
     .optional()

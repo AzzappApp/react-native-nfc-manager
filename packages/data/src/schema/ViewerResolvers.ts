@@ -1,4 +1,4 @@
-import { and, desc, eq, inArray, isNull, like, ne, or } from 'drizzle-orm';
+import { and, desc, eq, like } from 'drizzle-orm';
 import { connectionFromArray } from 'graphql-relay';
 import { shuffle } from '@azzapp/shared/arrayHelpers';
 import { simpleHash } from '@azzapp/shared/stringHelpers';
@@ -12,13 +12,10 @@ import {
   getCardTemplateTypes,
   getRecommendedWebCards,
   WebCardTable,
-  UserTable,
-  ProfileTable,
 } from '#domains';
 import { getCardStyles } from '#domains/cardStyles';
 import { getMediaSuggestions } from '#domains/mediasSuggestion';
 import { emptyConnection } from '#helpers/connectionsHelpers';
-import type { WebCard } from '#domains';
 import type { ViewerResolvers } from './__generated__/types';
 
 export const Viewer: ViewerResolvers = {
@@ -29,94 +26,6 @@ export const Viewer: ViewerResolvers = {
       return null;
     }
     return loaders.Profile.load(profileId);
-  },
-  contacts: async (_root, args, { auth, loaders }) => {
-    const { userId } = auth;
-
-    if (!userId) return null;
-
-    const user = await loaders.User.load(userId);
-
-    if (!user) return null;
-
-    if (args.phoneNumbers.length === 0 && args.emails.length === 0) return [];
-
-    const conditions = [];
-
-    if (args.phoneNumbers.length > 0) {
-      conditions.push(inArray(UserTable.phoneNumber, args.phoneNumbers));
-    }
-    if (args.emails.length > 0) {
-      conditions.push(inArray(UserTable.email, args.emails));
-    }
-
-    const filters = [
-      conditions.length === 1
-        ? conditions[0]
-        : or(conditions[0], conditions[1]),
-    ];
-
-    if (user.phoneNumber) {
-      filters.push(
-        or(
-          isNull(UserTable.phoneNumber),
-          ne(UserTable.phoneNumber, user.phoneNumber),
-        ),
-      );
-    }
-
-    if (user.email) {
-      filters.push(
-        or(isNull(UserTable.email), ne(UserTable.email, user.email)),
-      );
-    }
-
-    const result = await db
-      .select()
-      .from(UserTable)
-      .innerJoin(ProfileTable, eq(UserTable.id, ProfileTable.userId))
-      .innerJoin(
-        WebCardTable,
-        and(
-          eq(WebCardTable.id, ProfileTable.webCardId),
-          eq(WebCardTable.cardIsPublished, true),
-        ),
-      )
-      .where(and(...filters));
-
-    const indexedProfiles = result.reduce(
-      (accumulator, currentValue) => {
-        const { User, WebCard } = currentValue;
-
-        if (accumulator[User.id]) {
-          accumulator[User.id].publishedWebCards.push(WebCard);
-        } else {
-          accumulator[User.id] = {
-            email:
-              User.email && args.emails.includes(User.email)
-                ? User.email
-                : undefined,
-            phoneNumber:
-              User.phoneNumber && args.phoneNumbers.includes(User.phoneNumber)
-                ? User.phoneNumber
-                : undefined,
-            publishedWebCards: [WebCard],
-          };
-        }
-
-        return accumulator;
-      },
-      {} as Record<
-        string,
-        {
-          email?: string;
-          phoneNumber?: string;
-          publishedWebCards: WebCard[];
-        }
-      >,
-    );
-
-    return Object.values(indexedProfiles);
   },
   trendingWebCards: async (_, args) => {
     // TODO dummy implementation just to test frontend

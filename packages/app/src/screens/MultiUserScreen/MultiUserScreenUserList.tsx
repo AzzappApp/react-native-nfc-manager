@@ -1,3 +1,4 @@
+import { parsePhoneNumber } from 'libphonenumber-js';
 import { Fragment, useRef } from 'react';
 import { useIntl } from 'react-intl';
 import { StyleSheet, View } from 'react-native';
@@ -13,10 +14,24 @@ import Separation from '#ui/Separation';
 import Text from '#ui/Text';
 import Avatar from './Avatar';
 import MultiUserDetailModal from './MultiUserDetailModal';
+import type { EmailPhoneInput } from '#components/EmailOrPhoneInput';
 import type { ProfileRole } from '#relayArtifacts/MultiUserScreenQuery.graphql';
 import type { MultiUserScreenUserList_currentUser$key } from '#relayArtifacts/MultiUserScreenUserList_currentUser.graphql';
 import type { MultiUserDetailModalActions } from './MultiUserDetailModal';
-import type { UserInformation } from './MultiUserScreen';
+import type { ContactCard } from '@azzapp/shared/contactCardHelpers';
+
+type UserInformation = {
+  firstName: string;
+  lastName: string;
+  email: string;
+  phoneNumber: string;
+  avatar: {
+    id: string;
+    uri: string;
+  } | null;
+  contactCard: ContactCard;
+  profileId: string;
+};
 
 export type MultiUserScreenListProps = {
   usersByRole: Record<ProfileRole, UserInformation[]>;
@@ -125,19 +140,31 @@ const MultiUserScreenUserList = (props: MultiUserScreenListProps) => {
               const isCurrentUser =
                 user.email === currentUser.email ||
                 user.phoneNumber === currentUser.phoneNumber;
+              let selectedContact: EmailPhoneInput | null = null;
+              if (currentUser.email) {
+                selectedContact = {
+                  countryCodeOrEmail: 'email',
+                  value: currentUser.email,
+                };
+              } else if (currentUser.phoneNumber) {
+                const phoneNumber = parsePhoneNumber(currentUser.phoneNumber);
+                if (phoneNumber.isValid()) {
+                  selectedContact = {
+                    countryCodeOrEmail: phoneNumber.country!,
+                    value: phoneNumber.formatInternational()!,
+                  };
+                }
+              }
 
               return (
                 <PressableNative
                   onPress={() => {
                     detail.current?.open(
-                      {
-                        email: user.email,
-                        phoneNumber: user.phoneNumber,
-                      },
                       user.contactCard,
                       user.profileId,
                       profileRole,
                       user.avatar,
+                      selectedContact,
                     );
                   }}
                   key={user.email}

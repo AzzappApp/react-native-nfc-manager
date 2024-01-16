@@ -3,8 +3,6 @@ Represent an Application Viewer
 """
 type Viewer {
   profile: Profile
-
-  contacts(emails: [String!]!, phoneNumbers: [String!]!): [KnownContact!]
   """
   Return a list of suggested profiles for current user
   """
@@ -152,6 +150,11 @@ type Viewer {
   Fetches suggested medias
   """
   suggestedMedias(kind: MediaKind!, first: Int, after: String): MediaConnection!
+
+   """
+  Search User
+  """
+  searchUser(emails: [String!]!, phoneNumbers: [String!]!): User
 }
 
 """
@@ -167,10 +170,4 @@ type CoverTemplateCategory {
   The category templates
   """
   templates: [CoverTemplate!]!
-}
-
-type KnownContact {
-  email: String
-  phoneNumber: String
-  publishedWebCards: [WebCard!]!
 }

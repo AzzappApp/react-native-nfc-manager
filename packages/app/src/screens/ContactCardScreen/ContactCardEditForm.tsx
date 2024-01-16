@@ -86,7 +86,6 @@ const ContactCardEditForm = ({
           },
         ],
       });
-
       field.onChange({
         local: true,
         id: localPath,

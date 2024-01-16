@@ -24,7 +24,7 @@ const inviteUserMutation: MutationResolvers['inviteUser'] = async (
   if (email) filters.push(eq(UserTable.email, email));
   if (phoneNumber) filters.push(eq(UserTable.phoneNumber, phoneNumber));
 
-  const invitedUser = await db
+  const existingUser = await db
     .select()
     .from(UserTable)
     .where(and(...filters))
@@ -32,6 +32,7 @@ const inviteUserMutation: MutationResolvers['inviteUser'] = async (
 
   const profile = await loaders.Profile.load(profileId);
 
+  //check if the authed profile as the right to invite someone(multi user on)
   const webCard = profile
     ? await loaders.WebCard.load(profile.webCardId)
     : null;
@@ -41,20 +42,24 @@ const inviteUserMutation: MutationResolvers['inviteUser'] = async (
     !webCard ||
     !webCard.isMultiUser ||
     !isAdmin(profile.profileRole)
-  )
+  ) {
     throw new GraphQLError(ERRORS.INVALID_REQUEST);
+  }
 
   const createdProfileId = await db.transaction(async trx => {
-    const userId =
-      invitedUser?.id ??
-      (await createUser(
+    let userId;
+    if (!existingUser) {
+      userId = await createUser(
         {
           email,
           phoneNumber,
           invited: true,
         },
         trx,
-      ));
+      );
+    } else {
+      userId = existingUser.id;
+    }
 
     const { displayedOnWebCard, isPrivate, avatarId, ...data } =
       input.contactCard ?? {};
@@ -77,8 +82,8 @@ const inviteUserMutation: MutationResolvers['inviteUser'] = async (
     };
 
     try {
-      const userId = await createProfile(payload, trx);
-      return userId;
+      const profileId = await createProfile(payload, trx);
+      return profileId;
     } catch (e) {
       throw new GraphQLError(ERRORS.PROFILE_ALREADY_EXISTS);
     }

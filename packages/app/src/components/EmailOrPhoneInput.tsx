@@ -1,42 +1,44 @@
-import { useEffect, useMemo, useRef } from 'react';
+import { useCallback, useEffect, useMemo } from 'react';
 import { useIntl } from 'react-intl';
 import { View, StyleSheet } from 'react-native';
+import { getLocales } from 'react-native-localize';
+import { isNotFalsyString } from '@azzapp/shared/stringHelpers';
 import CountryCodeListWithOptions from '#ui/CountryCodeListWithOptions';
 import TextInput from '#ui/TextInput';
 import PhoneInput from './PhoneInput';
 import type { CountryCodeListOption } from '#ui/CountryCodeListWithOptions';
 import type { CountryCode } from 'libphonenumber-js';
 
-type EmailOrPhoneInputProps = {
+export type EmailPhoneInput = {
+  countryCodeOrEmail: CountryCode | 'email';
   value: string;
-  onChange: (value: string) => void;
+};
+type EmailOrPhoneInputProps = {
+  input: EmailPhoneInput;
+  onChange: (value: EmailPhoneInput) => void;
   hasError: boolean;
   onSubmitEditing?: () => void;
-  countryCodeOrEmail: CountryCode | 'email';
-  setCountryCodeOrEmail: (value: CountryCode | 'email') => void;
 };
 
 const EmailOrPhoneInput = ({
-  value,
+  input,
   onChange,
-  countryCodeOrEmail,
-  setCountryCodeOrEmail,
   hasError,
   onSubmitEditing,
 }: EmailOrPhoneInputProps) => {
   const intl = useIntl();
 
-  const prev = useRef(countryCodeOrEmail);
-
   useEffect(() => {
-    if (
-      prev.current !== countryCodeOrEmail &&
-      (prev.current === 'email' || countryCodeOrEmail === 'email')
-    ) {
-      prev.current = countryCodeOrEmail;
-      onChange('');
+    const locales = getLocales();
+
+    if (!isNotFalsyString(input.countryCodeOrEmail) && locales.length > 0) {
+      const localCountryCode = locales[0].countryCode;
+      onChange({
+        countryCodeOrEmail: localCountryCode as CountryCode,
+        value: input.value,
+      });
     }
-  }, [countryCodeOrEmail, onChange]);
+  }, [input.countryCodeOrEmail, input.value, onChange]);
 
   const SELECTORS: Array<CountryCodeListOption<'email'>> = useMemo(
     () => [
@@ -52,6 +54,27 @@ const EmailOrPhoneInput = ({
     [intl],
   );
 
+  const onChangeCode = useCallback(
+    (code: CountryCode | 'email') => {
+      if (
+        (input.countryCodeOrEmail === 'email' && code !== 'email') ||
+        (input.countryCodeOrEmail !== 'email' && code === 'email')
+      ) {
+        onChange({ ...input, countryCodeOrEmail: code, value: '' });
+      } else {
+        onChange({ ...input, countryCodeOrEmail: code });
+      }
+    },
+    [input, onChange],
+  );
+
+  const onChangeValue = useCallback(
+    (value: string) => {
+      onChange({ ...input, value });
+    },
+    [input, onChange],
+  );
+
   return (
     <View style={styles.phoneOrEmailContainer}>
       <CountryCodeListWithOptions<'email'>
@@ -65,9 +88,9 @@ const EmailOrPhoneInput = ({
           description:
             'Signup Form Connect with phone number section title in country selection list',
         })}
-        value={countryCodeOrEmail}
+        value={input.countryCodeOrEmail}
         options={SELECTORS}
-        onChange={setCountryCodeOrEmail}
+        onChange={onChangeCode}
         style={styles.countryCodeOrEmailButton}
         accessibilityLabel={intl.formatMessage({
           defaultMessage: 'Select a calling code or email',
@@ -81,15 +104,15 @@ const EmailOrPhoneInput = ({
             'Signup- The accessibility hint for the country selector',
         })}
       />
-      {countryCodeOrEmail === 'email' ? (
+      {input.countryCodeOrEmail === 'email' ? (
         <TextInput
           nativeID="email"
           placeholder={intl.formatMessage({
             defaultMessage: 'Email address',
             description: 'Signup Screen - email address input placeholder',
           })}
-          value={value}
-          onChangeText={onChange}
+          value={input.value}
+          onChangeText={onChangeValue}
           autoCapitalize="none"
           autoComplete="email"
           keyboardType="email-address"
@@ -111,9 +134,9 @@ const EmailOrPhoneInput = ({
             defaultMessage: 'Phone number',
             description: 'Signup Screen - phone number input placeholder',
           })}
-          value={value}
-          onChange={onChange}
-          defaultCountry={countryCodeOrEmail}
+          value={input.value}
+          onChangeText={onChangeValue}
+          countryCode={input.countryCodeOrEmail}
           autoCapitalize="none"
           keyboardType="phone-pad"
           autoCorrect={false}

@@ -31,16 +31,17 @@ import Select from '#ui/Select';
 import Text from '#ui/Text';
 import TextInput from '#ui/TextInput';
 import MultiUserTransferOwnershipModal from './MultiUserTransferOwnershipModal';
+import type { EmailPhoneInput } from '#components/EmailOrPhoneInput';
 import type { MultiUserDetailModal_CancelTransferOwnershipMutation } from '#relayArtifacts/MultiUserDetailModal_CancelTransferOwnershipMutation.graphql';
 import type { MultiUserDetailModal_RemoveUserMutation } from '#relayArtifacts/MultiUserDetailModal_RemoveUserMutation.graphql';
 import type { MultiUserDetailModal_UpdateProfileMutation } from '#relayArtifacts/MultiUserDetailModal_UpdateProfileMutation.graphql';
 import type { MultiUserDetailModal_webcard$key } from '#relayArtifacts/MultiUserDetailModal_webcard.graphql';
 import type { ProfileRole } from '#relayArtifacts/MultiUserScreenQuery.graphql';
 import type { ContactCardEditFormValues } from '#screens/ContactCardScreen/ContactCardEditModalSchema';
-import type { AssociatedUser } from '#screens/MultiUserAddScreen/MultiUserAddModal';
 import type { UserInformation } from './MultiUserScreen';
 import type { MultiUserTransferOwnershipModalActions } from './MultiUserTransferOwnershipModal';
 import type { ContactCard } from '@azzapp/shared/contactCardHelpers';
+import type { CountryCode } from 'libphonenumber-js';
 import type { ForwardedRef, ReactNode } from 'react';
 import type { Control } from 'react-hook-form';
 
@@ -51,17 +52,20 @@ type MultiUserDetailModalProps = {
 };
 
 export type MultiUserDetailFormValues = ContactCardEditFormValues & {
-  contact: string;
   role: ProfileRole;
+  selectedContact: EmailPhoneInput | null;
 };
 
 export type MultiUserDetailModalActions = {
   open: (
-    associated: AssociatedUser,
     contactCard: ContactCard,
     profileId: string,
     role: ProfileRole,
     avatar: { uri: string; id: string } | null,
+    selectedContact: {
+      value: string;
+      countryCodeOrEmail: CountryCode | 'email';
+    } | null,
   ) => void;
 };
 
@@ -195,7 +199,7 @@ const MultiUserDetailModal = (
 
   const submit = handleSubmit(
     async data => {
-      const { avatar, contact, role, ...contactCard } = data;
+      const { avatar, role, ...contactCard } = data;
 
       const input = {};
       let avatarId: string | null = avatar?.id ?? null;
@@ -265,10 +269,9 @@ const MultiUserDetailModal = (
   );
 
   useImperativeHandle(ref, () => ({
-    open: (associated, contactCard, profileId, role, avatar) => {
+    open: (contactCard, profileId, role, avatar, selectedContact) => {
       reset({
         role,
-        contact: associated.email ?? associated.phoneNumber,
         firstName: contactCard.firstName,
         lastName: contactCard.lastName,
         phoneNumbers: contactCard.phoneNumbers ?? [],
@@ -280,6 +283,7 @@ const MultiUserDetailModal = (
         socials: contactCard.socials ?? [],
         addresses: contactCard.addresses ?? [],
         avatar,
+        selectedContact,
       });
 
       setProfileId(profileId);
@@ -420,7 +424,7 @@ const MultiUserDetailModal = (
             <View style={{ paddingHorizontal: 10 }}>
               <Controller
                 control={control}
-                name="contact"
+                name="selectedContact"
                 render={({ field: { onChange, onBlur, value } }) => (
                   <View style={styles.field}>
                     <Text style={[styles.title, textStyles.xsmall]}>
@@ -430,7 +434,7 @@ const MultiUserDetailModal = (
                       />
                     </Text>
                     <TextInput
-                      value={value ?? ''}
+                      value={value?.value ?? ''}
                       onChangeText={onChange}
                       onBlur={onBlur}
                       style={[styles.input, styles.contactText]}

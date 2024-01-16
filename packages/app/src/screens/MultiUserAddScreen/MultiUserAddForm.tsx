@@ -1,89 +1,139 @@
+import { parsePhoneNumber } from 'libphonenumber-js';
+import { useCallback, type ReactNode } from 'react';
 import { Controller, useController } from 'react-hook-form';
 import { FormattedMessage } from 'react-intl';
-import { StyleSheet, View } from 'react-native';
-import { colors, textStyles } from '#theme';
+import { View } from 'react-native';
+import { colors } from '#theme';
+import EmailOrPhoneInput from '#components/EmailOrPhoneInput';
+import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
+import useToggle from '#hooks/useToggle';
+import BottomSheetModal from '#ui/BottomSheetModal';
+import PressableOpacity from '#ui/PressableOpacity';
 import Select from '#ui/Select';
+import SelectList from '#ui/SelectList';
 import Text from '#ui/Text';
-import TextInput from '#ui/TextInput';
 import type { ProfileRole } from '#relayArtifacts/MultiUserScreenQuery.graphql';
 import type { ContactCardEditFormValues } from '#screens/ContactCardScreen/ContactCardEditModalSchema';
+import type { SelectListItemInfo } from '#ui/SelectList';
 import type { ContactCard } from '@azzapp/shared/contactCardHelpers';
-import type { ReactNode } from 'react';
+import type { CountryCode } from 'libphonenumber-js';
 import type { Control } from 'react-hook-form';
 
 export type MultiUserAddFormValues = ContactCardEditFormValues & {
-  contact: string;
-  manualContact: string;
+  selectedContact: { countryCodeOrEmail: CountryCode | 'email'; value: string };
   role: ProfileRole;
   contactCard: ContactCard;
 };
 
 type MultiUserAddFormProps = {
-  contacts: Array<{ id: string; label: string }>;
-  currentContact: string;
+  contacts: Array<{
+    id: string;
+    label: string;
+    countryCodeOrEmail: CountryCode | 'email';
+  }>;
   control: Control<MultiUserAddFormValues>;
 };
 
-const MultiUserAddForm = (props: MultiUserAddFormProps) => {
-  const { contacts, currentContact, control } = props;
+const MultiUserAddForm = ({ contacts, control }: MultiUserAddFormProps) => {
+  const styles = useStyleSheet(styleSheet);
+  const [showAvailableInfo, toggleShowAvailableInfo] = useToggle(false);
 
   const { field } = useController({ control, name: 'role' });
+  const {
+    field: fieldContact,
+    fieldState: { error },
+  } = useController({
+    control,
+    name: 'selectedContact',
+  });
+  const { value: selectedContact, onChange: setSelectedContact } = fieldContact;
+
+  const updateSelectedContact = useCallback(
+    (info: {
+      id: string;
+      label: string;
+      countryCodeOrEmail: CountryCode | 'email';
+    }) => {
+      if (info.countryCodeOrEmail === 'email') {
+        setSelectedContact({
+          countryCodeOrEmail: 'email',
+          value: info.id,
+        });
+
+        return;
+      }
+      const parsed = parsePhoneNumber(info.id);
+      setSelectedContact({
+        countryCodeOrEmail: parsed.country,
+        value: parsed.nationalNumber,
+      });
+    },
+    [setSelectedContact],
+  );
+
+  const renderAvailableInfo = (
+    itemInfo: SelectListItemInfo<{
+      id: string;
+      label: string;
+    }>,
+  ) => {
+    return (
+      <Text variant="textField" style={styles.inputText}>
+        {itemInfo.item.id}
+      </Text>
+    );
+  };
 
   return (
     <View style={styles.form}>
-      <Text style={[styles.selectTitle, textStyles.xsmall]}>
-        <FormattedMessage
-          defaultMessage="Invitation Email address or phone number"
-          description="MultiUserAddModal - Title for contact select input"
-        />
-      </Text>
-      <Controller
-        control={control}
-        name="contact"
-        render={({ field: { onChange, value } }) => (
-          <Select
-            nativeID="contact"
-            accessibilityLabelledBy="contactLabel"
-            data={contacts}
-            selectedItemKey={value}
-            keyExtractor={contact => contact.id}
-            onItemSelected={item => onChange(item.id)}
-            itemContainerStyle={styles.selectItemContainerStyle}
-            bottomSheetHeight={
-              BOTTOM_SHEET_HEIGHT_BASE +
-              contacts.length * BOTTOM_SHEET_HEIGHT_ITEM
-            }
-          />
-        )}
-      />
-      {currentContact === 'manual' && (
-        <>
-          <Text
-            style={[styles.selectTitle, textStyles.xsmall, { marginTop: 10 }]}
-          >
+      <>
+        <View style={styles.emailAdressContainer}>
+          <Text variant="xsmall" style={styles.selectTitle}>
             <FormattedMessage
               defaultMessage="Enter an Email address or a phone number"
               description="MultiUserAddModal - Title for manual contact select input"
             />
           </Text>
-          <Controller
-            control={control}
-            name="manualContact"
-            render={({ field: { onChange, value } }) => (
-              <TextInput
-                nativeID="manualContact"
-                accessibilityLabelledBy="manualContactLabel"
-                value={value}
-                onChangeText={onChange}
-                autoCapitalize="none"
-                autoCorrect={false}
-                returnKeyType="next"
-              />
-            )}
-          />
-        </>
-      )}
-      <Text style={[styles.selectTitle, textStyles.xsmall, { marginTop: 10 }]}>
+          {contacts?.length > 0 && (
+            <PressableOpacity onPress={toggleShowAvailableInfo}>
+              <Text variant="hyperLink">
+                <FormattedMessage
+                  defaultMessage="See available Info"
+                  description="MultiUserAddForm - See available info text link"
+                />
+              </Text>
+            </PressableOpacity>
+          )}
+        </View>
+        {contacts?.length > 0 && (
+          <BottomSheetModal
+            visible={showAvailableInfo}
+            height={
+              BOTTOM_SHEET_HEIGHT_BASE +
+              contacts.length * BOTTOM_SHEET_HEIGHT_ITEM
+            }
+            variant="modal"
+            contentContainerStyle={styles.bottomSheetContentContainer}
+            onRequestClose={toggleShowAvailableInfo}
+            nestedScroll
+          >
+            <SelectList
+              data={contacts}
+              keyExtractor={contact => contact.id}
+              renderItem={renderAvailableInfo}
+              onItemSelected={updateSelectedContact}
+              itemContainerStyle={styles.selectItemContainerStyle}
+            />
+          </BottomSheetModal>
+        )}
+        <EmailOrPhoneInput
+          input={selectedContact}
+          onChange={setSelectedContact}
+          hasError={error != null}
+        />
+      </>
+
+      <Text variant="xsmall" style={[styles.selectTitle, { marginTop: 10 }]}>
         <FormattedMessage
           defaultMessage="Role"
           description="MultiUserAddModal - Title for role select input"
@@ -161,7 +211,7 @@ const roles: Array<{ id: ProfileRole; label: ReactNode }> = [
   },
 ];
 
-const styles = StyleSheet.create({
+const styleSheet = createStyleSheet(appearance => ({
   form: {
     paddingHorizontal: 10,
     marginTop: 20,
@@ -170,16 +220,29 @@ const styles = StyleSheet.create({
     paddingHorizontal: 30,
   },
   selectTitle: {
-    color: colors.grey900,
     paddingBottom: 10,
   },
   avatarLabel: {
     marginTop: 20,
     textAlign: 'center',
   },
-});
+  bottomSheetContentContainer: {
+    paddingHorizontal: 0,
+    marginHorizontal: 0,
+    backgroundColor: appearance === 'light' ? colors.white : colors.black,
+  },
+  inputText: {
+    color: appearance === 'light' ? colors.black : colors.white,
+    height: 30,
+  },
+  emailAdressContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+  },
+}));
 
-const BOTTOM_SHEET_HEIGHT_BASE = 20;
+const BOTTOM_SHEET_HEIGHT_BASE = 100;
 const BOTTOM_SHEET_HEIGHT_ITEM = 30;
 
 export default MultiUserAddForm;

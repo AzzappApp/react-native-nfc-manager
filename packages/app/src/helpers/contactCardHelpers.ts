@@ -137,7 +137,14 @@ export const useContactCardEmailLabels = () => {
   );
   return labelValues;
 };
-
+export const CardPhoneLabels = [
+  'Home',
+  'Work',
+  'Mobile',
+  'Main',
+  'Fax',
+  'Other',
+];
 export const useContactCardPhoneLabels = () => {
   const intl = useIntl();
 

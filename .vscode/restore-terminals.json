@@ -44,7 +44,7 @@
         {
           "name": "relay watch",
           "commands": [
-            "yarn update-graphql-schema &&  yarn relay:build --repersist && yarn relay:watch"
+            "yarn relay:prepare && yarn update-graphql-schema &&  yarn relay:build --repersist && yarn relay:watch"
           ]
         },
         {
