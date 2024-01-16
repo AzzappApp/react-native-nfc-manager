@@ -132,7 +132,7 @@ jobs:
         id: query-map-updated
         if: github.ref == 'refs/heads/staging' || github.ref == 'refs/heads/main' || github.ref == 'refs/heads/stable'
         run: |
-          if cmp -s "azzapp-precompiled-queries/${{ github.ref_name }}/query-map.json" "packages/relay/query-map.json"
+          if cmp -s "azzapp-precompiled-queries/${{ github.ref_name }}/query-map.json" "packages/web/src/persisted-query-map.json"
           then
               echo "QUERY_MAP_UPDATED=false" >> $GITHUB_OUTPUT
           else
