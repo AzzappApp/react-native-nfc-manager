@@ -1,5 +1,7 @@
-## 0.5.2-canary.149
+## 0.5.2-canary.150
 
+* **build:**  - query-map has been moved
+* **build:**  - query-map has been moved
 * **fix:**  - 🐛 correctly defines which role access features ([#2299](https://github.com/AzzappApp/azzapp/pull/2299))
 * **fix:**  - 🐛 deny access to multi & parameters before invite ([#2310](https://github.com/AzzappApp/azzapp/pull/2310))
 * **fix:**  - **contactCard:** [#2229](https://github.com/AzzappApp/azzapp/pull/2229) missing common infos for urls and socials ([#2302](https://github.com/AzzappApp/azzapp/pull/2302))
