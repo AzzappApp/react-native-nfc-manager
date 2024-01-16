@@ -1,4 +1,4 @@
-## 0.5.2-canary.147
+## 0.5.2-canary.148
 
 * **fix:**  - **contactCard:** [#2229](https://github.com/AzzappApp/azzapp/pull/2229) missing common infos for urls and socials ([#2302](https://github.com/AzzappApp/azzapp/pull/2302))
 * **feat:**  - 🎸 add transfer ownership ([#2293](https://github.com/AzzappApp/azzapp/pull/2293))
