@@ -1,5 +1,6 @@
-## 0.5.2-canary.153
+## 0.5.2-canary.154
 
+* **build:**  - fix yarn.lock
 * **build:**  - try to install vercel cli before install
 * **docs:**  - remove fastlane configuration
 * **build:**  - create file if missing
