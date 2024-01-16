@@ -1,5 +1,6 @@
-## 0.5.2-canary.151
+## 0.5.2-canary.152
 
+* **docs:**  - remove fastlane configuration
 * **build:**  - create file if missing
 * **build:**  - query-map has been moved
 * **build:**  - query-map has been moved
