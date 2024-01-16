@@ -1,8 +1,8 @@
 import { graphql, usePreloadedQuery } from 'react-relay';
 import { MODULE_KIND_SIMPLE_BUTTON } from '@azzapp/shared/cardModuleHelpers';
 import SimpleButtonEditionScreen from '#screens/SimpleButtonEditionScreen';
-import type { SimpleButtonEditionMobileScreenQuery } from '@azzapp/relay/artifacts/SimpleButtonEditionMobileScreenQuery.graphql';
-import type { SimpleButtonEditionScreen_module$key } from '@azzapp/relay/artifacts/SimpleButtonEditionScreen_module.graphql';
+import type { SimpleButtonEditionMobileScreenQuery } from '#relayArtifacts/SimpleButtonEditionMobileScreenQuery.graphql';
+import type { SimpleButtonEditionScreen_module$key } from '#relayArtifacts/SimpleButtonEditionScreen_module.graphql';
 import type { PreloadedQuery } from 'react-relay';
 
 type SimpleButtonEditionMobileScreenProps = {

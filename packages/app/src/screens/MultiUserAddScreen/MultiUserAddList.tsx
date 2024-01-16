@@ -7,9 +7,9 @@ import CoverRenderer from '#components/CoverRenderer';
 import IconButton from '#ui/IconButton';
 import Text from '#ui/Text';
 import { MultiUserAddScreen_FindContactsQuery } from './MultiUserAddScreen';
+import type { CoverRenderer_webCard$key } from '#relayArtifacts/CoverRenderer_webCard.graphql';
+import type { MultiUserAddScreen_FindContactsQuery as Query } from '#relayArtifacts/MultiUserAddScreen_FindContactsQuery.graphql';
 import type { Contact } from './MultiUserAddScreen';
-import type { CoverRenderer_webCard$key } from '@azzapp/relay/artifacts/CoverRenderer_webCard.graphql';
-import type { MultiUserAddScreen_FindContactsQuery as Query } from '@azzapp/relay/artifacts/MultiUserAddScreen_FindContactsQuery.graphql';
 import type { PreloadedQuery } from 'react-relay';
 
 type AssociatedContact = {

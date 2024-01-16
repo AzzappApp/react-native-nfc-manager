@@ -8,8 +8,8 @@ import Container from '#ui/Container';
 import PostCommentsList from './PostCommentsList';
 import PostCommentsScreenHeader from './PostCommentsScreenHeader';
 import type { RelayScreenProps } from '#helpers/relayScreen';
+import type { PostCommentsScreenQuery } from '#relayArtifacts/PostCommentsScreenQuery.graphql';
 import type { PostRoute } from '#routes';
-import type { PostCommentsScreenQuery } from '@azzapp/relay/artifacts/PostCommentsScreenQuery.graphql';
 
 const postCommentsMobileScreenQuery = graphql`
   query PostCommentsScreenQuery($postId: ID!) {

@@ -3,7 +3,7 @@ import { useIntl } from 'react-intl';
 import { StyleSheet, View } from 'react-native';
 import { graphql, useFragment } from 'react-relay';
 import { WebCardBoundEditorLayerSelectorPanel } from '#components/EditorLayerSelectorPanel';
-import type { CarouselEditionBackgroundPanel_viewer$key } from '@azzapp/relay/artifacts/CarouselEditionBackgroundPanel_viewer.graphql';
+import type { CarouselEditionBackgroundPanel_viewer$key } from '#relayArtifacts/CarouselEditionBackgroundPanel_viewer.graphql';
 import type { ViewProps } from 'react-native';
 
 type BackgroundStyle = {

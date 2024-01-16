@@ -13,7 +13,7 @@ import BottomSheetModal from '#ui/BottomSheetModal';
 import Icon from '#ui/Icon';
 import PressableNative from '#ui/PressableNative';
 import Text from '#ui/Text';
-import type { HomeBottomSheetPanel_profile$key } from '@azzapp/relay/artifacts/HomeBottomSheetPanel_profile.graphql';
+import type { HomeBottomSheetPanel_profile$key } from '#relayArtifacts/HomeBottomSheetPanel_profile.graphql';
 
 type HomeBottomSheetPanel = {
   /**

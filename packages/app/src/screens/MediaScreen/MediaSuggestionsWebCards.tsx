@@ -17,7 +17,6 @@ import {
   useMutation,
   usePaginationFragment,
 } from 'react-relay';
-import CoverLink_webCardFragment from '@azzapp/relay/artifacts/CoverLink_webCard.graphql';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
 import { isEditor } from '@azzapp/shared/profileHelpers';
 import { colors, shadow } from '#theme';
@@ -26,11 +25,12 @@ import CoverList from '#components/CoverList';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import useAuthState from '#hooks/useAuthState';
 import useToggleFollow from '#hooks/useToggleFollow';
+import CoverLink_webCardFragment from '#relayArtifacts/CoverLink_webCard.graphql';
 import ActivityIndicator from '#ui/ActivityIndicator';
 import Button from '#ui/Button';
 import IconButton from '#ui/IconButton';
 import type { CoverLinkProps } from '#components/CoverLink';
-import type { MediaSuggestionsWebCards_viewer$key } from '@azzapp/relay/artifacts/MediaSuggestionsWebCards_viewer.graphql';
+import type { MediaSuggestionsWebCards_viewer$key } from '#relayArtifacts/MediaSuggestionsWebCards_viewer.graphql';
 import type { StyleProp, ViewStyle } from 'react-native';
 
 type MediaSuggestionsWebCardsProps = {

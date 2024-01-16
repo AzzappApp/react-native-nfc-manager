@@ -18,9 +18,9 @@ import LineDividerEditionBottomMenu from './LineDividerEditionBottomMenu';
 import LineDividerMarginEditionPanel from './LineDividerMarginsEditionPanel';
 import LineDividerPreview from './LineDividerPreview';
 import LineDividerSettingsEditionPanel from './LineDividerSettingsEditionPanel';
-import type { LineDividerEditionScreen_module$key } from '@azzapp/relay/artifacts/LineDividerEditionScreen_module.graphql';
-import type { LineDividerEditionScreen_webCard$key } from '@azzapp/relay/artifacts/LineDividerEditionScreen_webCard.graphql';
-import type { LineDividerEditionScreenUpdateModuleMutation } from '@azzapp/relay/artifacts/LineDividerEditionScreenUpdateModuleMutation.graphql';
+import type { LineDividerEditionScreen_module$key } from '#relayArtifacts/LineDividerEditionScreen_module.graphql';
+import type { LineDividerEditionScreen_webCard$key } from '#relayArtifacts/LineDividerEditionScreen_webCard.graphql';
+import type { LineDividerEditionScreenUpdateModuleMutation } from '#relayArtifacts/LineDividerEditionScreenUpdateModuleMutation.graphql';
 import type { ViewProps } from 'react-native';
 
 export type LineDividerEditionScreenProps = ViewProps & {

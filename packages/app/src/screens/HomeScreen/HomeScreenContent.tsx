@@ -31,8 +31,8 @@ import HomeProfileLink, {
   PROFILE_LINK_MARGIN_TOP,
 } from './HomeProfileLink';
 import HomeProfilesCarousel from './HomeProfilesCarousel';
+import type { HomeScreenContent_user$key } from '#relayArtifacts/HomeScreenContent_user.graphql';
 import type { HomeProfilesCarouselHandle } from './HomeProfilesCarousel';
-import type { HomeScreenContent_user$key } from '@azzapp/relay/artifacts/HomeScreenContent_user.graphql';
 import type { Disposable } from 'react-relay';
 
 type HomeScreenContentProps = {

@@ -8,7 +8,7 @@ import { isEditor } from '@azzapp/shared/profileHelpers';
 import WebCardList from '#components/WebCardList';
 import useAuthState from '#hooks/useAuthState';
 import useToggleFollow from '#hooks/useToggleFollow';
-import type { FollowingsScreenList_webCard$key } from '@azzapp/relay/artifacts/FollowingsScreenList_webCard.graphql';
+import type { FollowingsScreenList_webCard$key } from '#relayArtifacts/FollowingsScreenList_webCard.graphql';
 
 type FollowingsListProps = {
   webCard: FollowingsScreenList_webCard$key | null;

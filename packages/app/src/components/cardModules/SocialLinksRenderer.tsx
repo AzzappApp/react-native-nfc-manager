@@ -13,7 +13,7 @@ import CardModuleBackground from './CardModuleBackground';
 import type {
   SocialLinksRenderer_module$data,
   SocialLinksRenderer_module$key,
-} from '@azzapp/relay/artifacts/SocialLinksRenderer_module.graphql';
+} from '#relayArtifacts/SocialLinksRenderer_module.graphql';
 import type { CardStyle, ColorPalette } from '@azzapp/shared/cardHelpers';
 import type { NullableFields } from '@azzapp/shared/objectHelpers';
 import type { SocialLinkId } from '@azzapp/shared/socialLinkHelpers';

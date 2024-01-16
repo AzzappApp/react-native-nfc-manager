@@ -27,10 +27,10 @@ import HeaderButton from '#ui/HeaderButton';
 import IconButton from '#ui/IconButton';
 import PressableNative from '#ui/PressableNative';
 import Text from '#ui/Text';
-import type { CardStyleModal_cardStyles$key } from '@azzapp/relay/artifacts/CardStyleModal_cardStyles.graphql';
-import type { CardStyleModal_webCard$key } from '@azzapp/relay/artifacts/CardStyleModal_webCard.graphql';
-import type { CardStyleModalMutation } from '@azzapp/relay/artifacts/CardStyleModalMutation.graphql';
-import type { CardStyleModalQuery } from '@azzapp/relay/artifacts/CardStyleModalQuery.graphql';
+import type { CardStyleModal_cardStyles$key } from '#relayArtifacts/CardStyleModal_cardStyles.graphql';
+import type { CardStyleModal_webCard$key } from '#relayArtifacts/CardStyleModal_webCard.graphql';
+import type { CardStyleModalMutation } from '#relayArtifacts/CardStyleModalMutation.graphql';
+import type { CardStyleModalQuery } from '#relayArtifacts/CardStyleModalQuery.graphql';
 
 type CardStyleModalProps = {
   /**

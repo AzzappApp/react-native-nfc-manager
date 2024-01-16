@@ -9,13 +9,13 @@ import {
 } from '@azzapp/shared/cardHelpers';
 import { ColorDropDownPicker } from '#ui/ColorDropDownPicker';
 import ColorPicker from '#ui/ColorPicker/ColorPicker';
-import type { ColorDropDownPickerProps } from '#ui/ColorDropDownPicker';
-import type { ColorPickerProps } from '#ui/ColorPicker';
-import type { WebCardColorPicker_webCard$key } from '@azzapp/relay/artifacts/WebCardColorPicker_webCard.graphql';
+import type { WebCardColorPicker_webCard$key } from '#relayArtifacts/WebCardColorPicker_webCard.graphql';
 import type {
   WebCardColorPickerMutation,
   SaveCardColorsInput,
-} from '@azzapp/relay/artifacts/WebCardColorPickerMutation.graphql';
+} from '#relayArtifacts/WebCardColorPickerMutation.graphql';
+import type { ColorDropDownPickerProps } from '#ui/ColorDropDownPicker';
+import type { ColorPickerProps } from '#ui/ColorPicker';
 import type { ColorPalette } from '@azzapp/shared/cardHelpers';
 
 export type WebCardColorsBoundsComponentProps<T> = Omit<

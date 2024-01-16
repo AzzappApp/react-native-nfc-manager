@@ -1,5 +1,5 @@
 import { graphql, useMutation } from 'react-relay';
-import type { useLoadCardTemplateMutation as UseLoadCardTemplateMutation } from '@azzapp/relay/artifacts/useLoadCardTemplateMutation.graphql';
+import type { useLoadCardTemplateMutation as UseLoadCardTemplateMutation } from '#relayArtifacts/useLoadCardTemplateMutation.graphql';
 
 const useLoadCardTemplateMutation = () => {
   return useMutation<UseLoadCardTemplateMutation>(graphql`

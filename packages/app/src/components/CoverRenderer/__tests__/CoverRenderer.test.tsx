@@ -17,7 +17,7 @@ describe('CoverEditionScreen', () => {
 // import { render } from '#helpers/testHelpers';
 // import CoverRenderer from '..';
 // import type { CoverRendererProps } from '..';
-// import type { CoverRendererTestQuery } from '@azzapp/relay/artifacts/CoverRendererTestQuery.graphql';
+// import type { CoverRendererTestQuery } from '#relayArtifacts/CoverRendererTestQuery.graphql';
 // import type { RelayMockEnvironment } from 'relay-test-utils/lib/RelayModernMockEnvironment';
 
 // let environement: RelayMockEnvironment;

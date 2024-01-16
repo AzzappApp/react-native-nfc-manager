@@ -14,7 +14,7 @@ import SocialIcon from '#ui/Icon/SocialIcon';
 import Input from '#ui/Input';
 import Text from '#ui/Text';
 import TitleWithLine from '#ui/TitleWithLine';
-import type { SocialLinkInput } from '@azzapp/relay/artifacts/SocialLinksEditionScreenUpdateModuleMutation.graphql';
+import type { SocialLinkInput } from '#relayArtifacts/SocialLinksEditionScreenUpdateModuleMutation.graphql';
 import type { SocialLinkId } from '@azzapp/shared/socialLinkHelpers';
 import type {
   ViewProps,

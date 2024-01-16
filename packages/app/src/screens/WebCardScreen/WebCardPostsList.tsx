@@ -6,8 +6,8 @@ import PostList from '#components/WebCardPostsList';
 import Container from '#ui/Container';
 import Header from '#ui/Header';
 import IconButton from '#ui/IconButton';
-import type { PostRendererFragment_author$key } from '@azzapp/relay/artifacts/PostRendererFragment_author.graphql';
-import type { WebCardPostsList_webCard$key } from '@azzapp/relay/artifacts/WebCardPostsList_webCard.graphql';
+import type { PostRendererFragment_author$key } from '#relayArtifacts/PostRendererFragment_author.graphql';
+import type { WebCardPostsList_webCard$key } from '#relayArtifacts/WebCardPostsList_webCard.graphql';
 
 type WebCardPostsListProps = {
   webCard: PostRendererFragment_author$key & WebCardPostsList_webCard$key;

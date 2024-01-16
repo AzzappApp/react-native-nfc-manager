@@ -22,10 +22,10 @@ import Text from '#ui/Text';
 import PostRendererActionBar, {
   PostRendererActionBarSkeleton,
 } from './PostRendererActionBar';
-import type { PostRendererActionBar_post$key } from '@azzapp/relay/artifacts/PostRendererActionBar_post.graphql';
-import type { PostRendererBottomPanelFragment_post$key } from '@azzapp/relay/artifacts/PostRendererBottomPanelFragment_post.graphql';
-import type { PostRendererBottomPanelUpdateAllowLikesPostMutation } from '@azzapp/relay/artifacts/PostRendererBottomPanelUpdateAllowLikesPostMutation.graphql';
-import type { PostRendererBottomPanelUpdatePostAllowCommentsMutation } from '@azzapp/relay/artifacts/PostRendererBottomPanelUpdatePostAllowCommentsMutation.graphql';
+import type { PostRendererActionBar_post$key } from '#relayArtifacts/PostRendererActionBar_post.graphql';
+import type { PostRendererBottomPanelFragment_post$key } from '#relayArtifacts/PostRendererBottomPanelFragment_post.graphql';
+import type { PostRendererBottomPanelUpdateAllowLikesPostMutation } from '#relayArtifacts/PostRendererBottomPanelUpdateAllowLikesPostMutation.graphql';
+import type { PostRendererBottomPanelUpdatePostAllowCommentsMutation } from '#relayArtifacts/PostRendererBottomPanelUpdatePostAllowCommentsMutation.graphql';
 
 type PostRendererBottomPanelProps = {
   /**

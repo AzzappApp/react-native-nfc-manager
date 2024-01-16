@@ -3,8 +3,8 @@ import { Dimensions, StyleSheet } from 'react-native';
 import { graphql, usePaginationFragment } from 'react-relay';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
 import CoverList from '#components/CoverList';
-import type { CoverList_users$key } from '@azzapp/relay/artifacts/CoverList_users.graphql';
-import type { FollowingsMosaicScreenList_webCard$key } from '@azzapp/relay/artifacts/FollowingsMosaicScreenList_webCard.graphql';
+import type { CoverList_users$key } from '#relayArtifacts/CoverList_users.graphql';
+import type { FollowingsMosaicScreenList_webCard$key } from '#relayArtifacts/FollowingsMosaicScreenList_webCard.graphql';
 
 const FollowingsMosaicScreen = ({
   webCard,

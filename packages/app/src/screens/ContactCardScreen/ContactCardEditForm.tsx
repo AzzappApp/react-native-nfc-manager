@@ -26,8 +26,8 @@ import ContactCardEditModalPhones from './ContactCardEditModalPhones';
 import ContactCardEditModalSocials from './ContactCardEditModalSocials';
 import ContactCardEditModalUrls from './ContactCardEditModalUrls';
 import type { ImagePickerResult } from '#components/ImagePicker';
+import type { ContactCardEditModal_card$data } from '#relayArtifacts/ContactCardEditModal_card.graphql';
 import type { ContactCardEditFormValues } from './ContactCardEditModalSchema';
-import type { ContactCardEditModal_card$data } from '@azzapp/relay/artifacts/ContactCardEditModal_card.graphql';
 import type { ReactNode } from 'react';
 import type { Control, FieldErrors } from 'react-hook-form';
 

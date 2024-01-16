@@ -24,12 +24,12 @@ import IconButton from '#ui/IconButton';
 import Text from '#ui/Text';
 import type { ScreenOptions } from '#components/NativeRouter';
 import type { RelayScreenProps } from '#helpers/relayScreen';
-import type { PostRoute } from '#routes';
 import type {
   PostScreenFragment_relatedPosts$data,
   PostScreenFragment_relatedPosts$key,
-} from '@azzapp/relay/artifacts/PostScreenFragment_relatedPosts.graphql';
-import type { PostScreenQuery } from '@azzapp/relay/artifacts/PostScreenQuery.graphql';
+} from '#relayArtifacts/PostScreenFragment_relatedPosts.graphql';
+import type { PostScreenQuery } from '#relayArtifacts/PostScreenQuery.graphql';
+import type { PostRoute } from '#routes';
 import type { ForwardedRef } from 'react';
 import type { EdgeInsets } from 'react-native-safe-area-context';
 

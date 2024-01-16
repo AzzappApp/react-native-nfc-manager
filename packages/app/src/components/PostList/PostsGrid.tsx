@@ -15,7 +15,7 @@ import useScrollToTopInterceptor from '#hooks/useScrollToTopInterceptor/useScrol
 import type {
   PostsGrid_posts$data,
   PostsGrid_posts$key,
-} from '@azzapp/relay/artifacts/PostsGrid_posts.graphql';
+} from '#relayArtifacts/PostsGrid_posts.graphql';
 import type { ArrayItemType } from '@azzapp/shared/arrayHelpers';
 import type { ReactNode } from 'react';
 import type { StyleProp, ViewStyle, LayoutChangeEvent } from 'react-native';

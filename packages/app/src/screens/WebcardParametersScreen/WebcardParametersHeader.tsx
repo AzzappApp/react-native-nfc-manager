@@ -1,7 +1,7 @@
 import { useIntl } from 'react-intl';
 import AccountHeader from '#components/AccountHeader';
 import Text from '#ui/Text';
-import type { AccountHeader_webCard$key } from '@azzapp/relay/artifacts/AccountHeader_webCard.graphql';
+import type { AccountHeader_webCard$key } from '#relayArtifacts/AccountHeader_webCard.graphql';
 
 const WebcardParametersHeader = ({
   webCard,

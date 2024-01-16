@@ -2,8 +2,8 @@ const path = require('path');
 const { createTransformer } = require('babel-jest');
 
 const relayArtifactDirectory = path.join(
-  path.dirname(require.resolve('@azzapp/relay/package.json')),
-  'artifacts',
+  path.dirname(require.resolve('@azzapp/app/package.json')),
+  'src/relayArtifacts',
 );
 module.exports = createTransformer({
   presets: ['module:@react-native/babel-preset'],

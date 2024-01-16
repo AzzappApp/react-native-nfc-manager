@@ -16,7 +16,7 @@ import {
   useVariantStyleSheet,
 } from '#helpers/createStyles';
 import Text from '#ui/Text';
-import type { HomeStatisticsChart_profiles$key } from '@azzapp/relay/artifacts/HomeStatisticsChart_profiles.graphql';
+import type { HomeStatisticsChart_profiles$key } from '#relayArtifacts/HomeStatisticsChart_profiles.graphql';
 import type { SharedValue } from 'react-native-reanimated';
 
 type HomeStatisticsChartProps = {

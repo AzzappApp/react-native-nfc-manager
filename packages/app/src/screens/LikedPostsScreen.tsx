@@ -11,9 +11,9 @@ import relayScreen from '#helpers/relayScreen';
 import Header from '#ui/Header';
 import IconButton from '#ui/IconButton';
 import type { RelayScreenProps } from '#helpers/relayScreen';
+import type { LikedPostsScreen_profile$key } from '#relayArtifacts/LikedPostsScreen_profile.graphql';
+import type { LikedPostsScreenQuery } from '#relayArtifacts/LikedPostsScreenQuery.graphql';
 import type { LikedPostsRoute } from '#routes';
-import type { LikedPostsScreen_profile$key } from '@azzapp/relay/artifacts/LikedPostsScreen_profile.graphql';
-import type { LikedPostsScreenQuery } from '@azzapp/relay/artifacts/LikedPostsScreenQuery.graphql';
 
 const likedPostsScreenQuery = graphql`
   query LikedPostsScreenQuery {

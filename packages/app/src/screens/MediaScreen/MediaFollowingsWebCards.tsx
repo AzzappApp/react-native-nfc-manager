@@ -6,8 +6,8 @@ import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
 import CoverList from '#components/CoverList';
 import Link from '#components/Link';
 import Button from '#ui/Button';
-import type { CoverList_users$key } from '@azzapp/relay/artifacts/CoverList_users.graphql';
-import type { MediaFollowingsWebCards_webCard$key } from '@azzapp/relay/artifacts/MediaFollowingsWebCards_webCard.graphql';
+import type { CoverList_users$key } from '#relayArtifacts/CoverList_users.graphql';
+import type { MediaFollowingsWebCards_webCard$key } from '#relayArtifacts/MediaFollowingsWebCards_webCard.graphql';
 import type { StyleProp, ViewStyle } from 'react-native';
 
 type MediaFollowingsWebCardsProps = {

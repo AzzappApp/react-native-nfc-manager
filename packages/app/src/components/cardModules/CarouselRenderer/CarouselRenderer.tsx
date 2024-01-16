@@ -14,7 +14,7 @@ import CardModuleBackground from '../CardModuleBackground';
 import type {
   CarouselRenderer_module$data,
   CarouselRenderer_module$key,
-} from '@azzapp/relay/artifacts/CarouselRenderer_module.graphql';
+} from '#relayArtifacts/CarouselRenderer_module.graphql';
 import type { CardStyle, ColorPalette } from '@azzapp/shared/cardHelpers';
 import type { NullableFields } from '@azzapp/shared/objectHelpers';
 import type { ViewProps } from 'react-native';
@@ -26,14 +26,8 @@ const CarouselRendererFragment = graphql`
   fragment CarouselRenderer_module on CardModuleCarousel
   @inline
   @argumentDefinitions(
-    screenWidth: {
-      type: "Float!"
-      provider: "../providers/ScreenWidth.relayprovider"
-    }
-    pixelRatio: {
-      type: "Float!"
-      provider: "../providers/PixelRatio.relayprovider"
-    }
+    screenWidth: { type: "Float!", provider: "ScreenWidth.relayprovider" }
+    pixelRatio: { type: "Float!", provider: "PixelRatio.relayprovider" }
   ) {
     images {
       id

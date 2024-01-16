@@ -1,10 +1,5 @@
-const path = require('path');
 const { withSentryConfig } = require('@sentry/nextjs');
 const { createVanillaExtractPlugin } = require('@vanilla-extract/next-plugin');
-const relayArtifactDirectory = path.join(
-  path.dirname(require.resolve('@azzapp/relay/package.json')),
-  'artifacts',
-);
 
 const withVanillaExtract = createVanillaExtractPlugin({
   identifiers: 'short',
@@ -37,14 +32,6 @@ const config = {
     tsconfigPath: './tsconfig.next.json',
     ignoreBuildErrors: true,
   },
-  compiler: {
-    relay: {
-      src: './src',
-      artifactDirectory: relayArtifactDirectory,
-      language: 'typescript',
-      eagerEsModules: false,
-    },
-  },
   headers() {
     return [
       {
@@ -67,7 +54,7 @@ const config = {
     // ],
     windowHistorySupport: true,
   },
-  transpilePackages: ['@azzapp/shared/', '@azzapp/data', '@azzapp/relay'],
+  transpilePackages: ['@azzapp/shared/', '@azzapp/data'],
 };
 
 module.exports = withSentryConfig(

@@ -23,7 +23,7 @@ import Header from '#ui/Header';
 import IconButton from '#ui/IconButton';
 import Text from '#ui/Text';
 import CoverRenderer from './CoverRenderer';
-import type { ShakeShareScreenQuery } from '@azzapp/relay/artifacts/ShakeShareScreenQuery.graphql';
+import type { ShakeShareScreenQuery } from '#relayArtifacts/ShakeShareScreenQuery.graphql';
 
 const ShakeShare = () => {
   const { viewer } = useLazyLoadQuery<ShakeShareScreenQuery>(

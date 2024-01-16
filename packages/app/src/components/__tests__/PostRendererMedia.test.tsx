@@ -7,7 +7,7 @@ import {
 import { createMockEnvironment, MockPayloadGenerator } from 'relay-test-utils';
 import PostRendererMedia from '#components/PostList/PostRendererMedia';
 import type { PostRendererMediaProps } from '#components/PostList/PostRendererMedia';
-import type { PostRendererMediaTestQuery } from '@azzapp/relay/artifacts/PostRendererMediaTestQuery.graphql';
+import type { PostRendererMediaTestQuery } from '#relayArtifacts/PostRendererMediaTestQuery.graphql';
 
 const renderPost = (props?: Partial<PostRendererMediaProps>) => {
   const environement = createMockEnvironment();

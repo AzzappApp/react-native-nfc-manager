@@ -7,8 +7,8 @@ import { createMockEnvironment, MockPayloadGenerator } from 'relay-test-utils';
 import { act, fireEvent, render, screen } from '#helpers/testHelpers';
 import PostRendererActionBar from '../PostList/PostRendererActionBar';
 import type { PostRendererMediaProps } from '#components/PostList/PostRendererMedia';
+import type { PostRendererActionBarTestQuery } from '#relayArtifacts/PostRendererActionBarTestQuery.graphql';
 import type { PostRendererActionBarProps } from '../PostList/PostRendererActionBar';
-import type { PostRendererActionBarTestQuery } from '@azzapp/relay/artifacts/PostRendererActionBarTestQuery.graphql';
 
 const mockRouter = {
   push: jest.fn(),

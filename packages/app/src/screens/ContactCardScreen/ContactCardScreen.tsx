@@ -41,9 +41,9 @@ import Text from '#ui/Text';
 import ContactCardEditModal from './ContactCardEditModal';
 import ContactCardExportVcf from './ContactCardExportVcf';
 import type { RelayScreenProps } from '#helpers/relayScreen';
+import type { AccountHeader_webCard$key } from '#relayArtifacts/AccountHeader_webCard.graphql';
+import type { ContactCardScreenQuery } from '#relayArtifacts/ContactCardScreenQuery.graphql';
 import type { ContactCardRoute } from '#routes';
-import type { AccountHeader_webCard$key } from '@azzapp/relay/artifacts/AccountHeader_webCard.graphql';
-import type { ContactCardScreenQuery } from '@azzapp/relay/artifacts/ContactCardScreenQuery.graphql';
 import type { LayoutChangeEvent } from 'react-native';
 
 const contactCardMobileScreenQuery = graphql`

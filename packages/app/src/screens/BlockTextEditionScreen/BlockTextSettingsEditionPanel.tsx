@@ -14,8 +14,8 @@ import AlignmentButton from '#ui/AlignmentButton';
 import FontDropDownPicker from '#ui/FontDropDownPicker';
 import LabeledDashedSlider from '#ui/LabeledDashedSlider';
 import TitleWithLine from '#ui/TitleWithLine';
-import type { BlockTextSettingsEditionPanel_webCard$key } from '@azzapp/relay/artifacts/BlockTextSettingsEditionPanel_webCard.graphql';
-import type { TextAlignment } from '@azzapp/relay/artifacts/PhotoWithTextAndTitleRenderer_module.graphql';
+import type { BlockTextSettingsEditionPanel_webCard$key } from '#relayArtifacts/BlockTextSettingsEditionPanel_webCard.graphql';
+import type { TextAlignment } from '#relayArtifacts/PhotoWithTextAndTitleRenderer_module.graphql';
 import type { ViewProps } from 'react-native';
 
 type BlockTextSettingsEditionPanelProps = ViewProps & {
@@ -118,7 +118,7 @@ const BlockTextSettingsEditionPanel = ({
             bottomSheetHeight={bottomSheetHeight}
           />
           <WebCardColorDropDownPicker
-            webCard={webCard}
+            webCard={webCard ?? null}
             color={fontColor}
             onColorChange={onFontColorChange}
             bottomSheetHeight={bottomSheetHeight}

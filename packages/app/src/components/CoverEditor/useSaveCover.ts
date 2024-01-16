@@ -25,16 +25,16 @@ import { uploadMedia, uploadSign } from '#helpers/MobileWebAPI';
 import useLatestCallback from '#hooks/useLatestCallback';
 import type { EditionParameters } from '#components/gpu';
 import type { ExportImageOptions } from '#components/gpu/GPUHelpers';
+import type { useSaveCover_webCard$key } from '#relayArtifacts/useSaveCover_webCard.graphql';
+import type {
+  SaveCoverInput,
+  useSaveCoverMutation,
+} from '#relayArtifacts/useSaveCoverMutation.graphql';
 import type {
   CoverStyleData,
   MaskMedia,
   SourceMedia,
 } from './coverEditorTypes';
-import type { useSaveCover_webCard$key } from '@azzapp/relay/artifacts/useSaveCover_webCard.graphql';
-import type {
-  SaveCoverInput,
-  useSaveCoverMutation,
-} from '@azzapp/relay/artifacts/useSaveCoverMutation.graphql';
 import type { ColorPalette } from '@azzapp/shared/cardHelpers';
 
 const useSaveCover = (

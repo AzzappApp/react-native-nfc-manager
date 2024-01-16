@@ -28,12 +28,12 @@ import WebCardBoundRelayEnvironmentProvider from '#helpers/WebCardBoundRelayEnvi
 import CarouselSelectList from '#ui/CarouselSelectList';
 import Icon from '#ui/Icon';
 import PressableOpacity from '#ui/PressableOpacity';
-import type { CarouselSelectListHandle } from '#ui/CarouselSelectList';
 import type {
   HomeProfilesCarousel_user$key,
   HomeProfilesCarousel_user$data,
-} from '@azzapp/relay/artifacts/HomeProfilesCarousel_user.graphql';
-import type { HomeProfilesCarouselItem_profile$key } from '@azzapp/relay/artifacts/HomeProfilesCarouselItem_profile.graphql';
+} from '#relayArtifacts/HomeProfilesCarousel_user.graphql';
+import type { HomeProfilesCarouselItem_profile$key } from '#relayArtifacts/HomeProfilesCarouselItem_profile.graphql';
+import type { CarouselSelectListHandle } from '#ui/CarouselSelectList';
 import type { ArrayItemType } from '@azzapp/shared/arrayHelpers';
 import type { ForwardedRef } from 'react';
 import type { GestureResponderEvent, ListRenderItemInfo } from 'react-native';

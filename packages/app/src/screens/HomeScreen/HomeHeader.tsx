@@ -13,7 +13,7 @@ import { getTextColor } from '@azzapp/shared/colorsHelpers';
 import { colors } from '#theme';
 import Header from '#ui/Header';
 import IconButton from '#ui/IconButton';
-import type { HomeHeader_user$key } from '@azzapp/relay/artifacts/HomeHeader_user.graphql';
+import type { HomeHeader_user$key } from '#relayArtifacts/HomeHeader_user.graphql';
 import type { ColorValue, StyleProp, ViewStyle } from 'react-native';
 import type { SharedValue } from 'react-native-reanimated';
 

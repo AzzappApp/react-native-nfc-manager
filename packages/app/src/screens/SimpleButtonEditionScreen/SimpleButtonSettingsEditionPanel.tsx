@@ -20,8 +20,8 @@ import FontDropDownPicker from '#ui/FontDropDownPicker';
 import LabeledDashedSlider from '#ui/LabeledDashedSlider';
 import TabsBar from '#ui/TabsBar';
 import TextInput from '#ui/TextInput';
+import type { SimpleButtonSettingsEditionPanel_webCard$key } from '#relayArtifacts/SimpleButtonSettingsEditionPanel_webCard.graphql';
 import type { CountryCodeListOption } from '#ui/CountryCodeListWithOptions';
-import type { SimpleButtonSettingsEditionPanel_webCard$key } from '@azzapp/relay/artifacts/SimpleButtonSettingsEditionPanel_webCard.graphql';
 import type { CountryCode } from 'libphonenumber-js';
 import type { ViewProps } from 'react-native';
 
@@ -267,7 +267,7 @@ const SimpleButtonSettingsEditionPanel = ({
             bottomSheetHeight={bottomSheetHeight}
           />
           <WebCardColorDropDownPicker
-            webCard={webCard}
+            webCard={webCard ?? null}
             color={fontColor}
             onColorChange={onFontColorChange}
             bottomSheetHeight={bottomSheetHeight}

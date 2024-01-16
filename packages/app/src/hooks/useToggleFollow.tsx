@@ -6,7 +6,7 @@ import useAuthState from './useAuthState';
 import type {
   useToggleFollowMutation,
   useToggleFollowMutation$data,
-} from '@azzapp/relay/artifacts/useToggleFollowMutation.graphql';
+} from '#relayArtifacts/useToggleFollowMutation.graphql';
 import type { RecordSourceSelectorProxy, RecordProxy } from 'relay-runtime';
 
 const propagateFollowUpdateInProfileList = (

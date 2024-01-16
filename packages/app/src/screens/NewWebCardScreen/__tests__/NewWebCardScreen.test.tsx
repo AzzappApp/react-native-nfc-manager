@@ -10,14 +10,14 @@ describe('CoverEditionScreen', () => {
 // import { Suspense } from 'react';
 // import * as ReactRelay from 'react-relay';
 // import { MockPayloadGenerator, createMockEnvironment } from 'relay-test-utils';
-// import NewProfileScreenQueryNode from '@azzapp/relay/artifacts/NewProfileScreenQuery.graphql';
+// import NewProfileScreenQueryNode from '#relayArtifacts/NewProfileScreenQuery.graphql';
 // import ERRORS from '@azzapp/shared/errors';
 // import { flushPromises } from '@azzapp/shared/jestHelpers';
 // import { dispatchGlobalEvent } from '#helpers/globalEvents';
 // import { createProfile } from '#helpers/MobileWebAPI';
 // import { act, fireEvent, render, screen } from '#helpers/testHelpers';
 // import { NewProfileScreen } from '../NewProfileScreen';
-// import type { NewProfileScreenQuery } from '@azzapp/relay/artifacts/NewProfileScreenQuery.graphql';
+// import type { NewProfileScreenQuery } from '#relayArtifacts/NewProfileScreenQuery.graphql';
 // import type { RelayMockEnvironment } from 'relay-test-utils/lib/RelayModernMockEnvironment';
 
 // jest.mock('react-native/Libraries/Animated/NativeAnimatedHelper');

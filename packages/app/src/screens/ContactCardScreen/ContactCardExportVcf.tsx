@@ -5,7 +5,7 @@ import { graphql, useFragment } from 'react-relay';
 import { formatDisplayName } from '@azzapp/shared/stringHelpers';
 import { buildVCard } from '@azzapp/shared/vCardHelpers';
 import Button from '#ui/Button';
-import type { ContactCardExportVcf_card$key } from '@azzapp/relay/artifacts/ContactCardExportVcf_card.graphql';
+import type { ContactCardExportVcf_card$key } from '#relayArtifacts/ContactCardExportVcf_card.graphql';
 import type { ContactCard } from '@azzapp/shared/contactCardHelpers';
 
 export type ContactCardExportVcfProps = {

@@ -18,9 +18,9 @@ import SearchResultProfiles, {
   SearchResultProfilesPlaceHolder,
   searchResultProfilesQuery,
 } from './SearchResultProfiles';
-import type { SearchResultGlobalQuery } from '@azzapp/relay/artifacts/SearchResultGlobalQuery.graphql';
-import type { SearchResultPostsQuery } from '@azzapp/relay/artifacts/SearchResultPostsQuery.graphql';
-import type { SearchResultProfilesQuery } from '@azzapp/relay/artifacts/SearchResultProfilesQuery.graphql';
+import type { SearchResultGlobalQuery } from '#relayArtifacts/SearchResultGlobalQuery.graphql';
+import type { SearchResultPostsQuery } from '#relayArtifacts/SearchResultPostsQuery.graphql';
+import type { SearchResultProfilesQuery } from '#relayArtifacts/SearchResultProfilesQuery.graphql';
 import type {
   NavigationState,
   SceneRendererProps,

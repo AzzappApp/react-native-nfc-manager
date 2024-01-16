@@ -18,7 +18,7 @@ import CardModuleBackground from './CardModuleBackground';
 import type {
   BlockTextRenderer_module$data,
   BlockTextRenderer_module$key,
-} from '@azzapp/relay/artifacts/BlockTextRenderer_module.graphql';
+} from '#relayArtifacts/BlockTextRenderer_module.graphql';
 import type { CardStyle, ColorPalette } from '@azzapp/shared/cardHelpers';
 import type { NullableFields } from '@azzapp/shared/objectHelpers';
 

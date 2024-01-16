@@ -14,8 +14,8 @@ import AlignmentButton from '#ui/AlignmentButton';
 import FontDropDownPicker from '#ui/FontDropDownPicker';
 import LabeledDashedSlider from '#ui/LabeledDashedSlider';
 import TabsBar from '#ui/TabsBar';
-import type { TextAlignment } from '@azzapp/relay/artifacts/PhotoWithTextAndTitleRenderer_module.graphql';
-import type { PhotoWithTextAndTitleSettingsEditionPanel_webCard$key } from '@azzapp/relay/artifacts/PhotoWithTextAndTitleSettingsEditionPanel_webCard.graphql';
+import type { TextAlignment } from '#relayArtifacts/PhotoWithTextAndTitleRenderer_module.graphql';
+import type { PhotoWithTextAndTitleSettingsEditionPanel_webCard$key } from '#relayArtifacts/PhotoWithTextAndTitleSettingsEditionPanel_webCard.graphql';
 import type { ViewProps } from 'react-native';
 
 type PhotoWithTextAndTitleSettingsEditionPanelProps = ViewProps & {
@@ -196,7 +196,7 @@ const PhotoWithTextAndTitleSettingsEditionPanel = ({
             bottomSheetHeight={bottomSheetHeight}
           />
           <WebCardColorDropDownPicker
-            webCard={webCard}
+            webCard={webCard ?? null}
             color={currentTab === 'title' ? titleFontColor : contentFontColor}
             onColorChange={
               currentTab === 'title'

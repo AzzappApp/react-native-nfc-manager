@@ -10,19 +10,17 @@ import ActivityIndicator from '#ui/ActivityIndicator';
 import { BUTTON_HEIGHT } from '#ui/Button';
 import Text from '#ui/Text';
 import type { CoverEditorHandle } from '#components/CoverEditor/CoverEditor';
-import type { CoverEditionStepQuery } from '@azzapp/relay/artifacts/CoverEditionStepQuery.graphql';
-import type { WebCardKind } from '@azzapp/relay/artifacts/NewWebCardScreenQuery.graphql';
+import type { CoverEditionStepQuery } from '#relayArtifacts/CoverEditionStepQuery.graphql';
 import type { ForwardedRef } from 'react';
 
 type CoverEditionStepProps = {
-  webCardKind: WebCardKind;
   height: number;
   onCoverSaved: () => void;
   setCanSave: (value: boolean) => void;
 };
 
 const CoverEditionStep = (
-  { webCardKind, height, onCoverSaved, setCanSave }: CoverEditionStepProps,
+  { height, onCoverSaved, setCanSave }: CoverEditionStepProps,
   forwardRef: ForwardedRef<CoverEditorHandle>,
 ) => {
   const data = useLazyLoadQuery<CoverEditionStepQuery>(
@@ -36,9 +34,7 @@ const CoverEditionStep = (
         }
       }
     `,
-    {
-      initialTemplateKind: webCardKind === 'business' ? 'others' : 'people',
-    },
+    {},
   );
 
   const insets = useScreenInsets();

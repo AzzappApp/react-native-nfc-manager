@@ -18,14 +18,14 @@ import WebcardParametersHeader from './WebcardParametersHeader';
 import WebcardParametersNameForm from './WebcardParametersNameForm';
 import WebcardParametersScreenFallback from './WebcardParametersScreenFallback';
 import type { RelayScreenProps } from '#helpers/relayScreen';
-import type { WebcardParametersRoute } from '#routes';
-import type { WebcardParametersScreenMutation } from '@azzapp/relay/artifacts/WebcardParametersScreenMutation.graphql';
-import type { WebcardParametersScreenPublishMutation } from '@azzapp/relay/artifacts/WebcardParametersScreenPublishMutation.graphql';
+import type { WebcardParametersScreenMutation } from '#relayArtifacts/WebcardParametersScreenMutation.graphql';
+import type { WebcardParametersScreenPublishMutation } from '#relayArtifacts/WebcardParametersScreenPublishMutation.graphql';
 import type {
   WebcardParametersScreenQuery,
   WebcardParametersScreenQuery$data,
-} from '@azzapp/relay/artifacts/WebcardParametersScreenQuery.graphql';
-import type { WebcardParametersScreenUnPublishMutation } from '@azzapp/relay/artifacts/WebcardParametersScreenUnPublishMutation.graphql';
+} from '#relayArtifacts/WebcardParametersScreenQuery.graphql';
+import type { WebcardParametersScreenUnPublishMutation } from '#relayArtifacts/WebcardParametersScreenUnPublishMutation.graphql';
+import type { WebcardParametersRoute } from '#routes';
 import type { ArrayItemType } from '@azzapp/shared/arrayHelpers';
 
 const webcardParametersScreenQuery = graphql`

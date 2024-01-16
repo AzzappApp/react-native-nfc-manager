@@ -1,7 +1,7 @@
 import { useIntl } from 'react-intl';
 import { graphql, useFragment } from 'react-relay';
 import EditorLayerSelectorPanel from '#components/EditorLayerSelectorPanel';
-import type { CECForegroundPanel_viewer$key } from '@azzapp/relay/artifacts/CECForegroundPanel_viewer.graphql';
+import type { CECForegroundPanel_viewer$key } from '#relayArtifacts/CECForegroundPanel_viewer.graphql';
 import type { ColorPalette } from '@azzapp/shared/cardHelpers';
 import type { StyleProp, ViewStyle } from 'react-native';
 

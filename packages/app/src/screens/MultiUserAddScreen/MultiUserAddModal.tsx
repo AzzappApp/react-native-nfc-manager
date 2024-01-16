@@ -21,10 +21,10 @@ import Container from '#ui/Container';
 import Header from '#ui/Header';
 import Text from '#ui/Text';
 import MultiUserAddForm from './MultiUserAddForm';
+import type { MultiUserAddModal_InviteUserMutation } from '#relayArtifacts/MultiUserAddModal_InviteUserMutation.graphql';
+import type { MultiUserAddModal_webCard$key } from '#relayArtifacts/MultiUserAddModal_webCard.graphql';
 import type { ContactCardEditFormValues } from '#screens/ContactCardScreen/ContactCardEditModalSchema';
 import type { MultiUserAddFormValues } from './MultiUserAddForm';
-import type { MultiUserAddModal_InviteUserMutation } from '@azzapp/relay/artifacts/MultiUserAddModal_InviteUserMutation.graphql';
-import type { MultiUserAddModal_webCard$key } from '@azzapp/relay/artifacts/MultiUserAddModal_webCard.graphql';
 import type { ForwardedRef } from 'react';
 import type { Control } from 'react-hook-form';
 

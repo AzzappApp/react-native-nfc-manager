@@ -24,11 +24,11 @@ import WizardTransitioner from './WizardTransitioner';
 import type { CardTemplatelistHandle } from '#components/CardTemplateList';
 import type { CoverEditorHandle } from '#components/CoverEditor/CoverEditor';
 import type { RelayScreenProps } from '#helpers/relayScreen';
+import type { NewWebCardScreenPreloadQuery } from '#relayArtifacts/NewWebCardScreenPreloadQuery.graphql';
+import type { NewWebCardScreenQuery } from '#relayArtifacts/NewWebCardScreenQuery.graphql';
+import type { NewWebCardScreenWithWebCardQuery } from '#relayArtifacts/NewWebCardScreenWithWebCardQuery.graphql';
 import type { NewWebCardRoute } from '#routes';
 import type { ProfileFormHandle } from './WebCardForm';
-import type { NewWebCardScreenPreloadQuery } from '@azzapp/relay/artifacts/NewWebCardScreenPreloadQuery.graphql';
-import type { NewWebCardScreenQuery } from '@azzapp/relay/artifacts/NewWebCardScreenQuery.graphql';
-import type { NewWebCardScreenWithWebCardQuery } from '@azzapp/relay/artifacts/NewWebCardScreenWithWebCardQuery.graphql';
 
 const newWebCardScreenQuery = graphql`
   query NewWebCardScreenQuery {
@@ -234,7 +234,6 @@ export const NewWebCardScreen = ({
             webCardId={webCardInfo.webCardId}
           >
             <CoverEditionStep
-              webCardKind={webCardKind!}
               height={contentHeight}
               setCanSave={setCanSave}
               onCoverSaved={onCoverSaved}

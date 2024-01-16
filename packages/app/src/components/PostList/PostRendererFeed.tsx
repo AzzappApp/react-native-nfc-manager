@@ -6,7 +6,7 @@ import AuthorCartouche from '#components/AuthorCartouche';
 
 import PostRendererMedia from './PostRendererMedia';
 import type { MediaVideoRendererHandle } from '#components/medias';
-import type { PostRendererFeedFragment_post$key } from '@azzapp/relay/artifacts/PostRendererFeedFragment_post.graphql';
+import type { PostRendererFeedFragment_post$key } from '#relayArtifacts/PostRendererFeedFragment_post.graphql';
 import type { ForwardedRef } from 'react';
 import type { ViewProps, HostComponent } from 'react-native';
 

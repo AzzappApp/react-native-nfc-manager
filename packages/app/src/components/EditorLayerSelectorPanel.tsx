@@ -9,8 +9,8 @@ import ColorPicker from '#ui/ColorPicker';
 import ColorPreview from '#ui/ColorPreview';
 import TabsBar from '#ui/TabsBar';
 import { useWebCardColors } from './WebCardColorPicker';
+import type { StaticMediaList_staticMedias$key } from '#relayArtifacts/StaticMediaList_staticMedias.graphql';
 import type { WebCardColorsBoundsComponentProps } from './WebCardColorPicker';
-import type { StaticMediaList_staticMedias$key } from '@azzapp/relay/artifacts/StaticMediaList_staticMedias.graphql';
 import type { ColorPalette } from '@azzapp/shared/cardHelpers';
 import type { ViewProps } from 'react-native';
 

@@ -4,7 +4,6 @@ import { useIntl } from 'react-intl';
 import { StyleSheet } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { graphql, useFragment, useMutation } from 'react-relay';
-import { type SimpleTextEditionScreenUpdateModuleMutation } from '@azzapp/relay/artifacts/SimpleTextEditionScreenUpdateModuleMutation.graphql';
 import {
   SIMPLE_TEXT_DEFAULT_VALUES,
   SIMPLE_TITLE_DEFAULT_VALUES,
@@ -16,6 +15,7 @@ import {
 import { useRouter } from '#components/NativeRouter';
 import useEditorLayout from '#hooks/useEditorLayout';
 import useModuleDataEditor from '#hooks/useModuleDataEditor';
+import { type SimpleTextEditionScreenUpdateModuleMutation } from '#relayArtifacts/SimpleTextEditionScreenUpdateModuleMutation.graphql';
 import { BOTTOM_MENU_HEIGHT } from '#ui/BottomMenu';
 import Container from '#ui/Container';
 import Header from '#ui/Header';
@@ -27,8 +27,8 @@ import SimpleTextEditionBottomMenu from './SimpleTextEditionBottomMenu';
 import SimpleTextMarginEditionPanel from './SimpleTextMarginsEditionPanel';
 import SimpleTextPreview from './SimpleTextPreview';
 import SimpleTextStyleEditionPanel from './SimpleTextStyleEditionPanel';
-import type { SimpleTextEditionScreen_module$key } from '@azzapp/relay/artifacts/SimpleTextEditionScreen_module.graphql';
-import type { SimpleTextEditionScreen_viewer$key } from '@azzapp/relay/artifacts/SimpleTextEditionScreen_viewer.graphql';
+import type { SimpleTextEditionScreen_module$key } from '#relayArtifacts/SimpleTextEditionScreen_module.graphql';
+import type { SimpleTextEditionScreen_viewer$key } from '#relayArtifacts/SimpleTextEditionScreen_viewer.graphql';
 import type { ViewProps } from 'react-native';
 
 export type SimpleTextEditionScreenProps = ViewProps & {

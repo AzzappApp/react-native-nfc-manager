@@ -63,10 +63,10 @@ import WebCardScreenPublishHelper from './WebCardScreenPublishHelper';
 import { WebCardScreenTransitionsProvider } from './WebCardScreenTransitions';
 import type { ScreenOptions } from '#components/NativeRouter';
 import type { RelayScreenProps } from '#helpers/relayScreen';
+import type { WebCardScreenByIdQuery } from '#relayArtifacts/WebCardScreenByIdQuery.graphql';
+import type { WebCardScreenByUserNameQuery } from '#relayArtifacts/WebCardScreenByUserNameQuery.graphql';
 import type { WebCardRoute } from '#routes';
 import type { CardFlipSwitchRef } from './CardFlipSwitch';
-import type { WebCardScreenByIdQuery } from '@azzapp/relay/artifacts/WebCardScreenByIdQuery.graphql';
-import type { WebCardScreenByUserNameQuery } from '@azzapp/relay/artifacts/WebCardScreenByUserNameQuery.graphql';
 import type { ModuleKind } from '@azzapp/shared/cardModuleHelpers';
 import type { Disposable } from 'react-relay';
 

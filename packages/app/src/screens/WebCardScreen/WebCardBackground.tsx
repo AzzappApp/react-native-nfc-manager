@@ -9,7 +9,7 @@ import {
 } from 'react-native-svg';
 import { graphql, useFragment } from 'react-relay';
 import { DEFAULT_COLOR_PALETTE } from '@azzapp/shared/cardHelpers';
-import type { WebCardBackground_webCard$key } from '@azzapp/relay/artifacts/WebCardBackground_webCard.graphql';
+import type { WebCardBackground_webCard$key } from '#relayArtifacts/WebCardBackground_webCard.graphql';
 
 const WebCardBackground = ({
   webCard: webCardKey,

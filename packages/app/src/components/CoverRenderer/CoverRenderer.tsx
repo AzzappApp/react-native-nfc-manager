@@ -29,7 +29,7 @@ import { MediaImageRenderer, MediaVideoRenderer } from '../medias';
 import CoverStaticMediaLayer from './CoverStaticMediaLayer';
 import CoverTextRenderer from './CoverTextRenderer';
 import MediaAnimator from './MediaAnimator';
-import type { CoverRenderer_webCard$key } from '@azzapp/relay/artifacts/CoverRenderer_webCard.graphql';
+import type { CoverRenderer_webCard$key } from '#relayArtifacts/CoverRenderer_webCard.graphql';
 import type { ForwardedRef } from 'react';
 import type { StyleProp, ViewStyle } from 'react-native';
 
@@ -89,17 +89,11 @@ const CoverRenderer = (
       graphql`
         fragment CoverRenderer_webCard on WebCard
         @argumentDefinitions(
-          screenWidth: {
-            type: "Float!"
-            provider: "../providers/ScreenWidth.relayprovider"
-          }
-          pixelRatio: {
-            type: "Float!"
-            provider: "../providers/PixelRatio.relayprovider"
-          }
+          screenWidth: { type: "Float!", provider: "ScreenWidth.relayprovider" }
+          pixelRatio: { type: "Float!", provider: "PixelRatio.relayprovider" }
           cappedPixelRatio: {
             type: "Float!"
-            provider: "../providers/CappedPixelRatio.relayprovider"
+            provider: "CappedPixelRatio.relayprovider"
           }
         ) {
           id

@@ -16,7 +16,7 @@ import Icon from '#ui/Icon';
 import IconButton from '#ui/IconButton';
 import Text from '#ui/Text';
 import type { CardTemplatelistHandle } from '#components/CardTemplateList';
-import type { LoadCardTemplateModal_profile$key } from '@azzapp/relay/artifacts/LoadCardTemplateModal_profile.graphql';
+import type { LoadCardTemplateModal_profile$key } from '#relayArtifacts/LoadCardTemplateModal_profile.graphql';
 
 type LoadCardTemplateModalProps = {
   onClose: () => void;

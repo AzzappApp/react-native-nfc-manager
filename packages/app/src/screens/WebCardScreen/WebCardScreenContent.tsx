@@ -29,11 +29,11 @@ import WebCardScreenFooter from './WebCardScreenFooter';
 import WebCardScreenHeader from './WebCardScreenHeader';
 import WebCardScreenScrollView from './WebCardScreenScrollView';
 import { useEditTransition } from './WebCardScreenTransitions';
+import type { WebCardScreenContent_webCard$key } from '#relayArtifacts/WebCardScreenContent_webCard.graphql';
 import type {
   WebCardBodyHandle,
   ModuleSelectionInfos,
 } from './WebCardScreenBody';
-import type { WebCardScreenContent_webCard$key } from '@azzapp/relay/artifacts/WebCardScreenContent_webCard.graphql';
 import type { ModuleKind } from '@azzapp/shared/cardModuleHelpers';
 import type { NativeScrollEvent, NativeSyntheticEvent } from 'react-native';
 

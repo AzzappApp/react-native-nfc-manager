@@ -24,7 +24,7 @@ import Button from '#ui/Button';
 import ColorChooser from '#ui/ColorPicker/ColorChooser';
 import Text from '#ui/Text';
 import ColorTriptychChooser from './ColorTriptychChooser';
-import type { WebCardColorPicker_webCard$key } from '@azzapp/relay/artifacts/WebCardColorPicker_webCard.graphql';
+import type { WebCardColorPicker_webCard$key } from '#relayArtifacts/WebCardColorPicker_webCard.graphql';
 import type { StoreUpdater, OptimisticUpdateFunction } from 'relay-runtime';
 
 export type ColorPickerProps = {

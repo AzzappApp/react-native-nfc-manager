@@ -12,7 +12,7 @@ import WebCardColorPicker from '#components/WebCardColorPicker';
 import ColorPreview from '#ui/ColorPreview';
 import LabeledDashedSlider from '#ui/LabeledDashedSlider';
 import TabsBar from '#ui/TabsBar';
-import type { SimpleButtonBordersEditionPanel_webCard$key } from '@azzapp/relay/artifacts/SimpleButtonBordersEditionPanel_webCard.graphql';
+import type { SimpleButtonBordersEditionPanel_webCard$key } from '#relayArtifacts/SimpleButtonBordersEditionPanel_webCard.graphql';
 import type { ViewProps } from 'react-native';
 
 type SimpleButtonBordersEditionPanelProps = ViewProps & {

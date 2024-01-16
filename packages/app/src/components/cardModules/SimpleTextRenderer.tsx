@@ -14,11 +14,11 @@ import CardModuleBackground from './CardModuleBackground';
 import type {
   SimpleTextRenderer_simpleTextModule$data,
   SimpleTextRenderer_simpleTextModule$key,
-} from '@azzapp/relay/artifacts/SimpleTextRenderer_simpleTextModule.graphql';
+} from '#relayArtifacts/SimpleTextRenderer_simpleTextModule.graphql';
 import type {
   SimpleTextRenderer_simpleTitleModule$data,
   SimpleTextRenderer_simpleTitleModule$key,
-} from '@azzapp/relay/artifacts/SimpleTextRenderer_simpleTitleModule.graphql';
+} from '#relayArtifacts/SimpleTextRenderer_simpleTitleModule.graphql';
 import type { CardStyle, ColorPalette } from '@azzapp/shared/cardHelpers';
 import type { NullableFields } from '@azzapp/shared/objectHelpers';
 import type { StyleProp, TextStyle, ViewProps } from 'react-native';

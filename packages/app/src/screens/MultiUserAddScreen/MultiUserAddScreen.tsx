@@ -19,13 +19,13 @@ import Text from '#ui/Text';
 import MultiUserAddList from './MultiUserAddList';
 import MultiUserAddModal from './MultiUserAddModal';
 import type { RelayScreenProps } from '#helpers/relayScreen';
+import type { MultiUserAddScreen_FindContactsQuery as Query } from '#relayArtifacts/MultiUserAddScreen_FindContactsQuery.graphql';
+import type { MultiUserAddScreenQuery } from '#relayArtifacts/MultiUserAddScreenQuery.graphql';
 import type { MultiUserAddRoute } from '#routes';
 import type {
   AssociatedUser,
   MultiUserAddModalActions,
 } from './MultiUserAddModal';
-import type { MultiUserAddScreen_FindContactsQuery as Query } from '@azzapp/relay/artifacts/MultiUserAddScreen_FindContactsQuery.graphql';
-import type { MultiUserAddScreenQuery } from '@azzapp/relay/artifacts/MultiUserAddScreenQuery.graphql';
 
 export type Contact = {
   lastName: string;

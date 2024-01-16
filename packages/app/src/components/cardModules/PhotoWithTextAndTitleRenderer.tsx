@@ -11,7 +11,7 @@ import CardModuleBackground from './CardModuleBackground';
 import type {
   PhotoWithTextAndTitleRenderer_module$data,
   PhotoWithTextAndTitleRenderer_module$key,
-} from '@azzapp/relay/artifacts/PhotoWithTextAndTitleRenderer_module.graphql';
+} from '#relayArtifacts/PhotoWithTextAndTitleRenderer_module.graphql';
 import type { CardStyle, ColorPalette } from '@azzapp/shared/cardHelpers';
 import type { NullableFields } from '@azzapp/shared/objectHelpers';
 import type {
@@ -26,14 +26,8 @@ const PhotoWithTextAndTitleRendererFragment = graphql`
   fragment PhotoWithTextAndTitleRenderer_module on CardModulePhotoWithTextAndTitle
   @inline
   @argumentDefinitions(
-    screenWidth: {
-      type: "Float!"
-      provider: "../providers/ScreenWidth.relayprovider"
-    }
-    pixelRatio: {
-      type: "Float!"
-      provider: "../providers/PixelRatio.relayprovider"
-    }
+    screenWidth: { type: "Float!", provider: "ScreenWidth.relayprovider" }
+    pixelRatio: { type: "Float!", provider: "PixelRatio.relayprovider" }
   ) {
     image {
       id

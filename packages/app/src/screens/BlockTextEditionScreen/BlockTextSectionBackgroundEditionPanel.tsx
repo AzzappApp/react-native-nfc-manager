@@ -3,7 +3,7 @@ import { useIntl } from 'react-intl';
 import { StyleSheet, View } from 'react-native';
 import { useFragment, graphql } from 'react-relay';
 import { WebCardBoundEditorLayerSelectorPanel } from '#components/EditorLayerSelectorPanel';
-import type { BlockTextSectionBackgroundEditionPanel_viewer$key } from '@azzapp/relay/artifacts/BlockTextSectionBackgroundEditionPanel_viewer.graphql';
+import type { BlockTextSectionBackgroundEditionPanel_viewer$key } from '#relayArtifacts/BlockTextSectionBackgroundEditionPanel_viewer.graphql';
 import type { ViewProps } from 'react-native';
 
 type BackgroundStyle = {

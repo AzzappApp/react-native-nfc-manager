@@ -9,9 +9,9 @@ import Icon from '#ui/Icon';
 import PressableNative from '#ui/PressableNative';
 import SwipeableRow, { SwipeableRowRightAction } from '#ui/SwipeableRow';
 import CommentItem from './CommentItem';
+import type { CommentItemFragment_comment$key } from '#relayArtifacts/CommentItemFragment_comment.graphql';
+import type { DeletableCommentItemDeleteCommentMutation } from '#relayArtifacts/DeletableCommentItemDeleteCommentMutation.graphql';
 import type { SwipeableRowActionsProps } from '#ui/SwipeableRow';
-import type { CommentItemFragment_comment$key } from '@azzapp/relay/artifacts/CommentItemFragment_comment.graphql';
-import type { DeletableCommentItemDeleteCommentMutation } from '@azzapp/relay/artifacts/DeletableCommentItemDeleteCommentMutation.graphql';
 type DeletableCommentItemProps = {
   item: CommentItemFragment_comment$key;
   postId: string;

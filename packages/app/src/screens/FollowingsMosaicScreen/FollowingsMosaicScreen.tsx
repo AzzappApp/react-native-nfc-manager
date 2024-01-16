@@ -10,8 +10,8 @@ import Header from '#ui/Header';
 import IconButton from '#ui/IconButton';
 import FollowingsMosaicScreenList from './FollowingsMosaicScreenList';
 import type { RelayScreenProps } from '#helpers/relayScreen';
+import type { FollowingsMosaicScreenQuery } from '#relayArtifacts/FollowingsMosaicScreenQuery.graphql';
 import type { FollowingsRoute } from '#routes';
-import type { FollowingsMosaicScreenQuery } from '@azzapp/relay/artifacts/FollowingsMosaicScreenQuery.graphql';
 import type { PreloadedQuery } from 'react-relay';
 
 const followingsMosaicScreenQuery = graphql`

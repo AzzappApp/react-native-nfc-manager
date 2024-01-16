@@ -11,7 +11,7 @@ import CoverLink from './CoverLink';
 import type {
   CoverList_users$data,
   CoverList_users$key,
-} from '@azzapp/relay/artifacts/CoverList_users.graphql';
+} from '#relayArtifacts/CoverList_users.graphql';
 import type { ArrayItemType } from '@azzapp/shared/arrayHelpers';
 import type { ListRenderItemInfo, StyleProp, ViewStyle } from 'react-native';
 

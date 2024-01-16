@@ -17,8 +17,8 @@ import Icon from '#ui/Icon';
 import PressableNative from '#ui/PressableNative';
 import Text from '#ui/Text';
 import type { RelayScreenProps } from '#helpers/relayScreen';
+import type { InviteFriendsScreenQuery } from '#relayArtifacts/InviteFriendsScreenQuery.graphql';
 import type { InviteFriendsRoute } from '#routes';
-import type { InviteFriendsScreenQuery } from '@azzapp/relay/artifacts/InviteFriendsScreenQuery.graphql';
 
 const inviteFriendsScreenQuery = graphql`
   query InviteFriendsScreenQuery {

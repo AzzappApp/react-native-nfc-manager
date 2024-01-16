@@ -26,17 +26,17 @@ import HomeContactCard from './HomeContactCard';
 import HomeInformations from './HomeInformations';
 import HomeMenu, { HOME_MENU_HEIGHT } from './HomeMenu';
 import HomeStatistics from './HomeStatistics';
-import type { HOME_TAB } from './HomeMenu';
-import type { HomeBottomPanel_profiles$key } from '@azzapp/relay/artifacts/HomeBottomPanel_profiles.graphql';
-import type { HomeBottomPanel_user$key } from '@azzapp/relay/artifacts/HomeBottomPanel_user.graphql';
-import type { HomeBottomPanelAcceptInvitationMutation } from '@azzapp/relay/artifacts/HomeBottomPanelAcceptInvitationMutation.graphql';
-import type { HomeBottomPanelAcceptOwnershipMutation } from '@azzapp/relay/artifacts/HomeBottomPanelAcceptOwnershipMutation.graphql';
+import type { HomeBottomPanel_profiles$key } from '#relayArtifacts/HomeBottomPanel_profiles.graphql';
+import type { HomeBottomPanel_user$key } from '#relayArtifacts/HomeBottomPanel_user.graphql';
+import type { HomeBottomPanelAcceptInvitationMutation } from '#relayArtifacts/HomeBottomPanelAcceptInvitationMutation.graphql';
+import type { HomeBottomPanelAcceptOwnershipMutation } from '#relayArtifacts/HomeBottomPanelAcceptOwnershipMutation.graphql';
 import type {
   HomeBottomPanelDeclineInvitationMutation,
   HomeBottomPanelDeclineInvitationMutation$data,
-} from '@azzapp/relay/artifacts/HomeBottomPanelDeclineInvitationMutation.graphql';
-import type { HomeBottomPanelDeclineOwnershipMutation } from '@azzapp/relay/artifacts/HomeBottomPanelDeclineOwnershipMutation.graphql';
-import type { HomeBottomPanelPublishMutation } from '@azzapp/relay/artifacts/HomeBottomPanelPublishMutation.graphql';
+} from '#relayArtifacts/HomeBottomPanelDeclineInvitationMutation.graphql';
+import type { HomeBottomPanelDeclineOwnershipMutation } from '#relayArtifacts/HomeBottomPanelDeclineOwnershipMutation.graphql';
+import type { HomeBottomPanelPublishMutation } from '#relayArtifacts/HomeBottomPanelPublishMutation.graphql';
+import type { HOME_TAB } from './HomeMenu';
 import type { SharedValue } from 'react-native-reanimated';
 import type { SelectorStoreUpdater } from 'relay-runtime';
 

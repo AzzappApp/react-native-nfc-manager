@@ -32,9 +32,9 @@ import CarouselEditionMarginPanel from './CarouselEditionMarginPanel';
 import CarouselImagesEditionPanel from './CarouselImagesEditionPanel';
 import CarouselPreview from './CarouselPreview';
 import type { ImagePickerResult } from '#components/ImagePicker';
-import type { CarouselEditionScreen_module$key } from '@azzapp/relay/artifacts/CarouselEditionScreen_module.graphql';
-import type { CarouselEditionScreen_viewer$key } from '@azzapp/relay/artifacts/CarouselEditionScreen_viewer.graphql';
-import type { CarouselEditionScreenUpdateModuleMutation } from '@azzapp/relay/artifacts/CarouselEditionScreenUpdateModuleMutation.graphql';
+import type { CarouselEditionScreen_module$key } from '#relayArtifacts/CarouselEditionScreen_module.graphql';
+import type { CarouselEditionScreen_viewer$key } from '#relayArtifacts/CarouselEditionScreen_viewer.graphql';
+import type { CarouselEditionScreenUpdateModuleMutation } from '#relayArtifacts/CarouselEditionScreenUpdateModuleMutation.graphql';
 import type { ViewProps } from 'react-native';
 import type { Observable } from 'relay-runtime';
 
@@ -61,14 +61,8 @@ const CarouselEditionScreen = ({
     graphql`
       fragment CarouselEditionScreen_module on CardModuleCarousel
       @argumentDefinitions(
-        screenWidth: {
-          type: "Float!"
-          provider: "../providers/ScreenWidth.relayprovider"
-        }
-        pixelRatio: {
-          type: "Float!"
-          provider: "../providers/PixelRatio.relayprovider"
-        }
+        screenWidth: { type: "Float!", provider: "ScreenWidth.relayprovider" }
+        pixelRatio: { type: "Float!", provider: "PixelRatio.relayprovider" }
       ) {
         id
         images {

@@ -36,9 +36,9 @@ import TextInput from '#ui/TextInput';
 import type {
   WebCardForm_webCardCategory$data,
   WebCardForm_webCardCategory$key,
-} from '@azzapp/relay/artifacts/WebCardForm_webCardCategory.graphql';
-import type { WebCardFormMutation } from '@azzapp/relay/artifacts/WebCardFormMutation.graphql';
-import type { WebCardFormQuery } from '@azzapp/relay/artifacts/WebCardFormQuery.graphql';
+} from '#relayArtifacts/WebCardForm_webCardCategory.graphql';
+import type { WebCardFormMutation } from '#relayArtifacts/WebCardFormMutation.graphql';
+import type { WebCardFormQuery } from '#relayArtifacts/WebCardFormQuery.graphql';
 import type { ArrayItemType } from '@azzapp/shared/arrayHelpers';
 import type { ForwardedRef } from 'react';
 import type { TextInput as RNTextInput } from 'react-native';

@@ -6,7 +6,7 @@ import PressableNative from '#ui/PressableNative';
 import Text from '#ui/Text';
 import CoverRenderer from './CoverRenderer';
 import { useRouter } from './NativeRouter';
-import type { AccountHeader_webCard$key } from '@azzapp/relay/artifacts/AccountHeader_webCard.graphql';
+import type { AccountHeader_webCard$key } from '#relayArtifacts/AccountHeader_webCard.graphql';
 
 const COVER_WIDTH = 29;
 

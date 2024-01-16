@@ -4,7 +4,7 @@ import { StyleSheet, View } from 'react-native';
 
 import { useFragment, graphql } from 'react-relay';
 import { WebCardBoundEditorLayerSelectorPanel } from '#components/EditorLayerSelectorPanel';
-import type { PhotoWithTextAndTitleBackgroundEditionPanel_viewer$key } from '@azzapp/relay/artifacts/PhotoWithTextAndTitleBackgroundEditionPanel_viewer.graphql';
+import type { PhotoWithTextAndTitleBackgroundEditionPanel_viewer$key } from '#relayArtifacts/PhotoWithTextAndTitleBackgroundEditionPanel_viewer.graphql';
 import type { ViewProps } from 'react-native';
 
 type BackgroundStyle = {

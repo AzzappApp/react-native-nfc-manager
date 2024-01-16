@@ -12,7 +12,7 @@ import CardModuleBackground from './CardModuleBackground';
 import type {
   SimpleButtonRenderer_module$data,
   SimpleButtonRenderer_module$key,
-} from '@azzapp/relay/artifacts/SimpleButtonRenderer_module.graphql';
+} from '#relayArtifacts/SimpleButtonRenderer_module.graphql';
 import type { CardStyle, ColorPalette } from '@azzapp/shared/cardHelpers';
 import type { NullableFields } from '@azzapp/shared/objectHelpers';
 import type { StyleProp, ViewProps, ViewStyle } from 'react-native';

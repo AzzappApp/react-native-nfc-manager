@@ -22,7 +22,7 @@ import {
 } from './CommonInformationSchema';
 import CommonInformationSocials from './CommonInformationSocials';
 import CommonInformationUrls from './CommonInformationUrls';
-import type { CommonInformationForm_data$key } from '@azzapp/relay/artifacts/CommonInformationForm_data.graphql';
+import type { CommonInformationForm_data$key } from '#relayArtifacts/CommonInformationForm_data.graphql';
 
 export type CommonInformationFormProps = {
   commonInfoFormIsOpened: boolean;

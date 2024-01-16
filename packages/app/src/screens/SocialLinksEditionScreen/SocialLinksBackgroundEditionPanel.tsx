@@ -3,7 +3,7 @@ import { useIntl } from 'react-intl';
 import { StyleSheet, View } from 'react-native';
 import { useFragment, graphql } from 'react-relay';
 import { WebCardBoundEditorLayerSelectorPanel } from '#components/EditorLayerSelectorPanel';
-import type { SocialLinksBackgroundEditionPanel_viewer$key } from '@azzapp/relay/artifacts/SocialLinksBackgroundEditionPanel_viewer.graphql';
+import type { SocialLinksBackgroundEditionPanel_viewer$key } from '#relayArtifacts/SocialLinksBackgroundEditionPanel_viewer.graphql';
 import type { ViewProps } from 'react-native';
 
 type BackgroundStyle = {

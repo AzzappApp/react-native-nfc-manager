@@ -9,7 +9,7 @@ import {
 import type {
   LineDividerRenderer_module$data,
   LineDividerRenderer_module$key,
-} from '@azzapp/relay/artifacts/LineDividerRenderer_module.graphql';
+} from '#relayArtifacts/LineDividerRenderer_module.graphql';
 import type { CardStyle, ColorPalette } from '@azzapp/shared/cardHelpers';
 import type { NullableFields } from '@azzapp/shared/objectHelpers';
 import type {

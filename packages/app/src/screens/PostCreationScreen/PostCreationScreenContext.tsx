@@ -1,5 +1,5 @@
 import { createContext } from 'react';
-import type { AuthorCartoucheFragment_webCard$key } from '@azzapp/relay/artifacts/AuthorCartoucheFragment_webCard.graphql';
+import type { AuthorCartoucheFragment_webCard$key } from '#relayArtifacts/AuthorCartoucheFragment_webCard.graphql';
 
 type PostCreationState = {
   allowLikes: boolean;

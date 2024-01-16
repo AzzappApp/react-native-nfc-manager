@@ -28,7 +28,7 @@
     "csv42": "5.0.0"
   },
   "devDependencies": {
-    "@types/relay-runtime": "^14.1.12",
+    "@types/relay-runtime": "^14.1.22",
     "@types/validator": "^13.11.1",
     "@types/chroma-js": "^2.4.3"
   }

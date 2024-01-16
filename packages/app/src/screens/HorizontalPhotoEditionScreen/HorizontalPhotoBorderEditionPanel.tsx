@@ -12,7 +12,7 @@ import WebCardColorPicker from '#components/WebCardColorPicker';
 import ColorPreview from '#ui/ColorPreview';
 import LabeledDashedSlider from '#ui/LabeledDashedSlider';
 import TabsBar from '#ui/TabsBar';
-import type { HorizontalPhotoBorderEditionPanel_webCard$key } from '@azzapp/relay/artifacts/HorizontalPhotoBorderEditionPanel_webCard.graphql';
+import type { HorizontalPhotoBorderEditionPanel_webCard$key } from '#relayArtifacts/HorizontalPhotoBorderEditionPanel_webCard.graphql';
 import type { ViewProps } from 'react-native-svg/lib/typescript/fabric/utils';
 
 type HorizontalPhotoBorderEditionPanelProps = ViewProps & {

@@ -10,7 +10,7 @@ import ActivityIndicator from '#ui/ActivityIndicator';
 import Container from '#ui/Container';
 import Header, { HEADER_HEIGHT } from '#ui/Header';
 import IconButton from '#ui/IconButton';
-import type { PreviewModal_webCard$key } from '@azzapp/relay/artifacts/PreviewModal_webCard.graphql';
+import type { PreviewModal_webCard$key } from '#relayArtifacts/PreviewModal_webCard.graphql';
 
 type PreviewModalProps = {
   webCard: PreviewModal_webCard$key;

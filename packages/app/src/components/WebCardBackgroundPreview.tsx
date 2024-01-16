@@ -6,7 +6,7 @@ import {
   MODULES_STYLES_VALUES,
   getModuleDataValues,
 } from '@azzapp/shared/cardModuleHelpers';
-import type { WebCardBackgroundPreview_webCard$key } from '@azzapp/relay/artifacts/WebCardBackgroundPreview_webCard.graphql';
+import type { WebCardBackgroundPreview_webCard$key } from '#relayArtifacts/WebCardBackgroundPreview_webCard.graphql';
 import type { CardStyle } from '@azzapp/shared/cardHelpers';
 import type { ModuleKind } from '@azzapp/shared/cardModuleHelpers';
 import type { ViewProps } from 'react-native-svg/lib/typescript/fabric/utils';

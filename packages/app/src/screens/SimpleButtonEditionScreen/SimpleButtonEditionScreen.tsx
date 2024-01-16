@@ -24,12 +24,12 @@ import SimpleButtonEditionBottomMenu from './SimpleButtonEditionBottomMenu';
 import SimpleButtonMarginsEditionPanel from './SimpleButtonMarginsEditionPanel';
 import SimpleButtonPreview from './SimpleButtonPreview';
 import SimpleButtonSettingsEditionPanel from './SimpleButtonSettingsEditionPanel';
-import type { SimpleButtonEditionScreen_module$key } from '@azzapp/relay/artifacts/SimpleButtonEditionScreen_module.graphql';
-import type { SimpleButtonEditionScreen_viewer$key } from '@azzapp/relay/artifacts/SimpleButtonEditionScreen_viewer.graphql';
+import type { SimpleButtonEditionScreen_module$key } from '#relayArtifacts/SimpleButtonEditionScreen_module.graphql';
+import type { SimpleButtonEditionScreen_viewer$key } from '#relayArtifacts/SimpleButtonEditionScreen_viewer.graphql';
 import type {
   SimpleButtonEditionScreenUpdateModuleMutation,
   SaveSimpleButtonModuleInput,
-} from '@azzapp/relay/artifacts/SimpleButtonEditionScreenUpdateModuleMutation.graphql';
+} from '#relayArtifacts/SimpleButtonEditionScreenUpdateModuleMutation.graphql';
 import type { CountryCode } from 'libphonenumber-js';
 import type { ViewProps } from 'react-native';
 

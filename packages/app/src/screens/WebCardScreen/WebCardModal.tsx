@@ -15,7 +15,7 @@ import Icon from '#ui/Icon';
 import IconButton from '#ui/IconButton';
 import PressableNative from '#ui/PressableNative';
 import Text from '#ui/Text';
-import type { WebCardModal_webCard$key } from '@azzapp/relay/artifacts/WebCardModal_webCard.graphql';
+import type { WebCardModal_webCard$key } from '#relayArtifacts/WebCardModal_webCard.graphql';
 
 type WebCardModalProps = {
   close: () => void;

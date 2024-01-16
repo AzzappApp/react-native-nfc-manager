@@ -32,9 +32,9 @@ import Text from '#ui/Text';
 import CommentItem from './CommentItem';
 import DeletableCommentItem from './DeletableCommentItem';
 import PostCommentsScreenHeader from './PostCommentsScreenHeader';
-import type { AuthorCartoucheFragment_webCard$key } from '@azzapp/relay/artifacts/AuthorCartoucheFragment_webCard.graphql';
-import type { CommentItemFragment_comment$key } from '@azzapp/relay/artifacts/CommentItemFragment_comment.graphql';
-import type { PostCommentsList_comments$key } from '@azzapp/relay/artifacts/PostCommentsList_comments.graphql';
+import type { AuthorCartoucheFragment_webCard$key } from '#relayArtifacts/AuthorCartoucheFragment_webCard.graphql';
+import type { CommentItemFragment_comment$key } from '#relayArtifacts/CommentItemFragment_comment.graphql';
+import type { PostCommentsList_comments$key } from '#relayArtifacts/PostCommentsList_comments.graphql';
 import type {
   NativeSyntheticEvent,
   TextInputContentSizeChangeEventData,

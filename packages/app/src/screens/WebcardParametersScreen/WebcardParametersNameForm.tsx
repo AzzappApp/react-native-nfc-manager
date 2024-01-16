@@ -18,7 +18,7 @@ import BottomSheetModal from '#ui/BottomSheetModal';
 import Button from '#ui/Button';
 import Text from '#ui/Text';
 import TextInput from '#ui/TextInput';
-import type { WebcardParametersNameFormQuery } from '@azzapp/relay/artifacts/WebcardParametersNameFormQuery.graphql';
+import type { WebcardParametersNameFormQuery } from '#relayArtifacts/WebcardParametersNameFormQuery.graphql';
 import type { GraphQLError } from 'graphql';
 
 const userNameFormSchema = z.object({

@@ -1,7 +1,7 @@
 import { graphql, useFragment } from 'react-relay';
 import CoverLinkRenderer from './CoverLinkRenderer';
+import type { CoverLink_webCard$key } from '#relayArtifacts/CoverLink_webCard.graphql';
 import type { CoverLinkRendererProps } from './coverLinkTypes';
-import type { CoverLink_webCard$key } from '@azzapp/relay/artifacts/CoverLink_webCard.graphql';
 
 export type CoverLinkProps = Omit<
   CoverLinkRendererProps,

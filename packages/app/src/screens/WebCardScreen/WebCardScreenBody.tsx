@@ -24,14 +24,14 @@ import CardModuleRenderer from '#components/cardModules/CardModuleRenderer';
 import { useModulesData } from '#components/cardModules/ModuleData';
 import { createId } from '#helpers/idHelpers';
 import WebCardBlockContainer from './WebCardBlockContainer';
-import type { WebCardScreenBody_webCard$key } from '@azzapp/relay/artifacts/WebCardScreenBody_webCard.graphql';
-import type { WebCardScreenBodyDeleteModuleMutation } from '@azzapp/relay/artifacts/WebCardScreenBodyDeleteModuleMutation.graphql';
+import type { WebCardScreenBody_webCard$key } from '#relayArtifacts/WebCardScreenBody_webCard.graphql';
+import type { WebCardScreenBodyDeleteModuleMutation } from '#relayArtifacts/WebCardScreenBodyDeleteModuleMutation.graphql';
 import type {
   WebCardScreenBodyDuplicateModuleMutation,
   WebCardScreenBodyDuplicateModuleMutation$data,
-} from '@azzapp/relay/artifacts/WebCardScreenBodyDuplicateModuleMutation.graphql';
-import type { WebCardScreenBodySwapModulesMutation } from '@azzapp/relay/artifacts/WebCardScreenBodySwapModulesMutation.graphql';
-import type { WebCardScreenBodyUpdateModulesVisibilityMutation } from '@azzapp/relay/artifacts/WebCardScreenBodyUpdateModulesVisibilityMutation.graphql';
+} from '#relayArtifacts/WebCardScreenBodyDuplicateModuleMutation.graphql';
+import type { WebCardScreenBodySwapModulesMutation } from '#relayArtifacts/WebCardScreenBodySwapModulesMutation.graphql';
+import type { WebCardScreenBodyUpdateModulesVisibilityMutation } from '#relayArtifacts/WebCardScreenBodyUpdateModulesVisibilityMutation.graphql';
 import type { ModuleKind } from '@azzapp/shared/cardModuleHelpers';
 import type { ForwardedRef } from 'react';
 import type { Disposable } from 'react-relay';

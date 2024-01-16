@@ -10,8 +10,8 @@ import Link from '#components/Link';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import WebCardBoundRelayEnvironmentProvider from '#helpers/WebCardBoundRelayEnvironmentProvider';
 import PressableNative from '#ui/PressableNative';
-import type { HomeContactCard_profile$key } from '@azzapp/relay/artifacts/HomeContactCard_profile.graphql';
-import type { HomeContactCard_user$key } from '@azzapp/relay/artifacts/HomeContactCard_user.graphql';
+import type { HomeContactCard_profile$key } from '#relayArtifacts/HomeContactCard_profile.graphql';
+import type { HomeContactCard_user$key } from '#relayArtifacts/HomeContactCard_user.graphql';
 import type { SharedValue } from 'react-native-reanimated';
 
 type HomeContactCardProps = {

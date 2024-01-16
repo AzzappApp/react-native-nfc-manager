@@ -13,8 +13,8 @@ import {
   getDatabaseConnectionsInfos,
   startDatabaseConnectionMonitoring,
 } from '@azzapp/data/domains/databaseMonitorer';
-import queryMap from '@azzapp/relay/query-map.json';
 import ERRORS from '@azzapp/shared/errors';
+import queryMap from '#persisted-query-map.json';
 import { getSessionData } from '#helpers/tokens';
 import packageJSON from '../../../../package.json';
 import type { GraphQLContext } from '@azzapp/data';

@@ -8,12 +8,12 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
 import { graphql, useFragment, useMutation } from 'react-relay';
 import { Observable } from 'relay-runtime';
-import { get as CappedPixelRatio } from '@azzapp/relay/providers/CappedPixelRatio.relayprovider';
 import { encodeMediaId } from '@azzapp/shared/imagesHelpers';
 import ScreenModal from '#components/ScreenModal';
 import { getFileName } from '#helpers/fileHelpers';
 import { addLocalCachedMediaFile } from '#helpers/mediaHelpers';
 import { uploadMedia, uploadSign } from '#helpers/MobileWebAPI';
+import { get as CappedPixelRatio } from '#relayProviders/CappedPixelRatio.relayprovider';
 import Button from '#ui/Button';
 import Container from '#ui/Container';
 import Header from '#ui/Header';
@@ -21,8 +21,8 @@ import UploadProgressModal from '#ui/UploadProgressModal';
 
 import ContactCardEditForm from './ContactCardEditForm';
 import { contactCardEditSchema } from './ContactCardEditModalSchema';
+import type { ContactCardEditModal_card$key } from '#relayArtifacts/ContactCardEditModal_card.graphql';
 import type { ContactCardEditFormValues } from './ContactCardEditModalSchema';
-import type { ContactCardEditModal_card$key } from '@azzapp/relay/artifacts/ContactCardEditModal_card.graphql';
 
 export type ContactCardEditModalProps = {
   visible: boolean;
@@ -44,7 +44,7 @@ const ContactCardEditModal = ({
       @argumentDefinitions(
         pixelRatio: {
           type: "Float!"
-          provider: "../providers/CappedPixelRatio.relayprovider"
+          provider: "CappedPixelRatio.relayprovider"
         }
       ) {
         webCard {

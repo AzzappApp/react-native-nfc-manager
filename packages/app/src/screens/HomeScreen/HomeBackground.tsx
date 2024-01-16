@@ -16,8 +16,8 @@ import {
 import { graphql, useFragment } from 'react-relay';
 import { colors } from '#theme';
 import useMultiActorEnvironmentPluralFragment from '#hooks/useMultiActorEnvironmentPluralFragment';
-import type { HomeBackground_user$key } from '@azzapp/relay/artifacts/HomeBackground_user.graphql';
-import type { HomeBackground_webCardColors$key } from '@azzapp/relay/artifacts/HomeBackground_webCardColors.graphql';
+import type { HomeBackground_user$key } from '#relayArtifacts/HomeBackground_user.graphql';
+import type { HomeBackground_webCardColors$key } from '#relayArtifacts/HomeBackground_webCardColors.graphql';
 import type { SharedValue } from 'react-native-reanimated';
 
 type HomeBackgroundProps = {

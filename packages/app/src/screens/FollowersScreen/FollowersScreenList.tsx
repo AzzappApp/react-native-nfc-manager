@@ -10,8 +10,8 @@ import useAuthState from '#hooks/useAuthState';
 import type {
   FollowersScreenList_removeFollowerMutation,
   FollowersScreenList_removeFollowerMutation$data,
-} from '@azzapp/relay/artifacts/FollowersScreenList_removeFollowerMutation.graphql';
-import type { FollowersScreenList_webCard$key } from '@azzapp/relay/artifacts/FollowersScreenList_webCard.graphql';
+} from '#relayArtifacts/FollowersScreenList_removeFollowerMutation.graphql';
+import type { FollowersScreenList_webCard$key } from '#relayArtifacts/FollowersScreenList_webCard.graphql';
 import type { RecordSourceSelectorProxy } from 'relay-runtime';
 
 type FollowersListProps = {

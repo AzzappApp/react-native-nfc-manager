@@ -25,8 +25,8 @@ import PostRendererBottomPanel, {
 } from './PostRendererBottomPanel';
 import PostRendererMedia from './PostRendererMedia';
 import type { MediaVideoRendererHandle } from '#components/medias';
-import type { PostRendererFragment_author$key } from '@azzapp/relay/artifacts/PostRendererFragment_author.graphql';
-import type { PostRendererFragment_post$key } from '@azzapp/relay/artifacts/PostRendererFragment_post.graphql';
+import type { PostRendererFragment_author$key } from '#relayArtifacts/PostRendererFragment_author.graphql';
+import type { PostRendererFragment_post$key } from '#relayArtifacts/PostRendererFragment_post.graphql';
 import type { ForwardedRef } from 'react';
 import type { ViewProps, HostComponent } from 'react-native';
 

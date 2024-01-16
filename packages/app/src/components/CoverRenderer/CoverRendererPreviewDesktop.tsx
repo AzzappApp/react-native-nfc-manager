@@ -1,12 +1,12 @@
 import { Image } from 'expo-image';
 import { Platform, StyleSheet, View, useWindowDimensions } from 'react-native';
 import { useFragment } from 'react-relay';
-import CoverRendererFragment from '@azzapp/relay/artifacts/CoverRenderer_webCard.graphql';
 import { swapColor } from '@azzapp/shared/cardHelpers';
 import { COVER_BASE_WIDTH, COVER_RATIO } from '@azzapp/shared/coverHelpers';
 import { MediaImageRenderer } from '#components/medias';
+import CoverRendererFragment from '#relayArtifacts/CoverRenderer_webCard.graphql';
 import CoverRenderer from './CoverRenderer';
-import type { CoverRenderer_webCard$key } from '@azzapp/relay/artifacts/CoverRenderer_webCard.graphql';
+import type { CoverRenderer_webCard$key } from '#relayArtifacts/CoverRenderer_webCard.graphql';
 import type { ViewProps } from 'react-native-svg/lib/typescript/fabric/utils';
 
 export type CoverRendererPreviewDesktopProps = ViewProps & {

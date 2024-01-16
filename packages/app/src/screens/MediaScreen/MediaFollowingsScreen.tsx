@@ -10,8 +10,8 @@ import { useDebounce } from 'use-debounce';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
 import PostsGrid from '#components/PostList/PostsGrid';
 import ListLoadingFooter from '#ui/ListLoadingFooter';
-import type { MediaFollowingsScreen_webCard$key } from '@azzapp/relay/artifacts/MediaFollowingsScreen_webCard.graphql';
-import type { PostsGrid_posts$key } from '@azzapp/relay/artifacts/PostsGrid_posts.graphql';
+import type { MediaFollowingsScreen_webCard$key } from '#relayArtifacts/MediaFollowingsScreen_webCard.graphql';
+import type { PostsGrid_posts$key } from '#relayArtifacts/PostsGrid_posts.graphql';
 
 type MediaFollowingsScreenScreenProps = {
   webCard: MediaFollowingsScreen_webCard$key;

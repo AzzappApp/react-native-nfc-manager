@@ -25,12 +25,12 @@ import BlockTextPreview from './BlockTextPreview';
 import BlockTextSectionBackgroundEditionPanel from './BlockTextSectionBackgroundEditionPanel';
 import BlockTextSettingsEditionPanel from './BlockTextSettingsEditionPanel';
 import BlockTextTextBackgroundEditionPanel from './BlockTextTextBackgroundEditionPanel';
-import type { BlockTextEditionScreen_module$key } from '@azzapp/relay/artifacts/BlockTextEditionScreen_module.graphql';
-import type { BlockTextEditionScreen_viewer$key } from '@azzapp/relay/artifacts/BlockTextEditionScreen_viewer.graphql';
+import type { BlockTextEditionScreen_module$key } from '#relayArtifacts/BlockTextEditionScreen_module.graphql';
+import type { BlockTextEditionScreen_viewer$key } from '#relayArtifacts/BlockTextEditionScreen_viewer.graphql';
 import type {
   BlockTextEditionScreenUpdateModuleMutation,
   SaveBlockTextModuleInput,
-} from '@azzapp/relay/artifacts/BlockTextEditionScreenUpdateModuleMutation.graphql';
+} from '#relayArtifacts/BlockTextEditionScreenUpdateModuleMutation.graphql';
 import type { ViewProps } from 'react-native';
 
 export type BlockTextEditionScreenProps = ViewProps & {

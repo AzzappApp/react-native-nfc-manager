@@ -38,12 +38,12 @@ import CECToolBar from './CECToolBar';
 import useCoverEditorCustomLayout from './useCoverEditorCustomLayout';
 import type { EditionParameters } from '#components/gpu';
 import type { ImagePickerResult } from '#components/ImagePicker';
+import type { CoverEditorCustom_viewer$key } from '#relayArtifacts/CoverEditorCustom_viewer.graphql';
 import type {
   CoverStyleData,
   MaskMedia,
   SourceMedia,
 } from '../coverEditorTypes';
-import type { CoverEditorCustom_viewer$key } from '@azzapp/relay/artifacts/CoverEditorCustom_viewer.graphql';
 import type { ColorPalette } from '@azzapp/shared/cardHelpers';
 import type { StyleProp, ViewStyle } from 'react-native';
 

@@ -40,17 +40,17 @@ import PressableOpacity from '#ui/PressableOpacity';
 import PressableScaleHighlight from '#ui/PressableScaleHighlight';
 import CoverErrorRenderer from '../CoverErrorRenderer';
 import type { TimeRange } from '#components/ImagePicker/imagePickerTypes';
-import type { CarouselSelectListHandle } from '#ui/CarouselSelectList';
-import type { CoverStyleData, MediaInfos } from './coverEditorTypes';
-import type { CoverEditorTemplateList_templates$key } from '@azzapp/relay/artifacts/CoverEditorTemplateList_templates.graphql';
-import type { CoverEditorTemplateList_templatesOthers$key } from '@azzapp/relay/artifacts/CoverEditorTemplateList_templatesOthers.graphql';
-import type { CoverEditorTemplateList_templatesPeople$key } from '@azzapp/relay/artifacts/CoverEditorTemplateList_templatesPeople.graphql';
-import type { CoverEditorTemplateList_templatesVideos$key } from '@azzapp/relay/artifacts/CoverEditorTemplateList_templatesVideos.graphql';
-import type { CoverEditorTemplateList_viewer$key } from '@azzapp/relay/artifacts/CoverEditorTemplateList_viewer.graphql';
+import type { CoverEditorTemplateList_templates$key } from '#relayArtifacts/CoverEditorTemplateList_templates.graphql';
+import type { CoverEditorTemplateList_templatesOthers$key } from '#relayArtifacts/CoverEditorTemplateList_templatesOthers.graphql';
+import type { CoverEditorTemplateList_templatesPeople$key } from '#relayArtifacts/CoverEditorTemplateList_templatesPeople.graphql';
+import type { CoverEditorTemplateList_templatesVideos$key } from '#relayArtifacts/CoverEditorTemplateList_templatesVideos.graphql';
+import type { CoverEditorTemplateList_viewer$key } from '#relayArtifacts/CoverEditorTemplateList_viewer.graphql';
 import type {
   CoverEditorTemplateListItem_coverTemplate$key,
   CoverTemplateKind,
-} from '@azzapp/relay/artifacts/CoverEditorTemplateListItem_coverTemplate.graphql';
+} from '#relayArtifacts/CoverEditorTemplateListItem_coverTemplate.graphql';
+import type { CarouselSelectListHandle } from '#ui/CarouselSelectList';
+import type { CoverStyleData, MediaInfos } from './coverEditorTypes';
 import type { ColorPalette } from '@azzapp/shared/cardHelpers';
 import type { ListRenderItemInfo, ViewToken } from 'react-native';
 
@@ -172,7 +172,7 @@ const CoverEditorTemplateList = ({
           @argumentDefinitions(
             cappedPixelRatio: {
               type: "Float!"
-              provider: "../providers/CappedPixelRatio.relayprovider"
+              provider: "CappedPixelRatio.relayprovider"
             }
           ) {
             id

@@ -17,8 +17,8 @@ import AccountDetailsPasswordForm from './AccountDetailsPasswordForm';
 import AccountDetailsPhoneNumberForm from './AccountDetailsPhoneNumberForm';
 import AccountDetailsScreenFallback from './AccountDetailsScreenFallback';
 import type { RelayScreenProps } from '#helpers/relayScreen';
+import type { AccountDetailsScreenQuery } from '#relayArtifacts/AccountDetailsScreenQuery.graphql';
 import type { AccountDetailsRoute } from '#routes';
-import type { AccountDetailsScreenQuery } from '@azzapp/relay/artifacts/AccountDetailsScreenQuery.graphql';
 
 const accountDetailsScreenQuery = graphql`
   query AccountDetailsScreenQuery {

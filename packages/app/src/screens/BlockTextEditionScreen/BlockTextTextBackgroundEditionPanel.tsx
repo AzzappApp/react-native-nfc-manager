@@ -4,7 +4,7 @@ import { StyleSheet, View } from 'react-native';
 import { useFragment, graphql } from 'react-relay';
 import { WebCardBoundEditorLayerSelectorPanel } from '#components/EditorLayerSelectorPanel';
 import LabeledDashedSlider from '#ui/LabeledDashedSlider';
-import type { BlockTextTextBackgroundEditionPanel_viewer$key } from '@azzapp/relay/artifacts/BlockTextTextBackgroundEditionPanel_viewer.graphql';
+import type { BlockTextTextBackgroundEditionPanel_viewer$key } from '#relayArtifacts/BlockTextTextBackgroundEditionPanel_viewer.graphql';
 import type { ViewProps } from 'react-native';
 
 type BackgroundStyle = {

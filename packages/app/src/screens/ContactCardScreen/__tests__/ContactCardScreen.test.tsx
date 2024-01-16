@@ -3,11 +3,11 @@ import { Platform } from 'react-native';
 import { RelayEnvironmentProvider, loadQuery } from 'react-relay';
 import { MockPayloadGenerator } from 'relay-test-utils';
 import { createMockEnvironment } from 'relay-test-utils/lib/RelayModernMockEnvironment';
-import ContactCardScreenQueryNode from '@azzapp/relay/artifacts/ContactCardScreenQuery.graphql';
 import { getAppleWalletPass, getGoogleWalletPass } from '#helpers/MobileWebAPI';
 import { screen, render, fireEvent, act } from '#helpers/testHelpers';
+import ContactCardScreenQueryNode from '#relayArtifacts/ContactCardScreenQuery.graphql';
 import { ContactCardScreen } from '../ContactCardScreen';
-import type { ContactCardScreenQuery } from '@azzapp/relay/artifacts/ContactCardScreenQuery.graphql';
+import type { ContactCardScreenQuery } from '#relayArtifacts/ContactCardScreenQuery.graphql';
 import type { RelayMockEnvironment } from 'relay-test-utils/lib/RelayModernMockEnvironment';
 
 jest.mock('@reeq/react-native-passkit', () => ({

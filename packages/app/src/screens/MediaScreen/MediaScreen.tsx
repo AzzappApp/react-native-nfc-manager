@@ -18,8 +18,8 @@ import MediaFollowingsWebCards from './MediaFollowingsWebCards';
 import MediaSuggestionsScreen from './MediaSuggestionsScreen';
 import MediaSuggestionsWebCards from './MediaSuggestionsWebCards';
 import type { RelayScreenProps } from '#helpers/relayScreen';
+import type { MediaScreenQuery } from '#relayArtifacts/MediaScreenQuery.graphql';
 import type { MediaRoute } from '#routes';
-import type { MediaScreenQuery } from '@azzapp/relay/artifacts/MediaScreenQuery.graphql';
 import type { ReactElement } from 'react';
 
 type TAB = 'FOLLOWINGS' | 'MY_POSTS' | 'SUGGESTIONS';

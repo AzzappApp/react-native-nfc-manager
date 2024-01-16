@@ -5,8 +5,8 @@ import { useDebounce } from 'use-debounce';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
 import PostsGrid from '#components/PostList/PostsGrid';
 import ListLoadingFooter from '#ui/ListLoadingFooter';
-import type { MediaSuggestionsScreen_viewer$key } from '@azzapp/relay/artifacts/MediaSuggestionsScreen_viewer.graphql';
-import type { PostsGrid_posts$key } from '@azzapp/relay/artifacts/PostsGrid_posts.graphql';
+import type { MediaSuggestionsScreen_viewer$key } from '#relayArtifacts/MediaSuggestionsScreen_viewer.graphql';
+import type { PostsGrid_posts$key } from '#relayArtifacts/PostsGrid_posts.graphql';
 
 type MediaSuggestionsScreenProps = {
   viewer: MediaSuggestionsScreen_viewer$key;

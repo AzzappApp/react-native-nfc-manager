@@ -110,7 +110,6 @@ The differents packages of the application are located under the `packages` dire
 - [backoffice](./packages/backoffice/): contains the source code of the backoffice of the application.
 - [data](./packages/data/): contains the source code of the GraphQL API layer of the application.
 - [i18n](./packages/i18n/): contains the translation files and related definitions.
-- [relay](./packages/relay/): this is a special package that is meant to contains the relay-compiler generated artifacts.
 - [shared](./packages/shared/): contains helpers shared by all the packages of the application
 - [web](./packages/web/): a NextJS project responsible of the web version of the application and the API
 

@@ -37,12 +37,12 @@ import HorizontalPhotoMarginsEditionPanel from './HorizontalPhotoMarginsEditionP
 import HorizontalPhotoPreview from './HorizontalPhotoPreview';
 import HorizontalPhotoSettingsEditionPanel from './HorizontalPhotoSettingsEditionPanel';
 import type { ImagePickerResult } from '#components/ImagePicker';
-import type { HorizontalPhotoEditionScreen_module$key } from '@azzapp/relay/artifacts/HorizontalPhotoEditionScreen_module.graphql';
-import type { HorizontalPhotoEditionScreen_viewer$key } from '@azzapp/relay/artifacts/HorizontalPhotoEditionScreen_viewer.graphql';
+import type { HorizontalPhotoEditionScreen_module$key } from '#relayArtifacts/HorizontalPhotoEditionScreen_module.graphql';
+import type { HorizontalPhotoEditionScreen_viewer$key } from '#relayArtifacts/HorizontalPhotoEditionScreen_viewer.graphql';
 import type {
   HorizontalPhotoEditionScreenUpdateModuleMutation,
   SaveHorizontalPhotoModuleInput,
-} from '@azzapp/relay/artifacts/HorizontalPhotoEditionScreenUpdateModuleMutation.graphql';
+} from '#relayArtifacts/HorizontalPhotoEditionScreenUpdateModuleMutation.graphql';
 import type { ViewProps } from 'react-native';
 import type { Observable } from 'relay-runtime';
 
@@ -69,14 +69,8 @@ const HorizontalPhotoEditionScreen = ({
     graphql`
       fragment HorizontalPhotoEditionScreen_module on CardModuleHorizontalPhoto
       @argumentDefinitions(
-        pixelRatio: {
-          type: "Float!"
-          provider: "../providers/PixelRatio.relayprovider"
-        }
-        screenWidth: {
-          type: "Float!"
-          provider: "../providers/ScreenWidth.relayprovider"
-        }
+        pixelRatio: { type: "Float!", provider: "PixelRatio.relayprovider" }
+        screenWidth: { type: "Float!", provider: "ScreenWidth.relayprovider" }
       ) {
         id
         borderWidth

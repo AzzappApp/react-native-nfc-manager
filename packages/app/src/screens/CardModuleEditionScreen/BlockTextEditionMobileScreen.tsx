@@ -1,8 +1,8 @@
 import { graphql, usePreloadedQuery } from 'react-relay';
 import { MODULE_KIND_BLOCK_TEXT } from '@azzapp/shared/cardModuleHelpers';
 import BlockTextEditionScreen from '#screens/BlockTextEditionScreen';
-import type { BlockTextEditionMobileScreenQuery } from '@azzapp/relay/artifacts/BlockTextEditionMobileScreenQuery.graphql';
-import type { BlockTextEditionScreen_module$key } from '@azzapp/relay/artifacts/BlockTextEditionScreen_module.graphql';
+import type { BlockTextEditionMobileScreenQuery } from '#relayArtifacts/BlockTextEditionMobileScreenQuery.graphql';
+import type { BlockTextEditionScreen_module$key } from '#relayArtifacts/BlockTextEditionScreen_module.graphql';
 import type { PreloadedQuery } from 'react-relay';
 
 type BlockTextEditionMobileScreenProps = {

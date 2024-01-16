@@ -15,7 +15,6 @@
   "dependencies": {
     "@azzapp/data": "0.5.2-canary.147",
     "@azzapp/i18n": "0.5.2-canary.147",
-    "@azzapp/relay": "0.5.2-canary.147",
     "@azzapp/shared": "0.5.2-canary.147",
     "@envelop/dataloader": "^6.0.0",
     "@envelop/disable-introspection": "^6.0.0",

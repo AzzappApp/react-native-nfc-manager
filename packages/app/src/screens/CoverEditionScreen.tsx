@@ -19,9 +19,9 @@ import Container from '#ui/Container';
 import Header, { HEADER_HEIGHT } from '#ui/Header';
 import type { CoverEditorHandle } from '#components/CoverEditor/CoverEditor';
 import type { RelayScreenProps } from '#helpers/relayScreen';
+import type { CoverEditionScreenPrefetchQuery } from '#relayArtifacts/CoverEditionScreenPrefetchQuery.graphql';
+import type { CoverEditionScreenQuery } from '#relayArtifacts/CoverEditionScreenQuery.graphql';
 import type { CoverEditionRoute } from '#routes';
-import type { CoverEditionScreenPrefetchQuery } from '@azzapp/relay/artifacts/CoverEditionScreenPrefetchQuery.graphql';
-import type { CoverEditionScreenQuery } from '@azzapp/relay/artifacts/CoverEditionScreenQuery.graphql';
 import type { Ref } from 'react';
 import type { PreloadedQuery } from 'react-relay';
 

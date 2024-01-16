@@ -13,7 +13,7 @@ import ContactCard, {
   CONTACT_CARD_RATIO,
 } from '#components/ContactCard/ContactCard';
 import { useMainTabBarVisibilityController } from '#components/MainTabBar';
-import type { HomeContactCardLandscape_profile$key } from '@azzapp/relay/artifacts/HomeContactCardLandscape_profile.graphql';
+import type { HomeContactCardLandscape_profile$key } from '#relayArtifacts/HomeContactCardLandscape_profile.graphql';
 
 type HomeContactCardLandscapeProps = {
   profile: HomeContactCardLandscape_profile$key | null;

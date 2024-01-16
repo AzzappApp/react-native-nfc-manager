@@ -13,8 +13,8 @@ import Button from '#ui/Button';
 import Container from '#ui/Container';
 import Icon from '#ui/Icon';
 import Text from '#ui/Text';
-import type { WebCardScreenPublishHelper_webCard$key } from '@azzapp/relay/artifacts/WebCardScreenPublishHelper_webCard.graphql';
-import type { WebCardScreenPublishHelperMutation } from '@azzapp/relay/artifacts/WebCardScreenPublishHelperMutation.graphql';
+import type { WebCardScreenPublishHelper_webCard$key } from '#relayArtifacts/WebCardScreenPublishHelper_webCard.graphql';
+import type { WebCardScreenPublishHelperMutation } from '#relayArtifacts/WebCardScreenPublishHelperMutation.graphql';
 
 type ProfileScreenPublishHelperProps = {
   webCard: WebCardScreenPublishHelper_webCard$key;

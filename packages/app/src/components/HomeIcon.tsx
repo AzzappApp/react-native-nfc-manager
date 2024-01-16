@@ -3,7 +3,7 @@ import { graphql, useLazyLoadQuery } from 'react-relay';
 import WebCardBoundRelayEnvironmentProvider from '#helpers/WebCardBoundRelayEnvironmentProvider';
 import useAuthState from '#hooks/useAuthState';
 import CoverRenderer from './CoverRenderer';
-import type { HomeIconQuery } from '@azzapp/relay/artifacts/HomeIconQuery.graphql';
+import type { HomeIconQuery } from '#relayArtifacts/HomeIconQuery.graphql';
 
 type HomeIconProps = {
   webCardId: string;

@@ -13,7 +13,7 @@ import Link from './Link';
 import type {
   AuthorCartoucheFragment_webCard$data,
   AuthorCartoucheFragment_webCard$key,
-} from '@azzapp/relay/artifacts/AuthorCartoucheFragment_webCard.graphql';
+} from '#relayArtifacts/AuthorCartoucheFragment_webCard.graphql';
 import type { ViewProps } from 'react-native';
 
 type AuthorCartoucheProps = ViewProps & {

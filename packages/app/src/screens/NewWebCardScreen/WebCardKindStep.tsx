@@ -18,7 +18,7 @@ import ContinueButton from './ContinueButton';
 import type {
   WebCardKindStep_webCardCategories$key,
   WebCardKindStep_webCardCategories$data,
-} from '@azzapp/relay/artifacts/WebCardKindStep_webCardCategories.graphql';
+} from '#relayArtifacts/WebCardKindStep_webCardCategories.graphql';
 import type { ArrayItemType } from '@azzapp/shared/arrayHelpers';
 import type { ListRenderItemInfo, LayoutChangeEvent } from 'react-native';
 
@@ -33,10 +33,7 @@ const webCardCategoriesFragment = graphql`
   fragment WebCardKindStep_webCardCategories on WebCardCategory
   @relay(plural: true)
   @argumentDefinitions(
-    pixelRatio: {
-      type: "Float!"
-      provider: "../providers/CappedPixelRatio.relayprovider"
-    }
+    pixelRatio: { type: "Float!", provider: "CappedPixelRatio.relayprovider" }
   ) {
     id
     medias {

@@ -11,8 +11,8 @@ import useMultiActorEnvironmentPluralFragment from '#hooks/useMultiActorEnvironm
 import Icon from '#ui/Icon';
 import PressableOpacity from '#ui/PressableOpacity';
 import Text from '#ui/Text';
-import type { HomeProfileLink_user$key } from '@azzapp/relay/artifacts/HomeProfileLink_user.graphql';
-import type { HomeProfileLink_username$key } from '@azzapp/relay/artifacts/HomeProfileLink_username.graphql';
+import type { HomeProfileLink_user$key } from '#relayArtifacts/HomeProfileLink_user.graphql';
+import type { HomeProfileLink_username$key } from '#relayArtifacts/HomeProfileLink_username.graphql';
 
 import type { SharedValue } from 'react-native-reanimated';
 

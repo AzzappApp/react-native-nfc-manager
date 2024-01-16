@@ -1,10 +1,10 @@
 import { noop } from 'lodash';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { graphql, useFragment, usePaginationFragment } from 'react-relay';
+import type { useSuggestedMedias_images$key } from '#relayArtifacts/useSuggestedMedias_images.graphql';
+import type { useSuggestedMedias_videos$key } from '#relayArtifacts/useSuggestedMedias_videos.graphql';
+import type { useSuggestedMedias_viewer$key } from '#relayArtifacts/useSuggestedMedias_viewer.graphql';
 import type { SourceMedia, TemplateKind } from './coverEditorTypes';
-import type { useSuggestedMedias_images$key } from '@azzapp/relay/artifacts/useSuggestedMedias_images.graphql';
-import type { useSuggestedMedias_videos$key } from '@azzapp/relay/artifacts/useSuggestedMedias_videos.graphql';
-import type { useSuggestedMedias_viewer$key } from '@azzapp/relay/artifacts/useSuggestedMedias_viewer.graphql';
 
 const useSuggestedMedias = (
   viewerKey: useSuggestedMedias_viewer$key | null,

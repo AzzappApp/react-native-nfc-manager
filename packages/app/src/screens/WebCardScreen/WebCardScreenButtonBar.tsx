@@ -20,7 +20,7 @@ import BlurredFloatingButton, {
 import FloatingButton from '#ui/FloatingButton';
 import Text from '#ui/Text';
 import { useEditTransition } from './WebCardScreenTransitions';
-import type { WebCardScreenButtonBar_webCard$key } from '@azzapp/relay/artifacts/WebCardScreenButtonBar_webCard.graphql';
+import type { WebCardScreenButtonBar_webCard$key } from '#relayArtifacts/WebCardScreenButtonBar_webCard.graphql';
 import type { ViewProps } from 'react-native';
 
 type WebCardScreenButtonBarProps = ViewProps & {

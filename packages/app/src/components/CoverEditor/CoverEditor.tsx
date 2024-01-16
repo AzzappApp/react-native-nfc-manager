@@ -56,13 +56,13 @@ import useSaveCover from './useSaveCover';
 import useSuggestedMedias from './useSuggestedMedias';
 import type { EditionParameters } from '#components/gpu';
 import type { ImagePickerResult } from '#components/ImagePicker';
+import type { CoverEditor_viewer$key } from '#relayArtifacts/CoverEditor_viewer.graphql';
 import type { CoverEditorCustomProps } from './CoverEditorCustom/CoverEditorCustom';
 import type {
   TemplateKind,
   CoverStyleData,
   MediaInfos,
 } from './coverEditorTypes';
-import type { CoverEditor_viewer$key } from '@azzapp/relay/artifacts/CoverEditor_viewer.graphql';
 import type { ColorPalette } from '@azzapp/shared/cardHelpers';
 import type { ForwardedRef } from 'react';
 import type { TextInput as NativeTextInput } from 'react-native';

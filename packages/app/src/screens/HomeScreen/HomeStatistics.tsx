@@ -21,7 +21,7 @@ import {
 import Text from '#ui/Text';
 import { format } from './HomeInformations';
 import HomeStatisticsChart from './HomeStatisticsChart';
-import type { HomeStatistics_profiles$key } from '@azzapp/relay/artifacts/HomeStatistics_profiles.graphql';
+import type { HomeStatistics_profiles$key } from '#relayArtifacts/HomeStatistics_profiles.graphql';
 
 const AnimatedScrollView = Animated.createAnimatedComponent(ScrollView);
 

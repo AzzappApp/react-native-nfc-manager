@@ -14,10 +14,10 @@ import RadioButton from '#ui/RadioButton';
 import Separation from '#ui/Separation';
 import Text from '#ui/Text';
 import Avatar from './Avatar';
+import type { ProfileRole } from '#relayArtifacts/MultiUserScreenQuery.graphql';
+import type { MultiUserTransferOwnershipModal_TransferOwnershipMutation } from '#relayArtifacts/MultiUserTransferOwnershipModal_TransferOwnershipMutation.graphql';
+import type { MultiUserTransferOwnershipModal_webcard$key } from '#relayArtifacts/MultiUserTransferOwnershipModal_webcard.graphql';
 import type { UserInformation } from './MultiUserScreen';
-import type { ProfileRole } from '@azzapp/relay/artifacts/MultiUserScreenQuery.graphql';
-import type { MultiUserTransferOwnershipModal_TransferOwnershipMutation } from '@azzapp/relay/artifacts/MultiUserTransferOwnershipModal_TransferOwnershipMutation.graphql';
-import type { MultiUserTransferOwnershipModal_webcard$key } from '@azzapp/relay/artifacts/MultiUserTransferOwnershipModal_webcard.graphql';
 import type { ForwardedRef } from 'react';
 
 type MultiUserTransferOwnershipModalProps = {

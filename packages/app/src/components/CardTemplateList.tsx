@@ -28,12 +28,12 @@ import Text from '#ui/Text';
 import { useModulesData } from './cardModules/ModuleData';
 import { CancelHeaderButton } from './commonsButtons';
 import WebCardPreview from './WebCardPreview';
-import type { CardTemplateList_cardTemplates$key } from '@azzapp/relay/artifacts/CardTemplateList_cardTemplates.graphql';
-import type { CardTemplateListQuery } from '@azzapp/relay/artifacts/CardTemplateListQuery.graphql';
-import type { CoverRenderer_webCard$key } from '@azzapp/relay/artifacts/CoverRenderer_webCard.graphql';
-import type { ModuleData_cardModules$key } from '@azzapp/relay/artifacts/ModuleData_cardModules.graphql';
-import type { WebCardBackground_webCard$key } from '@azzapp/relay/artifacts/WebCardBackground_webCard.graphql';
-import type { WebCardBackgroundPreview_webCard$key } from '@azzapp/relay/artifacts/WebCardBackgroundPreview_webCard.graphql';
+import type { CardTemplateList_cardTemplates$key } from '#relayArtifacts/CardTemplateList_cardTemplates.graphql';
+import type { CardTemplateListQuery } from '#relayArtifacts/CardTemplateListQuery.graphql';
+import type { CoverRenderer_webCard$key } from '#relayArtifacts/CoverRenderer_webCard.graphql';
+import type { ModuleData_cardModules$key } from '#relayArtifacts/ModuleData_cardModules.graphql';
+import type { WebCardBackground_webCard$key } from '#relayArtifacts/WebCardBackground_webCard.graphql';
+import type { WebCardBackgroundPreview_webCard$key } from '#relayArtifacts/WebCardBackgroundPreview_webCard.graphql';
 import type {
   CardStyle,
   ColorPalette,

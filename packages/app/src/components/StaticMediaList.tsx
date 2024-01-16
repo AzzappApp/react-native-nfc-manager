@@ -17,11 +17,11 @@ import {
 import BoxSelectionList from './BoxSelectionList';
 import CardModuleBackgroundImage from './cardModules/CardModuleBackgroundImage';
 import CoverLottiePlayer from './CoverRenderer/CoverLottiePlayer';
-import type { BoxButtonItemInfo } from './BoxSelectionList';
 import type {
   StaticMediaList_staticMedias$data,
   StaticMediaList_staticMedias$key,
-} from '@azzapp/relay/artifacts/StaticMediaList_staticMedias.graphql';
+} from '#relayArtifacts/StaticMediaList_staticMedias.graphql';
+import type { BoxButtonItemInfo } from './BoxSelectionList';
 import type { ArrayItemType } from '@azzapp/shared/arrayHelpers';
 import type { ColorValue } from 'react-native';
 import type { SharedValue } from 'react-native-reanimated';

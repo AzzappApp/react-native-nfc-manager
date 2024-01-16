@@ -9,7 +9,7 @@ import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import { relativeDateMinute } from '#helpers/dateHelpers';
 import Text from '#ui/Text';
 
-import type { CommentItemFragment_comment$key } from '@azzapp/relay/artifacts/CommentItemFragment_comment.graphql';
+import type { CommentItemFragment_comment$key } from '#relayArtifacts/CommentItemFragment_comment.graphql';
 
 type CommentItemProps = {
   item: CommentItemFragment_comment$key;

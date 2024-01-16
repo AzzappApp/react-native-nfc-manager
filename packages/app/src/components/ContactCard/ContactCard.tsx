@@ -10,7 +10,7 @@ import {
 } from '@azzapp/shared/urlHelpers';
 import { colors } from '#theme';
 import Text from '#ui/Text';
-import type { ContactCard_profile$key } from '@azzapp/relay/artifacts/ContactCard_profile.graphql';
+import type { ContactCard_profile$key } from '#relayArtifacts/ContactCard_profile.graphql';
 import type { StyleProp, ViewStyle } from 'react-native';
 
 type ContactCardProps = {

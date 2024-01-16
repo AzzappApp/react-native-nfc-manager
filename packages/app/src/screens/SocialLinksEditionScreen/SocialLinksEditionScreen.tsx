@@ -21,12 +21,12 @@ import SocialLinksLinksEditionPanel from './SocialLinksLinksEditionPanel';
 import SocialLinksMarginsEditionPanel from './SocialLinksMarginsEditionPanel';
 import SocialLinksPreview from './SocialLinksPreview';
 import SocialLinksSettingsEditionPanel from './SocialLinksSettingsEditionPanel';
-import type { SocialLinksEditionScreen_module$key } from '@azzapp/relay/artifacts/SocialLinksEditionScreen_module.graphql';
-import type { SocialLinksEditionScreen_viewer$key } from '@azzapp/relay/artifacts/SocialLinksEditionScreen_viewer.graphql';
+import type { SocialLinksEditionScreen_module$key } from '#relayArtifacts/SocialLinksEditionScreen_module.graphql';
+import type { SocialLinksEditionScreen_viewer$key } from '#relayArtifacts/SocialLinksEditionScreen_viewer.graphql';
 import type {
   SocialLinksEditionScreenUpdateModuleMutation,
   SaveSocialLinksModuleInput,
-} from '@azzapp/relay/artifacts/SocialLinksEditionScreenUpdateModuleMutation.graphql';
+} from '#relayArtifacts/SocialLinksEditionScreenUpdateModuleMutation.graphql';
 import type { ViewProps } from 'react-native';
 
 export type SocialLinksEditionScreenProps = ViewProps & {

@@ -20,9 +20,9 @@ describe('CoverEditionScreen', () => {
 // import CoverEditionScreen from '../CoverEditionScreen';
 // import type { GPULayer } from '#components/gpu';
 // import type { CoverEditionScreenProps } from '../CoverEditionScreen';
-// import type { CoverEditionScreen_cover$data } from '@azzapp/relay/artifacts/CoverEditionScreen_cover.graphql';
-// import type { CoverEditionScreen_template$data } from '@azzapp/relay/artifacts/CoverEditionScreen_template.graphql';
-// import type { CoverEditionScreenTestQuery } from '@azzapp/relay/artifacts/CoverEditionScreenTestQuery.graphql';
+// import type { CoverEditionScreen_cover$data } from '#relayArtifacts/CoverEditionScreen_cover.graphql';
+// import type { CoverEditionScreen_template$data } from '#relayArtifacts/CoverEditionScreen_template.graphql';
+// import type { CoverEditionScreenTestQuery } from '#relayArtifacts/CoverEditionScreenTestQuery.graphql';
 // import type { ReactTestInstance } from 'react-test-renderer';
 // import type { RelayMockEnvironment } from 'relay-test-utils/lib/RelayModernMockEnvironment';
 

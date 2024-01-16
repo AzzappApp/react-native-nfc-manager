@@ -8,9 +8,9 @@ import { colors } from '#theme';
 import PostsGrid from '#components/PostList/PostsGrid';
 import SkeletonPlaceholder from '#components/Skeleton';
 import ListLoadingFooter from '#ui/ListLoadingFooter';
-import type { PostsGrid_posts$key } from '@azzapp/relay/artifacts/PostsGrid_posts.graphql';
-import type { SearchResultPosts_viewer$key } from '@azzapp/relay/artifacts/SearchResultPosts_viewer.graphql';
-import type { SearchResultPostsQuery } from '@azzapp/relay/artifacts/SearchResultPostsQuery.graphql';
+import type { PostsGrid_posts$key } from '#relayArtifacts/PostsGrid_posts.graphql';
+import type { SearchResultPosts_viewer$key } from '#relayArtifacts/SearchResultPosts_viewer.graphql';
+import type { SearchResultPostsQuery } from '#relayArtifacts/SearchResultPostsQuery.graphql';
 import type { PreloadedQuery } from 'react-relay';
 
 export const searchResultPostsQuery = graphql`

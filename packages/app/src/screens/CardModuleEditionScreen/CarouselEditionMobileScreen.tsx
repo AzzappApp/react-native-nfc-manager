@@ -1,7 +1,7 @@
 import { graphql, usePreloadedQuery } from 'react-relay';
 import CarouselEditionScreen from '#screens/CarouselEditionScreen';
-import type { CarouselEditionMobileScreenQuery } from '@azzapp/relay/artifacts/CarouselEditionMobileScreenQuery.graphql';
-import type { CarouselEditionScreen_module$key } from '@azzapp/relay/artifacts/CarouselEditionScreen_module.graphql';
+import type { CarouselEditionMobileScreenQuery } from '#relayArtifacts/CarouselEditionMobileScreenQuery.graphql';
+import type { CarouselEditionScreen_module$key } from '#relayArtifacts/CarouselEditionScreen_module.graphql';
 import type { PreloadedQuery } from 'react-relay';
 
 type CarouselEditionMobileScreenProps = {

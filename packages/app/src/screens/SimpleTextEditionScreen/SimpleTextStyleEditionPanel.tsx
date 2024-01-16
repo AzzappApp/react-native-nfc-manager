@@ -14,8 +14,8 @@ import AlignmentButton from '#ui/AlignmentButton';
 import FontDropDownPicker from '#ui/FontDropDownPicker';
 import LabeledDashedSlider from '#ui/LabeledDashedSlider';
 import TitleWithLine from '#ui/TitleWithLine';
-import type { TextAlignment } from '@azzapp/relay/artifacts/SimpleTextEditionScreen_module.graphql';
-import type { SimpleTextStyleEditionPanel_webCard$key } from '@azzapp/relay/artifacts/SimpleTextStyleEditionPanel_webCard.graphql';
+import type { TextAlignment } from '#relayArtifacts/SimpleTextEditionScreen_module.graphql';
+import type { SimpleTextStyleEditionPanel_webCard$key } from '#relayArtifacts/SimpleTextStyleEditionPanel_webCard.graphql';
 import type { ViewProps } from 'react-native-svg/lib/typescript/fabric/utils';
 
 type SimpleTextStyleEditionPanelProps = ViewProps & {
@@ -125,7 +125,7 @@ const SimpleTextStyleEditionPanel = ({
           bottomSheetHeight={bottomSheetHeight}
         />
         <WebCardColorDropDownPicker
-          webCard={webCard}
+          webCard={webCard ?? null}
           color={fontColor}
           onColorChange={onColorChange}
           bottomSheetHeight={bottomSheetHeight}

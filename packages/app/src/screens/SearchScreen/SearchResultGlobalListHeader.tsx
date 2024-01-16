@@ -10,9 +10,9 @@ import CoverList from '#components/CoverList';
 import SkeletonPlaceholder from '#components/Skeleton';
 import Button from '#ui/Button';
 import Text from '#ui/Text';
-import type { CoverList_users$key } from '@azzapp/relay/artifacts/CoverList_users.graphql';
+import type { CoverList_users$key } from '#relayArtifacts/CoverList_users.graphql';
 
-import type { SearchResultGlobalListHeader_viewer$key } from '@azzapp/relay/artifacts/SearchResultGlobalListHeader_viewer.graphql';
+import type { SearchResultGlobalListHeader_viewer$key } from '#relayArtifacts/SearchResultGlobalListHeader_viewer.graphql';
 
 type SearchResultGlobalListHeaderProps = {
   viewer: SearchResultGlobalListHeader_viewer$key;

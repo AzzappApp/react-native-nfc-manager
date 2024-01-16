@@ -12,9 +12,9 @@ import SearchResultGlobalListHeader, {
   SearchResultGlobalListHeaderPlaceholder,
 } from './SearchResultGlobalListHeader';
 
-import type { PostsGrid_posts$key } from '@azzapp/relay/artifacts/PostsGrid_posts.graphql';
-import type { SearchResultGlobalPosts_viewer$key } from '@azzapp/relay/artifacts/SearchResultGlobalPosts_viewer.graphql';
-import type { SearchResultGlobalQuery } from '@azzapp/relay/artifacts/SearchResultGlobalQuery.graphql';
+import type { PostsGrid_posts$key } from '#relayArtifacts/PostsGrid_posts.graphql';
+import type { SearchResultGlobalPosts_viewer$key } from '#relayArtifacts/SearchResultGlobalPosts_viewer.graphql';
+import type { SearchResultGlobalQuery } from '#relayArtifacts/SearchResultGlobalQuery.graphql';
 import type { PreloadedQuery } from 'react-relay';
 
 export const searchResultGlobalQuery = graphql`

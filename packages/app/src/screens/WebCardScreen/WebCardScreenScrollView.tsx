@@ -261,7 +261,7 @@ const WebCardScreenScrollView = ({
         updateBlockCounts();
       },
     }),
-    [blocks],
+    [updateBlockCounts],
   );
 
   return (

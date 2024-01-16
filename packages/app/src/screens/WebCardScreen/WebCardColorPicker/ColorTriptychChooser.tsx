@@ -10,8 +10,8 @@ import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import Icon from '#ui/Icon';
 import PressableOpacity from '#ui/PressableOpacity';
 import Text from '#ui/Text';
+import type { ColorTriptychChooserQuery } from '#relayArtifacts/ColorTriptychChooserQuery.graphql';
 import type { PressableOpacityProps } from '#ui/PressableOpacity';
-import type { ColorTriptychChooserQuery } from '@azzapp/relay/artifacts/ColorTriptychChooserQuery.graphql';
 import type { ColorPalette } from '@azzapp/shared/cardHelpers';
 import type { ListRenderItemInfo } from 'react-native';
 

@@ -43,12 +43,12 @@ import PhotoWithTextAndTitleMarginsEditionPanel from './PhotoWithTextAndTitleMar
 import PhotoWithTextAndTitlePreview from './PhotoWithTextAndTitlePreview';
 import PhotoWithTextAndTitleSettingsEditionPanel from './PhotoWithTextAndTitleSettingsEditionPanel';
 import type { ImagePickerResult } from '#components/ImagePicker';
-import type { PhotoWithTextAndTitleEditionScreen_module$key } from '@azzapp/relay/artifacts/PhotoWithTextAndTitleEditionScreen_module.graphql';
-import type { PhotoWithTextAndTitleEditionScreen_viewer$key } from '@azzapp/relay/artifacts/PhotoWithTextAndTitleEditionScreen_viewer.graphql';
+import type { PhotoWithTextAndTitleEditionScreen_module$key } from '#relayArtifacts/PhotoWithTextAndTitleEditionScreen_module.graphql';
+import type { PhotoWithTextAndTitleEditionScreen_viewer$key } from '#relayArtifacts/PhotoWithTextAndTitleEditionScreen_viewer.graphql';
 import type {
   PhotoWithTextAndTitleEditionScreenUpdateModuleMutation,
   SavePhotoWithTextAndTitleModuleInput,
-} from '@azzapp/relay/artifacts/PhotoWithTextAndTitleEditionScreenUpdateModuleMutation.graphql';
+} from '#relayArtifacts/PhotoWithTextAndTitleEditionScreenUpdateModuleMutation.graphql';
 import type { ViewProps } from 'react-native';
 import type { Observable } from 'relay-runtime';
 
@@ -75,14 +75,8 @@ const PhotoWithTextAndTitleEditionScreen = ({
     graphql`
       fragment PhotoWithTextAndTitleEditionScreen_module on CardModulePhotoWithTextAndTitle
       @argumentDefinitions(
-        pixelRatio: {
-          type: "Float!"
-          provider: "../providers/PixelRatio.relayprovider"
-        }
-        screenWidth: {
-          type: "Float!"
-          provider: "../providers/ScreenWidth.relayprovider"
-        }
+        pixelRatio: { type: "Float!", provider: "PixelRatio.relayprovider" }
+        screenWidth: { type: "Float!", provider: "ScreenWidth.relayprovider" }
       ) {
         id
         image {

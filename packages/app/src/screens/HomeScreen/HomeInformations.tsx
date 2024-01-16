@@ -14,8 +14,8 @@ import Link from '#components/Link';
 import useMultiActorEnvironmentPluralFragment from '#hooks/useMultiActorEnvironmentPluralFragment';
 import PressableOpacity from '#ui/PressableOpacity';
 import Text from '#ui/Text';
-import type { HomeInformations_user$key } from '@azzapp/relay/artifacts/HomeInformations_user.graphql';
-import type { HomeInformations_webCard$key } from '@azzapp/relay/artifacts/HomeInformations_webCard.graphql';
+import type { HomeInformations_user$key } from '#relayArtifacts/HomeInformations_user.graphql';
+import type { HomeInformations_webCard$key } from '#relayArtifacts/HomeInformations_webCard.graphql';
 import type { SharedValue } from 'react-native-reanimated';
 type HomeInformationsProps = {
   user: HomeInformations_user$key;

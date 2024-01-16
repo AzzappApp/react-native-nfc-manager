@@ -7,8 +7,8 @@ import { MockPayloadGenerator } from 'relay-test-utils';
 import { createMockEnvironment } from 'relay-test-utils/lib/RelayModernMockEnvironment';
 import { screen, render, fireEvent, act, waitFor } from '#helpers/testHelpers';
 import CommonInformationForm from '../CommonInformationForm';
+import type { CommonInformationFormTestQuery } from '#relayArtifacts/CommonInformationFormTestQuery.graphql';
 import type { CommonInformationFormProps } from '../CommonInformationForm';
-import type { CommonInformationFormTestQuery } from '@azzapp/relay/artifacts/CommonInformationFormTestQuery.graphql';
 import type { RelayMockEnvironment } from 'relay-test-utils/lib/RelayModernMockEnvironment';
 
 describe('ContactCardEditModal', () => {

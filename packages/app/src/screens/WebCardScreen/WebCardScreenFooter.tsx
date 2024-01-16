@@ -14,8 +14,8 @@ import {
   useEditTransition,
   useSelectionModeTransition,
 } from './WebCardScreenTransitions';
+import type { WebCardColorPicker_webCard$key } from '#relayArtifacts/WebCardColorPicker_webCard.graphql';
 import type { FooterBarItem } from '#ui/FooterBar';
-import type { WebCardColorPicker_webCard$key } from '@azzapp/relay/artifacts/WebCardColorPicker_webCard.graphql';
 
 export type WebCardScreenFooterProps = {
   webCard: WebCardColorPicker_webCard$key;

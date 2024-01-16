@@ -5,7 +5,6 @@ import { StyleSheet, View } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { graphql, useMutation, usePreloadedQuery } from 'react-relay';
-import { get as CappedPixelRatio } from '@azzapp/relay/providers/CappedPixelRatio.relayprovider';
 import { colors, textStyles } from '#theme';
 import CoverRenderer from '#components/CoverRenderer';
 import { useRouter } from '#components/NativeRouter';
@@ -13,6 +12,7 @@ import ScreenModal from '#components/ScreenModal';
 import relayScreen from '#helpers/relayScreen';
 import useScreenInsets from '#hooks/useScreenInsets';
 import useToggle from '#hooks/useToggle';
+import { get as CappedPixelRatio } from '#relayProviders/CappedPixelRatio.relayprovider';
 import Button from '#ui/Button';
 import Container from '#ui/Container';
 import Header from '#ui/Header';
@@ -26,11 +26,11 @@ import MultiUserScreenUserList, {
   type MultiUserScreenListProps,
 } from './MultiUserScreenUserList';
 import type { RelayScreenProps } from '#helpers/relayScreen';
-import type { MultiUserRoute } from '#routes';
 import type {
   MultiUserScreenQuery,
   ProfileRole,
-} from '@azzapp/relay/artifacts/MultiUserScreenQuery.graphql';
+} from '#relayArtifacts/MultiUserScreenQuery.graphql';
+import type { MultiUserRoute } from '#routes';
 import type { ContactCard } from '@azzapp/shared/contactCardHelpers';
 
 export type UserInformation = {

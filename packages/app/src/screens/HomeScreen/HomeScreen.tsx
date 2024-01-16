@@ -8,8 +8,8 @@ import ActivityIndicator from '#ui/ActivityIndicator';
 import Container from '#ui/Container';
 import HomeScreenContent from './HomeScreenContent';
 import type { RelayScreenProps } from '#helpers/relayScreen';
+import type { HomeScreenQuery } from '#relayArtifacts/HomeScreenQuery.graphql';
 import type { HomeRoute } from '#routes';
-import type { HomeScreenQuery } from '@azzapp/relay/artifacts/HomeScreenQuery.graphql';
 
 export const homeScreenQuery = graphql`
   query HomeScreenQuery {

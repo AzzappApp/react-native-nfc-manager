@@ -35,6 +35,15 @@ import SimpleTextRenderer, {
 import SocialLinksRenderer, {
   readSocialLinksData,
 } from './SocialLinksRenderer';
+import type { BlockTextRenderer_module$key } from '#relayArtifacts/BlockTextRenderer_module.graphql';
+import type { CarouselRenderer_module$key } from '#relayArtifacts/CarouselRenderer_module.graphql';
+import type { HorizontalPhotoRenderer_module$key } from '#relayArtifacts/HorizontalPhotoRenderer_module.graphql';
+import type { LineDividerRenderer_module$key } from '#relayArtifacts/LineDividerRenderer_module.graphql';
+import type { PhotoWithTextAndTitleRenderer_module$key } from '#relayArtifacts/PhotoWithTextAndTitleRenderer_module.graphql';
+import type { SimpleButtonRenderer_module$key } from '#relayArtifacts/SimpleButtonRenderer_module.graphql';
+import type { SimpleTextRenderer_simpleTextModule$key } from '#relayArtifacts/SimpleTextRenderer_simpleTextModule.graphql';
+import type { SimpleTextRenderer_simpleTitleModule$key } from '#relayArtifacts/SimpleTextRenderer_simpleTitleModule.graphql';
+import type { SocialLinksRenderer_module$key } from '#relayArtifacts/SocialLinksRenderer_module.graphql';
 import type {
   BlockTextRendererData,
   BlockTextRendererProps,
@@ -61,15 +70,6 @@ import type {
   SocialLinksRendererData,
   SocialLinksRendererProps,
 } from './SocialLinksRenderer';
-import type { BlockTextRenderer_module$key } from '@azzapp/relay/artifacts/BlockTextRenderer_module.graphql';
-import type { CarouselRenderer_module$key } from '@azzapp/relay/artifacts/CarouselRenderer_module.graphql';
-import type { HorizontalPhotoRenderer_module$key } from '@azzapp/relay/artifacts/HorizontalPhotoRenderer_module.graphql';
-import type { LineDividerRenderer_module$key } from '@azzapp/relay/artifacts/LineDividerRenderer_module.graphql';
-import type { PhotoWithTextAndTitleRenderer_module$key } from '@azzapp/relay/artifacts/PhotoWithTextAndTitleRenderer_module.graphql';
-import type { SimpleButtonRenderer_module$key } from '@azzapp/relay/artifacts/SimpleButtonRenderer_module.graphql';
-import type { SimpleTextRenderer_simpleTextModule$key } from '@azzapp/relay/artifacts/SimpleTextRenderer_simpleTextModule.graphql';
-import type { SimpleTextRenderer_simpleTitleModule$key } from '@azzapp/relay/artifacts/SimpleTextRenderer_simpleTitleModule.graphql';
-import type { SocialLinksRenderer_module$key } from '@azzapp/relay/artifacts/SocialLinksRenderer_module.graphql';
 import type { ViewProps } from 'react-native-svg/lib/typescript/fabric/utils';
 
 type ModuleReadInfo =

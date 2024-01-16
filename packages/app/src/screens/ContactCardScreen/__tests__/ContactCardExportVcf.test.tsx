@@ -11,8 +11,8 @@ import { serializeContactCard } from '@azzapp/shared/contactCardHelpers';
 import { buildVCard } from '@azzapp/shared/vCardHelpers';
 import { screen, render, fireEvent, act } from '#helpers/testHelpers';
 import ContactCardExportVcf from '../ContactCardExportVcf';
+import type { ContactCardExportVcfTestQuery } from '#relayArtifacts/ContactCardExportVcfTestQuery.graphql';
 import type { ContactCardExportVcfProps } from '../ContactCardExportVcf';
-import type { ContactCardExportVcfTestQuery } from '@azzapp/relay/artifacts/ContactCardExportVcfTestQuery.graphql';
 import type { RelayMockEnvironment } from 'relay-test-utils/lib/RelayModernMockEnvironment';
 
 jest.mock('react-native-blob-util', () => ({

@@ -16,8 +16,8 @@ import ColorPreview from '#ui/ColorPreview';
 import FloatingIconButton from '#ui/FloatingIconButton';
 import LabeledDashedSlider from '#ui/LabeledDashedSlider';
 import TabsBar from '#ui/TabsBar';
-import type { CardModuleSocialLinksArrangement } from '@azzapp/relay/artifacts/SocialLinksRenderer_module.graphql';
-import type { SocialLinksSettingsEditionPanel_webCard$key } from '@azzapp/relay/artifacts/SocialLinksSettingsEditionPanel_webCard.graphql';
+import type { CardModuleSocialLinksArrangement } from '#relayArtifacts/SocialLinksRenderer_module.graphql';
+import type { SocialLinksSettingsEditionPanel_webCard$key } from '#relayArtifacts/SocialLinksSettingsEditionPanel_webCard.graphql';
 import type { ViewProps } from 'react-native';
 
 type SocialLinksSettingsEditionPanelProps = ViewProps & {

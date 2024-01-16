@@ -12,7 +12,7 @@ import Link from './Link';
 import type {
   WebCardList_webCard$data,
   WebCardList_webCard$key,
-} from '@azzapp/relay/artifacts/WebCardList_webCard.graphql';
+} from '#relayArtifacts/WebCardList_webCard.graphql';
 import type { ArrayItemType } from '@azzapp/shared/arrayHelpers';
 import type { StyleProp, ViewStyle } from 'react-native';
 

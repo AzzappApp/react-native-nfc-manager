@@ -17,11 +17,11 @@ import Text from '#ui/Text';
 import type {
   PostRendererActionBar_post$key,
   ReactionKind,
-} from '@azzapp/relay/artifacts/PostRendererActionBar_post.graphql';
+} from '#relayArtifacts/PostRendererActionBar_post.graphql';
 import type {
   PostRendererActionBarReactionMutation,
   PostRendererActionBarReactionMutation$data,
-} from '@azzapp/relay/artifacts/PostRendererActionBarReactionMutation.graphql';
+} from '#relayArtifacts/PostRendererActionBarReactionMutation.graphql';
 import type { ViewProps } from 'react-native';
 
 export type PostRendererActionBarProps = ViewProps & {

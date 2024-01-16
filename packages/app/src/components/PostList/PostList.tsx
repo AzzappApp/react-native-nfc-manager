@@ -15,9 +15,9 @@ import { PostListContext } from './PostListsContext';
 import type {
   PostList_posts$data,
   PostList_posts$key,
-} from '@azzapp/relay/artifacts/PostList_posts.graphql';
-import type { PostList_webCard$key } from '@azzapp/relay/artifacts/PostList_webCard.graphql';
-import type { PostRendererFragment_author$key } from '@azzapp/relay/artifacts/PostRendererFragment_author.graphql';
+} from '#relayArtifacts/PostList_posts.graphql';
+import type { PostList_webCard$key } from '#relayArtifacts/PostList_webCard.graphql';
+import type { PostRendererFragment_author$key } from '#relayArtifacts/PostRendererFragment_author.graphql';
 import type { ArrayItemType } from '@azzapp/shared/arrayHelpers';
 import type { ContentStyle, ListRenderItemInfo } from '@shopify/flash-list';
 import type { ViewProps, ViewToken } from 'react-native';

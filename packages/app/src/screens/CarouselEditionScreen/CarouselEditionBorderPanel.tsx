@@ -11,7 +11,7 @@ import WebCardColorPicker from '#components/WebCardColorPicker';
 import ColorPreview from '#ui/ColorPreview';
 import LabeledDashedSlider from '#ui/LabeledDashedSlider';
 import TabsBar from '#ui/TabsBar';
-import type { CarouselEditionBorderPanel_webCard$key } from '@azzapp/relay/artifacts/CarouselEditionBorderPanel_webCard.graphql';
+import type { CarouselEditionBorderPanel_webCard$key } from '#relayArtifacts/CarouselEditionBorderPanel_webCard.graphql';
 import type { ViewProps } from 'react-native';
 
 type CarouselEditionBorderPanelProps = Omit<ViewProps, 'children'> & {

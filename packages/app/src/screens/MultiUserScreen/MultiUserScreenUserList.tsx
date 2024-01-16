@@ -13,10 +13,10 @@ import Separation from '#ui/Separation';
 import Text from '#ui/Text';
 import Avatar from './Avatar';
 import MultiUserDetailModal from './MultiUserDetailModal';
+import type { ProfileRole } from '#relayArtifacts/MultiUserScreenQuery.graphql';
+import type { MultiUserScreenUserList_currentUser$key } from '#relayArtifacts/MultiUserScreenUserList_currentUser.graphql';
 import type { MultiUserDetailModalActions } from './MultiUserDetailModal';
 import type { UserInformation } from './MultiUserScreen';
-import type { ProfileRole } from '@azzapp/relay/artifacts/MultiUserScreenQuery.graphql';
-import type { MultiUserScreenUserList_currentUser$key } from '@azzapp/relay/artifacts/MultiUserScreenUserList_currentUser.graphql';
 
 export type MultiUserScreenListProps = {
   usersByRole: Record<ProfileRole, UserInformation[]>;

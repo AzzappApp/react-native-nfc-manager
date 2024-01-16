@@ -11,10 +11,6 @@ import {
   usePreloadedQuery,
 } from 'react-relay';
 import { Observable } from 'relay-runtime';
-import { get as CappedPixelRatio } from '@azzapp/relay/providers/CappedPixelRatio.relayprovider';
-import { get as PixelRatio } from '@azzapp/relay/providers/PixelRatio.relayprovider';
-import { get as PostWidth } from '@azzapp/relay/providers/PostWidth.relayprovider';
-import { get as ScreenWidth } from '@azzapp/relay/providers/ScreenWidth.relayprovider';
 import { encodeMediaId } from '@azzapp/shared/imagesHelpers';
 import { colors } from '#theme';
 import { CancelHeaderButton } from '#components/commonsButtons';
@@ -28,6 +24,10 @@ import { getFileName } from '#helpers/fileHelpers';
 import { addLocalCachedMediaFile } from '#helpers/mediaHelpers';
 import { uploadMedia, uploadSign } from '#helpers/MobileWebAPI';
 import relayScreen from '#helpers/relayScreen';
+import { get as CappedPixelRatio } from '#relayProviders/CappedPixelRatio.relayprovider';
+import { get as PixelRatio } from '#relayProviders/PixelRatio.relayprovider';
+import { get as PostWidth } from '#relayProviders/PostWidth.relayprovider';
+import { get as ScreenWidth } from '#relayProviders/ScreenWidth.relayprovider';
 import ActivityIndicator from '#ui/ActivityIndicator';
 import Container from '#ui/Container';
 import Header from '#ui/Header';
@@ -37,9 +37,9 @@ import PostContentStep from './PostContentStep';
 import PostCreationScreenContext from './PostCreationScreenContext';
 import type { ImagePickerResult } from '#components/ImagePicker';
 import type { RelayScreenProps } from '#helpers/relayScreen';
+import type { PostCreationScreenMutation } from '#relayArtifacts/PostCreationScreenMutation.graphql';
+import type { PostCreationScreenQuery } from '#relayArtifacts/PostCreationScreenQuery.graphql';
 import type { NewPostRoute } from '#routes';
-import type { PostCreationScreenMutation } from '@azzapp/relay/artifacts/PostCreationScreenMutation.graphql';
-import type { PostCreationScreenQuery } from '@azzapp/relay/artifacts/PostCreationScreenQuery.graphql';
 
 const POST_MAX_DURATION = 15;
 

@@ -10,8 +10,8 @@ import Header from '#ui/Header';
 import IconButton from '#ui/IconButton';
 import FollowingsScreenList from './FollowingsScreenList';
 import type { RelayScreenProps } from '#helpers/relayScreen';
+import type { FollowingsScreenQuery } from '#relayArtifacts/FollowingsScreenQuery.graphql';
 import type { FollowingsRoute } from '#routes';
-import type { FollowingsScreenQuery } from '@azzapp/relay/artifacts/FollowingsScreenQuery.graphql';
 import type { PreloadedQuery } from 'react-relay';
 
 const followingsScreenQuery = graphql`

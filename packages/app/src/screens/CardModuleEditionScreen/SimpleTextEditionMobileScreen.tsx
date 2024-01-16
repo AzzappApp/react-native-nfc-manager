@@ -1,7 +1,7 @@
 import { graphql, usePreloadedQuery } from 'react-relay';
 import SimpleTextEditionScreen from '#screens/SimpleTextEditionScreen';
-import type { SimpleTextEditionMobileScreenQuery } from '@azzapp/relay/artifacts/SimpleTextEditionMobileScreenQuery.graphql';
-import type { SimpleTextEditionScreen_module$key } from '@azzapp/relay/artifacts/SimpleTextEditionScreen_module.graphql';
+import type { SimpleTextEditionMobileScreenQuery } from '#relayArtifacts/SimpleTextEditionMobileScreenQuery.graphql';
+import type { SimpleTextEditionScreen_module$key } from '#relayArtifacts/SimpleTextEditionScreen_module.graphql';
 import type { PreloadedQuery } from 'react-relay';
 
 type SimpleTextEditionMobileScreenProps = {
