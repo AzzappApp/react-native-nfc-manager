@@ -68,10 +68,6 @@ const CardModuleBackground = ({
               swapColor(patternColor, colorPalette) ?? '#000',
               opacity,
             ),
-            WebkitMaskImage: `url(${getCldImageUrl({
-              src: decodeMediaId(backgroundId),
-              format: 'svg',
-            })})`,
             maskImage: `url(${getCldImageUrl({
               src: decodeMediaId(backgroundId),
               format: 'svg',

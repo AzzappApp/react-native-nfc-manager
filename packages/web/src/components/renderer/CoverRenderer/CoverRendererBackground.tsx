@@ -3,7 +3,6 @@ import { getCldImageUrl } from 'next-cloudinary';
 import { DEFAULT_COLOR_PALETTE, swapColor } from '@azzapp/shared/cardHelpers';
 import { COVER_RATIO } from '@azzapp/shared/coverHelpers';
 import { decodeMediaId } from '@azzapp/shared/imagesHelpers';
-import CloudinaryImage from '#ui/CloudinaryImage';
 import styles from './CoverRenderer.css';
 import type { Media, WebCard } from '@azzapp/data/domains';
 
@@ -21,15 +20,7 @@ const CoverRendererBackground = ({
   if (!media) return null;
 
   return (
-    <div
-      className={styles.wrapper}
-      style={{
-        backgroundColor: swapColor(
-          coverData?.backgroundColor ?? 'light',
-          cardColors ?? DEFAULT_COLOR_PALETTE,
-        ),
-      }}
-    >
+    <>
       {coverData?.backgroundId && (
         <div
           style={{
@@ -38,61 +29,29 @@ const CoverRendererBackground = ({
                 coverData.backgroundPatternColor,
                 cardColors ?? DEFAULT_COLOR_PALETTE,
               ) ?? '#000',
-            WebkitMaskImage: `url(${getCldImageUrl({
-              src: decodeMediaId(coverData.backgroundId),
-              width: BACKGROUND_IMAGE_SIZE,
-              height: BACKGROUND_IMAGE_SIZE / COVER_RATIO,
-              format: 'auto',
-            })})`,
             maskImage: `url(${getCldImageUrl({
               src: decodeMediaId(coverData.backgroundId),
               width: BACKGROUND_IMAGE_SIZE,
               height: BACKGROUND_IMAGE_SIZE / COVER_RATIO,
               format: 'auto',
             })})`,
-            maskPosition: 'bottom',
-            WebkitMaskPosition: 'bottom',
+            maskPosition: 'center',
           }}
-          className={styles.layerMedia}
+          className={cn(styles.layerMedia, styles.layerBackground)}
         />
       )}
-      <CloudinaryImage
-        mediaId={media.id}
-        alt="background"
-        quality={1}
-        priority
-        fill
-        sizes="100vw"
-        videoThumbnail={media.kind === 'video'}
+      <div
         className={cn(styles.coverMedia, styles.backgroundMedia)}
+        style={{
+          backgroundImage: `url(${getCldImageUrl({
+            src: decodeMediaId(media.id),
+            width: BACKGROUND_IMAGE_SIZE,
+            height: BACKGROUND_IMAGE_SIZE / COVER_RATIO,
+            format: 'auto',
+          })})`,
+        }}
       />
-      {coverData?.foregroundId && !coverData?.foregroundId.startsWith('l:') && (
-        <div
-          style={{
-            backgroundColor:
-              swapColor(
-                coverData.foregroundColor,
-                cardColors ?? DEFAULT_COLOR_PALETTE,
-              ) ?? '#000',
-            WebkitMaskImage: `url(${getCldImageUrl({
-              src: decodeMediaId(coverData.foregroundId),
-              width: BACKGROUND_IMAGE_SIZE,
-              height: BACKGROUND_IMAGE_SIZE / COVER_RATIO,
-              format: 'auto',
-            })})`,
-            maskImage: `url(${getCldImageUrl({
-              src: decodeMediaId(coverData.foregroundId),
-              width: BACKGROUND_IMAGE_SIZE,
-              height: BACKGROUND_IMAGE_SIZE / COVER_RATIO,
-              format: 'auto',
-            })})`,
-            maskPosition: 'bottom',
-            WebkitMaskPosition: 'bottom',
-          }}
-          className={styles.layerMedia}
-        />
-      )}
-    </div>
+    </>
   );
 };
 

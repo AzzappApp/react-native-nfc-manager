@@ -184,12 +184,6 @@ const CoverRenderer = ({
                   coverData.backgroundPatternColor,
                   cardColors ?? DEFAULT_COLOR_PALETTE,
                 ) ?? '#000',
-              WebkitMaskImage: `url(${getCldImageUrl({
-                src: decodeMediaId(coverData.backgroundId),
-                width: coverWidth,
-                height: coverHeight,
-                format: 'auto',
-              })})`,
               maskImage: `url(${getCldImageUrl({
                 src: decodeMediaId(coverData.backgroundId),
                 width: coverWidth,
@@ -278,12 +272,6 @@ const CoverRenderer = ({
                     coverData.foregroundColor,
                     cardColors ?? DEFAULT_COLOR_PALETTE,
                   ) ?? '#000',
-                WebkitMaskImage: `url(${getCldImageUrl({
-                  src: decodeMediaId(coverData.foregroundId),
-                  width: coverWidth,
-                  height: coverHeight,
-                  format: 'auto',
-                })})`,
                 maskImage: `url(${getCldImageUrl({
                   src: decodeMediaId(coverData.foregroundId),
                   width: coverWidth,
@@ -291,7 +279,6 @@ const CoverRenderer = ({
                   format: 'auto',
                 })})`,
                 maskPosition: 'bottom',
-                WebkitMaskPosition: 'bottom',
               }}
               className={styles.layerMedia}
             />

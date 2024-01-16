@@ -1,16 +1,6 @@
 import { style } from '@vanilla-extract/css';
 import { MediaQuery } from '#app/[userName]/theme.css';
 
-const wrapper = style({
-  filter: 'blur(15px)',
-  position: 'absolute',
-  top: '-4%',
-  left: '-4%',
-  width: '110%',
-  height: '110%',
-  willChange: 'blur',
-});
-
 const coverMedia = style({
   position: 'absolute',
   top: 0,
@@ -20,14 +10,17 @@ const coverMedia = style({
 });
 
 const backgroundMedia = style({
-  objectFit: 'cover',
-  objectPosition: 'bottom',
+  backgroundAttachment: 'fixed',
+  backgroundRepeat: 'no-repeat',
+  backgroundSize: 'cover',
+  backgroundPosition: 'center',
   '@media': {
     [MediaQuery.Mobile]: {
       display: 'none',
     },
     [MediaQuery.Desktop]: {
       display: 'block',
+      height: '580px',
     },
   },
 });
@@ -41,7 +34,9 @@ const content = style({
       width: '100vw',
     },
     [MediaQuery.Desktop]: {
-      maxWidth: '375px',
+      maxWidth: '300px',
+      borderRadius: 35,
+      boxShadow: '0px 10px 20px 0px rgba(0, 0, 0, 0.20)',
     },
   },
 });
@@ -73,8 +68,12 @@ const layerMedia = style({
   maskPosition: 'center',
 });
 
+const layerBackground = style({
+  height: 580,
+});
+
 const styles = {
-  wrapper,
+  layerBackground,
   coverMedia,
   backgroundMedia,
   content,

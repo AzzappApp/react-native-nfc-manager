@@ -130,6 +130,15 @@ const postNavigationHidden = style({
   visibility: 'hidden',
 });
 
+const coverContainer = style({
+  '@media': {
+    [MediaQuery.Desktop]: {
+      padding: '50px 0',
+      backdropFilter: 'blur(15px)',
+    },
+  },
+});
+
 const styles = {
   wrapper,
   background,
@@ -142,6 +151,7 @@ const styles = {
   postNavigation,
   postNavigationHidden,
   postsClosed,
+  coverContainer,
 };
 
 export default styles;
