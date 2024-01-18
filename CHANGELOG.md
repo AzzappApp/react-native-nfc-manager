@@ -1,5 +1,6 @@
-## 0.5.2-canary.162
+## 0.5.2-canary.163
 
+* **fix:**  - **multiUser:** [#2324](https://github.com/AzzappApp/azzapp/pull/2324) case when adding a user without selecting a contact ([#2350](https://github.com/AzzappApp/azzapp/pull/2350))
 * **test:**  - 💍 sync tests with removed multi actor ([#2345](https://github.com/AzzappApp/azzapp/pull/2345))
 * **fix:**  - **webCard:** manage edge cases for background ([#2326](https://github.com/AzzappApp/azzapp/pull/2326))
 * **docs:**  - update minimum node version
