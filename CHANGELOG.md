@@ -1,4 +1,4 @@
-## 0.5.2-canary.159
+## 0.5.2-canary.160
 
 * **docs:**  - update minimum node version
 * **feat:**  - rework user invit to use the contact folder and fix the matching ([#2320](https://github.com/AzzappApp/azzapp/pull/2320))
