@@ -120,38 +120,44 @@ class MediaHelpers: NSObject {
   
   private var prefetchImageTasks = [NSURL:Nuke.AsyncImageTask]()
   
+  private var imageCacheDispatchQueue = DispatchQueue(label: "com.azzapp.azzapp.MediaHelpers.imageCache")
+  
   @objc
   private func prefetchImage(
     _ uri: NSURL,
     resolve: @escaping RCTPromiseResolveBlock,
     reject: @escaping RCTPromiseRejectBlock
   ) {
-    if uri.isFileURL {
-      resolve(false)
-      return
-    }
-    if prefetchImageTasks[uri] != nil {
+    imageCacheDispatchQueue.sync {
+       if uri.isFileURL {
+        resolve(false)
+        return
+      }
+      if prefetchImageTasks[uri] != nil {
+        resolve(true)
+        return
+      }
+      
+      let request = ImageRequest(url: uri as URL)
+      let pipeline = MediaPipeline.pipeline;
+      
+      if pipeline.cache.cachedImage(for: request) != nil {
+        resolve(false)
+        return
+      }
+      
+      let task = pipeline.imageTask(with: request)
+      prefetchImageTasks[uri] = task;
+      
+      Task {
+        _ = try? await task.image
+        _ = imageCacheDispatchQueue.sync {
+          prefetchImageTasks.removeValue(forKey: uri)
+        }
+      }
+      
       resolve(true)
-      return
     }
-    
-    let request = ImageRequest(url: uri as URL)
-    let pipeline = MediaPipeline.pipeline;
-    
-    if pipeline.cache.cachedImage(for: request) != nil {
-      resolve(false)
-      return
-    }
-    
-    let task = pipeline.imageTask(with: request)
-    prefetchImageTasks[uri] = task;
-    
-    Task {
-      _ = try? await task.image
-      prefetchImageTasks.removeValue(forKey: uri)
-    }
-    
-    resolve(true)
   }
   
   @objc
@@ -160,32 +166,37 @@ class MediaHelpers: NSObject {
     resolve: @escaping RCTPromiseResolveBlock,
     reject: @escaping RCTPromiseRejectBlock
   ) {
-    guard let task = prefetchImageTasks[uri] else {
-      reject("TASK_DOES_NOT_EXISTS", "No task registered for url \(uri)", nil)
-      return
-    }
-    Task {
-      do {
-        _ = try await task.image
-      } catch {
-        if (error is CancellationError) {
-          resolve(nil)
-        } else {
-          reject("FAILED_TO_LOAD", "Task with uri: \(uri) failed", error)
-        }
+    imageCacheDispatchQueue.sync {
+      guard let task = prefetchImageTasks[uri] else {
+        // that generally means that the prefetch was successfull before this method was called
+        resolve(nil)
         return
       }
-      resolve(nil)
+      Task {
+        do {
+          _ = try await task.image
+        } catch {
+          if (error is CancellationError) {
+            resolve(nil)
+          } else {
+            reject("FAILED_TO_LOAD", "Task with uri: \(uri) failed", error)
+          }
+          return
+        }
+        resolve(nil)
+      }
     }
   }
   
   @objc
   func cancelImagePrefetch(_ uri: NSURL) {
-    guard let task = prefetchImageTasks[uri] else {
-      return
+    imageCacheDispatchQueue.sync {
+      guard let task = prefetchImageTasks[uri] else {
+        return
+      }
+      task.cancel()
+      prefetchImageTasks.removeValue(forKey: uri)
     }
-    task.cancel()
-    prefetchImageTasks.removeValue(forKey: uri)
   }
   
   @objc
