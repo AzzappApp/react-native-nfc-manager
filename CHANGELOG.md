@@ -1,5 +1,6 @@
-## 0.5.2-canary.165
+## 0.5.2-canary.166
 
+* **fix:**  - **CoverEdition:** use raw uri for suggested media in save an custom edition ([#2367](https://github.com/AzzappApp/azzapp/pull/2367))
 * **fix:**  - **MediaPrefetcher:** fix possible concurrent access on cache ([#2359](https://github.com/AzzappApp/azzapp/pull/2359))
 * **build:**  - add parameter for other graphql client of the org ([#2362](https://github.com/AzzappApp/azzapp/pull/2362))
 * **fix:**  - **multiUser:** [#2324](https://github.com/AzzappApp/azzapp/pull/2324) case when adding a user without selecting a contact ([#2350](https://github.com/AzzappApp/azzapp/pull/2350))
