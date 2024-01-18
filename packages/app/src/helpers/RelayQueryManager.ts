@@ -1,6 +1,7 @@
 import { isEqual } from 'lodash';
 import { useEffect, useState } from 'react';
 import { loadQuery } from 'react-relay';
+import { act } from 'react-test-renderer';
 import { addAuthStateListener, getAuthState } from './authStore';
 import {
   addEnvironmentListener,
@@ -31,6 +32,26 @@ const activeQueries = new Map<
     profileInfos: ProfileInfos | null;
   }
 >();
+
+/**
+ * A list of queries to dispose
+ */
+const queryToDisposes: Array<PreloadedQuery<any>> = [];
+
+/**
+ * Schedule the disposal of the queries thar are not used anymore
+ * it will be effective during the next idle time
+ */
+const requestDisposeQueries = () => {
+  requestIdleCallback(() => {
+    queryToDisposes.forEach(query => {
+      act(() => {
+        query.dispose();
+      });
+    });
+    queryToDisposes.length = 0;
+  });
+};
 
 /**
  * A map of listeners, indexed by screenId
@@ -90,13 +111,14 @@ const resetQueries = () => {
   // avoid some race conditions
   resetTimeout = setTimeout(() => {
     [...activeQueries.entries()].forEach(([, entry]) => {
-      entry.preloadedQuery.dispose();
+      queryToDisposes.push(entry.preloadedQuery);
     });
     activeQueries.clear();
     for (const screenListeners of listeners.values()) {
       screenListeners.forEach(listener => listener());
     }
     resetTimeout = null;
+    requestDisposeQueries();
   }, 20);
 };
 
@@ -107,29 +129,14 @@ const refreshQueries = () => {
   }
   clearTimeout(refreshTimeout);
   refreshTimeout = setTimeout(() => {
-    const profileInfos = getAuthState().profileInfos;
-    if (!profileInfos) {
-      // TODO handle this case ????
-      return;
-    }
-    const environment = getRelayEnvironment();
+    const profileInfos = getAuthState().profileInfos ?? null;
     for (const [screenId, entry] of activeQueries.entries()) {
       if (entry.profileInfos && !isEqual(entry.profileInfos, profileInfos)) {
-        const oldPreloadedQuery = entry.preloadedQuery;
-        const { query, variables } = getLoadQueryInfo(
-          entry.options,
-          entry.params,
-          profileInfos,
-        );
-        const newPreloadedQuery = loadQuery(environment, query, variables);
-        entry.preloadedQuery = newPreloadedQuery;
-        entry.profileInfos = profileInfos;
-        listeners.get(screenId)?.forEach(listener => listener());
-        requestIdleCallback(() => {
-          oldPreloadedQuery.dispose();
-        });
+        queryToDisposes.push(entry.preloadedQuery);
+        activeQueries.delete(screenId);
       }
     }
+    requestDisposeQueries();
     refreshTimeout = null;
   }, 30);
 };

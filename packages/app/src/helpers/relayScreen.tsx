@@ -14,7 +14,11 @@ import {
   FetchError,
   TIMEOUT_ERROR_MESSAGE,
 } from '@azzapp/shared/networkHelpers';
-import { useRouter, type NativeScreenProps } from '#components/NativeRouter';
+import {
+  useRouter,
+  type NativeScreenProps,
+  useScreenHasFocus,
+} from '#components/NativeRouter';
 import useAuthState from '#hooks/useAuthState';
 import {
   getLoadQueryInfo,
@@ -112,11 +116,13 @@ function relayScreen<TRoute extends Route>(
     const { preloadedQuery, profileInfos: queryProfileInfos } =
       useManagedQuery((props as any).screenId) ?? {};
 
+    const hasFocus = useScreenHasFocus();
+
     useEffect(() => {
-      if (!preloadedQuery) {
+      if (!preloadedQuery && hasFocus) {
         loadQueryFor(screenId, options, params);
       }
-    }, [screenId, params, preloadedQuery]);
+    }, [screenId, params, preloadedQuery, hasFocus]);
 
     const environment = useRelayEnvironment();
     useEffect(() => {
@@ -174,11 +180,11 @@ function relayScreen<TRoute extends Route>(
     const router = useRouter();
 
     const isInErrorState = useRef(false);
-    const erroBoundaryRef = useRef<RelayScreenErrorBoundary>(null);
+    const errorBoundaryRef = useRef<RelayScreenErrorBoundary>(null);
     const retry = useCallback(() => {
       isInErrorState.current = false;
       loadQueryFor(screenId, options, params, true);
-      erroBoundaryRef.current?.reset();
+      errorBoundaryRef.current?.reset();
     }, [params, screenId]);
 
     const onError = useCallback(() => {
@@ -239,7 +245,7 @@ function relayScreen<TRoute extends Route>(
     ErrorFallback = ErrorFallback ?? Fallback;
     return (
       <RelayScreenErrorBoundary
-        ref={erroBoundaryRef}
+        ref={errorBoundaryRef}
         onError={onError}
         fallback={
           ErrorFallback ? <ErrorFallback {...props} retry={retry} /> : null
