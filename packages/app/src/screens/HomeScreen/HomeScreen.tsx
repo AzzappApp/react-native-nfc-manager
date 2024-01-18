@@ -37,6 +37,11 @@ const HomeScreen = ({
     }
   }, [hasFocus]);
 
+  if (!currentUser) {
+    // should never happen
+    return null;
+  }
+
   return <HomeScreenContent user={currentUser} />;
 };
 
@@ -58,7 +63,7 @@ const HomeScreenFallback = () => {
 
 export default relayScreen(HomeScreen, {
   query: homeScreenQuery,
-  webCardBound: false,
+  profileBound: false,
   fallback: HomeScreenFallback,
   canGoBack: false,
   pollInterval: 30000,

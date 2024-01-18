@@ -52,21 +52,17 @@ describe('ContactCardScreen', () => {
 
   const renderContactCardScreen = () => {
     environment = createMockEnvironment();
-    environment.mock.queuePendingOperation(ContactCardScreenQueryNode, {});
-
+    environment.mock.queuePendingOperation(ContactCardScreenQueryNode, {
+      profileId: 'testProfileId',
+    });
     environment.mock.queueOperationResolver(operation => {
-      console.log(operation);
       return MockPayloadGenerator.generate(operation, {
-        Query() {
+        Profile() {
           return {
-            viewer: {
-              profile: {
-                webCard: {
-                  userName: 'testUserName',
-                  cardColors: {
-                    primary: '#FFFFFF',
-                  },
-                },
+            webCard: {
+              userName: 'testUserName',
+              cardColors: {
+                primary: '#FFFFFF',
               },
             },
           };
@@ -77,7 +73,9 @@ describe('ContactCardScreen', () => {
     const preloadedQuery = loadQuery<ContactCardScreenQuery>(
       environment,
       ContactCardScreenQueryNode,
-      {},
+      {
+        profileId: 'testProfileId',
+      },
     );
 
     const TestRenderer = () => {
@@ -104,7 +102,6 @@ describe('ContactCardScreen', () => {
 
   test('Should render add to wallet button', () => {
     renderContactCardScreen();
-
     expect(screen.getByTestId('add-to-wallet-button')).toBeOnTheScreen();
   });
 

@@ -5,6 +5,7 @@ import { graphql } from 'react-relay';
 import { useLazyLoadQuery } from 'react-relay/hooks';
 import { useRouter } from '#components/NativeRouter';
 import PostList from '#components/WebCardPostsList';
+import useAuthState from '#hooks/useAuthState';
 import Container from '#ui/Container';
 import Header from '#ui/Header';
 import IconButton from '#ui/IconButton';
@@ -27,18 +28,21 @@ const WebCardPostsList = ({
 }: WebCardPostsListProps) => {
   const intl = useIntl();
 
+  const authState = useAuthState();
+
   const { webCard } = useLazyLoadQuery<WebCardPostsListQuery>(
     graphql`
-      query WebCardPostsListQuery($id: ID!) {
+      query WebCardPostsListQuery($id: ID!, $viewerWebCardId: ID!) {
         webCard: node(id: $id) {
           ... on WebCard {
             ...WebCardPostsList_webCard
+              @arguments(viewerWebCardId: $viewerWebCardId)
             ...PostRendererFragment_author
           }
         }
       }
     `,
-    { id: webCardId },
+    { id: webCardId, viewerWebCardId: authState.profileInfos?.webCardId ?? '' },
     { fetchPolicy: 'store-and-network' },
   );
 

@@ -1,11 +1,12 @@
+import { isEqual } from 'lodash';
 import { useEffect, useState } from 'react';
 import { loadQuery } from 'react-relay';
 import { addAuthStateListener, getAuthState } from './authStore';
 import {
-  ROOT_ACTOR_ID,
   addEnvironmentListener,
   getRelayEnvironment,
 } from './relayEnvironment';
+import type { ProfileInfos } from './authStore';
 import type {
   FetchPolicy,
   GraphQLTaggedNode,
@@ -25,9 +26,9 @@ const activeQueries = new Map<
   string,
   {
     preloadedQuery: PreloadedQuery<any>;
-    variables: Variables;
-    query: GraphQLTaggedNode;
-    actorId?: string;
+    options: LoadQueryOptions<any>;
+    params: any;
+    profileInfos: ProfileInfos | null;
   }
 >();
 
@@ -73,39 +74,13 @@ export const init = () => {
         break;
     }
   });
-  let currentWebCardId = getAuthState().webCardId;
-  addAuthStateListener(({ webCardId }) => {
-    if (webCardId !== currentWebCardId) {
-      currentWebCardId = webCardId;
+  let currentProfileInfos = getAuthState().profileInfos;
+  addAuthStateListener(({ profileInfos }) => {
+    if (!isEqual(currentProfileInfos, profileInfos)) {
+      currentProfileInfos = profileInfos;
       refreshQueries();
     }
   });
-};
-
-let refreshTimeout: any = null;
-const refreshQueries = () => {
-  clearTimeout(refreshTimeout);
-  refreshTimeout = setTimeout(() => {
-    const webCardId = getAuthState().webCardId;
-    for (const [screenId, entry] of activeQueries.entries()) {
-      if (entry.actorId !== webCardId && entry.actorId !== ROOT_ACTOR_ID) {
-        const oldPreloadedQuery = entry.preloadedQuery;
-        const multiActorEnvironment = getRelayEnvironment();
-        const actorId = webCardId ?? ROOT_ACTOR_ID;
-        const newPreloadedQuery = loadQuery(
-          multiActorEnvironment.forActor(actorId),
-          entry.query,
-          entry.variables,
-        );
-        entry.preloadedQuery = newPreloadedQuery;
-        entry.actorId = actorId;
-        listeners.get(screenId)?.forEach(listener => listener());
-        requestIdleCallback(() => {
-          oldPreloadedQuery.dispose();
-        });
-      }
-    }
-  }, 30);
 };
 
 let resetTimeout: any = null;
@@ -121,7 +96,42 @@ const resetQueries = () => {
     for (const screenListeners of listeners.values()) {
       screenListeners.forEach(listener => listener());
     }
+    resetTimeout = null;
   }, 20);
+};
+
+let refreshTimeout: any = null;
+const refreshQueries = () => {
+  if (resetTimeout !== null) {
+    return;
+  }
+  clearTimeout(refreshTimeout);
+  refreshTimeout = setTimeout(() => {
+    const profileInfos = getAuthState().profileInfos;
+    if (!profileInfos) {
+      // TODO handle this case ????
+      return;
+    }
+    const environment = getRelayEnvironment();
+    for (const [screenId, entry] of activeQueries.entries()) {
+      if (entry.profileInfos && !isEqual(entry.profileInfos, profileInfos)) {
+        const oldPreloadedQuery = entry.preloadedQuery;
+        const { query, variables } = getLoadQueryInfo(
+          entry.options,
+          entry.params,
+          profileInfos,
+        );
+        const newPreloadedQuery = loadQuery(environment, query, variables);
+        entry.preloadedQuery = newPreloadedQuery;
+        entry.profileInfos = profileInfos;
+        listeners.get(screenId)?.forEach(listener => listener());
+        requestIdleCallback(() => {
+          oldPreloadedQuery.dispose();
+        });
+      }
+    }
+    refreshTimeout = null;
+  }, 30);
 };
 
 /**
@@ -131,15 +141,16 @@ const resetQueries = () => {
  */
 export const useManagedQuery = (screenId: string) => {
   const [queryInfos, setQueryInfos] = useState(() => {
-    const { preloadedQuery, actorId } = activeQueries.get(screenId) ?? {};
-    return preloadedQuery && actorId ? { preloadedQuery, actorId } : null;
+    const { preloadedQuery, profileInfos } = activeQueries.get(screenId) ?? {};
+    return preloadedQuery ? { preloadedQuery, profileInfos } : null;
   });
   useEffect(
     () =>
       addListener(screenId, () => {
         setQueryInfos(() => {
-          const { preloadedQuery, actorId } = activeQueries.get(screenId) ?? {};
-          return preloadedQuery && actorId ? { preloadedQuery, actorId } : null;
+          const { preloadedQuery, profileInfos } =
+            activeQueries.get(screenId) ?? {};
+          return preloadedQuery ? { preloadedQuery, profileInfos } : null;
         });
       }),
     [screenId],
@@ -162,11 +173,14 @@ export type LoadQueryOptions<TParams> = {
    * @param params
    * @returns the query variables
    */
-  getVariables?: (params: TParams) => Variables;
+  getVariables?: (
+    params: TParams,
+    profileInfos: ProfileInfos | null,
+  ) => Variables;
   /**
    * If true, the query will be bound to the current webCard
    */
-  webCardBound?: boolean | ((params: TParams) => boolean);
+  profileBound?: boolean | ((params: TParams) => boolean);
   /**
    * The request fetch policy
    */
@@ -182,10 +196,11 @@ export type LoadQueryOptions<TParams> = {
 export const getLoadQueryInfo = <T>(
   options: LoadQueryOptions<T>,
   params: T = {} as T,
+  profileInfos: ProfileInfos | null = null,
 ) => {
   const query =
     typeof options.query === 'function' ? options.query(params) : options.query;
-  const variables = options.getVariables?.(params) ?? {};
+  const variables = options.getVariables?.(params, profileInfos) ?? {};
 
   return { query, variables };
 };
@@ -204,23 +219,22 @@ export const loadQueryFor = <T>(
   refresh = false,
 ) => {
   if (!activeQueries.has(screenId) || refresh) {
-    const { query, variables } = getLoadQueryInfo(options, params);
-
-    const multiActorEnvironment = getRelayEnvironment();
-    const actorId =
-      (options.webCardBound && getAuthState().webCardId) || ROOT_ACTOR_ID;
-
-    const preloadedQuery = loadQuery(
-      multiActorEnvironment.forActor(actorId),
-      query,
-      variables,
-      { fetchPolicy: options.fetchPolicy },
+    const environment = getRelayEnvironment();
+    const { profileInfos } = getAuthState();
+    const { query, variables } = getLoadQueryInfo(
+      options,
+      params,
+      profileInfos,
     );
+
+    const preloadedQuery = loadQuery(environment, query, variables, {
+      fetchPolicy: options.fetchPolicy,
+    });
     activeQueries.set(screenId, {
-      query,
       preloadedQuery,
-      variables,
-      actorId,
+      options,
+      params,
+      profileInfos: options.profileBound ? profileInfos : null,
     });
     listeners.get(screenId)?.forEach(listener => listener());
   }

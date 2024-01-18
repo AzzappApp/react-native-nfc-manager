@@ -76,10 +76,10 @@ const MainTabBar = ({
 }) => {
   const router = useRouter();
 
-  const { profileRole } = useAuthState();
+  const { profileInfos } = useAuthState();
 
   const onItemPress = (key: string) => {
-    if (key !== 'NEW_POST' || (profileRole && isEditor(profileRole))) {
+    if (key !== 'NEW_POST' || isEditor(profileInfos?.profileRole)) {
       router.push({ route: key as any });
     } else {
       Toast.show({

@@ -1,9 +1,14 @@
-import { useCallback, useEffect, useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
-import { graphql, useMutation, usePreloadedQuery } from 'react-relay';
+import {
+  graphql,
+  useFragment,
+  useMutation,
+  usePreloadedQuery,
+} from 'react-relay';
 import { colors } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import relayScreen from '#helpers/relayScreen';
@@ -14,42 +19,24 @@ import PressableNative from '#ui/PressableNative';
 import Select from '#ui/Select';
 import Switch from '#ui/Switch';
 import Text from '#ui/Text';
-import WebcardParametersHeader from './WebcardParametersHeader';
-import WebcardParametersNameForm from './WebcardParametersNameForm';
-import WebcardParametersScreenFallback from './WebcardParametersScreenFallback';
+import WebCardParametersHeader from './WebCardParametersHeader';
+import WebCardParametersNameForm from './WebCardParametersNameForm';
+import WebCardParametersScreenFallback from './WebCardParametersScreenFallback';
 import type { RelayScreenProps } from '#helpers/relayScreen';
-import type { WebcardParametersScreenMutation } from '#relayArtifacts/WebcardParametersScreenMutation.graphql';
-import type { WebcardParametersScreenPublishMutation } from '#relayArtifacts/WebcardParametersScreenPublishMutation.graphql';
+import type { WebCardParametersScreen_webCard$key } from '#relayArtifacts/WebCardParametersScreen_webCard.graphql';
+import type { WebCardParametersScreenMutation } from '#relayArtifacts/WebCardParametersScreenMutation.graphql';
 import type {
-  WebcardParametersScreenQuery,
-  WebcardParametersScreenQuery$data,
-} from '#relayArtifacts/WebcardParametersScreenQuery.graphql';
-import type { WebcardParametersScreenUnPublishMutation } from '#relayArtifacts/WebcardParametersScreenUnPublishMutation.graphql';
-import type { WebcardParametersRoute } from '#routes';
+  WebCardParametersScreenQuery,
+  WebCardParametersScreenQuery$data,
+} from '#relayArtifacts/WebCardParametersScreenQuery.graphql';
+import type { WebCardParametersScreenUnPublishMutation } from '#relayArtifacts/WebCardParametersScreenUnPublishMutation.graphql';
+import type { WebCardParametersRoute } from '#routes';
 import type { ArrayItemType } from '@azzapp/shared/arrayHelpers';
 
-const webcardParametersScreenQuery = graphql`
-  query WebcardParametersScreenQuery {
-    viewer {
-      profile {
-        id
-        webCard {
-          id
-          userName
-          cardIsPublished
-          webCardKind
-          alreadyPublished
-          lastUserNameUpdate
-          nextChangeUsernameAllowedAt
-          webCardCategory {
-            id
-          }
-          companyActivity {
-            id
-          }
-          ...AccountHeader_webCard
-        }
-      }
+const webCardParametersScreenQuery = graphql`
+  query WebCardParametersScreenQuery($webCardId: ID!) {
+    webCard: node(id: $webCardId) {
+      ...WebCardParametersScreen_webCard
     }
     webCardCategories {
       id
@@ -66,15 +53,37 @@ const webcardParametersScreenQuery = graphql`
   }
 `;
 
-const WebcardParametersScreen = ({
+const WebCardParametersScreen = ({
   preloadedQuery,
-}: RelayScreenProps<WebcardParametersRoute, WebcardParametersScreenQuery>) => {
+}: RelayScreenProps<WebCardParametersRoute, WebCardParametersScreenQuery>) => {
   const {
-    viewer: { profile },
+    webCard: webCardKey,
     webCardCategories,
     webCardParameters: { userNameChangeFrequencyDay },
-  } = usePreloadedQuery(webcardParametersScreenQuery, preloadedQuery);
-  const webCard = profile?.webCard ?? null;
+  } = usePreloadedQuery(webCardParametersScreenQuery, preloadedQuery);
+
+  const webCard = useFragment(
+    graphql`
+      fragment WebCardParametersScreen_webCard on WebCard {
+        id
+        userName
+        cardIsPublished
+        webCardKind
+        alreadyPublished
+        lastUserNameUpdate
+        nextChangeUsernameAllowedAt
+        webCardCategory {
+          id
+        }
+        companyActivity {
+          id
+        }
+        ...AccountHeader_webCard
+      }
+    `,
+    webCardKey as WebCardParametersScreen_webCard$key | null,
+  );
+
   const intl = useIntl();
   const styles = useStyleSheet(styleSheet);
   const [userNameFormVisible, toggleUserNameFormVisible] = useToggle(false);
@@ -85,22 +94,12 @@ const WebcardParametersScreen = ({
     [webCard?.webCardCategory?.id, webCardCategories],
   );
 
-  const [publish] = useMutation<WebcardParametersScreenPublishMutation>(graphql`
-    mutation WebcardParametersScreenPublishMutation {
-      publishCard {
-        webCard {
-          id
-          cardIsPublished
-          alreadyPublished
-        }
-      }
-    }
-  `);
-
-  const [unpublish] = useMutation<WebcardParametersScreenUnPublishMutation>(
-    graphql`
-      mutation WebcardParametersScreenUnPublishMutation {
-        unpublishCard {
+  const [commitToggleWebCardPublished] =
+    useMutation<WebCardParametersScreenUnPublishMutation>(graphql`
+      mutation WebCardParametersScreenUnPublishMutation(
+        $input: ToggleWebCardPublishedInput!
+      ) {
+        toggleWebCardPublished(input: $input) {
           webCard {
             id
             cardIsPublished
@@ -108,69 +107,63 @@ const WebcardParametersScreen = ({
           }
         }
       }
-    `,
-  );
+    `);
 
   const onChangeIsPublished = useCallback(
-    (value: boolean) => {
-      if (value) {
-        publish({
-          variables: {},
-          optimisticResponse: {
-            publishCard: {
-              id: webCard?.id,
-              cardIsPublished: true,
-              alreadyPublished: webCard?.alreadyPublished,
-            },
-          },
-        });
-      } else {
-        unpublish({
-          variables: {},
-          optimisticResponse: {
-            publishCard: {
-              id: webCard?.id,
-              cardIsPublished: false,
-              alreadyPublished: webCard?.alreadyPublished,
-            },
-          },
-        });
+    (published: boolean) => {
+      if (!webCard) {
+        return;
       }
+      commitToggleWebCardPublished({
+        variables: {
+          input: {
+            webCardId: webCard.id,
+            published,
+          },
+        },
+        optimisticResponse: {
+          toggleWebCardPublished: {
+            webCard: {
+              id: webCard?.id,
+              cardIsPublished: published,
+              alreadyPublished: webCard?.alreadyPublished,
+            },
+          },
+        },
+      });
     },
-    [publish, unpublish, webCard?.alreadyPublished, webCard?.id],
+    [commitToggleWebCardPublished, webCard],
   );
 
-  useEffect(() => {
-    //TODO: remove this later,
-    // the already published flag was initalized at false and does not reflect the cardIsPublished actual flag
-    if (webCard && webCard.cardIsPublished && !webCard.alreadyPublished) {
-      publish({ variables: {} });
-    }
-  }, [publish, webCard, webCard?.alreadyPublished, webCard?.cardIsPublished]);
-
-  const [commit] = useMutation<WebcardParametersScreenMutation>(graphql`
-    mutation WebcardParametersScreenMutation($input: UpdateWebCardInput!) {
-      updateWebCard(input: $input) {
-        webCard {
-          id
-          webCardKind
-          lastUserNameUpdate
-          webCardCategory {
+  const [commitUpdateWebCard] = useMutation<WebCardParametersScreenMutation>(
+    graphql`
+      mutation WebCardParametersScreenMutation($input: UpdateWebCardInput!) {
+        updateWebCard(input: $input) {
+          webCard {
             id
-          }
-          companyActivity {
-            id
+            webCardKind
+            lastUserNameUpdate
+            webCardCategory {
+              id
+            }
+            companyActivity {
+              id
+            }
           }
         }
       }
-    }
-  `);
+    `,
+  );
 
   const updateWebCardCategory = useCallback(
     (webCardCategory: WebCardCategory) => {
-      commit({
+      if (!webCard) {
+        return;
+      }
+      commitUpdateWebCard({
         variables: {
           input: {
+            webCardId: webCard.id,
             webCardCategoryId: webCardCategory.id,
             webCardKind: webCardCategory.webCardKind,
             companyActivityId: undefined,
@@ -181,20 +174,24 @@ const WebcardParametersScreen = ({
         },
       });
     },
-    [commit],
+    [commitUpdateWebCard, webCard],
   );
 
   const updateProfileActivity = useCallback(
     (activity: CompanyActivity) => {
-      commit({
+      if (!webCard) {
+        return;
+      }
+      commitUpdateWebCard({
         variables: {
           input: {
+            webCardId: webCard.id,
             companyActivityId: activity.id,
           },
         },
       });
     },
-    [commit],
+    [commitUpdateWebCard, webCard],
   );
 
   const canChangeUserName = useMemo(() => {
@@ -224,7 +221,7 @@ const WebcardParametersScreen = ({
             defaultMessage:
               'You will be able to change your WebCard{azzappA} name',
             description:
-              'WebcardParameters Screen : Toast Error message when not authorize to change the Webcard name',
+              'WebCardParameters Screen : Toast Error message when not authorize to change the WebCard name',
           },
           {
             azzappA: <Text variant="azzapp">a</Text>,
@@ -234,7 +231,7 @@ const WebcardParametersScreen = ({
           {
             defaultMessage: 'The {dateChange} at {timeChange}',
             description:
-              'WebcardParameters Screen : Toast Error message when not authorize to change the Webcard name',
+              'WebCardParameters Screen : Toast Error message when not authorize to change the WebCard name',
           },
           {
             dateChange: webCard?.nextChangeUsernameAllowedAt
@@ -267,7 +264,7 @@ const WebcardParametersScreen = ({
           paddingHorizontal: 10,
         }}
       >
-        <WebcardParametersHeader webCard={webCard ?? null} />
+        <WebCardParametersHeader webCard={webCard ?? null} />
         <Icon icon="parameters" style={styles.warningIcon} />
         <View style={styles.modalLine}>
           <Text variant="medium">
@@ -346,7 +343,7 @@ const WebcardParametersScreen = ({
               intl.formatMessage({
                 defaultMessage: 'Select a category',
                 description:
-                  'WebcardParameters screen - Profile Categoriy BottomSheet - Title',
+                  'WebCardParameters screen - Profile Categoriy BottomSheet - Title',
               }) as string
             }
             style={{
@@ -379,7 +376,7 @@ const WebcardParametersScreen = ({
               bottomSheetTitle={intl.formatMessage({
                 defaultMessage: 'Select an activity',
                 description:
-                  'WebcardParameters screen - Activity BottomSheet - Title',
+                  'WebCardParameters screen - Activity BottomSheet - Title',
               })}
               style={{
                 backgroundColor: 'transparent',
@@ -390,7 +387,7 @@ const WebcardParametersScreen = ({
               placeHolder={intl.formatMessage({
                 defaultMessage: 'Select an activity',
                 description:
-                  'WebcardParameters screen Name Company Screen - Accessibility TextInput Placeholder Choose a company activity',
+                  'WebCardParameters screen Name Company Screen - Accessibility TextInput Placeholder Choose a company activity',
               })}
             />
           </View>
@@ -405,8 +402,8 @@ const WebcardParametersScreen = ({
             }}
           />
         </Text>
-        {profile && (
-          <WebcardParametersNameForm
+        {webCard && (
+          <WebCardParametersNameForm
             webCard={webCard}
             visible={userNameFormVisible}
             toggleBottomSheet={toggleUserNameFormVisible}
@@ -450,13 +447,16 @@ const styleSheet = createStyleSheet(appearance => ({
   },
 }));
 
-export default relayScreen(WebcardParametersScreen, {
-  query: webcardParametersScreenQuery,
-  fallback: WebcardParametersScreenFallback,
+export default relayScreen(WebCardParametersScreen, {
+  query: webCardParametersScreenQuery,
+  getVariables: (_, profileInfos) => ({
+    webCardId: profileInfos?.webCardId ?? '',
+  }),
+  fallback: WebCardParametersScreenFallback,
   fetchPolicy: 'store-and-network',
 });
 
 type WebCardCategory = ArrayItemType<
-  WebcardParametersScreenQuery$data['webCardCategories']
+  WebCardParametersScreenQuery$data['webCardCategories']
 >;
 type CompanyActivity = ArrayItemType<WebCardCategory['companyActivities']>;

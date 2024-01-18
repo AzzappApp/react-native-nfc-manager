@@ -13,26 +13,26 @@ import {
   checkMedias,
   db,
   getProfilesPosts,
+  getUserProfileWithWebCardId,
   referencesMedias,
   updateWebCard,
 } from '#domains';
+import fromGlobalIdWithType from '#helpers/relayIdHelpers';
 import type { WebCard } from '#domains';
 import type { MutationResolvers } from '#schema/__generated__/types';
 
 const saveCover: MutationResolvers['saveCover'] = async (
   _,
-  { input },
+  { input: { webCardId: gqlWebCardId, ...data } },
   { auth, cardUsernamesToRevalidate, postsToRevalidate, loaders },
 ) => {
-  const { profileId } = auth;
-  if (!profileId) {
-    throw new GraphQLError(ERRORS.UNAUTHORIZED);
-  }
-
-  const profile = await loaders.Profile.load(profileId);
+  const { userId } = auth;
+  const webCardId = fromGlobalIdWithType(gqlWebCardId, 'WebCard');
+  const profile =
+    userId && (await getUserProfileWithWebCardId(userId, webCardId));
 
   if (!profile || !isEditor(profile.profileRole)) {
-    throw new GraphQLError(ERRORS.INVALID_REQUEST);
+    throw new GraphQLError(ERRORS.UNAUTHORIZED);
   }
 
   const oldMedias: Array<string | null> = [];
@@ -47,23 +47,23 @@ const saveCover: MutationResolvers['saveCover'] = async (
 
   const validator = webCard.coverData ? updateValidator : creationValidator;
 
-  if (!validator.safeParse(input).success) {
+  if (!validator.safeParse(data).success) {
     throw new GraphQLError(ERRORS.INVALID_REQUEST);
   }
 
-  if (input.mediaId) {
+  if (data.mediaId) {
     oldMedias.push(webCard.coverData?.mediaId ?? null);
-    newMedias.push(input.mediaId);
+    newMedias.push(data.mediaId);
   }
 
-  if (input.sourceMediaId) {
+  if (data.sourceMediaId) {
     oldMedias.push(webCard.coverData?.sourceMediaId ?? null);
-    newMedias.push(input.sourceMediaId);
+    newMedias.push(data.sourceMediaId);
   }
 
-  if (input.maskMediaId) {
+  if (data.maskMediaId) {
     oldMedias.push(webCard.coverData?.maskMediaId ?? null);
-    newMedias.push(input.maskMediaId);
+    newMedias.push(data.maskMediaId);
   }
 
   let updatedWebCard = {
@@ -81,7 +81,7 @@ const saveCover: MutationResolvers['saveCover'] = async (
       const updates: Partial<WebCard> = {
         lastCardUpdate: new Date(),
       };
-      const { title, subTitle, ...coverData } = input;
+      const { title, subTitle, ...coverData } = data;
       let hasUpdates = false;
       if (title != null) {
         updates.coverTitle = title;
@@ -117,8 +117,8 @@ const saveCover: MutationResolvers['saveCover'] = async (
           mediaAnimation: coverDataUpdated.mediaAnimation ?? null,
           kind: coverDataUpdated.kind ?? null,
         };
-        if (input.cardColors) {
-          updates.cardColors = input.cardColors;
+        if (data.cardColors) {
+          updates.cardColors = data.cardColors;
         }
         hasUpdates = true;
       }

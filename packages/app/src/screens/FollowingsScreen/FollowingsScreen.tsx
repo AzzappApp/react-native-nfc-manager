@@ -15,14 +15,10 @@ import type { FollowingsRoute } from '#routes';
 import type { PreloadedQuery } from 'react-relay';
 
 const followingsScreenQuery = graphql`
-  query FollowingsScreenQuery {
-    viewer {
-      profile {
-        webCard {
-          id
-          ...FollowingsScreenList_webCard
-        }
-      }
+  query FollowingsScreenQuery($webCardId: ID!) {
+    webCard: node(id: $webCardId) {
+      id
+      ...FollowingsScreenList_webCard
     }
   }
 `;
@@ -75,10 +71,13 @@ const FollowingScreenInner = ({
 }: {
   preloadedQuery: PreloadedQuery<FollowingsScreenQuery>;
 }) => {
-  const { viewer } = usePreloadedQuery(followingsScreenQuery, preloadedQuery);
+  const { webCard } = usePreloadedQuery(followingsScreenQuery, preloadedQuery);
 
-  return <FollowingsScreenList webCard={viewer.profile?.webCard ?? null} />;
+  return <FollowingsScreenList webCard={webCard ?? null} />;
 };
 export default relayScreen(FollowingsScreen, {
   query: followingsScreenQuery,
+  getVariables: (_, profileInfos) => ({
+    webCardId: profileInfos?.webCardId ?? '',
+  }),
 });

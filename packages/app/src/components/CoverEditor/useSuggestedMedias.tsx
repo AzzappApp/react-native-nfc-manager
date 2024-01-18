@@ -2,22 +2,22 @@ import { noop } from 'lodash';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { graphql, useFragment, usePaginationFragment } from 'react-relay';
 import type { useSuggestedMedias_images$key } from '#relayArtifacts/useSuggestedMedias_images.graphql';
+import type { useSuggestedMedias_profile$key } from '#relayArtifacts/useSuggestedMedias_profile.graphql';
 import type { useSuggestedMedias_videos$key } from '#relayArtifacts/useSuggestedMedias_videos.graphql';
-import type { useSuggestedMedias_viewer$key } from '#relayArtifacts/useSuggestedMedias_viewer.graphql';
 import type { SourceMedia, TemplateKind } from './coverEditorTypes';
 
 const useSuggestedMedias = (
-  viewerKey: useSuggestedMedias_viewer$key | null,
+  profileKey: useSuggestedMedias_profile$key | null,
   templateKind: TemplateKind,
 ) => {
-  const viewer = useFragment(
+  const profile = useFragment(
     graphql`
-      fragment useSuggestedMedias_viewer on Viewer {
+      fragment useSuggestedMedias_profile on Profile {
         ...useSuggestedMedias_images
         ...useSuggestedMedias_videos
       }
     `,
-    viewerKey,
+    profileKey,
   );
 
   const {
@@ -27,7 +27,7 @@ const useSuggestedMedias = (
     hasNext: hasNextSuggestedImages,
   } = usePaginationFragment(
     graphql`
-      fragment useSuggestedMedias_images on Viewer
+      fragment useSuggestedMedias_images on Profile
       @refetchable(queryName: "CoverEditor_suggestedImages_query")
       @argumentDefinitions(
         after: { type: String }
@@ -50,7 +50,7 @@ const useSuggestedMedias = (
         }
       }
     `,
-    viewer as useSuggestedMedias_images$key | null,
+    profile as useSuggestedMedias_images$key | null,
   );
 
   const {
@@ -60,7 +60,7 @@ const useSuggestedMedias = (
     hasNext: hasNextSuggestedVideos,
   } = usePaginationFragment(
     graphql`
-      fragment useSuggestedMedias_videos on Viewer
+      fragment useSuggestedMedias_videos on Profile
       @refetchable(queryName: "CoverEditor_suggestedVideos_query")
       @argumentDefinitions(
         after: { type: String }
@@ -83,7 +83,7 @@ const useSuggestedMedias = (
         }
       }
     `,
-    viewer as useSuggestedMedias_videos$key | null,
+    profile as useSuggestedMedias_videos$key | null,
   );
 
   const [suggestedMediaIndexes, setSuggesteMediaIndex] = useState({

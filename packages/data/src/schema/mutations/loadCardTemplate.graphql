@@ -7,6 +7,10 @@ extend type Mutation {
 
 input LoadCardTemplateInput {
   """
+  The id of the card we want to load the modules into
+  """
+  webCardId: ID!
+  """
   The id of the card template we want to use the modules of
   """
   cardTemplateId: ID!

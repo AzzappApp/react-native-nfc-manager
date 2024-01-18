@@ -77,7 +77,7 @@ type WebCard implements Node {
   """
   True if the current viewer is following this webCard
   """
-  isFollowing: Boolean!
+  isFollowing(webCardId:ID): Boolean!
   """
   the number of post the webCard like
   """

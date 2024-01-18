@@ -3,7 +3,7 @@ extend type Mutation {
 }
 
 input DuplicateModuleInput {
-  moduleIds: [ID!]!
+  modulesIds: [ID!]!
 }
 
 type DuplicateModulePayload {

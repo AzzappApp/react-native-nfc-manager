@@ -1,7 +1,5 @@
 import { eq } from 'drizzle-orm';
-import { GraphQLError } from 'graphql';
 import { connectionFromArraySlice, cursorToOffset } from 'graphql-relay';
-import ERRORS from '@azzapp/shared/errors';
 import { isAdmin } from '@azzapp/shared/profileHelpers';
 import {
   getCompanyActivitiesByWebCardCategory,
@@ -18,11 +16,13 @@ import {
   getFollowingsPosts,
   db,
   ProfileTable,
+  getUserProfileWithWebCardId,
 } from '#domains';
 import {
   connectionFromDateSortedItems,
   cursorToDate,
 } from '#helpers/connectionsHelpers';
+import { maybeFromGlobalIdWithType } from '#helpers/relayIdHelpers';
 import { getLabel, idResolver } from './utils';
 import type {
   CompanyActivityResolvers,
@@ -48,24 +48,28 @@ export const WebCard: WebCardResolvers = {
     }
     return webCard;
   },
-  cardModules: async (webCard, _, { auth, loaders }) => {
-    const profile = auth.profileId
-      ? await loaders.Profile.load(auth.profileId)
-      : null;
-    const isCurrentProfile = profile?.webCardId === webCard.id;
-    if (!webCard.cardIsPublished && !isCurrentProfile) {
-      return [];
-    }
-    const modules = await getCardModules(webCard.id, isCurrentProfile);
-    return modules;
-  },
-  isFollowing: async (webCard, _, { auth, loaders }) => {
-    const profile = auth.profileId
-      ? await loaders.Profile.load(auth.profileId)
+  cardModules: async (webCard, _, { auth }) => {
+    const profile = auth.userId
+      ? await getUserProfileWithWebCardId(auth.userId, webCard.id)
       : null;
 
-    return profile?.webCardId
-      ? isFollowing(profile.webCardId, webCard.id)
+    if (!webCard.cardIsPublished && !profile) {
+      return [];
+    }
+    const modules = await getCardModules(webCard.id, profile !== null);
+    return modules;
+  },
+  isFollowing: async (webCard, { webCardId: gqlWebCardId }) => {
+    if (!gqlWebCardId) {
+      return false;
+    }
+    const maybeFollowingWebCardId = maybeFromGlobalIdWithType(
+      gqlWebCardId,
+      'WebCard',
+    );
+
+    return maybeFollowingWebCardId
+      ? isFollowing(maybeFollowingWebCardId, webCard.id)
       : false;
   },
   posts: async (webCard, args) => {
@@ -105,12 +109,12 @@ export const WebCard: WebCardResolvers = {
     const first = args.first ?? 50;
     const offset = args.after ? cursorToDate(args.after) : null;
 
-    const followersWebcard = await getFollowerProfiles(webCard.id, {
+    const followersWebCard = await getFollowerProfiles(webCard.id, {
       limit: first + 1,
       after: offset,
       userName: args.userName,
     });
-    const sizedWebCard = followersWebcard.slice(0, first);
+    const sizedWebCard = followersWebCard.slice(0, first);
     return connectionFromDateSortedItems(
       sizedWebCard.map(p => ({
         ...p.webCard,
@@ -119,7 +123,7 @@ export const WebCard: WebCardResolvers = {
       {
         getDate: post => post.followCreatedAt,
         // approximations that should be good enough, and avoid a query
-        hasNextPage: followersWebcard.length > first,
+        hasNextPage: followersWebCard.length > first,
         hasPreviousPage: offset !== null,
       },
     );
@@ -162,22 +166,18 @@ export const WebCard: WebCardResolvers = {
     });
   },
   profiles: async (webCard, _, { auth }) => {
-    const { profileId } = auth;
+    const userProfile = auth.userId
+      ? await getUserProfileWithWebCardId(auth.userId, webCard.id)
+      : null;
 
-    if (!profileId) throw new GraphQLError(ERRORS.UNAUTHORIZED);
+    if (!userProfile || !isAdmin(userProfile.profileRole)) {
+      return [];
+    }
 
-    const profiles = await db
+    return db
       .select()
       .from(ProfileTable)
       .where(eq(ProfileTable.webCardId, webCard.id));
-
-    const currentProfile = profiles.find(profile => profile.id === profileId);
-
-    if (!currentProfile || !isAdmin(currentProfile.profileRole)) {
-      throw new GraphQLError(ERRORS.UNAUTHORIZED);
-    }
-
-    return profiles;
   },
   nextChangeUsernameAllowedAt: async webCard => {
     // Convert lastUpdate to a Date object

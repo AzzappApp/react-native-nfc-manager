@@ -34,7 +34,7 @@ import DeletableCommentItem from './DeletableCommentItem';
 import PostCommentsScreenHeader from './PostCommentsScreenHeader';
 import type { AuthorCartoucheFragment_webCard$key } from '#relayArtifacts/AuthorCartoucheFragment_webCard.graphql';
 import type { CommentItemFragment_comment$key } from '#relayArtifacts/CommentItemFragment_comment.graphql';
-import type { PostCommentsList_comments$key } from '#relayArtifacts/PostCommentsList_comments.graphql';
+import type { PostCommentsList_post$key } from '#relayArtifacts/PostCommentsList_post.graphql';
 import type {
   NativeSyntheticEvent,
   TextInputContentSizeChangeEventData,
@@ -50,9 +50,9 @@ type PostCommentsListProps = {
   /**
    *
    *
-   * @type {PostCommentsList_comments$key}
+   * @type {PostCommentsList_post$key}
    */
-  post: PostCommentsList_comments$key;
+  post: PostCommentsList_post$key;
   /**
    * the post id for the comments
    *
@@ -74,14 +74,11 @@ const PostCommentsList = ({
   const router = useRouter();
   const intl = useIntl();
   const auth = useAuthState();
-  const onClose = () => {
-    router.back();
-  };
 
   const { data, loadNext, refetch, hasNext, isLoadingNext } =
     usePaginationFragment(
       graphql`
-        fragment PostCommentsList_comments on Post
+        fragment PostCommentsList_post on Post
         @refetchable(queryName: "PostCommentsList_post_comments_connection")
         @argumentDefinitions(
           after: { type: String }
@@ -138,10 +135,10 @@ const PostCommentsList = ({
   const onSubmit = () => {
     setSubmitting(true);
     if (!submitting) {
-      if (auth.profileRole && isEditor(auth.profileRole)) {
+      if (isEditor(auth.profileInfos?.profileRole)) {
         commit({
           variables: {
-            input: { postId, comment },
+            input: { postId, comment, webCardId: auth.profileInfos?.webCardId },
             connections: [connectionID],
           },
           onCompleted() {
@@ -232,12 +229,12 @@ const PostCommentsList = ({
     }: {
       item: CommentItemFragment_comment$key & { webCard: { id: string } };
     }) => {
-      if (auth.webCardId !== item.webCard.id) {
+      if (auth.profileInfos?.webCardId !== item.webCard.id) {
         return <CommentItem item={item} />;
       }
       return <DeletableCommentItem item={item} postId={postId} />;
     },
-    [auth.webCardId, postId],
+    [auth.profileInfos?.webCardId, postId],
   );
 
   const insets = useScreenInsets();
@@ -264,7 +261,7 @@ const PostCommentsList = ({
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
         style={[styles.keyboardAreaView]}
       >
-        <PostCommentsScreenHeader onClose={onClose} />
+        <PostCommentsScreenHeader onClose={router.back} />
         <FlatList
           data={postComments}
           renderItem={renderItem}

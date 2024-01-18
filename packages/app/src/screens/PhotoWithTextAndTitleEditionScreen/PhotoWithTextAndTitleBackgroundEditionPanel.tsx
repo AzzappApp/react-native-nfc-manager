@@ -4,7 +4,7 @@ import { StyleSheet, View } from 'react-native';
 
 import { useFragment, graphql } from 'react-relay';
 import { WebCardBoundEditorLayerSelectorPanel } from '#components/EditorLayerSelectorPanel';
-import type { PhotoWithTextAndTitleBackgroundEditionPanel_viewer$key } from '#relayArtifacts/PhotoWithTextAndTitleBackgroundEditionPanel_viewer.graphql';
+import type { PhotoWithTextAndTitleBackgroundEditionPanel_profile$key } from '#relayArtifacts/PhotoWithTextAndTitleBackgroundEditionPanel_profile.graphql';
 import type { ViewProps } from 'react-native';
 
 type BackgroundStyle = {
@@ -16,7 +16,7 @@ type PhotoWithTextAndTitleBackgroundEditionPanelProps = ViewProps & {
   /**
    * A relay fragment reference to the viewer
    */
-  viewer: PhotoWithTextAndTitleBackgroundEditionPanel_viewer$key;
+  profile: PhotoWithTextAndTitleBackgroundEditionPanel_profile$key;
   /**
    * The currently selected background id
    */
@@ -44,7 +44,7 @@ type PhotoWithTextAndTitleBackgroundEditionPanelProps = ViewProps & {
  * A Panel to edit the Background of the PhotoWithTextAndTitle edition screen
  */
 const PhotoWithTextAndTitleBackgroundEditionPanel = ({
-  viewer,
+  profile: profileKey,
   backgroundId: background,
   backgroundStyle,
   onBackgroundChange,
@@ -52,20 +52,18 @@ const PhotoWithTextAndTitleBackgroundEditionPanel = ({
   bottomSheetHeight,
   ...props
 }: PhotoWithTextAndTitleBackgroundEditionPanelProps) => {
-  const { moduleBackgrounds, profile } = useFragment(
+  const profile = useFragment(
     graphql`
-      fragment PhotoWithTextAndTitleBackgroundEditionPanel_viewer on Viewer {
+      fragment PhotoWithTextAndTitleBackgroundEditionPanel_profile on Profile {
         moduleBackgrounds {
           ...StaticMediaList_staticMedias
         }
-        profile {
-          webCard {
-            ...WebCardColorPicker_webCard
-          }
+        webCard {
+          ...WebCardColorPicker_webCard
         }
       }
     `,
-    viewer,
+    profileKey,
   );
 
   const backgroundColor = backgroundStyle?.backgroundColor ?? '#FFFFFF';
@@ -97,8 +95,8 @@ const PhotoWithTextAndTitleBackgroundEditionPanel = ({
           defaultMessage: 'Background',
           description: 'Label of Background tab in Horizontal photo edition',
         })}
-        webCard={profile?.webCard ?? null}
-        medias={moduleBackgrounds}
+        webCard={profile.webCard}
+        medias={profile.moduleBackgrounds}
         selectedMedia={background}
         tintColor={patternColor}
         backgroundColor={backgroundColor}

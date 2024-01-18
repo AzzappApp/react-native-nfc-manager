@@ -1,43 +1,40 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import { GraphQLError } from 'graphql';
-import { fromGlobalId } from 'graphql-relay';
 import ERRORS from '@azzapp/shared/errors';
 import { isEditor } from '@azzapp/shared/profileHelpers';
-import { updatePost } from '#domains';
+import { getUserProfileWithWebCardId, updatePost } from '#domains';
+import fromGlobalIdWithType from '#helpers/relayIdHelpers';
 import type { NewPost } from '#domains';
 import type { MutationResolvers } from '#schema/__generated__/types';
 import type { GraphQLContext } from '../GraphQLContext';
 
 const updatePostMutation: MutationResolvers['updatePost'] = async (
   _,
-  { input },
+  { input: { postId: gqlPostId, allowComments, allowLikes, content } },
   { auth, loaders, cardUsernamesToRevalidate }: GraphQLContext,
 ) => {
-  const { profileId, userId } = auth;
-
-  if (!profileId || !userId) {
-    throw new GraphQLError(ERRORS.UNAUTHORIZED);
+  const { userId } = auth;
+  const postId = fromGlobalIdWithType(gqlPostId, 'Post');
+  const post = await loaders.Post.load(postId);
+  if (!post) {
+    throw new GraphQLError(ERRORS.INVALID_REQUEST);
   }
 
-  const profile = await loaders.Profile.load(profileId);
+  const profile =
+    userId && (await getUserProfileWithWebCardId(userId, post.webCardId));
 
   if (!profile || !isEditor(profile.profileRole)) {
     throw new GraphQLError(ERRORS.UNAUTHORIZED);
   }
-
-  const { postId, ...postInput } = input;
-  const { id: targetId } = fromGlobalId(postId);
-
-  const post = await loaders.Post.load(targetId);
 
   if (!post) {
     throw new GraphQLError(ERRORS.UNAUTHORIZED);
   }
 
   const partialPost: Partial<NewPost> = {
-    ...postInput,
-    allowComments: postInput.allowComments ?? post.allowComments,
-    allowLikes: postInput.allowLikes ?? post.allowLikes,
+    content: content ?? post.content,
+    allowComments: allowComments ?? post.allowComments,
+    allowLikes: allowLikes ?? post.allowLikes,
   };
 
   try {

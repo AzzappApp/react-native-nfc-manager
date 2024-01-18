@@ -1,26 +1,20 @@
 import { and, eq } from 'drizzle-orm';
 import { GraphQLError } from 'graphql';
-import { fromGlobalId } from 'graphql-relay';
 import ERRORS from '@azzapp/shared/errors';
 import { isOwner } from '@azzapp/shared/profileHelpers';
 import { ProfileTable, db } from '#domains';
+import fromGlobalIdWithType from '#helpers/relayIdHelpers';
 import type { MutationResolvers } from '#schema/__generated__/types';
 
 const cancelTransferOwnership: MutationResolvers['cancelTransferOwnership'] =
   async (_, { input }, { auth, loaders }) => {
-    const { profileId } = auth;
-
-    const { id: targetProfileId, type } = fromGlobalId(input.profileId);
-
-    if (type !== 'Profile') {
-      throw new GraphQLError(ERRORS.INVALID_REQUEST);
-    }
-
-    if (!profileId) {
-      throw new GraphQLError(ERRORS.UNAUTHORIZED);
-    }
+    const profileId = fromGlobalIdWithType(input.profileId, 'Profile');
+    const webCardId = fromGlobalIdWithType(input.webCardId, 'WebCard');
 
     const profile = await loaders.Profile.load(profileId);
+    if (profile?.userId !== auth.userId) {
+      throw new GraphQLError(ERRORS.UNAUTHORIZED);
+    }
 
     if (!profile) {
       throw new GraphQLError(ERRORS.INVALID_REQUEST);
@@ -33,12 +27,7 @@ const cancelTransferOwnership: MutationResolvers['cancelTransferOwnership'] =
     const [targetProfile] = await db
       .select()
       .from(ProfileTable)
-      .where(
-        and(
-          eq(ProfileTable.webCardId, profile.webCardId),
-          eq(ProfileTable.id, targetProfileId),
-        ),
-      );
+      .where(and(eq(ProfileTable.webCardId, webCardId)));
 
     if (!targetProfile || !targetProfile.promotedAsOwner) {
       throw new GraphQLError(ERRORS.INVALID_REQUEST);
@@ -47,7 +36,7 @@ const cancelTransferOwnership: MutationResolvers['cancelTransferOwnership'] =
     await db
       .update(ProfileTable)
       .set({ promotedAsOwner: false })
-      .where(eq(ProfileTable.id, targetProfileId));
+      .where(eq(ProfileTable.id, targetProfile.id));
 
     return {
       profile: {

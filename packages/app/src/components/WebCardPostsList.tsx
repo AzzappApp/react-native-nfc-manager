@@ -21,6 +21,7 @@ const WebCardPostsList = ({
         fragment WebCardPostsList_webCard on WebCard
         @refetchable(queryName: "WebCardPostsList_webCard_posts_query")
         @argumentDefinitions(
+          viewerWebCardId: { type: "ID!" }
           after: { type: String }
           first: { type: Int, defaultValue: 10 }
         ) {
@@ -29,7 +30,11 @@ const WebCardPostsList = ({
             edges {
               node {
                 id
-                ...PostList_posts @arguments(includeAuthor: false)
+                ...PostList_posts
+                  @arguments(
+                    includeAuthor: false
+                    viewerWebCardId: $viewerWebCardId
+                  )
               }
             }
           }

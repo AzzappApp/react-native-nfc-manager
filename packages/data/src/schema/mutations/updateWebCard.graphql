@@ -3,6 +3,7 @@ extend type Mutation {
 }
 
 input UpdateWebCardInput {
+  webCardId: ID!
   firstName: String
   lastName: String
   webCardKind: WebCardKind

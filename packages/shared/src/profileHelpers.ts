@@ -1,9 +1,10 @@
-export const isEditor = (profileRole: string) =>
+export const isEditor = (profileRole: string | null | undefined) =>
   profileRole === 'editor' ||
   profileRole === 'admin' ||
   profileRole === 'owner';
 
-export const isAdmin = (profileRole: string) =>
+export const isAdmin = (profileRole: string | null | undefined) =>
   profileRole === 'admin' || profileRole === 'owner';
 
-export const isOwner = (profileRole: string) => profileRole === 'owner';
+export const isOwner = (profileRole: string | null | undefined) =>
+  profileRole === 'owner';

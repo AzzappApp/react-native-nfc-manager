@@ -18,7 +18,7 @@ import BottomSheetModal from '#ui/BottomSheetModal';
 import Button from '#ui/Button';
 import Text from '#ui/Text';
 import TextInput from '#ui/TextInput';
-import type { WebcardParametersNameFormQuery } from '#relayArtifacts/WebcardParametersNameFormQuery.graphql';
+import type { WebCardParametersNameFormQuery } from '#relayArtifacts/WebCardParametersNameFormQuery.graphql';
 import type { GraphQLError } from 'graphql';
 
 const userNameFormSchema = z.object({
@@ -59,10 +59,10 @@ const WebcardParametersNameForm = ({
       if (result.success) {
         if (data.userName) {
           try {
-            const res = await fetchQuery<WebcardParametersNameFormQuery>(
+            const res = await fetchQuery<WebCardParametersNameFormQuery>(
               environment,
               graphql`
-                query WebcardParametersNameFormQuery($userName: String!) {
+                query WebCardParametersNameFormQuery($userName: String!) {
                   userNameAvailable(userName: $userName)
                 }
               `,
@@ -120,7 +120,7 @@ const WebcardParametersNameForm = ({
   const insets = useScreenInsets();
 
   const [commitMutation] = useMutation(graphql`
-    mutation WebcardParametersNameFormMutation(
+    mutation WebCardParametersNameFormMutation(
       $input: UpdateWebCardUserNameInput!
     ) {
       updateWebCardUserName(input: $input) {
@@ -139,6 +139,7 @@ const WebcardParametersNameForm = ({
       variables: {
         input: {
           userName,
+          webCardId: webCard.id,
         },
       },
       onCompleted: () => {

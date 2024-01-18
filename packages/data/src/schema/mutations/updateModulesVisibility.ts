@@ -2,31 +2,38 @@ import { inArray } from 'drizzle-orm';
 import { GraphQLError } from 'graphql';
 import ERRORS from '@azzapp/shared/errors';
 import { isEditor } from '@azzapp/shared/profileHelpers';
-import { CardModuleTable, db, getCardModulesByIds } from '#domains';
+import {
+  CardModuleTable,
+  db,
+  getCardModulesByIds,
+  getUserProfileWithWebCardId,
+} from '#domains';
 import type { MutationResolvers } from '#schema/__generated__/types';
 
 const updateModulesVisibility: MutationResolvers['updateModulesVisibility'] =
-  async (_source, args, { auth, cardUsernamesToRevalidate, loaders }) => {
-    const { profileId } = auth;
-    if (!profileId) {
-      throw new GraphQLError(ERRORS.UNAUTHORIZED);
-    }
-
-    const profile = await loaders.Profile.load(profileId);
-    if (!profile || !isEditor(profile.profileRole)) {
-      throw new GraphQLError(ERRORS.INVALID_REQUEST);
-    }
-    const { modulesIds, visible } = args.input;
+  async (
+    _source,
+    { input: { modulesIds, visible } },
+    { auth, cardUsernamesToRevalidate, loaders },
+  ) => {
+    const { userId } = auth;
+    const modules = await getCardModulesByIds(modulesIds);
     if (modulesIds.length === 0) {
       throw new GraphQLError(ERRORS.INVALID_REQUEST);
     }
-    const modules = await getCardModulesByIds(modulesIds);
+
+    const webCardId = modules[0]!.webCardId;
     if (
-      modules.some(
-        module => module == null || module.webCardId !== profile?.webCardId,
-      )
+      !modules.every(module => module != null && module.webCardId === webCardId)
     ) {
       throw new GraphQLError(ERRORS.INVALID_REQUEST);
+    }
+
+    const profile =
+      userId && (await getUserProfileWithWebCardId(userId, webCardId));
+
+    if (!profile || !isEditor(profile.profileRole)) {
+      throw new GraphQLError(ERRORS.UNAUTHORIZED);
     }
 
     try {

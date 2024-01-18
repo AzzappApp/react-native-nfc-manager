@@ -15,8 +15,11 @@ export type SIGN_IN = {
   type: 'SIGN_IN';
   payload: {
     authTokens: { token: string; refreshToken: string };
-    webCardId?: string;
-    profileRole?: string;
+    profileInfos?: {
+      profileId: string;
+      webCardId: string;
+      profileRole: string;
+    } | null;
   };
 };
 
@@ -33,6 +36,7 @@ export type SIGN_OUT = {
 export type WEBCARD_CHANGE = {
   type: 'WEBCARD_CHANGE';
   payload: {
+    profileId: string;
     webCardId: string;
     profileRole: string;
   };

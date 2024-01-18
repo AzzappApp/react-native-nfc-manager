@@ -1,3 +1,4 @@
+import { isEqual } from 'lodash';
 import { useState, useCallback, useRef, useMemo, useEffect } from 'react';
 import {
   StatusBar,
@@ -13,9 +14,8 @@ import { useDebouncedCallback } from 'use-debounce';
 import { CONTACT_CARD_RATIO } from '#components/ContactCard/ContactCard';
 import { useOnFocus, useRouteWillChange } from '#components/NativeRouter';
 import { dispatchGlobalEvent } from '#helpers/globalEvents';
-import { ROOT_ACTOR_ID, getRelayEnvironment } from '#helpers/relayEnvironment';
+import { getRelayEnvironment } from '#helpers/relayEnvironment';
 import { usePrefetchRoute } from '#helpers/ScreenPrefetcher';
-import WebCardBoundRelayEnvironmentProvider from '#helpers/WebCardBoundRelayEnvironmentProvider';
 import useAuthState from '#hooks/useAuthState';
 import useScreenInsets from '#hooks/useScreenInsets';
 import useToggle from '#hooks/useToggle';
@@ -31,6 +31,7 @@ import HomeProfileLink, {
   PROFILE_LINK_MARGIN_TOP,
 } from './HomeProfileLink';
 import HomeProfilesCarousel from './HomeProfilesCarousel';
+import type { ProfileInfos } from '#helpers/authStore';
 import type { HomeScreenContent_user$key } from '#relayArtifacts/HomeScreenContent_user.graphql';
 import type { HomeProfilesCarouselHandle } from './HomeProfilesCarousel';
 import type { Disposable } from 'react-relay';
@@ -70,7 +71,7 @@ const HomeScreenContent = ({ user: userKey }: HomeScreenContentProps) => {
   const auth = useAuthState();
   const initialProfileIndex = useMemo(() => {
     const index = user.profiles?.findIndex(
-      profile => profile.webCard.id === auth.webCardId,
+      profile => profile.id === auth.profileInfos?.profileId,
     );
     return index !== undefined && index !== -1 ? index : 0;
     // we only want to run this once
@@ -92,20 +93,14 @@ const HomeScreenContent = ({ user: userKey }: HomeScreenContentProps) => {
       currentProfileIndexSharedValue.value = roundedProfileIndexSharedValue;
   });
 
-  const switchWebCard = useDebouncedCallback(
-    (webCardId: string, profileRole: string) => {
-      if (webCardId && auth.webCardId !== webCardId) {
-        void dispatchGlobalEvent({
-          type: 'WEBCARD_CHANGE',
-          payload: {
-            webCardId,
-            profileRole,
-          },
-        });
-      }
-    },
-    50,
-  );
+  const switchWebCard = useDebouncedCallback((profileInfos: ProfileInfos) => {
+    if (!isEqual(profileInfos, auth.profileInfos)) {
+      void dispatchGlobalEvent({
+        type: 'WEBCARD_CHANGE',
+        payload: profileInfos,
+      });
+    }
+  }, 50);
 
   const onCurrentProfileIndexChange = useCallback(
     (index: number) => {
@@ -113,7 +108,16 @@ const HomeScreenContent = ({ user: userKey }: HomeScreenContentProps) => {
       setCurrentProfileIndex(index);
       const newProfile = user.profiles?.[index];
       if (newProfile) {
-        switchWebCard(newProfile.webCard.id, newProfile.profileRole!);
+        const {
+          id: profileId,
+          webCard: { id: webCardId },
+          profileRole,
+        } = newProfile ?? {};
+        switchWebCard({
+          profileId,
+          webCardId,
+          profileRole,
+        });
       }
     },
     [setCurrentProfileIndex, switchWebCard, user.profiles],
@@ -140,7 +144,7 @@ const HomeScreenContent = ({ user: userKey }: HomeScreenContentProps) => {
 
   useOnFocus(() => {
     const authProfileIndex = user.profiles?.findIndex(
-      profile => profile.webCard.id === auth.webCardId,
+      profile => profile.id === auth.profileInfos?.profileId,
     );
     if (
       authProfileIndex !== undefined &&
@@ -158,10 +162,9 @@ const HomeScreenContent = ({ user: userKey }: HomeScreenContentProps) => {
   useEffect(() => {
     let disposable: Disposable | undefined;
     if (currentProfileIndex === -1) {
-      disposable = prefetchRoute(
-        getRelayEnvironment().forActor(ROOT_ACTOR_ID),
-        { route: 'NEW_WEBCARD' },
-      );
+      disposable = prefetchRoute(getRelayEnvironment(), {
+        route: 'NEW_WEBCARD',
+      });
     }
     return () => {
       disposable?.dispose();
@@ -176,30 +179,28 @@ const HomeScreenContent = ({ user: userKey }: HomeScreenContentProps) => {
 
   const profilesDisposables = useRef<Disposable[]>([]).current;
   useEffect(() => {
-    if (auth.webCardId) {
+    const profileInfos = auth.profileInfos;
+    if (profileInfos) {
       const profile = profilesRef.current?.find(
-        profile => profile.webCard.id === auth.webCardId,
+        profile => profile.id === profileInfos.profileId,
       );
       if (profile) {
-        const multiActorEnvironment = getRelayEnvironment();
-        const profileEnvironment = multiActorEnvironment.forActor(
-          profile.webCard.id,
-        );
+        const environment = getRelayEnvironment();
         profilesDisposables.push(
-          prefetchRoute(profileEnvironment, {
+          prefetchRoute(environment, {
             route: 'WEBCARD',
             params: {
-              webCardId: auth.webCardId,
+              webCardId: profileInfos.webCardId,
               userName: profile.webCard.userName,
             },
           }),
-          prefetchRoute(profileEnvironment, {
+          prefetchRoute(environment, {
             route: 'CONTACT_CARD',
           }),
         );
       }
     }
-  }, [profilesDisposables, prefetchRoute, auth.webCardId]);
+  }, [profilesDisposables, prefetchRoute, auth.profileInfos]);
 
   useEffect(
     () => () => {
@@ -283,18 +284,14 @@ const HomeScreenContent = ({ user: userKey }: HomeScreenContentProps) => {
           currentProfileIndex={currentProfileIndex}
         />
       </View>
-      <WebCardBoundRelayEnvironmentProvider
-        webCardId={currentProfile?.webCard?.id ?? null}
-      >
-        <HomeContactCardLandscape profile={currentProfile ?? null} />
-        <HomeBottomSheetPanel
-          visible={showMenu}
-          close={toggleShowMenu}
-          withProfile={currentProfileIndex !== -1}
-          profile={currentProfile ?? null}
-          profileRole={currentProfile?.profileRole ?? null}
-        />
-      </WebCardBoundRelayEnvironmentProvider>
+      <HomeContactCardLandscape profile={currentProfile ?? null} />
+      <HomeBottomSheetPanel
+        visible={showMenu}
+        close={toggleShowMenu}
+        withProfile={currentProfileIndex !== -1}
+        profile={currentProfile ?? null}
+        profileRole={currentProfile?.profileRole ?? null}
+      />
     </View>
   );
 };

@@ -63,7 +63,14 @@ export type SignUpParams = {
  */
 export const signup: APIMethod<
   SignUpParams,
-  TokensResponse & { webCardId?: string; profileRole?: string }
+  TokensResponse & {
+    userId: string;
+    profileInfos: {
+      profileRole: string;
+      profileId: string;
+      webCardId: string;
+    } | null;
+  }
 > = (data, init) =>
   apiFetch(`${API_ENDPOINT}/signup`, {
     ...init,
@@ -90,8 +97,15 @@ export type SignInParams = {
  */
 export const signin: APIMethod<
   SignInParams,
-  TokensResponse & { webCardId?: string; profileRole?: string }
-> = (data, init): Promise<TokensResponse> =>
+  TokensResponse & {
+    userId: string;
+    profileInfos: {
+      profileRole: string;
+      profileId: string;
+      webCardId: string;
+    } | null;
+  }
+> = (data, init) =>
   apiFetch(`${API_ENDPOINT}/signin`, {
     ...init,
     method: 'POST',

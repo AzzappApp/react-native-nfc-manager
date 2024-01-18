@@ -1,4 +1,14 @@
+extend type Mutation {
+  """
+  Mutation to save common information of a profile
+  """
+  saveCommonInformation(
+    input: SaveCommonInformationInput!
+  ): SaveCommonInformationPayload!
+}
+
 input SaveCommonInformationInput {
+  webCardId: ID!
   company: String
   emails: [ContactCardEmailInput!]
   phoneNumbers: [ContactCardPhoneNumberInput!]
@@ -10,13 +20,4 @@ input SaveCommonInformationInput {
 
 type SaveCommonInformationPayload {
   webCard: WebCard!
-}
-
-extend type Mutation {
-  """
-  Mutation to save common information of a profile
-  """
-  saveCommonInformation(
-    input: SaveCommonInformationInput!
-  ): SaveCommonInformationPayload!
 }

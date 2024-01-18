@@ -25,7 +25,7 @@ export const CoverTemplate: CoverTemplateResolvers = {
       mainColorPalette,
       ...shuffle(
         await sessionMemoized(getColorPalettes),
-        auth.profileId ?? '' + colorPaletteId,
+        auth.userId ?? '' + colorPaletteId,
       ),
     ];
     return connectionFromArray(colorPalettes, { first, after });

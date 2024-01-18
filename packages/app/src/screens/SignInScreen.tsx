@@ -19,6 +19,7 @@ import PressableOpacity from '#ui/PressableOpacity';
 import SecuredTextInput from '#ui/SecuredTextInput';
 import Text from '#ui/Text';
 import TextInput from '#ui/TextInput';
+import type { ProfileInfos } from '#helpers/authStore';
 import type { TextInput as NativeTextInput } from 'react-native';
 
 const SignInScreen = () => {
@@ -39,11 +40,10 @@ const SignInScreen = () => {
 
     let token: string;
     let refreshToken: string;
-    let webCardId: string | undefined;
-    let profileRole: string | undefined;
+    let profileInfos: ProfileInfos | null = null;
     try {
       setIsSubmitting(true);
-      ({ token, refreshToken, webCardId, profileRole } = await signin({
+      ({ token, refreshToken, profileInfos } = await signin({
         credential: intlPhoneNumber ?? credential,
         password,
       }));
@@ -55,7 +55,10 @@ const SignInScreen = () => {
     }
     await dispatchGlobalEvent({
       type: 'SIGN_IN',
-      payload: { authTokens: { token, refreshToken }, webCardId, profileRole },
+      payload: {
+        authTokens: { token, refreshToken },
+        profileInfos: profileInfos ?? null,
+      },
     });
   }, [credential, password]);
 

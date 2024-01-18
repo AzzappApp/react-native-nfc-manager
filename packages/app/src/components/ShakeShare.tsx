@@ -16,9 +16,10 @@ import {
   runOnJS,
 } from 'react-native-reanimated';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { graphql, useLazyLoadQuery } from 'react-relay';
+import { graphql, useClientQuery } from 'react-relay';
 import { buildUserUrlWithContactCard } from '@azzapp/shared/urlHelpers';
 import { colors } from '#theme';
+import useAuthState from '#hooks/useAuthState';
 import Header from '#ui/Header';
 import IconButton from '#ui/IconButton';
 import Text from '#ui/Text';
@@ -26,11 +27,12 @@ import CoverRenderer from './CoverRenderer';
 import type { ShakeShareScreenQuery } from '#relayArtifacts/ShakeShareScreenQuery.graphql';
 
 const ShakeShare = () => {
-  const { viewer } = useLazyLoadQuery<ShakeShareScreenQuery>(
+  const { profileInfos } = useAuthState();
+  const { node } = useClientQuery<ShakeShareScreenQuery>(
     graphql`
-      query ShakeShareScreenQuery {
-        viewer {
-          profile {
+      query ShakeShareScreenQuery($profileId: ID!) {
+        node(id: $profileId) {
+          ... on Profile @alias(as: "profile") {
             webCard {
               userName
               ...CoverRenderer_webCard
@@ -43,8 +45,12 @@ const ShakeShare = () => {
         }
       }
     `,
-    {},
+    {
+      profileId: profileInfos?.profileId ?? '',
+    },
   );
+
+  const profile = node?.profile;
 
   const [mountScreen, setMountScreen] = useState(false);
   const gyroscope = useAnimatedSensor(SensorType.ACCELEROMETER);
@@ -59,19 +65,16 @@ const ShakeShare = () => {
   });
 
   const contactCardUrl = useMemo(() => {
-    if (!viewer?.profile?.serializedContactCard) {
+    if (!profile?.serializedContactCard) {
       return null;
     }
-    const { data, signature } = viewer.profile.serializedContactCard;
+    const { data, signature } = profile.serializedContactCard;
     return buildUserUrlWithContactCard(
-      viewer.profile.webCard.userName,
+      profile.webCard.userName,
       data,
       signature,
     );
-  }, [
-    viewer?.profile?.serializedContactCard,
-    viewer?.profile?.webCard.userName,
-  ]);
+  }, [profile?.serializedContactCard, profile?.webCard]);
 
   const { width } = useWindowDimensions();
 
@@ -117,7 +120,7 @@ const ShakeShare = () => {
             <View style={styles.container}>
               <CoverRenderer
                 width={width / 2.5}
-                webCard={viewer.profile?.webCard}
+                webCard={profile?.webCard}
                 style={styles.coverStyle}
                 animationEnabled={true}
               />

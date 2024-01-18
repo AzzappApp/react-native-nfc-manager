@@ -9,7 +9,6 @@ import declineOwnership from './declineOwnership';
 import deleteModules from './deleteModules';
 import deletePostComment from './deletePostComment';
 import duplicateModule from './duplicateModule';
-import filterWebCardSuggestion from './filterWebCardSuggestion';
 import inviteUser from './inviteUser';
 import loadCardTemplate from './loadCardTemplate';
 import {
@@ -23,9 +22,8 @@ import {
   saveSocialLinksModule,
 } from './ModulesMutationsResolvers';
 import togglePostReaction from './postReaction';
-import { publishCard, unpublishCard } from './publishCard';
 import removeFollower from './removeFollower';
-import removeUserFromWebcard from './removeUserFromWebcard';
+import removeUserFromWebCard from './removeUserFromWebCard';
 import reorderModules from './reorderModules';
 import saveCardColors from './saveCardColors';
 import saveCardStyle from './saveCardStyle';
@@ -33,16 +31,13 @@ import saveCommonInformation from './saveCommonInformation';
 import saveContactCard from './saveContactCard';
 import saveCover from './saveCover';
 import toggleFollowing from './toggleFollowing';
+import toggleWebCardPublished from './toggleWebCardPublished';
 import transferOwnership from './transferOwnership';
 import updateModulesVisibility from './updateModulesVisibility';
 import updateMultiUser from './updateMultiUser';
 import updatePost from './updatePost';
 import updateProfile from './updateProfile';
-import {
-  updateContactCardScans,
-  updateLikes,
-  updateWebCardViews,
-} from './updateStatistic';
+import { updateContactCardScans, updateWebCardViews } from './updateStatistic';
 import updateUser from './updateUser';
 import updateWebCard from './updateWebCard';
 import updateWebCardUserName from './updateWebCardUserName';
@@ -56,8 +51,6 @@ export const Mutation: MutationResolvers = {
   deletePostComment,
   duplicateModule,
   loadCardTemplate,
-  publishCard,
-  unpublishCard,
   removeFollower,
   reorderModules,
   saveSimpleTextModule,
@@ -73,9 +66,9 @@ export const Mutation: MutationResolvers = {
   saveContactCard,
   saveCover,
   toggleFollowing,
-  updateContactCardScans,
   togglePostReaction,
-  updateLikes,
+  toggleWebCardPublished,
+  updateContactCardScans,
   updatePost,
   updateWebCard,
   updateUser,
@@ -90,8 +83,7 @@ export const Mutation: MutationResolvers = {
   updateWebCardUserName,
   updateProfile,
   inviteUser,
-  filterWebCardSuggestion,
-  removeUserFromWebcard,
+  removeUserFromWebCard,
   transferOwnership,
   cancelTransferOwnership,
 };

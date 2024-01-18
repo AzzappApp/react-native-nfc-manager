@@ -33,9 +33,9 @@ type Post implements Node {
   allowLikes: Boolean!
 
   """
-  Reaction of the viewer on this post
+  Reaction of a given WebCard to this post
   """
-  viewerPostReaction: ReactionKind
+  postReaction(webCardId: ID): ReactionKind
   """
   Number of reactions associated to this post
   """

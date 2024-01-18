@@ -32,7 +32,7 @@ jest.mock('react-native/Libraries/Share/Share', () => ({
 
 jest.mock('#helpers/authStore', () => ({
   getAuthState: () => ({
-    profileRole: 'owner',
+    profileInfos: { profileRole: 'owner' },
   }),
   addAuthStateListener: jest.fn(),
 }));
@@ -44,7 +44,7 @@ const renderActionBar = (props?: Partial<PostRendererActionBarProps>) => {
       Post(_, generateId) {
         return {
           id: String(generateId()),
-          viewerPostReaction: null,
+          postReaction: null,
           allowComments: true,
           allowLikes: true,
           counterReactions: 3,
@@ -60,6 +60,7 @@ const renderActionBar = (props?: Partial<PostRendererActionBarProps>) => {
           post: node(id: "test-post") {
             id
             ...PostRendererActionBar_post
+              @arguments(viewerWebCardId: "test-webCard")
           }
         }
       `,

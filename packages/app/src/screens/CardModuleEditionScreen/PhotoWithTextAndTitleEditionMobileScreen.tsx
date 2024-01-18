@@ -24,12 +24,19 @@ const PhotoWithTextAndTitleEditionMobileScreen = ({
   moduleId,
   preloadedQuery,
 }: PhotoWithTextAndTitleEditionMobileScreenProps) => {
-  const data = usePreloadedQuery(PhotoWithTextAndTitleQuery, preloadedQuery);
+  const { profile } = usePreloadedQuery(
+    PhotoWithTextAndTitleQuery,
+    preloadedQuery,
+  );
+
+  if (!profile) {
+    return null;
+  }
 
   let module: PhotoWithTextAndTitleEditionScreen_module$key | null = null;
   if (moduleId != null) {
     module =
-      data.viewer.profile?.webCard.cardModules.find(
+      profile?.webCard?.cardModules.find(
         module =>
           module?.id === moduleId &&
           module?.kind === MODULE_KIND_PHOTO_WITH_TEXT_AND_TITLE,
@@ -40,15 +47,15 @@ const PhotoWithTextAndTitleEditionMobileScreen = ({
   }
 
   return (
-    <PhotoWithTextAndTitleEditionScreen module={module} viewer={data.viewer} />
+    <PhotoWithTextAndTitleEditionScreen module={module} profile={profile} />
   );
 };
 
 const PhotoWithTextAndTitleQuery = graphql`
-  query PhotoWithTextAndTitleEditionMobileScreenQuery {
-    viewer {
-      ...PhotoWithTextAndTitleEditionScreen_viewer
-      profile {
+  query PhotoWithTextAndTitleEditionMobileScreenQuery($profileId: ID!) {
+    profile: node(id: $profileId) {
+      ... on Profile {
+        ...PhotoWithTextAndTitleEditionScreen_profile
         webCard {
           cardModules {
             id

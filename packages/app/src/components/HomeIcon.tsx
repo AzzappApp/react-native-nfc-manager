@@ -1,6 +1,5 @@
 import { Suspense } from 'react';
 import { graphql, useLazyLoadQuery } from 'react-relay';
-import WebCardBoundRelayEnvironmentProvider from '#helpers/WebCardBoundRelayEnvironmentProvider';
 import useAuthState from '#hooks/useAuthState';
 import CoverRenderer from './CoverRenderer';
 import type { HomeIconQuery } from '#relayArtifacts/HomeIconQuery.graphql';
@@ -34,14 +33,16 @@ const HomeCoverIcon = ({ webCardId }: HomeIconProps) => {
 };
 
 export const HomeIcon = () => {
-  const { webCardId } = useAuthState();
+  const { profileInfos } = useAuthState();
+
+  if (!profileInfos?.webCardId) {
+    return null;
+  }
 
   return (
-    <WebCardBoundRelayEnvironmentProvider webCardId={webCardId}>
-      <Suspense fallback={<CoverRenderer width={COVER_WIDTH} webCard={null} />}>
-        {webCardId && <HomeCoverIcon webCardId={webCardId} />}
-      </Suspense>
-    </WebCardBoundRelayEnvironmentProvider>
+    <Suspense fallback={<CoverRenderer width={COVER_WIDTH} webCard={null} />}>
+      <HomeCoverIcon webCardId={profileInfos.webCardId} />
+    </Suspense>
   );
 };
 

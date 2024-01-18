@@ -25,7 +25,7 @@ import SimpleButtonMarginsEditionPanel from './SimpleButtonMarginsEditionPanel';
 import SimpleButtonPreview from './SimpleButtonPreview';
 import SimpleButtonSettingsEditionPanel from './SimpleButtonSettingsEditionPanel';
 import type { SimpleButtonEditionScreen_module$key } from '#relayArtifacts/SimpleButtonEditionScreen_module.graphql';
-import type { SimpleButtonEditionScreen_viewer$key } from '#relayArtifacts/SimpleButtonEditionScreen_viewer.graphql';
+import type { SimpleButtonEditionScreen_profile$key } from '#relayArtifacts/SimpleButtonEditionScreen_profile.graphql';
 import type {
   SimpleButtonEditionScreenUpdateModuleMutation,
   SaveSimpleButtonModuleInput,
@@ -37,7 +37,7 @@ export type SimpleButtonEditionScreenProps = ViewProps & {
   /**
    * the current viewer
    */
-  viewer: SimpleButtonEditionScreen_viewer$key;
+  profile: SimpleButtonEditionScreen_profile$key;
   /**
    * the current module to edit, if null, a new module will be created
    */
@@ -75,7 +75,7 @@ const actionTypeSchema = z.intersection(
  */
 const SimpleButtonEditionScreen = ({
   module,
-  viewer: viewerKey,
+  profile: profileKey,
 }: SimpleButtonEditionScreenProps) => {
   // #region Data retrieval
   const simpleButton = useFragment(
@@ -110,41 +110,40 @@ const SimpleButtonEditionScreen = ({
     module,
   );
 
-  const viewer = useFragment(
+  const profile = useFragment(
     graphql`
-      fragment SimpleButtonEditionScreen_viewer on Viewer {
+      fragment SimpleButtonEditionScreen_profile on Profile {
         moduleBackgrounds {
           id
           uri
           resizeMode
         }
-        profile {
-          webCard {
-            cardColors {
-              primary
-              dark
-              light
-            }
-            cardStyle {
-              borderColor
-              borderRadius
-              borderWidth
-              buttonColor
-              buttonRadius
-              fontFamily
-              fontSize
-              gap
-              titleFontFamily
-              titleFontSize
-            }
-            ...SimpleButtonBordersEditionPanel_webCard
-            ...SimpleButtonSettingsEditionPanel_webCard
+        webCard {
+          id
+          cardColors {
+            primary
+            dark
+            light
           }
+          cardStyle {
+            borderColor
+            borderRadius
+            borderWidth
+            buttonColor
+            buttonRadius
+            fontFamily
+            fontSize
+            gap
+            titleFontFamily
+            titleFontSize
+          }
+          ...SimpleButtonBordersEditionPanel_webCard
+          ...SimpleButtonSettingsEditionPanel_webCard
         }
-        ...SimpleButtonBackgroundEditionPanel_viewer
+        ...SimpleButtonBackgroundEditionPanel_profile
       }
     `,
-    viewerKey,
+    profileKey,
   );
 
   // #endregion
@@ -173,7 +172,7 @@ const SimpleButtonEditionScreen = ({
 
   const { data, value, fieldUpdateHandler, dirty } = useModuleDataEditor({
     initialValue,
-    cardStyle: viewer.profile?.webCard.cardStyle,
+    cardStyle: profile?.webCard.cardStyle,
     styleValuesMap: SIMPLE_BUTTON_STYLE_VALUES,
     defaultValues: SIMPLE_BUTTON_DEFAULT_VALUES,
   });
@@ -200,7 +199,7 @@ const SimpleButtonEditionScreen = ({
   const previewData = {
     ...omit(data, 'backgroundId'),
     background:
-      viewer.moduleBackgrounds.find(
+      profile.moduleBackgrounds.find(
         background => background.id === backgroundId,
       ) ?? null,
   };
@@ -231,7 +230,7 @@ const SimpleButtonEditionScreen = ({
   const intl = useIntl();
 
   const onSave = useCallback(async () => {
-    if (!canSave) {
+    if (!canSave || !profile.webCard) {
       return;
     }
 
@@ -241,6 +240,7 @@ const SimpleButtonEditionScreen = ({
       buttonLabel: value.buttonLabel!,
       actionType: value.actionType!,
       actionLink: value.actionLink!,
+      webCardId: profile.webCard.id,
     };
 
     commit({
@@ -261,7 +261,7 @@ const SimpleButtonEditionScreen = ({
         });
       },
     });
-  }, [canSave, value, simpleButton?.id, commit, intl, router]);
+  }, [canSave, profile.webCard, value, simpleButton?.id, commit, router, intl]);
 
   const onCancel = useCallback(() => {
     router.back();
@@ -354,8 +354,8 @@ const SimpleButtonEditionScreen = ({
         <SimpleButtonPreview
           style={{ height: topPanelHeight - 20, marginVertical: 10 }}
           data={previewData}
-          colorPalette={viewer.profile?.webCard.cardColors}
-          cardStyle={viewer.profile?.webCard.cardStyle}
+          colorPalette={profile?.webCard.cardColors}
+          cardStyle={profile?.webCard.cardStyle}
         />
         <TabView
           style={{ height: bottomPanelHeight }}
@@ -365,7 +365,7 @@ const SimpleButtonEditionScreen = ({
               id: 'settings',
               element: (
                 <SimpleButtonSettingsEditionPanel
-                  webCard={viewer.profile?.webCard ?? null}
+                  webCard={profile?.webCard ?? null}
                   buttonLabel={buttonLabel ?? ''}
                   onButtonLabelChange={onButtonLabelChange}
                   actionType={actionType ?? ''}
@@ -392,7 +392,7 @@ const SimpleButtonEditionScreen = ({
               id: 'borders',
               element: (
                 <SimpleButtonBordersEditionPanel
-                  webCard={viewer.profile?.webCard ?? null}
+                  webCard={profile?.webCard ?? null}
                   borderColor={borderColor}
                   onBorderColorChange={onBordercolorChange}
                   borderWidth={borderWidth}
@@ -430,7 +430,7 @@ const SimpleButtonEditionScreen = ({
               id: 'background',
               element: (
                 <SimpleButtonBackgroundEditionPanel
-                  viewer={viewer}
+                  profile={profile}
                   backgroundId={backgroundId}
                   backgroundStyle={backgroundStyle}
                   onBackgroundChange={onBackgroundChange}

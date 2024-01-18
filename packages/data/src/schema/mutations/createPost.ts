@@ -7,21 +7,29 @@ import {
   checkMedias,
   createPost,
   db,
+  getUserProfileWithWebCardId,
   referencesMedias,
 } from '#domains';
+import fromGlobalIdWithType from '#helpers/relayIdHelpers';
 import type { MutationResolvers } from '#schema/__generated__/types';
 
 const createPostMutation: MutationResolvers['createPost'] = async (
   _,
-  { input: { mediaId, content, allowComments, allowLikes } },
+  {
+    input: {
+      webCardId: gqlWebCardId,
+      mediaId,
+      content,
+      allowComments,
+      allowLikes,
+    },
+  },
   { auth, loaders, cardUsernamesToRevalidate },
 ) => {
-  const { profileId } = auth;
-  if (!profileId) {
-    throw new GraphQLError(ERRORS.UNAUTHORIZED);
-  }
-
-  const profile = await loaders.Profile.load(profileId);
+  const { userId } = auth;
+  const webCardId = fromGlobalIdWithType(gqlWebCardId, 'WebCard');
+  const profile =
+    userId && (await getUserProfileWithWebCardId(userId, webCardId));
 
   if (
     !profile ||

@@ -12,20 +12,20 @@ import Button from '#ui/Button';
 import Text from '#ui/Text';
 import type { CoverList_users$key } from '#relayArtifacts/CoverList_users.graphql';
 
-import type { SearchResultGlobalListHeader_viewer$key } from '#relayArtifacts/SearchResultGlobalListHeader_viewer.graphql';
+import type { SearchResultGlobalListHeader_profile$key } from '#relayArtifacts/SearchResultGlobalListHeader_profile.graphql';
 
 type SearchResultGlobalListHeaderProps = {
-  viewer: SearchResultGlobalListHeader_viewer$key;
+  profile: SearchResultGlobalListHeader_profile$key;
   goToProfilesTab: () => void;
 };
 
 const SearchResultGlobalListHeader = ({
-  viewer,
+  profile,
   goToProfilesTab,
 }: SearchResultGlobalListHeaderProps) => {
   const { data, loadNext, isLoadingNext, hasNext } = usePaginationFragment(
     graphql`
-      fragment SearchResultGlobalListHeader_viewer on Viewer
+      fragment SearchResultGlobalListHeader_profile on Profile
       @refetchable(queryName: "SearchGlobalProfilesListQuery")
       @argumentDefinitions(
         after: { type: String }
@@ -48,7 +48,7 @@ const SearchResultGlobalListHeader = ({
         }
       }
     `,
-    viewer,
+    profile,
   );
 
   const onEndReachedCover = useCallback(() => {

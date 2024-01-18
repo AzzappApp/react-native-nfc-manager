@@ -15,15 +15,12 @@ import type { FollowersRoute } from '#routes';
 import type { PreloadedQuery } from 'react-relay';
 
 const followersScreenQuery = graphql`
-  query FollowersScreenQuery {
-    viewer {
-      profile {
+  query FollowersScreenQuery($webCardId: ID!) {
+    webCard: node(id: $webCardId) {
+      ... on WebCard {
         id
-        webCard {
-          id
-          cardIsPrivate
-          ...FollowersScreenList_webCard
-        }
+        cardIsPrivate
+        ...FollowersScreenList_webCard
       }
     }
   }
@@ -78,13 +75,13 @@ const FollowerScreenInner = ({
 }: {
   preloadedQuery: PreloadedQuery<FollowersScreenQuery>;
 }) => {
-  const { viewer } = usePreloadedQuery(followersScreenQuery, preloadedQuery);
+  const { webCard } = usePreloadedQuery(followersScreenQuery, preloadedQuery);
 
   return (
     <FollowersScreenList
-      isPublic={!viewer?.profile?.webCard.cardIsPrivate ?? false}
-      currentWebCardId={viewer.profile?.webCard?.id ?? ''}
-      webCard={viewer.profile?.webCard ?? null}
+      isPublic={webCard?.cardIsPrivate ?? false}
+      currentWebCardId={webCard?.id ?? ''}
+      webCard={webCard ?? null}
     />
   );
 };
@@ -97,4 +94,7 @@ const styles = StyleSheet.create({
 
 export default relayScreen(FollowersScreen, {
   query: followersScreenQuery,
+  getVariables: (_, profileInfos) => ({
+    webCardId: profileInfos?.webCardId ?? '',
+  }),
 });

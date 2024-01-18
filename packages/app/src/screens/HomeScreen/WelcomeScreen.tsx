@@ -30,19 +30,19 @@ const WelcomeScreen = () => {
     dispatchGlobalEvent({ type: 'READY' });
   }, []);
 
-  const { webCardId } = useAuthState();
+  const { profileInfos } = useAuthState();
 
   const router = useRouter();
 
   const goBackToHome = useCallback(() => {
-    if (webCardId) {
+    if (profileInfos?.webCardId) {
       router.replaceAll(mainRoutes(false));
     }
-  }, [webCardId, router]);
+  }, [profileInfos, router]);
 
   useFocusEffect(goBackToHome);
 
-  return webCardId ? (
+  return profileInfos ? (
     <Container
       style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}
     >

@@ -3,7 +3,7 @@ import { useIntl } from 'react-intl';
 import { StyleSheet, View } from 'react-native';
 import { useFragment, graphql } from 'react-relay';
 import { WebCardBoundEditorLayerSelectorPanel } from '#components/EditorLayerSelectorPanel';
-import type { SimpleButtonBackgroundEditionPanel_viewer$key } from '#relayArtifacts/SimpleButtonBackgroundEditionPanel_viewer.graphql';
+import type { SimpleButtonBackgroundEditionPanel_profile$key } from '#relayArtifacts/SimpleButtonBackgroundEditionPanel_profile.graphql';
 import type { ViewProps } from 'react-native';
 
 type BackgroundStyle = {
@@ -15,7 +15,7 @@ type SimpleButtonBackgroundEditionPanelProps = ViewProps & {
   /**
    * A relay fragment reference to the viewer
    */
-  viewer: SimpleButtonBackgroundEditionPanel_viewer$key;
+  profile: SimpleButtonBackgroundEditionPanel_profile$key;
   /**
    * The currently selected background id
    */
@@ -43,7 +43,7 @@ type SimpleButtonBackgroundEditionPanelProps = ViewProps & {
  * A Panel to edit the Background of the SimpleButton edition screen
  */
 const SimpleButtonBackgroundEditionPanel = ({
-  viewer,
+  profile: profileKey,
   backgroundId: background,
   backgroundStyle,
   onBackgroundChange,
@@ -51,21 +51,19 @@ const SimpleButtonBackgroundEditionPanel = ({
   bottomSheetHeight,
   ...props
 }: SimpleButtonBackgroundEditionPanelProps) => {
-  const { moduleBackgrounds, profile } = useFragment(
+  const profile = useFragment(
     graphql`
-      fragment SimpleButtonBackgroundEditionPanel_viewer on Viewer {
+      fragment SimpleButtonBackgroundEditionPanel_profile on Profile {
         moduleBackgrounds {
           ...StaticMediaList_staticMedias
         }
-        profile {
-          webCard {
-            ...WebCardBackground_webCard
-            ...WebCardColorPicker_webCard
-          }
+        webCard {
+          ...WebCardBackground_webCard
+          ...WebCardColorPicker_webCard
         }
       }
     `,
-    viewer,
+    profileKey,
   );
 
   const backgroundColor = backgroundStyle?.backgroundColor ?? '#FFFFFF';
@@ -98,7 +96,7 @@ const SimpleButtonBackgroundEditionPanel = ({
           description: 'Label of Background tab in Horizontal photo edition',
         })}
         webCard={profile?.webCard ?? null}
-        medias={moduleBackgrounds}
+        medias={profile.moduleBackgrounds}
         selectedMedia={background}
         tintColor={patternColor}
         backgroundColor={backgroundColor}

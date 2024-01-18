@@ -4,7 +4,7 @@ import { StyleSheet, View } from 'react-native';
 import { useFragment, graphql } from 'react-relay';
 import { WebCardBoundEditorLayerSelectorPanel } from '#components/EditorLayerSelectorPanel';
 import LabeledDashedSlider from '#ui/LabeledDashedSlider';
-import type { BlockTextTextBackgroundEditionPanel_viewer$key } from '#relayArtifacts/BlockTextTextBackgroundEditionPanel_viewer.graphql';
+import type { BlockTextTextBackgroundEditionPanel_profile$key } from '#relayArtifacts/BlockTextTextBackgroundEditionPanel_profile.graphql';
 import type { ViewProps } from 'react-native';
 
 type BackgroundStyle = {
@@ -20,7 +20,7 @@ type BlockTextTextBackgroundEditionPanelProps = ViewProps & {
   /**
    * A relay fragment reference to the viewer
    */
-  viewer: BlockTextTextBackgroundEditionPanel_viewer$key;
+  profile: BlockTextTextBackgroundEditionPanel_profile$key;
   /**
    * The currently selected textBackground id
    */
@@ -48,7 +48,7 @@ type BlockTextTextBackgroundEditionPanelProps = ViewProps & {
  * A Panel to edit the TextTextBackground of the BlockText edition screen
  */
 const BlockTextTextBackgroundEditionPanel = ({
-  viewer,
+  profile: profileKey,
   textBackgroundId: textBackground,
   textBackgroundStyle,
   onTextBackgroundChange,
@@ -56,20 +56,18 @@ const BlockTextTextBackgroundEditionPanel = ({
   bottomSheetHeight,
   ...props
 }: BlockTextTextBackgroundEditionPanelProps) => {
-  const { moduleBackgrounds, profile } = useFragment(
+  const profile = useFragment(
     graphql`
-      fragment BlockTextTextBackgroundEditionPanel_viewer on Viewer {
+      fragment BlockTextTextBackgroundEditionPanel_profile on Profile {
         moduleBackgrounds {
           ...StaticMediaList_staticMedias
         }
-        profile {
-          webCard {
-            ...WebCardColorPicker_webCard
-          }
+        webCard {
+          ...WebCardColorPicker_webCard
         }
       }
     `,
-    viewer,
+    profileKey,
   );
 
   const textBackgroundColor = textBackgroundStyle?.backgroundColor ?? '#FFFFFF';
@@ -116,7 +114,7 @@ const BlockTextTextBackgroundEditionPanel = ({
             'Label of TextBackground tab in Horizontal photo edition',
         })}
         webCard={profile?.webCard ?? null}
-        medias={moduleBackgrounds}
+        medias={profile.moduleBackgrounds}
         selectedMedia={textBackground}
         tintColor={patternColor}
         backgroundColor={textBackgroundColor}

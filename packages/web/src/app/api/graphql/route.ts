@@ -5,10 +5,8 @@ import { UnauthenticatedError, useGenericAuth } from '@envelop/generic-auth';
 import { useSentry } from '@envelop/sentry';
 import { usePersistedOperations } from '@graphql-yoga/plugin-persisted-operations';
 import { createYoga } from 'graphql-yoga';
-import { headers } from 'next/headers';
 import { compare } from 'semver';
 import { createGraphQLContext, schema } from '@azzapp/data';
-import { getProfileWithWebCardId } from '@azzapp/data/domains';
 import {
   getDatabaseConnectionsInfos,
   startDatabaseConnectionMonitoring,
@@ -165,34 +163,9 @@ const { handleRequest } = createYoga({
         process.env.NEXT_PUBLIC_PLATFORM !== 'production',
     }),
     useGenericAuth({
-      resolveUserFn: async (context: GraphQLContext) => {
+      resolveUserFn: async () => {
         try {
           const res = await getSessionData();
-
-          const webCardId = headers().get('azzapp-webCardId');
-
-          if (webCardId && res?.userId) {
-            const profile = await getProfileWithWebCardId(
-              res.userId,
-              webCardId,
-            );
-
-            if (profile) {
-              context.loaders.Profile.prime(profile.id, profile);
-            }
-
-            if (!profile || profile.userId !== res.userId) {
-              throw new Error('Invalid profile');
-            }
-
-            if (profile) {
-              return {
-                ...res,
-                profileId: profile.id,
-              };
-            }
-          }
-
           return res;
         } catch (e) {
           console.log('error', e);

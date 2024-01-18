@@ -24,7 +24,6 @@ import CoverLoadingIndicator from '#components/CoverLoadingIndicator';
 import CoverRenderer from '#components/CoverRenderer';
 import Link from '#components/Link';
 import { useScreenHasFocus } from '#components/NativeRouter';
-import WebCardBoundRelayEnvironmentProvider from '#helpers/WebCardBoundRelayEnvironmentProvider';
 import CarouselSelectList from '#ui/CarouselSelectList';
 import Icon from '#ui/Icon';
 import PressableOpacity from '#ui/PressableOpacity';
@@ -134,16 +133,14 @@ const HomeProfilesCarousel = (
     ({ item, index }: ListRenderItemInfo<ProfileType | null>) => {
       if (item) {
         return (
-          <WebCardBoundRelayEnvironmentProvider webCardId={item?.webCard?.id}>
-            <ItemRender
-              item={item}
-              coverHeight={coverHeight}
-              coverWidth={coverWidth}
-              index={index}
-              scrollToIndex={scrollToIndex}
-              currentUserIndex={selectedIndex}
-            />
-          </WebCardBoundRelayEnvironmentProvider>
+          <ItemRender
+            item={item}
+            coverHeight={coverHeight}
+            coverWidth={coverWidth}
+            index={index}
+            scrollToIndex={scrollToIndex}
+            currentUserIndex={selectedIndex}
+          />
         );
       }
 

@@ -3,7 +3,7 @@ import { useIntl } from 'react-intl';
 import { StyleSheet, View } from 'react-native';
 import { useFragment, graphql } from 'react-relay';
 import { WebCardBoundEditorLayerSelectorPanel } from '#components/EditorLayerSelectorPanel';
-import type { SocialLinksBackgroundEditionPanel_viewer$key } from '#relayArtifacts/SocialLinksBackgroundEditionPanel_viewer.graphql';
+import type { SocialLinksBackgroundEditionPanel_profile$key } from '#relayArtifacts/SocialLinksBackgroundEditionPanel_profile.graphql';
 import type { ViewProps } from 'react-native';
 
 type BackgroundStyle = {
@@ -15,7 +15,7 @@ type SocialLinksBackgroundEditionPanelProps = ViewProps & {
   /**
    * A relay fragment reference to the viewer
    */
-  viewer: SocialLinksBackgroundEditionPanel_viewer$key;
+  profile: SocialLinksBackgroundEditionPanel_profile$key;
   /**
    * The currently selected background id
    */
@@ -43,7 +43,7 @@ type SocialLinksBackgroundEditionPanelProps = ViewProps & {
  * A Panel to edit the Background of the SocialLinks edition screen
  */
 const SocialLinksBackgroundEditionPanel = ({
-  viewer,
+  profile,
   backgroundId: background,
   backgroundStyle,
   onBackgroundChange,
@@ -51,20 +51,18 @@ const SocialLinksBackgroundEditionPanel = ({
   bottomSheetHeight,
   ...props
 }: SocialLinksBackgroundEditionPanelProps) => {
-  const { moduleBackgrounds, profile } = useFragment(
+  const { moduleBackgrounds, webCard } = useFragment(
     graphql`
-      fragment SocialLinksBackgroundEditionPanel_viewer on Viewer {
+      fragment SocialLinksBackgroundEditionPanel_profile on Profile {
         moduleBackgrounds {
           ...StaticMediaList_staticMedias
         }
-        profile {
-          webCard {
-            ...WebCardColorPicker_webCard
-          }
+        webCard {
+          ...WebCardColorPicker_webCard
         }
       }
     `,
-    viewer,
+    profile,
   );
 
   const backgroundColor = backgroundStyle?.backgroundColor ?? '#FFFFFF';
@@ -96,7 +94,7 @@ const SocialLinksBackgroundEditionPanel = ({
           defaultMessage: 'Background',
           description: 'Label of Background tab in Horizontal photo edition',
         })}
-        webCard={profile?.webCard ?? null}
+        webCard={webCard}
         medias={moduleBackgrounds}
         selectedMedia={background}
         tintColor={patternColor}

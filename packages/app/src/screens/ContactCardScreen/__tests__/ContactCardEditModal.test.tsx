@@ -67,10 +67,8 @@ describe('ContactCardEditModal', () => {
       const data = useLazyLoadQuery<ContactCardEditModalTestQuery>(
         graphql`
           query ContactCardEditModalTestQuery @relay_test_operation {
-            viewer {
-              profile {
-                ...ContactCardEditModal_card
-              }
+            profile: node(id: "test-profile") {
+              ...ContactCardEditModal_card
             }
           }
         `,
@@ -79,7 +77,7 @@ describe('ContactCardEditModal', () => {
 
       return (
         <ContactCardEditModal
-          profile={data.viewer.profile!}
+          profile={data.profile!}
           visible
           toggleBottomSheet={() => void 0}
           {...props}
@@ -156,54 +154,57 @@ describe('ContactCardEditModal', () => {
     );
 
     expect(operation.request.variables.input).toEqual({
-      firstName: 'John 2',
-      lastName: 'Doe 2',
-      title: 'Software Engineer 2',
-      company: 'Facebook 2',
-      avatarId: '<mock-value-for-field-"id">',
-      emails: [
-        {
-          label: 'Work',
-          address: 'test@test.com 2',
-          selected: true,
-        },
-      ],
-      phoneNumbers: [
-        {
-          label: 'Work',
-          number: '1234567890 2',
-          selected: true,
-        },
-        {
-          label: 'Home',
-          number: '1234567890 3',
-          selected: true,
-        },
-      ],
-      addresses: [
-        {
-          address: '<mock-value-for-field-"address">',
-          label: '<mock-value-for-field-"label">',
+      contactCard: {
+        firstName: 'John 2',
+        lastName: 'Doe 2',
+        title: 'Software Engineer 2',
+        company: 'Facebook 2',
+        avatarId: '<mock-value-for-field-"id">',
+        emails: [
+          {
+            label: 'Work',
+            address: 'test@test.com 2',
+            selected: true,
+          },
+        ],
+        phoneNumbers: [
+          {
+            label: 'Work',
+            number: '1234567890 2',
+            selected: true,
+          },
+          {
+            label: 'Home',
+            number: '1234567890 3',
+            selected: true,
+          },
+        ],
+        addresses: [
+          {
+            address: '<mock-value-for-field-"address">',
+            label: '<mock-value-for-field-"label">',
+            selected: false,
+          },
+        ],
+        birthday: {
+          birthday: '<mock-value-for-field-"birthday">',
           selected: false,
         },
-      ],
-      birthday: {
-        birthday: '<mock-value-for-field-"birthday">',
-        selected: false,
+        socials: [
+          {
+            selected: false,
+            label: '<mock-value-for-field-"label">',
+            url: '<mock-value-for-field-"url">',
+          },
+        ],
+        urls: [
+          {
+            address: 'http://test.com',
+            selected: true,
+          },
+        ],
       },
-      socials: [
-        {
-          selected: false,
-          label: '<mock-value-for-field-"label">',
-          url: '<mock-value-for-field-"url">',
-        },
-      ],
-      urls: [
-        {
-          address: 'http://test.com',
-          selected: true,
-        },
-      ],
+      profileId: '<Node-mock-id-1>',
     });
   });
 });

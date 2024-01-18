@@ -26,7 +26,7 @@ import BlockTextSectionBackgroundEditionPanel from './BlockTextSectionBackground
 import BlockTextSettingsEditionPanel from './BlockTextSettingsEditionPanel';
 import BlockTextTextBackgroundEditionPanel from './BlockTextTextBackgroundEditionPanel';
 import type { BlockTextEditionScreen_module$key } from '#relayArtifacts/BlockTextEditionScreen_module.graphql';
-import type { BlockTextEditionScreen_viewer$key } from '#relayArtifacts/BlockTextEditionScreen_viewer.graphql';
+import type { BlockTextEditionScreen_profile$key } from '#relayArtifacts/BlockTextEditionScreen_profile.graphql';
 import type {
   BlockTextEditionScreenUpdateModuleMutation,
   SaveBlockTextModuleInput,
@@ -37,7 +37,7 @@ export type BlockTextEditionScreenProps = ViewProps & {
   /**
    * the current viewer
    */
-  viewer: BlockTextEditionScreen_viewer$key;
+  profile: BlockTextEditionScreen_profile$key;
   /**
    * the current module to edit, if null, a new module will be created
    */
@@ -49,7 +49,7 @@ export type BlockTextEditionScreenProps = ViewProps & {
  */
 const BlockTextEditionScreen = ({
   module,
-  viewer: viewerKey,
+  profile: profileKey,
 }: BlockTextEditionScreenProps) => {
   // #region Data retrieval
   const blockText = useFragment(
@@ -89,41 +89,40 @@ const BlockTextEditionScreen = ({
     module,
   );
 
-  const viewer = useFragment(
+  const profile = useFragment(
     graphql`
-      fragment BlockTextEditionScreen_viewer on Viewer {
-        ...BlockTextSectionBackgroundEditionPanel_viewer
-        ...BlockTextTextBackgroundEditionPanel_viewer
+      fragment BlockTextEditionScreen_profile on Profile {
         moduleBackgrounds {
           id
           uri
           resizeMode
         }
-        profile {
-          webCard {
-            cardColors {
-              primary
-              light
-              dark
-            }
-            cardStyle {
-              borderColor
-              borderRadius
-              borderWidth
-              buttonColor
-              buttonRadius
-              fontFamily
-              fontSize
-              gap
-              titleFontFamily
-              titleFontSize
-            }
-            ...BlockTextSettingsEditionPanel_webCard
+        webCard {
+          id
+          cardColors {
+            primary
+            light
+            dark
           }
+          cardStyle {
+            borderColor
+            borderRadius
+            borderWidth
+            buttonColor
+            buttonRadius
+            fontFamily
+            fontSize
+            gap
+            titleFontFamily
+            titleFontSize
+          }
+          ...BlockTextSettingsEditionPanel_webCard
         }
+        ...BlockTextSectionBackgroundEditionPanel_profile
+        ...BlockTextTextBackgroundEditionPanel_profile
       }
     `,
-    viewerKey,
+    profileKey,
   );
 
   // #endregion
@@ -150,7 +149,7 @@ const BlockTextEditionScreen = ({
 
   const { data, value, fieldUpdateHandler, dirty } = useModuleDataEditor({
     initialValue,
-    cardStyle: viewer.profile?.webCard.cardStyle,
+    cardStyle: profile?.webCard.cardStyle,
     styleValuesMap: BLOCK_TEXT_STYLE_VALUES,
     defaultValues: BLOCK_TEXT_DEFAULT_VALUES,
   });
@@ -175,11 +174,11 @@ const BlockTextEditionScreen = ({
   const previewData = {
     ...omit(data, 'backgroundId', 'textBackgroundId'),
     background:
-      viewer.moduleBackgrounds.find(
+      profile.moduleBackgrounds.find(
         background => background.id === backgroundId,
       ) ?? null,
     textBackground:
-      viewer.moduleBackgrounds.find(
+      profile.moduleBackgrounds.find(
         background => background.id === textBackgroundId,
       ) ?? null,
   };
@@ -219,6 +218,7 @@ const BlockTextEditionScreen = ({
       ...value,
       moduleId: blockText?.id,
       text: value.text!,
+      webCardId: profile.webCard.id,
     };
 
     commit({
@@ -241,7 +241,7 @@ const BlockTextEditionScreen = ({
         });
       },
     });
-  }, [canSave, value, blockText?.id, commit, router, intl]);
+  }, [canSave, value, blockText?.id, profile.webCard.id, commit, router, intl]);
 
   const onCancel = useCallback(() => {
     router.back();
@@ -348,8 +348,8 @@ const BlockTextEditionScreen = ({
         style={{ height: topPanelHeight - 20, marginVertical: 10 }}
         data={previewData}
         onPreviewPress={onPreviewPress}
-        colorPalette={viewer.profile?.webCard.cardColors}
-        cardStyle={viewer.profile?.webCard.cardStyle}
+        colorPalette={profile?.webCard.cardColors}
+        cardStyle={profile?.webCard.cardStyle}
       />
       <TabView
         style={{ height: bottomPanelHeight }}
@@ -359,7 +359,7 @@ const BlockTextEditionScreen = ({
             id: 'settings',
             element: (
               <BlockTextSettingsEditionPanel
-                webCard={viewer.profile?.webCard ?? null}
+                webCard={profile?.webCard ?? null}
                 fontFamily={fontFamily}
                 onFontFamilyChange={onFontFamilyChange}
                 fontColor={fontColor}
@@ -401,7 +401,7 @@ const BlockTextEditionScreen = ({
             id: 'textBackground',
             element: (
               <BlockTextTextBackgroundEditionPanel
-                viewer={viewer}
+                profile={profile}
                 textBackgroundId={textBackgroundId}
                 textBackgroundStyle={textBackgroundStyle}
                 onTextBackgroundChange={onTextBackgroundChange}
@@ -418,7 +418,7 @@ const BlockTextEditionScreen = ({
             id: 'sectionBackground',
             element: (
               <BlockTextSectionBackgroundEditionPanel
-                viewer={viewer}
+                profile={profile}
                 backgroundId={backgroundId}
                 backgroundStyle={backgroundStyle}
                 onBackgroundChange={onBackgroundChange}

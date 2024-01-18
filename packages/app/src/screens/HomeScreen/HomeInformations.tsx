@@ -11,11 +11,9 @@ import { useFragment, graphql } from 'react-relay';
 import { colors } from '#theme';
 import AnimatedText from '#components/AnimatedText';
 import Link from '#components/Link';
-import useMultiActorEnvironmentPluralFragment from '#hooks/useMultiActorEnvironmentPluralFragment';
 import PressableOpacity from '#ui/PressableOpacity';
 import Text from '#ui/Text';
 import type { HomeInformations_user$key } from '#relayArtifacts/HomeInformations_user.graphql';
-import type { HomeInformations_webCard$key } from '#relayArtifacts/HomeInformations_webCard.graphql';
 import type { SharedValue } from 'react-native-reanimated';
 type HomeInformationsProps = {
   user: HomeInformations_user$key;
@@ -42,7 +40,12 @@ const HomeInformations = ({
         profiles {
           webCard {
             id
-            ...HomeInformations_webCard
+            userName
+            firstName
+            nbPosts
+            nbFollowings
+            nbFollowers
+            nbPostsLiked
           }
         }
       }
@@ -50,48 +53,32 @@ const HomeInformations = ({
     user,
   );
 
-  const webCards = useMultiActorEnvironmentPluralFragment(
-    graphql`
-      fragment HomeInformations_webCard on WebCard {
-        id
-        userName
-        firstName
-        nbPosts
-        nbFollowings
-        nbFollowers
-        nbPostsLiked
-      }
-    `,
-    (webCard: any) => webCard.id,
-    profiles?.map(p => p.webCard) as unknown as HomeInformations_webCard$key[],
-  );
-
   // using relay result direclty inside animated hook cause crash
   const infosShared = useSharedValue(
-    webCards?.map(profile => {
+    profiles?.map(({ webCard }) => {
       return {
-        nbPosts: profile.nbPosts,
-        nbFollowings: profile.nbFollowings,
-        nbFollowers: profile.nbFollowers,
-        nbLikes: profile.nbPostsLiked,
+        nbPosts: webCard.nbPosts,
+        nbFollowings: webCard.nbFollowings,
+        nbFollowers: webCard.nbFollowers,
+        nbLikes: webCard.nbPostsLiked,
       };
     }) ?? [],
   );
 
   useEffect(() => {
     //updating the infosShared when profiles changed (after creating a new profile)
-    if (webCards) {
-      infosShared.value = webCards?.map(profile => {
+    if (profiles) {
+      infosShared.value = profiles?.map(({ webCard }) => {
         return {
-          nbPosts: profile.nbPosts,
-          nbFollowings: profile.nbFollowings,
-          nbFollowers: profile.nbFollowers,
-          nbLikes: profile.nbPostsLiked,
+          nbPosts: webCard.nbPosts,
+          nbFollowings: webCard.nbFollowings,
+          nbFollowers: webCard.nbFollowers,
+          nbLikes: webCard.nbPostsLiked,
         };
       });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [webCards]);
+  }, [profiles]);
 
   //TODO: reanmiated 3 and computedValue for better performance
   const nbPosts = useSharedValue(format(infosShared.value[0].nbPosts ?? 0));
@@ -104,10 +91,10 @@ const HomeInformations = ({
   );
 
   //using profiles object directly in animatedReaction causes error animatedHost(seems to be the case for all relay query result)
-  const [currentProfile, setCurrentProfile] = useState(webCards?.[0]);
+  const [currentProfile, setCurrentProfile] = useState(profiles?.[0]);
   const defineCurrentProfile = (index: number) => {
-    if (webCards && index >= 0 && index < webCards.length) {
-      setCurrentProfile(webCards[index]);
+    if (profiles && index >= 0 && index < profiles.length) {
+      setCurrentProfile(profiles[index]);
     }
   };
 
@@ -162,7 +149,7 @@ const HomeInformations = ({
         nbFollowings.value = format(infosShared.value[0].nbFollowings ?? 0);
       }
     },
-    [webCards],
+    [profiles],
   );
 
   if (!currentProfile) {
@@ -175,8 +162,8 @@ const HomeInformations = ({
         <Link
           route="WEBCARD"
           params={{
-            userName: currentProfile.userName,
-            webCardId: currentProfile.id,
+            userName: currentProfile.webCard.userName,
+            webCardId: currentProfile.webCard.id,
             showPosts: true,
           }}
         >

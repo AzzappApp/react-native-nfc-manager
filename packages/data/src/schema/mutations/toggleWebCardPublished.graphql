@@ -1,0 +1,22 @@
+extend type Mutation {
+  """
+  Publish a WebCard 
+  """
+  toggleWebCardPublished(input: ToggleWebCardPublishedInput!): ToggleWebCardPublishedPayload!
+
+}
+
+input ToggleWebCardPublishedInput {
+  """
+  The id of the WebCard to publish/unpublish
+  """
+  webCardId: ID!
+  """
+  The new published state of the WebCard
+  """
+  published: Boolean!
+}
+
+type ToggleWebCardPublishedPayload {
+  webCard: WebCard!
+}

@@ -41,7 +41,12 @@ describe('Signin Screen', () => {
     signinMock.mockResolvedValueOnce({
       token: 'fake-token',
       refreshToken: 'fake-refreshToken',
-      webCardId: 'fake-webCardId',
+      userId: 'fake-userId',
+      profileInfos: {
+        profileId: 'fake-profileId',
+        webCardId: 'fake-webCardId',
+        profileRole: 'editor',
+      },
     });
 
     const credentialInput = screen.getByPlaceholderText(
@@ -68,7 +73,11 @@ describe('Signin Screen', () => {
           token: 'fake-token',
           refreshToken: 'fake-refreshToken',
         },
-        webCardId: 'fake-webCardId',
+        profileInfos: {
+          profileId: 'fake-profileId',
+          profileRole: 'editor',
+          webCardId: 'fake-webCardId',
+        },
       },
     });
   });

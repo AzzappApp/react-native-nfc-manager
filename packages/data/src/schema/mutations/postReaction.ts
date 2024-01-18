@@ -1,38 +1,45 @@
 import { eq, sql } from 'drizzle-orm';
 import { GraphQLError } from 'graphql';
-import { fromGlobalId } from 'graphql-relay';
 import ERRORS from '@azzapp/shared/errors';
 import { isEditor } from '@azzapp/shared/profileHelpers';
-import { PostTable, WebCardTable, db, updateStatistics } from '#domains';
+import {
+  PostTable,
+  WebCardTable,
+  db,
+  getUserProfileWithWebCardId,
+  updateStatistics,
+} from '#domains';
 import {
   deletePostReaction,
   getPostReaction,
   insertPostReaction,
 } from '#domains/postReactions';
+import fromGlobalIdWithType from '#helpers/relayIdHelpers';
 import type { MutationResolvers } from '#schema/__generated__/types';
 
 const togglePostReaction: MutationResolvers['togglePostReaction'] = async (
   _,
-  { input: { postId, reactionKind } },
+  { input: { webCardId: gqlWebCardId, postId: gqlPostId, reactionKind } },
   { auth, loaders },
 ) => {
-  if (!auth.userId) {
+  const { userId } = auth;
+  const webCardId = fromGlobalIdWithType(gqlWebCardId, 'WebCard');
+  const profile =
+    userId && (await getUserProfileWithWebCardId(userId, webCardId));
+
+  if (
+    !profile ||
+    !('profileRole' in profile && isEditor(profile.profileRole))
+  ) {
     throw new GraphQLError(ERRORS.UNAUTHORIZED);
   }
-  const profileId = auth.profileId;
-  if (!profileId) {
-    throw new GraphQLError(ERRORS.UNAUTHORIZED);
-  }
-
-  const profile = await loaders.Profile.load(profileId);
-
   if (!profile || !isEditor(profile.profileRole)) {
     throw new GraphQLError(ERRORS.INVALID_REQUEST);
   }
 
-  const { id: targetId, type } = fromGlobalId(postId);
-  const post = await loaders.Post.load(targetId);
-  if (type !== 'Post' || !post) {
+  const postId = fromGlobalIdWithType(gqlPostId, 'Post');
+  const post = await loaders.Post.load(postId);
+  if (!post) {
     throw new GraphQLError(ERRORS.INVALID_REQUEST);
   }
 
@@ -47,19 +54,13 @@ const togglePostReaction: MutationResolvers['togglePostReaction'] = async (
   }
 
   try {
-    await db.transaction(async trx => {
-      const reaction = await getPostReaction(profile.webCardId, targetId, trx);
+    const updatedPost = await db.transaction(async trx => {
+      const reaction = await getPostReaction(profile.webCardId, postId, trx);
       const removeReaction = reaction?.reactionKind === reactionKind;
-
       if (removeReaction) {
-        await deletePostReaction(profile.webCardId, targetId, trx);
+        await deletePostReaction(profile.webCardId, postId, trx);
       } else {
-        await insertPostReaction(
-          profile.webCardId,
-          targetId,
-          reactionKind,
-          trx,
-        );
+        await insertPostReaction(profile.webCardId, postId, reactionKind, trx);
       }
       await trx
         .update(PostTable)
@@ -67,7 +68,8 @@ const togglePostReaction: MutationResolvers['togglePostReaction'] = async (
           //prettier-ignore
           counterReactions:removeReaction? sql`GREATEST(${PostTable.counterReactions} - 1, 0)`: sql`${PostTable.counterReactions} +  1`,
         })
-        .where(eq(PostTable.id, targetId));
+        .where(eq(PostTable.id, postId));
+
       await trx
         .update(WebCardTable)
         .set({
@@ -83,13 +85,19 @@ const togglePostReaction: MutationResolvers['togglePostReaction'] = async (
         })
         .where(eq(WebCardTable.id, profile.webCardId));
       await updateStatistics(post.webCardId, 'likes', !removeReaction, trx);
+
+      return {
+        ...post,
+        counterReactions: removeReaction
+          ? post.counterReactions - 1
+          : post.counterReactions + 1,
+      };
     });
+    return { post: updatedPost };
   } catch (e) {
     console.error(e);
     throw new GraphQLError(ERRORS.INTERNAL_SERVER_ERROR);
   }
-
-  return { post };
 };
 
 export default togglePostReaction;

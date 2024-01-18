@@ -5,6 +5,7 @@ import Toast from 'react-native-toast-message';
 import { graphql, useFragment } from 'react-relay';
 import CardTemplateList from '#components/CardTemplateList';
 import ScreenModal from '#components/ScreenModal';
+import useAuthState from '#hooks/useAuthState';
 import useLoadCardTemplateMutation from '#hooks/useLoadCardTemplateMutation';
 import useScreenInsets from '#hooks/useScreenInsets';
 import ActivityIndicator from '#ui/ActivityIndicator';
@@ -15,32 +16,34 @@ import HeaderButton from '#ui/HeaderButton';
 import Icon from '#ui/Icon';
 import IconButton from '#ui/IconButton';
 import Text from '#ui/Text';
-import type { CardTemplatelistHandle } from '#components/CardTemplateList';
-import type { LoadCardTemplateModal_profile$key } from '#relayArtifacts/LoadCardTemplateModal_profile.graphql';
+import type { CardTemplateListHandle } from '#components/CardTemplateList';
+import type { LoadCardTemplateModal_webCard$key } from '#relayArtifacts/LoadCardTemplateModal_webCard.graphql';
 
 type LoadCardTemplateModalProps = {
   onClose: () => void;
   visible: boolean;
-  profile: LoadCardTemplateModal_profile$key;
+  webCard: LoadCardTemplateModal_webCard$key;
 };
 
 const LoadCardTemplateModal = ({
   onClose,
   visible,
-  profile: profileKey,
+  webCard: webCardKey,
 }: LoadCardTemplateModalProps) => {
   const [cardTemplateId, setCardTemplateId] = useState<string | null>(null);
 
-  const profile = useFragment(
+  const webCard = useFragment(
     graphql`
-      fragment LoadCardTemplateModal_profile on WebCard {
+      fragment LoadCardTemplateModal_webCard on WebCard {
+        id
         cardModules {
           id
         }
       }
     `,
-    profileKey,
+    webCardKey,
   );
+  const profileId = useAuthState().profileInfos?.profileId;
 
   const intl = useIntl();
   const insets = useScreenInsets();
@@ -54,6 +57,7 @@ const LoadCardTemplateModal = ({
       commit({
         variables: {
           loadCardTemplateInput: {
+            webCardId: webCard.id,
             cardTemplateId: id,
           },
         },
@@ -73,16 +77,16 @@ const LoadCardTemplateModal = ({
         },
       });
     },
-    [commit, intl, onClose],
+    [commit, intl, onClose, webCard.id],
   );
 
-  const cardTemplatehandle = useRef<CardTemplatelistHandle>(null);
+  const cardTemplateHandle = useRef<CardTemplateListHandle>(null);
   const onSubmit = useCallback(() => {
     if (!cardTemplateId) return;
     commitCardTemplate(cardTemplateId);
   }, [cardTemplateId, commitCardTemplate]);
 
-  const showWarning = Boolean(profile.cardModules?.length);
+  const showWarning = Boolean(webCard.cardModules?.length);
 
   const applyTemplate = useCallback(
     (templateId: string) => {
@@ -93,6 +97,10 @@ const LoadCardTemplateModal = ({
     },
     [commitCardTemplate, showWarning],
   );
+
+  if (!profileId) {
+    return null;
+  }
 
   return (
     <>
@@ -119,7 +127,7 @@ const LoadCardTemplateModal = ({
             })}
             rightElement={
               <HeaderButton
-                onPress={() => cardTemplatehandle.current?.onSubmit()}
+                onPress={() => cardTemplateHandle.current?.onSubmit()}
                 label={intl.formatMessage({
                   defaultMessage: 'Apply',
                   description: 'Apply button label in card template preview',
@@ -137,10 +145,11 @@ const LoadCardTemplateModal = ({
             }
           >
             <CardTemplateList
+              profileId={profileId}
               height={height}
               onApplyTemplate={applyTemplate}
               loading={inFlight}
-              ref={cardTemplatehandle}
+              ref={cardTemplateHandle}
             />
           </Suspense>
         </Container>

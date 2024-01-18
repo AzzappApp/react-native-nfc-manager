@@ -15,9 +15,7 @@ import {
 } from 'react-native-reanimated';
 import { graphql, useFragment } from 'react-relay';
 import { colors } from '#theme';
-import useMultiActorEnvironmentPluralFragment from '#hooks/useMultiActorEnvironmentPluralFragment';
 import type { HomeBackground_user$key } from '#relayArtifacts/HomeBackground_user.graphql';
-import type { HomeBackground_webCardColors$key } from '#relayArtifacts/HomeBackground_webCardColors.graphql';
 import type { SharedValue } from 'react-native-reanimated';
 
 type HomeBackgroundProps = {
@@ -37,7 +35,10 @@ const HomeBackground = ({
         profiles {
           webCard {
             id
-            ...HomeBackground_webCardColors
+            cardColors {
+              dark
+              primary
+            }
           }
         }
       }
@@ -45,39 +46,25 @@ const HomeBackground = ({
     userKey,
   );
 
-  const webCards = useMultiActorEnvironmentPluralFragment(
-    graphql`
-      fragment HomeBackground_webCardColors on WebCard {
-        id
-        cardColors {
-          dark
-          primary
-        }
-      }
-    `,
-    (webCard: any) => webCard.id,
-    user.profiles?.map(
-      p => p.webCard,
-    ) as readonly HomeBackground_webCardColors$key[],
-  );
-
-  const inputRange = _.range(0, webCards?.length);
+  const inputRange = _.range(0, user.profiles?.length);
 
   const primaryColors = useMemo(
     () =>
-      (webCards ?? []).map(profile => {
-        if (profile.cardColors?.primary) {
-          return profile.cardColors?.primary;
+      (user.profiles ?? []).map(({ webCard }) => {
+        if (webCard.cardColors?.primary) {
+          return webCard.cardColors?.primary;
         }
         return '#45444b';
       }),
-    [webCards],
+    [user],
   );
 
   const darkColors = useMemo(
     () =>
-      (webCards ?? []).map(profile => profile.cardColors?.dark ?? colors.black),
-    [webCards],
+      (user.profiles ?? []).map(
+        ({ webCard }) => webCard.cardColors?.dark ?? colors.black,
+      ),
+    [user],
   );
 
   const skiaGradient = useDerivedValue(() => {

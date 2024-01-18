@@ -57,6 +57,7 @@ const PostList = ({
       fragment PostList_posts on Post
       @relay(plural: true)
       @argumentDefinitions(
+        viewerWebCardId: { type: "ID!" }
         includeAuthor: { type: "Boolean!", defaultValue: false }
       ) {
         id
@@ -65,6 +66,7 @@ const PostList = ({
           __typename
         }
         ...PostRendererFragment_post
+          @arguments(viewerWebCardId: $viewerWebCardId)
         webCard @include(if: $includeAuthor) {
           ...PostRendererFragment_author
         }

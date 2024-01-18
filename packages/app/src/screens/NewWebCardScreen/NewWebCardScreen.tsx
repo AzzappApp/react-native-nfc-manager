@@ -10,7 +10,6 @@ import { useRouter } from '#components/NativeRouter';
 import fetchQueryAndRetain from '#helpers/fetchQueryAndRetain';
 import { prefetchImage } from '#helpers/mediaHelpers';
 import relayScreen from '#helpers/relayScreen';
-import WebCardBoundRelayEnvironmentProvider from '#helpers/WebCardBoundRelayEnvironmentProvider';
 import useScreenInsets from '#hooks/useScreenInsets';
 import ActivityIndicator from '#ui/ActivityIndicator';
 import Container from '#ui/Container';
@@ -21,7 +20,7 @@ import PagerHeader, { PAGER_HEADER_HEIGHT } from './PagerHeader';
 import WebCardForm from './WebCardForm';
 import WebCardKinStep from './WebCardKindStep';
 import WizardTransitioner from './WizardTransitioner';
-import type { CardTemplatelistHandle } from '#components/CardTemplateList';
+import type { CardTemplateListHandle } from '#components/CardTemplateList';
 import type { CoverEditorHandle } from '#components/CoverEditor/CoverEditor';
 import type { RelayScreenProps } from '#helpers/relayScreen';
 import type { NewWebCardScreenPreloadQuery } from '#relayArtifacts/NewWebCardScreenPreloadQuery.graphql';
@@ -42,13 +41,17 @@ const newWebCardScreenQuery = graphql`
 `;
 
 const newProfileScreenQueryWithProfile = graphql`
-  query NewWebCardScreenWithWebCardQuery($webCardId: ID!) {
-    webCard: node(id: $webCardId) {
-      ... on WebCard {
+  query NewWebCardScreenWithWebCardQuery($profileId: ID!) {
+    node(id: $profileId) {
+      # aliasing avoir nullable field on fragment spread
+      ... on Profile @alias(as: "profile") {
         id
-        userName
-        webCardCategory {
+        webCard {
           id
+          userName
+          webCardCategory {
+            id
+          }
         }
       }
     }
@@ -76,13 +79,13 @@ export const NewWebCardScreen = ({
     preloadedQuery,
   );
   const { webCardCategories } = data;
-  const webCard = 'webCard' in data ? data.webCard : null;
+  const profile = 'node' in data ? data.node?.profile : null;
 
   // #endregion
 
   // #region Profile kind selection
   const [webCardCategoryId, setWebCardCategoryId] = useState<string | null>(
-    webCard?.webCardCategory?.id ?? webCardCategories?.[0]?.id ?? null,
+    profile?.webCard?.webCardCategory?.id ?? webCardCategories?.[0]?.id ?? null,
   );
   const webCardCategory = webCardCategories?.find(
     pc => pc.id === webCardCategoryId,
@@ -96,13 +99,15 @@ export const NewWebCardScreen = ({
 
   // #region Profile creation
   const [webCardInfo, setWebCardInfo] = useState<{
+    profileId: string;
     webCardId: string;
     userName: string;
   } | null>(
-    webCard?.id && webCard?.userName
+    profile
       ? {
-          webCardId: webCard.id,
-          userName: webCard.userName,
+          profileId: profile.id,
+          webCardId: profile.webCard.id,
+          userName: profile.webCard.userName,
         }
       : null,
   );
@@ -128,8 +133,13 @@ export const NewWebCardScreen = ({
   }, [currentStepIndex, prev, router]);
   // #endregion
 
-  const onWebCardCreated = async (webCardId: string, userName: string) => {
+  const onWebCardCreated = async (
+    profileId: string,
+    webCardId: string,
+    userName: string,
+  ) => {
     setWebCardInfo({
+      profileId,
       webCardId,
       userName,
     });
@@ -156,7 +166,7 @@ export const NewWebCardScreen = ({
   const contentHeight = windowHeight - insets.top - PAGER_HEADER_HEIGHT;
   // #endregion
 
-  const [headerHidden, setHeaderHiden] = useState(false);
+  const [headerHidden, setHeaderHidden] = useState(false);
   const webCardFormRef = useRef<ProfileFormHandle>(null);
   const onSubmitProfileForm = () => {
     webCardFormRef.current?.onSubmit();
@@ -167,9 +177,9 @@ export const NewWebCardScreen = ({
     coverEditionRef.current?.save();
   };
 
-  const webcardTemplateRef = useRef<CardTemplatelistHandle>(null);
-  const onWebcardTemplateRef = () => {
-    webcardTemplateRef.current?.onSubmit();
+  const webCardTemplateRef = useRef<CardTemplateListHandle>(null);
+  const onNext = () => {
+    webCardTemplateRef.current?.onSubmit();
   };
 
   const intl = useIntl();
@@ -230,16 +240,13 @@ export const NewWebCardScreen = ({
       }),
       element:
         webCardInfo != null && currentStepIndex === 2 ? (
-          <WebCardBoundRelayEnvironmentProvider
-            webCardId={webCardInfo.webCardId}
-          >
-            <CoverEditionStep
-              height={contentHeight}
-              setCanSave={setCanSave}
-              onCoverSaved={onCoverSaved}
-              ref={coverEditionRef}
-            />
-          </WebCardBoundRelayEnvironmentProvider>
+          <CoverEditionStep
+            profileId={webCardInfo.profileId}
+            height={contentHeight}
+            setCanSave={setCanSave}
+            onCoverSaved={onCoverSaved}
+            ref={coverEditionRef}
+          />
         ) : null,
       backIcon: 'arrow_down' as const,
       rightElement: (
@@ -258,25 +265,23 @@ export const NewWebCardScreen = ({
       }),
       element:
         webCardInfo !== null && currentStepIndex === 3 ? (
-          <WebCardBoundRelayEnvironmentProvider
+          <CardEditionStep
+            profileId={webCardInfo.profileId}
             webCardId={webCardInfo.webCardId}
-          >
-            <CardEditionStep
-              height={contentHeight}
-              onSkip={onCoverTemplateApplied}
-              onCoverTemplateApplied={onCoverTemplateApplied}
-              hideHeader={() => setHeaderHiden(true)}
-              showHeader={() => setHeaderHiden(false)}
-              ref={webcardTemplateRef}
-            />
-          </WebCardBoundRelayEnvironmentProvider>
+            height={contentHeight}
+            onSkip={onCoverTemplateApplied}
+            onCoverTemplateApplied={onCoverTemplateApplied}
+            hideHeader={() => setHeaderHidden(true)}
+            showHeader={() => setHeaderHidden(false)}
+            ref={webCardTemplateRef}
+          />
         ) : null,
 
       backIcon: 'arrow_down' as const,
       rightElement: (
         <NextHeaderButton
           style={{ width: 70, marginRight: 10 }}
-          onPress={onWebcardTemplateRef}
+          onPress={onNext}
         />
       ),
       rightElementWidth: 80,
@@ -339,7 +344,7 @@ export default relayScreen(NewWebCardScreen, {
       : newWebCardScreenQuery,
   getVariables: params =>
     params?.webCardId ? { webCardId: params.webCardId } : {},
-  webCardBound: false,
+  profileBound: false,
 
   fallback: NewProfileScreenFallback,
 

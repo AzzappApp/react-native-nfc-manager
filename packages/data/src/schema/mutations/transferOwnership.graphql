@@ -1,11 +1,24 @@
 extend type Mutation {
+  """
+  Transfers ownership of a card to another profile
+  """
   transferOwnership(input: TransferOwnershipInput!): TransferOwnershipPayload
 }
 
-type TransferOwnershipPayload {
-  profile: Profile
+input TransferOwnershipInput {
+  """
+  The ID of the card to transfer ownership to
+  """
+  webCardId: ID!
+  """
+  The ID of the profile to transfer ownership to
+  """
+  profileId: ID!
 }
 
-input TransferOwnershipInput {
-  profileId: ID!
+type TransferOwnershipPayload {
+  """
+  The profile that the card was transferred to
+  """
+  profile: Profile
 }

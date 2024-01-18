@@ -15,13 +15,9 @@ import type { FollowingsRoute } from '#routes';
 import type { PreloadedQuery } from 'react-relay';
 
 const followingsMosaicScreenQuery = graphql`
-  query FollowingsMosaicScreenQuery {
-    viewer {
-      profile {
-        webCard {
-          ...FollowingsMosaicScreenList_webCard
-        }
-      }
+  query FollowingsMosaicScreenQuery($webCardId: ID!) {
+    webCard: node(id: $webCardId) {
+      ...FollowingsMosaicScreenList_webCard
     }
   }
 `;
@@ -74,13 +70,17 @@ const FollowingsMosaicScreenInner = ({
 }: {
   preloadedQuery: PreloadedQuery<FollowingsMosaicScreenQuery>;
 }) => {
-  const {
-    viewer: { profile },
-  } = usePreloadedQuery(followingsMosaicScreenQuery, preloadedQuery);
+  const { webCard } = usePreloadedQuery(
+    followingsMosaicScreenQuery,
+    preloadedQuery,
+  );
 
-  return <FollowingsMosaicScreenList webCard={profile?.webCard ?? null} />;
+  return <FollowingsMosaicScreenList webCard={webCard ?? null} />;
 };
 
 export default relayScreen(FollowingsMosaicScreen, {
   query: followingsMosaicScreenQuery,
+  getVariables: (_, profileInfos) => ({
+    webCardId: profileInfos?.webCardId ?? '',
+  }),
 });

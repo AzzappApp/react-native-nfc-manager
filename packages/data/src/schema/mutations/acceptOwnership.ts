@@ -1,33 +1,33 @@
 import * as Sentry from '@sentry/nextjs';
 import { eq, and } from 'drizzle-orm';
 import { GraphQLError } from 'graphql';
+import { fromGlobalId } from 'graphql-relay';
 import ERRORS from '@azzapp/shared/errors';
 import { ProfileTable, db } from '#domains';
 import type { MutationResolvers } from '#schema/__generated__/types';
 
 const acceptOwnership: MutationResolvers['acceptOwnership'] = async (
   _,
-  _args,
+  { input: { profileId: gqlProfileId } },
   { auth, loaders, sendMail, sendSms },
 ) => {
-  const { profileId, userId } = auth;
-
-  if (!profileId || !userId) {
-    throw new GraphQLError(ERRORS.UNAUTHORIZED);
-  }
+  const { userId } = auth;
+  const profileId = fromGlobalId(gqlProfileId).id;
 
   const [profile, user] = await Promise.all([
     loaders.Profile.load(profileId),
-    loaders.User.load(userId),
+    userId && loaders.User.load(userId),
   ]);
 
   if (!user || !profile || !profile.promotedAsOwner) {
     throw new GraphQLError(ERRORS.INVALID_REQUEST);
   }
+  if (profile.userId !== userId) {
+    throw new GraphQLError(ERRORS.UNAUTHORIZED);
+  }
 
-  const webcard = await loaders.WebCard.load(profile.webCardId);
-
-  if (!webcard) {
+  const webCard = await loaders.WebCard.load(profile.webCardId);
+  if (!webCard) {
     throw new GraphQLError(ERRORS.INVALID_REQUEST);
   }
 
@@ -52,15 +52,15 @@ const acceptOwnership: MutationResolvers['acceptOwnership'] = async (
   try {
     if (phoneNumber) {
       await sendSms({
-        body: `Dear user, you are invited to take over the ownership of ${webcard.userName}. You can accept or decline the invitation from the app home page.`,
+        body: `Dear user, you are invited to take over the ownership of ${webCard.userName}. You can accept or decline the invitation from the app home page.`,
         phoneNumber,
       });
     } else if (email) {
       await sendMail({
         email,
         subject: `WebCard ownership transfer invitation.`,
-        text: `Dear user, you are invited to take over the ownership of ${webcard.userName}. You can accept or decline the invitation from the app home page.`,
-        html: `<div>Dear user, you are invited to take over the ownership of ${webcard.userName}. You can accept or decline the invitation from the app home page.</div>`,
+        text: `Dear user, you are invited to take over the ownership of ${webCard.userName}. You can accept or decline the invitation from the app home page.`,
+        html: `<div>Dear user, you are invited to take over the ownership of ${webCard.userName}. You can accept or decline the invitation from the app home page.</div>`,
       });
     }
   } catch (e) {

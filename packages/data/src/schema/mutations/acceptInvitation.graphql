@@ -1,5 +1,9 @@
 extend type Mutation {
-  acceptInvitation: AcceptInvitationPayload
+  acceptInvitation(input: AcceptInvitationInput!): AcceptInvitationPayload
+}
+
+input AcceptInvitationInput {
+  profileId: ID!
 }
 
 type AcceptInvitationPayload {

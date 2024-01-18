@@ -18,6 +18,9 @@ export const fetchNode = async (
   gqlId: string,
   { loaders }: GraphQLContext,
 ): Promise<any> => {
+  if (!gqlId) {
+    return null;
+  }
   const { id, type } = fromGlobalId(gqlId);
 
   switch (type) {

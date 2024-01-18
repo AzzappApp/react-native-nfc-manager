@@ -3,7 +3,7 @@ import { useIntl } from 'react-intl';
 import { StyleSheet, View } from 'react-native';
 import { graphql, useFragment } from 'react-relay';
 import { WebCardBoundEditorLayerSelectorPanel } from '#components/EditorLayerSelectorPanel';
-import type { CarouselEditionBackgroundPanel_viewer$key } from '#relayArtifacts/CarouselEditionBackgroundPanel_viewer.graphql';
+import type { CarouselEditionBackgroundPanel_profile$key } from '#relayArtifacts/CarouselEditionBackgroundPanel_profile.graphql';
 import type { ViewProps } from 'react-native';
 
 type BackgroundStyle = {
@@ -15,7 +15,7 @@ export type CarouselBackgroundPanelProps = ViewProps & {
   /**
    * A relay fragment reference to the viewer
    */
-  viewer: CarouselEditionBackgroundPanel_viewer$key;
+  profile: CarouselEditionBackgroundPanel_profile$key;
   /**
    * The currently selected background id
    */
@@ -43,7 +43,7 @@ export type CarouselBackgroundPanelProps = ViewProps & {
  * The background panel of the carousel edition screen
  */
 const CarouselEditionBackgroundPanel = ({
-  viewer,
+  profile: profileKey,
   backgroundId: background,
   backgroundStyle,
   onBackgroundChange,
@@ -51,20 +51,18 @@ const CarouselEditionBackgroundPanel = ({
   bottomSheetHeight,
   ...props
 }: CarouselBackgroundPanelProps) => {
-  const { moduleBackgrounds, profile } = useFragment(
+  const profile = useFragment(
     graphql`
-      fragment CarouselEditionBackgroundPanel_viewer on Viewer {
+      fragment CarouselEditionBackgroundPanel_profile on Profile {
         moduleBackgrounds {
           ...StaticMediaList_staticMedias
         }
-        profile {
-          webCard {
-            ...WebCardColorPicker_webCard
-          }
+        webCard {
+          ...WebCardColorPicker_webCard
         }
       }
     `,
-    viewer,
+    profileKey,
   );
 
   const backgroundColor = backgroundStyle?.backgroundColor ?? '#FFFFFF';
@@ -97,7 +95,7 @@ const CarouselEditionBackgroundPanel = ({
           description: 'Label of Background tab in carousel edition',
         })}
         webCard={profile?.webCard ?? null}
-        medias={moduleBackgrounds}
+        medias={profile.moduleBackgrounds}
         selectedMedia={background}
         tintColor={patternColor}
         backgroundColor={backgroundColor}

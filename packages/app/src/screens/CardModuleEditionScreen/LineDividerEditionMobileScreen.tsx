@@ -24,12 +24,15 @@ const LineDividerEditionMobileScreen = ({
   moduleId,
   preloadedQuery,
 }: LineDividerEditionMobileScreenProps) => {
-  const data = usePreloadedQuery(LineDividerQuery, preloadedQuery);
+  const { profile } = usePreloadedQuery(LineDividerQuery, preloadedQuery);
+  if (!profile) {
+    return null;
+  }
 
   let module: LineDividerEditionScreen_module$key | null = null;
   if (moduleId != null) {
     module =
-      data.viewer.profile?.webCard.cardModules.find(
+      profile?.webCard?.cardModules.find(
         module =>
           module?.id === moduleId && module?.kind === MODULE_KIND_LINE_DIVIDER,
       ) ?? null;
@@ -41,15 +44,15 @@ const LineDividerEditionMobileScreen = ({
   return (
     <LineDividerEditionScreen
       module={module}
-      webCard={data.viewer.profile?.webCard ?? null}
+      webCard={profile?.webCard ?? null}
     />
   );
 };
 
 const LineDividerQuery = graphql`
-  query LineDividerEditionMobileScreenQuery {
-    viewer {
-      profile {
+  query LineDividerEditionMobileScreenQuery($profileId: ID!) {
+    profile: node(id: $profileId) {
+      ... on Profile {
         webCard {
           cardModules {
             id

@@ -7,6 +7,10 @@ extend type Mutation {
 
 input SaveCoverInput {
   """
+  The id of the WebCard to update
+  """
+  webCardId: ID!
+  """
   The title of the card
   """
   title: String

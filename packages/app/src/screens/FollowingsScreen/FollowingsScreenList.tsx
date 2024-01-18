@@ -80,11 +80,11 @@ const FollowingsScreenList = ({ webCard: webCardKey }: FollowingsListProps) => {
     }
   }, [debouncedSearch, refetch]);
 
-  const { profileRole } = useAuthState();
+  const { profileInfos } = useAuthState();
 
   const onToggleFollow = useCallback(
     (profileId: string, profileUserName: string) => {
-      if (profileRole && isEditor(profileRole)) {
+      if (isEditor(profileInfos?.profileRole)) {
         toggleFollow(profileId, profileUserName, false);
       } else {
         Toast.show({
@@ -98,7 +98,7 @@ const FollowingsScreenList = ({ webCard: webCardKey }: FollowingsListProps) => {
         });
       }
     },
-    [profileRole, intl, toggleFollow],
+    [profileInfos, intl, toggleFollow],
   );
 
   return (

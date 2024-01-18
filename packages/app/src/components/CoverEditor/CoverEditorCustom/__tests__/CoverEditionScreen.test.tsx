@@ -196,7 +196,7 @@ describe('CoverEditionScreen', () => {
 //         graphql`
 //           query CoverEditionScreenTestQuery @relay_test_operation {
 //             viewer {
-//               ...CoverEditorCustom_viewer
+//               ...CoverEditorCustom_profile
 //             }
 //           }
 //         `,

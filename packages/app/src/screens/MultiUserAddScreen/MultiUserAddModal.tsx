@@ -22,6 +22,7 @@ import { CardPhoneLabels } from '#helpers/contactCardHelpers';
 import { getFileName } from '#helpers/fileHelpers';
 import { addLocalCachedMediaFile } from '#helpers/mediaHelpers';
 import { uploadMedia, uploadSign } from '#helpers/MobileWebAPI';
+import useAuthState from '#hooks/useAuthState';
 import ContactCardEditForm from '#screens/ContactCardScreen/ContactCardEditForm';
 import Button from '#ui/Button';
 import Container from '#ui/Container';
@@ -128,6 +129,7 @@ const MultiUserAddModal = (
   const { commonInformation } = useFragment(
     graphql`
       fragment MultiUserAddModal_webCard on WebCard {
+        id
         commonInformation {
           company
           addresses {
@@ -327,60 +329,35 @@ const MultiUserAddModal = (
     `,
   );
 
+  const { profileInfos } = useAuthState();
   const submit = handleSubmit(
     async value => {
-      let avatarId: string | undefined = undefined;
-      const { avatar, ...data } = value;
-      if (avatar?.local && avatar.uri) {
-        // setProgressIndicator(Observable.from(0));
+      if (profileInfos) {
+        let avatarId: string | undefined = undefined;
+        const { avatar, ...data } = value;
+        if (avatar?.local && avatar.uri) {
+          // setProgressIndicator(Observable.from(0));
 
-        const fileName = getFileName(avatar.uri);
-        const file: any = {
-          name: fileName,
-          uri: avatar.uri,
-          type: mime.lookup(fileName) || 'image/jpeg',
-        };
+          const fileName = getFileName(avatar.uri);
+          const file: any = {
+            name: fileName,
+            uri: avatar.uri,
+            type: mime.lookup(fileName) || 'image/jpeg',
+          };
 
-        const { uploadURL, uploadParameters } = await uploadSign({
-          kind: 'image',
-          target: 'post',
-        });
-        const { /* progress: uploadProgress, */ promise: uploadPromise } =
-          uploadMedia(file, uploadURL, uploadParameters);
-        // setProgressIndicator(uploadProgress);
-        const { public_id } = await uploadPromise;
-        avatarId = public_id;
-      }
+          const { uploadURL, uploadParameters } = await uploadSign({
+            kind: 'image',
+            target: 'post',
+          });
+          const { /* progress: uploadProgress, */ promise: uploadPromise } =
+            uploadMedia(file, uploadURL, uploadParameters);
+          // setProgressIndicator(uploadProgress);
+          const { public_id } = await uploadPromise;
+          avatarId = public_id;
+        }
 
-      const {
-        selectedContact,
-        firstName,
-        lastName,
-        phoneNumbers,
-        emails,
-        title,
-        company,
-        urls,
-        birthday,
-        socials,
-        addresses,
-      } = data;
-
-      const email =
-        selectedContact.countryCodeOrEmail === 'email'
-          ? selectedContact.value
-          : undefined;
-
-      const phoneNumber =
-        selectedContact.countryCodeOrEmail !== 'email'
-          ? selectedContact.value
-          : undefined;
-
-      const input = {
-        email,
-        phoneNumber,
-        profileRole: data.role,
-        contactCard: {
+        const {
+          selectedContact,
           firstName,
           lastName,
           phoneNumbers,
@@ -388,73 +365,99 @@ const MultiUserAddModal = (
           title,
           company,
           urls,
-          birthday: birthday ?? undefined,
+          birthday,
           socials,
-          avatarId: avatarId ? encodeMediaId(avatarId, 'image') : avatarId,
           addresses,
-        },
-      };
+        } = data;
 
-      commit({
-        variables: {
-          input,
-        },
-        onCompleted: () => {
-          if (avatarId && avatar?.uri) {
-            addLocalCachedMediaFile(
-              `${'image'.slice(0, 1)}:${avatarId}`,
-              'image',
-              avatar.uri,
-            );
-          }
+        const email =
+          selectedContact.countryCodeOrEmail === 'email'
+            ? selectedContact.value
+            : undefined;
 
-          beforeClose();
-          onClose();
-          onCompleted();
-        },
-        onError: e => {
-          if (e.message === ERRORS.PROFILE_ALREADY_EXISTS) {
-            Toast.show({
-              type: 'error',
-              text1: intl.formatMessage({
-                defaultMessage: 'Error, this user is already invited',
-                description:
-                  'Error toast message when inviting user that is already a member from MultiUserAddModal',
-              }),
-            });
-          } else {
-            Toast.show({
-              type: 'error',
-              text1: intl.formatMessage({
-                defaultMessage:
-                  'Error, could not invite user. Please try again.',
-                description:
-                  'Error toast message when inviting user from MultiUserAddModal',
-              }),
-            });
-          }
-        },
-        updater: (store, data) => {
-          const invitedProfile = data.inviteUser?.profile;
+        const phoneNumber =
+          selectedContact.countryCodeOrEmail !== 'email'
+            ? selectedContact.value
+            : undefined;
 
-          if (invitedProfile) {
-            const root = store.getRoot();
-            const viewer = root.getLinkedRecord('viewer');
-            const profile = viewer?.getLinkedRecord('profile');
-            const webcard = profile?.getLinkedRecord('webCard');
-            const profiles = webcard?.getLinkedRecords('profiles');
+        const input = {
+          profileId: profileInfos.profileId,
+          email,
+          phoneNumber,
+          profileRole: data.role,
+          contactCard: {
+            firstName,
+            lastName,
+            phoneNumbers,
+            emails,
+            title,
+            company,
+            urls,
+            birthday,
+            socials,
+            avatarId: avatarId ? encodeMediaId(avatarId, 'image') : avatarId,
+            addresses,
+          },
+        };
 
-            const newProfileRecord = store.get(invitedProfile.id);
-
-            if (newProfileRecord) {
-              webcard?.setLinkedRecords(
-                profiles?.concat(newProfileRecord),
-                'profiles',
+        commit({
+          variables: {
+            input,
+          },
+          onCompleted: () => {
+            if (avatarId && avatar?.uri) {
+              addLocalCachedMediaFile(
+                `${'image'.slice(0, 1)}:${avatarId}`,
+                'image',
+                avatar.uri,
               );
             }
-          }
-        },
-      });
+
+            beforeClose();
+            onClose();
+            onCompleted();
+          },
+          onError: e => {
+            if (e.message === ERRORS.PROFILE_ALREADY_EXISTS) {
+              Toast.show({
+                type: 'error',
+                text1: intl.formatMessage({
+                  defaultMessage: 'Error, this user is already invited',
+                  description:
+                    'Error toast message when inviting user that is already a member from MultiUserAddModal',
+                }),
+              });
+            } else {
+              Toast.show({
+                type: 'error',
+                text1: intl.formatMessage({
+                  defaultMessage:
+                    'Error, could not invite user. Please try again.',
+                  description:
+                    'Error toast message when inviting user from MultiUserAddModal',
+                }),
+              });
+            }
+          },
+          updater: (store, data) => {
+            const invitedProfile = data.inviteUser?.profile;
+
+            if (invitedProfile) {
+              const webcard = store?.get(profileInfos.webCardId);
+              const profiles = webcard?.getLinkedRecords('profiles');
+
+              const newProfileRecord = store.get(invitedProfile.id);
+
+              if (newProfileRecord) {
+                webcard?.setLinkedRecords(
+                  profiles?.concat(newProfileRecord),
+                  'profiles',
+                );
+              }
+            }
+          },
+        });
+      }
     },
     error => {
       console.log(error);

@@ -6,6 +6,7 @@ extend type Mutation {
 }
 
 input SaveCardColorsInput {
+  webCardId: ID!
   primary: String!
   light: String!
   dark: String!

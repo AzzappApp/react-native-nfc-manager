@@ -1,49 +1,33 @@
-import { and, eq } from 'drizzle-orm';
+import { eq } from 'drizzle-orm';
 import { GraphQLError } from 'graphql';
-import { fromGlobalId } from 'graphql-relay';
 import ERRORS from '@azzapp/shared/errors';
 import { isOwner } from '@azzapp/shared/profileHelpers';
-import { ProfileTable, db } from '#domains';
+import { ProfileTable, db, getUserProfileWithWebCardId } from '#domains';
+import fromGlobalIdWithType from '#helpers/relayIdHelpers';
 import type { MutationResolvers } from '#schema/__generated__/types';
 
 const transferOwnership: MutationResolvers['transferOwnership'] = async (
   _,
-  { input },
+  { input: { profileId: gqlProfileId, webCardId: gqlWebCardId } },
   { auth, loaders },
 ) => {
-  const { profileId } = auth;
+  const { userId } = auth;
+  const webCardId = fromGlobalIdWithType(gqlWebCardId, 'WebCard');
+  const profile =
+    userId && (await getUserProfileWithWebCardId(userId, webCardId));
 
-  const { id: targetProfileId, type } = fromGlobalId(input.profileId);
-  if (type !== 'Profile') {
-    throw new GraphQLError(ERRORS.INVALID_REQUEST);
-  }
-
-  if (!profileId || profileId === targetProfileId) {
+  if (!profile || !isOwner(profile.profileRole)) {
     throw new GraphQLError(ERRORS.UNAUTHORIZED);
   }
+  const targetProfileId = fromGlobalIdWithType(gqlProfileId, 'Profile');
+  const targetProfile = await loaders.Profile.load(targetProfileId);
 
-  const profile = await loaders.Profile.load(profileId);
-
-  if (!profile) {
+  if (!targetProfile || targetProfile.webCardId !== profile.webCardId) {
     throw new GraphQLError(ERRORS.INVALID_REQUEST);
   }
 
   if (!isOwner(profile.profileRole)) {
     throw new GraphQLError(ERRORS.FORBIDDEN);
-  }
-
-  const [targetProfile] = await db
-    .select()
-    .from(ProfileTable)
-    .where(
-      and(
-        eq(ProfileTable.webCardId, profile.webCardId),
-        eq(ProfileTable.id, targetProfileId),
-      ),
-    );
-
-  if (!targetProfile) {
-    throw new GraphQLError(ERRORS.INVALID_REQUEST);
   }
 
   await db

@@ -2,12 +2,11 @@
 GraphQL Schema Root Query object
 """
 type Query {
-  viewer: Viewer!
 
   """
-  User infos of the authenticated user
+  the current user
   """
-  currentUser: User!
+  currentUser: User
 
   """
   Fetches an object given its ID
@@ -53,6 +52,10 @@ type Query {
   Return the webCard parameters
   """
   webCardParameters: WebCardParameters!
+  """
+  The list of color palettes available in the application
+  """
+  colorPalettes(first: Int, after: String): ColorPaletteConnection!
 }
 
 type WebCardParameters {

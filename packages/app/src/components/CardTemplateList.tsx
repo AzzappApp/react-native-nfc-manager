@@ -48,6 +48,7 @@ import type {
 import type { ViewProps } from 'react-native-svg/lib/typescript/fabric/utils';
 
 type CardTemplateListProps = Omit<ViewProps, 'children'> & {
+  profileId: string;
   height: number;
   onApplyTemplate: (cardTemplateId: string) => void;
   onSkip?: () => void;
@@ -58,12 +59,13 @@ type CardTemplateListProps = Omit<ViewProps, 'children'> & {
   previewModalStyle?: ViewProps['style'];
 };
 
-export type CardTemplatelistHandle = {
+export type CardTemplateListHandle = {
   onSubmit: () => void;
 };
 
 const CardTemplateList = (
   {
+    profileId,
     height,
     onApplyTemplate,
     onSkip,
@@ -74,22 +76,22 @@ const CardTemplateList = (
     onPreviewModalClose,
     ...props
   }: CardTemplateListProps,
-  forwardRef: ForwardedRef<CardTemplatelistHandle>,
+  forwardRef: ForwardedRef<CardTemplateListHandle>,
 ) => {
-  const { viewer } = useLazyLoadQuery<CardTemplateListQuery>(
+  const { node } = useLazyLoadQuery<CardTemplateListQuery>(
     graphql`
-      query CardTemplateListQuery {
-        viewer {
-          ...CardTemplateList_cardTemplates
-          cardTemplateTypes {
-            id
-            label
-            webCardCategory {
+      query CardTemplateListQuery($profileId: ID!) {
+        node(id: $profileId) {
+          ... on Profile @alias(as: "profile") {
+            ...CardTemplateList_cardTemplates
+            cardTemplateTypes {
               id
               label
+              webCardCategory {
+                id
+                label
+              }
             }
-          }
-          profile {
             webCard {
               id
               ...CoverRenderer_webCard
@@ -105,14 +107,16 @@ const CardTemplateList = (
         }
       }
     `,
-    {},
+    { profileId },
   );
 
-  const { profile, cardTemplateTypes } = viewer;
+  const profile = node?.profile;
+  const cardTemplateTypes = profile?.cardTemplateTypes;
+
   const { data, loadNext, hasNext, isLoadingNext, refetch } =
     usePaginationFragment(
       graphql`
-        fragment CardTemplateList_cardTemplates on Viewer
+        fragment CardTemplateList_cardTemplates on Profile
         @refetchable(queryName: "CardTemplateList_cardTemplates_Query")
         @argumentDefinitions(
           cardTemplateTypeId: { type: String, defaultValue: null }
@@ -156,7 +160,7 @@ const CardTemplateList = (
           }
         }
       `,
-      viewer as CardTemplateList_cardTemplates$key,
+      profile as CardTemplateList_cardTemplates$key | null,
     );
 
   const onEndReached = useCallback(() => {

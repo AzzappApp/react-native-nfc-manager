@@ -168,5 +168,8 @@ const CardModuleEditionScreenFallback = () => {
 
 export default relayScreen(CardModuleEditionScreen, {
   query: getQuery,
+  getVariables: (_, profileInfos) => ({
+    profileId: profileInfos?.profileId ?? '',
+  }),
   fallback: CardModuleEditionScreenFallback,
 });

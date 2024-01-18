@@ -1,4 +1,3 @@
-import { fromGlobalId } from 'graphql-relay';
 import { useCallback, useMemo, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { StyleSheet, View } from 'react-native';
@@ -26,6 +25,7 @@ import MultiUserScreenUserList, {
   type MultiUserScreenListProps,
 } from './MultiUserScreenUserList';
 import type { RelayScreenProps } from '#helpers/relayScreen';
+import type { MultiUserScreenMutation } from '#relayArtifacts/MultiUserScreenMutation.graphql';
 import type {
   MultiUserScreenQuery,
   ProfileRole,
@@ -47,10 +47,12 @@ export type UserInformation = {
 };
 
 const multiUserScreenQuery = graphql`
-  query MultiUserScreenQuery($pixelRatio: Float!) {
-    ...MultiUserScreenUserList_currentUser
-    viewer {
-      profile {
+  query MultiUserScreenQuery($profileId: ID!, $pixelRatio: Float!) {
+    currentUser {
+      ...MultiUserScreenUserList_currentUser
+    }
+    node(id: $profileId) {
+      ... on Profile @alias(as: "profile") {
         id
         profileRole
         webCard {
@@ -118,6 +120,7 @@ const multiUserScreenQuery = graphql`
             }
           }
         }
+        ...MultiUserScreenUserList_profile
       }
     }
   }
@@ -126,12 +129,16 @@ const multiUserScreenQuery = graphql`
 const MultiUserScreen = ({
   preloadedQuery,
 }: RelayScreenProps<MultiUserRoute, MultiUserScreenQuery>) => {
-  const data = usePreloadedQuery(multiUserScreenQuery, preloadedQuery);
+  const { node, currentUser } = usePreloadedQuery(
+    multiUserScreenQuery,
+    preloadedQuery,
+  );
+  const profile = node?.profile;
 
   const intl = useIntl();
   const router = useRouter();
 
-  const nbUsers = data.viewer.profile?.webCard?.profiles?.length ?? 0;
+  const nbUsers = profile?.webCard?.profiles?.length ?? 0;
 
   const userProfilesByRole = useMemo(() => {
     const indexedRoles = roles.reduce(
@@ -144,32 +151,29 @@ const MultiUserScreen = ({
       {} as MultiUserScreenListProps['usersByRole'],
     );
 
-    if (!data.viewer.profile?.webCard.profiles) return indexedRoles;
+    if (!profile?.webCard.profiles) return indexedRoles;
 
-    return data.viewer.profile.webCard.profiles.reduce(
-      (accumulator, currentValue) => {
-        const { user, contactCard, avatar, id } = currentValue!;
+    return profile.webCard.profiles.reduce((accumulator, currentValue) => {
+      const { user, contactCard, avatar, id } = currentValue!;
 
-        accumulator[currentValue!.profileRole].push({
-          email: user.email!,
-          firstName: contactCard?.firstName ?? '',
-          lastName: contactCard?.lastName ?? '',
-          phoneNumber: user?.phoneNumber ?? '',
-          contactCard: (contactCard ?? {}) as ContactCard,
-          avatar,
-          profileId: id,
-        });
-        return accumulator;
-      },
-      indexedRoles,
-    );
-  }, [data.viewer?.profile?.webCard.profiles]);
+      accumulator[currentValue!.profileRole].push({
+        email: user.email!,
+        firstName: contactCard?.firstName ?? '',
+        lastName: contactCard?.lastName ?? '',
+        phoneNumber: user?.phoneNumber ?? '',
+        contactCard: (contactCard ?? {}) as ContactCard,
+        avatar,
+        profileId: id,
+      });
+      return accumulator;
+    }, indexedRoles);
+  }, [profile?.webCard.profiles]);
 
   const [commonInfoFormIsOpened, toggleCommonInfoForm] = useToggle(false);
 
-  const [commit] = useMutation(graphql`
-    mutation MultiUserScreenMutation($input: Boolean!) {
-      updateMultiUser(isMultiUser: $input) {
+  const [commit] = useMutation<MultiUserScreenMutation>(graphql`
+    mutation MultiUserScreenMutation($input: UpdateMultiUserInput!) {
+      updateMultiUser(input: $input) {
         webCard {
           id
           isMultiUser
@@ -182,38 +186,38 @@ const MultiUserScreen = ({
 
   const setAllowMultiUser = useCallback(
     (value: boolean) => {
-      commit({
-        variables: {
-          input: value,
-        },
-        optimisticResponse: {
-          updateMultiUser: {
-            webCard: {
-              id: data.viewer.profile?.webCard?.id,
-              isMultiUser: value,
+      if (profile?.webCard) {
+        commit({
+          variables: {
+            input: { isMultiUser: value, webCardId: profile?.webCard?.id },
+          },
+          optimisticResponse: {
+            updateMultiUser: {
+              webCard: {
+                id: profile?.webCard?.id,
+                isMultiUser: value,
+              },
             },
           },
-        },
-        updater: store => {
-          if (!value && data.viewer.profile?.webCard?.id) {
-            const webCard = store.get(data.viewer.profile?.webCard?.id);
-            if (webCard) {
-              const profiles = webCard.getLinkedRecords('profiles');
-              webCard.setLinkedRecords(
-                profiles?.filter(
-                  p => p.getDataID() === data.viewer.profile?.id,
-                ) ?? [],
-                'profiles',
-              );
+          updater: store => {
+            if (!value && profile?.webCard?.id) {
+              const webCard = store.get(profile?.webCard?.id);
+              if (webCard) {
+                const profiles = webCard.getLinkedRecords('profiles');
+                webCard.setLinkedRecords(
+                  profiles?.filter(p => p.getDataID() === profile?.id) ?? [],
+                  'profiles',
+                );
+              }
             }
-          }
-        },
-        onCompleted: () => {
-          setConfirmDeleteMultiUser(false);
-        },
-      });
+          },
+          onCompleted: () => {
+            setConfirmDeleteMultiUser(false);
+          },
+        });
+      }
     },
-    [commit, data.viewer.profile?.id, data.viewer.profile?.webCard?.id],
+    [commit, profile?.id, profile?.webCard],
   );
 
   const toggleMultiUser = useCallback(
@@ -250,7 +254,7 @@ const MultiUserScreen = ({
               })}
             >
               <CoverRenderer
-                webCard={data.viewer.profile?.webCard}
+                webCard={profile?.webCard}
                 width={COVER_WIDTH}
                 style={{ marginBottom: -1 }}
               />
@@ -283,7 +287,7 @@ const MultiUserScreen = ({
                 defaultMessage="$0,99/user, billed monthly "
                 description="Price for MultiUserScreen"
               />
-              {data.viewer.profile?.webCard.isMultiUser && (
+              {profile?.webCard.isMultiUser && (
                 <FormattedMessage
                   defaultMessage="{nbUsers} user"
                   description="Title for switch section in MultiUserScreen"
@@ -291,7 +295,7 @@ const MultiUserScreen = ({
                 />
               )}
             </Text>
-            {data.viewer.profile?.profileRole === 'owner' && (
+            {profile?.profileRole === 'owner' && (
               <View style={styles.switchSection}>
                 <Text style={[textStyles.large]}>
                   <FormattedMessage
@@ -301,28 +305,29 @@ const MultiUserScreen = ({
                 </Text>
                 <Switch
                   variant="large"
-                  value={data.viewer.profile?.webCard.isMultiUser}
+                  value={profile?.webCard.isMultiUser}
                   onValueChange={toggleMultiUser}
                 />
               </View>
             )}
-            {data.viewer.profile?.webCard.isMultiUser && (
+            {profile?.webCard.isMultiUser && currentUser && (
               <MultiUserScreenUserList
                 usersByRole={userProfilesByRole}
-                currentUser={data}
+                currentUser={currentUser}
                 toggleCommonInfosForm={toggleCommonInfoForm}
-                profileId={fromGlobalId(data.viewer.profile.id).id}
+                profile={profile}
               />
             )}
           </View>
         </ScrollView>
       </SafeAreaView>
 
-      {data.viewer.profile ? (
+      {profile ? (
         <CommonInformationForm
           commonInfoFormIsOpened={commonInfoFormIsOpened}
           toggleCommonInfoForm={toggleCommonInfoForm}
-          commonInformation={data.viewer.profile.webCard.commonInformation}
+          commonInformation={profile.webCard.commonInformation}
+          webCardId={profile.webCard.id}
         />
       ) : null}
       <ScreenModal visible={confirmDeletMultiUser}>
@@ -418,8 +423,9 @@ const styles = StyleSheet.create({
 
 export default relayScreen(MultiUserScreen, {
   query: multiUserScreenQuery,
-  fetchPolicy: 'store-and-network',
-  getVariables: () => ({
+  getVariables: (_, profileInfos) => ({
+    profileId: profileInfos?.profileId ?? '',
     pixelRatio: CappedPixelRatio(),
   }),
+  fetchPolicy: 'store-and-network',
 });

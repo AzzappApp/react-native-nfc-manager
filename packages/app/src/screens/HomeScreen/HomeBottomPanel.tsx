@@ -17,8 +17,7 @@ import Link from '#components/Link';
 import { useMainTabBarVisibilityController } from '#components/MainTabBar';
 import { getAuthState } from '#helpers/authStore';
 import { dispatchGlobalEvent } from '#helpers/globalEvents';
-import { ROOT_ACTOR_ID, getRelayEnvironment } from '#helpers/relayEnvironment';
-import useMultiActorEnvironmentPluralFragment from '#hooks/useMultiActorEnvironmentPluralFragment';
+import { getRelayEnvironment } from '#helpers/relayEnvironment';
 import Button from '#ui/Button';
 import Icon from '#ui/Icon';
 import Text from '#ui/Text';
@@ -26,7 +25,6 @@ import HomeContactCard from './HomeContactCard';
 import HomeInformations from './HomeInformations';
 import HomeMenu, { HOME_MENU_HEIGHT } from './HomeMenu';
 import HomeStatistics from './HomeStatistics';
-import type { HomeBottomPanel_profiles$key } from '#relayArtifacts/HomeBottomPanel_profiles.graphql';
 import type { HomeBottomPanel_user$key } from '#relayArtifacts/HomeBottomPanel_user.graphql';
 import type { HomeBottomPanelAcceptInvitationMutation } from '#relayArtifacts/HomeBottomPanelAcceptInvitationMutation.graphql';
 import type { HomeBottomPanelAcceptOwnershipMutation } from '#relayArtifacts/HomeBottomPanelAcceptOwnershipMutation.graphql';
@@ -62,6 +60,8 @@ type HomeBottomPanelProps = {
   currentProfileIndex: number;
 };
 
+// TODO the way of we handle the mutations has been made when multi-actor environment was used, we should refactor that
+
 const HomeBottomPanel = ({
   user: userKey,
   currentProfileIndexSharedValue,
@@ -75,45 +75,36 @@ const HomeBottomPanel = ({
         ...HomeContactCard_user
         ...HomeInformations_user
         profiles {
-          ...HomeStatistics_profiles
+          id
           webCard {
             id
           }
-          ...HomeBottomPanel_profiles
+          invited
+          profileRole
+          promotedAsOwner
+          webCard {
+            id
+            userName
+            cardIsPublished
+            cardCover {
+              title
+            }
+            webCardCategory {
+              id
+            }
+            owner {
+              email
+              phoneNumber
+            }
+          }
+          ...HomeStatistics_profiles
         }
       }
     `,
     userKey,
   );
+  const { profiles } = user;
   const intl = useIntl();
-
-  const profiles = useMultiActorEnvironmentPluralFragment(
-    graphql`
-      fragment HomeBottomPanel_profiles on Profile {
-        id
-        invited
-        profileRole
-        promotedAsOwner
-        webCard {
-          id
-          userName
-          cardIsPublished
-          cardCover {
-            title
-          }
-          webCardCategory {
-            id
-          }
-          owner {
-            email
-            phoneNumber
-          }
-        }
-      }
-    `,
-    (profile: any) => profile.webCard.id,
-    user.profiles as readonly HomeBottomPanel_profiles$key[],
-  );
 
   const currentProfile = profiles?.[currentProfileIndex];
 
@@ -122,9 +113,12 @@ const HomeBottomPanel = ({
 
   //#region card publication
   const onPublish = () => {
-    const { webCardId, profileRole } = getAuthState();
+    const { profileInfos } = getAuthState();
 
-    if (!webCardId || webCardId !== currentProfile?.webCard?.id) {
+    if (
+      !profileInfos ||
+      profileInfos.webCardId !== currentProfile?.webCard?.id
+    ) {
       return;
     }
     // using disable state with current profile show a disabled style during maybe one secdon
@@ -134,11 +128,13 @@ const HomeBottomPanel = ({
       return;
     }
 
-    if (profileRole && isAdmin(profileRole)) {
-      const environment = getRelayEnvironment().forActor(webCardId);
+    if (isAdmin(profileInfos.profileRole)) {
+      const environment = getRelayEnvironment();
       const publishMutation = graphql`
-        mutation HomeBottomPanelPublishMutation @raw_response_type {
-          publishCard {
+        mutation HomeBottomPanelPublishMutation(
+          $input: ToggleWebCardPublishedInput!
+        ) @raw_response_type {
+          toggleWebCardPublished(input: $input) {
             webCard {
               id
               cardIsPublished
@@ -149,11 +145,16 @@ const HomeBottomPanel = ({
 
       commitMutation<HomeBottomPanelPublishMutation>(environment, {
         mutation: publishMutation,
-        variables: {},
+        variables: {
+          input: {
+            webCardId: currentProfile.webCard.id,
+            published: true,
+          },
+        },
         optimisticResponse: {
-          publishCard: {
+          toggleWebCardPublished: {
             webCard: {
-              id: webCardId,
+              id: currentProfile.webCard.id,
               cardIsPublished: true,
             },
           },
@@ -209,15 +210,17 @@ const HomeBottomPanel = ({
   //#endregion
 
   const onAcceptInvitation = () => {
-    const webCardId = getAuthState().webCardId;
+    const webCardId = getAuthState().profileInfos?.webCardId;
     if (!webCardId || webCardId !== currentProfile?.webCard?.id) {
       return;
     }
-    const environment = getRelayEnvironment().forActor(webCardId);
+    const environment = getRelayEnvironment();
 
     const acceptInvitationMutation = graphql`
-      mutation HomeBottomPanelAcceptInvitationMutation @raw_response_type {
-        acceptInvitation {
+      mutation HomeBottomPanelAcceptInvitationMutation(
+        $input: AcceptInvitationInput!
+      ) @raw_response_type {
+        acceptInvitation(input: $input) {
           profile {
             id
             invited
@@ -228,7 +231,11 @@ const HomeBottomPanel = ({
 
     commitMutation<HomeBottomPanelAcceptInvitationMutation>(environment, {
       mutation: acceptInvitationMutation,
-      variables: {},
+      variables: {
+        input: {
+          profileId: currentProfile.id,
+        },
+      },
       optimisticResponse: {
         acceptInvitation: {
           profile: {
@@ -241,7 +248,7 @@ const HomeBottomPanel = ({
   };
 
   const onDeclineInvitation = (profileId: string) => {
-    const environment = getRelayEnvironment().forActor(ROOT_ACTOR_ID);
+    const environment = getRelayEnvironment();
 
     const declineInvitationMutation = graphql`
       mutation HomeBottomPanelDeclineInvitationMutation(
@@ -280,16 +287,18 @@ const HomeBottomPanel = ({
   };
 
   const onAcceptOwnership = () => {
-    const webCardId = getAuthState().webCardId;
+    const webCardId = getAuthState().profileInfos?.webCardId;
 
     if (!webCardId || webCardId !== currentProfile?.webCard?.id) {
       return;
     }
-    const environment = getRelayEnvironment().forActor(webCardId);
+    const environment = getRelayEnvironment();
 
     const acceptOwnershipMutation = graphql`
-      mutation HomeBottomPanelAcceptOwnershipMutation @raw_response_type {
-        acceptOwnership {
+      mutation HomeBottomPanelAcceptOwnershipMutation(
+        $input: AcceptOwnershipInput!
+      ) @raw_response_type {
+        acceptOwnership(input: $input) {
           profile {
             id
             profileRole
@@ -301,7 +310,11 @@ const HomeBottomPanel = ({
 
     commitMutation<HomeBottomPanelAcceptOwnershipMutation>(environment, {
       mutation: acceptOwnershipMutation,
-      variables: {},
+      variables: {
+        input: {
+          profileId: currentProfile.id,
+        },
+      },
       optimisticResponse: {
         acceptOwnership: {
           profile: {
@@ -327,13 +340,13 @@ const HomeBottomPanel = ({
   };
 
   const onDeclineOwnership = (profileId: string) => {
-    const webCardId = getAuthState().webCardId;
+    const webCardId = getAuthState().profileInfos?.webCardId;
 
     if (!webCardId || webCardId !== currentProfile?.webCard?.id) {
       return;
     }
 
-    const environment = getRelayEnvironment().forActor(webCardId);
+    const environment = getRelayEnvironment();
 
     const declineInvitationMutation = graphql`
       mutation HomeBottomPanelDeclineOwnershipMutation(
@@ -827,7 +840,7 @@ const HomeBottomPanel = ({
         )}
         {selectedPanel === 'STATS' && (
           <HomeStatistics
-            user={user.profiles!}
+            user={profiles!}
             height={panelHeight}
             currentProfileIndexSharedValue={currentProfileIndexSharedValue}
             currentUserIndex={currentProfileIndex}

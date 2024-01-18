@@ -1,3 +1,4 @@
+import { toGlobalId } from 'graphql-relay';
 import { NextResponse } from 'next/server';
 import { generateTokens } from './tokens';
 import type { Profile, User } from '@azzapp/data/domains';
@@ -11,8 +12,13 @@ export const handleSignInAuthMethod = async (
   });
   return NextResponse.json({
     ok: true,
-    webCardId: profile?.webCardId,
-    profileRole: profile?.profileRole,
+    profileInfos: profile
+      ? {
+          profileId: toGlobalId('Profile', profile.id),
+          profileRole: profile.profileRole,
+          webCardId: toGlobalId('WebCard', profile.webCardId),
+        }
+      : null,
     userId: user.id,
     token,
     refreshToken,

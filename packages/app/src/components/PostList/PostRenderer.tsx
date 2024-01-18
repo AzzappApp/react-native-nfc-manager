@@ -101,11 +101,14 @@ const PostRenderer = (
 ) => {
   const post = useFragment(
     graphql`
-      fragment PostRendererFragment_post on Post {
+      fragment PostRendererFragment_post on Post
+      @argumentDefinitions(viewerWebCardId: { type: "ID!" }) {
         id
         ...PostRendererBottomPanelFragment_post
+          @arguments(viewerWebCardId: $viewerWebCardId)
         ...PostRendererMediaFragment_post
         ...PostRendererActionBar_post
+          @arguments(viewerWebCardId: $viewerWebCardId)
       }
     `,
     postKey,
@@ -142,7 +145,7 @@ const PostRenderer = (
     [],
   );
 
-  const { profileRole } = useAuthState();
+  const { profileInfos } = useAuthState();
 
   const [showModal, toggleModal] = useToggle();
   const context = useContext(PostListContext);
@@ -152,7 +155,7 @@ const PostRenderer = (
   const intl = useIntl();
 
   const openModal = useCallback(() => {
-    if (profileRole && isEditor(profileRole)) {
+    if (isEditor(profileInfos?.profileRole)) {
       toggleModal();
     } else {
       Toast.show({
@@ -164,7 +167,7 @@ const PostRenderer = (
         }),
       });
     }
-  }, [intl, profileRole, toggleModal]);
+  }, [intl, profileInfos?.profileRole, toggleModal]);
 
   return (
     <View {...props}>

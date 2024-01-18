@@ -24,12 +24,15 @@ const BlockTextEditionMobileScreen = ({
   moduleId,
   preloadedQuery,
 }: BlockTextEditionMobileScreenProps) => {
-  const data = usePreloadedQuery(BlockTextQuery, preloadedQuery);
+  const { profile } = usePreloadedQuery(BlockTextQuery, preloadedQuery);
+  if (!profile) {
+    return null;
+  }
 
   let module: BlockTextEditionScreen_module$key | null = null;
   if (moduleId != null) {
     module =
-      data.viewer.profile?.webCard.cardModules.find(
+      profile?.webCard?.cardModules.find(
         module =>
           module?.id === moduleId && module?.kind === MODULE_KIND_BLOCK_TEXT,
       ) ?? null;
@@ -38,14 +41,14 @@ const BlockTextEditionMobileScreen = ({
     }
   }
 
-  return <BlockTextEditionScreen module={module} viewer={data.viewer} />;
+  return <BlockTextEditionScreen module={module} profile={profile} />;
 };
 
 const BlockTextQuery = graphql`
-  query BlockTextEditionMobileScreenQuery {
-    viewer {
-      ...BlockTextEditionScreen_viewer
-      profile {
+  query BlockTextEditionMobileScreenQuery($profileId: ID!) {
+    profile: node(id: $profileId) {
+      ... on Profile {
+        ...BlockTextEditionScreen_profile
         webCard {
           cardModules {
             id

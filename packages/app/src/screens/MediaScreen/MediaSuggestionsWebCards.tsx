@@ -10,13 +10,7 @@ import { useIntl } from 'react-intl';
 import { View } from 'react-native';
 import Animated, { FadeOut } from 'react-native-reanimated';
 import Toast from 'react-native-toast-message';
-import {
-  ConnectionHandler,
-  graphql,
-  useFragment,
-  useMutation,
-  usePaginationFragment,
-} from 'react-relay';
+import { graphql, useFragment, usePaginationFragment } from 'react-relay';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
 import { isEditor } from '@azzapp/shared/profileHelpers';
 import { colors, shadow } from '#theme';
@@ -28,13 +22,12 @@ import useToggleFollow from '#hooks/useToggleFollow';
 import CoverLink_webCardFragment from '#relayArtifacts/CoverLink_webCard.graphql';
 import ActivityIndicator from '#ui/ActivityIndicator';
 import Button from '#ui/Button';
-import IconButton from '#ui/IconButton';
 import type { CoverLinkProps } from '#components/CoverLink';
-import type { MediaSuggestionsWebCards_viewer$key } from '#relayArtifacts/MediaSuggestionsWebCards_viewer.graphql';
+import type { MediaSuggestionsWebCards_profile$key } from '#relayArtifacts/MediaSuggestionsWebCards_profile.graphql';
 import type { StyleProp, ViewStyle } from 'react-native';
 
 type MediaSuggestionsWebCardsProps = {
-  viewer: MediaSuggestionsWebCards_viewer$key;
+  profile: MediaSuggestionsWebCards_profile$key;
   coverListStyle?: StyleProp<ViewStyle>;
   header?: React.ReactNode;
   isCurrentTab: boolean;
@@ -43,7 +36,7 @@ type MediaSuggestionsWebCardsProps = {
 const NB_PROFILES = 6;
 
 const MediaSuggestionsWebCards = ({
-  viewer,
+  profile,
   coverListStyle,
   header,
   isCurrentTab,
@@ -63,7 +56,7 @@ const MediaSuggestionsWebCards = ({
       }
     >
       <MediaSuggestionsWebCardsInner
-        viewer={viewer}
+        profile={profile}
         style={coverListStyle}
         isCurrentTab={isCurrentTab}
       />
@@ -72,18 +65,18 @@ const MediaSuggestionsWebCards = ({
 );
 
 const MediaSuggestionsWebCardsInner = ({
-  viewer,
+  profile,
   style,
   isCurrentTab,
 }: {
-  viewer: MediaSuggestionsWebCards_viewer$key;
+  profile: MediaSuggestionsWebCards_profile$key;
   style?: StyleProp<ViewStyle>;
   isCurrentTab: boolean;
 }) => {
   const { data, refetch, loadNext, hasNext, isLoadingNext } =
     usePaginationFragment(
       graphql`
-        fragment MediaSuggestionsWebCards_viewer on Viewer
+        fragment MediaSuggestionsWebCards_profile on Profile
         @refetchable(queryName: "MediaSuggestionsWebCardsListQuery")
         @argumentDefinitions(
           after: { type: String }
@@ -101,7 +94,7 @@ const MediaSuggestionsWebCardsInner = ({
           }
         }
       `,
-      viewer,
+      profile,
     );
 
   const isCurrentTabRef = useRef(isCurrentTab);
@@ -166,25 +159,13 @@ const CoverLinkWithOptions = ({
 }) => {
   const styles = useStyleSheet(styleSheet);
 
-  const { profileRole } = useAuthState();
+  const { profileInfos } = useAuthState();
 
   const toggleFollow = useToggleFollow();
 
   const { userName } = useFragment(CoverLink_webCardFragment, props.webCard);
 
   const intl = useIntl();
-
-  const [commit] = useMutation(graphql`
-    mutation MediaSuggestionsWebCardsListMutation(
-      $input: FilterWebCardSuggestionInput!
-    ) {
-      filterWebCardSuggestion(input: $input) {
-        webCard {
-          id
-        }
-      }
-    }
-  `);
 
   return (
     <Animated.View style={styles.coverContainerStyle} exiting={FadeOut}>
@@ -205,7 +186,7 @@ const CoverLinkWithOptions = ({
           }
           style={{ flex: 1 }}
           onPress={() => {
-            if (profileRole && isEditor(profileRole)) {
+            if (isEditor(profileInfos?.profileRole)) {
               startTransition(() => {
                 toggleFollow(props.webCardId, userName, !isFollowing);
               });
@@ -229,48 +210,6 @@ const CoverLinkWithOptions = ({
                 }),
               });
             }
-          }}
-        />
-        <IconButton
-          icon="close"
-          size={29}
-          onPress={() => {
-            commit({
-              variables: {
-                input: {
-                  webCardId: props.webCardId,
-                },
-              },
-              updater: store => {
-                const viewer = store.getRoot().getLinkedRecord('viewer');
-                if (viewer) {
-                  const connectionRecordSuggestions =
-                    ConnectionHandler.getConnection(
-                      viewer,
-                      'Viewer_recommendedWebCards',
-                    );
-
-                  if (connectionRecordSuggestions) {
-                    ConnectionHandler.deleteNode(
-                      connectionRecordSuggestions,
-                      props.webCardId,
-                    );
-                  }
-                }
-              },
-              onError: e => {
-                console.error(e);
-                Toast.show({
-                  type: 'error',
-                  text1: intl.formatMessage({
-                    defaultMessage:
-                      'Error, could not remove this WebCard. Please try again.',
-                    description:
-                      'Error message when trying to remove a WebCard from suggestions',
-                  }),
-                });
-              },
-            });
           }}
         />
       </View>

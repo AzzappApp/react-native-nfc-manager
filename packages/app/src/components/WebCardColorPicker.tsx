@@ -114,6 +114,10 @@ export const useWebCardColors = (
 
   const updateCardColors = useCallback(
     (updates: Partial<SaveCardColorsInput>) => {
+      const webCardId = webCard?.id;
+      if (!webCardId) {
+        return;
+      }
       const input = {
         ...DEFAULT_COLOR_PALETTE,
         otherColors: DEFAULT_COLOR_LIST,
@@ -127,6 +131,7 @@ export const useWebCardColors = (
             otherColors: DEFAULT_COLOR_LIST,
             ...webCard?.cardColors,
             ...updates,
+            webCardId,
           },
         },
         optimisticResponse: {

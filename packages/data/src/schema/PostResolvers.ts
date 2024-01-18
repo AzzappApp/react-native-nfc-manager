@@ -11,6 +11,7 @@ import {
   cursorToDate,
   connectionFromDateSortedItems,
 } from '#helpers/connectionsHelpers';
+import { maybeFromGlobalIdWithType } from '#helpers/relayIdHelpers';
 import { idResolver } from './utils';
 import type {
   PostCommentResolvers,
@@ -33,17 +34,14 @@ export const Post: PostResolvers = {
   content: async post => {
     return post.content ?? '';
   },
-  viewerPostReaction: async (post, _, { auth, loaders }) => {
-    const { profileId } = auth;
-    if (!profileId) {
+  postReaction: async (post, { webCardId: gqlWebCardId }) => {
+    if (!gqlWebCardId) {
       return null;
     }
-    const profile = await loaders.Profile.load(profileId);
-    if (!profile) {
-      return null;
-    }
-
-    const reaction = await getPostReaction(profile.webCardId, post.id);
+    const webCardId = maybeFromGlobalIdWithType(gqlWebCardId, 'WebCard');
+    const reaction = webCardId
+      ? await getPostReaction(webCardId, post.id)
+      : null;
     if (reaction) {
       return reaction.reactionKind;
     }

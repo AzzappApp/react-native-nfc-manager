@@ -42,9 +42,10 @@ const useSaveCover = (
   onCoverSaved: () => void,
 ) => {
   const onCoverSavedInner = useLatestCallback(onCoverSaved);
-  const { cardCover } = useFragment(
+  const { id: webCardId, cardCover } = useFragment(
     graphql`
       fragment useSaveCover_webCard on WebCard {
+        id
         cardCover {
           mediaParameters
           mediaFilter
@@ -91,6 +92,9 @@ const useSaveCover = (
       colorPalette: ColorPalette,
       otherColors: readonly string[],
     ) => {
+      if (!webCardId) {
+        return;
+      }
       setProgressIndicator(Observable.from(0));
 
       let saveCoverInput: SaveCoverInput;
@@ -103,6 +107,7 @@ const useSaveCover = (
 
       try {
         saveCoverInput = {
+          webCardId,
           backgroundId: coverStyle.background?.id ?? null,
           backgroundColor: coverStyle.backgroundColor,
           backgroundPatternColor: coverStyle.backgroundPatternColor,
@@ -277,6 +282,7 @@ const useSaveCover = (
       }
 
       saveCoverInput.cardColors = {
+        webCardId,
         primary: colorPalette.primary,
         dark: colorPalette.dark,
         light: colorPalette.light,
@@ -315,7 +321,7 @@ const useSaveCover = (
         },
       });
     },
-    [commit, cardCover, onCoverSavedInner, intl],
+    [webCardId, commit, cardCover, intl, onCoverSavedInner],
   );
 
   return {

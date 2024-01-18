@@ -22,7 +22,7 @@ import SocialLinksMarginsEditionPanel from './SocialLinksMarginsEditionPanel';
 import SocialLinksPreview from './SocialLinksPreview';
 import SocialLinksSettingsEditionPanel from './SocialLinksSettingsEditionPanel';
 import type { SocialLinksEditionScreen_module$key } from '#relayArtifacts/SocialLinksEditionScreen_module.graphql';
-import type { SocialLinksEditionScreen_viewer$key } from '#relayArtifacts/SocialLinksEditionScreen_viewer.graphql';
+import type { SocialLinksEditionScreen_profile$key } from '#relayArtifacts/SocialLinksEditionScreen_profile.graphql';
 import type {
   SocialLinksEditionScreenUpdateModuleMutation,
   SaveSocialLinksModuleInput,
@@ -33,7 +33,7 @@ export type SocialLinksEditionScreenProps = ViewProps & {
   /**
    * the current viewer
    */
-  viewer: SocialLinksEditionScreen_viewer$key;
+  profile: SocialLinksEditionScreen_profile$key;
   /**
    * the current module to edit, if null, a new module will be created
    */
@@ -62,7 +62,7 @@ const socialLinkSchema = z
  */
 const SocialLinksEditionScreen = ({
   module,
-  viewer: viewerKey,
+  profile: profileKey,
 }: SocialLinksEditionScreenProps) => {
   // #region Data retrieval
   const socialLinks = useFragment(
@@ -96,28 +96,27 @@ const SocialLinksEditionScreen = ({
     module,
   );
 
-  const viewer = useFragment(
+  const profile = useFragment(
     graphql`
-      fragment SocialLinksEditionScreen_viewer on Viewer {
-        ...SocialLinksBackgroundEditionPanel_viewer
+      fragment SocialLinksEditionScreen_profile on Profile {
+        ...SocialLinksBackgroundEditionPanel_profile
         moduleBackgrounds {
           id
           uri
           resizeMode
         }
-        profile {
-          webCard {
-            cardColors {
-              primary
-              light
-              dark
-            }
-            ...SocialLinksSettingsEditionPanel_webCard
+        webCard {
+          id
+          cardColors {
+            primary
+            light
+            dark
           }
+          ...SocialLinksSettingsEditionPanel_webCard
         }
       }
     `,
-    viewerKey,
+    profileKey,
   );
 
   // #endregion
@@ -164,7 +163,7 @@ const SocialLinksEditionScreen = ({
   const previewData = {
     ...omit(data, 'backgroundId'),
     background:
-      viewer.moduleBackgrounds.find(
+      profile.moduleBackgrounds.find(
         background => background.id === backgroundId,
       ) ?? null,
   };
@@ -204,6 +203,7 @@ const SocialLinksEditionScreen = ({
       ...value,
       moduleId: socialLinks?.id,
       links: value.links!,
+      webCardId: profile.webCard.id,
     };
 
     commit({
@@ -224,7 +224,15 @@ const SocialLinksEditionScreen = ({
         });
       },
     });
-  }, [canSave, value, socialLinks?.id, commit, router, intl]);
+  }, [
+    canSave,
+    value,
+    socialLinks?.id,
+    profile.webCard.id,
+    commit,
+    router,
+    intl,
+  ]);
 
   const onCancel = useCallback(() => {
     router.back();
@@ -309,7 +317,7 @@ const SocialLinksEditionScreen = ({
       >
         <SocialLinksPreview
           style={{ height: topPanelHeight - 20, marginVertical: 10 }}
-          colorPalette={viewer.profile?.webCard.cardColors}
+          colorPalette={profile.webCard.cardColors}
           cardStyle={null}
           data={previewData}
         />
@@ -336,7 +344,7 @@ const SocialLinksEditionScreen = ({
               id: 'settings',
               element: (
                 <SocialLinksSettingsEditionPanel
-                  webCard={viewer.profile?.webCard ?? null}
+                  webCard={profile?.webCard ?? null}
                   iconColor={iconColor}
                   onIconColorChange={onIconColorChange}
                   arrangement={arrangement}
@@ -377,7 +385,7 @@ const SocialLinksEditionScreen = ({
               id: 'background',
               element: (
                 <SocialLinksBackgroundEditionPanel
-                  viewer={viewer}
+                  profile={profile}
                   backgroundId={backgroundId}
                   backgroundStyle={backgroundStyle}
                   onBackgroundChange={onBackgroundChange}

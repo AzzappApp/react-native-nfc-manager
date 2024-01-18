@@ -4,6 +4,7 @@ import { GraphQLError } from 'graphql';
 import ERRORS from '@azzapp/shared/errors';
 import { isAdmin } from '@azzapp/shared/profileHelpers';
 import { UserTable, createProfile, createUser, db } from '#domains';
+import fromGlobalIdWithType from '#helpers/relayIdHelpers';
 import type { GraphQLContext } from '#index';
 import type { MutationResolvers } from '#schema/__generated__/types';
 import type { SQLWrapper } from 'drizzle-orm';
@@ -13,10 +14,19 @@ const inviteUserMutation: MutationResolvers['inviteUser'] = async (
   { input },
   { auth, loaders, sendMail, sendSms }: GraphQLContext,
 ) => {
-  const { profileId } = auth;
-  const { email, phoneNumber } = input;
+  const { userId } = auth;
+  const { email, phoneNumber, profileId: gqlProfileId } = input;
 
-  if (!profileId) throw new GraphQLError(ERRORS.UNAUTHORIZED);
+  const profileId = fromGlobalIdWithType(gqlProfileId, 'Profile');
+  const profile = profileId && (await loaders.Profile.load(profileId));
+  if (!profile || !isAdmin(profile.profileRole)) {
+    throw new GraphQLError(ERRORS.UNAUTHORIZED);
+  }
+
+  if (profile.userId !== userId) {
+    throw new GraphQLError(ERRORS.UNAUTHORIZED);
+  }
+
   if (!email && !phoneNumber) throw new GraphQLError(ERRORS.INVALID_REQUEST);
 
   const filters: SQLWrapper[] = [];
@@ -30,19 +40,8 @@ const inviteUserMutation: MutationResolvers['inviteUser'] = async (
     .where(and(...filters))
     .then(res => res.pop());
 
-  const profile = await loaders.Profile.load(profileId);
-
-  //check if the authed profile as the right to invite someone(multi user on)
-  const webCard = profile
-    ? await loaders.WebCard.load(profile.webCardId)
-    : null;
-
-  if (
-    !profile ||
-    !webCard ||
-    !webCard.isMultiUser ||
-    !isAdmin(profile.profileRole)
-  ) {
+  const webCard = await loaders.WebCard.load(profile.webCardId);
+  if (!webCard || !webCard.isMultiUser) {
     throw new GraphQLError(ERRORS.INVALID_REQUEST);
   }
 
@@ -71,7 +70,7 @@ const inviteUserMutation: MutationResolvers['inviteUser'] = async (
       invited: true,
       contactCard: {
         ...data,
-        birthday: data.birthday ?? undefined,
+        birthday: undefined,
       },
       contactCardDisplayedOnWebCard: displayedOnWebCard ?? true,
       contactCardIsPrivate: displayedOnWebCard ?? false,

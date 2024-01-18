@@ -6,10 +6,12 @@ import CardTemplateList from '#components/CardTemplateList';
 import useLoadCardTemplateMutation from '#hooks/useLoadCardTemplateMutation';
 import useScreenInsets from '#hooks/useScreenInsets';
 import ActivityIndicator from '#ui/ActivityIndicator';
-import type { CardTemplatelistHandle } from '#components/CardTemplateList';
+import type { CardTemplateListHandle } from '#components/CardTemplateList';
 import type { ForwardedRef } from 'react';
 
 type CardEditionStepPros = {
+  profileId: string;
+  webCardId: string;
   height: number;
   onSkip?: () => void;
   onCoverTemplateApplied: () => void;
@@ -19,16 +21,18 @@ type CardEditionStepPros = {
 
 const CardEditionStep = (
   {
+    profileId,
+    webCardId,
     height,
     onSkip,
     onCoverTemplateApplied,
     hideHeader,
     showHeader,
   }: CardEditionStepPros,
-  forwardRef: ForwardedRef<CardTemplatelistHandle>,
+  forwardRef: ForwardedRef<CardTemplateListHandle>,
 ) => {
   const insets = useScreenInsets();
-  const eidtorHeight = height - Math.min(insets.bottom, 16);
+  const editorHeight = height - Math.min(insets.bottom, 16);
 
   const [commit, inFlight] = useLoadCardTemplateMutation();
   const intl = useIntl();
@@ -38,6 +42,7 @@ const CardEditionStep = (
       variables: {
         loadCardTemplateInput: {
           cardTemplateId,
+          webCardId,
         },
       },
       onCompleted: () => {
@@ -65,7 +70,8 @@ const CardEditionStep = (
       }
     >
       <CardTemplateList
-        height={eidtorHeight}
+        profileId={profileId}
+        height={editorHeight}
         onSkip={onSkip}
         onApplyTemplate={onSubmit}
         loading={inFlight}

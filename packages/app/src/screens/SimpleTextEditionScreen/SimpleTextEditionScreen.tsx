@@ -28,14 +28,14 @@ import SimpleTextMarginEditionPanel from './SimpleTextMarginsEditionPanel';
 import SimpleTextPreview from './SimpleTextPreview';
 import SimpleTextStyleEditionPanel from './SimpleTextStyleEditionPanel';
 import type { SimpleTextEditionScreen_module$key } from '#relayArtifacts/SimpleTextEditionScreen_module.graphql';
-import type { SimpleTextEditionScreen_viewer$key } from '#relayArtifacts/SimpleTextEditionScreen_viewer.graphql';
+import type { SimpleTextEditionScreen_profile$key } from '#relayArtifacts/SimpleTextEditionScreen_profile.graphql';
 import type { ViewProps } from 'react-native';
 
 export type SimpleTextEditionScreenProps = ViewProps & {
   /**
    * the current viewer
    */
-  viewer: SimpleTextEditionScreen_viewer$key;
+  profile: SimpleTextEditionScreen_profile$key;
   /**
    * the current module to edit, if null, a new module will be created
    */
@@ -51,7 +51,7 @@ export type SimpleTextEditionScreenProps = ViewProps & {
  */
 const SimpleTextEditionScreen = ({
   module,
-  viewer: viewerKey,
+  profile: profileKey,
   moduleKind,
 }: SimpleTextEditionScreenProps) => {
   // #region Data retrieval
@@ -110,41 +110,40 @@ const SimpleTextEditionScreen = ({
     // TODO error ?
   }
 
-  const viewer = useFragment(
+  const profile = useFragment(
     graphql`
-      fragment SimpleTextEditionScreen_viewer on Viewer {
-        ...SimpleTextEditionBackgroundPanel_viewer
-        profile {
-          webCard {
-            ...WebCardColorPicker_webCard
-            ...SimpleTextStyleEditionPanel_webCard
-            cardStyle {
-              borderColor
-              borderRadius
-              borderWidth
-              buttonColor
-              buttonRadius
-              fontFamily
-              fontSize
-              gap
-              titleFontFamily
-              titleFontSize
-            }
-            cardColors {
-              primary
-              light
-              dark
-            }
+      fragment SimpleTextEditionScreen_profile on Profile {
+        webCard {
+          id
+          cardStyle {
+            borderColor
+            borderRadius
+            borderWidth
+            buttonColor
+            buttonRadius
+            fontFamily
+            fontSize
+            gap
+            titleFontFamily
+            titleFontSize
           }
+          cardColors {
+            primary
+            light
+            dark
+          }
+          ...WebCardColorPicker_webCard
+          ...SimpleTextStyleEditionPanel_webCard
         }
         moduleBackgrounds {
           id
           uri
           resizeMode
         }
+        ...SimpleTextEditionBackgroundPanel_profile
       }
     `,
-    viewerKey,
+    profileKey,
   );
   // #endregion
 
@@ -168,7 +167,7 @@ const SimpleTextEditionScreen = ({
 
   const { data, value, fieldUpdateHandler, dirty } = useModuleDataEditor({
     initialValue,
-    cardStyle: viewer.profile?.webCard.cardStyle,
+    cardStyle: profile?.webCard.cardStyle,
     styleValuesMap:
       moduleKind === 'simpleText'
         ? SIMPLE_TEXT_STYLE_VALUES
@@ -196,7 +195,7 @@ const SimpleTextEditionScreen = ({
     ...omit(data, 'backgroundId'),
     kind: moduleKind,
     background:
-      viewer.moduleBackgrounds.find(
+      profile.moduleBackgrounds.find(
         background => background.id === backgroundId,
       ) ?? null,
   };
@@ -228,7 +227,7 @@ const SimpleTextEditionScreen = ({
   const router = useRouter();
   const intl = useIntl();
   const onSave = useCallback(() => {
-    if (!canSave) {
+    if (!canSave || !profile.webCard) {
       return;
     }
 
@@ -239,6 +238,7 @@ const SimpleTextEditionScreen = ({
           moduleId: moduleData?.id ?? null,
           kind: moduleKind,
           text: value.text!,
+          webCardId: profile.webCard.id,
         },
       },
       onCompleted() {
@@ -255,7 +255,16 @@ const SimpleTextEditionScreen = ({
         });
       },
     });
-  }, [canSave, commit, value, moduleData?.id, moduleKind, router, intl]);
+  }, [
+    canSave,
+    profile.webCard,
+    commit,
+    value,
+    moduleData?.id,
+    moduleKind,
+    router,
+    intl,
+  ]);
 
   const onCancel = useCallback(() => {
     router.back();
@@ -357,8 +366,8 @@ const SimpleTextEditionScreen = ({
         style={{ height: topPanelHeight - 20, marginVertical: 10 }}
         data={previewData}
         onPreviewPress={onPreviewPress}
-        colorPalette={viewer.profile?.webCard.cardColors}
-        cardStyle={viewer.profile?.webCard.cardStyle}
+        colorPalette={profile?.webCard.cardColors}
+        cardStyle={profile?.webCard.cardStyle}
       />
       <TabView
         style={{ height: bottomPanelHeight }}
@@ -369,7 +378,7 @@ const SimpleTextEditionScreen = ({
             element: (
               <SimpleTextStyleEditionPanel
                 moduleKind={moduleKind}
-                webCard={viewer.profile?.webCard ?? null}
+                webCard={profile?.webCard ?? null}
                 fontColor={fontColor ?? '#000'}
                 fontFamily={fontFamily ?? 'Arial'}
                 fontSize={fontSize ?? 12}
@@ -408,7 +417,7 @@ const SimpleTextEditionScreen = ({
             id: 'background',
             element: (
               <SimpleTextEditionBackgroundPanel
-                viewer={viewer}
+                profile={profile}
                 backgroundId={backgroundId}
                 backgroundStyle={backgroundStyle}
                 onBackgroundChange={onBackgroundChange}

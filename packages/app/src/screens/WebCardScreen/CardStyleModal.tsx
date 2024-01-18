@@ -19,6 +19,7 @@ import { useModulesData } from '#components/cardModules/ModuleData';
 import ScreenModal from '#components/ScreenModal';
 import WebCardPreview from '#components/WebCardPreview';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
+import useAuthState from '#hooks/useAuthState';
 import useScreenInsets from '#hooks/useScreenInsets';
 import ActivityIndicator from '#ui/ActivityIndicator';
 import Container from '#ui/Container';
@@ -27,7 +28,7 @@ import HeaderButton from '#ui/HeaderButton';
 import IconButton from '#ui/IconButton';
 import PressableNative from '#ui/PressableNative';
 import Text from '#ui/Text';
-import type { CardStyleModal_cardStyles$key } from '#relayArtifacts/CardStyleModal_cardStyles.graphql';
+import type { CardStyleModal_CardStyleList_profile$key } from '#relayArtifacts/CardStyleModal_CardStyleList_profile.graphql';
 import type { CardStyleModal_webCard$key } from '#relayArtifacts/CardStyleModal_webCard.graphql';
 import type { CardStyleModalMutation } from '#relayArtifacts/CardStyleModalMutation.graphql';
 import type { CardStyleModalQuery } from '#relayArtifacts/CardStyleModalQuery.graphql';
@@ -52,14 +53,14 @@ type CardStyleItem = CardStyle & {
  * A modal that allows the user to select a card style.
  */
 const CardStyleModal = ({ visible, onRequestClose }: CardStyleModalProps) => {
-  const { viewer } = useLazyLoadQuery<CardStyleModalQuery>(
+  const { profileInfos } = useAuthState();
+  const { profile } = useLazyLoadQuery<CardStyleModalQuery>(
     graphql`
-      query CardStyleModalQuery {
-        viewer {
-          ...CardStyleModal_cardStyles
-          profile {
+      query CardStyleModalQuery($profileId: ID!) {
+        profile: node(id: $profileId) {
+          ... on Profile {
             webCard {
-              ...CardStyleModal_webCard
+              id
               cardStyle {
                 borderColor
                 borderRadius
@@ -72,12 +73,16 @@ const CardStyleModal = ({ visible, onRequestClose }: CardStyleModalProps) => {
                 titleFontFamily
                 titleFontSize
               }
+              ...CardStyleModal_webCard
             }
+            ...CardStyleModal_CardStyleList_profile
           }
         }
       }
     `,
-    {},
+    {
+      profileId: profileInfos?.profileId ?? '',
+    },
   );
   const intl = useIntl();
 
@@ -90,9 +95,9 @@ const CardStyleModal = ({ visible, onRequestClose }: CardStyleModalProps) => {
         defaultMessage: 'Current style',
         description: 'Card style modal current style label',
       }),
-      ...(viewer.profile?.webCard?.cardStyle ?? DEFAULT_CARD_STYLE),
+      ...(profile?.webCard?.cardStyle ?? DEFAULT_CARD_STYLE),
     }),
-    [intl, viewer.profile?.webCard?.cardStyle],
+    [intl, profile?.webCard?.cardStyle],
   );
 
   const [cardStyle, setCardStyle] = useState<CardStyleItem>(currentCardStyle);
@@ -128,19 +133,22 @@ const CardStyleModal = ({ visible, onRequestClose }: CardStyleModalProps) => {
   const applyCardStyle = useCallback(() => {
     commit({
       variables: {
-        input: pick(
-          cardStyle,
-          'borderColor',
-          'borderRadius',
-          'borderWidth',
-          'buttonColor',
-          'buttonRadius',
-          'fontFamily',
-          'fontSize',
-          'gap',
-          'titleFontFamily',
-          'titleFontSize',
-        ),
+        input: {
+          webCardId: profile?.webCard?.id ?? '',
+          ...pick(
+            cardStyle,
+            'borderColor',
+            'borderRadius',
+            'borderWidth',
+            'buttonColor',
+            'buttonRadius',
+            'fontFamily',
+            'fontSize',
+            'gap',
+            'titleFontFamily',
+            'titleFontSize',
+          ),
+        },
       },
       onCompleted: () => {
         onRequestClose();
@@ -156,7 +164,7 @@ const CardStyleModal = ({ visible, onRequestClose }: CardStyleModalProps) => {
         });
       },
     });
-  }, [cardStyle, commit, intl, onRequestClose]);
+  }, [cardStyle, commit, intl, onRequestClose, profile?.webCard?.id]);
 
   const insets = useScreenInsets();
   const { height: windowHeight } = useWindowDimensions();
@@ -212,19 +220,21 @@ const CardStyleModal = ({ visible, onRequestClose }: CardStyleModalProps) => {
             </View>
           }
         >
-          {visible && viewer.profile?.webCard && (
+          {visible && profile?.webCard && (
             <CardStylePreview
               height={previewHeight}
-              webCard={viewer.profile.webCard}
+              webCard={profile.webCard}
               cardStyle={cardStyle}
             />
           )}
-          <CardStyleList
-            viewer={viewer}
-            currentCardStyle={currentCardStyle}
-            selectedCardStyle={cardStyle}
-            onSelectCardStyle={setCardStyle}
-          />
+          {profile && (
+            <CardStyleList
+              profile={profile}
+              currentCardStyle={currentCardStyle}
+              selectedCardStyle={cardStyle}
+              onSelectCardStyle={setCardStyle}
+            />
+          )}
         </Suspense>
       </Container>
     </ScreenModal>
@@ -295,11 +305,11 @@ type CardStyleListProps = {
   currentCardStyle: CardStyleItem;
   selectedCardStyle: CardStyleItem;
   onSelectCardStyle: (cardStyle: CardStyleItem) => void;
-  viewer: CardStyleModal_cardStyles$key;
+  profile: CardStyleModal_CardStyleList_profile$key;
 };
 
 const CardStyleList = ({
-  viewer,
+  profile,
   currentCardStyle,
   selectedCardStyle,
   onSelectCardStyle,
@@ -313,14 +323,16 @@ const CardStyleList = ({
     isLoadingNext,
   } = usePaginationFragment(
     graphql`
-      fragment CardStyleModal_cardStyles on Viewer
-      @refetchable(queryName: "CardStyleModal_cardStyles_Query")
+      fragment CardStyleModal_CardStyleList_profile on Profile
+      @refetchable(queryName: "CardStyleModal_CardStyleList_profile_Query")
       @argumentDefinitions(
         after: { type: String }
         first: { type: Int, defaultValue: 20 }
       ) {
         cardStyles(first: $first, after: $after)
-          @connection(key: "CardStyleModal_connection_cardStyles") {
+          @connection(
+            key: "CardStyleModal_CardStyleList_connection_cardStyles"
+          ) {
           edges {
             node {
               id
@@ -340,7 +352,7 @@ const CardStyleList = ({
         }
       }
     `,
-    viewer as CardStyleModal_cardStyles$key,
+    profile as CardStyleModal_CardStyleList_profile$key,
   );
 
   const cardStylesItems = useMemo<CardStyleItem[]>(

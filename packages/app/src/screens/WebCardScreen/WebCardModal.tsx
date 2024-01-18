@@ -57,18 +57,20 @@ const WebCardModal = ({
 }: WebCardModalProps) => {
   const webCard = useFragment(
     graphql`
-      fragment WebCardModal_webCard on WebCard {
+      fragment WebCardModal_webCard on WebCard
+      @argumentDefinitions(viewerWebCardId: { type: "ID" }) {
         id
         userName
         nbPosts
         nbFollowers
         nbFollowings
-        isFollowing
+        webCardModal_isFollowing: isFollowing(webCardId: $viewerWebCardId)
         ...CoverRenderer_webCard
       }
     `,
     webCardKey,
   );
+  const isFollowing = webCard.webCardModal_isFollowing;
 
   const { width: windowsWith, height: windowsHeight } = useWindowDimensions();
   const { top } = useSafeAreaInsets();
@@ -101,7 +103,7 @@ const WebCardModal = ({
   };
 
   const debouncedToggleFollowing = useDebouncedCallback(() => {
-    onToggleFollow(webCard.id, webCard.userName, !webCard.isFollowing);
+    onToggleFollow(webCard.id, webCard.userName, !isFollowing);
   }, 600);
 
   const styles = useStyleSheet(stylesheet);
@@ -196,11 +198,9 @@ const WebCardModal = ({
               onPress={debouncedToggleFollowing}
             >
               <View style={styles.bottomSheetOptionIconLabel}>
-                <Icon
-                  icon={webCard.isFollowing ? 'delete_filled' : 'add_circle'}
-                />
+                <Icon icon={isFollowing ? 'delete_filled' : 'add_circle'} />
                 <Text>
-                  {webCard.isFollowing ? (
+                  {isFollowing ? (
                     <FormattedMessage
                       defaultMessage="Unfollow"
                       description="Unfollow button label in Profile webcard modal Button"

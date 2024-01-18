@@ -16,13 +16,13 @@ import Text from '#ui/Text';
 import Avatar from './Avatar';
 import type { ProfileRole } from '#relayArtifacts/MultiUserScreenQuery.graphql';
 import type { MultiUserTransferOwnershipModal_TransferOwnershipMutation } from '#relayArtifacts/MultiUserTransferOwnershipModal_TransferOwnershipMutation.graphql';
-import type { MultiUserTransferOwnershipModal_webcard$key } from '#relayArtifacts/MultiUserTransferOwnershipModal_webcard.graphql';
+import type { MultiUserTransferOwnershipModal_webCard$key } from '#relayArtifacts/MultiUserTransferOwnershipModal_webCard.graphql';
 import type { UserInformation } from './MultiUserScreen';
 import type { ForwardedRef } from 'react';
 
 type MultiUserTransferOwnershipModalProps = {
   usersByRole: Record<ProfileRole, UserInformation[]>;
-  webCard: MultiUserTransferOwnershipModal_webcard$key;
+  webCard: MultiUserTransferOwnershipModal_webCard$key;
 };
 
 export type MultiUserTransferOwnershipModalActions = {
@@ -30,10 +30,9 @@ export type MultiUserTransferOwnershipModalActions = {
 };
 
 const MultiUserTransferOwnershipModal = (
-  props: MultiUserTransferOwnershipModalProps,
+  { usersByRole, webCard: webCardKey }: MultiUserTransferOwnershipModalProps,
   ref: ForwardedRef<MultiUserTransferOwnershipModalActions>,
 ) => {
-  const { usersByRole, webCard } = props;
   const intl = useIntl();
 
   const [visible, setVisible] = useState(false);
@@ -55,16 +54,17 @@ const MultiUserTransferOwnershipModal = (
       `,
     );
 
-  const data = useFragment(
+  const webCard = useFragment(
     graphql`
-      fragment MultiUserTransferOwnershipModal_webcard on WebCard {
+      fragment MultiUserTransferOwnershipModal_webCard on WebCard {
+        id
         userName
         profiles {
           id
         }
       }
     `,
-    webCard,
+    webCardKey,
   );
 
   const onClose = () => {
@@ -81,6 +81,7 @@ const MultiUserTransferOwnershipModal = (
       variables: {
         input: {
           profileId: userToTransfer.profileId,
+          webCardId: webCard.id,
         },
       },
       onCompleted: () => {
@@ -137,7 +138,7 @@ const MultiUserTransferOwnershipModal = (
             <FormattedMessage
               defaultMessage={`Select a new owner for the WebCard “{userName}”. The owner has full control over the WebCard, including the ability to add and remove collaborators. This is also the person who will be billed for multi-user.`}
               description="MultiUserDetailModal - User description"
-              values={{ userName: data.userName }}
+              values={{ userName: webCard.userName }}
             />
           </Text>
 
@@ -149,7 +150,7 @@ const MultiUserTransferOwnershipModal = (
             <FormattedMessage
               defaultMessage="{nbUsers} user"
               description="Title for switch section in MultiUserScreen"
-              values={{ nbUsers: data.profiles?.length ?? 1 }}
+              values={{ nbUsers: webCard.profiles?.length ?? 1 }}
             />
           </Text>
 

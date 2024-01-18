@@ -2,12 +2,12 @@ import { useCallback } from 'react';
 import { useIntl } from 'react-intl';
 import { graphql, useFragment } from 'react-relay';
 import EditorLayerSelectorPanel from '#components/EditorLayerSelectorPanel';
-import type { CECBackgroundPanel_viewer$key } from '#relayArtifacts/CECBackgroundPanel_viewer.graphql';
+import type { CECBackgroundPanel_profile$key } from '#relayArtifacts/CECBackgroundPanel_profile.graphql';
 import type { ColorPalette } from '@azzapp/shared/cardHelpers';
 import type { StyleProp, ViewStyle } from 'react-native';
 
 type CECBackgroundPanelProps = {
-  viewer: CECBackgroundPanel_viewer$key;
+  profile: CECBackgroundPanel_profile$key;
   background: string | null | undefined;
   backgroundColor: string | null | undefined;
   backgroundPatternColor: string | null | undefined;
@@ -29,7 +29,7 @@ type CECBackgroundPanelProps = {
 };
 
 const CECBackgroundPanel = ({
-  viewer,
+  profile,
   background,
   backgroundColor,
   backgroundPatternColor,
@@ -45,13 +45,13 @@ const CECBackgroundPanel = ({
 }: CECBackgroundPanelProps) => {
   const { coverBackgrounds } = useFragment(
     graphql`
-      fragment CECBackgroundPanel_viewer on Viewer {
+      fragment CECBackgroundPanel_profile on Profile {
         coverBackgrounds {
           ...StaticMediaList_staticMedias
         }
       }
     `,
-    viewer,
+    profile,
   );
 
   backgroundColor = backgroundColor ?? '#FFFFFF';

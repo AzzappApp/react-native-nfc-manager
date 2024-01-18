@@ -156,7 +156,7 @@ export type MultiUserAddRoute = {
   params?: never;
 };
 
-export type WebcardParametersRoute = {
+export type WebCardParametersRoute = {
   route: 'WEBCARD_PARAMETERS';
   params?: never;
 };
@@ -187,7 +187,7 @@ export type Route =
   | SearchRoute
   | SignInRoute
   | SignUpRoute
-  | WebcardParametersRoute
+  | WebCardParametersRoute
   | WebCardRoute;
 
 export type ROUTES = Route['route'];

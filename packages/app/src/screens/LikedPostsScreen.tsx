@@ -16,13 +16,9 @@ import type { LikedPostsScreenQuery } from '#relayArtifacts/LikedPostsScreenQuer
 import type { LikedPostsRoute } from '#routes';
 
 const likedPostsScreenQuery = graphql`
-  query LikedPostsScreenQuery {
-    viewer {
-      profile {
-        webCard {
-          ...LikedPostsScreen_profile
-        }
-      }
+  query LikedPostsScreenQuery($webCardId: ID!) {
+    profile: node(id: $webCardId) {
+      ...LikedPostsScreen_profile @arguments(viewerWebCardId: $webCardId)
     }
   }
 `;
@@ -38,15 +34,14 @@ const LikedPostsScreen = ({
     router.back();
   };
 
-  const {
-    viewer: { profile },
-  } = usePreloadedQuery(likedPostsScreenQuery, preloadedQuery);
+  const { profile } = usePreloadedQuery(likedPostsScreenQuery, preloadedQuery);
   const { data, loadNext, hasNext, isLoadingNext, refetch } =
     usePaginationFragment(
       graphql`
         fragment LikedPostsScreen_profile on WebCard
         @refetchable(queryName: "LikedPostListScreenQuery")
         @argumentDefinitions(
+          viewerWebCardId: { type: "ID!" }
           after: { type: String }
           first: { type: Int, defaultValue: 10 }
         ) {
@@ -55,13 +50,17 @@ const LikedPostsScreen = ({
             __id
             edges {
               node {
-                ...PostList_posts @arguments(includeAuthor: true)
+                ...PostList_posts
+                  @arguments(
+                    includeAuthor: true
+                    viewerWebCardId: $viewerWebCardId
+                  )
               }
             }
           }
         }
       `,
-      profile?.webCard as LikedPostsScreen_profile$key,
+      profile as LikedPostsScreen_profile$key,
     );
 
   const [refreshing, setRefreshing] = useState(false);
@@ -126,6 +125,9 @@ const LikedPostsScreen = ({
 };
 export default relayScreen(LikedPostsScreen, {
   query: likedPostsScreenQuery,
+  getVariables: (_, profileInfos) => ({
+    webCardId: profileInfos?.webCardId ?? '',
+  }),
   fetchPolicy: 'store-and-network',
 });
 

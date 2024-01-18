@@ -38,7 +38,7 @@ import CECToolBar from './CECToolBar';
 import useCoverEditorCustomLayout from './useCoverEditorCustomLayout';
 import type { EditionParameters } from '#components/gpu';
 import type { ImagePickerResult } from '#components/ImagePicker';
-import type { CoverEditorCustom_viewer$key } from '#relayArtifacts/CoverEditorCustom_viewer.graphql';
+import type { CoverEditorCustom_profile$key } from '#relayArtifacts/CoverEditorCustom_profile.graphql';
 import type {
   CoverStyleData,
   MaskMedia,
@@ -51,7 +51,7 @@ export type CoverEditorCustomProps = {
   /**
    * The relay viewer reference
    */
-  viewer: CoverEditorCustom_viewer$key;
+  profile: CoverEditorCustom_profile$key;
   /**
    * The cover initial data
    */
@@ -85,7 +85,7 @@ export type CoverEditorCustomProps = {
  * Allows un user to edit his Cover, the cover changes, can be previsualized
  */
 const CoverEditorCustom = ({
-  viewer: viewerKey,
+  profile: profileKey,
   initialData,
   initialColorPalette,
   style,
@@ -93,17 +93,15 @@ const CoverEditorCustom = ({
   onCancel,
 }: CoverEditorCustomProps) => {
   //#region Data dependencies
-  const viewer = useFragment(
+  const profile = useFragment(
     graphql`
-      fragment CoverEditorCustom_viewer on Viewer {
-        ...CECBackgroundPanel_viewer
-        ...CECForegroundPanel_viewer
-        profile {
-          webCard {
-            ...useSaveCover_webCard
-            cardColors {
-              otherColors
-            }
+      fragment CoverEditorCustom_profile on Profile {
+        ...CECBackgroundPanel_profile
+        ...CECForegroundPanel_profile
+        webCard {
+          ...useSaveCover_webCard
+          cardColors {
+            otherColors
           }
         }
         coverBackgrounds {
@@ -118,10 +116,10 @@ const CoverEditorCustom = ({
         }
       }
     `,
-    viewerKey,
+    profileKey,
   );
-  const { coverBackgrounds, coverForegrounds } = viewer ?? {};
-  const cardColors = viewer?.profile?.webCard.cardColors;
+  const { coverBackgrounds, coverForegrounds } = profile ?? {};
+  const cardColors = profile?.webCard.cardColors;
   //#endregion
 
   //#region Updates management
@@ -278,7 +276,7 @@ const CoverEditorCustom = ({
 
   // #region Save cover
   const { progressIndicator, saveCover } = useSaveCover(
-    viewer.profile?.webCard ?? null,
+    profile?.webCard ?? null,
     onCoverSaved,
   );
 
@@ -605,7 +603,7 @@ const CoverEditorCustom = ({
               id: 'foreground',
               element: (
                 <CECForegroundPanel
-                  viewer={viewer}
+                  profile={profile}
                   foreground={foreground?.id}
                   foregroundColor={foregroundColor}
                   colorPalette={colorPalette}
@@ -623,7 +621,7 @@ const CoverEditorCustom = ({
               id: 'background',
               element: (
                 <CoverEditorCustomBackgroundPanel
-                  viewer={viewer}
+                  profile={profile}
                   background={background?.id}
                   backgroundColor={backgroundColor}
                   backgroundPatternColor={backgroundPatternColor}

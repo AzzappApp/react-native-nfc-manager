@@ -33,7 +33,7 @@ import CarouselImagesEditionPanel from './CarouselImagesEditionPanel';
 import CarouselPreview from './CarouselPreview';
 import type { ImagePickerResult } from '#components/ImagePicker';
 import type { CarouselEditionScreen_module$key } from '#relayArtifacts/CarouselEditionScreen_module.graphql';
-import type { CarouselEditionScreen_viewer$key } from '#relayArtifacts/CarouselEditionScreen_viewer.graphql';
+import type { CarouselEditionScreen_profile$key } from '#relayArtifacts/CarouselEditionScreen_profile.graphql';
 import type { CarouselEditionScreenUpdateModuleMutation } from '#relayArtifacts/CarouselEditionScreenUpdateModuleMutation.graphql';
 import type { ViewProps } from 'react-native';
 import type { Observable } from 'relay-runtime';
@@ -42,7 +42,7 @@ export type CarouselEditionScreenProps = ViewProps & {
   /**
    * the current viewer
    */
-  viewer: CarouselEditionScreen_viewer$key;
+  profile: CarouselEditionScreen_profile$key;
   /**
    * the current module to edit, if null, a new module will be created
    */
@@ -54,7 +54,7 @@ export type CarouselEditionScreenProps = ViewProps & {
  */
 const CarouselEditionScreen = ({
   module,
-  viewer: viewerKey,
+  profile: profileKey,
 }: CarouselEditionScreenProps) => {
   // #region Data retrieval
   const carousel = useFragment(
@@ -92,42 +92,40 @@ const CarouselEditionScreen = ({
     module,
   );
 
-  const viewer = useFragment(
+  const profile = useFragment(
     graphql`
-      fragment CarouselEditionScreen_viewer on Viewer {
-        ...CarouselEditionBackgroundPanel_viewer
-
-        profile {
-          webCard {
-            ...WebCardColorPicker_webCard
-            cardColors {
-              primary
-              light
-              dark
-            }
-            cardStyle {
-              borderColor
-              borderRadius
-              borderWidth
-              buttonColor
-              buttonRadius
-              fontFamily
-              fontSize
-              gap
-              titleFontFamily
-              titleFontSize
-            }
-            ...CarouselEditionBorderPanel_webCard
+      fragment CarouselEditionScreen_profile on Profile {
+        webCard {
+          id
+          cardColors {
+            primary
+            light
+            dark
           }
+          cardStyle {
+            borderColor
+            borderRadius
+            borderWidth
+            buttonColor
+            buttonRadius
+            fontFamily
+            fontSize
+            gap
+            titleFontFamily
+            titleFontSize
+          }
+          ...WebCardColorPicker_webCard
+          ...CarouselEditionBorderPanel_webCard
         }
         moduleBackgrounds {
           id
           resizeMode
           uri
         }
+        ...CarouselEditionBackgroundPanel_profile
       }
     `,
-    viewerKey,
+    profileKey,
   );
   // #endregion
 
@@ -156,7 +154,7 @@ const CarouselEditionScreen = ({
   const { data, value, updateFields, fieldUpdateHandler, dirty } =
     useModuleDataEditor({
       initialValue,
-      cardStyle: viewer.profile?.webCard.cardStyle,
+      cardStyle: profile?.webCard.cardStyle,
       styleValuesMap: CAROUSEL_STYLE_VALUES,
       defaultValues: CAROUSEL_DEFAULT_VALUES,
     });
@@ -178,7 +176,7 @@ const CarouselEditionScreen = ({
   const previewData = {
     ...data,
     background:
-      viewer.moduleBackgrounds.find(
+      profile.moduleBackgrounds.find(
         background => background.id === backgroundId,
       ) ?? null,
   };
@@ -295,6 +293,7 @@ const CarouselEditionScreen = ({
     commit({
       variables: {
         input: {
+          webCardId: profile.webCard.id,
           images: images!.map(image => {
             if ('local' in image) {
               return mediasMap[image.uri].id;
@@ -323,15 +322,7 @@ const CarouselEditionScreen = ({
         });
       },
     });
-  }, [
-    canSave,
-    setProgressIndicator,
-    value,
-    commit,
-    carousel?.id,
-    intl,
-    router,
-  ]);
+  }, [canSave, value, commit, profile.webCard.id, carousel?.id, intl, router]);
 
   const onCancel = useCallback(() => {
     router.back();
@@ -463,8 +454,8 @@ const CarouselEditionScreen = ({
         data={previewData}
         height={topPanelHeight - 40}
         style={{ height: topPanelHeight - 40, marginVertical: 20 }}
-        colorPalette={viewer.profile?.webCard.cardColors}
-        cardStyle={viewer.profile?.webCard.cardStyle}
+        colorPalette={profile?.webCard.cardColors}
+        cardStyle={profile?.webCard.cardStyle}
       />
       <TabView
         style={{ height: bottomPanelHeight }}
@@ -492,7 +483,7 @@ const CarouselEditionScreen = ({
             id: 'border',
             element: (
               <CarouselEditionBorderPanel
-                webCard={viewer.profile?.webCard ?? null}
+                webCard={profile?.webCard ?? null}
                 borderWidth={borderWidth}
                 borderColor={borderColor}
                 borderRadius={borderRadius}
@@ -528,7 +519,7 @@ const CarouselEditionScreen = ({
             id: 'background',
             element: (
               <CarouselEditionBackgroundPanel
-                viewer={viewer}
+                profile={profile}
                 backgroundId={backgroundId ?? null}
                 backgroundStyle={backgroundStyle}
                 onBackgroundChange={onBackgroundChange}

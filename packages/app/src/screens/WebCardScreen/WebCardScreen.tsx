@@ -98,8 +98,9 @@ const WebCardScreen = ({
 
   const prefetchRoute = usePrefetchRoute();
 
-  const auth = useAuthState();
-  const canEdit = auth && auth.webCardId === data.webCard?.id;
+  const { profileInfos } = useAuthState();
+  const isViewer = profileInfos?.webCardId === data.webCard?.id;
+  const canEdit = isViewer && isEditor(profileInfos?.profileRole);
 
   const environment = useRelayEnvironment();
 
@@ -176,7 +177,7 @@ const WebCardScreen = ({
 
   const toggleFollow = useCallback(
     (webCardId: string, userName: string, follow: boolean) => {
-      if (auth.profileRole && isEditor(auth.profileRole)) {
+      if (profileInfos?.profileRole && isEditor(profileInfos.profileRole)) {
         onToggleFollow(webCardId, userName, follow);
       } else if (follow) {
         Toast.show({
@@ -197,7 +198,7 @@ const WebCardScreen = ({
         });
       }
     },
-    [auth.profileRole, intl, onToggleFollow],
+    [intl, onToggleFollow, profileInfos?.profileRole],
   );
 
   const ref = useRef<CardFlipSwitchRef>(null);
@@ -323,7 +324,7 @@ const WebCardScreen = ({
   // #end region
 
   const onEdit = useCallback(() => {
-    if (auth.profileRole && isEditor(auth.profileRole)) {
+    if (isEditor(profileInfos?.profileRole)) {
       if (!ref.current?.animationRunning.value) {
         toggleEditing();
       }
@@ -337,13 +338,11 @@ const WebCardScreen = ({
         }),
       });
     }
-  }, [auth.profileRole, toggleEditing, intl]);
+  }, [profileInfos?.profileRole, toggleEditing, intl]);
 
   if (!data.webCard) {
     return null;
   }
-
-  const isViewer = data.webCard.id === auth.webCardId;
 
   return (
     <View style={styles.container}>
@@ -424,7 +423,7 @@ const getQuery = (params: WebCardRoute['params']) =>
   params.webCardId ? webCardScreenByIdQuery : webCardScreenByNameQuery;
 
 const webCardScreenByIdQuery = graphql`
-  query WebCardScreenByIdQuery($webCardId: ID!) {
+  query WebCardScreenByIdQuery($webCardId: ID!, $viewerWebCardId: ID!) {
     webCard: node(id: $webCardId) {
       id
       ... on WebCard {
@@ -432,23 +431,28 @@ const webCardScreenByIdQuery = graphql`
       }
       ...WebCardScreenContent_webCard
       ...WebCardScreenButtonBar_webCard
+        @arguments(viewerWebCardId: $viewerWebCardId)
       ...WebCardScreenPublishHelper_webCard
       ...WebCardBackground_webCard
-      ...WebCardModal_webCard
+      ...WebCardModal_webCard @arguments(viewerWebCardId: $viewerWebCardId)
     }
   }
 `;
 
 const webCardScreenByNameQuery = graphql`
-  query WebCardScreenByUserNameQuery($userName: String!) {
+  query WebCardScreenByUserNameQuery(
+    $userName: String!
+    $viewerWebCardId: ID!
+  ) {
     webCard(userName: $userName) {
       id
       userName
       ...WebCardScreenContent_webCard
       ...WebCardScreenButtonBar_webCard
+        @arguments(viewerWebCardId: $viewerWebCardId)
       ...WebCardScreenPublishHelper_webCard
       ...WebCardBackground_webCard
-      ...WebCardModal_webCard
+      ...WebCardModal_webCard @arguments(viewerWebCardId: $viewerWebCardId)
     }
   }
 `;
@@ -490,8 +494,10 @@ const backRotationTargetInterpolation =
 
 export default relayScreen(WebCardScreen, {
   query: getQuery,
-  getVariables: ({ userName, webCardId }) =>
-    webCardId ? { webCardId } : { userName },
+  getVariables: ({ userName, webCardId }, profileInfos) =>
+    webCardId
+      ? { webCardId, viewerWebCardId: profileInfos?.webCardId ?? '' }
+      : { userName, viewerWebCardId: profileInfos?.webCardId ?? '' },
   fetchPolicy: 'store-and-network',
 });
 

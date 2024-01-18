@@ -46,7 +46,11 @@ import type { TextInput as RNTextInput } from 'react-native';
 type ProfileFormProps = {
   webCardKind: string;
   webCardCategory: WebCardForm_webCardCategory$key;
-  onWebCardCreated: (webCardId: string, userName: string) => void;
+  onWebCardCreated: (
+    profileId: string,
+    webCardId: string,
+    userName: string,
+  ) => void;
 };
 
 export type ProfileFormHandle = {
@@ -266,15 +270,20 @@ const WebCardForm = (
             return;
           }
 
-          const { profileRole, webCard } = data.createWebCard.profile;
+          const {
+            id: profileId,
+            profileRole,
+            webCard,
+          } = data.createWebCard.profile;
           dispatchGlobalEvent({
             type: 'WEBCARD_CHANGE',
             payload: {
+              profileId,
               webCardId: webCard.id,
               profileRole: profileRole!,
             },
           }).finally(() => {
-            onWebCardCreated(webCard.id, webCard.userName);
+            onWebCardCreated(profileId, webCard.id, webCard.userName);
             resolve();
           });
         },

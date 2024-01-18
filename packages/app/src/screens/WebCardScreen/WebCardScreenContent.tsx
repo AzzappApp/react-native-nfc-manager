@@ -99,7 +99,7 @@ const WebCardScreenContent = ({
         ...WebCardBackground_webCard
         ...WebCardBackgroundPreview_webCard
         ...PreviewModal_webCard
-        ...LoadCardTemplateModal_profile
+        ...LoadCardTemplateModal_webCard
         cardCover {
           backgroundColor
         }
@@ -437,7 +437,7 @@ const WebCardScreenContent = ({
             <LoadCardTemplateModal
               onClose={() => setLoadTemplate(false)}
               visible={loadTemplate}
-              profile={webCard}
+              webCard={webCard}
             />
             <WebCardColorPicker
               webCard={webCard}

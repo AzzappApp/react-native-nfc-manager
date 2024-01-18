@@ -3,10 +3,11 @@ extend type Mutation {
 }
 
 input InviteUserInput {
+  profileId: ID!
   phoneNumber: String
   email: String
   profileRole: ProfileRole!
-  contactCard: SaveContactCardInput
+  contactCard: ContactCardInput
 }
 
 type InviteUserPayload {

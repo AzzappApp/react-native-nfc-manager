@@ -35,7 +35,7 @@ import type { EmailPhoneInput } from '#components/EmailOrPhoneInput';
 import type { MultiUserDetailModal_CancelTransferOwnershipMutation } from '#relayArtifacts/MultiUserDetailModal_CancelTransferOwnershipMutation.graphql';
 import type { MultiUserDetailModal_RemoveUserMutation } from '#relayArtifacts/MultiUserDetailModal_RemoveUserMutation.graphql';
 import type { MultiUserDetailModal_UpdateProfileMutation } from '#relayArtifacts/MultiUserDetailModal_UpdateProfileMutation.graphql';
-import type { MultiUserDetailModal_webcard$key } from '#relayArtifacts/MultiUserDetailModal_webcard.graphql';
+import type { MultiUserDetailModal_webCard$key } from '#relayArtifacts/MultiUserDetailModal_webCard.graphql';
 import type { ProfileRole } from '#relayArtifacts/MultiUserScreenQuery.graphql';
 import type { ContactCardEditFormValues } from '#screens/ContactCardScreen/ContactCardEditModalSchema';
 import type { UserInformation } from './MultiUserScreen';
@@ -46,7 +46,7 @@ import type { ForwardedRef, ReactNode } from 'react';
 import type { Control } from 'react-hook-form';
 
 type MultiUserDetailModalProps = {
-  webCard: MultiUserDetailModal_webcard$key;
+  webCard: MultiUserDetailModal_webCard$key;
   currentProfileId: string;
   usersByRole: Record<ProfileRole, UserInformation[]>;
 };
@@ -70,7 +70,11 @@ export type MultiUserDetailModalActions = {
 };
 
 const MultiUserDetailModal = (
-  { webCard, currentProfileId, usersByRole }: MultiUserDetailModalProps,
+  {
+    webCard: webCardKey,
+    currentProfileId,
+    usersByRole,
+  }: MultiUserDetailModalProps,
   ref: ForwardedRef<MultiUserDetailModalActions>,
 ) => {
   const [visible, setVisible] = useState(false);
@@ -86,10 +90,10 @@ const MultiUserDetailModal = (
       mode: 'onSubmit',
     });
 
-  const data = useFragment(
+  const webCard = useFragment(
     graphql`
-      fragment MultiUserDetailModal_webcard on WebCard {
-        ...MultiUserTransferOwnershipModal_webcard
+      fragment MultiUserDetailModal_webCard on WebCard {
+        id
         commonInformation {
           company
           addresses {
@@ -120,9 +124,10 @@ const MultiUserDetailModal = (
             email
           }
         }
+        ...MultiUserTransferOwnershipModal_webCard
       }
     `,
-    webCard,
+    webCardKey,
   );
 
   const [commit] = useMutation<MultiUserDetailModal_UpdateProfileMutation>(
@@ -199,7 +204,7 @@ const MultiUserDetailModal = (
 
   const submit = handleSubmit(
     async data => {
-      const { avatar, role, ...contactCard } = data;
+      const { avatar, role, selectedContact, ...contactCard } = data;
 
       const input = {};
       let avatarId: string | null = avatar?.id ?? null;
@@ -234,8 +239,8 @@ const MultiUserDetailModal = (
           input: {
             ...input,
             avatarId,
-            profileId,
             contactCard,
+            profileId,
           },
           pixelRatio: CappedPixelRatio(),
         },
@@ -300,20 +305,20 @@ const MultiUserDetailModal = (
 
   useEffect(() => {
     const profileIndex =
-      data.profiles?.findIndex(profile => profile.id === profileId) ?? 0;
+      webCard.profiles?.findIndex(profile => profile.id === profileId) ?? 0;
 
     index.value = profileIndex;
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [profileId, data.profiles]);
+  }, [profileId, webCard.profiles]);
 
   const isCurrentProfile = profileId === currentProfileId;
 
   const [commitDelete, deletionIsActive] =
     useMutation<MultiUserDetailModal_RemoveUserMutation>(graphql`
       mutation MultiUserDetailModal_RemoveUserMutation(
-        $input: RemoveUserFromWebcardInput!
+        $input: RemoveUserFromWebCardInput!
       ) {
-        removeUserFromWebcard(input: $input) {
+        removeUserFromWebCard(input: $input) {
           profileId
         }
       }
@@ -323,7 +328,8 @@ const MultiUserDetailModal = (
     commitDelete({
       variables: {
         input: {
-          profileId,
+          profileId: currentProfileId,
+          removeProfileId: profileId,
         },
       },
       onCompleted: () => {
@@ -341,13 +347,10 @@ const MultiUserDetailModal = (
         });
       },
       updater: store => {
-        const root = store.getRoot();
-        const viewer = root.getLinkedRecord('viewer');
-        const profile = viewer?.getLinkedRecord('profile');
-        const webcard = profile?.getLinkedRecord('webCard');
-        const profiles = webcard?.getLinkedRecords('profiles');
+        const webCardRecord = store.get(webCard.id);
+        const profiles = webCardRecord?.getLinkedRecords('profiles');
 
-        webcard?.setLinkedRecords(
+        webCardRecord?.setLinkedRecords(
           profiles?.filter(
             profile => profile.getValue('id')?.toString() !== profileId,
           ),
@@ -359,7 +362,7 @@ const MultiUserDetailModal = (
 
   const colorScheme = useColorScheme();
 
-  const userPendingOwnership = data.profiles?.find(
+  const userPendingOwnership = webCard.profiles?.find(
     profile => profile.promotedAsOwner,
   );
 
@@ -397,7 +400,7 @@ const MultiUserDetailModal = (
             }
           />
           <ContactCardEditForm
-            commonInformation={data.commonInformation}
+            commonInformation={webCard.commonInformation}
             control={control as unknown as Control<ContactCardEditFormValues>}
             hideImagePicker={() => setShowImagePicker(false)}
             showImagePicker={() => setShowImagePicker(true)}
@@ -518,6 +521,7 @@ const MultiUserDetailModal = (
                           variables: {
                             input: {
                               profileId: userPendingOwnership.id,
+                              webCardId: webCard.id,
                             },
                           },
                         })
@@ -570,9 +574,9 @@ const MultiUserDetailModal = (
                 </Text>
               )}
               <View style={styles.stats}>
-                {data.profiles && (
+                {webCard.profiles && (
                   <HomeStatistics
-                    user={data.profiles}
+                    user={webCard.profiles}
                     height={250}
                     currentUserIndex={0}
                     currentProfileIndexSharedValue={index}
@@ -588,7 +592,7 @@ const MultiUserDetailModal = (
       <MultiUserTransferOwnershipModal
         ref={transfer}
         usersByRole={usersByRole}
-        webCard={data}
+        webCard={webCard}
       />
     </ScreenModal>
   );

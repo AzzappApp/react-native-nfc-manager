@@ -56,7 +56,7 @@ import useSaveCover from './useSaveCover';
 import useSuggestedMedias from './useSuggestedMedias';
 import type { EditionParameters } from '#components/gpu';
 import type { ImagePickerResult } from '#components/ImagePicker';
-import type { CoverEditor_viewer$key } from '#relayArtifacts/CoverEditor_viewer.graphql';
+import type { CoverEditor_profile$key } from '#relayArtifacts/CoverEditor_profile.graphql';
 import type { CoverEditorCustomProps } from './CoverEditorCustom/CoverEditorCustom';
 import type {
   TemplateKind,
@@ -68,7 +68,7 @@ import type { ForwardedRef } from 'react';
 import type { TextInput as NativeTextInput } from 'react-native';
 
 export type CoverEditorProps = {
-  viewer: CoverEditor_viewer$key;
+  profile: CoverEditor_profile$key;
   height: number;
   onCoverSaved: () => void;
   onCanSaveChange: (canSave: boolean) => void;
@@ -80,7 +80,7 @@ export type CoverEditorHandle = {
 
 const CoverEditor = (
   {
-    viewer: viewerKey,
+    profile: profileKey,
     height,
     onCoverSaved,
     onCanSaveChange,
@@ -91,82 +91,80 @@ const CoverEditor = (
   const { bottom: insetBottom } = useScreenInsets();
 
   // #region Data
-  const viewer = useFragment(
+  const profile = useFragment(
     graphql`
-      fragment CoverEditor_viewer on Viewer {
-        profile {
-          webCard {
-            firstName
-            lastName
-            companyName
-            companyActivity {
-              label
-            }
-            webCardKind
-            cardCover {
-              title
-              subTitle
-              mediaParameters
-              mediaFilter
-              mediaAnimation
-              sourceMedia {
-                __typename
-                id
-                uri
-                width
-                height
-              }
-              maskMedia {
-                id
-                uri
-              }
-              background {
-                id
-                uri
-                resizeMode
-              }
-              foreground {
-                id
-                kind
-                uri
-              }
-              backgroundColor
-              backgroundPatternColor
-              foregroundColor
-              segmented
-              textOrientation
-              textPosition
-              textAnimation
-              titleStyle {
-                fontFamily
-                fontSize
-                color
-              }
-              subTitleStyle {
-                fontFamily
-                fontSize
-                color
-              }
-            }
-            cardColors {
-              primary
-              light
-              dark
-              otherColors
-            }
-            ...useSaveCover_webCard
+      fragment CoverEditor_profile on Profile {
+        webCard {
+          firstName
+          lastName
+          companyName
+          companyActivity {
+            label
           }
+          webCardKind
+          cardCover {
+            title
+            subTitle
+            mediaParameters
+            mediaFilter
+            mediaAnimation
+            sourceMedia {
+              __typename
+              id
+              uri
+              width
+              height
+            }
+            maskMedia {
+              id
+              uri
+            }
+            background {
+              id
+              uri
+              resizeMode
+            }
+            foreground {
+              id
+              kind
+              uri
+            }
+            backgroundColor
+            backgroundPatternColor
+            foregroundColor
+            segmented
+            textOrientation
+            textPosition
+            textAnimation
+            titleStyle {
+              fontFamily
+              fontSize
+              color
+            }
+            subTitleStyle {
+              fontFamily
+              fontSize
+              color
+            }
+          }
+          cardColors {
+            primary
+            light
+            dark
+            otherColors
+          }
+          ...useSaveCover_webCard
         }
-        ...CoverEditorCustom_viewer
-        ...CoverEditorTemplateList_viewer
-        ...useSuggestedMedias_viewer
+        ...CoverEditorCustom_profile
+        ...CoverEditorTemplateList_profile
+        ...useSuggestedMedias_profile
       }
     `,
-    viewerKey as CoverEditor_viewer$key,
+    profileKey as CoverEditor_profile$key,
   );
 
-  const cardCover = viewer?.profile?.webCard.cardCover ?? null;
-  const cardColors = viewer?.profile?.webCard.cardColors ?? null;
+  const cardCover = profile?.webCard.cardCover ?? null;
+  const cardColors = profile?.webCard.cardColors ?? null;
   // #endregion
 
   // #region Template Kind
@@ -178,9 +176,7 @@ const CoverEditor = (
         ? 'people'
         : 'others';
     }
-    return viewer.profile?.webCard.webCardKind === 'business'
-      ? 'others'
-      : 'people';
+    return profile?.webCard.webCardKind === 'business' ? 'others' : 'people';
     // We don't want to update the initial data when the cardCover change
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -227,20 +223,20 @@ const CoverEditor = (
     if (cardCover) {
       return cardCover.title ?? null;
     }
-    if (viewer.profile?.webCard.webCardKind === 'business') {
-      return viewer.profile.webCard.companyName ?? null;
+    if (profile?.webCard.webCardKind === 'business') {
+      return profile.webCard.companyName ?? null;
     }
-    return viewer.profile?.webCard.firstName ?? null;
+    return profile?.webCard.firstName ?? null;
   });
 
   const [subTitle, setSubTitle] = useState(() => {
     if (cardCover) {
       return cardCover.subTitle ?? null;
     }
-    if (viewer.profile?.webCard.webCardKind === 'business') {
-      return viewer.profile.webCard.companyActivity?.label ?? null;
+    if (profile?.webCard.webCardKind === 'business') {
+      return profile.webCard.companyActivity?.label ?? null;
     }
-    return viewer.profile?.webCard.lastName ?? null;
+    return profile?.webCard.lastName ?? null;
   });
   // #endregion
 
@@ -373,12 +369,12 @@ const CoverEditor = (
     suggestedMedia,
     busy: suggestedMediaLoaderBusy,
     onNextSuggestedMedia,
-  } = useSuggestedMedias(viewer, templateKind);
+  } = useSuggestedMedias(profile, templateKind);
   // #endregion
 
   // #region Save cover
   const { progressIndicator, saveCover } = useSaveCover(
-    viewer.profile?.webCard ?? null,
+    profile?.webCard ?? null,
     onCoverSaved,
   );
 
@@ -687,7 +683,7 @@ const CoverEditor = (
           >
             <CoverEditorTemplateList
               key={templateKind}
-              viewer={viewer}
+              profile={profile}
               templateKind={templateKind}
               mediaInfos={displayedMediaInfos}
               title={title}
@@ -842,7 +838,7 @@ const CoverEditor = (
             {...customEditionProps}
             onCancel={onCustomEditionCancel}
             onCoverSaved={onCoverSaved}
-            viewer={viewer}
+            profile={profile}
           />
         )}
       </ScreenModal>

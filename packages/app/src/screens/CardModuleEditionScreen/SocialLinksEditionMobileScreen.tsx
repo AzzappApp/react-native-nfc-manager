@@ -24,12 +24,15 @@ const SocialLinksEditionMobileScreen = ({
   moduleId,
   preloadedQuery,
 }: SocialLinksEditionMobileScreenProps) => {
-  const data = usePreloadedQuery(SocialLinksQuery, preloadedQuery);
-
+  const { profile } = usePreloadedQuery(SocialLinksQuery, preloadedQuery);
   let module: SocialLinksEditionScreen_module$key | null = null;
+  if (!profile) {
+    return null;
+  }
+
   if (moduleId != null) {
     module =
-      data.viewer.profile?.webCard.cardModules.find(
+      profile.webCard?.cardModules.find(
         module =>
           module?.id === moduleId && module?.kind === MODULE_KIND_SOCIAL_LINKS,
       ) ?? null;
@@ -38,14 +41,14 @@ const SocialLinksEditionMobileScreen = ({
     }
   }
 
-  return <SocialLinksEditionScreen module={module} viewer={data.viewer} />;
+  return <SocialLinksEditionScreen module={module} profile={profile} />;
 };
 
 const SocialLinksQuery = graphql`
-  query SocialLinksEditionMobileScreenQuery {
-    viewer {
-      ...SocialLinksEditionScreen_viewer
-      profile {
+  query SocialLinksEditionMobileScreenQuery($profileId: ID!) {
+    profile: node(id: $profileId) {
+      ... on Profile {
+        ...SocialLinksEditionScreen_profile
         webCard {
           cardModules {
             id

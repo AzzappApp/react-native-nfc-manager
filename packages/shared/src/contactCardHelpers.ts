@@ -56,7 +56,7 @@ export type ContactCard = {
   birthday?: {
     birthday: string;
     selected?: boolean | null;
-  };
+  } | null;
   socials?: Array<{
     url: string;
     label: string;

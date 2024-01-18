@@ -1,26 +1,29 @@
 import { and, eq, ne } from 'drizzle-orm';
 import { GraphQLError } from 'graphql';
 import ERRORS from '@azzapp/shared/errors';
-import { ProfileTable, db, updateWebCard } from '#domains';
+import { isOwner } from '@azzapp/shared/profileHelpers';
+import {
+  ProfileTable,
+  db,
+  getUserProfileWithWebCardId,
+  updateWebCard,
+} from '#domains';
+import fromGlobalIdWithType from '#helpers/relayIdHelpers';
 import type { WebCard } from '#domains';
-import type { GraphQLContext } from '#index';
 import type { MutationResolvers } from '#schema/__generated__/types';
 
 const updateMultiUser: MutationResolvers['updateMultiUser'] = async (
   _,
-  { isMultiUser },
-  { auth, loaders }: GraphQLContext,
+  { input: { webCardId: gqlWebCardId, isMultiUser } },
+  { auth, loaders },
 ) => {
-  const { profileId, userId } = auth;
+  const { userId } = auth;
+  const webCardId = fromGlobalIdWithType(gqlWebCardId, 'WebCard');
+  const profile =
+    userId && (await getUserProfileWithWebCardId(userId, webCardId));
 
-  if (!profileId || !userId) {
+  if (!profile || !isOwner(profile.profileRole)) {
     throw new GraphQLError(ERRORS.UNAUTHORIZED);
-  }
-
-  const profile = await loaders.Profile.load(profileId);
-
-  if (!profile || profile.profileRole !== 'owner') {
-    throw new GraphQLError(ERRORS.INVALID_REQUEST);
   }
 
   const updates: Partial<WebCard> = {

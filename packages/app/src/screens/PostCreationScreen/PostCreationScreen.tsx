@@ -43,15 +43,11 @@ import type { NewPostRoute } from '#routes';
 
 const POST_MAX_DURATION = 15;
 
-const postCreationcreenQuery = graphql`
-  query PostCreationScreenQuery {
-    viewer {
-      profile {
-        webCard {
-          id
-          ...AuthorCartoucheFragment_webCard
-        }
-      }
+const postCreationScreenQuery = graphql`
+  query PostCreationScreenQuery($webCardId: ID!) {
+    webCard: node(id: $webCardId) {
+      id
+      ...AuthorCartoucheFragment_webCard
     }
   }
 `;
@@ -63,14 +59,15 @@ const PostCreationScreen = ({
   const [allowComments, setAllowComments] = useState(true);
   const [content, setContent] = useState('');
   const intl = useIntl();
-  const {
-    viewer: { profile },
-  } = usePreloadedQuery(postCreationcreenQuery, preloadedQuery);
+  const { webCard } = usePreloadedQuery(
+    postCreationScreenQuery,
+    preloadedQuery,
+  );
 
   const connectionID =
-    profile?.webCard.id &&
+    webCard &&
     ConnectionHandler.getConnectionID(
-      profile.webCard.id,
+      webCard.id,
       'WebCardPostsList_webCard_connection_posts',
     );
 
@@ -135,6 +132,9 @@ const PostCreationScreen = ({
     filter,
     timeRange,
   }: ImagePickerResult) => {
+    if (!webCard) {
+      return;
+    }
     try {
       setProgressIndicator(Observable.from(0));
       const exportedMedia = await exportMedia({
@@ -173,6 +173,7 @@ const PostCreationScreen = ({
             allowComments,
             allowLikes,
             content,
+            webCardId: webCard.id,
           },
           screenWidth: ScreenWidth(),
           postWith: PostWidth(),
@@ -227,8 +228,8 @@ const PostCreationScreen = ({
           setProgressIndicator(null);
         },
         updater: store => {
-          if (profile?.webCard.id) {
-            const currentWebCard = store.get(profile.webCard.id);
+          if (webCard.id) {
+            const currentWebCard = store.get(webCard.id);
 
             if (currentWebCard) {
               const nbPosts = currentWebCard?.getValue('nbPosts');
@@ -260,12 +261,12 @@ const PostCreationScreen = ({
       setAllowLikes,
       setAllowComments,
       setContent,
-      webCard: profile?.webCard ?? null,
+      webCard: webCard ?? null,
     }),
-    [allowComments, allowLikes, content, profile?.webCard],
+    [allowComments, allowLikes, content, webCard],
   );
 
-  if (!profile) {
+  if (!webCard) {
     // TODO redirect to login ?
     return null;
   }
@@ -318,6 +319,9 @@ const PostCreationScreenFallback = () => {
 };
 
 export default relayScreen(PostCreationScreen, {
-  query: postCreationcreenQuery,
+  query: postCreationScreenQuery,
+  getVariables: (_, profileInfos) => ({
+    webCardId: profileInfos?.webCardId ?? '',
+  }),
   fallback: PostCreationScreenFallback,
 });

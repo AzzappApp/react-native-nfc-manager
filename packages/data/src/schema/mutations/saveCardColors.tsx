@@ -1,25 +1,30 @@
 import { GraphQLError } from 'graphql';
 import ERRORS from '@azzapp/shared/errors';
 import { isEditor } from '@azzapp/shared/profileHelpers';
-import { db, updateProfile, updateWebCard } from '#domains';
+import {
+  db,
+  getUserProfileWithWebCardId,
+  updateProfile,
+  updateWebCard,
+} from '#domains';
+import fromGlobalIdWithType from '#helpers/relayIdHelpers';
 import type { MutationResolvers } from '#schema/__generated__/types';
 
 const saveCardColors: MutationResolvers['saveCardColors'] = async (
   _,
-  { input },
+  { input: { webCardId: gqlWebCardId, ...cardColors } },
   { auth, cardUsernamesToRevalidate, loaders },
 ) => {
-  const { profileId } = auth;
-  if (!profileId) {
+  const { userId } = auth;
+  const webCardId = fromGlobalIdWithType(gqlWebCardId, 'WebCard');
+  const profile =
+    userId && (await getUserProfileWithWebCardId(userId, webCardId));
+
+  if (!profile || !isEditor(profile.profileRole)) {
     throw new GraphQLError(ERRORS.UNAUTHORIZED);
   }
-  const profile = await loaders.Profile.load(profileId);
-  if (!profile || !isEditor(profile.profileRole)) {
-    throw new GraphQLError(ERRORS.INVALID_REQUEST);
-  }
-
   const updates = {
-    cardColors: input,
+    cardColors,
     updatedAt: new Date(),
     lastCardUpdate: new Date(),
   };
@@ -27,7 +32,7 @@ const saveCardColors: MutationResolvers['saveCardColors'] = async (
     await db.transaction(async trx => {
       await updateWebCard(profile.webCardId, updates, trx);
       await updateProfile(
-        profileId,
+        profile.id,
         { lastContactCardUpdate: new Date() },
         trx,
       );

@@ -107,15 +107,19 @@ const CoverEditionScreenCoverEditor = ({
   onCoverSaved,
   onCanSaveChange,
 }: CoverEditionScreenCoverEditorProps) => {
-  const { viewer } = usePreloadedQuery<CoverEditionScreenQuery>(
+  const { node } = usePreloadedQuery<CoverEditionScreenQuery>(
     query,
     preloadedQuery,
   );
 
+  if (!node?.profile) {
+    return null;
+  }
+
   return (
     <CoverEditor
       ref={coverEditorRef}
-      viewer={viewer}
+      profile={node.profile}
       height={editorHeight}
       onCoverSaved={onCoverSaved}
       onCanSaveChange={onCanSaveChange}
@@ -124,32 +128,39 @@ const CoverEditionScreenCoverEditor = ({
 };
 
 const query = graphql`
-  query CoverEditionScreenQuery {
-    viewer {
-      ...CoverEditor_viewer
+  query CoverEditionScreenQuery($profileId: ID!) {
+    node(id: $profileId) {
+      ...CoverEditor_profile @alias(as: "profile")
     }
   }
 `;
 
 export default relayScreen(CoverEditionScreen, {
   query,
-  prefetch: (_, environment) => {
+  getVariables: (_, profileInfos) => ({
+    profileId: profileInfos?.profileId ?? '',
+  }),
+  prefetch: (_, environment, profileInfos) => {
+    const profileId = profileInfos?.profileId;
+    if (!profileId) {
+      return null;
+    }
     return fetchQueryAndRetain<CoverEditionScreenPrefetchQuery>(
       environment,
       graphql`
-        query CoverEditionScreenPrefetchQuery {
-          viewer {
-            ...CoverEditor_viewer @relay(mask: false)
+        query CoverEditionScreenPrefetchQuery($profileId: ID!) {
+          profile: node(id: $profileId) {
+            ...CoverEditor_profile @relay(mask: false)
           }
         }
       `,
-      {},
-    ).mergeMap(({ viewer }) => {
-      if (!viewer.profile?.webCard.cardCover) {
+      { profileId },
+    ).mergeMap(({ profile }) => {
+      if (!profile?.webCard?.cardCover) {
         return [];
       }
       const { background, foreground, sourceMedia, maskMedia } =
-        viewer.profile.webCard.cardCover;
+        profile.webCard.cardCover;
       const medias = convertToNonNullArray([
         background && { kind: 'image', uri: background.uri },
         foreground && foreground.kind !== 'lottie'

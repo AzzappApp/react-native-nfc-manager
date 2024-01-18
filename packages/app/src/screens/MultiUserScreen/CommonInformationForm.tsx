@@ -28,12 +28,14 @@ export type CommonInformationFormProps = {
   commonInfoFormIsOpened: boolean;
   toggleCommonInfoForm: () => void;
   commonInformation: CommonInformationForm_data$key | null;
+  webCardId: string;
 };
 
 const CommonInformationForm = ({
   commonInfoFormIsOpened,
   toggleCommonInfoForm,
   commonInformation,
+  webCardId,
 }: CommonInformationFormProps) => {
   const commonInfo = useFragment(
     graphql`
@@ -114,6 +116,7 @@ const CommonInformationForm = ({
             urls: data.urls.filter(url => url.address),
             addresses: data.addresses.filter(address => address.address),
             socials: data.socials.filter(social => social.url),
+            webCardId,
           },
         },
         onCompleted: () => {

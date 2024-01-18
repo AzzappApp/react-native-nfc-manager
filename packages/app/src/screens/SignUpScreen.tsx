@@ -26,6 +26,7 @@ import HyperLink from '#ui/HyperLink';
 import SecuredTextInput from '#ui/SecuredTextInput';
 import Text from '#ui/Text';
 import type { EmailPhoneInput } from '#components/EmailOrPhoneInput';
+import type { ProfileInfos } from '#helpers/authStore';
 import type { CheckboxStatus } from '#ui/CheckBox';
 import type { TokensResponse } from '@azzapp/shared/WebAPI';
 import type { TextInput as NativeTextInput } from 'react-native';
@@ -85,9 +86,8 @@ const SignupScreen = () => {
 
     if (canSignup) {
       let tokens: TokensResponse & {
-        webCardId?: string;
-        userId?: string;
-        profileRole?: string;
+        userId: string;
+        profileInfos: ProfileInfos | null;
       };
       try {
         setIsSubmitting(true);
@@ -110,7 +110,7 @@ const SignupScreen = () => {
         }
         if (isNotFalsyString(tokens.userId)) {
           // Signin process
-          const { webCardId, profileRole } = tokens;
+          const { profileInfos } = tokens;
           await dispatchGlobalEvent({
             type: 'SIGN_IN',
             payload: {
@@ -118,8 +118,7 @@ const SignupScreen = () => {
                 token: tokens.token,
                 refreshToken: tokens.refreshToken,
               },
-              webCardId,
-              profileRole,
+              profileInfos: profileInfos ?? null,
             },
           });
         } else {

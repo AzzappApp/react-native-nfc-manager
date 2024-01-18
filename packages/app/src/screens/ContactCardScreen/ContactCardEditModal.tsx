@@ -35,6 +35,7 @@ const ContactCardEditModal = ({
   profile: profileKey,
 }: ContactCardEditModalProps) => {
   const {
+    id,
     contactCard,
     webCard: { commonInformation, isMultiUser },
     avatar,
@@ -47,6 +48,7 @@ const ContactCardEditModal = ({
           provider: "CappedPixelRatio.relayprovider"
         }
       ) {
+        id
         webCard {
           isMultiUser
           commonInformation {
@@ -225,16 +227,19 @@ const ContactCardEditModal = ({
       commit({
         variables: {
           input: {
-            ...data,
-            emails: data.emails.filter(email => email.address),
-            phoneNumbers: data.phoneNumbers.filter(
-              phoneNumber => phoneNumber.number,
-            ),
-            urls: data.urls.filter(url => url.address),
-            addresses: data.addresses.filter(address => address.address),
-            birthday: data.birthday,
-            socials: data.socials.filter(social => social.url),
-            avatarId,
+            profileId: id,
+            contactCard: {
+              ...data,
+              emails: data.emails.filter(email => email.address),
+              phoneNumbers: data.phoneNumbers.filter(
+                phoneNumber => phoneNumber.number,
+              ),
+              urls: data.urls.filter(url => url.address),
+              addresses: data.addresses.filter(address => address.address),
+              birthday: data.birthday,
+              socials: data.socials.filter(social => social.url),
+              avatarId,
+            },
           },
           pixelRatio: CappedPixelRatio(),
         },

@@ -60,7 +60,7 @@ const LineDividerEditionScreen = ({
   const webCard = useFragment(
     graphql`
       fragment LineDividerEditionScreen_webCard on WebCard {
-        ...WebCardColorPicker_webCard
+        id
         cardColors {
           primary
           light
@@ -78,6 +78,7 @@ const LineDividerEditionScreen = ({
           titleFontFamily
           titleFontSize
         }
+        ...WebCardColorPicker_webCard
       }
     `,
     webCardKey,
@@ -138,13 +139,14 @@ const LineDividerEditionScreen = ({
   const router = useRouter();
   const intl = useIntl();
   const onSave = useCallback(() => {
-    if (!canSave) {
+    if (!canSave || !webCard) {
       return;
     }
 
     commit({
       variables: {
         input: {
+          webCardId: webCard.id,
           moduleId: lineDivider?.id,
           ...value,
         },
@@ -165,7 +167,7 @@ const LineDividerEditionScreen = ({
         });
       },
     });
-  }, [canSave, commit, lineDivider?.id, value, intl, router]);
+  }, [canSave, webCard, commit, lineDivider?.id, value, router, intl]);
 
   const onCancel = useCallback(() => {
     router.back();

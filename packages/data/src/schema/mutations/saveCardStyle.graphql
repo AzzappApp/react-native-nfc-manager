@@ -6,6 +6,7 @@ extend type Mutation {
 }
 
 input SaveCardStyleInput {
+  webCardId: ID!
   fontFamily: String!
   fontSize: Int!
   titleFontFamily: String!

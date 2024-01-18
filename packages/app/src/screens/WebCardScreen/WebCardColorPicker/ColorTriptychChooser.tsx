@@ -7,6 +7,7 @@ import { getTextColor } from '@azzapp/shared/colorsHelpers';
 import { colors, shadow } from '#theme';
 import ColorTriptychRenderer from '#components/ColorTriptychRenderer';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
+import useAuthState from '#hooks/useAuthState';
 import Icon from '#ui/Icon';
 import PressableOpacity from '#ui/PressableOpacity';
 import Text from '#ui/Text';
@@ -32,24 +33,30 @@ const ColorTriptychChooser = ({
   onEditColor,
   onUpdateColorPalette,
 }: ColorTriptychChooserProps) => {
-  const { viewer } = useLazyLoadQuery<ColorTriptychChooserQuery>(
+  const { profileInfos } = useAuthState();
+  const { profile } = useLazyLoadQuery<ColorTriptychChooserQuery>(
     graphql`
-      query ColorTriptychChooserQuery {
-        viewer {
-          colorPalettes(first: 100) {
-            edges {
-              node {
-                id
-                dark
-                primary
-                light
+      query ColorTriptychChooserQuery($profileId: ID!, $skip: Boolean!) {
+        profile: node(id: $profileId) @skip(if: $skip) {
+          ... on Profile {
+            colorPalettes(first: 100) {
+              edges {
+                node {
+                  id
+                  dark
+                  primary
+                  light
+                }
               }
             }
           }
         }
       }
     `,
-    {},
+    {
+      profileId: profileInfos?.profileId as any,
+      skip: !profileInfos?.profileId,
+    },
   );
 
   const styles = useStyleSheet(stylesheet);
@@ -100,9 +107,9 @@ const ColorTriptychChooser = ({
 
   const colorPalettesList: ColorPaletteItem[] = useMemo(() => {
     return convertToNonNullArray(
-      viewer.colorPalettes?.edges?.map(edge => edge?.node) ?? [],
+      profile?.colorPalettes?.edges?.map(edge => edge?.node) ?? [],
     );
-  }, [viewer.colorPalettes?.edges]);
+  }, [profile?.colorPalettes?.edges]);
 
   const onRestorePreviousTriptych = useCallback(() => {
     onUpdateColorPalette(currentPalette);

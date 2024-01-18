@@ -3,21 +3,27 @@ import { GraphQLError } from 'graphql';
 import { fromGlobalId } from 'graphql-relay';
 import ERRORS from '@azzapp/shared/errors';
 import { isEditor } from '@azzapp/shared/profileHelpers';
-import { PostTable, db, getPostCommentById, removeComment } from '#domains';
+import {
+  PostTable,
+  db,
+  getPostCommentById,
+  getUserProfileWithWebCardId,
+  removeComment,
+} from '#domains';
 import type { MutationResolvers } from '#schema/__generated__/types';
 
 const deletePostComment: MutationResolvers['deletePostComment'] = async (
   _,
-  { input: { commentId } },
+  { input: { commentId: gqlCommentId } },
   { auth, loaders },
 ) => {
-  const { profileId } = auth;
-
-  if (!profileId) {
-    throw new GraphQLError(ERRORS.UNAUTHORIZED);
-  }
-
-  const profile = await loaders.Profile.load(profileId);
+  const { userId } = auth;
+  const commentId = fromGlobalId(gqlCommentId).id;
+  const comment = await loaders.PostComment.load(commentId);
+  const profile =
+    comment &&
+    userId &&
+    (await getUserProfileWithWebCardId(userId, comment.webCardId));
 
   if (
     !profile ||

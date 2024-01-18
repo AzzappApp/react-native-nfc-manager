@@ -25,7 +25,11 @@ const WebCardScreenPublishHelper = ({
   webCard,
   editMode,
 }: ProfileScreenPublishHelperProps) => {
-  const { userName, cardIsPublished } = useFragment(
+  const {
+    id: webCardId,
+    userName,
+    cardIsPublished,
+  } = useFragment(
     graphql`
       fragment WebCardScreenPublishHelper_webCard on WebCard {
         id
@@ -40,8 +44,10 @@ const WebCardScreenPublishHelper = ({
 
   const [commit, publishing] = useMutation<WebCardScreenPublishHelperMutation>(
     graphql`
-      mutation WebCardScreenPublishHelperMutation {
-        publishCard {
+      mutation WebCardScreenPublishHelperMutation(
+        $input: ToggleWebCardPublishedInput!
+      ) {
+        toggleWebCardPublished(input: $input) {
           webCard {
             id
             cardIsPublished
@@ -95,7 +101,12 @@ const WebCardScreenPublishHelper = ({
 
   const onPublish = () => {
     commit({
-      variables: {},
+      variables: {
+        input: {
+          webCardId,
+          published: true,
+        },
+      },
       onCompleted: () => {
         setShowPublishModal(false);
       },

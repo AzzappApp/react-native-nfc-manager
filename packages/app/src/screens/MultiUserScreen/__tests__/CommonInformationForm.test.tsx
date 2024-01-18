@@ -20,38 +20,59 @@ describe('ContactCardEditModal', () => {
     environment = createMockEnvironment();
     environment.mock.queueOperationResolver(operation => {
       return MockPayloadGenerator.generate(operation, {
-        CommonInformation() {
+        WebCard() {
           return {
-            company: 'Facebook',
-            emails: [
-              {
-                label: 'Work',
-                address: 'test@test.com',
-                selected: true,
-              },
-            ],
-            phoneNumbers: [
-              {
-                label: 'Work',
-                number: '1234567890',
-                selected: true,
-              },
-            ],
+            id: 'test-webcard',
+            commonInformation: {
+              company: 'Facebook',
+              emails: [
+                {
+                  label: 'Work',
+                  address: 'test@test.com',
+                  selected: true,
+                },
+              ],
+              phoneNumbers: [
+                {
+                  label: 'Work',
+                  number: '1234567890',
+                  selected: true,
+                },
+              ],
+            },
           };
         },
+        // CommonInformation() {
+        //   return {
+        //     company: 'Facebook',
+        //     emails: [
+        //       {
+        //         label: 'Work',
+        //         address: 'test@test.com',
+        //         selected: true,
+        //       },
+        //     ],
+        //     phoneNumbers: [
+        //       {
+        //         label: 'Work',
+        //         number: '1234567890',
+        //         selected: true,
+        //       },
+        //     ],
+        //   };
+        // },
       });
     });
 
     const TestRenderer = (props?: Partial<CommonInformationFormProps>) => {
-      const { viewer } = useLazyLoadQuery<CommonInformationFormTestQuery>(
+      const { webCard } = useLazyLoadQuery<CommonInformationFormTestQuery>(
         graphql`
           query CommonInformationFormTestQuery @relay_test_operation {
-            viewer {
-              profile {
-                webCard {
-                  commonInformation {
-                    ...CommonInformationForm_data
-                  }
+            webCard: node(id: "test-webcard") {
+              ... on WebCard {
+                id
+                commonInformation {
+                  ...CommonInformationForm_data
                 }
               }
             }
@@ -62,9 +83,10 @@ describe('ContactCardEditModal', () => {
 
       return (
         <CommonInformationForm
-          commonInformation={viewer.profile?.webCard.commonInformation ?? null}
+          commonInformation={webCard!.commonInformation ?? null}
           commonInfoFormIsOpened
           toggleCommonInfoForm={() => {}}
+          webCardId={webCard!.id!}
           {...props}
         />
       );
@@ -164,6 +186,7 @@ describe('ContactCardEditModal', () => {
           address: '<mock-value-for-field-"address">',
         },
       ],
+      webCardId: 'test-webcard',
     });
   });
 });

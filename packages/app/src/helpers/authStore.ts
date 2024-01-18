@@ -1,4 +1,3 @@
-import { toGlobalId } from 'graphql-relay';
 import EncryptedStorage from 'react-native-encrypted-storage';
 import { MMKV } from 'react-native-mmkv';
 import ERRORS from '@azzapp/shared/errors';
@@ -10,9 +9,26 @@ import { addGlobalEventListener } from './globalEvents';
  */
 
 const ENCRYPTED_STORAGE_TOKENS_KEY = 'AZZAPP_AUTH';
-const MMKVS_WEBCARD_ID = '@azzap/auth.webCardId';
-const MMKVS_PROFILE_ROLE = '@azzap/auth.profileRole';
+const MMKVS_PROFILE_INFOS = '@azzap/auth.profileInfos';
 const MMKVS_HAS_BEEN_SIGNED_IN = '@azzap/auth.hasBeenSignedIn';
+
+/**
+ * The profile infos
+ */
+export type ProfileInfos = {
+  /**
+   * the current user profile id
+   */
+  profileId: string;
+  /**
+   * the current user web card id
+   */
+  webCardId: string;
+  /**
+   * the current user profile role
+   */
+  profileRole: string;
+};
 
 /**
  * Auth state
@@ -23,13 +39,9 @@ export type AuthState = {
    */
   authenticated: boolean;
   /**
-   * The current user web card id, null if authenticated but without profile created
+   * the current profile infos  null if authenticated but without profile created
    */
-  webCardId: string | null;
-  /**
-   * The current user profile role, null if authenticated but without profile created
-   */
-  profileRole: string | null;
+  profileInfos: ProfileInfos | null;
   /**
    * Has the user been signed in at least once
    */
@@ -65,12 +77,9 @@ export const init = async () => {
 
   addGlobalEventListener(
     'SIGN_IN',
-    async ({ payload: { authTokens: tokens, webCardId, profileRole } }) => {
-      if (webCardId) {
-        storage.set(MMKVS_WEBCARD_ID, toGlobalId('WebCard', webCardId));
-      }
-      if (profileRole) {
-        storage.set(MMKVS_PROFILE_ROLE, profileRole);
+    async ({ payload: { authTokens: tokens, profileInfos } }) => {
+      if (profileInfos) {
+        storage.set(MMKVS_PROFILE_INFOS, JSON.stringify(profileInfos));
       }
       storage.set(MMKVS_HAS_BEEN_SIGNED_IN, true);
       await EncryptedStorage.setItem(
@@ -84,9 +93,11 @@ export const init = async () => {
 
   addGlobalEventListener(
     'WEBCARD_CHANGE',
-    async ({ payload: { webCardId, profileRole } }) => {
-      storage.set(MMKVS_WEBCARD_ID, webCardId);
-      storage.set(MMKVS_PROFILE_ROLE, profileRole);
+    async ({ payload: { profileId, webCardId, profileRole } }) => {
+      storage.set(
+        MMKVS_PROFILE_INFOS,
+        JSON.stringify({ profileId, webCardId, profileRole }),
+      );
       emitAuthState();
     },
   );
@@ -94,14 +105,19 @@ export const init = async () => {
   addGlobalEventListener(
     'PROFILE_ROLE_CHANGE',
     async ({ payload: { profileRole } }) => {
-      storage.set(MMKVS_PROFILE_ROLE, profileRole);
+      const profileInfos = getAuthState().profileInfos;
+      if (profileInfos) {
+        storage.set(
+          MMKVS_PROFILE_INFOS,
+          JSON.stringify({ ...profileInfos, profileRole }),
+        );
+      }
       emitAuthState();
     },
   );
 
   addGlobalEventListener('SIGN_OUT', async () => {
-    storage.delete(MMKVS_WEBCARD_ID);
-    storage.delete(MMKVS_PROFILE_ROLE);
+    storage.delete(MMKVS_PROFILE_INFOS);
     clearRecentSearch();
     await EncryptedStorage.clear();
     authTokens = null;
@@ -121,7 +137,7 @@ export const init = async () => {
 
   addGlobalEventListener('NETWORK_ERROR', async ({ payload: { error } }) => {
     if (error instanceof Error && error.message === ERRORS.INVALID_TOKEN) {
-      storage.delete(MMKVS_WEBCARD_ID);
+      storage.delete(MMKVS_PROFILE_INFOS);
       await EncryptedStorage.removeItem(ENCRYPTED_STORAGE_TOKENS_KEY);
       authTokens = null;
       emitAuthState();
@@ -132,12 +148,21 @@ export const init = async () => {
 /**
  * Return the current auth state
  */
-export const getAuthState = (): AuthState => ({
-  authenticated: authTokens !== null,
-  webCardId: storage.getString(MMKVS_WEBCARD_ID) ?? null,
-  hasBeenSignedIn: storage.getBoolean(MMKVS_HAS_BEEN_SIGNED_IN) ?? false,
-  profileRole: storage.getString(MMKVS_PROFILE_ROLE) ?? null,
-});
+export const getAuthState = (): AuthState => {
+  const profileInfoString = storage.getString(MMKVS_PROFILE_INFOS);
+  let profileInfos: any = null;
+  try {
+    profileInfos = profileInfoString ? JSON.parse(profileInfoString) : null;
+  } catch (e) {
+    profileInfos = null;
+  }
+
+  return {
+    authenticated: authTokens !== null,
+    profileInfos: profileInfos ?? null,
+    hasBeenSignedIn: storage.getBoolean(MMKVS_HAS_BEEN_SIGNED_IN) ?? false,
+  };
+};
 
 /**
  * Add a listener to the auth state

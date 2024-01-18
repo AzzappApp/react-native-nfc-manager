@@ -9,7 +9,7 @@ import jwt from 'jsonwebtoken';
 import { NextResponse } from 'next/server';
 import {
   buildDefaultContactCard,
-  getProfileWithWebCardId,
+  getUserProfileWithWebCardId,
   getWebCardById,
 } from '@azzapp/data/domains';
 import ERRORS from '@azzapp/shared/errors';
@@ -40,7 +40,7 @@ const getGoogleWalletPass = async (
       );
     }
     currentUserId = userId;
-    const profile = await getProfileWithWebCardId(userId, webCardId);
+    const profile = await getUserProfileWithWebCardId(userId, webCardId);
     if (!profile) {
       return NextResponse.json(
         { message: ERRORS.UNAUTHORIZED },

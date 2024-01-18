@@ -36,7 +36,7 @@ const PostRendererActionBar = ({
   const router = useRouter();
   const intl = useIntl();
   const {
-    viewerPostReaction,
+    postReaction: viewerPostReaction,
     id: postId,
     allowLikes,
     allowComments,
@@ -44,9 +44,10 @@ const PostRendererActionBar = ({
     webCard,
   } = useFragment(
     graphql`
-      fragment PostRendererActionBar_post on Post {
+      fragment PostRendererActionBar_post on Post
+      @argumentDefinitions(viewerWebCardId: { type: "ID!" }) {
         id
-        viewerPostReaction
+        postReaction(webCardId: $viewerWebCardId)
         allowComments
         allowLikes
         counterReactions
@@ -62,11 +63,12 @@ const PostRendererActionBar = ({
   const [commit] = useMutation<PostRendererActionBarReactionMutation>(graphql`
     mutation PostRendererActionBarReactionMutation(
       $input: TogglePostReactionInput!
+      $viewerWebCardId: ID!
     ) {
       togglePostReaction(input: $input) {
         post {
           id
-          viewerPostReaction
+          postReaction(webCardId: $viewerWebCardId)
           counterReactions
         }
       }
@@ -84,14 +86,19 @@ const PostRendererActionBar = ({
   const [countReactions, setCountReactions] =
     useState<number>(counterReactions);
 
-  const { webCardId, profileRole } = useAuthState();
+  const { profileInfos } = useAuthState();
   const debouncedCommit = useDebouncedCallback(
     () => {
+      if (!profileInfos) {
+        return;
+      }
       if (viewerPostReaction !== reaction) {
         const add = viewerPostReaction !== reaction;
         commit({
           variables: {
+            viewerWebCardId: profileInfos.webCardId,
             input: {
+              webCardId: profileInfos.webCardId,
               postId,
               reactionKind: 'like',
             },
@@ -100,7 +107,7 @@ const PostRendererActionBar = ({
             togglePostReaction: {
               post: {
                 id: postId,
-                viewerPostReaction: add ? reaction : null,
+                postReaction: add ? reaction : null,
                 counterReactions: Math.max(
                   0,
                   add ? countReactions + 1 : countReactions - 1,
@@ -113,8 +120,7 @@ const PostRendererActionBar = ({
             response: PostRendererActionBarReactionMutation$data,
           ) => {
             const reaction = response.togglePostReaction;
-            const added =
-              response.togglePostReaction.post.viewerPostReaction != null;
+            const added = response.togglePostReaction.post.postReaction != null;
 
             const post = store.get<{ counterReactions: number }>(
               reaction.post.id,
@@ -128,20 +134,17 @@ const PostRendererActionBar = ({
                   'counterReactions',
                 );
               }
-              post.setValue(
-                reaction.post.viewerPostReaction,
-                'viewerPostReaction',
-              );
+              post.setValue(reaction.post.postReaction, 'postReaction', {
+                webCardId: profileInfos.webCardId,
+              });
             }
-            if (webCardId) {
-              const webCard = store.get(webCardId);
-              const counter = webCard?.getValue('nbPostsLiked');
-              if (typeof counter === 'number') {
-                webCard?.setValue(
-                  Math.max(counter + (added ? 1 : -1), 0),
-                  'nbPostsLiked',
-                );
-              }
+            const webCard = store.get(profileInfos.webCardId);
+            const counter = webCard?.getValue('nbPostsLiked');
+            if (typeof counter === 'number') {
+              webCard?.setValue(
+                Math.max(counter + (added ? 1 : -1), 0),
+                'nbPostsLiked',
+              );
             }
           },
           onError: error => {
@@ -185,7 +188,7 @@ const PostRendererActionBar = ({
 
   // toggle the value locally
   const toggleReaction = useCallback(() => {
-    if (profileRole && isEditor(profileRole)) {
+    if (isEditor(profileInfos?.profileRole)) {
       if (reaction) {
         setCountReactions(countReactions - 1);
         setReaction(null);
@@ -204,7 +207,13 @@ const PostRendererActionBar = ({
         }),
       });
     }
-  }, [countReactions, debouncedCommit, intl, profileRole, reaction]);
+  }, [
+    countReactions,
+    debouncedCommit,
+    intl,
+    profileInfos?.profileRole,
+    reaction,
+  ]);
 
   const goToComments = () => {
     router.push({

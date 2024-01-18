@@ -167,21 +167,25 @@ const WebCardScreenButtonActionButton = ({
 }: ProfileScreenButtonActionButtonProps) => {
   const webCard = useFragment(
     graphql`
-      fragment WebCardScreenButtonBar_webCard on WebCard {
+      fragment WebCardScreenButtonBar_webCard on WebCard
+      @argumentDefinitions(viewerWebCardId: { type: "ID" }) {
         id
         userName
-        isFollowing
+        webCardScreenButtonBar_isFollowing: isFollowing(
+          webCardId: $viewerWebCardId
+        )
       }
     `,
     webCardKey,
   );
+  const isFollowing = webCard.webCardScreenButtonBar_isFollowing;
 
-  const { profileRole } = useAuthState();
+  const { profileInfos } = useAuthState();
 
   const debouncedToggleFollowing = useDebouncedCallback(() => {
-    if (profileRole && isEditor(profileRole)) {
-      onToggleFollow(webCard.id, webCard.userName, !webCard.isFollowing);
-    } else if (webCard.isFollowing) {
+    if (profileInfos?.profileRole && isEditor(profileInfos.profileRole)) {
+      onToggleFollow(webCard.id, webCard.userName, !isFollowing);
+    } else if (isFollowing) {
       Toast.show({
         type: 'error',
         text1: intl.formatMessage({
@@ -206,7 +210,7 @@ const WebCardScreenButtonActionButton = ({
 
   const router = useRouter();
   const onCreateNewPost = () => {
-    if (profileRole && isEditor(profileRole)) {
+    if (profileInfos?.profileRole && isEditor(profileInfos?.profileRole)) {
       router.push({ route: 'NEW_POST', params: { fromProfile: true } });
     } else {
       Toast.show({
@@ -268,7 +272,7 @@ const WebCardScreenButtonActionButton = ({
         })}
       >
         <Text variant="button" style={styles.textButton}>
-          {webCard.isFollowing ? (
+          {isFollowing ? (
             <FormattedMessage
               defaultMessage="Unfollow"
               description="Unfollow button label in WebCard Screen Button Bar"

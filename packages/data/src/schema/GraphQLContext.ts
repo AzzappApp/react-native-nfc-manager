@@ -43,10 +43,7 @@ import type {
 export type GraphQLContext = {
   cardUsernamesToRevalidate: Set<string>;
   postsToRevalidate: Set<{ userName: string; id: string }>;
-  auth: {
-    userId?: string;
-    profileId?: string;
-  };
+  auth: { userId?: string };
   locale: string;
   loaders: Loaders;
   sessionMemoized: <T>(t: () => T) => T;

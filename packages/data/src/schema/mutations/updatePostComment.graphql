@@ -7,12 +7,18 @@ extend type Mutation {
 
 input UpdatePostCommentInput {
   """
-  The post id we want toggle like on
+  The comment ID
   """
   commentId: ID!
+  """
+  The comment content
+  """
   comment: String!
 }
 
 type UpdatePostCommentPayload {
+  """
+  The updated post comment
+  """
   postComment: PostComment
 }

@@ -84,10 +84,10 @@ const WebCardColorPicker = ({
   const intl = useIntl();
 
   const onSave = useCallback(() => {
-    if (saving) {
+    if (saving || !webCard) {
       return;
     }
-    const input = webCard?.cardColors
+    const cardColors = webCard?.cardColors
       ? pick(webCard.cardColors, ['primary', 'light', 'dark', 'otherColors'])
       : {
           ...DEFAULT_COLOR_PALETTE,
@@ -95,13 +95,16 @@ const WebCardColorPicker = ({
         };
     commit({
       variables: {
-        input,
+        input: {
+          ...cardColors,
+          webCardId: webCard.id,
+        },
       },
       updater: webCard?.id
         ? cardColorsStoreUpdater(webCard.id, colorPalette)
         : undefined,
       onCompleted: _ => {
-        setCurrentPalette(pick(input, ['primary', 'light', 'dark']));
+        setCurrentPalette(pick(cardColors, ['primary', 'light', 'dark']));
         if (optimisticUpdate.current) {
           environment.revertUpdate(optimisticUpdate.current);
           optimisticUpdate.current = null;
@@ -122,8 +125,7 @@ const WebCardColorPicker = ({
     });
   }, [
     saving,
-    webCard?.cardColors,
-    webCard?.id,
+    webCard,
     commit,
     colorPalette,
     onRequestClose,

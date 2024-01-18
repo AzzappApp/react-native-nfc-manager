@@ -1,19 +1,20 @@
 import { GraphQLError } from 'graphql';
 import ERRORS from '@azzapp/shared/errors';
 import { buildDefaultContactCard, updateProfile } from '#domains';
+import fromGlobalIdWithType from '#helpers/relayIdHelpers';
 import type { Profile } from '#domains';
 import type { MutationResolvers } from '#schema/__generated__/types';
 
 const saveContactCard: MutationResolvers['saveContactCard'] = async (
   _,
-  { input: { displayedOnWebCard, isPrivate, avatarId, ...data } },
+  { input: { profileId: gqlProfileId, contactCard } },
   { auth, loaders },
 ) => {
-  const { profileId, userId } = auth;
-  if (!profileId || !userId) {
+  const { userId } = auth;
+  if (!userId) {
     throw new GraphQLError(ERRORS.UNAUTHORIZED);
   }
-
+  const profileId = fromGlobalIdWithType(gqlProfileId, 'Profile');
   const profile = await loaders.Profile.load(profileId);
   if (!profile) {
     throw new GraphQLError(ERRORS.INVALID_REQUEST);
@@ -25,22 +26,16 @@ const saveContactCard: MutationResolvers['saveContactCard'] = async (
     throw new GraphQLError(ERRORS.INVALID_REQUEST);
   }
 
-  if ('birthday' in data) {
-    data.birthday = data.birthday ?? undefined;
-  }
-
   const updates: Partial<Profile> = {
     contactCard: {
       ...(profile.contactCard ??
         (await buildDefaultContactCard(webCard, userId))),
-      ...(data as Partial<Profile['contactCard']>),
+      ...contactCard,
     },
     lastContactCardUpdate: new Date(),
-    contactCardIsPrivate: !!isPrivate,
-    contactCardDisplayedOnWebCard: !!displayedOnWebCard,
   };
 
-  updates.avatarId = avatarId;
+  updates.avatarId = contactCard.avatarId ?? profile.avatarId;
 
   try {
     await updateProfile(profileId, updates);

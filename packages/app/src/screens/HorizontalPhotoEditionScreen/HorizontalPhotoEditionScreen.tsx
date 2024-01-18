@@ -38,7 +38,7 @@ import HorizontalPhotoPreview from './HorizontalPhotoPreview';
 import HorizontalPhotoSettingsEditionPanel from './HorizontalPhotoSettingsEditionPanel';
 import type { ImagePickerResult } from '#components/ImagePicker';
 import type { HorizontalPhotoEditionScreen_module$key } from '#relayArtifacts/HorizontalPhotoEditionScreen_module.graphql';
-import type { HorizontalPhotoEditionScreen_viewer$key } from '#relayArtifacts/HorizontalPhotoEditionScreen_viewer.graphql';
+import type { HorizontalPhotoEditionScreen_profile$key } from '#relayArtifacts/HorizontalPhotoEditionScreen_profile.graphql';
 import type {
   HorizontalPhotoEditionScreenUpdateModuleMutation,
   SaveHorizontalPhotoModuleInput,
@@ -50,7 +50,7 @@ export type HorizontalPhotoEditionScreenProps = ViewProps & {
   /**
    * the current viewer
    */
-  viewer: HorizontalPhotoEditionScreen_viewer$key;
+  profile: HorizontalPhotoEditionScreen_profile$key;
   /**
    * the current module to edit, if null, a new module will be created
    */
@@ -62,7 +62,7 @@ export type HorizontalPhotoEditionScreenProps = ViewProps & {
  */
 const HorizontalPhotoEditionScreen = ({
   module,
-  viewer: viewerKey,
+  profile: profileKey,
 }: HorizontalPhotoEditionScreenProps) => {
   // #region Data retrieval
   const horizontalPhoto = useFragment(
@@ -99,40 +99,39 @@ const HorizontalPhotoEditionScreen = ({
     module,
   );
 
-  const viewer = useFragment(
+  const profile = useFragment(
     graphql`
-      fragment HorizontalPhotoEditionScreen_viewer on Viewer {
-        ...HorizontalPhotoBackgroundEditionPanel_viewer
+      fragment HorizontalPhotoEditionScreen_profile on Profile {
+        ...HorizontalPhotoBackgroundEditionPanel_profile
         moduleBackgrounds {
           id
           uri
           resizeMode
         }
-        profile {
-          webCard {
-            cardColors {
-              primary
-              light
-              dark
-            }
-            cardStyle {
-              borderColor
-              borderRadius
-              borderWidth
-              buttonColor
-              buttonRadius
-              fontFamily
-              fontSize
-              gap
-              titleFontFamily
-              titleFontSize
-            }
-            ...HorizontalPhotoBorderEditionPanel_webCard
+        webCard {
+          id
+          cardColors {
+            primary
+            light
+            dark
           }
+          cardStyle {
+            borderColor
+            borderRadius
+            borderWidth
+            buttonColor
+            buttonRadius
+            fontFamily
+            fontSize
+            gap
+            titleFontFamily
+            titleFontSize
+          }
+          ...HorizontalPhotoBorderEditionPanel_webCard
         }
       }
     `,
-    viewerKey,
+    profileKey,
   );
 
   // #endregion
@@ -154,7 +153,7 @@ const HorizontalPhotoEditionScreen = ({
 
   const { data, value, fieldUpdateHandler, dirty } = useModuleDataEditor({
     initialValue,
-    cardStyle: viewer.profile?.webCard.cardStyle,
+    cardStyle: profile?.webCard.cardStyle,
     styleValuesMap: HORIZONTAL_PHOTO_STYLE_VALUES,
     defaultValues: HORIZONTAL_PHOTO_DEFAULT_VALUES,
   });
@@ -174,7 +173,7 @@ const HorizontalPhotoEditionScreen = ({
   const previewData = {
     ...omit(data, 'backgroundId'),
     background:
-      viewer.moduleBackgrounds.find(
+      profile.moduleBackgrounds.find(
         background => background.id === backgroundId,
       ) ?? null,
   };
@@ -250,6 +249,7 @@ const HorizontalPhotoEditionScreen = ({
     }
 
     const input: SaveHorizontalPhotoModuleInput = {
+      webCardId: profile.webCard.id,
       moduleId: horizontalPhoto?.id,
       image: mediaId ?? value.image!.id,
       ...rest,
@@ -279,9 +279,9 @@ const HorizontalPhotoEditionScreen = ({
   }, [
     canSave,
     value,
+    profile.webCard.id,
     horizontalPhoto?.id,
     commit,
-    setProgressIndicator,
     intl,
     router,
   ]);
@@ -410,8 +410,8 @@ const HorizontalPhotoEditionScreen = ({
         <HorizontalPhotoPreview
           style={{ height: topPanelHeight - 110, marginVertical: 10 }}
           data={previewData}
-          colorPalette={viewer.profile?.webCard.cardColors}
-          cardStyle={viewer.profile?.webCard.cardStyle}
+          colorPalette={profile?.webCard.cardColors}
+          cardStyle={profile?.webCard.cardStyle}
         />
       </PressableOpacity>
       <View
@@ -453,7 +453,7 @@ const HorizontalPhotoEditionScreen = ({
                 onBorderRadiusChange={onBorderradiusChange}
                 borderColor={borderColor}
                 onBorderColorChange={onBordercolorChange}
-                webCard={viewer.profile?.webCard ?? null}
+                webCard={profile?.webCard ?? null}
                 bottomSheetHeight={bottomPanelHeight}
                 style={{
                   flex: 1,
@@ -481,7 +481,7 @@ const HorizontalPhotoEditionScreen = ({
             id: 'background',
             element: (
               <HorizontalPhotoBackgroundEditionPanel
-                viewer={viewer}
+                profile={profile}
                 backgroundId={backgroundId}
                 backgroundStyle={backgroundStyle}
                 onBackgroundChange={onBackgroundChange}

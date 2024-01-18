@@ -8,7 +8,6 @@ import ContactCard, {
 } from '#components/ContactCard/ContactCard';
 import Link from '#components/Link';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
-import WebCardBoundRelayEnvironmentProvider from '#helpers/WebCardBoundRelayEnvironmentProvider';
 import PressableNative from '#ui/PressableNative';
 import type { HomeContactCard_profile$key } from '#relayArtifacts/HomeContactCard_profile.graphql';
 import type { HomeContactCard_user$key } from '#relayArtifacts/HomeContactCard_user.graphql';
@@ -50,18 +49,14 @@ const HomeContactCard = ({
       }}
     >
       {profiles?.map((item, index) => (
-        <WebCardBoundRelayEnvironmentProvider
+        <MemoContactCardItem
           key={item.webCard.id}
-          webCardId={item.webCard.id}
-        >
-          <MemoContactCardItem
-            width={windowWidth}
-            height={height}
-            item={item}
-            currentProfileIndexSharedValue={currentProfileIndexSharedValue}
-            index={index}
-          />
-        </WebCardBoundRelayEnvironmentProvider>
+          width={windowWidth}
+          height={height}
+          item={item}
+          currentProfileIndexSharedValue={currentProfileIndexSharedValue}
+          index={index}
+        />
       ))}
     </View>
   );

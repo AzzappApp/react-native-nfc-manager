@@ -40,11 +40,11 @@ import PressableOpacity from '#ui/PressableOpacity';
 import PressableScaleHighlight from '#ui/PressableScaleHighlight';
 import CoverErrorRenderer from '../CoverErrorRenderer';
 import type { TimeRange } from '#components/ImagePicker/imagePickerTypes';
+import type { CoverEditorTemplateList_profile$key } from '#relayArtifacts/CoverEditorTemplateList_profile.graphql';
 import type { CoverEditorTemplateList_templates$key } from '#relayArtifacts/CoverEditorTemplateList_templates.graphql';
 import type { CoverEditorTemplateList_templatesOthers$key } from '#relayArtifacts/CoverEditorTemplateList_templatesOthers.graphql';
 import type { CoverEditorTemplateList_templatesPeople$key } from '#relayArtifacts/CoverEditorTemplateList_templatesPeople.graphql';
 import type { CoverEditorTemplateList_templatesVideos$key } from '#relayArtifacts/CoverEditorTemplateList_templatesVideos.graphql';
-import type { CoverEditorTemplateList_viewer$key } from '#relayArtifacts/CoverEditorTemplateList_viewer.graphql';
 import type {
   CoverEditorTemplateListItem_coverTemplate$key,
   CoverTemplateKind,
@@ -55,7 +55,7 @@ import type { ColorPalette } from '@azzapp/shared/cardHelpers';
 import type { ListRenderItemInfo, ViewToken } from 'react-native';
 
 export type CoverEditorProps = {
-  viewer: CoverEditorTemplateList_viewer$key;
+  profile: CoverEditorTemplateList_profile$key;
   templateKind: CoverTemplateKind;
   mediaInfos: MediaInfos | null;
   title: string | null;
@@ -82,7 +82,7 @@ export type CoverEditorProps = {
 };
 
 const CoverEditorTemplateList = ({
-  viewer: viewerKey,
+  profile: profileKey,
   templateKind = 'people',
   mediaInfos,
   timeRange,
@@ -99,9 +99,9 @@ const CoverEditorTemplateList = ({
   onSelectedIndexChange,
   videoPaused,
 }: CoverEditorProps) => {
-  const viewer = useFragment(
+  const profile = useFragment(
     graphql`
-      fragment CoverEditorTemplateList_viewer on Viewer {
+      fragment CoverEditorTemplateList_profile on Profile {
         colorPalettes(first: 100) {
           edges {
             node {
@@ -112,20 +112,18 @@ const CoverEditorTemplateList = ({
             }
           }
         }
-        profile {
-          webCard {
-            id
-            webCardKind
-          }
+        webCard {
+          id
+          webCardKind
         }
         ...CoverEditorTemplateList_templates
       }
     `,
-    viewerKey,
+    profileKey,
   );
 
   const { coverTemplates, loadNext, isLoadingNext, hasNext } =
-    useCoverTemplates(viewer, templateKind);
+    useCoverTemplates(profile, templateKind);
 
   const onEndTemplateReached = useCallback(() => {
     if (hasNext && !isLoadingNext) {
@@ -133,12 +131,12 @@ const CoverEditorTemplateList = ({
     }
   }, [hasNext, isLoadingNext, loadNext]);
 
-  //in some case viewer.colorPalette seems to be null (sentry crash
+  //in some case profile.colorPalette seems to be null (sentry crash
   const colorPalettes = useMemo(() => {
     return convertToNonNullArray(
-      (viewer?.colorPalettes?.edges ?? []).map(edge => edge?.node ?? null),
+      (profile?.colorPalettes?.edges ?? []).map(edge => edge?.node ?? null),
     );
-  }, [viewer?.colorPalettes?.edges]);
+  }, [profile?.colorPalettes?.edges]);
 
   const items = useMemo<TemplateListItem[]>(() => {
     const templates = convertToNonNullArray(
@@ -634,23 +632,23 @@ const CoverEditorTemplateList = ({
 export default CoverEditorTemplateList;
 
 const useCoverTemplates = (
-  viewerKey: CoverEditorTemplateList_templates$key,
+  profileKey: CoverEditorTemplateList_templates$key,
   kind: string,
 ) => {
-  const viewer = useFragment(
+  const profile = useFragment(
     graphql`
-      fragment CoverEditorTemplateList_templates on Viewer {
+      fragment CoverEditorTemplateList_templates on Profile {
         ...CoverEditorTemplateList_templatesPeople
         ...CoverEditorTemplateList_templatesVideos
         ...CoverEditorTemplateList_templatesOthers
       }
     `,
-    viewerKey,
+    profileKey,
   );
 
   const peopleFragmentResult = usePaginationFragment(
     graphql`
-      fragment CoverEditorTemplateList_templatesPeople on Viewer
+      fragment CoverEditorTemplateList_templatesPeople on Profile
       @refetchable(queryName: "CoverEditorTemplateList_people_templates_query")
       @argumentDefinitions(
         after: { type: String }
@@ -672,12 +670,12 @@ const useCoverTemplates = (
         }
       }
     `,
-    viewer as CoverEditorTemplateList_templatesPeople$key,
+    profile as CoverEditorTemplateList_templatesPeople$key,
   );
 
   const videosFragmentResult = usePaginationFragment(
     graphql`
-      fragment CoverEditorTemplateList_templatesVideos on Viewer
+      fragment CoverEditorTemplateList_templatesVideos on Profile
       @refetchable(queryName: "CoverEditorTemplateList_videos_templates_query")
       @argumentDefinitions(
         after: { type: String }
@@ -699,12 +697,12 @@ const useCoverTemplates = (
         }
       }
     `,
-    viewer as CoverEditorTemplateList_templatesVideos$key,
+    profile as CoverEditorTemplateList_templatesVideos$key,
   );
 
   const othersFragmentResult = usePaginationFragment(
     graphql`
-      fragment CoverEditorTemplateList_templatesOthers on Viewer
+      fragment CoverEditorTemplateList_templatesOthers on Profile
       @refetchable(queryName: "CoverEditorTemplateList_others_templates_query")
       @argumentDefinitions(
         after: { type: String }
@@ -726,7 +724,7 @@ const useCoverTemplates = (
         }
       }
     `,
-    viewer as CoverEditorTemplateList_templatesOthers$key,
+    profile as CoverEditorTemplateList_templatesOthers$key,
   );
 
   switch (kind) {

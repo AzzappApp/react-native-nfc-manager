@@ -21,13 +21,11 @@ import type { InviteFriendsScreenQuery } from '#relayArtifacts/InviteFriendsScre
 import type { InviteFriendsRoute } from '#routes';
 
 const inviteFriendsScreenQuery = graphql`
-  query InviteFriendsScreenQuery {
-    viewer {
-      profile {
-        webCard {
-          userName
-          ...AccountHeader_webCard
-        }
+  query InviteFriendsScreenQuery($webCardId: ID!) {
+    node(id: $webCardId) {
+      ... on WebCard @alias(as: "webCard") {
+        userName
+        ...AccountHeader_webCard
       }
     }
   }
@@ -36,9 +34,8 @@ const inviteFriendsScreenQuery = graphql`
 const InviteFriendsScreen = ({
   preloadedQuery,
 }: RelayScreenProps<InviteFriendsRoute, InviteFriendsScreenQuery>) => {
-  const {
-    viewer: { profile },
-  } = usePreloadedQuery(inviteFriendsScreenQuery, preloadedQuery);
+  const { node } = usePreloadedQuery(inviteFriendsScreenQuery, preloadedQuery);
+  const webCard = node?.webCard;
 
   const intl = useIntl();
 
@@ -48,7 +45,7 @@ const InviteFriendsScreen = ({
         'Hey, I’m using Azzapp as {userName}. Install the app to subscribe to my photos and videos. {url}',
       description: 'Invite message to share with friends',
     },
-    { userName: profile?.webCard?.userName, url: 'https://azzapp.com' },
+    { userName: webCard?.userName, url: 'https://azzapp.com' },
   );
 
   // const subject = intl.formatMessage({
@@ -70,7 +67,7 @@ const InviteFriendsScreen = ({
     <Container style={{ flex: 1 }}>
       <SafeAreaView style={{ flex: 1, rowGap: 15 }}>
         <AccountHeader
-          webCard={profile?.webCard ?? null}
+          webCard={webCard ?? null}
           title={intl.formatMessage({
             defaultMessage: 'Invite Friends',
             description:
@@ -176,6 +173,9 @@ const InviteFriendsScreen = ({
 
 export default relayScreen(InviteFriendsScreen, {
   query: inviteFriendsScreenQuery,
+  getVariables: (_, profileInfos) => ({
+    webCardId: profileInfos?.webCardId ?? '',
+  }),
 });
 
 const buildWhatsAppLink = (text: string) => {

@@ -23,27 +23,29 @@ const CarouselEditionMobileScreen = ({
   moduleId,
   preloadedQuery,
 }: CarouselEditionMobileScreenProps) => {
-  const data = usePreloadedQuery(CarouselQuery, preloadedQuery);
+  const { profile } = usePreloadedQuery(CarouselQuery, preloadedQuery);
+  if (!profile) {
+    return null;
+  }
 
   let module: CarouselEditionScreen_module$key | null = null;
   if (moduleId != null) {
     module =
-      data.viewer.profile?.webCard.cardModules.find(
-        module => module?.id === moduleId,
-      ) ?? null;
+      profile?.webCard?.cardModules.find(module => module?.id === moduleId) ??
+      null;
     if (!module) {
       // TODO
     }
   }
 
-  return <CarouselEditionScreen module={module} viewer={data.viewer} />;
+  return <CarouselEditionScreen module={module} profile={profile} />;
 };
 
 const CarouselQuery = graphql`
-  query CarouselEditionMobileScreenQuery {
-    viewer {
-      ...CarouselEditionScreen_viewer
-      profile {
+  query CarouselEditionMobileScreenQuery($profileId: ID!) {
+    profile: node(id: $profileId) {
+      ... on Profile {
+        ...CarouselEditionScreen_profile
         webCard {
           cardModules {
             id

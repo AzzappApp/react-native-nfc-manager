@@ -82,11 +82,14 @@ const FollowersScreenList = ({
 
   const intl = useIntl();
 
-  const { profileRole } = useAuthState();
+  const { profileInfos } = useAuthState();
 
   const removeFollower = useCallback(
-    (webCardId: string) => {
-      if (profileRole && isEditor(profileRole)) {
+    (removedFollowerId: string) => {
+      if (!profileInfos) {
+        return;
+      }
+      if (isEditor(profileInfos?.profileRole)) {
         // currentProfileId is undefined when user is anonymous so we can't follow
         if (currentWebCardId && data?.followers) {
           //data.followers was null on sentry crash
@@ -95,18 +98,15 @@ const FollowersScreenList = ({
           commit({
             variables: {
               input: {
-                webCardId,
+                webCardId: profileInfos.webCardId,
+                removedFollowerId,
               },
               connections: [connectionID],
             },
-            optimisticResponse: {
-              removeFollower: {
-                removedFollowerId: webCardId,
-              },
-            },
             optimisticUpdater: store =>
-              updater(store, currentWebCardId, webCardId),
-            updater: store => updater(store, currentWebCardId, webCardId),
+              updater(store, currentWebCardId, removedFollowerId),
+            updater: store =>
+              updater(store, currentWebCardId, removedFollowerId),
             onError(error) {
               console.error(error);
               Toast.show({
@@ -132,7 +132,7 @@ const FollowersScreenList = ({
         });
       }
     },
-    [commit, currentWebCardId, data?.followers, intl, profileRole],
+    [commit, currentWebCardId, data?.followers, intl, profileInfos],
   );
 
   const [searchValue, setSearchValue] = useState<string | undefined>('');

@@ -4,6 +4,7 @@ import ERRORS from '@azzapp/shared/errors';
 import { ProfileTable, db } from '#domains';
 import type { MutationResolvers } from '#schema/__generated__/types';
 
+// TODO I DON'T understand  why profileId is not a globalId here
 const declineInvitationMutation: MutationResolvers['declineInvitation'] =
   async (_, { input: { profileId } }, { auth, loaders }) => {
     const { userId } = auth;

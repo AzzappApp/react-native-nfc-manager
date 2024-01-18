@@ -24,7 +24,9 @@ import {
   updateCardModule,
   createCardModule,
   getCardModuleNextPosition,
+  getUserProfileWithWebCardId,
 } from '#domains';
+import fromGlobalIdWithType from '#helpers/relayIdHelpers';
 import type { GraphQLContext } from '#index';
 import type { MutationResolvers } from '#schema/__generated__/types';
 import type { ZodType } from 'zod';
@@ -34,25 +36,26 @@ const createModuleSavingMutation =
   async (
     _: unknown,
     {
-      input: { moduleId, ...data },
+      input: { moduleId, webCardId: gqlWebCardId, ...data },
     }: {
       input: TModule['data'] & {
+        webCardId: string;
         moduleId?: string | null;
       };
     },
     { auth, cardUsernamesToRevalidate, loaders }: GraphQLContext,
   ) => {
-    const { profileId, userId } = auth;
-    if (!profileId || !userId) {
+    const { userId } = auth;
+    const webCardId = fromGlobalIdWithType(gqlWebCardId, 'WebCard');
+    const profile =
+      userId && (await getUserProfileWithWebCardId(userId, webCardId));
+
+    if (
+      !profile ||
+      !('profileRole' in profile && isEditor(profile.profileRole))
+    ) {
       throw new GraphQLError(ERRORS.UNAUTHORIZED);
     }
-
-    const profile = await loaders.Profile.load(profileId);
-
-    if (!profile || !isEditor(profile.profileRole)) {
-      throw new GraphQLError(ERRORS.INVALID_REQUEST);
-    }
-
     const { validator, getMedias } = MODULES_SAVE_RULES[moduleKind] ?? {};
 
     let module: CardModule | null = null;

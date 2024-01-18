@@ -59,6 +59,8 @@ describe('SignUpScreen', () => {
     signupMock.mockResolvedValueOnce({
       token: 'fake-token',
       refreshToken: 'fake-refreshToken',
+      profileInfos: null,
+      userId: '',
     });
     dispatchGlobalEventMock.mockResolvedValueOnce(void 0);
 
@@ -97,6 +99,8 @@ describe('SignUpScreen', () => {
     signupMock.mockResolvedValueOnce({
       token: 'fake-token',
       refreshToken: 'fake-refreshToken',
+      profileInfos: null,
+      userId: '',
     });
 
     const emailOrCountryButton = screen.getByLabelText(

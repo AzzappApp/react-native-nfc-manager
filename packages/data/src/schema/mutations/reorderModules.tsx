@@ -4,6 +4,7 @@ import { isEditor } from '@azzapp/shared/profileHelpers';
 import {
   db,
   getCardModulesByIds,
+  getUserProfileWithWebCardId,
   resetCardModulesPositions,
   updateCardModule,
 } from '#domains';
@@ -11,30 +12,36 @@ import type { MutationResolvers } from '#schema/__generated__/types';
 
 const reorderModules: MutationResolvers['reorderModules'] = async (
   _,
-  { input: { moduleIds } },
+  { input: { modulesIds } },
   { auth, cardUsernamesToRevalidate, loaders },
 ) => {
-  const { profileId } = auth;
-  if (!profileId) {
-    throw new GraphQLError(ERRORS.UNAUTHORIZED);
+  const { userId } = auth;
+  const modules = await getCardModulesByIds(modulesIds);
+  if (modulesIds.length === 0) {
+    throw new GraphQLError(ERRORS.INVALID_REQUEST);
   }
 
-  const profile = await loaders.Profile.load(profileId);
-  if (!profile || !isEditor(profile.profileRole)) {
+  const webCardId = modules[0]!.webCardId;
+  if (
+    !modules.every(module => module != null && module.webCardId === webCardId)
+  ) {
     throw new GraphQLError(ERRORS.INVALID_REQUEST);
   }
-  const modules = await getCardModulesByIds(moduleIds);
-  if (modules.some(module => module?.webCardId !== profile.webCardId)) {
-    throw new GraphQLError(ERRORS.INVALID_REQUEST);
+
+  const profile =
+    userId && (await getUserProfileWithWebCardId(userId, webCardId));
+
+  if (!profile || !isEditor(profile.profileRole)) {
+    throw new GraphQLError(ERRORS.UNAUTHORIZED);
   }
 
   try {
     await db.transaction(async trx => {
-      for (let index = 0; index < moduleIds.length; index++) {
-        const moduleId = moduleIds[index];
+      for (let index = 0; index < modulesIds.length; index++) {
+        const moduleId = modulesIds[index];
         await updateCardModule(moduleId, { position: index }, trx);
       }
-      await resetCardModulesPositions(profileId, trx);
+      await resetCardModulesPositions(profile.id, trx);
     });
   } catch (e) {
     console.error(e);

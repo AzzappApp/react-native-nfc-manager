@@ -19,13 +19,9 @@ import type { MultiUserAddModalActions } from './MultiUserAddModal';
 import type * as Contacts from 'expo-contacts';
 
 const multiUserAddScreenQuery = graphql`
-  query MultiUserAddScreenQuery {
-    viewer {
-      profile {
-        webCard {
-          ...MultiUserAddModal_webCard
-        }
-      }
+  query MultiUserAddScreenQuery($webCardId: ID!) {
+    webCard: node(id: $webCardId) {
+      ...MultiUserAddModal_webCard
     }
   }
 `;
@@ -38,7 +34,10 @@ const MultiUserAddScreen = ({
 
   const [searchValue, setSearchValue] = useState<string | undefined>('');
 
-  const data = usePreloadedQuery(multiUserAddScreenQuery, preloadedQuery);
+  const { webCard } = usePreloadedQuery(
+    multiUserAddScreenQuery,
+    preloadedQuery,
+  );
 
   const ref = useRef<MultiUserAddModalActions>(null);
 
@@ -97,10 +96,10 @@ const MultiUserAddScreen = ({
           />
         </SafeAreaView>
       </Container>
-      {data.viewer.profile ? (
+      {webCard ? (
         <MultiUserAddModal
           onCompleted={router.back}
-          webCard={data.viewer.profile.webCard}
+          webCard={webCard}
           beforeClose={() => setSearchValue('')}
           ref={ref}
         />
@@ -115,4 +114,7 @@ const styles = StyleSheet.create({
 
 export default relayScreen(MultiUserAddScreen, {
   query: multiUserAddScreenQuery,
+  getVariables: (_, profileInfos) => ({
+    webCardId: profileInfos?.webCardId ?? '',
+  }),
 });

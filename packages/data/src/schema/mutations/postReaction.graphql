@@ -7,9 +7,16 @@ extend type Mutation {
 
 input TogglePostReactionInput {
   """
+  the id of the WebCard toggling the like
+  """
+  webCardId: ID!
+  """
   The post id we want toggle like on
   """
   postId: ID!
+  """
+  The reaction kind we want to toggle
+  """
   reactionKind: ReactionKind!
 }
 

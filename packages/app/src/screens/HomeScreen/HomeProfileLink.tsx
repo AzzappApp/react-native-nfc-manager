@@ -7,12 +7,10 @@ import { Toast } from 'react-native-toast-message/lib/src/Toast';
 import { useFragment, graphql } from 'react-relay';
 import { buildUserUrl } from '@azzapp/shared/urlHelpers';
 import { colors } from '#theme';
-import useMultiActorEnvironmentPluralFragment from '#hooks/useMultiActorEnvironmentPluralFragment';
 import Icon from '#ui/Icon';
 import PressableOpacity from '#ui/PressableOpacity';
 import Text from '#ui/Text';
 import type { HomeProfileLink_user$key } from '#relayArtifacts/HomeProfileLink_user.graphql';
-import type { HomeProfileLink_username$key } from '#relayArtifacts/HomeProfileLink_username.graphql';
 
 import type { SharedValue } from 'react-native-reanimated';
 
@@ -26,31 +24,18 @@ const HomeProfileLink = ({
   currentProfileIndexSharedValue,
   user: userKey,
 }: HomeProfileLinkProps) => {
-  const user = useFragment(
+  const { profiles } = useFragment(
     graphql`
       fragment HomeProfileLink_user on User {
         profiles {
           webCard {
             id
+            userName
           }
-          ...HomeProfileLink_username
         }
       }
     `,
     userKey,
-  );
-
-  const profiles = useMultiActorEnvironmentPluralFragment(
-    graphql`
-      fragment HomeProfileLink_username on Profile {
-        webCard {
-          id
-          userName
-        }
-      }
-    `,
-    (profile: any) => profile.webCard?.id,
-    user.profiles as readonly HomeProfileLink_username$key[],
   );
 
   const userNames = useMemo(

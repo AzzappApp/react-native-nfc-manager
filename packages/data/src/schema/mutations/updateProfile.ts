@@ -1,55 +1,45 @@
 import { GraphQLError } from 'graphql';
-import { fromGlobalId } from 'graphql-relay';
 import ERRORS from '@azzapp/shared/errors';
 import { isAdmin } from '@azzapp/shared/profileHelpers';
-import { updateProfile } from '#domains';
+import { getUserProfileWithWebCardId, updateProfile } from '#domains';
+import fromGlobalIdWithType from '#helpers/relayIdHelpers';
 import type { GraphQLContext } from '#index';
 import type { MutationResolvers } from '#schema/__generated__/types';
 
+// TODO why do we duplicate the avatarId in the profile and in the contactCard?
+// TODO in general perhaps this mutation should be split into two: one for the profile and one for the contactCard
 const updateProfileMutation: MutationResolvers['updateProfile'] = async (
   _,
-  { input },
+  { input: { profileId: gqlProfileId, profileRole, contactCard, avatarId } },
   { auth, loaders }: GraphQLContext,
 ) => {
-  const { profileId, userId } = auth;
+  const { userId } = auth;
+  const targetProfileId = fromGlobalIdWithType(gqlProfileId, 'Profile');
+  const targetProfile = await loaders.Profile.load(targetProfileId);
 
-  if (!profileId || !userId) {
+  if (!targetProfile || profileRole === 'owner') {
+    throw new GraphQLError(ERRORS.INVALID_REQUEST);
+  }
+
+  const currentProfile =
+    userId &&
+    (await getUserProfileWithWebCardId(userId, targetProfile.webCardId));
+
+  if (!currentProfile) {
     throw new GraphQLError(ERRORS.UNAUTHORIZED);
   }
 
-  const { id: targetProfileId, type } = fromGlobalId(input.profileId);
-
-  if (type !== 'Profile') {
-    throw new GraphQLError(ERRORS.INVALID_REQUEST);
+  if (
+    currentProfile.id !== targetProfileId &&
+    !isAdmin(currentProfile.profileRole)
+  ) {
+    throw new GraphQLError(ERRORS.UNAUTHORIZED);
   }
-
-  if (input.profileRole === 'owner')
-    throw new GraphQLError(ERRORS.INVALID_REQUEST);
-
-  const [author, target] = await Promise.all([
-    loaders.Profile.load(profileId),
-    loaders.Profile.load(targetProfileId),
-  ]);
-
-  if (!author || !target) throw new GraphQLError(ERRORS.INVALID_REQUEST);
-
-  if (profileId !== targetProfileId || input.profileRole) {
-    if (
-      !author ||
-      !target ||
-      !isAdmin(author.profileRole) ||
-      target.webCardId !== author.webCardId
-    ) {
-      throw new GraphQLError(ERRORS.UNAUTHORIZED);
-    }
-  }
-
-  const { profileRole, contactCard, avatarId } = input;
 
   if (
-    profileId === targetProfileId &&
+    currentProfile.id === targetProfileId &&
     profileRole &&
-    profileRole !== author.profileRole
+    profileRole !== currentProfile.profileRole
   ) {
     // we don't allow to change profile role of the profile you are logged in
     throw new GraphQLError(ERRORS.INVALID_REQUEST);
@@ -59,18 +49,25 @@ const updateProfileMutation: MutationResolvers['updateProfile'] = async (
     profileRole: profileRole ?? undefined,
     contactCard: {
       ...contactCard,
-      birthday: contactCard?.birthday ?? undefined,
     },
     avatarId,
   });
 
-  const profile = { ...target };
-  if (profileRole) Object.assign(profile, { profileRole });
-  Object.assign(profile, { avatarId });
-  if (contactCard) Object.assign(profile, { contactCard });
+  const updatedProfile = { ...targetProfile };
+  if (profileRole) {
+    updatedProfile.profileRole = profileRole;
+  }
+  if (avatarId) {
+    updatedProfile.avatarId = avatarId;
+  }
+  if (contactCard) {
+    updatedProfile.contactCard = {
+      ...contactCard,
+    };
+  }
 
   return {
-    profile,
+    profile: updatedProfile,
   };
 };
 

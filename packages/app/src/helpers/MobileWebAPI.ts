@@ -40,7 +40,7 @@ export const changePassword = withFetchFunction(
 
 export const refreshTokens = WebAPI.refreshTokens;
 
-export const uploadMedia = WebAPI.uploadMedia;
+export const uploadMedia: typeof WebAPI.uploadMedia = WebAPI.uploadMedia;
 
 export const uploadSign = withFetchFunction(
   WebAPI.uploadSign,

@@ -84,7 +84,7 @@ export const getProfileWithWebCardById = async (
     .then(res => res.pop() || null);
 };
 
-export const getProfileWithWebCardId = async (
+export const getUserProfileWithWebCardId = async (
   userId: string,
   webCardId: string,
 ) => {

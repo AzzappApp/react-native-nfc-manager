@@ -1,34 +1,40 @@
 import { eq, sql } from 'drizzle-orm';
 import { GraphQLError } from 'graphql';
-import { fromGlobalId } from 'graphql-relay';
 import ERRORS from '@azzapp/shared/errors';
 import { isEditor } from '@azzapp/shared/profileHelpers';
-import { WebCardTable, db, follows, isFollowing, unfollows } from '#domains';
+import {
+  WebCardTable,
+  db,
+  follows,
+  getUserProfileWithWebCardId,
+  isFollowing,
+  unfollows,
+} from '#domains';
+import fromGlobalIdWithType from '#helpers/relayIdHelpers';
 import type { WebCard } from '#domains';
 import type { MutationResolvers } from '#schema/__generated__/types';
 
 const toggleFollowing: MutationResolvers['toggleFollowing'] = async (
   _,
-  { input },
+  {
+    input: {
+      webCardId: gqlWebCardId,
+      targetWebCardId: gqlTargetWebCardId,
+      follow,
+    },
+  },
   { auth, loaders },
 ) => {
-  const { profileId, userId } = auth;
-  if (!profileId || !userId) {
+  const { userId } = auth;
+  const webCardId = fromGlobalIdWithType(gqlWebCardId, 'WebCard');
+  const profile =
+    userId && (await getUserProfileWithWebCardId(userId, webCardId));
+
+  if (!profile || !isEditor(profile.profileRole)) {
     throw new GraphQLError(ERRORS.UNAUTHORIZED);
   }
 
-  const profile = await loaders.Profile.load(profileId);
-  if (
-    !profile ||
-    !('profileRole' in profile && isEditor(profile.profileRole))
-  ) {
-    throw new GraphQLError(ERRORS.INVALID_REQUEST);
-  }
-
-  const { id: targetId, type } = fromGlobalId(input.webCardId);
-  if (type !== 'WebCard') {
-    throw new GraphQLError(ERRORS.INVALID_REQUEST);
-  }
+  const targetId = fromGlobalIdWithType(gqlTargetWebCardId, 'WebCard');
 
   let target: WebCard | null;
   try {
@@ -39,17 +45,15 @@ const toggleFollowing: MutationResolvers['toggleFollowing'] = async (
   if (!target) {
     throw new GraphQLError(ERRORS.INVALID_REQUEST);
   }
-  const { follow } = input;
-
   if (profile.webCardId === targetId) {
     throw new GraphQLError(ERRORS.INVALID_REQUEST);
   }
 
   try {
     await db.transaction(async trx => {
-      //fix: https://github.com/AzzappApp/azzapp/issues/1931 && https://github.com/AzzappApp/azzapp/issues/1930
+      // fix: https://github.com/AzzappApp/azzapp/issues/1931 && https://github.com/AzzappApp/azzapp/issues/1930
       // if the frontend allows spamming add or remove, this will cause the nbFollowers and nbFollowings to be negative (or opposite)
-      // is chking the actual status not enough, we can imaging splitting the function in 2 add/remove
+      // is checking the actual status not enough, we can imaging splitting the function in 2 add/remove
       const currentlyFollowing = await isFollowing(profile.webCardId, targetId);
       if (follow && currentlyFollowing) {
         return;

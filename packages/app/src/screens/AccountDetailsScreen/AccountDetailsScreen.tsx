@@ -46,6 +46,10 @@ const AccountDetailsScreen = ({
 
   const styles = useStyleSheet(styleSheet);
 
+  if (!currentUser) {
+    return null;
+  }
+
   return (
     <Container style={{ flex: 1 }}>
       <SafeAreaView
@@ -187,6 +191,6 @@ const styleSheet = createStyleSheet(appearance => ({
 
 export default relayScreen(AccountDetailsScreen, {
   query: accountDetailsScreenQuery,
-  webCardBound: false,
+  profileBound: false,
   fallback: AccountDetailsScreenFallback,
 });

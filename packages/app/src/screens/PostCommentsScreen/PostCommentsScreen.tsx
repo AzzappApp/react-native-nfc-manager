@@ -12,16 +12,12 @@ import type { PostCommentsScreenQuery } from '#relayArtifacts/PostCommentsScreen
 import type { PostRoute } from '#routes';
 
 const postCommentsMobileScreenQuery = graphql`
-  query PostCommentsScreenQuery($postId: ID!) {
-    viewer {
-      profile {
-        webCard {
-          ...AuthorCartoucheFragment_webCard
-        }
-      }
+  query PostCommentsScreenQuery($webCardId: ID!, $postId: ID!) {
+    webCard: node(id: $webCardId) {
+      ...AuthorCartoucheFragment_webCard
     }
-    node(id: $postId) {
-      ...PostCommentsList_comments
+    post: node(id: $postId) {
+      ...PostCommentsList_post
     }
   }
 `;
@@ -30,17 +26,16 @@ const PostCommentsMobileScreen = ({
   preloadedQuery,
   route: { params },
 }: RelayScreenProps<PostRoute, PostCommentsScreenQuery>) => {
-  const data = usePreloadedQuery(postCommentsMobileScreenQuery, preloadedQuery);
+  const { webCard, post } = usePreloadedQuery(
+    postCommentsMobileScreenQuery,
+    preloadedQuery,
+  );
 
-  if (!data.viewer.profile || !data.node) {
+  if (!webCard || !post) {
     return null;
   }
   return (
-    <PostCommentsList
-      webCard={data.viewer.profile.webCard}
-      post={data.node}
-      postId={params.postId}
-    />
+    <PostCommentsList webCard={webCard} post={post} postId={params.postId} />
   );
 };
 
@@ -65,6 +60,9 @@ const PostCommentsScreenFallback = () => {
 
 export default relayScreen(PostCommentsMobileScreen, {
   query: postCommentsMobileScreenQuery,
+  getVariables: ({ postId }, profileInfos) => ({
+    postId,
+    webCardId: profileInfos?.webCardId ?? '',
+  }),
   fallback: PostCommentsScreenFallback,
-  getVariables: ({ postId }) => ({ postId }),
 });

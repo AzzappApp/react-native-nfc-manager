@@ -4,6 +4,7 @@ import { fromGlobalId } from 'graphql-relay';
 import {
   Component,
   Fragment,
+  Suspense,
   //  Suspense,
   useCallback,
   useEffect,
@@ -31,6 +32,7 @@ import {
   RouterProvider,
 } from '#components/NativeRouter';
 //import ShakeShare from '#components/ShakeShare';
+import ShakeShare from '#components/ShakeShare';
 import Toast from '#components/Toast';
 import { getAuthState, init as initAuthStore } from '#helpers/authStore';
 import { addGlobalEventListener } from '#helpers/globalEvents';
@@ -41,7 +43,6 @@ import {
 } from '#helpers/localeHelpers';
 import { PermissionProvider } from '#helpers/PermissionContext';
 import {
-  ROOT_ACTOR_ID,
   addEnvironmentListener,
   getRelayEnvironment,
 } from '#helpers/relayEnvironment';
@@ -51,7 +52,6 @@ import {
   ScreenPrefetcherProvider,
   createScreenPrefetcher,
 } from '#helpers/ScreenPrefetcher';
-//import WebCardBoundRelayEnvironmentProvider from '#helpers/WebCardBoundRelayEnvironmentProvider';
 import useApplicationFonts from '#hooks/useApplicationFonts';
 import useAuthState from '#hooks/useAuthState';
 import { useDeepLink } from '#hooks/useDeepLink';
@@ -82,7 +82,7 @@ import SearchScreen from '#screens/SearchScreen';
 import SignInScreen from '#screens/SignInScreen';
 import SignupScreen from '#screens/SignUpScreen';
 import UpdateApplicationScreen from '#screens/UpdateApplicationScreen';
-import WebcardParametersScreen from '#screens/WebcardParametersScreen';
+import WebCardParametersScreen from '#screens/WebCardParametersScreen';
 import WebCardScreen from '#screens/WebCardScreen';
 import Button from '#ui/Button';
 import Container from '#ui/Container';
@@ -199,7 +199,7 @@ const screens = {
   SIGN_UP: SignupScreen,
   SEARCH: SearchScreen,
   WEBCARD: WebCardScreen,
-  WEBCARD_PARAMETERS: WebcardParametersScreen,
+  WEBCARD_PARAMETERS: WebCardParametersScreen,
 };
 
 const tabs = {
@@ -216,16 +216,16 @@ const unauthenticatedRoutes = ['SIGN_IN', 'SIGN_UP', 'FORGOT_PASSWORD'];
 const AppRouter = () => {
   // #region Routing
   const initialRoutes = useMemo(() => {
-    const { authenticated, hasBeenSignedIn, webCardId } = getAuthState();
+    const { authenticated, hasBeenSignedIn, profileInfos } = getAuthState();
     return authenticated
-      ? mainRoutes(!webCardId)
+      ? mainRoutes(!profileInfos)
       : hasBeenSignedIn
       ? signInRoutes
       : signUpRoutes;
   }, []);
 
   const { router, routerState } = useNativeRouter(initialRoutes);
-  const { authenticated, webCardId } = useAuthState();
+  const { authenticated, profileInfos } = useAuthState();
 
   useEffect(() => {
     const currentRoute = router.getCurrentRoute()?.route;
@@ -236,10 +236,10 @@ const AppRouter = () => {
         authenticated &&
         unauthenticatedRoutes.includes(currentRoute)
       ) {
-        router.replaceAll(mainRoutes(!webCardId));
+        router.replaceAll(mainRoutes(!profileInfos));
       }
     }
-  }, [authenticated, webCardId, router]);
+  }, [authenticated, profileInfos, router]);
 
   useEffect(() => {
     const subscription = BackHandler.addEventListener(
@@ -260,8 +260,12 @@ const AppRouter = () => {
 
   // #region Sentry Routing Instrumentation
   useEffect(() => {
-    Sentry.setUser(webCardId ? { id: fromGlobalId(webCardId).id } : null);
-  }, [webCardId]);
+    Sentry.setUser(
+      profileInfos?.profileId
+        ? { id: fromGlobalId(profileInfos.profileId).id }
+        : null,
+    );
+  }, [profileInfos]);
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -306,13 +310,6 @@ const AppRouter = () => {
     [],
   );
 
-  const getEnvironmentForActor = useCallback(
-    (actorId: string) => {
-      return environment.forActor(actorId);
-    },
-    [environment],
-  );
-
   const screenIdToDispose = useRef<string[]>([]).current;
 
   const screenPrefetcher = useMemo(
@@ -346,7 +343,7 @@ const AppRouter = () => {
     [router],
   );
 
-  const slapshScreenHidden = useRef(false);
+  const splashScreenHidden = useRef(false);
   const onFinishTransitioning = useCallback(() => {
     // We reset the environment only here
     // To avoid resetting it when old screens are still visible
@@ -358,7 +355,7 @@ const AppRouter = () => {
       RelayQueryManager.disposeQueryFor(screen),
     );
     screenIdToDispose.length = 0;
-    if (!slapshScreenHidden.current) {
+    if (!splashScreenHidden.current) {
       setTimeout(() => {
         hideSplashScreen({ fade: true });
       }, 200);
@@ -404,11 +401,7 @@ const AppRouter = () => {
   }
 
   return (
-    <RelayEnvironmentProvider
-      environment={environment.forActor(ROOT_ACTOR_ID)}
-      // @ts-expect-error not in the types
-      getEnvironmentForActor={getEnvironmentForActor}
-    >
+    <RelayEnvironmentProvider environment={environment}>
       <ScreenPrefetcherProvider value={screenPrefetcher}>
         <SafeAreaProvider
           initialMetrics={initialWindowMetrics}
@@ -424,13 +417,9 @@ const AppRouter = () => {
             />
           </RouterProvider>
           <Toast />
-          {/** TODO : put back ShakeShare when there is a suitable solution to fix the issue #2265
           <Suspense>
-            <WebCardBoundRelayEnvironmentProvider webCardId={webCardId}>
-              <ShakeShare />
-            </WebCardBoundRelayEnvironmentProvider>
+            <ShakeShare />
           </Suspense>
-          */}
           <LoadingScreen visible={showLoadingScreen} />
         </SafeAreaProvider>
       </ScreenPrefetcherProvider>

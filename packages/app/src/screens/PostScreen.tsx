@@ -34,18 +34,15 @@ import type { ForwardedRef } from 'react';
 import type { EdgeInsets } from 'react-native-safe-area-context';
 
 const postScreenQuery = graphql`
-  query PostScreenQuery($postId: ID!) {
-    node(id: $postId) {
+  query PostScreenQuery($postId: ID!, $webCardId: ID!) {
+    post: node(id: $postId) {
       id
-      ...PostList_posts @arguments(includeAuthor: true)
-      ...PostScreenFragment_relatedPosts
+      ...PostList_posts
+        @arguments(includeAuthor: true, viewerWebCardId: $webCardId)
+      ...PostScreenFragment_relatedPosts @arguments(viewerWebCardId: $webCardId)
     }
-    viewer {
-      profile {
-        webCard {
-          ...PostList_webCard
-        }
-      }
+    webCard: node(id: $webCardId) {
+      ...PostList_webCard
     }
   }
 `;
@@ -60,10 +57,7 @@ const PostScreen = ({
     router.back();
   };
 
-  const { node: post, viewer } = usePreloadedQuery(
-    postScreenQuery,
-    preloadedQuery,
-  );
+  const { post, webCard } = usePreloadedQuery(postScreenQuery, preloadedQuery);
   const [ready, setReady] = useState(false);
 
   useNativeNavigationEvent('appear', () => {
@@ -142,7 +136,7 @@ const PostScreen = ({
             label={intl.formatMessage({
               defaultMessage: 'Go back',
               description:
-                "PostScreen - Go back button when post deosn't exist",
+                "PostScreen - Go back button when post doesn't exist",
             })}
             onPress={router.back}
           />
@@ -150,7 +144,9 @@ const PostScreen = ({
       </SafeAreaView>
     );
   }
-
+  if (!webCard) {
+    return null;
+  }
   return (
     <SafeAreaView style={styles.safeAreaView}>
       <Header
@@ -172,7 +168,7 @@ const PostScreen = ({
         style={{ flex: 1 }}
         canPlay={ready && hasFocus}
         posts={posts}
-        webCard={viewer?.profile?.webCard}
+        webCard={webCard}
         onEndReached={onEndReached}
         loading={loading}
       />
@@ -221,7 +217,10 @@ PostScreen.getScreenOptions = (
 
 export default relayScreen(PostScreen, {
   query: postScreenQuery,
-  getVariables: ({ postId }) => ({ postId }),
+  getVariables: ({ postId }, profileInfos) => ({
+    postId,
+    webCardId: profileInfos?.webCardId ?? '',
+  }),
 });
 
 type RelatedPostLoaderHandle = { onEndReached(): void };
@@ -249,6 +248,7 @@ const RelatedPostLoaderInner = (
       fragment PostScreenFragment_relatedPosts on Post
       @refetchable(queryName: "RelatedPostScreenQuery")
       @argumentDefinitions(
+        viewerWebCardId: { type: "ID!" }
         after: { type: String }
         first: { type: Int, defaultValue: 10 }
       ) {
@@ -256,7 +256,11 @@ const RelatedPostLoaderInner = (
           @connection(key: "Post_relatedPosts") {
           edges {
             node {
-              ...PostList_posts @arguments(includeAuthor: true)
+              ...PostList_posts
+                @arguments(
+                  includeAuthor: true
+                  viewerWebCardId: $viewerWebCardId
+                )
             }
           }
         }

@@ -17,6 +17,7 @@ import MultiUserDetailModal from './MultiUserDetailModal';
 import type { EmailPhoneInput } from '#components/EmailOrPhoneInput';
 import type { ProfileRole } from '#relayArtifacts/MultiUserScreenQuery.graphql';
 import type { MultiUserScreenUserList_currentUser$key } from '#relayArtifacts/MultiUserScreenUserList_currentUser.graphql';
+import type { MultiUserScreenUserList_profile$key } from '#relayArtifacts/MultiUserScreenUserList_profile.graphql';
 import type { MultiUserDetailModalActions } from './MultiUserDetailModal';
 import type { ContactCard } from '@azzapp/shared/contactCardHelpers';
 
@@ -36,61 +37,62 @@ type UserInformation = {
 export type MultiUserScreenListProps = {
   usersByRole: Record<ProfileRole, UserInformation[]>;
   currentUser: MultiUserScreenUserList_currentUser$key;
+  profile: MultiUserScreenUserList_profile$key;
   toggleCommonInfosForm: () => void;
-  profileId: string;
 };
 
-const MultiUserScreenUserList = (props: MultiUserScreenListProps) => {
-  const { usersByRole, currentUser: currentUserKey } = props;
+const MultiUserScreenUserList = ({
+  usersByRole,
+  currentUser: currentUserKey,
+  profile: profileKey,
+  toggleCommonInfosForm,
+}: MultiUserScreenListProps) => {
   const intl = useIntl();
   const router = useRouter();
 
-  const data = useFragment(
+  const currentUser = useFragment(
     graphql`
-      fragment MultiUserScreenUserList_currentUser on Query {
-        currentUser {
-          email
-          phoneNumber
-        }
-        viewer {
-          profile {
-            id
-            webCard {
-              ...MultiUserDetailModal_webcard
-              profiles {
-                id
-                ...HomeStatistics_profiles
-              }
-              commonInformation {
-                company
-                addresses {
-                  address
-                }
-                emails {
-                  address
-                }
-                phoneNumbers {
-                  number
-                }
-                urls {
-                  address
-                }
-                socials {
-                  url
-                }
-              }
-            }
-          }
-        }
+      fragment MultiUserScreenUserList_currentUser on User {
+        email
+        phoneNumber
       }
     `,
     currentUserKey,
   );
 
-  const {
-    currentUser,
-    viewer: { profile },
-  } = data;
+  const profile = useFragment(
+    graphql`
+      fragment MultiUserScreenUserList_profile on Profile {
+        id
+        webCard {
+          ...MultiUserDetailModal_webCard
+          profiles {
+            id
+            ...HomeStatistics_profiles
+          }
+          commonInformation {
+            company
+            addresses {
+              address
+            }
+            emails {
+              address
+            }
+            phoneNumbers {
+              number
+            }
+            urls {
+              address
+            }
+            socials {
+              url
+            }
+          }
+        }
+      }
+    `,
+    profileKey,
+  );
 
   // @TODO
   const nbCommonInformation =
@@ -129,7 +131,7 @@ const MultiUserScreenUserList = (props: MultiUserScreenListProps) => {
           description:
             'Button to add common information to the contact card in MultiUserScreen',
         })} (${nbCommonInformation})`}
-        onPress={props.toggleCommonInfosForm}
+        onPress={toggleCommonInfosForm}
       />
       {Object.entries(usersByRole).map(([key, users]) => {
         const profileRole = key as ProfileRole; // ts infers the key type as string
@@ -203,7 +205,7 @@ const MultiUserScreenUserList = (props: MultiUserScreenListProps) => {
         <MultiUserDetailModal
           webCard={profile.webCard}
           ref={detail}
-          currentProfileId={data.viewer.profile?.id ?? ''}
+          currentProfileId={profile.id}
           usersByRole={usersByRole}
         />
       )}

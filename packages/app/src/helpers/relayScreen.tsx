@@ -1,14 +1,13 @@
 import { GraphQLError } from 'graphql';
+import { isEqual } from 'lodash';
 import React, { Suspense, useCallback, useEffect, useRef } from 'react';
 import { useIntl } from 'react-intl';
 import { Alert, Appearance } from 'react-native';
 import {
-  RelayEnvironmentProvider,
   type PreloadedQuery,
   fetchQuery,
+  useRelayEnvironment,
 } from 'react-relay';
-// @ts-expect-error not typed
-import useRelayActorEnvironment from 'react-relay/lib/multi-actor/useRelayActorEnvironment';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
 import ERRORS from '@azzapp/shared/errors';
 import {
@@ -17,7 +16,6 @@ import {
 } from '@azzapp/shared/networkHelpers';
 import { useRouter, type NativeScreenProps } from '#components/NativeRouter';
 import useAuthState from '#hooks/useAuthState';
-import { ROOT_ACTOR_ID, getRelayEnvironment } from './relayEnvironment';
 import {
   getLoadQueryInfo,
   loadQueryFor,
@@ -96,7 +94,7 @@ function relayScreen<TRoute extends Route>(
     fallback: Fallback,
     errorFallback: ErrorFallback,
     canGoBack = true,
-    webCardBound = true,
+    profileBound = true,
     pollInterval,
     stopPollingWhenNotFocused = true,
     ...options
@@ -109,22 +107,18 @@ function relayScreen<TRoute extends Route>(
       route: { params },
     } = props;
 
-    const { webCardId } = useAuthState();
-    const actorId = (
-      typeof webCardBound === 'function' ? webCardBound(params) : webCardBound
-    )
-      ? webCardId
-      : ROOT_ACTOR_ID;
-    const environment = useRelayActorEnvironment(actorId);
+    const { profileInfos } = useAuthState();
 
-    const { preloadedQuery, actorId: queryActorId } =
+    const { preloadedQuery, profileInfos: queryProfileInfos } =
       useManagedQuery((props as any).screenId) ?? {};
+
     useEffect(() => {
       if (!preloadedQuery) {
         loadQueryFor(screenId, options, params);
       }
     }, [screenId, params, preloadedQuery]);
 
+    const environment = useRelayEnvironment();
     useEffect(() => {
       let currentTimeout: any;
       let currentSubscription: Subscription | null;
@@ -136,7 +130,11 @@ function relayScreen<TRoute extends Route>(
       ) {
         const poll = () => {
           currentTimeout = setTimeout(() => {
-            const { query, variables } = getLoadQueryInfo(options, params);
+            const { query, variables } = getLoadQueryInfo(
+              options,
+              params,
+              profileInfos,
+            );
             currentSubscription = fetchQuery(environment, query, variables, {
               fetchPolicy: 'network-only',
               networkCacheConfig: { force: true },
@@ -170,7 +168,7 @@ function relayScreen<TRoute extends Route>(
         currentSubscription?.unsubscribe();
         clearTimeout(currentTimeout);
       };
-    }, [environment, params, props.hasFocus, screenId]);
+    }, [environment, params, profileInfos, props.hasFocus, screenId]);
 
     const intl = useIntl();
     const router = useRouter();
@@ -226,24 +224,13 @@ function relayScreen<TRoute extends Route>(
       );
     }, [intl, retry, router]);
 
-    const getEnvironmentForActor = useCallback((actorId: string) => {
-      return getRelayEnvironment().forActor(actorId);
-    }, []);
-
     const inner = (
-      <RelayEnvironmentProvider
-        environment={environment}
-        // @ts-expect-error not in the types
-        getEnvironmentForActor={getEnvironmentForActor}
-      >
-        <Suspense fallback={Fallback ? <Fallback {...props} /> : null}>
-          {preloadedQuery &&
-            (queryActorId === actorId ||
-              (queryActorId === ROOT_ACTOR_ID && !actorId)) && (
-              <Component {...props} preloadedQuery={preloadedQuery} />
-            )}
-        </Suspense>
-      </RelayEnvironmentProvider>
+      <Suspense fallback={Fallback ? <Fallback {...props} /> : null}>
+        {preloadedQuery &&
+          (!profileBound || isEqual(queryProfileInfos, profileInfos)) && (
+            <Component {...props} preloadedQuery={preloadedQuery} />
+          )}
+      </Suspense>
     );
     if (__DEV__) {
       return inner;
@@ -267,7 +254,7 @@ function relayScreen<TRoute extends Route>(
   RelayWrapper.displayName = `RelayWrapper(${displayName})`;
   Object.assign(RelayWrapper, Component, {
     ...options,
-    webCardBound,
+    profileBound,
   });
 
   return RelayWrapper as any;

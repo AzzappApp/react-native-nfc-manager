@@ -25,21 +25,21 @@ import type { ReactElement } from 'react';
 type TAB = 'FOLLOWINGS' | 'MY_POSTS' | 'SUGGESTIONS';
 
 const mediaScreenQuery = graphql`
-  query MediaScreenQuery {
-    viewer {
-      profile {
+  query MediaScreenQuery($profileId: ID!, $viewerWebCardId: ID!) {
+    node(id: $profileId) {
+      ... on Profile @alias(as: "profile") {
+        ...MediaSuggestionsScreen_profile
+        ...MediaSuggestionsWebCards_profile
         webCard {
           id
           userName
           ...WebCardPostsList_webCard
+            @arguments(viewerWebCardId: $viewerWebCardId)
           ...PostRendererFragment_author
           ...MediaFollowingsWebCards_webCard
           ...MediaFollowingsScreen_webCard
         }
       }
-
-      ...MediaSuggestionsScreen_viewer
-      ...MediaSuggestionsWebCards_viewer
     }
   }
 `;
@@ -48,12 +48,13 @@ const MediaScreen = ({
   preloadedQuery,
   hasFocus = true,
 }: RelayScreenProps<MediaRoute, MediaScreenQuery>) => {
-  const { viewer } = usePreloadedQuery(mediaScreenQuery, preloadedQuery);
+  const { node } = usePreloadedQuery(mediaScreenQuery, preloadedQuery);
+  const profile = node?.profile;
   const { top } = useScreenInsets();
   const [tab, setTab] = useState<TAB>('SUGGESTIONS');
 
   // viewer might be briefly null when the user logs out or by switching accounts
-  if (!viewer) {
+  if (!profile) {
     return null;
   }
 
@@ -62,7 +63,7 @@ const MediaScreen = ({
       id: 'SUGGESTIONS',
       element: (
         <MediaSuggestionsScreen
-          viewer={viewer}
+          profile={profile}
           canPlay={hasFocus && tab === 'SUGGESTIONS'}
           ListHeaderComponent={
             <View>
@@ -79,7 +80,7 @@ const MediaScreen = ({
                   </Text>
                 }
                 coverListStyle={styles.coverList}
-                viewer={viewer}
+                profile={profile}
                 isCurrentTab={tab === 'SUGGESTIONS'}
               />
               <Text style={styles.postsTitleStyle} variant="large">
@@ -95,13 +96,13 @@ const MediaScreen = ({
     },
   ];
 
-  if (viewer.profile?.webCard) {
+  if (profile?.webCard) {
     tabs.push({
       id: 'FOLLOWINGS',
       element: (
         <Suspense>
           <MediaFollowingsScreen
-            webCard={viewer.profile.webCard}
+            webCard={profile.webCard}
             canPlay={hasFocus && tab === 'FOLLOWINGS'}
             ListHeaderComponent={
               <View>
@@ -114,7 +115,7 @@ const MediaScreen = ({
                       />
                     </Text>
                   }
-                  webCard={viewer.profile?.webCard}
+                  webCard={profile?.webCard}
                   style={styles.coverList}
                 />
 
@@ -132,14 +133,14 @@ const MediaScreen = ({
     });
   }
 
-  if (viewer.profile) {
+  if (profile) {
     tabs.push({
       id: 'MY_POSTS',
       element: (
         <View style={{ flex: 1 }}>
           <Suspense>
             <ProfilePostsList
-              webCard={viewer.profile.webCard}
+              webCard={profile.webCard}
               canPlay={hasFocus && tab === 'MY_POSTS'}
             />
           </Suspense>
@@ -252,5 +253,9 @@ const styles = StyleSheet.create({
 
 export default relayScreen(MediaScreen, {
   query: mediaScreenQuery,
+  getVariables: (_, profileInfos) => ({
+    profileId: profileInfos?.profileId ?? '',
+    viewerWebCardId: profileInfos?.webCardId ?? '',
+  }),
   fallback: MediaScreenFallback,
 });

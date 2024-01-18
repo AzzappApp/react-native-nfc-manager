@@ -14,27 +14,25 @@ import type { CoverEditionStepQuery } from '#relayArtifacts/CoverEditionStepQuer
 import type { ForwardedRef } from 'react';
 
 type CoverEditionStepProps = {
+  profileId: string;
   height: number;
   onCoverSaved: () => void;
   setCanSave: (value: boolean) => void;
 };
 
 const CoverEditionStep = (
-  { height, onCoverSaved, setCanSave }: CoverEditionStepProps,
+  { profileId, height, onCoverSaved, setCanSave }: CoverEditionStepProps,
   forwardRef: ForwardedRef<CoverEditorHandle>,
 ) => {
   const data = useLazyLoadQuery<CoverEditionStepQuery>(
     graphql`
-      query CoverEditionStepQuery {
-        viewer {
-          ...CoverEditor_viewer
-          profile {
-            id
-          }
+      query CoverEditionStepQuery($profileId: ID!) {
+        profile: node(id: $profileId) {
+          ...CoverEditor_profile
         }
       }
     `,
-    {},
+    { profileId },
   );
 
   const insets = useScreenInsets();
@@ -64,10 +62,14 @@ const CoverEditionStep = (
           </Text>
         </View>
         <View style={{ flex: 1, paddingBottom: Math.min(insets.bottom, 16) }}>
-          {data.viewer.profile?.id != null && ( //the profile from CoverEditor_viewer is null  in some case (this condition fix https://github.com/AzzappApp/azzapp/issues/1384. )
+          {/*
+            the profile from CoverEditor_profile is null in some case 
+            (this condition fix https://github.com/AzzappApp/azzapp/issues/1384. ) 
+          */}
+          {data.profile != null && (
             <CoverEditor
               ref={forwardRef}
-              viewer={data.viewer}
+              profile={data.profile}
               height={editorHeight}
               onCoverSaved={onCoverSaved}
               onCanSaveChange={setCanSave}

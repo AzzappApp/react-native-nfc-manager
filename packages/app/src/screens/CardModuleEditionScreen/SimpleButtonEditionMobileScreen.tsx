@@ -24,12 +24,15 @@ const SimpleButtonEditionMobileScreen = ({
   moduleId,
   preloadedQuery,
 }: SimpleButtonEditionMobileScreenProps) => {
-  const data = usePreloadedQuery(SimpleButtonQuery, preloadedQuery);
+  const { profile } = usePreloadedQuery(SimpleButtonQuery, preloadedQuery);
 
   let module: SimpleButtonEditionScreen_module$key | null = null;
+  if (!profile) {
+    return null;
+  }
   if (moduleId != null) {
     module =
-      data.viewer.profile?.webCard.cardModules.find(
+      profile?.webCard?.cardModules.find(
         module =>
           module?.id === moduleId && module?.kind === MODULE_KIND_SIMPLE_BUTTON,
       ) ?? null;
@@ -38,14 +41,14 @@ const SimpleButtonEditionMobileScreen = ({
     }
   }
 
-  return <SimpleButtonEditionScreen module={module} viewer={data.viewer} />;
+  return <SimpleButtonEditionScreen module={module} profile={profile} />;
 };
 
 const SimpleButtonQuery = graphql`
-  query SimpleButtonEditionMobileScreenQuery {
-    viewer {
-      ...SimpleButtonEditionScreen_viewer
-      profile {
+  query SimpleButtonEditionMobileScreenQuery($profileId: ID!) {
+    profile: node(id: $profileId) {
+      ... on Profile {
+        ...SimpleButtonEditionScreen_profile
         webCard {
           cardModules {
             id

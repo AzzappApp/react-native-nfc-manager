@@ -2,14 +2,14 @@
 import { and, eq, lt } from 'drizzle-orm';
 import { GraphQLError } from 'graphql';
 import ERRORS from '@azzapp/shared/errors';
-
 import { isAdmin } from '@azzapp/shared/profileHelpers';
 import {
   db,
-  type Profile,
   RedirectWebCardTable,
   updateWebCard,
+  getUserProfileWithWebCardId,
 } from '#domains';
+import fromGlobalIdWithType from '#helpers/relayIdHelpers';
 import type { MutationResolvers } from '#schema/__generated__/types';
 import type { GraphQLContext } from '../GraphQLContext';
 
@@ -26,23 +26,16 @@ const USERNAME_REDIRECTION_AVAILABILITY_DAY = parseInt(
 const updateWebCardUserNameMutation: MutationResolvers['updateWebCardUserName'] =
   async (
     _,
-    args,
+    { input: { webCardId: gqlWebCardId, userName } },
     { auth, loaders, cardUsernamesToRevalidate }: GraphQLContext,
   ) => {
-    const { profileId } = auth;
-    if (!profileId) {
-      throw new GraphQLError(ERRORS.UNAUTHORIZED);
-    }
-
-    let profile: Profile | null;
-    try {
-      profile = await loaders.Profile.load(profileId);
-    } catch (e) {
-      throw new GraphQLError(ERRORS.INTERNAL_SERVER_ERROR);
-    }
+    const { userId } = auth;
+    const webCardId = fromGlobalIdWithType(gqlWebCardId, 'WebCard');
+    const profile =
+      userId && (await getUserProfileWithWebCardId(userId, webCardId));
 
     if (!profile || !isAdmin(profile.profileRole)) {
-      throw new GraphQLError(ERRORS.INVALID_REQUEST);
+      throw new GraphQLError(ERRORS.UNAUTHORIZED);
     }
 
     const webCard = await loaders.WebCard.load(profile.webCardId);
@@ -69,9 +62,7 @@ const updateWebCardUserNameMutation: MutationResolvers['updateWebCardUserName'] 
       });
     }
 
-    const { userName } = args.input;
-
-    //avoid h4ving the same value
+    //avoid having the same value
     if (webCard.userName === userName) {
       throw new GraphQLError(ERRORS.INVALID_REQUEST);
     }

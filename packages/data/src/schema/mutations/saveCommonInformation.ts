@@ -2,20 +2,29 @@ import { eq } from 'drizzle-orm';
 import { GraphQLError } from 'graphql';
 import ERRORS from '@azzapp/shared/errors';
 import { isAdmin } from '@azzapp/shared/profileHelpers';
-import { ProfileTable, db, updateWebCard } from '#domains';
+import {
+  ProfileTable,
+  db,
+  getUserProfileWithWebCardId,
+  updateWebCard,
+} from '#domains';
+import fromGlobalIdWithType from '#helpers/relayIdHelpers';
 import type { WebCard } from '#domains';
 import type { MutationResolvers } from '#schema/__generated__/types';
 
 const saveCommonInformation: MutationResolvers['saveCommonInformation'] =
-  async (_, { input: data }, { auth, loaders }) => {
-    const { profileId, userId } = auth;
-    if (!profileId || !userId) {
-      throw new GraphQLError(ERRORS.UNAUTHORIZED);
-    }
+  async (
+    _,
+    { input: { webCardId: gqlWebCardId, ...data } },
+    { auth, loaders },
+  ) => {
+    const { userId } = auth;
+    const webCardId = fromGlobalIdWithType(gqlWebCardId, 'WebCard');
+    const profile =
+      userId && (await getUserProfileWithWebCardId(userId, webCardId));
 
-    const profile = await loaders.Profile.load(profileId);
     if (!profile || !isAdmin(profile.profileRole)) {
-      throw new GraphQLError(ERRORS.INVALID_REQUEST);
+      throw new GraphQLError(ERRORS.UNAUTHORIZED);
     }
 
     const updates: Partial<WebCard> = {

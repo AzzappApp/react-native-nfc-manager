@@ -43,16 +43,16 @@ const DeletableCommentItem = (props: DeletableCommentItemProps) => {
 
   if (!comment) return null;
 
-  const DeletableCommenItemActions = ({
+  const DeletableCommentItemActions = ({
     progress,
     onClose,
   }: SwipeableRowActionsProps) => {
-    const { profileRole } = useAuthState();
+    const { profileInfos } = useAuthState();
 
     const intl = useIntl();
 
     const onDelete = () => {
-      if (profileRole && isEditor(profileRole)) {
+      if (isEditor(profileInfos?.profileRole)) {
         commit({
           variables: {
             input: {
@@ -104,7 +104,7 @@ const DeletableCommentItem = (props: DeletableCommentItemProps) => {
   };
 
   return (
-    <SwipeableRow RightActions={DeletableCommenItemActions}>
+    <SwipeableRow RightActions={DeletableCommentItemActions}>
       <CommentItem item={item} />
     </SwipeableRow>
   );

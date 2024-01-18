@@ -57,7 +57,8 @@ const PostRendererBottomPanel = ({
   const router = useRouter();
   const post = useFragment(
     graphql`
-      fragment PostRendererBottomPanelFragment_post on Post {
+      fragment PostRendererBottomPanelFragment_post on Post
+      @argumentDefinitions(viewerWebCardId: { type: "ID" }) {
         id
         content
         counterComments
@@ -73,7 +74,7 @@ const PostRendererBottomPanel = ({
         webCard {
           id
           userName
-          isFollowing
+          isFollowing(webCardId: $viewerWebCardId)
         }
         createdAt
       }
@@ -214,14 +215,14 @@ const PostRendererBottomPanel = ({
     updatePost({ allowLikes: !post.allowLikes });
   }, [post.allowLikes, updatePost]);
 
-  const { webCardId, profileRole } = useAuthState();
+  const { profileInfos } = useAuthState();
 
-  const isViewer = webCardId === post.webCard.id;
+  const isViewer = profileInfos?.webCardId === post.webCard.id;
 
   const toggleFollow = useToggleFollow();
 
   const onToggleFollow = () => {
-    if (profileRole && isEditor(profileRole)) {
+    if (isEditor(profileInfos?.profileRole)) {
       toggleFollow(
         post.webCard.id,
         post.webCard.userName,

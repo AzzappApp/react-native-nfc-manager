@@ -1,14 +1,35 @@
 extend type Mutation {
+  """
+  Updates a profile.
+  """
   updateProfile(input: UpdateProfileInput!): UpdateProfilePayload
 }
 
 input UpdateProfileInput {
+  """
+  The ID of the profile to update.
+  """
   profileId: ID!
+  """
+  The new profile role.
+  """
   profileRole: ProfileRole
-  contactCard: SaveContactCardInput
+  """
+  The new profile contact card content.
+  """
+  contactCard: ContactCardInput
+  """
+  The new profile avatar ID.
+  """
   avatarId: ID
 }
 
+
+
+
 type UpdateProfilePayload {
+  """
+  The updated profile.
+  """
   profile: Profile
 }

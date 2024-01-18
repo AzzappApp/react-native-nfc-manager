@@ -44,7 +44,7 @@ import PhotoWithTextAndTitlePreview from './PhotoWithTextAndTitlePreview';
 import PhotoWithTextAndTitleSettingsEditionPanel from './PhotoWithTextAndTitleSettingsEditionPanel';
 import type { ImagePickerResult } from '#components/ImagePicker';
 import type { PhotoWithTextAndTitleEditionScreen_module$key } from '#relayArtifacts/PhotoWithTextAndTitleEditionScreen_module.graphql';
-import type { PhotoWithTextAndTitleEditionScreen_viewer$key } from '#relayArtifacts/PhotoWithTextAndTitleEditionScreen_viewer.graphql';
+import type { PhotoWithTextAndTitleEditionScreen_profile$key } from '#relayArtifacts/PhotoWithTextAndTitleEditionScreen_profile.graphql';
 import type {
   PhotoWithTextAndTitleEditionScreenUpdateModuleMutation,
   SavePhotoWithTextAndTitleModuleInput,
@@ -56,7 +56,7 @@ export type PhotoWithTextAndTitleEditionScreenProps = ViewProps & {
   /**
    * the current viewer
    */
-  viewer: PhotoWithTextAndTitleEditionScreen_viewer$key;
+  profile: PhotoWithTextAndTitleEditionScreen_profile$key;
   /**
    * the current module to edit, if null, a new module will be created
    */
@@ -68,7 +68,7 @@ export type PhotoWithTextAndTitleEditionScreenProps = ViewProps & {
  */
 const PhotoWithTextAndTitleEditionScreen = ({
   module,
-  viewer: viewerKey,
+  profile: profileKey,
 }: PhotoWithTextAndTitleEditionScreenProps) => {
   // #region Data retrieval
   const photoWithTextAndTitle = useFragment(
@@ -119,40 +119,39 @@ const PhotoWithTextAndTitleEditionScreen = ({
     module,
   );
 
-  const viewer = useFragment(
+  const profile = useFragment(
     graphql`
-      fragment PhotoWithTextAndTitleEditionScreen_viewer on Viewer {
-        ...PhotoWithTextAndTitleBackgroundEditionPanel_viewer
+      fragment PhotoWithTextAndTitleEditionScreen_profile on Profile {
         moduleBackgrounds {
           id
           uri
           resizeMode
         }
-        profile {
-          webCard {
-            cardColors {
-              primary
-              dark
-              light
-            }
-            cardStyle {
-              borderColor
-              borderRadius
-              borderWidth
-              buttonColor
-              buttonRadius
-              fontFamily
-              fontSize
-              gap
-              titleFontFamily
-              titleFontSize
-            }
-            ...PhotoWithTextAndTitleSettingsEditionPanel_webCard
+        webCard {
+          id
+          cardColors {
+            primary
+            dark
+            light
           }
+          cardStyle {
+            borderColor
+            borderRadius
+            borderWidth
+            buttonColor
+            buttonRadius
+            fontFamily
+            fontSize
+            gap
+            titleFontFamily
+            titleFontSize
+          }
+          ...PhotoWithTextAndTitleSettingsEditionPanel_webCard
         }
+        ...PhotoWithTextAndTitleBackgroundEditionPanel_profile
       }
     `,
-    viewerKey,
+    profileKey,
   );
 
   // #endregion
@@ -191,7 +190,7 @@ const PhotoWithTextAndTitleEditionScreen = ({
   const { data, value, fieldUpdateHandler, updateFields, dirty } =
     useModuleDataEditor({
       initialValue,
-      cardStyle: viewer.profile?.webCard.cardStyle,
+      cardStyle: profile?.webCard.cardStyle,
       styleValuesMap: PHOTO_WITH_TEXT_AND_TITLE_STYLE_VALUES,
       defaultValues: PHOTO_WITH_TEXT_AND_TITLE_DEFAULT_VALUES,
     });
@@ -225,7 +224,7 @@ const PhotoWithTextAndTitleEditionScreen = ({
   const previewData = {
     ...omit(data, 'backgroundId'),
     background:
-      viewer.moduleBackgrounds.find(
+      profile.moduleBackgrounds.find(
         background => background.id === backgroundId,
       ) ?? null,
   };
@@ -304,6 +303,7 @@ const PhotoWithTextAndTitleEditionScreen = ({
       moduleId: photoWithTextAndTitle?.id,
       ...rest,
       image: mediaId ?? value.image!.id,
+      webCardId: profile.webCard.id,
     };
     if (value.title) {
       input.title = value.title;
@@ -341,8 +341,8 @@ const PhotoWithTextAndTitleEditionScreen = ({
     canSave,
     value,
     photoWithTextAndTitle?.id,
+    profile.webCard.id,
     commit,
-    setProgressIndicator,
     intl,
     router,
   ]);
@@ -528,8 +528,8 @@ const PhotoWithTextAndTitleEditionScreen = ({
         <PhotoWithTextAndTitlePreview
           style={{ height: topPanelHeight - 20, marginVertical: 10 }}
           data={previewData}
-          colorPalette={viewer.profile?.webCard.cardColors}
-          cardStyle={viewer.profile?.webCard.cardStyle}
+          colorPalette={profile?.webCard.cardColors}
+          cardStyle={profile?.webCard.cardStyle}
         />
       </PressableOpacity>
       <TabView
@@ -540,7 +540,7 @@ const PhotoWithTextAndTitleEditionScreen = ({
             id: 'text',
             element: (
               <PhotoWithTextAndTitleSettingsEditionPanel
-                webCard={viewer.profile?.webCard ?? null}
+                webCard={profile?.webCard ?? null}
                 style={{
                   flex: 1,
                   marginBottom: insetBottom + BOTTOM_MENU_HEIGHT,
@@ -612,7 +612,7 @@ const PhotoWithTextAndTitleEditionScreen = ({
             id: 'background',
             element: (
               <PhotoWithTextAndTitleBackgroundEditionPanel
-                viewer={viewer}
+                profile={profile}
                 backgroundId={backgroundId}
                 backgroundStyle={backgroundStyle}
                 onBackgroundChange={onBackgroundChange}

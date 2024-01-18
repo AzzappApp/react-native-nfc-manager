@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { getProfileWithWebCardId } from '@azzapp/data/domains';
+import { getUserProfileWithWebCardId } from '@azzapp/data/domains';
 import ERRORS from '@azzapp/shared/errors';
 import { buildApplePass } from '#helpers/pass/apple';
 import { getSessionData } from '#helpers/tokens';
@@ -24,7 +24,7 @@ const createPass = async (
         { status: 401 },
       );
     }
-    const profile = await getProfileWithWebCardId(userId, webCardId);
+    const profile = await getUserProfileWithWebCardId(userId, webCardId);
     if (!profile) {
       return NextResponse.json(
         { message: ERRORS.UNAUTHORIZED },

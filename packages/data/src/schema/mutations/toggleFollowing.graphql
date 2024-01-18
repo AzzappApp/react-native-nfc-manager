@@ -7,9 +7,13 @@ extend type Mutation {
 
 input ToggleFollowingInput {
   """
-  The id of the user we want toggle following on
+  The id of the WebCard that we want to follow/unfollow from
   """
   webCardId: ID!
+  """
+  The id of the user we want to follow/unfollow
+  """
+  targetWebCardId: ID!
 
   """
   Should we follow or unfollow the user

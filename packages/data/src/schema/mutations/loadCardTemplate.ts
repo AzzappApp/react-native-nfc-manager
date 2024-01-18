@@ -1,6 +1,5 @@
 import { inArray } from 'drizzle-orm';
 import { GraphQLError } from 'graphql';
-import { fromGlobalId } from 'graphql-relay';
 import { omit } from 'lodash';
 import { DEFAULT_CARD_STYLE } from '@azzapp/shared/cardHelpers';
 import ERRORS from '@azzapp/shared/errors';
@@ -11,33 +10,37 @@ import {
   getCardModules,
   getCardStyleById,
   getCardTemplateById,
+  getUserProfileWithWebCardId,
   referencesMedias,
   updateProfile,
   updateWebCard,
 } from '#domains';
+import fromGlobalIdWithType from '#helpers/relayIdHelpers';
 import { MODULES_SAVE_RULES } from './ModulesMutationsResolvers';
 import type { MutationResolvers } from '#schema/__generated__/types';
 
 const loadCardTemplateMutation: MutationResolvers['loadCardTemplate'] = async (
   _,
-  { input: { cardTemplateId } },
+  { input: { cardTemplateId: gqlCardTemplateID, webCardId: gqlWebCardId } },
   { auth, cardUsernamesToRevalidate, loaders },
 ) => {
-  const { profileId } = auth;
-  if (!profileId) {
+  const { userId } = auth;
+  const webCardId = fromGlobalIdWithType(gqlWebCardId, 'WebCard');
+  const profile =
+    userId && (await getUserProfileWithWebCardId(userId, webCardId));
+
+  if (
+    !profile ||
+    !('profileRole' in profile && isEditor(profile.profileRole))
+  ) {
     throw new GraphQLError(ERRORS.UNAUTHORIZED);
   }
 
-  const profile = await loaders.Profile.load(profileId);
-  if (!profile || !isEditor(profile.profileRole)) {
-    throw new GraphQLError(ERRORS.UNAUTHORIZED);
-  }
-
-  const { type, id } = fromGlobalId(cardTemplateId);
-  if (type !== 'CardTemplate') {
-    throw new GraphQLError(ERRORS.INVALID_REQUEST);
-  }
-  const cardTemplate = await getCardTemplateById(id);
+  const cardTemplateId = fromGlobalIdWithType(
+    gqlCardTemplateID,
+    'CardTemplate',
+  );
+  const cardTemplate = await getCardTemplateById(cardTemplateId);
   if (!cardTemplate) {
     throw new GraphQLError(ERRORS.INVALID_REQUEST);
   }
@@ -96,7 +99,7 @@ const loadCardTemplateMutation: MutationResolvers['loadCardTemplate'] = async (
       };
 
       await updateWebCard(profile.webCardId, webCardUpdates, trx);
-      await updateProfile(profileId, userProfileUpdates, trx);
+      await updateProfile(profile.id, userProfileUpdates, trx);
     });
   } catch (e) {
     console.error(e);

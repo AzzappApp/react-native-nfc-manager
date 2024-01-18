@@ -5,17 +5,17 @@ import { useDebounce } from 'use-debounce';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
 import PostsGrid from '#components/PostList/PostsGrid';
 import ListLoadingFooter from '#ui/ListLoadingFooter';
-import type { MediaSuggestionsScreen_viewer$key } from '#relayArtifacts/MediaSuggestionsScreen_viewer.graphql';
+import type { MediaSuggestionsScreen_profile$key } from '#relayArtifacts/MediaSuggestionsScreen_profile.graphql';
 import type { PostsGrid_posts$key } from '#relayArtifacts/PostsGrid_posts.graphql';
 
 type MediaSuggestionsScreenProps = {
-  viewer: MediaSuggestionsScreen_viewer$key;
+  profile: MediaSuggestionsScreen_profile$key;
   canPlay: boolean;
   ListHeaderComponent?: React.ReactNode;
 };
 
 const MediaSuggestionsScreen = ({
-  viewer,
+  profile,
   canPlay,
   ListHeaderComponent,
 }: MediaSuggestionsScreenProps) => {
@@ -23,7 +23,7 @@ const MediaSuggestionsScreen = ({
   const { data, loadNext, refetch, hasNext, isLoadingNext } =
     usePaginationFragment(
       graphql`
-        fragment MediaSuggestionsScreen_viewer on Viewer
+        fragment MediaSuggestionsScreen_profile on Profile
         @refetchable(queryName: "MediaSuggestionsScreenListQuery")
         @argumentDefinitions(
           after: { type: String }
@@ -39,7 +39,7 @@ const MediaSuggestionsScreen = ({
           }
         }
       `,
-      viewer,
+      profile,
     );
 
   const onRefresh = useCallback(() => {

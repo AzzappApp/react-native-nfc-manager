@@ -264,7 +264,7 @@ const WebCardScreenBody = (
   const moduleOrderTimeoutRef = useRef<any>(null);
   const optimisticUpdate = useRef<Disposable | null>();
   const scheduleModuleOrderUpdate = useCallback(
-    (moduleIds: string[]) => {
+    (modulesIds: string[]) => {
       if (moduleOrderTimeoutRef.current) {
         clearTimeout(moduleOrderTimeoutRef.current);
       }
@@ -273,11 +273,11 @@ const WebCardScreenBody = (
         setReorderPending(false);
         moduleOrderTimeoutRef.current = null;
         const currentOptimisticUpdate = optimisticUpdate.current;
-        const updater = moduleOrderUpdater(moduleIds);
+        const updater = moduleOrderUpdater(modulesIds);
 
         commitReorderModules({
           variables: {
-            input: { moduleIds },
+            input: { modulesIds },
           },
           updater: store => {
             if (currentOptimisticUpdate === optimisticUpdate.current) {
@@ -419,7 +419,7 @@ const WebCardScreenBody = (
   const duplicatedBlocks = useRef<Record<string, string>>({});
 
   const duplicateModules = useCallback(
-    (moduleIds: string[]) => {
+    (modulesIds: string[]) => {
       if (!canDuplicate) {
         return;
       }
@@ -473,7 +473,7 @@ const WebCardScreenBody = (
         webCardRecord.setLinkedRecords(modules, 'cardModules');
       };
 
-      const optimisticModuleIds = moduleIds.map(mId => ({
+      const optimisticModuleIds = modulesIds.map(mId => ({
         originalModuleId: mId,
         newModuleId: `temp-${createId()}`,
       }));
@@ -488,7 +488,7 @@ const WebCardScreenBody = (
       commitDuplicateModule({
         variables: {
           input: {
-            moduleIds,
+            modulesIds,
           },
         },
         updater(store, response) {
