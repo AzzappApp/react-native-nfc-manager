@@ -1,5 +1,6 @@
-## 0.5.2-canary.160
+## 0.5.2-canary.161
 
+* **fix:**  - **webCard:** manage edge cases for background ([#2326](https://github.com/AzzappApp/azzapp/pull/2326))
 * **docs:**  - update minimum node version
 * **feat:**  - rework user invit to use the contact folder and fix the matching ([#2320](https://github.com/AzzappApp/azzapp/pull/2320))
 * **perf:**  - lazy load posts on webCard ([#2291](https://github.com/AzzappApp/azzapp/pull/2291))
