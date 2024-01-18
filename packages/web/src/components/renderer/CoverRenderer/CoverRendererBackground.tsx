@@ -22,29 +22,41 @@ const CoverRendererBackground = ({
   return (
     <>
       {coverData?.backgroundId && (
-        <div
-          style={{
-            backgroundColor:
-              swapColor(
-                coverData.backgroundPatternColor,
+        <>
+          <div
+            style={{
+              backgroundColor: swapColor(
+                coverData.backgroundColor ?? 'light',
                 cardColors ?? DEFAULT_COLOR_PALETTE,
-              ) ?? '#000',
-            maskImage: `url(${getCldImageUrl({
-              src: decodeMediaId(coverData.backgroundId),
-              width: BACKGROUND_IMAGE_SIZE,
-              height: BACKGROUND_IMAGE_SIZE / COVER_RATIO,
-              format: 'auto',
-            })})`,
-            maskPosition: 'center',
-          }}
-          className={cn(styles.layerMedia, styles.layerBackground)}
-        />
+              ),
+            }}
+            className={cn(styles.layerMedia)}
+          />
+          <div
+            style={{
+              backgroundColor:
+                swapColor(
+                  coverData.backgroundPatternColor,
+                  cardColors ?? DEFAULT_COLOR_PALETTE,
+                ) ?? '#000',
+              maskImage: `url(${getCldImageUrl({
+                src: decodeMediaId(coverData.backgroundId),
+                width: BACKGROUND_IMAGE_SIZE,
+                height: BACKGROUND_IMAGE_SIZE / COVER_RATIO,
+                format: 'auto',
+              })})`,
+              maskPosition: 'center',
+            }}
+            className={cn(styles.layerMedia, styles.layerBackground)}
+          />
+        </>
       )}
       <div
         className={cn(styles.coverMedia, styles.backgroundMedia)}
         style={{
           backgroundImage: `url(${getCldImageUrl({
             src: decodeMediaId(media.id),
+            assetType: media.kind,
             width: BACKGROUND_IMAGE_SIZE,
             height: BACKGROUND_IMAGE_SIZE / COVER_RATIO,
             format: 'auto',

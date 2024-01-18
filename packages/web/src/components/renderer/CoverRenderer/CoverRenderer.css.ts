@@ -70,6 +70,7 @@ const layerMedia = style({
 
 const layerBackground = style({
   height: 580,
+  position: 'fixed',
 });
 
 const styles = {

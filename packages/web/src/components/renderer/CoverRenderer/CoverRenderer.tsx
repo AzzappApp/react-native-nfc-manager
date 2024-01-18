@@ -163,20 +163,23 @@ const CoverRenderer = ({
       }}
       className={styles.content}
     >
-      <div
-        {...props}
-        style={{
-          aspectRatio: `${COVER_RATIO}`,
-          backgroundColor: swapColor(
-            coverData.backgroundColor ?? 'light',
-            cardColors ?? DEFAULT_COLOR_PALETTE,
-          ),
-          width,
-          ...style,
-        }}
-        className={styles.content}
-      >
-        {coverData.backgroundId && (
+      {coverData.backgroundId && (
+        <>
+          <div
+            {...props}
+            style={{
+              aspectRatio: `${COVER_RATIO}`,
+              backgroundColor: swapColor(
+                coverData.backgroundColor ?? 'light',
+                cardColors ?? DEFAULT_COLOR_PALETTE,
+              ),
+              position: 'absolute',
+              width: '100%',
+              height: '100%',
+              overflow: 'hidden',
+              ...style,
+            }}
+          />
           <div
             style={{
               backgroundColor:
@@ -193,98 +196,99 @@ const CoverRenderer = ({
             }}
             className={styles.layerMedia}
           />
-        )}
-        {media != null &&
-          (media.kind === 'image' ? (
-            <CloudinaryImage
-              ref={imageRef}
-              mediaId={media.id}
-              alt="cover"
-              width={coverWidth}
-              height={coverHeight}
-              priority={priority}
-              className={cn(
-                styles.coverMedia,
-                mediaAnimation &&
-                  mediaAnimation in styles &&
-                  styles[mediaAnimation as keyof typeof styles],
-              )}
-              fetchPriority={priority ? 'high' : 'low'}
-              onLoad={onImageLoad}
-            />
-          ) : staticCover ? (
-            <CloudinaryImage
-              mediaId={media.id}
-              videoThumbnail
-              width={coverWidth}
-              height={coverHeight}
-              alt="cover"
-              className={styles.coverMedia}
-            />
-          ) : (
-            <CloudinaryVideo
-              media={media}
-              assetKind="cover"
-              alt="cover"
-              onEnded={onVideoEnd}
-              onCanPlayThrough={onVideoReady}
-              autoPlay={false}
-              loop={false}
-              className={cn(
-                styles.coverMedia,
-                mediaAnimation &&
-                  mediaAnimation in styles &&
-                  styles[mediaAnimation as keyof typeof styles],
-              )}
-              muted
-              fluid
-              posterSize={{
-                width: coverWidth,
-                height: coverHeight,
-              }}
-              playsInline
-              ref={videoRefCallback}
-            />
-          ))}
-        {coverData?.foregroundId ? (
-          hasLottie ? (
-            <CoverLottiePlayer
-              onLoop={media.kind === 'image' ? playJsAnimation : undefined}
-              ref={coverLottieRef}
-              src={getCloudinaryAssetURL(
-                decodeMediaId(coverData.foregroundId),
-                'raw',
-              )}
-              tintColor={
+        </>
+      )}
+      {media != null &&
+        (media.kind === 'image' ? (
+          <CloudinaryImage
+            ref={imageRef}
+            mediaId={media.id}
+            alt="cover"
+            width={coverWidth}
+            height={coverHeight}
+            priority={priority}
+            className={cn(
+              styles.coverMedia,
+              mediaAnimation &&
+                mediaAnimation in styles &&
+                styles[mediaAnimation as keyof typeof styles],
+            )}
+            fetchPriority={priority ? 'high' : 'low'}
+            onLoad={onImageLoad}
+          />
+        ) : staticCover ? (
+          <CloudinaryImage
+            mediaId={media.id}
+            videoThumbnail
+            width={coverWidth}
+            height={coverHeight}
+            alt="cover"
+            className={styles.coverMedia}
+          />
+        ) : (
+          <CloudinaryVideo
+            media={media}
+            assetKind="cover"
+            alt="cover"
+            onEnded={onVideoEnd}
+            onCanPlayThrough={onVideoReady}
+            autoPlay={false}
+            loop={false}
+            className={cn(
+              styles.coverMedia,
+              mediaAnimation &&
+                mediaAnimation in styles &&
+                styles[mediaAnimation as keyof typeof styles],
+            )}
+            muted
+            fluid
+            posterSize={{
+              width: coverWidth,
+              height: coverHeight,
+            }}
+            playsInline
+            ref={videoRefCallback}
+          />
+        ))}
+      {coverData?.foregroundId ? (
+        hasLottie ? (
+          <CoverLottiePlayer
+            onLoop={media.kind === 'image' ? playJsAnimation : undefined}
+            ref={coverLottieRef}
+            src={getCloudinaryAssetURL(
+              decodeMediaId(coverData.foregroundId),
+              'raw',
+            )}
+            tintColor={
+              swapColor(
+                coverData.foregroundColor,
+                cardColors ?? DEFAULT_COLOR_PALETTE,
+              ) ?? '#000'
+            }
+            staticCover={staticCover}
+            onLoaded={onLottieLoaded}
+          />
+        ) : (
+          <div
+            style={{
+              backgroundColor:
                 swapColor(
                   coverData.foregroundColor,
                   cardColors ?? DEFAULT_COLOR_PALETTE,
-                ) ?? '#000'
-              }
-              staticCover={staticCover}
-              onLoaded={onLottieLoaded}
-            />
-          ) : (
-            <div
-              style={{
-                backgroundColor:
-                  swapColor(
-                    coverData.foregroundColor,
-                    cardColors ?? DEFAULT_COLOR_PALETTE,
-                  ) ?? '#000',
-                maskImage: `url(${getCldImageUrl({
-                  src: decodeMediaId(coverData.foregroundId),
-                  width: coverWidth,
-                  height: coverHeight,
-                  format: 'auto',
-                })})`,
-                maskPosition: 'bottom',
-              }}
-              className={styles.layerMedia}
-            />
-          )
-        ) : null}
-      </div>
+                ) ?? '#000',
+              maskImage: `url(${getCldImageUrl({
+                src: decodeMediaId(coverData.foregroundId),
+                width: coverWidth,
+                height: coverHeight,
+                format: 'auto',
+              })})`,
+              maskPosition: 'bottom',
+            }}
+            className={styles.layerMedia}
+          />
+        )
+      ) : null}
+
       <CoverTextRenderer
         ref={textRef}
         title={coverTitle}

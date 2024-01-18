@@ -23,7 +23,7 @@ const coverTextContent = style({
       fontSize: '0.8vw',
     },
     [MediaQuery.Desktop]: {
-      fontSize: '3px',
+      fontSize: '2.4px',
     },
   },
 });
