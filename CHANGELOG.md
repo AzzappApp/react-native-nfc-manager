@@ -1,5 +1,6 @@
-## 0.5.2-canary.161
+## 0.5.2-canary.162
 
+* **test:**  - 💍 sync tests with removed multi actor ([#2345](https://github.com/AzzappApp/azzapp/pull/2345))
 * **fix:**  - **webCard:** manage edge cases for background ([#2326](https://github.com/AzzappApp/azzapp/pull/2326))
 * **docs:**  - update minimum node version
 * **feat:**  - rework user invit to use the contact folder and fix the matching ([#2320](https://github.com/AzzappApp/azzapp/pull/2320))
