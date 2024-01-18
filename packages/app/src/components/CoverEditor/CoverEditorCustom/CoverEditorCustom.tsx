@@ -24,7 +24,7 @@ import TabView from '#ui/TabView';
 import UploadProgressModal from '#ui/UploadProgressModal';
 import CoverErrorRenderer from '../../CoverErrorRenderer';
 import CoverEditorCropModal from '../CoverEditorCropModal';
-import CoverEditiorImagePicker from '../CoverEditorImagePicker';
+import CoverEditorImagePicker from '../CoverEditorImagePicker';
 import useCoverMediaEditor from '../useCoverMediaEditor';
 import useSaveCover from '../useSaveCover';
 import CoverEditorCustomBackgroundPanel from './CECBackgroundPanel';
@@ -675,7 +675,7 @@ const CoverEditorCustom = ({
         )}
       </KeyboardAvoidingView>
       <ScreenModal visible={showImagePicker} animationType="slide">
-        <CoverEditiorImagePicker
+        <CoverEditorImagePicker
           kind="mixed"
           onFinished={onMediaSelected}
           onCancel={closeImagePicker}

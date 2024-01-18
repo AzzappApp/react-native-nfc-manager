@@ -145,6 +145,7 @@ const useSuggestedMedias = (
     return {
       id: currentItem.id,
       uri: currentItem.uri,
+      rawUri: currentItem.rawUri,
       width: currentItem.width,
       height: currentItem.height,
       kind: mediaKind,
