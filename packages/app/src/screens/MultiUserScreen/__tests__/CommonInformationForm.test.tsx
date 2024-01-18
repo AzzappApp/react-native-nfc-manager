@@ -86,7 +86,7 @@ describe('ContactCardEditModal', () => {
           commonInformation={webCard!.commonInformation ?? null}
           commonInfoFormIsOpened
           toggleCommonInfoForm={() => {}}
-          webCardId={webCard!.id!}
+          webCardId="test-webcard"
           {...props}
         />
       );

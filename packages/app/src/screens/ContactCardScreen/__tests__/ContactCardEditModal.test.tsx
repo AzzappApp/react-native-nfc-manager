@@ -22,6 +22,7 @@ describe('ContactCardEditModal', () => {
       return MockPayloadGenerator.generate(operation, {
         Profile() {
           return {
+            id: 'test-profile',
             webCard: {
               isMultiUser: false,
               commonInformation: null,
@@ -204,7 +205,7 @@ describe('ContactCardEditModal', () => {
           },
         ],
       },
-      profileId: '<Node-mock-id-1>',
+      profileId: 'test-profile',
     });
   });
 });
