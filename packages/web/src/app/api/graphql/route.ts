@@ -161,7 +161,8 @@ const { handleRequest } = createYoga({
       getPersistedOperation(id: string) {
         return (queryMap as any)[id];
       },
-      allowArbitraryOperations: process.env.NODE_ENV !== 'production',
+      allowArbitraryOperations:
+        process.env.NEXT_PUBLIC_PLATFORM !== 'production',
     }),
     useGenericAuth({
       resolveUserFn: async (context: GraphQLContext) => {
