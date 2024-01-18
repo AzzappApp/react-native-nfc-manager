@@ -1668,13 +1668,6 @@
   dependencies:
     tslib "^2.5.0"
 
-"@envelop/disable-introspection@^6.0.0":
-  version "6.0.0"
-  resolved "https://registry.yarnpkg.com/@envelop/disable-introspection/-/disable-introspection-6.0.0.tgz#f611514ba7505f6e38fb171b3c765d837d687d4d"
-  integrity sha512-+DxCvKdzsHat/aWr6dqDsebbGk6ZGiM7VZlnpwKS8g4+PDHg7AfMBnDP8CtUODgifU+kgZME4TFzU288MNpNDg==
-  dependencies:
-    tslib "^2.5.0"
-
 "@envelop/extended-validation@^4.0.0":
   version "4.0.0"
   resolved "https://registry.yarnpkg.com/@envelop/extended-validation/-/extended-validation-4.0.0.tgz#5c445a86d37a3143bc9e87dfe34563a2c6e3f8eb"
@@ -3451,6 +3444,11 @@
   integrity sha512-Mg8psdkAp+YTG1OGmvU+xa6xpsAmSir0hhr3yFYPyLNwzUj95DdIwsMpKadDj9xDpYgJcH3Hp/4JMal9DhQimA==
   dependencies:
     tslib "^2.5.2"
+
+"@graphql-yoga/plugin-disable-introspection@^2.1.1":
+  version "2.1.1"
+  resolved "https://registry.yarnpkg.com/@graphql-yoga/plugin-disable-introspection/-/plugin-disable-introspection-2.1.1.tgz#bd687b137c2b1c291cdab47aeee90411598ffc08"
+  integrity sha512-vFeYDegjeCMa4agvKE/+1waINUBmckBTozpmRLSvElDlb18e18CWj1jm18hTDl6jV9R5GS4y5VMdpbFTukyh/w==
 
 "@graphql-yoga/plugin-persisted-operations@^3.1.1":
   version "3.1.1"

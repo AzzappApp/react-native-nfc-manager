@@ -1,8 +1,8 @@
 /* eslint-disable react-hooks/rules-of-hooks */
 import { useLogger, useErrorHandler } from '@envelop/core';
-import { useDisableIntrospection } from '@envelop/disable-introspection';
 import { UnauthenticatedError, useGenericAuth } from '@envelop/generic-auth';
 import { useSentry } from '@envelop/sentry';
+import { useDisableIntrospection } from '@graphql-yoga/plugin-disable-introspection';
 import { usePersistedOperations } from '@graphql-yoga/plugin-persisted-operations';
 import { createYoga } from 'graphql-yoga';
 import { compare } from 'semver';
@@ -159,8 +159,11 @@ const { handleRequest } = createYoga({
       getPersistedOperation(id: string) {
         return (queryMap as any)[id];
       },
-      allowArbitraryOperations:
-        process.env.NEXT_PUBLIC_PLATFORM !== 'production',
+      allowArbitraryOperations: request =>
+        process.env.API_SERVER_TOKEN
+          ? request.headers.get('authorization') ===
+            process.env.API_SERVER_TOKEN
+          : false,
     }),
     useGenericAuth({
       resolveUserFn: async () => {
@@ -186,7 +189,12 @@ const { handleRequest } = createYoga({
     }),
     useRevalidatePages(),
     useDisableIntrospection({
-      disableIf: () => process.env.NODE_ENV === 'production',
+      isDisabled: request => {
+        return process.env.API_SERVER_TOKEN
+          ? request.headers.get('authorization') !==
+              process.env.API_SERVER_TOKEN
+          : true;
+      },
     }),
     useSentry({
       includeRawResult: false,
