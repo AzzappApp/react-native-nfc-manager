@@ -20,6 +20,7 @@ import { textStyles } from '#theme';
 import ScreenModal from '#components/ScreenModal';
 import { CardPhoneLabels } from '#helpers/contactCardHelpers';
 import { getFileName } from '#helpers/fileHelpers';
+import { useCurrentLocale } from '#helpers/localeHelpers';
 import { addLocalCachedMediaFile } from '#helpers/mediaHelpers';
 import { uploadMedia, uploadSign } from '#helpers/MobileWebAPI';
 import useAuthState from '#hooks/useAuthState';
@@ -119,7 +120,7 @@ type MultiUserAddModalProps = {
 };
 
 export type MultiUserAddModalActions = {
-  open: (contact?: Contact | undefined) => void;
+  open: (contact: Contact | string) => void;
 };
 
 const MultiUserAddModal = (
@@ -195,9 +196,11 @@ const MultiUserAddModal = (
     mode: 'onSubmit',
   });
 
+  const locale = useCurrentLocale();
+
   useImperativeHandle(ref, () => ({
-    open: (contact: Contact | undefined) => {
-      if (contact) {
+    open: (contact: Contact | string) => {
+      if (typeof contact !== 'string') {
         setContact(contact);
         setIsManual(false);
         let selectedContact: EmailPhoneInput = {
@@ -254,6 +257,12 @@ const MultiUserAddModal = (
       } else {
         reset({
           role: 'user',
+          selectedContact: {
+            countryCodeOrEmail: isValidEmail(contact)
+              ? 'email'
+              : (locale as CountryCode),
+            value: contact,
+          },
         });
         setIsManual(isManual);
       }

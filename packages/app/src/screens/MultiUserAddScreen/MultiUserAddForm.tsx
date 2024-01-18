@@ -20,7 +20,10 @@ import type { CountryCode } from 'libphonenumber-js';
 import type { Control } from 'react-hook-form';
 
 export type MultiUserAddFormValues = ContactCardEditFormValues & {
-  selectedContact: { countryCodeOrEmail: CountryCode | 'email'; value: string };
+  selectedContact: {
+    countryCodeOrEmail: CountryCode | 'email';
+    value: string;
+  };
   role: ProfileRole;
   contactCard: ContactCard;
 };
@@ -127,7 +130,12 @@ const MultiUserAddForm = ({ contacts, control }: MultiUserAddFormProps) => {
           </BottomSheetModal>
         )}
         <EmailOrPhoneInput
-          input={selectedContact}
+          input={
+            selectedContact || {
+              countryCodeOrEmail: 'email',
+              value: '',
+            }
+          }
           onChange={setSelectedContact}
           hasError={error != null}
         />

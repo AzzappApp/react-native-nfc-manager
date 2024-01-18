@@ -46,8 +46,8 @@ const MultiUserAddScreen = ({
   };
 
   const addNewUser = useCallback(() => {
-    ref.current?.open();
-  }, []);
+    ref.current?.open(searchValue ?? '');
+  }, [searchValue]);
 
   return (
     <>
