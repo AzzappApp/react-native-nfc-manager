@@ -22,7 +22,7 @@ import { textStyles } from '#theme';
 import ScreenModal from '#components/ScreenModal';
 import { CardPhoneLabels } from '#helpers/contactCardHelpers';
 import { getFileName } from '#helpers/fileHelpers';
-import { useCurrentLocale } from '#helpers/localeHelpers';
+import { getLocales, useCurrentLocale } from '#helpers/localeHelpers';
 import { addLocalCachedMediaFile } from '#helpers/mediaHelpers';
 import { uploadMedia, uploadSign } from '#helpers/MobileWebAPI';
 import useAuthState from '#hooks/useAuthState';
@@ -198,7 +198,12 @@ const MultiUserAddModal = (
     mode: 'onSubmit',
   });
 
-  const locale = useCurrentLocale();
+  const locales = getLocales();
+  const currentLanguageLocale = useCurrentLocale();
+
+  const locale = locales.find(
+    locale => locale.languageCode === currentLanguageLocale,
+  );
 
   useImperativeHandle(ref, () => ({
     open: (contact: Contact | string) => {
@@ -262,7 +267,7 @@ const MultiUserAddModal = (
           selectedContact: {
             countryCodeOrEmail: isValidEmail(contact)
               ? 'email'
-              : (locale as CountryCode),
+              : (locale?.countryCode.toUpperCase() as CountryCode),
             value: contact,
           },
         });
