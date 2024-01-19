@@ -20,7 +20,7 @@ import type { CardTemplateListHandle } from '#components/CardTemplateList';
 import type { LoadCardTemplateModal_webCard$key } from '#relayArtifacts/LoadCardTemplateModal_webCard.graphql';
 
 type LoadCardTemplateModalProps = {
-  onClose: () => void;
+  onClose: (templateLoaded: boolean) => void;
   visible: boolean;
   webCard: LoadCardTemplateModal_webCard$key;
 };
@@ -63,7 +63,7 @@ const LoadCardTemplateModal = ({
         },
         onCompleted: () => {
           setCardTemplateId(null);
-          onClose();
+          onClose(true);
         },
         onError: error => {
           console.error(error);
@@ -116,7 +116,7 @@ const LoadCardTemplateModal = ({
             leftElement={
               <IconButton
                 icon="arrow_down"
-                onPress={onClose}
+                onPress={() => onClose(false)}
                 iconSize={28}
                 variant="icon"
               />

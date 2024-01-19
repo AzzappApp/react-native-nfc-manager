@@ -36,6 +36,7 @@ import type {
 } from './WebCardScreenBody';
 import type { ModuleKind } from '@azzapp/shared/cardModuleHelpers';
 import type { NativeScrollEvent, NativeSyntheticEvent } from 'react-native';
+import type { ScrollView } from 'react-native-gesture-handler';
 
 type WebCardScreenContentProps = {
   /**
@@ -247,9 +248,19 @@ const WebCardScreenContent = ({
     },
     [onToggleSelectionMode],
   );
-
-  const [loadTemplate, setLoadTemplate] = useState(false);
   // #endregion
+
+  //#region Load template
+
+  const scrollViewRef = useRef<ScrollView>(null);
+  const [loadTemplate, setLoadTemplate] = useState(false);
+  const onTemplateModalClose = useCallback((templateLoaded: boolean) => {
+    if (templateLoaded) {
+      scrollViewRef.current?.scrollTo({ x: 0, y: 0, animated: false });
+    }
+    setLoadTemplate(false);
+  }, []);
+  //#endregion
 
   // #region Card style
   const [showCardStyleModal, setShowCardStyleModal] = useState(false);
@@ -315,6 +326,7 @@ const WebCardScreenContent = ({
         />
         <WebCardScreenScrollView
           editing={editing}
+          ref={scrollViewRef}
           allBlockLoaded={allBlockLoaded}
           onScroll={onScroll}
           editFooter={
@@ -358,6 +370,8 @@ const WebCardScreenContent = ({
              *
              * Could be solved directly in WebCardBlockContainer once this PR is merged :
              * https://github.com/software-mansion/react-native-reanimated/pull/5371
+             *
+             * update 19/01/2023: the PR is merged, we need to wait for the next reanimated release
              */}
             <ScreenDidAppear>
               <WebCardScreenBody
@@ -435,7 +449,7 @@ const WebCardScreenContent = ({
               onRequestClose={closeCardStyleModal}
             />
             <LoadCardTemplateModal
-              onClose={() => setLoadTemplate(false)}
+              onClose={onTemplateModalClose}
               visible={loadTemplate}
               webCard={webCard}
             />

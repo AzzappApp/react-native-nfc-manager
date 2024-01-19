@@ -1,4 +1,11 @@
-import { createContext, useCallback, useMemo, useRef, useState } from 'react';
+import {
+  createContext,
+  useCallback,
+  useMemo,
+  useRef,
+  useState,
+  forwardRef,
+} from 'react';
 import { Dimensions, StyleSheet } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import Animated, {
@@ -10,6 +17,7 @@ import Animated, {
   useAnimatedRef,
   useAnimatedStyle,
 } from 'react-native-reanimated';
+import { mergeRefs } from '#helpers/mergeRefs';
 import useScreenInsets from '#hooks/useScreenInsets';
 import { BOTTOM_MENU_HEIGHT } from '#ui/BottomMenu';
 import { HEADER_HEIGHT } from '#ui/Header';
@@ -23,7 +31,7 @@ import {
   useEditTransition,
   useEditTransitionListeners,
 } from './WebCardScreenTransitions';
-import type { ReactNode } from 'react';
+import type { ForwardedRef, ReactNode } from 'react';
 import type {
   NativeScrollEvent,
   NativeSyntheticEvent,
@@ -53,15 +61,18 @@ export type WebCardScreenScrollViewProps = ScrollViewProps & {
 /**
  * A wrapper component for the webCard screen content. Handle the edit animation
  */
-const WebCardScreenScrollView = ({
-  editing,
-  allBlockLoaded,
-  children,
-  onScroll,
-  editFooter,
-  editFooterHeight,
-  ...props
-}: WebCardScreenScrollViewProps) => {
+const WebCardScreenScrollView = (
+  {
+    editing,
+    allBlockLoaded,
+    children,
+    onScroll,
+    editFooter,
+    editFooterHeight,
+    ...props
+  }: WebCardScreenScrollViewProps,
+  forwardedRef: ForwardedRef<ScrollView>,
+) => {
   const editScale = useWebCardEditScale();
   const editTransition = useEditTransition();
   const [editTransitionActive, setEditTransitionActive] = useState(false);
@@ -264,6 +275,11 @@ const WebCardScreenScrollView = ({
     [updateBlockCounts],
   );
 
+  const mergedRefs = useMemo(
+    () => mergeRefs([scrollViewRef, forwardedRef]),
+    [forwardedRef],
+  );
+
   return (
     <Animated.View style={[StyleSheet.absoluteFill, containerStyle]}>
       <ScrollView
@@ -272,7 +288,7 @@ const WebCardScreenScrollView = ({
           flexGrow: 1,
         }}
         contentInsetAdjustmentBehavior="never"
-        ref={scrollViewRef}
+        ref={mergedRefs}
         scrollToOverflowEnabled
         onScroll={onScrollInner}
         scrollEventThrottle={16}
@@ -309,7 +325,7 @@ const WebCardScreenScrollView = ({
   );
 };
 
-export default WebCardScreenScrollView;
+export default forwardRef(WebCardScreenScrollView);
 
 /* eslint-disable @typescript-eslint/no-unused-vars */
 export const WebCardScreenScrollViewContext = createContext({
