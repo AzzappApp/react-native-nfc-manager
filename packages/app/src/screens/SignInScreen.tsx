@@ -4,7 +4,11 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import { Image, View, StyleSheet, Keyboard } from 'react-native';
 
 import Animated, { useAnimatedStyle } from 'react-native-reanimated';
-import { isNotFalsyString } from '@azzapp/shared/stringHelpers';
+import {
+  isNotFalsyString,
+  isValidEmail,
+  isValidUserName,
+} from '@azzapp/shared/stringHelpers';
 import { colors } from '#theme';
 import Link from '#components/Link';
 import { dispatchGlobalEvent } from '#helpers/globalEvents';
@@ -25,6 +29,7 @@ import type { TextInput as NativeTextInput } from 'react-native';
 const SignInScreen = () => {
   const [credential, setCredential] = useState('');
   const [password, setPassword] = useState('');
+  const [credentialInvalid, setCredentialInvalid] = useState(false);
   const [signinError, setSigninError] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -37,6 +42,16 @@ const SignInScreen = () => {
       credential,
       locales[0]?.countryCode,
     );
+
+    if (
+      !intlPhoneNumber &&
+      !isValidEmail(credential) &&
+      !isValidUserName(credential)
+    ) {
+      setCredentialInvalid(true);
+      return;
+    }
+    setCredentialInvalid(false);
 
     let token: string;
     let refreshToken: string;
@@ -135,7 +150,6 @@ const SignInScreen = () => {
               onSubmitEditing={focusPassword}
               style={styles.textInput}
             />
-
             <SecuredTextInput
               ref={passwordRef}
               testID="password-input"
@@ -153,7 +167,6 @@ const SignInScreen = () => {
               onSubmitEditing={onSubmit}
               style={styles.textInput}
             />
-
             <View style={styles.forgotPasswordContainer}>
               <Link route="FORGOT_PASSWORD">
                 <PressableOpacity>
@@ -186,22 +199,30 @@ const SignInScreen = () => {
                 loading={isSubmitting}
               />
             </Submit>
-            {signinError && (
-              <View
-                style={{
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  marginTop: 20,
-                }}
-              >
-                <Text variant="error">
+            <View
+              style={{
+                justifyContent: 'center',
+                alignItems: 'center',
+                marginTop: 20,
+              }}
+            >
+              <Text variant="error">
+                {credentialInvalid ? (
+                  <FormattedMessage
+                    defaultMessage="Please use a valid phone number or email address"
+                    description="SigninScreen - Invalid email or phone number"
+                  />
+                ) : signinError ? (
                   <FormattedMessage
                     defaultMessage="Invalid credentials"
                     description="SigninScreen - Invalid Credentials"
                   />
-                </Text>
-              </View>
-            )}
+                ) : (
+                  // just to keep the same height
+                  ' '
+                )}
+              </Text>
+            </View>
             <View style={styles.footer}>
               <Text style={styles.greyText} variant="medium">
                 <FormattedMessage
