@@ -141,6 +141,14 @@ const MultiUserAddForm = ({ contacts, control }: MultiUserAddFormProps) => {
           onChange={setSelectedContact}
           hasError={error != null}
         />
+        <Text style={styles.error} variant="error">
+          {error != null && (
+            <FormattedMessage
+              defaultMessage="Please enter a valid phone number or email address."
+              description="MultiUserAddForm - Error message when phone number or email address is wrong"
+            />
+          )}
+        </Text>
       </>
 
       <Text variant="xsmall" style={[styles.selectTitle, { marginTop: 10 }]}>
@@ -249,6 +257,10 @@ const styleSheet = createStyleSheet(appearance => ({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'flex-start',
+  },
+  error: {
+    minHeight: 15,
+    marginBottom: 5,
   },
 }));
 
