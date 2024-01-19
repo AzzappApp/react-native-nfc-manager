@@ -52,7 +52,6 @@ const config = {
     //   ],
     // ],
     // ],
-    windowHistorySupport: true,
   },
   transpilePackages: ['@azzapp/shared/', '@azzapp/data'],
 };
