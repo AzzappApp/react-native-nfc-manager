@@ -1,5 +1,8 @@
-## 0.5.2-canary.169
+## 0.5.2-canary.170
 
+* **fix:**  - **WebCardEdition:** URL fields validation ([#2386](https://github.com/AzzappApp/azzapp/pull/2386))
+* **fix:**  - 🐛 close modal on value selection ([#2385](https://github.com/AzzappApp/azzapp/pull/2385))
+* **fix:**  - 🐛 invite user with international number ([#2384](https://github.com/AzzappApp/azzapp/pull/2384))
 * **fix:**  - **WebCardEdition:** reset scroll position after template loading ([#2374](https://github.com/AzzappApp/azzapp/pull/2374))
 * **build:**  - upgrade to expo 50 and next 14.1 ([#2373](https://github.com/AzzappApp/azzapp/pull/2373))
 * **fix:**  - **Logout:** crash on logout
