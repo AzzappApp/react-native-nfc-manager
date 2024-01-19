@@ -9,7 +9,6 @@ import {
   uniqueIndex,
 } from 'drizzle-orm/mysql-core';
 import db, { cols } from './db';
-import { FilteredWebCardSuggestionTable } from './filteredWebCardSuggestions';
 import { FollowTable } from './follows';
 import { WebCardTable } from './webCards';
 import type { DbTransaction } from './db';
@@ -167,18 +166,10 @@ export const getRecommendedWebCards = async (
         eq(FollowTable.followerId, webCardId),
       ),
     )
-    .leftJoin(
-      FilteredWebCardSuggestionTable,
-      and(
-        eq(FilteredWebCardSuggestionTable.profileId, profileId),
-        eq(FilteredWebCardSuggestionTable.webCardId, WebCardTable.id),
-      ),
-    )
     .where(
       and(
         ne(WebCardTable.id, webCardId),
         isNull(FollowTable.followerId),
-        isNull(FilteredWebCardSuggestionTable.profileId),
         eq(WebCardTable.cardIsPublished, true),
       ),
     )
