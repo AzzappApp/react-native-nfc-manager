@@ -1,9 +1,10 @@
 import * as Sentry from '@sentry/react-native';
 import { memo, useCallback, useMemo } from 'react';
-import { FormattedMessage, useIntl } from 'react-intl';
+import { useIntl } from 'react-intl';
 import { Platform, StyleSheet, View, Share } from 'react-native';
 import { graphql, useFragment } from 'react-relay';
-import { isAdmin, isOwner } from '@azzapp/shared/profileHelpers';
+import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
+import { isAdmin } from '@azzapp/shared/profileHelpers';
 import { buildUserUrl } from '@azzapp/shared/urlHelpers';
 import Link from '#components/Link';
 import { dispatchGlobalEvent } from '#helpers/globalEvents';
@@ -13,7 +14,10 @@ import BottomSheetModal from '#ui/BottomSheetModal';
 import Icon from '#ui/Icon';
 import PressableNative from '#ui/PressableNative';
 import Text from '#ui/Text';
+import type { LinkProps } from '#components/Link';
 import type { HomeBottomSheetPanel_profile$key } from '#relayArtifacts/HomeBottomSheetPanel_profile.graphql';
+import type { Icons } from '#ui/Icon';
+import type { ReactNode } from 'react';
 
 type HomeBottomSheetPanelProps = {
   /**
@@ -84,7 +88,7 @@ const HomeBottomSheetPanel = ({
   }, [close, toggleRequestLogout]);
 
   const intl = useIntl();
-  const onShare = async () => {
+  const onShare = useCallback(async () => {
     if (profile?.webCard.userName) {
       // a quick share method using the native share component. If we want to make a custom share (like tiktok for example, when they are recompressiong the media etc) we can use react-native-shares
       try {
@@ -112,19 +116,108 @@ const HomeBottomSheetPanel = ({
         Sentry.captureException(error);
       }
     }
-  };
+  }, [close, intl, profile?.webCard.userName]);
 
-  const modalHeight = useMemo(() => {
-    let height = 220;
-    if (!profile?.invited) height += 50;
+  const elements = useMemo<HomeBottomSheetPanelOptionProps[]>(
+    () =>
+      convertToNonNullArray([
+        {
+          icon: 'information',
+          text: intl.formatMessage({
+            defaultMessage: 'Account details',
+            description:
+              'Link to open account details form to change email, phone number, etc.',
+          }),
+          linkProps: {
+            route: 'ACCOUNT_DETAILS',
+          },
+          onPress: close,
+        },
+        withProfile && profileRole && isAdmin(profileRole) && !profile?.invited
+          ? {
+              icon: 'parameters',
+              text: intl.formatMessage(
+                {
+                  defaultMessage: 'WebCard{azzappA} parameters',
+                  description:
+                    'Link to open webcard parameters form to change webcard parameters',
+                },
+                { azzappA: <Text variant="azzapp">a</Text> },
+              ),
+              linkProps: {
+                route: 'WEBCARD_PARAMETERS',
+              },
+              onPress: close,
+            }
+          : null,
+        withProfile &&
+        profile &&
+        profile?.webCard.cardIsPublished &&
+        !profile?.invited
+          ? {
+              icon: 'share',
+              text: intl.formatMessage(
+                {
+                  defaultMessage: 'Share this WebCard{azzappApp}',
+                  description: 'Share this webcard',
+                },
+                { azzappApp: <Text variant="azzapp">a</Text> },
+              ),
+              onPress: onShare,
+            }
+          : null,
 
-    if (!withProfile || !profileRole) return height;
+        withProfile && !profile?.invited
+          ? {
+              icon: 'invite',
+              text: intl.formatMessage({
+                defaultMessage: 'Invite friends',
+                description: 'Invite friends to join the app',
+              }),
+              linkProps: {
+                route: 'INVITE_FRIENDS',
+              },
+              onPress: close,
+            }
+          : null,
 
-    if (isOwner(profileRole)) height += 50;
-    if (isAdmin(profileRole) && !profile?.invited) height += 50;
+        withProfile && profileRole && !profile?.invited && isAdmin(profileRole)
+          ? {
+              icon: 'shared_webcard',
+              text: intl.formatMessage({
+                defaultMessage: 'Multi user',
+                description: 'Multi user menu option',
+              }),
+              linkProps: {
+                route: 'MULTI_USER',
+              },
+              onPress: close,
+            }
+          : null,
+        {
+          icon: 'about',
+          text: intl.formatMessage({
+            defaultMessage: 'About',
+            description: 'About message item in Home bottom sheet panel',
+          }),
+          linkProps: {
+            route: 'ABOUT',
+          },
+          onPress: close,
+        },
+        {
+          icon: 'logout',
+          text: intl.formatMessage({
+            defaultMessage: 'Logout',
+            description: 'logout link',
+          }),
+          onPress: onLogout,
+        },
+      ]),
+    [close, intl, onLogout, onShare, profile, profileRole, withProfile],
+  );
 
-    return height;
-  }, [profile?.invited, profileRole, withProfile]);
+  const modalHeight = 20 + 32 * elements.length + 20 * (elements.length - 1);
 
   return (
     <BottomSheetModal
@@ -135,157 +228,42 @@ const HomeBottomSheetPanel = ({
       onRequestClose={close}
     >
       <View style={styles.bottomSheetOptionsContainer}>
-        <>
-          {!profile?.invited && (
-            <Link route="ACCOUNT_DETAILS">
-              <PressableNative
-                style={styles.bottomSheetOptionButton}
-                onPress={close}
-              >
-                <View style={styles.bottomSheetOptionContainer}>
-                  <View style={styles.bottomSheetOptionIconLabel}>
-                    <Icon icon="information" />
-                    <Text>
-                      <FormattedMessage
-                        defaultMessage="Account details"
-                        description="Link to open account details form to change email, phone number, etc."
-                      />
-                    </Text>
-                  </View>
-                  <Icon icon="arrow_right" />
-                </View>
-              </PressableNative>
-            </Link>
-          )}
-          {withProfile && profileRole && isOwner(profileRole) && (
-            <Link route="WEBCARD_PARAMETERS">
-              <PressableNative
-                style={styles.bottomSheetOptionButton}
-                onPress={close}
-              >
-                <View style={styles.bottomSheetOptionContainer}>
-                  <View style={styles.bottomSheetOptionIconLabel}>
-                    <Icon icon="parameters" />
-                    <Text>
-                      <FormattedMessage
-                        defaultMessage="WebCard{azzappA} parameters"
-                        description="Link to open webcard parameters form to change webcard parameters"
-                        values={{
-                          azzappA: <Text variant="azzapp">a</Text>,
-                        }}
-                      />
-                    </Text>
-                  </View>
-                  <Icon icon="arrow_right" />
-                </View>
-              </PressableNative>
-            </Link>
-          )}
-          {withProfile && profile && profile?.webCard.cardIsPublished && (
-            <PressableNative
-              style={styles.bottomSheetOptionButton}
-              onPress={onShare}
-            >
-              <View style={styles.bottomSheetOptionContainer}>
-                <View style={styles.bottomSheetOptionIconLabel}>
-                  <Icon icon="share" />
-                  <Text>
-                    <FormattedMessage
-                      defaultMessage="Share this WebCard{azzappApp}"
-                      description="Share this webcard"
-                      values={{ azzappApp: <Text variant="azzapp">a</Text> }}
-                    />
-                  </Text>
-                </View>
-                <Icon icon="arrow_right" />
-              </View>
-            </PressableNative>
-          )}
-          {withProfile ? (
-            <Link route="INVITE_FRIENDS">
-              <PressableNative
-                style={styles.bottomSheetOptionButton}
-                onPress={close}
-              >
-                <View style={styles.bottomSheetOptionContainer}>
-                  <View style={styles.bottomSheetOptionIconLabel}>
-                    <Icon icon="invite" />
-                    <Text>
-                      <FormattedMessage
-                        defaultMessage="Invite friends"
-                        description="Invite friends to join the app"
-                      />
-                    </Text>
-                  </View>
-                  <Icon icon="arrow_right" />
-                </View>
-              </PressableNative>
-            </Link>
-          ) : null}
-          {withProfile &&
-          profileRole &&
-          !profile?.invited &&
-          isAdmin(profileRole) ? (
-            <Link route="MULTI_USER">
-              <PressableNative
-                style={styles.bottomSheetOptionButton}
-                onPress={close}
-              >
-                <View style={styles.bottomSheetOptionContainer}>
-                  <View style={styles.bottomSheetOptionIconLabel}>
-                    <Icon icon="shared_webcard" />
-                    <Text>
-                      <FormattedMessage
-                        defaultMessage="Multi user"
-                        description="Multi user menu option"
-                      />
-                    </Text>
-                  </View>
-                  <Icon icon="arrow_right" />
-                </View>
-              </PressableNative>
-            </Link>
-          ) : null}
-        </>
-        <Link route="ABOUT">
-          <PressableNative
-            style={styles.bottomSheetOptionButton}
-            onPress={close}
-          >
-            <View style={styles.bottomSheetOptionContainer}>
-              <View style={styles.bottomSheetOptionIconLabel}>
-                <Icon icon="about" />
-                <Text>
-                  <FormattedMessage
-                    defaultMessage="About"
-                    description="About message item in Home bottom sheet panel"
-                  />
-                </Text>
-              </View>
-              <Icon icon="arrow_right" />
-            </View>
-          </PressableNative>
-        </Link>
-        <PressableNative
-          onPress={onLogout}
-          style={styles.bottomSheetOptionButton}
-        >
-          <View style={styles.bottomSheetOptionContainer}>
-            <View style={styles.bottomSheetOptionIconLabel}>
-              <Icon icon="logout" />
-              <Text>
-                <FormattedMessage
-                  defaultMessage="Logout"
-                  description="logout link"
-                />
-              </Text>
-            </View>
-            <Icon icon="arrow_right" />
-          </View>
-        </PressableNative>
+        {elements.map((element, index) => (
+          <HomeBottomSheetPanelOption key={index} {...element} />
+        ))}
       </View>
     </BottomSheetModal>
   );
+};
+
+type HomeBottomSheetPanelOptionProps = {
+  icon: Icons;
+  text: ReactNode;
+  linkProps?: LinkProps<any>;
+  onPress: () => void;
+};
+
+const HomeBottomSheetPanelOption = ({
+  icon,
+  text,
+  linkProps,
+  onPress,
+}: HomeBottomSheetPanelOptionProps) => {
+  const inner = (
+    <PressableNative style={styles.bottomSheetOptionButton} onPress={onPress}>
+      <View style={styles.bottomSheetOptionContainer}>
+        <View style={styles.bottomSheetOptionIconLabel}>
+          <Icon icon={icon} />
+          <Text>{text}</Text>
+        </View>
+        <Icon icon="arrow_right" />
+      </View>
+    </PressableNative>
+  );
+  if (linkProps) {
+    return <Link {...linkProps}>{inner}</Link>;
+  }
+  return inner;
 };
 
 const styles = StyleSheet.create({

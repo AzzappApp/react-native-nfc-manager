@@ -124,88 +124,77 @@ const HomeBottomPanel = ({
     // using disable state with current profile show a disabled style during maybe one secdon
     // (currentProfile is not animated so need to be updated)
     // avoid adding a new interpolation by using this condition
-    if (currentProfile.profileRole !== 'owner') {
+    if (!isAdmin(currentProfile.profileRole)) {
       return;
     }
 
-    if (isAdmin(profileInfos.profileRole)) {
-      const environment = getRelayEnvironment();
-      const publishMutation = graphql`
-        mutation HomeBottomPanelPublishMutation(
-          $input: ToggleWebCardPublishedInput!
-        ) @raw_response_type {
-          toggleWebCardPublished(input: $input) {
-            webCard {
-              id
-              cardIsPublished
-            }
+    const environment = getRelayEnvironment();
+    const publishMutation = graphql`
+      mutation HomeBottomPanelPublishMutation(
+        $input: ToggleWebCardPublishedInput!
+      ) @raw_response_type {
+        toggleWebCardPublished(input: $input) {
+          webCard {
+            id
+            cardIsPublished
           }
         }
-      `;
+      }
+    `;
 
-      commitMutation<HomeBottomPanelPublishMutation>(environment, {
-        mutation: publishMutation,
-        variables: {
-          input: {
-            webCardId: currentProfile.webCard.id,
-            published: true,
+    commitMutation<HomeBottomPanelPublishMutation>(environment, {
+      mutation: publishMutation,
+      variables: {
+        input: {
+          webCardId: currentProfile.webCard.id,
+          published: true,
+        },
+      },
+      optimisticResponse: {
+        toggleWebCardPublished: {
+          webCard: {
+            id: currentProfile.webCard.id,
+            cardIsPublished: true,
           },
         },
-        optimisticResponse: {
-          toggleWebCardPublished: {
-            webCard: {
-              id: currentProfile.webCard.id,
-              cardIsPublished: true,
+      },
+      onCompleted: (_, error) => {
+        if (error) {
+          // TODO - handle error
+          console.log(error);
+          return;
+        }
+        Toast.show({
+          type: 'success',
+          text1: intl.formatMessage(
+            {
+              defaultMessage: 'Your WebCard{azzappA} has been published.',
+              description: 'Home Screen - webcard published toast',
             },
-          },
-        },
-        onCompleted: (_, error) => {
-          if (error) {
-            // TODO - handle error
-            console.log(error);
-            return;
-          }
-          Toast.show({
-            type: 'success',
-            text1: intl.formatMessage(
-              {
-                defaultMessage: 'Your WebCard{azzappA} has been published.',
-                description: 'Home Screen - webcard published toast',
-              },
-              {
-                azzappA: <Text variant="azzapp">a</Text>,
-              },
-            ) as string,
-          });
-        },
-        onError: error => {
-          console.error(error);
-          Toast.show({
-            type: 'error',
-            text1: intl.formatMessage(
-              {
-                defaultMessage:
-                  'Error, could not publish your WebCard{azzappA}, please try again later',
-                description:
-                  'Error message displayed when the publication of the webcard failed in Home Screen',
-              },
-              {
-                azzappA: <Text variant="azzapp">a</Text>,
-              },
-            ) as string,
-          });
-        },
-      });
-    } else {
-      Toast.show({
-        type: 'error',
-        text1: intl.formatMessage({
-          defaultMessage: 'Only owners can publish a webCard',
-          description:
-            'Error message when a user tries to publish a webCard but is not an owner',
-        }),
-      });
-    }
+            {
+              azzappA: <Text variant="azzapp">a</Text>,
+            },
+          ) as string,
+        });
+      },
+      onError: error => {
+        console.error(error);
+        Toast.show({
+          type: 'error',
+          text1: intl.formatMessage(
+            {
+              defaultMessage:
+                'Error, could not publish your WebCard{azzappA}, please try again later',
+              description:
+                'Error message displayed when the publication of the webcard failed in Home Screen',
+            },
+            {
+              azzappA: <Text variant="azzapp">a</Text>,
+            },
+          ) as string,
+        });
+      },
+    });
   };
   //#endregion
 
@@ -395,10 +384,13 @@ const HomeBottomPanel = ({
     [profiles],
   );
 
-  const profilesIsOwner = useMemo(
+  const profilesIsAdmin = useMemo(
     () =>
-      profiles?.map(profile => (profile?.profileRole === 'owner' ? 1 : 0)) ??
-      [],
+      profiles?.map(profile =>
+        profile?.profileRole === 'owner' || profile?.profileRole === 'admin'
+          ? 1
+          : 0,
+      ) ?? [],
     [profiles],
   );
 
@@ -444,8 +436,8 @@ const HomeBottomPanel = ({
     const nextIsInvitation = !!profilesIsInvitation[next];
     const prevIsPromotedAsOwner = !!profilesIsPromotedAsOwner[prev];
     const nextIsPromotedAsOwner = !!profilesIsPromotedAsOwner[next];
-    const prevIsOwner = !!profilesIsOwner[prev];
-    const nextIsOwner = !!profilesIsOwner[next];
+    const prevIsAdmin = !!profilesIsAdmin[prev];
+    const nextIsAdmin = !!profilesIsAdmin[next];
 
     const prevIsNewProfile = prev === -1;
 
@@ -480,7 +472,7 @@ const HomeBottomPanel = ({
     const webCardPublishButtonVisible = interpolate(
       currentProfileIndexSharedValue.value,
       [prev, prev + 0.2, next - 0.2, next],
-      [prevIsOwner ? 1 : 0, 0, 0, nextIsOwner ? 1 : 0],
+      [prevIsAdmin ? 1 : 0, 0, 0, nextIsAdmin ? 1 : 0],
     );
 
     const invitationPanelVisible = interpolate(
