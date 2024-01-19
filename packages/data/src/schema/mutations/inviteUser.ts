@@ -3,6 +3,10 @@ import { and, eq } from 'drizzle-orm';
 import { GraphQLError } from 'graphql';
 import ERRORS from '@azzapp/shared/errors';
 import { isAdmin } from '@azzapp/shared/profileHelpers';
+import {
+  formatPhoneNumber,
+  isInternationalPhoneNumber,
+} from '@azzapp/shared/stringHelpers';
 import { UserTable, createProfile, createUser, db } from '#domains';
 import fromGlobalIdWithType from '#helpers/relayIdHelpers';
 import type { GraphQLContext } from '#index';
@@ -15,7 +19,7 @@ const inviteUserMutation: MutationResolvers['inviteUser'] = async (
   { auth, loaders, sendMail, sendSms }: GraphQLContext,
 ) => {
   const { userId } = auth;
-  const { email, phoneNumber, profileId: gqlProfileId } = input;
+  const { email, phoneNumber: rawPhoneNumber, profileId: gqlProfileId } = input;
 
   const profileId = fromGlobalIdWithType(gqlProfileId, 'Profile');
   const profile = profileId && (await loaders.Profile.load(profileId));
@@ -26,6 +30,12 @@ const inviteUserMutation: MutationResolvers['inviteUser'] = async (
   if (profile.userId !== userId) {
     throw new GraphQLError(ERRORS.UNAUTHORIZED);
   }
+
+  if (rawPhoneNumber && !isInternationalPhoneNumber(rawPhoneNumber)) {
+    throw new GraphQLError(ERRORS.INVALID_REQUEST);
+  }
+
+  const phoneNumber = rawPhoneNumber ? formatPhoneNumber(rawPhoneNumber) : '';
 
   if (!email && !phoneNumber) throw new GraphQLError(ERRORS.INVALID_REQUEST);
 

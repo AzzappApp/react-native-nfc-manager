@@ -1,5 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import parsePhoneNumberFromString from 'libphonenumber-js';
+import parsePhoneNumberFromString, {
+  parsePhoneNumber,
+} from 'libphonenumber-js';
 import capitalize from 'lodash/capitalize';
 import { forwardRef, useImperativeHandle, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -386,7 +388,10 @@ const MultiUserAddModal = (
 
         const phoneNumber =
           selectedContact.countryCodeOrEmail !== 'email'
-            ? selectedContact.value
+            ? parsePhoneNumber(
+                selectedContact.value,
+                selectedContact.countryCodeOrEmail,
+              ).formatInternational()
             : undefined;
 
         const input = {
