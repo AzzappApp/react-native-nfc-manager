@@ -1,5 +1,7 @@
-## 0.5.2-canary.167
+## 0.5.2-canary.168
 
+* **fix:**  - **WebCardEdition:** remove useless tab ([#2372](https://github.com/AzzappApp/azzapp/pull/2372))
+* **feat:**  - **Login:** improve error message ([#2371](https://github.com/AzzappApp/azzapp/pull/2371))
 * **fix:**  - **CoverEdition:** use raw uri for suggested media in save an custom edition ([#2367](https://github.com/AzzappApp/azzapp/pull/2367))
 * **fix:**  - **MediaPrefetcher:** fix possible concurrent access on cache ([#2359](https://github.com/AzzappApp/azzapp/pull/2359))
 * **build:**  - add parameter for other graphql client of the org ([#2362](https://github.com/AzzappApp/azzapp/pull/2362))
