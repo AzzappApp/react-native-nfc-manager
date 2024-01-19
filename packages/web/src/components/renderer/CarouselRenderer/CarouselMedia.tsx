@@ -1,7 +1,4 @@
 'use client';
-import { useRef } from 'react';
-import { useExactClick } from '#hooks';
-import { Button } from '#ui';
 import CloudinaryImage from '#ui/CloudinaryImage';
 import type { Media } from '@azzapp/data/domains';
 
@@ -12,7 +9,6 @@ type CarouselMediaProps = {
   borderRadius: number;
   borderColor: string;
   borderWidth: number;
-  onClick: () => void;
 };
 
 const CarouselMedia = (props: CarouselMediaProps) => {
@@ -23,18 +19,13 @@ const CarouselMedia = (props: CarouselMediaProps) => {
     borderRadius,
     borderColor,
     borderWidth,
-    onClick,
   } = props;
 
   const aspectRatio = media.width / media.height;
   const width = imageHeight * (squareRatio ? 1 : aspectRatio);
 
-  const button = useRef<HTMLButtonElement>(null);
-  useExactClick(button, onClick);
-
   return (
-    <Button.Empty
-      ref={button}
+    <div
       style={{
         minWidth: width,
         height: imageHeight,
@@ -57,7 +48,7 @@ const CarouselMedia = (props: CarouselMediaProps) => {
           objectFit: 'cover',
         }}
       />
-    </Button.Empty>
+    </div>
   );
 };
 

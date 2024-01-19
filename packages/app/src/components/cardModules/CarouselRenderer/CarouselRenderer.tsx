@@ -7,10 +7,7 @@ import {
   CAROUSEL_STYLE_VALUES,
   getModuleDataValues,
 } from '@azzapp/shared/cardModuleHelpers';
-// import PressableNative from '#ui/PressableNative';
 import CardModuleBackground from '../CardModuleBackground';
-// import CarouselFullscreen from './CarouselFullscreen';
-// import type { CarouselFullscrenActions } from './CarouselFullscreen';
 import type {
   CarouselRenderer_module$data,
   CarouselRenderer_module$key,
@@ -132,27 +129,6 @@ const CarouselRenderer = ({
           height: '100%',
         }}
       >
-        {/** Disabled For beta */}
-        {/* {images?.map((image, i) => (
-          <PressableNative
-            key={image.id}
-            onPress={() => modal.current?.open(i)}
-            accessibilityRole="alert"
-          >
-            <Image
-              key={image.id}
-              source={{ uri: image.uri }}
-              style={{
-                height: imageHeight + borderWidth * 2,
-                borderRadius,
-                borderColor: swapColor(borderColor, colorPalette),
-                borderWidth,
-                aspectRatio: squareRatio ? 1 : image.aspectRatio,
-                resizeMode: 'cover',
-              }}
-            />
-          </PressableNative>
-        ))} */}
         {images?.map(image => (
           <Image
             key={image.id}
@@ -168,15 +144,6 @@ const CarouselRenderer = ({
           />
         ))}
       </ScrollView>
-      {/** Disabled for beta */}
-      {/* <CarouselFullscreen
-        ref={modal}
-        images={images}
-        borderColor={borderColor}
-        borderRadius={borderRadius}
-        borderWidth={borderWidth}
-        squareRatio={squareRatio}
-      /> */}
     </CardModuleBackground>
   );
 };

@@ -4,10 +4,8 @@ import { useRef, useState, useEffect } from 'react';
 import { ArrowRightIcon } from '#assets';
 import { useMediaCarousel } from '#hooks';
 import { ButtonIcon } from '#ui';
-// import CarouselFullScreen from './CarouselFullScreen';
 import CarouselMedia from './CarouselMedia';
 import styles from './CarouselRenderer.css';
-// import type { CarouselFullScreenActions } from './CarouselFullScreen';
 import type { Media } from '@azzapp/data/domains';
 
 type CarouselProps = {
@@ -142,21 +140,9 @@ const Carousel = (props: CarouselProps) => {
             borderWidth={borderWidth}
             imageHeight={imageHeight}
             squareRatio={squareRatio}
-            onClick={() => {}}
           />
         ))}
       </div>
-      {/* <CarouselFullScreen
-        ref={modal}
-        medias={medias}
-        borderWidth={borderWidth}
-        mediaStyle={{
-          borderRadius,
-          borderColor,
-          borderStyle: 'solid',
-          objectFit: 'cover',
-        }}
-      /> */}
     </>
   );
 };
