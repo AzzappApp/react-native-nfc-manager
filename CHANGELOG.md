@@ -1,4 +1,4 @@
-## 0.5.2-canary.166
+## 0.5.2-canary.167
 
 * **fix:**  - **CoverEdition:** use raw uri for suggested media in save an custom edition ([#2367](https://github.com/AzzappApp/azzapp/pull/2367))
 * **fix:**  - **MediaPrefetcher:** fix possible concurrent access on cache ([#2359](https://github.com/AzzappApp/azzapp/pull/2359))
