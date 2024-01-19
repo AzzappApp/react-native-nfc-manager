@@ -1,5 +1,6 @@
-## 0.5.2-canary.171
+## 0.5.2-canary.172
 
+* **fix:**  - 🐛 use correct default phone code ([#2393](https://github.com/AzzappApp/azzapp/pull/2393))
 * **fix:**  - **WebCardParameters:** allow admin to access parameters ([#2391](https://github.com/AzzappApp/azzapp/pull/2391))
 * **fix:**  - **WebCardEdition:** URL fields validation ([#2386](https://github.com/AzzappApp/azzapp/pull/2386))
 * **fix:**  - 🐛 close modal on value selection ([#2385](https://github.com/AzzappApp/azzapp/pull/2385))
