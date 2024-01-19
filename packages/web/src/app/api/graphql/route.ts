@@ -159,11 +159,18 @@ const { handleRequest } = createYoga({
       getPersistedOperation(id: string) {
         return (queryMap as any)[id];
       },
-      allowArbitraryOperations: request =>
-        process.env.API_SERVER_TOKEN
-          ? request.headers.get('authorization') ===
+      allowArbitraryOperations: request => {
+        if (process.env.NODE_ENV !== 'production') {
+          return true;
+        }
+        if (process.env.API_SERVER_TOKEN) {
+          return (
+            request.headers.get('authorization') ===
             process.env.API_SERVER_TOKEN
-          : false,
+          );
+        }
+        return false;
+      },
     }),
     useGenericAuth({
       resolveUserFn: async () => {
