@@ -62,6 +62,7 @@ const MultiUserAddForm = ({ contacts, control }: MultiUserAddFormProps) => {
           countryCodeOrEmail: 'email',
           value: info.id,
         });
+        toggleShowAvailableInfo();
 
         return;
       }
@@ -70,8 +71,9 @@ const MultiUserAddForm = ({ contacts, control }: MultiUserAddFormProps) => {
         countryCodeOrEmail: parsed.country,
         value: parsed.nationalNumber,
       });
+      toggleShowAvailableInfo();
     },
-    [setSelectedContact],
+    [setSelectedContact, toggleShowAvailableInfo],
   );
 
   const renderAvailableInfo = (
