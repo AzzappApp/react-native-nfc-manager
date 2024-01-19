@@ -1,5 +1,8 @@
-## 0.5.2-canary.168
+## 0.5.2-canary.169
 
+* **fix:**  - **WebCardEdition:** reset scroll position after template loading ([#2374](https://github.com/AzzappApp/azzapp/pull/2374))
+* **build:**  - upgrade to expo 50 and next 14.1 ([#2373](https://github.com/AzzappApp/azzapp/pull/2373))
+* **fix:**  - **Logout:** crash on logout
 * **fix:**  - **WebCardEdition:** remove useless tab ([#2372](https://github.com/AzzappApp/azzapp/pull/2372))
 * **feat:**  - **Login:** improve error message ([#2371](https://github.com/AzzappApp/azzapp/pull/2371))
 * **fix:**  - **CoverEdition:** use raw uri for suggested media in save an custom edition ([#2367](https://github.com/AzzappApp/azzapp/pull/2367))
