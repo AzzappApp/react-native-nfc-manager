@@ -86,8 +86,6 @@ const WebCardScreenFooter = ({
   const onItemPress = useCallback(
     (key: string) => {
       switch (key) {
-        case 'mobile':
-          break;
         case 'preview':
           onRequestPreview();
           break;
@@ -114,15 +112,6 @@ const WebCardScreenFooter = ({
   const styles = useStyleSheet(styleSheet);
   const tabs = useMemo<FooterBarItem[]>(
     () => [
-      {
-        key: 'mobile',
-        icon: 'mobile',
-        label: intl.formatMessage({
-          defaultMessage: 'Mobile',
-          description:
-            'ProfileScreen bottom menu accessibility label for Mobile tab',
-        }),
-      },
       {
         key: 'preview',
         icon: 'preview',
@@ -191,12 +180,7 @@ const WebCardScreenFooter = ({
         ]}
         pointerEvents={editing ? 'auto' : 'none'}
       >
-        <BottomMenu
-          tabs={tabs}
-          showLabel
-          currentTab={'mobile'}
-          onItemPress={onItemPress}
-        />
+        <BottomMenu tabs={tabs} showLabel onItemPress={onItemPress} />
       </Animated.View>
 
       <Animated.View
