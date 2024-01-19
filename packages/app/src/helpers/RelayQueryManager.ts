@@ -1,7 +1,6 @@
 import { isEqual } from 'lodash';
 import { useEffect, useState } from 'react';
 import { loadQuery } from 'react-relay';
-import { act } from 'react-test-renderer';
 import { addAuthStateListener, getAuthState } from './authStore';
 import {
   addEnvironmentListener,
@@ -45,9 +44,7 @@ const queryToDisposes: Array<PreloadedQuery<any>> = [];
 const requestDisposeQueries = () => {
   requestIdleCallback(() => {
     queryToDisposes.forEach(query => {
-      act(() => {
-        query.dispose();
-      });
+      query.dispose();
     });
     queryToDisposes.length = 0;
   });
