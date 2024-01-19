@@ -2,6 +2,7 @@ import { useState, useCallback, useMemo } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { StyleSheet, View } from 'react-native';
 
+import Toast from 'react-native-toast-message';
 import { useFragment, graphql } from 'react-relay';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
 import { swapColor } from '@azzapp/shared/cardHelpers';
@@ -10,7 +11,7 @@ import {
   SIMPLE_BUTTON_MAX_LABEL_LENGTH,
   SIMPLE_BUTTON_MIN_FONT_SIZE,
 } from '@azzapp/shared/cardModuleHelpers';
-import { isNotFalsyString } from '@azzapp/shared/stringHelpers';
+import { isPhoneNumber, isValidUrl } from '@azzapp/shared/stringHelpers';
 import WebCardColorPicker, {
   WebCardColorDropDownPicker,
 } from '#components/WebCardColorPicker';
@@ -196,17 +197,56 @@ const SimpleButtonSettingsEditionPanel = ({
     );
   };
 
-  const onFocus = () => {
-    if (actionType === 'link' && !isNotFalsyString(actionLink)) {
-      onActionLinkChange('https://');
-    }
-  };
+  const onActionLinkTextInputChangeText = useCallback(
+    (text: string) => {
+      onActionLinkChange(text.trim());
+    },
+    [onActionLinkChange],
+  );
 
-  const onBlur = () => {
-    if (actionType === 'link' && !actionLink.startsWith('http')) {
-      onActionLinkChange(`https://${actionLink}`);
+  const onBlur = useCallback(() => {
+    if (!actionLink) {
+      return;
     }
-  };
+    switch (actionType) {
+      case 'email':
+        if (!isValidUrl(actionLink)) {
+          Toast.show({
+            type: 'error',
+            text1: intl.formatMessage({
+              defaultMessage: 'The email address is not valid.',
+              description:
+                'Error toast message when a the email address in button editor is not valid.',
+            }),
+          });
+        }
+        break;
+      case 'link':
+        if (!isValidUrl(actionLink)) {
+          Toast.show({
+            type: 'error',
+            text1: intl.formatMessage({
+              defaultMessage: 'The url is not valid.',
+              description:
+                'Error toast message when a the url in button editor is not valid.',
+            }),
+          });
+        }
+        break;
+      default:
+        if (!isPhoneNumber(actionLink, actionType as CountryCode)) {
+          Toast.show({
+            type: 'error',
+            text1: intl.formatMessage({
+              defaultMessage: 'The phone number is not valid.',
+              description:
+                'Error toast message when a the phone number in button editor is not valid.',
+            }),
+          });
+        }
+        break;
+    }
+  }, [actionLink, actionType, intl]);
 
   return (
     <View style={[styles.root, style]} {...props}>
@@ -252,11 +292,10 @@ const SimpleButtonSettingsEditionPanel = ({
           />
           <TextInput
             value={actionLink}
-            onChangeText={onActionLinkChange}
+            onChangeText={onActionLinkTextInputChangeText}
             placeholder={getActionTypePlaceholder()}
-            style={{ flex: 1 }}
-            onFocus={onFocus}
             onBlur={onBlur}
+            style={{ flex: 1 }}
             autoCapitalize="none"
           />
         </View>

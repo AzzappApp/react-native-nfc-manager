@@ -238,6 +238,7 @@ const SocialInputComponent = ({
   const colorScheme = useColorScheme();
   const [localValue, setLocalValue] = useState(value);
   const onChangeText = (value: string) => {
+    value = value.trim();
     //handle copy paste from the user with complete link
     let filterText = value;
     if (value.includes(mask)) {

@@ -19,6 +19,7 @@ const ContactCardEditField = <TFieldValues extends FieldValues>({
   onChangeLabel,
   autoCapitalize,
   errorMessage,
+  trim = false,
 }: {
   labelKey?: FieldPath<TFieldValues>;
   keyboardType: TextInputProps['keyboardType'];
@@ -31,6 +32,7 @@ const ContactCardEditField = <TFieldValues extends FieldValues>({
   placeholder?: string;
   onChangeLabel?: (label: string) => void;
   errorMessage?: string;
+  trim?: boolean;
 }) => {
   const styles = useStyleSheet(stylesheet);
 
@@ -50,7 +52,7 @@ const ContactCardEditField = <TFieldValues extends FieldValues>({
         render={({ field: { onChange, value } }) => (
           <TextInput
             value={value as string}
-            onChangeText={onChange}
+            onChangeText={trim ? value => onChange(value.trim()) : onChange}
             style={styles.input}
             numberOfLines={1}
             keyboardType={keyboardType}

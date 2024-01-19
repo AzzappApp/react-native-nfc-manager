@@ -51,6 +51,7 @@ const ContactCardEditModalUrls = ({
                 })
               : undefined
           }
+          trim
         />
       ))}
       <View>
