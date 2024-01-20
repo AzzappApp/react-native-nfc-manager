@@ -110,9 +110,7 @@ const ProfilePage = async ({ params }: ProfilePageProps) => {
                             backgroundColor?: string | null;
                           } | null;
                         }
-                      )?.backgroundStyle?.backgroundColor ??
-                        webCard.coverData?.backgroundPatternColor ??
-                        colorPalette.light,
+                      )?.backgroundStyle?.backgroundColor ?? '#FFF',
                       colorPalette,
                     ) ?? '#FFF'
                   : '#FFF'
