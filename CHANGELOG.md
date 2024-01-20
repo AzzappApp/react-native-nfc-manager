@@ -1,5 +1,6 @@
-## 0.5.2-canary.173
+## 0.5.2-canary.174
 
+* **fix:**  - **webCard:** [#2407](https://github.com/AzzappApp/azzapp/pull/2407) wrong default background color for gradient ([#2408](https://github.com/AzzappApp/azzapp/pull/2408))
 * **fix:**  - 🐛 display error message on wrong mail/phone ([#2397](https://github.com/AzzappApp/azzapp/pull/2397))
 * **fix:**  - 🐛 use correct default phone code ([#2393](https://github.com/AzzappApp/azzapp/pull/2393))
 * **fix:**  - **WebCardParameters:** allow admin to access parameters ([#2391](https://github.com/AzzappApp/azzapp/pull/2391))
