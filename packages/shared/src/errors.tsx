@@ -90,6 +90,11 @@ const ERRORS = {
    */
   PROFILE_ALREADY_EXISTS: 'PROFILE_ALREADY_EXISTS',
   /**
+   * The profile does not exist.
+   * This may happen when an action is triggered for a given profile, which is not part of a webcard anymore.
+   */
+  PROFILE_DONT_EXISTS: 'PROFILE_DONT_EXISTS',
+  /**
    * The webCard is not published.
    */
   UNPUBLISHED_WEB_CARD: 'UNPUBLISHED_WEB_CARD',

@@ -13,6 +13,7 @@ import { useSharedValue } from 'react-native-reanimated';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
 import { graphql, useFragment, useMutation } from 'react-relay';
+import ERRORS from '@azzapp/shared/errors';
 import { encodeMediaId } from '@azzapp/shared/imagesHelpers';
 import { isOwner } from '@azzapp/shared/profileHelpers';
 import { colors, textStyles } from '#theme';
@@ -257,14 +258,30 @@ const MultiUserDetailModal = (
         },
         onError: e => {
           console.error(e);
-          Toast.show({
-            type: 'error',
-            text1: intl.formatMessage({
-              defaultMessage: 'Error, could update user. Please try again.',
-              description:
-                'Error toast message when updating user from MultiUserDetailModal',
-            }),
-          });
+
+          if (e.message === ERRORS.PROFILE_DONT_EXISTS) {
+            Toast.show({
+              type: 'error',
+              text1: intl.formatMessage({
+                defaultMessage: 'Error, user declined the invitation.',
+                description:
+                  'Error toast message when updating user who declined the invitation from MultiUserDetailModal',
+              }),
+              onHide: () => {
+                setVisible(false);
+              },
+            });
+          } else {
+            Toast.show({
+              type: 'error',
+              text1: intl.formatMessage({
+                defaultMessage:
+                  'Error, could not update user. Please try again.',
+                description:
+                  'Error toast message when updating user from MultiUserDetailModal',
+              }),
+            });
+          }
         },
       });
     },

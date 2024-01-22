@@ -17,7 +17,11 @@ const updateProfileMutation: MutationResolvers['updateProfile'] = async (
   const targetProfileId = fromGlobalIdWithType(gqlProfileId, 'Profile');
   const targetProfile = await loaders.Profile.load(targetProfileId);
 
-  if (!targetProfile || profileRole === 'owner') {
+  if (!targetProfile) {
+    throw new GraphQLError(ERRORS.PROFILE_DONT_EXISTS);
+  }
+
+  if (profileRole === 'owner') {
     throw new GraphQLError(ERRORS.INVALID_REQUEST);
   }
 
