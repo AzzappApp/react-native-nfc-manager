@@ -17,7 +17,7 @@ export const buildAvatarUrl = async (
         src: decodeMediaId(avatarId),
         width: AVATAR_WIDTH,
         crop: 'fill',
-        format: 'jpeg',
+        format: 'jpg',
       },
       config: {
         cloud: {
