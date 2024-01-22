@@ -1,5 +1,6 @@
-## 0.5.2-canary.183
+## 0.5.2-canary.184
 
+* **fix:**  - **multiUser:** [#2421](https://github.com/AzzappApp/azzapp/pull/2421) reset form on cancel ([#2426](https://github.com/AzzappApp/azzapp/pull/2426))
 * **Fix:**  - **multiUser:** Empty phone number and updater ([#2425](https://github.com/AzzappApp/azzapp/pull/2425))
 * **fix:**  - change the way the shake and share pop the view ([#2422](https://github.com/AzzappApp/azzapp/pull/2422))
 * **fix:**  - **MultiUSer:** rework user list ([#2402](https://github.com/AzzappApp/azzapp/pull/2402))
