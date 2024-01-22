@@ -45,7 +45,6 @@ import type { Contact } from 'expo-contacts';
 import type { CountryCode } from 'libphonenumber-js';
 import type { ForwardedRef } from 'react';
 import type { Control } from 'react-hook-form';
-import type { RecordProxy, RecordSourceSelectorProxy } from 'relay-runtime';
 
 const multiUserAddFormSchema = z.object({
   selectedContact: z
