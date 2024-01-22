@@ -428,4 +428,5 @@ export default relayScreen(MultiUserScreen, {
     pixelRatio: CappedPixelRatio(),
   }),
   fetchPolicy: 'store-and-network',
+  pollInterval: 20000,
 });
