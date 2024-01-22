@@ -1,5 +1,9 @@
-## 0.5.2-canary.186
+## 0.5.2-canary.187
 
+* **fix:**  - lint
+* **fix:**  - lint on main ([#2440](https://github.com/AzzappApp/azzapp/pull/2440))
+* **fix:**  - append the new user added
+* **fix:**  - **MultiUser:** remove using with connection
 * **fix:**  - **contactCard:** [#2170](https://github.com/AzzappApp/azzapp/pull/2170) update message on mobile and web ([#2424](https://github.com/AzzappApp/azzapp/pull/2424))
 * **fix:**  - more dark mode ([#2434](https://github.com/AzzappApp/azzapp/pull/2434))
 * **fix:**  - **contactCard:** [#2303](https://github.com/AzzappApp/azzapp/pull/2303) wrong format type ([#2433](https://github.com/AzzappApp/azzapp/pull/2433))

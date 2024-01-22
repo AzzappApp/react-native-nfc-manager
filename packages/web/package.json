@@ -1,6 +1,6 @@
 {
   "name": "@azzapp/web",
-  "version": "0.5.2-canary.186",
+  "version": "0.5.2-canary.187",
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -13,9 +13,9 @@
     "dev"
   ],
   "dependencies": {
-    "@azzapp/data": "0.5.2-canary.186",
-    "@azzapp/i18n": "0.5.2-canary.186",
-    "@azzapp/shared": "0.5.2-canary.186",
+    "@azzapp/data": "0.5.2-canary.187",
+    "@azzapp/i18n": "0.5.2-canary.187",
+    "@azzapp/shared": "0.5.2-canary.187",
     "@envelop/dataloader": "^6.0.0",
     "@envelop/generic-auth": "^7.0.0",
     "@envelop/sentry": "^8.0.0",
