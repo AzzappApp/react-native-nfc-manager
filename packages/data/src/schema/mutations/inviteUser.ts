@@ -35,7 +35,9 @@ const inviteUserMutation: MutationResolvers['inviteUser'] = async (
     throw new GraphQLError(ERRORS.INVALID_REQUEST);
   }
 
-  const phoneNumber = rawPhoneNumber ? formatPhoneNumber(rawPhoneNumber) : '';
+  const phoneNumber = rawPhoneNumber
+    ? formatPhoneNumber(rawPhoneNumber)
+    : undefined;
 
   if (!email && !phoneNumber) throw new GraphQLError(ERRORS.INVALID_REQUEST);
 

@@ -462,23 +462,6 @@ const MultiUserAddModal = (
               });
             }
           },
-          updater: (store, data) => {
-            const invitedProfile = data.inviteUser?.profile;
-
-            if (invitedProfile) {
-              const webcard = store?.get(profileInfos.webCardId);
-              const profiles = webcard?.getLinkedRecords('profiles');
-
-              const newProfileRecord = store.get(invitedProfile.id);
-
-              if (newProfileRecord) {
-                webcard?.setLinkedRecords(
-                  profiles?.concat(newProfileRecord),
-                  'profiles',
-                );
-              }
-            }
-          },
         });
       }
     },
