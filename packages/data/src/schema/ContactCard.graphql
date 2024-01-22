@@ -9,7 +9,7 @@ type ContactCard {
   addresses: [ContactCardAddress!]
   birthday: ContactCardBirthday
   socials: [ContactCardSocial!]
-  urls: [ContactCardUrl]
+  urls: [ContactCardUrl!]
 }
 
 type ContactCardEmail {

@@ -3,6 +3,7 @@ import { getProfileById, getWebCardById } from '@azzapp/data/domains';
 import { parseContactCard } from '@azzapp/shared/contactCardHelpers';
 import { verifyHmacWithPassword } from '@azzapp/shared/crypto';
 import ERRORS from '@azzapp/shared/errors';
+import { buildAvatarUrl } from '#helpers/avatar';
 import cors from '#helpers/cors';
 
 const verifySignApi = async (req: Request) => {
@@ -31,6 +32,9 @@ const verifySignApi = async (req: Request) => {
 
     const webCard = await getWebCardById(foundContactCard.webCardId);
 
+    const avatarUrl =
+      storedProfile && (await buildAvatarUrl(storedProfile, webCard));
+
     return NextResponse.json(
       {
         urls: (webCard?.commonInformation?.urls ?? []).concat(
@@ -41,6 +45,7 @@ const verifySignApi = async (req: Request) => {
             social => social.selected,
           ) ?? [],
         ),
+        avatarUrl,
       },
       { status: 200 },
     );

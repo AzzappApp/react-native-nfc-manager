@@ -26,6 +26,14 @@ jest.mock('react-native-blob-util', () => ({
 
 jest.mock('react-native-share', () => ({ open: jest.fn() }));
 
+jest.mock('react-native-quick-base64', () => ({
+  fromByteArray: jest.fn(),
+}));
+
+jest.mock('react-native-blob-jsi-helper', () => ({
+  getArrayBufferForBlob: jest.fn(),
+}));
+
 const writeFileMock = ReactNativeBlobUtil.fs.writeFile as jest.MockedFunction<
   typeof ReactNativeBlobUtil.fs.writeFile
 >;
@@ -86,6 +94,7 @@ describe('ContactCardExportVcf', () => {
         Profile() {
           return {
             webCard: {
+              coverAvatarUrl: null,
               commonInformation: {
                 socials: [],
                 urls: [
@@ -98,6 +107,9 @@ describe('ContactCardExportVcf', () => {
             contactCard,
             serializedContactCard: {
               data: serializeContactCard('profileId', 'webCardId', contactCard),
+            },
+            avatar: {
+              exportUri: null,
             },
           };
         },
@@ -154,7 +166,7 @@ describe('ContactCardExportVcf', () => {
       fireEvent.press(screen.getByRole('button'));
     });
 
-    const { vCard } = buildVCard(
+    const { vCard } = await buildVCard(
       'userNameTest',
       serializeContactCard('profileId', 'webCardId', contactCard),
       {

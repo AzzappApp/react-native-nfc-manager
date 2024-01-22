@@ -13,6 +13,7 @@ import {
 } from '@azzapp/data/domains/databaseMonitorer';
 import ERRORS from '@azzapp/shared/errors';
 import queryMap from '#persisted-query-map.json';
+import { buildCoverAvatarUrl } from '#helpers/avatar';
 import { getSessionData } from '#helpers/tokens';
 import packageJSON from '../../../../package.json';
 import type { GraphQLContext } from '@azzapp/data';
@@ -34,6 +35,7 @@ function useRevalidatePages(): Plugin<GraphQLContext> {
           const posts = [
             ...payload.args.contextValue.postsToRevalidate.values(),
           ];
+
           if (cards.length || posts.length) {
             const res = await fetch(
               `${process.env.NEXT_PUBLIC_API_ENDPOINT}/revalidate`,
@@ -252,7 +254,12 @@ const { handleRequest } = createYoga({
       }
     };
 
-    return createGraphQLContext(sendMail, sendSms, locale ?? undefined);
+    return createGraphQLContext(
+      sendMail,
+      sendSms,
+      buildCoverAvatarUrl,
+      locale ?? undefined,
+    );
   },
 });
 

@@ -190,6 +190,9 @@ export const WebCard: WebCardResolvers = {
     );
     return nextChangeDate;
   },
+  coverAvatarUrl: async (webCard, _args, { buildCoverAvatarUrl }) => {
+    return buildCoverAvatarUrl(webCard);
+  },
 };
 
 export const WebCardCategory: WebCardCategoryResolvers = {

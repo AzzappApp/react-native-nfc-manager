@@ -207,6 +207,11 @@ type WebCard implements Node {
   Return the datetime when the webCard can change its username
   """
   nextChangeUsernameAllowedAt: DateTime
+
+  """
+  Return a default avatar based on cover
+  """
+  coverAvatarUrl: String
 }
 
 type WebCardStyle {

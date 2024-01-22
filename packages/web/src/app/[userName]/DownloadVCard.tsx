@@ -50,7 +50,18 @@ const DownloadVCard = ({ webCard }: { webCard: WebCard }) => {
           if (res.status === 200) {
             const additionalData = await res.json();
 
-            const { vCard, contact } = buildVCard(
+            if (additionalData.avatarUrl) {
+              const data = await fetch(additionalData.avatarUrl);
+              const blob = await data.arrayBuffer();
+              const base64 = Buffer.from(blob).toString('base64');
+
+              additionalData.avatar = {
+                type: data.headers.get('content-type')?.split('/')[1] ?? 'png',
+                base64,
+              };
+            }
+
+            const { vCard, contact } = await buildVCard(
               webCard.userName,
               contactData,
               additionalData,

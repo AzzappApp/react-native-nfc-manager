@@ -1,12 +1,13 @@
 import { useIntl } from 'react-intl';
+import { getArrayBufferForBlob } from 'react-native-blob-jsi-helper';
 import ReactNativeBlobUtil from 'react-native-blob-util';
+import { fromByteArray } from 'react-native-quick-base64';
 import ShareCommand from 'react-native-share';
 import { graphql, useFragment } from 'react-relay';
 import { formatDisplayName } from '@azzapp/shared/stringHelpers';
 import { buildVCard } from '@azzapp/shared/vCardHelpers';
 import Button from '#ui/Button';
 import type { ContactCardExportVcf_card$key } from '#relayArtifacts/ContactCardExportVcf_card.graphql';
-import type { ContactCard } from '@azzapp/shared/contactCardHelpers';
 
 export type ContactCardExportVcfProps = {
   userName: string;
@@ -33,6 +34,7 @@ const ContactCardExportVcf = ({
               address
             }
           }
+          coverAvatarUrl
         }
         contactCard {
           firstName
@@ -50,6 +52,9 @@ const ContactCardExportVcf = ({
         serializedContactCard {
           data
         }
+        avatar {
+          exportUri: uri(width: 720, pixelRatio: 1)
+        }
       }
     `,
     profileKey,
@@ -64,7 +69,21 @@ const ContactCardExportVcf = ({
         description: 'Share button label',
       })}
       onPress={async () => {
-        const { vCard } = buildVCard(
+        let avatar: { base64: string; type: string } | undefined = undefined;
+        if (profile.avatar?.exportUri || profile.webCard.coverAvatarUrl) {
+          const avatarData = await fetch(
+            profile.avatar?.exportUri ?? profile.webCard.coverAvatarUrl!,
+          );
+          const avatarBlob = await avatarData.blob();
+          const base64 = fromByteArray(getArrayBufferForBlob(avatarBlob));
+          avatar = {
+            type:
+              avatarData.headers.get('content-type')?.split('/')[1] ?? 'png',
+            base64,
+          };
+        }
+
+        const { vCard } = await buildVCard(
           userName,
           profile.serializedContactCard.data,
           {
@@ -76,7 +95,8 @@ const ContactCardExportVcf = ({
               ...(profile.webCard.commonInformation?.socials ?? []),
               ...(profile.contactCard?.socials ?? []),
             ],
-          } as Pick<ContactCard, 'socials' | 'urls'>,
+            avatar,
+          },
         );
         const docPath = ReactNativeBlobUtil.fs.dirs.CacheDir;
         const filePath = `${docPath}/${userName}.vcf`;

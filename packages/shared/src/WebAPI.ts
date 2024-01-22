@@ -2,7 +2,7 @@
  * This modules contains helper functions to make API calls to the backend.
  */
 import { fetchJSON, postFormData } from './networkHelpers';
-import type { ContactCard } from './contactCardHelpers';
+import type { CommonInformation } from './contactCardHelpers';
 import type { FetchFunction, fetchBlob } from './networkHelpers';
 
 const API_ENDPOINT = process.env.NEXT_PUBLIC_API_ENDPOINT!;
@@ -232,7 +232,9 @@ export const uploadMedia = (
  */
 export const verifySign: APIMethod<
   { signature: string; data: string; salt: string },
-  Pick<ContactCard, 'socials' | 'urls'>
+  Pick<CommonInformation, 'socials' | 'urls'> & {
+    avatarUrl?: string;
+  }
 > = async ({ signature, data, salt }, init) =>
   apiFetch(`${API_ENDPOINT}/verifySign`, {
     ...init,

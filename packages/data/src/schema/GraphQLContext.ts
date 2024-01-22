@@ -54,11 +54,13 @@ export type GraphQLContext = {
     html: string;
   }) => Promise<void>;
   sendSms: (p: { phoneNumber: string; body: string }) => Promise<void>;
+  buildCoverAvatarUrl: (webCard: WebCard | null) => Promise<string | null>;
 };
 
 export const createGraphQLContext = (
   sendMail: GraphQLContext['sendMail'],
   sendSms: GraphQLContext['sendSms'],
+  buildCoverAvatarUrl: GraphQLContext['buildCoverAvatarUrl'],
   locale = DEFAULT_LOCALE,
 ): Omit<GraphQLContext, 'auth'> => {
   const loaders = createLoaders();
@@ -81,6 +83,7 @@ export const createGraphQLContext = (
     postsToRevalidate: new Set<{ userName: string; id: string }>(),
     loaders,
     sessionMemoized,
+    buildCoverAvatarUrl,
   };
 };
 

@@ -150,7 +150,7 @@ export async function generateMetadata({
 
   const imageUrl = `${process.env.NEXT_PUBLIC_URL}api/cover/${
     params.userName
-  }?width=${1200}&height=${1200}&keepAspectRatio=left_pad&updatedAt=${webCard?.updatedAt.toISOString()}`;
+  }?width=${1200}&height=${1200}&crop=lpad&updatedAt=${webCard?.updatedAt.toISOString()}`;
 
   const meta = getMetaData({
     url: params.userName,

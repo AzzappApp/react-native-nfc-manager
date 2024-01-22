@@ -1,17 +1,21 @@
 import VCard from 'vcard-creator';
 import { parseContactCard } from './contactCardHelpers';
 import { buildUserUrl } from './urlHelpers';
-import type { ContactCard } from './contactCardHelpers';
+import type { CommonInformation } from './contactCardHelpers';
 
 /**
  * Generates a vCard from a serialized contact card
  * @param contactCardData The serialized contact card
  * @returns The vCard
  */
-export const buildVCard = (
+export const buildVCard = async (
   userName: string,
   contactCardData: string,
-  additionalData?: Pick<ContactCard, 'socials' | 'urls'> | null,
+  additionalData?:
+    | (Pick<CommonInformation, 'socials' | 'urls'> & {
+        avatar?: { base64: string; type: string } | null;
+      })
+    | null,
 ) => {
   const contactCard = parseContactCard(contactCardData);
 
@@ -24,6 +28,10 @@ export const buildVCard = (
   vcard.addCompany(contactCard.company ?? '');
 
   vcard.addJobtitle(contactCard.title ?? '');
+
+  if (additionalData?.avatar) {
+    vcard.addPhoto(additionalData.avatar.base64, additionalData.avatar.type);
+  }
 
   contactCard.emails.forEach(email => {
     vcard.addEmail(

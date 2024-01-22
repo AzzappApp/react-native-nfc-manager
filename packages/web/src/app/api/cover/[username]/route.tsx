@@ -1,10 +1,7 @@
 import * as Sentry from '@sentry/nextjs';
 import { ImageResponse } from 'next/og';
 import { NextResponse, type NextRequest } from 'next/server';
-import {
-  getMediasByIds,
-  getWebCardByUserNameWithRedirection,
-} from '@azzapp/data/domains';
+import { getWebCardByUserNameWithRedirection } from '@azzapp/data/domains';
 import { swapColor, DEFAULT_COLOR_PALETTE } from '@azzapp/shared/cardHelpers';
 import {
   COVER_BASE_WIDTH,
@@ -17,14 +14,12 @@ import {
   DEFAULT_COVER_TEXT_COLOR,
 } from '@azzapp/shared/coverHelpers';
 import ERRORS from '@azzapp/shared/errors';
-import { decodeMediaId } from '@azzapp/shared/imagesHelpers';
 import coverTextStyle from '#components/renderer/CoverRenderer/CoverTextRenderer.css';
+import { CROP, buildCoverImageUrl } from '#helpers/cover';
 import { fontsMap } from '#helpers/fonts';
+import type { Crop } from '#helpers/cover';
 
 export const runtime = 'edge';
-
-const CLOUDINARY_CLOUDNAME = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME!;
-const CLOUDINARY_BASE_URL = `https://res.cloudinary.com/${CLOUDINARY_CLOUDNAME}`;
 
 const fontsUrlMap = {
   AmaticSC_Bold:
@@ -154,7 +149,10 @@ export const GET = async (
   const { searchParams } = req.nextUrl;
   const paramWidth = searchParams.get('width');
   const paramHeight = searchParams.get('height');
-  const keepAspectRatio = searchParams.get('keepAspectRatio');
+  const paramCrop = searchParams.get('crop');
+
+  const crop =
+    paramCrop && CROP.includes(paramCrop as Crop) ? (paramCrop as Crop) : null;
 
   const foundWidth =
     paramWidth && !isNaN(parseFloat(paramWidth))
@@ -191,7 +189,7 @@ export const GET = async (
     height = width / COVER_RATIO;
   }
 
-  const imageWidth = keepAspectRatio ? height * COVER_RATIO : width;
+  const imageWidth = crop === 'lpad' ? height * COVER_RATIO : width;
 
   const scale = imageWidth / COVER_BASE_WIDTH;
 
@@ -205,36 +203,6 @@ export const GET = async (
     const { coverData, cardColors, coverTitle, coverSubTitle } = webCard;
     const mediaId = coverData?.mediaId;
     if (mediaId) {
-      const [media] = await getMediasByIds([mediaId]);
-
-      const url = (width: number, height: number) =>
-        `${CLOUDINARY_BASE_URL}/${
-          media?.kind === 'video' ? 'video' : 'image'
-        }/upload${
-          coverData.backgroundId
-            ? `/u_${decodeMediaId(
-                coverData.backgroundId,
-              )}/fl_relative,w_1.0,e_colorize,co_rgb:${swapColor(
-                coverData.backgroundPatternColor ?? '#FFF',
-                cardColors,
-              ).replace('#', '')},b_rgb:${swapColor(
-                coverData.backgroundColor ?? 'light',
-                cardColors,
-              ).replace('#', '')}/fl_layer_apply`
-            : ''
-        }${
-          coverData.foregroundId && !coverData.foregroundId.startsWith('l:')
-            ? `/l_${decodeMediaId(
-                coverData.foregroundId,
-              )}/fl_relative,w_1.0,e_colorize,co_rgb:${swapColor(
-                coverData.foregroundColor ?? '#FFF',
-                cardColors,
-              ).replace('#', '')}/fl_layer_apply`
-            : ''
-        }${
-          keepAspectRatio === 'left_pad' ? '/c_lpad' : '/c_fit'
-        },g_east,w_${width},h_${height},ar_1:1/${decodeMediaId(mediaId)}.png`;
-
       const orientation =
         coverData.textOrientation ?? DEFAULT_COVER_CONTENT_ORTIENTATION;
       const position = coverData.textPosition ?? DEFAULT_COVER_CONTENT_POSITION;
@@ -388,8 +356,7 @@ export const GET = async (
               width,
               height,
               backgroundColor: 'transparent',
-              alignItems:
-                keepAspectRatio === 'left_pad' ? 'flex-end' : 'center',
+              alignItems: crop === 'lpad' ? 'flex-end' : 'center',
               flexDirection: 'column',
             }}
           >
@@ -414,10 +381,16 @@ export const GET = async (
                   maxWidth: imageWidth,
                   position: 'absolute',
                   top: 0,
-                  right: 0, // To avoid the text to be on the left with keepAspectRatio
+                  right: 0, // To avoid the text to be on the left with crop
                 }}
               />
-              <img src={url(width, height)} />
+              <img
+                src={await buildCoverImageUrl(webCard, {
+                  width,
+                  height,
+                  crop,
+                })}
+              />
               <div
                 style={{
                   maxWidth: imageWidth,

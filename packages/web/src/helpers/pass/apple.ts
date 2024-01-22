@@ -17,7 +17,7 @@ import { convertHexToRGBA } from '../color';
 const getCoverUrl = (userName: string, size: number, updatedAt: Date) =>
   `${
     process.env.NEXT_PUBLIC_URL
-  }api/cover/${userName}?width=${size}&height=${size}&keepAspectRatio=left_pad&updatedAt=${updatedAt.toISOString()}`;
+  }api/cover/${userName}?width=${size}&height=${size}&crop=lpad&updatedAt=${updatedAt.toISOString()}`;
 
 export const buildApplePass = async (profileId: string, locale: string) => {
   const res = await getProfileWithWebCardById(profileId);

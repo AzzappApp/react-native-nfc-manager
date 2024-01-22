@@ -1,3 +1,4 @@
+import * as Sentry from '@sentry/react-native';
 import {
   getContactByIdAsync,
   updateContactAsync,
@@ -5,6 +6,7 @@ import {
   addContactAsync,
   requestPermissionsAsync,
 } from 'expo-contacts';
+import * as FileSystem from 'expo-file-system';
 import { fromGlobalId } from 'graphql-relay';
 import { useEffect } from 'react';
 import { useIntl } from 'react-intl';
@@ -12,8 +14,8 @@ import { Alert, Platform } from 'react-native';
 import { MMKV } from 'react-native-mmkv';
 import { parseContactCard } from '@azzapp/shared/contactCardHelpers';
 import { buildUserUrl } from '@azzapp/shared/urlHelpers';
-import type { ContactCard } from '@azzapp/shared/contactCardHelpers';
-import type { Contact } from 'expo-contacts';
+import type { CommonInformation } from '@azzapp/shared/contactCardHelpers';
+import type { Contact, Image } from 'expo-contacts';
 
 export const storage = new MMKV({
   id: 'contacts',
@@ -22,7 +24,9 @@ export const storage = new MMKV({
 type WebCardScreenContactDownloaderProps = {
   userName?: string;
   contactData: string | null | undefined;
-  additionalContactData?: Pick<ContactCard, 'socials' | 'urls'>;
+  additionalContactData?: Pick<CommonInformation, 'socials' | 'urls'> & {
+    avatarUrl?: string;
+  };
   webCard:
     | {
         readonly id: string;
@@ -39,73 +43,75 @@ const WebCardScreenContactDownloader = ({
 }: WebCardScreenContactDownloaderProps) => {
   const intl = useIntl();
   useEffect(() => {
-    if (contactData && webCard) {
-      const { contact, webCardId } = buildContact(
-        contactData,
-        additionalContactData,
-        webCard.userName,
-      );
-      if (webCardId === fromGlobalId(webCard.id).id) {
-        Alert.alert(
-          intl.formatMessage(
-            {
-              defaultMessage: 'Add {name} to contacts?',
-              description: 'Alert title when adding a profile to contacts',
-            },
-            {
-              name: `${webCard.userName}`,
-            },
-          ),
-          intl.formatMessage(
-            {
-              defaultMessage: 'Add {name} to the contacts list of your phone',
-              description: 'Alert message when adding a profile to contacts',
-            },
-            {
-              name: `${contact.firstName} ${contact.lastName}`,
-            },
-          ),
-          [
-            { text: 'Cancel', style: 'cancel' },
-            {
-              text: 'OK',
-              onPress: async () => {
-                try {
-                  const { status } = await requestPermissionsAsync();
-                  if (status === 'granted') {
-                    let foundContact: Contact | undefined = undefined;
-                    if (contact.id && storage.contains(contact.id)) {
-                      const internalId = storage.getString(contact.id);
-                      if (internalId) {
-                        foundContact = await getContactByIdAsync(internalId);
-                      }
-                    }
-
-                    if (foundContact) {
-                      if (Platform.OS === 'ios') {
-                        await updateContactAsync({
-                          ...contact,
-                          id: foundContact.id,
-                        });
-                      } else {
-                        await presentFormAsync(foundContact.id, contact);
-                      }
-                    } else {
-                      const resultId = await addContactAsync(contact);
-                      if (contact.id) {
-                        storage.set(contact.id, resultId);
-                      }
-                    }
-                  }
-                } catch (e) {
-                  console.error(e);
-                }
-              },
-            },
-          ],
+    (async () => {
+      if (contactData && webCard) {
+        const { contact, webCardId } = await buildContact(
+          contactData,
+          additionalContactData,
+          webCard.userName,
         );
+        if (webCardId === fromGlobalId(webCard.id).id) {
+          Alert.alert(
+            intl.formatMessage(
+              {
+                defaultMessage: 'Add {name} to contacts?',
+                description: 'Alert title when adding a profile to contacts',
+              },
+              {
+                name: `${webCard.userName}`,
+              },
+            ),
+            intl.formatMessage(
+              {
+                defaultMessage: 'Add {name} to the contacts list of your phone',
+                description: 'Alert message when adding a profile to contacts',
+              },
+              {
+                name: `${contact.firstName} ${contact.lastName}`,
+              },
+            ),
+            [
+              { text: 'Cancel', style: 'cancel' },
+              {
+                text: 'OK',
+                onPress: async () => {
+                  try {
+                    const { status } = await requestPermissionsAsync();
+                    if (status === 'granted') {
+                      let foundContact: Contact | undefined = undefined;
+                      if (contact.id && storage.contains(contact.id)) {
+                        const internalId = storage.getString(contact.id);
+                        if (internalId) {
+                          foundContact = await getContactByIdAsync(internalId);
+                        }
+                      }
+
+                      if (foundContact) {
+                        if (Platform.OS === 'ios') {
+                          await updateContactAsync({
+                            ...contact,
+                            id: foundContact.id,
+                          });
+                        } else {
+                          await presentFormAsync(foundContact.id, contact);
+                        }
+                      } else {
+                        const resultId = await addContactAsync(contact);
+                        if (contact.id) {
+                          storage.set(contact.id, resultId);
+                        }
+                      }
+                    }
+                  } catch (e) {
+                    console.error(e);
+                  }
+                },
+              },
+            ],
+          );
+        }
       }
-    }
+    })();
   }, [intl, contactData, webCard, additionalContactData]);
 
   return null;
@@ -113,7 +119,7 @@ const WebCardScreenContactDownloader = ({
 
 export default WebCardScreenContactDownloader;
 
-const buildContact = (
+const buildContact = async (
   contactCardData: string,
   additionalContactData: WebCardScreenContactDownloaderProps['additionalContactData'],
   userName?: string,
@@ -129,6 +135,25 @@ const buildContact = (
     phoneNumbers,
     emails,
   } = parseContactCard(contactCardData);
+
+  let image: Image | undefined = undefined;
+
+  if (additionalContactData?.avatarUrl) {
+    try {
+      const avatar = await FileSystem.downloadAsync(
+        additionalContactData.avatarUrl,
+        FileSystem.cacheDirectory + 'avatar',
+      );
+
+      image = {
+        width: 720,
+        height: 720,
+        uri: avatar.uri,
+      };
+    } catch (e) {
+      Sentry.captureException(e);
+    }
+  }
 
   const contact: Contact = {
     id: profileId,
@@ -178,6 +203,7 @@ const buildContact = (
         id: `${profileId}-${url.address}`,
       })) ?? [],
     ),
+    image,
   };
 
   return { contact, webCardId };
