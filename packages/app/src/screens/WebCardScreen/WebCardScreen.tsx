@@ -14,6 +14,7 @@ import {
   View,
   StyleSheet,
   useWindowDimensions,
+  Alert,
 } from 'react-native';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import Animated, {
@@ -340,6 +341,36 @@ const WebCardScreen = ({
     }
   }, [profileInfos?.profileRole, toggleEditing, intl]);
 
+  const viewerWebCardUnpublish =
+    data.node?.userWebCard?.cardIsPublished === false;
+  const displayAlertUnpublished = useCallback(() => {
+    Alert.alert(
+      intl.formatMessage({
+        defaultMessage: 'Unpublished WebCard.',
+        description:
+          'PostList - Alert Message title when the user is viewing a post (from deeplinking) with an unpublished WebCard',
+      }),
+      intl.formatMessage({
+        defaultMessage:
+          'This action can only be done from a published WebCard.',
+        description:
+          'PostList - AlertMessage when the user is viewing a post (from deeplinking) with an unpublished WebCard',
+      }),
+      [
+        {
+          text: intl.formatMessage({
+            defaultMessage: 'Ok',
+            description:
+              'PostList - Alert button when the user is viewing a post (from deeplinking) with an unpublished WebCard',
+          }),
+          onPress: () => {
+            router.back();
+          },
+        },
+      ],
+    );
+  }, [intl, router]);
+
   if (!data.webCard) {
     return null;
   }
@@ -415,6 +446,12 @@ const WebCardScreen = ({
           isViewer={isViewer}
         />
       </Suspense>
+      {viewerWebCardUnpublish && (
+        <View
+          style={StyleSheet.absoluteFill}
+          onTouchStart={displayAlertUnpublished}
+        />
+      )}
     </View>
   );
 };
@@ -436,6 +473,12 @@ const webCardScreenByIdQuery = graphql`
       ...WebCardBackground_webCard
       ...WebCardModal_webCard @arguments(viewerWebCardId: $viewerWebCardId)
     }
+    node(id: $viewerWebCardId) {
+      ... on WebCard @alias(as: "userWebCard") {
+        id
+        cardIsPublished
+      }
+    }
   }
 `;
 
@@ -453,6 +496,12 @@ const webCardScreenByNameQuery = graphql`
       ...WebCardScreenPublishHelper_webCard
       ...WebCardBackground_webCard
       ...WebCardModal_webCard @arguments(viewerWebCardId: $viewerWebCardId)
+    }
+    node(id: $viewerWebCardId) {
+      ... on WebCard @alias(as: "userWebCard") {
+        id
+        cardIsPublished
+      }
     }
   }
 `;
