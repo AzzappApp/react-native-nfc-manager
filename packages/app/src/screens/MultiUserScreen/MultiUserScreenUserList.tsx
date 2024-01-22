@@ -91,7 +91,7 @@ const MultiUserScreenUserList = ({
         )
         @argumentDefinitions(
           after: { type: String }
-          first: { type: Int, defaultValue: 100 }
+          first: { type: Int, defaultValue: 5 }
         ) {
           profiles(after: $after, first: $first)
             @connection(
@@ -155,7 +155,7 @@ const MultiUserScreenUserList = ({
 
   const onEndReached = useCallback(() => {
     if (hasNext && !isLoadingNext) {
-      loadNext(100);
+      loadNext(5);
     }
   }, [hasNext, isLoadingNext, loadNext]);
 

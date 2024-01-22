@@ -3,7 +3,7 @@ import parsePhoneNumberFromString, {
   parsePhoneNumber,
 } from 'libphonenumber-js';
 import capitalize from 'lodash/capitalize';
-import { forwardRef, useImperativeHandle, useMemo, useState } from 'react';
+import { useImperativeHandle, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useIntl } from 'react-intl';
 import { View, StyleSheet } from 'react-native';
@@ -11,7 +11,12 @@ import * as mime from 'react-native-mime-types';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import Toast from 'react-native-toast-message';
-import { graphql, useFragment, useMutation } from 'react-relay';
+import {
+  ConnectionHandler,
+  graphql,
+  useFragment,
+  useMutation,
+} from 'react-relay';
 import * as z from 'zod';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
 
@@ -25,7 +30,6 @@ import { getLocales, useCurrentLocale } from '#helpers/localeHelpers';
 import { addLocalCachedMediaFile } from '#helpers/mediaHelpers';
 import { uploadMedia, uploadSign } from '#helpers/MobileWebAPI';
 import useAuthState from '#hooks/useAuthState';
-import { get as CappedPixelRatio } from '#relayProviders/CappedPixelRatio.relayprovider';
 import ContactCardEditForm from '#screens/ContactCardScreen/ContactCardEditForm';
 import Button from '#ui/Button';
 import Container from '#ui/Container';
@@ -41,6 +45,7 @@ import type { Contact } from 'expo-contacts';
 import type { CountryCode } from 'libphonenumber-js';
 import type { ForwardedRef } from 'react';
 import type { Control } from 'react-hook-form';
+import type { RecordProxy, RecordSourceSelectorProxy } from 'relay-runtime';
 
 const multiUserAddFormSchema = z.object({
   selectedContact: z
@@ -281,67 +286,13 @@ const MultiUserAddModal = (
 
   const [commit, saving] = useMutation<MultiUserAddModal_InviteUserMutation>(
     graphql`
-      mutation MultiUserAddModal_InviteUserMutation(
-        $input: InviteUserInput!
-        $pixelRatio: Float!
-      ) {
+      mutation MultiUserAddModal_InviteUserMutation($input: InviteUserInput!) {
         inviteUser(input: $input) {
           profile {
             id
-            contactCard {
-              firstName
-              lastName
-              title
-              company
-              emails {
-                label
-                address
-                selected
-              }
-              phoneNumbers {
-                label
-                number
-                selected
-              }
-              urls {
-                address
-                selected
-              }
-              addresses {
-                address
-                label
-                selected
-              }
-              birthday {
-                birthday
-                selected
-              }
-              socials {
-                url
-                label
-                selected
-              }
-            }
-            user {
-              email
-              phoneNumber
-            }
             profileRole
-            avatar {
-              id
-              uri: uri(width: 112, pixelRatio: $pixelRatio)
-            }
-            statsSummary {
-              day
-              contactCardScans
-            }
-            webCard {
-              statsSummary {
-                day
-                webCardViews
-                likes
-              }
-            }
+            ...MultiUserScreenUserListItem_Profile
+            ...MultiUserDetailModal_Profile
           }
         }
       }
@@ -425,7 +376,6 @@ const MultiUserAddModal = (
         commit({
           variables: {
             input,
-            pixelRatio: CappedPixelRatio(),
           },
           onCompleted: () => {
             if (avatarId && avatar?.uri) {
@@ -460,6 +410,28 @@ const MultiUserAddModal = (
                     'Error toast message when inviting user from MultiUserAddModal',
                 }),
               });
+            }
+          },
+          updater: (store, data) => {
+            const invitedProfile = data.inviteUser?.profile;
+            const webCard = store?.get(profileInfos.webCardId);
+            if (invitedProfile && webCard) {
+              const connection = ConnectionHandler.getConnection(
+                webCard,
+                'MultiUserScreenUserList_webCard_connection_profiles',
+              );
+              const newProfileRecord = store.get(invitedProfile.id);
+              if (connection && newProfileRecord) {
+                const edge = ConnectionHandler.createEdge(
+                  store,
+                  connection,
+                  newProfileRecord,
+                  'WebCardEdge',
+                );
+                ConnectionHandler.insertEdgeAfter(connection, edge);
+                //we need to find a way to sort. we have access the proxy Record
+                // const edges = connection.getLinkedRecords('edges'); ti will be added at the end and for big list, a searchbar will be added (issue created)
+              }
             }
           },
         });
@@ -587,4 +559,4 @@ const normalizePhoneMailLabel = (label?: string) => {
   return 'Other';
 };
 
-export default forwardRef(MultiUserAddModal);
+export default MultiUserAddModal;
