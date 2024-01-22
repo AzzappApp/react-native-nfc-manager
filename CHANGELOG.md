@@ -1,5 +1,8 @@
-## 0.5.2-canary.174
+## 0.5.2-canary.175
 
+* **fix:**  - unable to remove avatar on contact card ([#2398](https://github.com/AzzappApp/azzapp/pull/2398))
+* **fix:**  - **multiUser:** [#2303](https://github.com/AzzappApp/azzapp/pull/2303) missing avatar after adding user ([#2403](https://github.com/AzzappApp/azzapp/pull/2403))
+* **fix:**  - **multiUser:** [#2312](https://github.com/AzzappApp/azzapp/pull/2312) use poll interval to refresh ownership status ([#2395](https://github.com/AzzappApp/azzapp/pull/2395))
 * **fix:**  - **webCard:** [#2407](https://github.com/AzzappApp/azzapp/pull/2407) wrong default background color for gradient ([#2408](https://github.com/AzzappApp/azzapp/pull/2408))
 * **fix:**  - 🐛 display error message on wrong mail/phone ([#2397](https://github.com/AzzappApp/azzapp/pull/2397))
 * **fix:**  - 🐛 use correct default phone code ([#2393](https://github.com/AzzappApp/azzapp/pull/2393))
