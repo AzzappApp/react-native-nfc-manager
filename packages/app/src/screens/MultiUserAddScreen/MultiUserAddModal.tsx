@@ -3,7 +3,7 @@ import parsePhoneNumberFromString, {
   parsePhoneNumber,
 } from 'libphonenumber-js';
 import capitalize from 'lodash/capitalize';
-import { useImperativeHandle, useMemo, useState } from 'react';
+import { forwardRef, useImperativeHandle, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useIntl } from 'react-intl';
 import { View, StyleSheet } from 'react-native';
@@ -558,4 +558,4 @@ const normalizePhoneMailLabel = (label?: string) => {
   return 'Other';
 };
 
-export default MultiUserAddModal;
+export default forwardRef(MultiUserAddModal);
