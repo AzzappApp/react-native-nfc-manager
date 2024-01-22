@@ -1,5 +1,6 @@
-## 0.5.2-canary.178
+## 0.5.2-canary.179
 
+* **fix:**  - missed introspection header ([#2420](https://github.com/AzzappApp/azzapp/pull/2420))
 * **fix:**  - server header on cache update ([#2418](https://github.com/AzzappApp/azzapp/pull/2418))
 * **fix:**  - change server header for server api calls ([#2417](https://github.com/AzzappApp/azzapp/pull/2417))
 * **feat:**  - **contactCard:** [#2279](https://github.com/AzzappApp/azzapp/pull/2279) add avatar in shared vcard ([#2389](https://github.com/AzzappApp/azzapp/pull/2389))
