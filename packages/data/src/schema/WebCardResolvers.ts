@@ -1,5 +1,6 @@
-import { eq } from 'drizzle-orm';
+import { GraphQLError } from 'graphql';
 import { connectionFromArraySlice, cursorToOffset } from 'graphql-relay';
+import ERRORS from '@azzapp/shared/errors';
 import { isAdmin } from '@azzapp/shared/profileHelpers';
 import {
   getCompanyActivitiesByWebCardCategory,
@@ -14,9 +15,10 @@ import {
   getFollowerProfiles,
   getFollowingsWebCard,
   getFollowingsPosts,
-  db,
-  ProfileTable,
   getUserProfileWithWebCardId,
+  getWebCardProfiles,
+  countWebCardProfiles,
+  getWebCardPendingOwnerProfile,
 } from '#domains';
 import {
   connectionFromDateSortedItems,
@@ -165,19 +167,54 @@ export const WebCard: WebCardResolvers = {
       hasPreviousPage: offset !== null,
     });
   },
-  profiles: async (webCard, _, { auth }) => {
+  nbProfiles: async (webCard, _, { auth }) => {
+    const userProfile = auth.userId
+      ? await getUserProfileWithWebCardId(auth.userId, webCard.id)
+      : null;
+    if (!userProfile || !isAdmin(userProfile.profileRole)) {
+      return 0;
+    }
+    const count = await countWebCardProfiles(webCard.id);
+    return count;
+  },
+  profilePendingOwner: async (webCard, _, { auth }) => {
     const userProfile = auth.userId
       ? await getUserProfileWithWebCardId(auth.userId, webCard.id)
       : null;
 
     if (!userProfile || !isAdmin(userProfile.profileRole)) {
-      return [];
+      throw new GraphQLError(ERRORS.UNAUTHORIZED);
     }
+    const pendingUser = await getWebCardPendingOwnerProfile(webCard.id);
+    return pendingUser.length > 0 ? pendingUser[0] : null;
+  },
+  profiles: async (webCard, { first, after }, { auth }) => {
+    const userProfile = auth.userId
+      ? await getUserProfileWithWebCardId(auth.userId, webCard.id)
+      : null;
 
-    return db
-      .select()
-      .from(ProfileTable)
-      .where(eq(ProfileTable.webCardId, webCard.id));
+    if (!userProfile || !isAdmin(userProfile.profileRole)) {
+      throw new GraphQLError(ERRORS.UNAUTHORIZED);
+    }
+    const limit = first ?? 100;
+    const offset = after ? cursorToOffset(after) : 0;
+    const profiles = await getWebCardProfiles(webCard.id, {
+      limit,
+      after: offset,
+    });
+    const result = profiles.slice(0, limit);
+    const count = await countWebCardProfiles(webCard.id);
+    return connectionFromArraySlice(
+      result,
+      { after, first },
+      {
+        sliceStart: offset,
+        arrayLength:
+          //TODO: need to find a better way don't want to fetch all and slice after or
+          // fetching the full size. maybe reproduce the connectionFromDateSortedItems
+          count,
+      },
+    );
   },
   nextChangeUsernameAllowedAt: async webCard => {
     // Convert lastUpdate to a Date object

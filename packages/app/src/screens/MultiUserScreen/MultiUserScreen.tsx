@@ -1,18 +1,15 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { StyleSheet, View } from 'react-native';
-import { ScrollView } from 'react-native-gesture-handler';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { graphql, useMutation, usePreloadedQuery } from 'react-relay';
 import { isAdmin } from '@azzapp/shared/profileHelpers';
-import { colors, textStyles } from '#theme';
+import { colors } from '#theme';
 import CoverRenderer from '#components/CoverRenderer';
 import { useRouter } from '#components/NativeRouter';
 import ScreenModal from '#components/ScreenModal';
 import relayScreen from '#helpers/relayScreen';
-import useScreenInsets from '#hooks/useScreenInsets';
 import useToggle from '#hooks/useToggle';
-import { get as CappedPixelRatio } from '#relayProviders/CappedPixelRatio.relayprovider';
 import Button from '#ui/Button';
 import Container from '#ui/Container';
 import Header from '#ui/Header';
@@ -22,15 +19,10 @@ import PressableNative from '#ui/PressableNative';
 import Switch from '#ui/Switch';
 import Text from '#ui/Text';
 import CommonInformationForm from './CommonInformationForm';
-import MultiUserScreenUserList, {
-  type MultiUserScreenListProps,
-} from './MultiUserScreenUserList';
+import MultiUserScreenUserList from './MultiUserScreenUserList';
 import type { RelayScreenProps } from '#helpers/relayScreen';
 import type { MultiUserScreenMutation } from '#relayArtifacts/MultiUserScreenMutation.graphql';
-import type {
-  MultiUserScreenQuery,
-  ProfileRole,
-} from '#relayArtifacts/MultiUserScreenQuery.graphql';
+import type { MultiUserScreenQuery } from '#relayArtifacts/MultiUserScreenQuery.graphql';
 import type { MultiUserRoute } from '#routes';
 import type { ContactCard } from '@azzapp/shared/contactCardHelpers';
 
@@ -48,10 +40,7 @@ export type UserInformation = {
 };
 
 const multiUserScreenQuery = graphql`
-  query MultiUserScreenQuery($profileId: ID!, $pixelRatio: Float!) {
-    currentUser {
-      ...MultiUserScreenUserList_currentUser
-    }
+  query MultiUserScreenQuery($profileId: ID!) {
     node(id: $profileId) {
       ... on Profile @alias(as: "profile") {
         id
@@ -63,65 +52,9 @@ const multiUserScreenQuery = graphql`
           commonInformation {
             ...CommonInformationForm_data
           }
-          profiles {
-            id
-            contactCard {
-              firstName
-              lastName
-              title
-              company
-              emails {
-                label
-                address
-                selected
-              }
-              phoneNumbers {
-                label
-                number
-                selected
-              }
-              urls {
-                address
-                selected
-              }
-              addresses {
-                address
-                label
-                selected
-              }
-              birthday {
-                birthday
-                selected
-              }
-              socials {
-                url
-                label
-                selected
-              }
-            }
-            user {
-              email
-              phoneNumber
-            }
-            profileRole
-            avatar {
-              id
-              uri: uri(width: 112, pixelRatio: $pixelRatio)
-            }
-            statsSummary {
-              day
-              contactCardScans
-            }
-            webCard {
-              statsSummary {
-                day
-                webCardViews
-                likes
-              }
-            }
-          }
+          nbProfiles
+          ...MultiUserScreenUserList_webCard
         }
-        ...MultiUserScreenUserList_profile
       }
     }
   }
@@ -130,14 +63,13 @@ const multiUserScreenQuery = graphql`
 const MultiUserScreen = ({
   preloadedQuery,
 }: RelayScreenProps<MultiUserRoute, MultiUserScreenQuery>) => {
-  const { node, currentUser } = usePreloadedQuery(
-    multiUserScreenQuery,
-    preloadedQuery,
-  );
+  const { node } = usePreloadedQuery(multiUserScreenQuery, preloadedQuery);
   const profile = node?.profile;
 
   const intl = useIntl();
   const router = useRouter();
+
+  const [commonInfoFormIsOpened, toggleCommonInfoForm] = useToggle(false);
 
   useEffect(() => {
     // users that loose their admin role should not be able to access this screen
@@ -145,39 +77,6 @@ const MultiUserScreen = ({
       router.back();
     }
   }, [profile?.profileRole, router]);
-
-  const nbUsers = profile?.webCard?.profiles?.length ?? 0;
-
-  const userProfilesByRole = useMemo(() => {
-    const indexedRoles = roles.reduce(
-      (accumulator, currentValue) => {
-        return {
-          ...accumulator,
-          [currentValue]: [],
-        };
-      },
-      {} as MultiUserScreenListProps['usersByRole'],
-    );
-
-    if (!profile?.webCard.profiles) return indexedRoles;
-
-    return profile.webCard.profiles.reduce((accumulator, currentValue) => {
-      const { user, contactCard, avatar, id } = currentValue!;
-
-      accumulator[currentValue!.profileRole].push({
-        email: user.email!,
-        firstName: contactCard?.firstName ?? '',
-        lastName: contactCard?.lastName ?? '',
-        phoneNumber: user?.phoneNumber ?? '',
-        contactCard: (contactCard ?? {}) as ContactCard,
-        avatar,
-        profileId: id,
-      });
-      return accumulator;
-    }, indexedRoles);
-  }, [profile?.webCard.profiles]);
-
-  const [commonInfoFormIsOpened, toggleCommonInfoForm] = useToggle(false);
 
   const [commit] = useMutation<MultiUserScreenMutation>(graphql`
     mutation MultiUserScreenMutation($input: UpdateMultiUserInput!) {
@@ -239,7 +138,57 @@ const MultiUserScreen = ({
     [setAllowMultiUser],
   );
 
-  const { bottom } = useScreenInsets();
+  const ScrollableHeader = useMemo(() => {
+    return (
+      <View style={{ alignItems: 'center' }}>
+        <Icon style={styles.sharedIcon} icon="multi_user" />
+        <Text variant="xsmall" style={styles.description}>
+          <FormattedMessage
+            defaultMessage="Allow your team members to have their own personal Contact Cards, connected to the same company or organisation’s WebCard."
+            description="Description for MultiUserScreen"
+          />
+        </Text>
+
+        <Text variant="smallbold" style={styles.price}>
+          <FormattedMessage
+            defaultMessage="$0,99/user, billed monthly "
+            description="Price for MultiUserScreen"
+          />
+          {profile?.webCard.isMultiUser && (
+            <FormattedMessage
+              defaultMessage="{nbUsers} user"
+              description="Title for switch section in MultiUserScreen"
+              values={{ nbUsers: profile?.webCard?.nbProfiles }}
+            />
+          )}
+        </Text>
+        {profile?.profileRole === 'owner' && (
+          <View style={styles.switchSection}>
+            <Text variant="large">
+              <FormattedMessage
+                defaultMessage="Multi User"
+                description="Title for switch section in MultiUserScreen"
+              />
+            </Text>
+            <Switch
+              variant="large"
+              value={profile?.webCard.isMultiUser}
+              onValueChange={toggleMultiUser}
+            />
+          </View>
+        )}
+      </View>
+    );
+  }, [
+    profile?.profileRole,
+    profile?.webCard.isMultiUser,
+    profile?.webCard?.nbProfiles,
+    toggleMultiUser,
+  ]);
+
+  if (!profile) {
+    return null;
+  }
 
   return (
     <Container style={{ flex: 1 }}>
@@ -277,57 +226,18 @@ const MultiUserScreen = ({
             />
           }
         />
-        <ScrollView
-          style={{ flex: 1 }}
-          contentContainerStyle={{ paddingBottom: bottom }}
-        >
-          <View style={styles.content}>
-            <Icon style={styles.sharedIcon} icon="multi_user" />
-            <Text style={[textStyles.xsmall, styles.description]}>
-              <FormattedMessage
-                defaultMessage="Allow your team members to have their own personal Contact Cards, connected to the same company or organisation’s WebCard."
-                description="Description for MultiUserScreen"
-              />
-            </Text>
 
-            <Text style={[textStyles.smallbold, styles.price]}>
-              <FormattedMessage
-                defaultMessage="$0,99/user, billed monthly "
-                description="Price for MultiUserScreen"
-              />
-              {profile?.webCard.isMultiUser && (
-                <FormattedMessage
-                  defaultMessage="{nbUsers} user"
-                  description="Title for switch section in MultiUserScreen"
-                  values={{ nbUsers }}
-                />
-              )}
-            </Text>
-            {profile?.profileRole === 'owner' && (
-              <View style={styles.switchSection}>
-                <Text style={[textStyles.large]}>
-                  <FormattedMessage
-                    defaultMessage="Multi User"
-                    description="Title for switch section in MultiUserScreen"
-                  />
-                </Text>
-                <Switch
-                  variant="large"
-                  value={profile?.webCard.isMultiUser}
-                  onValueChange={toggleMultiUser}
-                />
-              </View>
-            )}
-            {profile?.webCard.isMultiUser && currentUser && (
-              <MultiUserScreenUserList
-                usersByRole={userProfilesByRole}
-                currentUser={currentUser}
-                toggleCommonInfosForm={toggleCommonInfoForm}
-                profile={profile}
-              />
-            )}
-          </View>
-        </ScrollView>
+        <View style={styles.content}>
+          {profile.webCard.isMultiUser ? (
+            <MultiUserScreenUserList
+              Header={ScrollableHeader}
+              toggleCommonInfosForm={toggleCommonInfoForm}
+              webCard={profile.webCard}
+            />
+          ) : (
+            <>{ScrollableHeader}</>
+          )}
+        </View>
       </SafeAreaView>
 
       {profile ? (
@@ -385,7 +295,6 @@ const MultiUserScreen = ({
 };
 
 const COVER_WIDTH = 29;
-const roles: ProfileRole[] = ['owner', 'admin', 'editor', 'user'];
 
 const styles = StyleSheet.create({
   sharedIcon: {
@@ -433,8 +342,6 @@ export default relayScreen(MultiUserScreen, {
   query: multiUserScreenQuery,
   getVariables: (_, profileInfos) => ({
     profileId: profileInfos?.profileId ?? '',
-    pixelRatio: CappedPixelRatio(),
   }),
   fetchPolicy: 'store-and-network',
-  pollInterval: 20000,
 });

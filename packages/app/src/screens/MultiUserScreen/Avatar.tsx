@@ -1,5 +1,5 @@
 import { View } from 'react-native';
-import { colors, textStyles } from '#theme';
+import { colors } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import Text from '#ui/Text';
 
@@ -12,7 +12,7 @@ const Avatar = ({ firstName, lastName }: AvatarProps) => {
   const styles = useStyleSheet(styleSheet);
   return (
     <View style={styles.avatar}>
-      <Text style={[styles.initials, textStyles.xlarge]}>
+      <Text variant="xlarge" style={styles.initials}>
         {firstName.substring(0, 1)}
         {lastName.substring(0, 1)}
       </Text>

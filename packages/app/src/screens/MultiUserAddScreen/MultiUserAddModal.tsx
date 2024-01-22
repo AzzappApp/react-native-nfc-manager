@@ -18,7 +18,6 @@ import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
 import ERRORS from '@azzapp/shared/errors';
 import { encodeMediaId } from '@azzapp/shared/imagesHelpers';
 import { isValidEmail } from '@azzapp/shared/stringHelpers';
-import { textStyles } from '#theme';
 import ScreenModal from '#components/ScreenModal';
 import { CardPhoneLabels } from '#helpers/contactCardHelpers';
 import { getFileName } from '#helpers/fileHelpers';
@@ -497,7 +496,7 @@ const MultiUserAddModal = (
         >
           <Header
             middleElement={
-              <Text style={textStyles.large}>
+              <Text variant="large">
                 {contact?.firstName} {contact?.lastName}
               </Text>
             }

@@ -192,7 +192,7 @@ type Profile implements Node {
   """
   Fetches suggested medias
   """
-  suggestedMedias( kind: MediaKind!, first: Int, after: String): MediaConnection!
+  suggestedMedias(kind: MediaKind!, first: Int, after: String): MediaConnection!
   """
   Fetches color palettes
   """
@@ -214,6 +214,10 @@ enum ProfileRole {
   user
 }
 
+enum ProfileSortType {
+  ROLE
+}
+
 """
 A cover template by category
 """
@@ -233,4 +237,34 @@ type KnownContact {
   email: String
   phoneNumber: String
   publishedWebCards: [WebCard!]!
+}
+
+"""
+A connection to a list of Profile.
+"""
+type ProfileConnection {
+  """
+  Information to aid in pagination.
+  """
+  pageInfo: PageInfo!
+
+  """
+  A list of edges.
+  """
+  edges: [ProfileEdge]
+}
+
+"""
+An edge in a connection.
+"""
+type ProfileEdge {
+  """
+  The item at the end of the edge
+  """
+  node: Profile
+
+  """
+  A cursor for use in pagination
+  """
+  cursor: String!
 }

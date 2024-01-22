@@ -188,3 +188,104 @@ export const updateContactCardTotalScans = async (
     })
     .where(eq(ProfileTable.id, profileId));
 };
+
+/**
+ * Get the list of profiles associated to a webCard orderby role (owner, admin, editor, user)
+ * then by firstname and lastname (asc)
+ *
+ * @param {string} webCardId
+ * @param {{
+ *     limit: number;
+ *     after: number;
+ *   }} {
+ *     limit,
+ *     after = 0,
+ *   }
+ * @param {DbTransaction} [tx=db]
+ */
+export const getWebCardProfiles = async (
+  webCardId: string,
+  {
+    limit,
+    after = 0,
+  }: {
+    limit: number;
+    after: number;
+  },
+  tx: DbTransaction = db,
+) =>
+  (
+    await tx.execute(
+      sql`SELECT * 
+          FROM Profile
+          WHERE webCardId = ${webCardId} 
+          ORDER BY 
+            CASE 
+                WHEN profileRole = 'owner' THEN 1
+                WHEN profileRole = 'admin' THEN 2
+                WHEN profileRole = 'editor' THEN 3
+                WHEN profileRole = 'user' THEN 4
+                ELSE 5
+            END ASC,
+            JSON_EXTRACT(contactCard, '$.firstName'),
+            JSON_EXTRACT(contactCard, '$.lastName')
+          LIMIT ${limit} OFFSET ${after}`,
+    )
+  ).rows as Profile[];
+
+/**
+ * The the profile owner of a webcard
+ *
+ * @param {string} webCardId
+ * @param {DbTransaction} [tx=db]
+ * @returns {Promise<Profile[]>} the list of profiles that are owner (for now there is only one)
+ */
+export const getWebCardOwnerProfile = async (
+  webCardId: string,
+  tx: DbTransaction = db,
+) =>
+  tx
+    .select()
+    .from(ProfileTable)
+    .where(
+      and(
+        eq(ProfileTable.webCardId, webCardId),
+        eq(ProfileTable.profileRole, 'owner'),
+      ),
+    );
+/**
+ * Count the number of profiles associated to a webCard
+ *
+ * @param {string} webCardId
+ * @param {DbTransaction} [tx=db]
+ */
+export const countWebCardProfiles = async (
+  webCardId: string,
+  tx: DbTransaction = db,
+) =>
+  tx
+    .select({ count: sql`count(*)`.mapWith(Number) })
+    .from(ProfileTable)
+    .where(eq(ProfileTable.webCardId, webCardId))
+    .then(res => res[0].count);
+
+/**
+ *
+ *
+ * @param {string} webCardId
+ * @param {DbTransaction} [tx=db]
+ * @returns {Promise<Profile[]>} the list of profiles that are pending to be owner
+ */
+export const getWebCardPendingOwnerProfile = async (
+  webCardId: string,
+  tx: DbTransaction = db,
+) =>
+  tx
+    .select()
+    .from(ProfileTable)
+    .where(
+      and(
+        eq(ProfileTable.webCardId, webCardId),
+        eq(ProfileTable.promotedAsOwner, true),
+      ),
+    );

@@ -1,10 +1,5 @@
-import {
-  forwardRef,
-  useEffect,
-  useImperativeHandle,
-  useRef,
-  useState,
-} from 'react';
+import { parsePhoneNumber } from 'libphonenumber-js';
+import { useEffect, useRef, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { StyleSheet, View, useColorScheme } from 'react-native';
@@ -16,11 +11,12 @@ import { graphql, useFragment, useMutation } from 'react-relay';
 import ERRORS from '@azzapp/shared/errors';
 import { encodeMediaId } from '@azzapp/shared/imagesHelpers';
 import { isOwner } from '@azzapp/shared/profileHelpers';
-import { colors, textStyles } from '#theme';
+import { colors } from '#theme';
 import ScreenModal from '#components/ScreenModal';
 import { getFileName } from '#helpers/fileHelpers';
 import { addLocalCachedMediaFile } from '#helpers/mediaHelpers';
 import { uploadMedia, uploadSign } from '#helpers/MobileWebAPI';
+import useAuthState from '#hooks/useAuthState';
 import { get as CappedPixelRatio } from '#relayProviders/CappedPixelRatio.relayprovider';
 import ContactCardEditForm from '#screens/ContactCardScreen/ContactCardEditForm';
 import HomeStatistics from '#screens/HomeScreen/HomeStatistics';
@@ -31,25 +27,22 @@ import PressableNative from '#ui/PressableNative';
 import Select from '#ui/Select';
 import Text from '#ui/Text';
 import TextInput from '#ui/TextInput';
-import MultiUserTransferOwnershipModal from './MultiUserTransferOwnershipModal';
 import type { EmailPhoneInput } from '#components/EmailOrPhoneInput';
 import type { MultiUserDetailModal_CancelTransferOwnershipMutation } from '#relayArtifacts/MultiUserDetailModal_CancelTransferOwnershipMutation.graphql';
+import type { MultiUserDetailModal_Profile$key } from '#relayArtifacts/MultiUserDetailModal_Profile.graphql';
 import type { MultiUserDetailModal_RemoveUserMutation } from '#relayArtifacts/MultiUserDetailModal_RemoveUserMutation.graphql';
 import type { MultiUserDetailModal_UpdateProfileMutation } from '#relayArtifacts/MultiUserDetailModal_UpdateProfileMutation.graphql';
 import type { MultiUserDetailModal_webCard$key } from '#relayArtifacts/MultiUserDetailModal_webCard.graphql';
 import type { ProfileRole } from '#relayArtifacts/MultiUserScreenQuery.graphql';
 import type { ContactCardEditFormValues } from '#screens/ContactCardScreen/ContactCardEditModalSchema';
-import type { UserInformation } from './MultiUserScreen';
 import type { MultiUserTransferOwnershipModalActions } from './MultiUserTransferOwnershipModal';
-import type { ContactCard } from '@azzapp/shared/contactCardHelpers';
-import type { CountryCode } from 'libphonenumber-js';
-import type { ForwardedRef, ReactNode } from 'react';
+import type { ReactNode } from 'react';
 import type { Control } from 'react-hook-form';
 
 type MultiUserDetailModalProps = {
   webCard: MultiUserDetailModal_webCard$key;
-  currentProfileId: string;
-  usersByRole: Record<ProfileRole, UserInformation[]>;
+  profile: MultiUserDetailModal_Profile$key | undefined;
+  onClose: () => void;
 };
 
 export type MultiUserDetailFormValues = ContactCardEditFormValues & {
@@ -57,44 +50,91 @@ export type MultiUserDetailFormValues = ContactCardEditFormValues & {
   selectedContact: EmailPhoneInput | null;
 };
 
-export type MultiUserDetailModalActions = {
-  open: (
-    contactCard: ContactCard,
-    profileId: string,
-    role: ProfileRole,
-    avatar: { uri: string; id: string } | null,
-    selectedContact: {
-      value: string;
-      countryCodeOrEmail: CountryCode | 'email';
-    } | null,
-  ) => void;
-};
-
-const MultiUserDetailModal = (
-  {
-    webCard: webCardKey,
-    currentProfileId,
-    usersByRole,
-  }: MultiUserDetailModalProps,
-  ref: ForwardedRef<MultiUserDetailModalActions>,
-) => {
-  const [visible, setVisible] = useState(false);
+const MultiUserDetailModal = ({
+  webCard: webCardKey,
+  profile: profileKey,
+  onClose,
+}: MultiUserDetailModalProps) => {
   const [showImagePicker, setShowImagePicker] = useState(false);
-  const [profileId, setProfileId] = useState('');
   const transfer = useRef<MultiUserTransferOwnershipModalActions>(null);
-
-  const onClose = () => setVisible(false);
+  const { profileInfos } = useAuthState();
   const intl = useIntl();
 
   const { control, watch, handleSubmit, reset, formState } =
     useForm<MultiUserDetailFormValues>({
       mode: 'onSubmit',
     });
+  const profile = useFragment(
+    graphql`
+      fragment MultiUserDetailModal_Profile on Profile
+      @argumentDefinitions(
+        pixelRatio: {
+          type: "Float!"
+          provider: "CappedPixelRatio.relayprovider"
+        }
+      ) {
+        id
+        profileRole
+        promotedAsOwner
+        contactCard {
+          firstName
+          lastName
+          title
+          company
+          emails {
+            label
+            address
+            selected
+          }
+          phoneNumbers {
+            label
+            number
+            selected
+          }
+          urls {
+            address
+            selected
+          }
+          addresses {
+            address
+            label
+            selected
+          }
+          birthday {
+            birthday
+            selected
+          }
+          socials {
+            url
+            label
+            selected
+          }
+        }
+        ...HomeStatistics_profiles
+        avatar {
+          id
+          uri: uri(width: 56, pixelRatio: $pixelRatio)
+        }
+        user {
+          email
+          phoneNumber
+        }
+      }
+    `,
+    profileKey,
+  );
 
   const webCard = useFragment(
     graphql`
       fragment MultiUserDetailModal_webCard on WebCard {
         id
+        profilePendingOwner {
+          id
+          user {
+            email
+            phoneNumber
+          }
+        }
         commonInformation {
           company
           addresses {
@@ -117,22 +157,14 @@ const MultiUserDetailModal = (
             url
           }
         }
-        profiles {
-          id
-          ...HomeStatistics_profiles
-          promotedAsOwner
-          user {
-            email
-          }
-        }
         ...MultiUserTransferOwnershipModal_webCard
       }
     `,
     webCardKey,
   );
 
-  const [commit] = useMutation<MultiUserDetailModal_UpdateProfileMutation>(
-    graphql`
+  const [commit, saving] =
+    useMutation<MultiUserDetailModal_UpdateProfileMutation>(graphql`
       mutation MultiUserDetailModal_UpdateProfileMutation(
         $input: UpdateProfileInput!
         $pixelRatio: Float!
@@ -186,8 +218,7 @@ const MultiUserDetailModal = (
           }
         }
       }
-    `,
-  );
+    `);
 
   const [commitCancelTransfer, savingCancelTransfer] =
     useMutation<MultiUserDetailModal_CancelTransferOwnershipMutation>(graphql`
@@ -205,6 +236,7 @@ const MultiUserDetailModal = (
 
   const submit = handleSubmit(
     async data => {
+      if (profile == null) return;
       const { avatar, role, selectedContact, ...contactCard } = data;
 
       const input = {};
@@ -241,7 +273,7 @@ const MultiUserDetailModal = (
             ...input,
             avatarId,
             contactCard,
-            profileId,
+            profileId: profile.id,
           },
           pixelRatio: CappedPixelRatio(),
         },
@@ -253,8 +285,7 @@ const MultiUserDetailModal = (
               avatar.uri,
             );
           }
-
-          setVisible(false);
+          onClose();
         },
         onError: e => {
           console.error(e);
@@ -268,7 +299,7 @@ const MultiUserDetailModal = (
                   'Error toast message when updating user who declined the invitation from MultiUserDetailModal',
               }),
               onHide: () => {
-                setVisible(false);
+                onClose();
               },
             });
           } else {
@@ -290,29 +321,41 @@ const MultiUserDetailModal = (
     },
   );
 
-  useImperativeHandle(ref, () => ({
-    open: (contactCard, profileId, role, avatar, selectedContact) => {
+  useEffect(() => {
+    if (profile) {
+      let selectedContact: EmailPhoneInput | null = null;
+      if (profile.user.email) {
+        selectedContact = {
+          countryCodeOrEmail: 'email',
+          value: profile.user.email,
+        };
+      } else if (profile.user.phoneNumber) {
+        const phoneNumber = parsePhoneNumber(profile.user.phoneNumber);
+        if (phoneNumber.isValid()) {
+          selectedContact = {
+            countryCodeOrEmail: phoneNumber.country!,
+            value: phoneNumber.formatInternational()!,
+          };
+        }
+      }
       reset({
-        role,
-        firstName: contactCard.firstName,
-        lastName: contactCard.lastName,
-        phoneNumbers: contactCard.phoneNumbers ?? [],
-        emails: contactCard.emails ?? [],
-        title: contactCard.title,
-        company: contactCard.company ?? undefined,
-        urls: contactCard.urls ?? [],
-        birthday: contactCard.birthday,
-        socials: contactCard.socials ?? [],
-        addresses: contactCard.addresses ?? [],
-        avatar,
+        role: profile.profileRole,
+        firstName: profile.contactCard?.firstName,
+        lastName: profile.contactCard?.lastName,
+        //use .slice to tricks the readOnly coming from relay type.(using hard cast 'as' make it hard to read the code)
+        phoneNumbers: profile.contactCard?.phoneNumbers?.slice() ?? [],
+        emails: profile.contactCard?.emails?.slice() ?? [],
+        title: profile.contactCard?.title,
+        company: profile.contactCard?.company ?? undefined,
+        urls: profile.contactCard?.urls?.slice() ?? [],
+        birthday: profile.contactCard?.birthday,
+        socials: profile.contactCard?.socials?.slice() ?? [],
+        addresses: profile.contactCard?.addresses?.slice() ?? [],
+        avatar: profile.avatar,
         selectedContact,
       });
-
-      setProfileId(profileId);
-
-      setVisible(true);
-    },
-  }));
+    }
+  }, [profile, reset]);
 
   const firstName = watch('firstName');
   const lastName = watch('lastName');
@@ -320,15 +363,7 @@ const MultiUserDetailModal = (
 
   const index = useSharedValue(0);
 
-  useEffect(() => {
-    const profileIndex =
-      webCard.profiles?.findIndex(profile => profile.id === profileId) ?? 0;
-
-    index.value = profileIndex;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [profileId, webCard.profiles]);
-
-  const isCurrentProfile = profileId === currentProfileId;
+  const isCurrentProfile = profile?.id === profileInfos?.profileId;
 
   const [commitDelete, deletionIsActive] =
     useMutation<MultiUserDetailModal_RemoveUserMutation>(graphql`
@@ -342,15 +377,16 @@ const MultiUserDetailModal = (
     `);
 
   const onRemoveUser = () => {
+    if (profileInfos?.profileId == null || profile == null) return;
     commitDelete({
       variables: {
         input: {
-          profileId: currentProfileId,
-          removeProfileId: profileId,
+          profileId: profileInfos?.profileId,
+          removeProfileId: profile.id,
         },
       },
       onCompleted: () => {
-        setVisible(false);
+        onClose();
       },
       onError: e => {
         console.error(e);
@@ -369,7 +405,8 @@ const MultiUserDetailModal = (
 
         webCardRecord?.setLinkedRecords(
           profiles?.filter(
-            profile => profile.getValue('id')?.toString() !== profileId,
+            filterProfile =>
+              filterProfile.getValue('id')?.toString() !== profile.id,
           ),
           'profiles',
         );
@@ -379,12 +416,10 @@ const MultiUserDetailModal = (
 
   const colorScheme = useColorScheme();
 
-  const userPendingOwnership = webCard.profiles?.find(
-    profile => profile.promotedAsOwner,
-  );
+  if (!profileInfos?.profileId || profile == null) return null;
 
   return (
-    <ScreenModal visible={visible} animationType="slide">
+    <ScreenModal visible={profile != null} animationType="slide">
       <Container style={{ flex: 1 }}>
         <SafeAreaView
           style={{ flex: 1 }}
@@ -402,7 +437,7 @@ const MultiUserDetailModal = (
               />
             }
             middleElement={
-              <Text style={[textStyles.large, styles.name]}>
+              <Text variant="large" style={styles.name}>
                 ~{firstName} {lastName}
               </Text>
             }
@@ -412,6 +447,7 @@ const MultiUserDetailModal = (
                   defaultMessage: 'Save',
                   description: 'MultiUserAddModal - Save button label',
                 })}
+                loading={saving || formState.isSubmitting}
                 onPress={submit}
               />
             }
@@ -431,7 +467,7 @@ const MultiUserDetailModal = (
                   onPress={onRemoveUser}
                   disabled={deletionIsActive}
                 >
-                  <Text style={[styles.removeText, textStyles.button]}>
+                  <Text variant="button" style={styles.removeText}>
                     <FormattedMessage
                       defaultMessage="Remove user"
                       description="label for button to remove user from multi-user profile"
@@ -447,7 +483,7 @@ const MultiUserDetailModal = (
                 name="selectedContact"
                 render={({ field: { onChange, onBlur, value } }) => (
                   <View style={styles.field}>
-                    <Text style={[styles.title, textStyles.xsmall]}>
+                    <Text variant="xsmall" style={styles.title}>
                       <FormattedMessage
                         defaultMessage="Email address or phone number"
                         description="MultiUserDetailModal - label for contact"
@@ -468,7 +504,7 @@ const MultiUserDetailModal = (
                 name="role"
                 render={({ field: { onChange, value } }) => (
                   <View style={styles.field}>
-                    <Text style={[styles.title, textStyles.xsmall]}>
+                    <Text variant="xsmall" style={styles.title}>
                       <FormattedMessage
                         defaultMessage="Role"
                         description="MultiUserDetailModal - label for role"
@@ -505,57 +541,62 @@ const MultiUserDetailModal = (
                   </View>
                 )}
               />
-              {isOwner(role) && !userPendingOwnership && (
-                <Button
-                  style={styles.transfer}
-                  variant="secondary"
-                  label={intl.formatMessage({
-                    defaultMessage: 'Transfer Ownership',
-                    description:
-                      'MultiUserDetailModal - Label for transfer ownership button',
-                  })}
-                  onPress={() => transfer.current?.open()}
-                />
-              )}
-              {isOwner(role) && userPendingOwnership && (
-                <>
-                  <Text style={styles.pending}>
-                    <FormattedMessage
-                      defaultMessage="Pending Ownership transfer to"
-                      description="MultiUserDetailModal - Title for ownership transfer pending"
-                    />
-                  </Text>
+              {isOwner(profileInfos?.profileRole) &&
+                isOwner(role) &&
+                !webCard.profilePendingOwner && (
+                  <Button
+                    style={styles.transfer}
+                    variant="secondary"
+                    label={intl.formatMessage({
+                      defaultMessage: 'Transfer Ownership',
+                      description:
+                        'MultiUserDetailModal - Label for transfer ownership button',
+                    })}
+                    onPress={() => transfer.current?.open()}
+                  />
+                )}
+              {isOwner(profileInfos?.profileRole) &&
+                isOwner(role) &&
+                webCard.profilePendingOwner && (
+                  <>
+                    <Text style={styles.pending}>
+                      <FormattedMessage
+                        defaultMessage="Pending Ownership transfer to"
+                        description="MultiUserDetailModal - Title for ownership transfer pending"
+                      />
+                    </Text>
 
-                  <Text style={styles.pendingEmail}>
-                    {userPendingOwnership.user.email}
-                  </Text>
+                    <Text style={styles.pendingEmail}>
+                      {webCard.profilePendingOwner?.user.email ??
+                        webCard.profilePendingOwner?.user.phoneNumber}
+                    </Text>
 
-                  <View style={styles.cancel}>
-                    <Button
-                      disabled={savingCancelTransfer}
-                      onPress={() =>
-                        commitCancelTransfer({
-                          variables: {
-                            input: {
-                              profileId: userPendingOwnership.id,
-                              webCardId: webCard.id,
+                    <View style={styles.cancel}>
+                      <Button
+                        disabled={savingCancelTransfer}
+                        onPress={() =>
+                          commitCancelTransfer({
+                            variables: {
+                              input: {
+                                profileId: webCard.profilePendingOwner!.id,
+                                webCardId: webCard.id,
+                              },
                             },
-                          },
-                        })
-                      }
-                      label={intl.formatMessage({
-                        defaultMessage: 'Cancel transfer',
-                        description:
-                          'MultiUserDetailModal - Cancel transfer button label',
-                      })}
-                      variant="little_round"
-                      style={styles.cancelButton}
-                    />
-                  </View>
-                </>
-              )}
-              {!userPendingOwnership && (
-                <Text style={[styles.description, textStyles.xsmall]}>
+                          })
+                        }
+                        label={intl.formatMessage({
+                          defaultMessage: 'Cancel transfer',
+                          description:
+                            'MultiUserDetailModal - Cancel transfer button label',
+                        })}
+                        variant="little_round"
+                        style={styles.cancelButton}
+                      />
+                    </View>
+                  </>
+                )}
+              {!webCard.profilePendingOwner && (
+                <Text variant="xsmall" style={styles.description}>
                   {role === 'user' && (
                     <FormattedMessage
                       defaultMessage="A user has a ContactCard linked to the shared webcard but cannot publish posts or edit the WebCard."
@@ -582,8 +623,8 @@ const MultiUserDetailModal = (
                   )}
                 </Text>
               )}
-              {userPendingOwnership && (
-                <Text style={[styles.description, textStyles.xsmall]}>
+              {webCard.profilePendingOwner && (
+                <Text variant="xsmall" style={styles.description}>
                   <FormattedMessage
                     defaultMessage="An ownership request has been sent. Ownership will be transfered as soon as the request is accepted."
                     description="MultiUserDetailModal - Description for pending ownership transfer"
@@ -591,26 +632,24 @@ const MultiUserDetailModal = (
                 </Text>
               )}
               <View style={styles.stats}>
-                {webCard.profiles && (
-                  <HomeStatistics
-                    user={webCard.profiles}
-                    height={250}
-                    currentUserIndex={0}
-                    currentProfileIndexSharedValue={index}
-                    variant={colorScheme === 'dark' ? 'dark' : 'light'}
-                    initialStatsIndex={1}
-                  />
-                )}
+                <HomeStatistics
+                  user={[profile]}
+                  height={250}
+                  currentUserIndex={0}
+                  currentProfileIndexSharedValue={index}
+                  variant={colorScheme === 'dark' ? 'dark' : 'light'}
+                  initialStatsIndex={1}
+                />
               </View>
             </View>
           </ContactCardEditForm>
         </SafeAreaView>
+        {formState.isSubmitting || saving ? (
+          /* Used to prevent user from interacting with the screen while saving */
+          <View style={StyleSheet.absoluteFill} />
+        ) : null}
       </Container>
-      <MultiUserTransferOwnershipModal
-        ref={transfer}
-        usersByRole={usersByRole}
-        webCard={webCard}
-      />
+      {/* <MultiUserTransferOwnershipModal ref={transfer} webCard={webCard} /> */}
     </ScreenModal>
   );
 };
@@ -713,4 +752,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default forwardRef(MultiUserDetailModal);
+export default MultiUserDetailModal;

@@ -1,27 +1,19 @@
-import { Fragment, forwardRef, useImperativeHandle, useState } from 'react';
+import { forwardRef, useImperativeHandle, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { graphql, useFragment, useMutation } from 'react-relay';
-import { colors, textStyles } from '#theme';
-import { MEDIA_WIDTH } from '#components/AuthorCartouche';
-import { MediaImageRenderer } from '#components/medias';
+import { colors } from '#theme';
 import ScreenModal from '#components/ScreenModal';
 import Button from '#ui/Button';
 import Container from '#ui/Container';
 import Header from '#ui/Header';
-import RadioButton from '#ui/RadioButton';
-import Separation from '#ui/Separation';
 import Text from '#ui/Text';
-import Avatar from './Avatar';
-import type { ProfileRole } from '#relayArtifacts/MultiUserScreenQuery.graphql';
 import type { MultiUserTransferOwnershipModal_TransferOwnershipMutation } from '#relayArtifacts/MultiUserTransferOwnershipModal_TransferOwnershipMutation.graphql';
 import type { MultiUserTransferOwnershipModal_webCard$key } from '#relayArtifacts/MultiUserTransferOwnershipModal_webCard.graphql';
-import type { UserInformation } from './MultiUserScreen';
 import type { ForwardedRef } from 'react';
 
 type MultiUserTransferOwnershipModalProps = {
-  usersByRole: Record<ProfileRole, UserInformation[]>;
   webCard: MultiUserTransferOwnershipModal_webCard$key;
 };
 
@@ -30,13 +22,13 @@ export type MultiUserTransferOwnershipModalActions = {
 };
 
 const MultiUserTransferOwnershipModal = (
-  { usersByRole, webCard: webCardKey }: MultiUserTransferOwnershipModalProps,
+  { webCard: webCardKey }: MultiUserTransferOwnershipModalProps,
   ref: ForwardedRef<MultiUserTransferOwnershipModalActions>,
 ) => {
   const intl = useIntl();
 
   const [visible, setVisible] = useState(false);
-  const [selected, setSelected] = useState(0);
+  const [selected] = useState(0);
 
   const [commit, saving] =
     useMutation<MultiUserTransferOwnershipModal_TransferOwnershipMutation>(
@@ -59,9 +51,7 @@ const MultiUserTransferOwnershipModal = (
       fragment MultiUserTransferOwnershipModal_webCard on WebCard {
         id
         userName
-        profiles {
-          id
-        }
+        nbProfiles
       }
     `,
     webCardKey,
@@ -72,15 +62,10 @@ const MultiUserTransferOwnershipModal = (
   };
 
   const onTransfer = () => {
-    const userToTransfer = Object.values(usersByRole).reduce(
-      (accumulator, currentValue) => [...accumulator, ...currentValue],
-      [] as UserInformation[],
-    )[selected];
-
     commit({
       variables: {
         input: {
-          profileId: userToTransfer.profileId,
+          profileId: 'TODO', //waiting for Nico review
           webCardId: webCard.id,
         },
       },
@@ -115,7 +100,7 @@ const MultiUserTransferOwnershipModal = (
               />
             }
             middleElement={
-              <Text style={[textStyles.large, styles.name]}>
+              <Text variant="large" style={styles.name}>
                 <FormattedMessage
                   defaultMessage="Transfer Ownership"
                   description="MultiUserTransferOwnershipModal - Title"
@@ -134,7 +119,7 @@ const MultiUserTransferOwnershipModal = (
               />
             }
           />
-          <Text style={[styles.description, textStyles.xsmall]}>
+          <Text variant="xsmall" style={styles.description}>
             <FormattedMessage
               defaultMessage={`Select a new owner for the WebCard “{userName}”. The owner has full control over the WebCard, including the ability to add and remove collaborators. This is also the person who will be billed for multi-user.`}
               description="MultiUserDetailModal - User description"
@@ -142,7 +127,7 @@ const MultiUserTransferOwnershipModal = (
             />
           </Text>
 
-          <Text style={[textStyles.smallbold, styles.price]}>
+          <Text variant="smallbold" style={styles.price}>
             <FormattedMessage
               defaultMessage="$0,99/user, billed monthly - "
               description="Price for MultiUserScreen"
@@ -150,53 +135,12 @@ const MultiUserTransferOwnershipModal = (
             <FormattedMessage
               defaultMessage="{nbUsers} user"
               description="Title for switch section in MultiUserScreen"
-              values={{ nbUsers: webCard.profiles?.length ?? 1 }}
+              values={{ nbUsers: webCard.nbProfiles ?? 1 }}
             />
           </Text>
 
           <View style={styles.users}>
-            {Object.entries(usersByRole).map(([key, users], index) => {
-              const profileRole = key as ProfileRole; // ts infers the key type as string
-              return (
-                <Fragment key={profileRole}>
-                  <Separation style={styles.separation}>
-                    {profileRole}
-                  </Separation>
-                  {users.map(user => {
-                    return (
-                      <View key={user.email} style={styles.user}>
-                        {user.avatar ? (
-                          <MediaImageRenderer
-                            source={{
-                              uri: user.avatar.uri,
-                              mediaId: user.avatar.id ?? '',
-                              requestedSize: MEDIA_WIDTH,
-                            }}
-                            style={styles.avatar}
-                          />
-                        ) : (
-                          <Avatar
-                            firstName={user.firstName}
-                            lastName={user.lastName}
-                          />
-                        )}
-                        <View style={styles.userInfos}>
-                          <Text style={textStyles.large}>
-                            ~{user.firstName} {user.lastName}{' '}
-                            {index === 0 && '(me)'}
-                          </Text>
-                          <Text style={[styles.contact]}>{user.email}</Text>
-                        </View>
-                        <RadioButton
-                          checked={selected === index}
-                          onChange={() => setSelected(index)}
-                        />
-                      </View>
-                    );
-                  })}
-                </Fragment>
-              );
-            })}
+            {/* TODO : use a paginated SectionList is required by Nico after review*/}
           </View>
         </SafeAreaView>
       </Container>

@@ -77,7 +77,7 @@ type WebCard implements Node {
   """
   True if the current viewer is following this webCard
   """
-  isFollowing(webCardId:ID): Boolean!
+  isFollowing(webCardId: ID): Boolean!
   """
   the number of post the webCard like
   """
@@ -135,7 +135,7 @@ type WebCard implements Node {
   ): PostConnection!
 
   """
-  The webCard owner
+  The webCard owner User
   """
   owner: User
 
@@ -145,9 +145,28 @@ type WebCard implements Node {
   locale: String
 
   """
+  The number of profiles associated to the webCard
+  """
+  nbProfiles: Int!
+  """
   The associated profiles to the WebCard
   """
-  profiles: [Profile!]
+  profiles(
+    """
+    Returns the items in the list that come after the specified cursor.
+    """
+    after: String
+
+    """
+    Returns the first n items from the list.
+    """
+    first: Int
+  ): ProfileConnection!
+
+  """
+  The pending change ownership user if exist
+  """
+  profilePendingOwner: Profile
 
   """
   Return a list of WebCards that the current user is following

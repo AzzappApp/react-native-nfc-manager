@@ -45,5 +45,3 @@ type ContactCardSocial {
   label: String!
   selected: Boolean
 }
-
-
