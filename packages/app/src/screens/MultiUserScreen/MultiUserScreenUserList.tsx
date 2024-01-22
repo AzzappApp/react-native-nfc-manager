@@ -11,6 +11,7 @@ import { colors } from '#theme';
 import { MEDIA_WIDTH } from '#components/AuthorCartouche';
 import { MediaImageRenderer } from '#components/medias';
 import { useRouter } from '#components/NativeRouter';
+import ScreenModal from '#components/ScreenModal';
 import useAuthState from '#hooks/useAuthState';
 import Button from '#ui/Button';
 import Icon from '#ui/Icon';
@@ -208,12 +209,13 @@ const MultiUserScreenUserList = ({
         contentContainerStyle={{ paddingBottom: 40 + bottom }}
         onEndReachedThreshold={0.5}
       />
-
-      <MultiUserDetailModal
-        webCard={webCard}
-        profile={selectedProfile}
-        onClose={closeModal}
-      />
+      <ScreenModal visible={Boolean(selectedProfile)} animationType="slide">
+        <MultiUserDetailModal
+          webCard={webCard}
+          profile={selectedProfile}
+          onClose={closeModal}
+        />
+      </ScreenModal>
     </View>
   );
 };
@@ -261,7 +263,7 @@ const ItemList = ({
         }
         avatar {
           id
-          uri: uri(width: 56, pixelRatio: $pixelRatio)
+          uri: uri(width: 112, pixelRatio: $pixelRatio)
         }
       }
     `,

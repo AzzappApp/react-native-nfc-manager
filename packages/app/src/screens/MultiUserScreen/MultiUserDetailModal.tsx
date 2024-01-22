@@ -1,5 +1,5 @@
 import { parsePhoneNumber } from 'libphonenumber-js';
-import { useEffect, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { StyleSheet, View, useColorScheme } from 'react-native';
@@ -17,7 +17,6 @@ import ERRORS from '@azzapp/shared/errors';
 import { encodeMediaId } from '@azzapp/shared/imagesHelpers';
 import { isOwner } from '@azzapp/shared/profileHelpers';
 import { colors } from '#theme';
-import ScreenModal from '#components/ScreenModal';
 import { getFileName } from '#helpers/fileHelpers';
 import { addLocalCachedMediaFile } from '#helpers/mediaHelpers';
 import { uploadMedia, uploadSign } from '#helpers/MobileWebAPI';
@@ -65,10 +64,6 @@ const MultiUserDetailModal = ({
   const { profileInfos } = useAuthState();
   const intl = useIntl();
 
-  const { control, watch, handleSubmit, reset, formState } =
-    useForm<MultiUserDetailFormValues>({
-      mode: 'onSubmit',
-    });
   const profile = useFragment(
     graphql`
       fragment MultiUserDetailModal_Profile on Profile
@@ -118,7 +113,7 @@ const MultiUserDetailModal = ({
         ...HomeStatistics_profiles
         avatar {
           id
-          uri: uri(width: 56, pixelRatio: $pixelRatio)
+          uri: uri(width: 112, pixelRatio: $pixelRatio)
         }
         user {
           email
@@ -128,6 +123,40 @@ const MultiUserDetailModal = ({
     `,
     profileKey,
   );
+
+  const phoneNumber =
+    profile?.user.phoneNumber && parsePhoneNumber(profile.user.phoneNumber);
+
+  const { control, watch, handleSubmit, formState } =
+    useForm<MultiUserDetailFormValues>({
+      mode: 'onSubmit',
+      defaultValues: {
+        role: profile?.profileRole,
+        firstName: profile?.contactCard?.firstName,
+        lastName: profile?.contactCard?.lastName,
+        //use .slice to tricks the readOnly coming from relay type.(using hard cast 'as' make it hard to read the code)
+        phoneNumbers: profile?.contactCard?.phoneNumbers?.slice() ?? [],
+        emails: profile?.contactCard?.emails?.slice() ?? [],
+        title: profile?.contactCard?.title,
+        company: profile?.contactCard?.company ?? undefined,
+        urls: profile?.contactCard?.urls?.slice() ?? [],
+        birthday: profile?.contactCard?.birthday,
+        socials: profile?.contactCard?.socials?.slice() ?? [],
+        addresses: profile?.contactCard?.addresses?.slice() ?? [],
+        avatar: profile?.avatar,
+        selectedContact: profile?.user.email
+          ? {
+              countryCodeOrEmail: 'email',
+              value: profile.user.email,
+            }
+          : phoneNumber && phoneNumber?.isValid()
+          ? {
+              countryCodeOrEmail: phoneNumber.country!,
+              value: phoneNumber.formatInternational()!,
+            }
+          : null,
+      },
+    });
 
   const webCard = useFragment(
     graphql`
@@ -245,30 +274,31 @@ const MultiUserDetailModal = ({
       const { avatar, role, selectedContact, ...contactCard } = data;
 
       const input = {};
-      let avatarId: string | null = avatar?.id ?? null;
 
-      if (formState.dirtyFields.avatar) {
-        if (avatar?.local && avatar.uri) {
-          // setProgressIndicator(Observable.from(0));
+      let avatarId: string | null = profile?.avatar?.id ?? null;
 
-          const fileName = getFileName(avatar.uri);
-          const file: any = {
-            name: fileName,
-            uri: avatar.uri,
-            type: mime.lookup(fileName) || 'image/jpeg',
-          };
+      if (avatar?.local && avatar.uri) {
+        const fileName = getFileName(avatar.uri);
+        const file: any = {
+          name: fileName,
+          uri: avatar.uri,
+          type: mime.lookup(fileName) || 'image/jpeg',
+        };
 
-          const { uploadURL, uploadParameters } = await uploadSign({
-            kind: 'image',
-            target: 'post',
-          });
-          const { /* progress: uploadProgress, */ promise: uploadPromise } =
-            uploadMedia(file, uploadURL, uploadParameters);
-          // setProgressIndicator(uploadProgress);
-          const { public_id } = await uploadPromise;
-          avatarId = encodeMediaId(public_id, 'image');
-        }
+        const { uploadURL, uploadParameters } = await uploadSign({
+          kind: 'image',
+          target: 'post',
+        });
+        const { promise: uploadPromise } = uploadMedia(
+          file,
+          uploadURL,
+          uploadParameters,
+        );
+
+        const { public_id } = await uploadPromise;
+        avatarId = encodeMediaId(public_id, 'image');
       }
+
       if (formState.dirtyFields.role)
         Object.assign(input, { profileRole: role });
 
@@ -325,42 +355,6 @@ const MultiUserDetailModal = ({
       console.error(error);
     },
   );
-
-  useEffect(() => {
-    if (profile) {
-      let selectedContact: EmailPhoneInput | null = null;
-      if (profile.user.email) {
-        selectedContact = {
-          countryCodeOrEmail: 'email',
-          value: profile.user.email,
-        };
-      } else if (profile.user.phoneNumber) {
-        const phoneNumber = parsePhoneNumber(profile.user.phoneNumber);
-        if (phoneNumber.isValid()) {
-          selectedContact = {
-            countryCodeOrEmail: phoneNumber.country!,
-            value: phoneNumber.formatInternational()!,
-          };
-        }
-      }
-      reset({
-        role: profile.profileRole,
-        firstName: profile.contactCard?.firstName,
-        lastName: profile.contactCard?.lastName,
-        //use .slice to tricks the readOnly coming from relay type.(using hard cast 'as' make it hard to read the code)
-        phoneNumbers: profile.contactCard?.phoneNumbers?.slice() ?? [],
-        emails: profile.contactCard?.emails?.slice() ?? [],
-        title: profile.contactCard?.title,
-        company: profile.contactCard?.company ?? undefined,
-        urls: profile.contactCard?.urls?.slice() ?? [],
-        birthday: profile.contactCard?.birthday,
-        socials: profile.contactCard?.socials?.slice() ?? [],
-        addresses: profile.contactCard?.addresses?.slice() ?? [],
-        avatar: profile.avatar,
-        selectedContact,
-      });
-    }
-  }, [profile, reset]);
 
   const firstName = watch('firstName');
   const lastName = watch('lastName');
@@ -424,238 +418,235 @@ const MultiUserDetailModal = ({
   if (!profileInfos?.profileId || profile == null) return null;
 
   return (
-    <ScreenModal visible={profile != null} animationType="slide">
-      <Container style={{ flex: 1 }}>
-        <SafeAreaView
-          style={{ flex: 1 }}
-          edges={{ bottom: 'off', top: 'additive' }}
+    <Container style={{ flex: 1 }}>
+      <SafeAreaView
+        style={{ flex: 1 }}
+        edges={{ bottom: 'off', top: 'additive' }}
+      >
+        <Header
+          leftElement={
+            <Button
+              variant="secondary"
+              label={intl.formatMessage({
+                defaultMessage: 'Cancel',
+                description: 'MultiUserDetailModal - Cancel button label',
+              })}
+              onPress={onClose}
+            />
+          }
+          middleElement={
+            <Text variant="large" style={styles.name}>
+              ~{firstName} {lastName}
+            </Text>
+          }
+          rightElement={
+            <Button
+              label={intl.formatMessage({
+                defaultMessage: 'Save',
+                description: 'MultiUserAddModal - Save button label',
+              })}
+              loading={saving || formState.isSubmitting}
+              onPress={submit}
+            />
+          }
+        />
+        <ContactCardEditForm
+          commonInformation={webCard.commonInformation}
+          control={control as unknown as Control<ContactCardEditFormValues>}
+          hideImagePicker={() => setShowImagePicker(false)}
+          showImagePicker={() => setShowImagePicker(true)}
+          imagePickerVisible={showImagePicker}
+          isMultiUser={true}
+          footer={
+            !isCurrentProfile &&
+            role !== 'owner' && (
+              <PressableNative
+                style={styles.removeButton}
+                onPress={onRemoveUser}
+                disabled={deletionIsActive}
+              >
+                <Text variant="button" style={styles.removeText}>
+                  <FormattedMessage
+                    defaultMessage="Remove user"
+                    description="label for button to remove user from multi-user profile"
+                  />
+                </Text>
+              </PressableNative>
+            )
+          }
         >
-          <Header
-            leftElement={
-              <Button
-                variant="secondary"
-                label={intl.formatMessage({
-                  defaultMessage: 'Cancel',
-                  description: 'MultiUserDetailModal - Cancel button label',
-                })}
-                onPress={onClose}
-              />
-            }
-            middleElement={
-              <Text variant="large" style={styles.name}>
-                ~{firstName} {lastName}
-              </Text>
-            }
-            rightElement={
-              <Button
-                label={intl.formatMessage({
-                  defaultMessage: 'Save',
-                  description: 'MultiUserAddModal - Save button label',
-                })}
-                loading={saving || formState.isSubmitting}
-                onPress={submit}
-              />
-            }
-          />
-          <ContactCardEditForm
-            commonInformation={webCard.commonInformation}
-            control={control as unknown as Control<ContactCardEditFormValues>}
-            hideImagePicker={() => setShowImagePicker(false)}
-            showImagePicker={() => setShowImagePicker(true)}
-            imagePickerVisible={showImagePicker}
-            isMultiUser={true}
-            footer={
-              !isCurrentProfile &&
-              role !== 'owner' && (
-                <PressableNative
-                  style={styles.removeButton}
-                  onPress={onRemoveUser}
-                  disabled={deletionIsActive}
-                >
-                  <Text variant="button" style={styles.removeText}>
+          <View style={{ paddingHorizontal: 10 }}>
+            <Controller
+              control={control}
+              name="selectedContact"
+              render={({ field: { onChange, onBlur, value } }) => (
+                <View style={styles.field}>
+                  <Text variant="xsmall" style={styles.title}>
                     <FormattedMessage
-                      defaultMessage="Remove user"
-                      description="label for button to remove user from multi-user profile"
+                      defaultMessage="Email address or phone number"
+                      description="MultiUserDetailModal - label for contact"
                     />
                   </Text>
-                </PressableNative>
-              )
-            }
-          >
-            <View style={{ paddingHorizontal: 10 }}>
-              <Controller
-                control={control}
-                name="selectedContact"
-                render={({ field: { onChange, onBlur, value } }) => (
-                  <View style={styles.field}>
-                    <Text variant="xsmall" style={styles.title}>
-                      <FormattedMessage
-                        defaultMessage="Email address or phone number"
-                        description="MultiUserDetailModal - label for contact"
-                      />
-                    </Text>
-                    <TextInput
-                      value={value?.value ?? ''}
-                      onChangeText={onChange}
-                      onBlur={onBlur}
-                      style={[styles.input, styles.contactText]}
-                      editable={false}
-                    />
-                  </View>
-                )}
-              />
-              <Controller
-                control={control}
-                name="role"
-                render={({ field: { onChange, value } }) => (
-                  <View style={styles.field}>
-                    <Text variant="xsmall" style={styles.title}>
-                      <FormattedMessage
-                        defaultMessage="Role"
-                        description="MultiUserDetailModal - label for role"
-                      />
-                    </Text>
-                    <Select
-                      nativeID="role"
-                      disabled={isCurrentProfile || role === 'owner'}
-                      accessibilityLabelledBy="roleLabel"
-                      data={
-                        role === 'owner'
-                          ? [
-                              {
-                                id: 'owner',
-                                label: (
-                                  <FormattedMessage
-                                    defaultMessage="Owner"
-                                    description="MultiUserDetailModal - Label for owner select input"
-                                  />
-                                ),
-                              },
-                            ]
-                          : roles
-                      }
-                      selectedItemKey={value}
-                      keyExtractor={role => role.id}
-                      onItemSelected={item => onChange(item.id)}
-                      itemContainerStyle={styles.selectItemContainerStyle}
-                      bottomSheetHeight={
-                        BOTTOM_SHEET_HEIGHT_BASE +
-                        roles.length * BOTTOM_SHEET_HEIGHT_ITEM
-                      }
-                    />
-                  </View>
-                )}
-              />
-              {isOwner(profileInfos?.profileRole) &&
-                isOwner(role) &&
-                !webCard.profilePendingOwner && (
-                  <Button
-                    style={styles.transfer}
-                    variant="secondary"
-                    label={intl.formatMessage({
-                      defaultMessage: 'Transfer Ownership',
-                      description:
-                        'MultiUserDetailModal - Label for transfer ownership button',
-                    })}
-                    onPress={() => transfer.current?.open()}
+                  <TextInput
+                    value={value?.value ?? ''}
+                    onChangeText={onChange}
+                    onBlur={onBlur}
+                    style={[styles.input, styles.contactText]}
+                    editable={false}
                   />
-                )}
-              {isOwner(profileInfos?.profileRole) &&
-                isOwner(role) &&
-                webCard.profilePendingOwner && (
-                  <>
-                    <Text style={styles.pending}>
-                      <FormattedMessage
-                        defaultMessage="Pending Ownership transfer to"
-                        description="MultiUserDetailModal - Title for ownership transfer pending"
-                      />
-                    </Text>
-
-                    <Text style={styles.pendingEmail}>
-                      {webCard.profilePendingOwner?.user.email ??
-                        webCard.profilePendingOwner?.user.phoneNumber}
-                    </Text>
-
-                    <View style={styles.cancel}>
-                      <Button
-                        disabled={savingCancelTransfer}
-                        onPress={() =>
-                          commitCancelTransfer({
-                            variables: {
-                              input: {
-                                profileId: webCard.profilePendingOwner!.id,
-                                webCardId: webCard.id,
-                              },
+                </View>
+              )}
+            />
+            <Controller
+              control={control}
+              name="role"
+              render={({ field: { onChange, value } }) => (
+                <View style={styles.field}>
+                  <Text variant="xsmall" style={styles.title}>
+                    <FormattedMessage
+                      defaultMessage="Role"
+                      description="MultiUserDetailModal - label for role"
+                    />
+                  </Text>
+                  <Select
+                    nativeID="role"
+                    disabled={isCurrentProfile || role === 'owner'}
+                    accessibilityLabelledBy="roleLabel"
+                    data={
+                      role === 'owner'
+                        ? [
+                            {
+                              id: 'owner',
+                              label: (
+                                <FormattedMessage
+                                  defaultMessage="Owner"
+                                  description="MultiUserDetailModal - Label for owner select input"
+                                />
+                              ),
                             },
-                          })
-                        }
-                        label={intl.formatMessage({
-                          defaultMessage: 'Cancel transfer',
-                          description:
-                            'MultiUserDetailModal - Cancel transfer button label',
-                        })}
-                        variant="little_round"
-                        style={styles.cancelButton}
-                      />
-                    </View>
-                  </>
-                )}
-              {!webCard.profilePendingOwner && (
-                <Text variant="xsmall" style={styles.description}>
-                  {role === 'user' && (
-                    <FormattedMessage
-                      defaultMessage="A user has a ContactCard linked to the shared webcard but cannot publish posts or edit the WebCard."
-                      description="MultiUserDetailModal - User description"
-                    />
-                  )}
-                  {role === 'editor' && (
-                    <FormattedMessage
-                      defaultMessage="An editor can create and publish posts, edit the WebCard, but they cannot manage other aspects of the WebCard, such as settings and permissions."
-                      description="MultiUserDetailModal - Editor description"
-                    />
-                  )}
-                  {role === 'admin' && (
-                    <FormattedMessage
-                      defaultMessage="The admin has full control over the WebCard, including the ability to add and remove collaborators."
-                      description="MultiUserDetailModal - admin description"
-                    />
-                  )}
-                  {role === 'owner' && (
-                    <FormattedMessage
-                      defaultMessage="The owner has full control over the WebCard, including the ability to add and remove collaborators. This is also the person who will be billed for multi-user."
-                      description="MultiUserDetailModal - admin description"
-                    />
-                  )}
-                </Text>
-              )}
-              {webCard.profilePendingOwner && (
-                <Text variant="xsmall" style={styles.description}>
-                  <FormattedMessage
-                    defaultMessage="An ownership request has been sent. Ownership will be transfered as soon as the request is accepted."
-                    description="MultiUserDetailModal - Description for pending ownership transfer"
+                          ]
+                        : roles
+                    }
+                    selectedItemKey={value}
+                    keyExtractor={role => role.id}
+                    onItemSelected={item => onChange(item.id)}
+                    itemContainerStyle={styles.selectItemContainerStyle}
+                    bottomSheetHeight={
+                      BOTTOM_SHEET_HEIGHT_BASE +
+                      roles.length * BOTTOM_SHEET_HEIGHT_ITEM
+                    }
                   />
-                </Text>
+                </View>
               )}
-              <View style={styles.stats}>
-                <HomeStatistics
-                  user={[profile]}
-                  height={250}
-                  currentUserIndex={0}
-                  currentProfileIndexSharedValue={index}
-                  variant={colorScheme === 'dark' ? 'dark' : 'light'}
-                  initialStatsIndex={1}
+            />
+            {isOwner(profileInfos?.profileRole) &&
+              isOwner(role) &&
+              !webCard.profilePendingOwner && (
+                <Button
+                  style={styles.transfer}
+                  variant="secondary"
+                  label={intl.formatMessage({
+                    defaultMessage: 'Transfer Ownership',
+                    description:
+                      'MultiUserDetailModal - Label for transfer ownership button',
+                  })}
+                  onPress={() => transfer.current?.open()}
                 />
-              </View>
+              )}
+            {isOwner(profileInfos?.profileRole) &&
+              isOwner(role) &&
+              webCard.profilePendingOwner && (
+                <>
+                  <Text style={styles.pending}>
+                    <FormattedMessage
+                      defaultMessage="Pending Ownership transfer to"
+                      description="MultiUserDetailModal - Title for ownership transfer pending"
+                    />
+                  </Text>
+
+                  <Text style={styles.pendingEmail}>
+                    {webCard.profilePendingOwner?.user.email ??
+                      webCard.profilePendingOwner?.user.phoneNumber}
+                  </Text>
+
+                  <View style={styles.cancel}>
+                    <Button
+                      disabled={savingCancelTransfer}
+                      onPress={() =>
+                        commitCancelTransfer({
+                          variables: {
+                            input: {
+                              profileId: webCard.profilePendingOwner!.id,
+                              webCardId: webCard.id,
+                            },
+                          },
+                        })
+                      }
+                      label={intl.formatMessage({
+                        defaultMessage: 'Cancel transfer',
+                        description:
+                          'MultiUserDetailModal - Cancel transfer button label',
+                      })}
+                      variant="little_round"
+                      style={styles.cancelButton}
+                    />
+                  </View>
+                </>
+              )}
+            {!webCard.profilePendingOwner && (
+              <Text variant="xsmall" style={styles.description}>
+                {role === 'user' && (
+                  <FormattedMessage
+                    defaultMessage="A user has a ContactCard linked to the shared webcard but cannot publish posts or edit the WebCard."
+                    description="MultiUserDetailModal - User description"
+                  />
+                )}
+                {role === 'editor' && (
+                  <FormattedMessage
+                    defaultMessage="An editor can create and publish posts, edit the WebCard, but they cannot manage other aspects of the WebCard, such as settings and permissions."
+                    description="MultiUserDetailModal - Editor description"
+                  />
+                )}
+                {role === 'admin' && (
+                  <FormattedMessage
+                    defaultMessage="The admin has full control over the WebCard, including the ability to add and remove collaborators."
+                    description="MultiUserDetailModal - admin description"
+                  />
+                )}
+                {role === 'owner' && (
+                  <FormattedMessage
+                    defaultMessage="The owner has full control over the WebCard, including the ability to add and remove collaborators. This is also the person who will be billed for multi-user."
+                    description="MultiUserDetailModal - admin description"
+                  />
+                )}
+              </Text>
+            )}
+            {webCard.profilePendingOwner && (
+              <Text variant="xsmall" style={styles.description}>
+                <FormattedMessage
+                  defaultMessage="An ownership request has been sent. Ownership will be transfered as soon as the request is accepted."
+                  description="MultiUserDetailModal - Description for pending ownership transfer"
+                />
+              </Text>
+            )}
+            <View style={styles.stats}>
+              <HomeStatistics
+                user={[profile]}
+                height={250}
+                currentUserIndex={0}
+                currentProfileIndexSharedValue={index}
+                variant={colorScheme === 'dark' ? 'dark' : 'light'}
+                initialStatsIndex={1}
+              />
             </View>
-          </ContactCardEditForm>
-        </SafeAreaView>
-        {formState.isSubmitting || saving ? (
-          /* Used to prevent user from interacting with the screen while saving */
-          <View style={StyleSheet.absoluteFill} />
-        ) : null}
-      </Container>
-      {/* <MultiUserTransferOwnershipModal ref={transfer} webCard={webCard} /> */}
-    </ScreenModal>
+          </View>
+        </ContactCardEditForm>
+      </SafeAreaView>
+      {formState.isSubmitting || saving ? (
+        /* Used to prevent user from interacting with the screen while saving */
+        <View style={StyleSheet.absoluteFill} />
+      ) : null}
+    </Container>
   );
 };
 
