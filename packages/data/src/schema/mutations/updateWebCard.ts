@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import { GraphQLError } from 'graphql';
 import ERRORS from '@azzapp/shared/errors';
-import { isEditor, isOwner } from '@azzapp/shared/profileHelpers';
+import { isAdmin, isEditor } from '@azzapp/shared/profileHelpers';
 import {
   updateWebCard,
   type WebCard,
@@ -64,7 +64,7 @@ const updateWebCardMutation: MutationResolvers['updateWebCard'] = async (
 
     if (
       webCard.companyActivityId !== partialWebCard.companyActivityId &&
-      !isOwner(profile.profileRole)
+      !isAdmin(profile.profileRole)
     ) {
       throw new GraphQLError(ERRORS.UNAUTHORIZED);
     }
