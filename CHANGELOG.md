@@ -1,5 +1,6 @@
-## 0.5.2-canary.180
+## 0.5.2-canary.181
 
+* **fix:**  - **multiUser:** [#2383](https://github.com/AzzappApp/azzapp/pull/2383) manage the time frame when user is downgraded ([#2409](https://github.com/AzzappApp/azzapp/pull/2409))
 * **fix:**  - 🐛 display right error ([#2416](https://github.com/AzzappApp/azzapp/pull/2416))
 * **fix:**  - missed introspection header ([#2420](https://github.com/AzzappApp/azzapp/pull/2420))
 * **fix:**  - server header on cache update ([#2418](https://github.com/AzzappApp/azzapp/pull/2418))
