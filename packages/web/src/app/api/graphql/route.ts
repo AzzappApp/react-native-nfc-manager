@@ -200,7 +200,7 @@ const { handleRequest } = createYoga({
     useDisableIntrospection({
       isDisabled: request => {
         return process.env.API_SERVER_TOKEN
-          ? request.headers.get('authorization') !==
+          ? request.headers.get(AZZAPP_SERVER_HEADER) !==
               process.env.API_SERVER_TOKEN
           : true;
       },
