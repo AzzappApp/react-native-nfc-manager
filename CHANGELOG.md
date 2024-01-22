@@ -1,5 +1,9 @@
-## 0.5.2-canary.184
+## 0.5.2-canary.185
 
+* **fix:**  - **WebCardScreen:** block action if card is not publish ([#2431](https://github.com/AzzappApp/azzapp/pull/2431))
+* **fix:**  - 🐛 allow admins to update parameters for activity ([#2430](https://github.com/AzzappApp/azzapp/pull/2430))
+* **fix:**  - 🐛 display texts correctly ([#2427](https://github.com/AzzappApp/azzapp/pull/2427))
+* **fix:**  - **multiuser:** for fetchPolicy for refetch ([#2429](https://github.com/AzzappApp/azzapp/pull/2429))
 * **fix:**  - **multiUser:** [#2421](https://github.com/AzzappApp/azzapp/pull/2421) reset form on cancel ([#2426](https://github.com/AzzappApp/azzapp/pull/2426))
 * **Fix:**  - **multiUser:** Empty phone number and updater ([#2425](https://github.com/AzzappApp/azzapp/pull/2425))
 * **fix:**  - change the way the shake and share pop the view ([#2422](https://github.com/AzzappApp/azzapp/pull/2422))
