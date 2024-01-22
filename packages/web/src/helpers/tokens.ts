@@ -7,6 +7,8 @@ const REFRESH_TOKEN_EXP_TIME = 7 * 24 * 3600 * 1000;
 const TOKEN_SECRET = process.env.TOKEN_SECRET!;
 const REFRESH_TOKEN_SECRET = process.env.REFRESH_TOKEN_SECRET!;
 
+export const AZZAPP_SERVER_HEADER = 'azzapp-server-auth';
+
 export type SessionData = {
   userId: string;
 };
@@ -52,7 +54,7 @@ export const getSessionData = async (): Promise<SessionData | null> => {
 };
 
 export const checkServerAuth = () => {
-  const token = headers().get('authorization') ?? null;
+  const token = headers().get(AZZAPP_SERVER_HEADER) ?? null;
   if (token !== process.env.API_SERVER_TOKEN) {
     throw new Error(ERRORS.INVALID_TOKEN);
   }

@@ -14,7 +14,7 @@ import {
 import ERRORS from '@azzapp/shared/errors';
 import queryMap from '#persisted-query-map.json';
 import { buildCoverAvatarUrl } from '#helpers/avatar';
-import { getSessionData } from '#helpers/tokens';
+import { AZZAPP_SERVER_HEADER, getSessionData } from '#helpers/tokens';
 import packageJSON from '../../../../package.json';
 import type { GraphQLContext } from '@azzapp/data';
 import type { Plugin } from '@envelop/types';
@@ -167,7 +167,7 @@ const { handleRequest } = createYoga({
         }
         if (process.env.API_SERVER_TOKEN) {
           return (
-            request.headers.get('authorization') ===
+            request.headers.get(AZZAPP_SERVER_HEADER) ===
             process.env.API_SERVER_TOKEN
           );
         }
@@ -225,7 +225,7 @@ const { handleRequest } = createYoga({
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            authorization: process.env.API_SERVER_TOKEN ?? '',
+            [AZZAPP_SERVER_HEADER]: process.env.API_SERVER_TOKEN ?? '',
           },
           body: JSON.stringify(p),
         },
@@ -243,7 +243,7 @@ const { handleRequest } = createYoga({
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            authorization: process.env.API_SERVER_TOKEN ?? '',
+            [AZZAPP_SERVER_HEADER]: process.env.API_SERVER_TOKEN ?? '',
           },
           body: JSON.stringify(p),
         },
