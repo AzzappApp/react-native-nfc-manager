@@ -58,7 +58,13 @@ const WebCardScreenContactDownloader = ({
                 description: 'Alert title when adding a profile to contacts',
               },
               {
-                name: `${webCard.userName}`,
+                name: `${
+                  `${contact.firstName ?? ''}  ${
+                    contact.lastName ?? ''
+                  }`.trim() ||
+                  contact.company ||
+                  webCard.userName
+                }`,
               },
             ),
             intl.formatMessage(
@@ -67,7 +73,13 @@ const WebCardScreenContactDownloader = ({
                 description: 'Alert message when adding a profile to contacts',
               },
               {
-                name: `${contact.firstName} ${contact.lastName}`,
+                name: `${
+                  `${contact.firstName ?? ''}  ${
+                    contact.lastName ?? ''
+                  }`.trim() ||
+                  contact.company ||
+                  webCard.userName
+                }`,
               },
             ),
             [

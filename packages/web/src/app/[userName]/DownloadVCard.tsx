@@ -102,7 +102,9 @@ const DownloadVCard = ({ webCard }: { webCard: WebCard }) => {
             ? `of ${
                 `${contact.firstName ?? ''}  ${
                   contact.lastName ?? ''
-                }`.trim() || contact.company
+                }`.trim() ||
+                contact.company ||
+                webCard.userName
               }   🎉`
             : ''
         }`}</span>
