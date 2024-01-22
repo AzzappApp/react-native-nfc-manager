@@ -76,6 +76,7 @@ const CommonInformationForm = ({
     control,
     handleSubmit,
     formState: { isSubmitting },
+    reset,
   } = useForm<CommonInformationFormType>({
     mode: 'onBlur',
     resolver: zodResolver(commonInformationSchema),
@@ -161,7 +162,18 @@ const CommonInformationForm = ({
             defaultMessage: 'Cancel',
             description: 'Edit common information cancel button title',
           })}
-          onPress={toggleCommonInfoForm}
+          onPress={() => {
+            reset({
+              ...commonInfo,
+              emails: commonInfo?.emails?.map(m => ({ ...m })) ?? [],
+              phoneNumbers:
+                commonInfo?.phoneNumbers?.map(p => ({ ...p })) ?? [],
+              urls: commonInfo?.urls?.map(p => ({ ...p })) ?? [],
+              addresses: commonInfo?.addresses?.map(p => ({ ...p })) ?? [],
+              socials: commonInfo?.socials?.map(p => ({ ...p })) ?? [],
+            });
+            toggleCommonInfoForm();
+          }}
           variant="secondary"
           style={styles.headerButton}
         />
