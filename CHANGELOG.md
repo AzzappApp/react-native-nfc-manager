@@ -1,5 +1,6 @@
-## 0.5.2-canary.177
+## 0.5.2-canary.178
 
+* **fix:**  - server header on cache update ([#2418](https://github.com/AzzappApp/azzapp/pull/2418))
 * **fix:**  - change server header for server api calls ([#2417](https://github.com/AzzappApp/azzapp/pull/2417))
 * **feat:**  - **contactCard:** [#2279](https://github.com/AzzappApp/azzapp/pull/2279) add avatar in shared vcard ([#2389](https://github.com/AzzappApp/azzapp/pull/2389))
 * **fix:**  - unable to remove avatar on contact card ([#2398](https://github.com/AzzappApp/azzapp/pull/2398))
