@@ -1,5 +1,8 @@
-## 0.5.2-canary.185
+## 0.5.2-canary.186
 
+* **fix:**  - **contactCard:** [#2170](https://github.com/AzzappApp/azzapp/pull/2170) update message on mobile and web ([#2424](https://github.com/AzzappApp/azzapp/pull/2424))
+* **fix:**  - more dark mode ([#2434](https://github.com/AzzappApp/azzapp/pull/2434))
+* **fix:**  - **contactCard:** [#2303](https://github.com/AzzappApp/azzapp/pull/2303) wrong format type ([#2433](https://github.com/AzzappApp/azzapp/pull/2433))
 * **fix:**  - **WebCardScreen:** block action if card is not publish ([#2431](https://github.com/AzzappApp/azzapp/pull/2431))
 * **fix:**  - 🐛 allow admins to update parameters for activity ([#2430](https://github.com/AzzappApp/azzapp/pull/2430))
 * **fix:**  - 🐛 display texts correctly ([#2427](https://github.com/AzzappApp/azzapp/pull/2427))
