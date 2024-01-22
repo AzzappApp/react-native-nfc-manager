@@ -175,7 +175,7 @@ const MultiUserAddForm = ({ contacts, control }: MultiUserAddFormProps) => {
           />
         )}
       />
-      <Text style={styles.avatarLabel}>
+      <Text variant="xsmall" style={styles.description}>
         {field.value === 'user' && (
           <FormattedMessage
             defaultMessage="A user has a ContactCard linked to the shared webcard but cannot publish posts or edit the WebCard."
@@ -240,9 +240,10 @@ const styleSheet = createStyleSheet(appearance => ({
   selectTitle: {
     paddingBottom: 10,
   },
-  avatarLabel: {
-    marginTop: 20,
+  description: {
     textAlign: 'center',
+    marginTop: 20,
+    color: colors.grey400,
   },
   bottomSheetContentContainer: {
     paddingHorizontal: 0,

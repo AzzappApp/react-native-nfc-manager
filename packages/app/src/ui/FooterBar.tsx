@@ -233,6 +233,7 @@ const styleSheet = createStyleSheet(appearance => ({
   container: {
     flexDirection: 'row',
     justifyContent: 'space-evenly',
+    backgroundColor: appearance === 'light' ? colors.white : colors.grey1000,
   },
   tab: {
     flex: 1,

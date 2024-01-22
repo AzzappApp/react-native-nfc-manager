@@ -717,7 +717,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 50,
     textAlign: 'center',
     marginTop: 20,
-    color: colors.grey900,
+    color: colors.grey400,
   },
   stats: {
     paddingBottom: 50,
