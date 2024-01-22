@@ -161,7 +161,7 @@ const MultiUserScreenUserList = ({
 
   const onRefresh = useCallback(() => {
     if (!isLoadingNext) {
-      refetch({});
+      refetch({}, { fetchPolicy: 'store-and-network' });
     }
   }, [isLoadingNext, refetch]);
 
