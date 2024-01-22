@@ -1,5 +1,6 @@
-## 0.5.2-canary.175
+## 0.5.2-canary.176
 
+* **feat:**  - **contactCard:** [#2279](https://github.com/AzzappApp/azzapp/pull/2279) add avatar in shared vcard ([#2389](https://github.com/AzzappApp/azzapp/pull/2389))
 * **fix:**  - unable to remove avatar on contact card ([#2398](https://github.com/AzzappApp/azzapp/pull/2398))
 * **fix:**  - **multiUser:** [#2303](https://github.com/AzzappApp/azzapp/pull/2303) missing avatar after adding user ([#2403](https://github.com/AzzappApp/azzapp/pull/2403))
 * **fix:**  - **multiUser:** [#2312](https://github.com/AzzappApp/azzapp/pull/2312) use poll interval to refresh ownership status ([#2395](https://github.com/AzzappApp/azzapp/pull/2395))
