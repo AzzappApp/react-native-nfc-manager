@@ -56,10 +56,9 @@ const ShakeShare = () => {
   const gyroscope = useAnimatedSensor(SensorType.ACCELEROMETER);
 
   useDerivedValue(() => {
-    const { x, y, z } = gyroscope.sensor.value;
-    const speed = Math.abs(x + y + z);
-    // this 101 value is from tested, it has to be adjusted after multiple test, maybe removing  one axis
-    if (speed > 101) {
+    const { y, z } = gyroscope.sensor.value;
+    const speed = Math.sqrt(y * y + z * z);
+    if (speed > 30) {
       runOnJS(setMountScreen)(true);
     }
   });
