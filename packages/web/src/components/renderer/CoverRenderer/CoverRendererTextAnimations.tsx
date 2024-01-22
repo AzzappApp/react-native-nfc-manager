@@ -36,53 +36,48 @@ const bounce: Keyframe[] = [
     easing: 'ease-in-out',
   },
   {
+    opacity: 0,
+    scale: 0,
+    offset: 0.1,
+  },
+  {
+    opacity: 0.6,
+    scale: 1,
+    offset: 0.15,
+  },
+  {
+    opacity: 1,
+    scale: 0.92,
+    offset: 0.175,
+  },
+  {
     opacity: 1,
     scale: 1,
     offset: 0.2,
   },
   {
     opacity: 1,
-    scale: 0.92,
-    offset: 0.25,
-  },
-  {
-    opacity: 1,
     scale: 1,
-    offset: 0.3,
-  },
-  {
-    opacity: 1,
-    scale: 0.96,
-    offset: 0.325,
-  },
-  {
-    opacity: 1,
-    scale: 0.96,
-    offset: 0.35,
-  },
-  {
-    opacity: 1,
-    scale: 1,
-    offset: 0.8,
+    offset: 0.93,
   },
   {
     opacity: 0.1,
     scale: 0.3,
-    offset: 0.95,
+    offset: 0.94,
   },
   {
-    opacity: 0.2,
-    scale: 0.5,
-    offset: 0.97,
+    opacity: 0.15,
+    scale: 0.38,
+    offset: 0.965,
   },
   {
-    opacity: 0.05,
+    opacity: 0,
     scale: 0.3,
     offset: 0.98,
   },
   {
     opacity: 0,
-    scale: 0.2,
+    scale: 0,
     offset: 1,
   },
 ];
