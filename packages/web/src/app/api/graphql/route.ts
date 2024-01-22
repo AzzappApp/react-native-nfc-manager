@@ -43,7 +43,7 @@ function useRevalidatePages(): Plugin<GraphQLContext> {
                 method: 'POST',
                 headers: {
                   'Content-Type': 'application/json',
-                  authorization: process.env.API_SERVER_TOKEN ?? '',
+                  [AZZAPP_SERVER_HEADER]: process.env.API_SERVER_TOKEN ?? '',
                 },
                 body: JSON.stringify({
                   cards,
