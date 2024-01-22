@@ -1,9 +1,10 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { StyleSheet, View } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { graphql, useMutation, usePreloadedQuery } from 'react-relay';
+import { isAdmin } from '@azzapp/shared/profileHelpers';
 import { colors, textStyles } from '#theme';
 import CoverRenderer from '#components/CoverRenderer';
 import { useRouter } from '#components/NativeRouter';
@@ -137,6 +138,13 @@ const MultiUserScreen = ({
 
   const intl = useIntl();
   const router = useRouter();
+
+  useEffect(() => {
+    // users that loose their admin role should not be able to access this screen
+    if (!isAdmin(profile?.profileRole)) {
+      router.back();
+    }
+  }, [profile?.profileRole, router]);
 
   const nbUsers = profile?.webCard?.profiles?.length ?? 0;
 

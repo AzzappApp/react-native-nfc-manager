@@ -21,6 +21,7 @@ import {
 } from '#components/NativeRouter';
 import useAuthState from '#hooks/useAuthState';
 import {
+  disposeQueryFor,
   getLoadQueryInfo,
   loadQueryFor,
   useManagedQuery,
@@ -54,6 +55,11 @@ export type RelayScreenOptions<TRoute extends Route> = LoadQueryOptions<
      * The interval in milliseconds to poll the query.
      */
     pollInterval?: number;
+    /**
+     * If true, the query will be bound to the current webCard (true by default)
+     * @default true
+     */
+    profileBound?: boolean;
     /**
      * If true, the screen will stop polling when it is not focused.
      * @default true
@@ -113,8 +119,19 @@ function relayScreen<TRoute extends Route>(
 
     const { profileInfos } = useAuthState();
 
-    const { preloadedQuery, profileInfos: queryProfileInfos } =
-      useManagedQuery((props as any).screenId) ?? {};
+    const oldProfileInfosRef = useRef(profileInfos);
+
+    useEffect(() => {
+      if (
+        profileBound &&
+        !isEqual(oldProfileInfosRef.current ?? null, profileInfos ?? null)
+      ) {
+        oldProfileInfosRef.current = profileInfos;
+        disposeQueryFor(screenId);
+      }
+    }, [params, profileInfos, screenId]);
+
+    const { preloadedQuery } = useManagedQuery((props as any).screenId) ?? {};
 
     const hasFocus = useScreenHasFocus();
 
@@ -232,10 +249,9 @@ function relayScreen<TRoute extends Route>(
 
     const inner = (
       <Suspense fallback={Fallback ? <Fallback {...props} /> : null}>
-        {preloadedQuery &&
-          (!profileBound || isEqual(queryProfileInfos, profileInfos)) && (
-            <Component {...props} preloadedQuery={preloadedQuery} />
-          )}
+        {preloadedQuery && (
+          <Component {...props} preloadedQuery={preloadedQuery} />
+        )}
       </Suspense>
     );
     if (__DEV__) {

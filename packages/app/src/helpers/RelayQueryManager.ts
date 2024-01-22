@@ -1,7 +1,6 @@
-import { isEqual } from 'lodash';
 import { useEffect, useState } from 'react';
 import { loadQuery } from 'react-relay';
-import { addAuthStateListener, getAuthState } from './authStore';
+import { getAuthState } from './authStore';
 import {
   addEnvironmentListener,
   getRelayEnvironment,
@@ -28,7 +27,6 @@ const activeQueries = new Map<
     preloadedQuery: PreloadedQuery<any>;
     options: LoadQueryOptions<any>;
     params: any;
-    profileInfos: ProfileInfos | null;
   }
 >();
 
@@ -92,19 +90,11 @@ export const init = () => {
         break;
     }
   });
-  let currentProfileInfos = getAuthState().profileInfos;
-  addAuthStateListener(({ profileInfos }) => {
-    if (!isEqual(currentProfileInfos, profileInfos)) {
-      currentProfileInfos = profileInfos;
-      refreshQueries();
-    }
-  });
 };
 
 let resetTimeout: any = null;
 const resetQueries = () => {
   clearTimeout(resetTimeout);
-  clearTimeout(refreshTimeout);
   // avoid some race conditions
   resetTimeout = setTimeout(() => {
     [...activeQueries.entries()].forEach(([, entry]) => {
@@ -119,25 +109,6 @@ const resetQueries = () => {
   }, 20);
 };
 
-let refreshTimeout: any = null;
-const refreshQueries = () => {
-  if (resetTimeout !== null) {
-    return;
-  }
-  clearTimeout(refreshTimeout);
-  refreshTimeout = setTimeout(() => {
-    const profileInfos = getAuthState().profileInfos ?? null;
-    for (const [screenId, entry] of activeQueries.entries()) {
-      if (entry.profileInfos && !isEqual(entry.profileInfos, profileInfos)) {
-        queryToDisposes.push(entry.preloadedQuery);
-        activeQueries.delete(screenId);
-      }
-    }
-    requestDisposeQueries();
-    refreshTimeout = null;
-  }, 30);
-};
-
 /**
  * Return the relay preloaded query associated with a given screen
  * @param screenId the screen id
@@ -145,16 +116,15 @@ const refreshQueries = () => {
  */
 export const useManagedQuery = (screenId: string) => {
   const [queryInfos, setQueryInfos] = useState(() => {
-    const { preloadedQuery, profileInfos } = activeQueries.get(screenId) ?? {};
-    return preloadedQuery ? { preloadedQuery, profileInfos } : null;
+    const { preloadedQuery } = activeQueries.get(screenId) ?? {};
+    return preloadedQuery ? { preloadedQuery } : null;
   });
   useEffect(
     () =>
       addListener(screenId, () => {
         setQueryInfos(() => {
-          const { preloadedQuery, profileInfos } =
-            activeQueries.get(screenId) ?? {};
-          return preloadedQuery ? { preloadedQuery, profileInfos } : null;
+          const { preloadedQuery } = activeQueries.get(screenId) ?? {};
+          return preloadedQuery ? { preloadedQuery } : null;
         });
       }),
     [screenId],
@@ -181,10 +151,6 @@ export type LoadQueryOptions<TParams> = {
     params: TParams,
     profileInfos: ProfileInfos | null,
   ) => Variables;
-  /**
-   * If true, the query will be bound to the current webCard
-   */
-  profileBound?: boolean | ((params: TParams) => boolean);
   /**
    * The request fetch policy
    */
@@ -238,7 +204,6 @@ export const loadQueryFor = <T>(
       preloadedQuery,
       options,
       params,
-      profileInfos: options.profileBound ? profileInfos : null,
     });
     listeners.get(screenId)?.forEach(listener => listener());
   }
