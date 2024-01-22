@@ -1,5 +1,6 @@
-## 0.5.2-canary.179
+## 0.5.2-canary.180
 
+* **fix:**  - 🐛 display right error ([#2416](https://github.com/AzzappApp/azzapp/pull/2416))
 * **fix:**  - missed introspection header ([#2420](https://github.com/AzzappApp/azzapp/pull/2420))
 * **fix:**  - server header on cache update ([#2418](https://github.com/AzzappApp/azzapp/pull/2418))
 * **fix:**  - change server header for server api calls ([#2417](https://github.com/AzzappApp/azzapp/pull/2417))
