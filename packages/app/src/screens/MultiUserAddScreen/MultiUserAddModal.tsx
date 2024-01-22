@@ -26,6 +26,7 @@ import { getLocales, useCurrentLocale } from '#helpers/localeHelpers';
 import { addLocalCachedMediaFile } from '#helpers/mediaHelpers';
 import { uploadMedia, uploadSign } from '#helpers/MobileWebAPI';
 import useAuthState from '#hooks/useAuthState';
+import { get as CappedPixelRatio } from '#relayProviders/CappedPixelRatio.relayprovider';
 import ContactCardEditForm from '#screens/ContactCardScreen/ContactCardEditForm';
 import Button from '#ui/Button';
 import Container from '#ui/Container';
@@ -281,7 +282,10 @@ const MultiUserAddModal = (
 
   const [commit, saving] = useMutation<MultiUserAddModal_InviteUserMutation>(
     graphql`
-      mutation MultiUserAddModal_InviteUserMutation($input: InviteUserInput!) {
+      mutation MultiUserAddModal_InviteUserMutation(
+        $input: InviteUserInput!
+        $pixelRatio: Float!
+      ) {
         inviteUser(input: $input) {
           profile {
             id
@@ -326,7 +330,7 @@ const MultiUserAddModal = (
             profileRole
             avatar {
               id
-              uri
+              uri: uri(width: 112, pixelRatio: $pixelRatio)
             }
             statsSummary {
               day
@@ -422,6 +426,7 @@ const MultiUserAddModal = (
         commit({
           variables: {
             input,
+            pixelRatio: CappedPixelRatio(),
           },
           onCompleted: () => {
             if (avatarId && avatar?.uri) {

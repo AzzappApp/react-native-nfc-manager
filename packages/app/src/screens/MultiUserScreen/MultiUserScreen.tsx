@@ -105,7 +105,7 @@ const multiUserScreenQuery = graphql`
             profileRole
             avatar {
               id
-              uri: uri(width: 56, pixelRatio: $pixelRatio)
+              uri: uri(width: 112, pixelRatio: $pixelRatio)
             }
             statsSummary {
               day

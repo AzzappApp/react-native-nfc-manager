@@ -175,7 +175,7 @@ const MultiUserDetailModal = (
             }
             avatar {
               id
-              uri: uri(width: 56, pixelRatio: $pixelRatio)
+              uri: uri(width: 112, pixelRatio: $pixelRatio)
             }
             user {
               email
