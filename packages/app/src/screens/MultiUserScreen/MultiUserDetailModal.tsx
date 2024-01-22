@@ -7,7 +7,12 @@ import * as mime from 'react-native-mime-types';
 import { useSharedValue } from 'react-native-reanimated';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
-import { graphql, useFragment, useMutation } from 'react-relay';
+import {
+  ConnectionHandler,
+  graphql,
+  useFragment,
+  useMutation,
+} from 'react-relay';
 import ERRORS from '@azzapp/shared/errors';
 import { encodeMediaId } from '@azzapp/shared/imagesHelpers';
 import { isOwner } from '@azzapp/shared/profileHelpers';
@@ -401,15 +406,15 @@ const MultiUserDetailModal = ({
       },
       updater: store => {
         const webCardRecord = store.get(webCard.id);
-        const profiles = webCardRecord?.getLinkedRecords('profiles');
-
-        webCardRecord?.setLinkedRecords(
-          profiles?.filter(
-            filterProfile =>
-              filterProfile.getValue('id')?.toString() !== profile.id,
-          ),
-          'profiles',
-        );
+        if (webCardRecord) {
+          const connection = ConnectionHandler.getConnection(
+            webCardRecord,
+            'MultiUserScreenUserList_webCard_connection_profiles',
+          );
+          if (connection) {
+            ConnectionHandler.deleteNode(connection, profile.id);
+          }
+        }
       },
     });
   };
