@@ -1,5 +1,7 @@
-## 0.5.2-canary.181
+## 0.5.2-canary.182
 
+* **fix:**  - change the way the shake and share pop the view ([#2422](https://github.com/AzzappApp/azzapp/pull/2422))
+* **fix:**  - **MultiUSer:** rework user list ([#2402](https://github.com/AzzappApp/azzapp/pull/2402))
 * **fix:**  - **multiUser:** [#2383](https://github.com/AzzappApp/azzapp/pull/2383) manage the time frame when user is downgraded ([#2409](https://github.com/AzzappApp/azzapp/pull/2409))
 * **fix:**  - 🐛 display right error ([#2416](https://github.com/AzzappApp/azzapp/pull/2416))
 * **fix:**  - missed introspection header ([#2420](https://github.com/AzzappApp/azzapp/pull/2420))
