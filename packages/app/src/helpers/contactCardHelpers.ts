@@ -16,7 +16,15 @@ export const buildContactCardModalStyleSheet = (appareance: ColorSchemeName) =>
       justifyContent: 'space-between',
       alignItems: 'center',
       height: FIELD_HEIGHT,
-      paddingHorizontal: 20,
+      paddingHorizontal: 30,
+      backgroundColor: appareance === 'light' ? 'white' : 'black',
+    },
+    fieldCommon: {
+      flexDirection: 'row',
+      justifyContent: 'flex-start',
+      alignItems: 'center',
+      height: FIELD_HEIGHT,
+      paddingLeft: 18,
       backgroundColor: appareance === 'light' ? 'white' : 'black',
     },
     addButton: {

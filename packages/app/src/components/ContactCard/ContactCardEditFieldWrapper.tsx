@@ -113,6 +113,7 @@ const ContactCardEditField = <TFieldValues extends FieldValues>({
             justifyContent: 'space-between',
             alignItems: 'center',
             paddingHorizontal: 20,
+            flex: 1,
           }}
         >
           <View

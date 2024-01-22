@@ -218,7 +218,7 @@ const ContactCardEditForm = ({
           />
 
           {isMultiUser && commonInformation?.company ? (
-            <View style={styles.field}>
+            <View style={styles.fieldCommon}>
               <View style={styles.fieldTitleWithLock}>
                 <Icon icon="locked" />
                 <Text variant="smallbold" style={styles.fieldTitle}>
@@ -334,7 +334,7 @@ const CommonInformationField = ({
 }) => {
   const styles = useStyleSheet(styleSheet);
   return (
-    <View style={styles.field}>
+    <View style={styles.fieldCommon}>
       <View
         style={{
           flexDirection: 'row',
@@ -345,7 +345,9 @@ const CommonInformationField = ({
         <Icon icon="locked" />
         {label ? <Text variant="smallbold">{label}</Text> : null}
       </View>
-      <Text variant="medium">{value}</Text>
+      <Text style={{ paddingLeft: label ? 50 : 20 }} variant="medium">
+        {value}
+      </Text>
     </View>
   );
 };
