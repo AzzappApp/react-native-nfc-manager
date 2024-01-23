@@ -1,33 +1,57 @@
-import { useMemo, useState } from 'react';
-import { FormattedMessage, useIntl } from 'react-intl';
-import { View, useWindowDimensions } from 'react-native';
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
+import { Platform, View, useWindowDimensions } from 'react-native';
+import {
+  useSharedValue,
+  withRepeat,
+  withTiming,
+  Easing,
+} from 'react-native-reanimated';
 import { swapColor } from '@azzapp/shared/cardHelpers';
-import { COVER_CARD_RADIUS, COVER_RATIO } from '@azzapp/shared/coverHelpers';
+import {
+  COVER_ANIMATION_DURATION,
+  COVER_CARD_RADIUS,
+  COVER_RATIO,
+} from '@azzapp/shared/coverHelpers';
 import { shadow } from '#theme';
+import CoverStaticMediaLayer from '#components/CoverRenderer/CoverStaticMediaLayer';
 import CoverTextRenderer from '#components/CoverRenderer/CoverTextRenderer';
-import { MediaImageRenderer } from '#components/medias';
+import MediaAnimator from '#components/CoverRenderer/MediaAnimator';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
-import ActivityIndicator from '#ui/ActivityIndicator';
-import Button from '#ui/Button';
-import Delay from '#ui/Delay';
-import Text from '#ui/Text';
 import CoverMediaPreview from './CoverMediaPreview';
 import type { CoverTextRendererProps } from '#components/CoverRenderer/CoverTextRenderer';
 import type { CoverMediaPreviewProps } from './CoverMediaPreview';
 
-type CoverPreviewRendererProps = CoverTextRendererProps &
-  Omit<
-    CoverMediaPreviewProps,
-    'onLoadingEnd' | 'onLoadingError' | 'onLoadingStart' | 'uri'
-  > & {
+type CoverPreviewRendererProps = Omit<
+  CoverMediaPreviewProps,
+  'onLoadingEnd' | 'onLoadingError' | 'onLoadingStart' | 'uri'
+> &
+  Omit<CoverTextRendererProps, 'height'> & {
     /**
      * the source media uri
      */
     uri?: string | null;
     /**
+     * the animation to apply on the  media
+     */
+    mediaAnimation?: string | null;
+    /**
+     * The background image uri
+     */
+    backgroundId?: string | null;
+    /**
      * The foreground image id
      */
     foregroundId?: string | null;
+    /**
+     * The foreground image id
+     */
+    foregroundKind?: string | null;
     /**
      * the foreground image uri
      */
@@ -45,21 +69,21 @@ type CoverPreviewRendererProps = CoverTextRendererProps &
       dark: string;
     };
     /**
-     * if true, a loading indicator will be displayed after a delay
+     * Callback called when the cover starts loading
      */
-    computing?: boolean | null;
+    onStartLoading?: () => void;
     /**
-     * Callback called when the cover preview is ready
+     * Callback called when the cover preview has loaded all its medias
      */
-    onReady?: () => void;
+    onLoad?: () => void;
     /**
-     * Callback called when the cover preview failed to load
+     * Callback called when the cover preview failed to load a media
      */
     onError?: () => void;
     /**
-     * the height of the cover
+     * the width of the cover
      */
-    height: number;
+    width: number;
   };
 
 /**
@@ -74,11 +98,14 @@ const CoverPreviewRenderer = ({
   time,
   startTime,
   duration,
+  mediaAnimation,
   backgroundColor,
   maskUri,
+  backgroundId,
   backgroundImageUri,
   backgroundImageTintColor,
   foregroundId,
+  foregroundKind,
   foregroundImageUri,
   foregroundImageTintColor,
   backgroundMultiply,
@@ -91,71 +118,167 @@ const CoverPreviewRenderer = ({
   subTitleStyle,
   textOrientation,
   textPosition,
+  textAnimation,
   // other props
   colorPalette,
-  computing,
-  height,
-  onReady,
-  onError,
-  style,
   paused,
+  width,
+  style,
+  onStartLoading,
+  onLoad,
+  onError,
   ...props
 }: CoverPreviewRendererProps) => {
-  const borderRadius = height * COVER_RATIO * COVER_CARD_RADIUS;
+  const height = width / COVER_RATIO;
+  const borderRadius = width * COVER_CARD_RADIUS;
 
-  const [isLoading, setIsLoading] = useState(false);
-  const [loadingFailed, setLoadingFailed] = useState(false);
+  const loadingStatus = useRef({
+    mediaLoading: !!uri || (Platform.OS === 'android' && !!backgroundImageUri),
+    foregroundLoading: !!foregroundImageUri,
+    backgroundLoading: !!backgroundImageUri && Platform.OS !== 'android',
+  });
 
-  const intl = useIntl();
+  const prevProps = useRef({
+    uri,
+    foregroundImageUri,
+    backgroundImageUri,
+  });
 
-  const onLoadStart = () => {
-    setIsLoading(true);
-  };
+  const [allMediaLoaded, setAllMediaLoaded] = useState(
+    !loadingStatus.current.mediaLoading &&
+      !loadingStatus.current.foregroundLoading &&
+      !loadingStatus.current.backgroundLoading,
+  );
 
-  const onLoad = () => {
-    // A delay to avoid flickering
-    setTimeout(() => {
-      setIsLoading(false);
-      onReady?.();
-    }, 50);
-  };
+  useEffect(() => {
+    if (prevProps.current.uri !== uri) {
+      const mediaLoading = !!uri;
+      loadingStatus.current.mediaLoading = mediaLoading;
+      prevProps.current.uri = uri;
+      if (mediaLoading) {
+        setAllMediaLoaded(false);
+      }
+    }
+    if (prevProps.current.foregroundImageUri !== foregroundImageUri) {
+      prevProps.current.foregroundImageUri = foregroundImageUri;
+      const foregroundLoading = !!foregroundImageUri;
+      loadingStatus.current.foregroundLoading = foregroundLoading;
+      if (foregroundLoading) {
+        setAllMediaLoaded(false);
+      }
+    }
+    if (prevProps.current.backgroundImageUri !== backgroundImageUri) {
+      prevProps.current.backgroundImageUri = backgroundImageUri;
+      const mediaLoading =
+        loadingStatus.current.mediaLoading ||
+        (Platform.OS === 'android' && !!backgroundImageUri);
+      const backgroundLoading =
+        !!backgroundImageUri && Platform.OS !== 'android';
 
-  const onLoadingError = () => {
-    setLoadingFailed(true);
-    onError?.();
-  };
+      loadingStatus.current.mediaLoading = mediaLoading;
+      loadingStatus.current.backgroundLoading = backgroundLoading;
+      if (backgroundLoading || mediaLoading) {
+        setAllMediaLoaded(false);
+      }
+    }
+  }, [backgroundImageUri, foregroundImageUri, uri]);
 
-  const onRetry = () => {
-    setLoadingFailed(false);
-  };
+  const [videoReady, setVideoReady] = useState(kind !== 'video');
+  useEffect(() => {
+    setVideoReady(kind !== 'video');
+  }, [kind]);
+
+  const mediasReadyHandler = useCallback(() => {
+    const { mediaLoading, foregroundLoading, backgroundLoading } =
+      loadingStatus.current;
+    if (!mediaLoading && !foregroundLoading && !backgroundLoading) {
+      onLoad?.();
+      setAllMediaLoaded(true);
+    }
+  }, [onLoad]);
+
+  useEffect(() => {
+    if (!allMediaLoaded) {
+      onStartLoading?.();
+    }
+  }, [allMediaLoaded, onStartLoading]);
+
+  const onMediaLoad = useCallback(() => {
+    loadingStatus.current.mediaLoading = false;
+    mediasReadyHandler();
+  }, [mediasReadyHandler]);
+
+  const onForegroundLoad = useCallback(() => {
+    loadingStatus.current.foregroundLoading = false;
+    mediasReadyHandler();
+  }, [mediasReadyHandler]);
+
+  const onBackgroundLoad = useCallback(() => {
+    loadingStatus.current.backgroundLoading = false;
+    mediasReadyHandler();
+  }, [mediasReadyHandler]);
+
+  const onVideoLoaded = useCallback(() => {
+    setVideoReady(true);
+  }, []);
 
   const styles = useStyleSheet(styleSheet);
 
   const { width: windowWidth } = useWindowDimensions();
-
-  const foregroundSource = useMemo(
-    () =>
-      foregroundImageUri && foregroundId
-        ? {
-            uri: foregroundImageUri,
-            mediaId: foregroundId,
-            requestedSize: windowWidth,
-          }
-        : null,
-    [foregroundImageUri, foregroundId, windowWidth],
-  );
-
-  const foregroundStyle = useMemo(
+  const layerStyle = useMemo(
     () => ({
       position: 'absolute' as const,
       top: 0,
       left: 0,
       height,
-      width: height * COVER_RATIO,
-      aspectRatio: COVER_RATIO,
+      width,
     }),
-    [height],
+    [height, width],
   );
+
+  const animationSharedValue = useSharedValue(0);
+
+  const onProgress = useCallback(
+    (event: { currentTime: number; duration: number }) => {
+      const { currentTime, duration } = event;
+      if (!paused) {
+        if (currentTime / duration <= 0.1 / duration) {
+          animationSharedValue.value = 0;
+        } else {
+          animationSharedValue.value = withTiming(
+            currentTime / duration + 0.1 / duration,
+            { duration: 100, easing: Easing.linear },
+          );
+        }
+      }
+    },
+    [animationSharedValue, paused],
+  );
+
+  useEffect(() => {
+    animationSharedValue.value = 0;
+    if (!paused && allMediaLoaded && videoReady) {
+      // we setup the animations even for the video cover
+      // to avoid flickering of the animation due to the delay
+      // of inProgress event on the first frames
+      animationSharedValue.value = withRepeat(
+        withTiming(1, {
+          duration: COVER_ANIMATION_DURATION,
+          easing: Easing.linear,
+        }),
+        -1,
+        false,
+      );
+    }
+  }, [
+    animationSharedValue,
+    paused,
+    videoReady,
+    allMediaLoaded,
+    // we want to restart the animation when the text animation or the media animation change
+    textAnimation,
+    mediaAnimation,
+  ]);
 
   return (
     <View
@@ -163,96 +286,100 @@ const CoverPreviewRenderer = ({
       {...props}
     >
       <View style={[styles.topPanelContent, { borderRadius }]}>
-        {loadingFailed ? (
-          <View style={styles.errorContainer}>
-            <Text variant="error" style={styles.errorMessage}>
-              <FormattedMessage
-                defaultMessage="Failed to load the informations of your cover"
-                description="Error message displayed when cover image failed to load"
-              />
-            </Text>
-            <Button
-              onPress={onRetry}
-              label={intl.formatMessage({
-                defaultMessage: 'Retry',
-                description:
-                  'label of the button allowing  to retry loading cover image',
-              })}
-            />
-          </View>
-        ) : (
-          <>
-            <View
-              style={{
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                height,
-                width: height * COVER_RATIO,
-                backgroundColor: swapColor(
-                  backgroundColor,
-                  colorPalette,
-                ) as any,
-              }}
-            />
-            {uri && (
-              <CoverMediaPreview
-                key={uri}
-                uri={uri}
-                kind={kind}
-                time={time}
-                startTime={startTime}
-                duration={duration}
-                maskUri={maskUri}
-                backgroundColor={swapColor(backgroundColor, colorPalette)}
-                backgroundMultiply={backgroundMultiply}
-                backgroundImageUri={backgroundImageUri}
-                backgroundImageTintColor={swapColor(
-                  backgroundImageTintColor,
-                  colorPalette,
-                )}
-                filter={filter}
-                editionParameters={editionParameters}
-                paused={paused}
-                onLoadingStart={onLoadStart}
-                onLoadingEnd={onLoad}
-                onLoadingError={onLoadingError}
-                style={styles.cover}
-                testID="cover-edition-screen-cover-preview"
-              />
-            )}
-            {foregroundSource && (
-              <MediaImageRenderer
-                testID="cover-foreground-preview"
-                pointerEvents="none"
-                source={foregroundSource}
-                tintColor={swapColor(foregroundImageTintColor, colorPalette)}
-                style={foregroundStyle}
-                alt={'Cover edition foreground'}
-              />
-            )}
-            <CoverTextRenderer
-              title={title}
-              subTitle={subTitle}
-              titleStyle={titleStyle}
-              subTitleStyle={subTitleStyle}
-              textOrientation={textOrientation}
-              textPosition={textPosition}
-              pointerEvents="none"
-              style={styles.titleOverlayContainer}
-              colorPalette={colorPalette}
-              height={height}
-            />
-
-            {(computing || isLoading) && (
-              <Delay delay={computing ? 0 : 100}>
-                <View style={styles.maskComputingOverlay}>
-                  <ActivityIndicator color="white" />
-                </View>
-              </Delay>
-            )}
-          </>
+        <View
+          style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            height,
+            width,
+            backgroundColor: swapColor(backgroundColor, colorPalette) as any,
+          }}
+        />
+        {Platform.OS !== 'android' && backgroundId && backgroundImageUri && (
+          <CoverStaticMediaLayer
+            testID="cover-foreground-preview"
+            mediaId={backgroundId}
+            uri={backgroundImageUri}
+            requestedSize={windowWidth}
+            tintColor={swapColor(backgroundImageTintColor, colorPalette)}
+            kind="png"
+            animationSharedValue={paused ? null : animationSharedValue}
+            onReady={onBackgroundLoad}
+            onError={onError}
+            style={layerStyle}
+          />
         )}
+        {uri && (
+          <MediaAnimator
+            animation={mediaAnimation}
+            animationSharedValue={paused ? null : animationSharedValue}
+            width={width}
+            height={height}
+            style={styles.cover}
+          >
+            <CoverMediaPreview
+              key={uri}
+              uri={uri}
+              kind={kind}
+              time={time}
+              startTime={startTime}
+              duration={duration}
+              maskUri={maskUri}
+              backgroundColor={
+                Platform.OS === 'android'
+                  ? swapColor(backgroundColor, colorPalette)
+                  : 'transparent'
+              }
+              backgroundMultiply={backgroundMultiply}
+              backgroundImageUri={
+                Platform.OS === 'android' ? backgroundImageUri : null
+              }
+              backgroundImageTintColor={swapColor(
+                backgroundImageTintColor,
+                colorPalette,
+              )}
+              filter={filter}
+              editionParameters={editionParameters}
+              paused={paused || !allMediaLoaded}
+              onLoadingEnd={onMediaLoad}
+              onLoadingError={onError}
+              onVideoLoaded={onVideoLoaded}
+              style={styles.cover}
+              testID="cover-edition-screen-cover-preview"
+              onProgress={onProgress}
+            />
+          </MediaAnimator>
+        )}
+        {foregroundId && foregroundImageUri && (
+          <CoverStaticMediaLayer
+            testID="cover-foreground-preview"
+            mediaId={foregroundId}
+            uri={foregroundImageUri}
+            requestedSize={windowWidth}
+            tintColor={swapColor(foregroundImageTintColor, colorPalette)}
+            kind={foregroundKind ?? 'png'}
+            animationSharedValue={paused ? null : animationSharedValue}
+            onReady={onForegroundLoad}
+            onError={onError}
+            style={layerStyle}
+          />
+        )}
+        <CoverTextRenderer
+          key={`${title}-${subTitle}-${textAnimation}`}
+          title={title}
+          subTitle={subTitle}
+          titleStyle={titleStyle}
+          subTitleStyle={subTitleStyle}
+          textOrientation={textOrientation}
+          textPosition={textPosition}
+          textAnimation={textAnimation}
+          pointerEvents="none"
+          style={styles.titleOverlayContainer}
+          colorPalette={colorPalette}
+          height={height}
+          animationSharedValue={paused ? null : animationSharedValue}
+        />
       </View>
     </View>
   );

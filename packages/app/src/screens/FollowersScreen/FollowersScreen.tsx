@@ -10,20 +10,18 @@ import Header from '#ui/Header';
 import IconButton from '#ui/IconButton';
 import FollowersScreenList from './FollowersScreenList';
 import type { RelayScreenProps } from '#helpers/relayScreen';
+import type { FollowersScreenQuery } from '#relayArtifacts/FollowersScreenQuery.graphql';
 import type { FollowersRoute } from '#routes';
-import type { FollowersScreenQuery } from '@azzapp/relay/artifacts/FollowersScreenQuery.graphql';
 import type { PreloadedQuery } from 'react-relay';
 
 const followersScreenQuery = graphql`
-  query FollowersScreenQuery {
-    viewer {
-      profile {
+  query FollowersScreenQuery($webCardId: ID!) {
+    webCard: node(id: $webCardId) {
+      ... on WebCard {
         id
-        contactCard {
-          isPrivate
-        }
+        cardIsPrivate
+        ...FollowersScreenList_webCard
       }
-      ...FollowersScreenList_viewer
     }
   }
 `;
@@ -77,13 +75,13 @@ const FollowerScreenInner = ({
 }: {
   preloadedQuery: PreloadedQuery<FollowersScreenQuery>;
 }) => {
-  const { viewer } = usePreloadedQuery(followersScreenQuery, preloadedQuery);
+  const { webCard } = usePreloadedQuery(followersScreenQuery, preloadedQuery);
 
   return (
     <FollowersScreenList
-      isPublic={!viewer?.profile?.contactCard?.isPrivate ?? false}
-      currentProfileId={viewer.profile?.id ?? ''}
-      viewer={viewer}
+      isPublic={webCard?.cardIsPrivate ?? false}
+      currentWebCardId={webCard?.id ?? ''}
+      webCard={webCard ?? null}
     />
   );
 };
@@ -96,4 +94,7 @@ const styles = StyleSheet.create({
 
 export default relayScreen(FollowersScreen, {
   query: followersScreenQuery,
+  getVariables: (_, profileInfos) => ({
+    webCardId: profileInfos?.webCardId ?? '',
+  }),
 });

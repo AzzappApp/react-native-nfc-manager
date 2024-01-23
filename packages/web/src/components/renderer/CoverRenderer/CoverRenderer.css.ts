@@ -1,14 +1,5 @@
 import { style } from '@vanilla-extract/css';
-
-const wrapper = style({
-  filter: 'blur(15px)',
-  position: 'absolute',
-  top: '-4%',
-  left: '-4%',
-  width: '110%',
-  height: '110%',
-  willChange: 'blur',
-});
+import { MediaQuery } from '#app/[userName]/theme.css';
 
 const coverMedia = style({
   position: 'absolute',
@@ -19,14 +10,51 @@ const coverMedia = style({
 });
 
 const backgroundMedia = style({
-  objectFit: 'cover',
-  objectPosition: 'bottom',
+  backgroundAttachment: 'fixed',
+  backgroundRepeat: 'no-repeat',
+  backgroundSize: 'cover',
+  backgroundPosition: 'center',
+  '@media': {
+    [MediaQuery.Mobile]: {
+      display: 'none',
+    },
+    [MediaQuery.Desktop]: {
+      display: 'block',
+      height: '580px',
+    },
+  },
 });
 
 const content = style({
   position: 'relative',
   margin: 'auto',
-  maxWidth: '375px',
+  overflow: 'hidden',
+  '@media': {
+    [MediaQuery.Mobile]: {
+      width: '100vw',
+    },
+    [MediaQuery.Desktop]: {
+      maxWidth: '300px',
+      borderRadius: 35,
+      boxShadow: '0px 10px 20px 0px rgba(0, 0, 0, 0.20)',
+    },
+  },
+});
+
+const appearZoomIn = style({
+  transformOrigin: 'top center',
+});
+
+const appearZoomOut = style({
+  transformOrigin: 'top center',
+});
+
+const smoothZoomIn = style({
+  transformOrigin: 'top center',
+});
+
+const smoothZoomOut = style({
+  transformOrigin: 'top center',
 });
 
 const layerMedia = style({
@@ -40,12 +68,21 @@ const layerMedia = style({
   maskPosition: 'center',
 });
 
+const layerBackground = style({
+  height: 580,
+  position: 'fixed',
+});
+
 const styles = {
-  wrapper,
+  layerBackground,
   coverMedia,
   backgroundMedia,
   content,
   layerMedia,
+  appearZoomIn,
+  appearZoomOut,
+  smoothZoomIn,
+  smoothZoomOut,
 };
 
 export default styles;

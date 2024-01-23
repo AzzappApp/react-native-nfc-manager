@@ -14,6 +14,7 @@ import {
 } from '@azzapp/shared/cardModuleHelpers';
 import ERRORS from '@azzapp/shared/errors';
 
+import { isEditor } from '@azzapp/shared/profileHelpers';
 import {
   getCardModulesByIds,
   type CardModule,
@@ -22,8 +23,10 @@ import {
   referencesMedias,
   updateCardModule,
   createCardModule,
-  getCardModuleCount,
+  getCardModuleNextPosition,
+  getUserProfileWithWebCardId,
 } from '#domains';
+import fromGlobalIdWithType from '#helpers/relayIdHelpers';
 import type { GraphQLContext } from '#index';
 import type { MutationResolvers } from '#schema/__generated__/types';
 import type { ZodType } from 'zod';
@@ -33,24 +36,26 @@ const createModuleSavingMutation =
   async (
     _: unknown,
     {
-      input: { moduleId, ...data },
+      input: { moduleId, webCardId: gqlWebCardId, ...data },
     }: {
       input: TModule['data'] & {
+        webCardId: string;
         moduleId?: string | null;
       };
     },
-    { auth, loaders, cardUsernamesToRevalidate }: GraphQLContext,
+    { auth, cardUsernamesToRevalidate, loaders }: GraphQLContext,
   ) => {
-    const profileId = auth.profileId;
-    if (!profileId) {
-      throw new GraphQLError(ERRORS.UNAUTORIZED);
-    }
+    const { userId } = auth;
+    const webCardId = fromGlobalIdWithType(gqlWebCardId, 'WebCard');
+    const profile =
+      userId && (await getUserProfileWithWebCardId(userId, webCardId));
 
-    const profile = await loaders.Profile.load(profileId);
-    if (!profile) {
-      throw new GraphQLError(ERRORS.INVALID_REQUEST);
+    if (
+      !profile ||
+      !('profileRole' in profile && isEditor(profile.profileRole))
+    ) {
+      throw new GraphQLError(ERRORS.UNAUTHORIZED);
     }
-
     const { validator, getMedias } = MODULES_SAVE_RULES[moduleKind] ?? {};
 
     let module: CardModule | null = null;
@@ -71,7 +76,7 @@ const createModuleSavingMutation =
       }
       if (
         !module ||
-        module.profileId !== profileId ||
+        module.webCardId !== profile.webCardId ||
         module.kind !== moduleKind
       ) {
         throw new GraphQLError(ERRORS.INVALID_REQUEST);
@@ -93,9 +98,9 @@ const createModuleSavingMutation =
         } else {
           await createCardModule(
             {
-              profileId,
+              webCardId: profile.webCardId,
               kind: moduleKind,
-              position: await getCardModuleCount(profileId),
+              position: await getCardModuleNextPosition(profile.webCardId),
               data,
               visible: true,
             },
@@ -108,9 +113,14 @@ const createModuleSavingMutation =
       throw new GraphQLError(ERRORS.INTERNAL_SERVER_ERROR);
     }
 
-    cardUsernamesToRevalidate.add(profile.userName);
+    const webCard = await loaders.WebCard.load(profile.webCardId);
+    if (!webCard) {
+      throw new GraphQLError(ERRORS.INTERNAL_SERVER_ERROR);
+    }
 
-    return { profile };
+    cardUsernamesToRevalidate.add(webCard.userName);
+
+    return { webCard };
   };
 
 export const MODULES_SAVE_RULES: {

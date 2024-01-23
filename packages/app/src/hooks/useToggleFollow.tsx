@@ -6,67 +6,64 @@ import useAuthState from './useAuthState';
 import type {
   useToggleFollowMutation,
   useToggleFollowMutation$data,
-} from '@azzapp/relay/artifacts/useToggleFollowMutation.graphql';
+} from '#relayArtifacts/useToggleFollowMutation.graphql';
 import type { RecordSourceSelectorProxy, RecordProxy } from 'relay-runtime';
 
 const propagateFollowUpdateInProfileList = (
   connection: RecordProxy,
   store: RecordSourceSelectorProxy<useToggleFollowMutation$data>,
   follow: boolean,
-  profileId: string,
+  webCardId: string,
 ) => {
   if (follow) {
-    const followed = store.get(profileId);
+    const followed = store.get(webCardId);
     if (followed) {
       const edge = ConnectionHandler.createEdge(
         store,
         connection,
         followed,
-        'ProfileEdge',
+        'WebCardEdge',
       );
       ConnectionHandler.insertEdgeBefore(connection, edge);
     }
   } else {
-    ConnectionHandler.deleteNode(connection, profileId);
+    ConnectionHandler.deleteNode(connection, webCardId);
   }
 };
 
 const updater = (
   store: RecordSourceSelectorProxy<useToggleFollowMutation$data>,
-  currentProfileId: string,
-  profileId: string,
+  currentWebCardId: string,
+  webCardId: string,
   follow: boolean,
   userNameFilter?: string,
 ) => {
-  const currentProfile = store.get(currentProfileId);
+  const currentWebCard = store.get(currentWebCardId);
 
-  const nbFollowings = currentProfile?.getValue('nbFollowings');
+  const nbFollowings = currentWebCard?.getValue('nbFollowings');
 
   if (typeof nbFollowings === 'number') {
-    currentProfile?.setValue(
+    currentWebCard?.setValue(
       follow ? nbFollowings + 1 : nbFollowings - 1,
       'nbFollowings',
     );
   }
 
-  const profile = store.get(profileId);
+  const webCard = store.get(webCardId);
 
-  profile?.setValue(follow, 'isFollowing');
+  webCard?.setValue(follow, 'isFollowing');
 
-  const nbFollowers = profile?.getValue('nbFollowers');
+  const nbFollowers = webCard?.getValue('nbFollowers');
 
   if (typeof nbFollowers === 'number') {
-    profile?.setValue(
+    webCard?.setValue(
       follow ? nbFollowers + 1 : nbFollowers - 1,
       'nbFollowers',
     );
   }
-
-  const viewer = store.getRoot().getLinkedRecord('viewer');
-
-  if (viewer) {
+  if (currentWebCard) {
     const connectionRecord = ConnectionHandler.getConnection(
-      viewer,
+      currentWebCard,
       'Account_followings',
       { userName: userNameFilter ?? '' },
     );
@@ -76,13 +73,13 @@ const updater = (
         connectionRecord,
         store,
         follow,
-        profileId,
+        webCardId,
       );
     }
 
     const connectionRecordHome = ConnectionHandler.getConnection(
-      viewer,
-      'Viewer_followings',
+      currentWebCard,
+      'WebCard_followings',
     );
 
     if (connectionRecordHome) {
@@ -90,26 +87,30 @@ const updater = (
         connectionRecordHome,
         store,
         follow,
-        profileId,
+        webCardId,
       );
     }
 
     ConnectionHandler.getConnection(
-      viewer,
-      'Viewer_followingsPosts',
+      currentWebCard,
+      'WebCard_followingsPosts',
     )?.invalidateRecord();
   }
 };
 
 const useToggleFollow = (userNameFilter?: string) => {
-  const { profileId: currentProfileId } = useAuthState();
+  const { profileInfos } = useAuthState();
+  const currentWebCardId = profileInfos?.webCardId;
   const [commit, toggleFollowingActive] = useMutation<useToggleFollowMutation>(
     graphql`
-      mutation useToggleFollowMutation($input: ToggleFollowingInput!) {
+      mutation useToggleFollowMutation(
+        $input: ToggleFollowingInput!
+        $viewerWebCardId: ID!
+      ) {
         toggleFollowing(input: $input) {
-          profile {
+          webCard {
             id
-            isFollowing
+            isFollowing(webCardId: $viewerWebCardId)
           }
         }
       }
@@ -119,7 +120,7 @@ const useToggleFollow = (userNameFilter?: string) => {
   const intl = useIntl();
 
   const toggleFollow = (
-    profileId: string,
+    targetWebCardId: string,
     userName: string,
     follow: boolean,
   ) => {
@@ -132,61 +133,76 @@ const useToggleFollow = (userNameFilter?: string) => {
       text1: (follow
         ? intl.formatMessage(
             {
-              defaultMessage: 'You started to follow this Webcard{azzappAp}',
+              defaultMessage: 'You started to follow this Webcard{azzappA}',
               description: 'Toast message when user follows a profile',
             },
             {
-              azzappAp: <Text variant="azzapp">a</Text>,
+              azzappA: <Text variant="azzapp">a</Text>,
             },
           )
         : intl.formatMessage(
             {
-              defaultMessage: 'You no longer follow this Webcard{azzappAp}',
+              defaultMessage: 'You no longer follow this Webcard{azzappA}',
               description: 'Toast message when user unfollows a profile',
             },
             {
-              azzappAp: <Text variant="azzapp">a</Text>,
+              azzappA: <Text variant="azzapp">a</Text>,
             },
           )) as string,
     });
 
     // currentProfileId is undefined when user is anonymous so we can't follow
-    if (currentProfileId) {
-      commit({
-        variables: {
-          input: {
-            profileId,
-            follow,
-          },
-        },
-        optimisticResponse: {
-          toggleFollowing: {
-            profile: {
-              id: profileId,
-              isFollowing: follow,
-            },
-          },
-        },
-        optimisticUpdater: store =>
-          updater(store, currentProfileId, profileId, follow, userNameFilter),
-        updater: store =>
-          updater(store, currentProfileId, profileId, follow, userNameFilter),
-        onError(error) {
-          console.error(error);
-          Toast.show({
-            type: 'error',
-            text1: intl.formatMessage(
-              {
-                defaultMessage: 'Error, could not follow {userName}',
-                description:
-                  'Error toast message when we could not follow a user',
-              },
-              { userName },
-            ),
-          });
-        },
-      });
+    if (!currentWebCardId) {
+      return;
     }
+    commit({
+      variables: {
+        viewerWebCardId: currentWebCardId,
+        input: {
+          targetWebCardId,
+          webCardId: currentWebCardId,
+          follow,
+        },
+      },
+      optimisticResponse: {
+        toggleFollowing: {
+          webCard: {
+            id: targetWebCardId,
+            isFollowing: follow,
+          },
+        },
+      },
+      optimisticUpdater: store =>
+        updater(
+          store,
+          currentWebCardId,
+          targetWebCardId,
+          follow,
+          userNameFilter,
+        ),
+      updater: store =>
+        updater(
+          store,
+          currentWebCardId,
+          targetWebCardId,
+          follow,
+          userNameFilter,
+        ),
+      onError(error) {
+        console.error(error);
+        Toast.show({
+          type: 'error',
+          text1: intl.formatMessage(
+            {
+              defaultMessage: 'Error, could not follow {userName}',
+              description:
+                'Error toast message when we could not follow a user',
+            },
+            { userName },
+          ),
+        });
+      },
+    });
   };
 
   return toggleFollow;

@@ -11,10 +11,6 @@ import {
   usePreloadedQuery,
 } from 'react-relay';
 import { Observable } from 'relay-runtime';
-import { get as CappedPixelRatio } from '@azzapp/relay/providers/CappedPixelRatio.relayprovider';
-import { get as PixelRatio } from '@azzapp/relay/providers/PixelRatio.relayprovider';
-import { get as PostWidth } from '@azzapp/relay/providers/PostWidth.relayprovider';
-import { get as ScreenWidth } from '@azzapp/relay/providers/ScreenWidth.relayprovider';
 import { encodeMediaId } from '@azzapp/shared/imagesHelpers';
 import { colors } from '#theme';
 import { CancelHeaderButton } from '#components/commonsButtons';
@@ -28,6 +24,10 @@ import { getFileName } from '#helpers/fileHelpers';
 import { addLocalCachedMediaFile } from '#helpers/mediaHelpers';
 import { uploadMedia, uploadSign } from '#helpers/MobileWebAPI';
 import relayScreen from '#helpers/relayScreen';
+import { get as CappedPixelRatio } from '#relayProviders/CappedPixelRatio.relayprovider';
+import { get as PixelRatio } from '#relayProviders/PixelRatio.relayprovider';
+import { get as PostWidth } from '#relayProviders/PostWidth.relayprovider';
+import { get as ScreenWidth } from '#relayProviders/ScreenWidth.relayprovider';
 import ActivityIndicator from '#ui/ActivityIndicator';
 import Container from '#ui/Container';
 import Header from '#ui/Header';
@@ -37,19 +37,17 @@ import PostContentStep from './PostContentStep';
 import PostCreationScreenContext from './PostCreationScreenContext';
 import type { ImagePickerResult } from '#components/ImagePicker';
 import type { RelayScreenProps } from '#helpers/relayScreen';
+import type { PostCreationScreenMutation } from '#relayArtifacts/PostCreationScreenMutation.graphql';
+import type { PostCreationScreenQuery } from '#relayArtifacts/PostCreationScreenQuery.graphql';
 import type { NewPostRoute } from '#routes';
-import type { PostCreationScreenMutation } from '@azzapp/relay/artifacts/PostCreationScreenMutation.graphql';
-import type { PostCreationScreenQuery } from '@azzapp/relay/artifacts/PostCreationScreenQuery.graphql';
 
 const POST_MAX_DURATION = 15;
 
-const postCreationcreenQuery = graphql`
-  query PostCreationScreenQuery {
-    viewer {
-      profile {
-        id
-        ...AuthorCartoucheFragment_profile
-      }
+const postCreationScreenQuery = graphql`
+  query PostCreationScreenQuery($webCardId: ID!) {
+    webCard: node(id: $webCardId) {
+      id
+      ...AuthorCartoucheFragment_webCard
     }
   }
 `;
@@ -61,15 +59,16 @@ const PostCreationScreen = ({
   const [allowComments, setAllowComments] = useState(true);
   const [content, setContent] = useState('');
   const intl = useIntl();
-  const {
-    viewer: { profile },
-  } = usePreloadedQuery(postCreationcreenQuery, preloadedQuery);
+  const { webCard } = usePreloadedQuery(
+    postCreationScreenQuery,
+    preloadedQuery,
+  );
 
   const connectionID =
-    profile?.id &&
+    webCard &&
     ConnectionHandler.getConnectionID(
-      profile.id,
-      'ProfilePostsList_profile_connection_posts',
+      webCard.id,
+      'WebCardPostsList_webCard_connection_posts',
     );
 
   const router = useRouter();
@@ -94,7 +93,7 @@ const PostCreationScreen = ({
           allowComments
           counterComments
           counterReactions
-          author {
+          webCard {
             id
             userName
           }
@@ -133,6 +132,9 @@ const PostCreationScreen = ({
     filter,
     timeRange,
   }: ImagePickerResult) => {
+    if (!webCard) {
+      return;
+    }
     try {
       setProgressIndicator(Observable.from(0));
       const exportedMedia = await exportMedia({
@@ -171,6 +173,7 @@ const PostCreationScreen = ({
             allowComments,
             allowLikes,
             content,
+            webCardId: webCard.id,
           },
           screenWidth: ScreenWidth(),
           postWith: PostWidth(),
@@ -225,14 +228,14 @@ const PostCreationScreen = ({
           setProgressIndicator(null);
         },
         updater: store => {
-          if (profile?.id) {
-            const currentProfile = store.get(profile.id);
+          if (webCard.id) {
+            const currentWebCard = store.get(webCard.id);
 
-            if (currentProfile) {
-              const nbPosts = currentProfile?.getValue('nbPosts');
+            if (currentWebCard) {
+              const nbPosts = currentWebCard?.getValue('nbPosts');
 
               if (typeof nbPosts === 'number') {
-                currentProfile.setValue(nbPosts + 1, 'nbPosts');
+                currentWebCard.setValue(nbPosts + 1, 'nbPosts');
               }
             }
           }
@@ -258,12 +261,12 @@ const PostCreationScreen = ({
       setAllowLikes,
       setAllowComments,
       setContent,
-      profile,
+      webCard: webCard ?? null,
     }),
-    [allowComments, allowLikes, content, profile],
+    [allowComments, allowLikes, content, webCard],
   );
 
-  if (!profile) {
+  if (!webCard) {
     // TODO redirect to login ?
     return null;
   }
@@ -316,6 +319,9 @@ const PostCreationScreenFallback = () => {
 };
 
 export default relayScreen(PostCreationScreen, {
-  query: postCreationcreenQuery,
+  query: postCreationScreenQuery,
+  getVariables: (_, profileInfos) => ({
+    webCardId: profileInfos?.webCardId ?? '',
+  }),
   fallback: PostCreationScreenFallback,
 });

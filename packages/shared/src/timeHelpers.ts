@@ -53,3 +53,10 @@ export const getFormatedElapsedTime = (sinceTimestamp: number) => {
   if (elapsed.value > 1) elapsed.kind += 's';
   return `${elapsed.value} ${elapsed.kind} ago`;
 };
+
+export const formatBirthday = (year: number, month: number, day: number) => {
+  const formattedDay = `${day < 10 ? 0 : ''}${day}`;
+  const formattedMonth = `${month < 9 ? 0 : ''}${month + 1}`;
+
+  return `${year}-${formattedMonth}-${formattedDay}`;
+};

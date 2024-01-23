@@ -1,3 +1,4 @@
+import { isEqual } from 'lodash';
 import { useState, useCallback, useRef, useMemo, useEffect } from 'react';
 import {
   StatusBar,
@@ -10,17 +11,18 @@ import {
 import { useSharedValue } from 'react-native-reanimated';
 import { graphql, useFragment } from 'react-relay';
 import { useDebouncedCallback } from 'use-debounce';
-import { CONTACT_CARD_RATIO } from '#components/ContactCard';
-import { useOnFocus } from '#components/NativeRouter';
+import { CONTACT_CARD_RATIO } from '#components/ContactCard/ContactCard';
+import { useOnFocus, useRouteWillChange } from '#components/NativeRouter';
 import { dispatchGlobalEvent } from '#helpers/globalEvents';
-import ProfileBoundRelayEnvironmentProvider from '#helpers/ProfileBoundRelayEnvironmentProvider';
-import { ROOT_ACTOR_ID, getRelayEnvironment } from '#helpers/relayEnvironment';
+import { getRelayEnvironment } from '#helpers/relayEnvironment';
 import { usePrefetchRoute } from '#helpers/ScreenPrefetcher';
 import useAuthState from '#hooks/useAuthState';
 import useScreenInsets from '#hooks/useScreenInsets';
+import useToggle from '#hooks/useToggle';
 import { BOTTOM_MENU_HEIGHT } from '#ui/BottomMenu';
 import HomeBackground from './HomeBackground';
 import HomeBottomPanel from './HomeBottomPanel';
+import HomeBottomSheetPanel from './HomeBottomSheetPanel';
 import HomeContactCardLandscape from './HomeContactCardLandscape';
 import HomeHeader, { HOME_HEADER_HEIGHT } from './HomeHeader';
 import { HOME_MENU_HEIGHT } from './HomeMenu';
@@ -29,32 +31,34 @@ import HomeProfileLink, {
   PROFILE_LINK_MARGIN_TOP,
 } from './HomeProfileLink';
 import HomeProfilesCarousel from './HomeProfilesCarousel';
+import type { ProfileInfos } from '#helpers/authStore';
+import type { HomeScreenContent_user$key } from '#relayArtifacts/HomeScreenContent_user.graphql';
 import type { HomeProfilesCarouselHandle } from './HomeProfilesCarousel';
-import type { HomeScreenContent_user$key } from '@azzapp/relay/artifacts/HomeScreenContent_user.graphql';
 import type { Disposable } from 'react-relay';
 
 type HomeScreenContentProps = {
   user: HomeScreenContent_user$key;
-  onShowMenu: () => void;
 };
 
-const HomeScreenContent = ({
-  user: userKey,
-  onShowMenu,
-}: HomeScreenContentProps) => {
+const HomeScreenContent = ({ user: userKey }: HomeScreenContentProps) => {
   // #regions data
   const user = useFragment(
     graphql`
       fragment HomeScreenContent_user on User {
         profiles {
           id
-          userName
+          profileRole
+          webCard {
+            id
+            userName
+          }
           ...HomeContactCardLandscape_profile
+          ...HomeBottomSheetPanel_profile
         }
+        ...HomeBackground_user
         ...HomeProfileLink_user
         ...HomeProfilesCarousel_user
         ...HomeBottomPanel_user
-        ...HomeBackground_user
         ...HomeHeader_user
       }
     `,
@@ -67,7 +71,7 @@ const HomeScreenContent = ({
   const auth = useAuthState();
   const initialProfileIndex = useMemo(() => {
     const index = user.profiles?.findIndex(
-      profile => profile.id === auth.profileId,
+      profile => profile.id === auth.profileInfos?.profileId,
     );
     return index !== undefined && index !== -1 ? index : 0;
     // we only want to run this once
@@ -80,13 +84,20 @@ const HomeScreenContent = ({
   const currentProfileIndexSharedValue = useSharedValue(currentProfileIndex);
   const currentProfile = user.profiles?.[currentProfileIndex];
 
-  const switchProfile = useDebouncedCallback((profileId: string) => {
-    if (profileId && auth.profileId !== profileId) {
+  useRouteWillChange('HOME', () => {
+    const roundedProfileIndexSharedValue = Math.round(
+      currentProfileIndexSharedValue.value,
+    );
+
+    if (roundedProfileIndexSharedValue !== currentProfileIndexSharedValue.value)
+      currentProfileIndexSharedValue.value = roundedProfileIndexSharedValue;
+  });
+
+  const switchWebCard = useDebouncedCallback((profileInfos: ProfileInfos) => {
+    if (!isEqual(profileInfos, auth.profileInfos)) {
       void dispatchGlobalEvent({
-        type: 'PROFILE_CHANGE',
-        payload: {
-          profileId,
-        },
+        type: 'WEBCARD_CHANGE',
+        payload: profileInfos,
       });
     }
   }, 50);
@@ -95,26 +106,45 @@ const HomeScreenContent = ({
     (index: number) => {
       currentProfileIndexRef.current = index;
       setCurrentProfileIndex(index);
-      const newProfileId = user.profiles?.[index]?.id;
-      if (newProfileId) {
-        switchProfile(newProfileId);
+      const newProfile = user.profiles?.[index];
+      if (newProfile) {
+        const {
+          id: profileId,
+          webCard: { id: webCardId },
+          profileRole,
+        } = newProfile ?? {};
+        switchWebCard({
+          profileId,
+          webCardId,
+          profileRole,
+        });
       }
     },
-    [setCurrentProfileIndex, switchProfile, user.profiles],
+    [setCurrentProfileIndex, switchWebCard, user.profiles],
   );
 
   const carouselRef = useRef<HomeProfilesCarouselHandle>(null);
   const onCurrentProfileIndexChangeAnimated = useCallback(
     (index: number) => {
       'worklet';
-      currentProfileIndexSharedValue.value = index;
+      // on the last item, with no bounce, the onScroll is to be called even after the onMomentumScrollEnd
+      //resulting in a final index value being a decimal over the limit number, causing issue on the last items
+      //giving an unstable state
+      if (user?.profiles?.length) {
+        currentProfileIndexSharedValue.value = Math.min(
+          index,
+          user.profiles.length - 1,
+        );
+      } else {
+        currentProfileIndexSharedValue.value = index;
+      }
     },
-    [currentProfileIndexSharedValue],
+    [currentProfileIndexSharedValue, user?.profiles?.length],
   );
 
   useOnFocus(() => {
     const authProfileIndex = user.profiles?.findIndex(
-      profile => profile.id === auth.profileId,
+      profile => profile.id === auth.profileInfos?.profileId,
     );
     if (
       authProfileIndex !== undefined &&
@@ -132,10 +162,9 @@ const HomeScreenContent = ({
   useEffect(() => {
     let disposable: Disposable | undefined;
     if (currentProfileIndex === -1) {
-      disposable = prefetchRoute(
-        getRelayEnvironment().forActor(ROOT_ACTOR_ID),
-        { route: 'NEW_PROFILE' },
-      );
+      disposable = prefetchRoute(getRelayEnvironment(), {
+        route: 'NEW_WEBCARD',
+      });
     }
     return () => {
       disposable?.dispose();
@@ -150,28 +179,28 @@ const HomeScreenContent = ({
 
   const profilesDisposables = useRef<Disposable[]>([]).current;
   useEffect(() => {
-    if (auth.profileId) {
+    const profileInfos = auth.profileInfos;
+    if (profileInfos) {
       const profile = profilesRef.current?.find(
-        profile => profile.id === auth.profileId,
+        profile => profile.id === profileInfos.profileId,
       );
       if (profile) {
-        const multiActorEnvironment = getRelayEnvironment();
-        const profileEnvironment = multiActorEnvironment.forActor(profile.id);
+        const environment = getRelayEnvironment();
         profilesDisposables.push(
-          prefetchRoute(profileEnvironment, {
-            route: 'PROFILE',
+          prefetchRoute(environment, {
+            route: 'WEBCARD',
             params: {
-              profileId: auth.profileId,
-              userName: profile.userName,
+              webCardId: profileInfos.webCardId,
+              userName: profile.webCard.userName,
             },
           }),
-          prefetchRoute(profileEnvironment, {
+          prefetchRoute(environment, {
             route: 'CONTACT_CARD',
           }),
         );
       }
     }
-  }, [auth.profileId, profilesDisposables, prefetchRoute]);
+  }, [profilesDisposables, prefetchRoute, auth.profileInfos]);
 
   useEffect(
     () => () => {
@@ -215,6 +244,11 @@ const HomeScreenContent = ({
   );
   // #endregion
 
+  // #region bottomMenu
+  const [showMenu, toggleShowMenu] = useToggle(false);
+
+  // #endregion
+
   return (
     <View style={{ flex: 1 }}>
       <HomeBackground
@@ -223,7 +257,7 @@ const HomeScreenContent = ({
       />
       <View style={styles.contentContainer}>
         <HomeHeader
-          openPanel={onShowMenu}
+          openPanel={toggleShowMenu}
           user={user}
           currentProfileIndexSharedValue={currentProfileIndexSharedValue}
           style={{ marginTop: insets.top }}
@@ -250,11 +284,14 @@ const HomeScreenContent = ({
           currentProfileIndex={currentProfileIndex}
         />
       </View>
-      <ProfileBoundRelayEnvironmentProvider
-        profileId={currentProfile?.id ?? null}
-      >
-        <HomeContactCardLandscape profile={currentProfile ?? null} />
-      </ProfileBoundRelayEnvironmentProvider>
+      <HomeContactCardLandscape profile={currentProfile ?? null} />
+      <HomeBottomSheetPanel
+        visible={showMenu}
+        close={toggleShowMenu}
+        withProfile={currentProfileIndex !== -1}
+        profile={currentProfile ?? null}
+        profileRole={currentProfile?.profileRole ?? null}
+      />
     </View>
   );
 };

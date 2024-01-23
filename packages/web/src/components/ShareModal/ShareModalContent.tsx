@@ -4,11 +4,13 @@ import { ArrowRightIcon } from '#assets';
 import { useScroll } from '#hooks';
 import { Button, ButtonIcon } from '#ui';
 import { FormInput } from '#ui/Form';
-import FacebookIcon from '#ui/SocialIcons/assets/facebook.svg';
-import InstagramIcon from '#ui/SocialIcons/assets/instagram.svg';
+//import FacebookIcon from '#ui/SocialIcons/assets/facebook.svg';
+//import InstagramIcon from '#ui/SocialIcons/assets/instagram.svg';
 import LinkedInIcon from '#ui/SocialIcons/assets/linkedin.svg';
-import MessengerIcon from '#ui/SocialIcons/assets/messenger.svg';
-import TiktokIcon from '#ui/SocialIcons/assets/tiktok.svg';
+//import MessengerIcon from '#ui/SocialIcons/assets/messenger.svg';
+//import TiktokIcon from '#ui/SocialIcons/assets/tiktok.svg';
+import MailIcon from '#ui/SocialIcons/assets/mail.svg';
+import SmsIcon from '#ui/SocialIcons/assets/sms.svg';
 import TwitterIcon from '#ui/SocialIcons/assets/twitter.svg';
 import WhatsAppIcon from '#ui/SocialIcons/assets/whatsapp.svg';
 import styles from './ShareModal.css';
@@ -25,26 +27,37 @@ const options = [
     link: (text: string) => `https://twitter.com/intent/tweet?text=${text}`,
   },
   // @TODO find a way to share on Tiktok?
-  { name: 'TikTok', icon: TiktokIcon },
-  {
-    name: 'Messenger',
-    icon: MessengerIcon,
-    // @TODO complete link when app is setup on facebook platform
-    // link: (text: string) => `https://www.facebook.com/dialog/send?link=${text}&app_id=<APP_ID>`,
-  },
-  {
-    name: 'Facebook',
-    icon: FacebookIcon,
-    // @TODO complete link when app is setup on facebook platform
-    // link: (text: string) => `https://www.facebook.com/sharer/sharer.php?app_id=<APP_ID>&u=${text}`,
-  },
+  // { name: 'TikTok', icon: TiktokIcon },
+  // {
+  //   name: 'Messenger',
+  //   icon: MessengerIcon,
+  // @TODO complete link when app is setup on facebook platform
+  // link: (text: string) => `https://www.facebook.com/dialog/send?link=${text}&app_id=<APP_ID>`,
+  //},
+  // { name: 'Facebook',
+  //   icon: FacebookIcon,
+  // @TODO complete link when app is setup on facebook platform
+  // link: (text: string) => `https://www.facebook.com/sharer/sharer.php?app_id=<APP_ID>&u=${text}`,
+  // },
   // @TODO find a way to share on Instagram?
-  { name: 'Instagram', icon: InstagramIcon },
+  // { name: 'Instagram', icon: InstagramIcon },
   {
     name: 'LinkedIn',
     icon: LinkedInIcon,
     link: (text: string) =>
       `https://www.linkedin.com/sharing/share-offsite/?url=${text}`,
+  },
+  {
+    name: 'Email',
+    icon: MailIcon,
+    link: (text: string) =>
+      `mailto:?body=${`Hello,\n I thought you could be interested in this post on Azzapp: ${text}`}`,
+  },
+  {
+    name: 'SMS',
+    icon: SmsIcon,
+    link: (text: string) =>
+      `sms:?body=${`Hello,\n I thought you could be interested in this post on Azzapp: ${text}`}`,
   },
 ];
 

@@ -14,6 +14,7 @@ import { colors } from '#theme';
 import EmailOrPhoneInput from '#components/EmailOrPhoneInput';
 import Link from '#components/Link';
 import { dispatchGlobalEvent } from '#helpers/globalEvents';
+import { getCurrentLocale } from '#helpers/localeHelpers';
 import { signup } from '#helpers/MobileWebAPI';
 import useAnimatedKeyboardHeight from '#hooks/useAnimatedKeyboardHeight';
 import useScreenInsets from '#hooks/useScreenInsets';
@@ -24,16 +25,17 @@ import Form, { Submit } from '#ui/Form/Form';
 import HyperLink from '#ui/HyperLink';
 import SecuredTextInput from '#ui/SecuredTextInput';
 import Text from '#ui/Text';
+import type { EmailPhoneInput } from '#components/EmailOrPhoneInput';
+import type { ProfileInfos } from '#helpers/authStore';
 import type { CheckboxStatus } from '#ui/CheckBox';
 import type { TokensResponse } from '@azzapp/shared/WebAPI';
-import type { CountryCode } from 'libphonenumber-js';
 import type { TextInput as NativeTextInput } from 'react-native';
 
 const SignupScreen = () => {
-  const [countryCodeOrEmail, setCountryCodeOrEmail] = useState<
-    CountryCode | 'email'
-  >('email');
-  const [emailOrPhoneNumber, setEmailOrPhoneNumber] = useState('');
+  const [contact, setContact] = useState<EmailPhoneInput>({
+    countryCodeOrEmail: 'email',
+    value: '',
+  });
 
   const [phoneOrEmailError, setPhoneOrEmailError] = useState('');
 
@@ -53,8 +55,8 @@ const SignupScreen = () => {
   const onSubmit = useCallback(async () => {
     setPhoneOrEmailError('');
     let canSignup = true;
-    if (countryCodeOrEmail === 'email') {
-      if (!isValidEmail(emailOrPhoneNumber)) {
+    if (contact.countryCodeOrEmail === 'email') {
+      if (!isValidEmail(contact.value)) {
         setPhoneOrEmailError(
           intl.formatMessage({
             defaultMessage: 'Please enter a valid email address',
@@ -64,7 +66,7 @@ const SignupScreen = () => {
         );
         canSignup = false;
       }
-    } else if (!isPhoneNumber(emailOrPhoneNumber, countryCodeOrEmail)) {
+    } else if (!isPhoneNumber(contact.value, contact.countryCodeOrEmail)) {
       setPhoneOrEmailError(
         intl.formatMessage({
           defaultMessage: 'Please enter a valid phone number',
@@ -83,23 +85,32 @@ const SignupScreen = () => {
     canSignup &&= tosValid;
 
     if (canSignup) {
-      let tokens: TokensResponse & { profileId?: string; userId?: string };
+      let tokens: TokensResponse & {
+        userId: string;
+        profileInfos: ProfileInfos | null;
+      };
       try {
         setIsSubmitting(true);
-        if (countryCodeOrEmail === 'email') {
-          tokens = await signup({ email: emailOrPhoneNumber, password });
+        const locale = getCurrentLocale();
+        if (contact.countryCodeOrEmail === 'email') {
+          tokens = await signup({
+            email: contact.value,
+            password,
+            locale,
+          });
         } else {
           tokens = await signup({
             phoneNumber: parsePhoneNumber(
-              emailOrPhoneNumber,
-              countryCodeOrEmail,
+              contact.value,
+              contact.countryCodeOrEmail,
             ).formatInternational(),
+            locale,
             password,
           });
         }
         if (isNotFalsyString(tokens.userId)) {
           // Signin process
-          const profileId = tokens.profileId;
+          const { profileInfos } = tokens;
           await dispatchGlobalEvent({
             type: 'SIGN_IN',
             payload: {
@@ -107,7 +118,7 @@ const SignupScreen = () => {
                 token: tokens.token,
                 refreshToken: tokens.refreshToken,
               },
-              profileId,
+              profileInfos: profileInfos ?? null,
             },
           });
         } else {
@@ -153,8 +164,8 @@ const SignupScreen = () => {
   }, [
     checkedPrivacy,
     checkedTos,
-    countryCodeOrEmail,
-    emailOrPhoneNumber,
+    contact.countryCodeOrEmail,
+    contact.value,
     intl,
     password,
   ]);
@@ -217,12 +228,10 @@ const SignupScreen = () => {
             </View>
 
             <EmailOrPhoneInput
-              value={emailOrPhoneNumber}
-              onChange={setEmailOrPhoneNumber}
+              input={contact}
+              onChange={setContact}
               hasError={!!phoneOrEmailError}
               onSubmitEditing={focusPassword}
-              countryCodeOrEmail={countryCodeOrEmail}
-              setCountryCodeOrEmail={setCountryCodeOrEmail}
             />
             <Text style={styles.error} variant="error">
               {phoneOrEmailError}
@@ -249,7 +258,7 @@ const SignupScreen = () => {
             <Text style={styles.error} variant="error">
               {showPasswordError && (
                 <FormattedMessage
-                  defaultMessage="Password should contain at least 8 characters, a number, an uppercase letter and a lowercase letter"
+                  defaultMessage="Password should contain at least 8 characters and at most 32 characters, a number, an uppercase letter and a lowercase letter"
                   description="Signup Screen - error message when password is not compliant with our rules"
                 />
               )}
@@ -319,7 +328,7 @@ const SignupScreen = () => {
                   description: 'Signup Screen - Accessibility Sign Up button',
                 })}
                 style={styles.button}
-                disabled={!emailOrPhoneNumber || !password}
+                disabled={!contact.value || !password}
                 loading={isSubmitting}
               />
             </Submit>
@@ -384,7 +393,6 @@ const styles = StyleSheet.create({
   },
   body: {
     justifyContent: 'center',
-    alignItem: 'center',
     borderTopLeftRadius: 16,
     borderTopRightRadius: 16,
   },

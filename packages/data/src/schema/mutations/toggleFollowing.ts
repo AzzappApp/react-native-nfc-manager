@@ -1,61 +1,92 @@
 import { eq, sql } from 'drizzle-orm';
 import { GraphQLError } from 'graphql';
-import { fromGlobalId } from 'graphql-relay';
 import ERRORS from '@azzapp/shared/errors';
-import { ProfileTable, db, follows, unfollows } from '#domains';
-import type { Profile } from '#domains';
+import { isEditor } from '@azzapp/shared/profileHelpers';
+import {
+  WebCardTable,
+  db,
+  follows,
+  getUserProfileWithWebCardId,
+  isFollowing,
+  unfollows,
+} from '#domains';
+import fromGlobalIdWithType from '#helpers/relayIdHelpers';
+import type { WebCard } from '#domains';
 import type { MutationResolvers } from '#schema/__generated__/types';
 
 const toggleFollowing: MutationResolvers['toggleFollowing'] = async (
   _,
-  { input },
+  {
+    input: {
+      webCardId: gqlWebCardId,
+      targetWebCardId: gqlTargetWebCardId,
+      follow,
+    },
+  },
   { auth, loaders },
 ) => {
-  const { profileId } = auth;
-  if (!profileId) {
-    throw new GraphQLError(ERRORS.UNAUTORIZED);
+  const { userId } = auth;
+  const webCardId = fromGlobalIdWithType(gqlWebCardId, 'WebCard');
+  const profile =
+    userId && (await getUserProfileWithWebCardId(userId, webCardId));
+
+  if (!profile || !isEditor(profile.profileRole)) {
+    throw new GraphQLError(ERRORS.UNAUTHORIZED);
   }
 
-  const { id: targetId, type } = fromGlobalId(input.profileId);
-  if (type !== 'Profile') {
-    throw new GraphQLError(ERRORS.INVALID_REQUEST);
-  }
+  const targetId = fromGlobalIdWithType(gqlTargetWebCardId, 'WebCard');
 
-  let target: Profile | null;
+  let target: WebCard | null;
   try {
-    target = await loaders.Profile.load(targetId);
+    target = await loaders.WebCard.load(targetId);
   } catch (e) {
     throw new GraphQLError(ERRORS.INTERNAL_SERVER_ERROR);
   }
   if (!target) {
     throw new GraphQLError(ERRORS.INVALID_REQUEST);
   }
-  const { follow } = input;
+  if (profile.webCardId === targetId) {
+    throw new GraphQLError(ERRORS.INVALID_REQUEST);
+  }
 
   try {
     await db.transaction(async trx => {
+      // fix: https://github.com/AzzappApp/azzapp/issues/1931 && https://github.com/AzzappApp/azzapp/issues/1930
+      // if the frontend allows spamming add or remove, this will cause the nbFollowers and nbFollowings to be negative (or opposite)
+      // is checking the actual status not enough, we can imaging splitting the function in 2 add/remove
+      const currentlyFollowing = await isFollowing(profile.webCardId, targetId);
+      if (follow && currentlyFollowing) {
+        return;
+      }
+      if (!follow && !currentlyFollowing) {
+        return;
+      }
       await trx
-        .update(ProfileTable)
+        .update(WebCardTable)
         .set({
-          nbFollowers: follow ? sql`nbFollowers + 1` : sql`nbFollowers - 1`,
+          nbFollowers: follow
+            ? sql`nbFollowers + 1`
+            : sql`GREATEST(nbFollowers - 1, 0)`,
         })
-        .where(eq(ProfileTable.id, targetId));
+        .where(eq(WebCardTable.id, targetId));
 
       await trx
-        .update(ProfileTable)
+        .update(WebCardTable)
         .set({
-          nbFollowings: follow ? sql`nbFollowings + 1` : sql`nbFollowings - 1`,
+          nbFollowings: follow
+            ? sql`nbFollowings + 1`
+            : sql`GREATEST(nbFollowings - 1, 0)`,
         })
-        .where(eq(ProfileTable.id, profileId));
+        .where(eq(WebCardTable.id, profile.webCardId));
 
-      if (follow) await follows(profileId, targetId, trx);
-      else await unfollows(profileId, targetId, trx);
+      if (follow) await follows(profile.webCardId, targetId, trx);
+      else await unfollows(profile.webCardId, targetId, trx);
     });
   } catch (e) {
     throw new GraphQLError(ERRORS.INTERNAL_SERVER_ERROR);
   }
 
-  return { profile: target };
+  return { webCard: target };
 };
 
 export default toggleFollowing;

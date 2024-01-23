@@ -3,22 +3,23 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import { StyleSheet, View } from 'react-native';
 import { graphql, useFragment } from 'react-relay';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
+import { swapColor } from '@azzapp/shared/cardHelpers';
 import {
   HORIZONTAL_PHOTO_MAX_BORDER_RADIUS,
   HORIZONTAL_PHOTO_MAX_BORDER_WIDTH,
 } from '@azzapp/shared/cardModuleHelpers';
-import ProfileColorPicker from '#components/ProfileColorPicker';
+import WebCardColorPicker from '#components/WebCardColorPicker';
 import ColorPreview from '#ui/ColorPreview';
 import LabeledDashedSlider from '#ui/LabeledDashedSlider';
 import TabsBar from '#ui/TabsBar';
-import type { HorizontalPhotoBorderEditionPanel_viewer$key } from '@azzapp/relay/artifacts/HorizontalPhotoBorderEditionPanel_viewer.graphql';
+import type { HorizontalPhotoBorderEditionPanel_webCard$key } from '#relayArtifacts/HorizontalPhotoBorderEditionPanel_webCard.graphql';
 import type { ViewProps } from 'react-native-svg/lib/typescript/fabric/utils';
 
 type HorizontalPhotoBorderEditionPanelProps = ViewProps & {
   /**
    * A relay fragment reference to the viewer
    */
-  viewer: HorizontalPhotoBorderEditionPanel_viewer$key;
+  webCard: HorizontalPhotoBorderEditionPanel_webCard$key | null;
   /**
    * The borderWidth currently set on the module
    */
@@ -61,7 +62,7 @@ const HorizontalPhotoBorderEditionPanel = ({
   onBorderRadiusChange,
   borderColor,
   onBorderColorChange,
-  viewer,
+  webCard: webCardKey,
   bottomSheetHeight,
   style,
   ...props
@@ -69,15 +70,18 @@ const HorizontalPhotoBorderEditionPanel = ({
   const intl = useIntl();
 
   const [currentTab, setCurrentTab] = useState<string>('border');
-  const { profile } = useFragment(
+  const webCard = useFragment(
     graphql`
-      fragment HorizontalPhotoBorderEditionPanel_viewer on Viewer {
-        profile {
-          ...ProfileColorPicker_profile
+      fragment HorizontalPhotoBorderEditionPanel_webCard on WebCard {
+        ...WebCardColorPicker_webCard
+        cardColors {
+          primary
+          dark
+          light
         }
       }
     `,
-    viewer,
+    webCardKey,
   );
 
   const onProfileColorPickerClose = useCallback(() => {
@@ -101,11 +105,14 @@ const HorizontalPhotoBorderEditionPanel = ({
             description: 'Border color tab label in HorizontalPhoto edition',
           }),
           rightElement: (
-            <ColorPreview color={borderColor} style={{ marginLeft: 5 }} />
+            <ColorPreview
+              color={swapColor(borderColor, webCard?.cardColors)}
+              style={{ marginLeft: 5 }}
+            />
           ),
         },
       ]),
-    [borderColor, intl],
+    [borderColor, intl, webCard?.cardColors],
   );
 
   return (
@@ -160,11 +167,11 @@ const HorizontalPhotoBorderEditionPanel = ({
           })}
           style={styles.slider}
         />
-        {profile && (
-          <ProfileColorPicker
+        {webCard && (
+          <WebCardColorPicker
             visible={currentTab !== 'border'}
             height={bottomSheetHeight}
-            profile={profile}
+            webCard={webCard}
             title={intl.formatMessage({
               defaultMessage: 'Border color',
               description: 'Border color title in HorizontalPhoto edition',

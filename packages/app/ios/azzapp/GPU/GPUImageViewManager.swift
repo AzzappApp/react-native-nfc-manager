@@ -195,8 +195,10 @@ class GPUImageView: UIView, MTKViewDelegate {
                     throw GPUViewError.failedToLoad(layerSource)
                   }
                   #if targetEnvironment(simulator)
-                  if (inverseYOnSimulator) {
-                    image = image.inverseY() ?? image
+                  if #unavailable(iOS 17) {
+                    if (inverseYOnSimulator) {
+                      image = image.inverseY() ?? image
+                    }
                   }
                   #endif
                   return (layerSource, image)

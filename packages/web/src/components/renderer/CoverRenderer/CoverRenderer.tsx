@@ -1,28 +1,154 @@
-import 'server-only';
-import { DEFAULT_COLOR_PALETTE } from '@azzapp/shared/cardHelpers';
+'use client';
 
-import { COVER_RATIO } from '@azzapp/shared/coverHelpers';
-import CoverPreview from './CoverPreview';
+import cn from 'classnames';
+import { getCldImageUrl } from 'next-cloudinary';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { swapColor, DEFAULT_COLOR_PALETTE } from '@azzapp/shared/cardHelpers';
+import {
+  COVER_ANIMATION_DURATION,
+  COVER_RATIO,
+} from '@azzapp/shared/coverHelpers';
+import {
+  decodeMediaId,
+  getCloudinaryAssetURL,
+} from '@azzapp/shared/imagesHelpers';
+import CloudinaryImage from '#ui/CloudinaryImage';
+import CloudinaryVideo from '#ui/CloudinaryVideo';
+import CoverLottiePlayer from './CoverLottiePlayer';
 import styles from './CoverRenderer.css';
-import CoverRendererBackground from './CoverRendererBackground';
+import { animations } from './CoverRendererAnimations';
 import CoverTextRenderer from './CoverTextRenderer';
-import type { Media, Profile } from '@azzapp/data/domains';
+import type { CoverLottiePlayerHandle } from './CoverLottiePlayer';
+import type { CoverTextRenderHandler } from './CoverTextRenderer';
+import type { Media, WebCard } from '@azzapp/data/domains';
 
 type CoverRendererProps = Omit<
   React.HTMLProps<HTMLDivElement>,
-  'children' | 'media'
+  'children' | 'media' | 'width'
 > & {
-  profile: Profile;
+  webCard: WebCard;
   media: Media;
+  staticCover?: boolean;
+  width?: number;
+  priority?: boolean;
 };
 
-const CoverRenderer = async ({
-  profile,
+const DEFAULT_COVER_WIDTH = 375;
+
+const CoverRenderer = ({
+  webCard,
   media,
+  staticCover,
   style,
+  width,
+  priority,
   ...props
 }: CoverRendererProps) => {
-  const { coverData, coverTitle, coverSubTitle, cardColors } = profile;
+  const { coverData, cardColors, coverTitle, coverSubTitle } = webCard;
+
+  const coverWidth = width ? width * 2 : DEFAULT_COVER_WIDTH * 2;
+  const coverHeight = coverWidth / COVER_RATIO;
+
+  const mediaAnimation = coverData?.mediaAnimation ?? null;
+
+  const [duration, setDuration] = useState<number | null>(null);
+  const [lottieDuration, setLottieDuration] = useState<number | null>(null);
+
+  const coverLottieRef = useRef<CoverLottiePlayerHandle | null>(null);
+
+  const onLottieLoaded = useCallback((lottieDuration: number) => {
+    setLottieDuration(lottieDuration);
+  }, []);
+
+  useEffect(() => {
+    if (duration && lottieDuration) {
+      coverLottieRef.current?.setSpeed(lottieDuration / duration);
+    }
+  }, [lottieDuration, duration]);
+
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+  const imageRef = useRef<HTMLImageElement | null>(null);
+
+  const videoReady = useRef(false);
+
+  const textRef = useRef<CoverTextRenderHandler | null>(null);
+
+  const hasLottie = coverData?.foregroundId?.startsWith('l:') ?? false;
+
+  const playJsAnimation = useCallback(
+    (animationDuration?: number) => {
+      if (mediaAnimation && mediaAnimation in animations && !staticCover) {
+        const container = videoRef.current ?? imageRef.current;
+        container?.animate(
+          animations[mediaAnimation as keyof typeof animations],
+          {
+            duration: (animationDuration ?? duration ?? 0) * 1000,
+            iterations:
+              hasLottie || media.kind === 'video'
+                ? 1
+                : Number.POSITIVE_INFINITY,
+          },
+        );
+      }
+
+      textRef.current?.playJsAnimation(
+        (animationDuration ?? duration ?? 0) * 1000,
+        hasLottie || media.kind === 'video' ? 1 : Number.POSITIVE_INFINITY,
+      );
+    },
+    [duration, hasLottie, media.kind, mediaAnimation, staticCover],
+  );
+
+  useEffect(() => {
+    //to start video we want to be sure that lottie and video are charged
+    if (media.kind === 'video' && duration && (!hasLottie || lottieDuration)) {
+      videoRef.current?.play();
+      coverLottieRef.current?.play();
+      playJsAnimation();
+    }
+
+    if (media.kind === 'image' && duration) {
+      coverLottieRef.current?.play(true);
+      playJsAnimation(COVER_ANIMATION_DURATION / 1000);
+    }
+  }, [duration, hasLottie, lottieDuration, media.kind, playJsAnimation]);
+
+  const onImageLoad = useCallback(() => {
+    if (!staticCover) {
+      setDuration(COVER_ANIMATION_DURATION / 1000);
+    }
+  }, [staticCover]);
+
+  const onVideoReady = useCallback(() => {
+    if (!videoRef.current || videoReady.current) {
+      return;
+    }
+    videoReady.current = true;
+    let duration = videoRef.current.duration;
+    if (isNaN(duration)) {
+      duration = COVER_ANIMATION_DURATION;
+    }
+    setDuration(duration);
+  }, []);
+
+  const videoRefCallback = useCallback(
+    (node: HTMLVideoElement | null) => {
+      videoRef.current = node;
+      if (videoRef.current && videoRef.current.readyState >= 4) {
+        onVideoReady();
+      }
+
+      // needed for safari on iOS (without video is not loaded and onCanPlayThrough is not called)
+      videoRef.current?.load();
+    },
+    [onVideoReady],
+  );
+
+  const onVideoEnd = useCallback(() => {
+    coverLottieRef.current?.play();
+    videoRef.current?.play();
+    playJsAnimation();
+  }, [playJsAnimation]);
 
   if (!coverData) {
     return null;
@@ -31,27 +157,154 @@ const CoverRenderer = async ({
   return (
     <div
       {...props}
-      style={{ position: 'relative', overflow: 'hidden', ...style }}
+      style={{
+        aspectRatio: `${COVER_RATIO}`,
+        width,
+        backgroundColor: swapColor(
+          coverData.backgroundColor ?? 'light',
+          cardColors ?? DEFAULT_COLOR_PALETTE,
+        ),
+      }}
+      className={styles.content}
     >
-      <CoverRendererBackground media={media} profile={profile} />
-      <div
-        {...props}
-        style={{
-          aspectRatio: `${COVER_RATIO}`,
-        }}
-        className={styles.content}
-      >
-        <CoverPreview profile={profile} media={media} {...props} />
-        <CoverTextRenderer
-          title={coverTitle}
-          titleStyle={coverData.titleStyle}
-          subTitle={coverSubTitle}
-          subTitleStyle={coverData.subTitleStyle}
-          colorPalette={cardColors ?? DEFAULT_COLOR_PALETTE}
-          textOrientation={coverData.textOrientation}
-          textPosition={coverData.textPosition}
-        />
-      </div>
+      {coverData.backgroundId && (
+        <>
+          <div
+            {...props}
+            style={{
+              aspectRatio: `${COVER_RATIO}`,
+              backgroundColor: swapColor(
+                coverData.backgroundColor ?? 'light',
+                cardColors ?? DEFAULT_COLOR_PALETTE,
+              ),
+              position: 'absolute',
+              width: '100%',
+              height: '100%',
+              overflow: 'hidden',
+              ...style,
+            }}
+          />
+          <div
+            style={{
+              backgroundColor:
+                swapColor(
+                  coverData.backgroundPatternColor,
+                  cardColors ?? DEFAULT_COLOR_PALETTE,
+                ) ?? '#000',
+              maskImage: `url(${getCldImageUrl({
+                src: decodeMediaId(coverData.backgroundId),
+                width: coverWidth,
+                height: coverHeight,
+                format: 'auto',
+              })})`,
+            }}
+            className={styles.layerMedia}
+          />
+        </>
+      )}
+      {media != null &&
+        (media.kind === 'image' ? (
+          <CloudinaryImage
+            ref={imageRef}
+            mediaId={media.id}
+            alt="cover"
+            width={coverWidth}
+            height={coverHeight}
+            priority={priority}
+            className={cn(
+              styles.coverMedia,
+              mediaAnimation &&
+                mediaAnimation in styles &&
+                styles[mediaAnimation as keyof typeof styles],
+            )}
+            fetchPriority={priority ? 'high' : 'low'}
+            onLoad={onImageLoad}
+          />
+        ) : staticCover ? (
+          <CloudinaryImage
+            mediaId={media.id}
+            videoThumbnail
+            width={coverWidth}
+            height={coverHeight}
+            alt="cover"
+            className={styles.coverMedia}
+          />
+        ) : (
+          <CloudinaryVideo
+            media={media}
+            assetKind="cover"
+            alt="cover"
+            onEnded={onVideoEnd}
+            onCanPlayThrough={onVideoReady}
+            autoPlay={false}
+            loop={false}
+            className={cn(
+              styles.coverMedia,
+              mediaAnimation &&
+                mediaAnimation in styles &&
+                styles[mediaAnimation as keyof typeof styles],
+            )}
+            muted
+            fluid
+            posterSize={{
+              width: coverWidth,
+              height: coverHeight,
+            }}
+            playsInline
+            ref={videoRefCallback}
+          />
+        ))}
+      {coverData?.foregroundId ? (
+        hasLottie ? (
+          <CoverLottiePlayer
+            onLoop={media.kind === 'image' ? playJsAnimation : undefined}
+            ref={coverLottieRef}
+            src={getCloudinaryAssetURL(
+              decodeMediaId(coverData.foregroundId),
+              'raw',
+            )}
+            tintColor={
+              swapColor(
+                coverData.foregroundColor,
+                cardColors ?? DEFAULT_COLOR_PALETTE,
+              ) ?? '#000'
+            }
+            staticCover={staticCover}
+            onLoaded={onLottieLoaded}
+          />
+        ) : (
+          <div
+            style={{
+              backgroundColor:
+                swapColor(
+                  coverData.foregroundColor,
+                  cardColors ?? DEFAULT_COLOR_PALETTE,
+                ) ?? '#000',
+              maskImage: `url(${getCldImageUrl({
+                src: decodeMediaId(coverData.foregroundId),
+                width: coverWidth,
+                height: coverHeight,
+                format: 'auto',
+              })})`,
+              maskPosition: 'bottom',
+            }}
+            className={styles.layerMedia}
+          />
+        )
+      ) : null}
+
+      <CoverTextRenderer
+        ref={textRef}
+        title={coverTitle}
+        titleStyle={coverData.titleStyle}
+        subTitle={coverSubTitle}
+        subTitleStyle={coverData.subTitleStyle}
+        colorPalette={cardColors ?? DEFAULT_COLOR_PALETTE}
+        textOrientation={coverData.textOrientation}
+        textPosition={coverData.textPosition}
+        width={width}
+        textAnimation={coverData.textAnimation}
+      />
     </div>
   );
 };

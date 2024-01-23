@@ -3,6 +3,8 @@ import { useCallback, useMemo, useRef, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { StyleSheet } from 'react-native';
 import { RESULTS } from 'react-native-permissions';
+import { useDebouncedCallback } from 'use-debounce';
+import { cropDataForAspectRatio } from '#components/gpu';
 import { getImageSize, getVideoSize } from '#helpers/mediaHelpers';
 import { usePermissionContext } from '#helpers/PermissionContext';
 import useEditorLayout from '#hooks/useEditorLayout';
@@ -46,6 +48,7 @@ const SelectImageStep = ({
     onAspectRatioChange,
     onEditionParametersChange,
     clearMedia,
+    cameraButtonsLeftRightPosition,
   } = useImagePickerState();
 
   const [pickerMode, setPickerMode] = useState<'gallery' | 'photo' | 'video'>(
@@ -86,11 +89,11 @@ const SelectImageStep = ({
   }, []);
 
   const onCameraError = useCallback((error: CameraRuntimeError) => {
-    console.log(error);
+    console.warn(error);
     // TODO
   }, []);
 
-  const onTakePhoto = useCallback(async () => {
+  const takePhoto = useCallback(async () => {
     if (!cameraRef.current) {
       // TODO
       return;
@@ -113,29 +116,9 @@ const SelectImageStep = ({
       forceCameraRatio,
     );
     if (forceAspectRatio) {
-      let editionParameters = {};
-      if (forceAspectRatio < 1) {
-        const wantedWidth = height * forceAspectRatio;
-        editionParameters = {
-          cropData: {
-            height,
-            originX: (width - wantedWidth) / 2,
-            originY: 0,
-            width: wantedWidth,
-          },
-        };
-      } else if (forceAspectRatio >= 1) {
-        const wantedHeight = width / forceAspectRatio;
-        editionParameters = {
-          cropData: {
-            height: wantedHeight,
-            originX: 0,
-            originY: (height - wantedHeight) / 2,
-            width,
-          },
-        };
-      }
-      onEditionParametersChange(editionParameters);
+      onEditionParametersChange({
+        cropData: cropDataForAspectRatio(width, height, forceAspectRatio),
+      });
     }
     onNext();
   }, [
@@ -145,6 +128,8 @@ const SelectImageStep = ({
     onMediaChange,
     onNext,
   ]);
+
+  const onTakePhoto = useDebouncedCallback(takePhoto, 400);
 
   const captureSession = useRef<RecordSession | null>(null);
   const onStartRecording = useCallback(() => {
@@ -290,6 +275,7 @@ const SelectImageStep = ({
               initialCameraPosition={initialCameraPosition}
               photo={pickerMode === 'photo'}
               video={pickerMode === 'video'}
+              cameraButtonsLeftRightPosition={cameraButtonsLeftRightPosition}
             />
           ) : null
         }

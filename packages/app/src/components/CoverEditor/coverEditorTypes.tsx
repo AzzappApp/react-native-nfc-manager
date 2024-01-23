@@ -13,14 +13,15 @@ export type CoverStyleData = {
   subTitleStyle: TextStyle;
   textOrientation: TextOrientation;
   textPosition: TextPosition;
+  textAnimation: string | null;
   mediaFilter: string | null;
   mediaParameters: EditionParameters;
+  mediaAnimation: string | null;
   background: { id: string; uri: string } | null;
   backgroundColor: string | null;
   backgroundPatternColor: string | null;
-  foreground: { id: string; uri: string } | null;
+  foreground: { id: string; kind: string; uri: string } | null;
   foregroundColor: string | null;
-  merged: boolean;
   segmented: boolean;
 };
 
@@ -37,4 +38,10 @@ export type MaskMedia = {
   id?: string;
   uri: string;
   source?: string;
+};
+
+export type MediaInfos = {
+  sourceMedia: SourceMedia;
+  mediaCropParameters?: EditionParameters | null;
+  maskMedia?: MaskMedia | null;
 };

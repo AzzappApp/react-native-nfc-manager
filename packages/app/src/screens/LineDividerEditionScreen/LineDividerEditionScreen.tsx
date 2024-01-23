@@ -1,20 +1,16 @@
-import { Suspense, useCallback, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { graphql, useFragment, useMutation } from 'react-relay';
-import {
-  LINE_DIVIDER_DEFAULT_VALUES,
-  MODULE_KIND_LINE_DIVIDER,
-} from '@azzapp/shared/cardModuleHelpers';
+import { LINE_DIVIDER_DEFAULT_VALUES } from '@azzapp/shared/cardModuleHelpers';
 import { useRouter } from '#components/NativeRouter';
-import ProfileColorPicker from '#components/ProfileColorPicker';
-import WebCardModulePreview from '#components/WebCardModulePreview';
+import WebCardColorPicker from '#components/WebCardColorPicker';
 import useEditorLayout from '#hooks/useEditorLayout';
 import useModuleDataEditor from '#hooks/useModuleDataEditor';
 import { BOTTOM_MENU_HEIGHT } from '#ui/BottomMenu';
 import Container from '#ui/Container';
-import Header, { HEADER_HEIGHT } from '#ui/Header';
+import Header from '#ui/Header';
 import HeaderButton from '#ui/HeaderButton';
 import TabView from '#ui/TabView';
 
@@ -22,16 +18,16 @@ import LineDividerEditionBottomMenu from './LineDividerEditionBottomMenu';
 import LineDividerMarginEditionPanel from './LineDividerMarginsEditionPanel';
 import LineDividerPreview from './LineDividerPreview';
 import LineDividerSettingsEditionPanel from './LineDividerSettingsEditionPanel';
-import type { LineDividerEditionScreen_module$key } from '@azzapp/relay/artifacts/LineDividerEditionScreen_module.graphql';
-import type { LineDividerEditionScreen_viewer$key } from '@azzapp/relay/artifacts/LineDividerEditionScreen_viewer.graphql';
-import type { LineDividerEditionScreenUpdateModuleMutation } from '@azzapp/relay/artifacts/LineDividerEditionScreenUpdateModuleMutation.graphql';
+import type { LineDividerEditionScreen_module$key } from '#relayArtifacts/LineDividerEditionScreen_module.graphql';
+import type { LineDividerEditionScreen_webCard$key } from '#relayArtifacts/LineDividerEditionScreen_webCard.graphql';
+import type { LineDividerEditionScreenUpdateModuleMutation } from '#relayArtifacts/LineDividerEditionScreenUpdateModuleMutation.graphql';
 import type { ViewProps } from 'react-native';
 
 export type LineDividerEditionScreenProps = ViewProps & {
   /**
    * the current viewer
    */
-  viewer: LineDividerEditionScreen_viewer$key;
+  webCard: LineDividerEditionScreen_webCard$key | null;
   /**
    * the current module to edit, if null, a new module will be created
    */
@@ -43,7 +39,7 @@ export type LineDividerEditionScreenProps = ViewProps & {
  */
 const LineDividerEditionScreen = ({
   module,
-  viewer: viewerKey,
+  webCard: webCardKey,
 }: LineDividerEditionScreenProps) => {
   // #region Data retrieval
   const lineDivider = useFragment(
@@ -61,32 +57,31 @@ const LineDividerEditionScreen = ({
     module,
   );
 
-  const viewer = useFragment(
+  const webCard = useFragment(
     graphql`
-      fragment LineDividerEditionScreen_viewer on Viewer {
-        profile {
-          ...ProfileColorPicker_profile
-          cardColors {
-            primary
-            light
-            dark
-          }
-          cardStyle {
-            borderColor
-            borderRadius
-            borderWidth
-            buttonColor
-            buttonRadius
-            fontFamily
-            fontSize
-            gap
-            titleFontFamily
-            titleFontSize
-          }
+      fragment LineDividerEditionScreen_webCard on WebCard {
+        id
+        cardColors {
+          primary
+          light
+          dark
         }
+        cardStyle {
+          borderColor
+          borderRadius
+          borderWidth
+          buttonColor
+          buttonRadius
+          fontFamily
+          fontSize
+          gap
+          titleFontFamily
+          titleFontSize
+        }
+        ...WebCardColorPicker_webCard
       }
     `,
-    viewerKey,
+    webCardKey,
   );
   // #endregion
 
@@ -105,7 +100,7 @@ const LineDividerEditionScreen = ({
   const { data, value, updateFields, fieldUpdateHandler, dirty } =
     useModuleDataEditor({
       initialValue,
-      cardStyle: viewer.profile?.cardStyle,
+      cardStyle: webCard?.cardStyle,
       styleValuesMap: null,
       defaultValues: LINE_DIVIDER_DEFAULT_VALUES,
     });
@@ -127,7 +122,7 @@ const LineDividerEditionScreen = ({
         $input: SaveLineDividerModuleInput!
       ) {
         saveLineDividerModule(input: $input) {
-          profile {
+          webCard {
             id
             cardModules {
               kind
@@ -144,13 +139,14 @@ const LineDividerEditionScreen = ({
   const router = useRouter();
   const intl = useIntl();
   const onSave = useCallback(() => {
-    if (!canSave) {
+    if (!canSave || !webCard) {
       return;
     }
 
     commit({
       variables: {
         input: {
+          webCardId: webCard.id,
           moduleId: lineDivider?.id,
           ...value,
         },
@@ -171,7 +167,7 @@ const LineDividerEditionScreen = ({
         });
       },
     });
-  }, [canSave, commit, lineDivider?.id, value, intl, router]);
+  }, [canSave, webCard, commit, lineDivider?.id, value, router, intl]);
 
   const onCancel = useCallback(() => {
     router.back();
@@ -262,8 +258,8 @@ const LineDividerEditionScreen = ({
       <LineDividerPreview
         style={{ height: topPanelHeight - 20, marginVertical: 10 }}
         data={data}
-        colorPalette={viewer.profile?.cardColors}
-        cardStyle={viewer.profile?.cardStyle}
+        colorPalette={webCard?.cardColors}
+        cardStyle={webCard?.cardStyle}
       />
       <TabView
         style={{ height: bottomPanelHeight }}
@@ -297,32 +293,9 @@ const LineDividerEditionScreen = ({
           },
         ]}
       />
-      <View
-        style={{
-          position: 'absolute',
-          top: HEADER_HEIGHT + insetTop,
-          height: topPanelHeight + bottomPanelHeight,
-          width: windowWidth,
-          opacity: currentTab === 'preview' ? 1 : 0,
-        }}
-        pointerEvents={currentTab === 'preview' ? 'auto' : 'none'}
-      >
-        <Suspense>
-          <WebCardModulePreview
-            editedModuleId={lineDivider?.id}
-            visible={currentTab === 'preview'}
-            editedModuleInfo={{
-              kind: MODULE_KIND_LINE_DIVIDER,
-              data,
-            }}
-            height={topPanelHeight + bottomPanelHeight}
-            contentPaddingBottom={insetBottom + BOTTOM_MENU_HEIGHT}
-          />
-        </Suspense>
-      </View>
 
       <LineDividerEditionBottomMenu
-        colorPalette={viewer.profile?.cardColors}
+        colorPalette={webCard?.cardColors}
         currentTab={currentTab}
         onItemPress={onCurrentTabChange}
         colorTop={colorTop}
@@ -332,11 +305,11 @@ const LineDividerEditionScreen = ({
           { bottom: insetBottom, width: windowWidth - 20 },
         ]}
       />
-      {viewer.profile && (
-        <ProfileColorPicker
+      {webCard && (
+        <WebCardColorPicker
           visible={showContentModal}
           height={bottomPanelHeight}
-          profile={viewer.profile}
+          webCard={webCard}
           title={
             colorMode === 'colorTop'
               ? intl.formatMessage({

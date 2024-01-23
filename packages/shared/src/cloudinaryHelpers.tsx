@@ -171,14 +171,16 @@ export const deleteMediaByPublicIds = async (
  */
 export const createPresignedUpload = async (
   publicId: string,
-  kind: 'image' | 'video',
+  kind: 'image' | 'raw' | 'video',
   pregeneratedSizes?: number[] | null,
   context?: string | null,
 ) => {
   const uploadURL: string =
     kind === 'image'
       ? `${CLOUDINARY_API_URL}/image/upload`
-      : `${CLOUDINARY_API_URL}/video/upload`;
+      : kind === 'video'
+      ? `${CLOUDINARY_API_URL}/video/upload`
+      : `${CLOUDINARY_API_URL}/raw/upload`;
   const uploadParameters: Record<string, any> = {
     timestamp: Math.round(Date.now() / 1000),
     public_id: publicId,

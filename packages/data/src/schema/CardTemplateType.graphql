@@ -9,7 +9,7 @@ type CardTemplateType implements Node {
   label: String
 
   """
-  Associated Profile Category
+  Associated WebCard Category
   """
-  profileCategory: ProfileCategory
+  webCardCategory: WebCardCategory
 }

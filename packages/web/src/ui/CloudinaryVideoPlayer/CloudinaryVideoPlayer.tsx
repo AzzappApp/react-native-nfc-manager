@@ -78,6 +78,7 @@ const CloudinaryVideoPlayer = (
       <ButtonIcon
         Icon={muted ? SoundOffIcon : SoundOnIcon}
         size={18}
+        aria-label={muted ? 'Unmute' : 'Mute'}
         width={28}
         height={28}
         className={styles.sound}
@@ -89,6 +90,7 @@ const CloudinaryVideoPlayer = (
           size={72}
           onClick={togglePlaying}
           className={styles.play}
+          aria-label="Play"
         />
       )}
     </div>

@@ -11,11 +11,15 @@ export type SIGN_UP_EVENTS = {
 /**
  * Events dispatched when an user signs in
  */
-export type SINGN_IN = {
+export type SIGN_IN = {
   type: 'SIGN_IN';
   payload: {
     authTokens: { token: string; refreshToken: string };
-    profileId?: string;
+    profileInfos?: {
+      profileId: string;
+      webCardId: string;
+      profileRole: string;
+    } | null;
   };
 };
 
@@ -29,10 +33,22 @@ export type SIGN_OUT = {
 /**
  * Events dispatched when an user changes the current profile
  */
-export type PROFILE_CHANGE = {
-  type: 'PROFILE_CHANGE';
+export type WEBCARD_CHANGE = {
+  type: 'WEBCARD_CHANGE';
   payload: {
     profileId: string;
+    webCardId: string;
+    profileRole: string;
+  };
+};
+
+/**
+ * Events dispatched when an user current role is changed
+ */
+export type PROFILE_ROLE_CHANGE = {
+  type: 'PROFILE_ROLE_CHANGE';
+  payload: {
+    profileRole: string;
   };
 };
 
@@ -67,21 +83,24 @@ export type READY = {
 
 export type GlobalEvents =
   | NETWORK_ERROR
-  | PROFILE_CHANGE
+  | PROFILE_ROLE_CHANGE
   | READY
+  | SIGN_IN
   | SIGN_OUT
   | SIGN_UP_EVENTS
-  | SINGN_IN
-  | TOKENS_REFRESHED;
+  | TOKENS_REFRESHED
+  | WEBCARD_CHANGE;
 
 type TypeToLister<TType extends GlobalEvents['type']> = TType extends 'SIGN_UP'
   ? SIGN_UP_EVENTS
   : TType extends 'SIGN_IN'
-  ? SINGN_IN
+  ? SIGN_IN
   : TType extends 'SIGN_OUT'
   ? SIGN_OUT
-  : TType extends 'PROFILE_CHANGE'
-  ? PROFILE_CHANGE
+  : TType extends 'WEBCARD_CHANGE'
+  ? WEBCARD_CHANGE
+  : TType extends 'PROFILE_ROLE_CHANGE'
+  ? PROFILE_ROLE_CHANGE
   : TType extends 'NETWORK_ERROR'
   ? NETWORK_ERROR
   : TType extends 'TOKENS_REFRESHED'

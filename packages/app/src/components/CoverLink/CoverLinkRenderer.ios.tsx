@@ -14,7 +14,7 @@ import type { Disposable } from 'react-relay';
  * the native reveal animation
  */
 const CoverLink = ({
-  profileId,
+  webCardId,
   userName,
   style,
   coverStyle,
@@ -34,7 +34,7 @@ const CoverLink = ({
     const container = ref.current;
     if (!container) {
       router.push({
-        route: 'PROFILE',
+        route: 'WEBCARD',
         params: {
           userName,
         },
@@ -43,10 +43,10 @@ const CoverLink = ({
     }
     container.measureInWindow(async (x, y, width, height) => {
       router.push({
-        route: 'PROFILE',
+        route: 'WEBCARD',
         params: {
           userName,
-          profileId,
+          webCardId,
           fromRectangle: { x, y, width, height },
         },
       });
@@ -58,17 +58,17 @@ const CoverLink = ({
     let disposable: Disposable | null = null;
     if (prefetch) {
       disposable = prefetchScreen(environment, {
-        route: 'PROFILE',
+        route: 'WEBCARD',
         params: {
           userName,
-          profileId,
+          webCardId,
         },
       });
     }
     return () => {
       disposable?.dispose();
     };
-  }, [prefetch, prefetchScreen, userName, profileId, environment]);
+  }, [prefetch, prefetchScreen, userName, webCardId, environment]);
 
   return (
     <PressableScaleHighlight

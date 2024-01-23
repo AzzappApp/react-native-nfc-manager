@@ -1,47 +1,78 @@
-/* eslint-disable @typescript-eslint/ban-ts-comment */
 import { GraphQLError } from 'graphql';
 import ERRORS from '@azzapp/shared/errors';
-import { updateProfile } from '#domains/profiles';
-import type { Profile } from '#domains';
+import { isAdmin } from '@azzapp/shared/profileHelpers';
+import { getUserProfileWithWebCardId, updateProfile } from '#domains';
+import fromGlobalIdWithType from '#helpers/relayIdHelpers';
+import type { GraphQLContext } from '#index';
 import type { MutationResolvers } from '#schema/__generated__/types';
-import type { GraphQLContext } from '../GraphQLContext';
 
+// TODO why do we duplicate the avatarId in the profile and in the contactCard?
+// TODO in general perhaps this mutation should be split into two: one for the profile and one for the contactCard
 const updateProfileMutation: MutationResolvers['updateProfile'] = async (
   _,
-  args,
+  { input: { profileId: gqlProfileId, profileRole, contactCard, avatarId } },
   { auth, loaders }: GraphQLContext,
 ) => {
-  const { profileId } = auth;
-  if (!profileId) {
-    throw new GraphQLError(ERRORS.UNAUTORIZED);
+  const { userId } = auth;
+  const targetProfileId = fromGlobalIdWithType(gqlProfileId, 'Profile');
+  const targetProfile = await loaders.Profile.load(targetProfileId);
+
+  if (!targetProfile) {
+    throw new GraphQLError(ERRORS.PROFILE_DONT_EXISTS);
   }
 
-  let profile: Profile | null;
-  try {
-    profile = await loaders.Profile.load(profileId);
-  } catch (e) {
-    throw new GraphQLError(ERRORS.INTERNAL_SERVER_ERROR);
-  }
-  if (!profile) {
-    throw new GraphQLError(ERRORS.UNAUTORIZED);
+  if (profileRole === 'owner') {
+    throw new GraphQLError(ERRORS.INVALID_REQUEST);
   }
 
-  const { ...profileUpdates } = args.input;
+  const currentProfile =
+    userId &&
+    (await getUserProfileWithWebCardId(userId, targetProfile.webCardId));
 
-  const partialProfile: Partial<
-    Omit<Profile, 'createdAt' | 'id' | 'profileKind' | 'updatedAt'>
-  > = {
-    ...profileUpdates,
-  };
+  if (!currentProfile) {
+    throw new GraphQLError(ERRORS.UNAUTHORIZED);
+  }
 
-  try {
-    await updateProfile(profile.id, partialProfile);
-    return {
-      profile: { ...profile, ...partialProfile },
+  if (
+    currentProfile.id !== targetProfileId &&
+    !isAdmin(currentProfile.profileRole)
+  ) {
+    throw new GraphQLError(ERRORS.UNAUTHORIZED);
+  }
+
+  if (
+    currentProfile.id === targetProfileId &&
+    profileRole &&
+    profileRole !== currentProfile.profileRole
+  ) {
+    // we don't allow to change profile role of the profile you are logged in
+    throw new GraphQLError(ERRORS.INVALID_REQUEST);
+  }
+
+  await updateProfile(targetProfileId, {
+    profileRole: profileRole ?? undefined,
+    contactCard: {
+      ...contactCard,
+    },
+    avatarId,
+  });
+
+  const updatedProfile = { ...targetProfile };
+  if (profileRole) {
+    updatedProfile.profileRole = profileRole;
+  }
+  if (avatarId) {
+    updatedProfile.avatarId = avatarId;
+  }
+  if (contactCard) {
+    updatedProfile.contactCard = {
+      ...contactCard,
     };
-  } catch (error) {
-    throw new GraphQLError(ERRORS.INTERNAL_SERVER_ERROR);
   }
+
+  return {
+    profile: updatedProfile,
+  };
 };
 
 export default updateProfileMutation;

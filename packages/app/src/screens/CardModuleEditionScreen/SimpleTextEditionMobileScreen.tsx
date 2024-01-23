@@ -1,7 +1,7 @@
 import { graphql, usePreloadedQuery } from 'react-relay';
 import SimpleTextEditionScreen from '#screens/SimpleTextEditionScreen';
-import type { SimpleTextEditionMobileScreenQuery } from '@azzapp/relay/artifacts/SimpleTextEditionMobileScreenQuery.graphql';
-import type { SimpleTextEditionScreen_module$key } from '@azzapp/relay/artifacts/SimpleTextEditionScreen_module.graphql';
+import type { SimpleTextEditionMobileScreenQuery } from '#relayArtifacts/SimpleTextEditionMobileScreenQuery.graphql';
+import type { SimpleTextEditionScreen_module$key } from '#relayArtifacts/SimpleTextEditionScreen_module.graphql';
 import type { PreloadedQuery } from 'react-relay';
 
 type SimpleTextEditionMobileScreenProps = {
@@ -28,12 +28,15 @@ const SimpleTextEditionMobileScreen = ({
   preloadedQuery,
   moduleKind,
 }: SimpleTextEditionMobileScreenProps) => {
-  const data = usePreloadedQuery(SimpleTextQuery, preloadedQuery);
+  const { profile } = usePreloadedQuery(SimpleTextQuery, preloadedQuery);
+  if (!profile) {
+    return null;
+  }
 
   let module: SimpleTextEditionScreen_module$key | null = null;
   if (moduleId != null) {
     module =
-      data.viewer.profile?.cardModules.find(
+      profile?.webCard?.cardModules.find(
         module => module?.id === moduleId && module?.kind === moduleKind,
       ) ?? null;
     if (!module) {
@@ -44,21 +47,23 @@ const SimpleTextEditionMobileScreen = ({
   return (
     <SimpleTextEditionScreen
       module={module}
-      viewer={data.viewer}
+      profile={profile}
       moduleKind={moduleKind}
     />
   );
 };
 
 const SimpleTextQuery = graphql`
-  query SimpleTextEditionMobileScreenQuery {
-    viewer {
-      ...SimpleTextEditionScreen_viewer
-      profile {
-        cardModules {
-          id
-          kind
-          ...SimpleTextEditionScreen_module
+  query SimpleTextEditionMobileScreenQuery($profileId: ID!) {
+    profile: node(id: $profileId) {
+      ... on Profile {
+        ...SimpleTextEditionScreen_profile
+        webCard {
+          cardModules {
+            id
+            kind
+            ...SimpleTextEditionScreen_module
+          }
         }
       }
     }

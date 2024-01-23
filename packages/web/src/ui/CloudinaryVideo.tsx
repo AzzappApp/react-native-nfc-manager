@@ -1,10 +1,7 @@
-'use client';
+import { getCldImageUrl, getCldVideoUrl } from 'next-cloudinary';
 import { forwardRef, type ForwardedRef } from 'react';
 import { COVER_ASSET_SIZES } from '@azzapp/shared/coverHelpers';
-import {
-  getVideoThumbnailURL,
-  getVideoUrlForSize,
-} from '@azzapp/shared/imagesHelpers';
+import { decodeMediaId } from '@azzapp/shared/imagesHelpers';
 import { POST_VIDEO_SIZES } from '@azzapp/shared/postHelpers';
 import type { Media } from '@azzapp/data/domains';
 
@@ -28,6 +25,10 @@ export type CloudinaryVideoProps = Omit<
   fluid?: boolean;
   width?: number;
   height?: number;
+  posterSize?: {
+    width: number;
+    height: number;
+  };
 };
 
 const CloudinaryVideo = (
@@ -39,6 +40,7 @@ const CloudinaryVideo = (
     width,
     style,
     fluid,
+    posterSize,
     ...props
   }: CloudinaryVideoProps,
   ref: ForwardedRef<HTMLVideoElement>,
@@ -53,11 +55,24 @@ const CloudinaryVideo = (
     assetKind === 'cover' ? COVER_ASSET_SIZES : POST_VIDEO_SIZES;
 
   const maxSize = pregeneratedSizes.at(-1);
+
   return (
     <video
       ref={ref}
-      poster={getVideoThumbnailURL(media.id)}
-      src={getVideoUrlForSize(media.id)}
+      poster={getCldImageUrl({
+        src: decodeMediaId(media.id),
+        assetType: 'video',
+        format: 'auto',
+        width: posterSize?.width,
+        height: posterSize?.height,
+      })}
+      src={getCldVideoUrl({
+        src: decodeMediaId(media.id),
+        width,
+        height: width && media.height * (width / media.width),
+        aspectRatio: `${media.width / media.height}`,
+        format: 'mp4', // for safari
+      })}
       autoPlay={autoPlay}
       loop={loop}
       style={{
@@ -68,7 +83,12 @@ const CloudinaryVideo = (
       {...props}
     >
       {pregeneratedSizes.map(size => {
-        const src = getVideoUrlForSize(media.id, size);
+        const src = getCldVideoUrl({
+          src: decodeMediaId(media.id),
+          width: size,
+          height: media.height * (size / media.width),
+          format: 'mp4',
+        });
         const mediaAttr = `all and (max-width: ${size}px)`;
         return (
           <source key={size} src={src} type="video/mp4" media={mediaAttr} />
@@ -76,7 +96,12 @@ const CloudinaryVideo = (
       })}
       <source
         key={maxSize}
-        src={getVideoUrlForSize(media.id, maxSize)}
+        src={getCldVideoUrl({
+          src: decodeMediaId(media.id),
+          width: maxSize,
+          height: maxSize && media.height * (maxSize / media.width),
+          format: 'mp4',
+        })}
         media="all"
       />
     </video>

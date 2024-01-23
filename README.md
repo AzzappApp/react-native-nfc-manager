@@ -7,7 +7,7 @@ This is the main repository of the Azzapp application source code.
 Developping and building the project requires **MacOS version 12+**.
 In addition developpers should install the followings dependencies:
 
-- [NodeJS](https://nodejs.org/en/) version **16** (recommended install through [nvm](https://github.com/nvm-sh/nvm))
+- [NodeJS](https://nodejs.org/en/) version **18** (recommended install through [nvm](https://github.com/nvm-sh/nvm))
 - [yarn](https://yarnpkg.com/)
 - [XCode](https://apps.apple.com/fr/app/xcode/id497799835?mt=12) version **13+**
 - [Android Studio](https://developer.android.com/studio)
@@ -110,7 +110,6 @@ The differents packages of the application are located under the `packages` dire
 - [backoffice](./packages/backoffice/): contains the source code of the backoffice of the application.
 - [data](./packages/data/): contains the source code of the GraphQL API layer of the application.
 - [i18n](./packages/i18n/): contains the translation files and related definitions.
-- [relay](./packages/relay/): this is a special package that is meant to contains the relay-compiler generated artifacts.
 - [shared](./packages/shared/): contains helpers shared by all the packages of the application
 - [web](./packages/web/): a NextJS project responsible of the web version of the application and the API
 
@@ -152,13 +151,10 @@ The application use a [GraphQL](https://graphql.org/) API to communicate between
 
 - The workspace build system is based on [Turbo Repo](https://turbo.build/)
 - The CI/CD Process is based on [Github Actions](https://github.com/features/actions)
-- The natives applications are built [FastLane](https://fastlane.tools/). A [match](https://docs.fastlane.tools/actions/match/) repository is used to synchronize the IOS application certificate.
+- The natives applications are built [EAS](https://expo.dev/). 
 
 ### List of environement variables during the build process:
 
-- `FASTLANE_APPSTORE_API_KEY`: a base 64 encoded of a [Faslane JSON API Key](https://docs.fastlane.tools/app-store-connect-api/)
-- `FASTLANE_GIT_BASIC_AUTH`: [Git basic auth](https://docs.fastlane.tools/actions/match/#git-storage-on-github) used by fastlane match
-- `FASTLANE_MATCH_PASSWORD`: password of the fastlane match repository
 - `VERCEL_TOKEN`: vercel api token
 
 Valid environments are `DEV`, `STAGING` and `PRODUCTION` (the later is omitted in env variable name).

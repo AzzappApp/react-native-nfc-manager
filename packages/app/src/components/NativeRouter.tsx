@@ -13,6 +13,7 @@ import { StyleSheet } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Screen, ScreenContainer, ScreenStack } from 'react-native-screens';
+import { createDeferred } from '@azzapp/shared/asyncHelpers';
 import { isRouteEqual, type Route, type ROUTES } from '#routes';
 import { createId } from '#helpers/idHelpers';
 import type { ComponentType, ReactNode, Provider, Ref } from 'react';
@@ -854,6 +855,53 @@ export const useOnFocus = (handler: (() => void) | null) => {
   }, [hasFocus]);
 };
 
+export const ScreenDidAppear = ({ children }: { children: ReactNode }) => {
+  const deferred = useMemo(() => createDeferred<boolean>(), []);
+  const { didAppear } = useContext(ScreenRendererContext);
+
+  useEffect(() => {
+    if (didAppear) {
+      deferred.resolve(true);
+    }
+  }, [didAppear, deferred]);
+
+  return (
+    <ScreenDidAppearInner
+      screenDidAppear={didAppear}
+      promise={deferred.promise}
+    >
+      {children}
+    </ScreenDidAppearInner>
+  );
+};
+
+export const useRouteWillChange = (route: string, cb: () => void) => {
+  const router = useRouter();
+
+  useEffect(() => {
+    const { dispose } = router.addRouteWillChangeListener(routeEvent => {
+      if (routeEvent.route === route) cb();
+    });
+
+    return dispose;
+  });
+};
+
+const ScreenDidAppearInner = ({
+  screenDidAppear,
+  promise,
+  children,
+}: {
+  screenDidAppear: boolean;
+  promise: Promise<boolean>;
+  children: ReactNode;
+}) => {
+  if (!screenDidAppear) {
+    throw promise;
+  }
+  return <>{children}</>;
+};
+
 const StackRenderer = ({
   stack,
   screens,
@@ -1009,6 +1057,7 @@ export const ScreenRendererContext = React.createContext<{
   id: string;
   navigationEventEmitter: EventEmitter;
   hasFocus?: boolean;
+  didAppear: boolean;
   setOptions: (
     value:
       | ScreenOptions
@@ -1018,6 +1067,7 @@ export const ScreenRendererContext = React.createContext<{
 }>({
   id: '',
   navigationEventEmitter: new EventEmitter(),
+  didAppear: false,
   setOptions: () => void 0,
 });
 
@@ -1065,15 +1115,22 @@ const ScreenRenderer = ({
     return options;
   });
 
+  const [didAppear, setDidAppear] = useState(false);
   const screenContextValue = useMemo(
     () => ({
       id,
       navigationEventEmitter,
       hasFocus,
+      didAppear,
       setOptions,
     }),
-    [id, navigationEventEmitter, hasFocus],
+    [id, navigationEventEmitter, didAppear, hasFocus],
   );
+
+  const onAppear = () => {
+    navigationEventEmitter.emit('appear');
+    setDidAppear(true);
+  };
 
   const onDismissed = () => {
     // TODO this event might be dispatched on tab switch which has no sense
@@ -1104,7 +1161,7 @@ const ScreenRenderer = ({
       key={id}
       activityState={activityState}
       isNativeStack={isNativeStack}
-      onAppear={() => navigationEventEmitter.emit('appear')}
+      onAppear={onAppear}
       onWillAppear={() => navigationEventEmitter.emit('willAppear')}
       onDisappear={() => navigationEventEmitter.emit('disappear')}
       onWillDisappear={() => navigationEventEmitter.emit('willDisappear')}

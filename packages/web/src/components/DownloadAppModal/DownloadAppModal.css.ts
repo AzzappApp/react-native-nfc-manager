@@ -1,18 +1,20 @@
 import { style } from '@vanilla-extract/css';
 import { COVER_RATIO } from '@azzapp/shared/coverHelpers';
-import { textLarge, textMedium, textXLarge, vars } from '#app/theme.css';
+import {
+  textLarge,
+  textMedium,
+  textXLarge,
+  vars,
+} from '#app/[userName]/theme.css';
 
 const coverWrapper = style({
   position: 'relative',
   aspectRatio: `${COVER_RATIO}`,
   width: 125,
-  margin: 'auto',
-});
-
-const cover = style({
-  objectFit: 'cover',
   borderRadius: 20,
   boxShadow: '0px 0px 20px 0px rgba(0, 0, 0, 0.20)',
+  margin: 'auto',
+  overflow: 'hidden',
 });
 
 const stats = style({
@@ -58,7 +60,6 @@ const footerButton = style({ marginTop: '20px', width: '100%' });
 
 const styles = {
   coverWrapper,
-  cover,
   stats,
   stat,
   statCategory,

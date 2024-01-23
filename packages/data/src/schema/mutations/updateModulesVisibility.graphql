@@ -8,5 +8,5 @@ input UpdateModulesVisibilityInput {
 }
 
 type UpdateModulesVisibilityPayload {
-  profile: Profile!
+  webCard: WebCard!
 }

@@ -342,7 +342,7 @@ class GPUVideoView: UIView {
         }
         let currentTime = CMTimeGetSeconds(currentItem.currentTime())
         if(currentTime >= 0) {
-          self.onProgress?(["currentTime": currentTime])
+          self.onProgress?(["currentTime": currentTime, "duration": CMTimeGetSeconds(currentItem.duration)])
         }
       })
       

@@ -1,8 +1,8 @@
 import { graphql, usePreloadedQuery } from 'react-relay';
 import { MODULE_KIND_PHOTO_WITH_TEXT_AND_TITLE } from '@azzapp/shared/cardModuleHelpers';
 import PhotoWithTextAndTitleEditionScreen from '#screens/PhotoWithTextAndTitleEditionScreen';
-import type { PhotoWithTextAndTitleEditionMobileScreenQuery } from '@azzapp/relay/artifacts/PhotoWithTextAndTitleEditionMobileScreenQuery.graphql';
-import type { PhotoWithTextAndTitleEditionScreen_module$key } from '@azzapp/relay/artifacts/PhotoWithTextAndTitleEditionScreen_module.graphql';
+import type { PhotoWithTextAndTitleEditionMobileScreenQuery } from '#relayArtifacts/PhotoWithTextAndTitleEditionMobileScreenQuery.graphql';
+import type { PhotoWithTextAndTitleEditionScreen_module$key } from '#relayArtifacts/PhotoWithTextAndTitleEditionScreen_module.graphql';
 import type { PreloadedQuery } from 'react-relay';
 
 type PhotoWithTextAndTitleEditionMobileScreenProps = {
@@ -24,12 +24,19 @@ const PhotoWithTextAndTitleEditionMobileScreen = ({
   moduleId,
   preloadedQuery,
 }: PhotoWithTextAndTitleEditionMobileScreenProps) => {
-  const data = usePreloadedQuery(PhotoWithTextAndTitleQuery, preloadedQuery);
+  const { profile } = usePreloadedQuery(
+    PhotoWithTextAndTitleQuery,
+    preloadedQuery,
+  );
+
+  if (!profile) {
+    return null;
+  }
 
   let module: PhotoWithTextAndTitleEditionScreen_module$key | null = null;
   if (moduleId != null) {
     module =
-      data.viewer.profile?.cardModules.find(
+      profile?.webCard?.cardModules.find(
         module =>
           module?.id === moduleId &&
           module?.kind === MODULE_KIND_PHOTO_WITH_TEXT_AND_TITLE,
@@ -40,19 +47,21 @@ const PhotoWithTextAndTitleEditionMobileScreen = ({
   }
 
   return (
-    <PhotoWithTextAndTitleEditionScreen module={module} viewer={data.viewer} />
+    <PhotoWithTextAndTitleEditionScreen module={module} profile={profile} />
   );
 };
 
 const PhotoWithTextAndTitleQuery = graphql`
-  query PhotoWithTextAndTitleEditionMobileScreenQuery {
-    viewer {
-      ...PhotoWithTextAndTitleEditionScreen_viewer
-      profile {
-        cardModules {
-          id
-          kind
-          ...PhotoWithTextAndTitleEditionScreen_module
+  query PhotoWithTextAndTitleEditionMobileScreenQuery($profileId: ID!) {
+    profile: node(id: $profileId) {
+      ... on Profile {
+        ...PhotoWithTextAndTitleEditionScreen_profile
+        webCard {
+          cardModules {
+            id
+            kind
+            ...PhotoWithTextAndTitleEditionScreen_module
+          }
         }
       }
     }

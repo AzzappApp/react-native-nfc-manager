@@ -18,6 +18,7 @@ import { IconButton, Box, Button, Typography } from '@mui/material';
 import { uniqBy } from 'lodash';
 import { useEffect, useState } from 'react';
 import { getImageURL } from '@azzapp/shared/imagesHelpers';
+import LottiePlayer from './LottiePlayer';
 import type { DragStartEvent, DragEndEvent } from '@dnd-kit/core';
 import type { BoxProps } from '@mui/material';
 import type { ChangeEvent } from 'react';
@@ -26,7 +27,7 @@ type MediasListInputProps = Omit<BoxProps, 'onChange'> & {
   name: string;
   label?: string;
   value: Array<File | string> | null | undefined;
-  kind?: 'image' | 'mixed' | 'video';
+  accept: string;
   error?: boolean | null;
   helperText?: string | null;
   canAdd?: boolean;
@@ -37,7 +38,7 @@ const MediasListInput = ({
   name,
   label,
   value,
-  kind = 'mixed',
+  accept,
   error,
   helperText,
   onChange,
@@ -126,13 +127,7 @@ const MediasListInput = ({
           <input
             name={name}
             type="file"
-            accept={
-              kind === 'image'
-                ? 'image/*'
-                : kind === 'video'
-                ? 'video/*'
-                : 'video/*,image/*'
-            }
+            accept={accept}
             onChange={handleImageUpload}
             multiple
             hidden
@@ -169,7 +164,13 @@ export const SortableItem: React.FC<SortableItemProps> = ({
   const [src, setSrc] = useState<string | null>(null);
 
   const kind =
-    image instanceof File && image.type.startsWith('video') ? 'video' : 'image';
+    image instanceof File
+      ? image.type === 'application/json'
+        ? 'lottie'
+        : image.type.startsWith('video')
+        ? 'video'
+        : 'image'
+      : 'image';
 
   useEffect(() => {
     let urlToClean: string | null = null;
@@ -194,7 +195,18 @@ export const SortableItem: React.FC<SortableItemProps> = ({
 
   return (
     <Box ref={setNodeRef} style={{ ...style, position: 'relative' }}>
-      {kind === 'video' ? (
+      {kind === 'lottie' ? (
+        src && (
+          <LottiePlayer
+            src={src}
+            autoplay
+            loop
+            tintColor="#FF0000"
+            {...attributes}
+            {...listeners}
+          />
+        )
+      ) : kind === 'video' ? (
         <video
           src={src!}
           style={{ maxWidth: 120 }}

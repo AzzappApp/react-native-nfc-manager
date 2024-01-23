@@ -10,7 +10,7 @@ import CardModuleBackground from './CardModuleBackground';
 import type {
   HorizontalPhotoRenderer_module$data,
   HorizontalPhotoRenderer_module$key,
-} from '@azzapp/relay/artifacts/HorizontalPhotoRenderer_module.graphql';
+} from '#relayArtifacts/HorizontalPhotoRenderer_module.graphql';
 import type { CardStyle, ColorPalette } from '@azzapp/shared/cardHelpers';
 import type { NullableFields } from '@azzapp/shared/objectHelpers';
 import type { StyleProp, ViewProps, ViewStyle } from 'react-native';
@@ -19,14 +19,8 @@ const HorizontalPhotoRendererFragment = graphql`
   fragment HorizontalPhotoRenderer_module on CardModuleHorizontalPhoto
   @inline
   @argumentDefinitions(
-    screenWidth: {
-      type: "Float!"
-      provider: "../providers/ScreenWidth.relayprovider"
-    }
-    pixelRatio: {
-      type: "Float!"
-      provider: "../providers/PixelRatio.relayprovider"
-    }
+    screenWidth: { type: "Float!", provider: "ScreenWidth.relayprovider" }
+    pixelRatio: { type: "Float!", provider: "PixelRatio.relayprovider" }
   ) {
     borderWidth
     borderRadius
@@ -144,18 +138,3 @@ const HorizontalPhotoRenderer = ({
 };
 
 export default HorizontalPhotoRenderer;
-
-export const measureHorizontalPhotoHeight = async (
-  data: HorizontalPhotoRendererData,
-  cardStyle: CardStyle,
-  _maxWidth: number,
-) => {
-  const { marginVertical, imageHeight } = getModuleDataValues({
-    data,
-    cardStyle,
-    defaultValues: HORIZONTAL_PHOTO_DEFAULT_VALUES,
-    styleValuesMap: HORIZONTAL_PHOTO_STYLE_VALUES,
-  });
-
-  return marginVertical * 2 + imageHeight;
-};

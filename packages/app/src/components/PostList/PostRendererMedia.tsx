@@ -5,7 +5,7 @@ import { colors } from '#theme';
 import { MediaImageRenderer, MediaVideoRenderer } from '#components/medias';
 import Icon from '#ui/Icon';
 import type { MediaVideoRendererHandle } from '#components/medias';
-import type { PostRendererMediaFragment_post$key } from '@azzapp/relay/artifacts/PostRendererMediaFragment_post.graphql';
+import type { PostRendererMediaFragment_post$key } from '#relayArtifacts/PostRendererMediaFragment_post.graphql';
 import type { ForwardedRef } from 'react';
 import type { ViewProps, HostComponent } from 'react-native';
 
@@ -76,25 +76,16 @@ const PostRendererMedia = (
     graphql`
       fragment PostRendererMediaFragment_post on Post
       @argumentDefinitions(
-        screenWidth: {
-          type: "Float!"
-          provider: "../providers/ScreenWidth.relayprovider"
-        }
-        postWith: {
-          type: "Float!"
-          provider: "../providers/PostWidth.relayprovider"
-        }
+        screenWidth: { type: "Float!", provider: "ScreenWidth.relayprovider" }
+        postWith: { type: "Float!", provider: "PostWidth.relayprovider" }
         cappedPixelRatio: {
           type: "Float!"
-          provider: "../providers/CappedPixelRatio.relayprovider"
+          provider: "CappedPixelRatio.relayprovider"
         }
-        pixelRatio: {
-          type: "Float!"
-          provider: "../providers/PixelRatio.relayprovider"
-        }
+        pixelRatio: { type: "Float!", provider: "PixelRatio.relayprovider" }
         videoPixelRatio: {
           type: "Float!"
-          provider: "../providers/VideoPixelRatio.relayprovider"
+          provider: "VideoPixelRatio.relayprovider"
         }
       ) {
         media {

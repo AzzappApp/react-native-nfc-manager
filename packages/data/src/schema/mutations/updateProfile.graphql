@@ -1,18 +1,35 @@
 extend type Mutation {
+  """
+  Updates a profile.
+  """
   updateProfile(input: UpdateProfileInput!): UpdateProfilePayload
 }
 
-
-
 input UpdateProfileInput {
-  firstName: String
-  lastName: String
-  profileKind: ProfileKind
-  companyName: String
-  profileCategoryId: ID
-  companyActivityId: ID
+  """
+  The ID of the profile to update.
+  """
+  profileId: ID!
+  """
+  The new profile role.
+  """
+  profileRole: ProfileRole
+  """
+  The new profile contact card content.
+  """
+  contactCard: ContactCardInput
+  """
+  The new profile avatar ID.
+  """
+  avatarId: ID
 }
 
+
+
+
 type UpdateProfilePayload {
+  """
+  The updated profile.
+  """
   profile: Profile
 }

@@ -72,7 +72,7 @@ export const updateCardStyle = async (
 
 /**
  * Return a list of card styles. filtered by profile kind and template kind
- * @param profileKind the profile kind to filter by
+ * @param webCardKind the profile kind to filter by
  * @param templateKind the template kind to filter by
  * @param randomSeed the random seed to use for random ordering
  * @param offset the offset to use for pagination

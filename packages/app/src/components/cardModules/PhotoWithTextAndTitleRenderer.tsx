@@ -7,12 +7,11 @@ import {
   PHOTO_WITH_TEXT_AND_TITLE_STYLE_VALUES,
   getModuleDataValues,
 } from '@azzapp/shared/cardModuleHelpers';
-import measureText from '#helpers/measureText';
 import CardModuleBackground from './CardModuleBackground';
 import type {
   PhotoWithTextAndTitleRenderer_module$data,
   PhotoWithTextAndTitleRenderer_module$key,
-} from '@azzapp/relay/artifacts/PhotoWithTextAndTitleRenderer_module.graphql';
+} from '#relayArtifacts/PhotoWithTextAndTitleRenderer_module.graphql';
 import type { CardStyle, ColorPalette } from '@azzapp/shared/cardHelpers';
 import type { NullableFields } from '@azzapp/shared/objectHelpers';
 import type {
@@ -27,14 +26,8 @@ const PhotoWithTextAndTitleRendererFragment = graphql`
   fragment PhotoWithTextAndTitleRenderer_module on CardModulePhotoWithTextAndTitle
   @inline
   @argumentDefinitions(
-    screenWidth: {
-      type: "Float!"
-      provider: "../providers/ScreenWidth.relayprovider"
-    }
-    pixelRatio: {
-      type: "Float!"
-      provider: "../providers/PixelRatio.relayprovider"
-    }
+    screenWidth: { type: "Float!", provider: "ScreenWidth.relayprovider" }
+    pixelRatio: { type: "Float!", provider: "PixelRatio.relayprovider" }
   ) {
     image {
       id
@@ -271,69 +264,3 @@ const PhotoWithTextAndTitleRenderer = ({
 };
 
 export default PhotoWithTextAndTitleRenderer;
-
-export const measurePhotoWithTextAndTitleHeight = async (
-  data: PhotoWithTextAndTitleRendererData,
-  cardStyle: CardStyle,
-  maxWidth: number,
-) => {
-  const {
-    contentFontFamily,
-    contentFontSize,
-    contentVerticalSpacing,
-    content,
-    titleFontFamily,
-    titleFontSize,
-    titleVerticalSpacing,
-    title,
-    imageMargin,
-    gap,
-    marginHorizontal,
-    marginVertical,
-    aspectRatio,
-  } = getModuleDataValues({
-    data,
-    cardStyle,
-    styleValuesMap: PHOTO_WITH_TEXT_AND_TITLE_STYLE_VALUES,
-    defaultValues: PHOTO_WITH_TEXT_AND_TITLE_DEFAULT_VALUES,
-  });
-
-  const titleHeight = title
-    ? await measureText({
-        text: title ?? '',
-        fontFamily: titleFontFamily ?? undefined,
-        fontSize: titleFontSize,
-        width: maxWidth - (marginHorizontal ?? 0) * 2,
-        lineHeight:
-          titleFontSize && titleVerticalSpacing
-            ? titleFontSize * 1.2 + titleVerticalSpacing
-            : undefined,
-      })
-    : 0;
-
-  const contentHeight = content
-    ? await measureText({
-        text: content ?? '',
-        fontFamily: contentFontFamily ?? undefined,
-        fontSize: contentFontSize,
-        width: maxWidth - (marginHorizontal ?? 0) * 2,
-        lineHeight:
-          contentFontSize && contentVerticalSpacing
-            ? contentFontSize * 1.2 + contentVerticalSpacing
-            : undefined,
-      })
-    : 0;
-
-  const imageHeight =
-    (maxWidth - (imageMargin === 'width_full' ? 0 : marginHorizontal * 2)) /
-    aspectRatio;
-
-  return (
-    marginVertical * 2 +
-    gap +
-    titleHeight +
-    contentHeight +
-    (content != null ? 7 : 0) +
-    imageHeight
-  );
-};

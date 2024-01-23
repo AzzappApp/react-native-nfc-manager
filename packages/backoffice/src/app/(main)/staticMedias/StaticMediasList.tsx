@@ -2,9 +2,10 @@
 import { Box, Button, Dialog, DialogContent, Typography } from '@mui/material';
 import { useOptimistic, useState } from 'react';
 import { uploadMedia } from '@azzapp/shared/WebAPI';
-import { getSignedUpload } from '#app/mediaActions';
+import { getMediaFileKind } from '#helpers/fileHelpers';
 import {
   addStaticMedias,
+  getStaticMediaSignedUpload,
   reorderStaticMedias,
   setStaticMediaEnabled,
 } from './staticMediaActions';
@@ -71,23 +72,26 @@ const StaticMediasList = ({ staticMedias }: StaticMediasListProps) => {
     setUploading(true);
     try {
       const mediaToUploads = await Promise.all(
-        medias.map(async media => ({
-          media,
-          ...(await getSignedUpload(
-            'image',
-            addingMediaUsage !== 'moduleBackground' ? 'cover' : null,
-          )),
-        })),
+        medias.map(async media => {
+          const kind = getMediaFileKind(media);
+          return {
+            media,
+            kind,
+            ...(await getStaticMediaSignedUpload(kind, addingMediaUsage!)),
+          } as const;
+        }),
       );
       const mediaIds = await Promise.all(
-        mediaToUploads.map(async ({ media, uploadParameters, uploadURL }) => {
-          const { public_id } = await uploadMedia(
-            media,
-            uploadURL,
-            uploadParameters,
-          ).promise;
-          return public_id as string;
-        }),
+        mediaToUploads.map(
+          async ({ media, kind, uploadParameters, uploadURL }) => {
+            const { public_id } = await uploadMedia(
+              media,
+              uploadURL,
+              uploadParameters,
+            ).promise;
+            return { id: public_id as string, kind };
+          },
+        ),
       );
 
       await addStaticMedias({
@@ -167,6 +171,7 @@ const StaticMediasList = ({ staticMedias }: StaticMediasListProps) => {
             handleClose={() => setAddingMediaUsage(null)}
             onAdd={saveMedias}
             error={saveError}
+            usage={addingMediaUsage}
           />
         )}
 

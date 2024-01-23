@@ -10,7 +10,8 @@ import { colors } from '#theme';
 import Icon from '#ui/Icon';
 import PressableOpacity from '#ui/PressableOpacity';
 import Text from '#ui/Text';
-import type { HomeProfileLink_user$key } from '@azzapp/relay/artifacts/HomeProfileLink_user.graphql';
+import type { HomeProfileLink_user$key } from '#relayArtifacts/HomeProfileLink_user.graphql';
+
 import type { SharedValue } from 'react-native-reanimated';
 
 type HomeProfileLinkProps = {
@@ -23,12 +24,14 @@ const HomeProfileLink = ({
   currentProfileIndexSharedValue,
   user: userKey,
 }: HomeProfileLinkProps) => {
-  const user = useFragment(
+  const { profiles } = useFragment(
     graphql`
       fragment HomeProfileLink_user on User {
         profiles {
-          id
-          userName
+          webCard {
+            id
+            userName
+          }
         }
       }
     `,
@@ -36,8 +39,8 @@ const HomeProfileLink = ({
   );
 
   const userNames = useMemo(
-    () => user?.profiles?.map(p => p.userName) ?? [],
-    [user?.profiles],
+    () => profiles?.map(p => p.webCard.userName) ?? [],
+    [profiles],
   );
 
   const opacityStyle = useAnimatedStyle(() => {
@@ -65,7 +68,11 @@ const HomeProfileLink = ({
 
   return (
     <Animated.View style={[styles.container, opacityStyle]}>
-      <PressableOpacity accessibilityRole="button" onPress={onPress}>
+      <PressableOpacity
+        accessibilityRole="button"
+        onPress={onPress}
+        disabled={currentProfileIndex === -1}
+      >
         <View style={styles.containerText}>
           <Icon icon="earth" style={styles.iconLink} />
           <Text variant="button" numberOfLines={1} style={styles.url}>
@@ -87,7 +94,7 @@ export const PROFILE_LINK_MARGIN_TOP = 21;
 const styles = StyleSheet.create({
   container: {
     height: PROFILE_LINK_HEIGHT,
-    wdith: '100%',
+    width: '100%',
     alignItems: 'center',
     marginTop: PROFILE_LINK_MARGIN_TOP,
   },

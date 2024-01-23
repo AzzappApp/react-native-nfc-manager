@@ -1,40 +1,46 @@
 import { inArray } from 'drizzle-orm';
 import { GraphQLError } from 'graphql';
-import { fromGlobalId } from 'graphql-relay';
 import { omit } from 'lodash';
 import { DEFAULT_CARD_STYLE } from '@azzapp/shared/cardHelpers';
 import ERRORS from '@azzapp/shared/errors';
+import { isEditor } from '@azzapp/shared/profileHelpers';
 import {
   CardModuleTable,
   db,
   getCardModules,
   getCardStyleById,
   getCardTemplateById,
+  getUserProfileWithWebCardId,
   referencesMedias,
   updateProfile,
+  updateWebCard,
 } from '#domains';
+import fromGlobalIdWithType from '#helpers/relayIdHelpers';
 import { MODULES_SAVE_RULES } from './ModulesMutationsResolvers';
 import type { MutationResolvers } from '#schema/__generated__/types';
 
 const loadCardTemplateMutation: MutationResolvers['loadCardTemplate'] = async (
   _,
-  { input: { cardTemplateId } },
-  { auth, loaders, cardUsernamesToRevalidate },
+  { input: { cardTemplateId: gqlCardTemplateID, webCardId: gqlWebCardId } },
+  { auth, cardUsernamesToRevalidate, loaders },
 ) => {
-  const { profileId } = auth;
-  if (!profileId) {
-    throw new GraphQLError(ERRORS.UNAUTORIZED);
-  }
-  const profile = await loaders.Profile.load(profileId);
-  if (!profile) {
-    throw new GraphQLError(ERRORS.UNAUTORIZED);
+  const { userId } = auth;
+  const webCardId = fromGlobalIdWithType(gqlWebCardId, 'WebCard');
+  const profile =
+    userId && (await getUserProfileWithWebCardId(userId, webCardId));
+
+  if (
+    !profile ||
+    !('profileRole' in profile && isEditor(profile.profileRole))
+  ) {
+    throw new GraphQLError(ERRORS.UNAUTHORIZED);
   }
 
-  const { type, id } = fromGlobalId(cardTemplateId);
-  if (type !== 'CardTemplate') {
-    throw new GraphQLError(ERRORS.INVALID_REQUEST);
-  }
-  const cardTemplate = await getCardTemplateById(id);
+  const cardTemplateId = fromGlobalIdWithType(
+    gqlCardTemplateID,
+    'CardTemplate',
+  );
+  const cardTemplate = await getCardTemplateById(cardTemplateId);
   if (!cardTemplate) {
     throw new GraphQLError(ERRORS.INVALID_REQUEST);
   }
@@ -44,7 +50,8 @@ const loadCardTemplateMutation: MutationResolvers['loadCardTemplate'] = async (
 
   try {
     await db.transaction(async trx => {
-      const currentModules = await getCardModules(profileId, true, trx);
+      const currentModules = await getCardModules(profile.webCardId, true, trx);
+
       const currentMedias = currentModules.flatMap(m => {
         const saveRules = MODULES_SAVE_RULES[m.kind];
         if (saveRules && 'getMedias' in saveRules) {
@@ -76,26 +83,36 @@ const loadCardTemplateMutation: MutationResolvers['loadCardTemplate'] = async (
         cardTemplate.modules.map(({ kind, data }, index) => ({
           kind,
           data,
-          profileId,
+          webCardId: profile.webCardId,
           position: index,
         })),
       );
 
-      const profileUpdates = {
+      const webCardUpdates = {
         cardStyle: omit(cardStyle, 'id', 'labels', 'enabled'),
         updatedAt: new Date(),
         lastCardUpdate: new Date(),
+      };
+
+      const userProfileUpdates = {
         lastContactCardUpdate: new Date(),
       };
-      await updateProfile(profileId, profileUpdates, trx);
+
+      await updateWebCard(profile.webCardId, webCardUpdates, trx);
+      await updateProfile(profile.id, userProfileUpdates, trx);
     });
   } catch (e) {
     console.error(e);
     throw new GraphQLError(ERRORS.INTERNAL_SERVER_ERROR);
   }
 
-  cardUsernamesToRevalidate.add(profile.userName);
-  return { profile };
+  const webCard = await loaders.WebCard.load(profile.webCardId);
+  if (!webCard) {
+    throw new GraphQLError(ERRORS.INTERNAL_SERVER_ERROR);
+  }
+
+  cardUsernamesToRevalidate.add(webCard.userName);
+  return { webCard };
 };
 
 export default loadCardTemplateMutation;

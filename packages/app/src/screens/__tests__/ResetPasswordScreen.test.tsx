@@ -59,7 +59,7 @@ describe('ChangePasswordScreen Screen', () => {
     await waitFor(() => {
       expect(
         screen.getByText(
-          'Password should contain at least 8 characters, a number, an uppercase letter and a lowercase letter',
+          'Password should contain at least 8 characters and at most 32 characters, a number, an uppercase letter and a lowercase letter',
         ),
       ).toBeTruthy();
     });
@@ -109,10 +109,10 @@ describe('ChangePasswordScreen Screen', () => {
     fireEvent.press(buttonComponent);
 
     await waitFor(() => {
-      expect(buttonComponent).toBeEnabled();
+      expect(changePasswordMock).toHaveBeenCalled();
     });
 
-    expect(changePasswordMock).toHaveBeenCalled();
+    expect(buttonComponent).toBeDisabled();
 
     cleanup();
   });

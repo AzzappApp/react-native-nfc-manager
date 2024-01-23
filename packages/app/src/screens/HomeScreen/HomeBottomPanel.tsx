@@ -1,19 +1,23 @@
+import { fromGlobalId } from 'graphql-relay';
 import { useState, memo, useMemo } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { StyleSheet, View } from 'react-native';
 import Animated, {
   interpolate,
+  runOnJS,
+  useAnimatedReaction,
   useAnimatedStyle,
   useDerivedValue,
 } from 'react-native-reanimated';
 import Toast from 'react-native-toast-message';
 import { commitMutation, graphql, useFragment } from 'react-relay';
+import { isAdmin } from '@azzapp/shared/profileHelpers';
 import { colors } from '#theme';
 import Link from '#components/Link';
-import { useMainTabBarVisiblilityController } from '#components/MainTabBar';
+import { useMainTabBarVisibilityController } from '#components/MainTabBar';
 import { getAuthState } from '#helpers/authStore';
+import { dispatchGlobalEvent } from '#helpers/globalEvents';
 import { getRelayEnvironment } from '#helpers/relayEnvironment';
-import useMultiActorEnvironmentPluralFragment from '#hooks/useMultiActorEnvironmentPluralFragment';
 import Button from '#ui/Button';
 import Icon from '#ui/Icon';
 import Text from '#ui/Text';
@@ -21,11 +25,18 @@ import HomeContactCard from './HomeContactCard';
 import HomeInformations from './HomeInformations';
 import HomeMenu, { HOME_MENU_HEIGHT } from './HomeMenu';
 import HomeStatistics from './HomeStatistics';
+import type { HomeBottomPanel_user$key } from '#relayArtifacts/HomeBottomPanel_user.graphql';
+import type { HomeBottomPanelAcceptInvitationMutation } from '#relayArtifacts/HomeBottomPanelAcceptInvitationMutation.graphql';
+import type { HomeBottomPanelAcceptOwnershipMutation } from '#relayArtifacts/HomeBottomPanelAcceptOwnershipMutation.graphql';
+import type {
+  HomeBottomPanelDeclineInvitationMutation,
+  HomeBottomPanelDeclineInvitationMutation$data,
+} from '#relayArtifacts/HomeBottomPanelDeclineInvitationMutation.graphql';
+import type { HomeBottomPanelDeclineOwnershipMutation } from '#relayArtifacts/HomeBottomPanelDeclineOwnershipMutation.graphql';
+import type { HomeBottomPanelPublishMutation } from '#relayArtifacts/HomeBottomPanelPublishMutation.graphql';
 import type { HOME_TAB } from './HomeMenu';
-import type { HomeBottomPanel_profiles$key } from '@azzapp/relay/artifacts/HomeBottomPanel_profiles.graphql';
-import type { HomeBottomPanel_user$key } from '@azzapp/relay/artifacts/HomeBottomPanel_user.graphql';
-import type { HomeBottomPanelPublishMutation } from '@azzapp/relay/artifacts/HomeBottomPanelPublishMutation.graphql';
 import type { SharedValue } from 'react-native-reanimated';
+import type { SelectorStoreUpdater } from 'relay-runtime';
 
 type HomeBottomPanelProps = {
   /**
@@ -41,9 +52,15 @@ type HomeBottomPanelProps = {
    * @type {SharedValue<number>}
    */
   currentProfileIndexSharedValue: SharedValue<number>;
-
+  /**
+   * the current profile index
+   *
+   * @type {number}
+   */
   currentProfileIndex: number;
 };
+
+// TODO the way of we handle the mutations has been made when multi-actor environment was used, we should refactor that
 
 const HomeBottomPanel = ({
   user: userKey,
@@ -57,34 +74,37 @@ const HomeBottomPanel = ({
       fragment HomeBottomPanel_user on User {
         ...HomeContactCard_user
         ...HomeInformations_user
-        ...HomeStatistics_user
         profiles {
           id
-          ...HomeBottomPanel_profiles
+          webCard {
+            id
+          }
+          invited
+          profileRole
+          promotedAsOwner
+          webCard {
+            id
+            userName
+            cardIsPublished
+            cardCover {
+              title
+            }
+            webCardCategory {
+              id
+            }
+            owner {
+              email
+              phoneNumber
+            }
+          }
+          ...HomeStatistics_profiles
         }
       }
     `,
     userKey,
   );
+  const { profiles } = user;
   const intl = useIntl();
-
-  const profiles = useMultiActorEnvironmentPluralFragment(
-    graphql`
-      fragment HomeBottomPanel_profiles on Profile {
-        id
-        userName
-        cardIsPublished
-        cardCover {
-          title
-        }
-        profileCategory {
-          id
-        }
-      }
-    `,
-    (profile: any) => profile.id,
-    user.profiles as readonly HomeBottomPanel_profiles$key[],
-  );
 
   const currentProfile = profiles?.[currentProfileIndex];
 
@@ -93,28 +113,47 @@ const HomeBottomPanel = ({
 
   //#region card publication
   const onPublish = () => {
-    const profileId = getAuthState().profileId;
-    if (!profileId || profileId !== currentProfile?.id) {
+    const { profileInfos } = getAuthState();
+
+    if (
+      !profileInfos ||
+      profileInfos.webCardId !== currentProfile?.webCard?.id
+    ) {
       return;
     }
-    const environment = getRelayEnvironment().forActor(profileId);
+    // using disable state with current profile show a disabled style during maybe one secdon
+    // (currentProfile is not animated so need to be updated)
+    // avoid adding a new interpolation by using this condition
+    if (!isAdmin(currentProfile.profileRole)) {
+      return;
+    }
+
+    const environment = getRelayEnvironment();
     const publishMutation = graphql`
-      mutation HomeBottomPanelPublishMutation @raw_response_type {
-        publishCard {
-          profile {
+      mutation HomeBottomPanelPublishMutation(
+        $input: ToggleWebCardPublishedInput!
+      ) @raw_response_type {
+        toggleWebCardPublished(input: $input) {
+          webCard {
             id
             cardIsPublished
           }
         }
       }
     `;
+
     commitMutation<HomeBottomPanelPublishMutation>(environment, {
       mutation: publishMutation,
-      variables: {},
+      variables: {
+        input: {
+          webCardId: currentProfile.webCard.id,
+          published: true,
+        },
+      },
       optimisticResponse: {
-        publishCard: {
-          profile: {
-            id: profileId,
+        toggleWebCardPublished: {
+          webCard: {
+            id: currentProfile.webCard.id,
             cardIsPublished: true,
           },
         },
@@ -129,11 +168,11 @@ const HomeBottomPanel = ({
           type: 'success',
           text1: intl.formatMessage(
             {
-              defaultMessage: 'Your WebCard{azzappAp} has been published.',
+              defaultMessage: 'Your WebCard{azzappA} has been published.',
               description: 'Home Screen - webcard published toast',
             },
             {
-              azzappAp: <Text variant="azzapp">a</Text>,
+              azzappA: <Text variant="azzapp">a</Text>,
             },
           ) as string,
         });
@@ -145,12 +184,12 @@ const HomeBottomPanel = ({
           text1: intl.formatMessage(
             {
               defaultMessage:
-                'Error, could not publish your WebCard{azzappAp}, please try again later',
+                'Error, could not publish your WebCard{azzappA}, please try again later',
               description:
                 'Error message displayed when the publication of the webcard failed in Home Screen',
             },
             {
-              azzappAp: <Text variant="azzapp">a</Text>,
+              azzappA: <Text variant="azzapp">a</Text>,
             },
           ) as string,
         });
@@ -159,15 +198,229 @@ const HomeBottomPanel = ({
   };
   //#endregion
 
+  const onAcceptInvitation = () => {
+    const webCardId = getAuthState().profileInfos?.webCardId;
+    if (!webCardId || webCardId !== currentProfile?.webCard?.id) {
+      return;
+    }
+    const environment = getRelayEnvironment();
+
+    const acceptInvitationMutation = graphql`
+      mutation HomeBottomPanelAcceptInvitationMutation(
+        $input: AcceptInvitationInput!
+      ) @raw_response_type {
+        acceptInvitation(input: $input) {
+          profile {
+            id
+            invited
+          }
+        }
+      }
+    `;
+
+    commitMutation<HomeBottomPanelAcceptInvitationMutation>(environment, {
+      mutation: acceptInvitationMutation,
+      variables: {
+        input: {
+          profileId: currentProfile.id,
+        },
+      },
+      optimisticResponse: {
+        acceptInvitation: {
+          profile: {
+            id: currentProfile.id,
+            invited: false,
+          },
+        },
+      },
+    });
+  };
+
+  const onDeclineInvitation = (profileId: string) => {
+    const environment = getRelayEnvironment();
+
+    const declineInvitationMutation = graphql`
+      mutation HomeBottomPanelDeclineInvitationMutation(
+        $input: DeclineInvitationInput!
+      ) {
+        declineInvitation(input: $input) {
+          profileId
+        }
+      }
+    `;
+
+    const { id } = fromGlobalId(profileId);
+
+    const updater: SelectorStoreUpdater<
+      HomeBottomPanelDeclineInvitationMutation$data
+    > = store => {
+      const root = store.getRoot();
+
+      const user = root.getLinkedRecord('currentUser');
+
+      const profiles = user?.getLinkedRecords('profiles');
+
+      user?.setLinkedRecords(
+        profiles?.filter(p => p.getDataID() !== profileId) ?? [],
+        'profiles',
+      );
+      root.setLinkedRecord(user, 'currentUser');
+    };
+
+    commitMutation<HomeBottomPanelDeclineInvitationMutation>(environment, {
+      mutation: declineInvitationMutation,
+      variables: { input: { profileId: id } },
+      optimisticUpdater: updater,
+      updater,
+    });
+  };
+
+  const onAcceptOwnership = () => {
+    const webCardId = getAuthState().profileInfos?.webCardId;
+
+    if (!webCardId || webCardId !== currentProfile?.webCard?.id) {
+      return;
+    }
+    const environment = getRelayEnvironment();
+
+    const acceptOwnershipMutation = graphql`
+      mutation HomeBottomPanelAcceptOwnershipMutation(
+        $input: AcceptOwnershipInput!
+      ) @raw_response_type {
+        acceptOwnership(input: $input) {
+          profile {
+            id
+            profileRole
+            promotedAsOwner
+          }
+        }
+      }
+    `;
+
+    commitMutation<HomeBottomPanelAcceptOwnershipMutation>(environment, {
+      mutation: acceptOwnershipMutation,
+      variables: {
+        input: {
+          profileId: currentProfile.id,
+        },
+      },
+      optimisticResponse: {
+        acceptOwnership: {
+          profile: {
+            id: currentProfile.id,
+            profileRole: 'owner',
+            promotedAsOwner: false,
+          },
+        },
+      },
+      onCompleted: (data, error) => {
+        if (!error) {
+          if (data.acceptOwnership?.profile?.profileRole) {
+            void dispatchGlobalEvent({
+              type: 'PROFILE_ROLE_CHANGE',
+              payload: {
+                profileRole: data.acceptOwnership.profile.profileRole,
+              },
+            });
+          }
+        }
+      },
+    });
+  };
+
+  const onDeclineOwnership = (profileId: string) => {
+    const webCardId = getAuthState().profileInfos?.webCardId;
+
+    if (!webCardId || webCardId !== currentProfile?.webCard?.id) {
+      return;
+    }
+
+    const environment = getRelayEnvironment();
+
+    const declineInvitationMutation = graphql`
+      mutation HomeBottomPanelDeclineOwnershipMutation(
+        $input: DeclineOwnershipInput!
+      ) @raw_response_type {
+        declineOwnership(input: $input) {
+          profile {
+            id
+            promotedAsOwner
+          }
+        }
+      }
+    `;
+
+    const { id } = fromGlobalId(profileId);
+
+    commitMutation<HomeBottomPanelDeclineOwnershipMutation>(environment, {
+      mutation: declineInvitationMutation,
+      variables: { input: { profileId: id } },
+      optimisticResponse: {
+        declineOwnership: {
+          profile: {
+            id: profileId,
+            promotedAsOwner: false,
+          },
+        },
+      },
+    });
+  };
+
   //#region panels visibility
   const profilesHasCover = useMemo(
-    () => profiles?.map(profile => (profile?.cardCover ? 1 : 0)) ?? [],
+    () => profiles?.map(profile => (profile?.webCard?.cardCover ? 1 : 0)) ?? [],
     [profiles],
   );
 
-  const profilesWebcCardPublished = useMemo(
-    () => profiles?.map(profile => (profile?.cardIsPublished ? 1 : 0)) ?? [],
+  const profilesWebCardPublished = useMemo(
+    () =>
+      profiles?.map(profile => (profile?.webCard?.cardIsPublished ? 1 : 0)) ??
+      [],
     [profiles],
+  );
+
+  const profilesIsInvitation = useMemo(
+    () => profiles?.map(profile => (profile?.invited ? 1 : 0)) ?? [],
+    [profiles],
+  );
+
+  const profilesIsAdmin = useMemo(
+    () =>
+      profiles?.map(profile =>
+        profile?.profileRole === 'owner' || profile?.profileRole === 'admin'
+          ? 1
+          : 0,
+      ) ?? [],
+    [profiles],
+  );
+
+  const profilesIsPromotedAsOwner = useMemo(
+    () => profiles?.map(profile => (profile?.promotedAsOwner ? 1 : 0)) ?? [],
+    [profiles],
+  );
+
+  const webCardOwnerName = useMemo(
+    () =>
+      profiles?.map(profile => ({
+        email: profile?.webCard?.owner?.email ?? '',
+        company: profile?.webCard?.userName ?? '',
+      })) ?? [],
+    [profiles],
+  );
+
+  const [invitationLabel, setInvitationLabel] = useState<{
+    company: string;
+    email: string;
+  }>({ company: '', email: '' });
+
+  //Formatted message does not handle well using SharedValue for dynamic content
+  useAnimatedReaction(
+    () => currentProfileIndexSharedValue.value,
+    actual => {
+      const index = Math.round(actual);
+      runOnJS(setInvitationLabel)(webCardOwnerName[index]);
+    },
+    [],
   );
 
   const panelVisibilities = useDerivedValue(() => {
@@ -177,8 +430,15 @@ const HomeBottomPanel = ({
 
     const prevHasWebCover = !!profilesHasCover[prev];
     const nextHasWebCover = !!profilesHasCover[next];
-    const prevWebCardPublished = !!profilesWebcCardPublished[prev];
-    const nextWebCardPublished = !!profilesWebcCardPublished[next];
+    const prevWebCardPublished = !!profilesWebCardPublished[prev];
+    const nextWebCardPublished = !!profilesWebCardPublished[next];
+    const prevIsInvitation = !!profilesIsInvitation[prev];
+    const nextIsInvitation = !!profilesIsInvitation[next];
+    const prevIsPromotedAsOwner = !!profilesIsPromotedAsOwner[prev];
+    const nextIsPromotedAsOwner = !!profilesIsPromotedAsOwner[next];
+    const prevIsAdmin = !!profilesIsAdmin[prev];
+    const nextIsAdmin = !!profilesIsAdmin[next];
+
     const prevIsNewProfile = prev === -1;
 
     let missingCoverPanelVisible = 0;
@@ -199,17 +459,47 @@ const HomeBottomPanel = ({
       currentProfileIndexSharedValue.value,
       [prev, next],
       [
-        prevIsNewProfile || prevWebCardPublished || !prevHasWebCover ? 0 : 1,
-        nextWebCardPublished || !nextHasWebCover ? 0 : 1,
+        prevIsNewProfile ||
+        prevWebCardPublished ||
+        !prevHasWebCover ||
+        prevIsInvitation
+          ? 0
+          : 1,
+        nextWebCardPublished || !nextHasWebCover || nextIsInvitation ? 0 : 1,
       ],
+    );
+
+    const webCardPublishButtonVisible = interpolate(
+      currentProfileIndexSharedValue.value,
+      [prev, prev + 0.2, next - 0.2, next],
+      [prevIsAdmin ? 1 : 0, 0, 0, nextIsAdmin ? 1 : 0],
+    );
+
+    const invitationPanelVisible = interpolate(
+      currentProfileIndexSharedValue.value,
+      [prev, next],
+      [prevIsInvitation ? 1 : 0, nextIsInvitation ? 1 : 0],
+    );
+
+    const promotionPanelVisible = interpolate(
+      currentProfileIndexSharedValue.value,
+      [prev, next],
+      [prevIsPromotedAsOwner ? 1 : 0, nextIsPromotedAsOwner ? 1 : 0],
     );
 
     let bottomPanelVisible = interpolate(
       currentProfileIndexSharedValue.value,
       [prev, next],
       [
-        prevIsNewProfile || !prevWebCardPublished ? 0 : 1,
-        nextWebCardPublished ? 1 : 0,
+        prevIsNewProfile ||
+        !prevWebCardPublished ||
+        prevIsInvitation ||
+        prevIsPromotedAsOwner
+          ? 0
+          : 1,
+        nextWebCardPublished && !nextIsInvitation && !nextIsPromotedAsOwner
+          ? 1
+          : 0,
       ],
     );
 
@@ -222,6 +512,9 @@ const HomeBottomPanel = ({
       missingCoverPanelVisible,
       webCardPublishPanelVisible,
       bottomPanelVisible,
+      invitationPanelVisible,
+      promotionPanelVisible,
+      webCardPublishButtonVisible,
     };
   });
 
@@ -253,6 +546,21 @@ const HomeBottomPanel = ({
     zIndex: panelVisibilities.value.webCardPublishPanelVisible,
   }));
 
+  const invitationPanelStyle = useAnimatedStyle(() => ({
+    opacity: panelVisibilities.value.invitationPanelVisible,
+    zIndex: panelVisibilities.value.invitationPanelVisible,
+  }));
+
+  const promotionPanelStyle = useAnimatedStyle(() => ({
+    opacity: panelVisibilities.value.promotionPanelVisible,
+    zIndex: panelVisibilities.value.promotionPanelVisible,
+  }));
+
+  const webCardPublishButtonStyle = useAnimatedStyle(() => ({
+    opacity: panelVisibilities.value.webCardPublishButtonVisible,
+    zIndex: panelVisibilities.value.webCardPublishButtonVisible,
+  }));
+
   const bottomPanelStyle = useAnimatedStyle(() => ({
     opacity: panelVisibilities.value.bottomPanelVisible,
   }));
@@ -260,7 +568,7 @@ const HomeBottomPanel = ({
   const mainTabBarVisible = useDerivedValue(
     () => panelVisibilities.value.bottomPanelVisible,
   );
-  useMainTabBarVisiblilityController(mainTabBarVisible);
+  useMainTabBarVisibilityController(mainTabBarVisible);
   //#endregion
 
   const panelHeight = height - HOME_MENU_HEIGHT;
@@ -270,10 +578,10 @@ const HomeBottomPanel = ({
       <Animated.View style={[styles.informationPanel, newCardPanelStyle]}>
         <Text variant="large" style={{ color: colors.white }}>
           <FormattedMessage
-            defaultMessage="Create a new WebCard{azzappAp}"
+            defaultMessage="Create a new WebCard{azzappA}"
             description="Home Screen - Create a new WebCard"
             values={{
-              azzappAp: (
+              azzappA: (
                 <Text variant="azzapp" style={styles.icon}>
                   a
                 </Text>
@@ -283,10 +591,10 @@ const HomeBottomPanel = ({
         </Text>
         <Text variant="medium" style={styles.informationText}>
           <FormattedMessage
-            defaultMessage="Introduce yourself in a new way by creating your own WebCard{azzappAp}."
+            defaultMessage="Introduce yourself in a new way by creating your own WebCard{azzappA}."
             description="Home Screen - Create a new webcard description"
             values={{
-              azzappAp: (
+              azzappA: (
                 <Text variant="azzapp" style={styles.icon}>
                   a
                 </Text>
@@ -300,10 +608,10 @@ const HomeBottomPanel = ({
         <Icon icon="warning" style={styles.warningIcon} />
         <Text variant="large" style={{ color: colors.white }}>
           <FormattedMessage
-            defaultMessage="This WebCard{azzappAp} needs a cover"
+            defaultMessage="This WebCard{azzappA} needs a cover"
             description="Home Screen - Missing cover title"
             values={{
-              azzappAp: (
+              azzappA: (
                 <Text style={styles.icon} variant="azzapp">
                   a
                 </Text>
@@ -313,10 +621,10 @@ const HomeBottomPanel = ({
         </Text>
         <Text variant="medium" style={styles.informationText}>
           <FormattedMessage
-            defaultMessage="This WebCard{azzappAp} has no cover and can’t be published."
+            defaultMessage="This WebCard{azzappA} has no cover and can’t be published."
             description="Home Screen - Missing cover text"
             values={{
-              azzappAp: (
+              azzappA: (
                 <Text style={styles.icon} variant="azzapp">
                   a
                 </Text>
@@ -325,9 +633,11 @@ const HomeBottomPanel = ({
           />
         </Text>
         <Link
-          route="NEW_PROFILE"
+          route="NEW_WEBCARD"
           params={
-            currentProfile?.id ? { profileId: currentProfile.id } : undefined
+            currentProfile?.webCard?.id
+              ? { webCardId: currentProfile.webCard.id }
+              : undefined
           }
         >
           <Button
@@ -335,10 +645,10 @@ const HomeBottomPanel = ({
             appearance="dark"
             label={
               <FormattedMessage
-                defaultMessage="Create your WebCard{azzappAp} cover"
+                defaultMessage="Create your WebCard{azzappA} cover"
                 description="Home Screen - Missing cover button"
                 values={{
-                  azzappAp: (
+                  azzappA: (
                     <Text style={styles.icon} variant="azzapp">
                       a
                     </Text>
@@ -357,10 +667,10 @@ const HomeBottomPanel = ({
         <Icon icon="warning" style={styles.warningIcon} />
         <Text variant="large" style={{ color: colors.white }}>
           <FormattedMessage
-            defaultMessage="This WebCard{azzappAp} is not published"
+            defaultMessage="This WebCard{azzappA} is not published"
             description="Home Screen - webcard not published title"
             values={{
-              azzappAp: (
+              azzappA: (
                 <Text style={styles.icon} variant="azzapp">
                   a
                 </Text>
@@ -370,10 +680,10 @@ const HomeBottomPanel = ({
         </Text>
         <Text variant="medium" style={styles.informationText}>
           <FormattedMessage
-            defaultMessage="This WebCard{azzappAp} has not been published, nobody can see it for the moment."
+            defaultMessage="This WebCard{azzappA} has not been published, nobody can see it for the moment."
             description="Home Screen - webcard not published text"
             values={{
-              azzappAp: (
+              azzappA: (
                 <Text style={styles.icon} variant="azzapp">
                   a
                 </Text>
@@ -381,31 +691,134 @@ const HomeBottomPanel = ({
             }}
           />
         </Text>
-        <Button
-          variant="secondary"
-          appearance="dark"
-          label={
-            <FormattedMessage
-              defaultMessage="Publish this WebCard{azzappAp}"
-              description="Home Screen - webcard not published button"
-              values={{
-                azzappAp: (
-                  <Text style={styles.icon} variant="azzapp">
-                    a
-                  </Text>
-                ),
-              }}
-            />
-          }
-          style={styles.informationPanelButton}
-          onPress={onPublish}
-        />
+
+        <Animated.View style={webCardPublishButtonStyle}>
+          <Button
+            variant="secondary"
+            appearance="dark"
+            label={
+              <FormattedMessage
+                defaultMessage="Publish this WebCard{azzappA}"
+                description="Home Screen - webcard not published button"
+                values={{
+                  azzappA: (
+                    <Text style={styles.icon} variant="azzapp">
+                      a
+                    </Text>
+                  ),
+                }}
+              />
+            }
+            style={styles.informationPanelButton}
+            onPress={onPublish}
+          />
+        </Animated.View>
       </Animated.View>
 
+      <Animated.View style={[styles.informationPanel, invitationPanelStyle]}>
+        <Text variant="large" style={{ color: colors.white }}>
+          <FormattedMessage
+            defaultMessage="Invitation"
+            description="Home Screen - invitation title"
+          />
+        </Text>
+        <Text variant="medium" style={styles.informationText}>
+          <FormattedMessage
+            defaultMessage={`{email} invited you to the WebCard{azzappA} {company}`}
+            description="Home bottom panel invitation"
+            values={{
+              ...invitationLabel,
+              azzappA: (
+                <Text style={styles.icon} variant="azzapp">
+                  a
+                </Text>
+              ),
+            }}
+          />
+        </Text>
+        <View style={styles.invitationButtons}>
+          <Button
+            variant="primary"
+            appearance="dark"
+            label={
+              <FormattedMessage
+                defaultMessage="Accept invitation"
+                description="Home Screen - Accept invitation button"
+              />
+            }
+            style={styles.invitationPanelButton}
+            onPress={onAcceptInvitation}
+          />
+          <Button
+            variant="secondary"
+            appearance="dark"
+            label={
+              <FormattedMessage
+                defaultMessage="Decline invitation"
+                description="Home Screen - decline invitation button"
+              />
+            }
+            style={styles.invitationPanelButton}
+            onPress={() =>
+              currentProfile?.id && onDeclineInvitation(currentProfile.id)
+            }
+          />
+        </View>
+      </Animated.View>
+      <Animated.View style={[styles.informationPanel, promotionPanelStyle]}>
+        <Text variant="large" style={{ color: colors.white }}>
+          <FormattedMessage
+            defaultMessage="Ownership transfer request"
+            description="Home Screen - ownership transfer request title"
+          />
+        </Text>
+        <Text variant="medium" style={styles.informationText}>
+          <FormattedMessage
+            defaultMessage={`{email} wants to transfer the ownership of this WebCard{azzappA} to your`}
+            description="Home bottom panel transfer ownership request"
+            values={{
+              email: currentProfile?.webCard?.owner?.email ?? '',
+              azzappA: (
+                <Text style={styles.icon} variant="azzapp">
+                  a
+                </Text>
+              ),
+            }}
+          />
+        </Text>
+        <View style={styles.invitationButtons}>
+          <Button
+            variant="primary"
+            appearance="dark"
+            label={
+              <FormattedMessage
+                defaultMessage="Accept ownership"
+                description="Home Screen - Accept ownership button"
+              />
+            }
+            style={styles.invitationPanelButton}
+            onPress={onAcceptOwnership}
+          />
+          <Button
+            variant="secondary"
+            appearance="dark"
+            label={
+              <FormattedMessage
+                defaultMessage="Decline"
+                description="Home Screen - decline ownership button"
+              />
+            }
+            style={styles.invitationPanelButton}
+            onPress={() =>
+              currentProfile?.id && onDeclineOwnership(currentProfile.id)
+            }
+          />
+        </View>
+      </Animated.View>
       <Animated.View
         style={[styles.bottomPanel, bottomPanelStyle]}
         pointerEvents={
-          profilesWebcCardPublished[currentProfileIndex] === 1 ? 'auto' : 'none'
+          profilesWebCardPublished[currentProfileIndex] === 1 ? 'auto' : 'none'
         }
       >
         <HomeMenu selected={selectedPanel} setSelected={setSelectedPanel} />
@@ -419,9 +832,8 @@ const HomeBottomPanel = ({
         )}
         {selectedPanel === 'STATS' && (
           <HomeStatistics
-            user={user}
+            user={profiles!}
             height={panelHeight}
-            animated={selectedPanel === 'STATS'}
             currentProfileIndexSharedValue={currentProfileIndexSharedValue}
             currentUserIndex={currentProfileIndex}
           />
@@ -429,7 +841,6 @@ const HomeBottomPanel = ({
         {selectedPanel === 'INFORMATION' && (
           <HomeInformations
             user={user}
-            animated={selectedPanel === 'INFORMATION'}
             height={panelHeight}
             currentProfileIndexSharedValue={currentProfileIndexSharedValue}
           />
@@ -468,6 +879,10 @@ const styles = StyleSheet.create({
   },
   informationPanelButton: {
     marginTop: 30,
+  },
+  invitationButtons: { rowGap: 15, marginTop: 35 },
+  invitationPanelButton: {
+    minWidth: 250,
   },
   icon: {
     color: colors.white,

@@ -16,6 +16,8 @@ import {
   usePaginationFragment,
 } from 'react-relay';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
+import ERRORS from '@azzapp/shared/errors';
+import { isEditor } from '@azzapp/shared/profileHelpers';
 import { isNotFalsyString } from '@azzapp/shared/stringHelpers';
 import { colors } from '#theme';
 import AuthorCartouche from '#components/AuthorCartouche';
@@ -30,9 +32,9 @@ import Text from '#ui/Text';
 import CommentItem from './CommentItem';
 import DeletableCommentItem from './DeletableCommentItem';
 import PostCommentsScreenHeader from './PostCommentsScreenHeader';
-import type { AuthorCartoucheFragment_profile$key } from '@azzapp/relay/artifacts/AuthorCartoucheFragment_profile.graphql';
-import type { CommentItemFragment_comment$key } from '@azzapp/relay/artifacts/CommentItemFragment_comment.graphql';
-import type { PostCommentsList_comments$key } from '@azzapp/relay/artifacts/PostCommentsList_comments.graphql';
+import type { AuthorCartoucheFragment_webCard$key } from '#relayArtifacts/AuthorCartoucheFragment_webCard.graphql';
+import type { CommentItemFragment_comment$key } from '#relayArtifacts/CommentItemFragment_comment.graphql';
+import type { PostCommentsList_post$key } from '#relayArtifacts/PostCommentsList_post.graphql';
 import type {
   NativeSyntheticEvent,
   TextInputContentSizeChangeEventData,
@@ -44,13 +46,13 @@ type PostCommentsListProps = {
    *
    * @type {PostCommentsListQuery$key}
    */
-  viewer: AuthorCartoucheFragment_profile$key;
+  webCard: AuthorCartoucheFragment_webCard$key;
   /**
    *
    *
-   * @type {PostCommentsList_comments$key}
+   * @type {PostCommentsList_post$key}
    */
-  post: PostCommentsList_comments$key;
+  post: PostCommentsList_post$key;
   /**
    * the post id for the comments
    *
@@ -60,7 +62,7 @@ type PostCommentsListProps = {
 };
 
 const PostCommentsList = ({
-  viewer: viewerKey,
+  webCard: webCardKey,
   post: postKey,
   postId,
 }: PostCommentsListProps) => {
@@ -72,14 +74,11 @@ const PostCommentsList = ({
   const router = useRouter();
   const intl = useIntl();
   const auth = useAuthState();
-  const onClose = () => {
-    router.back();
-  };
 
   const { data, loadNext, refetch, hasNext, isLoadingNext } =
     usePaginationFragment(
       graphql`
-        fragment PostCommentsList_comments on Post
+        fragment PostCommentsList_post on Post
         @refetchable(queryName: "PostCommentsList_post_comments_connection")
         @argumentDefinitions(
           after: { type: String }
@@ -90,7 +89,7 @@ const PostCommentsList = ({
             edges {
               node {
                 id
-                author {
+                webCard {
                   id
                 }
                 ...CommentItemFragment_comment
@@ -136,37 +135,58 @@ const PostCommentsList = ({
   const onSubmit = () => {
     setSubmitting(true);
     if (!submitting) {
-      commit({
-        variables: {
-          input: { postId, comment },
-          connections: [connectionID],
-        },
-        onCompleted() {
-          setSubmitting(false);
-          setComment('');
-        },
-        updater: store => {
-          const post = store.get<{ counterComments: number }>(postId);
-          if (post) {
-            const counterComments = post?.getValue('counterComments');
+      if (isEditor(auth.profileInfos?.profileRole)) {
+        commit({
+          variables: {
+            input: { postId, comment, webCardId: auth.profileInfos?.webCardId },
+            connections: [connectionID],
+          },
+          onCompleted() {
+            setSubmitting(false);
+            setComment('');
+          },
+          updater: store => {
+            const post = store.get<{ counterComments: number }>(postId);
+            if (post) {
+              const counterComments = post?.getValue('counterComments');
 
-            if (typeof counterComments === 'number') {
-              post?.setValue(counterComments + 1, 'counterComments');
+              if (typeof counterComments === 'number') {
+                post?.setValue(counterComments + 1, 'counterComments');
+              }
             }
-          }
-        },
-        onError(error) {
-          console.error(error);
-          Toast.show({
-            type: 'error',
-            text1: intl.formatMessage({
-              defaultMessage:
-                'Error, could not save your comment, try again later',
-              description: 'Post comment screen - error toast',
-            }),
-          });
-        },
-      });
+          },
+          onError(error) {
+            if (error.message === ERRORS.UNPUBLISHED_WEB_CARD) {
+              Toast.show({
+                type: 'error',
+                text1: intl.formatMessage({
+                  defaultMessage: 'Error, the related webCard is unpublished',
+                  description:
+                    'Error when a user tries to comment a post from an unpublished webCard',
+                }),
+              });
+            } else {
+              console.error(error);
+              Toast.show({
+                type: 'error',
+                text1: intl.formatMessage({
+                  defaultMessage:
+                    'Error, could not save your comment, try again later',
+                  description: 'Post comment screen - error toast',
+                }),
+              });
+            }
+          },
+        });
+      } else {
+        Toast.show({
+          type: 'error',
+          text1: intl.formatMessage({
+            defaultMessage: 'Only admins & editors can comment a post',
+            description: 'Error message when trying to comment a post',
+          }),
+        });
+      }
     }
   };
 
@@ -207,14 +227,14 @@ const PostCommentsList = ({
     ({
       item,
     }: {
-      item: CommentItemFragment_comment$key & { author: { id: string } };
+      item: CommentItemFragment_comment$key & { webCard: { id: string } };
     }) => {
-      if (auth.profileId !== item.author.id) {
+      if (auth.profileInfos?.webCardId !== item.webCard.id) {
         return <CommentItem item={item} />;
       }
       return <DeletableCommentItem item={item} postId={postId} />;
     },
-    [auth.profileId, postId],
+    [auth.profileInfos?.webCardId, postId],
   );
 
   const insets = useScreenInsets();
@@ -241,7 +261,7 @@ const PostCommentsList = ({
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
         style={[styles.keyboardAreaView]}
       >
-        <PostCommentsScreenHeader onClose={onClose} />
+        <PostCommentsScreenHeader onClose={router.back} />
         <FlatList
           data={postComments}
           renderItem={renderItem}
@@ -255,7 +275,7 @@ const PostCommentsList = ({
         />
         <View style={styles.inputContainer}>
           <AuthorCartouche
-            author={viewerKey}
+            author={webCardKey}
             variant="post"
             hideUserName
             style={{ height: 48 }}

@@ -7,32 +7,32 @@ import {
   useRef,
   useState,
 } from 'react';
-import { useIntl } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 import {
   View,
   useWindowDimensions,
-  StyleSheet,
   PixelRatio,
   Platform,
+  StyleSheet,
 } from 'react-native';
 import { graphql, useFragment } from 'react-relay';
 import { COVER_CARD_RADIUS, COVER_RATIO } from '@azzapp/shared/coverHelpers';
 import { colors, shadow } from '#theme';
+import CoverErrorRenderer from '#components/CoverErrorRenderer';
 import CoverLink from '#components/CoverLink';
+import CoverLoadingIndicator from '#components/CoverLoadingIndicator';
 import CoverRenderer from '#components/CoverRenderer';
 import Link from '#components/Link';
 import { useScreenHasFocus } from '#components/NativeRouter';
-import Skeleton from '#components/Skeleton';
-import ProfileBoundRelayEnvironmentProvider from '#helpers/ProfileBoundRelayEnvironmentProvider';
 import CarouselSelectList from '#ui/CarouselSelectList';
 import Icon from '#ui/Icon';
 import PressableOpacity from '#ui/PressableOpacity';
-import type { CarouselSelectListHandle } from '#ui/CarouselSelectList';
 import type {
   HomeProfilesCarousel_user$key,
   HomeProfilesCarousel_user$data,
-} from '@azzapp/relay/artifacts/HomeProfilesCarousel_user.graphql';
-import type { HomeProfilesCarouselItem_profile$key } from '@azzapp/relay/artifacts/HomeProfilesCarouselItem_profile.graphql';
+} from '#relayArtifacts/HomeProfilesCarousel_user.graphql';
+import type { HomeProfilesCarouselItem_profile$key } from '#relayArtifacts/HomeProfilesCarouselItem_profile.graphql';
+import type { CarouselSelectListHandle } from '#ui/CarouselSelectList';
 import type { ArrayItemType } from '@azzapp/shared/arrayHelpers';
 import type { ForwardedRef } from 'react';
 import type { GestureResponderEvent, ListRenderItemInfo } from 'react-native';
@@ -79,7 +79,9 @@ const HomeProfilesCarousel = (
     graphql`
       fragment HomeProfilesCarousel_user on User {
         profiles {
-          id
+          webCard {
+            id
+          }
           ...HomeProfilesCarouselItem_profile
         }
       }
@@ -94,7 +96,9 @@ const HomeProfilesCarousel = (
       ? Math.trunc(coverHeight * COVER_RATIO) //roundToNearestPixel is not working fine on some IOS (i.eiphone 13 mini)
       : PixelRatio.roundToNearestPixel(coverHeight * COVER_RATIO);
   const carouselRef = useRef<CarouselSelectListHandle | null>(null);
-  const [selectedIndex, setSelectedIndex] = useState(initialProfileIndex + 1);
+  const [selectedIndex, setSelectedIndex] = useState(
+    profiles?.length ? initialProfileIndex + 1 : 0,
+  );
 
   const onSelectedIndexChange = useCallback(
     (index: number) => {
@@ -129,21 +133,19 @@ const HomeProfilesCarousel = (
     ({ item, index }: ListRenderItemInfo<ProfileType | null>) => {
       if (item) {
         return (
-          <ProfileBoundRelayEnvironmentProvider profileId={item?.id}>
-            <ItemRender
-              item={item}
-              coverHeight={coverHeight}
-              coverWidth={coverWidth}
-              index={index}
-              scrollToIndex={scrollToIndex}
-              currentUserIndex={selectedIndex}
-            />
-          </ProfileBoundRelayEnvironmentProvider>
+          <ItemRender
+            item={item}
+            coverHeight={coverHeight}
+            coverWidth={coverWidth}
+            index={index}
+            scrollToIndex={scrollToIndex}
+            currentUserIndex={selectedIndex}
+          />
         );
       }
 
       return (
-        <Link route="NEW_PROFILE">
+        <Link route="NEW_WEBCARD">
           <PressableOpacity
             style={[
               styles.newCover,
@@ -196,7 +198,9 @@ const HomeProfilesCarousel = (
       itemContainerStyle={styles.carouselContentContainer}
       onSelectedIndexChange={onSelectedIndexChange}
       onSelectedIndexChangeAnimated={onSelectedIndexChangeAnimated}
-      initialScrollIndex={initialProfileIndex + 1}
+      initialScrollIndex={
+        profiles.length ? initialProfileIndex + 1 : initialProfileIndex
+      }
     />
   );
 };
@@ -205,7 +209,8 @@ const VERTICAL_MARGIN = 15;
 
 const SCALE_RATIO = 108 / 291;
 
-const keyExtractor = (item: ProfileType | null) => item?.id ?? 'new';
+const keyExtractor = (item: ProfileType | null, index: number) =>
+  item?.webCard.id ?? `new_${index}`;
 
 export default forwardRef(HomeProfilesCarousel);
 
@@ -234,23 +239,37 @@ const ItemRenderComponent = ({
     graphql`
       fragment HomeProfilesCarouselItem_profile on Profile {
         id
-        userName
-        cardCover {
-          media {
-            id
+        invited
+        webCard {
+          id
+          userName
+          cardCover {
+            media {
+              id
+            }
           }
+          ...CoverLink_webCard
+          ...CoverRenderer_webCard
         }
-        ...CoverLink_profile
-        ...CoverRenderer_profile
       }
     `,
     item as HomeProfilesCarouselItem_profile$key,
   );
 
-  const [ready, setReady] = useState(!profile?.cardCover);
-
+  const [ready, setReady] = useState(!profile?.webCard?.cardCover);
+  const [loadingFailed, setLoadingFailed] = useState(false);
   const onReady = useCallback(() => {
     setReady(true);
+  }, []);
+
+  const onError = useCallback(() => {
+    setReady(false);
+    setLoadingFailed(true);
+  }, []);
+
+  const onRetry = useCallback(() => {
+    setLoadingFailed(false);
+    setReady(false);
   }, []);
 
   const onPress = (event: GestureResponderEvent) => {
@@ -263,7 +282,6 @@ const ItemRenderComponent = ({
   const isCurrent = index === currentUserIndex;
 
   const hasFocus = useScreenHasFocus();
-
   return (
     <View
       style={[
@@ -276,20 +294,49 @@ const ItemRenderComponent = ({
         },
       ]}
     >
-      {profile.cardCover?.media?.id != null ? (
-        <CoverLink
-          profile={profile}
+      {loadingFailed ? (
+        <CoverErrorRenderer
+          label={
+            <FormattedMessage
+              defaultMessage="An error occured"
+              description="Error message displayed when a cover failed to load in HomeScreen"
+            />
+          }
           width={coverWidth}
-          profileId={profile.id}
+          onRetry={onRetry}
+        />
+      ) : profile.invited ? (
+        <View
+          style={{
+            width: coverWidth,
+            aspectRatio: 0.625,
+            justifyContent: 'center',
+            alignItems: 'center',
+            borderRadius: coverWidth * COVER_CARD_RADIUS,
+            backgroundColor: colors.white,
+          }}
+        >
+          <Icon
+            icon="shared_webcard"
+            style={styles.invitationIcon}
+            tintColor={colors.red400}
+          />
+        </View>
+      ) : profile.webCard.cardCover?.media?.id != null ? (
+        <CoverLink
+          webCard={profile.webCard}
+          width={coverWidth}
+          webCardId={profile.webCard.id}
           onPress={onPress}
-          videoEnabled={isCurrent && hasFocus}
+          animationEnabled={isCurrent && hasFocus}
           onReadyForDisplay={onReady}
+          onError={onError}
         />
       ) : (
         <Link
-          route="NEW_PROFILE"
+          route="NEW_WEBCARD"
           params={{
-            profileId: profile.id,
+            webCardId: profile.webCard.id,
           }}
         >
           <PressableOpacity
@@ -308,22 +355,17 @@ const ItemRenderComponent = ({
           >
             <CoverRenderer
               width={coverWidth}
-              profile={profile}
+              webCard={profile.webCard}
               onReadyForDisplay={onReady}
+              onError={onError}
             />
           </PressableOpacity>
         </Link>
       )}
-      {!ready && (
-        <Skeleton
-          style={{
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            width: coverWidth,
-            height: coverHeight,
-            borderRadius: coverWidth * COVER_CARD_RADIUS,
-          }}
+      {!ready && !profile.invited && !loadingFailed && (
+        <CoverLoadingIndicator
+          width={coverWidth}
+          style={StyleSheet.absoluteFill}
         />
       )}
     </View>
@@ -358,6 +400,7 @@ const styles = StyleSheet.create({
     width: 44,
     height: 44,
   },
+  invitationIcon: { width: 60, height: 60 },
   coverContainer: {
     overflow: 'visible',
     // trick to have the shadow on the cover

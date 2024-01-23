@@ -76,3 +76,6 @@ fastlane/test_output
 dist/
 lib/
 
+
+# relay
+src/relayArtifacts

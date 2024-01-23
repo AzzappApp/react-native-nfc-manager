@@ -78,8 +78,8 @@ const HorizontalPhotoRenderer = async ({
           {image && (
             <CloudinaryImage
               mediaId={image}
-              assetKind="module"
               fill
+              sizes="100vw"
               alt="TODO"
               style={{
                 objectFit: 'cover',

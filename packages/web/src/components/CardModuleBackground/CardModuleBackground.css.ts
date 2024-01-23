@@ -45,6 +45,7 @@ const backgroundStretch = style({
 
 const content = style({
   zIndex: '1',
+  position: 'relative',
 });
 
 const styles = {

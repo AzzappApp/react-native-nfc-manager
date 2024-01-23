@@ -1,19 +1,59 @@
-import RPNInput from 'react-phone-number-input/react-native-input';
+import { parsePhoneNumber, AsYouType } from 'libphonenumber-js';
+import { useCallback, useEffect, useState } from 'react';
 import TextInput from '#ui/TextInput';
 import type { TextInputProps } from '#ui/TextInput';
-import type { Props as RPNIProps } from 'react-phone-number-input/input';
+import type { CountryCode } from 'libphonenumber-js';
 
-type PhoneInputProps = Omit<
-  RPNIProps<Omit<TextInputProps, 'onChange' | 'onTextChange' | 'value'>>,
-  'Component' | 'inputComponent' | 'smartCaret'
->;
+type PhoneInputProps = TextInputProps & {
+  countryCode: CountryCode;
+};
 
 /**
- * PhoneInput is a wrapper around react-phone-number-input that uses our TextInput
- * @see RPNInput
+ * PhoneInput handle phone with  our TextInput
  */
-const PhoneInput = (props: PhoneInputProps) => (
-  <RPNInput inputComponent={TextInput as any} {...props} />
-);
+const PhoneInput = ({
+  value,
+  onChangeText,
+  countryCode,
+  ...props
+}: PhoneInputProps) => {
+  const [formattedValue, setFormattedValue] = useState(value);
+  useEffect(() => {
+    if (countryCode && value) {
+      try {
+        const parsedInput = parsePhoneNumber(value, countryCode);
+        setFormattedValue(parsedInput.formatNational());
+      } catch {
+        setFormattedValue(value);
+      }
+    } else {
+      setFormattedValue(value);
+    }
+  }, [countryCode, value]);
+
+  const formatOnChange = useCallback(
+    (value: string) => {
+      //format the input
+      let formatted = value;
+      if (countryCode) {
+        const asYouType = new AsYouType(countryCode);
+        formatted = asYouType.input(value);
+      }
+      setFormattedValue(formatted);
+      if (onChangeText) {
+        onChangeText(formatted);
+      }
+    },
+    [countryCode, onChangeText],
+  );
+
+  return (
+    <TextInput
+      {...props}
+      onChangeText={formatOnChange}
+      value={formattedValue}
+    />
+  );
+};
 
 export default PhoneInput;

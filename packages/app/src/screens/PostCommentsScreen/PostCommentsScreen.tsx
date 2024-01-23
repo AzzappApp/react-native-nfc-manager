@@ -8,18 +8,16 @@ import Container from '#ui/Container';
 import PostCommentsList from './PostCommentsList';
 import PostCommentsScreenHeader from './PostCommentsScreenHeader';
 import type { RelayScreenProps } from '#helpers/relayScreen';
+import type { PostCommentsScreenQuery } from '#relayArtifacts/PostCommentsScreenQuery.graphql';
 import type { PostRoute } from '#routes';
-import type { PostCommentsScreenQuery } from '@azzapp/relay/artifacts/PostCommentsScreenQuery.graphql';
 
 const postCommentsMobileScreenQuery = graphql`
-  query PostCommentsScreenQuery($postId: ID!) {
-    viewer {
-      profile {
-        ...AuthorCartoucheFragment_profile
-      }
+  query PostCommentsScreenQuery($webCardId: ID!, $postId: ID!) {
+    webCard: node(id: $webCardId) {
+      ...AuthorCartoucheFragment_webCard
     }
-    node(id: $postId) {
-      ...PostCommentsList_comments
+    post: node(id: $postId) {
+      ...PostCommentsList_post
     }
   }
 `;
@@ -28,17 +26,16 @@ const PostCommentsMobileScreen = ({
   preloadedQuery,
   route: { params },
 }: RelayScreenProps<PostRoute, PostCommentsScreenQuery>) => {
-  const data = usePreloadedQuery(postCommentsMobileScreenQuery, preloadedQuery);
+  const { webCard, post } = usePreloadedQuery(
+    postCommentsMobileScreenQuery,
+    preloadedQuery,
+  );
 
-  if (!data.viewer.profile || !data.node) {
+  if (!webCard || !post) {
     return null;
   }
   return (
-    <PostCommentsList
-      viewer={data.viewer.profile}
-      post={data.node}
-      postId={params.postId}
-    />
+    <PostCommentsList webCard={webCard} post={post} postId={params.postId} />
   );
 };
 
@@ -63,6 +60,9 @@ const PostCommentsScreenFallback = () => {
 
 export default relayScreen(PostCommentsMobileScreen, {
   query: postCommentsMobileScreenQuery,
+  getVariables: ({ postId }, profileInfos) => ({
+    postId,
+    webCardId: profileInfos?.webCardId ?? '',
+  }),
   fallback: PostCommentsScreenFallback,
-  getVariables: ({ postId }) => ({ postId }),
 });

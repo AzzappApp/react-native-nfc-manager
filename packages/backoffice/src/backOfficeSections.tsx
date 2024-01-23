@@ -10,7 +10,7 @@ const backOfficeSections = [
   },
   {
     text: 'Profile Categories',
-    href: '/profileCategories',
+    href: '/webCardCategories',
     roles: [ADMIN],
   },
   {

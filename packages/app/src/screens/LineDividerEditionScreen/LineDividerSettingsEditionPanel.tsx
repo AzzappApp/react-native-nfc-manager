@@ -7,7 +7,7 @@ import {
 import FloatingIconButton from '#ui/FloatingIconButton';
 import LabeledDashedSlider from '#ui/LabeledDashedSlider';
 import TitleWithLine from '#ui/TitleWithLine';
-import type { LineDividerOrientation } from '@azzapp/relay/artifacts/LineDividerEditionScreen_module.graphql';
+import type { LineDividerOrientation } from '#relayArtifacts/LineDividerEditionScreen_module.graphql';
 import type { ViewProps } from 'react-native-svg/lib/typescript/fabric/utils';
 
 type LineDividerSettingsEditionPanelProps = ViewProps & {

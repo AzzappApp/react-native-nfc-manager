@@ -1,6 +1,6 @@
-import { Suspense, useCallback, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { graphql, useFragment, useMutation } from 'react-relay';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
@@ -8,7 +8,6 @@ import {
   CAROUSEL_DEFAULT_VALUES,
   MODULE_IMAGE_MAX_WIDTH,
   CAROUSEL_STYLE_VALUES,
-  MODULE_KIND_CAROUSEL,
 } from '@azzapp/shared/cardModuleHelpers';
 import { encodeMediaId } from '@azzapp/shared/imagesHelpers';
 import { combineLatest } from '@azzapp/shared/observableHelpers';
@@ -16,14 +15,13 @@ import { FILTERS, exportLayersToImage, isFilter } from '#components/gpu';
 import ImagePicker from '#components/ImagePicker';
 import { useRouter } from '#components/NativeRouter';
 import ScreenModal from '#components/ScreenModal';
-import WebCardModulePreview from '#components/WebCardModulePreview';
 import { getFileName } from '#helpers/fileHelpers';
 import { uploadMedia, uploadSign } from '#helpers/MobileWebAPI';
 import useEditorLayout from '#hooks/useEditorLayout';
 import useModuleDataEditor from '#hooks/useModuleDataEditor';
 import { BOTTOM_MENU_HEIGHT } from '#ui/BottomMenu';
 import Container from '#ui/Container';
-import Header, { HEADER_HEIGHT } from '#ui/Header';
+import Header from '#ui/Header';
 import HeaderButton from '#ui/HeaderButton';
 import TabView from '#ui/TabView';
 import UploadProgressModal from '#ui/UploadProgressModal';
@@ -34,9 +32,9 @@ import CarouselEditionMarginPanel from './CarouselEditionMarginPanel';
 import CarouselImagesEditionPanel from './CarouselImagesEditionPanel';
 import CarouselPreview from './CarouselPreview';
 import type { ImagePickerResult } from '#components/ImagePicker';
-import type { CarouselEditionScreen_module$key } from '@azzapp/relay/artifacts/CarouselEditionScreen_module.graphql';
-import type { CarouselEditionScreen_viewer$key } from '@azzapp/relay/artifacts/CarouselEditionScreen_viewer.graphql';
-import type { CarouselEditionScreenUpdateModuleMutation } from '@azzapp/relay/artifacts/CarouselEditionScreenUpdateModuleMutation.graphql';
+import type { CarouselEditionScreen_module$key } from '#relayArtifacts/CarouselEditionScreen_module.graphql';
+import type { CarouselEditionScreen_profile$key } from '#relayArtifacts/CarouselEditionScreen_profile.graphql';
+import type { CarouselEditionScreenUpdateModuleMutation } from '#relayArtifacts/CarouselEditionScreenUpdateModuleMutation.graphql';
 import type { ViewProps } from 'react-native';
 import type { Observable } from 'relay-runtime';
 
@@ -44,7 +42,7 @@ export type CarouselEditionScreenProps = ViewProps & {
   /**
    * the current viewer
    */
-  viewer: CarouselEditionScreen_viewer$key;
+  profile: CarouselEditionScreen_profile$key;
   /**
    * the current module to edit, if null, a new module will be created
    */
@@ -56,21 +54,15 @@ export type CarouselEditionScreenProps = ViewProps & {
  */
 const CarouselEditionScreen = ({
   module,
-  viewer: viewerKey,
+  profile: profileKey,
 }: CarouselEditionScreenProps) => {
   // #region Data retrieval
   const carousel = useFragment(
     graphql`
       fragment CarouselEditionScreen_module on CardModuleCarousel
       @argumentDefinitions(
-        screenWidth: {
-          type: "Float!"
-          provider: "../providers/ScreenWidth.relayprovider"
-        }
-        pixelRatio: {
-          type: "Float!"
-          provider: "../providers/PixelRatio.relayprovider"
-        }
+        screenWidth: { type: "Float!", provider: "ScreenWidth.relayprovider" }
+        pixelRatio: { type: "Float!", provider: "PixelRatio.relayprovider" }
       ) {
         id
         images {
@@ -100,13 +92,11 @@ const CarouselEditionScreen = ({
     module,
   );
 
-  const viewer = useFragment(
+  const profile = useFragment(
     graphql`
-      fragment CarouselEditionScreen_viewer on Viewer {
-        ...CarouselEditionBackgroundPanel_viewer
-        ...CarouselEditionBorderPanel_viewer
-        profile {
-          ...ProfileColorPicker_profile
+      fragment CarouselEditionScreen_profile on Profile {
+        webCard {
+          id
           cardColors {
             primary
             light
@@ -124,15 +114,18 @@ const CarouselEditionScreen = ({
             titleFontFamily
             titleFontSize
           }
+          ...WebCardColorPicker_webCard
+          ...CarouselEditionBorderPanel_webCard
         }
         moduleBackgrounds {
           id
           resizeMode
           uri
         }
+        ...CarouselEditionBackgroundPanel_profile
       }
     `,
-    viewerKey,
+    profileKey,
   );
   // #endregion
 
@@ -161,7 +154,7 @@ const CarouselEditionScreen = ({
   const { data, value, updateFields, fieldUpdateHandler, dirty } =
     useModuleDataEditor({
       initialValue,
-      cardStyle: viewer.profile?.cardStyle,
+      cardStyle: profile?.webCard.cardStyle,
       styleValuesMap: CAROUSEL_STYLE_VALUES,
       defaultValues: CAROUSEL_DEFAULT_VALUES,
     });
@@ -183,7 +176,7 @@ const CarouselEditionScreen = ({
   const previewData = {
     ...data,
     background:
-      viewer.moduleBackgrounds.find(
+      profile.moduleBackgrounds.find(
         background => background.id === backgroundId,
       ) ?? null,
   };
@@ -195,7 +188,7 @@ const CarouselEditionScreen = ({
         $input: SaveCarouselModuleInput!
       ) {
         saveCarouselModule(input: $input) {
-          profile {
+          webCard {
             id
             cardModules {
               kind
@@ -253,7 +246,7 @@ const CarouselEditionScreen = ({
               {
                 name: getFileName(uri),
                 uri,
-                type: 'image/jpg',
+                type: 'image/jpeg',
               } as any,
               uploadURL,
               uploadParameters,
@@ -300,6 +293,7 @@ const CarouselEditionScreen = ({
     commit({
       variables: {
         input: {
+          webCardId: profile.webCard.id,
           images: images!.map(image => {
             if ('local' in image) {
               return mediasMap[image.uri].id;
@@ -328,15 +322,7 @@ const CarouselEditionScreen = ({
         });
       },
     });
-  }, [
-    canSave,
-    setProgressIndicator,
-    value,
-    commit,
-    carousel?.id,
-    intl,
-    router,
-  ]);
+  }, [canSave, value, commit, profile.webCard.id, carousel?.id, intl, router]);
 
   const onCancel = useCallback(() => {
     router.back();
@@ -362,11 +348,10 @@ const CarouselEditionScreen = ({
     async ({
       uri,
       width,
-      height,
       editionParameters,
       filter,
+      aspectRatio,
     }: ImagePickerResult) => {
-      const aspectRatio = width / height;
       const exportWidth = Math.min(MODULE_IMAGE_MAX_WIDTH, width);
       const exportHeight = exportWidth / aspectRatio;
       const localPath = await exportLayersToImage({
@@ -469,8 +454,8 @@ const CarouselEditionScreen = ({
         data={previewData}
         height={topPanelHeight - 40}
         style={{ height: topPanelHeight - 40, marginVertical: 20 }}
-        colorPalette={viewer.profile?.cardColors}
-        cardStyle={viewer.profile?.cardStyle}
+        colorPalette={profile?.webCard.cardColors}
+        cardStyle={profile?.webCard.cardStyle}
       />
       <TabView
         style={{ height: bottomPanelHeight }}
@@ -498,7 +483,7 @@ const CarouselEditionScreen = ({
             id: 'border',
             element: (
               <CarouselEditionBorderPanel
-                viewer={viewer}
+                webCard={profile?.webCard ?? null}
                 borderWidth={borderWidth}
                 borderColor={borderColor}
                 borderRadius={borderRadius}
@@ -534,7 +519,7 @@ const CarouselEditionScreen = ({
             id: 'background',
             element: (
               <CarouselEditionBackgroundPanel
-                viewer={viewer}
+                profile={profile}
                 backgroundId={backgroundId ?? null}
                 backgroundStyle={backgroundStyle}
                 onBackgroundChange={onBackgroundChange}
@@ -549,29 +534,6 @@ const CarouselEditionScreen = ({
           },
         ]}
       />
-      <View
-        style={{
-          position: 'absolute',
-          top: HEADER_HEIGHT + insetTop,
-          height: topPanelHeight + bottomPanelHeight,
-          width: windowWidth,
-          opacity: currentTab === 'preview' ? 1 : 0,
-        }}
-        pointerEvents={currentTab === 'preview' ? 'auto' : 'none'}
-      >
-        <Suspense>
-          <WebCardModulePreview
-            editedModuleId={carousel?.id}
-            visible={currentTab === 'preview'}
-            editedModuleInfo={{
-              kind: MODULE_KIND_CAROUSEL,
-              data: previewData,
-            }}
-            height={topPanelHeight + bottomPanelHeight}
-            contentPaddingBottom={insetBottom + BOTTOM_MENU_HEIGHT}
-          />
-        </Suspense>
-      </View>
       <CarouselEditionBottomMenu
         currentTab={currentTab}
         onItemPress={setCurrentTab}

@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { getProfileById } from '@azzapp/data/domains';
+import { getUserProfileWithWebCardId } from '@azzapp/data/domains';
 import ERRORS from '@azzapp/shared/errors';
 import { buildApplePass } from '#helpers/pass/apple';
 import { getSessionData } from '#helpers/tokens';
@@ -13,15 +13,34 @@ const createPass = async (
     params: { lang: string };
   },
 ) => {
-  const profileId = new URL(req.url).searchParams.get('profileId')!;
+  const webCardId = new URL(req.url).searchParams.get('webCardId')!;
+  let userId: string | undefined;
   try {
-    const { userId } = (await getSessionData()) ?? {};
-    const profile = await getProfileById(profileId);
-    if (!profile || profile.userId !== userId) {
+    const data = await getSessionData();
+    userId = data?.userId;
+    if (!userId) {
       return NextResponse.json(
-        { message: ERRORS.UNAUTORIZED },
+        { message: ERRORS.UNAUTHORIZED },
         { status: 401 },
       );
+    }
+    const profile = await getUserProfileWithWebCardId(userId, webCardId);
+    if (!profile) {
+      return NextResponse.json(
+        { message: ERRORS.UNAUTHORIZED },
+        { status: 401 },
+      );
+    }
+    const pass = await buildApplePass(profile.id, params.lang);
+
+    if (pass) {
+      return new Response(pass.getAsBuffer(), {
+        headers: {
+          'Content-Type': pass.mimeType,
+        },
+      });
+    } else {
+      return NextResponse.json({ message: ERRORS.NOT_FOUND }, { status: 404 });
     }
   } catch (e) {
     if (e instanceof Error && e.message === ERRORS.INVALID_TOKEN) {
@@ -31,18 +50,6 @@ const createPass = async (
       { message: ERRORS.INVALID_REQUEST },
       { status: 400 },
     );
-  }
-
-  const pass = await buildApplePass(profileId, params.lang);
-
-  if (pass) {
-    return new Response(pass.getAsBuffer(), {
-      headers: {
-        'Content-Type': pass.mimeType,
-      },
-    });
-  } else {
-    return NextResponse.json({ message: ERRORS.NOT_FOUND }, { status: 404 });
   }
 };
 

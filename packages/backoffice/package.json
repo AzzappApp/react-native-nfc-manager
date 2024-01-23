@@ -1,6 +1,6 @@
 {
   "name": "@azzapp/backoffice",
-  "version": "0.5.1",
+  "version": "0.5.4-rc.0",
   "private": true,
   "scripts": {
     "dev": "next dev -p 3005",
@@ -13,20 +13,22 @@
     "dev"
   ],
   "dependencies": {
-    "@azzapp/data": "0.5.1",
-    "@azzapp/shared": "0.5.1",
+    "@azzapp/data": "0.5.4-rc.0",
+    "@azzapp/shared": "0.5.4-rc.0",
+    "@dnd-kit/core": "^6.0.8",
+    "@dnd-kit/sortable": "^7.0.2",
+    "@dnd-kit/utilities": "^3.2.1",
+    "@dotlottie/react-player": "^1.6.6",
     "@emotion/cache": "latest",
     "@emotion/react": "latest",
     "@emotion/styled": "latest",
     "@mui/icons-material": "latest",
     "@mui/material": "latest",
     "@mui/x-data-grid": "latest",
-    "@dnd-kit/core": "^6.0.8",
-    "@dnd-kit/sortable": "^7.0.2",
-    "@dnd-kit/utilities": "^3.2.1",
-    "classnames": "^2.3.2",
+    "classnames": "^2.5.1",
     "drizzle-orm": "^0.28.6",
     "lodash": "^4.17.21",
+    "lottie-web": "^5.12.2",
     "next": "^14.0.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
@@ -34,7 +36,7 @@
   },
   "devDependencies": {
     "@types/node": "^18.15.11",
-    "@types/react": "^18.2.37",
+    "@types/react": "^18.2.45",
     "@types/react-dom": "^18.2.15"
   }
 }

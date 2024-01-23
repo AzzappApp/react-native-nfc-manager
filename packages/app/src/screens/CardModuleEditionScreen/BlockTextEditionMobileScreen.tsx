@@ -1,8 +1,8 @@
 import { graphql, usePreloadedQuery } from 'react-relay';
 import { MODULE_KIND_BLOCK_TEXT } from '@azzapp/shared/cardModuleHelpers';
 import BlockTextEditionScreen from '#screens/BlockTextEditionScreen';
-import type { BlockTextEditionMobileScreenQuery } from '@azzapp/relay/artifacts/BlockTextEditionMobileScreenQuery.graphql';
-import type { BlockTextEditionScreen_module$key } from '@azzapp/relay/artifacts/BlockTextEditionScreen_module.graphql';
+import type { BlockTextEditionMobileScreenQuery } from '#relayArtifacts/BlockTextEditionMobileScreenQuery.graphql';
+import type { BlockTextEditionScreen_module$key } from '#relayArtifacts/BlockTextEditionScreen_module.graphql';
 import type { PreloadedQuery } from 'react-relay';
 
 type BlockTextEditionMobileScreenProps = {
@@ -24,12 +24,15 @@ const BlockTextEditionMobileScreen = ({
   moduleId,
   preloadedQuery,
 }: BlockTextEditionMobileScreenProps) => {
-  const data = usePreloadedQuery(BlockTextQuery, preloadedQuery);
+  const { profile } = usePreloadedQuery(BlockTextQuery, preloadedQuery);
+  if (!profile) {
+    return null;
+  }
 
   let module: BlockTextEditionScreen_module$key | null = null;
   if (moduleId != null) {
     module =
-      data.viewer.profile?.cardModules.find(
+      profile?.webCard?.cardModules.find(
         module =>
           module?.id === moduleId && module?.kind === MODULE_KIND_BLOCK_TEXT,
       ) ?? null;
@@ -38,18 +41,20 @@ const BlockTextEditionMobileScreen = ({
     }
   }
 
-  return <BlockTextEditionScreen module={module} viewer={data.viewer} />;
+  return <BlockTextEditionScreen module={module} profile={profile} />;
 };
 
 const BlockTextQuery = graphql`
-  query BlockTextEditionMobileScreenQuery {
-    viewer {
-      ...BlockTextEditionScreen_viewer
-      profile {
-        cardModules {
-          id
-          kind
-          ...BlockTextEditionScreen_module
+  query BlockTextEditionMobileScreenQuery($profileId: ID!) {
+    profile: node(id: $profileId) {
+      ... on Profile {
+        ...BlockTextEditionScreen_profile
+        webCard {
+          cardModules {
+            id
+            kind
+            ...BlockTextEditionScreen_module
+          }
         }
       }
     }

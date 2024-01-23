@@ -1,23 +1,23 @@
 import { noop } from 'lodash';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { graphql, useFragment, usePaginationFragment } from 'react-relay';
+import type { useSuggestedMedias_images$key } from '#relayArtifacts/useSuggestedMedias_images.graphql';
+import type { useSuggestedMedias_profile$key } from '#relayArtifacts/useSuggestedMedias_profile.graphql';
+import type { useSuggestedMedias_videos$key } from '#relayArtifacts/useSuggestedMedias_videos.graphql';
 import type { SourceMedia, TemplateKind } from './coverEditorTypes';
-import type { useSuggestedMedias_images$key } from '@azzapp/relay/artifacts/useSuggestedMedias_images.graphql';
-import type { useSuggestedMedias_videos$key } from '@azzapp/relay/artifacts/useSuggestedMedias_videos.graphql';
-import type { useSuggestedMedias_viewer$key } from '@azzapp/relay/artifacts/useSuggestedMedias_viewer.graphql';
 
 const useSuggestedMedias = (
-  viewerKey: useSuggestedMedias_viewer$key | null,
+  profileKey: useSuggestedMedias_profile$key | null,
   templateKind: TemplateKind,
 ) => {
-  const viewer = useFragment(
+  const profile = useFragment(
     graphql`
-      fragment useSuggestedMedias_viewer on Viewer {
+      fragment useSuggestedMedias_profile on Profile {
         ...useSuggestedMedias_images
         ...useSuggestedMedias_videos
       }
     `,
-    viewerKey,
+    profileKey,
   );
 
   const {
@@ -27,7 +27,7 @@ const useSuggestedMedias = (
     hasNext: hasNextSuggestedImages,
   } = usePaginationFragment(
     graphql`
-      fragment useSuggestedMedias_images on Viewer
+      fragment useSuggestedMedias_images on Profile
       @refetchable(queryName: "CoverEditor_suggestedImages_query")
       @argumentDefinitions(
         after: { type: String }
@@ -50,7 +50,7 @@ const useSuggestedMedias = (
         }
       }
     `,
-    viewer as useSuggestedMedias_images$key | null,
+    profile as useSuggestedMedias_images$key | null,
   );
 
   const {
@@ -60,7 +60,7 @@ const useSuggestedMedias = (
     hasNext: hasNextSuggestedVideos,
   } = usePaginationFragment(
     graphql`
-      fragment useSuggestedMedias_videos on Viewer
+      fragment useSuggestedMedias_videos on Profile
       @refetchable(queryName: "CoverEditor_suggestedVideos_query")
       @argumentDefinitions(
         after: { type: String }
@@ -83,7 +83,7 @@ const useSuggestedMedias = (
         }
       }
     `,
-    viewer as useSuggestedMedias_videos$key | null,
+    profile as useSuggestedMedias_videos$key | null,
   );
 
   const [suggestedMediaIndexes, setSuggesteMediaIndex] = useState({
@@ -93,7 +93,7 @@ const useSuggestedMedias = (
 
   const mediaKind = templateKind === 'video' ? 'video' : 'image';
 
-  const index = suggestedMediaIndexes[mediaKind];
+  const currentIndex = suggestedMediaIndexes[mediaKind];
   const list =
     mediaKind === 'image'
       ? suggestedImagesData?.suggestedImages ?? null
@@ -107,38 +107,36 @@ const useSuggestedMedias = (
   const loadNext =
     mediaKind === 'image' ? loadNextSuggestedImages : loadNextSuggestedVideos;
 
-  const currentItem = list?.edges?.[index]?.node ?? null;
+  const nbSuggestedMedias = list?.edges?.length ?? 0;
+  const currentItem = list?.edges?.[currentIndex]?.node ?? null;
 
   const onNextSuggestedMedia = useCallback(() => {
     setSuggesteMediaIndex(prev => {
       const currentIndex = prev[mediaKind];
-      if (currentIndex >= (list?.edges?.length ?? 0) - 1) {
-        return prev;
+
+      if (currentIndex >= nbSuggestedMedias - 1) {
+        if (isLoadingNext) {
+          return prev;
+        } else {
+          return {
+            ...prev,
+            [mediaKind]: 0,
+          };
+        }
       }
+
       return {
         ...prev,
         [mediaKind]: currentIndex + 1,
       };
     });
-  }, [list?.edges?.length, mediaKind]);
+  }, [isLoadingNext, nbSuggestedMedias, mediaKind]);
 
   useEffect(() => {
-    const currentIndex = suggestedMediaIndexes[mediaKind];
-    if (
-      currentIndex >= (list?.edges?.length ?? 0) / 2 &&
-      hasNext &&
-      !isLoadingNext
-    ) {
+    if (currentIndex % 50 >= 25 && hasNext && !isLoadingNext) {
       loadNext(50);
     }
-  }, [
-    hasNext,
-    isLoadingNext,
-    list?.edges?.length,
-    loadNext,
-    mediaKind,
-    suggestedMediaIndexes,
-  ]);
+  }, [hasNext, isLoadingNext, loadNext, mediaKind, currentIndex]);
 
   const suggestedMedia = useMemo<SourceMedia | null>(() => {
     if (templateKind === 'people' || !currentItem) {
@@ -147,6 +145,7 @@ const useSuggestedMedias = (
     return {
       id: currentItem.id,
       uri: currentItem.uri,
+      rawUri: currentItem.rawUri,
       width: currentItem.width,
       height: currentItem.height,
       kind: mediaKind,
@@ -155,6 +154,10 @@ const useSuggestedMedias = (
 
   return {
     suggestedMedia,
+    busy:
+      templateKind !== 'people' &&
+      isLoadingNext &&
+      currentIndex >= nbSuggestedMedias - 1,
     onNextSuggestedMedia: useMemo(() => {
       if (templateKind === 'people') {
         return noop;

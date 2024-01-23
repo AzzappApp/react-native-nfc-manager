@@ -12,7 +12,9 @@ export type NativeGPUVideoViewProps = Omit<ViewProps, 'children'> & {
   /**
    * A callback called while the video is playing, allowing to track the current time
    */
-  onProgress?: (event: NativeSyntheticEvent<{ currentTime: number }>) => void;
+  onProgress?: (
+    event: NativeSyntheticEvent<{ currentTime: number; duration: number }>,
+  ) => void;
   onError?: (error: Error | null) => void;
 };
 

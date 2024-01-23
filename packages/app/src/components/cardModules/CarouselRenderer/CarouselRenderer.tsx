@@ -7,14 +7,11 @@ import {
   CAROUSEL_STYLE_VALUES,
   getModuleDataValues,
 } from '@azzapp/shared/cardModuleHelpers';
-// import PressableNative from '#ui/PressableNative';
 import CardModuleBackground from '../CardModuleBackground';
-// import CarouselFullscreen from './CarouselFullscreen';
-// import type { CarouselFullscrenActions } from './CarouselFullscreen';
 import type {
   CarouselRenderer_module$data,
   CarouselRenderer_module$key,
-} from '@azzapp/relay/artifacts/CarouselRenderer_module.graphql';
+} from '#relayArtifacts/CarouselRenderer_module.graphql';
 import type { CardStyle, ColorPalette } from '@azzapp/shared/cardHelpers';
 import type { NullableFields } from '@azzapp/shared/objectHelpers';
 import type { ViewProps } from 'react-native';
@@ -26,14 +23,8 @@ const CarouselRendererFragment = graphql`
   fragment CarouselRenderer_module on CardModuleCarousel
   @inline
   @argumentDefinitions(
-    screenWidth: {
-      type: "Float!"
-      provider: "../providers/ScreenWidth.relayprovider"
-    }
-    pixelRatio: {
-      type: "Float!"
-      provider: "../providers/PixelRatio.relayprovider"
-    }
+    screenWidth: { type: "Float!", provider: "ScreenWidth.relayprovider" }
+    pixelRatio: { type: "Float!", provider: "PixelRatio.relayprovider" }
   ) {
     images {
       id
@@ -138,27 +129,6 @@ const CarouselRenderer = ({
           height: '100%',
         }}
       >
-        {/** Disabled For beta */}
-        {/* {images?.map((image, i) => (
-          <PressableNative
-            key={image.id}
-            onPress={() => modal.current?.open(i)}
-            accessibilityRole="alert"
-          >
-            <Image
-              key={image.id}
-              source={{ uri: image.uri }}
-              style={{
-                height: imageHeight + borderWidth * 2,
-                borderRadius,
-                borderColor: swapColor(borderColor, colorPalette),
-                borderWidth,
-                aspectRatio: squareRatio ? 1 : image.aspectRatio,
-                resizeMode: 'cover',
-              }}
-            />
-          </PressableNative>
-        ))} */}
         {images?.map(image => (
           <Image
             key={image.id}
@@ -174,32 +144,8 @@ const CarouselRenderer = ({
           />
         ))}
       </ScrollView>
-      {/** Disabled for beta */}
-      {/* <CarouselFullscreen
-        ref={modal}
-        images={images}
-        borderColor={borderColor}
-        borderRadius={borderRadius}
-        borderWidth={borderWidth}
-        squareRatio={squareRatio}
-      /> */}
     </CardModuleBackground>
   );
 };
 
 export default CarouselRenderer;
-
-export const measureCarouselHeight = async (
-  data: CarouselRendererData,
-  cardStyle: CardStyle,
-  _maxWidth: number,
-) => {
-  const { borderWidth, marginVertical, imageHeight } = getModuleDataValues({
-    data,
-    cardStyle,
-    defaultValues: CAROUSEL_DEFAULT_VALUES,
-    styleValuesMap: CAROUSEL_STYLE_VALUES,
-  });
-
-  return imageHeight + marginVertical * 2 + borderWidth * 2;
-};

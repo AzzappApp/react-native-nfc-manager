@@ -2,12 +2,11 @@
 GraphQL Schema Root Query object
 """
 type Query {
-  viewer: Viewer!
 
   """
-  User infos of the authenticated user
+  the current user
   """
-  currentUser: User!
+  currentUser: User
 
   """
   Fetches an object given its ID
@@ -18,29 +17,47 @@ type Query {
     """
     id: ID!
   ): Node
-
   """
   Fetches objects given their IDs
   """
   nodes(
-    """
+  """
     The IDs of objects
     """
     ids: [ID!]!
   ): [Node]!
-
+   """
+  Fetches a published webCard given its user name
   """
-  Fetches a profile given its user name
-  """
-  profile(
+  webCard(
     """
     The user name of the profile
     """
     userName: String!
-  ): Profile
-
+  ): WebCard
+  """
+  Fetches a profile given its user name
+  """
+  userNameAvailable(
+    """
+    The user name of the profile
+    """
+    userName: String!
+  ): Boolean!
   """
   Return a list of profile categories
   """
-  profileCategories: [ProfileCategory!]!
+  webCardCategories: [WebCardCategory!]!
+  """
+  Return the webCard parameters
+  """
+  webCardParameters: WebCardParameters!
+  """
+  The list of color palettes available in the application
+  """
+  colorPalettes(first: Int, after: String): ColorPaletteConnection!
+}
+
+type WebCardParameters {
+  userNameChangeFrequencyDay: Int!
 }

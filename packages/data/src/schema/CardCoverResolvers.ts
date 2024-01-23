@@ -2,53 +2,54 @@
 import type { CardCoverResolvers } from './__generated__/types';
 
 export const CardCover: CardCoverResolvers = {
-  title: profile => profile.coverTitle ?? null,
-  titleStyle: profile => profile.coverData?.titleStyle ?? null,
-  subTitle: profile => profile.coverSubTitle ?? null,
-  subTitleStyle: profile => profile.coverData?.subTitleStyle ?? null,
-  textOrientation: profile => profile.coverData?.textOrientation ?? null,
-  textPosition: profile => profile.coverData?.textPosition ?? null,
-  media: profile =>
-    profile.coverData?.mediaId
+  title: webCard => webCard.coverTitle ?? null,
+  titleStyle: webCard => webCard.coverData?.titleStyle ?? null,
+  subTitle: webCard => webCard.coverSubTitle ?? null,
+  subTitleStyle: webCard => webCard.coverData?.subTitleStyle ?? null,
+  textOrientation: webCard => webCard.coverData?.textOrientation ?? null,
+  textPosition: webCard => webCard.coverData?.textPosition ?? null,
+  textAnimation: webCard => webCard.coverData?.textAnimation ?? null,
+  media: webCard =>
+    webCard.coverData?.mediaId
       ? {
-          media: profile.coverData?.mediaId,
+          media: webCard.coverData?.mediaId,
           assetKind: 'cover',
         }
       : null,
-  sourceMedia: profile =>
-    profile.coverData?.sourceMediaId
+  sourceMedia: webCard =>
+    webCard.coverData?.sourceMediaId
       ? {
-          media: profile.coverData?.sourceMediaId ?? null,
+          media: webCard.coverData?.sourceMediaId ?? null,
           assetKind: 'coverSource',
         }
       : null,
-  maskMedia: profile =>
-    profile.coverData?.maskMediaId
+  maskMedia: webCard =>
+    webCard.coverData?.maskMediaId
       ? {
-          media: profile.coverData?.maskMediaId ?? null,
+          media: webCard.coverData?.maskMediaId ?? null,
           assetKind: 'coverSource',
         }
       : null,
-  mediaFilter: profile => profile.coverData?.mediaFilter ?? null,
-  mediaParameters: profile => profile.coverData?.mediaParameters ?? null,
-  background: async profile =>
-    profile.coverData?.backgroundId
+  mediaFilter: webCard => webCard.coverData?.mediaFilter ?? null,
+  mediaParameters: webCard => webCard.coverData?.mediaParameters ?? null,
+  mediaAnimation: webCard => webCard.coverData?.mediaAnimation ?? null,
+  background: async webCard =>
+    webCard.coverData?.backgroundId
       ? {
-          staticMedia: profile.coverData?.backgroundId,
+          staticMedia: webCard.coverData?.backgroundId,
           assetKind: 'cover',
         }
       : null,
-  backgroundColor: profile => profile.coverData?.backgroundColor ?? null,
-  backgroundPatternColor: profile =>
-    profile.coverData?.backgroundPatternColor ?? null,
-  foreground: async profile =>
-    profile.coverData?.foregroundId
+  backgroundColor: webCard => webCard.coverData?.backgroundColor ?? null,
+  backgroundPatternColor: webCard =>
+    webCard.coverData?.backgroundPatternColor ?? null,
+  foreground: async webCard =>
+    webCard.coverData?.foregroundId
       ? {
-          staticMedia: profile.coverData?.foregroundId,
+          staticMedia: webCard.coverData?.foregroundId,
           assetKind: 'cover',
         }
       : null,
-  foregroundColor: profile => profile.coverData?.foregroundColor ?? null,
-  segmented: profile => profile.coverData?.segmented ?? false,
-  merged: profile => profile.coverData?.merged ?? false,
+  foregroundColor: webCard => webCard.coverData?.foregroundColor ?? null,
+  segmented: webCard => webCard.coverData?.segmented ?? false,
 };

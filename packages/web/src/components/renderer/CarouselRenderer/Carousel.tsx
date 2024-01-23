@@ -4,10 +4,8 @@ import { useRef, useState, useEffect } from 'react';
 import { ArrowRightIcon } from '#assets';
 import { useMediaCarousel } from '#hooks';
 import { ButtonIcon } from '#ui';
-// import CarouselFullScreen from './CarouselFullScreen';
 import CarouselMedia from './CarouselMedia';
 import styles from './CarouselRenderer.css';
-// import type { CarouselFullScreenActions } from './CarouselFullScreen';
 import type { Media } from '@azzapp/data/domains';
 
 type CarouselProps = {
@@ -112,9 +110,11 @@ const Carousel = (props: CarouselProps) => {
                 top: 'calc(50% - 18px)',
                 cursor: 'pointer',
                 transform: 'rotate(180deg)',
+                padding: 12,
               }}
               onClick={onClickLeft}
-              size={36}
+              size={48}
+              aria-label="see prev photo"
             />
             <ButtonIcon
               Icon={ArrowRightIcon}
@@ -123,9 +123,11 @@ const Carousel = (props: CarouselProps) => {
                 right: 10,
                 top: 'calc(50% - 18px)',
                 cursor: 'pointer',
+                padding: 12,
               }}
+              aria-label="see next photo"
               onClick={onClickRight}
-              size={36}
+              size={48}
             />
           </>
         )}
@@ -138,21 +140,9 @@ const Carousel = (props: CarouselProps) => {
             borderWidth={borderWidth}
             imageHeight={imageHeight}
             squareRatio={squareRatio}
-            onClick={() => {}}
           />
         ))}
       </div>
-      {/* <CarouselFullScreen
-        ref={modal}
-        medias={medias}
-        borderWidth={borderWidth}
-        mediaStyle={{
-          borderRadius,
-          borderColor,
-          borderStyle: 'solid',
-          objectFit: 'cover',
-        }}
-      /> */}
     </>
   );
 };

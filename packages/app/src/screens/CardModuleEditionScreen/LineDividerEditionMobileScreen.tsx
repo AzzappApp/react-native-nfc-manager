@@ -1,8 +1,8 @@
 import { graphql, usePreloadedQuery } from 'react-relay';
 import { MODULE_KIND_LINE_DIVIDER } from '@azzapp/shared/cardModuleHelpers';
 import LineDividerEditionScreen from '#screens/LineDividerEditionScreen';
-import type { LineDividerEditionMobileScreenQuery } from '@azzapp/relay/artifacts/LineDividerEditionMobileScreenQuery.graphql';
-import type { LineDividerEditionScreen_module$key } from '@azzapp/relay/artifacts/LineDividerEditionScreen_module.graphql';
+import type { LineDividerEditionMobileScreenQuery } from '#relayArtifacts/LineDividerEditionMobileScreenQuery.graphql';
+import type { LineDividerEditionScreen_module$key } from '#relayArtifacts/LineDividerEditionScreen_module.graphql';
 import type { PreloadedQuery } from 'react-relay';
 
 type LineDividerEditionMobileScreenProps = {
@@ -24,12 +24,15 @@ const LineDividerEditionMobileScreen = ({
   moduleId,
   preloadedQuery,
 }: LineDividerEditionMobileScreenProps) => {
-  const data = usePreloadedQuery(LineDividerQuery, preloadedQuery);
+  const { profile } = usePreloadedQuery(LineDividerQuery, preloadedQuery);
+  if (!profile) {
+    return null;
+  }
 
   let module: LineDividerEditionScreen_module$key | null = null;
   if (moduleId != null) {
     module =
-      data.viewer.profile?.cardModules.find(
+      profile?.webCard?.cardModules.find(
         module =>
           module?.id === moduleId && module?.kind === MODULE_KIND_LINE_DIVIDER,
       ) ?? null;
@@ -38,18 +41,25 @@ const LineDividerEditionMobileScreen = ({
     }
   }
 
-  return <LineDividerEditionScreen module={module} viewer={data.viewer} />;
+  return (
+    <LineDividerEditionScreen
+      module={module}
+      webCard={profile?.webCard ?? null}
+    />
+  );
 };
 
 const LineDividerQuery = graphql`
-  query LineDividerEditionMobileScreenQuery {
-    viewer {
-      ...LineDividerEditionScreen_viewer
-      profile {
-        cardModules {
-          id
-          kind
-          ...LineDividerEditionScreen_module
+  query LineDividerEditionMobileScreenQuery($profileId: ID!) {
+    profile: node(id: $profileId) {
+      ... on Profile {
+        webCard {
+          cardModules {
+            id
+            kind
+            ...LineDividerEditionScreen_module
+          }
+          ...LineDividerEditionScreen_webCard
         }
       }
     }

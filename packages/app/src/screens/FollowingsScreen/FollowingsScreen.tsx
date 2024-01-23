@@ -10,17 +10,15 @@ import Header from '#ui/Header';
 import IconButton from '#ui/IconButton';
 import FollowingsScreenList from './FollowingsScreenList';
 import type { RelayScreenProps } from '#helpers/relayScreen';
+import type { FollowingsScreenQuery } from '#relayArtifacts/FollowingsScreenQuery.graphql';
 import type { FollowingsRoute } from '#routes';
-import type { FollowingsScreenQuery } from '@azzapp/relay/artifacts/FollowingsScreenQuery.graphql';
 import type { PreloadedQuery } from 'react-relay';
 
 const followingsScreenQuery = graphql`
-  query FollowingsScreenQuery {
-    viewer {
-      profile {
-        id
-      }
-      ...FollowingsScreenList_viewer
+  query FollowingsScreenQuery($webCardId: ID!) {
+    webCard: node(id: $webCardId) {
+      id
+      ...FollowingsScreenList_webCard
     }
   }
 `;
@@ -73,10 +71,13 @@ const FollowingScreenInner = ({
 }: {
   preloadedQuery: PreloadedQuery<FollowingsScreenQuery>;
 }) => {
-  const { viewer } = usePreloadedQuery(followingsScreenQuery, preloadedQuery);
+  const { webCard } = usePreloadedQuery(followingsScreenQuery, preloadedQuery);
 
-  return <FollowingsScreenList viewer={viewer} />;
+  return <FollowingsScreenList webCard={webCard ?? null} />;
 };
 export default relayScreen(FollowingsScreen, {
   query: followingsScreenQuery,
+  getVariables: (_, profileInfos) => ({
+    webCardId: profileInfos?.webCardId ?? '',
+  }),
 });

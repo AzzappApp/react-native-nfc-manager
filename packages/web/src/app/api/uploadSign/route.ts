@@ -21,7 +21,7 @@ const uploadSignApi = async (req: Request) => {
 
     if (!viewer?.userId) {
       return NextResponse.json(
-        { message: ERRORS.UNAUTORIZED },
+        { message: ERRORS.UNAUTHORIZED },
         { status: 401 },
       );
     }

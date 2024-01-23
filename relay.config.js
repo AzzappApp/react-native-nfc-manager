@@ -4,7 +4,7 @@ module.exports = {
     azzapp: {
       ...require('./relay.config.base').projects.azzapp,
       persist: {
-        file: 'packages/relay/query-map.json',
+        file: 'packages/web/src/persisted-query-map.json',
       },
     },
   },

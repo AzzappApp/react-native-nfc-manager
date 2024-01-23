@@ -60,10 +60,10 @@ const ColorList = ({
       <View style={styles.colorSection}>
         <Text variant="small">
           <FormattedMessage
-            defaultMessage="My WebCard{azzappApp} colors"
+            defaultMessage="My WebCard{azzappA} colors"
             description="Name of the color palette section in color choose"
             values={{
-              azzappApp: <Text variant="azzapp">a</Text>,
+              azzappA: <Text variant="azzapp">a</Text>,
             }}
           />
         </Text>

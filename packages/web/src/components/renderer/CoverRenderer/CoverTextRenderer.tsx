@@ -1,13 +1,22 @@
 import cx from 'classnames';
+import {
+  forwardRef,
+  type ForwardedRef,
+  useImperativeHandle,
+  useRef,
+} from 'react';
 import { swapColor } from '@azzapp/shared/cardHelpers';
 import {
+  COVER_BASE_WIDTH,
   DEFAULT_COVER_CONTENT_ORTIENTATION,
   DEFAULT_COVER_CONTENT_POSITION,
   DEFAULT_COVER_FONT_FAMILY,
   DEFAULT_COVER_FONT_SIZE,
   DEFAULT_COVER_TEXT_COLOR,
 } from '@azzapp/shared/coverHelpers';
+import { extractLetters } from '@azzapp/shared/stringHelpers';
 import { fontsMap } from '#helpers/fonts';
+import { textAnimations } from './CoverRendererTextAnimations';
 import styles from './CoverTextRenderer.css';
 import type {
   TextOrientation,
@@ -17,7 +26,7 @@ import type {
 
 export type CoverTextRendererProps = Omit<
   React.HTMLProps<HTMLDivElement>,
-  'children' | 'title'
+  'children' | 'title' | 'width'
 > & {
   /**
    * The title of the cover
@@ -51,20 +60,33 @@ export type CoverTextRendererProps = Omit<
     light: string;
     dark: string;
   };
+
+  width?: number;
+
+  textAnimation?: string | null;
 };
 
-const CoverTextRenderer = ({
-  title,
-  titleStyle,
-  subTitle,
-  subTitleStyle,
-  textOrientation,
-  textPosition,
-  style,
-  colorPalette,
-  className,
-  ...props
-}: CoverTextRendererProps) => {
+export type CoverTextRenderHandler = {
+  playJsAnimation: (duration: number, iterations: number) => void;
+};
+
+const CoverTextRenderer = (
+  {
+    title,
+    titleStyle,
+    subTitle,
+    subTitleStyle,
+    textOrientation,
+    textPosition,
+    style,
+    colorPalette,
+    className,
+    width,
+    textAnimation,
+    ...props
+  }: CoverTextRendererProps,
+  ref: ForwardedRef<CoverTextRenderHandler>,
+) => {
   const orientation = textOrientation ?? DEFAULT_COVER_CONTENT_ORTIENTATION;
   const position = textPosition ?? DEFAULT_COVER_CONTENT_POSITION;
 
@@ -133,13 +155,20 @@ const CoverTextRenderer = ({
   }
 
   const titleFontFamily = titleStyle?.fontFamily ?? DEFAULT_COVER_FONT_FAMILY;
+
+  const scale = width && width / COVER_BASE_WIDTH;
+
   const titleTextStyle = {
     color: swapColor(
       titleStyle?.color ?? DEFAULT_COVER_TEXT_COLOR,
       colorPalette,
     ),
-    fontSize: `${titleStyle?.fontSize ?? DEFAULT_COVER_FONT_SIZE}em`,
+    fontSize: scale
+      ? `${(titleStyle?.fontSize ?? DEFAULT_COVER_FONT_SIZE) * scale}px`
+      : `${titleStyle?.fontSize ?? DEFAULT_COVER_FONT_SIZE}em`,
     textAlign,
+    position: 'relative',
+    wordWrap: 'break-word',
   } as const;
 
   const subTitleFontFamily =
@@ -149,42 +178,153 @@ const CoverTextRenderer = ({
       subTitleStyle?.color ?? DEFAULT_COVER_TEXT_COLOR,
       colorPalette,
     ),
-    fontSize: `${subTitleStyle?.fontSize ?? DEFAULT_COVER_FONT_SIZE}em`,
+    fontSize: scale
+      ? `${(subTitleStyle?.fontSize ?? DEFAULT_COVER_FONT_SIZE) * scale}px`
+      : `${subTitleStyle?.fontSize ?? DEFAULT_COVER_FONT_SIZE}em`,
     textAlign,
+    position: 'relative',
+    wordWrap: 'break-word',
   } as const;
+
+  const foundAnimation =
+    textAnimation && textAnimation in textAnimations
+      ? textAnimations[textAnimation as keyof typeof textAnimations]
+      : null;
+
+  const maskDirection = textAnimation?.endsWith('Left')
+    ? 'right'
+    : textAnimation?.endsWith('Right')
+    ? 'left'
+    : textAnimation?.endsWith('Top')
+    ? 'bottom'
+    : textAnimation?.endsWith('Bottom')
+    ? 'top'
+    : null;
+
+  const containersRef = useRef<HTMLDivElement[]>([]);
+
+  const titleLetters = extractLetters(title ?? '');
+  const subTitleLetters = extractLetters(subTitle ?? '');
+
+  const lettersRef = useRef<
+    Array<{ el: HTMLSpanElement; letterAnimPosition: number }>
+  >([]);
+
+  useImperativeHandle(
+    ref,
+    () => ({
+      playJsAnimation: (duration: number, iterations?: number) => {
+        if (foundAnimation) {
+          if (Array.isArray(foundAnimation)) {
+            containersRef.current.map(c =>
+              c.animate(foundAnimation, {
+                duration,
+                iterations: iterations ?? 1,
+              }),
+            );
+          } else if (typeof foundAnimation === 'function') {
+            lettersRef.current.map(l =>
+              l.el.animate(foundAnimation(l.letterAnimPosition), {
+                duration,
+                iterations: iterations ?? 1,
+              }),
+            );
+          }
+        }
+      },
+    }),
+    [foundAnimation],
+  );
 
   return (
     <div className={cx(styles.coverTextRender, className)} {...props}>
-      <h1
+      <div
         style={{
           justifyContent: overlayJustifyContent,
+          maskImage:
+            maskDirection === 'left' || maskDirection === 'top'
+              ? `linear-gradient(to ${maskDirection}, transparent 0%, black 5%, black 100%)`
+              : maskDirection === 'right' || maskDirection === 'bottom'
+              ? `linear-gradient(to ${maskDirection}, black 0%, black 95%, transparent 100%)`
+              : undefined,
         }}
         className={cx(
-          styles.converTextContainer,
-          orientation !== 'horizontal' && styles.converTextContainerVertical,
-          orientation === 'topToBottom' &&
-            styles.converTextContainerTopToBottom,
-          orientation === 'bottomToTop' &&
-            styles.converTextContainerBottomToTop,
+          styles.coverTextContainer,
+          orientation !== 'horizontal' && styles.coverTextContainerVertical,
+          orientation === 'horizontal' && styles.coverTextContainerHorizontal,
+          orientation === 'topToBottom' && styles.coverTextContainerTopToBottom,
+          orientation === 'bottomToTop' && styles.coverTextContainerBottomToTop,
         )}
       >
-        <div
-          style={titleTextStyle}
-          className={fontsMap[titleFontFamily].className}
-        >
-          {title ?? ''}
-        </div>
-        {!!subTitle && (
-          <div
-            style={subTitleTextStyle}
-            className={fontsMap[subTitleFontFamily].className}
+        <div className={styles.coverTextContentContainer}>
+          <h1
+            className={styles.coverTextContent}
+            ref={el => {
+              if (el && !containersRef.current.includes(el)) {
+                containersRef.current.push(el);
+              }
+            }}
           >
-            {subTitle}
-          </div>
-        )}
-      </h1>
+            <div
+              style={titleTextStyle}
+              className={fontsMap[titleFontFamily].className}
+            >
+              {foundAnimation && typeof foundAnimation === 'function'
+                ? titleLetters.map((letter, index, arr) => (
+                    <span
+                      className={styles.coverTextLetter}
+                      key={index}
+                      ref={el => {
+                        if (el && !lettersRef.current.some(l => l.el === el)) {
+                          lettersRef.current.push({
+                            el,
+                            letterAnimPosition:
+                              (index + 1) /
+                              (arr.length + subTitleLetters.length),
+                          });
+                        }
+                      }}
+                    >
+                      {letter}
+                    </span>
+                  ))
+                : title ?? ''}
+            </div>
+            {!!subTitle && (
+              <div
+                style={subTitleTextStyle}
+                className={fontsMap[subTitleFontFamily].className}
+              >
+                {foundAnimation && typeof foundAnimation === 'function'
+                  ? extractLetters(subTitle).map((letter, index, arr) => (
+                      <span
+                        className={styles.coverTextLetter}
+                        key={index}
+                        ref={el => {
+                          if (
+                            el &&
+                            !lettersRef.current.some(l => l.el === el)
+                          ) {
+                            lettersRef.current.push({
+                              el,
+                              letterAnimPosition:
+                                (titleLetters.length + index + 1) /
+                                (arr.length + titleLetters.length),
+                            });
+                          }
+                        }}
+                      >
+                        {letter}
+                      </span>
+                    ))
+                  : subTitle}
+              </div>
+            )}
+          </h1>
+        </div>
+      </div>
     </div>
   );
 };
 
-export default CoverTextRenderer;
+export default forwardRef(CoverTextRenderer);

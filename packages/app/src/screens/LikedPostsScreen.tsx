@@ -11,22 +11,21 @@ import relayScreen from '#helpers/relayScreen';
 import Header from '#ui/Header';
 import IconButton from '#ui/IconButton';
 import type { RelayScreenProps } from '#helpers/relayScreen';
+import type { LikedPostsScreen_profile$key } from '#relayArtifacts/LikedPostsScreen_profile.graphql';
+import type { LikedPostsScreenQuery } from '#relayArtifacts/LikedPostsScreenQuery.graphql';
 import type { LikedPostsRoute } from '#routes';
-import type { LikedPostsScreen_profile$key } from '@azzapp/relay/artifacts/LikedPostsScreen_profile.graphql';
-import type { LikedPostsScreenQuery } from '@azzapp/relay/artifacts/LikedPostsScreenQuery.graphql';
 
 const likedPostsScreenQuery = graphql`
-  query LikedPostsScreenQuery {
-    viewer {
-      profile {
-        ...LikedPostsScreen_profile
-      }
+  query LikedPostsScreenQuery($webCardId: ID!) {
+    profile: node(id: $webCardId) {
+      ...LikedPostsScreen_profile @arguments(viewerWebCardId: $webCardId)
     }
   }
 `;
 
 const LikedPostsScreen = ({
   preloadedQuery,
+  hasFocus,
 }: RelayScreenProps<LikedPostsRoute, LikedPostsScreenQuery>) => {
   const styles = useStyleSheet(styleSheet);
   const intl = useIntl();
@@ -35,15 +34,14 @@ const LikedPostsScreen = ({
     router.back();
   };
 
-  const {
-    viewer: { profile },
-  } = usePreloadedQuery(likedPostsScreenQuery, preloadedQuery);
+  const { profile } = usePreloadedQuery(likedPostsScreenQuery, preloadedQuery);
   const { data, loadNext, hasNext, isLoadingNext, refetch } =
     usePaginationFragment(
       graphql`
-        fragment LikedPostsScreen_profile on Profile
+        fragment LikedPostsScreen_profile on WebCard
         @refetchable(queryName: "LikedPostListScreenQuery")
         @argumentDefinitions(
+          viewerWebCardId: { type: "ID!" }
           after: { type: String }
           first: { type: Int, defaultValue: 10 }
         ) {
@@ -52,7 +50,11 @@ const LikedPostsScreen = ({
             __id
             edges {
               node {
-                ...PostList_posts @arguments(includeAuthor: true)
+                ...PostList_posts
+                  @arguments(
+                    includeAuthor: true
+                    viewerWebCardId: $viewerWebCardId
+                  )
               }
             }
           }
@@ -103,7 +105,7 @@ const LikedPostsScreen = ({
         })}
         leftElement={
           <IconButton
-            icon="arrow_down"
+            icon="arrow_left"
             onPress={onClose}
             iconSize={30}
             size={47}
@@ -113,7 +115,7 @@ const LikedPostsScreen = ({
       />
       <PostList
         posts={posts}
-        canPlay
+        canPlay={hasFocus}
         refreshing={refreshing}
         onEndReached={onEndReached}
         onRefresh={onRefresh}
@@ -121,7 +123,13 @@ const LikedPostsScreen = ({
     </SafeAreaView>
   );
 };
-export default relayScreen(LikedPostsScreen, { query: likedPostsScreenQuery });
+export default relayScreen(LikedPostsScreen, {
+  query: likedPostsScreenQuery,
+  getVariables: (_, profileInfos) => ({
+    webCardId: profileInfos?.webCardId ?? '',
+  }),
+  fetchPolicy: 'store-and-network',
+});
 
 const styleSheet = createStyleSheet(appearance => ({
   safeAreaView: {

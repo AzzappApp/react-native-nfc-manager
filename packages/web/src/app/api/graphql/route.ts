@@ -1,24 +1,22 @@
 /* eslint-disable react-hooks/rules-of-hooks */
 import { useLogger, useErrorHandler } from '@envelop/core';
-import { useDisableIntrospection } from '@envelop/disable-introspection';
 import { UnauthenticatedError, useGenericAuth } from '@envelop/generic-auth';
 import { useSentry } from '@envelop/sentry';
+import { useDisableIntrospection } from '@graphql-yoga/plugin-disable-introspection';
 import { usePersistedOperations } from '@graphql-yoga/plugin-persisted-operations';
 import { createYoga } from 'graphql-yoga';
-import { revalidateTag } from 'next/cache';
-import { headers } from 'next/headers';
 import { compare } from 'semver';
 import { createGraphQLContext, schema } from '@azzapp/data';
 import {
   getDatabaseConnectionsInfos,
   startDatabaseConnectionMonitoring,
 } from '@azzapp/data/domains/databaseMonitorer';
-import queryMap from '@azzapp/relay/query-map.json';
 import ERRORS from '@azzapp/shared/errors';
-import { getSessionData } from '#helpers/tokens';
+import queryMap from '#persisted-query-map.json';
+import { buildCoverAvatarUrl } from '#helpers/avatar';
+import { AZZAPP_SERVER_HEADER, getSessionData } from '#helpers/tokens';
 import packageJSON from '../../../../package.json';
 import type { GraphQLContext } from '@azzapp/data';
-import type { Profile } from '@azzapp/data/domains';
 import type { Plugin } from '@envelop/types';
 import type { GraphQLError } from 'graphql';
 import type { LogLevel, Plugin as YogaPlugin } from 'graphql-yoga';
@@ -26,16 +24,37 @@ import type { LogLevel, Plugin as YogaPlugin } from 'graphql-yoga';
 const LAST_SUPPORTED_APP_VERSION =
   process.env.LAST_SUPPORTED_APP_VERSION ?? packageJSON.version;
 
-function useRevalidateTag(): Plugin<GraphQLContext> {
+function useRevalidatePages(): Plugin<GraphQLContext> {
   return {
     onExecute: () => {
       return {
-        onExecuteDone(payload) {
-          payload.args.contextValue.cardUsernamesToRevalidate.forEach(
-            username => {
-              revalidateTag(username);
-            },
-          );
+        async onExecuteDone(payload) {
+          const cards = [
+            ...payload.args.contextValue.cardUsernamesToRevalidate.values(),
+          ];
+          const posts = [
+            ...payload.args.contextValue.postsToRevalidate.values(),
+          ];
+
+          if (cards.length || posts.length) {
+            const res = await fetch(
+              `${process.env.NEXT_PUBLIC_API_ENDPOINT}/revalidate`,
+              {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                  [AZZAPP_SERVER_HEADER]: process.env.API_SERVER_TOKEN ?? '',
+                },
+                body: JSON.stringify({
+                  cards,
+                  posts,
+                }),
+              },
+            );
+            if (!res.ok) {
+              console.error('Error revalidating pages');
+            }
+          }
         },
       };
     },
@@ -142,26 +161,24 @@ const { handleRequest } = createYoga({
       getPersistedOperation(id: string) {
         return (queryMap as any)[id];
       },
-      allowArbitraryOperations: process.env.NODE_ENV !== 'production',
+      allowArbitraryOperations: request => {
+        if (process.env.NODE_ENV !== 'production') {
+          return true;
+        }
+        if (process.env.API_SERVER_TOKEN) {
+          return (
+            request.headers.get(AZZAPP_SERVER_HEADER) ===
+            process.env.API_SERVER_TOKEN
+          );
+        }
+        return false;
+      },
     }),
     useGenericAuth({
-      resolveUserFn: async (context: GraphQLContext) => {
+      resolveUserFn: async () => {
         try {
           const res = await getSessionData();
-
-          const profileId = headers().get('azzapp-profileId');
-          let profile: Profile | null = null;
-          if (profileId) {
-            profile = await context.loaders.Profile.load(profileId);
-            if (profile?.userId !== res?.userId) {
-              return null;
-            }
-          }
-
-          return {
-            ...res,
-            profileId,
-          };
+          return res;
         } catch (e) {
           console.log('error', e);
           return null;
@@ -170,7 +187,7 @@ const { handleRequest } = createYoga({
       contextFieldName: 'auth',
       validateUser: params => {
         if (!params.user?.userId) {
-          return new UnauthenticatedError(`Unauthenticated`, {
+          return new UnauthenticatedError(ERRORS.INVALID_TOKEN, {
             extensions: {
               code: ERRORS.INVALID_TOKEN,
             },
@@ -179,9 +196,14 @@ const { handleRequest } = createYoga({
       },
       mode: 'protect-all',
     }),
-    useRevalidateTag(),
+    useRevalidatePages(),
     useDisableIntrospection({
-      disableIf: () => process.env.NODE_ENV === 'production',
+      isDisabled: request => {
+        return process.env.API_SERVER_TOKEN
+          ? request.headers.get(AZZAPP_SERVER_HEADER) !==
+              process.env.API_SERVER_TOKEN
+          : true;
+      },
     }),
     useSentry({
       includeRawResult: false,
@@ -191,7 +213,53 @@ const { handleRequest } = createYoga({
   context: ({ request }) => {
     const locale = request.headers.get('azzapp-locale');
 
-    return createGraphQLContext(locale ?? undefined);
+    const sendMail = async (p: {
+      email: string;
+      subject: string;
+      text: string;
+      html: string;
+    }) => {
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API_ENDPOINT}/sendMail`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            [AZZAPP_SERVER_HEADER]: process.env.API_SERVER_TOKEN ?? '',
+          },
+          body: JSON.stringify(p),
+        },
+      );
+
+      if (!res.ok) {
+        throw new Error('Error sending email');
+      }
+    };
+
+    const sendSms = async (p: { phoneNumber: string; body: string }) => {
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API_ENDPOINT}/sendSms`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            [AZZAPP_SERVER_HEADER]: process.env.API_SERVER_TOKEN ?? '',
+          },
+          body: JSON.stringify(p),
+        },
+      );
+
+      if (!res.ok) {
+        throw new Error('Error sending sms');
+      }
+    };
+
+    return createGraphQLContext(
+      sendMail,
+      sendSms,
+      buildCoverAvatarUrl,
+      locale ?? undefined,
+    );
   },
 });
 

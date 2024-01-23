@@ -14,6 +14,7 @@ export type CoverTemplateData = {
   subTitleStyle?: TextStyle | null;
   textOrientation: TextOrientation;
   textPosition: TextPosition;
+  textAnimation?: string | null;
   backgroundId?: string | null;
   backgroundColor?: string | null;
   backgroundPatternColor?: string | null;
@@ -21,7 +22,7 @@ export type CoverTemplateData = {
   foregroundColor?: string | null;
   mediaFilter?: string | null;
   mediaParameters?: Record<string, any> | null;
-  merged: boolean;
+  mediaAnimation?: string | null;
 };
 
 export const CoverTemplateTable = mysqlTable('CoverTemplate', {
@@ -52,7 +53,7 @@ export const getCoverTemplateById = (id: string) =>
 
 /**
  * Return a list of cover templates. filtered by profile kind and template kind
- * @param profileKind the profile kind to filter by
+ * @param webCardKind the webCard kind to filter by
  * @param templateKind the template kind to filter by
  * @param randomSeed the random seed to use for random ordering
  * @param offset the offset to use for pagination
@@ -60,7 +61,7 @@ export const getCoverTemplateById = (id: string) =>
  * @return {*}  {Promise<Array<CoverTemplate & { cursor: string }>>}
  */
 export const getCoverTemplates = async (
-  profileKind: 'business' | 'personal',
+  webCardKind: 'business' | 'personal',
   templateKind: 'others' | 'people' | 'video',
   randomSeed: string,
   offset?: string | null,
@@ -70,7 +71,7 @@ export const getCoverTemplates = async (
     SELECT *, RAND(${randomSeed}) as cursor
     FROM CoverTemplate
     WHERE ${
-      profileKind === 'business'
+      webCardKind === 'business'
         ? CoverTemplateTable.businessEnabled
         : CoverTemplateTable.personalEnabled
     } = 1

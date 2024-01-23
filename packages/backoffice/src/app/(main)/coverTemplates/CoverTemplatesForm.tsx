@@ -16,7 +16,7 @@ import {
   DialogContent,
   Snackbar,
 } from '@mui/material';
-import { omit, pick } from 'lodash';
+import { capitalize, omit, pick } from 'lodash';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { TEXT_POSITIONS } from '@azzapp/shared/coverHelpers';
@@ -86,6 +86,7 @@ const CoverTemplateForm = ({
           subTitleFontFamily: coverTemplate.data.subTitleStyle?.fontFamily,
           subTitleColor: coverTemplate.data.subTitleStyle?.color,
           textOrientation: coverTemplate.data.textOrientation,
+          textAnimation: coverTemplate.data.textAnimation,
           textPosition: coverTemplate.data.textPosition,
           backgroundId: coverTemplate.data.backgroundId,
           backgroundColor: coverTemplate.data.backgroundColor,
@@ -94,10 +95,10 @@ const CoverTemplateForm = ({
           foregroundColor: coverTemplate.data.foregroundColor,
           mediaFilter: coverTemplate.data.mediaFilter,
           mediaParameters: coverTemplate.data.mediaParameters,
-          merged: coverTemplate.data.merged,
+          mediaAnimation: coverTemplate.data.mediaAnimation,
         };
       }
-      return { businessEnabled: true, personalEnabled: true, merged: false };
+      return { businessEnabled: true, personalEnabled: true };
     },
     formErrors?.fieldErrors,
     [coverTemplate, previewMedia],
@@ -188,6 +189,14 @@ const CoverTemplateForm = ({
   const kindProps = fieldProps('kind');
   const colorPaletteIdProps = fieldProps('colorPaletteId');
   const textOrientationProps = fieldProps('textOrientation');
+  const textAnimationProps = fieldProps('textAnimation', {
+    // filter empty string to null
+    parse: value => (value ? value : null),
+  });
+  const mediaAnimationProps = fieldProps('mediaAnimation', {
+    // filter empty string to null
+    parse: value => (value ? value : null),
+  });
   const textPositionProps = fieldProps('textPosition');
 
   return (
@@ -366,6 +375,46 @@ const CoverTemplateForm = ({
           {...fieldProps('mediaFilter')}
         />
 
+        <FormControl fullWidth error={textAnimationProps.error}>
+          <InputLabel id="textAnimation-label">Text Animation</InputLabel>
+          <Select
+            labelId={'textAnimation-label'}
+            id="textAnimation"
+            name="textAnimation"
+            value={textAnimationProps.value}
+            label="Text Animation"
+            onChange={textAnimationProps.onChange as any}
+          >
+            <MenuItem value="">None</MenuItem>
+            {textAnimations.map(animation => (
+              <MenuItem key={animation} value={animation}>
+                {capitalize(animation)}
+              </MenuItem>
+            ))}
+          </Select>
+          <FormHelperText>{textAnimationProps.helperText}</FormHelperText>
+        </FormControl>
+
+        <FormControl fullWidth error={mediaAnimationProps.error}>
+          <InputLabel id="mediaAnimation-label">Media Animation</InputLabel>
+          <Select
+            labelId={'mediaAnimation-label'}
+            id="mediaAnimation"
+            name="mediaAnimation"
+            value={mediaAnimationProps.value}
+            label="Media Animation"
+            onChange={mediaAnimationProps.onChange as any}
+          >
+            <MenuItem value="">None</MenuItem>
+            {mediaAnimations.map(animation => (
+              <MenuItem key={animation} value={animation}>
+                {capitalize(animation)}
+              </MenuItem>
+            ))}
+          </Select>
+          <FormHelperText>{mediaAnimationProps.helperText}</FormHelperText>
+        </FormControl>
+
         <FormControl fullWidth error={textOrientationProps.error}>
           <InputLabel id="textOrientation-label">Orientation</InputLabel>
           <Select
@@ -373,7 +422,7 @@ const CoverTemplateForm = ({
             id="textOrientation"
             name="textOrientation"
             value={textOrientationProps.value}
-            label="Template Kind"
+            label="Orientation"
             onChange={textOrientationProps.onChange as any}
           >
             <MenuItem value="horizontal">Horizontal</MenuItem>
@@ -449,23 +498,6 @@ const CoverTemplateForm = ({
         <FormControlLabel
           control={
             <Switch
-              name="merged"
-              checked={!!data.merged}
-              disabled={saving}
-              {...omit(
-                fieldProps('merged', {
-                  format: value => value ?? null,
-                }),
-                'error',
-                'helperText',
-              )}
-            />
-          }
-          label="Merged"
-        />
-        <FormControlLabel
-          control={
-            <Switch
               name="businessEnabled"
               checked={!!data.businessEnabled}
               disabled={saving}
@@ -527,3 +559,38 @@ const CoverTemplateForm = ({
 };
 
 export default CoverTemplateForm;
+
+const textAnimations = [
+  'slideUp',
+  'slideRight',
+  'slideBottom',
+  'slideLeft',
+  'smoothUp',
+  'smoothRight',
+  'smoothBottom',
+  'smoothLeft',
+  'smoothLettersUp',
+  'smoothLettersBottom',
+  'slideLettersUp',
+  'slideLettersRight',
+  'slideLettersBottom',
+  'slideLettersLeft',
+  'fadeIn',
+  'fadeInByLetter',
+  'appear',
+  'appearByLetter',
+  'bounce',
+  'neon',
+];
+
+const mediaAnimations = [
+  'smoothZoomOut',
+  'linearZoomOut',
+  'appearZoomOut',
+  'smoothZoomIn',
+  'linearZoomIn',
+  'appearZoomIn',
+  'fadeInOut',
+  'pop',
+  'rotate',
+];

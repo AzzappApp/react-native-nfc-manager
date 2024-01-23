@@ -2,8 +2,8 @@ import { useCallback } from 'react';
 import { useIntl } from 'react-intl';
 import { StyleSheet, View } from 'react-native';
 import { useFragment, graphql } from 'react-relay';
-import { ProfileBoundEditorLayerSelectorPanel } from '#components/EditorLayerSelectorPanel';
-import type { BlockTextSectionBackgroundEditionPanel_viewer$key } from '@azzapp/relay/artifacts/BlockTextSectionBackgroundEditionPanel_viewer.graphql';
+import { WebCardBoundEditorLayerSelectorPanel } from '#components/EditorLayerSelectorPanel';
+import type { BlockTextSectionBackgroundEditionPanel_profile$key } from '#relayArtifacts/BlockTextSectionBackgroundEditionPanel_profile.graphql';
 import type { ViewProps } from 'react-native';
 
 type BackgroundStyle = {
@@ -15,7 +15,7 @@ type BlockTextSectionBackgroundEditionPanelProps = ViewProps & {
   /**
    * A relay fragment reference to the viewer
    */
-  viewer: BlockTextSectionBackgroundEditionPanel_viewer$key;
+  profile: BlockTextSectionBackgroundEditionPanel_profile$key;
   /**
    * The currently selected background id
    */
@@ -43,7 +43,7 @@ type BlockTextSectionBackgroundEditionPanelProps = ViewProps & {
  * A Panel to edit the SectionBackground of the BlockText edition screen
  */
 const BlockTextSectionBackgroundEditionPanel = ({
-  viewer,
+  profile: profileKey,
   backgroundId: background,
   backgroundStyle,
   onBackgroundChange,
@@ -51,18 +51,18 @@ const BlockTextSectionBackgroundEditionPanel = ({
   bottomSheetHeight,
   ...props
 }: BlockTextSectionBackgroundEditionPanelProps) => {
-  const { moduleBackgrounds, profile } = useFragment(
+  const profile = useFragment(
     graphql`
-      fragment BlockTextSectionBackgroundEditionPanel_viewer on Viewer {
+      fragment BlockTextSectionBackgroundEditionPanel_profile on Profile {
         moduleBackgrounds {
           ...StaticMediaList_staticMedias
         }
-        profile {
-          ...ProfileColorPicker_profile
+        webCard {
+          ...WebCardColorPicker_webCard
         }
       }
     `,
-    viewer,
+    profileKey,
   );
 
   const backgroundColor = backgroundStyle?.backgroundColor ?? '#FFFFFF';
@@ -89,13 +89,13 @@ const BlockTextSectionBackgroundEditionPanel = ({
 
   return (
     <View {...props}>
-      <ProfileBoundEditorLayerSelectorPanel
+      <WebCardBoundEditorLayerSelectorPanel
         title={intl.formatMessage({
           defaultMessage: 'Background',
           description: 'Label of Background tab in Horizontal photo edition',
         })}
-        profile={profile!}
-        medias={moduleBackgrounds}
+        webCard={profile?.webCard ?? null}
+        medias={profile.moduleBackgrounds}
         selectedMedia={background}
         tintColor={patternColor}
         backgroundColor={backgroundColor}

@@ -42,10 +42,11 @@ extend type Mutation {
 }
 
 type SaveModulePayload {
-  profile: Profile!
+  webCard: WebCard!
 }
 
 input SaveBlockTextModuleInput {
+  webCardId: ID!
   moduleId: ID
   text: String!
   fontFamily: String
@@ -65,6 +66,7 @@ input SaveBlockTextModuleInput {
 
 
 input SaveCarouselModuleInput {
+  webCardId: ID!
   moduleId: ID
   images: [String!]!
   squareRatio: Boolean
@@ -80,6 +82,7 @@ input SaveCarouselModuleInput {
 }
 
 input SaveHorizontalPhotoModuleInput {
+  webCardId: ID!
   moduleId: ID
   image: String!
   borderWidth: Int
@@ -95,6 +98,7 @@ input SaveHorizontalPhotoModuleInput {
 }
 
 input SaveLineDividerModuleInput {
+  webCardId: ID!
   moduleId: ID
   orientation: LineDividerOrientation
   marginTop: Int
@@ -105,6 +109,7 @@ input SaveLineDividerModuleInput {
 }
 
 input SavePhotoWithTextAndTitleModuleInput {
+  webCardId: ID!
   moduleId: ID
   image: String!
   contentFontFamily: String
@@ -132,6 +137,7 @@ input SavePhotoWithTextAndTitleModuleInput {
 }
 
 input SaveSimpleButtonModuleInput {
+  webCardId: ID!
   moduleId: ID
   buttonLabel: String!
   actionType: String!
@@ -152,6 +158,7 @@ input SaveSimpleButtonModuleInput {
 }
 
 input SaveSimpleTextModuleInput {
+  webCardId: ID!
   moduleId: ID
   kind: String!
   text: String!
@@ -167,6 +174,7 @@ input SaveSimpleTextModuleInput {
 }
 
 input SaveSocialLinksModuleInput {
+  webCardId: ID!
   moduleId: ID
   links: [SocialLinkInput!]!
   iconColor: String

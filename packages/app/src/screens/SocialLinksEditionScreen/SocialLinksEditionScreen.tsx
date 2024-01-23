@@ -1,22 +1,18 @@
 import { omit } from 'lodash';
-import { Suspense, useCallback, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
-import { KeyboardAvoidingView, StyleSheet, View } from 'react-native';
+import { KeyboardAvoidingView, StyleSheet } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { graphql, useFragment, useMutation } from 'react-relay';
 import * as z from 'zod';
-import {
-  MODULE_KIND_SOCIAL_LINKS,
-  SOCIAL_LINKS_DEFAULT_VALUES,
-} from '@azzapp/shared/cardModuleHelpers';
-import { URL_REGEX } from '@azzapp/shared/stringHelpers';
+import { SOCIAL_LINKS_DEFAULT_VALUES } from '@azzapp/shared/cardModuleHelpers';
+import { isValidUrl } from '@azzapp/shared/stringHelpers';
 import { useRouter } from '#components/NativeRouter';
-import WebCardModulePreview from '#components/WebCardModulePreview';
 import useEditorLayout from '#hooks/useEditorLayout';
 import useModuleDataEditor from '#hooks/useModuleDataEditor';
 import { BOTTOM_MENU_HEIGHT } from '#ui/BottomMenu';
 import Container from '#ui/Container';
-import Header, { HEADER_HEIGHT } from '#ui/Header';
+import Header from '#ui/Header';
 import HeaderButton from '#ui/HeaderButton';
 import TabView from '#ui/TabView';
 import SocialLinksBackgroundEditionPanel from './SocialLinksBackgroundEditionPanel';
@@ -25,19 +21,19 @@ import SocialLinksLinksEditionPanel from './SocialLinksLinksEditionPanel';
 import SocialLinksMarginsEditionPanel from './SocialLinksMarginsEditionPanel';
 import SocialLinksPreview from './SocialLinksPreview';
 import SocialLinksSettingsEditionPanel from './SocialLinksSettingsEditionPanel';
-import type { SocialLinksEditionScreen_module$key } from '@azzapp/relay/artifacts/SocialLinksEditionScreen_module.graphql';
-import type { SocialLinksEditionScreen_viewer$key } from '@azzapp/relay/artifacts/SocialLinksEditionScreen_viewer.graphql';
+import type { SocialLinksEditionScreen_module$key } from '#relayArtifacts/SocialLinksEditionScreen_module.graphql';
+import type { SocialLinksEditionScreen_profile$key } from '#relayArtifacts/SocialLinksEditionScreen_profile.graphql';
 import type {
   SocialLinksEditionScreenUpdateModuleMutation,
   SaveSocialLinksModuleInput,
-} from '@azzapp/relay/artifacts/SocialLinksEditionScreenUpdateModuleMutation.graphql';
+} from '#relayArtifacts/SocialLinksEditionScreenUpdateModuleMutation.graphql';
 import type { ViewProps } from 'react-native';
 
 export type SocialLinksEditionScreenProps = ViewProps & {
   /**
    * the current viewer
    */
-  viewer: SocialLinksEditionScreen_viewer$key;
+  profile: SocialLinksEditionScreen_profile$key;
   /**
    * the current module to edit, if null, a new module will be created
    */
@@ -47,10 +43,12 @@ export type SocialLinksEditionScreenProps = ViewProps & {
 const socialLinkSchema = z
   .array(
     z.union([
-      z.object({
-        socialId: z.literal('website'),
-        link: z.string().regex(URL_REGEX).nonempty(),
-      }),
+      z
+        .object({
+          socialId: z.literal('website'),
+          link: z.string().nonempty(),
+        })
+        .refine(item => isValidUrl(item.link)),
       z.object({
         socialId: z.custom<string>(value => value !== 'website'),
         link: z.string().nonempty(),
@@ -64,7 +62,7 @@ const socialLinkSchema = z
  */
 const SocialLinksEditionScreen = ({
   module,
-  viewer: viewerKey,
+  profile: profileKey,
 }: SocialLinksEditionScreenProps) => {
   // #region Data retrieval
   const socialLinks = useFragment(
@@ -98,26 +96,27 @@ const SocialLinksEditionScreen = ({
     module,
   );
 
-  const viewer = useFragment(
+  const profile = useFragment(
     graphql`
-      fragment SocialLinksEditionScreen_viewer on Viewer {
-        ...SocialLinksSettingsEditionPanel_viewer
-        ...SocialLinksBackgroundEditionPanel_viewer
+      fragment SocialLinksEditionScreen_profile on Profile {
+        ...SocialLinksBackgroundEditionPanel_profile
         moduleBackgrounds {
           id
           uri
           resizeMode
         }
-        profile {
+        webCard {
+          id
           cardColors {
             primary
             light
             dark
           }
+          ...SocialLinksSettingsEditionPanel_webCard
         }
       }
     `,
-    viewerKey,
+    profileKey,
   );
 
   // #endregion
@@ -164,7 +163,7 @@ const SocialLinksEditionScreen = ({
   const previewData = {
     ...omit(data, 'backgroundId'),
     background:
-      viewer.moduleBackgrounds.find(
+      profile.moduleBackgrounds.find(
         background => background.id === backgroundId,
       ) ?? null,
   };
@@ -177,7 +176,7 @@ const SocialLinksEditionScreen = ({
         $input: SaveSocialLinksModuleInput!
       ) {
         saveSocialLinksModule(input: $input) {
-          profile {
+          webCard {
             id
             cardModules {
               kind
@@ -204,6 +203,7 @@ const SocialLinksEditionScreen = ({
       ...value,
       moduleId: socialLinks?.id,
       links: value.links!,
+      webCardId: profile.webCard.id,
     };
 
     commit({
@@ -224,7 +224,15 @@ const SocialLinksEditionScreen = ({
         });
       },
     });
-  }, [canSave, value, socialLinks?.id, commit, router, intl]);
+  }, [
+    canSave,
+    value,
+    socialLinks?.id,
+    profile.webCard.id,
+    commit,
+    router,
+    intl,
+  ]);
 
   const onCancel = useCallback(() => {
     router.back();
@@ -309,7 +317,7 @@ const SocialLinksEditionScreen = ({
       >
         <SocialLinksPreview
           style={{ height: topPanelHeight - 20, marginVertical: 10 }}
-          colorPalette={viewer.profile?.cardColors}
+          colorPalette={profile.webCard.cardColors}
           cardStyle={null}
           data={previewData}
         />
@@ -336,7 +344,7 @@ const SocialLinksEditionScreen = ({
               id: 'settings',
               element: (
                 <SocialLinksSettingsEditionPanel
-                  viewer={viewer}
+                  webCard={profile?.webCard ?? null}
                   iconColor={iconColor}
                   onIconColorChange={onIconColorChange}
                   arrangement={arrangement}
@@ -377,7 +385,7 @@ const SocialLinksEditionScreen = ({
               id: 'background',
               element: (
                 <SocialLinksBackgroundEditionPanel
-                  viewer={viewer}
+                  profile={profile}
                   backgroundId={backgroundId}
                   backgroundStyle={backgroundStyle}
                   onBackgroundChange={onBackgroundChange}
@@ -393,29 +401,6 @@ const SocialLinksEditionScreen = ({
           ]}
         />
       </KeyboardAvoidingView>
-      <View
-        style={{
-          position: 'absolute',
-          top: HEADER_HEIGHT + insetTop,
-          height: topPanelHeight + bottomPanelHeight,
-          width: windowWidth,
-          opacity: currentTab === 'preview' ? 1 : 0,
-        }}
-        pointerEvents={currentTab === 'preview' ? 'auto' : 'none'}
-      >
-        <Suspense>
-          <WebCardModulePreview
-            editedModuleId={socialLinks?.id}
-            visible={currentTab === 'preview'}
-            editedModuleInfo={{
-              kind: MODULE_KIND_SOCIAL_LINKS,
-              data: previewData,
-            }}
-            height={topPanelHeight + bottomPanelHeight}
-            contentPaddingBottom={insetBottom + BOTTOM_MENU_HEIGHT}
-          />
-        </Suspense>
-      </View>
       <SocialLinksEditionBottomMenu
         currentTab={currentTab}
         onItemPress={setCurrentTab}

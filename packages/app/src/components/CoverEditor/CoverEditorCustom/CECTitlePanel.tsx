@@ -1,6 +1,13 @@
-import { useMemo, useState } from 'react';
+import { identity } from 'lodash';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { Image, StyleSheet, View } from 'react-native';
+import {
+  Easing,
+  useSharedValue,
+  withRepeat,
+  withTiming,
+} from 'react-native-reanimated';
 import {
   DEFAULT_COVER_CONTENT_ORTIENTATION,
   DEFAULT_COVER_CONTENT_POSITION,
@@ -10,14 +17,22 @@ import {
   COVER_MIN_FONT_SIZE,
   DEFAULT_COVER_TEXT_COLOR,
   TEXT_POSITIONS,
+  COVER_ANIMATION_DURATION,
 } from '@azzapp/shared/coverHelpers';
+import { colors } from '#theme';
+import BoxSelectionList from '#components/BoxSelectionList';
+import { TEXT_ANIMATIONS } from '#components/CoverRenderer/coverTextAnimators';
+import CoverTextRenderer from '#components/CoverRenderer/CoverTextRenderer';
 import { ColorDropDownPicker } from '#ui/ColorDropDownPicker';
 import FloatingButton from '#ui/FloatingButton';
 import FontDropDownPicker from '#ui/FontDropDownPicker';
 import LabeledDashedSlider from '#ui/LabeledDashedSlider';
 import TabsBar from '#ui/TabsBar';
+import TabView from '#ui/TabView';
 import TextInput from '#ui/TextInput';
 import { TitlePositionIcon } from './TitlePositionIcon';
+import type { BoxButtonItemInfo } from '#components/BoxSelectionList';
+import type { CoverTextRendererProps } from '#components/CoverRenderer/CoverTextRenderer';
 import type { ColorPalette } from '@azzapp/shared/cardHelpers';
 import type {
   TextOrientation,
@@ -33,6 +48,7 @@ type CECTitlePanelProps = {
   subTitleStyle: TextStyle | null | undefined;
   textOrientation: TextOrientation | null | undefined;
   textPosition: TextPosition | null | undefined;
+  textAnimation: string | null | undefined;
   colorPalette: ColorPalette;
   otherColors: string[];
   onTitleChange: (title: string) => void;
@@ -41,6 +57,7 @@ type CECTitlePanelProps = {
   onSubTitleStyleChange: (subTitleStyle: TextStyle) => void;
   onTextOrientationChange: (orientation: TextOrientation) => void;
   onTextPositionChange: (position: TextPosition) => void;
+  onTextAnimationChange: (animation: string | null) => void;
   /**
    * Called when the user update the color palette
    */
@@ -60,6 +77,7 @@ const CECTitlePanel = ({
   subTitleStyle,
   textOrientation,
   textPosition,
+  textAnimation,
   colorPalette,
   otherColors,
   onTitleChange,
@@ -68,12 +86,15 @@ const CECTitlePanel = ({
   onSubTitleStyleChange,
   onTextOrientationChange,
   onTextPositionChange,
+  onTextAnimationChange,
   onUpdateColorPalette,
   onUpdateColorList,
   bottomSheetHeights,
   style,
 }: CECTitlePanelProps) => {
-  const [currentTab, setCurrentTab] = useState<'subtitle' | 'title'>('title');
+  const [currentTab, setCurrentTab] = useState<
+    'animation' | 'subtitle' | 'title'
+  >('title');
 
   const onTabPress = (tab: string) => {
     setCurrentTab(tab as 'subtitle' | 'title');
@@ -145,8 +166,49 @@ const CECTitlePanel = ({
   const placementsLabels = usePlacementsLabels();
   const orientationsLabel = useOrientationsLabels();
 
+  const animationSharedValue = useSharedValue(0);
+  useEffect(() => {
+    animationSharedValue.value = withRepeat(
+      withTiming(1, {
+        duration: COVER_ANIMATION_DURATION,
+        easing: Easing.linear,
+      }),
+      -1,
+      false,
+    );
+  }, [animationSharedValue]);
+
+  const renderTextAnimationSample = useCallback(
+    ({ item, height }: BoxButtonItemInfo<string>) => {
+      return (
+        <AnimationSample
+          textAnimation={item}
+          title={title}
+          subTitle={subTitle}
+          titleStyle={titleStyle}
+          subTitleStyle={subTitleStyle}
+          textOrientation={textOrientation}
+          textPosition={textPosition}
+          colorPalette={colorPalette}
+          height={height}
+          animationSharedValue={animationSharedValue}
+        />
+      );
+    },
+    [
+      title,
+      subTitle,
+      titleStyle,
+      subTitleStyle,
+      textOrientation,
+      textPosition,
+      colorPalette,
+      animationSharedValue,
+    ],
+  );
+
   return (
-    <View style={[styles.root, style]}>
+    <View style={[{ flex: 1 }, style]}>
       <TabsBar
         currentTab={currentTab}
         onTabPress={onTabPress}
@@ -166,121 +228,193 @@ const CECTitlePanel = ({
               description: 'Label of the subtitle tab in cover edition',
             }),
           },
+          {
+            tabKey: 'animation',
+            label: intl.formatMessage({
+              defaultMessage: 'Animation',
+              description: 'Label of the text animation tab in cover edition',
+            }),
+          },
         ]}
       />
-      <View style={styles.contentContainer}>
-        <TextInput
-          value={(currentTab === 'subtitle' ? subTitle : title) ?? ''}
-          onChangeText={
-            currentTab === 'subtitle' ? onSubTitleChange : onTitleChange
-          }
-          placeholder={
-            currentTab === 'title'
-              ? intl.formatMessage({
-                  defaultMessage: 'Title',
-                  description: 'Label of the title input in cover edition',
-                })
-              : intl.formatMessage({
-                  defaultMessage: 'Subtitle',
-                  description: 'Label of the subtitle input in cover edition',
-                })
-          }
-        />
-        <View style={styles.buttonContainer}>
-          <FontDropDownPicker
-            fontFamily={fontFamily}
-            onFontFamilyChange={onFontFamilyChange}
-            bottomSheetHeight={bottomSheetHeights}
-          />
-          <ColorDropDownPicker
-            color={color}
-            onColorChange={onColorChange}
-            bottomSheetHeight={bottomSheetHeights}
-            colorPalette={colorPalette}
-            colorList={otherColors}
-            onUpdateColorList={onUpdateColorList}
-            onUpdateColorPalette={onUpdateColorPalette}
-          />
+      <TabView
+        style={{ flex: 1 }}
+        currentTab={currentTab === 'animation' ? 'animation' : 'text'}
+        tabs={[
+          {
+            id: 'text',
+            element: (
+              <View style={styles.contentContainer}>
+                <TextInput
+                  value={(currentTab === 'subtitle' ? subTitle : title) ?? ''}
+                  onChangeText={
+                    currentTab === 'subtitle' ? onSubTitleChange : onTitleChange
+                  }
+                  placeholder={
+                    currentTab === 'title'
+                      ? intl.formatMessage({
+                          defaultMessage: 'Title',
+                          description:
+                            'Label of the title input in cover edition',
+                        })
+                      : intl.formatMessage({
+                          defaultMessage: 'Subtitle',
+                          description:
+                            'Label of the subtitle input in cover edition',
+                        })
+                  }
+                />
+                <View style={styles.buttonContainer}>
+                  <FontDropDownPicker
+                    fontFamily={fontFamily}
+                    onFontFamilyChange={onFontFamilyChange}
+                    bottomSheetHeight={bottomSheetHeights}
+                  />
+                  <ColorDropDownPicker
+                    color={color}
+                    onColorChange={onColorChange}
+                    bottomSheetHeight={bottomSheetHeights}
+                    colorPalette={colorPalette}
+                    colorList={otherColors}
+                    onUpdateColorList={onUpdateColorList}
+                    onUpdateColorPalette={onUpdateColorPalette}
+                  />
 
-          <FloatingButton
-            onPress={onNextOrientation}
-            accessibilityRole="button"
-            accessibilityLabel={intl.formatMessage({
-              defaultMessage: 'Orientation',
-              description: 'Label of the orientation button in cover edition',
-            })}
-            accessibilityHint={intl.formatMessage({
-              defaultMessage: 'Tap to change the orientation of the content',
-              description: 'Hint of the orientation button in cover edition',
-            })}
-            accessibilityValue={{
-              text: orientationsLabel[orientation] ?? '',
-            }}
-          >
-            <Image
-              source={
-                orientation === 'bottomToTop'
-                  ? require('./assets/bottom-to-top.png')
-                  : orientation === 'topToBottom'
-                  ? require('./assets/top-to-bottom.png')
-                  : require('./assets/horizontal.png')
-              }
-              style={styles.orientationIcon}
-            />
-          </FloatingButton>
-          <FloatingButton
-            onPress={onNextPlacement}
-            accessibilityRole="button"
-            accessibilityLabel={intl.formatMessage({
-              defaultMessage: 'Position',
-              description: 'Label of the position button in cover edition',
-            })}
-            accessibilityHint={intl.formatMessage({
-              defaultMessage: 'Tap to change the position',
-              description: 'Hint of the position button in cover edition',
-            })}
-            accessibilityValue={{
-              text: placementsLabels[position],
-            }}
-          >
-            <TitlePositionIcon value={position} />
-          </FloatingButton>
-        </View>
+                  <FloatingButton
+                    onPress={onNextOrientation}
+                    accessibilityRole="button"
+                    accessibilityLabel={intl.formatMessage({
+                      defaultMessage: 'Orientation',
+                      description:
+                        'Label of the orientation button in cover edition',
+                    })}
+                    accessibilityHint={intl.formatMessage({
+                      defaultMessage:
+                        'Tap to change the orientation of the content',
+                      description:
+                        'Hint of the orientation button in cover edition',
+                    })}
+                    accessibilityValue={{
+                      text: orientationsLabel[orientation] ?? '',
+                    }}
+                  >
+                    <Image
+                      source={
+                        orientation === 'bottomToTop'
+                          ? require('./assets/bottom-to-top.png')
+                          : orientation === 'topToBottom'
+                          ? require('./assets/top-to-bottom.png')
+                          : require('./assets/horizontal.png')
+                      }
+                      style={styles.orientationIcon}
+                    />
+                  </FloatingButton>
+                  <FloatingButton
+                    onPress={onNextPlacement}
+                    accessibilityRole="button"
+                    accessibilityLabel={intl.formatMessage({
+                      defaultMessage: 'Position',
+                      description:
+                        'Label of the position button in cover edition',
+                    })}
+                    accessibilityHint={intl.formatMessage({
+                      defaultMessage: 'Tap to change the position',
+                      description:
+                        'Hint of the position button in cover edition',
+                    })}
+                    accessibilityValue={{
+                      text: placementsLabels[position],
+                    }}
+                  >
+                    <TitlePositionIcon value={position} />
+                  </FloatingButton>
+                </View>
 
-        <LabeledDashedSlider
-          key={`${currentTab}-fontSize`}
-          label={
-            <FormattedMessage
-              defaultMessage="Font size :"
-              description="Font size message in cover edition"
-            />
-          }
-          initialValue={fontSize}
-          min={COVER_MIN_FONT_SIZE}
-          max={COVER_MAX_FONT_SIZE}
-          step={1}
-          onChange={onFontSizeChange}
-          accessibilityLabel={intl.formatMessage({
-            defaultMessage: 'Font size',
-            description: 'Label of the font size slider in cover edition',
-          })}
-          accessibilityHint={intl.formatMessage({
-            defaultMessage: 'Slide to change the font size',
-            description: 'Hint of the font size slider in cover edition',
-          })}
-          style={styles.slider}
-        />
-      </View>
+                <LabeledDashedSlider
+                  key={`${currentTab}-fontSize`}
+                  label={
+                    <FormattedMessage
+                      defaultMessage="Font size :"
+                      description="Font size message in cover edition"
+                    />
+                  }
+                  initialValue={fontSize}
+                  min={COVER_MIN_FONT_SIZE}
+                  max={COVER_MAX_FONT_SIZE}
+                  step={1}
+                  onChange={onFontSizeChange}
+                  accessibilityLabel={intl.formatMessage({
+                    defaultMessage: 'Font size',
+                    description:
+                      'Label of the font size slider in cover edition',
+                  })}
+                  accessibilityHint={intl.formatMessage({
+                    defaultMessage: 'Slide to change the font size',
+                    description:
+                      'Hint of the font size slider in cover edition',
+                  })}
+                  style={styles.slider}
+                />
+              </View>
+            ),
+          },
+          {
+            id: 'animation',
+            element: (
+              <BoxSelectionList
+                data={TEXT_ANIMATIONS}
+                renderItem={renderTextAnimationSample}
+                keyExtractor={identity}
+                accessibilityRole="list"
+                onSelect={onTextAnimationChange}
+                selectedItem={textAnimation ?? null}
+                style={styles.animationList}
+              />
+            ),
+          },
+        ]}
+      />
     </View>
   );
 };
 
 export default CECTitlePanel;
 
+const AnimationSample = ({
+  textAnimation,
+  ...props
+}: CoverTextRendererProps) => {
+  const titleStyle = useMemo(
+    () => ({
+      fontFamily: DEFAULT_COVER_FONT_FAMILY,
+      fontSize: DEFAULT_COVER_FONT_SIZE,
+      ...props.titleStyle,
+      color: colors.black,
+    }),
+    [props.titleStyle],
+  );
+
+  const subTitleStyle = useMemo(
+    () => ({
+      fontFamily: DEFAULT_COVER_FONT_FAMILY,
+      fontSize: DEFAULT_COVER_FONT_SIZE,
+      ...props.subTitleStyle,
+      color: colors.black,
+    }),
+    [props.subTitleStyle],
+  );
+
+  return (
+    <CoverTextRenderer
+      {...props}
+      titleStyle={titleStyle}
+      subTitleStyle={subTitleStyle}
+      textAnimation={textAnimation}
+    />
+  );
+};
+
 const styles = StyleSheet.create({
-  root: {
-    flex: 1,
-  },
   contentContainer: {
     flex: 1,
     paddingHorizontal: 20,
@@ -299,6 +433,9 @@ const styles = StyleSheet.create({
   slider: {
     width: '90%',
     alignSelf: 'center',
+  },
+  animationList: {
+    marginVertical: 15,
   },
 });
 

@@ -1,5 +1,5 @@
 import { style } from '@vanilla-extract/css';
-import { textSmallBold, vars } from '#app/theme.css';
+import { textSmallBold, vars } from '#app/[userName]/theme.css';
 
 const empty = style({
   cursor: 'pointer',

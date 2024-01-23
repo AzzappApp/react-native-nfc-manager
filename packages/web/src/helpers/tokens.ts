@@ -3,9 +3,11 @@ import { seal, unseal } from '@azzapp/shared/crypto';
 import ERRORS from '@azzapp/shared/errors';
 
 const TOKEN_EXP_TIME = 3600 * 1000;
-const REFREH_TOKEN_EXP_TIME = 7 * 24 * 3600 * 1000;
+const REFRESH_TOKEN_EXP_TIME = 7 * 24 * 3600 * 1000;
 const TOKEN_SECRET = process.env.TOKEN_SECRET!;
 const REFRESH_TOKEN_SECRET = process.env.REFRESH_TOKEN_SECRET!;
+
+export const AZZAPP_SERVER_HEADER = 'azzapp-server-auth';
 
 export type SessionData = {
   userId: string;
@@ -17,7 +19,7 @@ export const generateTokens = async (data: SessionData) => {
   });
 
   const refreshToken = await seal(data, REFRESH_TOKEN_SECRET, {
-    ttl: REFREH_TOKEN_EXP_TIME,
+    ttl: REFRESH_TOKEN_EXP_TIME,
   });
 
   return { token, refreshToken };
@@ -49,4 +51,11 @@ export const getSessionData = async (): Promise<SessionData | null> => {
     }
   }
   return null;
+};
+
+export const checkServerAuth = () => {
+  const token = headers().get(AZZAPP_SERVER_HEADER) ?? null;
+  if (token !== process.env.API_SERVER_TOKEN) {
+    throw new Error(ERRORS.INVALID_TOKEN);
+  }
 };

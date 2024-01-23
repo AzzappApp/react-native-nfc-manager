@@ -6,6 +6,7 @@ extend type Mutation {
 }
 
 input SaveCardStyleInput {
+  webCardId: ID!
   fontFamily: String!
   fontSize: Int!
   titleFontFamily: String!
@@ -19,5 +20,5 @@ input SaveCardStyleInput {
 }
 
 type SaveCardStylePayload {
-  profile: Profile!
+  webCard: WebCard!
 }

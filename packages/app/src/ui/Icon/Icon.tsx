@@ -82,10 +82,10 @@ const icons = {
   get carrousel_original_ratio() {
     return require('./assets/carroussel_original_ratio.png');
   },
-  get carroussel_square() {
+  get carrousel_square() {
     return require('./assets/carroussel_square.png');
   },
-  get carroussel_webcards() {
+  get carrousel_webcards() {
     return require('./assets/carroussel_webcards.png');
   },
   get chat() {
@@ -253,6 +253,9 @@ const icons = {
   get locked() {
     return require('./assets/locked.png');
   },
+  get lock_line() {
+    return require('./assets/lock_line.png');
+  },
   get logout() {
     return require('./assets/logout.png');
   },
@@ -280,11 +283,17 @@ const icons = {
   get more() {
     return require('./assets/more.png');
   },
+  get multi_user() {
+    return require('./assets/multi-user.png');
+  },
   get notification() {
     return require('./assets/notification.png');
   },
   get palette() {
     return require('./assets/palette.png');
+  },
+  get parameters() {
+    return require('./assets/parameters.png');
   },
   get preview() {
     return require('./assets/preview.png');
@@ -318,6 +327,9 @@ const icons = {
   },
   get search() {
     return require('./assets/search.png');
+  },
+  get secret() {
+    return require('./assets/secret.png');
   },
   get settings() {
     return require('./assets/settings.png');

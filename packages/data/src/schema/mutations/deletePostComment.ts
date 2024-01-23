@@ -2,18 +2,34 @@ import { eq, sql } from 'drizzle-orm';
 import { GraphQLError } from 'graphql';
 import { fromGlobalId } from 'graphql-relay';
 import ERRORS from '@azzapp/shared/errors';
-import { PostTable, db, getPostCommentById, removeComment } from '#domains';
+import { isEditor } from '@azzapp/shared/profileHelpers';
+import {
+  PostTable,
+  db,
+  getPostCommentById,
+  getUserProfileWithWebCardId,
+  removeComment,
+} from '#domains';
 import type { MutationResolvers } from '#schema/__generated__/types';
 
 const deletePostComment: MutationResolvers['deletePostComment'] = async (
   _,
-  { input: { commentId } },
-  { auth },
+  { input: { commentId: gqlCommentId } },
+  { auth, loaders },
 ) => {
-  const { profileId } = auth;
+  const { userId } = auth;
+  const commentId = fromGlobalId(gqlCommentId).id;
+  const comment = await loaders.PostComment.load(commentId);
+  const profile =
+    comment &&
+    userId &&
+    (await getUserProfileWithWebCardId(userId, comment.webCardId));
 
-  if (!profileId) {
-    throw new GraphQLError(ERRORS.UNAUTORIZED);
+  if (
+    !profile ||
+    !('profileRole' in profile && isEditor(profile.profileRole))
+  ) {
+    throw new GraphQLError(ERRORS.INVALID_REQUEST);
   }
 
   const { id: targetId, type } = fromGlobalId(commentId);
@@ -23,7 +39,7 @@ const deletePostComment: MutationResolvers['deletePostComment'] = async (
   try {
     const originalComment = await getPostCommentById(targetId);
     if (!originalComment) throw new GraphQLError(ERRORS.INVALID_REQUEST);
-    if (originalComment.profileId !== profileId)
+    if (originalComment.webCardId !== profile.webCardId)
       throw new GraphQLError(ERRORS.FORBIDDEN);
 
     await db.transaction(async trx => {

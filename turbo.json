@@ -8,8 +8,8 @@
       "dependsOn": ["relay:prepare", "graphql-codegen"],
       "inputs": ["packages/**/*.{js,jsx,ts,tsx}", "schema.graphql"],
       "outputs": [
-        "packages/relay/artifacts/**",
-        "packages/relay/query-map.json"
+        "packages/app/src/relayArtifacts/**",
+        "packages/web/src/persisted-query-map.json"
       ]
     },
     "//#relay:prepare": {

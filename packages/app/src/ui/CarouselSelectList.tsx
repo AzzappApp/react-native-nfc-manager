@@ -5,7 +5,6 @@ import {
   useMemo,
   useRef,
 } from 'react';
-import { FlatList } from 'react-native';
 import Animated, {
   Extrapolate,
   interpolate,
@@ -15,6 +14,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import type { ForwardedRef, ReactElement, ReactNode, Ref } from 'react';
 import type {
+  FlatList,
   ListRenderItem,
   StyleProp,
   ViewStyle,
@@ -71,6 +71,10 @@ type CarouselSelectListProps<TItem = any> = Omit<ViewProps, 'children'> & {
    */
   onEndReached?: () => void;
   /**
+   * @see https://reactnative.dev/docs/virtualizedlist#onendreachedthreshold
+   */
+  onEndReachedThreshold?: number;
+  /**
    * Callback called when the user scroll between two items, the index is not rounded
    * To allows synchroneous animation.
    * This callback is called on the UI thread (and should be a worklet)
@@ -95,10 +99,6 @@ export type CarouselSelectListHandle = {
    */
   scrollToIndex: (index: number, animated?: boolean) => void;
 };
-
-const AnimatedFlatList = Animated.createAnimatedComponent(
-  FlatList,
-) as unknown as typeof FlatList;
 
 /**
  * Render a list of items displayed in a carousel
@@ -206,7 +206,7 @@ function CarouselSelectList<TItem = any>(
   );
 
   return (
-    <AnimatedFlatList
+    <Animated.FlatList
       ref={listRef}
       data={data}
       horizontal

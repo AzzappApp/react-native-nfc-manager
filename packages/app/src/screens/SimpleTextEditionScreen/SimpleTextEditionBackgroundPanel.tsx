@@ -2,8 +2,8 @@ import { useCallback } from 'react';
 import { useIntl } from 'react-intl';
 import { StyleSheet, View } from 'react-native';
 import { graphql, useFragment } from 'react-relay';
-import { ProfileBoundEditorLayerSelectorPanel } from '#components/EditorLayerSelectorPanel';
-import type { SimpleTextEditionBackgroundPanel_viewer$key } from '@azzapp/relay/artifacts/SimpleTextEditionBackgroundPanel_viewer.graphql';
+import { WebCardBoundEditorLayerSelectorPanel } from '#components/EditorLayerSelectorPanel';
+import type { SimpleTextEditionBackgroundPanel_profile$key } from '#relayArtifacts/SimpleTextEditionBackgroundPanel_profile.graphql';
 import type { ViewProps } from 'react-native';
 
 type BackgroundStyle = {
@@ -15,7 +15,7 @@ export type SimpleTextBackgroundPanelProps = ViewProps & {
   /**
    * A relay fragment reference to the viewer
    */
-  viewer: SimpleTextEditionBackgroundPanel_viewer$key;
+  profile: SimpleTextEditionBackgroundPanel_profile$key;
   /**
    * The currently selected background id
    */
@@ -43,7 +43,7 @@ export type SimpleTextBackgroundPanelProps = ViewProps & {
  * The background panel of the simple text edition screen
  */
 const SimpleTextEditionBackgroundPanel = ({
-  viewer,
+  profile: profileKey,
   backgroundId: background,
   backgroundStyle,
   onBackgroundChange,
@@ -51,18 +51,18 @@ const SimpleTextEditionBackgroundPanel = ({
   bottomSheetHeight,
   ...props
 }: SimpleTextBackgroundPanelProps) => {
-  const { moduleBackgrounds, profile } = useFragment(
+  const profile = useFragment(
     graphql`
-      fragment SimpleTextEditionBackgroundPanel_viewer on Viewer {
+      fragment SimpleTextEditionBackgroundPanel_profile on Profile {
         moduleBackgrounds {
           ...StaticMediaList_staticMedias
         }
-        profile {
-          ...ProfileColorPicker_profile
+        webCard {
+          ...WebCardColorPicker_webCard
         }
       }
     `,
-    viewer,
+    profileKey,
   );
 
   const backgroundColor = backgroundStyle?.backgroundColor ?? '#FFFFFF';
@@ -89,13 +89,13 @@ const SimpleTextEditionBackgroundPanel = ({
 
   return (
     <View {...props}>
-      <ProfileBoundEditorLayerSelectorPanel
+      <WebCardBoundEditorLayerSelectorPanel
         title={intl.formatMessage({
           defaultMessage: 'Background',
           description: 'Label of Background tab in simple text edition',
         })}
-        profile={profile!}
-        medias={moduleBackgrounds}
+        webCard={profile?.webCard ?? null}
+        medias={profile.moduleBackgrounds}
         selectedMedia={background}
         tintColor={patternColor}
         backgroundColor={backgroundColor}

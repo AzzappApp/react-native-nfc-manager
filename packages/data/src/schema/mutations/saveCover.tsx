@@ -8,52 +8,66 @@ import {
   DEFAULT_COVER_TEXT_COLOR,
 } from '@azzapp/shared/coverHelpers';
 import ERRORS from '@azzapp/shared/errors';
-import { checkMedias, db, referencesMedias, updateProfile } from '#domains';
-import type { Profile } from '#domains';
+import { isEditor } from '@azzapp/shared/profileHelpers';
+import {
+  checkMedias,
+  db,
+  getProfilesPosts,
+  getUserProfileWithWebCardId,
+  referencesMedias,
+  updateWebCard,
+} from '#domains';
+import fromGlobalIdWithType from '#helpers/relayIdHelpers';
+import type { WebCard } from '#domains';
 import type { MutationResolvers } from '#schema/__generated__/types';
 
 const saveCover: MutationResolvers['saveCover'] = async (
   _,
-  { input },
-  { auth, loaders, cardUsernamesToRevalidate },
+  { input: { webCardId: gqlWebCardId, ...data } },
+  { auth, cardUsernamesToRevalidate, postsToRevalidate, loaders },
 ) => {
-  const profileId = auth.profileId;
-  if (!profileId) {
-    throw new GraphQLError(ERRORS.UNAUTORIZED);
-  }
+  const { userId } = auth;
+  const webCardId = fromGlobalIdWithType(gqlWebCardId, 'WebCard');
+  const profile =
+    userId && (await getUserProfileWithWebCardId(userId, webCardId));
 
-  const profile = await loaders.Profile.load(profileId);
-  if (!profile) {
-    throw new GraphQLError(ERRORS.INVALID_REQUEST);
+  if (!profile || !isEditor(profile.profileRole)) {
+    throw new GraphQLError(ERRORS.UNAUTHORIZED);
   }
 
   const oldMedias: Array<string | null> = [];
 
   const newMedias: string[] = [];
 
-  const validator = profile.coverData ? updateValidator : creationValidator;
+  const webCard = await loaders.WebCard.load(profile.webCardId);
 
-  if (!validator.safeParse(input).success) {
+  if (!webCard) {
     throw new GraphQLError(ERRORS.INVALID_REQUEST);
   }
 
-  if (input.mediaId) {
-    oldMedias.push(profile.coverData?.mediaId ?? null);
-    newMedias.push(input.mediaId);
+  const validator = webCard.coverData ? updateValidator : creationValidator;
+
+  if (!validator.safeParse(data).success) {
+    throw new GraphQLError(ERRORS.INVALID_REQUEST);
   }
 
-  if (input.sourceMediaId) {
-    oldMedias.push(profile.coverData?.sourceMediaId ?? null);
-    newMedias.push(input.sourceMediaId);
+  if (data.mediaId) {
+    oldMedias.push(webCard.coverData?.mediaId ?? null);
+    newMedias.push(data.mediaId);
   }
 
-  if (input.maskMediaId) {
-    oldMedias.push(profile.coverData?.maskMediaId ?? null);
-    newMedias.push(input.maskMediaId);
+  if (data.sourceMediaId) {
+    oldMedias.push(webCard.coverData?.sourceMediaId ?? null);
+    newMedias.push(data.sourceMediaId);
   }
 
-  let updatedProfile = {
-    ...profile,
+  if (data.maskMediaId) {
+    oldMedias.push(webCard.coverData?.maskMediaId ?? null);
+    newMedias.push(data.maskMediaId);
+  }
+
+  let updatedWebCard = {
+    ...webCard,
     updatedAt: new Date(),
   };
   try {
@@ -64,10 +78,10 @@ const saveCover: MutationResolvers['saveCover'] = async (
       if (newMedias.length > 0) {
         await referencesMedias(newMedias, oldMedias, trx);
       }
-      const updates: Partial<Profile> = {
+      const updates: Partial<WebCard> = {
         lastCardUpdate: new Date(),
       };
-      const { title, subTitle, ...coverData } = input;
+      const { title, subTitle, ...coverData } = data;
       let hasUpdates = false;
       if (title != null) {
         updates.coverTitle = title;
@@ -77,9 +91,10 @@ const saveCover: MutationResolvers['saveCover'] = async (
         updates.coverSubTitle = subTitle;
         hasUpdates = true;
       }
+
       if (Object.keys(coverData).length > 0) {
         const coverDataUpdated = {
-          ...profile.coverData,
+          ...webCard.coverData,
           ...coverData,
         };
         if (!coverDataUpdated.sourceMediaId || !coverDataUpdated.mediaId) {
@@ -96,25 +111,31 @@ const saveCover: MutationResolvers['saveCover'] = async (
             DEFAULT_COVER_DATA.textOrientation,
           textPosition:
             coverDataUpdated.textPosition ?? DEFAULT_COVER_DATA.textPosition,
+          textAnimation: coverDataUpdated.textAnimation ?? null,
           sourceMediaId: coverDataUpdated.sourceMediaId,
-          merged: coverDataUpdated.merged ?? false,
           segmented: coverDataUpdated.segmented ?? false,
+          mediaAnimation: coverDataUpdated.mediaAnimation ?? null,
           kind: coverDataUpdated.kind ?? null,
         };
-        if (input.cardColors) {
-          updates.cardColors = input.cardColors;
+        if (data.cardColors) {
+          updates.cardColors = data.cardColors;
         }
         hasUpdates = true;
       }
       if (!hasUpdates) {
         throw new GraphQLError(ERRORS.INVALID_REQUEST);
       }
-      await updateProfile(profileId, updates, trx);
-      updatedProfile = { ...updatedProfile, ...updates };
+      await updateWebCard(webCard.id, updates, trx);
+      updatedWebCard = { ...updatedWebCard, ...updates };
     });
 
-    cardUsernamesToRevalidate.add(profile.userName);
-    return { profile: updatedProfile };
+    cardUsernamesToRevalidate.add(webCard.userName);
+    const posts = await getProfilesPosts(webCard.id);
+    posts.forEach(post =>
+      postsToRevalidate.add({ id: post.id, userName: webCard.userName }),
+    );
+
+    return { webCard: updatedWebCard };
   } catch (error) {
     console.log(error);
     throw new GraphQLError(ERRORS.INTERNAL_SERVER_ERROR);
@@ -148,4 +169,4 @@ const DEFAULT_COVER_DATA = {
     fontSize: DEFAULT_COVER_FONT_SIZE,
     color: DEFAULT_COVER_TEXT_COLOR,
   },
-} satisfies Partial<Profile['coverData']>;
+} satisfies Partial<WebCard['coverData']>;

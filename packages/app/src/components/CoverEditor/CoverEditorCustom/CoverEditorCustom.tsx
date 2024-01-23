@@ -1,27 +1,30 @@
 import { memoize } from 'lodash';
 import { useCallback, useMemo, useRef, useState } from 'react';
-import { useIntl } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 import { KeyboardAvoidingView, StyleSheet, View } from 'react-native';
 import { graphql, useFragment } from 'react-relay';
 import { DEFAULT_COLOR_LIST } from '@azzapp/shared/cardHelpers';
 import {
   COVER_RATIO,
-  textOrientationOrDefaut,
-  textPositionOrDefaut,
+  textOrientationOrDefault,
+  textPositionOrDefault,
 } from '@azzapp/shared/coverHelpers';
 import { CameraButton, CropButton } from '#components/commonsButtons';
+import CoverLoadingIndicator from '#components/CoverLoadingIndicator';
 import CoverPreviewRenderer from '#components/CoverPreviewRenderer';
 import ImageEditionFooter from '#components/ImageEditionFooter';
 import ImageEditionParameterControl from '#components/ImageEditionParameterControl';
 import ScreenModal from '#components/ScreenModal';
 import { BOTTOM_MENU_HEIGHT } from '#ui/BottomMenu';
 import Container from '#ui/Container';
+import Delay from '#ui/Delay';
 import PressableNative from '#ui/PressableNative';
 import SwitchLabel from '#ui/SwitchLabel';
 import TabView from '#ui/TabView';
 import UploadProgressModal from '#ui/UploadProgressModal';
+import CoverErrorRenderer from '../../CoverErrorRenderer';
 import CoverEditorCropModal from '../CoverEditorCropModal';
-import CoverEditiorImagePicker from '../CoverEditorImagePicker';
+import CoverEditorImagePicker from '../CoverEditorImagePicker';
 import useCoverMediaEditor from '../useCoverMediaEditor';
 import useSaveCover from '../useSaveCover';
 import CoverEditorCustomBackgroundPanel from './CECBackgroundPanel';
@@ -35,12 +38,12 @@ import CECToolBar from './CECToolBar';
 import useCoverEditorCustomLayout from './useCoverEditorCustomLayout';
 import type { EditionParameters } from '#components/gpu';
 import type { ImagePickerResult } from '#components/ImagePicker';
+import type { CoverEditorCustom_profile$key } from '#relayArtifacts/CoverEditorCustom_profile.graphql';
 import type {
   CoverStyleData,
   MaskMedia,
   SourceMedia,
 } from '../coverEditorTypes';
-import type { CoverEditorCustom_viewer$key } from '@azzapp/relay/artifacts/CoverEditorCustom_viewer.graphql';
 import type { ColorPalette } from '@azzapp/shared/cardHelpers';
 import type { StyleProp, ViewStyle } from 'react-native';
 
@@ -48,7 +51,7 @@ export type CoverEditorCustomProps = {
   /**
    * The relay viewer reference
    */
-  viewer: CoverEditorCustom_viewer$key;
+  profile: CoverEditorCustom_profile$key;
   /**
    * The cover initial data
    */
@@ -69,14 +72,6 @@ export type CoverEditorCustomProps = {
    */
   style?: StyleProp<ViewStyle>;
   /**
-   * callback called when the screen is ready to be displayed
-   */
-  onReady?: () => void;
-  /**
-   *  callback called when the image fails to load
-   */
-  onError?: () => void;
-  /**
    * callback when to save the cover
    */
   onCoverSaved: () => void;
@@ -90,41 +85,41 @@ export type CoverEditorCustomProps = {
  * Allows un user to edit his Cover, the cover changes, can be previsualized
  */
 const CoverEditorCustom = ({
-  viewer: viewerKey,
+  profile: profileKey,
   initialData,
   initialColorPalette,
   style,
-  // onReady,
-  onError,
   onCoverSaved,
   onCancel,
 }: CoverEditorCustomProps) => {
   //#region Data dependencies
-  const viewer = useFragment(
+  const profile = useFragment(
     graphql`
-      fragment CoverEditorCustom_viewer on Viewer {
-        ...CECBackgroundPanel_viewer
-        ...CECForegroundPanel_viewer
-        profile {
-          ...useSaveCover_profile
+      fragment CoverEditorCustom_profile on Profile {
+        ...CECBackgroundPanel_profile
+        ...CECForegroundPanel_profile
+        webCard {
+          ...useSaveCover_webCard
           cardColors {
             otherColors
           }
         }
         coverBackgrounds {
           id
+          kind
           uri
         }
         coverForegrounds {
           id
+          kind
           uri
         }
       }
     `,
-    viewerKey,
+    profileKey,
   );
-  const { coverBackgrounds, coverForegrounds } = viewer ?? {};
-  const cardColors = viewer?.profile?.cardColors;
+  const { coverBackgrounds, coverForegrounds } = profile ?? {};
+  const cardColors = profile?.webCard.cardColors;
   //#endregion
 
   //#region Updates management
@@ -242,6 +237,10 @@ const CoverEditorCustom = ({
 
   const onTextPositionChange = createStyleFieldUpdater('textPosition');
 
+  const onTextAnimationChange = createStyleFieldUpdater('textAnimation');
+
+  const onMediaAnimationChange = createStyleFieldUpdater('mediaAnimation');
+
   const onBackgroundChange = useCallback(
     (id: string | null) => {
       setCoverStyle(coverStyle => ({
@@ -277,7 +276,7 @@ const CoverEditorCustom = ({
 
   // #region Save cover
   const { progressIndicator, saveCover } = useSaveCover(
-    viewer.profile,
+    profile?.webCard ?? null,
     onCoverSaved,
   );
 
@@ -290,9 +289,9 @@ const CoverEditorCustom = ({
       title,
       subTitle,
       coverStyle,
-      maskMedia,
-      mediaCropParameters ?? {},
       sourceMedia,
+      maskMedia,
+      mediaCropParameters,
       colorPalette,
       cardColors?.otherColors ?? DEFAULT_COLOR_LIST,
     );
@@ -308,6 +307,31 @@ const CoverEditorCustom = ({
     subTitle,
     title,
   ]);
+  // #endregion
+
+  // #region Media loading
+  const [loading, setLoading] = useState(true);
+  const [loadingFailed, setLoadingFailed] = useState(false);
+
+  const onStartLoading = useCallback(() => {
+    setLoading(true);
+    setLoadingFailed(false);
+  }, []);
+
+  const onLoad = useCallback(() => {
+    setLoading(false);
+    setLoadingFailed(false);
+  }, []);
+
+  const onError = useCallback(() => {
+    setLoading(false);
+    setLoadingFailed(true);
+  }, []);
+
+  const onRetry = useCallback(() => {
+    setLoadingFailed(false);
+    setLoading(true);
+  }, []);
   // #endregion
 
   // #region Image picker
@@ -327,14 +351,6 @@ const CoverEditorCustom = ({
     },
     [setSourceMediaFromImagePicker],
   );
-
-  const errorDispatched = useRef(false);
-  const onMediaError = useCallback(() => {
-    if (!errorDispatched.current) {
-      errorDispatched.current = true;
-      onError?.();
-    }
-  }, [onError]);
   // #endregion
 
   // #region Crop mode
@@ -369,15 +385,6 @@ const CoverEditorCustom = ({
     }));
   }, [setCoverStyle]);
 
-  // TODO reenable merge when we support it again
-  // const onToggleMerge = useCallback(() => {
-  //   setCoverStyle(coverStyle => ({
-  //     ...coverStyle,
-  //     merged: !coverStyle.merged,
-  //   }));
-  // }, [setCoverStyle]);
-  //#endregion
-
   const [currentTab, setCurrentTab] = useState('image');
   const navigateToPanel = useCallback((menu: string) => {
     setCurrentTab(menu);
@@ -400,11 +407,12 @@ const CoverEditorCustom = ({
     foreground,
     foregroundColor,
     mediaFilter,
-    merged,
+    mediaAnimation,
     segmented,
     subTitleStyle,
     textOrientation,
     textPosition,
+    textAnimation,
     titleStyle,
   } = coverStyle;
 
@@ -419,7 +427,12 @@ const CoverEditorCustom = ({
     bottomSheetHeights,
   } = useCoverEditorCustomLayout();
 
+  const coverWidth = coverHeight * COVER_RATIO;
+
   const intl = useIntl();
+
+  const tabViewHeight =
+    bottomPanelHeight - insetBottom - BOTTOM_MENU_HEIGHT - 10;
 
   return (
     //ths container on top avoid some weid feeling when transitionning with transparent backgorund
@@ -443,33 +456,61 @@ const CoverEditorCustom = ({
           <PressableNative
             style={{ height: coverHeight, aspectRatio: COVER_RATIO }}
             onPress={openImagePicker}
+            disabled={mediaComputing || loading || loadingFailed}
+            disabledOpacity={1}
           >
-            <CoverPreviewRenderer
-              kind={kind}
-              uri={uri}
-              maskUri={segmented ? maskMedia?.uri : null}
-              foregroundId={foreground?.id}
-              foregroundImageUri={foreground?.uri}
-              foregroundImageTintColor={foregroundColor}
-              backgroundImageUri={background?.uri}
-              backgroundColor={backgroundColor}
-              backgroundMultiply={merged}
-              backgroundImageTintColor={backgroundPatternColor}
-              editionParameters={editionParameters}
-              filter={mediaFilter}
-              title={title}
-              subTitle={subTitle}
-              titleStyle={titleStyle}
-              subTitleStyle={subTitleStyle}
-              textOrientation={textOrientationOrDefaut(textOrientation)}
-              textPosition={textPositionOrDefaut(textPosition)}
-              computing={mediaComputing}
-              // onReady={onCoverPreviewReady}
-              onError={onMediaError}
-              height={coverHeight}
-              colorPalette={colorPalette}
-              paused={!!progressIndicator}
-            />
+            {loadingFailed ? (
+              <CoverErrorRenderer
+                label={
+                  <FormattedMessage
+                    defaultMessage="An error occured"
+                    description="Error message displayed when a the custom cover editor failed to load the cover preview"
+                  />
+                }
+                width={coverWidth}
+                onRetry={onRetry}
+              />
+            ) : (
+              <CoverPreviewRenderer
+                kind={kind}
+                uri={uri}
+                maskUri={
+                  segmentationEnabled && segmented ? maskMedia?.uri : null
+                }
+                foregroundId={foreground?.id}
+                foregroundKind={foreground?.kind}
+                foregroundImageUri={foreground?.uri}
+                foregroundImageTintColor={foregroundColor}
+                backgroundId={background?.id}
+                backgroundImageUri={background?.uri}
+                backgroundColor={backgroundColor}
+                backgroundImageTintColor={backgroundPatternColor}
+                editionParameters={editionParameters}
+                filter={mediaFilter}
+                title={title}
+                subTitle={subTitle}
+                titleStyle={titleStyle}
+                subTitleStyle={subTitleStyle}
+                textOrientation={textOrientationOrDefault(textOrientation)}
+                textPosition={textPositionOrDefault(textPosition)}
+                textAnimation={textAnimation}
+                mediaAnimation={mediaAnimation}
+                onStartLoading={onStartLoading}
+                onLoad={onLoad}
+                onError={onError}
+                width={coverWidth}
+                colorPalette={colorPalette}
+                paused={!!progressIndicator || mediaComputing}
+              />
+            )}
+            {loading && (
+              <Delay delay={50}>
+                <CoverLoadingIndicator
+                  width={coverWidth}
+                  style={StyleSheet.absoluteFill}
+                />
+              </Delay>
+            )}
           </PressableNative>
           {sourceMedia && !editedParameter && (
             <CropButton
@@ -504,19 +545,6 @@ const CoverEditorCustom = ({
                 })}
               />
             )}
-            {/*
-              We for the moment disable merging since we don't supporting it anymore with
-              background extraction
-            */}
-            {/* <SwitchLabel
-              variant="small"
-              value={merged ?? false}
-              onValueChange={onToggleMerge}
-              label={intl.formatMessage({
-                defaultMessage: 'Merge',
-                description: 'Label of the merge switch in cover edition',
-              })}
-            /> */}
           </CECToolBar>
         </View>
 
@@ -524,7 +552,7 @@ const CoverEditorCustom = ({
           currentTab={currentTab}
           style={{
             marginTop: 10,
-            height: bottomPanelHeight - insetBottom - BOTTOM_MENU_HEIGHT,
+            height: tabViewHeight,
             width: windowWidth,
           }}
           tabs={[
@@ -536,9 +564,10 @@ const CoverEditorCustom = ({
                   kind={kind}
                   filter={mediaFilter}
                   editionParameters={editionParameters}
-                  merged={merged}
+                  mediaAnimation={mediaAnimation}
                   onFilterChange={onFilterChange}
                   onStartParameterEdition={onStartParameterEdition}
+                  onMediaAnimationChange={onMediaAnimationChange}
                   style={{ flex: 1 }}
                 />
               ),
@@ -553,6 +582,7 @@ const CoverEditorCustom = ({
                   subTitleStyle={subTitleStyle}
                   textOrientation={textOrientation}
                   textPosition={textPosition}
+                  textAnimation={textAnimation}
                   colorPalette={colorPalette}
                   otherColors={otherColors}
                   onTitleChange={onTitleChange}
@@ -561,6 +591,7 @@ const CoverEditorCustom = ({
                   onSubTitleStyleChange={onSubTitleStyleChange}
                   onTextOrientationChange={onTextOrientationChange}
                   onTextPositionChange={onTextPositionChange}
+                  onTextAnimationChange={onTextAnimationChange}
                   onUpdateColorList={setOtherColors}
                   onUpdateColorPalette={setColorPalette}
                   bottomSheetHeights={bottomSheetHeights}
@@ -572,7 +603,7 @@ const CoverEditorCustom = ({
               id: 'foreground',
               element: (
                 <CECForegroundPanel
-                  viewer={viewer}
+                  profile={profile}
                   foreground={foreground?.id}
                   foregroundColor={foregroundColor}
                   colorPalette={colorPalette}
@@ -590,7 +621,7 @@ const CoverEditorCustom = ({
               id: 'background',
               element: (
                 <CoverEditorCustomBackgroundPanel
-                  viewer={viewer}
+                  profile={profile}
                   background={background?.id}
                   backgroundColor={backgroundColor}
                   backgroundPatternColor={backgroundPatternColor}
@@ -644,7 +675,7 @@ const CoverEditorCustom = ({
         )}
       </KeyboardAvoidingView>
       <ScreenModal visible={showImagePicker} animationType="slide">
-        <CoverEditiorImagePicker
+        <CoverEditorImagePicker
           kind="mixed"
           onFinished={onMediaSelected}
           onCancel={closeImagePicker}

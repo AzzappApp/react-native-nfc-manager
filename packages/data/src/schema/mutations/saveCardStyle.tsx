@@ -1,37 +1,45 @@
 import { GraphQLError } from 'graphql';
 import ERRORS from '@azzapp/shared/errors';
-import { updateProfile } from '#domains';
+import { isEditor } from '@azzapp/shared/profileHelpers';
+import { getUserProfileWithWebCardId, updateWebCard } from '#domains';
+import fromGlobalIdWithType from '#helpers/relayIdHelpers';
 import type { MutationResolvers } from '#schema/__generated__/types';
 
 const saveCardStyle: MutationResolvers['saveCardStyle'] = async (
   _,
-  { input },
-  { auth, loaders, cardUsernamesToRevalidate },
+  { input: { webCardId: gqlWebCardId, ...cardStyle } },
+  { auth, cardUsernamesToRevalidate, loaders },
 ) => {
-  const profileId = auth.profileId;
-  if (!profileId) {
-    throw new GraphQLError(ERRORS.UNAUTORIZED);
-  }
-  const profile = await loaders.Profile.load(profileId);
-  if (!profile) {
-    throw new GraphQLError(ERRORS.INVALID_REQUEST);
+  const { userId } = auth;
+  const webCardId = fromGlobalIdWithType(gqlWebCardId, 'WebCard');
+  const profile =
+    userId && (await getUserProfileWithWebCardId(userId, webCardId));
+
+  if (!profile || !isEditor(profile.profileRole)) {
+    throw new GraphQLError(ERRORS.UNAUTHORIZED);
   }
 
   const updates = {
-    cardStyle: input,
+    cardStyle,
     updatedAt: new Date(),
     lastCardUpdate: new Date(),
-    lastContactCardUpdate: new Date(),
   };
   try {
-    await updateProfile(profileId, updates);
+    await updateWebCard(profile.webCardId, updates);
   } catch (e) {
     throw new GraphQLError(ERRORS.INVALID_REQUEST);
   }
-  cardUsernamesToRevalidate.add(profile.userName);
+
+  const webCard = await loaders.WebCard.load(profile.webCardId);
+
+  if (!webCard) {
+    throw new GraphQLError(ERRORS.INVALID_REQUEST);
+  }
+
+  cardUsernamesToRevalidate.add(webCard.userName);
   return {
-    profile: {
-      ...profile,
+    webCard: {
+      ...webCard,
       ...updates,
     },
   };

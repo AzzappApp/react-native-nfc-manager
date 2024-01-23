@@ -4,12 +4,14 @@ import {
   db,
   getPostCommentsByDate,
   getPostReaction,
+  getWebCardById,
   PostTable,
 } from '#domains';
 import {
   cursorToDate,
   connectionFromDateSortedItems,
 } from '#helpers/connectionsHelpers';
+import { maybeFromGlobalIdWithType } from '#helpers/relayIdHelpers';
 import { idResolver } from './utils';
 import type {
   PostCommentResolvers,
@@ -18,10 +20,10 @@ import type {
 
 export const Post: PostResolvers = {
   id: idResolver('Post'),
-  author: async (post, _, { loaders }) => {
-    const author = await loaders.Profile.load(post.authorId);
-    if (author) {
-      return author;
+  webCard: async post => {
+    const webCard = await getWebCardById(post.webCardId);
+    if (webCard) {
+      return webCard;
     }
     throw new Error(ERRORS.INTERNAL_SERVER_ERROR);
   },
@@ -32,12 +34,14 @@ export const Post: PostResolvers = {
   content: async post => {
     return post.content ?? '';
   },
-  viewerPostReaction: async (post, _, { auth }) => {
-    const { profileId } = auth;
-    if (!profileId) {
+  postReaction: async (post, { webCardId: gqlWebCardId }) => {
+    if (!gqlWebCardId) {
       return null;
     }
-    const reaction = await getPostReaction(profileId, post.id);
+    const webCardId = maybeFromGlobalIdWithType(gqlWebCardId, 'WebCard');
+    const reaction = webCardId
+      ? await getPostReaction(webCardId, post.id)
+      : null;
     if (reaction) {
       return reaction.reactionKind;
     }
@@ -82,8 +86,8 @@ export const Post: PostResolvers = {
 
 export const PostComment: PostCommentResolvers = {
   id: idResolver('PostComment'),
-  author: async (post, _, { loaders }) => {
-    const author = await loaders.Profile.load(post.profileId);
+  webCard: async post => {
+    const author = await getWebCardById(post.webCardId);
     if (author) {
       return author;
     }

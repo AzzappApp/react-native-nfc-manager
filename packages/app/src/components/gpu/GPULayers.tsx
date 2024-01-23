@@ -177,3 +177,25 @@ export const extractLayoutParameters = (
   });
   return [layoutParameters, otherParameters];
 };
+
+export const cropDataForAspectRatio = (
+  mediaWidth: number,
+  mediaHeight: number,
+  aspectRatio: number,
+): CropData => {
+  if (mediaWidth / mediaHeight > aspectRatio) {
+    return {
+      originX: (mediaWidth - mediaHeight * aspectRatio) / 2,
+      originY: 0,
+      height: mediaHeight,
+      width: mediaHeight * aspectRatio,
+    };
+  } else {
+    return {
+      originX: 0,
+      originY: (mediaHeight - mediaWidth / aspectRatio) / 2,
+      height: mediaWidth / aspectRatio,
+      width: mediaWidth,
+    };
+  }
+};

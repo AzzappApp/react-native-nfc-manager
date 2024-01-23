@@ -15,6 +15,18 @@ export type LabeledDashedSliderProps = Omit<
   formatValue?: (value: number) => number | string;
 };
 
+function getPrecision(a: number) {
+  'worklet';
+  if (!isFinite(a)) return 0;
+  let e = 1;
+  let p = 0;
+  while (Math.round(a * e) / e !== a) {
+    e *= 10;
+    p++;
+  }
+  return p;
+}
+
 const LabeledDashedSlider = ({
   label,
   variant,
@@ -32,7 +44,9 @@ const LabeledDashedSlider = ({
   const textValue = useDerivedValue(() => {
     return formatValue
       ? `${formatValue(getClampedValue(sharedValue.value, step, min, max))}`
-      : ` ${getClampedValue(sharedValue.value, step, min, max)}`;
+      : getClampedValue(sharedValue.value, step, min, max).toFixed(
+          getPrecision(step),
+        );
   }, [sharedValue, formatValue]);
 
   return (

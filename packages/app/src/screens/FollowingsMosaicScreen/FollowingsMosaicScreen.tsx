@@ -10,14 +10,14 @@ import Header from '#ui/Header';
 import IconButton from '#ui/IconButton';
 import FollowingsMosaicScreenList from './FollowingsMosaicScreenList';
 import type { RelayScreenProps } from '#helpers/relayScreen';
+import type { FollowingsMosaicScreenQuery } from '#relayArtifacts/FollowingsMosaicScreenQuery.graphql';
 import type { FollowingsRoute } from '#routes';
-import type { FollowingsMosaicScreenQuery } from '@azzapp/relay/artifacts/FollowingsMosaicScreenQuery.graphql';
 import type { PreloadedQuery } from 'react-relay';
 
 const followingsMosaicScreenQuery = graphql`
-  query FollowingsMosaicScreenQuery {
-    viewer {
-      ...FollowingsMosaicScreenList_viewer
+  query FollowingsMosaicScreenQuery($webCardId: ID!) {
+    webCard: node(id: $webCardId) {
+      ...FollowingsMosaicScreenList_webCard
     }
   }
 `;
@@ -70,14 +70,17 @@ const FollowingsMosaicScreenInner = ({
 }: {
   preloadedQuery: PreloadedQuery<FollowingsMosaicScreenQuery>;
 }) => {
-  const { viewer } = usePreloadedQuery(
+  const { webCard } = usePreloadedQuery(
     followingsMosaicScreenQuery,
     preloadedQuery,
   );
 
-  return <FollowingsMosaicScreenList viewer={viewer} />;
+  return <FollowingsMosaicScreenList webCard={webCard ?? null} />;
 };
 
 export default relayScreen(FollowingsMosaicScreen, {
   query: followingsMosaicScreenQuery,
+  getVariables: (_, profileInfos) => ({
+    webCardId: profileInfos?.webCardId ?? '',
+  }),
 });

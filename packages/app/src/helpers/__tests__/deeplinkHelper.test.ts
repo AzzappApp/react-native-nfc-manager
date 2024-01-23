@@ -12,10 +12,10 @@ describe('deeplinkHelpers', () => {
   });
 
   test('should redirect to profile', async () => {
-    const res = await matchUrlWithRoute('https://fake-azzapp.com/123');
+    const res = await matchUrlWithRoute(`${process.env.NEXT_PUBLIC_URL}123`);
 
     expect(res).toEqual({
-      route: 'PROFILE',
+      route: 'WEBCARD',
       params: {
         userName: '123',
       },
@@ -23,14 +23,30 @@ describe('deeplinkHelpers', () => {
   });
 
   test('should redirect to profile with contactData', async () => {
-    verifySignMock.mockReturnValueOnce(Promise.resolve({ message: 'ok' }));
+    verifySignMock.mockReturnValueOnce(
+      Promise.resolve({
+        urls: [
+          {
+            selected: true,
+            address: 'https://www.linkedin.com/in/alexander-kozlov-5b4a1b1b/',
+          },
+        ],
+        socials: [
+          {
+            selected: true,
+            label: 'LinkedIn',
+            url: 'https://www.linkedin.com/in/alexander-kozlov-5b4a1b1b/',
+          },
+        ],
+      }),
+    );
 
     const compressedCard = compressToEncodedURIComponent(
       JSON.stringify(['contact123', 'sign123']),
     );
 
     const res = await matchUrlWithRoute(
-      `https://fake-azzapp.com/123?c=${compressedCard}`,
+      `${process.env.NEXT_PUBLIC_URL}/123?c=${compressedCard}`,
     );
 
     expect(verifySignMock).toBeCalledTimes(1);
@@ -41,10 +57,25 @@ describe('deeplinkHelpers', () => {
     });
 
     expect(res).toEqual({
-      route: 'PROFILE',
+      route: 'WEBCARD',
       params: {
         userName: '123',
         contactData: 'contact123',
+        additionalContactData: {
+          urls: [
+            {
+              selected: true,
+              address: 'https://www.linkedin.com/in/alexander-kozlov-5b4a1b1b/',
+            },
+          ],
+          socials: [
+            {
+              selected: true,
+              label: 'LinkedIn',
+              url: 'https://www.linkedin.com/in/alexander-kozlov-5b4a1b1b/',
+            },
+          ],
+        },
       },
     });
   });
@@ -57,7 +88,7 @@ describe('deeplinkHelpers', () => {
     );
 
     const res = await matchUrlWithRoute(
-      `https://fake-azzapp.com/124?c=${compressedCard}`,
+      `${process.env.NEXT_PUBLIC_URL}124?c=${compressedCard}`,
     );
 
     expect(verifySignMock).toBeCalledTimes(1);
@@ -68,7 +99,7 @@ describe('deeplinkHelpers', () => {
     });
 
     expect(res).toEqual({
-      route: 'PROFILE',
+      route: 'WEBCARD',
       params: {
         userName: '124',
       },

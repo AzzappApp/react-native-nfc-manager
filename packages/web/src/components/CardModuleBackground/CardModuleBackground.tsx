@@ -1,6 +1,7 @@
 import cx from 'classnames';
+import { getCldImageUrl } from 'next-cloudinary';
 import { swapColor, type ColorPalette } from '@azzapp/shared/cardHelpers';
-import { getImageURL } from '@azzapp/shared/imagesHelpers';
+import { decodeMediaId } from '@azzapp/shared/imagesHelpers';
 import { convertHexToRGBA } from '#helpers';
 import styles from './CardModuleBackground.css';
 
@@ -39,7 +40,8 @@ const CardModuleBackground = ({
       ? resizeModes?.get?.(backgroundId)
       : 'cover';
 
-  const classnames = cx(styles.background, {
+  const classnames = cx({
+    [styles.background]: true,
     [styles.backgroundCover]: resizeMode === 'cover',
     [styles.backgroundContain]: resizeMode === 'contain',
     [styles.backgroundCenter]: resizeMode === 'center',
@@ -66,8 +68,10 @@ const CardModuleBackground = ({
               swapColor(patternColor, colorPalette) ?? '#000',
               opacity,
             ),
-            WebkitMaskImage: `url(${getImageURL(backgroundId)}.svg)`,
-            maskImage: `url(${getImageURL(backgroundId)}.svg)`,
+            maskImage: `url(${getCldImageUrl({
+              src: decodeMediaId(backgroundId),
+              format: 'svg',
+            })})`,
           }}
           className={classnames}
         />

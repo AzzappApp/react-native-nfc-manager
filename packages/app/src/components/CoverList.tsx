@@ -11,7 +11,7 @@ import CoverLink from './CoverLink';
 import type {
   CoverList_users$data,
   CoverList_users$key,
-} from '@azzapp/relay/artifacts/CoverList_users.graphql';
+} from '#relayArtifacts/CoverList_users.graphql';
 import type { ArrayItemType } from '@azzapp/shared/arrayHelpers';
 import type { ListRenderItemInfo, StyleProp, ViewStyle } from 'react-native';
 
@@ -68,10 +68,10 @@ const CoverList = ({
 
   const users = useFragment(
     graphql`
-      fragment CoverList_users on Profile @relay(plural: true) {
+      fragment CoverList_users on WebCard @relay(plural: true) {
         id
         userName
-        ...CoverLink_profile
+        ...CoverLink_webCard
       }
     `,
     usersKey,
@@ -108,9 +108,9 @@ const CoverList = ({
         }
       >
         <CoverLink
-          profile={item}
+          webCard={item}
           width={coverWidth}
-          profileId={item.id}
+          webCardId={item.id}
           style={coverStyle}
           onReadyForDisplay={onCoverReady}
         />

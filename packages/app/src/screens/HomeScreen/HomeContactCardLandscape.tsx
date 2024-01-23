@@ -9,9 +9,11 @@ import Animated, {
 } from 'react-native-reanimated';
 import { graphql, useFragment } from 'react-relay';
 import { colors } from '#theme';
-import ContactCard, { CONTACT_CARD_RATIO } from '#components/ContactCard';
-import { useMainTabBarVisiblilityController } from '#components/MainTabBar';
-import type { HomeContactCardLandscape_profile$key } from '@azzapp/relay/artifacts/HomeContactCardLandscape_profile.graphql';
+import ContactCard, {
+  CONTACT_CARD_RATIO,
+} from '#components/ContactCard/ContactCard';
+import { useMainTabBarVisibilityController } from '#components/MainTabBar';
+import type { HomeContactCardLandscape_profile$key } from '#relayArtifacts/HomeContactCardLandscape_profile.graphql';
 
 type HomeContactCardLandscapeProps = {
   profile: HomeContactCardLandscape_profile$key | null;
@@ -25,7 +27,9 @@ const HomeContactCardLandscape = ({
       fragment HomeContactCardLandscape_profile on Profile {
         ...ContactCard_profile
         id
-        cardIsPublished
+        webCard {
+          cardIsPublished
+        }
       }
     `,
     profileKey,
@@ -41,9 +45,6 @@ const HomeContactCardLandscape = ({
     [visibleSharedValue],
   );
   useEffect(() => {
-    // could be improve using a hook to know if this is the current display screen
-    // maybe to much battery consuming
-    DeviceMotion.setUpdateInterval(1000);
     const subscription = DeviceMotion.addListener(({ orientation }) => {
       if (orientation !== orientationRef.current) {
         const visible = Math.abs(orientation) === 90;
@@ -63,14 +64,14 @@ const HomeContactCardLandscape = ({
     opacity: visibleSharedValue.value,
   }));
 
-  useMainTabBarVisiblilityController(
+  useMainTabBarVisibilityController(
     tabBarVisibleSharedValue,
     Math.abs(orientation) === 90,
   );
   const appearance = useColorScheme();
 
   const { width: windowWidth, height: windowHeight } = useWindowDimensions();
-  if (!profile || !profile.cardIsPublished) {
+  if (!profile || !profile.webCard.cardIsPublished) {
     return null;
   }
 

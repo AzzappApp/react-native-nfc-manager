@@ -3,6 +3,7 @@ import { asc, eq } from 'drizzle-orm';
 import {
   CardModuleTable,
   ProfileTable,
+  WebCardTable,
   checkMedias,
   createCardTemplate,
   db,
@@ -20,8 +21,8 @@ export const getModulesData = async (profileUserName: string) => {
   const res = await db
     .select()
     .from(CardModuleTable)
-    .innerJoin(ProfileTable, eq(ProfileTable.id, CardModuleTable.profileId))
-    .where(eq(ProfileTable.userName, profileUserName))
+    .innerJoin(WebCardTable, eq(ProfileTable.id, CardModuleTable.webCardId))
+    .where(eq(WebCardTable.userName, profileUserName))
     .orderBy(asc(CardModuleTable.position));
 
   if (res.length < 1) return null;

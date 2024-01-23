@@ -99,6 +99,8 @@ export type ImagePickerState = {
     param: T,
     value: EditionParameters[T],
   ): void;
+
+  cameraButtonsLeftRightPosition?: number;
 };
 
 const ImagePickerContext = createContext<ImagePickerState | null>(null);
@@ -145,6 +147,8 @@ type ImagePickerContextProviderProps = {
    * @param media the selected media
    */
   onMediaChange?(media: Media | null): void;
+
+  cameraButtonsLeftRightPosition?: number;
 };
 
 const _ImagePickerContextProvider = (
@@ -156,6 +160,7 @@ const _ImagePickerContextProvider = (
     children,
     forceCameraRatio,
     onMediaChange: onMediaChangeProps,
+    cameraButtonsLeftRightPosition,
   }: ImagePickerContextProviderProps,
   forwardedRef: ForwardedRef<ImagePickerState>,
 ) => {
@@ -269,6 +274,7 @@ const _ImagePickerContextProvider = (
       onMediaFilterChange: setMediaFilter,
       forceCameraRatio,
       clearMedia,
+      cameraButtonsLeftRightPosition,
     }),
     [
       kind,
@@ -286,6 +292,7 @@ const _ImagePickerContextProvider = (
       onTimeRangeChange,
       forceCameraRatio,
       clearMedia,
+      cameraButtonsLeftRightPosition,
     ],
   );
 

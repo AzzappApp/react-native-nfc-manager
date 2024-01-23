@@ -1,18 +1,35 @@
-import { forwardRef, memo, useCallback, useMemo, useRef } from 'react';
+import {
+  forwardRef,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import { Dimensions, Image, StyleSheet, View } from 'react-native';
+import {
+  useSharedValue,
+  withRepeat,
+  withTiming,
+  Easing,
+} from 'react-native-reanimated';
 import { graphql, useFragment } from 'react-relay';
 import { DEFAULT_COLOR_PALETTE, swapColor } from '@azzapp/shared/cardHelpers';
 import {
+  COVER_ANIMATION_DURATION,
   COVER_BASE_WIDTH,
   COVER_CARD_RADIUS,
   COVER_RATIO,
-  textOrientationOrDefaut,
-  textPositionOrDefaut,
+  textOrientationOrDefault,
+  textPositionOrDefault,
 } from '@azzapp/shared/coverHelpers';
 import { colors } from '#theme';
+import useLatestCallback from '#hooks/useLatestCallback';
 import { MediaImageRenderer, MediaVideoRenderer } from '../medias';
+import CoverStaticMediaLayer from './CoverStaticMediaLayer';
 import CoverTextRenderer from './CoverTextRenderer';
-import type { CoverRenderer_profile$key } from '@azzapp/relay/artifacts/CoverRenderer_profile.graphql';
+import MediaAnimator from './MediaAnimator';
+import type { CoverRenderer_webCard$key } from '#relayArtifacts/CoverRenderer_webCard.graphql';
 import type { ForwardedRef } from 'react';
 import type { StyleProp, ViewStyle } from 'react-native';
 
@@ -20,7 +37,7 @@ export type CoverRendererProps = {
   /**
    * The relay reference to the cover
    */
-  profile: CoverRenderer_profile$key | null | undefined;
+  webCard: CoverRenderer_webCard$key | null | undefined;
   /**
    * The width of the displayed cover
    */
@@ -31,17 +48,20 @@ export type CoverRendererProps = {
    */
   hideBorderRadius?: boolean;
   /**
-   * if true, the cover will play the cover video (if the cover media is a video)
-   * Should be also set on the fragment definition
+   * if true, the cover will play the cover animations if any or the video if any
    * @default false
    */
-  videoEnabled?: boolean;
+  animationEnabled?: boolean;
   /**
    * Called when the cover is ready for display,
    * which means both the media and the text are ready for display,
    * even if the size of the downloaded image is different from the size of the cover
    */
   onReadyForDisplay?: () => void;
+  /**
+   * Error handler for the cover
+   */
+  onError?: (error: any) => void;
   /**
    * The style of the cover container
    */
@@ -53,12 +73,13 @@ export type CoverRendererProps = {
  */
 const CoverRenderer = (
   {
-    profile: coverKey,
+    webCard: coverKey,
     width = 125,
     hideBorderRadius,
     style,
-    videoEnabled,
+    animationEnabled,
     onReadyForDisplay,
+    onError,
   }: CoverRendererProps,
   forwardRef: ForwardedRef<View>,
 ) => {
@@ -66,21 +87,16 @@ const CoverRenderer = (
   const { cardColors, cardCover } =
     useFragment(
       graphql`
-        fragment CoverRenderer_profile on Profile
+        fragment CoverRenderer_webCard on WebCard
         @argumentDefinitions(
-          screenWidth: {
-            type: "Float!"
-            provider: "../providers/ScreenWidth.relayprovider"
-          }
-          pixelRatio: {
-            type: "Float!"
-            provider: "../providers/PixelRatio.relayprovider"
-          }
+          screenWidth: { type: "Float!", provider: "ScreenWidth.relayprovider" }
+          pixelRatio: { type: "Float!", provider: "PixelRatio.relayprovider" }
           cappedPixelRatio: {
             type: "Float!"
-            provider: "../providers/CappedPixelRatio.relayprovider"
+            provider: "CappedPixelRatio.relayprovider"
           }
         ) {
+          id
           cardColors {
             primary
             dark
@@ -102,12 +118,14 @@ const CoverRenderer = (
             }
             foreground {
               id
+              kind
               largeURI: uri(width: $screenWidth, pixelRatio: $pixelRatio)
               smallURI: uri(width: 125, pixelRatio: $cappedPixelRatio)
             }
             foregroundColor
             background {
               id
+              kind
               largeURI: uri(width: $screenWidth, pixelRatio: $pixelRatio)
               smallURI: uri(width: 125, pixelRatio: $cappedPixelRatio)
             }
@@ -127,80 +145,24 @@ const CoverRenderer = (
             }
             textOrientation
             textPosition
+            textAnimation
+            mediaAnimation
           }
         }
       `,
       coverKey ?? null,
     ) ?? {};
-  //#endregion
-
-  //#region Ready states
-  // We need to wait for both the media and the text to be ready for display
-  // before calling the onReadyForDisplay callback, however, we need to
-  // redispatch it when the cover changes
-  const readyStates = useRef({
-    media: false,
-    foreground: false,
-    background: false,
-  });
-
-  const sources = useRef({
-    media: cardCover?.media?.id,
-    foreground: cardCover?.foreground?.id,
-    background: cardCover?.background?.id,
-  });
-
-  if (sources.current.media !== cardCover?.media?.id) {
-    readyStates.current.media = false;
-    sources.current.media = cardCover?.media?.id;
-  }
-  if (!sources.current.background) {
-    readyStates.current.background = true;
-  } else if (sources.current.background !== cardCover?.background?.id) {
-    readyStates.current.background = false;
-    sources.current.background = cardCover?.background?.id;
-  }
-
-  if (!sources.current.foreground) {
-    readyStates.current.foreground = true;
-  } else if (sources.current.foreground !== cardCover?.foreground?.id) {
-    readyStates.current.foreground = false;
-    sources.current.foreground = cardCover?.foreground?.id;
-  }
-
-  const onMediaReadyForDisplay = useCallback(() => {
-    readyStates.current.media = true;
-    if (readyStates.current.foreground && readyStates.current.background) {
-      onReadyForDisplay?.();
-    }
-  }, [onReadyForDisplay]);
-
-  const onForegroundReadyForDisplay = useCallback(() => {
-    readyStates.current.foreground = true;
-    if (readyStates.current.media && readyStates.current.background) {
-      onReadyForDisplay?.();
-    }
-  }, [onReadyForDisplay]);
-
-  const onBackgroundReadyForDisplay = useCallback(() => {
-    readyStates.current.background = true;
-    if (readyStates.current.media && readyStates.current.foreground) {
-      onReadyForDisplay?.();
-    }
-  }, [onReadyForDisplay]);
-  //#endregion
-
-  //#region Styles
-  const borderRadius: number = hideBorderRadius ? 0 : COVER_CARD_RADIUS * width;
 
   const {
     media,
+    mediaAnimation,
     title,
     titleStyle,
     subTitle,
     subTitleStyle,
     textOrientation,
     textPosition,
+    textAnimation,
     foreground,
     foregroundColor,
     background,
@@ -208,33 +170,169 @@ const CoverRenderer = (
     backgroundPatternColor,
   } = cardCover ?? {};
 
+  const { __typename, uri, thumbnail, smallURI, smallThumbnail } = media ?? {};
+
+  const mediaId = media?.id ?? null;
+  const foregroundId = foreground?.id ?? null;
+  const backgroundId = background?.id ?? null;
+  const isVideoMedia = __typename === 'MediaVideo';
+
   //#endregion
 
-  const { __typename, uri, thumbnail, smallURI, smallThumbnail } = media ?? {};
+  //#region States
+
+  const mediaLoadingStates = useRef({
+    mediaLoading: mediaId != null,
+    foregroundLoading: foregroundId != null,
+    backgroundLoading: backgroundId != null,
+  });
+
+  const [readyForDisplay, setReadyForDisplay] = useState(
+    mediaId == null && foregroundId == null && backgroundId == null,
+  );
+  const [textAnimationReady, setTextAnimationReady] = useState(
+    !title && !subTitle,
+  );
+  const [videoReady, setVideoReady] = useState(!isVideoMedia);
+
+  const animationSharedValue = useSharedValue(0);
+
+  const prevData = useRef({
+    mediaId,
+    foregroundId,
+    backgroundId,
+    title,
+    subTitle,
+  });
+
+  const {
+    current: {
+      mediaId: prevMediaId,
+      foregroundId: prevForegroundId,
+      backgroundId: prevBackgroundId,
+      title: prevTitle,
+      subTitle: prevSubTitle,
+    },
+  } = prevData;
+
+  if (prevMediaId !== mediaId) {
+    prevData.current.mediaId = mediaId;
+    mediaLoadingStates.current.mediaLoading = mediaId != null;
+  }
+
+  if (prevForegroundId !== foregroundId) {
+    prevData.current.foregroundId = foregroundId;
+    mediaLoadingStates.current.foregroundLoading = foregroundId != null;
+  }
+
+  if (prevBackgroundId !== backgroundId) {
+    prevData.current.backgroundId = backgroundId;
+    mediaLoadingStates.current.backgroundLoading = backgroundId != null;
+  }
+
+  if (prevTitle !== title || prevSubTitle !== subTitle) {
+    prevData.current.title = title;
+    prevData.current.subTitle = subTitle;
+    setTextAnimationReady(title === null && subTitle === null);
+  }
+
+  const onReadyForDisplayLatest = useLatestCallback(onReadyForDisplay);
+  const mediasReadyHandler = useCallback(() => {
+    const { mediaLoading, foregroundLoading, backgroundLoading } =
+      mediaLoadingStates.current;
+    if (!mediaLoading && !foregroundLoading && !backgroundLoading) {
+      setReadyForDisplay(true);
+      onReadyForDisplayLatest?.();
+    }
+  }, [onReadyForDisplayLatest]);
+
+  useEffect(() => {
+    // on the first render of empty cover, we need to dispatch the ready event
+    mediasReadyHandler();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const onMediaReadyForDisplay = useCallback(() => {
+    mediaLoadingStates.current.mediaLoading = false;
+    mediasReadyHandler();
+  }, [mediasReadyHandler]);
+
+  const onForegroundReadyForDisplay = useCallback(() => {
+    mediaLoadingStates.current.foregroundLoading = false;
+    mediasReadyHandler();
+  }, [mediasReadyHandler]);
+
+  const onBackgroundReadyForDisplay = useCallback(() => {
+    mediaLoadingStates.current.backgroundLoading = false;
+    mediasReadyHandler();
+  }, [mediasReadyHandler]);
+
+  const onTextReadyToAnimate = useCallback(() => {
+    setTextAnimationReady(true);
+  }, []);
+
+  const onVideoReady = useCallback(() => {
+    setVideoReady(true);
+  }, []);
+
+  const onVideoProgress = useCallback(
+    (event: { currentTime: number; duration: number }) => {
+      const { currentTime, duration } = event;
+      if (animationEnabled) {
+        animationSharedValue.value = withTiming(
+          currentTime / duration + 0.1 / duration,
+          {
+            duration: 100,
+            easing: Easing.linear,
+          },
+        );
+      }
+    },
+    [animationEnabled, animationSharedValue],
+  );
+
+  const onVideoEnd = useCallback(() => {
+    if (animationEnabled) {
+      animationSharedValue.value = 0;
+    }
+  }, [animationEnabled, animationSharedValue]);
+
+  useEffect(() => {
+    if (readyForDisplay && textAnimationReady && videoReady) {
+      animationSharedValue.value = 0;
+      if (animationEnabled) {
+        // we setup the animations even for the video cover
+        // to avoid flickering of the animation due to the delay
+        // of inProgress event on the first frames
+        animationSharedValue.value = withRepeat(
+          withTiming(1, {
+            duration: COVER_ANIMATION_DURATION,
+            easing: Easing.linear,
+          }),
+          -1,
+          false,
+        );
+      }
+    }
+  }, [
+    animationEnabled,
+    animationSharedValue,
+    readyForDisplay,
+    textAnimationReady,
+    videoReady,
+  ]);
+  //#endregion
+
+  //#region Styles and media sources
+  const borderRadius: number = hideBorderRadius ? 0 : COVER_CARD_RADIUS * width;
+
   const isSmallCover = width <= COVER_BASE_WIDTH;
-  const isVideoMedia = __typename === 'MediaVideo';
 
   const mediaUri = isSmallCover ? smallURI : uri;
 
   const requestedSize = useMemo(
     () => (isSmallCover ? COVER_BASE_WIDTH : Dimensions.get('window').width),
     [isSmallCover],
-  );
-
-  const backgroundSource = useMemo(
-    () =>
-      background?.id && {
-        uri: isSmallCover ? background.smallURI : background.largeURI,
-        mediaId: background.id,
-        requestedSize,
-      },
-    [
-      isSmallCover,
-      background?.smallURI,
-      background?.largeURI,
-      background?.id,
-      requestedSize,
-    ],
   );
 
   const coverSource = useMemo(
@@ -249,24 +347,6 @@ const CoverRenderer = (
     [mediaUri, requestedSize, media?.id],
   );
 
-  const foregroundSource = useMemo(
-    () =>
-      foreground?.id
-        ? {
-            uri: isSmallCover ? foreground.smallURI : foreground.largeURI,
-            mediaId: foreground.id,
-            requestedSize,
-          }
-        : null,
-    [
-      isSmallCover,
-      foreground?.smallURI,
-      foreground?.largeURI,
-      foreground?.id,
-      requestedSize,
-    ],
-  );
-
   const containerStyle = useMemo(
     () => [
       styles.root,
@@ -279,79 +359,160 @@ const CoverRenderer = (
     ],
     [borderRadius, width, backgroundColor, cardColors, style],
   );
+  //#endregion
 
-  return (
-    <View ref={forwardRef} style={containerStyle} testID="cover-renderer">
-      {coverSource ? (
-        <>
-          {backgroundSource && (
-            <MediaImageRenderer
-              testID="CoverRenderer_background"
-              source={backgroundSource}
-              tintColor={swapColor(backgroundPatternColor, cardColors)}
-              onReadyForDisplay={onBackgroundReadyForDisplay}
+  return useMemo(
+    () => (
+      <View ref={forwardRef} style={containerStyle} testID="cover-renderer">
+        {coverSource ? (
+          <>
+            {background && (
+              <CoverStaticMediaLayer
+                testID="CoverRenderer_background"
+                mediaId={background.id}
+                requestedSize={requestedSize}
+                kind={background.kind}
+                uri={isSmallCover ? background.smallURI : background.largeURI}
+                tintColor={swapColor(backgroundPatternColor, cardColors)}
+                onReady={onBackgroundReadyForDisplay}
+                onError={onError}
+                animationSharedValue={
+                  animationEnabled ? animationSharedValue : null
+                }
+                style={styles.layer}
+              />
+            )}
+            <MediaAnimator
+              animationSharedValue={
+                animationEnabled ? animationSharedValue : null
+              }
+              animation={mediaAnimation}
+              width={width}
+              height={width / COVER_RATIO}
               style={styles.layer}
+            >
+              {isVideoMedia ? (
+                <MediaVideoRenderer
+                  testID="CoverRenderer_media"
+                  source={coverSource}
+                  thumbnailURI={isSmallCover ? smallThumbnail : thumbnail}
+                  onReadyForDisplay={onMediaReadyForDisplay}
+                  onVideoReady={onVideoReady}
+                  videoEnabled={animationEnabled}
+                  onProgress={onVideoProgress}
+                  onEnd={onVideoEnd}
+                  onError={onError}
+                  style={styles.layer}
+                  paused={
+                    !animationEnabled ||
+                    !readyForDisplay ||
+                    !textAnimationReady ||
+                    !videoReady
+                  }
+                />
+              ) : (
+                <MediaImageRenderer
+                  testID="CoverRenderer_media"
+                  source={coverSource}
+                  onReadyForDisplay={onMediaReadyForDisplay}
+                  onError={onError}
+                  style={styles.layer}
+                />
+              )}
+            </MediaAnimator>
+            {foreground && (
+              <CoverStaticMediaLayer
+                testID="CoverRenderer_foreground"
+                mediaId={foreground.id}
+                requestedSize={requestedSize}
+                kind={foreground.kind}
+                uri={isSmallCover ? foreground.smallURI : foreground.largeURI}
+                tintColor={swapColor(foregroundColor, cardColors)}
+                onReady={onForegroundReadyForDisplay}
+                onError={onError}
+                animationSharedValue={
+                  animationEnabled ? animationSharedValue : null
+                }
+                style={styles.layer}
+              />
+            )}
+            <CoverTextRenderer
+              title={title}
+              subTitle={subTitle}
+              textOrientation={textOrientationOrDefault(textOrientation)}
+              textPosition={textPositionOrDefault(textPosition)}
+              textAnimation={textAnimation}
+              titleStyle={titleStyle}
+              subTitleStyle={subTitleStyle}
+              colorPalette={cardColors ?? DEFAULT_COLOR_PALETTE}
+              animationSharedValue={
+                animationEnabled ? animationSharedValue : null
+              }
+              onReadyToAnimate={onTextReadyToAnimate}
+              height={width / COVER_RATIO}
             />
-          )}
-          {isVideoMedia ? (
-            <MediaVideoRenderer
-              testID="CoverRenderer_media"
-              source={coverSource}
-              thumbnailURI={isSmallCover ? smallThumbnail : thumbnail}
-              onReadyForDisplay={onMediaReadyForDisplay}
-              style={styles.layer}
-              videoEnabled={videoEnabled}
+          </>
+        ) : (
+          <View style={styles.coverPlaceHolder}>
+            <Image
+              source={require('#assets/webcard/logo-substract-full.png')}
+              style={{
+                width: width / 2,
+                height: width / 2,
+              }}
+              resizeMode="contain"
             />
-          ) : (
-            <MediaImageRenderer
-              testID="CoverRenderer_media"
-              source={coverSource}
-              onReadyForDisplay={onMediaReadyForDisplay}
-              style={styles.layer}
-            />
-          )}
-          {foregroundSource && (
-            <MediaImageRenderer
-              testID="CoverRenderer_foreground"
-              source={foregroundSource}
-              tintColor={swapColor(foregroundColor, cardColors)}
-              onReadyForDisplay={onForegroundReadyForDisplay}
-              style={styles.layer}
-            />
-          )}
-          <CoverTextRenderer
-            title={title}
-            subTitle={subTitle}
-            textOrientation={textOrientationOrDefaut(textOrientation)}
-            textPosition={textPositionOrDefaut(textPosition)}
-            titleStyle={titleStyle}
-            subTitleStyle={subTitleStyle}
-            colorPalette={cardColors ?? DEFAULT_COLOR_PALETTE}
-            height={width / COVER_RATIO}
-          />
-        </>
-      ) : (
-        <View style={styles.coverPlaceHolder}>
-          <Image
-            source={require('#assets/webcard/logo-substract-full.png')}
-            style={{
-              width: width / 2,
-              height: width / 2,
-            }}
-            resizeMode="contain"
-          />
-        </View>
-      )}
-    </View>
+          </View>
+        )}
+      </View>
+    ),
+    [
+      animationEnabled,
+      animationSharedValue,
+      background,
+      backgroundPatternColor,
+      cardColors,
+      containerStyle,
+      coverSource,
+      foreground,
+      foregroundColor,
+      forwardRef,
+      isSmallCover,
+      isVideoMedia,
+      mediaAnimation,
+      onBackgroundReadyForDisplay,
+      onError,
+      onForegroundReadyForDisplay,
+      onMediaReadyForDisplay,
+      onTextReadyToAnimate,
+      onVideoEnd,
+      onVideoProgress,
+      onVideoReady,
+      readyForDisplay,
+      requestedSize,
+      smallThumbnail,
+      subTitle,
+      subTitleStyle,
+      textAnimation,
+      textAnimationReady,
+      textOrientation,
+      textPosition,
+      thumbnail,
+      title,
+      titleStyle,
+      videoReady,
+      width,
+    ],
   );
 };
 
-export default memo(forwardRef(CoverRenderer));
+export default forwardRef(CoverRenderer);
 
 const styles = StyleSheet.create({
   root: {
     aspectRatio: COVER_RATIO,
     overflow: 'hidden',
+    borderCurve: 'continuous',
   },
   layer: {
     position: 'absolute',

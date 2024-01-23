@@ -9,20 +9,20 @@ import {
   SIMPLE_TITLE_MAX_VERTICAL_SPACING,
   SIMPLE_TITLE_MIN_FONT_SIZE,
 } from '@azzapp/shared/cardModuleHelpers';
-import { ProfileColorDropDownPicker } from '#components/ProfileColorPicker';
+import { WebCardColorDropDownPicker } from '#components/WebCardColorPicker';
 import AlignmentButton from '#ui/AlignmentButton';
 import FontDropDownPicker from '#ui/FontDropDownPicker';
 import LabeledDashedSlider from '#ui/LabeledDashedSlider';
 import TitleWithLine from '#ui/TitleWithLine';
-import type { TextAlignment } from '@azzapp/relay/artifacts/SimpleTextEditionScreen_module.graphql';
-import type { SimpleTextStyleEditionPanel_viewer$key } from '@azzapp/relay/artifacts/SimpleTextStyleEditionPanel_viewer.graphql';
+import type { TextAlignment } from '#relayArtifacts/SimpleTextEditionScreen_module.graphql';
+import type { SimpleTextStyleEditionPanel_webCard$key } from '#relayArtifacts/SimpleTextStyleEditionPanel_webCard.graphql';
 import type { ViewProps } from 'react-native-svg/lib/typescript/fabric/utils';
 
 type SimpleTextStyleEditionPanelProps = ViewProps & {
   /**
    * A relay fragment reference to the profile
    */
-  viewer: SimpleTextStyleEditionPanel_viewer$key;
+  webCard: SimpleTextStyleEditionPanel_webCard$key | null;
   /**
    * The color of the text
    */
@@ -77,7 +77,7 @@ type SimpleTextStyleEditionPanelProps = ViewProps & {
  * Panel to edit the style of the simple text
  */
 const SimpleTextStyleEditionPanel = ({
-  viewer,
+  webCard: webCardKey,
   fontColor,
   fontSize,
   verticalSpacing,
@@ -95,20 +95,18 @@ const SimpleTextStyleEditionPanel = ({
 }: SimpleTextStyleEditionPanelProps) => {
   const intl = useIntl();
 
-  const { profile } = useFragment(
+  const webCard = useFragment(
     graphql`
-      fragment SimpleTextStyleEditionPanel_viewer on Viewer {
-        profile {
-          ...ProfileColorPicker_profile
-          cardColors {
-            primary
-            dark
-            light
-          }
+      fragment SimpleTextStyleEditionPanel_webCard on WebCard {
+        ...WebCardColorPicker_webCard
+        cardColors {
+          primary
+          dark
+          light
         }
       }
     `,
-    viewer,
+    webCardKey,
   );
 
   return (
@@ -126,8 +124,8 @@ const SimpleTextStyleEditionPanel = ({
           onFontFamilyChange={onFontFamilyChange}
           bottomSheetHeight={bottomSheetHeight}
         />
-        <ProfileColorDropDownPicker
-          profile={profile!}
+        <WebCardColorDropDownPicker
+          webCard={webCard ?? null}
           color={fontColor}
           onColorChange={onColorChange}
           bottomSheetHeight={bottomSheetHeight}

@@ -3,7 +3,7 @@ import { FormattedMessage } from 'react-intl';
 import { StyleSheet, View } from 'react-native';
 import { graphql, usePreloadedQuery } from 'react-relay';
 import Link from '#components/Link';
-import ProfilePostsList from '#components/ProfilePostsList';
+import ProfilePostsList from '#components/WebCardPostsList';
 import relayScreen from '#helpers/relayScreen';
 import useScreenInsets from '#hooks/useScreenInsets';
 import ActivityIndicator from '#ui/ActivityIndicator';
@@ -13,30 +13,33 @@ import PressableNative from '#ui/PressableNative';
 import TabBarMenuItem from '#ui/TabBarMenuItem';
 import TabView from '#ui/TabView';
 import Text from '#ui/Text';
-import MediaFollowingsProfiles from './MediaFollowingsProfiles';
 import MediaFollowingsScreen from './MediaFollowingsScreen';
-import MediaSuggestionsProfiles from './MediaSuggestionsProfiles';
+import MediaFollowingsWebCards from './MediaFollowingsWebCards';
 import MediaSuggestionsScreen from './MediaSuggestionsScreen';
+import MediaSuggestionsWebCards from './MediaSuggestionsWebCards';
 import type { RelayScreenProps } from '#helpers/relayScreen';
+import type { MediaScreenQuery } from '#relayArtifacts/MediaScreenQuery.graphql';
 import type { MediaRoute } from '#routes';
-import type { MediaScreenQuery } from '@azzapp/relay/artifacts/MediaScreenQuery.graphql';
 import type { ReactElement } from 'react';
 
 type TAB = 'FOLLOWINGS' | 'MY_POSTS' | 'SUGGESTIONS';
 
 const mediaScreenQuery = graphql`
-  query MediaScreenQuery {
-    viewer {
-      profile {
-        id
-        userName
-        ...ProfilePostsList_profile
-        ...PostRendererFragment_author
+  query MediaScreenQuery($profileId: ID!, $viewerWebCardId: ID!) {
+    node(id: $profileId) {
+      ... on Profile @alias(as: "profile") {
+        ...MediaSuggestionsScreen_profile
+        ...MediaSuggestionsWebCards_profile
+        webCard {
+          id
+          userName
+          ...WebCardPostsList_webCard
+            @arguments(viewerWebCardId: $viewerWebCardId)
+          ...PostRendererFragment_author
+          ...MediaFollowingsWebCards_webCard
+          ...MediaFollowingsScreen_webCard
+        }
       }
-      ...MediaSuggestionsScreen_viewer
-      ...MediaSuggestionsProfiles_viewer
-      ...MediaFollowingsScreen_viewer
-      ...MediaFollowingsProfiles_viewer
     }
   }
 `;
@@ -45,12 +48,13 @@ const MediaScreen = ({
   preloadedQuery,
   hasFocus = true,
 }: RelayScreenProps<MediaRoute, MediaScreenQuery>) => {
-  const { viewer } = usePreloadedQuery(mediaScreenQuery, preloadedQuery);
+  const { node } = usePreloadedQuery(mediaScreenQuery, preloadedQuery);
+  const profile = node?.profile;
   const { top } = useScreenInsets();
   const [tab, setTab] = useState<TAB>('SUGGESTIONS');
 
   // viewer might be briefly null when the user logs out or by switching accounts
-  if (!viewer) {
+  if (!profile) {
     return null;
   }
 
@@ -59,24 +63,24 @@ const MediaScreen = ({
       id: 'SUGGESTIONS',
       element: (
         <MediaSuggestionsScreen
-          viewer={viewer}
+          profile={profile}
           canPlay={hasFocus && tab === 'SUGGESTIONS'}
           ListHeaderComponent={
             <View>
-              <MediaSuggestionsProfiles
+              <MediaSuggestionsWebCards
                 header={
                   <Text variant="large" style={styles.coversTitleStyle}>
                     <FormattedMessage
-                      defaultMessage="Webcards{azzappAp} to follow"
+                      defaultMessage="Webcards{azzappA} to follow"
                       description="List of suggested profiles"
                       values={{
-                        azzappAp: <Text variant="azzapp">a</Text>,
+                        azzappA: <Text variant="azzapp">a</Text>,
                       }}
                     />
                   </Text>
                 }
                 coverListStyle={styles.coverList}
-                viewer={viewer}
+                profile={profile}
                 isCurrentTab={tab === 'SUGGESTIONS'}
               />
               <Text style={styles.postsTitleStyle} variant="large">
@@ -90,16 +94,19 @@ const MediaScreen = ({
         />
       ),
     },
-    {
+  ];
+
+  if (profile?.webCard) {
+    tabs.push({
       id: 'FOLLOWINGS',
       element: (
         <Suspense>
           <MediaFollowingsScreen
-            viewer={viewer}
+            webCard={profile.webCard}
             canPlay={hasFocus && tab === 'FOLLOWINGS'}
             ListHeaderComponent={
               <View>
-                <MediaFollowingsProfiles
+                <MediaFollowingsWebCards
                   header={
                     <Text variant="large" style={styles.coversTitleStyle}>
                       <FormattedMessage
@@ -108,7 +115,7 @@ const MediaScreen = ({
                       />
                     </Text>
                   }
-                  viewer={viewer}
+                  webCard={profile?.webCard}
                   style={styles.coverList}
                 />
 
@@ -123,17 +130,17 @@ const MediaScreen = ({
           />
         </Suspense>
       ),
-    },
-  ];
+    });
+  }
 
-  if (viewer.profile) {
+  if (profile) {
     tabs.push({
       id: 'MY_POSTS',
       element: (
         <View style={{ flex: 1 }}>
           <Suspense>
             <ProfilePostsList
-              profile={viewer.profile}
+              webCard={profile.webCard}
               canPlay={hasFocus && tab === 'MY_POSTS'}
             />
           </Suspense>
@@ -246,5 +253,9 @@ const styles = StyleSheet.create({
 
 export default relayScreen(MediaScreen, {
   query: mediaScreenQuery,
+  getVariables: (_, profileInfos) => ({
+    profileId: profileInfos?.profileId ?? '',
+    viewerWebCardId: profileInfos?.webCardId ?? '',
+  }),
   fallback: MediaScreenFallback,
 });

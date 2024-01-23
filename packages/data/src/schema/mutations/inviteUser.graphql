@@ -1,0 +1,15 @@
+extend type Mutation {
+  inviteUser(input: InviteUserInput!): InviteUserPayload
+}
+
+input InviteUserInput {
+  profileId: ID!
+  phoneNumber: String
+  email: String
+  profileRole: ProfileRole!
+  contactCard: ContactCardInput
+}
+
+type InviteUserPayload {
+  profile: Profile
+}

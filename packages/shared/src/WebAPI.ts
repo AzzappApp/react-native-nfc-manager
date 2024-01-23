@@ -2,6 +2,7 @@
  * This modules contains helper functions to make API calls to the backend.
  */
 import { fetchJSON, postFormData } from './networkHelpers';
+import type { CommonInformation } from './contactCardHelpers';
 import type { FetchFunction, fetchBlob } from './networkHelpers';
 
 const API_ENDPOINT = process.env.NEXT_PUBLIC_API_ENDPOINT!;
@@ -38,6 +39,10 @@ export type SignUpParams = {
    * The user's chosen password.
    */
   password: string;
+  /**
+   * The user's locale.
+   */
+  locale?: string;
 } & (
   | {
       /**
@@ -56,7 +61,17 @@ export type SignUpParams = {
 /**
  * API call to signup a new user.
  */
-export const signup: APIMethod<SignUpParams, TokensResponse> = (data, init) =>
+export const signup: APIMethod<
+  SignUpParams,
+  TokensResponse & {
+    userId: string;
+    profileInfos: {
+      profileRole: string;
+      profileId: string;
+      webCardId: string;
+    } | null;
+  }
+> = (data, init) =>
   apiFetch(`${API_ENDPOINT}/signup`, {
     ...init,
     method: 'POST',
@@ -82,8 +97,15 @@ export type SignInParams = {
  */
 export const signin: APIMethod<
   SignInParams,
-  TokensResponse & { profileId?: string }
-> = (data, init): Promise<TokensResponse> =>
+  TokensResponse & {
+    userId: string;
+    profileInfos: {
+      profileRole: string;
+      profileId: string;
+      webCardId: string;
+    } | null;
+  }
+> = (data, init) =>
   apiFetch(`${API_ENDPOINT}/signin`, {
     ...init,
     method: 'POST',
@@ -210,7 +232,9 @@ export const uploadMedia = (
  */
 export const verifySign: APIMethod<
   { signature: string; data: string; salt: string },
-  { message: string }
+  Pick<CommonInformation, 'socials' | 'urls'> & {
+    avatarUrl?: string;
+  }
 > = async ({ signature, data, salt }, init) =>
   apiFetch(`${API_ENDPOINT}/verifySign`, {
     ...init,
@@ -222,10 +246,10 @@ export const verifySign: APIMethod<
  * Api call to generate an apple wallet pass.
  */
 export const getAppleWalletPass = (
-  { locale, profileId }: { locale: string; profileId: string },
+  { locale, webCardId }: { locale: string; webCardId: string },
   init: RequestInit & { fetchFunction: typeof fetchBlob },
 ) =>
-  apiFetch(`${API_ENDPOINT}/${locale}/wallet/apple?profileId=${profileId}`, {
+  apiFetch(`${API_ENDPOINT}/${locale}/wallet/apple?webCardId=${webCardId}`, {
     ...init,
     method: 'GET',
   });
@@ -234,10 +258,10 @@ export const getAppleWalletPass = (
  * Api call to generate a google wallet pass.
  */
 export const getGoogleWalletPass: APIMethod<
-  { locale: string; profileId: string },
+  { locale: string; webCardId: string },
   { token: string }
-> = ({ locale, profileId }, init) =>
-  apiFetch(`${API_ENDPOINT}/${locale}/wallet/google?profileId=${profileId}`, {
+> = ({ locale, webCardId }, init) =>
+  apiFetch(`${API_ENDPOINT}/${locale}/wallet/google?webCardId=${webCardId}`, {
     ...init,
     method: 'GET',
   });

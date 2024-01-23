@@ -1,6 +1,9 @@
 import { NextResponse } from 'next/server';
+import { getProfileById, getWebCardById } from '@azzapp/data/domains';
+import { parseContactCard } from '@azzapp/shared/contactCardHelpers';
 import { verifyHmacWithPassword } from '@azzapp/shared/crypto';
 import ERRORS from '@azzapp/shared/errors';
+import { buildAvatarUrl } from '#helpers/avatar';
 import cors from '#helpers/cors';
 
 const verifySignApi = async (req: Request) => {
@@ -23,7 +26,29 @@ const verifySignApi = async (req: Request) => {
   );
 
   if (isValid) {
-    return NextResponse.json({ message: 'Valid signature' }, { status: 200 });
+    const foundContactCard = parseContactCard(decodeURIComponent(data));
+
+    const storedProfile = await getProfileById(foundContactCard.profileId);
+
+    const webCard = await getWebCardById(foundContactCard.webCardId);
+
+    const avatarUrl =
+      storedProfile && (await buildAvatarUrl(storedProfile, webCard));
+
+    return NextResponse.json(
+      {
+        urls: (webCard?.commonInformation?.urls ?? []).concat(
+          storedProfile?.contactCard?.urls?.filter(url => url.selected) ?? [],
+        ),
+        socials: (webCard?.commonInformation?.socials ?? []).concat(
+          storedProfile?.contactCard?.socials?.filter(
+            social => social.selected,
+          ) ?? [],
+        ),
+        avatarUrl,
+      },
+      { status: 200 },
+    );
   } else {
     return NextResponse.json(
       { message: ERRORS.INVALID_REQUEST },

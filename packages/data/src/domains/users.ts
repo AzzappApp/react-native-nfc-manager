@@ -1,7 +1,8 @@
 import { createId } from '@paralleldrive/cuid2';
 import { eq } from 'drizzle-orm';
-import { uniqueIndex, mysqlTable, json } from 'drizzle-orm/mysql-core';
+import { uniqueIndex, mysqlTable, json, boolean } from 'drizzle-orm/mysql-core';
 import db, { cols } from './db';
+import type { DbTransaction } from './db';
 import type { InferInsertModel, InferSelectModel } from 'drizzle-orm';
 
 export const UserTable = mysqlTable(
@@ -14,6 +15,8 @@ export const UserTable = mysqlTable(
     createdAt: cols.dateTime('createdAt').notNull(),
     updatedAt: cols.dateTime('updatedAt').notNull(),
     roles: json('roles').$type<string[]>(),
+    invited: boolean('invited').default(false).notNull(),
+    locale: cols.defaultVarchar('locale'),
   },
   table => {
     return {
@@ -62,7 +65,6 @@ export const getUserByPhoneNumber = async (
     .select()
     .from(UserTable)
     .where(eq(UserTable.phoneNumber, phoneNumber))
-
     .then(user => user.pop() ?? null);
 };
 
@@ -71,9 +73,9 @@ export const getUserByPhoneNumber = async (
  * @param data - The user fields, excluding the id
  * @returns The newly created user
  */
-export const createUser = async (data: NewUser) => {
+export const createUser = async (data: NewUser, tx: DbTransaction = db) => {
   const id = createId();
-  await db.insert(UserTable).values({ ...data, id });
+  await tx.insert(UserTable).values({ ...data, id });
   return id;
 };
 

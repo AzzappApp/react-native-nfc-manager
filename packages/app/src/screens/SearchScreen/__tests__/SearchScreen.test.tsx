@@ -49,7 +49,7 @@ const renderScreen = () => {
               },
             ],
           },
-          recommendedProfilesList_viewer: {
+          recommendedProfilesList_profile: {
             edges: [
               {
                 node: {
@@ -58,7 +58,7 @@ const renderScreen = () => {
               },
             ],
           },
-          trendingPostsList_viewer: {
+          trendingPostsList_profile: {
             edges: [
               {
                 node: {

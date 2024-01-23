@@ -1,30 +1,36 @@
 """
 Template for a cover
 """
-type Statistic implements Node {
+type WebCardStatistic implements Node {
   """
   The ID of an object
   """
   id: ID!
   """
-  The profile ID of an object
+  The Date for the daily stats
   """
-  profileId: ID!
+  day: String!
+  """
+  Number of webCardsView for the day
+  """
+  webCardViews: Int!
+  """
+  Number of likes (post....) recevied for the day
+  """
+  likes: Int!
+}
+
+type ProfileStatistic implements Node {
+  """
+  The ID of an object
+  """
+  id: ID!
   """
   The Date for the daily stats
   """
   day: String!
   """
-  Number of webcardsView for the day
+  Number of contactCardScans for the day
   """
-  webcardViews: Int!
-  """
-  Number of contactcardScans for the day
-  """
-  contactcardScans:Int!
-  """
-  Number of likes (post....) recevied for the day
-  """
-  likes: Int!
-
+  contactCardScans: Int!
 }

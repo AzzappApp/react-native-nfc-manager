@@ -1,7 +1,7 @@
 import { omit } from 'lodash';
-import { Suspense, useCallback, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { graphql, useFragment, useMutation } from 'react-relay';
 
@@ -9,15 +9,13 @@ import {
   BLOCK_TEXT_DEFAULT_VALUES,
   BLOCK_TEXT_MAX_LENGTH,
   BLOCK_TEXT_STYLE_VALUES,
-  MODULE_KIND_BLOCK_TEXT,
 } from '@azzapp/shared/cardModuleHelpers';
 import { useRouter } from '#components/NativeRouter';
-import WebCardModulePreview from '#components/WebCardModulePreview';
 import useEditorLayout from '#hooks/useEditorLayout';
 import useModuleDataEditor from '#hooks/useModuleDataEditor';
 import { BOTTOM_MENU_HEIGHT } from '#ui/BottomMenu';
 import Container from '#ui/Container';
-import Header, { HEADER_HEIGHT } from '#ui/Header';
+import Header from '#ui/Header';
 import HeaderButton from '#ui/HeaderButton';
 import TabView from '#ui/TabView';
 import TextAreaModal from '#ui/TextAreaModal';
@@ -27,19 +25,19 @@ import BlockTextPreview from './BlockTextPreview';
 import BlockTextSectionBackgroundEditionPanel from './BlockTextSectionBackgroundEditionPanel';
 import BlockTextSettingsEditionPanel from './BlockTextSettingsEditionPanel';
 import BlockTextTextBackgroundEditionPanel from './BlockTextTextBackgroundEditionPanel';
-import type { BlockTextEditionScreen_module$key } from '@azzapp/relay/artifacts/BlockTextEditionScreen_module.graphql';
-import type { BlockTextEditionScreen_viewer$key } from '@azzapp/relay/artifacts/BlockTextEditionScreen_viewer.graphql';
+import type { BlockTextEditionScreen_module$key } from '#relayArtifacts/BlockTextEditionScreen_module.graphql';
+import type { BlockTextEditionScreen_profile$key } from '#relayArtifacts/BlockTextEditionScreen_profile.graphql';
 import type {
   BlockTextEditionScreenUpdateModuleMutation,
   SaveBlockTextModuleInput,
-} from '@azzapp/relay/artifacts/BlockTextEditionScreenUpdateModuleMutation.graphql';
+} from '#relayArtifacts/BlockTextEditionScreenUpdateModuleMutation.graphql';
 import type { ViewProps } from 'react-native';
 
 export type BlockTextEditionScreenProps = ViewProps & {
   /**
    * the current viewer
    */
-  viewer: BlockTextEditionScreen_viewer$key;
+  profile: BlockTextEditionScreen_profile$key;
   /**
    * the current module to edit, if null, a new module will be created
    */
@@ -51,7 +49,7 @@ export type BlockTextEditionScreenProps = ViewProps & {
  */
 const BlockTextEditionScreen = ({
   module,
-  viewer: viewerKey,
+  profile: profileKey,
 }: BlockTextEditionScreenProps) => {
   // #region Data retrieval
   const blockText = useFragment(
@@ -91,18 +89,16 @@ const BlockTextEditionScreen = ({
     module,
   );
 
-  const viewer = useFragment(
+  const profile = useFragment(
     graphql`
-      fragment BlockTextEditionScreen_viewer on Viewer {
-        ...BlockTextSettingsEditionPanel_viewer
-        ...BlockTextSectionBackgroundEditionPanel_viewer
-        ...BlockTextTextBackgroundEditionPanel_viewer
+      fragment BlockTextEditionScreen_profile on Profile {
         moduleBackgrounds {
           id
           uri
           resizeMode
         }
-        profile {
+        webCard {
+          id
           cardColors {
             primary
             light
@@ -120,10 +116,13 @@ const BlockTextEditionScreen = ({
             titleFontFamily
             titleFontSize
           }
+          ...BlockTextSettingsEditionPanel_webCard
         }
+        ...BlockTextSectionBackgroundEditionPanel_profile
+        ...BlockTextTextBackgroundEditionPanel_profile
       }
     `,
-    viewerKey,
+    profileKey,
   );
 
   // #endregion
@@ -150,7 +149,7 @@ const BlockTextEditionScreen = ({
 
   const { data, value, fieldUpdateHandler, dirty } = useModuleDataEditor({
     initialValue,
-    cardStyle: viewer.profile?.cardStyle,
+    cardStyle: profile?.webCard.cardStyle,
     styleValuesMap: BLOCK_TEXT_STYLE_VALUES,
     defaultValues: BLOCK_TEXT_DEFAULT_VALUES,
   });
@@ -175,11 +174,11 @@ const BlockTextEditionScreen = ({
   const previewData = {
     ...omit(data, 'backgroundId', 'textBackgroundId'),
     background:
-      viewer.moduleBackgrounds.find(
+      profile.moduleBackgrounds.find(
         background => background.id === backgroundId,
       ) ?? null,
     textBackground:
-      viewer.moduleBackgrounds.find(
+      profile.moduleBackgrounds.find(
         background => background.id === textBackgroundId,
       ) ?? null,
   };
@@ -192,7 +191,7 @@ const BlockTextEditionScreen = ({
         $input: SaveBlockTextModuleInput!
       ) {
         saveBlockTextModule(input: $input) {
-          profile {
+          webCard {
             id
             cardModules {
               kind
@@ -219,6 +218,7 @@ const BlockTextEditionScreen = ({
       ...value,
       moduleId: blockText?.id,
       text: value.text!,
+      webCardId: profile.webCard.id,
     };
 
     commit({
@@ -241,7 +241,7 @@ const BlockTextEditionScreen = ({
         });
       },
     });
-  }, [canSave, value, blockText?.id, commit, router, intl]);
+  }, [canSave, value, blockText?.id, profile.webCard.id, commit, router, intl]);
 
   const onCancel = useCallback(() => {
     router.back();
@@ -348,8 +348,8 @@ const BlockTextEditionScreen = ({
         style={{ height: topPanelHeight - 20, marginVertical: 10 }}
         data={previewData}
         onPreviewPress={onPreviewPress}
-        colorPalette={viewer.profile?.cardColors}
-        cardStyle={viewer.profile?.cardStyle}
+        colorPalette={profile?.webCard.cardColors}
+        cardStyle={profile?.webCard.cardStyle}
       />
       <TabView
         style={{ height: bottomPanelHeight }}
@@ -359,7 +359,7 @@ const BlockTextEditionScreen = ({
             id: 'settings',
             element: (
               <BlockTextSettingsEditionPanel
-                viewer={viewer}
+                webCard={profile?.webCard ?? null}
                 fontFamily={fontFamily}
                 onFontFamilyChange={onFontFamilyChange}
                 fontColor={fontColor}
@@ -401,7 +401,7 @@ const BlockTextEditionScreen = ({
             id: 'textBackground',
             element: (
               <BlockTextTextBackgroundEditionPanel
-                viewer={viewer}
+                profile={profile}
                 textBackgroundId={textBackgroundId}
                 textBackgroundStyle={textBackgroundStyle}
                 onTextBackgroundChange={onTextBackgroundChange}
@@ -418,7 +418,7 @@ const BlockTextEditionScreen = ({
             id: 'sectionBackground',
             element: (
               <BlockTextSectionBackgroundEditionPanel
-                viewer={viewer}
+                profile={profile}
                 backgroundId={backgroundId}
                 backgroundStyle={backgroundStyle}
                 onBackgroundChange={onBackgroundChange}
@@ -433,29 +433,6 @@ const BlockTextEditionScreen = ({
           },
         ]}
       />
-      <View
-        style={{
-          position: 'absolute',
-          top: HEADER_HEIGHT + insetTop,
-          height: topPanelHeight + bottomPanelHeight,
-          width: windowWidth,
-          opacity: currentTab === 'preview' ? 1 : 0,
-        }}
-        pointerEvents={currentTab === 'preview' ? 'auto' : 'none'}
-      >
-        <Suspense>
-          <WebCardModulePreview
-            editedModuleId={blockText?.id}
-            visible={currentTab === 'preview'}
-            editedModuleInfo={{
-              kind: MODULE_KIND_BLOCK_TEXT,
-              data: previewData,
-            }}
-            height={topPanelHeight + bottomPanelHeight}
-            contentPaddingBottom={insetBottom + BOTTOM_MENU_HEIGHT}
-          />
-        </Suspense>
-      </View>
       <BlockTextEditionBottomMenu
         currentTab={currentTab}
         onItemPress={onCurrentTabChange}

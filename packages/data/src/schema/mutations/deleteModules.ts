@@ -1,10 +1,12 @@
 import { inArray } from 'drizzle-orm';
 import { GraphQLError } from 'graphql';
 import ERRORS from '@azzapp/shared/errors';
+import { isEditor } from '@azzapp/shared/profileHelpers';
 import {
   CardModuleTable,
   db,
   getCardModulesByIds,
+  getUserProfileWithWebCardId,
   resetCardModulesPositions,
 } from '#domains';
 import type { MutationResolvers } from '#schema/__generated__/types';
@@ -12,21 +14,26 @@ import type { MutationResolvers } from '#schema/__generated__/types';
 const deleteModules: MutationResolvers['deleteModules'] = async (
   _,
   { input: { modulesIds } },
-  { auth, loaders, cardUsernamesToRevalidate },
+  { auth, cardUsernamesToRevalidate, loaders },
 ) => {
-  const { profileId } = auth;
-  if (!profileId) {
-    throw new GraphQLError(ERRORS.UNAUTORIZED);
-  }
+  const { userId } = auth;
+  const modules = await getCardModulesByIds(modulesIds);
   if (modulesIds.length === 0) {
     throw new GraphQLError(ERRORS.INVALID_REQUEST);
   }
 
-  const modules = await getCardModulesByIds(modulesIds);
+  const webCardId = modules[0]!.webCardId;
   if (
-    !modules.every(module => module != null && module.profileId === profileId)
+    !modules.every(module => module != null && module.webCardId === webCardId)
   ) {
     throw new GraphQLError(ERRORS.INVALID_REQUEST);
+  }
+
+  const profile =
+    userId && (await getUserProfileWithWebCardId(userId, webCardId));
+
+  if (!profile || !isEditor(profile.profileRole)) {
+    throw new GraphQLError(ERRORS.UNAUTHORIZED);
   }
 
   try {
@@ -34,17 +41,22 @@ const deleteModules: MutationResolvers['deleteModules'] = async (
       await db
         .delete(CardModuleTable)
         .where(inArray(CardModuleTable.id, modulesIds));
-      await resetCardModulesPositions(profileId, trx);
+      await resetCardModulesPositions(profile.id, trx);
     });
   } catch (e) {
     console.error(e);
     throw new GraphQLError(ERRORS.INTERNAL_SERVER_ERROR);
   }
 
-  const profile = (await loaders.Profile.load(profileId))!;
-  cardUsernamesToRevalidate.add(profile.userName);
+  const webCard = await loaders.WebCard.load(profile.webCardId);
 
-  return { profile };
+  if (!webCard) {
+    throw new Error(ERRORS.INTERNAL_SERVER_ERROR);
+  }
+
+  cardUsernamesToRevalidate.add(webCard.userName);
+
+  return { webCard };
 };
 
 export default deleteModules;

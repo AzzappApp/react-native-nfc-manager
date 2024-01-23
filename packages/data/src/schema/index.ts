@@ -14,7 +14,7 @@ import * as ProfileResolvers from './ProfileResolvers';
 import * as QueryResolvers from './QueryResolvers';
 import * as StatisticResolvers from './StatisticResolvers';
 import * as UserResolvers from './UserResolvers';
-import * as ViewerResolvers from './ViewerResolvers';
+import * as WebCardResolvers from './WebCardResolvers';
 import type { Resolvers } from './__generated__/types';
 
 const resolvers: Resolvers = {
@@ -28,9 +28,9 @@ const resolvers: Resolvers = {
   ...MutationResolvers,
   ...PostResolvers,
   ...ProfileResolvers,
+  ...WebCardResolvers,
   ...QueryResolvers,
   ...UserResolvers,
-  ...ViewerResolvers,
   ...CardTemplateResolvers,
   ...CardTemplateTypeResolvers,
   ...StatisticResolvers,

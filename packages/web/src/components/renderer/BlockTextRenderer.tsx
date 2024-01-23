@@ -58,6 +58,7 @@ const BlockTextRenderer = ({
     >
       <div style={{ maxWidth: '800px', margin: 'auto' }}>
         <CardModuleBackground
+          {...props}
           backgroundId={textBackgroundId}
           backgroundStyle={textBackgroundStyle}
           colorPalette={colorPalette}
@@ -80,6 +81,7 @@ const BlockTextRenderer = ({
                   ? `${fontSize * 1.2 + verticalSpacing}px`
                   : undefined,
               whiteSpace: 'pre-wrap',
+              wordBreak: 'break-word',
             }}
             className={fontsMap[fontFamily].className}
           >

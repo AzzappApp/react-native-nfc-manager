@@ -1,12 +1,11 @@
 import { omit } from 'lodash';
-import { Suspense, useCallback, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { graphql, useFragment, useMutation } from 'react-relay';
 import {
   MODULE_IMAGE_MAX_WIDTH,
-  MODULE_KIND_PHOTO_WITH_TEXT_AND_TITLE,
   PHOTO_WITH_TEXT_AND_TITLE_DEFAULT_VALUES,
   PHOTO_WITH_TEXT_AND_TITLE_STYLE_VALUES,
   PHOTO_WITH_TEXT_AND_TITLE_TEXT_MAX_LENGTH,
@@ -21,7 +20,6 @@ import ImagePicker, {
 } from '#components/ImagePicker';
 import { useRouter } from '#components/NativeRouter';
 import ScreenModal from '#components/ScreenModal';
-import WebCardModulePreview from '#components/WebCardModulePreview';
 import { getFileName } from '#helpers/fileHelpers';
 import { downScaleImage } from '#helpers/mediaHelpers';
 import { uploadMedia, uploadSign } from '#helpers/MobileWebAPI';
@@ -30,7 +28,7 @@ import useEditorLayout from '#hooks/useEditorLayout';
 import useModuleDataEditor from '#hooks/useModuleDataEditor';
 import { BOTTOM_MENU_HEIGHT } from '#ui/BottomMenu';
 import Container from '#ui/Container';
-import Header, { HEADER_HEIGHT } from '#ui/Header';
+import Header from '#ui/Header';
 import HeaderButton from '#ui/HeaderButton';
 import PressableOpacity from '#ui/PressableOpacity';
 import TabView from '#ui/TabView';
@@ -45,12 +43,12 @@ import PhotoWithTextAndTitleMarginsEditionPanel from './PhotoWithTextAndTitleMar
 import PhotoWithTextAndTitlePreview from './PhotoWithTextAndTitlePreview';
 import PhotoWithTextAndTitleSettingsEditionPanel from './PhotoWithTextAndTitleSettingsEditionPanel';
 import type { ImagePickerResult } from '#components/ImagePicker';
-import type { PhotoWithTextAndTitleEditionScreen_module$key } from '@azzapp/relay/artifacts/PhotoWithTextAndTitleEditionScreen_module.graphql';
-import type { PhotoWithTextAndTitleEditionScreen_viewer$key } from '@azzapp/relay/artifacts/PhotoWithTextAndTitleEditionScreen_viewer.graphql';
+import type { PhotoWithTextAndTitleEditionScreen_module$key } from '#relayArtifacts/PhotoWithTextAndTitleEditionScreen_module.graphql';
+import type { PhotoWithTextAndTitleEditionScreen_profile$key } from '#relayArtifacts/PhotoWithTextAndTitleEditionScreen_profile.graphql';
 import type {
   PhotoWithTextAndTitleEditionScreenUpdateModuleMutation,
   SavePhotoWithTextAndTitleModuleInput,
-} from '@azzapp/relay/artifacts/PhotoWithTextAndTitleEditionScreenUpdateModuleMutation.graphql';
+} from '#relayArtifacts/PhotoWithTextAndTitleEditionScreenUpdateModuleMutation.graphql';
 import type { ViewProps } from 'react-native';
 import type { Observable } from 'relay-runtime';
 
@@ -58,7 +56,7 @@ export type PhotoWithTextAndTitleEditionScreenProps = ViewProps & {
   /**
    * the current viewer
    */
-  viewer: PhotoWithTextAndTitleEditionScreen_viewer$key;
+  profile: PhotoWithTextAndTitleEditionScreen_profile$key;
   /**
    * the current module to edit, if null, a new module will be created
    */
@@ -70,21 +68,15 @@ export type PhotoWithTextAndTitleEditionScreenProps = ViewProps & {
  */
 const PhotoWithTextAndTitleEditionScreen = ({
   module,
-  viewer: viewerKey,
+  profile: profileKey,
 }: PhotoWithTextAndTitleEditionScreenProps) => {
   // #region Data retrieval
   const photoWithTextAndTitle = useFragment(
     graphql`
       fragment PhotoWithTextAndTitleEditionScreen_module on CardModulePhotoWithTextAndTitle
       @argumentDefinitions(
-        pixelRatio: {
-          type: "Float!"
-          provider: "../providers/PixelRatio.relayprovider"
-        }
-        screenWidth: {
-          type: "Float!"
-          provider: "../providers/ScreenWidth.relayprovider"
-        }
+        pixelRatio: { type: "Float!", provider: "PixelRatio.relayprovider" }
+        screenWidth: { type: "Float!", provider: "ScreenWidth.relayprovider" }
       ) {
         id
         image {
@@ -127,17 +119,16 @@ const PhotoWithTextAndTitleEditionScreen = ({
     module,
   );
 
-  const viewer = useFragment(
+  const profile = useFragment(
     graphql`
-      fragment PhotoWithTextAndTitleEditionScreen_viewer on Viewer {
-        ...PhotoWithTextAndTitleBackgroundEditionPanel_viewer
-        ...PhotoWithTextAndTitleSettingsEditionPanel_viewer
+      fragment PhotoWithTextAndTitleEditionScreen_profile on Profile {
         moduleBackgrounds {
           id
           uri
           resizeMode
         }
-        profile {
+        webCard {
+          id
           cardColors {
             primary
             dark
@@ -155,10 +146,12 @@ const PhotoWithTextAndTitleEditionScreen = ({
             titleFontFamily
             titleFontSize
           }
+          ...PhotoWithTextAndTitleSettingsEditionPanel_webCard
         }
+        ...PhotoWithTextAndTitleBackgroundEditionPanel_profile
       }
     `,
-    viewerKey,
+    profileKey,
   );
 
   // #endregion
@@ -197,7 +190,7 @@ const PhotoWithTextAndTitleEditionScreen = ({
   const { data, value, fieldUpdateHandler, updateFields, dirty } =
     useModuleDataEditor({
       initialValue,
-      cardStyle: viewer.profile?.cardStyle,
+      cardStyle: profile?.webCard.cardStyle,
       styleValuesMap: PHOTO_WITH_TEXT_AND_TITLE_STYLE_VALUES,
       defaultValues: PHOTO_WITH_TEXT_AND_TITLE_DEFAULT_VALUES,
     });
@@ -231,7 +224,7 @@ const PhotoWithTextAndTitleEditionScreen = ({
   const previewData = {
     ...omit(data, 'backgroundId'),
     background:
-      viewer.moduleBackgrounds.find(
+      profile.moduleBackgrounds.find(
         background => background.id === backgroundId,
       ) ?? null,
   };
@@ -244,7 +237,7 @@ const PhotoWithTextAndTitleEditionScreen = ({
         $input: SavePhotoWithTextAndTitleModuleInput!
       ) {
         savePhotoWithTextAndTitleModule(input: $input) {
-          profile {
+          webCard {
             id
             cardModules {
               kind
@@ -310,6 +303,7 @@ const PhotoWithTextAndTitleEditionScreen = ({
       moduleId: photoWithTextAndTitle?.id,
       ...rest,
       image: mediaId ?? value.image!.id,
+      webCardId: profile.webCard.id,
     };
     if (value.title) {
       input.title = value.title;
@@ -347,8 +341,8 @@ const PhotoWithTextAndTitleEditionScreen = ({
     canSave,
     value,
     photoWithTextAndTitle?.id,
+    profile.webCard.id,
     commit,
-    setProgressIndicator,
     intl,
     router,
   ]);
@@ -534,8 +528,8 @@ const PhotoWithTextAndTitleEditionScreen = ({
         <PhotoWithTextAndTitlePreview
           style={{ height: topPanelHeight - 20, marginVertical: 10 }}
           data={previewData}
-          colorPalette={viewer.profile?.cardColors}
-          cardStyle={viewer.profile?.cardStyle}
+          colorPalette={profile?.webCard.cardColors}
+          cardStyle={profile?.webCard.cardStyle}
         />
       </PressableOpacity>
       <TabView
@@ -546,7 +540,7 @@ const PhotoWithTextAndTitleEditionScreen = ({
             id: 'text',
             element: (
               <PhotoWithTextAndTitleSettingsEditionPanel
-                viewer={viewer}
+                webCard={profile?.webCard ?? null}
                 style={{
                   flex: 1,
                   marginBottom: insetBottom + BOTTOM_MENU_HEIGHT,
@@ -618,7 +612,7 @@ const PhotoWithTextAndTitleEditionScreen = ({
             id: 'background',
             element: (
               <PhotoWithTextAndTitleBackgroundEditionPanel
-                viewer={viewer}
+                profile={profile}
                 backgroundId={backgroundId}
                 backgroundStyle={backgroundStyle}
                 onBackgroundChange={onBackgroundChange}
@@ -678,29 +672,7 @@ const PhotoWithTextAndTitleEditionScreen = ({
           </>
         }
       />
-      <View
-        style={{
-          position: 'absolute',
-          top: HEADER_HEIGHT + insetTop,
-          height: topPanelHeight + bottomPanelHeight,
-          width: windowWidth,
-          opacity: currentTab === 'preview' ? 1 : 0,
-        }}
-        pointerEvents={currentTab === 'preview' ? 'auto' : 'none'}
-      >
-        <Suspense>
-          <WebCardModulePreview
-            editedModuleId={photoWithTextAndTitle?.id}
-            visible={currentTab === 'preview'}
-            editedModuleInfo={{
-              kind: MODULE_KIND_PHOTO_WITH_TEXT_AND_TITLE,
-              data: previewData,
-            }}
-            height={topPanelHeight + bottomPanelHeight}
-            contentPaddingBottom={insetBottom + BOTTOM_MENU_HEIGHT}
-          />
-        </Suspense>
-      </View>
+
       <PhotoWithTextAndTitleEditionBottomMenu
         currentTab={currentTab}
         onItemPress={onCurrentTabChange}

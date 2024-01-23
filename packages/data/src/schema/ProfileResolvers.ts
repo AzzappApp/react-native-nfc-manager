@@ -1,108 +1,343 @@
-import { connectionFromArraySlice, cursorToOffset } from 'graphql-relay';
+import { and, desc, eq, like } from 'drizzle-orm';
+import { connectionFromArray } from 'graphql-relay';
+import { shuffle } from '@azzapp/shared/arrayHelpers';
+import ERRORS from '@azzapp/shared/errors';
+import serializeAndSignContactCard from '@azzapp/shared/serializeAndSignContactCard';
+import { simpleHash } from '@azzapp/shared/stringHelpers';
 import {
-  getCompanyActivitiesByProfileCategory,
-  getCompanyActivityById,
-  getProfileCategoryById,
-  getProfilesPosts,
-  isFollowing,
-  getCardModules,
-  getLastStatisticsFor,
-  getLikedPosts,
+  getUserProfileWithWebCardId,
+  db,
+  getStaticMediasByUsage,
+  PostTable,
+  getCoverTemplates,
+  getCardTemplates,
+  getColorPalettes,
+  getCardTemplateTypes,
+  getRecommendedWebCards,
+  WebCardTable,
 } from '#domains';
-import {
-  connectionFromDateSortedItems,
-  cursorToDate,
-} from '#helpers/connectionsHelpers';
-import { getLabel, idResolver } from './utils';
-import type {
-  CompanyActivityResolvers,
-  ProfileCategoryResolvers,
-  ProfileResolvers,
-} from './__generated__/types';
+import { getCardStyles } from '#domains/cardStyles';
+import { getMediaSuggestions } from '#domains/mediasSuggestion';
+import { getLastProfileStatisticsFor } from '#domains/profileStatistics';
+import { emptyConnection } from '#helpers/connectionsHelpers';
+import { idResolver } from './utils';
+import type { ProfileResolvers } from './__generated__/types';
 
 export const Profile: ProfileResolvers = {
   id: idResolver('Profile'),
-  profileCategory: async (profile, _) => {
-    return profile.profileCategoryId
-      ? getProfileCategoryById(profile.profileCategoryId)
-      : null;
-  },
-  companyActivity: async (profile, _) => {
-    return profile.companyActivityId
-      ? getCompanyActivityById(profile.companyActivityId)
-      : null;
-  },
-  cardCover: async (profile, _, { auth }) => {
-    if (!profile.cardIsPublished && auth.userId !== profile.userId) {
-      return null;
-    }
-    if (!profile.coverData) {
-      return null;
-    }
-    return profile;
-  },
-  cardModules: async (profile, _, { auth }) => {
-    const isCurrentProfile = auth.profileId === profile.id;
-    if (!profile.cardIsPublished && !isCurrentProfile) {
-      return [];
-    }
-    const modules = await getCardModules(profile.id, isCurrentProfile);
-    return modules;
-  },
-  contactCard: async (profile, _, { auth }) => {
-    const isCurrentUser = auth.userId === profile.userId;
-    if (!isCurrentUser) {
-      return null;
-    }
-    return profile;
-  },
-  isFollowing: async (profile, _, { auth }) => {
-    return auth.profileId ? isFollowing(auth.profileId, profile.id) : false;
-  },
-  posts: async (profile, args) => {
-    // TODO we should use a bookmark instead of offset, perhaps by using createdAt as a bookmark
-    let { after, first } = args;
-    after = after ?? null;
-    first = first ?? 100;
+  user: async (userProfile, _, { loaders }) => {
+    const user = await loaders.User.load(userProfile.userId);
 
-    const offset = after ? cursorToOffset(after) : 0;
-    return connectionFromArraySlice(
-      await getProfilesPosts(profile.id, first, offset),
-      { after, first },
-      {
-        sliceStart: offset,
-        arrayLength: profile.nbPosts,
-      },
-    );
+    if (!user) throw new Error(ERRORS.GRAPHQL_ERROR);
+    return user;
+  },
+  avatar: async profile =>
+    profile.avatarId
+      ? {
+          media: profile.avatarId,
+          assetKind: 'contactCard',
+        }
+      : null,
+  contactCard: async (profile, _, { auth }) => {
+    const userProfile = auth.userId
+      ? await getUserProfileWithWebCardId(auth.userId, profile.webCardId)
+      : null;
+
+    const isSameWebCard = userProfile?.webCardId === profile.webCardId;
+
+    if (!isSameWebCard && profile.userId !== auth.userId) {
+      return null;
+    }
+
+    return profile.contactCard;
   },
   statsSummary: async profile => {
     //get data for the last 30 day
-    const result = await getLastStatisticsFor(profile.id, 30);
+    const result = await getLastProfileStatisticsFor(profile.id, 30);
     return result;
   },
-  likedPosts: async (profile, args) => {
-    const limit = args.first ?? 100;
-    const offset = args.after ? cursorToDate(args.after) : null;
-    const posts = await getLikedPosts(profile.id, limit + 1, offset);
-    const sizedPosts = posts.slice(0, limit);
-    return connectionFromDateSortedItems(sizedPosts, {
-      getDate: post => post.createdAt,
-      hasNextPage: posts.length > limit,
-      hasPreviousPage: offset !== null,
+  serializedContactCard: async (profile, _, { loaders }) => {
+    const webCard = await loaders.WebCard.load(profile.webCardId);
+
+    return serializeAndSignContactCard(
+      webCard?.userName ?? '',
+      profile.id,
+      profile.webCardId,
+      profile.contactCard ?? {},
+      webCard?.commonInformation,
+    );
+  },
+  webCard: async (profile, _, { loaders }) => {
+    const webCard = await loaders.WebCard.load(profile.webCardId);
+
+    if (!webCard) throw new Error(ERRORS.GRAPHQL_ERROR);
+    return webCard;
+  },
+
+  trendingWebCards: async (_, args) => {
+    // TODO dummy implementation just to test frontend
+    return connectionFromArray(
+      await db
+        .select()
+        .from(WebCardTable)
+        .where(eq(WebCardTable.cardIsPublished, true))
+        .orderBy(desc(WebCardTable.createdAt)),
+      args,
+    );
+  },
+  trendingPosts: async (_, args) => {
+    // TODO dummy implementation just to test frontend
+    return connectionFromArray(
+      await db
+        .select()
+        .from(PostTable)
+        .innerJoin(
+          WebCardTable,
+          and(
+            eq(PostTable.webCardId, WebCardTable.id),
+            eq(WebCardTable.cardIsPublished, true),
+          ),
+        )
+        .orderBy(desc(PostTable.createdAt))
+        .then(res => res.map(({ Post }) => Post)),
+      args,
+    );
+  },
+  recommendedWebCards: async (profile, { ...args }, { auth: { userId } }) => {
+    if (!userId || profile.userId !== userId) {
+      return connectionFromArray([], args);
+    }
+
+    // TODO dummy implementation just to test frontend
+    return connectionFromArray(
+      await getRecommendedWebCards(profile.id, profile.webCardId),
+      args,
+    );
+  },
+  searchPosts: async (_, args) => {
+    const posts = await db
+      .select()
+      .from(PostTable)
+      .innerJoin(WebCardTable, eq(PostTable.webCardId, WebCardTable.id))
+      .where(
+        and(
+          like(PostTable.content, `%${args.search}%`),
+          eq(WebCardTable.cardIsPublished, true),
+        ),
+      );
+    return connectionFromArray(
+      posts.map(({ Post }) => Post),
+      args,
+    );
+  },
+  searchWebCards: async (_, args) => {
+    // TODO dummy implementation just to test frontend
+    return connectionFromArray(
+      await db
+        .select()
+        .from(WebCardTable)
+        .where(
+          and(
+            eq(WebCardTable.cardIsPublished, true),
+            like(WebCardTable.userName, `%${args.search}%`),
+          ),
+        ),
+      args,
+    );
+  },
+  coverBackgrounds: async () =>
+    getStaticMediasByUsage('coverBackground').then(medias =>
+      medias.map(media => ({
+        staticMedia: media,
+        assetKind: 'cover',
+      })),
+    ),
+  coverForegrounds: async () =>
+    getStaticMediasByUsage('coverForeground').then(medias =>
+      medias.map(media => ({
+        staticMedia: media,
+        assetKind: 'cover',
+      })),
+    ),
+  moduleBackgrounds: async () =>
+    getStaticMediasByUsage('moduleBackground').then(medias =>
+      medias.map(media => ({
+        staticMedia: media,
+        assetKind: 'module',
+      })),
+    ),
+  coverTemplates: async (
+    profile,
+    { kind, after, first },
+    { auth: { userId }, loaders },
+  ) => {
+    const webCard = profile?.webCardId
+      ? await loaders.WebCard.load(profile.webCardId)
+      : null;
+    if (!userId || profile.userId !== userId) {
+      return emptyConnection;
+    }
+    const limit = first ?? 100;
+    const templates = await getCoverTemplates(
+      webCard?.webCardKind ?? 'business',
+      kind,
+      profile.webCardId,
+      after,
+      limit + 1,
+    );
+    const sizedTemplate = templates.slice(0, limit);
+    return {
+      edges: sizedTemplate.map(template => ({
+        node: template,
+        cursor: template.cursor,
+      })),
+      pageInfo: {
+        hasNextPage: templates.length > limit,
+        hasPreviousPage: false,
+        startCursor: templates[0]?.cursor,
+        endCursor: sizedTemplate[sizedTemplate.length - 1].cursor,
+      },
+    };
+  },
+  cardTemplates: async (
+    profile,
+    { cardTemplateTypeId, after, first },
+    { auth: { userId }, loaders },
+  ) => {
+    const webCard = profile?.webCardId
+      ? await loaders.WebCard.load(profile.webCardId)
+      : null;
+    if (!userId || profile.userId !== userId) {
+      return emptyConnection;
+    }
+    let typeId = cardTemplateTypeId;
+    if (cardTemplateTypeId == null) {
+      if (webCard?.companyActivityId) {
+        const compActivity = await loaders.CompanyActivity.load(
+          webCard.companyActivityId,
+        );
+        if (compActivity) {
+          typeId = compActivity.cardTemplateTypeId;
+        }
+      }
+    }
+    if (typeId == null) {
+      if (webCard?.webCardCategoryId) {
+        const webCardCategory = await loaders.WebCardCategory.load(
+          webCard.webCardCategoryId,
+        );
+        if (webCardCategory) {
+          typeId = webCardCategory.cardTemplateTypeId;
+        }
+      }
+    }
+    const limit = first ?? 20;
+    const cardTemplates = await getCardTemplates(
+      webCard?.webCardKind ?? 'business',
+      typeId,
+      profile.webCardId,
+      after,
+      limit + 1,
+    );
+    if (cardTemplates.length > 0) {
+      const sizedCardTemplate = cardTemplates.slice(0, limit);
+      return {
+        edges: sizedCardTemplate.map(cardTemplate => ({
+          node: cardTemplate,
+          cursor: cardTemplate.cursor,
+        })),
+        pageInfo: {
+          hasNextPage: cardTemplates.length > limit,
+          hasPreviousPage: false,
+          startCursor: cardTemplates[0]?.cursor,
+          endCursor: sizedCardTemplate[sizedCardTemplate.length - 1].cursor,
+        },
+      };
+    }
+    return emptyConnection;
+  },
+  cardTemplateTypes: async () => getCardTemplateTypes(),
+  cardStyles: async (profile, { after, first }, { auth: { userId } }) => {
+    if (!userId || profile.userId !== userId) {
+      return emptyConnection;
+    }
+    const limit = first ?? 100;
+    const cardStyles = await getCardStyles(profile.id, after, limit + 1);
+    const sizedCardStyles = cardStyles.slice(0, limit);
+    return {
+      edges: sizedCardStyles.map(style => ({
+        node: style,
+        cursor: style.cursor,
+      })),
+      pageInfo: {
+        hasNextPage: cardStyles.length > limit,
+        hasPreviousPage: false,
+        startCursor: cardStyles[0]?.cursor,
+        endCursor: cardStyles[sizedCardStyles.length - 1].cursor,
+      },
+    };
+  },
+  colorPalettes: async (
+    profile,
+    { after, first },
+    { auth: { userId }, sessionMemoized },
+  ) => {
+    if (!profile || !userId || profile.userId !== userId) {
+      return emptyConnection;
+    }
+    first = first ?? 100;
+    const colorPalettes = shuffle(
+      await sessionMemoized(getColorPalettes),
+      simpleHash(profile.id),
+    );
+
+    return connectionFromArray(colorPalettes, {
+      after,
+      first,
     });
   },
-};
+  suggestedMedias: async (
+    profile,
+    { kind, after, first },
+    { auth: { userId }, loaders },
+  ) => {
+    if (!userId || profile.userId !== userId) {
+      return emptyConnection;
+    }
+    const webCard = profile?.webCardId
+      ? await loaders.WebCard.load(profile.webCardId)
+      : null;
+    if (
+      !profile ||
+      webCard?.webCardKind !== 'business' ||
+      webCard.webCardCategoryId == null //profile category Id is mandatory on busness profile
+    ) {
+      return emptyConnection;
+    }
 
-export const ProfileCategory: ProfileCategoryResolvers = {
-  id: idResolver('ProfileCategory'),
-  label: getLabel,
-  medias: profileCategory => profileCategory.medias,
-  companyActivities: async (profileCategory, _) => {
-    return getCompanyActivitiesByProfileCategory(profileCategory.id);
+    const limit = first ?? 100;
+    const suggestions = await getMediaSuggestions(
+      profile.webCardId,
+      kind,
+      webCard.webCardCategoryId,
+      webCard.companyActivityId,
+      after,
+      (first ?? 100) + 1,
+    );
+    const sizedSuggestion = suggestions.slice(0, limit);
+    const edges = sizedSuggestion.map(({ cursor, ...media }) => ({
+      node: media,
+      cursor,
+    })) as any[];
+
+    return {
+      edges,
+      pageInfo: {
+        hasNextPage: suggestions.length > limit,
+        hasPreviousPage: false,
+        startCursor: suggestions[0]?.cursor,
+        endCursor: sizedSuggestion[sizedSuggestion.length - 1]?.cursor,
+      },
+    };
   },
-};
-
-export const CompanyActivity: CompanyActivityResolvers = {
-  id: idResolver('CompanyActivity'),
-  label: getLabel,
 };

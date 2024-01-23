@@ -3,9 +3,9 @@ extend type Mutation {
 }
 
 input ReorderModulesInput {
-  moduleIds: [ID!]!
+  modulesIds: [ID!]!
 }
 
 type ReorderModulesPayload {
-  profile: Profile!
+  webCard: WebCard!
 }

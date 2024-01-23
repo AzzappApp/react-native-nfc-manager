@@ -1,32 +1,37 @@
 import { GraphQLError } from 'graphql';
 import { fromGlobalId } from 'graphql-relay';
 import ERRORS from '@azzapp/shared/errors';
-import { getPostCommentById, updatePostComment } from '#domains';
+import { isEditor } from '@azzapp/shared/profileHelpers';
+import { getUserProfileWithWebCardId, updatePostComment } from '#domains';
 import type { MutationResolvers } from '#schema/__generated__/types';
 
 const updatePostCommentMutation: MutationResolvers['updatePostComment'] =
-  async (_, { input: { commentId, comment } }, { auth }) => {
-    const { profileId } = auth;
+  async (
+    _,
+    { input: { commentId: gqlCommentId, comment } },
+    { auth, loaders },
+  ) => {
+    const { userId } = auth;
+    const commentId = fromGlobalId(gqlCommentId).id;
+    const postComment = await loaders.PostComment.load(commentId);
+    const profile =
+      postComment &&
+      userId &&
+      (await getUserProfileWithWebCardId(userId, postComment.webCardId));
 
-    if (!profileId) {
-      throw new GraphQLError(ERRORS.UNAUTORIZED);
-    }
-
-    const { id: targetId, type } = fromGlobalId(commentId);
-    if (type !== 'PostComment' || !comment) {
+    if (!postComment) {
       throw new GraphQLError(ERRORS.INVALID_REQUEST);
     }
-    try {
-      const originalComment = await getPostCommentById(targetId);
-      if (!originalComment) throw new GraphQLError(ERRORS.INVALID_REQUEST);
-      if (originalComment.profileId !== profileId)
-        throw new GraphQLError(ERRORS.FORBIDDEN);
 
-      await updatePostComment(targetId, comment);
+    if (!profile || !isEditor(profile.profileRole)) {
+      throw new GraphQLError(ERRORS.UNAUTHORIZED);
+    }
+    try {
+      await updatePostComment(commentId, comment);
 
       return {
         postComment: {
-          ...originalComment,
+          ...postComment,
           comment,
         },
       };

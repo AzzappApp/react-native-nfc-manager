@@ -11,20 +11,20 @@ import {
   SOCIAL_LINKS_MAX_ICON_SIZE,
   SOCIAL_LINKS_MIN_ICON_SIZE,
 } from '@azzapp/shared/cardModuleHelpers';
-import ProfileColorPicker from '#components/ProfileColorPicker';
+import WebCardColorPicker from '#components/WebCardColorPicker';
 import ColorPreview from '#ui/ColorPreview';
 import FloatingIconButton from '#ui/FloatingIconButton';
 import LabeledDashedSlider from '#ui/LabeledDashedSlider';
 import TabsBar from '#ui/TabsBar';
-import type { CardModuleSocialLinksArrangement } from '@azzapp/relay/artifacts/SocialLinksRenderer_module.graphql';
-import type { SocialLinksSettingsEditionPanel_viewer$key } from '@azzapp/relay/artifacts/SocialLinksSettingsEditionPanel_viewer.graphql';
+import type { CardModuleSocialLinksArrangement } from '#relayArtifacts/SocialLinksRenderer_module.graphql';
+import type { SocialLinksSettingsEditionPanel_webCard$key } from '#relayArtifacts/SocialLinksSettingsEditionPanel_webCard.graphql';
 import type { ViewProps } from 'react-native';
 
 type SocialLinksSettingsEditionPanelProps = ViewProps & {
   /**
-   * A relay fragment reference to the viewer
+   * A relay fragment reference to the webCard
    */
-  viewer: SocialLinksSettingsEditionPanel_viewer$key;
+  webCard: SocialLinksSettingsEditionPanel_webCard$key | null;
   /**
    * The iconColor currently set on the module
    */
@@ -75,7 +75,7 @@ type SocialLinksSettingsEditionPanelProps = ViewProps & {
  * A Panel to edit the Settings of the SocialLinks edition screen
  */
 const SocialLinksSettingsEditionPanel = ({
-  viewer,
+  webCard: webCardKey,
   iconColor,
   onIconColorChange,
   iconSize,
@@ -93,20 +93,18 @@ const SocialLinksSettingsEditionPanel = ({
   const intl = useIntl();
 
   const [currentTab, setCurrentTab] = useState<string>('settings');
-  const { profile } = useFragment(
+  const webCard = useFragment(
     graphql`
-      fragment SocialLinksSettingsEditionPanel_viewer on Viewer {
-        profile {
-          ...ProfileColorPicker_profile
-          cardColors {
-            primary
-            light
-            dark
-          }
+      fragment SocialLinksSettingsEditionPanel_webCard on WebCard {
+        ...WebCardColorPicker_webCard
+        cardColors {
+          primary
+          light
+          dark
         }
       }
     `,
-    viewer,
+    webCardKey,
   );
 
   const onProfileColorPickerClose = useCallback(() => {
@@ -131,13 +129,13 @@ const SocialLinksSettingsEditionPanel = ({
           }),
           rightElement: (
             <ColorPreview
-              color={swapColor(iconColor, profile?.cardColors)}
+              color={swapColor(iconColor, webCard?.cardColors)}
               style={{ marginLeft: 5 }}
             />
           ),
         },
       ]),
-    [iconColor, intl, profile?.cardColors],
+    [iconColor, intl, webCard?.cardColors],
   );
 
   return (
@@ -232,11 +230,11 @@ const SocialLinksSettingsEditionPanel = ({
           style={styles.slider}
         />
       </View>
-      {profile && (
-        <ProfileColorPicker
+      {webCard && (
+        <WebCardColorPicker
           visible={currentTab !== 'settings'}
           height={bottomSheetHeight}
-          profile={profile}
+          webCard={webCard}
           title={intl.formatMessage({
             defaultMessage: 'IconColor color',
             description: 'IconColor color title in SocialLinks edition',

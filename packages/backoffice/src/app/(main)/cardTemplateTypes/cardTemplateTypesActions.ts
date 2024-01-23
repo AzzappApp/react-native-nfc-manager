@@ -7,11 +7,11 @@ import { cardTemplateTypeSchema } from './cardTemplateTypeSchema';
 import type {
   CardTemplateType,
   NewCardTemplateType,
-  ProfileCategory,
+  WebCardCategory,
 } from '@azzapp/data/domains';
 
 export const saveCardTemplateType = async (
-  data: { profileCategory: ProfileCategory } & (
+  data: { webCardCategory: WebCardCategory } & (
     | CardTemplateType
     | NewCardTemplateType
   ),
@@ -32,7 +32,7 @@ export const saveCardTemplateType = async (
         .update(CardTemplateTypeTable)
         .set({
           labels: data.labels,
-          profileCategoryId: data.profileCategory.id,
+          webCardCategoryId: data.webCardCategory.id,
         })
         .where(eq(CardTemplateTypeTable.id, data.id));
 
@@ -42,7 +42,7 @@ export const saveCardTemplateType = async (
       await db.insert(CardTemplateTypeTable).values({
         id: templateTypeId,
         labels: data.labels,
-        profileCategoryId: data.profileCategory.id,
+        webCardCategoryId: data.webCardCategory.id,
       });
     }
   } catch (error) {

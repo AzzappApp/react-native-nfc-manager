@@ -14,7 +14,12 @@ import { downScaleImage, segmentImage } from '#helpers/mediaHelpers';
 import type { EditionParameters } from '#components/gpu';
 import type { ImagePickerResult } from '#components/ImagePicker';
 import type { TimeRange } from '#components/ImagePicker/imagePickerTypes';
-import type { MaskMedia, SourceMedia, TemplateKind } from './coverEditorTypes';
+import type {
+  MaskMedia,
+  MediaInfos,
+  SourceMedia,
+  TemplateKind,
+} from './coverEditorTypes';
 
 type CoverMediaEditorState = {
   sourceMedia: SourceMedia | null;
@@ -80,13 +85,7 @@ const reducer = (
   }
 };
 
-const useCoverMediaEditor = (
-  initialData: {
-    sourceMedia?: SourceMedia | null;
-    maskMedia?: MaskMedia | null;
-    mediaCropParameters?: EditionParameters | null;
-  } | null,
-) => {
+const useCoverMediaEditor = (initialData: MediaInfos | null) => {
   const [state, dispatch] = useReducer(reducer, {
     sourceMedia: initialData?.sourceMedia ?? null,
     maskMedia: initialData?.maskMedia ?? null,

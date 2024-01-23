@@ -15,9 +15,7 @@ import {
 } from 'react-native-reanimated';
 import { graphql, useFragment } from 'react-relay';
 import { colors } from '#theme';
-import useMultiActorEnvironmentPluralFragment from '#hooks/useMultiActorEnvironmentPluralFragment';
-import type { HomeBackground_profileColors$key } from '@azzapp/relay/artifacts/HomeBackground_profileColors.graphql';
-import type { HomeBackground_user$key } from '@azzapp/relay/artifacts/HomeBackground_user.graphql';
+import type { HomeBackground_user$key } from '#relayArtifacts/HomeBackground_user.graphql';
 import type { SharedValue } from 'react-native-reanimated';
 
 type HomeBackgroundProps = {
@@ -35,45 +33,38 @@ const HomeBackground = ({
     graphql`
       fragment HomeBackground_user on User {
         profiles {
-          id
-          ...HomeBackground_profileColors
+          webCard {
+            id
+            cardColors {
+              dark
+              primary
+            }
+          }
         }
       }
     `,
     userKey,
   );
 
-  const profiles = useMultiActorEnvironmentPluralFragment(
-    graphql`
-      fragment HomeBackground_profileColors on Profile {
-        id
-        cardColors {
-          dark
-          primary
-        }
-      }
-    `,
-    (profile: any) => profile.id,
-    user.profiles as readonly HomeBackground_profileColors$key[],
-  );
-
-  const inputRange = _.range(0, profiles?.length);
+  const inputRange = _.range(0, user.profiles?.length);
 
   const primaryColors = useMemo(
     () =>
-      (profiles ?? []).map(profile => {
-        if (profile.cardColors?.primary) {
-          return profile.cardColors?.primary;
+      (user.profiles ?? []).map(({ webCard }) => {
+        if (webCard.cardColors?.primary) {
+          return webCard.cardColors?.primary;
         }
         return '#45444b';
       }),
-    [profiles],
+    [user],
   );
 
   const darkColors = useMemo(
     () =>
-      (profiles ?? []).map(profile => profile.cardColors?.dark ?? colors.black),
-    [profiles],
+      (user.profiles ?? []).map(
+        ({ webCard }) => webCard.cardColors?.dark ?? colors.black,
+      ),
+    [user],
   );
 
   const skiaGradient = useDerivedValue(() => {
@@ -95,7 +86,10 @@ const HomeBackground = ({
         ),
       ];
     }
-    return [primaryColors[0], darkColors[0]];
+    if (primaryColors.length > 0) {
+      return [primaryColors[0], darkColors[0]];
+    }
+    return ['#45444b', '#45444b'];
   }, [inputRange, primaryColors, darkColors]);
 
   return (

@@ -3,19 +3,17 @@ import { eq, sql, and, desc, inArray } from 'drizzle-orm';
 import { text, index, mysqlTable } from 'drizzle-orm/mysql-core';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
 import db, { cols } from './db';
-import { getMediasByIds } from './medias';
+import { getMediasByIds, type Media } from './medias';
 import { PostTable } from './posts';
-import { ProfileTable } from './profiles';
+import { WebCardTable, type WebCard } from './webCards';
 import type { DbTransaction } from './db';
-import type { Media } from './medias';
-import type { Profile } from './profiles';
 import type { InferInsertModel, InferSelectModel } from 'drizzle-orm';
 
 export const PostCommentTable = mysqlTable(
   'PostComment',
   {
     id: cols.cuid('id').notNull().primaryKey().$defaultFn(createId),
-    profileId: cols.cuid('profileId').notNull(),
+    webCardId: cols.cuid('webCardId').notNull(),
     postId: cols.cuid('postId').notNull(),
     comment: text('comment').notNull(),
     createdAt: cols.dateTime('createdAt').notNull(),
@@ -29,8 +27,11 @@ export const PostCommentTable = mysqlTable(
 
 export type PostComment = InferSelectModel<typeof PostCommentTable>;
 export type NewPostComment = InferInsertModel<typeof PostCommentTable>;
-export type PostCommentWithProfile = Pick<Profile, 'firstName' | 'lastName'> &
-  PostComment & { media: Media };
+export type PostCommentWithWebCard = {
+  PostComment: PostComment;
+  WebCard: WebCard;
+  media: Media;
+};
 
 /**
  * insert a post comment
@@ -59,7 +60,7 @@ export const insertPostComment = async (postComment: NewPostComment) =>
  * @param before - The maximum date of creation for the comments to retrieve
  * @returns A list of PostComment
  */
-export const getPostCommentsWithProfile = async (
+export const getPostCommentsWithWebCard = async (
   postId: string,
   limit: number,
   before?: Date,
@@ -74,10 +75,10 @@ export const getPostCommentsWithProfile = async (
       ),
     )
     .innerJoin(
-      ProfileTable,
+      WebCardTable,
       and(
-        eq(ProfileTable.id, PostCommentTable.profileId),
-        eq(ProfileTable.cardIsPublished, true),
+        eq(WebCardTable.id, PostCommentTable.webCardId),
+        eq(WebCardTable.cardIsPublished, true),
       ),
     )
     .orderBy(desc(PostCommentTable.createdAt))
@@ -86,7 +87,7 @@ export const getPostCommentsWithProfile = async (
   const mediasMap = (
     await getMediasByIds(
       convertToNonNullArray(
-        res.map(({ Profile }) => Profile.coverData?.mediaId),
+        res.map(({ WebCard }) => WebCard.coverData?.mediaId),
       ),
     )
   ).reduce((acc, media) => {
@@ -95,18 +96,18 @@ export const getPostCommentsWithProfile = async (
     return acc;
   }, new Map<string, Media>());
 
-  const result: PostCommentWithProfile[] = [];
+  const result: PostCommentWithWebCard[] = [];
 
-  for (const { PostComment, Profile } of res) {
-    const media = mediasMap.get(Profile.coverData?.mediaId ?? '');
+  for (const { PostComment, WebCard } of res) {
+    const media = mediasMap.get(WebCard.coverData?.mediaId ?? '');
     if (!media) continue;
     result.push({
-      ...PostComment,
-      firstName: Profile.firstName,
-      lastName: Profile.lastName,
+      PostComment,
+      WebCard,
       media,
     });
   }
+
   return result;
 };
 
@@ -143,7 +144,7 @@ export const getPostCommentsByDate = async (
  */
 export const getTopPostsComment = async (
   postIds: string[],
-): Promise<Array<PostComment & { author: Profile }>> => {
+): Promise<Array<PostComment & { author: WebCard }>> => {
   if (!postIds.length) {
     return [];
   }
@@ -167,11 +168,11 @@ export const getTopPostsComment = async (
         comments.map(comment => comment.postsId),
       ),
     )
-    .innerJoin(ProfileTable, eq(PostCommentTable.profileId, ProfileTable.id))
+    .innerJoin(WebCardTable, eq(PostCommentTable.webCardId, WebCardTable.id))
     .then(res =>
-      res.map(({ PostComment, Profile }) => ({
+      res.map(({ PostComment, WebCard }) => ({
         ...PostComment,
-        author: Profile,
+        author: WebCard,
       })),
     );
 };

@@ -12,17 +12,21 @@ import SearchResultGlobalListHeader, {
   SearchResultGlobalListHeaderPlaceholder,
 } from './SearchResultGlobalListHeader';
 
-import type { PostsGrid_posts$key } from '@azzapp/relay/artifacts/PostsGrid_posts.graphql';
-import type { SearchResultGlobalPosts_viewer$key } from '@azzapp/relay/artifacts/SearchResultGlobalPosts_viewer.graphql';
-import type { SearchResultGlobalQuery } from '@azzapp/relay/artifacts/SearchResultGlobalQuery.graphql';
+import type { PostsGrid_posts$key } from '#relayArtifacts/PostsGrid_posts.graphql';
+import type { SearchResultGlobalPosts_profile$key } from '#relayArtifacts/SearchResultGlobalPosts_profile.graphql';
+import type { SearchResultGlobalQuery } from '#relayArtifacts/SearchResultGlobalQuery.graphql';
 import type { PreloadedQuery } from 'react-relay';
 
 export const searchResultGlobalQuery = graphql`
-  query SearchResultGlobalQuery($search: String!, $useLocation: Boolean!) {
-    viewer {
-      ...SearchResultGlobalListHeader_viewer
+  query SearchResultGlobalQuery(
+    $profileId: ID!
+    $search: String!
+    $useLocation: Boolean!
+  ) {
+    profile: node(id: $profileId) {
+      ...SearchResultGlobalListHeader_profile
         @arguments(search: $search, useLocation: $useLocation)
-      ...SearchResultGlobalPosts_viewer
+      ...SearchResultGlobalPosts_profile
         @arguments(search: $search, useLocation: $useLocation)
     }
   }
@@ -39,7 +43,7 @@ const SearchResultGlobal = ({
   hasFocus,
   goToProfilesTab,
 }: SearchResultGlobalProps) => {
-  const preloadedQuery = usePreloadedQuery<SearchResultGlobalQuery>(
+  const { profile } = usePreloadedQuery<SearchResultGlobalQuery>(
     searchResultGlobalQuery,
     queryReference,
   );
@@ -47,10 +51,10 @@ const SearchResultGlobal = ({
   const { data, loadNext, isLoadingNext, hasNext, refetch } =
     usePaginationFragment<
       SearchResultGlobalQuery,
-      SearchResultGlobalPosts_viewer$key
+      SearchResultGlobalPosts_profile$key
     >(
       graphql`
-        fragment SearchResultGlobalPosts_viewer on Viewer
+        fragment SearchResultGlobalPosts_profile on Profile
         @refetchable(queryName: "SearchGlobalPostsListQuery")
         @argumentDefinitions(
           after: { type: String }
@@ -73,14 +77,14 @@ const SearchResultGlobal = ({
           }
         }
       `,
-      preloadedQuery.viewer,
+      profile,
     );
 
   const posts: PostsGrid_posts$key = useMemo(() => {
     return convertToNonNullArray(
-      data.searchPosts?.edges?.map(edge => edge?.node) ?? [],
+      data?.searchPosts?.edges?.map(edge => edge?.node) ?? [],
     );
-  }, [data.searchPosts?.edges]);
+  }, [data?.searchPosts?.edges]);
 
   const [refreshing, setRefreshing] = useState(false);
   const onRefresh = useCallback(() => {
@@ -118,13 +122,16 @@ const SearchResultGlobal = ({
     [showLoadingIndicatorDebounced],
   );
 
+  if (!profile) {
+    return null;
+  }
   return (
     <PostsGrid
       posts={posts}
       canPlay={hasFocus}
       ListHeaderComponent={
         <SearchResultGlobalListHeader
-          viewer={preloadedQuery.viewer}
+          profile={profile}
           goToProfilesTab={goToProfilesTab}
         />
       }

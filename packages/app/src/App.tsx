@@ -4,6 +4,8 @@ import { fromGlobalId } from 'graphql-relay';
 import {
   Component,
   Fragment,
+  Suspense,
+  //  Suspense,
   useCallback,
   useEffect,
   useMemo,
@@ -29,6 +31,8 @@ import {
   ScreensRenderer,
   RouterProvider,
 } from '#components/NativeRouter';
+//import ShakeShare from '#components/ShakeShare';
+import ShakeShare from '#components/ShakeShare';
 import Toast from '#components/Toast';
 import { getAuthState, init as initAuthStore } from '#helpers/authStore';
 import { addGlobalEventListener } from '#helpers/globalEvents';
@@ -39,7 +43,6 @@ import {
 } from '#helpers/localeHelpers';
 import { PermissionProvider } from '#helpers/PermissionContext';
 import {
-  ROOT_ACTOR_ID,
   addEnvironmentListener,
   getRelayEnvironment,
 } from '#helpers/relayEnvironment';
@@ -52,6 +55,7 @@ import {
 import useApplicationFonts from '#hooks/useApplicationFonts';
 import useAuthState from '#hooks/useAuthState';
 import { useDeepLink } from '#hooks/useDeepLink';
+import AboutScreen from '#screens/AboutScreen';
 import AccountDetailsScreen from '#screens/AccountDetailsScreen';
 import CardModuleEditionScreen from '#screens/CardModuleEditionScreen';
 import ContactCardScreen from '#screens/ContactCardScreen';
@@ -67,16 +71,19 @@ import InviteFriendsScreen from '#screens/InviteFriendsScreen';
 import LikedPostsScreen from '#screens/LikedPostsScreen';
 import LoadingScreen from '#screens/LoadingScreen';
 import MediaScreen from '#screens/MediaScreen';
-import NewProfileScreen from '#screens/NewProfileScreen';
+import MultiUserAddScreen from '#screens/MultiUserAddScreen';
+import MultiUserScreen from '#screens/MultiUserScreen';
+import NewWebCardScreen from '#screens/NewWebCardScreen';
 import PostCommentsMobileScreen from '#screens/PostCommentsScreen';
 import PostCreationScreen from '#screens/PostCreationScreen';
 import PostScreen from '#screens/PostScreen';
-import ProfileScreen from '#screens/ProfileScreen';
 import ResetPasswordScreen from '#screens/ResetPasswordScreen';
 import SearchScreen from '#screens/SearchScreen';
 import SignInScreen from '#screens/SignInScreen';
 import SignupScreen from '#screens/SignUpScreen';
 import UpdateApplicationScreen from '#screens/UpdateApplicationScreen';
+import WebCardParametersScreen from '#screens/WebCardParametersScreen';
+import WebCardScreen from '#screens/WebCardScreen';
 import Button from '#ui/Button';
 import Container from '#ui/Container';
 import Text from '#ui/Text';
@@ -166,29 +173,33 @@ export default Sentry.wrap(App);
 
 // #region Routing Definitions
 const screens = {
-  SIGN_IN: SignInScreen,
-  SIGN_UP: SignupScreen,
-  FORGOT_PASSWORD: ForgotPasswordScreen,
-  FORGOT_PASSWORD_CONFIRMATION: ForgotPasswordConfirmationScreen,
-  RESET_PASSWORD: ResetPasswordScreen,
-  HOME: HomeScreen,
-  MEDIA: MediaScreen,
-  SEARCH: SearchScreen,
-  POST: PostScreen,
-  POST_COMMENTS: PostCommentsMobileScreen,
-  NEW_POST: PostCreationScreen,
-  NEW_PROFILE: NewProfileScreen,
+  ABOUT: AboutScreen,
+  ACCOUNT_DETAILS: AccountDetailsScreen,
   CARD_MODULE_EDITION: CardModuleEditionScreen,
+  CONTACT_CARD: ContactCardScreen,
   COVER_EDITION: CoverEditionScreen,
-  PROFILE: ProfileScreen,
   FOLLOWINGS: FollowingsScreen,
   FOLLOWINGS_MOSAIC: FollowingsMosaicScreen,
   FOLLOWERS: FollowersScreen,
-  ACCOUNT_DETAILS: AccountDetailsScreen,
+  FORGOT_PASSWORD: ForgotPasswordScreen,
+  FORGOT_PASSWORD_CONFIRMATION: ForgotPasswordConfirmationScreen,
+  HOME: HomeScreen,
   INVITE_FRIENDS: InviteFriendsScreen,
-  CONTACT_CARD: ContactCardScreen,
-  ONBOARDING: WelcomeScreen,
   LIKED_POSTS: LikedPostsScreen,
+  MULTI_USER: MultiUserScreen,
+  MULTI_USER_ADD: MultiUserAddScreen,
+  MEDIA: MediaScreen,
+  NEW_POST: PostCreationScreen,
+  NEW_WEBCARD: NewWebCardScreen,
+  ONBOARDING: WelcomeScreen,
+  POST: PostScreen,
+  POST_COMMENTS: PostCommentsMobileScreen,
+  RESET_PASSWORD: ResetPasswordScreen,
+  SIGN_IN: SignInScreen,
+  SIGN_UP: SignupScreen,
+  SEARCH: SearchScreen,
+  WEBCARD: WebCardScreen,
+  WEBCARD_PARAMETERS: WebCardParametersScreen,
 };
 
 const tabs = {
@@ -205,16 +216,16 @@ const unauthenticatedRoutes = ['SIGN_IN', 'SIGN_UP', 'FORGOT_PASSWORD'];
 const AppRouter = () => {
   // #region Routing
   const initialRoutes = useMemo(() => {
-    const { authenticated, hasBeenSignedIn, profileId } = getAuthState();
+    const { authenticated, hasBeenSignedIn, profileInfos } = getAuthState();
     return authenticated
-      ? mainRoutes(!profileId)
+      ? mainRoutes(!profileInfos)
       : hasBeenSignedIn
       ? signInRoutes
       : signUpRoutes;
   }, []);
 
   const { router, routerState } = useNativeRouter(initialRoutes);
-  const { authenticated, profileId } = useAuthState();
+  const { authenticated, profileInfos } = useAuthState();
 
   useEffect(() => {
     const currentRoute = router.getCurrentRoute()?.route;
@@ -225,10 +236,10 @@ const AppRouter = () => {
         authenticated &&
         unauthenticatedRoutes.includes(currentRoute)
       ) {
-        router.replaceAll(mainRoutes(!profileId));
+        router.replaceAll(mainRoutes(!profileInfos));
       }
     }
-  }, [authenticated, profileId, router]);
+  }, [authenticated, profileInfos, router]);
 
   useEffect(() => {
     const subscription = BackHandler.addEventListener(
@@ -249,8 +260,12 @@ const AppRouter = () => {
 
   // #region Sentry Routing Instrumentation
   useEffect(() => {
-    Sentry.setUser(profileId ? { id: fromGlobalId(profileId).id } : null);
-  }, [profileId]);
+    Sentry.setUser(
+      profileInfos?.profileId
+        ? { id: fromGlobalId(profileInfos.profileId).id }
+        : null,
+    );
+  }, [profileInfos]);
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -283,23 +298,16 @@ const AppRouter = () => {
   // #endregion
 
   // #region Relay Query Management and Screen Prefetching
-  const environmentReseted = useRef(false);
+  const environmentReset = useRef(false);
   const [environment, setEnvironment] = useState(getRelayEnvironment());
   useEffect(
     () =>
       addEnvironmentListener(event => {
         if (event === 'reset') {
-          environmentReseted.current = true;
+          environmentReset.current = true;
         }
       }),
     [],
-  );
-
-  const getEnvironmentForActor = useCallback(
-    (actorId: string) => {
-      return environment.forActor(actorId);
-    },
-    [environment],
   );
 
   const screenIdToDispose = useRef<string[]>([]).current;
@@ -325,8 +333,6 @@ const AppRouter = () => {
     });
   }, [router, screenIdToDispose, screenPrefetcher]);
 
-  useDeepLink(router);
-
   const onScreenDismissed = useCallback(
     (id: string) => {
       router.screenDismissed(id);
@@ -337,19 +343,19 @@ const AppRouter = () => {
     [router],
   );
 
-  const slapshScreenHidden = useRef(false);
+  const splashScreenHidden = useRef(false);
   const onFinishTransitioning = useCallback(() => {
     // We reset the environment only here
     // To avoid resetting it when old screens are still visible
-    if (environmentReseted.current) {
+    if (environmentReset.current) {
       setEnvironment(getRelayEnvironment());
-      environmentReseted.current = false;
+      environmentReset.current = false;
     }
     screenIdToDispose.forEach(screen =>
       RelayQueryManager.disposeQueryFor(screen),
     );
     screenIdToDispose.length = 0;
-    if (!slapshScreenHidden.current) {
+    if (!splashScreenHidden.current) {
       setTimeout(() => {
         hideSplashScreen({ fade: true });
       }, 200);
@@ -378,6 +384,8 @@ const AppRouter = () => {
   }, []);
   // #endregion
 
+  useDeepLink(router);
+
   const colorScheme = useColorScheme();
 
   const safeAreaBackgroundStyle = useMemo(() => {
@@ -393,11 +401,7 @@ const AppRouter = () => {
   }
 
   return (
-    <RelayEnvironmentProvider
-      environment={environment.forActor(ROOT_ACTOR_ID)}
-      // @ts-expect-error not in the types
-      getEnvironmentForActor={getEnvironmentForActor}
-    >
+    <RelayEnvironmentProvider environment={environment}>
       <ScreenPrefetcherProvider value={screenPrefetcher}>
         <SafeAreaProvider
           initialMetrics={initialWindowMetrics}
@@ -413,6 +417,9 @@ const AppRouter = () => {
             />
           </RouterProvider>
           <Toast />
+          <Suspense>
+            <ShakeShare />
+          </Suspense>
           <LoadingScreen visible={showLoadingScreen} />
         </SafeAreaProvider>
       </ScreenPrefetcherProvider>

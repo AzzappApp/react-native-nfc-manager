@@ -1,12 +1,21 @@
 // expo-font @expo-google-fonts/anton @expo-google-fonts/archivo @expo-google-fonts/cinzel @expo-google-fonts/inter @expo-google-fonts/jost @expo-google-fonts/koulen @expo-google-fonts/limelight @expo-google-fonts/lora @expo-google-fonts/manrope @expo-google-fonts/monoton @expo-google-fonts/montserrat @expo-google-fonts/poppins @expo-google-fonts/raleway @expo-google-fonts/righteous @expo-google-fonts/rye
 
+import {
+  AmaticSC_700Bold,
+  AmaticSC_400Regular,
+} from '@expo-google-fonts/amatic-sc';
 import { Anton_400Regular } from '@expo-google-fonts/anton';
 import { Archivo_300Light, Archivo_900Black } from '@expo-google-fonts/archivo';
+import { BebasNeue_400Regular } from '@expo-google-fonts/bebas-neue';
+import { Cardo_400Regular } from '@expo-google-fonts/cardo';
 import { Cinzel_400Regular } from '@expo-google-fonts/cinzel';
+import { CormorantGaramond_700Bold } from '@expo-google-fonts/cormorant-garamond';
 import { CourierPrime_400Regular } from '@expo-google-fonts/courier-prime';
 import { DMSerifDisplay_400Regular } from '@expo-google-fonts/dm-serif-display';
 import { FaunaOne_400Regular } from '@expo-google-fonts/fauna-one';
 import { Fraunces_300Light } from '@expo-google-fonts/fraunces';
+import { GildaDisplay_400Regular } from '@expo-google-fonts/gilda-display';
+import { Gloock_400Regular } from '@expo-google-fonts/gloock';
 import { GreatVibes_400Regular } from '@expo-google-fonts/great-vibes';
 import {
   Inter_400Regular,
@@ -18,6 +27,9 @@ import { JosefinSans_400Regular } from '@expo-google-fonts/josefin-sans';
 import { Jost_400Regular } from '@expo-google-fonts/jost';
 import { KaushanScript_400Regular } from '@expo-google-fonts/kaushan-script';
 import { Koulen_400Regular } from '@expo-google-fonts/koulen';
+import { Lexend_800ExtraBold } from '@expo-google-fonts/lexend';
+import { LibreBaskerville_400Regular_Italic } from '@expo-google-fonts/libre-baskerville';
+import { LibreCaslonDisplay_400Regular } from '@expo-google-fonts/libre-caslon-display';
 import { LibreCaslonText_400Regular } from '@expo-google-fonts/libre-caslon-text';
 import { Limelight_400Regular } from '@expo-google-fonts/limelight';
 import { Lora_400Regular, Lora_700Bold } from '@expo-google-fonts/lora';
@@ -33,6 +45,7 @@ import {
 } from '@expo-google-fonts/montserrat';
 import { MrDafoe_400Regular } from '@expo-google-fonts/mr-dafoe';
 import { OpenSans_400Regular } from '@expo-google-fonts/open-sans';
+import { Outfit_500Medium } from '@expo-google-fonts/outfit';
 import { PlayfairDisplay_700Bold } from '@expo-google-fonts/playfair-display';
 import {
   PlusJakartaSans_300Light,
@@ -46,17 +59,26 @@ import {
 } from '@expo-google-fonts/poppins';
 import { Raleway_400Regular } from '@expo-google-fonts/raleway';
 import { Righteous_400Regular } from '@expo-google-fonts/righteous';
+import { Rubik_700Bold } from '@expo-google-fonts/rubik';
 import { Rye_400Regular } from '@expo-google-fonts/rye';
 import { SeaweedScript_400Regular } from '@expo-google-fonts/seaweed-script';
+import { SixCaps_400Regular } from '@expo-google-fonts/six-caps';
 import { SourceSansPro_400Regular } from '@expo-google-fonts/source-sans-pro';
+import { Ultra_400Regular } from '@expo-google-fonts/ultra';
+import { WaterBrush_400Regular } from '@expo-google-fonts/water-brush';
 import { YesevaOne_400Regular } from '@expo-google-fonts/yeseva-one';
 import { useFonts } from 'expo-font';
 import type { ApplicationFonts } from '@azzapp/shared/fontHelpers';
 
 const fontMap: Record<ApplicationFonts, any> = {
+  AmaticSC_Bold: AmaticSC_700Bold,
+  AmaticSC_Regular: AmaticSC_400Regular,
   Anton_Regular: Anton_400Regular,
   Archivo_Black: Archivo_900Black,
   Archivo_Light: Archivo_300Light,
+  BebasNeue_Regular: BebasNeue_400Regular,
+  Cardo_Regular: Cardo_400Regular,
+  CormorantGaramond_Bold: CormorantGaramond_700Bold,
   CourrierPrime_Regular: CourierPrime_400Regular,
   Cinzel_Regular: Cinzel_400Regular,
   DMSerifDisplay_Regular: DMSerifDisplay_400Regular,
@@ -68,10 +90,15 @@ const fontMap: Record<ApplicationFonts, any> = {
   Inter_Black: Inter_900Black,
   JosefinSans_Regular: JosefinSans_400Regular,
   Jost_Regular: Jost_400Regular,
+  GildaDisplay_Regular: GildaDisplay_400Regular,
+  Gloock_Regular: Gloock_400Regular,
   GreatVibes_Regular: GreatVibes_400Regular,
   Kaushan_Regular: KaushanScript_400Regular,
   Koulen_Regular: Koulen_400Regular,
+  Lexend_ExtraBold: Lexend_800ExtraBold,
+  LibreBaskerville_Italic: LibreBaskerville_400Regular_Italic,
   LibreCaslonText_Regular: LibreCaslonText_400Regular,
+  LibreCaslonDisplay_Regular: LibreCaslonDisplay_400Regular,
   Limelight_Regular: Limelight_400Regular,
   Lora_Regular: Lora_400Regular,
   Lora_Bold: Lora_700Bold,
@@ -83,6 +110,7 @@ const fontMap: Record<ApplicationFonts, any> = {
   Montserrat_SemiBold: Montserrat_600SemiBold,
   MrDafoe_Regular: MrDafoe_400Regular,
   OpenSans_Regular: OpenSans_400Regular,
+  Outfit_Medium: Outfit_500Medium,
   PlayfairDisplay_Bold: PlayfairDisplay_700Bold,
   'Plus-Jakarta_Light': PlusJakartaSans_300Light,
   'Plus-Jakarta_ExtraBold': PlusJakartaSans_800ExtraBold,
@@ -91,10 +119,14 @@ const fontMap: Record<ApplicationFonts, any> = {
   Poppins_Bold: Poppins_700Bold,
   Poppins_Black: Poppins_900Black,
   Raleway_Regular: Raleway_400Regular,
+  Rubik_Bold: Rubik_700Bold,
   Righteous_Regular: Righteous_400Regular,
   Rye_Regular: Rye_400Regular,
   SeaweedScript_Regular: SeaweedScript_400Regular,
+  SixCaps_Regular: SixCaps_400Regular,
   SourcePro_Regular: SourceSansPro_400Regular,
+  Ultra_Regular: Ultra_400Regular,
+  WaterBrush_Regular: WaterBrush_400Regular,
   YesevaOne_Regular: YesevaOne_400Regular,
 };
 

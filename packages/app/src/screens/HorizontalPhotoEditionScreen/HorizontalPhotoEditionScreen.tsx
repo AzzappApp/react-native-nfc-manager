@@ -1,5 +1,5 @@
 import { omit } from 'lodash';
-import { Suspense, useCallback, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { StyleSheet, View } from 'react-native';
 import Toast from 'react-native-toast-message';
@@ -8,7 +8,6 @@ import {
   HORIZONTAL_PHOTO_DEFAULT_VALUES,
   HORIZONTAL_PHOTO_STYLE_VALUES,
   MODULE_IMAGE_MAX_WIDTH,
-  MODULE_KIND_HORIZONTAL_PHOTO,
 } from '@azzapp/shared/cardModuleHelpers';
 import { encodeMediaId } from '@azzapp/shared/imagesHelpers';
 import { CameraButton } from '#components/commonsButtons';
@@ -19,7 +18,6 @@ import ImagePicker, {
 } from '#components/ImagePicker';
 import { useRouter } from '#components/NativeRouter';
 import ScreenModal from '#components/ScreenModal';
-import WebCardModulePreview from '#components/WebCardModulePreview';
 import { getFileName } from '#helpers/fileHelpers';
 import { downScaleImage } from '#helpers/mediaHelpers';
 import { uploadMedia, uploadSign } from '#helpers/MobileWebAPI';
@@ -27,7 +25,7 @@ import useEditorLayout from '#hooks/useEditorLayout';
 import useModuleDataEditor from '#hooks/useModuleDataEditor';
 import { BOTTOM_MENU_HEIGHT } from '#ui/BottomMenu';
 import Container from '#ui/Container';
-import Header, { HEADER_HEIGHT } from '#ui/Header';
+import Header from '#ui/Header';
 import HeaderButton from '#ui/HeaderButton';
 import PressableOpacity from '#ui/PressableOpacity';
 import TabView from '#ui/TabView';
@@ -39,12 +37,12 @@ import HorizontalPhotoMarginsEditionPanel from './HorizontalPhotoMarginsEditionP
 import HorizontalPhotoPreview from './HorizontalPhotoPreview';
 import HorizontalPhotoSettingsEditionPanel from './HorizontalPhotoSettingsEditionPanel';
 import type { ImagePickerResult } from '#components/ImagePicker';
-import type { HorizontalPhotoEditionScreen_module$key } from '@azzapp/relay/artifacts/HorizontalPhotoEditionScreen_module.graphql';
-import type { HorizontalPhotoEditionScreen_viewer$key } from '@azzapp/relay/artifacts/HorizontalPhotoEditionScreen_viewer.graphql';
+import type { HorizontalPhotoEditionScreen_module$key } from '#relayArtifacts/HorizontalPhotoEditionScreen_module.graphql';
+import type { HorizontalPhotoEditionScreen_profile$key } from '#relayArtifacts/HorizontalPhotoEditionScreen_profile.graphql';
 import type {
   HorizontalPhotoEditionScreenUpdateModuleMutation,
   SaveHorizontalPhotoModuleInput,
-} from '@azzapp/relay/artifacts/HorizontalPhotoEditionScreenUpdateModuleMutation.graphql';
+} from '#relayArtifacts/HorizontalPhotoEditionScreenUpdateModuleMutation.graphql';
 import type { ViewProps } from 'react-native';
 import type { Observable } from 'relay-runtime';
 
@@ -52,7 +50,7 @@ export type HorizontalPhotoEditionScreenProps = ViewProps & {
   /**
    * the current viewer
    */
-  viewer: HorizontalPhotoEditionScreen_viewer$key;
+  profile: HorizontalPhotoEditionScreen_profile$key;
   /**
    * the current module to edit, if null, a new module will be created
    */
@@ -64,21 +62,15 @@ export type HorizontalPhotoEditionScreenProps = ViewProps & {
  */
 const HorizontalPhotoEditionScreen = ({
   module,
-  viewer: viewerKey,
+  profile: profileKey,
 }: HorizontalPhotoEditionScreenProps) => {
   // #region Data retrieval
   const horizontalPhoto = useFragment(
     graphql`
       fragment HorizontalPhotoEditionScreen_module on CardModuleHorizontalPhoto
       @argumentDefinitions(
-        pixelRatio: {
-          type: "Float!"
-          provider: "../providers/PixelRatio.relayprovider"
-        }
-        screenWidth: {
-          type: "Float!"
-          provider: "../providers/ScreenWidth.relayprovider"
-        }
+        pixelRatio: { type: "Float!", provider: "PixelRatio.relayprovider" }
+        screenWidth: { type: "Float!", provider: "ScreenWidth.relayprovider" }
       ) {
         id
         borderWidth
@@ -107,17 +99,17 @@ const HorizontalPhotoEditionScreen = ({
     module,
   );
 
-  const viewer = useFragment(
+  const profile = useFragment(
     graphql`
-      fragment HorizontalPhotoEditionScreen_viewer on Viewer {
-        ...HorizontalPhotoBorderEditionPanel_viewer
-        ...HorizontalPhotoBackgroundEditionPanel_viewer
+      fragment HorizontalPhotoEditionScreen_profile on Profile {
+        ...HorizontalPhotoBackgroundEditionPanel_profile
         moduleBackgrounds {
           id
           uri
           resizeMode
         }
-        profile {
+        webCard {
+          id
           cardColors {
             primary
             light
@@ -135,10 +127,11 @@ const HorizontalPhotoEditionScreen = ({
             titleFontFamily
             titleFontSize
           }
+          ...HorizontalPhotoBorderEditionPanel_webCard
         }
       }
     `,
-    viewerKey,
+    profileKey,
   );
 
   // #endregion
@@ -160,7 +153,7 @@ const HorizontalPhotoEditionScreen = ({
 
   const { data, value, fieldUpdateHandler, dirty } = useModuleDataEditor({
     initialValue,
-    cardStyle: viewer.profile?.cardStyle,
+    cardStyle: profile?.webCard.cardStyle,
     styleValuesMap: HORIZONTAL_PHOTO_STYLE_VALUES,
     defaultValues: HORIZONTAL_PHOTO_DEFAULT_VALUES,
   });
@@ -180,7 +173,7 @@ const HorizontalPhotoEditionScreen = ({
   const previewData = {
     ...omit(data, 'backgroundId'),
     background:
-      viewer.moduleBackgrounds.find(
+      profile.moduleBackgrounds.find(
         background => background.id === backgroundId,
       ) ?? null,
   };
@@ -191,7 +184,7 @@ const HorizontalPhotoEditionScreen = ({
         $input: SaveHorizontalPhotoModuleInput!
       ) {
         saveHorizontalPhotoModule(input: $input) {
-          profile {
+          webCard {
             id
             cardModules {
               kind
@@ -256,6 +249,7 @@ const HorizontalPhotoEditionScreen = ({
     }
 
     const input: SaveHorizontalPhotoModuleInput = {
+      webCardId: profile.webCard.id,
       moduleId: horizontalPhoto?.id,
       image: mediaId ?? value.image!.id,
       ...rest,
@@ -285,9 +279,9 @@ const HorizontalPhotoEditionScreen = ({
   }, [
     canSave,
     value,
+    profile.webCard.id,
     horizontalPhoto?.id,
     commit,
-    setProgressIndicator,
     intl,
     router,
   ]);
@@ -416,8 +410,8 @@ const HorizontalPhotoEditionScreen = ({
         <HorizontalPhotoPreview
           style={{ height: topPanelHeight - 110, marginVertical: 10 }}
           data={previewData}
-          colorPalette={viewer.profile?.cardColors}
-          cardStyle={viewer.profile?.cardStyle}
+          colorPalette={profile?.webCard.cardColors}
+          cardStyle={profile?.webCard.cardStyle}
         />
       </PressableOpacity>
       <View
@@ -459,7 +453,7 @@ const HorizontalPhotoEditionScreen = ({
                 onBorderRadiusChange={onBorderradiusChange}
                 borderColor={borderColor}
                 onBorderColorChange={onBordercolorChange}
-                viewer={viewer}
+                webCard={profile?.webCard ?? null}
                 bottomSheetHeight={bottomPanelHeight}
                 style={{
                   flex: 1,
@@ -487,7 +481,7 @@ const HorizontalPhotoEditionScreen = ({
             id: 'background',
             element: (
               <HorizontalPhotoBackgroundEditionPanel
-                viewer={viewer}
+                profile={profile}
                 backgroundId={backgroundId}
                 backgroundStyle={backgroundStyle}
                 onBackgroundChange={onBackgroundChange}
@@ -502,29 +496,6 @@ const HorizontalPhotoEditionScreen = ({
           },
         ]}
       />
-      <View
-        style={{
-          position: 'absolute',
-          top: HEADER_HEIGHT + insetTop,
-          height: topPanelHeight + bottomPanelHeight,
-          width: windowWidth,
-          opacity: currentTab === 'preview' ? 1 : 0,
-        }}
-        pointerEvents={currentTab === 'preview' ? 'auto' : 'none'}
-      >
-        <Suspense>
-          <WebCardModulePreview
-            editedModuleId={horizontalPhoto?.id}
-            visible={currentTab === 'preview'}
-            editedModuleInfo={{
-              kind: MODULE_KIND_HORIZONTAL_PHOTO,
-              data: previewData,
-            }}
-            height={topPanelHeight + bottomPanelHeight}
-            contentPaddingBottom={insetBottom + BOTTOM_MENU_HEIGHT}
-          />
-        </Suspense>
-      </View>
       <HorizontalPhotoEditionBottomMenu
         currentTab={currentTab}
         onItemPress={onCurrentTabChange}

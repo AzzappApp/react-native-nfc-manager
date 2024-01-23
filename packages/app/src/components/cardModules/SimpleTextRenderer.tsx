@@ -10,16 +10,15 @@ import {
   getModuleDataValues,
   textAlignmentOrDefault,
 } from '@azzapp/shared/cardModuleHelpers';
-import measureText from '#helpers/measureText';
 import CardModuleBackground from './CardModuleBackground';
 import type {
   SimpleTextRenderer_simpleTextModule$data,
   SimpleTextRenderer_simpleTextModule$key,
-} from '@azzapp/relay/artifacts/SimpleTextRenderer_simpleTextModule.graphql';
+} from '#relayArtifacts/SimpleTextRenderer_simpleTextModule.graphql';
 import type {
   SimpleTextRenderer_simpleTitleModule$data,
   SimpleTextRenderer_simpleTitleModule$key,
-} from '@azzapp/relay/artifacts/SimpleTextRenderer_simpleTitleModule.graphql';
+} from '#relayArtifacts/SimpleTextRenderer_simpleTitleModule.graphql';
 import type { CardStyle, ColorPalette } from '@azzapp/shared/cardHelpers';
 import type { NullableFields } from '@azzapp/shared/objectHelpers';
 import type { StyleProp, TextStyle, ViewProps } from 'react-native';
@@ -143,6 +142,7 @@ const SimpleTextRenderer = ({
   return (
     <CardModuleBackground
       {...props}
+      key={background?.uri}
       backgroundUri={background?.uri}
       backgroundColor={swapColor(
         backgroundStyle?.backgroundColor,
@@ -181,44 +181,3 @@ const SimpleTextRenderer = ({
 };
 
 export default SimpleTextRenderer;
-
-export const measureSimpleTextHeight = async (
-  data: SimpleTextRendererData,
-  cardStyle: CardStyle,
-  maxWidth: number,
-) => {
-  const {
-    text,
-    fontFamily,
-    fontSize,
-    verticalSpacing,
-    marginHorizontal,
-    marginVertical,
-  } = getModuleDataValues({
-    data,
-    styleValuesMap:
-      data.kind === MODULE_KIND_SIMPLE_TITLE
-        ? SIMPLE_TITLE_STYLE_VALUES
-        : SIMPLE_TEXT_STYLE_VALUES,
-    cardStyle,
-    defaultValues:
-      data.kind === MODULE_KIND_SIMPLE_TITLE
-        ? SIMPLE_TITLE_DEFAULT_VALUES
-        : SIMPLE_TEXT_DEFAULT_VALUES,
-  });
-
-  const textMaxWidth = maxWidth - (marginHorizontal ?? 0) * 2;
-
-  const textSize = await measureText({
-    text: text ?? '',
-    fontFamily: fontFamily ?? undefined,
-    fontSize,
-    width: textMaxWidth,
-    lineHeight:
-      fontSize && verticalSpacing
-        ? fontSize * 1.2 + verticalSpacing
-        : undefined,
-  });
-
-  return marginVertical * 2 + textSize;
-};

@@ -16,14 +16,14 @@ import { getTopPostsComment } from './postComments';
 import { PostReactionTable } from './postReactions';
 import type { DbTransaction } from './db';
 import type { PostComment } from './postComments';
-import type { Profile } from './profiles';
+import type { WebCard } from './webCards';
 import type { InferInsertModel, InferSelectModel, SQL } from 'drizzle-orm';
 
 export const PostTable = mysqlTable(
   'Post',
   {
     id: cols.cuid('id').primaryKey().notNull().$defaultFn(createId),
-    authorId: cols.cuid('authorId').notNull(),
+    webCardId: cols.cuid('webCardId').notNull(),
     content: text('content'),
     allowComments: boolean('allowComments').notNull(),
     allowLikes: boolean('allowLikes').notNull(),
@@ -35,7 +35,7 @@ export const PostTable = mysqlTable(
   },
   table => {
     return {
-      authorIdIdx: index('Post_authorId_idx').on(table.authorId),
+      authorIdIdx: index('Post_webCardId_idx').on(table.webCardId),
     };
   },
 );
@@ -44,7 +44,7 @@ export type Post = InferSelectModel<typeof PostTable>;
 export type NewPost = InferInsertModel<typeof PostTable>;
 export type PostWithMedias = Omit<Post, 'medias'> & { medias: Media[] };
 export type PostWithCommentAndAuthor = PostWithMedias & {
-  comment: (PostComment & { author: Profile }) | null;
+  comment: (PostComment & { author: WebCard }) | null;
 };
 
 /**
@@ -62,7 +62,6 @@ export const getPostById = async (id: string) => {
 /**
  * Retrieve a post by its ids.
  * @param id - The id of the post to retrieve
- * @param profileId - The id of the attached profile
  * @returns A post and its medias
  */
 export const getPostByIdWithMedia = async (id: string) => {
@@ -76,21 +75,21 @@ export const getPostByIdWithMedia = async (id: string) => {
 };
 
 /**
- * Retrieve a profile's post, ordered by date, with pagination.
+ * Retrieve a webCard's post, ordered by date, with pagination.
  *
- * @param profileId  The id of the profile
+ * @param webCardId  The id of the webCard
  * @param limit The maximum number of post to retrieve
- * @param offset The offset of the first post to retrieve
  * @param excludedId The id of a post to exclude from the search
+ * @param before The date of the first post to retrieve
  * @returns A list of post
  */
-export const getProfilesPostsWithMedias = async (
-  profileId: string,
+export const getWebCardsPostsWithMedias = async (
+  webCardId: string,
   limit: number,
-  offset: number,
   excludedId?: string,
+  before?: Date,
 ) => {
-  const conditions: SQL[] = [eq(PostTable.authorId, profileId)];
+  const conditions: SQL[] = [eq(PostTable.webCardId, webCardId)];
 
   if (excludedId) {
     conditions.push(notInArray(PostTable.id, [excludedId]));
@@ -99,10 +98,14 @@ export const getProfilesPostsWithMedias = async (
   const posts = await db
     .select()
     .from(PostTable)
-    .where(and(...conditions))
+    .where(
+      and(
+        ...conditions,
+        before ? sql`${PostTable.createdAt} < ${before}` : undefined,
+      ),
+    )
     .orderBy(desc(PostTable.createdAt))
-    .limit(limit)
-    .offset(offset);
+    .limit(limit);
 
   const mediasIds = posts.reduce<string[]>((mediasIds, post) => {
     return [...mediasIds, ...post.medias];
@@ -122,45 +125,48 @@ export const getProfilesPostsWithMedias = async (
 };
 
 /**
- * Retrieve a profile's post, ordered by date, with pagination.
+ * Retrieve a webCard's post, ordered by date, with pagination.
  *
- * @param profileId  The id of the profile
+ * @param webCardId  The id of the webCard
  * @param limit The maximum number of post to retrieve
  * @param offset The offset of the first post to retrieve
  * @returns A list of post
  */
 export const getProfilesPosts = async (
-  profileId: string,
-  limit: number,
-  offset: number,
+  webCardId: string,
+  limit?: number,
+  offset?: number,
 ) => {
-  const res = await db
+  const query = db
     .select()
     .from(PostTable)
-    .where(eq(PostTable.authorId, profileId))
-    .orderBy(desc(PostTable.createdAt))
-    .limit(limit)
-    .offset(offset);
-  return res;
+    .where(eq(PostTable.webCardId, webCardId))
+    .orderBy(desc(PostTable.createdAt));
+
+  if (limit) {
+    return query.limit(limit).offset(offset ?? 0);
+  }
+
+  return query;
 };
 
 /**
- * Retrieve a profile's post, ordered by date, with pagination.
+ * Retrieve a webCard's post, ordered by date, with pagination.
  *
- * @param profileId  The id of the profile
+ * @param webCardId  The id of the webCard
  * @param limit The maximum number of post to retrieve
  * @param offset The offset of the first post to retrieve
  * @returns A list of post
  */
 export const getProfilesPostsWithTopComment = async (
-  profileId: string,
+  webCardId: string,
   limit: number,
   offset = 0,
 ): Promise<PostWithCommentAndAuthor[]> => {
   const posts = await db
     .select()
     .from(PostTable)
-    .where(eq(PostTable.authorId, profileId))
+    .where(eq(PostTable.webCardId, webCardId))
     .orderBy(desc(PostTable.createdAt))
     .limit(limit)
     .offset(offset);
@@ -203,16 +209,16 @@ export const getAllPosts = async (limit: number, after: Date | null = null) => {
 };
 
 /**
- * Retrieve a list of post from the profiles a profile is following, ordered by date,
+ * Retrieve a list of post from the webCards a webCard is following, ordered by date,
  * with pagination based on postDate.
  *
- * @param profileId - The id of the profile
+ * @param webCardId - The id of the webCard
  * @param limit - The maximum number of post to retrieve
  * @param offset - the offset of the first post to retrieve (based on postDate)
  * @returns A list of post
  */
 export const getFollowingsPosts = async (
-  profileId: string,
+  webCardId: string,
   limit: number,
   after: Date | null = null,
 ) => {
@@ -221,10 +227,10 @@ export const getFollowingsPosts = async (
       Post: PostTable,
     })
     .from(PostTable)
-    .innerJoin(FollowTable, eq(PostTable.authorId, FollowTable.followingId))
+    .innerJoin(FollowTable, eq(PostTable.webCardId, FollowTable.followingId))
     .where(
       and(
-        eq(FollowTable.followerId, profileId),
+        eq(FollowTable.followerId, webCardId),
         after ? lt(PostTable.createdAt, after) : undefined,
       ),
     )
@@ -235,17 +241,17 @@ export const getFollowingsPosts = async (
 };
 
 /**
- * Retrieve the number of post from the profiles a profile is following.
+ * Retrieve the number of post from the webCards a webCard is following.
  *
- * @param profileId - The id of the profile
- * @returns The number of post from the profiles a profile is following
+ * @param webCardId - The id of the webCard
+ * @returns The number of post from the webCards a webCard is following
  */
-export const getFollowingsPostsCount = async (profileId: string) =>
+export const getFollowingsPostsCount = async (webCardId: string) =>
   db
     .select({ count: sql`count(*)`.mapWith(Number) })
     .from(PostTable)
-    .innerJoin(FollowTable, eq(PostTable.authorId, FollowTable.followingId))
-    .where(eq(FollowTable.followerId, profileId))
+    .innerJoin(FollowTable, eq(PostTable.webCardId, FollowTable.followingId))
+    .where(eq(FollowTable.followerId, webCardId))
 
     .then(res => res[0].count);
 
@@ -253,7 +259,7 @@ export const getFollowingsPostsCount = async (profileId: string) =>
  * Create a post.
  *
  * @param values - the post fields, excluding the id and the postDate
- * @param tx - The query creator to use (profile for transactions)
+ * @param tx - The query creator to use
  * @returns The created post
  */
 export const createPost = async (values: NewPost, tx: DbTransaction = db) => {
@@ -277,16 +283,16 @@ export const updatePost = async (postId: string, data: Partial<NewPost>) => {
 };
 
 /**
- * Retrieve a list of post liked by a profile
+ * Retrieve a list of post liked by a webCardId
  * with pagination based on postDate.
  *
- * @param profileId - The id of the profile
+ * @param webCardId - The id of the webCardId
  * @param limit - The maximum number of post to retrieve
  * @param offset - the offset of the first post to retrieve (based on postDate)
  * @returns A list of post
  */
 export const getLikedPosts = async (
-  profileId: string,
+  webCardId: string,
   limit: number,
   after: Date | null = null,
 ) => {
@@ -297,7 +303,7 @@ export const getLikedPosts = async (
     .from(PostReactionTable)
     .where(
       and(
-        eq(PostReactionTable.profileId, profileId),
+        eq(PostReactionTable.webCardId, webCardId),
         after ? lt(PostReactionTable.createdAt, after) : undefined,
       ),
     )

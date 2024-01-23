@@ -2,9 +2,9 @@ import { useCallback } from 'react';
 import { useIntl } from 'react-intl';
 import { StyleSheet, View } from 'react-native';
 import { graphql, useFragment } from 'react-relay';
-import { ProfileBoundEditorLayerSelectorPanel } from '#components/EditorLayerSelectorPanel';
+import { WebCardBoundEditorLayerSelectorPanel } from '#components/EditorLayerSelectorPanel';
 
-import type { HorizontalPhotoBackgroundEditionPanel_viewer$key } from '@azzapp/relay/artifacts/HorizontalPhotoBackgroundEditionPanel_viewer.graphql';
+import type { HorizontalPhotoBackgroundEditionPanel_profile$key } from '#relayArtifacts/HorizontalPhotoBackgroundEditionPanel_profile.graphql';
 import type { ViewProps } from 'react-native-svg/lib/typescript/fabric/utils';
 
 type BackgroundStyle = {
@@ -16,7 +16,7 @@ type HorizontalPhotoBackgroundEditionPanelProps = ViewProps & {
   /**
    * A relay fragment reference to the viewer
    */
-  viewer: HorizontalPhotoBackgroundEditionPanel_viewer$key;
+  profile: HorizontalPhotoBackgroundEditionPanel_profile$key;
   /**
    * The currently selected background id
    */
@@ -44,7 +44,7 @@ type HorizontalPhotoBackgroundEditionPanelProps = ViewProps & {
  * Panel to edit the style of the HorizontalPhoto
  */
 const HorizontalPhotoBackgroundEditionPanel = ({
-  viewer,
+  profile: profileKey,
   backgroundId: background,
   backgroundStyle,
   onBackgroundChange,
@@ -52,18 +52,18 @@ const HorizontalPhotoBackgroundEditionPanel = ({
   bottomSheetHeight,
   ...props
 }: HorizontalPhotoBackgroundEditionPanelProps) => {
-  const { moduleBackgrounds, profile } = useFragment(
+  const profile = useFragment(
     graphql`
-      fragment HorizontalPhotoBackgroundEditionPanel_viewer on Viewer {
+      fragment HorizontalPhotoBackgroundEditionPanel_profile on Profile {
         moduleBackgrounds {
           ...StaticMediaList_staticMedias
         }
-        profile {
-          ...ProfileColorPicker_profile
+        webCard {
+          ...WebCardColorPicker_webCard
         }
       }
     `,
-    viewer,
+    profileKey,
   );
 
   const backgroundColor = backgroundStyle?.backgroundColor ?? '#FFFFFF';
@@ -90,13 +90,13 @@ const HorizontalPhotoBackgroundEditionPanel = ({
 
   return (
     <View {...props}>
-      <ProfileBoundEditorLayerSelectorPanel
+      <WebCardBoundEditorLayerSelectorPanel
         title={intl.formatMessage({
           defaultMessage: 'Background',
           description: 'Label of Background tab in Horizontal photo edition',
         })}
-        profile={profile!}
-        medias={moduleBackgrounds}
+        webCard={profile?.webCard ?? null}
+        medias={profile.moduleBackgrounds}
         selectedMedia={background}
         tintColor={patternColor}
         backgroundColor={backgroundColor}

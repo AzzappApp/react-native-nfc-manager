@@ -5,17 +5,18 @@ import {
   SOCIAL_LINKS_DEFAULT_VALUES,
   getModuleDataValues,
 } from '@azzapp/shared/cardModuleHelpers';
-import { SOCIAL_LINKS } from '#helpers/socialLinkHelpers';
+import { SOCIAL_LINKS } from '@azzapp/shared/socialLinkHelpers';
 import { SocialIcon } from '#ui/Icon';
 import PressableOpacity from '#ui/PressableOpacity';
 import CardModuleBackground from './CardModuleBackground';
-import type { SocialIcons } from '#ui/Icon';
+
 import type {
   SocialLinksRenderer_module$data,
   SocialLinksRenderer_module$key,
-} from '@azzapp/relay/artifacts/SocialLinksRenderer_module.graphql';
+} from '#relayArtifacts/SocialLinksRenderer_module.graphql';
 import type { CardStyle, ColorPalette } from '@azzapp/shared/cardHelpers';
 import type { NullableFields } from '@azzapp/shared/objectHelpers';
+import type { SocialLinkId } from '@azzapp/shared/socialLinkHelpers';
 import type { StyleProp, ViewProps, ViewStyle } from 'react-native';
 
 /**
@@ -177,7 +178,7 @@ const SocialLinksRenderer = ({
               onPress={() => onPressSocialLink(link)}
             >
               <SocialIcon
-                icon={link.socialId as SocialIcons}
+                icon={link.socialId as SocialLinkId}
                 style={{
                   width: iconSize - 22,
                   height: iconSize - 22,
@@ -222,7 +223,7 @@ const SocialLinksRenderer = ({
               disabledOpacity={1}
             >
               <SocialIcon
-                icon={link.socialId as SocialIcons}
+                icon={link.socialId as SocialLinkId}
                 style={{
                   width: iconSize - 22,
                   height: iconSize - 22,
@@ -238,41 +239,3 @@ const SocialLinksRenderer = ({
 };
 
 export default SocialLinksRenderer;
-
-export const measureSocialLinksHeight = async (
-  data: SocialLinksRendererData,
-  cardStyle: CardStyle,
-  maxWidth: number,
-) => {
-  const {
-    links,
-    iconSize,
-    arrangement,
-    columnGap,
-    marginTop,
-    marginBottom,
-    marginHorizontal,
-  } = getModuleDataValues({
-    data,
-    cardStyle,
-    defaultValues: SOCIAL_LINKS_DEFAULT_VALUES,
-    styleValuesMap: null,
-  });
-
-  if (arrangement === 'inline') {
-    return iconSize + marginTop + marginBottom;
-  } else {
-    const [contentHeight] = (links ?? []).reduce(
-      ([height, width], _) => {
-        const nextWidth = width + iconSize + columnGap;
-        if (nextWidth > maxWidth - 2 * marginHorizontal) {
-          return [height + iconSize + columnGap, iconSize];
-        } else {
-          return [height, nextWidth];
-        }
-      },
-      [iconSize, 0],
-    );
-    return contentHeight + marginTop + marginBottom;
-  }
-};

@@ -1,6 +1,6 @@
 import { addPass, addPassJWT } from '@reeq/react-native-passkit';
 import { fromGlobalId } from 'graphql-relay';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import {
   View,
@@ -18,11 +18,13 @@ import Animated, {
 } from 'react-native-reanimated';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
-import { graphql, useMutation, usePreloadedQuery } from 'react-relay';
-import { useDebounce } from 'use-debounce';
+import { graphql, usePreloadedQuery } from 'react-relay';
 import { colors } from '#theme';
 import AccountHeader from '#components/AccountHeader';
-import ContactCard, { CONTACT_CARD_RATIO } from '#components/ContactCard';
+import ContactCard, {
+  CONTACT_CARD_RATIO,
+} from '#components/ContactCard/ContactCard';
+import ScreenModal from '#components/ScreenModal';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import { getAppleWalletPass, getGoogleWalletPass } from '#helpers/MobileWebAPI';
 import relayScreen from '#helpers/relayScreen';
@@ -33,33 +35,30 @@ import Button from '#ui/Button';
 import Container from '#ui/Container';
 import PressableAnimated from '#ui/PressableAnimated';
 import PressableNative from '#ui/PressableNative';
-import Switch from '#ui/Switch';
 import Text from '#ui/Text';
 import ContactCardEditModal from './ContactCardEditModal';
 import ContactCardExportVcf from './ContactCardExportVcf';
 import type { RelayScreenProps } from '#helpers/relayScreen';
+import type { AccountHeader_webCard$key } from '#relayArtifacts/AccountHeader_webCard.graphql';
+import type { ContactCardScreenQuery } from '#relayArtifacts/ContactCardScreenQuery.graphql';
 import type { ContactCardRoute } from '#routes';
-import type { AccountHeader_profile$key } from '@azzapp/relay/artifacts/AccountHeader_profile.graphql';
-import type { ContactCardScreenQuery } from '@azzapp/relay/artifacts/ContactCardScreenQuery.graphql';
 import type { LayoutChangeEvent } from 'react-native';
 
 const contactCardMobileScreenQuery = graphql`
-  query ContactCardScreenQuery {
-    viewer {
-      profile {
-        id
-        userName
-        ...AccountHeader_profile
+  query ContactCardScreenQuery($profileId: ID!) {
+    node(id: $profileId) {
+      ... on Profile @alias(as: "profile") {
+        webCard {
+          id
+          userName
+          ...AccountHeader_webCard
+          cardColors {
+            primary
+          }
+        }
         ...ContactCard_profile
-        contactCard {
-          isPrivate
-          displayedOnWebCard
-          ...ContactCardEditModal_card
-          ...ContactCardExportVcf_card
-        }
-        cardColors {
-          primary
-        }
+        ...ContactCardExportVcf_card
+        ...ContactCardEditModal_card
       }
     }
   }
@@ -70,15 +69,16 @@ const defaultTimingParam = {
   easing: Easing.inOut(Easing.ease), //Easing.bezier(0.25, 0.1, 0.25, 1),
 };
 
-const ContactCardScreen = ({
+export const ContactCardScreen = ({
   preloadedQuery,
 }: RelayScreenProps<ContactCardRoute, ContactCardScreenQuery>) => {
-  const { viewer } = usePreloadedQuery(
+  const { node } = usePreloadedQuery(
     contactCardMobileScreenQuery,
     preloadedQuery,
   );
   const { width, height } = useWindowDimensions();
-  const profile = viewer?.profile;
+  const profile = node?.profile;
+  const webCard = profile?.webCard;
   const intl = useIntl();
 
   const [fullScreen, setFullscreen] = useToggle(false);
@@ -151,58 +151,12 @@ const ContactCardScreen = ({
 
   const [contactCardEditModal, toggleContactEditModal] = useToggle(false);
 
-  const [commit] = useMutation(graphql`
-    mutation ContactCardScreenMutation($input: SaveContactCardInput!) {
-      saveContactCard(input: $input) {
-        profile {
-          contactCard {
-            isPrivate
-            displayedOnWebCard
-            ...ContactCardEditModal_card
-          }
-        }
-      }
-    }
-  `);
-
-  //TODO: remove for beta
-  const [isPublicCard] = useToggle(false);
-  const [isDisplayedOnWebCard, setIsDisplayedOnWebCard] = useToggle(
-    viewer.profile?.contactCard?.displayedOnWebCard ?? false,
-  );
-
-  const [debouncedPublic] = useDebounce(isPublicCard, 500);
-  const [debouncedDisplayedOnWebCard] = useDebounce(isDisplayedOnWebCard, 500);
-
-  //TODO: find another way, we are saving the contact card when displaying the page(initial render)
-  useEffect(() => {
-    commit({
-      variables: {
-        input: {
-          isPrivate: !debouncedPublic,
-          displayedOnWebCard: debouncedPublic && debouncedDisplayedOnWebCard,
-        },
-      },
-      onError: e => {
-        console.error(e);
-        Toast.show({
-          type: 'error',
-          text1: intl.formatMessage({
-            defaultMessage:
-              'Error, could not save your contact card. Please try again.',
-            description: 'Error toast message when saving contact card failed',
-          }),
-        });
-      },
-    });
-  }, [debouncedPublic, debouncedDisplayedOnWebCard, commit, intl]);
-
   const styles = useStyleSheet(styleSheet);
 
   const [loadingPass, setLoadingPass] = useState(false);
 
   const colorScheme = useColorScheme();
-  if (!profile) {
+  if (!webCard) {
     return null;
   }
 
@@ -210,7 +164,7 @@ const ContactCardScreen = ({
     <Container style={{ flex: 1 }}>
       <SafeAreaView style={styles.container}>
         <Animated.View style={headerStyle}>
-          <ContactCardScreenHeader profile={profile} />
+          <ContactCardScreenHeader webCard={webCard} />
         </Animated.View>
 
         <PressableAnimated
@@ -240,68 +194,17 @@ const ContactCardScreen = ({
           />
 
           <View style={{ width: '100%' }}>
-            {/* 
-            TODO: Disable for the beta
-            <View style={styles.publicOptions}>
-              <Text variant="large">
-                <FormattedMessage
-                  defaultMessage="Public contact card"
-                  description="When true the contact card is public"
-                />
-              </Text>
-              <Switch
-                variant="large"
-                value={isPublicCard}
-                onValueChange={setIsPublicCard}
-              />
-            </View> */}
             <Text variant="xsmall">
-              {isPublicCard ? (
-                <FormattedMessage
-                  defaultMessage="Anyone can download your contact card from your profile."
-                  description="Description message when contact card is public."
-                />
-              ) : (
-                <FormattedMessage
-                  defaultMessage="Your contact card is not visible on your Webcard. Only you can share your contact card with other users."
-                  description="Description message when contact card is private."
-                />
-              )}
+              <FormattedMessage
+                defaultMessage="Your contact card is not visible on your Webcard. Only you can share your contact card with other users."
+                description="Description message when contact card is private."
+              />
             </Text>
           </View>
 
-          {isPublicCard && (
-            <Animated.View
-              style={{ width: '100%' }}
-              // TODO reenable once RANIMATED3 see: https://github.com/software-mansion/react-native-reanimated/issues/3124
-
-              // entering={FadeIn}
-              // exiting={FadeOut}
-            >
-              <View style={styles.publicOptions}>
-                <Text variant="large">
-                  <FormattedMessage
-                    defaultMessage="Display on my webcard"
-                    description="When true the contact card is displayed on the webcard"
-                  />
-                </Text>
-                <Switch
-                  variant="large"
-                  value={isDisplayedOnWebCard}
-                  onValueChange={setIsDisplayedOnWebCard}
-                />
-              </View>
-              <Text variant="xsmall">
-                <FormattedMessage
-                  defaultMessage="When users visite your Webcard, they are prompted to download your contact card."
-                  description="Description of the display on my webcard toggle."
-                />
-              </Text>
-            </Animated.View>
-          )}
-
           <View style={styles.buttons}>
             <PressableNative
+              testID="add-to-wallet-button"
               disabled={loadingPass}
               style={styles.addToWalletButton}
               onPress={async () => {
@@ -309,7 +212,7 @@ const ContactCardScreen = ({
                   setLoadingPass(true);
                   if (Platform.OS === 'ios') {
                     const pass = await getAppleWalletPass({
-                      profileId: fromGlobalId(profile.id).id,
+                      webCardId: fromGlobalId(webCard.id).id,
                       locale: intl.locale,
                     });
 
@@ -320,7 +223,7 @@ const ContactCardScreen = ({
                     await addPass(base64Pass);
                   } else if (Platform.OS === 'android') {
                     const pass = await getGoogleWalletPass({
-                      profileId: fromGlobalId(profile.id).id,
+                      webCardId: fromGlobalId(webCard.id).id,
                       locale: intl.locale,
                     });
 
@@ -369,36 +272,36 @@ const ContactCardScreen = ({
               </Text>
             </PressableNative>
 
-            {profile?.contactCard && (
+            {webCard && (
               <ContactCardExportVcf
-                userName={profile.userName}
-                contactCard={profile.contactCard}
+                userName={webCard.userName}
+                profile={profile}
               />
             )}
           </View>
         </Animated.View>
-        {viewer.profile.contactCard && (
+        <ScreenModal visible={contactCardEditModal} animationType="slide">
           <ContactCardEditModal
-            key={viewer.profile.id}
-            contactCard={viewer.profile.contactCard}
+            key={webCard.id}
+            profile={profile}
             visible={contactCardEditModal}
             toggleBottomSheet={toggleContactEditModal}
           />
-        )}
+        </ScreenModal>
       </SafeAreaView>
     </Container>
   );
 };
 
 const ContactCardScreenHeader = ({
-  profile,
+  webCard,
 }: {
-  profile: AccountHeader_profile$key | null;
+  webCard: AccountHeader_webCard$key | null;
 }) => {
   const intl = useIntl();
   return (
     <AccountHeader
-      profile={profile}
+      webCard={webCard}
       title={intl.formatMessage({
         defaultMessage: 'Contact Card',
         description:
@@ -411,7 +314,7 @@ const ContactCardScreenHeader = ({
 const ContactCardScreenFallback = () => (
   <Container style={{ flex: 1 }}>
     <SafeAreaView style={{ flex: 1 }}>
-      <ContactCardScreenHeader profile={null} />
+      <ContactCardScreenHeader webCard={null} />
       <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
         <ActivityIndicator />
       </View>
@@ -421,6 +324,9 @@ const ContactCardScreenFallback = () => (
 
 export default relayScreen(ContactCardScreen, {
   query: contactCardMobileScreenQuery,
+  getVariables: (_, profileInfos) => ({
+    profileId: profileInfos?.profileId ?? '',
+  }),
   fallback: ContactCardScreenFallback,
 });
 

@@ -1,13 +1,17 @@
+import { useIntl } from 'react-intl';
 import { View, StyleSheet } from 'react-native';
+import Toast from 'react-native-toast-message';
 import { graphql, useFragment, useMutation } from 'react-relay';
+import { isEditor } from '@azzapp/shared/profileHelpers';
 import { colors } from '#theme';
+import useAuthState from '#hooks/useAuthState';
 import Icon from '#ui/Icon';
 import PressableNative from '#ui/PressableNative';
 import SwipeableRow, { SwipeableRowRightAction } from '#ui/SwipeableRow';
 import CommentItem from './CommentItem';
+import type { CommentItemFragment_comment$key } from '#relayArtifacts/CommentItemFragment_comment.graphql';
+import type { DeletableCommentItemDeleteCommentMutation } from '#relayArtifacts/DeletableCommentItemDeleteCommentMutation.graphql';
 import type { SwipeableRowActionsProps } from '#ui/SwipeableRow';
-import type { CommentItemFragment_comment$key } from '@azzapp/relay/artifacts/CommentItemFragment_comment.graphql';
-import type { DeletableCommentItemDeleteCommentMutation } from '@azzapp/relay/artifacts/DeletableCommentItemDeleteCommentMutation.graphql';
 type DeletableCommentItemProps = {
   item: CommentItemFragment_comment$key;
   postId: string;
@@ -39,31 +43,45 @@ const DeletableCommentItem = (props: DeletableCommentItemProps) => {
 
   if (!comment) return null;
 
-  const DeletableCommenItemActions = ({
+  const DeletableCommentItemActions = ({
     progress,
     onClose,
   }: SwipeableRowActionsProps) => {
-    const onDelete = () => {
-      commit({
-        variables: {
-          input: {
-            commentId: comment.id,
-          },
-        },
-        onCompleted() {
-          onClose();
-        },
-        updater: store => {
-          const post = store.get<{ counterComments: number }>(postId);
-          if (post) {
-            const counterComments = post?.getValue('counterComments');
+    const { profileInfos } = useAuthState();
 
-            if (typeof counterComments === 'number') {
-              post?.setValue(counterComments - 1, 'counterComments');
+    const intl = useIntl();
+
+    const onDelete = () => {
+      if (isEditor(profileInfos?.profileRole)) {
+        commit({
+          variables: {
+            input: {
+              commentId: comment.id,
+            },
+          },
+          onCompleted() {
+            onClose();
+          },
+          updater: store => {
+            const post = store.get<{ counterComments: number }>(postId);
+            if (post) {
+              const counterComments = post?.getValue('counterComments');
+
+              if (typeof counterComments === 'number') {
+                post?.setValue(counterComments - 1, 'counterComments');
+              }
             }
-          }
-        },
-      });
+          },
+        });
+      } else {
+        Toast.show({
+          type: 'error',
+          text1: intl.formatMessage({
+            defaultMessage: 'Only admins & editors can delete a comment',
+            description: 'Error message when trying to delete a comment',
+          }),
+        });
+      }
     };
 
     return (
@@ -86,7 +104,7 @@ const DeletableCommentItem = (props: DeletableCommentItemProps) => {
   };
 
   return (
-    <SwipeableRow RightActions={DeletableCommenItemActions}>
+    <SwipeableRow RightActions={DeletableCommentItemActions}>
       <CommentItem item={item} />
     </SwipeableRow>
   );

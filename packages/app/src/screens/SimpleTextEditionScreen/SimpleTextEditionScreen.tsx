@@ -1,10 +1,9 @@
 import { omit } from 'lodash';
-import { Suspense, useCallback, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { graphql, useFragment, useMutation } from 'react-relay';
-import { type SimpleTextEditionScreenUpdateModuleMutation } from '@azzapp/relay/artifacts/SimpleTextEditionScreenUpdateModuleMutation.graphql';
 import {
   SIMPLE_TEXT_DEFAULT_VALUES,
   SIMPLE_TITLE_DEFAULT_VALUES,
@@ -14,12 +13,12 @@ import {
   SIMPLE_TITLE_STYLE_VALUES,
 } from '@azzapp/shared/cardModuleHelpers';
 import { useRouter } from '#components/NativeRouter';
-import WebCardModulePreview from '#components/WebCardModulePreview';
 import useEditorLayout from '#hooks/useEditorLayout';
 import useModuleDataEditor from '#hooks/useModuleDataEditor';
+import { type SimpleTextEditionScreenUpdateModuleMutation } from '#relayArtifacts/SimpleTextEditionScreenUpdateModuleMutation.graphql';
 import { BOTTOM_MENU_HEIGHT } from '#ui/BottomMenu';
 import Container from '#ui/Container';
-import Header, { HEADER_HEIGHT } from '#ui/Header';
+import Header from '#ui/Header';
 import HeaderButton from '#ui/HeaderButton';
 import TabView from '#ui/TabView';
 import TextAreaModal from '#ui/TextAreaModal';
@@ -28,15 +27,15 @@ import SimpleTextEditionBottomMenu from './SimpleTextEditionBottomMenu';
 import SimpleTextMarginEditionPanel from './SimpleTextMarginsEditionPanel';
 import SimpleTextPreview from './SimpleTextPreview';
 import SimpleTextStyleEditionPanel from './SimpleTextStyleEditionPanel';
-import type { SimpleTextEditionScreen_module$key } from '@azzapp/relay/artifacts/SimpleTextEditionScreen_module.graphql';
-import type { SimpleTextEditionScreen_viewer$key } from '@azzapp/relay/artifacts/SimpleTextEditionScreen_viewer.graphql';
+import type { SimpleTextEditionScreen_module$key } from '#relayArtifacts/SimpleTextEditionScreen_module.graphql';
+import type { SimpleTextEditionScreen_profile$key } from '#relayArtifacts/SimpleTextEditionScreen_profile.graphql';
 import type { ViewProps } from 'react-native';
 
 export type SimpleTextEditionScreenProps = ViewProps & {
   /**
    * the current viewer
    */
-  viewer: SimpleTextEditionScreen_viewer$key;
+  profile: SimpleTextEditionScreen_profile$key;
   /**
    * the current module to edit, if null, a new module will be created
    */
@@ -52,7 +51,7 @@ export type SimpleTextEditionScreenProps = ViewProps & {
  */
 const SimpleTextEditionScreen = ({
   module,
-  viewer: viewerKey,
+  profile: profileKey,
   moduleKind,
 }: SimpleTextEditionScreenProps) => {
   // #region Data retrieval
@@ -111,13 +110,11 @@ const SimpleTextEditionScreen = ({
     // TODO error ?
   }
 
-  const viewer = useFragment(
+  const profile = useFragment(
     graphql`
-      fragment SimpleTextEditionScreen_viewer on Viewer {
-        ...SimpleTextEditionBackgroundPanel_viewer
-        ...SimpleTextStyleEditionPanel_viewer
-        profile {
-          ...ProfileColorPicker_profile
+      fragment SimpleTextEditionScreen_profile on Profile {
+        webCard {
+          id
           cardStyle {
             borderColor
             borderRadius
@@ -135,15 +132,18 @@ const SimpleTextEditionScreen = ({
             light
             dark
           }
+          ...WebCardColorPicker_webCard
+          ...SimpleTextStyleEditionPanel_webCard
         }
         moduleBackgrounds {
           id
           uri
           resizeMode
         }
+        ...SimpleTextEditionBackgroundPanel_profile
       }
     `,
-    viewerKey,
+    profileKey,
   );
   // #endregion
 
@@ -167,7 +167,7 @@ const SimpleTextEditionScreen = ({
 
   const { data, value, fieldUpdateHandler, dirty } = useModuleDataEditor({
     initialValue,
-    cardStyle: viewer.profile?.cardStyle,
+    cardStyle: profile?.webCard.cardStyle,
     styleValuesMap:
       moduleKind === 'simpleText'
         ? SIMPLE_TEXT_STYLE_VALUES
@@ -195,7 +195,7 @@ const SimpleTextEditionScreen = ({
     ...omit(data, 'backgroundId'),
     kind: moduleKind,
     background:
-      viewer.moduleBackgrounds.find(
+      profile.moduleBackgrounds.find(
         background => background.id === backgroundId,
       ) ?? null,
   };
@@ -208,7 +208,7 @@ const SimpleTextEditionScreen = ({
         $input: SaveSimpleTextModuleInput!
       ) {
         saveSimpleTextModule(input: $input) {
-          profile {
+          webCard {
             id
             cardModules {
               visible
@@ -227,7 +227,7 @@ const SimpleTextEditionScreen = ({
   const router = useRouter();
   const intl = useIntl();
   const onSave = useCallback(() => {
-    if (!canSave) {
+    if (!canSave || !profile.webCard) {
       return;
     }
 
@@ -238,6 +238,7 @@ const SimpleTextEditionScreen = ({
           moduleId: moduleData?.id ?? null,
           kind: moduleKind,
           text: value.text!,
+          webCardId: profile.webCard.id,
         },
       },
       onCompleted() {
@@ -254,7 +255,16 @@ const SimpleTextEditionScreen = ({
         });
       },
     });
-  }, [canSave, commit, value, moduleData?.id, moduleKind, router, intl]);
+  }, [
+    canSave,
+    profile.webCard,
+    commit,
+    value,
+    moduleData?.id,
+    moduleKind,
+    router,
+    intl,
+  ]);
 
   const onCancel = useCallback(() => {
     router.back();
@@ -356,8 +366,8 @@ const SimpleTextEditionScreen = ({
         style={{ height: topPanelHeight - 20, marginVertical: 10 }}
         data={previewData}
         onPreviewPress={onPreviewPress}
-        colorPalette={viewer.profile?.cardColors}
-        cardStyle={viewer.profile?.cardStyle}
+        colorPalette={profile?.webCard.cardColors}
+        cardStyle={profile?.webCard.cardStyle}
       />
       <TabView
         style={{ height: bottomPanelHeight }}
@@ -368,7 +378,7 @@ const SimpleTextEditionScreen = ({
             element: (
               <SimpleTextStyleEditionPanel
                 moduleKind={moduleKind}
-                viewer={viewer}
+                webCard={profile?.webCard ?? null}
                 fontColor={fontColor ?? '#000'}
                 fontFamily={fontFamily ?? 'Arial'}
                 fontSize={fontSize ?? 12}
@@ -407,7 +417,7 @@ const SimpleTextEditionScreen = ({
             id: 'background',
             element: (
               <SimpleTextEditionBackgroundPanel
-                viewer={viewer}
+                profile={profile}
                 backgroundId={backgroundId}
                 backgroundStyle={backgroundStyle}
                 onBackgroundChange={onBackgroundChange}
@@ -422,29 +432,6 @@ const SimpleTextEditionScreen = ({
           },
         ]}
       />
-      <View
-        style={{
-          position: 'absolute',
-          top: HEADER_HEIGHT + insetTop,
-          height: topPanelHeight + bottomPanelHeight,
-          width: windowWidth,
-          opacity: currentTab === 'preview' ? 1 : 0,
-        }}
-        pointerEvents={currentTab === 'preview' ? 'auto' : 'none'}
-      >
-        <Suspense>
-          <WebCardModulePreview
-            editedModuleId={moduleData?.id}
-            visible={currentTab === 'preview'}
-            editedModuleInfo={{
-              kind: moduleKind,
-              data: previewData,
-            }}
-            height={topPanelHeight + bottomPanelHeight}
-            contentPaddingBottom={insetBottom + BOTTOM_MENU_HEIGHT}
-          />
-        </Suspense>
-      </View>
       <TextAreaModal
         visible={showContentModal}
         value={text ?? ''}

@@ -50,7 +50,9 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-yarn-
       
-
+      - name: Install Vercel CLI
+        run: yarn global add vercel@latest
+        
       - name: Install dependencies
         run: yarn install --frozen-lockfile  --immutable
 
@@ -119,7 +121,9 @@ jobs:
 
       - name: Copy the the previous query-map.json file
         if: github.ref == 'refs/heads/staging' || github.ref == 'refs/heads/main' || github.ref == 'refs/heads/stable'
-        run: cp -R azzapp-precompiled-queries/${{ github.ref_name }}/query-map.json packages/relay  
+        run: |
+          touch azzapp-precompiled-queries/${{ github.ref_name }}/persisted-query-map.json 
+          cp -R azzapp-precompiled-queries/${{ github.ref_name }}/persisted-query-map.json packages/web/src 
 
       # use manual command instead of build command for passing --repersist option to relay
       - name: Force rebuild the query-map.json
@@ -132,7 +136,7 @@ jobs:
         id: query-map-updated
         if: github.ref == 'refs/heads/staging' || github.ref == 'refs/heads/main' || github.ref == 'refs/heads/stable'
         run: |
-          if cmp -s "azzapp-precompiled-queries/${{ github.ref_name }}/query-map.json" "packages/relay/query-map.json"
+          if cmp -s "azzapp-precompiled-queries/${{ github.ref_name }}/persisted-query-map.json" "packages/web/src/persisted-query-map.json"
           then
               echo "QUERY_MAP_UPDATED=false" >> $GITHUB_OUTPUT
           else
@@ -141,7 +145,7 @@ jobs:
 
       - name: Copy the file back to azzapp-precompiled-queries repository
         if: ${{ steps.query-map-updated.outputs.QUERY_MAP_UPDATED == 'true'}}
-        run: cp -r packages/relay/query-map.json azzapp-precompiled-queries/${{ github.ref_name }}
+        run: cp -r packages/web/src/persisted-query-map.json azzapp-precompiled-queries/${{ github.ref_name }}
         env:
           CI: true
 
@@ -268,9 +272,6 @@ jobs:
       # Deploy the web app to Vercel 
       #
       ############################################
-      - name: Install Vercel CLI
-        run: npm i -g vercel@latest
-
       - name: Azzapp Web - Pull Vercel configuration 
         env:
           VERCEL_PROJECT_ID: "azzapp"

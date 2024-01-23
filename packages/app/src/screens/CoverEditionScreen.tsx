@@ -19,9 +19,9 @@ import Container from '#ui/Container';
 import Header, { HEADER_HEIGHT } from '#ui/Header';
 import type { CoverEditorHandle } from '#components/CoverEditor/CoverEditor';
 import type { RelayScreenProps } from '#helpers/relayScreen';
+import type { CoverEditionScreenPrefetchQuery } from '#relayArtifacts/CoverEditionScreenPrefetchQuery.graphql';
+import type { CoverEditionScreenQuery } from '#relayArtifacts/CoverEditionScreenQuery.graphql';
 import type { CoverEditionRoute } from '#routes';
-import type { CoverEditionScreenPrefetchQuery } from '@azzapp/relay/artifacts/CoverEditionScreenPrefetchQuery.graphql';
-import type { CoverEditionScreenQuery } from '@azzapp/relay/artifacts/CoverEditionScreenQuery.graphql';
 import type { Ref } from 'react';
 import type { PreloadedQuery } from 'react-relay';
 
@@ -107,15 +107,19 @@ const CoverEditionScreenCoverEditor = ({
   onCoverSaved,
   onCanSaveChange,
 }: CoverEditionScreenCoverEditorProps) => {
-  const { viewer } = usePreloadedQuery<CoverEditionScreenQuery>(
+  const { node } = usePreloadedQuery<CoverEditionScreenQuery>(
     query,
     preloadedQuery,
   );
 
+  if (!node?.profile) {
+    return null;
+  }
+
   return (
     <CoverEditor
       ref={coverEditorRef}
-      viewer={viewer}
+      profile={node.profile}
       height={editorHeight}
       onCoverSaved={onCoverSaved}
       onCanSaveChange={onCanSaveChange}
@@ -124,35 +128,47 @@ const CoverEditionScreenCoverEditor = ({
 };
 
 const query = graphql`
-  query CoverEditionScreenQuery {
-    viewer {
-      ...CoverEditor_viewer
+  query CoverEditionScreenQuery($profileId: ID!) {
+    node(id: $profileId) {
+      ...CoverEditor_profile @alias(as: "profile")
     }
   }
 `;
 
 export default relayScreen(CoverEditionScreen, {
   query,
-  prefetch: (_, environment) => {
+  getVariables: (_, profileInfos) => ({
+    profileId: profileInfos?.profileId ?? '',
+  }),
+  prefetch: (_, environment, profileInfos) => {
+    const profileId = profileInfos?.profileId;
+    if (!profileId) {
+      return null;
+    }
     return fetchQueryAndRetain<CoverEditionScreenPrefetchQuery>(
       environment,
       graphql`
-        query CoverEditionScreenPrefetchQuery {
-          viewer {
-            ...CoverEditor_viewer @relay(mask: false)
+        query CoverEditionScreenPrefetchQuery($profileId: ID!) {
+          profile: node(id: $profileId) {
+            ...CoverEditor_profile @relay(mask: false)
           }
         }
       `,
-      {},
-    ).mergeMap(({ viewer }) => {
-      if (!viewer.profile?.cardCover) {
+      { profileId },
+    ).mergeMap(({ profile }) => {
+      if (!profile?.webCard?.cardCover) {
         return [];
       }
       const { background, foreground, sourceMedia, maskMedia } =
-        viewer.profile.cardCover;
+        profile.webCard.cardCover;
       const medias = convertToNonNullArray([
         background && { kind: 'image', uri: background.uri },
-        foreground && { kind: 'image', uri: foreground.uri },
+        foreground && foreground.kind !== 'lottie'
+          ? {
+              kind: 'image',
+              uri: foreground.uri,
+            }
+          : null,
         sourceMedia && {
           kind: sourceMedia.__typename === 'MediaVideo' ? 'video' : 'image',
           uri: sourceMedia.uri,

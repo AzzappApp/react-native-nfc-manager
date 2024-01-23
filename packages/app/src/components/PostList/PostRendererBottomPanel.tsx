@@ -2,10 +2,12 @@
 import * as Sentry from '@sentry/react-native';
 import * as Clipboard from 'expo-clipboard';
 import { fromGlobalId } from 'graphql-relay';
+import { useCallback } from 'react';
 import { FormattedMessage, FormattedRelativeTime, useIntl } from 'react-intl';
 import { View, StyleSheet, Share } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { graphql, useFragment, useMutation } from 'react-relay';
+import { isEditor } from '@azzapp/shared/profileHelpers';
 import { buildPostUrl } from '@azzapp/shared/urlHelpers';
 import { colors } from '#theme';
 import { useRouter } from '#components/NativeRouter';
@@ -20,12 +22,10 @@ import Text from '#ui/Text';
 import PostRendererActionBar, {
   PostRendererActionBarSkeleton,
 } from './PostRendererActionBar';
-import type { PostRendererActionBar_post$key } from '@azzapp/relay/artifacts/PostRendererActionBar_post.graphql';
-import type { PostRendererBottomPanelFragment_post$key } from '@azzapp/relay/artifacts/PostRendererBottomPanelFragment_post.graphql';
-import type {
-  PostRendererBottomPanelUpdatePostMutation,
-  UpdatePostInput,
-} from '@azzapp/relay/artifacts/PostRendererBottomPanelUpdatePostMutation.graphql';
+import type { PostRendererActionBar_post$key } from '#relayArtifacts/PostRendererActionBar_post.graphql';
+import type { PostRendererBottomPanelFragment_post$key } from '#relayArtifacts/PostRendererBottomPanelFragment_post.graphql';
+import type { PostRendererBottomPanelUpdateAllowLikesPostMutation } from '#relayArtifacts/PostRendererBottomPanelUpdateAllowLikesPostMutation.graphql';
+import type { PostRendererBottomPanelUpdatePostAllowCommentsMutation } from '#relayArtifacts/PostRendererBottomPanelUpdatePostAllowCommentsMutation.graphql';
 
 type PostRendererBottomPanelProps = {
   /**
@@ -36,7 +36,7 @@ type PostRendererBottomPanelProps = {
   showModal: boolean;
   /**
    *
-   * Togg the display modal action visibility
+   * Toggle the display modal action visibility
    * @type {() => void}
    */
   toggleModal: () => void;
@@ -57,7 +57,8 @@ const PostRendererBottomPanel = ({
   const router = useRouter();
   const post = useFragment(
     graphql`
-      fragment PostRendererBottomPanelFragment_post on Post {
+      fragment PostRendererBottomPanelFragment_post on Post
+      @argumentDefinitions(viewerWebCardId: { type: "ID" }) {
         id
         content
         counterComments
@@ -66,14 +67,14 @@ const PostRendererBottomPanel = ({
         previewComment {
           id
           comment
-          author {
+          webCard {
             userName
           }
         }
-        author {
+        webCard {
           id
           userName
-          isFollowing
+          isFollowing(webCardId: $viewerWebCardId)
         }
         createdAt
       }
@@ -85,7 +86,7 @@ const PostRendererBottomPanel = ({
     toggleModal();
 
     Clipboard.setStringAsync(
-      buildPostUrl(post.author.userName, fromGlobalId(post.id).id),
+      buildPostUrl(post.webCard.userName, fromGlobalId(post.id).id),
     ).then(() => {
       /* 
         Modals and Toasts are known to interfere with each other
@@ -113,7 +114,7 @@ const PostRendererBottomPanel = ({
     // a quick share method using the native share component. If we want to make a custom share (like tiktok for example, when they are recompressiong the media etc) we can use react-native-shares
     try {
       await Share.share({
-        url: buildPostUrl(post.author.userName, fromGlobalId(post.id).id),
+        url: buildPostUrl(post.webCard.userName, fromGlobalId(post.id).id),
       });
       //TODO: handle result of the share when specified
     } catch (error: any) {
@@ -138,15 +139,28 @@ const PostRendererBottomPanel = ({
     toggleModal();
   };
 
-  const [commitUpdatePost] =
-    useMutation<PostRendererBottomPanelUpdatePostMutation>(graphql`
-      mutation PostRendererBottomPanelUpdatePostMutation(
+  const [commitUpdatePostComments] =
+    useMutation<PostRendererBottomPanelUpdatePostAllowCommentsMutation>(graphql`
+      mutation PostRendererBottomPanelUpdatePostAllowCommentsMutation(
         $input: UpdatePostInput!
       ) {
         updatePost(input: $input) {
           post {
             id
             allowComments
+          }
+        }
+      }
+    `);
+
+  const [commitUpdatePostLikes] =
+    useMutation<PostRendererBottomPanelUpdateAllowLikesPostMutation>(graphql`
+      mutation PostRendererBottomPanelUpdateAllowLikesPostMutation(
+        $input: UpdatePostInput!
+      ) {
+        updatePost(input: $input) {
+          post {
+            id
             allowLikes
           }
         }
@@ -154,52 +168,85 @@ const PostRendererBottomPanel = ({
     `);
 
   const intl = useIntl();
-  const updatePost = (input: UpdatePostInput) => {
-    commitUpdatePost({
-      variables: {
-        input,
-      },
-      optimisticResponse: {
-        updatePost: {
-          post: {
-            id: input.postId,
-            allowComments: input.allowComments ?? post.allowComments,
-            allowLikes: input.allowLikes ?? post.allowLikes,
+
+  const updatePost = useCallback(
+    (input: { allowComments: boolean } | { allowLikes: boolean }) => {
+      const update =
+        'allowComments' in input
+          ? commitUpdatePostComments
+          : commitUpdatePostLikes;
+
+      update({
+        variables: {
+          input: {
+            postId: post.id,
+            ...input,
           },
         },
-      },
-      onError: error => {
-        console.error(error);
-        Toast.show({
-          type: 'error',
-          text1: intl.formatMessage({
-            defaultMessage: 'Error while updating this post, please try again.',
-            description: 'Error toast message when updating post fails.',
-          }),
-        });
-      },
-    });
-  };
-  const setAllowComments = () => {
-    updatePost({ postId: post.id, allowComments: !post.allowComments });
-  };
+        optimisticResponse: {
+          updatePost: {
+            post: {
+              id: post.id,
+              ...input,
+            },
+          },
+        },
+        onError: error => {
+          console.error(error);
+          Toast.show({
+            type: 'error',
+            text1: intl.formatMessage({
+              defaultMessage:
+                'Error while updating this post, please try again.',
+              description: 'Error toast message when updating post fails.',
+            }),
+          });
+        },
+      });
+    },
+    [commitUpdatePostComments, commitUpdatePostLikes, intl, post.id],
+  );
 
-  const setAllowLikes = () => {
-    updatePost({ postId: post.id, allowLikes: !post.allowLikes });
-  };
+  const setAllowComments = useCallback(() => {
+    updatePost({ allowComments: !post.allowComments });
+  }, [post.allowComments, updatePost]);
 
-  const { profileId } = useAuthState();
+  const setAllowLikes = useCallback(() => {
+    updatePost({ allowLikes: !post.allowLikes });
+  }, [post.allowLikes, updatePost]);
 
-  const isViewer = profileId === post.author.id;
+  const { profileInfos } = useAuthState();
+
+  const isViewer = profileInfos?.webCardId === post.webCard.id;
 
   const toggleFollow = useToggleFollow();
 
   const onToggleFollow = () => {
-    toggleFollow(
-      post.author.id,
-      post.author.userName,
-      !post.author.isFollowing,
-    );
+    if (isEditor(profileInfos?.profileRole)) {
+      toggleFollow(
+        post.webCard.id,
+        post.webCard.userName,
+        !post.webCard.isFollowing,
+      );
+    } else if (post.webCard.isFollowing) {
+      Toast.show({
+        type: 'error',
+        text1: intl.formatMessage({
+          defaultMessage: 'Only admins & editors can stop following a WebCard',
+          description:
+            'Error message when trying to unfollow a WebCard without being an admin',
+        }),
+      });
+    } else {
+      Toast.show({
+        type: 'error',
+        text1: intl.formatMessage({
+          defaultMessage: 'Only admins & editors can follow a WebCard',
+          description:
+            'Error message when trying to follow a WebCard without being an admin',
+        }),
+      });
+    }
   };
 
   return (
@@ -216,9 +263,9 @@ const PostRendererBottomPanel = ({
         )}
         <PressableOpacity onPress={goToComments}>
           {post.previewComment && (
-            <Text variant="small">
+            <Text variant="small" numberOfLines={2} ellipsizeMode="tail">
               <Text variant="smallbold">
-                {post.previewComment.author.userName}{' '}
+                {post.previewComment.webCard.userName}{' '}
               </Text>
               {post.previewComment.comment}
             </Text>
@@ -318,7 +365,7 @@ const PostRendererBottomPanel = ({
           )}
           {!isViewer && (
             <PressableOpacity onPress={onToggleFollow} style={styles.modalLine}>
-              {post.author?.isFollowing ? (
+              {post.webCard?.isFollowing ? (
                 <Text variant="medium" style={{ color: colors.grey400 }}>
                   <FormattedMessage
                     defaultMessage="Unfollow"

@@ -5,6 +5,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { GestureDetector, Gesture } from 'react-native-gesture-handler';
 import { colors, mixins } from '#theme';
+import { cropDataForAspectRatio } from '#components/gpu';
 import type { CropData, ImageOrientation } from '#components/gpu';
 import type {
   LayoutChangeEvent,
@@ -186,7 +187,7 @@ const Cropper = ({
 
   const cropData = useMemo(
     () =>
-      getValidCropdata(
+      getValidCropData(
         cropDataProps,
         aspectRatio,
         mediaSizeInfos.width,
@@ -226,7 +227,7 @@ const Cropper = ({
   }, [cropDataCurrentValue]);
 
   const onGestureEnd = useCallback(() => {
-    const cropDataCurrentValid = getValidCropdata(
+    const cropDataCurrentValid = getValidCropData(
       cropDataCurrentValue,
       aspectRatio,
       mediaSizeInfos.width,
@@ -438,7 +439,7 @@ type Quadrilateral = {
   bottomLeft: Point;
 };
 
-const getValidCropdata = (
+const getValidCropData = (
   cropData: CropData | null | undefined,
   aspectRatio: number,
   mediaWidth: number,
@@ -449,24 +450,10 @@ const getValidCropdata = (
     !cropData ||
     cropData.width > mediaWidth ||
     cropData.height > mediaHeight ||
-    // might have slight error due to javascrpt floating number
+    // might have slight error due to javascript floating number
     Math.abs(cropData.width / cropData.height - aspectRatio) > 0.00001
   ) {
-    if (mediaWidth / mediaHeight > aspectRatio) {
-      cropData = {
-        originX: (mediaWidth - mediaHeight * aspectRatio) / 2,
-        originY: 0,
-        height: mediaHeight,
-        width: mediaHeight * aspectRatio,
-      };
-    } else {
-      cropData = {
-        originX: 0,
-        originY: (mediaHeight - mediaWidth / aspectRatio) / 2,
-        height: mediaWidth / aspectRatio,
-        width: mediaWidth,
-      };
-    }
+    cropData = cropDataForAspectRatio(mediaWidth, mediaHeight, aspectRatio);
   }
 
   const cropRect = createRect(

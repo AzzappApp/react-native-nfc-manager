@@ -1,30 +1,46 @@
 import { GraphQLError } from 'graphql';
-import { fromGlobalId } from 'graphql-relay';
 import ERRORS from '@azzapp/shared/errors';
-import { getPostByIdWithMedia, insertPostComment } from '#domains';
+import { isEditor } from '@azzapp/shared/profileHelpers';
+import {
+  getPostByIdWithMedia,
+  getUserProfileWithWebCardId,
+  insertPostComment,
+} from '#domains';
+import fromGlobalIdWithType from '#helpers/relayIdHelpers';
 import type { MutationResolvers } from '#schema/__generated__/types';
 
 const createPostComment: MutationResolvers['createPostComment'] = async (
   _,
-  { input: { postId, comment } },
-  { auth },
+  { input: { webCardId: gqlWebCardId, postId: gqlPostId, comment } },
+  { auth, loaders },
 ) => {
-  const { profileId } = auth;
-  if (!profileId) {
-    throw new GraphQLError(ERRORS.UNAUTORIZED);
-  }
+  const { userId } = auth;
+  const webCardId = fromGlobalIdWithType(gqlWebCardId, 'WebCard');
+  const postId = fromGlobalIdWithType(gqlPostId, 'Post');
+  const profile =
+    userId && (await getUserProfileWithWebCardId(userId, webCardId));
 
-  const { id: targetId, type } = fromGlobalId(postId);
-  if (type !== 'Post') {
+  if (!profile || !isEditor(profile.profileRole)) {
     throw new GraphQLError(ERRORS.INVALID_REQUEST);
   }
-  try {
-    const post = await getPostByIdWithMedia(targetId);
-    if (!post?.allowComments) throw new GraphQLError(ERRORS.INVALID_REQUEST);
 
+  const post = await getPostByIdWithMedia(postId);
+  if (!post?.allowComments) throw new GraphQLError(ERRORS.INVALID_REQUEST);
+
+  const webCard = await loaders.WebCard.load(post.webCardId);
+
+  if (!webCard) {
+    throw new GraphQLError(ERRORS.INVALID_REQUEST);
+  }
+
+  if (!webCard.cardIsPublished) {
+    throw new GraphQLError(ERRORS.UNPUBLISHED_WEB_CARD);
+  }
+
+  try {
     const postComment = {
-      profileId,
-      postId: targetId,
+      webCardId: profile.webCardId,
+      postId,
       comment,
     };
     const postCommentId = await insertPostComment(postComment);

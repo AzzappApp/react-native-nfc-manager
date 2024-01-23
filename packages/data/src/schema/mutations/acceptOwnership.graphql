@@ -1,0 +1,11 @@
+extend type Mutation {
+  acceptOwnership(input: AcceptOwnershipInput!): AcceptOwnershipPayload
+}
+
+input AcceptOwnershipInput {
+  profileId: ID!
+}
+
+type AcceptOwnershipPayload {
+  profile: Profile
+}

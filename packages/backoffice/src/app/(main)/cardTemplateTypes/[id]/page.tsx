@@ -1,7 +1,7 @@
 import {
   db,
   getCardTemplateTypeById,
-  ProfileCategoryTable,
+  WebCardCategoryTable,
 } from '@azzapp/data/domains';
 import CardTemplateTypesForm from '../CardTemplateTypesForm';
 type CardTemplatePageProps = {
@@ -14,11 +14,11 @@ const CardTemplatePage = async (props: CardTemplatePageProps) => {
   const { params } = props;
 
   const template = await getCardTemplateTypeById(params.id);
-  const profileCategories = await db.select().from(ProfileCategoryTable);
+  const webCardCategories = await db.select().from(WebCardCategoryTable);
   return (
     <CardTemplateTypesForm
       cardTemplateType={template}
-      profileCategories={profileCategories}
+      webCardCategories={webCardCategories}
     />
   );
 };

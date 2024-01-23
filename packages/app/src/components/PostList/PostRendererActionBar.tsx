@@ -6,6 +6,8 @@ import { View, StyleSheet, Share } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { useMutation, graphql, useFragment } from 'react-relay';
 import { useDebouncedCallback } from 'use-debounce';
+import ERRORS from '@azzapp/shared/errors';
+import { isEditor } from '@azzapp/shared/profileHelpers';
 import { buildPostUrl } from '@azzapp/shared/urlHelpers';
 import { useRouter } from '#components/NativeRouter';
 import useAuthState from '#hooks/useAuthState';
@@ -15,9 +17,13 @@ import Text from '#ui/Text';
 import type {
   PostRendererActionBar_post$key,
   ReactionKind,
-} from '@azzapp/relay/artifacts/PostRendererActionBar_post.graphql';
-
+} from '#relayArtifacts/PostRendererActionBar_post.graphql';
+import type {
+  PostRendererActionBarReactionMutation,
+  PostRendererActionBarReactionMutation$data,
+} from '#relayArtifacts/PostRendererActionBarReactionMutation.graphql';
 import type { ViewProps } from 'react-native';
+
 export type PostRendererActionBarProps = ViewProps & {
   postKey: PostRendererActionBar_post$key;
 };
@@ -30,22 +36,23 @@ const PostRendererActionBar = ({
   const router = useRouter();
   const intl = useIntl();
   const {
-    viewerPostReaction,
+    postReaction: viewerPostReaction,
     id: postId,
     allowLikes,
     allowComments,
     counterReactions,
-    author,
+    webCard,
   } = useFragment(
     graphql`
-      fragment PostRendererActionBar_post on Post {
+      fragment PostRendererActionBar_post on Post
+      @argumentDefinitions(viewerWebCardId: { type: "ID!" }) {
         id
-        viewerPostReaction
+        postReaction(webCardId: $viewerWebCardId)
         allowComments
         allowLikes
         counterReactions
         content
-        author {
+        webCard {
           userName
         }
       }
@@ -53,14 +60,15 @@ const PostRendererActionBar = ({
     postKey,
   );
 
-  const [commit] = useMutation(graphql`
+  const [commit] = useMutation<PostRendererActionBarReactionMutation>(graphql`
     mutation PostRendererActionBarReactionMutation(
       $input: TogglePostReactionInput!
+      $viewerWebCardId: ID!
     ) {
       togglePostReaction(input: $input) {
         post {
           id
-          viewerPostReaction
+          postReaction(webCardId: $viewerWebCardId)
           counterReactions
         }
       }
@@ -78,78 +86,134 @@ const PostRendererActionBar = ({
   const [countReactions, setCountReactions] =
     useState<number>(counterReactions);
 
-  const { profileId } = useAuthState();
+  const { profileInfos } = useAuthState();
   const debouncedCommit = useDebouncedCallback(
-    (add: boolean) => {
-      commit({
-        variables: {
-          input: {
-            postId,
-            reactionKind: 'like',
-          },
-        },
-        optimisticResponse: {
-          togglePostReaction: {
-            post: {
-              id: postId,
-              viewerPostReaction: reaction,
-              counterReactions: countReactions,
+    () => {
+      if (!profileInfos) {
+        return;
+      }
+      if (viewerPostReaction !== reaction) {
+        const add = viewerPostReaction !== reaction;
+        commit({
+          variables: {
+            viewerWebCardId: profileInfos.webCardId,
+            input: {
+              webCardId: profileInfos.webCardId,
+              postId,
+              reactionKind: 'like',
             },
           },
-        },
-        updater: store => {
-          const post = store.get<{ counterReactions: number }>(postId);
-          if (post) {
-            const counter = post?.getValue('counterReactions');
+          optimisticResponse: {
+            togglePostReaction: {
+              post: {
+                id: postId,
+                postReaction: add ? reaction : null,
+                counterReactions: Math.max(
+                  0,
+                  add ? countReactions + 1 : countReactions - 1,
+                ),
+              },
+            },
+          },
+          updater: (
+            store,
+            response: PostRendererActionBarReactionMutation$data,
+          ) => {
+            const reaction = response.togglePostReaction;
+            const added = response.togglePostReaction.post.postReaction != null;
 
-            if (typeof counter === 'number') {
-              post?.setValue(counter + (add ? 1 : -1), 'counterReactions');
+            const post = store.get<{ counterReactions: number }>(
+              reaction.post.id,
+            );
+            if (post) {
+              const counter = post?.getValue('counterReactions');
+
+              if (typeof counter === 'number') {
+                post?.setValue(
+                  reaction.post.counterReactions,
+                  'counterReactions',
+                );
+              }
+              post.setValue(reaction.post.postReaction, 'postReaction', {
+                webCardId: profileInfos.webCardId,
+              });
             }
-            post.setValue(add ? reaction : null, 'viewerPostReaction');
-          }
-          if (profileId) {
-            const profile = store.get(profileId);
-            const counter = profile?.getValue('nbPostsLiked');
+            const webCard = store.get(profileInfos.webCardId);
+            const counter = webCard?.getValue('nbPostsLiked');
             if (typeof counter === 'number') {
-              profile?.setValue(counter + (add ? 1 : -1), 'nbPostsLiked');
+              webCard?.setValue(
+                Math.max(counter + (added ? 1 : -1), 0),
+                'nbPostsLiked',
+              );
             }
-          }
-        },
-        onError: error => {
-          console.log(error);
-          //add manual capture exception for testing issue
-          Sentry.captureException(error, { extra: { tag: 'PostReaction' } });
+          },
+          onError: error => {
+            console.log(error);
 
-          setCountReactions(prevReactions =>
-            add ? prevReactions + 1 : prevReactions - 1,
-          );
+            setCountReactions(prevReactions =>
+              add ? prevReactions - 1 : prevReactions + 1,
+            );
 
-          Toast.show({
-            type: 'error',
-            text1: intl.formatMessage({
-              defaultMessage: 'Error, we were unable to like this post',
-              description: 'Error toast message when liking a post failed.',
-            }),
-          });
-        },
-      });
+            if (error.message === ERRORS.UNPUBLISHED_WEB_CARD) {
+              Toast.show({
+                type: 'error',
+                text1: intl.formatMessage({
+                  defaultMessage: 'Error, the related webCard is unpublished',
+                  description:
+                    'Error when a user tries to like a post from an unpublished webCard',
+                }),
+              });
+            } else {
+              //add manual capture exception for testing issue
+              Sentry.captureException(error, {
+                extra: { tag: 'PostReaction' },
+              });
+
+              Toast.show({
+                type: 'error',
+                text1: intl.formatMessage({
+                  defaultMessage: 'Error, we were unable to like this post',
+                  description: 'Error toast message when liking a post failed.',
+                }),
+              });
+            }
+          },
+        });
+      }
     },
     // delay in ms
-    600,
+    700,
     { trailing: true, leading: false },
   );
+
   // toggle the value locally
   const toggleReaction = useCallback(() => {
-    if (reaction) {
-      setCountReactions(countReactions - 1);
-      setReaction(null);
-      debouncedCommit(false);
+    if (isEditor(profileInfos?.profileRole)) {
+      if (reaction) {
+        setCountReactions(countReactions - 1);
+        setReaction(null);
+      } else {
+        setCountReactions(countReactions + 1);
+        setReaction('like');
+      }
+      debouncedCommit();
     } else {
-      setCountReactions(countReactions + 1);
-      setReaction('like');
-      debouncedCommit(true);
+      Toast.show({
+        type: 'error',
+        text1: intl.formatMessage({
+          defaultMessage: 'Only admins & editors can like a post',
+          description:
+            'Error message when trying to like a post without being an admin',
+        }),
+      });
     }
-  }, [countReactions, debouncedCommit, reaction]);
+  }, [
+    countReactions,
+    debouncedCommit,
+    intl,
+    profileInfos?.profileRole,
+    reaction,
+  ]);
 
   const goToComments = () => {
     router.push({
@@ -162,7 +226,7 @@ const PostRendererActionBar = ({
     // a quick share method using the native share component. If we want to make a custom share (like tiktok for example, when they are recompressiong the media etc) we can use react-native-shares
     try {
       await Share.share({
-        url: buildPostUrl(author.userName, fromGlobalId(postId).id),
+        url: buildPostUrl(webCard.userName, fromGlobalId(postId).id),
       });
       //TODO: handle result of the share when specified
     } catch (error: any) {
@@ -225,7 +289,11 @@ const PostRendererActionBar = ({
         {allowLikes && (
           <Text variant="smallbold">
             <FormattedMessage
-              defaultMessage="{countReactions} likes"
+              defaultMessage="{countReactions, plural,
+                                    =0 {0 like}
+                                    one {1 like}
+                                    other {# likes}
+                                }"
               description="PastRendererActionBar - Like Counter"
               values={{ countReactions }}
             />
@@ -256,7 +324,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     height: 36,
-    witdh: '100%',
+    width: '100%',
   },
   icon: {
     marginRight: 20,

@@ -2,9 +2,9 @@ import { useCallback } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { StyleSheet, View } from 'react-native';
 import { useFragment, graphql } from 'react-relay';
-import { ProfileBoundEditorLayerSelectorPanel } from '#components/EditorLayerSelectorPanel';
+import { WebCardBoundEditorLayerSelectorPanel } from '#components/EditorLayerSelectorPanel';
 import LabeledDashedSlider from '#ui/LabeledDashedSlider';
-import type { BlockTextTextBackgroundEditionPanel_viewer$key } from '@azzapp/relay/artifacts/BlockTextTextBackgroundEditionPanel_viewer.graphql';
+import type { BlockTextTextBackgroundEditionPanel_profile$key } from '#relayArtifacts/BlockTextTextBackgroundEditionPanel_profile.graphql';
 import type { ViewProps } from 'react-native';
 
 type BackgroundStyle = {
@@ -20,7 +20,7 @@ type BlockTextTextBackgroundEditionPanelProps = ViewProps & {
   /**
    * A relay fragment reference to the viewer
    */
-  viewer: BlockTextTextBackgroundEditionPanel_viewer$key;
+  profile: BlockTextTextBackgroundEditionPanel_profile$key;
   /**
    * The currently selected textBackground id
    */
@@ -48,7 +48,7 @@ type BlockTextTextBackgroundEditionPanelProps = ViewProps & {
  * A Panel to edit the TextTextBackground of the BlockText edition screen
  */
 const BlockTextTextBackgroundEditionPanel = ({
-  viewer,
+  profile: profileKey,
   textBackgroundId: textBackground,
   textBackgroundStyle,
   onTextBackgroundChange,
@@ -56,18 +56,18 @@ const BlockTextTextBackgroundEditionPanel = ({
   bottomSheetHeight,
   ...props
 }: BlockTextTextBackgroundEditionPanelProps) => {
-  const { moduleBackgrounds, profile } = useFragment(
+  const profile = useFragment(
     graphql`
-      fragment BlockTextTextBackgroundEditionPanel_viewer on Viewer {
+      fragment BlockTextTextBackgroundEditionPanel_profile on Profile {
         moduleBackgrounds {
           ...StaticMediaList_staticMedias
         }
-        profile {
-          ...ProfileColorPicker_profile
+        webCard {
+          ...WebCardColorPicker_webCard
         }
       }
     `,
-    viewer,
+    profileKey,
   );
 
   const textBackgroundColor = textBackgroundStyle?.backgroundColor ?? '#FFFFFF';
@@ -107,14 +107,14 @@ const BlockTextTextBackgroundEditionPanel = ({
 
   return (
     <View {...props}>
-      <ProfileBoundEditorLayerSelectorPanel
+      <WebCardBoundEditorLayerSelectorPanel
         title={intl.formatMessage({
           defaultMessage: 'TextBackground',
           description:
             'Label of TextBackground tab in Horizontal photo edition',
         })}
-        profile={profile!}
-        medias={moduleBackgrounds}
+        webCard={profile?.webCard ?? null}
+        medias={profile.moduleBackgrounds}
         selectedMedia={textBackground}
         tintColor={patternColor}
         backgroundColor={textBackgroundColor}
@@ -125,6 +125,7 @@ const BlockTextTextBackgroundEditionPanel = ({
         imageRatio={1}
         style={styles.mediaSelector}
       />
+
       <LabeledDashedSlider
         label={
           <FormattedMessage

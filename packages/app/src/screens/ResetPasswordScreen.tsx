@@ -40,7 +40,7 @@ const ResetPasswordScreen = ({
 }: NativeScreenProps<ResetPasswordRoute>) => {
   const {
     control,
-    formState: { isSubmitting, isDirty, isValid, errors },
+    formState: { isSubmitting, isDirty, isValid, errors, isSubmitSuccessful },
     handleSubmit,
   } = useForm<ResetPasswordForm>({
     resolver: zodResolver(ResetPasswordScreenSchema),
@@ -155,7 +155,6 @@ const ResetPasswordScreen = ({
                       defaultMessage: 'Confirm password',
                       description: 'Confirm password input placeholder',
                     })}
-                    onEndEditing={onSubmit}
                   />
                 );
               }}
@@ -174,7 +173,9 @@ const ResetPasswordScreen = ({
                   'Create new password Screen - AccessibilityLabel Create New Password button',
               })}
               style={styles.field}
-              disabled={!isDirty || !isValid || isSubmitting}
+              disabled={
+                !isDirty || !isValid || isSubmitting || isSubmitSuccessful
+              }
               loading={isSubmitting}
               onPress={onSubmit}
             />
@@ -184,7 +185,7 @@ const ResetPasswordScreen = ({
             {errors.password && (
               <Text variant="error" style={{ textAlign: 'center' }}>
                 <FormattedMessage
-                  defaultMessage="Password should contain at least 8 characters, a number, an uppercase letter and a lowercase letter"
+                  defaultMessage="Password should contain at least 8 characters and at most 32 characters, a number, an uppercase letter and a lowercase letter"
                   description="Reset password Screen - error message when password is not compliant with our rules"
                 />
               </Text>

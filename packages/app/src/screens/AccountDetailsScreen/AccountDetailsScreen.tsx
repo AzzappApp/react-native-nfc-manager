@@ -17,27 +17,11 @@ import AccountDetailsPasswordForm from './AccountDetailsPasswordForm';
 import AccountDetailsPhoneNumberForm from './AccountDetailsPhoneNumberForm';
 import AccountDetailsScreenFallback from './AccountDetailsScreenFallback';
 import type { RelayScreenProps } from '#helpers/relayScreen';
+import type { AccountDetailsScreenQuery } from '#relayArtifacts/AccountDetailsScreenQuery.graphql';
 import type { AccountDetailsRoute } from '#routes';
-import type { AccountDetailsScreenWithoutProfileQuery } from '@azzapp/relay/artifacts/AccountDetailsScreenWithoutProfileQuery.graphql';
-import type { AccountDetailsScreenWithProfileQuery } from '@azzapp/relay/artifacts/AccountDetailsScreenWithProfileQuery.graphql';
 
-const accountDetailsScreenWithProfileQuery = graphql`
-  query AccountDetailsScreenWithProfileQuery {
-    currentUser {
-      email
-      phoneNumber
-    }
-    viewer {
-      profile {
-        userName
-        ...AccountHeader_profile
-      }
-    }
-  }
-`;
-
-const accountDetailsScreenWithoutProfileQuery = graphql`
-  query AccountDetailsScreenWithoutProfileQuery {
+const accountDetailsScreenQuery = graphql`
+  query AccountDetailsScreenQuery {
     currentUser {
       email
       phoneNumber
@@ -47,21 +31,13 @@ const accountDetailsScreenWithoutProfileQuery = graphql`
 
 const AccountDetailsScreen = ({
   preloadedQuery,
-  route: { params },
-}: RelayScreenProps<
-  AccountDetailsRoute,
-  AccountDetailsScreenWithoutProfileQuery | AccountDetailsScreenWithProfileQuery
->) => {
+}: RelayScreenProps<AccountDetailsRoute, AccountDetailsScreenQuery>) => {
   const preloaded = usePreloadedQuery(
-    params.withProfile
-      ? accountDetailsScreenWithProfileQuery
-      : accountDetailsScreenWithoutProfileQuery,
+    accountDetailsScreenQuery,
     preloadedQuery,
   );
 
-  const viewer = 'viewer' in preloaded ? preloaded.viewer : null;
   const currentUser = preloaded.currentUser;
-  const profile = viewer?.profile;
 
   const [emailsFormVisible, toggleEmailsFormVisible] = useToggle(false);
   const [phoneNumberFormVisible, togglePhoneNumberFormVisible] =
@@ -69,6 +45,10 @@ const AccountDetailsScreen = ({
   const [passwordVisible, togglePasswordVisible] = useToggle(false);
 
   const styles = useStyleSheet(styleSheet);
+
+  if (!currentUser) {
+    return null;
+  }
 
   return (
     <Container style={{ flex: 1 }}>
@@ -78,53 +58,22 @@ const AccountDetailsScreen = ({
           rowGap: 15,
         }}
       >
-        <AccountDetailsHeader profile={profile ?? null} />
+        <AccountDetailsHeader />
         <Icon icon="information" style={styles.warningIcon} />
         <View style={{ rowGap: 20, paddingHorizontal: 10 }}>
           <Text variant="xsmall" style={styles.warningMessage}>
             <FormattedMessage
-              defaultMessage="Your account details are linked to all your webcards{azzappAp}."
+              defaultMessage="Your account details are linked to all your webcards{azzappA}."
               description="Warning label displayed at the top on the screen to indicate that updates go through all profiles"
               values={{
-                azzappAp: <Text variant="azzapp">a</Text>,
+                azzappA: <Text variant="azzapp">a</Text>,
               }}
             />
           </Text>
-          {profile?.userName ? (
-            <>
-              <View style={styles.section}>
-                <Text variant="xsmall" style={styles.sectionTitle}>
-                  <FormattedMessage
-                    defaultMessage="Webcard{azzappAp} details"
-                    description="Title of the section where user can view their webcard details"
-                    values={{
-                      azzappAp: (
-                        <Text style={styles.icon} variant="azzapp">
-                          a
-                        </Text>
-                      ),
-                    }}
-                  />
-                </Text>
-              </View>
-              <View style={styles.sectionField}>
-                <Text variant="smallbold">
-                  <FormattedMessage
-                    defaultMessage="Webcard{azzappAp} name"
-                    description="Webcard name field in the account details screen"
-                    values={{
-                      azzappAp: <Text variant="azzapp">a</Text>,
-                    }}
-                  />
-                </Text>
-                <Text variant="medium">{profile.userName}</Text>
-              </View>
-            </>
-          ) : null}
           <View style={styles.section}>
             <Text variant="xsmall" style={styles.sectionTitle}>
               <FormattedMessage
-                defaultMessage="Account details"
+                defaultMessage="Details"
                 description="Title of the section where user can view their account details"
               />
             </Text>
@@ -241,10 +190,7 @@ const styleSheet = createStyleSheet(appearance => ({
 }));
 
 export default relayScreen(AccountDetailsScreen, {
-  query: params =>
-    params.withProfile
-      ? accountDetailsScreenWithProfileQuery
-      : accountDetailsScreenWithoutProfileQuery,
-  profileBound: params => params.withProfile,
+  query: accountDetailsScreenQuery,
+  profileBound: false,
   fallback: AccountDetailsScreenFallback,
 });

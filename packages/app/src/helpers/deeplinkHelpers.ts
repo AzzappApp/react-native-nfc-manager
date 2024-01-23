@@ -1,3 +1,4 @@
+import { toGlobalId } from 'graphql-relay';
 import { decompressFromEncodedURIComponent } from 'lz-string';
 import { verifySign } from './MobileWebAPI';
 import type { Route } from '#routes';
@@ -13,14 +14,13 @@ const getSearchParamFromURL = (url: string, param: string) => {
   return value;
 };
 
-const profileUrl = new RegExp('([^?]+)');
+const profileUrl = /^\/?([^/?]+)(?:\/([^/?]+))?.*$/;
 const resetPasswordUrl = new RegExp('^reset-password');
 const prefixes = [process.env.APP_SCHEME, process.env.NEXT_PUBLIC_URL];
 export const matchUrlWithRoute = async (
   url: string,
 ): Promise<Route | undefined> => {
   const prefix = prefixes.find(prefix => prefix && url.startsWith(prefix));
-
   if (!prefix) {
     return;
   }
@@ -51,6 +51,24 @@ export const matchUrlWithRoute = async (
       return;
     }
 
+    if (matchProfile && matchProfile[2] != null) {
+      const postId = matchProfile[2];
+      if (postId) {
+        return {
+          route: 'POST',
+          params: {
+            postId: toGlobalId('Post', postId),
+          },
+        };
+      }
+      return {
+        route: 'WEBCARD',
+        params: {
+          userName: username,
+        },
+      };
+    }
+    //this is a webCard
     const compressedContactCard = getSearchParamFromURL(url, 'c');
     if (compressedContactCard) {
       let contactData: string;
@@ -61,7 +79,7 @@ export const matchUrlWithRoute = async (
         );
       } catch {
         return {
-          route: 'PROFILE',
+          route: 'WEBCARD',
           params: {
             userName: username,
           },
@@ -70,22 +88,23 @@ export const matchUrlWithRoute = async (
 
       if (signature && contactData) {
         try {
-          await verifySign({
+          const additionalContactData = await verifySign({
             signature,
             data: contactData,
             salt: username,
           });
 
           return {
-            route: 'PROFILE',
+            route: 'WEBCARD',
             params: {
               userName: username,
               contactData,
+              additionalContactData,
             },
           };
         } catch {
           return {
-            route: 'PROFILE',
+            route: 'WEBCARD',
             params: {
               userName: username,
             },
@@ -93,8 +112,9 @@ export const matchUrlWithRoute = async (
         }
       }
     } else {
+      //this is a webcard deeplink
       return {
-        route: 'PROFILE',
+        route: 'WEBCARD',
         params: {
           userName: username,
         },

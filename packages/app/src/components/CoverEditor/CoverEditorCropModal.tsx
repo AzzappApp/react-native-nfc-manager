@@ -149,12 +149,12 @@ const CoverEditorCropModal = ({
               duration={timeRange?.duration}
               backgroundColor={coverStyle?.backgroundColor}
               maskUri={maskMedia?.uri}
+              backgroundId={coverStyle?.background?.id}
               backgroundImageUri={coverStyle?.background?.uri}
               backgroundImageTintColor={coverStyle?.backgroundPatternColor}
               foregroundId={coverStyle?.foreground?.id}
               foregroundImageUri={coverStyle?.foreground?.uri}
               foregroundImageTintColor={coverStyle?.foregroundColor}
-              backgroundMultiply={coverStyle?.merged}
               editionParameters={{
                 ...coverStyle?.mediaParameters,
                 ...editionParameters,
@@ -170,7 +170,7 @@ const CoverEditorCropModal = ({
               textPosition={coverStyle?.textPosition}
               // other props
               colorPalette={colorPalette!}
-              height={coverHeight}
+              width={coverHeight * COVER_RATIO}
               style={{ flex: 1, shadowOpacity: 0 }}
             />
           )}

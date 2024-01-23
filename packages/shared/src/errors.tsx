@@ -28,6 +28,11 @@ const ERRORS = {
    */
   USERNAME_ALREADY_EXISTS: 'USERNAME_ALREADY_EXISTS',
   /**
+   * The username cannot be changed
+   * This may happen when a user tries to change is userName to often(minimum delay between change not fill).
+   */
+  USERNAME_CHANGE_NOT_ALLOWED_DELAY: 'USERNAME_CHANGE_NOT_ALLOWED_DELAY',
+  /**
    * The requested resource was not found.
    * This may happen when a user tries to access a resource that does not exist.
    */
@@ -46,14 +51,14 @@ const ERRORS = {
    * Unauthorized access.
    * This may happen when a user tries to access a protected resource without being authenticated.
    */
-  UNAUTORIZED: 'UNAUTORIZED',
+  UNAUTHORIZED: 'UNAUTHORIZED',
   /**
    * Forbidden access.
    * This may happen when a user tries to access a protected resource without the required permissions.
    */
   FORBIDDEN: 'FORBIDDEN',
   // TODO why do we have two different errors for the same thing?
-  UNAUTORIZED_INVALID_ACCESS_TOKEN: 'UNAUTORIZED_INVALID_ACCESS_TOKEN',
+  UNAUTHORIZED_INVALID_ACCESS_TOKEN: 'UNAUTHORIZED_INVALID_ACCESS_TOKEN',
   /**
    * Internal server error.
    * This may happen when the server encounters an unexpected error.
@@ -79,6 +84,20 @@ const ERRORS = {
    * This may happen when the user is using an old version of the app that is not supported anymore.
    */
   UPDATE_APP_VERSION: 'UPDATE_APP_VERSION',
+  /**
+   * The profile already exist.
+   * This may happen when a user is invited to a multi-user webcard, but is already a member.
+   */
+  PROFILE_ALREADY_EXISTS: 'PROFILE_ALREADY_EXISTS',
+  /**
+   * The profile does not exist.
+   * This may happen when an action is triggered for a given profile, which is not part of a webcard anymore.
+   */
+  PROFILE_DONT_EXISTS: 'PROFILE_DONT_EXISTS',
+  /**
+   * The webCard is not published.
+   */
+  UNPUBLISHED_WEB_CARD: 'UNPUBLISHED_WEB_CARD',
 } as const;
 
 export default ERRORS;

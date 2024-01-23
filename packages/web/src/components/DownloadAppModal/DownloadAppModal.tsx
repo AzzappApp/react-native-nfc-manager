@@ -1,76 +1,43 @@
-'use client';
-
-import { useEffect, useState, forwardRef } from 'react';
+import { forwardRef } from 'react';
 import { Button, Modal, type ModalProps } from '#ui';
-import { loadProfileStats } from '#app/actions/profileActions';
-import CloudinaryImage from '#ui/CloudinaryImage';
+import CoverRenderer from '#components/renderer/CoverRenderer';
 import styles from './DownloadAppModal.css';
 import type { ModalActions } from '#ui/Modal';
-import type { Media, Profile } from '@azzapp/data/domains';
+import type { Media, WebCard } from '@azzapp/data/domains';
 import type { ForwardedRef } from 'react';
 
 type DownloadAppModalProps = Omit<ModalProps, 'children'> & {
   media: Media;
-  profile: Profile;
-};
-
-type Stats = {
-  posts: number;
-  followers: number;
-  following: number;
+  webCard: WebCard;
 };
 
 // eslint-disable-next-line react/display-name
 const DownloadAppModal = forwardRef(
   (props: DownloadAppModalProps, ref: ForwardedRef<ModalActions>) => {
-    const { media, profile, ...others } = props;
-
-    const [stats, setStats] = useState<Stats | null>(null);
-
-    useEffect(() => {
-      async function loadStats() {
-        const { nbFollowers, nbPosts, nbFollowings } = await loadProfileStats(
-          profile.id,
-        );
-        setStats({
-          posts: nbPosts,
-          followers: nbFollowers,
-          following: nbFollowings,
-        });
-      }
-
-      void loadStats();
-    }, [profile.id]);
+    const { media, webCard, ...others } = props;
 
     return (
       <Modal ref={ref} {...others}>
         <div className={styles.coverWrapper}>
-          <CloudinaryImage
-            mediaId={media.id}
-            assetKind="cover"
-            videoThumbnail={media.kind === 'video'}
-            alt="cover"
-            fill
-            className={styles.cover}
-          />
+          <CoverRenderer webCard={webCard} media={media} width={125} />
         </div>
         <div className={styles.stats}>
           <div className={styles.stat}>
-            <span className={styles.statValue}>{stats?.posts}</span>
+            <span className={styles.statValue}>{webCard.nbPosts}</span>
             <span className={styles.statCategory}>Posts</span>
           </div>
           <div className={styles.stat}>
-            <span className={styles.statValue}>{stats?.followers}</span>
+            <span className={styles.statValue}>{webCard.nbFollowers}</span>
             <span className={styles.statCategory}>Followers</span>
           </div>
           <div className={styles.stat}>
-            <span className={styles.statValue}>{stats?.following}</span>
+            <span className={styles.statValue}>{webCard.nbFollowings}</span>
             <span className={styles.statCategory}>Following</span>
           </div>
         </div>
         <div className={styles.footer}>
           <span className={styles.footerTitle}>
-            Stay connected to {profile.userName}
+            Stay connected to {webCard.userName}
           </span>
           <span className={styles.footerText}>
             Access digital profile, albums, posts...

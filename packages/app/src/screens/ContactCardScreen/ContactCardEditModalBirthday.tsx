@@ -1,34 +1,25 @@
 import { useController } from 'react-hook-form';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { View, type LayoutRectangle } from 'react-native';
+import { View } from 'react-native';
 import { colors } from '#theme';
+import ContactCardEditDateField from '#components/ContactCard/ContactCardEditDateField';
+import { contactCardEditModalStyleSheet } from '#helpers/contactCardHelpers';
 import { useStyleSheet } from '#helpers/createStyles';
 import Icon from '#ui/Icon';
 import PressableNative from '#ui/PressableNative';
 import Text from '#ui/Text';
-import ContactCardEditModalField from './ContactCardEditModalField';
-import { contactCardEditModalStyleSheet } from './ContactCardEditModalStyles';
-import type { ContactCardEditForm } from './ContactCardEditModalSchema';
+import type { ContactCardEditFormValues } from './ContactCardEditModalSchema';
 import type { Control } from 'react-hook-form';
 
 const ContactCardEditModalBirthdays = ({
   control,
-  deleted,
-  openDeleteButton,
-  deleteButtonRect,
-  closeDeleteButton,
 }: {
-  control: Control<ContactCardEditForm>;
-  deleted: boolean;
-  openDeleteButton: (changeEvent: LayoutRectangle) => void;
-  deleteButtonRect: LayoutRectangle | null;
-  closeDeleteButton: () => void;
+  control: Control<ContactCardEditFormValues>;
 }) => {
   const { field } = useController({
     control,
     name: 'birthday',
   });
-
   const intl = useIntl();
 
   const styles = useStyleSheet(contactCardEditModalStyleSheet);
@@ -36,19 +27,14 @@ const ContactCardEditModalBirthdays = ({
   return (
     <>
       {field.value && (
-        <ContactCardEditModalField
-          deleteButtonRect={deleteButtonRect}
-          deleted={deleted}
-          openDeleteButton={openDeleteButton}
-          closeDeleteButton={closeDeleteButton}
+        <ContactCardEditDateField
           control={control}
           valueKey={`birthday.birthday`}
           selectedKey={`birthday.selected`}
           deleteField={() => field.onChange(null)}
-          keyboardType="default"
-          placeholder={intl.formatMessage({
-            defaultMessage: 'Enter a birthday',
-            description: 'Placeholder for birthday inside contact card',
+          title={intl.formatMessage({
+            defaultMessage: 'Birthday',
+            description: 'Contact Card Birthday title',
           })}
         />
       )}

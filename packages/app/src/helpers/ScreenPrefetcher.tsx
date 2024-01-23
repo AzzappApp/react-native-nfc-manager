@@ -1,7 +1,9 @@
 import { createContext, useCallback, useContext } from 'react';
 import { useCurrentScreenID } from '#components/NativeRouter';
+import { getAuthState } from './authStore';
 import fetchQueryAndRetain from './fetchQueryAndRetain';
 import type { ROUTES, Route } from '#routes';
+import type { ProfileInfos } from './authStore';
 import type { Disposable, Environment } from 'react-relay';
 import type { Observable, Variables, GraphQLTaggedNode } from 'relay-runtime';
 
@@ -13,6 +15,7 @@ export type ScreenPrefetchOptions<TRoute extends Route> = {
   prefetch?: (
     route: TRoute,
     environment: Environment,
+    profileInfos: ProfileInfos | null,
   ) => Observable<any> | null | undefined;
   /**
    * The query to load, can be a static query or a function that returns a query
@@ -24,7 +27,10 @@ export type ScreenPrefetchOptions<TRoute extends Route> = {
    * @param params
    * @returns the query variables
    */
-  getVariables?: (params: TRoute['params']) => Variables;
+  getVariables?: (
+    params: TRoute['params'],
+    profileInfos: ProfileInfos | null,
+  ) => Variables;
 };
 
 /**
@@ -54,11 +60,13 @@ export const createScreenPrefetcher = (
   screens: Record<ROUTES, ScreenPrefetchOptions<Route>>,
 ): ScreenPrefetcher => {
   const prefetchRoute = (environment: Environment, route: Route) => {
+    // return
     const Component = screens[route.route];
     let observable: Observable<any> | null | undefined = null;
+    const profileInfos = getAuthState().profileInfos;
 
     if (Component.prefetch) {
-      observable = Component.prefetch(route, environment);
+      observable = Component.prefetch(route, environment, profileInfos);
     } else if (Component.query) {
       const query =
         typeof Component.query === 'function'
@@ -68,7 +76,7 @@ export const createScreenPrefetcher = (
       observable = fetchQueryAndRetain(
         environment,
         query,
-        Component.getVariables?.(route.params) ?? ({} as any),
+        Component.getVariables?.(route.params, profileInfos) ?? ({} as any),
       );
     }
 

@@ -4,6 +4,7 @@ import { TabBar, TabView } from 'react-native-tab-view';
 import { loadQuery, useRelayEnvironment } from 'react-relay';
 import { colors } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
+import useAuthState from '#hooks/useAuthState';
 import TabBarMenuItem from '#ui/TabBarMenuItem';
 import Text from '#ui/Text';
 import SearchResultGlobal, {
@@ -18,9 +19,9 @@ import SearchResultProfiles, {
   SearchResultProfilesPlaceHolder,
   searchResultProfilesQuery,
 } from './SearchResultProfiles';
-import type { SearchResultGlobalQuery } from '@azzapp/relay/artifacts/SearchResultGlobalQuery.graphql';
-import type { SearchResultPostsQuery } from '@azzapp/relay/artifacts/SearchResultPostsQuery.graphql';
-import type { SearchResultProfilesQuery } from '@azzapp/relay/artifacts/SearchResultProfilesQuery.graphql';
+import type { SearchResultGlobalQuery } from '#relayArtifacts/SearchResultGlobalQuery.graphql';
+import type { SearchResultPostsQuery } from '#relayArtifacts/SearchResultPostsQuery.graphql';
+import type { SearchResultProfilesQuery } from '#relayArtifacts/SearchResultProfilesQuery.graphql';
 import type {
   NavigationState,
   SceneRendererProps,
@@ -75,13 +76,17 @@ const SearchTabContainer = ({
     ],
     [intl],
   );
-
+  const { profileInfos } = useAuthState();
   useEffect(() => {
     if (searchValue && environnement) {
       const queryReference = loadQuery(
         environnement,
         routes[pageIndexSelected].query,
-        { search: searchValue, useLocation: false },
+        {
+          search: searchValue,
+          useLocation: false,
+          profileId: profileInfos?.profileId,
+        },
         { fetchPolicy: 'store-or-network' },
       );
       setTabPreloadedQuery(prevState => {
@@ -91,7 +96,13 @@ const SearchTabContainer = ({
         };
       });
     }
-  }, [environnement, pageIndexSelected, routes, searchValue]);
+  }, [
+    environnement,
+    pageIndexSelected,
+    profileInfos?.profileId,
+    routes,
+    searchValue,
+  ]);
 
   //TODO: inquiry this because warning are shown that query are disposed and should not
   useEffect(() => {

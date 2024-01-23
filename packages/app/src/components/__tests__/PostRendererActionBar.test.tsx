@@ -7,8 +7,8 @@ import { createMockEnvironment, MockPayloadGenerator } from 'relay-test-utils';
 import { act, fireEvent, render, screen } from '#helpers/testHelpers';
 import PostRendererActionBar from '../PostList/PostRendererActionBar';
 import type { PostRendererMediaProps } from '#components/PostList/PostRendererMedia';
+import type { PostRendererActionBarTestQuery } from '#relayArtifacts/PostRendererActionBarTestQuery.graphql';
 import type { PostRendererActionBarProps } from '../PostList/PostRendererActionBar';
-import type { PostRendererActionBarTestQuery } from '@azzapp/relay/artifacts/PostRendererActionBarTestQuery.graphql';
 
 const mockRouter = {
   push: jest.fn(),
@@ -30,14 +30,21 @@ jest.mock('react-native/Libraries/Share/Share', () => ({
   share: mockShare,
 }));
 
+jest.mock('#helpers/authStore', () => ({
+  getAuthState: () => ({
+    profileInfos: { profileRole: 'owner' },
+  }),
+  addAuthStateListener: jest.fn(),
+}));
+
 const renderActionBar = (props?: Partial<PostRendererActionBarProps>) => {
-  const environement = createMockEnvironment();
-  environement.mock.queueOperationResolver(operation =>
+  const environment = createMockEnvironment();
+  environment.mock.queueOperationResolver(operation =>
     MockPayloadGenerator.generate(operation, {
       Post(_, generateId) {
         return {
           id: String(generateId()),
-          viewerPostReaction: null,
+          postReaction: null,
           allowComments: true,
           allowLikes: true,
           counterReactions: 3,
@@ -53,6 +60,7 @@ const renderActionBar = (props?: Partial<PostRendererActionBarProps>) => {
           post: node(id: "test-post") {
             id
             ...PostRendererActionBar_post
+              @arguments(viewerWebCardId: "test-webCard")
           }
         }
       `,
@@ -61,7 +69,7 @@ const renderActionBar = (props?: Partial<PostRendererActionBarProps>) => {
     return <PostRendererActionBar postKey={data.post!} {...props} />;
   };
   const component = render(
-    <RelayEnvironmentProvider environment={environement}>
+    <RelayEnvironmentProvider environment={environment}>
       <TestRenderer {...props} />
     </RelayEnvironmentProvider>,
   );
@@ -69,7 +77,7 @@ const renderActionBar = (props?: Partial<PostRendererActionBarProps>) => {
   return {
     rerender(updates?: Partial<PostRendererMediaProps>) {
       component.rerender(
-        <RelayEnvironmentProvider environment={environement}>
+        <RelayEnvironmentProvider environment={environment}>
           <TestRenderer {...props} {...updates} />
         </RelayEnvironmentProvider>,
       );

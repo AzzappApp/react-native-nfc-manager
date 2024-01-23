@@ -11,7 +11,13 @@ import {
   useMemo,
 } from 'react';
 import { useIntl } from 'react-intl';
-import { Keyboard, StyleSheet, View, useWindowDimensions } from 'react-native';
+import {
+  Keyboard,
+  StyleSheet,
+  View,
+  unstable_batchedUpdates,
+  useWindowDimensions,
+} from 'react-native';
 import Toast from 'react-native-toast-message';
 import { graphql, useFragment } from 'react-relay';
 import {
@@ -22,10 +28,13 @@ import {
   COVER_RATIO,
   DEFAULT_COVER_SUBTITLE_TEXT_STYLE,
   DEFAULT_COVER_TEXT_STYLE,
-  textOrientationOrDefaut,
-  textPositionOrDefaut,
+  textOrientationOrDefault,
+  textPositionOrDefault,
 } from '@azzapp/shared/coverHelpers';
-import { extractLayoutParameters } from '#components/gpu';
+import {
+  cropDataForAspectRatio,
+  extractLayoutParameters,
+} from '#components/gpu';
 import ScreenModal from '#components/ScreenModal';
 import useScreenInsets from '#hooks/useScreenInsets';
 import ActivityIndicator from '#ui/ActivityIndicator';
@@ -38,7 +47,7 @@ import TextInput from '#ui/TextInput';
 import UploadProgressModal from '#ui/UploadProgressModal';
 import CoverEditorCropModal from './CoverEditorCropModal';
 import CoverEditorCustom from './CoverEditorCustom/CoverEditorCustom';
-import CoverEditiorImagePicker from './CoverEditorImagePicker';
+import CoverEditorImagePicker from './CoverEditorImagePicker';
 import CoverEditorSuggestionButton from './CoverEditorSuggestionButton';
 import CoverEditorTemplateList from './CoverEditorTemplateList';
 import MediaRequiredModal from './MediaRequiredModal';
@@ -47,19 +56,19 @@ import useSaveCover from './useSaveCover';
 import useSuggestedMedias from './useSuggestedMedias';
 import type { EditionParameters } from '#components/gpu';
 import type { ImagePickerResult } from '#components/ImagePicker';
+import type { CoverEditor_profile$key } from '#relayArtifacts/CoverEditor_profile.graphql';
 import type { CoverEditorCustomProps } from './CoverEditorCustom/CoverEditorCustom';
 import type {
   TemplateKind,
   CoverStyleData,
-  SourceMedia,
+  MediaInfos,
 } from './coverEditorTypes';
-import type { CoverEditor_viewer$key } from '@azzapp/relay/artifacts/CoverEditor_viewer.graphql';
 import type { ColorPalette } from '@azzapp/shared/cardHelpers';
 import type { ForwardedRef } from 'react';
 import type { TextInput as NativeTextInput } from 'react-native';
 
 export type CoverEditorProps = {
-  viewer: CoverEditor_viewer$key;
+  profile: CoverEditor_profile$key;
   height: number;
   onCoverSaved: () => void;
   onCanSaveChange: (canSave: boolean) => void;
@@ -71,7 +80,7 @@ export type CoverEditorHandle = {
 
 const CoverEditor = (
   {
-    viewer: viewerKey,
+    profile: profileKey,
     height,
     onCoverSaved,
     onCanSaveChange,
@@ -82,22 +91,23 @@ const CoverEditor = (
   const { bottom: insetBottom } = useScreenInsets();
 
   // #region Data
-  const viewer = useFragment(
+  const profile = useFragment(
     graphql`
-      fragment CoverEditor_viewer on Viewer {
-        profile {
+      fragment CoverEditor_profile on Profile {
+        webCard {
           firstName
           lastName
           companyName
           companyActivity {
             label
           }
-          profileKind
+          webCardKind
           cardCover {
             title
             subTitle
             mediaParameters
             mediaFilter
+            mediaAnimation
             sourceMedia {
               __typename
               id
@@ -116,15 +126,16 @@ const CoverEditor = (
             }
             foreground {
               id
+              kind
               uri
             }
             backgroundColor
             backgroundPatternColor
             foregroundColor
             segmented
-            merged
             textOrientation
             textPosition
+            textAnimation
             titleStyle {
               fontFamily
               fontSize
@@ -142,20 +153,21 @@ const CoverEditor = (
             dark
             otherColors
           }
-          ...useSaveCover_profile
+          ...useSaveCover_webCard
         }
-        ...CoverEditorCustom_viewer
-        ...CoverEditorTemplateList_viewer
-        ...useSuggestedMedias_viewer
+        ...CoverEditorCustom_profile
+        ...CoverEditorTemplateList_profile
+        ...useSuggestedMedias_profile
       }
     `,
-    viewerKey as CoverEditor_viewer$key,
+    profileKey as CoverEditor_profile$key,
   );
 
-  const cardCover = viewer?.profile?.cardCover ?? null;
-  const cardColors = viewer?.profile?.cardColors ?? null;
-
+  const cardCover = profile?.webCard.cardCover ?? null;
+  const cardColors = profile?.webCard.cardColors ?? null;
   // #endregion
+
+  // #region Template Kind
   const initialTemplateKind = useMemo<TemplateKind>(() => {
     if (cardCover) {
       return cardCover.sourceMedia?.__typename === 'MediaVideo'
@@ -164,7 +176,7 @@ const CoverEditor = (
         ? 'people'
         : 'others';
     }
-    return viewer.profile?.profileKind === 'business' ? 'others' : 'people';
+    return profile?.webCard.webCardKind === 'business' ? 'others' : 'people';
     // We don't want to update the initial data when the cardCover change
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -172,7 +184,6 @@ const CoverEditor = (
   const [templateKind, setTemplateKind] =
     useState<TemplateKind>(initialTemplateKind);
 
-  // #region Template Kind
   const onSwitchTemplateKind = useCallback(
     async (kind: string) => {
       startTransition(() => {
@@ -207,27 +218,29 @@ const CoverEditor = (
   );
   // #endregion
 
-  // #region Data edition
+  // #region Title/Subtitle state
   const [title, setTitle] = useState(() => {
     if (cardCover) {
       return cardCover.title ?? null;
     }
-    if (viewer.profile?.profileKind === 'business') {
-      return viewer.profile.companyName ?? null;
+    if (profile?.webCard.webCardKind === 'business') {
+      return profile.webCard.companyName ?? null;
     }
-    return viewer.profile?.firstName ?? null;
+    return profile?.webCard.firstName ?? null;
   });
 
   const [subTitle, setSubTitle] = useState(() => {
     if (cardCover) {
       return cardCover.subTitle ?? null;
     }
-    if (viewer.profile?.profileKind === 'business') {
-      return viewer.profile.companyActivity?.label ?? null;
+    if (profile?.webCard.webCardKind === 'business') {
+      return profile.webCard.companyActivity?.label ?? null;
     }
-    return viewer.profile?.lastName ?? null;
+    return profile?.webCard.lastName ?? null;
   });
+  // #endregion
 
+  // #region Initial media state
   const initialCoverStyle = useMemo<CoverStyleData | null>(() => {
     if (!cardCover) {
       return null;
@@ -236,9 +249,11 @@ const CoverEditor = (
       titleStyle: cardCover.titleStyle ?? DEFAULT_COVER_TEXT_STYLE,
       subTitleStyle:
         cardCover.subTitleStyle ?? DEFAULT_COVER_SUBTITLE_TEXT_STYLE,
-      textOrientation: textOrientationOrDefaut(cardCover.textOrientation),
-      textPosition: textPositionOrDefaut(cardCover.textPosition),
+      textOrientation: textOrientationOrDefault(cardCover.textOrientation),
+      textPosition: textPositionOrDefault(cardCover.textPosition),
+      textAnimation: cardCover?.textAnimation ?? null,
       mediaFilter: cardCover.mediaFilter ?? null,
+      mediaAnimation: cardCover.mediaAnimation ?? null,
       mediaParameters: cardCover.mediaParameters
         ? extractLayoutParameters(
             cardCover.mediaParameters as EditionParameters,
@@ -249,7 +264,6 @@ const CoverEditor = (
       backgroundPatternColor: cardCover.backgroundPatternColor ?? '#000',
       foreground: cardCover.foreground ?? null,
       foregroundColor: cardCover.foregroundColor ?? '#FFF',
-      merged: cardCover.merged ?? false,
       segmented: cardCover.segmented ?? false,
     };
 
@@ -257,38 +271,35 @@ const CoverEditor = (
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const [coverStyle, setCoverStyle] = useState<CoverStyleData>(
-    () => initialCoverStyle ?? DEFAULT_COVER_STYLE,
-  );
-
-  const initialMediaInfos = useMemo(
-    () =>
-      cardCover
-        ? {
-            sourceMedia: cardCover.sourceMedia
-              ? ({
-                  id: cardCover.sourceMedia.id,
-                  uri: cardCover.sourceMedia.uri,
-                  height: cardCover.sourceMedia.height,
-                  width: cardCover.sourceMedia.width,
-                  kind:
-                    cardCover.sourceMedia.__typename === 'MediaVideo'
-                      ? 'video'
-                      : 'image',
-                } as const)
-              : null,
-            maskMedia: cardCover.maskMedia,
-            mediaCropParameters: extractLayoutParameters(
-              cardCover.mediaParameters,
-            )[0],
-          }
-        : null,
-
+  const initialMediaInfos = useMemo<MediaInfos | null>(
+    () => {
+      if (!cardCover?.sourceMedia) {
+        return null;
+      }
+      return {
+        sourceMedia: {
+          id: cardCover.sourceMedia.id,
+          uri: cardCover.sourceMedia.uri,
+          width: cardCover.sourceMedia.width,
+          height: cardCover.sourceMedia.height,
+          kind:
+            cardCover.sourceMedia.__typename === 'MediaVideo'
+              ? 'video'
+              : 'image',
+        },
+        mediaCropParameters: extractLayoutParameters(
+          cardCover.mediaParameters,
+        )[0],
+        maskMedia: cardCover.maskMedia,
+      };
+    },
     // We don't want to update the initial data when the cardCover change
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [],
   );
+  // #endregion
 
+  // #region Media state
   const {
     sourceMedia,
     maskMedia,
@@ -321,32 +332,49 @@ const CoverEditor = (
       [templateKind]: !previous[templateKind],
     }));
   }, [templateKind]);
+  // #endregion
 
+  // #region Color palette
   const [colorPalette, setColorPalette] = useState<ColorPalette>(
     cardColors
       ? pick(cardColors, 'dark', 'light', 'primary')
       : DEFAULT_COLOR_PALETTE,
   );
+  // #endregion
 
-  const currentDemoMediaRef = useRef<SourceMedia | null>(null);
+  // #region Selection handling
+  const [coverStyle, setCoverStyle] = useState<CoverStyleData>(
+    () => initialCoverStyle ?? DEFAULT_COVER_STYLE,
+  );
+  const [currentMediaInfos, setCurrentMediaInfos] = useState<MediaInfos | null>(
+    null,
+  );
   const onSelectedTemplateChange = useCallback(
-    (template: { style: CoverStyleData; media: SourceMedia }) => {
-      setCoverStyle(template.style);
-      currentDemoMediaRef.current = template.media;
+    (template: {
+      id: string;
+      style: CoverStyleData;
+      mediaInfos: MediaInfos;
+    }) => {
+      unstable_batchedUpdates(() => {
+        setCoverStyle(template.style);
+        setCurrentMediaInfos(template.mediaInfos);
+      });
     },
-    [setCoverStyle],
+    [],
   );
   // #endregion
 
-  // #region Suggested Media
-  const { suggestedMedia, onNextSuggestedMedia } = useSuggestedMedias(
-    viewer,
-    templateKind,
-  );
+  // #region Suggested medias
+  const {
+    suggestedMedia,
+    busy: suggestedMediaLoaderBusy,
+    onNextSuggestedMedia,
+  } = useSuggestedMedias(profile, templateKind);
+  // #endregion
 
   // #region Save cover
   const { progressIndicator, saveCover } = useSaveCover(
-    viewer.profile,
+    profile?.webCard ?? null,
     onCoverSaved,
   );
 
@@ -356,7 +384,7 @@ const CoverEditor = (
         setShowMediaRequiredModal(true);
         return;
       }
-      if (!mediaVisible) {
+      if (!currentMediaInfos?.maskMedia) {
         Toast.show({
           type: 'error',
           text1: intl.formatMessage({
@@ -371,27 +399,24 @@ const CoverEditor = (
     if (mediaComputing) {
       return;
     }
-    let media: SourceMedia | null = null;
-    let cropParameters: EditionParameters = {};
-    if (mediaVisible) {
-      media = sourceMedia;
-      cropParameters = mediaCropParameters ?? {};
-    }
-    if (!media) {
-      media = suggestedMedia ?? currentDemoMediaRef.current;
-    }
-    if (!media) {
-      // should not happend
+
+    if (!currentMediaInfos) {
+      // should not happen
       return;
     }
+    const {
+      sourceMedia: mediaInfoSourceMedia,
+      maskMedia,
+      mediaCropParameters,
+    } = currentMediaInfos;
 
     saveCover(
       title,
       subTitle,
       coverStyle,
+      mediaInfoSourceMedia,
       maskMedia,
-      cropParameters,
-      media,
+      mediaCropParameters,
       colorPalette,
       cardColors?.otherColors ?? DEFAULT_COLOR_LIST,
     );
@@ -399,18 +424,20 @@ const CoverEditor = (
     cardColors?.otherColors,
     colorPalette,
     coverStyle,
+    currentMediaInfos,
     intl,
-    maskMedia,
     mediaComputing,
-    mediaCropParameters,
-    mediaVisible,
     saveCover,
     sourceMedia,
     subTitle,
-    suggestedMedia,
     templateKind,
     title,
   ]);
+
+  const canSave = !mediaComputing;
+  useEffect(() => {
+    onCanSaveChange(canSave);
+  }, [canSave, onCanSaveChange]);
 
   useImperativeHandle(
     ref,
@@ -419,6 +446,55 @@ const CoverEditor = (
     }),
     [onSave],
   );
+  // #endregion
+
+  // #region Custom edition
+  const [customEditionProps, setCustomEditionProps] = useState<{
+    initialData: CoverEditorCustomProps['initialData'];
+    initialColorPalette: ColorPalette;
+  } | null>(null);
+
+  const onCustomEdition = useCallback(() => {
+    if (
+      !currentMediaInfos ||
+      (templateKind === 'people' && !currentMediaInfos?.maskMedia) ||
+      mediaComputing
+    ) {
+      return;
+    }
+    let { sourceMedia } = currentMediaInfos;
+    const { maskMedia, mediaCropParameters } = currentMediaInfos;
+    if (sourceMedia.rawUri) {
+      sourceMedia = {
+        ...sourceMedia,
+        uri: sourceMedia.rawUri,
+      };
+      delete sourceMedia.rawUri;
+    }
+    setCustomEditionProps({
+      initialData: {
+        title,
+        subTitle,
+        coverStyle,
+        sourceMedia,
+        maskMedia,
+        mediaCropParameters,
+      },
+      initialColorPalette: colorPalette,
+    });
+  }, [
+    colorPalette,
+    coverStyle,
+    currentMediaInfos,
+    mediaComputing,
+    subTitle,
+    templateKind,
+    title,
+  ]);
+
+  const onCustomEditionCancel = useCallback(() => {
+    setCustomEditionProps(null);
+  }, []);
   // #endregion
 
   // #region Title modal
@@ -477,64 +553,6 @@ const CoverEditor = (
   );
   // #endregion
 
-  // #region Custom edition
-  const [customEditionProps, setCustomEditionProps] = useState<{
-    initialData: CoverEditorCustomProps['initialData'];
-    initialColorPalette: ColorPalette;
-  } | null>(null);
-
-  const onCustomEdition = useCallback(() => {
-    if (mediaComputing) {
-      return;
-    }
-    let media: SourceMedia | null = null;
-    let cropParameters: EditionParameters = {};
-    if (mediaVisible) {
-      media = sourceMedia;
-      cropParameters = mediaCropParameters ?? {};
-    }
-    if (!media) {
-      media = suggestedMedia ?? currentDemoMediaRef.current;
-    }
-    if (!media) {
-      // should not happend
-      return;
-    }
-    setCustomEditionProps({
-      initialData: {
-        title,
-        subTitle,
-        sourceMedia: {
-          id: media.id,
-          width: media.width,
-          height: media.height,
-          uri: media.rawUri ?? media.uri,
-          kind: media.kind,
-        },
-        maskMedia,
-        mediaCropParameters: cropParameters,
-        coverStyle,
-      },
-      initialColorPalette: colorPalette,
-    });
-  }, [
-    colorPalette,
-    coverStyle,
-    maskMedia,
-    mediaComputing,
-    mediaCropParameters,
-    mediaVisible,
-    sourceMedia,
-    subTitle,
-    suggestedMedia,
-    title,
-  ]);
-
-  const onCustomEditionCancel = useCallback(() => {
-    setCustomEditionProps(null);
-  }, []);
-  // #endregion
-
   // #region Media required modal
   const [showMediaRequiredModal, setShowMediaRequiredModal] = useState(false);
   const onMediaRequiredModalClose = useCallback(
@@ -563,6 +581,66 @@ const CoverEditor = (
   );
   // #endregion
 
+  // #region Displayed Media infos
+  const suggestedMediaInfos = useMemo<MediaInfos | null>(() => {
+    if (!suggestedMedia) {
+      return null;
+    }
+
+    const { width, height } = suggestedMedia;
+
+    return {
+      sourceMedia: suggestedMedia,
+      mediaCropParameters:
+        Math.abs(width / height - COVER_RATIO) > 0.05
+          ? { cropData: cropDataForAspectRatio(width, height, COVER_RATIO) }
+          : null,
+    };
+  }, [suggestedMedia]);
+
+  const displayedMediaInfos = useMemo<MediaInfos | null>(() => {
+    if (!sourceMedia || !mediaVisible) {
+      return suggestedMediaInfos ?? null;
+    }
+
+    return {
+      sourceMedia,
+      mediaCropParameters,
+      maskMedia,
+    };
+  }, [
+    maskMedia,
+    mediaCropParameters,
+    mediaVisible,
+    sourceMedia,
+    suggestedMediaInfos,
+  ]);
+
+  const currentCoverInfos = useMemo<{
+    style: CoverStyleData;
+    mediaInfos: MediaInfos;
+  } | null>(() => {
+    if (
+      !initialMediaInfos ||
+      !initialCoverStyle ||
+      templateKind !== initialTemplateKind
+    ) {
+      return null;
+    }
+
+    return {
+      style: initialCoverStyle,
+      mediaInfos: displayedMediaInfos ?? initialMediaInfos,
+    };
+  }, [
+    initialCoverStyle,
+    initialMediaInfos,
+    initialTemplateKind,
+    displayedMediaInfos,
+    templateKind,
+  ]);
+  //#endregion
+
   // #region Layout
   const { width: windowWidth } = useWindowDimensions();
 
@@ -578,18 +656,6 @@ const CoverEditor = (
 
   const templateListWidth = templateListHeight * COVER_RATIO * 2;
   // #endregion
-
-  // #region canSave
-  const canSave = !mediaComputing;
-
-  useEffect(() => {
-    onCanSaveChange(canSave);
-  }, [canSave, onCanSaveChange]);
-  // #endregion
-
-  const displayedMedia = mediaVisible
-    ? sourceMedia ?? suggestedMedia
-    : suggestedMedia;
 
   return (
     <>
@@ -617,24 +683,16 @@ const CoverEditor = (
           >
             <CoverEditorTemplateList
               key={templateKind}
-              viewer={viewer}
+              profile={profile}
               templateKind={templateKind}
-              media={displayedMedia ?? null}
-              maskUri={
-                mediaVisible && templateKind === 'people'
-                  ? maskMedia?.uri ?? null
-                  : null
-              }
+              mediaInfos={displayedMediaInfos}
               title={title}
               subTitle={subTitle}
               videoPaused={!!progressIndicator}
               width={templateListWidth}
               height={templateListHeight}
-              mediaCropParameters={mediaVisible ? mediaCropParameters : null}
               timeRange={timeRange}
-              currentCoverStyle={
-                initialTemplateKind === templateKind ? initialCoverStyle : null
-              }
+              currentCoverInfos={currentCoverInfos}
               cardColors={cardColors ?? null}
               initialSelectedIndex={indexes.current[templateKind]}
               onSelectedItemChange={onSelectedTemplateChange}
@@ -660,7 +718,8 @@ const CoverEditor = (
             templateKind={templateKind}
             mediaVisible={mediaVisible}
             toggleMediaVisibility={toggleMediaVisibility}
-            onSelectSuggestedMedia={onNextSuggestedMedia}
+            suggestedMediaLoaderBusy={suggestedMediaLoaderBusy}
+            onNextSuggestedMedia={onNextSuggestedMedia}
             hasSuggestedMedia={!!suggestedMedia}
           />
           {sourceMedia && (
@@ -674,7 +733,7 @@ const CoverEditor = (
             icon="settings"
             onPress={onCustomEdition}
             disabled={
-              templateKind === 'people' && (!sourceMedia || !mediaVisible)
+              templateKind === 'people' && !currentMediaInfos?.maskMedia
             }
           />
         </View>
@@ -745,7 +804,7 @@ const CoverEditor = (
         </View>
       </BottomSheetModal>
       <ScreenModal visible={showImagePicker} animationType="slide">
-        <CoverEditiorImagePicker
+        <CoverEditorImagePicker
           kind={templateKind === 'video' ? 'video' : 'image'}
           onFinished={onMediaSelected}
           onCancel={closeImagePicker}
@@ -779,7 +838,7 @@ const CoverEditor = (
             {...customEditionProps}
             onCancel={onCustomEditionCancel}
             onCoverSaved={onCoverSaved}
-            viewer={viewer}
+            profile={profile}
           />
         )}
       </ScreenModal>
@@ -837,10 +896,11 @@ const DEFAULT_COVER_STYLE: CoverStyleData = {
   foregroundColor: 'primary',
   mediaFilter: null,
   mediaParameters: {},
-  merged: false,
+  mediaAnimation: null,
   segmented: false,
   subTitleStyle: DEFAULT_COVER_SUBTITLE_TEXT_STYLE,
   textOrientation: 'horizontal',
   textPosition: 'bottomLeft',
+  textAnimation: null,
   titleStyle: DEFAULT_COVER_TEXT_STYLE,
 };

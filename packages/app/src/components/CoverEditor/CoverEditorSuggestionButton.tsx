@@ -1,10 +1,11 @@
-import { StyleSheet, View } from 'react-native';
+import { View } from 'react-native';
 import Animated, {
   interpolate,
   useAnimatedStyle,
 } from 'react-native-reanimated';
 import { colors } from '#theme';
 import { GPUImageView, VideoFrame, Image as ImageLayer } from '#components/gpu';
+import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import useAnimatedState from '#hooks/useAnimatedState';
 import { FLOATING_BUTTON_SIZE } from '#ui/FloatingButton';
 import FloatingIconButton from '#ui/FloatingIconButton';
@@ -18,8 +19,9 @@ type CoverEditorSuggestionButtonProps = {
   iconHeight?: number;
   templateKind: TemplateKind;
   hasSuggestedMedia: boolean;
+  suggestedMediaLoaderBusy: boolean;
   toggleMediaVisibility: () => void;
-  onSelectSuggestedMedia: () => void;
+  onNextSuggestedMedia: () => void;
 };
 
 const CoverEditorSuggestionButton = ({
@@ -27,8 +29,9 @@ const CoverEditorSuggestionButton = ({
   templateKind,
   mediaVisible,
   hasSuggestedMedia,
+  suggestedMediaLoaderBusy,
   toggleMediaVisibility,
-  onSelectSuggestedMedia,
+  onNextSuggestedMedia,
 }: CoverEditorSuggestionButtonProps) => {
   const timing = useAnimatedState(
     sourceMedia != null && !mediaVisible && hasSuggestedMedia,
@@ -54,6 +57,7 @@ const CoverEditorSuggestionButton = ({
       ),
     };
   });
+  const styles = useStyleSheet(styleSheet);
 
   if (!sourceMedia && !hasSuggestedMedia) {
     return null;
@@ -74,7 +78,8 @@ const CoverEditorSuggestionButton = ({
             templateKind === 'video' ? 'suggested_video' : 'suggested_photo'
           }
           iconSize={30}
-          onPress={onSelectSuggestedMedia}
+          onPress={onNextSuggestedMedia}
+          loading={suggestedMediaLoaderBusy}
         />
       </Animated.View>
       <Animated.View
@@ -102,7 +107,7 @@ const CoverEditorSuggestionButton = ({
 
             <Icon
               style={styles.mediaHideButtonIcon}
-              icon={mediaVisible ? 'display' : 'hide'}
+              icon={mediaVisible ? 'preview' : 'hide'}
             />
           </PressableOpacity>
         )}
@@ -113,12 +118,12 @@ const CoverEditorSuggestionButton = ({
 
 export default CoverEditorSuggestionButton;
 
-const styles = StyleSheet.create({
+const styleSheet = createStyleSheet(appearance => ({
   mediaHideButton: {
     width: FLOATING_BUTTON_SIZE,
     height: FLOATING_BUTTON_SIZE,
     borderRadius: FLOATING_BUTTON_SIZE / 2,
-    borderColor: colors.black,
+    borderColor: appearance === 'light' ? colors.black : colors.white,
     borderWidth: 1,
     borderStyle: 'solid',
     display: 'flex',
@@ -132,9 +137,8 @@ const styles = StyleSheet.create({
   },
   mediaHideButtonIcon: {
     position: 'absolute',
-    top: (FLOATING_BUTTON_SIZE - 24) / 2,
-    left: (FLOATING_BUTTON_SIZE - 24) / 2,
+    margin: 'auto',
     width: 24,
     height: 24,
   },
-});
+}));

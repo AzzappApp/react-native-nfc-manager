@@ -13,7 +13,7 @@ import { getTextColor } from '@azzapp/shared/colorsHelpers';
 import { colors } from '#theme';
 import Header from '#ui/Header';
 import IconButton from '#ui/IconButton';
-import type { HomeHeader_user$key } from '@azzapp/relay/artifacts/HomeHeader_user.graphql';
+import type { HomeHeader_user$key } from '#relayArtifacts/HomeHeader_user.graphql';
 import type { ColorValue, StyleProp, ViewStyle } from 'react-native';
 import type { SharedValue } from 'react-native-reanimated';
 
@@ -34,9 +34,11 @@ const HomeHeader = ({
     graphql`
       fragment HomeHeader_user on User {
         profiles {
-          id
-          cardColors {
-            primary
+          webCard {
+            id
+            cardColors {
+              primary
+            }
           }
         }
       }
@@ -48,8 +50,8 @@ const HomeHeader = ({
   const readableColors = useMemo(
     () =>
       profiles?.map(profile => {
-        return profile?.cardColors?.primary
-          ? getTextColor(profile?.cardColors?.primary)
+        return profile?.webCard.cardColors?.primary
+          ? getTextColor(profile?.webCard.cardColors?.primary)
           : colors.white;
       }) ?? [],
     [profiles],
@@ -59,7 +61,10 @@ const HomeHeader = ({
     if (inputRange.length > 1) {
       return interpolateColor(currentProfileIndex, inputRange, readableColors);
     }
-    return readableColors[0];
+    if (readableColors.length > 0) {
+      return readableColors[0];
+    }
+    return colors.white;
   }, [currentProfileIndexSharedValue]);
 
   const svgProps = useAnimatedProps(() => ({ color: colorValue.value }));

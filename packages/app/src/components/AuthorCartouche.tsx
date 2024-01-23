@@ -1,7 +1,5 @@
-import { useMemo } from 'react';
 import { View } from 'react-native';
 import { graphql, useFragment } from 'react-relay';
-import { swapColor } from '@azzapp/shared/cardHelpers';
 import { COVER_RATIO } from '@azzapp/shared/coverHelpers';
 import { colors } from '#theme';
 import {
@@ -10,19 +8,21 @@ import {
 } from '#helpers/createStyles';
 import PressableOpacity from '#ui/PressableOpacity';
 import Text from '#ui/Text';
+import CoverRenderer from './CoverRenderer';
 import Link from './Link';
-import MediaImageRenderer from './medias/MediaImageRenderer';
-import type { MediaImageRendererProps } from './medias';
-import type { AuthorCartoucheFragment_profile$key } from '@azzapp/relay/artifacts/AuthorCartoucheFragment_profile.graphql';
+import type {
+  AuthorCartoucheFragment_webCard$data,
+  AuthorCartoucheFragment_webCard$key,
+} from '#relayArtifacts/AuthorCartoucheFragment_webCard.graphql';
 import type { ViewProps } from 'react-native';
 
 type AuthorCartoucheProps = ViewProps & {
   /**
    *
    *
-   * @type {AuthorCartoucheFragment_profile$key}
+   * @type {AuthorCartoucheFragment_webCard$key}
    */
-  author: AuthorCartoucheFragment_profile$key;
+  author: AuthorCartoucheFragment_webCard$key;
   /**
    * variant of the author cartouche
    *
@@ -41,6 +41,11 @@ type AuthorCartoucheProps = ViewProps & {
    * @type {boolean}
    */
   activeLink?: boolean;
+
+  /**
+   * callback when the cartouche is pressed
+   */
+  onPress?: () => void;
 };
 /**
  * Author cartouche
@@ -52,84 +57,44 @@ const AuthorCartouche = ({
   author: authorKey,
   activeLink = false,
   hideUserName = false,
+  onPress,
   ...props
 }: AuthorCartoucheProps) => {
   const author = useFragment(
     graphql`
-      fragment AuthorCartoucheFragment_profile on Profile
-      @argumentDefinitions(
-        pixelRatio: {
-          type: "Float!"
-          provider: "../providers/PixelRatio.relayprovider"
-        }
-      ) {
-        id
+      fragment AuthorCartoucheFragment_webCard on WebCard {
         userName
-        cardColors {
-          primary
-          light
-          dark
-        }
-        cardCover {
-          media {
-            id
-            ... on MediaImage {
-              avatarURI: uri(width: 25, pixelRatio: $pixelRatio)
-            }
-            ... on MediaVideo {
-              avatarURI: thumbnail(width: 25, pixelRatio: $pixelRatio)
-            }
-          }
-          foregroundColor
-          foreground {
-            id
-            uri: uri(width: 25, pixelRatio: $pixelRatio)
-          }
-        }
+        ...CoverRenderer_webCard
       }
     `,
     authorKey,
   );
 
   const styles = useVariantStyleSheet(stylesheet, variant);
-  const { cardCover, cardColors } = author ?? {};
-  const { media, foreground, foregroundColor } = cardCover ?? {};
 
-  const mediaSource = useMemo(
-    () =>
-      media?.id
-        ? {
-            uri: media.avatarURI!,
-            mediaId: media.id,
-            requestedSize: MEDIA_WIDTH,
-          }
-        : null,
-    [media?.avatarURI, media?.id],
-  );
-
-  const foregroundSource = useMemo(
-    () =>
-      foreground?.id
-        ? {
-            uri: foreground.uri!,
-            mediaId: foreground.id,
-            requestedSize: MEDIA_WIDTH,
-          }
-        : null,
-    [foreground?.id, foreground?.uri],
-  );
+  if (onPress) {
+    return (
+      <PressableOpacity
+        style={[styles.container, style]}
+        onPress={onPress}
+        {...props}
+      >
+        <AuthorCartoucheContent
+          hideUserName={hideUserName}
+          variant={variant}
+          author={author}
+        />
+      </PressableOpacity>
+    );
+  }
 
   if (activeLink) {
     return (
-      <Link route="PROFILE" params={{ userName: author.userName }}>
+      <Link route="WEBCARD" params={{ userName: author.userName }}>
         <PressableOpacity style={[styles.container, style]} {...props}>
           <AuthorCartoucheContent
-            mediaSource={mediaSource}
-            foregroundSource={foregroundSource}
-            foregroundColor={foregroundColor}
             hideUserName={hideUserName}
             variant={variant}
-            cardColors={cardColors}
             author={author}
           />
         </PressableOpacity>
@@ -140,12 +105,8 @@ const AuthorCartouche = ({
   return (
     <View style={[styles.container, style]} {...props}>
       <AuthorCartoucheContent
-        mediaSource={mediaSource}
-        foregroundSource={foregroundSource}
-        foregroundColor={foregroundColor}
         hideUserName={hideUserName}
         variant={variant}
-        cardColors={cardColors}
         author={author}
       />
     </View>
@@ -153,55 +114,21 @@ const AuthorCartouche = ({
 };
 
 const AuthorCartoucheContent = ({
-  mediaSource,
-  foregroundSource,
-  foregroundColor,
   hideUserName,
   variant = 'post',
-  cardColors,
   author,
 }: {
-  mediaSource?: MediaImageRendererProps['source'] | null;
-  foregroundSource?: MediaImageRendererProps['source'] | null;
-  foregroundColor?: string | null;
   hideUserName?: boolean;
   variant?: AuthorCartoucheProps['variant'];
-  cardColors?: {
-    primary: string;
-    light: string;
-    dark: string;
-  } | null;
-  author?: { userName: string | null };
+  author?: AuthorCartoucheFragment_webCard$data;
 }) => {
   const styles = useVariantStyleSheet(stylesheet, variant);
 
-  const foregroundStyle = useMemo(
-    () => [styles.layer, styles.image, { backgroundColor: 'transparent' }],
-    [styles.layer, styles.image],
-  );
-
   return (
     <>
-      {mediaSource != null ? (
-        <View>
-          <MediaImageRenderer
-            source={mediaSource}
-            alt="avatar"
-            style={styles.image}
-          />
-          {foregroundSource?.mediaId && (
-            <MediaImageRenderer
-              testID="CoverPreview_foreground"
-              source={foregroundSource}
-              tintColor={swapColor(foregroundColor, cardColors)}
-              style={foregroundStyle}
-              alt={'Cover edition foreground'}
-            />
-          )}
-        </View>
-      ) : (
-        <View style={styles.image} />
-      )}
+      <View style={styles.image}>
+        <CoverRenderer width={styles.image.width} webCard={author} />
+      </View>
       {!hideUserName && (
         <Text
           variant={variant === 'post' ? 'button' : 'smallbold'}
@@ -236,9 +163,11 @@ const stylesheet = createVariantsStyleSheet(appearance => ({
       width: 12.5,
       height: 20,
       borderRadius: 3,
+      borderCurve: 'continuous',
       marginRight: 10,
       backgroundColor: appearance === 'light' ? colors.grey200 : colors.grey200,
       aspectRatio: COVER_RATIO,
+      overflow: 'hidden',
     },
   },
   post: {
@@ -246,8 +175,10 @@ const stylesheet = createVariantsStyleSheet(appearance => ({
       width: 21,
       height: 34,
       borderRadius: 4,
+      borderCurve: 'continuous',
       marginRight: 5,
       backgroundColor: appearance === 'light' ? colors.grey200 : colors.grey200,
+      overflow: 'hidden',
     },
     text: { color: appearance === 'light' ? colors.black : colors.white },
   },
@@ -259,6 +190,7 @@ const stylesheet = createVariantsStyleSheet(appearance => ({
       paddingLeft: 6,
       paddingRight: 12,
       borderRadius: 10,
+      borderCurve: 'continuous',
       flexDirection: 'row',
       alignItems: 'center',
       backgroundColor: 'rgba(0, 0, 0, 0.18)',
@@ -267,8 +199,10 @@ const stylesheet = createVariantsStyleSheet(appearance => ({
       width: 12.5,
       height: 20,
       borderRadius: 3,
+      borderCurve: 'continuous',
       marginRight: 4,
       backgroundColor: colors.white,
+      overflow: 'hidden',
     },
     userName: {
       color: 'white',

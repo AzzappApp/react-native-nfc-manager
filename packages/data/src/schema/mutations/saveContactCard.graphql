@@ -1,8 +1,4 @@
-input ContactCardEmailInput {
-  address: String!
-  label: String!
-  selected: Boolean!
-}
+
 extend type Mutation {
   """
   Save the current user's contact card.
@@ -10,39 +6,13 @@ extend type Mutation {
   saveContactCard(input: SaveContactCardInput!): SaveContactCardPayload!
 }
 
-input ContactCardPhoneNumberInput {
-  number: String!
-  label: String!
-  selected: Boolean!
-}
-
-input ContactCardUrlInput {
-  address: String!
-  selected: Boolean!
-}
-
-input ContactCardAddressInput {
-  address: String!
-  label: String!
-  selected: Boolean!
-}
-
-input ContactCardBirthdayInput {
-  birthday: String!
-  selected: Boolean!
-}
-
-input ContactCardSocialInput {
-  url: String!
-  label: String!
-  selected: Boolean!
-}
-
-input ContactCardStyleInput {
-  backgroundColor: String!
-}
 
 input SaveContactCardInput {
+  profileId: ID!
+  contactCard: ContactCardInput!
+}
+
+input ContactCardInput {
   firstName: String
   lastName: String
   title: String
@@ -55,6 +25,46 @@ input SaveContactCardInput {
   socials: [ContactCardSocialInput!]
   isPrivate: Boolean
   displayedOnWebCard: Boolean
+  avatarId: String
+}
+
+
+input ContactCardEmailInput {
+  address: String!
+  label: String!
+  selected: Boolean
+}
+
+input ContactCardPhoneNumberInput {
+  number: String!
+  label: String!
+  selected: Boolean
+}
+
+input ContactCardUrlInput {
+  address: String!
+  selected: Boolean
+}
+
+input ContactCardAddressInput {
+  address: String!
+  label: String!
+  selected: Boolean
+}
+
+input ContactCardBirthdayInput {
+  birthday: String!
+  selected: Boolean
+}
+
+input ContactCardSocialInput {
+  url: String!
+  label: String!
+  selected: Boolean
+}
+
+input ContactCardStyleInput {
+  backgroundColor: String!
 }
 
 type SaveContactCardPayload {

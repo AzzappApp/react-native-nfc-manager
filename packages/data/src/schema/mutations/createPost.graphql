@@ -4,6 +4,10 @@ extend type Mutation {
 
 input CreatePostInput {
   """
+  The id of the WebCard to  which this post belongs
+  """
+  webCardId: String!
+  """
   The media of the publication
   """
   mediaId: String

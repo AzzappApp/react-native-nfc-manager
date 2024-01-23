@@ -1,13 +1,7 @@
 import _ from 'lodash';
 import { memo, useMemo } from 'react';
 import { useIntl } from 'react-intl';
-import {
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  View,
-  useWindowDimensions,
-} from 'react-native';
+import { Pressable, ScrollView, View, useWindowDimensions } from 'react-native';
 import Animated, {
   type SharedValue,
   useAnimatedScrollHandler,
@@ -20,75 +14,83 @@ import Animated, {
 import { useFragment, graphql } from 'react-relay';
 import { colors, fontFamilies } from '#theme';
 import AnimatedText from '#components/AnimatedText';
+import {
+  createVariantsStyleSheet,
+  useVariantStyleSheet,
+} from '#helpers/createStyles';
 import Text from '#ui/Text';
 import { format } from './HomeInformations';
 import HomeStatisticsChart from './HomeStatisticsChart';
-import type { HomeStatistics_user$key } from '@azzapp/relay/artifacts/HomeStatistics_user.graphql';
+import type { HomeStatistics_profiles$key } from '#relayArtifacts/HomeStatistics_profiles.graphql';
 
 const AnimatedScrollView = Animated.createAnimatedComponent(ScrollView);
 
 type HomeInformationsProps = {
-  user: HomeStatistics_user$key;
+  user: HomeStatistics_profiles$key;
   height: number;
-  animated: boolean;
   currentProfileIndexSharedValue: SharedValue<number>;
   currentUserIndex: number;
+  variant?: 'dark' | 'light';
+  initialStatsIndex?: number;
 };
 
 const HomeStatistics = ({
   user,
   height,
-  animated,
   currentUserIndex,
   currentProfileIndexSharedValue,
+  variant = 'dark',
+  initialStatsIndex = 0,
 }: HomeInformationsProps) => {
   //TODO: backend part .
-  const data = useFragment(
+
+  const profiles = useFragment(
     graphql`
-      fragment HomeStatistics_user on User {
-        profiles {
+      fragment HomeStatistics_profiles on Profile @relay(plural: true) {
+        id
+        webCard {
           id
           nbLikes
-          nbWebcardViews
-          nbContactCardScans
+          nbWebCardViews
         }
-        ...HomeStatisticsChart_user
+        nbContactCardScans
+        ...HomeStatisticsChart_profiles
       }
     `,
     user,
   );
 
+  const styles = useVariantStyleSheet(stylesheet, variant);
+
   const { width } = useWindowDimensions();
   const intl = useIntl();
 
-  const scrollIndexOffset = useSharedValue(0);
+  const scrollIndexOffset = useSharedValue(initialStatsIndex);
   const scrollHandler = useAnimatedScrollHandler(event => {
     scrollIndexOffset.value = event.contentOffset.x / BOX_NUMBER_WIDTH;
   });
-
   const totalLikes = useSharedValue(format(0));
   const totalScans = useSharedValue(format(0));
   const totalViews = useSharedValue(format(0));
+  const inputRange = _.range(0, profiles?.length);
 
-  const inputRange = _.range(0, data.profiles?.length);
-  const { profiles } = data;
   const likes = useMemo(
-    () => profiles?.map(profile => profile.nbLikes) ?? [],
+    () => profiles?.map(profile => profile.webCard.nbLikes) ?? [],
     [profiles],
   );
-  const contactcardScans = useMemo(
-    () => profiles?.map(profile => profile.nbContactCardScans) ?? [],
+  const contactCardScans = useMemo(
+    () => profiles?.map(profile => profile.nbContactCardScans ?? 0) ?? [],
     [profiles],
   );
-  const webcardViews = useMemo(
-    () => profiles?.map(profile => profile.nbWebcardViews) ?? [],
+  const webCardViews = useMemo(
+    () => profiles?.map(profile => profile.webCard.nbWebCardViews) ?? [],
     [profiles],
   );
 
   useAnimatedReaction(
     () => currentProfileIndexSharedValue.value,
     actual => {
-      if (profiles && profiles?.length > 1 && actual >= 0 && animated) {
+      if (profiles && profiles?.length > 1 && actual >= 0) {
         totalLikes.value = format(
           interpolate(currentProfileIndexSharedValue.value, inputRange, likes),
         );
@@ -96,26 +98,24 @@ const HomeStatistics = ({
           interpolate(
             currentProfileIndexSharedValue.value,
             inputRange,
-            contactcardScans,
+            contactCardScans,
           ),
         );
         totalViews.value = format(
           interpolate(
             currentProfileIndexSharedValue.value,
             inputRange,
-            webcardViews,
+            webCardViews,
           ),
         );
-      } else if (actual >= 0 && !animated && Math.trunc(actual) === actual) {
-        //use to hide animation if not show. few perf gain
-        const prevIndex = Math.floor(actual);
-        totalLikes.value = format(likes[prevIndex] ?? 0);
-        totalScans.value = format(contactcardScans[prevIndex] ?? 0);
-        totalViews.value = format(webcardViews[prevIndex] ?? 0);
+      } else if (actual >= 0) {
+        totalLikes.value = format(likes[0] ?? 0);
+        totalScans.value = format(contactCardScans[0] ?? 0);
+        totalViews.value = format(webCardViews[0] ?? 0);
       }
     },
 
-    [currentProfileIndexSharedValue.value, animated, profiles, inputRange],
+    [currentProfileIndexSharedValue.value, profiles, inputRange],
   );
 
   const scrollViewRef = useAnimatedRef<Animated.ScrollView>();
@@ -131,10 +131,10 @@ const HomeStatistics = ({
         width={width - 2 * PADDING_HORIZONTAL}
         height={height - BOX_NUMBER_HEIGHT}
         statsScrollIndex={scrollIndexOffset}
-        animated={animated}
         currentUserIndex={currentUserIndex}
         currentProfileIndexSharedValue={currentProfileIndexSharedValue}
-        user={data}
+        user={profiles}
+        variant={variant}
       />
       <AnimatedScrollView
         ref={scrollViewRef}
@@ -142,6 +142,7 @@ const HomeStatistics = ({
           height: BOX_NUMBER_HEIGHT,
           width: '100%',
           overflow: 'visible',
+          paddingTop: 5,
         }}
         pagingEnabled
         snapToInterval={BOX_NUMBER_WIDTH}
@@ -157,17 +158,19 @@ const HomeStatistics = ({
         scrollEventThrottle={16}
         horizontal
         onScroll={scrollHandler}
+        contentOffset={{ x: initialStatsIndex * BOX_NUMBER_WIDTH, y: 0 }}
       >
         <StatisticItems
+          variant={variant}
           value={totalViews}
           title={
             intl.formatMessage(
               {
-                defaultMessage: 'Webcard{azzappAp} Views',
+                defaultMessage: 'Webcard{azzappA} Views',
                 description: 'Home statistics - webcardView label',
               },
               {
-                azzappAp: (
+                azzappA: (
                   <Text style={styles.icon} variant="azzapp">
                     a
                   </Text>
@@ -180,6 +183,7 @@ const HomeStatistics = ({
           onSelect={onSelectStat}
         />
         <StatisticItems
+          variant={variant}
           value={totalScans}
           title={intl.formatMessage({
             defaultMessage: 'Contact card scans',
@@ -190,6 +194,7 @@ const HomeStatistics = ({
           onSelect={onSelectStat}
         />
         <StatisticItems
+          variant={variant}
           value={totalLikes}
           title={intl.formatMessage({
             defaultMessage: 'Total Likes',
@@ -216,13 +221,15 @@ type StatisticItemsProps = {
   title: string;
   index: number;
   onSelect: (index: number) => void;
+  variant: 'dark' | 'light';
 };
-const StatisticItems = ({
+export const StatisticItems = ({
   value,
   scrollIndex,
   title,
   index,
   onSelect,
+  variant = 'dark',
 }: StatisticItemsProps) => {
   const animatedTextStyle = useAnimatedStyle(() => {
     return {
@@ -259,6 +266,8 @@ const StatisticItems = ({
     onSelect(index);
   };
 
+  const styles = useVariantStyleSheet(stylesheet, variant);
+
   return (
     <Animated.View style={[styles.boxContainer, animatedOpacity]}>
       <Pressable onPress={onPress}>
@@ -274,33 +283,53 @@ const StatisticItems = ({
   );
 };
 
-const styles = StyleSheet.create({
-  boxContainer: {
-    width: BOX_NUMBER_WIDTH,
-    height: BOX_NUMBER_HEIGHT,
-    justifyContent: 'flex-end',
-    alignItems: 'center',
-    overflow: 'visible',
+const stylesheet = createVariantsStyleSheet(() => ({
+  default: {
+    boxContainer: {
+      width: BOX_NUMBER_WIDTH,
+      height: BOX_NUMBER_HEIGHT,
+      justifyContent: 'flex-end',
+      alignItems: 'center',
+      overflow: 'visible',
+      paddingTop: 4,
+    },
+    container: {
+      justifyContent: 'center',
+      alignItems: 'flex-end',
+      paddingHorizontal: PADDING_HORIZONTAL,
+      width: '100%',
+      overflow: 'visible',
+      flex: 1,
+    },
+    largetText: {
+      ...fontFamilies.extrabold,
+      textAlign: 'center',
+      fontSize: 40,
+    },
+    smallText: {
+      textAlign: 'center',
+    },
   },
-  container: {
-    justifyContent: 'center',
-    alignItems: 'flex-end',
-    paddingHorizontal: PADDING_HORIZONTAL,
-    width: '100%',
-    overflow: 'visible',
-    flex: 1,
+  dark: {
+    icon: {
+      color: colors.white,
+    },
+    smallText: {
+      color: colors.white,
+    },
+    largetText: {
+      color: colors.white,
+    },
   },
-  largetText: {
-    ...fontFamilies.extrabold,
-    color: colors.white,
-    textAlign: 'center',
-    fontSize: 44,
+  light: {
+    icon: {
+      color: colors.black,
+    },
+    smallText: {
+      color: colors.black,
+    },
+    largetText: {
+      color: colors.black,
+    },
   },
-  smallText: {
-    color: colors.white,
-    textAlign: 'center',
-  },
-  icon: {
-    color: colors.white,
-  },
-});
+}));

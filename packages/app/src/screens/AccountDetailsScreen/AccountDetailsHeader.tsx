@@ -1,16 +1,11 @@
 import { useIntl } from 'react-intl';
 import AccountHeader from '#components/AccountHeader';
-import type { AccountHeader_profile$key } from '@azzapp/relay/artifacts/AccountHeader_profile.graphql';
 
-const AccountDetailsHeader = ({
-  profile,
-}: {
-  profile: AccountHeader_profile$key | null;
-}) => {
+const AccountDetailsHeader = () => {
   const intl = useIntl();
   return (
     <AccountHeader
-      profile={profile}
+      webCard={null}
       title={intl.formatMessage({
         defaultMessage: 'Account details',
         description:

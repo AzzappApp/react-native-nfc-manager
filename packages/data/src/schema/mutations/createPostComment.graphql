@@ -7,9 +7,16 @@ extend type Mutation {
 
 input CreatePostCommentInput {
   """
-  The post id we want toggle like on
+  The id of the post to comment on
   """
   postId: ID!
+  """
+  the id of the WebCard posting the comment
+  """
+  webCardId: ID!
+  """
+  The comment to post
+  """
   comment: String!
 }
 

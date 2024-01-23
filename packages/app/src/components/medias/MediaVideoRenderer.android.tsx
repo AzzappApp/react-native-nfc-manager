@@ -33,7 +33,9 @@ const MediaVideoRenderer = (
     onProgress,
     onEnd,
     onReadyForDisplay,
+    onVideoReady,
     videoEnabled,
+    onError,
     style,
     ...props
   }: MediaVideoRendererProps,
@@ -51,8 +53,9 @@ const MediaVideoRenderer = (
 
   const onVideoReadyForDisplay = useCallback(() => {
     setVideoReady(true);
+    onVideoReady?.();
     dispatchReady();
-  }, [dispatchReady]);
+  }, [dispatchReady, onVideoReady]);
 
   const sourceRef = useRef(source.mediaId);
   // we need to clean the state to start loading
@@ -121,6 +124,7 @@ const MediaVideoRenderer = (
       if (status.isLoaded && status.durationMillis) {
         onProgress?.({
           currentTime: status.positionMillis,
+          duration: status.durationMillis,
         });
       }
     },
@@ -156,7 +160,7 @@ const MediaVideoRenderer = (
             resizeMode={ResizeMode.CONTAIN}
             onReadyForDisplay={onVideoReadyForDisplay}
             onPlaybackStatusUpdate={onPlaybackStatusUpdate}
-            onError={console.error}
+            onError={onError}
           />
         </View>
       )}

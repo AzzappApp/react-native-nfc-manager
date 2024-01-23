@@ -1,12 +1,22 @@
 import VCard from 'vcard-creator';
 import { parseContactCard } from './contactCardHelpers';
+import { buildUserUrl } from './urlHelpers';
+import type { CommonInformation } from './contactCardHelpers';
 
 /**
  * Generates a vCard from a serialized contact card
  * @param contactCardData The serialized contact card
  * @returns The vCard
  */
-export const buildVCard = (contactCardData: string) => {
+export const buildVCard = async (
+  userName: string,
+  contactCardData: string,
+  additionalData?:
+    | (Pick<CommonInformation, 'socials' | 'urls'> & {
+        avatar?: { base64: string; type: string } | null;
+      })
+    | null,
+) => {
   const contactCard = parseContactCard(contactCardData);
 
   const vcard = new VCard();
@@ -18,6 +28,10 @@ export const buildVCard = (contactCardData: string) => {
   vcard.addCompany(contactCard.company ?? '');
 
   vcard.addJobtitle(contactCard.title ?? '');
+
+  if (additionalData?.avatar) {
+    vcard.addPhoto(additionalData.avatar.base64, additionalData.avatar.type);
+  }
 
   contactCard.emails.forEach(email => {
     vcard.addEmail(
@@ -38,19 +52,34 @@ export const buildVCard = (contactCardData: string) => {
         : `type=${phone[0].toLocaleUpperCase()}`,
     );
   });
-  contactCard.urls.forEach(url => {
-    vcard.addURL(url[1], url[0]);
+
+  vcard.addURL(buildUserUrl(userName), 'type=azzapp WebCard');
+  additionalData?.urls?.forEach(url => {
+    vcard.addURL(url.address, '');
   });
 
   contactCard.addresses.forEach(address => {
     vcard.addAddress(address[0], address[1].replace(/;/g, '\\;'));
   });
 
-  if (contactCard.birthday) vcard.addBirthday(contactCard.birthday);
+  if (contactCard.birthday && !isNaN(Date.parse(contactCard.birthday)))
+    vcard.addBirthday(contactCard.birthday.split('T')[0]);
 
-  contactCard.socials.forEach(social => {
-    vcard.addSocial(social[1], social[0]);
+  additionalData?.socials?.forEach(social => {
+    vcard.addSocial(
+      `https://${social.url.replace(/^https?:\/\//, '')}`,
+      social.label,
+    );
   });
 
-  return { vCard: vcard, contactId: contactCard.profileId };
+  return {
+    vCard: vcard,
+    contact: {
+      profileId: contactCard.profileId,
+      webCardId: contactCard.webCardId,
+      lastName: contactCard.lastName,
+      firstName: contactCard.firstName,
+      company: contactCard.company,
+    },
+  };
 };

@@ -102,8 +102,8 @@ const PhotoWithTextAndTitleRenderer = ({
             >
               <CloudinaryImage
                 mediaId={image}
-                assetKind="module"
                 fill
+                sizes="100vw"
                 alt="TODO"
                 style={{
                   objectFit: 'cover',
@@ -140,6 +140,7 @@ const PhotoWithTextAndTitleRenderer = ({
                       ? `${titleFontSize * 1.2 + titleVerticalSpacing}px`
                       : undefined,
                   whiteSpace: 'pre-wrap',
+                  wordBreak: 'break-word',
                 }}
                 className={fontsMap[titleFontFamily].className}
               >
@@ -158,6 +159,7 @@ const PhotoWithTextAndTitleRenderer = ({
                       ? `${contentFontSize * 1.2 + contentVerticalSpacing}px`
                       : undefined,
                   whiteSpace: 'pre-wrap',
+                  wordBreak: 'break-word',
                 }}
                 className={fontsMap[contentFontFamily].className}
               >

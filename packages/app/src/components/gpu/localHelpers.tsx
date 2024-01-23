@@ -37,14 +37,14 @@ export const useEditionParametersDisplayInfos = (): ParametersInfo<{
           description: 'Contrast image edition parameters name',
         }),
       },
-      highlights: {
-        icon: 'brightness',
-        label: intl.formatMessage({
-          defaultMessage: 'Highlights',
-          description: 'Highlights image edition parameters name',
-        }),
-        kind: 'slider',
-      },
+      // highlights: {
+      //   icon: 'brightness',
+      //   label: intl.formatMessage({
+      //     defaultMessage: 'Highlights',
+      //     description: 'Highlights image edition parameters name',
+      //   }),
+      //   kind: 'slider',
+      // },
       saturation: {
         icon: 'saturation',
         label: intl.formatMessage({
@@ -127,13 +127,13 @@ export const editionParametersSettings: ParametersInfo<{
     step: 0.025,
     displayedValues: [-100, 100],
   },
-  highlights: {
-    defaultValue: 1,
-    min: 0,
-    max: 1,
-    step: 0.025,
-    displayedValues: [-100, 100],
-  },
+  // highlights: {
+  //   defaultValue: 1,
+  //   min: 0,
+  //   max: 1,
+  //   step: 0.025,
+  //   displayedValues: [-100, 100],
+  // },
   saturation: {
     defaultValue: 1,
     min: 0,
@@ -167,16 +167,29 @@ const getUri = (source: ImageSourcePropType) =>
   Image.resolveAssetSource(source)?.uri;
 
 export const FILTERS = {
-  'black-and-white': getUri(require('./assets/luts/black-and-white.png')),
-  eterna: getUri(require('./assets/luts/eterna.png')),
-  'deep-south': getUri(require('./assets/luts/deep-south.png')),
-  'gold-dust': getUri(require('./assets/luts/gold-dust.png')),
-  'bw1-cinematic': getUri(require('./assets/luts/BW1-Cinematic.png')),
-  'color1-portrait': getUri(require('./assets/luts/Color1_Portrait.png')),
-  Color3_Vintage: getUri(require('./assets/luts/Color3_Vintage.png')),
-  Color6_Azure: getUri(require('./assets/luts/Color6_Azure.png')),
-  Color9_Mosaic: getUri(require('./assets/luts/Color9_Mosaic.png')),
-  Sepia2_Harmony: getUri(require('./assets/luts/Sepia2_Harmony.png')),
+  nah: getUri(require('./assets/nah.png')),
+  once: getUri(require('./assets/once.png')),
+  passing_by: getUri(require('./assets/passing_by.png')),
+  serenity: getUri(require('./assets/serenity.png')),
+  solar: getUri(require('./assets/solar.png')),
+  undeniable: getUri(require('./assets/undeniable.png')),
+  undeniable2: getUri(require('./assets/undeniable2.png')),
+  you_can_do_it: getUri(require('./assets/you_can_do_it.png')),
+  pure: getUri(require('./assets/pure.png')),
+  syrah: getUri(require('./assets/syrah.png')),
+  paper: getUri(require('./assets/paper.png')),
+  rock: getUri(require('./assets/rock.png')),
+  vouzon: getUri(require('./assets/vouzon.png')),
+  // BIG UP @mlecoq
+  transparency: getUri(require('./assets/transparency.png')),
+  autumn: getUri(require('./assets/autumn.png')),
+  one_of_us: getUri(require('./assets/one_of_us.png')),
+  bourbon: getUri(require('./assets/bourbon.png')),
+  black_and_white_light: getUri(require('./assets/black_and_white_light.png')),
+  black_and_white_neutral: getUri(
+    require('./assets/black_and_white_neutral.png'),
+  ),
+  black_and_white_old: getUri(require('./assets/black_and_white_old.png')),
 } as const;
 
 export type Filter = keyof typeof FILTERS;
@@ -188,45 +201,86 @@ export const useFilterLabels = (): Record<Filter, string> => {
   const intl = useIntl();
   return useMemo(
     () => ({
-      eterna: intl.formatMessage({
-        defaultMessage: 'Eterna',
-        description: 'Eterna photo filter name',
+      nah: intl.formatMessage({
+        defaultMessage: 'Nah',
+        description: 'Nah filter name',
       }),
-      'deep-south': intl.formatMessage({
-        defaultMessage: 'Deep South',
-        description: 'Deep South photo filter name',
+      once: intl.formatMessage({
+        defaultMessage: 'Once',
+        description: 'Once filter name',
       }),
-      'gold-dust': intl.formatMessage({
-        defaultMessage: 'Gold Dust',
-        description: 'Gold Dust photo filter name',
+      passing_by: intl.formatMessage({
+        defaultMessage: 'Passing by',
+        description: 'Passing by filter name',
       }),
-      'color1-portrait': intl.formatMessage({
-        defaultMessage: 'Color1 Portrait',
-        description: 'Color1 Portrait photo filter name',
+      serenity: intl.formatMessage({
+        defaultMessage: 'Serenity',
+        description: 'Serenity filter name',
       }),
-      Color3_Vintage: intl.formatMessage({
-        defaultMessage: 'Color3_Vintage',
-        description: 'Color3_Vintage photo filter name',
+      solar: intl.formatMessage({
+        defaultMessage: 'Solar',
+        description: 'Solar filter name',
       }),
-      Color6_Azure: intl.formatMessage({
-        defaultMessage: 'Color6_Azure',
-        description: 'Color6_Azure photo filter name',
+      undeniable: intl.formatMessage({
+        defaultMessage: 'Undeniable',
+        description: 'Undeniable filter name',
       }),
-      Color9_Mosaic: intl.formatMessage({
-        defaultMessage: 'Color9_Mosaic',
-        description: 'Color9_Mosaic photo filter name',
+      undeniable2: intl.formatMessage({
+        defaultMessage: 'Undeniable 2',
+        description: 'Undeniable 2 filter name',
       }),
-      Sepia2_Harmony: intl.formatMessage({
-        defaultMessage: 'Sepia2_Harmony',
-        description: 'Sepia2_Harmonyphoto filter name',
+      you_can_do_it: intl.formatMessage({
+        defaultMessage: 'You can do it',
+        description: 'You can do it filter name',
       }),
-      'black-and-white': intl.formatMessage({
-        defaultMessage: 'Black & White',
-        description: 'Black & White photo filter name',
+      pure: intl.formatMessage({
+        defaultMessage: 'Pure',
+        description: 'Pure filter name',
       }),
-      'bw1-cinematic': intl.formatMessage({
-        defaultMessage: 'BW1 Cinematic',
-        description: 'BW1 Cinematic photo filter name',
+      syrah: intl.formatMessage({
+        defaultMessage: 'Syrah',
+        description: 'Syrah filter name',
+      }),
+      paper: intl.formatMessage({
+        defaultMessage: 'Paper',
+        description: 'Paper filter name',
+      }),
+      rock: intl.formatMessage({
+        defaultMessage: 'Rock',
+        description: 'Rock filter name',
+      }),
+      vouzon: intl.formatMessage({
+        defaultMessage: 'Vouzon',
+        description: 'Vouzon filter name',
+      }),
+      // BIG UP @mlecoq
+      transparency: intl.formatMessage({
+        defaultMessage: 'Transparency',
+        description: 'Transparency filter name',
+      }),
+      autumn: intl.formatMessage({
+        defaultMessage: 'Autumn',
+        description: 'Autaumn filter name',
+      }),
+      one_of_us: intl.formatMessage({
+        defaultMessage: 'One of us',
+        description: 'One of us filter name',
+      }),
+      bourbon: intl.formatMessage({
+        defaultMessage: 'Bourbon',
+        description: 'Bourbon filter name',
+      }),
+      black_and_white_light: intl.formatMessage({
+        defaultMessage: 'B&W light',
+        description: 'B&W light filter name',
+      }),
+      black_and_white_neutral: intl.formatMessage({
+        defaultMessage: 'B&W neutral',
+        description: 'B&W neutral filter name',
+      }),
+      black_and_white_old: intl.formatMessage({
+        defaultMessage: 'B&W old',
+        description: 'B&W old filter name',
       }),
     }),
     [intl],

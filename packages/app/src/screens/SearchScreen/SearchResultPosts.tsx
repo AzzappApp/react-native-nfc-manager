@@ -8,15 +8,15 @@ import { colors } from '#theme';
 import PostsGrid from '#components/PostList/PostsGrid';
 import SkeletonPlaceholder from '#components/Skeleton';
 import ListLoadingFooter from '#ui/ListLoadingFooter';
-import type { PostsGrid_posts$key } from '@azzapp/relay/artifacts/PostsGrid_posts.graphql';
-import type { SearchResultPosts_viewer$key } from '@azzapp/relay/artifacts/SearchResultPosts_viewer.graphql';
-import type { SearchResultPostsQuery } from '@azzapp/relay/artifacts/SearchResultPostsQuery.graphql';
+import type { PostsGrid_posts$key } from '#relayArtifacts/PostsGrid_posts.graphql';
+import type { SearchResultPosts_profile$key } from '#relayArtifacts/SearchResultPosts_profile.graphql';
+import type { SearchResultPostsQuery } from '#relayArtifacts/SearchResultPostsQuery.graphql';
 import type { PreloadedQuery } from 'react-relay';
 
 export const searchResultPostsQuery = graphql`
-  query SearchResultPostsQuery($search: String!) {
-    viewer {
-      ...SearchResultPosts_viewer @arguments(search: $search)
+  query SearchResultPostsQuery($search: String!, $profileId: ID!) {
+    profile: node(id: $profileId) {
+      ...SearchResultPosts_profile @arguments(search: $search)
     }
   }
 `;
@@ -35,9 +35,12 @@ const SearchResultPosts = ({
     queryReference,
   );
   const { data, loadNext, isLoadingNext, hasNext, refetch } =
-    usePaginationFragment<SearchResultPostsQuery, SearchResultPosts_viewer$key>(
+    usePaginationFragment<
+      SearchResultPostsQuery,
+      SearchResultPosts_profile$key
+    >(
       graphql`
-        fragment SearchResultPosts_viewer on Viewer
+        fragment SearchResultPosts_profile on Profile
         @refetchable(queryName: "SearchResultPostsListQuery")
         @argumentDefinitions(
           after: { type: String }
@@ -58,7 +61,7 @@ const SearchResultPosts = ({
           }
         }
       `,
-      preloadedQuery.viewer,
+      preloadedQuery.profile,
     );
 
   const [refreshing, setRefreshing] = useState(false);
@@ -94,9 +97,9 @@ const SearchResultPosts = ({
 
   const posts: PostsGrid_posts$key = useMemo(() => {
     return convertToNonNullArray(
-      data.searchPosts?.edges?.map(edge => edge?.node) ?? [],
+      data?.searchPosts?.edges?.map(edge => edge?.node) ?? [],
     );
-  }, [data.searchPosts?.edges]);
+  }, [data?.searchPosts?.edges]);
 
   const ListFooterComponent = useMemo(() => {
     return <ListLoadingFooter loading={showLoadingIndicatorDebounced} />;

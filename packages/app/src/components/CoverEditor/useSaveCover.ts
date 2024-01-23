@@ -17,7 +17,6 @@ import {
   FILTERS,
   exportLayersToImage,
   exportLayersToVideo,
-  extractLayoutParameters,
   isFilter,
 } from '#components/gpu';
 import { getFileName } from '#helpers/fileHelpers';
@@ -26,26 +25,27 @@ import { uploadMedia, uploadSign } from '#helpers/MobileWebAPI';
 import useLatestCallback from '#hooks/useLatestCallback';
 import type { EditionParameters } from '#components/gpu';
 import type { ExportImageOptions } from '#components/gpu/GPUHelpers';
+import type { useSaveCover_webCard$key } from '#relayArtifacts/useSaveCover_webCard.graphql';
+import type {
+  SaveCoverInput,
+  useSaveCoverMutation,
+} from '#relayArtifacts/useSaveCoverMutation.graphql';
 import type {
   CoverStyleData,
   MaskMedia,
   SourceMedia,
 } from './coverEditorTypes';
-import type { useSaveCover_profile$key } from '@azzapp/relay/artifacts/useSaveCover_profile.graphql';
-import type {
-  SaveCoverInput,
-  useSaveCoverMutation,
-} from '@azzapp/relay/artifacts/useSaveCoverMutation.graphql';
 import type { ColorPalette } from '@azzapp/shared/cardHelpers';
 
 const useSaveCover = (
-  profile: useSaveCover_profile$key | null,
+  webCard: useSaveCover_webCard$key | null,
   onCoverSaved: () => void,
 ) => {
   const onCoverSavedInner = useLatestCallback(onCoverSaved);
-  const { cardCover } = useFragment(
+  const { id: webCardId, cardCover } = useFragment(
     graphql`
-      fragment useSaveCover_profile on Profile {
+      fragment useSaveCover_webCard on WebCard {
+        id
         cardCover {
           mediaParameters
           mediaFilter
@@ -53,20 +53,19 @@ const useSaveCover = (
             id
           }
           segmented
-          merged
         }
       }
     `,
-    profile,
+    webCard,
   ) ?? { cardCover: null };
 
   const [commit] = useMutation<useSaveCoverMutation>(graphql`
     mutation useSaveCoverMutation($saveCoverInput: SaveCoverInput!) {
       saveCover(input: $saveCoverInput) {
-        profile {
+        webCard {
           id
-          ...CoverRenderer_profile
-          ...useSaveCover_profile
+          ...CoverRenderer_webCard
+          ...useSaveCover_webCard
           cardCover {
             media {
               id
@@ -87,36 +86,42 @@ const useSaveCover = (
       title: string | null,
       subTitle: string | null,
       coverStyle: CoverStyleData,
-      maskMedia: MaskMedia | null,
-      mediaCropParameters: EditionParameters,
       sourceMedia: SourceMedia,
+      maskMedia: MaskMedia | null | undefined,
+      mediaCropParameters: EditionParameters | null | undefined,
       colorPalette: ColorPalette,
       otherColors: readonly string[],
     ) => {
+      if (!webCardId) {
+        return;
+      }
       setProgressIndicator(Observable.from(0));
 
       let saveCoverInput: SaveCoverInput;
       let mediaPath: string | null = null;
 
       const mediaParameters = {
-        ...extractLayoutParameters(coverStyle.mediaParameters)[1],
+        ...coverStyle.mediaParameters,
         ...mediaCropParameters,
       };
+
       try {
         saveCoverInput = {
+          webCardId,
           backgroundId: coverStyle.background?.id ?? null,
           backgroundColor: coverStyle.backgroundColor,
           backgroundPatternColor: coverStyle.backgroundPatternColor,
           foregroundId: coverStyle.foreground?.id ?? null,
           foregroundColor: coverStyle.foregroundColor,
           mediaFilter: coverStyle.mediaFilter,
+          mediaAnimation: coverStyle.mediaAnimation,
           mediaParameters,
-          merged: coverStyle.merged,
           segmented: coverStyle.segmented,
           subTitle: subTitle ?? null,
           subTitleStyle: coverStyle.subTitleStyle,
           textOrientation: coverStyle.textOrientation,
           textPosition: coverStyle.textPosition,
+          textAnimation: coverStyle.textAnimation,
           title,
           titleStyle: coverStyle.titleStyle,
         };
@@ -224,7 +229,7 @@ const useSaveCover = (
                   mime.lookup(fileName) || media.kind === 'image'
                     ? isPNG(media.uri)
                       ? 'image/png'
-                      : 'image/jpg'
+                      : 'image/jpeg'
                     : 'video/mp4',
               } as any,
               uploadURL,
@@ -277,6 +282,7 @@ const useSaveCover = (
       }
 
       saveCoverInput.cardColors = {
+        webCardId,
         primary: colorPalette.primary,
         dark: colorPalette.dark,
         light: colorPalette.light,
@@ -289,7 +295,7 @@ const useSaveCover = (
         },
         onCompleted: response => {
           if (mediaPath) {
-            const mediaId = response.saveCover.profile.cardCover?.media?.id;
+            const mediaId = response.saveCover.webCard.cardCover?.media?.id;
             if (mediaId) {
               addLocalCachedMediaFile(
                 mediaId,
@@ -315,7 +321,7 @@ const useSaveCover = (
         },
       });
     },
-    [commit, cardCover, onCoverSavedInner, intl],
+    [webCardId, commit, cardCover, intl, onCoverSavedInner],
   );
 
   return {

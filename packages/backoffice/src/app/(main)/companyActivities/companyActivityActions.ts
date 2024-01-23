@@ -3,7 +3,7 @@ import { asc, eq } from 'drizzle-orm';
 import { revalidatePath } from 'next/cache';
 import {
   CardModuleTable,
-  ProfileTable,
+  WebCardTable,
   createCompanyActivity,
   db,
   updateCompanyActivity,
@@ -15,8 +15,8 @@ export const getModulesData = async (profileUserName: string) => {
   const res = await db
     .select()
     .from(CardModuleTable)
-    .innerJoin(ProfileTable, eq(ProfileTable.id, CardModuleTable.profileId))
-    .where(eq(ProfileTable.userName, profileUserName))
+    .innerJoin(WebCardTable, eq(WebCardTable.id, CardModuleTable.webCardId))
+    .where(eq(WebCardTable.userName, profileUserName))
     .orderBy(asc(CardModuleTable.position));
 
   if (res.length < 1) return null;

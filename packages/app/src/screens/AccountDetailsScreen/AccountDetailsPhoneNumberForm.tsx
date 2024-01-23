@@ -18,27 +18,6 @@ import TextInput from '#ui/TextInput';
 import type { GraphQLError } from 'graphql';
 import type { CountryCode } from 'libphonenumber-js';
 
-const phoneNumberFormSchema = z
-  .object({
-    phoneNumber: z.string().min(1),
-    countryCode: z.string().min(1),
-  })
-  .refine(
-    ({ phoneNumber, countryCode }) => {
-      return (
-        phoneNumber &&
-        countryCode &&
-        isPhoneNumber(phoneNumber, countryCode as CountryCode)
-      );
-    },
-    val => ({
-      message: `${val.phoneNumber} is not a valid phone number for country ${val.countryCode}`,
-      path: ['phoneNumber'],
-    }),
-  );
-
-type PhoneNumberForm = z.infer<typeof phoneNumberFormSchema>;
-
 const AccountDetailsPhoneNumberForm = ({
   currentUser,
   visible,
@@ -51,6 +30,28 @@ const AccountDetailsPhoneNumberForm = ({
     phoneNumber: string | null;
   };
 }) => {
+  const hasEmail = currentUser.email != null;
+
+  const phoneNumberFormSchema = z
+    .object({
+      phoneNumber: hasEmail ? z.string().optional() : z.string().min(1),
+      countryCode: z.string().min(1),
+    })
+    .refine(
+      ({ phoneNumber, countryCode }) => {
+        if (hasEmail && !phoneNumber) return true;
+        return (
+          phoneNumber &&
+          countryCode &&
+          isPhoneNumber(phoneNumber, countryCode as CountryCode)
+        );
+      },
+      val => ({
+        message: `${val.phoneNumber} is not a valid phone number for country ${val.countryCode}`,
+        path: ['phoneNumber'],
+      }),
+    );
+
   const parsedPhoneNumber =
     currentUser.phoneNumber && isValidPhoneNumber(currentUser.phoneNumber)
       ? parsePhoneNumber(currentUser.phoneNumber)
@@ -62,15 +63,20 @@ const AccountDetailsPhoneNumberForm = ({
     control,
     handleSubmit,
     setError,
+    clearErrors,
     formState: { isSubmitting, errors },
-  } = useForm<PhoneNumberForm>({
-    resolver: zodResolver(phoneNumberFormSchema),
+  } = useForm<z.infer<typeof phoneNumberFormSchema>>({
+    resolver: (data, context, options) => {
+      clearErrors();
+      return zodResolver(phoneNumberFormSchema)(data, context, options);
+    },
     defaultValues: {
       phoneNumber: parsedPhoneNumber?.formatNational() ?? '',
       countryCode:
         parsedPhoneNumber?.country ??
         (country in COUNTRY_FLAG ? country : COUNTRY_FLAG.AC),
     },
+    mode: 'onChange',
   });
 
   const intl = useIntl();
@@ -80,10 +86,13 @@ const AccountDetailsPhoneNumberForm = ({
   const [commitMutation] = useUpdateUser();
 
   const submit = handleSubmit(async ({ phoneNumber, countryCode }) => {
-    const storedPhoneNumber = parsePhoneNumber(
-      phoneNumber,
-      countryCode as CountryCode,
-    ).formatInternational();
+    let storedPhoneNumber: string | null = null;
+    if (phoneNumber) {
+      storedPhoneNumber = parsePhoneNumber(
+        phoneNumber,
+        countryCode as CountryCode,
+      ).formatInternational();
+    }
 
     commitMutation({
       variables: {

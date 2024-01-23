@@ -74,8 +74,8 @@ const BlockTextMarginsEditionPanel = ({
       <View style={styles.paramContainer}>
         <LabeledDashedSlider
           label={intl.formatMessage({
-            defaultMessage: 'Text margin :',
-            description: 'Text margin message in BlockText edition',
+            defaultMessage: 'Text top/bottom margin :',
+            description: 'Text top/bottom margin message in BlockText edition',
           })}
           initialValue={textMarginVertical}
           min={0}

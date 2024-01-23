@@ -1,31 +1,36 @@
 import { GraphQLError } from 'graphql';
-import { fromGlobalId } from 'graphql-relay';
 import ERRORS from '@azzapp/shared/errors';
 import {
-  incrementContactCardScans,
-  updateStatistics,
   incrementWebCardViews,
+  incrementContactCardScans,
+  db,
+  updateContactCardTotalScans,
 } from '#domains';
+import fromGlobalIdWithType from '#helpers/relayIdHelpers';
 import type { MutationResolvers } from '#schema/__generated__/types';
 
-const updateWebcardViews: MutationResolvers['updateWebcardViews'] = async (
+const updateWebCardViews: MutationResolvers['updateWebCardViews'] = async (
   _,
-  { input: { id } },
-  { auth },
+  { input: { webCardId: gqlWebCardId, profileId: gqlProfileId } },
+  { loaders },
 ) => {
-  const { profileId } = auth;
+  const webCardId = fromGlobalIdWithType(gqlWebCardId, 'WebCard');
 
-  if (!profileId) {
-    throw new GraphQLError(ERRORS.UNAUTORIZED);
-  }
+  const profileId = gqlProfileId
+    ? fromGlobalIdWithType(gqlProfileId, 'Profile')
+    : null;
 
-  const { id: targetId, type } = fromGlobalId(id);
-  if (type !== 'Profile') {
+  const profile = profileId ? await loaders.Profile.load(profileId) : null;
+
+  const webCard = await loaders.WebCard.load(webCardId);
+
+  if (!webCard) {
     throw new GraphQLError(ERRORS.INVALID_REQUEST);
   }
+
   try {
-    if (targetId !== profileId) {
-      await incrementWebCardViews(profileId);
+    if (profile?.webCardId !== webCardId) {
+      await incrementWebCardViews(webCardId);
     }
 
     return true;
@@ -34,23 +39,34 @@ const updateWebcardViews: MutationResolvers['updateWebcardViews'] = async (
   }
 };
 
-const updateContactcardScans: MutationResolvers['updateContactcardScans'] =
-  async (_, { input: { id } }, { auth }) => {
-    const { profileId } = auth;
+const updateContactCardScans: MutationResolvers['updateContactCardScans'] =
+  async (
+    _,
+    {
+      input: { scannedProfileId: gqlScannedProfileId, profileId: gqlProfileId },
+    },
+    { loaders },
+  ) => {
+    const scannedProfileId = fromGlobalIdWithType(
+      gqlScannedProfileId,
+      'Profile',
+    );
+    const profileId = gqlProfileId
+      ? fromGlobalIdWithType(gqlProfileId, 'Profile')
+      : null;
 
-    if (!profileId) {
-      throw new GraphQLError(ERRORS.UNAUTORIZED);
-    }
+    const scannedProfile = loaders.Profile.load(scannedProfileId);
 
-    const { id: targetId, type } = fromGlobalId(id);
-
-    if (type !== 'Profile') {
+    if (!scannedProfile) {
       throw new GraphQLError(ERRORS.INVALID_REQUEST);
     }
 
     try {
-      if (targetId !== profileId) {
-        await incrementContactCardScans(targetId);
+      if (scannedProfileId !== profileId) {
+        await db.transaction(async tx => {
+          await updateContactCardTotalScans(scannedProfileId, tx);
+          await incrementContactCardScans(scannedProfileId, true, tx);
+        });
       }
 
       return true;
@@ -59,31 +75,4 @@ const updateContactcardScans: MutationResolvers['updateContactcardScans'] =
     }
   };
 
-const updateLikes: MutationResolvers['updateLikes'] = async (
-  _,
-  { input: { id } },
-  { auth },
-) => {
-  const { profileId } = auth;
-
-  if (!profileId) {
-    throw new GraphQLError(ERRORS.UNAUTORIZED);
-  }
-
-  const { id: targetId, type } = fromGlobalId(id);
-
-  if (type !== 'Profile') {
-    throw new GraphQLError(ERRORS.INVALID_REQUEST);
-  }
-  try {
-    if (targetId !== profileId) {
-      await updateStatistics(targetId, 'likes', true);
-    }
-
-    return true;
-  } catch (error) {
-    throw new GraphQLError(ERRORS.INTERNAL_SERVER_ERROR);
-  }
-};
-
-export { updateWebcardViews, updateContactcardScans, updateLikes };
+export { updateWebCardViews, updateContactCardScans };

@@ -17,6 +17,7 @@ jest.mock('#helpers/localeHelpers', () => ({
     },
   ],
   useCurrentLocale: () => 'en',
+  getCurrentLocale: () => 'en',
 }));
 
 jest.mock('#helpers/MobileWebAPI');
@@ -58,6 +59,8 @@ describe('SignUpScreen', () => {
     signupMock.mockResolvedValueOnce({
       token: 'fake-token',
       refreshToken: 'fake-refreshToken',
+      profileInfos: null,
+      userId: '',
     });
     dispatchGlobalEventMock.mockResolvedValueOnce(void 0);
 
@@ -75,6 +78,7 @@ describe('SignUpScreen', () => {
     expect(signupMock).toHaveBeenCalledWith({
       email: 'test@azzaap.com',
       password: 'AZEqsd81',
+      locale: 'en',
     });
     expect(submitButton).toHaveAccessibilityState({ busy: true });
 
@@ -95,6 +99,8 @@ describe('SignUpScreen', () => {
     signupMock.mockResolvedValueOnce({
       token: 'fake-token',
       refreshToken: 'fake-refreshToken',
+      profileInfos: null,
+      userId: '',
     });
 
     const emailOrCountryButton = screen.getByLabelText(
@@ -121,6 +127,7 @@ describe('SignUpScreen', () => {
     expect(signupMock).toHaveBeenCalledWith({
       phoneNumber: '+1 212 688 0188',
       password: 'AZEqsd81',
+      locale: 'en',
     });
 
     expect(submitButton).toHaveAccessibilityState({ busy: true });
@@ -207,7 +214,7 @@ describe('SignUpScreen', () => {
     act(() => fireEvent(checkboxes[1], 'onPress'));
 
     const passwordError =
-      'Password should contain at least 8 characters, a number, an uppercase letter and a lowercase letter';
+      'Password should contain at least 8 characters and at most 32 characters, a number, an uppercase letter and a lowercase letter';
     expect(screen.queryByText(passwordError)).not.toBeTruthy();
 
     act(() => fireEvent(submitButton, 'onPress'));

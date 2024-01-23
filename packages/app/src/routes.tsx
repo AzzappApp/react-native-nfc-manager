@@ -1,6 +1,12 @@
 import { isEqual } from 'lodash';
 import type { ModuleKind } from '@azzapp/shared/cardModuleHelpers';
+import type { ContactCard } from '@azzapp/shared/contactCardHelpers';
 import type { LayoutRectangle } from 'react-native';
+
+export type AboutRoute = {
+  route: 'ABOUT';
+  params?: never;
+};
 
 export type HomeRoute = {
   route: 'HOME';
@@ -39,21 +45,22 @@ export type ForgotPasswordConfirmationRoute = {
   };
 };
 
-export type NewProfileRoute = {
-  route: 'NEW_PROFILE';
+export type NewWebCardRoute = {
+  route: 'NEW_WEBCARD';
   params?: {
-    profileId: string;
+    webCardId: string;
   };
 };
 
-export type ProfileRoute = {
-  route: 'PROFILE';
+export type WebCardRoute = {
+  route: 'WEBCARD';
   params: {
     userName: string;
-    profileId?: string;
+    webCardId?: string;
     fromRectangle?: LayoutRectangle;
     showPosts?: boolean;
     contactData?: string | null;
+    additionalContactData?: Pick<ContactCard, 'socials' | 'urls'>;
     editing?: boolean;
   };
 };
@@ -113,9 +120,7 @@ export type LikedPostsRoute = {
 
 export type AccountDetailsRoute = {
   route: 'ACCOUNT_DETAILS';
-  params: {
-    withProfile: boolean;
-  };
+  params?: never;
 };
 
 export type InviteFriendsRoute = {
@@ -141,7 +146,23 @@ export type OnboardingRoute = {
   params?: never;
 };
 
+export type MultiUserRoute = {
+  route: 'MULTI_USER';
+  params?: never;
+};
+
+export type MultiUserAddRoute = {
+  route: 'MULTI_USER_ADD';
+  params?: never;
+};
+
+export type WebCardParametersRoute = {
+  route: 'WEBCARD_PARAMETERS';
+  params?: never;
+};
+
 export type Route =
+  | AboutRoute
   | AccountDetailsRoute
   | CardModuleEditionRoute
   | ContactCardRoute
@@ -155,16 +176,19 @@ export type Route =
   | InviteFriendsRoute
   | LikedPostsRoute
   | MediaRoute
+  | MultiUserAddRoute
+  | MultiUserRoute
   | NewPostRoute
-  | NewProfileRoute
+  | NewWebCardRoute
   | OnboardingRoute
   | PostCommentsRoute
   | PostRoute
-  | ProfileRoute
   | ResetPasswordRoute
   | SearchRoute
   | SignInRoute
-  | SignUpRoute;
+  | SignUpRoute
+  | WebCardParametersRoute
+  | WebCardRoute;
 
 export type ROUTES = Route['route'];
 
@@ -175,10 +199,10 @@ export const isRouteEqual = (route: Route, compareRoute: Route) => {
   if (route.route === 'POST' && compareRoute.route === 'POST') {
     return route.params.postId === compareRoute.params.postId;
   }
-  if (route.route === 'PROFILE' && compareRoute.route === 'PROFILE') {
+  if (route.route === 'WEBCARD' && compareRoute.route === 'WEBCARD') {
     return (
       route.params.userName === compareRoute.params.userName &&
-      route.params.profileId === compareRoute.params.profileId
+      route.params.webCardId === compareRoute.params.webCardId
     );
   }
   return isEqual(route.params, compareRoute.params);

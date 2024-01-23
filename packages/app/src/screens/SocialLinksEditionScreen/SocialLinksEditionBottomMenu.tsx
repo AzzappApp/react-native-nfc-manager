@@ -51,14 +51,6 @@ const SocialLinksEditionBottomMenu = (
               description: 'SocialLinks bottom menu label for Background tab',
             }),
           },
-          {
-            key: 'preview',
-            icon: 'preview',
-            label: intl.formatMessage({
-              defaultMessage: 'Preview',
-              description: 'SocialLinks bottom menu label for Preview tab',
-            }),
-          },
         ],
         [intl],
       )}

@@ -1,5 +1,5 @@
 import { style } from '@vanilla-extract/css';
-import { textMedium, vars } from '#app/theme.css';
+import { textMedium, vars } from '#app/[userName]/theme.css';
 
 const input = style([
   textMedium,

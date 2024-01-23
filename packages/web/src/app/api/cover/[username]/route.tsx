@@ -1,7 +1,7 @@
-import { ImageResponse } from '@vercel/og';
-import cx from 'classnames';
+import * as Sentry from '@sentry/nextjs';
+import { ImageResponse } from 'next/og';
 import { NextResponse, type NextRequest } from 'next/server';
-import { getMediasByIds, getProfileByUserName } from '@azzapp/data/domains';
+import { getWebCardByUserNameWithRedirection } from '@azzapp/data/domains';
 import { swapColor, DEFAULT_COLOR_PALETTE } from '@azzapp/shared/cardHelpers';
 import {
   COVER_BASE_WIDTH,
@@ -14,14 +14,129 @@ import {
   DEFAULT_COVER_TEXT_COLOR,
 } from '@azzapp/shared/coverHelpers';
 import ERRORS from '@azzapp/shared/errors';
-import { decodeMediaId } from '@azzapp/shared/imagesHelpers';
 import coverTextStyle from '#components/renderer/CoverRenderer/CoverTextRenderer.css';
-import styles from '../../../../components/renderer/CoverRenderer/CoverRenderer.css';
+import { CROP, buildCoverImageUrl } from '#helpers/cover';
+import { fontsMap } from '#helpers/fonts';
+import type { Crop } from '#helpers/cover';
 
 export const runtime = 'edge';
 
-const CLOUDINARY_CLOUDNAME = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME!;
-const CLOUDINARY_BASE_URL = `https://res.cloudinary.com/${CLOUDINARY_CLOUDNAME}`;
+const fontsUrlMap = {
+  AmaticSC_Bold:
+    'https://cdn.jsdelivr.net/fontsource/fonts/amatic-sc@latest/latin-700-normal.ttf',
+  AmaticSC_Regular:
+    'https://cdn.jsdelivr.net/fontsource/fonts/amatic-sc@latest/latin-400-normal.ttf',
+  Anton_Regular:
+    'https://cdn.jsdelivr.net/fontsource/fonts/anton@latest/latin-400-normal.ttf',
+  Archivo_Black:
+    'https://cdn.jsdelivr.net/fontsource/fonts/archivo-black@latest/latin-400-normal.ttf',
+  Archivo_Light:
+    'https://cdn.jsdelivr.net/fontsource/fonts/archivo@latest/latin-300-normal.ttf',
+  BebasNeue_Regular:
+    'https://cdn.jsdelivr.net/fontsource/fonts/bebas-neue@latest/latin-400-normal.ttf',
+  Cardo_Regular:
+    'https://cdn.jsdelivr.net/fontsource/fonts/cardo@latest/latin-400-normal.ttf',
+  Cinzel_Regular:
+    'https://cdn.jsdelivr.net/fontsource/fonts/cinzel@latest/latin-400-normal.ttf',
+  CormorantGaramond_Bold:
+    'https://cdn.jsdelivr.net/fontsource/fonts/cormorant-garamond@latest/latin-700-normal.ttf',
+  CourrierPrime_Regular:
+    'https://cdn.jsdelivr.net/fontsource/fonts/courier-prime@latest/latin-400-normal.ttf',
+  DMSerifDisplay_Regular:
+    'https://cdn.jsdelivr.net/fontsource/fonts/dm-serif-display@latest/latin-400-normal.ttf',
+  FaunaOne_Regular:
+    'https://cdn.jsdelivr.net/fontsource/fonts/fauna-one@latest/latin-400-normal.ttf',
+  Fraunces_Light:
+    'https://cdn.jsdelivr.net/fontsource/fonts/fraunces@latest/latin-400-normal.ttf',
+  GildaDisplay_Regular:
+    'https://cdn.jsdelivr.net/fontsource/fonts/gilda-display@latest/latin-400-normal.ttf',
+  Gloock_Regular:
+    'https://cdn.jsdelivr.net/fontsource/fonts/gloock@latest/latin-400-normal.ttf',
+  GreatVibes_Regular:
+    'https://cdn.jsdelivr.net/fontsource/fonts/great-vibes@latest/latin-400-normal.ttf',
+  Inter_Regular:
+    'https://cdn.jsdelivr.net/fontsource/fonts/inter@latest/latin-400-normal.ttf',
+  Inter_Medium:
+    'https://cdn.jsdelivr.net/fontsource/fonts/inter@latest/latin-500-normal.ttf',
+  Inter_SemiBold:
+    'https://cdn.jsdelivr.net/fontsource/fonts/inter@latest/latin-600-normal.ttf',
+  Inter_Black:
+    'https://cdn.jsdelivr.net/fontsource/fonts/inter@latest/latin-900-normal.ttf',
+  JosefinSans_Regular:
+    'https://cdn.jsdelivr.net/fontsource/fonts/josefin-sans@latest/latin-400-normal.ttf',
+  Jost_Regular:
+    'https://cdn.jsdelivr.net/fontsource/fonts/jost@latest/latin-400-normal.ttf',
+  Kaushan_Regular:
+    'https://cdn.jsdelivr.net/fontsource/fonts/kaushan-script@latest/latin-400-normal.ttf',
+  Koulen_Regular:
+    'https://cdn.jsdelivr.net/fontsource/fonts/koulen@latest/latin-400-normal.ttf',
+  Lexend_ExtraBold:
+    'https://cdn.jsdelivr.net/fontsource/fonts/lexend@latest/latin-800-normal.ttf',
+  LibreBaskerville_Italic:
+    'https://cdn.jsdelivr.net/fontsource/fonts/libre-baskerville@latest/latin-400-italic.ttf',
+  LibreCaslonDisplay_Regular:
+    'https://cdn.jsdelivr.net/fontsource/fonts/libre-caslon-display@latest/latin-400-normal.ttf',
+  LibreCaslonText_Regular:
+    'https://cdn.jsdelivr.net/fontsource/fonts/libre-caslon-text@latest/latin-400-normal.ttf',
+  Limelight_Regular:
+    'https://cdn.jsdelivr.net/fontsource/fonts/limelight@latest/latin-400-normal.ttf',
+  Lora_Regular:
+    'https://cdn.jsdelivr.net/fontsource/fonts/lora@latest/latin-400-normal.ttf',
+  Lora_Bold:
+    'https://cdn.jsdelivr.net/fontsource/fonts/lora@latest/latin-700-normal.ttf',
+  Manrope_ExtraLight:
+    'https://cdn.jsdelivr.net/fontsource/fonts/manrope@latest/latin-200-normal.ttf',
+  Manrope_Light:
+    'https://cdn.jsdelivr.net/fontsource/fonts/manrope@latest/latin-300-normal.ttf',
+  Manrope_Regular:
+    'https://cdn.jsdelivr.net/fontsource/fonts/manrope@latest/latin-400-normal.ttf',
+  Monoton_Regular:
+    'https://cdn.jsdelivr.net/fontsource/fonts/monoton@latest/latin-400-normal.ttf',
+  Montserrat_Regular:
+    'https://cdn.jsdelivr.net/fontsource/fonts/montserrat@latest/latin-400-normal.ttf',
+  Montserrat_SemiBold:
+    'https://cdn.jsdelivr.net/fontsource/fonts/montserrat@latest/latin-500-normal.ttf',
+  MrDafoe_Regular:
+    'https://cdn.jsdelivr.net/fontsource/fonts/mr-dafoe@latest/latin-400-normal.ttf',
+  OpenSans_Regular:
+    'https://cdn.jsdelivr.net/fontsource/fonts/open-sans@latest/latin-400-normal.ttf',
+  Outfit_Medium:
+    'https://cdn.jsdelivr.net/fontsource/fonts/outfit@latest/latin-500-normal.ttf',
+  PlayfairDisplay_Bold:
+    'https://cdn.jsdelivr.net/fontsource/fonts/playfair-display@latest/latin-700-normal.ttf',
+  'Plus-Jakarta_Light':
+    'https://cdn.jsdelivr.net/fontsource/fonts/plus-jakarta-sans@latest/latin-300-normal.ttf',
+  'Plus-Jakarta_ExtraBold':
+    'https://cdn.jsdelivr.net/fontsource/fonts/plus-jakarta-sans@latest/latin-900-normal.ttf',
+  Poppins_Regular:
+    'https://cdn.jsdelivr.net/fontsource/fonts/poppins@latest/latin-400-normal.ttf',
+  Poppins_SemiBold:
+    'https://cdn.jsdelivr.net/fontsource/fonts/poppins@latest/latin-600-normal.ttf',
+  Poppins_Bold:
+    'https://cdn.jsdelivr.net/fontsource/fonts/poppins@latest/latin-700-normal.ttf',
+  Poppins_Black:
+    'https://cdn.jsdelivr.net/fontsource/fonts/poppins@latest/latin-900-normal.ttf',
+  Raleway_Regular:
+    'https://cdn.jsdelivr.net/fontsource/fonts/raleway@latest/latin-400-normal.ttf',
+  Rubik_Bold:
+    'https://cdn.jsdelivr.net/fontsource/fonts/rubik@latest/latin-700-normal.ttf',
+  Righteous_Regular:
+    'https://cdn.jsdelivr.net/fontsource/fonts/righteous@latest/latin-400-normal.ttf',
+  Rye_Regular:
+    'https://cdn.jsdelivr.net/fontsource/fonts/rye@latest/latin-400-normal.ttf',
+  SeaweedScript_Regular:
+    'https://cdn.jsdelivr.net/fontsource/fonts/seaweed-script@latest/latin-400-normal.ttf',
+  SixCaps_Regular:
+    'https://cdn.jsdelivr.net/fontsource/fonts/six-caps@latest/latin-400-normal.ttf',
+  SourcePro_Regular:
+    'https://cdn.jsdelivr.net/fontsource/fonts/source-sans-pro@latest/latin-400-normal.ttf',
+  Ultra_Regular:
+    'https://cdn.jsdelivr.net/fontsource/fonts/ultra@latest/latin-400-normal.ttf',
+  WaterBrush_Regular:
+    'https://cdn.jsdelivr.net/fontsource/fonts/water-brush@latest/latin-400-normal.ttf',
+  YesevaOne_Regular:
+    'https://cdn.jsdelivr.net/fontsource/fonts/yeseva-one@latest/latin-400-normal.ttf',
+};
 
 export const GET = async (
   req: NextRequest,
@@ -34,7 +149,10 @@ export const GET = async (
   const { searchParams } = req.nextUrl;
   const paramWidth = searchParams.get('width');
   const paramHeight = searchParams.get('height');
-  const keepAspectRatio = searchParams.get('keepAspectRatio');
+  const paramCrop = searchParams.get('crop');
+
+  const crop =
+    paramCrop && CROP.includes(paramCrop as Crop) ? (paramCrop as Crop) : null;
 
   const foundWidth =
     paramWidth && !isNaN(parseFloat(paramWidth))
@@ -71,7 +189,7 @@ export const GET = async (
     height = width / COVER_RATIO;
   }
 
-  const imageWidth = keepAspectRatio ? height * COVER_RATIO : width;
+  const imageWidth = crop === 'lpad' ? height * COVER_RATIO : width;
 
   const scale = imageWidth / COVER_BASE_WIDTH;
 
@@ -79,42 +197,12 @@ export const GET = async (
     return NextResponse.json({ message: ERRORS.NOT_FOUND }, { status: 404 });
   }
 
-  const profile = await getProfileByUserName(username);
+  const webCard = await getWebCardByUserNameWithRedirection(username);
 
-  if (profile?.cardIsPublished) {
-    const { coverData, cardColors, coverTitle, coverSubTitle } = profile;
+  if (webCard?.cardIsPublished) {
+    const { coverData, cardColors, coverTitle, coverSubTitle } = webCard;
     const mediaId = coverData?.mediaId;
     if (mediaId) {
-      const [media] = await getMediasByIds([mediaId]);
-
-      const url = (width: number, height: number) =>
-        `${CLOUDINARY_BASE_URL}/${
-          media?.kind === 'video' ? 'video' : 'image'
-        }/upload${
-          coverData.backgroundId
-            ? `/u_${decodeMediaId(
-                coverData.backgroundId,
-              )}/fl_relative,w_1.0,e_colorize,co_rgb:${swapColor(
-                coverData.backgroundPatternColor ?? '#FFF',
-                cardColors,
-              ).replace('#', '')},b_rgb:${swapColor(
-                coverData.backgroundColor ?? 'light',
-                cardColors,
-              ).replace('#', '')}/fl_layer_apply`
-            : ''
-        }${
-          coverData.foregroundId
-            ? `/l_${decodeMediaId(
-                coverData.foregroundId,
-              )}/fl_relative,w_1.0,e_colorize,co_rgb:${swapColor(
-                coverData.foregroundColor ?? '#FFF',
-                cardColors,
-              ).replace('#', '')}/fl_layer_apply/`
-            : ''
-        }${
-          keepAspectRatio === 'left_pad' ? 'c_lpad' : 'c_fit'
-        },g_east,w_${width},h_${height},ar_1:1/${decodeMediaId(mediaId)}.png`;
-
       const orientation =
         coverData.textOrientation ?? DEFAULT_COVER_CONTENT_ORTIENTATION;
       const position = coverData.textPosition ?? DEFAULT_COVER_CONTENT_POSITION;
@@ -207,6 +295,59 @@ export const GET = async (
         }px`,
       } as const;
 
+      const titleFontData =
+        titleFontFamily in fontsUrlMap
+          ? await fetch(
+              fontsUrlMap[titleFontFamily as keyof typeof fontsUrlMap],
+            )
+              .then(res => {
+                return res.arrayBuffer();
+              })
+              .catch(err => {
+                Sentry.captureException(err);
+                return null;
+              })
+          : null;
+
+      const fonts = [];
+      if (titleFontData) {
+        fonts.push({
+          name: titleFontFamily,
+          data: titleFontData,
+          style:
+            fontsMap[titleFontFamily].style.fontStyle === 'italic'
+              ? ('italic' as const)
+              : ('normal' as const),
+        });
+      }
+
+      if (titleFontFamily !== subTitleFontFamily) {
+        const subTitleFontData =
+          subTitleFontFamily in fontsUrlMap
+            ? await fetch(
+                fontsUrlMap[subTitleFontFamily as keyof typeof fontsUrlMap],
+              )
+                .then(res => {
+                  return res.arrayBuffer();
+                })
+                .catch(err => {
+                  Sentry.captureException(err);
+                  return null;
+                })
+            : null;
+
+        if (subTitleFontData) {
+          fonts.push({
+            name: subTitleFontFamily,
+            data: subTitleFontData,
+            style:
+              fontsMap[subTitleFontFamily].style.fontStyle === 'italic'
+                ? ('italic' as const)
+                : ('normal' as const),
+          });
+        }
+      }
+
       return new ImageResponse(
         (
           <div
@@ -215,8 +356,7 @@ export const GET = async (
               width,
               height,
               backgroundColor: 'transparent',
-              alignItems:
-                keepAspectRatio === 'left_pad' ? 'flex-end' : 'center',
+              alignItems: crop === 'lpad' ? 'flex-end' : 'center',
               flexDirection: 'column',
             }}
           >
@@ -224,8 +364,10 @@ export const GET = async (
               style={{
                 display: 'flex',
                 flex: 1,
+                position: 'relative',
+                margin: 'auto',
+                overflow: 'hidden',
               }}
-              className={styles.content}
             >
               <div
                 style={{
@@ -239,35 +381,37 @@ export const GET = async (
                   maxWidth: imageWidth,
                   position: 'absolute',
                   top: 0,
-                  right: 0, // To avoid the text to be on the left with keepAspectRatio
+                  right: 0, // To avoid the text to be on the left with crop
                 }}
               />
-              <img src={url(width, height)} />
+              <img
+                src={await buildCoverImageUrl(webCard, {
+                  width,
+                  height,
+                  crop,
+                })}
+              />
               <div
                 style={{
-                  display: 'flex',
-                  height: '100%',
-                  width: '100%',
                   maxWidth: imageWidth,
-                  position: 'absolute',
-                  top: 0,
-                  right: 0, // To avoid the text to be on the left with keepAspectRatio
                   fontSize: '5px',
-                  flexDirection: 'column',
                   alignItems: textAlign,
                   justifyContent: overlayJustifyContent,
-                  padding: '5%',
                   paddingTop: '30%',
+                  ...coverTextStyle.coverTextContainerStyle,
+                  ...(orientation === 'horizontal'
+                    ? coverTextStyle.coverTextContainerHorizontalStyle
+                    : {}),
+                  ...(orientation !== 'horizontal'
+                    ? coverTextStyle.coverTextContainerVerticalStyle
+                    : {}),
+                  ...(orientation === 'topToBottom'
+                    ? coverTextStyle.coverTextContainerTopToBottomStyle
+                    : {}),
+                  ...(orientation === 'bottomToTop'
+                    ? coverTextStyle.coverTextContainerBottomToTopStyle
+                    : {}),
                 }}
-                className={cx(
-                  coverTextStyle.converTextContainer,
-                  orientation !== 'horizontal' &&
-                    coverTextStyle.converTextContainerVertical,
-                  orientation === 'topToBottom' &&
-                    coverTextStyle.converTextContainerTopToBottom,
-                  orientation === 'bottomToTop' &&
-                    coverTextStyle.converTextContainerBottomToTop,
-                )}
               >
                 <div style={{ fontFamily: titleFontFamily, ...titleTextStyle }}>
                   {coverTitle}
@@ -287,13 +431,14 @@ export const GET = async (
         {
           width,
           height,
+          fonts,
         },
       );
     } else {
       return NextResponse.json({ message: ERRORS.NOT_FOUND }, { status: 404 });
     }
   } else {
-    if (profile) {
+    if (webCard) {
       return NextResponse.json({ message: ERRORS.FORBIDDEN }, { status: 403 });
     }
     return NextResponse.json({ message: ERRORS.NOT_FOUND }, { status: 404 });

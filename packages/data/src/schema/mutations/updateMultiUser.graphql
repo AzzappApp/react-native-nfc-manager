@@ -1,0 +1,25 @@
+extend type Mutation {
+  """
+  Update the multiUser flag of a webCard.
+  """
+  updateMultiUser(input:UpdateMultiUserInput!): UpdateMultiUserPayload
+}
+
+
+input UpdateMultiUserInput {
+  """
+  The ID of the webCard to update.
+  """
+  webCardId: ID!
+  """
+  the new value of the multiUser flag
+  """
+  isMultiUser: Boolean!
+}
+
+type UpdateMultiUserPayload {
+  """
+  The updated webCard.
+  """
+  webCard: WebCard
+}

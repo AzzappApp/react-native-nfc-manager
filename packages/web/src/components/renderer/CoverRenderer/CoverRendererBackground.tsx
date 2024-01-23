@@ -1,86 +1,69 @@
 import cn from 'classnames';
+import { getCldImageUrl } from 'next-cloudinary';
 import { DEFAULT_COLOR_PALETTE, swapColor } from '@azzapp/shared/cardHelpers';
-import { getImageURL } from '@azzapp/shared/imagesHelpers';
-import CloudinaryImage from '#ui/CloudinaryImage';
-import CloudinaryVideo from '#ui/CloudinaryVideo';
+import { COVER_RATIO } from '@azzapp/shared/coverHelpers';
+import { decodeMediaId } from '@azzapp/shared/imagesHelpers';
 import styles from './CoverRenderer.css';
-import type { Media, Profile } from '@azzapp/data/domains';
+import type { Media, WebCard } from '@azzapp/data/domains';
 
 type CoverRendererBackgroundProps = {
   media: Media | null;
-  profile: Profile;
+  webCard: WebCard;
 };
+
+const BACKGROUND_IMAGE_SIZE = 320;
 
 const CoverRendererBackground = ({
   media,
-  profile: { coverData, cardColors },
+  webCard: { coverData, cardColors },
 }: CoverRendererBackgroundProps) => {
   if (!media) return null;
 
   return (
-    <div
-      className={styles.wrapper}
-      style={{
-        backgroundColor: swapColor(
-          coverData?.backgroundColor ?? 'light',
-          cardColors ?? DEFAULT_COLOR_PALETTE,
-        ),
-      }}
-    >
+    <>
       {coverData?.backgroundId && (
-        <div
-          style={{
-            backgroundColor:
-              swapColor(
-                coverData.backgroundPatternColor,
+        <>
+          <div
+            style={{
+              backgroundColor: swapColor(
+                coverData.backgroundColor ?? 'light',
                 cardColors ?? DEFAULT_COLOR_PALETTE,
-              ) ?? '#000',
-            WebkitMaskImage: `url(${getImageURL(coverData.backgroundId)})`,
-            maskImage: `url(${getImageURL(coverData.backgroundId)})`,
-            maskPosition: 'bottom',
-            WebkitMaskPosition: 'bottom',
-          }}
-          className={styles.layerMedia}
-        />
+              ),
+            }}
+            className={cn(styles.layerMedia)}
+          />
+          <div
+            style={{
+              backgroundColor:
+                swapColor(
+                  coverData.backgroundPatternColor,
+                  cardColors ?? DEFAULT_COLOR_PALETTE,
+                ) ?? '#000',
+              maskImage: `url(${getCldImageUrl({
+                src: decodeMediaId(coverData.backgroundId),
+                width: BACKGROUND_IMAGE_SIZE,
+                height: BACKGROUND_IMAGE_SIZE / COVER_RATIO,
+                format: 'auto',
+              })})`,
+              maskPosition: 'center',
+            }}
+            className={cn(styles.layerMedia, styles.layerBackground)}
+          />
+        </>
       )}
-      {media.kind === 'image' ? (
-        <CloudinaryImage
-          mediaId={media.id}
-          assetKind="cover"
-          alt="background"
-          fill
-          priority
-          className={cn(styles.coverMedia, styles.backgroundMedia)}
-        />
-      ) : (
-        <CloudinaryVideo
-          media={media}
-          assetKind="cover"
-          alt="background"
-          className={cn(styles.coverMedia, styles.backgroundMedia)}
-          muted
-          fluid
-          playsInline
-          autoPlay
-        />
-      )}
-      {coverData?.foregroundId && (
-        <div
-          style={{
-            backgroundColor:
-              swapColor(
-                coverData.foregroundColor,
-                cardColors ?? DEFAULT_COLOR_PALETTE,
-              ) ?? '#000',
-            WebkitMaskImage: `url(${getImageURL(coverData.foregroundId)})`,
-            maskImage: `url(${getImageURL(coverData.foregroundId)})`,
-            maskPosition: 'bottom',
-            WebkitMaskPosition: 'bottom',
-          }}
-          className={styles.layerMedia}
-        />
-      )}
-    </div>
+      <div
+        className={cn(styles.coverMedia, styles.backgroundMedia)}
+        style={{
+          backgroundImage: `url(${getCldImageUrl({
+            src: decodeMediaId(media.id),
+            assetType: media.kind,
+            width: BACKGROUND_IMAGE_SIZE,
+            height: BACKGROUND_IMAGE_SIZE / COVER_RATIO,
+            format: 'auto',
+          })})`,
+        }}
+      />
+    </>
   );
 };
 

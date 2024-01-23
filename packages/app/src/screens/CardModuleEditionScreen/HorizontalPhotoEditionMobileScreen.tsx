@@ -1,8 +1,8 @@
 import { graphql, usePreloadedQuery } from 'react-relay';
 import { MODULE_KIND_HORIZONTAL_PHOTO } from '@azzapp/shared/cardModuleHelpers';
 import HorizontalPhotoEditionScreen from '#screens/HorizontalPhotoEditionScreen';
-import type { HorizontalPhotoEditionMobileScreenQuery } from '@azzapp/relay/artifacts/HorizontalPhotoEditionMobileScreenQuery.graphql';
-import type { HorizontalPhotoEditionScreen_module$key } from '@azzapp/relay/artifacts/HorizontalPhotoEditionScreen_module.graphql';
+import type { HorizontalPhotoEditionMobileScreenQuery } from '#relayArtifacts/HorizontalPhotoEditionMobileScreenQuery.graphql';
+import type { HorizontalPhotoEditionScreen_module$key } from '#relayArtifacts/HorizontalPhotoEditionScreen_module.graphql';
 import type { PreloadedQuery } from 'react-relay';
 
 type HorizontalPhotoEditionMobileScreenProps = {
@@ -24,12 +24,15 @@ const HorizontalPhotoEditionMobileScreen = ({
   moduleId,
   preloadedQuery,
 }: HorizontalPhotoEditionMobileScreenProps) => {
-  const data = usePreloadedQuery(HorizontalPhotoQuery, preloadedQuery);
+  const { profile } = usePreloadedQuery(HorizontalPhotoQuery, preloadedQuery);
+  if (!profile) {
+    return null;
+  }
 
   let module: HorizontalPhotoEditionScreen_module$key | null = null;
   if (moduleId != null) {
     module =
-      data.viewer.profile?.cardModules.find(
+      profile?.webCard?.cardModules.find(
         module =>
           module?.id === moduleId &&
           module?.kind === MODULE_KIND_HORIZONTAL_PHOTO,
@@ -39,18 +42,20 @@ const HorizontalPhotoEditionMobileScreen = ({
     }
   }
 
-  return <HorizontalPhotoEditionScreen module={module} viewer={data.viewer} />;
+  return <HorizontalPhotoEditionScreen module={module} profile={profile} />;
 };
 
 const HorizontalPhotoQuery = graphql`
-  query HorizontalPhotoEditionMobileScreenQuery {
-    viewer {
-      ...HorizontalPhotoEditionScreen_viewer
-      profile {
-        cardModules {
-          id
-          kind
-          ...HorizontalPhotoEditionScreen_module
+  query HorizontalPhotoEditionMobileScreenQuery($profileId: ID!) {
+    profile: node(id: $profileId) {
+      ... on Profile {
+        ...HorizontalPhotoEditionScreen_profile
+        webCard {
+          cardModules {
+            id
+            kind
+            ...HorizontalPhotoEditionScreen_module
+          }
         }
       }
     }

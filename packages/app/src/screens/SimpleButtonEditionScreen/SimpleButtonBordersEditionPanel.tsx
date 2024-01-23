@@ -8,18 +8,18 @@ import {
   SIMPLE_BUTTON_MAX_BORDER_RADIUS,
   SIMPLE_BUTTON_MAX_BORDER_WIDTH,
 } from '@azzapp/shared/cardModuleHelpers';
-import ProfileColorPicker from '#components/ProfileColorPicker';
+import WebCardColorPicker from '#components/WebCardColorPicker';
 import ColorPreview from '#ui/ColorPreview';
 import LabeledDashedSlider from '#ui/LabeledDashedSlider';
 import TabsBar from '#ui/TabsBar';
-import type { SimpleButtonBordersEditionPanel_viewer$key } from '@azzapp/relay/artifacts/SimpleButtonBordersEditionPanel_viewer.graphql';
+import type { SimpleButtonBordersEditionPanel_webCard$key } from '#relayArtifacts/SimpleButtonBordersEditionPanel_webCard.graphql';
 import type { ViewProps } from 'react-native';
 
 type SimpleButtonBordersEditionPanelProps = ViewProps & {
   /**
    * A relay fragment reference to the viewer
    */
-  viewer: SimpleButtonBordersEditionPanel_viewer$key;
+  webCard: SimpleButtonBordersEditionPanel_webCard$key | null;
   /**
    * The borderColor currently set on the module
    */
@@ -27,7 +27,7 @@ type SimpleButtonBordersEditionPanelProps = ViewProps & {
   /**
    * A callback called when the user update the borderColor
    */
-  onBordercolorChange: (borderColor: string) => void;
+  onBorderColorChange: (borderColor: string) => void;
   /**
    * The borderWidth currently set on the module
    */
@@ -35,7 +35,7 @@ type SimpleButtonBordersEditionPanelProps = ViewProps & {
   /**
    * A callback called when the user update the borderWidth
    */
-  onBorderwidthChange: (borderWidth: number) => void;
+  onBorderWidthChange: (borderWidth: number) => void;
   /**
    * The borderRadius currently set on the module
    */
@@ -43,7 +43,7 @@ type SimpleButtonBordersEditionPanelProps = ViewProps & {
   /**
    * A callback called when the user update the borderRadius
    */
-  onBorderradiusChange: (borderRadius: number) => void;
+  onBorderRadiusChange: (borderRadius: number) => void;
   /**
    * The height of the bottom sheet
    */
@@ -54,13 +54,13 @@ type SimpleButtonBordersEditionPanelProps = ViewProps & {
  * A Panel to edit the Borders of the SimpleButton edition screen
  */
 const SimpleButtonBordersEditionPanel = ({
-  viewer,
+  webCard: webCardKey,
   borderColor,
-  onBordercolorChange,
+  onBorderColorChange: onBordercolorChange,
   borderWidth,
-  onBorderwidthChange,
+  onBorderWidthChange: onBorderwidthChange,
   borderRadius,
-  onBorderradiusChange,
+  onBorderRadiusChange: onBorderradiusChange,
   style,
   bottomSheetHeight,
   ...props
@@ -68,20 +68,18 @@ const SimpleButtonBordersEditionPanel = ({
   const intl = useIntl();
 
   const [currentTab, setCurrentTab] = useState<string>('borders');
-  const { profile } = useFragment(
+  const webCard = useFragment(
     graphql`
-      fragment SimpleButtonBordersEditionPanel_viewer on Viewer {
-        profile {
-          ...ProfileColorPicker_profile
-          cardColors {
-            primary
-            dark
-            light
-          }
+      fragment SimpleButtonBordersEditionPanel_webCard on WebCard {
+        ...WebCardColorPicker_webCard
+        cardColors {
+          primary
+          dark
+          light
         }
       }
     `,
-    viewer,
+    webCardKey,
   );
 
   const onProfileColorPickerClose = useCallback(() => {
@@ -106,13 +104,13 @@ const SimpleButtonBordersEditionPanel = ({
           }),
           rightElement: (
             <ColorPreview
-              color={swapColor(borderColor, profile?.cardColors)}
+              color={swapColor(borderColor, webCard?.cardColors)}
               style={{ marginLeft: 5 }}
             />
           ),
         },
       ]),
-    [borderColor, intl, profile?.cardColors],
+    [borderColor, intl, webCard?.cardColors],
   );
 
   return (
@@ -169,11 +167,11 @@ const SimpleButtonBordersEditionPanel = ({
           style={styles.slider}
         />
       </View>
-      {profile && (
-        <ProfileColorPicker
+      {webCard && (
+        <WebCardColorPicker
           visible={currentTab !== 'borders'}
           height={bottomSheetHeight}
-          profile={profile}
+          webCard={webCard}
           title={intl.formatMessage({
             defaultMessage: 'Border color',
             description: 'Bordercolor color title in SimpleButton edition',

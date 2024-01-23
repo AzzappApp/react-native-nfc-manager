@@ -10,13 +10,17 @@ const coverTemplateSymbol = Symbol('CoverTemplate');
 const postSymbol = Symbol('Post');
 const postCommentSymbol = Symbol('PostComment');
 const profileSymbol = Symbol('Profile');
-const profileCategorySymbol = Symbol('ProfileCategory');
+const webCardSymbol = Symbol('WebCard');
+const webCardCategorySymbol = Symbol('WebCardCategory');
 const companyActivitySymbol = Symbol('CompanyActivity');
 
 export const fetchNode = async (
   gqlId: string,
   { loaders }: GraphQLContext,
 ): Promise<any> => {
+  if (!gqlId) {
+    return null;
+  }
   const { id, type } = fromGlobalId(gqlId);
 
   switch (type) {
@@ -51,10 +55,12 @@ export const fetchNode = async (
       );
     case 'Profile':
       return withTypeSymbol(await loaders.Profile.load(id), profileSymbol);
-    case 'ProfileCategory':
+    case 'WebCard':
+      return withTypeSymbol(await loaders.WebCard.load(id), webCardSymbol);
+    case 'WebCardCategory':
       return withTypeSymbol(
-        await loaders.ProfileCategory.load(id),
-        profileCategorySymbol,
+        await loaders.WebCardCategory.load(id),
+        webCardCategorySymbol,
       );
     case 'CompanyActivity':
       return withTypeSymbol(
@@ -93,8 +99,11 @@ const resolveNode = (value: any) => {
   if (value[profileSymbol]) {
     return 'Profile';
   }
-  if (value[profileCategorySymbol]) {
-    return 'ProfileCategory';
+  if (value[webCardSymbol]) {
+    return 'WebCard';
+  }
+  if (value[webCardCategorySymbol]) {
+    return 'WebCardCategory';
   }
   if (value[companyActivitySymbol]) {
     return 'CompanyActivity';

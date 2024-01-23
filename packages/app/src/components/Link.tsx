@@ -7,7 +7,7 @@ import type { ReactElement } from 'react';
 import type { GestureResponderEvent } from 'react-native';
 import type { Disposable } from 'react-relay';
 
-type LinkProps<T extends Route> = T & {
+export type LinkProps<T extends Route> = T & {
   /**
    * If true, the current screen will be replaced by the new one.
    */

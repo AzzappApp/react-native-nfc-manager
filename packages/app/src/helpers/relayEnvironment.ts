@@ -1,19 +1,18 @@
-import { fromGlobalId } from 'graphql-relay';
 import {
   ROOT_TYPE,
   Network,
   Observable,
   Store,
   RecordSource,
+  Environment,
 } from 'relay-runtime';
-import { MultiActorEnvironment } from 'relay-runtime/lib/multi-actor-environment';
-// @ts-expect-error not typed
-import { create as createRelayOptimisticRecordSource } from 'relay-runtime/lib/store/RelayOptimisticRecordSource';
+import ERRORS from '@azzapp/shared/errors';
 import { fetchJSON, isAbortError } from '@azzapp/shared/networkHelpers';
 import { version as APP_VERSION } from '../../package.json';
 import { addAuthStateListener, getAuthState } from './authStore';
 import fetchWithAuthTokens from './fetchWithAuthTokens';
 import fetchWithGlobalEvents from './fetchWithGlobalEvents';
+import { dispatchGlobalEvent } from './globalEvents';
 import { getCurrentLocale } from './localeHelpers';
 import type {
   MissingFieldHandler,
@@ -22,9 +21,7 @@ import type {
   RequestParameters,
 } from 'relay-runtime';
 
-export const ROOT_ACTOR_ID = 'ROOT_ACTOR_ID';
-
-let environment: MultiActorEnvironment | null;
+let environment: Environment | null;
 
 type RelayEnvironmentListener = (event: 'reset') => void;
 const listeners: RelayEnvironmentListener[] = [];
@@ -58,18 +55,9 @@ const init = () => {
 };
 
 const createEnvironment = () => {
-  const rootStore = new Store(RecordSource.create());
-
-  environment = new MultiActorEnvironment({
-    createNetworkForActor: (actorId: string) => createNetwork(actorId),
-    createStoreForActor: (actorId: string) => {
-      if (actorId === ROOT_ACTOR_ID) {
-        return rootStore;
-      }
-      return new Store(
-        createRelayOptimisticRecordSource(rootStore.getSource()),
-      );
-    },
+  environment = new Environment({
+    store: new Store(RecordSource.create()),
+    network: createNetwork(),
     missingFieldHandlers,
     isServer: false,
   });
@@ -77,7 +65,7 @@ const createEnvironment = () => {
 
 const GRAPHQL_ENDPOINT = `${process.env.NEXT_PUBLIC_API_ENDPOINT}/graphql`;
 
-export const createNetwork = (actorId: string) => {
+export const createNetwork = () => {
   const fetchFunction = fetchWithGlobalEvents(fetchWithAuthTokens(fetchJSON));
 
   const fetchGraphQL: FetchFunction = (request, variables) =>
@@ -105,13 +93,6 @@ export const createNetwork = (actorId: string) => {
         'azzapp-appVersion': APP_VERSION,
       };
 
-      const profileId = actorId === ROOT_ACTOR_ID ? null : actorId;
-
-      if (profileId) {
-        const { id } = fromGlobalId(profileId);
-        headers['azzapp-profileId'] = id;
-      }
-
       const locale = getCurrentLocale();
       if (locale) {
         headers['azzapp-locale'] = locale;
@@ -124,7 +105,7 @@ export const createNetwork = (actorId: string) => {
         signal: abortController.signal,
       })
         .then(
-          result => {
+          async result => {
             if (sink.closed) {
               return;
             }
@@ -133,7 +114,16 @@ export const createNetwork = (actorId: string) => {
               'errors' in result ||
               ('data' in result && result.data == null)
             ) {
-              sink.error(new GraphQLError(result, request));
+              const error = new GraphQLError(result, request);
+              await dispatchGlobalEvent({
+                type: 'NETWORK_ERROR',
+                payload: { error, params: [request, variables] },
+              });
+              if (error.message === ERRORS.INVALID_TOKEN) {
+                sink.complete();
+              } else {
+                sink.error(error);
+              }
             } else {
               sink.next(result);
             }
@@ -188,12 +178,11 @@ const missingFieldHandlers: MissingFieldHandler[] = [
     handle(field, record, argValues) {
       if (
         record != null &&
-        // @ts-expect-error it seems like the type of record is not correct
-        record.__typename === ROOT_TYPE &&
+        record.getType() === ROOT_TYPE &&
         field.name === 'node' &&
-        argValues?.['id'] != null
+        // eslint-disable-next-line no-prototype-builtins
+        argValues.hasOwnProperty('id')
       ) {
-        // If field is node(id: $id), look up the record by the value of $id
         return argValues.id;
       }
     },

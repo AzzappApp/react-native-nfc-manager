@@ -2,11 +2,11 @@ import * as Sentry from '@sentry/nextjs';
 import * as bcrypt from 'bcrypt-ts';
 import { NextResponse } from 'next/server';
 import {
-  getProfileByUserName,
   getUserByEmail,
   getUserByPhoneNumber,
-  getUserProfiles,
   getUserById,
+  getProfilesOfUser,
+  getProfileByUserName,
 } from '@azzapp/data/domains';
 import ERRORS from '@azzapp/shared/errors';
 import {
@@ -14,7 +14,7 @@ import {
   isInternationalPhoneNumber,
   isValidEmail,
 } from '@azzapp/shared/stringHelpers';
-import { handleSigninAuthMethod } from '#helpers/auth';
+import { handleSignInAuthMethod } from '#helpers/auth';
 import cors from '#helpers/cors';
 import type { Profile, User } from '@azzapp/data/domains';
 
@@ -47,7 +47,7 @@ const signin = async (req: Request) => {
     }
     if (user) {
       // if we found a user by email or phonenumber, we look for the profile
-      [profile] = await getUserProfiles(user.id);
+      [profile] = await getProfilesOfUser(user.id);
     } else {
       // in all other case, look for username
       profile = await getProfileByUserName(credential);
@@ -69,7 +69,7 @@ const signin = async (req: Request) => {
         { status: 401 },
       );
     }
-    return await handleSigninAuthMethod(user, profile);
+    return await handleSignInAuthMethod(user, profile);
   } catch (error) {
     console.error(error);
     Sentry.captureException(error);

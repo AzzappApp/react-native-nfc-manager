@@ -20,33 +20,34 @@ import Form, { Submit } from '#ui/Form/Form';
 import Icon from '#ui/Icon';
 import PressableNative from '#ui/PressableNative';
 import Text from '#ui/Text';
+import type { EmailPhoneInput } from '#components/EmailOrPhoneInput';
 import type { CountryCode } from 'libphonenumber-js';
 
 const ForgotPasswordScreen = () => {
   const router = useRouter();
   const intl = useIntl();
 
-  const [countryCodeOrEmail, setCountryCodeOrEmail] = useState<
-    CountryCode | 'email'
-  >('email');
+  const [contact, setContact] = useState<EmailPhoneInput>({
+    countryCodeOrEmail: 'email',
+    value: '',
+  });
 
-  const [emailOrPhone, setEmailOrPhone] = useState('');
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [error, setError] = useState(false);
 
   const isValidMailOrPhone = useMemo(() => {
-    if (isValidEmail(emailOrPhone)) {
+    if (isValidEmail(contact.value)) {
       return true;
     }
 
     const locales = getLocales();
     for (let i = 0; i < locales.length; i++) {
-      if (isPhoneNumber(emailOrPhone, locales[i].countryCode as CountryCode)) {
+      if (isPhoneNumber(contact.value, locales[i].countryCode as CountryCode)) {
         return true;
       }
     }
     return false;
-  }, [emailOrPhone]);
+  }, [contact]);
 
   const onSubmit = async () => {
     if (isValidMailOrPhone) {
@@ -56,7 +57,7 @@ const ForgotPasswordScreen = () => {
         try {
           ({ issuer } = await forgotPassword({
             locale: intl.locale,
-            credential: emailOrPhone,
+            credential: contact.value,
           }));
         } catch (e) {
           setIsSubmitted(false);
@@ -105,11 +106,9 @@ const ForgotPasswordScreen = () => {
             </View>
             <View style={styles.input}>
               <EmailOrPhoneInput
-                value={emailOrPhone}
-                onChange={setEmailOrPhone}
+                input={contact}
+                onChange={setContact}
                 hasError={error}
-                countryCodeOrEmail={countryCodeOrEmail}
-                setCountryCodeOrEmail={setCountryCodeOrEmail}
               />
             </View>
             {error && (
@@ -187,7 +186,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'center',
-    alignItem: 'center',
+    alignItems: 'center',
     marginBottom: 100,
     paddingHorizontal: 15,
   },

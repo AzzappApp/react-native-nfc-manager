@@ -1,8 +1,8 @@
-import { ProfileCategoryTable, db } from '@azzapp/data/domains';
+import { WebCardCategoryTable, db } from '@azzapp/data/domains';
 import CardTemplateTypesForm from '../CardTemplateTypesForm';
 const NewCardTemplateTypePage = async () => {
-  const profileCategories = await db.select().from(ProfileCategoryTable);
-  return <CardTemplateTypesForm profileCategories={profileCategories} />;
+  const webCardCategories = await db.select().from(WebCardCategoryTable);
+  return <CardTemplateTypesForm webCardCategories={webCardCategories} />;
 };
 
 export default NewCardTemplateTypePage;

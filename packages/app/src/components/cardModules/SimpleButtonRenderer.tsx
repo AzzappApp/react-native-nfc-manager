@@ -12,7 +12,7 @@ import CardModuleBackground from './CardModuleBackground';
 import type {
   SimpleButtonRenderer_module$data,
   SimpleButtonRenderer_module$key,
-} from '@azzapp/relay/artifacts/SimpleButtonRenderer_module.graphql';
+} from '#relayArtifacts/SimpleButtonRenderer_module.graphql';
 import type { CardStyle, ColorPalette } from '@azzapp/shared/cardHelpers';
 import type { NullableFields } from '@azzapp/shared/objectHelpers';
 import type { StyleProp, ViewProps, ViewStyle } from 'react-native';
@@ -185,18 +185,3 @@ const SimpleButtonRenderer = ({
 };
 
 export default SimpleButtonRenderer;
-
-export const measureSimpleButtonHeight = async (
-  data: SimpleButtonRendererData,
-  cardStyle: CardStyle,
-  _maxWidth: number,
-) => {
-  const { marginTop, marginBottom, height } = getModuleDataValues({
-    data,
-    cardStyle,
-    styleValuesMap: SIMPLE_BUTTON_STYLE_VALUES,
-    defaultValues: SIMPLE_BUTTON_DEFAULT_VALUES,
-  });
-
-  return height + marginBottom + marginTop;
-};

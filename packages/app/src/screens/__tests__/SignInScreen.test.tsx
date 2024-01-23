@@ -33,8 +33,6 @@ describe('Signin Screen', () => {
 
     expect(buttonComponent).toBeDisabled();
     act(() => fireEvent(passwordInput, 'onChangeText', 'myPassword'));
-    console.log(passwordInput);
-    console.log(passwordInput.props.value);
     expect(passwordInput.props.value).toBe('myPassword');
   });
 
@@ -43,7 +41,12 @@ describe('Signin Screen', () => {
     signinMock.mockResolvedValueOnce({
       token: 'fake-token',
       refreshToken: 'fake-refreshToken',
-      profileId: 'fake-profileId',
+      userId: 'fake-userId',
+      profileInfos: {
+        profileId: 'fake-profileId',
+        webCardId: 'fake-webCardId',
+        profileRole: 'editor',
+      },
     });
 
     const credentialInput = screen.getByPlaceholderText(
@@ -70,7 +73,11 @@ describe('Signin Screen', () => {
           token: 'fake-token',
           refreshToken: 'fake-refreshToken',
         },
-        profileId: 'fake-profileId',
+        profileInfos: {
+          profileId: 'fake-profileId',
+          profileRole: 'editor',
+          webCardId: 'fake-webCardId',
+        },
       },
     });
   });

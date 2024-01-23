@@ -1,16 +1,13 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback } from 'react';
 import { useIntl } from 'react-intl';
-import { ScrollView, View, Platform } from 'react-native';
 import { typedEntries } from '@azzapp/shared/objectHelpers';
-import { colors, shadow } from '#theme';
-import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
-import PressableNative from '#ui/PressableNative';
-import Text from '#ui/Text';
+import BoxSelectionList from './BoxSelectionList';
 import { FILTERS, GPUImageView, isFilter, useFilterLabels } from './gpu';
+import type { BoxButtonItemInfo } from './BoxSelectionList';
 import type { ImageLayer, VideoFrameLayer } from './gpu';
-import type { ScrollViewProps, LayoutChangeEvent } from 'react-native';
+import type { ViewProps } from 'react-native';
 
-type FilterSelectionListProps = ScrollViewProps & {
+type FilterSelectionListProps = ViewProps & {
   layer: ImageLayer | VideoFrameLayer;
   aspectRatio: number;
   selectedFilter: string | null;
@@ -18,161 +15,71 @@ type FilterSelectionListProps = ScrollViewProps & {
   onChange(value: string | null): void;
 };
 
-// TODO docs and tests once this component is production ready
 const FilterSelectionList = ({
   layer,
   aspectRatio,
   selectedFilter,
-  cardRadius = 0,
   onChange,
   ...props
 }: FilterSelectionListProps) => {
-  const intl = useIntl();
   const filters = typedEntries(useFilterLabels());
 
-  const [height, setHeight] = useState(0);
+  const renderItem = useCallback(
+    ({ item, height, width }: BoxButtonItemInfo<[string, string]>) => {
+      const filter = item?.[0];
+      return (
+        <GPUImageView
+          style={{ height, width }}
+          layers={[
+            {
+              ...layer,
+              lutFilterUri: isFilter(filter) ? FILTERS[filter] : null,
+            },
+          ]}
+        />
+      );
+    },
+    [layer],
+  );
 
-  const onLayout = useCallback(({ nativeEvent }: LayoutChangeEvent) => {
-    setHeight(nativeEvent.layout.height / 1.9);
-  }, []);
+  const onSelect = useCallback(
+    (item: [string, string] | null) => {
+      onChange(item ? item[0] : null);
+    },
+    [onChange],
+  );
+
+  const intl = useIntl();
+
+  const renderLabel = useCallback(
+    ({ item }: BoxButtonItemInfo<[string, string]>) => {
+      return (
+        item?.[1] ??
+        intl.formatMessage({
+          defaultMessage: 'Normal',
+          description:
+            'Name of the default filter (no filter applied) in image edition',
+        })
+      );
+    },
+    [intl],
+  );
 
   return (
-    <ScrollView
-      horizontal
-      showsHorizontalScrollIndicator={false}
+    <BoxSelectionList
+      data={filters}
+      renderItem={renderItem}
+      renderLabel={renderLabel}
+      keyExtractor={keyExtractor}
+      accessibilityRole="list"
+      onSelect={onSelect}
+      imageRatio={aspectRatio}
+      selectedItem={filters.find(item => item[0] === selectedFilter) ?? null}
       {...props}
-      onLayout={onLayout}
-    >
-      <>
-        <FilterButton
-          layer={layer}
-          aspectRatio={aspectRatio}
-          selected={selectedFilter === null}
-          label={intl.formatMessage({
-            defaultMessage: 'Normal',
-            description:
-              'Name of the default filter (no filter applied) in image edition',
-          })}
-          filter={null}
-          height={height}
-          cardRadius={cardRadius}
-          onPress={() => onChange(null)}
-        />
-        {filters.map(([id, label]) => (
-          <FilterButton
-            key={id}
-            layer={layer}
-            aspectRatio={aspectRatio}
-            selected={id === selectedFilter}
-            label={label}
-            filter={id}
-            height={height}
-            cardRadius={cardRadius}
-            onPress={() => onChange(id)}
-          />
-        ))}
-      </>
-    </ScrollView>
+    />
   );
 };
+
+const keyExtractor = (item: [string, string]) => item[0];
 
 export default FilterSelectionList;
-type FilterButtonProps = {
-  layer: ImageLayer | VideoFrameLayer;
-  aspectRatio: number;
-  selected: boolean;
-  filter: string | null;
-  label: string;
-  cardRadius: number;
-  onPress(): void;
-  height: number;
-};
-
-const FilterButton = ({
-  layer,
-  aspectRatio,
-  selected,
-  label,
-  filter,
-  cardRadius,
-  height,
-  onPress,
-}: FilterButtonProps) => {
-  const borderRadius = useMemo(() => {
-    return Platform.select({
-      web: cardRadius ? (`${cardRadius}%` as any) : null,
-      default:
-        height * aspectRatio != null && cardRadius != null
-          ? cardRadius * height * aspectRatio
-          : null,
-    });
-  }, [aspectRatio, cardRadius, height]);
-
-  const styles = useStyleSheet(styleSheet);
-  return (
-    <PressableNative onPress={onPress} style={styles.filterButton}>
-      <View
-        style={[
-          styles.filterImageContainer,
-          {
-            borderRadius: borderRadius + BORDER_SELECTED_WIDTH,
-            borderColor: 'transparent',
-          },
-          selected && styles.selected,
-        ]}
-      >
-        <View style={[styles.imageWrapper, { borderRadius, aspectRatio }]}>
-          <GPUImageView
-            style={[styles.filterImage, { height, aspectRatio, borderRadius }]}
-            layers={[
-              {
-                ...layer,
-                lutFilterUri: isFilter(filter) ? FILTERS[filter] : null,
-              },
-            ]}
-          />
-        </View>
-      </View>
-      <Text
-        variant="xsmall"
-        style={[styles.filterTitle, selected && styles.filterTitleSelected]}
-      >
-        {label}
-      </Text>
-    </PressableNative>
-  );
-};
-
-const BORDER_SELECTED_WIDTH = 3.75;
-
-const styleSheet = createStyleSheet(appearance => ({
-  imageWrapper: {
-    flex: 1,
-    backgroundColor: colors.grey200,
-  },
-  filterButton: {
-    height: '100%',
-    alignItems: 'center',
-    marginEnd: 15 - 2 * BORDER_SELECTED_WIDTH,
-  },
-  filterImageContainer: [
-    {
-      flex: 1,
-      borderWidth: BORDER_SELECTED_WIDTH,
-    },
-    shadow(appearance, 'center'),
-  ],
-  selected: {
-    borderColor: appearance === 'light' ? colors.black : colors.white,
-  },
-  filterImage: {
-    flex: 1,
-    overflow: 'hidden',
-  },
-  filterTitle: {
-    alignSelf: 'center',
-  },
-  filterTitleSelected: {
-    alignSelf: 'center',
-  },
-}));

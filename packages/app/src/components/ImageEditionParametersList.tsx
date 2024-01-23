@@ -73,7 +73,7 @@ const parametersList: Array<keyof EditionParameters> = [
   'cropData',
   'brightness',
   'contrast',
-  'highlights',
+  // 'highlights',
   'shadow',
   'temperature',
   'tint',

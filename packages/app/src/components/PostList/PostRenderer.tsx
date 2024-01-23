@@ -2,15 +2,20 @@ import {
   Suspense,
   forwardRef,
   memo,
+  useCallback,
   useContext,
   useImperativeHandle,
   useRef,
 } from 'react';
 
+import { useIntl } from 'react-intl';
 import { StyleSheet, View } from 'react-native';
+import Toast from 'react-native-toast-message';
 import { graphql, useFragment } from 'react-relay';
+import { isEditor } from '@azzapp/shared/profileHelpers';
 import { colors } from '#theme';
 import AuthorCartouche from '#components/AuthorCartouche';
+import useAuthState from '#hooks/useAuthState';
 import useToggle from '#hooks/useToggle';
 import IconButton from '#ui/IconButton';
 
@@ -20,8 +25,8 @@ import PostRendererBottomPanel, {
 } from './PostRendererBottomPanel';
 import PostRendererMedia from './PostRendererMedia';
 import type { MediaVideoRendererHandle } from '#components/medias';
-import type { PostRendererFragment_author$key } from '@azzapp/relay/artifacts/PostRendererFragment_author.graphql';
-import type { PostRendererFragment_post$key } from '@azzapp/relay/artifacts/PostRendererFragment_post.graphql';
+import type { PostRendererFragment_author$key } from '#relayArtifacts/PostRendererFragment_author.graphql';
+import type { PostRendererFragment_post$key } from '#relayArtifacts/PostRendererFragment_post.graphql';
 import type { ForwardedRef } from 'react';
 import type { ViewProps, HostComponent } from 'react-native';
 
@@ -33,7 +38,7 @@ export type PostRendererProps = ViewProps & {
    */
   post: PostRendererFragment_post$key;
   /**
-   *  ths post author
+   *  the post author
    *
    * @type {PostRendererFragment_author$key}
    */
@@ -62,11 +67,16 @@ export type PostRendererProps = ViewProps & {
    */
   paused?: boolean;
   /**
-   * iniital time of the video
+   * initial time of the video
    *
    * @type {(number | null)}
    */
   initialTime?: number | null;
+
+  /**
+   * callback when the author cartouche is pressed
+   */
+  onPressAuthor?: () => void;
 };
 
 export type PostRendererHandle = {
@@ -84,17 +94,21 @@ const PostRenderer = (
     videoDisabled = false,
     paused = false,
     initialTime,
+    onPressAuthor,
     ...props
   }: PostRendererProps,
   forwardedRef: ForwardedRef<PostRendererHandle>,
 ) => {
   const post = useFragment(
     graphql`
-      fragment PostRendererFragment_post on Post {
+      fragment PostRendererFragment_post on Post
+      @argumentDefinitions(viewerWebCardId: { type: "ID!" }) {
         id
         ...PostRendererBottomPanelFragment_post
+          @arguments(viewerWebCardId: $viewerWebCardId)
         ...PostRendererMediaFragment_post
         ...PostRendererActionBar_post
+          @arguments(viewerWebCardId: $viewerWebCardId)
       }
     `,
     postKey,
@@ -102,8 +116,8 @@ const PostRenderer = (
 
   const author = useFragment(
     graphql`
-      fragment PostRendererFragment_author on Profile {
-        ...AuthorCartoucheFragment_profile
+      fragment PostRendererFragment_author on WebCard {
+        ...AuthorCartoucheFragment_webCard
       }
     `,
     authorKey,
@@ -130,10 +144,30 @@ const PostRenderer = (
     }),
     [],
   );
+
+  const { profileInfos } = useAuthState();
+
   const [showModal, toggleModal] = useToggle();
   const context = useContext(PostListContext);
   const shouldPlayVideo = context.played === post.id;
   const shouldPauseVideo = context.paused.includes(post.id) && !shouldPlayVideo;
+
+  const intl = useIntl();
+
+  const openModal = useCallback(() => {
+    if (isEditor(profileInfos?.profileRole)) {
+      toggleModal();
+    } else {
+      Toast.show({
+        type: 'error',
+        text1: intl.formatMessage({
+          defaultMessage: 'Only admins & editors can edit a post',
+          description:
+            'Error message when a user tries to edit a post but is not an admin',
+        }),
+      });
+    }
+  }, [intl, profileInfos?.profileRole, toggleModal]);
 
   return (
     <View {...props}>
@@ -142,12 +176,13 @@ const PostRenderer = (
           author={author}
           style={styles.authorCartoucheStyle}
           activeLink
+          onPress={onPressAuthor}
         />
 
         <IconButton
           variant="icon"
           icon="more"
-          onPress={toggleModal}
+          onPress={openModal}
           style={{ marginRight: 20 }}
         />
       </View>
@@ -165,7 +200,7 @@ const PostRenderer = (
       </View>
       <Suspense fallback={<PostRendererBottomPanelSkeleton />}>
         <PostRendererBottomPanel
-          toggleModal={toggleModal}
+          toggleModal={openModal}
           showModal={showModal}
           post={post}
         />

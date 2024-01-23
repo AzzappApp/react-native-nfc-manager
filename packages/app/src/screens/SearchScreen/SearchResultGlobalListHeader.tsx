@@ -10,22 +10,22 @@ import CoverList from '#components/CoverList';
 import SkeletonPlaceholder from '#components/Skeleton';
 import Button from '#ui/Button';
 import Text from '#ui/Text';
-import type { CoverList_users$key } from '@azzapp/relay/artifacts/CoverList_users.graphql';
+import type { CoverList_users$key } from '#relayArtifacts/CoverList_users.graphql';
 
-import type { SearchResultGlobalListHeader_viewer$key } from '@azzapp/relay/artifacts/SearchResultGlobalListHeader_viewer.graphql';
+import type { SearchResultGlobalListHeader_profile$key } from '#relayArtifacts/SearchResultGlobalListHeader_profile.graphql';
 
 type SearchResultGlobalListHeaderProps = {
-  viewer: SearchResultGlobalListHeader_viewer$key;
+  profile: SearchResultGlobalListHeader_profile$key;
   goToProfilesTab: () => void;
 };
 
 const SearchResultGlobalListHeader = ({
-  viewer,
+  profile,
   goToProfilesTab,
 }: SearchResultGlobalListHeaderProps) => {
   const { data, loadNext, isLoadingNext, hasNext } = usePaginationFragment(
     graphql`
-      fragment SearchResultGlobalListHeader_viewer on Viewer
+      fragment SearchResultGlobalListHeader_profile on Profile
       @refetchable(queryName: "SearchGlobalProfilesListQuery")
       @argumentDefinitions(
         after: { type: String }
@@ -33,12 +33,12 @@ const SearchResultGlobalListHeader = ({
         search: { type: "String!" }
         useLocation: { type: "Boolean!" }
       ) {
-        searchProfiles(
+        searchWebCards(
           after: $after
           first: $first
           search: $search
           useLocation: $useLocation
-        ) @connection(key: "ViewerGlobal_searchProfiles") {
+        ) @connection(key: "ViewerGlobal_searchWebCards") {
           edges {
             node {
               id
@@ -48,7 +48,7 @@ const SearchResultGlobalListHeader = ({
         }
       }
     `,
-    viewer,
+    profile,
   );
 
   const onEndReachedCover = useCallback(() => {
@@ -59,7 +59,7 @@ const SearchResultGlobalListHeader = ({
 
   const users: CoverList_users$key = useMemo(() => {
     return convertToNonNullArray(
-      data.searchProfiles?.edges?.map(edge => edge?.node) ?? [],
+      data.searchWebCards?.edges?.map(edge => edge?.node) ?? [],
     );
   }, [data]);
 
@@ -80,6 +80,7 @@ const SearchResultGlobalListHeader = ({
           containerStyle={styles.containerStyle}
           coverStyle={styles.coverStyle}
           style={styles.coverListStyle}
+          withShadow
         />
         <Button
           variant="little_round"
@@ -149,6 +150,7 @@ const styles = StyleSheet.create({
   },
   coverListStyle: {
     height: 128,
+    overflow: 'visible',
   },
   seeAll: {
     position: 'absolute',

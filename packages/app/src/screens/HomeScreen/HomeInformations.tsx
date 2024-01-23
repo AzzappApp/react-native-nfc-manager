@@ -11,15 +11,12 @@ import { useFragment, graphql } from 'react-relay';
 import { colors } from '#theme';
 import AnimatedText from '#components/AnimatedText';
 import Link from '#components/Link';
-import useMultiActorEnvironmentPluralFragment from '#hooks/useMultiActorEnvironmentPluralFragment';
 import PressableOpacity from '#ui/PressableOpacity';
 import Text from '#ui/Text';
-import type { HomeInformations_profile$key } from '@azzapp/relay/artifacts/HomeInformations_profile.graphql';
-import type { HomeInformations_user$key } from '@azzapp/relay/artifacts/HomeInformations_user.graphql';
+import type { HomeInformations_user$key } from '#relayArtifacts/HomeInformations_user.graphql';
 import type { SharedValue } from 'react-native-reanimated';
 type HomeInformationsProps = {
   user: HomeInformations_user$key;
-  animated: boolean;
   height: number;
   currentProfileIndexSharedValue: SharedValue<number>;
 };
@@ -27,54 +24,43 @@ type HomeInformationsProps = {
  *
  *
  * @param {HomeInformationsProps} {
- *   animated,
  *   user,
  *   currentProfileIndexSharedValue,
  * }
  * @return {*}
  */
 const HomeInformations = ({
-  animated,
   height,
   user,
   currentProfileIndexSharedValue,
 }: HomeInformationsProps) => {
-  const { profiles: profilesKey } = useFragment(
+  const { profiles } = useFragment(
     graphql`
       fragment HomeInformations_user on User {
         profiles {
-          id
-          ...HomeInformations_profile
+          webCard {
+            id
+            userName
+            firstName
+            nbPosts
+            nbFollowings
+            nbFollowers
+            nbPostsLiked
+          }
         }
       }
     `,
     user,
   );
 
-  const profiles = useMultiActorEnvironmentPluralFragment(
-    graphql`
-      fragment HomeInformations_profile on Profile {
-        id
-        userName
-        firstName
-        nbPosts
-        nbFollowings
-        nbFollowers
-        nbPostsLiked
-      }
-    `,
-    (profile: any) => profile.id,
-    profilesKey as unknown as HomeInformations_profile$key[],
-  );
-
   // using relay result direclty inside animated hook cause crash
   const infosShared = useSharedValue(
-    profiles?.map(profile => {
+    profiles?.map(({ webCard }) => {
       return {
-        nbPosts: profile.nbPosts,
-        nbFollowings: profile.nbFollowings,
-        nbFollowers: profile.nbFollowers,
-        nbLikes: profile.nbPostsLiked,
+        nbPosts: webCard.nbPosts,
+        nbFollowings: webCard.nbFollowings,
+        nbFollowers: webCard.nbFollowers,
+        nbLikes: webCard.nbPostsLiked,
       };
     }) ?? [],
   );
@@ -82,12 +68,12 @@ const HomeInformations = ({
   useEffect(() => {
     //updating the infosShared when profiles changed (after creating a new profile)
     if (profiles) {
-      infosShared.value = profiles?.map(profile => {
+      infosShared.value = profiles?.map(({ webCard }) => {
         return {
-          nbPosts: profile.nbPosts,
-          nbFollowings: profile.nbFollowings,
-          nbFollowers: profile.nbFollowers,
-          nbLikes: profile.nbPostsLiked,
+          nbPosts: webCard.nbPosts,
+          nbFollowings: webCard.nbFollowings,
+          nbFollowers: webCard.nbFollowers,
+          nbLikes: webCard.nbPostsLiked,
         };
       });
     }
@@ -115,7 +101,7 @@ const HomeInformations = ({
   useAnimatedReaction(
     () => currentProfileIndexSharedValue.value,
     actual => {
-      if (actual >= 0 && animated) {
+      if (actual >= 0 && profiles && profiles?.length > 1) {
         runOnJS(defineCurrentProfile)(Math.floor(actual));
 
         const prevIndex = Math.floor(actual);
@@ -156,16 +142,14 @@ const HomeInformations = ({
             [previous.nbFollowings, next.nbFollowings],
           ),
         );
-      } else if (actual >= 0 && !animated && Math.trunc(actual) === actual) {
-        nbPosts.value = format(infosShared.value[actual].nbPosts ?? 0);
-        nbLikes.value = format(infosShared.value[actual].nbLikes ?? 0);
-        nbFollowers.value = format(infosShared.value[actual].nbFollowers ?? 0);
-        nbFollowings.value = format(
-          infosShared.value[actual].nbFollowings ?? 0,
-        );
+      } else if (actual >= 0) {
+        nbPosts.value = format(infosShared.value[0].nbPosts ?? 0);
+        nbLikes.value = format(infosShared.value[0].nbLikes ?? 0);
+        nbFollowers.value = format(infosShared.value[0].nbFollowers ?? 0);
+        nbFollowings.value = format(infosShared.value[0].nbFollowings ?? 0);
       }
     },
-    [animated, profiles],
+    [profiles],
   );
 
   if (!currentProfile) {
@@ -176,10 +160,10 @@ const HomeInformations = ({
     <View style={[styles.container, { height }]}>
       <View style={styles.row}>
         <Link
-          route="PROFILE"
+          route="WEBCARD"
           params={{
-            userName: currentProfile.userName,
-            profileId: currentProfile.id,
+            userName: currentProfile.webCard.userName,
+            webCardId: currentProfile.webCard.id,
             showPosts: true,
           }}
         >

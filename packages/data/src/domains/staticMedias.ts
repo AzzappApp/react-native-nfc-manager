@@ -5,6 +5,8 @@ import { sortEntitiesByIds } from './generic';
 import type { InferInsertModel, InferSelectModel } from 'drizzle-orm';
 
 export const StaticMediaTable = mysqlTable('StaticMedia', {
+  // we keep defaultVarchar here because raw media id in cloudinary needs to keep
+  // an extension, which would be too long for the mediaId (char(26)) column size
   id: cols.defaultVarchar('id').primaryKey().notNull(),
   usage: mysqlEnum('usage', [
     'coverForeground',

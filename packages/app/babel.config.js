@@ -1,14 +1,17 @@
 const path = require('path');
+const {
+  default: resolvePath,
+} = require('babel-plugin-module-resolver/lib/resolvePath');
 
 const relayArtifactDirectory = path.join(
-  path.dirname(require.resolve('@azzapp/relay/package.json')),
-  'artifacts',
+  path.dirname(require.resolve('@azzapp/app/package.json')),
+  'src/relayArtifacts',
 );
 
 module.exports = {
   presets: [
     [
-      'module:metro-react-native-babel-preset',
+      'module:@react-native/babel-preset',
       {
         unstable_transformProfile: 'hermes-stable',
       },
@@ -17,6 +20,7 @@ module.exports = {
   plugins: [
     // TODO allowList to avoid bad env injected ?
     ['module:react-native-dotenv', { moduleName: 'process.env' }],
+    ['relay', { artifactDirectory: relayArtifactDirectory }],
     [
       'module-resolver',
       {
@@ -24,9 +28,15 @@ module.exports = {
           '^#(.+)': './src/\\1',
           '@azzapp/shared': '../shared/src',
         },
+        resolvePath(sourcePath, currentFile, opts) {
+          if (sourcePath.endsWith('.relayprovider')) {
+            const name = sourcePath.split('/').pop();
+            return resolvePath(`#relayProviders/${name}`, currentFile, opts);
+          }
+          return resolvePath(sourcePath, currentFile, opts);
+        },
       },
     ],
-    ['relay', { artifactDirectory: relayArtifactDirectory }],
     [
       'formatjs',
       {

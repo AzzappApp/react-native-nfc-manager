@@ -1,80 +1,36 @@
 import { createId } from '@paralleldrive/cuid2';
-import { eq, asc, sql, and, lt, desc, isNull, ne } from 'drizzle-orm';
+import { and, asc, desc, eq, isNull, ne, sql } from 'drizzle-orm';
 import {
-  mysqlEnum,
-  index,
-  uniqueIndex,
-  fulltextIndex,
-  mysqlTable,
-  json,
   boolean,
+  json,
+  mysqlTable,
+  varchar,
   int,
+  uniqueIndex,
 } from 'drizzle-orm/mysql-core';
 import db, { cols } from './db';
 import { FollowTable } from './follows';
-import { getUserById } from './users';
-import type { Profile } from '#schema/ProfileResolvers';
+import { WebCardTable } from './webCards';
 import type { DbTransaction } from './db';
-import type { CardStyle } from '@azzapp/shared/cardHelpers';
+import type { WebCard } from './webCards';
 import type { ContactCard } from '@azzapp/shared/contactCardHelpers';
-import type {
-  TextOrientation,
-  TextPosition,
-  TextStyle,
-} from '@azzapp/shared/coverHelpers';
 import type { InferInsertModel, InferSelectModel } from 'drizzle-orm';
 
 export const ProfileTable = mysqlTable(
   'Profile',
   {
-    /* Profile infos */
     id: cols.cuid('id').primaryKey().notNull().$defaultFn(createId),
     userId: cols.cuid('userId').notNull(),
-    userName: cols.defaultVarchar('userName').notNull(),
-    profileKind: mysqlEnum('profileKind', ['personal', 'business']).notNull(),
-    profileCategoryId: cols.cuid('profileCategoryId'),
-    firstName: cols.defaultVarchar('firstName'),
-    lastName: cols.defaultVarchar('lastName'),
-    companyName: cols.defaultVarchar('companyName'),
-    companyActivityId: cols.cuid('companyActivityId'),
-    createdAt: cols.dateTime('createdAt').notNull(),
-    updatedAt: cols.dateTime('updatedAt').notNull(),
-
-    /* Cards infos */
-    cardColors: json('cardColors').$type<{
-      primary: string;
-      light: string;
-      dark: string;
-      otherColors: string[];
-    } | null>(),
-    cardStyle: json('cardStyle').$type<CardStyle>(),
-    cardIsPrivate: boolean('cardIsPrivate').default(false).notNull(),
-    cardIsPublished: boolean('cardIsPublished').default(false).notNull(),
-    lastCardUpdate: cols.dateTime('lastCardUpdate').notNull(),
-
-    /* Covers infos */
-    coverTitle: cols.defaultVarchar('coverTitle'),
-    coverSubTitle: cols.defaultVarchar('coverSubTitle'),
-    coverData: json('coverData').$type<{
-      kind: 'others' | 'people' | 'video' | null;
-      titleStyle: TextStyle;
-      subTitleStyle: TextStyle;
-      textOrientation: TextOrientation;
-      textPosition: TextPosition;
-      backgroundId?: string | null;
-      backgroundColor?: string | null;
-      backgroundPatternColor?: string | null;
-      foregroundId?: string | null;
-      foregroundColor?: string | null;
-      sourceMediaId: string | null;
-      maskMediaId?: string | null;
-      mediaFilter?: string | null;
-      mediaParameters?: Record<string, any> | null;
-      mediaId?: string | null;
-      merged: boolean;
-      segmented: boolean;
-    }>(),
-
+    webCardId: cols.cuid('webCardId').notNull(),
+    profileRole: varchar('profileRole', {
+      length: 6,
+      enum: ['owner', 'admin', 'editor', 'user'],
+    })
+      .notNull()
+      .default('owner'),
+    invited: boolean('invited').default(false).notNull(),
+    promotedAsOwner: boolean('promotedAsOwner').default(false).notNull(),
+    avatarId: cols.mediaId('avatarId'),
     /* Contact cards infos */
     contactCard: json('contactCard').$type<ContactCard>(),
     contactCardIsPrivate: boolean('contactCardIsPrivate')
@@ -84,19 +40,14 @@ export const ProfileTable = mysqlTable(
       .default(false)
       .notNull(),
     lastContactCardUpdate: cols.dateTime('lastContactCardUpdate').notNull(),
-    nbFollowers: int('nbFollowers').default(0).notNull(),
-    nbFollowings: int('nbFollowings').default(0).notNull(),
-    nbPosts: int('nbPosts').default(0).notNull(),
-    nbPostsLiked: int('nbPostsLiked').default(0).notNull(), // this is the informations postLiked
-    nbLikes: int('nbLikes').default(0).notNull(), //this is the stats TotalLikes (number of likes received)
-    nbWebcardViews: int('nbWebcardViews').default(0).notNull(),
     nbContactCardScans: int('nbContactCardScans').default(0).notNull(),
   },
   table => {
     return {
-      userIdIdx: index('Profile_userId_idx').on(table.userId),
-      userNameKey: uniqueIndex('Profile_userName_key').on(table.userName),
-      profileSearch: fulltextIndex('Profile_search').on(table.userName),
+      profileKey: uniqueIndex('Profile_user_webcard_key').on(
+        table.userId,
+        table.webCardId,
+      ),
     };
   },
 );
@@ -104,180 +55,88 @@ export const ProfileTable = mysqlTable(
 export type Profile = InferSelectModel<typeof ProfileTable>;
 export type NewProfile = InferInsertModel<typeof ProfileTable>;
 
-/**
- * Retrieves a profile by its id
- * @param id - The id of the profile to retrieve
- * @returns The profile if found, otherwise null
- */
-export const getProfileById = async (id: string) =>
-  db
-    .select()
-    .from(ProfileTable)
-    .where(eq(ProfileTable.id, id))
-    .then(res => res[0] ?? null);
-
-/**
- * Retrieves a list of associated to an user
- * @param id - The id of the user
- * @returns The list of profile associated to the user
- */
-export const getUserProfiles = async (userId: string) => {
-  const res = await db
-    .select()
-    .from(ProfileTable)
-    .where(eq(ProfileTable.userId, userId))
-    .orderBy(asc(ProfileTable.userName));
-  return res;
+export const createProfile = async (
+  profile: NewProfile,
+  tx: DbTransaction = db,
+) => {
+  const id = createId();
+  await tx.insert(ProfileTable).values({ ...profile, id });
+  return id;
 };
 
-/**
- * Retrieves a profile by their profilename
- *
- * @param profileName - The profilename of the profile to retrieve
- * @returns - The profile if found, otherwise null
- */
-export const getProfileByUserName = async (profileName: string) => {
+export const getProfileById = async (profileId: string) => {
   return db
     .select()
     .from(ProfileTable)
-    .where(eq(ProfileTable.userName, profileName))
-    .then(res => res.pop() ?? null);
+    .where(eq(ProfileTable.id, profileId))
+    .then(res => res.pop() || null);
 };
 
-/**
- * Retrieve the list of profile a profile is following
- * @param profileId - The id of the profile
- * @param params - The parameters to filter the result
- * @returns A list of profile
- */
-export const getFollowings = async (
+export const getProfileWithWebCardById = async (
   profileId: string,
-  params: { userName?: string | null },
-) => {
-  const result = await db
-    .select({ Profile: ProfileTable })
+): Promise<{ Profile: Profile; WebCard: WebCard } | null> => {
+  return db
+    .select()
     .from(ProfileTable)
-    .innerJoin(FollowTable, eq(FollowTable.followingId, ProfileTable.id))
-    .where(
-      and(
-        eq(FollowTable.followerId, profileId),
-        params.userName
-          ? sql`MATCH (${ProfileTable.userName}) AGAINST ("${params.userName}*" IN BOOLEAN MODE)`
-          : undefined,
-      ),
-    );
-
-  return result.map(({ Profile }) => Profile);
+    .innerJoin(WebCardTable, eq(WebCardTable.id, ProfileTable.webCardId))
+    .where(eq(ProfileTable.id, profileId))
+    .then(res => res.pop() || null);
 };
 
-export const getRecommendedProfiles = async (
-  profileId: string,
+export const getUserProfileWithWebCardId = async (
   userId: string,
+  webCardId: string,
 ) => {
-  const result = await db
-    .select({ Profile: ProfileTable })
+  return db
+    .select()
     .from(ProfileTable)
-    .leftJoin(
-      FollowTable,
-      and(
-        eq(FollowTable.followingId, ProfileTable.id),
-        eq(FollowTable.followerId, profileId),
-      ),
-    )
     .where(
       and(
-        ne(ProfileTable.userId, userId),
-        isNull(FollowTable.followerId),
-        eq(ProfileTable.cardIsPublished, true),
+        eq(ProfileTable.userId, userId),
+        eq(ProfileTable.webCardId, webCardId),
       ),
     )
-    .orderBy(desc(ProfileTable.createdAt));
-
-  return result.map(({ Profile }) => Profile);
+    .then(res => res.pop() || null);
 };
 
 /**
- * Retrieve the list of profile a profile is being followed
- * @param profileId - The id of the profile
- * @param params - The parameters to filter the result
- * @returns the list of profile a profile is being followed
+ * Retrieves a list of associated profiles to an user
+ * @param id - The id of the user
+ * @returns The list of profile associated to the user
  */
-export const getFollowerProfiles = async (
-  profileId: string,
-  {
-    limit,
-    after = null,
-    userName,
-  }: {
-    limit: number;
-    after: Date | null;
-    userName?: string | null;
-  },
-) =>
-  db
-    .select({
-      Profile: ProfileTable,
-      followCreatedAt: FollowTable.createdAt,
-    })
+export const getProfilesOfUser = async (userId: string) => {
+  return db
+    .select()
     .from(ProfileTable)
-    .innerJoin(FollowTable, eq(FollowTable.followerId, ProfileTable.id))
-    .where(
-      and(
-        eq(FollowTable.followingId, profileId),
-        after ? lt(FollowTable.createdAt, after) : undefined,
-        userName
-          ? sql`MATCH (${ProfileTable.userName}) AGAINST ("${userName}*" IN BOOLEAN MODE)`
-          : undefined,
-      ),
-    )
-    .orderBy(desc(FollowTable.createdAt))
-    .limit(limit);
+    .innerJoin(WebCardTable, eq(WebCardTable.id, ProfileTable.webCardId))
+    .where(eq(ProfileTable.userId, userId))
+    .orderBy(asc(WebCardTable.userName))
+    .then(res => res.map(({ Profile }) => Profile));
+};
 
 /**
- * Retrieve the list of profile a profile is following
- * @param profileId - The id of the profile
- * @returns the list of profile a profileis following
+ * Retrieves the owner profile by the username
+ *
+ * @param userName - The userName of the profile to retrieve
+ * @returns - The profile if found, otherwise null
  */
-export const getFollowingsProfiles = async (
-  profileId: string,
-  {
-    limit,
-    after = null,
-    userName,
-  }: {
-    limit: number;
-    after: Date | null;
-    userName?: string | null;
-  },
-) =>
-  db
-    .select({
-      Profile: ProfileTable,
-      followCreatedAt: FollowTable.createdAt,
-    })
+export const getProfileByUserName = async (userName: string) => {
+  return db
+    .select()
     .from(ProfileTable)
-    .innerJoin(FollowTable, eq(FollowTable.followingId, ProfileTable.id))
+    .innerJoin(WebCardTable, eq(WebCardTable.id, ProfileTable.webCardId))
     .where(
       and(
-        eq(FollowTable.followerId, profileId),
-        after ? lt(FollowTable.createdAt, after) : undefined,
-        userName
-          ? sql`MATCH (${ProfileTable.userName}) AGAINST ("${userName}*" IN BOOLEAN MODE)`
-          : undefined,
+        eq(WebCardTable.userName, userName),
+        eq(ProfileTable.profileRole, 'owner'),
       ),
     )
-    .orderBy(desc(FollowTable.createdAt))
-    .limit(limit);
+    .then(res => {
+      const user = res.pop();
 
-/**
- * Create a new profile
- * @param data - The profile fields, excluding the id
- * @returns The newly created profile
- */
-export const createProfile = async (data: NewProfile): Promise<string> => {
-  const id = createId();
-  await db.insert(ProfileTable).values({ ...data, id });
-  return id;
+      if (!user) return null;
+      return user.Profile;
+    });
 };
 
 export const updateProfile = async (
@@ -285,48 +144,148 @@ export const updateProfile = async (
   updates: Partial<Profile>,
   tx: DbTransaction = db,
 ) => {
-  const updatedProfile = {
-    updatedAt: new Date(),
-    ...updates,
-  };
-
   await tx
     .update(ProfileTable)
-    .set(updatedProfile)
+    .set(updates)
+    .where(eq(ProfileTable.id, profileId));
+};
+export const getRecommendedWebCards = async (
+  profileId: string,
+  webCardId: string,
+): Promise<WebCard[]> => {
+  return db
+    .selectDistinct({
+      WebCard: WebCardTable,
+    })
+    .from(WebCardTable)
+    .innerJoin(ProfileTable, eq(ProfileTable.webCardId, WebCardTable.id))
+    .leftJoin(
+      FollowTable,
+      and(
+        eq(FollowTable.followingId, WebCardTable.id),
+        eq(FollowTable.followerId, webCardId),
+      ),
+    )
+    .where(
+      and(
+        ne(WebCardTable.id, webCardId),
+        isNull(FollowTable.followerId),
+        eq(WebCardTable.cardIsPublished, true),
+      ),
+    )
+    .orderBy(desc(WebCardTable.createdAt))
+    .then(res => res.map(({ WebCard }) => WebCard));
+};
+
+export const updateContactCardTotalScans = async (
+  profileId: string,
+  tx: DbTransaction = db,
+) => {
+  await tx
+    .update(ProfileTable)
+    .set({
+      nbContactCardScans: sql`${ProfileTable.nbContactCardScans} + 1`,
+    })
     .where(eq(ProfileTable.id, profileId));
 };
 
 /**
- * Build a default contact card from a profile and a user
- * @param profile
- * @returns
+ * Get the list of profiles associated to a webCard orderby role (owner, admin, editor, user)
+ * then by firstname and lastname (asc)
+ *
+ * @param {string} webCardId
+ * @param {{
+ *     limit: number;
+ *     after: number;
+ *   }} {
+ *     limit,
+ *     after = 0,
+ *   }
+ * @param {DbTransaction} [tx=db]
  */
-export const buildDefaultContactCard = async (
-  profile: NewProfile,
-): Promise<ContactCard> => {
-  const user = await getUserById(profile.userId);
-  return {
-    firstName: profile.firstName,
-    lastName: profile.lastName,
-    company: profile.companyName,
-    title: null,
-    emails: user?.email
-      ? [
-          {
-            address: user.email,
-            label: 'Home',
-            selected: true,
-          },
-        ]
-      : null,
-    phoneNumbers: user?.phoneNumber
-      ? [
-          {
-            number: user.phoneNumber,
-            label: 'Home',
-            selected: true,
-          },
-        ]
-      : null,
-  };
-};
+export const getWebCardProfiles = async (
+  webCardId: string,
+  {
+    limit,
+    after = 0,
+  }: {
+    limit: number;
+    after: number;
+  },
+  tx: DbTransaction = db,
+) =>
+  (
+    await tx.execute(
+      sql`SELECT * 
+          FROM Profile
+          WHERE webCardId = ${webCardId} 
+          ORDER BY 
+            CASE 
+                WHEN profileRole = 'owner' THEN 1
+                WHEN profileRole = 'admin' THEN 2
+                WHEN profileRole = 'editor' THEN 3
+                WHEN profileRole = 'user' THEN 4
+                ELSE 5
+            END ASC,
+            JSON_EXTRACT(contactCard, '$.firstName'),
+            JSON_EXTRACT(contactCard, '$.lastName')
+          LIMIT ${limit} OFFSET ${after}`,
+    )
+  ).rows as Profile[];
+
+/**
+ * The the profile owner of a webcard
+ *
+ * @param {string} webCardId
+ * @param {DbTransaction} [tx=db]
+ * @returns {Promise<Profile[]>} the list of profiles that are owner (for now there is only one)
+ */
+export const getWebCardOwnerProfile = async (
+  webCardId: string,
+  tx: DbTransaction = db,
+) =>
+  tx
+    .select()
+    .from(ProfileTable)
+    .where(
+      and(
+        eq(ProfileTable.webCardId, webCardId),
+        eq(ProfileTable.profileRole, 'owner'),
+      ),
+    );
+/**
+ * Count the number of profiles associated to a webCard
+ *
+ * @param {string} webCardId
+ * @param {DbTransaction} [tx=db]
+ */
+export const countWebCardProfiles = async (
+  webCardId: string,
+  tx: DbTransaction = db,
+) =>
+  tx
+    .select({ count: sql`count(*)`.mapWith(Number) })
+    .from(ProfileTable)
+    .where(eq(ProfileTable.webCardId, webCardId))
+    .then(res => res[0].count);
+
+/**
+ *
+ *
+ * @param {string} webCardId
+ * @param {DbTransaction} [tx=db]
+ * @returns {Promise<Profile[]>} the list of profiles that are pending to be owner
+ */
+export const getWebCardPendingOwnerProfile = async (
+  webCardId: string,
+  tx: DbTransaction = db,
+) =>
+  tx
+    .select()
+    .from(ProfileTable)
+    .where(
+      and(
+        eq(ProfileTable.webCardId, webCardId),
+        eq(ProfileTable.promotedAsOwner, true),
+      ),
+    );

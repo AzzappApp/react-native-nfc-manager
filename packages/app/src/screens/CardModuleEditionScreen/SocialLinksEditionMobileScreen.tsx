@@ -1,8 +1,8 @@
 import { graphql, usePreloadedQuery } from 'react-relay';
 import { MODULE_KIND_SOCIAL_LINKS } from '@azzapp/shared/cardModuleHelpers';
 import SocialLinksEditionScreen from '#screens/SocialLinksEditionScreen';
-import type { SocialLinksEditionMobileScreenQuery } from '@azzapp/relay/artifacts/SocialLinksEditionMobileScreenQuery.graphql';
-import type { SocialLinksEditionScreen_module$key } from '@azzapp/relay/artifacts/SocialLinksEditionScreen_module.graphql';
+import type { SocialLinksEditionMobileScreenQuery } from '#relayArtifacts/SocialLinksEditionMobileScreenQuery.graphql';
+import type { SocialLinksEditionScreen_module$key } from '#relayArtifacts/SocialLinksEditionScreen_module.graphql';
 import type { PreloadedQuery } from 'react-relay';
 
 type SocialLinksEditionMobileScreenProps = {
@@ -24,12 +24,15 @@ const SocialLinksEditionMobileScreen = ({
   moduleId,
   preloadedQuery,
 }: SocialLinksEditionMobileScreenProps) => {
-  const data = usePreloadedQuery(SocialLinksQuery, preloadedQuery);
-
+  const { profile } = usePreloadedQuery(SocialLinksQuery, preloadedQuery);
   let module: SocialLinksEditionScreen_module$key | null = null;
+  if (!profile) {
+    return null;
+  }
+
   if (moduleId != null) {
     module =
-      data.viewer.profile?.cardModules.find(
+      profile.webCard?.cardModules.find(
         module =>
           module?.id === moduleId && module?.kind === MODULE_KIND_SOCIAL_LINKS,
       ) ?? null;
@@ -38,18 +41,20 @@ const SocialLinksEditionMobileScreen = ({
     }
   }
 
-  return <SocialLinksEditionScreen module={module} viewer={data.viewer} />;
+  return <SocialLinksEditionScreen module={module} profile={profile} />;
 };
 
 const SocialLinksQuery = graphql`
-  query SocialLinksEditionMobileScreenQuery {
-    viewer {
-      ...SocialLinksEditionScreen_viewer
-      profile {
-        cardModules {
-          id
-          kind
-          ...SocialLinksEditionScreen_module
+  query SocialLinksEditionMobileScreenQuery($profileId: ID!) {
+    profile: node(id: $profileId) {
+      ... on Profile {
+        ...SocialLinksEditionScreen_profile
+        webCard {
+          cardModules {
+            id
+            kind
+            ...SocialLinksEditionScreen_module
+          }
         }
       }
     }

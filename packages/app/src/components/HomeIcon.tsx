@@ -1,32 +1,31 @@
 import { Suspense } from 'react';
 import { graphql, useLazyLoadQuery } from 'react-relay';
-import ProfileBoundRelayEnvironmentProvider from '#helpers/ProfileBoundRelayEnvironmentProvider';
 import useAuthState from '#hooks/useAuthState';
 import CoverRenderer from './CoverRenderer';
-import type { HomeIconQuery } from '@azzapp/relay/artifacts/HomeIconQuery.graphql';
+import type { HomeIconQuery } from '#relayArtifacts/HomeIconQuery.graphql';
 
 type HomeIconProps = {
-  profileId: string;
+  webCardId: string;
 };
 
-const HomeCoverIcon = ({ profileId }: HomeIconProps) => {
+const HomeCoverIcon = ({ webCardId }: HomeIconProps) => {
   const data = useLazyLoadQuery<HomeIconQuery>(
     graphql`
-      query HomeIconQuery($profileId: ID!) {
-        node(id: $profileId) {
-          ...CoverRenderer_profile
+      query HomeIconQuery($webCardId: ID!) {
+        node(id: $webCardId) {
+          ...CoverRenderer_webCard
         }
       }
     `,
     {
-      profileId,
+      webCardId,
     },
     { fetchPolicy: 'store-only' },
   );
 
   return (
     <CoverRenderer
-      profile={data.node}
+      webCard={data.node}
       width={COVER_WIDTH}
       style={{ marginBottom: -1 }}
     />
@@ -34,14 +33,16 @@ const HomeCoverIcon = ({ profileId }: HomeIconProps) => {
 };
 
 export const HomeIcon = () => {
-  const { profileId } = useAuthState();
+  const { profileInfos } = useAuthState();
+
+  if (!profileInfos?.webCardId) {
+    return null;
+  }
 
   return (
-    <ProfileBoundRelayEnvironmentProvider profileId={profileId}>
-      <Suspense fallback={<CoverRenderer width={COVER_WIDTH} profile={null} />}>
-        {profileId && <HomeCoverIcon profileId={profileId} />}
-      </Suspense>
-    </ProfileBoundRelayEnvironmentProvider>
+    <Suspense fallback={<CoverRenderer width={COVER_WIDTH} webCard={null} />}>
+      <HomeCoverIcon webCardId={profileInfos.webCardId} />
+    </Suspense>
   );
 };
 

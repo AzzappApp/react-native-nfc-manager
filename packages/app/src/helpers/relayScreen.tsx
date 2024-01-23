@@ -1,25 +1,36 @@
 import { GraphQLError } from 'graphql';
+import { isEqual } from 'lodash';
 import React, { Suspense, useCallback, useEffect, useRef } from 'react';
 import { useIntl } from 'react-intl';
 import { Alert, Appearance } from 'react-native';
-import { RelayEnvironmentProvider, type PreloadedQuery } from 'react-relay';
-// @ts-expect-error not typed
-import useRelayActorEnvironment from 'react-relay/lib/multi-actor/useRelayActorEnvironment';
+import {
+  type PreloadedQuery,
+  fetchQuery,
+  useRelayEnvironment,
+} from 'react-relay';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
 import ERRORS from '@azzapp/shared/errors';
 import {
   FetchError,
   TIMEOUT_ERROR_MESSAGE,
 } from '@azzapp/shared/networkHelpers';
-import { useRouter, type NativeScreenProps } from '#components/NativeRouter';
+import {
+  useRouter,
+  type NativeScreenProps,
+  useScreenHasFocus,
+} from '#components/NativeRouter';
 import useAuthState from '#hooks/useAuthState';
-import { ROOT_ACTOR_ID, getRelayEnvironment } from './relayEnvironment';
-import { loadQueryFor, useManagedQuery } from './RelayQueryManager';
+import {
+  disposeQueryFor,
+  getLoadQueryInfo,
+  loadQueryFor,
+  useManagedQuery,
+} from './RelayQueryManager';
 import type { Route } from '#routes';
 import type { LoadQueryOptions } from './RelayQueryManager';
 import type { ScreenPrefetchOptions } from './ScreenPrefetcher';
 import type { ComponentType } from 'react';
-import type { OperationType } from 'relay-runtime';
+import type { OperationType, Subscription } from 'relay-runtime';
 
 export type RelayScreenOptions<TRoute extends Route> = LoadQueryOptions<
   TRoute['params']
@@ -38,7 +49,22 @@ export type RelayScreenOptions<TRoute extends Route> = LoadQueryOptions<
      *
      * @default true
      */
-    canGoback?: boolean;
+    canGoBack?: boolean;
+
+    /**
+     * The interval in milliseconds to poll the query.
+     */
+    pollInterval?: number;
+    /**
+     * If true, the query will be bound to the current webCard (true by default)
+     * @default true
+     */
+    profileBound?: boolean;
+    /**
+     * If true, the screen will stop polling when it is not focused.
+     * @default true
+     */
+    stopPollingWhenNotFocused?: boolean;
   };
 
 /**
@@ -77,8 +103,10 @@ function relayScreen<TRoute extends Route>(
   {
     fallback: Fallback,
     errorFallback: ErrorFallback,
-    canGoback = true,
+    canGoBack = true,
     profileBound = true,
+    pollInterval,
+    stopPollingWhenNotFocused = true,
     ...options
   }: RelayScreenOptions<TRoute>,
 ): ComponentType<Omit<RelayScreenProps<TRoute, any>, 'preloadedQuery'>> &
@@ -89,31 +117,91 @@ function relayScreen<TRoute extends Route>(
       route: { params },
     } = props;
 
-    const { profileId } = useAuthState();
-    const actorId = (
-      typeof profileBound === 'function' ? profileBound(params) : profileBound
-    )
-      ? profileId
-      : ROOT_ACTOR_ID;
-    const environment = useRelayActorEnvironment(actorId);
+    const { profileInfos } = useAuthState();
 
-    const { preloadedQuery, actorId: queryActorId } =
-      useManagedQuery((props as any).screenId) ?? {};
+    const oldProfileInfosRef = useRef(profileInfos);
+
     useEffect(() => {
-      if (!preloadedQuery) {
+      if (
+        profileBound &&
+        !isEqual(oldProfileInfosRef.current ?? null, profileInfos ?? null)
+      ) {
+        oldProfileInfosRef.current = profileInfos;
+        disposeQueryFor(screenId);
+      }
+    }, [params, profileInfos, screenId]);
+
+    const { preloadedQuery } = useManagedQuery((props as any).screenId) ?? {};
+
+    const hasFocus = useScreenHasFocus();
+
+    useEffect(() => {
+      if (!preloadedQuery && hasFocus) {
         loadQueryFor(screenId, options, params);
       }
-    }, [screenId, params, preloadedQuery]);
+    }, [screenId, params, preloadedQuery, hasFocus]);
+
+    const environment = useRelayEnvironment();
+    useEffect(() => {
+      let currentTimeout: any;
+      let currentSubscription: Subscription | null;
+      let cancelled = false;
+      let retryCount = 0;
+      if (
+        Number.isInteger(pollInterval) &&
+        (props.hasFocus || !stopPollingWhenNotFocused)
+      ) {
+        const poll = () => {
+          currentTimeout = setTimeout(() => {
+            const { query, variables } = getLoadQueryInfo(
+              options,
+              params,
+              profileInfos,
+            );
+            currentSubscription = fetchQuery(environment, query, variables, {
+              fetchPolicy: 'network-only',
+              networkCacheConfig: { force: true },
+            }).subscribe({
+              complete: () => {
+                retryCount = 0;
+                if (cancelled) {
+                  return;
+                }
+                poll();
+              },
+              error: () => {
+                retryCount += 1;
+                setTimeout(
+                  () => {
+                    if (cancelled) {
+                      return;
+                    }
+                    poll();
+                  },
+                  2 ** Math.min(retryCount, 5) * 1000,
+                );
+              },
+            });
+          }, pollInterval);
+        };
+        poll();
+      }
+      return () => {
+        cancelled = true;
+        currentSubscription?.unsubscribe();
+        clearTimeout(currentTimeout);
+      };
+    }, [environment, params, profileInfos, props.hasFocus, screenId]);
 
     const intl = useIntl();
     const router = useRouter();
 
     const isInErrorState = useRef(false);
-    const erroBoundaryRef = useRef<RelayScreenErrorBoundary>(null);
+    const errorBoundaryRef = useRef<RelayScreenErrorBoundary>(null);
     const retry = useCallback(() => {
       isInErrorState.current = false;
       loadQueryFor(screenId, options, params, true);
-      erroBoundaryRef.current?.reset();
+      errorBoundaryRef.current?.reset();
     }, [params, screenId]);
 
     const onError = useCallback(() => {
@@ -131,7 +219,7 @@ function relayScreen<TRoute extends Route>(
           description: 'Screen Alert message loading error',
         }),
         convertToNonNullArray([
-          canGoback
+          canGoBack
             ? {
                 text: intl.formatMessage({
                   defaultMessage: 'Cancel',
@@ -159,24 +247,12 @@ function relayScreen<TRoute extends Route>(
       );
     }, [intl, retry, router]);
 
-    const getEnvironmentForActor = useCallback((actorId: string) => {
-      return getRelayEnvironment().forActor(actorId);
-    }, []);
-
     const inner = (
-      <RelayEnvironmentProvider
-        environment={environment}
-        // @ts-expect-error not in the types
-        getEnvironmentForActor={getEnvironmentForActor}
-      >
-        <Suspense fallback={Fallback ? <Fallback {...props} /> : null}>
-          {preloadedQuery &&
-            (queryActorId === actorId ||
-              (queryActorId === ROOT_ACTOR_ID && !actorId)) && (
-              <Component {...props} preloadedQuery={preloadedQuery} />
-            )}
-        </Suspense>
-      </RelayEnvironmentProvider>
+      <Suspense fallback={Fallback ? <Fallback {...props} /> : null}>
+        {preloadedQuery && (
+          <Component {...props} preloadedQuery={preloadedQuery} />
+        )}
+      </Suspense>
     );
     if (__DEV__) {
       return inner;
@@ -185,7 +261,7 @@ function relayScreen<TRoute extends Route>(
     ErrorFallback = ErrorFallback ?? Fallback;
     return (
       <RelayScreenErrorBoundary
-        ref={erroBoundaryRef}
+        ref={errorBoundaryRef}
         onError={onError}
         fallback={
           ErrorFallback ? <ErrorFallback {...props} retry={retry} /> : null
@@ -198,7 +274,10 @@ function relayScreen<TRoute extends Route>(
 
   const displayName = Component.displayName ?? Component.name ?? 'Screen';
   RelayWrapper.displayName = `RelayWrapper(${displayName})`;
-  Object.assign(RelayWrapper, Component, { ...options, profileBound });
+  Object.assign(RelayWrapper, Component, {
+    ...options,
+    profileBound,
+  });
 
   return RelayWrapper as any;
 }

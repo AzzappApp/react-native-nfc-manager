@@ -6,7 +6,7 @@ import { Image, StyleSheet, View } from 'react-native';
 import { mainRoutes } from '#mobileRoutes';
 import { colors } from '#theme';
 import Link from '#components/Link';
-import { useMainTabBarVisiblilityController } from '#components/MainTabBar';
+import { useMainTabBarVisibilityController } from '#components/MainTabBar';
 import { useRouter } from '#components/NativeRouter';
 import { dispatchGlobalEvent } from '#helpers/globalEvents';
 import useAuthState from '#hooks/useAuthState';
@@ -22,7 +22,7 @@ import type { ScreenOptions } from '#components/NativeRouter';
 
 const WelcomeScreen = () => {
   const intl = useIntl();
-  useMainTabBarVisiblilityController(false, true);
+  useMainTabBarVisibilityController(false, true);
 
   const [showMenu, toggleShowMenu] = useToggle(false);
 
@@ -30,19 +30,19 @@ const WelcomeScreen = () => {
     dispatchGlobalEvent({ type: 'READY' });
   }, []);
 
-  const { profileId } = useAuthState();
+  const { profileInfos } = useAuthState();
 
   const router = useRouter();
 
   const goBackToHome = useCallback(() => {
-    if (profileId) {
+    if (profileInfos?.webCardId) {
       router.replaceAll(mainRoutes(false));
     }
-  }, [profileId, router]);
+  }, [profileInfos, router]);
 
   useFocusEffect(goBackToHome);
 
-  return profileId ? (
+  return profileInfos ? (
     <Container
       style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}
     >
@@ -74,22 +74,22 @@ const WelcomeScreen = () => {
         </Text>
         <Text style={styles.subtitle}>
           <FormattedMessage
-            defaultMessage="Introduce yourself in a new way by creating your own WebCard{azzappAp}."
+            defaultMessage="Introduce yourself in a new way by creating your own WebCard{azzappA}."
             description="Subtitle for welcome screen"
             values={{
-              azzappAp: <Text variant="azzapp">a</Text>,
+              azzappA: <Text variant="azzapp">a</Text>,
             }}
           />
         </Text>
-        <Link route="NEW_PROFILE" prefetch>
+        <Link route="NEW_WEBCARD" prefetch>
           <Button
             label={intl.formatMessage(
               {
-                defaultMessage: 'Create my first webcard{azzappAp}',
+                defaultMessage: 'Create my first webcard{azzappA}',
                 description: 'Button label for welcome screen',
               },
               {
-                azzappAp: (
+                azzappA: (
                   <Text style={styles.icon} variant="azzapp">
                     a
                   </Text>
@@ -103,6 +103,7 @@ const WelcomeScreen = () => {
         visible={showMenu}
         close={toggleShowMenu}
         withProfile={false}
+        profileRole={null}
       />
     </Container>
   );

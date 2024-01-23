@@ -1,31 +1,38 @@
 import { GraphQLError } from 'graphql';
-import { fromGlobalId } from 'graphql-relay';
 import ERRORS from '@azzapp/shared/errors';
-import { unfollows } from '#domains';
+import { isEditor } from '@azzapp/shared/profileHelpers';
+import { getUserProfileWithWebCardId, unfollows } from '#domains';
+import fromGlobalIdWithType from '#helpers/relayIdHelpers';
 import type { MutationResolvers } from '#schema/__generated__/types';
 
 const removeFollowerMutation: MutationResolvers['removeFollower'] = async (
   _,
-  { input: { profileId: removedFollowerId } },
+  {
+    input: { removedFollowerId: gqlRemovedFollowerId, webCardId: gqlWebCardId },
+  },
   { auth, loaders },
 ) => {
-  const { profileId } = auth;
-  if (!profileId) {
-    throw new GraphQLError(ERRORS.UNAUTORIZED);
+  const { userId } = auth;
+  const webCardId = fromGlobalIdWithType(gqlWebCardId, 'WebCard');
+  const profile =
+    userId && (await getUserProfileWithWebCardId(userId, webCardId));
+
+  if (!profile || !isEditor(profile.profileRole)) {
+    throw new GraphQLError(ERRORS.UNAUTHORIZED);
   }
 
-  const { id: targetId, type } = fromGlobalId(removedFollowerId);
-  const profile = await loaders.Profile.load(targetId);
-  if (type !== 'Profile' || !profile) {
-    throw new GraphQLError(ERRORS.INVALID_REQUEST);
-  }
+  const webCard = await loaders.WebCard.load(profile.webCardId);
 
-  if (!profile.cardIsPrivate) {
+  if (!webCard?.cardIsPrivate) {
     throw new GraphQLError(ERRORS.FORBIDDEN);
   }
 
+  const removedFollowerId = fromGlobalIdWithType(
+    gqlRemovedFollowerId,
+    'WebCard',
+  );
   try {
-    await unfollows(targetId, profileId);
+    await unfollows(removedFollowerId, profile.webCardId);
   } catch (e) {
     throw new GraphQLError(ERRORS.INTERNAL_SERVER_ERROR);
   }

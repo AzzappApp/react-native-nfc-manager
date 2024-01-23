@@ -5,15 +5,15 @@ import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
 import { COVER_CARD_RADIUS, COVER_RATIO } from '@azzapp/shared/coverHelpers';
 import CoverList from '#components/CoverList';
 import SkeletonPlaceholder from '#components/Skeleton';
-import type { CoverList_users$key } from '@azzapp/relay/artifacts/CoverList_users.graphql';
-import type { SearchResultProfiles_viewer$key } from '@azzapp/relay/artifacts/SearchResultProfiles_viewer.graphql';
-import type { SearchResultProfilesQuery } from '@azzapp/relay/artifacts/SearchResultProfilesQuery.graphql';
+import type { CoverList_users$key } from '#relayArtifacts/CoverList_users.graphql';
+import type { SearchResultProfiles_profile$key } from '#relayArtifacts/SearchResultProfiles_profile.graphql';
+import type { SearchResultProfilesQuery } from '#relayArtifacts/SearchResultProfilesQuery.graphql';
 import type { PreloadedQuery } from 'react-relay';
 
 export const searchResultProfilesQuery = graphql`
-  query SearchResultProfilesQuery($search: String!) {
-    viewer {
-      ...SearchResultProfiles_viewer @arguments(search: $search)
+  query SearchResultProfilesQuery($search: String!, $profileId: ID!) {
+    profile: node(id: $profileId) {
+      ...SearchResultProfiles_profile @arguments(search: $search)
     }
   }
 `;
@@ -32,22 +32,22 @@ const SearchResultProfiles = ({
 
   const { data, loadNext, isLoadingNext, hasNext } = usePaginationFragment<
     SearchResultProfilesQuery,
-    SearchResultProfiles_viewer$key
+    SearchResultProfiles_profile$key
   >(
     graphql`
-      fragment SearchResultProfiles_viewer on Viewer
+      fragment SearchResultProfiles_profile on Profile
       @refetchable(queryName: "SearchResultProfilesListQuery")
       @argumentDefinitions(
         after: { type: String }
         first: { type: Int, defaultValue: 8 }
         search: { type: "String!" }
       ) {
-        searchProfiles(
+        searchWebCards(
           after: $after
           first: $first
           search: $search
           useLocation: false
-        ) @connection(key: "Viewer_searchProfiles") {
+        ) @connection(key: "Viewer_searchWebCards") {
           edges {
             node {
               ...CoverList_users
@@ -56,14 +56,14 @@ const SearchResultProfiles = ({
         }
       }
     `,
-    preloadedQuery.viewer,
+    preloadedQuery.profile,
   );
 
   const users: CoverList_users$key = useMemo(() => {
     return convertToNonNullArray(
-      data.searchProfiles?.edges?.map(edge => edge?.node) ?? [],
+      data?.searchWebCards?.edges?.map(edge => edge?.node) ?? [],
     );
-  }, [data.searchProfiles?.edges]);
+  }, [data?.searchWebCards?.edges]);
 
   const onEndReached = useCallback(() => {
     if (!isLoadingNext && hasNext) {

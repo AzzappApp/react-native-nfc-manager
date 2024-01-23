@@ -1,60 +1,63 @@
 import { useIntl } from 'react-intl';
+import { getArrayBufferForBlob } from 'react-native-blob-jsi-helper';
 import ReactNativeBlobUtil from 'react-native-blob-util';
+import { fromByteArray } from 'react-native-quick-base64';
 import ShareCommand from 'react-native-share';
 import { graphql, useFragment } from 'react-relay';
 import { formatDisplayName } from '@azzapp/shared/stringHelpers';
 import { buildVCard } from '@azzapp/shared/vCardHelpers';
 import Button from '#ui/Button';
-import type { ContactCardExportVcf_card$key } from '@azzapp/relay/artifacts/ContactCardExportVcf_card.graphql';
+import type { ContactCardExportVcf_card$key } from '#relayArtifacts/ContactCardExportVcf_card.graphql';
+
+export type ContactCardExportVcfProps = {
+  userName: string;
+  profile: ContactCardExportVcf_card$key;
+};
 
 const ContactCardExportVcf = ({
   userName,
-  contactCard: contactCardKey,
+  profile: profileKey,
 }: {
   userName: string;
-  contactCard: ContactCardExportVcf_card$key;
+  profile: ContactCardExportVcf_card$key;
 }) => {
-  const contactCard = useFragment(
+  const profile = useFragment(
     graphql`
-      fragment ContactCardExportVcf_card on ContactCard {
-        firstName
-        lastName
-        title
-        company
-        emails {
-          label
-          address
-          selected
+      fragment ContactCardExportVcf_card on Profile {
+        webCard {
+          commonInformation {
+            socials {
+              url
+              label
+            }
+            urls {
+              address
+            }
+          }
+          coverAvatarUrl
         }
-        phoneNumbers {
-          label
-          number
-          selected
-        }
-        urls {
-          address
-          selected
-        }
-        addresses {
-          address
-          label
-          selected
-        }
-        birthday {
-          birthday
-          selected
-        }
-        socials {
-          url
-          label
-          selected
+        contactCard {
+          firstName
+          lastName
+          urls {
+            address
+            selected
+          }
+          socials {
+            url
+            label
+            selected
+          }
         }
         serializedContactCard {
           data
         }
+        avatar {
+          exportUri: uri(width: 720, pixelRatio: 1)
+        }
       }
     `,
-    contactCardKey,
+    profileKey,
   );
 
   const intl = useIntl();
@@ -66,7 +69,35 @@ const ContactCardExportVcf = ({
         description: 'Share button label',
       })}
       onPress={async () => {
-        const { vCard } = buildVCard(contactCard.serializedContactCard.data);
+        let avatar: { base64: string; type: string } | undefined = undefined;
+        if (profile.avatar?.exportUri || profile.webCard.coverAvatarUrl) {
+          const avatarData = await fetch(
+            profile.avatar?.exportUri ?? profile.webCard.coverAvatarUrl!,
+          );
+          const avatarBlob = await avatarData.blob();
+          const base64 = fromByteArray(getArrayBufferForBlob(avatarBlob));
+          avatar = {
+            type:
+              avatarData.headers.get('content-type')?.split('/')[1] ?? 'png',
+            base64,
+          };
+        }
+
+        const { vCard } = await buildVCard(
+          userName,
+          profile.serializedContactCard.data,
+          {
+            urls: [
+              ...(profile.webCard.commonInformation?.urls ?? []),
+              ...(profile.contactCard?.urls ?? []),
+            ],
+            socials: [
+              ...(profile.webCard.commonInformation?.socials ?? []),
+              ...(profile.contactCard?.socials ?? []),
+            ],
+            avatar,
+          },
+        );
         const docPath = ReactNativeBlobUtil.fs.dirs.CacheDir;
         const filePath = `${docPath}/${userName}.vcf`;
         try {
@@ -78,8 +109,10 @@ const ContactCardExportVcf = ({
 
           await ShareCommand.open({
             title:
-              formatDisplayName(contactCard.firstName, contactCard.lastName) ??
-              '',
+              formatDisplayName(
+                profile.contactCard?.firstName,
+                profile.contactCard?.lastName,
+              ) ?? '',
             url: `file://${filePath}`,
             type: 'text/vcard',
             failOnCancel: false,

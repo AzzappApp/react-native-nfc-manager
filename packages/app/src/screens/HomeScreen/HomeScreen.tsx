@@ -1,16 +1,15 @@
 import { useEffect } from 'react';
 import { graphql, usePreloadedQuery } from 'react-relay';
-import { useMainTabBarVisiblilityController } from '#components/MainTabBar';
+import { useMainTabBarVisibilityController } from '#components/MainTabBar';
 import { dispatchGlobalEvent } from '#helpers/globalEvents';
 import relayScreen from '#helpers/relayScreen';
-import useToggle from '#hooks/useToggle';
+import { useDeepLinkStoredRoute } from '#hooks/useDeepLink';
 import ActivityIndicator from '#ui/ActivityIndicator';
 import Container from '#ui/Container';
-import HomeBottomSheetPanel from './HomeBottomSheetPanel';
 import HomeScreenContent from './HomeScreenContent';
 import type { RelayScreenProps } from '#helpers/relayScreen';
+import type { HomeScreenQuery } from '#relayArtifacts/HomeScreenQuery.graphql';
 import type { HomeRoute } from '#routes';
-import type { HomeScreenQuery } from '@azzapp/relay/artifacts/HomeScreenQuery.graphql';
 
 export const homeScreenQuery = graphql`
   query HomeScreenQuery {
@@ -27,7 +26,9 @@ const HomeScreen = ({
   preloadedQuery,
   hasFocus,
 }: RelayScreenProps<HomeRoute, HomeScreenQuery>) => {
-  // data
+  //we need to wait the initial screen to be load before doing any deep link
+  useDeepLinkStoredRoute();
+  // dat
   const { currentUser } = usePreloadedQuery(homeScreenQuery, preloadedQuery);
 
   useEffect(() => {
@@ -36,21 +37,16 @@ const HomeScreen = ({
     }
   }, [hasFocus]);
 
-  const [showMenu, toggleShowMenu] = useToggle(false);
-  return (
-    <>
-      <HomeScreenContent user={currentUser} onShowMenu={toggleShowMenu} />
-      <HomeBottomSheetPanel
-        visible={showMenu}
-        close={toggleShowMenu}
-        withProfile
-      />
-    </>
-  );
+  if (!currentUser) {
+    // should never happen
+    return null;
+  }
+
+  return <HomeScreenContent user={currentUser} />;
 };
 
 const HomeScreenFallback = () => {
-  useMainTabBarVisiblilityController(false);
+  useMainTabBarVisibilityController(false);
 
   return (
     <Container
@@ -69,5 +65,6 @@ export default relayScreen(HomeScreen, {
   query: homeScreenQuery,
   profileBound: false,
   fallback: HomeScreenFallback,
-  canGoback: false,
+  canGoBack: false,
+  pollInterval: 30000,
 });

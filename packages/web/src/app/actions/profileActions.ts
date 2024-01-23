@@ -4,10 +4,11 @@ import { headers } from 'next/headers';
 import {
   getProfilesPosts,
   getProfilesPostsWithTopComment,
-  getPostCommentsWithProfile,
+  getPostCommentsWithWebCard,
   getPostByIdWithMedia,
-  getProfileById,
   getPostById,
+  getWebCardById,
+  getWebCardsPostsWithMedias,
 } from '@azzapp/data/domains';
 
 export const loadProfilePosts = async (
@@ -18,6 +19,17 @@ export const loadProfilePosts = async (
   // @TODO: make this function dynamic with a better mechanism than headers
   headers();
   return getProfilesPosts(profileId, limit, offset);
+};
+
+export const loadOtherPosts = async (
+  webCardId: string,
+  limit: number,
+  excludedId?: string,
+  before?: Date,
+) => {
+  // @TODO: make this function dynamic with a better mechanism than headers
+  headers();
+  return getWebCardsPostsWithMedias(webCardId, limit, excludedId, before);
 };
 
 export const loadProfilePostsWithTopComment = async (
@@ -40,7 +52,7 @@ export const loadPostCommentsWithProfile = async (
   const post = await getPostById(postId);
   if (!post?.allowComments) return [];
 
-  return getPostCommentsWithProfile(postId, limit, before);
+  return getPostCommentsWithWebCard(postId, limit, before);
 };
 
 export const loadPostById = async (id: string) => {
@@ -49,13 +61,13 @@ export const loadPostById = async (id: string) => {
   return getPostByIdWithMedia(id);
 };
 
-export const loadProfileStats = async (profileId: string) => {
+export const loadWebCardStats = async (webCardId: string) => {
   // @TODO: make this function dynamic with a better mechanism than headers
   headers();
-  const profile = await getProfileById(profileId);
+  const webCard = await getWebCardById(webCardId);
   return {
-    nbFollowers: profile.nbFollowers,
-    nbFollowings: profile.nbFollowings,
-    nbPosts: profile.nbPosts,
+    nbFollowers: webCard.nbFollowers,
+    nbFollowings: webCard.nbFollowings,
+    nbPosts: webCard.nbPosts,
   };
 };

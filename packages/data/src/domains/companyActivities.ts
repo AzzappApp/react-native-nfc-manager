@@ -11,16 +11,16 @@ export const CompanyActivityTable = mysqlTable('CompanyActivity', {
   cardTemplateTypeId: cols.cuid('cardTemplateTypeId'),
 });
 
-export const ProfileCategoryCompanyActivityTable = mysqlTable(
-  'ProfileCategoryCompanyActivity',
+export const WebCardCategoryCompanyActivityTable = mysqlTable(
+  'WebCardCategoryCompanyActivity',
   {
-    profileCategoryId: cols.cuid('profileCategoryId').notNull(),
+    webCardCategoryId: cols.cuid('categoryId').notNull(),
     companyActivityId: cols.cuid('companyActivityId').notNull(),
     order: int('order').notNull(),
   },
   table => {
     return {
-      pk: primaryKey(table.profileCategoryId, table.companyActivityId),
+      pk: primaryKey(table.webCardCategoryId, table.companyActivityId),
     };
   },
 );
@@ -30,29 +30,29 @@ export type NewCompanyActivity = InferInsertModel<typeof CompanyActivityTable>;
 
 /**
  * Retrieves a list of all company activities
- * @param profileCategoryId - The id of the profile category to filter the list by
+ * @param webCardCategoryId - The id of the webCard category to filter the list by
  * @returns A list of company activities
  */
-export const getCompanyActivitiesByProfileCategory = async (
-  profileCategoryId: string,
+export const getCompanyActivitiesByWebCardCategory = async (
+  webCardCategoryId: string,
 ) => {
   return db
     .select()
     .from(CompanyActivityTable)
     .innerJoin(
-      ProfileCategoryCompanyActivityTable,
+      WebCardCategoryCompanyActivityTable,
       eq(
         CompanyActivityTable.id,
-        ProfileCategoryCompanyActivityTable.companyActivityId,
+        WebCardCategoryCompanyActivityTable.companyActivityId,
       ),
     )
     .where(
       eq(
-        ProfileCategoryCompanyActivityTable.profileCategoryId,
-        profileCategoryId,
+        WebCardCategoryCompanyActivityTable.webCardCategoryId,
+        webCardCategoryId,
       ),
     )
-    .orderBy(ProfileCategoryCompanyActivityTable.order)
+    .orderBy(WebCardCategoryCompanyActivityTable.order)
     .then(res => res.map(r => r.CompanyActivity));
 };
 

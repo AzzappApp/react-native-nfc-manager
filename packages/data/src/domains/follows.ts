@@ -27,53 +27,56 @@ export type Follow = InferSelectModel<typeof FollowTable>;
 export type NewFollow = InferInsertModel<typeof FollowTable>;
 
 /**
- * Checks if a profile is following another one.
+ * Checks if a webCard is following another one.
  *
- * @param userId - The id of the potential follower
- * @param targetId - The id of the potential followed user
- * @returns true if the user is following the target, false otherwise
+ * @param webCardId - The id of the potential follower
+ * @param targetId - The id of the potential followed webCard
+ * @returns true if the webCard is following the target, false otherwise
  */
-export const isFollowing = async (userId: string, targetId: string) =>
-  db
+export const isFollowing = async (
+  webCardId: string,
+  targetId: string,
+  trx: DbTransaction = db,
+) =>
+  trx
     .select()
     .from(FollowTable)
     .where(
       and(
-        eq(FollowTable.followerId, userId),
+        eq(FollowTable.followerId, webCardId),
         eq(FollowTable.followingId, targetId),
       ),
     )
-
     .then(res => Boolean(res.pop()));
 
 /**
- * Adds a follow relation between two users.
+ * Adds a follow relation between two webCard.
  *
- * @param userId - The id of the follower
- * @param targetId - The id of the followed user
+ * @param webCardId - The id of the follower
+ * @param targetId - The id of the followed webCard
  */
 export const follows = async (
-  userId: string,
+  webCardId: string,
   targetId: string,
   trx: DbTransaction = db,
 ) =>
   trx
     .insert(FollowTable)
     .values({
-      followerId: userId,
+      followerId: webCardId,
       followingId: targetId,
     })
 
     .then(() => void 0);
 
 /**
- * Removes a follow relation between two users.
+ * Removes a follow relation between two webCards.
  *
- * @param userId - The id of the follower
- * @param targetId - The id of the followed user
+ * @param webCardId - The id of the follower
+ * @param targetId - The id of the followed webCard
  */
 export const unfollows = (
-  userId: string,
+  webCardId: string,
   targetId: string,
   trx: DbTransaction = db,
 ) =>
@@ -81,9 +84,30 @@ export const unfollows = (
     .delete(FollowTable)
     .where(
       and(
-        eq(FollowTable.followerId, userId),
+        eq(FollowTable.followerId, webCardId),
         eq(FollowTable.followingId, targetId),
       ),
     )
 
     .then(() => void 0);
+/**
+ *
+ *
+ * @param {string} followerId
+ * @param {string} followingId
+ * @param {DbTransaction} [trx=db]
+ */
+export const getFollows = (
+  followerId: string,
+  followingId: string,
+  trx: DbTransaction = db,
+) =>
+  trx
+    .select()
+    .from(FollowTable)
+    .where(
+      and(
+        eq(FollowTable.followerId, followerId),
+        eq(FollowTable.followingId, followingId),
+      ),
+    );

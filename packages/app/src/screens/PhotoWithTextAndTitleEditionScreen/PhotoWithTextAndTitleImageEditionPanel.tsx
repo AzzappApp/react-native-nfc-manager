@@ -8,12 +8,12 @@ import {
 import FloatingIconButton from '#ui/FloatingIconButton';
 import LabeledDashedSlider from '#ui/LabeledDashedSlider';
 import TitleWithLine from '#ui/TitleWithLine';
-import type { Icons } from '#ui/Icon';
 import type {
   CardModulePhotoWithTextAndTitleImageMargin,
   HorizontalArrangement,
   VerticalArrangement,
-} from '@azzapp/relay/artifacts/PhotoWithTextAndTitleRenderer_module.graphql';
+} from '#relayArtifacts/PhotoWithTextAndTitleRenderer_module.graphql';
+import type { Icons } from '#ui/Icon';
 import type { ViewProps } from 'react-native';
 
 type PhotoWithTextAndTitleImageEditionPanelProps = ViewProps & {

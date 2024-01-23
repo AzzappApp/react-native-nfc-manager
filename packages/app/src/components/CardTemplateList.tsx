@@ -28,11 +28,12 @@ import Text from '#ui/Text';
 import { useModulesData } from './cardModules/ModuleData';
 import { CancelHeaderButton } from './commonsButtons';
 import WebCardPreview from './WebCardPreview';
-import type { CardTemplateList_cardTemplates$key } from '@azzapp/relay/artifacts/CardTemplateList_cardTemplates.graphql';
-import type { CardTemplateListQuery } from '@azzapp/relay/artifacts/CardTemplateListQuery.graphql';
-import type { CoverRenderer_profile$key } from '@azzapp/relay/artifacts/CoverRenderer_profile.graphql';
-import type { ModuleData_cardModules$key } from '@azzapp/relay/artifacts/ModuleData_cardModules.graphql';
-import type { WebCardBackground_profile$key } from '@azzapp/relay/artifacts/WebCardBackground_profile.graphql';
+import type { CardTemplateList_cardTemplates$key } from '#relayArtifacts/CardTemplateList_cardTemplates.graphql';
+import type { CardTemplateListQuery } from '#relayArtifacts/CardTemplateListQuery.graphql';
+import type { CoverRenderer_webCard$key } from '#relayArtifacts/CoverRenderer_webCard.graphql';
+import type { ModuleData_cardModules$key } from '#relayArtifacts/ModuleData_cardModules.graphql';
+import type { WebCardBackground_webCard$key } from '#relayArtifacts/WebCardBackground_webCard.graphql';
+import type { WebCardBackgroundPreview_webCard$key } from '#relayArtifacts/WebCardBackgroundPreview_webCard.graphql';
 import type {
   CardStyle,
   ColorPalette,
@@ -47,6 +48,7 @@ import type {
 import type { ViewProps } from 'react-native-svg/lib/typescript/fabric/utils';
 
 type CardTemplateListProps = Omit<ViewProps, 'children'> & {
+  profileId: string;
   height: number;
   onApplyTemplate: (cardTemplateId: string) => void;
   onSkip?: () => void;
@@ -57,12 +59,13 @@ type CardTemplateListProps = Omit<ViewProps, 'children'> & {
   previewModalStyle?: ViewProps['style'];
 };
 
-export type CardTemplatelistHandle = {
+export type CardTemplateListHandle = {
   onSubmit: () => void;
 };
 
 const CardTemplateList = (
   {
+    profileId,
     height,
     onApplyTemplate,
     onSkip,
@@ -73,42 +76,47 @@ const CardTemplateList = (
     onPreviewModalClose,
     ...props
   }: CardTemplateListProps,
-  forwardRef: ForwardedRef<CardTemplatelistHandle>,
+  forwardRef: ForwardedRef<CardTemplateListHandle>,
 ) => {
-  const { viewer } = useLazyLoadQuery<CardTemplateListQuery>(
+  const { node } = useLazyLoadQuery<CardTemplateListQuery>(
     graphql`
-      query CardTemplateListQuery {
-        viewer {
-          ...CardTemplateList_cardTemplates
-          cardTemplateTypes {
-            id
-            label
-            profileCategory {
+      query CardTemplateListQuery($profileId: ID!) {
+        node(id: $profileId) {
+          ... on Profile @alias(as: "profile") {
+            ...CardTemplateList_cardTemplates
+            cardTemplateTypes {
               id
               label
+              webCardCategory {
+                id
+                label
+              }
             }
-          }
-          profile {
-            id
-            ...CoverRenderer_profile
-            ...WebCardBackground_profile
-            cardColors {
-              primary
-              dark
-              light
+            webCard {
+              id
+              ...CoverRenderer_webCard
+              ...WebCardBackground_webCard
+              ...WebCardBackgroundPreview_webCard
+              cardColors {
+                primary
+                dark
+                light
+              }
             }
           }
         }
       }
     `,
-    {},
+    { profileId },
   );
 
-  const { profile, cardTemplateTypes } = viewer;
+  const profile = node?.profile;
+  const cardTemplateTypes = profile?.cardTemplateTypes;
+
   const { data, loadNext, hasNext, isLoadingNext, refetch } =
     usePaginationFragment(
       graphql`
-        fragment CardTemplateList_cardTemplates on Viewer
+        fragment CardTemplateList_cardTemplates on Profile
         @refetchable(queryName: "CardTemplateList_cardTemplates_Query")
         @argumentDefinitions(
           cardTemplateTypeId: { type: String, defaultValue: null }
@@ -152,7 +160,7 @@ const CardTemplateList = (
           }
         }
       `,
-      viewer as CardTemplateList_cardTemplates$key,
+      profile as CardTemplateList_cardTemplates$key | null,
     );
 
   const onEndReached = useCallback(() => {
@@ -201,7 +209,7 @@ const CardTemplateList = (
             cardTemplateType,
           };
         }) ?? [],
-      ),
+      ).sort((a, b) => (a.label ?? '').localeCompare(b.label ?? '')),
     [data?.cardTemplates?.edges, profile],
   );
 
@@ -329,7 +337,7 @@ const CardTemplateList = (
     { id: string; title: string } | undefined
   >(undefined);
 
-  const templateTypesByProfileCategory = useMemo(() => {
+  const templateTypesByWebCardCategory = useMemo(() => {
     return (
       cardTemplateTypes?.reduce(
         (
@@ -348,7 +356,7 @@ const CardTemplateList = (
           if (!curr) {
             return acc;
           }
-          const label = curr.profileCategory?.label ?? '-';
+          const label = curr.webCardCategory?.label ?? '-';
 
           const existingSection = acc.find(section => section.title === label);
 
@@ -358,6 +366,10 @@ const CardTemplateList = (
               title: curr.label ?? '-',
               data: [],
             });
+
+            existingSection.data = existingSection.data.sort((a, b) =>
+              a.title.localeCompare(b.title),
+            );
           } else {
             acc.push({
               title: label,
@@ -369,7 +381,7 @@ const CardTemplateList = (
         },
         [],
       ) ?? []
-    );
+    ).sort((a, b) => a.title.localeCompare(b.title));
   }, [cardTemplateTypes]);
 
   const onSelectSection = (item: { id: string; title: string }) => {
@@ -397,7 +409,7 @@ const CardTemplateList = (
           <SelectSection
             nativeID="activities"
             accessibilityLabelledBy="activitiesLabel"
-            sections={templateTypesByProfileCategory}
+            sections={templateTypesByWebCardCategory}
             inputLabel={selectedCardTemplateType?.title}
             selectedItemKey={selectedCardTemplateType?.id}
             keyExtractor={sectionKeyExtractor as any}
@@ -459,16 +471,18 @@ const CardTemplateList = (
           )}
         </View>
       </View>
-      <CardTemplatePreviewModal
-        visible={showPreviewModal}
-        onRequestClose={onClosePreviewModal}
-        onApply={onApplyPreviewTemplate}
-        template={previewTemplate}
-        profile={profile}
-        cardColors={profile?.cardColors ?? DEFAULT_COLOR_PALETTE}
-        loading={loading}
-        style={previewModalStyle}
-      />
+      {profile?.webCard && (
+        <CardTemplatePreviewModal
+          visible={showPreviewModal}
+          onRequestClose={onClosePreviewModal}
+          onApply={onApplyPreviewTemplate}
+          template={previewTemplate}
+          webCard={profile?.webCard}
+          cardColors={profile?.webCard?.cardColors ?? DEFAULT_COLOR_PALETTE}
+          loading={loading}
+          style={previewModalStyle}
+        />
+      )}
     </>
   );
 };
@@ -486,7 +500,11 @@ type CardTemplateItem = {
 
 type CoverTemplatePreviewModalProps = {
   visible: boolean;
-  profile: (CoverRenderer_profile$key & WebCardBackground_profile$key) | null;
+  webCard:
+    | (CoverRenderer_webCard$key &
+        WebCardBackground_webCard$key &
+        WebCardBackgroundPreview_webCard$key)
+    | null;
   template: CardTemplateItem | null;
   cardColors: ColorPalette;
   loading: boolean;
@@ -497,7 +515,7 @@ type CoverTemplatePreviewModalProps = {
 
 const CardTemplatePreviewModal = ({
   visible,
-  profile,
+  webCard,
   template,
   cardColors,
   loading,
@@ -546,9 +564,9 @@ const CardTemplatePreviewModal = ({
             />
           }
         />
-        {template && profile && (
+        {template && webCard && (
           <WebCardPreview
-            profile={profile}
+            webCard={webCard}
             height={previewHeight}
             cardStyle={template.cardStyle}
             cardColors={cardColors}

@@ -1,7 +1,6 @@
 import * as Sentry from '@sentry/nextjs';
 import * as bcrypt from 'bcrypt-ts';
 import { NextResponse } from 'next/server';
-import { Twilio } from 'twilio';
 import {
   updateUser,
   getUserByPhoneNumber,
@@ -9,16 +8,13 @@ import {
 } from '@azzapp/data/domains';
 import ERRORS from '@azzapp/shared/errors';
 import { isValidEmail } from '@azzapp/shared/stringHelpers';
+import { twilioVerificationService } from '#helpers/twilioHelpers';
 
 type ChangePasswordBody = {
   password: string;
   token: string;
   issuer: string;
 };
-const TWILIO_ACCOUNT_SID = process.env.TWILIO_ACCOUNT_SID!;
-const TWILIO_AUTH_TOKEN = process.env.TWILIO_AUTH_TOKEN!;
-const TWILIO_ACCOUNT_VERIFY_SERVICE_SID =
-  process.env.TWILIO_ACCOUNT_VERIFY_SERVICE_SID!;
 
 export const POST = async (req: Request) => {
   const { password, token, issuer } = (await req.json()) as ChangePasswordBody;
@@ -30,10 +26,11 @@ export const POST = async (req: Request) => {
   }
 
   try {
-    const client = new Twilio(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN);
-    const verificationCheck = await client.verify.v2
-      .services(TWILIO_ACCOUNT_VERIFY_SERVICE_SID)
-      .verificationChecks.create({ to: issuer, code: token });
+    const verificationCheck =
+      await twilioVerificationService().verificationChecks.create({
+        to: issuer,
+        code: token,
+      });
 
     if (verificationCheck.status !== 'approved') {
       return NextResponse.json(

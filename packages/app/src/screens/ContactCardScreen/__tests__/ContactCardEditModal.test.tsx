@@ -7,8 +7,8 @@ import { MockPayloadGenerator } from 'relay-test-utils';
 import { createMockEnvironment } from 'relay-test-utils/lib/RelayModernMockEnvironment';
 import { screen, render, fireEvent, act, waitFor } from '#helpers/testHelpers';
 import ContactCardEditModal from '../ContactCardEditModal';
+import type { ContactCardEditModalTestQuery } from '#relayArtifacts/ContactCardEditModalTestQuery.graphql';
 import type { ContactCardEditModalProps } from '../ContactCardEditModal';
-import type { ContactCardEditModalTestQuery } from '@azzapp/relay/artifacts/ContactCardEditModalTestQuery.graphql';
 import type { RelayMockEnvironment } from 'relay-test-utils/lib/RelayModernMockEnvironment';
 
 describe('ContactCardEditModal', () => {
@@ -18,12 +18,15 @@ describe('ContactCardEditModal', () => {
     props?: Partial<ContactCardEditModalProps>,
   ) => {
     environment = createMockEnvironment();
-    environment.mock.queueOperationResolver(operation =>
-      MockPayloadGenerator.generate(operation, {
-        Viewer: () => ({
-          id: 'viewerId',
-          profile: {
-            id: 'profileId',
+    environment.mock.queueOperationResolver(operation => {
+      return MockPayloadGenerator.generate(operation, {
+        Profile() {
+          return {
+            id: 'test-profile',
+            webCard: {
+              isMultiUser: false,
+              commonInformation: null,
+            },
             contactCard: {
               id: 'contactCardId',
               firstName: 'John',
@@ -44,22 +47,29 @@ describe('ContactCardEditModal', () => {
                   selected: true,
                 },
               ],
+              urls: [
+                // Add this
+                {
+                  label: 'Work',
+                  address: 'http://test.com',
+                  selected: true,
+                },
+              ],
             },
-          },
-        }),
-      }),
-    );
+            commonInformation: {
+              company: '',
+            },
+          };
+        },
+      });
+    });
 
     const TestRenderer = (props?: Partial<ContactCardEditModalProps>) => {
       const data = useLazyLoadQuery<ContactCardEditModalTestQuery>(
         graphql`
           query ContactCardEditModalTestQuery @relay_test_operation {
-            viewer {
-              profile {
-                contactCard {
-                  ...ContactCardEditModal_card
-                }
-              }
+            profile: node(id: "test-profile") {
+              ...ContactCardEditModal_card
             }
           }
         `,
@@ -67,14 +77,12 @@ describe('ContactCardEditModal', () => {
       );
 
       return (
-        data.viewer.profile && (
-          <ContactCardEditModal
-            contactCard={data.viewer.profile.contactCard!}
-            visible
-            toggleBottomSheet={() => void 0}
-            {...props}
-          />
-        )
+        <ContactCardEditModal
+          profile={data.profile!}
+          visible
+          toggleBottomSheet={() => void 0}
+          {...props}
+        />
       );
     };
 
@@ -122,7 +130,7 @@ describe('ContactCardEditModal', () => {
     act(() => {
       expect(
         screen.getAllByTestId('contact-card-edit-modal-field'),
-      ).toHaveLength(7);
+      ).toHaveLength(6);
 
       const newPhoneInput = screen.getByDisplayValue('');
       if (newPhoneInput) {
@@ -147,53 +155,57 @@ describe('ContactCardEditModal', () => {
     );
 
     expect(operation.request.variables.input).toEqual({
-      firstName: 'John 2',
-      lastName: 'Doe 2',
-      title: 'Software Engineer 2',
-      company: 'Facebook 2',
-      emails: [
-        {
-          label: 'Work',
-          address: 'test@test.com 2',
-          selected: true,
-        },
-      ],
-      phoneNumbers: [
-        {
-          label: 'Work',
-          number: '1234567890 2',
-          selected: true,
-        },
-        {
-          label: 'Home',
-          number: '1234567890 3',
-          selected: true,
-        },
-      ],
-      addresses: [
-        {
-          address: '<mock-value-for-field-"address">',
-          label: '<mock-value-for-field-"label">',
+      contactCard: {
+        firstName: 'John 2',
+        lastName: 'Doe 2',
+        title: 'Software Engineer 2',
+        company: 'Facebook 2',
+        avatarId: '<mock-value-for-field-"id">',
+        emails: [
+          {
+            label: 'Work',
+            address: 'test@test.com 2',
+            selected: true,
+          },
+        ],
+        phoneNumbers: [
+          {
+            label: 'Work',
+            number: '1234567890 2',
+            selected: true,
+          },
+          {
+            label: 'Home',
+            number: '1234567890 3',
+            selected: true,
+          },
+        ],
+        addresses: [
+          {
+            address: '<mock-value-for-field-"address">',
+            label: '<mock-value-for-field-"label">',
+            selected: false,
+          },
+        ],
+        birthday: {
+          birthday: '<mock-value-for-field-"birthday">',
           selected: false,
         },
-      ],
-      birthday: {
-        birthday: '<mock-value-for-field-"birthday">',
-        selected: false,
+        socials: [
+          {
+            selected: false,
+            label: '<mock-value-for-field-"label">',
+            url: '<mock-value-for-field-"url">',
+          },
+        ],
+        urls: [
+          {
+            address: 'http://test.com',
+            selected: true,
+          },
+        ],
       },
-      socials: [
-        {
-          selected: false,
-          label: '<mock-value-for-field-"label">',
-          url: '<mock-value-for-field-"url">',
-        },
-      ],
-      urls: [
-        {
-          address: '<mock-value-for-field-"address">',
-          selected: false,
-        },
-      ],
+      profileId: 'test-profile',
     });
   });
 });
