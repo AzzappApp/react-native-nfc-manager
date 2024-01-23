@@ -1,5 +1,7 @@
-## 0.5.2-canary.192
+## 0.5.2-canary.193
 
+* **Fix:**  - **CreateCover:** Crash create cover from home screen  ([#2453](https://github.com/AzzappApp/azzapp/pull/2453))
+* **fix:**  - **WebCardEdition:** fix initial template loading after signup ([#2454](https://github.com/AzzappApp/azzapp/pull/2454))
 * **fix:**  - **multiUser:** [#2383](https://github.com/AzzappApp/azzapp/pull/2383) crash when accessing multiUser screen after downgrading role ([#2451](https://github.com/AzzappApp/azzapp/pull/2451))
 * **fix:**  - **MultiUser:** insert in paginated list ([#2452](https://github.com/AzzappApp/azzapp/pull/2452))
 * **fix:**  - user can do action on his webcard even if not published
