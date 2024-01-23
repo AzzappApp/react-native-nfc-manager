@@ -290,6 +290,10 @@ const MultiUserAddModal = (
           profile {
             id
             profileRole
+            contactCard {
+              firstName
+              lastName
+            }
             ...MultiUserScreenUserListItem_Profile
             ...MultiUserDetailModal_Profile
           }
@@ -421,15 +425,52 @@ const MultiUserAddModal = (
               );
               const newProfileRecord = store.get(invitedProfile.id);
               if (connection && newProfileRecord) {
-                const edge = ConnectionHandler.createEdge(
-                  store,
-                  connection,
-                  newProfileRecord,
-                  'WebCardEdge',
-                );
-                ConnectionHandler.insertEdgeAfter(connection, edge);
-                //we need to find a way to sort. we have access the proxy Record
-                // const edges = connection.getLinkedRecords('edges'); ti will be added at the end and for big list, a searchbar will be added (issue created)
+                const edges = connection.getLinkedRecords('edges');
+                if (edges) {
+                  const invitedContactCard = {
+                    firstName: invitedProfile?.contactCard?.firstName,
+                    lastName: invitedProfile?.contactCard?.lastName,
+                  };
+                  let cursor: string | null = null;
+                  for (let index = 0; index < edges.length; index++) {
+                    const edge = edges[index];
+                    const dataId = edges[index]
+                      .getLinkedRecord('node')
+                      ?.getDataID();
+                    const profile = store.get(dataId!);
+                    const profileRole = profile?.getValue('profileRole');
+                    if (profileRole === invitedProfile.profileRole) {
+                      const contactCard = profile?.getLinkedRecord<{
+                        firstName: string;
+                        lastName: string;
+                      }>('contactCard');
+                      const firstName = contactCard?.getValue('firstName');
+                      const lastName = contactCard?.getValue('lastName');
+
+                      if (
+                        isAfter(invitedContactCard, {
+                          firstName,
+                          lastName,
+                        })
+                      ) {
+                        cursor = edge.getValue('cursor') as string;
+                        break;
+                      }
+                    }
+                  }
+
+                  const edge = ConnectionHandler.createEdge(
+                    store,
+                    connection,
+                    newProfileRecord,
+                    'WebCardEdge',
+                  );
+                  if (cursor) {
+                    ConnectionHandler.insertEdgeAfter(connection, edge, cursor);
+                  } else {
+                    ConnectionHandler.insertEdgeAfter(connection, edge);
+                  }
+                }
               }
             }
           },
@@ -566,3 +607,39 @@ const styles = StyleSheet.create({
 });
 
 export default forwardRef(MultiUserAddModal);
+
+const isAfter = (
+  profileA: {
+    firstName: string | null | undefined;
+    lastName: string | null | undefined;
+  },
+  profileB: {
+    firstName: string | null | undefined;
+    lastName: string | null | undefined;
+  },
+) => {
+  if (profileA.firstName && profileB.firstName) {
+    const firstNameComparison = profileA.firstName.localeCompare(
+      profileB.firstName,
+    );
+    if (firstNameComparison !== 0) {
+      return firstNameComparison;
+    }
+  } else if (profileA.firstName) {
+    return -1; // profileA comes first if profileB.firstName is undefined
+  } else if (profileB.firstName) {
+    return 1; // profileB comes first if profileA.firstName is undefined
+  }
+
+  // If first names are equal or undefined, compare last names
+  if (profileA.lastName && profileB.lastName) {
+    return profileA.lastName.localeCompare(profileB.lastName);
+  } else if (profileA.lastName) {
+    return -1; // profileA comes first if profileB.lastName is undefined
+  } else if (profileB.lastName) {
+    return 1; // profileB comes first if profileA.lastName is undefined
+  }
+
+  // If all fields are equal or undefined, return 0
+  return 0;
+};
