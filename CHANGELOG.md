@@ -1,5 +1,6 @@
-## 0.5.2-canary.189
+## 0.5.2-canary.190
 
+* **fix:**  - deactivate highlights
 * **fix:**  - **cover:** [#2442](https://github.com/AzzappApp/azzapp/pull/2442) missing background color on cover ([#2443](https://github.com/AzzappApp/azzapp/pull/2443))
 * **fix:**  - **cover:** [#2304](https://github.com/AzzappApp/azzapp/pull/2304) attempt to tune bounce animation ([#2437](https://github.com/AzzappApp/azzapp/pull/2437))
 * **fix:**  - **multiUser:** [#2432](https://github.com/AzzappApp/azzapp/pull/2432) avoid infinite loop and fix avatar update ([#2441](https://github.com/AzzappApp/azzapp/pull/2441))
