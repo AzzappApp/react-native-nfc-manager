@@ -10,6 +10,7 @@ import { useRouter } from '#components/NativeRouter';
 import fetchQueryAndRetain from '#helpers/fetchQueryAndRetain';
 import { prefetchImage } from '#helpers/mediaHelpers';
 import relayScreen from '#helpers/relayScreen';
+import useAuthState from '#hooks/useAuthState';
 import useScreenInsets from '#hooks/useScreenInsets';
 import ActivityIndicator from '#ui/ActivityIndicator';
 import Container from '#ui/Container';
@@ -41,17 +42,14 @@ const newWebCardScreenQuery = graphql`
 `;
 
 const newProfileScreenQueryWithProfile = graphql`
-  query NewWebCardScreenWithWebCardQuery($profileId: ID!) {
-    node(id: $profileId) {
+  query NewWebCardScreenWithWebCardQuery($webCardId: ID!) {
+    node(id: $webCardId) {
       # aliasing avoir nullable field on fragment spread
-      ... on Profile @alias(as: "profile") {
+      ... on WebCard @alias(as: "webCard") {
         id
-        webCard {
+        userName
+        webCardCategory {
           id
-          userName
-          webCardCategory {
-            id
-          }
         }
       }
     }
@@ -79,13 +77,13 @@ export const NewWebCardScreen = ({
     preloadedQuery,
   );
   const { webCardCategories } = data;
-  const profile = 'node' in data ? data.node?.profile : null;
+  const webCard = 'node' in data ? data.node?.webCard : null;
 
   // #endregion
 
   // #region Profile kind selection
   const [webCardCategoryId, setWebCardCategoryId] = useState<string | null>(
-    profile?.webCard?.webCardCategory?.id ?? webCardCategories?.[0]?.id ?? null,
+    webCard?.webCardCategory?.id ?? webCardCategories?.[0]?.id ?? null,
   );
   const webCardCategory = webCardCategories?.find(
     pc => pc.id === webCardCategoryId,
@@ -98,16 +96,17 @@ export const NewWebCardScreen = ({
   // #endregion
 
   // #region Profile creation
+  const { profileInfos } = useAuthState();
   const [webCardInfo, setWebCardInfo] = useState<{
     profileId: string;
     webCardId: string;
     userName: string;
   } | null>(
-    profile
+    webCard && profileInfos
       ? {
-          profileId: profile.id,
-          webCardId: profile.webCard.id,
-          userName: profile.webCard.userName,
+          profileId: profileInfos?.profileId,
+          webCardId: webCard.id,
+          userName: webCard.userName,
         }
       : null,
   );
