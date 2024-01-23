@@ -37,14 +37,14 @@ export const useEditionParametersDisplayInfos = (): ParametersInfo<{
           description: 'Contrast image edition parameters name',
         }),
       },
-      highlights: {
-        icon: 'brightness',
-        label: intl.formatMessage({
-          defaultMessage: 'Highlights',
-          description: 'Highlights image edition parameters name',
-        }),
-        kind: 'slider',
-      },
+      // highlights: {
+      //   icon: 'brightness',
+      //   label: intl.formatMessage({
+      //     defaultMessage: 'Highlights',
+      //     description: 'Highlights image edition parameters name',
+      //   }),
+      //   kind: 'slider',
+      // },
       saturation: {
         icon: 'saturation',
         label: intl.formatMessage({
@@ -127,13 +127,13 @@ export const editionParametersSettings: ParametersInfo<{
     step: 0.025,
     displayedValues: [-100, 100],
   },
-  highlights: {
-    defaultValue: 0.5,
-    min: 0,
-    max: 1,
-    step: 0.025,
-    displayedValues: [-100, 100],
-  },
+  // highlights: {
+  //   defaultValue: 1,
+  //   min: 0,
+  //   max: 1,
+  //   step: 0.025,
+  //   displayedValues: [-100, 100],
+  // },
   saturation: {
     defaultValue: 1,
     min: 0,
