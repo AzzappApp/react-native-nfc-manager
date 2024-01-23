@@ -14,6 +14,7 @@ import Animated, {
   enableLayoutAnimations,
   interpolate,
   measure,
+  runOnJS,
   useAnimatedRef,
   useAnimatedStyle,
 } from 'react-native-reanimated';
@@ -208,6 +209,14 @@ const WebCardScreenScrollView = (
     };
   });
 
+  const [needReComputeHeight, setNeedReComputeHeight] = useState(0);
+  const recomputeHeightTimeoutRef = useRef<any>(null);
+  const scheduleRecomputeHeight = useCallback(() => {
+    clearTimeout(recomputeHeightTimeoutRef.current);
+    recomputeHeightTimeoutRef.current = setTimeout(() => {
+      setNeedReComputeHeight(val => val + 1);
+    }, 50);
+  }, []);
   const outerBlockContainerStyle = useAnimatedStyle(() => {
     if ((editTransition?.value ?? 0) <= 0.98) {
       return { height: 'auto' };
@@ -217,11 +226,15 @@ const WebCardScreenScrollView = (
     if (!measurement) {
       return { height: 'auto' };
     }
+    if (measurement.height === 0) {
+      runOnJS(scheduleRecomputeHeight)();
+      return { height: 'auto' };
+    }
     return {
       height: measurement.height,
     };
     // we add blockCount to the deps because we want to recompute the height when the children change
-  }, [editTransition, blockCount]);
+  }, [editTransition, blockCount, needReComputeHeight]);
 
   const blocksContainerStyle = useAnimatedStyle(() => {
     return {
@@ -252,6 +265,8 @@ const WebCardScreenScrollView = (
     };
   }, [editTransition, editScale]);
 
+  console.log(blocks.current);
+
   const contextValue = useMemo(
     () => ({
       registerBlock: (
@@ -265,6 +280,7 @@ const WebCardScreenScrollView = (
           height,
           visible,
         };
+        console.log('register block', id);
         updateBlockCounts();
       },
       unregisterBlock: (id: string) => {
