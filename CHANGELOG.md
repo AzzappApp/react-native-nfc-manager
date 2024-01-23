@@ -1,5 +1,6 @@
-## 0.5.2-canary.191
+## 0.5.2-canary.192
 
+* **fix:**  - **multiUser:** [#2383](https://github.com/AzzappApp/azzapp/pull/2383) crash when accessing multiUser screen after downgrading role ([#2451](https://github.com/AzzappApp/azzapp/pull/2451))
 * **fix:**  - **MultiUser:** insert in paginated list ([#2452](https://github.com/AzzappApp/azzapp/pull/2452))
 * **fix:**  - user can do action on his webcard even if not published
 * **fix:**  - 🐛 avoid username overlap ([#2436](https://github.com/AzzappApp/azzapp/pull/2436))
