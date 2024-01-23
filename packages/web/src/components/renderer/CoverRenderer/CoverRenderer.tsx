@@ -160,6 +160,10 @@ const CoverRenderer = ({
       style={{
         aspectRatio: `${COVER_RATIO}`,
         width,
+        backgroundColor: swapColor(
+          coverData.backgroundColor ?? 'light',
+          cardColors ?? DEFAULT_COLOR_PALETTE,
+        ),
       }}
       className={styles.content}
     >
