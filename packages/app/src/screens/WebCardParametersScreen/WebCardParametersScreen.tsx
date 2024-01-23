@@ -130,9 +130,21 @@ const WebCardParametersScreen = ({
             },
           },
         },
+        onError: error => {
+          console.log(error);
+
+          Toast.show({
+            type: 'error',
+            text1: intl.formatMessage({
+              defaultMessage:
+                'The webCard could not be updated. Please try again.',
+              description: 'Error toast message when saving webCard failed',
+            }),
+          });
+        },
       });
     },
-    [commitToggleWebCardPublished, webCard],
+    [commitToggleWebCardPublished, intl, webCard],
   );
 
   const [commitUpdateWebCard] = useMutation<WebCardParametersScreenMutation>(
@@ -171,10 +183,19 @@ const WebCardParametersScreen = ({
         },
         onError: error => {
           console.log(error);
+
+          Toast.show({
+            type: 'error',
+            text1: intl.formatMessage({
+              defaultMessage:
+                'The webCard could not be updated. Please try again.',
+              description: 'Error toast message when saving webCard failed',
+            }),
+          });
         },
       });
     },
-    [commitUpdateWebCard, webCard],
+    [commitUpdateWebCard, intl, webCard],
   );
 
   const updateProfileActivity = useCallback(
@@ -189,9 +210,19 @@ const WebCardParametersScreen = ({
             companyActivityId: activity.id,
           },
         },
+        onError: () => {
+          Toast.show({
+            type: 'error',
+            text1: intl.formatMessage({
+              defaultMessage:
+                'The webCard could not be updated. Please try again.',
+              description: 'Error toast message when saving webCard failed',
+            }),
+          });
+        },
       });
     },
-    [commitUpdateWebCard, webCard],
+    [commitUpdateWebCard, intl, webCard],
   );
 
   const canChangeUserName = useMemo(() => {
@@ -236,10 +267,10 @@ const WebCardParametersScreen = ({
           {
             dateChange: webCard?.nextChangeUsernameAllowedAt
               ? intl.formatDate(webCard?.nextChangeUsernameAllowedAt)
-              : 'unknwon date',
+              : 'unknown date',
             timeChange: webCard?.nextChangeUsernameAllowedAt
               ? intl.formatTime(webCard?.nextChangeUsernameAllowedAt)
-              : 'unknwon date',
+              : 'unknown date',
           },
         ),
         visibilityTime: 5000,

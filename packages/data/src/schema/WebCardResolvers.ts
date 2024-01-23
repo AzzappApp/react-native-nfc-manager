@@ -1,6 +1,8 @@
-import { GraphQLError } from 'graphql';
-import { connectionFromArraySlice, cursorToOffset } from 'graphql-relay';
-import ERRORS from '@azzapp/shared/errors';
+import {
+  connectionFromArray,
+  connectionFromArraySlice,
+  cursorToOffset,
+} from 'graphql-relay';
 import { isAdmin } from '@azzapp/shared/profileHelpers';
 import {
   getCompanyActivitiesByWebCardCategory,
@@ -183,7 +185,7 @@ export const WebCard: WebCardResolvers = {
       : null;
 
     if (!userProfile || !isAdmin(userProfile.profileRole)) {
-      throw new GraphQLError(ERRORS.UNAUTHORIZED);
+      return null;
     }
     const pendingUser = await getWebCardPendingOwnerProfile(webCard.id);
     return pendingUser.length > 0 ? pendingUser[0] : null;
@@ -194,7 +196,7 @@ export const WebCard: WebCardResolvers = {
       : null;
 
     if (!userProfile || !isAdmin(userProfile.profileRole)) {
-      throw new GraphQLError(ERRORS.UNAUTHORIZED);
+      return connectionFromArray([], { after, first });
     }
     const limit = first ?? 100;
     const offset = after ? cursorToOffset(after) : 0;
