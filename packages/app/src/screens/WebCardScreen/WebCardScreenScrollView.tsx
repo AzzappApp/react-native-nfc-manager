@@ -265,8 +265,6 @@ const WebCardScreenScrollView = (
     };
   }, [editTransition, editScale]);
 
-  console.log(blocks.current);
-
   const contextValue = useMemo(
     () => ({
       registerBlock: (
@@ -280,7 +278,6 @@ const WebCardScreenScrollView = (
           height,
           visible,
         };
-        console.log('register block', id);
         updateBlockCounts();
       },
       unregisterBlock: (id: string) => {
