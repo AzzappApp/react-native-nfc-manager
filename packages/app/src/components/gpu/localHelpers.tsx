@@ -128,7 +128,7 @@ export const editionParametersSettings: ParametersInfo<{
     displayedValues: [-100, 100],
   },
   highlights: {
-    defaultValue: 1,
+    defaultValue: 0.5,
     min: 0,
     max: 1,
     step: 0.025,
