@@ -1,5 +1,8 @@
-## 0.5.2-canary.190
+## 0.5.2-canary.191
 
+* **fix:**  - **MultiUser:** insert in paginated list ([#2452](https://github.com/AzzappApp/azzapp/pull/2452))
+* **fix:**  - user can do action on his webcard even if not published
+* **fix:**  - 🐛 avoid username overlap ([#2436](https://github.com/AzzappApp/azzapp/pull/2436))
 * **fix:**  - deactivate highlights
 * **fix:**  - **cover:** [#2442](https://github.com/AzzappApp/azzapp/pull/2442) missing background color on cover ([#2443](https://github.com/AzzappApp/azzapp/pull/2443))
 * **fix:**  - **cover:** [#2304](https://github.com/AzzappApp/azzapp/pull/2304) attempt to tune bounce animation ([#2437](https://github.com/AzzappApp/azzapp/pull/2437))
