@@ -110,7 +110,16 @@ module.exports = async function buildChangeLog(
       : 'patch';
 
     const lastReleasedVersion = lastTag ? lastTag.version : currentVersion;
-    const [major, minor, patch] = lastReleasedVersion.split('-')[0].split('.');
+    let [major, minor, patch] = lastReleasedVersion.split('-')[0].split('.');
+    const [currentMajor, currentMinor, currentPatch] = currentVersion
+      .split('-')[0]
+      .split('.');
+
+    if (currentMajor > major || currentMinor > minor || currentPatch > patch) {
+      major = currentMajor;
+      minor = currentMinor;
+      patch = currentPatch;
+    }
 
     switch (increment) {
       case 'major':
