@@ -450,7 +450,7 @@ const MultiUserAddModal = (
         >
           <Header
             middleElement={
-              <Text variant="large">
+              <Text variant="large" style={styles.name}>
                 {contact?.firstName} {contact?.lastName}
               </Text>
             }
@@ -557,5 +557,12 @@ const normalizePhoneMailLabel = (label?: string) => {
   }
   return 'Other';
 };
+
+const styles = StyleSheet.create({
+  name: {
+    maxWidth: '50%',
+    textAlign: 'center',
+  },
+});
 
 export default forwardRef(MultiUserAddModal);
