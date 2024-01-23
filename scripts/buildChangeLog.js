@@ -110,10 +110,9 @@ module.exports = async function buildChangeLog(
       : 'patch';
 
     const lastReleasedVersion = lastTag ? lastTag.version : currentVersion;
-    let [major, minor, patch] = lastReleasedVersion.split('-')[0].split('.');
-    const [currentMajor, currentMinor, currentPatch] = currentVersion
-      .split('-')[0]
-      .split('.');
+    let [major, minor, patch] = extractVersionNumber(lastReleasedVersion);
+    const [currentMajor, currentMinor, currentPatch] =
+      extractVersionNumber(currentVersion);
 
     if (currentMajor > major || currentMinor > minor || currentPatch > patch) {
       major = currentMajor;
@@ -123,13 +122,13 @@ module.exports = async function buildChangeLog(
 
     switch (increment) {
       case 'major':
-        nextVersion = `${Number(major) + 1}.0.0`;
+        nextVersion = `${major + 1}.0.0`;
         break;
       case 'minor':
-        nextVersion = `${major}.${Number(minor) + 1}.0`;
+        nextVersion = `${major}.${minor + 1}.0`;
         break;
       default:
-        nextVersion = `${major}.${minor}.${Number(patch) + 1}`;
+        nextVersion = `${major}.${minor}.${patch + 1}`;
         break;
     }
     if (prerelease) {
@@ -197,4 +196,9 @@ module.exports = async function buildChangeLog(
     nextVersion,
     changeLog,
   };
+};
+
+const extractVersionNumber = version => {
+  const [major, minor, patch] = version.split('-')[0].split('.');
+  return [Number(major), Number(minor), Number(patch)];
 };
