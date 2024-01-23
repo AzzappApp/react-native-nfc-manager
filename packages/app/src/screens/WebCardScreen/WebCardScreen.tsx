@@ -342,6 +342,7 @@ const WebCardScreen = ({
   }, [profileInfos?.profileRole, toggleEditing, intl]);
 
   const viewerWebCardUnpublish =
+    profileInfos?.webCardId !== data.webCard?.id &&
     data.node?.userWebCard?.cardIsPublished === false;
   const displayAlertUnpublished = useCallback(() => {
     Alert.alert(
