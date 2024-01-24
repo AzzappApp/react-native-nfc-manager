@@ -462,10 +462,16 @@ const HomeBottomPanel = ({
         prevIsNewProfile ||
         prevWebCardPublished ||
         !prevHasWebCover ||
-        prevIsInvitation
+        prevIsInvitation ||
+        prevIsPromotedAsOwner
           ? 0
           : 1,
-        nextWebCardPublished || !nextHasWebCover || nextIsInvitation ? 0 : 1,
+        nextWebCardPublished ||
+        !nextHasWebCover ||
+        nextIsInvitation ||
+        nextIsPromotedAsOwner
+          ? 0
+          : 1,
       ],
     );
 
