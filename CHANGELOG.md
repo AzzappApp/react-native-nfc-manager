@@ -1,5 +1,9 @@
-## 0.5.5-canary.5
+## 0.5.5-canary.6
 
+* **fix:**  - 🐛 display shadow to avoid white contact card ([#2481](https://github.com/AzzappApp/azzapp/pull/2481))
+* **fix:**  - 🐛 deny access to unpublished webcard from comment ([#2470](https://github.com/AzzappApp/azzapp/pull/2470))
+* **fix:**  - 🐛 don't display unpublished webcards stats ([#2455](https://github.com/AzzappApp/azzapp/pull/2455))
+* **fix:**  - various texts ([#2461](https://github.com/AzzappApp/azzapp/pull/2461))
 * **fix:**  - **Android:** prevent memory issues when exporting video ([#2477](https://github.com/AzzappApp/azzapp/pull/2477))
 * **fix:**  - **account:** send correct phone number on forgot password request ([#2478](https://github.com/AzzappApp/azzapp/pull/2478))
 * **fix:**  - 🐛 avoid overlaping panels on home ([#2444](https://github.com/AzzappApp/azzapp/pull/2444))
