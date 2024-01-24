@@ -272,6 +272,7 @@ const CameraView = (
             video={video}
             audio={hasMicrophonePermission}
             orientation="portrait"
+            exposure={0}
           />
         </GestureDetector>
       )}
