@@ -1,12 +1,16 @@
 import { memo } from 'react';
-import { FormattedRelativeTime } from 'react-intl';
+import { FormattedRelativeTime, useIntl } from 'react-intl';
 import { View } from 'react-native';
+import Toast from 'react-native-toast-message';
 import { graphql, useFragment } from 'react-relay';
+import { isEditor } from '@azzapp/shared/profileHelpers';
 import { colors } from '#theme';
 import AuthorCartouche from '#components/AuthorCartouche';
 import Link from '#components/Link';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import { relativeDateMinute } from '#helpers/dateHelpers';
+import useAuthState from '#hooks/useAuthState';
+import PressableNative from '#ui/PressableNative';
 import Text from '#ui/Text';
 
 import type { CommentItemFragment_comment$key } from '#relayArtifacts/CommentItemFragment_comment.graphql';
@@ -16,6 +20,7 @@ type CommentItemProps = {
 };
 
 const CommentItem = ({ item }: CommentItemProps) => {
+  const intl = useIntl();
   const postComment = useFragment(
     graphql`
       fragment CommentItemFragment_comment on PostComment {
@@ -25,6 +30,7 @@ const CommentItem = ({ item }: CommentItemProps) => {
         webCard {
           id
           userName
+          cardIsPublished
           ...AuthorCartoucheFragment_webCard
         }
       }
@@ -33,6 +39,7 @@ const CommentItem = ({ item }: CommentItemProps) => {
   );
 
   const styles = useStyleSheet(styleSheet);
+  const { profileInfos } = useAuthState();
 
   if (!postComment) return null;
 
@@ -46,15 +53,33 @@ const CommentItem = ({ item }: CommentItemProps) => {
         activeLink
       />
       <View style={{ flex: 1 }}>
-        <Text variant="small">
-          <Link
-            route="WEBCARD"
-            params={{ userName: postComment.webCard.userName }}
-          >
-            <Text variant="smallbold">{postComment.webCard.userName} </Text>
-          </Link>
-          {postComment.comment}
-        </Text>
+        <View style={{ flexDirection: 'row' }}>
+          {postComment.webCard.cardIsPublished ||
+          isEditor(profileInfos?.profileRole) ? (
+            <Link
+              route="WEBCARD"
+              params={{ userName: postComment.webCard.userName }}
+            >
+              <Text variant="smallbold">{postComment.webCard.userName} </Text>
+            </Link>
+          ) : (
+            <PressableNative
+              onPress={() =>
+                Toast.show({
+                  type: 'error',
+                  text1: intl.formatMessage({
+                    defaultMessage: 'Oops, this WebCard could not be found.',
+                    description:
+                      'Comment Item - Error message toast when accessing an unpublished webcard',
+                  }) as string,
+                })
+              }
+            >
+              <Text variant="smallbold">{postComment.webCard.userName} </Text>
+            </PressableNative>
+          )}
+          <Text variant="small">{postComment.comment}</Text>
+        </View>
         <Text variant="small" style={styles.relativeTime}>
           <FormattedRelativeTime
             value={relativeDateMinute(postComment.createdAt)}

@@ -24,10 +24,12 @@ import ActivityIndicator from '#ui/ActivityIndicator';
 import Button from '#ui/Button';
 import type { CoverLinkProps } from '#components/CoverLink';
 import type { MediaSuggestionsWebCards_profile$key } from '#relayArtifacts/MediaSuggestionsWebCards_profile.graphql';
+import type { MediaSuggestionsWebCards_webCard$key } from '#relayArtifacts/MediaSuggestionsWebCards_webCard.graphql';
 import type { StyleProp, ViewStyle } from 'react-native';
 
 type MediaSuggestionsWebCardsProps = {
   profile: MediaSuggestionsWebCards_profile$key;
+  webcard: MediaSuggestionsWebCards_webCard$key;
   coverListStyle?: StyleProp<ViewStyle>;
   header?: React.ReactNode;
   isCurrentTab: boolean;
@@ -37,6 +39,7 @@ const NB_PROFILES = 6;
 
 const MediaSuggestionsWebCards = ({
   profile,
+  webcard,
   coverListStyle,
   header,
   isCurrentTab,
@@ -57,6 +60,7 @@ const MediaSuggestionsWebCards = ({
     >
       <MediaSuggestionsWebCardsInner
         profile={profile}
+        webcard={webcard}
         style={coverListStyle}
         isCurrentTab={isCurrentTab}
       />
@@ -66,10 +70,12 @@ const MediaSuggestionsWebCards = ({
 
 const MediaSuggestionsWebCardsInner = ({
   profile,
+  webcard,
   style,
   isCurrentTab,
 }: {
   profile: MediaSuggestionsWebCards_profile$key;
+  webcard: MediaSuggestionsWebCards_webCard$key;
   style?: StyleProp<ViewStyle>;
   isCurrentTab: boolean;
 }) => {
@@ -96,6 +102,15 @@ const MediaSuggestionsWebCardsInner = ({
       `,
       profile,
     );
+
+  const { cardIsPublished } = useFragment(
+    graphql`
+      fragment MediaSuggestionsWebCards_webCard on WebCard {
+        cardIsPublished
+      }
+    `,
+    webcard,
+  );
 
   const isCurrentTabRef = useRef(isCurrentTab);
   useEffect(() => {
@@ -145,6 +160,7 @@ const MediaSuggestionsWebCardsInner = ({
           webCard={item}
           isFollowing={followingMap.get(item.id) ?? false}
           webCardId={item.id}
+          cardIsPublished={cardIsPublished}
         />
       )}
     />
@@ -153,9 +169,11 @@ const MediaSuggestionsWebCardsInner = ({
 
 const CoverLinkWithOptions = ({
   isFollowing,
+  cardIsPublished,
   ...props
 }: CoverLinkProps & {
   isFollowing: boolean;
+  cardIsPublished: boolean;
 }) => {
   const styles = useStyleSheet(styleSheet);
 
@@ -186,6 +204,19 @@ const CoverLinkWithOptions = ({
           }
           style={{ flex: 1 }}
           onPress={() => {
+            if (!cardIsPublished) {
+              Toast.show({
+                type: 'error',
+                text1: intl.formatMessage({
+                  defaultMessage:
+                    'This action can only be done from a published WebCard.',
+                  description:
+                    'MediaSuggestionsWebCards - AlertMessage when the user is viewing a post with an unpublished WebCard',
+                }),
+              });
+              return;
+            }
+
             if (isEditor(profileInfos?.profileRole)) {
               startTransition(() => {
                 toggleFollow(props.webCardId, userName, !isFollowing);

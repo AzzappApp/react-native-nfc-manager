@@ -38,6 +38,7 @@ const mediaScreenQuery = graphql`
           ...PostRendererFragment_author
           ...MediaFollowingsWebCards_webCard
           ...MediaFollowingsScreen_webCard
+          ...MediaSuggestionsWebCards_webCard
         }
       }
     }
@@ -81,6 +82,7 @@ const MediaScreen = ({
                 }
                 coverListStyle={styles.coverList}
                 profile={profile}
+                webcard={node?.profile.webCard}
                 isCurrentTab={tab === 'SUGGESTIONS'}
               />
               <Text style={styles.postsTitleStyle} variant="large">
