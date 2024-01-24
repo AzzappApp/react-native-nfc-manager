@@ -1,37 +1,28 @@
-import { and, eq } from 'drizzle-orm';
+import { eq } from 'drizzle-orm';
 import { GraphQLError } from 'graphql';
 import ERRORS from '@azzapp/shared/errors';
 import { isOwner } from '@azzapp/shared/profileHelpers';
-import { ProfileTable, db } from '#domains';
+import {
+  ProfileTable,
+  db,
+  getUserProfileWithWebCardId,
+  getWebCardPendingOwnerProfile,
+} from '#domains';
 import fromGlobalIdWithType from '#helpers/relayIdHelpers';
 import type { MutationResolvers } from '#schema/__generated__/types';
 
 const cancelTransferOwnership: MutationResolvers['cancelTransferOwnership'] =
-  async (_, { input }, { auth, loaders }) => {
-    const profileId = fromGlobalIdWithType(input.profileId, 'Profile');
-    const webCardId = fromGlobalIdWithType(input.webCardId, 'WebCard');
+  async (_, { input: { webCardId: gqlWebCardId } }, { auth }) => {
+    const { userId } = auth;
+    const webCardId = fromGlobalIdWithType(gqlWebCardId, 'WebCard');
+    const profile =
+      userId && (await getUserProfileWithWebCardId(userId, webCardId));
 
-    const profile = await loaders.Profile.load(profileId);
-    if (profile?.userId !== auth.userId) {
+    if (!profile || !isOwner(profile.profileRole)) {
       throw new GraphQLError(ERRORS.UNAUTHORIZED);
     }
 
-    if (!profile) {
-      throw new GraphQLError(ERRORS.INVALID_REQUEST);
-    }
-
-    if (!isOwner(profile.profileRole)) {
-      throw new GraphQLError(ERRORS.FORBIDDEN);
-    }
-
-    const [targetProfile] = await db
-      .select()
-      .from(ProfileTable)
-      .where(and(eq(ProfileTable.webCardId, webCardId)));
-
-    if (!targetProfile || !targetProfile.promotedAsOwner) {
-      throw new GraphQLError(ERRORS.INVALID_REQUEST);
-    }
+    const [targetProfile] = await getWebCardPendingOwnerProfile(webCardId);
 
     await db
       .update(ProfileTable)

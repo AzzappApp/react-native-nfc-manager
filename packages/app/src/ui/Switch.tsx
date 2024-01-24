@@ -17,7 +17,7 @@ const Switch = ({ variant = 'small', style, ...props }: SwitchProps) => {
     <RNSwitch
       {...props}
       style={[variantStyle.switch, style]}
-      thumbColor={colors.white}
+      thumbColor={variantStyle.thumbColor.color}
       trackColor={{
         false: variantStyle.trackFalse.color,
         true: variantStyle.trackTrue.color,
@@ -36,6 +36,9 @@ const computedStyle = createVariantsStyleSheet(appearance => ({
     },
     trackFalse: {
       color: appearance === 'light' ? colors.grey200 : colors.grey800,
+    },
+    thumbColor: {
+      color: appearance === 'light' ? colors.white : colors.black,
     },
   },
   small: {

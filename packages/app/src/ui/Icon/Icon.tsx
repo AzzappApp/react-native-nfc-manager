@@ -100,6 +100,9 @@ const icons = {
   get chrono() {
     return require('./assets/chrono.png');
   },
+  get clock() {
+    return require('./assets/clock.png');
+  },
   get close() {
     return require('./assets/close.png');
   },

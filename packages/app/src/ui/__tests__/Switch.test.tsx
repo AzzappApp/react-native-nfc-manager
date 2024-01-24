@@ -62,7 +62,7 @@ describe('Switch component', () => {
     );
 
     const switchComponent = getByTestId('switch');
-    expect(switchComponent.props.thumbTintColor).toBe(colors.white);
+    expect(switchComponent.props.thumbTintColor).toBe(colors.black);
     expect(switchComponent.props.onTintColor).toBe(colors.grey100);
   });
 

@@ -1,5 +1,5 @@
 import { parsePhoneNumber } from 'libphonenumber-js';
-import { useRef, useState } from 'react';
+import { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { StyleSheet, View, useColorScheme } from 'react-native';
@@ -15,7 +15,6 @@ import {
 } from 'react-relay';
 import ERRORS from '@azzapp/shared/errors';
 import { encodeMediaId } from '@azzapp/shared/imagesHelpers';
-import { isOwner } from '@azzapp/shared/profileHelpers';
 import { colors } from '#theme';
 import { getFileName } from '#helpers/fileHelpers';
 import { addLocalCachedMediaFile } from '#helpers/mediaHelpers';
@@ -32,14 +31,12 @@ import Select from '#ui/Select';
 import Text from '#ui/Text';
 import TextInput from '#ui/TextInput';
 import type { EmailPhoneInput } from '#components/EmailOrPhoneInput';
-import type { MultiUserDetailModal_CancelTransferOwnershipMutation } from '#relayArtifacts/MultiUserDetailModal_CancelTransferOwnershipMutation.graphql';
 import type { MultiUserDetailModal_Profile$key } from '#relayArtifacts/MultiUserDetailModal_Profile.graphql';
 import type { MultiUserDetailModal_RemoveUserMutation } from '#relayArtifacts/MultiUserDetailModal_RemoveUserMutation.graphql';
 import type { MultiUserDetailModal_UpdateProfileMutation } from '#relayArtifacts/MultiUserDetailModal_UpdateProfileMutation.graphql';
 import type { MultiUserDetailModal_webCard$key } from '#relayArtifacts/MultiUserDetailModal_webCard.graphql';
 import type { ProfileRole } from '#relayArtifacts/MultiUserScreenQuery.graphql';
 import type { ContactCardEditFormValues } from '#screens/ContactCardScreen/ContactCardEditModalSchema';
-import type { MultiUserTransferOwnershipModalActions } from './MultiUserTransferOwnershipModal';
 import type { ReactNode } from 'react';
 import type { Control } from 'react-hook-form';
 
@@ -60,7 +57,6 @@ const MultiUserDetailModal = ({
   onClose,
 }: MultiUserDetailModalProps) => {
   const [showImagePicker, setShowImagePicker] = useState(false);
-  const transfer = useRef<MultiUserTransferOwnershipModalActions>(null);
   const { profileInfos } = useAuthState();
   const intl = useIntl();
 
@@ -191,7 +187,6 @@ const MultiUserDetailModal = ({
             url
           }
         }
-        ...MultiUserTransferOwnershipModal_webCard
       }
     `,
     webCardKey,
@@ -249,20 +244,6 @@ const MultiUserDetailModal = ({
               phoneNumber
             }
             profileRole
-          }
-        }
-      }
-    `);
-
-  const [commitCancelTransfer, savingCancelTransfer] =
-    useMutation<MultiUserDetailModal_CancelTransferOwnershipMutation>(graphql`
-      mutation MultiUserDetailModal_CancelTransferOwnershipMutation(
-        $input: CancelTransferOwnershipInput!
-      ) {
-        cancelTransferOwnership(input: $input) {
-          profile {
-            id
-            promotedAsOwner
           }
         }
       }
@@ -539,60 +520,7 @@ const MultiUserDetailModal = ({
                 </View>
               )}
             />
-            {isOwner(profileInfos?.profileRole) &&
-              isOwner(role) &&
-              !webCard.profilePendingOwner && (
-                <Button
-                  style={styles.transfer}
-                  variant="secondary"
-                  label={intl.formatMessage({
-                    defaultMessage: 'Transfer Ownership',
-                    description:
-                      'MultiUserDetailModal - Label for transfer ownership button',
-                  })}
-                  onPress={() => transfer.current?.open()}
-                />
-              )}
-            {isOwner(profileInfos?.profileRole) &&
-              isOwner(role) &&
-              webCard.profilePendingOwner && (
-                <>
-                  <Text style={styles.pending}>
-                    <FormattedMessage
-                      defaultMessage="Pending Ownership transfer to"
-                      description="MultiUserDetailModal - Title for ownership transfer pending"
-                    />
-                  </Text>
 
-                  <Text style={styles.pendingEmail}>
-                    {webCard.profilePendingOwner?.user.email ??
-                      webCard.profilePendingOwner?.user.phoneNumber}
-                  </Text>
-
-                  <View style={styles.cancel}>
-                    <Button
-                      disabled={savingCancelTransfer}
-                      onPress={() =>
-                        commitCancelTransfer({
-                          variables: {
-                            input: {
-                              profileId: webCard.profilePendingOwner!.id,
-                              webCardId: webCard.id,
-                            },
-                          },
-                        })
-                      }
-                      label={intl.formatMessage({
-                        defaultMessage: 'Cancel transfer',
-                        description:
-                          'MultiUserDetailModal - Cancel transfer button label',
-                      })}
-                      variant="little_round"
-                      style={styles.cancelButton}
-                    />
-                  </View>
-                </>
-              )}
             {!webCard.profilePendingOwner && (
               <Text variant="xsmall" style={styles.description}>
                 {role === 'user' && (

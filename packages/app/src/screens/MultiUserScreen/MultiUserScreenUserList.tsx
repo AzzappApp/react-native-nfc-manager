@@ -1,24 +1,30 @@
-import { memo, useCallback, useMemo, useState } from 'react';
+import { memo, useCallback, useContext, useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
-import { SectionList, StyleSheet, View } from 'react-native';
+import { SectionList, View } from 'react-native';
+import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { graphql, useFragment, usePaginationFragment } from 'react-relay';
 import {
   convertToNonNullArray,
   type ArrayItemType,
 } from '@azzapp/shared/arrayHelpers';
+import { isOwner } from '@azzapp/shared/profileHelpers';
 import { colors } from '#theme';
 import { MEDIA_WIDTH } from '#components/AuthorCartouche';
 import { MediaImageRenderer } from '#components/medias';
 import { useRouter } from '#components/NativeRouter';
 import ScreenModal from '#components/ScreenModal';
+import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import useAuthState from '#hooks/useAuthState';
 import Button from '#ui/Button';
 import Icon from '#ui/Icon';
 import PressableNative from '#ui/PressableNative';
+import RadioButton from '#ui/RadioButton';
 import Text from '#ui/Text';
 import Avatar from './Avatar';
 import MultiUserDetailModal from './MultiUserDetailModal';
+import MultiUserPendingProfileOwner from './MultiUserPendingProfileOwner';
+import { MultiUserTransferOwnerContext } from './MultiUserScreen';
 import type { MultiUserDetailModal_Profile$key } from '#relayArtifacts/MultiUserDetailModal_Profile.graphql';
 import type {
   MultiUserScreenUserList_profiles$data,
@@ -41,10 +47,12 @@ const MultiUserScreenUserList = ({
 }: MultiUserScreenListProps) => {
   const intl = useIntl();
   const router = useRouter();
+  const styles = useStyleSheet(styleSheet);
 
   const webCard = useFragment(
     graphql`
       fragment MultiUserScreenUserList_webCard on WebCard {
+        id
         commonInformation {
           company
           addresses {
@@ -65,6 +73,7 @@ const MultiUserScreenUserList = ({
         }
         ...MultiUserDetailModal_webCard
         ...MultiUserScreenUserList_profiles
+        ...MultiUserPendingProfileOwner
       }
     `,
     webCardKey,
@@ -166,9 +175,37 @@ const MultiUserScreenUserList = ({
     }
   }, [isLoadingNext, refetch]);
 
-  const renderListItem = useCallback<ListRenderItem<Profile>>(({ item }) => {
-    return <UserListItem profileKey={item} onPress={setSelectedProfile} />;
-  }, []);
+  const { profileInfos } = useAuthState();
+
+  const isWebCardOwner = useMemo(
+    () => isOwner(profileInfos?.profileRole),
+    [profileInfos?.profileRole],
+  );
+
+  const { transferOwnerMode } = useContext(MultiUserTransferOwnerContext);
+
+  const renderListItem = useCallback<ListRenderItem<Profile>>(
+    ({ item }) => {
+      if (isWebCardOwner && item.id === profileInfos?.profileId) {
+        return (
+          <View>
+            <UserListItem profileKey={item} onPress={setSelectedProfile} />
+            <MultiUserPendingProfileOwner webCard={webCard} />
+          </View>
+        );
+      }
+      return <UserListItem profileKey={item} onPress={setSelectedProfile} />;
+    },
+    [isWebCardOwner, profileInfos?.profileId, webCard],
+  );
+
+  //filter the sections without having to reparse all the data
+  const filteredSections = useMemo(() => {
+    if (transferOwnerMode) {
+      return sections.filter(section => section.title !== 'owner');
+    }
+    return sections;
+  }, [sections, transferOwnerMode]);
 
   const { bottom } = useSafeAreaInsets();
   return (
@@ -198,7 +235,7 @@ const MultiUserScreenUserList = ({
           </View>
         }
         accessibilityRole="list"
-        sections={sections}
+        sections={filteredSections}
         keyExtractor={sectionKeyExtractor}
         renderItem={renderListItem}
         renderSectionHeader={renderHeaderSection}
@@ -223,10 +260,16 @@ const MultiUserScreenUserList = ({
 const renderHeaderSection = (info: {
   section: SectionListData<Profile, { title: string; data: Profile[] }>;
 }) => {
+  return <SectionHeader title={info.section.title} />;
+};
+
+// split the component from render function to use `useStyleSheet`
+const SectionHeader = ({ title }: { title: string }) => {
+  const styles = useStyleSheet(styleSheet);
   return (
     <View style={styles.header}>
       <Text variant="xsmall" style={styles.headerText}>
-        {info.section.title}
+        {title}
       </Text>
     </View>
   );
@@ -242,7 +285,9 @@ const ItemList = ({
   ) => void;
   profileKey: MultiUserDetailModal_Profile$key &
     MultiUserScreenUserListItem_Profile$key;
+  selectProfile?: (profileId: string) => void;
 }) => {
+  const styles = useStyleSheet(styleSheet);
   const data = useFragment(
     graphql`
       fragment MultiUserScreenUserListItem_Profile on Profile
@@ -270,10 +315,23 @@ const ItemList = ({
     profileKey as MultiUserDetailModal_Profile$key,
   );
   const { profileInfos } = useAuthState();
+  const { transferOwnerMode, selectedProfileId, setSelectedProfileId } =
+    useContext(MultiUserTransferOwnerContext);
 
   const onPressItem = useCallback(() => {
-    onPress(profileKey);
-  }, [onPress, profileKey]);
+    if (transferOwnerMode) {
+      setSelectedProfileId(data.id);
+    } else {
+      onPress(profileKey);
+    }
+  }, [data.id, onPress, profileKey, setSelectedProfileId, transferOwnerMode]);
+
+  //#region Transfert ownership
+  const onPressRadio = useCallback(() => {
+    setSelectedProfileId(data.id);
+  }, [data.id, setSelectedProfileId]);
+
+  //#endregion
 
   if (!data || !data.contactCard) {
     return null;
@@ -282,33 +340,42 @@ const ItemList = ({
   const isCurrentUser = data.id === profileInfos?.profileId;
 
   return (
-    <PressableNative onPress={onPressItem} style={styles.user}>
-      {data.avatar ? (
-        <MediaImageRenderer
-          source={{
-            uri: data.avatar.uri,
-            mediaId: data.avatar.id ?? '',
-            requestedSize: MEDIA_WIDTH,
-          }}
-          style={styles.avatar}
-        />
-      ) : (
-        <Avatar
-          firstName={contactCard.firstName ?? ''}
-          lastName={contactCard.lastName ?? ''}
-        />
-      )}
-      <View style={styles.userInfos}>
-        <Text variant="large">
-          ~{contactCard.firstName ?? ''} {contactCard.lastName ?? ''}{' '}
-          {isCurrentUser && '(me)'}
-        </Text>
-        <Text style={[styles.contact]}>
-          {data.user.email ?? data.user.phoneNumber}
-        </Text>
-      </View>
-      <Icon icon="arrow_right" />
-    </PressableNative>
+    <Animated.View entering={FadeIn} exiting={FadeOut}>
+      <PressableNative onPress={onPressItem} style={styles.user}>
+        {data.avatar ? (
+          <MediaImageRenderer
+            source={{
+              uri: data.avatar.uri,
+              mediaId: data.avatar.id ?? '',
+              requestedSize: MEDIA_WIDTH,
+            }}
+            style={styles.avatar}
+          />
+        ) : (
+          <Avatar
+            firstName={contactCard.firstName ?? ''}
+            lastName={contactCard.lastName ?? ''}
+          />
+        )}
+        <View style={styles.userInfos}>
+          <Text variant="large">
+            ~{contactCard.firstName ?? ''} {contactCard.lastName ?? ''}{' '}
+            {isCurrentUser && '(me)'}
+          </Text>
+          <Text style={styles.contact}>
+            {data.user.email ?? data.user.phoneNumber}
+          </Text>
+        </View>
+        {transferOwnerMode ? (
+          <RadioButton
+            checked={selectedProfileId === data.id}
+            onChange={onPressRadio}
+          />
+        ) : (
+          <Icon icon="arrow_right" />
+        )}
+      </PressableNative>
+    </Animated.View>
   );
 };
 
@@ -317,8 +384,7 @@ const UserListItem = memo(ItemList);
 const sectionKeyExtractor = (item: { id: string }) => {
   return item.id;
 };
-
-const styles = StyleSheet.create({
+const styleSheet = createStyleSheet(appearance => ({
   content: {
     paddingTop: 10,
     width: '100%',
@@ -348,19 +414,19 @@ const styles = StyleSheet.create({
     borderRadius: 28,
   },
   header: {
-    backgroundColor: colors.grey100,
+    backgroundColor: appearance === 'light' ? colors.grey100 : colors.grey800,
     borderRadius: 12,
     paddingVertical: 7,
     marginTop: 10,
   },
   headerText: {
-    color: colors.grey600,
+    color: appearance === 'light' ? colors.grey600 : colors.grey300,
     textTransform: 'uppercase',
     textAlign: 'center',
   },
-});
+}));
 
-export default MultiUserScreenUserList;
+export default memo(MultiUserScreenUserList);
 
 type Profile = NonNullable<
   NonNullable<

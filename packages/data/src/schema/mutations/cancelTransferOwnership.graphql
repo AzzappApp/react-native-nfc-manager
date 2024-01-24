@@ -10,5 +10,4 @@ type CancelTransferOwnershipPayload {
 
 input CancelTransferOwnershipInput {
   webCardId: ID!
-  profileId: ID!
 }

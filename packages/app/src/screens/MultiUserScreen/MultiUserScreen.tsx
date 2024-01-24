@@ -1,10 +1,17 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import {
+  createContext,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { graphql, useMutation, usePreloadedQuery } from 'react-relay';
 import { isAdmin } from '@azzapp/shared/profileHelpers';
 import { colors } from '#theme';
+import { CancelHeaderButton } from '#components/commonsButtons';
 import CoverRenderer from '#components/CoverRenderer';
 import { useRouter } from '#components/NativeRouter';
 import ScreenModal from '#components/ScreenModal';
@@ -13,6 +20,7 @@ import useToggle from '#hooks/useToggle';
 import Button from '#ui/Button';
 import Container from '#ui/Container';
 import Header from '#ui/Header';
+import HeaderButton from '#ui/HeaderButton';
 import Icon from '#ui/Icon';
 import IconButton from '#ui/IconButton';
 import PressableNative from '#ui/PressableNative';
@@ -21,6 +29,7 @@ import Text from '#ui/Text';
 import CommonInformationForm from './CommonInformationForm';
 import MultiUserScreenUserList from './MultiUserScreenUserList';
 import type { RelayScreenProps } from '#helpers/relayScreen';
+import type { MultiUserScreen_transferOwnershipMutation } from '#relayArtifacts/MultiUserScreen_transferOwnershipMutation.graphql';
 import type { MultiUserScreenMutation } from '#relayArtifacts/MultiUserScreenMutation.graphql';
 import type { MultiUserScreenQuery } from '#relayArtifacts/MultiUserScreenQuery.graphql';
 import type { MultiUserRoute } from '#routes';
@@ -138,15 +147,83 @@ const MultiUserScreen = ({
     [setAllowMultiUser],
   );
 
+  //#region Transfert ownership
+  const [transferOwner, savingTransferOwner] =
+    useMutation<MultiUserScreen_transferOwnershipMutation>(graphql`
+      mutation MultiUserScreen_transferOwnershipMutation(
+        $input: TransferOwnershipInput!
+      ) {
+        transferOwnership(input: $input) {
+          profile {
+            id
+            promotedAsOwner
+            user {
+              email
+              phoneNumber
+            }
+          }
+        }
+      }
+    `);
+
+  const [selectedProfileId, setSelectedProfileId] = useState<
+    string | undefined
+  >(undefined);
+  const [transferOwnerMode, toggleTransferOwnerMode] = useToggle(false);
+
+  const transferOwnership = useCallback(() => {
+    if (selectedProfileId && profile?.webCard?.id) {
+      transferOwner({
+        variables: {
+          input: {
+            profileId: selectedProfileId,
+            webCardId: profile.webCard.id,
+          },
+        },
+        onCompleted: () => {
+          toggleTransferOwnerMode();
+          setSelectedProfileId(undefined);
+        },
+        updater: store => {
+          // Get the new profile from the mutation response
+          const pendingProfile = store
+            .getRootField('transferOwnership')
+            .getLinkedRecord('profile');
+          const webCardRecord = store.get(profile.webCard.id);
+          if (!webCardRecord) {
+            return;
+          }
+          store
+            .get(profile.webCard.id)
+            ?.setLinkedRecord(pendingProfile, 'profilePendingOwner');
+        },
+      });
+    }
+  }, [
+    profile?.webCard.id,
+    selectedProfileId,
+    toggleTransferOwnerMode,
+    transferOwner,
+  ]);
+
+  //#endRegion
+
   const ScrollableHeader = useMemo(() => {
     return (
       <View style={{ alignItems: 'center' }}>
         <Icon style={styles.sharedIcon} icon="multi_user" />
         <Text variant="xsmall" style={styles.description}>
-          <FormattedMessage
-            defaultMessage="Allow your team members to have their own personal Contact Cards, connected to the same company or organisation’s WebCard."
-            description="Description for MultiUserScreen"
-          />
+          {transferOwnerMode ? (
+            <FormattedMessage
+              defaultMessage="You can choose to transfer ownership to an existing WebCard user. The new owner will have full control over the WebCard, including billing responsibility"
+              description="Description for MultiUser transfert ownership"
+            />
+          ) : (
+            <FormattedMessage
+              defaultMessage="Allow your team members to have their own personal Contact Cards, connected to the same company or organisation’s WebCard."
+              description="Description for MultiUserScreen"
+            />
+          )}
         </Text>
 
         <Text variant="smallbold" style={styles.price}>
@@ -184,6 +261,7 @@ const MultiUserScreen = ({
     profile?.webCard.isMultiUser,
     profile?.webCard?.nbProfiles,
     toggleMultiUser,
+    transferOwnerMode,
   ]);
 
   if (!profile) {
@@ -196,44 +274,81 @@ const MultiUserScreen = ({
         style={{ flex: 1 }}
         edges={{ bottom: 'off', top: 'additive' }}
       >
-        <Header
-          middleElement={intl.formatMessage({
-            defaultMessage: 'Multi user',
-            description: 'MultiUserScreen - Multi user title',
-          })}
-          rightElement={
-            <PressableNative
-              onPress={router.back}
-              accessibilityRole="link"
-              accessibilityLabel={intl.formatMessage({
-                defaultMessage: 'Go back',
-                description: 'Go back button in multi user header',
-              })}
-            >
-              <CoverRenderer
-                webCard={profile?.webCard}
-                width={COVER_WIDTH}
-                style={{ marginBottom: -1 }}
+        {transferOwnerMode ? (
+          <Header
+            middleElement={intl.formatMessage({
+              defaultMessage: 'Transfer Ownership',
+              description:
+                'MultiUserScreen - Multi user Transfer Ownership header title',
+            })}
+            leftElement={
+              <CancelHeaderButton
+                onPress={toggleTransferOwnerMode}
+                disabled={savingTransferOwner}
               />
-            </PressableNative>
-          }
-          leftElement={
-            <IconButton
-              icon="arrow_left"
-              onPress={router.back}
-              iconSize={28}
-              variant="icon"
-            />
-          }
-        />
+            }
+            rightElement={
+              <HeaderButton
+                variant="primary"
+                disabled={!selectedProfileId || savingTransferOwner}
+                label={intl.formatMessage({
+                  defaultMessage: 'Transfer',
+                  description:
+                    'MultiUser Screen - Transfer owner header button label',
+                })}
+                onPress={transferOwnership}
+              />
+            }
+          />
+        ) : (
+          <Header
+            middleElement={intl.formatMessage({
+              defaultMessage: 'Multi user',
+              description: 'MultiUserScreen - Multi user title',
+            })}
+            rightElement={
+              <PressableNative
+                onPress={router.back}
+                accessibilityRole="link"
+                accessibilityLabel={intl.formatMessage({
+                  defaultMessage: 'Go back',
+                  description: 'Go back button in multi user header',
+                })}
+              >
+                <CoverRenderer
+                  webCard={profile?.webCard}
+                  width={COVER_WIDTH}
+                  style={{ marginBottom: -1 }}
+                />
+              </PressableNative>
+            }
+            leftElement={
+              <IconButton
+                icon="arrow_left"
+                onPress={router.back}
+                iconSize={28}
+                variant="icon"
+              />
+            }
+          />
+        )}
 
         <View style={styles.content}>
           {profile.webCard.isMultiUser ? (
-            <MultiUserScreenUserList
-              Header={ScrollableHeader}
-              toggleCommonInfosForm={toggleCommonInfoForm}
-              webCard={profile.webCard}
-            />
+            <MultiUserTransferOwnerContext.Provider
+              value={{
+                selectedProfileId,
+                setSelectedProfileId,
+                transferOwnerMode,
+                toggleTransferOwnerMode,
+              }}
+            >
+              <MultiUserScreenUserList
+                Header={ScrollableHeader}
+                toggleCommonInfosForm={toggleCommonInfoForm}
+                webCard={profile.webCard}
+              />
+            </MultiUserTransferOwnerContext.Provider>
           ) : (
             <>{ScrollableHeader}</>
           )}
@@ -345,3 +460,18 @@ export default relayScreen(MultiUserScreen, {
   }),
   fetchPolicy: 'store-and-network',
 });
+
+type MultiUserTransferOwnerContextProps = {
+  selectedProfileId: string | undefined;
+  setSelectedProfileId: (id: string) => void;
+  transferOwnerMode: boolean;
+  toggleTransferOwnerMode: () => void;
+};
+
+export const MultiUserTransferOwnerContext =
+  createContext<MultiUserTransferOwnerContextProps>({
+    selectedProfileId: undefined,
+    setSelectedProfileId: () => {},
+    transferOwnerMode: false,
+    toggleTransferOwnerMode: () => {},
+  });
