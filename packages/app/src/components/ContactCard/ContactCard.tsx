@@ -1,5 +1,5 @@
 import { memo, useMemo } from 'react';
-import { Image, View, StyleSheet } from 'react-native';
+import { Image, View } from 'react-native';
 import QRCode from 'react-native-qrcode-svg';
 import { useFragment, graphql } from 'react-relay';
 import { getTextColor } from '@azzapp/shared/colorsHelpers';
@@ -8,7 +8,8 @@ import {
   buildUserUrl,
   buildUserUrlWithContactCard,
 } from '@azzapp/shared/urlHelpers';
-import { colors } from '#theme';
+import { colors, shadow } from '#theme';
+import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import Text from '#ui/Text';
 import type { ContactCard_profile$key } from '#relayArtifacts/ContactCard_profile.graphql';
 import type { StyleProp, ViewStyle } from 'react-native';
@@ -54,6 +55,7 @@ const ContactCard = ({
     `,
     profileKey,
   );
+  const styles = useStyleSheet(stylesheet);
 
   const backgroundColor = cardColors?.primary ?? colors.black;
 
@@ -195,7 +197,7 @@ export const CONTACT_CARD_RADIUS_HEIGHT = 1 / 10;
 export default memo(ContactCard);
 export const CONTACT_CARD_ASPECT_RATIO = 0.6;
 
-const styles = StyleSheet.create({
+const stylesheet = createStyleSheet(appearance => ({
   webCardContainer: {
     paddingVertical: 10,
     paddingHorizontal: 20,
@@ -203,6 +205,7 @@ const styles = StyleSheet.create({
     overflow: 'visible',
     flexDirection: 'row',
     borderCurve: 'continuous',
+    ...shadow(appearance),
   },
   logo: { zIndex: 1 },
   webCardBackground: {
@@ -241,4 +244,4 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     height: '100%',
   },
-});
+}));
