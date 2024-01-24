@@ -1,11 +1,13 @@
 import { isEqual } from 'lodash';
 import { useCallback, useState } from 'react';
 import { useIntl } from 'react-intl';
+import { Platform } from 'react-native';
 import * as mime from 'react-native-mime-types';
 import { Toast } from 'react-native-toast-message/lib/src/Toast';
 import { graphql, useFragment, useMutation } from 'react-relay';
 import { Observable } from 'relay-runtime';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
+import { waitTime } from '@azzapp/shared/asyncHelpers';
 import {
   COVER_MAX_HEIGHT,
   COVER_MAX_WIDTH,
@@ -135,6 +137,11 @@ const useSaveCover = (
           !isEqual(cardCover?.mediaParameters, mediaParameters);
 
         if (shouldRecreateMedia) {
+          if (sourceMedia.kind === 'video' && Platform.OS === 'android') {
+            // on Android we need to be sure that the player is released to avoid memory overload
+            await waitTime(50);
+          }
+
           const size = {
             width: COVER_MAX_WIDTH,
             height: COVER_MAX_HEIGHT,

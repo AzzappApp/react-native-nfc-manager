@@ -1,5 +1,7 @@
 import { mapValues } from 'lodash';
 import { useCallback, useReducer, useRef } from 'react';
+import { Platform } from 'react-native';
+import { waitTime } from '@azzapp/shared/asyncHelpers';
 import {
   COVER_SOURCE_MAX_IMAGE_DIMENSION,
   COVER_SOURCE_MAX_VIDEO_DIMENSION,
@@ -238,6 +240,10 @@ const createMediaComputation = ({
   let canceled = false;
   const computeMedia = async () => {
     if (downscaleMedia) {
+      if (kind === 'video' && Platform.OS === 'android') {
+        // on Android we need to be sure that the player is released to avoid memory overload
+        await waitTime(50);
+      }
       const newSize = downScaleImage(width, height, maxSize);
       const resizePath =
         kind === 'image'

@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
-import { View } from 'react-native';
+import { Platform, View } from 'react-native';
 import * as mime from 'react-native-mime-types';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
@@ -11,6 +11,7 @@ import {
   usePreloadedQuery,
 } from 'react-relay';
 import { Observable } from 'relay-runtime';
+import { waitTime } from '@azzapp/shared/asyncHelpers';
 import { encodeMediaId } from '@azzapp/shared/imagesHelpers';
 import { colors } from '#theme';
 import { CancelHeaderButton } from '#components/commonsButtons';
@@ -137,6 +138,10 @@ const PostCreationScreen = ({
     }
     try {
       setProgressIndicator(Observable.from(0));
+      if (Platform.OS === 'android' && kind === 'video') {
+        // on Android we need to be sure that the player is released to avoid memory overload
+        await waitTime(50);
+      }
       const exportedMedia = await exportMedia({
         uri,
         kind,

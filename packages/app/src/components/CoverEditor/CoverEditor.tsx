@@ -688,7 +688,7 @@ const CoverEditor = (
               mediaInfos={displayedMediaInfos}
               title={title}
               subTitle={subTitle}
-              videoPaused={!!progressIndicator}
+              videoPaused={!!progressIndicator || customEditionProps != null}
               width={templateListWidth}
               height={templateListHeight}
               timeRange={timeRange}
