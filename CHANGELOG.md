@@ -1,4 +1,4 @@
-## 0.5.5-canary.6
+## 0.5.5-canary.7
 
 * **fix:**  - 🐛 display shadow to avoid white contact card ([#2481](https://github.com/AzzappApp/azzapp/pull/2481))
 * **fix:**  - 🐛 deny access to unpublished webcard from comment ([#2470](https://github.com/AzzappApp/azzapp/pull/2470))
