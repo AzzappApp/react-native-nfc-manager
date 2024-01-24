@@ -1,3 +1,4 @@
+import { Fragment } from 'react';
 import { useFieldArray } from 'react-hook-form';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { View } from 'react-native';
@@ -10,6 +11,7 @@ import {
 import { useStyleSheet } from '#helpers/createStyles';
 import Icon from '#ui/Icon';
 import PressableNative from '#ui/PressableNative';
+import Separation from '#ui/Separation';
 import Text from '#ui/Text';
 import type { ContactCardEditFormValues } from './ContactCardEditModalSchema';
 import type { Control } from 'react-hook-form';
@@ -33,21 +35,23 @@ const ContactCardEditModalEmails = ({
   return (
     <>
       {fields.map((email, index) => (
-        <ContactCardEditModalField
-          key={email.id}
-          control={control}
-          labelKey={`emails.${index}.label`}
-          valueKey={`emails.${index}.address`}
-          selectedKey={`emails.${index}.selected`}
-          deleteField={() => remove(index)}
-          keyboardType="email-address"
-          autoCapitalize="none"
-          labelValues={labelValues}
-          placeholder={intl.formatMessage({
-            defaultMessage: 'Enter an email',
-            description: 'Placeholder for email inside contact card',
-          })}
-        />
+        <Fragment key={email.id}>
+          <ContactCardEditModalField
+            control={control}
+            labelKey={`emails.${index}.label`}
+            valueKey={`emails.${index}.address`}
+            selectedKey={`emails.${index}.selected`}
+            deleteField={() => remove(index)}
+            keyboardType="email-address"
+            autoCapitalize="none"
+            labelValues={labelValues}
+            placeholder={intl.formatMessage({
+              defaultMessage: 'Enter an email',
+              description: 'Placeholder for email inside contact card',
+            })}
+          />
+          <Separation small />
+        </Fragment>
       ))}
       <View>
         <PressableNative

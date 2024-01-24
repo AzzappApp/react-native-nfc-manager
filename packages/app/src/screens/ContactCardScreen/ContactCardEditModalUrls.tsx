@@ -1,3 +1,4 @@
+import { Fragment } from 'react';
 import { useFieldArray } from 'react-hook-form';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { View } from 'react-native';
@@ -7,6 +8,7 @@ import { contactCardEditModalStyleSheet } from '#helpers/contactCardHelpers';
 import { useStyleSheet } from '#helpers/createStyles';
 import Icon from '#ui/Icon';
 import PressableNative from '#ui/PressableNative';
+import Separation from '#ui/Separation';
 import Text from '#ui/Text';
 import type { ContactCardEditFormValues } from './ContactCardEditModalSchema';
 import type { Control, FieldErrors } from 'react-hook-form';
@@ -30,29 +32,31 @@ const ContactCardEditModalUrls = ({
   return (
     <>
       {fields.map((url, index) => (
-        <ContactCardEditModalField
-          key={url.id}
-          control={control}
-          valueKey={`urls.${index}.address`}
-          selectedKey={`urls.${index}.selected`}
-          deleteField={() => remove(index)}
-          keyboardType="url"
-          autoCapitalize="none"
-          placeholder={intl.formatMessage({
-            defaultMessage: 'Enter a URL',
-            description: 'Placeholder for URL inside contact card',
-          })}
-          errorMessage={
-            errors?.urls?.[index]?.root
-              ? intl.formatMessage({
-                  defaultMessage: 'Please enter a valid url',
-                  description:
-                    'Edit Contact Card - Error message when a url is wrongly formatted',
-                })
-              : undefined
-          }
-          trim
-        />
+        <Fragment key={url.id}>
+          <ContactCardEditModalField
+            control={control}
+            valueKey={`urls.${index}.address`}
+            selectedKey={`urls.${index}.selected`}
+            deleteField={() => remove(index)}
+            keyboardType="url"
+            autoCapitalize="none"
+            placeholder={intl.formatMessage({
+              defaultMessage: 'Enter a URL',
+              description: 'Placeholder for URL inside contact card',
+            })}
+            errorMessage={
+              errors?.urls?.[index]?.root
+                ? intl.formatMessage({
+                    defaultMessage: 'Please enter a valid url',
+                    description:
+                      'Edit Contact Card - Error message when a url is wrongly formatted',
+                  })
+                : undefined
+            }
+            trim
+          />
+          <Separation small />
+        </Fragment>
       ))}
       <View>
         <PressableNative

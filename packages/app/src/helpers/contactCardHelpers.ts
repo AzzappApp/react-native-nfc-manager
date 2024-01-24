@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import { useIntl } from 'react-intl';
 import { SOCIAL_NETWORK_LINKS } from '@azzapp/shared/socialLinkHelpers';
-import { colors, textStyles } from '#theme';
+import { textStyles } from '#theme';
 import { createStyleSheet } from '#helpers/createStyles';
 import type { ColorSchemeName } from 'react-native';
 
@@ -38,10 +38,6 @@ export const buildContactCardModalStyleSheet = (appareance: ColorSchemeName) =>
     sectionsContainer: {
       rowGap: 1,
       paddingBottom: 20,
-    },
-    separator: {
-      height: 30,
-      backgroundColor: appareance === 'light' ? colors.grey50 : colors.black,
     },
     input: {
       flex: 1,

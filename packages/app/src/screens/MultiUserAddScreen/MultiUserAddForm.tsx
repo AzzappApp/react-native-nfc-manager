@@ -1,7 +1,7 @@
 import { parsePhoneNumber } from 'libphonenumber-js';
 import { useCallback, type ReactNode } from 'react';
 import { Controller, useController } from 'react-hook-form';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 import { View } from 'react-native';
 import { colors } from '#theme';
 import EmailOrPhoneInput from '#components/EmailOrPhoneInput';
@@ -42,6 +42,7 @@ const MultiUserAddForm = ({ contacts, control }: MultiUserAddFormProps) => {
   const [showAvailableInfo, toggleShowAvailableInfo] = useToggle(false);
 
   const { field } = useController({ control, name: 'role' });
+  const intl = useIntl();
   const {
     field: fieldContact,
     fieldState: { error },
@@ -83,7 +84,7 @@ const MultiUserAddForm = ({ contacts, control }: MultiUserAddFormProps) => {
     }>,
   ) => {
     return (
-      <Text variant="textField" style={styles.inputText}>
+      <Text variant="button" style={styles.inputText}>
         {itemInfo.item.id}
       </Text>
     );
@@ -101,7 +102,7 @@ const MultiUserAddForm = ({ contacts, control }: MultiUserAddFormProps) => {
           </Text>
           {contacts?.length > 0 && (
             <PressableOpacity onPress={toggleShowAvailableInfo}>
-              <Text variant="hyperLink">
+              <Text variant="xsmall" style={styles.info}>
                 <FormattedMessage
                   defaultMessage="See available Info"
                   description="MultiUserAddForm - See available info text link"
@@ -121,6 +122,13 @@ const MultiUserAddForm = ({ contacts, control }: MultiUserAddFormProps) => {
             contentContainerStyle={styles.bottomSheetContentContainer}
             onRequestClose={toggleShowAvailableInfo}
             nestedScroll
+            headerTitle={
+              intl.formatMessage({
+                defaultMessage: 'Available Info',
+                description:
+                  'MultiUserAddForm - Available Info BottomSheet - Title',
+              }) as string
+            }
           >
             <SelectList
               data={contacts}
@@ -168,9 +176,15 @@ const MultiUserAddForm = ({ contacts, control }: MultiUserAddFormProps) => {
             selectedItemKey={value}
             keyExtractor={role => role.id}
             onItemSelected={item => onChange(item.id)}
-            itemContainerStyle={styles.selectItemContainerStyle}
+            itemContainerStyle={[styles.selectItemContainerStyle]}
             bottomSheetHeight={
               BOTTOM_SHEET_HEIGHT_BASE + roles.length * BOTTOM_SHEET_HEIGHT_ITEM
+            }
+            bottomSheetTitle={
+              intl.formatMessage({
+                defaultMessage: 'Select a role',
+                description: 'MultiUserAddForm - Role BottomSheet - Title',
+              }) as string
             }
           />
         )}
@@ -236,6 +250,7 @@ const styleSheet = createStyleSheet(appearance => ({
   },
   selectItemContainerStyle: {
     paddingHorizontal: 30,
+    marginBottom: 18,
   },
   selectTitle: {
     paddingBottom: 10,
@@ -263,9 +278,12 @@ const styleSheet = createStyleSheet(appearance => ({
     minHeight: 15,
     marginBottom: 5,
   },
+  info: {
+    textDecorationLine: 'underline',
+  },
 }));
 
 const BOTTOM_SHEET_HEIGHT_BASE = 100;
-const BOTTOM_SHEET_HEIGHT_ITEM = 30;
+const BOTTOM_SHEET_HEIGHT_ITEM = 40;
 
 export default MultiUserAddForm;

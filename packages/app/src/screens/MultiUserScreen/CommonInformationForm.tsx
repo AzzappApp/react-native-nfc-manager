@@ -11,6 +11,7 @@ import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import BottomSheetModal from '#ui/BottomSheetModal';
 import Button from '#ui/Button';
 import Icon from '#ui/Icon';
+import Separation from '#ui/Separation';
 import Text from '#ui/Text';
 import TextInput from '#ui/TextInput';
 import CommonInformationAddresses from './CommonInformationAddresses';
@@ -230,15 +231,15 @@ const CommonInformationForm = ({
               </View>
             )}
           />
-          <View style={styles.separator} />
+          <Separation />
           <CommonInformationAddresses control={control} />
-          <View style={styles.separator} />
+          <Separation />
           <CommonInformationPhones control={control} />
-          <View style={styles.separator} />
+          <Separation />
           <CommonInformationEmails control={control} />
-          <View style={styles.separator} />
+          <Separation />
           <CommonInformationUrls control={control} />
-          <View style={styles.separator} />
+          <Separation />
           <CommonInformationSocials control={control} />
         </View>
       </FormDeleteFieldOverlay>

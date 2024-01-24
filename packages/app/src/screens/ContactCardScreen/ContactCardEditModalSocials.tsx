@@ -1,3 +1,4 @@
+import { Fragment } from 'react';
 import { useFieldArray } from 'react-hook-form';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { View } from 'react-native';
@@ -11,6 +12,7 @@ import {
 import { useStyleSheet } from '#helpers/createStyles';
 import Icon from '#ui/Icon';
 import PressableNative from '#ui/PressableNative';
+import Separation from '#ui/Separation';
 import Text from '#ui/Text';
 import type { ContactCardEditFormValues } from './ContactCardEditModalSchema';
 import type { Control } from 'react-hook-form';
@@ -34,29 +36,32 @@ const ContactCardEditModalSocials = ({
   return (
     <>
       {fields.map((social, index) => (
-        <ContactCardEditModalField
-          key={social.id}
-          control={control}
-          labelKey={`socials.${index}.label`}
-          valueKey={`socials.${index}.url`}
-          labelValues={labelValues}
-          selectedKey={`socials.${index}.selected`}
-          deleteField={() => remove(index)}
-          keyboardType="default"
-          placeholder={intl.formatMessage({
-            defaultMessage: 'Enter a social profile',
-            description: 'Placeholder for social profile inside contact card',
-          })}
-          onChangeLabel={label => {
-            update(index, {
-              selected: social.selected,
-              label,
-              url:
-                SOCIAL_NETWORK_LINKS.find(socialLink => socialLink.id === label)
-                  ?.mask ?? '',
-            });
-          }}
-        />
+        <Fragment key={social.id}>
+          <ContactCardEditModalField
+            control={control}
+            labelKey={`socials.${index}.label`}
+            valueKey={`socials.${index}.url`}
+            labelValues={labelValues}
+            selectedKey={`socials.${index}.selected`}
+            deleteField={() => remove(index)}
+            keyboardType="default"
+            placeholder={intl.formatMessage({
+              defaultMessage: 'Enter a social profile',
+              description: 'Placeholder for social profile inside contact card',
+            })}
+            onChangeLabel={label => {
+              update(index, {
+                selected: social.selected,
+                label,
+                url:
+                  SOCIAL_NETWORK_LINKS.find(
+                    socialLink => socialLink.id === label,
+                  )?.mask ?? '',
+              });
+            }}
+          />
+          <Separation small />
+        </Fragment>
       ))}
       <View>
         <PressableNative

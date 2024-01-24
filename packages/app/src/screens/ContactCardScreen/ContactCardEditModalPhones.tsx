@@ -1,3 +1,4 @@
+import { Fragment } from 'react';
 import { useFieldArray } from 'react-hook-form';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { View } from 'react-native';
@@ -10,6 +11,7 @@ import {
 import { useStyleSheet } from '#helpers/createStyles';
 import Icon from '#ui/Icon';
 import PressableNative from '#ui/PressableNative';
+import Separation from '#ui/Separation';
 import Text from '#ui/Text';
 import type { ContactCardEditFormValues } from './ContactCardEditModalSchema';
 import type { Control } from 'react-hook-form';
@@ -33,20 +35,22 @@ const ContactCardEditModalPhones = ({
   return (
     <>
       {fields.map((phone, index) => (
-        <ContactCardEditModalField
-          key={phone.id}
-          control={control}
-          labelKey={`phoneNumbers.${index}.label`}
-          valueKey={`phoneNumbers.${index}.number`}
-          selectedKey={`phoneNumbers.${index}.selected`}
-          deleteField={() => remove(index)}
-          keyboardType="phone-pad"
-          labelValues={labelValues}
-          placeholder={intl.formatMessage({
-            defaultMessage: 'Enter a phone number',
-            description: 'Placeholder for phone number inside contact card',
-          })}
-        />
+        <Fragment key={phone.id}>
+          <ContactCardEditModalField
+            control={control}
+            labelKey={`phoneNumbers.${index}.label`}
+            valueKey={`phoneNumbers.${index}.number`}
+            selectedKey={`phoneNumbers.${index}.selected`}
+            deleteField={() => remove(index)}
+            keyboardType="phone-pad"
+            labelValues={labelValues}
+            placeholder={intl.formatMessage({
+              defaultMessage: 'Enter a phone number',
+              description: 'Placeholder for phone number inside contact card',
+            })}
+          />
+          <Separation small />
+        </Fragment>
       ))}
       <View>
         <PressableNative

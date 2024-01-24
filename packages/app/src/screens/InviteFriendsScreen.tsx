@@ -42,10 +42,10 @@ const InviteFriendsScreen = ({
   const message = intl.formatMessage(
     {
       defaultMessage:
-        'Hey, I’m using Azzapp as {userName}. Install the app to subscribe to my photos and videos. {url}',
+        "Hey, I'm using azzapp, the ultimate networking app for businesses & individuals. Install the app here: {url}",
       description: 'Invite message to share with friends',
     },
-    { userName: webCard?.userName, url: 'https://azzapp.com' },
+    { url: 'https://azzapp.com' },
   );
 
   // const subject = intl.formatMessage({

@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { Fragment, useCallback } from 'react';
 import { Controller, useController } from 'react-hook-form';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { View } from 'react-native';
@@ -17,6 +17,7 @@ import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import Icon from '#ui/Icon';
 import IconButton from '#ui/IconButton';
 import PressableNative from '#ui/PressableNative';
+import Separation from '#ui/Separation';
 import Text from '#ui/Text';
 import TextInput from '#ui/TextInput';
 import ContactCardEditModalAddresses from './ContactCardEditModalAddresses';
@@ -137,7 +138,7 @@ const ContactCardEditForm = ({
               </PressableNative>
             </View>
           ) : null}
-
+          <Separation small />
           <Controller
             control={control}
             name="firstName"
@@ -164,7 +165,7 @@ const ContactCardEditForm = ({
               </View>
             )}
           />
-
+          <Separation small />
           <Controller
             control={control}
             name="lastName"
@@ -190,7 +191,7 @@ const ContactCardEditForm = ({
               </View>
             )}
           />
-
+          <Separation small />
           <Controller
             control={control}
             name="title"
@@ -216,7 +217,7 @@ const ContactCardEditForm = ({
               </View>
             )}
           />
-
+          <Separation />
           {isMultiUser && commonInformation?.company ? (
             <View style={styles.fieldCommon}>
               <View style={styles.fieldTitleWithLock}>
@@ -259,33 +260,40 @@ const ContactCardEditForm = ({
             />
           )}
 
-          <View style={styles.separator} />
+          <Separation />
           {isMultiUser &&
             commonInformation?.phoneNumbers?.map((phoneNumber, index) => (
-              <CommonInformationField
-                key={index}
-                label={phoneNumber.label}
-                value={phoneNumber.number}
-              />
+              <Fragment key={index}>
+                <CommonInformationField
+                  label={phoneNumber.label}
+                  value={phoneNumber.number}
+                />
+                <Separation small />
+              </Fragment>
             ))}
           <ContactCardEditModalPhones control={control} />
-          <View style={styles.separator} />
+          <Separation />
           {isMultiUser &&
             commonInformation?.emails?.map((email, index) => (
-              <CommonInformationField
-                key={index}
-                label={email.label}
-                value={email.address}
-              />
+              <Fragment key={index}>
+                <CommonInformationField
+                  label={email.label}
+                  value={email.address}
+                />
+                <Separation small />
+              </Fragment>
             ))}
           <ContactCardEditModalEmails control={control} />
-          <View style={styles.separator} />
+          <Separation />
           {isMultiUser &&
             commonInformation?.urls?.map((url, index) => (
-              <CommonInformationField key={index} value={url.address} />
+              <Fragment key={index}>
+                <CommonInformationField value={url.address} />
+                <Separation small />
+              </Fragment>
             ))}
           <ContactCardEditModalUrls control={control} errors={errors} />
-          <View style={styles.separator} />
+          <Separation />
           {isMultiUser &&
             commonInformation?.addresses?.map((address, index) => (
               <CommonInformationField
@@ -295,16 +303,18 @@ const ContactCardEditForm = ({
               />
             ))}
           <ContactCardEditModalAddresses control={control} />
-          <View style={styles.separator} />
+          <Separation />
           <ContactCardEditModalBirthdays control={control} />
-          <View style={styles.separator} />
+          <Separation />
           {isMultiUser &&
             commonInformation?.socials?.map((social, index) => (
-              <CommonInformationField
-                key={index}
-                label={social.label}
-                value={social.url}
-              />
+              <Fragment key={index}>
+                <CommonInformationField
+                  label={social.label}
+                  value={social.url}
+                />
+                <Separation small />
+              </Fragment>
             ))}
           <ContactCardEditModalSocials control={control} />
         </View>
