@@ -34,6 +34,7 @@ export const getSignedUpload = async (
     mediaId,
     kind,
     pregeneratedSizes,
+    false,
     `userId=${userId}|backoffice=true`,
   );
 };

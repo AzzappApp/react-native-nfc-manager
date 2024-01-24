@@ -28,6 +28,7 @@ export const getStaticMediaSignedUpload = async (
     mediaId,
     fileKind === 'lottie' ? 'raw' : 'image',
     pregeneratedSizes,
+    false,
     `userId=${userId}|backoffice=true`,
   );
 };

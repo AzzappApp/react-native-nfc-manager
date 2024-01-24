@@ -296,6 +296,7 @@ import kotlin.math.round
       val eventListener = (context as ReactContext).getJSModule(RCTEventEmitter::class.java)
       val event = Arguments.createMap()
       event.putDouble("currentTime", currentPosition / 1000.0)
+      event.putDouble("duration", player.duration.toDouble() / 1000.0)
       eventListener.receiveEvent(
         this.id,
         GPUVideoViewManager.ON_PROGRESS,

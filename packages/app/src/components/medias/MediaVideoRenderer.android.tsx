@@ -123,8 +123,8 @@ const MediaVideoRenderer = (
 
       if (status.isLoaded && status.durationMillis) {
         onProgress?.({
-          currentTime: status.positionMillis,
-          duration: status.durationMillis,
+          currentTime: status.positionMillis / 1000,
+          duration: status.durationMillis / 1000,
         });
       }
     },
@@ -161,6 +161,7 @@ const MediaVideoRenderer = (
             onReadyForDisplay={onVideoReadyForDisplay}
             onPlaybackStatusUpdate={onPlaybackStatusUpdate}
             onError={onError}
+            progressUpdateIntervalMillis={onProgress ? 50 : undefined}
           />
         </View>
       )}

@@ -95,6 +95,7 @@ const CoverRenderer = (
             type: "Float!"
             provider: "CappedPixelRatio.relayprovider"
           }
+          isAndroid: { type: "Boolean!", provider: "isAndroid.relayprovider" }
         ) {
           id
           cardColors {
@@ -106,9 +107,16 @@ const CoverRenderer = (
             media {
               id
               __typename
-              uri(width: $screenWidth, pixelRatio: $pixelRatio)
               smallURI: uri(width: 125, pixelRatio: $cappedPixelRatio)
+              ... on MediaImage {
+                uri(width: $screenWidth, pixelRatio: $pixelRatio)
+              }
               ... on MediaVideo {
+                uri(
+                  width: $screenWidth
+                  pixelRatio: $pixelRatio
+                  streaming: $isAndroid
+                )
                 thumbnail(width: $screenWidth, pixelRatio: $pixelRatio)
                 smallThumbnail: thumbnail(
                   width: 125

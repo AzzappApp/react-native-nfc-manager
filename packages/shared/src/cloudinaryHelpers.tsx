@@ -173,6 +173,7 @@ export const createPresignedUpload = async (
   publicId: string,
   kind: 'image' | 'raw' | 'video',
   pregeneratedSizes?: number[] | null,
+  generateVideoStreaming?: boolean | null,
   context?: string | null,
 ) => {
   const uploadURL: string =
@@ -192,6 +193,11 @@ export const createPresignedUpload = async (
       .map(size => resizeTransforms(size))
       .join('|');
     uploadParameters.eager_async = true;
+  }
+  if (generateVideoStreaming && kind === 'video') {
+    uploadParameters.eager = [uploadParameters.eager, 'sp_auto,f_m3u8']
+      .filter(val => !!val)
+      .join('|');
   }
 
   // TODO transformations based on preset

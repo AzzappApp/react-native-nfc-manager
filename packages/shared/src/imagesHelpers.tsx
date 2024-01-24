@@ -87,9 +87,13 @@ export const getVideoUrlForSize = (
   height?: number | null,
   pixelRatio?: number | null,
   pregeneratedSizes?: number[] | null,
+  streaming = false,
 ) => {
   assetNotRN('getVideoUrlForSize');
   id = decodeMediaId(id);
+  if (streaming) {
+    return assembleCloudinaryUrl(id, 'video', 'sp_auto', 'm3u8');
+  }
   const transforms = resizeTransforms(
     width,
     height,

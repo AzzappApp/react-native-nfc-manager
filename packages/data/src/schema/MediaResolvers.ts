@@ -126,11 +126,13 @@ const uriResolver =
       height,
       pixelRatio,
       raw,
+      streaming = false,
     }: {
       width?: number | null;
       height?: number | null;
       pixelRatio?: number | null;
       raw?: boolean | null;
+      streaming?: boolean | null;
     },
   ) => {
     const assetKind = getAssetKind(media);
@@ -151,7 +153,15 @@ const uriResolver =
           ? POST_IMAGES_SIZES
           : POST_VIDEO_SIZES
         : null;
-    return uriGenerator(id, width, height, pixelRatio, pregeneratedSizes);
+    return uriGenerator(
+      id,
+      width,
+      height,
+      pixelRatio,
+      pregeneratedSizes,
+      // @ts-expect-error streaming is not in the getImageURLForSize signature
+      streaming,
+    );
   };
 
 export const MediaImage: MediaImageResolvers = {

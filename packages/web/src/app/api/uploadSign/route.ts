@@ -78,6 +78,7 @@ const uploadSignApi = async (req: Request) => {
     mediaId,
     kind,
     pregeneratedSizes,
+    kind === 'video' && target === 'cover',
     `userId=${viewer.userId}`,
   );
   return NextResponse.json({ uploadURL, uploadParameters });
