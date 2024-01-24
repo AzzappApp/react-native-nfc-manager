@@ -265,7 +265,7 @@ const CoverTextRenderer = (
               }
             }}
           >
-            <div
+            <span
               style={titleTextStyle}
               className={fontsMap[titleFontFamily].className}
             >
@@ -289,9 +289,9 @@ const CoverTextRenderer = (
                     </span>
                   ))
                 : title ?? ''}
-            </div>
+            </span>
             {!!subTitle && (
-              <div
+              <span
                 style={subTitleTextStyle}
                 className={fontsMap[subTitleFontFamily].className}
               >
@@ -318,7 +318,7 @@ const CoverTextRenderer = (
                       </span>
                     ))
                   : subTitle}
-              </div>
+              </span>
             )}
           </h1>
         </div>

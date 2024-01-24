@@ -17,6 +17,8 @@ const coverTextContentContainer = style({
 const coverTextContent = style({
   position: 'relative',
   overflow: 'hidden',
+  display: 'flex',
+  flexDirection: 'column',
   margin: 0,
   '@media': {
     [MediaQuery.Mobile]: {

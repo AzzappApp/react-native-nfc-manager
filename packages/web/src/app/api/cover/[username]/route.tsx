@@ -391,11 +391,9 @@ export const GET = async (
               />
               <div
                 style={{
-                  maxWidth: imageWidth,
                   fontSize: '5px',
                   alignItems: textAlign,
                   justifyContent: overlayJustifyContent,
-                  paddingTop: '30%',
                   ...coverTextStyle.coverTextContainerStyle,
                   ...(orientation === 'horizontal'
                     ? coverTextStyle.coverTextContainerHorizontalStyle
