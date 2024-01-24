@@ -1,3 +1,4 @@
+import { parsePhoneNumber } from 'libphonenumber-js';
 import { useMemo, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import {
@@ -11,7 +12,6 @@ import { isPhoneNumber, isValidEmail } from '@azzapp/shared/stringHelpers';
 import { colors } from '#theme';
 import EmailOrPhoneInput from '#components/EmailOrPhoneInput';
 import { useRouter } from '#components/NativeRouter';
-import { getLocales } from '#helpers/localeHelpers';
 import { forgotPassword } from '#helpers/MobileWebAPI';
 import useScreenInsets from '#hooks/useScreenInsets';
 import Button from '#ui/Button';
@@ -21,7 +21,6 @@ import Icon from '#ui/Icon';
 import PressableNative from '#ui/PressableNative';
 import Text from '#ui/Text';
 import type { EmailPhoneInput } from '#components/EmailOrPhoneInput';
-import type { CountryCode } from 'libphonenumber-js';
 
 const ForgotPasswordScreen = () => {
   const router = useRouter();
@@ -40,12 +39,13 @@ const ForgotPasswordScreen = () => {
       return true;
     }
 
-    const locales = getLocales();
-    for (let i = 0; i < locales.length; i++) {
-      if (isPhoneNumber(contact.value, locales[i].countryCode as CountryCode)) {
-        return true;
-      }
+    if (
+      contact.countryCodeOrEmail !== 'email' &&
+      isPhoneNumber(contact.value, contact.countryCodeOrEmail)
+    ) {
+      return true;
     }
+
     return false;
   }, [contact]);
 
@@ -57,7 +57,13 @@ const ForgotPasswordScreen = () => {
         try {
           ({ issuer } = await forgotPassword({
             locale: intl.locale,
-            credential: contact.value,
+            credential:
+              contact.countryCodeOrEmail === 'email'
+                ? contact.value
+                : parsePhoneNumber(
+                    contact.value,
+                    contact.countryCodeOrEmail,
+                  ).formatInternational(),
           }));
         } catch (e) {
           setIsSubmitted(false);
