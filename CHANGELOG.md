@@ -1,5 +1,6 @@
-## 0.5.5-canary.3
+## 0.5.5-canary.4
 
+* **fix:**  - 🐛 avoid overlaping panels on home ([#2444](https://github.com/AzzappApp/azzapp/pull/2444))
 * **perf:**  - don’t render other tabs on android ([#2468](https://github.com/AzzappApp/azzapp/pull/2468))
 * **fix:**  - **Android:** fix video cover ([#2465](https://github.com/AzzappApp/azzapp/pull/2465))
 * **fix:**  - **cover:** [#2338](https://github.com/AzzappApp/azzapp/pull/2338) improve text display consistency ([#2463](https://github.com/AzzappApp/azzapp/pull/2463))
