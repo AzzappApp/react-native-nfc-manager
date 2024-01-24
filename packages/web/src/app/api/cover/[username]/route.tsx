@@ -189,7 +189,7 @@ export const GET = async (
     height = width / COVER_RATIO;
   }
 
-  const imageWidth = crop === 'lpad' ? height * COVER_RATIO : width;
+  const imageWidth = Math.round(height * COVER_RATIO);
 
   const scale = imageWidth / COVER_BASE_WIDTH;
 
@@ -365,8 +365,7 @@ export const GET = async (
                 display: 'flex',
                 flex: 1,
                 position: 'relative',
-                margin: 'auto',
-                overflow: 'hidden',
+                maxWidth: imageWidth,
               }}
             >
               <div
@@ -378,7 +377,6 @@ export const GET = async (
                   display: 'flex',
                   height: '100%',
                   width: '100%',
-                  maxWidth: imageWidth,
                   position: 'absolute',
                   top: 0,
                   right: 0, // To avoid the text to be on the left with crop
@@ -386,9 +384,9 @@ export const GET = async (
               />
               <img
                 src={await buildCoverImageUrl(webCard, {
-                  width,
+                  width: imageWidth,
                   height,
-                  crop,
+                  crop: 'fit',
                 })}
               />
               <div

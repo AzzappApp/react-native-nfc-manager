@@ -41,6 +41,18 @@ const content = style({
   },
 });
 
+const backgroundContent = style({
+  position: 'absolute',
+  overflow: 'hidden',
+  width: '100%',
+  height: '100%',
+  '@media': {
+    [MediaQuery.Desktop]: {
+      borderRadius: 39, //hack to avoid having a line with the background color  on the border
+    },
+  },
+});
+
 const appearZoomIn = style({
   transformOrigin: 'top center',
 });
@@ -83,6 +95,7 @@ const styles = {
   appearZoomOut,
   smoothZoomIn,
   smoothZoomOut,
+  backgroundContent,
 };
 
 export default styles;

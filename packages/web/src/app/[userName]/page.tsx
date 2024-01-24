@@ -150,13 +150,23 @@ export async function generateMetadata({
 
   const imageUrl = `${process.env.NEXT_PUBLIC_URL}api/cover/${
     params.userName
-  }?width=${1200}&height=${1200}&crop=lpad&updatedAt=${webCard?.updatedAt.toISOString()}`;
+  }?width=${630}&updatedAt=${webCard?.updatedAt.toISOString()}`;
+
+  const twitterCard = `${process.env.NEXT_PUBLIC_URL}api/cover/${
+    params.userName
+  }?width=${630}&height=${630}&updatedAt=${webCard?.updatedAt.toISOString()}`;
 
   const meta = getMetaData({
     url: params.userName,
     title: capitalize(params.userName),
     ogImage: imageUrl,
     description: `${params.userName} | Azzapp WebCard`,
+    other: {
+      twitter: {
+        card: 'summary_large_image',
+        images: twitterCard,
+      },
+    },
   });
   return meta;
 }
