@@ -110,7 +110,9 @@ jobs:
       - name: Bump version
         run: |
           yarn bump-version
-          yarn write-dev-changelog
+          if [ "$GITHUB_REF" == "refs/heads/main" ]; then
+            yarn write-dev-changelog
+          fi
           git add .
           git commit -m "chore: bump version [skip ci]"
           git push origin main
