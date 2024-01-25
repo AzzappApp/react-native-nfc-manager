@@ -65,10 +65,7 @@ const PostPage = async (props: PostPageProps) => {
       <div className={styles.center}>
         <main className={styles.wrapper}>
           <div className={styles.postSection}>
-            <div
-              className={styles.postMedia}
-              style={{ aspectRatio: `${postMedia.width / postMedia.height}` }}
-            >
+            <div className={styles.postMedia}>
               {postMedia.kind === 'video' ? (
                 <>
                   <CloudinaryVideoPlayer

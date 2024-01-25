@@ -52,8 +52,7 @@ const postSection = style({
   '@media': {
     [MediaQuery.Desktop]: {
       flex: 1,
-      paddingTop: '75px',
-      paddingBottom: '75px',
+      height: '550px',
     },
     [MediaQuery.Mobile]: {
       height: '100%',
@@ -65,6 +64,7 @@ const postSection = style({
 const postMedia = style({
   position: 'relative',
   width: '100%',
+  maxHeight: '550px',
   '@media': {
     [MediaQuery.Desktop]: {
       height: '100%',
