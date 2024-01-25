@@ -194,6 +194,7 @@ const MultiUserAddModal = (
     handleSubmit,
     reset,
     formState: { isSubmitting },
+    watch,
   } = useForm<MultiUserAddFormValues>({
     resolver: zodResolver(multiUserAddFormSchema),
     defaultValues: {
@@ -201,6 +202,9 @@ const MultiUserAddModal = (
     },
     mode: 'onSubmit',
   });
+
+  const firstName = watch('firstName');
+  const lastName = watch('lastName');
 
   const locales = getLocales();
   const currentLanguageLocale = useCurrentLocale();
@@ -492,7 +496,7 @@ const MultiUserAddModal = (
           <Header
             middleElement={
               <Text variant="large" style={styles.name}>
-                {contact?.firstName} {contact?.lastName}
+                {firstName} {lastName}
               </Text>
             }
             leftElement={
