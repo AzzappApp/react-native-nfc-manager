@@ -11,7 +11,11 @@ import {
   SIMPLE_BUTTON_MAX_LABEL_LENGTH,
   SIMPLE_BUTTON_MIN_FONT_SIZE,
 } from '@azzapp/shared/cardModuleHelpers';
-import { isPhoneNumber, isValidUrl } from '@azzapp/shared/stringHelpers';
+import {
+  isPhoneNumber,
+  isValidEmail,
+  isValidUrl,
+} from '@azzapp/shared/stringHelpers';
 import WebCardColorPicker, {
   WebCardColorDropDownPicker,
 } from '#components/WebCardColorPicker';
@@ -210,7 +214,7 @@ const SimpleButtonSettingsEditionPanel = ({
     }
     switch (actionType) {
       case 'email':
-        if (!isValidUrl(actionLink)) {
+        if (!isValidEmail(actionLink)) {
           Toast.show({
             type: 'error',
             text1: intl.formatMessage({
