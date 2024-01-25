@@ -75,11 +75,9 @@ type CarouselSelectListProps<TItem = any> = Omit<ViewProps, 'children'> & {
    */
   onEndReachedThreshold?: number;
   /**
-   * Callback called when the user scroll between two items, the index is not rounded
-   * To allows synchroneous animation.
-   * This callback is called on the UI thread (and should be a worklet)
+   * Shared value to track current profile index
    */
-  onSelectedIndexChangeAnimated?: (index: number) => void;
+  currentProfileIndexSharedValue?: SharedValue<number>;
   /**
    * Callback called when the user scroll between two items, the index is rounded
    */
@@ -116,7 +114,7 @@ function CarouselSelectList<TItem = any>(
     contentContainerStyle,
     scaleRatio,
     extraData,
-    onSelectedIndexChangeAnimated,
+    currentProfileIndexSharedValue,
     onSelectedIndexChange,
     ...props
   }: CarouselSelectListProps<TItem>,
@@ -140,7 +138,9 @@ function CarouselSelectList<TItem = any>(
     onScroll: event => {
       const index = event.contentOffset.x / itemWidth;
       scrollIndex.value = index;
-      onSelectedIndexChangeAnimated?.(index);
+      if (currentProfileIndexSharedValue) {
+        currentProfileIndexSharedValue.value = index;
+      }
     },
   });
 
@@ -205,6 +205,11 @@ function CarouselSelectList<TItem = any>(
     ],
   );
 
+  const computedStyle = useMemo(
+    () => [{ width, height }, style as any],
+    [height, style, width],
+  );
+
   return (
     <Animated.FlatList
       ref={listRef}
@@ -223,7 +228,7 @@ function CarouselSelectList<TItem = any>(
       onScroll={scrollHandler}
       showsHorizontalScrollIndicator={false}
       showsVerticalScrollIndicator={false}
-      style={[{ width, height }, style as any]}
+      style={computedStyle}
       onMomentumScrollEnd={onMomentumScrollEnd}
       initialNumToRender={7}
       windowSize={11}

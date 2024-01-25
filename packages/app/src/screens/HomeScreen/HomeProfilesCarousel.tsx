@@ -36,6 +36,7 @@ import type { CarouselSelectListHandle } from '#ui/CarouselSelectList';
 import type { ArrayItemType } from '@azzapp/shared/arrayHelpers';
 import type { ForwardedRef } from 'react';
 import type { GestureResponderEvent, ListRenderItemInfo } from 'react-native';
+import type { SharedValue } from 'react-native-reanimated';
 
 type HomeProfilesCarouselProps = {
   /**
@@ -54,7 +55,7 @@ type HomeProfilesCarouselProps = {
    * Animated callback called during the profile switch, index is a floating number
    * the callback passed should be a worklet
    */
-  onCurrentProfileIndexChangeAnimated: (index: number) => void;
+  currentProfileIndexSharedValue: SharedValue<number>;
   /**
    * The height of the carousel
    */
@@ -70,7 +71,7 @@ const HomeProfilesCarousel = (
     user: userKey,
     height,
     onCurrentProfileIndexChange,
-    onCurrentProfileIndexChangeAnimated,
+    currentProfileIndexSharedValue,
     initialProfileIndex = 0,
   }: HomeProfilesCarouselProps,
   ref: ForwardedRef<HomeProfilesCarouselHandle>,
@@ -106,14 +107,6 @@ const HomeProfilesCarousel = (
       onCurrentProfileIndexChange(index - 1);
     },
     [onCurrentProfileIndexChange],
-  );
-
-  const onSelectedIndexChangeAnimated = useCallback(
-    (index: number) => {
-      'worklet';
-      onCurrentProfileIndexChangeAnimated(index - 1);
-    },
-    [onCurrentProfileIndexChangeAnimated],
   );
 
   const scrollToIndex = useCallback((index: number, animated?: boolean) => {
@@ -174,6 +167,17 @@ const HomeProfilesCarousel = (
     [profiles],
   );
 
+  const style = useMemo(
+    () => [
+      styles.carousel,
+      {
+        width: windowWidth,
+        height,
+      },
+    ],
+    [windowWidth, height],
+  );
+
   if (profiles == null) {
     return null;
   }
@@ -188,16 +192,10 @@ const HomeProfilesCarousel = (
       height={coverHeight}
       itemWidth={coverWidth}
       scaleRatio={SCALE_RATIO}
-      style={[
-        styles.carousel,
-        {
-          width: windowWidth,
-          height,
-        },
-      ]}
+      style={style}
       itemContainerStyle={styles.carouselContentContainer}
       onSelectedIndexChange={onSelectedIndexChange}
-      onSelectedIndexChangeAnimated={onSelectedIndexChangeAnimated}
+      currentProfileIndexSharedValue={currentProfileIndexSharedValue}
       initialScrollIndex={
         profiles.length ? initialProfileIndex + 1 : initialProfileIndex
       }

@@ -8,7 +8,7 @@ import {
   useWindowDimensions,
   PixelRatio,
 } from 'react-native';
-import { useSharedValue } from 'react-native-reanimated';
+import { useDerivedValue, useSharedValue } from 'react-native-reanimated';
 import { graphql, useFragment } from 'react-relay';
 import { useDebouncedCallback } from 'use-debounce';
 import { CONTACT_CARD_RATIO } from '#components/ContactCard/ContactCard';
@@ -82,6 +82,18 @@ const HomeScreenContent = ({ user: userKey }: HomeScreenContentProps) => {
     useState(initialProfileIndex);
   const currentProfileIndexRef = useRef(initialProfileIndex);
   const currentProfileIndexSharedValue = useSharedValue(currentProfileIndex);
+
+  const actualCurrentProfileIndex = useDerivedValue(() => {
+    if (user?.profiles?.length) {
+      return Math.min(
+        currentProfileIndexSharedValue.value - 1,
+        user.profiles.length - 1,
+      );
+    } else {
+      return currentProfileIndexSharedValue.value;
+    }
+  }, [user?.profiles?.length]);
+
   const currentProfile = user.profiles?.[currentProfileIndex];
 
   useRouteWillChange('HOME', () => {
@@ -124,23 +136,6 @@ const HomeScreenContent = ({ user: userKey }: HomeScreenContentProps) => {
   );
 
   const carouselRef = useRef<HomeProfilesCarouselHandle>(null);
-  const onCurrentProfileIndexChangeAnimated = useCallback(
-    (index: number) => {
-      'worklet';
-      // on the last item, with no bounce, the onScroll is to be called even after the onMomentumScrollEnd
-      //resulting in a final index value being a decimal over the limit number, causing issue on the last items
-      //giving an unstable state
-      if (user?.profiles?.length) {
-        currentProfileIndexSharedValue.value = Math.min(
-          index,
-          user.profiles.length - 1,
-        );
-      } else {
-        currentProfileIndexSharedValue.value = index;
-      }
-    },
-    [currentProfileIndexSharedValue, user?.profiles?.length],
-  );
 
   useOnFocus(() => {
     const authProfileIndex = user.profiles?.findIndex(
@@ -250,21 +245,21 @@ const HomeScreenContent = ({ user: userKey }: HomeScreenContentProps) => {
   // #endregion
 
   return (
-    <View style={{ flex: 1 }}>
+    <View style={styles.container}>
       <HomeBackground
         user={user}
-        currentProfileIndexSharedValue={currentProfileIndexSharedValue}
+        currentProfileIndexSharedValue={actualCurrentProfileIndex}
       />
       <View style={styles.contentContainer}>
         <HomeHeader
           openPanel={toggleShowMenu}
           user={user}
-          currentProfileIndexSharedValue={currentProfileIndexSharedValue}
+          currentProfileIndexSharedValue={actualCurrentProfileIndex}
           style={{ marginTop: insets.top }}
         />
         <HomeProfileLink
           user={user}
-          currentProfileIndexSharedValue={currentProfileIndexSharedValue}
+          currentProfileIndexSharedValue={actualCurrentProfileIndex}
           currentProfileIndex={currentProfileIndex}
         />
         <HomeProfilesCarousel
@@ -272,15 +267,13 @@ const HomeScreenContent = ({ user: userKey }: HomeScreenContentProps) => {
           user={user}
           height={carouselHeight}
           onCurrentProfileIndexChange={onCurrentProfileIndexChange}
-          onCurrentProfileIndexChangeAnimated={
-            onCurrentProfileIndexChangeAnimated
-          }
+          currentProfileIndexSharedValue={currentProfileIndexSharedValue}
           initialProfileIndex={initialProfileIndex}
         />
         <HomeBottomPanel
           height={bottomPanelHeight}
           user={user}
-          currentProfileIndexSharedValue={currentProfileIndexSharedValue}
+          currentProfileIndexSharedValue={actualCurrentProfileIndex}
           currentProfileIndex={currentProfileIndex}
         />
       </View>
@@ -305,5 +298,8 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'flex-start',
     overflow: 'visible',
+  },
+  container: {
+    flex: 1,
   },
 });
