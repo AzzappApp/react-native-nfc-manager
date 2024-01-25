@@ -1,5 +1,7 @@
-## 0.5.5-canary.8
+## 0.5.5-canary.9
 
+* **fix:**  - linkedin link ([#2498](https://github.com/AzzappApp/azzapp/pull/2498))
+* **fix:**  - add CardTemplateType enable flag ([#2495](https://github.com/AzzappApp/azzapp/pull/2495))
 * **fix:**  - 🐛 display updated username for new user ([#2488](https://github.com/AzzappApp/azzapp/pull/2488))
 * **fix:**  - **SimpleButton:** email validation: ([#2494](https://github.com/AzzappApp/azzapp/pull/2494))
 * **fix:**  - 🐛 display shadow to avoid white contact card ([#2481](https://github.com/AzzappApp/azzapp/pull/2481))
