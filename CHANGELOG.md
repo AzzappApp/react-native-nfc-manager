@@ -1,5 +1,6 @@
-## 0.5.5-canary.11
+## 0.5.5-canary.12
 
+* **fix:**  - use PureComponent for render item list as recommended ([#2509](https://github.com/AzzappApp/azzapp/pull/2509))
 * **perf:**  - 🤖 lag on switching profile on home ([#2504](https://github.com/AzzappApp/azzapp/pull/2504))
 * **feat:**  - **MultiUser:** Search user ([#2491](https://github.com/AzzappApp/azzapp/pull/2491))
 * **perf:**  - 🤖 lag on switching tabs on home ([#2499](https://github.com/AzzappApp/azzapp/pull/2499))
