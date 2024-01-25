@@ -1,5 +1,6 @@
-## 0.5.5-canary.12
+## 0.5.5-canary.13
 
+* **feat:**  - 🎸 display media without vertical margins ([#2512](https://github.com/AzzappApp/azzapp/pull/2512))
 * **fix:**  - use PureComponent for render item list as recommended ([#2509](https://github.com/AzzappApp/azzapp/pull/2509))
 * **perf:**  - 🤖 lag on switching profile on home ([#2504](https://github.com/AzzappApp/azzapp/pull/2504))
 * **feat:**  - **MultiUser:** Search user ([#2491](https://github.com/AzzappApp/azzapp/pull/2491))
