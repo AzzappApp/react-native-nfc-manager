@@ -258,7 +258,7 @@ const SocialInputComponent = ({
     e: NativeSyntheticEvent<TextInputEndEditingEventData>,
   ) => {
     if (icon === 'website') {
-      if (isValidUrl(e.nativeEvent.text)) {
+      if (!e.nativeEvent.text || isValidUrl(e.nativeEvent.text)) {
         onChangeLink(icon, e.nativeEvent.text);
       } else {
         Toast.show({
