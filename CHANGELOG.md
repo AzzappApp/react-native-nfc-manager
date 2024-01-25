@@ -1,5 +1,8 @@
-## 0.5.5-canary.13
+## 0.5.5-canary.14
 
+* **fix:**  - 🐛 allow to delete custom website url ([#2516](https://github.com/AzzappApp/azzapp/pull/2516))
+* **fix:**  - 🐛 correctly display carousel preview ([#2487](https://github.com/AzzappApp/azzapp/pull/2487))
+* **perf:**  - 🤖 simplify sync between profiles and bottom panel ([#2515](https://github.com/AzzappApp/azzapp/pull/2515))
 * **feat:**  - 🎸 display media without vertical margins ([#2512](https://github.com/AzzappApp/azzapp/pull/2512))
 * **fix:**  - use PureComponent for render item list as recommended ([#2509](https://github.com/AzzappApp/azzapp/pull/2509))
 * **perf:**  - 🤖 lag on switching profile on home ([#2504](https://github.com/AzzappApp/azzapp/pull/2504))
