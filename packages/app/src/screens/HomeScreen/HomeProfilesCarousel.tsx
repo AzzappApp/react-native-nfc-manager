@@ -8,13 +8,7 @@ import {
   useState,
 } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
-import {
-  View,
-  useWindowDimensions,
-  PixelRatio,
-  Platform,
-  StyleSheet,
-} from 'react-native';
+import { View, useWindowDimensions, StyleSheet } from 'react-native';
 import { graphql, useFragment } from 'react-relay';
 import { COVER_CARD_RADIUS, COVER_RATIO } from '@azzapp/shared/coverHelpers';
 import { colors, shadow } from '#theme';
@@ -91,11 +85,14 @@ const HomeProfilesCarousel = (
   );
 
   const { width: windowWidth } = useWindowDimensions();
-  const coverHeight = height - 2 * VERTICAL_MARGIN;
-  const coverWidth =
-    Platform.OS === 'ios'
-      ? Math.trunc(coverHeight * COVER_RATIO) //roundToNearestPixel is not working fine on some IOS (i.eiphone 13 mini)
-      : PixelRatio.roundToNearestPixel(coverHeight * COVER_RATIO);
+  const coverHeight = useMemo(() => height - 2 * VERTICAL_MARGIN, [height]);
+  const coverWidth = useMemo(
+    () => Math.trunc(coverHeight * COVER_RATIO),
+    [coverHeight],
+    // Platform.OS === 'ios'
+    //   ? Math.trunc(coverHeight * COVER_RATIO) //roundToNearestPixel is not working fine on some IOS (i.eiphone 13 mini)
+    //   : Math.trunc(coverHeight * COVER_RATIO),
+  );
   const carouselRef = useRef<CarouselSelectListHandle | null>(null);
   const [selectedIndex, setSelectedIndex] = useState(
     profiles?.length ? initialProfileIndex + 1 : 0,
@@ -121,7 +118,6 @@ const HomeProfilesCarousel = (
     [scrollToIndex],
   );
 
-  const intl = useIntl();
   const renderItem = useCallback(
     ({ item, index }: ListRenderItemInfo<ProfileType | null>) => {
       if (item) {
@@ -138,28 +134,10 @@ const HomeProfilesCarousel = (
       }
 
       return (
-        <Link route="NEW_WEBCARD">
-          <PressableOpacity
-            style={[
-              styles.newCover,
-              styles.coverShadow,
-              {
-                width: coverWidth,
-                height: coverHeight,
-                borderRadius: coverWidth * COVER_CARD_RADIUS,
-              },
-            ]}
-            accessibilityLabel={intl.formatMessage({
-              defaultMessage: 'Create a new profile',
-              description: 'Start new profile creation from account screen',
-            })}
-          >
-            <Icon icon="add" style={styles.icon} />
-          </PressableOpacity>
-        </Link>
+        <CreateItemMemo coverHeight={coverHeight} coverWidth={coverWidth} />
       );
     },
-    [coverWidth, coverHeight, intl, scrollToIndex, selectedIndex],
+    [coverWidth, coverHeight, scrollToIndex, selectedIndex],
   );
 
   const data = useMemo(
@@ -270,12 +248,15 @@ const ItemRenderComponent = ({
     setReady(false);
   }, []);
 
-  const onPress = (event: GestureResponderEvent) => {
-    if (index !== currentUserIndex) {
-      event.preventDefault();
-      scrollToIndex(index);
-    }
-  };
+  const onPress = useCallback(
+    (event: GestureResponderEvent) => {
+      if (index !== currentUserIndex) {
+        event.preventDefault();
+        scrollToIndex(index);
+      }
+    },
+    [currentUserIndex, index, scrollToIndex],
+  );
 
   const isCurrent = index === currentUserIndex;
 
@@ -371,6 +352,39 @@ const ItemRenderComponent = ({
 };
 
 const ItemRender = memo(ItemRenderComponent);
+
+const CreateItem = ({
+  coverWidth,
+  coverHeight,
+}: {
+  coverWidth: number;
+  coverHeight: number;
+}) => {
+  const intl = useIntl();
+  return (
+    <Link route="NEW_WEBCARD">
+      <PressableOpacity
+        style={[
+          styles.newCover,
+          styles.coverShadow,
+          {
+            width: coverWidth,
+            height: coverHeight,
+            borderRadius: coverWidth * COVER_CARD_RADIUS,
+          },
+        ]}
+        accessibilityLabel={intl.formatMessage({
+          defaultMessage: 'Create a new profile',
+          description: 'Start new profile creation from account screen',
+        })}
+      >
+        <Icon icon="add" style={styles.icon} />
+      </PressableOpacity>
+    </Link>
+  );
+};
+
+const CreateItemMemo = memo(CreateItem);
 
 const styles = StyleSheet.create({
   carousel: {

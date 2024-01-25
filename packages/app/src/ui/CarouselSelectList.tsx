@@ -3,6 +3,7 @@ import {
   useCallback,
   useImperativeHandle,
   useMemo,
+  memo,
   useRef,
 } from 'react';
 import Animated, {
@@ -183,7 +184,7 @@ function CarouselSelectList<TItem = any>(
   const renderAnimatedItem = useCallback(
     (info: ListRenderItemInfo<TItem>) => {
       return (
-        <AnimatedItemWrapper
+        <AnimatedItem
           index={info.index}
           scrollIndex={scrollIndex}
           scaleRatio={scaleRatio}
@@ -192,7 +193,7 @@ function CarouselSelectList<TItem = any>(
           offsetCenter={offsetCenter}
         >
           {renderItem(info)}
-        </AnimatedItemWrapper>
+        </AnimatedItem>
       );
     },
     [
@@ -240,7 +241,7 @@ function CarouselSelectList<TItem = any>(
   );
 }
 
-export default forwardRef(CarouselSelectList) as <T>(
+export default memo(forwardRef(CarouselSelectList)) as <T>(
   p: CarouselSelectListProps<T> & { ref?: Ref<CarouselSelectListHandle> },
 ) => ReactElement;
 
@@ -282,8 +283,10 @@ const AnimatedItemWrapper = ({
     };
   });
   return (
-    <Animated.View style={[animatedStyle, containerStyle]} key={index}>
+    <Animated.View style={[animatedStyle, containerStyle]}>
       {children}
     </Animated.View>
   );
 };
+
+const AnimatedItem = memo(AnimatedItemWrapper);
