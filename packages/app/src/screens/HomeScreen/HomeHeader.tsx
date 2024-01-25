@@ -65,7 +65,7 @@ const HomeHeader = ({
       return readableColors[0];
     }
     return colors.white;
-  }, [currentProfileIndexSharedValue]);
+  }, [currentProfileIndexSharedValue, readableColors]);
 
   const svgProps = useAnimatedProps(() => ({ color: colorValue.value }));
 
