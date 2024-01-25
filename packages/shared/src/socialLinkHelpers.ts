@@ -11,7 +11,7 @@ export const SOCIAL_NETWORK_LINKS = [
   { id: 'hashnode', mask: 'hashnode.com/@' },
   { id: 'instagram', mask: 'instagram.com/' },
   { id: 'letterboxd', mask: 'letterboxd.com/' },
-  { id: 'linkedin', mask: 'linkedin.com/in/' },
+  { id: 'linkedin', mask: 'linkedin.com/' },
   { id: 'mastodon', mask: 'mastodon.social/@' },
   { id: 'messenger', mask: 'm.me/' },
   { id: 'npm', mask: 'npmjs.com/' },
