@@ -153,6 +153,10 @@ type WebCard implements Node {
   """
   profiles(
     """
+    The search query
+    """
+    search: String
+    """
     Returns the items in the list that come after the specified cursor.
     """
     after: String

@@ -1,4 +1,5 @@
 import {
+  Suspense,
   createContext,
   useCallback,
   useEffect,
@@ -6,7 +7,7 @@ import {
   useState,
 } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { StyleSheet, View } from 'react-native';
+import { ActivityIndicator, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { graphql, useMutation, usePreloadedQuery } from 'react-relay';
 import { isAdmin } from '@azzapp/shared/profileHelpers';
@@ -335,20 +336,34 @@ const MultiUserScreen = ({
 
         <View style={styles.content}>
           {profile.webCard.isMultiUser ? (
-            <MultiUserTransferOwnerContext.Provider
-              value={{
-                selectedProfileId,
-                setSelectedProfileId,
-                transferOwnerMode,
-                toggleTransferOwnerMode,
-              }}
+            <Suspense
+              fallback={
+                <View
+                  style={{
+                    flex: 1,
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}
+                >
+                  <ActivityIndicator />
+                </View>
+              }
             >
-              <MultiUserScreenUserList
-                Header={ScrollableHeader}
-                toggleCommonInfosForm={toggleCommonInfoForm}
-                webCard={profile.webCard}
-              />
-            </MultiUserTransferOwnerContext.Provider>
+              <MultiUserTransferOwnerContext.Provider
+                value={{
+                  selectedProfileId,
+                  setSelectedProfileId,
+                  transferOwnerMode,
+                  toggleTransferOwnerMode,
+                }}
+              >
+                <MultiUserScreenUserList
+                  Header={ScrollableHeader}
+                  toggleCommonInfosForm={toggleCommonInfoForm}
+                  webCard={profile.webCard}
+                />
+              </MultiUserTransferOwnerContext.Provider>
+            </Suspense>
           ) : (
             <>{ScrollableHeader}</>
           )}

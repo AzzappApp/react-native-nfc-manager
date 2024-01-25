@@ -206,9 +206,11 @@ export const updateContactCardTotalScans = async (
 export const getWebCardProfiles = async (
   webCardId: string,
   {
+    search,
     limit,
     after = 0,
   }: {
+    search: string | null;
     limit: number;
     after: number;
   },
@@ -219,6 +221,13 @@ export const getWebCardProfiles = async (
       sql`SELECT * 
           FROM Profile
           WHERE webCardId = ${webCardId} 
+          AND (
+            ${search} IS NULL OR
+            JSON_EXTRACT(contactCard, '$.firstName') LIKE ${
+              '%' + search + '%'
+            } OR
+            JSON_EXTRACT(contactCard, '$.lastName') LIKE ${'%' + search + '%'}
+          )
           ORDER BY 
             CASE 
                 WHEN profileRole = 'owner' THEN 1

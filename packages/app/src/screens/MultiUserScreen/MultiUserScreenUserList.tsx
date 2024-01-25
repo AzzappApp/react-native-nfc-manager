@@ -1,9 +1,18 @@
-import { memo, useCallback, useContext, useMemo, useState } from 'react';
+import {
+  Suspense,
+  memo,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
 import { useIntl } from 'react-intl';
-import { SectionList, View } from 'react-native';
+import { ActivityIndicator, SectionList, View } from 'react-native';
 import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { graphql, useFragment, usePaginationFragment } from 'react-relay';
+import { useDebounce } from 'use-debounce';
 import {
   convertToNonNullArray,
   type ArrayItemType,
@@ -20,6 +29,7 @@ import Button from '#ui/Button';
 import Icon from '#ui/Icon';
 import PressableNative from '#ui/PressableNative';
 import RadioButton from '#ui/RadioButton';
+import SearchBar from '#ui/SearchBar';
 import Text from '#ui/Text';
 import Avatar from './Avatar';
 import MultiUserDetailModal from './MultiUserDetailModal';
@@ -88,9 +98,9 @@ const MultiUserScreenUserList = ({
     (webCard.commonInformation?.urls?.some(u => u.address) ? 1 : 0) +
     (webCard.commonInformation?.socials?.some(s => s.url) ? 1 : 0);
 
-  const onAddUsers = () => {
+  const onAddUsers = useCallback(() => {
     router.push({ route: 'MULTI_USER_ADD' });
-  };
+  }, [router]);
 
   const { data, loadNext, refetch, hasNext, isLoadingNext } =
     usePaginationFragment(
@@ -102,8 +112,9 @@ const MultiUserScreenUserList = ({
         @argumentDefinitions(
           after: { type: String }
           first: { type: Int, defaultValue: 5 }
+          search: { type: String }
         ) {
-          profiles(after: $after, first: $first)
+          profiles(search: $search, after: $after, first: $first)
             @connection(
               key: "MultiUserScreenUserList_webCard_connection_profiles"
             ) {
@@ -120,6 +131,7 @@ const MultiUserScreenUserList = ({
       `,
       webCard as MultiUserScreenUserList_profiles$key,
     );
+
   const sections = useMemo(() => {
     const result = (data.profiles.edges ?? []).reduce(
       (acc, curr) => {
@@ -169,9 +181,12 @@ const MultiUserScreenUserList = ({
     }
   }, [hasNext, isLoadingNext, loadNext]);
 
+  const [refreshing, setRefreshing] = useState(false);
   const onRefresh = useCallback(() => {
     if (!isLoadingNext) {
+      setRefreshing(true);
       refetch({}, { fetchPolicy: 'store-and-network' });
+      setRefreshing(false);
     }
   }, [isLoadingNext, refetch]);
 
@@ -207,45 +222,87 @@ const MultiUserScreenUserList = ({
     return sections;
   }, [sections, transferOwnerMode]);
 
+  //#region Search
+  const [searchValue, setSearchValue] = useState<string | undefined>('');
+  const [debounceText] = useDebounce(searchValue, 500);
+
+  useEffect(() => {
+    refetch({ search: debounceText }, { fetchPolicy: 'store-and-network' });
+  }, [debounceText, refetch]);
+  //#endregion
+
+  const ListHeaderComponent = useMemo(() => {
+    return (
+      <View style={{ marginBottom: 16 }}>
+        {Header}
+        <Button
+          style={styles.button}
+          label={intl.formatMessage({
+            defaultMessage: 'Add users',
+            description: 'Button to add new users from MultiUserScreen',
+          })}
+          onPress={onAddUsers}
+        />
+        <Button
+          style={styles.button}
+          variant="secondary"
+          label={`${intl.formatMessage({
+            defaultMessage: 'Set common information',
+            description:
+              'Button to add common information to the contact card in MultiUserScreen',
+          })} (${nbCommonInformation})`}
+          onPress={toggleCommonInfosForm}
+        />
+      </View>
+    );
+  }, [
+    Header,
+    intl,
+    nbCommonInformation,
+    onAddUsers,
+    styles.button,
+    toggleCommonInfosForm,
+  ]);
+
   const { bottom } = useSafeAreaInsets();
   return (
     <View style={styles.content}>
-      <SectionList
-        ListHeaderComponent={
-          <View style={{ marginBottom: 16 }}>
-            {Header}
-            <Button
-              style={styles.button}
-              label={intl.formatMessage({
-                defaultMessage: 'Add users',
-                description: 'Button to add new users from MultiUserScreen',
-              })}
-              onPress={onAddUsers}
-            />
-            <Button
-              style={styles.button}
-              variant="secondary"
-              label={`${intl.formatMessage({
-                defaultMessage: 'Set common information',
-                description:
-                  'Button to add common information to the contact card in MultiUserScreen',
-              })} (${nbCommonInformation})`}
-              onPress={toggleCommonInfosForm}
-            />
+      <SearchBar
+        placeholder={intl.formatMessage({
+          defaultMessage: 'Search for a user',
+          description: 'MultiScreen - search bar placeholder',
+        })}
+        onChangeText={setSearchValue}
+        value={searchValue}
+      />
+      <Suspense
+        fallback={
+          <View
+            style={{
+              flex: 1,
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            <ActivityIndicator />
           </View>
         }
-        accessibilityRole="list"
-        sections={filteredSections}
-        keyExtractor={sectionKeyExtractor}
-        renderItem={renderListItem}
-        renderSectionHeader={renderHeaderSection}
-        showsVerticalScrollIndicator={false}
-        onEndReached={onEndReached}
-        refreshing={isLoadingNext}
-        onRefresh={onRefresh}
-        contentContainerStyle={{ paddingBottom: 40 + bottom }}
-        onEndReachedThreshold={0.5}
-      />
+      >
+        <SectionList
+          ListHeaderComponent={ListHeaderComponent}
+          accessibilityRole="list"
+          sections={filteredSections}
+          keyExtractor={sectionKeyExtractor}
+          renderItem={renderListItem}
+          renderSectionHeader={renderHeaderSection}
+          showsVerticalScrollIndicator={false}
+          onEndReached={onEndReached}
+          refreshing={refreshing}
+          onRefresh={onRefresh}
+          contentContainerStyle={{ paddingBottom: 40 + bottom }}
+          onEndReachedThreshold={0.5}
+        />
+      </Suspense>
       <ScreenModal visible={Boolean(selectedProfile)} animationType="slide">
         <MultiUserDetailModal
           webCard={webCard}

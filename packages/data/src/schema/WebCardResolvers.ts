@@ -190,7 +190,7 @@ export const WebCard: WebCardResolvers = {
     const pendingUser = await getWebCardPendingOwnerProfile(webCard.id);
     return pendingUser.length > 0 ? pendingUser[0] : null;
   },
-  profiles: async (webCard, { first, after }, { auth }) => {
+  profiles: async (webCard, { first, after, search }, { auth }) => {
     const userProfile = auth.userId
       ? await getUserProfileWithWebCardId(auth.userId, webCard.id)
       : null;
@@ -203,6 +203,7 @@ export const WebCard: WebCardResolvers = {
     const profiles = await getWebCardProfiles(webCard.id, {
       limit,
       after: offset,
+      search: search ?? null, //cannot be undefined
     });
     const result = profiles.slice(0, limit);
     const count = await countWebCardProfiles(webCard.id);
