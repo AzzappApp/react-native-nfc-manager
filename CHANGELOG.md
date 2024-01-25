@@ -1,4 +1,4 @@
-## 0.5.5-canary.9
+## 0.5.5-canary.10
 
 * **fix:**  - linkedin link ([#2498](https://github.com/AzzappApp/azzapp/pull/2498))
 * **fix:**  - add CardTemplateType enable flag ([#2495](https://github.com/AzzappApp/azzapp/pull/2495))
