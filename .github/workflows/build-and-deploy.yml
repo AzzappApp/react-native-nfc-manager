@@ -115,7 +115,7 @@ jobs:
           fi
           git add .
           git commit -m "chore: bump version [skip ci]"
-          git push origin main
+          git push origin $GITHUB_REF_NAME
           yarn install --frozen-lockfile  --immutable
         env:
           github_token: ${{ secrets.ADMIN_GITHUB_TOKEN }}
