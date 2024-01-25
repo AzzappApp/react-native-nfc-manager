@@ -7,6 +7,7 @@ import { Toast } from 'react-native-toast-message/lib/src/Toast';
 import { useFragment, graphql } from 'react-relay';
 import { buildUserUrl } from '@azzapp/shared/urlHelpers';
 import { colors } from '#theme';
+import useAuthState from '#hooks/useAuthState';
 import Icon from '#ui/Icon';
 import PressableOpacity from '#ui/PressableOpacity';
 import Text from '#ui/Text';
@@ -15,12 +16,10 @@ import type { HomeProfileLink_user$key } from '#relayArtifacts/HomeProfileLink_u
 import type { SharedValue } from 'react-native-reanimated';
 
 type HomeProfileLinkProps = {
-  currentProfileIndex: number;
   currentProfileIndexSharedValue: SharedValue<number>;
   user: HomeProfileLink_user$key;
 };
 const HomeProfileLink = ({
-  currentProfileIndex,
   currentProfileIndexSharedValue,
   user: userKey,
 }: HomeProfileLinkProps) => {
@@ -38,20 +37,26 @@ const HomeProfileLink = ({
     userKey,
   );
 
+  const { profileInfos } = useAuthState();
+
   const userNames = useMemo(
-    () => profiles?.map(p => p.webCard.userName) ?? [],
+    () => new Map(profiles?.map(p => [p.webCard.id, p.webCard.userName])) ?? [],
     [profiles],
   );
 
   const opacityStyle = useAnimatedStyle(() => {
     return {
       opacity: 1 + Math.min(0, currentProfileIndexSharedValue.value),
+      pointerEvents:
+        currentProfileIndexSharedValue.value === -1 ? 'none' : 'auto',
     };
   }, [currentProfileIndexSharedValue]);
 
   const intl = useIntl();
   const onPress = () => {
-    Clipboard.setStringAsync(buildUserUrl(userNames[currentProfileIndex]))
+    Clipboard.setStringAsync(
+      buildUserUrl(userNames.get(profileInfos?.webCardId ?? '') ?? ''),
+    )
       .then(() => {
         Toast.show({
           type: 'info',
@@ -68,15 +73,14 @@ const HomeProfileLink = ({
 
   return (
     <Animated.View style={[styles.container, opacityStyle]}>
-      <PressableOpacity
-        accessibilityRole="button"
-        onPress={onPress}
-        disabled={currentProfileIndex === -1}
-      >
+      <PressableOpacity accessibilityRole="button" onPress={onPress}>
         <View style={styles.containerText}>
           <Icon icon="earth" style={styles.iconLink} />
           <Text variant="button" numberOfLines={1} style={styles.url}>
-            {buildUserUrl(userNames[currentProfileIndex], 'azzapp.com/')}
+            {buildUserUrl(
+              userNames.get(profileInfos?.webCardId ?? '') ?? '',
+              'azzapp.com/',
+            )}
           </Text>
           <View style={styles.emptyViewCenter} />
         </View>

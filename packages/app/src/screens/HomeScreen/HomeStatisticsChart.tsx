@@ -15,6 +15,7 @@ import {
   createVariantsStyleSheet,
   useVariantStyleSheet,
 } from '#helpers/createStyles';
+import useAuthState from '#hooks/useAuthState';
 import Text from '#ui/Text';
 import type { HomeStatisticsChart_profiles$key } from '#relayArtifacts/HomeStatisticsChart_profiles.graphql';
 import type { SharedValue } from 'react-native-reanimated';
@@ -25,7 +26,6 @@ type HomeStatisticsChartProps = {
   height: number;
   statsScrollIndex: SharedValue<number>;
   currentProfileIndexSharedValue: SharedValue<number>;
-  currentUserIndex: number;
   variant?: 'dark' | 'light';
 };
 // * TODO: using SKIA here would have been great, but need to be validated by dev team.
@@ -36,12 +36,12 @@ const HomeStatisticsChart = ({
   height,
   statsScrollIndex,
   currentProfileIndexSharedValue,
-  currentUserIndex,
   variant = 'dark',
 }: HomeStatisticsChartProps) => {
   const profiles = useFragment(
     graphql`
       fragment HomeStatisticsChart_profiles on Profile @relay(plural: true) {
+        id
         statsSummary {
           day
           contactCardScans
@@ -56,6 +56,13 @@ const HomeStatisticsChart = ({
       }
     `,
     user,
+  );
+
+  const { profileInfos } = useAuthState();
+
+  const currentUserIndex = Math.min(
+    profiles.findIndex(p => p.id === profileInfos?.profileId),
+    0,
   );
 
   // Convert to have the correct type for matrix animation chart

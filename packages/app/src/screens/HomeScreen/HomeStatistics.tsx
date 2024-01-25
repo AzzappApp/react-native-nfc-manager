@@ -29,7 +29,6 @@ type HomeInformationsProps = {
   user: HomeStatistics_profiles$key;
   height: number;
   currentProfileIndexSharedValue: SharedValue<number>;
-  currentUserIndex: number;
   variant?: 'dark' | 'light';
   initialStatsIndex?: number;
 };
@@ -37,7 +36,6 @@ type HomeInformationsProps = {
 const HomeStatistics = ({
   user,
   height,
-  currentUserIndex,
   currentProfileIndexSharedValue,
   variant = 'dark',
   initialStatsIndex = 0,
@@ -131,7 +129,6 @@ const HomeStatistics = ({
         width={width - 2 * PADDING_HORIZONTAL}
         height={height - BOX_NUMBER_HEIGHT}
         statsScrollIndex={scrollIndexOffset}
-        currentUserIndex={currentUserIndex}
         currentProfileIndexSharedValue={currentProfileIndexSharedValue}
         user={profiles}
         variant={variant}

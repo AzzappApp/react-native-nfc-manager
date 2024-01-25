@@ -128,7 +128,7 @@ const HomeProfilesCarousel = (
             coverWidth={coverWidth}
             index={index}
             scrollToIndex={scrollToIndex}
-            currentUserIndex={selectedIndex}
+            isCurrent={index === selectedIndex}
           />
         );
       }
@@ -198,12 +198,12 @@ type ItemRenderProps = {
   coverWidth: number;
   coverHeight: number;
   scrollToIndex: (index: number) => void;
-  currentUserIndex: number;
+  isCurrent: boolean;
 };
 
 const ItemRenderComponent = ({
   index,
-  currentUserIndex,
+  isCurrent,
   item,
   coverWidth,
   coverHeight,
@@ -250,29 +250,31 @@ const ItemRenderComponent = ({
 
   const onPress = useCallback(
     (event: GestureResponderEvent) => {
-      if (index !== currentUserIndex) {
+      if (!isCurrent) {
         event.preventDefault();
         scrollToIndex(index);
       }
     },
-    [currentUserIndex, index, scrollToIndex],
+    [scrollToIndex, isCurrent, index],
   );
 
-  const isCurrent = index === currentUserIndex;
-
   const hasFocus = useScreenHasFocus();
+
+  const containerStyle = useMemo(
+    () => [
+      styles.coverShadow,
+      styles.coverContainer,
+      {
+        width: coverWidth,
+        height: coverHeight,
+        borderRadius: coverWidth * COVER_CARD_RADIUS,
+      },
+    ],
+    [coverWidth, coverHeight],
+  );
+
   return (
-    <View
-      style={[
-        styles.coverShadow,
-        styles.coverContainer,
-        {
-          width: coverWidth,
-          height: coverHeight,
-          borderRadius: coverWidth * COVER_CARD_RADIUS,
-        },
-      ]}
-    >
+    <View style={containerStyle}>
       {loadingFailed ? (
         <CoverErrorRenderer
           label={

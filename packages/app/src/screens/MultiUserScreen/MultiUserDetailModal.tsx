@@ -561,7 +561,6 @@ const MultiUserDetailModal = ({
               <HomeStatistics
                 user={[profile]}
                 height={250}
-                currentUserIndex={0}
                 currentProfileIndexSharedValue={index}
                 variant={colorScheme === 'dark' ? 'dark' : 'light'}
                 initialStatsIndex={1}

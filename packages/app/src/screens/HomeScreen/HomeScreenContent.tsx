@@ -10,13 +10,12 @@ import {
 } from 'react-native';
 import { useDerivedValue, useSharedValue } from 'react-native-reanimated';
 import { graphql, useFragment } from 'react-relay';
-import { useDebouncedCallback } from 'use-debounce';
 import { CONTACT_CARD_RATIO } from '#components/ContactCard/ContactCard';
 import { useOnFocus, useRouteWillChange } from '#components/NativeRouter';
+import { addAuthStateListener, getAuthState } from '#helpers/authStore';
 import { dispatchGlobalEvent } from '#helpers/globalEvents';
 import { getRelayEnvironment } from '#helpers/relayEnvironment';
 import { usePrefetchRoute } from '#helpers/ScreenPrefetcher';
-import useAuthState from '#hooks/useAuthState';
 import useScreenInsets from '#hooks/useScreenInsets';
 import useToggle from '#hooks/useToggle';
 import { BOTTOM_MENU_HEIGHT } from '#ui/BottomMenu';
@@ -31,7 +30,6 @@ import HomeProfileLink, {
   PROFILE_LINK_MARGIN_TOP,
 } from './HomeProfileLink';
 import HomeProfilesCarousel from './HomeProfilesCarousel';
-import type { ProfileInfos } from '#helpers/authStore';
 import type { HomeScreenContent_user$key } from '#relayArtifacts/HomeScreenContent_user.graphql';
 import type { HomeProfilesCarouselHandle } from './HomeProfilesCarousel';
 import type { Disposable } from 'react-relay';
@@ -68,10 +66,9 @@ const HomeScreenContent = ({ user: userKey }: HomeScreenContentProps) => {
   //#endregion
 
   //#region profile switch
-  const auth = useAuthState();
   const initialProfileIndex = useMemo(() => {
     const index = user.profiles?.findIndex(
-      profile => profile.id === auth.profileInfos?.profileId,
+      profile => profile.id === getAuthState().profileInfos?.profileId,
     );
     return index !== undefined && index !== -1 ? index : 0;
     // we only want to run this once
@@ -105,15 +102,6 @@ const HomeScreenContent = ({ user: userKey }: HomeScreenContentProps) => {
       currentProfileIndexSharedValue.value = roundedProfileIndexSharedValue;
   });
 
-  const switchWebCard = useDebouncedCallback((profileInfos: ProfileInfos) => {
-    if (!isEqual(profileInfos, auth.profileInfos)) {
-      void dispatchGlobalEvent({
-        type: 'WEBCARD_CHANGE',
-        payload: profileInfos,
-      });
-    }
-  }, 50);
-
   const onCurrentProfileIndexChange = useCallback(
     (index: number) => {
       currentProfileIndexRef.current = index;
@@ -125,21 +113,29 @@ const HomeScreenContent = ({ user: userKey }: HomeScreenContentProps) => {
           webCard: { id: webCardId },
           profileRole,
         } = newProfile ?? {};
-        switchWebCard({
+        const profileInfos = {
           profileId,
           webCardId,
           profileRole,
-        });
+        };
+        const auth = getAuthState();
+        if (!isEqual(profileInfos, auth.profileInfos)) {
+          void dispatchGlobalEvent({
+            type: 'WEBCARD_CHANGE',
+            payload: profileInfos,
+          });
+        }
       }
     },
-    [setCurrentProfileIndex, switchWebCard, user.profiles],
+    [user.profiles],
   );
 
   const carouselRef = useRef<HomeProfilesCarouselHandle>(null);
 
   useOnFocus(() => {
+    const { profileInfos } = getAuthState();
     const authProfileIndex = user.profiles?.findIndex(
-      profile => profile.id === auth.profileInfos?.profileId,
+      profile => profile.id === profileInfos?.profileId,
     );
     if (
       authProfileIndex !== undefined &&
@@ -174,28 +170,30 @@ const HomeScreenContent = ({ user: userKey }: HomeScreenContentProps) => {
 
   const profilesDisposables = useRef<Disposable[]>([]).current;
   useEffect(() => {
-    const profileInfos = auth.profileInfos;
-    if (profileInfos) {
-      const profile = profilesRef.current?.find(
-        profile => profile.id === profileInfos.profileId,
-      );
-      if (profile) {
-        const environment = getRelayEnvironment();
-        profilesDisposables.push(
-          prefetchRoute(environment, {
-            route: 'WEBCARD',
-            params: {
-              webCardId: profileInfos.webCardId,
-              userName: profile.webCard.userName,
-            },
-          }),
-          prefetchRoute(environment, {
-            route: 'CONTACT_CARD',
-          }),
+    const dispose = addAuthStateListener(({ profileInfos }) => {
+      if (profileInfos) {
+        const profile = profilesRef.current?.find(
+          profile => profile.id === profileInfos.profileId,
         );
+        if (profile) {
+          const environment = getRelayEnvironment();
+          profilesDisposables.push(
+            prefetchRoute(environment, {
+              route: 'WEBCARD',
+              params: {
+                webCardId: profileInfos.webCardId,
+                userName: profile.webCard.userName,
+              },
+            }),
+            prefetchRoute(environment, {
+              route: 'CONTACT_CARD',
+            }),
+          );
+        }
       }
-    }
-  }, [profilesDisposables, prefetchRoute, auth.profileInfos]);
+    });
+    return dispose;
+  }, [profilesDisposables, prefetchRoute]);
 
   useEffect(
     () => () => {
@@ -209,6 +207,8 @@ const HomeScreenContent = ({ user: userKey }: HomeScreenContentProps) => {
   // #region Layout
   const insets = useScreenInsets();
   const { height: windowHeight, width: windowWidth } = useWindowDimensions();
+
+  const headerStyle = useMemo(() => ({ marginTop: insets.top }), [insets.top]);
 
   // windowsHeight return by android can have some issue (navbar/statusbar).
   ///navbar is not included in useWindowsDimensions.onLayout is the way to go in case of further ratio issue on multiple android
@@ -255,12 +255,11 @@ const HomeScreenContent = ({ user: userKey }: HomeScreenContentProps) => {
           openPanel={toggleShowMenu}
           user={user}
           currentProfileIndexSharedValue={actualCurrentProfileIndex}
-          style={{ marginTop: insets.top }}
+          style={headerStyle}
         />
         <HomeProfileLink
           user={user}
           currentProfileIndexSharedValue={actualCurrentProfileIndex}
-          currentProfileIndex={currentProfileIndex}
         />
         <HomeProfilesCarousel
           ref={carouselRef}
@@ -274,7 +273,6 @@ const HomeScreenContent = ({ user: userKey }: HomeScreenContentProps) => {
           height={bottomPanelHeight}
           user={user}
           currentProfileIndexSharedValue={actualCurrentProfileIndex}
-          currentProfileIndex={currentProfileIndex}
         />
       </View>
       <HomeContactCardLandscape profile={currentProfile ?? null} />
