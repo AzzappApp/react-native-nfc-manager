@@ -2,7 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const { SUPPORTED_LOCALES } = require('../index');
 
-const DEV_LANG = 'en-dev.json';
+const DEV_LANG = 'dev-lang.json';
 
 const prepare = (keysFile, target) => {
   const keys = JSON.parse(fs.readFileSync(keysFile, 'utf8'));

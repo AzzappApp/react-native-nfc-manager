@@ -56,21 +56,35 @@ jobs:
       - name: Install dependencies
         run: yarn install --frozen-lockfile  --immutable
 
-      - uses: phrase/setup-cli@v1
-        with:
-          version: 2.11.0
+      ############################################
+      #
+      # Translations management
+      #
+      ############################################
+      - name: Pull translations
+        if : github.ref_name == 'staging' || github.ref_name == 'stable'
+        run: yarn i18n:pull ${{ github.ref_name }}
+        env:
+          LOKALISE_PROJECT_ID: ${{ secrets.LOKALISE_PROJECT_ID }}
+          LOKALISE_TOKEN: ${{ secrets.LOKALISE_TOKEN }}
 
+      - name: Extract translations keys
+        run: yarn i18n:extract
+
+      - name: Push translations
+        if : github.ref_name == 'staging' || github.ref_name == 'stable'
+        run: yarn i18n:push ${{ github.ref_name }}
+        env:
+          LOKALISE_PROJECT_ID: ${{ secrets.LOKALISE_PROJECT_ID }}
+          LOKALISE_TOKEN: ${{ secrets.LOKALISE_TOKEN }}
+
+      
       ############################################
       #
       # JavaScript build and tests
       #
       ############################################
-      - name: Phrase - Pull translations
-        run: phrase pull
-
-      - name: Build translations
-        run: yarn i18n:extract
-
+   
       - name: JavaScript build
         run: yarn build
 
@@ -89,15 +103,13 @@ jobs:
       #
       ############################################
       - name: Git config
-        if: github.ref == 'refs/heads/main'
         run: |
           git config user.name "Azzapp Dev Bot"
           git config user.email "azzapp-dev-bot@azzapp.com"
 
       - name: Bump version
-        if: github.ref == 'refs/heads/main'
         run: |
-          yarn bump-version canary
+          yarn bump-version
           yarn write-dev-changelog
           git add .
           git commit -m "chore: bump version [skip ci]"
@@ -379,11 +391,3 @@ jobs:
             PROFILE="staging"
           fi
           eas build --platform all --profile $PROFILE --non-interactive --no-wait
-      
-      ############################################
-      #
-      # Deploy translations to Phrase
-      #
-      ############################################
-      - name: Phrase - Push translations
-        run: phrase push
