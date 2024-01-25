@@ -1,5 +1,8 @@
-## 0.5.5-canary.10
+## 0.5.5-canary.11
 
+* **perf:**  - 🤖 lag on switching profile on home ([#2504](https://github.com/AzzappApp/azzapp/pull/2504))
+* **feat:**  - **MultiUser:** Search user ([#2491](https://github.com/AzzappApp/azzapp/pull/2491))
+* **perf:**  - 🤖 lag on switching tabs on home ([#2499](https://github.com/AzzappApp/azzapp/pull/2499))
 * **fix:**  - linkedin link ([#2498](https://github.com/AzzappApp/azzapp/pull/2498))
 * **fix:**  - add CardTemplateType enable flag ([#2495](https://github.com/AzzappApp/azzapp/pull/2495))
 * **fix:**  - 🐛 display updated username for new user ([#2488](https://github.com/AzzappApp/azzapp/pull/2488))
