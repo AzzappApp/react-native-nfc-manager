@@ -33,6 +33,7 @@ export const saveCardTemplateType = async (
         .set({
           labels: data.labels,
           webCardCategoryId: data.webCardCategory.id,
+          enabled: data.enabled,
         })
         .where(eq(CardTemplateTypeTable.id, data.id));
 
@@ -43,6 +44,7 @@ export const saveCardTemplateType = async (
         id: templateTypeId,
         labels: data.labels,
         webCardCategoryId: data.webCardCategory.id,
+        enabled: data.enabled,
       });
     }
   } catch (error) {

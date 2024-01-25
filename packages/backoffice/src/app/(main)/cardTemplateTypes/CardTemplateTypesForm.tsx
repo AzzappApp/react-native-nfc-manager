@@ -4,10 +4,13 @@ import {
   Autocomplete,
   Box,
   Button,
+  FormControlLabel,
   Snackbar,
+  Switch,
   TextField,
   Typography,
 } from '@mui/material';
+import { omit } from 'lodash';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { labelsOptions, useForm } from '#helpers/formHelpers';
@@ -100,6 +103,7 @@ const CardTemplateTypeForm = ({
           name="label"
           label="Label"
           required
+          fullWidth
           {...fieldProps('labels', labelsOptions)}
         />
 
@@ -130,6 +134,23 @@ const CardTemplateTypeForm = ({
               </li>
             );
           }}
+        />
+        <FormControlLabel
+          control={
+            <Switch
+              name="enabled"
+              checked={!!data.enabled}
+              disabled={saving}
+              {...omit(
+                fieldProps('enabled', {
+                  format: value => value ?? null,
+                }),
+                'error',
+                'helperText',
+              )}
+            />
+          }
+          label="Enabled"
         />
 
         <Button
