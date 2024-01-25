@@ -63,7 +63,7 @@ jobs:
       ############################################
       - name: Pull translations
         if : github.ref_name == 'staging' || github.ref_name == 'stable'
-        run: yarn i18n:pull
+        run: yarn i18n:pull ${{ github.ref_name }}
         env:
           LOKALISE_PROJECT_ID: ${{ vars.LOKALISE_PROJECT_ID }}
           LOKALISE_TOKEN: ${{ secrets.LOKALISE_TOKEN }}
