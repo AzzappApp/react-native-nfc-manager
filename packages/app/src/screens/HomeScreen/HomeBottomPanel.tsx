@@ -1,5 +1,5 @@
 import { fromGlobalId } from 'graphql-relay';
-import { useState, memo, useMemo } from 'react';
+import { useState, memo, useMemo, useCallback } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { StyleSheet, View } from 'react-native';
 import Animated, {
@@ -112,7 +112,7 @@ const HomeBottomPanel = ({
   //#endregion
 
   //#region card publication
-  const onPublish = () => {
+  const onPublish = useCallback(() => {
     const { profileInfos } = getAuthState();
 
     if (
@@ -195,10 +195,10 @@ const HomeBottomPanel = ({
         });
       },
     });
-  };
+  }, [currentProfile?.profileRole, currentProfile?.webCard.id, intl]);
   //#endregion
 
-  const onAcceptInvitation = () => {
+  const onAcceptInvitation = useCallback(() => {
     const webCardId = getAuthState().profileInfos?.webCardId;
     if (!webCardId || webCardId !== currentProfile?.webCard?.id) {
       return;
@@ -234,9 +234,9 @@ const HomeBottomPanel = ({
         },
       },
     });
-  };
+  }, [currentProfile]);
 
-  const onDeclineInvitation = (profileId: string) => {
+  const onDeclineInvitation = useCallback(() => {
     const environment = getRelayEnvironment();
 
     const declineInvitationMutation = graphql`
@@ -248,32 +248,34 @@ const HomeBottomPanel = ({
         }
       }
     `;
+    const profileId = currentProfile?.id;
+    if (profileId) {
+      const { id } = fromGlobalId(profileId);
 
-    const { id } = fromGlobalId(profileId);
+      const updater: SelectorStoreUpdater<
+        HomeBottomPanelDeclineInvitationMutation$data
+      > = store => {
+        const root = store.getRoot();
 
-    const updater: SelectorStoreUpdater<
-      HomeBottomPanelDeclineInvitationMutation$data
-    > = store => {
-      const root = store.getRoot();
+        const user = root.getLinkedRecord('currentUser');
 
-      const user = root.getLinkedRecord('currentUser');
+        const profiles = user?.getLinkedRecords('profiles');
 
-      const profiles = user?.getLinkedRecords('profiles');
+        user?.setLinkedRecords(
+          profiles?.filter(p => p.getDataID() !== profileId) ?? [],
+          'profiles',
+        );
+        root.setLinkedRecord(user, 'currentUser');
+      };
 
-      user?.setLinkedRecords(
-        profiles?.filter(p => p.getDataID() !== profileId) ?? [],
-        'profiles',
-      );
-      root.setLinkedRecord(user, 'currentUser');
-    };
-
-    commitMutation<HomeBottomPanelDeclineInvitationMutation>(environment, {
-      mutation: declineInvitationMutation,
-      variables: { input: { profileId: id } },
-      optimisticUpdater: updater,
-      updater,
-    });
-  };
+      commitMutation<HomeBottomPanelDeclineInvitationMutation>(environment, {
+        mutation: declineInvitationMutation,
+        variables: { input: { profileId: id } },
+        optimisticUpdater: updater,
+        updater,
+      });
+    }
+  }, [currentProfile?.id]);
 
   const onAcceptOwnership = () => {
     const webCardId = getAuthState().profileInfos?.webCardId;
@@ -328,7 +330,7 @@ const HomeBottomPanel = ({
     });
   };
 
-  const onDeclineOwnership = (profileId: string) => {
+  const onDeclineOwnership = useCallback(() => {
     const webCardId = getAuthState().profileInfos?.webCardId;
 
     if (!webCardId || webCardId !== currentProfile?.webCard?.id) {
@@ -350,21 +352,24 @@ const HomeBottomPanel = ({
       }
     `;
 
-    const { id } = fromGlobalId(profileId);
+    const profileId = currentProfile?.id;
+    if (profileId) {
+      const { id } = fromGlobalId(profileId);
 
-    commitMutation<HomeBottomPanelDeclineOwnershipMutation>(environment, {
-      mutation: declineInvitationMutation,
-      variables: { input: { profileId: id } },
-      optimisticResponse: {
-        declineOwnership: {
-          profile: {
-            id: profileId,
-            promotedAsOwner: false,
+      commitMutation<HomeBottomPanelDeclineOwnershipMutation>(environment, {
+        mutation: declineInvitationMutation,
+        variables: { input: { profileId: id } },
+        optimisticResponse: {
+          declineOwnership: {
+            profile: {
+              id: profileId,
+              promotedAsOwner: false,
+            },
           },
         },
-      },
-    });
-  };
+      });
+    }
+  }, [currentProfile?.id, currentProfile?.webCard?.id]);
 
   //#region panels visibility
   const profilesHasCover = useMemo(
@@ -580,7 +585,7 @@ const HomeBottomPanel = ({
   const panelHeight = height - HOME_MENU_HEIGHT;
 
   return (
-    <View style={{ flex: 1 }}>
+    <View style={styles.container}>
       <Animated.View style={[styles.informationPanel, newCardPanelStyle]}>
         <Text variant="large" style={{ color: colors.white }}>
           <FormattedMessage
@@ -765,9 +770,7 @@ const HomeBottomPanel = ({
               />
             }
             style={styles.invitationPanelButton}
-            onPress={() =>
-              currentProfile?.id && onDeclineInvitation(currentProfile.id)
-            }
+            onPress={onDeclineInvitation}
           />
         </View>
       </Animated.View>
@@ -815,9 +818,7 @@ const HomeBottomPanel = ({
               />
             }
             style={styles.invitationPanelButton}
-            onPress={() =>
-              currentProfile?.id && onDeclineOwnership(currentProfile.id)
-            }
+            onPress={onDeclineOwnership}
           />
         </View>
       </Animated.View>
@@ -829,21 +830,33 @@ const HomeBottomPanel = ({
       >
         <HomeMenu selected={selectedPanel} setSelected={setSelectedPanel} />
 
-        {selectedPanel === 'CONTACT_CARD' && (
+        <View
+          style={{
+            flex: 1,
+            display: selectedPanel === 'CONTACT_CARD' ? 'flex' : 'none',
+          }}
+        >
           <HomeContactCard
             user={user}
             height={panelHeight}
             currentProfileIndexSharedValue={currentProfileIndexSharedValue}
           />
-        )}
-        {selectedPanel === 'STATS' && (
+        </View>
+
+        <View
+          style={{
+            flex: 1,
+            display: selectedPanel === 'STATS' ? 'flex' : 'none',
+          }}
+        >
           <HomeStatistics
             user={profiles!}
             height={panelHeight}
             currentProfileIndexSharedValue={currentProfileIndexSharedValue}
             currentUserIndex={currentProfileIndex}
           />
-        )}
+        </View>
+
         {selectedPanel === 'INFORMATION' && (
           <HomeInformations
             user={user}
@@ -857,6 +870,7 @@ const HomeBottomPanel = ({
 };
 
 const styles = StyleSheet.create({
+  container: { flex: 1 },
   informationPanel: {
     overflow: 'visible',
     top: 0,
