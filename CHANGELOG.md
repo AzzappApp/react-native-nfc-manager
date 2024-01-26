@@ -1,5 +1,8 @@
-## 0.5.5-canary.15
+## 0.5.5-canary.16
 
+* **fix:**  - **backoffice:** [#2506](https://github.com/AzzappApp/azzapp/pull/2506) wrong query to get modules data ([#2524](https://github.com/AzzappApp/azzapp/pull/2524))
+* **fix:**  - **cover:** [#2458](https://github.com/AzzappApp/azzapp/pull/2458) resume videos when app is foregrounded ([#2533](https://github.com/AzzappApp/azzapp/pull/2533))
+* **fix:**  - linkedin link ([#2526](https://github.com/AzzappApp/azzapp/pull/2526))
 * **fix:**  - **multiUser:** [#2351](https://github.com/AzzappApp/azzapp/pull/2351) no access until invitation is accepted ([#2519](https://github.com/AzzappApp/azzapp/pull/2519))
 * **fix:**  - cannot remove followers if card is public ([#2530](https://github.com/AzzappApp/azzapp/pull/2530))
 * **fix:**  - 🐛 allow to delete custom website url ([#2516](https://github.com/AzzappApp/azzapp/pull/2516))
