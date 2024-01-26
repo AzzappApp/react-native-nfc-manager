@@ -169,6 +169,7 @@ const CoverTextRenderer = (
     textAlign,
     position: 'relative',
     wordWrap: 'break-word',
+    whiteSpace: 'pre',
   } as const;
 
   const subTitleFontFamily =
@@ -184,6 +185,7 @@ const CoverTextRenderer = (
     textAlign,
     position: 'relative',
     wordWrap: 'break-word',
+    whiteSpace: 'pre',
   } as const;
 
   const foundAnimation =
