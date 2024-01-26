@@ -79,7 +79,7 @@ const FollowerScreenInner = ({
 
   return (
     <FollowersScreenList
-      isPublic={webCard?.cardIsPrivate ?? false}
+      isPublic={!webCard?.cardIsPrivate ?? false}
       currentWebCardId={webCard?.id ?? ''}
       webCard={webCard ?? null}
     />
