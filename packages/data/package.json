@@ -1,6 +1,6 @@
 {
   "name": "@azzapp/data",
-  "version": "0.5.4-rc.3",
+  "version": "0.5.4-rc.4",
   "private": true,
   "exports": {
     ".": {
@@ -35,8 +35,8 @@
     "definition:watch"
   ],
   "dependencies": {
-    "@azzapp/i18n": "0.5.4-rc.3",
-    "@azzapp/shared": "0.5.4-rc.3",
+    "@azzapp/i18n": "0.5.4-rc.4",
+    "@azzapp/shared": "0.5.4-rc.4",
     "@graphql-tools/schema": "^10.0.0",
     "@paralleldrive/cuid2": "^2.2.0",
     "@planetscale/database": "^1.11.0",
