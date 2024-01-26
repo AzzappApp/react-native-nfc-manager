@@ -307,6 +307,7 @@ const WebCardBlockContainer = ({
       marginVertical: editTransitionValue * (EDIT_BLOCK_GAP / editScale),
       minHeight: editTransitionValue * BUTTON_SIZE,
       height: visible || editTransitionValue > 0 ? 'auto' : 0,
+      justifyContent: 'center',
     };
   });
 
