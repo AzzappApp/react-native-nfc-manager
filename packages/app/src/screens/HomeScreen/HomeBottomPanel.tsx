@@ -202,6 +202,7 @@ const HomeBottomPanel = ({
           profile {
             id
             invited
+            profileRole
           }
         }
       }
@@ -219,11 +220,13 @@ const HomeBottomPanel = ({
           profile: {
             id: profileId,
             invited: false,
+            profileRole:
+              profiles?.find(p => p.id === profileId)?.profileRole ?? 'user',
           },
         },
       },
     });
-  }, []);
+  }, [profiles]);
 
   const onAcceptOwnership = useCallback(() => {
     const profileId = getAuthState().profileInfos?.profileId;
@@ -413,7 +416,7 @@ const HomeBottomPanel = ({
         runOnJS(setInvitationLabel)(webCardOwnerName[index]);
       }
     },
-    [],
+    [profilesIsInvitation, profilesIsPromotedAsOwner],
   );
 
   const panelVisibilities = useDerivedValue(() => {

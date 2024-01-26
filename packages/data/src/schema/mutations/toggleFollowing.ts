@@ -30,7 +30,7 @@ const toggleFollowing: MutationResolvers['toggleFollowing'] = async (
   const profile =
     userId && (await getUserProfileWithWebCardId(userId, webCardId));
 
-  if (!profile || !isEditor(profile.profileRole)) {
+  if (!profile || !isEditor(profile.profileRole) || profile.invited) {
     throw new GraphQLError(ERRORS.UNAUTHORIZED);
   }
 

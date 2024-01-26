@@ -46,6 +46,7 @@ const HomeScreenContent = ({ user: userKey }: HomeScreenContentProps) => {
         profiles {
           id
           profileRole
+          invited
           webCard {
             id
             userName
@@ -112,11 +113,12 @@ const HomeScreenContent = ({ user: userKey }: HomeScreenContentProps) => {
           id: profileId,
           webCard: { id: webCardId },
           profileRole,
+          invited,
         } = newProfile ?? {};
         const profileInfos = {
           profileId,
           webCardId,
-          profileRole,
+          profileRole: invited ? 'invited' : profileRole,
         };
         const auth = getAuthState();
         if (!isEqual(profileInfos, auth.profileInfos)) {

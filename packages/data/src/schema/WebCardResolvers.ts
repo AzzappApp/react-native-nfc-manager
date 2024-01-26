@@ -173,7 +173,11 @@ export const WebCard: WebCardResolvers = {
     const userProfile = auth.userId
       ? await getUserProfileWithWebCardId(auth.userId, webCard.id)
       : null;
-    if (!userProfile || !isAdmin(userProfile.profileRole)) {
+    if (
+      !userProfile ||
+      !isAdmin(userProfile.profileRole) ||
+      userProfile.invited
+    ) {
       return 0;
     }
     const count = await countWebCardProfiles(webCard.id);
@@ -184,7 +188,11 @@ export const WebCard: WebCardResolvers = {
       ? await getUserProfileWithWebCardId(auth.userId, webCard.id)
       : null;
 
-    if (!userProfile || !isAdmin(userProfile.profileRole)) {
+    if (
+      !userProfile ||
+      !isAdmin(userProfile.profileRole) ||
+      userProfile.invited
+    ) {
       return null;
     }
     const pendingUser = await getWebCardPendingOwnerProfile(webCard.id);
@@ -195,7 +203,11 @@ export const WebCard: WebCardResolvers = {
       ? await getUserProfileWithWebCardId(auth.userId, webCard.id)
       : null;
 
-    if (!userProfile || !isAdmin(userProfile.profileRole)) {
+    if (
+      !userProfile ||
+      !isAdmin(userProfile.profileRole) ||
+      userProfile.invited
+    ) {
       return connectionFromArray([], { after, first });
     }
     const limit = first ?? 100;

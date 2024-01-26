@@ -23,7 +23,7 @@ const updatePostCommentMutation: MutationResolvers['updatePostComment'] =
       throw new GraphQLError(ERRORS.INVALID_REQUEST);
     }
 
-    if (!profile || !isEditor(profile.profileRole)) {
+    if (!profile || !isEditor(profile.profileRole) || profile.invited) {
       throw new GraphQLError(ERRORS.UNAUTHORIZED);
     }
     try {

@@ -23,7 +23,7 @@ const updatePostMutation: MutationResolvers['updatePost'] = async (
   const profile =
     userId && (await getUserProfileWithWebCardId(userId, post.webCardId));
 
-  if (!profile || !isEditor(profile.profileRole)) {
+  if (!profile || !isEditor(profile.profileRole) || profile.invited) {
     throw new GraphQLError(ERRORS.UNAUTHORIZED);
   }
 

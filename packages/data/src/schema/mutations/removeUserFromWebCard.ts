@@ -19,17 +19,11 @@ const removeUserFromWebCard: MutationResolvers['removeUserFromWebCard'] =
 
     const profile = profileId && (await loaders.Profile.load(profileId));
 
-    if (!profile || !isAdmin(profile.profileRole)) {
+    if (!profile || !isAdmin(profile.profileRole) || profile.invited) {
       throw new GraphQLError(ERRORS.UNAUTHORIZED);
     }
 
     if (profile.userId !== userId) {
-      throw new GraphQLError(ERRORS.UNAUTHORIZED);
-    }
-
-    const currentProfile = profileId && (await loaders.Profile.load(profileId));
-
-    if (!currentProfile || !isAdmin(currentProfile.profileRole)) {
       throw new GraphQLError(ERRORS.UNAUTHORIZED);
     }
 

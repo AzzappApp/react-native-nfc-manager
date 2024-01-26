@@ -34,7 +34,7 @@ const updateWebCardUserNameMutation: MutationResolvers['updateWebCardUserName'] 
     const profile =
       userId && (await getUserProfileWithWebCardId(userId, webCardId));
 
-    if (!profile || !isAdmin(profile.profileRole)) {
+    if (!profile || !isAdmin(profile.profileRole) || profile.invited) {
       throw new GraphQLError(ERRORS.UNAUTHORIZED);
     }
 

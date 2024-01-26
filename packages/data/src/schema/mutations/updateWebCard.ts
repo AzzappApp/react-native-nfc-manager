@@ -21,7 +21,7 @@ const updateWebCardMutation: MutationResolvers['updateWebCard'] = async (
   const profile =
     userId && (await getUserProfileWithWebCardId(userId, webCardId));
 
-  if (!profile || !isEditor(profile.profileRole)) {
+  if (!profile || !isEditor(profile.profileRole) || profile.invited) {
     throw new GraphQLError(ERRORS.UNAUTHORIZED);
   }
 
@@ -64,7 +64,7 @@ const updateWebCardMutation: MutationResolvers['updateWebCard'] = async (
 
     if (
       webCard.companyActivityId !== partialWebCard.companyActivityId &&
-      !isAdmin(profile.profileRole)
+      (!isAdmin(profile.profileRole) || profile.invited)
     ) {
       throw new GraphQLError(ERRORS.UNAUTHORIZED);
     }

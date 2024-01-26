@@ -35,7 +35,7 @@ const updateProfileMutation: MutationResolvers['updateProfile'] = async (
 
   if (
     currentProfile.id !== targetProfileId &&
-    !isAdmin(currentProfile.profileRole)
+    (!isAdmin(currentProfile.profileRole) || currentProfile.invited)
   ) {
     throw new GraphQLError(ERRORS.UNAUTHORIZED);
   }

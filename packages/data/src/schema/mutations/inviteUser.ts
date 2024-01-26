@@ -23,7 +23,7 @@ const inviteUserMutation: MutationResolvers['inviteUser'] = async (
 
   const profileId = fromGlobalIdWithType(gqlProfileId, 'Profile');
   const profile = profileId && (await loaders.Profile.load(profileId));
-  if (!profile || !isAdmin(profile.profileRole)) {
+  if (!profile || !isAdmin(profile.profileRole) || profile.invited) {
     throw new GraphQLError(ERRORS.UNAUTHORIZED);
   }
 

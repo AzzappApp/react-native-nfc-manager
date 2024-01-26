@@ -50,10 +50,7 @@ const createModuleSavingMutation =
     const profile =
       userId && (await getUserProfileWithWebCardId(userId, webCardId));
 
-    if (
-      !profile ||
-      !('profileRole' in profile && isEditor(profile.profileRole))
-    ) {
+    if (!profile || !isEditor(profile.profileRole) || profile.invited) {
       throw new GraphQLError(ERRORS.UNAUTHORIZED);
     }
     const { validator, getMedias } = MODULES_SAVE_RULES[moduleKind] ?? {};
