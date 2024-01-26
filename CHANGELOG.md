@@ -1,5 +1,7 @@
-## 0.5.5-canary.14
+## 0.5.5-canary.15
 
+* **fix:**  - **multiUser:** [#2351](https://github.com/AzzappApp/azzapp/pull/2351) no access until invitation is accepted ([#2519](https://github.com/AzzappApp/azzapp/pull/2519))
+* **fix:**  - cannot remove followers if card is public ([#2530](https://github.com/AzzappApp/azzapp/pull/2530))
 * **fix:**  - 🐛 allow to delete custom website url ([#2516](https://github.com/AzzappApp/azzapp/pull/2516))
 * **fix:**  - 🐛 correctly display carousel preview ([#2487](https://github.com/AzzappApp/azzapp/pull/2487))
 * **perf:**  - 🤖 simplify sync between profiles and bottom panel ([#2515](https://github.com/AzzappApp/azzapp/pull/2515))
