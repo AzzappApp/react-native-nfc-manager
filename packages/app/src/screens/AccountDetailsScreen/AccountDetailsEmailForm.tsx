@@ -27,7 +27,9 @@ const AccountDetailsEmailForm = ({
 }) => {
   const hasPhoneNumber = currentUser.phoneNumber != null;
   const emailFormSchema = z.object({
-    email: hasPhoneNumber ? z.string().optional() : z.string().min(1),
+    email: hasPhoneNumber
+      ? z.string().email().optional()
+      : z.string().email().min(1),
   });
 
   type EmailForm = z.infer<typeof emailFormSchema>;
