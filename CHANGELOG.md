@@ -1,5 +1,6 @@
-## 0.5.5-canary.18
+## 0.5.5-canary.19
 
+* **fix:**  - 🐛 add scaleup animation when navigating to cover ([#2531](https://github.com/AzzappApp/azzapp/pull/2531))
 * **fix:**  - 🐛 ensure email is valid when updating account info ([#2532](https://github.com/AzzappApp/azzapp/pull/2532))
 * **fix:**  - 🐛 allow to delete custom website url
 * **fix:**  - **SimpleButton:** email validation: ([#2535](https://github.com/AzzappApp/azzapp/pull/2535))
