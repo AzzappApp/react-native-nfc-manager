@@ -1,5 +1,6 @@
-## 0.5.5-canary.16
+## 0.5.5-canary.17
 
+* **fix:**  - 🐛 ensure email is valid when updating account info ([#2532](https://github.com/AzzappApp/azzapp/pull/2532))
 * **fix:**  - **backoffice:** [#2506](https://github.com/AzzappApp/azzapp/pull/2506) wrong query to get modules data ([#2524](https://github.com/AzzappApp/azzapp/pull/2524))
 * **fix:**  - **cover:** [#2458](https://github.com/AzzappApp/azzapp/pull/2458) resume videos when app is foregrounded ([#2533](https://github.com/AzzappApp/azzapp/pull/2533))
 * **fix:**  - linkedin link ([#2526](https://github.com/AzzappApp/azzapp/pull/2526))
