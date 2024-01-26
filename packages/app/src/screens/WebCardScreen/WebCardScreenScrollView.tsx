@@ -265,8 +265,6 @@ const WebCardScreenScrollView = (
     };
   }, [editTransition, editScale]);
 
-  console.log(blocks.current);
-
   const contextValue = useMemo(
     () => ({
       registerBlock: (
@@ -280,7 +278,6 @@ const WebCardScreenScrollView = (
           height,
           visible,
         };
-        console.log('register block', id);
         updateBlockCounts();
       },
       unregisterBlock: (id: string) => {
@@ -308,6 +305,7 @@ const WebCardScreenScrollView = (
         scrollToOverflowEnabled
         onScroll={onScrollInner}
         scrollEventThrottle={16}
+        onContentSizeChange={scheduleRecomputeHeight}
         {...props}
       >
         <Animated.View
@@ -318,8 +316,8 @@ const WebCardScreenScrollView = (
         >
           <Animated.View style={outerBlockContainerStyle}>
             <Animated.View
-              ref={blockContainerRef}
               style={[blocksContainerStyle, { transformOrigin: 'top' }]}
+              ref={blockContainerRef}
             >
               <WebCardScreenScrollViewContext.Provider value={contextValue}>
                 {children}
