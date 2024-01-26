@@ -8,6 +8,7 @@ import {
 } from '#helpers/createStyles';
 import PressableOpacity from '#ui/PressableOpacity';
 import Text from '#ui/Text';
+import CoverLinkRenderer from './CoverLink/CoverLinkRenderer';
 import CoverRenderer from './CoverRenderer';
 import Link from './Link';
 import type {
@@ -63,6 +64,7 @@ const AuthorCartouche = ({
   const author = useFragment(
     graphql`
       fragment AuthorCartoucheFragment_webCard on WebCard {
+        id
         userName
         ...CoverRenderer_webCard
       }
@@ -96,6 +98,7 @@ const AuthorCartouche = ({
             hideUserName={hideUserName}
             variant={variant}
             author={author}
+            animated
           />
         </PressableOpacity>
       </Link>
@@ -117,17 +120,28 @@ const AuthorCartoucheContent = ({
   hideUserName,
   variant = 'post',
   author,
+  animated,
 }: {
   hideUserName?: boolean;
   variant?: AuthorCartoucheProps['variant'];
   author?: AuthorCartoucheFragment_webCard$data;
+  animated?: boolean;
 }) => {
   const styles = useVariantStyleSheet(stylesheet, variant);
 
   return (
     <>
       <View style={styles.image}>
-        <CoverRenderer width={styles.image.width} webCard={author} />
+        {animated ? (
+          <CoverLinkRenderer
+            webCard={author!}
+            width={21}
+            webCardId={author!.id}
+            userName={author!.userName}
+          />
+        ) : (
+          <CoverRenderer width={styles.image.width} webCard={author} />
+        )}
       </View>
       {!hideUserName && (
         <Text

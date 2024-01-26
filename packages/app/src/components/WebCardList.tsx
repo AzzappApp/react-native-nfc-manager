@@ -7,7 +7,7 @@ import IconButton from '#ui/IconButton';
 import PressableNative from '#ui/PressableNative';
 import SearchBar from '#ui/SearchBar';
 import Text from '#ui/Text';
-import CoverRenderer from './CoverRenderer';
+import CoverLinkRenderer from './CoverLink/CoverLinkRenderer';
 import Link from './Link';
 import type {
   WebCardList_webCard$data,
@@ -33,9 +33,11 @@ const WebCardListItemMemoized = memo(function ProfileListItem({
         params={{ userName: webCard.userName, webCardId: webCard.id }}
       >
         <PressableNative style={styles.profile}>
-          <CoverRenderer
+          <CoverLinkRenderer
             webCard={webCard}
             width={COVER_WIDTH}
+            webCardId={webCard.id}
+            userName={webCard.userName}
             animationEnabled={false}
           />
           <Text variant="large" numberOfLines={1}>
