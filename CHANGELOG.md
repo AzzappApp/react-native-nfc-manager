@@ -1,5 +1,6 @@
-## 0.5.5-canary.19
+## 0.5.5-canary.20
 
+* **fix:**  - **cover:** [#2445](https://github.com/AzzappApp/azzapp/pull/2445) maintain white spaces ([#2525](https://github.com/AzzappApp/azzapp/pull/2525))
 * **fix:**  - 🐛 add scaleup animation when navigating to cover ([#2531](https://github.com/AzzappApp/azzapp/pull/2531))
 * **fix:**  - 🐛 ensure email is valid when updating account info ([#2532](https://github.com/AzzappApp/azzapp/pull/2532))
 * **fix:**  - 🐛 allow to delete custom website url
