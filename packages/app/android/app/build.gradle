@@ -84,7 +84,7 @@ android {
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 5004
-        versionName "0.5.4-rc.3"
+        versionName "0.5.4-rc.4"
     }
 
     flavorDimensions "env"
