@@ -148,6 +148,16 @@ class MediaVideoRenderer: UIView {
   private var playerTimeObserver: Any?
   
   private var readyForDisplayObserver: AnyObject?
+
+  
+  @objc func applicationWillEnterForeground(_ notification: NSNotification) {
+    guard let player = player else { return }
+    if player.status == .readyToPlay {
+      if !paused.boolValue {
+        player.play()
+      }
+    }
+  }
   
   override required init(frame: CGRect) {
     super.init(frame: frame)
@@ -233,6 +243,12 @@ class MediaVideoRenderer: UIView {
       object: player.currentItem
     )
 
+    NotificationCenter.default.addObserver(self,
+      selector: #selector(applicationWillEnterForeground(_:)),
+      name: UIApplication.willEnterForegroundNotification,
+      object: nil
+    )
+
   
     playerTimeObserver = player.addPeriodicTimeObserver(forInterval: CMTimeMakeWithSeconds(0.1, preferredTimescale:600), queue: nil, using: {
       [weak self] time in
@@ -261,6 +277,11 @@ class MediaVideoRenderer: UIView {
     NotificationCenter.default.removeObserver(self,
       name: .AVPlayerItemDidPlayToEndTime,
       object: player.currentItem
+    )
+
+    NotificationCenter.default.removeObserver(self,
+      name: UIApplication.willEnterForegroundNotification,
+      object: nil
     )
     
     if let playerTimeObserver = playerTimeObserver {
