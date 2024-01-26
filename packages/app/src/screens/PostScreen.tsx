@@ -14,7 +14,7 @@ import { graphql, usePaginationFragment, usePreloadedQuery } from 'react-relay';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
 import { colors } from '#theme';
 import { AUTHOR_CARTOUCHE_HEIGHT } from '#components/AuthorCartouche';
-import { useNativeNavigationEvent, useRouter } from '#components/NativeRouter';
+import { useDidAppear, useRouter } from '#components/NativeRouter';
 import PostList from '#components/PostList/PostList';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import relayScreen from '#helpers/relayScreen';
@@ -58,11 +58,8 @@ const PostScreen = ({
   };
 
   const { post, webCard } = usePreloadedQuery(postScreenQuery, preloadedQuery);
-  const [ready, setReady] = useState(false);
 
-  useNativeNavigationEvent('appear', () => {
-    setReady(true);
-  });
+  const ready = useDidAppear();
 
   const [relatedPosts, setRelatedPosts] = useState<
     PostScreenFragment_relatedPosts$data['relatedPosts'] | null
