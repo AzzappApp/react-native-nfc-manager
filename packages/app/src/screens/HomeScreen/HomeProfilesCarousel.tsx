@@ -294,13 +294,13 @@ const ItemRenderComponent = ({
             justifyContent: 'center',
             alignItems: 'center',
             borderRadius: coverWidth * COVER_CARD_RADIUS,
-            backgroundColor: colors.white,
+            backgroundColor: colors.black,
           }}
         >
           <Icon
             icon="shared_webcard"
             style={styles.invitationIcon}
-            tintColor={colors.red400}
+            tintColor={colors.white}
           />
         </View>
       ) : profile.webCard.cardCover?.media?.id != null ? (
@@ -414,7 +414,7 @@ const styles = StyleSheet.create({
     width: 44,
     height: 44,
   },
-  invitationIcon: { width: 60, height: 60 },
+  invitationIcon: { width: 60, height: 60, opacity: 0.2 },
   coverContainer: {
     overflow: 'visible',
     // trick to have the shadow on the cover
