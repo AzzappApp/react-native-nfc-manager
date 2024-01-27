@@ -241,7 +241,7 @@ const CoverRenderer = (
   if (prevTitle !== title || prevSubTitle !== subTitle) {
     prevData.current.title = title;
     prevData.current.subTitle = subTitle;
-    setTextAnimationReady(title === null && subTitle === null);
+    setTextAnimationReady(!title && !subTitle);
   }
 
   const onReadyForDisplayLatest = useLatestCallback(onReadyForDisplay);

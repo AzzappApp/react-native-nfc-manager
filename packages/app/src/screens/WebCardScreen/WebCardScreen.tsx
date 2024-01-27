@@ -37,7 +37,7 @@ import { parseContactCard } from '@azzapp/shared/contactCardHelpers';
 import { COVER_CARD_RADIUS, COVER_RATIO } from '@azzapp/shared/coverHelpers';
 import { isEditor } from '@azzapp/shared/profileHelpers';
 import {
-  useNativeNavigationEvent,
+  useDidAppear,
   useRouter,
   useScreenOptionsUpdater,
 } from '#components/NativeRouter';
@@ -85,10 +85,7 @@ const WebCardScreen = ({
 
   useWebCardViewStatistic(params.webCardId ?? data.webCard?.id);
 
-  const [ready, setReady] = useState(false);
-  useNativeNavigationEvent('appear', () => {
-    setReady(true);
-  });
+  const ready = useDidAppear();
 
   useEffect(() => {
     dispatchGlobalEvent({ type: 'READY' });

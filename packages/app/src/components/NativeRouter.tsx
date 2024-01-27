@@ -855,6 +855,11 @@ export const useOnFocus = (handler: (() => void) | null) => {
   }, [hasFocus]);
 };
 
+export const useDidAppear = () => {
+  const { didAppear } = useContext(ScreenRendererContext);
+  return didAppear;
+};
+
 export const ScreenDidAppear = ({ children }: { children: ReactNode }) => {
   const deferred = useMemo(() => createDeferred<boolean>(), []);
   const { didAppear } = useContext(ScreenRendererContext);

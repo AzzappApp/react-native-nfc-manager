@@ -1,8 +1,9 @@
-import { Suspense, useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { FormattedMessage } from 'react-intl';
 import { StyleSheet, View } from 'react-native';
 import { graphql, usePreloadedQuery } from 'react-relay';
 import Link from '#components/Link';
+import { useRouter } from '#components/NativeRouter';
 import ProfilePostsList from '#components/WebCardPostsList';
 import relayScreen from '#helpers/relayScreen';
 import useScreenInsets from '#hooks/useScreenInsets';
@@ -28,6 +29,7 @@ const mediaScreenQuery = graphql`
   query MediaScreenQuery($profileId: ID!, $viewerWebCardId: ID!) {
     node(id: $profileId) {
       ... on Profile @alias(as: "profile") {
+        invited
         ...MediaSuggestionsScreen_profile
         ...MediaSuggestionsWebCards_profile
         webCard {
@@ -53,6 +55,14 @@ const MediaScreen = ({
   const profile = node?.profile;
   const { top } = useScreenInsets();
   const [tab, setTab] = useState<TAB>('SUGGESTIONS');
+
+  const router = useRouter();
+
+  useEffect(() => {
+    if (profile?.invited) {
+      router.replace({ route: 'HOME' });
+    }
+  }, [profile?.invited, router]);
 
   // viewer might be briefly null when the user logs out or by switching accounts
   if (!profile) {
