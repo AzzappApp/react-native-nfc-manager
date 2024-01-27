@@ -1,5 +1,12 @@
-## 0.5.5-canary.20
+## 0.5.5-canary.21
 
+* **fix:**  - **webCard:** [#2513](https://github.com/AzzappApp/azzapp/pull/2513) ensure screen sees that it has appeared ([#2537](https://github.com/AzzappApp/azzapp/pull/2537))
+* **fix:**  - **multiUser:** [#2510](https://github.com/AzzappApp/azzapp/pull/2510) block access to media when profile is invited ([#2534](https://github.com/AzzappApp/azzapp/pull/2534))
+* **fix:**  - Scrolling content on profile when adding a first module is very big ([#2539](https://github.com/AzzappApp/azzapp/pull/2539))
+* **fix:**  - 🐛 ensure email is valid when updating account info ([#2532](https://github.com/AzzappApp/azzapp/pull/2532))
+* **fix:**  - 🐛 allow to delete custom website url
+* **fix:**  - **SimpleButton:** email validation: ([#2535](https://github.com/AzzappApp/azzapp/pull/2535))
+* **fix:**  - **backoffice:** [#2506](https://github.com/AzzappApp/azzapp/pull/2506) wrong query to get modules data ([#2524](https://github.com/AzzappApp/azzapp/pull/2524))
 * **fix:**  - **cover:** [#2445](https://github.com/AzzappApp/azzapp/pull/2445) maintain white spaces ([#2525](https://github.com/AzzappApp/azzapp/pull/2525))
 * **fix:**  - 🐛 add scaleup animation when navigating to cover ([#2531](https://github.com/AzzappApp/azzapp/pull/2531))
 * **fix:**  - 🐛 ensure email is valid when updating account info ([#2532](https://github.com/AzzappApp/azzapp/pull/2532))
