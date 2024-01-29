@@ -1,5 +1,6 @@
-## 0.5.5-canary.27
+## 0.5.5-canary.28
 
+* **build:**  - android - add missing product flavor in command
 * **build:**  - android - assemble apk
 * **fix:**  - 🐛 display error when username is different from locql ([#2549](https://github.com/AzzappApp/azzapp/pull/2549))
 * **fix:**  - HomeBottomSheetPanel with separator ([#2548](https://github.com/AzzappApp/azzapp/pull/2548))
