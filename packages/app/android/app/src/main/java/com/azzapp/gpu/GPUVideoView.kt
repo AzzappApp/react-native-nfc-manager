@@ -303,7 +303,7 @@ import kotlin.math.round
         event
       )
     }
-    handler.postDelayed(updateProgressAction, 200)
+    handler.postDelayed(updateProgressAction, 50)
   }
 
   override fun onPlaybackStateChanged(playbackState: Int) {
