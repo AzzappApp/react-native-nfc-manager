@@ -27,7 +27,7 @@ const CarouselMedia = (props: CarouselMediaProps) => {
   return (
     <div
       style={{
-        minWidth: width,
+        width,
         height: imageHeight,
       }}
     >
