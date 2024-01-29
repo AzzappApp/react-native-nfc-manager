@@ -355,7 +355,7 @@ const CommonInformationField = ({
         <Icon icon="locked" />
         {label ? <Text variant="smallbold">{label}</Text> : null}
       </View>
-      <Text style={{ paddingLeft: label ? 50 : 20 }} variant="medium">
+      <Text style={{ paddingLeft: label ? 50 : 20, flex: 1 }} variant="medium">
         {value}
       </Text>
     </View>
