@@ -118,10 +118,13 @@ const HomeBottomSheetPanel = ({
     }
   }, [close, intl, profile?.webCard.userName]);
 
-  const elements = useMemo<HomeBottomSheetPanelOptionProps[]>(
+  const elements = useMemo<
+    Array<HomeBottomSheetPanelOptionProps | { type: 'separator' }>
+  >(
     () =>
       convertToNonNullArray([
         {
+          type: 'row',
           icon: 'information',
           text: intl.formatMessage({
             defaultMessage: 'Account details',
@@ -133,8 +136,10 @@ const HomeBottomSheetPanel = ({
           },
           onPress: close,
         },
+        { type: 'separator' },
         withProfile && profileRole && isAdmin(profileRole) && !profile?.invited
           ? {
+              type: 'row',
               icon: 'parameters',
               text: intl.formatMessage(
                 {
@@ -155,6 +160,7 @@ const HomeBottomSheetPanel = ({
         profile?.webCard.cardIsPublished &&
         !profile?.invited
           ? {
+              type: 'row',
               icon: 'share',
               text: intl.formatMessage(
                 {
@@ -169,6 +175,7 @@ const HomeBottomSheetPanel = ({
 
         withProfile && !profile?.invited
           ? {
+              type: 'row',
               icon: 'invite',
               text: intl.formatMessage({
                 defaultMessage: 'Invite friends',
@@ -180,9 +187,10 @@ const HomeBottomSheetPanel = ({
               onPress: close,
             }
           : null,
-
+        { type: 'separator' },
         withProfile && profileRole && !profile?.invited && isAdmin(profileRole)
           ? {
+              type: 'row',
               icon: 'shared_webcard',
               text: intl.formatMessage({
                 defaultMessage: 'Multi user',
@@ -195,6 +203,7 @@ const HomeBottomSheetPanel = ({
             }
           : null,
         {
+          type: 'row',
           icon: 'about',
           text: intl.formatMessage({
             defaultMessage: 'About',
@@ -206,6 +215,7 @@ const HomeBottomSheetPanel = ({
           onPress: close,
         },
         {
+          type: 'row',
           icon: 'logout',
           text: intl.formatMessage({
             defaultMessage: 'Logout',
@@ -217,7 +227,14 @@ const HomeBottomSheetPanel = ({
     [close, intl, onLogout, onShare, profile, profileRole, withProfile],
   );
 
-  const modalHeight = 20 + 32 * elements.length + 20 * (elements.length - 1);
+  const modalHeight = useMemo(() => {
+    const separatorHeight =
+      elements.filter(element => element.type === 'separator').length * 25;
+    const rowHeight =
+      elements.filter(element => element.type === 'row').length *
+      (ROW_HEIGHT + 10);
+    return 20 + rowHeight + separatorHeight + 30;
+  }, [elements]);
 
   return (
     <BottomSheetModal
@@ -228,27 +245,41 @@ const HomeBottomSheetPanel = ({
       onRequestClose={close}
     >
       <View style={styles.bottomSheetOptionsContainer}>
-        {elements.map((element, index) => (
-          <HomeBottomSheetPanelOption key={index} {...element} />
-        ))}
+        {elements.map((element, index) => {
+          if (element.type === 'separator') {
+            return <View key={`separator_${index}`} style={styles.separator} />;
+          }
+          return <HomeBottomSheetPanelOption key={index} {...element} />;
+        })}
       </View>
     </BottomSheetModal>
   );
 };
 
-type HomeBottomSheetPanelOptionProps = {
-  icon: Icons;
-  text: ReactNode;
-  linkProps?: LinkProps<any>;
-  onPress: () => void;
-};
+type HomeBottomSheetPanelOptionProps =
+  | {
+      type: 'row';
+      icon: Icons;
+      text: ReactNode;
+      linkProps?: LinkProps<any>;
+      onPress: () => void;
+    }
+  | {
+      type: 'separator';
+    };
 
 const HomeBottomSheetPanelOption = ({
   icon,
   text,
   linkProps,
   onPress,
-}: HomeBottomSheetPanelOptionProps) => {
+}: {
+  type: 'row';
+  icon: Icons;
+  text: ReactNode;
+  linkProps?: LinkProps<any>;
+  onPress: () => void;
+}) => {
   const inner = (
     <PressableNative style={styles.bottomSheetOptionButton} onPress={onPress}>
       <View style={styles.bottomSheetOptionContainer}>
@@ -266,7 +297,9 @@ const HomeBottomSheetPanelOption = ({
   return inner;
 };
 
+const ROW_HEIGHT = 32;
 const styles = StyleSheet.create({
+  separator: { height: 25 },
   bottomSheetContainer: {
     marginTop: 10,
     paddingHorizontal: 0,
@@ -274,10 +307,11 @@ const styles = StyleSheet.create({
   bottomSheetOptionsContainer: {
     paddingHorizontal: 20,
     paddingTop: 20,
-    rowGap: 20,
+    rowGap: 10,
   },
   bottomSheetOptionButton: {
-    height: 32,
+    height: ROW_HEIGHT,
+    justifyContent: 'center',
   },
   bottomSheetOptionContainer: {
     flexDirection: 'row',
