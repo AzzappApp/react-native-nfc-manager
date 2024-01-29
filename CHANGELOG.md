@@ -1,5 +1,6 @@
-## 0.5.5-canary.21
+## 0.5.5-canary.22
 
+* **fix:**  - 🐛 use width to avoid elongated image when square ratio ([#2545](https://github.com/AzzappApp/azzapp/pull/2545))
 * **fix:**  - **webCard:** [#2513](https://github.com/AzzappApp/azzapp/pull/2513) ensure screen sees that it has appeared ([#2537](https://github.com/AzzappApp/azzapp/pull/2537))
 * **fix:**  - **multiUser:** [#2510](https://github.com/AzzappApp/azzapp/pull/2510) block access to media when profile is invited ([#2534](https://github.com/AzzappApp/azzapp/pull/2534))
 * **fix:**  - Scrolling content on profile when adding a first module is very big ([#2539](https://github.com/AzzappApp/azzapp/pull/2539))
