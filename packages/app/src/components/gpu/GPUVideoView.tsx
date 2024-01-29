@@ -1,4 +1,5 @@
-import { useChildrenLayers } from './GPULayers';
+import { useMemo } from 'react';
+import { transformParameters, useChildrenLayers } from './GPULayers';
 import NativeGPUVideoView from './NativeGPUVideoView';
 import type { GPULayer } from './GPULayers';
 import type { NativeGPUVideoViewProps } from './NativeGPUVideoView';
@@ -10,7 +11,13 @@ export type GPUVideoViewProps = Omit<NativeGPUVideoViewProps, 'layers'> & {
 
 const GPUVideoView = ({ children, layers, ...props }: GPUVideoViewProps) => {
   const childrenLayers = useChildrenLayers(children);
-  layers = layers ? [...childrenLayers, ...layers] : childrenLayers;
+  layers = useMemo(
+    () =>
+      transformParameters(
+        layers ? [...childrenLayers, ...layers] : childrenLayers,
+      ),
+    [childrenLayers, layers],
+  );
 
   return <NativeGPUVideoView {...props} layers={layers} />;
 };

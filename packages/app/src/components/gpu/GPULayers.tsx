@@ -1,40 +1,12 @@
 import { Children, useMemo } from 'react';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
 import { typedEntries } from '@azzapp/shared/objectHelpers';
-
-/**
- * Crop informations for an image or video
- */
-export type CropData = {
-  originX: number;
-  originY: number;
-  width: number;
-  height: number;
-};
-
-/**
- * The orientation of an image or video
- */
-export type ImageOrientation = 'DOWN' | 'LEFT' | 'RIGHT' | 'UP';
-
-export type EditionParameters = {
-  brightness?: number | null;
-  contrast?: number | null;
-  highlights?: number | null;
-  saturation?: number | null;
-  shadow?: number | null;
-  sharpness?: number | null;
-  structure?: number | null;
-  temperature?: number | null;
-  tint?: number | null;
-  vibrance?: number | null;
-  vignetting?: number | null;
-  pitch?: number | null;
-  roll?: number | null;
-  yaw?: number | null;
-  cropData?: CropData | null;
-  orientation?: ImageOrientation | null;
-};
+import {
+  editionParametersTransforms,
+  type CropData,
+  type EditionParameters,
+  type ImageOrientation,
+} from './EditionParameters';
 
 export type Blending = 'multiply' | 'none';
 
@@ -131,6 +103,27 @@ export const extractLayer = (child: unknown): GPULayer | null => {
     }
   }
   return null;
+};
+
+export const transformParameters = (layers: GPULayer[]) => {
+  if (!layers) return layers;
+
+  return layers.map(layer => ({
+    ...layer,
+    parameters: layer.parameters
+      ? typedEntries(layer.parameters).reduce((acc, [key, value]) => {
+          const transform = editionParametersTransforms[key];
+          if (value != null && transform != null) {
+            // @ts-expect-error no mapped type in TS
+            acc[key] = transform(value);
+          } else {
+            // @ts-expect-error no mapped type in TS
+            acc[key] = value;
+          }
+          return acc;
+        }, {} as EditionParameters)
+      : null,
+  }));
 };
 
 export const useChildrenLayers = (children: React.ReactNode) =>

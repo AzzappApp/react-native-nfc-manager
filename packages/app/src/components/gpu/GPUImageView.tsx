@@ -1,5 +1,6 @@
+import { useMemo } from 'react';
 import NativeGPUImageView from './NativeGPUImageView';
-import { useChildrenLayers } from '.';
+import { transformParameters, useChildrenLayers } from '.';
 import type { GPULayer } from '.';
 import type { NativeGPUImageViewProps } from './NativeGPUImageView';
 
@@ -10,7 +11,13 @@ export type GPUImageViewProps = Omit<NativeGPUImageViewProps, 'layers'> & {
 
 const GPUImageView = ({ children, layers, ...props }: GPUImageViewProps) => {
   const childrenLayers = useChildrenLayers(children);
-  layers = layers ? [...childrenLayers, ...layers] : childrenLayers;
+  layers = useMemo(
+    () =>
+      transformParameters(
+        layers ? [...childrenLayers, ...layers] : childrenLayers,
+      ),
+    [childrenLayers, layers],
+  );
 
   return <NativeGPUImageView {...props} layers={layers} />;
 };

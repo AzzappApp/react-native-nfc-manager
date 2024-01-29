@@ -1,9 +1,12 @@
-import { StyleSheet, View } from 'react-native';
+import { Platform, StyleSheet, View } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import FloatingButton from '#ui/FloatingButton';
 import Icon from '#ui/Icon';
 import Text from '#ui/Text';
-import { useEditionParametersDisplayInfos } from './gpu';
+import {
+  editionParametersSettings,
+  useEditionParametersDisplayInfos,
+} from './gpu';
 import type { EditionParameters } from './gpu';
 import type { ScrollViewProps } from 'react-native';
 
@@ -31,7 +34,14 @@ const EditionParametersList = ({
   return (
     <ScrollView {...props} horizontal showsHorizontalScrollIndicator={false}>
       {parametersList
-        .filter(param => !excludedParams?.includes(param))
+        .filter(param => {
+          const supported = Platform.select({
+            ios: editionParametersSettings[param]?.ios ?? true,
+            android: editionParametersSettings[param]?.android ?? true,
+            default: false,
+          });
+          return supported && !excludedParams?.includes(param);
+        })
         .map(param => {
           const { label, icon } = paramsInfos[param]!;
           return (
@@ -73,7 +83,7 @@ const parametersList: Array<keyof EditionParameters> = [
   'cropData',
   'brightness',
   'contrast',
-  // 'highlights',
+  'highlights',
   'shadow',
   'temperature',
   'tint',
