@@ -2456,10 +2456,10 @@
     mv "~2"
     safe-json-stringify "~1"
 
-"@expo/cli@0.17.2":
-  version "0.17.2"
-  resolved "https://registry.yarnpkg.com/@expo/cli/-/cli-0.17.2.tgz#398b504e9f938eb6786abf3834b423932f582a05"
-  integrity sha512-0uJGuiV8XGjsTGnga95CiCZAtAymtQlo8FxRBp7AjLKpG/oTXG7+s368H7ZIC+XQBsvWx83iv+HyXQfOtPbsxQ==
+"@expo/cli@0.17.3":
+  version "0.17.3"
+  resolved "https://registry.yarnpkg.com/@expo/cli/-/cli-0.17.3.tgz#0763696671522062e5592411d02952ed905d4838"
+  integrity sha512-lIK8igsEQxTh4WuDlcEhE0wAJcDrAyjWDF00phdmwuSCpE5SaEXNlddOXvGxEVKPhUxHZUFo9NbfoQC+JVmkfA==
   dependencies:
     "@babel/runtime" "^7.20.0"
     "@expo/code-signing-certificates" "0.0.5"
@@ -3017,6 +3017,15 @@
     "@formatjs/icu-skeleton-parser" "1.7.2"
     tslib "^2.4.0"
 
+"@formatjs/icu-messageformat-parser@2.7.6":
+  version "2.7.6"
+  resolved "https://registry.yarnpkg.com/@formatjs/icu-messageformat-parser/-/icu-messageformat-parser-2.7.6.tgz#3d69806de056d2919d53dad895a5ff4851e4e9ff"
+  integrity sha512-etVau26po9+eewJKYoiBKP6743I1br0/Ie00Pb/S/PtmYfmjTcOn2YCh2yNkSZI12h6Rg+BOgQYborXk46BvkA==
+  dependencies:
+    "@formatjs/ecma402-abstract" "1.18.2"
+    "@formatjs/icu-skeleton-parser" "1.8.0"
+    tslib "^2.4.0"
+
 "@formatjs/icu-skeleton-parser@1.6.0":
   version "1.6.0"
   resolved "https://registry.yarnpkg.com/@formatjs/icu-skeleton-parser/-/icu-skeleton-parser-1.6.0.tgz#0728be8b6b3656f1a4b8e6e5b0e02dffffc23c6c"
@@ -3037,6 +3046,14 @@
   version "1.7.2"
   resolved "https://registry.yarnpkg.com/@formatjs/icu-skeleton-parser/-/icu-skeleton-parser-1.7.2.tgz#ffbdd535c33249635ad0e54a34813194287a1567"
   integrity sha512-nlIXVv280bjGW3ail5Np1+xgGKBnMhwQQIivgbk9xX0af8ESQO+y2VW9TOY7mCrs3WH786uVpZlLimXAlXH7SA==
+  dependencies:
+    "@formatjs/ecma402-abstract" "1.18.2"
+    tslib "^2.4.0"
+
+"@formatjs/icu-skeleton-parser@1.8.0":
+  version "1.8.0"
+  resolved "https://registry.yarnpkg.com/@formatjs/icu-skeleton-parser/-/icu-skeleton-parser-1.8.0.tgz#5f3d3a620c687d6f8c180d80d1241e8f213acf79"
+  integrity sha512-QWLAYvM0n8hv7Nq5BEs4LKIjevpVpbGLAJgOaYzg9wABEoX1j0JO1q2/jVkO6CVlq0dbsxZCngS5aXbysYueqA==
   dependencies:
     "@formatjs/ecma402-abstract" "1.18.2"
     tslib "^2.4.0"
@@ -3120,6 +3137,19 @@
   dependencies:
     "@formatjs/ecma402-abstract" "1.18.2"
     "@formatjs/intl-localematcher" "0.5.4"
+    tslib "^2.4.0"
+
+"@formatjs/intl@2.10.0":
+  version "2.10.0"
+  resolved "https://registry.yarnpkg.com/@formatjs/intl/-/intl-2.10.0.tgz#d7bb557e172ceb0bb0be9298b61e9de957119985"
+  integrity sha512-X3xT9guVkKDS86EKV80lS0KxoazUglkJTGZO66sKY7otgl0VeStPA8B3u8UkKT47PexVV98fUzjpkchYmbe9nw==
+  dependencies:
+    "@formatjs/ecma402-abstract" "1.18.2"
+    "@formatjs/fast-memoize" "2.2.0"
+    "@formatjs/icu-messageformat-parser" "2.7.6"
+    "@formatjs/intl-displaynames" "6.6.6"
+    "@formatjs/intl-listformat" "7.5.5"
+    intl-messageformat "10.5.11"
     tslib "^2.4.0"
 
 "@formatjs/intl@2.9.11":
@@ -5242,10 +5272,10 @@
     invariant "^2.2.4"
     nullthrows "^1.1.1"
 
-"@reeq/react-native-passkit@^0.1.2":
-  version "0.1.2"
-  resolved "https://registry.yarnpkg.com/@reeq/react-native-passkit/-/react-native-passkit-0.1.2.tgz#da693ece1f00292254790c49b86072b3208aeed3"
-  integrity sha512-xkKGh7fSZHOop1c+ZGQLiQSBp8vph6gludKrvutbJTPi23/bzkXIXB1by+jZG8oLQaCNbtsXZ0FuRvG22RFZig==
+"@reeq/react-native-passkit@^0.1.3":
+  version "0.1.3"
+  resolved "https://registry.yarnpkg.com/@reeq/react-native-passkit/-/react-native-passkit-0.1.3.tgz#7733426e9c9b4075d403103b8a67662c01a21e0d"
+  integrity sha512-sObqb8F4mXvwzVp0E+mJmdRLF+L1vvtuf/9LVBdtMTtuWCtmpEChoqTshHbgnNa4MTuL34liuWgF406A0wkvUQ==
 
 "@repeaterjs/repeater@^3.0.4":
   version "3.0.4"
@@ -5471,45 +5501,45 @@
     "@sentry/types" "7.93.0"
     "@sentry/utils" "7.93.0"
 
-"@sentry/cli-darwin@2.23.0":
-  version "2.23.0"
-  resolved "https://registry.yarnpkg.com/@sentry/cli-darwin/-/cli-darwin-2.23.0.tgz#1a4f149071a77f2e767a9cd7997b0b9257eae59f"
-  integrity sha512-tWuTxvb6P5pA0E+O1/7jKQ6AP45DOOW+BAd7mwBMHZ+5xG3nsvvrRS9hOIzBNPTeB2RyIEXgpQ2Mb6NdD21DBQ==
+"@sentry/cli-darwin@2.25.2":
+  version "2.25.2"
+  resolved "https://registry.yarnpkg.com/@sentry/cli-darwin/-/cli-darwin-2.25.2.tgz#9fd935aa0381acbf2e22aef23eddc90d6efc1d97"
+  integrity sha512-o1d5NnVUrc1dxDm56k7Co8tSTcOuxbApdxweVXXsiq20HblZCyIi7WxxRkAg4RfKx594sKGiw9uCVvECi+9UpA==
 
-"@sentry/cli-linux-arm64@2.23.0":
-  version "2.23.0"
-  resolved "https://registry.yarnpkg.com/@sentry/cli-linux-arm64/-/cli-linux-arm64-2.23.0.tgz#f3f154dc9ee68b4c3e6386ececb7c4b7dbe6cdbe"
-  integrity sha512-KsOckP+b0xAzrRuoP4eiqJ6ASD6SqIplL8BCHOAODQfvWn9rgNwsJWOgKlWwfrJnkJYkpWVYvYeyx0oeUx3N0g==
+"@sentry/cli-linux-arm64@2.25.2":
+  version "2.25.2"
+  resolved "https://registry.yarnpkg.com/@sentry/cli-linux-arm64/-/cli-linux-arm64-2.25.2.tgz#4a442d55f4e0a849b6faebd151d0d2277abf5de9"
+  integrity sha512-lm5jaigV6xu9Gwo0wNk+bX6yVkl5k3gNXcSXcKCISFo+Teb7Zhf9IyXANPm4VY2DdiZAjPJt8gS1bu+Mn7irtQ==
 
-"@sentry/cli-linux-arm@2.23.0":
-  version "2.23.0"
-  resolved "https://registry.yarnpkg.com/@sentry/cli-linux-arm/-/cli-linux-arm-2.23.0.tgz#93afbf73c21b69c0e7b605d7508ee8002f90bba0"
-  integrity sha512-1R8ngBDKtPw++Km6VnVTx76ndrBL9BuBBNpF9TUCGftK3ArdaifqoIx8cZ8aKu8sWXLAKO7lHzxL4BNPZvlDiw==
+"@sentry/cli-linux-arm@2.25.2":
+  version "2.25.2"
+  resolved "https://registry.yarnpkg.com/@sentry/cli-linux-arm/-/cli-linux-arm-2.25.2.tgz#053430a6508450b382fc980195cbd5cc0fe90d86"
+  integrity sha512-n398jd87Ymejt5k/6RjCEjXAvntOWuqhBDANxzhgr5/9FzbODJ844g1mOpcxiIlduzKSzWlPbTEKQulMp2Mt4w==
 
-"@sentry/cli-linux-i686@2.23.0":
-  version "2.23.0"
-  resolved "https://registry.yarnpkg.com/@sentry/cli-linux-i686/-/cli-linux-i686-2.23.0.tgz#4a2db236f94474aea127abcb73402c5aa5a48f89"
-  integrity sha512-KRqB98KstBkKh33ZqUq+q8O0U4c01aTWCNPpVrqAX7zikSk0AAJTG8eAtqwDSx949IkKUl8xa6PFLfz+Nb2EMQ==
+"@sentry/cli-linux-i686@2.25.2":
+  version "2.25.2"
+  resolved "https://registry.yarnpkg.com/@sentry/cli-linux-i686/-/cli-linux-i686-2.25.2.tgz#ce72717f48890984a805c82d116a9da115fc53a1"
+  integrity sha512-/YYx2gfqO5mkxyBgFcnDbZzkZ2+2xNarwrqWcqq3Qw0XlO9DWAQB2G+twV1RW/UfSU6fFIWErn94efh2EWmyzQ==
 
-"@sentry/cli-linux-x64@2.23.0":
-  version "2.23.0"
-  resolved "https://registry.yarnpkg.com/@sentry/cli-linux-x64/-/cli-linux-x64-2.23.0.tgz#fd0a1ac2fe4841247dcf89e43f3df9a416719259"
-  integrity sha512-USHZ0zzg9qujGYAyRjLeUfLDZOMgNjCr82m0BSBMmlFs4oKwHmO6bSvdi9UzNNcpmkOavNAdUM4jnZWk11i46Q==
+"@sentry/cli-linux-x64@2.25.2":
+  version "2.25.2"
+  resolved "https://registry.yarnpkg.com/@sentry/cli-linux-x64/-/cli-linux-x64-2.25.2.tgz#fb178ac3540f64595a17dd95b4b2071f18aa098a"
+  integrity sha512-rRafqy84R5mYA4JEfNsUeN10af5euJnK7fgqYM0mJIaplHC2YEXT9aUYWoryWPZiYqmdNUhsA6lX7iynSW9pZw==
 
-"@sentry/cli-win32-i686@2.23.0":
-  version "2.23.0"
-  resolved "https://registry.yarnpkg.com/@sentry/cli-win32-i686/-/cli-win32-i686-2.23.0.tgz#0201030d2128a2fba79e3fd7e644052151bb21ed"
-  integrity sha512-lS/B3pONDl18IEu/I//3vcMnosThobyXpqfAm4WYUtFTiw/wwDHgwGgaIjZWm5wMRkPFzYoRFpZfPlUrJd/4cQ==
+"@sentry/cli-win32-i686@2.25.2":
+  version "2.25.2"
+  resolved "https://registry.yarnpkg.com/@sentry/cli-win32-i686/-/cli-win32-i686-2.25.2.tgz#e0d73977771a578439207ea7863cde422a6cfee2"
+  integrity sha512-plT/gi41F+67g9AwrEm4avRXnjCtHCcnRnJ6zPu/iINGap8mvYQJSU/qM0oGwV6hRGg3JJN66XIvJPIuIs8P8w==
 
-"@sentry/cli-win32-x64@2.23.0":
-  version "2.23.0"
-  resolved "https://registry.yarnpkg.com/@sentry/cli-win32-x64/-/cli-win32-x64-2.23.0.tgz#648b99be78af130dbb0a53506d5c55bbe0d46472"
-  integrity sha512-7LP6wA3w93ViYKQR8tMN2i/SfpQzaXqM2SAHI3yfJ3bdREHOV3+/N0mNiWVRvgL0TKNQJS42v2IILLhiDxufHQ==
+"@sentry/cli-win32-x64@2.25.2":
+  version "2.25.2"
+  resolved "https://registry.yarnpkg.com/@sentry/cli-win32-x64/-/cli-win32-x64-2.25.2.tgz#f21f71e7c2c60f99dd62c3360e4b0cda4f27d877"
+  integrity sha512-Mb6mAyPi9gIfpzF5MTk0JXgFP9nxka3Fb7JYn6AY4RW++sOjapkTrcXL2Gp3ZfQkWj5rFTgln4+eNmZPsD2gzA==
 
-"@sentry/cli@2.23.0":
-  version "2.23.0"
-  resolved "https://registry.yarnpkg.com/@sentry/cli/-/cli-2.23.0.tgz#d8fa6a514aedfe316a8afc046435b96746e7099f"
-  integrity sha512-xFTv7YOaKWMCSPgN8A1jZpxJQhwdES89pqMTWjJOgjmkwFvziuaTM7O7kazps/cACDhJp2lK2j6AT6imhr4t9w==
+"@sentry/cli@2.25.2":
+  version "2.25.2"
+  resolved "https://registry.yarnpkg.com/@sentry/cli/-/cli-2.25.2.tgz#7e8eec38c19ee27cb3f5c5a7ba3e80ad587c6517"
+  integrity sha512-lgt1QPaCfs/QZNXwyw3gvuBR2/CLwFSdU/oT7Bpxwizz8XVXhlKS98zJF1UVCy7SecsDSoOI0Z+B+X658cpquQ==
   dependencies:
     https-proxy-agent "^5.0.0"
     node-fetch "^2.6.7"
@@ -5517,13 +5547,13 @@
     proxy-from-env "^1.1.0"
     which "^2.0.2"
   optionalDependencies:
-    "@sentry/cli-darwin" "2.23.0"
-    "@sentry/cli-linux-arm" "2.23.0"
-    "@sentry/cli-linux-arm64" "2.23.0"
-    "@sentry/cli-linux-i686" "2.23.0"
-    "@sentry/cli-linux-x64" "2.23.0"
-    "@sentry/cli-win32-i686" "2.23.0"
-    "@sentry/cli-win32-x64" "2.23.0"
+    "@sentry/cli-darwin" "2.25.2"
+    "@sentry/cli-linux-arm" "2.25.2"
+    "@sentry/cli-linux-arm64" "2.25.2"
+    "@sentry/cli-linux-i686" "2.25.2"
+    "@sentry/cli-linux-x64" "2.25.2"
+    "@sentry/cli-win32-i686" "2.25.2"
+    "@sentry/cli-win32-x64" "2.25.2"
 
 "@sentry/cli@^1.77.1":
   version "1.77.1"
@@ -5612,13 +5642,13 @@
     "@sentry/utils" "7.93.0"
     https-proxy-agent "^5.0.0"
 
-"@sentry/react-native@^5.16.0":
-  version "5.16.0"
-  resolved "https://registry.yarnpkg.com/@sentry/react-native/-/react-native-5.16.0.tgz#a75b53ce28ac3e651be3dbd6ae27205778357b27"
-  integrity sha512-Tc67g4UJO7nFJWrbsTGP/zrsTErXWvL8YNOR9pNvGPcsNdP2HcLrYfuHE7B29EQZeH6psEGVJuWeWbdlqRuKzA==
+"@sentry/react-native@^5.17.0":
+  version "5.17.0"
+  resolved "https://registry.yarnpkg.com/@sentry/react-native/-/react-native-5.17.0.tgz#e85d28417558f12abca82f1abde1d7006598f5d2"
+  integrity sha512-d0TLASMcpUtvw0A8zNznRyCskfH0kwfb3GzqMXXpfPJAG8vsBnY15EFOIc+czOLt6FbV9o3567bHYWhSW51Ssg==
   dependencies:
     "@sentry/browser" "7.81.1"
-    "@sentry/cli" "2.23.0"
+    "@sentry/cli" "2.25.2"
     "@sentry/core" "7.81.1"
     "@sentry/hub" "7.81.1"
     "@sentry/integrations" "7.81.1"
@@ -5724,10 +5754,10 @@
     recyclerlistview "4.2.0"
     tslib "2.4.0"
 
-"@shopify/react-native-skia@^0.1.236":
-  version "0.1.236"
-  resolved "https://registry.yarnpkg.com/@shopify/react-native-skia/-/react-native-skia-0.1.236.tgz#a7532873a5176fd16435c66f02181cc76cd833a4"
-  integrity sha512-yE4+AAKgZNflhqQU/nt5OZdNU4sC5TcV8JD1W9SyJsSRADcG0piVKO8PnmrEPT8t316EbVSz7+V0PmgOZmObzQ==
+"@shopify/react-native-skia@^0.1.237":
+  version "0.1.237"
+  resolved "https://registry.yarnpkg.com/@shopify/react-native-skia/-/react-native-skia-0.1.237.tgz#db7a19b76462371bf076715a5f4645faa6f85b51"
+  integrity sha512-PTV81LvmIHt1cmkUjCf6l8q/owppgGEJPn5OCXOKdB82Up0bzY08iOUCGeWqcPo31FNdkz+dAyLHRnS3i/OF2g==
   dependencies:
     canvaskit-wasm "0.39.1"
     react-reconciler "^0.27.0"
@@ -9395,10 +9425,10 @@ expo-asset@~9.0.2:
     invariant "^2.2.4"
     md5-file "^3.2.3"
 
-expo-av@^13.10.3:
-  version "13.10.3"
-  resolved "https://registry.yarnpkg.com/expo-av/-/expo-av-13.10.3.tgz#8eddc9343fb166b790704c5015713041f5eee6bf"
-  integrity sha512-QDq2nIOZXBfc55pkAUQ3ckMH9g107Ws5je8GYTAT6Sn+tPyMA3YOVfwO79w/vFghKQcRFXX4AlBrcpoqCKNq7Q==
+expo-av@^13.10.4:
+  version "13.10.4"
+  resolved "https://registry.yarnpkg.com/expo-av/-/expo-av-13.10.4.tgz#04e549240e513753971dbeef323457e6fa30a60a"
+  integrity sha512-Qlj+ILJ8wVK7J8DT9e6B1FyIcI3kM0iPhgmt7vnSqAWAbexOJRK7IP3MlKqKvHAhwm2OxIU3qJkShF7hvk20xA==
 
 expo-blur@^12.9.1:
   version "12.9.1"
@@ -9459,10 +9489,10 @@ expo-keep-awake@~12.8.2:
   resolved "https://registry.yarnpkg.com/expo-keep-awake/-/expo-keep-awake-12.8.2.tgz#6cfdf8ad02b5fa130f99d4a1eb98e459d5b4332e"
   integrity sha512-uiQdGbSX24Pt8nGbnmBtrKq6xL/Tm3+DuDRGBk/3ZE/HlizzNosGRIufIMJ/4B4FRw4dw8KU81h2RLuTjbay6g==
 
-expo-linear-gradient@~12.7.0:
-  version "12.7.0"
-  resolved "https://registry.yarnpkg.com/expo-linear-gradient/-/expo-linear-gradient-12.7.0.tgz#95516021b20a6fc3b886778bce492be34df48fa0"
-  integrity sha512-4a8m+yf0gcPsBO6MEGz2fgGTdpLzGWuGE8biMN5L/vWfP4L7Erve3dTU1gIr0uYxeTH1RjGtdllqOQsx36WIyw==
+expo-linear-gradient@~12.7.1:
+  version "12.7.1"
+  resolved "https://registry.yarnpkg.com/expo-linear-gradient/-/expo-linear-gradient-12.7.1.tgz#bd4f29826bcf8009efce1cad7752baa1bb892896"
+  integrity sha512-2obkeC1hyOlljCpTbO3xS4WkEEYA9UtgDO486H+8wYYl1qf6C05d+LgWEVMD7B7CKI3xG/g5chPr9T0BLMSY4w==
 
 expo-media-library@~15.9.1:
   version "15.9.1"
@@ -9488,20 +9518,20 @@ expo-modules-core@1.11.8:
   dependencies:
     invariant "^2.2.4"
 
-expo-sensors@~12.9.0:
-  version "12.9.0"
-  resolved "https://registry.yarnpkg.com/expo-sensors/-/expo-sensors-12.9.0.tgz#f9d0a0b9b654285b00cbdcb081e0a1c08cf20c4c"
-  integrity sha512-yqywSbeEAI+eoi7Wyzlsurmp1G4v2LW6vxBQfSHyc4G1h1jw3Nr7ZkJWDiUnolL4TC95Zs5rL1X+WLSNE/NG7g==
+expo-sensors@~12.9.1:
+  version "12.9.1"
+  resolved "https://registry.yarnpkg.com/expo-sensors/-/expo-sensors-12.9.1.tgz#d7c856782ffcfa0860b2a713ab768f3fb197608b"
+  integrity sha512-G2WYHO+RMU9Vj7wvzjV3lPMPDEBvS3S9/oYs1ToaaS4LR6VH8Dr2pJqspS7n8GFq+n5ftEi/2oqE4EizlHX/lQ==
   dependencies:
     invariant "^2.2.4"
 
-expo@^50.0.3:
-  version "50.0.3"
-  resolved "https://registry.yarnpkg.com/expo/-/expo-50.0.3.tgz#0179de2e133644464f3f71f4a1139e4719c21948"
-  integrity sha512-3Yk42YShkugC90S24Dbo0mhrq/N3Kfn30FscrjCk3o8ldXh9OdE5RhVi/mc5Cqp28nw5a4DfiGSDFs0mA0t2ng==
+expo@^50.0.4:
+  version "50.0.4"
+  resolved "https://registry.yarnpkg.com/expo/-/expo-50.0.4.tgz#3ec5349a58b8b3264bc2f218d85b673beb352a99"
+  integrity sha512-8QWBvYZyKFd7pHxbtri8/ZITBR19QbrW2IkezAhs3ZOHR2kluSgNfyo9ojAe7GnOnE8hCB6Xe83Dbm0R3Ealhw==
   dependencies:
     "@babel/runtime" "^7.20.0"
-    "@expo/cli" "0.17.2"
+    "@expo/cli" "0.17.3"
     "@expo/config" "8.5.4"
     "@expo/config-plugins" "7.8.4"
     "@expo/metro-config" "0.17.3"
@@ -10530,10 +10560,10 @@ humanize-ms@^1.2.1:
   dependencies:
     ms "^2.0.0"
 
-i18n-iso-countries@^7.7.0:
-  version "7.7.0"
-  resolved "https://registry.yarnpkg.com/i18n-iso-countries/-/i18n-iso-countries-7.7.0.tgz#33a0974d6ffbe864fb853325de3afb4717c54b52"
-  integrity sha512-07zMatrSsR1Z+cnxW//7s14Xf4v5g6U6ORHPaH8+Ox4uPqV+y46Uq78veYV8H1DKTr76EfdjSeaTxHpnaYq+bw==
+i18n-iso-countries@^7.8.0:
+  version "7.8.0"
+  resolved "https://registry.yarnpkg.com/i18n-iso-countries/-/i18n-iso-countries-7.8.0.tgz#6b66bf323bf662d66dad590866dd5f264eaf4d8e"
+  integrity sha512-XNxPF0cpNFDxz/FA/uMoONFwvRoWFzrtU8OTOXKMXNpoY7FtqKSKF++/jxTKkMEew0J2MGB8Mf/f1j+BEW/hfw==
   dependencies:
     diacritics "1.3.0"
 
@@ -10711,6 +10741,16 @@ intl-messageformat@10.5.10:
     "@formatjs/ecma402-abstract" "1.18.2"
     "@formatjs/fast-memoize" "2.2.0"
     "@formatjs/icu-messageformat-parser" "2.7.5"
+    tslib "^2.4.0"
+
+intl-messageformat@10.5.11:
+  version "10.5.11"
+  resolved "https://registry.yarnpkg.com/intl-messageformat/-/intl-messageformat-10.5.11.tgz#95d6a3b0b303f924d5d8c3f8d3ad057d1dc73c64"
+  integrity sha512-eYq5fkFBVxc7GIFDzpFQkDOZgNayNTQn4Oufe8jw6YY6OHVw70/4pA3FyCsQ0Gb2DnvEJEMmN2tOaXUGByM+kg==
+  dependencies:
+    "@formatjs/ecma402-abstract" "1.18.2"
+    "@formatjs/fast-memoize" "2.2.0"
+    "@formatjs/icu-messageformat-parser" "2.7.6"
     tslib "^2.4.0"
 
 invariant@^2.2.4:
@@ -12450,10 +12490,10 @@ loose-envify@^1.0.0, loose-envify@^1.1.0, loose-envify@^1.4.0:
   dependencies:
     js-tokens "^3.0.0 || ^4.0.0"
 
-lottie-react-native@^6.5.1:
-  version "6.5.1"
-  resolved "https://registry.yarnpkg.com/lottie-react-native/-/lottie-react-native-6.5.1.tgz#7986078648d1ff274a704ae3bd979a4c3aa235c6"
-  integrity sha512-pjih71P6qX6Ax5ucUBA+YJO7+fnveI581Bd8LmYeARm3spq3AnoGzEkrWaieM8odnK6WI4d5dwEJsxge/QjFPw==
+lottie-react-native@^6.6.0:
+  version "6.6.0"
+  resolved "https://registry.yarnpkg.com/lottie-react-native/-/lottie-react-native-6.6.0.tgz#080c69e4cd149adec0e5e67b320646890031c73f"
+  integrity sha512-ttS8qrtjrWc/tmAbCLjvqWpC+cfbwSPLZIWpNdiW2Z1WwqA653JSSJSPxf4c/ut2rwoIuKSBBkeaY2IvmCAQAg==
 
 lottie-web@^5.12.2:
   version "5.12.2"
@@ -14663,6 +14703,22 @@ react-intl@^6.6.1:
     intl-messageformat "10.5.10"
     tslib "^2.4.0"
 
+react-intl@^6.6.2:
+  version "6.6.2"
+  resolved "https://registry.yarnpkg.com/react-intl/-/react-intl-6.6.2.tgz#97a044afa9cac65ae62f404c8bb9cbd3aec52d41"
+  integrity sha512-IpW2IkLtGENSFlX3vfH11rjuCIsW0VyjT0Q1pPKMZPtT2z1FxLt4weFT5Ezti2TScT1xiyb3aQBFth9EB7jzAg==
+  dependencies:
+    "@formatjs/ecma402-abstract" "1.18.2"
+    "@formatjs/icu-messageformat-parser" "2.7.6"
+    "@formatjs/intl" "2.10.0"
+    "@formatjs/intl-displaynames" "6.6.6"
+    "@formatjs/intl-listformat" "7.5.5"
+    "@types/hoist-non-react-statics" "^3.3.1"
+    "@types/react" "16 || 17 || 18"
+    hoist-non-react-statics "^3.3.2"
+    intl-messageformat "10.5.11"
+    tslib "^2.4.0"
+
 "react-is@^16.12.0 || ^17.0.0 || ^18.0.0", react-is@^18.0.0, react-is@^18.2.0:
   version "18.2.0"
   resolved "https://registry.yarnpkg.com/react-is/-/react-is-18.2.0.tgz#199431eeaaa2e09f86427efbb4f1473edb47609b"
@@ -14691,11 +14747,12 @@ react-native-blob-util@^0.19.6:
     base-64 "0.1.0"
     glob "^10.3.10"
 
-react-native-bootsplash@^5.2.2:
-  version "5.2.2"
-  resolved "https://registry.yarnpkg.com/react-native-bootsplash/-/react-native-bootsplash-5.2.2.tgz#521aa16858ca0e98e1e9d2f71aa5b7dccb21dae6"
-  integrity sha512-iht65USUnJPQ747I2s/miuYvSwioRtwacB85lmECnJAtJLbj7Ms7hZoi2PLY8L+DAanwrXxQx+qk+rWVujSaEA==
+react-native-bootsplash@^5.3.0:
+  version "5.3.0"
+  resolved "https://registry.yarnpkg.com/react-native-bootsplash/-/react-native-bootsplash-5.3.0.tgz#15f856a3e8e5102a8f695bb41632f656c49ada44"
+  integrity sha512-BVCD/2sBU8f8yipaKWN79guIeGqose+O0lXxl/Zt6afZfjav20hT4NubISqqdSRCZ7ruoKSSjCMtb/6DkUxrNQ==
   dependencies:
+    "@emotion/hash" "^0.9.1"
     detect-indent "^6.1.0"
     fs-extra "^11.2.0"
     node-html-parser "^6.1.12"
@@ -14778,10 +14835,10 @@ react-native-pager-view@^6.2.3:
   resolved "https://registry.yarnpkg.com/react-native-pager-view/-/react-native-pager-view-6.2.3.tgz#698f6387fdf06cecc3d8d4792604419cb89cb775"
   integrity sha512-dqVpXWFtPNfD3D2QQQr8BP+ullS5MhjRJuF8Z/qml4QTILcrWaW8F5iAxKkQR3Jl0ikcEryG/+SQlNcwlo0Ggg==
 
-react-native-permissions@^4.0.4:
-  version "4.0.4"
-  resolved "https://registry.yarnpkg.com/react-native-permissions/-/react-native-permissions-4.0.4.tgz#5156d61230193c5eedd96a6e54f2a1e65d582baf"
-  integrity sha512-7xU71u1Xe239F7DCvO3rfuqthzOa52v5Nvd0OQ5OpEkL9S9UGhWMLRw0b7OC9zti846puTGJDnjy8FvXiAzgxQ==
+react-native-permissions@^4.1.0:
+  version "4.1.0"
+  resolved "https://registry.yarnpkg.com/react-native-permissions/-/react-native-permissions-4.1.0.tgz#6f09c2ea6d20554608312ca6450990abe52392ac"
+  integrity sha512-P07Ge+gxj0yLcKPE9YK5EQq6PEYDi78aHtJs8E6LAh0actAqe3r3CxnqyVHJ+w4NQbXCJwoqqGTLULYn7OeuhA==
 
 react-native-qrcode-svg@^6.2.0:
   version "6.2.0"
@@ -14926,16 +14983,16 @@ react-refresh@0.14.0, react-refresh@^0.14.0:
   resolved "https://registry.yarnpkg.com/react-refresh/-/react-refresh-0.14.0.tgz#4e02825378a5f227079554d4284889354e5f553e"
   integrity sha512-wViHqhAd8OHeLS/IRMJjTSDHF3U9eWi62F/MledQGPdJGDhodXJ9PBLNGr6WWL7qlH12Mt3TyTpbS+hGXMjCzQ==
 
-react-relay@^16.1.0:
-  version "16.1.0"
-  resolved "https://registry.yarnpkg.com/react-relay/-/react-relay-16.1.0.tgz#de363f52d49bd01a8543c5d515cc034f97835483"
-  integrity sha512-qwm5PC+Vwy+qzs+Ob/PKs3YAWZOK2jm87GaMa44pHGR62ENS6xpFGXsANKAvFas1CUJ75yaexuGRO6z7RPnk8w==
+react-relay@^16.2.0:
+  version "16.2.0"
+  resolved "https://registry.yarnpkg.com/react-relay/-/react-relay-16.2.0.tgz#ce74e771ee925c03a62491f3cb8268b4d5d82514"
+  integrity sha512-f/HtC4whyYmK6/WUeOVakXRoBkV+JEgoSeBHXfIC2U6AuH14NrKXnFicX65LksfzgD1OUfYF6IqGQ4MvO52lTQ==
   dependencies:
     "@babel/runtime" "^7.0.0"
     fbjs "^3.0.2"
     invariant "^2.2.4"
     nullthrows "^1.1.1"
-    relay-runtime "16.1.0"
+    relay-runtime "16.2.0"
 
 react-shallow-renderer@^16.15.0:
   version "16.15.0"
@@ -15182,24 +15239,24 @@ relay-runtime@12.0.0:
     fbjs "^3.0.0"
     invariant "^2.2.4"
 
-relay-runtime@16.1.0:
-  version "16.1.0"
-  resolved "https://registry.yarnpkg.com/relay-runtime/-/relay-runtime-16.1.0.tgz#7ea5fa0e5964069f1bcfe802a41a20f92560e704"
-  integrity sha512-SM5MP4ETxTtYrXya5ceAEF3XuVzlku48+YyaxZkTnXG/FUvE2QfIxkZ5P2Q/j33Eo9tfrcl4UfZoSkx6IbQ37Q==
+relay-runtime@16.2.0:
+  version "16.2.0"
+  resolved "https://registry.yarnpkg.com/relay-runtime/-/relay-runtime-16.2.0.tgz#1126b67749b89f6d4855ebd7e5749033fab5b97f"
+  integrity sha512-SrIyYItH1EZUj37NI8nZALasuq7mNyFrrSNgMefhgxNZxTVnr1KCp43LaxUfZqhsWbw4Y00JSGDRQXlcv4STHQ==
   dependencies:
     "@babel/runtime" "^7.0.0"
     fbjs "^3.0.2"
     invariant "^2.2.4"
 
-relay-test-utils@^16.1.0:
-  version "16.1.0"
-  resolved "https://registry.yarnpkg.com/relay-test-utils/-/relay-test-utils-16.1.0.tgz#5e0c758bcab5e4f222832a521008d2e73258d4a0"
-  integrity sha512-EtPSPez4ypbk81LnPn69LMUPCUrvISobVPEAY0vqf5jFSQcXFz3KBYc46bUh1txnLTED3jWGnn7Qfy8fEBEiyQ==
+relay-test-utils@^16.2.0:
+  version "16.2.0"
+  resolved "https://registry.yarnpkg.com/relay-test-utils/-/relay-test-utils-16.2.0.tgz#0f94b65a169bca2fc98d3f06b93e0cc006bb7a97"
+  integrity sha512-nslgYqW7bIwEvlUbZoISgLz2TGh3/wHZWEQSwQ7oFZ8gpw6mRatG1ortIywGLhfqsRw5q9t6BJXdiqbl4BPu4w==
   dependencies:
     "@babel/runtime" "^7.0.0"
     fbjs "^3.0.2"
     invariant "^2.2.4"
-    relay-runtime "16.1.0"
+    relay-runtime "16.2.0"
 
 remedial@^1.0.7:
   version "1.0.8"
