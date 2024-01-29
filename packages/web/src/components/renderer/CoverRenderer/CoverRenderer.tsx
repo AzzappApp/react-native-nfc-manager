@@ -160,6 +160,7 @@ const CoverRenderer = ({
       style={{
         aspectRatio: `${COVER_RATIO}`,
         width,
+        borderRadius: width ? `${(35 / 300) * width}px` : undefined,
       }}
       className={styles.content}
     >
@@ -169,6 +170,7 @@ const CoverRenderer = ({
             coverData.backgroundColor ?? 'light',
             cardColors ?? DEFAULT_COLOR_PALETTE,
           ),
+          borderRadius: width ? `${(39 / 300) * width}px` : undefined,
         }}
         className={styles.backgroundContent}
       />

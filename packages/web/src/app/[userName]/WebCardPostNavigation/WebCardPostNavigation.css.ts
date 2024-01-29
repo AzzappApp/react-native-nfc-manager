@@ -67,7 +67,6 @@ const coverContainer = style({
 
 const cover = style({
   objectFit: 'cover',
-  borderRadius: 20,
 });
 
 const clickable = style({
