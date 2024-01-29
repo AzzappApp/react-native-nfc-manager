@@ -209,6 +209,8 @@ const WebcardParametersNameForm = ({
   const userName = watch('userName');
   const [debouncedUserName] = useDebounce(userName, 200);
 
+  const userNameError = webCard.userName !== userName && errors.userName;
+
   useEffect(() => {
     if (debouncedUserName) {
       void trigger('userName');
@@ -254,7 +256,7 @@ const WebcardParametersNameForm = ({
         <Controller
           control={control}
           name="userName"
-          render={({ field: { onChange, value }, formState: { errors } }) => (
+          render={({ field: { onChange, value } }) => (
             <View style={{ flex: 1, height: 50 }}>
               <TextInput
                 nativeID="userName"
@@ -263,7 +265,7 @@ const WebcardParametersNameForm = ({
                   defaultMessage: 'Choose an username',
                   description: 'ProfileForm username textinput placeholder',
                 })}
-                isErrored={errors.userName != null}
+                isErrored={!!userNameError}
                 value={value}
                 onChangeText={text => onChange(text.toLowerCase())}
                 autoCapitalize="none"
@@ -276,8 +278,8 @@ const WebcardParametersNameForm = ({
           )}
         />
       </View>
-      {errors.userName ? (
-        <Text variant="error">{errors.userName.message}</Text>
+      {userNameError ? (
+        <Text variant="error">{userNameError.message}</Text>
       ) : null}
       {errors.root?.server ? (
         <Text variant="error">{errors.root.server.message}</Text>
