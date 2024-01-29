@@ -20,7 +20,7 @@ const HomeCoverIcon = ({ webCardId }: HomeIconProps) => {
     {
       webCardId,
     },
-    { fetchPolicy: 'store-only' },
+    { fetchPolicy: 'store-or-network' },
   );
 
   return (
