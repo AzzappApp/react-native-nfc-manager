@@ -1,5 +1,6 @@
-## 0.5.5-canary.28
+## 0.5.5-canary.29
 
+* **build:**  - upgrade expo ([#2560](https://github.com/AzzappApp/azzapp/pull/2560))
 * **build:**  - android - add missing product flavor in command
 * **build:**  - android - assemble apk
 * **fix:**  - 🐛 display error when username is different from locql ([#2549](https://github.com/AzzappApp/azzapp/pull/2549))
