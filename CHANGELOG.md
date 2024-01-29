@@ -1,4 +1,4 @@
-## 0.5.5-canary.24
+## 0.5.5-canary.25
 
 * **fix:**  - HomeBottomSheetPanel with separator ([#2548](https://github.com/AzzappApp/azzapp/pull/2548))
 * **fix:**  - **Home:** invitation profile
