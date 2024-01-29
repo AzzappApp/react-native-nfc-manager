@@ -97,106 +97,56 @@ jobs:
       - name: Test
         run: yarn test
 
+
       ############################################
       #
       # Bump version
       #
       ############################################
-      - name: Git config
-        run: |
-          git config user.name "Azzapp Dev Bot"
-          git config user.email "azzapp-dev-bot@azzapp.com"
-
       - name: Bump version
         run: |
           yarn bump-version
           if [ "$GITHUB_REF" == "refs/heads/main" ]; then
             yarn write-dev-changelog
           fi
-          git add .
-          git commit -m "chore: bump version [skip ci]"
-          git push origin $GITHUB_REF_NAME
-          yarn install --frozen-lockfile  --immutable
         env:
           github_token: ${{ secrets.ADMIN_GITHUB_TOKEN }}
-        
+
+      
       ############################################
       #
       # Precompiled Queries merging
       #
       ############################################
-      - name: Fetch the previous query-map.json file from AzzappApp/azzapp-precompiled-queries repository
-        uses: actions/checkout@v3
-        with: 
-          repository: 'AzzappApp/azzapp-precompiled-queries'
-          path: 'azzapp-precompiled-queries'
-          token: ${{ secrets.QUERY_MAP_PAT }}
-          ref: 'main'
-
-      - name: Copy the the previous query-map.json file
-        if: github.ref == 'refs/heads/staging' || github.ref == 'refs/heads/main' || github.ref == 'refs/heads/stable'
-        run: |
-          touch azzapp-precompiled-queries/${{ github.ref_name }}/persisted-query-map.json 
-          cp -R azzapp-precompiled-queries/${{ github.ref_name }}/persisted-query-map.json packages/web/src 
-
-      # use manual command instead of build command for passing --repersist option to relay
       - name: Force rebuild the query-map.json
         run: yarn relay:build --repersist
         if: github.ref == 'refs/heads/staging' || github.ref == 'refs/heads/main' || github.ref == 'refs/heads/stable'
-        env:
-          CI: true  
 
-      - name: Check if there is difference between 2 precompiled query map
+      - name: Update persisted queries
         id: query-map-updated
         if: github.ref == 'refs/heads/staging' || github.ref == 'refs/heads/main' || github.ref == 'refs/heads/stable'
+        run: yarn persist-queries
+        # ADD this once we support multiple versions
+        #env:
+          # LAST_SUPPORTED_APP_VERSION: ${{ vars.LAST_SUPPORTED_APP_VERSION }}
+
+      
+      ############################################
+      #
+      # Commit changes
+      #
+      ############################################
+      - name: Git config
         run: |
-          if cmp -s "azzapp-precompiled-queries/${{ github.ref_name }}/persisted-query-map.json" "packages/web/src/persisted-query-map.json"
-          then
-              echo "QUERY_MAP_UPDATED=false" >> $GITHUB_OUTPUT
-          else
-              echo "QUERY_MAP_UPDATED=true" >> $GITHUB_OUTPUT
-          fi  
-
-      - name: Copy the file back to azzapp-precompiled-queries repository
-        if: ${{ steps.query-map-updated.outputs.QUERY_MAP_UPDATED == 'true'}}
-        run: cp -r packages/web/src/persisted-query-map.json azzapp-precompiled-queries/${{ github.ref_name }}
-        env:
-          CI: true
-
-      # was not able to make a push and commit working on another repo. it was creating a submodule ...
-      - name: 'Create Pull Request on query map repository'
-        uses: peter-evans/create-pull-request@v4
-        id: cpr
-        if:  ${{ steps.query-map-updated.outputs.QUERY_MAP_UPDATED == 'true'}}
-        with:
-          token: ${{ secrets.QUERY_MAP_PAT }}
-          commit-message: 'Update query-map.json'
-          title: '[Update] Precompiled Queries on ${{ github.ref_name }}'
-          branch: '${{ github.ref_name }}-precompiled-queries'
-          base: 'main'
-          delete-branch: true 
-          labels: 'precompiled-queries'
-          reviewers: '@fdecompredon,@batical'
-          draft: false
-          path: 'azzapp-precompiled-queries'
-          branch-suffix: timestamp  # the branch is using a prefix timestamp to avoid issue creating a PR already done before
-
-      # a github action on azzapp-precompiled-queries will delete the branch
-      - name: Merging the PR on query map repository
-        if: ${{ steps.query-map-updated.outputs.QUERY_MAP_UPDATED == 'true'}}
-        uses: actions/github-script@v6.4.0
-        env:
-          pull_number: ${{ steps.cpr.outputs.pull-request-number}}
-        with:
-          github-token: ${{ secrets.QUERY_MAP_PAT }}
-          script: |
-            const { pull_number} = process.env;
-            await github.rest.pulls.merge({
-              owner: "AzzappApp",
-              repo: "azzapp-precompiled-queries",
-              pull_number,
-            });
-
+          git config user.name "Azzapp Dev Bot"
+          git config user.email "azzapp-dev-bot@azzapp.com"
+      - name: Commit version bump
+        run: |
+          git add .
+          git commit -m "chore: bump version [skip ci]"
+          git push origin $GITHUB_REF_NAME
+          yarn install --frozen-lockfile  --immutable
+        
       ############################################
       #
       # PlanetScale schema migration

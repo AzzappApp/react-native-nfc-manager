@@ -31,7 +31,8 @@
     "clean": "yarn workspaces run clean && rm -Rf node_mdules && rm -f tsconfig.tsbuildinfo",
     "release": "node ./scripts/release.js",
     "bump-version": "node ./scripts/bumpVersion.js",
-    "write-dev-changelog": "node ./scripts/writeDevChangeLog.js"
+    "write-dev-changelog": "node ./scripts/writeDevChangeLog.js",
+    "persist-queries": "yarn workspace @azzapp/web persist-queries"
   },
   "devScripts": [
     "relay:watch",

@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "typecheck": "tsc -p tsconfig.next.json --noEmit",
-    "clean": "rm -rf lib && rm -f tsconfig.tsbuildinfo && rm -rf .next && rm -rf node_modules"
+    "clean": "rm -rf lib && rm -f tsconfig.tsbuildinfo && rm -rf .next && rm -rf node_modules",
+    "persist-queries": "node ./scripts/persistQueries.js"
   },
   "devScripts": [
     "dev"
