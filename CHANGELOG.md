@@ -1,5 +1,10 @@
-## 0.5.5-canary.29
+## 0.5.5-canary.30
 
+* **fix:**  - **webCard:** [#2364](https://github.com/AzzappApp/azzapp/pull/2364) adapt preview on desktop mode ([#2552](https://github.com/AzzappApp/azzapp/pull/2552))
+* **fix:**  - **cover:** [#2476](https://github.com/AzzappApp/azzapp/pull/2476) wrong cover radius in web ([#2557](https://github.com/AzzappApp/azzapp/pull/2557))
+* **fix:**  - HomeCoverIcon in tab not displayed on startup ([#2544](https://github.com/AzzappApp/azzapp/pull/2544))
+* **fix:**  - **multiUser:** [#2507](https://github.com/AzzappApp/azzapp/pull/2507) wrong display for long texts ([#2543](https://github.com/AzzappApp/azzapp/pull/2543))
+* **fix:**  - **multiUser:** [#2459](https://github.com/AzzappApp/azzapp/pull/2459) set email by default when no value is set ([#2538](https://github.com/AzzappApp/azzapp/pull/2538))
 * **build:**  - upgrade expo ([#2560](https://github.com/AzzappApp/azzapp/pull/2560))
 * **build:**  - android - add missing product flavor in command
 * **build:**  - android - assemble apk
