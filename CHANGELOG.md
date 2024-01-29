@@ -1,5 +1,6 @@
-## 0.5.5-canary.25
+## 0.5.5-canary.26
 
+* **fix:**  - 🐛 display error when username is different from locql ([#2549](https://github.com/AzzappApp/azzapp/pull/2549))
 * **fix:**  - HomeBottomSheetPanel with separator ([#2548](https://github.com/AzzappApp/azzapp/pull/2548))
 * **fix:**  - **Home:** invitation profile
 * **fix:**  - 🐛 use width to avoid elongated image when square ratio ([#2545](https://github.com/AzzappApp/azzapp/pull/2545))
