@@ -273,9 +273,10 @@ const MultiUserAddModal = (
         reset({
           role: 'user',
           selectedContact: {
-            countryCodeOrEmail: isValidEmail(contact)
-              ? 'email'
-              : (locale?.countryCode.toUpperCase() as CountryCode),
+            countryCodeOrEmail:
+              !contact || isValidEmail(contact)
+                ? 'email'
+                : (locale?.countryCode.toUpperCase() as CountryCode),
             value: contact,
           },
         });
