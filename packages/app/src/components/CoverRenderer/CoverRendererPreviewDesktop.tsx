@@ -1,11 +1,14 @@
 import { Image } from 'expo-image';
-import { Platform, StyleSheet, View, useWindowDimensions } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
+import { Platform, StyleSheet, View } from 'react-native';
 import { useFragment } from 'react-relay';
 import { swapColor } from '@azzapp/shared/cardHelpers';
+import { getModuleDataValues } from '@azzapp/shared/cardModuleHelpers';
 import { COVER_BASE_WIDTH, COVER_RATIO } from '@azzapp/shared/coverHelpers';
 import { MediaImageRenderer } from '#components/medias';
 import CoverRendererFragment from '#relayArtifacts/CoverRenderer_webCard.graphql';
 import CoverRenderer from './CoverRenderer';
+import type { ModuleRenderInfo } from '#components/cardModules/CardModuleRenderer';
 import type { CoverRenderer_webCard$key } from '#relayArtifacts/CoverRenderer_webCard.graphql';
 import type { ViewProps } from 'react-native-svg/lib/typescript/fabric/utils';
 
@@ -16,7 +19,11 @@ export type CoverRendererPreviewDesktopProps = ViewProps & {
   webCard: CoverRenderer_webCard$key;
 
   videoEnabled?: boolean;
+
+  firstModule?: ModuleRenderInfo;
 };
+
+const COVER_DESKTOP_WIDTH = 300;
 
 /**
  * Renders a card cover in desktop preview mode
@@ -25,6 +32,7 @@ const CoverRendererPreviewDesktop = ({
   webCard: coverKey,
   videoEnabled,
   style,
+  firstModule,
   ...props
 }: CoverRendererPreviewDesktopProps) => {
   const { cardCover, cardColors } =
@@ -41,8 +49,9 @@ const CoverRendererPreviewDesktop = ({
   const { __typename, uri, thumbnail } = media ?? {};
 
   const mediaUri = __typename === 'MediaVideo' ? thumbnail : uri;
-
-  const { width: windowWidth } = useWindowDimensions();
+  const moduleData = firstModule?.data
+    ? getModuleDataValues({ data: firstModule.data })
+    : null;
 
   return (
     <View {...props} style={[style, styles.wrapper]}>
@@ -62,11 +71,26 @@ const CoverRendererPreviewDesktop = ({
         style={StyleSheet.absoluteFill}
         source={{ uri: mediaUri }}
         contentFit="cover"
-        contentPosition="bottom"
+        contentPosition="center"
         blurRadius={Platform.select({
           ios: 15,
           android: 10,
         })}
+      />
+      <LinearGradient
+        colors={[
+          'transparent',
+          moduleData && 'backgroundStyle' in moduleData
+            ? swapColor(
+                moduleData?.backgroundStyle?.backgroundColor ?? '#FFF',
+                cardColors,
+              ) ?? '#FFF'
+            : '#FFF',
+        ]}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 0, y: 1 }}
+        locations={[0, 0.95]}
+        style={styles.layer}
       />
       {foreground && (
         <MediaImageRenderer
@@ -81,9 +105,9 @@ const CoverRendererPreviewDesktop = ({
         />
       )}
       <CoverRenderer
-        style={{ alignSelf: 'center' }}
+        style={styles.cover}
         webCard={coverKey}
-        width={windowWidth}
+        width={COVER_DESKTOP_WIDTH}
         hideBorderRadius
         animationEnabled={videoEnabled}
       />
@@ -94,6 +118,7 @@ const CoverRendererPreviewDesktop = ({
 const styles = StyleSheet.create({
   wrapper: {
     overflow: 'hidden',
+    paddingVertical: 50,
   },
   layer: {
     position: 'absolute',
@@ -102,6 +127,7 @@ const styles = StyleSheet.create({
     width: '100%',
     aspectRatio: COVER_RATIO,
   },
+  cover: { alignSelf: 'center', borderRadius: 35 },
 });
 
 export default CoverRendererPreviewDesktop;

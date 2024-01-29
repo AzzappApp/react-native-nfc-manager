@@ -101,7 +101,7 @@ const ProfilePage = async ({ params }: ProfilePageProps) => {
           <div
             className={styles.coverContainer}
             style={{
-              background: `linear-gradient(to bottom, rgb(255 237 209 / 0%) 0%, ${
+              background: `linear-gradient(to bottom, transparent 0%, ${
                 modules.length
                   ? swapColor(
                       (

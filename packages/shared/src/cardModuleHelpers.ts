@@ -880,15 +880,15 @@ export const getModuleDataValues = <
   /**
    * The card style used to render the web card.
    */
-  cardStyle: CardStyle | null | undefined;
+  cardStyle?: CardStyle | null | undefined;
   /**
    * A map of the module data keys to the card style keys.
    */
-  styleValuesMap: TStyleValues | null | undefined;
+  styleValuesMap?: TStyleValues | null | undefined;
   /**
    * The default values for the module data.
    */
-  defaultValues: TDefaultValues;
+  defaultValues?: TDefaultValues;
 }): {
   [key in keyof TModuleData]-?: key extends keyof TStyleValues
     ? Exclude<TModuleData[key], null | undefined>
@@ -911,7 +911,7 @@ export const getModuleDataValues = <
       acc[key] = value;
     } else if (cardStyleValues[key] != null) {
       acc[key] = cardStyleValues[key];
-    } else {
+    } else if (defaultValues) {
       acc[key] = (defaultValues as any)[key];
     }
     return acc;

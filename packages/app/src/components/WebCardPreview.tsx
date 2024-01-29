@@ -163,7 +163,11 @@ const WebCardPreview = (
               style={styles.webCardBackground}
             />
             {viewMode === 'desktop' ? (
-              <CoverRendererPreviewDesktop webCard={webCard} videoEnabled />
+              <CoverRendererPreviewDesktop
+                webCard={webCard}
+                firstModule={cardModules.length ? cardModules[0] : undefined}
+                videoEnabled
+              />
             ) : (
               <CoverRenderer
                 webCard={webCard}
