@@ -1,5 +1,7 @@
-## 0.5.5-canary.31
+## 0.5.5-canary.32
 
+* **fix:**  - **imagePicker:** [#2411](https://github.com/AzzappApp/azzapp/pull/2411) present image picker selection when limited ([#2564](https://github.com/AzzappApp/azzapp/pull/2564))
+* **fix:**  - improve Animation rendering (removing blink when changing animat… ([#2562](https://github.com/AzzappApp/azzapp/pull/2562))
 * **fix:**  - **home:** [#2542](https://github.com/AzzappApp/azzapp/pull/2542) make tab bar items translatable ([#2561](https://github.com/AzzappApp/azzapp/pull/2561))
 * **fix:**  - **webCard:** [#2364](https://github.com/AzzappApp/azzapp/pull/2364) adapt preview on desktop mode ([#2552](https://github.com/AzzappApp/azzapp/pull/2552))
 * **fix:**  - **cover:** [#2476](https://github.com/AzzappApp/azzapp/pull/2476) wrong cover radius in web ([#2557](https://github.com/AzzappApp/azzapp/pull/2557))
