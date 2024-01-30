@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { Platform, View } from 'react-native';
 import * as mime from 'react-native-mime-types';
@@ -73,9 +73,6 @@ const PostCreationScreen = ({
     );
 
   const router = useRouter();
-  const onCancel = () => {
-    router.back();
-  };
 
   const [commit] = useMutation<PostCreationScreenMutation>(graphql`
     mutation PostCreationScreenMutation(
@@ -125,69 +122,102 @@ const PostCreationScreen = ({
   const [progressIndicator, setProgressIndicator] =
     useState<Observable<number> | null>(null);
 
-  const onFinished = async ({
-    kind,
-    uri,
-    aspectRatio,
-    editionParameters,
-    filter,
-    timeRange,
-  }: ImagePickerResult) => {
-    if (!webCard) {
-      return;
-    }
-    try {
-      setProgressIndicator(Observable.from(0));
-      if (Platform.OS === 'android' && kind === 'video') {
-        // on Android we need to be sure that the player is released to avoid memory overload
-        await waitTime(50);
+  const onFinished = useCallback(
+    async ({
+      kind,
+      uri,
+      aspectRatio,
+      editionParameters,
+      filter,
+      timeRange,
+    }: ImagePickerResult) => {
+      if (!webCard) {
+        return;
       }
-      const exportedMedia = await exportMedia({
-        uri,
-        kind,
-        editionParameters,
-        aspectRatio,
-        filter,
-        ...timeRange,
-      });
+      try {
+        setProgressIndicator(Observable.from(0));
+        if (Platform.OS === 'android' && kind === 'video') {
+          // on Android we need to be sure that the player is released to avoid memory overload
+          await waitTime(50);
+        }
+        const exportedMedia = await exportMedia({
+          uri,
+          kind,
+          editionParameters,
+          aspectRatio,
+          filter,
+          ...timeRange,
+        });
 
-      const fileName = getFileName(exportedMedia.path);
-      const file: any = {
-        name: fileName,
-        uri: `file://${exportedMedia.path}`,
-        type:
-          mime.lookup(fileName) ||
-          (kind === 'image' ? 'image/jpeg' : 'video/quicktime'),
-      };
+        const fileName = getFileName(exportedMedia.path);
+        const file: any = {
+          name: fileName,
+          uri: `file://${exportedMedia.path}`,
+          type:
+            mime.lookup(fileName) ||
+            (kind === 'image' ? 'image/jpeg' : 'video/quicktime'),
+        };
 
-      const { uploadURL, uploadParameters } = await uploadSign({
-        kind: kind === 'video' ? 'video' : 'image',
-        target: 'post',
-      });
-      const { progress: uploadProgress, promise: uploadPromise } = uploadMedia(
-        file,
-        uploadURL,
-        uploadParameters,
-      );
-      setProgressIndicator(uploadProgress);
-      const { public_id } = await uploadPromise;
-      commit({
-        variables: {
-          input: {
-            mediaId: encodeMediaId(public_id, kind),
-            allowComments,
-            allowLikes,
-            content,
-            webCardId: webCard.id,
+        const { uploadURL, uploadParameters } = await uploadSign({
+          kind: kind === 'video' ? 'video' : 'image',
+          target: 'post',
+        });
+        const { progress: uploadProgress, promise: uploadPromise } =
+          uploadMedia(file, uploadURL, uploadParameters);
+        setProgressIndicator(uploadProgress);
+        const { public_id } = await uploadPromise;
+        commit({
+          variables: {
+            input: {
+              mediaId: encodeMediaId(public_id, kind),
+              allowComments,
+              allowLikes,
+              content,
+              webCardId: webCard.id,
+            },
+            screenWidth: ScreenWidth(),
+            postWith: PostWidth(),
+            cappedPixelRatio: CappedPixelRatio(),
+            pixelRatio: PixelRatio(),
+            connections: [connectionID!],
           },
-          screenWidth: ScreenWidth(),
-          postWith: PostWidth(),
-          cappedPixelRatio: CappedPixelRatio(),
-          pixelRatio: PixelRatio(),
-          connections: [connectionID!],
-        },
-        onCompleted(response, error) {
-          if (error) {
+          onCompleted(response, error) {
+            if (error) {
+              Toast.show({
+                type: 'error',
+                text1: intl.formatMessage({
+                  defaultMessage: 'Error while creating post',
+                  description: 'Toast Error message while creating post',
+                }),
+              });
+            } else {
+              Toast.show({
+                type: 'success',
+                text1: intl.formatMessage({
+                  defaultMessage: 'Post created',
+                  description: 'Toast Success message while creating post',
+                }),
+              });
+              addLocalCachedMediaFile(
+                `${kind.slice(0, 1)}:${public_id}`,
+                kind === 'video' ? 'video' : 'image',
+                `file://${exportedMedia.path}`,
+              );
+              // TODO use fragment instead of response
+              // if (params?.fromProfile) {
+              router.back();
+              // } else {
+              //   router.replace({
+              //     route: 'PROFILE',
+              //     params: {
+              //       userName: response.createPost?.post?.author.userName as string,
+              //       showPosts: true,
+              //     },
+              //   });
+              // }
+            }
+          },
+          onError() {
             Toast.show({
               type: 'error',
               text1: intl.formatMessage({
@@ -195,68 +225,44 @@ const PostCreationScreen = ({
                 description: 'Toast Error message while creating post',
               }),
             });
-          } else {
-            Toast.show({
-              type: 'success',
-              text1: intl.formatMessage({
-                defaultMessage: 'Post created',
-                description: 'Toast Success message while creating post',
-              }),
-            });
-            addLocalCachedMediaFile(
-              `${kind.slice(0, 1)}:${public_id}`,
-              kind === 'video' ? 'video' : 'image',
-              `file://${exportedMedia.path}`,
-            );
-            // TODO use fragment instead of response
-            // if (params?.fromProfile) {
-            router.back();
-            // } else {
-            //   router.replace({
-            //     route: 'PROFILE',
-            //     params: {
-            //       userName: response.createPost?.post?.author.userName as string,
-            //       showPosts: true,
-            //     },
-            //   });
-            // }
-          }
-        },
-        onError() {
-          Toast.show({
-            type: 'error',
-            text1: intl.formatMessage({
-              defaultMessage: 'Error while creating post',
-              description: 'Toast Error message while creating post',
-            }),
-          });
-          setProgressIndicator(null);
-        },
-        updater: store => {
-          if (webCard.id) {
-            const currentWebCard = store.get(webCard.id);
+            setProgressIndicator(null);
+          },
+          updater: store => {
+            if (webCard.id) {
+              const currentWebCard = store.get(webCard.id);
 
-            if (currentWebCard) {
-              const nbPosts = currentWebCard?.getValue('nbPosts');
+              if (currentWebCard) {
+                const nbPosts = currentWebCard?.getValue('nbPosts');
 
-              if (typeof nbPosts === 'number') {
-                currentWebCard.setValue(nbPosts + 1, 'nbPosts');
+                if (typeof nbPosts === 'number') {
+                  currentWebCard.setValue(nbPosts + 1, 'nbPosts');
+                }
               }
             }
-          }
-        },
-      });
-    } catch (e) {
-      Toast.show({
-        type: 'error',
-        text1: intl.formatMessage({
-          defaultMessage: 'Error while creating post',
-          description: 'Toast Error message while creating post',
-        }),
-      });
-      setProgressIndicator(null);
-    }
-  };
+          },
+        });
+      } catch (e) {
+        Toast.show({
+          type: 'error',
+          text1: intl.formatMessage({
+            defaultMessage: 'Error while creating post',
+            description: 'Toast Error message while creating post',
+          }),
+        });
+        setProgressIndicator(null);
+      }
+    },
+    [
+      allowComments,
+      allowLikes,
+      commit,
+      connectionID,
+      content,
+      intl,
+      router,
+      webCard,
+    ],
+  );
 
   const contextValue = useMemo(
     () => ({
@@ -282,10 +288,10 @@ const PostCreationScreen = ({
         <ImagePicker
           maxVideoDuration={POST_MAX_DURATION}
           forceCameraRatio={1}
-          onCancel={onCancel}
+          onCancel={router.back}
           onFinished={onFinished}
           busy={!!progressIndicator}
-          steps={[SelectImageStep, EditImageStep, PostContentStep]}
+          steps={steps}
           exporting={!!progressIndicator}
         />
       </PostCreationScreenContext.Provider>
@@ -299,19 +305,18 @@ const PostCreationScreen = ({
   );
 };
 
+const steps = [SelectImageStep, EditImageStep, PostContentStep];
+
 PostCreationScreen.options = {
   stackAnimation: 'slide_from_bottom',
 };
 
 const PostCreationScreenFallback = () => {
   const router = useRouter();
-  const onBack = () => {
-    router.back();
-  };
   return (
     <Container style={{ flex: 1 }}>
       <SafeAreaView style={{ flex: 1 }}>
-        <Header leftElement={<CancelHeaderButton onPress={onBack} />} />
+        <Header leftElement={<CancelHeaderButton onPress={router.back} />} />
         <View style={{ aspectRatio: 1, backgroundColor: colors.grey100 }} />
         <View
           style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}

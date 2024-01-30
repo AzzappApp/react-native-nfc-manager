@@ -686,7 +686,7 @@ const PhotoWithTextAndTitleEditionScreen = ({
           kind="image"
           onFinished={onMediaSelected}
           onCancel={onImagePickerCancel}
-          steps={[SelectImageStep, EditImageStep]}
+          steps={steps}
         />
       </ScreenModal>
       <ScreenModal visible={!!progressIndicator}>
@@ -697,6 +697,8 @@ const PhotoWithTextAndTitleEditionScreen = ({
     </Container>
   );
 };
+
+const steps = [SelectImageStep, EditImageStep];
 
 export default PhotoWithTextAndTitleEditionScreen;
 

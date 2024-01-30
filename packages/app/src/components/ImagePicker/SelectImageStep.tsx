@@ -1,7 +1,7 @@
-import { type Album } from 'expo-media-library';
-import { useCallback, useMemo, useRef, useState } from 'react';
+import { presentPermissionsPickerAsync, type Album } from 'expo-media-library';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useIntl } from 'react-intl';
-import { StyleSheet } from 'react-native';
+import { Alert, Platform, StyleSheet } from 'react-native';
 import { RESULTS } from 'react-native-permissions';
 import { useDebouncedCallback } from 'use-debounce';
 import { cropDataForAspectRatio } from '#components/gpu';
@@ -68,6 +68,8 @@ const SelectImageStep = ({
   const { mediaPermission, cameraPermission, audioPermission } =
     usePermissionContext();
 
+  const initialMediaPermission = useRef(mediaPermission);
+
   const onChangePickerMode = useCallback(
     (mode: 'gallery' | 'photo' | 'video') => {
       //we need to discard the current media if we switch from gallery to video/photo(to desactive the next button)
@@ -77,7 +79,7 @@ const SelectImageStep = ({
       setPermissionModalRejected(false);
       setPickerMode(mode);
     },
-    [clearMedia, setPermissionModalRejected, pickerMode],
+    [pickerMode, clearMedia],
   );
 
   // #region camera logic
@@ -207,7 +209,7 @@ const SelectImageStep = ({
   }, [intl, kind]);
   // #endregion
 
-  const onCameraPermissionModalClose = () => {
+  const onCameraPermissionModalClose = useCallback(() => {
     if (
       mediaPermission === RESULTS.GRANTED ||
       mediaPermission === RESULTS.LIMITED
@@ -217,7 +219,7 @@ const SelectImageStep = ({
     } else {
       setPermissionModalRejected(true);
     }
-  };
+  }, [mediaPermission, onChangePickerMode]);
 
   const { insetBottom } = useEditorLayout();
 
@@ -227,6 +229,45 @@ const SelectImageStep = ({
     }),
     [insetBottom],
   );
+
+  useEffect(() => {
+    if (
+      initialMediaPermission.current === RESULTS.LIMITED &&
+      Platform.OS === 'ios'
+    ) {
+      Alert.alert(
+        intl.formatMessage({
+          defaultMessage: '"azzapp" Would Like to Access Your Photos',
+          description: 'Title of the permission picker in image picker wizard',
+        }),
+        intl.formatMessage({
+          defaultMessage:
+            'This lets you add photos and videos to your posts and profile.',
+          description:
+            'Description of the permission picker in image picker wizard',
+        }),
+        [
+          {
+            text: intl.formatMessage({
+              defaultMessage: 'Select More Photos ...',
+              description:
+                'Button to open the permission picker in image picker wizard',
+            }),
+            onPress: presentPermissionsPickerAsync,
+          },
+          {
+            text: intl.formatMessage({
+              defaultMessage: 'Keep current selection',
+              description:
+                'Button to keep the current selection in image picker wizard',
+            }),
+            onPress: () => {},
+            isPreferred: true,
+          },
+        ],
+      );
+    }
+  }, [intl]);
 
   return (
     <>

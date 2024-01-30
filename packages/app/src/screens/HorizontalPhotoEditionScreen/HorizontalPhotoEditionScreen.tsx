@@ -509,7 +509,7 @@ const HorizontalPhotoEditionScreen = ({
           kind="image"
           onFinished={onMediaSelected}
           onCancel={onImagePickerCancel}
-          steps={[SelectImageStep, EditImageStep]}
+          steps={steps}
         />
       </ScreenModal>
       <ScreenModal visible={!!progressIndicator}>
@@ -520,6 +520,8 @@ const HorizontalPhotoEditionScreen = ({
     </Container>
   );
 };
+
+const steps = [SelectImageStep, EditImageStep];
 
 export default HorizontalPhotoEditionScreen;
 
