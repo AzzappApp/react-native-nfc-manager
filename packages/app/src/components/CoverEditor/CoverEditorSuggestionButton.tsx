@@ -1,4 +1,4 @@
-import { View } from 'react-native';
+import { Platform, View } from 'react-native';
 import Animated, {
   interpolate,
   useAnimatedStyle,
@@ -85,7 +85,7 @@ const CoverEditorSuggestionButton = ({
       <Animated.View
         style={[{ position: 'absolute' }, mediaVisibleAnimatedStyle]}
       >
-        {sourceMedia && (
+        {Platform.OS === 'ios' && sourceMedia ? (
           <PressableOpacity
             style={[styles.mediaHideButton]}
             onPress={toggleMediaVisibility}
@@ -94,7 +94,6 @@ const CoverEditorSuggestionButton = ({
               style={[
                 styles.mediaHideButtonImage,
                 !mediaVisible && { opacity: 0.5 },
-                { overflow: 'hidden' },
               ]}
               testID="image-picker-media-video"
             >
@@ -110,6 +109,11 @@ const CoverEditorSuggestionButton = ({
               icon={mediaVisible ? 'preview' : 'hide'}
             />
           </PressableOpacity>
+        ) : (
+          <FloatingIconButton
+            icon={mediaVisible ? 'preview' : 'hide'}
+            onPress={toggleMediaVisibility}
+          />
         )}
       </Animated.View>
     </View>
@@ -129,11 +133,13 @@ const styleSheet = createStyleSheet(appearance => ({
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
+    overflow: 'hidden',
   },
   mediaHideButtonImage: {
     width: FLOATING_BUTTON_SIZE - 6,
     height: FLOATING_BUTTON_SIZE - 6,
     borderRadius: (FLOATING_BUTTON_SIZE - 4) / 2,
+    overflow: 'hidden',
   },
   mediaHideButtonIcon: {
     position: 'absolute',
