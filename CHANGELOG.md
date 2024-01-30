@@ -1,5 +1,6 @@
-## 0.5.5-canary.30
+## 0.5.5-canary.31
 
+* **fix:**  - **home:** [#2542](https://github.com/AzzappApp/azzapp/pull/2542) make tab bar items translatable ([#2561](https://github.com/AzzappApp/azzapp/pull/2561))
 * **fix:**  - **webCard:** [#2364](https://github.com/AzzappApp/azzapp/pull/2364) adapt preview on desktop mode ([#2552](https://github.com/AzzappApp/azzapp/pull/2552))
 * **fix:**  - **cover:** [#2476](https://github.com/AzzappApp/azzapp/pull/2476) wrong cover radius in web ([#2557](https://github.com/AzzappApp/azzapp/pull/2557))
 * **fix:**  - HomeCoverIcon in tab not displayed on startup ([#2544](https://github.com/AzzappApp/azzapp/pull/2544))
