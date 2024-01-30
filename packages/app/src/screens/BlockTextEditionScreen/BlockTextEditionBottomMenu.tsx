@@ -43,7 +43,7 @@ const BlockTextEditionBottomMenu = (props: BlockTextEditionBottomMenuProps) => {
           },
           {
             key: 'textBackground',
-            icon: 'background',
+            icon: 'foreground',
             label: intl.formatMessage({
               defaultMessage: 'Edit TextBackground',
               description: 'BlockText bottom menu label for TextBackground tab',
