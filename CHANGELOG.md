@@ -1,5 +1,6 @@
-## 0.5.5-canary.35
+## 0.5.5-canary.36
 
+* **fix:**  - **MultiUser:** fix mode darkmode ([#2580](https://github.com/AzzappApp/azzapp/pull/2580))
 * **fix:**  - 🐛 set button section as email by default ([#2577](https://github.com/AzzappApp/azzapp/pull/2577))
 * **feat:**  - **Social:** add a little animation layout when changing display mode ([#2574](https://github.com/AzzappApp/azzapp/pull/2574))
 * **fix:**  - **MultiUser:** Add a background to the header ([#2572](https://github.com/AzzappApp/azzapp/pull/2572))
