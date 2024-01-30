@@ -78,6 +78,9 @@ const WebCardParametersScreen = ({
         companyActivity {
           id
         }
+        cardCover {
+          segmented
+        }
         ...AccountHeader_webCard
       }
     `,
@@ -308,6 +311,7 @@ const WebCardParametersScreen = ({
             variant="large"
             value={webCard?.cardIsPublished}
             onValueChange={onChangeIsPublished}
+            disabled={!webCard?.cardCover}
           />
         </View>
         <View style={styles.section}>
