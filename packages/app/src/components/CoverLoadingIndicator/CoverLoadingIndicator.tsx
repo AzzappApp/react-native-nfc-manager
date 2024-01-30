@@ -1,5 +1,5 @@
 import Lottie from 'lottie-react-native';
-import { useColorScheme } from 'react-native';
+import { useColorScheme, View } from 'react-native';
 import { COVER_CARD_RADIUS, COVER_RATIO } from '@azzapp/shared/coverHelpers';
 import type { StyleProp, ViewStyle } from 'react-native';
 
@@ -19,17 +19,19 @@ function CoverLoadingIndicator({
   const borderRadius = width * COVER_CARD_RADIUS;
   const height = width / COVER_RATIO;
   return (
-    <Lottie
-      source={
-        color === 'white'
-          ? require('./coverLoadingAnimation.json')
-          : require('./coverLoadingAnimationDark.json')
-      }
-      autoPlay
-      loop
-      hardwareAccelerationAndroid
-      style={[{ borderRadius, width, height, overflow: 'hidden' }, style]}
-    />
+    <View style={[{ borderRadius, width, height, overflow: 'hidden' }, style]}>
+      <Lottie
+        source={
+          color === 'white'
+            ? require('./coverLoadingAnimation.json')
+            : require('./coverLoadingAnimationDark.json')
+        }
+        autoPlay
+        loop
+        hardwareAccelerationAndroid
+        style={[{ borderRadius, width, height, overflow: 'hidden' }, style]}
+      />
+    </View>
   );
 }
 
