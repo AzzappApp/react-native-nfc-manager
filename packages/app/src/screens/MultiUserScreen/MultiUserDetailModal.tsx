@@ -17,6 +17,7 @@ import {
 import ERRORS from '@azzapp/shared/errors';
 import { encodeMediaId } from '@azzapp/shared/imagesHelpers';
 import { colors } from '#theme';
+import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import { getFileName } from '#helpers/fileHelpers';
 import { addLocalCachedMediaFile } from '#helpers/mediaHelpers';
 import { uploadMedia, uploadSign } from '#helpers/MobileWebAPI';
@@ -61,6 +62,7 @@ const MultiUserDetailModal = ({
   const [showImagePicker, setShowImagePicker] = useState(false);
   const { profileInfos } = useAuthState();
   const intl = useIntl();
+  const styles = useStyleSheet(styleSheet);
 
   const profile = useFragment(
     graphql`
@@ -616,7 +618,7 @@ const roles: Array<{ id: ProfileRole; label: ReactNode }> = [
   },
 ];
 
-const styles = StyleSheet.create({
+const styleSheet = createStyleSheet(appearance => ({
   removeButton: {
     display: 'flex',
     flexDirection: 'row',
@@ -646,7 +648,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 50,
     textAlign: 'center',
     marginTop: 20,
-    color: colors.grey400,
+    color: appearance === 'light' ? colors.grey900 : colors.grey300,
   },
   stats: {
     paddingBottom: 50,
@@ -679,6 +681,6 @@ const styles = StyleSheet.create({
   cancelButton: {
     width: 136,
   },
-});
+}));
 
 export default MultiUserDetailModal;

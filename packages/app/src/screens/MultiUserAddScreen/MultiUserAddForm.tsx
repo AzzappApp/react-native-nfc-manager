@@ -258,7 +258,7 @@ const styleSheet = createStyleSheet(appearance => ({
   description: {
     textAlign: 'center',
     marginTop: 20,
-    color: colors.grey400,
+    color: appearance === 'light' ? colors.grey900 : colors.grey300,
   },
   bottomSheetContentContainer: {
     paddingHorizontal: 0,

@@ -7,7 +7,7 @@ import {
   useState,
 } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { ActivityIndicator, StyleSheet, View } from 'react-native';
+import { ActivityIndicator, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { graphql, useMutation, usePreloadedQuery } from 'react-relay';
 import { isAdmin } from '@azzapp/shared/profileHelpers';
@@ -16,6 +16,7 @@ import { CancelHeaderButton } from '#components/commonsButtons';
 import CoverRenderer from '#components/CoverRenderer';
 import { useRouter } from '#components/NativeRouter';
 import ScreenModal from '#components/ScreenModal';
+import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import relayScreen from '#helpers/relayScreen';
 import useToggle from '#hooks/useToggle';
 import Button from '#ui/Button';
@@ -78,6 +79,8 @@ const MultiUserScreen = ({
 
   const intl = useIntl();
   const router = useRouter();
+
+  const styles = useStyleSheet(styleSheet);
 
   const [commonInfoFormIsOpened, toggleCommonInfoForm] = useToggle(false);
 
@@ -261,6 +264,10 @@ const MultiUserScreen = ({
     profile?.profileRole,
     profile?.webCard.isMultiUser,
     profile?.webCard?.nbProfiles,
+    styles.description,
+    styles.price,
+    styles.sharedIcon,
+    styles.switchSection,
     toggleMultiUser,
     transferOwnerMode,
   ]);
@@ -426,7 +433,7 @@ const MultiUserScreen = ({
 
 const COVER_WIDTH = 29;
 
-const styles = StyleSheet.create({
+const styleSheet = createStyleSheet(appearance => ({
   sharedIcon: {
     height: 140,
     margin: 'auto',
@@ -440,7 +447,7 @@ const styles = StyleSheet.create({
   description: {
     textAlign: 'center',
     paddingHorizontal: 50,
-    color: colors.grey900,
+    color: appearance === 'light' ? colors.grey900 : colors.grey300,
   },
   price: {
     textAlign: 'center',
@@ -466,7 +473,7 @@ const styles = StyleSheet.create({
     marginTop: 10,
     alignItems: 'center',
   },
-});
+}));
 
 export default relayScreen(MultiUserScreen, {
   query: multiUserScreenQuery,
