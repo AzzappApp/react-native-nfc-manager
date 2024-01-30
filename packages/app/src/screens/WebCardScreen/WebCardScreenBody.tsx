@@ -492,7 +492,10 @@ const WebCardScreenBody = (
           },
         },
         updater(store, response) {
-          const createdModules = response.duplicateModule?.createdModules;
+          const createdModules = response?.duplicateModule?.createdModules;
+          if (!createdModules) {
+            return;
+          }
           createdModules.forEach(({ originalModuleId, newModuleId }) => {
             duplicatedBlocks.current[newModuleId] =
               duplicatedBlockTempIds[originalModuleId];

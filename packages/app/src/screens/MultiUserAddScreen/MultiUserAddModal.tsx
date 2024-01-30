@@ -421,7 +421,7 @@ const MultiUserAddModal = (
             }
           },
           updater: (store, data) => {
-            const invitedProfile = data.inviteUser?.profile;
+            const invitedProfile = data?.inviteUser?.profile;
             const webCard = store?.get(profileInfos.webCardId);
             if (invitedProfile && webCard) {
               const connection = ConnectionHandler.getConnection(

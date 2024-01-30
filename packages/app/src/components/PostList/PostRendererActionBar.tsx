@@ -18,10 +18,7 @@ import type {
   PostRendererActionBar_post$key,
   ReactionKind,
 } from '#relayArtifacts/PostRendererActionBar_post.graphql';
-import type {
-  PostRendererActionBarReactionMutation,
-  PostRendererActionBarReactionMutation$data,
-} from '#relayArtifacts/PostRendererActionBarReactionMutation.graphql';
+import type { PostRendererActionBarReactionMutation } from '#relayArtifacts/PostRendererActionBarReactionMutation.graphql';
 import type { ViewProps } from 'react-native';
 
 export type PostRendererActionBarProps = ViewProps & {
@@ -115,10 +112,10 @@ const PostRendererActionBar = ({
               },
             },
           },
-          updater: (
-            store,
-            response: PostRendererActionBarReactionMutation$data,
-          ) => {
+          updater: (store, response) => {
+            if (!response) {
+              return;
+            }
             const reaction = response.togglePostReaction;
             const added = response.togglePostReaction.post.postReaction != null;
 
