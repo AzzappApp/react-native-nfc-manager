@@ -54,7 +54,7 @@ import type {
 import type { CarouselSelectListHandle } from '#ui/CarouselSelectList';
 import type { CoverStyleData, MediaInfos } from './coverEditorTypes';
 import type { ColorPalette } from '@azzapp/shared/cardHelpers';
-import type { ListRenderItemInfo, ViewToken } from 'react-native';
+import type { ListRenderItemInfo, ViewStyle, ViewToken } from 'react-native';
 
 export type CoverEditorProps = {
   profile: CoverEditorTemplateList_profile$key;
@@ -831,9 +831,17 @@ const CoverEditorTemplateRenderer = ({
     };
   }, [mediaInfos, style]);
 
+  const coverPreviewRendererStyle = useMemo(
+    () => [styles.templateItemContainer, { borderRadius }],
+    [styles.templateItemContainer, borderRadius],
+  );
+
   return (
     <PressableScaleHighlight
-      style={{ overflow: 'visible', borderRadius }}
+      style={{
+        overflow: Platform.select({ default: 'visible', android: 'hidden' }),
+        borderRadius,
+      }}
       onPress={loading || loadingFailed ? null : onPress}
       disabled={loading || loadingFailed}
       disabledOpacity={1}
@@ -881,7 +889,7 @@ const CoverEditorTemplateRenderer = ({
           }
           width={width}
           paused={!isSelectedItem || videoPaused || mediaComputing}
-          style={styles.templateItemContainer}
+          style={coverPreviewRendererStyle}
           onStartLoading={onStartLoading}
           onLoad={onLoad}
           onError={onError}
@@ -953,7 +961,15 @@ const styleSheet = createStyleSheet(appearance => ({
   carouselContentContainer: { flexGrow: 0, overflow: 'visible' },
   templateItemContainer: {
     backgroundColor: appearance === 'light' ? '#fff' : '#000',
-    ...shadow(appearance, 'center'),
+    ...Platform.select<ViewStyle>({
+      default: shadow(appearance, 'center'),
+      android: {
+        borderWidth: StyleSheet.hairlineWidth,
+        borderColor: appearance === 'dark' ? colors.grey800 : colors.grey100,
+        overflow: 'hidden',
+        elevation: 0,
+      },
+    }),
   },
   colorPaletteListContainer: {
     paddingHorizontal: GAP,

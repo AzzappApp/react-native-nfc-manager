@@ -8,7 +8,7 @@ import {
   useState,
 } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { View, useWindowDimensions, StyleSheet } from 'react-native';
+import { View, useWindowDimensions, StyleSheet, Platform } from 'react-native';
 import { graphql, useFragment } from 'react-relay';
 import { COVER_CARD_RADIUS, COVER_RATIO } from '@azzapp/shared/coverHelpers';
 import { colors, shadow } from '#theme';
@@ -29,7 +29,11 @@ import type { HomeProfilesCarouselItem_profile$key } from '#relayArtifacts/HomeP
 import type { CarouselSelectListHandle } from '#ui/CarouselSelectList';
 import type { ArrayItemType } from '@azzapp/shared/arrayHelpers';
 import type { ForwardedRef } from 'react';
-import type { GestureResponderEvent, ListRenderItemInfo } from 'react-native';
+import type {
+  GestureResponderEvent,
+  ListRenderItemInfo,
+  ViewStyle,
+} from 'react-native';
 import type { SharedValue } from 'react-native-reanimated';
 
 type HomeProfilesCarouselProps = {
@@ -399,7 +403,10 @@ const styles = StyleSheet.create({
     flexGrow: 0,
     overflow: 'visible',
   },
-  coverShadow: shadow('light', 'bottom'),
+  coverShadow: Platform.select<ViewStyle>({
+    default: shadow('light', 'bottom'),
+    android: {},
+  }),
   newCover: {
     aspectRatio: COVER_RATIO,
     alignItems: 'center',

@@ -90,5 +90,5 @@ export const shadow = (
     },
     shadowOpacity: appearence === 'dark' ? 0.4 : 0.2,
     shadowRadius: 10,
-    elevation: 1,
+    elevation: 10,
   };

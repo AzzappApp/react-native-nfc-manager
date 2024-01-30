@@ -16,7 +16,7 @@ import type { ForwardedRef } from 'react';
 import type { View, EasingFunction, StyleProp, ViewStyle } from 'react-native';
 
 type PressableOpacityProps = Omit<PressableAnimatedProps, 'style'> & {
-  highlightColor: string;
+  highlightColor?: string;
   backgroundColor?: string;
   disabledOpacity?: number;
   animationDuration?: number;

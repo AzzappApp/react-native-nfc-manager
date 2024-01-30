@@ -1,15 +1,16 @@
 import { memo, useCallback, useMemo, useState } from 'react';
-import { View } from 'react-native';
+import { Platform, StyleSheet, View } from 'react-native';
 import { FlatList } from 'react-native-gesture-handler';
 import { COVER_CARD_RADIUS, COVER_RATIO } from '@azzapp/shared/coverHelpers';
 import { colors, shadow } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
-import PressableNative from '#ui/PressableNative';
+import PressableScaleHighlight from '#ui/PressableScaleHighlight';
 import Text from '#ui/Text';
 import type {
   LayoutChangeEvent,
   ListRenderItemInfo,
   ViewProps,
+  ViewStyle,
 } from 'react-native';
 
 export type BoxButtonItemInfo<T> = {
@@ -146,7 +147,7 @@ const BoxButton = <T,>({
 
   return (
     <View style={{ height, width }}>
-      <PressableNative
+      <PressableScaleHighlight
         style={[
           styles.button,
           {
@@ -170,7 +171,7 @@ const BoxButton = <T,>({
         >
           {renderItem(itemInfos)}
         </View>
-      </PressableNative>
+      </PressableScaleHighlight>
       {isSelected && (
         <>
           <View
@@ -222,11 +223,21 @@ const styleSheet = createStyleSheet(appearance => ({
       position: 'absolute',
       top: 6,
       left: 6,
-      overflow: 'visible',
       backgroundColor: appearance === 'dark' ? colors.grey900 : colors.grey200,
       borderCurve: 'continuous',
     },
-    shadow(appearance),
+    Platform.select<ViewStyle>({
+      default: {
+        overflow: 'visible',
+        ...shadow(appearance),
+      },
+      android: {
+        borderWidth: StyleSheet.hairlineWidth,
+        borderColor: appearance === 'dark' ? colors.grey800 : colors.grey100,
+        overflow: 'hidden',
+        elevation: 0,
+      },
+    }),
   ],
   buttonInnerBorder: {
     position: 'absolute',
