@@ -1,5 +1,7 @@
-## 0.5.5-canary.32
+## 0.5.5-canary.33
 
+* **fix:**  - image name
+* **fix:**  - add coming soon moduleyarn lint fix [#1146](https://github.com/AzzappApp/azzapp/pull/1146) ([#2554](https://github.com/AzzappApp/azzapp/pull/2554))
 * **fix:**  - **imagePicker:** [#2411](https://github.com/AzzappApp/azzapp/pull/2411) present image picker selection when limited ([#2564](https://github.com/AzzappApp/azzapp/pull/2564))
 * **fix:**  - improve Animation rendering (removing blink when changing animat… ([#2562](https://github.com/AzzappApp/azzapp/pull/2562))
 * **fix:**  - **home:** [#2542](https://github.com/AzzappApp/azzapp/pull/2542) make tab bar items translatable ([#2561](https://github.com/AzzappApp/azzapp/pull/2561))
