@@ -1,3 +1,4 @@
+import { Platform } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 /**
@@ -7,7 +8,10 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 const useScreenInsets = () => {
   const insets = useSafeAreaInsets();
   return {
-    top: insets.top,
+    top: Platform.select({
+      default: insets.top,
+      android: Math.max(insets.top, 15),
+    }),
     bottom: Math.max(insets.bottom, 16),
   };
 };
