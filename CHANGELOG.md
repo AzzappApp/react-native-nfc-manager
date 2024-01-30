@@ -1,5 +1,10 @@
-## 0.5.5-canary.34
+## 0.5.5-canary.35
 
+* **fix:**  - 🐛 set button section as email by default ([#2577](https://github.com/AzzappApp/azzapp/pull/2577))
+* **feat:**  - **Social:** add a little animation layout when changing display mode ([#2574](https://github.com/AzzappApp/azzapp/pull/2574))
+* **fix:**  - **MultiUser:** Add a background to the header ([#2572](https://github.com/AzzappApp/azzapp/pull/2572))
+* **fix:**  - 🐛 use right icon for text block bottom menu ([#2571](https://github.com/AzzappApp/azzapp/pull/2571))
+* **fix:**  - add urls control ([#2563](https://github.com/AzzappApp/azzapp/pull/2563))
 * **fix:**  - **Android:** simplify cover carousel
 * **fix:**  - **Android:** remove media preview in CoverEditor hide button
 * **fix:**  - **Android:** Edition parameters uniformization
