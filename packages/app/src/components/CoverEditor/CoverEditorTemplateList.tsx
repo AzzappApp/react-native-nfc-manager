@@ -5,6 +5,7 @@ import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { FormattedMessage } from 'react-intl';
 import {
   PixelRatio,
+  Platform,
   StyleSheet,
   View,
   useWindowDimensions,
@@ -38,6 +39,7 @@ import ActivityIndicator from '#ui/ActivityIndicator';
 import CarouselSelectList from '#ui/CarouselSelectList';
 import PressableOpacity from '#ui/PressableOpacity';
 import PressableScaleHighlight from '#ui/PressableScaleHighlight';
+import SimpleCarouselSelectList from '#ui/SimpleCarouselSelectList';
 import CoverErrorRenderer from '../CoverErrorRenderer';
 import type { TimeRange } from '#components/ImagePicker/imagePickerTypes';
 import type { CoverEditorTemplateList_profile$key } from '#relayArtifacts/CoverEditorTemplateList_profile.graphql';
@@ -534,9 +536,12 @@ const CoverEditorTemplateList = ({
     ],
   );
 
+  const Carousel =
+    Platform.OS === 'ios' ? CarouselSelectList : SimpleCarouselSelectList;
+
   return (
     <>
-      <CarouselSelectList
+      <Carousel
         ref={carouselRef}
         data={items}
         scaleRatio={0.5}

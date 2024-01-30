@@ -13,6 +13,7 @@ import {
 import { useIntl } from 'react-intl';
 import {
   Keyboard,
+  Platform,
   StyleSheet,
   View,
   unstable_batchedUpdates,
@@ -654,7 +655,10 @@ const CoverEditor = (
     windowWidth / (COVER_RATIO * 1.5),
   );
 
-  const templateListWidth = templateListHeight * COVER_RATIO * 2;
+  const templateListWidth = Platform.select({
+    ios: templateListHeight * COVER_RATIO * 2,
+    default: windowWidth,
+  });
   // #endregion
 
   return (

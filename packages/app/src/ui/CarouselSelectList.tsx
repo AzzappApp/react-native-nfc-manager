@@ -26,7 +26,10 @@ import type {
 } from 'react-native';
 import type { SharedValue } from 'react-native-reanimated';
 
-type CarouselSelectListProps<TItem = any> = Omit<ViewProps, 'children'> & {
+export type CarouselSelectListProps<TItem = any> = Omit<
+  ViewProps,
+  'children'
+> & {
   /**
    * The data to display
    */
