@@ -155,9 +155,69 @@ type CardModuleLineDivider implements CardModule { """
 }
 
 """
-User Card module : OpeningHours
+User Card module :Schedule
 """
-type CardModuleOpeningHours implements CardModule {
+type CardModuleSchedule implements CardModule {
+  """
+  User Card module id, unique between all modules (but not a node id)
+  """
+  id: ID!
+
+  """
+  User Card module kind
+  """
+  kind: CardModuleKind!
+
+  """
+  User Card module visibility
+  """
+  visible: Boolean!
+}
+
+"""
+User Card module :Video
+"""
+type CardModuleVideo implements CardModule {
+  """
+  User Card module id, unique between all modules (but not a node id)
+  """
+  id: ID!
+
+  """
+  User Card module kind
+  """
+  kind: CardModuleKind!
+
+  """
+  User Card module visibility
+  """
+  visible: Boolean!
+}
+
+"""
+User Card module : ImageGrid
+"""
+type CardModuleImageGrid implements CardModule {
+  """
+  User Card module id, unique between all modules (but not a node id)
+  """
+  id: ID!
+
+  """
+  User Card module kind
+  """
+  kind: CardModuleKind!
+
+  """
+  User Card module visibility
+  """
+  visible: Boolean!
+}
+
+"""
+User Card module : Parallax
+"""
+type CardModuleParallax implements CardModule {
   """
   User Card module id, unique between all modules (but not a node id)
   """

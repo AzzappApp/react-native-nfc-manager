@@ -24,13 +24,16 @@ import type {
   MODULE_KIND_CAROUSEL,
   MODULE_KIND_HORIZONTAL_PHOTO,
   MODULE_KIND_LINE_DIVIDER,
-  MODULE_KIND_OPENING_HOURS,
+  MODULE_KIND_SCHEDULE,
   MODULE_KIND_PHOTO_WITH_TEXT_AND_TITLE,
   MODULE_KIND_SIMPLE_BUTTON,
   MODULE_KIND_SIMPLE_TEXT,
   MODULE_KIND_SIMPLE_TITLE,
   MODULE_KIND_SOCIAL_LINKS,
   MODULE_KIND_WEB_CARDS_CAROUSEL,
+  MODULE_KIND_PARALLAX,
+  MODULE_KIND_VIDEO,
+  MODULE_KIND_IMAGEGRID,
 } from '@azzapp/shared/cardModuleHelpers';
 import type { InferInsertModel, InferSelectModel } from 'drizzle-orm';
 
@@ -43,13 +46,16 @@ export const CardModuleTable = mysqlTable(
       'blockText',
       'carousel',
       'horizontalPhoto',
+      'imageGrid',
       'lineDivider',
-      'openingHours',
+      'parallax',
       'photoWithTextAndTitle',
+      'schedule',
       'simpleButton',
       'simpleText',
       'simpleTitle',
       'socialLinks',
+      'video',
       'webCardsCarousel',
     ]).notNull(),
     data: json('data').$type<any>().notNull(),
@@ -88,8 +94,23 @@ export type CardModuleLineDivider = CardModuleBase & {
   data: CardModuleLineDividerData;
 };
 
-export type CardModuleOpeningHours = CardModuleBase & {
-  kind: typeof MODULE_KIND_OPENING_HOURS;
+export type CardModuleSchedule = CardModuleBase & {
+  kind: typeof MODULE_KIND_SCHEDULE;
+  data: unknown;
+};
+
+export type CardModuleParrallax = CardModuleBase & {
+  kind: typeof MODULE_KIND_PARALLAX;
+  data: unknown;
+};
+
+export type CardModuleVideo = CardModuleBase & {
+  kind: typeof MODULE_KIND_VIDEO;
+  data: unknown;
+};
+
+export type CardModuleImageGrid = CardModuleBase & {
+  kind: typeof MODULE_KIND_IMAGEGRID;
   data: unknown;
 };
 
@@ -122,12 +143,15 @@ export type CardModule =
   | CardModuleBlockText
   | CardModuleCarousel
   | CardModuleHorizontalPhoto
+  | CardModuleImageGrid
   | CardModuleLineDivider
-  | CardModuleOpeningHours
+  | CardModuleParrallax
   | CardModulePhotoWithTextAndTitle
+  | CardModuleSchedule
   | CardModuleSimpleButton
   | CardModuleSimpleText
   | CardModuleSocialLinks
+  | CardModuleVideo
   | CardModuleWebCardsCarousel;
 
 export type NewCardModule = InferInsertModel<typeof CardModuleTable>;

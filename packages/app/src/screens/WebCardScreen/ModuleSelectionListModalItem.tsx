@@ -69,14 +69,25 @@ const ModuleSelectionListModalItem = ({
             alignItems: 'center',
           }}
         >
-          <View style={styles.freeTextView}>
-            <Text variant="xsmall">
-              <FormattedMessage
-                defaultMessage="Free"
-                description="Module Selection List - Free label for module"
-              />
-            </Text>
-          </View>
+          {module.ready ? (
+            <View style={styles.freeTextView}>
+              <Text variant="xsmall">
+                <FormattedMessage
+                  defaultMessage="Free"
+                  description="Module Selection List - Free label for module"
+                />
+              </Text>
+            </View>
+          ) : (
+            <View style={styles.comingSoon}>
+              <Text variant="xsmall" style={styles.comingSoonText}>
+                <FormattedMessage
+                  defaultMessage="Coming soon"
+                  description="Module Select List - Coming soon label"
+                />
+              </Text>
+            </View>
+          )}
           <View style={styles.addIconButtonStyle}>
             <Icon icon="add" style={styles.addIconStyle} />
           </View>
@@ -127,4 +138,14 @@ const styleSheet = createStyleSheet(appearance => ({
     tintColor: appearance === 'light' ? colors.white : colors.black,
   },
   image: { flex: 1, width: undefined, height: undefined },
+  comingSoon: {
+    paddingHorizontal: 9,
+    paddingVertical: 4,
+    backgroundColor: colors.red400,
+    borderRadius: 11,
+    height: 22,
+  },
+  comingSoonText: {
+    color: colors.white,
+  },
 }));

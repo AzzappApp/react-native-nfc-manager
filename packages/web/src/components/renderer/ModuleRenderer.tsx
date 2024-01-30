@@ -46,13 +46,16 @@ const renderers: {
   blockText: BlockTextRenderer,
   carousel: CarouselRenderer,
   horizontalPhoto: HorizontalPhotoRenderer,
+  imageGrid: () => null,
   lineDivider: LineDividerRenderer,
+  parallax: () => null,
   photoWithTextAndTitle: PhotoWithTextAndTitleRenderer,
   simpleButton: SimpleButtonRenderer,
   simpleTitle: SimpleTextRenderer,
   simpleText: SimpleTextRenderer,
   socialLinks: SocialLinksRenderer,
-  openingHours: () => null,
+  schedule: () => null,
+  video: () => null,
   webCardsCarousel: () => null,
 };
 

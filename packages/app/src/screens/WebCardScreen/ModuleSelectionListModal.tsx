@@ -10,6 +10,7 @@ import ModuleSelectionListModalItem from './ModuleSelectionListModalItem';
 import type { ScreenModalProps } from '#components/ScreenModal';
 import type { ModuleSelectionListItem } from './ModuleSelectionListModalItem';
 import type { ModuleKind } from '@azzapp/shared/cardModuleHelpers';
+import type { ListRenderItemInfo } from 'react-native';
 
 type ModuleSelectionListModalProps = Exclude<
   ScreenModalProps,
@@ -114,17 +115,17 @@ const ModuleSelectionListModal = ({
           image_dark: require('./../../assets/module/photoWithTextAndTitle_dark.png'),
           ready: true,
         },
-        // {
-        //   moduleKind: 'openingHours',
-        //   label: intl.formatMessage({
-        //     defaultMessage: 'Schedule',
-        //     description:
-        //       'Module selection list modal Opening Hours module label',
-        //   }),
-        //   image_light: require('./../../assets/module/openingHours_light.png'),
-        //   image_dark: require('./../../assets/module/openingHours_dark.png'),
-        //   ready: false,
-        // },
+        {
+          moduleKind: 'schedule',
+          label: intl.formatMessage({
+            defaultMessage: 'Schedule',
+            description:
+              'Module selection list modal Opening Hours module label',
+          }),
+          image_light: require('./../../assets/module/openingHours_light.png'),
+          image_dark: require('./../../assets/module/openingHours_dark.png'),
+          ready: false,
+        },
         {
           moduleKind: 'socialLinks',
           label: intl.formatMessage({
@@ -136,25 +137,43 @@ const ModuleSelectionListModal = ({
           image_dark: require('./../../assets/module/socialLinks_dark.png'),
           ready: true,
         },
-        //TODO: waiting for specification and thumbnail
-        // {
-        //   moduleKind: 'webCardsCarousel',
-        //   label: intl.formatMessage({
-        //     defaultMessage: 'WebCards Carousel',
-        //     description:
-        //       'Module selection list modal WebCards Carousel module label',
-        //   }),
-        //   image_light: require('./assets/simple-button.png'),
-        //   image_dark: require('./assets/simple-button.png'),
-        //   ready: false,
-        // },
+        {
+          moduleKind: 'parallax',
+          label: intl.formatMessage({
+            defaultMessage: 'Parrallax',
+            description: 'Module selection list modal Parrallax module label',
+          }),
+          image_light: require('./../../assets/module/parallax_light.png'),
+          image_dark: require('./../../assets/module/parallax_light.png'),
+          ready: false,
+        },
+        {
+          moduleKind: 'video',
+          label: intl.formatMessage({
+            defaultMessage: 'Video',
+            description: 'Module selection list modal Video module label',
+          }),
+          image_light: require('./../../assets/module/video_light.png'),
+          image_dark: require('./../../assets/module/video_light.png'),
+          ready: false,
+        },
+        {
+          moduleKind: 'imageGrid',
+          label: intl.formatMessage({
+            defaultMessage: 'Image Grid',
+            description: 'Module selection list modal Image Grid module label',
+          }),
+          image_light: require('./../../assets/module/imagegrid_light.png'),
+          image_dark: require('./../../assets/module/imagegrid_light.png'),
+          ready: false,
+        },
       ] as const,
     [intl],
   );
 
   const { top, bottom } = useScreenInsets();
   const renderItem = useCallback(
-    ({ item }: { item: ModuleSelectionListItem | null }) =>
+    ({ item }: ListRenderItemInfo<ModuleSelectionListItem | null>) =>
       item ? (
         <ModuleSelectionListModalItem
           module={item}
@@ -170,6 +189,7 @@ const ModuleSelectionListModal = ({
           }}
         />
       ),
+
     [onSelectModuleKind],
   );
 
