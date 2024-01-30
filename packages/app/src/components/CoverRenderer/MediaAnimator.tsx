@@ -31,7 +31,9 @@ const MediaAnimator = ({
       return {};
     } else {
       const animFunction = ANIMATORS[animation];
-      return animFunction({ animationSharedValue, height, width });
+      return animFunction
+        ? animFunction({ animationSharedValue, height, width })
+        : {};
     }
   }, [animation, animationSharedValue, height, width]);
 
