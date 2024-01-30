@@ -180,7 +180,7 @@ const ContactCardEditModal = ({
   const {
     control,
     handleSubmit,
-    formState: { errors, isSubmitting },
+    formState: { isSubmitting },
   } = useForm<ContactCardEditFormValues>({
     mode: 'onBlur',
     resolver: zodResolver(contactCardEditSchema),
@@ -315,7 +315,6 @@ const ContactCardEditModal = ({
           showImagePicker={() => setShowImagePicker(true)}
           hideImagePicker={() => setShowImagePicker(false)}
           imagePickerVisible={showImagePicker}
-          errors={errors}
         />
         <ScreenModal visible={!!progressIndicator}>
           {progressIndicator && (

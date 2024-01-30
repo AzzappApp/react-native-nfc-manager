@@ -39,28 +39,15 @@ describe('ContactCardEditModal', () => {
                   selected: true,
                 },
               ],
+              urls: [
+                {
+                  address: 'https://www.google.com',
+                  selected: true,
+                },
+              ],
             },
           };
         },
-        // CommonInformation() {
-        //   return {
-        //     company: 'Facebook',
-        //     emails: [
-        //       {
-        //         label: 'Work',
-        //         address: 'test@test.com',
-        //         selected: true,
-        //       },
-        //     ],
-        //     phoneNumbers: [
-        //       {
-        //         label: 'Work',
-        //         number: '1234567890',
-        //         selected: true,
-        //       },
-        //     ],
-        //   };
-        // },
       });
     });
 
@@ -183,7 +170,7 @@ describe('ContactCardEditModal', () => {
       ],
       urls: [
         {
-          address: '<mock-value-for-field-"address">',
+          address: 'https://www.google.com',
         },
       ],
       webCardId: 'test-webcard',

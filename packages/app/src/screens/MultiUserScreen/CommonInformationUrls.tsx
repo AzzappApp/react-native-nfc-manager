@@ -11,7 +11,7 @@ import Text from '#ui/Text';
 import type { CommonInformationForm } from './CommonInformationSchema';
 import type { Control } from 'react-hook-form';
 
-const ContactCardEditModalUrls = ({
+const CommonInformationUrls = ({
   control,
 }: {
   control: Control<CommonInformationForm>;
@@ -39,6 +39,12 @@ const ContactCardEditModalUrls = ({
             defaultMessage: 'Enter a URL',
             description: 'Placeholder for URL inside contact card',
           })}
+          errorMessage={intl.formatMessage({
+            defaultMessage: 'Please enter a valid url',
+            description:
+              'Edit Contact Card - Error message when a url is wrongly formatted',
+          })}
+          trim
         />
       ))}
       <View>
@@ -61,4 +67,4 @@ const ContactCardEditModalUrls = ({
   );
 };
 
-export default ContactCardEditModalUrls;
+export default CommonInformationUrls;

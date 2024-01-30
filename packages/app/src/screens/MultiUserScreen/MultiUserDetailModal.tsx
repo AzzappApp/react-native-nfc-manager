@@ -1,3 +1,4 @@
+import { zodResolver } from '@hookform/resolvers/zod';
 import { parsePhoneNumber } from 'libphonenumber-js';
 import { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
@@ -30,6 +31,7 @@ import PressableNative from '#ui/PressableNative';
 import Select from '#ui/Select';
 import Text from '#ui/Text';
 import TextInput from '#ui/TextInput';
+import { multiUSerDetailModalSchema } from './MultiUserDetailModalSchema';
 import type { EmailPhoneInput } from '#components/EmailOrPhoneInput';
 import type { MultiUserDetailModal_Profile$key } from '#relayArtifacts/MultiUserDetailModal_Profile.graphql';
 import type { MultiUserDetailModal_RemoveUserMutation } from '#relayArtifacts/MultiUserDetailModal_RemoveUserMutation.graphql';
@@ -123,36 +125,41 @@ const MultiUserDetailModal = ({
   const phoneNumber =
     profile?.user.phoneNumber && parsePhoneNumber(profile.user.phoneNumber);
 
-  const { control, watch, handleSubmit, formState } =
-    useForm<MultiUserDetailFormValues>({
-      mode: 'onSubmit',
-      defaultValues: {
-        role: profile?.profileRole,
-        firstName: profile?.contactCard?.firstName,
-        lastName: profile?.contactCard?.lastName,
-        //use .slice to tricks the readOnly coming from relay type.(using hard cast 'as' make it hard to read the code)
-        phoneNumbers: profile?.contactCard?.phoneNumbers?.slice() ?? [],
-        emails: profile?.contactCard?.emails?.slice() ?? [],
-        title: profile?.contactCard?.title,
-        company: profile?.contactCard?.company ?? undefined,
-        urls: profile?.contactCard?.urls?.slice() ?? [],
-        birthday: profile?.contactCard?.birthday,
-        socials: profile?.contactCard?.socials?.slice() ?? [],
-        addresses: profile?.contactCard?.addresses?.slice() ?? [],
-        avatar: profile?.avatar,
-        selectedContact: profile?.user.email
-          ? {
-              countryCodeOrEmail: 'email',
-              value: profile.user.email,
-            }
-          : phoneNumber && phoneNumber?.isValid()
-          ? {
-              countryCodeOrEmail: phoneNumber.country!,
-              value: phoneNumber.formatInternational()!,
-            }
-          : null,
-      },
-    });
+  const {
+    control,
+    watch,
+    handleSubmit,
+    formState: { dirtyFields, isSubmitting },
+  } = useForm<MultiUserDetailFormValues>({
+    mode: 'onBlur',
+    resolver: zodResolver(multiUSerDetailModalSchema),
+    defaultValues: {
+      role: profile?.profileRole,
+      firstName: profile?.contactCard?.firstName,
+      lastName: profile?.contactCard?.lastName,
+      //use .slice to tricks the readOnly coming from relay type.(using hard cast 'as' make it hard to read the code)
+      phoneNumbers: profile?.contactCard?.phoneNumbers?.slice() ?? [],
+      emails: profile?.contactCard?.emails?.slice() ?? [],
+      title: profile?.contactCard?.title,
+      company: profile?.contactCard?.company ?? undefined,
+      urls: profile?.contactCard?.urls?.slice() ?? [],
+      birthday: profile?.contactCard?.birthday,
+      socials: profile?.contactCard?.socials?.slice() ?? [],
+      addresses: profile?.contactCard?.addresses?.slice() ?? [],
+      avatar: profile?.avatar,
+      selectedContact: profile?.user.email
+        ? {
+            countryCodeOrEmail: 'email',
+            value: profile.user.email,
+          }
+        : phoneNumber && phoneNumber?.isValid()
+        ? {
+            countryCodeOrEmail: phoneNumber.country!,
+            value: phoneNumber.formatInternational()!,
+          }
+        : null,
+    },
+  });
 
   const webCard = useFragment(
     graphql`
@@ -280,8 +287,7 @@ const MultiUserDetailModal = ({
         avatarId = encodeMediaId(public_id, 'image');
       }
 
-      if (formState.dirtyFields.role)
-        Object.assign(input, { profileRole: role });
+      if (dirtyFields.role) Object.assign(input, { profileRole: role });
 
       commit({
         variables: {
@@ -426,7 +432,7 @@ const MultiUserDetailModal = ({
                 defaultMessage: 'Save',
                 description: 'MultiUserAddModal - Save button label',
               })}
-              loading={saving || formState.isSubmitting}
+              loading={saving || isSubmitting}
               onPress={submit}
             />
           }
@@ -569,7 +575,7 @@ const MultiUserDetailModal = ({
           </View>
         </ContactCardEditForm>
       </SafeAreaView>
-      {formState.isSubmitting || saving ? (
+      {isSubmitting || saving ? (
         /* Used to prevent user from interacting with the screen while saving */
         <View style={StyleSheet.absoluteFill} />
       ) : null}

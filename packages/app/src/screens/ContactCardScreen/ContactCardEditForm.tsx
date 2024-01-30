@@ -30,7 +30,7 @@ import type { ImagePickerResult } from '#components/ImagePicker';
 import type { ContactCardEditModal_card$data } from '#relayArtifacts/ContactCardEditModal_card.graphql';
 import type { ContactCardEditFormValues } from './ContactCardEditModalSchema';
 import type { ReactNode } from 'react';
-import type { Control, FieldErrors } from 'react-hook-form';
+import type { Control } from 'react-hook-form';
 
 type ContactCardEditFormProps = {
   isMultiUser: boolean;
@@ -41,7 +41,6 @@ type ContactCardEditFormProps = {
   commonInformation: ContactCardEditModal_card$data['webCard']['commonInformation'];
   children?: ReactNode;
   footer?: ReactNode;
-  errors?: FieldErrors<ContactCardEditFormValues>;
 };
 
 const ContactCardEditForm = ({
@@ -53,7 +52,6 @@ const ContactCardEditForm = ({
   commonInformation,
   children,
   footer,
-  errors,
 }: ContactCardEditFormProps) => {
   const styles = useStyleSheet(styleSheet);
   const intl = useIntl();
@@ -292,7 +290,7 @@ const ContactCardEditForm = ({
                 <Separation small />
               </Fragment>
             ))}
-          <ContactCardEditModalUrls control={control} errors={errors} />
+          <ContactCardEditModalUrls control={control} />
           <Separation />
           {isMultiUser &&
             commonInformation?.addresses?.map((address, index) => (

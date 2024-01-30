@@ -1,4 +1,5 @@
 import * as z from 'zod';
+import { isValidUrl } from '@azzapp/shared/stringHelpers';
 
 export const commonInformationSchema = z.object({
   company: z.string().nullable(),
@@ -16,7 +17,7 @@ export const commonInformationSchema = z.object({
   ),
   urls: z.array(
     z.object({
-      address: z.string(),
+      address: z.string().refine(address => isValidUrl(address)),
     }),
   ),
   addresses: z.array(

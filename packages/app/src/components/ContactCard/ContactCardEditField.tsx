@@ -2,7 +2,6 @@ import { Controller } from 'react-hook-form';
 import { type TextInputProps } from 'react-native';
 import { buildContactCardModalStyleSheet } from '#helpers/contactCardHelpers';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
-
 import TextInput from '#ui/TextInput';
 import ContactCardEditFieldWrapper from './ContactCardEditFieldWrapper';
 import type { Control, FieldPath, FieldValues } from 'react-hook-form';
@@ -37,34 +36,36 @@ const ContactCardEditField = <TFieldValues extends FieldValues>({
   const styles = useStyleSheet(stylesheet);
 
   return (
-    <ContactCardEditFieldWrapper
-      labelKey={labelKey}
+    <Controller
       control={control}
-      labelValues={labelValues}
-      onChangeLabel={onChangeLabel}
-      deleteField={deleteField}
-      selectedKey={selectedKey}
-      errorMessage={errorMessage}
-    >
-      <Controller
-        control={control}
-        name={valueKey}
-        render={({ field: { onChange, value } }) => (
-          <TextInput
-            value={value as string}
-            onChangeText={trim ? value => onChange(value.trim()) : onChange}
-            style={styles.input}
-            numberOfLines={1}
-            keyboardType={keyboardType}
-            clearButtonMode="while-editing"
-            testID="contact-card-edit-modal-field"
-            placeholder={placeholder}
-            autoCapitalize={autoCapitalize}
-            isErrored={!!errorMessage}
-          />
-        )}
-      />
-    </ContactCardEditFieldWrapper>
+      name={valueKey}
+      render={({ field: { onChange, value }, fieldState: { error } }) => {
+        return (
+          <ContactCardEditFieldWrapper
+            labelKey={labelKey}
+            control={control}
+            labelValues={labelValues}
+            onChangeLabel={onChangeLabel}
+            deleteField={deleteField}
+            selectedKey={selectedKey}
+            errorMessage={error ? errorMessage ?? error.message : undefined}
+          >
+            <TextInput
+              value={value as string}
+              onChangeText={trim ? value => onChange(value.trim()) : onChange}
+              style={styles.input}
+              numberOfLines={1}
+              keyboardType={keyboardType}
+              clearButtonMode="while-editing"
+              testID="contact-card-edit-modal-field"
+              placeholder={placeholder}
+              autoCapitalize={autoCapitalize}
+              isErrored={!!error}
+            />
+          </ContactCardEditFieldWrapper>
+        );
+      }}
+    />
   );
 };
 
