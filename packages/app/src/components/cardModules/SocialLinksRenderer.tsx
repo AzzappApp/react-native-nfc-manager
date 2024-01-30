@@ -1,4 +1,12 @@
-import { Linking, ScrollView, View } from 'react-native';
+import { useEffect } from 'react';
+import {
+  LayoutAnimation,
+  Linking,
+  Platform,
+  ScrollView,
+  UIManager,
+  View,
+} from 'react-native';
 import { graphql, readInlineData } from 'react-relay';
 import { swapColor } from '@azzapp/shared/cardHelpers';
 import {
@@ -79,7 +87,12 @@ export type SocialLinksRendererProps = ViewProps & {
    */
   disabled?: boolean;
 };
-
+if (
+  Platform.OS === 'android' &&
+  UIManager.setLayoutAnimationEnabledExperimental
+) {
+  UIManager.setLayoutAnimationEnabledExperimental(true);
+}
 /**
  *  implementation of the SocialLinks module
  * This component takes the data directly instead of a relay fragment reference
@@ -134,6 +147,16 @@ const SocialLinksRenderer = ({
 
     await Linking.openURL(`${method}${url}${link.link}`);
   };
+
+  useEffect(() => {
+    LayoutAnimation.configureNext({
+      duration: 100, // duration in milliseconds
+      update: {
+        type: LayoutAnimation.Types.linear,
+        property: LayoutAnimation.Properties.opacity,
+      },
+    });
+  }, [arrangement]);
 
   return (
     <CardModuleBackground
