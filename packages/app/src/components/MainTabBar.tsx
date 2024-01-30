@@ -22,7 +22,6 @@ import {
   useRouter,
   useScreenHasFocus,
 } from './NativeRouter';
-import type { FooterBarItem } from '#ui/FooterBar';
 import type { SharedValue } from 'react-native-reanimated';
 
 const mainTabBarVisibilityStates: Array<{
@@ -143,22 +142,41 @@ const MainTabBar = ({
 
   const intl = useIntl();
 
-  const tabs = [
-    {
-      key: 'HOME',
-      label: intl.formatMessage(
+  const tabs = useMemo(
+    () =>
+      [
         {
-          defaultMessage: 'Webcards{azzappA}',
-          description: 'Main tab bar title for webcards',
+          key: 'HOME',
+          label: intl.formatMessage(
+            {
+              defaultMessage: 'Webcards{azzappA}',
+              description: 'Main tab bar title for webcards',
+            },
+            {
+              azzappA: <Text variant="azzapp">a</Text>,
+            },
+          ),
+          IconComponent: <HomeIcon />,
         },
         {
-          azzappA: <Text variant="azzapp">a</Text>,
+          key: 'NEW_POST',
+          label: intl.formatMessage({
+            defaultMessage: 'New Post',
+            description: 'Main tab bar title for new post',
+          }),
+          icon: 'add_filled',
         },
-      ),
-      IconComponent: <HomeIcon />,
-    },
-    ...TABS,
-  ];
+        {
+          key: 'MEDIA',
+          label: intl.formatMessage({
+            defaultMessage: 'Media',
+            description: 'Main tab bar title for media',
+          }),
+          icon: 'media',
+        },
+      ] as const,
+    [intl],
+  );
 
   return (
     <Animated.View
@@ -188,16 +206,4 @@ const MainTabBar = ({
 
 const MARGIN_HORIZONTAL = 30;
 
-const TABS: FooterBarItem[] = [
-  {
-    key: 'NEW_POST',
-    label: 'New Post',
-    icon: 'add_filled',
-  },
-  {
-    key: 'MEDIA',
-    label: 'Media',
-    icon: 'media',
-  },
-];
 export default MainTabBar;
