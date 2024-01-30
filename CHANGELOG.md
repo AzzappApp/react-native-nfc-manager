@@ -1,5 +1,9 @@
-## 0.5.5-canary.33
+## 0.5.5-canary.34
 
+* **fix:**  - **Android:** simplify cover carousel
+* **fix:**  - **Android:** remove media preview in CoverEditor hide button
+* **fix:**  - **Android:** Edition parameters uniformization
+* **fix:**  - **Android:** reduce onProgress interval on GPUVideoView
 * **fix:**  - image name
 * **fix:**  - add coming soon moduleyarn lint fix [#1146](https://github.com/AzzappApp/azzapp/pull/1146) ([#2554](https://github.com/AzzappApp/azzapp/pull/2554))
 * **fix:**  - **imagePicker:** [#2411](https://github.com/AzzappApp/azzapp/pull/2411) present image picker selection when limited ([#2564](https://github.com/AzzappApp/azzapp/pull/2564))
