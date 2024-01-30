@@ -26,6 +26,7 @@ import ScreenModal from '#components/ScreenModal';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import useAuthState from '#hooks/useAuthState';
 import Button from '#ui/Button';
+import Container from '#ui/Container';
 import Icon from '#ui/Icon';
 import PressableNative from '#ui/PressableNative';
 import RadioButton from '#ui/RadioButton';
@@ -324,11 +325,13 @@ const renderHeaderSection = (info: {
 const SectionHeader = ({ title }: { title: string }) => {
   const styles = useStyleSheet(styleSheet);
   return (
-    <View style={styles.header}>
-      <Text variant="xsmall" style={styles.headerText}>
-        {title}
-      </Text>
-    </View>
+    <Container>
+      <View style={styles.header}>
+        <Text variant="xsmall" style={styles.headerText}>
+          {title}
+        </Text>
+      </View>
+    </Container>
   );
 };
 
@@ -475,6 +478,7 @@ const styleSheet = createStyleSheet(appearance => ({
     borderRadius: 12,
     paddingVertical: 7,
     marginTop: 10,
+    marginBottom: 5,
   },
   headerText: {
     color: appearance === 'light' ? colors.grey600 : colors.grey300,
