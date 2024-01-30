@@ -1,9 +1,7 @@
-import { View } from 'react-native';
 import Animated, {
   interpolate,
   useAnimatedStyle,
   Easing,
-  useDerivedValue,
 } from 'react-native-reanimated';
 import getCoverAnimationProgress from './getCoverAnimationProgress';
 import type { TransformsStyle, ViewProps, ViewStyle } from 'react-native';
@@ -19,27 +17,30 @@ export type MediaAnimatorProps = ViewProps & {
 const MediaAnimator = ({
   animation = null,
   animationSharedValue,
+  height,
+  width,
+  style,
   ...props
 }: MediaAnimatorProps) => {
-  const Animator = animation && ANIMATORS[animation];
-  const forwardAnimationSharedValue = useDerivedValue(() => {
-    if (animationSharedValue) {
-      return animationSharedValue.value;
+  const animatedStyle = useAnimatedStyle(() => {
+    if (!animationSharedValue) {
+      return {};
     }
-    return -1;
-  }, [animationSharedValue]);
 
-  if (!Animator) {
-    return <View {...props} />;
-  }
-  return (
-    <Animator animationSharedValue={forwardAnimationSharedValue} {...props} />
-  );
+    if (!animation) {
+      return {};
+    } else {
+      const animFunction = ANIMATORS[animation];
+      return animFunction({ animationSharedValue, height, width });
+    }
+  }, [animation, animationSharedValue, height, width]);
+
+  return <Animated.View style={[style, animatedStyle]} {...props} />;
 };
 
 export default MediaAnimator;
 
-type AnimationProps = ViewProps & {
+type AnimationProps = {
   animationSharedValue: SharedValue<number>;
   height: number;
   width: number;
@@ -61,151 +62,115 @@ const createZoomTransform = (
   return transforms;
 };
 
-const createSimpleAnimation = (
-  displayName: string,
-  animatedStyleWorklet: (
-    animationSharedValue: SharedValue<number>,
-    width: number,
-    height: number,
-  ) => ViewStyle,
-) => {
-  const Animation = ({
-    animationSharedValue,
-    height,
-    width,
-    style,
-    ...props
-  }: AnimationProps) => {
-    const animatedStyle = useAnimatedStyle(() => {
-      if (animationSharedValue.value === -1) {
-        return {};
-      }
-      return animatedStyleWorklet(animationSharedValue, width, height);
-    });
-    return <Animated.View style={[style, animatedStyle]} {...props} />;
+const SmoothZoomOut = ({ animationSharedValue, height }: AnimationProps) => {
+  'worklet';
+  const animProgress = getCoverAnimationProgress(
+    animationSharedValue.value,
+    {
+      duration: 0.1,
+      easing: Easing.in(Easing.ease),
+    },
+    {
+      duration: 0.9,
+      easing: Easing.linear,
+    },
+  );
+  return {
+    opacity: 1,
+    transform: createZoomTransform(
+      interpolate(animProgress, [0, 1, 2], [1.4, 1.1, 1]),
+      true,
+      height,
+    ),
   };
-  Animation.displayName = displayName;
-  return Animation;
 };
 
-const SmoothZoomOut = createSimpleAnimation(
-  'SmoothZoomOut',
-  (animationSharedValue, _width, height) => {
-    'worklet';
-    const animProgress = getCoverAnimationProgress(
-      animationSharedValue.value,
-      {
-        duration: 0.1,
-        easing: Easing.in(Easing.ease),
-      },
-      {
-        duration: 0.9,
-        easing: Easing.linear,
-      },
-    );
-    return {
-      transform: createZoomTransform(
-        interpolate(animProgress, [0, 1, 2], [1.4, 1.1, 1]),
-        true,
-        height,
-      ),
-    };
-  },
-);
-
-const LinearZoomOut = createSimpleAnimation(
-  'LinearZoomOut',
-  animationSharedValue => {
-    'worklet';
-    return {
-      transform: [
-        {
-          scale: interpolate(animationSharedValue.value, [0, 1], [1.4, 1]),
-        },
-      ],
-    };
-  },
-);
-
-const AppearZoomOut = createSimpleAnimation(
-  'AppearZoomOut',
-  (animationSharedValue, _width, height) => {
-    'worklet';
-    const animationProgress = getCoverAnimationProgress(
-      animationSharedValue.value,
-      {
-        duration: 0.1,
-        easing: Easing.inOut(Easing.ease),
-      },
-    );
-    return {
-      transform: createZoomTransform(
-        interpolate(animationProgress, [0, 1], [1.4, 1]),
-        true,
-        height,
-      ),
-    };
-  },
-);
-
-const SmoothZoomIn = createSimpleAnimation(
-  'SmoothZoomIn',
-  (animationSharedValue, _width, height) => {
-    'worklet';
-    const animProgress = getCoverAnimationProgress(
-      animationSharedValue.value,
-      {
-        duration: 0.1,
-        easing: Easing.in(Easing.ease),
-      },
-      {
-        duration: 0.9,
-        easing: Easing.linear,
-      },
-    );
-    return {
-      transform: createZoomTransform(
-        interpolate(animProgress, [0, 1, 2], [1, 1.3, 1.4]),
-        true,
-        height,
-      ),
-    };
-  },
-);
-
-const LinearZoomIn = createSimpleAnimation('ZoomIn', animationSharedValue => {
+const LinearZoomOut = ({ animationSharedValue }: AnimationProps) => {
   'worklet';
   return {
+    opacity: 1,
+    transform: [
+      {
+        scale: interpolate(animationSharedValue.value, [0, 1], [1.4, 1]),
+      },
+    ],
+  };
+};
+
+const AppearZoomOut = ({ animationSharedValue, height }: AnimationProps) => {
+  'worklet';
+  const animationProgress = getCoverAnimationProgress(
+    animationSharedValue.value,
+    {
+      duration: 0.1,
+      easing: Easing.inOut(Easing.ease),
+    },
+  );
+  return {
+    opacity: 1,
+    transform: createZoomTransform(
+      interpolate(animationProgress, [0, 1], [1.4, 1]),
+      true,
+      height,
+    ),
+  };
+};
+
+const SmoothZoomIn = ({ animationSharedValue, height }: AnimationProps) => {
+  'worklet';
+  const animProgress = getCoverAnimationProgress(
+    animationSharedValue.value,
+    {
+      duration: 0.1,
+      easing: Easing.in(Easing.ease),
+    },
+    {
+      duration: 0.9,
+      easing: Easing.linear,
+    },
+  );
+  return {
+    opacity: 1,
+    transform: createZoomTransform(
+      interpolate(animProgress, [0, 1, 2], [1, 1.3, 1.4]),
+      true,
+      height,
+    ),
+  };
+};
+
+const LinearZoomIn = ({ animationSharedValue }: AnimationProps) => {
+  'worklet';
+  return {
+    opacity: 1,
     transform: [
       {
         scale: interpolate(animationSharedValue.value, [0, 1], [1, 1.4]),
       },
     ],
   };
-});
+};
 
-const AppearZoomIn = createSimpleAnimation(
-  'AppearZoomIn',
-  (animationSharedValue, _width, height) => {
-    'worklet';
-    const animationProgress = getCoverAnimationProgress(
-      animationSharedValue.value,
-      {
-        duration: 0.1,
-        easing: Easing.inOut(Easing.ease),
-      },
-    );
-    return {
-      transform: createZoomTransform(
-        interpolate(animationProgress, [0, 1], [1, 1.4]),
-        true,
-        height,
-      ),
-    };
-  },
-);
+const AppearZoomIn = ({ animationSharedValue, height }: AnimationProps) => {
+  'worklet';
+  const animationProgress = getCoverAnimationProgress(
+    animationSharedValue.value,
+    {
+      duration: 0.1,
+      easing: Easing.inOut(Easing.ease),
+    },
+  );
+  return {
+    opacity: 1,
+    transform: createZoomTransform(
+      interpolate(animationProgress, [0, 1], [1, 1.4]),
+      true,
+      height,
+    ),
+  };
+};
 
-const FadeInOut = createSimpleAnimation('FadeInOut', animationSharedValue => {
+const FadeInOut = ({ animationSharedValue }: AnimationProps) => {
   'worklet';
   const animationProgress = getCoverAnimationProgress(
     animationSharedValue.value,
@@ -224,9 +189,9 @@ const FadeInOut = createSimpleAnimation('FadeInOut', animationSharedValue => {
       { scale: interpolate(animationProgress, [0, 1, 2], [1.2, 1, 1.2]) },
     ],
   };
-});
+};
 
-const Pop = createSimpleAnimation('Pop', animationSharedValue => {
+const Pop = ({ animationSharedValue }: AnimationProps) => {
   'worklet';
   const animationProgress = getCoverAnimationProgress(
     animationSharedValue.value,
@@ -240,13 +205,14 @@ const Pop = createSimpleAnimation('Pop', animationSharedValue => {
     },
   );
   return {
+    opacity: 1,
     transform: [
       { scale: interpolate(animationProgress, [0, 1, 2], [1, 1.2, 1]) },
     ],
   };
-});
+};
 
-const Rotate = createSimpleAnimation('Rotate', animationSharedValue => {
+const Rotate = ({ animationSharedValue }: AnimationProps) => {
   'worklet';
 
   const animationProgress = getCoverAnimationProgress(
@@ -261,6 +227,7 @@ const Rotate = createSimpleAnimation('Rotate', animationSharedValue => {
     },
   );
   return {
+    opacity: 1,
     transform: [
       {
         rotate: `${interpolate(animationProgress, [0, 1, 2], [90, 0, 0])}deg`,
@@ -274,9 +241,9 @@ const Rotate = createSimpleAnimation('Rotate', animationSharedValue => {
       },
     ],
   };
-});
+};
 
-const ANIMATORS: Record<string, React.ComponentType<AnimationProps>> = {
+const ANIMATORS: Record<string, (param: AnimationProps) => ViewStyle> = {
   smoothZoomOut: SmoothZoomOut,
   linearZoomOut: LinearZoomOut,
   appearZoomOut: AppearZoomOut,
