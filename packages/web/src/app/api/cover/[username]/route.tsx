@@ -229,22 +229,22 @@ export const GET = async (
           verticalPosition === 'top'
             ? 'flex-start'
             : verticalPosition === 'middle'
-            ? 'center'
-            : 'flex-end';
+              ? 'center'
+              : 'flex-end';
       } else if (orientation === 'topToBottom') {
         overlayJustifyContent =
           horizontalPosition === 'left'
             ? 'flex-end'
             : horizontalPosition === 'center'
-            ? 'center'
-            : 'flex-start';
+              ? 'center'
+              : 'flex-start';
       } else {
         overlayJustifyContent =
           horizontalPosition === 'left'
             ? 'flex-start'
             : horizontalPosition === 'center'
-            ? 'center'
-            : 'flex-end';
+              ? 'center'
+              : 'flex-end';
       }
 
       let textAlign: 'center' | 'flex-end' | 'flex-start';
@@ -253,22 +253,22 @@ export const GET = async (
           horizontalPosition === 'left'
             ? 'flex-start'
             : horizontalPosition === 'center'
-            ? 'center'
-            : 'flex-end';
+              ? 'center'
+              : 'flex-end';
       } else if (orientation === 'topToBottom') {
         textAlign =
           verticalPosition === 'top'
             ? 'flex-start'
             : verticalPosition === 'middle'
-            ? 'center'
-            : 'flex-end';
+              ? 'center'
+              : 'flex-end';
       } else {
         textAlign =
           verticalPosition === 'bottom'
             ? 'flex-start'
             : verticalPosition === 'middle'
-            ? 'center'
-            : 'flex-end';
+              ? 'center'
+              : 'flex-end';
       }
 
       const titleFontFamily =

@@ -145,14 +145,14 @@ const uriResolver =
       assetKind === 'cover'
         ? COVER_ASSET_SIZES
         : assetKind === 'module'
-        ? MODULE_IMAGES_SIZES
-        : assetKind === 'contactCard'
-        ? CONTACTCARD_ASSET_SIZES
-        : assetKind === 'post'
-        ? kind === 'image'
-          ? POST_IMAGES_SIZES
-          : POST_VIDEO_SIZES
-        : null;
+          ? MODULE_IMAGES_SIZES
+          : assetKind === 'contactCard'
+            ? CONTACTCARD_ASSET_SIZES
+            : assetKind === 'post'
+              ? kind === 'image'
+                ? POST_IMAGES_SIZES
+                : POST_VIDEO_SIZES
+              : null;
     return uriGenerator(
       id,
       width,

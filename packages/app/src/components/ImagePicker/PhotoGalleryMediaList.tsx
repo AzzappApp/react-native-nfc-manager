@@ -82,8 +82,8 @@ const PhotoGalleryMediaList = ({
               kind === 'mixed'
                 ? ['photo', 'video']
                 : kind === 'image'
-                ? ['photo']
-                : ['video'],
+                  ? ['photo']
+                  : ['video'],
             sortBy: ['creationTime'],
             album: album ?? undefined,
           });

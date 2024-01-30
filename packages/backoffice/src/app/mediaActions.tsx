@@ -21,8 +21,8 @@ export const getSignedUpload = async (
     assetKind === 'cover'
       ? COVER_ASSET_SIZES
       : assetKind === 'module'
-      ? MODULE_IMAGES_SIZES
-      : null;
+        ? MODULE_IMAGES_SIZES
+        : null;
 
   await createMedia({
     id: mediaId,

@@ -393,8 +393,8 @@ const initToRouteInstance = <T extends RouteInit | StackInit | TabsInit>(
 ): T extends StackInit
   ? StackRoute
   : T extends TabsInit
-  ? TabsRoute
-  : BasicRoute => {
+    ? TabsRoute
+    : BasicRoute => {
   if ('stack' in init) {
     return {
       id: createId(),
@@ -796,8 +796,8 @@ export const ScreensRenderer = ({
                 animationType === 'fade'
                   ? 'fade'
                   : animationType === 'none'
-                  ? 'none'
-                  : 'slide_from_bottom'
+                    ? 'none'
+                    : 'slide_from_bottom'
               }
             >
               <GestureHandlerRootView style={{ flex: 1 }}>

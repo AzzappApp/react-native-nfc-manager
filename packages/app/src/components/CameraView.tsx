@@ -292,8 +292,8 @@ const CameraView = (
             flash === 'off'
               ? 'flash_off'
               : flash === 'auto'
-              ? 'flash_auto'
-              : 'flash_on'
+                ? 'flash_auto'
+                : 'flash_on'
           }
           style={[
             styles.flashButton,
@@ -310,14 +310,14 @@ const CameraView = (
                     description: 'flash off accessibility value',
                   })
                 : flash === 'auto'
-                ? intl.formatMessage({
-                    defaultMessage: 'Auto',
-                    description: 'flash auto accessibility value',
-                  })
-                : intl.formatMessage({
-                    defaultMessage: 'On',
-                    description: 'flash on accessibility value',
-                  }),
+                  ? intl.formatMessage({
+                      defaultMessage: 'Auto',
+                      description: 'flash auto accessibility value',
+                    })
+                  : intl.formatMessage({
+                      defaultMessage: 'On',
+                      description: 'flash on accessibility value',
+                    }),
           }}
           accessibilityLabel={intl.formatMessage({
             defaultMessage: 'Torch',

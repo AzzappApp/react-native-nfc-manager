@@ -255,11 +255,10 @@ const useSaveCover = (
           );
 
           const [sourceMediaId, maskMediaId, mediaId] = await Promise.all(
-            uploads.map(
-              upload =>
-                upload?.promise.then(({ public_id, resource_type }) => {
-                  return encodeMediaId(public_id, resource_type);
-                }),
+            uploads.map(upload =>
+              upload?.promise.then(({ public_id, resource_type }) => {
+                return encodeMediaId(public_id, resource_type);
+              }),
             ),
           );
 

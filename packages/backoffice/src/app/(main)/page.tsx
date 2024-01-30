@@ -4,8 +4,8 @@ import backOfficeSections from '../../backOfficeSections';
 
 const RootPage = async () => {
   const user = await getCurrentUser();
-  const link = backOfficeSections.find(
-    page => user?.roles?.some(role => page.roles.includes(role)),
+  const link = backOfficeSections.find(page =>
+    user?.roles?.some(role => page.roles.includes(role)),
   );
   redirect(link ? link.href : '/login');
 };

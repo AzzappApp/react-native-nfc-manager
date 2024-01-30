@@ -67,12 +67,12 @@ const uploadSignApi = async (req: Request) => {
     target === 'coverSource'
       ? null
       : target === 'cover'
-      ? COVER_ASSET_SIZES
-      : target === 'module'
-      ? MODULE_IMAGES_SIZES
-      : kind === 'image'
-      ? POST_IMAGES_SIZES
-      : POST_VIDEO_SIZES;
+        ? COVER_ASSET_SIZES
+        : target === 'module'
+          ? MODULE_IMAGES_SIZES
+          : kind === 'image'
+            ? POST_IMAGES_SIZES
+            : POST_VIDEO_SIZES;
 
   const { uploadParameters, uploadURL } = await createPresignedUpload(
     mediaId,

@@ -191,14 +191,14 @@ const ColorPicker = ({
         state === 'colorChooser'
           ? title
           : state === 'editing'
-          ? intl.formatMessage({
-              defaultMessage: 'Edit Palette',
-              description: 'ColorPicker component button Edit Palette',
-            })
-          : intl.formatMessage({
-              defaultMessage: 'Add a color',
-              description: 'ColorPicker component title when adding a color',
-            })
+            ? intl.formatMessage({
+                defaultMessage: 'Edit Palette',
+                description: 'ColorPicker component button Edit Palette',
+              })
+            : intl.formatMessage({
+                defaultMessage: 'Add a color',
+                description: 'ColorPicker component title when adding a color',
+              })
       }
       headerLeftButton={
         <Button
@@ -217,8 +217,8 @@ const ColorPicker = ({
             state === 'colorChooser'
               ? onEdit
               : state === 'colorEdition'
-              ? onCancelColorEdition
-              : onCancelEdit
+                ? onCancelColorEdition
+                : onCancelEdit
           }
           variant="secondary"
         />
@@ -240,8 +240,8 @@ const ColorPicker = ({
             state === 'colorChooser'
               ? onValidateColor
               : state === 'colorEdition'
-              ? onSaveEditedColor
-              : onSaveEditedColorList
+                ? onSaveEditedColor
+                : onSaveEditedColorList
           }
           variant="primary"
         />

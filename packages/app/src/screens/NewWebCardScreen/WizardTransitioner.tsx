@@ -102,8 +102,8 @@ const WizardTransitioner = ({
               index === currentStepIndex
                 ? 2
                 : transitionInformation?.disappearingPage === index
-                ? 1
-                : 0
+                  ? 1
+                  : 0
             }
             transitionProgress={
               transitionInformation?.transitioningPage === index

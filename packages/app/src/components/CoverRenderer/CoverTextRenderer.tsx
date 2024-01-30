@@ -123,22 +123,22 @@ const CoverTextRenderer = ({
       verticalPosition === 'top'
         ? 'flex-start'
         : verticalPosition === 'middle'
-        ? 'center'
-        : 'flex-end';
+          ? 'center'
+          : 'flex-end';
   } else if (orientation === 'topToBottom') {
     overlayJustifyContent =
       horizontalPosition === 'left'
         ? 'flex-end'
         : horizontalPosition === 'center'
-        ? 'center'
-        : 'flex-start';
+          ? 'center'
+          : 'flex-start';
   } else {
     overlayJustifyContent =
       horizontalPosition === 'left'
         ? 'flex-start'
         : horizontalPosition === 'center'
-        ? 'center'
-        : 'flex-end';
+          ? 'center'
+          : 'flex-end';
   }
 
   let textAlign: 'center' | 'left' | 'right';
@@ -147,22 +147,22 @@ const CoverTextRenderer = ({
       horizontalPosition === 'left'
         ? 'left'
         : horizontalPosition === 'center'
-        ? 'center'
-        : 'right';
+          ? 'center'
+          : 'right';
   } else if (orientation === 'topToBottom') {
     textAlign =
       verticalPosition === 'top'
         ? 'left'
         : verticalPosition === 'middle'
-        ? 'center'
-        : 'right';
+          ? 'center'
+          : 'right';
   } else {
     textAlign =
       verticalPosition === 'bottom'
         ? 'left'
         : verticalPosition === 'middle'
-        ? 'center'
-        : 'right';
+          ? 'center'
+          : 'right';
   }
 
   const topPadding = width * 0.15;

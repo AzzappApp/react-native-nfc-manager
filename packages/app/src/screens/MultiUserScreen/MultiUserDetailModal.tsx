@@ -155,11 +155,11 @@ const MultiUserDetailModal = ({
             value: profile.user.email,
           }
         : phoneNumber && phoneNumber?.isValid()
-        ? {
-            countryCodeOrEmail: phoneNumber.country!,
-            value: phoneNumber.formatInternational()!,
-          }
-        : null,
+          ? {
+              countryCodeOrEmail: phoneNumber.country!,
+              value: phoneNumber.formatInternational()!,
+            }
+          : null,
     },
   });
 

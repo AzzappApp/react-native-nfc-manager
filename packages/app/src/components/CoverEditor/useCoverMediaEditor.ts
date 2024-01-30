@@ -330,6 +330,6 @@ export const useTemplateSwitcherCoverMediaEditor = (
   return templateKind === 'people'
     ? people
     : templateKind === 'video'
-    ? video
-    : others;
+      ? video
+      : others;
 };

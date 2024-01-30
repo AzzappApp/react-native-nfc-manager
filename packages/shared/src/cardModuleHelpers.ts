@@ -926,10 +926,10 @@ export const getModuleDataValues = <
   [key in keyof TModuleData]-?: key extends keyof TStyleValues
     ? Exclude<TModuleData[key], null | undefined>
     : key extends keyof TDefaultValues
-    ? TDefaultValues[key] extends NonNullable<unknown>
-      ? Exclude<TModuleData[key], null | undefined>
-      : TModuleData[key]
-    : TModuleData[key];
+      ? TDefaultValues[key] extends NonNullable<unknown>
+        ? Exclude<TModuleData[key], null | undefined>
+        : TModuleData[key]
+      : TModuleData[key];
 } => {
   const cardStyleValues = getValuesFromStyle(cardStyle, styleValuesMap as any);
   const fields = uniq([

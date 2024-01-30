@@ -50,8 +50,8 @@ const CheckBox = ({
         ? colors.black
         : colors.grey100
       : scheme === 'light'
-      ? colors.grey100
-      : colors.grey800;
+        ? colors.grey100
+        : colors.grey800;
   const checkMark = scheme === 'light' ? colors.white : colors.black;
   return (
     <PressableNative

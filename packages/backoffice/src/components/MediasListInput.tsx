@@ -168,8 +168,8 @@ export const SortableItem: React.FC<SortableItemProps> = ({
       ? image.type === 'application/json'
         ? 'lottie'
         : image.type.startsWith('video')
-        ? 'video'
-        : 'image'
+          ? 'video'
+          : 'image'
       : 'image';
 
   useEffect(() => {

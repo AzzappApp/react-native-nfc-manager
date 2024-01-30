@@ -48,8 +48,8 @@ export const buildVCard = async (
       phone[0] === 'Main'
         ? 'type=PREF'
         : phone[0] === 'Mobile'
-        ? 'type=CELL'
-        : `type=${phone[0].toLocaleUpperCase()}`,
+          ? 'type=CELL'
+          : `type=${phone[0].toLocaleUpperCase()}`,
     );
   });
 

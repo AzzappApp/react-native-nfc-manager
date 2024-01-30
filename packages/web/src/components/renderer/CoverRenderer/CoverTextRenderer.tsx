@@ -112,22 +112,22 @@ const CoverTextRenderer = (
       verticalPosition === 'top'
         ? 'flex-start'
         : verticalPosition === 'middle'
-        ? 'center'
-        : 'flex-end';
+          ? 'center'
+          : 'flex-end';
   } else if (orientation === 'topToBottom') {
     overlayJustifyContent =
       horizontalPosition === 'left'
         ? 'flex-end'
         : horizontalPosition === 'center'
-        ? 'center'
-        : 'flex-start';
+          ? 'center'
+          : 'flex-start';
   } else {
     overlayJustifyContent =
       horizontalPosition === 'left'
         ? 'flex-start'
         : horizontalPosition === 'center'
-        ? 'center'
-        : 'flex-end';
+          ? 'center'
+          : 'flex-end';
   }
 
   let textAlign: 'center' | 'left' | 'right';
@@ -136,22 +136,22 @@ const CoverTextRenderer = (
       horizontalPosition === 'left'
         ? 'left'
         : horizontalPosition === 'center'
-        ? 'center'
-        : 'right';
+          ? 'center'
+          : 'right';
   } else if (orientation === 'topToBottom') {
     textAlign =
       verticalPosition === 'top'
         ? 'left'
         : verticalPosition === 'middle'
-        ? 'center'
-        : 'right';
+          ? 'center'
+          : 'right';
   } else {
     textAlign =
       verticalPosition === 'bottom'
         ? 'left'
         : verticalPosition === 'middle'
-        ? 'center'
-        : 'right';
+          ? 'center'
+          : 'right';
   }
 
   const titleFontFamily = titleStyle?.fontFamily ?? DEFAULT_COVER_FONT_FAMILY;
@@ -196,12 +196,12 @@ const CoverTextRenderer = (
   const maskDirection = textAnimation?.endsWith('Left')
     ? 'right'
     : textAnimation?.endsWith('Right')
-    ? 'left'
-    : textAnimation?.endsWith('Top')
-    ? 'bottom'
-    : textAnimation?.endsWith('Bottom')
-    ? 'top'
-    : null;
+      ? 'left'
+      : textAnimation?.endsWith('Top')
+        ? 'bottom'
+        : textAnimation?.endsWith('Bottom')
+          ? 'top'
+          : null;
 
   const containersRef = useRef<HTMLDivElement[]>([]);
 
@@ -247,8 +247,8 @@ const CoverTextRenderer = (
             maskDirection === 'left' || maskDirection === 'top'
               ? `linear-gradient(to ${maskDirection}, transparent 0%, black 5%, black 100%)`
               : maskDirection === 'right' || maskDirection === 'bottom'
-              ? `linear-gradient(to ${maskDirection}, black 0%, black 95%, transparent 100%)`
-              : undefined,
+                ? `linear-gradient(to ${maskDirection}, black 0%, black 95%, transparent 100%)`
+                : undefined,
         }}
         className={cx(
           styles.coverTextContainer,

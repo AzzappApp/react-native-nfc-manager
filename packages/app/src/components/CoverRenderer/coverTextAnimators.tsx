@@ -137,12 +137,12 @@ const AnimatedTextContainer = ({
             position === 'top'
               ? maskSize / (textContainerLayout.height + maskSize)
               : position === 'right'
-              ? textContainerLayout.width /
-                (textContainerLayout.width + maskSize)
-              : position === 'bottom'
-              ? textContainerLayout.height /
-                (textContainerLayout.height + maskSize)
-              : maskSize / (textContainerLayout.width + maskSize),
+                ? textContainerLayout.width /
+                  (textContainerLayout.width + maskSize)
+                : position === 'bottom'
+                  ? textContainerLayout.height /
+                    (textContainerLayout.height + maskSize)
+                  : maskSize / (textContainerLayout.width + maskSize),
             1,
           ]}
           style={{ flex: 1 }}
@@ -893,14 +893,14 @@ const NeonAnimation = ({
         progress < 0.2
           ? 0
           : progress < 0.225
-          ? 1
-          : progress < 0.25
-          ? 0
-          : progress < 0.275
-          ? 1
-          : progress < 0.3
-          ? 0
-          : 1,
+            ? 1
+            : progress < 0.25
+              ? 0
+              : progress < 0.275
+                ? 1
+                : progress < 0.3
+                  ? 0
+                  : 1,
     };
   });
 

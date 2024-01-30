@@ -148,16 +148,16 @@ const PhotoWithTextAndTitleRenderer = ({
     viewMode === 'desktop'
       ? 'web'
       : viewMode === 'mobile'
-      ? 'ios'
-      : Platform.OS;
+        ? 'ios'
+        : Platform.OS;
 
   const widthMargin = (layout?.width ?? 0) - 2 * marginHorizontal;
   const imageWidth =
     os === 'web'
       ? widthMargin / 2
       : imageMargin === 'width_full'
-      ? layout?.width ?? 0
-      : widthMargin;
+        ? layout?.width ?? 0
+        : widthMargin;
 
   const flexDirection =
     os === 'web'
@@ -165,8 +165,8 @@ const PhotoWithTextAndTitleRenderer = ({
         ? 'row'
         : 'row-reverse'
       : verticalArrangement === 'top'
-      ? 'column'
-      : 'column-reverse';
+        ? 'column'
+        : 'column-reverse';
 
   return (
     <CardModuleBackground
@@ -197,8 +197,8 @@ const PhotoWithTextAndTitleRenderer = ({
               os === 'web'
                 ? 0
                 : imageMargin === 'width_full'
-                ? 0
-                : marginHorizontal,
+                  ? 0
+                  : marginHorizontal,
             width: imageWidth,
             aspectRatio,
             borderRadius,

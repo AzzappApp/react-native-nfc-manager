@@ -80,8 +80,8 @@ const WebCardKinStep = ({
 
   useEffect(() => {
     const observables = convertToNonNullArray(
-      webCardCategories.flatMap(
-        category => category.medias?.map(media => prefetchImage(media.uri)),
+      webCardCategories.flatMap(category =>
+        category.medias?.map(media => prefetchImage(media.uri)),
       ),
     );
     const subscription = observables.length

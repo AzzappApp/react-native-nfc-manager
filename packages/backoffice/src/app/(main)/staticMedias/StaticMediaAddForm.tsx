@@ -75,8 +75,8 @@ const StaticMediaAddForm = ({
               usage === 'moduleBackground'
                 ? 'image/svg+xml'
                 : usage === 'coverForeground'
-                ? 'image/png,application/json'
-                : 'image/png'
+                  ? 'image/png,application/json'
+                  : 'image/png'
             }
             onChange={setMedias as any}
             error={!!mediaErrors}

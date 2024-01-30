@@ -193,14 +193,14 @@ const ImagePickerWizardRenderer = ({
           headerRightButtonTitle
             ? headerRightButtonTitle
             : isLastStep
-            ? intl.formatMessage({
-                defaultMessage: 'Save',
-                description: 'Save button label in image picker wizzard',
-              })
-            : intl.formatMessage({
-                defaultMessage: 'Next',
-                description: 'Next button label in image picker wizzard',
-              })
+              ? intl.formatMessage({
+                  defaultMessage: 'Save',
+                  description: 'Save button label in image picker wizzard',
+                })
+              : intl.formatMessage({
+                  defaultMessage: 'Next',
+                  description: 'Next button label in image picker wizzard',
+                })
         }
         onPress={onNext}
       />

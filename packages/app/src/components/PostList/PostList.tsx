@@ -153,12 +153,13 @@ const PostList = ({
                   paused: before.played
                     ? [before.played]
                     : before.paused.length > 1
-                    ? before.paused.includes(videoIds[videoIds.length - 1].id)
-                      ? before.paused.filter(
-                          paused => paused !== videoIds[videoIds.length - 1].id,
-                        )
-                      : before.paused.slice(1)
-                    : before.paused,
+                      ? before.paused.includes(videoIds[videoIds.length - 1].id)
+                        ? before.paused.filter(
+                            paused =>
+                              paused !== videoIds[videoIds.length - 1].id,
+                          )
+                        : before.paused.slice(1)
+                      : before.paused,
                 },
           );
         } else {
@@ -170,12 +171,12 @@ const PostList = ({
                   paused: before.played
                     ? [before.played]
                     : before.paused.length > 1
-                    ? before.paused.includes(videoIds[0].id)
-                      ? before.paused.filter(
-                          paused => paused !== videoIds[0].id,
-                        )
-                      : before.paused.slice(1)
-                    : before.paused,
+                      ? before.paused.includes(videoIds[0].id)
+                        ? before.paused.filter(
+                            paused => paused !== videoIds[0].id,
+                          )
+                        : before.paused.slice(1)
+                      : before.paused,
                 },
           );
         }

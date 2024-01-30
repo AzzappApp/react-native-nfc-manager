@@ -31,11 +31,11 @@ const CECHeader = ({
               description: 'Cover creation screen title',
             })
           : editedParameter
-          ? paramsInfos[editedParameter]?.label ?? ''
-          : intl.formatMessage({
-              defaultMessage: 'Update your cover',
-              description: 'Cover edition screen title',
-            })
+            ? paramsInfos[editedParameter]?.label ?? ''
+            : intl.formatMessage({
+                defaultMessage: 'Update your cover',
+                description: 'Cover edition screen title',
+              })
       }
       leftElement={
         !editedParameter ? (

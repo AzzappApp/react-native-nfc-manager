@@ -106,8 +106,8 @@ const MainTabBar = ({
       visibilityState === true
         ? 1
         : visibilityState === false
-        ? 0
-        : visibilityState?.value;
+          ? 0
+          : visibilityState?.value;
     return {
       opacity: visible,
     };
@@ -120,10 +120,10 @@ const MainTabBar = ({
       visibilityState === true
         ? 'box-none'
         : visibilityState === false
-        ? 'none'
-        : visibilityState?.value === 0
-        ? 'none'
-        : 'box-none';
+          ? 'none'
+          : visibilityState?.value === 0
+            ? 'none'
+            : 'box-none';
 
     return {
       pointerEvents,

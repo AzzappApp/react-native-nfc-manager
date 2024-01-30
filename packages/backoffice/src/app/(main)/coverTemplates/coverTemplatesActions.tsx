@@ -126,8 +126,8 @@ export const getCoverData = async (username: string) => {
     kind: webCard.coverData.segmented
       ? 'people'
       : media.kind === 'image'
-      ? 'others'
-      : 'video',
+        ? 'others'
+        : 'video',
 
     previewMedia: {
       id: media.id,

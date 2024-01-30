@@ -367,9 +367,8 @@ export default relayScreen(NewWebCardScreen, {
       { pixelRatio },
     ).mergeMap(({ webCardCategories }) => {
       const observables = convertToNonNullArray(
-        webCardCategories.flatMap(
-          category =>
-            category.medias?.map(media => prefetchImage(media.preloadURI)),
+        webCardCategories.flatMap(category =>
+          category.medias?.map(media => prefetchImage(media.preloadURI)),
         ),
       );
       if (observables.length === 0) {

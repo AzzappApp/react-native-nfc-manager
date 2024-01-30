@@ -174,8 +174,8 @@ const CoverEditor = (
       return cardCover.sourceMedia?.__typename === 'MediaVideo'
         ? 'video'
         : cardCover.segmented
-        ? 'people'
-        : 'others';
+          ? 'people'
+          : 'others';
     }
     return profile?.webCard.webCardKind === 'business' ? 'others' : 'people';
     // We don't want to update the initial data when the cardCover change
@@ -198,16 +198,16 @@ const CoverEditor = (
                 'Toast message while switching to people in cover creation',
             })
           : kind === 'others'
-          ? intl.formatMessage({
-              defaultMessage: 'Add a photo yo your cover',
-              description:
-                'Toast message while switching to others in cover creation',
-            })
-          : intl.formatMessage({
-              defaultMessage: 'Add a video to your cover',
-              description:
-                'Toast message while switching to viode in cover creation',
-            });
+            ? intl.formatMessage({
+                defaultMessage: 'Add a photo yo your cover',
+                description:
+                  'Toast message while switching to others in cover creation',
+              })
+            : intl.formatMessage({
+                defaultMessage: 'Add a video to your cover',
+                description:
+                  'Toast message while switching to viode in cover creation',
+              });
 
       Toast.show({
         type: 'success',

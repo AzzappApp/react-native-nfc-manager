@@ -70,8 +70,8 @@ const UsersPage = async ({ searchParams = {} }: UsersPageProps) => {
     searchParams.order === 'desc'
       ? 'desc'
       : sort === 'createdAt' && !searchParams.order
-      ? 'desc'
-      : 'asc';
+        ? 'desc'
+        : 'asc';
   const search = searchParams.s ?? null;
 
   const users = await getUsers(page - 1, sort, order, search);

@@ -220,8 +220,8 @@ const AppRouter = () => {
     return authenticated
       ? mainRoutes(!profileInfos)
       : hasBeenSignedIn
-      ? signInRoutes
-      : signUpRoutes;
+        ? signInRoutes
+        : signUpRoutes;
   }, []);
 
   const { router, routerState } = useNativeRouter(initialRoutes);

@@ -156,8 +156,8 @@ const CECTitlePanel = ({
       orientation === 'bottomToTop'
         ? 'topToBottom'
         : orientation === 'topToBottom'
-        ? 'horizontal'
-        : 'bottomToTop',
+          ? 'horizontal'
+          : 'bottomToTop',
     );
   };
 
@@ -303,8 +303,8 @@ const CECTitlePanel = ({
                         orientation === 'bottomToTop'
                           ? require('./assets/bottom-to-top.png')
                           : orientation === 'topToBottom'
-                          ? require('./assets/top-to-bottom.png')
-                          : require('./assets/horizontal.png')
+                            ? require('./assets/top-to-bottom.png')
+                            : require('./assets/horizontal.png')
                       }
                       style={styles.orientationIcon}
                     />

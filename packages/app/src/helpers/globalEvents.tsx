@@ -94,18 +94,18 @@ export type GlobalEvents =
 type TypeToLister<TType extends GlobalEvents['type']> = TType extends 'SIGN_UP'
   ? SIGN_UP_EVENTS
   : TType extends 'SIGN_IN'
-  ? SIGN_IN
-  : TType extends 'SIGN_OUT'
-  ? SIGN_OUT
-  : TType extends 'WEBCARD_CHANGE'
-  ? WEBCARD_CHANGE
-  : TType extends 'PROFILE_ROLE_CHANGE'
-  ? PROFILE_ROLE_CHANGE
-  : TType extends 'NETWORK_ERROR'
-  ? NETWORK_ERROR
-  : TType extends 'TOKENS_REFRESHED'
-  ? TOKENS_REFRESHED
-  : never;
+    ? SIGN_IN
+    : TType extends 'SIGN_OUT'
+      ? SIGN_OUT
+      : TType extends 'WEBCARD_CHANGE'
+        ? WEBCARD_CHANGE
+        : TType extends 'PROFILE_ROLE_CHANGE'
+          ? PROFILE_ROLE_CHANGE
+          : TType extends 'NETWORK_ERROR'
+            ? NETWORK_ERROR
+            : TType extends 'TOKENS_REFRESHED'
+              ? TOKENS_REFRESHED
+              : never;
 
 type EventListener<T extends GlobalEvents> =
   | ((event: T) => Promise<any>)

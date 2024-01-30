@@ -25,12 +25,12 @@ const MultiUserAddList = ({
     (contact.firstName && contact.lastName
       ? `${contact.firstName} ${contact.lastName}`
       : contact.firstName
-      ? `${contact.firstName}`
-      : contact.lastName
-      ? `${contact.lastName}`
-      : contact.name
-      ? `${contact.name}`
-      : ''
+        ? `${contact.firstName}`
+        : contact.lastName
+          ? `${contact.lastName}`
+          : contact.name
+            ? `${contact.name}`
+            : ''
     ).trim();
 
   useEffect(() => {
@@ -73,12 +73,12 @@ const MultiUserAddList = ({
           (contact.lastName &&
             contact.lastName.toLowerCase().includes(searchLower)) ||
           (contact.phoneNumbers &&
-            contact.phoneNumbers.some(
-              phone => phone.number?.toLowerCase().includes(searchLower),
+            contact.phoneNumbers.some(phone =>
+              phone.number?.toLowerCase().includes(searchLower),
             )) ||
           (contact.emails &&
-            contact.emails.some(
-              email => email.email?.toLowerCase().includes(searchLower),
+            contact.emails.some(email =>
+              email.email?.toLowerCase().includes(searchLower),
             ))
         );
       });
