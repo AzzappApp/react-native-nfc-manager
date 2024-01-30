@@ -18,7 +18,7 @@ import { useImagePickerState } from './ImagePickerContext';
 import ImagePickerMediaRenderer from './ImagePickerMediaRenderer';
 import { ImagePickerStep } from './ImagePickerWizardContainer';
 import type { EditionParameters, ImageOrientation } from '#components/gpu';
-import type { FooterBarItem } from '#ui/FooterBar';
+import type { BottomMenuItem } from '#ui/BottomMenu';
 import type { MediaVideo } from './imagePickerTypes';
 /**
  * A step of the Image Picker that allows the user to edit the selected image
@@ -100,8 +100,8 @@ const EditImageStep = () => {
   const isEditing = !!editedParameter;
   const paramsInfos = useEditionParametersDisplayInfos();
 
-  const tabs = useMemo<FooterBarItem[]>(() => {
-    const tabs: FooterBarItem[] = [
+  const tabs = useMemo<BottomMenuItem[]>(() => {
+    const tabs: BottomMenuItem[] = [
       {
         icon: 'filters',
         key: 'filter',

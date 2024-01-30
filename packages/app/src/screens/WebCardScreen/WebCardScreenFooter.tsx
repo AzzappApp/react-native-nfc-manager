@@ -15,7 +15,7 @@ import {
   useSelectionModeTransition,
 } from './WebCardScreenTransitions';
 import type { WebCardColorPicker_webCard$key } from '#relayArtifacts/WebCardColorPicker_webCard.graphql';
-import type { FooterBarItem } from '#ui/FooterBar';
+import type { BottomMenuItem } from '#ui/BottomMenu';
 
 export type WebCardScreenFooterProps = {
   webCard: WebCardColorPicker_webCard$key;
@@ -110,7 +110,7 @@ const WebCardScreenFooter = ({
 
   const intl = useIntl();
   const styles = useStyleSheet(styleSheet);
-  const tabs = useMemo<FooterBarItem[]>(
+  const tabs = useMemo<BottomMenuItem[]>(
     () => [
       {
         key: 'preview',

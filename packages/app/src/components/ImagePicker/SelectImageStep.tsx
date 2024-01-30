@@ -19,7 +19,7 @@ import { useImagePickerState } from './ImagePickerContext';
 import ImagePickerMediaRenderer from './ImagePickerMediaRenderer';
 import { ImagePickerStep } from './ImagePickerWizardContainer';
 import PhotoGalleryMediaList from './PhotoGalleryMediaList';
-import type { FooterBarItem } from '#ui/FooterBar';
+import type { BottomMenuItem } from '#ui/BottomMenu';
 import type { CameraViewHandle, RecordSession } from '../CameraView';
 import type { CameraRuntimeError } from 'react-native-vision-camera';
 
@@ -172,7 +172,7 @@ const SelectImageStep = ({
   const intl = useIntl();
 
   const tabs = useMemo(() => {
-    const tabs: FooterBarItem[] = [
+    const tabs: BottomMenuItem[] = [
       {
         icon: 'grid',
         key: 'gallery',
