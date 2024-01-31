@@ -1,5 +1,10 @@
-## 0.5.5-canary.36
+## 0.5.5-canary.37
 
+* **fix:**  - **Android:** add minimum inset top
+* **fix:**  - **Android:** proper ripple on bottom menu
+* **fix:**  - **Android:** shadow in selection list
+* **fix:**  - **CoverRenderer:** missing animation
+* **fix:**  - **Android:** border-radius on CoverLoadingIndicator
 * **fix:**  - **MultiUser:** fix mode darkmode ([#2580](https://github.com/AzzappApp/azzapp/pull/2580))
 * **fix:**  - 🐛 set button section as email by default ([#2577](https://github.com/AzzappApp/azzapp/pull/2577))
 * **feat:**  - **Social:** add a little animation layout when changing display mode ([#2574](https://github.com/AzzappApp/azzapp/pull/2574))
