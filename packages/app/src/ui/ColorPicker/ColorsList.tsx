@@ -1,7 +1,8 @@
 import chroma from 'chroma-js';
 import { memo, useCallback } from 'react';
 import { FormattedMessage } from 'react-intl';
-import { View, StyleSheet, ScrollView, useColorScheme } from 'react-native';
+import { View, StyleSheet, useColorScheme } from 'react-native';
+import { ScrollView } from 'react-native-gesture-handler';
 import Animated, {
   interpolateColor,
   useAnimatedStyle,
@@ -293,6 +294,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     gap: ITEM_MARGIN,
     paddingLeft: 5,
+    paddingBottom: 5,
   },
   itemContainer: {
     justifyContent: 'center',
