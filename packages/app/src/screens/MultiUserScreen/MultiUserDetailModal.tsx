@@ -524,6 +524,13 @@ const MultiUserDetailModal = ({
                       BOTTOM_SHEET_HEIGHT_BASE +
                       roles.length * BOTTOM_SHEET_HEIGHT_ITEM
                     }
+                    bottomSheetTitle={
+                      intl.formatMessage({
+                        defaultMessage: 'Select a role',
+                        description:
+                          'MultiUserDetailForm - Role BottomSheet - Title',
+                      }) as string
+                    }
                   />
                 </View>
               )}
@@ -585,8 +592,8 @@ const MultiUserDetailModal = ({
   );
 };
 
-const BOTTOM_SHEET_HEIGHT_BASE = 20;
-const BOTTOM_SHEET_HEIGHT_ITEM = 30;
+const BOTTOM_SHEET_HEIGHT_BASE = 100;
+const BOTTOM_SHEET_HEIGHT_ITEM = 40;
 
 const roles: Array<{ id: ProfileRole; label: ReactNode }> = [
   {
@@ -639,6 +646,7 @@ const styleSheet = createStyleSheet(appearance => ({
   },
   selectItemContainerStyle: {
     paddingHorizontal: 30,
+    marginBottom: 18,
   },
   contactText: {
     backgroundColor: 'transparent',
