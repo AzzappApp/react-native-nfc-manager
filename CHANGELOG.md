@@ -1,5 +1,6 @@
-## 0.5.5-canary.38
+## 0.5.5-canary.39
 
+* **fix:**  - 🐛 wait for transition to navigate on bottom bar ([#2594](https://github.com/AzzappApp/azzapp/pull/2594))
 * **fix:**  - **Android:** Color picker behavior
 * **fix:**  - **Android:** vertical alignment of TextArea modal
 * **fix:**  - ImagePickerMenuBar
