@@ -117,7 +117,7 @@ describe('ContactCardEditModal', () => {
       fireEvent.changeText(screen.getByDisplayValue('Facebook'), 'Facebook 2');
       fireEvent.changeText(
         screen.getByDisplayValue('test@test.com'),
-        'test@test.com 2',
+        'test2@test.com',
       );
       fireEvent.changeText(
         screen.getByDisplayValue('1234567890'),
@@ -164,7 +164,7 @@ describe('ContactCardEditModal', () => {
         emails: [
           {
             label: 'Work',
-            address: 'test@test.com 2',
+            address: 'test2@test.com',
             selected: true,
           },
         ],

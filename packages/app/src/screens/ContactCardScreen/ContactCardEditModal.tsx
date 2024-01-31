@@ -183,6 +183,7 @@ const ContactCardEditModal = ({
     formState: { isSubmitting },
   } = useForm<ContactCardEditFormValues>({
     mode: 'onBlur',
+    shouldFocusError: true,
     resolver: zodResolver(contactCardEditSchema),
     defaultValues: {
       ...contactCard,
@@ -200,77 +201,74 @@ const ContactCardEditModal = ({
   const [progressIndicator, setProgressIndicator] =
     useState<Observable<number> | null>(null);
 
-  const submit = handleSubmit(
-    async ({ avatar, ...data }) => {
-      let avatarId: string | null = avatar?.id ?? null;
-      if (avatar?.local && avatar.uri) {
-        setProgressIndicator(Observable.from(0));
+  const submit = handleSubmit(async ({ avatar, ...data }) => {
+    let avatarId: string | null = avatar?.id ?? null;
+    if (avatar?.local && avatar.uri) {
+      setProgressIndicator(Observable.from(0));
 
-        const fileName = getFileName(avatar.uri);
-        const file: any = {
-          name: fileName,
-          uri: avatar.uri,
-          type: mime.lookup(fileName) || 'image/jpeg',
-        };
+      const fileName = getFileName(avatar.uri);
+      const file: any = {
+        name: fileName,
+        uri: avatar.uri,
+        type: mime.lookup(fileName) || 'image/jpeg',
+      };
 
-        const { uploadURL, uploadParameters } = await uploadSign({
-          kind: 'image',
-          target: 'post',
-        });
-        const { progress: uploadProgress, promise: uploadPromise } =
-          uploadMedia(file, uploadURL, uploadParameters);
-        setProgressIndicator(uploadProgress);
-        const { public_id } = await uploadPromise;
-        avatarId = encodeMediaId(public_id, 'image');
-      }
-
-      commit({
-        variables: {
-          input: {
-            profileId: id,
-            contactCard: {
-              ...data,
-              emails: data.emails.filter(email => email.address),
-              phoneNumbers: data.phoneNumbers.filter(
-                phoneNumber => phoneNumber.number,
-              ),
-              urls: data.urls.filter(url => url.address),
-              addresses: data.addresses.filter(address => address.address),
-              birthday: data.birthday,
-              socials: data.socials.filter(social => social.url),
-              avatarId,
-            },
-          },
-          pixelRatio: CappedPixelRatio(),
-        },
-        onCompleted: () => {
-          if (avatarId && avatar?.uri) {
-            addLocalCachedMediaFile(
-              `${'image'.slice(0, 1)}:${avatarId}`,
-              'image',
-              avatar.uri,
-            );
-          }
-          toggleBottomSheet();
-        },
-        onError: e => {
-          console.error(e);
-          Toast.show({
-            type: 'error',
-            text1: intl.formatMessage({
-              defaultMessage:
-                'Error, could not save your contact card. Please try again.',
-              description:
-                'Error toast message when saving contact card failed',
-            }),
-          });
-        },
+      const { uploadURL, uploadParameters } = await uploadSign({
+        kind: 'image',
+        target: 'post',
       });
-    },
-    error => {
-      console.log(error);
-    },
-  );
+      const { progress: uploadProgress, promise: uploadPromise } = uploadMedia(
+        file,
+        uploadURL,
+        uploadParameters,
+      );
+      setProgressIndicator(uploadProgress);
+      const { public_id } = await uploadPromise;
+      avatarId = encodeMediaId(public_id, 'image');
+    }
+
+    commit({
+      variables: {
+        input: {
+          profileId: id,
+          contactCard: {
+            ...data,
+            emails: data.emails.filter(email => email.address),
+            phoneNumbers: data.phoneNumbers.filter(
+              phoneNumber => phoneNumber.number,
+            ),
+            urls: data.urls.filter(url => url.address),
+            addresses: data.addresses.filter(address => address.address),
+            birthday: data.birthday,
+            socials: data.socials.filter(social => social.url),
+            avatarId,
+          },
+        },
+        pixelRatio: CappedPixelRatio(),
+      },
+      onCompleted: () => {
+        if (avatarId && avatar?.uri) {
+          addLocalCachedMediaFile(
+            `${'image'.slice(0, 1)}:${avatarId}`,
+            'image',
+            avatar.uri,
+          );
+        }
+        toggleBottomSheet();
+      },
+      onError: e => {
+        console.error(e);
+        Toast.show({
+          type: 'error',
+          text1: intl.formatMessage({
+            defaultMessage:
+              'Error, could not save your contact card. Please try again.',
+            description: 'Error toast message when saving contact card failed',
+          }),
+        });
+      },
+    });
+  });
 
   const [showImagePicker, setShowImagePicker] = useState(false);
 

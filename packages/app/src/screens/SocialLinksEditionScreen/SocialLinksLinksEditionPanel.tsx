@@ -1,10 +1,15 @@
+import { isValidPhoneNumber } from 'libphonenumber-js';
 import { memo, useCallback, useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { StyleSheet, View, useColorScheme } from 'react-native';
 import { GestureDetector } from 'react-native-gesture-handler';
 import Toast from 'react-native-toast-message';
 import { SOCIAL_LINKS } from '@azzapp/shared/socialLinkHelpers';
-import { isNotFalsyString, isValidUrl } from '@azzapp/shared/stringHelpers';
+import {
+  isNotFalsyString,
+  isValidEmail,
+  isValidUrl,
+} from '@azzapp/shared/stringHelpers';
 import { colors } from '#theme';
 import SortableList from '#components/SortableScrollView/SortableScrollView';
 import useEditorLayout from '#hooks/useEditorLayout';
@@ -257,22 +262,49 @@ const SocialInputComponent = ({
   const onEndEditing = async (
     e: NativeSyntheticEvent<TextInputEndEditingEventData>,
   ) => {
-    if (icon === 'website') {
-      if (!e.nativeEvent.text || isValidUrl(e.nativeEvent.text)) {
-        onChangeLink(icon, e.nativeEvent.text);
-      } else {
-        Toast.show({
-          type: 'error',
-          text1: intl.formatMessage({
+    const validators = {
+      website: (text: string) => {
+        if (!isValidUrl(text)) {
+          return intl.formatMessage({
             defaultMessage: 'The Website url is not valid.',
             description:
               'Error toast message when a website url sociallink is not valid.',
-          }),
+          });
+        }
+      },
+      phone: (text: string) => {
+        if (!isValidPhoneNumber(text)) {
+          return intl.formatMessage({
+            defaultMessage: 'The phone number is not valid.',
+            description:
+              'Error toast message when a phone number sociallink is not valid.',
+          });
+        }
+      },
+      mail: (text: string) => {
+        if (!isValidEmail(text)) {
+          return intl.formatMessage({
+            defaultMessage: 'The email is not valid.',
+            description:
+              'Error toast message when an email sociallink is not valid.',
+          });
+        }
+      },
+    } as Partial<Record<SocialLinkId, (text: string) => string | undefined>>;
+
+    const validator = validators[icon];
+    if (validator && e.nativeEvent.text) {
+      const error = validator(e.nativeEvent.text);
+
+      if (error) {
+        return Toast.show({
+          type: 'error',
+          text1: error,
         });
       }
-    } else {
-      onChangeLink(icon, e.nativeEvent.text);
     }
+
+    onChangeLink(icon, e.nativeEvent.text);
   };
 
   return (

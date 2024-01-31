@@ -46,6 +46,11 @@ const CommonInformationEmails = ({
             defaultMessage: 'Enter an email',
             description: 'Placeholder for email inside contact card',
           })}
+          errorMessage={intl.formatMessage({
+            defaultMessage: 'Please enter a valid email',
+            description:
+              'Edit Common Information - Error message when email is invalid',
+          })}
         />
       ))}
       <View>

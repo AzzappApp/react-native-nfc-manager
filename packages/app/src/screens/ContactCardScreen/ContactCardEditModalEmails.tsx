@@ -49,6 +49,11 @@ const ContactCardEditModalEmails = ({
               defaultMessage: 'Enter an email',
               description: 'Placeholder for email inside contact card',
             })}
+            errorMessage={intl.formatMessage({
+              defaultMessage: 'Please enter a valid email',
+              description:
+                'Edit Contact Card - Error message when an email is wrongly formatted',
+            })}
           />
           <Separation small />
         </Fragment>

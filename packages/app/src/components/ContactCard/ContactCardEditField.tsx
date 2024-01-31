@@ -39,7 +39,10 @@ const ContactCardEditField = <TFieldValues extends FieldValues>({
     <Controller
       control={control}
       name={valueKey}
-      render={({ field: { onChange, value }, fieldState: { error } }) => {
+      render={({
+        field: { onChange, value, onBlur, ref },
+        fieldState: { error },
+      }) => {
         return (
           <ContactCardEditFieldWrapper
             labelKey={labelKey}
@@ -61,6 +64,8 @@ const ContactCardEditField = <TFieldValues extends FieldValues>({
               placeholder={placeholder}
               autoCapitalize={autoCapitalize}
               isErrored={!!error}
+              onBlur={onBlur}
+              ref={ref}
             />
           </ContactCardEditFieldWrapper>
         );

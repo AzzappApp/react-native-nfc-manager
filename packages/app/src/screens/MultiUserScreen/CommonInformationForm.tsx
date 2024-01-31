@@ -81,6 +81,7 @@ const CommonInformationForm = ({
   } = useForm<CommonInformationFormType>({
     mode: 'onBlur',
     resolver: zodResolver(commonInformationSchema),
+    shouldFocusError: true,
     defaultValues: {
       ...commonInfo,
       emails: commonInfo?.emails?.map(m => ({ ...m })) ?? [],

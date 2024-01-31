@@ -135,6 +135,7 @@ const MultiUserDetailModal = ({
   } = useForm<MultiUserDetailFormValues>({
     mode: 'onBlur',
     resolver: zodResolver(multiUSerDetailModalSchema),
+    shouldFocusError: true,
     defaultValues: {
       role: profile?.profileRole,
       firstName: profile?.contactCard?.firstName,

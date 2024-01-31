@@ -6,7 +6,7 @@ export const multiUSerDetailModalSchema = z.object({
   firstName: z.string().nullable(),
   lastName: z.string().nullable(),
   title: z.string().nullable(),
-  company: z.string(),
+  company: z.string().optional(),
   phoneNumbers: z.array(
     z.object({
       label: z.string(),
@@ -17,7 +17,7 @@ export const multiUSerDetailModalSchema = z.object({
   emails: z.array(
     z.object({
       label: z.string(),
-      address: z.string(),
+      address: z.string().email(),
       selected: z.boolean().nullable().optional(),
     }),
   ),

@@ -140,7 +140,7 @@ const ContactCardEditForm = ({
           <Controller
             control={control}
             name="firstName"
-            render={({ field: { onChange, onBlur, value } }) => (
+            render={({ field: { onChange, onBlur, value, ref } }) => (
               <View style={styles.field}>
                 <Text variant="smallbold" style={styles.fieldTitle}>
                   <FormattedMessage
@@ -159,6 +159,7 @@ const ContactCardEditForm = ({
                     description:
                       'Placeholder for first name inside contact card',
                   })}
+                  ref={ref}
                 />
               </View>
             )}
@@ -167,7 +168,7 @@ const ContactCardEditForm = ({
           <Controller
             control={control}
             name="lastName"
-            render={({ field: { onChange, onBlur, value } }) => (
+            render={({ field: { onChange, onBlur, value, ref } }) => (
               <View style={styles.field}>
                 <Text variant="smallbold" style={styles.fieldTitle}>
                   <FormattedMessage
@@ -185,6 +186,7 @@ const ContactCardEditForm = ({
                     defaultMessage: 'Enter a last name',
                     description: 'Placeholder for last name contact card',
                   })}
+                  ref={ref}
                 />
               </View>
             )}
@@ -193,7 +195,7 @@ const ContactCardEditForm = ({
           <Controller
             control={control}
             name="title"
-            render={({ field: { onChange, onBlur, value } }) => (
+            render={({ field: { onChange, onBlur, value, ref } }) => (
               <View style={styles.field}>
                 <Text variant="smallbold" style={styles.fieldTitle}>
                   <FormattedMessage
@@ -211,6 +213,7 @@ const ContactCardEditForm = ({
                     defaultMessage: 'Enter a title',
                     description: 'Placeholder for title inside contact card',
                   })}
+                  ref={ref}
                 />
               </View>
             )}
@@ -233,7 +236,7 @@ const ContactCardEditForm = ({
             <Controller
               control={control}
               name="company"
-              render={({ field: { onChange, onBlur, value } }) => (
+              render={({ field: { onChange, onBlur, value, ref } }) => (
                 <View style={styles.field}>
                   <Text variant="smallbold" style={styles.fieldTitle}>
                     <FormattedMessage
@@ -252,6 +255,7 @@ const ContactCardEditForm = ({
                       description:
                         'Placeholder for company name inside contact card',
                     })}
+                    ref={ref}
                   />
                 </View>
               )}
