@@ -52,8 +52,12 @@ const LabeledDashedSlider = ({
   return (
     <View {...props}>
       <View style={styles.label}>
-        {label && <Text variant="small">{label}</Text>}
-        <AnimatedText text={textValue} variant="small" />
+        {label && (
+          <Text variant="small" style={styles.text}>
+            {label}
+          </Text>
+        )}
+        <AnimatedText text={textValue} variant="small" style={styles.text} />
       </View>
       <DashedSlider
         variant={variant}
@@ -76,5 +80,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     flexDirection: 'row',
     marginBottom: 5,
+  },
+  text: {
+    textAlign: 'center',
+    transform: [{ translateX: -1 }],
   },
 });
