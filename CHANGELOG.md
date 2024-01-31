@@ -1,5 +1,6 @@
-## 0.5.5-canary.40
+## 0.5.5-canary.41
 
+* **fix:**  - 🐛 correctly validate URLS & Emails ([#2570](https://github.com/AzzappApp/azzapp/pull/2570))
 * **fix:**  - 🐛 display bottom sheet with title and style ([#2593](https://github.com/AzzappApp/azzapp/pull/2593))
 * **fix:**  - limite action of unpublished car on webcardscreen ([#2583](https://github.com/AzzappApp/azzapp/pull/2583))
 * **fix:**  - 🐛 wait for transition to navigate on bottom bar ([#2594](https://github.com/AzzappApp/azzapp/pull/2594))
