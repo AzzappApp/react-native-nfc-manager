@@ -183,5 +183,5 @@ const styles = StyleSheet.create({
     marginLeft: 12,
     color: 'white',
   },
-  textInput: { borderWidth: 0, flex: 1 },
+  textInput: { borderWidth: 0, flex: 1, verticalAlign: 'top' },
 });
