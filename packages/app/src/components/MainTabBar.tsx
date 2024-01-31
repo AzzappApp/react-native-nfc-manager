@@ -77,20 +77,6 @@ const MainTabBar = ({
 
   const { profileInfos } = useAuthState();
 
-  const onItemPress = (key: string) => {
-    if (key !== 'NEW_POST' || isEditor(profileInfos?.profileRole)) {
-      router.push({ route: key as any });
-    } else {
-      Toast.show({
-        type: 'error',
-        text1: intl.formatMessage({
-          defaultMessage: 'Only admins & editors can create a post',
-          description: 'Error message when trying to create a post',
-        }),
-      });
-    }
-  };
-
   const insets = useScreenInsets();
   const { width } = useWindowDimensions();
 
@@ -129,6 +115,26 @@ const MainTabBar = ({
       pointerEvents,
     };
   }, [visibilityState]);
+
+  const onItemPress = (key: string) => {
+    const hasFinishedTransition =
+      visibilityState === true ||
+      (visibilityState as SharedValue<number>)?.value === 1;
+
+    if (!hasFinishedTransition) return;
+
+    if (key !== 'NEW_POST' || isEditor(profileInfos?.profileRole)) {
+      router.push({ route: key as any });
+    } else {
+      Toast.show({
+        type: 'error',
+        text1: intl.formatMessage({
+          defaultMessage: 'Only admins & editors can create a post',
+          description: 'Error message when trying to create a post',
+        }),
+      });
+    }
+  };
 
   useEffect(() => {
     const listener = () => {
