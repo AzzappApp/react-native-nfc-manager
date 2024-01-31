@@ -1,5 +1,7 @@
-## 0.5.5-canary.39
+## 0.5.5-canary.40
 
+* **fix:**  - 🐛 display bottom sheet with title and style ([#2593](https://github.com/AzzappApp/azzapp/pull/2593))
+* **fix:**  - limite action of unpublished car on webcardscreen ([#2583](https://github.com/AzzappApp/azzapp/pull/2583))
 * **fix:**  - 🐛 wait for transition to navigate on bottom bar ([#2594](https://github.com/AzzappApp/azzapp/pull/2594))
 * **fix:**  - **Android:** Color picker behavior
 * **fix:**  - **Android:** vertical alignment of TextArea modal
