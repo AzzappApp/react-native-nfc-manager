@@ -1,6 +1,6 @@
 import { Suspense } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { StyleSheet, View } from 'react-native';
+import { Alert, StyleSheet, View } from 'react-native';
 import Animated, {
   interpolate,
   useAnimatedStyle,
@@ -20,6 +20,7 @@ import BlurredFloatingButton, {
 import FloatingButton from '#ui/FloatingButton';
 import Text from '#ui/Text';
 import { useEditTransition } from './WebCardScreenTransitions';
+import type { WebCardScreenButtonBar_myWebCard$key } from '#relayArtifacts/WebCardScreenButtonBar_myWebCard.graphql';
 import type { WebCardScreenButtonBar_webCard$key } from '#relayArtifacts/WebCardScreenButtonBar_webCard.graphql';
 import type { ViewProps } from 'react-native';
 
@@ -28,6 +29,10 @@ type WebCardScreenButtonBarProps = ViewProps & {
    * The current displayed webCard
    */
   webCard: WebCardScreenButtonBar_webCard$key;
+  /**
+   * The current user  webCard
+   */
+  userWebCard: WebCardScreenButtonBar_myWebCard$key;
   /**
    * true if the webCard is the current user
    */
@@ -73,6 +78,7 @@ type WebCardScreenButtonBarProps = ViewProps & {
  */
 const WebCardScreenButtonBar = ({
   webCard,
+  userWebCard,
   editing,
   isViewer,
   onEdit,
@@ -120,6 +126,7 @@ const WebCardScreenButtonBar = ({
       >
         <WebCardScreenButtonActionButton
           webCard={webCard}
+          userWebCard={userWebCard}
           isViewer={isViewer}
           onEdit={onEdit}
           isWebCardDisplayed={isWebCardDisplayed}
@@ -143,6 +150,7 @@ export default WebCardScreenButtonBar;
 
 type ProfileScreenButtonActionButtonProps = {
   webCard: WebCardScreenButtonBar_webCard$key;
+  userWebCard: WebCardScreenButtonBar_myWebCard$key;
   isViewer: boolean;
   isWebCardDisplayed: boolean;
   onEdit: () => void;
@@ -159,12 +167,23 @@ type ProfileScreenButtonActionButtonProps = {
 
 const WebCardScreenButtonActionButton = ({
   webCard: webCardKey,
+  userWebCard: userWebCardKey,
   isViewer,
   isWebCardDisplayed,
   onEdit,
   onToggleFollow,
   onShowWebcardModal,
 }: ProfileScreenButtonActionButtonProps) => {
+  const { cardIsPublished } = useFragment(
+    graphql`
+      fragment WebCardScreenButtonBar_myWebCard on WebCard {
+        id
+        cardIsPublished
+      }
+    `,
+    userWebCardKey,
+  );
+
   const webCard = useFragment(
     graphql`
       fragment WebCardScreenButtonBar_webCard on WebCard
@@ -181,8 +200,51 @@ const WebCardScreenButtonActionButton = ({
   const isFollowing = webCard.webCardScreenButtonBar_isFollowing;
 
   const { profileInfos } = useAuthState();
+  const intl = useIntl();
+
+  const router = useRouter();
+  const showWebcardUnpublishAlert = () => {
+    Alert.alert(
+      intl.formatMessage({
+        defaultMessage: 'Unpublished WebCard.',
+        description:
+          'PostList - Alert Message title when the user is viewing a post (from deeplinking) with an unpublished WebCard',
+      }),
+      intl.formatMessage({
+        defaultMessage:
+          'This action can only be done from a published WebCard.',
+        description:
+          'PostList - AlertMessage when the user is viewing a post (from deeplinking) with an unpublished WebCard',
+      }),
+      [
+        {
+          text: intl.formatMessage({
+            defaultMessage: 'Ok',
+            description:
+              'PostList - Alert button when the user is viewing a post (from deeplinking) with an unpublished WebCard',
+          }),
+          onPress: () => {
+            router.back();
+          },
+        },
+      ],
+    );
+  };
+
+  const onShowWebcardModalCallback = () => {
+    if (cardIsPublished) {
+      onShowWebcardModal();
+    } else {
+      showWebcardUnpublishAlert();
+    }
+  };
 
   const debouncedToggleFollowing = useDebouncedCallback(() => {
+    if (!cardIsPublished) {
+      showWebcardUnpublishAlert();
+      return;
+    }
+
     if (profileInfos?.profileRole && isEditor(profileInfos.profileRole)) {
       onToggleFollow(webCard.id, webCard.userName, !isFollowing);
     } else if (isFollowing) {
@@ -206,9 +268,6 @@ const WebCardScreenButtonActionButton = ({
     }
   }, 600);
 
-  const intl = useIntl();
-
-  const router = useRouter();
   const onCreateNewPost = () => {
     if (profileInfos?.profileRole && isEditor(profileInfos?.profileRole)) {
       router.push({ route: 'NEW_POST', params: { fromProfile: true } });
@@ -288,7 +347,7 @@ const WebCardScreenButtonActionButton = ({
       <BlurredFloatingIconButton
         icon="more"
         variant="grey"
-        onPress={onShowWebcardModal}
+        onPress={onShowWebcardModalCallback}
         iconStyle={{ tintColor: colors.white }}
         accessibilityLabel={intl.formatMessage({
           defaultMessage: 'Tap to show the webcard informations',

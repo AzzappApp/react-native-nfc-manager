@@ -206,8 +206,10 @@ const WebCardScreen = ({
   const cardRadius = COVER_CARD_RADIUS * windowWidth;
 
   const toggleFlip = useCallback(() => {
-    setPositionFlip(prev => prev + 1);
-  }, []);
+    if (data.node?.userWebCard?.cardIsPublished === true) {
+      setPositionFlip(prev => prev + 1);
+    }
+  }, [data.node?.userWebCard?.cardIsPublished]);
 
   const manualFlip = useSharedValue(0);
   const flip = useAnimatedState(positionFlip, {
@@ -368,7 +370,7 @@ const WebCardScreen = ({
   //   );
   // }, [intl, router]);
 
-  if (!data.webCard) {
+  if (!data.webCard || !data.node?.userWebCard) {
     return null;
   }
 
@@ -417,6 +419,7 @@ const WebCardScreen = ({
         </GestureDetector>
         <WebCardScreenButtonBar
           webCard={data.webCard}
+          userWebCard={data.node.userWebCard}
           isViewer={isViewer}
           editing={editing}
           onHome={router.backToTop}
@@ -443,12 +446,6 @@ const WebCardScreen = ({
           isViewer={isViewer}
         />
       </Suspense>
-      {/* {viewerWebCardUnpublish && (
-        <View
-          style={StyleSheet.absoluteFill}
-          onTouchStart={displayAlertUnpublished}
-        />
-      )} */}
     </View>
   );
 };
@@ -472,8 +469,8 @@ const webCardScreenByIdQuery = graphql`
     }
     node(id: $viewerWebCardId) {
       ... on WebCard @alias(as: "userWebCard") {
-        id
         cardIsPublished
+        ...WebCardScreenButtonBar_myWebCard
       }
     }
   }
@@ -496,8 +493,8 @@ const webCardScreenByNameQuery = graphql`
     }
     node(id: $viewerWebCardId) {
       ... on WebCard @alias(as: "userWebCard") {
-        id
         cardIsPublished
+        ...WebCardScreenButtonBar_myWebCard
       }
     }
   }
