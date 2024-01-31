@@ -1,5 +1,9 @@
-## 0.5.5-canary.37
+## 0.5.5-canary.38
 
+* **fix:**  - **Android:** Color picker behavior
+* **fix:**  - **Android:** vertical alignment of TextArea modal
+* **fix:**  - ImagePickerMenuBar
+* **fix:**  - **Android:** Dashed slider text alignment
 * **fix:**  - **Android:** add minimum inset top
 * **fix:**  - **Android:** proper ripple on bottom menu
 * **fix:**  - **Android:** shadow in selection list
