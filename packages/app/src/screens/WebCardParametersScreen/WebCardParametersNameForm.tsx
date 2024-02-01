@@ -253,7 +253,7 @@ const WebcardParametersNameForm = ({
           control={control}
           name="userName"
           render={({ field: { onChange, value } }) => (
-            <View style={{ flex: 1, height: 50 }}>
+            <View style={styles.inputContainer}>
               <TextInput
                 nativeID="userName"
                 accessibilityLabelledBy="userNameLabel"
@@ -286,8 +286,9 @@ const WebcardParametersNameForm = ({
 
 const styles = StyleSheet.create({
   headerButton: { paddingHorizontal: 5, minWidth: 74 },
+  inputContainer: { flex: 1, height: 50, paddingHorizontal: 10 },
   controllerContainer: {
-    paddingTop: 10,
+    paddingVertical: 10,
     gap: 5,
     flexDirection: 'row',
     width: '100%',
