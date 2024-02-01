@@ -96,9 +96,9 @@ const styles = StyleSheet.create({
   aboutMessage: { width: 255, textAlign: 'center', alignSelf: 'center' },
   rowStyle: {
     height: 32,
-    marginLeft: 10,
-    marginRight: 10,
+    paddingHorizontal: 10,
     justifyContent: 'space-between',
     flexDirection: 'row',
+    alignItems: 'center',
   },
 });
