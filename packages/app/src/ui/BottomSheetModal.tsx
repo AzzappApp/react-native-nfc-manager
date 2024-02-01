@@ -1,12 +1,16 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useIntl } from 'react-intl';
-import { Modal, Platform, View } from 'react-native';
+import { Keyboard, Modal, Platform, View } from 'react-native';
 import {
   Gesture,
   GestureDetector,
   GestureHandlerRootView,
   TouchableWithoutFeedback,
 } from 'react-native-gesture-handler';
+import {
+  KeyboardController,
+  KeyboardEvents,
+} from 'react-native-keyboard-controller';
 import Animated, {
   interpolate,
   runOnJS,
@@ -18,7 +22,6 @@ import Animated, {
 import { colors, shadow } from '#theme';
 import Toast from '#components/Toast';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
-import useAnimatedKeyboardHeight from '#hooks/useAnimatedKeyboardHeight';
 import useAnimatedState from '#hooks/useAnimatedState';
 import useScreenInsets from '#hooks/useScreenInsets';
 import Button from './Button';
@@ -74,14 +77,12 @@ export type BottomSheetModalProps = Omit<
    * @see ModalProps#onRequestClose
    */
   onRequestClose: () => void;
-
   /**
-   * disable the keyboard avoiding view
+   * If `true`, the bottom sheet will support nested scrolling.
+   * This is useful when the bottom sheet contains a scrollable element, such as a list or a long form.
+   * If `false`, the bottom sheet will not respond to scroll events on its children.
    * @default false
-   * @see KeyboardAvoidingView
    */
-  disableKeyboardAvoidingView?: boolean;
-
   nestedScroll?: boolean;
 };
 
@@ -104,7 +105,6 @@ const BottomSheetModal = ({
   headerStyle,
   showGestureIndicator = true,
   onRequestClose,
-  disableKeyboardAvoidingView,
   nestedScroll = false,
   ...props
 }: BottomSheetModalProps) => {
@@ -138,14 +138,41 @@ const BottomSheetModal = ({
   const translateY = useAnimatedState(isVisible);
   const panTranslationY = useSharedValue(0);
 
-  useEffect(() => {
-    if (visible != null) {
-      setIsVisible(visible);
-      if (!visible) {
-        panTranslationY.value = 0;
-      }
+  const openAfterKeyBoardDismiss = useRef(false);
+  const handleKeyBoardEnd = () => {
+    if (openAfterKeyBoardDismiss.current) {
+      setIsVisible(true);
+      openAfterKeyBoardDismiss.current = false;
     }
-  }, [panTranslationY, visible]);
+  };
+
+  useEffect(() => {
+    const listener = KeyboardEvents.addListener(
+      'keyboardDidHide',
+      handleKeyBoardEnd,
+    );
+    return () => {
+      listener.remove();
+    };
+  }, []);
+
+  useEffect(() => {
+    if (visible && Keyboard.isVisible()) {
+      openAfterKeyBoardDismiss.current = true;
+      KeyboardController.dismiss();
+    } else {
+      setIsVisible(visible ?? false);
+    }
+    return () => {
+      openAfterKeyBoardDismiss.current = false;
+    };
+  }, [visible]);
+
+  useEffect(() => {
+    if (!isVisible) {
+      panTranslationY.value = 0;
+    }
+  }, [panTranslationY, isVisible]);
 
   const panGesture = useMemo(
     () =>
@@ -231,18 +258,6 @@ const BottomSheetModal = ({
     styles.gestureInteractionIndicator,
   ]);
 
-  // #region KeyboardAvoidingView manual handling blinking of secured text input and keyboard changing value for nohting
-  const keyboardHeight = useAnimatedKeyboardHeight();
-  const animatedKeyboardAvoidingStyle = useAnimatedStyle(() => {
-    return {
-      flex: 1,
-      transform: [
-        {
-          translateY: disableKeyboardAvoidingView ? 0 : keyboardHeight.value,
-        },
-      ],
-    };
-  });
   // #endregion
 
   return (
@@ -256,49 +271,47 @@ const BottomSheetModal = ({
     >
       {/* required for android */}
       <GestureHandlerRootView style={{ height: '100%', width: '100%' }}>
-        <Animated.View style={animatedKeyboardAvoidingStyle}>
-          <TouchableWithoutFeedback
-            style={styles.absoluteFill}
-            onPress={onRequestClose}
-          >
-            <View style={styles.absoluteFill}>
-              {variant === 'modal' && (
-                <Animated.View
-                  style={[
-                    styles.absoluteFill,
-                    {
-                      backgroundColor: colors.black,
-                    },
-                    backgroundOpacity,
-                  ]}
-                />
-              )}
-            </View>
-          </TouchableWithoutFeedback>
-          <Animated.View
-            style={[
-              styles.bottomSheetContainer,
-              {
-                height: height + insets.bottom,
-                paddingBottom: insets.bottom,
-              },
-              contentContainerStyle,
-              animatedStyle,
-            ]}
-          >
-            {nestedScroll && Platform.OS === 'android' ? (
-              <>
-                <GestureDetector gesture={panGesture}>
-                  <View style={styles.gestureViewAndroid} collapsable={false} />
-                </GestureDetector>
-                {content}
-              </>
-            ) : (
-              <GestureDetector gesture={panGesture}>
-                <View style={styles.gestureView}>{content}</View>
-              </GestureDetector>
+        <TouchableWithoutFeedback
+          style={styles.absoluteFill}
+          onPress={onRequestClose}
+        >
+          <View style={styles.absoluteFill}>
+            {variant === 'modal' && (
+              <Animated.View
+                style={[
+                  styles.absoluteFill,
+                  {
+                    backgroundColor: colors.black,
+                  },
+                  backgroundOpacity,
+                ]}
+              />
             )}
-          </Animated.View>
+          </View>
+        </TouchableWithoutFeedback>
+        <Animated.View
+          style={[
+            styles.bottomSheetContainer,
+            {
+              height: height + insets.bottom,
+              paddingBottom: insets.bottom,
+            },
+            contentContainerStyle,
+            animatedStyle,
+          ]}
+        >
+          {nestedScroll && Platform.OS === 'android' ? (
+            <>
+              <GestureDetector gesture={panGesture}>
+                <View style={styles.gestureViewAndroid} collapsable={false} />
+              </GestureDetector>
+              {content}
+            </>
+          ) : (
+            <GestureDetector gesture={panGesture}>
+              <View style={styles.gestureView}>{content}</View>
+            </GestureDetector>
+          )}
         </Animated.View>
       </GestureHandlerRootView>
       <Toast />

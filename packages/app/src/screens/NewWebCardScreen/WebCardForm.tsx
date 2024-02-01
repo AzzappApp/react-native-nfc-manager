@@ -7,12 +7,8 @@ import {
 } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { useIntl } from 'react-intl';
-import {
-  StyleSheet,
-  View,
-  KeyboardAvoidingView,
-  useWindowDimensions,
-} from 'react-native';
+import { StyleSheet, View, useWindowDimensions } from 'react-native';
+import { KeyboardAvoidingView } from 'react-native-keyboard-controller';
 import {
   fetchQuery,
   graphql,

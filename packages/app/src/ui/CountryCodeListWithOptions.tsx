@@ -11,7 +11,8 @@ import PressableBackground from './PressableBackground';
 import PressableNative from './PressableNative';
 import type { Icons } from './Icon';
 import type { CountryCode } from 'libphonenumber-js';
-import type { ViewProps } from 'react-native';
+import type { RefObject } from 'react';
+import type { TextInput, ViewProps } from 'react-native';
 
 export type CountryCodeListOption<T extends string> = {
   type: T;
@@ -24,7 +25,11 @@ type CountryCodeListWithOptionsProps<T extends string> = ViewProps & {
   options: Array<CountryCodeListOption<T>>;
   phoneSectionTitle: string;
   value: CountryCode | T;
+  inputRef?: RefObject<TextInput>;
   onChange: (value: CountryCode | T) => void;
+  onOpen?: () => void;
+  onClose?: () => void;
+  onDismiss?: () => void;
 };
 
 const CountryCodeListWithOptions = <T extends string>({
@@ -32,16 +37,33 @@ const CountryCodeListWithOptions = <T extends string>({
   otherSectionTitle,
   options,
   value,
+  inputRef,
   onChange,
+  onClose,
+  onOpen,
+  onDismiss,
   style,
   ...props
 }: CountryCodeListWithOptionsProps<T>) => {
   const [showDropdown, setShowDropdown] = useState(false);
+  const onButtonPress = () => {
+    setShowDropdown(true);
+    onOpen?.();
+  };
+
+  const onRequestClose = () => {
+    setShowDropdown(false);
+    onClose?.();
+    setTimeout(() => {
+      inputRef?.current?.focus();
+    }, 50);
+  };
 
   const onSelect = (value: CountryCode | T) => {
     onChange(value);
-    setShowDropdown(false);
+    onRequestClose();
   };
+
   const styles = useStyleSheet(styleSheet);
 
   const isSelectorType = () => {
@@ -57,7 +79,7 @@ const CountryCodeListWithOptions = <T extends string>({
     <>
       <PressableNative
         {...props}
-        onPress={() => setShowDropdown(true)}
+        onPress={onButtonPress}
         style={[styles.button, style]}
         accessibilityRole="button"
       >
@@ -76,7 +98,8 @@ const CountryCodeListWithOptions = <T extends string>({
         height={windowHeight - 120}
         contentContainerStyle={styles.bottomSheetContainer}
         nestedScroll
-        onRequestClose={() => setShowDropdown(false)}
+        onRequestClose={onRequestClose}
+        onDismiss={onDismiss}
       >
         <CountrySelector
           value={isSelectorType() ? null : (value as CountryCode)}

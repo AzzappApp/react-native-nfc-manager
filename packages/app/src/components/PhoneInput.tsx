@@ -1,8 +1,10 @@
 import { parsePhoneNumber, AsYouType } from 'libphonenumber-js';
-import { useCallback, useEffect, useState } from 'react';
+import { forwardRef, useCallback, useEffect, useState } from 'react';
 import TextInput from '#ui/TextInput';
 import type { TextInputProps } from '#ui/TextInput';
 import type { CountryCode } from 'libphonenumber-js';
+import type { ForwardedRef } from 'react';
+import type { TextInput as NativeTextInput } from 'react-native';
 
 type PhoneInputProps = TextInputProps & {
   countryCode: CountryCode;
@@ -11,12 +13,10 @@ type PhoneInputProps = TextInputProps & {
 /**
  * PhoneInput handle phone with  our TextInput
  */
-const PhoneInput = ({
-  value,
-  onChangeText,
-  countryCode,
-  ...props
-}: PhoneInputProps) => {
+const PhoneInput = (
+  { value, onChangeText, countryCode, ...props }: PhoneInputProps,
+  ref: ForwardedRef<NativeTextInput>,
+) => {
   const [formattedValue, setFormattedValue] = useState(value);
   useEffect(() => {
     if (countryCode && value) {
@@ -49,6 +49,7 @@ const PhoneInput = ({
 
   return (
     <TextInput
+      ref={ref}
       {...props}
       onChangeText={formatOnChange}
       value={formattedValue}
@@ -56,4 +57,4 @@ const PhoneInput = ({
   );
 };
 
-export default PhoneInput;
+export default forwardRef(PhoneInput);

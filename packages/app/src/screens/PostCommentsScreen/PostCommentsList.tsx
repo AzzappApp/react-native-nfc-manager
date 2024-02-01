@@ -1,13 +1,8 @@
 import { useCallback, useMemo, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
-import {
-  KeyboardAvoidingView,
-  Platform,
-  RefreshControl,
-  StyleSheet,
-  View,
-} from 'react-native';
+import { RefreshControl, StyleSheet, View } from 'react-native';
 import { FlatList } from 'react-native-gesture-handler';
+import { KeyboardAvoidingView } from 'react-native-keyboard-controller';
 import Toast from 'react-native-toast-message';
 import {
   ConnectionHandler,
@@ -257,10 +252,7 @@ const PostCommentsList = ({
         { paddingBottom: insets.bottom, paddingTop: insets.top },
       ]}
     >
-      <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-        style={[styles.keyboardAreaView]}
-      >
+      <KeyboardAvoidingView behavior="padding" style={styles.keyboardAreaView}>
         <PostCommentsScreenHeader onClose={router.back} />
         <FlatList
           data={postComments}

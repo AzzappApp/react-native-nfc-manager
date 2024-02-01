@@ -1,7 +1,8 @@
 import { memoize } from 'lodash';
 import { useCallback, useMemo, useRef, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { KeyboardAvoidingView, StyleSheet, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
+import { KeyboardAvoidingView } from 'react-native-keyboard-controller';
 import { graphql, useFragment } from 'react-relay';
 import { DEFAULT_COLOR_LIST } from '@azzapp/shared/cardHelpers';
 import {
@@ -435,7 +436,7 @@ const CoverEditorCustom = ({
     bottomPanelHeight - insetBottom - BOTTOM_MENU_HEIGHT - 10;
 
   return (
-    //ths container on top avoid some weid feeling when transitionning with transparent backgorund
+    //ths container on top avoid some weird feeling when transitionning with transparent backgorund
     <Container style={[styles.root, style]}>
       <KeyboardAvoidingView
         contentContainerStyle={[

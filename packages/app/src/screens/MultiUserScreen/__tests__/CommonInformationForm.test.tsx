@@ -11,7 +11,10 @@ import type { CommonInformationFormTestQuery } from '#relayArtifacts/CommonInfor
 import type { CommonInformationFormProps } from '../CommonInformationForm';
 import type { RelayMockEnvironment } from 'relay-test-utils/lib/RelayModernMockEnvironment';
 
-describe('ContactCardEditModal', () => {
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+jest.mock('#components/ScreenModal', () => require('react-native').View);
+
+describe('CommonInformationForm', () => {
   let environment: RelayMockEnvironment;
 
   const renderCommonInformationForm = (

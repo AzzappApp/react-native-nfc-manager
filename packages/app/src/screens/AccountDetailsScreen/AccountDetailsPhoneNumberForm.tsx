@@ -1,5 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { isValidPhoneNumber, parsePhoneNumber } from 'libphonenumber-js';
+import { useRef } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { View, StyleSheet } from 'react-native';
@@ -7,16 +8,17 @@ import { getCountry } from 'react-native-localize';
 import { z } from 'zod';
 import ERRORS from '@azzapp/shared/errors';
 import { isPhoneNumber } from '@azzapp/shared/stringHelpers';
-import useScreenInsets from '#hooks/useScreenInsets';
 import useUpdateUser from '#screens/AccountDetailsScreen/useUpdateUser';
-import BottomSheetModal from '#ui/BottomSheetModal';
 import Button from '#ui/Button';
 import CountryCodeListWithOptions from '#ui/CountryCodeListWithOptions';
 import COUNTRY_FLAG from '#ui/CountrySelector/CountryFlag';
+import Header from '#ui/Header';
+import InputAccessoryView from '#ui/InputAccessoryView';
 import Text from '#ui/Text';
 import TextInput from '#ui/TextInput';
 import type { GraphQLError } from 'graphql';
 import type { CountryCode } from 'libphonenumber-js';
+import type { TextInput as NativeTextInput } from 'react-native';
 
 const AccountDetailsPhoneNumberForm = ({
   currentUser,
@@ -81,8 +83,6 @@ const AccountDetailsPhoneNumberForm = ({
 
   const intl = useIntl();
 
-  const insets = useScreenInsets();
-
   const [commitMutation] = useUpdateUser();
 
   const submit = handleSubmit(async ({ phoneNumber, countryCode }) => {
@@ -146,41 +146,40 @@ const AccountDetailsPhoneNumberForm = ({
     });
   });
 
+  const phoneNumberInputRef = useRef<NativeTextInput>(null);
+
   return (
-    <BottomSheetModal
-      visible={visible}
-      height={insets.bottom + 160}
-      onRequestClose={toggleBottomSheet}
-      headerTitle={intl.formatMessage({
-        defaultMessage: 'Edit phone number',
-        description: 'Edit phone number modal title',
-      })}
-      showGestureIndicator={false}
-      headerLeftButton={
-        <Button
-          label={intl.formatMessage({
-            defaultMessage: 'Cancel',
-            description: 'Edit phone number modal cancel button label',
-          })}
-          onPress={toggleBottomSheet}
-          variant="secondary"
-          style={styles.headerButton}
-        />
-      }
-      headerRightButton={
-        <Button
-          loading={isSubmitting}
-          disabled={isSubmitting}
-          label={intl.formatMessage({
-            defaultMessage: 'Save',
-            description: 'Edit phone number modal save button label',
-          })}
-          onPress={submit}
-          variant="primary"
-          style={styles.headerButton}
-        />
-      }
-    >
+    <InputAccessoryView visible={visible} onClose={toggleBottomSheet}>
+      <Header
+        leftElement={
+          <Button
+            label={intl.formatMessage({
+              defaultMessage: 'Cancel',
+              description: 'Edit phone number modal cancel button label',
+            })}
+            onPress={toggleBottomSheet}
+            variant="secondary"
+            style={styles.headerButton}
+          />
+        }
+        rightElement={
+          <Button
+            loading={isSubmitting}
+            disabled={isSubmitting}
+            label={intl.formatMessage({
+              defaultMessage: 'Save',
+              description: 'Edit phone number modal save button label',
+            })}
+            onPress={submit}
+            variant="primary"
+            style={styles.headerButton}
+          />
+        }
+        middleElement={intl.formatMessage({
+          defaultMessage: 'Edit phone number',
+          description: 'Edit phone number modal title',
+        })}
+      />
       <View style={styles.phoneAndCountryCode}>
         <Controller
           control={control}
@@ -195,6 +194,7 @@ const AccountDetailsPhoneNumberForm = ({
               value={value}
               options={[]}
               onChange={onChange}
+              inputRef={phoneNumberInputRef}
               accessibilityLabel={intl.formatMessage({
                 defaultMessage: 'Select a calling code',
                 description:
@@ -218,6 +218,7 @@ const AccountDetailsPhoneNumberForm = ({
           }) => (
             <View style={{ flex: 1 }}>
               <TextInput
+                ref={phoneNumberInputRef}
                 testID="phoneNumberInput"
                 value={value}
                 onChangeText={onChange}
@@ -247,14 +248,14 @@ const AccountDetailsPhoneNumberForm = ({
       {errors.root?.server ? (
         <Text variant="error">{errors.root.server.message}</Text>
       ) : null}
-    </BottomSheetModal>
+    </InputAccessoryView>
   );
 };
 
 const styles = StyleSheet.create({
   headerButton: { paddingHorizontal: 5, minWidth: 74 },
   phoneAndCountryCode: {
-    paddingTop: 10,
+    padding: 20,
     gap: 5,
     flexDirection: 'row',
     width: '100%',

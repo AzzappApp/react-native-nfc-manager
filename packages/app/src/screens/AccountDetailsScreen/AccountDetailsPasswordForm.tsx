@@ -7,10 +7,10 @@ import Toast from 'react-native-toast-message';
 import { z } from 'zod';
 import ERRORS from '@azzapp/shared/errors';
 import { REGEX_PWD } from '@azzapp/shared/stringHelpers';
-import useScreenInsets from '#hooks/useScreenInsets';
 import useUpdateUser from '#screens/AccountDetailsScreen/useUpdateUser';
-import BottomSheetModal from '#ui/BottomSheetModal';
 import Button from '#ui/Button';
+import Header from '#ui/Header';
+import InputAccessoryView from '#ui/InputAccessoryView';
 import SecuredTextInput from '#ui/SecuredTextInput';
 import Text from '#ui/Text';
 import type { GraphQLError } from 'graphql';
@@ -51,8 +51,6 @@ const AccountDetailsPasswordForm = ({
   }, [reset, visible]);
 
   const intl = useIntl();
-
-  const insets = useScreenInsets();
 
   const [commitMutation] = useUpdateUser();
 
@@ -105,40 +103,37 @@ const AccountDetailsPasswordForm = ({
   const newPasswordRef = useRef<TextInput>(null);
 
   return (
-    <BottomSheetModal
-      visible={visible}
-      height={insets.bottom + 280}
-      onRequestClose={toggleBottomSheet}
-      headerTitle={intl.formatMessage({
-        defaultMessage: 'Edit password',
-        description: 'Edit password modal title',
-      })}
-      showGestureIndicator={false}
-      headerLeftButton={
-        <Button
-          label={intl.formatMessage({
-            defaultMessage: 'Cancel',
-            description: 'Edit password modal cancel button label',
-          })}
-          onPress={toggleBottomSheet}
-          variant="secondary"
-          style={styles.headerButton}
-        />
-      }
-      headerRightButton={
-        <Button
-          disabled={isSubmitting || isSubmitSuccessful}
-          loading={isSubmitting}
-          label={intl.formatMessage({
-            defaultMessage: 'Save',
-            description: 'Edit password modal save button label',
-          })}
-          onPress={submit}
-          variant="primary"
-          style={styles.headerButton}
-        />
-      }
-    >
+    <InputAccessoryView visible={visible} onClose={toggleBottomSheet}>
+      <Header
+        leftElement={
+          <Button
+            disabled={isSubmitting || isSubmitSuccessful}
+            loading={isSubmitting}
+            label={intl.formatMessage({
+              defaultMessage: 'Save',
+              description: 'Edit password modal save button label',
+            })}
+            onPress={submit}
+            variant="primary"
+            style={styles.headerButton}
+          />
+        }
+        rightElement={
+          <Button
+            label={intl.formatMessage({
+              defaultMessage: 'Cancel',
+              description: 'Edit password modal cancel button label',
+            })}
+            onPress={toggleBottomSheet}
+            variant="secondary"
+            style={styles.headerButton}
+          />
+        }
+        middleElement={intl.formatMessage({
+          defaultMessage: 'Edit password',
+          description: 'Edit password modal title',
+        })}
+      />
       <View style={styles.container}>
         <Controller
           control={control}
@@ -217,13 +212,13 @@ const AccountDetailsPasswordForm = ({
           <Text variant="error">{errors.root.server.message}</Text>
         ) : null}
       </View>
-    </BottomSheetModal>
+    </InputAccessoryView>
   );
 };
 
 const styles = StyleSheet.create({
   headerButton: { paddingHorizontal: 5, minWidth: 74 },
-  container: { rowGap: 20 },
+  container: { rowGap: 20, marginBottom: 20, paddingHorizontal: 20 },
   field: { paddingTop: 10, rowGap: 5 },
   input: { rowGap: 10 },
 });

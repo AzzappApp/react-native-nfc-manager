@@ -43,13 +43,9 @@ jest.mock('react-native-encrypted-storage');
 jest.mock('react-native-vision-camera');
 
 // react-native-keyboard-controller
-jest.mock('react-native-keyboard-controller', () => ({
-  KeyboardProvider: props => props.children,
-  useReanimatedKeyboardAnimation: jest.fn().mockReturnValue({
-    height: 0,
-    progress: { value: 0 },
-  }),
-}));
+jest.mock('react-native-keyboard-controller', () =>
+  require('react-native-keyboard-controller/jest'),
+);
 
 //#region AZP Modules Mock
 jest.mock('#helpers/mediaHelpers/NativeMediaHelpers');

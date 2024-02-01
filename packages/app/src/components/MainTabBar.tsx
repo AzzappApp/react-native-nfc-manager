@@ -188,10 +188,13 @@ const MainTabBar = ({
     <Animated.View
       style={[
         {
-          bottom: insets.bottom,
+          left: 0,
+          bottom: 0,
+          paddingBottom: insets.bottom,
           position: 'absolute',
-          left: MARGIN_HORIZONTAL,
-          width: width - 2 * MARGIN_HORIZONTAL,
+          paddingLeft: MARGIN_HORIZONTAL,
+          paddingRight: MARGIN_HORIZONTAL,
+          width,
         },
         visibilityStyle,
         style,

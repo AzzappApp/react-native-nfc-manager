@@ -1,7 +1,8 @@
 import { omit } from 'lodash';
 import { useCallback, useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
-import { KeyboardAvoidingView, StyleSheet } from 'react-native';
+import { StyleSheet } from 'react-native';
+import { KeyboardAvoidingView } from 'react-native-keyboard-controller';
 import Toast from 'react-native-toast-message';
 import { graphql, useFragment, useMutation } from 'react-relay';
 import * as z from 'zod';

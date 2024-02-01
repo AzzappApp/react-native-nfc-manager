@@ -1,13 +1,16 @@
-import { useCallback, useEffect, useMemo } from 'react';
+import { useCallback, useEffect, useMemo, useRef } from 'react';
 import { useIntl } from 'react-intl';
 import { View, StyleSheet } from 'react-native';
 import { getLocales } from 'react-native-localize';
 import { isNotFalsyString } from '@azzapp/shared/stringHelpers';
+import { mergeRefs } from '#helpers/mergeRefs';
 import CountryCodeListWithOptions from '#ui/CountryCodeListWithOptions';
 import TextInput from '#ui/TextInput';
 import PhoneInput from './PhoneInput';
 import type { CountryCodeListOption } from '#ui/CountryCodeListWithOptions';
 import type { CountryCode } from 'libphonenumber-js';
+import type { Ref } from 'react';
+import type { TextInput as NativeTextInput } from 'react-native';
 
 export type EmailPhoneInput = {
   countryCodeOrEmail: CountryCode | 'email';
@@ -17,6 +20,7 @@ type EmailOrPhoneInputProps = {
   input: EmailPhoneInput;
   onChange: (value: EmailPhoneInput) => void;
   hasError: boolean;
+  inputRef?: Ref<NativeTextInput>;
   onSubmitEditing?: () => void;
 };
 
@@ -24,9 +28,12 @@ const EmailOrPhoneInput = ({
   input,
   onChange,
   hasError,
+  inputRef,
   onSubmitEditing,
 }: EmailOrPhoneInputProps) => {
   const intl = useIntl();
+
+  const inputRefInner = useRef<NativeTextInput>(null);
 
   useEffect(() => {
     const locales = getLocales();
@@ -78,6 +85,7 @@ const EmailOrPhoneInput = ({
   return (
     <View style={styles.phoneOrEmailContainer}>
       <CountryCodeListWithOptions<'email'>
+        inputRef={inputRefInner}
         otherSectionTitle={intl.formatMessage({
           defaultMessage: 'Connect with email address',
           description:
@@ -106,6 +114,7 @@ const EmailOrPhoneInput = ({
       />
       {input.countryCodeOrEmail === 'email' ? (
         <TextInput
+          ref={mergeRefs([inputRefInner, inputRef])}
           nativeID="email"
           placeholder={intl.formatMessage({
             defaultMessage: 'Email address',
@@ -129,6 +138,7 @@ const EmailOrPhoneInput = ({
         />
       ) : (
         <PhoneInput
+          ref={mergeRefs([inputRefInner, inputRef])}
           nativeID="phoneNumber"
           placeholder={intl.formatMessage({
             defaultMessage: 'Phone number',

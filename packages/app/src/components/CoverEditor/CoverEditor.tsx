@@ -12,13 +12,13 @@ import {
 } from 'react';
 import { useIntl } from 'react-intl';
 import {
-  Keyboard,
   Platform,
   StyleSheet,
   View,
   unstable_batchedUpdates,
   useWindowDimensions,
 } from 'react-native';
+import { KeyboardController } from 'react-native-keyboard-controller';
 import Toast from 'react-native-toast-message';
 import { graphql, useFragment } from 'react-relay';
 import {
@@ -40,17 +40,16 @@ import ScreenModal from '#components/ScreenModal';
 import useScreenInsets from '#hooks/useScreenInsets';
 import ActivityIndicator from '#ui/ActivityIndicator';
 import BottomMenu, { BOTTOM_MENU_HEIGHT } from '#ui/BottomMenu';
-import BottomSheetModal from '#ui/BottomSheetModal';
 import Container from '#ui/Container';
 import { FLOATING_BUTTON_SIZE } from '#ui/FloatingButton';
 import FloatingIconButton from '#ui/FloatingIconButton';
-import TextInput from '#ui/TextInput';
 import UploadProgressModal from '#ui/UploadProgressModal';
 import CoverEditorCropModal from './CoverEditorCropModal';
 import CoverEditorCustom from './CoverEditorCustom/CoverEditorCustom';
 import CoverEditorImagePicker from './CoverEditorImagePicker';
 import CoverEditorSuggestionButton from './CoverEditorSuggestionButton';
 import CoverEditorTemplateList from './CoverEditorTemplateList';
+import CoverEditorTitleModal from './CoverEditorTitleModal';
 import MediaRequiredModal from './MediaRequiredModal';
 import { useTemplateSwitcherCoverMediaEditor } from './useCoverMediaEditor';
 import useSaveCover from './useSaveCover';
@@ -66,7 +65,6 @@ import type {
 } from './coverEditorTypes';
 import type { ColorPalette } from '@azzapp/shared/cardHelpers';
 import type { ForwardedRef } from 'react';
-import type { TextInput as NativeTextInput } from 'react-native';
 
 export type CoverEditorProps = {
   profile: CoverEditor_profile$key;
@@ -506,13 +504,9 @@ const CoverEditor = (
 
   const closeTitleModal = useCallback(() => {
     setTitleModalOpen(false);
-    Keyboard.dismiss();
+    KeyboardController.dismiss();
   }, []);
 
-  const subTitleInputRef = useRef<NativeTextInput>(null);
-  const focusSubTitle = useCallback(() => {
-    subTitleInputRef.current?.focus();
-  }, []);
   // #endregion
 
   // #region Image picker
@@ -784,29 +778,14 @@ const CoverEditor = (
         />
       </Container>
 
-      <BottomSheetModal
-        height={MODAL_HEIGHT}
+      <CoverEditorTitleModal
         visible={titleModalOpen}
-        onRequestClose={closeTitleModal}
-        showGestureIndicator={false}
-      >
-        <View style={styles.modalContent}>
-          <TextInput
-            value={title ?? ''}
-            onChangeText={setTitle}
-            autoFocus
-            returnKeyType="next"
-            onSubmitEditing={focusSubTitle}
-          />
-          <TextInput
-            ref={subTitleInputRef}
-            value={subTitle ?? ''}
-            onChangeText={setSubTitle}
-            returnKeyType="done"
-            onSubmitEditing={closeTitleModal}
-          />
-        </View>
-      </BottomSheetModal>
+        title={title}
+        subTitle={subTitle}
+        onTitleChange={setTitle}
+        onSubtitleChange={setSubTitle}
+        onClose={closeTitleModal}
+      />
       <ScreenModal visible={showImagePicker} animationType="slide">
         <CoverEditorImagePicker
           kind={templateKind === 'video' ? 'video' : 'image'}
@@ -854,7 +833,6 @@ export default forwardRef(CoverEditor);
 
 export const GAP = 16;
 export const SMALL_GAP = 9;
-export const MODAL_HEIGHT = 160;
 
 const styles = StyleSheet.create({
   root: {
@@ -884,11 +862,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     gap: 20,
-  },
-  modalContent: {
-    height: MODAL_HEIGHT,
-    justifyContent: 'space-around',
-    padding: 20,
   },
 });
 

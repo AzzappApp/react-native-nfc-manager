@@ -5,10 +5,10 @@ import { StyleSheet, View } from 'react-native';
 import { z } from 'zod';
 import ERRORS from '@azzapp/shared/errors';
 import { isNotFalsyString } from '@azzapp/shared/stringHelpers';
-import useScreenInsets from '#hooks/useScreenInsets';
 import useUpdateUser from '#screens/AccountDetailsScreen/useUpdateUser';
-import BottomSheetModal from '#ui/BottomSheetModal';
 import Button from '#ui/Button';
+import Header from '#ui/Header';
+import InputAccessoryView from '#ui/InputAccessoryView';
 import Text from '#ui/Text';
 import TextInput from '#ui/TextInput';
 import type { GraphQLError } from '#helpers/relayEnvironment';
@@ -46,8 +46,6 @@ const AccountDetailsEmailForm = ({
   });
 
   const intl = useIntl();
-
-  const insets = useScreenInsets();
 
   const [commitMutation] = useUpdateUser();
 
@@ -108,40 +106,37 @@ const AccountDetailsEmailForm = ({
   });
 
   return (
-    <BottomSheetModal
-      visible={visible}
-      height={insets.bottom + 160}
-      onRequestClose={toggleBottomSheet}
-      headerTitle={intl.formatMessage({
-        defaultMessage: 'Edit email address',
-        description: 'Edit email address modal title',
-      })}
-      showGestureIndicator={false}
-      headerLeftButton={
-        <Button
-          label={intl.formatMessage({
-            defaultMessage: 'Cancel',
-            description: 'Edit email address modal cancel button label',
-          })}
-          onPress={toggleBottomSheet}
-          variant="secondary"
-          style={styles.headerButton}
-        />
-      }
-      headerRightButton={
-        <Button
-          loading={isSubmitting}
-          disabled={isSubmitting}
-          label={intl.formatMessage({
-            defaultMessage: 'Save',
-            description: 'Edit email address modal save button label',
-          })}
-          onPress={submit}
-          variant="primary"
-          style={styles.headerButton}
-        />
-      }
-    >
+    <InputAccessoryView visible={visible} onClose={toggleBottomSheet}>
+      <Header
+        leftElement={
+          <Button
+            label={intl.formatMessage({
+              defaultMessage: 'Cancel',
+              description: 'Edit email address modal cancel button label',
+            })}
+            onPress={toggleBottomSheet}
+            variant="secondary"
+            style={styles.headerButton}
+          />
+        }
+        rightElement={
+          <Button
+            loading={isSubmitting}
+            disabled={isSubmitting}
+            label={intl.formatMessage({
+              defaultMessage: 'Save',
+              description: 'Edit email address modal save button label',
+            })}
+            onPress={submit}
+            variant="primary"
+            style={styles.headerButton}
+          />
+        }
+        middleElement={intl.formatMessage({
+          defaultMessage: 'Edit email address',
+          description: 'Edit email address modal title',
+        })}
+      />
       <Controller
         control={control}
         name="email"
@@ -177,12 +172,12 @@ const AccountDetailsEmailForm = ({
       {errors.root?.server ? (
         <Text variant="error">{errors.root.server.message}</Text>
       ) : null}
-    </BottomSheetModal>
+    </InputAccessoryView>
   );
 };
 
 const styles = StyleSheet.create({
-  field: { paddingTop: 10, rowGap: 5 },
+  field: { padding: 20, rowGap: 5 },
   headerButton: { paddingHorizontal: 5, minWidth: 74 },
 });
 

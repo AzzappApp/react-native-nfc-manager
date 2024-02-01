@@ -2,7 +2,6 @@ import { parsePhoneNumber } from 'libphonenumber-js';
 import { useCallback, useState, useRef } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { Image, View, StyleSheet, Keyboard } from 'react-native';
-
 import Animated, { useAnimatedStyle } from 'react-native-reanimated';
 import {
   isNotFalsyString,
@@ -14,7 +13,7 @@ import Link from '#components/Link';
 import { dispatchGlobalEvent } from '#helpers/globalEvents';
 import { getLocales } from '#helpers/localeHelpers';
 import { signin } from '#helpers/MobileWebAPI';
-import useAnimatedKeyboardHeight from '#hooks/useAnimatedKeyboardHeight';
+import useFormKeyboardManager from '#hooks/useFormKeyboardManager';
 import useScreenInsets from '#hooks/useScreenInsets';
 import Button from '#ui/Button';
 import Container from '#ui/Container';
@@ -78,20 +77,12 @@ const SignInScreen = () => {
   }, [credential, password]);
 
   const passwordRef = useRef<NativeTextInput>(null);
-  const focusPassword = () => {
-    passwordRef?.current?.focus();
-  };
+  const { focusNextInput, translateY } = useFormKeyboardManager();
 
-  // #region KeyboardAvoidingView manual handling blinking of secured text input and keyboard changing value for nohting
-  const keyboardHeight = useAnimatedKeyboardHeight();
   const animatedStyle = useAnimatedStyle(() => {
     return {
       flex: 1,
-      transform: [
-        {
-          translateY: keyboardHeight.value,
-        },
-      ],
+      transform: [{ translateY: -translateY.value }],
     };
   });
   // #endregion
@@ -147,7 +138,7 @@ const SignInScreen = () => {
                   'SignIn Screen - Accessibility TextInput phone number or email address',
               })}
               returnKeyType="next"
-              onSubmitEditing={focusPassword}
+              onSubmitEditing={focusNextInput(passwordRef)}
               style={styles.textInput}
             />
             <SecuredTextInput

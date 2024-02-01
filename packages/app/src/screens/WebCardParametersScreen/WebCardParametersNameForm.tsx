@@ -13,9 +13,9 @@ import { z } from 'zod';
 import ERRORS from '@azzapp/shared/errors';
 import { isValidUserName } from '@azzapp/shared/stringHelpers';
 import { colors } from '#theme';
-import useScreenInsets from '#hooks/useScreenInsets';
-import BottomSheetModal from '#ui/BottomSheetModal';
 import Button from '#ui/Button';
+import Header from '#ui/Header';
+import InputAccessoryView from '#ui/InputAccessoryView';
 import Text from '#ui/Text';
 import TextInput from '#ui/TextInput';
 import type { WebCardParametersNameFormQuery } from '#relayArtifacts/WebCardParametersNameFormQuery.graphql';
@@ -117,8 +117,6 @@ const WebcardParametersNameForm = ({
 
   const environment = useRelayEnvironment();
 
-  const insets = useScreenInsets();
-
   const [commitMutation] = useMutation(graphql`
     mutation WebCardParametersNameFormMutation(
       $input: UpdateWebCardUserNameInput!
@@ -218,40 +216,38 @@ const WebcardParametersNameForm = ({
   }, [debouncedUserName, trigger]);
 
   return (
-    <BottomSheetModal
-      visible={visible}
-      height={insets.bottom + 160}
-      onRequestClose={toggleBottomSheet}
-      headerTitle={intl.formatMessage({
-        defaultMessage: 'Edit your name',
-        description: 'Edit Webcard Name modal title',
-      })}
-      showGestureIndicator={false}
-      headerLeftButton={
-        <Button
-          label={intl.formatMessage({
-            defaultMessage: 'Cancel',
-            description: 'Edit Webcard Name modal cancel button label',
-          })}
-          onPress={toggleBottomSheet}
-          variant="secondary"
-          style={styles.headerButton}
-        />
-      }
-      headerRightButton={
-        <Button
-          loading={isSubmitting}
-          disabled={isSubmitting || webCard.userName === userName}
-          label={intl.formatMessage({
-            defaultMessage: 'Save',
-            description: 'Edit Webcard Name modal save button label',
-          })}
-          onPress={onSubmit}
-          variant="primary"
-          style={styles.headerButton}
-        />
-      }
-    >
+    <InputAccessoryView visible={visible} onClose={toggleBottomSheet}>
+      <Header
+        middleElement={intl.formatMessage({
+          defaultMessage: 'Edit your name',
+          description: 'Edit Webcard Name modal title',
+        })}
+        leftElement={
+          <Button
+            label={intl.formatMessage({
+              defaultMessage: 'Cancel',
+              description: 'Edit Webcard Name modal cancel button label',
+            })}
+            onPress={toggleBottomSheet}
+            variant="secondary"
+            style={styles.headerButton}
+          />
+        }
+        rightElement={
+          <Button
+            loading={isSubmitting}
+            disabled={isSubmitting || webCard.userName === userName}
+            label={intl.formatMessage({
+              defaultMessage: 'Save',
+              description: 'Edit Webcard Name modal save button label',
+            })}
+            onPress={onSubmit}
+            variant="primary"
+            style={styles.headerButton}
+          />
+        }
+      />
+
       <View style={styles.controllerContainer}>
         <Controller
           control={control}
@@ -284,7 +280,7 @@ const WebcardParametersNameForm = ({
       {errors.root?.server ? (
         <Text variant="error">{errors.root.server.message}</Text>
       ) : null}
-    </BottomSheetModal>
+    </InputAccessoryView>
   );
 };
 

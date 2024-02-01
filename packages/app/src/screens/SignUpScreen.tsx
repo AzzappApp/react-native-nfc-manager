@@ -16,7 +16,7 @@ import Link from '#components/Link';
 import { dispatchGlobalEvent } from '#helpers/globalEvents';
 import { getCurrentLocale } from '#helpers/localeHelpers';
 import { signup } from '#helpers/MobileWebAPI';
-import useAnimatedKeyboardHeight from '#hooks/useAnimatedKeyboardHeight';
+import useFormKeyboardManager from '#hooks/useFormKeyboardManager';
 import useScreenInsets from '#hooks/useScreenInsets';
 import Button from '#ui/Button';
 import CheckBox from '#ui/CheckBox';
@@ -47,8 +47,6 @@ const SignupScreen = () => {
   const [showTOSError, setShowTOSError] = useState<boolean>(false);
 
   const [isSubmitting, setIsSubmitting] = useState(false);
-
-  const passwordRef = useRef<NativeTextInput>(null);
 
   const intl = useIntl();
 
@@ -170,24 +168,21 @@ const SignupScreen = () => {
     password,
   ]);
 
-  const focusPassword = () => {
-    passwordRef?.current?.focus();
-  };
+  const passwordRef = useRef<NativeTextInput>(null);
+  const { focusNextInput, translateY } = useFormKeyboardManager();
+
   // #endregion
 
-  // #region KeyboardAvoidingView manual handling blinking of secured text input and keyboard changing value for nohting
-  const keyboardHeight = useAnimatedKeyboardHeight();
   const animatedStyle = useAnimatedStyle(() => {
     return {
       flex: 1,
       transform: [
         {
-          translateY: keyboardHeight.value,
+          translateY: -translateY.value,
         },
       ],
     };
   });
-  // #endregion
 
   const insets = useScreenInsets();
   return (
@@ -231,7 +226,7 @@ const SignupScreen = () => {
               input={contact}
               onChange={setContact}
               hasError={!!phoneOrEmailError}
-              onSubmitEditing={focusPassword}
+              onSubmitEditing={focusNextInput(passwordRef)}
             />
             <Text style={styles.error} variant="error">
               {phoneOrEmailError}
