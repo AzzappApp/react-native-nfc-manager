@@ -234,7 +234,7 @@ const MultiUserScreenUserList = ({
 
   const ListHeaderComponent = useMemo(() => {
     return (
-      <View style={{ marginBottom: 16 }}>
+      <View style={styles.headerContainer}>
         {Header}
         <Button
           style={styles.button}
@@ -262,6 +262,7 @@ const MultiUserScreenUserList = ({
     nbCommonInformation,
     onAddUsers,
     styles.button,
+    styles.headerContainer,
     toggleCommonInfosForm,
   ]);
 
@@ -445,13 +446,14 @@ const sectionKeyExtractor = (item: { id: string }) => {
   return item.id;
 };
 const styleSheet = createStyleSheet(appearance => ({
+  headerContainer: { paddingBottom: 16, gap: 10 },
   content: {
     paddingTop: 10,
     width: '100%',
+    flex: 1,
   },
   button: {
     width: '100%',
-    marginTop: 10,
   },
   user: {
     marginTop: 20,

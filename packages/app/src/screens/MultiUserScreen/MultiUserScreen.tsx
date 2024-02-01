@@ -443,6 +443,7 @@ const styleSheet = createStyleSheet(appearance => ({
     flexDirection: 'column',
     alignItems: 'center',
     padding: 10,
+    flex: 1,
   },
   description: {
     textAlign: 'center',

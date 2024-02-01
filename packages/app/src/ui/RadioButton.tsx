@@ -46,6 +46,7 @@ const variantStyles = createVariantsStyleSheet(appearance => ({
       borderWidth: 2,
       borderColor: appearance === 'light' ? colors.grey100 : colors.grey800,
       backgroundColor: appearance === 'light' ? colors.white : colors.white,
+      marginRight: 1, // to make sur that radio button is not cut on android
     },
     outerRingChecked: {
       borderColor: appearance === 'light' ? colors.black : colors.grey100,

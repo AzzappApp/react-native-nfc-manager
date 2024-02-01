@@ -147,8 +147,6 @@ const styleSheet = createStyleSheet(appearance => ({
   },
   transfer: {
     height: 29,
-    width: '60%',
-    marginTop: 20,
     borderRadius: 15,
     alignSelf: 'center',
   },
@@ -170,11 +168,12 @@ const styleSheet = createStyleSheet(appearance => ({
     marginBottom: 10,
   },
   cancelButton: {
-    width: 136,
     backgroundColor: 'transparent',
   },
   transferContainer: {
     justifyContent: 'center',
     alignContent: 'center',
+    paddingTop: 20,
+    paddingBottom: 5,
   },
 }));

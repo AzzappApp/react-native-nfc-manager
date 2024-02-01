@@ -1,6 +1,6 @@
 import { useCallback, useRef, useState } from 'react';
 import { useIntl } from 'react-intl';
-import { StyleSheet } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { graphql, usePreloadedQuery } from 'react-relay';
 import { useRouter } from '#components/NativeRouter';
@@ -53,15 +53,14 @@ const MultiUserAddScreen = ({
     <>
       <Container style={{ flex: 1 }}>
         <SafeAreaView
-          style={{ flex: 1 }}
           edges={{ bottom: 'off', top: 'additive' }}
+          style={styles.container}
         >
           <Header
             middleElement={intl.formatMessage({
               defaultMessage: 'Add a user',
               description: 'MultiUserAddScreen - title',
             })}
-            style={styles.header}
             leftElement={
               <IconButton
                 icon="arrow_left"
@@ -80,16 +79,18 @@ const MultiUserAddScreen = ({
               />
             }
           />
-          <SearchBarStatic
-            onChangeText={setSearchValue}
-            value={searchValue}
-            placeholder={intl.formatMessage({
-              defaultMessage: 'Search or enter email/phone number',
-              description: 'Search Label for MultiUserAddScreen',
-            })}
-            autoCapitalize="none"
-            autoCorrect={false}
-          />
+          <View style={styles.search}>
+            <SearchBarStatic
+              onChangeText={setSearchValue}
+              value={searchValue}
+              placeholder={intl.formatMessage({
+                defaultMessage: 'Search or enter email/phone number',
+                description: 'Search Label for MultiUserAddScreen',
+              })}
+              autoCapitalize="none"
+              autoCorrect={false}
+            />
+          </View>
           <MultiUserAddList
             onAddSingleUser={onAddSingleUser}
             searchValue={searchValue}
@@ -109,7 +110,8 @@ const MultiUserAddScreen = ({
 };
 
 const styles = StyleSheet.create({
-  header: { marginBottom: 10 },
+  search: { paddingHorizontal: 10 },
+  container: { flex: 1, gap: 10 },
 });
 
 export default relayScreen(MultiUserAddScreen, {

@@ -118,11 +118,7 @@ const styles = StyleSheet.create({
   contact: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginLeft: 10,
-    marginRight: 10,
-    height: AVATAR_SIZE,
-    marginTop: 5,
-    marginBottom: 15,
+    padding: 10,
   },
   placeholderAvatar: {
     justifyContent: 'center',

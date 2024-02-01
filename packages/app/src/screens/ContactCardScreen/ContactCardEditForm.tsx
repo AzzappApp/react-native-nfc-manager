@@ -105,13 +105,16 @@ const ContactCardEditForm = ({
           {children}
           {isMultiUser ? (
             <View style={styles.avatarSection}>
-              <PressableNative onPress={showImagePicker}>
-                <Controller
-                  control={control}
-                  name="avatar"
-                  render={({ field: { value, onChange } }) =>
-                    value?.uri ? (
-                      <View style={styles.avatarContainer}>
+              <Controller
+                control={control}
+                name="avatar"
+                render={({ field: { value, onChange } }) =>
+                  value?.uri ? (
+                    <View style={styles.avatarContainer}>
+                      <PressableNative
+                        onPress={showImagePicker}
+                        android_ripple={{ borderless: true, foreground: true }}
+                      >
                         <MediaImageRenderer
                           source={{
                             uri: value.uri,
@@ -120,22 +123,29 @@ const ContactCardEditForm = ({
                           }}
                           style={styles.avatar}
                         />
-                        <IconButton
-                          icon="delete_filled"
-                          variant="icon"
-                          iconStyle={styles.removeAvatarIcon}
-                          style={styles.removeAvatarButton}
-                          onPress={() => onChange(null)}
-                        />
-                      </View>
-                    ) : (
-                      <View style={styles.noAvatar}>
-                        <Icon icon="add" />
-                      </View>
-                    )
-                  }
-                />
-              </PressableNative>
+                      </PressableNative>
+                      <IconButton
+                        icon="delete_filled"
+                        variant="icon"
+                        iconStyle={styles.removeAvatarIcon}
+                        style={styles.removeAvatarButton}
+                        onPress={() => onChange(null)}
+                      />
+                    </View>
+                  ) : (
+                    <View style={styles.noAvatarContainer}>
+                      <PressableNative
+                        onPress={showImagePicker}
+                        android_ripple={{ borderless: true, foreground: true }}
+                      >
+                        <View style={styles.noAvatar}>
+                          <Icon icon="add" />
+                        </View>
+                      </PressableNative>
+                    </View>
+                  )
+                }
+              />
             </View>
           ) : null}
           <Separation small />
@@ -386,6 +396,10 @@ const styleSheet = createStyleSheet(appearance => ({
     backgroundColor: appearance === 'dark' ? colors.grey900 : colors.grey50,
     borderRadius: AVATAR_WIDTH / 2,
   },
+  noAvatarContainer: {
+    overflow: 'hidden',
+    borderRadius: AVATAR_WIDTH / 2,
+  },
   avatar: {
     width: AVATAR_WIDTH,
     height: AVATAR_WIDTH,
@@ -397,7 +411,10 @@ const styleSheet = createStyleSheet(appearance => ({
   fieldTitle: { minWidth: 100 },
   fieldTitleWithLock: { flexDirection: 'row', gap: 5, alignItems: 'center' },
   avatarContainer: [
-    { overflow: 'visible', position: 'relative' },
+    {
+      position: 'relative',
+      borderRadius: AVATAR_WIDTH / 2,
+    },
     shadow(appearance, 'bottom'),
   ],
   removeAvatarButton: {
