@@ -1,5 +1,7 @@
-## 0.5.5-canary.41
+## 0.5.5-canary.42
 
+* **fix:**  - **webCard:** [#2364](https://github.com/AzzappApp/azzapp/pull/2364) remove foreground on background preview desktop ([#2581](https://github.com/AzzappApp/azzapp/pull/2581))
+* **build:**  - update drizzle orm & drizzle kit ([#2576](https://github.com/AzzappApp/azzapp/pull/2576))
 * **fix:**  - 🐛 correctly validate URLS & Emails ([#2570](https://github.com/AzzappApp/azzapp/pull/2570))
 * **fix:**  - 🐛 display bottom sheet with title and style ([#2593](https://github.com/AzzappApp/azzapp/pull/2593))
 * **fix:**  - limite action of unpublished car on webcardscreen ([#2583](https://github.com/AzzappApp/azzapp/pull/2583))
