@@ -38,13 +38,7 @@ const CoverRendererPreviewDesktop = ({
   const { cardCover, cardColors } =
     useFragment(CoverRendererFragment, coverKey) ?? {};
 
-  const {
-    media,
-    foreground,
-    foregroundColor,
-    background,
-    backgroundPatternColor,
-  } = cardCover ?? {};
+  const { media, background, backgroundPatternColor } = cardCover ?? {};
 
   const { __typename, uri, thumbnail } = media ?? {};
 
@@ -92,18 +86,6 @@ const CoverRendererPreviewDesktop = ({
         locations={[0, 0.95]}
         style={styles.layer}
       />
-      {foreground && (
-        <MediaImageRenderer
-          testID="CoverRenderer_foreground"
-          source={{
-            uri: foreground.smallURI,
-            mediaId: foreground.id,
-            requestedSize: COVER_BASE_WIDTH,
-          }}
-          tintColor={swapColor(foregroundColor, cardColors)}
-          style={styles.layer}
-        />
-      )}
       <CoverRenderer
         style={styles.cover}
         webCard={coverKey}
