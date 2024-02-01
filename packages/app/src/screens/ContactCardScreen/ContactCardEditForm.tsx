@@ -8,7 +8,9 @@ import { MEDIA_WIDTH } from '#components/AuthorCartouche';
 import FormDeleteFieldOverlay from '#components/ContactCard/FormDeleteFieldOverlay';
 import { FILTERS, exportLayersToImage, isFilter } from '#components/gpu';
 import ImagePicker, {
+  EditImageStep,
   ImagePickerContactCardMediaWrapper,
+  SelectImageStepWithFrontCameraByDefault,
 } from '#components/ImagePicker';
 import { MediaImageRenderer } from '#components/medias';
 import ScreenModal from '#components/ScreenModal';
@@ -328,6 +330,7 @@ const ContactCardEditForm = ({
           kind="image"
           forceAspectRatio={1}
           TopPanelWrapper={ImagePickerContactCardMediaWrapper}
+          steps={steps}
           onFinished={onImagePickerFinished}
           onCancel={hideImagePicker}
           cameraButtonsLeftRightPosition={70}
@@ -336,6 +339,8 @@ const ContactCardEditForm = ({
     </>
   );
 };
+
+export const steps = [SelectImageStepWithFrontCameraByDefault, EditImageStep];
 
 const CommonInformationField = ({
   label,

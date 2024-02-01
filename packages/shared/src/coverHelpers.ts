@@ -15,7 +15,7 @@ export const COVER_ANIMATION_DURATION = 5000;
 /**
  * Cover video maxium duration in seconds
  */
-export const COVER_MAX_VIDEO_DURATTION = 12;
+export const COVER_MAX_VIDEO_DURATION = 12;
 
 /**
  * Cover video maxium duration in seconds

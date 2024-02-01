@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import { View } from 'react-native';
 import { COVER_RATIO, COVER_CARD_RADIUS } from '@azzapp/shared/coverHelpers';
 import { colors, shadow } from '#theme';
@@ -8,9 +8,9 @@ import type { LayoutChangeEvent } from 'react-native';
 
 const ImagePickerCardMediaWrapper = ({ children }: { children: ReactNode }) => {
   const [height, setHeight] = useState(0);
-  const onLayout = ({ nativeEvent }: LayoutChangeEvent) => {
+  const onLayout = useCallback(({ nativeEvent }: LayoutChangeEvent) => {
     setHeight(nativeEvent.layout.height);
-  };
+  }, []);
 
   const styles = useStyleSheet(styleSheet);
 
@@ -20,7 +20,9 @@ const ImagePickerCardMediaWrapper = ({ children }: { children: ReactNode }) => {
         <View
           style={[
             styles.radiusBox,
-            { borderRadius: height * COVER_RATIO * COVER_CARD_RADIUS },
+            {
+              borderRadius: height * COVER_RATIO * COVER_CARD_RADIUS,
+            },
           ]}
         >
           {children}

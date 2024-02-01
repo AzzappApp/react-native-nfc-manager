@@ -122,6 +122,8 @@ const CameraView = (
   const isActive = useIsForeground();
   const [hasMicrophonePermission, setHasMicrophonePermission] = useState(false);
 
+  const [ready, setReady] = useState(Platform.OS === 'ios');
+
   useEffect(() => {
     const status = Camera.getMicrophonePermissionStatus();
     setHasMicrophonePermission(status === 'granted');
@@ -260,12 +262,15 @@ const CameraView = (
         <GestureDetector gesture={gesture}>
           <Camera
             ref={camera}
-            style={styles.cameraStyle}
+            style={styles.camera}
             device={device}
-            fps={30}
-            format={Platform.OS === 'android' ? format : undefined}
+            fps={ready ? 30 : undefined}
+            format={Platform.OS === 'android' && ready ? format : undefined}
             isActive={isActive}
-            onInitialized={onInitialized}
+            onInitialized={() => {
+              onInitialized();
+              setReady(true);
+            }}
             onError={onError}
             enableZoomGesture={true}
             photo={photo}
@@ -357,11 +362,7 @@ export default forwardRef(CameraView);
 const FOCUS_RING_SIZE = 100;
 
 const styles = StyleSheet.create({
-  cameraStyle: { flex: 1 },
-  container: {
-    flex: 1,
-    backgroundColor: 'black',
-  },
+  camera: { flex: 1 },
   focusRing: {
     position: 'absolute',
     borderWidth: 1,

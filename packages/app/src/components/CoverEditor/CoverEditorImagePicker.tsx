@@ -1,5 +1,5 @@
 import {
-  COVER_MAX_VIDEO_DURATTION,
+  COVER_MAX_VIDEO_DURATION,
   COVER_RATIO,
 } from '@azzapp/shared/coverHelpers';
 import ImagePicker, {
@@ -17,7 +17,7 @@ const CoverEditiorImagePicker = (
 ) => (
   <ImagePicker
     forceAspectRatio={COVER_RATIO}
-    maxVideoDuration={COVER_MAX_VIDEO_DURATTION}
+    maxVideoDuration={COVER_MAX_VIDEO_DURATION}
     steps={[SelectImageStepWithFrontCameraByDefault, VideoTimeRangeStep]}
     TopPanelWrapper={ImagePickerCardMediaWrapper}
     {...props}
