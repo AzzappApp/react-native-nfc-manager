@@ -4,6 +4,7 @@ import Animated, { useAnimatedStyle } from 'react-native-reanimated';
 import { useFragment, graphql } from 'react-relay';
 import { shadow } from '#theme';
 import ContactCard, {
+  CONTACT_CARD_RADIUS_HEIGHT,
   CONTACT_CARD_RATIO,
 } from '#components/ContactCard/ContactCard';
 import Link from '#components/Link';
@@ -120,21 +121,28 @@ const ContactCardItem = ({
       {profile.webCard.cardIsPublished &&
         !profile.invited &&
         !profile.promotedAsOwner && (
-          <Link route="CONTACT_CARD">
-            <PressableNative
-              style={{
-                width: cardHeight * CONTACT_CARD_RATIO,
-                height: cardHeight,
-                overflow: 'visible',
-              }}
-            >
-              <ContactCard
-                profile={profile}
-                height={Math.min(height, maxHeight)}
-                style={styles.card}
-              />
-            </PressableNative>
-          </Link>
+          <View
+            style={{
+              borderRadius: cardHeight * CONTACT_CARD_RADIUS_HEIGHT,
+              overflow: 'hidden',
+            }}
+          >
+            <Link route="CONTACT_CARD">
+              <PressableNative
+                ripple={{
+                  borderless: true,
+                  foreground: true,
+                  radius: cardHeight,
+                }}
+              >
+                <ContactCard
+                  profile={profile}
+                  height={Math.min(height, maxHeight)}
+                  style={styles.card}
+                />
+              </PressableNative>
+            </Link>
+          </View>
         )}
     </Animated.View>
   );
