@@ -1,5 +1,6 @@
-## 0.5.5-canary.44
+## 0.5.5-canary.45
 
+* **fix:**  - **multiUser:** ui fixes for android ([#2605](https://github.com/AzzappApp/azzapp/pull/2605))
 * **fix:**  - **about:** improve ripple effects in about screen ([#2610](https://github.com/AzzappApp/azzapp/pull/2610))
 * **fix:**  - **webCardParams:** enhance bottom sheet to change webCard name ([#2609](https://github.com/AzzappApp/azzapp/pull/2609))
 * **fix:**  - **home:** ripple effect on contact card ([#2607](https://github.com/AzzappApp/azzapp/pull/2607))
