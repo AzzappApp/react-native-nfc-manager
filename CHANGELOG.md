@@ -1,5 +1,9 @@
-## 0.5.5-canary.43
+## 0.5.5-canary.44
 
+* **fix:**  - **about:** improve ripple effects in about screen ([#2610](https://github.com/AzzappApp/azzapp/pull/2610))
+* **fix:**  - **webCardParams:** enhance bottom sheet to change webCard name ([#2609](https://github.com/AzzappApp/azzapp/pull/2609))
+* **fix:**  - **home:** ripple effect on contact card ([#2607](https://github.com/AzzappApp/azzapp/pull/2607))
+* **fix:**  - **android:** improve keyboard behaviour on forms with scrollview ([#2603](https://github.com/AzzappApp/azzapp/pull/2603))
 * **fix:**  - **android:** camera preview is strechted on android ([#2599](https://github.com/AzzappApp/azzapp/pull/2599))
 * **fix:**  - **Android:** keyboard behavior ([#2600](https://github.com/AzzappApp/azzapp/pull/2600))
 * **fix:**  - **webCard:** [#2364](https://github.com/AzzappApp/azzapp/pull/2364) remove foreground on background preview desktop ([#2581](https://github.com/AzzappApp/azzapp/pull/2581))
