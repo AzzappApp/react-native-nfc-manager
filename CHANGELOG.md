@@ -1,5 +1,7 @@
-## 0.5.5-canary.42
+## 0.5.5-canary.43
 
+* **fix:**  - **android:** camera preview is strechted on android ([#2599](https://github.com/AzzappApp/azzapp/pull/2599))
+* **fix:**  - **Android:** keyboard behavior ([#2600](https://github.com/AzzappApp/azzapp/pull/2600))
 * **fix:**  - **webCard:** [#2364](https://github.com/AzzappApp/azzapp/pull/2364) remove foreground on background preview desktop ([#2581](https://github.com/AzzappApp/azzapp/pull/2581))
 * **build:**  - update drizzle orm & drizzle kit ([#2576](https://github.com/AzzappApp/azzapp/pull/2576))
 * **fix:**  - 🐛 correctly validate URLS & Emails ([#2570](https://github.com/AzzappApp/azzapp/pull/2570))
