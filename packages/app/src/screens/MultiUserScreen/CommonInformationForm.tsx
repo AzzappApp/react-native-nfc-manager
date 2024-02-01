@@ -2,7 +2,6 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Controller, useForm } from 'react-hook-form';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { View } from 'react-native';
-import { KeyboardAvoidingView } from 'react-native-keyboard-controller';
 import Toast from 'react-native-toast-message';
 import { graphql, useFragment, useMutation } from 'react-relay';
 import FormDeleteFieldOverlay from '#components/ContactCard/FormDeleteFieldOverlay';
@@ -147,108 +146,105 @@ const CommonInformationForm = ({
 
   return (
     <ScreenModal visible={commonInfoFormIsOpened}>
-      <KeyboardAvoidingView behavior="height" style={{ flex: 1 }}>
-        <View
-          style={{
-            paddingTop: insets.top,
-            paddingBottom: insets.bottom,
-            flex: 1,
-          }}
-        >
-          <Header
-            middleElement={intl.formatMessage({
-              defaultMessage: 'Common information',
-              description: 'Common information form header title',
-            })}
-            leftElement={
-              <Button
-                label={intl.formatMessage({
-                  defaultMessage: 'Cancel',
-                  description: 'Edit common information cancel button title',
-                })}
-                onPress={() => {
-                  reset({
-                    ...commonInfo,
-                    emails: commonInfo?.emails?.map(m => ({ ...m })) ?? [],
-                    phoneNumbers:
-                      commonInfo?.phoneNumbers?.map(p => ({ ...p })) ?? [],
-                    urls: commonInfo?.urls?.map(p => ({ ...p })) ?? [],
-                    addresses:
-                      commonInfo?.addresses?.map(p => ({ ...p })) ?? [],
-                    socials: commonInfo?.socials?.map(p => ({ ...p })) ?? [],
-                  });
-                  toggleCommonInfoForm();
-                }}
-                variant="secondary"
-                style={styles.headerButton}
-              />
-            }
-            rightElement={
-              <Button
-                testID="save-common-information"
-                label={intl.formatMessage({
-                  defaultMessage: 'Save',
-                  description: 'Edit common information save button label',
-                })}
-                loading={isSubmitting}
-                onPress={submit}
-                variant="primary"
-                style={styles.headerButton}
-              />
-            }
-          />
-          <FormDeleteFieldOverlay>
-            <View style={styles.sectionsContainer}>
-              <View style={styles.container}>
-                <Icon icon="lock_line" style={styles.icon} />
-                <Text variant="xsmall" style={styles.description}>
-                  <FormattedMessage
-                    defaultMessage="Common information will be displayed on each team member’s Contact Card and won’t be editable."
-                    description="Common information form description"
-                  />
-                </Text>
-              </View>
-
-              <Controller
-                control={control}
-                name="company"
-                render={({ field: { onChange, onBlur, value } }) => (
-                  <View style={styles.field}>
-                    <Text variant="smallbold" style={styles.fieldName}>
-                      <FormattedMessage
-                        defaultMessage="Company"
-                        description="Company name field registered for the contact card"
-                      />
-                    </Text>
-                    <TextInput
-                      value={value ?? ''}
-                      onChangeText={onChange}
-                      onBlur={onBlur}
-                      style={styles.input}
-                      clearButtonMode="while-editing"
-                      placeholder={intl.formatMessage({
-                        defaultMessage: 'Enter a company name',
-                        description:
-                          'Placeholder for company name inside contact card',
-                      })}
-                    />
-                  </View>
-                )}
-              />
-              <Separation />
-              <CommonInformationAddresses control={control} />
-              <Separation />
-              <CommonInformationPhones control={control} />
-              <Separation />
-              <CommonInformationEmails control={control} />
-              <Separation />
-              <CommonInformationUrls control={control} />
-              <Separation />
-              <CommonInformationSocials control={control} />
+      <View
+        style={{
+          paddingTop: insets.top,
+          paddingBottom: insets.bottom,
+          flex: 1,
+        }}
+      >
+        <Header
+          middleElement={intl.formatMessage({
+            defaultMessage: 'Common information',
+            description: 'Common information form header title',
+          })}
+          leftElement={
+            <Button
+              label={intl.formatMessage({
+                defaultMessage: 'Cancel',
+                description: 'Edit common information cancel button title',
+              })}
+              onPress={() => {
+                reset({
+                  ...commonInfo,
+                  emails: commonInfo?.emails?.map(m => ({ ...m })) ?? [],
+                  phoneNumbers:
+                    commonInfo?.phoneNumbers?.map(p => ({ ...p })) ?? [],
+                  urls: commonInfo?.urls?.map(p => ({ ...p })) ?? [],
+                  addresses: commonInfo?.addresses?.map(p => ({ ...p })) ?? [],
+                  socials: commonInfo?.socials?.map(p => ({ ...p })) ?? [],
+                });
+                toggleCommonInfoForm();
+              }}
+              variant="secondary"
+              style={styles.headerButton}
+            />
+          }
+          rightElement={
+            <Button
+              testID="save-common-information"
+              label={intl.formatMessage({
+                defaultMessage: 'Save',
+                description: 'Edit common information save button label',
+              })}
+              loading={isSubmitting}
+              onPress={submit}
+              variant="primary"
+              style={styles.headerButton}
+            />
+          }
+        />
+        <FormDeleteFieldOverlay>
+          <View style={styles.sectionsContainer}>
+            <View style={styles.container}>
+              <Icon icon="lock_line" style={styles.icon} />
+              <Text variant="xsmall" style={styles.description}>
+                <FormattedMessage
+                  defaultMessage="Common information will be displayed on each team member’s Contact Card and won’t be editable."
+                  description="Common information form description"
+                />
+              </Text>
             </View>
-          </FormDeleteFieldOverlay>
-        </View>
-      </KeyboardAvoidingView>
+
+            <Controller
+              control={control}
+              name="company"
+              render={({ field: { onChange, onBlur, value } }) => (
+                <View style={styles.field}>
+                  <Text variant="smallbold" style={styles.fieldName}>
+                    <FormattedMessage
+                      defaultMessage="Company"
+                      description="Company name field registered for the contact card"
+                    />
+                  </Text>
+                  <TextInput
+                    value={value ?? ''}
+                    onChangeText={onChange}
+                    onBlur={onBlur}
+                    style={styles.input}
+                    clearButtonMode="while-editing"
+                    placeholder={intl.formatMessage({
+                      defaultMessage: 'Enter a company name',
+                      description:
+                        'Placeholder for company name inside contact card',
+                    })}
+                  />
+                </View>
+              )}
+            />
+            <Separation />
+            <CommonInformationAddresses control={control} />
+            <Separation />
+            <CommonInformationPhones control={control} />
+            <Separation />
+            <CommonInformationEmails control={control} />
+            <Separation />
+            <CommonInformationUrls control={control} />
+            <Separation />
+            <CommonInformationSocials control={control} />
+          </View>
+        </FormDeleteFieldOverlay>
+      </View>
     </ScreenModal>
   );
 };
