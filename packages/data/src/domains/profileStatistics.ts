@@ -14,7 +14,7 @@ export const ProfileStatisticTable = mysqlTable(
   },
   table => {
     return {
-      id: primaryKey(table.profileId, table.day),
+      id: primaryKey({ columns: [table.day, table.profileId] }),
     };
   },
 );

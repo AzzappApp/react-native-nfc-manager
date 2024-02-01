@@ -16,7 +16,7 @@ export const WebCardStatisticTable = mysqlTable(
   },
   table => {
     return {
-      id: primaryKey(table.webCardId, table.day),
+      id: primaryKey({ columns: [table.day, table.webCardId] }),
     };
   },
 );

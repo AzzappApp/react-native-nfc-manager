@@ -4,8 +4,9 @@ import 'dotenv/config';
 export default {
   schema: './src/domains/*',
   dbCredentials: {
-    connectionString: process.env.DATABASE_URL ?? '',
+    uri: process.env.DATABASE_URL ?? '',
   },
+  tablesFilter: ['!_*'],
   driver: 'mysql2',
   out: './drizzle',
 } satisfies Config;

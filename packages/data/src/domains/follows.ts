@@ -15,10 +15,9 @@ export const FollowTable = mysqlTable(
     return {
       followingIdIdx: index('Follow_followingId_idx').on(table.followingId),
       followerIdIdx: index('Follow_followerId_idx').on(table.followerId),
-      followFollowerIdFollowingId: primaryKey(
-        table.followerId,
-        table.followingId,
-      ),
+      followFollowerIdFollowingId: primaryKey({
+        columns: [table.followerId, table.followingId],
+      }),
     };
   },
 );

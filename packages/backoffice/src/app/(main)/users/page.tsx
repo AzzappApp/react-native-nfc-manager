@@ -1,4 +1,4 @@
-import { asc, desc, or, sql } from 'drizzle-orm';
+import { asc, desc, like, or, sql } from 'drizzle-orm';
 import { UserTable, db } from '@azzapp/data/domains';
 import UsersList from './UsersList';
 
@@ -15,13 +15,13 @@ const getUsers = (
   order: 'asc' | 'desc',
   search: string | null,
 ) => {
-  let query = db.select().from(UserTable);
+  let query = db.select().from(UserTable).$dynamic();
 
   if (search) {
     query = query.where(
       or(
-        sql`email LIKE ${`%${search}%`}`,
-        sql`phoneNumber LIKE ${`%${search}%`}`,
+        like(UserTable.email, `%${search}%`),
+        like(UserTable.phoneNumber, `%${search}%`),
       ),
     );
   }
@@ -36,13 +36,14 @@ const getUsers = (
 const getUsersCount = async (search: string | null) => {
   let query = db
     .select({ count: sql`count(*)`.mapWith(Number) })
-    .from(UserTable);
+    .from(UserTable)
+    .$dynamic();
 
   if (search) {
     query = query.where(
       or(
-        sql`email LIKE ${`%${search}%`}`,
-        sql`phoneNumber LIKE ${`%${search}%`}`,
+        like(UserTable.email, `%${search}%`),
+        like(UserTable.phoneNumber, `%${search}%`),
       ),
     );
   }

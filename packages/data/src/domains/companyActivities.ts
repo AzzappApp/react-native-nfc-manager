@@ -20,7 +20,9 @@ export const WebCardCategoryCompanyActivityTable = mysqlTable(
   },
   table => {
     return {
-      pk: primaryKey(table.webCardCategoryId, table.companyActivityId),
+      pk: primaryKey({
+        columns: [table.companyActivityId, table.webCardCategoryId],
+      }),
     };
   },
 );

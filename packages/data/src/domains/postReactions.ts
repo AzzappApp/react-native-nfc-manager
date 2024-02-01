@@ -21,11 +21,9 @@ export const PostReactionTable = mysqlTable(
     return {
       // TODO : not sure about this one : do we want to support several reactions on the same post (like and dislike) ?
       // We could imagine to user the last one but do we need to keep an historic of reactions ?
-      postReactionPostIdReactionKindProfileId: primaryKey(
-        table.postId,
-        table.webCardId,
-        table.reactionKind,
-      ),
+      postReactionPostIdReactionKindProfileId: primaryKey({
+        columns: [table.postId, table.reactionKind, table.webCardId],
+      }),
       postIdIdx: index('PostReaction_postId_idx').on(table.postId),
       webCardIdIdx: index('PostReaction_webCardId_idx').on(table.webCardId),
     };
