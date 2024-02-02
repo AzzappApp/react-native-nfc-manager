@@ -304,7 +304,7 @@ const HomeBottomSheetPanelOption = ({
   return inner;
 };
 
-const ROW_HEIGHT = 32;
+const ROW_HEIGHT = 42;
 const styles = StyleSheet.create({
   separator: { height: 25 },
   bottomSheetContainer: {
@@ -312,11 +312,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 0,
   },
   bottomSheetOptionsContainer: {
-    paddingHorizontal: 20,
     paddingTop: 20,
-    rowGap: 10,
   },
   bottomSheetOptionButton: {
+    paddingVertical: 5,
+    paddingHorizontal: 20,
     height: ROW_HEIGHT,
     justifyContent: 'center',
   },
