@@ -1,5 +1,6 @@
-## 0.5.5-canary.53
+## 0.5.5-canary.54
 
+* **build:**  - upgrade bcrypt
 * **fix:**  - **Android:** media improvement ([#2623](https://github.com/AzzappApp/azzapp/pull/2623))
 * **fix:**  - **Android:** ripple effect on about menu ([#2621](https://github.com/AzzappApp/azzapp/pull/2621))
 * **fix:**  - **WebCardEdition:** simplify system ([#2619](https://github.com/AzzappApp/azzapp/pull/2619))
