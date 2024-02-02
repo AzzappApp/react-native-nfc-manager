@@ -1,5 +1,6 @@
-## 0.5.5-canary.46
+## 0.5.5-canary.47
 
+* **fix:**  - 🐛 ignore space when searching phone number ([#2597](https://github.com/AzzappApp/azzapp/pull/2597))
 * **fix:**  - **android:** keyboard behaviour on account details ([#2608](https://github.com/AzzappApp/azzapp/pull/2608))
 * **fix:**  - **multiUser:** ui fixes for android ([#2605](https://github.com/AzzappApp/azzapp/pull/2605))
 * **fix:**  - **about:** improve ripple effects in about screen ([#2610](https://github.com/AzzappApp/azzapp/pull/2610))
