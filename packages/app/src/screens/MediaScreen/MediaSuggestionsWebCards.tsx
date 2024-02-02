@@ -255,6 +255,8 @@ const styleSheet = createStyleSheet(appearance => ({
     paddingHorizontal: 8,
     overflow: 'visible',
     zIndex: 1,
+    paddingBottom: 20,
+    paddingTop: 16.5,
     gap: 10,
   },
   coverContainerStyle: {

@@ -254,12 +254,11 @@ const styles = StyleSheet.create({
   },
   coversTitleStyle: {
     marginHorizontal: 10,
-    marginBottom: 16.5,
     marginTop: 6.5,
   },
   postsTitleStyle: {
     marginHorizontal: 10,
-    marginVertical: 20,
+    marginBottom: 20,
   },
 });
 
