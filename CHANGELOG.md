@@ -1,5 +1,6 @@
-## 0.5.5-canary.49
+## 0.5.5-canary.50
 
+* **fix:**  - **media:** improve shadow appearance on android ([#2620](https://github.com/AzzappApp/azzapp/pull/2620))
 * **fix:**  - **ShakeAndShare:** sensibility and error ([#2616](https://github.com/AzzappApp/azzapp/pull/2616))
 * **build:**  - update yarn.lock
 * **fix:**  - 🐛 ignore space when searching phone number ([#2597](https://github.com/AzzappApp/azzapp/pull/2597))
