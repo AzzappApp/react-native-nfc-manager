@@ -1,4 +1,4 @@
-## 0.5.5-canary.50
+## 0.5.5-canary.51
 
 * **fix:**  - **media:** improve shadow appearance on android ([#2620](https://github.com/AzzappApp/azzapp/pull/2620))
 * **fix:**  - **ShakeAndShare:** sensibility and error ([#2616](https://github.com/AzzappApp/azzapp/pull/2616))
