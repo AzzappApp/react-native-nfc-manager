@@ -16,7 +16,7 @@ import useAuthState from '#hooks/useAuthState';
 import useToggleFollow from '#hooks/useToggleFollow';
 import BottomSheetModal from '#ui/BottomSheetModal';
 import ExpendableText from '#ui/ExpendableText';
-import PressableOpacity from '#ui/PressableOpacity';
+import PressableNative from '#ui/PressableNative';
 import Switch from '#ui/Switch';
 import Text from '#ui/Text';
 import PostRendererActionBar, {
@@ -261,7 +261,7 @@ const PostRendererBottomPanel = ({
             variant="medium"
           />
         )}
-        <PressableOpacity onPress={goToComments}>
+        <PressableNative onPress={goToComments}>
           {post.previewComment && (
             <Text variant="small" numberOfLines={2} ellipsizeMode="tail">
               <Text variant="smallbold">
@@ -290,7 +290,7 @@ const PostRendererBottomPanel = ({
               />
             </Text>
           )}
-        </PressableOpacity>
+        </PressableNative>
         <Text variant="small" style={styles.relativeTime}>
           <FormattedRelativeTime
             value={relativeDateMinute(post.createdAt)}
@@ -304,6 +304,7 @@ const PostRendererBottomPanel = ({
         height={post.allowComments ? MODAL_HEIGHT : SMALL_MODAL_HEIGHT}
         variant="modal"
         onRequestClose={toggleModal}
+        contentContainerStyle={styles.bottomSheetContainer}
       >
         <View style={{ flex: 1, justifyContent: 'space-evenly' }}>
           {isViewer && (
@@ -337,34 +338,34 @@ const PostRendererBottomPanel = ({
             </View>
           )}
 
-          <PressableOpacity onPress={copyLink} style={styles.modalLine}>
+          <PressableNative onPress={copyLink} style={styles.modalLine}>
             <Text variant="medium">
               <FormattedMessage
                 defaultMessage="Copy link"
                 description="PostItem Modal - Copy Link Label"
               />
             </Text>
-          </PressableOpacity>
-          <PressableOpacity onPress={onShare} style={styles.modalLine}>
+          </PressableNative>
+          <PressableNative onPress={onShare} style={styles.modalLine}>
             <Text variant="medium">
               <FormattedMessage
                 defaultMessage="Share"
                 description="PostItem Modal - Share Label"
               />
             </Text>
-          </PressableOpacity>
+          </PressableNative>
           {post.allowComments && (
-            <PressableOpacity onPress={addComment} style={styles.modalLine}>
+            <PressableNative onPress={addComment} style={styles.modalLine}>
               <Text variant="medium">
                 <FormattedMessage
                   defaultMessage="Add a comment"
                   description="PostItem Modal - Add a comment Label"
                 />
               </Text>
-            </PressableOpacity>
+            </PressableNative>
           )}
           {!isViewer && (
-            <PressableOpacity onPress={onToggleFollow} style={styles.modalLine}>
+            <PressableNative onPress={onToggleFollow} style={styles.modalLine}>
               {post.webCard?.isFollowing ? (
                 <Text variant="medium" style={{ color: colors.grey400 }}>
                   <FormattedMessage
@@ -380,10 +381,10 @@ const PostRendererBottomPanel = ({
                   />
                 </Text>
               )}
-            </PressableOpacity>
+            </PressableNative>
           )}
           {!isViewer && (
-            <PressableOpacity
+            <PressableNative
               onPress={report}
               style={[styles.modalLine, styles.errorModalLine]}
             >
@@ -393,10 +394,10 @@ const PostRendererBottomPanel = ({
                   description="PostItem Modal - Likes Label"
                 />
               </Text>
-            </PressableOpacity>
+            </PressableNative>
           )}
           {isViewer && (
-            <PressableOpacity
+            <PressableNative
               onPress={report}
               style={[styles.modalLine, styles.errorModalLine]}
             >
@@ -406,7 +407,7 @@ const PostRendererBottomPanel = ({
                   description="PostItem Modal - Delete this post"
                 />
               </Text>
-            </PressableOpacity>
+            </PressableNative>
           )}
         </View>
       </BottomSheetModal>
@@ -418,12 +419,17 @@ export default PostRendererBottomPanel;
 
 const styles = StyleSheet.create({
   bottomContainerPost: { marginHorizontal: 20, rowGap: 10 },
+
+  bottomSheetContainer: {
+    paddingHorizontal: 0,
+  },
   modalLine: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    height: 32,
-    marginHorizontal: 20,
+    height: 42,
+    paddingVertical: 5,
+    paddingHorizontal: 20,
   },
   errorModalLine: {
     flexDirection: 'row',
