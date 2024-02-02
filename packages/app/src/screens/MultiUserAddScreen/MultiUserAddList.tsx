@@ -74,7 +74,10 @@ const MultiUserAddList = ({
             contact.lastName.toLowerCase().includes(searchLower)) ||
           (contact.phoneNumbers &&
             contact.phoneNumbers.some(phone =>
-              phone.number?.toLowerCase().includes(searchLower),
+              phone.number
+                ?.toLowerCase()
+                .replaceAll(' ', '')
+                .includes(searchLower.replaceAll(' ', '')),
             )) ||
           (contact.emails &&
             contact.emails.some(email =>
