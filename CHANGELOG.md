@@ -1,5 +1,6 @@
-## 0.5.5-canary.56
+## 0.5.5-canary.57
 
+* **fix:**  - use globalThis to patch correctly
 * **build:**  - try to patch bcrypt-ts
 * **fix:**  - **authent:** force node import of bcrypt
 * **build:**  - upgrade bcrypt
