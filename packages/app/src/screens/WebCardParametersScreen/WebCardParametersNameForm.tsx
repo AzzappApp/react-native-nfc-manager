@@ -269,6 +269,7 @@ const WebcardParametersNameForm = ({
                 autoCorrect={false}
                 returnKeyType="next"
                 onSubmitEditing={onSubmit}
+                autoFocus
               />
             </View>
           )}
