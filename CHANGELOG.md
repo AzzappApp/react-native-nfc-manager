@@ -1,5 +1,6 @@
-## 0.5.5-canary.55
+## 0.5.5-canary.56
 
+* **build:**  - try to patch bcrypt-ts
 * **fix:**  - **authent:** force node import of bcrypt
 * **build:**  - upgrade bcrypt
 * **fix:**  - **Android:** media improvement ([#2623](https://github.com/AzzappApp/azzapp/pull/2623))
