@@ -6342,10 +6342,10 @@ base64-js@^1.2.3, base64-js@^1.3.0, base64-js@^1.3.1, base64-js@^1.5.1:
   resolved "https://registry.yarnpkg.com/base64-js/-/base64-js-1.5.1.tgz#1b1b440160a5bf7ad40b650f095963481903930a"
   integrity sha512-AKpaYlHn8t4SVbOHCy+b5+KKgvR4vrsD8vbvrbiQJps7fKDTkjkDry6ji0rUJjC0kzbNePLwzxq8iypo41qeWA==
 
-bcrypt-ts@^4.0.0:
-  version "4.0.1"
-  resolved "https://registry.yarnpkg.com/bcrypt-ts/-/bcrypt-ts-4.0.1.tgz#8a1c2aec74c686a2878469ce93c07de604cd5b91"
-  integrity sha512-VdQBytZqdlUs6Hv992mKwhwvjaPAEfVRk+VAV4uuQtJ/6G/AQrqdiOq5nSubtBBsG9HxkTCfiVGUjQcnzq1htw==
+bcrypt-ts@^5.0.1:
+  version "5.0.1"
+  resolved "https://registry.yarnpkg.com/bcrypt-ts/-/bcrypt-ts-5.0.1.tgz#493c9bacf48e08e872f43e21b1fe154779cf38f0"
+  integrity sha512-+Q6wjkT+PO0Da56BIyaYyueMeqAV/zOXqfFIssRgCbQLGwU+YkBJfBpP2Q9Q8hGbpDyDNCrG36npSdE+S9HWUA==
 
 before-after-hook@^2.2.0:
   version "2.2.3"
