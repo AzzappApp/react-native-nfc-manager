@@ -1,5 +1,6 @@
-## 0.5.5-canary.54
+## 0.5.5-canary.55
 
+* **fix:**  - **authent:** force node import of bcrypt
 * **build:**  - upgrade bcrypt
 * **fix:**  - **Android:** media improvement ([#2623](https://github.com/AzzappApp/azzapp/pull/2623))
 * **fix:**  - **Android:** ripple effect on about menu ([#2621](https://github.com/AzzappApp/azzapp/pull/2621))
