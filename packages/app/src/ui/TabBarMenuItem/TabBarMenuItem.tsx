@@ -2,76 +2,24 @@ import { StyleSheet } from 'react-native';
 import { interpolateColor, useAnimatedStyle } from 'react-native-reanimated';
 import { colors } from '#theme';
 import useAnimatedState from '#hooks/useAnimatedState';
-import Icon from './Icon';
-import PressableAnimated from './PressableAnimated';
-import Text from './Text';
-import type { Icons } from './Icon';
-import type { PropsWithChildren } from 'react';
-import type { StyleProp, TextStyle, ViewStyle } from 'react-native';
-
-type TabBarMenuItemProps = PropsWithChildren<{
-  /**
-   * determine is the item is selected
-   *
-   * @type {boolean}
-   */
-  selected: boolean;
-  /**
-   * callback to select the time
-   *
-   */
-  setSelected: () => void;
-  /**
-   * style of the label
-   *
-   * @type {StyleProp<TextStyle>}
-   */
-  labelStyle?: StyleProp<TextStyle>;
-  /**
-   * container style
-   *
-   * @type {StyleProp<ViewStyle>}
-   */
-  containerStyle?: StyleProp<ViewStyle>;
-  /**
-   * optional props to define the selectedBackgroundColor
-   *
-   * @type {string}
-   */
-  selectedBackgroundColor?: string;
-  /**
-   * optional props to define the selectedTextColor. This will for now be applied also to the icon if use
-   *
-   * @type {string}
-   */
-  selectedLabelColor?: string;
-  /**
-   * backgroundColor
-   *
-   * @type {string}
-   */
-  backgroundColor?: string;
-  /**
-   * icons
-   *
-   * @type {Icons}
-   */
-  icon?: Icons;
-}>;
+import PressableOpacity from '#ui/PressableOpacity';
+import Icon from '../Icon';
+import Text from '../Text';
+import type TabBarMenuItemProps from './TabBarMenuItemProps';
 
 const TabBarMenuItem = ({
   selected,
-  setSelected,
+  onPress,
   children,
   labelStyle,
-  containerStyle,
   selectedBackgroundColor = colors.grey50,
   selectedLabelColor = colors.black,
   backgroundColor = `${colors.grey50}00`,
   icon,
+  style,
 }: TabBarMenuItemProps) => {
   const state = useAnimatedState(selected);
-  const style = useAnimatedStyle(() => {
+  const animatedStyle = useAnimatedStyle(() => {
     return {
       backgroundColor: interpolateColor(
         state.value,
@@ -82,10 +30,11 @@ const TabBarMenuItem = ({
   }, [state]);
 
   return (
-    <PressableAnimated
-      style={[styles.pressable, containerStyle, style]}
-      onPress={setSelected}
+    <PressableOpacity
+      style={[styles.pressable, animatedStyle, style]}
+      onPress={onPress}
       accessibilityRole="tab"
+      android_ripple={{ color: selectedBackgroundColor, borderless: false }}
     >
       {icon && (
         <Icon
@@ -99,7 +48,7 @@ const TabBarMenuItem = ({
       >
         {children}
       </Text>
-    </PressableAnimated>
+    </PressableOpacity>
   );
 };
 export const TAB_BAR_MENU_ITEM_HEIGHT = 32;

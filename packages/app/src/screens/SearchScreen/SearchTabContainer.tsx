@@ -205,9 +205,9 @@ const TabBarSearch = (
               props.navigationState.routes[props.navigationState.index].key ===
               route.key
             }
-            setSelected={onPress}
+            onPress={onPress}
             labelStyle={labelStyle}
-            containerStyle={styles.tabItemContainerStyle}
+            style={styles.tabItemContainerStyle}
           >
             {getLabelText({ route })}
             {route.key === 'searchProfiles' && <Text variant="azzapp">a</Text>}

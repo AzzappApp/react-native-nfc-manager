@@ -15,7 +15,7 @@ const HomeMenu = ({ selected, setSelected }: HomeMenuProps) => {
     <View style={styles.container} accessibilityRole="tablist">
       <TabBarMenuItem
         selected={selected === 'CONTACT_CARD'}
-        setSelected={() => setSelected('CONTACT_CARD')}
+        onPress={() => setSelected('CONTACT_CARD')}
         selectedBackgroundColor={END_GRADIENT_COLOR}
         backgroundColor={CLEAR_GRADIENT_COLOR}
         labelStyle={styles.menuLabelStyle}
@@ -28,7 +28,7 @@ const HomeMenu = ({ selected, setSelected }: HomeMenuProps) => {
       </TabBarMenuItem>
       <TabBarMenuItem
         selected={selected === 'STATS'}
-        setSelected={() => setSelected('STATS')}
+        onPress={() => setSelected('STATS')}
         selectedBackgroundColor={END_GRADIENT_COLOR}
         backgroundColor={CLEAR_GRADIENT_COLOR}
         labelStyle={styles.menuLabelStyle}
@@ -41,7 +41,7 @@ const HomeMenu = ({ selected, setSelected }: HomeMenuProps) => {
       </TabBarMenuItem>
       <TabBarMenuItem
         selected={selected === 'INFORMATION'}
-        setSelected={() => setSelected('INFORMATION')}
+        onPress={() => setSelected('INFORMATION')}
         selectedBackgroundColor={END_GRADIENT_COLOR}
         backgroundColor={CLEAR_GRADIENT_COLOR}
         labelStyle={styles.menuLabelStyle}

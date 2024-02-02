@@ -179,13 +179,25 @@ const MediaScreenTabBar = ({
   return (
     <View style={styles.tabBarContainer} accessibilityRole="tablist">
       <Link route="SEARCH">
-        <PressableNative style={{ paddingLeft: 25 }}>
+        <PressableNative
+          style={{ marginLeft: 25 }}
+          hitSlop={{
+            left: 10,
+            right: 10,
+            top: 10,
+            bottom: 10,
+          }}
+          ripple={{
+            borderless: true,
+            radius: 20,
+          }}
+        >
           <Icon icon="search" style={{ width: 28, height: 28 }} />
         </PressableNative>
       </Link>
       <TabBarMenuItem
         selected={currentTab === 'SUGGESTIONS'}
-        setSelected={() => setTab('SUGGESTIONS')}
+        onPress={() => setTab('SUGGESTIONS')}
       >
         <FormattedMessage
           defaultMessage="For me"
@@ -194,7 +206,7 @@ const MediaScreenTabBar = ({
       </TabBarMenuItem>
       <TabBarMenuItem
         selected={currentTab === 'FOLLOWINGS'}
-        setSelected={() => setTab('FOLLOWINGS')}
+        onPress={() => setTab('FOLLOWINGS')}
       >
         <FormattedMessage
           defaultMessage="Following"
@@ -204,7 +216,7 @@ const MediaScreenTabBar = ({
 
       <TabBarMenuItem
         selected={currentTab === 'MY_POSTS'}
-        setSelected={() => setTab('MY_POSTS')}
+        onPress={() => setTab('MY_POSTS')}
       >
         <FormattedMessage
           defaultMessage="My posts"
