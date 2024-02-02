@@ -663,7 +663,6 @@ const WebCardScreenBody = (
       <WebCardBlockContainerMemo
         key={blockId}
         id={blockId}
-        index={index + 1}
         editing={editing}
         canMove={canReorder}
         canDelete={canDelete}

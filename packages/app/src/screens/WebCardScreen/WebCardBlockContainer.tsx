@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useContext, useCallback } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useIntl } from 'react-intl';
 import {
   StyleSheet,
@@ -8,9 +8,9 @@ import {
 } from 'react-native';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import Animated, {
+  Easing,
   FadeIn,
   FadeOut,
-  LinearTransition,
   interpolate,
   runOnJS,
   useAnimatedReaction,
@@ -28,22 +28,17 @@ import {
   EDIT_TRANSITION_DURATION,
   useWebCardEditScale,
 } from './webCardScreenHelpers';
-import { WebCardScreenScrollViewContext } from './WebCardScreenScrollView';
 import {
   useEditTransition,
   useSelectionModeTransition,
 } from './WebCardScreenTransitions';
-import type { LayoutChangeEvent } from 'react-native';
+import type { LayoutAnimationsValues } from 'react-native-reanimated';
 
 export type ProfileBlockContainerProps = {
   /**
    * id of the block
    */
   id: string;
-  /**
-   * the index of the block in the list
-   */
-  index: number;
   /**
    * The children of the container
    */
@@ -141,7 +136,6 @@ export type ProfileBlockContainerProps = {
  */
 const WebCardBlockContainer = ({
   id,
-  index,
   editing,
   visible = true,
   displayEditionButtons = true,
@@ -177,30 +171,6 @@ const WebCardBlockContainer = ({
   const dragX = useSharedValue(0);
   const dragRightLimit = (windowWidth * (1 - editScale)) / 2;
   const dragLeftLimit = (windowWidth * (editScale - 1)) / 2;
-
-  const [height, setHeight] = useState(-1);
-  const { registerBlock, unregisterBlock } = useContext(
-    WebCardScreenScrollViewContext,
-  );
-  const onLayout = useCallback(
-    ({
-      nativeEvent: {
-        layout: { height },
-      },
-    }: LayoutChangeEvent) => {
-      setHeight(height);
-    },
-    [],
-  );
-
-  useEffect(() => {
-    if (height === -1) {
-      return;
-    }
-
-    registerBlock(id, index, height, visible);
-    return () => unregisterBlock(id);
-  }, [height, id, index, registerBlock, unregisterBlock, visible]);
 
   useEffect(() => {
     if (selectionMode && editing) {
@@ -358,6 +328,46 @@ const WebCardBlockContainer = ({
     opacity: Math.max(0, dragX.value / dragLeftLimit),
   }));
 
+  const layoutTransition = useMemo(
+    () => (values: LayoutAnimationsValues) => {
+      'worklet';
+      if (editingTransition?.value !== 1) {
+        return {
+          initialValues: {},
+          animations: {},
+        };
+      }
+
+      return {
+        initialValues: {
+          originX: values.currentOriginX,
+          originY: values.currentOriginY,
+          width: values.currentWidth,
+          height: values.currentHeight,
+        },
+        animations: {
+          originX: withTiming(values.targetOriginX, {
+            duration: EDIT_TRANSITION_DURATION,
+            easing: Easing.linear,
+          }),
+          originY: withTiming(values.targetOriginY, {
+            duration: EDIT_TRANSITION_DURATION,
+            easing: Easing.linear,
+          }),
+          width: withTiming(values.targetWidth, {
+            duration: EDIT_TRANSITION_DURATION,
+            easing: Easing.linear,
+          }),
+          height: withTiming(values.targetHeight, {
+            duration: EDIT_TRANSITION_DURATION,
+            easing: Easing.linear,
+          }),
+        },
+      };
+    },
+    [editingTransition],
+  );
+
   return (
     <Animated.View
       style={blockStyle}
@@ -367,12 +377,11 @@ const WebCardBlockContainer = ({
       exiting={
         id !== 'cover' ? FadeOut.duration(EDIT_TRANSITION_DURATION) : undefined
       }
-      layout={LinearTransition.duration(EDIT_TRANSITION_DURATION)}
+      layout={layoutTransition}
     >
       <GestureDetector gesture={Gesture.Race(tapGesture, panGesture)}>
         <Animated.View
           style={[moduleContainerStyle, editing && shadow(appearance)]}
-          onLayout={onLayout}
         >
           {/** this View is only here because ios bug with shadow and overflow hidden */}
           <Animated.View

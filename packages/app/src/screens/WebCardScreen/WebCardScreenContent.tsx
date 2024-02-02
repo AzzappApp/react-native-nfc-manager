@@ -336,7 +336,6 @@ const WebCardScreenContent = ({
         >
           <WebCardBlockContainer
             id="cover"
-            index={0}
             backgroundColor={coverBackgroundColor}
             editing={editing}
             displayEditionButtons={false}
@@ -372,6 +371,7 @@ const WebCardScreenContent = ({
              * https://github.com/software-mansion/react-native-reanimated/pull/5371
              *
              * update 19/01/2023: the PR is merged, we need to wait for the next reanimated release
+             * update 02/02/2023: the version 3.6.2 is released, but changing the layout transition doesn't seems to fix the issue
              */}
             <ScreenDidAppear>
               <WebCardScreenBody
