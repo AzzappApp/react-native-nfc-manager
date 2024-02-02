@@ -157,6 +157,7 @@ const AccountDetailsPasswordForm = ({
                   onBlur={onBlur}
                   isErrored={errors.currentPassword != null}
                   onSubmitEditing={() => newPasswordRef.current?.focus()}
+                  blurOnSubmit={false}
                   returnKeyType="next"
                   autoFocus
                 />

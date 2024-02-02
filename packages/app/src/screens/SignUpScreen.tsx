@@ -1,7 +1,7 @@
 import { parsePhoneNumber } from 'libphonenumber-js';
 import { useCallback, useState, useRef, memo } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { StyleSheet, View, Image, Keyboard } from 'react-native';
+import { View, Image, Keyboard } from 'react-native';
 import Animated, { useAnimatedStyle } from 'react-native-reanimated';
 import ERRORS from '@azzapp/shared/errors';
 import {
@@ -13,14 +13,14 @@ import {
 import { colors } from '#theme';
 import EmailOrPhoneInput from '#components/EmailOrPhoneInput';
 import Link from '#components/Link';
+import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import { dispatchGlobalEvent } from '#helpers/globalEvents';
 import { getCurrentLocale } from '#helpers/localeHelpers';
 import { signup } from '#helpers/MobileWebAPI';
-import useFormKeyboardManager from '#hooks/useFormKeyboardManager';
+import useAnimatedKeyboardHeight from '#hooks/useAnimatedKeyboardHeight';
 import useScreenInsets from '#hooks/useScreenInsets';
 import Button from '#ui/Button';
 import CheckBox from '#ui/CheckBox';
-import Container from '#ui/Container';
 import Form, { Submit } from '#ui/Form/Form';
 import HyperLink from '#ui/HyperLink';
 import SecuredTextInput from '#ui/SecuredTextInput';
@@ -168,21 +168,23 @@ const SignupScreen = () => {
     password,
   ]);
 
-  const passwordRef = useRef<NativeTextInput>(null);
-  const { focusNextInput, translateY } = useFormKeyboardManager();
-
-  // #endregion
+  const keyboardHeight = useAnimatedKeyboardHeight();
 
   const animatedStyle = useAnimatedStyle(() => {
     return {
-      flex: 1,
       transform: [
         {
-          translateY: -translateY.value,
+          translateY: -keyboardHeight.value,
         },
       ],
     };
   });
+
+  const passwordRef = useRef<NativeTextInput>(null);
+
+  const styles = useStyleSheet(styleSheet);
+
+  // #endregion
 
   const insets = useScreenInsets();
   return (
@@ -193,72 +195,73 @@ const SignupScreen = () => {
           resizeMode="cover"
         />
       </View>
-      <Animated.View style={animatedStyle}>
-        <View style={styles.logoContainer} onTouchStart={Keyboard.dismiss}>
-          <Image
-            source={require('#assets/logo-full_white.png')}
-            resizeMode="contain"
-            style={styles.logo}
+
+      <View style={styles.logoContainer} onTouchStart={Keyboard.dismiss}>
+        <Image
+          source={require('#assets/logo-full_white.png')}
+          resizeMode="contain"
+          style={styles.logo}
+        />
+      </View>
+      <Animated.View style={[animatedStyle, styles.body]}>
+        <Form
+          style={[styles.form, { marginBottom: insets.bottom }]}
+          onSubmit={onSubmit}
+        >
+          <View style={styles.header}>
+            <Text style={styles.title} variant="xlarge">
+              <FormattedMessage
+                defaultMessage="Welcome!"
+                description="Signup Screen - Welcome title"
+              />
+            </Text>
+
+            <Text style={styles.subTitle} variant="medium">
+              <FormattedMessage
+                defaultMessage="Let's get started with Azzapp!"
+                description="Signup Screen - Let's get started with Azzapp! subtitle"
+              />
+            </Text>
+          </View>
+
+          <EmailOrPhoneInput
+            input={contact}
+            onChange={setContact}
+            hasError={!!phoneOrEmailError}
+            onSubmitEditing={() => passwordRef.current?.focus()}
+            blurOnSubmit={false}
           />
-        </View>
-        <Container style={styles.body}>
-          <Form
-            style={[styles.form, { marginBottom: insets.bottom }]}
-            onSubmit={onSubmit}
-          >
-            <View style={styles.header}>
-              <Text style={styles.title} variant="xlarge">
-                <FormattedMessage
-                  defaultMessage="Welcome!"
-                  description="Signup Screen - Welcome title"
-                />
-              </Text>
+          <Text style={styles.error} variant="error">
+            {phoneOrEmailError}
+          </Text>
 
-              <Text style={styles.subTitle} variant="medium">
-                <FormattedMessage
-                  defaultMessage="Let's get started with Azzapp!"
-                  description="Signup Screen - Let's get started with Azzapp! subtitle"
-                />
-              </Text>
-            </View>
-
-            <EmailOrPhoneInput
-              input={contact}
-              onChange={setContact}
-              hasError={!!phoneOrEmailError}
-              onSubmitEditing={focusNextInput(passwordRef)}
-            />
-            <Text style={styles.error} variant="error">
-              {phoneOrEmailError}
-            </Text>
-
-            <SecuredTextInput
-              nativeID="password"
-              ref={passwordRef}
-              placeholder={intl.formatMessage({
-                defaultMessage: 'Password',
-                description: 'Signup Screen - password textinput placeholder',
-              })}
-              onChangeText={isSubmitting ? undefined : setPassword}
-              accessibilityLabel={intl.formatMessage({
-                defaultMessage:
-                  'Enter your password. It should contain at least 8 characters with one digit, one upper and one lower case',
-                description:
-                  'Signup Screen - Accessibility Label TextInput Password',
-              })}
-              returnKeyType="send"
-              onSubmitEditing={onSubmit}
-              isErrored={showPasswordError}
-            />
-            <Text style={styles.error} variant="error">
-              {showPasswordError && (
-                <FormattedMessage
-                  defaultMessage="Password should contain at least 8 characters and at most 32 characters, a number, an uppercase letter and a lowercase letter"
-                  description="Signup Screen - error message when password is not compliant with our rules"
-                />
-              )}
-            </Text>
-
+          <SecuredTextInput
+            nativeID="password"
+            ref={passwordRef}
+            placeholder={intl.formatMessage({
+              defaultMessage: 'Password',
+              description: 'Signup Screen - password textinput placeholder',
+            })}
+            onChangeText={isSubmitting ? undefined : setPassword}
+            accessibilityLabel={intl.formatMessage({
+              defaultMessage:
+                'Enter your password. It should contain at least 8 characters with one digit, one upper and one lower case',
+              description:
+                'Signup Screen - Accessibility Label TextInput Password',
+            })}
+            returnKeyType="send"
+            onSubmitEditing={onSubmit}
+            isErrored={showPasswordError}
+          />
+          <Text style={styles.error} variant="error">
+            {showPasswordError && (
+              <FormattedMessage
+                defaultMessage="Password should contain at least 8 characters and at most 32 characters, a number, an uppercase letter and a lowercase letter"
+                description="Signup Screen - error message when password is not compliant with our rules"
+              />
+            )}
+          </Text>
+          <View style={styles.checkboxesContainer}>
             <CheckBox
               label={
                 <Text style={styles.checkLabel} variant="medium">
@@ -303,56 +306,55 @@ const SignupScreen = () => {
               }
               status={checkedPrivacy}
               onValueChange={setCheckedPrivacy}
-              style={styles.checkboxContainer}
               accessibilityLabel={intl.formatMessage({
                 defaultMessage: 'Tap to accept the privacy policy',
                 description:
                   'Signup Screen - Accessibility checkbox  Privacy Policy',
               })}
             />
+          </View>
 
-            <Submit>
-              <Button
-                testID="submit"
-                label={intl.formatMessage({
-                  defaultMessage: 'Sign Up',
-                  description: 'Signup Screen - Sign Up button',
-                })}
-                accessibilityLabel={intl.formatMessage({
-                  defaultMessage: 'Tap to sign up',
-                  description: 'Signup Screen - Accessibility Sign Up button',
-                })}
-                style={styles.button}
-                disabled={!contact.value || !password}
-                loading={isSubmitting}
+          <Submit>
+            <Button
+              testID="submit"
+              label={intl.formatMessage({
+                defaultMessage: 'Sign Up',
+                description: 'Signup Screen - Sign Up button',
+              })}
+              accessibilityLabel={intl.formatMessage({
+                defaultMessage: 'Tap to sign up',
+                description: 'Signup Screen - Accessibility Sign Up button',
+              })}
+              style={styles.button}
+              disabled={!contact.value || !password}
+              loading={isSubmitting}
+            />
+          </Submit>
+          {showTOSError && (
+            <Text style={styles.formError} variant="error">
+              <FormattedMessage
+                defaultMessage="You need to accept the Terms of Service and the Privacy Policy"
+                description="Signup Screen - error message when the user did not accept the terms of service and the privacy policy"
               />
-            </Submit>
-            {showTOSError && (
-              <Text style={styles.formError} variant="error">
+            </Text>
+          )}
+          <View style={styles.footer}>
+            <Text style={styles.alrSignText} variant="medium">
+              <FormattedMessage
+                defaultMessage="Already have an account?"
+                description="Signup Screen - Already have an account?"
+              />
+            </Text>
+            <Link route="SIGN_IN" replace>
+              <Text style={styles.linkLogin} variant="medium">
                 <FormattedMessage
-                  defaultMessage="You need to accept the Terms of Service and the Privacy Policy"
-                  description="Signup Screen - error message when the user did not accept the terms of service and the privacy policy"
+                  defaultMessage="Log In"
+                  description="Signup Screen - Login link bottom screen"
                 />
               </Text>
-            )}
-            <View style={styles.footer}>
-              <Text style={styles.alrSignText} variant="medium">
-                <FormattedMessage
-                  defaultMessage="Already have an account?"
-                  description="Signup Screen - Already have an account?"
-                />
-              </Text>
-              <Link route="SIGN_IN" replace>
-                <Text style={styles.linkLogin} variant="medium">
-                  <FormattedMessage
-                    defaultMessage="Log In"
-                    description="Signup Screen - Login link bottom screen"
-                  />
-                </Text>
-              </Link>
-            </View>
-          </Form>
-        </Container>
+            </Link>
+          </View>
+        </Form>
       </Animated.View>
     </View>
   );
@@ -360,11 +362,10 @@ const SignupScreen = () => {
 
 export default memo(SignupScreen);
 
-const styles = StyleSheet.create({
+const styleSheet = createStyleSheet(appearance => ({
   flex: { flex: 1 },
   root: {
     flex: 1,
-    justifyContent: 'flex-end',
   },
   background: {
     width: '100%',
@@ -390,11 +391,10 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     borderTopLeftRadius: 16,
     borderTopRightRadius: 16,
+    backgroundColor: appearance === 'light' ? colors.white : colors.black,
   },
   form: {
-    paddingLeft: 20,
-    paddingRight: 20,
-    paddingTop: 20,
+    padding: 20,
     paddingBottom: 10,
   },
   header: {
@@ -421,8 +421,8 @@ const styles = StyleSheet.create({
   checkLabel: {
     paddingLeft: 11,
   },
-  checkboxContainer: {
-    paddingTop: 20,
+  checkboxesContainer: {
+    gap: 20,
   },
   button: {
     marginTop: 20,
@@ -445,4 +445,4 @@ const styles = StyleSheet.create({
   linkLogin: {
     paddingLeft: 5,
   },
-});
+}));

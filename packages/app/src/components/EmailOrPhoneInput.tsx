@@ -22,6 +22,7 @@ type EmailOrPhoneInputProps = {
   hasError: boolean;
   inputRef?: Ref<NativeTextInput>;
   onSubmitEditing?: () => void;
+  blurOnSubmit?: boolean;
 };
 
 const EmailOrPhoneInput = ({
@@ -30,6 +31,7 @@ const EmailOrPhoneInput = ({
   hasError,
   inputRef,
   onSubmitEditing,
+  blurOnSubmit,
 }: EmailOrPhoneInputProps) => {
   const intl = useIntl();
 
@@ -135,6 +137,7 @@ const EmailOrPhoneInput = ({
           onSubmitEditing={onSubmitEditing}
           returnKeyType="next"
           style={styles.flex}
+          blurOnSubmit={blurOnSubmit}
         />
       ) : (
         <PhoneInput
@@ -158,6 +161,7 @@ const EmailOrPhoneInput = ({
           onSubmitEditing={onSubmitEditing}
           returnKeyType="next"
           style={styles.flex}
+          blurOnSubmit={blurOnSubmit}
         />
       )}
     </View>

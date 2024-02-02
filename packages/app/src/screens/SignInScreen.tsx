@@ -1,7 +1,7 @@
 import { parsePhoneNumber } from 'libphonenumber-js';
 import { useCallback, useState, useRef } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { Image, View, StyleSheet, Keyboard } from 'react-native';
+import { Image, View, Keyboard } from 'react-native';
 import Animated, { useAnimatedStyle } from 'react-native-reanimated';
 import {
   isNotFalsyString,
@@ -10,13 +10,13 @@ import {
 } from '@azzapp/shared/stringHelpers';
 import { colors } from '#theme';
 import Link from '#components/Link';
+import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import { dispatchGlobalEvent } from '#helpers/globalEvents';
 import { getLocales } from '#helpers/localeHelpers';
 import { signin } from '#helpers/MobileWebAPI';
-import useFormKeyboardManager from '#hooks/useFormKeyboardManager';
+import useAnimatedKeyboardHeight from '#hooks/useAnimatedKeyboardHeight';
 import useScreenInsets from '#hooks/useScreenInsets';
 import Button from '#ui/Button';
-import Container from '#ui/Container';
 import Form, { Submit } from '#ui/Form/Form';
 import PressableOpacity from '#ui/PressableOpacity';
 import SecuredTextInput from '#ui/SecuredTextInput';
@@ -77,18 +77,24 @@ const SignInScreen = () => {
   }, [credential, password]);
 
   const passwordRef = useRef<NativeTextInput>(null);
-  const { focusNextInput, translateY } = useFormKeyboardManager();
-
-  const animatedStyle = useAnimatedStyle(() => {
-    return {
-      flex: 1,
-      transform: [{ translateY: -translateY.value }],
-    };
-  });
   // #endregion
 
   const intl = useIntl();
   const insets = useScreenInsets();
+
+  const styles = useStyleSheet(stylesheet);
+
+  const keyboardHeight = useAnimatedKeyboardHeight();
+
+  const animatedStyle = useAnimatedStyle(() => {
+    return {
+      transform: [
+        {
+          translateY: -keyboardHeight.value,
+        },
+      ],
+    };
+  });
 
   return (
     <View style={styles.root}>
@@ -98,49 +104,50 @@ const SignInScreen = () => {
           resizeMode="cover"
         />
       </View>
-      <Animated.View style={animatedStyle}>
-        <View style={styles.logoContainer} onTouchStart={Keyboard.dismiss}>
-          <Image
-            source={require('#assets/logo-full_white.png')}
-            resizeMode="contain"
-            style={styles.logo}
-          />
-        </View>
-        <Container style={styles.content}>
-          <View style={styles.header}>
-            <Text variant="xlarge" style={styles.title}>
-              <FormattedMessage
-                defaultMessage="Log in"
-                description="Signin Screen - Log in title"
-              />
-            </Text>
-          </View>
-          <Form
-            style={[styles.form, { marginBottom: insets.bottom }]}
-            onSubmit={onSubmit}
-          >
-            <TextInput
-              testID="credential-input"
-              placeholder={intl.formatMessage({
-                defaultMessage: 'Phone number or email address',
-                description:
-                  'SignIn Screen Phone number or email address input placeholder',
-              })}
-              value={credential}
-              onChangeText={isSubmitting ? undefined : setCredential}
-              autoCapitalize="none"
-              autoComplete="email"
-              keyboardType="email-address"
-              autoCorrect={false}
-              accessibilityLabel={intl.formatMessage({
-                defaultMessage: 'Enter your phone number or email address',
-                description:
-                  'SignIn Screen - Accessibility TextInput phone number or email address',
-              })}
-              returnKeyType="next"
-              onSubmitEditing={focusNextInput(passwordRef)}
-              style={styles.textInput}
+
+      <View style={styles.logoContainer} onTouchStart={Keyboard.dismiss}>
+        <Image
+          source={require('#assets/logo-full_white.png')}
+          resizeMode="contain"
+          style={styles.logo}
+        />
+      </View>
+      <Animated.View style={[styles.content, animatedStyle]}>
+        <View style={styles.header}>
+          <Text variant="xlarge">
+            <FormattedMessage
+              defaultMessage="Log in"
+              description="Signin Screen - Log in title"
             />
+          </Text>
+        </View>
+        <Form
+          style={[styles.form, { marginBottom: insets.bottom }]}
+          onSubmit={onSubmit}
+        >
+          <TextInput
+            testID="credential-input"
+            placeholder={intl.formatMessage({
+              defaultMessage: 'Phone number or email address',
+              description:
+                'SignIn Screen Phone number or email address input placeholder',
+            })}
+            value={credential}
+            onChangeText={isSubmitting ? undefined : setCredential}
+            autoCapitalize="none"
+            autoComplete="email"
+            keyboardType="email-address"
+            autoCorrect={false}
+            accessibilityLabel={intl.formatMessage({
+              defaultMessage: 'Enter your phone number or email address',
+              description:
+                'SignIn Screen - Accessibility TextInput phone number or email address',
+            })}
+            returnKeyType="next"
+            onSubmitEditing={() => passwordRef.current?.focus()}
+            blurOnSubmit={false}
+          />
+          <View>
             <SecuredTextInput
               ref={passwordRef}
               testID="password-input"
@@ -156,7 +163,6 @@ const SignInScreen = () => {
               })}
               returnKeyType="done"
               onSubmitEditing={onSubmit}
-              style={styles.textInput}
             />
             <View style={styles.forgotPasswordContainer}>
               <Link route="FORGOT_PASSWORD">
@@ -170,68 +176,66 @@ const SignInScreen = () => {
                 </PressableOpacity>
               </Link>
             </View>
-            <Submit>
-              <Button
-                variant="primary"
-                testID="submitButton"
-                label={intl.formatMessage({
-                  defaultMessage: 'Log In',
-                  description: 'SigninScreen - Login Button Placeholder',
-                })}
-                accessibilityLabel={intl.formatMessage({
-                  defaultMessage: 'Tap to sign in',
-                  description:
-                    'SignIn Screen - AccessibilityLabel Sign In button',
-                })}
-                style={styles.button}
-                disabled={
-                  !isNotFalsyString(credential) || !isNotFalsyString(password)
-                }
-                loading={isSubmitting}
-              />
-            </Submit>
-            <View
-              style={{
-                justifyContent: 'center',
-                alignItems: 'center',
-                marginTop: 20,
-              }}
-            >
-              <Text variant="error">
-                {credentialInvalid ? (
-                  <FormattedMessage
-                    defaultMessage="Please use a valid phone number or email address"
-                    description="SigninScreen - Invalid email or phone number"
-                  />
-                ) : signinError ? (
-                  <FormattedMessage
-                    defaultMessage="Invalid credentials"
-                    description="SigninScreen - Invalid Credentials"
-                  />
-                ) : (
-                  // just to keep the same height
-                  ' '
-                )}
-              </Text>
-            </View>
-            <View style={styles.footer}>
-              <Text style={styles.greyText} variant="medium">
+          </View>
+          <Submit>
+            <Button
+              variant="primary"
+              testID="submitButton"
+              label={intl.formatMessage({
+                defaultMessage: 'Log In',
+                description: 'SigninScreen - Login Button Placeholder',
+              })}
+              accessibilityLabel={intl.formatMessage({
+                defaultMessage: 'Tap to sign in',
+                description:
+                  'SignIn Screen - AccessibilityLabel Sign In button',
+              })}
+              disabled={
+                !isNotFalsyString(credential) || !isNotFalsyString(password)
+              }
+              loading={isSubmitting}
+            />
+          </Submit>
+          <View
+            style={{
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}
+          >
+            <Text variant="error">
+              {credentialInvalid ? (
                 <FormattedMessage
-                  defaultMessage="Don't have an account?"
-                  description="SigninScreen - Don't have an account"
+                  defaultMessage="Please use a valid phone number or email address"
+                  description="SigninScreen - Invalid email or phone number"
+                />
+              ) : signinError ? (
+                <FormattedMessage
+                  defaultMessage="Invalid credentials"
+                  description="SigninScreen - Invalid Credentials"
+                />
+              ) : (
+                // just to keep the same height
+                ' '
+              )}
+            </Text>
+          </View>
+          <View style={styles.footer}>
+            <Text style={styles.greyText} variant="medium">
+              <FormattedMessage
+                defaultMessage="Don't have an account?"
+                description="SigninScreen - Don't have an account"
+              />
+            </Text>
+            <Link modal route="SIGN_UP" replace>
+              <Text style={styles.linkLogout} variant="medium">
+                <FormattedMessage
+                  defaultMessage="Sign Up"
+                  description="SigninScreen - Sign Up"
                 />
               </Text>
-              <Link modal route="SIGN_UP" replace>
-                <Text style={styles.linkLogout} variant="medium">
-                  <FormattedMessage
-                    defaultMessage="Sign Up"
-                    description="SigninScreen - Sign Up"
-                  />
-                </Text>
-              </Link>
-            </View>
-          </Form>
-        </Container>
+            </Link>
+          </View>
+        </Form>
       </Animated.View>
     </View>
   );
@@ -256,11 +260,9 @@ function tryGetPhoneNumber(phoneNumber: string, countryCode?: string) {
   return null;
 }
 
-const styles = StyleSheet.create({
-  keyboardVAvoidingiew: { flex: 1 },
+const stylesheet = createStyleSheet(appearance => ({
   root: {
     flex: 1,
-    justifyContent: 'flex-end',
   },
   background: {
     width: '100%',
@@ -279,12 +281,12 @@ const styles = StyleSheet.create({
     width: 165,
   },
   form: {
-    padding: 20,
-  },
-  textInput: {
-    marginBottom: 20,
+    paddingHorizontal: 20,
+    paddingTop: 20,
+    gap: 20,
   },
   content: {
+    backgroundColor: appearance === 'light' ? colors.white : colors.black,
     justifyContent: 'center',
     borderTopLeftRadius: 16,
     borderTopRightRadius: 16,
@@ -292,12 +294,10 @@ const styles = StyleSheet.create({
   forgotPasswordContainer: {
     alignItems: 'flex-end',
     paddingRight: 10,
+    marginTop: 5,
   },
   greyText: {
     color: colors.grey200,
-  },
-  button: {
-    marginTop: 20,
   },
   error: {
     paddingLeft: 10,
@@ -307,16 +307,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop: 20,
   },
   linkLogout: {
     paddingLeft: 5,
   },
   header: {
     alignItems: 'center',
-    marginTop: 10,
+    paddingVertical: 10,
   },
-  title: {
-    marginBottom: 10,
-  },
-});
+}));
