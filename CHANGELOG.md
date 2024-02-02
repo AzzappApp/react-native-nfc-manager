@@ -1,5 +1,7 @@
-## 0.5.5-canary.51
+## 0.5.5-canary.52
 
+* **fix:**  - **Android:** ripple effect on about menu ([#2621](https://github.com/AzzappApp/azzapp/pull/2621))
+* **fix:**  - **WebCardEdition:** simplify system ([#2619](https://github.com/AzzappApp/azzapp/pull/2619))
 * **fix:**  - **media:** improve shadow appearance on android ([#2620](https://github.com/AzzappApp/azzapp/pull/2620))
 * **fix:**  - **ShakeAndShare:** sensibility and error ([#2616](https://github.com/AzzappApp/azzapp/pull/2616))
 * **build:**  - update yarn.lock
