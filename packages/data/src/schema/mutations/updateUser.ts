@@ -1,4 +1,4 @@
-import * as bcrypt from 'bcrypt-ts';
+import * as bcrypt from 'bcrypt-ts/node';
 import { GraphQLError } from 'graphql';
 import ERRORS from '@azzapp/shared/errors';
 import {

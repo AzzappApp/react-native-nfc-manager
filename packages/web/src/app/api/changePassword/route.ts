@@ -1,5 +1,5 @@
 import * as Sentry from '@sentry/nextjs';
-import * as bcrypt from 'bcrypt-ts';
+import * as bcrypt from 'bcrypt-ts/node';
 import { NextResponse } from 'next/server';
 import {
   updateUser,
