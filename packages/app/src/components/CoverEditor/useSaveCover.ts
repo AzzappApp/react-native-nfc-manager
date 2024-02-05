@@ -16,10 +16,9 @@ import {
 import { encodeMediaId } from '@azzapp/shared/imagesHelpers';
 import { combineLatest } from '@azzapp/shared/observableHelpers';
 import {
-  FILTERS,
   exportLayersToImage,
   exportLayersToVideo,
-  isFilter,
+  getFilterUri,
 } from '#components/gpu';
 import { getFileName } from '#helpers/fileHelpers';
 import { addLocalCachedMediaFile, isPNG } from '#helpers/mediaHelpers';
@@ -150,9 +149,7 @@ const useSaveCover = (
           const layerOptions = {
             parameters: mediaParameters,
             maskUri: isSegmented ? maskMedia?.uri ?? null : null,
-            lutFilterUri: isFilter(coverStyle.mediaFilter)
-              ? FILTERS[coverStyle.mediaFilter]
-              : null,
+            lutFilterUri: getFilterUri(coverStyle.mediaFilter),
           };
           if (sourceMedia.kind === 'image') {
             let exportOptions: ExportImageOptions = {

@@ -2,7 +2,7 @@ import { useCallback } from 'react';
 import { useIntl } from 'react-intl';
 import { typedEntries } from '@azzapp/shared/objectHelpers';
 import BoxSelectionList from './BoxSelectionList';
-import { FILTERS, GPUImageView, isFilter, useFilterLabels } from './gpu';
+import { GPUImageView, getFilterUri, useFilterLabels } from './gpu';
 import type { BoxButtonItemInfo } from './BoxSelectionList';
 import type { ImageLayer, VideoFrameLayer } from './gpu';
 import type { ViewProps } from 'react-native';
@@ -33,7 +33,7 @@ const FilterSelectionList = ({
           layers={[
             {
               ...layer,
-              lutFilterUri: isFilter(filter) ? FILTERS[filter] : null,
+              lutFilterUri: getFilterUri(filter),
             },
           ]}
         />

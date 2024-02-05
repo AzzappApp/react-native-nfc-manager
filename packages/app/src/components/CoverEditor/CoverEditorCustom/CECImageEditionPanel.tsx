@@ -21,8 +21,7 @@ import FilterSelectionList from '#components/FilterSelectionList';
 import {
   GPUImageView,
   type EditionParameters,
-  isFilter,
-  FILTERS,
+  getFilterUri,
 } from '#components/gpu';
 import ImageEditionParametersList from '#components/ImageEditionParametersList';
 import TabsBar from '#ui/TabsBar';
@@ -227,6 +226,7 @@ const AnimationSample = ({
   if (!uri || !kind) {
     return null;
   }
+
   return (
     <MediaAnimator
       animationSharedValue={animationSharedValue}
@@ -243,7 +243,7 @@ const AnimationSample = ({
             uri,
             time,
             parameters: editionParameters,
-            lutFilterUri: isFilter(filter) ? FILTERS[filter] : null,
+            lutFilterUri: getFilterUri(filter),
           },
         ]}
       />

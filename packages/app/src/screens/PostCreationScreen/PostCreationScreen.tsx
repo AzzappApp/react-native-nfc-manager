@@ -15,6 +15,7 @@ import { waitTime } from '@azzapp/shared/asyncHelpers';
 import { encodeMediaId } from '@azzapp/shared/imagesHelpers';
 import { colors } from '#theme';
 import { CancelHeaderButton } from '#components/commonsButtons';
+import { getFilterUri } from '#components/gpu';
 import ImagePicker, {
   SelectImageStep,
   EditImageStep,
@@ -145,7 +146,7 @@ const PostCreationScreen = ({
           kind,
           editionParameters,
           aspectRatio,
-          filter,
+          filterUri: getFilterUri(filter),
           ...timeRange,
         });
 

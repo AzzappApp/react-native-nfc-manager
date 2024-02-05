@@ -11,7 +11,7 @@ import {
 } from '@azzapp/shared/cardModuleHelpers';
 import { encodeMediaId } from '@azzapp/shared/imagesHelpers';
 import { combineLatest } from '@azzapp/shared/observableHelpers';
-import { FILTERS, exportLayersToImage, isFilter } from '#components/gpu';
+import { exportLayersToImage, getFilterUri } from '#components/gpu';
 import ImagePicker from '#components/ImagePicker';
 import { useRouter } from '#components/NativeRouter';
 import ScreenModal from '#components/ScreenModal';
@@ -363,7 +363,7 @@ const CarouselEditionScreen = ({
             kind: 'image',
             uri,
             parameters: editionParameters,
-            lutFilterUri: isFilter(filter) ? FILTERS[filter] : null,
+            lutFilterUri: getFilterUri(filter),
           },
         ],
       });

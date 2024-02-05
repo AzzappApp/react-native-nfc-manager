@@ -125,24 +125,34 @@ object GPULayerImageLoader {
         }
 
         val requestManager = Glide.with(MainApplication.getMainApplicationContext())
-        requestManager.asBitmap()
-          .load(uri)
+
+        val loaded = if (uri.scheme != null) requestManager.asBitmap()
+          .load(uri) else requestManager.asBitmap()
+          .load(
+            MainApplication.getMainApplicationContext().resources.getIdentifier(
+              uri.toString(),
+              "drawable",
+              MainApplication.getMainApplicationContext().packageName
+            )
+          )
+
+        loaded
           .listener(object : RequestListener<Bitmap> {
             override fun onLoadFailed(
               e: GlideException?,
               model: Any?,
-              target: Target<Bitmap>?,
+              target: Target<Bitmap>,
               isFirstResource: Boolean
             ): Boolean {
-              cont.resumeWithException(e?: Error("unknown error"))
+              cont.resumeWithException(e ?: Error("unknown error"))
               return true
             }
 
             override fun onResourceReady(
-              resource: Bitmap?,
-              model: Any?,
+              resource: Bitmap,
+              model: Any,
               target: Target<Bitmap>?,
-              dataSource: DataSource?,
+              dataSource: DataSource,
               isFirstResource: Boolean
             ): Boolean {
               return false
@@ -165,7 +175,6 @@ object GPULayerImageLoader {
       } else {
         retriever.setDataSource(uri.toString(), HashMap<String, String>())
       }
-     
       val image =
         retriever.getFrameAtTime(
           time,

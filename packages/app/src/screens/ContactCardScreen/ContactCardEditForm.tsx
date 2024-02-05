@@ -6,7 +6,7 @@ import { AVATAR_MAX_WIDTH } from '@azzapp/shared/contactCardHelpers';
 import { colors, shadow } from '#theme';
 import { MEDIA_WIDTH } from '#components/AuthorCartouche';
 import FormDeleteFieldOverlay from '#components/ContactCard/FormDeleteFieldOverlay';
-import { FILTERS, exportLayersToImage, isFilter } from '#components/gpu';
+import { exportLayersToImage, getFilterUri } from '#components/gpu';
 import ImagePicker, {
   EditImageStep,
   ImagePickerContactCardMediaWrapper,
@@ -83,7 +83,7 @@ const ContactCardEditForm = ({
             kind: 'image',
             uri,
             parameters: editionParameters,
-            lutFilterUri: isFilter(filter) ? FILTERS[filter] : null,
+            lutFilterUri: getFilterUri(filter),
           },
         ],
       });

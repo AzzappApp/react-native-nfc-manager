@@ -11,7 +11,7 @@ import {
 } from '@azzapp/shared/cardModuleHelpers';
 import { encodeMediaId } from '@azzapp/shared/imagesHelpers';
 import { CameraButton } from '#components/commonsButtons';
-import { FILTERS, exportLayersToImage, isFilter } from '#components/gpu';
+import { exportLayersToImage, getFilterUri } from '#components/gpu';
 import ImagePicker, {
   EditImageStep,
   SelectImageStep,
@@ -317,7 +317,7 @@ const HorizontalPhotoEditionScreen = ({
           kind: 'image',
           uri,
           parameters: editionParameters,
-          lutFilterUri: isFilter(filter) ? FILTERS[filter] : null,
+          lutFilterUri: getFilterUri(filter),
         },
       ],
     });

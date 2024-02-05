@@ -39,6 +39,9 @@ export type Filter = keyof typeof FILTERS;
 export const isFilter = (filter?: string | null): filter is Filter =>
   !!(FILTERS as any)[filter as Filter];
 
+export const getFilterUri = (filter?: string | null) =>
+  isFilter(filter) ? FILTERS[filter] : null;
+
 export const useFilterLabels = (): Record<Filter, string> => {
   const intl = useIntl();
   return useMemo(

@@ -43,10 +43,10 @@ object ImageCache {
       .load(uri)
       .listener(object : RequestListener<Drawable> {
         override fun onResourceReady(
-          resource: Drawable?,
-          model: Any?,
+          resource: Drawable,
+          model: Any,
           target: Target<Drawable>?,
-          dataSource: DataSource?,
+          dataSource: DataSource,
           isFirstResource: Boolean
         ): Boolean {
           task.onLoadSuccess()
@@ -56,10 +56,9 @@ object ImageCache {
         override fun onLoadFailed(
           e: GlideException?,
           model: Any?,
-          target: Target<Drawable>?,
+          target: Target<Drawable>,
           isFirstResource: Boolean
         ): Boolean {
-
           task.onLoadFailed(e)
           return false
         }

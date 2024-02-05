@@ -3,19 +3,14 @@ import {
   POST_VIDEO_BIT_RATE,
   POST_VIDEO_MAX_SIZE,
 } from '@azzapp/shared/postHelpers';
-import {
-  FILTERS,
-  exportLayersToImage,
-  exportLayersToVideo,
-  isFilter,
-} from '#components/gpu';
+import { exportLayersToImage, exportLayersToVideo } from '#components/gpu';
 import type { EditionParameters } from '#components/gpu';
 
 const exportMedia = async ({
   uri,
   kind,
   aspectRatio,
-  filter,
+  filterUri,
   editionParameters,
   removeSound = false,
   startTime,
@@ -24,7 +19,7 @@ const exportMedia = async ({
   uri: string;
   kind: 'image' | 'video';
   aspectRatio: number;
-  filter?: string | null;
+  filterUri?: string | null;
   editionParameters?: EditionParameters | null;
   removeSound?: boolean;
   startTime?: number;
@@ -42,7 +37,7 @@ const exportMedia = async ({
         {
           kind: 'image',
           uri,
-          lutFilterUri: isFilter(filter) ? FILTERS[filter] : null,
+          lutFilterUri: filterUri,
           parameters: editionParameters ?? {},
           backgroundColor: '#FFFFFF',
         },
@@ -57,7 +52,7 @@ const exportMedia = async ({
         {
           kind: 'video',
           uri,
-          lutFilterUri: isFilter(filter) ? FILTERS[filter] : null,
+          lutFilterUri: filterUri,
           parameters: editionParameters ?? {},
           startTime,
           duration,

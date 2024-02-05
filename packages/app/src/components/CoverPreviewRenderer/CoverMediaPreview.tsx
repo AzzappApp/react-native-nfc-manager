@@ -1,13 +1,12 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import {
-  FILTERS,
   GPUImageView,
   GPUVideoView,
   Image,
   Video,
   VideoFrame,
-  isFilter,
+  getFilterUri,
 } from '#components/gpu';
 import { isFileURL } from '#helpers/fileHelpers';
 import { prefetchVideo } from '#helpers/mediaHelpers';
@@ -206,7 +205,7 @@ const CoverMediaPreview = ({
     uri,
     maskUri,
     parameters: editionParameters,
-    lutFilterUri: isFilter(filter) ? FILTERS[filter] : null,
+    lutFilterUri: getFilterUri(filter),
     blending: backgroundMultiply ? 'multiply' : 'none',
   } as const;
 
