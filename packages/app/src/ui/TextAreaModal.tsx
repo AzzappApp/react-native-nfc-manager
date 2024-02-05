@@ -183,5 +183,10 @@ const styles = StyleSheet.create({
     marginLeft: 12,
     color: 'white',
   },
-  textInput: { borderWidth: 0, flex: 1, verticalAlign: 'top' },
+  textInput: {
+    borderWidth: 0,
+    flex: 1,
+    lineHeight: 24,
+    verticalAlign: 'top',
+  },
 });
