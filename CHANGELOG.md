@@ -1,5 +1,7 @@
-## 0.5.5-canary.57
+## 0.5.5-canary.58
 
+* **fix:**  - **android:** text input ui on create post comment and text area modal ([#2628](https://github.com/AzzappApp/azzapp/pull/2628))
+* **fix:**  - **android:** wrong ripple on add to google wallet ([#2631](https://github.com/AzzappApp/azzapp/pull/2631))
 * **fix:**  - use globalThis to patch correctly
 * **build:**  - try to patch bcrypt-ts
 * **fix:**  - **authent:** force node import of bcrypt
