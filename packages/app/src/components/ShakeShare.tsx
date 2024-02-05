@@ -1,5 +1,6 @@
-import { LinearGradient } from 'expo-linear-gradient';
+import { BlurView } from 'expo-blur';
 import { Suspense, useCallback, useMemo, useState } from 'react';
+import { FormattedMessage } from 'react-intl';
 import { View, StyleSheet, useWindowDimensions } from 'react-native';
 import {
   Directions,
@@ -16,13 +17,16 @@ import {
   useDerivedValue,
   useSharedValue,
 } from 'react-native-reanimated';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { graphql, useClientQuery } from 'react-relay';
 import { buildUserUrlWithContactCard } from '@azzapp/shared/urlHelpers';
 import { colors } from '#theme';
 import useAuthState from '#hooks/useAuthState';
 import useLatestCallback from '#hooks/useLatestCallback';
 import ActivityIndicator from '#ui/ActivityIndicator';
+import Header from '#ui/Header';
 import IconButton from '#ui/IconButton';
+import Text from '#ui/Text';
 import CoverRenderer from './CoverRenderer';
 import type { ShakeShareScreenQuery } from '#relayArtifacts/ShakeShareScreenQuery.graphql';
 
@@ -41,28 +45,31 @@ const ShakeShare = () => {
   });
 
   //Gesture to close on swipe
+
   const fling = Gesture.Fling()
     .direction(Directions.DOWN)
     .runOnJS(true)
     .onEnd(dismount);
 
-  if (!mountScreen || !profileInfos?.webCardId) {
+  if (!mountScreen) {
     return null;
   }
   return (
     <GestureHandlerRootView style={StyleSheet.absoluteFillObject}>
       <GestureDetector gesture={fling}>
-        <View style={styles.safeArea}>
-          <Suspense
-            fallback={
-              <View style={styles.activityIndicatorContainer}>
-                <ActivityIndicator color="white" />
-              </View>
-            }
-          >
-            <ShakeShareDisplay onClose={dismount} />
-          </Suspense>
-        </View>
+        <BlurView intensity={27} tint="dark" style={styles.blurView}>
+          <SafeAreaView style={styles.safeArea}>
+            <Suspense
+              fallback={
+                <View style={styles.activityIndicatorContainer}>
+                  <ActivityIndicator color="white" />
+                </View>
+              }
+            >
+              <ShakeShareDisplay onClose={dismount} />
+            </Suspense>
+          </SafeAreaView>
+        </BlurView>
       </GestureDetector>
     </GestureHandlerRootView>
   );
@@ -111,66 +118,51 @@ const ShakeShareDisplay = ({ onClose }: { onClose: () => void }) => {
   const { width } = useWindowDimensions();
   return (
     <>
+      <Header
+        leftElement={
+          <IconButton
+            icon="close"
+            variant="icon"
+            onPress={onClose}
+            iconStyle={styles.iconStyle}
+          />
+        }
+        middleElement={
+          <Text variant="large" style={styles.headerTitle}>
+            <FormattedMessage
+              defaultMessage={'Share your information'}
+              description={'Shake share screen header title'}
+            />
+          </Text>
+        }
+        style={styles.headerStyle}
+      />
       <View style={styles.container}>
         <CoverRenderer
-          width={width}
+          width={width / 2.5}
           webCard={profile?.webCard}
           style={styles.coverStyle}
           animationEnabled={true}
         />
-        <LinearGradient
-          colors={['rgba(14, 18, 22,0)', 'rgba(14, 18, 22, 1)']}
-          start={{ x: 0.5, y: 0 }}
-          end={{ x: 0.5, y: 1 }}
-          locations={[0.22, 0.66]}
-          style={styles.linear}
-        />
         {contactCardUrl && (
-          <View style={styles.qrCodeContainer}>
-            <QRCode
-              value={contactCardUrl}
-              size={width * 0.6}
-              color={colors.white}
-              backgroundColor="transparent"
-              ecl="L"
-            />
-          </View>
+          <QRCode
+            value={contactCardUrl}
+            size={width * 0.6}
+            color={colors.white}
+            backgroundColor="transparent"
+            ecl="L"
+          />
         )}
-
-        <IconButton
-          icon="close"
-          onPress={onClose}
-          iconStyle={styles.iconStyle}
-          style={styles.iconContainerStyle}
-        />
       </View>
     </>
   );
 };
 
 const styles = StyleSheet.create({
-  iconContainerStyle: {
-    position: 'absolute',
-    bottom: 35,
-    borderColor: 'white',
-  },
-  qrCodeContainer: {
-    backgroundColor: 'black',
-    position: 'absolute',
-    borderRadius: 34,
-    padding: 17,
-    bottom: 123,
-  },
-  linear: {
-    height: '100%',
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    width: '100%',
-  },
+  blurView: { flex: 1 },
   safeArea: {
     flex: 1,
-    backgroundColor: colors.black,
+    backgroundColor: 'rgba(14, 18, 22, 0.95)',
   },
   activityIndicatorContainer: {
     flex: 1,
@@ -178,12 +170,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   headerStyle: { backgroundColor: 'transparent' },
-  iconStyle: {
-    tintColor: colors.white,
-  },
+  iconStyle: { tintColor: colors.white },
   coverStyle: { marginBottom: 50 },
   headerTitle: { color: colors.white },
-  container: { flex: 1, alignItems: 'center', justifyContent: 'flex-start' },
+  container: { flex: 1, alignItems: 'center', justifyContent: 'center' },
 });
 
 // This code is transposed from https://github.com/facebook/react-native/blob/184b295a019e2af6712d34276c741e0dae78f798/packages/react-native/ReactAndroid/src/main/java/com/facebook/react/common/ShakeDetector.java#L45
