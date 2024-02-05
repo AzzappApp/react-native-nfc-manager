@@ -186,12 +186,14 @@ function SimpleCarouselSelectList<TItem = any>(
           variant="icon"
           style={previousButtonAnimatedStyle}
           onPress={onPrevious}
+          hitSlop={{ top: 20, bottom: 20, left: 20, right: 20 }}
         />
         <IconButton
           icon="arrow_right"
           variant="icon"
           style={nextButtonAnimatedStyle}
           onPress={onNext}
+          hitSlop={{ top: 20, bottom: 20, left: 20, right: 20 }}
         />
       </View>
     </View>
