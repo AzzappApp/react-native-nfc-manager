@@ -1,5 +1,7 @@
-## 0.5.5-canary.58
+## 0.5.5-canary.59
 
+* **fix:**  - **android:** [#2639](https://github.com/AzzappApp/azzapp/pull/2639) glide load error on lut filters ([#2659](https://github.com/AzzappApp/azzapp/pull/2659))
+* **fix:**  - **CoverEdition:** increase hitslop of arrow in Android carousel ([#2661](https://github.com/AzzappApp/azzapp/pull/2661))
 * **fix:**  - **android:** text input ui on create post comment and text area modal ([#2628](https://github.com/AzzappApp/azzapp/pull/2628))
 * **fix:**  - **android:** wrong ripple on add to google wallet ([#2631](https://github.com/AzzappApp/azzapp/pull/2631))
 * **fix:**  - use globalThis to patch correctly
