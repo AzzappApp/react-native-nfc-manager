@@ -344,11 +344,9 @@ const HomeBottomPanel = ({
       }
     `;
 
-    const { id } = fromGlobalId(profileId);
-
     commitMutation<HomeBottomPanelDeclineOwnershipMutation>(environment, {
       mutation: declineInvitationMutation,
-      variables: { input: { profileId: id } },
+      variables: { input: { profileId } },
       optimisticResponse: {
         declineOwnership: {
           profile: {
