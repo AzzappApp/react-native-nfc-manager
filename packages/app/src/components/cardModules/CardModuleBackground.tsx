@@ -47,21 +47,20 @@ const CardModuleBackground = ({
       >
         {children}
       </View>
-      <View
-        style={[
-          styles.background,
-          { backgroundColor, opacity: layout ? 1 : 0 },
-        ]}
-        pointerEvents="none"
-      >
-        <CardModuleBackgroundImage
-          backgroundOpacity={backgroundOpacity}
-          backgroundUri={backgroundUri}
-          layout={layout}
-          patternColor={patternColor}
-          resizeMode={resizeMode}
-        />
-      </View>
+      {layout && (
+        <View
+          style={[styles.background, { backgroundColor }]}
+          pointerEvents="none"
+        >
+          <CardModuleBackgroundImage
+            backgroundOpacity={backgroundOpacity}
+            backgroundUri={backgroundUri}
+            layout={layout}
+            patternColor={patternColor}
+            resizeMode={resizeMode}
+          />
+        </View>
+      )}
     </View>
   );
 };

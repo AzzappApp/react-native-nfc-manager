@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { Defs, Pattern, Rect, Svg, SvgUri } from 'react-native-svg';
 import type {
@@ -10,7 +10,7 @@ import type {
 import type { PatternProps, UriProps } from 'react-native-svg';
 
 type CardModuleBackgroundImageProps = {
-  layout: { width?: number; height?: number } | null;
+  layout: { width: number; height: number };
   resizeMode: string | null | undefined;
   backgroundUri: string | null | undefined;
   patternColor: ColorValue | string | null | undefined;
@@ -28,10 +28,13 @@ const CardModuleBackgroundImage = (props: CardModuleBackgroundImageProps) => {
 
   const [svgSize, setSvgSize] = useState<Size | null>(null);
 
-  const handleSvgLayout = (e: LayoutChangeEvent) => {
-    const { width, height } = e.nativeEvent.layout;
-    if (width && height && !svgSize) setSvgSize({ width, height });
-  };
+  const handleSvgLayout = useCallback(
+    (e: LayoutChangeEvent) => {
+      const { width, height } = e.nativeEvent.layout;
+      if (width && height && !svgSize) setSvgSize({ width, height });
+    },
+    [svgSize],
+  );
 
   const [svg, style, pattern] = useMemo(() => {
     const svgProps: Omit<UriProps, 'uri'> = { style: {} };
@@ -68,8 +71,8 @@ const CardModuleBackgroundImage = (props: CardModuleBackgroundImageProps) => {
     }
 
     if (resizeMode === 'repeat' && svgSize) {
-      patternProps.width = `${svgSize.width}px`;
-      patternProps.height = `${svgSize.height}px`;
+      patternProps.width = svgSize.width;
+      patternProps.height = svgSize.height;
     }
 
     if (resizeMode === 'stretch' && svgSize && width && height) {
@@ -101,7 +104,7 @@ const CardModuleBackgroundImage = (props: CardModuleBackgroundImageProps) => {
           <Pattern
             {...pattern}
             id="BackgroundPattern"
-            patternUnits="objectBoundingBox"
+            patternUnits="userSpaceOnUse"
             x="0"
             y="0"
           >
@@ -109,7 +112,7 @@ const CardModuleBackgroundImage = (props: CardModuleBackgroundImageProps) => {
               onLayout={handleSvgLayout}
               {...svg}
               uri={backgroundUri}
-              style={[{ opacity: backgroundOpacity }]}
+              style={{ opacity: backgroundOpacity }}
               color={patternColor ?? '#000'}
             />
           </Pattern>
