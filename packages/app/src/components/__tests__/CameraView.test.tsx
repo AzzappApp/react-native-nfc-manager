@@ -273,32 +273,21 @@ describe('CameraView', () => {
   });
 
   test('record session behavior', async () => {
-    expect.assertions(4);
+    expect.assertions(1);
     const ref = createRef<CameraViewHandle>();
-    useCameraDeviceMock.mockReturnValue({
-      id: 'back',
-      hasFlash: true,
-    });
+
     await renderCameraView({ ref });
 
-    let startRecordingArgs: any = null;
-    mockCameraRef.startRecording.mockImplementationOnce((args: any) => {
-      startRecordingArgs = args;
+    mockCameraRef.startRecording.mockResolvedValue({
+      uri: 'file:///path/to/video.mp4',
     });
     const session = ref.current!.startRecording();
+    await flushPromises();
     expect(mockCameraRef.startRecording).toHaveBeenCalled();
 
-    mockCameraRef.stopRecording.mockResolvedValueOnce({});
-    void session?.end().then(path => {
-      expect(path).toEqual('file:///path/to/video.mp4');
+    void session?.then(path => {
+      expect(path?.uri).toEqual('file:///path/to/video.mp4');
     });
-    expect(mockCameraRef.stopRecording).toHaveBeenCalled();
-    startRecordingArgs.onRecordingFinished('file:///path/to/video.mp4');
-    await flushPromises();
-
-    expect(() => {
-      void session?.end();
-    }).toThrowError('Recording already ended');
   });
 
   test('renders the CameraView correctly with `initialCameraPosition` props to front', async () => {

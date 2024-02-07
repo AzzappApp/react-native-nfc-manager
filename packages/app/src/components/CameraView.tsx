@@ -22,7 +22,6 @@ import {
   useCameraDevice,
   useCameraFormat,
 } from 'react-native-vision-camera';
-import { createDeferred } from '@azzapp/shared/asyncHelpers';
 import useIsForeground from '#hooks/useIsForeground';
 import FloatingIconButton from '#ui/FloatingIconButton';
 import type { ForwardedRef } from 'react';
@@ -59,21 +58,16 @@ export type CameraViewProps = ViewProps & {
 /**
  * An object that represents a recording session
  */
-export type RecordSession = {
+export type RecordSession = Promise<{
   /**
-   * Stops recording and returns the recorded video
+   * The path to the recorded video
    */
-  end(): Promise<{
-    /**
-     * The path to the recorded video
-     */
-    path: string;
-    /**
-     * The duration of the recorded video in seconds
-     */
-    duration: number;
-  }>;
-};
+  uri: string;
+  /**
+   * The duration of the recorded video in seconds
+   */
+  duration?: number;
+}>;
 
 /**
  * The type of the reference to the CameraView component
@@ -87,6 +81,8 @@ export type CameraViewHandle = {
    * Starts recording a video and returns a RecordSession
    */
   startRecording(): RecordSession | null;
+
+  stopRecording(): void;
 };
 
 /**
@@ -153,36 +149,28 @@ const CameraView = (
         if (!camera.current || !isActive) {
           return null;
         }
-        const resultDeffered = createDeferred<{
-          path: string;
-          duration: number;
-        }>();
-        let recording = true;
-        camera.current.startRecording({
-          flash: flash === 'auto' ? 'off' : flash,
-          videoBitRate: 'low',
-          onRecordingError(error) {
-            recording = false;
-            resultDeffered.reject(error);
-          },
-          onRecordingFinished(video) {
-            recording = false;
-            resultDeffered.resolve(video);
-          },
+
+        return new Promise((resolve, reject) => {
+          camera.current?.startRecording({
+            flash: flash === 'auto' ? 'off' : flash,
+            videoBitRate: 'low',
+            onRecordingError(error) {
+              reject(error);
+            },
+            onRecordingFinished(video) {
+              resolve({
+                uri: video.path,
+                duration: video.duration,
+              });
+            },
+          });
         });
-        return {
-          end() {
-            if (!camera.current) {
-              throw new Error('Invalid record session');
-            }
-            if (!recording) {
-              throw new Error('Recording already ended');
-            }
-            return camera.current
-              .stopRecording()
-              .then(() => resultDeffered.promise);
-          },
-        };
+      },
+      stopRecording() {
+        if (!camera.current || !isActive) {
+          return null;
+        }
+        camera.current.stopRecording();
       },
     }),
     [flash, isActive, supportsFlash],

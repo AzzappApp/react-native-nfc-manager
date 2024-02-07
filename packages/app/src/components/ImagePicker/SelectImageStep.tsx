@@ -1,8 +1,10 @@
+import * as Sentry from '@sentry/react-native';
 import { presentPermissionsPickerAsync, type Album } from 'expo-media-library';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { Alert, Platform, StyleSheet } from 'react-native';
 import { RESULTS } from 'react-native-permissions';
+import { getVideoDuration } from 'react-native-video-duration';
 import { useDebouncedCallback } from 'use-debounce';
 import { cropDataForAspectRatio } from '#components/gpu';
 import { getImageSize, getVideoSize } from '#helpers/mediaHelpers';
@@ -20,8 +22,7 @@ import ImagePickerMediaRenderer from './ImagePickerMediaRenderer';
 import { ImagePickerStep } from './ImagePickerWizardContainer';
 import PhotoGalleryMediaList from './PhotoGalleryMediaList';
 import type { BottomMenuItem } from '#ui/BottomMenu';
-import type { CameraViewHandle, RecordSession } from '../CameraView';
-import type { CameraRuntimeError } from 'react-native-vision-camera';
+import type { CameraViewHandle } from '../CameraView';
 
 export type SelectImageStepProps = {
   onNext(): void;
@@ -90,7 +91,7 @@ const SelectImageStep = ({
     setCameraInitialized(true);
   }, []);
 
-  const onCameraError = useCallback((error: CameraRuntimeError) => {
+  const onCameraError = useCallback((error: Error) => {
     console.warn(error);
     // TODO
   }, []);
@@ -133,39 +134,41 @@ const SelectImageStep = ({
 
   const onTakePhoto = useDebouncedCallback(takePhoto, 400);
 
-  const captureSession = useRef<RecordSession | null>(null);
-  const onStartRecording = useCallback(() => {
-    if (!cameraRef.current) {
-      // TODO
-      return;
+  const onStartRecording = useCallback(async () => {
+    try {
+      const result = await cameraRef.current?.startRecording();
+
+      if (result) {
+        const duration =
+          result.duration ?? (await getVideoDuration(result.uri));
+        if (duration) {
+          const { uri: _uri } = result;
+          const uri = _uri.startsWith('file://') ? _uri : `file://${_uri}`;
+          const { width, height } = await getVideoSize(_uri);
+          onMediaChange(
+            {
+              kind: 'video',
+              uri,
+              height,
+              width,
+              duration: duration as number,
+            },
+            forceCameraRatio,
+          );
+          onNext();
+        }
+      }
+    } catch (e) {
+      console.error(e);
+      Sentry.captureException(e);
+      /* empty */
     }
-    captureSession.current = cameraRef.current.startRecording();
-    if (!captureSession.current) {
-      // TODO
-    }
+  }, [forceCameraRatio, onMediaChange, onNext]);
+
+  const onStopRecording = useCallback(() => {
+    cameraRef.current?.stopRecording();
   }, []);
 
-  const onStopRecording = useCallback(async () => {
-    const result = await captureSession.current?.end().catch(() => null);
-    if (!result) {
-      //TODO
-      return;
-    }
-    const { path, duration } = result;
-    const uri = `file://${path}`;
-    const { width, height } = await getVideoSize(uri);
-    onMediaChange(
-      {
-        kind: 'video',
-        uri,
-        height,
-        width,
-        duration,
-      },
-      forceCameraRatio,
-    );
-    onNext();
-  }, [forceCameraRatio, onMediaChange, onNext]);
   // #endregion
 
   // #region display logic

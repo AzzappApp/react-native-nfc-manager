@@ -19,6 +19,7 @@ jest.mock('../AlbumPicker', () =>
 const mockCameraViewRef = {
   takePhoto: jest.fn(),
   startRecording: jest.fn(),
+  stopRecording: jest.fn(),
 };
 
 jest.mock('#components/CameraView', () =>
@@ -250,9 +251,10 @@ describe('ImagePicker', () => {
         fireEvent.press(screen.getByLabelText('Take a picture'));
       });
       const cameraControlPanel = screen.getByTestId('camera-control-panel');
-      mockCameraViewRef.takePhoto.mockResolvedValueOnce(
-        '/fakeuri.com/image.jpg',
-      );
+      mockCameraViewRef.takePhoto.mockResolvedValueOnce({
+        uri: '/fakeuri.com/image.jpg',
+        duration: 10,
+      });
       act(() => {
         fireEvent(cameraControlPanel, 'takePhoto');
       });
@@ -277,11 +279,8 @@ describe('ImagePicker', () => {
       const cameraControlPanel = screen.getByTestId('camera-control-panel');
 
       mockCameraViewRef.startRecording.mockReturnValueOnce({
-        end: () =>
-          Promise.resolve({
-            path: '/fakeuri.com/video.mp4',
-            size: 1000,
-          }),
+        uri: '/fakeuri.com/video.mp4',
+        duration: 1000,
       });
       act(() => {
         fireEvent(cameraControlPanel, 'startRecording');

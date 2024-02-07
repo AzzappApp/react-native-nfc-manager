@@ -57,7 +57,7 @@
     "@graphql-codegen/typescript-resolvers": "^4.0.1",
     "@octokit/rest": "^20.0.1",
     "@parcel/watcher": "^2.3.0",
-    "@react-native/babel-preset": "^0.73.18",
+    "@react-native/babel-preset": "^0.73.21",
     "@svgr/webpack": "^8.1.0",
     "@testing-library/jest-native": "^5.4.2",
     "@testing-library/react-hooks": "^8.0.1",

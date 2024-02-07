@@ -1,0 +1,10 @@
+diff --git a/node_modules/expo-camera/plugin/src/withCamera.ts b/node_modules/expo-camera/plugin/src/withCamera.ts
+index bd39c49..940b5c3 100644
+--- a/node_modules/expo-camera/plugin/src/withCamera.ts
++++ b/node_modules/expo-camera/plugin/src/withCamera.ts
+@@ -103,4 +103,4 @@ const withCamera: ConfigPlugin<
+   return withAndroidCameraGradle(config);
+ };
+ 
+-export default createRunOncePlugin(withCamera, pkg.name, pkg.version);
++export default createRunOncePlugin(withCamera, `${pkg.name}/next`, pkg.version);
