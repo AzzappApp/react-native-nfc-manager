@@ -10,6 +10,7 @@ import {
 } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { useLocalCachedMediaFile } from '#helpers/mediaHelpers/AndroidLocalMediaCache';
+import ActivityIndicator from '#ui/ActivityIndicator';
 import MediaImageRenderer from './MediaImageRenderer';
 import type {
   MediaVideoRendererHandle,
@@ -162,7 +163,9 @@ const MediaVideoRenderer = (
             onPlaybackStatusUpdate={onPlaybackStatusUpdate}
             onError={onError}
             progressUpdateIntervalMillis={onProgress ? 50 : undefined}
-          />
+          >
+            <ActivityIndicator color="white" />
+          </Video>
         </View>
       )}
     </View>
