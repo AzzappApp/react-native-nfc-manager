@@ -1,5 +1,8 @@
-## 0.5.5-canary.60
+## 0.5.5-canary.61
 
+* **fix:**  - **multiUser:** use global id in decline ownership ([#2699](https://github.com/AzzappApp/azzapp/pull/2699))
+* **fix:**  - **android:** try expo-camera on android ([#2698](https://github.com/AzzappApp/azzapp/pull/2698))
+* **fix:**  - **android:** add video indicator when video is loading ([#2665](https://github.com/AzzappApp/azzapp/pull/2665))
 * **feat:**  - ShakenShare update design ([#2675](https://github.com/AzzappApp/azzapp/pull/2675))
 * **feat:**  - rework design
 * **fix:**  - **android:** [#2639](https://github.com/AzzappApp/azzapp/pull/2639) glide load error on lut filters ([#2659](https://github.com/AzzappApp/azzapp/pull/2659))
