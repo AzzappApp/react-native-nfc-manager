@@ -168,7 +168,9 @@ const AlbumRenderer = ({
       album: album?.id,
     }).then(
       result => {
-        setImageUri(result.assets[0].uri);
+        if (result.assets.length > 0) {
+          setImageUri(result.assets[0].uri);
+        }
       },
       e => {
         // TODO
