@@ -1,5 +1,8 @@
-## 0.5.5-canary.63
+## 0.5.5-canary.64
 
+* **fix:**  - **android:** [#2729](https://github.com/AzzappApp/azzapp/pull/2729) case when assets array if empty ([#2730](https://github.com/AzzappApp/azzapp/pull/2730))
+* **fix:**  - **android:** [#2649](https://github.com/AzzappApp/azzapp/pull/2649) use scrollview from gesture-handler to allow cross gesture handler ([#2731](https://github.com/AzzappApp/azzapp/pull/2731))
+* **fix:**  - **android:** [#2719](https://github.com/AzzappApp/azzapp/pull/2719) replace react-native-svg to skia to fix crashes due to large bitmap ([#2725](https://github.com/AzzappApp/azzapp/pull/2725))
 * **fix:**  - **Android:** GPUView improvment ([#2717](https://github.com/AzzappApp/azzapp/pull/2717))
 * **fix:**  - **android:** [#2634](https://github.com/AzzappApp/azzapp/pull/2634) crash on android with background-repeat ([#2709](https://github.com/AzzappApp/azzapp/pull/2709))
 * **fix:**  - **multiUser:** use global id in decline ownership ([#2699](https://github.com/AzzappApp/azzapp/pull/2699))
