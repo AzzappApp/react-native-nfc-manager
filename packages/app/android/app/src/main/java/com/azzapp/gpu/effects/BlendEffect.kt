@@ -1,19 +1,15 @@
-package com.azzapp.gpu
+package com.azzapp.gpu.effects
 
 import android.opengl.GLES20
+import com.azzapp.gpu.GLFrame
+import com.azzapp.gpu.FrameBufferPool
+import com.azzapp.gpu.ShaderUtils
 
 class BlendEffect {
 
-  private var frameBuffer: Int? = null
+  private var blendRenderer: BlendRenderer = BlendRenderer()
 
-  private var blendRenderer: BlendRenderer? = null
-
-  fun applyBlend(inputImage: GLFrame, maskTexture: GLFrame): GLFrame? {
-    if (frameBuffer == null) {
-      frameBuffer = ShaderUtils.createFrameBuffer()
-    }
-    val frameBuffer = frameBuffer ?: return null
-
+  fun draw(inputImage: GLFrame, maskTexture: GLFrame, frameBufferPool: FrameBufferPool): GLFrame {
     val outputFrame = GLFrame.create()
     ShaderUtils.bindRGBATexture(
       outputFrame.texture,
@@ -23,44 +19,23 @@ class BlendEffect {
     outputFrame.width = inputImage.width
     outputFrame.height = inputImage.height
 
-    GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, frameBuffer!!)
-    GLES20.glFramebufferTexture2D(
-      GLES20.GL_FRAMEBUFFER,
-      GLES20.GL_COLOR_ATTACHMENT0,
-      GLES20.GL_TEXTURE_2D,
-      outputFrame!!.texture,
-      0
-    )
+    val frameBuffer = frameBufferPool.getFrameBuffer()
+    ShaderUtils.focuFrameBuffer(frameBuffer, outputFrame.texture)
 
-    if (blendRenderer == null) {
-      blendRenderer = BlendRenderer()
-    }
-    val blendRenderer = blendRenderer?: return null
-    GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, frameBuffer)
-    blendRenderer.apply(
+    blendRenderer.draw(
       inputImage.texture,
       maskTexture.texture,
       0, 0,
       inputImage.width,
       inputImage.height
     )
+    frameBufferPool.releaseFrameBuffer(frameBuffer)
     return outputFrame
   }
 
   fun release() {
-    blendRenderer?.release()
-    val frameBuffer = this.frameBuffer?:return
-    ShaderUtils.disposeFrameBuffer(frameBuffer)
+    blendRenderer.release()
   }
-
-  companion object  {
-    private const val GL_STATE_FBO = 0
-    private const val GL_STATE_PROGRAM = 1
-    private const val GL_STATE_ARRAYBUFFER = 2
-    private const val GL_STATE_COUNT = 3
-  }
-
-  private val mOldState = IntArray(GL_STATE_COUNT)
 
   private  class BlendRenderer {
     var program = 0
@@ -98,7 +73,7 @@ class BlendEffect {
       )
     }
 
-    fun apply(
+    fun draw(
       texture: Int,
       maskTexture: Int,
       x: Int,

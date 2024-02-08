@@ -226,6 +226,7 @@ function CarouselSelectList<TItem = any>(
       snapToInterval={itemWidth}
       decelerationRate="fast"
       snapToAlignment="start"
+      disableIntervalMomentum
       //removeClippedSubviews removing this to avoid blank (was use to improve perf)
       pagingEnabled
       bounces={false}

@@ -20,13 +20,14 @@ import androidx.media3.transformer.TransformationRequest.HDR_MODE_KEEP_HDR
 import androidx.media3.transformer.Transformer
 import androidx.media3.transformer.VideoEncoderSettings
 import com.azzapp.MainApplication
+import com.azzapp.gpu.effects.BlendEffect
+import com.azzapp.gpu.effects.ColorLUTEffect
 import com.facebook.react.bridge.Promise
 import com.facebook.react.bridge.ReactApplicationContext
 import com.facebook.react.bridge.ReactContextBaseJavaModule
 import com.facebook.react.bridge.ReactMethod
 import com.facebook.react.bridge.ReadableArray
 import com.facebook.react.bridge.ReadableMap
-import com.facebook.react.uimanager.UIManagerHelper
 import com.google.common.collect.ImmutableList
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -191,7 +192,6 @@ import kotlin.math.round
     var eglDisplay: EGLDisplay? = null
     var eglSurface: EGLSurface? = null
     var effectContext: EffectContext? = null
-    var sourceImage: GLFrame? = null
 
     try {
       val width = size.getInt("width")
@@ -278,9 +278,19 @@ import kotlin.math.round
           promise.reject(e)
         }
       }
+
+      val frameBufferPool = FrameBufferPool()
       val inputBitmap = loadedBitmap ?:return
-      sourceImage = GLFrame.create(inputBitmap.width, inputBitmap.height)
-      ShaderUtils.bindImageTexture(sourceImage.texture, inputBitmap)
+      var image = GLFrame.create(inputBitmap.width, inputBitmap.height)
+      ShaderUtils.bindImageTexture(image.texture, inputBitmap)
+
+
+      fun setImage(value: GLFrame) {
+        if (value !== image) {
+          image.release()
+        }
+        image = value
+      }
 
       val maskBitmap = loadedMaskBitmap
       if (maskBitmap != null) {
@@ -288,10 +298,9 @@ import kotlin.math.round
         ShaderUtils.bindImageTexture(maskImage.texture, maskBitmap)
 
         var blendEffect = BlendEffect()
-        val imageWithMask = blendEffect.applyBlend(sourceImage, maskImage!!)
+        val imageWithMask = blendEffect.draw(image, maskImage, frameBufferPool)
         if (imageWithMask != null) {
-          sourceImage.release()
-          sourceImage = imageWithMask
+          setImage(imageWithMask)
         }
         maskImage.release()
       }
@@ -299,16 +308,16 @@ import kotlin.math.round
       val parameters = layer.parameters
       if (parameters != null) {
         effectContext = EffectContext.createWithCurrentGlContext()
-        val croppedImage = GLFrameTransformations.applyEditorTransform(
-          sourceImage,
+        val transformedImage = GLFrameTransformations.applyEditorTransform(
+          image,
           parameters,
           effectContext.factory
         )
-        if (croppedImage != null) {
-          sourceImage.release()
-          sourceImage = croppedImage
-        }
+        setImage(transformedImage)
+        GLES20.glEnable(GLES20.GL_BLEND)
+        GLES20.glBlendFunc(GLES20.GL_SRC_ALPHA, GLES20.GL_ONE_MINUS_SRC_ALPHA);
       }
+
 
       val lutFilterBitmap = loadedLutFilterBitmap
       if (lutFilterBitmap != null) {
@@ -316,15 +325,12 @@ import kotlin.math.round
         ShaderUtils.bindImageTexture(lutImage.texture, lutFilterBitmap)
 
         var colorLUTEffect = ColorLUTEffect()
-        val imageWithLut = colorLUTEffect.apply(sourceImage, lutImage!!)
-        if (imageWithLut != null) {
-          sourceImage.release()
-          sourceImage = imageWithLut
-        }
+        val imageWithLut = colorLUTEffect.draw(image, lutImage, frameBufferPool)
+        setImage(imageWithLut)
         lutImage.release()
       }
 
-      var bitmap = saveTexture(sourceImage.texture, sourceImage.width, sourceImage.height)
+      var bitmap = saveTexture(image.texture, image.width, image.height)
       val fileExtension = when (format) {
         "png" -> ".png"
         "auto" -> if (bitmap.hasAlpha())  ".png" else ".jpg"
@@ -346,7 +352,6 @@ import kotlin.math.round
     } catch (e: Exception) {
       promise.reject(e)
     } finally {
-      sourceImage?.release()
       effectContext?.release()
       if (eglSurface != null && eglSurface != EGL10.EGL_NO_SURFACE) {
         egl.eglDestroySurface(eglDisplay, eglSurface)

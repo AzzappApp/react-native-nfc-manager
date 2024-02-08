@@ -65,7 +65,22 @@ export type CoverMediaPreviewProps = Omit<ViewProps, 'children'> & {
    * @type {(string | null)}
    */
   filter?: string | null;
-
+  /**
+   * if true, a preview of the video will be displayed (thumbnail)
+   * Until the video is ready to play
+   *
+   * @default true
+   */
+  videoPreview?: boolean;
+  /**
+   * Pause the video and the animations
+   */
+  paused?: boolean;
+  /**
+   * If true the video view won't be rendered
+   * @default false
+   */
+  videoDisabled?: boolean;
   /**
    * Called when the GPUView starts loading the media
    */
@@ -92,11 +107,6 @@ export type CoverMediaPreviewProps = Omit<ViewProps, 'children'> & {
     currentTime: number;
     duration: number;
   }) => void;
-
-  /**
-   * Pause the video and the animations
-   */
-  paused?: boolean;
 };
 
 /**
@@ -115,7 +125,9 @@ const CoverMediaPreview = ({
   backgroundMultiply,
   editionParameters,
   filter,
+  videoPreview = true,
   paused = false,
+  videoDisabled = false,
   style,
   onLoadingStart,
   onLoadingEnd,
@@ -213,7 +225,7 @@ const CoverMediaPreview = ({
 
   return (
     <View style={style} {...props}>
-      {kind === 'video' && (
+      {kind === 'video' && videoPreview && (
         <GPUImageView
           {...imageLoadingHandlers}
           style={[
@@ -230,7 +242,7 @@ const CoverMediaPreview = ({
           <VideoFrame {...mainGPULayerProps} time={startTime ?? 0} />
         </GPUImageView>
       )}
-      {(kind !== 'video' || !paused) && (
+      {(kind !== 'video' || !videoDisabled) && (
         <GPUView
           {...(kind === 'video' ? videoLoadingHandlers : imageLoadingHandlers)}
           paused={paused}

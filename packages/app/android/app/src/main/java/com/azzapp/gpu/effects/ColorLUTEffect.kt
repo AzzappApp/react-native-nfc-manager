@@ -1,19 +1,16 @@
-package com.azzapp.gpu
+package com.azzapp.gpu.effects
 
 import android.opengl.GLES20
+import com.azzapp.gpu.GLFrame
+import com.azzapp.gpu.FrameBufferPool
+import com.azzapp.gpu.ShaderUtils
 
 class ColorLUTEffect {
 
-  private var frameBuffer: Int? = null
 
   private var colorLutRenderer: ColorLutRenderer = ColorLutRenderer()
 
-  fun apply(inputImage: GLFrame, colorLutImage: GLFrame): GLFrame? {
-    if (frameBuffer == null) {
-      frameBuffer = ShaderUtils.createFrameBuffer()
-    }
-    val frameBuffer = frameBuffer ?: return null
-
+  fun draw(inputImage: GLFrame, colorLutImage: GLFrame, frameBufferPool: FrameBufferPool): GLFrame {
     val outputFrame = GLFrame.create()
     ShaderUtils.bindRGBATexture(
       outputFrame.texture,
@@ -23,15 +20,10 @@ class ColorLUTEffect {
     outputFrame.width = inputImage.width
     outputFrame.height = inputImage.height
 
-    GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, frameBuffer)
-    GLES20.glFramebufferTexture2D(
-      GLES20.GL_FRAMEBUFFER,
-      GLES20.GL_COLOR_ATTACHMENT0,
-      GLES20.GL_TEXTURE_2D,
-      outputFrame!!.texture,
-      0
-    )
-    colorLutRenderer.apply(
+    val frameBuffer = frameBufferPool.getFrameBuffer()
+    ShaderUtils.focuFrameBuffer(frameBuffer, outputFrame.texture)
+
+    colorLutRenderer.draw(
       inputImage.texture,
       colorLutImage.texture,
       0,
@@ -39,25 +31,13 @@ class ColorLUTEffect {
       inputImage.width,
       inputImage.height
     )
-
+    frameBufferPool.releaseFrameBuffer(frameBuffer)
     return outputFrame
   }
 
   fun release() {
     colorLutRenderer.release()
-    val frameBuffer = frameBuffer?: return
-    ShaderUtils.disposeFrameBuffer(frameBuffer)
   }
-
-  companion object  {
-    private const val GL_STATE_FBO = 0
-    private const val GL_STATE_PROGRAM = 1
-    private const val GL_STATE_ARRAYBUFFER = 2
-    private const val GL_STATE_COUNT = 3
-  }
-
-  private val mOldState = IntArray(GL_STATE_COUNT)
-
 
 
   class ColorLutRenderer {
@@ -96,7 +76,7 @@ class ColorLUTEffect {
       )
     }
 
-    fun apply(
+    fun draw(
       texture: Int,
       lutTexture: Int,
       x: Int,

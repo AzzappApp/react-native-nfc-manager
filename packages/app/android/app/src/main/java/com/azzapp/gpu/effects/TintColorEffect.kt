@@ -1,41 +1,27 @@
-package com.azzapp.gpu
+package com.azzapp.gpu.effects
 
 import android.opengl.GLES20
+import com.azzapp.gpu.GLFrame
+import com.azzapp.gpu.FrameBufferPool
+import com.azzapp.gpu.ShaderUtils
 
 class TintColorEffect {
-
-  private var frameBuffer: Int? = null
-
   private var tintRenderer: TintColorRenderer = TintColorRenderer()
 
-  fun apply(inputImage: GLFrame, tintColor: Int): GLFrame? {
-    if (frameBuffer == null) {
-      frameBuffer = ShaderUtils.createFrameBuffer()
-    }
-    val frameBuffer = frameBuffer ?: return null
-
-
-
-    GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, frameBuffer)
-
+  fun draw(inputImage: GLFrame, tintColor: Int, frameBufferPool: FrameBufferPool): GLFrame {
     val outputFrame = GLFrame.create()
     ShaderUtils.bindRGBATexture(
       outputFrame.texture,
       inputImage.width,
       inputImage.height,
     )
-    outputFrame.x = inputImage.x
-    outputFrame.y = inputImage.y
     outputFrame.width = inputImage.width
     outputFrame.height = inputImage.height
 
-    GLES20.glFramebufferTexture2D(
-      GLES20.GL_FRAMEBUFFER,
-      GLES20.GL_COLOR_ATTACHMENT0,
-      GLES20.GL_TEXTURE_2D,
-      outputFrame!!.texture,
-      0
-    )
+
+    val frameBuffer = frameBufferPool.getFrameBuffer()
+    ShaderUtils.focuFrameBuffer(frameBuffer, outputFrame.texture)
+
     tintRenderer.apply(
       inputImage.texture,
       tintColor,
@@ -43,26 +29,13 @@ class TintColorEffect {
       inputImage.width,
       inputImage.height
     )
-
+    frameBufferPool.releaseFrameBuffer(frameBuffer)
     return outputFrame
   }
 
   fun release() {
     tintRenderer.release()
-    val frameBuffer = frameBuffer?: return
-    ShaderUtils.disposeFrameBuffer(frameBuffer)
   }
-
-  companion object  {
-    private const val GL_STATE_FBO = 0
-    private const val GL_STATE_PROGRAM = 1
-    private const val GL_STATE_ARRAYBUFFER = 2
-    private const val GL_STATE_COUNT = 3
-  }
-
-  private val mOldState = IntArray(GL_STATE_COUNT)
-
-
 
   class TintColorRenderer {
     var program = 0
@@ -148,25 +121,25 @@ class TintColorEffect {
 
     companion object {
       private const val VERTEX_SHADER = """
-      attribute vec4 aFramePosition;
-      attribute vec2 aTexCoords;
-      varying vec2 vTexCoords;
-      void main() {
-       gl_Position = aFramePosition;
-       vTexCoords = aTexCoords.xy;
-      }
-    """
+        attribute vec4 aFramePosition;
+        attribute vec2 aTexCoords;
+        varying vec2 vTexCoords;
+        void main() {
+         gl_Position = aFramePosition;
+         vTexCoords = aTexCoords.xy;
+        }
+      """
 
       private const val FRAGMENT_SHADER = """
-      precision mediump float;
-      uniform sampler2D uTexSampler;
-      uniform vec3 uTintColor;
-      varying vec2 vTexCoords;
-      void main() {
-        vec4 texColor = texture2D(uTexSampler, vTexCoords);
-        gl_FragColor = vec4(uTintColor.r, uTintColor.g, uTintColor.b, texColor.a);
-      }
-    """
+        precision mediump float;
+        uniform sampler2D uTexSampler;
+        uniform vec3 uTintColor;
+        varying vec2 vTexCoords;
+        void main() {
+          vec4 texColor = texture2D(uTexSampler, vTexCoords);
+          gl_FragColor = vec4(uTintColor.r, uTintColor.g, uTintColor.b, texColor.a);
+        }
+      """
 
       private val POS_VERTICES = ShaderUtils.floatBuffer(
         -1f, -1f, 0f, 1f,

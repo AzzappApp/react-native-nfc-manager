@@ -17,8 +17,8 @@ import androidx.media3.common.OnInputFrameProcessedListener
 import androidx.media3.common.SurfaceInfo
 import androidx.media3.common.VideoFrameProcessingException
 import androidx.media3.common.VideoFrameProcessor
-import androidx.media3.common.util.GlUtil
 import androidx.media3.common.util.UnstableApi
+import com.azzapp.gpu.effects.ColorLUTEffect
 import kotlinx.coroutines.ExecutorCoroutineDispatcher
 import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.runBlocking
@@ -61,6 +61,8 @@ import javax.microedition.khronos.egl.*
   private var inputSurface: Surface
 
   private var effectContext: EffectContext? = null
+
+  private var frameBufferPool = FrameBufferPool()
 
   private var frameBuffer: Int
   private var image: GLFrame
@@ -279,7 +281,7 @@ import javax.microedition.khronos.egl.*
     }
 
     if (lutImage != null) {
-      val imageWithLut = colorLUTEffect?.apply(outputImage, lutImage!!)
+      val imageWithLut = colorLUTEffect?.draw(outputImage, lutImage!!, frameBufferPool)
       if (imageWithLut != null) {
         if (outputImage !== image) {
           outputImage.release()
@@ -289,13 +291,17 @@ import javax.microedition.khronos.egl.*
     }
 
     if (surfaceInfo.orientationDegrees != 0) {
-      outputImage = GLFrameTransformations.applyEffect(
+
+      val newImage = GLFrame.create()
+      GLFrameTransformations.applyEffect(
         outputImage,
-        null,
+        newImage,
         EffectFactory.EFFECT_ROTATE,
         mapOf("angle" to -surfaceInfo.orientationDegrees),
         effectContext!!.factory
       )
+      outputImage?.release()
+      outputImage = newImage
     }
 
     textureRenderer.renderTexture(

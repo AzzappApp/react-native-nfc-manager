@@ -25,13 +25,25 @@ object GLFrameTransformations {
     inputImage: GLFrame,
     parameters: GPULayer.EditionParameters?,
     effectFactory: EffectFactory
-  ): GLFrame? {
+  ): GLFrame {
     if (parameters == null) {
-      return null
+      return inputImage
     }
-    var outputImage: GLFrame? = null
     var currentImage = inputImage
-    var shouldRelease = false;
+
+    fun transformImage(transform: (input: GLFrame, output: GLFrame) -> Unit) {
+      val outputImage = GLFrame.create()
+      outputImage.x = currentImage.x
+      outputImage.y = currentImage.y
+      outputImage.width = currentImage.width
+      outputImage.height = currentImage.height
+
+      transform(currentImage, outputImage)
+      if (currentImage !== inputImage) {
+        currentImage.release()
+      }
+      currentImage = outputImage
+    }
 
     val orientationAngle =
       when (parameters.orientation) {
@@ -42,73 +54,69 @@ object GLFrameTransformations {
       }
 
     if (orientationAngle != 0 && EffectFactory.isEffectSupported(EffectFactory.EFFECT_ROTATE)) {
-      outputImage = applyEffect(
-        currentImage,
-        null,
-        EffectFactory.EFFECT_ROTATE,
-        mapOf("angle" to orientationAngle),
-        effectFactory
-      )
+      transformImage { input, output ->
+        applyEffect(
+          input,
+          output,
+          EffectFactory.EFFECT_ROTATE,
+          mapOf("angle" to orientationAngle),
+          effectFactory
+        )
 
-      if (orientationAngle == 90 || orientationAngle == 270) {
-        outputImage.width = currentImage.height
-        outputImage.height = currentImage.width
+        if (orientationAngle == 90 || orientationAngle == 270) {
+          output.width = input.height
+          output.height = input.width
+        }
       }
-      shouldRelease = true;
-      currentImage = outputImage
     }
 
 
     val cropData = parameters.cropData
     if (cropData != null && EffectFactory.isEffectSupported(EffectFactory.EFFECT_CROP)) {
-      var originX = round(cropData.originX).toInt()
-      var originY = round(cropData.originY).toInt()
-      var width = round(cropData.width).toInt()
-      var height = round(cropData.height).toInt()
+      transformImage { input, output ->
+        var originX = round(cropData.originX).toInt()
+        var originY = round(cropData.originY).toInt()
+        var width = round(cropData.width).toInt()
+        var height = round(cropData.height).toInt()
 
-      if (width != 0 && height != 0) {
-        var x = 0
-        var y = 0
-        if (originX < 0) {
-          x = -originX
-        }
-        if (originY < 0) {
-          y = -originY
-        }
-        val right = originX + width
-        val bottom = originY + height
-        if (right > currentImage.width) {
-          x = -(right - currentImage.width)
-        }
-        if (bottom > currentImage.height) {
-          y = -(bottom - currentImage.height)
-        }
-        originX += x
-        originY += y
+        if (width != 0 && height != 0) {
+          var x = 0
+          var y = 0
+          if (originX < 0) {
+            x = -originX
+          }
+          if (originY < 0) {
+            y = -originY
+          }
+          val right = originX + width
+          val bottom = originY + height
+          if (right > input.width) {
+            x = -(right - input.width)
+          }
+          if (bottom > input.height) {
+            y = -(bottom - input.height)
+          }
+          originX += x
+          originY += y
 
-        outputImage = applyEffect(
-          currentImage,
-          null,
-          EffectFactory.EFFECT_CROP,
-          mapOf(
-            "xorigin" to originX,
-            "yorigin" to originY,
-            "width" to width,
-            "height" to height
-          ),
-          effectFactory
-        )
+          applyEffect(
+            input,
+            output,
+            EffectFactory.EFFECT_CROP,
+            mapOf(
+              "xorigin" to originX,
+              "yorigin" to originY,
+              "width" to width,
+              "height" to height
+            ),
+            effectFactory
+          )
 
-        outputImage.x = x
-        outputImage.y = y
-        outputImage.width = width
-        outputImage.height = height
-
-        if (shouldRelease) {
-          currentImage.release()
+          output.x = x
+          output.y = y
+          output.width = width
+          output.height = height
         }
-        currentImage = outputImage
-        shouldRelease = true;
       }
     }
 
@@ -117,110 +125,104 @@ object GLFrameTransformations {
         but this might lead to imprecise calculation of the image size on js part */
     val roll = if (parameters.roll != null) round(parameters.roll) else 0
     if (roll != 0 && EffectFactory.isEffectSupported(EffectFactory.EFFECT_STRAIGHTEN)) {
-      outputImage = applyEffect(
-        currentImage,
-        null,
-        EffectFactory.EFFECT_STRAIGHTEN,
-        mapOf(
-          "angle" to roll.toFloat(),
-        ),
-        effectFactory
-      )
-
-      if (shouldRelease) {
-        currentImage.release()
+      transformImage { input, output ->
+        applyEffect(
+          input,
+          output,
+          EffectFactory.EFFECT_STRAIGHTEN,
+          mapOf(
+            "angle" to roll.toFloat(),
+          ),
+          effectFactory
+        )
       }
-      currentImage = outputImage
     }
 
 
     // MAY DO highlights, shadow, structure, tint, vibrance
 
-    if (parameters.brightness != null) {
-      outputImage = applyEffect(
-        currentImage,
-        outputImage,
-        EffectFactory.EFFECT_BRIGHTNESS,
-        mapOf("brightness" to parameters.brightness.toFloat()),
-        effectFactory
-      )
-      currentImage = outputImage
+    if (parameters.brightness != null && EffectFactory.isEffectSupported(EffectFactory.EFFECT_BRIGHTNESS)) {
+      transformImage { input, output ->
+        applyEffect(
+          input,
+          output,
+          EffectFactory.EFFECT_BRIGHTNESS,
+          mapOf("brightness" to parameters.brightness.toFloat()),
+          effectFactory
+        )
+      }
     }
 
-    if (parameters.contrast != null) {
-      outputImage = applyEffect(
-        currentImage,
-        outputImage,
-        EffectFactory.EFFECT_CONTRAST,
-        mapOf("contrast" to parameters.contrast.toFloat()),
-        effectFactory
-      )
-      currentImage = outputImage
+    if (parameters.contrast != null && EffectFactory.isEffectSupported(EffectFactory.EFFECT_CONTRAST)) {
+      transformImage { input, output ->
+        applyEffect(
+          input,
+          output,
+          EffectFactory.EFFECT_CONTRAST,
+          mapOf("contrast" to parameters.contrast.toFloat()),
+          effectFactory
+        )
+      }
     }
 
-    if (parameters.saturation != null) {
-      outputImage = applyEffect(
-        currentImage,
-        outputImage,
-        EffectFactory.EFFECT_SATURATE,
-        mapOf("scale" to parameters.saturation.toFloat()),
-        effectFactory
-      )
-      currentImage = outputImage
+    if (parameters.saturation != null && EffectFactory.isEffectSupported(EffectFactory.EFFECT_SATURATE)) {
+      transformImage { input, output ->
+        applyEffect(
+          input,
+          output,
+          EffectFactory.EFFECT_SATURATE,
+          mapOf("scale" to parameters.saturation.toFloat()),
+          effectFactory
+        )
+      }
     }
 
-    if (parameters.sharpness != null) {
-      outputImage = applyEffect(
-        currentImage,
-        outputImage,
-        EffectFactory.EFFECT_SHARPEN,
-        mapOf("scale" to parameters.sharpness.toFloat()),
-        effectFactory
-      )
-      currentImage = outputImage
+    if (parameters.sharpness != null && EffectFactory.isEffectSupported(EffectFactory.EFFECT_SHARPEN)) {
+      transformImage { input, output ->
+        applyEffect(
+          input,
+          output,
+          EffectFactory.EFFECT_SHARPEN,
+          mapOf("scale" to parameters.sharpness.toFloat()),
+          effectFactory
+        )
+      }
     }
 
-    if (parameters.temperature != null) {
-      outputImage = applyEffect(
-        currentImage,
-        outputImage,
-        EffectFactory.EFFECT_TEMPERATURE,
-        mapOf("scale" to parameters.temperature.toFloat()),
-        effectFactory
-      )
-      currentImage = outputImage
+    if (parameters.temperature != null && EffectFactory.isEffectSupported(EffectFactory.EFFECT_TEMPERATURE)) {
+      transformImage { input, output ->
+        applyEffect(
+          input,
+          output,
+          EffectFactory.EFFECT_TEMPERATURE,
+          mapOf("scale" to parameters.temperature.toFloat()),
+          effectFactory
+        )
+      }
     }
 
-    if (parameters.vignetting != null) {
-      outputImage = applyEffect(
-        currentImage,
-        outputImage,
-        EffectFactory.EFFECT_VIGNETTE,
-        mapOf("scale" to parameters.vignetting.toFloat()),
-        effectFactory
-      )
+    if (parameters.vignetting != null && EffectFactory.isEffectSupported(EffectFactory.EFFECT_VIGNETTE)) {
+      transformImage { input, output ->
+        applyEffect(
+          input,
+          output,
+          EffectFactory.EFFECT_VIGNETTE,
+          mapOf("scale" to parameters.vignetting.toFloat()),
+          effectFactory
+        )
+      }
     }
 
-    return outputImage
+    return currentImage
   }
 
   fun applyEffect(
     inputImage: GLFrame,
-    outputImage: GLFrame?,
+    outputImage: GLFrame,
     effectName: String,
     parameters: Map<String, Any>?,
     effectFactory: EffectFactory
-  ): GLFrame {
-    if (!EffectFactory.isEffectSupported(effectName)) {
-      return inputImage
-    }
-    val result = outputImage ?: GLFrame.create(
-      inputImage.x,
-      inputImage.y,
-      inputImage.width,
-      inputImage.height
-    );
-
+  ) {
     val effect = effectFactory.createEffect(effectName)
     parameters?.forEach { entry ->
       effect.setParameter(entry.key, entry.value)
@@ -230,8 +232,7 @@ object GLFrameTransformations {
       inputImage.texture,
       inputImage.width,
       inputImage.height,
-      result.texture
+      outputImage.texture
     )
-    return result
   }
 }

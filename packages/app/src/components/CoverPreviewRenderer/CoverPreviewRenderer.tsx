@@ -119,9 +119,11 @@ const CoverPreviewRenderer = ({
   textOrientation,
   textPosition,
   textAnimation,
+  videoDisabled,
+  videoPreview,
+  paused,
   // other props
   colorPalette,
-  paused,
   width,
   style,
   onStartLoading,
@@ -341,7 +343,9 @@ const CoverPreviewRenderer = ({
               )}
               filter={filter}
               editionParameters={editionParameters}
+              videoDisabled={videoDisabled}
               paused={paused || !allMediaLoaded}
+              videoPreview={videoPreview}
               onLoadingEnd={onMediaLoad}
               onLoadingError={onError}
               onVideoLoaded={onVideoLoaded}

@@ -1,5 +1,5 @@
 import { processColor, NativeModules } from 'react-native';
-import type { GPULayer } from '#components/gpu/GPULayers';
+import { transformParameters, type GPULayer } from '#components/gpu/GPULayers';
 
 const GPUHelpers = NativeModules.AZPGPUHelpers;
 
@@ -27,8 +27,9 @@ export const exportLayersToImage = (
     size,
     backgroundColor = 'transparent',
   } = options;
+
   return GPUHelpers.exportLayersToImage(
-    layers,
+    transformParameters(layers),
     processColor(backgroundColor),
     format,
     quality,
@@ -56,7 +57,7 @@ export const exportLayersToVideo = (
     backgroundColor = '#000',
   } = options;
   return GPUHelpers.exportLayersToVideo(
-    layers,
+    transformParameters(layers),
     processColor(backgroundColor),
     size,
     bitRate,

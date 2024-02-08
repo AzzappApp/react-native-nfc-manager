@@ -888,7 +888,9 @@ const CoverEditorTemplateRenderer = ({
               : item.colorPalettes[colorPaletteIndex]
           }
           width={width}
-          paused={!isSelectedItem || videoPaused || mediaComputing}
+          videoPreview={Platform.OS !== 'android'}
+          videoDisabled={!isSelectedItem}
+          paused={videoPaused || mediaComputing}
           style={coverPreviewRendererStyle}
           onStartLoading={onStartLoading}
           onLoad={onLoad}

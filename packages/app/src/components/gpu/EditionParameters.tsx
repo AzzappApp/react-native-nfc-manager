@@ -199,6 +199,7 @@ export const editionParametersSettings: ParametersInfo<{
     min: -20,
     max: 20,
     step: 1,
+    displayedValues: [-20, 20],
   },
 };
 

@@ -10,6 +10,9 @@ import android.opengl.GLES20
 import android.opengl.GLSurfaceView
 import android.util.Log
 import android.widget.FrameLayout
+import com.azzapp.gpu.effects.BlendEffect
+import com.azzapp.gpu.effects.ColorLUTEffect
+import com.azzapp.gpu.effects.TintColorEffect
 import com.facebook.react.bridge.WritableNativeMap
 import com.facebook.react.uimanager.ThemedReactContext
 import com.facebook.react.uimanager.events.RCTEventEmitter
@@ -35,6 +38,8 @@ class GPUImageView(context: Context) : FrameLayout(context), GLSurfaceView.Rende
 
     private var bitmaps = mutableMapOf<String, Bitmap>()
     private var frames = mutableMapOf<String, GLFrame>()
+
+    private var frameBufferPool = FrameBufferPool()
 
     private var readyToDraw  = false
 
@@ -158,14 +163,18 @@ class GPUImageView(context: Context) : FrameLayout(context), GLSurfaceView.Rende
             var image = sourceImage
 
             fun setImage(value: GLFrame) {
-                if (image !== sourceImage) {
+                if (image !== sourceImage && value !== image) {
                     image.release()
                 }
                 image = value
             }
 
             if (layer.backgroundColor != null && layer.backgroundColor.lowercase() != "transparent") {
-                val color = try { Color.parseColor(layer.backgroundColor)} catch (e: IllegalArgumentException){ Color.BLACK }
+                val color = try {
+                    Color.parseColor(layer.backgroundColor)
+                } catch (e: IllegalArgumentException){
+                    Color.BLACK
+                }
                 val r = (color shr 16 and 0xff) / 255.0f
                 val g = (color shr 8 and 0xff) / 255.0f
                 val b = (color and 0xff) / 255.0f
@@ -184,7 +193,7 @@ class GPUImageView(context: Context) : FrameLayout(context), GLSurfaceView.Rende
                     blendEffect = BlendEffect()
                     this.blendEffect = blendEffect
                 }
-                setImage(blendEffect.applyBlend(image, maskImage) ?: image)
+                setImage(blendEffect.draw(image, maskImage, frameBufferPool))
             }
 
             if (layer.tintColor != null) {
@@ -194,7 +203,7 @@ class GPUImageView(context: Context) : FrameLayout(context), GLSurfaceView.Rende
                     tintColorEffect = TintColorEffect()
                     this.tintColorEffect = tintColorEffect
                 }
-                setImage(tintColorEffect.apply(image, color) ?: image)
+                setImage(tintColorEffect.draw(image, color, frameBufferPool))
             }
 
             val parameters = layer.parameters
@@ -202,12 +211,12 @@ class GPUImageView(context: Context) : FrameLayout(context), GLSurfaceView.Rende
                 if (effectContext == null) {
                     effectContext = EffectContext.createWithCurrentGlContext()
                 }
-                setImage(GLFrameTransformations.applyEditorTransform(
+                val transformedImage = GLFrameTransformations.applyEditorTransform(
                     image,
                     parameters,
                     effectContext!!.factory
-                ) ?: image)
-
+                )
+                setImage(transformedImage)
                 GLES20.glEnable(GLES20.GL_BLEND)
                 GLES20.glBlendFunc(GLES20.GL_SRC_ALPHA, GLES20.GL_ONE_MINUS_SRC_ALPHA);
             }
@@ -217,13 +226,18 @@ class GPUImageView(context: Context) : FrameLayout(context), GLSurfaceView.Rende
             else null
 
             if (lutImage != null) {
+                var colorLutEffect = this.colorLutEffect
                 if (colorLutEffect == null) {
                     colorLutEffect = ColorLUTEffect()
+                    this.colorLutEffect = colorLutEffect
                 }
-                setImage(colorLutEffect?.apply(
-                    image,
-                    lutImage,
-                )?: image)
+                setImage(
+                    colorLutEffect.draw(
+                        image,
+                        lutImage,
+                        frameBufferPool,
+                    )
+                )
             }
 
             textureRenderer?.renderTexture(
@@ -281,7 +295,6 @@ class GPUImageView(context: Context) : FrameLayout(context), GLSurfaceView.Rende
             }
         }
         unusedKeys.forEach {
-            bitmaps[it]?.recycle()
             bitmaps.remove(it)
         }
 
@@ -335,6 +348,7 @@ class GPUImageView(context: Context) : FrameLayout(context), GLSurfaceView.Rende
         frames.clear()
         effectContext?.release()
         effectContext = null
+        frameBufferPool.release()
     }
 
     companion object {

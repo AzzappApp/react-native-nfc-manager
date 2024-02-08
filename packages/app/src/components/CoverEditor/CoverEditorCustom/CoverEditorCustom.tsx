@@ -501,7 +501,8 @@ const CoverEditorCustom = ({
                 onError={onError}
                 width={coverWidth}
                 colorPalette={colorPalette}
-                paused={!!progressIndicator || mediaComputing}
+                videoDisabled={!!progressIndicator}
+                paused={mediaComputing}
               />
             )}
             {loading && (

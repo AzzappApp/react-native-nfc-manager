@@ -1,73 +1,45 @@
 package com.azzapp.gpu
 
 import android.graphics.Bitmap
-import android.graphics.SurfaceTexture
 import android.media.effect.EffectContext
 import android.opengl.GLES20
-import android.opengl.GLSurfaceView
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
-import android.view.Surface
 import android.widget.FrameLayout
 import com.facebook.react.bridge.Arguments
 import com.facebook.react.bridge.LifecycleEventListener
 import com.facebook.react.bridge.ReactContext
 import com.facebook.react.uimanager.ThemedReactContext
 import com.facebook.react.uimanager.events.RCTEventEmitter
-import androidx.media3.exoplayer.DefaultRenderersFactory
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.common.MediaItem
 import androidx.media3.common.PlaybackException
 import androidx.media3.common.Player
 import androidx.media3.common.VideoSize
 import androidx.media3.common.util.UnstableApi
+import com.azzapp.gpu.effects.ColorLUTEffect
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
-import java.util.concurrent.atomic.AtomicBoolean
-import javax.microedition.khronos.egl.EGLConfig
-import javax.microedition.khronos.opengles.GL10
 import kotlin.math.round
 
 
 @UnstableApi class GPUVideoView(private val reactContext: ThemedReactContext) :
   FrameLayout(reactContext),
   LifecycleEventListener,
-  GLSurfaceView.Renderer,
   Player.Listener {
 
-  private val surfaceView = GLSurfaceView(context)
+  private val videoProcessor = GPUVideoViewVideoProcessor()
+  private val surfaceView = VideoProcessingGLSurfaceView(context, false, videoProcessor)
   private var layer: GPULayer? = null
-  private var videoSizeChanged: Boolean = false
-  private var videoSize: VideoSize? = null
   private var player: ExoPlayer? = null
-  private var surfaceWidth = 0
-  private var surfaceHeight = 0
   private val mainHandler = Handler(Looper.getMainLooper())
-  private val frameAvailable = AtomicBoolean(false)
-  private var surface: Surface? = null
-  private var surfaceTexture: SurfaceTexture? = null
-  private var externalTexture: Int? = null
-  private val externalTextureTransformMatrix: FloatArray = FloatArray(16)
-  private var frameBuffer: Int? = null
-  private var externalTextureRenderer: TextureRenderer? = null
-  private var lutBitmap: Bitmap? = null
-  private var lutImage: GLFrame? = null
-  private var colorLutEffect: ColorLUTEffect? = null;
-  private var image: GLFrame? = null
-  private var transformedImage: GLFrame? = null
-  private var textureRenderer: TextureRenderer? = null
-  private var effectContext: EffectContext? = null
 
   init {
     addView(surfaceView)
     reactContext.addLifecycleEventListener(this)
-    surfaceView.setEGLContextClientVersion(2)
-    surfaceView.setEGLConfigChooser(8, 8, 8, 8, 0, 0)
-    surfaceView.setRenderer(this)
-    surfaceView.setPreserveEGLContextOnPause(true)
-    surfaceView.setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY)
+    surfaceView.preserveEGLContextOnPause = true
   }
 
   private var _paused = false
@@ -106,6 +78,7 @@ import kotlin.math.round
 
     val oldLutFilterUri = layer?.lutFilterUri
     layer = newLayer;
+    videoProcessor.setLayer(newLayer)
 
     if (oldLutFilterUri != layer?.lutFilterUri) {
       loadLutBitmapIfNecessary()
@@ -118,167 +91,46 @@ import kotlin.math.round
     this.initPlayer()
   }
 
-  fun release() {
-    mainHandler.post {
-      player?.setVideoSurface(null)
-      player?.release()
-      if (surface != null) {
-        releaseSurface(surfaceTexture, surface)
-        surfaceTexture = null
-        surface = null
-      }
-    }
-    reactContext.removeLifecycleEventListener(this)
-  }
-
-  override fun onHostResume() {
-    if (!paused) {
-      player?.play()
-    }
-  }
-
-  override fun onHostPause() {
-    player?.pause()
-  }
-
-  override fun onHostDestroy() {
-    release()
-  }
-
-  override fun onSurfaceCreated(gl: GL10?, config: EGLConfig?) {
-    externalTexture = ShaderUtils.createTexture()
-    ShaderUtils.bindExternalTexture(externalTexture!!)
-
-    val surfaceTexture = SurfaceTexture(externalTexture!!)
-    surfaceTexture.setOnFrameAvailableListener {
-      frameAvailable.set(true)
-      surfaceView.requestRender()
+  private fun initPlayer() {
+    val uri = layer?.source?.uri
+    if (uri == null) {
+      this.player?.release()
+      this.player = null
+      surfaceView.setPlayer(null)
+      return
     }
 
-    if (image == null) {
-      image = GLFrame.create()
+    var player = this.player
+    if (player == null) {
+      player = ExoPlayer.Builder(context).build()
+      player.repeatMode = Player.REPEAT_MODE_ONE
+      player.volume = 0f
+      player.addListener(this)
+      this.player = player
     }
 
-    mainHandler.post {
-      val oldSurfaceTexture = this.surfaceTexture
-      val oldSurface = surface
-      this.surfaceTexture = surfaceTexture
-      surface = Surface(surfaceTexture)
-      releaseSurface(oldSurfaceTexture, oldSurface)
-      player?.setVideoSurface(surface)
-      player?.play()
+    if (player.mediaItemCount != 0) {
+      player.stop()
+      player.removeMediaItem(0)
     }
-  }
-
-  override fun onSurfaceChanged(gl: GL10?, width: Int, height: Int) {
-    surfaceWidth = width
-    surfaceHeight = height
-  }
-
-  override fun onDrawFrame(gl: GL10?) {
-    GLES20.glClearColor(0.0f, 0.0f, 0.0f, 1.0f)
-    GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT)
-
-    var image = this.image ?: return
-    val videoSize = this.videoSize ?: return
-
-    if (frameAvailable.compareAndSet(true, false)) {
-      surfaceTexture?.updateTexImage()
-      surfaceTexture?.getTransformMatrix(externalTextureTransformMatrix)
-
-      if (frameBuffer == null) {
-        frameBuffer = ShaderUtils.createFrameBuffer()
-      }
-
-      if (videoSizeChanged) {
-        ShaderUtils.bindRGBATexture(image.texture, videoSize.width, videoSize.height)
-        image.width = videoSize.width
-        image.height = videoSize.height
-        videoSizeChanged = false
-      }
-
-      GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, frameBuffer!!)
-      GLES20.glFramebufferTexture2D(
-        GLES20.GL_FRAMEBUFFER,
-        GLES20.GL_COLOR_ATTACHMENT0,
-        GLES20.GL_TEXTURE_2D,
-        image.texture,
-        0
+    val mediaItemBuilder = MediaItem.Builder().setUri(uri)
+    if(layer?.source?.startTime != null){
+      val start = layer!!.source.startTime!!.toLong() * 1000L;
+      mediaItemBuilder.setClippingConfiguration(
+        MediaItem.ClippingConfiguration.Builder().setStartPositionMs(start).setEndPositionMs(start + layer!!.source.duration!!.toLong() * 1000L).build()
       )
-
-      if (externalTextureRenderer == null) {
-        externalTextureRenderer = TextureRenderer(external = true, flipTexY = true)
-      }
-
-      GLES20.glClearColor(0.0f, 0.0f, 0.0f, 0.0f)
-      GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT)
-      externalTextureRenderer?.renderTexture(
-        externalTexture!!,
-        externalTextureTransformMatrix,
-        0,
-        0,
-        videoSize.width,
-        videoSize.height,
-        frameBuffer!!
-      )
-
-      val parameters = layer?.parameters
-      if (parameters != null) {
-        if (effectContext == null) {
-          effectContext = EffectContext.createWithCurrentGlContext()
-        }
-
-        this.transformedImage?.release()
-        this.transformedImage = null
-
-
-        this.transformedImage = GLFrameTransformations.applyEditorTransform(
-          image,
-          parameters,
-          effectContext!!.factory
-        )
-        image = this.transformedImage ?: image
-      }
-
-      val lutBitmap = lutBitmap
-      if (lutBitmap != null && lutImage == null) {
-        lutImage = GLFrame.create(lutBitmap.width, lutBitmap.height)
-        ShaderUtils.bindImageTexture(lutImage!!.texture, lutBitmap)
-      }
-      val lutImage = lutImage
-      if (lutImage != null) {
-        if (colorLutEffect == null) {
-          colorLutEffect = ColorLUTEffect()
-        }
-        val imageWithLut = colorLutEffect?.apply(
-          image,
-          lutImage,
-        )
-        if (imageWithLut != null) {
-          this.transformedImage?.release()
-          this.transformedImage = imageWithLut
-          image = this.transformedImage ?: image
-        }
-      }
     }
 
-    if (textureRenderer == null) {
-      textureRenderer = TextureRenderer(external = false, flipTexY = true)
-    }
+    player.addMediaItem(mediaItemBuilder.build())
 
-    textureRenderer?.renderTexture(
-      image.texture,
-      ShaderUtils.IDENT_MATRIX,
-      round(image.x * surfaceWidth.toFloat() / image.width.toFloat()).toInt(),
-      -round(image.y * surfaceHeight.toFloat() / image.height.toFloat()).toInt(),
-      surfaceWidth,
-      surfaceHeight
-    )
+    player.prepare()
+    surfaceView.setPlayer(player)
   }
+
+
   override fun onVideoSizeChanged(videoSize: VideoSize) {
     if (videoSize.width > 0 && videoSize.height > 0) {
-      this.videoSize = videoSize
-      videoSizeChanged = true
+      videoProcessor.setVideoSize(videoSize)
     }
   }
 
@@ -308,6 +160,7 @@ import kotlin.math.round
 
   override fun onPlaybackStateChanged(playbackState: Int) {
     val eventListener = (context as ReactContext).getJSModule(RCTEventEmitter::class.java)
+    Log.i(TAG, "Playback state $playbackState")
     if (playbackState == Player.STATE_READY) {
       eventListener.receiveEvent(
         this.id,
@@ -333,74 +186,197 @@ import kotlin.math.round
     )
   }
 
-  private fun initPlayer() {
-    val uri = layer?.source?.uri
-    if (uri == null) {
-      releasePlayer()
-      return
-    }
-
-    var player = this.player
-    if (player == null) {
-      player = ExoPlayer.Builder(context)
-        .setRenderersFactory(
-          // see https://github.com/google/ExoPlayer/issues/6168
-          DefaultRenderersFactory(context).setEnableDecoderFallback(true)
-        ).build()
-      player.repeatMode = Player.REPEAT_MODE_ONE
-      player.volume = 0f
-      player.addListener(this)
-      this.player = player
-    }
-
-    if (player.mediaItemCount != 0) {
-      player.stop()
-      player.removeMediaItem(0)
-    }
-    val mediaItemBuilder = MediaItem.Builder().setUri(uri)
-    if(layer?.source?.startTime != null){
-      val start = layer!!.source.startTime!!.toLong() * 1000L;
-      mediaItemBuilder.setClippingConfiguration(
-              MediaItem.ClippingConfiguration.Builder().setStartPositionMs(start).setEndPositionMs(start + layer!!.source.duration!!.toLong() * 1000L).build()
-      )
-    }
-
-    player.addMediaItem(mediaItemBuilder.build())
-
-    player.prepare()
-
-    if (surface != null) {
-      player.setVideoSurface(surface)
-      player.play()
-    }
-  }
-
-  private fun releasePlayer() {
-    this.player?.release()
-    this.player = null
-  }
-
-  private fun releaseSurface(oldSurfaceTexture: SurfaceTexture?, oldSurface: Surface?) {
-    oldSurfaceTexture?.release()
-    oldSurface?.release()
-  }
-
 
   private var loadLutJob: Deferred<Any>? = null
   private fun loadLutBitmapIfNecessary() {
     loadLutJob?.cancel()
-    lutBitmap = null
-    lutImage?.release()
-    lutImage = null
+    videoProcessor.setLutBitmap(null)
     val lutFilterUri = layer?.lutFilterUri;
     if (lutFilterUri != null) {
       loadLutJob = GlobalScope.async {
-        lutBitmap = GPULayerImageLoader.loadImage(lutFilterUri)
+        val bitmap = GPULayerImageLoader.loadImage(lutFilterUri)
+        videoProcessor.setLutBitmap(bitmap)
       }
     }
   }
 
+  override fun onHostResume() {
+    if (!paused) {
+      player?.play()
+    }
+  }
+
+  override fun onHostPause() {
+    player?.pause()
+  }
+
+
+  override fun onHostDestroy() {
+    release()
+  }
+
+  override fun onDetachedFromWindow() {
+    super.onDetachedFromWindow()
+    release()
+  }
+
+  fun release() {
+    mainHandler.post {
+      surfaceView.setPlayer(null)
+      player?.release()
+    }
+    reactContext.removeLifecycleEventListener(this)
+  }
+
+
   companion object {
     private const val TAG = "GPUVideoView"
+  }
+
+  private class GPUVideoViewVideoProcessor: VideoProcessingGLSurfaceView.VideoProcessor {
+    private var surfaceWidth = 0
+    private var surfaceHeight = 0
+
+    private var videoSize: VideoSize? = null
+
+    private var layer: GPULayer? = null
+
+    private val frameBufferPool = FrameBufferPool()
+
+    private var externalTextureRenderer: TextureRenderer? = null
+    private var textureRenderer: TextureRenderer? = null
+
+    private var effectContext: EffectContext? = null
+
+    private var lutChanged = false
+    private var lutBitmap: Bitmap? = null
+    private var lutImage: GLFrame? = null
+    private var colorLutEffect: ColorLUTEffect? = null;
+
+    override fun initialize() {
+      externalTextureRenderer = TextureRenderer(external = true, flipTexY = true)
+      textureRenderer = TextureRenderer(external = false, flipTexY = true)
+      colorLutEffect = ColorLUTEffect()
+      effectContext = EffectContext.createWithCurrentGlContext()
+    }
+
+    fun setVideoSize(videoSize: VideoSize) {
+      this.videoSize = videoSize
+    }
+
+    fun setLayer(layer: GPULayer?) {
+      this.layer = layer
+    }
+
+    fun setLutBitmap(bitmap: Bitmap?) {
+      if (bitmap == lutBitmap) {
+        return
+      }
+      lutChanged = true
+      lutBitmap = bitmap
+    }
+
+    override fun setSurfaceSize(width: Int, height: Int) {
+      surfaceWidth = width
+      surfaceHeight= height
+    }
+
+    override fun draw(frameTexture: Int, frameTimestampUs: Long, transformMatrix: FloatArray) {
+      GLES20.glClearColor(0.0f, 0.0f, 0.0f, 1.0f)
+      GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT)
+
+      var image = GLFrame.create()
+      val videoSize = this.videoSize ?: return
+
+      ShaderUtils.bindRGBATexture(image.texture, videoSize.width, videoSize.height)
+      image.width = videoSize.width
+      image.height = videoSize.height
+
+      val frameBuffer = frameBufferPool.getFrameBuffer()
+
+      GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, frameBuffer)
+      GLES20.glFramebufferTexture2D(
+        GLES20.GL_FRAMEBUFFER,
+        GLES20.GL_COLOR_ATTACHMENT0,
+        GLES20.GL_TEXTURE_2D,
+        image.texture,
+        0
+      )
+
+      GLES20.glClearColor(0.0f, 0.0f, 0.0f, 0.0f)
+      GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT)
+      externalTextureRenderer?.renderTexture(
+        frameTexture,
+        transformMatrix,
+        0,
+        0,
+        videoSize.width,
+        videoSize.height,
+        frameBuffer
+      )
+
+      frameBufferPool.releaseFrameBuffer(frameBuffer)
+
+
+      fun setImage(newImage: GLFrame) {
+        if (newImage === image) {
+          return;
+        }
+        image.release()
+        image = newImage
+      }
+
+      val parameters = layer?.parameters
+      if (parameters != null) {
+        val transformedImage = GLFrameTransformations.applyEditorTransform(
+          image,
+          parameters,
+          effectContext!!.factory
+        )
+        setImage(transformedImage)
+      }
+
+
+      if (lutChanged) {
+        lutImage?.release()
+        lutImage = null
+        lutChanged = false
+      }
+
+      val lutBitmap = lutBitmap
+      var lutImage = lutImage
+      if (lutBitmap != null && lutImage == null) {
+        lutImage = GLFrame.create(lutBitmap.width, lutBitmap.height)
+        ShaderUtils.bindImageTexture(lutImage.texture, lutBitmap)
+        this.lutImage = lutImage
+      }
+      if (lutImage != null) {
+        val imageWithLut = colorLutEffect?.draw(
+          image,
+          lutImage,
+          frameBufferPool
+        )
+        setImage(imageWithLut ?: image)
+      }
+
+      textureRenderer?.renderTexture(
+        image.texture,
+        ShaderUtils.IDENT_MATRIX,
+        round(image.x * surfaceWidth.toFloat() / image.width.toFloat()).toInt(),
+        -round(image.y * surfaceHeight.toFloat() / image.height.toFloat()).toInt(),
+        surfaceWidth,
+        surfaceHeight
+      )
+      image.release()
+    }
+
+    override fun release() {
+      frameBufferPool.release()
+      effectContext?.release()
+      externalTextureRenderer?.release()
+      textureRenderer?.release()
+      colorLutEffect?.release()
+      lutImage?.release()
+    }
   }
 }
