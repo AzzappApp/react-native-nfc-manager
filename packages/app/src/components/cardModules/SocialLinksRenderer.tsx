@@ -3,10 +3,10 @@ import {
   LayoutAnimation,
   Linking,
   Platform,
-  ScrollView,
   UIManager,
   View,
 } from 'react-native';
+import { ScrollView } from 'react-native-gesture-handler';
 import { graphql, readInlineData } from 'react-relay';
 import { swapColor } from '@azzapp/shared/cardHelpers';
 import {

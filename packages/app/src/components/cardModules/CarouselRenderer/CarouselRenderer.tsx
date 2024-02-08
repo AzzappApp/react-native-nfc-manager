@@ -1,5 +1,6 @@
 // import { useRef } from 'react';
-import { Image, ScrollView } from 'react-native';
+import { Image } from 'react-native';
+import { ScrollView } from 'react-native-gesture-handler';
 import { graphql, readInlineData } from 'react-relay';
 import { swapColor } from '@azzapp/shared/cardHelpers';
 import {
