@@ -1,5 +1,6 @@
-## 0.5.5-canary.62
+## 0.5.5-canary.63
 
+* **fix:**  - **Android:** GPUView improvment ([#2717](https://github.com/AzzappApp/azzapp/pull/2717))
 * **fix:**  - **android:** [#2634](https://github.com/AzzappApp/azzapp/pull/2634) crash on android with background-repeat ([#2709](https://github.com/AzzappApp/azzapp/pull/2709))
 * **fix:**  - **multiUser:** use global id in decline ownership ([#2699](https://github.com/AzzappApp/azzapp/pull/2699))
 * **fix:**  - **android:** try expo-camera on android ([#2698](https://github.com/AzzappApp/azzapp/pull/2698))
