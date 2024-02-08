@@ -1,5 +1,5 @@
 import chroma from 'chroma-js';
-import { useCallback, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { colors } from '#theme';
 import CardModuleBackgroundImage from './CardModuleBackgroundImage';
@@ -38,6 +38,13 @@ const CardModuleBackground = ({
     ? chroma(backgroundColor).alpha(backgroundOpacity).hex()
     : colors.white;
 
+  const backgroundImageStyle = useMemo(
+    () =>
+      backgroundColor
+        ? [styles.background, { backgroundColor }]
+        : styles.background,
+    [backgroundColor],
+  );
   return (
     <View style={{ width: '100%', position: 'relative', overflow: 'hidden' }}>
       <View
@@ -48,10 +55,7 @@ const CardModuleBackground = ({
         {children}
       </View>
       {layout && (
-        <View
-          style={[styles.background, { backgroundColor }]}
-          pointerEvents="none"
-        >
+        <View style={backgroundImageStyle} pointerEvents="none">
           <CardModuleBackgroundImage
             backgroundOpacity={backgroundOpacity}
             backgroundUri={backgroundUri}

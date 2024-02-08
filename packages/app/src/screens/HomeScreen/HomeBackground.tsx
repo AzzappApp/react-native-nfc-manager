@@ -1,13 +1,5 @@
-import {
-  Canvas,
-  RadialGradient,
-  Rect,
-  vec,
-  LinearGradient,
-} from '@shopify/react-native-skia';
 import _ from 'lodash';
 import { useMemo } from 'react';
-import { useWindowDimensions, View, StyleSheet } from 'react-native';
 import {
   interpolateColor,
   useDerivedValue,
@@ -15,6 +7,7 @@ import {
 } from 'react-native-reanimated';
 import { graphql, useFragment } from 'react-relay';
 import { colors } from '#theme';
+import WebCardBackground from '#components/WebCardBackground';
 import type { HomeBackground_user$key } from '#relayArtifacts/HomeBackground_user.graphql';
 import type { SharedValue } from 'react-native-reanimated';
 
@@ -27,8 +20,6 @@ const HomeBackground = ({
   user: userKey,
   currentProfileIndexSharedValue,
 }: HomeBackgroundProps) => {
-  const { width, height } = useWindowDimensions();
-
   const user = useFragment(
     graphql`
       fragment HomeBackground_user on User {
@@ -92,27 +83,7 @@ const HomeBackground = ({
     return ['#45444b', '#45444b'];
   }, [inputRange, primaryColors, darkColors]);
 
-  return (
-    <View style={StyleSheet.absoluteFill}>
-      <Canvas style={{ flex: 1 }}>
-        <Rect x={0} y={0} width={width} height={height}>
-          <RadialGradient
-            c={vec(width / 2, 0)}
-            r={width * 1.3}
-            colors={skiaGradient}
-          />
-        </Rect>
-        <Rect x={0} y={0} width={width} height={height}>
-          <LinearGradient
-            start={vec(width / 2, 0)}
-            end={vec(width / 2, height * 0.66)}
-            positions={[0.22, 0.66]}
-            colors={['rgba(0, 0, 0,0)', 'rgba(0, 0, 0,0.2)']}
-          />
-        </Rect>
-      </Canvas>
-    </View>
-  );
+  return <WebCardBackground colors={skiaGradient} />;
 };
 
 export default HomeBackground;
