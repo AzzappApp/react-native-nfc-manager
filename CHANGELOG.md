@@ -1,5 +1,8 @@
-## 0.5.5-canary.64
+## 0.5.5-canary.65
 
+* **fix:**  - **android:** [#2632](https://github.com/AzzappApp/azzapp/pull/2632) perf issues with many pictures in webcard ([#2738](https://github.com/AzzappApp/azzapp/pull/2738))
+* **build:**  - upgrade deps ([#2736](https://github.com/AzzappApp/azzapp/pull/2736))
+* **perf:**  - **android:** memoize + don’t listen on invited webcards ([#2741](https://github.com/AzzappApp/azzapp/pull/2741))
 * **fix:**  - **android:** [#2729](https://github.com/AzzappApp/azzapp/pull/2729) case when assets array if empty ([#2730](https://github.com/AzzappApp/azzapp/pull/2730))
 * **fix:**  - **android:** [#2649](https://github.com/AzzappApp/azzapp/pull/2649) use scrollview from gesture-handler to allow cross gesture handler ([#2731](https://github.com/AzzappApp/azzapp/pull/2731))
 * **fix:**  - **android:** [#2719](https://github.com/AzzappApp/azzapp/pull/2719) replace react-native-svg to skia to fix crashes due to large bitmap ([#2725](https://github.com/AzzappApp/azzapp/pull/2725))
