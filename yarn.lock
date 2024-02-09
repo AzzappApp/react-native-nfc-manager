@@ -5035,13 +5035,13 @@
     recyclerlistview "4.2.0"
     tslib "2.4.0"
 
-"@shopify/react-native-skia@^0.1.237":
-  version "0.1.237"
-  resolved "https://registry.yarnpkg.com/@shopify/react-native-skia/-/react-native-skia-0.1.237.tgz#db7a19b76462371bf076715a5f4645faa6f85b51"
-  integrity sha512-PTV81LvmIHt1cmkUjCf6l8q/owppgGEJPn5OCXOKdB82Up0bzY08iOUCGeWqcPo31FNdkz+dAyLHRnS3i/OF2g==
+"@shopify/react-native-skia@^0.1.238":
+  version "0.1.238"
+  resolved "https://registry.yarnpkg.com/@shopify/react-native-skia/-/react-native-skia-0.1.238.tgz#e1f87a943881daa5cc7ca8d70a0fc686e882ba6d"
+  integrity sha512-XWB8dyfa+jigOfr24s8gcuCrSSTeik3OvN81hUSr2sS+XZPci57QlE8zfRtwTgxxjRqGcsB4KxyR8KNL4564cA==
   dependencies:
     canvaskit-wasm "0.39.1"
-    react-reconciler "^0.27.0"
+    react-reconciler "0.27.0"
 
 "@sideway/address@^4.1.0", "@sideway/address@^4.1.5":
   version "4.1.5"
@@ -5281,6 +5281,11 @@
   version "2.4.3"
   resolved "https://registry.yarnpkg.com/@types/chroma-js/-/chroma-js-2.4.3.tgz#2f10bd16483a87d8ead68764fc439550e9c4cbb6"
   integrity sha512-1ly5ly/7S/YF8aD7MxUQnFOZxdegimuOunJl0xDsLlguu5JrwuSTVGVH3UpIUlh6YauI0RMNT4cqjBonhgbdIQ==
+
+"@types/chroma-js@^2.4.4":
+  version "2.4.4"
+  resolved "https://registry.yarnpkg.com/@types/chroma-js/-/chroma-js-2.4.4.tgz#254dddff54568ff8e5d0dcdb071871a458fdfd31"
+  integrity sha512-/DTccpHTaKomqussrn+ciEvfW4k6NAHzNzs/sts1TCqg333qNxOhy8TNIoQCmbGG3Tl8KdEhkGAssb1n3mTXiQ==
 
 "@types/eslint@7 || 8":
   version "8.56.2"
@@ -12893,10 +12898,10 @@ react-freeze@^1.0.0:
   resolved "https://registry.yarnpkg.com/react-freeze/-/react-freeze-1.0.3.tgz#5e3ca90e682fed1d73a7cb50c2c7402b3e85618d"
   integrity sha512-ZnXwLQnGzrDpHBHiC56TXFXvmolPeMjTn1UOm610M4EXGzbEDR7oOIyS2ZiItgbs6eZc4oU/a0hpk8PrcKvv5g==
 
-react-hook-form@^7.50.0:
-  version "7.50.0"
-  resolved "https://registry.yarnpkg.com/react-hook-form/-/react-hook-form-7.50.0.tgz#379802d85c7b78e0056229c53607946d34f99a36"
-  integrity sha512-AOhuzM3RdP09ZCnq+Z0yvKGHK25yiOX5phwxjV9L7U6HMla10ezkBnvQ+Pk4GTuDfsC5P2zza3k8mawFwFLVuQ==
+react-hook-form@^7.50.1:
+  version "7.50.1"
+  resolved "https://registry.yarnpkg.com/react-hook-form/-/react-hook-form-7.50.1.tgz#f6aeb17a863327e5a0252de8b35b4fc8990377ed"
+  integrity sha512-3PCY82oE0WgeOgUtIr3nYNNtNvqtJ7BZjsbxh6TnYNbXButaD5WpjOmTjdxZfheuHKR68qfeFnEDVYoSSFPMTQ==
 
 react-intl@^6.6.1, react-intl@^6.6.2:
   version "6.6.2"
@@ -12995,10 +13000,10 @@ react-native-haptic-feedback@^2.2.0:
   resolved "https://registry.yarnpkg.com/react-native-haptic-feedback/-/react-native-haptic-feedback-2.2.0.tgz#bc46edd1f053265bfbe6c32487cbce074e099429"
   integrity sha512-3tqJOjCguWhIrX0nkURn4yw6kXdsSDjjrvZCRjKXYGlL28hdQmoW2okAHduDTD9FWj9lA+lHgwFWgGs4aFNN7A==
 
-react-native-keyboard-controller@^1.10.5:
-  version "1.10.5"
-  resolved "https://registry.yarnpkg.com/react-native-keyboard-controller/-/react-native-keyboard-controller-1.10.5.tgz#0a3f6edf61b3a2ef64cd179a4a9902d0f64f29de"
-  integrity sha512-aKiDqx5XJf6J7/WX4RUgCwjqD0XC9fRUMe8akD1XbrFiUMux/MrvS4siwepiOzfHnabJ8qIj+QOKxAzKaKNEeQ==
+react-native-keyboard-controller@^1.10.6:
+  version "1.10.6"
+  resolved "https://registry.yarnpkg.com/react-native-keyboard-controller/-/react-native-keyboard-controller-1.10.6.tgz#ac9d74218e9e51168455aa388c21094470647a1c"
+  integrity sha512-UlXWtM4FvsJUYRFYKSN1ubummuOLSsQAPUAVk91fyfJJ4nM06lf0Nbx3xen6vT9CtohP3thL8cQp2Z+38N+Eiw==
 
 react-native-localize@^3.0.6:
   version "3.0.6"
@@ -13050,10 +13055,10 @@ react-native-quick-base64@^2.0.8:
   dependencies:
     base64-js "^1.5.1"
 
-react-native-reanimated@~3.6.2:
-  version "3.6.2"
-  resolved "https://registry.yarnpkg.com/react-native-reanimated/-/react-native-reanimated-3.6.2.tgz#8a48c37251cbd3b665a659444fa9778f5b510356"
-  integrity sha512-IIMREMOrxhtK35drfpzh2UhxNqAOHnuvGgtMofj7yHcMj16tmWZR2zFvMUf6z2MfmXv+aVgFQ6TRZ6yKYf7LNA==
+react-native-reanimated@~3.7.0:
+  version "3.7.0"
+  resolved "https://registry.yarnpkg.com/react-native-reanimated/-/react-native-reanimated-3.7.0.tgz#ad36b86533c0aa5e64795b05588dfd656d490039"
+  integrity sha512-KM+MKa3CJWqsF4GlOLLKBxTR2NEcrg5/HP9J2b6Dfgvll1sjZPywCOEEIh967SboEU8N9LjYZuoVm2UoXGxp2Q==
   dependencies:
     "@babel/plugin-transform-object-assign" "^7.16.7"
     "@babel/preset-typescript" "^7.16.7"
@@ -13171,7 +13176,7 @@ react-native@^0.73.4:
     ws "^6.2.2"
     yargs "^17.6.2"
 
-react-reconciler@^0.27.0:
+react-reconciler@0.27.0:
   version "0.27.0"
   resolved "https://registry.yarnpkg.com/react-reconciler/-/react-reconciler-0.27.0.tgz#360124fdf2d76447c7491ee5f0e04503ed9acf5b"
   integrity sha512-HmMDKciQjYmBRGuuhIaKA1ba/7a+UsM5FzOZsMO2JYHt9Jh8reCb7j1eDC95NOyUlKM9KRyvdx0flBuDvYSBoA==
