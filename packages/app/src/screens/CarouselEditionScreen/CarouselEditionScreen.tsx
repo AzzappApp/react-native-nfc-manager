@@ -374,7 +374,9 @@ const CarouselEditionScreen = ({
           {
             local: true,
             id: localPath,
-            uri: `file://${localPath.replace('file://', '')}`,
+            uri: localPath.startsWith('file')
+              ? localPath
+              : `file://${localPath}`,
             aspectRatio,
           },
         ],
