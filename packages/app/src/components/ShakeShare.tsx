@@ -34,11 +34,13 @@ const ShakeShare = () => {
     setMountScreen(false);
   }, []);
 
-  useShakeDetector(() => {
-    if (profileInfos && profileInfos.profileRole !== 'invited') {
-      setMountScreen(true);
-    }
-  });
+  const hasProfile = !!(profileInfos && profileInfos.profileRole !== 'invited');
+
+  const activateDetector = useCallback(() => {
+    setMountScreen(true);
+  }, []);
+
+  useShakeDetector(activateDetector, hasProfile);
 
   //Gesture to close on swipe
   const fling = Gesture.Fling()
@@ -46,7 +48,7 @@ const ShakeShare = () => {
     .runOnJS(true)
     .onEnd(dismount);
 
-  if (!mountScreen || !profileInfos?.webCardId) {
+  if (!mountScreen) {
     return null;
   }
   return (
@@ -195,42 +197,48 @@ const atLeastRequiredForce = (a: number) => {
   return Math.abs(a) > REQUIRED_FORCE;
 };
 
-const useShakeDetector = (callback: () => void) => {
+const useShakeDetector = (callback: () => void, activated: boolean) => {
   const lastShakeTimestamp = useSharedValue(0);
   const numShakes = useSharedValue(0);
   const accelX = useSharedValue(0);
   const accelY = useSharedValue(0);
   const accelZ = useSharedValue(0);
 
-  const reset = () => {
+  const reset = useCallback(() => {
     'worklet';
     lastShakeTimestamp.value = 0;
     numShakes.value = 0;
     accelX.value = 0;
     accelY.value = 0;
     accelZ.value = 0;
-  };
+  }, [accelX, accelY, accelZ, lastShakeTimestamp, numShakes]);
 
   const gyroscope = useAnimatedSensor(SensorType.ACCELEROMETER);
 
-  const recordShake = (timestamp: number) => {
-    'worklet';
-    lastShakeTimestamp.value = timestamp;
-    numShakes.value++;
-  };
+  const recordShake = useCallback(
+    (timestamp: number) => {
+      'worklet';
+      lastShakeTimestamp.value = timestamp;
+      numShakes.value++;
+    },
+    [lastShakeTimestamp, numShakes],
+  );
 
   const callbackRef = useLatestCallback(callback);
-  const maybeDispatchShake = (timeStamp: number) => {
-    'worklet';
-    if (numShakes.value >= 8) {
-      reset();
-      runOnJS(callbackRef)();
-    }
+  const maybeDispatchShake = useCallback(
+    (timeStamp: number) => {
+      'worklet';
+      if (numShakes.value >= 8) {
+        reset();
+        runOnJS(callbackRef)();
+      }
 
-    if (timeStamp - lastShakeTimestamp.value > 3000) {
-      reset();
-    }
-  };
+      if (timeStamp - lastShakeTimestamp.value > 3000) {
+        reset();
+      }
+    },
+    [callbackRef, lastShakeTimestamp.value, numShakes.value, reset],
+  );
 
   const sensorValue = useDerivedValue(() => {
     const { x, y, z } = gyroscope.sensor.value;
@@ -244,20 +252,23 @@ const useShakeDetector = (callback: () => void) => {
   useAnimatedReaction(
     () => sensorValue.value,
     ({ ax, ay, az }) => {
-      const timeStamp = Date.now();
+      if (activated) {
+        const timeStamp = Date.now();
 
-      if (atLeastRequiredForce(ax) && ax * accelX.value <= 0) {
-        recordShake(timeStamp);
-        accelX.value = ax;
-      } else if (atLeastRequiredForce(ay) && ay * accelY.value <= 0) {
-        recordShake(timeStamp);
-        accelX.value = ay;
-      } else if (atLeastRequiredForce(az) && az * accelZ.value <= 0) {
-        recordShake(timeStamp);
-        accelX.value = az;
+        if (atLeastRequiredForce(ax) && ax * accelX.value <= 0) {
+          recordShake(timeStamp);
+          accelX.value = ax;
+        } else if (atLeastRequiredForce(ay) && ay * accelY.value <= 0) {
+          recordShake(timeStamp);
+          accelX.value = ay;
+        } else if (atLeastRequiredForce(az) && az * accelZ.value <= 0) {
+          recordShake(timeStamp);
+          accelX.value = az;
+        }
+
+        maybeDispatchShake(timeStamp);
       }
-
-      maybeDispatchShake(timeStamp);
     },
+    [activated],
   );
 };
