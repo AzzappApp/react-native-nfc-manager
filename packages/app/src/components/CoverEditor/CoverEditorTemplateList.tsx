@@ -34,6 +34,7 @@ import {
   type EditionParameters,
   cropDataForAspectRatio,
 } from '#components/gpu';
+import { useScreenHasFocus } from '#components/NativeRouter';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import ActivityIndicator from '#ui/ActivityIndicator';
 import CarouselSelectList from '#ui/CarouselSelectList';
@@ -774,6 +775,7 @@ const CoverEditorTemplateRenderer = ({
   templateKind: CoverTemplateKind;
   onPress: () => void;
 }) => {
+  const hasFocus = useScreenHasFocus();
   const { mediaInfos, style } = item;
   const { uri, kind } = mediaInfos.sourceMedia;
   const colorPaletteIndex = colorPalettesIndexes[item.id] ?? 0;
@@ -889,7 +891,9 @@ const CoverEditorTemplateRenderer = ({
           }
           width={width}
           videoPreview={Platform.OS !== 'android'}
-          videoDisabled={!isSelectedItem}
+          videoDisabled={
+            !isSelectedItem || (Platform.OS === 'android' && !hasFocus)
+          }
           paused={videoPaused || mediaComputing}
           style={coverPreviewRendererStyle}
           onStartLoading={onStartLoading}

@@ -9,7 +9,7 @@ import ImagePicker, {
 } from '#components/ImagePicker';
 import type { ImagePickerProps } from '#components/ImagePicker/ImagePicker';
 
-const CoverEditiorImagePicker = (
+const CoverEditorImagePicker = (
   props: Omit<
     ImagePickerProps,
     'forceAspectRatio' | 'maxVideoDuration' | 'steps' | 'TopPanelWrapper'
@@ -24,4 +24,4 @@ const CoverEditiorImagePicker = (
   />
 );
 
-export default CoverEditiorImagePicker;
+export default CoverEditorImagePicker;

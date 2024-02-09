@@ -780,7 +780,7 @@ export const ScreensRenderer = ({
         defaultScreenOptions={defaultScreenOptions}
         onFinishTransitioning={onFinishTransitioning}
         onScreenDismissed={onScreenDismissed}
-        hasFocus
+        hasFocus={modals.length === 0}
       >
         {modals.map(
           ({ id, children, animationType, onWillAppear, onDisappear }) => (
