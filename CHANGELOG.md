@@ -1,5 +1,6 @@
-## 0.5.5-canary.66
+## 0.5.5-canary.67
 
+* **fix:**  - **Android:** refactor filter system ([#2759](https://github.com/AzzappApp/azzapp/pull/2759))
 * **fix:**  - **android:** [#2722](https://github.com/AzzappApp/azzapp/pull/2722) disable video when image picker is opened ([#2752](https://github.com/AzzappApp/azzapp/pull/2752))
 * **fix:**  - **contactCard:** [#2753](https://github.com/AzzappApp/azzapp/pull/2753) manage specific extension for vcard ([#2754](https://github.com/AzzappApp/azzapp/pull/2754))
 * **fix:**  - wrong sentry configuration for users ([#2755](https://github.com/AzzappApp/azzapp/pull/2755))
