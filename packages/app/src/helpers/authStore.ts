@@ -17,6 +17,10 @@ const MMKVS_HAS_BEEN_SIGNED_IN = '@azzap/auth.hasBeenSignedIn';
  */
 export type ProfileInfos = {
   /**
+   * the current user id
+   */
+  userId: string;
+  /**
    * the current user profile id
    */
   profileId: string;
@@ -28,6 +32,18 @@ export type ProfileInfos = {
    * the current user profile role
    */
   profileRole: string;
+  /**
+   * the current user userName
+   */
+  userName: string;
+  /**
+   * the current user email
+   */
+  email: string | null;
+  /**
+   * the current user phoneNumber
+   */
+  phoneNumber: string | null;
 };
 
 /**
@@ -64,11 +80,15 @@ export const init = async () => {
 
   addGlobalEventListener(
     'SIGN_UP',
-    async ({ payload: { authTokens: tokens } }) => {
+    async ({ payload: { authTokens: tokens, email, phoneNumber, userId } }) => {
       storage.set(MMKVS_HAS_BEEN_SIGNED_IN, true);
       await EncryptedStorage.setItem(
         ENCRYPTED_STORAGE_TOKENS_KEY,
         JSON.stringify(tokens),
+      );
+      storage.set(
+        MMKVS_PROFILE_INFOS,
+        JSON.stringify({ email, phoneNumber, userId }),
       );
       authTokens = tokens;
       emitAuthState();
@@ -77,9 +97,14 @@ export const init = async () => {
 
   addGlobalEventListener(
     'SIGN_IN',
-    async ({ payload: { authTokens: tokens, profileInfos } }) => {
+    async ({
+      payload: { authTokens: tokens, profileInfos, email, phoneNumber, userId },
+    }) => {
       if (profileInfos) {
-        storage.set(MMKVS_PROFILE_INFOS, JSON.stringify(profileInfos));
+        storage.set(
+          MMKVS_PROFILE_INFOS,
+          JSON.stringify({ ...profileInfos, email, phoneNumber, userId }),
+        );
       }
       storage.set(MMKVS_HAS_BEEN_SIGNED_IN, true);
       await EncryptedStorage.setItem(
@@ -94,9 +119,10 @@ export const init = async () => {
   addGlobalEventListener(
     'WEBCARD_CHANGE',
     async ({ payload: { profileId, webCardId, profileRole } }) => {
+      const profileInfos = getAuthState().profileInfos;
       storage.set(
         MMKVS_PROFILE_INFOS,
-        JSON.stringify({ profileId, webCardId, profileRole }),
+        JSON.stringify({ ...profileInfos, profileId, webCardId, profileRole }),
       );
       emitAuthState();
     },

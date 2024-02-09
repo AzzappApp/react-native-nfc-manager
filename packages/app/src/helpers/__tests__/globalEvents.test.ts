@@ -9,7 +9,11 @@ describe('globalEvents', () => {
     void dispatchGlobalEvent({
       type: 'SIGN_IN',
       payload: {
-        authTokens: { token: 'mockToken', refreshToken: 'mockRefreshToken' },
+        authTokens: {
+          token: 'mockToken',
+          refreshToken: 'mockRefreshToken',
+        },
+        userId: '',
       },
     });
     expect(listener).toHaveBeenCalledTimes(1);
@@ -18,6 +22,7 @@ describe('globalEvents', () => {
       type: 'SIGN_IN',
       payload: {
         authTokens: { token: 'mockToken', refreshToken: 'mockRefreshToken' },
+        userId: '',
       },
     });
     expect(listener).toHaveBeenCalledTimes(1);

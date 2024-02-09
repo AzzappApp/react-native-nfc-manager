@@ -61,6 +61,8 @@ describe('SignUpScreen', () => {
       refreshToken: 'fake-refreshToken',
       profileInfos: null,
       userId: '',
+      email: 'test@azzapp.com',
+      phoneNumber: null,
     });
     dispatchGlobalEventMock.mockResolvedValueOnce(void 0);
 
@@ -90,6 +92,9 @@ describe('SignUpScreen', () => {
           token: 'fake-token',
           refreshToken: 'fake-refreshToken',
         },
+        email: 'test@azzapp.com',
+        phoneNumber: null,
+        userId: '',
       },
     });
   });
@@ -101,6 +106,8 @@ describe('SignUpScreen', () => {
       refreshToken: 'fake-refreshToken',
       profileInfos: null,
       userId: '',
+      email: null,
+      phoneNumber: '+1 212 688 0188',
     });
 
     const emailOrCountryButton = screen.getByLabelText(
@@ -139,6 +146,9 @@ describe('SignUpScreen', () => {
           token: 'fake-token',
           refreshToken: 'fake-refreshToken',
         },
+        email: null,
+        phoneNumber: '+1 212 688 0188',
+        userId: '',
       },
     });
   });

@@ -19,6 +19,8 @@ export const handleSignInAuthMethod = async (
           webCardId: toGlobalId('WebCard', profile.webCardId),
         }
       : null,
+    email: user.email,
+    phoneNumber: user.phoneNumber,
     userId: user.id,
     token,
     refreshToken,

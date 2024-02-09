@@ -218,7 +218,7 @@ const AppRouter = () => {
   const initialRoutes = useMemo(() => {
     const { authenticated, hasBeenSignedIn, profileInfos } = getAuthState();
     return authenticated
-      ? mainRoutes(!profileInfos)
+      ? mainRoutes(!profileInfos?.profileId)
       : hasBeenSignedIn
         ? signInRoutes
         : signUpRoutes;
@@ -236,7 +236,7 @@ const AppRouter = () => {
         authenticated &&
         unauthenticatedRoutes.includes(currentRoute)
       ) {
-        router.replaceAll(mainRoutes(!profileInfos));
+        router.replaceAll(mainRoutes(!profileInfos?.profileId));
       }
     }
   }, [authenticated, profileInfos, router]);
@@ -260,11 +260,20 @@ const AppRouter = () => {
 
   // #region Sentry Routing Instrumentation
   useEffect(() => {
-    Sentry.setUser(
-      profileInfos?.profileId
-        ? { id: fromGlobalId(profileInfos.profileId).id }
-        : null,
-    );
+    Sentry.withScope(scope => {
+      scope.setUser({
+        id: profileInfos?.userId,
+        username: profileInfos?.email ?? profileInfos?.phoneNumber ?? undefined,
+        email: profileInfos?.email ?? undefined,
+        phoneNumber: profileInfos?.phoneNumber,
+      });
+
+      if (profileInfos) {
+        scope.setTag('profileId', fromGlobalId(profileInfos.profileId).id);
+        scope.setTag('webCardId', fromGlobalId(profileInfos.webCardId).id);
+        scope.setTag('profileRole', profileInfos.profileRole);
+      }
+    });
   }, [profileInfos]);
 
   useEffect(() => {

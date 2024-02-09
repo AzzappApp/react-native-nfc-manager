@@ -42,7 +42,7 @@ const WelcomeScreen = () => {
 
   useFocusEffect(goBackToHome);
 
-  return profileInfos ? (
+  return profileInfos?.profileId ? (
     <Container
       style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}
     >

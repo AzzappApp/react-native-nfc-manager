@@ -70,6 +70,8 @@ export const signup: APIMethod<
       profileId: string;
       webCardId: string;
     } | null;
+    email: string | null;
+    phoneNumber: string | null;
   }
 > = (data, init) =>
   apiFetch(`${API_ENDPOINT}/signup`, {
@@ -104,6 +106,8 @@ export const signin: APIMethod<
       profileId: string;
       webCardId: string;
     } | null;
+    email: string | null;
+    phoneNumber: string | null;
   }
 > = (data, init) =>
   apiFetch(`${API_ENDPOINT}/signin`, {

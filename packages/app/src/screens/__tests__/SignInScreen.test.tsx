@@ -47,6 +47,8 @@ describe('Signin Screen', () => {
         webCardId: 'fake-webCardId',
         profileRole: 'editor',
       },
+      email: 'fake-email',
+      phoneNumber: 'fake-phoneNumber',
     });
 
     const credentialInput = screen.getByPlaceholderText(
@@ -78,6 +80,9 @@ describe('Signin Screen', () => {
           profileRole: 'editor',
           webCardId: 'fake-webCardId',
         },
+        email: 'fake-email',
+        phoneNumber: 'fake-phoneNumber',
+        userId: 'fake-userId',
       },
     });
   });

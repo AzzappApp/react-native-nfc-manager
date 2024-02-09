@@ -5,6 +5,9 @@ export type SIGN_UP_EVENTS = {
   type: 'SIGN_UP';
   payload: {
     authTokens: { token: string; refreshToken: string };
+    email?: string | null;
+    phoneNumber?: string | null;
+    userId: string;
   };
 };
 
@@ -20,6 +23,9 @@ export type SIGN_IN = {
       webCardId: string;
       profileRole: string;
     } | null;
+    email?: string | null;
+    phoneNumber?: string | null;
+    userId: string;
   };
 };
 

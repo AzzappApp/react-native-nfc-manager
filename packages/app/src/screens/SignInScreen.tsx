@@ -22,7 +22,6 @@ import PressableOpacity from '#ui/PressableOpacity';
 import SecuredTextInput from '#ui/SecuredTextInput';
 import Text from '#ui/Text';
 import TextInput from '#ui/TextInput';
-import type { ProfileInfos } from '#helpers/authStore';
 import type { TextInput as NativeTextInput } from 'react-native';
 
 const SignInScreen = () => {
@@ -52,28 +51,30 @@ const SignInScreen = () => {
     }
     setCredentialInvalid(false);
 
-    let token: string;
-    let refreshToken: string;
-    let profileInfos: ProfileInfos | null = null;
     try {
       setIsSubmitting(true);
-      ({ token, refreshToken, profileInfos } = await signin({
-        credential: intlPhoneNumber ?? credential,
-        password,
-      }));
+      const { token, refreshToken, profileInfos, email, phoneNumber, userId } =
+        await signin({
+          credential: intlPhoneNumber ?? credential,
+          password,
+        });
+
+      await dispatchGlobalEvent({
+        type: 'SIGN_IN',
+        payload: {
+          authTokens: { token, refreshToken },
+          profileInfos,
+          email,
+          phoneNumber,
+          userId,
+        },
+      });
     } catch (error) {
       //TODO handle more error cases ?
       setSigninError(true);
       setIsSubmitting(false);
       return;
     }
-    await dispatchGlobalEvent({
-      type: 'SIGN_IN',
-      payload: {
-        authTokens: { token, refreshToken },
-        profileInfos: profileInfos ?? null,
-      },
-    });
   }, [credential, password]);
 
   const passwordRef = useRef<NativeTextInput>(null);

@@ -7,6 +7,9 @@
 const path = require('path');
 const { getDefaultConfig, mergeConfig } = require('@react-native/metro-config');
 const {
+  createSentryMetroSerializer,
+} = require('@sentry/react-native/dist/js/tools/sentryMetroSerializer');
+const {
   getMetroAndroidAssetsResolutionFix,
 } = require('react-native-monorepo-tools');
 
@@ -27,6 +30,9 @@ module.exports = mergeConfig(getDefaultConfig(__dirname), {
     enhanceMiddleware: middleware => {
       return androidAssetsResolutionFix.applyMiddleware(middleware);
     },
+  },
+  serializer: {
+    customSerializer: createSentryMetroSerializer(),
   },
   watchFolders: [path.resolve(__dirname, '../../')],
 });

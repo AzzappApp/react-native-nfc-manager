@@ -26,9 +26,7 @@ import HyperLink from '#ui/HyperLink';
 import SecuredTextInput from '#ui/SecuredTextInput';
 import Text from '#ui/Text';
 import type { EmailPhoneInput } from '#components/EmailOrPhoneInput';
-import type { ProfileInfos } from '#helpers/authStore';
 import type { CheckboxStatus } from '#ui/CheckBox';
-import type { TokensResponse } from '@azzapp/shared/WebAPI';
 import type { TextInput as NativeTextInput } from 'react-native';
 
 const SignupScreen = () => {
@@ -83,10 +81,7 @@ const SignupScreen = () => {
     canSignup &&= tosValid;
 
     if (canSignup) {
-      let tokens: TokensResponse & {
-        userId: string;
-        profileInfos: ProfileInfos | null;
-      };
+      let tokens: Awaited<ReturnType<typeof signup>>;
       try {
         setIsSubmitting(true);
         const locale = getCurrentLocale();
@@ -117,6 +112,9 @@ const SignupScreen = () => {
                 refreshToken: tokens.refreshToken,
               },
               profileInfos: profileInfos ?? null,
+              email: tokens.email,
+              phoneNumber: tokens.phoneNumber,
+              userId: tokens.userId,
             },
           });
         } else {
@@ -127,6 +125,9 @@ const SignupScreen = () => {
                 token: tokens.token,
                 refreshToken: tokens.refreshToken,
               },
+              email: tokens.email,
+              phoneNumber: tokens.phoneNumber,
+              userId: tokens.userId,
             },
           });
           setIsSubmitting(false);

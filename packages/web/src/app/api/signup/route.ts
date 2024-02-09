@@ -87,10 +87,10 @@ export const POST = async (req: Request) => {
         return handleExistingUser(user, password);
       }
     }
-
+    const userPhoneNumber = phoneNumber?.replace(/\s/g, '') ?? null;
     const userId = await createUser({
       email: email ?? null,
-      phoneNumber: phoneNumber?.replace(/\s/g, '') ?? null,
+      phoneNumber: userPhoneNumber,
       password: bcrypt.hashSync(password, 12),
       locale: locale ?? null,
       roles: null,
@@ -100,7 +100,14 @@ export const POST = async (req: Request) => {
       userId,
     });
 
-    return NextResponse.json({ ok: true, token, refreshToken });
+    return NextResponse.json({
+      ok: true,
+      token,
+      refreshToken,
+      email: email ?? null,
+      phoneNumber: userPhoneNumber,
+      userId,
+    });
   } catch (error) {
     console.error(error);
     Sentry.captureException(error);
