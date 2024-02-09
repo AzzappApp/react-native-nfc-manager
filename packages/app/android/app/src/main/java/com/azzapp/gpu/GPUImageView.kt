@@ -4,15 +4,14 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Color
 import android.graphics.PixelFormat
-import android.media.effect.EffectContext
 import android.net.Uri
 import android.opengl.GLES20
 import android.opengl.GLSurfaceView
 import android.util.Log
 import android.widget.FrameLayout
-import com.azzapp.gpu.effects.BlendEffect
-import com.azzapp.gpu.effects.ColorLUTEffect
-import com.azzapp.gpu.effects.TintColorEffect
+import com.azzapp.gpu.utils.GLFrame
+import com.azzapp.gpu.utils.GLObjectManager
+import com.azzapp.gpu.utils.GLESUtils
 import com.facebook.react.bridge.WritableNativeMap
 import com.facebook.react.uimanager.ThemedReactContext
 import com.facebook.react.uimanager.events.RCTEventEmitter
@@ -39,14 +38,9 @@ class GPUImageView(context: Context) : FrameLayout(context), GLSurfaceView.Rende
     private var bitmaps = mutableMapOf<String, Bitmap>()
     private var frames = mutableMapOf<String, GLFrame>()
 
-    private var frameBufferPool = FrameBufferPool()
+    private var glObjectManager = GLObjectManager()
 
     private var readyToDraw  = false
-
-    private var blendEffect: BlendEffect? = null
-    private var colorLutEffect: ColorLUTEffect? = null
-    private var tintColorEffect: TintColorEffect? = null
-    private var effectContext: EffectContext? = null
 
     private var surfaceWidth = 0
     private var surfaceHeight = 0
@@ -103,7 +97,14 @@ class GPUImageView(context: Context) : FrameLayout(context), GLSurfaceView.Rende
     }
 
     override fun onSurfaceCreated(gl: GL10?, config: EGLConfig?) {
-        // nothing
+        if (created) {
+            // the context has been we reset the glObjectManager to avoid
+            // using shader/texture created in a different context
+            try {
+                glObjectManager.release()
+            } catch(e: Error) {}
+            glObjectManager = GLObjectManager()
+        }
         created = true
         GLES20.glDisable(GLES20.GL_DEPTH_TEST)
 
@@ -149,7 +150,7 @@ class GPUImageView(context: Context) : FrameLayout(context), GLSurfaceView.Rende
             if (!frames.contains(key)) {
                 val frame = GLFrame.sharedFrame(key) {
                     val glFrame = GLFrame.create(bitmap.width, bitmap.height)
-                    ShaderUtils.bindImageTexture(glFrame.texture, bitmap)
+                    GLESUtils.bindImageTexture(glFrame.texture, bitmap)
                     glFrame
                 } ?: return
                 frames[key] = frame
@@ -158,100 +159,41 @@ class GPUImageView(context: Context) : FrameLayout(context), GLSurfaceView.Rende
 
         var layers = layers ?: return
 
+        val layersWithImages = mutableListOf <Pair<GPULayer, GPULayer.Companion.LayerImages>>()
+
         for (layer in layers) {
-            val sourceImage = frames[layer.source.stringRepresentation()] ?: continue
-            var image = sourceImage
-
-            fun setImage(value: GLFrame) {
-                if (image !== sourceImage && value !== image) {
-                    image.release()
-                }
-                image = value
-            }
-
-            if (layer.backgroundColor != null && layer.backgroundColor.lowercase() != "transparent") {
-                val color = try {
-                    Color.parseColor(layer.backgroundColor)
-                } catch (e: IllegalArgumentException){
-                    Color.BLACK
-                }
-                val r = (color shr 16 and 0xff) / 255.0f
-                val g = (color shr 8 and 0xff) / 255.0f
-                val b = (color and 0xff) / 255.0f
-                val a = (color shr 24 and 0xff) / 255.0f
-                GLES20.glClearColor(r, g, b, a)
-                GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT)
-            }
-
-            val maskImage = if (layer.maskUri != null)
-                frames[layer.maskUri.toString()] ?: continue
-            else null
-
-            if (maskImage != null) {
-                var blendEffect = this.blendEffect
-                if (blendEffect == null) {
-                    blendEffect = BlendEffect()
-                    this.blendEffect = blendEffect
-                }
-                setImage(blendEffect.draw(image, maskImage, frameBufferPool))
-            }
-
-            if (layer.tintColor != null) {
-                val color = try { Color.parseColor(layer.tintColor) } catch (e: IllegalArgumentException){ Color.BLACK }
-                var tintColorEffect = this.tintColorEffect
-                if (tintColorEffect == null) {
-                    tintColorEffect = TintColorEffect()
-                    this.tintColorEffect = tintColorEffect
-                }
-                setImage(tintColorEffect.draw(image, color, frameBufferPool))
-            }
-
-            val parameters = layer.parameters
-            if (parameters != null) {
-                if (effectContext == null) {
-                    effectContext = EffectContext.createWithCurrentGlContext()
-                }
-                val transformedImage = GLFrameTransformations.applyEditorTransform(
-                    image,
-                    parameters,
-                    effectContext!!.factory
+            var sourceImage = frames[layer.source.stringRepresentation()] ?: continue
+            val maskImage =
+                if (layer.maskUri != null)
+                    frames[layer.maskUri.toString()] ?: continue
+                else null
+            val lutImage =
+                if (layer.lutFilterUri != null)
+                    frames[layer.lutFilterUri.toString()] ?: continue
+                else null
+            layersWithImages.add(Pair(
+                layer,
+                GPULayer.Companion.LayerImages(
+                    inputImage = sourceImage,
+                    maskImage = maskImage,
+                    lutImage = lutImage,
                 )
-                setImage(transformedImage)
-                GLES20.glEnable(GLES20.GL_BLEND)
-                GLES20.glBlendFunc(GLES20.GL_SRC_ALPHA, GLES20.GL_ONE_MINUS_SRC_ALPHA);
-            }
+            ))
+        }
 
-            val lutImage = if (layer.lutFilterUri != null)
-                frames[layer.lutFilterUri.toString()] ?: continue
-            else null
+        val image = GPULayer.drawLayers(layersWithImages, glObjectManager) ?: return
 
-            if (lutImage != null) {
-                var colorLutEffect = this.colorLutEffect
-                if (colorLutEffect == null) {
-                    colorLutEffect = ColorLUTEffect()
-                    this.colorLutEffect = colorLutEffect
-                }
-                setImage(
-                    colorLutEffect.draw(
-                        image,
-                        lutImage,
-                        frameBufferPool,
-                    )
-                )
-            }
+        textureRenderer?.renderTexture(
+            image.texture,
+            GLESUtils.IDENT_MATRIX,
+            round(image.x * surfaceWidth.toFloat() / image.width.toFloat()).toInt(),
+            -round(image.y * surfaceHeight.toFloat() / image.height.toFloat()).toInt(),
+            surfaceWidth,
+            surfaceHeight
+        )
 
-            textureRenderer?.renderTexture(
-                image.texture,
-                ShaderUtils.IDENT_MATRIX,
-                round(image.x * surfaceWidth.toFloat() / image.width.toFloat()).toInt(),
-                -round(image.y * surfaceHeight.toFloat() / image.height.toFloat()).toInt(),
-                surfaceWidth,
-                surfaceHeight
-            )
-
-            if (image !== sourceImage) {
-                image.release()
-            }
+        if (!frames.containsValue(image)) {
+            image.release()
         }
     }
 
@@ -342,13 +284,11 @@ class GPUImageView(context: Context) : FrameLayout(context), GLSurfaceView.Rende
     }
 
     private fun clean() {
+        glObjectManager.release()
         loadSourceJob?.cancel()
         loadSourceJob = null
         frames.values.forEach{ it.release() }
         frames.clear()
-        effectContext?.release()
-        effectContext = null
-        frameBufferPool.release()
     }
 
     companion object {
@@ -373,7 +313,7 @@ class GPUImageView(context: Context) : FrameLayout(context), GLSurfaceView.Rende
             ): EGLContext? {
                 contextRefCount.incrementAndGet()
                 val attrib = intArrayOf(
-                        ShaderUtils.EGL_CONTEXT_CLIENT_VERSION,
+                        GLESUtils.EGL_CONTEXT_CLIENT_VERSION,
                         2,
                         EGL10.EGL_NONE
                 )

@@ -2,6 +2,7 @@ package com.azzapp.gpu
 
 import android.opengl.GLES11Ext
 import android.opengl.GLES20
+import com.azzapp.gpu.utils.GLESUtils
 
 class TextureRenderer(
   private val external: Boolean,
@@ -16,7 +17,7 @@ class TextureRenderer(
 
   init {
     // Create program
-    program = ShaderUtils.createProgram(
+    program = GLESUtils.createProgram(
       VERTEX_SHADER,
       if (external) FRAGMENT_SHADER_EXTERNAL else FRAGMENT_SHADER
     )
@@ -118,21 +119,21 @@ class TextureRenderer(
       }
     """
 
-    private val POS_VERTICES = ShaderUtils.floatBuffer(
+    private val POS_VERTICES = GLESUtils.floatBuffer(
       -1f, -1f, 0f, 1f,
       1f, -1f, 0f, 1f,
       -1f, 1f, 0f, 1f,
       1f, 1f, 0f, 1f
     )
 
-    private val TEX_VERTICES = ShaderUtils.floatBuffer(
+    private val TEX_VERTICES = GLESUtils.floatBuffer(
       0f, 0f, 0f, 1f,
       1f, 0f, 0f, 1f,
       0f, 1f, 0f, 1f,
       1f, 1f, 0f, 1f
     )
 
-    private val FLIPPED_TEXTURE_VERTICES = ShaderUtils.floatBuffer(
+    private val FLIPPED_TEXTURE_VERTICES = GLESUtils.floatBuffer(
       0f, 1f, 0f, 1f,
       1f, 1f, 0f, 1f,
       0f, 0f, 0f, 1f,

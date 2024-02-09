@@ -1,4 +1,4 @@
-package com.azzapp.gpu
+package com.azzapp.gpu.utils
 
 import android.graphics.Bitmap
 import android.opengl.*
@@ -6,7 +6,7 @@ import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import java.nio.FloatBuffer
 
-internal object ShaderUtils {
+internal object GLESUtils {
 
   const val EGL_CONTEXT_CLIENT_VERSION = 0x3098
 
@@ -161,4 +161,17 @@ internal object ShaderUtils {
   }
 
 
+  val DEFAULT_VERTICES_COORD = GLESUtils.floatBuffer(
+    -1f, -1f, 0f, 1f,
+    1f, -1f, 0f, 1f,
+    -1f, 1f, 0f, 1f,
+    1f, 1f, 0f, 1f
+  )
+
+  val DEFAULT_TEX_COORD = GLESUtils.floatBuffer(
+    0f, 0f,
+    1f, 0f,
+    0f, 1f,
+    1f, 1f,
+  )
 }

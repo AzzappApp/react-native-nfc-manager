@@ -1,7 +1,6 @@
 package com.azzapp.gpu
 
 import android.graphics.Bitmap
-import android.media.effect.EffectContext
 import android.opengl.GLES20
 import android.os.Handler
 import android.os.Looper
@@ -18,7 +17,9 @@ import androidx.media3.common.PlaybackException
 import androidx.media3.common.Player
 import androidx.media3.common.VideoSize
 import androidx.media3.common.util.UnstableApi
-import com.azzapp.gpu.effects.ColorLUTEffect
+import com.azzapp.gpu.utils.GLFrame
+import com.azzapp.gpu.utils.GLESUtils
+import com.azzapp.gpu.utils.GLObjectManager
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
@@ -241,23 +242,22 @@ import kotlin.math.round
 
     private var layer: GPULayer? = null
 
-    private val frameBufferPool = FrameBufferPool()
+    private var glObjectManager = GLObjectManager()
 
     private var externalTextureRenderer: TextureRenderer? = null
     private var textureRenderer: TextureRenderer? = null
 
-    private var effectContext: EffectContext? = null
-
     private var lutChanged = false
     private var lutBitmap: Bitmap? = null
     private var lutImage: GLFrame? = null
-    private var colorLutEffect: ColorLUTEffect? = null;
 
     override fun initialize() {
       externalTextureRenderer = TextureRenderer(external = true, flipTexY = true)
       textureRenderer = TextureRenderer(external = false, flipTexY = true)
-      colorLutEffect = ColorLUTEffect()
-      effectContext = EffectContext.createWithCurrentGlContext()
+      try {
+        glObjectManager.release()
+      } catch (e: Error){}
+      glObjectManager = GLObjectManager()
     }
 
     fun setVideoSize(videoSize: VideoSize) {
@@ -285,23 +285,15 @@ import kotlin.math.round
       GLES20.glClearColor(0.0f, 0.0f, 0.0f, 1.0f)
       GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT)
 
-      var image = GLFrame.create()
+      var inputImage = glObjectManager.getGlFrame()
       val videoSize = this.videoSize ?: return
 
-      ShaderUtils.bindRGBATexture(image.texture, videoSize.width, videoSize.height)
-      image.width = videoSize.width
-      image.height = videoSize.height
+      GLESUtils.bindRGBATexture(inputImage.texture, videoSize.width, videoSize.height)
+      inputImage.width = videoSize.width
+      inputImage.height = videoSize.height
 
-      val frameBuffer = frameBufferPool.getFrameBuffer()
-
-      GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, frameBuffer)
-      GLES20.glFramebufferTexture2D(
-        GLES20.GL_FRAMEBUFFER,
-        GLES20.GL_COLOR_ATTACHMENT0,
-        GLES20.GL_TEXTURE_2D,
-        image.texture,
-        0
-      )
+      val frameBuffer = glObjectManager.getFrameBuffer()
+      GLESUtils.focuFrameBuffer(frameBuffer, inputImage.texture)
 
       GLES20.glClearColor(0.0f, 0.0f, 0.0f, 0.0f)
       GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT)
@@ -314,28 +306,7 @@ import kotlin.math.round
         videoSize.height,
         frameBuffer
       )
-
-      frameBufferPool.releaseFrameBuffer(frameBuffer)
-
-
-      fun setImage(newImage: GLFrame) {
-        if (newImage === image) {
-          return;
-        }
-        image.release()
-        image = newImage
-      }
-
-      val parameters = layer?.parameters
-      if (parameters != null) {
-        val transformedImage = GLFrameTransformations.applyEditorTransform(
-          image,
-          parameters,
-          effectContext!!.factory
-        )
-        setImage(transformedImage)
-      }
-
+      glObjectManager.releaseFrameBuffer(frameBuffer)
 
       if (lutChanged) {
         lutImage?.release()
@@ -346,37 +317,44 @@ import kotlin.math.round
       val lutBitmap = lutBitmap
       var lutImage = lutImage
       if (lutBitmap != null && lutImage == null) {
-        lutImage = GLFrame.create(lutBitmap.width, lutBitmap.height)
-        ShaderUtils.bindImageTexture(lutImage.texture, lutBitmap)
+        lutImage = glObjectManager.getGlFrame()
+        lutImage.width = lutBitmap.width
+        lutImage.height = lutBitmap.height
+        GLESUtils.bindImageTexture(lutImage.texture, lutBitmap)
         this.lutImage = lutImage
       }
-      if (lutImage != null) {
-        val imageWithLut = colorLutEffect?.draw(
-          image,
-          lutImage,
-          frameBufferPool
-        )
-        setImage(imageWithLut ?: image)
-      }
+
+      val layer = layer ?:return
+      val outputImage = GPULayer.drawLayer(
+        layer,
+        GPULayer.Companion.LayerImages(
+          inputImage = inputImage,
+          maskImage = null,
+          lutImage = lutImage
+        ),
+        glObjectManager
+      )
+
 
       textureRenderer?.renderTexture(
-        image.texture,
-        ShaderUtils.IDENT_MATRIX,
-        round(image.x * surfaceWidth.toFloat() / image.width.toFloat()).toInt(),
-        -round(image.y * surfaceHeight.toFloat() / image.height.toFloat()).toInt(),
+        outputImage.texture,
+        GLESUtils.IDENT_MATRIX,
+        round(inputImage.x * surfaceWidth.toFloat() / inputImage.width.toFloat()).toInt(),
+        -round(inputImage.y * surfaceHeight.toFloat() / inputImage.height.toFloat()).toInt(),
         surfaceWidth,
         surfaceHeight
       )
-      image.release()
+      outputImage.release()
+      inputImage.release()
     }
 
     override fun release() {
-      frameBufferPool.release()
-      effectContext?.release()
-      externalTextureRenderer?.release()
-      textureRenderer?.release()
-      colorLutEffect?.release()
-      lutImage?.release()
+      try {
+        glObjectManager.release()
+        externalTextureRenderer?.release()
+        textureRenderer?.release()
+        lutImage?.release()
+      } catch (error: Error){}
     }
   }
 }

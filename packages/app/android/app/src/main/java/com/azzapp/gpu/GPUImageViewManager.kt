@@ -1,31 +1,10 @@
 package com.azzapp.gpu
 
 
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
-import android.graphics.Color
-import android.media.effect.EffectContext
-import android.opengl.EGL14
-import android.opengl.GLES20
-import android.opengl.GLUtils
-import com.azzapp.MainApplication
 import com.facebook.react.bridge.*
 import com.facebook.react.uimanager.SimpleViewManager
 import com.facebook.react.uimanager.ThemedReactContext
-import com.facebook.react.uimanager.UIManagerHelper
 import com.facebook.react.uimanager.annotations.ReactProp
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.runBlocking
-import java.io.File
-import java.io.FileOutputStream
-import java.nio.ByteBuffer
-import java.util.UUID
-import javax.microedition.khronos.egl.EGL10
-import javax.microedition.khronos.egl.EGLConfig
-import javax.microedition.khronos.egl.EGLContext
-import javax.microedition.khronos.egl.EGLDisplay
-import javax.microedition.khronos.egl.EGLSurface
-import kotlin.math.round
 
 
 class GPUImageViewManager(

@@ -1,23 +1,10 @@
 package com.azzapp.gpu
 
-import android.media.MediaCodecInfo
 import com.facebook.react.bridge.*
 import com.facebook.react.uimanager.SimpleViewManager
 import com.facebook.react.uimanager.ThemedReactContext
-import com.facebook.react.uimanager.UIManagerHelper
 import com.facebook.react.uimanager.annotations.ReactProp
-import androidx.media3.common.MediaItem
 import androidx.media3.common.util.UnstableApi
-import androidx.media3.transformer.DefaultEncoderFactory
-import androidx.media3.transformer.EncoderSelector
-import androidx.media3.transformer.TransformationException
-import androidx.media3.transformer.TransformationResult
-import androidx.media3.transformer.Transformer
-import androidx.media3.transformer.VideoEncoderSettings
-import com.google.common.collect.ImmutableList
-import kotlinx.coroutines.GlobalScope
-import java.io.File
-import java.util.UUID
 
 
 @UnstableApi class GPUVideoViewManager(

@@ -313,10 +313,6 @@ export const editionParametersTransforms: {
     value: NonNullable<EditionParameters[key]>,
   ) => NonNullable<EditionParameters[key]>;
 } = {
-  brightness: Platform.select({
-    default: value => value,
-    android: value => (value < 0 ? value : value * 5) + 1,
-  }),
   saturation: Platform.select({
     default: value => value,
     android: value => (value < 1 ? value - 1 : (value - 1) / 5),

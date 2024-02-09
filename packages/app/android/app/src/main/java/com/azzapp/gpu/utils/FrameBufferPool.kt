@@ -1,6 +1,4 @@
-package com.azzapp.gpu
-
-import android.opengl.GLES20
+package com.azzapp.gpu.utils
 
 class FrameBufferPool {
 
@@ -15,7 +13,7 @@ class FrameBufferPool {
       }
     }
     if (frameBuffer == null) {
-      frameBuffer = ShaderUtils.createFrameBuffer()
+      frameBuffer = GLESUtils.createFrameBuffer()
     }
     frameBuffers[frameBuffer] = false
     return frameBuffer
@@ -29,7 +27,7 @@ class FrameBufferPool {
 
   fun release() {
     frameBuffers.keys.forEach {
-      ShaderUtils.disposeFrameBuffer(it)
+      GLESUtils.disposeFrameBuffer(it)
     }
     frameBuffers.clear()
   }

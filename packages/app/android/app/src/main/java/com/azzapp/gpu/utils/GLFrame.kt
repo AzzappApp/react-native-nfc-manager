@@ -1,4 +1,4 @@
-package com.azzapp.gpu
+package com.azzapp.gpu.utils
 
 import android.opengl.GLES20
 import java.util.concurrent.atomic.AtomicInteger
@@ -41,6 +41,10 @@ interface GLFrame {
       image.refCount.incrementAndGet()
       return image
     }
+
+    fun createRef(glFrame: GLFrame): GLFrame {
+      return GLFrameImpl(glFrame.texture, glFrame.x, glFrame.y, glFrame.width, glFrame.height)
+    }
   }
 
   private class GLFrameImpl(
@@ -57,7 +61,7 @@ interface GLFrame {
 
     init {
       if (texture == null) {
-        _texture = ShaderUtils.createTexture()
+        _texture = GLESUtils.createTexture()
         ownTexture =true;
       }  else {
         _texture = texture;

@@ -1,9 +1,25 @@
 package com.azzapp.gpu
 
+import android.graphics.Color
 import android.net.Uri
+import android.opengl.GLES20
+import com.azzapp.gpu.filters.BlendFilter
+import com.azzapp.gpu.filters.BrightnessFilter
+import com.azzapp.gpu.filters.ColorLUTFilter
+import com.azzapp.gpu.filters.CompositeOverFilter
+import com.azzapp.gpu.filters.ContrastFilter
+import com.azzapp.gpu.filters.CropFilter
+import com.azzapp.gpu.filters.OrientationFilter
+import com.azzapp.gpu.filters.RotationFilter
+import com.azzapp.gpu.filters.TintFilter
+import com.azzapp.gpu.utils.GLFrame
+import com.azzapp.gpu.utils.GLObjectManager
+import com.azzapp.gpu.utils.GLESUtils
+import com.azzapp.gpu.utils.ImageOrientation
 import com.azzapp.helpers.RNHelpers
 import com.facebook.react.bridge.ReadableArray
 import com.facebook.react.bridge.ReadableMap
+import kotlin.math.round
 
 class GPULayer(
   val source: GPULayerSource,
@@ -106,12 +122,7 @@ class GPULayer(
     }
   }
 
-  enum class ImageOrientation {
-    UP,
-    RIGHT,
-    DOWN,
-    LEFT,
-  }
+
 
   class CropData(
     val originX: Double,
@@ -121,6 +132,205 @@ class GPULayer(
   )
 
   companion object {
+
+    class LayerImages(
+      val inputImage: GLFrame,
+      val lutImage: GLFrame?,
+      val maskImage: GLFrame?
+    )
+
+    fun drawLayer(layer: GPULayer, images: LayerImages, glObjectManager: GLObjectManager): GLFrame {
+      var currentImage = GLFrame.createRef(images.inputImage)
+      fun setImage(image: GLFrame) {
+        if (currentImage !== image) {
+          currentImage.release()
+        }
+        currentImage = image
+      }
+
+      if (layer.backgroundColor != null && layer.backgroundColor.lowercase() != "transparent") {
+        val backgroundColorImage = glObjectManager.getGlFrame()
+        backgroundColorImage.x = currentImage.x
+        backgroundColorImage.y = currentImage.y
+        backgroundColorImage.width = currentImage.width
+        backgroundColorImage.height = currentImage.height
+
+        GLESUtils.bindRGBATexture(backgroundColorImage.texture, currentImage.width, currentImage.height)
+
+        val frameBuffer = glObjectManager.getFrameBuffer()
+        GLESUtils.focuFrameBuffer(frameBuffer, backgroundColorImage.texture)
+        val color = try {
+          Color.parseColor(layer.backgroundColor)
+        } catch (e: IllegalArgumentException){
+          Color.BLACK
+        }
+        val r = (color shr 16 and 0xff) / 255.0f
+        val g = (color shr 8 and 0xff) / 255.0f
+        val b = (color and 0xff) / 255.0f
+        val a = (color shr 24 and 0xff) / 255.0f
+        GLES20.glViewport(currentImage.x, currentImage.y, currentImage.width, currentImage.height)
+        GLES20.glClearColor(r, g, b, a)
+        GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT)
+        glObjectManager.releaseFrameBuffer(frameBuffer)
+
+        val compositedImage = glObjectManager.applyCompositeOverFilter(
+          CompositeOverFilter.Parameters(
+            inputImage = currentImage,
+            underlayImage = backgroundColorImage
+          )
+        )
+        backgroundColorImage.release()
+
+        setImage(compositedImage)
+      }
+
+      if (images.maskImage != null) {
+        setImage(
+          glObjectManager.applyBlendFilter(
+            BlendFilter.Parameters(
+              inputImage = currentImage,
+              maskImage = images.maskImage
+            ),
+          )
+        )
+      }
+
+      if (layer.tintColor != null) {
+        val color = try { Color.parseColor(layer.tintColor) } catch (e: IllegalArgumentException){ Color.BLACK }
+        setImage(
+          glObjectManager.applyTintFilter(
+            TintFilter.Parameters(
+              inputImage = currentImage,
+              tintColor = color
+            ),
+          )
+        )
+      }
+
+      val parameters = layer.parameters
+
+      val orientation = parameters?.orientation ?: ImageOrientation.UP
+      if (orientation != ImageOrientation.UP) {
+        setImage(
+          glObjectManager.applyOrientationFilter(OrientationFilter.Parameters(
+            inputImage = currentImage,
+            orientation = orientation
+          ))
+        )
+      }
+
+      val roll = parameters?.roll ?: 0f
+      if (roll != 0f) {
+        setImage(
+          glObjectManager.applyRotationFilter(RotationFilter.Parameters(
+            inputImage = currentImage,
+            angle = roll.toFloat()
+          ))
+        )
+      }
+
+      val cropData: CropData? = parameters?.cropData
+      if (cropData != null) {
+        var originX = round(cropData.originX).toInt()
+        var originY = round(cropData.originY).toInt()
+        var width = round(cropData.width).toInt()
+        var height = round(cropData.height).toInt()
+
+        if (width != 0 && height != 0) {
+          var x = 0
+          var y = 0
+          if (originX < 0) {
+            x = -originX
+          }
+          if (originY < 0) {
+            y = -originY
+          }
+          val right = originX + width
+          val bottom = originY + height
+          if (right > currentImage.width) {
+            x = -(right - currentImage.width)
+          }
+          if (bottom > currentImage.height) {
+            y = -(bottom - currentImage.height)
+          }
+          originX += x
+          originY += y
+
+          val croppedImage = glObjectManager.applyCrop(
+            CropFilter.Parameters(
+              inputImage = currentImage,
+              originX = originX,
+              originY = originY,
+              width = width,
+              height = height
+            )
+          )
+          croppedImage.x = x
+          croppedImage.y = y
+
+          setImage(croppedImage)
+        }
+      }
+
+      val brightness = parameters?.brightness
+      if (brightness != null) {
+        setImage(
+          glObjectManager.applyBrightnessFilter(
+            BrightnessFilter.Parameters(
+              inputImage = currentImage,
+              brightness = brightness.toFloat()
+            )
+          )
+        )
+      }
+
+      val contrast = parameters?.contrast
+      if (contrast != null) {
+        setImage(
+          glObjectManager.applyContrastFilter(
+            ContrastFilter.Parameters(
+              inputImage = currentImage,
+              contrast = contrast.toFloat()
+            )
+          )
+        )
+      }
+
+      if (images.lutImage != null) {
+        setImage(
+          glObjectManager.applyColorLUTFilter(
+            ColorLUTFilter.Parameters(
+              inputImage = currentImage,
+              lutImage = images.lutImage
+            ),
+          )
+        )
+      }
+
+      return currentImage
+    }
+
+    fun drawLayers(layersWithImages: List<Pair<GPULayer, LayerImages>>, glObjectManager: GLObjectManager): GLFrame? {
+      var currentImage: GLFrame? = null
+      for ((layer, layerImages) in layersWithImages) {
+        val layerImage = drawLayer(layer, layerImages, glObjectManager)
+        if(currentImage != null) {
+          val compositedImage = glObjectManager.applyCompositeOverFilter(
+            CompositeOverFilter.Parameters(
+              inputImage = layerImage,
+              underlayImage = currentImage
+            ),
+          )
+          currentImage.release()
+          layerImage.release()
+          currentImage = compositedImage
+        } else {
+          currentImage = layerImage
+        }
+      }
+      return currentImage
+    }
+
     fun fromReadableMap(readableMap: ReadableMap): GPULayer? {
       val kindStr = readableMap.getString("kind")
       val uriStr = readableMap.getString("uri")

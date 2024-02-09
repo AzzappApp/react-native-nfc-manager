@@ -236,6 +236,7 @@ class VideoProcessingGLSurfaceView(
         requestRender()
       }
       onSurfaceTextureAvailable(surfaceTexture!!)
+      initialized = false
     }
 
     override fun onSurfaceChanged(gl: GL10, width: Int, height: Int) {

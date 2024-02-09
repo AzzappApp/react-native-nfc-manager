@@ -2,7 +2,6 @@ package com.azzapp.gpu
 
 import android.graphics.Bitmap
 import android.media.MediaCodecInfo
-import android.media.effect.EffectContext
 import android.opengl.EGL14
 import android.opengl.GLES20
 import android.opengl.GLUtils
@@ -20,8 +19,9 @@ import androidx.media3.transformer.TransformationRequest.HDR_MODE_KEEP_HDR
 import androidx.media3.transformer.Transformer
 import androidx.media3.transformer.VideoEncoderSettings
 import com.azzapp.MainApplication
-import com.azzapp.gpu.effects.BlendEffect
-import com.azzapp.gpu.effects.ColorLUTEffect
+import com.azzapp.gpu.utils.GLFrame
+import com.azzapp.gpu.utils.GLESUtils
+import com.azzapp.gpu.utils.GLObjectManager
 import com.facebook.react.bridge.Promise
 import com.facebook.react.bridge.ReactApplicationContext
 import com.facebook.react.bridge.ReactContextBaseJavaModule
@@ -97,7 +97,7 @@ import kotlin.math.round
         GLExoPlayerFrameProcessor.Factory(
           size.getInt("width"),
           size.getInt("height"),
-          layer.parameters,
+          layer,
           loadedLutFilterBitmap
         )
       )
@@ -191,7 +191,6 @@ import kotlin.math.round
     var eglContext: EGLContext? = null
     var eglDisplay: EGLDisplay? = null
     var eglSurface: EGLSurface? = null
-    var effectContext: EffectContext? = null
 
     try {
       val width = size.getInt("width")
@@ -279,58 +278,37 @@ import kotlin.math.round
         }
       }
 
-      val frameBufferPool = FrameBufferPool()
+      val glObjectManager = GLObjectManager()
       val inputBitmap = loadedBitmap ?:return
-      var image = GLFrame.create(inputBitmap.width, inputBitmap.height)
-      ShaderUtils.bindImageTexture(image.texture, inputBitmap)
 
+      var inputImage = GLFrame.create(inputBitmap.width, inputBitmap.height)
+      GLESUtils.bindImageTexture(inputImage.texture, inputBitmap)
 
-      fun setImage(value: GLFrame) {
-        if (value !== image) {
-          image.release()
-        }
-        image = value
-      }
-
+      var maskImage: GLFrame? = null
       val maskBitmap = loadedMaskBitmap
       if (maskBitmap != null) {
-        val maskImage = GLFrame.create(maskBitmap.width, maskBitmap.height)
-        ShaderUtils.bindImageTexture(maskImage.texture, maskBitmap)
-
-        var blendEffect = BlendEffect()
-        val imageWithMask = blendEffect.draw(image, maskImage, frameBufferPool)
-        if (imageWithMask != null) {
-          setImage(imageWithMask)
-        }
-        maskImage.release()
+        maskImage = GLFrame.create(maskBitmap.width, maskBitmap.height)
+        GLESUtils.bindImageTexture(maskImage.texture, maskBitmap)
       }
 
-      val parameters = layer.parameters
-      if (parameters != null) {
-        effectContext = EffectContext.createWithCurrentGlContext()
-        val transformedImage = GLFrameTransformations.applyEditorTransform(
-          image,
-          parameters,
-          effectContext.factory
-        )
-        setImage(transformedImage)
-        GLES20.glEnable(GLES20.GL_BLEND)
-        GLES20.glBlendFunc(GLES20.GL_SRC_ALPHA, GLES20.GL_ONE_MINUS_SRC_ALPHA);
-      }
-
-
+      var lutImage: GLFrame? = null
       val lutFilterBitmap = loadedLutFilterBitmap
       if (lutFilterBitmap != null) {
-        val lutImage = GLFrame.create(lutFilterBitmap.width, lutFilterBitmap.height)
-        ShaderUtils.bindImageTexture(lutImage.texture, lutFilterBitmap)
-
-        var colorLUTEffect = ColorLUTEffect()
-        val imageWithLut = colorLUTEffect.draw(image, lutImage, frameBufferPool)
-        setImage(imageWithLut)
-        lutImage.release()
+        lutImage = GLFrame.create(lutFilterBitmap.width, lutFilterBitmap.height)
+        GLESUtils.bindImageTexture(lutImage.texture, lutFilterBitmap)
       }
 
-      var bitmap = saveTexture(image.texture, image.width, image.height)
+      val output = GPULayer.drawLayer(
+        layer,
+        GPULayer.Companion.LayerImages(
+          inputImage = inputImage,
+          maskImage = maskImage,
+          lutImage = lutImage
+        ),
+        glObjectManager
+      )
+
+      var bitmap = saveTexture(output.texture, output.width, output.height)
       val fileExtension = when (format) {
         "png" -> ".png"
         "auto" -> if (bitmap.hasAlpha())  ".png" else ".jpg"
@@ -352,7 +330,6 @@ import kotlin.math.round
     } catch (e: Exception) {
       promise.reject(e)
     } finally {
-      effectContext?.release()
       if (eglSurface != null && eglSurface != EGL10.EGL_NO_SURFACE) {
         egl.eglDestroySurface(eglDisplay, eglSurface)
       }

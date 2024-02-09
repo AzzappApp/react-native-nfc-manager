@@ -3,8 +3,6 @@ package com.azzapp.gpu
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.SurfaceTexture
-import android.media.effect.EffectContext
-import android.media.effect.EffectFactory
 import android.opengl.EGL14
 import android.opengl.EGLExt
 import android.opengl.GLES20
@@ -18,7 +16,9 @@ import androidx.media3.common.SurfaceInfo
 import androidx.media3.common.VideoFrameProcessingException
 import androidx.media3.common.VideoFrameProcessor
 import androidx.media3.common.util.UnstableApi
-import com.azzapp.gpu.effects.ColorLUTEffect
+import com.azzapp.gpu.utils.GLFrame
+import com.azzapp.gpu.utils.GLESUtils
+import com.azzapp.gpu.utils.GLObjectManager
 import kotlinx.coroutines.ExecutorCoroutineDispatcher
 import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.runBlocking
@@ -40,7 +40,7 @@ import javax.microedition.khronos.egl.*
         private val eglConfig: EGLConfig,
         private val listener: VideoFrameProcessor.Listener,
         private val coroutineDispatcher: ExecutorCoroutineDispatcher,
-        private val parameters: GPULayer.EditionParameters?,
+        private val layer: GPULayer,
         private val lutFilterBitmap: Bitmap?
 ) : VideoFrameProcessor {
 
@@ -56,45 +56,37 @@ import javax.microedition.khronos.egl.*
   //private var outputSizeOrRotationChanged = false
   private var outputEglSurface: EGLSurface? = null
 
-  private val externalTexture: Int = ShaderUtils.createTexture()
+  private val externalTexture: Int = GLESUtils.createTexture()
   private val surfaceTexture: SurfaceTexture
   private var inputSurface: Surface
 
-  private var effectContext: EffectContext? = null
+  private var glObjectManager = GLObjectManager()
 
-  private var frameBufferPool = FrameBufferPool()
-
-  private var frameBuffer: Int
-  private var image: GLFrame
   private var externalTextureRenderer: TextureRenderer
   private val externalTextureTransformMatrix: FloatArray = FloatArray(16)
 
 
   private var textureRenderer: TextureRenderer
-  private var colorLUTEffect: ColorLUTEffect? = null
   private var lutImage: GLFrame?  = null
 
 
   init {
-    ShaderUtils.bindExternalTexture(externalTexture)
+    GLESUtils.bindExternalTexture(externalTexture)
     surfaceTexture = SurfaceTexture(externalTexture)
     surfaceTexture.setOnFrameAvailableListener {
       availableFrameCount.getAndIncrement()
       maybeQueueFrame()
     }
 
-
     inputSurface = Surface(surfaceTexture)
     externalTextureRenderer = TextureRenderer(external = true, flipTexY = true)
-    image = GLFrame.create()
     textureRenderer = TextureRenderer(external = false, flipTexY = true)
 
-    frameBuffer = ShaderUtils.createFrameBuffer()
-
     if (lutFilterBitmap != null) {
-      colorLUTEffect = ColorLUTEffect()
-      lutImage = GLFrame.create(lutFilterBitmap.width, lutFilterBitmap.height)
-      ShaderUtils.bindImageTexture(lutImage!!.texture, lutFilterBitmap)
+      lutImage = glObjectManager.getGlFrame()
+      lutImage!!.width = lutFilterBitmap.width
+      lutImage!!.height = lutFilterBitmap.height
+      GLESUtils.bindImageTexture(lutImage!!.texture, lutFilterBitmap)
     }
 
   }
@@ -150,7 +142,6 @@ import javax.microedition.khronos.egl.*
     if (pendingFrames.isEmpty()) {
       listener.onEnded()
     }
-
   }
 
   override fun flush() {
@@ -234,20 +225,14 @@ import javax.microedition.khronos.egl.*
     }
 
     egl.eglMakeCurrent(eglDisplay, eglSurface, eglSurface, eglContext)
-    if (width != image.width || height != image.height) {
-      ShaderUtils.bindRGBATexture(image.texture, width, height)
-      image.width = width
-      image.height = height
-    }
 
-    GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, frameBuffer)
-    GLES20.glFramebufferTexture2D(
-      GLES20.GL_FRAMEBUFFER,
-      GLES20.GL_COLOR_ATTACHMENT0,
-      GLES20.GL_TEXTURE_2D,
-      image.texture,
-      0
-    )
+    val image = glObjectManager.getGlFrame()
+    GLESUtils.bindRGBATexture(image.texture, width, height)
+    image.width = width
+    image.height = height
+
+    val frameBuffer = glObjectManager.getFrameBuffer()
+    GLESUtils.focuFrameBuffer(frameBuffer, image.texture)
 
     GLES20.glClearColor(0.0f, 0.0f, 0.0f, 0.0f)
     GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT)
@@ -260,68 +245,35 @@ import javax.microedition.khronos.egl.*
       height,
       frameBuffer
     )
+    glObjectManager.releaseFrameBuffer(frameBuffer)
 
-    if (effectContext == null) {
-      effectContext = EffectContext.createWithCurrentGlContext()
-    }
-
-    var outputImage = image
-
-
-    if (parameters != null) {
-      val croppedImage = GLFrameTransformations.applyEditorTransform(
-              outputImage,
-              parameters,
-              effectContext!!.factory
-      ) ?: image
-      if (outputImage !== image) {
-        outputImage.release()
-      }
-      outputImage = croppedImage
-    }
-
-    if (lutImage != null) {
-      val imageWithLut = colorLUTEffect?.draw(outputImage, lutImage!!, frameBufferPool)
-      if (imageWithLut != null) {
-        if (outputImage !== image) {
-          outputImage.release()
-        }
-        outputImage = imageWithLut
-      }
-    }
-
-    if (surfaceInfo.orientationDegrees != 0) {
-
-      val newImage = GLFrame.create()
-      GLFrameTransformations.applyEffect(
-        outputImage,
-        newImage,
-        EffectFactory.EFFECT_ROTATE,
-        mapOf("angle" to -surfaceInfo.orientationDegrees),
-        effectContext!!.factory
-      )
-      outputImage?.release()
-      outputImage = newImage
-    }
+    var outputImage = GPULayer.drawLayer(
+      layer,
+      GPULayer.Companion.LayerImages(
+        inputImage = image,
+        maskImage = null,
+        lutImage = lutImage
+      ),
+      glObjectManager
+    )
 
     textureRenderer.renderTexture(
       outputImage.texture,
-      ShaderUtils.IDENT_MATRIX,
+      GLESUtils.IDENT_MATRIX,
       round(image.x * surfaceInfo.width.toFloat() / image.width.toFloat()).toInt(),
       -round(image.y * surfaceInfo.height.toFloat() / image.height.toFloat()).toInt(),
       surfaceInfo.width,
       surfaceInfo.height
     )
-    if (outputImage !== image) {
-      outputImage.release()
-    }
+    image.release()
+    outputImage.release()
   }
 
 
   class Factory(
     private val outputWidth: Int,
     private val outputHeight: Int,
-    private val parameters: GPULayer.EditionParameters?,
+    private val layer: GPULayer,
     private val lutFilterBitmap: Bitmap?,
   ) : VideoFrameProcessor.Factory {
 
@@ -397,7 +349,7 @@ import javax.microedition.khronos.egl.*
         eglConfig,
         EGL10.EGL_NO_CONTEXT,
         intArrayOf(
-          ShaderUtils.EGL_CONTEXT_CLIENT_VERSION,
+          GLESUtils.EGL_CONTEXT_CLIENT_VERSION,
           2,
           EGL10.EGL_NONE
         )
@@ -412,7 +364,7 @@ import javax.microedition.khronos.egl.*
         eglConfig,
         listener,
         coroutineDispatcher,
-        parameters,
+        layer,
         lutFilterBitmap
       )
     }
