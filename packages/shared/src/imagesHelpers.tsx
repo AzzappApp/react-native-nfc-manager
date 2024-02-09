@@ -53,7 +53,7 @@ export const getImageURLForSize = (
     pixelRatio,
     pregeneratedSizes,
   );
-  return assembleCloudinaryUrl(id, 'image', transforms);
+  return assembleCloudinaryUrl(id, 'image', transforms, 'webp');
 };
 
 /**
@@ -127,7 +127,7 @@ export const getVideoThumbnailURL = (
     pixelRatio,
     pregeneratedSizes,
   );
-  return assembleCloudinaryUrl(id, 'video', transforms, 'jpg');
+  return assembleCloudinaryUrl(id, 'video', transforms, 'webp');
 };
 
 /**
