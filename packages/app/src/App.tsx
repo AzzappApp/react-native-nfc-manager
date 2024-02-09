@@ -1,6 +1,5 @@
 import { IntlErrorCode } from '@formatjs/intl';
 import * as Sentry from '@sentry/react-native';
-import { fromGlobalId } from 'graphql-relay';
 import {
   Component,
   Fragment,
@@ -260,19 +259,16 @@ const AppRouter = () => {
 
   // #region Sentry Routing Instrumentation
   useEffect(() => {
-    Sentry.withScope(scope => {
-      scope.setUser({
-        id: profileInfos?.userId,
-        username: profileInfos?.email ?? profileInfos?.phoneNumber ?? undefined,
-        email: profileInfos?.email ?? undefined,
-        phoneNumber: profileInfos?.phoneNumber,
-      });
-
-      if (profileInfos) {
-        scope.setTag('profileId', fromGlobalId(profileInfos.profileId).id);
-        scope.setTag('webCardId', fromGlobalId(profileInfos.webCardId).id);
-        scope.setTag('profileRole', profileInfos.profileRole);
-      }
+    Sentry.setUser({
+      id: profileInfos?.userId,
+      username: profileInfos?.email ?? profileInfos?.phoneNumber ?? undefined,
+      email: profileInfos?.email ?? undefined,
+      phoneNumber: profileInfos?.phoneNumber,
+    });
+    Sentry.setTags({
+      profileId: profileInfos?.profileId,
+      webCardId: profileInfos?.webCardId,
+      profileRole: profileInfos?.profileRole,
     });
   }, [profileInfos]);
 
