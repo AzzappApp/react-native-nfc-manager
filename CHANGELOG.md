@@ -1,5 +1,9 @@
-## 0.5.5-canary.65
+## 0.5.5-canary.66
 
+* **fix:**  - **android:** [#2722](https://github.com/AzzappApp/azzapp/pull/2722) disable video when image picker is opened ([#2752](https://github.com/AzzappApp/azzapp/pull/2752))
+* **fix:**  - **contactCard:** [#2753](https://github.com/AzzappApp/azzapp/pull/2753) manage specific extension for vcard ([#2754](https://github.com/AzzappApp/azzapp/pull/2754))
+* **fix:**  - wrong sentry configuration for users ([#2755](https://github.com/AzzappApp/azzapp/pull/2755))
+* **fix:**  - **cardModules:** [#2728](https://github.com/AzzappApp/azzapp/pull/2728) wrong file paths to display images ([#2757](https://github.com/AzzappApp/azzapp/pull/2757))
 * **fix:**  - **android:** [#2632](https://github.com/AzzappApp/azzapp/pull/2632) perf issues with many pictures in webcard ([#2738](https://github.com/AzzappApp/azzapp/pull/2738))
 * **build:**  - upgrade deps ([#2736](https://github.com/AzzappApp/azzapp/pull/2736))
 * **perf:**  - **android:** memoize + don’t listen on invited webcards ([#2741](https://github.com/AzzappApp/azzapp/pull/2741))
