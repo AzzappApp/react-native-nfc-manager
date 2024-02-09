@@ -17,6 +17,7 @@ import type {
   Media as MediaModel,
 } from '#domains';
 import type {
+  Extension,
   MediaImageResolvers,
   MediaResolvers,
   MediaVideoResolvers,
@@ -127,12 +128,14 @@ const uriResolver =
       pixelRatio,
       raw,
       streaming = false,
+      extension,
     }: {
       width?: number | null;
       height?: number | null;
       pixelRatio?: number | null;
       raw?: boolean | null;
       streaming?: boolean | null;
+      extension?: Extension | null;
     },
   ) => {
     const assetKind = getAssetKind(media);
@@ -159,6 +162,7 @@ const uriResolver =
       height,
       pixelRatio,
       pregeneratedSizes,
+      extension,
       // @ts-expect-error streaming is not in the getImageURLForSize signature
       streaming,
     );

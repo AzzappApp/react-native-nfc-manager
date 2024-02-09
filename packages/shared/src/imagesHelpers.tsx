@@ -44,6 +44,7 @@ export const getImageURLForSize = (
   height?: number | null,
   pixelRatio: number | null = 1,
   pregeneratedSizes?: number[] | null,
+  extension?: string | null,
 ) => {
   assetNotRN('getImageURLForSize');
   id = decodeMediaId(id);
@@ -53,7 +54,7 @@ export const getImageURLForSize = (
     pixelRatio,
     pregeneratedSizes,
   );
-  return assembleCloudinaryUrl(id, 'image', transforms, 'webp');
+  return assembleCloudinaryUrl(id, 'image', transforms, extension ?? 'webp');
 };
 
 /**
@@ -87,12 +88,13 @@ export const getVideoUrlForSize = (
   height?: number | null,
   pixelRatio?: number | null,
   pregeneratedSizes?: number[] | null,
+  extension?: string | null,
   streaming = false,
 ) => {
   assetNotRN('getVideoUrlForSize');
   id = decodeMediaId(id);
   if (streaming) {
-    return assembleCloudinaryUrl(id, 'video', 'sp_auto', 'm3u8');
+    return assembleCloudinaryUrl(id, 'video', 'sp_auto', extension ?? 'm3u8');
   }
   const transforms = resizeTransforms(
     width,
@@ -100,7 +102,7 @@ export const getVideoUrlForSize = (
     pixelRatio,
     pregeneratedSizes,
   );
-  return assembleCloudinaryUrl(id, 'video', transforms, 'mp4');
+  return assembleCloudinaryUrl(id, 'video', transforms, extension ?? 'mp4');
 };
 
 /**

@@ -53,7 +53,7 @@ const ContactCardExportVcf = ({
           data
         }
         avatar {
-          exportUri: uri(width: 720, pixelRatio: 1)
+          exportUri: uri(width: 720, pixelRatio: 1, extension: jpg)
         }
       }
     `,
