@@ -1,5 +1,6 @@
-## 0.5.5-canary.67
+## 0.5.5-canary.68
 
+* **feat:**  - 🎸 restrict access to/from unpublished webcard ([#2768](https://github.com/AzzappApp/azzapp/pull/2768))
 * **fix:**  - **Android:** refactor filter system ([#2759](https://github.com/AzzappApp/azzapp/pull/2759))
 * **fix:**  - **android:** [#2722](https://github.com/AzzappApp/azzapp/pull/2722) disable video when image picker is opened ([#2752](https://github.com/AzzappApp/azzapp/pull/2752))
 * **fix:**  - **contactCard:** [#2753](https://github.com/AzzappApp/azzapp/pull/2753) manage specific extension for vcard ([#2754](https://github.com/AzzappApp/azzapp/pull/2754))
