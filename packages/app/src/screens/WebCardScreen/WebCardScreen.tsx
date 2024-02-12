@@ -279,7 +279,7 @@ const WebCardScreen = ({
     () =>
       Gesture.Pan()
         .activeOffsetX([-10, 10]) //help the postlist scroll to work on Android
-        .enabled(!editing)
+        .enabled(!editing && !!data.webCard?.cardIsPublished)
         .onStart(() => {
           initialManualGesture.value = manualFlip.value;
         })
@@ -311,7 +311,13 @@ const WebCardScreen = ({
             });
           }
         }),
-    [editing, initialManualGesture, manualFlip, windowWidth],
+    [
+      data.webCard?.cardIsPublished,
+      editing,
+      initialManualGesture,
+      manualFlip,
+      windowWidth,
+    ],
   );
   const [showPost, setShowPost] = useState(params.showPosts ?? false);
 
@@ -458,6 +464,7 @@ const webCardScreenByIdQuery = graphql`
     webCard: node(id: $webCardId) {
       id
       ... on WebCard {
+        cardIsPublished
         userName
       }
       ...WebCardScreenContent_webCard
@@ -484,6 +491,7 @@ const webCardScreenByNameQuery = graphql`
     webCard(userName: $userName) {
       id
       userName
+      cardIsPublished
       ...WebCardScreenContent_webCard
       ...WebCardScreenButtonBar_webCard
         @arguments(viewerWebCardId: $viewerWebCardId)

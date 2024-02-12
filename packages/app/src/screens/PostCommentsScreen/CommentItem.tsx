@@ -55,7 +55,8 @@ const CommentItem = ({ item }: CommentItemProps) => {
       <View style={{ flex: 1 }}>
         <View style={{ flexDirection: 'row' }}>
           {postComment.webCard.cardIsPublished ||
-          isEditor(profileInfos?.profileRole) ? (
+          (isEditor(profileInfos?.profileRole) &&
+            profileInfos?.webCardId === postComment.webCard.id) ? (
             <Link
               route="WEBCARD"
               params={{ userName: postComment.webCard.userName }}
