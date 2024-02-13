@@ -105,7 +105,7 @@ object GPULayerImageLoader {
         throw Exception("Could not retrieve bitmap")
       }
       bitmap!!
-    } catch (e: CompletionException) {
+    } catch (e: Exception) {
       cache.remove(key)
       throw e;
     }

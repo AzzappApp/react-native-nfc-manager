@@ -26,6 +26,7 @@ class CropFilter: Filter<CropFilter.Parameters> {
     val width = parameters.width
     val height = parameters.height
 
+
     val outputImage = glFramePool.getGlFrame()
     GLESUtils.bindRGBATexture(
       outputImage.texture,
@@ -40,7 +41,7 @@ class CropFilter: Filter<CropFilter.Parameters> {
 
     glProgram.use()
 
-    GLES20.glViewport(inputImage.x, inputImage.y, inputImage.width, inputImage.height)
+    GLES20.glViewport(0, 0, width, height)
 
     GLES20.glDisable(GLES20.GL_BLEND)
     GLES20.glClearColor(0f,0f,0f,0f)
@@ -79,6 +80,7 @@ class CropFilter: Filter<CropFilter.Parameters> {
     GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, 4)
 
     frameBufferPool.releaseFrameBuffer(frameBuffer)
+
     return outputImage
   }
 
