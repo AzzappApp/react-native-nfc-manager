@@ -46,16 +46,16 @@ export type SimpleButtonEditionScreenProps = ViewProps & {
 };
 
 const actionTypeSchema = z.intersection(
-  z.object({ buttonLabel: z.string().nonempty() }),
+  z.object({ buttonLabel: z.string().min(1) }),
   z.union([
     z.object({
       actionType: z.literal('email'),
-      actionLink: z.string().email().nonempty(),
+      actionLink: z.string().email().min(1),
     }),
     z
       .object({
         actionType: z.literal('link'),
-        actionLink: z.string().nonempty(),
+        actionLink: z.string().min(1),
       })
       .refine(item => isValidUrl(item.actionLink)),
     z
@@ -63,7 +63,7 @@ const actionTypeSchema = z.intersection(
         actionType: z.custom<string>(
           value => value !== 'link' && value !== 'email',
         ),
-        actionLink: z.string().nonempty(),
+        actionLink: z.string().min(1),
       })
       .refine(({ actionType, actionLink }) => {
         return isPhoneNumber(actionLink, actionType as CountryCode);
@@ -153,7 +153,7 @@ const SimpleButtonEditionScreen = ({
   const initialValue = useMemo(() => {
     return {
       buttonLabel: simpleButton?.buttonLabel ?? null,
-      actionType: simpleButton?.actionType ?? null,
+      actionType: simpleButton?.actionType ?? 'email',
       actionLink: simpleButton?.actionLink ?? null,
       fontFamily: simpleButton?.fontFamily ?? null,
       fontColor: simpleButton?.fontColor ?? null,
@@ -225,6 +225,7 @@ const SimpleButtonEditionScreen = ({
       }
     `);
   const isValid = actionTypeSchema.safeParse(value).success;
+
   const canSave = dirty && isValid && !saving;
 
   const router = useRouter();
