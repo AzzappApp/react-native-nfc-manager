@@ -1,5 +1,8 @@
-## 0.5.5-canary.72
+## 0.5.5-canary.73
 
+* **fix:**  - set a default actionType on button ([#2779](https://github.com/AzzappApp/azzapp/pull/2779))
+* **fix:**  - avoid specific caracter in sms openLink ([#2781](https://github.com/AzzappApp/azzapp/pull/2781))
+* **build:**  - **android:** upgrade media3 ([#2770](https://github.com/AzzappApp/azzapp/pull/2770))
 * **fix:**  - **Android:** handle surface orientation in video export
 * **fix:**  - **Android:** use capped pixel ratio for crop data scaling
 * **fix:**  - **Android:** Some gpu image problemes
