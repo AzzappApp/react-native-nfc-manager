@@ -1,5 +1,6 @@
-## 0.5.5-canary.70
+## 0.5.5-canary.71
 
+* **fix:**  - **Android:** use capped pixel ratio for crop data scaling
 * **fix:**  - **Android:** Some gpu image problemes
 * **fix:**  - **webCard:** [#2760](https://github.com/AzzappApp/azzapp/pull/2760) manage png background image for modules ([#2766](https://github.com/AzzappApp/azzapp/pull/2766))
 * **fix:**  - removing the control on email in add user modal ([#2778](https://github.com/AzzappApp/azzapp/pull/2778))
