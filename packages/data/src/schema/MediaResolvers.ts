@@ -142,7 +142,11 @@ const uriResolver =
     media = getDefferedMedia(media);
     const id = decodeMediaId(typeof media === 'string' ? media : media.id);
     if (assetKind === 'coverSource' || raw) {
-      return getCloudinaryAssetURL(id, kind);
+      return getCloudinaryAssetURL(
+        id,
+        kind,
+        kind === 'video' ? 'mp4' : kind === 'image' ? 'webp' : undefined,
+      );
     }
     const pregeneratedSizes =
       assetKind === 'cover'
@@ -231,9 +235,10 @@ export const StaticMedia: StaticMediaResolvers = {
         staticMedia.assetKind === 'cover'
           ? COVER_ASSET_SIZES
           : MODULE_IMAGES_SIZES,
+        'png',
       );
     } else if (kind === 'svg') {
-      return getCloudinaryAssetURL(cloudinaryId, 'image');
+      return getCloudinaryAssetURL(cloudinaryId, 'image', 'svg');
     } else {
       return getCloudinaryAssetURL(cloudinaryId, 'raw');
     }

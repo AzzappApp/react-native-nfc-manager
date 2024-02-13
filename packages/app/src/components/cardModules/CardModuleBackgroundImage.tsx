@@ -7,6 +7,8 @@ import {
   useSVG,
   Paint,
   BlendColor,
+  useImage,
+  Image,
 } from '@shopify/react-native-skia';
 import { StyleSheet } from 'react-native';
 import type { ColorValue } from 'react-native';
@@ -20,11 +22,60 @@ type CardModuleBackgroundImageProps = {
 };
 
 const CardModuleBackgroundImage = (props: CardModuleBackgroundImageProps) => {
+  if (!props.backgroundUri) {
+    return null;
+  }
+  if (props.backgroundUri.endsWith('.svg')) {
+    return <CardModuleBackgroundSvgImage {...props} />;
+  } else {
+    return <CardModuleBackgroundImageInner {...props} />;
+  }
+};
+
+const CardModuleBackgroundImageInner = (
+  props: CardModuleBackgroundImageProps,
+) => {
+  const { layout, backgroundUri, resizeMode, patternColor, backgroundOpacity } =
+    props;
+  const image = useImage(backgroundUri);
+
+  if (image) {
+    return (
+      <Canvas style={styles.container}>
+        <Group
+          opacity={backgroundOpacity}
+          layer={
+            <Paint>
+              <BlendColor
+                color={patternColor?.toString() ?? 'black'}
+                mode="srcIn"
+              />
+            </Paint>
+          }
+        >
+          <Image
+            image={image}
+            fit={resizeMode === 'contain' ? 'contain' : 'fill'}
+            x={0}
+            y={0}
+            width={layout.width}
+            height={layout.height}
+          />
+        </Group>
+      </Canvas>
+    );
+  }
+
+  return null;
+};
+
+const CardModuleBackgroundSvgImage = (
+  props: CardModuleBackgroundImageProps,
+) => {
   const { layout, resizeMode, backgroundUri, patternColor, backgroundOpacity } =
     props;
 
   const svg = useSVG(backgroundUri);
-  if (!backgroundUri) return null;
 
   if (!svg) {
     return null;
@@ -99,7 +150,7 @@ const CardModuleBackgroundImage = (props: CardModuleBackgroundImageProps) => {
             </Paint>
           }
         >
-          <ImageSVG svg={svg} width={svg.width()} height={svg.height()} />
+          <ImageSVG svg={svg} width={svgWidth} height={svgHeight} />
         </Group>
       </Canvas>
     )
