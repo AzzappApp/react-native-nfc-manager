@@ -3,13 +3,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { isEqual, omit } from 'lodash';
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { FormattedMessage } from 'react-intl';
-import {
-  PixelRatio,
-  Platform,
-  StyleSheet,
-  View,
-  useWindowDimensions,
-} from 'react-native';
+import { Platform, StyleSheet, View, useWindowDimensions } from 'react-native';
 import { FlatList } from 'react-native-gesture-handler';
 import {
   graphql,
@@ -36,6 +30,7 @@ import {
 } from '#components/gpu';
 import { useScreenHasFocus } from '#components/NativeRouter';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
+import { get as getCappedPixelRatio } from '#relayProviders/CappedPixelRatio.relayprovider';
 import ActivityIndicator from '#ui/ActivityIndicator';
 import CarouselSelectList from '#ui/CarouselSelectList';
 import PressableOpacity from '#ui/PressableOpacity';
@@ -816,7 +811,7 @@ const CoverEditorTemplateRenderer = ({
     let { mediaCropParameters } = mediaInfos;
     if (sourceMedia.rawUri && mediaCropParameters?.cropData) {
       const { originX, originY, width, height } = mediaCropParameters.cropData;
-      const scale = (256 * Math.min(2, PixelRatio.get())) / sourceMedia.width;
+      const scale = (256 * getCappedPixelRatio()) / sourceMedia.width;
       mediaCropParameters = {
         ...mediaCropParameters,
         cropData: {

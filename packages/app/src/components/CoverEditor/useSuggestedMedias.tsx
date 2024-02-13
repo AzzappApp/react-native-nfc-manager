@@ -32,6 +32,10 @@ const useSuggestedMedias = (
       @argumentDefinitions(
         after: { type: String }
         first: { type: Int, defaultValue: 50 }
+        cappedPixelRatio: {
+          type: "Float!"
+          provider: "CappedPixelRatio.relayprovider"
+        }
       ) {
         suggestedImages: suggestedMedias(
           kind: image
@@ -41,7 +45,7 @@ const useSuggestedMedias = (
           edges {
             node {
               id
-              uri(width: 256, pixelRatio: 2)
+              uri(width: 256, pixelRatio: $cappedPixelRatio)
               rawUri: uri(raw: true)
               width
               height
@@ -65,6 +69,10 @@ const useSuggestedMedias = (
       @argumentDefinitions(
         after: { type: String }
         first: { type: Int, defaultValue: 50 }
+        cappedPixelRatio: {
+          type: "Float!"
+          provider: "CappedPixelRatio.relayprovider"
+        }
       ) {
         suggestedVideos: suggestedMedias(
           kind: video
@@ -74,7 +82,7 @@ const useSuggestedMedias = (
           edges {
             node {
               id
-              uri(width: 256, pixelRatio: 2)
+              uri(width: 256, pixelRatio: $cappedPixelRatio)
               rawUri: uri(raw: true)
               width
               height
