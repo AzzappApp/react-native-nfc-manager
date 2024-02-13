@@ -15,7 +15,6 @@ import androidx.media3.transformer.EncoderSelector
 import androidx.media3.transformer.ExportException
 import androidx.media3.transformer.ExportResult
 import androidx.media3.transformer.TransformationRequest
-import androidx.media3.transformer.TransformationRequest.HDR_MODE_KEEP_HDR
 import androidx.media3.transformer.Transformer
 import androidx.media3.transformer.VideoEncoderSettings
 import com.azzapp.MainApplication
@@ -82,7 +81,7 @@ import kotlin.math.round
     removeAudio: Boolean,
     promise: Promise
   ) {
-    val transformerRequestBuilder = TransformationRequest.Builder().setHdrMode(HDR_MODE_KEEP_HDR).build()
+    val transformerRequestBuilder = TransformationRequest.Builder().setHdrMode(Composition.HDR_MODE_KEEP_HDR).build()
     var loadedLutFilterBitmap: Bitmap? = null
     runBlocking {
       try {

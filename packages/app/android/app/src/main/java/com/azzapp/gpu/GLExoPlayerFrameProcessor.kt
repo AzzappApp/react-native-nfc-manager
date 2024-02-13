@@ -16,6 +16,7 @@ import androidx.media3.common.OnInputFrameProcessedListener
 import androidx.media3.common.SurfaceInfo
 import androidx.media3.common.VideoFrameProcessingException
 import androidx.media3.common.VideoFrameProcessor
+import androidx.media3.common.util.TimestampIterator
 import androidx.media3.common.util.UnstableApi
 import com.azzapp.gpu.filters.OrientationFilter
 import com.azzapp.gpu.filters.RotationFilter
@@ -95,10 +96,15 @@ import javax.microedition.khronos.egl.*
 
   }
 
-  override fun queueInputBitmap(inputBitmap: Bitmap, durationUs: Long, frameRate: Float) {
+  override fun queueInputBitmap(
+    inputBitmap: Bitmap,
+    inStreamOffsetsUs: TimestampIterator
+  ): Boolean {
+    return true;
   }
 
-  override fun queueInputTexture(textureId: Int, presentationTimeUs: Long) {
+  override fun queueInputTexture(textureId: Int, presentationTimeUs: Long): Boolean {
+    return true;
   }
 
   override fun setOnInputFrameProcessedListener(listener: OnInputFrameProcessedListener) {
@@ -106,18 +112,19 @@ import javax.microedition.khronos.egl.*
 
 
   override fun getInputSurface(): Surface = inputSurface
-
-  override fun registerInputStream(inputType: Int) {
-
+  override fun registerInputStream(
+    inputType: Int,
+    effects: MutableList<Effect>,
+    frameInfo: FrameInfo
+  ) {
+      nextInputFrameInfo = frameInfo
   }
 
-  override fun setInputFrameInfo(inputFrameInfo: FrameInfo) {
-    nextInputFrameInfo = inputFrameInfo
+  override fun registerInputFrame(): Boolean {
+      pendingFrames.add(nextInputFrameInfo);
+      return true;
   }
 
-  override fun registerInputFrame() {
-    pendingFrames.add(nextInputFrameInfo)
-  }
 
   override fun getPendingInputFrameCount(): Int {
     return pendingFrames.size
@@ -299,11 +306,10 @@ import javax.microedition.khronos.egl.*
   ) : VideoFrameProcessor.Factory {
 
     override fun create(
-      context: Context, 
-      effects: MutableList<Effect>, 
-      debugViewProvider: DebugViewProvider, 
-      inputColorInfo: ColorInfo, 
-      outputColorInfo: ColorInfo, 
+      context: Context,
+      debugViewProvider: DebugViewProvider,
+      inputColorInfo: ColorInfo,
+      outputColorInfo: ColorInfo,
       renderFramesAutomatically: Boolean,
       listenerExecutor: Executor,
       listener: VideoFrameProcessor.Listener): VideoFrameProcessor {

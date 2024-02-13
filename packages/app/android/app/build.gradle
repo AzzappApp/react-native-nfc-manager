@@ -132,7 +132,8 @@ android {
 
 ext {
     REACT_NATIVE_NODE_MODULES_DIR = reactNativePath
-    MEDIA3_VERSION = "1.1.1"
+    MEDIA3_VERSION = "1.2.1"
+    GLIDE_VERSION = "4.16.0"
 }
 
 apply plugin: "kotlin-android"
@@ -151,15 +152,15 @@ dependencies {
     // kotlin dependencies
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:${rootProject.ext.kotlinVersion}"
     // TODO https://github.com/Kotlin/kotlinx.coroutines#avoiding-including-the-debug-infrastructure-in-the-resulting-apk
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
 
     // Selfie segmentation mlkit
     implementation 'com.google.mlkit:segmentation-selfie:16.0.0-beta4'
     
     // glide dependencies
-    implementation "com.github.bumptech.glide:glide:4.16.0"
-    implementation "com.github.bumptech.glide:okhttp3-integration:4.16.0"
-    annotationProcessor "com.github.bumptech.glide:compiler:4.16.0"
+    implementation "com.github.bumptech.glide:glide:${GLIDE_VERSION}"
+    implementation "com.github.bumptech.glide:okhttp3-integration:${GLIDE_VERSION}"
+    annotationProcessor "com.github.bumptech.glide:compiler:${GLIDE_VERSION}"
 
     // exoplayer dependencies
     implementation "androidx.media3:media3-exoplayer:${MEDIA3_VERSION}"
