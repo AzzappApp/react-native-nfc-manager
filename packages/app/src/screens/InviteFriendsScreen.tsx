@@ -42,8 +42,9 @@ const InviteFriendsScreen = ({
   const message = intl.formatMessage(
     {
       defaultMessage:
-        "Hey, I'm using azzapp, the ultimate networking app for businesses & individuals. Install the app here: {url}",
-      description: 'Invite message to share with friends',
+        "Hey, I'm using azzapp, the ultimate networking app for businesses and individuals. Install the app here: {url}",
+      description:
+        'Invite message to share with friends - avoid specific characters like &',
     },
     { url: 'https://azzapp.com' },
   );
@@ -108,7 +109,7 @@ const InviteFriendsScreen = ({
             style={styles.inviteOption}
             onPress={() => {
               Linking.openURL(
-                `sms:${Platform.OS === 'ios' ? '&' : '?'}body=${message}`,
+                `sms:${Platform.OS === 'ios' ? '&' : '?'}body="${message}"`,
               ).catch(err => {
                 //TODO: handle error
                 console.error('An error occurred', err);
