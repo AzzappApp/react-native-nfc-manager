@@ -66,13 +66,11 @@ const multiUserAddFormSchema = z.object({
   firstName: z.string().optional(),
   lastName: z.string().optional(),
   emails: z.array(
-    z
-      .object({
-        label: z.string(),
-        address: z.string(),
-        selected: z.boolean().nullable().optional(),
-      })
-      .refine(email => isValidEmail(email.address)),
+    z.object({
+      label: z.string(),
+      address: z.string(),
+      selected: z.boolean().nullable().optional(),
+    }),
   ),
   phoneNumbers: z.array(
     z.object({
