@@ -92,7 +92,10 @@ const HomeScreenContent = ({ user: userKey }: HomeScreenContentProps) => {
     }
   }, [user?.profiles?.length]);
 
-  const currentProfile = user.profiles?.[currentProfileIndex];
+  const currentProfile = useMemo(
+    () => user.profiles?.[currentProfileIndex],
+    [currentProfileIndex, user.profiles],
+  );
 
   useRouteWillChange('HOME', () => {
     const roundedProfileIndexSharedValue = Math.round(

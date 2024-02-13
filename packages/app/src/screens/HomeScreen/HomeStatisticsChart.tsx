@@ -60,7 +60,7 @@ const HomeStatisticsChart = ({
 
   const { profileInfos } = useAuthState();
 
-  const currentUserIndex = Math.min(
+  const currentUserIndex = Math.max(
     profiles.findIndex(p => p.id === profileInfos?.profileId),
     0,
   );
