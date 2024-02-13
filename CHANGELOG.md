@@ -1,5 +1,7 @@
-## 0.5.5-canary.68
+## 0.5.5-canary.69
 
+* **fix:**  - **webCard:** [#2760](https://github.com/AzzappApp/azzapp/pull/2760) manage png background image for modules ([#2766](https://github.com/AzzappApp/azzapp/pull/2766))
+* **fix:**  - removing the control on email in add user modal ([#2778](https://github.com/AzzappApp/azzapp/pull/2778))
 * **feat:**  - 🎸 restrict access to/from unpublished webcard ([#2768](https://github.com/AzzappApp/azzapp/pull/2768))
 * **fix:**  - **Android:** refactor filter system ([#2759](https://github.com/AzzappApp/azzapp/pull/2759))
 * **fix:**  - **android:** [#2722](https://github.com/AzzappApp/azzapp/pull/2722) disable video when image picker is opened ([#2752](https://github.com/AzzappApp/azzapp/pull/2752))
