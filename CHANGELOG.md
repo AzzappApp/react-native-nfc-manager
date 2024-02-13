@@ -1,5 +1,6 @@
-## 0.5.5-canary.73
+## 0.5.5-canary.74
 
+* **fix:**  - HomeCharts (currentUserIndex were always zero) ([#2783](https://github.com/AzzappApp/azzapp/pull/2783))
 * **fix:**  - set a default actionType on button ([#2779](https://github.com/AzzappApp/azzapp/pull/2779))
 * **fix:**  - avoid specific caracter in sms openLink ([#2781](https://github.com/AzzappApp/azzapp/pull/2781))
 * **build:**  - **android:** upgrade media3 ([#2770](https://github.com/AzzappApp/azzapp/pull/2770))
