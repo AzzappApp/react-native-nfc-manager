@@ -1,16 +1,17 @@
-import { memo, useEffect, useState } from 'react';
+import _ from 'lodash';
+import { memo, useMemo } from 'react';
 import { FormattedMessage } from 'react-intl';
 import { StyleSheet, View } from 'react-native';
 import {
   useAnimatedReaction,
   interpolate,
   useSharedValue,
-  runOnJS,
 } from 'react-native-reanimated';
 import { useFragment, graphql } from 'react-relay';
 import { colors } from '#theme';
 import AnimatedText from '#components/AnimatedText';
 import Link from '#components/Link';
+import useAuthState from '#hooks/useAuthState';
 import PressableOpacity from '#ui/PressableOpacity';
 import Text from '#ui/Text';
 import type { HomeInformations_user$key } from '#relayArtifacts/HomeInformations_user.graphql';
@@ -38,6 +39,7 @@ const HomeInformations = ({
     graphql`
       fragment HomeInformations_user on User {
         profiles {
+          id
           webCard {
             id
             userName
@@ -52,101 +54,55 @@ const HomeInformations = ({
     `,
     user,
   );
-
-  // using relay result direclty inside animated hook cause crash
-  const infosShared = useSharedValue(
-    profiles?.map(({ webCard }) => {
-      return {
-        nbPosts: webCard.nbPosts,
-        nbFollowings: webCard.nbFollowings,
-        nbFollowers: webCard.nbFollowers,
-        nbLikes: webCard.nbPostsLiked,
-      };
-    }) ?? [],
+  const nbLikesValue = useMemo(
+    () => profiles?.map(({ webCard }) => webCard.nbPostsLiked) ?? [],
+    [profiles],
+  );
+  const nbFollowersValue = useMemo(
+    () => profiles?.map(({ webCard }) => webCard.nbFollowers) ?? [],
+    [profiles],
   );
 
-  useEffect(() => {
-    //updating the infosShared when profiles changed (after creating a new profile)
-    if (profiles) {
-      infosShared.value = profiles?.map(({ webCard }) => {
-        return {
-          nbPosts: webCard.nbPosts,
-          nbFollowings: webCard.nbFollowings,
-          nbFollowers: webCard.nbFollowers,
-          nbLikes: webCard.nbPostsLiked,
-        };
-      });
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [profiles]);
-
-  //TODO: reanmiated 3 and computedValue for better performance
-  const nbPosts = useSharedValue(format(infosShared.value[0].nbPosts ?? 0));
-  const nbLikes = useSharedValue(format(infosShared.value[0].nbLikes ?? 0));
-  const nbFollowers = useSharedValue(
-    format(infosShared.value[0].nbFollowers ?? 0),
-  );
-  const nbFollowings = useSharedValue(
-    format(infosShared.value[0].nbFollowings ?? 0),
+  const nbFollowingsValue = useMemo(
+    () => profiles?.map(({ webCard }) => webCard.nbFollowings) ?? [],
+    [profiles],
   );
 
+  const nbPostsValue = useMemo(
+    () => profiles?.map(({ webCard }) => webCard.nbPosts) ?? [],
+    [profiles],
+  );
+
+  const nbPosts = useSharedValue('0');
+  const nbLikes = useSharedValue('0');
+  const nbFollowers = useSharedValue('0');
+  const nbFollowings = useSharedValue('0');
   //using profiles object directly in animatedReaction causes error animatedHost(seems to be the case for all relay query result)
-  const [currentProfile, setCurrentProfile] = useState(profiles?.[0]);
-  const defineCurrentProfile = (index: number) => {
-    if (profiles && index >= 0 && index < profiles.length) {
-      setCurrentProfile(profiles[index]);
-    }
-  };
+  const { profileInfos } = useAuthState();
+
+  const currentProfile = (profiles ?? []).find(
+    p => p.id === profileInfos?.profileId,
+  );
+
+  const inputRange = _.range(0, profiles?.length);
 
   useAnimatedReaction(
     () => currentProfileIndexSharedValue.value,
     actual => {
       if (actual >= 0 && profiles && profiles?.length > 1) {
-        runOnJS(defineCurrentProfile)(Math.floor(actual));
-
-        const prevIndex = Math.floor(actual);
-        const nextIndex = Math.ceil(actual);
-
-        const previous = infosShared.value[prevIndex] ?? 0;
-        //  const current = infosShared.value[currentIndex.value];
-        const next =
-          infosShared.value[
-            Math.min(nextIndex, infosShared.value.length - 1)
-          ] ?? 0;
-
-        nbPosts.value = format(
-          interpolate(
-            actual,
-            [prevIndex, nextIndex],
-            [previous.nbPosts, next.nbPosts],
-          ),
-        );
-        nbLikes.value = format(
-          interpolate(
-            actual,
-            [prevIndex, nextIndex],
-            [previous.nbLikes, next.nbLikes],
-          ),
-        );
+        nbLikes.value = format(interpolate(actual, inputRange, nbLikesValue));
+        nbPosts.value = format(interpolate(actual, inputRange, nbPostsValue));
         nbFollowers.value = format(
-          interpolate(
-            actual,
-            [prevIndex, nextIndex],
-            [previous.nbFollowers, next.nbFollowers],
-          ),
+          interpolate(actual, inputRange, nbFollowersValue),
         );
         nbFollowings.value = format(
-          interpolate(
-            actual,
-            [prevIndex, nextIndex],
-            [previous.nbFollowings, next.nbFollowings],
-          ),
+          interpolate(actual, inputRange, nbFollowingsValue),
         );
       } else if (actual >= 0) {
-        nbPosts.value = format(infosShared.value[0].nbPosts ?? 0);
-        nbLikes.value = format(infosShared.value[0].nbLikes ?? 0);
-        nbFollowers.value = format(infosShared.value[0].nbFollowers ?? 0);
-        nbFollowings.value = format(infosShared.value[0].nbFollowings ?? 0);
+        nbPosts.value = '0';
+        nbLikes.value = '0';
+        nbFollowers.value = '0';
+        nbFollowings.value = '0';
       }
     },
     [profiles],
@@ -230,7 +186,7 @@ export default memo(HomeInformations);
 export const format = (value: number) => {
   'worklet';
   if (typeof value === 'number') {
-    return Math.trunc(value).toString();
+    return Math.round(value).toString();
   }
   return '0';
 };
