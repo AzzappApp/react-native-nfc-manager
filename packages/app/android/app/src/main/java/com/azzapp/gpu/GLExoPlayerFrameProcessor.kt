@@ -6,6 +6,7 @@ import android.graphics.SurfaceTexture
 import android.opengl.EGL14
 import android.opengl.EGLExt
 import android.opengl.GLES20
+import android.util.Log
 import android.view.Surface
 import androidx.media3.common.ColorInfo
 import androidx.media3.common.DebugViewProvider
@@ -16,9 +17,12 @@ import androidx.media3.common.SurfaceInfo
 import androidx.media3.common.VideoFrameProcessingException
 import androidx.media3.common.VideoFrameProcessor
 import androidx.media3.common.util.UnstableApi
+import com.azzapp.gpu.filters.OrientationFilter
+import com.azzapp.gpu.filters.RotationFilter
 import com.azzapp.gpu.utils.GLFrame
 import com.azzapp.gpu.utils.GLESUtils
 import com.azzapp.gpu.utils.GLObjectManager
+import com.azzapp.gpu.utils.ImageOrientation
 import kotlinx.coroutines.ExecutorCoroutineDispatcher
 import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.runBlocking
@@ -256,16 +260,33 @@ import javax.microedition.khronos.egl.*
       ),
       glObjectManager
     )
+    image.release()
+
+    if (surfaceInfo.orientationDegrees != 0 &&  surfaceInfo.orientationDegrees != 360) {
+      val imageOrientation = when(surfaceInfo.orientationDegrees) {
+        90 -> ImageOrientation.LEFT
+        180 -> ImageOrientation.DOWN
+        270 -> ImageOrientation.RIGHT
+        else -> ImageOrientation.UP
+      }
+      val newImage = glObjectManager.applyOrientationFilter(
+        OrientationFilter.Parameters(
+          inputImage = outputImage,
+          orientation = imageOrientation
+        )
+      )
+      outputImage.release()
+      outputImage = newImage
+    }
 
     textureRenderer.renderTexture(
       outputImage.texture,
       GLESUtils.IDENT_MATRIX,
-      round(image.x * surfaceInfo.width.toFloat() / image.width.toFloat()).toInt(),
-      -round(image.y * surfaceInfo.height.toFloat() / image.height.toFloat()).toInt(),
+      round(outputImage.x * surfaceInfo.width.toFloat() / outputImage.width.toFloat()).toInt(),
+      -round(outputImage.y * surfaceInfo.height.toFloat() / outputImage.height.toFloat()).toInt(),
       surfaceInfo.width,
       surfaceInfo.height
     )
-    image.release()
     outputImage.release()
   }
 
