@@ -1,5 +1,7 @@
-## 0.5.5-canary.74
+## 0.5.5-canary.75
 
+* **fix:**  - **android:** [#2692](https://github.com/AzzappApp/azzapp/pull/2692) wrong image size produces zoomed in images ([#2791](https://github.com/AzzappApp/azzapp/pull/2791))
+* **fix:**  - **Android:** reenable missing adjustments ([#2790](https://github.com/AzzappApp/azzapp/pull/2790))
 * **fix:**  - HomeCharts (currentUserIndex were always zero) ([#2783](https://github.com/AzzappApp/azzapp/pull/2783))
 * **fix:**  - set a default actionType on button ([#2779](https://github.com/AzzappApp/azzapp/pull/2779))
 * **fix:**  - avoid specific caracter in sms openLink ([#2781](https://github.com/AzzappApp/azzapp/pull/2781))
