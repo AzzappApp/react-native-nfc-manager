@@ -1,4 +1,4 @@
-import { Image } from 'react-native';
+import ImageSize from 'react-native-image-size';
 
 /**
  * Returns the size of an image.
@@ -6,14 +6,7 @@ import { Image } from 'react-native';
  * @param uri The URI of the image.
  * @returns A promise that resolves with the size of the image.
  */
-export const getImageSize = (uri: string) =>
-  new Promise<{ width: number; height: number }>((resolve, reject) => {
-    Image.getSize(
-      uri,
-      (width, height) => resolve({ width, height }),
-      error => reject(error),
-    );
-  });
+export const getImageSize = (uri: string) => ImageSize.getSize(uri);
 
 /**
  * Format a number to a 2 digit string.

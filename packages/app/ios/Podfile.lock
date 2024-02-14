@@ -1220,7 +1220,7 @@ PODS:
     - React-jsi (= 0.73.4)
     - React-logger (= 0.73.4)
     - React-perflogger (= 0.73.4)
-  - RNBootSplash (5.3.0):
+  - RNBootSplash (5.4.0):
     - React-Core
   - RNCAsyncStorage (1.21.0):
     - React-Core
@@ -1712,7 +1712,7 @@ SPEC CHECKSUMS:
   React-runtimescheduler: ed48e5faac6751e66ee1261c4bd01643b436f112
   React-utils: 6e5ad394416482ae21831050928ae27348f83487
   ReactCommon: 840a955d37b7f3358554d819446bffcf624b2522
-  RNBootSplash: 73c2a97d761db234125638c24ad6da6d781d049d
+  RNBootSplash: 009c55e0258f3e56be9c5f7a578bf2baf140c4bc
   RNCAsyncStorage: 618d03a5f52fbccb3d7010076bc54712844c18ef
   RNCMaskedView: 090213d32d8b3bb83a4dcb7d12c18f0152591906
   RNDateTimePicker: fc2e4f2795877d45e84d85659bebe627eba5c931
@@ -1734,7 +1734,7 @@ SPEC CHECKSUMS:
   SentryPrivate: 839b1e58addf58624087a80b2628e543193fa8ef
   SocketRocket: f32cd54efbe0f095c4d7594881e52619cfe80b17
   VisionCamera: 4b98b273902ac18491bb68481b6601f1f0da0f2d
-  Yoga: 64cd2a583ead952b0315d5135bf39e053ae9be70
+  Yoga: 1b901a6d6eeba4e8a2e8f308f708691cdb5db312
   ZXingObjC: 8898711ab495761b2dbbdec76d90164a6d7e14c5
 
 PODFILE CHECKSUM: 12a372b1bfae73bb427f1900e5ad20006b112d12
