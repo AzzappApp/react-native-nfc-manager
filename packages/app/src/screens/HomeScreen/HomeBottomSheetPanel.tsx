@@ -159,6 +159,24 @@ const HomeBottomSheetPanel = ({
             }
           : null,
         withProfile &&
+        profileRole &&
+        !profile?.invited &&
+        isAdmin(profileRole) &&
+        profile?.webCard.cardCover
+          ? {
+              type: 'row',
+              icon: 'shared_webcard',
+              text: intl.formatMessage({
+                defaultMessage: 'Multi user',
+                description: 'Multi user menu option',
+              }),
+              linkProps: {
+                route: 'MULTI_USER',
+              },
+              onPress: close,
+            }
+          : null,
+        withProfile &&
         profile &&
         profile?.webCard.cardIsPublished &&
         !profile?.invited
@@ -175,7 +193,7 @@ const HomeBottomSheetPanel = ({
               onPress: onShare,
             }
           : null,
-
+        { type: 'separator' },
         withProfile && !profile?.invited
           ? {
               type: 'row',
@@ -186,25 +204,6 @@ const HomeBottomSheetPanel = ({
               }),
               linkProps: {
                 route: 'INVITE_FRIENDS',
-              },
-              onPress: close,
-            }
-          : null,
-        { type: 'separator' },
-        withProfile &&
-        profileRole &&
-        !profile?.invited &&
-        isAdmin(profileRole) &&
-        profile?.webCard.cardCover
-          ? {
-              type: 'row',
-              icon: 'shared_webcard',
-              text: intl.formatMessage({
-                defaultMessage: 'Multi user',
-                description: 'Multi user menu option',
-              }),
-              linkProps: {
-                route: 'MULTI_USER',
               },
               onPress: close,
             }
