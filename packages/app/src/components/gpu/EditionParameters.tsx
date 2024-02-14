@@ -313,22 +313,12 @@ export const editionParametersTransforms: {
     value: NonNullable<EditionParameters[key]>,
   ) => NonNullable<EditionParameters[key]>;
 } = {
-  saturation: Platform.select({
+  sharpness: Platform.select({
     default: value => value,
-    android: value => (value < 1 ? value - 1 : (value - 1) / 5),
-  }),
-  temperature: Platform.select({
-    default: value => value,
-    android: value => {
-      const temperature = value / 6500 - 0.5;
-      if (temperature < 0.5) {
-        return temperature;
-      }
-      return (temperature - 0.5) / 2 + 0.5;
-    },
+    android: value => (value > 0 ? value * 4 : value),
   }),
   vignetting: Platform.select({
     default: value => value,
-    android: value => value / 8,
+    android: value => value / 3,
   }),
 };

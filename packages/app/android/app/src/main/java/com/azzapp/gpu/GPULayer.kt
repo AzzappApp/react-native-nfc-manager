@@ -11,7 +11,11 @@ import com.azzapp.gpu.filters.ContrastFilter
 import com.azzapp.gpu.filters.CropFilter
 import com.azzapp.gpu.filters.OrientationFilter
 import com.azzapp.gpu.filters.RotationFilter
+import com.azzapp.gpu.filters.SaturationFilter
+import com.azzapp.gpu.filters.SharpenFilter
+import com.azzapp.gpu.filters.TemperatureFilter
 import com.azzapp.gpu.filters.TintFilter
+import com.azzapp.gpu.filters.VignetteFilter
 import com.azzapp.gpu.utils.GLFrame
 import com.azzapp.gpu.utils.GLObjectManager
 import com.azzapp.gpu.utils.GLESUtils
@@ -291,6 +295,54 @@ class GPULayer(
             ContrastFilter.Parameters(
               inputImage = currentImage,
               contrast = contrast.toFloat()
+            )
+          )
+        )
+      }
+
+      var saturation = parameters?.saturation
+      if (saturation != null) {
+        setImage(
+          glObjectManager.applySaturationFilter(
+            SaturationFilter.Parameters(
+              inputImage = currentImage,
+              saturation = saturation.toFloat()
+            )
+          )
+        )
+      }
+
+      var sharpness = parameters?.sharpness
+      if (sharpness != null) {
+        setImage(
+          glObjectManager.applySharpenFilter(
+            SharpenFilter.Parameters(
+              inputImage = currentImage,
+              sharpness = sharpness.toFloat()
+            )
+          )
+        )
+      }
+
+      var temperature = parameters?.temperature
+      if (temperature != null) {
+        setImage(
+          glObjectManager.applyTemperatureFilter(
+            TemperatureFilter.Parameters(
+              inputImage = currentImage,
+              temperature = temperature.toFloat()
+            )
+          )
+        )
+      }
+
+      var vignetting = parameters?.vignetting
+      if (vignetting != null) {
+        setImage(
+          glObjectManager.applyVignetteFilter(
+            VignetteFilter.Parameters(
+              inputImage = currentImage,
+              vignette = vignetting.toFloat()
             )
           )
         )

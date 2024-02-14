@@ -9,7 +9,11 @@ import com.azzapp.gpu.filters.CropFilter
 import com.azzapp.gpu.filters.FilterFactory
 import com.azzapp.gpu.filters.OrientationFilter
 import com.azzapp.gpu.filters.RotationFilter
+import com.azzapp.gpu.filters.SaturationFilter
+import com.azzapp.gpu.filters.SharpenFilter
+import com.azzapp.gpu.filters.TemperatureFilter
 import com.azzapp.gpu.filters.TintFilter
+import com.azzapp.gpu.filters.VignetteFilter
 
 class GLObjectManager {
   val frameBufferPool = FrameBufferPool()
@@ -61,9 +65,23 @@ class GLObjectManager {
     OrientationFilter.NAME,
     params
   )
+  fun applySaturationFilter(params: SaturationFilter.Parameters) = applyFilter(
+    SaturationFilter.NAME,
+    params
+  )
+
+  fun applySharpenFilter(params: SharpenFilter.Parameters) = applyFilter(
+    SharpenFilter.NAME,
+    params
+  )
 
   fun applyRotationFilter(params: RotationFilter.Parameters) = applyFilter(
     RotationFilter.NAME,
+    params
+  )
+
+  fun applyTemperatureFilter(params: TemperatureFilter.Parameters) = applyFilter(
+    TemperatureFilter.NAME,
     params
   )
 
@@ -72,6 +90,10 @@ class GLObjectManager {
     params
   )
 
+  fun applyVignetteFilter(params: VignetteFilter.Parameters) = applyFilter(
+    VignetteFilter.NAME,
+    params
+  )
 
 
   fun release() {

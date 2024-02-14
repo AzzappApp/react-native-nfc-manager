@@ -50,8 +50,20 @@ class FilterFactory {
       registerFilter(RotationFilter.NAME) {
         RotationFilter()
       }
+      registerFilter(SaturationFilter.NAME) {
+        SaturationFilter()
+      }
+      registerFilter(SharpenFilter.NAME) {
+        SharpenFilter()
+      }
+      registerFilter(TemperatureFilter.NAME) {
+        TemperatureFilter()
+      }
       registerFilter(TintFilter.NAME) {
         TintFilter()
+      }
+      registerFilter(VignetteFilter.NAME) {
+        VignetteFilter()
       }
     }
   }
