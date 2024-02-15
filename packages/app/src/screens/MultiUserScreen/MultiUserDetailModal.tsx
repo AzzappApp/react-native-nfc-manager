@@ -398,6 +398,9 @@ const MultiUserDetailModal = ({
           if (connection) {
             ConnectionHandler.deleteNode(connection, profile.id);
           }
+          //update the user counter profile?.webCard?.nbProfiles
+          const nbProfiles = webCardRecord?.getValue('nbProfiles') as number;
+          webCardRecord?.setValue(nbProfiles - 1, 'nbProfiles');
         }
       },
     });

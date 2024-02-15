@@ -476,6 +476,9 @@ const MultiUserAddModal = (
                 }
               }
             }
+            //update the user counter profile?.webCard?.nbProfiles
+            const nbProfiles = webCard?.getValue('nbProfiles') as number;
+            webCard?.setValue(nbProfiles + 1, 'nbProfiles');
           },
         });
       }
