@@ -1,5 +1,6 @@
-## 0.5.5-canary.77
+## 0.5.5-canary.78
 
+* **feat:**  - **ImagePicker:** access to app settings if media permission is limited ([#2806](https://github.com/AzzappApp/azzapp/pull/2806))
 * **fix:**  - multi user counter update cache ([#2798](https://github.com/AzzappApp/azzapp/pull/2798))
 * **fix:**  - avatar should use aspect ratio return from image picker (in case of forceImageRatio) ([#2793](https://github.com/AzzappApp/azzapp/pull/2793))
 * **fix:**  - **android:** [#2692](https://github.com/AzzappApp/azzapp/pull/2692) wrong image size produces zoomed in images ([#2791](https://github.com/AzzappApp/azzapp/pull/2791))
