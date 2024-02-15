@@ -30,6 +30,7 @@ type HomeInformationsProps = {
   height: number;
   currentProfileIndexSharedValue: SharedValue<number>;
   variant?: 'dark' | 'light';
+  mode?: 'compact' | 'full';
   initialStatsIndex?: number;
 };
 
@@ -39,6 +40,7 @@ const HomeStatistics = ({
   currentProfileIndexSharedValue,
   variant = 'dark',
   initialStatsIndex = 0,
+  mode = 'full',
 }: HomeInformationsProps) => {
   //TODO: backend part .
 
@@ -133,80 +135,106 @@ const HomeStatistics = ({
         user={profiles}
         variant={variant}
       />
-      <AnimatedScrollView
-        ref={scrollViewRef}
-        style={{
-          height: BOX_NUMBER_HEIGHT,
-          width: '100%',
-          overflow: 'visible',
-          paddingTop: 5,
-        }}
-        pagingEnabled
-        snapToInterval={BOX_NUMBER_WIDTH}
-        decelerationRate="fast"
-        snapToAlignment="start"
-        showsHorizontalScrollIndicator={false}
-        contentContainerStyle={{
-          paddingLeft: (width - 2 * PADDING_HORIZONTAL - BOX_NUMBER_WIDTH) / 2,
-          paddingRight: (width - 2 * PADDING_HORIZONTAL - BOX_NUMBER_WIDTH) / 2,
-          overflow: 'visible',
-        }}
-        bounces={false}
-        scrollEventThrottle={16}
-        horizontal
-        onScroll={scrollHandler}
-        contentOffset={{ x: initialStatsIndex * BOX_NUMBER_WIDTH, y: 0 }}
-      >
-        <StatisticItems
-          variant={variant}
-          value={totalViews}
-          title={
-            intl.formatMessage(
-              {
-                defaultMessage: 'Webcard{azzappA} Views',
-                description: 'Home statistics - webcardView label',
-              },
-              {
-                azzappA: (
-                  <Text style={styles.icon} variant="azzapp">
-                    a
-                  </Text>
-                ),
-              },
-            ) as string
-          }
-          scrollIndex={scrollIndexOffset}
-          index={0}
-          onSelect={onSelectStat}
-        />
-        <StatisticItems
-          variant={variant}
-          value={totalScans}
-          title={intl.formatMessage({
-            defaultMessage: 'Contact card scans',
-            description: 'Home statistics - Contact card scans label',
-          })}
-          scrollIndex={scrollIndexOffset}
-          index={1}
-          onSelect={onSelectStat}
-        />
-        <StatisticItems
-          variant={variant}
-          value={totalLikes}
-          title={intl.formatMessage({
-            defaultMessage: 'Total Likes',
-            description: 'Home statistics - Total Likes',
-          })}
-          scrollIndex={scrollIndexOffset}
-          index={2}
-          onSelect={onSelectStat}
-        />
-      </AnimatedScrollView>
+      {mode === 'full' && (
+        <AnimatedScrollView
+          ref={scrollViewRef}
+          style={{
+            height: BOX_NUMBER_HEIGHT,
+            width: '100%',
+            overflow: 'visible',
+            paddingTop: 5,
+          }}
+          pagingEnabled
+          snapToInterval={BOX_NUMBER_WIDTH}
+          decelerationRate="fast"
+          snapToAlignment="start"
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={{
+            paddingLeft:
+              (width - 2 * PADDING_HORIZONTAL - BOX_NUMBER_WIDTH) / 2,
+            paddingRight:
+              (width - 2 * PADDING_HORIZONTAL - BOX_NUMBER_WIDTH) / 2,
+            overflow: 'visible',
+            height: BOX_NUMBER_HEIGHT,
+          }}
+          bounces={false}
+          scrollEventThrottle={16}
+          horizontal
+          onScroll={scrollHandler}
+          contentOffset={{ x: initialStatsIndex * BOX_NUMBER_WIDTH, y: 0 }}
+        >
+          <StatisticItems
+            variant={variant}
+            value={totalViews}
+            title={
+              intl.formatMessage(
+                {
+                  defaultMessage: 'Webcard{azzappA} Views',
+                  description: 'Home statistics - webcardView label',
+                },
+                {
+                  azzappA: (
+                    <Text style={styles.icon} variant="azzapp">
+                      a
+                    </Text>
+                  ),
+                },
+              ) as string
+            }
+            scrollIndex={scrollIndexOffset}
+            index={0}
+            onSelect={onSelectStat}
+          />
+          <StatisticItems
+            variant={variant}
+            value={totalScans}
+            title={intl.formatMessage({
+              defaultMessage: 'Contact card scans',
+              description: 'Home statistics - Contact card scans label',
+            })}
+            scrollIndex={scrollIndexOffset}
+            index={1}
+            onSelect={onSelectStat}
+          />
+          <StatisticItems
+            variant={variant}
+            value={totalLikes}
+            title={intl.formatMessage({
+              defaultMessage: 'Total Likes',
+              description: 'Home statistics - Total Likes',
+            })}
+            scrollIndex={scrollIndexOffset}
+            index={2}
+            onSelect={onSelectStat}
+          />
+        </AnimatedScrollView>
+      )}
+      {mode === 'compact' && (
+        <View
+          style={{
+            width: '100%',
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}
+        >
+          <StatisticItems
+            variant={variant}
+            value={totalScans}
+            title={intl.formatMessage({
+              defaultMessage: 'Contact card scans',
+              description: 'Home statistics - Contact card scans label',
+            })}
+            scrollIndex={scrollIndexOffset}
+            index={1}
+            onSelect={onSelectStat}
+          />
+        </View>
+      )}
     </View>
   );
 };
 
-const BOX_NUMBER_HEIGHT = 50;
+const BOX_NUMBER_HEIGHT = 62.3;
 const PADDING_HORIZONTAL = 20;
 const BOX_NUMBER_WIDTH = 140;
 
@@ -267,9 +295,9 @@ export const StatisticItems = ({
 
   return (
     <Animated.View style={[styles.boxContainer, animatedOpacity]}>
-      <Pressable onPress={onPress}>
+      <Pressable onPress={onPress} style={{ overflow: 'visible' }}>
         <AnimatedText
-          style={[styles.largetText, animatedTextStyle]}
+          style={[styles.largeText, animatedTextStyle]}
           text={value}
         />
         <Text variant="smallbold" style={styles.smallText}>
@@ -288,7 +316,6 @@ const stylesheet = createVariantsStyleSheet(() => ({
       justifyContent: 'flex-end',
       alignItems: 'center',
       overflow: 'visible',
-      paddingTop: 4,
     },
     container: {
       justifyContent: 'center',
@@ -298,7 +325,7 @@ const stylesheet = createVariantsStyleSheet(() => ({
       overflow: 'visible',
       flex: 1,
     },
-    largetText: {
+    largeText: {
       ...fontFamilies.extrabold,
       textAlign: 'center',
       fontSize: 40,
@@ -314,7 +341,7 @@ const stylesheet = createVariantsStyleSheet(() => ({
     smallText: {
       color: colors.white,
     },
-    largetText: {
+    largeText: {
       color: colors.white,
     },
   },
@@ -325,7 +352,7 @@ const stylesheet = createVariantsStyleSheet(() => ({
     smallText: {
       color: colors.black,
     },
-    largetText: {
+    largeText: {
       color: colors.black,
     },
   },

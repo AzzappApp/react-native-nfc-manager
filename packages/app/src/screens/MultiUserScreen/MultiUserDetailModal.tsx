@@ -583,6 +583,7 @@ const MultiUserDetailModal = ({
                 currentProfileIndexSharedValue={index}
                 variant={colorScheme === 'dark' ? 'dark' : 'light'}
                 initialStatsIndex={1}
+                mode="compact"
               />
             </View>
           </View>
@@ -663,10 +664,11 @@ const styleSheet = createStyleSheet(appearance => ({
     color: appearance === 'light' ? colors.grey900 : colors.grey300,
   },
   stats: {
-    paddingBottom: 50,
-    display: 'flex',
+    marginBottom: 50,
+    flex: 1,
     flexDirection: 'row',
     justifyContent: 'center',
+    overflow: 'visible',
   },
   name: {
     maxWidth: '50%',
