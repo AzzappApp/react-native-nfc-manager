@@ -54,7 +54,16 @@ const coverTextContainerVertical = style(coverTextContainerVerticalStyle);
 
 const coverTextContainerHorizontalStyle = {
   paddingTop: '15%',
+  paddingBottom: '15%',
 };
+
+const coverTextContainerBottomHorizontalStyle = {
+  paddingTop: '15%',
+};
+
+const coverTextContainerBottomHorizontal = style(
+  coverTextContainerBottomHorizontalStyle,
+);
 
 const coverTextContainerHorizontal = style(coverTextContainerHorizontalStyle);
 
@@ -87,6 +96,8 @@ export default {
   coverTextContainerVerticalStyle,
   coverTextContainerHorizontal,
   coverTextContainerHorizontalStyle,
+  coverTextContainerBottomHorizontal,
+  coverTextContainerBottomHorizontalStyle,
   coverTextContainerTopToBottom,
   coverTextContainerTopToBottomStyle,
   coverTextContainerBottomToTop,

@@ -253,7 +253,11 @@ const CoverTextRenderer = (
         className={cx(
           styles.coverTextContainer,
           orientation !== 'horizontal' && styles.coverTextContainerVertical,
-          orientation === 'horizontal' && styles.coverTextContainerHorizontal,
+          orientation === 'horizontal'
+            ? verticalPosition === 'bottom'
+              ? styles.coverTextContainerBottomHorizontal
+              : styles.coverTextContainerHorizontal
+            : undefined,
           orientation === 'topToBottom' && styles.coverTextContainerTopToBottom,
           orientation === 'bottomToTop' && styles.coverTextContainerBottomToTop,
         )}

@@ -25,6 +25,7 @@ import type {
   TextLayoutLine,
   LayoutChangeEvent,
   LayoutRectangle,
+  TextStyle as RNTextStyle,
 } from 'react-native';
 import type { SharedValue } from 'react-native-reanimated';
 
@@ -190,21 +191,29 @@ const CoverTextRenderer = ({
             },
           ]
         : [],
-    paddingBottom: padding,
+    paddingBottom:
+      orientation === 'horizontal' && verticalPosition !== 'bottom'
+        ? topPadding
+        : padding,
     paddingTop: orientation === 'horizontal' ? topPadding : padding,
     paddingLeft: orientation === 'topToBottom' ? topPadding : padding,
     paddingRight: orientation === 'bottomToTop' ? topPadding : padding,
     justifyContent: overlayJustifyContent,
   };
 
-  const titleTextStyle = {
+  const titleFontSize =
+    (titleStyle?.fontSize ?? DEFAULT_COVER_FONT_SIZE) * scale;
+
+  const titleTextStyle: RNTextStyle = {
     fontFamily: titleStyle?.fontFamily ?? DEFAULT_COVER_FONT_FAMILY,
     color: swapColor(
       titleStyle?.color ?? DEFAULT_COVER_TEXT_COLOR,
       colorPalette,
     ),
-    fontSize: (titleStyle?.fontSize ?? DEFAULT_COVER_FONT_SIZE) * scale,
+    fontSize: titleFontSize,
     textAlign,
+    lineHeight: !subTitle ? 1.2 * titleFontSize : undefined,
+    top: !subTitle ? -titleFontSize * 0.1 : 0,
   } as const;
 
   const subTitleTextStyle = {
