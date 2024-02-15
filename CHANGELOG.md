@@ -1,5 +1,6 @@
-## 0.5.5-canary.80
+## 0.5.5-canary.81
 
+* **feat:**  - 🎸 align text inputs on contact card edition ([#2769](https://github.com/AzzappApp/azzapp/pull/2769))
 * **fix:**  - remove duplicated avatar id input field ([#2807](https://github.com/AzzappApp/azzapp/pull/2807))
 * **fix:**  - Social padding( apply directly on items not on scrollview) ([#2808](https://github.com/AzzappApp/azzapp/pull/2808))
 * **feat:**  - **ImagePicker:** access to app settings if media permission is limited ([#2806](https://github.com/AzzappApp/azzapp/pull/2806))
