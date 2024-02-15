@@ -1,19 +1,14 @@
 package com.azzapp.gpu
 
 import android.graphics.Bitmap
-import android.graphics.drawable.Drawable
+import android.graphics.BitmapFactory
 import android.media.MediaMetadataRetriever
 import android.net.Uri
 import android.os.Build
 import android.util.Log
 import com.azzapp.MainApplication
 import com.bumptech.glide.Glide
-import com.bumptech.glide.load.DataSource
-import com.bumptech.glide.load.engine.GlideException
-import com.bumptech.glide.request.RequestListener
-import com.bumptech.glide.request.target.CustomTarget
-import com.bumptech.glide.request.target.Target
-import com.bumptech.glide.request.transition.Transition
+import expo.modules.image.NoopDownsampleStrategy
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -21,9 +16,10 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
+import java.io.File
 import java.lang.ref.WeakReference
-import java.util.concurrent.CompletableFuture
-import java.util.concurrent.CompletionException
+import java.net.URL
+import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 
 object GPULayerImageLoader {
@@ -114,53 +110,46 @@ object GPULayerImageLoader {
   private suspend fun getBitmapFromImage(uri: Uri)  =
     withContext(Dispatchers.IO) {
       suspendCancellableCoroutine<Bitmap?> { cont ->
-        val target = object : CustomTarget<Bitmap>() {
-          override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
-            cont.resume(resource) {}
-          }
 
-          override fun onLoadCleared(placeholder: Drawable?) {
-            // DO NOTHING ?
+        val uriToLoad = if (uri.scheme != null) uri else MainApplication.getMainApplicationContext().resources.getIdentifier(
+          uri.toString(),
+          "drawable",
+          MainApplication.getMainApplicationContext().packageName
+        )
+
+        var cachedFile: File? = null
+        try {
+          val context = MainApplication.getMainApplicationContext()
+          if (context != null) {
+            cachedFile = Glide.with(context)
+              .asFile()
+              .onlyRetrieveFromCache(true)
+              .load(uri)
+              .submit()
+              .get()
+          }
+        } catch (e: Exception) {
+          Log.d(TAG, "could not decode cached file from glide cache $uri", e)
+        }
+
+        var bitmap: Bitmap? = null
+        if (cachedFile != null) {
+          try {
+            bitmap = BitmapFactory.decodeFile(cachedFile.path)
+          } catch (e: Exception) {
+            Log.w(TAG, "could not fetch image $uri", e)
           }
         }
 
-        val requestManager = Glide.with(MainApplication.getMainApplicationContext())
-
-        val loaded = if (uri.scheme != null) requestManager.asBitmap()
-          .load(uri) else requestManager.asBitmap()
-          .load(
-            MainApplication.getMainApplicationContext().resources.getIdentifier(
-              uri.toString(),
-              "drawable",
-              MainApplication.getMainApplicationContext().packageName
-            )
-          )
-
-        loaded
-          .listener(object : RequestListener<Bitmap> {
-            override fun onLoadFailed(
-              e: GlideException?,
-              model: Any?,
-              target: Target<Bitmap>,
-              isFirstResource: Boolean
-            ): Boolean {
-              cont.resumeWithException(e ?: Error("unknown error"))
-              return true
-            }
-
-            override fun onResourceReady(
-              resource: Bitmap,
-              model: Any,
-              target: Target<Bitmap>?,
-              dataSource: DataSource,
-              isFirstResource: Boolean
-            ): Boolean {
-              return false
-            }
-          })
-          .into(target)
-
-        cont.invokeOnCancellation { requestManager.clear(target) }
+        if (bitmap == null) {
+          try {
+            val url = URL(uriToLoad.toString())
+            bitmap = BitmapFactory.decodeStream(url.openConnection().getInputStream())
+          } catch (e: Exception) {
+            cont.resumeWithException(e)
+          }
+        }
+        cont.resume(bitmap)
       }
     }
 
@@ -183,4 +172,6 @@ object GPULayerImageLoader {
       retriever.release()
       image
     }
+
+  private const val TAG = "GPULayerImageLoad"
 }

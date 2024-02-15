@@ -1,6 +1,6 @@
 import { NativeModules, Platform } from 'react-native';
 import * as AndroidLocalMediaCache from './AndroidLocalMediaCache';
-import { createPrefetecher } from './MediaPrefetcher';
+import { createExpoImagePrefetcher, createPrefetcher } from './MediaPrefetcher';
 
 const { AZPMediaHelpers } = NativeModules;
 
@@ -44,18 +44,21 @@ export const segmentImage: (uri: string) => Promise<string | null> =
  * returns an observable that will complete when the prefetch is done.
  * If the observable is unsubscribed before the prefetch is done, the prefetch will be cancelled.
  */
-export const prefetchImage = createPrefetecher(
-  AZPMediaHelpers.prefetchImage,
-  AZPMediaHelpers.observeImagePrefetchResult,
-  AZPMediaHelpers.cancelImagePrefetch,
-);
+export const prefetchImage = Platform.select({
+  default: createPrefetcher(
+    AZPMediaHelpers.prefetchImage,
+    AZPMediaHelpers.observeImagePrefetchResult,
+    AZPMediaHelpers.cancelImagePrefetch,
+  ),
+  android: createExpoImagePrefetcher(),
+});
 
 /**
  * Prefetches an video.
  * returns an observable that will complete when the prefetch is done.
  * If the observable is unsubscribed before the prefetch is done, the prefetch will be cancelled.
  */
-export const prefetchVideo = createPrefetecher(
+export const prefetchVideo = createPrefetcher(
   AZPMediaHelpers.prefetchVideo,
   AZPMediaHelpers.observeVideoPrefetchResult,
   AZPMediaHelpers.cancelVideoPrefetch,

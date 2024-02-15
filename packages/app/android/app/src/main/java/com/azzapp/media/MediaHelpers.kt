@@ -100,30 +100,6 @@ import java.util.UUID
   }
 
   @ReactMethod
-  fun prefetchImage(uriStr: String, promise: Promise) {
-    val uri = try { Uri.parse(uriStr) } catch(e: NullPointerException) {
-      promise.reject("INVALID_URI", "provided uri is invalid")
-      return;
-    }
-    ImageCache.prefetch(uri, promise)
-  }
-
-  @ReactMethod
-  fun observeImagePrefetchResult(uriStr: String, promise: Promise) {
-    val uri = try { Uri.parse(uriStr) } catch(e: NullPointerException) {
-      promise.reject("INVALID_URI", "provided uri is invalid")
-      return;
-    }
-    ImageCache.observePrefetchResult(uri, promise)
-  }
-
-  @ReactMethod
-  fun cancelImagePrefetch(uriStr: String) {
-    val uri = try { Uri.parse(uriStr) } catch(e: NullPointerException) { return }
-    ImageCache.cancelPrefetch(uri)
-  }
-
-  @ReactMethod
   fun prefetchVideo(uriStr: String, promise: Promise) {
     val uri = try { Uri.parse(uriStr) } catch(e: NullPointerException) {
       promise.reject("INVALID_URI", "provided uri is invalid")
