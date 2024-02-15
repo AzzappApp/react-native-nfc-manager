@@ -296,8 +296,10 @@ const MultiUserDetailModal = ({
         variables: {
           input: {
             ...input,
-            avatarId,
-            contactCard,
+            contactCard: {
+              ...contactCard,
+              avatarId,
+            },
             profileId: profile.id,
           },
           pixelRatio: CappedPixelRatio(),

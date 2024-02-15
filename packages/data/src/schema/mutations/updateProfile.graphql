@@ -18,10 +18,6 @@ input UpdateProfileInput {
   The new profile contact card content.
   """
   contactCard: ContactCardInput
-  """
-  The new profile avatar ID.
-  """
-  avatarId: ID
 }
 
 

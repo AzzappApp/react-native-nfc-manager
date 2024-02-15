@@ -10,7 +10,7 @@ import type { MutationResolvers } from '#schema/__generated__/types';
 // TODO in general perhaps this mutation should be split into two: one for the profile and one for the contactCard
 const updateProfileMutation: MutationResolvers['updateProfile'] = async (
   _,
-  { input: { profileId: gqlProfileId, profileRole, contactCard, avatarId } },
+  { input: { profileId: gqlProfileId, profileRole, contactCard } },
   { auth, loaders }: GraphQLContext,
 ) => {
   const { userId } = auth;
@@ -49,10 +49,12 @@ const updateProfileMutation: MutationResolvers['updateProfile'] = async (
     throw new GraphQLError(ERRORS.INVALID_REQUEST);
   }
 
+  const { avatarId, ...restContactCard } = contactCard || {};
+
   await updateProfile(targetProfileId, {
     profileRole: profileRole ?? undefined,
     contactCard: {
-      ...contactCard,
+      ...restContactCard,
     },
     avatarId,
   });
