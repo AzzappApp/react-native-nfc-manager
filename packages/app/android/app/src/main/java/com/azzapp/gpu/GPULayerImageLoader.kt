@@ -109,63 +109,20 @@ object GPULayerImageLoader {
 
   private suspend fun getBitmapFromImage(uri: Uri)  =
     withContext(Dispatchers.IO) {
-      suspendCancellableCoroutine<Bitmap?> { cont ->
+      val uriToLoad =
+        if (uri.scheme != null) uri
+        else MainApplication.getMainApplicationContext().resources
+          .getIdentifier(
+            uri.toString(),
+            "drawable",
+            MainApplication.getMainApplicationContext().packageName
+          )
 
-        val uriToLoad = if (uri.scheme != null) uri else MainApplication.getMainApplicationContext().resources.getIdentifier(
-          uri.toString(),
-          "drawable",
-          MainApplication.getMainApplicationContext().packageName
-        )
-
-        var cachedFile: File? = null
-        try {
-          val context = MainApplication.getMainApplicationContext()
-          if (context != null) {
-            cachedFile = Glide.with(context)
-              .asFile()
-              .onlyRetrieveFromCache(true)
-              .load(uri)
-              .submit()
-              .get()
-          }
-        } catch (e: Exception) {
-          Log.d(TAG, "could not decode cached file from glide cache $uri", e)
-        }
-
-        var bitmap: Bitmap? = null
-        if (cachedFile != null) {
-          try {
-            bitmap = BitmapFactory.decodeFile(cachedFile.path)
-          } catch (e: Exception) {
-            Log.w(TAG, "could not fetch image $uri", e)
-          }
-        }
-
-        if (bitmap == null) {
-          try {
-            val url = URL(uriToLoad.toString())
-            bitmap = BitmapFactory.decodeStream(url.openConnection().getInputStream())
-          } catch (e: Exception) {
-            cont.resumeWithException(e)
-          }
-        }
-
-        var resumed = false
-
-        if (bitmap == null) {
-          try {
-            val url = URL(uriToLoad.toString())
-            bitmap = BitmapFactory.decodeStream(url.openConnection().getInputStream())
-          } catch (e: Exception) {
-            cont.resumeWithException(e)
-            resumed = true
-          }
-        }
-        
-        if (!resumed) {
-          cont.resume(bitmap)
-        }
-      }
+      Glide.with(MainApplication.getMainApplicationContext())
+        .asBitmap()
+        .load(uriToLoad)
+        .submit()
+        .get()
     }
 
   private suspend fun getBitmapFromVideoFrame(
