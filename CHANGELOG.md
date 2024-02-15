@@ -1,5 +1,6 @@
-## 0.5.5-canary.79
+## 0.5.5-canary.80
 
+* **fix:**  - remove duplicated avatar id input field ([#2807](https://github.com/AzzappApp/azzapp/pull/2807))
 * **fix:**  - Social padding( apply directly on items not on scrollview) ([#2808](https://github.com/AzzappApp/azzapp/pull/2808))
 * **feat:**  - **ImagePicker:** access to app settings if media permission is limited ([#2806](https://github.com/AzzappApp/azzapp/pull/2806))
 * **fix:**  - multi user counter update cache ([#2798](https://github.com/AzzappApp/azzapp/pull/2798))
