@@ -176,8 +176,6 @@ const SocialLinksRenderer = ({
           style={{
             marginTop,
             marginBottom,
-            paddingLeft: marginHorizontal,
-            paddingRight: marginHorizontal,
           }}
           contentContainerStyle={{
             columnGap,
@@ -197,6 +195,10 @@ const SocialLinksRenderer = ({
                 borderColor: swapColor(iconColor, colorPalette),
                 alignItems: 'center',
                 justifyContent: 'center',
+                //padding on scrollview mess the display with contentContainerStyle, to keep the "centered" effect we need to add margin to the first and last element to keep the same "centered effect
+                marginLeft: index === 0 ? marginHorizontal : 0,
+                marginRight:
+                  index === linksOrdered.length - 1 ? marginHorizontal : 0,
               }}
               onPress={() => onPressSocialLink(link)}
             >
