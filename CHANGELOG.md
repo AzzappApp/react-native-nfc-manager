@@ -1,5 +1,6 @@
-## 0.5.5-canary.86
+## 0.5.5-canary.87
 
+* **fix:**  - remove cover border on ShakenShare ([#2821](https://github.com/AzzappApp/azzapp/pull/2821))
 * **fix:**  - **Android:** simplify code loading
 * **fix:**  - 🐛 allow multiline inside contact card fields ([#2819](https://github.com/AzzappApp/azzapp/pull/2819))
 * **fix:**  - don’t add file:// prefix when useless ([#2820](https://github.com/AzzappApp/azzapp/pull/2820))
