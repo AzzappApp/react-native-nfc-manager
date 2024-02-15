@@ -149,7 +149,22 @@ object GPULayerImageLoader {
             cont.resumeWithException(e)
           }
         }
-        cont.resume(bitmap)
+
+        var resumed = false
+
+        if (bitmap == null) {
+          try {
+            val url = URL(uriToLoad.toString())
+            bitmap = BitmapFactory.decodeStream(url.openConnection().getInputStream())
+          } catch (e: Exception) {
+            cont.resumeWithException(e)
+            resumed = true
+          }
+        }
+        
+        if (!resumed) {
+          cont.resume(bitmap)
+        }
       }
     }
 
