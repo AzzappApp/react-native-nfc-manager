@@ -1,4 +1,4 @@
-## 0.5.5-canary.82
+## 0.5.5-canary.83
 
 * **fix:**  - typo in method
 * **fix:**  - **Android:** use expo image for image prefetching ([#2813](https://github.com/AzzappApp/azzapp/pull/2813))
