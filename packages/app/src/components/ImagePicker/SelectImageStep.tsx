@@ -107,7 +107,7 @@ const SelectImageStep = ({
       // TODO
       return;
     }
-    const uri = `file://${path}`;
+    const uri = path.startsWith('file://') ? path : `file://${path}`;
     const { width, height } = await getImageSize(uri);
     onMediaChange(
       {
