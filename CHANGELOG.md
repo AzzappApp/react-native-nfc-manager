@@ -1,5 +1,6 @@
-## 0.5.5-canary.83
+## 0.5.5-canary.84
 
+* **fix:**  - **android:** avoid twice resume
 * **fix:**  - typo in method
 * **fix:**  - **Android:** use expo image for image prefetching ([#2813](https://github.com/AzzappApp/azzapp/pull/2813))
 * **fix:**  - **android:** [#2692](https://github.com/AzzappApp/azzapp/pull/2692) freeze on back camera ([#2811](https://github.com/AzzappApp/azzapp/pull/2811))
