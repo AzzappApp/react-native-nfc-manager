@@ -183,7 +183,7 @@ const styles = StyleSheet.create({
   iconStyle: {
     tintColor: colors.white,
   },
-  coverStyle: { marginBottom: 50 },
+  coverStyle: { marginBottom: 50, borderRadius: 0 },
   headerTitle: { color: colors.white },
   container: { flex: 1, alignItems: 'center', justifyContent: 'flex-start' },
 });
