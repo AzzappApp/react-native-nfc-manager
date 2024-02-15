@@ -282,6 +282,7 @@ const ContactCardEditForm = ({
                 <CommonInformationField
                   label={phoneNumber.label}
                   value={phoneNumber.number}
+                  labelMargin={54}
                 />
                 <Separation small />
               </Fragment>
@@ -294,6 +295,7 @@ const ContactCardEditForm = ({
                 <CommonInformationField
                   label={email.label}
                   value={email.address}
+                  labelMargin={54}
                 />
                 <Separation small />
               </Fragment>
@@ -303,7 +305,7 @@ const ContactCardEditForm = ({
           {isMultiUser &&
             commonInformation?.urls?.map((url, index) => (
               <Fragment key={index}>
-                <CommonInformationField value={url.address} />
+                <CommonInformationField value={url.address} labelMargin={18} />
                 <Separation small />
               </Fragment>
             ))}
@@ -315,6 +317,7 @@ const ContactCardEditForm = ({
                 key={index}
                 label={address.label}
                 value={address.address}
+                labelMargin={54}
               />
             ))}
           <ContactCardEditModalAddresses control={control} />
@@ -327,6 +330,7 @@ const ContactCardEditForm = ({
                 <CommonInformationField
                   label={social.label}
                   value={social.url}
+                  labelMargin={47}
                 />
                 <Separation small />
               </Fragment>
@@ -356,9 +360,11 @@ export const steps = [SelectImageStepWithFrontCameraByDefault, EditImageStep];
 const CommonInformationField = ({
   label,
   value,
+  labelMargin,
 }: {
   label?: string;
   value: string;
+  labelMargin?: number;
 }) => {
   const styles = useStyleSheet(styleSheet);
   return (
@@ -373,7 +379,13 @@ const CommonInformationField = ({
         <Icon icon="locked" />
         {label ? <Text variant="smallbold">{label}</Text> : null}
       </View>
-      <Text style={{ paddingLeft: label ? 50 : 20, flex: 1 }} variant="medium">
+      <Text
+        style={{
+          marginLeft: labelMargin ?? (label ? 50 : 20),
+          flex: 1,
+        }}
+        variant="medium"
+      >
         {value}
       </Text>
     </View>
