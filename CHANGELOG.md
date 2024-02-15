@@ -1,5 +1,8 @@
-## 0.5.5-canary.81
+## 0.5.5-canary.82
 
+* **fix:**  - typo in method
+* **fix:**  - **Android:** use expo image for image prefetching ([#2813](https://github.com/AzzappApp/azzapp/pull/2813))
+* **fix:**  - **android:** [#2692](https://github.com/AzzappApp/azzapp/pull/2692) freeze on back camera ([#2811](https://github.com/AzzappApp/azzapp/pull/2811))
 * **feat:**  - 🎸 align text inputs on contact card edition ([#2769](https://github.com/AzzappApp/azzapp/pull/2769))
 * **fix:**  - remove duplicated avatar id input field ([#2807](https://github.com/AzzappApp/azzapp/pull/2807))
 * **fix:**  - Social padding( apply directly on items not on scrollview) ([#2808](https://github.com/AzzappApp/azzapp/pull/2808))
