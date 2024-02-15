@@ -6,8 +6,8 @@ import { createStyleSheet } from '#helpers/createStyles';
 import type { ColorSchemeName } from 'react-native';
 
 export const DELETE_BUTTON_WIDTH = 70;
-
-const FIELD_HEIGHT = 72;
+export const MAX_FIELD_HEIGHT = 85;
+const MIN_FIELD_HEIGHT = 72;
 
 export const buildContactCardModalStyleSheet = (appareance: ColorSchemeName) =>
   ({
@@ -15,7 +15,7 @@ export const buildContactCardModalStyleSheet = (appareance: ColorSchemeName) =>
       flexDirection: 'row',
       justifyContent: 'space-between',
       alignItems: 'center',
-      height: FIELD_HEIGHT,
+      minHeight: MIN_FIELD_HEIGHT,
       paddingHorizontal: 30,
       backgroundColor: appareance === 'light' ? 'white' : 'black',
     },
@@ -23,7 +23,7 @@ export const buildContactCardModalStyleSheet = (appareance: ColorSchemeName) =>
       flexDirection: 'row',
       justifyContent: 'flex-start',
       alignItems: 'center',
-      height: FIELD_HEIGHT,
+      minHeight: MIN_FIELD_HEIGHT,
       paddingLeft: 18,
       backgroundColor: appareance === 'light' ? 'white' : 'black',
     },
@@ -31,7 +31,7 @@ export const buildContactCardModalStyleSheet = (appareance: ColorSchemeName) =>
       flexDirection: 'row',
       alignItems: 'center',
       columnGap: 7,
-      height: FIELD_HEIGHT,
+      minHeight: MIN_FIELD_HEIGHT,
       paddingHorizontal: 20,
       backgroundColor: appareance === 'light' ? 'white' : 'black',
     },
@@ -42,6 +42,8 @@ export const buildContactCardModalStyleSheet = (appareance: ColorSchemeName) =>
     input: {
       flex: 1,
       padding: 0,
+      maxHeight: MAX_FIELD_HEIGHT,
+      height: undefined,
       backgroundColor: 'transparent',
       borderWidth: 0,
       paddingLeft: 16,

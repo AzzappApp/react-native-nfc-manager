@@ -14,7 +14,10 @@ import ImagePicker, {
 } from '#components/ImagePicker';
 import { MediaImageRenderer } from '#components/medias';
 import ScreenModal from '#components/ScreenModal';
-import { buildContactCardModalStyleSheet } from '#helpers/contactCardHelpers';
+import {
+  MAX_FIELD_HEIGHT,
+  buildContactCardModalStyleSheet,
+} from '#helpers/contactCardHelpers';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import Icon from '#ui/Icon';
 import IconButton from '#ui/IconButton';
@@ -383,6 +386,7 @@ const CommonInformationField = ({
         style={{
           marginLeft: labelMargin ?? (label ? 50 : 20),
           flex: 1,
+          maxHeight: MAX_FIELD_HEIGHT,
         }}
         variant="medium"
       >

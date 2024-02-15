@@ -57,7 +57,8 @@ const ContactCardEditField = <TFieldValues extends FieldValues>({
               value={value as string}
               onChangeText={trim ? value => onChange(value.trim()) : onChange}
               style={styles.input}
-              numberOfLines={1}
+              numberOfLines={4}
+              multiline
               keyboardType={keyboardType}
               clearButtonMode="while-editing"
               testID="contact-card-edit-modal-field"
