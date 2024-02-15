@@ -4,11 +4,12 @@ import {
   addListener,
   getAssetInfoAsync,
   getAssetsAsync,
+  presentPermissionsPickerAsync,
   removeAllListeners,
 } from 'expo-media-library';
 import { useCallback, useRef, useState, useEffect, memo } from 'react';
-import { useIntl } from 'react-intl';
-import { useWindowDimensions, View } from 'react-native';
+import { FormattedMessage, useIntl } from 'react-intl';
+import { Platform, useWindowDimensions, View } from 'react-native';
 import { colors } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import {
@@ -16,6 +17,8 @@ import {
   getImageSize,
   getVideoSize,
 } from '#helpers/mediaHelpers';
+import { usePermissionContext } from '#helpers/PermissionContext';
+import Button from '#ui/Button';
 import PressableNative from '#ui/PressableNative';
 import Text from '#ui/Text';
 import type { Media } from './imagePickerTypes';
@@ -68,6 +71,7 @@ const PhotoGalleryMediaList = ({
   const isLoading = useRef(false);
   const [hasNext, setHasNext] = useState(false);
   const nextCursor = useRef<string | undefined>();
+  const { mediaPermission } = usePermissionContext();
 
   const load = useCallback(
     async (refreshing = false) => {
@@ -76,7 +80,7 @@ const PhotoGalleryMediaList = ({
         const previous = refreshing ? [] : [...medias];
         try {
           const result = await getAssetsAsync({
-            first: refreshing ? 16 : 60, //multiple of items per row
+            first: refreshing ? 16 : 48, //multiple of items per row
             after: refreshing ? undefined : nextCursor.current,
             mediaType:
               kind === 'mixed'
@@ -117,10 +121,6 @@ const PhotoGalleryMediaList = ({
       void load(true);
     }
   }, [album, load]);
-
-  useEffect(() => {
-    void load(true);
-  }, [load]);
 
   const onMediaPress = useCallback(
     async (asset: Asset) => {
@@ -201,8 +201,35 @@ const PhotoGalleryMediaList = ({
     };
   }, [load]);
 
+  const intl = useIntl();
+
   return (
     <View style={styles.container}>
+      {Platform.OS === 'ios' && mediaPermission === 'limited' && (
+        <View style={{ flexDirection: 'row' }}>
+          <Text
+            variant="smallbold"
+            style={styles.manageAccessMediaText}
+            numberOfLines={2}
+          >
+            <FormattedMessage
+              defaultMessage={
+                'You’ve given azzapp access to a selected number of photos and videos'
+              }
+              description="ImagePicker Media library - Message when user did not authorize access to media or partially authorize"
+            />
+          </Text>
+          <Button
+            variant="little_round"
+            onPress={presentPermissionsPickerAsync}
+            label={intl.formatMessage({
+              defaultMessage: 'Manage',
+              description: 'Button to manage media permissions',
+            })}
+            style={styles.buttonManageAccessMedia}
+          />
+        </View>
+      )}
       <FlashList
         ref={scrollViewRef}
         numColumns={numColumns}
@@ -300,6 +327,15 @@ const styleSheet = createStyleSheet(appearance => ({
   },
   textDuration: { position: 'absolute', bottom: 10, right: 10, color: 'white' },
   flatListStyle: { flex: 1 },
+  manageAccessMediaText: {
+    flex: 1,
+    flexWrap: 'wrap',
+    alignContent: 'center',
+    textAlignVertical: 'center',
+    marginLeft: 16,
+    marginRight: 16,
+  },
+  buttonManageAccessMedia: { marginVertical: 7, marginRight: 16 },
 }));
 
 const SEPARATOR_WIDTH = 1;
