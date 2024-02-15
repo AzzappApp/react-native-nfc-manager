@@ -1,6 +1,6 @@
 import { createDeferred } from '@azzapp/shared/asyncHelpers';
 import { flushPromises } from '@azzapp/shared/jestHelpers';
-import { createPrefetecher } from '../MediaPrefetcher';
+import { createPrefetcher } from '../MediaPrefetcher';
 
 describe('MediaPrefetcher', () => {
   const prefetch = jest.fn();
@@ -12,7 +12,7 @@ describe('MediaPrefetcher', () => {
     observePrefetchResult.mockReset();
     cancelPrefetch.mockReset();
   });
-  const prefetcher = createPrefetecher(
+  const prefetcher = createPrefetcher(
     prefetch,
     observePrefetchResult,
     cancelPrefetch,
