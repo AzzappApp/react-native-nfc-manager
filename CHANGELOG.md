@@ -1,5 +1,7 @@
-## 0.5.5-canary.84
+## 0.5.5-canary.85
 
+* **feat:**  - 🎸 give access from unpublished webcard but limited ([#2780](https://github.com/AzzappApp/azzapp/pull/2780))
+* **fix:**  - **CoverRenderering:**  properly vertically center title ([#2817](https://github.com/AzzappApp/azzapp/pull/2817))
 * **fix:**  - **android:** avoid twice resume
 * **fix:**  - typo in method
 * **fix:**  - **Android:** use expo image for image prefetching ([#2813](https://github.com/AzzappApp/azzapp/pull/2813))
