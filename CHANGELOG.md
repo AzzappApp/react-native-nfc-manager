@@ -1,5 +1,8 @@
-## 0.5.5-canary.85
+## 0.5.5-canary.86
 
+* **fix:**  - **Android:** simplify code loading
+* **fix:**  - 🐛 allow multiline inside contact card fields ([#2819](https://github.com/AzzappApp/azzapp/pull/2819))
+* **fix:**  - don’t add file:// prefix when useless ([#2820](https://github.com/AzzappApp/azzapp/pull/2820))
 * **feat:**  - 🎸 give access from unpublished webcard but limited ([#2780](https://github.com/AzzappApp/azzapp/pull/2780))
 * **fix:**  - **CoverRenderering:**  properly vertically center title ([#2817](https://github.com/AzzappApp/azzapp/pull/2817))
 * **fix:**  - **android:** avoid twice resume
