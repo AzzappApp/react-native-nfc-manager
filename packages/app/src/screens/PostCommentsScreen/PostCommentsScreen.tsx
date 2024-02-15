@@ -15,6 +15,7 @@ const postCommentsMobileScreenQuery = graphql`
   query PostCommentsScreenQuery($webCardId: ID!, $postId: ID!) {
     webCard: node(id: $webCardId) {
       ...AuthorCartoucheFragment_webCard
+      ...PostCommentsList_myWebCard
     }
     post: node(id: $postId) {
       ...PostCommentsList_post

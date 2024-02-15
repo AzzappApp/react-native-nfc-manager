@@ -66,7 +66,9 @@ const renderActionBar = (props?: Partial<PostRendererActionBarProps>) => {
       `,
       {},
     );
-    return <PostRendererActionBar postKey={data.post!} {...props} />;
+    return (
+      <PostRendererActionBar postKey={data.post!} {...props} actionEnabled />
+    );
   };
   const component = render(
     <RelayEnvironmentProvider environment={environment}>

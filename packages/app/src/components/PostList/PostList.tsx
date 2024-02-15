@@ -1,10 +1,9 @@
 import { FlashList } from '@shopify/flash-list';
 import { useCallback, useMemo, useState } from 'react';
-import { FormattedMessage, useIntl } from 'react-intl';
-import { Alert, useColorScheme, useWindowDimensions, View } from 'react-native';
+import { FormattedMessage } from 'react-intl';
+import { useColorScheme, useWindowDimensions, View } from 'react-native';
 import { graphql, useFragment } from 'react-relay';
 import { colors } from '#theme';
-import { useRouter } from '#components/NativeRouter';
 import PostRenderer from '#components/PostList/PostRenderer';
 import useScreenInsets from '#hooks/useScreenInsets';
 import { HEADER_HEIGHT } from '#ui/Header';
@@ -93,36 +92,6 @@ const PostList = ({
     [viewerWebCard?.cardIsPublished],
   );
 
-  const intl = useIntl();
-  const router = useRouter();
-  const displayToastUnpublished = useCallback(() => {
-    Alert.alert(
-      intl.formatMessage({
-        defaultMessage: 'Unpublished WebCard.',
-        description:
-          'PostList - Alert Message title when the user is viewing a post (from deeplinking) with an unpublished WebCard',
-      }),
-      intl.formatMessage({
-        defaultMessage:
-          'This action can only be done from a published WebCard.',
-        description:
-          'PostList - AlertMessage when the user is viewing a post (from deeplinking) with an unpublished WebCard',
-      }),
-      [
-        {
-          text: intl.formatMessage({
-            defaultMessage: 'Ok',
-            description:
-              'PostList - Alert button when the user is viewing a post (from deeplinking) with an unpublished WebCard',
-          }),
-          onPress: () => {
-            router.back();
-          },
-        },
-      ],
-    );
-  }, [intl, router]);
-
   const [visiblePostIds, setVisiblePostIds] = useState<{
     played: string | null;
     paused: string[];
@@ -200,19 +169,6 @@ const PostList = ({
   const { width: windowWidth, height: windowHeight } = useWindowDimensions();
   const renderItem = useCallback(
     ({ item, extraData }: ListRenderItemInfo<Post>) => {
-      if (!extraData.postActionEnabled) {
-        return (
-          <View onTouchStart={displayToastUnpublished}>
-            <PostRenderer
-              post={item}
-              videoDisabled={!extraData.canPlay}
-              width={windowWidth}
-              onPressAuthor={onPressAuthor}
-              author={item.webCard ?? extraData.author!}
-            />
-          </View>
-        );
-      }
       return (
         <PostRenderer
           post={item}
@@ -220,10 +176,11 @@ const PostList = ({
           width={windowWidth}
           onPressAuthor={onPressAuthor}
           author={item.webCard ?? extraData.author!}
+          actionEnabled={extraData.postActionEnabled}
         />
       );
     },
-    [displayToastUnpublished, onPressAuthor, windowWidth],
+    [onPressAuthor, windowWidth],
   );
 
   const extraData = useMemo(

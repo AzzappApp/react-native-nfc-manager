@@ -206,10 +206,8 @@ const WebCardScreen = ({
   const cardRadius = COVER_CARD_RADIUS * windowWidth;
 
   const toggleFlip = useCallback(() => {
-    if (data.node?.userWebCard?.cardIsPublished === true) {
-      setPositionFlip(prev => prev + 1);
-    }
-  }, [data.node?.userWebCard?.cardIsPublished]);
+    setPositionFlip(prev => prev + 1);
+  }, []);
 
   const manualFlip = useSharedValue(0);
   const flip = useAnimatedState(positionFlip, {
@@ -279,7 +277,7 @@ const WebCardScreen = ({
     () =>
       Gesture.Pan()
         .activeOffsetX([-10, 10]) //help the postlist scroll to work on Android
-        .enabled(!editing && !!data.webCard?.cardIsPublished)
+        .enabled(!editing)
         .onStart(() => {
           initialManualGesture.value = manualFlip.value;
         })
@@ -311,13 +309,7 @@ const WebCardScreen = ({
             });
           }
         }),
-    [
-      data.webCard?.cardIsPublished,
-      editing,
-      initialManualGesture,
-      manualFlip,
-      windowWidth,
-    ],
+    [editing, initialManualGesture, manualFlip, windowWidth],
   );
   const [showPost, setShowPost] = useState(params.showPosts ?? false);
 
@@ -418,6 +410,7 @@ const WebCardScreen = ({
                   webCardId={data.webCard.id}
                   hasFocus={hasFocus && showPost && ready}
                   userName={data.webCard.userName!}
+                  userWebCard={data.node.userWebCard}
                 />
               </Suspense>
             </Animated.View>
@@ -478,6 +471,7 @@ const webCardScreenByIdQuery = graphql`
       ... on WebCard @alias(as: "userWebCard") {
         cardIsPublished
         ...WebCardScreenButtonBar_myWebCard
+        ...PostList_webCard
       }
     }
   }
@@ -503,6 +497,7 @@ const webCardScreenByNameQuery = graphql`
       ... on WebCard @alias(as: "userWebCard") {
         cardIsPublished
         ...WebCardScreenButtonBar_myWebCard
+        ...PostList_webCard
       }
     }
   }

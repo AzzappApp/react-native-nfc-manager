@@ -9,6 +9,7 @@ import useAuthState from '#hooks/useAuthState';
 import Container from '#ui/Container';
 import Header from '#ui/Header';
 import IconButton from '#ui/IconButton';
+import type { PostList_webCard$key } from '#relayArtifacts/PostList_webCard.graphql';
 import type { WebCardPostsListQuery } from '#relayArtifacts/WebCardPostsListQuery.graphql';
 
 type WebCardPostsListProps = {
@@ -17,9 +18,11 @@ type WebCardPostsListProps = {
   hasFocus: boolean;
   userName: string;
   toggleFlip: () => void;
+  userWebCard: PostList_webCard$key;
 };
 
 const WebCardPostsList = ({
+  userWebCard,
   webCardId,
   isViewer,
   hasFocus,
@@ -85,6 +88,7 @@ const WebCardPostsList = ({
         {webCard && (
           <PostList
             webCard={webCard}
+            userWebCard={userWebCard}
             canPlay={hasFocus}
             onPressAuthor={toggleFlip}
           />

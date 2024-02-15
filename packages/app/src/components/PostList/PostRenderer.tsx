@@ -9,7 +9,7 @@ import {
 } from 'react';
 
 import { useIntl } from 'react-intl';
-import { StyleSheet, View } from 'react-native';
+import { Alert, StyleSheet, View } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { graphql, useFragment } from 'react-relay';
 import { isEditor } from '@azzapp/shared/profileHelpers';
@@ -77,6 +77,8 @@ export type PostRendererProps = ViewProps & {
    * callback when the author cartouche is pressed
    */
   onPressAuthor?: () => void;
+
+  actionEnabled?: boolean;
 };
 
 export type PostRendererHandle = {
@@ -95,6 +97,7 @@ const PostRenderer = (
     paused = false,
     initialTime,
     onPressAuthor,
+    actionEnabled = true,
     ...props
   }: PostRendererProps,
   forwardedRef: ForwardedRef<PostRendererHandle>,
@@ -169,6 +172,40 @@ const PostRenderer = (
     }
   }, [intl, profileInfos?.profileRole, toggleModal]);
 
+  const displayToastUnpublished = useCallback(() => {
+    Alert.alert(
+      intl.formatMessage({
+        defaultMessage: 'Unpublished WebCard.',
+        description:
+          'PostRenderer - Alert Message title when the user is viewing a post (from deeplinking) with an unpublished WebCard',
+      }),
+      intl.formatMessage({
+        defaultMessage:
+          'This action can only be done from a published WebCard.',
+        description:
+          'PostRenderer - AlertMessage when the user is viewing a post (from deeplinking) with an unpublished WebCard',
+      }),
+      [
+        {
+          text: intl.formatMessage({
+            defaultMessage: 'Ok',
+            description:
+              'PostRenderer - Alert button when the user is viewing a post (from deeplinking) with an unpublished WebCard',
+          }),
+        },
+      ],
+    );
+  }, [intl]);
+
+  const handleOpenModal = () => {
+    if (!actionEnabled) {
+      displayToastUnpublished();
+      return;
+    }
+
+    openModal();
+  };
+
   return (
     <View {...props}>
       <View style={styles.headerView}>
@@ -182,7 +219,7 @@ const PostRenderer = (
         <IconButton
           variant="icon"
           icon="more"
-          onPress={openModal}
+          onPress={handleOpenModal}
           style={{ marginRight: 20 }}
         />
       </View>
@@ -200,9 +237,10 @@ const PostRenderer = (
       </View>
       <Suspense fallback={<PostRendererBottomPanelSkeleton />}>
         <PostRendererBottomPanel
-          toggleModal={openModal}
+          toggleModal={handleOpenModal}
           showModal={showModal}
           post={post}
+          actionEnabled={actionEnabled}
         />
       </Suspense>
     </View>

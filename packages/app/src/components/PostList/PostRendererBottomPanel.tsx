@@ -47,12 +47,19 @@ type PostRendererBottomPanelProps = {
    */
   post: PostRendererActionBar_post$key &
     PostRendererBottomPanelFragment_post$key;
+  /**
+   * Allow actions
+   *
+   * @type {boolean}
+   */
+  actionEnabled: boolean;
 };
 
 const PostRendererBottomPanel = ({
   showModal,
   toggleModal,
   post: postKey,
+  actionEnabled,
 }: PostRendererBottomPanelProps) => {
   const router = useRouter();
   const post = useFragment(
@@ -252,7 +259,11 @@ const PostRendererBottomPanel = ({
   return (
     <>
       <View style={styles.bottomContainerPost}>
-        <PostRendererActionBar style={{ marginTop: 10 }} postKey={postKey} />
+        <PostRendererActionBar
+          style={{ marginTop: 10 }}
+          postKey={postKey}
+          actionEnabled={actionEnabled}
+        />
         {!!post.content && (
           <ExpendableText
             style={styles.content}

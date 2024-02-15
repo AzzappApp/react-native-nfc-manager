@@ -2,7 +2,7 @@ import * as Sentry from '@sentry/react-native';
 import { fromGlobalId } from 'graphql-relay';
 import { memo, useCallback, useEffect, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { View, StyleSheet, Share } from 'react-native';
+import { View, StyleSheet, Share, Alert } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { useMutation, graphql, useFragment } from 'react-relay';
 import { useDebouncedCallback } from 'use-debounce';
@@ -23,9 +23,11 @@ import type { ViewProps } from 'react-native';
 
 export type PostRendererActionBarProps = ViewProps & {
   postKey: PostRendererActionBar_post$key;
+  actionEnabled: boolean;
 };
 
 const PostRendererActionBar = ({
+  actionEnabled,
   postKey,
   style,
   ...props
@@ -50,7 +52,9 @@ const PostRendererActionBar = ({
         counterReactions
         content
         webCard {
+          id
           userName
+          cardIsPublished
         }
       }
     `,
@@ -185,6 +189,33 @@ const PostRendererActionBar = ({
 
   // toggle the value locally
   const toggleReaction = useCallback(() => {
+    if (!actionEnabled) {
+      Alert.alert(
+        intl.formatMessage({
+          defaultMessage: 'Unpublished WebCard.',
+          description:
+            'PostRendererActionBar - Alert Message title when the user is viewing a post (from deeplinking) with an unpublished WebCard',
+        }),
+        intl.formatMessage({
+          defaultMessage:
+            'This action can only be done from a published WebCard.',
+          description:
+            'PostRendererActionBar - AlertMessage when the user is viewing a post (from deeplinking) with an unpublished WebCard',
+        }),
+        [
+          {
+            text: intl.formatMessage({
+              defaultMessage: 'Ok',
+              description:
+                'PostRendererActionBar - Alert button when the user is viewing a post (from deeplinking) with an unpublished WebCard',
+            }),
+          },
+        ],
+      );
+
+      return;
+    }
+
     if (isEditor(profileInfos?.profileRole)) {
       if (reaction) {
         setCountReactions(countReactions - 1);
@@ -205,6 +236,7 @@ const PostRendererActionBar = ({
       });
     }
   }, [
+    actionEnabled,
     countReactions,
     debouncedCommit,
     intl,

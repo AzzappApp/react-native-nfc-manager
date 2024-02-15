@@ -223,9 +223,6 @@ const WebCardScreenButtonActionButton = ({
             description:
               'PostList - Alert button when the user is viewing a post (from deeplinking) with an unpublished WebCard',
           }),
-          onPress: () => {
-            router.back();
-          },
         },
       ],
     );

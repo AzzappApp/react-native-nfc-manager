@@ -1,12 +1,13 @@
 import { useCallback, useMemo, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { RefreshControl, StyleSheet, View } from 'react-native';
+import { Alert, RefreshControl, StyleSheet, View } from 'react-native';
 import { FlatList } from 'react-native-gesture-handler';
 import { KeyboardAvoidingView } from 'react-native-keyboard-controller';
 import Toast from 'react-native-toast-message';
 import {
   ConnectionHandler,
   graphql,
+  useFragment,
   useMutation,
   usePaginationFragment,
 } from 'react-relay';
@@ -27,8 +28,8 @@ import Text from '#ui/Text';
 import CommentItem from './CommentItem';
 import DeletableCommentItem from './DeletableCommentItem';
 import PostCommentsScreenHeader from './PostCommentsScreenHeader';
-import type { AuthorCartoucheFragment_webCard$key } from '#relayArtifacts/AuthorCartoucheFragment_webCard.graphql';
 import type { CommentItemFragment_comment$key } from '#relayArtifacts/CommentItemFragment_comment.graphql';
+import type { PostCommentsList_myWebCard$key } from '#relayArtifacts/PostCommentsList_myWebCard.graphql';
 import type { PostCommentsList_post$key } from '#relayArtifacts/PostCommentsList_post.graphql';
 import type {
   NativeSyntheticEvent,
@@ -41,7 +42,7 @@ type PostCommentsListProps = {
    *
    * @type {PostCommentsListQuery$key}
    */
-  webCard: AuthorCartoucheFragment_webCard$key;
+  webCard: PostCommentsList_myWebCard$key;
   /**
    *
    *
@@ -97,6 +98,17 @@ const PostCommentsList = ({
       postKey,
     );
 
+  const viewerWebCard = useFragment(
+    graphql`
+      fragment PostCommentsList_myWebCard on WebCard {
+        id
+        cardIsPublished
+        ...AuthorCartoucheFragment_webCard
+      }
+    `,
+    webCardKey,
+  );
+
   const [comment, setComment] = useState<string>('');
   const [inputHeight, setInputHeight] = useState<number>(68);
   const onContentSizeChange = (
@@ -128,6 +140,33 @@ const PostCommentsList = ({
   const [submitting, setSubmitting] = useState(false);
 
   const onSubmit = () => {
+    if (!viewerWebCard.cardIsPublished) {
+      Alert.alert(
+        intl.formatMessage({
+          defaultMessage: 'Unpublished WebCard.',
+          description:
+            'PostList - Alert Message title when the user is viewing a post (from deeplinking) with an unpublished WebCard',
+        }),
+        intl.formatMessage({
+          defaultMessage:
+            'This action can only be done from a published WebCard.',
+          description:
+            'PostList - AlertMessage when the user is viewing a post (from deeplinking) with an unpublished WebCard',
+        }),
+        [
+          {
+            text: intl.formatMessage({
+              defaultMessage: 'Ok',
+              description:
+                'PostList - Alert button when the user is viewing a post (from deeplinking) with an unpublished WebCard',
+            }),
+          },
+        ],
+      );
+
+      return;
+    }
+
     setSubmitting(true);
     if (!submitting) {
       if (isEditor(auth.profileInfos?.profileRole)) {
@@ -267,7 +306,7 @@ const PostCommentsList = ({
         />
         <View style={styles.inputContainer}>
           <AuthorCartouche
-            author={webCardKey}
+            author={viewerWebCard}
             variant="post"
             hideUserName
             style={{ height: 48 }}
