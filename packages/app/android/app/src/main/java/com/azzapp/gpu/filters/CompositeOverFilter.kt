@@ -91,7 +91,7 @@ class CompositeOverFilter: Filter<CompositeOverFilter.Parameters> {
 
 
     private val FRAGMENT_SHADER = """
-      precision mediump float;
+      precision highp float;
       uniform sampler2D uTexSampler;
       uniform sampler2D underlayTextSampler;
       varying vec2 vTexCoords;

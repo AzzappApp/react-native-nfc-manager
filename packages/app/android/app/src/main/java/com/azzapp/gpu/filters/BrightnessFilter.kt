@@ -89,7 +89,7 @@ class BrightnessFilter: Filter<BrightnessFilter.Parameters> {
 
 
     private val FRAGMENT_SHADER = """
-      precision mediump float;
+      precision highp float;
       uniform sampler2D uTexSampler;
       uniform float brightness;
       varying vec2 vTexCoords;

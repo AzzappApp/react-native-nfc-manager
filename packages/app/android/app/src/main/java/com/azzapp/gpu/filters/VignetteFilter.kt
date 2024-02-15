@@ -100,7 +100,7 @@ class VignetteFilter: Filter<VignetteFilter.Parameters> {
     """.trimIndent()
 
     private val FRAGMENT_SHADER = """
-     precision mediump float;
+     precision highp float;
      
      uniform sampler2D uTexSampler;
      uniform float darkness;

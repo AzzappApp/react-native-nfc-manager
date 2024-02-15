@@ -103,7 +103,7 @@ class CropFilter: Filter<CropFilter.Parameters> {
 
 
     private val FRAGMENT_SHADER = """
-      precision mediump float;
+      precision highp float;
       uniform sampler2D uTexSampler;
       varying vec2 vTexCoords;
       void main() {

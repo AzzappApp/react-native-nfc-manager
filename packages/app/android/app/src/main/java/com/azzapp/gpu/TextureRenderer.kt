@@ -101,7 +101,7 @@ class TextureRenderer(
 
 
     private const val FRAGMENT_SHADER = """
-      precision mediump float;
+      precision highp float;
       uniform sampler2D uTexSampler;
       varying vec2 vTexCoords;
       void main() {
@@ -111,7 +111,7 @@ class TextureRenderer(
 
     private const val FRAGMENT_SHADER_EXTERNAL = """
       #extension GL_OES_EGL_image_external : require
-      precision mediump float;
+      precision highp float;
       uniform samplerExternalOES uTexSampler;
       varying vec2 vTexCoords;
       void main() {

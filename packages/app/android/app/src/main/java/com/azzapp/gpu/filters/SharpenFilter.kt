@@ -96,7 +96,7 @@ class SharpenFilter: Filter<SharpenFilter.Parameters> {
 
 
     private val FRAGMENT_SHADER = """
-      precision mediump float;
+      precision highp float;
       varying vec2 vTexCoords;
       uniform sampler2D uTexSampler;
       uniform float uSharpness;
