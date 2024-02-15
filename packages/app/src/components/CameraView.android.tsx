@@ -111,6 +111,7 @@ const CameraView = (
         }
         const photo = await camera.current.takePictureAsync({
           quality: 1,
+          skipProcessing: cameraPosition === 'back',
         });
         return photo?.uri ?? null;
       },
@@ -132,7 +133,7 @@ const CameraView = (
         camera.current.stopRecording();
       },
     }),
-    [],
+    [cameraPosition],
   );
   // #endregion
 
