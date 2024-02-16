@@ -93,27 +93,30 @@ const LineDividerRenderer = ({
       {marginTop > 0 && (
         <View
           style={{
-            height: marginTop,
+            height: marginTop + 1,
             backgroundColor: swapColor(colorTop, colorPalette),
           }}
         />
       )}
       <View
         style={{
-          height,
-          maxHeight: height,
+          height: height + 2,
+          maxHeight: height + 2,
           borderRightWidth: orientation === 'bottomRight' ? layout?.width : 0,
           borderLeftWidth: orientation !== 'bottomRight' ? layout?.width : 0,
           borderRightColor: swapColor(colorBottom, colorPalette),
           borderLeftColor: swapColor(colorBottom, colorPalette),
           borderTopWidth: height,
           borderTopColor: swapColor(colorTop, colorPalette),
+          marginTop: -1,
+          marginBottom: -1,
+          zIndex: 1,
         }}
       />
       {marginBottom > 0 && (
         <View
           style={{
-            height: marginBottom,
+            height: marginBottom + 1,
             backgroundColor: swapColor(colorBottom, colorPalette),
           }}
         />
