@@ -296,21 +296,24 @@ const CardTemplateList = (
               contentContainerStyle={
                 imageHeight != null ? { height: imageHeight } : null
               }
+              overScrollMode="never"
             >
-              {item.previewMedia && (
-                <Image
-                  source={{
-                    uri: item.previewMedia.uri,
-                    width: itemWidth,
-                    height: imageHeight!,
-                  }}
-                  style={{
-                    width: itemWidth,
-                    height: imageHeight!,
-                  }}
-                  priority={index === 0 ? 'high' : 'normal'}
-                />
-              )}
+              <View style={styles.webCardContainerRadius}>
+                {item.previewMedia && (
+                  <Image
+                    source={{
+                      uri: item.previewMedia.uri,
+                      width: itemWidth,
+                      height: imageHeight!,
+                    }}
+                    style={{
+                      width: itemWidth,
+                      height: imageHeight!,
+                    }}
+                    priority={index === 0 ? 'high' : 'normal'}
+                  />
+                )}
+              </View>
             </ScrollView>
           </View>
         </View>
@@ -624,12 +627,14 @@ const stylesheet = createStyleSheet(theme => ({
     {
       backgroundColor: colors.grey100,
       borderRadius: ITEM_RADIUS,
+      borderCurve: 'continuous',
       minHeight: '30%',
     },
     shadow(theme, 'bottom'),
   ],
   webCardContainerRadius: {
     borderRadius: ITEM_RADIUS,
+    borderCurve: 'continuous',
     overflow: 'hidden',
     flex: 1,
   },
