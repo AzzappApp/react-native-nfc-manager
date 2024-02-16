@@ -1,5 +1,7 @@
-## 0.5.5-canary.89
+## 0.5.5-canary.90
 
+* **fix:**  - 🐛 update role on accept multi-user invitation ([#2827](https://github.com/AzzappApp/azzapp/pull/2827))
+* **fix:**  - **Android:** suggested media button not display when no media ([#2828](https://github.com/AzzappApp/azzapp/pull/2828))
 * **fix:**  - **Android:** video scrambled when exported without transform ([#2826](https://github.com/AzzappApp/azzapp/pull/2826))
 * **fix:**  - **android:** [#2739](https://github.com/AzzappApp/azzapp/pull/2739) configure deep links ([#2814](https://github.com/AzzappApp/azzapp/pull/2814))
 * **fix:**  - **android:** [#2676](https://github.com/AzzappApp/azzapp/pull/2676) border radius missing on android ([#2818](https://github.com/AzzappApp/azzapp/pull/2818))
