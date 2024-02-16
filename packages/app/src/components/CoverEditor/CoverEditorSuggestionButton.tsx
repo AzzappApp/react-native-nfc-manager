@@ -85,36 +85,37 @@ const CoverEditorSuggestionButton = ({
       <Animated.View
         style={[{ position: 'absolute' }, mediaVisibleAnimatedStyle]}
       >
-        {Platform.OS === 'ios' && sourceMedia ? (
-          <PressableOpacity
-            style={[styles.mediaHideButton]}
-            onPress={toggleMediaVisibility}
-          >
-            <GPUImageView
-              style={[
-                styles.mediaHideButtonImage,
-                !mediaVisible && { opacity: 0.5 },
-              ]}
-              testID="image-picker-media-video"
+        {sourceMedia &&
+          (Platform.OS === 'ios' ? (
+            <PressableOpacity
+              style={[styles.mediaHideButton]}
+              onPress={toggleMediaVisibility}
             >
-              {sourceMedia.kind === 'image' ? (
-                <ImageLayer uri={sourceMedia.uri} />
-              ) : (
-                <VideoFrame uri={sourceMedia.uri} time={0} />
-              )}
-            </GPUImageView>
+              <GPUImageView
+                style={[
+                  styles.mediaHideButtonImage,
+                  !mediaVisible && { opacity: 0.5 },
+                ]}
+                testID="image-picker-media-video"
+              >
+                {sourceMedia.kind === 'image' ? (
+                  <ImageLayer uri={sourceMedia.uri} />
+                ) : (
+                  <VideoFrame uri={sourceMedia.uri} time={0} />
+                )}
+              </GPUImageView>
 
-            <Icon
-              style={styles.mediaHideButtonIcon}
+              <Icon
+                style={styles.mediaHideButtonIcon}
+                icon={mediaVisible ? 'preview' : 'hide'}
+              />
+            </PressableOpacity>
+          ) : (
+            <FloatingIconButton
               icon={mediaVisible ? 'preview' : 'hide'}
+              onPress={toggleMediaVisibility}
             />
-          </PressableOpacity>
-        ) : (
-          <FloatingIconButton
-            icon={mediaVisible ? 'preview' : 'hide'}
-            onPress={toggleMediaVisibility}
-          />
-        )}
+          ))}
       </Animated.View>
     </View>
   );
