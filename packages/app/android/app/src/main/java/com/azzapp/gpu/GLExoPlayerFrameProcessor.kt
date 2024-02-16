@@ -267,7 +267,6 @@ import javax.microedition.khronos.egl.*
       ),
       glObjectManager
     )
-    image.release()
 
     if (surfaceInfo.orientationDegrees != 0 &&  surfaceInfo.orientationDegrees != 360) {
       val imageOrientation = when(surfaceInfo.orientationDegrees) {
@@ -295,6 +294,7 @@ import javax.microedition.khronos.egl.*
       surfaceInfo.height
     )
     outputImage.release()
+    image.release()
   }
 
 

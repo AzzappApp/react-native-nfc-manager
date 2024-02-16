@@ -115,10 +115,14 @@ import kotlin.math.round
       player.removeMediaItem(0)
     }
     val mediaItemBuilder = MediaItem.Builder().setUri(uri)
-    if(layer?.source?.startTime != null){
-      val start = layer!!.source.startTime!!.toLong() * 1000L;
+    val startTime = layer?.source?.startTime
+    val duration = layer?.source?.duration
+    if(startTime != null && duration != null){
       mediaItemBuilder.setClippingConfiguration(
-        MediaItem.ClippingConfiguration.Builder().setStartPositionMs(start).setEndPositionMs(start + layer!!.source.duration!!.toLong() * 1000L).build()
+        MediaItem.ClippingConfiguration.Builder()
+          .setStartPositionMs((startTime * 1000).toLong())
+          .setEndPositionMs(((duration + startTime) * 1000).toLong())
+          .build()
       )
     }
 

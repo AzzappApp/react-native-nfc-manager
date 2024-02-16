@@ -111,15 +111,15 @@ import kotlin.math.round
       )
       .build()
 
-    val startMs = layer.source.startTime?.toLong()?.times(1000L) ?: C.TIME_UNSET
-    val endMs =  layer.source.startTime?.toLong()?.times(1000L)?.plus(layer.source.duration?.toLong()?.times(1000L) ?: 0) ?: C.TIME_UNSET
+    val startTime = layer.source.startTime
+    val duration = layer.source.duration
     val sourceMediaItem = MediaItem.Builder().setUri(layer.source.uri);
 
-    if(startMs != C.TIME_UNSET && endMs !=C.TIME_UNSET) {
+    if(startTime != null && duration != null) {
       sourceMediaItem.setClippingConfiguration(
               MediaItem.ClippingConfiguration.Builder()
-                      .setStartPositionMs(startMs)
-                      .setEndPositionMs(endMs)
+                      .setStartPositionMs((startTime * 1000).toLong())
+                      .setEndPositionMs(((duration + startTime) * 1000).toLong())
                       .build()
       );
     }
