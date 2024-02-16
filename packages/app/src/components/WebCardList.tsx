@@ -1,4 +1,5 @@
 import { memo, useCallback } from 'react';
+import { FormattedMessage } from 'react-intl';
 import { FlatList, StyleSheet, View } from 'react-native';
 import Animated from 'react-native-reanimated';
 import { graphql, useFragment } from 'react-relay';
@@ -29,6 +30,7 @@ const WebCardListItemMemoized = memo(function ProfileListItem({
     // TODO reenable once RANIMATED3 see: https://github.com/software-mansion/react-native-reanimated/issues/3124
     <Animated.View style={styles.item} /*exiting={FadeOutUp}*/>
       <Link
+        disabled={webCard.cardIsPublished === false}
         route="WEBCARD"
         params={{ userName: webCard.userName, webCardId: webCard.id }}
       >
@@ -40,9 +42,19 @@ const WebCardListItemMemoized = memo(function ProfileListItem({
             userName={webCard.userName}
             animationEnabled={false}
           />
-          <Text variant="large" numberOfLines={1}>
-            {webCard.userName}
-          </Text>
+          <View>
+            <Text variant="large" numberOfLines={1}>
+              {webCard.userName}
+            </Text>
+            {webCard.cardIsPublished === false && (
+              <Text variant="small">
+                <FormattedMessage
+                  defaultMessage="Unpublished"
+                  description="WebCardList - webcard unpublished information"
+                />
+              </Text>
+            )}
+          </View>
         </PressableNative>
       </Link>
       {onToggleFollow ? (
@@ -95,6 +107,7 @@ const WebCardList = ({
       fragment WebCardList_webCard on WebCard @relay(plural: true) {
         id
         userName
+        cardIsPublished
         ...CoverRenderer_webCard
       }
     `,

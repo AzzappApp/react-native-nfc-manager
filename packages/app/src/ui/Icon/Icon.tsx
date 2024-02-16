@@ -436,15 +436,16 @@ export type Icons = keyof typeof icons;
 
 export type IconProps = Omit<ImageProps, 'source'> & {
   icon: Icons;
+  size?: number;
 };
 
-const Icon = ({ icon, ...props }: IconProps) => {
+const Icon = ({ icon, size = 24, ...props }: IconProps) => {
   const styles = useStyleSheet(styleSheet);
   return (
     <Animated.Image
       {...props}
       style={[
-        { resizeMode: 'contain' },
+        { resizeMode: 'contain', width: size, height: size },
         shouldTintColor(icon) && styles.tintColor,
         props.style,
       ]}

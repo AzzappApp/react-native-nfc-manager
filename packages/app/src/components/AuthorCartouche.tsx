@@ -1,3 +1,5 @@
+import { useCallback } from 'react';
+import { FormattedMessage } from 'react-intl';
 import { View } from 'react-native';
 import { graphql, useFragment } from 'react-relay';
 import { COVER_RATIO } from '@azzapp/shared/coverHelpers';
@@ -66,11 +68,18 @@ const AuthorCartouche = ({
       fragment AuthorCartoucheFragment_webCard on WebCard {
         id
         userName
+        cardIsPublished
         ...CoverRenderer_webCard
       }
     `,
     authorKey,
   );
+
+  const onPressWebCard = useCallback(() => {
+    if (author?.cardIsPublished) {
+      onPress?.();
+    }
+  }, [author?.cardIsPublished, onPress]);
 
   const styles = useVariantStyleSheet(stylesheet, variant);
 
@@ -78,7 +87,7 @@ const AuthorCartouche = ({
     return (
       <PressableOpacity
         style={[styles.container, style]}
-        onPress={onPress}
+        onPress={onPressWebCard}
         {...props}
       >
         <AuthorCartoucheContent
@@ -132,7 +141,9 @@ const AuthorCartoucheContent = ({
   return (
     <>
       <View style={styles.image}>
-        {animated ? (
+        {author?.cardIsPublished === false ? (
+          <View />
+        ) : animated ? (
           <CoverLinkRenderer
             webCard={author!}
             width={21}
@@ -144,12 +155,22 @@ const AuthorCartoucheContent = ({
         )}
       </View>
       {!hideUserName && (
-        <Text
-          variant={variant === 'post' ? 'button' : 'smallbold'}
-          style={styles.userName}
-        >
-          {author?.userName}
-        </Text>
+        <View>
+          <Text
+            variant={variant === 'post' ? 'button' : 'smallbold'}
+            style={styles.userName}
+          >
+            {author?.userName}
+          </Text>
+          {author?.cardIsPublished === false && (
+            <Text variant="small">
+              <FormattedMessage
+                defaultMessage="Unpublished"
+                description="AuthorCartouche webcard unpublished information"
+              />
+            </Text>
+          )}
+        </View>
       )}
     </>
   );

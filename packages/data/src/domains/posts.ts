@@ -14,7 +14,7 @@ import { FollowTable } from './follows';
 import { getMediasByIds, type Media } from './medias';
 import { getTopPostsComment } from './postComments';
 import { PostReactionTable } from './postReactions';
-import { WebCardTable, type WebCard } from './webCards';
+import { type WebCard } from './webCards';
 import type { DbTransaction } from './db';
 import type { PostComment } from './postComments';
 import type { InferInsertModel, InferSelectModel, SQL } from 'drizzle-orm';
@@ -315,12 +315,5 @@ export const getLikedPosts = async (
     .select()
     .from(PostTable)
     .innerJoin(subquery, eq(PostTable.id, subquery.postId))
-    .innerJoin(
-      WebCardTable,
-      and(
-        eq(WebCardTable.id, PostTable.webCardId),
-        eq(WebCardTable.cardIsPublished, true),
-      ),
-    )
     .then(res => res.map(({ Post }) => Post));
 };

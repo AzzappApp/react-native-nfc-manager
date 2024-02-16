@@ -9,14 +9,16 @@ import {
 } from 'react';
 
 import { useIntl } from 'react-intl';
-import { Alert, StyleSheet, View } from 'react-native';
+import { Alert, View } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { graphql, useFragment } from 'react-relay';
 import { isEditor } from '@azzapp/shared/profileHelpers';
 import { colors } from '#theme';
 import AuthorCartouche from '#components/AuthorCartouche';
+import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import useAuthState from '#hooks/useAuthState';
 import useToggle from '#hooks/useToggle';
+import Icon from '#ui/Icon';
 import IconButton from '#ui/IconButton';
 
 import { PostListContext } from './PostListsContext';
@@ -102,6 +104,7 @@ const PostRenderer = (
   }: PostRendererProps,
   forwardedRef: ForwardedRef<PostRendererHandle>,
 ) => {
+  const styles = useStyleSheet(styleSheet);
   const post = useFragment(
     graphql`
       fragment PostRendererFragment_post on Post
@@ -120,6 +123,7 @@ const PostRenderer = (
   const author = useFragment(
     graphql`
       fragment PostRendererFragment_author on WebCard {
+        cardIsPublished
         ...AuthorCartoucheFragment_webCard
       }
     `,
@@ -224,16 +228,22 @@ const PostRenderer = (
         />
       </View>
       <View style={styles.mediaContainer}>
-        <PostRendererMedia
-          post={post}
-          width={width}
-          muted={muted}
-          paused={paused || !shouldPlayVideo}
-          initialTime={initialTime}
-          videoDisabled={
-            videoDisabled || (!shouldPlayVideo && !shouldPauseVideo)
-          }
-        />
+        {author.cardIsPublished === false ? (
+          <View style={styles.unpublishedOverlay}>
+            <Icon icon="bloc" size={48} style={styles.unpublishedIcon} />
+          </View>
+        ) : (
+          <PostRendererMedia
+            post={post}
+            width={width}
+            muted={muted}
+            paused={paused || !shouldPlayVideo}
+            initialTime={initialTime}
+            videoDisabled={
+              videoDisabled || (!shouldPlayVideo && !shouldPauseVideo)
+            }
+          />
+        )}
       </View>
       <Suspense fallback={<PostRendererBottomPanelSkeleton />}>
         <PostRendererBottomPanel
@@ -249,7 +259,7 @@ const PostRenderer = (
 
 export default memo(forwardRef(PostRenderer));
 
-const styles = StyleSheet.create({
+const styleSheet = createStyleSheet(appearance => ({
   headerView: { flexDirection: 'row', alignItems: 'center', height: 56 },
   pressableLink: { flex: 1 },
   authorCartoucheStyle: { marginLeft: 10, flex: 1 },
@@ -267,4 +277,14 @@ const styles = StyleSheet.create({
   mediaContainerSmall: {
     borderRadius: 16,
   },
-});
+  unpublishedOverlay: {
+    width: '100%',
+    aspectRatio: 3 / 2,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: appearance === 'light' ? colors.grey50 : colors.grey1000,
+  },
+  unpublishedIcon: {
+    tintColor: appearance === 'light' ? colors.grey100 : colors.grey900,
+  },
+}));

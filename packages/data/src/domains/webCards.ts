@@ -171,7 +171,6 @@ export const getFollowerProfiles = async (
         userName
           ? sql`MATCH (${WebCardTable.userName}) AGAINST ("${userName}*" IN BOOLEAN MODE)`
           : undefined,
-        eq(WebCardTable.cardIsPublished, true),
       ),
     )
     .orderBy(desc(FollowTable.createdAt))
@@ -208,7 +207,6 @@ export const getFollowingsWebCard = async (
         userName
           ? sql`MATCH (${WebCardTable.userName}) AGAINST ("${userName}*" IN BOOLEAN MODE)`
           : undefined,
-        eq(WebCardTable.cardIsPublished, true),
       ),
     )
     .orderBy(desc(FollowTable.createdAt))

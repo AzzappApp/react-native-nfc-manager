@@ -1,4 +1,4 @@
-import { cloneElement, useContext, useEffect } from 'react';
+import { cloneElement, useCallback, useContext, useEffect } from 'react';
 import { ReactRelayContext } from 'react-relay';
 import { usePrefetchRoute } from '#helpers/ScreenPrefetcher';
 import { useRouter } from './NativeRouter';
@@ -26,6 +26,12 @@ export type LinkProps<T extends Route> = T & {
    * The route key that will be used to prefetch the route.
    */
   routeKey?: string;
+  /**
+   *  disable the navigation
+   *
+   * @type {boolean}
+   */
+  disabled?: boolean;
 };
 
 /**
@@ -47,6 +53,7 @@ const Link = <T extends Route>({
   prefetch,
   children,
   routeKey,
+  disabled = false,
 }: LinkProps<T>) => {
   const router = useRouter();
   const prefetchScreen = usePrefetchRoute();
@@ -54,7 +61,7 @@ const Link = <T extends Route>({
   const context = useContext(ReactRelayContext);
   useEffect(() => {
     let disposable: Disposable | null = null;
-    if (prefetch && context?.environment) {
+    if (!disabled && prefetch && context?.environment) {
       disposable = prefetchScreen(context.environment, {
         route,
         params,
@@ -63,19 +70,24 @@ const Link = <T extends Route>({
     return () => {
       disposable?.dispose();
     };
-  }, [prefetch, prefetchScreen, route, params, context]);
+  }, [prefetch, prefetchScreen, route, params, context, disabled]);
 
-  const onLinkPress = (event?: GestureResponderEvent) => {
-    children.props.onPress?.(event);
-    if (event?.isDefaultPrevented()) {
-      return;
-    }
-    if (replace) {
-      router.replace({ route, params } as Route);
-    } else {
-      router.push({ id: routeKey ?? null, route, params } as Route);
-    }
-  };
+  const onLinkPress = useCallback(
+    (event?: GestureResponderEvent) => {
+      if (!disabled) {
+        children.props.onPress?.(event);
+        if (event?.isDefaultPrevented()) {
+          return;
+        }
+        if (replace) {
+          router.replace({ route, params } as Route);
+        } else {
+          router.push({ id: routeKey ?? null, route, params } as Route);
+        }
+      }
+    },
+    [children.props, disabled, params, replace, route, routeKey, router],
+  );
 
   return cloneElement(children, {
     accessibilityRole: 'link',
