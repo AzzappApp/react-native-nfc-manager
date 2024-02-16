@@ -1,5 +1,9 @@
-## 0.5.5-canary.90
+## 0.5.5-canary.91
 
+* **fix:**  - unit tests
+* **fix:**  - 🐛 restore working deletable comment ([#2830](https://github.com/AzzappApp/azzapp/pull/2830))
+* **fix:**  - **android:** try vision camera with rotation for samsung ([#2832](https://github.com/AzzappApp/azzapp/pull/2832))
+* **fix:**  - **Home:** properly handle non focused item touch ([#2831](https://github.com/AzzappApp/azzapp/pull/2831))
 * **fix:**  - 🐛 update role on accept multi-user invitation ([#2827](https://github.com/AzzappApp/azzapp/pull/2827))
 * **fix:**  - **Android:** suggested media button not display when no media ([#2828](https://github.com/AzzappApp/azzapp/pull/2828))
 * **fix:**  - **Android:** video scrambled when exported without transform ([#2826](https://github.com/AzzappApp/azzapp/pull/2826))
