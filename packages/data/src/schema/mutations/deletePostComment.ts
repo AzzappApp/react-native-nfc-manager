@@ -29,12 +29,8 @@ const deletePostComment: MutationResolvers['deletePostComment'] = async (
     throw new GraphQLError(ERRORS.INVALID_REQUEST);
   }
 
-  const { id: targetId, type } = fromGlobalId(commentId);
-  if (type !== 'PostComment') {
-    throw new GraphQLError(ERRORS.INVALID_REQUEST);
-  }
   try {
-    const originalComment = await getPostCommentById(targetId);
+    const originalComment = await getPostCommentById(commentId);
     if (!originalComment) throw new GraphQLError(ERRORS.INVALID_REQUEST);
     if (originalComment.webCardId !== profile.webCardId)
       throw new GraphQLError(ERRORS.FORBIDDEN);
@@ -47,11 +43,11 @@ const deletePostComment: MutationResolvers['deletePostComment'] = async (
         })
         .where(eq(PostTable.id, originalComment.postId));
 
-      await removeComment(targetId, trx);
+      await removeComment(commentId, trx);
     });
 
     return {
-      commentId,
+      commentId: gqlCommentId,
     };
   } catch (error) {
     console.error(error);
