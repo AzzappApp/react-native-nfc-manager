@@ -65,3 +65,7 @@ require('@shopify/flash-list/jestSetup');
 //#region Sentry
 jest.mock('@sentry/react-native', () => ({ init: () => jest.fn() }));
 //#endRegion
+
+jest.mock('react-native-device-info', () => ({
+  getManufacturer: jest.fn(() => 'Apple'),
+}));
