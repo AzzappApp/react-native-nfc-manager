@@ -67,6 +67,7 @@ const SearchBar = ({
 
   const onPressCancel = () => {
     setSearchValue(undefined);
+    onChangeText(undefined);
     if (onCancel) {
       onCancel();
     }

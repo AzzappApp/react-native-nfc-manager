@@ -144,6 +144,7 @@ const styleSheet = createStyleSheet(appearance => ({
     alignItems: 'center',
     marginTop: 10,
     marginBottom: 10,
+    paddingHorizontal: 20,
   },
   transfer: {
     height: 29,

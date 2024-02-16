@@ -441,10 +441,10 @@ const HomeBottomPanel = ({
         currentProfileIndexSharedValue.value,
         [prev, prev + 0.2, next - 0.2, next],
         [
-          prevIsNewProfile || prevHasWebCover ? 0 : 1,
+          prevIsNewProfile || prevHasWebCover || prevIsInvitation ? 0 : 1,
           0,
           0,
-          nextHasWebCover ? 0 : 1,
+          nextHasWebCover || nextIsInvitation ? 0 : 1,
         ],
       );
     }

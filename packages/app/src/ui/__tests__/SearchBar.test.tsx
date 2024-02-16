@@ -132,7 +132,7 @@ describe('SearchBar component', () => {
     expect(onChangeText).toHaveBeenCalledWith(undefined);
   });
 
-  test('should call `onCancel` and not `onChangeText` when touching the cancel button', () => {
+  test('should call `onCancel` and `onChangeText` with undefined', () => {
     render(
       <SearchBar
         placeholder={placeholder}
@@ -154,7 +154,7 @@ describe('SearchBar component', () => {
     fireEvent(screen.getByTestId('azzapp__SearchBar__cancel-button'), 'press');
     expect(onCancel).toHaveBeenCalled();
     expect(onClear).not.toHaveBeenCalled();
-    expect(onChangeText).not.toHaveBeenCalled();
+    expect(onChangeText).toHaveBeenCalledWith(undefined);
   });
 
   test('should show the correct `placeholder` text', () => {
