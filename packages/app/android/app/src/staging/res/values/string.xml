@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Azzapp - Staging</string>
+    <string name="azzapp_domain">azzapp-staging.vercel.app</string>
 </resources>
