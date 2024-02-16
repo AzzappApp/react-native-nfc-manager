@@ -207,6 +207,8 @@ const HomeBottomPanel = ({
         }
       }
     `;
+    const profileRole =
+      profiles?.find(p => p.id === profileId)?.profileRole ?? 'user';
 
     commitMutation<HomeBottomPanelAcceptInvitationMutation>(environment, {
       mutation: acceptInvitationMutation,
@@ -220,10 +222,17 @@ const HomeBottomPanel = ({
           profile: {
             id: profileId,
             invited: false,
-            profileRole:
-              profiles?.find(p => p.id === profileId)?.profileRole ?? 'user',
+            profileRole,
           },
         },
+      },
+      onCompleted: () => {
+        void dispatchGlobalEvent({
+          type: 'PROFILE_ROLE_CHANGE',
+          payload: {
+            profileRole,
+          },
+        });
       },
     });
   }, [profiles]);
