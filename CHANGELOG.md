@@ -1,5 +1,6 @@
-## 0.5.5-canary.88
+## 0.5.5-canary.89
 
+* **fix:**  - **Android:** video scrambled when exported without transform ([#2826](https://github.com/AzzappApp/azzapp/pull/2826))
 * **fix:**  - **android:** [#2739](https://github.com/AzzappApp/azzapp/pull/2739) configure deep links ([#2814](https://github.com/AzzappApp/azzapp/pull/2814))
 * **fix:**  - **android:** [#2676](https://github.com/AzzappApp/azzapp/pull/2676) border radius missing on android ([#2818](https://github.com/AzzappApp/azzapp/pull/2818))
 * **fix:**  - 🐛 fix multiple ui issues on multi-user ([#2809](https://github.com/AzzappApp/azzapp/pull/2809))
