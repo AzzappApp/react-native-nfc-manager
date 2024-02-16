@@ -4,7 +4,6 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { Alert, Platform, StyleSheet } from 'react-native';
 import { RESULTS } from 'react-native-permissions';
-import { getVideoDuration } from 'react-native-video-duration';
 import { useDebouncedCallback } from 'use-debounce';
 import { cropDataForAspectRatio } from '#components/gpu';
 import { getImageSize, getVideoSize } from '#helpers/mediaHelpers';
@@ -109,6 +108,7 @@ const SelectImageStep = ({
     }
     const uri = path.startsWith('file://') ? path : `file://${path}`;
     const { width, height } = await getImageSize(uri);
+
     onMediaChange(
       {
         kind: 'image',
@@ -139,8 +139,7 @@ const SelectImageStep = ({
       const result = await cameraRef.current?.startRecording();
 
       if (result) {
-        const duration =
-          result.duration ?? (await getVideoDuration(result.uri));
+        const duration = result.duration;
         if (duration) {
           const { uri: _uri } = result;
           const uri = _uri.startsWith('file://') ? _uri : `file://${_uri}`;

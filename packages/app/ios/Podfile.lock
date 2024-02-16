@@ -11,6 +11,9 @@ PODS:
     - ExpoModulesCore
   - EXFont (11.10.2):
     - ExpoModulesCore
+  - EXImageLoader (4.6.0):
+    - ExpoModulesCore
+    - React-Core
   - EXMediaLibrary (15.9.1):
     - ExpoModulesCore
     - glog
@@ -20,10 +23,6 @@ PODS:
     - ExpoModulesCore
   - ExpoBlur (12.9.1):
     - ExpoModulesCore
-  - ExpoCamera (14.0.4):
-    - ExpoModulesCore
-    - ZXingObjC/OneD
-    - ZXingObjC/PDF417
   - ExpoClipboard (5.0.1):
     - ExpoModulesCore
   - ExpoFileSystem (16.0.6):
@@ -36,6 +35,9 @@ PODS:
     - SDWebImageAVIFCoder (~> 0.10.1)
     - SDWebImageSVGCoder (~> 1.7.0)
     - SDWebImageWebPCoder (~> 0.13.0)
+  - ExpoImageManipulator (11.8.0):
+    - EXImageLoader
+    - ExpoModulesCore
   - ExpoKeepAwake (12.8.2):
     - ExpoModulesCore
   - ExpoLinearGradient (12.7.1):
@@ -1030,8 +1032,8 @@ PODS:
     - React-Core
   - react-native-keyboard-controller (1.10.6):
     - React-Core
-  - react-native-mmkv (2.11.0):
-    - MMKV (>= 1.2.13)
+  - react-native-mmkv (2.12.1):
+    - MMKV (>= 1.3.3)
     - React-Core
   - react-native-pager-view (6.2.3):
     - glog
@@ -1048,10 +1050,6 @@ PODS:
     - RCT-Folly (= 2022.05.16.00)
     - React
     - React-callinvoker
-    - React-Core
-  - react-native-video-duration (0.1.2):
-    - glog
-    - RCT-Folly (= 2022.05.16.00)
     - React-Core
   - React-nativeconfig (0.73.4)
   - React-NativeModulesApple (0.73.4):
@@ -1222,11 +1220,13 @@ PODS:
     - React-perflogger (= 0.73.4)
   - RNBootSplash (5.4.0):
     - React-Core
-  - RNCAsyncStorage (1.21.0):
+  - RNCAsyncStorage (1.22.0):
     - React-Core
   - RNCMaskedView (0.3.1):
     - React-Core
   - RNDateTimePicker (7.6.2):
+    - React-Core
+  - RNDeviceInfo (10.12.0):
     - React-Core
   - RNFlashList (1.6.3):
     - React-Core
@@ -1249,7 +1249,7 @@ PODS:
     - glog
     - RCT-Folly (= 2022.05.16.00)
     - React-Core
-  - RNSentry (5.18.0):
+  - RNSentry (5.19.0):
     - hermes-engine
     - React-Core
     - React-hermes
@@ -1273,16 +1273,11 @@ PODS:
     - SentryPrivate (= 8.17.1)
   - SentryPrivate (8.17.1)
   - SocketRocket (0.6.1)
-  - VisionCamera (3.8.2):
+  - VisionCamera (3.9.0):
     - React
     - React-callinvoker
     - React-Core
   - Yoga (1.14.0)
-  - ZXingObjC/Core (3.6.9)
-  - ZXingObjC/OneD (3.6.9):
-    - ZXingObjC/Core
-  - ZXingObjC/PDF417 (3.6.9):
-    - ZXingObjC/Core
 
 DEPENDENCIES:
   - boost (from `../../../node_modules/react-native/third-party-podspecs/boost.podspec`)
@@ -1291,14 +1286,15 @@ DEPENDENCIES:
   - EXConstants (from `../../../node_modules/expo-constants/ios`)
   - EXContacts (from `../../../node_modules/expo-contacts/ios`)
   - EXFont (from `../../../node_modules/expo-font/ios`)
+  - EXImageLoader (from `../../../node_modules/expo-image-loader/ios`)
   - EXMediaLibrary (from `../../../node_modules/expo-media-library/ios`)
   - Expo (from `../../../node_modules/expo`)
   - ExpoBlur (from `../../../node_modules/expo-blur/ios`)
-  - ExpoCamera (from `../../../node_modules/expo-camera/ios`)
   - ExpoClipboard (from `../../../node_modules/expo-clipboard/ios`)
   - ExpoFileSystem (from `../../../node_modules/expo-file-system/ios`)
   - ExpoHaptics (from `../../../node_modules/expo-haptics/ios`)
   - ExpoImage (from `../../../node_modules/expo-image/ios`)
+  - ExpoImageManipulator (from `../../../node_modules/expo-image-manipulator/ios`)
   - ExpoKeepAwake (from `../../../node_modules/expo-keep-awake/ios`)
   - ExpoLinearGradient (from `../../../node_modules/expo-linear-gradient/ios`)
   - ExpoModulesCore (from `../../../node_modules/expo-modules-core`)
@@ -1364,7 +1360,6 @@ DEPENDENCIES:
   - react-native-quick-base64 (from `../../../node_modules/react-native-quick-base64`)
   - react-native-safe-area-context (from `../../../node_modules/react-native-safe-area-context`)
   - "react-native-skia (from `../../../node_modules/@shopify/react-native-skia`)"
-  - react-native-video-duration (from `../../../node_modules/react-native-video-duration`)
   - React-nativeconfig (from `../../../node_modules/react-native/ReactCommon`)
   - React-NativeModulesApple (from `../../../node_modules/react-native/ReactCommon/react/nativemodule/core/platform/ios`)
   - React-perflogger (from `../../../node_modules/react-native/ReactCommon/reactperflogger`)
@@ -1389,6 +1384,7 @@ DEPENDENCIES:
   - "RNCAsyncStorage (from `../../../node_modules/@react-native-async-storage/async-storage`)"
   - "RNCMaskedView (from `../../../node_modules/@react-native-masked-view/masked-view`)"
   - "RNDateTimePicker (from `../../../node_modules/@react-native-community/datetimepicker`)"
+  - RNDeviceInfo (from `../../../node_modules/react-native-device-info`)
   - "RNFlashList (from `../../../node_modules/@shopify/flash-list`)"
   - RNGestureHandler (from `../../../node_modules/react-native-gesture-handler`)
   - RNLocalize (from `../../../node_modules/react-native-localize`)
@@ -1430,7 +1426,6 @@ SPEC REPOS:
     - Sentry
     - SentryPrivate
     - SocketRocket
-    - ZXingObjC
 
 EXTERNAL SOURCES:
   boost:
@@ -1445,14 +1440,14 @@ EXTERNAL SOURCES:
     :path: "../../../node_modules/expo-contacts/ios"
   EXFont:
     :path: "../../../node_modules/expo-font/ios"
+  EXImageLoader:
+    :path: "../../../node_modules/expo-image-loader/ios"
   EXMediaLibrary:
     :path: "../../../node_modules/expo-media-library/ios"
   Expo:
     :path: "../../../node_modules/expo"
   ExpoBlur:
     :path: "../../../node_modules/expo-blur/ios"
-  ExpoCamera:
-    :path: "../../../node_modules/expo-camera/ios"
   ExpoClipboard:
     :path: "../../../node_modules/expo-clipboard/ios"
   ExpoFileSystem:
@@ -1461,6 +1456,8 @@ EXTERNAL SOURCES:
     :path: "../../../node_modules/expo-haptics/ios"
   ExpoImage:
     :path: "../../../node_modules/expo-image/ios"
+  ExpoImageManipulator:
+    :path: "../../../node_modules/expo-image-manipulator/ios"
   ExpoKeepAwake:
     :path: "../../../node_modules/expo-keep-awake/ios"
   ExpoLinearGradient:
@@ -1542,8 +1539,6 @@ EXTERNAL SOURCES:
     :path: "../../../node_modules/react-native-safe-area-context"
   react-native-skia:
     :path: "../../../node_modules/@shopify/react-native-skia"
-  react-native-video-duration:
-    :path: "../../../node_modules/react-native-video-duration"
   React-nativeconfig:
     :path: "../../../node_modules/react-native/ReactCommon"
   React-NativeModulesApple:
@@ -1592,6 +1587,8 @@ EXTERNAL SOURCES:
     :path: "../../../node_modules/@react-native-masked-view/masked-view"
   RNDateTimePicker:
     :path: "../../../node_modules/@react-native-community/datetimepicker"
+  RNDeviceInfo:
+    :path: "../../../node_modules/react-native-device-info"
   RNFlashList:
     :path: "../../../node_modules/@shopify/flash-list"
   RNGestureHandler:
@@ -1625,14 +1622,15 @@ SPEC CHECKSUMS:
   EXConstants: 988aa430ca0f76b43cd46b66e7fae3287f9cc2fc
   EXContacts: 5fcab84e1f1a562934e688d422117f9a33169c37
   EXFont: 21b9c760abd593ce8f0d5386b558ced76018506f
+  EXImageLoader: 55080616b2fe9da19ef8c7f706afd9814e279b6b
   EXMediaLibrary: 5a74f7d9cce776ca07cb3090b948cedd7d4841a1
   Expo: fb745b3074989670b6641f9f20463e8ee56a69ca
   ExpoBlur: 2eb7f7ac50c0818ee7d596996e4c0112b3d225f6
-  ExpoCamera: 64e9bb61e639dfaec9d12872c5b6bad0c4167b67
   ExpoClipboard: b597982124f067ff9f5b89093eb3d97898d5d877
   ExpoFileSystem: a9273932e69a9a1e1a8d01b6ba895bb8294bbea2
   ExpoHaptics: 28a771b630353cd6e8dcf1b1e3e693e38ad7c3c3
   ExpoImage: 8cf2d51de3d03b7e984e9b0ba8f19c0c22057001
+  ExpoImageManipulator: c1d7cb865eacd620a35659f3da34c70531f10b59
   ExpoKeepAwake: 0f5cad99603a3268e50af9a6eb8b76d0d9ac956c
   ExpoLinearGradient: d10226652f849e675528883aa45afd2358c2f92f
   ExpoModulesCore: 96d1751929ad10622773bb729ab28a8423f0dd0c
@@ -1685,13 +1683,12 @@ SPEC CHECKSUMS:
   react-native-blob-util: d8fa1a7f726867907a8e43163fdd8b441d4489ea
   react-native-encrypted-storage: db300a3f2f0aba1e818417c1c0a6be549038deb7
   react-native-keyboard-controller: c0a4b8d0f6c9b87852f12f2dfecb45d8e637c2aa
-  react-native-mmkv: e97c0c79403fb94577e5d902ab1ebd42b0715b43
+  react-native-mmkv: 124b22209aacdcd172b6ac39071b9647080f0411
   react-native-pager-view: d81ab2060b9caf57ca8c3a0d57467ff407cdb825
   react-native-passkit: aaf4f946eb981b872104192aadaa7d6c94011f86
   react-native-quick-base64: 777057ea4286f806b00259ede65dc79c7c706320
   react-native-safe-area-context: b97eb6f9e3b7f437806c2ce5983f479f8eb5de4b
   react-native-skia: 88bc2430278842f46935d77888059bc1a2f564b6
-  react-native-video-duration: 2a669828adb16d9911051a1eba239afcdb59616b
   React-nativeconfig: d7af5bae6da70fa15ce44f045621cf99ed24087c
   React-NativeModulesApple: 0123905d5699853ac68519607555a9a4f5c7b3ac
   React-perflogger: 8a1e1af5733004bdd91258dcefbde21e0d1faccd
@@ -1713,9 +1710,10 @@ SPEC CHECKSUMS:
   React-utils: 6e5ad394416482ae21831050928ae27348f83487
   ReactCommon: 840a955d37b7f3358554d819446bffcf624b2522
   RNBootSplash: 009c55e0258f3e56be9c5f7a578bf2baf140c4bc
-  RNCAsyncStorage: 618d03a5f52fbccb3d7010076bc54712844c18ef
+  RNCAsyncStorage: c43e6d71e13bb4748503797784839e0fbbf89d56
   RNCMaskedView: 090213d32d8b3bb83a4dcb7d12c18f0152591906
   RNDateTimePicker: fc2e4f2795877d45e84d85659bebe627eba5c931
+  RNDeviceInfo: db5c64a060e66e5db3102d041ebe3ef307a85120
   RNFlashList: 4b4b6b093afc0df60ae08f9cbf6ccd4c836c667a
   RNGestureHandler: deda62b8339496ba721a45e0f3e2d7a319932cee
   RNLocalize: 4222a3756cdbe2dc9a5bdf445765a4d2572107cb
@@ -1723,7 +1721,7 @@ SPEC CHECKSUMS:
   RNReactNativeHapticFeedback: ec56a5f81c3941206fd85625fa669ffc7b4545f9
   RNReanimated: ec630a026d5bec1e5a06873830795d8a6d257f21
   RNScreens: b582cb834dc4133307562e930e8fa914b8c04ef2
-  RNSentry: eefa12fa65b37dd71f54371720f9fcddcd17be2f
+  RNSentry: 98df59e833edc1975d8628fb8c5345773c79974a
   RNShare: 859ff710211285676b0bcedd156c12437ea1d564
   RNSVG: ba3e7232f45e34b7b47e74472386cf4e1a676d0a
   SDWebImage: 750adf017a315a280c60fde706ab1e552a3ae4e9
@@ -1733,9 +1731,8 @@ SPEC CHECKSUMS:
   Sentry: d9f99f9cc13777c5d938650c1e1c85047bb4f0d1
   SentryPrivate: 839b1e58addf58624087a80b2628e543193fa8ef
   SocketRocket: f32cd54efbe0f095c4d7594881e52619cfe80b17
-  VisionCamera: 4b98b273902ac18491bb68481b6601f1f0da0f2d
+  VisionCamera: 7a5c87805b13adaaa557132b44879ed1e1e39786
   Yoga: 1b901a6d6eeba4e8a2e8f308f708691cdb5db312
-  ZXingObjC: 8898711ab495761b2dbbdec76d90164a6d7e14c5
 
 PODFILE CHECKSUM: 12a372b1bfae73bb427f1900e5ad20006b112d12
 

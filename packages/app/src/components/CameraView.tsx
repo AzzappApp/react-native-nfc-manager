@@ -1,3 +1,4 @@
+import { manipulateAsync, SaveFormat } from 'expo-image-manipulator';
 import {
   useRef,
   useState,
@@ -9,6 +10,7 @@ import {
 } from 'react';
 import { useIntl } from 'react-intl';
 import { Platform, StyleSheet, View } from 'react-native';
+import { getManufacturer } from 'react-native-device-info';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import Animated, {
   runOnJS,
@@ -66,7 +68,7 @@ export type RecordSession = Promise<{
   /**
    * The duration of the recorded video in seconds
    */
-  duration?: number;
+  duration: number;
 }>;
 
 /**
@@ -110,6 +112,8 @@ const CameraView = (
 
   const device = useCameraDevice(cameraPosition);
 
+  const manufacturerRef = useRef<string | null>(null);
+
   const supportsCameraFlipping = devices.length > 1;
 
   const [flash, setFlash] = useState<'auto' | 'off' | 'on'>('off');
@@ -142,6 +146,22 @@ const CameraView = (
           // enableAutoRedEyeReduction: true,
           // enableAutoStabilization: true,
         });
+        const currentManufacturer =
+          manufacturerRef.current || (await getManufacturer());
+        manufacturerRef.current = currentManufacturer;
+
+        if (
+          ['Samsung', 'samsung'].includes(manufacturerRef.current) &&
+          photo.isMirrored
+        ) {
+          // rotate to right position when using samsung front camera
+          const rotated = await manipulateAsync(photo.path, [{ rotate: 90 }], {
+            compress: 1,
+            format: SaveFormat.JPEG,
+          });
+          return rotated.uri;
+        }
+
         return photo.path;
       },
 
