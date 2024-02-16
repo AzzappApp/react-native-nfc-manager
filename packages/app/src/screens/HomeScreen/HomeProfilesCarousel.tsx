@@ -8,7 +8,13 @@ import {
   useState,
 } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { View, useWindowDimensions, StyleSheet, Platform } from 'react-native';
+import {
+  View,
+  useWindowDimensions,
+  StyleSheet,
+  Platform,
+  Pressable,
+} from 'react-native';
 import { graphql, useFragment } from 'react-relay';
 import { COVER_CARD_RADIUS, COVER_RATIO } from '@azzapp/shared/coverHelpers';
 import { colors, shadow } from '#theme';
@@ -29,11 +35,7 @@ import type { HomeProfilesCarouselItem_profile$key } from '#relayArtifacts/HomeP
 import type { CarouselSelectListHandle } from '#ui/CarouselSelectList';
 import type { ArrayItemType } from '@azzapp/shared/arrayHelpers';
 import type { ForwardedRef } from 'react';
-import type {
-  GestureResponderEvent,
-  ListRenderItemInfo,
-  ViewStyle,
-} from 'react-native';
+import type { ListRenderItemInfo, ViewStyle } from 'react-native';
 import type { SharedValue } from 'react-native-reanimated';
 
 type HomeProfilesCarouselProps = {
@@ -110,9 +112,13 @@ const HomeProfilesCarousel = (
     [onCurrentProfileIndexChange],
   );
 
-  const scrollToIndex = useCallback((index: number, animated?: boolean) => {
-    carouselRef.current?.scrollToIndex(index, animated);
-  }, []);
+  const scrollToIndex = useCallback(
+    (index: number, animated?: boolean) => {
+      carouselRef.current?.scrollToIndex(index, animated);
+      onSelectedIndexChange(index);
+    },
+    [onSelectedIndexChange],
+  );
 
   useImperativeHandle(
     ref,
@@ -252,16 +258,6 @@ const ItemRenderComponent = ({
     setReady(false);
   }, []);
 
-  const onPress = useCallback(
-    (event: GestureResponderEvent) => {
-      if (!isCurrent) {
-        event.preventDefault();
-        scrollToIndex(index);
-      }
-    },
-    [scrollToIndex, isCurrent, index],
-  );
-
   const hasFocus = useScreenHasFocus();
 
   const containerStyle = useMemo(
@@ -277,8 +273,18 @@ const ItemRenderComponent = ({
     [coverWidth, coverHeight],
   );
 
+  const onContainerPress = useCallback(() => {
+    if (!isCurrent) {
+      scrollToIndex(index);
+    }
+  }, [scrollToIndex, isCurrent, index]);
+
   return (
-    <View style={containerStyle}>
+    <Pressable
+      style={containerStyle}
+      onPress={onContainerPress}
+      pointerEvents={isCurrent ? 'box-none' : 'box-only'}
+    >
       {loadingFailed ? (
         <CoverErrorRenderer
           label={
@@ -312,7 +318,6 @@ const ItemRenderComponent = ({
           webCard={profile.webCard}
           width={coverWidth}
           webCardId={profile.webCard.id}
-          onPress={onPress}
           animationEnabled={isCurrent && hasFocus}
           onReadyForDisplay={onReady}
           onError={onError}
@@ -353,7 +358,7 @@ const ItemRenderComponent = ({
           style={StyleSheet.absoluteFill}
         />
       )}
-    </View>
+    </Pressable>
   );
 };
 
