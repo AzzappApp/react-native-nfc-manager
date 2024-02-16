@@ -1,5 +1,12 @@
-## 0.5.5-canary.87
+## 0.5.5-canary.88
 
+* **fix:**  - **android:** [#2739](https://github.com/AzzappApp/azzapp/pull/2739) configure deep links ([#2814](https://github.com/AzzappApp/azzapp/pull/2814))
+* **fix:**  - **android:** [#2676](https://github.com/AzzappApp/azzapp/pull/2676) border radius missing on android ([#2818](https://github.com/AzzappApp/azzapp/pull/2818))
+* **fix:**  - 🐛 fix multiple ui issues on multi-user ([#2809](https://github.com/AzzappApp/azzapp/pull/2809))
+* **fix:**  - **cover:** [#2695](https://github.com/AzzappApp/azzapp/pull/2695) hide chevrons when not relevant ([#2823](https://github.com/AzzappApp/azzapp/pull/2823))
+* **fix:**  - **cover:** [#2816](https://github.com/AzzappApp/azzapp/pull/2816) allow line break on title & subtitle ([#2824](https://github.com/AzzappApp/azzapp/pull/2824))
+* **fix:**  - **android:** [#2645](https://github.com/AzzappApp/azzapp/pull/2645) avoid blink in divider edition ([#2825](https://github.com/AzzappApp/azzapp/pull/2825))
+* **feat:**  - handle unpublished content, followers, followings, counter properly ([#2812](https://github.com/AzzappApp/azzapp/pull/2812))
 * **fix:**  - remove cover border on ShakenShare ([#2821](https://github.com/AzzappApp/azzapp/pull/2821))
 * **fix:**  - **Android:** simplify code loading
 * **fix:**  - 🐛 allow multiline inside contact card fields ([#2819](https://github.com/AzzappApp/azzapp/pull/2819))
