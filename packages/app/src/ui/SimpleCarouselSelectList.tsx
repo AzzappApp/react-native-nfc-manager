@@ -181,20 +181,22 @@ function SimpleCarouselSelectList<TItem = any>(
         {...props}
       />
       <View style={styles.overlay} pointerEvents="box-none">
-        <IconButton
-          icon="arrow_left"
-          variant="icon"
-          style={previousButtonAnimatedStyle}
-          onPress={onPrevious}
-          hitSlop={{ top: 20, bottom: 20, left: 20, right: 20 }}
-        />
-        <IconButton
-          icon="arrow_right"
-          variant="icon"
-          style={nextButtonAnimatedStyle}
-          onPress={onNext}
-          hitSlop={{ top: 20, bottom: 20, left: 20, right: 20 }}
-        />
+        <Animated.View style={previousButtonAnimatedStyle}>
+          <IconButton
+            icon="arrow_left"
+            variant="icon"
+            onPress={onPrevious}
+            hitSlop={{ top: 20, bottom: 20, left: 20, right: 20 }}
+          />
+        </Animated.View>
+        <Animated.View style={nextButtonAnimatedStyle}>
+          <IconButton
+            icon="arrow_right"
+            variant="icon"
+            onPress={onNext}
+            hitSlop={{ top: 20, bottom: 20, left: 20, right: 20 }}
+          />
+        </Animated.View>
       </View>
     </View>
   );
