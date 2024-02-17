@@ -77,7 +77,14 @@ const SelectImageStep = ({
         clearMedia();
       }
       setPermissionModalRejected(false);
-      setPickerMode(mode);
+
+      setPickerMode(previousMode => {
+        if (previousMode === 'gallery') {
+          setCameraInitialized(false);
+        }
+
+        return mode;
+      });
     },
     [pickerMode, clearMedia],
   );
@@ -314,7 +321,7 @@ const SelectImageStep = ({
               ref={cameraRef}
               onError={onCameraError}
               onInitialized={onCameraInitialized}
-              style={{ flex: 1 }}
+              style={styles.cameraStyle}
               initialCameraPosition={initialCameraPosition}
               photo={pickerMode === 'photo'}
               video={pickerMode === 'video'}
@@ -390,4 +397,5 @@ const styles = StyleSheet.create({
     left: 25,
     bottom: 20,
   },
+  cameraStyle: { flex: 1 },
 });

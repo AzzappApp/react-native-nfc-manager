@@ -19,15 +19,15 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 import {
-  useCameraDevices,
   Camera,
   useCameraDevice,
+  useCameraDevices,
   useCameraFormat,
 } from 'react-native-vision-camera';
 import useIsForeground from '#hooks/useIsForeground';
 import FloatingIconButton from '#ui/FloatingIconButton';
 import type { ForwardedRef } from 'react';
-import type { ViewProps } from 'react-native';
+import type { LayoutRectangle, ViewProps } from 'react-native';
 import type { CameraRuntimeError } from 'react-native-vision-camera';
 
 export type CameraViewProps = ViewProps & {
@@ -110,19 +110,19 @@ const CameraView = (
     devices.length ? initialCameraPosition : 'back',
   );
 
+  const supportsCameraFlipping = devices.length > 1;
+
+  const [layoutRect, setLayoutRect] = useState<LayoutRectangle | null>(null);
+
   const device = useCameraDevice(cameraPosition);
 
   const manufacturerRef = useRef<string | null>(null);
-
-  const supportsCameraFlipping = devices.length > 1;
 
   const [flash, setFlash] = useState<'auto' | 'off' | 'on'>('off');
   const supportsFlash = device?.hasFlash ?? false;
 
   const isActive = useIsForeground();
   const [hasMicrophonePermission, setHasMicrophonePermission] = useState(false);
-
-  const [ready, setReady] = useState(Platform.OS === 'ios');
 
   useEffect(() => {
     const status = Camera.getMicrophonePermissionStatus();
@@ -140,7 +140,8 @@ const CameraView = (
         }
         const photo = await camera.current.takePhoto({
           flash: supportsFlash ? flash : 'off',
-          qualityPrioritization: 'balanced',
+          qualityPrioritization:
+            Platform.OS === 'android' ? 'speed' : 'balanced',
           // TODO investigate those parameters
           // enableAutoDistortionCorrection: true,
           // enableAutoRedEyeReduction: true,
@@ -213,9 +214,9 @@ const CameraView = (
     null,
   );
 
-  const resetFocus = () => {
+  const resetFocus = useCallback(() => {
     setFocusPoint(null);
-  };
+  }, []);
 
   const setFocus = useCallback(
     (x: number, y: number) => {
@@ -236,7 +237,7 @@ const CameraView = (
         },
       );
     },
-    [device?.supportsFocus, focusRingVisible],
+    [device?.supportsFocus, focusRingVisible, resetFocus],
   );
 
   const gesture = useMemo(
@@ -258,29 +259,40 @@ const CameraView = (
 
   const intl = useIntl();
 
+  const aspectRatio = layoutRect
+    ? layoutRect.width / layoutRect.height
+    : undefined;
+
   // see https://github.com/mrousavy/react-native-vision-camera/issues/2208#issuecomment-1850856762
   const format = useCameraFormat(device, [
-    { videoResolution: { width: 1280, height: 720 } },
-    { fps: 30 },
+    {
+      videoResolution: { width: 1280, height: 720 },
+      photoAspectRatio: aspectRatio,
+      videoAspectRatio: aspectRatio,
+    },
   ]);
 
+  const onCameraInitialized = useCallback(() => {
+    onInitialized();
+  }, [onInitialized]);
+
   return (
-    <View {...props}>
-      {device != null && (
+    <View
+      {...props}
+      onLayout={event => setLayoutRect(event.nativeEvent.layout)}
+    >
+      {(Platform.OS !== 'android' || aspectRatio) && device != null ? (
         <GestureDetector gesture={gesture}>
           <Camera
             ref={camera}
             style={styles.camera}
             device={device}
-            fps={ready ? 30 : undefined}
-            format={Platform.OS === 'android' && ready ? format : undefined}
+            fps={30}
+            format={Platform.OS === 'android' ? format : undefined}
             isActive={isActive}
-            onInitialized={() => {
-              onInitialized();
-              setReady(true);
-            }}
+            onInitialized={onCameraInitialized}
             onError={onError}
-            enableZoomGesture={true}
+            enableZoomGesture
             photo={photo}
             video={video}
             audio={hasMicrophonePermission}
@@ -288,7 +300,8 @@ const CameraView = (
             exposure={0}
           />
         </GestureDetector>
-      )}
+      ) : null}
+
       <Animated.View
         style={[
           styles.focusRing,
@@ -342,6 +355,7 @@ const CameraView = (
           })}
         />
       )}
+
       {supportsCameraFlipping && (
         <FloatingIconButton
           icon="revert"
