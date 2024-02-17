@@ -1,5 +1,6 @@
-## 0.5.5-canary.91
+## 0.5.5-canary.92
 
+* **fix:**  - 🐛 properly calculte scroll to bottom on android ([#2837](https://github.com/AzzappApp/azzapp/pull/2837))
 * **fix:**  - unit tests
 * **fix:**  - 🐛 restore working deletable comment ([#2830](https://github.com/AzzappApp/azzapp/pull/2830))
 * **fix:**  - **android:** try vision camera with rotation for samsung ([#2832](https://github.com/AzzappApp/azzapp/pull/2832))
