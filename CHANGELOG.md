@@ -1,5 +1,6 @@
-## 0.5.5-canary.96
+## 0.5.5-canary.97
 
+* **feat:**  - **Upload:** improve progress bar precision ([#2839](https://github.com/AzzappApp/azzapp/pull/2839))
 * **perf:**  - **cover:** [#2774](https://github.com/AzzappApp/azzapp/pull/2774) make color picker more responsive in cover editor ([#2829](https://github.com/AzzappApp/azzapp/pull/2829))
 * **fix:**  - 🐛 correctly update color list ([#2834](https://github.com/AzzappApp/azzapp/pull/2834))
 * **fix:**  - set proper aspect ratio on android ([#2838](https://github.com/AzzappApp/azzapp/pull/2838))
