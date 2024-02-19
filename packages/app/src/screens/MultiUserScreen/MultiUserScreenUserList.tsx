@@ -236,24 +236,28 @@ const MultiUserScreenUserList = ({
     return (
       <View style={styles.headerContainer}>
         {Header}
-        <Button
-          style={styles.button}
-          label={intl.formatMessage({
-            defaultMessage: 'Add users',
-            description: 'Button to add new users from MultiUserScreen',
-          })}
-          onPress={onAddUsers}
-        />
-        <Button
-          style={styles.button}
-          variant="secondary"
-          label={`${intl.formatMessage({
-            defaultMessage: 'Set common information',
-            description:
-              'Button to add common information to the contact card in MultiUserScreen',
-          })} (${nbCommonInformation})`}
-          onPress={toggleCommonInfosForm}
-        />
+        {!transferOwnerMode && (
+          <>
+            <Button
+              style={styles.button}
+              label={intl.formatMessage({
+                defaultMessage: 'Add users',
+                description: 'Button to add new users from MultiUserScreen',
+              })}
+              onPress={onAddUsers}
+            />
+            <Button
+              style={styles.button}
+              variant="secondary"
+              label={`${intl.formatMessage({
+                defaultMessage: 'Set common information',
+                description:
+                  'Button to add common information to the contact card in MultiUserScreen',
+              })} (${nbCommonInformation})`}
+              onPress={toggleCommonInfosForm}
+            />
+          </>
+        )}
       </View>
     );
   }, [
@@ -264,6 +268,7 @@ const MultiUserScreenUserList = ({
     styles.button,
     styles.headerContainer,
     toggleCommonInfosForm,
+    transferOwnerMode,
   ]);
 
   const { bottom } = useSafeAreaInsets();

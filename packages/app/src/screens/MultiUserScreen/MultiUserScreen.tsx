@@ -243,7 +243,7 @@ const MultiUserScreen = ({
             />
           )}
         </Text>
-        {profile?.profileRole === 'owner' && (
+        {profile?.profileRole === 'owner' && !transferOwnerMode && (
           <View style={styles.switchSection}>
             <Text variant="large">
               <FormattedMessage
