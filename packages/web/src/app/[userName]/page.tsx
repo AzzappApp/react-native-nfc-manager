@@ -140,6 +140,8 @@ const ProfilePage = async ({ params }: ProfilePageProps) => {
 
 export default ProfilePage;
 
+export const dynamic = 'force-static';
+
 export async function generateMetadata({
   params,
 }: ProfilePageProps): Promise<Metadata> {
@@ -168,8 +170,6 @@ export async function generateMetadata({
   });
   return meta;
 }
-
-export const dynamic = 'force-static';
 
 export const generateStaticParams = () => [];
 

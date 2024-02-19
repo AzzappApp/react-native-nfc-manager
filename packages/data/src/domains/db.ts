@@ -4,7 +4,6 @@ import { sql } from 'drizzle-orm';
 import { char, datetime, varchar, json } from 'drizzle-orm/mysql-core';
 import { drizzle } from 'drizzle-orm/planetscale-serverless';
 import { monitorRequest, monitorRequestEnd } from './databaseMonitorer';
-import '#helpers/polyfills';
 
 let fetchFunction: typeof fetch;
 
