@@ -1,5 +1,6 @@
-## 0.5.5-canary.95
+## 0.5.5-canary.96
 
+* **perf:**  - **cover:** [#2774](https://github.com/AzzappApp/azzapp/pull/2774) make color picker more responsive in cover editor ([#2829](https://github.com/AzzappApp/azzapp/pull/2829))
 * **fix:**  - 🐛 correctly update color list ([#2834](https://github.com/AzzappApp/azzapp/pull/2834))
 * **fix:**  - set proper aspect ratio on android ([#2838](https://github.com/AzzappApp/azzapp/pull/2838))
 * **fix:**  - 🐛 properly calculte scroll to bottom on android ([#2837](https://github.com/AzzappApp/azzapp/pull/2837))
