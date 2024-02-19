@@ -22,6 +22,7 @@ import {
   saveSocialLinksModule,
 } from './ModulesMutationsResolvers';
 import togglePostReaction from './postReaction';
+import quitWebCard from './quitWebCard';
 import removeFollower from './removeFollower';
 import removeUserFromWebCard from './removeUserFromWebCard';
 import reorderModules from './reorderModules';
@@ -86,4 +87,5 @@ export const Mutation: MutationResolvers = {
   removeUserFromWebCard,
   transferOwnership,
   cancelTransferOwnership,
+  quitWebCard,
 };

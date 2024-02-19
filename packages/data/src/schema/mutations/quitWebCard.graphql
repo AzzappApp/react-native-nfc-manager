@@ -1,0 +1,11 @@
+extend type Mutation {
+  quitWebCard(input: QuitWebCardInput!): QuitWebCardPayload
+}
+
+input QuitWebCardInput {
+  profileId: ID!
+}
+
+type QuitWebCardPayload {
+  profileId: ID!
+}
