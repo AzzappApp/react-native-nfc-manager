@@ -167,7 +167,9 @@ const PostCreationScreen = ({
         });
         const { progress: uploadProgress, promise: uploadPromise } =
           uploadMedia(file, uploadURL, uploadParameters);
-        setProgressIndicator(uploadProgress);
+        setProgressIndicator(
+          uploadProgress.map(({ loaded, total }) => loaded / total),
+        );
         const { public_id } = await uploadPromise;
         commit({
           variables: {

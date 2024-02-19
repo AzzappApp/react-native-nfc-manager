@@ -10,7 +10,7 @@ import {
   CAROUSEL_STYLE_VALUES,
 } from '@azzapp/shared/cardModuleHelpers';
 import { encodeMediaId } from '@azzapp/shared/imagesHelpers';
-import { combineLatest } from '@azzapp/shared/observableHelpers';
+import { combineMultiUploadProgresses } from '@azzapp/shared/networkHelpers';
 import { exportLayersToImage, getFilterUri } from '#components/gpu';
 import ImagePicker from '#components/ImagePicker';
 import { useRouter } from '#components/NativeRouter';
@@ -255,10 +255,7 @@ const CarouselEditionScreen = ({
         );
 
         setProgressIndicator(
-          combineLatest(uploads.map(({ progress }) => progress)).map(
-            progresses =>
-              progresses.reduce((a, b) => a + b, 0) / progresses.length,
-          ),
+          combineMultiUploadProgresses(uploads.map(({ progress }) => progress)),
         );
 
         const medias = await Promise.all(

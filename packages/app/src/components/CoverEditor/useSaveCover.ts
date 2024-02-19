@@ -14,7 +14,7 @@ import {
   COVER_VIDEO_BITRATE,
 } from '@azzapp/shared/coverHelpers';
 import { encodeMediaId } from '@azzapp/shared/imagesHelpers';
-import { combineLatest } from '@azzapp/shared/observableHelpers';
+import { combineMultiUploadProgresses } from '@azzapp/shared/networkHelpers';
 import {
   exportLayersToImage,
   exportLayersToVideo,
@@ -241,13 +241,9 @@ const useSaveCover = (
             );
           });
 
-          const observables = convertToNonNullArray(
-            uploads.map(upload => upload?.progress),
-          );
           setProgressIndicator(
-            combineLatest(observables).map(
-              progresses =>
-                progresses.reduce((a, b) => a + b, 0) / progresses.length,
+            combineMultiUploadProgresses(
+              convertToNonNullArray(uploads.map(upload => upload?.progress)),
             ),
           );
 

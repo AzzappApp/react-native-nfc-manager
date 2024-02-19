@@ -186,13 +186,13 @@ export const createPresignedUpload = async (
     timestamp: Math.round(Date.now() / 1000),
     public_id: publicId,
     context,
+    eager_async: true,
   };
 
   if (pregeneratedSizes) {
     uploadParameters.eager = pregeneratedSizes
       .map(size => resizeTransforms(size))
       .join('|');
-    uploadParameters.eager_async = true;
   }
   if (generateVideoStreaming && kind === 'video') {
     uploadParameters.eager = [uploadParameters.eager, 'sp_auto,f_m3u8']

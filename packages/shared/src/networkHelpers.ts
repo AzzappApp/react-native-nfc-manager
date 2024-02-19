@@ -1,6 +1,7 @@
 import { Observable } from 'relay-runtime';
 import { executeWithRetries } from './asyncHelpers';
 import ERRORS from './errors';
+import { combineLatest } from './observableHelpers';
 import type { Sink } from 'relay-runtime/lib/network/RelayObservable';
 
 const DEFAULT_TIMEOUT = 15000;
@@ -191,6 +192,9 @@ export class FetchError extends Error {
  * will be resolved when the request is fulfiled and an `progress` field containing
  * an Observable reprensenting upload progress.
  *
+ * > Note: The `progress` Observable won't emit valid value in debug mode
+ * (see https://stackoverflow.com/questions/74628502/react-native-xhr-upload-onprogress-showing-inaccurate-result)
+ *
  */
 export const postFormData = (
   url: string,
@@ -198,11 +202,11 @@ export const postFormData = (
   responseType: XMLHttpRequestResponseType = 'json',
   signal?: AbortSignal,
 ) => {
-  let progressSink: Sink<number> | null;
-  const progress: Observable<number> = Observable.create(sink => {
-    progressSink = sink;
-    progressSink.next(0);
-  });
+  let progressSink: Sink<{ loaded: number; total: number }> | null;
+  const progress: Observable<{ loaded: number; total: number }> =
+    Observable.create(sink => {
+      progressSink = sink;
+    });
 
   const promise = new Promise<any>((resolve, reject) => {
     const signalAbortHandler = () => {
@@ -250,7 +254,10 @@ export const postFormData = (
     };
 
     xhr.upload.onprogress = event => {
-      progressSink?.next(event.loaded / event.total);
+      progressSink?.next({
+        loaded: event.loaded,
+        total: event.total,
+      });
     };
 
     xhr.open('POST', url);
@@ -260,6 +267,23 @@ export const postFormData = (
 
   return { promise, progress };
 };
+
+export const combineMultiUploadProgresses = (
+  observables: Array<Observable<{ loaded: number; total: number }>>,
+): Observable<number> =>
+  combineLatest(observables).map(progresses => {
+    const { total, loaded } = progresses.reduce(
+      (a, b) => ({
+        total: a.total + b.total,
+        loaded: a.loaded + b.loaded,
+      }),
+      {
+        total: 0,
+        loaded: 0,
+      },
+    );
+    return total === 0 ? 0 : loaded / total;
+  });
 
 export const isAbortError = (error: any) =>
   error instanceof Error && error.name === 'AbortError';

@@ -5,16 +5,13 @@ import type { Subscription, Observer } from 'relay-runtime';
  * Combine multiple observables into one, and emit an array of values when
  * all observables have emitted at least one value, with the latest value from each observable.
  */
-export const combineLatest = <
-  T extends any[],
-  P extends any[] & {
-    [I in keyof T]: Observable<T[I]>;
-  },
->(
+export const combineLatest = <P extends Array<Observable<unknown>>>(
   observables: P,
-): Observable<T> =>
+): Observable<{
+  [I in keyof P]: P[I] extends Observable<infer T> ? T : never;
+}> =>
   Observable.create(sink => {
-    const values: T = new Array(observables.length) as T;
+    const values: any = new Array(observables.length);
     const hasEmittedArray = new Array(observables.length).fill(false);
     const completesArrays = new Array(observables.length).fill(false);
     const subscriptions = observables.map((observable, index) => {

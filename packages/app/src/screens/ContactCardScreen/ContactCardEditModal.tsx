@@ -222,7 +222,9 @@ const ContactCardEditModal = ({
         uploadURL,
         uploadParameters,
       );
-      setProgressIndicator(uploadProgress);
+      setProgressIndicator(
+        uploadProgress.map(({ loaded, total }) => loaded / total),
+      );
       const { public_id } = await uploadPromise;
       avatarId = encodeMediaId(public_id, 'image');
     }

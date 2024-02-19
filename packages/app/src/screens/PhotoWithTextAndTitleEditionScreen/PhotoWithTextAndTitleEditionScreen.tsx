@@ -282,7 +282,9 @@ const PhotoWithTextAndTitleEditionScreen = ({
         uploadURL,
         uploadParameters,
       );
-      setProgressIndicator(uploadProgress);
+      setProgressIndicator(
+        uploadProgress.map(({ loaded, total }) => loaded / total),
+      );
       try {
         const { public_id } = await uploadPromise;
         mediaId = encodeMediaId(public_id, 'image');
