@@ -1,4 +1,4 @@
-## 0.5.5-canary.94
+## 0.5.5-canary.95
 
 * **fix:**  - 🐛 correctly update color list ([#2834](https://github.com/AzzappApp/azzapp/pull/2834))
 * **fix:**  - set proper aspect ratio on android ([#2838](https://github.com/AzzappApp/azzapp/pull/2838))
