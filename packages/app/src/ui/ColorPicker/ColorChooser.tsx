@@ -1,7 +1,8 @@
 import chroma from 'chroma-js';
 import clamp from 'lodash/clamp';
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
+import { useDebouncedCallback } from 'use-debounce';
 import HuePicker from './HuePicker';
 import RGBHexColorPicker from './RGBHexColorPicker';
 import SaturationValuePicker from './SaturationValuePicker';
@@ -19,32 +20,44 @@ const ColorChooser = ({ value, onColorChange, style }: ColorChooserProps) => {
     saturation: hexToHSV(value)[1],
     value: hexToHSV(value)[2],
   });
-  const onSatValChange = ([saturation, value]: [number, number]) => {
-    setHsv(prev => {
-      return {
-        ...prev,
-        saturation: clamp(saturation, 0, 1),
-        value: clamp(value, 0, 1),
-      };
-    });
-    onColorChange(chroma.hsv(hsv.hue, saturation, value).hex());
-  };
 
-  const onHueChange = (hue: number) => {
-    setHsv(prev => {
-      return { ...prev, hue };
-    });
-    onColorChange(chroma.hsv(hue, hsv.saturation, hsv.value).hex());
-  };
+  const onColorChangeDebounced = useDebouncedCallback(onColorChange, 200);
 
-  const onHexChange = (hex: string) => {
-    setHsv({
-      hue: hexToHSV(hex)[0],
-      saturation: hexToHSV(hex)[1],
-      value: hexToHSV(hex)[2],
-    });
-    onColorChange(hex);
-  };
+  const onSatValChange = useCallback(
+    ([saturation, value]: [number, number]) => {
+      setHsv(prev => {
+        return {
+          ...prev,
+          saturation: clamp(saturation, 0, 1),
+          value: clamp(value, 0, 1),
+        };
+      });
+      onColorChangeDebounced(chroma.hsv(hsv.hue, saturation, value).hex());
+    },
+    [hsv.hue, onColorChangeDebounced],
+  );
+
+  const onHueChange = useCallback(
+    (hue: number) => {
+      setHsv(prev => {
+        return { ...prev, hue };
+      });
+      onColorChangeDebounced(chroma.hsv(hue, hsv.saturation, hsv.value).hex());
+    },
+    [hsv.saturation, hsv.value, onColorChangeDebounced],
+  );
+
+  const onHexChange = useCallback(
+    (hex: string) => {
+      setHsv({
+        hue: hexToHSV(hex)[0],
+        saturation: hexToHSV(hex)[1],
+        value: hexToHSV(hex)[2],
+      });
+      onColorChange(hex);
+    },
+    [onColorChange],
+  );
 
   return (
     <View style={style}>

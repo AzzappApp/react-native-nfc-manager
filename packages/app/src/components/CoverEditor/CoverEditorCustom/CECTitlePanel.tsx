@@ -96,9 +96,9 @@ const CECTitlePanel = ({
     'animation' | 'subtitle' | 'title'
   >('title');
 
-  const onTabPress = (tab: string) => {
+  const onTabPress = useCallback((tab: string) => {
     setCurrentTab(tab as 'subtitle' | 'title');
-  };
+  }, []);
 
   const { fontFamily, fontSize, color } = useMemo(() => {
     const textStyles = currentTab === 'title' ? titleStyle : subTitleStyle;
@@ -112,46 +112,76 @@ const CECTitlePanel = ({
   const orientation = textOrientation ?? DEFAULT_COVER_CONTENT_ORTIENTATION;
   const position = textPosition ?? DEFAULT_COVER_CONTENT_POSITION;
 
-  const onFontFamilyChange = (fontFamily: string) => {
-    if (currentTab === 'title') {
-      onTitleStyleChange({ fontFamily, fontSize, color });
-      if (!subTitleStyle?.fontFamily) {
+  const onFontFamilyChange = useCallback(
+    (fontFamily: string) => {
+      if (currentTab === 'title') {
+        onTitleStyleChange({ fontFamily, fontSize, color });
+        if (!subTitleStyle?.fontFamily) {
+          onSubTitleStyleChange({ fontFamily, fontSize, color });
+        }
+      } else {
         onSubTitleStyleChange({ fontFamily, fontSize, color });
       }
-    } else {
-      onSubTitleStyleChange({ fontFamily, fontSize, color });
-    }
-  };
+    },
+    [
+      color,
+      currentTab,
+      fontSize,
+      onSubTitleStyleChange,
+      onTitleStyleChange,
+      subTitleStyle?.fontFamily,
+    ],
+  );
 
-  const onFontSizeChange = (fontSize: number) => {
-    if (currentTab === 'title') {
-      onTitleStyleChange({ fontFamily, fontSize, color });
-      if (!subTitleStyle?.fontSize) {
+  const onFontSizeChange = useCallback(
+    (fontSize: number) => {
+      if (currentTab === 'title') {
+        onTitleStyleChange({ fontFamily, fontSize, color });
+        if (!subTitleStyle?.fontSize) {
+          onSubTitleStyleChange({ fontFamily, fontSize, color });
+        }
+      } else {
         onSubTitleStyleChange({ fontFamily, fontSize, color });
       }
-    } else {
-      onSubTitleStyleChange({ fontFamily, fontSize, color });
-    }
-  };
+    },
+    [
+      currentTab,
+      onTitleStyleChange,
+      fontFamily,
+      color,
+      subTitleStyle?.fontSize,
+      onSubTitleStyleChange,
+    ],
+  );
 
-  const onColorChange = (color: string) => {
-    if (currentTab === 'title') {
-      onTitleStyleChange({ fontFamily, fontSize, color });
-      if (!subTitleStyle?.color) {
+  const onColorChange = useCallback(
+    (color: string) => {
+      if (currentTab === 'title') {
+        onTitleStyleChange({ fontFamily, fontSize, color });
+        if (!subTitleStyle?.color) {
+          onSubTitleStyleChange({ fontFamily, fontSize, color });
+        }
+      } else {
         onSubTitleStyleChange({ fontFamily, fontSize, color });
       }
-    } else {
-      onSubTitleStyleChange({ fontFamily, fontSize, color });
-    }
-  };
+    },
+    [
+      currentTab,
+      onTitleStyleChange,
+      fontFamily,
+      fontSize,
+      subTitleStyle?.color,
+      onSubTitleStyleChange,
+    ],
+  );
 
-  const onNextPlacement = () => {
+  const onNextPlacement = useCallback(() => {
     const index =
       (TEXT_POSITIONS.indexOf(position as any) + 1) % TEXT_POSITIONS.length;
     onTextPositionChange(TEXT_POSITIONS[index]);
-  };
+  }, [onTextPositionChange, position]);
 
-  const onNextOrientation = () => {
+  const onNextOrientation = useCallback(() => {
     onTextOrientationChange(
       orientation === 'bottomToTop'
         ? 'topToBottom'
@@ -159,7 +189,7 @@ const CECTitlePanel = ({
           ? 'horizontal'
           : 'bottomToTop',
     );
-  };
+  }, [onTextOrientationChange, orientation]);
 
   const intl = useIntl();
 

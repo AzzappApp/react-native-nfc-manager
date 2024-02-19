@@ -1,14 +1,11 @@
 import chroma from 'chroma-js';
 import { LinearGradient } from 'expo-linear-gradient';
-import clamp from 'lodash/clamp';
-import { useCallback, useRef, useState } from 'react';
-import { View, PanResponder, StyleSheet } from 'react-native';
-import type {
-  StyleProp,
-  ViewStyle,
-  GestureResponderEvent,
-  LayoutChangeEvent,
-} from 'react-native';
+import { useCallback, useMemo, useState } from 'react';
+import { View, StyleSheet } from 'react-native';
+import { Gesture, GestureDetector } from 'react-native-gesture-handler';
+import { clamp, runOnJS } from 'react-native-reanimated';
+import { useBottomSheetModalContext } from '#ui/BottomSheetModal';
+import type { StyleProp, ViewStyle, LayoutChangeEvent } from 'react-native';
 
 type SaturationValuePickerProps = {
   hue: number;
@@ -27,40 +24,43 @@ const SaturationValuePicker = ({
     null,
   );
 
-  const sizeRef = useRef(size);
-  const onChangeRef = useRef(onChange);
-  onChangeRef.current = onChange;
-
-  const onLayout = (e: LayoutChangeEvent) => {
+  const onLayout = useCallback((e: LayoutChangeEvent) => {
     const { width, height } = e.nativeEvent.layout;
     setSize([width, height]);
-    sizeRef.current = [width, height];
-  };
-
-  const handleGestureEvent = useCallback((event: GestureResponderEvent) => {
-    const { locationX, locationY } = event.nativeEvent;
-    if (!sizeRef.current) {
-      return null;
-    }
-    const [width, height] = sizeRef.current;
-    onChangeRef.current([
-      clamp(locationX / width, 0, 1),
-      clamp(1 - locationY / height, 0, 1),
-    ]);
   }, []);
 
-  const pan = useRef(
-    PanResponder.create({
-      onStartShouldSetPanResponder: () => true,
-      onStartShouldSetPanResponderCapture: () => true,
-      onMoveShouldSetPanResponder: () => true,
-      onMoveShouldSetPanResponderCapture: () => true,
-      onPanResponderGrant: handleGestureEvent,
-      onPanResponderMove: handleGestureEvent,
-      onPanResponderRelease: handleGestureEvent,
-      onPanResponderTerminate: handleGestureEvent,
-    }),
-  ).current;
+  const { panGesture: modalPanGesture } = useBottomSheetModalContext();
+
+  const panGesture = useMemo(
+    () =>
+      Gesture.Pan()
+        .blocksExternalGesture(modalPanGesture)
+        .onBegin(e => {
+          const { x, y } = e;
+          if (!size) {
+            return null;
+          }
+
+          const [width, height] = size;
+          runOnJS(onChange)([
+            clamp(x / width, 0, 1),
+            clamp(1 - y / height, 0, 1),
+          ]);
+        })
+        .onChange(e => {
+          const { x, y } = e;
+
+          if (!size) {
+            return null;
+          }
+          const [width, height] = size;
+          runOnJS(onChange)([
+            clamp(x / width, 0, 1),
+            clamp(1 - y / height, 0, 1),
+          ]);
+        }),
+    [modalPanGesture, onChange, size],
+  );
 
   let { borderRadius } = StyleSheet.flatten(style);
 
@@ -68,19 +68,20 @@ const SaturationValuePicker = ({
 
   return (
     <View style={[styles.container, style]} onLayout={onLayout}>
-      <LinearGradient
-        style={[styles.innerGradient, { borderRadius }]}
-        colors={['#fff', chroma.hsl(hue, 1, 0.5).hex()]}
-        start={{ x: 0, y: 0.5 }}
-        end={{ x: 1, y: 0.5 }}
-        {...pan.panHandlers}
-        hitSlop={{ left: 12, right: 12, top: 12, bottom: 12 }}
-      >
+      <GestureDetector gesture={panGesture}>
         <LinearGradient
           style={[styles.innerGradient, { borderRadius }]}
-          colors={['rgba(0, 0, 0, 0)', '#000']}
-        />
-      </LinearGradient>
+          colors={['#fff', chroma.hsl(hue, 1, 0.5).hex()]}
+          start={{ x: 0, y: 0.5 }}
+          end={{ x: 1, y: 0.5 }}
+          hitSlop={{ left: 12, right: 12, top: 12, bottom: 12 }}
+        >
+          <LinearGradient
+            style={[styles.innerGradient, { borderRadius }]}
+            colors={['rgba(0, 0, 0, 0)', '#000']}
+          />
+        </LinearGradient>
+      </GestureDetector>
       {size && (
         <View
           style={[

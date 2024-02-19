@@ -1,3 +1,4 @@
+import { useCallback } from 'react';
 import { useIntl } from 'react-intl';
 import { graphql, useFragment } from 'react-relay';
 import EditorLayerSelectorPanel from '#components/EditorLayerSelectorPanel';
@@ -51,9 +52,12 @@ const CECForegroundPanel = ({
 
   const color = foregroundColor ?? '#000000';
 
-  const onColorChange = (_: unknown, value: string) => {
-    onForegroundColorChange(value);
-  };
+  const onColorChange = useCallback(
+    (_: unknown, value: string) => {
+      onForegroundColorChange(value);
+    },
+    [onForegroundColorChange],
+  );
 
   const intl = useIntl();
   return (

@@ -1,4 +1,11 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import { useIntl } from 'react-intl';
 import { Keyboard, Modal, Platform, View } from 'react-native';
 import {
@@ -28,6 +35,7 @@ import Button from './Button';
 import Header from './Header';
 import type { HeaderProps } from './Header';
 import type { ModalProps, StyleProp, ViewStyle } from 'react-native';
+import type { PanGesture } from 'react-native-gesture-handler';
 
 export type BottomSheetModalProps = Omit<
   ModalProps,
@@ -88,6 +96,20 @@ export type BottomSheetModalProps = Omit<
 
 // TODO in the actual implementation, the height of the bottomsheet is actually the given height + insets.bottom
 // this is confusing and should be fixed
+
+const BottomSheetModalContext = createContext<{
+  panGesture: PanGesture;
+} | null>(null);
+
+export const useBottomSheetModalContext = () => {
+  const context = useContext(BottomSheetModalContext);
+  if (context === null) {
+    throw new Error(
+      'useBottomSheetModalContext must be used within a BottomSheetModalContext.Provider',
+    );
+  }
+  return context;
+};
 
 /**
  * A simple bottom sheet component
@@ -260,6 +282,13 @@ const BottomSheetModal = ({
 
   // #endregion
 
+  const bottomSheetContextValue = useMemo(
+    () => ({
+      panGesture,
+    }),
+    [panGesture],
+  );
+
   return (
     <Modal
       animationType="none"
@@ -300,18 +329,20 @@ const BottomSheetModal = ({
             animatedStyle,
           ]}
         >
-          {nestedScroll && Platform.OS === 'android' ? (
-            <>
+          <BottomSheetModalContext.Provider value={bottomSheetContextValue}>
+            {nestedScroll && Platform.OS === 'android' ? (
+              <>
+                <GestureDetector gesture={panGesture}>
+                  <View style={styles.gestureViewAndroid} collapsable={false} />
+                </GestureDetector>
+                {content}
+              </>
+            ) : (
               <GestureDetector gesture={panGesture}>
-                <View style={styles.gestureViewAndroid} collapsable={false} />
+                <View style={styles.gestureView}>{content}</View>
               </GestureDetector>
-              {content}
-            </>
-          ) : (
-            <GestureDetector gesture={panGesture}>
-              <View style={styles.gestureView}>{content}</View>
-            </GestureDetector>
-          )}
+            )}
+          </BottomSheetModalContext.Provider>
         </Animated.View>
       </GestureHandlerRootView>
       <Toast />

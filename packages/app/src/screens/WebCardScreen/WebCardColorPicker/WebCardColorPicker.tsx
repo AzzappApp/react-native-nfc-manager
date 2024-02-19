@@ -11,7 +11,6 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import { Alert, View } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { useRelayEnvironment } from 'react-relay';
-import { useDebouncedCallback } from 'use-debounce';
 import {
   DEFAULT_COLOR_PALETTE,
   type ColorPalette,
@@ -172,11 +171,6 @@ const WebCardColorPicker = ({
     [colorPalette, editedColor, onUpdateColorPalette],
   );
 
-  const onChangeColorInPaletteDebounced = useDebouncedCallback(
-    onChangeColorInPalette,
-    150,
-  );
-
   const previousEditedColorValueRef = useRef<string | null>(null);
 
   const onEditColor = useCallback(
@@ -326,7 +320,7 @@ const WebCardColorPicker = ({
       {editedColor ? (
         <ColorChooser
           value={colorPalette[editedColor]}
-          onColorChange={onChangeColorInPaletteDebounced}
+          onColorChange={onChangeColorInPalette}
         />
       ) : (
         <Suspense
