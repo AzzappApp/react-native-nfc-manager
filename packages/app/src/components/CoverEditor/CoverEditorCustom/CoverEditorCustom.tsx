@@ -16,6 +16,7 @@ import CoverPreviewRenderer from '#components/CoverPreviewRenderer';
 import ImageEditionFooter from '#components/ImageEditionFooter';
 import ImageEditionParameterControl from '#components/ImageEditionParameterControl';
 import ScreenModal from '#components/ScreenModal';
+import { useWebCardColors } from '#components/WebCardColorPicker';
 import { BOTTOM_MENU_HEIGHT } from '#ui/BottomMenu';
 import Container from '#ui/Container';
 import Delay from '#ui/Delay';
@@ -104,6 +105,7 @@ const CoverEditorCustom = ({
           cardColors {
             otherColors
           }
+          ...WebCardColorPicker_webCard
         }
         coverBackgrounds {
           id
@@ -144,12 +146,20 @@ const CoverEditorCustom = ({
     // retryMediaComputation,
   } = useCoverMediaEditor(initialData);
 
+  const { onUpdateColorList } = useWebCardColors(profile.webCard);
+
   const [colorPalette, setColorPalette] =
     useState<ColorPalette>(initialColorPalette);
 
   const [otherColors, setOtherColors] = useState<string[]>(
     cardColors?.otherColors?.slice() ?? DEFAULT_COLOR_LIST,
   );
+
+  const updateOtherColors = (colors: string[]) => {
+    onUpdateColorList(colors);
+    setOtherColors(colors);
+  };
+
   //#endregion
 
   const onFilterChange = useCallback(
@@ -594,7 +604,7 @@ const CoverEditorCustom = ({
                   onTextOrientationChange={onTextOrientationChange}
                   onTextPositionChange={onTextPositionChange}
                   onTextAnimationChange={onTextAnimationChange}
-                  onUpdateColorList={setOtherColors}
+                  onUpdateColorList={updateOtherColors}
                   onUpdateColorPalette={setColorPalette}
                   bottomSheetHeights={bottomSheetHeights}
                   style={{ flex: 1 }}
@@ -612,7 +622,7 @@ const CoverEditorCustom = ({
                   otherColors={otherColors}
                   onForegroundChange={onForegroundChange}
                   onForegroundColorChange={onForegroundColorChange}
-                  onUpdateColorList={setOtherColors}
+                  onUpdateColorList={updateOtherColors}
                   onUpdateColorPalette={setColorPalette}
                   bottomSheetHeights={bottomSheetHeights}
                   style={{ flex: 1 }}
@@ -634,7 +644,7 @@ const CoverEditorCustom = ({
                   onBackgroundPatternColorChange={
                     onBackgroundPatternColorChange
                   }
-                  onUpdateColorList={setOtherColors}
+                  onUpdateColorList={updateOtherColors}
                   onUpdateColorPalette={setColorPalette}
                   bottomSheetHeights={bottomSheetHeights}
                   style={{ flex: 1 }}
