@@ -21,6 +21,7 @@ import {
 import { KeyboardController } from 'react-native-keyboard-controller';
 import Toast from 'react-native-toast-message';
 import { graphql, useFragment } from 'react-relay';
+import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
 import {
   DEFAULT_COLOR_LIST,
   DEFAULT_COLOR_PALETTE,
@@ -57,6 +58,7 @@ import useSuggestedMedias from './useSuggestedMedias';
 import type { EditionParameters } from '#components/gpu';
 import type { ImagePickerResult } from '#components/ImagePicker';
 import type { CoverEditor_profile$key } from '#relayArtifacts/CoverEditor_profile.graphql';
+import type { BottomMenuItem } from '#ui/BottomMenu';
 import type { CoverEditorCustomProps } from './CoverEditorCustom/CoverEditorCustom';
 import type {
   TemplateKind,
@@ -171,11 +173,13 @@ const CoverEditor = (
     if (cardCover) {
       return cardCover.sourceMedia?.__typename === 'MediaVideo'
         ? 'video'
-        : cardCover.segmented
+        : Platform.OS === 'ios' && cardCover.segmented
           ? 'people'
           : 'others';
     }
-    return profile?.webCard.webCardKind === 'business' ? 'others' : 'people';
+    return profile?.webCard.webCardKind === 'personal' && Platform.OS === 'ios'
+      ? 'people'
+      : 'others';
     // We don't want to update the initial data when the cardCover change
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -204,7 +208,7 @@ const CoverEditor = (
             : intl.formatMessage({
                 defaultMessage: 'Add a video to your cover',
                 description:
-                  'Toast message while switching to viode in cover creation',
+                  'Toast message while switching to video in cover creation',
               });
 
       Toast.show({
@@ -655,6 +659,47 @@ const CoverEditor = (
   });
   // #endregion
 
+  const tabs = useMemo(() => {
+    const tabs: Array<BottomMenuItem | null> = [
+      Platform.OS === 'ios'
+        ? {
+            key: 'people',
+            icon: 'silhouette',
+            label: intl.formatMessage({
+              defaultMessage: 'People',
+              description: 'Cover editor people tab bar item label',
+            }),
+          }
+        : {
+            key: 'others',
+            icon: 'image',
+            label: intl.formatMessage({
+              defaultMessage: 'Image',
+              description: 'Cover editor images tab bar item label',
+            }),
+          },
+      {
+        key: 'video',
+        icon: 'video',
+        label: intl.formatMessage({
+          defaultMessage: 'Video',
+          description: 'Cover editor video tab bar item label',
+        }),
+      },
+      Platform.OS === 'ios'
+        ? {
+            key: 'others',
+            icon: 'landscape',
+            label: intl.formatMessage({
+              defaultMessage: 'Others',
+              description: 'Cover editor others tab bar item label',
+            }),
+          }
+        : null,
+    ];
+    return convertToNonNullArray(tabs);
+  }, [intl]);
+
   return (
     <>
       <Container style={[styles.root]}>
@@ -738,35 +783,7 @@ const CoverEditor = (
         <BottomMenu
           currentTab={templateKind}
           onItemPress={onSwitchTemplateKind}
-          tabs={useMemo(
-            () => [
-              {
-                key: 'people',
-                icon: 'silhouette',
-                label: intl.formatMessage({
-                  defaultMessage: 'People',
-                  description: 'Cover editor people tab bar item label',
-                }),
-              },
-              {
-                key: 'video',
-                icon: 'video',
-                label: intl.formatMessage({
-                  defaultMessage: 'Video',
-                  description: 'Cover editor video tab bar item label',
-                }),
-              },
-              {
-                key: 'others',
-                icon: 'landscape',
-                label: intl.formatMessage({
-                  defaultMessage: 'Others',
-                  description: 'Cover editor others tab bar item label',
-                }),
-              },
-            ],
-            [intl],
-          )}
+          tabs={tabs}
           showLabel={true}
           style={[
             {

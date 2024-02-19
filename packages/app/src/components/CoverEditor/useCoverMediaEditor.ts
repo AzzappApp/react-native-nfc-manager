@@ -116,7 +116,9 @@ const useCoverMediaEditor = (initialData: MediaInfos | null) => {
         width > maxSize || height > maxSize || timeRange != null;
 
       const shouldRecomputeMask: boolean =
-        kind === 'image' && state.maskMedia?.source !== uri;
+        kind === 'image' &&
+        state.maskMedia?.source !== uri &&
+        Platform.OS === 'ios';
 
       if (shouldRecomputeMedia || shouldRecomputeMask) {
         const mediaComputation = createMediaComputation({

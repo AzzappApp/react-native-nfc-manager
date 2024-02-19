@@ -81,7 +81,10 @@ export type CoverEditorProps = {
 
 const CoverEditorTemplateList = ({
   profile: profileKey,
-  templateKind = 'people',
+  templateKind = Platform.select({
+    ios: 'people',
+    default: 'others',
+  }),
   mediaInfos,
   timeRange,
   title,
@@ -638,8 +641,11 @@ const useCoverTemplates = (
 ) => {
   const profile = useFragment(
     graphql`
-      fragment CoverEditorTemplateList_templates on Profile {
-        ...CoverEditorTemplateList_templatesPeople
+      fragment CoverEditorTemplateList_templates on Profile
+      @argumentDefinitions(
+        isAndroid: { type: "Boolean!", provider: "isAndroid.relayprovider" }
+      ) {
+        ...CoverEditorTemplateList_templatesPeople @skip(if: $isAndroid)
         ...CoverEditorTemplateList_templatesVideos
         ...CoverEditorTemplateList_templatesOthers
       }
@@ -671,7 +677,9 @@ const useCoverTemplates = (
         }
       }
     `,
-    profile as CoverEditorTemplateList_templatesPeople$key,
+    Platform.OS !== 'android'
+      ? (profile as CoverEditorTemplateList_templatesPeople$key)
+      : null,
   );
 
   const videosFragmentResult = usePaginationFragment(
@@ -729,16 +737,19 @@ const useCoverTemplates = (
   );
 
   switch (kind) {
-    case 'people':
-      return {
-        coverTemplates: peopleFragmentResult.data.peopleCoverTemplates,
-        ...omit(peopleFragmentResult, 'data'),
-      };
     case 'video':
       return {
         coverTemplates: videosFragmentResult.data.videosCoverTemplates,
         ...omit(videosFragmentResult, 'data'),
       };
+    case 'people':
+      if (peopleFragmentResult.data != null) {
+        return {
+          coverTemplates: peopleFragmentResult.data.peopleCoverTemplates,
+          ...omit(peopleFragmentResult, 'data'),
+        };
+      }
+    /* fallthrough */
     default:
       return {
         coverTemplates: othersFragmentResult.data.othersCoverTemplates,

@@ -1,7 +1,7 @@
 import { memoize } from 'lodash';
 import { useCallback, useMemo, useRef, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { StyleSheet, View } from 'react-native';
+import { Platform, StyleSheet, View } from 'react-native';
 import { KeyboardAvoidingView } from 'react-native-keyboard-controller';
 import { graphql, useFragment } from 'react-relay';
 import { DEFAULT_COLOR_LIST } from '@azzapp/shared/cardHelpers';
@@ -385,7 +385,10 @@ const CoverEditorCustom = ({
 
   //#region Segmentation and merge
   const segmentationEnabled = useMemo(
-    () => sourceMedia?.kind !== 'video' && (mediaComputing || maskMedia),
+    () =>
+      sourceMedia?.kind !== 'video' &&
+      (mediaComputing || maskMedia) &&
+      Platform.OS === 'ios',
     [maskMedia, mediaComputing, sourceMedia?.kind],
   );
 
