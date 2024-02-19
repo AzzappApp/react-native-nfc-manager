@@ -1,5 +1,8 @@
-## 0.5.5-canary.98
+## 0.5.5-canary.99
 
+* **feat:**  - 🎸 remove unexpected ui elements from transfer ownership ([#2848](https://github.com/AzzappApp/azzapp/pull/2848))
+* **feat:**  - **Android:** Disable the people cover on android ([#2840](https://github.com/AzzappApp/azzapp/pull/2840))
+* **feat:**  - 🎸 add option to quit a webcard ([#2844](https://github.com/AzzappApp/azzapp/pull/2844))
 * **feat:**  - **Upload:** improve progress bar precision ([#2839](https://github.com/AzzappApp/azzapp/pull/2839))
 * **perf:**  - **cover:** [#2774](https://github.com/AzzappApp/azzapp/pull/2774) make color picker more responsive in cover editor ([#2829](https://github.com/AzzappApp/azzapp/pull/2829))
 * **fix:**  - 🐛 correctly update color list ([#2834](https://github.com/AzzappApp/azzapp/pull/2834))
