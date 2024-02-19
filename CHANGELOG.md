@@ -1,5 +1,6 @@
-## 0.5.5-canary.93
+## 0.5.5-canary.94
 
+* **fix:**  - 🐛 correctly update color list ([#2834](https://github.com/AzzappApp/azzapp/pull/2834))
 * **fix:**  - set proper aspect ratio on android ([#2838](https://github.com/AzzappApp/azzapp/pull/2838))
 * **fix:**  - 🐛 properly calculte scroll to bottom on android ([#2837](https://github.com/AzzappApp/azzapp/pull/2837))
 * **fix:**  - unit tests
