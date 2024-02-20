@@ -1,5 +1,9 @@
-## 0.5.5-canary.99
+## 0.5.5-canary.100
 
+* **fix:**  - 🐛 trigger scroll end even with margin ([#2850](https://github.com/AzzappApp/azzapp/pull/2850))
+* **fix:**  - icon size props issue if only one param is defined (width, height) ([#2851](https://github.com/AzzappApp/azzapp/pull/2851))
+* **fix:**  - **Android:** AnimatedText block scrolling ([#2853](https://github.com/AzzappApp/azzapp/pull/2853))
+* **fix:**  - Rework bottom panel message display ([#2849](https://github.com/AzzappApp/azzapp/pull/2849))
 * **feat:**  - 🎸 remove unexpected ui elements from transfer ownership ([#2848](https://github.com/AzzappApp/azzapp/pull/2848))
 * **feat:**  - **Android:** Disable the people cover on android ([#2840](https://github.com/AzzappApp/azzapp/pull/2840))
 * **feat:**  - 🎸 add option to quit a webcard ([#2844](https://github.com/AzzappApp/azzapp/pull/2844))
