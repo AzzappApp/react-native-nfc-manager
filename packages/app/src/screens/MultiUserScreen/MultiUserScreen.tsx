@@ -215,7 +215,7 @@ const MultiUserScreen = ({
   const ScrollableHeader = useMemo(() => {
     return (
       <View style={{ alignItems: 'center' }}>
-        <Icon style={styles.sharedIcon} icon="multi_user" />
+        <Icon style={styles.sharedIcon} icon="multi_user" size={140} />
         <Text variant="xsmall" style={styles.description}>
           {transferOwnerMode ? (
             <FormattedMessage
@@ -435,7 +435,6 @@ const COVER_WIDTH = 29;
 
 const styleSheet = createStyleSheet(appearance => ({
   sharedIcon: {
-    height: 140,
     margin: 'auto',
     marginTop: 15,
   },

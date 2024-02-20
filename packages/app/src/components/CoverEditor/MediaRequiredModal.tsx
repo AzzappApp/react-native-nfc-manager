@@ -42,10 +42,7 @@ const MediaRequiredModal = ({
               padding: 20,
             }}
           >
-            <Icon
-              icon="camera"
-              style={{ width: 60, height: 60, marginBottom: 10 }}
-            />
+            <Icon icon="camera" size={60} style={{ marginBottom: 10 }} />
             <Text variant="large" style={{ marginBottom: 20 }}>
               <FormattedMessage
                 defaultMessage="Add a photo"

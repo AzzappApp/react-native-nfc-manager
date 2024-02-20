@@ -74,17 +74,7 @@ const IconButton = ({
       ]}
       {...props}
     >
-      <Icon
-        icon={icon}
-        style={[
-          styles.image,
-          iconStyle,
-          {
-            width: iconSize,
-            height: iconSize,
-          },
-        ]}
-      />
+      <Icon icon={icon} size={iconSize} style={[styles.image, iconStyle]} />
     </PressableOpacity>
   );
 };
