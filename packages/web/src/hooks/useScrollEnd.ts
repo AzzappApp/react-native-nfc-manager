@@ -11,7 +11,7 @@ const useScrollEnd = <T extends HTMLElement>(
     const target = e.target as HTMLDivElement;
 
     const bottom =
-      Math.round(target.scrollHeight - target.scrollTop) ===
+      Math.round(target.scrollHeight - target.scrollTop - 1) <=
       Math.round(target.clientHeight);
 
     if (bottom) {
