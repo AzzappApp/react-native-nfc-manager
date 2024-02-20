@@ -1,4 +1,4 @@
-import { TextInput } from 'react-native';
+import { TextInput, View } from 'react-native';
 import Animated, { useAnimatedProps } from 'react-native-reanimated';
 import { useVariantStyleSheet } from '#helpers/createStyles';
 import { textStyleSheet } from '#ui/Text';
@@ -49,16 +49,18 @@ const AnimatedText = ({
     } as any;
   });
   return (
-    <AnimatedTextInput
-      accessible={false}
-      accessibilityRole="text"
-      underlineColorAndroid="transparent"
-      editable={false}
-      value={text.value}
-      style={[styles.text, { padding: 0 }, style]}
-      pointerEvents={'box-none'}
-      {...{ animatedProps }}
-    />
+    <View pointerEvents="box-only">
+      <AnimatedTextInput
+        accessible={false}
+        accessibilityRole="text"
+        underlineColorAndroid="transparent"
+        editable={false}
+        value={text.value}
+        style={[styles.text, { padding: 0 }, style]}
+        pointerEvents="none"
+        {...{ animatedProps }}
+      />
+    </View>
   );
 };
 
