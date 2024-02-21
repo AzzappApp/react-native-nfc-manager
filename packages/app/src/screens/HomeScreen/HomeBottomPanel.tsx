@@ -80,7 +80,7 @@ const HomeBottomPanel = ({
   //#endregion
 
   const bottomPanelVisible = useMemo(() => {
-    return (
+    const res =
       profiles?.map(profile => {
         if (!profile) return 0;
         return profile?.webCard?.cardCover != null &&
@@ -89,17 +89,17 @@ const HomeBottomPanel = ({
           !profile.promotedAsOwner
           ? 1
           : 0;
-      }) ?? []
-    );
+      }) ?? [];
+    return [0, ...res];
   }, [profiles]);
 
-  const inputRange = _.range(0, profiles?.length);
+  const inputRange = _.range(0, (profiles?.length ?? 0) + 1);
 
   const mainTabBarVisible = useDerivedValue(() => {
     if (inputRange.length > 1) {
       return Math.pow(
         interpolate(
-          currentProfileIndexSharedValue.value,
+          currentProfileIndexSharedValue.value + 1,
           inputRange,
           bottomPanelVisible,
         ),
@@ -112,23 +112,16 @@ const HomeBottomPanel = ({
   }, [bottomPanelVisible, currentProfileIndexSharedValue.value, inputRange]);
 
   const bottomPanelStyle = useAnimatedStyle(() => {
-    if (inputRange.length > 1) {
-      const index = Math.round(currentProfileIndexSharedValue.value);
-      const opacity = interpolate(
-        currentProfileIndexSharedValue.value,
-        inputRange,
-        bottomPanelVisible,
-      );
-      return {
-        opacity: Math.pow(opacity, 3),
-        pointerEvents: bottomPanelVisible[index] === 1 ? 'box-none' : 'none',
-      };
-    } else {
-      return {
-        opacity: bottomPanelVisible[0],
-        pointerEvents: bottomPanelVisible[0] === 1 ? 'box-none' : 'none',
-      };
-    }
+    const index = Math.round(currentProfileIndexSharedValue.value + 1);
+    const opacity = interpolate(
+      currentProfileIndexSharedValue.value + 1,
+      inputRange,
+      bottomPanelVisible,
+    );
+    return {
+      opacity: Math.pow(opacity, 3),
+      pointerEvents: bottomPanelVisible[index] === 1 ? 'box-none' : 'none',
+    };
   }, [bottomPanelVisible, currentProfileIndexSharedValue.value, inputRange]);
 
   useMainTabBarVisibilityController(mainTabBarVisible);
