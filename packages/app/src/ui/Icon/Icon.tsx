@@ -37,6 +37,9 @@ const icons = {
   get albums() {
     return require('./assets/albums.png');
   },
+  get app_store() {
+    return require('./assets/app_store.png');
+  },
   get approve() {
     return require('./assets/approve.png');
   },
@@ -321,6 +324,9 @@ const icons = {
   },
   get play() {
     return require('./assets/play.png');
+  },
+  get play_store() {
+    return require('./assets/play_store.png');
   },
   get rotate() {
     return require('./assets/rotate.png');

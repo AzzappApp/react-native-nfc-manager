@@ -177,7 +177,8 @@ const HomeBottomSheetPanel = ({
       }
     }
   }, [close, intl, profile?.webCard.userName]);
-
+  //Restore purchase
+  //Manage my subsciption
   const elements = useMemo<
     Array<HomeBottomSheetPanelOptionProps | { type: 'separator' }>
   >(
@@ -194,6 +195,27 @@ const HomeBottomSheetPanel = ({
           linkProps: {
             route: 'ACCOUNT_DETAILS',
           },
+          onPress: close,
+        },
+        {
+          type: 'row',
+          icon: Platform.OS === 'ios' ? 'app_store' : 'play_store',
+          text:
+            Platform.OS === 'ios'
+              ? intl.formatMessage({
+                  defaultMessage: 'Restore purchase',
+                  description:
+                    'Link to restore purchase (apple) form to change webcard parameters',
+                })
+              : intl.formatMessage({
+                  defaultMessage: 'Manage my subscription',
+                  description:
+                    'Link to manage my subscription(android) form to change webcard parameters',
+                }),
+          // linkProps: {
+          // TODO
+          //   route: 'WEBCARD_PARAMETERS',
+          // },
           onPress: close,
         },
         { type: 'separator' },
