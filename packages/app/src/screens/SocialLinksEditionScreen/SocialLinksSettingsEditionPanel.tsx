@@ -19,6 +19,7 @@ import TabsBar from '#ui/TabsBar';
 import type { CardModuleSocialLinksArrangement } from '#relayArtifacts/SocialLinksRenderer_module.graphql';
 import type { SocialLinksSettingsEditionPanel_webCard$key } from '#relayArtifacts/SocialLinksSettingsEditionPanel_webCard.graphql';
 import type { ViewProps } from 'react-native';
+import type { SharedValue } from 'react-native-reanimated';
 
 type SocialLinksSettingsEditionPanelProps = ViewProps & {
   /**
@@ -36,11 +37,7 @@ type SocialLinksSettingsEditionPanelProps = ViewProps & {
   /**
    * The iconSize currently set on the module
    */
-  iconSize: number;
-  /**
-   * A callback called when the user update the iconSize
-   */
-  onIconSizeChange: (iconSize: number) => void;
+  iconSize: SharedValue<number>;
   /**
    * The arrangement currently set on the module
    */
@@ -52,23 +49,17 @@ type SocialLinksSettingsEditionPanelProps = ViewProps & {
   /**
    * The borderWidth currently set on the module
    */
-  borderWidth: number;
-  /**
-   * A callback called when the user update the borderWidth
-   */
-  onBorderWidthChange: (borderWidth: number) => void;
+  borderWidth: SharedValue<number>;
   /**
    * The columnGap currently set on the module
    */
-  columnGap: number;
-  /**
-   * A callback called when the user update the columnGap
-   */
-  onColumnGapChange: (columnGap: number) => void;
+  columnGap: SharedValue<number>;
   /**
    * The height of the bottom sheet
    */
   bottomSheetHeight: number;
+
+  onTouched: () => void;
 };
 
 /**
@@ -79,15 +70,13 @@ const SocialLinksSettingsEditionPanel = ({
   iconColor,
   onIconColorChange,
   iconSize,
-  onIconSizeChange,
   arrangement,
   onArrangementChange,
   borderWidth,
-  onBorderWidthChange,
   columnGap,
-  onColumnGapChange,
   style,
   bottomSheetHeight,
+  onTouched,
   ...props
 }: SocialLinksSettingsEditionPanelProps) => {
   const intl = useIntl();
@@ -168,11 +157,10 @@ const SocialLinksSettingsEditionPanel = ({
               description="Icon Size message in SocialLinks edition"
             />
           }
-          initialValue={iconSize}
+          value={iconSize}
           min={SOCIAL_LINKS_MIN_ICON_SIZE}
           max={SOCIAL_LINKS_MAX_ICON_SIZE}
           step={1}
-          onChange={onIconSizeChange}
           accessibilityLabel={intl.formatMessage({
             defaultMessage: 'Icon Size',
             description: 'Label of the Icon Size slider in SocialLinks edition',
@@ -182,6 +170,7 @@ const SocialLinksSettingsEditionPanel = ({
             description: 'Hint of the Icon Size slider in SocialLinks edition',
           })}
           style={styles.slider}
+          onTouched={onTouched}
         />
         <LabeledDashedSlider
           label={
@@ -190,11 +179,10 @@ const SocialLinksSettingsEditionPanel = ({
               description="Border size message in SocialLinks edition"
             />
           }
-          initialValue={borderWidth}
+          value={borderWidth}
           min={0}
           max={SOCIAL_LINKS_MAX_BORDER_WIDTH}
           step={1}
-          onChange={onBorderWidthChange}
           accessibilityLabel={intl.formatMessage({
             defaultMessage: 'Border size',
             description:
@@ -206,6 +194,7 @@ const SocialLinksSettingsEditionPanel = ({
               'Hint of the Border size slider in SocialLinks edition',
           })}
           style={styles.slider}
+          onTouched={onTouched}
         />
         <LabeledDashedSlider
           label={
@@ -214,11 +203,10 @@ const SocialLinksSettingsEditionPanel = ({
               description="Spacing message in SocialLinks edition"
             />
           }
-          initialValue={columnGap}
+          value={columnGap}
           min={0}
           max={SOCIAL_LINKS_MAX_COLUMN_GAP}
           step={1}
-          onChange={onColumnGapChange}
           accessibilityLabel={intl.formatMessage({
             defaultMessage: 'Spacing',
             description: 'Label of the Spacing slider in SocialLinks edition',
@@ -228,6 +216,7 @@ const SocialLinksSettingsEditionPanel = ({
             description: 'Hint of the Spacing slider in SocialLinks edition',
           })}
           style={styles.slider}
+          onTouched={onTouched}
         />
       </View>
       {webCard && (

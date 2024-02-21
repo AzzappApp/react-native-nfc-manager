@@ -40,12 +40,16 @@ const useModuleDataEditor = <
 }) => {
   const [value, setValue] = useState<NullableFields<TModuleData>>(initialValue);
 
-  const data = getModuleDataValues({
-    data: value as TModuleData,
-    cardStyle,
-    styleValuesMap,
-    defaultValues,
-  });
+  const data = useMemo(
+    () =>
+      getModuleDataValues({
+        data: value as TModuleData,
+        cardStyle,
+        styleValuesMap,
+        defaultValues,
+      }),
+    [cardStyle, defaultValues, styleValuesMap, value],
+  );
 
   const styleValues = useMemo(() => {
     return getValuesFromStyle(cardStyle, styleValuesMap as any);

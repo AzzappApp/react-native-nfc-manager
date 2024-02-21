@@ -16,6 +16,7 @@ import LabeledDashedSlider from '#ui/LabeledDashedSlider';
 import TitleWithLine from '#ui/TitleWithLine';
 import type { TextAlignment } from '#relayArtifacts/SimpleTextEditionScreen_module.graphql';
 import type { SimpleTextStyleEditionPanel_webCard$key } from '#relayArtifacts/SimpleTextStyleEditionPanel_webCard.graphql';
+import type { SharedValue } from 'react-native-reanimated';
 import type { ViewProps } from 'react-native-svg/lib/typescript/fabric/utils';
 
 type SimpleTextStyleEditionPanelProps = ViewProps & {
@@ -34,7 +35,7 @@ type SimpleTextStyleEditionPanelProps = ViewProps & {
   /**
    * The font size of the text
    */
-  fontSize: number;
+  fontSize: SharedValue<number>;
   /**
    * The vertical spacing of the text
    */
@@ -42,7 +43,7 @@ type SimpleTextStyleEditionPanelProps = ViewProps & {
   /**
    * The vertical spacing of the text
    */
-  verticalSpacing: number;
+  verticalSpacing: SharedValue<number>;
   /**
    * The text alignment
    */
@@ -56,17 +57,9 @@ type SimpleTextStyleEditionPanelProps = ViewProps & {
    */
   onFontFamilyChange: (fontFamily: string) => void;
   /**
-   * A callback called when the user update the font size
-   */
-  onFontSizeChange: (fontSize: number) => void;
-  /**
    * A callback called when the user update the color
    */
   onColorChange: (color: string) => void;
-  /**
-   * A callback called when the user update the vertical spacing
-   */
-  onVerticalSpacingChange: (verticalSpacing: number) => void;
   /**
    * A callback called when the user update the text alignment
    */
@@ -84,10 +77,8 @@ const SimpleTextStyleEditionPanel = ({
   fontFamily,
   textAlignment,
   bottomSheetHeight,
-  onFontSizeChange,
   onFontFamilyChange,
   onColorChange,
-  onVerticalSpacingChange,
   onTextAlignmentChange,
   style,
   moduleKind,
@@ -142,7 +133,7 @@ const SimpleTextStyleEditionPanel = ({
             description="Font size message in cover edition"
           />
         }
-        initialValue={fontSize}
+        value={fontSize}
         min={
           moduleKind === 'simpleText'
             ? SIMPLE_TEXT_MIN_FONT_SIZE
@@ -154,7 +145,6 @@ const SimpleTextStyleEditionPanel = ({
             : SIMPLE_TITLE_MAX_FONT_SIZE
         }
         step={1}
-        onChange={onFontSizeChange}
         accessibilityLabel={intl.formatMessage({
           defaultMessage: 'Font size',
           description: 'Label of the font size slider in cover edition',
@@ -172,7 +162,7 @@ const SimpleTextStyleEditionPanel = ({
             description="Vertical Spacing message in simple text edition"
           />
         }
-        initialValue={verticalSpacing}
+        value={verticalSpacing}
         min={0}
         max={
           moduleKind === 'simpleText'
@@ -180,7 +170,6 @@ const SimpleTextStyleEditionPanel = ({
             : SIMPLE_TITLE_MAX_VERTICAL_SPACING
         }
         step={1}
-        onChange={onVerticalSpacingChange}
         accessibilityLabel={intl.formatMessage({
           defaultMessage: 'Vertical Spacing',
           description:

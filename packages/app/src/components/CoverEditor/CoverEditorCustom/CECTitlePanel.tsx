@@ -109,6 +109,8 @@ const CECTitlePanel = ({
     };
   }, [currentTab, subTitleStyle, titleStyle]);
 
+  const fontSizeValue = useSharedValue(fontSize);
+
   const orientation = textOrientation ?? DEFAULT_COVER_CONTENT_ORTIENTATION;
   const position = textPosition ?? DEFAULT_COVER_CONTENT_POSITION;
 
@@ -368,7 +370,7 @@ const CECTitlePanel = ({
                       description="Font size message in cover edition"
                     />
                   }
-                  initialValue={fontSize}
+                  value={fontSizeValue}
                   min={COVER_MIN_FONT_SIZE}
                   max={COVER_MAX_FONT_SIZE}
                   step={1}

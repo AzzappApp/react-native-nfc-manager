@@ -9,32 +9,23 @@ import LabeledDashedSlider from '#ui/LabeledDashedSlider';
 
 import TitleWithLine from '#ui/TitleWithLine';
 import type { ViewProps } from 'react-native';
+import type { SharedValue } from 'react-native-reanimated';
 
 type PhotoWithTextAndTitleMarginsEditionPanelProps = ViewProps & {
   /**
    * The marginHorizontal currently set on the module
    */
-  marginHorizontal: number;
-  /**
-   * A callback called when the user update the marginHorizontal
-   */
-  onMarginHorizontalChange: (marginHorizontal: number) => void;
+  marginHorizontal: SharedValue<number>;
   /**
    * The marginVertical currently set on the module
    */
-  marginVertical: number;
-  /**
-   * A callback called when the user update the marginVertical
-   */
-  onMarginVerticalChange: (marginVertical: number) => void;
+  marginVertical: SharedValue<number>;
   /**
    * The gap currently set on the module
    */
-  gap: number;
-  /**
-   * A callback called when the user update the gap
-   */
-  onGapChange: (gap: number) => void;
+  gap: SharedValue<number>;
+
+  onTouched: () => void;
 };
 
 /**
@@ -42,12 +33,10 @@ type PhotoWithTextAndTitleMarginsEditionPanelProps = ViewProps & {
  */
 const PhotoWithTextAndTitleMarginsEditionPanel = ({
   gap,
-  onGapChange,
   marginHorizontal,
-  onMarginHorizontalChange,
   marginVertical,
-  onMarginVerticalChange,
   style,
+  onTouched,
   ...props
 }: PhotoWithTextAndTitleMarginsEditionPanelProps) => {
   const intl = useIntl();
@@ -68,11 +57,10 @@ const PhotoWithTextAndTitleMarginsEditionPanel = ({
               description="Left/Right message in PhotoWithTextAndTitle edition"
             />
           }
-          initialValue={marginHorizontal}
+          value={marginHorizontal}
           min={0}
           max={PHOTO_WITH_TEXT_AND_TITLE_MAX_HORIZONTAL_MARGIN}
           step={1}
-          onChange={onMarginHorizontalChange}
           accessibilityLabel={intl.formatMessage({
             defaultMessage: 'Left/Right margin',
             description:
@@ -84,6 +72,7 @@ const PhotoWithTextAndTitleMarginsEditionPanel = ({
               'Hint of the Left/Right slider in PhotoWithTextAndTitle edition',
           })}
           style={styles.slider}
+          onTouched={onTouched}
         />
         <LabeledDashedSlider
           label={
@@ -92,11 +81,10 @@ const PhotoWithTextAndTitleMarginsEditionPanel = ({
               description="Top/Bottom margin message in PhotoWithTextAndTitle edition"
             />
           }
-          initialValue={marginVertical}
+          value={marginVertical}
           min={0}
           max={PHOTO_WITH_TEXT_AND_TITLE_MAX_VERTICAL_MARGIN}
           step={1}
-          onChange={onMarginVerticalChange}
           accessibilityLabel={intl.formatMessage({
             defaultMessage: 'Top/Bottom Margin',
             description:
@@ -108,6 +96,7 @@ const PhotoWithTextAndTitleMarginsEditionPanel = ({
               'Hint of the Top/Bottom Margin slider in PhotoWithTextAndTitle edition',
           })}
           style={styles.slider}
+          onTouched={onTouched}
         />
         <LabeledDashedSlider
           label={
@@ -116,11 +105,10 @@ const PhotoWithTextAndTitleMarginsEditionPanel = ({
               description="Image/Text Gap message in PhotoWithTextAndTitle edition"
             />
           }
-          initialValue={gap}
+          value={gap}
           min={0}
           max={PHOTO_WITH_TEXT_AND_TITLE_MAX_GAP}
           step={1}
-          onChange={onGapChange}
           accessibilityLabel={intl.formatMessage({
             defaultMessage: 'Image/Text Gap',
             description:
@@ -132,6 +120,7 @@ const PhotoWithTextAndTitleMarginsEditionPanel = ({
               'Hint of the Image/Text Gap slider in PhotoWithTextAndTitle edition',
           })}
           style={styles.slider}
+          onTouched={onTouched}
         />
       </View>
     </View>

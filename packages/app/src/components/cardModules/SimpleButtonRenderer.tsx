@@ -1,5 +1,6 @@
 import { useCallback } from 'react';
-import { Linking, Text, View } from 'react-native';
+import { Linking } from 'react-native';
+import Animated, { useAnimatedStyle } from 'react-native-reanimated';
 import { graphql, readInlineData } from 'react-relay';
 import { swapColor } from '@azzapp/shared/cardHelpers';
 import {
@@ -16,6 +17,7 @@ import type {
 import type { CardStyle, ColorPalette } from '@azzapp/shared/cardHelpers';
 import type { NullableFields } from '@azzapp/shared/objectHelpers';
 import type { StyleProp, ViewProps, ViewStyle } from 'react-native';
+import type { SharedValue } from 'react-native-reanimated';
 
 /**
  * Render a SimpleButton module
@@ -51,15 +53,37 @@ const SimpleButtonRendererFragment = graphql`
 export const readSimpleButtonData = (module: SimpleButtonRenderer_module$key) =>
   readInlineData(SimpleButtonRendererFragment, module);
 
+const animatedProps = [
+  'borderRadius',
+  'borderWidth',
+  'fontSize',
+  'height',
+  'marginBottom',
+  'marginTop',
+  'width',
+] as const;
+
+type AnimatedProps = (typeof animatedProps)[number];
+
 export type SimpleButtonRendererData = NullableFields<
-  Omit<SimpleButtonRenderer_module$data, ' $fragmentType'>
+  Omit<SimpleButtonViewRendererData, AnimatedProps>
 >;
+
+type SimpleButtonRendererAnimatedData = {
+  [K in AnimatedProps]:
+    | SharedValue<SimpleButtonViewRendererData[K]>
+    | SimpleButtonViewRendererData[K];
+};
 
 export type SimpleButtonRendererProps = ViewProps & {
   /**
    * The data for the SimpleButton module
    */
   data: SimpleButtonRendererData;
+  /**
+   * The animated data for the SimpleButton module
+   */
+  animatedData: SimpleButtonRendererAnimatedData;
   /**
    * the color palette
    */
@@ -78,13 +102,58 @@ export type SimpleButtonRendererProps = ViewProps & {
   disabled?: boolean;
 };
 
+export type SimpleButtonViewRendererData = Omit<
+  SimpleButtonRenderer_module$data,
+  ' $fragmentType'
+>;
+
+export type SimpleButtonViewRenderProps = Omit<
+  SimpleButtonRendererProps,
+  'animatedData' | 'data'
+> & {
+  data: SimpleButtonViewRendererData;
+};
+
+export const SimpleButtonViewRenderer = ({
+  data,
+  ...rest
+}: SimpleButtonViewRenderProps) => {
+  const {
+    borderRadius,
+    borderWidth,
+    fontSize,
+    height,
+    width,
+    marginTop,
+    marginBottom,
+    ...restData
+  } = data;
+
+  return (
+    <SimpleButtonRenderer
+      {...rest}
+      data={restData}
+      animatedData={{
+        borderRadius,
+        borderWidth,
+        fontSize,
+        height,
+        width,
+        marginTop,
+        marginBottom,
+      }}
+    />
+  );
+};
+
 /**
  *  implementation of the SimpleButton module
  * This component takes the data directly instead of a relay fragment reference
  * Useful for edition preview
  */
-const SimpleButtonRenderer = ({
+export const SimpleButtonRenderer = ({
   data,
+  animatedData,
   colorPalette,
   cardStyle,
   style,
@@ -98,15 +167,8 @@ const SimpleButtonRenderer = ({
     actionLink,
     fontFamily,
     fontColor,
-    fontSize,
     buttonColor,
     borderColor,
-    borderWidth,
-    borderRadius,
-    marginTop,
-    marginBottom,
-    width,
-    height,
     background,
     backgroundStyle,
   } = getModuleDataValues({
@@ -115,6 +177,16 @@ const SimpleButtonRenderer = ({
     styleValuesMap: SIMPLE_BUTTON_STYLE_VALUES,
     defaultValues: SIMPLE_BUTTON_DEFAULT_VALUES,
   });
+
+  const {
+    borderRadius,
+    borderWidth,
+    fontSize,
+    height,
+    marginBottom,
+    marginTop,
+    width,
+  } = animatedData;
 
   const onPress = useCallback(async () => {
     if (actionLink) {
@@ -128,6 +200,58 @@ const SimpleButtonRenderer = ({
     }
   }, [actionLink, actionType]);
 
+  const cardModuleBackgroundStyle = useAnimatedStyle(() => {
+    return {
+      height:
+        (typeof height === 'number'
+          ? height
+          : height?.value ?? SIMPLE_BUTTON_DEFAULT_VALUES.height) +
+        (typeof marginTop === 'number'
+          ? marginTop
+          : marginTop?.value ?? SIMPLE_BUTTON_DEFAULT_VALUES.marginTop) +
+        (typeof marginBottom === 'number'
+          ? marginBottom
+          : marginBottom?.value ?? SIMPLE_BUTTON_DEFAULT_VALUES.marginBottom),
+      alignItems: 'center',
+    };
+  }, [height, marginBottom, marginTop]);
+
+  const moduleContentStyle = useAnimatedStyle(() => {
+    return {
+      height:
+        typeof height === 'number'
+          ? height
+          : height?.value ?? SIMPLE_BUTTON_DEFAULT_VALUES.height,
+      width:
+        typeof width === 'number'
+          ? width
+          : width?.value ?? SIMPLE_BUTTON_DEFAULT_VALUES.width,
+      marginBottom:
+        typeof marginBottom === 'number'
+          ? marginBottom
+          : marginBottom?.value ?? SIMPLE_BUTTON_DEFAULT_VALUES.marginBottom,
+      marginTop:
+        typeof marginTop === 'number'
+          ? marginTop
+          : marginTop?.value ?? SIMPLE_BUTTON_DEFAULT_VALUES.marginTop,
+      borderRadius:
+        typeof borderRadius === 'number'
+          ? borderRadius
+          : borderRadius?.value ?? undefined,
+      borderWidth:
+        typeof borderWidth === 'number'
+          ? borderWidth
+          : borderWidth?.value ?? undefined,
+    };
+  }, [marginBottom, marginTop, borderRadius, borderWidth, height, width]);
+
+  const moduleTextStyle = useAnimatedStyle(() => {
+    return {
+      fontSize:
+        typeof fontSize === 'number' ? fontSize : fontSize?.value ?? undefined,
+    };
+  }, [fontSize]);
+
   return (
     <CardModuleBackground
       {...props}
@@ -138,13 +262,7 @@ const SimpleButtonRenderer = ({
       )}
       patternColor={swapColor(backgroundStyle?.patternColor, colorPalette)}
       resizeMode={background?.resizeMode}
-      style={[
-        style,
-        {
-          height: height + marginTop + marginBottom,
-          alignItems: 'center',
-        },
-      ]}
+      style={[style, cardModuleBackgroundStyle]}
     >
       <PressableOpacity
         onPress={onPress}
@@ -152,36 +270,34 @@ const SimpleButtonRenderer = ({
         disabled={disabled}
         disabledOpacity={1}
       >
-        <View
-          style={{
-            height,
-            width,
-            marginBottom,
-            marginTop,
-            backgroundColor: swapColor(buttonColor, colorPalette),
-            alignItems: 'center',
-            justifyContent: 'center',
-            borderRadius,
-            borderWidth,
-            borderColor: swapColor(borderColor, colorPalette),
-            overflow: 'hidden',
-          }}
+        <Animated.View
+          style={[
+            {
+              backgroundColor: swapColor(buttonColor, colorPalette),
+              alignItems: 'center',
+              justifyContent: 'center',
+
+              borderColor: swapColor(borderColor, colorPalette),
+              overflow: 'hidden',
+            },
+            moduleContentStyle,
+          ]}
         >
-          <Text
-            style={{
-              fontFamily,
-              color: swapColor(fontColor, colorPalette),
-              fontSize,
-              flexWrap: 'nowrap',
-            }}
+          <Animated.Text
+            style={[
+              {
+                fontFamily,
+                color: swapColor(fontColor, colorPalette),
+                flexWrap: 'nowrap',
+              },
+              moduleTextStyle,
+            ]}
             numberOfLines={1}
           >
             {buttonLabel}
-          </Text>
-        </View>
+          </Animated.Text>
+        </Animated.View>
       </PressableOpacity>
     </CardModuleBackground>
   );
 };
-
-export default SimpleButtonRenderer;

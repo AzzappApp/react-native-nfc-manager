@@ -1,5 +1,6 @@
 import { useCallback } from 'react';
 import { StyleSheet, View } from 'react-native';
+import { useSharedValue } from 'react-native-reanimated';
 import LabeledDashedSlider from '#ui/LabeledDashedSlider';
 import { editionParametersSettings } from './gpu';
 import type { EditionParameters } from './gpu';
@@ -92,17 +93,19 @@ const ImageEditionParameterControl = ({
     [labelSuffix, parameterSettings],
   );
 
+  const value = propsValue ?? parameterSettings?.defaultValue ?? 0;
+  const parameterValue = useSharedValue(value);
+
   if (!parameterSettings) {
     return null;
   }
-  const { min, max, step, interval, defaultValue } = parameterSettings;
-  const value = propsValue ?? defaultValue;
+  const { min, max, step, interval } = parameterSettings;
 
   return (
     <View style={[styles.root, style]} {...props}>
       <LabeledDashedSlider
         formatValue={formatValue}
-        initialValue={value}
+        value={parameterValue}
         min={min}
         max={max}
         step={step}

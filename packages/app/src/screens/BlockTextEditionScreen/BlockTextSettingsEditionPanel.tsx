@@ -17,6 +17,7 @@ import TitleWithLine from '#ui/TitleWithLine';
 import type { BlockTextSettingsEditionPanel_webCard$key } from '#relayArtifacts/BlockTextSettingsEditionPanel_webCard.graphql';
 import type { TextAlignment } from '#relayArtifacts/PhotoWithTextAndTitleRenderer_module.graphql';
 import type { ViewProps } from 'react-native';
+import type { SharedValue } from 'react-native-reanimated';
 
 type BlockTextSettingsEditionPanelProps = ViewProps & {
   webCard: BlockTextSettingsEditionPanel_webCard$key | null;
@@ -47,23 +48,17 @@ type BlockTextSettingsEditionPanelProps = ViewProps & {
   /**
    * The fontSize currently set on the module
    */
-  fontSize: number;
-  /**
-   * A callback called when the user update the fontSize
-   */
-  onFontSizeChange: (fontSize: number) => void;
+  fontSize: SharedValue<number>;
   /**
    * The verticalSpacing currently set on the module
    */
-  verticalSpacing: number;
-  /**
-   * A callback called when the user update the verticalSpacing
-   */
-  onVerticalSpacingChange: (verticalSpacing: number) => void;
+  verticalSpacing: SharedValue<number>;
   /**
    * The height of the bottom sheet
    */
   bottomSheetHeight: number;
+
+  onTouched: () => void;
 };
 
 /**
@@ -78,11 +73,10 @@ const BlockTextSettingsEditionPanel = ({
   textAlign,
   onTextAlignChange,
   fontSize,
-  onFontSizeChange,
   verticalSpacing,
-  onVerticalSpacingChange,
   style,
   bottomSheetHeight,
+  onTouched,
   ...props
 }: BlockTextSettingsEditionPanelProps) => {
   const intl = useIntl();
@@ -135,11 +129,11 @@ const BlockTextSettingsEditionPanel = ({
               description="fontSize message in BlockText edition"
             />
           }
-          initialValue={fontSize}
+          value={fontSize}
           min={BLOCK_TEXT_MIN_FONT_SIZE}
           max={BLOCK_TEXT_MAX_FONT_SIZE}
           step={1}
-          onChange={onFontSizeChange}
+          onTouched={onTouched}
           accessibilityLabel={intl.formatMessage({
             defaultMessage: 'FontSize',
             description: 'Label of the fontSize slider in BlockText edition',
@@ -157,11 +151,11 @@ const BlockTextSettingsEditionPanel = ({
               description="vertical Spacing message in BlockText edition"
             />
           }
-          initialValue={verticalSpacing}
+          value={verticalSpacing}
           min={0}
           max={BLOCK_TEXT_MAX_VERTICAL_SPACING}
           step={1}
-          onChange={onVerticalSpacingChange}
+          onTouched={onTouched}
           accessibilityLabel={intl.formatMessage({
             defaultMessage: 'Vertical Spacing',
             description:

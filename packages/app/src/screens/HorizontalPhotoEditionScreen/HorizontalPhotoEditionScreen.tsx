@@ -2,6 +2,7 @@ import { omit } from 'lodash';
 import { useCallback, useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { StyleSheet, View } from 'react-native';
+import { useSharedValue } from 'react-native-reanimated';
 import Toast from 'react-native-toast-message';
 import { graphql, useFragment, useMutation } from 'react-relay';
 import {
@@ -158,17 +159,7 @@ const HorizontalPhotoEditionScreen = ({
     defaultValues: HORIZONTAL_PHOTO_DEFAULT_VALUES,
   });
 
-  const {
-    borderWidth,
-    borderRadius,
-    borderColor,
-    marginHorizontal,
-    marginVertical,
-    imageHeight,
-    backgroundId,
-    backgroundStyle,
-    image,
-  } = data;
+  const { borderColor, backgroundId, backgroundStyle, image } = data;
 
   const previewData = {
     ...omit(data, 'backgroundId'),
@@ -197,13 +188,94 @@ const HorizontalPhotoEditionScreen = ({
     `);
 
   const isValid = image?.id ?? image?.uri;
-  const canSave = dirty && isValid && !saving;
+
+  const [touched, setTouched] = useState(false);
+
+  const onTouched = useCallback(() => {
+    setTouched(true);
+  }, [setTouched]);
+
+  const canSave = (dirty || touched) && isValid && !saving;
 
   const router = useRouter();
   const intl = useIntl();
 
   const [progressIndicator, setProgressIndicator] =
     useState<Observable<number> | null>(null);
+
+  const onCancel = router.back;
+
+  // #endregion
+
+  //#region Image Picker state
+
+  const [showImagePicker, setShowImagePicker] = useState(image == null);
+
+  const onPickImage = () => {
+    setShowImagePicker(true);
+  };
+
+  const onMediaSelected = async ({
+    uri,
+    width,
+    height,
+    editionParameters,
+    filter,
+  }: ImagePickerResult) => {
+    const size = downScaleImage(width, height, MODULE_IMAGE_MAX_WIDTH);
+    const exportUri = await exportLayersToImage({
+      size,
+      quality: 95,
+      format: 'auto',
+      layers: [
+        {
+          kind: 'image',
+          uri,
+          parameters: editionParameters,
+          lutFilterUri: getFilterUri(filter),
+        },
+      ],
+    });
+    setShowImagePicker(false);
+    onImageChange({
+      uri: exportUri.startsWith('file://') ? exportUri : `file://${exportUri}`,
+      width: size.width,
+      height: size.height,
+      kind: 'image',
+    });
+  };
+
+  const onImagePickerCancel = useCallback(() => {
+    setShowImagePicker(false);
+  }, [setShowImagePicker]);
+  //#endregion
+
+  // #region Fields edition handlers
+  const borderWidth = useSharedValue(
+    data.borderWidth ?? HORIZONTAL_PHOTO_DEFAULT_VALUES.borderWidth,
+  );
+
+  const borderRadius = useSharedValue(data.borderRadius ?? null);
+
+  const onBordercolorChange = fieldUpdateHandler('borderColor');
+
+  const marginHorizontal = useSharedValue(
+    data.marginHorizontal ?? HORIZONTAL_PHOTO_DEFAULT_VALUES.marginHorizontal,
+  );
+
+  const marginVertical = useSharedValue(
+    data.marginVertical ?? HORIZONTAL_PHOTO_DEFAULT_VALUES.marginVertical,
+  );
+
+  const imageHeight = useSharedValue(
+    data.imageHeight ?? HORIZONTAL_PHOTO_DEFAULT_VALUES.imageHeight,
+  );
+
+  const onBackgroundChange = fieldUpdateHandler('backgroundId');
+
+  const onBackgroundStyleChange = fieldUpdateHandler('backgroundStyle');
+
+  const onImageChange = fieldUpdateHandler('image');
 
   const onSave = useCallback(async () => {
     if (!canSave) {
@@ -256,6 +328,11 @@ const HorizontalPhotoEditionScreen = ({
       moduleId: horizontalPhoto?.id,
       image: mediaId ?? value.image!.id,
       ...rest,
+      marginHorizontal: marginHorizontal.value,
+      marginVertical: marginVertical.value,
+      borderWidth: borderWidth.value,
+      borderRadius: borderRadius.value,
+      imageHeight: imageHeight.value,
     };
 
     commit({
@@ -284,78 +361,15 @@ const HorizontalPhotoEditionScreen = ({
     value,
     profile.webCard.id,
     horizontalPhoto?.id,
+    marginHorizontal,
+    marginVertical,
+    borderWidth,
+    borderRadius,
+    imageHeight,
     commit,
     intl,
     router,
   ]);
-
-  const onCancel = useCallback(() => {
-    router.back();
-  }, [router]);
-
-  // #endregion
-
-  //#region Image Picker state
-
-  const [showImagePicker, setShowImagePicker] = useState(image == null);
-
-  const onPickImage = () => {
-    setShowImagePicker(true);
-  };
-
-  const onMediaSelected = async ({
-    uri,
-    width,
-    height,
-    editionParameters,
-    filter,
-  }: ImagePickerResult) => {
-    const size = downScaleImage(width, height, MODULE_IMAGE_MAX_WIDTH);
-    const exportUri = await exportLayersToImage({
-      size,
-      quality: 95,
-      format: 'auto',
-      layers: [
-        {
-          kind: 'image',
-          uri,
-          parameters: editionParameters,
-          lutFilterUri: getFilterUri(filter),
-        },
-      ],
-    });
-    setShowImagePicker(false);
-    onImageChange({
-      uri: exportUri.startsWith('file://') ? exportUri : `file://${exportUri}`,
-      width: size.width,
-      height: size.height,
-      kind: 'image',
-    });
-  };
-
-  const onImagePickerCancel = () => {
-    setShowImagePicker(false);
-  };
-  //#endregion
-
-  // #region Fields edition handlers
-  const onBorderwidthChange = fieldUpdateHandler('borderWidth');
-
-  const onBorderradiusChange = fieldUpdateHandler('borderRadius');
-
-  const onBordercolorChange = fieldUpdateHandler('borderColor');
-
-  const onMarginhorizontalChange = fieldUpdateHandler('marginHorizontal');
-
-  const onMarginverticalChange = fieldUpdateHandler('marginVertical');
-
-  const onHeightChange = fieldUpdateHandler('imageHeight');
-
-  const onBackgroundChange = fieldUpdateHandler('backgroundId');
-
-  const onBackgroundStyleChange = fieldUpdateHandler('backgroundStyle');
-
-  const onImageChange = fieldUpdateHandler('image');
 
   // #endregion
 
@@ -413,6 +427,13 @@ const HorizontalPhotoEditionScreen = ({
         <HorizontalPhotoPreview
           style={{ height: topPanelHeight - 110, marginVertical: 10 }}
           data={previewData}
+          animatedData={{
+            borderWidth,
+            borderRadius,
+            marginHorizontal,
+            marginVertical,
+            imageHeight,
+          }}
           colorPalette={profile?.webCard.cardColors}
           cardStyle={profile?.webCard.cardStyle}
         />
@@ -438,11 +459,11 @@ const HorizontalPhotoEditionScreen = ({
             element: (
               <HorizontalPhotoSettingsEditionPanel
                 height={imageHeight}
-                onHeightChange={onHeightChange}
                 style={{
                   flex: 1,
                   marginBottom: insetBottom + BOTTOM_MENU_HEIGHT,
                 }}
+                onTouched={onTouched}
               />
             ),
           },
@@ -451,9 +472,7 @@ const HorizontalPhotoEditionScreen = ({
             element: (
               <HorizontalPhotoBorderEditionPanel
                 borderWidth={borderWidth}
-                onBorderWidthChange={onBorderwidthChange}
                 borderRadius={borderRadius}
-                onBorderRadiusChange={onBorderradiusChange}
                 borderColor={borderColor}
                 onBorderColorChange={onBordercolorChange}
                 webCard={profile?.webCard ?? null}
@@ -462,6 +481,7 @@ const HorizontalPhotoEditionScreen = ({
                   flex: 1,
                   marginBottom: insetBottom + BOTTOM_MENU_HEIGHT,
                 }}
+                onTouched={onTouched}
               />
             ),
           },
@@ -470,9 +490,8 @@ const HorizontalPhotoEditionScreen = ({
             element: (
               <HorizontalPhotoMarginsEditionPanel
                 marginHorizontal={marginHorizontal}
-                onMarginHorizontalChange={onMarginhorizontalChange}
                 marginVertical={marginVertical}
-                onMarginVerticalChange={onMarginverticalChange}
+                onTouched={onTouched}
                 style={{
                   flex: 1,
                   marginBottom: insetBottom + BOTTOM_MENU_HEIGHT,

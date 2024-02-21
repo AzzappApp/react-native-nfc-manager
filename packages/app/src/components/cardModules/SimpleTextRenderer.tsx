@@ -1,4 +1,7 @@
-import { Text } from 'react-native';
+import Animated, {
+  useAnimatedStyle,
+  type SharedValue,
+} from 'react-native-reanimated';
 import { graphql, readInlineData } from 'react-relay';
 import { swapColor } from '@azzapp/shared/cardHelpers';
 import {
@@ -76,16 +79,34 @@ export const readSimpleTitleData = (
   module: SimpleTextRenderer_simpleTitleModule$key,
 ) => readInlineData(SimpleTitleRendererFragment, module);
 
+const animatedProps = [
+  'fontSize',
+  'verticalSpacing',
+  'marginVertical',
+  'marginHorizontal',
+] as const;
+
+type AnimatedProps = (typeof animatedProps)[number];
+
 export type SimpleTextRendererData = NullableFields<
-  | Omit<SimpleTextRenderer_simpleTextModule$data, ' $fragmentType'>
-  | Omit<SimpleTextRenderer_simpleTitleModule$data, ' $fragmentType'>
+  Omit<SimpleTextViewRendererData, AnimatedProps>
 >;
+
+type SimpleButtonRendererAnimatedData = {
+  [K in AnimatedProps]:
+    | SharedValue<SimpleTextViewRendererData[K]>
+    | SimpleTextViewRendererData[K];
+};
 
 export type SimpleTextRendererProps = ViewProps & {
   /**
    * The data for the simple text module
    */
   data: SimpleTextRendererData;
+  /**
+   * The animated data for the SimpleButton module
+   */
+  animatedData: SimpleButtonRendererAnimatedData;
   /**
    * the color palette
    */
@@ -100,6 +121,43 @@ export type SimpleTextRendererProps = ViewProps & {
   contentStyle?: StyleProp<TextStyle>;
 };
 
+export type SimpleTextViewRendererData =
+  | Omit<SimpleTextRenderer_simpleTextModule$data, ' $fragmentType'>
+  | Omit<SimpleTextRenderer_simpleTitleModule$data, ' $fragmentType'>;
+
+export type SimpleTextViewRendererProps = Omit<
+  SimpleTextRendererProps,
+  'animatedData' | 'data'
+> & {
+  data: SimpleTextViewRendererData;
+};
+
+export const SimpleTextViewRenderer = ({
+  data,
+  ...rest
+}: SimpleTextViewRendererProps) => {
+  const {
+    fontSize,
+    verticalSpacing,
+    marginVertical,
+    marginHorizontal,
+    ...restData
+  } = data;
+
+  return (
+    <SimpleTextRenderer
+      {...rest}
+      data={restData}
+      animatedData={{
+        fontSize,
+        verticalSpacing,
+        marginVertical,
+        marginHorizontal,
+      }}
+    />
+  );
+};
+
 /**
  *  implementation of the simple text module
  * This component takes the data directly instead of a relay fragment reference
@@ -110,6 +168,7 @@ const SimpleTextRenderer = ({
   colorPalette,
   cardStyle,
   style,
+  animatedData,
   contentStyle,
   ...props
 }: SimpleTextRendererProps) => {
@@ -118,12 +177,8 @@ const SimpleTextRenderer = ({
   const {
     text,
     fontFamily,
-    fontSize,
     textAlign,
     fontColor,
-    verticalSpacing,
-    marginHorizontal,
-    marginVertical,
     background,
     backgroundStyle,
   } = getModuleDataValues({
@@ -139,6 +194,42 @@ const SimpleTextRenderer = ({
         : SIMPLE_TEXT_DEFAULT_VALUES,
   });
 
+  const { fontSize, verticalSpacing, marginVertical, marginHorizontal } =
+    animatedData;
+
+  const cardModuleBackgroundStyle = useAnimatedStyle(() => {
+    return {
+      paddingVertical:
+        typeof marginVertical === 'number'
+          ? marginVertical
+          : marginVertical?.value ?? SIMPLE_TEXT_DEFAULT_VALUES.marginVertical,
+      paddingHorizontal:
+        typeof marginHorizontal === 'number'
+          ? marginHorizontal
+          : marginHorizontal?.value ??
+            SIMPLE_TEXT_DEFAULT_VALUES.marginHorizontal,
+      flexShrink: 0,
+    };
+  }, [marginVertical, marginHorizontal]);
+
+  const textStyle = useAnimatedStyle(() => {
+    const fontSizeValue =
+      typeof fontSize === 'number' ? fontSize : fontSize?.value;
+
+    const verticalSpacingValue =
+      typeof verticalSpacing === 'number'
+        ? verticalSpacing
+        : verticalSpacing?.value;
+
+    return {
+      lineHeight:
+        fontSizeValue && verticalSpacingValue
+          ? fontSizeValue * 1.2 + verticalSpacingValue
+          : undefined,
+      fontSize: fontSizeValue ?? undefined,
+    };
+  }, [fontSize, verticalSpacing]);
+
   return (
     <CardModuleBackground
       {...props}
@@ -150,32 +241,21 @@ const SimpleTextRenderer = ({
       )}
       patternColor={swapColor(backgroundStyle?.patternColor, colorPalette)}
       resizeMode={background?.resizeMode}
-      style={[
-        style,
-        {
-          paddingHorizontal: marginHorizontal ?? 0,
-          paddingVertical: marginVertical ?? 0,
-          flexShrink: 0,
-        },
-      ]}
+      style={[style, cardModuleBackgroundStyle]}
     >
-      <Text
+      <Animated.Text
         style={[
           {
             textAlign: textAlignmentOrDefault(textAlign),
             color: swapColor(fontColor, colorPalette),
-            fontSize,
             fontFamily,
-            lineHeight:
-              fontSize && verticalSpacing
-                ? fontSize * 1.2 + verticalSpacing
-                : undefined,
           },
+          textStyle,
           contentStyle,
         ]}
       >
         {text}
-      </Text>
+      </Animated.Text>
     </CardModuleBackground>
   );
 };

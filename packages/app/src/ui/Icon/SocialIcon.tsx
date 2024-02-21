@@ -1,4 +1,4 @@
-import { Image } from 'react-native';
+import Animated from 'react-native-reanimated';
 import { colors } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import type { SocialLinkId } from '@azzapp/shared/socialLinkHelpers';
@@ -110,7 +110,7 @@ export type SocialIconProps = Omit<ImageProps, 'source'> & {
 const SocialIcon = ({ icon, ...props }: SocialIconProps) => {
   const style = useStyleSheet(computedStyle);
   return (
-    <Image
+    <Animated.Image
       {...props}
       style={[{ resizeMode: 'contain' }, style.tintColor, props.style]}
       source={socialIcons[icon]}

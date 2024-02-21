@@ -1,23 +1,12 @@
 import { useIntl } from 'react-intl';
 import PhotoWithTextAndTitleRenderer from '#components/cardModules/PhotoWithTextAndTitleRenderer';
 import EditorScaledPreview from '#components/EditorScaledPreview';
-import type { PhotoWithTextAndTitleRendererData } from '#components/cardModules/PhotoWithTextAndTitleRenderer';
-import type { CardStyle, ColorPalette } from '@azzapp/shared/cardHelpers';
-import type { ViewProps } from 'react-native-svg/lib/typescript/fabric/utils';
+import type { PhotoWithTextAndTitleRendererProps } from '#components/cardModules/PhotoWithTextAndTitleRenderer';
 
-type PhotoWithTextAndTitlePreviewProps = ViewProps & {
-  /**
-   * the data of the module to preview.
-   */
-  data: PhotoWithTextAndTitleRendererData;
-  /**
-   * the color palette
-   */
-  colorPalette?: ColorPalette | null | undefined;
-  /**
-   * the color palette
-   */
-  cardStyle: CardStyle | null | undefined;
+type PhotoWithTextAndTitlePreviewProps = Pick<
+  PhotoWithTextAndTitleRendererProps,
+  'animatedData' | 'cardStyle' | 'colorPalette' | 'data' | 'style'
+> & {
   /**
    * A callback that is called when the module preview is pressed.
    */
@@ -57,6 +46,7 @@ const PhotoWithTextAndTitlePreview = ({
         colorPalette={colorPalette}
         cardStyle={cardStyle}
         data={moduleData}
+        animatedData={props.animatedData}
       />
     </EditorScaledPreview>
   );

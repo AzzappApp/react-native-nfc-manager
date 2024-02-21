@@ -1,22 +1,11 @@
 import SocialLinksRenderer from '#components/cardModules/SocialLinksRenderer';
 import EditorScaledPreview from '#components/EditorScaledPreview';
-import type { SocialLinksRendererData } from '#components/cardModules/SocialLinksRenderer';
-import type { CardStyle, ColorPalette } from '@azzapp/shared/cardHelpers';
-import type { ViewProps } from 'react-native-svg/lib/typescript/fabric/utils';
+import type { SocialLinksRendererProps } from '#components/cardModules/SocialLinksRenderer';
 
-type SocialLinksPreviewProps = ViewProps & {
-  /**
-   * the data of the module to preview.
-   */
-  data: SocialLinksRendererData;
-  /**
-   * the color palette
-   */
-  colorPalette: ColorPalette | null | undefined;
-  /**
-   * the card style
-   */
-  cardStyle: CardStyle | null | undefined;
+type SocialLinksPreviewProps = Pick<
+  SocialLinksRendererProps,
+  'animatedData' | 'cardStyle' | 'colorPalette' | 'data' | 'style'
+> & {
   /**
    * A callback that is called when the module preview is pressed.
    */
@@ -39,6 +28,7 @@ const SocialLinksPreview = ({
         colorPalette={colorPalette}
         cardStyle={cardStyle}
         data={data}
+        animatedData={props.animatedData}
         disabled
       />
     </EditorScaledPreview>

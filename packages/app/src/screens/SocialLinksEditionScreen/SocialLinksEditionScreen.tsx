@@ -3,6 +3,7 @@ import { useCallback, useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { StyleSheet } from 'react-native';
 import { KeyboardAvoidingView } from 'react-native-keyboard-controller';
+import { useSharedValue } from 'react-native-reanimated';
 import Toast from 'react-native-toast-message';
 import { graphql, useFragment, useMutation } from 'react-relay';
 import * as z from 'zod';
@@ -147,19 +148,7 @@ const SocialLinksEditionScreen = ({
       defaultValues: SOCIAL_LINKS_DEFAULT_VALUES,
     });
 
-  const {
-    links,
-    iconColor,
-    arrangement,
-    borderWidth,
-    columnGap,
-    marginTop,
-    iconSize,
-    marginBottom,
-    marginHorizontal,
-    backgroundId,
-    backgroundStyle,
-  } = data;
+  const { links, iconColor, arrangement, backgroundId, backgroundStyle } = data;
 
   const previewData = {
     ...omit(data, 'backgroundId'),
@@ -190,10 +179,61 @@ const SocialLinksEditionScreen = ({
     `);
 
   const isValid = socialLinkSchema.safeParse(links).success;
-  const canSave = dirty && isValid && !saving;
+
+  const [touched, setTouched] = useState(false);
+
+  const onTouched = useCallback(() => {
+    setTouched(true);
+  }, []);
+
+  const canSave = (dirty || touched) && isValid && !saving;
 
   const router = useRouter();
   const intl = useIntl();
+
+  const onCancel = router.back;
+
+  // #endregion
+
+  // #region Fields edition handlers
+
+  const onLinksChange = fieldUpdateHandler('links');
+
+  const onIconColorChange = fieldUpdateHandler('iconColor');
+
+  const onArrangementChange = useCallback(() => {
+    updateFields({
+      arrangement: arrangement === 'inline' ? 'multiline' : 'inline',
+    });
+  }, [arrangement, updateFields]);
+
+  const iconSize = useSharedValue(
+    data.iconSize ?? SOCIAL_LINKS_DEFAULT_VALUES.iconSize,
+  );
+
+  const borderWidth = useSharedValue(
+    data.borderWidth ?? SOCIAL_LINKS_DEFAULT_VALUES.borderWidth,
+  );
+
+  const columnGap = useSharedValue(
+    data.columnGap ?? SOCIAL_LINKS_DEFAULT_VALUES.columnGap,
+  );
+
+  const marginTop = useSharedValue(
+    data.marginTop ?? SOCIAL_LINKS_DEFAULT_VALUES.marginTop,
+  );
+
+  const marginBottom = useSharedValue(
+    data.marginBottom ?? SOCIAL_LINKS_DEFAULT_VALUES.marginBottom,
+  );
+
+  const marginHorizontal = useSharedValue(
+    data.marginHorizontal ?? SOCIAL_LINKS_DEFAULT_VALUES.marginHorizontal,
+  );
+
+  const onBackgroundChange = fieldUpdateHandler('backgroundId');
+
+  const onBackgroundStyleChange = fieldUpdateHandler('backgroundStyle');
 
   const onSave = useCallback(async () => {
     if (!canSave) {
@@ -202,6 +242,12 @@ const SocialLinksEditionScreen = ({
 
     const input: SaveSocialLinksModuleInput = {
       ...value,
+      iconSize: iconSize.value,
+      borderWidth: borderWidth.value,
+      columnGap: columnGap.value,
+      marginTop: marginTop.value,
+      marginBottom: marginBottom.value,
+      marginHorizontal: marginHorizontal.value,
       moduleId: socialLinks?.id,
       links: value.links!,
       webCardId: profile.webCard.id,
@@ -228,44 +274,18 @@ const SocialLinksEditionScreen = ({
   }, [
     canSave,
     value,
+    iconSize,
+    borderWidth,
+    columnGap,
+    marginTop,
+    marginBottom,
+    marginHorizontal,
     socialLinks?.id,
     profile.webCard.id,
     commit,
     router,
     intl,
   ]);
-
-  const onCancel = useCallback(() => {
-    router.back();
-  }, [router]);
-
-  // #endregion
-
-  // #region Fields edition handlers
-
-  const onLinksChange = fieldUpdateHandler('links');
-
-  const onIconColorChange = fieldUpdateHandler('iconColor');
-
-  const onArrangementChange = useCallback(() => {
-    updateFields({
-      arrangement: arrangement === 'inline' ? 'multiline' : 'inline',
-    });
-  }, [arrangement, updateFields]);
-
-  const onBorderWidthChange = fieldUpdateHandler('borderWidth');
-
-  const onColumnGapChange = fieldUpdateHandler('columnGap');
-
-  const onMarginTopChange = fieldUpdateHandler('marginTop');
-
-  const onMarginBottomChange = fieldUpdateHandler('marginBottom');
-
-  const onMarginHorizontalChange = fieldUpdateHandler('marginHorizontal');
-
-  const onBackgroundChange = fieldUpdateHandler('backgroundId');
-
-  const onBackgroundStyleChange = fieldUpdateHandler('backgroundStyle');
 
   // #endregion
 
@@ -320,6 +340,14 @@ const SocialLinksEditionScreen = ({
           style={{ height: topPanelHeight - 20, marginVertical: 10 }}
           colorPalette={profile.webCard.cardColors}
           cardStyle={null}
+          animatedData={{
+            iconSize,
+            borderWidth,
+            columnGap,
+            marginTop,
+            marginBottom,
+            marginHorizontal,
+          }}
           data={previewData}
         />
         <TabView
@@ -351,16 +379,14 @@ const SocialLinksEditionScreen = ({
                   arrangement={arrangement}
                   onArrangementChange={onArrangementChange}
                   iconSize={iconSize}
-                  onIconSizeChange={fieldUpdateHandler('iconSize')}
                   borderWidth={borderWidth}
-                  onBorderWidthChange={onBorderWidthChange}
                   columnGap={columnGap}
-                  onColumnGapChange={onColumnGapChange}
                   style={{
                     flex: 1,
                     marginBottom: insetBottom + BOTTOM_MENU_HEIGHT,
                   }}
                   bottomSheetHeight={bottomPanelHeight}
+                  onTouched={onTouched}
                 />
               ),
             },
@@ -369,16 +395,14 @@ const SocialLinksEditionScreen = ({
               element: (
                 <SocialLinksMarginsEditionPanel
                   marginTop={marginTop}
-                  onMarginTopChange={onMarginTopChange}
                   marginBottom={marginBottom}
-                  onMarginBottomChange={onMarginBottomChange}
-                  onMarginHorizontalChange={onMarginHorizontalChange}
                   marginHorizontal={marginHorizontal ?? 0}
                   style={{
                     flex: 1,
                     marginBottom: insetBottom + BOTTOM_MENU_HEIGHT,
                   }}
                   bottomSheetHeight={bottomPanelHeight}
+                  onTouched={onTouched}
                 />
               ),
             },

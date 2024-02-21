@@ -7,16 +7,15 @@ import {
 import LabeledDashedSlider from '#ui/LabeledDashedSlider';
 import TitleWithLine from '#ui/TitleWithLine';
 import type { ViewProps } from 'react-native';
+import type { SharedValue } from 'react-native-reanimated';
 
 type HorizontalPhotoSettingsEditionPanelProps = ViewProps & {
   /**
    * The height currently set on the module
    */
-  height: number;
-  /**
-   * A callback called when the user update the height
-   */
-  onHeightChange: (height: number) => void;
+  height: SharedValue<number>;
+
+  onTouched: () => void;
 };
 
 /**
@@ -24,8 +23,8 @@ type HorizontalPhotoSettingsEditionPanelProps = ViewProps & {
  */
 const HorizontalPhotoSettingsEditionPanel = ({
   height,
-  onHeightChange,
   style,
+  onTouched,
   ...props
 }: HorizontalPhotoSettingsEditionPanelProps) => {
   const intl = useIntl();
@@ -47,11 +46,10 @@ const HorizontalPhotoSettingsEditionPanel = ({
               description="Height message in HorizontalPhoto edition"
             />
           }
-          initialValue={height}
+          value={height}
           min={HORIZONTAL_PHOTO_MIN_IMAGE_HEIGHT}
           max={HORIZONTAL_PHOTO_MAX_IMAGE_HEIGHT}
           step={1}
-          onChange={onHeightChange}
           accessibilityLabel={intl.formatMessage({
             defaultMessage: 'Height size',
             description:
@@ -62,6 +60,7 @@ const HorizontalPhotoSettingsEditionPanel = ({
             description: 'Hint of the height slider in HorizontalPhoto edition',
           })}
           style={styles.slider}
+          onTouched={onTouched}
         />
       </View>
     </View>

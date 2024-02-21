@@ -1,7 +1,7 @@
-import { omit } from 'lodash';
 import { useCallback, useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { StyleSheet } from 'react-native';
+import { useSharedValue } from 'react-native-reanimated';
 import Toast from 'react-native-toast-message';
 import { graphql, useFragment, useMutation } from 'react-relay';
 import {
@@ -182,23 +182,35 @@ const SimpleTextEditionScreen = ({
     text,
     textAlign,
     fontColor,
-    fontSize,
     fontFamily,
-    verticalSpacing,
-    marginHorizontal,
-    marginVertical,
     backgroundId,
     backgroundStyle,
   } = data;
 
-  const previewData = {
-    ...omit(data, 'backgroundId'),
-    kind: moduleKind,
-    background:
-      profile.moduleBackgrounds.find(
-        background => background.id === backgroundId,
-      ) ?? null,
-  };
+  const previewData = useMemo(
+    () => ({
+      text,
+      textAlign,
+      fontColor,
+      fontFamily,
+      backgroundStyle,
+      kind: moduleKind,
+      background:
+        profile.moduleBackgrounds.find(
+          background => background.id === backgroundId,
+        ) ?? null,
+    }),
+    [
+      backgroundId,
+      backgroundStyle,
+      fontColor,
+      fontFamily,
+      moduleKind,
+      profile.moduleBackgrounds,
+      text,
+      textAlign,
+    ],
+  );
   // #endregion
 
   // #region Mutations and saving logic
@@ -226,6 +238,31 @@ const SimpleTextEditionScreen = ({
 
   const router = useRouter();
   const intl = useIntl();
+
+  const onCancel = router.back;
+  // #endregion
+
+  // #region Fields edition handlers
+  const onTextChange = fieldUpdateHandler('text');
+
+  const onColorChange = fieldUpdateHandler('fontColor');
+
+  const fontSize = useSharedValue(data.fontSize ?? 12);
+
+  const onFontFamilyChange = fieldUpdateHandler('fontFamily');
+
+  const onTextAlignChange = fieldUpdateHandler('textAlign');
+
+  const verticalSpacing = useSharedValue(data.verticalSpacing ?? null);
+
+  const marginHorizontal = useSharedValue(data.marginHorizontal ?? null);
+
+  const marginVertical = useSharedValue(data.marginVertical ?? null);
+
+  const onBackgroundChange = fieldUpdateHandler('backgroundId');
+
+  const onBackgroundStyleChange = fieldUpdateHandler('backgroundStyle');
+
   const onSave = useCallback(() => {
     if (!canSave || !profile.webCard) {
       return;
@@ -235,6 +272,10 @@ const SimpleTextEditionScreen = ({
       variables: {
         input: {
           ...value,
+          fontSize: fontSize.value,
+          verticalSpacing: verticalSpacing.value,
+          marginHorizontal: marginHorizontal.value,
+          marginVertical: marginVertical.value,
           moduleId: moduleData?.id ?? null,
           kind: moduleKind,
           text: value.text!,
@@ -260,37 +301,16 @@ const SimpleTextEditionScreen = ({
     profile.webCard,
     commit,
     value,
+    fontSize,
+    verticalSpacing,
+    marginHorizontal,
+    marginVertical,
     moduleData?.id,
     moduleKind,
     router,
     intl,
   ]);
 
-  const onCancel = useCallback(() => {
-    router.back();
-  }, [router]);
-  // #endregion
-
-  // #region Fields edition handlers
-  const onTextChange = fieldUpdateHandler('text');
-
-  const onColorChange = fieldUpdateHandler('fontColor');
-
-  const onFontSizeChange = fieldUpdateHandler('fontSize');
-
-  const onFontFamilyChange = fieldUpdateHandler('fontFamily');
-
-  const onTextAlignChange = fieldUpdateHandler('textAlign');
-
-  const onVerticalSpacingChange = fieldUpdateHandler('verticalSpacing');
-
-  const onMarginHorizontalChange = fieldUpdateHandler('marginHorizontal');
-
-  const onMarginVerticalChange = fieldUpdateHandler('marginVertical');
-
-  const onBackgroundChange = fieldUpdateHandler('backgroundId');
-
-  const onBackgroundStyleChange = fieldUpdateHandler('backgroundStyle');
   // #endregion
 
   // #region tabs
@@ -365,6 +385,12 @@ const SimpleTextEditionScreen = ({
       <SimpleTextPreview
         style={{ height: topPanelHeight - 20, marginVertical: 10 }}
         data={previewData}
+        animatedData={{
+          fontSize,
+          verticalSpacing,
+          marginHorizontal,
+          marginVertical,
+        }}
         onPreviewPress={onPreviewPress}
         colorPalette={profile?.webCard.cardColors}
         cardStyle={profile?.webCard.cardStyle}
@@ -381,14 +407,12 @@ const SimpleTextEditionScreen = ({
                 webCard={profile?.webCard ?? null}
                 fontColor={fontColor ?? '#000'}
                 fontFamily={fontFamily ?? 'Arial'}
-                fontSize={fontSize ?? 12}
+                fontSize={fontSize}
                 textAlignment={textAlign ?? 'left'}
-                verticalSpacing={verticalSpacing ?? 0}
+                verticalSpacing={verticalSpacing}
                 onColorChange={onColorChange}
                 onFontFamilyChange={onFontFamilyChange}
-                onFontSizeChange={onFontSizeChange}
                 onTextAlignmentChange={onTextAlignChange}
-                onVerticalSpacingChange={onVerticalSpacingChange}
                 bottomSheetHeight={bottomPanelHeight}
                 style={{
                   flex: 1,
@@ -402,10 +426,8 @@ const SimpleTextEditionScreen = ({
             element: (
               <SimpleTextMarginEditionPanel
                 moduleKind={moduleKind}
-                marginHorizontal={marginHorizontal ?? 0}
-                marginVertical={marginVertical ?? 0}
-                onMarginHorizontalChange={onMarginHorizontalChange}
-                onMarginVerticalChange={onMarginVerticalChange}
+                marginHorizontal={marginHorizontal}
+                marginVertical={marginVertical}
                 style={{
                   flex: 1,
                   marginBottom: insetBottom + BOTTOM_MENU_HEIGHT,

@@ -9,6 +9,7 @@ import IconButton from '#ui/IconButton';
 import LabeledDashedSlider from '#ui/LabeledDashedSlider';
 import PressableNative from '#ui/PressableNative';
 import TitleWithLine from '#ui/TitleWithLine';
+import type { SharedValue } from 'react-native-reanimated';
 import type { ViewProps } from 'react-native-svg/lib/typescript/fabric/utils';
 
 type CarouselImagesEditionPanelProps = Omit<ViewProps, 'children'> & {
@@ -35,7 +36,7 @@ type CarouselImagesEditionPanelProps = Omit<ViewProps, 'children'> & {
   /**
    * The image height currently set on the module
    */
-  imageHeight: number;
+  imageHeight: SharedValue<number>;
   /**
    * Called when the user wants to add an image.
    */
@@ -48,10 +49,8 @@ type CarouselImagesEditionPanelProps = Omit<ViewProps, 'children'> & {
    * Called when the user wants to change the image ratio.
    */
   onSquareRatioChange: (value: boolean) => void;
-  /**
-   * A callback called when the user update the image height
-   */
-  onImageHeightChange: (value: number) => void;
+
+  onTouched: () => void;
 };
 
 /**
@@ -64,7 +63,7 @@ const CarouselImagesEditionPanel = ({
   onRemoveImage,
   onSquareRatioChange,
   imageHeight,
-  onImageHeightChange,
+  onTouched,
   style,
   ...props
 }: CarouselImagesEditionPanelProps) => {
@@ -137,11 +136,11 @@ const CarouselImagesEditionPanel = ({
               description="Images height label in carousel edition"
             />
           }
-          initialValue={imageHeight}
+          value={imageHeight}
           min={CAROUSEL_MIN_IMAGE_HEIGHT}
           max={CAROUSEL_MAX_IMAGE_HEIGHT}
           step={5}
-          onChange={onImageHeightChange}
+          onTouched={onTouched}
           style={styles.slider}
         />
       </View>

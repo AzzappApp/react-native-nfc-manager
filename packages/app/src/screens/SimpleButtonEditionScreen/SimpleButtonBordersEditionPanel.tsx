@@ -14,6 +14,7 @@ import LabeledDashedSlider from '#ui/LabeledDashedSlider';
 import TabsBar from '#ui/TabsBar';
 import type { SimpleButtonBordersEditionPanel_webCard$key } from '#relayArtifacts/SimpleButtonBordersEditionPanel_webCard.graphql';
 import type { ViewProps } from 'react-native';
+import type { SharedValue } from 'react-native-reanimated';
 
 type SimpleButtonBordersEditionPanelProps = ViewProps & {
   /**
@@ -31,23 +32,17 @@ type SimpleButtonBordersEditionPanelProps = ViewProps & {
   /**
    * The borderWidth currently set on the module
    */
-  borderWidth: number;
-  /**
-   * A callback called when the user update the borderWidth
-   */
-  onBorderWidthChange: (borderWidth: number) => void;
+  borderWidth: SharedValue<number>;
   /**
    * The borderRadius currently set on the module
    */
-  borderRadius: number;
-  /**
-   * A callback called when the user update the borderRadius
-   */
-  onBorderRadiusChange: (borderRadius: number) => void;
+  borderRadius: SharedValue<number>;
   /**
    * The height of the bottom sheet
    */
   bottomSheetHeight: number;
+
+  onTouched: () => void;
 };
 
 /**
@@ -56,13 +51,12 @@ type SimpleButtonBordersEditionPanelProps = ViewProps & {
 const SimpleButtonBordersEditionPanel = ({
   webCard: webCardKey,
   borderColor,
-  onBorderColorChange: onBordercolorChange,
+  onBorderColorChange,
   borderWidth,
-  onBorderWidthChange: onBorderwidthChange,
   borderRadius,
-  onBorderRadiusChange: onBorderradiusChange,
   style,
   bottomSheetHeight,
+  onTouched,
   ...props
 }: SimpleButtonBordersEditionPanelProps) => {
   const intl = useIntl();
@@ -124,11 +118,10 @@ const SimpleButtonBordersEditionPanel = ({
               description="borderWidth message in SimpleButton edition"
             />
           }
-          initialValue={borderWidth}
+          value={borderWidth}
           min={0}
           max={SIMPLE_BUTTON_MAX_BORDER_WIDTH}
           step={1}
-          onChange={onBorderwidthChange}
           accessibilityLabel={intl.formatMessage({
             defaultMessage: 'Border width',
             description:
@@ -140,6 +133,7 @@ const SimpleButtonBordersEditionPanel = ({
               'Hint of the border Width slider in SimpleButton edition',
           })}
           style={styles.slider}
+          onTouched={onTouched}
         />
 
         <LabeledDashedSlider
@@ -149,11 +143,10 @@ const SimpleButtonBordersEditionPanel = ({
               description="border radius message in SimpleButton edition"
             />
           }
-          initialValue={borderRadius}
+          value={borderRadius}
           min={0}
           max={SIMPLE_BUTTON_MAX_BORDER_RADIUS}
           step={1}
-          onChange={onBorderradiusChange}
           accessibilityLabel={intl.formatMessage({
             defaultMessage: 'Border Radius',
             description:
@@ -165,6 +158,7 @@ const SimpleButtonBordersEditionPanel = ({
               'Hint of the borderRadius slider in SimpleButton edition',
           })}
           style={styles.slider}
+          onTouched={onTouched}
         />
       </View>
       {webCard && (
@@ -177,7 +171,7 @@ const SimpleButtonBordersEditionPanel = ({
             description: 'Bordercolor color title in SimpleButton edition',
           })}
           selectedColor={borderColor}
-          onColorChange={onBordercolorChange}
+          onColorChange={onBorderColorChange}
           onRequestClose={onProfileColorPickerClose}
         />
       )}

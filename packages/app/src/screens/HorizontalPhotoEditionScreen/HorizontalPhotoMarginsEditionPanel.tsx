@@ -1,5 +1,11 @@
+import { useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { StyleSheet, View } from 'react-native';
+import {
+  type SharedValue,
+  runOnJS,
+  useAnimatedReaction,
+} from 'react-native-reanimated';
 import {
   HORIZONTAL_PHOTO_MAX_HORIZONTAL_MARGIN,
   HORIZONTAL_PHOTO_MAX_VERTICAL_MARGIN,
@@ -12,20 +18,13 @@ type HorizontalPhotoMarginsEditionPanelProps = ViewProps & {
   /**
    * The marginHorizontal currently set on the module
    */
-  marginHorizontal: number;
-  /**
-   * A callback called when the user update the marginHorizontal
-   */
-  onMarginHorizontalChange: (marginHorizontal: number) => void;
-
+  marginHorizontal: SharedValue<number>;
   /**
    * The marginVertical currently set on the module
    */
-  marginVertical: number;
-  /**
-   * A callback called when the user update the marginVertical
-   */
-  onMarginVerticalChange: (marginVertical: number) => void;
+  marginVertical: SharedValue<number>;
+
+  onTouched: () => void;
 };
 
 /**
@@ -33,13 +32,29 @@ type HorizontalPhotoMarginsEditionPanelProps = ViewProps & {
  */
 const HorizontalPhotoMarginsEditionPanel = ({
   marginHorizontal,
-  onMarginHorizontalChange,
   marginVertical,
-  onMarginVerticalChange,
+  onTouched,
   style,
   ...props
 }: HorizontalPhotoMarginsEditionPanelProps) => {
   const intl = useIntl();
+
+  const [fullWidth, setFullWidth] = useState(marginHorizontal.value === 0);
+
+  useAnimatedReaction(
+    () => {
+      return marginHorizontal.value;
+    },
+    (currentValue, previousValue) => {
+      if (
+        (previousValue === 0 && currentValue !== 0) ||
+        (previousValue !== 0 && currentValue === 0)
+      ) {
+        runOnJS(setFullWidth)(currentValue === 0);
+      }
+    },
+    [],
+  );
 
   return (
     <View style={[styles.root, style]} {...props}>
@@ -58,11 +73,10 @@ const HorizontalPhotoMarginsEditionPanel = ({
               description="Top/bottom margin message in HorizontalPhoto edition"
             />
           }
-          initialValue={marginVertical}
+          value={marginVertical}
           min={0}
           max={HORIZONTAL_PHOTO_MAX_VERTICAL_MARGIN}
           step={1}
-          onChange={onMarginVerticalChange}
           accessibilityLabel={intl.formatMessage({
             defaultMessage: 'Top/bottom margin size',
             description:
@@ -74,10 +88,11 @@ const HorizontalPhotoMarginsEditionPanel = ({
               'Hint of the Top/bottom margin slider in HorizontalPhoto edition',
           })}
           style={styles.slider}
+          onTouched={onTouched}
         />
         <LabeledDashedSlider
           label={
-            marginHorizontal === 0 ? (
+            fullWidth ? (
               <FormattedMessage
                 defaultMessage="Left/right margin: 0 - Full Width"
                 description="Left/right margin message in Horizontal Photo edition"
@@ -89,11 +104,17 @@ const HorizontalPhotoMarginsEditionPanel = ({
               />
             )
           }
-          initialValue={marginHorizontal}
+          formatValue={value => {
+            'worklet';
+            if (value === 0) {
+              return '';
+            }
+            return value;
+          }}
+          value={marginHorizontal}
           min={0}
           max={HORIZONTAL_PHOTO_MAX_HORIZONTAL_MARGIN}
           step={1}
-          onChange={onMarginHorizontalChange}
           accessibilityLabel={intl.formatMessage({
             defaultMessage: 'Left/right margin size',
             description:
@@ -105,6 +126,7 @@ const HorizontalPhotoMarginsEditionPanel = ({
               'Hint of the Left/right margin slider in HorizontalPhoto edition',
           })}
           style={styles.slider}
+          onTouched={onTouched}
         />
       </View>
     </View>

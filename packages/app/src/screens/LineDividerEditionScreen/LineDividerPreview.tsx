@@ -1,22 +1,11 @@
 import LineDividerRenderer from '#components/cardModules/LineDividerRenderer';
 import EditorScaledPreview from '#components/EditorScaledPreview';
-import type { LineDividerRendererData } from '#components/cardModules/LineDividerRenderer';
-import type { CardStyle, ColorPalette } from '@azzapp/shared/cardHelpers';
-import type { ViewProps } from 'react-native-svg/lib/typescript/fabric/utils';
+import type { LineDividerRendererProps } from '#components/cardModules/LineDividerRenderer';
 
-type LineDividerPreviewProps = ViewProps & {
-  /**
-   * the data of the module to preview.
-   */
-  data: LineDividerRendererData;
-  /**
-   * the color palette
-   */
-  colorPalette: ColorPalette | null | undefined;
-  /**
-   * the card style
-   */
-  cardStyle: CardStyle | null | undefined;
+type LineDividerPreviewProps = Pick<
+  LineDividerRendererProps,
+  'animatedData' | 'cardStyle' | 'colorPalette' | 'data' | 'style'
+> & {
   /**
    * A callback that is called when the module preview is pressed.
    */
@@ -31,6 +20,7 @@ const LineDividerPreview = ({
   colorPalette,
   cardStyle,
   onPreviewPress,
+  animatedData,
   ...props
 }: LineDividerPreviewProps) => {
   return (
@@ -39,6 +29,7 @@ const LineDividerPreview = ({
         colorPalette={colorPalette}
         cardStyle={cardStyle}
         data={data}
+        animatedData={animatedData}
       />
     </EditorScaledPreview>
   );

@@ -29,6 +29,7 @@ import type { SimpleButtonSettingsEditionPanel_webCard$key } from '#relayArtifac
 import type { CountryCodeListOption } from '#ui/CountryCodeListWithOptions';
 import type { CountryCode } from 'libphonenumber-js';
 import type { ViewProps } from 'react-native';
+import type { SharedValue } from 'react-native-reanimated';
 
 type SimpleButtonSettingsEditionPanelProps = ViewProps & {
   /**
@@ -79,11 +80,7 @@ type SimpleButtonSettingsEditionPanelProps = ViewProps & {
   /**
    * The fontSize currently set on the module
    */
-  fontSize: number;
-  /**
-   * A callback called when the user update the fontSize
-   */
-  onFontSizeChange: (fontSize: number) => void;
+  fontSize: SharedValue<number>;
   /**
    * The buttonColor currently set on the module
    */
@@ -96,6 +93,8 @@ type SimpleButtonSettingsEditionPanelProps = ViewProps & {
    * The height of the bottom sheet
    */
   bottomSheetHeight: number;
+
+  onTouched: () => void;
 };
 
 /**
@@ -114,11 +113,11 @@ const SimpleButtonSettingsEditionPanel = ({
   fontColor,
   onFontColorChange,
   fontSize,
-  onFontSizeChange,
   buttonColor,
   onButtonColorChange,
   style,
   bottomSheetHeight,
+  onTouched,
   ...props
 }: SimpleButtonSettingsEditionPanelProps) => {
   const intl = useIntl();
@@ -323,11 +322,10 @@ const SimpleButtonSettingsEditionPanel = ({
               description="fontSize message in SimpleButton edition"
             />
           }
-          initialValue={fontSize}
+          value={fontSize}
           min={SIMPLE_BUTTON_MIN_FONT_SIZE}
           max={SIMPLE_BUTTON_MAX_FONT_SIZE}
           step={1}
-          onChange={onFontSizeChange}
           accessibilityLabel={intl.formatMessage({
             defaultMessage: 'Font size',
             description: 'Label of the fontSize slider in SimpleButton edition',
@@ -337,6 +335,7 @@ const SimpleButtonSettingsEditionPanel = ({
             description: 'Hint of the fontSize slider in SimpleButton edition',
           })}
           style={styles.slider}
+          onTouched={onTouched}
         />
         {webCard && (
           <WebCardColorPicker

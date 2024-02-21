@@ -17,6 +17,7 @@ import TabsBar from '#ui/TabsBar';
 import type { TextAlignment } from '#relayArtifacts/PhotoWithTextAndTitleRenderer_module.graphql';
 import type { PhotoWithTextAndTitleSettingsEditionPanel_webCard$key } from '#relayArtifacts/PhotoWithTextAndTitleSettingsEditionPanel_webCard.graphql';
 import type { ViewProps } from 'react-native';
+import type { SharedValue } from 'react-native-reanimated';
 
 type PhotoWithTextAndTitleSettingsEditionPanelProps = ViewProps & {
   /**
@@ -50,19 +51,11 @@ type PhotoWithTextAndTitleSettingsEditionPanelProps = ViewProps & {
   /**
    * The title fontSize currently set on the module
    */
-  titleFontSize: number;
-  /**
-   * A callback called when the user update the title fontSize
-   */
-  onTitleFontSizeChange: (fontSize: number) => void;
+  titleFontSize: SharedValue<number>;
   /**
    * The title verticalSpacing currently set on the module
    */
-  titleVerticalSpacing: number;
-  /**
-   * A callback called when the user update the title verticalSpacing
-   */
-  onTitleVerticalSpacingChange: (verticalSpacing: number) => void;
+  titleVerticalSpacing: SharedValue<number>;
   /**
    * The content fontFamily currently set on the module
    */
@@ -90,23 +83,17 @@ type PhotoWithTextAndTitleSettingsEditionPanelProps = ViewProps & {
   /**
    * The content fontSize currently set on the module
    */
-  contentFontSize: number;
-  /**
-   * A callback called when the user update the content fontSize
-   */
-  onContentFontSizeChange: (fontSize: number) => void;
+  contentFontSize: SharedValue<number>;
   /**
    * The content verticalSpacing currently set on the module
    */
-  contentVerticalSpacing: number;
-  /**
-   * A callback called when the user update the content verticalSpacing
-   */
-  onContentVerticalSpacingChange: (verticalSpacing: number) => void;
+  contentVerticalSpacing: SharedValue<number>;
   /**
    * The height of the bottom sheet
    */
   bottomSheetHeight: number;
+
+  onTouched: () => void;
 };
 
 /**
@@ -121,9 +108,7 @@ const PhotoWithTextAndTitleSettingsEditionPanel = ({
   titleTextAlign,
   onTitleTextAlignChange,
   titleFontSize,
-  onTitleFontSizeChange,
   titleVerticalSpacing,
-  onTitleVerticalSpacingChange,
   contentFontFamily,
   onContentFontFamilyChange,
   contentFontColor,
@@ -131,11 +116,10 @@ const PhotoWithTextAndTitleSettingsEditionPanel = ({
   contentTextAlign,
   onContentTextAlignChange,
   contentFontSize,
-  onContentFontSizeChange,
   contentVerticalSpacing,
-  onContentVerticalSpacingChange,
   style,
   bottomSheetHeight,
+  onTouched,
   ...props
 }: PhotoWithTextAndTitleSettingsEditionPanelProps) => {
   const intl = useIntl();
@@ -225,9 +209,7 @@ const PhotoWithTextAndTitleSettingsEditionPanel = ({
                 description="Font size message in PhotoWithTextAndTitle edition"
               />
             }
-            initialValue={
-              currentTab === 'title' ? titleFontSize : contentFontSize
-            }
+            value={currentTab === 'title' ? titleFontSize : contentFontSize}
             min={
               currentTab === 'title'
                 ? PHOTO_WITH_TEXT_AND_TITLE_MIN_TITLE_FONT_SIZE
@@ -239,11 +221,6 @@ const PhotoWithTextAndTitleSettingsEditionPanel = ({
                 : PHOTO_WITH_TEXT_AND_TITLE_MAX_FONT_SIZE
             }
             step={1}
-            onChange={
-              currentTab === 'title'
-                ? onTitleFontSizeChange
-                : onContentFontSizeChange
-            }
             accessibilityLabel={
               currentTab === 'title'
                 ? intl.formatMessage({
@@ -271,6 +248,7 @@ const PhotoWithTextAndTitleSettingsEditionPanel = ({
                   })
             }
             style={styles.slider}
+            onTouched={onTouched}
           />
         </View>
         <LabeledDashedSlider
@@ -281,7 +259,7 @@ const PhotoWithTextAndTitleSettingsEditionPanel = ({
               description="Vertical Spacing message in PhotoWithTextAndTitle edition"
             />
           }
-          initialValue={
+          value={
             currentTab === 'title'
               ? titleVerticalSpacing
               : contentVerticalSpacing
@@ -289,11 +267,6 @@ const PhotoWithTextAndTitleSettingsEditionPanel = ({
           min={0}
           max={PHOTO_WITH_TEXT_AND_TITLE_MAX_VERTICAL_SPACING}
           step={1}
-          onChange={
-            currentTab === 'title'
-              ? onTitleVerticalSpacingChange
-              : onContentVerticalSpacingChange
-          }
           accessibilityLabel={intl.formatMessage({
             defaultMessage: 'Vertical Spacing',
             description:
@@ -305,6 +278,7 @@ const PhotoWithTextAndTitleSettingsEditionPanel = ({
               'Hint of the Vertical Spacing slider in PhotoWithTextAndTitle edition',
           })}
           style={styles.slider}
+          onTouched={onTouched}
         />
       </View>
     </View>

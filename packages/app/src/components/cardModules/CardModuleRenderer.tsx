@@ -13,26 +13,38 @@ import {
   MODULE_KIND_SOCIAL_LINKS,
   getModuleDataValues,
 } from '@azzapp/shared/cardModuleHelpers';
-import BlockTextRenderer, { readBlockTextData } from './BlockTextRenderer';
-import CarouselRenderer from './CarouselRenderer';
-import { readCarouselData } from './CarouselRenderer/CarouselRenderer';
-import HorizontalPhotoRenderer, {
+import { BlockTextViewRenderer, readBlockTextData } from './BlockTextRenderer';
+import {
+  CarouselViewRenderer,
+  readCarouselData,
+} from './CarouselRenderer/CarouselRenderer';
+import {
+  HorizontalPhotoViewRenderer,
   readHorizontalPhotoData,
 } from './HorizontalPhotoRenderer';
-import LineDividerRenderer, {
+import {
+  LineDividerViewRenderer,
   readLineDividerData,
 } from './LineDividerRenderer';
-import PhotoWithTextAndTitleRenderer, {
+import {
+  PhotoWithTextAndTitleViewRenderer,
   readPhotoWithTextAndTitleData,
 } from './PhotoWithTextAndTitleRenderer';
-import SimpleButtonRenderer, {
+import {
+  SimpleButtonViewRenderer,
   readSimpleButtonData,
 } from './SimpleButtonRenderer';
-import SimpleTextRenderer, {
+import {
+  type SimpleButtonViewRenderProps,
+  type SimpleButtonViewRendererData,
+} from './SimpleButtonRenderer';
+import {
+  SimpleTextViewRenderer,
   readSimpleTextData,
   readSimpleTitleData,
 } from './SimpleTextRenderer';
-import SocialLinksRenderer, {
+import {
+  SocialLinksViewRenderer,
   readSocialLinksData,
 } from './SocialLinksRenderer';
 import type { BlockTextRenderer_module$key } from '#relayArtifacts/BlockTextRenderer_module.graphql';
@@ -46,29 +58,25 @@ import type { SimpleTextRenderer_simpleTitleModule$key } from '#relayArtifacts/S
 import type { SocialLinksRenderer_module$key } from '#relayArtifacts/SocialLinksRenderer_module.graphql';
 import type {
   BlockTextRendererData,
-  BlockTextRendererProps,
+  BlockTextViewRendererProps,
 } from './BlockTextRenderer';
 import type { CarouselRendererData } from './CarouselRenderer';
 import type {
   HorizontalPhotoRendererData,
-  HorizontalPhotoRendererProps,
+  HorizontalPhotoViewRendererProps,
 } from './HorizontalPhotoRenderer';
 import type { LineDividerRendererData } from './LineDividerRenderer';
 import type {
   PhotoWithTextAndTitleRendererData,
-  PhotoWithTextAndTitleRendererProps,
+  PhotoWithTextAndTitleViewRendererProps,
 } from './PhotoWithTextAndTitleRenderer';
 import type {
-  SimpleButtonRendererData,
-  SimpleButtonRendererProps,
-} from './SimpleButtonRenderer';
-import type {
   SimpleTextRendererData,
-  SimpleTextRendererProps,
+  SimpleTextViewRendererProps,
 } from './SimpleTextRenderer';
 import type {
   SocialLinksRendererData,
-  SocialLinksRendererProps,
+  SocialLinksViewRendererProps,
 } from './SocialLinksRenderer';
 import type { ViewProps } from 'react-native-svg/lib/typescript/fabric/utils';
 
@@ -147,7 +155,7 @@ export type ModuleRenderInfo =
     }
   | {
       kind: typeof MODULE_KIND_SIMPLE_BUTTON;
-      data: SimpleButtonRendererData;
+      data: SimpleButtonViewRendererData;
     }
   | {
       kind: typeof MODULE_KIND_SIMPLE_TEXT;
@@ -199,20 +207,20 @@ const CardModuleRenderer = <T extends ModuleRenderInfo>({
 export default CardModuleRenderer;
 
 const MODULE_RENDERERS = {
-  [MODULE_KIND_BLOCK_TEXT]: BlockTextRenderer,
-  [MODULE_KIND_CAROUSEL]: CarouselRenderer,
-  [MODULE_KIND_HORIZONTAL_PHOTO]: HorizontalPhotoRenderer,
-  [MODULE_KIND_LINE_DIVIDER]: LineDividerRenderer,
-  [MODULE_KIND_PHOTO_WITH_TEXT_AND_TITLE]: PhotoWithTextAndTitleRenderer,
-  [MODULE_KIND_SIMPLE_BUTTON]: SimpleButtonRenderer,
-  [MODULE_KIND_SIMPLE_TEXT]: SimpleTextRenderer,
-  [MODULE_KIND_SIMPLE_TITLE]: SimpleTextRenderer,
-  [MODULE_KIND_SOCIAL_LINKS]: SocialLinksRenderer,
+  [MODULE_KIND_BLOCK_TEXT]: BlockTextViewRenderer,
+  [MODULE_KIND_CAROUSEL]: CarouselViewRenderer,
+  [MODULE_KIND_HORIZONTAL_PHOTO]: HorizontalPhotoViewRenderer,
+  [MODULE_KIND_LINE_DIVIDER]: LineDividerViewRenderer,
+  [MODULE_KIND_PHOTO_WITH_TEXT_AND_TITLE]: PhotoWithTextAndTitleViewRenderer,
+  [MODULE_KIND_SIMPLE_BUTTON]: SimpleButtonViewRenderer,
+  [MODULE_KIND_SIMPLE_TEXT]: SimpleTextViewRenderer,
+  [MODULE_KIND_SIMPLE_TITLE]: SimpleTextViewRenderer,
+  [MODULE_KIND_SOCIAL_LINKS]: SocialLinksViewRenderer,
 } as const;
 
 const MODULE_RENDERERS_DESKTOP = {
-  [MODULE_KIND_BLOCK_TEXT]: (props: BlockTextRendererProps) => (
-    <BlockTextRenderer
+  [MODULE_KIND_BLOCK_TEXT]: (props: BlockTextViewRendererProps) => (
+    <BlockTextViewRenderer
       {...props}
       contentStyle={{
         maxWidth: DESKTOP_CONTENT_MAX_WIDTH,
@@ -221,8 +229,8 @@ const MODULE_RENDERERS_DESKTOP = {
       }}
     />
   ),
-  [MODULE_KIND_CAROUSEL]: CarouselRenderer,
-  [MODULE_KIND_HORIZONTAL_PHOTO]: (props: HorizontalPhotoRendererProps) => {
+  [MODULE_KIND_CAROUSEL]: CarouselViewRenderer,
+  [MODULE_KIND_HORIZONTAL_PHOTO]: (props: HorizontalPhotoViewRendererProps) => {
     const { marginHorizontal } = getModuleDataValues({
       data: props.data,
       cardStyle: props.cardStyle,
@@ -231,7 +239,7 @@ const MODULE_RENDERERS_DESKTOP = {
     });
 
     return (
-      <HorizontalPhotoRenderer
+      <HorizontalPhotoViewRenderer
         {...props}
         contentStyle={{
           maxWidth: marginHorizontal ? DESKTOP_CONTENT_MAX_WIDTH : '100%',
@@ -241,12 +249,12 @@ const MODULE_RENDERERS_DESKTOP = {
       />
     );
   },
-  [MODULE_KIND_LINE_DIVIDER]: LineDividerRenderer,
+  [MODULE_KIND_LINE_DIVIDER]: LineDividerViewRenderer,
   [MODULE_KIND_PHOTO_WITH_TEXT_AND_TITLE]: (
-    props: PhotoWithTextAndTitleRendererProps,
-  ) => <PhotoWithTextAndTitleRenderer {...props} viewMode="desktop" />,
-  [MODULE_KIND_SIMPLE_BUTTON]: (props: SimpleButtonRendererProps) => (
-    <SimpleButtonRenderer
+    props: PhotoWithTextAndTitleViewRendererProps,
+  ) => <PhotoWithTextAndTitleViewRenderer {...props} viewMode="desktop" />,
+  [MODULE_KIND_SIMPLE_BUTTON]: (props: SimpleButtonViewRenderProps) => (
+    <SimpleButtonViewRenderer
       {...props}
       contentStyle={{
         maxWidth: DESKTOP_CONTENT_MAX_WIDTH,
@@ -254,8 +262,8 @@ const MODULE_RENDERERS_DESKTOP = {
       }}
     />
   ),
-  [MODULE_KIND_SIMPLE_TEXT]: (props: SimpleTextRendererProps) => (
-    <SimpleTextRenderer
+  [MODULE_KIND_SIMPLE_TEXT]: (props: SimpleTextViewRendererProps) => (
+    <SimpleTextViewRenderer
       {...props}
       contentStyle={{
         maxWidth: DESKTOP_CONTENT_MAX_WIDTH,
@@ -263,8 +271,8 @@ const MODULE_RENDERERS_DESKTOP = {
       }}
     />
   ),
-  [MODULE_KIND_SIMPLE_TITLE]: (props: SimpleTextRendererProps) => (
-    <SimpleTextRenderer
+  [MODULE_KIND_SIMPLE_TITLE]: (props: SimpleTextViewRendererProps) => (
+    <SimpleTextViewRenderer
       {...props}
       contentStyle={{
         maxWidth: DESKTOP_CONTENT_MAX_WIDTH,
@@ -272,8 +280,8 @@ const MODULE_RENDERERS_DESKTOP = {
       }}
     />
   ),
-  [MODULE_KIND_SOCIAL_LINKS]: (props: SocialLinksRendererProps) => (
-    <SocialLinksRenderer
+  [MODULE_KIND_SOCIAL_LINKS]: (props: SocialLinksViewRendererProps) => (
+    <SocialLinksViewRenderer
       {...props}
       multilineStyle={{
         maxWidth: 800,

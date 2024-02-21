@@ -7,33 +7,24 @@ import {
 } from '@azzapp/shared/cardModuleHelpers';
 import LabeledDashedSlider from '#ui/LabeledDashedSlider';
 import TitleWithLine from '#ui/TitleWithLine';
+import type { SharedValue } from 'react-native-reanimated';
 import type { ViewProps } from 'react-native-svg/lib/typescript/fabric/utils';
 
 type CarouselEditionMarginPanelProps = ViewProps & {
   /**
    * The horizontal margin currently set on the module
    */
-  gap: number;
+  gap: SharedValue<number>;
   /**
    * The vertical margin currently set on the module
    */
-  marginVertical: number;
+  marginVertical: SharedValue<number>;
   /**
    * The horizontal margin currently set on the module
    */
-  marginHorizontal: number;
-  /**
-   * A callback called when the user update the horizontal margin
-   */
-  onGapChange: (gap: number) => void;
-  /**
-   * A callback called when the user update the vertical margin
-   */
-  onMarginVerticalChange: (marginVertical: number) => void;
-  /**
-   * A callback called when the user update the horizontal margin
-   */
-  onMarginHorizontalChange: (marginHorizontal: number) => void;
+  marginHorizontal: SharedValue<number>;
+
+  onTouched: () => void;
 };
 
 /**
@@ -43,9 +34,7 @@ const CarouselEditionMarginPanel = ({
   gap,
   marginVertical,
   marginHorizontal,
-  onMarginVerticalChange,
-  onMarginHorizontalChange,
-  onGapChange,
+  onTouched,
   style,
   ...props
 }: CarouselEditionMarginPanelProps) => {
@@ -67,11 +56,11 @@ const CarouselEditionMarginPanel = ({
               description="Margin vertical label in carousel edition"
             />
           }
-          initialValue={marginVertical}
+          value={marginVertical}
           min={0}
           max={CAROUSEL_MAX_VERTICAL_MARGIN}
           step={1}
-          onChange={onMarginVerticalChange}
+          onTouched={onTouched}
           style={styles.slider}
         />
         <LabeledDashedSlider
@@ -81,11 +70,11 @@ const CarouselEditionMarginPanel = ({
               description="Margin horizontal label in carousel edition"
             />
           }
-          initialValue={marginHorizontal}
+          value={marginHorizontal}
           min={0}
           max={CAROUSEL_MAX_HORIZONTAL_MARGIN}
           step={1}
-          onChange={onMarginHorizontalChange}
+          onTouched={onTouched}
           style={styles.slider}
         />
         <LabeledDashedSlider
@@ -95,11 +84,11 @@ const CarouselEditionMarginPanel = ({
               description="Image gap label in carousel edition"
             />
           }
-          initialValue={gap}
+          value={gap}
           min={0}
           max={CAROUSEL_MAX_GAP}
           step={1}
-          onChange={onGapChange}
+          onTouched={onTouched}
           style={styles.slider}
         />
       </View>

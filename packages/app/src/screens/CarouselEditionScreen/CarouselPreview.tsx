@@ -2,27 +2,16 @@ import { shadow } from '#theme';
 import CarouselRenderer from '#components/cardModules/CarouselRenderer';
 import EditorScaledPreview from '#components/EditorScaledPreview';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
-import type { CarouselRendererData } from '#components/cardModules/CarouselRenderer';
-import type { CardStyle, ColorPalette } from '@azzapp/shared/cardHelpers';
-import type { ViewProps } from 'react-native';
+import type { CarouselRendererProps } from '#components/cardModules/CarouselRenderer/CarouselRenderer';
 
-type CarouselPreviewProps = ViewProps & {
+type CarouselPreviewProps = Pick<
+  CarouselRendererProps,
+  'animatedData' | 'cardStyle' | 'colorPalette' | 'data' | 'style'
+> & {
   /**
-   * the data of the module to preview.
+   * A callback that is called when the module preview is pressed.
    */
-  data: CarouselRendererData;
-  /**
-   * height of the preview
-   */
-  height: number;
-  /**
-   * the color palette
-   */
-  colorPalette: ColorPalette | null | undefined;
-  /**
-   * the color palette
-   */
-  cardStyle: CardStyle | null | undefined;
+  onPreviewPress?: () => void;
 };
 
 /**
@@ -32,7 +21,7 @@ const CarouselPreview = ({
   data,
   colorPalette,
   cardStyle,
-  height,
+  animatedData,
   ...props
 }: CarouselPreviewProps) => {
   const styles = useStyleSheet(styleSheet);
@@ -40,6 +29,7 @@ const CarouselPreview = ({
     <EditorScaledPreview {...props}>
       <CarouselRenderer
         data={data}
+        animatedData={animatedData}
         colorPalette={colorPalette}
         cardStyle={cardStyle}
         style={styles.module}
@@ -50,7 +40,7 @@ const CarouselPreview = ({
 
 export default CarouselPreview;
 
-const styleSheet = createStyleSheet(apperance => ({
+const styleSheet = createStyleSheet(appearance => ({
   module: [{ width: '100%' }],
-  container: shadow(apperance),
+  container: shadow(appearance),
 }));

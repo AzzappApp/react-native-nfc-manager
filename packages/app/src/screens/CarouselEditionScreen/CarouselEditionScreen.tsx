@@ -1,6 +1,7 @@
 import { useCallback, useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { StyleSheet } from 'react-native';
+import { useSharedValue } from 'react-native-reanimated';
 import Toast from 'react-native-toast-message';
 import { graphql, useFragment, useMutation } from 'react-relay';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
@@ -159,19 +160,8 @@ const CarouselEditionScreen = ({
       defaultValues: CAROUSEL_DEFAULT_VALUES,
     });
 
-  const {
-    images,
-    squareRatio,
-    borderWidth,
-    borderColor,
-    borderRadius,
-    imageHeight,
-    marginHorizontal,
-    marginVertical,
-    gap,
-    backgroundId,
-    backgroundStyle,
-  } = data;
+  const { images, squareRatio, borderColor, backgroundId, backgroundStyle } =
+    data;
 
   const previewData = {
     ...data,
@@ -201,12 +191,118 @@ const CarouselEditionScreen = ({
     `);
 
   const isValid = images.length > 0;
-  const canSave = dirty && isValid && !saving;
+
+  const [touched, setTouched] = useState(false);
+
+  const onTouched = useCallback(() => {
+    setTouched(true);
+  }, []);
+
+  const canSave = (dirty || touched) && isValid && !saving;
 
   const router = useRouter();
   const intl = useIntl();
   const [progressIndicator, setProgressIndicator] =
     useState<Observable<number> | null>(null);
+
+  const onCancel = router.back;
+  // #endregion
+
+  // #region Fields edition handlers
+  const [showImagePicker, setShowImagePicker] = useState(images.length === 0);
+  const [currentTab, setCurrentTab] = useState('images');
+
+  const onShowImagePicker = useCallback(() => {
+    setShowImagePicker(true);
+  }, []);
+
+  const onCloseImagePicker = useCallback(() => {
+    if (images.length === 0) {
+      router.back();
+    }
+    setShowImagePicker(false);
+  }, [images.length, router]);
+
+  const onImagePickerFinished = useCallback(
+    async ({
+      uri,
+      width,
+      editionParameters,
+      filter,
+      aspectRatio,
+    }: ImagePickerResult) => {
+      const exportWidth = Math.min(MODULE_IMAGE_MAX_WIDTH, width);
+      const exportHeight = exportWidth / aspectRatio;
+      const localPath = await exportLayersToImage({
+        size: { width: exportWidth, height: exportHeight },
+        quality: 95,
+        format: 'auto',
+        layers: [
+          {
+            kind: 'image',
+            uri,
+            parameters: editionParameters,
+            lutFilterUri: getFilterUri(filter),
+          },
+        ],
+      });
+
+      updateFields({
+        images: [
+          ...images,
+          {
+            local: true,
+            id: localPath,
+            uri: localPath.startsWith('file')
+              ? localPath
+              : `file://${localPath}`,
+            aspectRatio,
+          },
+        ],
+      });
+      setShowImagePicker(false);
+    },
+    [images, updateFields],
+  );
+
+  const onRemoveImage = useCallback(
+    (index: number) => {
+      updateFields({
+        images: images.filter((_, i) => i !== index),
+      });
+    },
+    [images, updateFields],
+  );
+
+  const onSquareRatioChange = fieldUpdateHandler('squareRatio');
+
+  const borderWidth = useSharedValue(
+    data.borderWidth ?? CAROUSEL_DEFAULT_VALUES.borderWidth,
+  );
+
+  const borderRadius = useSharedValue(
+    data.borderRadius ?? CAROUSEL_DEFAULT_VALUES.borderRadius,
+  );
+
+  const imageHeight = useSharedValue(
+    data.imageHeight ?? CAROUSEL_DEFAULT_VALUES.imageHeight,
+  );
+
+  const marginVertical = useSharedValue(
+    data.marginVertical ?? CAROUSEL_DEFAULT_VALUES.marginVertical,
+  );
+
+  const marginHorizontal = useSharedValue(
+    data.marginHorizontal ?? CAROUSEL_DEFAULT_VALUES.marginHorizontal,
+  );
+
+  const gap = useSharedValue(data.gap ?? null);
+
+  const onBorderColorChange = fieldUpdateHandler('borderColor');
+
+  const onBackgroundChange = fieldUpdateHandler('backgroundId');
+
+  const onBackgroundStyleChange = fieldUpdateHandler('backgroundStyle');
 
   const onSave = useCallback(async () => {
     if (!canSave) {
@@ -299,6 +395,12 @@ const CarouselEditionScreen = ({
           }),
           moduleId: carousel?.id,
           ...rest,
+          borderWidth: borderWidth.value,
+          borderRadius: borderRadius.value,
+          imageHeight: imageHeight.value,
+          marginHorizontal: marginHorizontal.value,
+          marginVertical: marginVertical.value,
+          gap: gap.value,
         },
       },
       onCompleted() {
@@ -319,98 +421,21 @@ const CarouselEditionScreen = ({
         });
       },
     });
-  }, [canSave, value, commit, profile.webCard.id, carousel?.id, intl, router]);
-
-  const onCancel = useCallback(() => {
-    router.back();
-  }, [router]);
-  // #endregion
-
-  // #region Fields edition handlers
-  const [showImagePicker, setShowImagePicker] = useState(images.length === 0);
-  const [currentTab, setCurrentTab] = useState('images');
-
-  const onShowImagePicker = useCallback(() => {
-    setShowImagePicker(true);
-  }, []);
-
-  const onCloseImagePicker = useCallback(() => {
-    if (images.length === 0) {
-      router.back();
-    }
-    setShowImagePicker(false);
-  }, [images.length, router]);
-
-  const onImagePickerFinished = useCallback(
-    async ({
-      uri,
-      width,
-      editionParameters,
-      filter,
-      aspectRatio,
-    }: ImagePickerResult) => {
-      const exportWidth = Math.min(MODULE_IMAGE_MAX_WIDTH, width);
-      const exportHeight = exportWidth / aspectRatio;
-      const localPath = await exportLayersToImage({
-        size: { width: exportWidth, height: exportHeight },
-        quality: 95,
-        format: 'auto',
-        layers: [
-          {
-            kind: 'image',
-            uri,
-            parameters: editionParameters,
-            lutFilterUri: getFilterUri(filter),
-          },
-        ],
-      });
-
-      updateFields({
-        images: [
-          ...images,
-          {
-            local: true,
-            id: localPath,
-            uri: localPath.startsWith('file')
-              ? localPath
-              : `file://${localPath}`,
-            aspectRatio,
-          },
-        ],
-      });
-      setShowImagePicker(false);
-    },
-    [images, updateFields],
-  );
-
-  const onRemoveImage = useCallback(
-    (index: number) => {
-      updateFields({
-        images: images.filter((_, i) => i !== index),
-      });
-    },
-    [images, updateFields],
-  );
-
-  const onSquareRatioChange = fieldUpdateHandler('squareRatio');
-
-  const onBorderSizeChange = fieldUpdateHandler('borderWidth');
-
-  const onBorderColorChange = fieldUpdateHandler('borderColor');
-
-  const onBorderRadiusChange = fieldUpdateHandler('borderRadius');
-
-  const onImageHeightChange = fieldUpdateHandler('imageHeight');
-
-  const onMarginVerticalChange = fieldUpdateHandler('marginVertical');
-
-  const onMarginHorizontalChange = fieldUpdateHandler('marginHorizontal');
-
-  const onGapChange = fieldUpdateHandler('gap');
-
-  const onBackgroundChange = fieldUpdateHandler('backgroundId');
-
-  const onBackgroundStyleChange = fieldUpdateHandler('backgroundStyle');
+  }, [
+    canSave,
+    value,
+    commit,
+    profile.webCard.id,
+    carousel?.id,
+    borderWidth,
+    borderRadius,
+    imageHeight,
+    marginHorizontal,
+    marginVertical,
+    gap,
+    intl,
+    router,
+  ]);
 
   // #endregion
   const {
@@ -451,7 +476,14 @@ const CarouselEditionScreen = ({
       />
       <CarouselPreview
         data={previewData}
-        height={topPanelHeight - 40}
+        animatedData={{
+          borderRadius,
+          borderWidth,
+          marginVertical,
+          marginHorizontal,
+          imageHeight,
+          gap,
+        }}
         style={{ height: topPanelHeight - 40, marginVertical: 20 }}
         colorPalette={profile?.webCard.cardColors}
         cardStyle={profile?.webCard.cardStyle}
@@ -470,7 +502,7 @@ const CarouselEditionScreen = ({
                 onRemoveImage={onRemoveImage}
                 onSquareRatioChange={onSquareRatioChange}
                 imageHeight={imageHeight}
-                onImageHeightChange={onImageHeightChange}
+                onTouched={onTouched}
                 style={{
                   flex: 1,
                   marginBottom: insetBottom + BOTTOM_MENU_HEIGHT,
@@ -487,9 +519,8 @@ const CarouselEditionScreen = ({
                 borderColor={borderColor}
                 borderRadius={borderRadius}
                 bottomSheetHeight={bottomPanelHeight}
-                onBorderSizeChange={onBorderSizeChange}
                 onBorderColorChange={onBorderColorChange}
-                onBorderRadiusChange={onBorderRadiusChange}
+                onTouched={onTouched}
                 style={{
                   flex: 1,
                   marginBottom: insetBottom + BOTTOM_MENU_HEIGHT,
@@ -504,9 +535,7 @@ const CarouselEditionScreen = ({
                 marginVertical={marginVertical}
                 marginHorizontal={marginHorizontal}
                 gap={gap}
-                onMarginVerticalChange={onMarginVerticalChange}
-                onMarginHorizontalChange={onMarginHorizontalChange}
-                onGapChange={onGapChange}
+                onTouched={onTouched}
                 style={{
                   flex: 1,
                   marginBottom: insetBottom + BOTTOM_MENU_HEIGHT,

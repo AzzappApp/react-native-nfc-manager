@@ -2,6 +2,7 @@ import { omit } from 'lodash';
 import { useCallback, useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { StyleSheet } from 'react-native';
+import { useSharedValue } from 'react-native-reanimated';
 import Toast from 'react-native-toast-message';
 import { graphql, useFragment, useMutation } from 'react-relay';
 
@@ -159,12 +160,6 @@ const BlockTextEditionScreen = ({
     fontFamily,
     fontColor,
     textAlign,
-    fontSize,
-    verticalSpacing,
-    textMarginVertical,
-    textMarginHorizontal,
-    marginHorizontal,
-    marginVertical,
     textBackgroundId,
     textBackgroundStyle,
     backgroundId,
@@ -203,11 +198,64 @@ const BlockTextEditionScreen = ({
       }
     `);
   const isValid = true; //TODO:
-  const canSave = dirty && isValid && !saving;
+
+  const [touched, setTouched] = useState(false);
+
+  const onTouched = useCallback(() => {
+    setTouched(true);
+  }, []);
+
+  const canSave = (dirty || touched) && isValid && !saving;
 
   const router = useRouter();
 
   const intl = useIntl();
+
+  const onCancel = useCallback(() => {
+    router.back();
+  }, [router]);
+
+  // #endregion
+
+  // #region Fields edition handlers
+
+  const onTextChange = fieldUpdateHandler('text');
+
+  const onFontFamilyChange = fieldUpdateHandler('fontFamily');
+
+  const onFontColorChange = fieldUpdateHandler('fontColor');
+
+  const onTextAlignChange = fieldUpdateHandler('textAlign');
+
+  const fontSize = useSharedValue(data.fontSize ?? null);
+
+  const verticalSpacing = useSharedValue(
+    data.verticalSpacing ?? BLOCK_TEXT_DEFAULT_VALUES.verticalSpacing,
+  );
+
+  const textMarginVertical = useSharedValue(
+    data.textMarginVertical ?? BLOCK_TEXT_DEFAULT_VALUES.textMarginVertical,
+  );
+
+  const textMarginHorizontal = useSharedValue(
+    data.textMarginHorizontal ?? BLOCK_TEXT_DEFAULT_VALUES.textMarginHorizontal,
+  );
+
+  const marginHorizontal = useSharedValue(
+    data.marginHorizontal ?? BLOCK_TEXT_DEFAULT_VALUES.marginHorizontal,
+  );
+
+  const marginVertical = useSharedValue(
+    data.marginVertical ?? BLOCK_TEXT_DEFAULT_VALUES.marginVertical,
+  );
+
+  const onTextBackgroundChange = fieldUpdateHandler('textBackgroundId');
+
+  const onTextBackgroundStyleChange = fieldUpdateHandler('textBackgroundStyle');
+
+  const onBackgroundChange = fieldUpdateHandler('backgroundId');
+
+  const onBackgroundStyleChange = fieldUpdateHandler('backgroundStyle');
 
   const onSave = useCallback(async () => {
     if (!canSave) {
@@ -219,6 +267,12 @@ const BlockTextEditionScreen = ({
       moduleId: blockText?.id,
       text: value.text!,
       webCardId: profile.webCard.id,
+      textMarginHorizontal: textMarginHorizontal.value,
+      textMarginVertical: textMarginVertical.value,
+      marginHorizontal: marginHorizontal.value,
+      marginVertical: marginVertical.value,
+      fontSize: fontSize.value,
+      verticalSpacing: verticalSpacing.value,
     };
 
     commit({
@@ -241,45 +295,21 @@ const BlockTextEditionScreen = ({
         });
       },
     });
-  }, [canSave, value, blockText?.id, profile.webCard.id, commit, router, intl]);
-
-  const onCancel = useCallback(() => {
-    router.back();
-  }, [router]);
-
-  // #endregion
-
-  // #region Fields edition handlers
-
-  const onTextChange = fieldUpdateHandler('text');
-
-  const onFontFamilyChange = fieldUpdateHandler('fontFamily');
-
-  const onFontColorChange = fieldUpdateHandler('fontColor');
-
-  const onTextAlignChange = fieldUpdateHandler('textAlign');
-
-  const onFontSizeChange = fieldUpdateHandler('fontSize');
-
-  const onVerticalSpacingChange = fieldUpdateHandler('verticalSpacing');
-
-  const onTextMarginVerticalChange = fieldUpdateHandler('textMarginVertical');
-
-  const onTextMarginHorizontalChange = fieldUpdateHandler(
-    'textMarginHorizontal',
-  );
-
-  const onMarginHorizontalChange = fieldUpdateHandler('marginHorizontal');
-
-  const onMarginVerticalChange = fieldUpdateHandler('marginVertical');
-
-  const onTextBackgroundChange = fieldUpdateHandler('textBackgroundId');
-
-  const onTextBackgroundStyleChange = fieldUpdateHandler('textBackgroundStyle');
-
-  const onBackgroundChange = fieldUpdateHandler('backgroundId');
-
-  const onBackgroundStyleChange = fieldUpdateHandler('backgroundStyle');
+  }, [
+    canSave,
+    value,
+    blockText?.id,
+    profile.webCard.id,
+    textMarginHorizontal,
+    textMarginVertical,
+    marginHorizontal,
+    marginVertical,
+    fontSize,
+    verticalSpacing,
+    commit,
+    router,
+    intl,
+  ]);
 
   // #endregion
 
@@ -347,6 +377,14 @@ const BlockTextEditionScreen = ({
       <BlockTextPreview
         style={{ height: topPanelHeight - 20, marginVertical: 10 }}
         data={previewData}
+        animatedData={{
+          fontSize,
+          verticalSpacing,
+          marginHorizontal,
+          marginVertical,
+          textMarginVertical,
+          textMarginHorizontal,
+        }}
         onPreviewPress={onPreviewPress}
         colorPalette={profile?.webCard.cardColors}
         cardStyle={profile?.webCard.cardStyle}
@@ -367,14 +405,13 @@ const BlockTextEditionScreen = ({
                 textAlign={textAlign}
                 onTextAlignChange={onTextAlignChange}
                 fontSize={fontSize}
-                onFontSizeChange={onFontSizeChange}
                 verticalSpacing={verticalSpacing}
-                onVerticalSpacingChange={onVerticalSpacingChange}
                 style={{
                   flex: 1,
                   marginBottom: insetBottom + BOTTOM_MENU_HEIGHT,
                 }}
                 bottomSheetHeight={bottomPanelHeight}
+                onTouched={onTouched}
               />
             ),
           },
@@ -383,17 +420,14 @@ const BlockTextEditionScreen = ({
             element: (
               <BlockTextMarginsEditionPanel
                 textMarginVertical={textMarginVertical}
-                onTextMarginVerticalChange={onTextMarginVerticalChange}
                 textMarginHorizontal={textMarginHorizontal}
-                onTextMarginHorizontalChange={onTextMarginHorizontalChange}
                 marginHorizontal={marginHorizontal}
-                onMarginHorizontalChange={onMarginHorizontalChange}
                 marginVertical={marginVertical}
-                onMarginVerticalChange={onMarginVerticalChange}
                 style={{
                   flex: 1,
                   marginBottom: insetBottom + BOTTOM_MENU_HEIGHT,
                 }}
+                onTouched={onTouched}
               />
             ),
           },
@@ -411,6 +445,7 @@ const BlockTextEditionScreen = ({
                   flex: 1,
                   marginBottom: insetBottom + BOTTOM_MENU_HEIGHT,
                 }}
+                onTouched={onTouched}
               />
             ),
           },

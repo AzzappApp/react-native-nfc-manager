@@ -11,41 +11,27 @@ import {
 import LabeledDashedSlider from '#ui/LabeledDashedSlider';
 import TitleWithLine from '#ui/TitleWithLine';
 import type { ViewProps } from 'react-native';
+import type { SharedValue } from 'react-native-reanimated';
 
 type SimpleButtonMarginsEditionPanelProps = ViewProps & {
   /**
    * The marginTop currently set on the module
    */
-  marginTop: number;
-  /**
-   * A callback called when the user update the marginTop
-   */
-  onMargintopChange: (marginTop: number) => void;
+  marginTop: SharedValue<number>;
   /**
    * The marginBottom currently set on the module
    */
-  marginBottom: number;
-  /**
-   * A callback called when the user update the marginBottom
-   */
-  onMarginbottomChange: (marginBottom: number) => void;
-
+  marginBottom: SharedValue<number>;
   /**
    * The width currently set on the module
    */
-  width: number;
-  /**
-   * A callback called when the user update the width
-   */
-  onWidthChange: (width: number) => void;
+  width: SharedValue<number>;
   /**
    * The height currently set on the module
    */
-  height: number;
-  /**
-   * A callback called when the user update the height
-   */
-  onHeightChange: (height: number) => void;
+  height: SharedValue<number>;
+
+  onTouched: () => void;
 };
 
 /**
@@ -53,14 +39,11 @@ type SimpleButtonMarginsEditionPanelProps = ViewProps & {
  */
 const SimpleButtonMarginsEditionPanel = ({
   marginTop,
-  onMargintopChange,
   marginBottom,
-  onMarginbottomChange,
   width,
-  onWidthChange,
   height,
-  onHeightChange,
   style,
+  onTouched,
   ...props
 }: SimpleButtonMarginsEditionPanelProps) => {
   const intl = useIntl();
@@ -80,11 +63,10 @@ const SimpleButtonMarginsEditionPanel = ({
             description="marginTop message in SimpleButton edition"
           />
         }
-        initialValue={marginTop}
+        value={marginTop}
         min={0}
         max={SIMPLE_BUTTON_MAX_MARGIN_TOP}
         step={1}
-        onChange={onMargintopChange}
         accessibilityLabel={intl.formatMessage({
           defaultMessage: 'Top margin',
           description: 'Label of the marginTop slider in SimpleButton edition',
@@ -94,6 +76,7 @@ const SimpleButtonMarginsEditionPanel = ({
           description: 'Hint of the marginTop slider in SimpleButton edition',
         })}
         style={styles.slider}
+        onTouched={onTouched}
       />
       <LabeledDashedSlider
         label={
@@ -102,11 +85,10 @@ const SimpleButtonMarginsEditionPanel = ({
             description="Bottom margin message in SimpleButton edition"
           />
         }
-        initialValue={marginBottom}
+        value={marginBottom}
         min={0}
         max={SIMPLE_BUTTON_MAX_MARGIN_BOTTOM}
         step={1}
-        onChange={onMarginbottomChange}
         accessibilityLabel={intl.formatMessage({
           defaultMessage: 'Bottom margin',
           description:
@@ -118,6 +100,7 @@ const SimpleButtonMarginsEditionPanel = ({
             'Hint of the marginBottom marginttom slider in SimpleButton edition',
         })}
         style={styles.slider}
+        onTouched={onTouched}
       />
       <View
         style={{
@@ -133,11 +116,10 @@ const SimpleButtonMarginsEditionPanel = ({
               description="width message in SimpleButton edition"
             />
           }
-          initialValue={width}
+          value={width}
           min={SIMPLE_BUTTON_MIN_WIDTH}
           max={SIMPLE_BUTTON_MAX_WIDTH}
           step={1}
-          onChange={onWidthChange}
           accessibilityLabel={intl.formatMessage({
             defaultMessage: 'Width',
             description: 'Label of the width slider in SimpleButton edition',
@@ -147,6 +129,7 @@ const SimpleButtonMarginsEditionPanel = ({
             description: 'Hint of the width slider in SimpleButton edition',
           })}
           style={styles.halfSlider}
+          onTouched={onTouched}
         />
         <LabeledDashedSlider
           label={
@@ -155,11 +138,10 @@ const SimpleButtonMarginsEditionPanel = ({
               description="height message in SimpleButton edition"
             />
           }
-          initialValue={height}
+          value={height}
           min={SIMPLE_BUTTON_MIN_HEIGHT}
           max={SIMPLE_BUTTON_MAX_HEIGHT}
           step={1}
-          onChange={onHeightChange}
           accessibilityLabel={intl.formatMessage({
             defaultMessage: 'Height',
             description: 'Label of the height slider in SimpleButton edition',
@@ -169,6 +151,7 @@ const SimpleButtonMarginsEditionPanel = ({
             description: 'Hint of the height slider in SimpleButton edition',
           })}
           style={styles.halfSlider}
+          onTouched={onTouched}
         />
       </View>
     </View>

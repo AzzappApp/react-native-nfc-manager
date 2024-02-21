@@ -8,17 +8,14 @@ import FloatingIconButton from '#ui/FloatingIconButton';
 import LabeledDashedSlider from '#ui/LabeledDashedSlider';
 import TitleWithLine from '#ui/TitleWithLine';
 import type { LineDividerOrientation } from '#relayArtifacts/LineDividerEditionScreen_module.graphql';
+import type { SharedValue } from 'react-native-reanimated';
 import type { ViewProps } from 'react-native-svg/lib/typescript/fabric/utils';
 
 type LineDividerSettingsEditionPanelProps = ViewProps & {
   /**
    * The height of divider
    */
-  height: number;
-  /**
-   * A callback called when the user update the height
-   */
-  onHeightChange: (height: number) => void;
+  height: SharedValue<number>;
   /**
    * orientation of the divider
    *
@@ -30,6 +27,8 @@ type LineDividerSettingsEditionPanelProps = ViewProps & {
    *
    */
   onOrientationChange: () => void;
+
+  onTouched: () => void;
 };
 
 /**
@@ -37,10 +36,10 @@ type LineDividerSettingsEditionPanelProps = ViewProps & {
  */
 const LineDividerSettingsEditionPanel = ({
   height,
-  onHeightChange,
   orientation,
   onOrientationChange,
   style,
+  onTouched,
   ...props
 }: LineDividerSettingsEditionPanelProps) => {
   const intl = useIntl();
@@ -69,11 +68,10 @@ const LineDividerSettingsEditionPanel = ({
             description="Height message in Line Divider edition"
           />
         }
-        initialValue={height}
+        value={height}
         min={LINE_DIVIDER_MIN_HEIGHT}
         max={LINE_DIVIDER_MAX_HEIGHT}
         step={1}
-        onChange={onHeightChange}
         accessibilityLabel={intl.formatMessage({
           defaultMessage: 'Height',
           description: 'Label of the height slider in Line Divider edition',
@@ -83,6 +81,7 @@ const LineDividerSettingsEditionPanel = ({
           description: 'Hint of the height slider in Line Divider edition',
         })}
         style={styles.slider}
+        onTouched={onTouched}
       />
     </View>
   );

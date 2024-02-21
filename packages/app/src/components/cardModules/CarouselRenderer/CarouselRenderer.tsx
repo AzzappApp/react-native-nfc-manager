@@ -1,6 +1,9 @@
 // import { useRef } from 'react';
-import { Image } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
+import Animated, {
+  type SharedValue,
+  useAnimatedStyle,
+} from 'react-native-reanimated';
 import { graphql, readInlineData } from 'react-relay';
 import { swapColor } from '@azzapp/shared/cardHelpers';
 import {
@@ -51,18 +54,44 @@ const CarouselRendererFragment = graphql`
   }
 `;
 
+const animatedProps = [
+  'borderWidth',
+  'borderRadius',
+  'marginVertical',
+  'marginHorizontal',
+  'imageHeight',
+  'gap',
+] as const;
+
+type AnimatedProps = (typeof animatedProps)[number];
+
 export const readCarouselData = (module: CarouselRenderer_module$key) =>
   readInlineData(CarouselRendererFragment, module);
 
-export type CarouselRendererData = NullableFields<
-  Omit<CarouselRenderer_module$data, ' $fragmentType'>
+export type CarouselViewRendererData = Omit<
+  CarouselRenderer_module$data,
+  ' $fragmentType'
 >;
 
-type CarouselRendererProps = ViewProps & {
+export type CarouselRendererData = NullableFields<
+  Omit<CarouselViewRendererData, AnimatedProps>
+>;
+
+type CarouselRendererAnimatedData = {
+  [K in AnimatedProps]:
+    | CarouselViewRendererData[K]
+    | SharedValue<CarouselViewRendererData[K]>;
+};
+
+export type CarouselRendererProps = ViewProps & {
   /**
    * The data for the carousel module
    */
   data: CarouselRendererData;
+  /**
+   * the animated data for the carousel module
+   */
+  animatedData: CarouselRendererAnimatedData;
   /**
    * the color palette
    */
@@ -73,6 +102,43 @@ type CarouselRendererProps = ViewProps & {
   cardStyle: CardStyle | null | undefined;
 };
 
+export type CarouselViewRendererProps = Omit<
+  CarouselRendererProps,
+  'animatedData' | 'data'
+> & {
+  data: CarouselViewRendererData;
+};
+
+export const CarouselViewRenderer = ({
+  data,
+  ...rest
+}: CarouselViewRendererProps) => {
+  const {
+    borderRadius,
+    borderWidth,
+    marginVertical,
+    marginHorizontal,
+    imageHeight,
+    gap,
+    ...restData
+  } = data;
+
+  return (
+    <CarouselRenderer
+      {...rest}
+      data={restData}
+      animatedData={{
+        borderRadius,
+        borderWidth,
+        marginVertical,
+        marginHorizontal,
+        imageHeight,
+        gap,
+      }}
+    />
+  );
+};
+
 /**
  *  implementation of the carousel module
  * This component takes the data directly instead of a relay fragment reference
@@ -80,31 +146,74 @@ type CarouselRendererProps = ViewProps & {
  */
 const CarouselRenderer = ({
   data,
+  animatedData,
   colorPalette,
   cardStyle,
   style,
   ...props
 }: CarouselRendererProps) => {
+  const { images, squareRatio, borderColor, background, backgroundStyle } =
+    getModuleDataValues({
+      data,
+      cardStyle,
+      defaultValues: CAROUSEL_DEFAULT_VALUES,
+      styleValuesMap: CAROUSEL_STYLE_VALUES,
+    });
+
   const {
-    images,
-    squareRatio,
-    borderWidth,
-    borderColor,
     borderRadius,
+    borderWidth,
     marginVertical,
     marginHorizontal,
     imageHeight,
     gap,
-    background,
-    backgroundStyle,
-  } = getModuleDataValues({
-    data,
-    cardStyle,
-    defaultValues: CAROUSEL_DEFAULT_VALUES,
-    styleValuesMap: CAROUSEL_STYLE_VALUES,
-  });
+  } = animatedData;
 
-  const height = imageHeight + marginVertical * 2 + borderWidth * 2;
+  const cardModuleBackgroundStyle = useAnimatedStyle(() => {
+    const imageHeightValue =
+      typeof imageHeight === 'number' ? imageHeight : imageHeight?.value ?? 0;
+    const marginVerticalValue =
+      typeof marginVertical === 'number'
+        ? marginVertical
+        : marginVertical?.value ?? 0;
+    const borderWidthValue =
+      typeof borderWidth === 'number' ? borderWidth : borderWidth?.value ?? 0;
+
+    return {
+      height: imageHeightValue + marginVerticalValue * 2 + borderWidthValue * 2,
+    };
+  }, [imageHeight, marginVertical, borderWidth]);
+
+  const containerStyle = useAnimatedStyle(() => {
+    return {
+      paddingVertical:
+        typeof marginVertical === 'number'
+          ? marginVertical
+          : marginVertical?.value ?? 0,
+      paddingHorizontal:
+        typeof marginHorizontal === 'number'
+          ? marginHorizontal
+          : marginHorizontal?.value ?? 0,
+      columnGap: typeof gap === 'number' ? gap : gap?.value ?? 0,
+      height: '100%',
+      flexDirection: 'row',
+    };
+  }, [marginVertical, marginHorizontal, gap]);
+
+  const imageStyle = useAnimatedStyle(
+    () => ({
+      height:
+        typeof imageHeight === 'number' ? imageHeight : imageHeight?.value ?? 0,
+      borderRadius:
+        typeof borderRadius === 'number'
+          ? borderRadius
+          : borderRadius?.value ?? 0,
+      borderWidth:
+        typeof borderWidth === 'number' ? borderWidth : borderWidth?.value ?? 0,
+    }),
+    [imageHeight, borderRadius, borderWidth],
+  );
+
   // const modal = useRef<CarouselFullscrenActions>(null);
 
   return (
@@ -117,33 +226,29 @@ const CarouselRenderer = ({
       )}
       patternColor={swapColor(backgroundStyle?.patternColor, colorPalette)}
       resizeMode={background?.resizeMode}
-      style={[{ height }, style]}
+      style={[cardModuleBackgroundStyle, style]}
     >
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
         style={{ height: '100%' }}
-        contentContainerStyle={{
-          paddingVertical: marginVertical,
-          paddingHorizontal: marginHorizontal,
-          columnGap: gap,
-          height: '100%',
-        }}
       >
-        {images?.map(image => (
-          <Image
-            key={image.id}
-            source={{ uri: image.uri }}
-            style={{
-              height: imageHeight + borderWidth * 2,
-              borderRadius,
-              borderColor: swapColor(borderColor, colorPalette),
-              borderWidth,
-              aspectRatio: squareRatio ? 1 : image.aspectRatio,
-              resizeMode: 'cover',
-            }}
-          />
-        ))}
+        <Animated.View style={containerStyle}>
+          {images?.map(image => (
+            <Animated.Image
+              key={image.id}
+              source={{ uri: image.uri }}
+              style={[
+                imageStyle,
+                {
+                  borderColor: swapColor(borderColor, colorPalette),
+                  aspectRatio: squareRatio ? 1 : image.aspectRatio,
+                  resizeMode: 'cover',
+                },
+              ]}
+            />
+          ))}
+        </Animated.View>
       </ScrollView>
     </CardModuleBackground>
   );

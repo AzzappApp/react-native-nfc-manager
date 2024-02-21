@@ -2,6 +2,7 @@ import { omit } from 'lodash';
 import { useCallback, useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { StyleSheet } from 'react-native';
+import { useSharedValue } from 'react-native-reanimated';
 import Toast from 'react-native-toast-message';
 import { graphql, useFragment, useMutation } from 'react-relay';
 import {
@@ -201,24 +202,15 @@ const PhotoWithTextAndTitleEditionScreen = ({
     contentFontFamily,
     contentFontColor,
     contentTextAlign,
-    contentVerticalSpacing,
-    contentFontSize,
     title,
     titleFontFamily,
     titleFontColor,
     titleTextAlign,
-    titleVerticalSpacing,
-    titleFontSize,
     imageMargin,
     verticalArrangement,
     horizontalArrangement,
-    gap,
-    borderRadius,
-    marginHorizontal,
-    marginVertical,
     backgroundId,
     backgroundStyle,
-    aspectRatio,
   } = data;
 
   const previewData = {
@@ -248,14 +240,147 @@ const PhotoWithTextAndTitleEditionScreen = ({
         }
       }
     `);
+
+  const [touched, setTouched] = useState(false);
+
+  const onTouched = useCallback(() => {
+    setTouched(true);
+  }, []);
+
   const isValid =
     (isNotFalsyString(title) || isNotFalsyString(content)) && image;
-  const canSave = dirty && isValid && !saving;
+  const canSave = (dirty || touched) && isValid && !saving;
 
   const router = useRouter();
   const intl = useIntl();
   const [progressIndicator, setProgressIndicator] =
     useState<Observable<number> | null>(null);
+
+  const onCancel = router.back;
+
+  // #endregion
+
+  //#region Image Picker state
+
+  const [showImagePicker, setShowImagePicker] = useState(image == null);
+
+  const onPickImage = () => {
+    setShowImagePicker(true);
+  };
+
+  const onMediaSelected = async ({
+    uri,
+    editionParameters,
+    filter,
+    width,
+    height,
+  }: ImagePickerResult) => {
+    const size = downScaleImage(width, height, MODULE_IMAGE_MAX_WIDTH);
+    const exportUri = await exportLayersToImage({
+      size,
+      quality: 95,
+      format: 'auto',
+      layers: [
+        {
+          kind: 'image',
+          uri,
+          parameters: editionParameters,
+          lutFilterUri: getFilterUri(filter),
+        },
+      ],
+    });
+    setShowImagePicker(false);
+    onImageChange({
+      uri: exportUri.startsWith('file://') ? exportUri : `file://${exportUri}`,
+      width: size.width,
+      height: size.height,
+      kind: 'image',
+    });
+  };
+
+  const onImagePickerCancel = useCallback(() => {
+    setShowImagePicker(false);
+  }, []);
+
+  //#endregion
+
+  // #region Fields edition handlers
+
+  const onImageChange = fieldUpdateHandler('image');
+
+  const onTitleFontFamilyChange = fieldUpdateHandler('titleFontFamily');
+
+  const onTitleFontColorChange = fieldUpdateHandler('titleFontColor');
+
+  const onTitleTextAlignChange = fieldUpdateHandler('titleTextAlign');
+
+  const titleFontSize = useSharedValue(data.titleFontSize ?? null);
+
+  const onContentChange = fieldUpdateHandler('content');
+
+  const titleVerticalSpacing = useSharedValue(
+    data.titleVerticalSpacing ??
+      PHOTO_WITH_TEXT_AND_TITLE_DEFAULT_VALUES.titleVerticalSpacing,
+  );
+
+  const onContentFontFamilyChange = fieldUpdateHandler('contentFontFamily');
+
+  const onContentFontColorChange = fieldUpdateHandler('contentFontColor');
+
+  const onContentTextAlignChange = fieldUpdateHandler('contentTextAlign');
+
+  const contentFontSize = useSharedValue(data.contentFontSize ?? null);
+
+  const onTitleChange = fieldUpdateHandler('title');
+
+  const contentVerticalSpacing = useSharedValue(
+    data.contentVerticalSpacing ??
+      PHOTO_WITH_TEXT_AND_TITLE_DEFAULT_VALUES.contentVerticalSpacing,
+  );
+
+  const onImageMarginChange = useCallback(() => {
+    updateFields({
+      imageMargin:
+        imageMargin === 'width_full' ? 'width_limited' : 'width_full',
+    });
+  }, [imageMargin, updateFields]);
+
+  const onVerticalArrangementChange = useCallback(() => {
+    updateFields({
+      verticalArrangement: verticalArrangement === 'top' ? 'bottom' : 'top',
+    });
+  }, [verticalArrangement, updateFields]);
+
+  const onHorizontalArrangementChange = useCallback(() => {
+    updateFields({
+      horizontalArrangement:
+        horizontalArrangement === 'left' ? 'right' : 'left',
+    });
+  }, [horizontalArrangement, updateFields]);
+
+  const borderRadius = useSharedValue(data.borderRadius ?? null);
+
+  const marginHorizontal = useSharedValue(
+    data.marginHorizontal ??
+      PHOTO_WITH_TEXT_AND_TITLE_DEFAULT_VALUES.marginHorizontal,
+  );
+
+  const marginVertical = useSharedValue(
+    data.marginVertical ??
+      PHOTO_WITH_TEXT_AND_TITLE_DEFAULT_VALUES.marginVertical,
+  );
+
+  const gap = useSharedValue(
+    data.gap ?? PHOTO_WITH_TEXT_AND_TITLE_DEFAULT_VALUES.gap,
+  );
+
+  const aspectRatio = useSharedValue(
+    data.aspectRatio ?? PHOTO_WITH_TEXT_AND_TITLE_DEFAULT_VALUES.aspectRatio,
+  );
+
+  const onBackgroundChange = fieldUpdateHandler('backgroundId');
+
+  const onBackgroundStyleChange = fieldUpdateHandler('backgroundStyle');
 
   const onSave = useCallback(async () => {
     if (!canSave) {
@@ -304,6 +429,16 @@ const PhotoWithTextAndTitleEditionScreen = ({
     const input: SavePhotoWithTextAndTitleModuleInput = {
       moduleId: photoWithTextAndTitle?.id,
       ...rest,
+      titleFontSize: titleFontSize.value,
+      titleVerticalSpacing: titleVerticalSpacing.value,
+      contentFontSize: contentFontSize.value,
+      contentVerticalSpacing: contentVerticalSpacing.value,
+      marginHorizontal: marginHorizontal.value,
+      borderRadius: borderRadius.value,
+      marginVertical: marginVertical.value,
+      gap: gap.value,
+      aspectRatio: aspectRatio.value,
+
       image: mediaId ?? value.image!.id,
       webCardId: profile.webCard.id,
     };
@@ -343,126 +478,20 @@ const PhotoWithTextAndTitleEditionScreen = ({
     canSave,
     value,
     photoWithTextAndTitle?.id,
+    titleFontSize,
+    titleVerticalSpacing,
+    contentFontSize,
+    contentVerticalSpacing,
+    marginHorizontal,
+    borderRadius,
+    marginVertical,
+    gap,
+    aspectRatio,
     profile.webCard.id,
     commit,
     intl,
     router,
   ]);
-
-  const onCancel = useCallback(() => {
-    router.back();
-  }, [router]);
-
-  // #endregion
-
-  //#region Image Picker state
-
-  const [showImagePicker, setShowImagePicker] = useState(image == null);
-
-  const onPickImage = () => {
-    setShowImagePicker(true);
-  };
-
-  const onMediaSelected = async ({
-    uri,
-    editionParameters,
-    filter,
-    width,
-    height,
-  }: ImagePickerResult) => {
-    const size = downScaleImage(width, height, MODULE_IMAGE_MAX_WIDTH);
-    const exportUri = await exportLayersToImage({
-      size,
-      quality: 95,
-      format: 'auto',
-      layers: [
-        {
-          kind: 'image',
-          uri,
-          parameters: editionParameters,
-          lutFilterUri: getFilterUri(filter),
-        },
-      ],
-    });
-    setShowImagePicker(false);
-    onImageChange({
-      uri: exportUri.startsWith('file://') ? exportUri : `file://${exportUri}`,
-      width: size.width,
-      height: size.height,
-      kind: 'image',
-    });
-  };
-
-  const onImagePickerCancel = () => {
-    setShowImagePicker(false);
-  };
-
-  //#endregion
-
-  // #region Fields edition handlers
-
-  const onImageChange = fieldUpdateHandler('image');
-
-  const onTitleFontFamilyChange = fieldUpdateHandler('titleFontFamily');
-
-  const onTitleFontColorChange = fieldUpdateHandler('titleFontColor');
-
-  const onTitleTextAlignChange = fieldUpdateHandler('titleTextAlign');
-
-  const onTitleFontSizeChange = fieldUpdateHandler('titleFontSize');
-
-  const onContentChange = fieldUpdateHandler('content');
-
-  const onTitleVerticalSpacingChange = fieldUpdateHandler(
-    'titleVerticalSpacing',
-  );
-  const onContentFontFamilyChange = fieldUpdateHandler('contentFontFamily');
-
-  const onContentFontColorChange = fieldUpdateHandler('contentFontColor');
-
-  const onContentTextAlignChange = fieldUpdateHandler('contentTextAlign');
-
-  const onContentFontSizeChange = fieldUpdateHandler('contentFontSize');
-
-  const onTitleChange = fieldUpdateHandler('title');
-
-  const onContentVerticalSpacingChange = fieldUpdateHandler(
-    'contentVerticalSpacing',
-  );
-
-  const onImageMarginChange = useCallback(() => {
-    updateFields({
-      imageMargin:
-        imageMargin === 'width_full' ? 'width_limited' : 'width_full',
-    });
-  }, [imageMargin, updateFields]);
-
-  const onVerticalArrangementChange = useCallback(() => {
-    updateFields({
-      verticalArrangement: verticalArrangement === 'top' ? 'bottom' : 'top',
-    });
-  }, [verticalArrangement, updateFields]);
-
-  const onHorizontalArrangementChange = useCallback(() => {
-    updateFields({
-      horizontalArrangement:
-        horizontalArrangement === 'left' ? 'right' : 'left',
-    });
-  }, [horizontalArrangement, updateFields]);
-
-  const onBorderRadiusChange = fieldUpdateHandler('borderRadius');
-
-  const onMarginHorizontalChange = fieldUpdateHandler('marginHorizontal');
-
-  const onMarginVerticalChange = fieldUpdateHandler('marginVertical');
-
-  const onAspectRatioChange = fieldUpdateHandler('aspectRatio');
-
-  const onGapChange = fieldUpdateHandler('gap');
-
-  const onBackgroundChange = fieldUpdateHandler('backgroundId');
-
-  const onBackgroundStyleChange = fieldUpdateHandler('backgroundStyle');
 
   // #endregion
 
@@ -530,6 +559,17 @@ const PhotoWithTextAndTitleEditionScreen = ({
         <PhotoWithTextAndTitlePreview
           style={{ height: topPanelHeight - 20, marginVertical: 10 }}
           data={previewData}
+          animatedData={{
+            aspectRatio,
+            borderRadius,
+            gap,
+            marginHorizontal,
+            marginVertical,
+            titleFontSize,
+            titleVerticalSpacing,
+            contentFontSize,
+            contentVerticalSpacing,
+          }}
           colorPalette={profile?.webCard.cardColors}
           cardStyle={profile?.webCard.cardStyle}
         />
@@ -555,9 +595,7 @@ const PhotoWithTextAndTitleEditionScreen = ({
                 titleTextAlign={titleTextAlign}
                 onTitleTextAlignChange={onTitleTextAlignChange}
                 titleFontSize={titleFontSize}
-                onTitleFontSizeChange={onTitleFontSizeChange}
                 titleVerticalSpacing={titleVerticalSpacing}
-                onTitleVerticalSpacingChange={onTitleVerticalSpacingChange}
                 contentFontFamily={contentFontFamily}
                 onContentFontFamilyChange={onContentFontFamilyChange}
                 contentFontColor={contentFontColor}
@@ -565,9 +603,8 @@ const PhotoWithTextAndTitleEditionScreen = ({
                 contentTextAlign={contentTextAlign}
                 onContentTextAlignChange={onContentTextAlignChange}
                 contentFontSize={contentFontSize}
-                onContentFontSizeChange={onContentFontSizeChange}
                 contentVerticalSpacing={contentVerticalSpacing}
-                onContentVerticalSpacingChange={onContentVerticalSpacingChange}
+                onTouched={onTouched}
               />
             ),
           },
@@ -582,13 +619,12 @@ const PhotoWithTextAndTitleEditionScreen = ({
                 verticalArrangement={verticalArrangement}
                 onVerticalArrangementChange={onVerticalArrangementChange}
                 borderRadius={borderRadius}
-                onBorderRadiusChange={onBorderRadiusChange}
                 aspectRatio={aspectRatio}
-                onAspectRatioChange={onAspectRatioChange}
                 style={{
                   flex: 1,
                   marginBottom: insetBottom + BOTTOM_MENU_HEIGHT,
                 }}
+                onTouched={onTouched}
               />
             ),
           },
@@ -598,15 +634,13 @@ const PhotoWithTextAndTitleEditionScreen = ({
             element: (
               <PhotoWithTextAndTitleMarginsEditionPanel
                 marginHorizontal={marginHorizontal}
-                onMarginHorizontalChange={onMarginHorizontalChange}
                 marginVertical={marginVertical}
-                onMarginVerticalChange={onMarginVerticalChange}
                 gap={gap}
-                onGapChange={onGapChange}
                 style={{
                   flex: 1,
                   marginBottom: insetBottom + BOTTOM_MENU_HEIGHT,
                 }}
+                onTouched={onTouched}
               />
             ),
           },

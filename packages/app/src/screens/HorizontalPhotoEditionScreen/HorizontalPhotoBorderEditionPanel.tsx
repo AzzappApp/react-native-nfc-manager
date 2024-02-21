@@ -13,6 +13,7 @@ import ColorPreview from '#ui/ColorPreview';
 import LabeledDashedSlider from '#ui/LabeledDashedSlider';
 import TabsBar from '#ui/TabsBar';
 import type { HorizontalPhotoBorderEditionPanel_webCard$key } from '#relayArtifacts/HorizontalPhotoBorderEditionPanel_webCard.graphql';
+import type { SharedValue } from 'react-native-reanimated';
 import type { ViewProps } from 'react-native-svg/lib/typescript/fabric/utils';
 
 type HorizontalPhotoBorderEditionPanelProps = ViewProps & {
@@ -23,21 +24,11 @@ type HorizontalPhotoBorderEditionPanelProps = ViewProps & {
   /**
    * The borderWidth currently set on the module
    */
-  borderWidth: number;
-  /**
-   * A callback called when the user update the borderWidth
-   */
-  onBorderWidthChange: (borderWidth: number) => void;
-
+  borderWidth: SharedValue<number>;
   /**
    * The borderRadius currently set on the module
    */
-  borderRadius: number;
-  /**
-   * A callback called when the user update the borderRadius
-   */
-  onBorderRadiusChange: (borderRadius: number) => void;
-
+  borderRadius: SharedValue<number>;
   /**
    * The borderColor currently set on the module
    */
@@ -50,6 +41,8 @@ type HorizontalPhotoBorderEditionPanelProps = ViewProps & {
    * The height of the bottom sheet
    */
   bottomSheetHeight: number;
+
+  onTouched: () => void;
 };
 
 /**
@@ -57,14 +50,13 @@ type HorizontalPhotoBorderEditionPanelProps = ViewProps & {
  */
 const HorizontalPhotoBorderEditionPanel = ({
   borderWidth,
-  onBorderWidthChange,
   borderRadius,
-  onBorderRadiusChange,
   borderColor,
   onBorderColorChange,
   webCard: webCardKey,
   bottomSheetHeight,
   style,
+  onTouched,
   ...props
 }: HorizontalPhotoBorderEditionPanelProps) => {
   const intl = useIntl();
@@ -126,11 +118,10 @@ const HorizontalPhotoBorderEditionPanel = ({
               description="Border size message in Horizontal Photo edition"
             />
           }
-          initialValue={borderWidth}
+          value={borderWidth}
           min={0}
           max={HORIZONTAL_PHOTO_MAX_BORDER_WIDTH}
           step={1}
-          onChange={onBorderWidthChange}
           accessibilityLabel={intl.formatMessage({
             defaultMessage: 'Border size',
             description:
@@ -142,6 +133,7 @@ const HorizontalPhotoBorderEditionPanel = ({
               'Hint of the Border size slider in HorizontalPhoto edition',
           })}
           style={styles.slider}
+          onTouched={onTouched}
         />
         <LabeledDashedSlider
           label={
@@ -150,11 +142,10 @@ const HorizontalPhotoBorderEditionPanel = ({
               description="Border radius message in Horizontal Photo edition"
             />
           }
-          initialValue={borderRadius}
+          value={borderRadius}
           min={0}
           max={HORIZONTAL_PHOTO_MAX_BORDER_RADIUS}
           step={1}
-          onChange={onBorderRadiusChange}
           accessibilityLabel={intl.formatMessage({
             defaultMessage: 'Image border radius size',
             description:
@@ -166,6 +157,7 @@ const HorizontalPhotoBorderEditionPanel = ({
               'Hint of the Border radius slider in HorizontalPhoto edition',
           })}
           style={styles.slider}
+          onTouched={onTouched}
         />
         {webCard && (
           <WebCardColorPicker

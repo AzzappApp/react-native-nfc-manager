@@ -1,6 +1,7 @@
 import { useCallback, useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { StyleSheet } from 'react-native';
+import { useSharedValue } from 'react-native-reanimated';
 import Toast from 'react-native-toast-message';
 import { graphql, useFragment, useMutation } from 'react-relay';
 import { LINE_DIVIDER_DEFAULT_VALUES } from '@azzapp/shared/cardModuleHelpers';
@@ -105,14 +106,7 @@ const LineDividerEditionScreen = ({
       defaultValues: LINE_DIVIDER_DEFAULT_VALUES,
     });
 
-  const {
-    orientation,
-    marginBottom,
-    marginTop,
-    height,
-    colorTop,
-    colorBottom,
-  } = data;
+  const { orientation, colorTop, colorBottom } = data;
   // #endregion
 
   // #region Mutations and saving logic
@@ -134,10 +128,44 @@ const LineDividerEditionScreen = ({
       }
     `);
 
-  const canSave = (dirty || lineDivider == null) && !saving;
+  const [touched, setTouched] = useState(false);
+
+  const onTouched = useCallback(() => {
+    setTouched(true);
+  }, []);
+
+  const canSave = (dirty || lineDivider == null || touched) && !saving;
 
   const router = useRouter();
   const intl = useIntl();
+
+  const onCancel = router.back;
+
+  // #endregion
+
+  // #region Fields edition handlers
+  const onOrientationChange = () => {
+    updateFields({
+      orientation: orientation === 'bottomRight' ? 'topLeft' : 'bottomRight',
+    });
+  };
+
+  const height = useSharedValue(
+    data.height ?? LINE_DIVIDER_DEFAULT_VALUES.height,
+  );
+
+  const onColorTopChange = fieldUpdateHandler('colorTop');
+
+  const onColorBottomChange = fieldUpdateHandler('colorBottom');
+
+  const marginTop = useSharedValue(
+    data.marginTop ?? LINE_DIVIDER_DEFAULT_VALUES.marginTop,
+  );
+
+  const marginBottom = useSharedValue(
+    data.marginBottom ?? LINE_DIVIDER_DEFAULT_VALUES.marginBottom,
+  );
+
   const onSave = useCallback(() => {
     if (!canSave || !webCard) {
       return;
@@ -146,9 +174,12 @@ const LineDividerEditionScreen = ({
     commit({
       variables: {
         input: {
+          ...value,
+          height: height.value,
+          marginBottom: marginBottom.value,
+          marginTop: marginTop.value,
           webCardId: webCard.id,
           moduleId: lineDivider?.id,
-          ...value,
         },
       },
       onCompleted() {
@@ -167,30 +198,18 @@ const LineDividerEditionScreen = ({
         });
       },
     });
-  }, [canSave, webCard, commit, lineDivider?.id, value, router, intl]);
-
-  const onCancel = useCallback(() => {
-    router.back();
-  }, [router]);
-
-  // #endregion
-
-  // #region Fields edition handlers
-  const onOrientationChange = () => {
-    updateFields({
-      orientation: orientation === 'bottomRight' ? 'topLeft' : 'bottomRight',
-    });
-  };
-
-  const onHeightChange = fieldUpdateHandler('height');
-
-  const onColorTopChange = fieldUpdateHandler('colorTop');
-
-  const onColorBottomChange = fieldUpdateHandler('colorBottom');
-
-  const onMarginBottomChange = fieldUpdateHandler('marginBottom');
-
-  const onMarginTopChange = fieldUpdateHandler('marginTop');
+  }, [
+    canSave,
+    webCard,
+    commit,
+    height,
+    marginBottom,
+    marginTop,
+    lineDivider?.id,
+    value,
+    router,
+    intl,
+  ]);
 
   // #endregion
 
@@ -260,6 +279,11 @@ const LineDividerEditionScreen = ({
         data={data}
         colorPalette={webCard?.cardColors}
         cardStyle={webCard?.cardStyle}
+        animatedData={{
+          height,
+          marginTop,
+          marginBottom,
+        }}
       />
       <TabView
         style={{ height: bottomPanelHeight }}
@@ -270,7 +294,7 @@ const LineDividerEditionScreen = ({
             element: (
               <LineDividerSettingsEditionPanel
                 height={height}
-                onHeightChange={onHeightChange}
+                onTouched={onTouched}
                 orientation={orientation}
                 onOrientationChange={onOrientationChange}
               />
@@ -280,10 +304,9 @@ const LineDividerEditionScreen = ({
             id: 'margins',
             element: (
               <LineDividerMarginEditionPanel
-                marginBottom={marginBottom ?? 0}
-                marginTop={marginTop ?? 0}
-                onMarginBottomChange={onMarginBottomChange}
-                onMarginTopChange={onMarginTopChange}
+                marginBottom={marginBottom}
+                marginTop={marginTop}
+                onTouched={onTouched}
                 style={{
                   flex: 1,
                   marginBottom: insetBottom + BOTTOM_MENU_HEIGHT,

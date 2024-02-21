@@ -8,6 +8,7 @@ import Animated, {
   Extrapolation,
   clamp,
   interpolate,
+  runOnJS,
   useAnimatedStyle,
   useSharedValue,
   withTiming,
@@ -25,7 +26,8 @@ export type DashedSliderProps = ViewProps & {
   max: number;
   step: number;
   interval?: number;
-  onChange: (value: number) => void;
+  onTouched?: () => void;
+  onChange?: (value: number) => void;
 };
 
 const DashedSlider = ({
@@ -37,6 +39,7 @@ const DashedSlider = ({
   onChange,
   interval: chosenInterval,
   style,
+  onTouched,
   ...props
 }: DashedSliderProps) => {
   const windowWidth = useWindowDimensions().width;
@@ -47,10 +50,12 @@ const DashedSlider = ({
 
   const animationOffsetValue = useSharedValue(0);
 
+  const hasBeenTouched = useSharedValue(false);
+
   const animationActive = useSharedValue(false);
 
   useInterval(() => {
-    if (!animationActive.value) {
+    if (!animationActive.value || !onChange) {
       return;
     }
     onChange(Math.round(pan.value / step) * step);
@@ -60,6 +65,12 @@ const DashedSlider = ({
     .onBegin(() => {
       animationOffsetValue.value = pan.value;
       animationActive.value = true;
+      if (!hasBeenTouched.value) {
+        hasBeenTouched.value = true;
+        if (onTouched) {
+          runOnJS(onTouched)();
+        }
+      }
     })
     .onUpdate(e => {
       const dval = step * (e.translationX / computedInterval);

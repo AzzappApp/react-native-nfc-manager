@@ -1,6 +1,7 @@
 import { useCallback } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { StyleSheet, View } from 'react-native';
+import { useSharedValue } from 'react-native-reanimated';
 import { useFragment, graphql } from 'react-relay';
 import { WebCardBoundEditorLayerSelectorPanel } from '#components/EditorLayerSelectorPanel';
 import LabeledDashedSlider from '#ui/LabeledDashedSlider';
@@ -42,6 +43,8 @@ type BlockTextTextBackgroundEditionPanelProps = ViewProps & {
    * The height of the bottom sheet
    */
   bottomSheetHeight: number;
+
+  onTouched: () => void;
 };
 
 /**
@@ -54,6 +57,7 @@ const BlockTextTextBackgroundEditionPanel = ({
   onTextBackgroundChange,
   onTextBackgroundStyleChange,
   bottomSheetHeight,
+  onTouched,
   ...props
 }: BlockTextTextBackgroundEditionPanelProps) => {
   const profile = useFragment(
@@ -73,6 +77,8 @@ const BlockTextTextBackgroundEditionPanel = ({
   const textBackgroundColor = textBackgroundStyle?.backgroundColor ?? '#FFFFFF';
   const patternColor = textBackgroundStyle?.patternColor ?? '#000000';
   const opacity = textBackgroundStyle?.opacity ?? 100;
+
+  const textBackgroundOpacity = useSharedValue(opacity);
 
   const onColorChange = useCallback(
     (color: 'backgroundColor' | 'tintColor', value: string) => {
@@ -103,6 +109,7 @@ const BlockTextTextBackgroundEditionPanel = ({
     },
     [onTextBackgroundStyleChange, patternColor, textBackgroundColor],
   );
+
   const intl = useIntl();
 
   return (
@@ -133,10 +140,11 @@ const BlockTextTextBackgroundEditionPanel = ({
             description="Photo Opacity message in BlockText edition"
           />
         }
-        initialValue={opacity}
+        value={textBackgroundOpacity}
         min={0}
         max={100}
         step={1}
+        onTouched={onTouched}
         onChange={onOpacityChange}
         accessibilityLabel={intl.formatMessage({
           defaultMessage: 'TextBackground opacity',

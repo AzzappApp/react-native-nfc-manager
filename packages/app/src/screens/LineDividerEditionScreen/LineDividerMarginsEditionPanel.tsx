@@ -6,25 +6,20 @@ import {
 } from '@azzapp/shared/cardModuleHelpers';
 import LabeledDashedSlider from '#ui/LabeledDashedSlider';
 import TitleWithLine from '#ui/TitleWithLine';
+import type { SharedValue } from 'react-native-reanimated';
 import type { ViewProps } from 'react-native-svg/lib/typescript/fabric/utils';
 
 type LineDividerMarginEditionPanelProps = ViewProps & {
   /**
    * The horizontal margin currently set on the module
    */
-  marginBottom: number;
+  marginBottom: SharedValue<number>;
   /**
    * The vertical margin currently set on the module
    */
-  marginTop: number;
-  /**
-   * A callback called when the user update the horizontal margin
-   */
-  onMarginBottomChange: (marginBottom: number) => void;
-  /**
-   * A callback called when the user update the vertical margin
-   */
-  onMarginTopChange: (marginTop: number) => void;
+  marginTop: SharedValue<number>;
+
+  onTouched: () => void;
 };
 
 /**
@@ -33,9 +28,8 @@ type LineDividerMarginEditionPanelProps = ViewProps & {
 const LineDividerMarginEditionPanel = ({
   marginBottom,
   marginTop,
-  onMarginTopChange,
-  onMarginBottomChange,
   style,
+  onTouched,
   ...props
 }: LineDividerMarginEditionPanelProps) => {
   const intl = useIntl();
@@ -56,11 +50,10 @@ const LineDividerMarginEditionPanel = ({
               description="Top margin message in Line Divider edition"
             />
           }
-          initialValue={marginTop}
+          value={marginTop}
           min={0}
           max={LINE_DIVIDER_MAX_MARGIN_TOP}
           step={1}
-          onChange={onMarginTopChange}
           accessibilityLabel={intl.formatMessage({
             defaultMessage: 'Top Margin size',
             description:
@@ -72,6 +65,7 @@ const LineDividerMarginEditionPanel = ({
               'Hint of the top margin slider in Line Divider edition',
           })}
           style={styles.slider}
+          onTouched={onTouched}
         />
         <LabeledDashedSlider
           label={
@@ -80,11 +74,10 @@ const LineDividerMarginEditionPanel = ({
               description="Bottom margin message in Line Divider edition"
             />
           }
-          initialValue={marginBottom}
+          value={marginBottom}
           min={0}
           max={LINE_DIVIDER_MAX_MARGIN_BOTTOM}
           step={1}
-          onChange={onMarginBottomChange}
           accessibilityLabel={intl.formatMessage({
             defaultMessage: 'Bottom Margin size',
             description:
@@ -96,6 +89,7 @@ const LineDividerMarginEditionPanel = ({
               'Hint of the bottom margin slider in Line Divider edition',
           })}
           style={styles.slider}
+          onTouched={onTouched}
         />
       </View>
     </View>

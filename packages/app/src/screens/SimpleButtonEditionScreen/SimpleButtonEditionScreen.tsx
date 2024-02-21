@@ -1,8 +1,8 @@
-import { omit } from 'lodash';
 import { useCallback, useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { StyleSheet } from 'react-native';
 import { KeyboardAvoidingView } from 'react-native-keyboard-controller';
+import { useSharedValue } from 'react-native-reanimated';
 import Toast from 'react-native-toast-message';
 import { graphql, useFragment, useMutation } from 'react-relay';
 import * as z from 'zod';
@@ -184,26 +184,40 @@ const SimpleButtonEditionScreen = ({
     actionLink,
     fontFamily,
     fontColor,
-    fontSize,
     buttonColor,
     borderColor,
-    borderWidth,
-    borderRadius,
-    marginTop,
-    marginBottom,
-    width,
-    height,
     backgroundId,
     backgroundStyle,
   } = data;
 
-  const previewData = {
-    ...omit(data, 'backgroundId'),
-    background:
-      profile.moduleBackgrounds.find(
-        background => background.id === backgroundId,
-      ) ?? null,
-  };
+  const previewData = useMemo(
+    () => ({
+      buttonLabel,
+      actionType,
+      actionLink,
+      fontFamily,
+      fontColor,
+      buttonColor,
+      borderColor,
+      backgroundStyle,
+      background:
+        profile.moduleBackgrounds.find(
+          background => background.id === backgroundId,
+        ) ?? null,
+    }),
+    [
+      buttonLabel,
+      actionType,
+      actionLink,
+      fontFamily,
+      fontColor,
+      buttonColor,
+      borderColor,
+      backgroundStyle,
+      backgroundId,
+      profile.moduleBackgrounds,
+    ],
+  );
   // #endregion
 
   // #region Mutations and saving logic
@@ -226,10 +240,54 @@ const SimpleButtonEditionScreen = ({
     `);
   const isValid = actionTypeSchema.safeParse(value).success;
 
-  const canSave = dirty && isValid && !saving;
+  const [touched, setTouched] = useState(false);
+
+  const onTouched = useCallback(() => {
+    setTouched(true);
+  }, []);
+
+  const canSave = (dirty || touched) && isValid && !saving;
 
   const router = useRouter();
   const intl = useIntl();
+
+  const onCancel = router.back;
+
+  // #endregion
+
+  // #region Fields edition handlers
+
+  const onButtonLabelChange = fieldUpdateHandler('buttonLabel');
+
+  const onActionTypeChange = fieldUpdateHandler('actionType');
+
+  const onActionLinkChange = fieldUpdateHandler('actionLink');
+
+  const onFontFamilyChange = fieldUpdateHandler('fontFamily');
+
+  const onFontColorChange = fieldUpdateHandler('fontColor');
+
+  const fontSize = useSharedValue(data.fontSize ?? null);
+
+  const onButtonColorChange = fieldUpdateHandler('buttonColor');
+
+  const onBordercolorChange = fieldUpdateHandler('borderColor');
+
+  const borderWidth = useSharedValue(data.borderWidth ?? null);
+
+  const borderRadius = useSharedValue(data.borderRadius ?? null);
+
+  const marginTop = useSharedValue(data.marginTop ?? null);
+
+  const marginBottom = useSharedValue(data.marginBottom ?? null);
+
+  const width = useSharedValue(data.width ?? null);
+
+  const height = useSharedValue(data.height ?? null);
+
+  const onBackgroundChange = fieldUpdateHandler('backgroundId');
+
+  const onBackgroundStyleChange = fieldUpdateHandler('backgroundStyle');
 
   const onSave = useCallback(async () => {
     if (!canSave || !profile.webCard) {
@@ -243,6 +301,13 @@ const SimpleButtonEditionScreen = ({
       actionType: value.actionType!,
       actionLink: value.actionLink!,
       webCardId: profile.webCard.id,
+      fontSize: fontSize.value,
+      borderWidth: borderWidth.value,
+      borderRadius: borderRadius.value,
+      marginTop: marginTop.value,
+      marginBottom: marginBottom.value,
+      width: width.value,
+      height: height.value,
     };
 
     commit({
@@ -263,47 +328,22 @@ const SimpleButtonEditionScreen = ({
         });
       },
     });
-  }, [canSave, profile.webCard, value, simpleButton?.id, commit, router, intl]);
-
-  const onCancel = useCallback(() => {
-    router.back();
-  }, [router]);
-
-  // #endregion
-
-  // #region Fields edition handlers
-
-  const onButtonLabelChange = fieldUpdateHandler('buttonLabel');
-
-  const onActionTypeChange = fieldUpdateHandler('actionType');
-
-  const onActionLinkChange = fieldUpdateHandler('actionLink');
-
-  const onFontFamilyChange = fieldUpdateHandler('fontFamily');
-
-  const onFontColorChange = fieldUpdateHandler('fontColor');
-
-  const onFontSizeChange = fieldUpdateHandler('fontSize');
-
-  const onButtonColorChange = fieldUpdateHandler('buttonColor');
-
-  const onBordercolorChange = fieldUpdateHandler('borderColor');
-
-  const onBorderwidthChange = fieldUpdateHandler('borderWidth');
-
-  const onBorderradiusChange = fieldUpdateHandler('borderRadius');
-
-  const onMargintopChange = fieldUpdateHandler('marginTop');
-
-  const onMarginbottomChange = fieldUpdateHandler('marginBottom');
-
-  const onWidthChange = fieldUpdateHandler('width');
-
-  const onHeightChange = fieldUpdateHandler('height');
-
-  const onBackgroundChange = fieldUpdateHandler('backgroundId');
-
-  const onBackgroundStyleChange = fieldUpdateHandler('backgroundStyle');
+  }, [
+    canSave,
+    profile.webCard,
+    value,
+    simpleButton?.id,
+    fontSize,
+    borderWidth,
+    borderRadius,
+    marginTop,
+    marginBottom,
+    width,
+    height,
+    commit,
+    router,
+    intl,
+  ]);
 
   // #endregion
 
@@ -356,6 +396,15 @@ const SimpleButtonEditionScreen = ({
         <SimpleButtonPreview
           style={{ height: topPanelHeight - 20, marginVertical: 10 }}
           data={previewData}
+          animatedData={{
+            fontSize,
+            borderWidth,
+            borderRadius,
+            marginTop,
+            marginBottom,
+            width,
+            height,
+          }}
           colorPalette={profile?.webCard.cardColors}
           cardStyle={profile?.webCard.cardStyle}
         />
@@ -379,7 +428,6 @@ const SimpleButtonEditionScreen = ({
                   fontColor={fontColor}
                   onFontColorChange={onFontColorChange}
                   fontSize={fontSize}
-                  onFontSizeChange={onFontSizeChange}
                   buttonColor={buttonColor}
                   onButtonColorChange={onButtonColorChange}
                   style={{
@@ -387,6 +435,7 @@ const SimpleButtonEditionScreen = ({
                     marginBottom: insetBottom + BOTTOM_MENU_HEIGHT,
                   }}
                   bottomSheetHeight={bottomPanelHeight}
+                  onTouched={onTouched}
                 />
               ),
             },
@@ -398,14 +447,13 @@ const SimpleButtonEditionScreen = ({
                   borderColor={borderColor}
                   onBorderColorChange={onBordercolorChange}
                   borderWidth={borderWidth}
-                  onBorderWidthChange={onBorderwidthChange}
                   borderRadius={borderRadius}
-                  onBorderRadiusChange={onBorderradiusChange}
                   style={{
                     flex: 1,
                     marginBottom: insetBottom + BOTTOM_MENU_HEIGHT,
                   }}
                   bottomSheetHeight={bottomPanelHeight}
+                  onTouched={onTouched}
                 />
               ),
             },
@@ -414,17 +462,14 @@ const SimpleButtonEditionScreen = ({
               element: (
                 <SimpleButtonMarginsEditionPanel
                   marginTop={marginTop}
-                  onMargintopChange={onMargintopChange}
                   marginBottom={marginBottom}
-                  onMarginbottomChange={onMarginbottomChange}
                   width={width}
-                  onWidthChange={onWidthChange}
                   height={height}
-                  onHeightChange={onHeightChange}
                   style={{
                     flex: 1,
                     marginBottom: insetBottom + BOTTOM_MENU_HEIGHT,
                   }}
+                  onTouched={onTouched}
                 />
               ),
             },

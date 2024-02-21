@@ -1,27 +1,16 @@
 import { useIntl } from 'react-intl';
 import SimpleTextRenderer from '#components/cardModules/SimpleTextRenderer';
 import EditorScaledPreview from '#components/EditorScaledPreview';
-import type { SimpleTextRendererData } from '#components/cardModules/SimpleTextRenderer';
-import type { CardStyle, ColorPalette } from '@azzapp/shared/cardHelpers';
-import type { ViewProps } from 'react-native';
+import type { SimpleTextRendererProps } from '#components/cardModules/SimpleTextRenderer';
 
-type SimpleTextPreviewProps = ViewProps & {
-  /**
-   * the data of the module to preview.
-   */
-  data: SimpleTextRendererData;
-  /**
-   * the color palette
-   */
-  colorPalette: ColorPalette | null | undefined;
-  /**
-   * the card style
-   */
-  cardStyle: CardStyle | null | undefined;
+type SimpleTextPreviewProps = Pick<
+  SimpleTextRendererProps,
+  'animatedData' | 'cardStyle' | 'colorPalette' | 'data' | 'style'
+> & {
   /**
    * A callback that is called when the module preview is pressed.
    */
-  onPreviewPress: () => void;
+  onPreviewPress?: () => void;
 };
 
 /**
@@ -32,6 +21,7 @@ const SimpleTextPreview = ({
   colorPalette,
   cardStyle,
   onPreviewPress,
+  animatedData,
   ...props
 }: SimpleTextPreviewProps) => {
   const intl = useIntl();
@@ -56,6 +46,7 @@ const SimpleTextPreview = ({
     <EditorScaledPreview onPreviewPress={onPreviewPress} {...props}>
       <SimpleTextRenderer
         data={moduleData}
+        animatedData={animatedData}
         colorPalette={colorPalette}
         cardStyle={cardStyle}
       />

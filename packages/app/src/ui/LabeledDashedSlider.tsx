@@ -1,17 +1,18 @@
 import { type ReactNode } from 'react';
 import { StyleSheet, View } from 'react-native';
-import { useDerivedValue, useSharedValue } from 'react-native-reanimated';
+import { useDerivedValue } from 'react-native-reanimated';
 import AnimatedText from '#components/AnimatedText';
 import DashedSlider, { getClampedValue } from './DashedSlider';
 import Text from './Text';
 import type { DashedSliderProps } from './DashedSlider';
+import type { SharedValue } from 'react-native-reanimated';
 
 export type LabeledDashedSliderProps = Omit<
   DashedSliderProps,
   'sharedValue'
 > & {
   label?: ReactNode;
-  initialValue: number;
+  value: SharedValue<number>;
   formatValue?: (value: number) => number | string;
 };
 
@@ -30,24 +31,23 @@ function getPrecision(a: number) {
 const LabeledDashedSlider = ({
   label,
   variant,
-  initialValue,
+  value,
   min,
   max,
   step,
   interval,
-  onChange,
   formatValue,
+  onTouched,
+  onChange,
   ...props
 }: LabeledDashedSliderProps) => {
-  const sharedValue = useSharedValue(initialValue);
-
   const textValue = useDerivedValue(() => {
     return formatValue
-      ? `${formatValue(getClampedValue(sharedValue.value, step, min, max))}`
-      : getClampedValue(sharedValue.value, step, min, max).toFixed(
+      ? `${formatValue(getClampedValue(value.value, step, min, max))}`
+      : getClampedValue(value.value, step, min, max).toFixed(
           getPrecision(step),
         );
-  }, [sharedValue, formatValue]);
+  }, [value, formatValue]);
 
   return (
     <View {...props}>
@@ -61,11 +61,12 @@ const LabeledDashedSlider = ({
       </View>
       <DashedSlider
         variant={variant}
-        sharedValue={sharedValue}
+        sharedValue={value}
         min={min}
         max={max}
         step={step}
         interval={interval}
+        onTouched={onTouched}
         onChange={onChange}
       />
     </View>

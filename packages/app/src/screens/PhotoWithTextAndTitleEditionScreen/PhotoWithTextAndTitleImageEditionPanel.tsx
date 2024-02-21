@@ -15,16 +15,13 @@ import type {
 } from '#relayArtifacts/PhotoWithTextAndTitleRenderer_module.graphql';
 import type { Icons } from '#ui/Icon';
 import type { ViewProps } from 'react-native';
+import type { SharedValue } from 'react-native-reanimated';
 
 type PhotoWithTextAndTitleImageEditionPanelProps = ViewProps & {
   /**
    * The borderRadius currently set on the module
    */
-  borderRadius: number;
-  /**
-   * A callback called when the user update the borderRadius
-   */
-  onBorderRadiusChange: (borderRadius: number) => void;
+  borderRadius: SharedValue<number>;
   /**
    * The imageMargin currently set on the module
    */
@@ -52,11 +49,9 @@ type PhotoWithTextAndTitleImageEditionPanelProps = ViewProps & {
   /**
    * The aspectRatio currently set on the module
    */
-  aspectRatio: number;
-  /**
-   * A callback called when the user update the aspectRatio
-   */
-  onAspectRatioChange: (aspectRatio: number) => void;
+  aspectRatio: SharedValue<number>;
+
+  onTouched: () => void;
 };
 
 /**
@@ -64,7 +59,6 @@ type PhotoWithTextAndTitleImageEditionPanelProps = ViewProps & {
  */
 const PhotoWithTextAndTitleImageEditionPanel = ({
   borderRadius,
-  onBorderRadiusChange,
   imageMargin,
   onImageMarginChange,
   verticalArrangement,
@@ -72,8 +66,8 @@ const PhotoWithTextAndTitleImageEditionPanel = ({
   onVerticalArrangementChange,
   onHorizontalArrangementChange,
   aspectRatio,
-  onAspectRatioChange,
   style,
+  onTouched,
   ...props
 }: PhotoWithTextAndTitleImageEditionPanelProps) => {
   const intl = useIntl();
@@ -137,11 +131,10 @@ const PhotoWithTextAndTitleImageEditionPanel = ({
               description="borderRadius message in PhotoWithTextAndTitle edition"
             />
           }
-          initialValue={borderRadius}
+          value={borderRadius}
           min={0}
           max={PHOTO_WITH_TEXT_AND_TITLE_MAX_BORDER_RADIUS}
           step={1}
-          onChange={onBorderRadiusChange}
           accessibilityLabel={intl.formatMessage({
             defaultMessage: 'Border radius',
             description:
@@ -153,6 +146,7 @@ const PhotoWithTextAndTitleImageEditionPanel = ({
               'Hint of the borderRadius slider in PhotoWithTextAndTitle edition',
           })}
           style={styles.slider}
+          onTouched={onTouched}
         />
         <LabeledDashedSlider
           label={
@@ -161,11 +155,10 @@ const PhotoWithTextAndTitleImageEditionPanel = ({
               description="Aspect ratio message in PhotoWithTextAndTitle edition"
             />
           }
-          initialValue={aspectRatio}
+          value={aspectRatio}
           min={PHOTO_WITH_TEXT_AND_TITLE_MIN_ASPECT_RATIO}
           max={PHOTO_WITH_TEXT_AND_TITLE_MAX_ASPECT_RATIO}
           step={0.01}
-          onChange={onAspectRatioChange}
           accessibilityLabel={intl.formatMessage({
             defaultMessage: 'Title size',
             description:
@@ -177,6 +170,7 @@ const PhotoWithTextAndTitleImageEditionPanel = ({
               'Hint of the Title size slider in PhotoWithTextAndTitle edition',
           })}
           style={styles.slider}
+          onTouched={onTouched}
         />
       </View>
     </View>

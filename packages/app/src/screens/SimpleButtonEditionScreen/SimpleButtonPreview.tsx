@@ -1,23 +1,14 @@
 import { useIntl } from 'react-intl';
-import SimpleButtonRenderer from '#components/cardModules/SimpleButtonRenderer';
+import {
+  SimpleButtonRenderer,
+  type SimpleButtonRendererProps,
+} from '#components/cardModules/SimpleButtonRenderer';
 import EditorScaledPreview from '#components/EditorScaledPreview';
-import type { SimpleButtonRendererData } from '#components/cardModules/SimpleButtonRenderer';
-import type { CardStyle, ColorPalette } from '@azzapp/shared/cardHelpers';
-import type { ViewProps } from 'react-native-svg/lib/typescript/fabric/utils';
 
-type SimpleButtonPreviewProps = ViewProps & {
-  /**
-   * the data of the module to preview.
-   */
-  data: SimpleButtonRendererData;
-  /**
-   * the color palette
-   */
-  colorPalette: ColorPalette | null | undefined;
-  /**
-   * the card style
-   */
-  cardStyle: CardStyle | null | undefined;
+type SimpleButtonPreviewProps = Pick<
+  SimpleButtonRendererProps,
+  'animatedData' | 'cardStyle' | 'colorPalette' | 'data' | 'style'
+> & {
   /**
    * A callback that is called when the module preview is pressed.
    */
@@ -29,6 +20,7 @@ type SimpleButtonPreviewProps = ViewProps & {
  */
 const SimpleButtonPreview = ({
   data,
+  animatedData,
   colorPalette,
   cardStyle,
   onPreviewPress,
@@ -44,12 +36,14 @@ const SimpleButtonPreview = ({
         description: 'Placeholder for button that has no label yet',
       }),
   };
+
   return (
     <EditorScaledPreview onPreviewPress={onPreviewPress} {...props}>
       <SimpleButtonRenderer
         cardStyle={cardStyle}
         colorPalette={colorPalette}
         data={moduleData}
+        animatedData={animatedData}
         disabled
       />
     </EditorScaledPreview>

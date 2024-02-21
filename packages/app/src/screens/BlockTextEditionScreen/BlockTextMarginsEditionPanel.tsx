@@ -10,40 +10,27 @@ import LabeledDashedSlider from '#ui/LabeledDashedSlider';
 
 import TitleWithLine from '#ui/TitleWithLine';
 import type { ViewProps } from 'react-native';
+import type { SharedValue } from 'react-native-reanimated';
 
 type BlockTextMarginsEditionPanelProps = ViewProps & {
   /**
    * The textMarginVertical currently set on the module
    */
-  textMarginVertical: number;
-  /**
-   * A callback called when the user update the textMarginVertical
-   */
-  onTextMarginVerticalChange: (textMarginVertical: number) => void;
+  textMarginVertical: SharedValue<number>;
   /**
    * The textMarginHorizontal currently set on the module
    */
-  textMarginHorizontal: number;
-  /**
-   * A callback called when the user update the textMarginHorizontal
-   */
-  onTextMarginHorizontalChange: (textMarginHorizontal: number) => void;
+  textMarginHorizontal: SharedValue<number>;
   /**
    * The marginHorizontal currently set on the module
    */
-  marginHorizontal: number;
-  /**
-   * A callback called when the user update the marginHorizontal
-   */
-  onMarginHorizontalChange: (marginHorizontal: number) => void;
+  marginHorizontal: SharedValue<number>;
   /**
    * The marginVertical currently set on the module
    */
-  marginVertical: number;
-  /**
-   * A callback called when the user update the marginVertical
-   */
-  onMarginVerticalChange: (marginVertical: number) => void;
+  marginVertical: SharedValue<number>;
+
+  onTouched: () => void;
 };
 
 /**
@@ -51,13 +38,10 @@ type BlockTextMarginsEditionPanelProps = ViewProps & {
  */
 const BlockTextMarginsEditionPanel = ({
   textMarginVertical,
-  onTextMarginVerticalChange,
   textMarginHorizontal,
-  onTextMarginHorizontalChange,
   marginHorizontal,
-  onMarginHorizontalChange,
   marginVertical,
-  onMarginVerticalChange,
+  onTouched,
   style,
   ...props
 }: BlockTextMarginsEditionPanelProps) => {
@@ -77,11 +61,11 @@ const BlockTextMarginsEditionPanel = ({
             defaultMessage: 'Text top/bottom margin :',
             description: 'Text top/bottom margin message in BlockText edition',
           })}
-          initialValue={textMarginVertical}
+          value={textMarginVertical}
           min={0}
           max={BLOCK_TEXT_TEXT_MAX_VERTICAL_MARGIN}
           step={1}
-          onChange={onTextMarginVerticalChange}
+          onTouched={onTouched}
           accessibilityLabel={intl.formatMessage({
             defaultMessage: 'Text top/bottom margin',
             description:
@@ -101,11 +85,11 @@ const BlockTextMarginsEditionPanel = ({
               description="textMarginHorizontal message in BlockText edition"
             />
           }
-          initialValue={textMarginHorizontal}
+          value={textMarginHorizontal}
           min={0}
           max={BLOCK_TEXT_TEXT_MAX_HORIZONTAL_MARGIN}
           step={1}
-          onChange={onTextMarginHorizontalChange}
+          onTouched={onTouched}
           accessibilityLabel={intl.formatMessage({
             defaultMessage: 'Text left/right margin',
             description:
@@ -132,11 +116,11 @@ const BlockTextMarginsEditionPanel = ({
                 description="Space top/bottom message in BlockText edition"
               />
             }
-            initialValue={marginVertical}
+            value={marginVertical}
             min={0}
             max={BLOCK_TEXT_MAX_VERTICAL_MARGIN}
             step={1}
-            onChange={onMarginVerticalChange}
+            onTouched={onTouched}
             accessibilityLabel={intl.formatMessage({
               defaultMessage: 'Space top/bottom',
               description:
@@ -156,11 +140,11 @@ const BlockTextMarginsEditionPanel = ({
                 description="Space left/right message in BlockText edition"
               />
             }
-            initialValue={marginHorizontal}
+            value={marginHorizontal}
             min={0}
             max={BLOCK_TEXT_MAX_HORIZONTAL_MARGIN}
             step={1}
-            onChange={onMarginHorizontalChange}
+            onTouched={onTouched}
             accessibilityLabel={intl.formatMessage({
               defaultMessage: 'Space left/right',
               description:

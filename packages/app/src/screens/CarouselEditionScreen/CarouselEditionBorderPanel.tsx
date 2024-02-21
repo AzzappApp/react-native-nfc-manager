@@ -13,12 +13,13 @@ import LabeledDashedSlider from '#ui/LabeledDashedSlider';
 import TabsBar from '#ui/TabsBar';
 import type { CarouselEditionBorderPanel_webCard$key } from '#relayArtifacts/CarouselEditionBorderPanel_webCard.graphql';
 import type { ViewProps } from 'react-native';
+import type { SharedValue } from 'react-native-reanimated';
 
 type CarouselEditionBorderPanelProps = Omit<ViewProps, 'children'> & {
   /**
    * The size of the border.
    */
-  borderWidth: number;
+  borderWidth: SharedValue<number>;
   /**
    * The color of the border.
    */
@@ -26,7 +27,7 @@ type CarouselEditionBorderPanelProps = Omit<ViewProps, 'children'> & {
   /**
    * The radius of the border.
    */
-  borderRadius: number;
+  borderRadius: SharedValue<number>;
   /**
    * The height of the bottom sheet.
    */
@@ -36,17 +37,11 @@ type CarouselEditionBorderPanelProps = Omit<ViewProps, 'children'> & {
    */
   webCard: CarouselEditionBorderPanel_webCard$key | null;
   /**
-   * Called when the user wants to change the border size.
-   */
-  onBorderSizeChange: (borderWidth: number) => void;
-  /**
    * Called when the user wants to change the border color.
    */
   onBorderColorChange: (borderColor: string) => void;
-  /**
-   * Called when the user wants to change the border radius.
-   */
-  onBorderRadiusChange: (borderRadius: number) => void;
+
+  onTouched: () => void;
 };
 
 /**
@@ -58,10 +53,9 @@ const CarouselEditionBorderPanel = ({
   borderColor,
   borderRadius,
   bottomSheetHeight,
-  onBorderSizeChange,
   onBorderColorChange,
-  onBorderRadiusChange,
   style,
+  onTouched,
   ...props
 }: CarouselEditionBorderPanelProps) => {
   const [currentTab, setCurrentTab] = useState<string>('size');
@@ -123,11 +117,11 @@ const CarouselEditionBorderPanel = ({
               description="Border size message in carousel edition"
             />
           }
-          initialValue={borderWidth}
+          value={borderWidth}
           min={0}
           max={CAROUSEL_MAX_BORDER_WIDTH}
           step={1}
-          onChange={onBorderSizeChange}
+          onTouched={onTouched}
           accessibilityLabel={intl.formatMessage({
             defaultMessage: 'Border size',
             description: 'Label of the border size in carousel edition',
@@ -145,11 +139,11 @@ const CarouselEditionBorderPanel = ({
               description="Border radius in carousel edition"
             />
           }
-          initialValue={borderRadius}
+          value={borderRadius}
+          onTouched={onTouched}
           min={0}
           max={CAROUSEL_MAX_BORDER_RADIUS}
           step={1}
-          onChange={onBorderRadiusChange}
           accessibilityLabel={intl.formatMessage({
             defaultMessage: 'Border radius',
             description: 'Label of the border radius in carousel edition',

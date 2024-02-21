@@ -1,6 +1,7 @@
 import chroma from 'chroma-js';
 import { useCallback, useMemo, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
+import Animated from 'react-native-reanimated';
 import { colors } from '#theme';
 import CardModuleBackgroundImage from './CardModuleBackgroundImage';
 import type { LayoutChangeEvent, LayoutRectangle } from 'react-native';
@@ -47,13 +48,13 @@ const CardModuleBackground = ({
   );
   return (
     <View style={{ width: '100%', position: 'relative', overflow: 'hidden' }}>
-      <View
+      <Animated.View
         {...props}
         style={[{ opacity: layout ? 1 : 0 }, style]}
         onLayout={onLayout}
       >
         {children}
-      </View>
+      </Animated.View>
       {layout && (
         <View style={backgroundImageStyle} pointerEvents="none">
           <CardModuleBackgroundImage

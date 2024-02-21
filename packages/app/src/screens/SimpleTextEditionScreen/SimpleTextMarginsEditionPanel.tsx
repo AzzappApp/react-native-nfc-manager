@@ -8,6 +8,7 @@ import {
 } from '@azzapp/shared/cardModuleHelpers';
 import LabeledDashedSlider from '#ui/LabeledDashedSlider';
 import TitleWithLine from '#ui/TitleWithLine';
+import type { SharedValue } from 'react-native-reanimated';
 import type { ViewProps } from 'react-native-svg/lib/typescript/fabric/utils';
 
 type SimpleTextMarginEditionPanelProps = ViewProps & {
@@ -18,19 +19,11 @@ type SimpleTextMarginEditionPanelProps = ViewProps & {
   /**
    * The horizontal margin currently set on the module
    */
-  marginHorizontal: number;
+  marginHorizontal: SharedValue<number>;
   /**
    * The vertical margin currently set on the module
    */
-  marginVertical: number;
-  /**
-   * A callback called when the user update the horizontal margin
-   */
-  onMarginHorizontalChange: (marginHorizontal: number) => void;
-  /**
-   * A callback called when the user update the vertical margin
-   */
-  onMarginVerticalChange: (marginVertical: number) => void;
+  marginVertical: SharedValue<number>;
 };
 
 /**
@@ -40,8 +33,6 @@ const SimpleTextMarginEditionPanel = ({
   moduleKind,
   marginHorizontal,
   marginVertical,
-  onMarginVerticalChange,
-  onMarginHorizontalChange,
   style,
   ...props
 }: SimpleTextMarginEditionPanelProps) => {
@@ -63,7 +54,7 @@ const SimpleTextMarginEditionPanel = ({
               description="Font size message in cover edition"
             />
           }
-          initialValue={marginVertical}
+          value={marginVertical}
           min={0}
           max={
             moduleKind === 'simpleText'
@@ -71,7 +62,6 @@ const SimpleTextMarginEditionPanel = ({
               : SIMPLE_TITLE_MAX_VERTICAL_MARGIN
           }
           step={1}
-          onChange={onMarginVerticalChange}
           accessibilityLabel={intl.formatMessage({
             defaultMessage: 'Margin size',
             description: 'Label of the margin size slider in cover edition',
@@ -89,7 +79,7 @@ const SimpleTextMarginEditionPanel = ({
               description="margin size message in cover edition"
             />
           }
-          initialValue={marginHorizontal}
+          value={marginHorizontal}
           min={0}
           max={
             moduleKind === 'simpleText'
@@ -97,7 +87,6 @@ const SimpleTextMarginEditionPanel = ({
               : SIMPLE_TITLE_MAX_HORIZONTAL_MARGIN
           }
           step={1}
-          onChange={onMarginHorizontalChange}
           accessibilityLabel={intl.formatMessage({
             defaultMessage: 'Margin size',
             description: 'Label of the margin size slider in cover edition',

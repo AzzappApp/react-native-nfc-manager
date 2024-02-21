@@ -1,4 +1,8 @@
-import { View, Image } from 'react-native';
+import { Image } from 'react-native';
+import Animated, {
+  useAnimatedStyle,
+  type SharedValue,
+} from 'react-native-reanimated';
 import { graphql, readInlineData } from 'react-relay';
 import { swapColor } from '@azzapp/shared/cardHelpers';
 import {
@@ -44,19 +48,51 @@ const HorizontalPhotoRendererFragment = graphql`
   }
 `;
 
+const animatedProps = [
+  'borderWidth',
+  'borderRadius',
+  'marginHorizontal',
+  'marginVertical',
+  'imageHeight',
+] as const;
+
+type AnimatedProps = (typeof animatedProps)[number];
+
 export const readHorizontalPhotoData = (
   module: HorizontalPhotoRenderer_module$key,
 ) => readInlineData(HorizontalPhotoRendererFragment, module);
 
-export type HorizontalPhotoRendererData = NullableFields<
-  Omit<HorizontalPhotoRenderer_module$data, ' $fragmentType'>
+export type HorizontalPhotoViewRendererData = Omit<
+  HorizontalPhotoRenderer_module$data,
+  ' $fragmentType'
 >;
+
+export type HorizontalPhotoRendererData = NullableFields<
+  Omit<HorizontalPhotoViewRendererData, AnimatedProps>
+>;
+
+export type HorizontalPhotoViewRendererProps = Omit<
+  HorizontalPhotoRendererProps,
+  'animatedData' | 'data'
+> & {
+  data: HorizontalPhotoViewRendererData;
+};
+
+type HorizontalPhotoRendererAnimatedData = {
+  [K in AnimatedProps]:
+    | HorizontalPhotoViewRendererData[K]
+    | SharedValue<HorizontalPhotoViewRendererData[K]>;
+};
 
 export type HorizontalPhotoRendererProps = ViewProps & {
   /**
    * The data for the HorizontalPhoto module
    */
   data: HorizontalPhotoRendererData;
+  /**
+   * The animated data for the HorizontalPhoto module
+   */
+  animatedData: HorizontalPhotoRendererAnimatedData;
   /**
    * the color palette
    */
@@ -71,33 +107,88 @@ export type HorizontalPhotoRendererProps = ViewProps & {
   contentStyle?: StyleProp<ViewStyle>;
 };
 
+export const HorizontalPhotoViewRenderer = ({
+  data,
+  ...rest
+}: HorizontalPhotoViewRendererProps) => {
+  const {
+    borderWidth,
+    borderRadius,
+    marginHorizontal,
+    marginVertical,
+    imageHeight,
+    ...restData
+  } = data;
+
+  return (
+    <HorizontalPhotoRenderer
+      {...rest}
+      data={restData}
+      animatedData={{
+        borderWidth,
+        borderRadius,
+        marginHorizontal,
+        marginVertical,
+        imageHeight,
+      }}
+    />
+  );
+};
+
 /**
  * Render a HorizontalPhoto module
  */
 const HorizontalPhotoRenderer = ({
   data,
+  animatedData,
   colorPalette,
   cardStyle,
   style,
   contentStyle,
   ...props
 }: HorizontalPhotoRendererProps) => {
+  const { borderColor, background, backgroundStyle, image } =
+    getModuleDataValues({
+      data,
+      cardStyle,
+      defaultValues: HORIZONTAL_PHOTO_DEFAULT_VALUES,
+      styleValuesMap: HORIZONTAL_PHOTO_STYLE_VALUES,
+    });
+
   const {
     borderWidth,
     borderRadius,
-    borderColor,
     marginHorizontal,
     marginVertical,
-    background,
-    backgroundStyle,
     imageHeight,
-    image,
-  } = getModuleDataValues({
-    data,
-    cardStyle,
-    defaultValues: HORIZONTAL_PHOTO_DEFAULT_VALUES,
-    styleValuesMap: HORIZONTAL_PHOTO_STYLE_VALUES,
-  });
+  } = animatedData;
+
+  const containerStyle = useAnimatedStyle(() => {
+    return {
+      height:
+        typeof imageHeight === 'number' ? imageHeight : imageHeight?.value ?? 0,
+      borderWidth:
+        typeof borderWidth === 'number' ? borderWidth : borderWidth?.value ?? 0,
+      borderRadius:
+        typeof borderRadius === 'number'
+          ? borderRadius
+          : borderRadius?.value ?? 0,
+      marginHorizontal:
+        typeof marginHorizontal === 'number'
+          ? marginHorizontal
+          : marginHorizontal?.value ?? 0,
+      marginVertical:
+        typeof marginVertical === 'number'
+          ? marginVertical
+          : marginVertical?.value ?? 0,
+    };
+  }, [
+    imageHeight,
+    marginVertical,
+    marginHorizontal,
+    borderRadius,
+    borderWidth,
+  ]);
 
   return (
     <CardModuleBackground
@@ -112,17 +203,13 @@ const HorizontalPhotoRenderer = ({
       style={style}
     >
       {image?.uri && (
-        <View
+        <Animated.View
           style={[
             {
-              height: imageHeight,
-              borderWidth,
-              borderRadius,
-              marginHorizontal,
-              marginVertical,
               borderColor: swapColor(borderColor, colorPalette),
               overflow: 'hidden',
             },
+            containerStyle,
             contentStyle,
           ]}
         >
@@ -131,7 +218,7 @@ const HorizontalPhotoRenderer = ({
             style={{ flex: 1 }}
             resizeMode="cover"
           />
-        </View>
+        </Animated.View>
       )}
     </CardModuleBackground>
   );

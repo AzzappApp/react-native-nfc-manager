@@ -9,36 +9,27 @@ import LabeledDashedSlider from '#ui/LabeledDashedSlider';
 
 import TitleWithLine from '#ui/TitleWithLine';
 import type { ViewProps } from 'react-native';
+import type { SharedValue } from 'react-native-reanimated';
 
 type SocialLinksMarginsEditionPanelProps = ViewProps & {
   /**
    * The marginTop currently set on the module
    */
-  marginTop: number;
-  /**
-   * A callback called when the user update the marginTop
-   */
-  onMarginTopChange: (marginTop: number) => void;
+  marginTop: SharedValue<number>;
   /**
    * The marginBottom currently set on the module
    */
-  marginBottom: number;
-  /**
-   * A callback called when the user update the marginBottom
-   */
-  onMarginBottomChange: (marginBottom: number) => void;
+  marginBottom: SharedValue<number>;
   /**
    * The marginHorizontal currently set on the module
    */
-  marginHorizontal: number;
-  /**
-   * A callback called when the user update the marginHorizontal
-   */
-  onMarginHorizontalChange: (marginRight: number) => void;
+  marginHorizontal: SharedValue<number>;
   /**
    * The height of the bottom sheet
    */
   bottomSheetHeight: number;
+
+  onTouched: () => void;
 };
 
 /**
@@ -46,12 +37,10 @@ type SocialLinksMarginsEditionPanelProps = ViewProps & {
  */
 const SocialLinksMarginsEditionPanel = ({
   marginTop,
-  onMarginTopChange,
   marginBottom,
-  onMarginBottomChange,
   marginHorizontal,
-  onMarginHorizontalChange,
   style,
+  onTouched,
   ...props
 }: SocialLinksMarginsEditionPanelProps) => {
   const intl = useIntl();
@@ -72,11 +61,10 @@ const SocialLinksMarginsEditionPanel = ({
               description="Top margin message in SocialLinks edition"
             />
           }
-          initialValue={marginTop}
+          value={marginTop}
           min={0}
           max={SOCIAL_LINKS_MAX_MARGIN_TOP}
           step={1}
-          onChange={onMarginTopChange}
           accessibilityLabel={intl.formatMessage({
             defaultMessage: 'Top margin',
             description:
@@ -87,6 +75,7 @@ const SocialLinksMarginsEditionPanel = ({
             description: 'Hint of the Top margin slider in SocialLinks edition',
           })}
           style={styles.slider}
+          onTouched={onTouched}
         />
         <LabeledDashedSlider
           label={
@@ -95,11 +84,10 @@ const SocialLinksMarginsEditionPanel = ({
               description="Bottom margin message in SocialLinks edition"
             />
           }
-          initialValue={marginBottom}
+          value={marginBottom}
           min={0}
           max={SOCIAL_LINKS_MAX_MARGIN_BOTTOM}
           step={1}
-          onChange={onMarginBottomChange}
           accessibilityLabel={intl.formatMessage({
             defaultMessage: 'Bottom margin',
             description:
@@ -111,6 +99,7 @@ const SocialLinksMarginsEditionPanel = ({
               'Hint of the Bottom margin slider in SocialLinks edition',
           })}
           style={styles.slider}
+          onTouched={onTouched}
         />
         <LabeledDashedSlider
           label={
@@ -119,11 +108,10 @@ const SocialLinksMarginsEditionPanel = ({
               description="Horizontal margin message in SocialLinks edition"
             />
           }
-          initialValue={marginHorizontal}
+          value={marginHorizontal}
           min={0}
           max={SOCIAL_LINKS_MAX_MARGIN_HORIZONTAL}
           step={1}
-          onChange={onMarginHorizontalChange}
           accessibilityLabel={intl.formatMessage({
             defaultMessage: 'Horizontal margin',
             description:
@@ -135,6 +123,7 @@ const SocialLinksMarginsEditionPanel = ({
               'Hint of the horizontal margin slider in SocialLinks edition',
           })}
           style={styles.slider}
+          onTouched={onTouched}
         />
       </View>
     </View>
