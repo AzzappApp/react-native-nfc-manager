@@ -1,5 +1,6 @@
-## 0.5.5-canary.101
+## 0.5.5-canary.102
 
+* **perf:**  - **android:** [#2646](https://github.com/AzzappApp/azzapp/pull/2646) enhance module edition updates ([#2856](https://github.com/AzzappApp/azzapp/pull/2856))
 * **fix:**  - (SortableList) fix order if moving for more than one position at a time ([#2857](https://github.com/AzzappApp/azzapp/pull/2857))
 * **fix:**  - 🐛 trigger scroll end even with margin ([#2850](https://github.com/AzzappApp/azzapp/pull/2850))
 * **fix:**  - icon size props issue if only one param is defined (width, height) ([#2851](https://github.com/AzzappApp/azzapp/pull/2851))
