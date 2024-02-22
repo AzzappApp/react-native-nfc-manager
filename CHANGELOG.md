@@ -1,5 +1,6 @@
-## 0.5.5-canary.103
+## 0.5.5-canary.104
 
+* **feat:**  - add batch invite mutation ([#2867](https://github.com/AzzappApp/azzapp/pull/2867))
 * **feat:**  - add subscriptoin management in bottom panel ([#2866](https://github.com/AzzappApp/azzapp/pull/2866))
 * **fix:**  - stats stay visible  in create webcard ([#2865](https://github.com/AzzappApp/azzapp/pull/2865))
 * **perf:**  - **android:** [#2646](https://github.com/AzzappApp/azzapp/pull/2646) enhance module edition updates ([#2856](https://github.com/AzzappApp/azzapp/pull/2856))
