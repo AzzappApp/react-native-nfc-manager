@@ -1,7 +1,10 @@
 import * as Sentry from '@sentry/nextjs';
 import { ImageResponse } from 'next/og';
 import { NextResponse, type NextRequest } from 'next/server';
-import { getWebCardByUserNameWithRedirection } from '@azzapp/data/domains';
+import {
+  getProfile,
+  getWebCardByUserNameWithRedirection,
+} from '@azzapp/data/domains';
 import { swapColor, DEFAULT_COLOR_PALETTE } from '@azzapp/shared/cardHelpers';
 import {
   COVER_BASE_WIDTH,
@@ -17,6 +20,7 @@ import ERRORS from '@azzapp/shared/errors';
 import coverTextStyle from '#components/renderer/CoverRenderer/CoverTextRenderer.css';
 import { CROP, buildCoverImageUrl } from '#helpers/cover';
 import { fontsMap } from '#helpers/fonts';
+import { verifyToken } from '#helpers/tokens';
 import type { Crop } from '#helpers/cover';
 
 export const runtime = 'edge';
@@ -138,6 +142,8 @@ const fontsUrlMap = {
     'https://cdn.jsdelivr.net/fontsource/fonts/yeseva-one@latest/latin-400-normal.ttf',
 };
 
+const USER_MANAGER_COOKIE_NAME = '@azzapp/users-manager/session';
+
 export const GET = async (
   req: NextRequest,
   {
@@ -199,8 +205,28 @@ export const GET = async (
 
   const webCard = await getWebCardByUserNameWithRedirection(username);
 
-  if (webCard?.cardIsPublished) {
-    const { coverData, cardColors, coverTitle, coverSubTitle } = webCard;
+  if (!webCard) {
+    return NextResponse.json({ message: ERRORS.NOT_FOUND }, { status: 404 });
+  }
+
+  let displayCover = webCard.cardIsPublished;
+  try {
+    const cookie = req.cookies.get(USER_MANAGER_COOKIE_NAME);
+    if (cookie) {
+      const { token } = JSON.parse(cookie.value);
+      const { userId } = await verifyToken(token);
+
+      const profile = await getProfile(userId, webCard.id);
+      if (profile) {
+        displayCover = !profile.invited;
+      }
+    }
+  } catch (e) {
+    console.error(e);
+  }
+
+  if (displayCover) {
+    const { coverData, cardColors, coverTitle, coverSubTitle } = webCard!;
     const mediaId = coverData?.mediaId;
     if (mediaId) {
       const orientation =
@@ -434,9 +460,6 @@ export const GET = async (
       return NextResponse.json({ message: ERRORS.NOT_FOUND }, { status: 404 });
     }
   } else {
-    if (webCard) {
-      return NextResponse.json({ message: ERRORS.FORBIDDEN }, { status: 403 });
-    }
-    return NextResponse.json({ message: ERRORS.NOT_FOUND }, { status: 404 });
+    return NextResponse.json({ message: ERRORS.FORBIDDEN }, { status: 403 });
   }
 };

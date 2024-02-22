@@ -109,7 +109,7 @@ export const getUserProfileWithWebCardId = async (
 
 /**
  * Retrieves a list of associated profiles to an user
- * @param id - The id of the user
+ * @param userId - The id of the user
  * @returns The list of profile associated to the user
  */
 export const getProfilesOfUser = async (userId: string) => {
@@ -120,6 +120,27 @@ export const getProfilesOfUser = async (userId: string) => {
     .where(eq(ProfileTable.userId, userId))
     .orderBy(asc(WebCardTable.userName))
     .then(res => res.map(({ Profile }) => Profile));
+};
+
+/**
+ * Retrieves an associated profiles to an user for a webCard
+ * @param userId - The id of the user
+ * @param webCardId - The id of the webCard
+ * @returns The list of profile associated to the user
+ */
+export const getProfile = async (userId: string, webCardId: string) => {
+  return db
+    .select()
+    .from(ProfileTable)
+    .innerJoin(WebCardTable, eq(WebCardTable.id, ProfileTable.webCardId))
+    .where(
+      and(
+        eq(ProfileTable.userId, userId),
+        eq(ProfileTable.webCardId, webCardId),
+      ),
+    )
+    .limit(1)
+    .then(res => res.map(({ Profile }) => Profile).pop());
 };
 
 /**
