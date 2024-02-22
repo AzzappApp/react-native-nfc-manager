@@ -1,10 +1,14 @@
+import {
+  type TransformsStyle,
+  type ViewProps,
+  type ViewStyle,
+} from 'react-native';
 import Animated, {
   interpolate,
   useAnimatedStyle,
   Easing,
 } from 'react-native-reanimated';
 import getCoverAnimationProgress from './getCoverAnimationProgress';
-import type { TransformsStyle, ViewProps, ViewStyle } from 'react-native';
 import type { SharedValue } from 'react-native-reanimated';
 
 export type MediaAnimatorProps = ViewProps & {
@@ -24,11 +28,11 @@ const MediaAnimator = ({
 }: MediaAnimatorProps) => {
   const animatedStyle = useAnimatedStyle(() => {
     if (!animationSharedValue) {
-      return {};
+      return EMPTY_MEDIA_ANIMATION;
     }
 
     if (!animation) {
-      return {};
+      return EMPTY_MEDIA_ANIMATION;
     } else {
       const animFunction = ANIMATORS[animation];
       return animFunction
@@ -258,3 +262,8 @@ const ANIMATORS: Record<string, (param: AnimationProps) => ViewStyle> = {
 };
 
 export const MEDIA_ANIMATIONS = Object.keys(ANIMATORS);
+
+const EMPTY_MEDIA_ANIMATION: ViewStyle = {
+  opacity: 1,
+  transform: [],
+};
