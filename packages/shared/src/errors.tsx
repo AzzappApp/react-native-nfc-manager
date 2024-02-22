@@ -98,6 +98,10 @@ const ERRORS = {
    * The webCard is not published.
    */
   UNPUBLISHED_WEB_CARD: 'UNPUBLISHED_WEB_CARD',
+  /**
+   * The payload is too large.
+   */
+  PAYLOAD_TOO_LARGE: 'PAYLOAD_TOO_LARGE',
 } as const;
 
 export default ERRORS;

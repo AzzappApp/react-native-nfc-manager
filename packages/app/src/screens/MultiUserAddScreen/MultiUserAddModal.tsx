@@ -288,8 +288,11 @@ const MultiUserAddModal = (
 
   const [commit, saving] = useMutation<MultiUserAddModal_InviteUserMutation>(
     graphql`
-      mutation MultiUserAddModal_InviteUserMutation($input: InviteUserInput!) {
-        inviteUser(input: $input) {
+      mutation MultiUserAddModal_InviteUserMutation(
+        $profileId: ID!
+        $invited: InviteUserInput!
+      ) {
+        inviteUser(profileId: $profileId, invited: $invited) {
           profile {
             id
             profileRole
@@ -359,8 +362,7 @@ const MultiUserAddModal = (
               ).formatInternational()
             : undefined;
 
-        const input = {
-          profileId: profileInfos.profileId,
+        const invited = {
           email,
           phoneNumber,
           profileRole: data.role,
@@ -381,7 +383,8 @@ const MultiUserAddModal = (
 
         commit({
           variables: {
-            input,
+            profileId: profileInfos.profileId,
+            invited,
           },
           onCompleted: () => {
             if (avatarId && avatar?.uri) {

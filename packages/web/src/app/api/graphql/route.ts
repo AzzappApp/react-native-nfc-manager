@@ -1,7 +1,9 @@
 /* eslint-disable react-hooks/rules-of-hooks */
 import { useLogger, useErrorHandler } from '@envelop/core';
 import { UnauthenticatedError, useGenericAuth } from '@envelop/generic-auth';
+import { useParserCache } from '@envelop/parser-cache';
 import { useSentry } from '@envelop/sentry';
+import { useValidationCache } from '@envelop/validation-cache';
 import { useDisableIntrospection } from '@graphql-yoga/plugin-disable-introspection';
 import { usePersistedOperations } from '@graphql-yoga/plugin-persisted-operations';
 import { createYoga } from 'graphql-yoga';
@@ -115,7 +117,12 @@ const { handleRequest } = createYoga({
   },
   logging: getLoggingLevel(),
   graphiql: process.env.NODE_ENV !== 'production',
+  batching: {
+    limit: 5,
+  },
   plugins: [
+    useParserCache(),
+    useValidationCache(),
     useAppVersion(),
     useLogger({
       logFn: (eventName, { args }) => {
@@ -199,10 +206,12 @@ const { handleRequest } = createYoga({
     useRevalidatePages(),
     useDisableIntrospection({
       isDisabled: request => {
-        return process.env.API_SERVER_TOKEN
-          ? request.headers.get(AZZAPP_SERVER_HEADER) !==
+        return process.env.NODE_ENV !== 'production'
+          ? false
+          : process.env.API_SERVER_TOKEN
+            ? request.headers.get(AZZAPP_SERVER_HEADER) !==
               process.env.API_SERVER_TOKEN
-          : true;
+            : true;
       },
     }),
     useSentry({
@@ -213,12 +222,14 @@ const { handleRequest } = createYoga({
   context: ({ request }) => {
     const locale = request.headers.get('azzapp-locale');
 
-    const sendMail = async (p: {
-      email: string;
-      subject: string;
-      text: string;
-      html: string;
-    }) => {
+    const sendMail = async (
+      p: Array<{
+        email: string;
+        subject: string;
+        text: string;
+        html: string;
+      }>,
+    ) => {
       const res = await fetch(
         `${process.env.NEXT_PUBLIC_API_ENDPOINT}/sendMail`,
         {

@@ -1,15 +1,38 @@
 extend type Mutation {
-  inviteUser(input: InviteUserInput!): InviteUserPayload
+  inviteUser(profileId: ID!, invited: InviteUserInput!): InviteUserPayload
+  inviteUsersList(profileId: ID!, invited: [InviteUserEmailInput!]!): InviteUsersListPayload
 }
 
 input InviteUserInput {
-  profileId: ID!
   phoneNumber: String
   email: String
   profileRole: ProfileRole!
   contactCard: ContactCardInput
 }
 
+input InviteUserEmailInput {
+  email: String!
+  profileRole: ProfileRole!
+  contactCard: ContactCardInput
+}
+
 type InviteUserPayload {
   profile: Profile
+}
+
+type InviteUserRejected {
+  email: String
+  reason: InviteUserRejectedReason!
+}
+
+enum InviteUserRejectedReason {
+  wrongEmail
+  wrongPhoneNumber
+  alreadyInvited
+  unknownError
+}
+
+type InviteUsersListPayload {
+  added: [Profile]
+  rejected: [InviteUserRejected]
 }

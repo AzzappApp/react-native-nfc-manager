@@ -56,12 +56,14 @@ const acceptOwnership: MutationResolvers['acceptOwnership'] = async (
         phoneNumber,
       });
     } else if (email) {
-      await sendMail({
-        email,
-        subject: `WebCard ownership transfer invitation.`,
-        text: `Dear user, you are invited to take over the ownership of ${webCard.userName}. You can accept or decline the invitation from the app home page.`,
-        html: `<div>Dear user, you are invited to take over the ownership of ${webCard.userName}. You can accept or decline the invitation from the app home page.</div>`,
-      });
+      await sendMail([
+        {
+          email,
+          subject: `WebCard ownership transfer invitation.`,
+          text: `Dear user, you are invited to take over the ownership of ${webCard.userName}. You can accept or decline the invitation from the app home page.`,
+          html: `<div>Dear user, you are invited to take over the ownership of ${webCard.userName}. You can accept or decline the invitation from the app home page.</div>`,
+        },
+      ]);
     }
   } catch (e) {
     Sentry.captureException(e);

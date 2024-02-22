@@ -47,12 +47,14 @@ export type GraphQLContext = {
   locale: string;
   loaders: Loaders;
   sessionMemoized: <T>(t: () => T) => T;
-  sendMail: (p: {
-    email: string;
-    subject: string;
-    text: string;
-    html: string;
-  }) => Promise<void>;
+  sendMail: (
+    p: Array<{
+      email: string;
+      subject: string;
+      text: string;
+      html: string;
+    }>,
+  ) => Promise<void>;
   sendSms: (p: { phoneNumber: string; body: string }) => Promise<void>;
   buildCoverAvatarUrl: (webCard: WebCard | null) => Promise<string | null>;
 };

@@ -6,6 +6,7 @@ import { isAdmin } from '@azzapp/shared/profileHelpers';
 import {
   formatPhoneNumber,
   isInternationalPhoneNumber,
+  isValidEmail,
 } from '@azzapp/shared/stringHelpers';
 import { UserTable, createProfile, createUser, db } from '#domains';
 import fromGlobalIdWithType from '#helpers/relayIdHelpers';
@@ -15,11 +16,10 @@ import type { SQLWrapper } from 'drizzle-orm';
 
 const inviteUserMutation: MutationResolvers['inviteUser'] = async (
   _,
-  { input },
+  { profileId: gqlProfileId, invited },
   { auth, loaders, sendMail, sendSms }: GraphQLContext,
 ) => {
   const { userId } = auth;
-  const { email, phoneNumber: rawPhoneNumber, profileId: gqlProfileId } = input;
 
   const profileId = fromGlobalIdWithType(gqlProfileId, 'Profile');
   const profile = profileId && (await loaders.Profile.load(profileId));
@@ -29,6 +29,12 @@ const inviteUserMutation: MutationResolvers['inviteUser'] = async (
 
   if (profile.userId !== userId) {
     throw new GraphQLError(ERRORS.UNAUTHORIZED);
+  }
+
+  const { email, phoneNumber: rawPhoneNumber } = invited;
+
+  if (email && !isValidEmail(email)) {
+    throw new GraphQLError(ERRORS.INVALID_REQUEST);
   }
 
   if (rawPhoneNumber && !isInternationalPhoneNumber(rawPhoneNumber)) {
@@ -73,7 +79,7 @@ const inviteUserMutation: MutationResolvers['inviteUser'] = async (
     }
 
     const { displayedOnWebCard, isPrivate, avatarId, ...data } =
-      input.contactCard ?? {};
+      invited.contactCard ?? {};
 
     const payload = {
       webCardId: profile.webCardId,
@@ -86,7 +92,7 @@ const inviteUserMutation: MutationResolvers['inviteUser'] = async (
       },
       contactCardDisplayedOnWebCard: displayedOnWebCard ?? true,
       contactCardIsPrivate: displayedOnWebCard ?? false,
-      profileRole: input.profileRole,
+      profileRole: invited.profileRole,
       lastContactCardUpdate: new Date(),
       nbContactCardScans: 0,
       promotedAsOwner: false,
@@ -111,12 +117,14 @@ const inviteUserMutation: MutationResolvers['inviteUser'] = async (
         phoneNumber,
       });
     } else if (email) {
-      await sendMail({
-        email,
-        subject: `You have been invited to join ${webCard.userName}`,
-        text: `You have been invited to join ${webCard.userName} on Azzapp! Download the app and sign up with this email to join: ${email}`,
-        html: `<div>You have been invited to join ${webCard.userName} on Azzapp! Download the app and sign up with this email to join: ${email}</div>`,
-      });
+      await sendMail([
+        {
+          email,
+          subject: `You have been invited to join ${webCard.userName}`,
+          text: `You have been invited to join ${webCard.userName} on Azzapp! Download the app and sign up with this email to join: ${email}`,
+          html: `<div>You have been invited to join ${webCard.userName} on Azzapp! Download the app and sign up with this email to join: ${email}</div>`,
+        },
+      ]);
     }
   } catch (e) {
     Sentry.captureException(e);

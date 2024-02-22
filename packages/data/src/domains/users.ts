@@ -79,6 +79,11 @@ export const createUser = async (data: NewUser, tx: DbTransaction = db) => {
   return id;
 };
 
+export const createUsers = async (data: NewUser[], tx: DbTransaction = db) => {
+  console.log({ data, t: tx.insert(UserTable).ignore().values(data).toSQL() });
+  await tx.insert(UserTable).ignore().values(data);
+};
+
 export const updateUser = async (
   userId: string,
   data: Partial<User>,

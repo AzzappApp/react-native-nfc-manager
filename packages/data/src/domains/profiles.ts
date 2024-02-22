@@ -39,6 +39,7 @@ export const ProfileTable = mysqlTable(
     contactCardDisplayedOnWebCard: boolean('contactCardDisplayedOnWebCard')
       .default(false)
       .notNull(),
+    createdAt: cols.dateTime('createdAt').notNull(),
     lastContactCardUpdate: cols.dateTime('lastContactCardUpdate').notNull(),
     nbContactCardScans: int('nbContactCardScans').default(0).notNull(),
   },
@@ -62,6 +63,13 @@ export const createProfile = async (
   const id = createId();
   await tx.insert(ProfileTable).values({ ...profile, id });
   return id;
+};
+
+export const createProfiles = async (
+  profiles: NewProfile[],
+  tx: DbTransaction = db,
+) => {
+  await tx.insert(ProfileTable).ignore().values(profiles);
 };
 
 export const getProfileById = async (profileId: string) => {

@@ -4,12 +4,15 @@ import * as z from 'zod';
 import ERRORS from '@azzapp/shared/errors';
 import { checkServerAuth } from '#helpers/tokens';
 
-const SendEmailSchema = z.object({
-  email: z.string().email(),
-  subject: z.string(),
-  text: z.string(),
-  html: z.string(),
-});
+const SendEmailSchema = z
+  .object({
+    email: z.string().email(),
+    subject: z.string(),
+    text: z.string(),
+    html: z.string(),
+  })
+  .array()
+  .nonempty();
 
 sgMail.setApiKey(process.env.SENDGRID_API_KEY!);
 
@@ -21,17 +24,15 @@ export const POST = async (req: Request) => {
     const body = await req.json();
     const input = SendEmailSchema.parse(body);
 
-    const { email, subject, text, html } = input;
-
-    const msg = {
-      to: email,
-      from: SENDGRIP_NOREPLY_SENDER, // Change to your verified sender
-      subject,
-      text,
-      html,
-    };
-
-    await sgMail.send(msg);
+    await sgMail.send(
+      input.map(msg => ({
+        to: msg.email,
+        from: SENDGRIP_NOREPLY_SENDER, // Change to your verified sender
+        subject: msg.subject,
+        text: msg.text,
+        html: msg.html,
+      })),
+    );
 
     return NextResponse.json(
       {
