@@ -1,5 +1,6 @@
-## 0.5.5-canary.105
+## 0.5.5-canary.106
 
+* **fix:**  - 🐛 restore default appearance with no animation ([#2877](https://github.com/AzzappApp/azzapp/pull/2877))
 * **feat:**  - display cover of unpublished webcard when connected ([#2859](https://github.com/AzzappApp/azzapp/pull/2859))
 * **feat:**  - add batch invite mutation ([#2867](https://github.com/AzzappApp/azzapp/pull/2867))
 * **feat:**  - add subscriptoin management in bottom panel ([#2866](https://github.com/AzzappApp/azzapp/pull/2866))
