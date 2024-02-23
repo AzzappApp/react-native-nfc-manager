@@ -198,7 +198,7 @@ export const loadQueryFor = <T>(
     );
 
     const preloadedQuery = loadQuery(environment, query, variables, {
-      fetchPolicy: options.fetchPolicy,
+      fetchPolicy: options.fetchPolicy ?? 'store-and-network',
     });
     activeQueries.set(screenId, {
       preloadedQuery,

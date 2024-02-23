@@ -1,3 +1,4 @@
+import { MMKV } from 'react-native-mmkv';
 import {
   ROOT_TYPE,
   Network,
@@ -54,9 +55,81 @@ const init = () => {
   });
 };
 
+const createMMKVForUser = () => {
+  const userId = getAuthState().profileInfos?.userId;
+  if (!userId) {
+    return null;
+  }
+  return new MMKV({ id: `relay_${userId}` });
+};
+
+const createSource = () => {
+  let currentMMKV = createMMKVForUser();
+
+  const createInnerSourceWithOfflineData = () => {
+    let record: any;
+    try {
+      const json = currentMMKV?.getString('relayRecord');
+      if (json) {
+        record = JSON.parse(json);
+      } else {
+        record = {};
+      }
+    } catch {
+      record = {};
+    }
+    return RecordSource.create(record);
+  };
+
+  let innerSource = createInnerSourceWithOfflineData();
+
+  const authState = getAuthState();
+  addAuthStateListener(newAuthState => {
+    if (newAuthState.profileInfos?.userId !== authState.profileInfos?.userId) {
+      currentMMKV = createMMKVForUser();
+      innerSource = createInnerSourceWithOfflineData();
+    }
+  });
+
+  let saveTimeout: any = null;
+  const scheduleSave = () => {
+    clearTimeout(saveTimeout);
+    saveTimeout = setTimeout(() => {
+      currentMMKV?.set('relayRecord', JSON.stringify(innerSource.toJSON()));
+    }, 1000);
+  };
+
+  const wrapSetMethod = <TMethod extends (...args: any[]) => any>(
+    method: TMethod,
+  ) => {
+    return ((...args: Parameters<TMethod>) => {
+      method.apply(innerSource, args);
+      scheduleSave();
+    }) as TMethod;
+  };
+
+  return new Proxy(
+    {},
+    {
+      get: (_, key: keyof typeof innerSource) => {
+        const method = innerSource[key];
+        if (
+          key === 'set' ||
+          key === 'delete' ||
+          key === 'remove' ||
+          key === 'clear'
+        ) {
+          return wrapSetMethod(method);
+        }
+        return method;
+      },
+    },
+  ) as typeof innerSource;
+};
+
 const createEnvironment = () => {
   environment = new Environment({
-    store: new Store(RecordSource.create()),
+    store: new Store(createSource()),
     network: createNetwork(),
     missingFieldHandlers,
     isServer: false,

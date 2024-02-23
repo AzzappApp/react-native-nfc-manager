@@ -77,6 +77,9 @@ export const createScreenPrefetcher = (
         environment,
         query,
         Component.getVariables?.(route.params, profileInfos) ?? ({} as any),
+        {
+          fetchPolicy: 'network-only',
+        },
       );
     }
 
