@@ -1,6 +1,6 @@
 import { GraphQLError } from 'graphql';
 import ERRORS from '@azzapp/shared/errors';
-import { isAdmin } from '@azzapp/shared/profileHelpers';
+import { isAdmin, isOwner } from '@azzapp/shared/profileHelpers';
 import { getUserProfileWithWebCardId, updateProfile } from '#domains';
 import fromGlobalIdWithType from '#helpers/relayIdHelpers';
 import type { GraphQLContext } from '#index';
@@ -21,16 +21,16 @@ const updateProfileMutation: MutationResolvers['updateProfile'] = async (
     throw new GraphQLError(ERRORS.PROFILE_DONT_EXISTS);
   }
 
-  if (profileRole === 'owner') {
-    throw new GraphQLError(ERRORS.INVALID_REQUEST);
-  }
-
   const currentProfile =
     userId &&
     (await getUserProfileWithWebCardId(userId, targetProfile.webCardId));
 
   if (!currentProfile) {
     throw new GraphQLError(ERRORS.UNAUTHORIZED);
+  }
+
+  if (profileRole === 'owner' && !isOwner(currentProfile.profileRole)) {
+    throw new GraphQLError(ERRORS.INVALID_REQUEST);
   }
 
   if (
