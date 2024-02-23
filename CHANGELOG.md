@@ -1,5 +1,7 @@
-## 0.5.5-canary.108
+## 0.5.5-canary.109
 
+* **fix:**  - 🐛 dismiss keyboard when submitting form ([#2897](https://github.com/AzzappApp/azzapp/pull/2897))
+* **fix:**  - 🐛 correctly redirect to onboarding when quit last webcard ([#2896](https://github.com/AzzappApp/azzapp/pull/2896))
 * **fix:**  - **router:** possible rerender ([#2650](https://github.com/AzzappApp/azzapp/pull/2650))
 * **fix:**  - 🐛 allow owners to update their own profile ([#2890](https://github.com/AzzappApp/azzapp/pull/2890))
 * **fix:**  - 🐛 restore default appearance with no animation ([#2877](https://github.com/AzzappApp/azzapp/pull/2877))
