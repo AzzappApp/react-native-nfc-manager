@@ -6,7 +6,7 @@ import capitalize from 'lodash/capitalize';
 import { forwardRef, useImperativeHandle, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useIntl } from 'react-intl';
-import { View, StyleSheet } from 'react-native';
+import { View, StyleSheet, Keyboard } from 'react-native';
 import * as mime from 'react-native-mime-types';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -312,6 +312,7 @@ const MultiUserAddModal = (
   const submit = handleSubmit(
     async value => {
       if (profileInfos) {
+        Keyboard.dismiss();
         let avatarId: string | undefined = undefined;
         const { avatar, ...data } = value;
         if (avatar?.local && avatar.uri) {
