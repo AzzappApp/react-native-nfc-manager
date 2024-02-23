@@ -1,5 +1,6 @@
-## 0.5.5-canary.106
+## 0.5.5-canary.107
 
+* **fix:**  - 🐛 allow owners to update their own profile ([#2890](https://github.com/AzzappApp/azzapp/pull/2890))
 * **fix:**  - 🐛 restore default appearance with no animation ([#2877](https://github.com/AzzappApp/azzapp/pull/2877))
 * **feat:**  - display cover of unpublished webcard when connected ([#2859](https://github.com/AzzappApp/azzapp/pull/2859))
 * **feat:**  - add batch invite mutation ([#2867](https://github.com/AzzappApp/azzapp/pull/2867))
