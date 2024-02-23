@@ -97,6 +97,19 @@ const HomeScreenContent = ({ user: userKey }: HomeScreenContentProps) => {
     [currentProfileIndex, user.profiles],
   );
 
+  useEffect(() => {
+    if (currentProfile === undefined) {
+      dispatchGlobalEvent({
+        type: 'WEBCARD_CHANGE',
+        payload: {
+          profileId: '',
+          webCardId: '',
+          profileRole: '',
+        },
+      });
+    }
+  }, [currentProfile]);
+
   useRouteWillChange('HOME', () => {
     const roundedProfileIndexSharedValue = Math.round(
       currentProfileIndexSharedValue.value,

@@ -113,11 +113,14 @@ const HomeBottomPanel = ({
 
   const bottomPanelStyle = useAnimatedStyle(() => {
     const index = Math.round(currentProfileIndexSharedValue.value + 1);
-    const opacity = interpolate(
-      currentProfileIndexSharedValue.value + 1,
-      inputRange,
-      bottomPanelVisible,
-    );
+    const opacity =
+      inputRange.length > 1
+        ? interpolate(
+            currentProfileIndexSharedValue.value + 1,
+            inputRange,
+            bottomPanelVisible,
+          )
+        : 1;
     return {
       opacity: Math.pow(opacity, 3),
       pointerEvents: bottomPanelVisible[index] === 1 ? 'box-none' : 'none',
