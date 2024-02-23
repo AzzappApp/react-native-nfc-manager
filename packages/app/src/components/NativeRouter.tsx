@@ -926,43 +926,55 @@ const StackRenderer = ({
   onFinishTransitioning?: (e: NativeSyntheticEvent<TargetedEvent>) => void;
   onScreenDismissed?: (id: string) => void;
 }) => {
-  const childs: any[] = stack.map((routeInfo, index) => {
-    const screenHasFocus = hasFocus && index === stack.length - 1;
-    if (routeInfo.kind === 'tabs') {
-      return (
-        <Screen
-          key={routeInfo.id}
-          enabled
-          isNativeStack
-          style={StyleSheet.absoluteFill}
-        >
-          <TabsRenderer
-            id={routeInfo.id}
-            tabState={routeInfo.state}
-            screens={screens}
-            tabsRenderers={tabsRenderers}
-            defaultScreenOptions={defaultScreenOptions}
-            onFinishTransitioning={onFinishTransitioning}
-            onScreenDismissed={onScreenDismissed}
-            hasFocus={screenHasFocus}
-          />
-        </Screen>
-      );
-    }
+  const childs: any[] = useMemo(
+    () =>
+      stack.map((routeInfo, index) => {
+        const screenHasFocus = hasFocus && index === stack.length - 1;
+        if (routeInfo.kind === 'tabs') {
+          return (
+            <Screen
+              key={routeInfo.id}
+              enabled
+              isNativeStack
+              style={StyleSheet.absoluteFill}
+            >
+              <TabsRenderer
+                id={routeInfo.id}
+                tabState={routeInfo.state}
+                screens={screens}
+                tabsRenderers={tabsRenderers}
+                defaultScreenOptions={defaultScreenOptions}
+                onFinishTransitioning={onFinishTransitioning}
+                onScreenDismissed={onScreenDismissed}
+                hasFocus={screenHasFocus}
+              />
+            </Screen>
+          );
+        }
 
-    return (
-      <ScreenRenderer
-        key={routeInfo.id}
-        id={routeInfo.id}
-        {...routeInfo.state}
-        defaultScreenOptions={defaultScreenOptions}
-        screens={screens}
-        onDismissed={() => onScreenDismissed?.(routeInfo.id)}
-        hasFocus={screenHasFocus}
-        isNativeStack
-      />
-    );
-  });
+        return (
+          <ScreenRenderer
+            key={routeInfo.id}
+            id={routeInfo.id}
+            {...routeInfo.state}
+            defaultScreenOptions={defaultScreenOptions}
+            screens={screens}
+            onDismissed={() => onScreenDismissed?.(routeInfo.id)}
+            hasFocus={screenHasFocus}
+            isNativeStack
+          />
+        );
+      }),
+    [
+      defaultScreenOptions,
+      hasFocus,
+      onFinishTransitioning,
+      onScreenDismissed,
+      screens,
+      stack,
+      tabsRenderers,
+    ],
+  );
 
   return (
     <ScreenStack
