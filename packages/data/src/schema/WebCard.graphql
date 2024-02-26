@@ -235,6 +235,10 @@ type WebCard implements Node {
   Return a default avatar based on cover
   """
   coverAvatarUrl: String
+  """
+  Return the webCard updated at
+  """
+  updatedAt: String
 }
 
 type WebCardStyle {

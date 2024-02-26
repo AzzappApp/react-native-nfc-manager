@@ -245,6 +245,7 @@ export const WebCard: WebCardResolvers = {
   coverAvatarUrl: async (webCard, _args, { buildCoverAvatarUrl }) => {
     return buildCoverAvatarUrl(webCard);
   },
+  updatedAt: webCard => webCard.updatedAt.toISOString(),
 };
 
 export const WebCardCategory: WebCardCategoryResolvers = {
