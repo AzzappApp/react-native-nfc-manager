@@ -1,6 +1,7 @@
 /* eslint-disable no-bitwise */
 import { createId } from '@paralleldrive/cuid2';
 import { NextResponse } from 'next/server';
+import * as z from 'zod';
 import { createMedia } from '@azzapp/data/domains';
 import { MODULE_IMAGES_SIZES } from '@azzapp/shared/cardModuleHelpers';
 import { createPresignedUpload } from '@azzapp/shared/cloudinaryHelpers';
@@ -13,6 +14,13 @@ import {
 import cors from '#helpers/cors';
 import { getSessionData } from '#helpers/tokens';
 import type { SessionData } from '#helpers/tokens';
+
+const UploadSignSchema = z.object({
+  kind: z.enum(['image', 'video']),
+  target: z.enum(['cover', 'coverSource', 'module', 'post', 'avatar']),
+});
+
+type uploadSignParams = z.infer<typeof UploadSignSchema>;
 
 const uploadSignApi = async (req: Request) => {
   let viewer: SessionData | null = null;
@@ -35,26 +43,10 @@ const uploadSignApi = async (req: Request) => {
     );
   }
 
-  const {
-    kind,
-    target,
-  }: {
-    kind: 'image' | 'video';
-    target: 'cover' | 'coverSource' | 'module' | 'post';
-  } = await req.json();
+  const body = await req.json();
+  const input = UploadSignSchema.parse(body);
 
-  if (
-    (kind !== 'image' && kind !== 'video') ||
-    (target !== 'cover' &&
-      target !== 'post' &&
-      target !== 'module' &&
-      target !== 'coverSource')
-  ) {
-    return NextResponse.json(
-      { message: ERRORS.INVALID_REQUEST },
-      { status: 400 },
-    );
-  }
+  const { kind, target } = input;
 
   const mediaId = createId();
   await createMedia({
@@ -63,25 +55,40 @@ const uploadSignApi = async (req: Request) => {
     height: 0,
     width: 0,
   });
-  const pregeneratedSizes =
-    target === 'coverSource'
-      ? null
-      : target === 'cover'
-        ? COVER_ASSET_SIZES
-        : target === 'module'
-          ? MODULE_IMAGES_SIZES
-          : kind === 'image'
-            ? POST_IMAGES_SIZES
-            : POST_VIDEO_SIZES;
 
   const { uploadParameters, uploadURL } = await createPresignedUpload(
     mediaId,
     kind,
-    pregeneratedSizes,
+    getAspectRatio(input),
+    getPregeneratedSizes(input),
     kind === 'video' && target === 'cover',
     `userId=${viewer.userId}`,
   );
   return NextResponse.json({ uploadURL, uploadParameters });
+};
+
+const getAspectRatio = (body: uploadSignParams) => {
+  switch (body.target) {
+    case 'avatar':
+      return '1.0';
+    default:
+      return null;
+  }
+};
+
+const getPregeneratedSizes = (body: uploadSignParams) => {
+  switch (body.target) {
+    case 'coverSource':
+      return null;
+    case 'cover':
+      return COVER_ASSET_SIZES;
+    case 'module':
+      return MODULE_IMAGES_SIZES;
+    case 'post':
+      return body.kind === 'image' ? POST_IMAGES_SIZES : POST_VIDEO_SIZES;
+    default:
+      return null;
+  }
 };
 
 export const { POST, OPTIONS } = cors({ POST: uploadSignApi });

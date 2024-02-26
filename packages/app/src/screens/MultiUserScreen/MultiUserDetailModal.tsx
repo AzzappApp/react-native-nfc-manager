@@ -278,7 +278,7 @@ const MultiUserDetailModal = ({
 
         const { uploadURL, uploadParameters } = await uploadSign({
           kind: 'image',
-          target: 'post',
+          target: 'avatar',
         });
         const { promise: uploadPromise } = uploadMedia(
           file,

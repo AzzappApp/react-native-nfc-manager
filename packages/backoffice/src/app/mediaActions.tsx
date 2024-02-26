@@ -33,6 +33,7 @@ export const getSignedUpload = async (
   return createPresignedUpload(
     mediaId,
     kind,
+    null,
     pregeneratedSizes,
     false,
     `userId=${userId}|backoffice=true`,

@@ -27,6 +27,7 @@ export const getStaticMediaSignedUpload = async (
   return createPresignedUpload(
     mediaId,
     fileKind === 'lottie' ? 'raw' : 'image',
+    null,
     pregeneratedSizes,
     false,
     `userId=${userId}|backoffice=true`,

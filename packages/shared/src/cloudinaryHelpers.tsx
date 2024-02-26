@@ -172,6 +172,7 @@ export const deleteMediaByPublicIds = async (
 export const createPresignedUpload = async (
   publicId: string,
   kind: 'image' | 'raw' | 'video',
+  aspectRatio?: string | null,
   pregeneratedSizes?: number[] | null,
   generateVideoStreaming?: boolean | null,
   context?: string | null,
@@ -198,6 +199,10 @@ export const createPresignedUpload = async (
     uploadParameters.eager = [uploadParameters.eager, 'sp_auto,f_m3u8']
       .filter(val => !!val)
       .join('|');
+  }
+
+  if (aspectRatio) {
+    uploadParameters.transformation = `ar_${aspectRatio},c_crop`;
   }
 
   // TODO transformations based on preset

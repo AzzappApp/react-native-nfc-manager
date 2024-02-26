@@ -215,7 +215,7 @@ const ContactCardEditModal = ({
 
       const { uploadURL, uploadParameters } = await uploadSign({
         kind: 'image',
-        target: 'post',
+        target: 'avatar',
       });
       const { progress: uploadProgress, promise: uploadPromise } = uploadMedia(
         file,
