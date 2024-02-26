@@ -1030,7 +1030,7 @@ PODS:
     - React-Core
   - react-native-encrypted-storage (4.0.3):
     - React-Core
-  - react-native-keyboard-controller (1.11.0):
+  - react-native-keyboard-controller (1.11.1):
     - React-Core
   - react-native-mmkv (2.12.1):
     - MMKV (>= 1.3.3)
@@ -1220,13 +1220,13 @@ PODS:
     - React-perflogger (= 0.73.4)
   - RNBootSplash (5.4.1):
     - React-Core
-  - RNCAsyncStorage (1.22.1):
+  - RNCAsyncStorage (1.22.2):
     - React-Core
   - RNCMaskedView (0.3.1):
     - React-Core
   - RNDateTimePicker (7.6.2):
     - React-Core
-  - RNDeviceInfo (10.12.0):
+  - RNDeviceInfo (10.13.0):
     - React-Core
   - RNFlashList (1.6.3):
     - React-Core
@@ -1236,7 +1236,7 @@ PODS:
     - React-Core
   - RNLocalize (3.0.6):
     - React-Core
-  - RNPermissions (4.1.2):
+  - RNPermissions (4.1.4):
     - React-Core
   - RNReactNativeHapticFeedback (2.2.0):
     - React-Core
@@ -1682,7 +1682,7 @@ SPEC CHECKSUMS:
   react-native-blob-jsi-helper: 13c10135af4614dbc0712afba5960784cd44f043
   react-native-blob-util: d8fa1a7f726867907a8e43163fdd8b441d4489ea
   react-native-encrypted-storage: db300a3f2f0aba1e818417c1c0a6be549038deb7
-  react-native-keyboard-controller: 30f2304b54b2b34e9a6678c33d8ea12830b9cda1
+  react-native-keyboard-controller: fe785bafb89a7e8e467ecd11b06d72020b616533
   react-native-mmkv: 124b22209aacdcd172b6ac39071b9647080f0411
   react-native-pager-view: d81ab2060b9caf57ca8c3a0d57467ff407cdb825
   react-native-passkit: aaf4f946eb981b872104192aadaa7d6c94011f86
@@ -1710,14 +1710,14 @@ SPEC CHECKSUMS:
   React-utils: 6e5ad394416482ae21831050928ae27348f83487
   ReactCommon: 840a955d37b7f3358554d819446bffcf624b2522
   RNBootSplash: eff8239c4f795ce42a0604873aef3733aac0dedd
-  RNCAsyncStorage: 7deab901e27d1f989a83e8be6ce91b673772c848
+  RNCAsyncStorage: 014a78b2cc8cc107c9e92ee428dc0c1ac3223416
   RNCMaskedView: 090213d32d8b3bb83a4dcb7d12c18f0152591906
   RNDateTimePicker: fc2e4f2795877d45e84d85659bebe627eba5c931
-  RNDeviceInfo: db5c64a060e66e5db3102d041ebe3ef307a85120
+  RNDeviceInfo: 5e4695f906aeb624855cee8d568a46037e4a50f7
   RNFlashList: 4b4b6b093afc0df60ae08f9cbf6ccd4c836c667a
   RNGestureHandler: deda62b8339496ba721a45e0f3e2d7a319932cee
   RNLocalize: 4222a3756cdbe2dc9a5bdf445765a4d2572107cb
-  RNPermissions: 11f9c3dcc82f927f2d9ef5752d2f399569bec69d
+  RNPermissions: 4c90a767b6f27c328c5f7541d400b4a1204cac07
   RNReactNativeHapticFeedback: ec56a5f81c3941206fd85625fa669ffc7b4545f9
   RNReanimated: 4198db10cf9a8a77140d2e8f36dca3fe5fb5e263
   RNScreens: b582cb834dc4133307562e930e8fa914b8c04ef2

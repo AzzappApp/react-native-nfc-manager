@@ -5,8 +5,8 @@ import {
   Platform,
   StyleSheet,
   View,
-  useWindowDimensions,
   PixelRatio,
+  Dimensions,
 } from 'react-native';
 import { useDerivedValue, useSharedValue } from 'react-native-reanimated';
 import { graphql, useFragment } from 'react-relay';
@@ -37,6 +37,8 @@ import type { Disposable } from 'react-relay';
 type HomeScreenContentProps = {
   user: HomeScreenContent_user$key;
 };
+
+const { height: windowHeight, width: windowWidth } = Dimensions.get('screen');
 
 const HomeScreenContent = ({ user: userKey }: HomeScreenContentProps) => {
   // #regions data
@@ -224,7 +226,6 @@ const HomeScreenContent = ({ user: userKey }: HomeScreenContentProps) => {
 
   // #region Layout
   const insets = useScreenInsets();
-  const { height: windowHeight, width: windowWidth } = useWindowDimensions();
 
   const headerStyle = useMemo(() => ({ marginTop: insets.top }), [insets.top]);
 
@@ -241,14 +242,14 @@ const HomeScreenContent = ({ user: userKey }: HomeScreenContentProps) => {
       BOTTOM_MENU_HEIGHT -
       insets.bottom -
       (Platform.OS === 'android' ? StatusBar?.currentHeight ?? 0 : 0),
-    [insets.bottom, insets.top, windowHeight],
+    [insets.bottom, insets.top],
   );
 
   const bottomPanelHeight = useMemo(() => {
     return PixelRatio.roundToNearestPixel(
       (windowWidth - 40) / CONTACT_CARD_RATIO + HOME_MENU_HEIGHT,
     );
-  }, [windowWidth]);
+  }, []);
 
   //used PixelRatio because different amount of pixels per square inch on android.
   const carouselHeight = useMemo(

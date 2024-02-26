@@ -1,5 +1,6 @@
 import { IntlErrorCode } from '@formatjs/intl';
 import * as Sentry from '@sentry/react-native';
+import { StatusBar } from 'expo-status-bar';
 import {
   Component,
   Fragment,
@@ -156,15 +157,18 @@ const App = () => {
   }
 
   return (
-    <AppIntlProvider>
-      <ErrorBoundary>
-        <PermissionProvider>
-          <KeyboardProvider>
-            <AppRouter />
-          </KeyboardProvider>
-        </PermissionProvider>
-      </ErrorBoundary>
-    </AppIntlProvider>
+    <>
+      <StatusBar style="auto" translucent />
+      <AppIntlProvider>
+        <ErrorBoundary>
+          <PermissionProvider>
+            <KeyboardProvider statusBarTranslucent>
+              <AppRouter />
+            </KeyboardProvider>
+          </PermissionProvider>
+        </ErrorBoundary>
+      </AppIntlProvider>
+    </>
   );
 };
 

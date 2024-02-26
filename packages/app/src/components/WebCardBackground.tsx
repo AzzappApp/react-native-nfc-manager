@@ -5,7 +5,7 @@ import {
   Rect,
   vec,
 } from '@shopify/react-native-skia';
-import { StyleSheet, View, useWindowDimensions } from 'react-native';
+import { Dimensions, StyleSheet, View } from 'react-native';
 import type { Color } from '@shopify/react-native-skia';
 import type { ParsedColorArray, SharedValue } from 'react-native-reanimated';
 
@@ -14,7 +14,7 @@ const WebCardBackground = ({
 }: {
   colors: Color[] | SharedValue<ParsedColorArray[] | string[]>;
 }) => {
-  const { width, height } = useWindowDimensions();
+  const { width, height } = Dimensions.get('screen');
 
   return (
     <View style={StyleSheet.absoluteFill}>

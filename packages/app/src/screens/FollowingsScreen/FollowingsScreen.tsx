@@ -1,6 +1,6 @@
 import { Suspense } from 'react';
 import { useIntl } from 'react-intl';
-import { SafeAreaView, View } from 'react-native';
+import { View } from 'react-native';
 import { graphql, usePreloadedQuery } from 'react-relay';
 import { useRouter } from '#components/NativeRouter';
 import relayScreen from '#helpers/relayScreen';
@@ -8,6 +8,7 @@ import ActivityIndicator from '#ui/ActivityIndicator';
 import Container from '#ui/Container';
 import Header from '#ui/Header';
 import IconButton from '#ui/IconButton';
+import SafeAreaView from '#ui/SafeAreaView';
 import FollowingsScreenList from './FollowingsScreenList';
 import type { RelayScreenProps } from '#helpers/relayScreen';
 import type { FollowingsScreenQuery } from '#relayArtifacts/FollowingsScreenQuery.graphql';
