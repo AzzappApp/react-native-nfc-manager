@@ -1,5 +1,7 @@
-## 0.5.5-canary.109
+## 0.5.5-canary.110
 
+* **fix:**  - **webCard:** [#2886](https://github.com/AzzappApp/azzapp/pull/2886) styles are not correctly applied in preview ([#2888](https://github.com/AzzappApp/azzapp/pull/2888))
+* **feat:**  - force square image for avatar ([#2898](https://github.com/AzzappApp/azzapp/pull/2898))
 * **fix:**  - 🐛 dismiss keyboard when submitting form ([#2897](https://github.com/AzzappApp/azzapp/pull/2897))
 * **fix:**  - 🐛 correctly redirect to onboarding when quit last webcard ([#2896](https://github.com/AzzappApp/azzapp/pull/2896))
 * **fix:**  - **router:** possible rerender ([#2650](https://github.com/AzzappApp/azzapp/pull/2650))
