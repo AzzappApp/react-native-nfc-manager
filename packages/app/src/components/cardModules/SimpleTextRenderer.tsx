@@ -89,24 +89,15 @@ const animatedProps = [
 type AnimatedProps = (typeof animatedProps)[number];
 
 export type SimpleTextRendererData = NullableFields<
-  Omit<SimpleTextViewRendererData, AnimatedProps>
+  | Omit<SimpleTextRenderer_simpleTextModule$data, ' $fragmentType'>
+  | Omit<SimpleTextRenderer_simpleTitleModule$data, ' $fragmentType'>
 >;
 
 type SimpleButtonRendererAnimatedData = {
-  [K in AnimatedProps]:
-    | SharedValue<SimpleTextViewRendererData[K]>
-    | SimpleTextViewRendererData[K];
+  [K in AnimatedProps]: SharedValue<SimpleTextRendererData[K]>;
 };
 
 export type SimpleTextRendererProps = ViewProps & {
-  /**
-   * The data for the simple text module
-   */
-  data: SimpleTextRendererData;
-  /**
-   * The animated data for the SimpleButton module
-   */
-  animatedData: SimpleButtonRendererAnimatedData;
   /**
    * the color palette
    */
@@ -119,44 +110,28 @@ export type SimpleTextRendererProps = ViewProps & {
    * The wrapped content style
    */
   contentStyle?: StyleProp<TextStyle>;
-};
-
-export type SimpleTextViewRendererData =
-  | Omit<SimpleTextRenderer_simpleTextModule$data, ' $fragmentType'>
-  | Omit<SimpleTextRenderer_simpleTitleModule$data, ' $fragmentType'>;
-
-export type SimpleTextViewRendererProps = Omit<
-  SimpleTextRendererProps,
-  'animatedData' | 'data'
-> & {
-  data: SimpleTextViewRendererData;
-};
-
-export const SimpleTextViewRenderer = ({
-  data,
-  ...rest
-}: SimpleTextViewRendererProps) => {
-  const {
-    fontSize,
-    verticalSpacing,
-    marginVertical,
-    marginHorizontal,
-    ...restData
-  } = data;
-
-  return (
-    <SimpleTextRenderer
-      {...rest}
-      data={restData}
-      animatedData={{
-        fontSize,
-        verticalSpacing,
-        marginVertical,
-        marginHorizontal,
-      }}
-    />
+} & (
+    | {
+        /**
+         * The data for the simple text module
+         */
+        data: Omit<SimpleTextRendererData, AnimatedProps>;
+        /**
+         * The animated data for the SimpleButton module
+         */
+        animatedData: SimpleButtonRendererAnimatedData;
+      }
+    | {
+        /**
+         * The data for the simple text module
+         */
+        data: SimpleTextRendererData;
+        /**
+         * The animated data for the SimpleButton module
+         */
+        animatedData: null;
+      }
   );
-};
 
 /**
  *  implementation of the simple text module
@@ -181,6 +156,7 @@ const SimpleTextRenderer = ({
     fontColor,
     background,
     backgroundStyle,
+    ...rest
   } = getModuleDataValues({
     data,
     styleValuesMap:
@@ -194,41 +170,53 @@ const SimpleTextRenderer = ({
         : SIMPLE_TEXT_DEFAULT_VALUES,
   });
 
-  const { fontSize, verticalSpacing, marginVertical, marginHorizontal } =
-    animatedData;
-
   const cardModuleBackgroundStyle = useAnimatedStyle(() => {
+    if (animatedData === null) {
+      if ('marginVertical' in rest) {
+        return {
+          paddingVertical:
+            rest.marginVertical ?? SIMPLE_TEXT_DEFAULT_VALUES.marginVertical,
+          paddingHorizontal:
+            rest.marginHorizontal ??
+            SIMPLE_TEXT_DEFAULT_VALUES.marginHorizontal,
+        };
+      }
+      return {};
+    }
+
     return {
       paddingVertical:
-        typeof marginVertical === 'number'
-          ? marginVertical
-          : marginVertical?.value ?? SIMPLE_TEXT_DEFAULT_VALUES.marginVertical,
+        animatedData.marginVertical?.value ??
+        SIMPLE_TEXT_DEFAULT_VALUES.marginVertical,
       paddingHorizontal:
-        typeof marginHorizontal === 'number'
-          ? marginHorizontal
-          : marginHorizontal?.value ??
-            SIMPLE_TEXT_DEFAULT_VALUES.marginHorizontal,
-      flexShrink: 0,
+        animatedData.marginHorizontal?.value ??
+        SIMPLE_TEXT_DEFAULT_VALUES.marginHorizontal,
     };
-  }, [marginVertical, marginHorizontal]);
+  });
 
   const textStyle = useAnimatedStyle(() => {
-    const fontSizeValue =
-      typeof fontSize === 'number' ? fontSize : fontSize?.value;
-
-    const verticalSpacingValue =
-      typeof verticalSpacing === 'number'
-        ? verticalSpacing
-        : verticalSpacing?.value;
+    if (animatedData === null) {
+      if ('fontSize' in rest) {
+        return {
+          lineHeight:
+            rest.fontSize && rest.verticalSpacing
+              ? rest.fontSize * 1.2 + rest.verticalSpacing
+              : undefined,
+          fontSize: rest.fontSize ?? undefined,
+        };
+      }
+      return {};
+    }
 
     return {
       lineHeight:
-        fontSizeValue && verticalSpacingValue
-          ? fontSizeValue * 1.2 + verticalSpacingValue
+        animatedData.fontSize.value && animatedData.verticalSpacing.value
+          ? animatedData.fontSize.value * 1.2 +
+            animatedData.verticalSpacing.value
           : undefined,
-      fontSize: fontSizeValue ?? undefined,
+      fontSize: animatedData.fontSize.value ?? undefined,
     };
-  }, [fontSize, verticalSpacing]);
+  });
 
   return (
     <CardModuleBackground
@@ -241,7 +229,7 @@ const SimpleTextRenderer = ({
       )}
       patternColor={swapColor(backgroundStyle?.patternColor, colorPalette)}
       resizeMode={background?.resizeMode}
-      style={[style, cardModuleBackgroundStyle]}
+      style={[style, cardModuleBackgroundStyle, { flexShrink: 0 }]}
     >
       <Animated.Text
         style={[

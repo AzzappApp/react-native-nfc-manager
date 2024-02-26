@@ -64,6 +64,8 @@ type SimpleTextStyleEditionPanelProps = ViewProps & {
    * A callback called when the user update the text alignment
    */
   onTextAlignmentChange: (textAlignment: TextAlignment) => void;
+
+  onTouched?: () => void;
 };
 
 /**
@@ -82,6 +84,7 @@ const SimpleTextStyleEditionPanel = ({
   onTextAlignmentChange,
   style,
   moduleKind,
+  onTouched,
   ...props
 }: SimpleTextStyleEditionPanelProps) => {
   const intl = useIntl();
@@ -154,6 +157,7 @@ const SimpleTextStyleEditionPanel = ({
           description: 'Hint of the font size slider in cover edition',
         })}
         style={styles.slider}
+        onTouched={onTouched}
       />
       <LabeledDashedSlider
         label={
@@ -181,6 +185,7 @@ const SimpleTextStyleEditionPanel = ({
             'Hint of the vertical spacing slider in simple text edition',
         })}
         style={styles.slider}
+        onTouched={onTouched}
       />
     </View>
   );

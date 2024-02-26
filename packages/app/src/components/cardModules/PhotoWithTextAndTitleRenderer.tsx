@@ -24,6 +24,7 @@ import type {
   LayoutRectangle,
   ColorValue,
   TextStyle,
+  ViewStyle,
 } from 'react-native';
 import type { SharedValue } from 'react-native-reanimated';
 
@@ -89,30 +90,15 @@ const animatedProps = [
 
 type AnimatedProps = (typeof animatedProps)[number];
 
-export type PhotoWithTextAndTitleViewRendererData = Omit<
-  PhotoWithTextAndTitleRenderer_module$data,
-  ' $fragmentType'
->;
-
 export type PhotoWithTextAndTitleRendererData = NullableFields<
-  Omit<PhotoWithTextAndTitleViewRendererData, AnimatedProps>
+  Omit<PhotoWithTextAndTitleRenderer_module$data, ' $fragmentType'>
 >;
 
 type PhotoWithTextAndTitleRendererAnimatedData = {
-  [K in AnimatedProps]:
-    | PhotoWithTextAndTitleViewRendererData[K]
-    | SharedValue<PhotoWithTextAndTitleViewRendererData[K]>;
+  [K in AnimatedProps]: SharedValue<PhotoWithTextAndTitleRendererData[K]>;
 };
 
 export type PhotoWithTextAndTitleRendererProps = ViewProps & {
-  /**
-   * The data for the PhotoWithTextAndTitle module
-   */
-  data: PhotoWithTextAndTitleRendererData;
-  /**
-   * The animated data for the PhotoWithTextAndTitle module
-   */
-  animatedData: PhotoWithTextAndTitleRendererAnimatedData;
   /**
    * The view mode for the module
    */
@@ -125,50 +111,28 @@ export type PhotoWithTextAndTitleRendererProps = ViewProps & {
    * the card style
    */
   cardStyle: CardStyle | null | undefined;
-};
-
-export type PhotoWithTextAndTitleViewRendererProps = Omit<
-  PhotoWithTextAndTitleRendererProps,
-  'animatedData' | 'data'
-> & {
-  data: PhotoWithTextAndTitleViewRendererData;
-};
-
-export const PhotoWithTextAndTitleViewRenderer = ({
-  data,
-  ...rest
-}: PhotoWithTextAndTitleViewRendererProps) => {
-  const {
-    contentFontSize,
-    contentVerticalSpacing,
-    titleFontSize,
-    titleVerticalSpacing,
-    gap,
-    borderRadius,
-    marginHorizontal,
-    marginVertical,
-    aspectRatio,
-    ...restData
-  } = data;
-
-  return (
-    <PhotoWithTextAndTitleRenderer
-      {...rest}
-      data={restData}
-      animatedData={{
-        contentFontSize,
-        contentVerticalSpacing,
-        titleFontSize,
-        titleVerticalSpacing,
-        gap,
-        borderRadius,
-        marginHorizontal,
-        marginVertical,
-        aspectRatio,
-      }}
-    />
+} & (
+    | {
+        /**
+         * The data for the PhotoWithTextAndTitle module
+         */
+        data: Omit<PhotoWithTextAndTitleRendererData, AnimatedProps>;
+        /**
+         * The animated data for the PhotoWithTextAndTitle module
+         */
+        animatedData: PhotoWithTextAndTitleRendererAnimatedData;
+      }
+    | {
+        /**
+         * The data for the PhotoWithTextAndTitle module
+         */
+        data: PhotoWithTextAndTitleRendererData;
+        /**
+         * The animated data for the PhotoWithTextAndTitle module
+         */
+        animatedData: null;
+      }
   );
-};
 
 /**
  * Render a PhotoWithTextAndTitle module
@@ -178,6 +142,7 @@ const PhotoWithTextAndTitleRenderer = ({
   colorPalette,
   cardStyle,
   style,
+  animatedData,
   viewMode,
   ...props
 }: PhotoWithTextAndTitleRendererProps) => {
@@ -196,6 +161,7 @@ const PhotoWithTextAndTitleRenderer = ({
     horizontalArrangement,
     background,
     backgroundStyle,
+    ...rest
   } = getModuleDataValues({
     data,
     cardStyle,
@@ -219,38 +185,28 @@ const PhotoWithTextAndTitleRenderer = ({
         ? 'ios'
         : Platform.OS;
 
-  const {
-    contentFontSize,
-    contentVerticalSpacing,
-    titleFontSize,
-    titleVerticalSpacing,
-    gap,
-    borderRadius,
-    marginHorizontal,
-    marginVertical,
-    aspectRatio,
-  } = props.animatedData;
-
   const widthMargin = useDerivedValue(
     () =>
       (layout?.width ?? 0) -
       2 *
-        (typeof marginHorizontal === 'number'
-          ? marginHorizontal
-          : marginHorizontal?.value ?? 0),
-    [layout?.width, marginHorizontal],
+        (animatedData === null
+          ? 'marginHorizontal' in rest
+            ? rest.marginHorizontal
+            : 0
+          : animatedData?.marginHorizontal.value ?? 0),
   );
-  const imageWidth = useDerivedValue(
-    () =>
-      os === 'web'
+
+  const imageWidth = useDerivedValue(() =>
+    animatedData === null
+      ? 0
+      : os === 'web'
         ? widthMargin.value / 2
         : imageMargin === 'width_full'
           ? layout?.width ?? 0
           : widthMargin.value,
-    [layout?.width, imageMargin, widthMargin],
   );
 
-  const flexDirection =
+  const flexDirection: ViewStyle['flexDirection'] =
     os === 'web'
       ? horizontalArrangement === 'left'
         ? 'row'
@@ -260,110 +216,143 @@ const PhotoWithTextAndTitleRenderer = ({
         : 'column-reverse';
 
   const containerStyle = useAnimatedStyle(() => {
-    const gapValue = typeof gap === 'number' ? gap : gap?.value ?? 0;
+    if (animatedData === null) {
+      if ('gap' in rest) {
+        return {
+          flexDirection,
+          rowGap: rest.gap ?? 0,
+          columnGap: rest.gap ?? 0,
+          width: os === 'web' ? widthMargin.value : layout?.width ?? 0,
+          marginHorizontal: os === 'web' ? rest.marginHorizontal ?? 0 : 0,
+        };
+      }
+      return {};
+    }
+    const gapValue = animatedData.gap.value ?? 0;
     return {
       flexDirection,
       rowGap: gapValue,
       columnGap: gapValue,
       width: os === 'web' ? widthMargin.value : layout?.width ?? 0,
       marginHorizontal:
-        os === 'web'
-          ? typeof marginHorizontal === 'number'
-            ? marginHorizontal
-            : marginHorizontal?.value ?? 0
-          : 0,
+        os === 'web' ? animatedData.marginHorizontal.value ?? 0 : 0,
     };
-  }, [gap, layout?.width, marginHorizontal]);
+  });
 
-  const imageContainerStyle = useAnimatedStyle(() => {
-    return {
-      marginVertical: typeof marginVertical === 'number' ? marginVertical : 0,
-      marginHorizontal:
-        os === 'web'
-          ? 0
-          : imageMargin === 'width_full'
-            ? 0
-            : typeof marginHorizontal === 'number'
-              ? marginHorizontal
-              : marginHorizontal?.value ?? 0,
-      aspectRatio:
-        typeof aspectRatio === 'number' ? aspectRatio : aspectRatio?.value ?? 1,
-      width: imageWidth.value,
-      borderRadius:
-        typeof borderRadius === 'number'
-          ? borderRadius
-          : borderRadius?.value ?? 0,
-      overflow: 'hidden',
-    };
-  }, [
-    aspectRatio,
-    borderRadius,
-    imageWidth,
-    imageMargin,
-    marginHorizontal,
-    marginVertical,
-  ]);
+  const imageContainerStyle = useAnimatedStyle(() =>
+    animatedData === null
+      ? 'marginVertical' in rest
+        ? {
+            marginVertical: rest.marginVertical,
+            marginHorizontal:
+              os === 'web'
+                ? 0
+                : imageMargin === 'width_full'
+                  ? 0
+                  : rest.marginHorizontal,
+            aspectRatio: rest.aspectRatio ?? 1,
+            borderRadius: rest.borderRadius ?? 0,
+          }
+        : {}
+      : {
+          marginVertical: animatedData.marginVertical.value,
+          marginHorizontal:
+            os === 'web'
+              ? 0
+              : imageMargin === 'width_full'
+                ? 0
+                : animatedData.marginHorizontal.value,
+          aspectRatio: animatedData.aspectRatio.value ?? 1,
+          borderRadius: animatedData.borderRadius.value ?? 0,
+        },
+  );
 
-  const imageStyle = useAnimatedStyle(() => {
-    return {
-      aspectRatio:
-        typeof aspectRatio === 'number' ? aspectRatio : aspectRatio?.value ?? 1,
-      width: imageWidth.value,
-    };
-  }, [aspectRatio, imageWidth]);
+  const imageStyle = useAnimatedStyle(() =>
+    animatedData === null
+      ? 'aspectRatio' in rest
+        ? {
+            aspectRatio: rest.aspectRatio ?? 1,
+            width: imageWidth.value,
+          }
+        : { width: imageWidth.value }
+      : {
+          aspectRatio: animatedData.aspectRatio.value ?? 1,
+          width: imageWidth.value,
+        },
+  );
 
   const textContainerStyle = useAnimatedStyle(() => {
-    return {
-      width:
-        os === 'web'
-          ? widthMargin.value / 2 -
-            (typeof gap === 'number' ? gap : gap?.value ?? 0)
-          : undefined,
-      marginHorizontal:
-        os === 'web'
-          ? 0
-          : typeof marginHorizontal === 'number'
-            ? marginHorizontal
-            : marginHorizontal?.value ?? 0,
-      justifyContent: viewMode === 'desktop' ? 'center' : undefined,
-    };
-  }, [marginHorizontal, gap, widthMargin, viewMode]);
+    return animatedData === null
+      ? 'marginHorizontal' in rest
+        ? {
+            width:
+              os === 'web'
+                ? widthMargin.value / 2 - (rest.gap ?? 0)
+                : undefined,
+            marginHorizontal: os === 'web' ? 0 : rest.marginHorizontal ?? 0,
+            justifyContent: viewMode === 'desktop' ? 'center' : undefined,
+          }
+        : {}
+      : {
+          width:
+            os === 'web'
+              ? widthMargin.value / 2 - (animatedData?.gap.value ?? 0)
+              : undefined,
+          marginHorizontal:
+            os === 'web' ? 0 : animatedData?.marginHorizontal.value ?? 0,
+          justifyContent: viewMode === 'desktop' ? 'center' : undefined,
+        };
+  });
 
   const titleStyle = useAnimatedStyle(() => {
-    const titleFontSizeValue =
-      typeof titleFontSize === 'number'
-        ? titleFontSize
-        : titleFontSize?.value ?? undefined;
-    const titleVerticalSpacingValue =
-      typeof titleVerticalSpacing === 'number'
-        ? titleVerticalSpacing
-        : titleVerticalSpacing?.value ?? undefined;
+    if (animatedData === null) {
+      if ('titleFontSize' in rest) {
+        return {
+          lineHeight:
+            rest.titleFontSize && rest.titleVerticalSpacing
+              ? rest.titleFontSize * 1.2 + rest.titleVerticalSpacing
+              : undefined,
+          fontSize: rest.titleFontSize,
+        };
+      }
+      return {};
+    }
+
+    const fontSizeValue = animatedData.titleFontSize.value;
+    const verticalSpacingValue = animatedData.titleVerticalSpacing.value;
     return {
-      fontSize: titleFontSizeValue,
+      fontSize: fontSizeValue ?? undefined,
       lineHeight:
-        titleFontSizeValue && titleVerticalSpacingValue
-          ? titleFontSizeValue * 1.2 + titleVerticalSpacingValue
+        fontSizeValue && verticalSpacingValue
+          ? fontSizeValue * 1.2 + verticalSpacingValue
           : undefined,
     };
-  }, [titleFontSize, titleVerticalSpacing]);
+  });
 
   const contentStyle = useAnimatedStyle(() => {
-    const contentFontSizeValue =
-      typeof contentFontSize === 'number'
-        ? contentFontSize
-        : contentFontSize?.value ?? undefined;
-    const contentVerticalSpacingValue =
-      typeof contentVerticalSpacing === 'number'
-        ? contentVerticalSpacing
-        : contentVerticalSpacing?.value ?? undefined;
+    if (animatedData === null) {
+      if ('contentFontSize' in rest) {
+        return {
+          lineHeight:
+            rest.contentFontSize && rest.contentVerticalSpacing
+              ? rest.contentFontSize * 1.2 + rest.contentVerticalSpacing
+              : undefined,
+          fontSize: rest.contentFontSize,
+        };
+      }
+      return {};
+    }
+
+    const fontSizeValue = animatedData.contentFontSize.value;
+    const verticalSpacingValue = animatedData.contentVerticalSpacing.value;
     return {
-      fontSize: contentFontSizeValue,
+      fontSize: fontSizeValue ?? undefined,
       lineHeight:
-        contentFontSizeValue && contentVerticalSpacingValue
-          ? contentFontSizeValue * 1.2 + contentVerticalSpacingValue
+        fontSizeValue && verticalSpacingValue
+          ? fontSizeValue * 1.2 + verticalSpacingValue
           : undefined,
     };
-  }, [contentFontSize, contentVerticalSpacing]);
+  });
 
   return (
     <CardModuleBackground
@@ -379,7 +368,7 @@ const PhotoWithTextAndTitleRenderer = ({
       onLayout={onLayout}
     >
       <Animated.View style={containerStyle}>
-        <Animated.View style={imageContainerStyle}>
+        <Animated.View style={[imageContainerStyle, { overflow: 'hidden' }]}>
           {image && (
             <Animated.Image
               source={{ uri: image.uri }}

@@ -234,7 +234,14 @@ const SimpleTextEditionScreen = ({
     `);
 
   const isValid = !!text;
-  const canSave = dirty && isValid && !saving;
+
+  const [touched, setTouched] = useState(false);
+
+  const onTouched = useCallback(() => {
+    setTouched(true);
+  }, []);
+
+  const canSave = (dirty || touched) && isValid && !saving;
 
   const router = useRouter();
   const intl = useIntl();
@@ -418,6 +425,7 @@ const SimpleTextEditionScreen = ({
                   flex: 1,
                   marginBottom: insetBottom + BOTTOM_MENU_HEIGHT,
                 }}
+                onTouched={onTouched}
               />
             ),
           },
@@ -432,6 +440,7 @@ const SimpleTextEditionScreen = ({
                   flex: 1,
                   marginBottom: insetBottom + BOTTOM_MENU_HEIGHT,
                 }}
+                onTouched={onTouched}
               />
             ),
           },

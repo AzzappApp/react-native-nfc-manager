@@ -24,6 +24,8 @@ type SimpleTextMarginEditionPanelProps = ViewProps & {
    * The vertical margin currently set on the module
    */
   marginVertical: SharedValue<number>;
+
+  onTouched?: () => void;
 };
 
 /**
@@ -34,6 +36,7 @@ const SimpleTextMarginEditionPanel = ({
   marginHorizontal,
   marginVertical,
   style,
+  onTouched,
   ...props
 }: SimpleTextMarginEditionPanelProps) => {
   const intl = useIntl();
@@ -71,6 +74,7 @@ const SimpleTextMarginEditionPanel = ({
             description: 'Hint of the margin size slider in cover edition',
           })}
           style={styles.slider}
+          onTouched={onTouched}
         />
         <LabeledDashedSlider
           label={
@@ -96,6 +100,7 @@ const SimpleTextMarginEditionPanel = ({
             description: 'Hint of the margin size slider in cover edition',
           })}
           style={styles.slider}
+          onTouched={onTouched}
         />
       </View>
     </View>

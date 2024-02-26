@@ -66,24 +66,14 @@ const animatedProps = [
 type AnimatedProps = (typeof animatedProps)[number];
 
 export type SimpleButtonRendererData = NullableFields<
-  Omit<SimpleButtonViewRendererData, AnimatedProps>
+  Omit<SimpleButtonRenderer_module$data, ' $fragmentType'>
 >;
 
 type SimpleButtonRendererAnimatedData = {
-  [K in AnimatedProps]:
-    | SharedValue<SimpleButtonViewRendererData[K]>
-    | SimpleButtonViewRendererData[K];
+  [K in AnimatedProps]: SharedValue<SimpleButtonRendererData[K]>;
 };
 
 export type SimpleButtonRendererProps = ViewProps & {
-  /**
-   * The data for the SimpleButton module
-   */
-  data: SimpleButtonRendererData;
-  /**
-   * The animated data for the SimpleButton module
-   */
-  animatedData: SimpleButtonRendererAnimatedData;
   /**
    * the color palette
    */
@@ -100,51 +90,28 @@ export type SimpleButtonRendererProps = ViewProps & {
    * Whether the button is disabled
    */
   disabled?: boolean;
-};
-
-export type SimpleButtonViewRendererData = Omit<
-  SimpleButtonRenderer_module$data,
-  ' $fragmentType'
->;
-
-export type SimpleButtonViewRenderProps = Omit<
-  SimpleButtonRendererProps,
-  'animatedData' | 'data'
-> & {
-  data: SimpleButtonViewRendererData;
-};
-
-export const SimpleButtonViewRenderer = ({
-  data,
-  ...rest
-}: SimpleButtonViewRenderProps) => {
-  const {
-    borderRadius,
-    borderWidth,
-    fontSize,
-    height,
-    width,
-    marginTop,
-    marginBottom,
-    ...restData
-  } = data;
-
-  return (
-    <SimpleButtonRenderer
-      {...rest}
-      data={restData}
-      animatedData={{
-        borderRadius,
-        borderWidth,
-        fontSize,
-        height,
-        width,
-        marginTop,
-        marginBottom,
-      }}
-    />
+} & (
+    | {
+        /**
+         * The data for the SimpleButton module
+         */
+        data: Omit<SimpleButtonRendererData, AnimatedProps>;
+        /**
+         * The animated data for the SimpleButton module
+         */
+        animatedData: SimpleButtonRendererAnimatedData;
+      }
+    | {
+        /**
+         * The data for the SimpleButton module
+         */
+        data: SimpleButtonRendererData;
+        /**
+         * The animated data for the SimpleButton module
+         */
+        animatedData: null;
+      }
   );
-};
 
 /**
  *  implementation of the SimpleButton module
@@ -171,23 +138,13 @@ export const SimpleButtonRenderer = ({
     borderColor,
     background,
     backgroundStyle,
+    ...rest
   } = getModuleDataValues({
     data,
     cardStyle,
     styleValuesMap: SIMPLE_BUTTON_STYLE_VALUES,
     defaultValues: SIMPLE_BUTTON_DEFAULT_VALUES,
   });
-
-  const {
-    borderRadius,
-    borderWidth,
-    fontSize,
-    height,
-    marginBottom,
-    marginTop,
-    width,
-  } = animatedData;
-
   const onPress = useCallback(async () => {
     if (actionLink) {
       if (actionType === 'link') {
@@ -201,56 +158,64 @@ export const SimpleButtonRenderer = ({
   }, [actionLink, actionType]);
 
   const cardModuleBackgroundStyle = useAnimatedStyle(() => {
+    if (animatedData === null) {
+      if ('height' in rest) {
+        return {
+          height: rest.height ?? SIMPLE_BUTTON_DEFAULT_VALUES.height,
+          marginBottom:
+            rest.marginBottom ?? SIMPLE_BUTTON_DEFAULT_VALUES.marginBottom,
+          marginTop: rest.marginTop ?? SIMPLE_BUTTON_DEFAULT_VALUES.marginTop,
+        };
+      }
+      return {};
+    }
+
     return {
       height:
-        (typeof height === 'number'
-          ? height
-          : height?.value ?? SIMPLE_BUTTON_DEFAULT_VALUES.height) +
-        (typeof marginTop === 'number'
-          ? marginTop
-          : marginTop?.value ?? SIMPLE_BUTTON_DEFAULT_VALUES.marginTop) +
-        (typeof marginBottom === 'number'
-          ? marginBottom
-          : marginBottom?.value ?? SIMPLE_BUTTON_DEFAULT_VALUES.marginBottom),
-      alignItems: 'center',
+        (animatedData.height.value ?? SIMPLE_BUTTON_DEFAULT_VALUES.height) +
+        (animatedData.marginTop.value ??
+          SIMPLE_BUTTON_DEFAULT_VALUES.marginTop) +
+        (animatedData.marginBottom.value ??
+          SIMPLE_BUTTON_DEFAULT_VALUES.marginBottom),
     };
-  }, [height, marginBottom, marginTop]);
+  });
 
   const moduleContentStyle = useAnimatedStyle(() => {
-    return {
-      height:
-        typeof height === 'number'
-          ? height
-          : height?.value ?? SIMPLE_BUTTON_DEFAULT_VALUES.height,
-      width:
-        typeof width === 'number'
-          ? width
-          : width?.value ?? SIMPLE_BUTTON_DEFAULT_VALUES.width,
-      marginBottom:
-        typeof marginBottom === 'number'
-          ? marginBottom
-          : marginBottom?.value ?? SIMPLE_BUTTON_DEFAULT_VALUES.marginBottom,
-      marginTop:
-        typeof marginTop === 'number'
-          ? marginTop
-          : marginTop?.value ?? SIMPLE_BUTTON_DEFAULT_VALUES.marginTop,
-      borderRadius:
-        typeof borderRadius === 'number'
-          ? borderRadius
-          : borderRadius?.value ?? undefined,
-      borderWidth:
-        typeof borderWidth === 'number'
-          ? borderWidth
-          : borderWidth?.value ?? undefined,
-    };
-  }, [marginBottom, marginTop, borderRadius, borderWidth, height, width]);
+    if (animatedData === null) {
+      if ('height' in rest) {
+        return {
+          height: rest.height ?? SIMPLE_BUTTON_DEFAULT_VALUES.height,
+          width: rest.width ?? SIMPLE_BUTTON_DEFAULT_VALUES.width,
+          marginBottom:
+            rest.marginBottom ?? SIMPLE_BUTTON_DEFAULT_VALUES.marginBottom,
+          marginTop: rest.marginTop ?? SIMPLE_BUTTON_DEFAULT_VALUES.marginTop,
+          borderRadius: rest.borderRadius ?? 0,
+          borderWidth: rest.borderWidth ?? 0,
+        };
+      }
+      return {};
+    }
 
-  const moduleTextStyle = useAnimatedStyle(() => {
     return {
-      fontSize:
-        typeof fontSize === 'number' ? fontSize : fontSize?.value ?? undefined,
+      height: animatedData.height.value ?? SIMPLE_BUTTON_DEFAULT_VALUES.height,
+      width: animatedData.width.value ?? SIMPLE_BUTTON_DEFAULT_VALUES.width,
+      marginBottom:
+        animatedData.marginBottom.value ??
+        SIMPLE_BUTTON_DEFAULT_VALUES.marginBottom,
+      marginTop:
+        animatedData.marginTop.value ?? SIMPLE_BUTTON_DEFAULT_VALUES.marginTop,
+      borderRadius: animatedData.borderRadius.value ?? 0,
+      borderWidth: animatedData.borderWidth.value ?? 0,
     };
-  }, [fontSize]);
+  });
+
+  const textStyle = useAnimatedStyle(() => {
+    return animatedData === null
+      ? { fontSize: 'fontSize' in rest ? rest.fontSize : undefined }
+      : {
+          fontSize: animatedData.fontSize.value ?? undefined,
+        };
+  });
 
   return (
     <CardModuleBackground
@@ -262,7 +227,7 @@ export const SimpleButtonRenderer = ({
       )}
       patternColor={swapColor(backgroundStyle?.patternColor, colorPalette)}
       resizeMode={background?.resizeMode}
-      style={[style, cardModuleBackgroundStyle]}
+      style={[style, cardModuleBackgroundStyle, { alignItems: 'center' }]}
     >
       <PressableOpacity
         onPress={onPress}
@@ -290,7 +255,7 @@ export const SimpleButtonRenderer = ({
                 color: swapColor(fontColor, colorPalette),
                 flexWrap: 'nowrap',
               },
-              moduleTextStyle,
+              textStyle,
             ]}
             numberOfLines={1}
           >
@@ -301,3 +266,5 @@ export const SimpleButtonRenderer = ({
     </CardModuleBackground>
   );
 };
+
+export default SimpleButtonRenderer;

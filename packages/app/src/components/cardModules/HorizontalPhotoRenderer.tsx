@@ -62,37 +62,15 @@ export const readHorizontalPhotoData = (
   module: HorizontalPhotoRenderer_module$key,
 ) => readInlineData(HorizontalPhotoRendererFragment, module);
 
-export type HorizontalPhotoViewRendererData = Omit<
-  HorizontalPhotoRenderer_module$data,
-  ' $fragmentType'
->;
-
 export type HorizontalPhotoRendererData = NullableFields<
-  Omit<HorizontalPhotoViewRendererData, AnimatedProps>
+  Omit<HorizontalPhotoRenderer_module$data, ' $fragmentType'>
 >;
-
-export type HorizontalPhotoViewRendererProps = Omit<
-  HorizontalPhotoRendererProps,
-  'animatedData' | 'data'
-> & {
-  data: HorizontalPhotoViewRendererData;
-};
 
 type HorizontalPhotoRendererAnimatedData = {
-  [K in AnimatedProps]:
-    | HorizontalPhotoViewRendererData[K]
-    | SharedValue<HorizontalPhotoViewRendererData[K]>;
+  [K in AnimatedProps]: SharedValue<HorizontalPhotoRendererData[K]>;
 };
 
 export type HorizontalPhotoRendererProps = ViewProps & {
-  /**
-   * The data for the HorizontalPhoto module
-   */
-  data: HorizontalPhotoRendererData;
-  /**
-   * The animated data for the HorizontalPhoto module
-   */
-  animatedData: HorizontalPhotoRendererAnimatedData;
   /**
    * the color palette
    */
@@ -105,35 +83,25 @@ export type HorizontalPhotoRendererProps = ViewProps & {
    * The wrapped content style
    */
   contentStyle?: StyleProp<ViewStyle>;
-};
-
-export const HorizontalPhotoViewRenderer = ({
-  data,
-  ...rest
-}: HorizontalPhotoViewRendererProps) => {
-  const {
-    borderWidth,
-    borderRadius,
-    marginHorizontal,
-    marginVertical,
-    imageHeight,
-    ...restData
-  } = data;
-
-  return (
-    <HorizontalPhotoRenderer
-      {...rest}
-      data={restData}
-      animatedData={{
-        borderWidth,
-        borderRadius,
-        marginHorizontal,
-        marginVertical,
-        imageHeight,
-      }}
-    />
+} & (
+    | {
+        /**
+         * The data for the BlockText module
+         */
+        data: Omit<HorizontalPhotoRendererData, AnimatedProps>;
+        /**
+         * The animated data for the BlockText module
+         */
+        animatedData: HorizontalPhotoRendererAnimatedData;
+      }
+    | {
+        /**
+         * The data for the HorizontalPhoto module
+         */
+        data: HorizontalPhotoRendererData;
+        animatedData: null;
+      }
   );
-};
 
 /**
  * Render a HorizontalPhoto module
@@ -147,7 +115,7 @@ const HorizontalPhotoRenderer = ({
   contentStyle,
   ...props
 }: HorizontalPhotoRendererProps) => {
-  const { borderColor, background, backgroundStyle, image } =
+  const { borderColor, background, backgroundStyle, image, ...rest } =
     getModuleDataValues({
       data,
       cardStyle,
@@ -155,40 +123,29 @@ const HorizontalPhotoRenderer = ({
       styleValuesMap: HORIZONTAL_PHOTO_STYLE_VALUES,
     });
 
-  const {
-    borderWidth,
-    borderRadius,
-    marginHorizontal,
-    marginVertical,
-    imageHeight,
-  } = animatedData;
-
   const containerStyle = useAnimatedStyle(() => {
+    if (animatedData === null) {
+      if ('imageHeight' in rest) {
+        return {
+          height: rest.imageHeight,
+          borderWidth: rest.borderWidth ?? 0,
+          borderRadius: rest.borderRadius ?? 0,
+          marginHorizontal: rest.marginHorizontal,
+          marginVertical: rest.marginVertical,
+        };
+      }
+
+      return {};
+    }
+
     return {
-      height:
-        typeof imageHeight === 'number' ? imageHeight : imageHeight?.value ?? 0,
-      borderWidth:
-        typeof borderWidth === 'number' ? borderWidth : borderWidth?.value ?? 0,
-      borderRadius:
-        typeof borderRadius === 'number'
-          ? borderRadius
-          : borderRadius?.value ?? 0,
-      marginHorizontal:
-        typeof marginHorizontal === 'number'
-          ? marginHorizontal
-          : marginHorizontal?.value ?? 0,
-      marginVertical:
-        typeof marginVertical === 'number'
-          ? marginVertical
-          : marginVertical?.value ?? 0,
+      height: animatedData.imageHeight.value,
+      borderWidth: animatedData.borderWidth.value ?? 0,
+      borderRadius: animatedData.borderRadius.value ?? 0,
+      marginHorizontal: animatedData.marginHorizontal.value,
+      marginVertical: animatedData.marginVertical.value,
     };
-  }, [
-    imageHeight,
-    marginVertical,
-    marginHorizontal,
-    borderRadius,
-    borderWidth,
-  ]);
+  });
 
   return (
     <CardModuleBackground

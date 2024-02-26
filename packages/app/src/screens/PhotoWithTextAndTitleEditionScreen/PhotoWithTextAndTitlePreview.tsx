@@ -11,6 +11,8 @@ type PhotoWithTextAndTitlePreviewProps = Pick<
    * A callback that is called when the module preview is pressed.
    */
   onPreviewPress?: () => void;
+
+  animatedData: object;
 };
 
 /**

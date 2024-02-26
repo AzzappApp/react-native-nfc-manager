@@ -72,37 +72,15 @@ type AnimatedProps = (typeof animatedProps)[number];
 export const readBlockTextData = (module: BlockTextRenderer_module$key) =>
   readInlineData(BlockTextRendererFragment, module);
 
-export type BlockTextViewRendererData = Omit<
-  BlockTextRenderer_module$data,
-  ' $fragmentType'
->;
-
 export type BlockTextRendererData = NullableFields<
-  Omit<BlockTextViewRendererData, AnimatedProps>
+  Omit<BlockTextRenderer_module$data, ' $fragmentType'>
 >;
 
 type BlockTextRendererAnimatedData = {
-  [K in AnimatedProps]:
-    | BlockTextViewRendererData[K]
-    | SharedValue<BlockTextViewRendererData[K]>;
-};
-
-export type BlockTextViewRendererProps = Omit<
-  BlockTextRendererProps,
-  'animatedData' | 'data'
-> & {
-  data: BlockTextViewRendererData;
+  [K in AnimatedProps]: SharedValue<BlockTextRendererData[K]>;
 };
 
 export type BlockTextRendererProps = ViewProps & {
-  /**
-   * The data for the BlockText module
-   */
-  data: BlockTextRendererData;
-  /**
-   * The animated data for the BlockText module
-   */
-  animatedData: BlockTextRendererAnimatedData;
   /**
    * the color palette
    */
@@ -115,37 +93,26 @@ export type BlockTextRendererProps = ViewProps & {
    * The wrapped content style
    */
   contentStyle?: StyleProp<ViewStyle>;
-};
+} & (
+    | {
+        /**
+         * The data for the BlockText module
+         */
+        data: BlockTextRendererData;
 
-export const BlockTextViewRenderer = ({
-  data,
-  ...rest
-}: BlockTextViewRendererProps) => {
-  const {
-    fontSize,
-    verticalSpacing,
-    marginHorizontal,
-    marginVertical,
-    textMarginVertical,
-    textMarginHorizontal,
-    ...restData
-  } = data;
-
-  return (
-    <BlockTextRenderer
-      {...rest}
-      data={restData}
-      animatedData={{
-        fontSize,
-        verticalSpacing,
-        marginHorizontal,
-        marginVertical,
-        textMarginVertical,
-        textMarginHorizontal,
-      }}
-    />
+        animatedData: null;
+      }
+    | {
+        /**
+         * The data for the BlockText module
+         */
+        data: Omit<BlockTextRendererData, AnimatedProps>;
+        /**
+         * The animated data for the BlockText module
+         */
+        animatedData: BlockTextRendererAnimatedData;
+      }
   );
-};
 
 /**
  * Render a BlockText module
@@ -167,6 +134,7 @@ const BlockTextRenderer = ({
     textBackgroundStyle,
     background,
     backgroundStyle,
+    ...rest
   } = getModuleDataValues({
     data,
     cardStyle,
@@ -174,48 +142,50 @@ const BlockTextRenderer = ({
     styleValuesMap: BLOCK_TEXT_STYLE_VALUES,
   });
 
-  const {
-    fontSize,
-    verticalSpacing,
-    marginHorizontal,
-    marginVertical,
-    textMarginVertical,
-    textMarginHorizontal,
-  } = animatedData;
-
-  const containerStyle = useAnimatedStyle(
-    () => ({
-      marginVertical:
-        typeof marginVertical === 'number'
-          ? marginVertical
-          : marginVertical?.value ?? 0,
-      marginHorizontal:
-        typeof marginHorizontal === 'number'
-          ? marginHorizontal
-          : marginHorizontal?.value ?? 0,
-    }),
-    [marginVertical, marginHorizontal],
+  const containerStyle = useAnimatedStyle(() =>
+    animatedData !== null
+      ? {
+          marginVertical: animatedData.marginVertical.value,
+          marginHorizontal: animatedData.marginHorizontal.value,
+        }
+      : 'marginVertical' in rest
+        ? {
+            marginVertical: rest.marginVertical,
+            marginHorizontal: rest.marginHorizontal,
+          }
+        : {},
   );
 
   const textStyle = useAnimatedStyle(() => {
-    const fontSizeValue =
-      typeof fontSize === 'number' ? fontSize : fontSize?.value ?? undefined;
+    if (animatedData === null) {
+      if ('fontSize' in rest) {
+        return {
+          paddingVertical: rest.textMarginVertical,
+          paddingHorizontal: rest.textMarginHorizontal,
+          fontSize: rest.fontSize ?? undefined,
+          lineHeight:
+            rest.fontSize && rest.verticalSpacing
+              ? rest.fontSize * 1.2 + rest.verticalSpacing
+              : undefined,
+        };
+      }
+      return {};
+    }
 
-    const verticalSpacingValue =
-      typeof verticalSpacing === 'number'
-        ? verticalSpacing
-        : verticalSpacing?.value ?? undefined;
+    const {
+      fontSize,
+      verticalSpacing,
+      textMarginVertical,
+      textMarginHorizontal,
+    } = animatedData;
+
+    const fontSizeValue = fontSize?.value;
+
+    const verticalSpacingValue = verticalSpacing?.value;
     return {
-      paddingVertical:
-        typeof textMarginVertical === 'number'
-          ? textMarginVertical
-          : textMarginVertical?.value ?? 0,
-      paddingHorizontal:
-        typeof textMarginHorizontal === 'number'
-          ? textMarginHorizontal
-          : textMarginHorizontal?.value ?? 0,
-
-      fontSize: fontSizeValue,
+      paddingVertical: textMarginVertical?.value,
+      paddingHorizontal: textMarginHorizontal?.value ?? 0,
+      fontSize: fontSizeValue ?? undefined,
       lineHeight:
         fontSizeValue && verticalSpacingValue
           ? fontSizeValue * 1.2 + verticalSpacingValue

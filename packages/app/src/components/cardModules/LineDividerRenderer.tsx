@@ -39,37 +39,15 @@ const animatedProps = ['height', 'marginBottom', 'marginTop'] as const;
 
 type AnimatedProps = (typeof animatedProps)[number];
 
-export type LineDividerRendererViewData = Omit<
-  LineDividerRenderer_module$data,
-  ' $fragmentType'
->;
-
 export type LineDividerRendererData = NullableFields<
-  Omit<LineDividerRendererViewData, AnimatedProps>
+  Omit<LineDividerRenderer_module$data, ' $fragmentType'>
 >;
-
-export type LineDividerViewRendererProps = Omit<
-  LineDividerRendererProps,
-  'animatedData' | 'data'
-> & {
-  data: LineDividerRendererViewData;
-};
 
 type LineDividerRendererAnimatedData = {
-  [K in AnimatedProps]:
-    | LineDividerRendererViewData[K]
-    | SharedValue<LineDividerRendererViewData[K]>;
+  [K in AnimatedProps]: SharedValue<LineDividerRendererData[K]>;
 };
 
 export type LineDividerRendererProps = ViewProps & {
-  /**
-   * The data for the line divider module
-   */
-  data: LineDividerRendererData;
-  /**
-   * The animated data for the line divider module
-   */
-  animatedData: LineDividerRendererAnimatedData;
   /**
    * the color palette
    */
@@ -78,26 +56,25 @@ export type LineDividerRendererProps = ViewProps & {
    * the card style
    */
   cardStyle: CardStyle | null | undefined;
-};
-
-export const LineDividerViewRenderer = ({
-  data,
-  ...rest
-}: LineDividerViewRendererProps) => {
-  const { height, marginTop, marginBottom, ...restData } = data;
-
-  return (
-    <LineDividerRenderer
-      {...rest}
-      data={restData}
-      animatedData={{
-        height,
-        marginTop,
-        marginBottom,
-      }}
-    />
+} & (
+    | {
+        /**
+         * The data for the line divider module
+         */
+        data: LineDividerRendererData;
+        animatedData: null;
+      }
+    | {
+        /**
+         * The data for the line divider module
+         */
+        data: Omit<LineDividerRendererData, AnimatedProps>;
+        /**
+         * The animated data for the line divider module
+         */
+        animatedData: LineDividerRendererAnimatedData;
+      }
   );
-};
 
 /**
  * Render a LineDivider module
@@ -110,7 +87,7 @@ const LineDividerRenderer = ({
   animatedData,
   ...props
 }: LineDividerRendererProps) => {
-  const { orientation, colorTop, colorBottom } = getModuleDataValues({
+  const { orientation, colorTop, colorBottom, ...rest } = getModuleDataValues({
     data,
     cardStyle,
     defaultValues: LINE_DIVIDER_DEFAULT_VALUES,
@@ -126,54 +103,85 @@ const LineDividerRenderer = ({
     [props],
   );
 
-  const { height, marginTop, marginBottom } = animatedData;
-
   const containerStyle = useAnimatedStyle(() => {
-    const heightValue =
-      typeof height === 'number' ? height : height?.value ?? 0;
-    const marginBottomValue =
-      typeof marginBottom === 'number'
-        ? marginBottom
-        : marginBottom?.value ?? 0;
-    const marginTopValue =
-      typeof marginTop === 'number' ? marginTop : marginTop?.value ?? 0;
+    if (animatedData === null) {
+      if ('height' in rest) {
+        return {
+          height:
+            (rest.height ?? 0) +
+            (rest.marginBottom ?? 0) +
+            (rest.marginTop ?? 0),
+        };
+      }
+      return {};
+    }
+
     return {
-      height: heightValue + marginBottomValue + marginTopValue,
+      height:
+        (animatedData.height.value ?? 0) +
+        (animatedData.marginBottom.value ?? 0) +
+        (animatedData.marginTop.value ?? 0),
     };
   });
 
   const elementTop = useAnimatedStyle(() => {
-    const marginTopValue =
-      typeof marginTop === 'number' ? marginTop : marginTop?.value ?? 0;
+    if (animatedData === null) {
+      if ('marginTop' in rest) {
+        return {
+          height: rest.marginTop ?? 0,
+          display: rest.marginTop ? 'flex' : 'none',
+        };
+      }
+      return {};
+    }
     return {
-      height: marginTopValue + 1,
-      display: marginTopValue > 0 ? 'flex' : 'none',
+      height: (animatedData.marginTop.value ?? 0) + 1,
+      display: animatedData.marginTop.value ? 'flex' : 'none',
     };
-  }, [marginTop]);
+  });
 
   const elementBottom = useAnimatedStyle(() => {
-    const marginBottomValue =
-      typeof marginBottom === 'number'
-        ? marginBottom
-        : marginBottom?.value ?? 0;
+    if (animatedData === null) {
+      if ('marginBottom' in rest) {
+        return {
+          height: rest.marginBottom ?? 0,
+          display: rest.marginBottom ? 'flex' : 'none',
+        };
+      }
+      return {};
+    }
     return {
-      height: marginBottomValue + 1,
-      display: marginBottomValue > 0 ? 'flex' : 'none',
+      height: (animatedData.marginBottom.value ?? 0) + 1,
+      display: animatedData.marginBottom.value ? 'flex' : 'none',
     };
-  }, [marginBottom]);
+  });
 
   const dividerStyle = useAnimatedStyle(() => {
-    const heightValue =
-      typeof height === 'number' ? height : height?.value ?? 0;
+    if (animatedData === null) {
+      if ('height' in rest) {
+        return {
+          height: (rest.height ?? 0) + 2,
+          maxHeight: (rest.height ?? 0) + 2,
+          marginTop: -1,
+          marginBottom: -1,
+          zIndex: 1,
+          borderTopWidth: rest.height ?? 0,
+        };
+      }
+      return {};
+    }
+
+    const height = animatedData.height.value ?? 0;
+
     return {
-      height: heightValue + 2,
-      maxHeight: heightValue + 2,
+      height: height + 2,
+      maxHeight: height + 2,
       marginTop: -1,
       marginBottom: -1,
       zIndex: 1,
-      borderTopWidth: heightValue,
+      borderTopWidth: height,
     };
-  }, [height]);
+  });
 
   return (
     <Animated.View

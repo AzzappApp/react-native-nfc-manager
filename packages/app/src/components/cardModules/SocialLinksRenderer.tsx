@@ -68,30 +68,15 @@ const animatedProps = [
 
 type AnimatedProps = (typeof animatedProps)[number];
 
-export type SocialLinksViewRendererData = Omit<
-  SocialLinksRenderer_module$data,
-  ' $fragmentType'
->;
-
 export type SocialLinksRendererData = NullableFields<
-  Omit<SocialLinksViewRendererData, AnimatedProps>
+  Omit<SocialLinksRenderer_module$data, ' $fragmentType'>
 >;
 
 type SocialLinksRendererAnimatedData = {
-  [K in AnimatedProps]:
-    | SharedValue<SocialLinksViewRendererData[K]>
-    | SocialLinksViewRendererData[K];
+  [K in AnimatedProps]: SharedValue<SocialLinksRendererData[K]>;
 };
 
 export type SocialLinksRendererProps = ViewProps & {
-  /**
-   * The data for the SocialLinks module
-   */
-  data: SocialLinksRendererData;
-  /**
-   * The animated data for the SocialLinks module
-   */
-  animatedData: SocialLinksRendererAnimatedData;
   /**
    * the color palette
    */
@@ -109,50 +94,34 @@ export type SocialLinksRendererProps = ViewProps & {
    * Whether the social links are disabled
    */
   disabled?: boolean;
-};
+} & (
+    | {
+        /**
+         * The data for the SocialLinks module
+         */
+        data: Omit<SocialLinksRendererData, AnimatedProps>;
+        /**
+         * The animated data for the SocialLinks module
+         */
+        animatedData: SocialLinksRendererAnimatedData;
+      }
+    | {
+        /**
+         * The data for the SocialLinks module
+         */
+        data: SocialLinksRendererData;
+        /**
+         * The animated data for the SocialLinks module
+         */
+        animatedData: null;
+      }
+  );
 if (
   Platform.OS === 'android' &&
   UIManager.setLayoutAnimationEnabledExperimental
 ) {
   UIManager.setLayoutAnimationEnabledExperimental(true);
 }
-
-export type SocialLinksViewRendererProps = Omit<
-  SocialLinksRendererProps,
-  'animatedData' | 'data'
-> & {
-  data: SocialLinksViewRendererData;
-};
-
-export const SocialLinksViewRenderer = ({
-  data,
-  ...rest
-}: SocialLinksViewRendererProps) => {
-  const {
-    borderWidth,
-    columnGap,
-    marginTop,
-    marginBottom,
-    marginHorizontal,
-    iconSize,
-    ...restData
-  } = data;
-
-  return (
-    <SocialLinksRenderer
-      {...rest}
-      data={restData}
-      animatedData={{
-        iconSize,
-        borderWidth,
-        columnGap,
-        marginTop,
-        marginBottom,
-        marginHorizontal,
-      }}
-    />
-  );
-};
 
 const AnimatedScrollView = Animated.createAnimatedComponent(ScrollView);
 
@@ -167,16 +136,23 @@ const SocialLinksRenderer = ({
   cardStyle,
   style,
   multilineStyle,
+  animatedData,
   disabled,
   ...props
 }: SocialLinksRendererProps) => {
-  const { links, iconColor, arrangement, background, backgroundStyle } =
-    getModuleDataValues({
-      data,
-      cardStyle,
-      defaultValues: SOCIAL_LINKS_DEFAULT_VALUES,
-      styleValuesMap: null,
-    });
+  const {
+    links,
+    iconColor,
+    arrangement,
+    background,
+    backgroundStyle,
+    ...rest
+  } = getModuleDataValues({
+    data,
+    cardStyle,
+    defaultValues: SOCIAL_LINKS_DEFAULT_VALUES,
+    styleValuesMap: null,
+  });
 
   const linksOrdered = [...(links ?? [])].sort(
     (a, b) => a.position - b.position,
@@ -210,100 +186,97 @@ const SocialLinksRenderer = ({
     });
   }, [arrangement]);
 
-  const {
-    iconSize,
-    borderWidth,
-    columnGap,
-    marginTop,
-    marginBottom,
-    marginHorizontal,
-  } = props.animatedData;
+  const scrollViewStyle = useAnimatedStyle(() => {
+    if (animatedData === null) {
+      if ('marginTop' in rest) {
+        return {
+          marginTop: rest.marginTop ?? 0,
+          marginBottom: rest.marginBottom ?? 0,
+        };
+      }
+      return {};
+    }
 
-  const scrollViewStyle = useAnimatedStyle(
-    () => ({
-      marginTop:
-        typeof marginTop === 'number'
-          ? marginTop
-          : marginTop?.value ?? undefined,
-      marginBottom:
-        typeof marginBottom === 'number'
-          ? marginBottom
-          : marginBottom?.value ?? undefined,
-    }),
-    [marginTop, marginBottom],
-  );
+    return {
+      marginTop: animatedData.marginTop.value,
+      marginBottom: animatedData.marginBottom.value,
+    };
+  });
 
-  const scrollViewContentStyle = useAnimatedStyle(
-    () => ({
-      columnGap:
-        typeof columnGap === 'number'
-          ? columnGap
-          : columnGap?.value ?? SOCIAL_LINKS_DEFAULT_VALUES.columnGap,
-      flexGrow: 1,
-      justifyContent: 'center',
-      flexDirection: 'row',
-    }),
-    [columnGap],
-  );
+  const scrollViewContentStyle = useAnimatedStyle(() => {
+    if (animatedData === null) {
+      if ('columnGap' in rest) {
+        return {
+          columnGap: rest.columnGap ?? undefined,
+        };
+      }
+      return {};
+    }
+
+    return {
+      columnGap: animatedData.columnGap.value ?? undefined,
+    };
+  });
 
   const pressableStyle = useAnimatedStyle(() => {
-    const iconSizeValue =
-      typeof iconSize === 'number'
-        ? iconSize
-        : iconSize?.value ?? SOCIAL_LINKS_DEFAULT_VALUES.iconSize;
+    if (animatedData === null) {
+      if ('iconSize' in rest) {
+        return {
+          width: rest.iconSize ?? 0,
+          height: rest.iconSize ?? 0,
+          borderWidth: rest.borderWidth ?? 0,
+          borderRadius: (rest.iconSize ?? 0) / 2,
+        };
+      }
+      return {};
+    }
+
     return {
-      width: iconSizeValue,
-      height: iconSizeValue,
-      borderWidth:
-        typeof borderWidth === 'number'
-          ? borderWidth
-          : borderWidth?.value ?? SOCIAL_LINKS_DEFAULT_VALUES.borderWidth,
-      borderRadius: iconSizeValue / 2,
+      width: animatedData.iconSize.value,
+      height: animatedData.iconSize.value,
+      borderWidth: animatedData.borderWidth.value ?? 0,
+      borderRadius: (animatedData.iconSize.value ?? 0) / 2,
     };
-  }, [iconSize, borderWidth]);
+  });
 
   const iconStyle = useAnimatedStyle(() => {
-    const iconSizeValue =
-      typeof iconSize === 'number'
-        ? iconSize
-        : iconSize?.value ?? SOCIAL_LINKS_DEFAULT_VALUES.iconSize;
-    return {
-      width: iconSizeValue - 22,
-      height: iconSizeValue - 22,
-    };
-  }, [iconSize]);
-
-  const multiLineAnimatedStyle = useAnimatedStyle(() => {
-    const marginHorizontalValue =
-      typeof marginHorizontal === 'number'
-        ? marginHorizontal
-        : marginHorizontal?.value ??
-          SOCIAL_LINKS_DEFAULT_VALUES.marginHorizontal;
-
-    const columnGapValue =
-      typeof columnGap === 'number'
-        ? columnGap
-        : columnGap?.value ?? SOCIAL_LINKS_DEFAULT_VALUES.columnGap;
+    if (animatedData === null) {
+      if ('iconSize' in rest) {
+        return {
+          width: (rest.iconSize ?? 0) - 22,
+          height: (rest.iconSize ?? 0) - 22,
+        };
+      }
+      return {};
+    }
 
     return {
-      width: '100%',
-      flexDirection: 'row',
-      justifyContent: 'center',
-      flexWrap: 'wrap',
-      marginTop:
-        typeof marginTop === 'number'
-          ? marginTop
-          : marginTop?.value ?? SOCIAL_LINKS_DEFAULT_VALUES.marginTop,
-      marginBottom:
-        typeof marginBottom === 'number'
-          ? marginBottom
-          : marginBottom?.value ?? SOCIAL_LINKS_DEFAULT_VALUES.marginBottom,
-      paddingLeft: marginHorizontalValue,
-      paddingRight: marginHorizontalValue,
-      columnGap: columnGapValue,
-      rowGap: columnGapValue,
+      width: (animatedData.iconSize.value ?? 0) - 22,
+      height: (animatedData.iconSize.value ?? 0) - 22,
     };
-  }, [marginTop, marginBottom, marginHorizontal, columnGap]);
+  });
+
+  const animatedMultiLinestyle = useAnimatedStyle(() => {
+    if (animatedData === null) {
+      if ('marginTop' in rest) {
+        return {
+          marginTop: rest.marginTop ?? 0,
+          marginBottom: rest.marginBottom ?? 0,
+          paddingLeft: rest.marginHorizontal ?? 0,
+          paddingRight: rest.marginHorizontal ?? 0,
+        };
+      }
+      return {};
+    }
+    return {
+      marginTop: animatedData.marginTop.value,
+      marginBottom: animatedData.marginBottom.value,
+      paddingLeft: animatedData.marginHorizontal.value,
+      paddingRight: animatedData.marginHorizontal.value,
+      columnGap: animatedData.columnGap.value ?? undefined,
+      rowGap: animatedData.columnGap.value ?? undefined,
+    };
+  });
 
   return (
     <CardModuleBackground
@@ -323,7 +296,12 @@ const SocialLinksRenderer = ({
           style={scrollViewStyle}
           showsHorizontalScrollIndicator={false}
         >
-          <Animated.View style={scrollViewContentStyle}>
+          <Animated.View
+            style={[
+              scrollViewContentStyle,
+              { flexGrow: 1, justifyContent: 'center', flexDirection: 'row' },
+            ]}
+          >
             {linksOrdered.map((link, index) => (
               <SocialLinkRenderer
                 key={index}
@@ -343,13 +321,28 @@ const SocialLinksRenderer = ({
                   iconStyle,
                 ]}
                 icon={link.socialId as SocialLinkId}
-                marginHorizontal={marginHorizontal}
+                marginHorizontal={
+                  animatedData === null
+                    ? data.marginHorizontal
+                    : animatedData.marginHorizontal
+                }
               />
             ))}
           </Animated.View>
         </AnimatedScrollView>
       ) : (
-        <Animated.View style={[multiLineAnimatedStyle, multilineStyle]}>
+        <Animated.View
+          style={[
+            {
+              width: '100%',
+              flexDirection: 'row',
+              justifyContent: 'center',
+              flexWrap: 'wrap',
+            },
+            animatedMultiLinestyle,
+            multilineStyle,
+          ]}
+        >
           {linksOrdered.map((link, index) => (
             <SocialLinkRenderer
               key={index}
@@ -393,20 +386,31 @@ const SocialLinkRenderer = ({
   icon: SocialLinkId;
   marginHorizontal?: SharedValue<number | null> | number | null;
 }) => {
-  const pressableStyle = useAnimatedStyle(() => {
-    const marginHorizontalValue =
-      typeof marginHorizontal === 'number'
-        ? marginHorizontal
-        : marginHorizontal?.value ?? undefined;
+  const animatedPressableStyle = useAnimatedStyle(() => {
+    if (typeof marginHorizontal === 'number') {
+      return {};
+    }
+
     return {
       //padding on scrollview mess the display with contentContainerStyle, to keep the "centered" effect we need to add margin to the first and last element to keep the same "centered effect
-      marginLeft: first ? marginHorizontalValue : 0,
-      marginRight: last ? marginHorizontalValue : 0,
+      marginLeft: first ? marginHorizontal?.value : 0,
+      marginRight: last ? marginHorizontal?.value : 0,
     };
-  }, [first, last, marginHorizontal]);
+  });
+
+  const staticPressableStyle =
+    typeof marginHorizontal === 'number'
+      ? {
+          marginLeft: first ? marginHorizontal : 0,
+          marginRight: last ? marginHorizontal : 0,
+        }
+      : {};
 
   return (
-    <PressableOpacity style={[style, pressableStyle]} {...props}>
+    <PressableOpacity
+      style={[style, animatedPressableStyle, staticPressableStyle]}
+      {...props}
+    >
       <SocialIcon icon={icon} style={iconStyle} />
     </PressableOpacity>
   );
