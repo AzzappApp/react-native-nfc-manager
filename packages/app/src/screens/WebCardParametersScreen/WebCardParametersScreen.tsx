@@ -1,7 +1,6 @@
 import { useCallback, useMemo } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
 import {
   graphql,
@@ -16,6 +15,7 @@ import useToggle from '#hooks/useToggle';
 import Container from '#ui/Container';
 import Icon from '#ui/Icon';
 import PressableNative from '#ui/PressableNative';
+import SafeAreaView from '#ui/SafeAreaView';
 import Select from '#ui/Select';
 import Switch from '#ui/Switch';
 import Text from '#ui/Text';

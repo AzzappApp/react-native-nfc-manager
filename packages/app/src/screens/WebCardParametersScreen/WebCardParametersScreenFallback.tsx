@@ -1,5 +1,6 @@
-import { SafeAreaView, View, ActivityIndicator } from 'react-native';
+import { View, ActivityIndicator } from 'react-native';
 import Container from '#ui/Container';
+import SafeAreaView from '#ui/SafeAreaView';
 import WebCardParametersHeader from './WebCardParametersHeader';
 
 const WebCardParametersScreenFallback = () => (

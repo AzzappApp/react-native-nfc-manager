@@ -3,8 +3,6 @@ import { useCallback, useRef } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { View, StyleSheet, KeyboardAvoidingView, Platform } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-
 import Toast from 'react-native-toast-message';
 import * as z from 'zod';
 import { REGEX_PWD } from '@azzapp/shared/stringHelpers';
@@ -16,6 +14,7 @@ import Button from '#ui/Button';
 import Container from '#ui/Container';
 import Icon from '#ui/Icon';
 import PressableNative from '#ui/PressableNative';
+import SafeAreaView from '#ui/SafeAreaView';
 import SecuredTextInput from '#ui/SecuredTextInput';
 import Text from '#ui/Text';
 import type { ResetPasswordRoute } from '#routes';

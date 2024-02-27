@@ -16,7 +16,6 @@ import Animated, {
   interpolate,
   useAnimatedStyle,
 } from 'react-native-reanimated';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
 import { graphql, usePreloadedQuery } from 'react-relay';
 import { colors } from '#theme';
@@ -35,6 +34,7 @@ import Button from '#ui/Button';
 import Container from '#ui/Container';
 import PressableAnimated from '#ui/PressableAnimated';
 import PressableNative from '#ui/PressableNative';
+import SafeAreaView from '#ui/SafeAreaView';
 import Text from '#ui/Text';
 import ContactCardEditModal from './ContactCardEditModal';
 import ContactCardExportVcf from './ContactCardExportVcf';

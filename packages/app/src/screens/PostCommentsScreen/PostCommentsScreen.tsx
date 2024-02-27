@@ -1,10 +1,10 @@
 import { View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { graphql, usePreloadedQuery } from 'react-relay';
 import { useRouter } from '#components/NativeRouter';
 import relayScreen from '#helpers/relayScreen';
 import ActivityIndicator from '#ui/ActivityIndicator';
 import Container from '#ui/Container';
+import SafeAreaView from '#ui/SafeAreaView';
 import PostCommentsList from './PostCommentsList';
 import PostCommentsScreenHeader from './PostCommentsScreenHeader';
 import type { RelayScreenProps } from '#helpers/relayScreen';

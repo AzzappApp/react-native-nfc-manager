@@ -1,12 +1,12 @@
 import { isEqual } from 'lodash';
 import { useState, useCallback, useRef, useMemo, useEffect } from 'react';
 import {
-  StatusBar,
-  Platform,
   StyleSheet,
   View,
   PixelRatio,
+  StatusBar,
   Dimensions,
+  Platform,
 } from 'react-native';
 import { useDerivedValue, useSharedValue } from 'react-native-reanimated';
 import { graphql, useFragment } from 'react-relay';
@@ -241,7 +241,9 @@ const HomeScreenContent = ({ user: userKey }: HomeScreenContentProps) => {
       BOTTOM_MENU_GAP -
       BOTTOM_MENU_HEIGHT -
       insets.bottom -
-      (Platform.OS === 'android' ? StatusBar?.currentHeight ?? 0 : 0),
+      (Platform.OS === 'android' && StatusBar?.currentHeight
+        ? StatusBar.currentHeight + 10
+        : 0),
     [insets.bottom, insets.top],
   );
 

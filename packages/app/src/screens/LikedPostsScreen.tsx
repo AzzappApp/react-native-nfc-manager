@@ -1,6 +1,5 @@
 import { useState, useCallback, useMemo } from 'react';
 import { useIntl } from 'react-intl';
-import { SafeAreaView } from 'react-native';
 import { graphql, usePaginationFragment, usePreloadedQuery } from 'react-relay';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
 import { colors } from '#theme';
@@ -10,6 +9,7 @@ import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import relayScreen from '#helpers/relayScreen';
 import Header from '#ui/Header';
 import IconButton from '#ui/IconButton';
+import SafeAreaView from '#ui/SafeAreaView';
 import type { RelayScreenProps } from '#helpers/relayScreen';
 import type { LikedPostsScreen_profile$key } from '#relayArtifacts/LikedPostsScreen_profile.graphql';
 import type { LikedPostsScreenQuery } from '#relayArtifacts/LikedPostsScreenQuery.graphql';

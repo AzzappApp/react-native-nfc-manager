@@ -1,5 +1,4 @@
 import { View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { CancelHeaderButton } from '#components/commonsButtons';
 import { useRouter } from '#components/NativeRouter';
 import relayScreen from '#helpers/relayScreen';
@@ -14,6 +13,7 @@ import SocialLinksEditionMobileScreenNode from '#relayArtifacts/SocialLinksEditi
 import ActivityIndicator from '#ui/ActivityIndicator';
 import Container from '#ui/Container';
 import Header from '#ui/Header';
+import SafeAreaView from '#ui/SafeAreaView';
 import BlockTextEditionMobileScreen from './BlockTextEditionMobileScreen';
 import CarouselEditionMobileScreen from './CarouselEditionMobileScreen';
 import HorizontalPhotoEditionMobileScreen from './HorizontalPhotoEditionMobileScreen';

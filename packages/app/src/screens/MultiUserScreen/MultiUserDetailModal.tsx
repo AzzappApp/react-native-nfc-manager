@@ -6,7 +6,6 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import { StyleSheet, View, useColorScheme } from 'react-native';
 import * as mime from 'react-native-mime-types';
 import { useSharedValue } from 'react-native-reanimated';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
 import {
   ConnectionHandler,
@@ -29,6 +28,7 @@ import Button from '#ui/Button';
 import Container from '#ui/Container';
 import Header from '#ui/Header';
 import PressableNative from '#ui/PressableNative';
+import SafeAreaView from '#ui/SafeAreaView';
 import Select from '#ui/Select';
 import Text from '#ui/Text';
 import TextInput from '#ui/TextInput';

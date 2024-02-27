@@ -4,7 +4,6 @@ import { useForm } from 'react-hook-form';
 import { useIntl } from 'react-intl';
 import { StyleSheet } from 'react-native';
 import * as mime from 'react-native-mime-types';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
 import { graphql, useFragment, useMutation } from 'react-relay';
 import { Observable } from 'relay-runtime';
@@ -17,6 +16,7 @@ import { get as CappedPixelRatio } from '#relayProviders/CappedPixelRatio.relayp
 import Button from '#ui/Button';
 import Container from '#ui/Container';
 import Header from '#ui/Header';
+import SafeAreaView from '#ui/SafeAreaView';
 import UploadProgressModal from '#ui/UploadProgressModal';
 
 import ContactCardEditForm from './ContactCardEditForm';

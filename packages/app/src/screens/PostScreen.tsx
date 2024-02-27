@@ -9,7 +9,7 @@ import {
   useState,
 } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { Dimensions, Platform, SafeAreaView, View } from 'react-native';
+import { Dimensions, Platform, View } from 'react-native';
 import { graphql, usePaginationFragment, usePreloadedQuery } from 'react-relay';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
 import { colors } from '#theme';
@@ -21,6 +21,7 @@ import relayScreen from '#helpers/relayScreen';
 import Button from '#ui/Button';
 import Header, { HEADER_HEIGHT } from '#ui/Header';
 import IconButton from '#ui/IconButton';
+import SafeAreaView from '#ui/SafeAreaView';
 import Text from '#ui/Text';
 import type { ScreenOptions } from '#components/NativeRouter';
 import type { RelayScreenProps } from '#helpers/relayScreen';
@@ -99,7 +100,7 @@ const PostScreen = ({
 
   if (!post) {
     return (
-      <SafeAreaView style={[styles.safeAreaView]}>
+      <SafeAreaView style={styles.safeAreaView}>
         <Header
           middleElement={intl.formatMessage({
             defaultMessage: 'Related Posts',

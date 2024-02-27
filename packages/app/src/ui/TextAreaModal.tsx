@@ -4,11 +4,10 @@ import {
   KeyboardAvoidingView,
   Modal,
   Platform,
+  SafeAreaView, //we want to use this one here on purpose
   StyleSheet,
-  View,
 } from 'react-native';
 import { colors } from '#theme';
-import useScreenInsets from '#hooks/useScreenInsets';
 import Header from './Header';
 import HeaderButton from './HeaderButton';
 import Text from './Text';
@@ -68,7 +67,6 @@ const TextAreaModal = ({
   ...props
 }: TextAreaModalProps) => {
   const intl = useIntl();
-  const { top: insetTop } = useScreenInsets();
 
   const [text, setText] = useState(value);
 
@@ -82,7 +80,6 @@ const TextAreaModal = ({
       onClose();
     }
   };
-
   const textInputRef = useRef<TextInputBase>(null);
 
   return (
@@ -98,10 +95,9 @@ const TextAreaModal = ({
         }
       }}
     >
-      <View style={styles.modal}>
+      <SafeAreaView style={styles.modal}>
         <Header
           style={{
-            marginTop: insetTop,
             marginBottom: 10,
           }}
           leftElement={
@@ -161,7 +157,7 @@ const TextAreaModal = ({
             </Text>
           )}
         </KeyboardAvoidingView>
-      </View>
+      </SafeAreaView>
     </Modal>
   );
 };

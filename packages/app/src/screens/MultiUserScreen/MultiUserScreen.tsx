@@ -8,7 +8,6 @@ import {
 } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { ActivityIndicator, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { graphql, useMutation, usePreloadedQuery } from 'react-relay';
 import { isAdmin } from '@azzapp/shared/profileHelpers';
 import { colors } from '#theme';
@@ -26,6 +25,7 @@ import HeaderButton from '#ui/HeaderButton';
 import Icon from '#ui/Icon';
 import IconButton from '#ui/IconButton';
 import PressableNative from '#ui/PressableNative';
+import SafeAreaView from '#ui/SafeAreaView';
 import Switch from '#ui/Switch';
 import Text from '#ui/Text';
 import CommonInformationForm from './CommonInformationForm';

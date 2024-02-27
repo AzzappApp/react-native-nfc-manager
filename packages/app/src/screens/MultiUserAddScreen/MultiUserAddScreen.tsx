@@ -1,7 +1,6 @@
 import { useCallback, useRef, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { StyleSheet, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { graphql, usePreloadedQuery } from 'react-relay';
 import { useRouter } from '#components/NativeRouter';
 import relayScreen from '#helpers/relayScreen';
@@ -9,6 +8,7 @@ import Container from '#ui/Container';
 import Header from '#ui/Header';
 import HeaderButton from '#ui/HeaderButton';
 import IconButton from '#ui/IconButton';
+import SafeAreaView from '#ui/SafeAreaView';
 import SearchBarStatic from '#ui/SearchBarStatic';
 import MultiUserAddList from './MultiUserAddList';
 import MultiUserAddModal from './MultiUserAddModal';

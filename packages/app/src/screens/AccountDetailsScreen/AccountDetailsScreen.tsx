@@ -1,7 +1,6 @@
 import { parsePhoneNumber } from 'libphonenumber-js';
 import { FormattedMessage } from 'react-intl';
 import { View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { graphql, usePreloadedQuery } from 'react-relay';
 import { colors } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
@@ -10,6 +9,7 @@ import useToggle from '#hooks/useToggle';
 import Container from '#ui/Container';
 import Icon from '#ui/Icon';
 import PressableNative from '#ui/PressableNative';
+import SafeAreaView from '#ui/SafeAreaView';
 import Text from '#ui/Text';
 import AccountDetailsEmailForm from './AccountDetailsEmailForm';
 import AccountDetailsHeader from './AccountDetailsHeader';

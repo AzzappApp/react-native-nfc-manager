@@ -1,13 +1,6 @@
 import { useEffect, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
-import {
-  Linking,
-  Platform,
-  StyleSheet,
-  View,
-  Share,
-  SafeAreaView,
-} from 'react-native';
+import { Linking, Platform, StyleSheet, View, Share } from 'react-native';
 // import { openComposer } from 'react-native-email-link';
 import { graphql, usePreloadedQuery } from 'react-relay';
 import AccountHeader from '#components/AccountHeader';
@@ -15,6 +8,7 @@ import relayScreen from '#helpers/relayScreen';
 import Container from '#ui/Container';
 import Icon from '#ui/Icon';
 import PressableNative from '#ui/PressableNative';
+import SafeAreaView from '#ui/SafeAreaView';
 import Text from '#ui/Text';
 import type { RelayScreenProps } from '#helpers/relayScreen';
 import type { InviteFriendsScreenQuery } from '#relayArtifacts/InviteFriendsScreenQuery.graphql';

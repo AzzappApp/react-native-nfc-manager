@@ -8,8 +8,6 @@ import { useForm } from 'react-hook-form';
 import { useIntl } from 'react-intl';
 import { View, StyleSheet, Keyboard } from 'react-native';
 import * as mime from 'react-native-mime-types';
-import { SafeAreaView } from 'react-native-safe-area-context';
-
 import Toast from 'react-native-toast-message';
 import {
   ConnectionHandler,
@@ -34,6 +32,7 @@ import ContactCardEditForm from '#screens/ContactCardScreen/ContactCardEditForm'
 import Button from '#ui/Button';
 import Container from '#ui/Container';
 import Header from '#ui/Header';
+import SafeAreaView from '#ui/SafeAreaView';
 import Text from '#ui/Text';
 import MultiUserAddForm from './MultiUserAddForm';
 import type { EmailPhoneInput } from '#components/EmailOrPhoneInput';

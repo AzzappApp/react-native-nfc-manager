@@ -1,6 +1,5 @@
 import { memo } from 'react';
 import { useIntl } from 'react-intl';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { graphql } from 'react-relay';
 import { useLazyLoadQuery } from 'react-relay/hooks';
 import { useRouter } from '#components/NativeRouter';
@@ -9,6 +8,7 @@ import useAuthState from '#hooks/useAuthState';
 import Container from '#ui/Container';
 import Header from '#ui/Header';
 import IconButton from '#ui/IconButton';
+import SafeAreaView from '#ui/SafeAreaView';
 import type { PostList_webCard$key } from '#relayArtifacts/PostList_webCard.graphql';
 import type { WebCardPostsListQuery } from '#relayArtifacts/WebCardPostsListQuery.graphql';
 
