@@ -1,5 +1,15 @@
-## 0.5.5-canary.112
+## 0.5.5-canary.113
 
+* **fix:**  - **android:** [#2911](https://github.com/AzzappApp/azzapp/pull/2911) loader is too large on videos ([#2931](https://github.com/AzzappApp/azzapp/pull/2931))
+* **fix:**  - **cover:** [#2863](https://github.com/AzzappApp/azzapp/pull/2863) return default cover when no one is registered ([#2919](https://github.com/AzzappApp/azzapp/pull/2919))
+* **fix:**  - **android:** [#2905](https://github.com/AzzappApp/azzapp/pull/2905) status bar is overlapping content ([#2918](https://github.com/AzzappApp/azzapp/pull/2918))
+* **fix:**  - **camera:** 2860 wrong preview (either stretched or zoomed in) ([#2917](https://github.com/AzzappApp/azzapp/pull/2917))
+* **fix:**  - **modules:** [#2920](https://github.com/AzzappApp/azzapp/pull/2920) missing space ([#2927](https://github.com/AzzappApp/azzapp/pull/2927))
+* **fix:**  - **android:** [#2669](https://github.com/AzzappApp/azzapp/pull/2669) blurry images on android ([#2924](https://github.com/AzzappApp/azzapp/pull/2924))
+* **fix:**  - warning on statusbar on ios ([#2929](https://github.com/AzzappApp/azzapp/pull/2929))
+* **fix:**  - **media:** [#2921](https://github.com/AzzappApp/azzapp/pull/2921) missing padding ([#2930](https://github.com/AzzappApp/azzapp/pull/2930))
+* **fix:**  - **multiUser:** [#2878](https://github.com/AzzappApp/azzapp/pull/2878) accepting ownership implicitely accepts invitation ([#2933](https://github.com/AzzappApp/azzapp/pull/2933))
+* **fix:**  - **multiUser:** [#2861](https://github.com/AzzappApp/azzapp/pull/2861) auto set multi user to true while adding users ([#2935](https://github.com/AzzappApp/azzapp/pull/2935))
 * **fix:**  - 🐛 correctly render photo with title module ([#2928](https://github.com/AzzappApp/azzapp/pull/2928))
 * **feat:**  - add updatedAt field on webcard ([#2881](https://github.com/AzzappApp/azzapp/pull/2881))
 * **fix:**  - **android:** [#2843](https://github.com/AzzappApp/azzapp/pull/2843) set status bar translucent ([#2893](https://github.com/AzzappApp/azzapp/pull/2893))
