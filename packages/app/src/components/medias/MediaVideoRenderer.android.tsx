@@ -164,12 +164,23 @@ const MediaVideoRenderer = (
             onError={onError}
             progressUpdateIntervalMillis={onProgress ? 50 : undefined}
           >
-            <ActivityIndicator color="white" />
+            <View style={styles.loadingContainer}>
+              <ActivityIndicator color="white" video />
+            </View>
           </Video>
         </View>
       )}
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  loadingContainer: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'transparent', // without background color, the activity indicator is large
+    flex: 1,
+  },
+});
 
 export default forwardRef(MediaVideoRenderer);

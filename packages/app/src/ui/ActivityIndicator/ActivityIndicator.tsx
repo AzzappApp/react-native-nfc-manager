@@ -5,14 +5,17 @@ import type { StyleProp, ViewStyle } from 'react-native';
 export type ActivityIndicatorProps = {
   style?: StyleProp<ViewStyle>;
   color?: 'black' | 'white';
+  video?: boolean;
 };
 
-function ActivityIndicator({ style, color }: ActivityIndicatorProps) {
+function ActivityIndicator({ style, color, video }: ActivityIndicatorProps) {
   const colorScheme = useColorScheme() ?? 'light';
   color = color ?? (colorScheme === 'dark' ? 'white' : 'black');
   return (
     <Lottie
-      source={require('./animation.json')}
+      source={
+        video ? require('./animation_video.json') : require('./animation.json')
+      }
       colorFilters={[
         {
           keypath: 'Shape',
@@ -22,7 +25,7 @@ function ActivityIndicator({ style, color }: ActivityIndicatorProps) {
       autoPlay
       loop
       hardwareAccelerationAndroid
-      style={[style, { width: 51, height: 40 }]}
+      style={[style, { width: video ? 150 : 51, height: video ? 150 : 40 }]}
     />
   );
 }
