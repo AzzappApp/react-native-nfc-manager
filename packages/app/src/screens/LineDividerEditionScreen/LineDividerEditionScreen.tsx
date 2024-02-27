@@ -2,12 +2,12 @@ import { useCallback, useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { StyleSheet } from 'react-native';
 import { useSharedValue } from 'react-native-reanimated';
-import Toast from 'react-native-toast-message';
 import { graphql, useFragment, useMutation } from 'react-relay';
 import { LINE_DIVIDER_DEFAULT_VALUES } from '@azzapp/shared/cardModuleHelpers';
 import { useRouter } from '#components/NativeRouter';
 import WebCardColorPicker from '#components/WebCardColorPicker';
 import useEditorLayout from '#hooks/useEditorLayout';
+import useHandleProfileActionError from '#hooks/useHandleProfileError';
 import useModuleDataEditor from '#hooks/useModuleDataEditor';
 import { BOTTOM_MENU_HEIGHT } from '#ui/BottomMenu';
 import Container from '#ui/Container';
@@ -141,6 +141,14 @@ const LineDividerEditionScreen = ({
 
   const onCancel = router.back;
 
+  const handleProfileActionError = useHandleProfileActionError(
+    intl.formatMessage({
+      defaultMessage:
+        'Could not save your line divider module, try again later',
+      description:
+        'Error toast message when saving a line divider module failed because of an unknown error.',
+    }) as string,
+  );
   // #endregion
 
   // #region Fields edition handlers
@@ -187,15 +195,7 @@ const LineDividerEditionScreen = ({
       },
       onError(e) {
         console.error(e);
-        Toast.show({
-          type: 'error',
-          text1: intl.formatMessage({
-            defaultMessage:
-              'Could not save your line divider module, try again later',
-            description:
-              'Error toast message when saving a line divider module failed because of an unknown error.',
-          }),
-        });
+        handleProfileActionError(e);
       },
     });
   }, [
@@ -208,7 +208,7 @@ const LineDividerEditionScreen = ({
     lineDivider?.id,
     value,
     router,
-    intl,
+    handleProfileActionError,
   ]);
 
   // #endregion

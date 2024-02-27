@@ -31,8 +31,14 @@ const createPostMutation: MutationResolvers['createPost'] = async (
   const profile =
     userId && (await getUserProfileWithWebCardId(userId, webCardId));
 
-  if (!profile || !isEditor(profile.profileRole) || profile.invited) {
-    throw new GraphQLError(ERRORS.INVALID_REQUEST);
+  if (!profile) {
+    throw new GraphQLError(ERRORS.UNAUTHORIZED);
+  }
+
+  if (!isEditor(profile.profileRole) || profile.invited) {
+    throw new GraphQLError(ERRORS.FORBIDDEN, {
+      extensions: { role: profile.profileRole },
+    });
   }
 
   if (!mediaId) {

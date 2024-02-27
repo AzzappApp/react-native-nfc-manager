@@ -50,9 +50,15 @@ const createModuleSavingMutation =
     const profile =
       userId && (await getUserProfileWithWebCardId(userId, webCardId));
 
-    if (!profile || !isEditor(profile.profileRole) || profile.invited) {
+    if (!profile) {
       throw new GraphQLError(ERRORS.UNAUTHORIZED);
     }
+    if (!isEditor(profile.profileRole) || profile.invited) {
+      throw new GraphQLError(ERRORS.FORBIDDEN, {
+        extensions: { role: profile.profileRole },
+      });
+    }
+
     const { validator, getMedias } = MODULES_SAVE_RULES[moduleKind] ?? {};
 
     let module: CardModule | null = null;

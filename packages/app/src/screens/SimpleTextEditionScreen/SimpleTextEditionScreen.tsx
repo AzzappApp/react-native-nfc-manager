@@ -2,7 +2,6 @@ import { useCallback, useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { StyleSheet } from 'react-native';
 import { useSharedValue } from 'react-native-reanimated';
-import Toast from 'react-native-toast-message';
 import { graphql, useFragment, useMutation } from 'react-relay';
 import {
   SIMPLE_TEXT_DEFAULT_VALUES,
@@ -14,6 +13,7 @@ import {
 } from '@azzapp/shared/cardModuleHelpers';
 import { useRouter } from '#components/NativeRouter';
 import useEditorLayout from '#hooks/useEditorLayout';
+import useHandleProfileActionError from '#hooks/useHandleProfileError';
 import useModuleDataEditor from '#hooks/useModuleDataEditor';
 import { type SimpleTextEditionScreenUpdateModuleMutation } from '#relayArtifacts/SimpleTextEditionScreenUpdateModuleMutation.graphql';
 import { BOTTOM_MENU_HEIGHT } from '#ui/BottomMenu';
@@ -247,6 +247,13 @@ const SimpleTextEditionScreen = ({
   const intl = useIntl();
 
   const onCancel = router.back;
+
+  const handleProfileActionError = useHandleProfileActionError(
+    intl.formatMessage({
+      defaultMessage: 'Error, could not save your module',
+      description: 'Error toast when saving a module',
+    }) as string,
+  );
   // #endregion
 
   // #region Fields edition handlers
@@ -294,13 +301,7 @@ const SimpleTextEditionScreen = ({
       },
       onError(e) {
         console.error(e);
-        Toast.show({
-          type: 'error',
-          text1: intl.formatMessage({
-            defaultMessage: 'Error, could not save your module',
-            description: 'Error toast when saving a module',
-          }),
-        });
+        handleProfileActionError(e);
       },
     });
   }, [
@@ -315,7 +316,7 @@ const SimpleTextEditionScreen = ({
     moduleData?.id,
     moduleKind,
     router,
-    intl,
+    handleProfileActionError,
   ]);
 
   // #endregion

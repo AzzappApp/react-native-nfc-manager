@@ -6,6 +6,7 @@ import { graphql, commitMutation } from 'react-relay';
 import { isAdmin } from '@azzapp/shared/profileHelpers';
 import { colors } from '#theme';
 import { getRelayEnvironment } from '#helpers/relayEnvironment';
+import useHandleProfileActionError from '#hooks/useHandleProfileError';
 import Button from '#ui/Button';
 import Icon from '#ui/Icon';
 import Text from '#ui/Text';
@@ -20,6 +21,19 @@ type HomeBottomPanelPublishProps = {
 const HomeBottomPanelPublish = ({ profile }: HomeBottomPanelPublishProps) => {
   const intl = useIntl();
 
+  const handleProfileActionError = useHandleProfileActionError(
+    intl.formatMessage(
+      {
+        defaultMessage:
+          'Error, could not publish your WebCard{azzappA}, please try again later',
+        description:
+          'Error message displayed when the publication of the webcard failed in Home Screen',
+      },
+      {
+        azzappA: <Text variant="azzapp">a</Text>,
+      },
+    ) as string,
+  );
   const onPublish = useCallback(() => {
     if (!profile) {
       return;
@@ -82,24 +96,10 @@ const HomeBottomPanelPublish = ({ profile }: HomeBottomPanelPublishProps) => {
         });
       },
       onError: error => {
-        console.error(error);
-        Toast.show({
-          type: 'error',
-          text1: intl.formatMessage(
-            {
-              defaultMessage:
-                'Error, could not publish your WebCard{azzappA}, please try again later',
-              description:
-                'Error message displayed when the publication of the webcard failed in Home Screen',
-            },
-            {
-              azzappA: <Text variant="azzapp">a</Text>,
-            },
-          ) as string,
-        });
+        handleProfileActionError(error);
       },
     });
-  }, [intl, profile]);
+  }, [handleProfileActionError, intl, profile]);
 
   return (
     <>

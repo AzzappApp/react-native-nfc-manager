@@ -3,7 +3,6 @@ import { useIntl } from 'react-intl';
 import { StyleSheet } from 'react-native';
 import { KeyboardAvoidingView } from 'react-native-keyboard-controller';
 import { useSharedValue } from 'react-native-reanimated';
-import Toast from 'react-native-toast-message';
 import { graphql, useFragment, useMutation } from 'react-relay';
 import * as z from 'zod';
 import {
@@ -13,6 +12,7 @@ import {
 import { isValidUrl, isPhoneNumber } from '@azzapp/shared/stringHelpers';
 import { useRouter } from '#components/NativeRouter';
 import useEditorLayout from '#hooks/useEditorLayout';
+import useHandleProfileActionError from '#hooks/useHandleProfileError';
 import useModuleDataEditor from '#hooks/useModuleDataEditor';
 import { BOTTOM_MENU_HEIGHT } from '#ui/BottomMenu';
 import Container from '#ui/Container';
@@ -253,6 +253,13 @@ const SimpleButtonEditionScreen = ({
 
   const onCancel = router.back;
 
+  const handleProfileActionError = useHandleProfileActionError(
+    intl.formatMessage({
+      defaultMessage: 'Error, could not save your module',
+      description: 'Simple Button module screen - error toast',
+    }) as string,
+  );
+
   // #endregion
 
   // #region Fields edition handlers
@@ -319,13 +326,7 @@ const SimpleButtonEditionScreen = ({
       },
       onError(e) {
         console.error(e);
-        Toast.show({
-          type: 'error',
-          text1: intl.formatMessage({
-            defaultMessage: 'Error, could not save your module',
-            description: 'Simple Button module screen - error toast',
-          }),
-        });
+        handleProfileActionError(e);
       },
     });
   }, [
@@ -342,7 +343,7 @@ const SimpleButtonEditionScreen = ({
     height,
     commit,
     router,
-    intl,
+    handleProfileActionError,
   ]);
 
   // #endregion

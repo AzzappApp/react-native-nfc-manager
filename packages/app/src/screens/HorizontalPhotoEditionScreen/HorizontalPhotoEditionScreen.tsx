@@ -23,6 +23,7 @@ import { getFileName } from '#helpers/fileHelpers';
 import { downScaleImage } from '#helpers/mediaHelpers';
 import { uploadMedia, uploadSign } from '#helpers/MobileWebAPI';
 import useEditorLayout from '#hooks/useEditorLayout';
+import useHandleProfileActionError from '#hooks/useHandleProfileError';
 import useModuleDataEditor from '#hooks/useModuleDataEditor';
 import { BOTTOM_MENU_HEIGHT } from '#ui/BottomMenu';
 import Container from '#ui/Container';
@@ -205,6 +206,13 @@ const HorizontalPhotoEditionScreen = ({
 
   const onCancel = router.back;
 
+  const handleProfileActionError = useHandleProfileActionError(
+    intl.formatMessage({
+      defaultMessage: 'Could not save your photo module, try again later',
+      description:
+        'Error toast message when saving a horizontal photo module failed because of an unknown error.',
+    }) as string,
+  );
   // #endregion
 
   //#region Image Picker state
@@ -346,14 +354,7 @@ const HorizontalPhotoEditionScreen = ({
       onError(e) {
         console.error(e);
         setShowImagePicker(false);
-        Toast.show({
-          type: 'error',
-          text1: intl.formatMessage({
-            defaultMessage: 'Could not save your photo module, try again later',
-            description:
-              'Error toast message when saving a horizontal photo module failed because of an unknown error.',
-          }),
-        });
+        handleProfileActionError(e);
       },
     });
   }, [
@@ -369,6 +370,7 @@ const HorizontalPhotoEditionScreen = ({
     commit,
     intl,
     router,
+    handleProfileActionError,
   ]);
 
   // #endregion

@@ -20,8 +20,14 @@ const toggleWebCardPublished: MutationResolvers['toggleWebCardPublished'] =
     const profile =
       userId && (await getUserProfileWithWebCardId(userId, webCardId));
 
-    if (!profile || !isAdmin(profile.profileRole)) {
+    if (!profile) {
       throw new GraphQLError(ERRORS.UNAUTHORIZED);
+    }
+
+    if (!isAdmin(profile.profileRole)) {
+      throw new GraphQLError(ERRORS.FORBIDDEN, {
+        extensions: { role: profile.profileRole },
+      });
     }
 
     const webCard = await loaders.WebCard.load(webCardId);

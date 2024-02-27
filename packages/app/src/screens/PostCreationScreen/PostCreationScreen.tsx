@@ -26,6 +26,7 @@ import { getFileName } from '#helpers/fileHelpers';
 import { addLocalCachedMediaFile } from '#helpers/mediaHelpers';
 import { uploadMedia, uploadSign } from '#helpers/MobileWebAPI';
 import relayScreen from '#helpers/relayScreen';
+import useHandleProfileActionError from '#hooks/useHandleProfileError';
 import { get as CappedPixelRatio } from '#relayProviders/CappedPixelRatio.relayprovider';
 import { get as PixelRatio } from '#relayProviders/PixelRatio.relayprovider';
 import { get as PostWidth } from '#relayProviders/PostWidth.relayprovider';
@@ -64,6 +65,13 @@ const PostCreationScreen = ({
   const { webCard } = usePreloadedQuery(
     postCreationScreenQuery,
     preloadedQuery,
+  );
+
+  const handleProfileActionError = useHandleProfileActionError(
+    intl.formatMessage({
+      defaultMessage: 'Error while creating post',
+      description: 'Toast Error message while creating post',
+    }),
   );
 
   const connectionID =
@@ -222,14 +230,8 @@ const PostCreationScreen = ({
               // }
             }
           },
-          onError() {
-            Toast.show({
-              type: 'error',
-              text1: intl.formatMessage({
-                defaultMessage: 'Error while creating post',
-                description: 'Toast Error message while creating post',
-              }),
-            });
+          onError(error) {
+            handleProfileActionError(error);
             setProgressIndicator(null);
           },
           updater: store => {
@@ -263,6 +265,7 @@ const PostCreationScreen = ({
       commit,
       connectionID,
       content,
+      handleProfileActionError,
       intl,
       router,
       webCard,

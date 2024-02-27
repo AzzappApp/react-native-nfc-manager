@@ -19,6 +19,7 @@ import ScreenModal from '#components/ScreenModal';
 import { getFileName } from '#helpers/fileHelpers';
 import { uploadMedia, uploadSign } from '#helpers/MobileWebAPI';
 import useEditorLayout from '#hooks/useEditorLayout';
+import useHandleProfileActionError from '#hooks/useHandleProfileError';
 import useModuleDataEditor from '#hooks/useModuleDataEditor';
 import { BOTTOM_MENU_HEIGHT } from '#ui/BottomMenu';
 import Container from '#ui/Container';
@@ -206,6 +207,14 @@ const CarouselEditionScreen = ({
     useState<Observable<number> | null>(null);
 
   const onCancel = router.back;
+
+  const handleProfileActionError = useHandleProfileActionError(
+    intl.formatMessage({
+      defaultMessage: 'Could not save your carousel module, an error occured',
+      description:
+        'Error toast message when saving a carousel module failed for an unknown reason.',
+    }) as string,
+  );
   // #endregion
 
   // #region Fields edition handlers
@@ -410,15 +419,7 @@ const CarouselEditionScreen = ({
       onError(e) {
         console.error(e);
         setShowImagePicker(false);
-        Toast.show({
-          type: 'error',
-          text1: intl.formatMessage({
-            defaultMessage:
-              'Could not save your carouse module, an error occured',
-            description:
-              'Error toast message when saving a carousel module failed for an unknown reason.',
-          }),
-        });
+        handleProfileActionError(e);
       },
     });
   }, [
@@ -435,6 +436,7 @@ const CarouselEditionScreen = ({
     gap,
     intl,
     router,
+    handleProfileActionError,
   ]);
 
   // #endregion

@@ -24,8 +24,8 @@ import ScreenModal from '#components/ScreenModal';
 import { getFileName } from '#helpers/fileHelpers';
 import { downScaleImage } from '#helpers/mediaHelpers';
 import { uploadMedia, uploadSign } from '#helpers/MobileWebAPI';
-import { GraphQLError } from '#helpers/relayEnvironment';
 import useEditorLayout from '#hooks/useEditorLayout';
+import useHandleProfileActionError from '#hooks/useHandleProfileError';
 import useModuleDataEditor from '#hooks/useModuleDataEditor';
 import { BOTTOM_MENU_HEIGHT } from '#ui/BottomMenu';
 import Container from '#ui/Container';
@@ -258,6 +258,14 @@ const PhotoWithTextAndTitleEditionScreen = ({
 
   const onCancel = router.back;
 
+  const handleProfileActionError = useHandleProfileActionError(
+    intl.formatMessage({
+      defaultMessage:
+        'Could not save your image with title module, try again later',
+      description:
+        'Error toast message when saving a photo with text and title module failed because of an unknown error.',
+    }) as string,
+  );
   // #endregion
 
   //#region Image Picker state
@@ -460,18 +468,7 @@ const PhotoWithTextAndTitleEditionScreen = ({
       onError(e) {
         setShowImagePicker(false);
         console.log(e);
-        if (e instanceof GraphQLError) {
-          console.log(e.cause);
-        }
-        Toast.show({
-          type: 'error',
-          text1: intl.formatMessage({
-            defaultMessage:
-              'Could not save your line divider module, try again later',
-            description:
-              'Error toast message when saving a photo with text and title module failed because of an unknown error.',
-          }),
-        });
+        handleProfileActionError(e);
       },
     });
   }, [
@@ -491,6 +488,7 @@ const PhotoWithTextAndTitleEditionScreen = ({
     commit,
     intl,
     router,
+    handleProfileActionError,
   ]);
 
   // #endregion
