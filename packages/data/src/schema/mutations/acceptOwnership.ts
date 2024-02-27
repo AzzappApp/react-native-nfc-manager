@@ -44,7 +44,7 @@ const acceptOwnership: MutationResolvers['acceptOwnership'] = async (
 
     await trx
       .update(ProfileTable)
-      .set({ profileRole: 'owner', promotedAsOwner: false })
+      .set({ profileRole: 'owner', promotedAsOwner: false, invited: false })
       .where(eq(ProfileTable.id, profileId));
   });
 
@@ -76,6 +76,7 @@ const acceptOwnership: MutationResolvers['acceptOwnership'] = async (
       ...profile,
       profileRole: 'owner',
       promotedAsOwner: false,
+      invited: false,
     },
   };
 };
