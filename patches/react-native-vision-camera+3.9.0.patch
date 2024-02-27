@@ -1,0 +1,46 @@
+diff --git a/node_modules/react-native-vision-camera/android/src/main/java/com/mrousavy/camera/core/CameraDeviceDetails.kt b/node_modules/react-native-vision-camera/android/src/main/java/com/mrousavy/camera/core/CameraDeviceDetails.kt
+index a589c26..91f5b8c 100644
+--- a/node_modules/react-native-vision-camera/android/src/main/java/com/mrousavy/camera/core/CameraDeviceDetails.kt
++++ b/node_modules/react-native-vision-camera/android/src/main/java/com/mrousavy/camera/core/CameraDeviceDetails.kt
+@@ -47,6 +47,13 @@ class CameraDeviceDetails(private val cameraManager: CameraManager, val cameraId
+ 
+       return if (isHighResScreen) display1080p else displaySize
+     }
++
++    fun getActualPreviewSize(): Size {
++      return Size(
++        Resources.getSystem().displayMetrics.widthPixels,
++        Resources.getSystem().displayMetrics.heightPixels
++      )
++    }
+   }
+ 
+   val characteristics by lazy { cameraManager.getCameraCharacteristics(cameraId) }
+diff --git a/node_modules/react-native-vision-camera/android/src/main/java/com/mrousavy/camera/core/PreviewView.kt b/node_modules/react-native-vision-camera/android/src/main/java/com/mrousavy/camera/core/PreviewView.kt
+index ba3c94b..c2b7335 100644
+--- a/node_modules/react-native-vision-camera/android/src/main/java/com/mrousavy/camera/core/PreviewView.kt
++++ b/node_modules/react-native-vision-camera/android/src/main/java/com/mrousavy/camera/core/PreviewView.kt
+@@ -20,7 +20,7 @@ import kotlinx.coroutines.withContext
+ class PreviewView(context: Context, callback: SurfaceHolder.Callback) :
+   SurfaceView(context),
+   SurfaceHolder.Callback {
+-  var size: Size = CameraDeviceDetails.getMaximumPreviewSize()
++  var size: Size = CameraDeviceDetails.getActualPreviewSize()
+     set(value) {
+       if (field != value) {
+         Log.i(TAG, "Surface Size changed: $field -> $value")
+@@ -92,11 +92,11 @@ class PreviewView(context: Context, callback: SurfaceHolder.Callback) :
+ 
+   private fun getSize(contentSize: Size, containerSize: Size, resizeMode: ResizeMode): Size {
+     val contentAspectRatio = contentSize.width.toDouble() / contentSize.height
+-    val containerAspectRatio = containerSize.width.toDouble() / containerSize.height
++    val containerAspectRatio = if(containerSize.height > 0) containerSize.width.toDouble() / containerSize.height else 0
+ 
+     val widthOverHeight = when (resizeMode) {
+-      ResizeMode.COVER -> contentAspectRatio > containerAspectRatio
+-      ResizeMode.CONTAIN -> contentAspectRatio < containerAspectRatio
++      ResizeMode.COVER -> contentAspectRatio > containerAspectRatio.toDouble()
++      ResizeMode.CONTAIN -> contentAspectRatio < containerAspectRatio.toDouble()
+     }
+ 
+     return if (widthOverHeight) {

@@ -1,4 +1,5 @@
 import { manipulateAsync, SaveFormat } from 'expo-image-manipulator';
+
 import {
   useRef,
   useState,
@@ -7,6 +8,7 @@ import {
   useEffect,
   forwardRef,
   useImperativeHandle,
+  useLayoutEffect,
 } from 'react';
 import { useIntl } from 'react-intl';
 import { Platform, StyleSheet, View } from 'react-native';
@@ -27,7 +29,7 @@ import {
 import useIsForeground from '#hooks/useIsForeground';
 import FloatingIconButton from '#ui/FloatingIconButton';
 import type { ForwardedRef } from 'react';
-import type { LayoutRectangle, ViewProps } from 'react-native';
+import type { LayoutRectangle, ViewProps, ViewStyle } from 'react-native';
 import type { CameraRuntimeError } from 'react-native-vision-camera';
 
 export type CameraViewProps = ViewProps & {
@@ -272,25 +274,54 @@ const CameraView = (
     },
   ]);
 
-  const onCameraInitialized = useCallback(() => {
-    onInitialized();
-  }, [onInitialized]);
+  //we put a delay on the size to avoid a stretched camera view on android
+  const [sizeWithDelay, setSizeWithDelay] = useState<ViewStyle>(
+    Platform.OS === 'android'
+      ? { width: 1, height: 1 }
+      : {
+          width: '100%',
+          height: '100%',
+        },
+  );
+
+  useLayoutEffect(() => {
+    let current: NodeJS.Timeout | null = null;
+
+    if (Platform.OS === 'android' && aspectRatio) {
+      current = setTimeout(() => {
+        setSizeWithDelay({
+          width: '100%',
+          height: '100%',
+        });
+      }, 1000);
+    }
+
+    return () => {
+      if (current !== null) {
+        clearTimeout(current);
+        setSizeWithDelay({
+          width: 1,
+          height: 1,
+        });
+      }
+    };
+  }, [aspectRatio]);
 
   return (
     <View
       {...props}
       onLayout={event => setLayoutRect(event.nativeEvent.layout)}
     >
-      {(Platform.OS !== 'android' || aspectRatio) && device != null ? (
+      {(Platform.OS !== 'android' || aspectRatio) && device !== undefined ? (
         <GestureDetector gesture={gesture}>
           <Camera
             ref={camera}
-            style={styles.camera}
+            style={sizeWithDelay}
             device={device}
             fps={30}
             format={Platform.OS === 'android' ? format : undefined}
             isActive={isActive}
-            onInitialized={onCameraInitialized}
+            onInitialized={onInitialized}
             onError={onError}
             enableZoomGesture
             photo={photo}
@@ -384,7 +415,9 @@ export default forwardRef(CameraView);
 const FOCUS_RING_SIZE = 100;
 
 const styles = StyleSheet.create({
-  camera: { flex: 1 },
+  camera: {
+    flex: 1,
+  },
   focusRing: {
     position: 'absolute',
     borderWidth: 1,

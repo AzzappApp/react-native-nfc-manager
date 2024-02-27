@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Image, useWindowDimensions } from 'react-native';
+import { Dimensions, Image } from 'react-native';
 import Animated, {
   Easing,
   runOnJS,
@@ -14,9 +14,9 @@ type LoadingScreenProps = {
   visible: boolean;
 };
 
-const LoadingScreen = ({ visible }: LoadingScreenProps) => {
-  const { width: windowWidth, height: windowHeight } = useWindowDimensions();
+const { width: windowWidth, height: windowHeight } = Dimensions.get('screen');
 
+const LoadingScreen = ({ visible }: LoadingScreenProps) => {
   const [display, setDisplay] = useState(visible);
   const visibleSharedValue = useSharedValue(visible ? 1 : 0);
 
