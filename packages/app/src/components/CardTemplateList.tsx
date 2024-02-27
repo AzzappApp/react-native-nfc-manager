@@ -301,11 +301,7 @@ const CardTemplateList = (
               <View style={styles.webCardContainerRadius}>
                 {item.previewMedia && (
                   <Image
-                    source={{
-                      uri: item.previewMedia.uri,
-                      width: itemWidth,
-                      height: imageHeight!,
-                    }}
+                    source={item.previewMedia}
                     style={{
                       width: itemWidth,
                       height: imageHeight!,
