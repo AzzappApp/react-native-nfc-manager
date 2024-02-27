@@ -197,13 +197,11 @@ const PhotoWithTextAndTitleRenderer = ({
   );
 
   const imageWidth = useDerivedValue(() =>
-    animatedData === null
-      ? 0
-      : os === 'web'
-        ? widthMargin.value / 2
-        : imageMargin === 'width_full'
-          ? layout?.width ?? 0
-          : widthMargin.value,
+    os === 'web'
+      ? widthMargin.value / 2
+      : imageMargin === 'width_full'
+        ? layout?.width ?? 0
+        : widthMargin.value,
   );
 
   const flexDirection: ViewStyle['flexDirection'] =
@@ -219,6 +217,7 @@ const PhotoWithTextAndTitleRenderer = ({
     if (animatedData === null) {
       if ('gap' in rest) {
         return {
+          marginVertical: rest.marginVertical,
           flexDirection,
           rowGap: rest.gap ?? 0,
           columnGap: rest.gap ?? 0,
@@ -226,10 +225,13 @@ const PhotoWithTextAndTitleRenderer = ({
           marginHorizontal: os === 'web' ? rest.marginHorizontal ?? 0 : 0,
         };
       }
-      return {};
+      return {
+        marginHorizontal: 0,
+      };
     }
     const gapValue = animatedData.gap.value ?? 0;
     return {
+      marginVertical: animatedData.marginVertical.value,
       flexDirection,
       rowGap: gapValue,
       columnGap: gapValue,
@@ -239,33 +241,27 @@ const PhotoWithTextAndTitleRenderer = ({
     };
   });
 
-  const imageContainerStyle = useAnimatedStyle(() =>
-    animatedData === null
-      ? 'marginVertical' in rest
-        ? {
-            marginVertical: rest.marginVertical,
-            marginHorizontal:
-              os === 'web'
-                ? 0
-                : imageMargin === 'width_full'
-                  ? 0
-                  : rest.marginHorizontal,
-            aspectRatio: rest.aspectRatio ?? 1,
-            borderRadius: rest.borderRadius ?? 0,
-          }
-        : {}
-      : {
-          marginVertical: animatedData.marginVertical.value,
-          marginHorizontal:
-            os === 'web'
-              ? 0
-              : imageMargin === 'width_full'
-                ? 0
-                : animatedData.marginHorizontal.value,
-          aspectRatio: animatedData.aspectRatio.value ?? 1,
-          borderRadius: animatedData.borderRadius.value ?? 0,
-        },
-  );
+  const imageContainerStyle = useAnimatedStyle(() => {
+    if (animatedData === null) {
+      return {
+        marginHorizontal:
+          'marginHorizontal' in rest && imageMargin !== 'width_full'
+            ? rest.marginHorizontal
+            : 0,
+      };
+    }
+
+    return {
+      marginHorizontal:
+        os === 'web'
+          ? 0
+          : imageMargin === 'width_full'
+            ? 0
+            : animatedData.marginHorizontal.value,
+      aspectRatio: animatedData.aspectRatio.value ?? 1,
+      borderRadius: animatedData.borderRadius.value ?? 0,
+    };
+  });
 
   const imageStyle = useAnimatedStyle(() =>
     animatedData === null
