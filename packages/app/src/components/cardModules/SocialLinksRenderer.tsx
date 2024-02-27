@@ -264,6 +264,8 @@ const SocialLinksRenderer = ({
           marginBottom: rest.marginBottom ?? 0,
           paddingLeft: rest.marginHorizontal ?? 0,
           paddingRight: rest.marginHorizontal ?? 0,
+          columnGap: rest.columnGap ?? undefined,
+          rowGap: rest.columnGap ?? undefined,
         };
       }
       return {};
