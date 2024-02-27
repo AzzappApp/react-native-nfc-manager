@@ -69,16 +69,17 @@ const MediaFollowingsWebCards = ({
           withShadow
           style={style}
         />
-        <Link route="FOLLOWINGS_MOSAIC">
-          <Button
-            variant="little_round"
-            label={intl.formatMessage({
-              defaultMessage: 'See all',
-              description: 'See all followed profiles',
-            })}
-            style={styles.seeAll}
-          />
-        </Link>
+        <View style={styles.seeAll}>
+          <Link route="FOLLOWINGS_MOSAIC">
+            <Button
+              variant="little_round"
+              label={intl.formatMessage({
+                defaultMessage: 'See all',
+                description: 'See all followed profiles',
+              })}
+            />
+          </Link>
+        </View>
       </View>
     </View>
   ) : null;
@@ -89,11 +90,13 @@ export default MediaFollowingsWebCards;
 const styles = StyleSheet.create({
   containerStyle: {
     paddingHorizontal: 8,
+    paddingBottom: 20,
+    paddingTop: 16.5,
   },
   coverStyle: { width: 80 },
   seeAll: {
     position: 'absolute',
     right: 12,
-    top: 44,
+    top: 60.5,
   },
 });
