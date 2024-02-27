@@ -8,7 +8,13 @@ import {
   isInternationalPhoneNumber,
   isValidEmail,
 } from '@azzapp/shared/stringHelpers';
-import { UserTable, createProfile, createUser, db } from '#domains';
+import {
+  UserTable,
+  createProfile,
+  createUser,
+  db,
+  updateWebCard,
+} from '#domains';
 import fromGlobalIdWithType from '#helpers/relayIdHelpers';
 import type { GraphQLContext } from '#index';
 import type { MutationResolvers } from '#schema/__generated__/types';
@@ -59,11 +65,15 @@ const inviteUserMutation: MutationResolvers['inviteUser'] = async (
     .then(res => res.pop());
 
   const webCard = await loaders.WebCard.load(profile.webCardId);
-  if (!webCard || !webCard.isMultiUser) {
+  if (!webCard) {
     throw new GraphQLError(ERRORS.INVALID_REQUEST);
   }
 
   const createdProfileId = await db.transaction(async trx => {
+    if (!webCard.isMultiUser) {
+      await updateWebCard(webCard.id, { isMultiUser: true }, trx);
+    }
+
     let userId;
     if (!existingUser) {
       userId = await createUser(
