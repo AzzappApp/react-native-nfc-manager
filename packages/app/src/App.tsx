@@ -13,7 +13,7 @@ import {
   useState,
 } from 'react';
 import { FormattedMessage, IntlProvider, injectIntl } from 'react-intl';
-import { BackHandler, useColorScheme } from 'react-native';
+import { BackHandler, Platform, useColorScheme } from 'react-native';
 import { hide as hideSplashScreen } from 'react-native-bootsplash';
 import { KeyboardProvider } from 'react-native-keyboard-controller';
 import {
@@ -158,7 +158,7 @@ const App = () => {
 
   return (
     <>
-      <StatusBar style="auto" translucent />
+      {Platform.OS === 'android' && <StatusBar style="auto" translucent />}
       <AppIntlProvider>
         <ErrorBoundary>
           <PermissionProvider>
