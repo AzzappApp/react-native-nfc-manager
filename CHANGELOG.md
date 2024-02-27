@@ -1,5 +1,6 @@
-## 0.5.5-canary.111
+## 0.5.5-canary.112
 
+* **fix:**  - 🐛 correctly render photo with title module ([#2928](https://github.com/AzzappApp/azzapp/pull/2928))
 * **feat:**  - add updatedAt field on webcard ([#2881](https://github.com/AzzappApp/azzapp/pull/2881))
 * **fix:**  - **android:** [#2843](https://github.com/AzzappApp/azzapp/pull/2843) set status bar translucent ([#2893](https://github.com/AzzappApp/azzapp/pull/2893))
 * **fix:**  - **webCard:** [#2886](https://github.com/AzzappApp/azzapp/pull/2886) styles are not correctly applied in preview ([#2888](https://github.com/AzzappApp/azzapp/pull/2888))
