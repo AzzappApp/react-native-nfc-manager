@@ -131,7 +131,6 @@ const WebCardList = ({
       keyExtractor={keyExtractor}
       renderItem={renderItem}
       onEndReached={onEndReached}
-      onEndReachedThreshold={0.5}
       directionalLockEnabled
       showsHorizontalScrollIndicator={false}
       contentContainerStyle={styles.container}
