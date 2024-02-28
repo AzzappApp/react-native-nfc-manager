@@ -15,7 +15,7 @@ const declineInvitationMutation: MutationResolvers['declineInvitation'] =
 
     const profile = await loaders.Profile.load(profileId);
 
-    if (!profile || profile.userId !== userId) {
+    if (!profile || profile.userId !== userId || !profile.invited) {
       throw new GraphQLError(ERRORS.INVALID_REQUEST);
     }
 

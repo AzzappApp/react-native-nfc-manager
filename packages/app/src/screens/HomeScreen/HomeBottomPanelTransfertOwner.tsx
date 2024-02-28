@@ -33,6 +33,7 @@ const HomeBottomPanelTransfertOwner = ({
             id
             profileRole
             promotedAsOwner
+            invited
           }
         }
       }
@@ -51,6 +52,7 @@ const HomeBottomPanelTransfertOwner = ({
             id: profile.id,
             profileRole: 'owner',
             promotedAsOwner: false,
+            invited: false,
           },
         },
       },
