@@ -187,6 +187,7 @@ const ColorPicker = ({
     <BottomSheetModal
       height={height}
       visible={visible}
+      avoidKeyboard
       headerTitle={
         state === 'colorChooser'
           ? title
