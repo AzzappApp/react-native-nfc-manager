@@ -69,7 +69,7 @@ object GPULayerImageLoader {
 
   private suspend fun loadVideoFrame(uri: Uri, time: Long) =
     loadImageWithCache("${uri.toString()}-${time.toString()}") {
-      getBitmapFromVideoFrame(uri, time)
+      getBitmapFromVideoFrame(uri, time * 1000 * 1000)
     }
 
   private suspend fun loadImageWithCache(
@@ -137,10 +137,7 @@ object GPULayerImageLoader {
         retriever.setDataSource(uri.toString(), HashMap<String, String>())
       }
       val image =
-        retriever.getFrameAtTime(
-          time,
-          MediaMetadataRetriever.OPTION_CLOSEST_SYNC
-        )
+        retriever.getFrameAtTime(time)
       retriever.release()
       image
     }
