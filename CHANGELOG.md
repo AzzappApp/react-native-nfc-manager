@@ -1,5 +1,13 @@
-## 0.5.5-canary.114
+## 0.5.5-canary.115
 
+* **fix:**  - **android:** [#2941](https://github.com/AzzappApp/azzapp/pull/2941) apply bigger margin top to handle ios and android cases ([#2948](https://github.com/AzzappApp/azzapp/pull/2948))
+* **fix:**  - 🐛 correctly fetch more webcards when end is reached ([#2961](https://github.com/AzzappApp/azzapp/pull/2961))
+* **fix:**  - webcard builder UI ([#2942](https://github.com/AzzappApp/azzapp/pull/2942))
+* **fix:**  - **multiUser:** [#2932](https://github.com/AzzappApp/azzapp/pull/2932) update client & can‘t decline when not invited ([#2940](https://github.com/AzzappApp/azzapp/pull/2940))
+* **feat:**  - **api:** [#2914](https://github.com/AzzappApp/azzapp/pull/2914) apply limits on queries + remove useless definitions ([#2946](https://github.com/AzzappApp/azzapp/pull/2946))
+* **fix:**  - **android:** [#2842](https://github.com/AzzappApp/azzapp/pull/2842) wrong image extracted for timeline editor ([#2939](https://github.com/AzzappApp/azzapp/pull/2939))
+* **feat:**  - [#2882](https://github.com/AzzappApp/azzapp/pull/2882) add rate limiter ([#2938](https://github.com/AzzappApp/azzapp/pull/2938))
+* **fix:**  - 🐛 dismiss keyboard when sending comment on post ([#2959](https://github.com/AzzappApp/azzapp/pull/2959))
 * **feat:**  - 🎸 update user and redirect when losing webcard access ([#2916](https://github.com/AzzappApp/azzapp/pull/2916))
 * **fix:**  - **android:** [#2911](https://github.com/AzzappApp/azzapp/pull/2911) loader is too large on videos ([#2931](https://github.com/AzzappApp/azzapp/pull/2931))
 * **fix:**  - **cover:** [#2863](https://github.com/AzzappApp/azzapp/pull/2863) return default cover when no one is registered ([#2919](https://github.com/AzzappApp/azzapp/pull/2919))
