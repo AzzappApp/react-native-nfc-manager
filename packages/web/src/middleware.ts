@@ -1,9 +1,31 @@
+import { Ratelimit } from '@upstash/ratelimit';
+import { kv } from '@vercel/kv';
 import { NextResponse } from 'next/server';
 import { getRedirectWebCardByUserName } from '@azzapp/data/domains';
 import type { NextRequest } from 'next/server';
 
+const ratelimit = new Ratelimit({
+  redis: kv,
+  limiter: Ratelimit.slidingWindow(10, '10 s'),
+});
+
 export async function middleware(request: NextRequest) {
   const { nextUrl } = request;
+
+  const ip = request.ip ?? '127.0.0.1';
+  const { success } = await ratelimit.limit(ip);
+
+  if (!success) {
+    return NextResponse.json(
+      {
+        message: 'Too Many Requests',
+      },
+      {
+        status: 429,
+      },
+    );
+  }
+
   // Handle redirection at root level but should be the LAST to be handle(performance, handle all other static route like /api before)
   if (nextUrl.pathname?.length > 1) {
     const pathComponents = nextUrl.pathname.substring(1).split('/');
