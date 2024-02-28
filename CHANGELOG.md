@@ -1,5 +1,6 @@
-## 0.5.5-canary.115
+## 0.5.5-canary.116
 
+* **feat:**  - [#2914](https://github.com/AzzappApp/azzapp/pull/2914) add graphql shield ([#2960](https://github.com/AzzappApp/azzapp/pull/2960))
 * **fix:**  - **android:** [#2941](https://github.com/AzzappApp/azzapp/pull/2941) apply bigger margin top to handle ios and android cases ([#2948](https://github.com/AzzappApp/azzapp/pull/2948))
 * **fix:**  - 🐛 correctly fetch more webcards when end is reached ([#2961](https://github.com/AzzappApp/azzapp/pull/2961))
 * **fix:**  - webcard builder UI ([#2942](https://github.com/AzzappApp/azzapp/pull/2942))
