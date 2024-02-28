@@ -219,27 +219,6 @@ enum ProfileSortType {
 }
 
 """
-A cover template by category
-"""
-type CoverTemplateCategory {
-  """
-  The category name
-  """
-  category: String!
-
-  """
-  The category templates
-  """
-  templates: [CoverTemplate!]!
-}
-
-type KnownContact {
-  email: String
-  phoneNumber: String
-  publishedWebCards: [WebCard!]!
-}
-
-"""
 A connection to a list of Profile.
 """
 type ProfileConnection {

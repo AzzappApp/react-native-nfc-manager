@@ -4,6 +4,8 @@ import { UnauthenticatedError, useGenericAuth } from '@envelop/generic-auth';
 import { useParserCache } from '@envelop/parser-cache';
 import { useSentry } from '@envelop/sentry';
 import { useValidationCache } from '@envelop/validation-cache';
+import { maxAliasesPlugin } from '@escape.tech/graphql-armor-max-aliases';
+import { maxTokensPlugin } from '@escape.tech/graphql-armor-max-tokens';
 import { useDisableIntrospection } from '@graphql-yoga/plugin-disable-introspection';
 import { usePersistedOperations } from '@graphql-yoga/plugin-persisted-operations';
 import { createYoga } from 'graphql-yoga';
@@ -217,6 +219,13 @@ const { handleRequest } = createYoga({
     useSentry({
       includeRawResult: false,
       includeExecuteVariables: true,
+    }),
+    maxAliasesPlugin({
+      n: 50, // Number of aliases allowed
+      allowList: ['node', 'uri'],
+    }),
+    maxTokensPlugin({
+      n: 1000, // Number of tokens allowed
     }),
   ],
   context: ({ request }) => {

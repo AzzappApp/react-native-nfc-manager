@@ -1954,6 +1954,33 @@
   resolved "https://registry.yarnpkg.com/@esbuild/win32-x64/-/win32-x64-0.19.12.tgz#c57c8afbb4054a3ab8317591a0b7320360b444ae"
   integrity sha512-T1QyPSDCyMXaO3pzBkF96E8xMkiRYbUEZADd29SyPGabqxMViNoii+NcK7eWJAEoU6RZyEm5lVSIjTmcdoB9HA==
 
+"@escape.tech/graphql-armor-max-aliases@^2.3.0":
+  version "2.3.0"
+  resolved "https://registry.yarnpkg.com/@escape.tech/graphql-armor-max-aliases/-/graphql-armor-max-aliases-2.3.0.tgz#063fd35345316ca9e4a37461a8307d3001ed7a01"
+  integrity sha512-h0AfPx929MWBnDlWnn/hcLHHNIAnUjws30OmyPLj9GqVmsBpj3338LELvORuuf3N1ciWI0xgkQd3NRSrmgr3ig==
+  dependencies:
+    graphql "^16.0.0"
+  optionalDependencies:
+    "@envelop/core" "^5.0.0"
+    "@escape.tech/graphql-armor-types" "0.5.0"
+
+"@escape.tech/graphql-armor-max-tokens@^2.3.0":
+  version "2.3.0"
+  resolved "https://registry.yarnpkg.com/@escape.tech/graphql-armor-max-tokens/-/graphql-armor-max-tokens-2.3.0.tgz#e8478634869fe0e37bdb49cbec3cc7708df358ca"
+  integrity sha512-4aqtUhT4ONUVWY6Z7crjPFyOK2/quUGHFU3G2+s4GYFxQHn3F5HjdI2KoY5ot2Sdijh4X+gx0ebBjUzriLNtbg==
+  dependencies:
+    graphql "^16.0.0"
+  optionalDependencies:
+    "@envelop/core" "^5.0.0"
+    "@escape.tech/graphql-armor-types" "0.5.0"
+
+"@escape.tech/graphql-armor-types@0.5.0":
+  version "0.5.0"
+  resolved "https://registry.yarnpkg.com/@escape.tech/graphql-armor-types/-/graphql-armor-types-0.5.0.tgz#bc8452443fef533b118a9e807782f5da95780148"
+  integrity sha512-a7KMhb1qVHFFWw4bvGYQI637YaIZRozbfc+Fj1Vv/pwnTCJOzOgnvKO8+WBXJsFFGJ2Kj+fRORmSpz7J+lJF1w==
+  dependencies:
+    graphql "^16.0.0"
+
 "@eslint-community/eslint-utils@^4.2.0", "@eslint-community/eslint-utils@^4.4.0":
   version "4.4.0"
   resolved "https://registry.yarnpkg.com/@eslint-community/eslint-utils/-/eslint-utils-4.4.0.tgz#a23514e8fb9af1269d5f7788aa556798d61c6b59"
@@ -9365,7 +9392,7 @@ graphql-yoga@^5.1.1:
     lru-cache "^10.0.0"
     tslib "^2.5.2"
 
-graphql@15.3.0, graphql@15.8.0, graphql@^16.8.0, graphql@^16.8.1:
+graphql@15.3.0, graphql@15.8.0, graphql@^16.0.0, graphql@^16.8.0, graphql@^16.8.1:
   version "16.8.1"
   resolved "https://registry.yarnpkg.com/graphql/-/graphql-16.8.1.tgz#1930a965bef1170603702acdb68aedd3f3cf6f07"
   integrity sha512-59LZHPdGZVh695Ud9lRzPBVTtlX9ZCV150Er2W43ro37wVof0ctenSaskPPjN7lVTIN8mSZt8PHUNKZuNQUuxw==
