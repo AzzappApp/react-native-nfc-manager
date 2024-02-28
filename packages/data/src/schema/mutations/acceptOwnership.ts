@@ -8,7 +8,7 @@ import type { MutationResolvers } from '#schema/__generated__/types';
 
 const acceptOwnership: MutationResolvers['acceptOwnership'] = async (
   _,
-  { input: { profileId: gqlProfileId } },
+  { profileId: gqlProfileId },
   { auth, loaders, sendMail, sendSms },
 ) => {
   const { userId } = auth;
@@ -19,11 +19,8 @@ const acceptOwnership: MutationResolvers['acceptOwnership'] = async (
     userId && loaders.User.load(userId),
   ]);
 
-  if (!user || !profile || !profile.promotedAsOwner) {
+  if (!user || !profile?.promotedAsOwner) {
     throw new GraphQLError(ERRORS.INVALID_REQUEST);
-  }
-  if (profile.userId !== userId) {
-    throw new GraphQLError(ERRORS.UNAUTHORIZED);
   }
 
   const webCard = await loaders.WebCard.load(profile.webCardId);

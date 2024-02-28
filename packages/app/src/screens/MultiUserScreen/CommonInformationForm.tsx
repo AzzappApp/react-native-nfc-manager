@@ -92,9 +92,10 @@ const CommonInformationForm = ({
 
   const [commit] = useMutation(graphql`
     mutation CommonInformationFormMutation(
+      $webCardId: ID!
       $input: SaveCommonInformationInput!
     ) {
-      saveCommonInformation(input: $input) {
+      saveCommonInformation(webCardId: $webCardId, input: $input) {
         webCard {
           commonInformation {
             ...CommonInformationForm_data
@@ -108,6 +109,7 @@ const CommonInformationForm = ({
     data => {
       commit({
         variables: {
+          webCardId,
           input: {
             ...data,
             emails: data.emails.filter(email => email.address),
@@ -117,7 +119,6 @@ const CommonInformationForm = ({
             urls: data.urls.filter(url => url.address),
             addresses: data.addresses.filter(address => address.address),
             socials: data.socials.filter(social => social.url),
-            webCardId,
           },
         },
         onCompleted: () => {

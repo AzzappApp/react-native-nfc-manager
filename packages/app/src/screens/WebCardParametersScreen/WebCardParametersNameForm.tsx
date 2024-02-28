@@ -119,9 +119,10 @@ const WebcardParametersNameForm = ({
 
   const [commitMutation] = useMutation(graphql`
     mutation WebCardParametersNameFormMutation(
+      $webCardId: ID!
       $input: UpdateWebCardUserNameInput!
     ) {
-      updateWebCardUserName(input: $input) {
+      updateWebCardUserName(webCardId: $webCardId, input: $input) {
         webCard {
           id
           userName
@@ -135,9 +136,9 @@ const WebcardParametersNameForm = ({
   const onSubmit = handleSubmit(async ({ userName }) => {
     commitMutation({
       variables: {
+        webCardId: webCard.id,
         input: {
           userName,
-          webCardId: webCard.id,
         },
       },
       onCompleted: () => {

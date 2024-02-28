@@ -3,42 +3,42 @@ extend type Mutation {
   Save a block text module, create it if it doesn't exist, update it otherwise
   :warning: Every field that is not specified will be set to null
   """
-  saveBlockTextModule(input: SaveBlockTextModuleInput!): SaveModulePayload!
+  saveBlockTextModule(webCardId: ID!, input: SaveBlockTextModuleInput!): SaveModulePayload!
   """
   Save a carousel module, create it if it doesn't exist, update it otherwise
   :warning: Every field that is not specified will be set to null
   """
-  saveCarouselModule(input: SaveCarouselModuleInput!): SaveModulePayload!
+  saveCarouselModule(webCardId: ID!,input: SaveCarouselModuleInput!): SaveModulePayload!
   """
   Save an horizontal photo module, create it if it doesn't exist, update it otherwise
   :warning: Every field that is not specified will be set to null
   """
-  saveHorizontalPhotoModule(input: SaveHorizontalPhotoModuleInput!): SaveModulePayload!
+  saveHorizontalPhotoModule(webCardId: ID!,input: SaveHorizontalPhotoModuleInput!): SaveModulePayload!
   """
   Save a line divider module, create it if it doesn't exist, update it otherwise
   :warning: Every field that is not specified will be set to null
   """
-  saveLineDividerModule(input: SaveLineDividerModuleInput!): SaveModulePayload!
+  saveLineDividerModule(webCardId: ID!,input: SaveLineDividerModuleInput!): SaveModulePayload!
   """
   Save a line photoWithTextAndTitle module, create it if it doesn't exist, update it otherwise
   :warning: Every field that is not specified will be set to null
   """
-  savePhotoWithTextAndTitleModule(input: SavePhotoWithTextAndTitleModuleInput!): SaveModulePayload!
+  savePhotoWithTextAndTitleModule(webCardId: ID!,input: SavePhotoWithTextAndTitleModuleInput!): SaveModulePayload!
   """
   Save a simple button module, create it if it doesn't exist, update it otherwise
   :warning: Every field that is not specified will be set to null
   """
-  saveSimpleButtonModule(input: SaveSimpleButtonModuleInput!): SaveModulePayload!
+  saveSimpleButtonModule(webCardId: ID!,input: SaveSimpleButtonModuleInput!): SaveModulePayload!
   """
   Save a simple text module, create it if it doesn't exist, update it otherwise
   :warning: Every field that is not specified will be set to null
   """
-  saveSimpleTextModule(input: SaveSimpleTextModuleInput!): SaveModulePayload!
+  saveSimpleTextModule(webCardId: ID!,input: SaveSimpleTextModuleInput!): SaveModulePayload!
   """
   Save a social links module, create it if it doesn't exist, update it otherwise
   :warning: Every field that is not specified will be set to null
   """
-  saveSocialLinksModule(input: SaveSocialLinksModuleInput!): SaveModulePayload!
+  saveSocialLinksModule(webCardId: ID!,input: SaveSocialLinksModuleInput!): SaveModulePayload!
 }
 
 type SaveModulePayload {
@@ -46,7 +46,6 @@ type SaveModulePayload {
 }
 
 input SaveBlockTextModuleInput {
-  webCardId: ID!
   moduleId: ID
   text: String!
   fontFamily: String
@@ -66,7 +65,6 @@ input SaveBlockTextModuleInput {
 
 
 input SaveCarouselModuleInput {
-  webCardId: ID!
   moduleId: ID
   images: [String!]!
   squareRatio: Boolean
@@ -82,7 +80,6 @@ input SaveCarouselModuleInput {
 }
 
 input SaveHorizontalPhotoModuleInput {
-  webCardId: ID!
   moduleId: ID
   image: String!
   borderWidth: Int
@@ -98,7 +95,6 @@ input SaveHorizontalPhotoModuleInput {
 }
 
 input SaveLineDividerModuleInput {
-  webCardId: ID!
   moduleId: ID
   orientation: LineDividerOrientation
   marginTop: Int
@@ -109,7 +105,6 @@ input SaveLineDividerModuleInput {
 }
 
 input SavePhotoWithTextAndTitleModuleInput {
-  webCardId: ID!
   moduleId: ID
   image: String!
   contentFontFamily: String
@@ -137,7 +132,6 @@ input SavePhotoWithTextAndTitleModuleInput {
 }
 
 input SaveSimpleButtonModuleInput {
-  webCardId: ID!
   moduleId: ID
   buttonLabel: String!
   actionType: String!
@@ -158,7 +152,6 @@ input SaveSimpleButtonModuleInput {
 }
 
 input SaveSimpleTextModuleInput {
-  webCardId: ID!
   moduleId: ID
   kind: String!
   text: String!
@@ -174,7 +167,6 @@ input SaveSimpleTextModuleInput {
 }
 
 input SaveSocialLinksModuleInput {
-  webCardId: ID!
   moduleId: ID
   links: [SocialLinkInput!]!
   iconColor: String

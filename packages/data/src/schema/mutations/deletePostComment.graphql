@@ -1,9 +1,5 @@
 extend type Mutation {
-  deletePostComment(input: DeletePostCommentInput!): DeletePostCommentPayload!
-}
-
-input DeletePostCommentInput {
-  commentId: ID!
+  deletePostComment(webCardId: ID!, commentId: ID!): DeletePostCommentPayload!
 }
 
 type DeletePostCommentPayload {

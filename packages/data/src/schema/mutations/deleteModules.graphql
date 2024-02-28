@@ -1,5 +1,5 @@
 extend type Mutation {
-  deleteModules(input: DeleteModulesInput!): DeleteModulesPayload!
+  deleteModules(webCardId: ID!, input: DeleteModulesInput!): DeleteModulesPayload!
 }
 
 input DeleteModulesInput {

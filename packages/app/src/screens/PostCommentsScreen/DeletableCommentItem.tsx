@@ -32,9 +32,10 @@ const DeletableCommentItem = (props: DeletableCommentItemProps) => {
   const [commit] = useMutation<DeletableCommentItemDeleteCommentMutation>(
     graphql`
       mutation DeletableCommentItemDeleteCommentMutation(
-        $input: DeletePostCommentInput!
+        $webCardId: ID!
+        $commentId: ID!
       ) {
-        deletePostComment(input: $input) {
+        deletePostComment(webCardId: $webCardId, commentId: $commentId) {
           commentId @deleteRecord
         }
       }
@@ -52,12 +53,11 @@ const DeletableCommentItem = (props: DeletableCommentItemProps) => {
     const intl = useIntl();
 
     const onDelete = () => {
-      if (isEditor(profileInfos?.profileRole)) {
+      if (isEditor(profileInfos?.profileRole) && profileInfos?.webCardId) {
         commit({
           variables: {
-            input: {
-              commentId: comment.id,
-            },
+            webCardId: profileInfos?.webCardId,
+            commentId: comment.id,
           },
           onCompleted() {
             onClose();

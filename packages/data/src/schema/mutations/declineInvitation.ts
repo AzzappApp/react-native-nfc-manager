@@ -1,23 +1,11 @@
 import { eq } from 'drizzle-orm';
-import { GraphQLError } from 'graphql';
-import ERRORS from '@azzapp/shared/errors';
+import { fromGlobalId } from 'graphql-relay';
 import { ProfileTable, db } from '#domains';
 import type { MutationResolvers } from '#schema/__generated__/types';
 
-// TODO I DON'T understand  why profileId is not a globalId here
 const declineInvitationMutation: MutationResolvers['declineInvitation'] =
-  async (_, { input: { profileId } }, { auth, loaders }) => {
-    const { userId } = auth;
-
-    if (!userId) {
-      throw new GraphQLError(ERRORS.UNAUTHORIZED);
-    }
-
-    const profile = await loaders.Profile.load(profileId);
-
-    if (!profile || profile.userId !== userId || !profile.invited) {
-      throw new GraphQLError(ERRORS.INVALID_REQUEST);
-    }
+  async (_, { profileId: gqlProfileId }) => {
+    const profileId = fromGlobalId(gqlProfileId).id;
 
     await db.delete(ProfileTable).where(eq(ProfileTable.id, profileId));
 

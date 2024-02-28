@@ -104,10 +104,11 @@ const useToggleFollow = (userNameFilter?: string) => {
   const [commit, toggleFollowingActive] = useMutation<useToggleFollowMutation>(
     graphql`
       mutation useToggleFollowMutation(
+        $webCardId: ID!
         $input: ToggleFollowingInput!
         $viewerWebCardId: ID!
       ) {
-        toggleFollowing(input: $input) {
+        toggleFollowing(webCardId: $webCardId, input: $input) {
           webCard {
             id
             isFollowing(webCardId: $viewerWebCardId)
@@ -157,10 +158,10 @@ const useToggleFollow = (userNameFilter?: string) => {
     }
     commit({
       variables: {
+        webCardId: currentWebCardId,
         viewerWebCardId: currentWebCardId,
         input: {
           targetWebCardId,
-          webCardId: currentWebCardId,
           follow,
         },
       },

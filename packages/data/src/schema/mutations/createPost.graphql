@@ -1,12 +1,8 @@
 extend type Mutation {
-  createPost(input: CreatePostInput!): CreatePostPayload!
+  createPost(webCardId: ID!, input: CreatePostInput!): CreatePostPayload!
 }
 
 input CreatePostInput {
-  """
-  The id of the WebCard to  which this post belongs
-  """
-  webCardId: String!
   """
   The media of the publication
   """

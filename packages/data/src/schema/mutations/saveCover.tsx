@@ -8,12 +8,10 @@ import {
   DEFAULT_COVER_TEXT_COLOR,
 } from '@azzapp/shared/coverHelpers';
 import ERRORS from '@azzapp/shared/errors';
-import { isEditor } from '@azzapp/shared/profileHelpers';
 import {
   checkMedias,
   db,
   getProfilesPosts,
-  getUserProfileWithWebCardId,
   referencesMedias,
   updateWebCard,
 } from '#domains';
@@ -23,23 +21,16 @@ import type { MutationResolvers } from '#schema/__generated__/types';
 
 const saveCover: MutationResolvers['saveCover'] = async (
   _,
-  { input: { webCardId: gqlWebCardId, ...data } },
-  { auth, cardUsernamesToRevalidate, postsToRevalidate, loaders },
+  { webCardId: gqlWebCardId, input: data },
+  { cardUsernamesToRevalidate, postsToRevalidate, loaders },
 ) => {
-  const { userId } = auth;
   const webCardId = fromGlobalIdWithType(gqlWebCardId, 'WebCard');
-  const profile =
-    userId && (await getUserProfileWithWebCardId(userId, webCardId));
-
-  if (!profile || !isEditor(profile.profileRole)) {
-    throw new GraphQLError(ERRORS.UNAUTHORIZED);
-  }
 
   const oldMedias: Array<string | null> = [];
 
   const newMedias: string[] = [];
 
-  const webCard = await loaders.WebCard.load(profile.webCardId);
+  const webCard = await loaders.WebCard.load(webCardId);
 
   if (!webCard) {
     throw new GraphQLError(ERRORS.INVALID_REQUEST);

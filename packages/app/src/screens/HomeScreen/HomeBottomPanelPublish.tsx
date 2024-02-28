@@ -48,9 +48,10 @@ const HomeBottomPanelPublish = ({ profile }: HomeBottomPanelPublishProps) => {
     const environment = getRelayEnvironment();
     const publishMutation = graphql`
       mutation HomeBottomPanelPublishMutation(
+        $webCardId: ID!
         $input: ToggleWebCardPublishedInput!
       ) @raw_response_type {
-        toggleWebCardPublished(input: $input) {
+        toggleWebCardPublished(webCardId: $webCardId, input: $input) {
           webCard {
             id
             cardIsPublished
@@ -62,8 +63,8 @@ const HomeBottomPanelPublish = ({ profile }: HomeBottomPanelPublishProps) => {
     commitMutation<HomeBottomPanelPublishMutation>(environment, {
       mutation: publishMutation,
       variables: {
+        webCardId: profile.webCard.id,
         input: {
-          webCardId: profile.webCard.id,
           published: true,
         },
       },

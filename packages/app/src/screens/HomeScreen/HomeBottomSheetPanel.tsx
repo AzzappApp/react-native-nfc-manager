@@ -75,10 +75,8 @@ const HomeBottomSheetPanel = ({
 
   const [commitQuitWebCard] =
     useMutation<HomeBottomSheetPanelQuitWebCardMutation>(graphql`
-      mutation HomeBottomSheetPanelQuitWebCardMutation(
-        $input: QuitWebCardInput!
-      ) {
-        quitWebCard(input: $input) {
+      mutation HomeBottomSheetPanelQuitWebCardMutation($profileId: ID!) {
+        quitWebCard(profileId: $profileId) {
           profileId
         }
       }
@@ -89,9 +87,7 @@ const HomeBottomSheetPanel = ({
 
     commitQuitWebCard({
       variables: {
-        input: {
-          profileId: profile.id,
-        },
+        profileId: profile.id,
       },
 
       updater: store => {

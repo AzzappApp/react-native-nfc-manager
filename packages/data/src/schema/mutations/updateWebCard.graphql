@@ -1,9 +1,8 @@
 extend type Mutation {
-  updateWebCard(input: UpdateWebCardInput!): UpdateWebCardPayload
+  updateWebCard(webCardId: ID!, input: UpdateWebCardInput!): UpdateWebCardPayload
 }
 
 input UpdateWebCardInput {
-  webCardId: ID!
   firstName: String
   lastName: String
   webCardKind: WebCardKind

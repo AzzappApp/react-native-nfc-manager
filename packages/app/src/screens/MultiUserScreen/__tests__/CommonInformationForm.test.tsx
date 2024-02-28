@@ -176,7 +176,6 @@ describe('CommonInformationForm', () => {
           address: 'https://www.google.com',
         },
       ],
-      webCardId: 'test-webcard',
     });
   });
 });

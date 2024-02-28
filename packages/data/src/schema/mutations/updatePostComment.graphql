@@ -2,7 +2,7 @@ extend type Mutation {
   """
   Update a post comment
   """
-  updatePostComment(input: UpdatePostCommentInput!): UpdatePostCommentPayload!
+  updatePostComment(webCardId: ID!, input: UpdatePostCommentInput!): UpdatePostCommentPayload!
 }
 
 input UpdatePostCommentInput {

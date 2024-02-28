@@ -94,9 +94,9 @@ const WebCardColorPicker = ({
         };
     commit({
       variables: {
+        webCardId: webCard.id,
         input: {
           ...cardColors,
-          webCardId: webCard.id,
         },
       },
       updater: webCard?.id

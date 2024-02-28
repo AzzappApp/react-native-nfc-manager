@@ -1,8 +1,7 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import { GraphQLError } from 'graphql';
 import ERRORS from '@azzapp/shared/errors';
-import { isEditor } from '@azzapp/shared/profileHelpers';
-import { getUserProfileWithWebCardId, updatePost } from '#domains';
+import { updatePost } from '#domains';
 import fromGlobalIdWithType from '#helpers/relayIdHelpers';
 import type { NewPost } from '#domains';
 import type { MutationResolvers } from '#schema/__generated__/types';
@@ -10,21 +9,17 @@ import type { GraphQLContext } from '../GraphQLContext';
 
 const updatePostMutation: MutationResolvers['updatePost'] = async (
   _,
-  { input: { postId: gqlPostId, allowComments, allowLikes, content } },
-  { auth, loaders, cardUsernamesToRevalidate }: GraphQLContext,
+  {
+    webCardId: gqlWebCardId,
+    input: { postId: gqlPostId, allowComments, allowLikes, content },
+  },
+  { loaders, cardUsernamesToRevalidate }: GraphQLContext,
 ) => {
-  const { userId } = auth;
   const postId = fromGlobalIdWithType(gqlPostId, 'Post');
+  const webCardId = fromGlobalIdWithType(gqlWebCardId, 'WebCard');
   const post = await loaders.Post.load(postId);
-  if (!post) {
+  if (!post || post.webCardId !== webCardId) {
     throw new GraphQLError(ERRORS.INVALID_REQUEST);
-  }
-
-  const profile =
-    userId && (await getUserProfileWithWebCardId(userId, post.webCardId));
-
-  if (!profile || !isEditor(profile.profileRole) || profile.invited) {
-    throw new GraphQLError(ERRORS.UNAUTHORIZED);
   }
 
   if (!post) {
@@ -40,7 +35,7 @@ const updatePostMutation: MutationResolvers['updatePost'] = async (
   try {
     await updatePost(post.id, partialPost);
 
-    const webCard = await loaders.WebCard.load(profile.webCardId);
+    const webCard = await loaders.WebCard.load(webCardId);
     if (webCard) {
       cardUsernamesToRevalidate.add(webCard.userName);
     }

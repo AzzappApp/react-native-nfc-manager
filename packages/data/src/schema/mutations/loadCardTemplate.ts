@@ -3,7 +3,6 @@ import { GraphQLError } from 'graphql';
 import { omit } from 'lodash';
 import { DEFAULT_CARD_STYLE } from '@azzapp/shared/cardHelpers';
 import ERRORS from '@azzapp/shared/errors';
-import { isEditor } from '@azzapp/shared/profileHelpers';
 import {
   CardModuleTable,
   db,
@@ -21,7 +20,7 @@ import type { MutationResolvers } from '#schema/__generated__/types';
 
 const loadCardTemplateMutation: MutationResolvers['loadCardTemplate'] = async (
   _,
-  { input: { cardTemplateId: gqlCardTemplateID, webCardId: gqlWebCardId } },
+  { cardTemplateId: gqlCardTemplateID, webCardId: gqlWebCardId },
   { auth, cardUsernamesToRevalidate, loaders },
 ) => {
   const { userId } = auth;
@@ -29,7 +28,7 @@ const loadCardTemplateMutation: MutationResolvers['loadCardTemplate'] = async (
   const profile =
     userId && (await getUserProfileWithWebCardId(userId, webCardId));
 
-  if (!profile || !isEditor(profile.profileRole) || profile.invited) {
+  if (!profile) {
     throw new GraphQLError(ERRORS.UNAUTHORIZED);
   }
 

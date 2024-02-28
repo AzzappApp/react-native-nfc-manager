@@ -1,5 +1,5 @@
 extend type Mutation {
-  duplicateModule(input: DuplicateModuleInput!): DuplicateModulePayload!
+  duplicateModule(webCardId: ID!, input: DuplicateModuleInput!): DuplicateModulePayload!
 }
 
 input DuplicateModuleInput {

@@ -77,8 +77,11 @@ export const useWebCardColorsFragment = (
   );
 
   const mutation = useMutation<WebCardColorPickerMutation>(graphql`
-    mutation WebCardColorPickerMutation($input: SaveCardColorsInput!) {
-      saveCardColors(input: $input) {
+    mutation WebCardColorPickerMutation(
+      $webCardId: ID!
+      $input: SaveCardColorsInput!
+    ) {
+      saveCardColors(webCardId: $webCardId, input: $input) {
         webCard {
           id
           cardColors {
@@ -126,12 +129,12 @@ export const useWebCardColors = (
       };
       commit({
         variables: {
+          webCardId,
           input: {
             ...DEFAULT_COLOR_PALETTE,
             otherColors: DEFAULT_COLOR_LIST,
             ...webCard?.cardColors,
             ...updates,
-            webCardId,
           },
         },
         optimisticResponse: {

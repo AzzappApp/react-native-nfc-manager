@@ -1,13 +1,11 @@
 import { eq, sql } from 'drizzle-orm';
 import { GraphQLError } from 'graphql';
 import ERRORS from '@azzapp/shared/errors';
-import { isEditor } from '@azzapp/shared/profileHelpers';
 import {
   WebCardTable,
   checkMedias,
   createPost,
   db,
-  getUserProfileWithWebCardId,
   referencesMedias,
 } from '#domains';
 import fromGlobalIdWithType from '#helpers/relayIdHelpers';
@@ -16,30 +14,12 @@ import type { MutationResolvers } from '#schema/__generated__/types';
 const createPostMutation: MutationResolvers['createPost'] = async (
   _,
   {
-    input: {
-      webCardId: gqlWebCardId,
-      mediaId,
-      content,
-      allowComments,
-      allowLikes,
-    },
+    webCardId: gqlWebCardId,
+    input: { mediaId, content, allowComments, allowLikes },
   },
-  { auth, loaders, cardUsernamesToRevalidate },
+  { loaders, cardUsernamesToRevalidate },
 ) => {
-  const { userId } = auth;
   const webCardId = fromGlobalIdWithType(gqlWebCardId, 'WebCard');
-  const profile =
-    userId && (await getUserProfileWithWebCardId(userId, webCardId));
-
-  if (!profile) {
-    throw new GraphQLError(ERRORS.UNAUTHORIZED);
-  }
-
-  if (!isEditor(profile.profileRole) || profile.invited) {
-    throw new GraphQLError(ERRORS.FORBIDDEN, {
-      extensions: { role: profile.profileRole },
-    });
-  }
 
   if (!mediaId) {
     throw new GraphQLError(ERRORS.INVALID_REQUEST);
@@ -54,10 +34,10 @@ const createPostMutation: MutationResolvers['createPost'] = async (
         .set({
           nbPosts: sql`nbPosts + 1`,
         })
-        .where(eq(WebCardTable.id, profile.webCardId));
+        .where(eq(WebCardTable.id, webCardId));
 
       const newPost = {
-        webCardId: profile.webCardId,
+        webCardId,
         content,
         allowComments,
         allowLikes,
@@ -76,7 +56,7 @@ const createPostMutation: MutationResolvers['createPost'] = async (
       };
     });
 
-    const webCard = await loaders.WebCard.load(profile.webCardId);
+    const webCard = await loaders.WebCard.load(webCardId);
 
     if (webCard) {
       cardUsernamesToRevalidate.add(webCard.userName);

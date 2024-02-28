@@ -4,9 +4,10 @@ import type { useLoadCardTemplateMutation as UseLoadCardTemplateMutation } from 
 const useLoadCardTemplateMutation = () => {
   return useMutation<UseLoadCardTemplateMutation>(graphql`
     mutation useLoadCardTemplateMutation(
-      $loadCardTemplateInput: LoadCardTemplateInput!
+      $webCardId: ID!
+      $cardTemplateId: ID!
     ) {
-      loadCardTemplate(input: $loadCardTemplateInput) {
+      loadCardTemplate(webCardId: $webCardId, cardTemplateId: $cardTemplateId) {
         webCard {
           id
           cardStyle {

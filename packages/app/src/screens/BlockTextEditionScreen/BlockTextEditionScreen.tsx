@@ -183,9 +183,10 @@ const BlockTextEditionScreen = ({
   const [commit, saving] =
     useMutation<BlockTextEditionScreenUpdateModuleMutation>(graphql`
       mutation BlockTextEditionScreenUpdateModuleMutation(
+        $webCardId: ID!
         $input: SaveBlockTextModuleInput!
       ) {
-        saveBlockTextModule(input: $input) {
+        saveBlockTextModule(webCardId: $webCardId, input: $input) {
           webCard {
             id
             cardModules {
@@ -273,7 +274,6 @@ const BlockTextEditionScreen = ({
       ...value,
       moduleId: blockText?.id,
       text: value.text!,
-      webCardId: profile.webCard.id,
       textMarginHorizontal: textMarginHorizontal.value,
       textMarginVertical: textMarginVertical.value,
       marginHorizontal: marginHorizontal.value,
@@ -284,6 +284,7 @@ const BlockTextEditionScreen = ({
 
     commit({
       variables: {
+        webCardId: profile.webCard.id,
         input,
       },
       onCompleted() {

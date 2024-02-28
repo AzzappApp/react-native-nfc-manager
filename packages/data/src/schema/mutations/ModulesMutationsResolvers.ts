@@ -13,8 +13,6 @@ import {
   MODULE_KIND_SOCIAL_LINKS,
 } from '@azzapp/shared/cardModuleHelpers';
 import ERRORS from '@azzapp/shared/errors';
-
-import { isEditor } from '@azzapp/shared/profileHelpers';
 import {
   getCardModulesByIds,
   type CardModule,
@@ -24,7 +22,6 @@ import {
   updateCardModule,
   createCardModule,
   getCardModuleNextPosition,
-  getUserProfileWithWebCardId,
 } from '#domains';
 import fromGlobalIdWithType from '#helpers/relayIdHelpers';
 import type { GraphQLContext } from '#index';
@@ -36,28 +33,17 @@ const createModuleSavingMutation =
   async (
     _: unknown,
     {
-      input: { moduleId, webCardId: gqlWebCardId, ...data },
+      webCardId: gqlWebCardId,
+      input: { moduleId, ...data },
     }: {
+      webCardId: string;
       input: TModule['data'] & {
-        webCardId: string;
         moduleId?: string | null;
       };
     },
-    { auth, cardUsernamesToRevalidate, loaders }: GraphQLContext,
+    { cardUsernamesToRevalidate, loaders }: GraphQLContext,
   ) => {
-    const { userId } = auth;
     const webCardId = fromGlobalIdWithType(gqlWebCardId, 'WebCard');
-    const profile =
-      userId && (await getUserProfileWithWebCardId(userId, webCardId));
-
-    if (!profile) {
-      throw new GraphQLError(ERRORS.UNAUTHORIZED);
-    }
-    if (!isEditor(profile.profileRole) || profile.invited) {
-      throw new GraphQLError(ERRORS.FORBIDDEN, {
-        extensions: { role: profile.profileRole },
-      });
-    }
 
     const { validator, getMedias } = MODULES_SAVE_RULES[moduleKind] ?? {};
 
@@ -79,7 +65,7 @@ const createModuleSavingMutation =
       }
       if (
         !module ||
-        module.webCardId !== profile.webCardId ||
+        module.webCardId !== webCardId ||
         module.kind !== moduleKind
       ) {
         throw new GraphQLError(ERRORS.INVALID_REQUEST);
@@ -101,9 +87,9 @@ const createModuleSavingMutation =
         } else {
           await createCardModule(
             {
-              webCardId: profile.webCardId,
+              webCardId,
               kind: moduleKind,
-              position: await getCardModuleNextPosition(profile.webCardId),
+              position: await getCardModuleNextPosition(webCardId),
               data,
               visible: true,
             },
@@ -116,7 +102,7 @@ const createModuleSavingMutation =
       throw new GraphQLError(ERRORS.INTERNAL_SERVER_ERROR);
     }
 
-    const webCard = await loaders.WebCard.load(profile.webCardId);
+    const webCard = await loaders.WebCard.load(webCardId);
     if (!webCard) {
       throw new GraphQLError(ERRORS.INTERNAL_SERVER_ERROR);
     }
@@ -206,13 +192,17 @@ export const saveLineDividerModule: MutationResolvers['saveLineDividerModule'] =
 
 export const saveSimpleTextModule: MutationResolvers['saveSimpleTextModule'] = (
   parent,
-  { input: { kind, ...rest } },
+  { webCardId, input: { kind, ...rest } },
   context,
 ) => {
   if (kind !== MODULE_KIND_SIMPLE_TEXT && kind !== MODULE_KIND_SIMPLE_TITLE) {
     throw new GraphQLError(ERRORS.INVALID_REQUEST);
   }
-  return createModuleSavingMutation(kind)(parent, { input: rest }, context);
+  return createModuleSavingMutation(kind)(
+    parent,
+    { webCardId, input: rest },
+    context,
+  );
 };
 
 export const saveSimpleButtonModule: MutationResolvers['saveSimpleButtonModule'] =

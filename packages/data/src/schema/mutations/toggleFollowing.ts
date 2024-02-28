@@ -1,15 +1,7 @@
 import { eq, sql } from 'drizzle-orm';
 import { GraphQLError } from 'graphql';
 import ERRORS from '@azzapp/shared/errors';
-import { isEditor } from '@azzapp/shared/profileHelpers';
-import {
-  WebCardTable,
-  db,
-  follows,
-  getUserProfileWithWebCardId,
-  isFollowing,
-  unfollows,
-} from '#domains';
+import { WebCardTable, db, follows, isFollowing, unfollows } from '#domains';
 import fromGlobalIdWithType from '#helpers/relayIdHelpers';
 import type { WebCard } from '#domains';
 import type { MutationResolvers } from '#schema/__generated__/types';
@@ -17,22 +9,12 @@ import type { MutationResolvers } from '#schema/__generated__/types';
 const toggleFollowing: MutationResolvers['toggleFollowing'] = async (
   _,
   {
-    input: {
-      webCardId: gqlWebCardId,
-      targetWebCardId: gqlTargetWebCardId,
-      follow,
-    },
+    webCardId: gqlWebCardId,
+    input: { targetWebCardId: gqlTargetWebCardId, follow },
   },
-  { auth, loaders },
+  { loaders },
 ) => {
-  const { userId } = auth;
   const webCardId = fromGlobalIdWithType(gqlWebCardId, 'WebCard');
-  const profile =
-    userId && (await getUserProfileWithWebCardId(userId, webCardId));
-
-  if (!profile || !isEditor(profile.profileRole) || profile.invited) {
-    throw new GraphQLError(ERRORS.UNAUTHORIZED);
-  }
 
   const targetId = fromGlobalIdWithType(gqlTargetWebCardId, 'WebCard');
 
@@ -45,7 +27,7 @@ const toggleFollowing: MutationResolvers['toggleFollowing'] = async (
   if (!target) {
     throw new GraphQLError(ERRORS.INVALID_REQUEST);
   }
-  if (profile.webCardId === targetId) {
+  if (webCardId === targetId) {
     throw new GraphQLError(ERRORS.INVALID_REQUEST);
   }
 
@@ -54,7 +36,7 @@ const toggleFollowing: MutationResolvers['toggleFollowing'] = async (
       // fix: https://github.com/AzzappApp/azzapp/issues/1931 && https://github.com/AzzappApp/azzapp/issues/1930
       // if the frontend allows spamming add or remove, this will cause the nbFollowers and nbFollowings to be negative (or opposite)
       // is checking the actual status not enough, we can imaging splitting the function in 2 add/remove
-      const currentlyFollowing = await isFollowing(profile.webCardId, targetId);
+      const currentlyFollowing = await isFollowing(webCardId, targetId);
       if (follow && currentlyFollowing) {
         return;
       }
@@ -77,10 +59,10 @@ const toggleFollowing: MutationResolvers['toggleFollowing'] = async (
             ? sql`nbFollowings + 1`
             : sql`GREATEST(nbFollowings - 1, 0)`,
         })
-        .where(eq(WebCardTable.id, profile.webCardId));
+        .where(eq(WebCardTable.id, webCardId));
 
-      if (follow) await follows(profile.webCardId, targetId, trx);
-      else await unfollows(profile.webCardId, targetId, trx);
+      if (follow) await follows(webCardId, targetId, trx);
+      else await unfollows(webCardId, targetId, trx);
     });
   } catch (e) {
     throw new GraphQLError(ERRORS.INTERNAL_SERVER_ERROR);

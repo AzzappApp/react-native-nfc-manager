@@ -224,9 +224,10 @@ const SimpleButtonEditionScreen = ({
   const [commit, saving] =
     useMutation<SimpleButtonEditionScreenUpdateModuleMutation>(graphql`
       mutation SimpleButtonEditionScreenUpdateModuleMutation(
+        $webCardId: ID!
         $input: SaveSimpleButtonModuleInput!
       ) {
-        saveSimpleButtonModule(input: $input) {
+        saveSimpleButtonModule(webCardId: $webCardId, input: $input) {
           webCard {
             id
             cardModules {
@@ -307,7 +308,6 @@ const SimpleButtonEditionScreen = ({
       buttonLabel: value.buttonLabel!,
       actionType: value.actionType!,
       actionLink: value.actionLink!,
-      webCardId: profile.webCard.id,
       fontSize: fontSize.value,
       borderWidth: borderWidth.value,
       borderRadius: borderRadius.value,
@@ -319,6 +319,7 @@ const SimpleButtonEditionScreen = ({
 
     commit({
       variables: {
+        webCardId: profile.webCard.id,
         input,
       },
       onCompleted() {

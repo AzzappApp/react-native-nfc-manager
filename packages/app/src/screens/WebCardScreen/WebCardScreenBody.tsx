@@ -185,9 +185,10 @@ const WebCardScreenBody = (
   const [commitDeleteModules, deleteModulesActive] =
     useMutation<WebCardScreenBodyDeleteModuleMutation>(graphql`
       mutation WebCardScreenBodyDeleteModuleMutation(
+        $webCardId: ID!
         $input: DeleteModulesInput!
       ) {
-        deleteModules(input: $input) {
+        deleteModules(webCardId: $webCardId, input: $input) {
           webCard {
             id
           }
@@ -198,9 +199,10 @@ const WebCardScreenBody = (
   const [commitDuplicateModule, duplicateModuleActive] =
     useMutation<WebCardScreenBodyDuplicateModuleMutation>(graphql`
       mutation WebCardScreenBodyDuplicateModuleMutation(
+        $webCardId: ID!
         $input: DuplicateModuleInput!
       ) {
-        duplicateModule(input: $input) {
+        duplicateModule(webCardId: $webCardId, input: $input) {
           createdModules {
             originalModuleId
             newModuleId
@@ -212,9 +214,10 @@ const WebCardScreenBody = (
   const [commitUpdateModulesVisibility, updateModulesVisibilityActive] =
     useMutation<WebCardScreenBodyUpdateModulesVisibilityMutation>(graphql`
       mutation WebCardScreenBodyUpdateModulesVisibilityMutation(
+        $webCardId: ID!
         $input: UpdateModulesVisibilityInput!
       ) {
-        updateModulesVisibility(input: $input) {
+        updateModulesVisibility(webCardId: $webCardId, input: $input) {
           webCard {
             id
           }
@@ -229,9 +232,10 @@ const WebCardScreenBody = (
   const [commitReorderModules, reorderModulesActive] =
     useMutation<WebCardScreenBodySwapModulesMutation>(graphql`
       mutation WebCardScreenBodySwapModulesMutation(
+        $webCardId: ID!
         $input: ReorderModulesInput!
       ) {
-        reorderModules(input: $input) {
+        reorderModules(webCardId: $webCardId, input: $input) {
           webCard {
             id
           }
@@ -277,6 +281,7 @@ const WebCardScreenBody = (
 
         commitReorderModules({
           variables: {
+            webCardId,
             input: { modulesIds },
           },
           updater: store => {
@@ -308,7 +313,7 @@ const WebCardScreenBody = (
         });
       }, 2000);
     },
-    [commitReorderModules, moduleOrderUpdater, intl],
+    [moduleOrderUpdater, commitReorderModules, webCardId, intl],
   );
 
   const environment = useRelayEnvironment();
@@ -379,6 +384,7 @@ const WebCardScreenBody = (
       };
       commitDeleteModules({
         variables: {
+          webCardId,
           input: {
             modulesIds,
           },
@@ -487,6 +493,7 @@ const WebCardScreenBody = (
 
       commitDuplicateModule({
         variables: {
+          webCardId,
           input: {
             modulesIds,
           },
@@ -546,6 +553,7 @@ const WebCardScreenBody = (
       };
       commitUpdateModulesVisibility({
         variables: {
+          webCardId,
           input: {
             modulesIds,
             visible,
@@ -565,7 +573,7 @@ const WebCardScreenBody = (
         },
       });
     },
-    [canUpdateVisibility, commitUpdateModulesVisibility, intl],
+    [canUpdateVisibility, commitUpdateModulesVisibility, intl, webCardId],
   );
 
   const onToggleModuleVisibility = useCallback(

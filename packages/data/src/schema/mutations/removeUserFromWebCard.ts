@@ -1,7 +1,7 @@
 import { eq } from 'drizzle-orm';
 import { GraphQLError } from 'graphql';
 import ERRORS from '@azzapp/shared/errors';
-import { isAdmin, isOwner } from '@azzapp/shared/profileHelpers';
+import { isOwner } from '@azzapp/shared/profileHelpers';
 import { ProfileTable, db } from '#domains';
 import fromGlobalIdWithType from '#helpers/relayIdHelpers';
 import type { MutationResolvers } from '#schema/__generated__/types';
@@ -10,22 +10,14 @@ const removeUserFromWebCard: MutationResolvers['removeUserFromWebCard'] =
   async (
     _,
     {
-      input: { profileId: gqlProfileId, removeProfileId: gqlRemovedProfileId },
+      profileId: gqlProfileId,
+      input: { removeProfileId: gqlRemovedProfileId },
     },
-    { auth, loaders },
+    { loaders },
   ) => {
-    const { userId } = auth;
     const profileId = fromGlobalIdWithType(gqlProfileId, 'Profile');
 
-    const profile = profileId && (await loaders.Profile.load(profileId));
-
-    if (!profile || !isAdmin(profile.profileRole) || profile.invited) {
-      throw new GraphQLError(ERRORS.UNAUTHORIZED);
-    }
-
-    if (profile.userId !== userId) {
-      throw new GraphQLError(ERRORS.UNAUTHORIZED);
-    }
+    const profile = await loaders.Profile.load(profileId);
 
     const removeProfileId = fromGlobalIdWithType(
       gqlRemovedProfileId,
@@ -33,7 +25,11 @@ const removeUserFromWebCard: MutationResolvers['removeUserFromWebCard'] =
     );
     const targetProfile = await loaders.Profile.load(removeProfileId);
 
-    if (!targetProfile || isOwner(targetProfile.profileRole)) {
+    if (
+      !targetProfile ||
+      isOwner(targetProfile.profileRole) ||
+      profile?.webCardId !== targetProfile.webCardId
+    ) {
       throw new GraphQLError(ERRORS.INVALID_REQUEST);
     }
 

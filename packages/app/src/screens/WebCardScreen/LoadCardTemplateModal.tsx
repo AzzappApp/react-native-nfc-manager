@@ -56,10 +56,8 @@ const LoadCardTemplateModal = ({
     (id: string) => {
       commit({
         variables: {
-          loadCardTemplateInput: {
-            webCardId: webCard.id,
-            cardTemplateId: id,
-          },
+          webCardId: webCard.id,
+          cardTemplateId: id,
         },
         onCompleted: () => {
           setCardTemplateId(null);

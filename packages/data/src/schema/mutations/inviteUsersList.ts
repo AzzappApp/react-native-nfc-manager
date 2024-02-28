@@ -3,7 +3,6 @@ import * as Sentry from '@sentry/nextjs';
 import { and, eq, inArray } from 'drizzle-orm';
 import { GraphQLError } from 'graphql';
 import ERRORS from '@azzapp/shared/errors';
-import { isAdmin } from '@azzapp/shared/profileHelpers';
 import { isValidEmail } from '@azzapp/shared/stringHelpers';
 import {
   ProfileTable,
@@ -30,7 +29,7 @@ const inviteUsersListMutation: MutationResolvers['inviteUsersList'] = async (
 
   const profileId = fromGlobalIdWithType(gqlProfileId, 'Profile');
   const profile = profileId && (await loaders.Profile.load(profileId));
-  if (!profile || !isAdmin(profile.profileRole) || profile.invited) {
+  if (!profile) {
     throw new GraphQLError(ERRORS.UNAUTHORIZED);
   }
 

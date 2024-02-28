@@ -63,10 +63,11 @@ const PostRendererActionBar = ({
 
   const [commit] = useMutation<PostRendererActionBarReactionMutation>(graphql`
     mutation PostRendererActionBarReactionMutation(
+      $webCardId: ID!
       $input: TogglePostReactionInput!
       $viewerWebCardId: ID!
     ) {
-      togglePostReaction(input: $input) {
+      togglePostReaction(webCardId: $webCardId, input: $input) {
         post {
           id
           postReaction(webCardId: $viewerWebCardId)
@@ -98,8 +99,8 @@ const PostRendererActionBar = ({
         commit({
           variables: {
             viewerWebCardId: profileInfos.webCardId,
+            webCardId: webCard.id,
             input: {
-              webCardId: profileInfos.webCardId,
               postId,
               reactionKind: 'like',
             },

@@ -123,10 +123,11 @@ const ContactCardEditModal = ({
 
   const [commit] = useMutation(graphql`
     mutation ContactCardEditModalMutation(
-      $input: SaveContactCardInput!
+      $profileId: ID!
+      $contactCard: ContactCardInput!
       $pixelRatio: Float!
     ) {
-      saveContactCard(input: $input) {
+      saveContactCard(profileId: $profileId, contactCard: $contactCard) {
         profile {
           contactCard {
             firstName
@@ -231,20 +232,18 @@ const ContactCardEditModal = ({
 
     commit({
       variables: {
-        input: {
-          profileId: id,
-          contactCard: {
-            ...data,
-            emails: data.emails.filter(email => email.address),
-            phoneNumbers: data.phoneNumbers.filter(
-              phoneNumber => phoneNumber.number,
-            ),
-            urls: data.urls.filter(url => url.address),
-            addresses: data.addresses.filter(address => address.address),
-            birthday: data.birthday,
-            socials: data.socials.filter(social => social.url),
-            avatarId,
-          },
+        profileId: id,
+        contactCard: {
+          ...data,
+          emails: data.emails.filter(email => email.address),
+          phoneNumbers: data.phoneNumbers.filter(
+            phoneNumber => phoneNumber.number,
+          ),
+          urls: data.urls.filter(url => url.address),
+          addresses: data.addresses.filter(address => address.address),
+          birthday: data.birthday,
+          socials: data.socials.filter(social => social.url),
+          avatarId,
         },
         pixelRatio: CappedPixelRatio(),
       },

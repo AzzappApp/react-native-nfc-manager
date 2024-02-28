@@ -7,15 +7,9 @@ import type { MutationResolvers } from '#schema/__generated__/types';
 
 const declineOwnershipMutation: MutationResolvers['declineOwnership'] = async (
   _,
-  { input: { profileId: gqlProfileId } },
-  { auth, loaders },
+  { profileId: gqlProfileId },
+  { loaders },
 ) => {
-  const { userId } = auth;
-
-  if (!userId) {
-    throw new GraphQLError(ERRORS.UNAUTHORIZED);
-  }
-
   const profileId = fromGlobalId(gqlProfileId).id;
 
   const profile = await loaders.Profile.load(profileId);

@@ -205,10 +205,11 @@ const MultiUserDetailModal = ({
   const [commit, saving] =
     useMutation<MultiUserDetailModal_UpdateProfileMutation>(graphql`
       mutation MultiUserDetailModal_UpdateProfileMutation(
+        $profileId: ID!
         $input: UpdateProfileInput!
         $pixelRatio: Float!
       ) {
-        updateProfile(input: $input) {
+        updateProfile(profileId: $profileId, input: $input) {
           profile {
             id
             contactCard {
@@ -294,13 +295,13 @@ const MultiUserDetailModal = ({
 
       commit({
         variables: {
+          profileId: profile.id,
           input: {
             ...input,
             contactCard: {
               ...contactCard,
               avatarId,
             },
-            profileId: profile.id,
           },
           pixelRatio: CappedPixelRatio(),
         },
@@ -359,9 +360,10 @@ const MultiUserDetailModal = ({
   const [commitDelete, deletionIsActive] =
     useMutation<MultiUserDetailModal_RemoveUserMutation>(graphql`
       mutation MultiUserDetailModal_RemoveUserMutation(
+        $profileId: ID!
         $input: RemoveUserFromWebCardInput!
       ) {
-        removeUserFromWebCard(input: $input) {
+        removeUserFromWebCard(profileId: $profileId, input: $input) {
           profileId
         }
       }
@@ -371,10 +373,8 @@ const MultiUserDetailModal = ({
     if (profileInfos?.profileId == null || profile == null) return;
     commitDelete({
       variables: {
-        input: {
-          profileId: profileInfos?.profileId,
-          removeProfileId: profile.id,
-        },
+        profileId: profileInfos?.profileId,
+        input: { removeProfileId: profile.id },
       },
       onCompleted: () => {
         onClose();

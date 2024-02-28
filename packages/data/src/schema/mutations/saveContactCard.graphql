@@ -3,14 +3,9 @@ extend type Mutation {
   """
   Save the current user's contact card.
   """
-  saveContactCard(input: SaveContactCardInput!): SaveContactCardPayload!
+  saveContactCard(profileId: ID!, contactCard: ContactCardInput!): SaveContactCardPayload!
 }
 
-
-input SaveContactCardInput {
-  profileId: ID!
-  contactCard: ContactCardInput!
-}
 
 input ContactCardInput {
   firstName: String

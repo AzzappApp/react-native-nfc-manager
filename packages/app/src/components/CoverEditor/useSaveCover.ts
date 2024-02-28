@@ -61,8 +61,11 @@ const useSaveCover = (
   ) ?? { cardCover: null };
 
   const [commit] = useMutation<useSaveCoverMutation>(graphql`
-    mutation useSaveCoverMutation($saveCoverInput: SaveCoverInput!) {
-      saveCover(input: $saveCoverInput) {
+    mutation useSaveCoverMutation(
+      $webCardId: ID!
+      $saveCoverInput: SaveCoverInput!
+    ) {
+      saveCover(webCardId: $webCardId, input: $saveCoverInput) {
         webCard {
           id
           ...CoverRenderer_webCard
@@ -108,7 +111,6 @@ const useSaveCover = (
 
       try {
         saveCoverInput = {
-          webCardId,
           backgroundId: coverStyle.background?.id ?? null,
           backgroundColor: coverStyle.backgroundColor,
           backgroundPatternColor: coverStyle.backgroundPatternColor,
@@ -281,7 +283,6 @@ const useSaveCover = (
       }
 
       saveCoverInput.cardColors = {
-        webCardId,
         primary: colorPalette.primary,
         dark: colorPalette.dark,
         light: colorPalette.light,
@@ -290,6 +291,7 @@ const useSaveCover = (
 
       commit({
         variables: {
+          webCardId,
           saveCoverInput,
         },
         onCompleted: response => {

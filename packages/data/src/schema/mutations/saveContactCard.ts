@@ -7,7 +7,7 @@ import type { MutationResolvers } from '#schema/__generated__/types';
 
 const saveContactCard: MutationResolvers['saveContactCard'] = async (
   _,
-  { input: { profileId: gqlProfileId, contactCard } },
+  { profileId: gqlProfileId, contactCard },
   { auth, loaders },
 ) => {
   const { userId } = auth;

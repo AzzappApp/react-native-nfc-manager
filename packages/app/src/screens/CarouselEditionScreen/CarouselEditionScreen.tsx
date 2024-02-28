@@ -176,9 +176,10 @@ const CarouselEditionScreen = ({
   const [commit, saving] =
     useMutation<CarouselEditionScreenUpdateModuleMutation>(graphql`
       mutation CarouselEditionScreenUpdateModuleMutation(
+        $webCardId: ID!
         $input: SaveCarouselModuleInput!
       ) {
-        saveCarouselModule(input: $input) {
+        saveCarouselModule(webCardId: $webCardId, input: $input) {
           webCard {
             id
             cardModules {
@@ -394,8 +395,8 @@ const CarouselEditionScreen = ({
 
     commit({
       variables: {
+        webCardId: profile.webCard.id,
         input: {
-          webCardId: profile.webCard.id,
           images: images!.map(image => {
             if ('local' in image) {
               return mediasMap[image.uri].id;

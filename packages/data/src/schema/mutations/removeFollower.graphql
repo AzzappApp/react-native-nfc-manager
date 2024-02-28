@@ -2,15 +2,11 @@ extend type Mutation {
   """
   Remove a follower from the current user
   """
-  removeFollower(input: RemoveFollowerInput!): RemoveFollowerPayload!
+  removeFollower(webCardId: ID!,input: RemoveFollowerInput!): RemoveFollowerPayload!
 }
 
 
 input RemoveFollowerInput {
-  """
-  The id of the WebCard we want to remove the follower from
-  """
-  webCardId: ID!
   """
   The id of the WebCard we want remove as follower
   """

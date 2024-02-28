@@ -25,10 +25,9 @@ const HomeBottomPanelTransfertOwner = ({
     const environment = getRelayEnvironment();
 
     const acceptOwnershipMutation = graphql`
-      mutation HomeBottomPanelTransfertOwnerAceeptMutation(
-        $input: AcceptOwnershipInput!
-      ) @raw_response_type {
-        acceptOwnership(input: $input) {
+      mutation HomeBottomPanelTransfertOwnerAceeptMutation($profileId: ID!)
+      @raw_response_type {
+        acceptOwnership(profileId: $profileId) {
           profile {
             id
             profileRole
@@ -42,9 +41,7 @@ const HomeBottomPanelTransfertOwner = ({
     commitMutation<HomeBottomPanelTransfertOwnerAceeptMutation>(environment, {
       mutation: acceptOwnershipMutation,
       variables: {
-        input: {
-          profileId: profile.id,
-        },
+        profileId: profile.id,
       },
       optimisticResponse: {
         acceptOwnership: {
@@ -79,10 +76,9 @@ const HomeBottomPanelTransfertOwner = ({
     const environment = getRelayEnvironment();
 
     const declineInvitationMutation = graphql`
-      mutation HomeBottomPanelTransfertOwnerDeclineMutation(
-        $input: DeclineOwnershipInput!
-      ) @raw_response_type {
-        declineOwnership(input: $input) {
+      mutation HomeBottomPanelTransfertOwnerDeclineMutation($profileId: ID!)
+      @raw_response_type {
+        declineOwnership(profileId: $profileId) {
           profile {
             id
             promotedAsOwner
@@ -93,7 +89,7 @@ const HomeBottomPanelTransfertOwner = ({
 
     commitMutation<HomeBottomPanelTransfertOwnerDeclineMutation>(environment, {
       mutation: declineInvitationMutation,
-      variables: { input: { profileId: profile.id } },
+      variables: { profileId: profile.id },
       optimisticResponse: {
         declineOwnership: {
           profile: {

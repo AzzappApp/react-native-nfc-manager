@@ -3,12 +3,12 @@ extend type Mutation {
   Mutation to save common information of a profile
   """
   saveCommonInformation(
+    webCardId: ID!,
     input: SaveCommonInformationInput!
   ): SaveCommonInformationPayload!
 }
 
 input SaveCommonInformationInput {
-  webCardId: ID!
   company: String
   emails: [ContactCardEmailInput!]
   phoneNumbers: [ContactCardPhoneNumberInput!]

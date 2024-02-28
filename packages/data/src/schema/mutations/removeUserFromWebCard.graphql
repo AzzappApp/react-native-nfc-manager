@@ -1,15 +1,10 @@
 extend type Mutation {
   removeUserFromWebCard(
-    input: RemoveUserFromWebCardInput!
+     profileId: ID!, input: RemoveUserFromWebCardInput!
   ): RemoveUserFromWebCardPayload!
 }
 
 input RemoveUserFromWebCardInput {
-  """
-  the profileId removing the webcard
-  """
-  profileId: ID!
-
   """
   the user to remove from the web card
   """

@@ -163,9 +163,10 @@ const SocialLinksEditionScreen = ({
   const [commit, saving] =
     useMutation<SocialLinksEditionScreenUpdateModuleMutation>(graphql`
       mutation SocialLinksEditionScreenUpdateModuleMutation(
+        $webCardId: ID!
         $input: SaveSocialLinksModuleInput!
       ) {
-        saveSocialLinksModule(input: $input) {
+        saveSocialLinksModule(webCardId: $webCardId, input: $input) {
           webCard {
             id
             cardModules {
@@ -256,11 +257,11 @@ const SocialLinksEditionScreen = ({
       marginHorizontal: marginHorizontal.value,
       moduleId: socialLinks?.id,
       links: value.links!,
-      webCardId: profile.webCard.id,
     };
 
     commit({
       variables: {
+        webCardId: profile.webCard.id,
         input,
       },
       onCompleted() {

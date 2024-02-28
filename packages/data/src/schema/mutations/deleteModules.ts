@@ -1,39 +1,30 @@
 import { inArray } from 'drizzle-orm';
 import { GraphQLError } from 'graphql';
 import ERRORS from '@azzapp/shared/errors';
-import { isEditor } from '@azzapp/shared/profileHelpers';
 import {
   CardModuleTable,
   db,
   getCardModulesByIds,
-  getUserProfileWithWebCardId,
   resetCardModulesPositions,
 } from '#domains';
+import fromGlobalIdWithType from '#helpers/relayIdHelpers';
 import type { MutationResolvers } from '#schema/__generated__/types';
 
 const deleteModules: MutationResolvers['deleteModules'] = async (
   _,
-  { input: { modulesIds } },
-  { auth, cardUsernamesToRevalidate, loaders },
+  { webCardId: gqlWebCardId, input: { modulesIds } },
+  { cardUsernamesToRevalidate, loaders },
 ) => {
-  const { userId } = auth;
   const modules = await getCardModulesByIds(modulesIds);
   if (modulesIds.length === 0) {
     throw new GraphQLError(ERRORS.INVALID_REQUEST);
   }
 
-  const webCardId = modules[0]!.webCardId;
+  const webCardId = fromGlobalIdWithType(gqlWebCardId, 'WebCard');
   if (
     !modules.every(module => module != null && module.webCardId === webCardId)
   ) {
     throw new GraphQLError(ERRORS.INVALID_REQUEST);
-  }
-
-  const profile =
-    userId && (await getUserProfileWithWebCardId(userId, webCardId));
-
-  if (!profile || !isEditor(profile.profileRole) || profile.invited) {
-    throw new GraphQLError(ERRORS.UNAUTHORIZED);
   }
 
   try {
@@ -41,14 +32,14 @@ const deleteModules: MutationResolvers['deleteModules'] = async (
       await db
         .delete(CardModuleTable)
         .where(inArray(CardModuleTable.id, modulesIds));
-      await resetCardModulesPositions(profile.id, trx);
+      await resetCardModulesPositions(webCardId, trx);
     });
   } catch (e) {
     console.error(e);
     throw new GraphQLError(ERRORS.INTERNAL_SERVER_ERROR);
   }
 
-  const webCard = await loaders.WebCard.load(profile.webCardId);
+  const webCard = await loaders.WebCard.load(webCardId);
 
   if (!webCard) {
     throw new Error(ERRORS.INTERNAL_SERVER_ERROR);

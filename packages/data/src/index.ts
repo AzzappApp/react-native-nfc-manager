@@ -1,4 +1,6 @@
 import { makeExecutableSchema } from '@graphql-tools/schema';
+import { applyMiddleware } from 'graphql-middleware';
+import permissions from '#permission';
 import { typeDefs } from '#schema/__generated__/types';
 import resolvers from './schema';
 import { createGraphQLContext } from './schema/GraphQLContext';
@@ -11,7 +13,7 @@ const buildSchema = () => {
   });
 };
 
-const schema = buildSchema();
+const schema = applyMiddleware(buildSchema(), permissions);
 
 export { schema, createGraphQLContext };
 

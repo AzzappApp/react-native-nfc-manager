@@ -7,24 +7,13 @@ import type { MutationResolvers } from '#schema/__generated__/types';
 
 const acceptInvitationMutation: MutationResolvers['acceptInvitation'] = async (
   _,
-  { input: { profileId: gqlProfileId } },
-  { auth, loaders },
+  { profileId: gqlProfileId },
+  { loaders },
 ) => {
-  const { userId } = auth;
   const profileId = fromGlobalIdWithType(gqlProfileId, 'Profile');
   const profile = await loaders.Profile.load(profileId);
 
   if (!profile) {
-    throw new GraphQLError(ERRORS.INVALID_REQUEST);
-  }
-
-  if (profile.userId !== userId) {
-    throw new GraphQLError(ERRORS.UNAUTHORIZED);
-  }
-
-  const webCard = await loaders.WebCard.load(profile.webCardId);
-
-  if (!webCard) {
     throw new GraphQLError(ERRORS.INVALID_REQUEST);
   }
 

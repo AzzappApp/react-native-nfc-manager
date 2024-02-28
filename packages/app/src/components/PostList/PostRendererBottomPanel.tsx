@@ -149,9 +149,10 @@ const PostRendererBottomPanel = ({
   const [commitUpdatePostComments] =
     useMutation<PostRendererBottomPanelUpdatePostAllowCommentsMutation>(graphql`
       mutation PostRendererBottomPanelUpdatePostAllowCommentsMutation(
+        $webCardId: ID!
         $input: UpdatePostInput!
       ) {
-        updatePost(input: $input) {
+        updatePost(webCardId: $webCardId, input: $input) {
           post {
             id
             allowComments
@@ -163,9 +164,10 @@ const PostRendererBottomPanel = ({
   const [commitUpdatePostLikes] =
     useMutation<PostRendererBottomPanelUpdateAllowLikesPostMutation>(graphql`
       mutation PostRendererBottomPanelUpdateAllowLikesPostMutation(
+        $webCardId: ID!
         $input: UpdatePostInput!
       ) {
-        updatePost(input: $input) {
+        updatePost(webCardId: $webCardId, input: $input) {
           post {
             id
             allowLikes
@@ -185,6 +187,7 @@ const PostRendererBottomPanel = ({
 
       update({
         variables: {
+          webCardId: post.webCard.id,
           input: {
             postId: post.id,
             ...input,
@@ -211,7 +214,13 @@ const PostRendererBottomPanel = ({
         },
       });
     },
-    [commitUpdatePostComments, commitUpdatePostLikes, intl, post.id],
+    [
+      commitUpdatePostComments,
+      commitUpdatePostLikes,
+      intl,
+      post.id,
+      post.webCard.id,
+    ],
   );
 
   const setAllowComments = useCallback(() => {

@@ -40,10 +40,8 @@ const CardEditionStep = (
   const onSubmit = (cardTemplateId: string) => {
     commit({
       variables: {
-        loadCardTemplateInput: {
-          cardTemplateId,
-          webCardId,
-        },
+        cardTemplateId,
+        webCardId,
       },
       onCompleted: () => {
         onCoverTemplateApplied();

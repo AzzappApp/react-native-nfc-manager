@@ -2,14 +2,10 @@ extend type Mutation {
   """
   Update the card cover of the current profile
   """
-  saveCover(input: SaveCoverInput!): SaveCoverPayload!
+  saveCover(webCardId: ID!, input: SaveCoverInput!): SaveCoverPayload!
 }
 
 input SaveCoverInput {
-  """
-  The id of the WebCard to update
-  """
-  webCardId: ID!
   """
   The title of the card
   """

@@ -127,10 +127,11 @@ const PostCommentsList = ({
 
   const [commit] = useMutation(graphql`
     mutation PostCommentsListMutation(
+      $webCardId: ID!
       $input: CreatePostCommentInput!
       $connections: [ID!]!
     ) {
-      createPostComment(input: $input) {
+      createPostComment(webCardId: $webCardId, input: $input) {
         postComment
           @prependNode(
             connections: $connections
@@ -179,7 +180,8 @@ const PostCommentsList = ({
       if (isEditor(auth.profileInfos?.profileRole)) {
         commit({
           variables: {
-            input: { postId, comment, webCardId: auth.profileInfos?.webCardId },
+            webCardId: auth.profileInfos?.webCardId,
+            input: { postId, comment },
             connections: [connectionID],
           },
           onCompleted() {

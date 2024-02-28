@@ -1,31 +1,25 @@
 import { GraphQLError } from 'graphql';
 import { fromGlobalId } from 'graphql-relay';
 import ERRORS from '@azzapp/shared/errors';
-import { isEditor } from '@azzapp/shared/profileHelpers';
-import { getUserProfileWithWebCardId, updatePostComment } from '#domains';
+import { updatePostComment } from '#domains';
+import fromGlobalIdWithType from '#helpers/relayIdHelpers';
 import type { MutationResolvers } from '#schema/__generated__/types';
 
 const updatePostCommentMutation: MutationResolvers['updatePostComment'] =
   async (
     _,
-    { input: { commentId: gqlCommentId, comment } },
-    { auth, loaders },
+    { webCardId: gqlWebCardId, input: { commentId: gqlCommentId, comment } },
+    { loaders },
   ) => {
-    const { userId } = auth;
     const commentId = fromGlobalId(gqlCommentId).id;
     const postComment = await loaders.PostComment.load(commentId);
-    const profile =
-      postComment &&
-      userId &&
-      (await getUserProfileWithWebCardId(userId, postComment.webCardId));
 
-    if (!postComment) {
+    const webCardId = fromGlobalIdWithType(gqlWebCardId, 'WebCard');
+
+    if (!postComment || postComment.webCardId !== webCardId) {
       throw new GraphQLError(ERRORS.INVALID_REQUEST);
     }
 
-    if (!profile || !isEditor(profile.profileRole) || profile.invited) {
-      throw new GraphQLError(ERRORS.UNAUTHORIZED);
-    }
     try {
       await updatePostComment(commentId, comment);
 

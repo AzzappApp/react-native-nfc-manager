@@ -1,6 +1,6 @@
 extend type Mutation {
   cancelTransferOwnership(
-    input: CancelTransferOwnershipInput!
+    webCardId: ID!
   ): CancelTransferOwnershipPayload
 }
 
@@ -8,6 +8,4 @@ type CancelTransferOwnershipPayload {
   profile: Profile
 }
 
-input CancelTransferOwnershipInput {
-  webCardId: ID!
-}
+

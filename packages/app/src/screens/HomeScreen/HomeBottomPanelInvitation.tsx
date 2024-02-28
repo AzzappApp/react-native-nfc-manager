@@ -32,10 +32,9 @@ const HomeBottomPanelInvitation = ({
     const environment = getRelayEnvironment();
 
     const acceptInvitationMutation = graphql`
-      mutation HomeBottomPanelInvitationAcceptMutation(
-        $input: AcceptInvitationInput!
-      ) @raw_response_type {
-        acceptInvitation(input: $input) {
+      mutation HomeBottomPanelInvitationAcceptMutation($profileId: ID!)
+      @raw_response_type {
+        acceptInvitation(profileId: $profileId) {
           profile {
             id
             invited
@@ -48,9 +47,7 @@ const HomeBottomPanelInvitation = ({
     commitMutation<HomeBottomPanelInvitationAcceptMutation>(environment, {
       mutation: acceptInvitationMutation,
       variables: {
-        input: {
-          profileId: profile.id,
-        },
+        profileId: profile.id,
       },
       optimisticResponse: {
         acceptInvitation: {
@@ -76,10 +73,8 @@ const HomeBottomPanelInvitation = ({
     const environment = getRelayEnvironment();
 
     const declineInvitationMutation = graphql`
-      mutation HomeBottomPanelInvitationDeclineMutation(
-        $input: DeclineInvitationInput!
-      ) {
-        declineInvitation(input: $input) {
+      mutation HomeBottomPanelInvitationDeclineMutation($profileId: ID!) {
+        declineInvitation(profileId: $profileId) {
           profileId
         }
       }
@@ -106,7 +101,7 @@ const HomeBottomPanelInvitation = ({
 
       commitMutation<HomeBottomPanelInvitationDeclineMutation>(environment, {
         mutation: declineInvitationMutation,
-        variables: { input: { profileId: id } },
+        variables: { profileId: id },
         optimisticUpdater: updater,
         updater,
       });

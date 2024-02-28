@@ -154,58 +154,55 @@ describe('ContactCardEditModal', () => {
       'ContactCardEditModalMutation',
     );
 
-    expect(operation.request.variables.input).toEqual({
-      contactCard: {
-        firstName: 'John 2',
-        lastName: 'Doe 2',
-        title: 'Software Engineer 2',
-        company: 'Facebook 2',
-        avatarId: '<mock-value-for-field-"id">',
-        emails: [
-          {
-            label: 'Work',
-            address: 'test2@test.com',
-            selected: true,
-          },
-        ],
-        phoneNumbers: [
-          {
-            label: 'Work',
-            number: '1234567890 2',
-            selected: true,
-          },
-          {
-            label: 'Home',
-            number: '1234567890 3',
-            selected: true,
-          },
-        ],
-        addresses: [
-          {
-            address: '<mock-value-for-field-"address">',
-            label: '<mock-value-for-field-"label">',
-            selected: false,
-          },
-        ],
-        birthday: {
-          birthday: '<mock-value-for-field-"birthday">',
+    expect(operation.request.variables.contactCard).toEqual({
+      firstName: 'John 2',
+      lastName: 'Doe 2',
+      title: 'Software Engineer 2',
+      company: 'Facebook 2',
+      avatarId: '<mock-value-for-field-"id">',
+      emails: [
+        {
+          label: 'Work',
+          address: 'test2@test.com',
+          selected: true,
+        },
+      ],
+      phoneNumbers: [
+        {
+          label: 'Work',
+          number: '1234567890 2',
+          selected: true,
+        },
+        {
+          label: 'Home',
+          number: '1234567890 3',
+          selected: true,
+        },
+      ],
+      addresses: [
+        {
+          address: '<mock-value-for-field-"address">',
+          label: '<mock-value-for-field-"label">',
           selected: false,
         },
-        socials: [
-          {
-            selected: false,
-            label: '<mock-value-for-field-"label">',
-            url: '<mock-value-for-field-"url">',
-          },
-        ],
-        urls: [
-          {
-            address: 'http://test.com',
-            selected: true,
-          },
-        ],
+      ],
+      birthday: {
+        birthday: '<mock-value-for-field-"birthday">',
+        selected: false,
       },
-      profileId: 'test-profile',
+      socials: [
+        {
+          selected: false,
+          label: '<mock-value-for-field-"label">',
+          url: '<mock-value-for-field-"url">',
+        },
+      ],
+      urls: [
+        {
+          address: 'http://test.com',
+          selected: true,
+        },
+      ],
     });
   });
 });

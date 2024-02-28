@@ -86,13 +86,14 @@ const PostCreationScreen = ({
   const [commit] = useMutation<PostCreationScreenMutation>(graphql`
     mutation PostCreationScreenMutation(
       $connections: [ID!]!
+      $webCardId: ID!
       $input: CreatePostInput!
       $screenWidth: Float!
       $postWith: Float!
       $cappedPixelRatio: Float!
       $pixelRatio: Float!
     ) {
-      createPost(input: $input) {
+      createPost(webCardId: $webCardId, input: $input) {
         post @prependNode(connections: $connections, edgeTypeName: "PostEdge") {
           id
           content
@@ -181,12 +182,12 @@ const PostCreationScreen = ({
         const { public_id } = await uploadPromise;
         commit({
           variables: {
+            webCardId: webCard.id,
             input: {
               mediaId: encodeMediaId(public_id, kind),
               allowComments,
               allowLikes,
               content,
-              webCardId: webCard.id,
             },
             screenWidth: ScreenWidth(),
             postWith: PostWidth(),

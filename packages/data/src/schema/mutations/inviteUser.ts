@@ -2,7 +2,6 @@ import * as Sentry from '@sentry/nextjs';
 import { and, eq } from 'drizzle-orm';
 import { GraphQLError } from 'graphql';
 import ERRORS from '@azzapp/shared/errors';
-import { isAdmin } from '@azzapp/shared/profileHelpers';
 import {
   formatPhoneNumber,
   isInternationalPhoneNumber,
@@ -23,17 +22,11 @@ import type { SQLWrapper } from 'drizzle-orm';
 const inviteUserMutation: MutationResolvers['inviteUser'] = async (
   _,
   { profileId: gqlProfileId, invited },
-  { auth, loaders, sendMail, sendSms }: GraphQLContext,
+  { loaders, sendMail, sendSms }: GraphQLContext,
 ) => {
-  const { userId } = auth;
-
   const profileId = fromGlobalIdWithType(gqlProfileId, 'Profile');
   const profile = profileId && (await loaders.Profile.load(profileId));
-  if (!profile || !isAdmin(profile.profileRole) || profile.invited) {
-    throw new GraphQLError(ERRORS.UNAUTHORIZED);
-  }
-
-  if (profile.userId !== userId) {
+  if (!profile) {
     throw new GraphQLError(ERRORS.UNAUTHORIZED);
   }
 

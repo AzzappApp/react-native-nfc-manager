@@ -113,9 +113,10 @@ const LineDividerEditionScreen = ({
   const [commit, saving] =
     useMutation<LineDividerEditionScreenUpdateModuleMutation>(graphql`
       mutation LineDividerEditionScreenUpdateModuleMutation(
+        $webCardId: ID!
         $input: SaveLineDividerModuleInput!
       ) {
-        saveLineDividerModule(input: $input) {
+        saveLineDividerModule(webCardId: $webCardId, input: $input) {
           webCard {
             id
             cardModules {
@@ -181,12 +182,12 @@ const LineDividerEditionScreen = ({
 
     commit({
       variables: {
+        webCardId: webCard.id,
         input: {
           ...value,
           height: height.value,
           marginBottom: marginBottom.value,
           marginTop: marginTop.value,
-          webCardId: webCard.id,
           moduleId: lineDivider?.id,
         },
       },

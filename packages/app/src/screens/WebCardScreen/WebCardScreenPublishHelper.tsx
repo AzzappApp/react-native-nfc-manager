@@ -45,9 +45,10 @@ const WebCardScreenPublishHelper = ({
   const [commit, publishing] = useMutation<WebCardScreenPublishHelperMutation>(
     graphql`
       mutation WebCardScreenPublishHelperMutation(
+        $webCardId: ID!
         $input: ToggleWebCardPublishedInput!
       ) {
-        toggleWebCardPublished(input: $input) {
+        toggleWebCardPublished(webCardId: $webCardId, input: $input) {
           webCard {
             id
             cardIsPublished
@@ -102,8 +103,8 @@ const WebCardScreenPublishHelper = ({
   const onPublish = () => {
     commit({
       variables: {
+        webCardId,
         input: {
-          webCardId,
           published: true,
         },
       },

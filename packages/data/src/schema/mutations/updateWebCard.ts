@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import { GraphQLError } from 'graphql';
 import ERRORS from '@azzapp/shared/errors';
-import { isAdmin, isEditor } from '@azzapp/shared/profileHelpers';
+import { isAdmin } from '@azzapp/shared/profileHelpers';
 import {
   updateWebCard,
   type WebCard,
@@ -13,17 +13,11 @@ import type { GraphQLContext } from '../GraphQLContext';
 
 const updateWebCardMutation: MutationResolvers['updateWebCard'] = async (
   _,
-  { input: { webCardId: gqlWebCardId, ...updates } },
+  { webCardId: gqlWebCardId, input: updates },
   { auth, loaders }: GraphQLContext,
 ) => {
   const { userId } = auth;
   const webCardId = fromGlobalIdWithType(gqlWebCardId, 'WebCard');
-  const profile =
-    userId && (await getUserProfileWithWebCardId(userId, webCardId));
-
-  if (!profile || !isEditor(profile.profileRole) || profile.invited) {
-    throw new GraphQLError(ERRORS.UNAUTHORIZED);
-  }
 
   const {
     webCardCategoryId: graphqlWebCardCategoryId,
@@ -38,7 +32,7 @@ const updateWebCardMutation: MutationResolvers['updateWebCard'] = async (
   };
 
   try {
-    const webCard = await loaders.WebCard.load(profile.webCardId);
+    const webCard = await loaders.WebCard.load(webCardId);
 
     if (!webCard) {
       throw new GraphQLError(ERRORS.INVALID_REQUEST);
@@ -62,14 +56,15 @@ const updateWebCardMutation: MutationResolvers['updateWebCard'] = async (
       partialWebCard.companyActivityId = companyActivityId;
     }
 
-    if (
-      webCard.companyActivityId !== partialWebCard.companyActivityId &&
-      (!isAdmin(profile.profileRole) || profile.invited)
-    ) {
-      throw new GraphQLError(ERRORS.UNAUTHORIZED);
+    if (webCard.companyActivityId !== partialWebCard.companyActivityId) {
+      const profile =
+        userId && (await getUserProfileWithWebCardId(userId, webCardId));
+      if (!profile || !isAdmin(profile.profileRole) || profile.invited) {
+        throw new GraphQLError(ERRORS.UNAUTHORIZED);
+      }
     }
 
-    await updateWebCard(profile.webCardId, partialWebCard);
+    await updateWebCard(webCardId, partialWebCard);
 
     return {
       webCard: { ...webCard, ...partialWebCard },

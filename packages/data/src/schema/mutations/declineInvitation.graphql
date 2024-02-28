@@ -1,12 +1,5 @@
 extend type Mutation {
-  declineInvitation(input: DeclineInvitationInput!): DeclineInvitationPayload!
-}
-
-input DeclineInvitationInput {
-  """
-  profile id
-  """
-  profileId: ID!
+  declineInvitation(profileId: ID!): DeclineInvitationPayload!
 }
 
 type DeclineInvitationPayload {

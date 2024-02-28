@@ -100,9 +100,10 @@ const WebCardParametersScreen = ({
   const [commitToggleWebCardPublished] =
     useMutation<WebCardParametersScreenUnPublishMutation>(graphql`
       mutation WebCardParametersScreenUnPublishMutation(
+        $webCardId: ID!
         $input: ToggleWebCardPublishedInput!
       ) {
-        toggleWebCardPublished(input: $input) {
+        toggleWebCardPublished(webCardId: $webCardId, input: $input) {
           webCard {
             id
             cardIsPublished
@@ -119,8 +120,8 @@ const WebCardParametersScreen = ({
       }
       commitToggleWebCardPublished({
         variables: {
+          webCardId: webCard.id,
           input: {
-            webCardId: webCard.id,
             published,
           },
         },
@@ -152,8 +153,11 @@ const WebCardParametersScreen = ({
 
   const [commitUpdateWebCard] = useMutation<WebCardParametersScreenMutation>(
     graphql`
-      mutation WebCardParametersScreenMutation($input: UpdateWebCardInput!) {
-        updateWebCard(input: $input) {
+      mutation WebCardParametersScreenMutation(
+        $webCardId: ID!
+        $input: UpdateWebCardInput!
+      ) {
+        updateWebCard(webCardId: $webCardId, input: $input) {
           webCard {
             id
             webCardKind
@@ -177,8 +181,8 @@ const WebCardParametersScreen = ({
       }
       commitUpdateWebCard({
         variables: {
+          webCardId: webCard.id,
           input: {
-            webCardId: webCard.id,
             webCardCategoryId: webCardCategory.id,
             webCardKind: webCardCategory.webCardKind,
             companyActivityId: undefined,
@@ -208,8 +212,8 @@ const WebCardParametersScreen = ({
       }
       commitUpdateWebCard({
         variables: {
+          webCardId: webCard.id,
           input: {
-            webCardId: webCard.id,
             companyActivityId: activity.id,
           },
         },

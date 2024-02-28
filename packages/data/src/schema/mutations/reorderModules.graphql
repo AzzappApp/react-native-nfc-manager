@@ -1,5 +1,5 @@
 extend type Mutation {
-  reorderModules(input: ReorderModulesInput!): ReorderModulesPayload!
+  reorderModules(webCardId: ID!, input: ReorderModulesInput!): ReorderModulesPayload!
 }
 
 input ReorderModulesInput {

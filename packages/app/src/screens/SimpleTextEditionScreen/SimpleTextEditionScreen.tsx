@@ -217,9 +217,10 @@ const SimpleTextEditionScreen = ({
   const [commit, saving] =
     useMutation<SimpleTextEditionScreenUpdateModuleMutation>(graphql`
       mutation SimpleTextEditionScreenUpdateModuleMutation(
+        $webCardId: ID!
         $input: SaveSimpleTextModuleInput!
       ) {
-        saveSimpleTextModule(input: $input) {
+        saveSimpleTextModule(webCardId: $webCardId, input: $input) {
           webCard {
             id
             cardModules {
@@ -284,6 +285,7 @@ const SimpleTextEditionScreen = ({
 
     commit({
       variables: {
+        webCardId: profile.webCard.id,
         input: {
           ...value,
           fontSize: fontSize.value,
@@ -293,7 +295,6 @@ const SimpleTextEditionScreen = ({
           moduleId: moduleData?.id ?? null,
           kind: moduleKind,
           text: value.text!,
-          webCardId: profile.webCard.id,
         },
       },
       onCompleted() {

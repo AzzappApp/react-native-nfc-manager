@@ -226,9 +226,10 @@ const PhotoWithTextAndTitleEditionScreen = ({
   const [commit, saving] =
     useMutation<PhotoWithTextAndTitleEditionScreenUpdateModuleMutation>(graphql`
       mutation PhotoWithTextAndTitleEditionScreenUpdateModuleMutation(
+        $webCardId: ID!
         $input: SavePhotoWithTextAndTitleModuleInput!
       ) {
-        savePhotoWithTextAndTitleModule(input: $input) {
+        savePhotoWithTextAndTitleModule(webCardId: $webCardId, input: $input) {
           webCard {
             id
             cardModules {
@@ -446,9 +447,7 @@ const PhotoWithTextAndTitleEditionScreen = ({
       marginVertical: marginVertical.value,
       gap: gap.value,
       aspectRatio: aspectRatio.value,
-
       image: mediaId ?? value.image!.id,
-      webCardId: profile.webCard.id,
     };
     if (value.title) {
       input.title = value.title;
@@ -459,6 +458,7 @@ const PhotoWithTextAndTitleEditionScreen = ({
 
     commit({
       variables: {
+        webCardId: profile.webCard.id,
         input,
       },
       onCompleted() {

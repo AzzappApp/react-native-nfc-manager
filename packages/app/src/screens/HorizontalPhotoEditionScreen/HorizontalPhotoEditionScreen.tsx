@@ -173,9 +173,10 @@ const HorizontalPhotoEditionScreen = ({
   const [commit, saving] =
     useMutation<HorizontalPhotoEditionScreenUpdateModuleMutation>(graphql`
       mutation HorizontalPhotoEditionScreenUpdateModuleMutation(
+        $webCardId: ID!
         $input: SaveHorizontalPhotoModuleInput!
       ) {
-        saveHorizontalPhotoModule(input: $input) {
+        saveHorizontalPhotoModule(webCardId: $webCardId, input: $input) {
           webCard {
             id
             cardModules {
@@ -332,7 +333,6 @@ const HorizontalPhotoEditionScreen = ({
     }
 
     const input: SaveHorizontalPhotoModuleInput = {
-      webCardId: profile.webCard.id,
       moduleId: horizontalPhoto?.id,
       image: mediaId ?? value.image!.id,
       ...rest,
@@ -345,6 +345,7 @@ const HorizontalPhotoEditionScreen = ({
 
     commit({
       variables: {
+        webCardId: profile.webCard.id,
         input,
       },
       onCompleted() {

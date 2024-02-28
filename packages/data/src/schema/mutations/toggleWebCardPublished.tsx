@@ -1,34 +1,16 @@
 import { GraphQLError } from 'graphql';
 import ERRORS from '@azzapp/shared/errors';
-import { isAdmin } from '@azzapp/shared/profileHelpers';
-import {
-  getProfilesPosts,
-  getUserProfileWithWebCardId,
-  updateWebCard,
-} from '#domains';
+import { getProfilesPosts, updateWebCard } from '#domains';
 import fromGlobalIdWithType from '#helpers/relayIdHelpers';
 import type { MutationResolvers } from '#schema/__generated__/types';
 
 const toggleWebCardPublished: MutationResolvers['toggleWebCardPublished'] =
   async (
     _,
-    { input: { webCardId: gqlWebCardId, published } },
-    { auth, cardUsernamesToRevalidate, postsToRevalidate, loaders },
+    { webCardId: gqlWebCardId, input: { published } },
+    { cardUsernamesToRevalidate, postsToRevalidate, loaders },
   ) => {
-    const { userId } = auth;
     const webCardId = fromGlobalIdWithType(gqlWebCardId, 'WebCard');
-    const profile =
-      userId && (await getUserProfileWithWebCardId(userId, webCardId));
-
-    if (!profile) {
-      throw new GraphQLError(ERRORS.UNAUTHORIZED);
-    }
-
-    if (!isAdmin(profile.profileRole)) {
-      throw new GraphQLError(ERRORS.FORBIDDEN, {
-        extensions: { role: profile.profileRole },
-      });
-    }
 
     const webCard = await loaders.WebCard.load(webCardId);
     if (!webCard) {
@@ -43,7 +25,7 @@ const toggleWebCardPublished: MutationResolvers['toggleWebCardPublished'] =
     };
 
     try {
-      await updateWebCard(profile.webCardId, updates);
+      await updateWebCard(webCardId, updates);
     } catch (e) {
       console.error(e);
       throw new GraphQLError(ERRORS.INVALID_REQUEST);

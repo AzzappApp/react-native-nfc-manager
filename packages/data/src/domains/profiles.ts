@@ -168,6 +168,17 @@ export const getProfileByUserName = async (userName: string) => {
     });
 };
 
+export const updateProfiles = async (
+  webCardId: string,
+  updates: Partial<Profile>,
+  tx: DbTransaction = db,
+) => {
+  await tx
+    .update(ProfileTable)
+    .set(updates)
+    .where(eq(ProfileTable.webCardId, webCardId));
+};
+
 export const updateProfile = async (
   profileId: string,
   updates: Partial<Profile>,

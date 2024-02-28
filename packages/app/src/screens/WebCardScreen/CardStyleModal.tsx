@@ -103,8 +103,11 @@ const CardStyleModal = ({ visible, onRequestClose }: CardStyleModalProps) => {
   const [cardStyle, setCardStyle] = useState<CardStyleItem>(currentCardStyle);
 
   const [commit, isInFlight] = useMutation<CardStyleModalMutation>(graphql`
-    mutation CardStyleModalMutation($input: SaveCardStyleInput!) {
-      saveCardStyle(input: $input) {
+    mutation CardStyleModalMutation(
+      $webCardId: ID!
+      $input: SaveCardStyleInput!
+    ) {
+      saveCardStyle(webCardId: $webCardId, input: $input) {
         webCard {
           id
           cardStyle {
@@ -133,8 +136,8 @@ const CardStyleModal = ({ visible, onRequestClose }: CardStyleModalProps) => {
   const applyCardStyle = useCallback(() => {
     commit({
       variables: {
+        webCardId: profile?.webCard?.id ?? '',
         input: {
-          webCardId: profile?.webCard?.id ?? '',
           ...pick(
             cardStyle,
             'borderColor',

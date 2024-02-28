@@ -92,8 +92,11 @@ const MultiUserScreen = ({
   }, [profile?.profileRole, router]);
 
   const [commit] = useMutation<MultiUserScreenMutation>(graphql`
-    mutation MultiUserScreenMutation($input: UpdateMultiUserInput!) {
-      updateMultiUser(input: $input) {
+    mutation MultiUserScreenMutation(
+      $webCardId: ID!
+      $input: UpdateMultiUserInput!
+    ) {
+      updateMultiUser(webCardId: $webCardId, input: $input) {
         webCard {
           id
           isMultiUser
@@ -109,7 +112,8 @@ const MultiUserScreen = ({
       if (profile?.webCard) {
         commit({
           variables: {
-            input: { isMultiUser: value, webCardId: profile?.webCard?.id },
+            webCardId: profile?.webCard?.id,
+            input: { isMultiUser: value },
           },
           optimisticResponse: {
             updateMultiUser: {
@@ -155,9 +159,10 @@ const MultiUserScreen = ({
   const [transferOwner, savingTransferOwner] =
     useMutation<MultiUserScreen_transferOwnershipMutation>(graphql`
       mutation MultiUserScreen_transferOwnershipMutation(
+        $webCardId: ID!
         $input: TransferOwnershipInput!
       ) {
-        transferOwnership(input: $input) {
+        transferOwnership(webCardId: $webCardId, input: $input) {
           profile {
             id
             promotedAsOwner
@@ -179,9 +184,9 @@ const MultiUserScreen = ({
     if (selectedProfileId && profile?.webCard?.id) {
       transferOwner({
         variables: {
+          webCardId: profile.webCard.id,
           input: {
             profileId: selectedProfileId,
-            webCardId: profile.webCard.id,
           },
         },
         onCompleted: () => {

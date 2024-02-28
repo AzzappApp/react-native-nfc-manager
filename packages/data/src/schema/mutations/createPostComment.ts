@@ -1,28 +1,16 @@
 import { GraphQLError } from 'graphql';
 import ERRORS from '@azzapp/shared/errors';
-import { isEditor } from '@azzapp/shared/profileHelpers';
-import {
-  getPostByIdWithMedia,
-  getUserProfileWithWebCardId,
-  insertPostComment,
-} from '#domains';
+import { getPostByIdWithMedia, insertPostComment } from '#domains';
 import fromGlobalIdWithType from '#helpers/relayIdHelpers';
 import type { MutationResolvers } from '#schema/__generated__/types';
 
 const createPostComment: MutationResolvers['createPostComment'] = async (
   _,
-  { input: { webCardId: gqlWebCardId, postId: gqlPostId, comment } },
-  { auth, loaders },
+  { webCardId: gqlWebCardId, input: { postId: gqlPostId, comment } },
+  { loaders },
 ) => {
-  const { userId } = auth;
   const webCardId = fromGlobalIdWithType(gqlWebCardId, 'WebCard');
   const postId = fromGlobalIdWithType(gqlPostId, 'Post');
-  const profile =
-    userId && (await getUserProfileWithWebCardId(userId, webCardId));
-
-  if (!profile || !isEditor(profile.profileRole) || profile.invited) {
-    throw new GraphQLError(ERRORS.INVALID_REQUEST);
-  }
 
   const post = await getPostByIdWithMedia(postId);
   if (!post?.allowComments) throw new GraphQLError(ERRORS.INVALID_REQUEST);
@@ -39,7 +27,7 @@ const createPostComment: MutationResolvers['createPostComment'] = async (
 
   try {
     const postComment = {
-      webCardId: profile.webCardId,
+      webCardId,
       postId,
       comment,
     };

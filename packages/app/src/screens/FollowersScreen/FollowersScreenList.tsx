@@ -71,9 +71,10 @@ const FollowersScreenList = ({
     graphql`
       mutation FollowersScreenList_removeFollowerMutation(
         $connections: [ID!]!
+        $webCardId: ID!
         $input: RemoveFollowerInput!
       ) {
-        removeFollower(input: $input) {
+        removeFollower(webCardId: $webCardId, input: $input) {
           removedFollowerId @deleteEdge(connections: $connections)
         }
       }
@@ -97,8 +98,8 @@ const FollowersScreenList = ({
 
           commit({
             variables: {
+              webCardId: profileInfos.webCardId,
               input: {
-                webCardId: profileInfos.webCardId,
                 removedFollowerId,
               },
               connections: [connectionID],

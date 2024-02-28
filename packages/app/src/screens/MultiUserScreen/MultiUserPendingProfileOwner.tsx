@@ -41,10 +41,8 @@ const MultiUserPendingProfileOwner = ({
 
   const [commitCancelTransfer, savingCancelTransfer] =
     useMutation<MultiUserPendingProfileOwnerCancelMutation>(graphql`
-      mutation MultiUserPendingProfileOwnerCancelMutation(
-        $input: CancelTransferOwnershipInput!
-      ) {
-        cancelTransferOwnership(input: $input) {
+      mutation MultiUserPendingProfileOwnerCancelMutation($webCardId: ID!) {
+        cancelTransferOwnership(webCardId: $webCardId) {
           profile {
             id
             promotedAsOwner
@@ -61,9 +59,7 @@ const MultiUserPendingProfileOwner = ({
     () =>
       commitCancelTransfer({
         variables: {
-          input: {
-            webCardId,
-          },
+          webCardId,
         },
         updater: store => {
           // Get the new profile from the mutation response
