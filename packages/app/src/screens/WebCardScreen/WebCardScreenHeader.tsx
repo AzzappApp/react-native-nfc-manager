@@ -80,7 +80,7 @@ const WebCardScrenHeader = ({
 
   const editHeaderStyle = useAnimatedStyle(() => ({
     height: (editTransition?.value ?? 0) * (HEADER_HEIGHT + 4),
-    marginTop: (editTransition?.value ?? 0) * inset.top,
+    marginTop: (editTransition?.value ? 1.5 : 0) * inset.top,
     opacity: editTransition?.value ?? 0,
   }));
 
