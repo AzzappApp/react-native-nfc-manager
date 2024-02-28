@@ -1,6 +1,12 @@
 import { useCallback, useMemo, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { Alert, RefreshControl, StyleSheet, View } from 'react-native';
+import {
+  Alert,
+  Keyboard,
+  RefreshControl,
+  StyleSheet,
+  View,
+} from 'react-native';
 import { FlatList } from 'react-native-gesture-handler';
 import { KeyboardAvoidingView } from 'react-native-keyboard-controller';
 import Toast from 'react-native-toast-message';
@@ -169,6 +175,7 @@ const PostCommentsList = ({
 
     setSubmitting(true);
     if (!submitting) {
+      Keyboard.dismiss();
       if (isEditor(auth.profileInfos?.profileRole)) {
         commit({
           variables: {
