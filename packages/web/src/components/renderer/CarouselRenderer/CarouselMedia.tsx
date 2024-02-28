@@ -29,6 +29,7 @@ const CarouselMedia = (props: CarouselMediaProps) => {
       style={{
         width,
         height: imageHeight,
+        flex: '0 0 auto',
       }}
     >
       <CloudinaryImage

@@ -157,29 +157,6 @@ export const SimpleButtonRenderer = ({
     }
   }, [actionLink, actionType]);
 
-  const cardModuleBackgroundStyle = useAnimatedStyle(() => {
-    if (animatedData === null) {
-      if ('height' in rest) {
-        return {
-          height: rest.height ?? SIMPLE_BUTTON_DEFAULT_VALUES.height,
-          marginBottom:
-            rest.marginBottom ?? SIMPLE_BUTTON_DEFAULT_VALUES.marginBottom,
-          marginTop: rest.marginTop ?? SIMPLE_BUTTON_DEFAULT_VALUES.marginTop,
-        };
-      }
-      return {};
-    }
-
-    return {
-      height:
-        (animatedData.height.value ?? SIMPLE_BUTTON_DEFAULT_VALUES.height) +
-        (animatedData.marginTop.value ??
-          SIMPLE_BUTTON_DEFAULT_VALUES.marginTop) +
-        (animatedData.marginBottom.value ??
-          SIMPLE_BUTTON_DEFAULT_VALUES.marginBottom),
-    };
-  });
-
   const moduleContentStyle = useAnimatedStyle(() => {
     if (animatedData === null) {
       if ('height' in rest) {
@@ -227,7 +204,7 @@ export const SimpleButtonRenderer = ({
       )}
       patternColor={swapColor(backgroundStyle?.patternColor, colorPalette)}
       resizeMode={background?.resizeMode}
-      style={[style, cardModuleBackgroundStyle, { alignItems: 'center' }]}
+      style={[style, { alignItems: 'center' }]}
     >
       <PressableOpacity
         onPress={onPress}
