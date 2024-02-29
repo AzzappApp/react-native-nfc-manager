@@ -1,5 +1,7 @@
-## 0.5.5-canary.120
+## 0.5.5-canary.121
 
+* **fix:**  - **android:** [#2941](https://github.com/AzzappApp/azzapp/pull/2941) remove status bar from screen height ([#2982](https://github.com/AzzappApp/azzapp/pull/2982))
+* **fix:**  - 🐛 don't display quit webcard when user has no webcard ([#2981](https://github.com/AzzappApp/azzapp/pull/2981))
 * **fix:**  - [#2971](https://github.com/AzzappApp/azzapp/pull/2971) set distinct rate limiting on web and api ([#2974](https://github.com/AzzappApp/azzapp/pull/2974))
 * **feat:**  - [#2914](https://github.com/AzzappApp/azzapp/pull/2914) add graphql shield on query ([#2968](https://github.com/AzzappApp/azzapp/pull/2968))
 * **feat:**  - [#2914](https://github.com/AzzappApp/azzapp/pull/2914) add max directive to avoid heavy pagination ([#2977](https://github.com/AzzappApp/azzapp/pull/2977))
