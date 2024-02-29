@@ -64,6 +64,10 @@ const createMMKVForUser = () => {
 };
 
 const createSource = () => {
+  if (!process.env.USE_OFFLINE_CACHE) {
+    return RecordSource.create();
+  }
+
   let currentMMKV = createMMKVForUser();
 
   const createInnerSourceWithOfflineData = () => {
