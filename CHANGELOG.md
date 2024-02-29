@@ -1,4 +1,4 @@
-## 0.5.5-canary.121
+## 0.5.5-canary.122
 
 * **fix:**  - **android:** [#2941](https://github.com/AzzappApp/azzapp/pull/2941) remove status bar from screen height ([#2982](https://github.com/AzzappApp/azzapp/pull/2982))
 * **fix:**  - 🐛 don't display quit webcard when user has no webcard ([#2981](https://github.com/AzzappApp/azzapp/pull/2981))
