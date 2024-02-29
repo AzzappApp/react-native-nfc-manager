@@ -1,6 +1,6 @@
 import { useCallback, useState } from 'react';
 import { useIntl } from 'react-intl';
-import { View } from 'react-native';
+import { Platform, View } from 'react-native';
 import Animated, { useAnimatedStyle } from 'react-native-reanimated';
 import { colors } from '#theme';
 import { useRouter } from '#components/NativeRouter';
@@ -143,8 +143,8 @@ const styleSheet = createStyleSheet(appearance => ({
 
   flexOne: { flex: 1 },
   searchBarContainer: {
-    paddingLeft: 10,
-    paddingRight: 10,
+    paddingTop: Platform.OS === 'android' ? 5 : 0,
+    paddingHorizontal: 10,
     paddingBottom: 10,
     flexDirection: 'row',
     width: '100%',
