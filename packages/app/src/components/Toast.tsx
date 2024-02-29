@@ -91,6 +91,9 @@ const Toast = ({
           )}
           renderTrailingIcon={() => renderTrailingIcon(successProps.props)}
           text1Style={[textStyles.smallbold, styles.toastText]}
+          text1Props={{
+            adjustsFontSizeToFit: true,
+          }}
         />
       ),
       error: (errorProps: ToastConfigParams<ToastProps>) => (
@@ -103,6 +106,9 @@ const Toast = ({
           )}
           renderTrailingIcon={() => renderTrailingIcon(errorProps.props)}
           text1Style={[textStyles.smallbold, styles.toastText]}
+          text1Props={{
+            adjustsFontSizeToFit: true,
+          }}
         />
       ),
       info: (infoProps: ToastConfigParams<ToastProps>) => (
@@ -129,6 +135,9 @@ const Toast = ({
             renderTrailingIcon={() => renderTrailingIcon(infoProps.props)}
             text1Style={[textStyles.smallbold, styles.toastText]}
             onPress={ExternalToast.hide}
+            text1Props={{
+              adjustsFontSizeToFit: true,
+            }}
           />
         </>
       ),
