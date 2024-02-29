@@ -142,8 +142,6 @@ const CameraView = (
         }
         const photo = await camera.current.takePhoto({
           flash: supportsFlash ? flash : 'off',
-          qualityPrioritization:
-            Platform.OS === 'android' ? 'speed' : 'balanced',
           // TODO investigate those parameters
           // enableAutoDistortionCorrection: true,
           // enableAutoRedEyeReduction: true,
@@ -268,7 +266,6 @@ const CameraView = (
   // see https://github.com/mrousavy/react-native-vision-camera/issues/2208#issuecomment-1850856762
   const format = useCameraFormat(device, [
     {
-      videoResolution: { width: 1280, height: 720 },
       photoAspectRatio: aspectRatio,
       videoAspectRatio: aspectRatio,
     },
@@ -329,6 +326,9 @@ const CameraView = (
             audio={hasMicrophonePermission}
             orientation="portrait"
             exposure={0}
+            photoQualityBalance={
+              Platform.OS === 'android' ? 'speed' : 'balanced'
+            }
           />
         </GestureDetector>
       ) : null}
