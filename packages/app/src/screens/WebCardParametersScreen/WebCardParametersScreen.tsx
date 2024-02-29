@@ -377,7 +377,7 @@ const WebCardParametersScreen = ({
               keyExtractor={keyExtractor}
               bottomSheetHeight={Math.min(
                 (webCardCategories?.length ?? 0) * 50 + 80,
-                300,
+                500,
               )}
               onItemSelected={updateWebCardCategory}
               bottomSheetTitle={
@@ -409,9 +409,9 @@ const WebCardParametersScreen = ({
                 data={activities ?? []}
                 selectedItemKey={webCard.companyActivity?.id}
                 keyExtractor={keyExtractor}
-                bottomSheetHeight={Math.min(
-                  (webCardCategories?.length ?? 0) * 50 + 80,
-                  400,
+                bottomSheetHeight={Math.max(
+                  Math.min((webCardCategories?.length ?? 0) * 50 + 80, 400),
+                  300,
                 )}
                 onItemSelected={updateProfileActivity}
                 bottomSheetTitle={intl.formatMessage({
