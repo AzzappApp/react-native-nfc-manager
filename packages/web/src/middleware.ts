@@ -4,16 +4,25 @@ import { NextResponse } from 'next/server';
 import { getRedirectWebCardByUserName } from '@azzapp/data/domains';
 import type { NextRequest } from 'next/server';
 
-const ratelimit = new Ratelimit({
-  redis: kv,
-  limiter: Ratelimit.slidingWindow(10, '10 s'),
-});
+const rateLimit = {
+  api: new Ratelimit({
+    redis: kv,
+    limiter: Ratelimit.slidingWindow(10, '1 s'),
+  }),
+  web: new Ratelimit({
+    redis: kv,
+    limiter: Ratelimit.slidingWindow(15, '1 s'),
+  }),
+};
 
 export async function middleware(request: NextRequest) {
   const { nextUrl } = request;
 
   const ip = request.ip ?? '127.0.0.1';
-  const { success } = await ratelimit.limit(ip);
+
+  const { success } = nextUrl.pathname.startsWith('/api')
+    ? await rateLimit.api.limit(ip)
+    : await rateLimit.web.limit(ip);
 
   if (!success) {
     return NextResponse.json(
@@ -24,6 +33,10 @@ export async function middleware(request: NextRequest) {
         status: 429,
       },
     );
+  }
+
+  if (nextUrl.pathname.startsWith('/api')) {
+    return undefined;
   }
 
   // Handle redirection at root level but should be the LAST to be handle(performance, handle all other static route like /api before)
@@ -59,6 +72,6 @@ export const config = {
      * - _next/image (image optimization files)
      * - favicon.ico (favicon file)
      */
-    '/((?!api|_.*|favicon.*|site.*|.well-known).*)',
+    '/((?!_.*|favicon.*|site.*|.well-known).*)',
   ],
 };
