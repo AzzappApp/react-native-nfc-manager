@@ -1,5 +1,8 @@
-## 0.5.5-canary.119
+## 0.5.5-canary.120
 
+* **fix:**  - [#2971](https://github.com/AzzappApp/azzapp/pull/2971) set distinct rate limiting on web and api ([#2974](https://github.com/AzzappApp/azzapp/pull/2974))
+* **feat:**  - [#2914](https://github.com/AzzappApp/azzapp/pull/2914) add graphql shield on query ([#2968](https://github.com/AzzappApp/azzapp/pull/2968))
+* **feat:**  - [#2914](https://github.com/AzzappApp/azzapp/pull/2914) add max directive to avoid heavy pagination ([#2977](https://github.com/AzzappApp/azzapp/pull/2977))
 * **fix:**  - 🐛 add option to activate/deactivate offline ([#2973](https://github.com/AzzappApp/azzapp/pull/2973))
 * **fix:**  - remove redundant indexes ([#2969](https://github.com/AzzappApp/azzapp/pull/2969))
 * **fix:**  - **android:** [#2955](https://github.com/AzzappApp/azzapp/pull/2955) seeAll button not visible on android ([#2963](https://github.com/AzzappApp/azzapp/pull/2963))
