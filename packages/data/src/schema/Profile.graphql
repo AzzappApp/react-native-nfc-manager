@@ -70,7 +70,7 @@ type Profile implements Node {
     """
     Returns the first n items from the list.
     """
-    first: Int
+    first: Int @max(value: 50)
   ): WebCardConnection!
 
   """
@@ -81,11 +81,10 @@ type Profile implements Node {
     Returns the items in the list that come after the specified cursor.
     """
     after: String
-
     """
     Returns the first n items from the list.
     """
-    first: Int
+    first: Int @max(value: 50)
   ): PostConnection!
 
   """
@@ -100,7 +99,7 @@ type Profile implements Node {
     """
     Returns the first n items from the list.
     """
-    first: Int
+    first: Int @max(value: 50)
   ): WebCardConnection!
 
   """
@@ -122,7 +121,7 @@ type Profile implements Node {
     """
     Returns the first n items from the list.
     """
-    first: Int
+    first: Int @max(value: 50)
   ): PostConnection!
 
   """
@@ -144,7 +143,7 @@ type Profile implements Node {
     """
     Returns the first n items from the list.
     """
-    first: Int
+    first: Int @max(value: 50)
   ): WebCardConnection!
 
   """
@@ -167,7 +166,7 @@ type Profile implements Node {
   """
   coverTemplates(
     kind: CoverTemplateKind!
-    first: Int
+    first: Int @max(value: 50)
     after: String
   ): CoverTemplateConnection!
 
@@ -181,7 +180,7 @@ type Profile implements Node {
   """
   cardTemplates(
     cardTemplateTypeId: String
-    first: Int
+    first: Int @max(value: 20)
     after: String
   ): CardTemplateConnection!
 
@@ -192,11 +191,11 @@ type Profile implements Node {
   """
   Fetches suggested medias
   """
-  suggestedMedias(kind: MediaKind!, first: Int, after: String): MediaConnection!
+  suggestedMedias(kind: MediaKind!, first: Int @max(value: 50), after: String): MediaConnection!
   """
   Fetches color palettes
   """
-  colorPalettes(first: Int, after: String): ColorPaletteConnection!
+  colorPalettes(first: Int  @max(value: 50), after: String): ColorPaletteConnection!
 }
 
 type SerializedContactCard {

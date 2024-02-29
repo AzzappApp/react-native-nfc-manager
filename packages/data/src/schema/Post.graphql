@@ -67,7 +67,7 @@ type Post implements Node {
     """
     Returns the first n items from the list.
     """
-    first: Int
+    first: Int @max(value: 50)
   ): PostCommentConnection
   relatedPosts(
     """

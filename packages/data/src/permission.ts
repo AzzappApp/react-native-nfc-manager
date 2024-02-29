@@ -111,8 +111,13 @@ const ProtectedMutation: Record<
   updateWebCard: isEditorRule,
 };
 
-const permissions = shield({
-  Mutation: ProtectedMutation,
-});
+const permissions = shield(
+  {
+    Mutation: ProtectedMutation,
+  },
+  {
+    allowExternalErrors: true,
+  },
+);
 
 export default permissions;

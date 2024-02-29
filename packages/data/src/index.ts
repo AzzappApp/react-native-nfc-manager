@@ -1,5 +1,6 @@
 import { makeExecutableSchema } from '@graphql-tools/schema';
 import { applyMiddleware } from 'graphql-middleware';
+import { applyDirectiveSchemaTransform, directivesTypeDefs } from '#directives';
 import permissions from '#permission';
 import { typeDefs } from '#schema/__generated__/types';
 import resolvers from './schema';
@@ -8,12 +9,15 @@ import type { GraphQLContext } from './schema/GraphQLContext';
 
 const buildSchema = () => {
   return makeExecutableSchema({
-    typeDefs,
+    typeDefs: [directivesTypeDefs, typeDefs],
     resolvers,
   });
 };
 
-const schema = applyMiddleware(buildSchema(), permissions);
+const schema = applyMiddleware(
+  applyDirectiveSchemaTransform(buildSchema()),
+  permissions,
+);
 
 export { schema, createGraphQLContext };
 

@@ -113,7 +113,7 @@ type WebCard implements Node {
     """
     Returns the first n items from the list.
     """
-    first: Int
+    first: Int @max(value: 50)
   ): PostConnection
   """
   Returns summary of statistics
@@ -131,7 +131,7 @@ type WebCard implements Node {
     """
     Returns the first n items from the list.
     """
-    first: Int
+    first: Int @max(value: 50)
   ): PostConnection!
 
   """
@@ -164,7 +164,7 @@ type WebCard implements Node {
     """
     Returns the first n items from the list.
     """
-    first: Int
+    first: Int @max(value: 50)
   ): ProfileConnection!
 
   """
@@ -184,7 +184,7 @@ type WebCard implements Node {
     """
     Returns the first n items from the list.
     """
-    first: Int
+    first: Int @max(value: 50)
 
     """
     Filter by userName
@@ -204,7 +204,7 @@ type WebCard implements Node {
     """
     Returns the first n items from the list.
     """
-    first: Int
+    first: Int @max(value: 50)
 
     """
     Filter by userName
@@ -224,7 +224,7 @@ type WebCard implements Node {
     """
     Returns the first n items from the list.
     """
-    first: Int
+    first: Int @max(value: 50)
   ): PostConnection!
   """
   Return the datetime when the webCard can change its username
