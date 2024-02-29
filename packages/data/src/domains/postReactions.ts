@@ -1,10 +1,5 @@
 import { eq, and } from 'drizzle-orm';
-import {
-  index,
-  primaryKey,
-  mysqlEnum,
-  mysqlTable,
-} from 'drizzle-orm/mysql-core';
+import { primaryKey, mysqlEnum, mysqlTable } from 'drizzle-orm/mysql-core';
 import db, { cols } from './db';
 import type { DbTransaction } from './db';
 import type { InferInsertModel, InferSelectModel } from 'drizzle-orm';
@@ -24,8 +19,6 @@ export const PostReactionTable = mysqlTable(
       postReactionPostIdReactionKindProfileId: primaryKey({
         columns: [table.postId, table.reactionKind, table.webCardId],
       }),
-      postIdIdx: index('PostReaction_postId_idx').on(table.postId),
-      webCardIdIdx: index('PostReaction_webCardId_idx').on(table.webCardId),
     };
   },
 );

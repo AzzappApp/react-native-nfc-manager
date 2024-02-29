@@ -1,5 +1,5 @@
 import { eq, and } from 'drizzle-orm';
-import { index, primaryKey, mysqlTable } from 'drizzle-orm/mysql-core';
+import { primaryKey, mysqlTable } from 'drizzle-orm/mysql-core';
 import db, { cols } from './db';
 import type { DbTransaction } from './db';
 import type { InferInsertModel, InferSelectModel } from 'drizzle-orm';
@@ -13,8 +13,6 @@ export const FollowTable = mysqlTable(
   },
   table => {
     return {
-      followingIdIdx: index('Follow_followingId_idx').on(table.followingId),
-      followerIdIdx: index('Follow_followerId_idx').on(table.followerId),
       followFollowerIdFollowingId: primaryKey({
         columns: [table.followerId, table.followingId],
       }),
