@@ -1,0 +1,146 @@
+import { style } from '@vanilla-extract/css';
+const background = style({
+  backgroundColor: '#FFFFFF',
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center',
+  alignSelf: 'center',
+});
+
+const container = style({
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center',
+  alignSelf: 'center',
+  marginTop: '70px',
+  width: '500px',
+});
+
+const image = style({
+  width: '150px',
+  marginBottom: '70px',
+});
+
+const text = style({
+  fontWeight: 400,
+  fontFamily: 'Helvetica Neue',
+  fontSize: '14px',
+});
+
+const title = style({
+  fontWeight: 700,
+  textAlign: 'center',
+  fontFamily: 'Helvetica Neue',
+  fontSize: '20px',
+});
+
+const openIcon = style({
+  marginLeft: '20px',
+  marginRight: '20px',
+  width: '24px',
+  height: '24px',
+});
+
+const button = style({
+  margin: 20,
+  width: '250px',
+});
+
+const stepText = style({
+  color: 'rgba(161, 161, 165, 1)',
+  fontFamily: 'Helvetica Neue',
+  fontSize: '14px',
+  fontWeight: 400,
+});
+
+const stepDesc = style({
+  fontFamily: 'Helvetica Neue',
+  fontSize: '14px',
+  fontWeight: 400,
+});
+
+const separator = style({
+  height: '1px',
+  width: '100%',
+  backgroundColor: 'rgba(226, 225, 227, 1)',
+  marginTop: '10px',
+  marginBottom: '20px',
+});
+
+const pageContainer = style({
+  flexDirection: 'row',
+  display: 'flex',
+  alignItems: 'center',
+  marginTop: 70,
+  width: 500,
+});
+
+const simpleContainer = style({
+  width: 200,
+  height: 320,
+  display: 'flex',
+  justifyContent: 'center',
+  alignItems: 'center',
+  border: '1px solid rgba(226, 225, 227, 1)',
+  borderRadius: 18,
+  borderStyle: 'dashed',
+});
+
+const simpleButton = style({
+  height: 34,
+  width: 125,
+  padding: '10px, 15px, 10px, 15px',
+  borderRadius: 48,
+  boxShadow: '0px 4px 16px 0px rgba(0, 0, 0, 0.25)',
+  fontSize: 12,
+  flexDirection: 'row',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+});
+
+const tableFull = style({
+  border: '1px solid black',
+  tableLayout: 'fixed',
+  width: '450px',
+  paddingLeft: ' 15px',
+  paddingRight: ' 15px',
+  paddingTop: '20px',
+  paddingBottom: ' 20px',
+  background: 'white',
+  borderRadius: ' 20px',
+  overflow: 'hidden',
+  gap: ' 15px',
+  marginTop: 50,
+});
+
+const tableButton = style({
+  border: '1px solid black',
+  background: 'white',
+  height: '34px',
+  paddingLeft: '10px',
+  paddingRight: ' 10px',
+  borderRadius: '48px',
+  fontSize: '12px',
+  marginTop: '12px',
+});
+
+const styles = {
+  background,
+  button,
+  container,
+  image,
+  text,
+  title,
+  openIcon,
+  stepText,
+  stepDesc,
+  separator,
+  pageContainer,
+  simpleContainer,
+  simpleButton,
+  tableFull,
+  tableButton,
+};
+
+export default styles;

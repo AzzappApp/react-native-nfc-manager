@@ -1,6 +1,6 @@
 import { addPass, addPassJWT } from '@reeq/react-native-passkit';
 import { fromGlobalId } from 'graphql-relay';
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import {
   View,
@@ -25,7 +25,11 @@ import ContactCard, {
 } from '#components/ContactCard/ContactCard';
 import ScreenModal from '#components/ScreenModal';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
-import { getAppleWalletPass, getGoogleWalletPass } from '#helpers/MobileWebAPI';
+import {
+  generateEmailSignature,
+  getAppleWalletPass,
+  getGoogleWalletPass,
+} from '#helpers/MobileWebAPI';
 import relayScreen from '#helpers/relayScreen';
 import useAnimatedState from '#hooks/useAnimatedState';
 import useToggle from '#hooks/useToggle';
@@ -48,6 +52,7 @@ const contactCardMobileScreenQuery = graphql`
   query ContactCardScreenQuery($profileId: ID!) {
     node(id: $profileId) {
       ... on Profile @alias(as: "profile") {
+        id
         webCard {
           id
           userName
@@ -61,6 +66,9 @@ const contactCardMobileScreenQuery = graphql`
         ...ContactCardEditModal_card
       }
     }
+    currentUser {
+      email
+    }
   }
 `;
 
@@ -72,7 +80,7 @@ const defaultTimingParam = {
 export const ContactCardScreen = ({
   preloadedQuery,
 }: RelayScreenProps<ContactCardRoute, ContactCardScreenQuery>) => {
-  const { node } = usePreloadedQuery(
+  const { node, currentUser } = usePreloadedQuery(
     contactCardMobileScreenQuery,
     preloadedQuery,
   );
@@ -148,6 +156,15 @@ export const ContactCardScreen = ({
     }),
     [sharedRotationState.value],
   );
+
+  const generateEmail = useCallback(async () => {
+    if (profile?.id && webCard?.id) {
+      await generateEmailSignature({
+        locale: intl.locale,
+        profileId: fromGlobalId(profile.id).id,
+      });
+    }
+  }, [intl.locale, profile?.id, webCard?.id]);
 
   const [contactCardEditModal, toggleContactEditModal] = useToggle(false);
 
@@ -284,6 +301,15 @@ export const ContactCardScreen = ({
               <ContactCardExportVcf
                 userName={webCard.userName}
                 profile={profile}
+              />
+            )}
+            {currentUser?.email && (
+              <Button
+                label={intl.formatMessage({
+                  defaultMessage: 'Generate an email Signature',
+                  description: 'Generate an email Signature button label',
+                })}
+                onPress={generateEmail}
               />
             )}
           </View>

@@ -16,7 +16,7 @@ export function buildUserUrl(
  * Builds a post URL from a user name and post.
  */
 export function buildPostUrl(userName: string, postId: string) {
-  return `${process.env.NEXT_PUBLIC_URL}${userName}/${postId}`;
+  return `${buildUserUrl(userName)}/${postId}`;
 }
 
 /**
@@ -33,4 +33,22 @@ export function buildUserUrlWithContactCard(
   );
 
   return `${buildUserUrl(userName)}?c=${compressedData}`;
+}
+
+export function buildEmailSignatureGenerationUrl(
+  userName: string,
+  serializedEmail: string,
+  signature: string,
+  serializedContactCard: string,
+  signatureContactCard: string,
+) {
+  const compressedData = compressToEncodedURIComponent(
+    JSON.stringify([serializedEmail, signature]),
+  );
+
+  const compressedContactCardData = compressToEncodedURIComponent(
+    JSON.stringify([serializedContactCard, signatureContactCard]),
+  );
+
+  return `${buildUserUrl(userName)}/emailsignature?e=${compressedData}&c=${compressedContactCardData}`;
 }

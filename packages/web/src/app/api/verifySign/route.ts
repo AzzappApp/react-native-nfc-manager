@@ -24,7 +24,6 @@ const verifySignApi = async (req: Request) => {
     decodeURIComponent(data),
     { salt },
   );
-
   if (isValid) {
     const foundContactCard = parseContactCard(decodeURIComponent(data));
 

@@ -46,6 +46,7 @@
     "os-browserify": "^0.3.0",
     "passkit-generator": "^3.1.11",
     "path-browserify": "^1.0.1",
+    "qrcode": "^1.5.3",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-intl": "^6.6.2",
@@ -58,6 +59,7 @@
   "devDependencies": {
     "@types/jsonwebtoken": "^9.0.2",
     "@types/node": "^18.15.11",
+    "@types/qrcode": "^1.5.5",
     "@types/react": "^18.2.48",
     "@types/react-dom": "^18.2.18",
     "@vanilla-extract/dynamic": "^2.1.0",

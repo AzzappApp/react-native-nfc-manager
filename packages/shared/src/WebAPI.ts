@@ -269,3 +269,18 @@ export const getGoogleWalletPass: APIMethod<
     ...init,
     method: 'GET',
   });
+
+/**
+ * Api call to generate a google wallet pass.
+ */
+export const generateEmailSignature: APIMethod<
+  { locale: string; profileId: string },
+  { token: string }
+> = ({ locale, profileId }, init) =>
+  apiFetch(
+    `${API_ENDPOINT}/${locale}/generateEmailSignature?profileId=${profileId}`,
+    {
+      ...init,
+      method: 'POST',
+    },
+  );
