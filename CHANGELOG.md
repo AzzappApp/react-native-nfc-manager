@@ -1,5 +1,6 @@
-## 0.5.5-canary.122
+## 0.5.5-canary.123
 
+* **fix:**  - 🐛 make comment go back to line and avoid empty text ([#2985](https://github.com/AzzappApp/azzapp/pull/2985))
 * **fix:**  - **android:** [#2941](https://github.com/AzzappApp/azzapp/pull/2941) remove status bar from screen height ([#2982](https://github.com/AzzappApp/azzapp/pull/2982))
 * **fix:**  - 🐛 don't display quit webcard when user has no webcard ([#2981](https://github.com/AzzappApp/azzapp/pull/2981))
 * **fix:**  - [#2971](https://github.com/AzzappApp/azzapp/pull/2971) set distinct rate limiting on web and api ([#2974](https://github.com/AzzappApp/azzapp/pull/2974))
