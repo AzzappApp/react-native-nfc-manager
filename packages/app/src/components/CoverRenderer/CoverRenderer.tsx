@@ -339,7 +339,7 @@ const CoverRenderer = (
   const mediaUri = isSmallCover ? smallURI : uri;
 
   const requestedSize = useMemo(
-    () => (isSmallCover ? COVER_BASE_WIDTH : Dimensions.get('window').width),
+    () => (isSmallCover ? COVER_BASE_WIDTH : Dimensions.get('screen').width),
     [isSmallCover],
   );
 

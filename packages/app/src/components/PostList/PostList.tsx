@@ -1,7 +1,7 @@
 import { FlashList } from '@shopify/flash-list';
 import { useCallback, useMemo, useState } from 'react';
 import { FormattedMessage } from 'react-intl';
-import { useColorScheme, useWindowDimensions, View } from 'react-native';
+import { Dimensions, StatusBar, useColorScheme, View } from 'react-native';
 import { graphql, useFragment } from 'react-relay';
 import { colors } from '#theme';
 import PostRenderer from '#components/PostList/PostRenderer';
@@ -38,6 +38,7 @@ const viewabilityConfig = {
   itemVisiblePercentThreshold: 60,
 };
 
+const { height: windowHeight, width: windowWidth } = Dimensions.get('screen');
 // TODO docs and tests once this component is production ready
 const PostList = ({
   posts: postKey,
@@ -166,7 +167,6 @@ const PostList = ({
     [posts.length],
   );
 
-  const { width: windowWidth, height: windowHeight } = useWindowDimensions();
   const renderItem = useCallback(
     ({ item, extraData }: ListRenderItemInfo<Post>) => {
       return (
@@ -180,7 +180,7 @@ const PostList = ({
         />
       );
     },
-    [onPressAuthor, windowWidth],
+    [onPressAuthor],
   );
 
   const extraData = useMemo(
@@ -199,7 +199,12 @@ const PostList = ({
     () => (
       <View
         style={{
-          height: windowHeight - HEADER_HEIGHT - insets.bottom - insets.top,
+          height:
+            windowHeight -
+            (StatusBar.currentHeight ?? 0) -
+            HEADER_HEIGHT -
+            insets.bottom -
+            insets.top,
           alignItems: 'center',
           justifyContent: 'center',
         }}
@@ -233,7 +238,7 @@ const PostList = ({
         </View>
       </View>
     ),
-    [colorScheme, insets.bottom, insets.top, windowHeight],
+    [colorScheme, insets.bottom, insets.top],
   );
 
   return (

@@ -1,4 +1,4 @@
-import { View } from 'react-native';
+import { Platform, View } from 'react-native';
 import Animated, { FadeInDown, FadeOutDown } from 'react-native-reanimated';
 import { colors } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
@@ -97,7 +97,7 @@ export default PagerHeader;
 
 const CIRCLE_SIZE = 5;
 
-export const PAGER_HEADER_HEIGHT = 85;
+export const PAGER_HEADER_HEIGHT = Platform.OS === 'android' ? 90 : 85;
 
 const styleSheet = createStyleSheet(appearance => ({
   root: {

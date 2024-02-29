@@ -446,7 +446,11 @@ const CoverEditorCustom = ({
   const intl = useIntl();
 
   const tabViewHeight =
-    bottomPanelHeight - insetBottom - BOTTOM_MENU_HEIGHT - 10;
+    bottomPanelHeight -
+    insetBottom -
+    (Platform.OS === 'android' ? 10 : 0) -
+    BOTTOM_MENU_HEIGHT -
+    10;
 
   return (
     //ths container on top avoid some weird feeling when transitionning with transparent backgorund

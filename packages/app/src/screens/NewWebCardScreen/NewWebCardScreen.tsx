@@ -1,6 +1,12 @@
 import { useState, useCallback, useRef } from 'react';
 import { useIntl } from 'react-intl';
-import { PixelRatio, View, useWindowDimensions } from 'react-native';
+import {
+  Dimensions,
+  PixelRatio,
+  Platform,
+  View,
+  useWindowDimensions,
+} from 'react-native';
 import { graphql, usePreloadedQuery } from 'react-relay';
 import { Observable } from 'relay-runtime';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
@@ -61,6 +67,8 @@ const newProfileScreenQueryWithProfile = graphql`
     }
   }
 `;
+
+const { height: windowHeight } = Dimensions.get('screen');
 
 export const NewWebCardScreen = ({
   route: { params },
@@ -161,8 +169,12 @@ export const NewWebCardScreen = ({
 
   // #region Layout
   const insets = useScreenInsets();
-  const { width: windowWidth, height: windowHeight } = useWindowDimensions();
-  const contentHeight = windowHeight - insets.top - PAGER_HEADER_HEIGHT;
+  const { width: windowWidth } = useWindowDimensions();
+  const contentHeight =
+    windowHeight -
+    insets.top -
+    (Platform.OS === 'android' ? insets.bottom : 0) -
+    PAGER_HEADER_HEIGHT;
   // #endregion
 
   const [headerHidden, setHeaderHidden] = useState(false);

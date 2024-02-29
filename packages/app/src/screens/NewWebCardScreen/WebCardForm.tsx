@@ -7,7 +7,7 @@ import {
 } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { useIntl } from 'react-intl';
-import { StyleSheet, View, useWindowDimensions } from 'react-native';
+import { Dimensions, StyleSheet, View } from 'react-native';
 import { KeyboardAvoidingView } from 'react-native-keyboard-controller';
 import {
   fetchQuery,
@@ -64,6 +64,8 @@ const webCardFormSchema = z.object({
 });
 
 type WebCardForm = z.infer<typeof webCardFormSchema>;
+
+const { height: windowHeight } = Dimensions.get('screen');
 
 const WebCardForm = (
   { webCardKind, webCardCategory, onWebCardCreated }: ProfileFormProps,
@@ -317,7 +319,6 @@ const WebCardForm = (
   };
 
   const insets = useScreenInsets();
-  const { height: windowHeight } = useWindowDimensions();
 
   const companyActivityKeyExtractor = useCallback(
     (item: CompanyActivity) => item.id,

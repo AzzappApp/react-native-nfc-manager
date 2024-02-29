@@ -68,7 +68,7 @@ const FollowingsMosaicScreen = ({
   );
 };
 
-const COVER_WIDTH = (Dimensions.get('window').width - 2 * 8) / 2;
+const COVER_WIDTH = (Dimensions.get('screen').width - 2 * 8) / 2;
 
 const styles = StyleSheet.create({
   coverStyle: {

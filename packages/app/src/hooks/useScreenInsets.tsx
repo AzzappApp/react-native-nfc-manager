@@ -12,7 +12,10 @@ const useScreenInsets = () => {
       default: insets.top,
       android: Math.max(insets.top, 15),
     }),
-    bottom: Math.max(insets.bottom, 16),
+    bottom: Platform.select({
+      default: Math.max(insets.bottom, 16),
+      android: Math.max(insets.bottom, 20),
+    }),
   };
 };
 

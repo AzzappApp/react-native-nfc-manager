@@ -10,7 +10,13 @@ import {
   useState,
 } from 'react';
 import { useIntl } from 'react-intl';
-import { View, FlatList, useWindowDimensions, ScrollView } from 'react-native';
+import {
+  View,
+  FlatList,
+  useWindowDimensions,
+  ScrollView,
+  Dimensions,
+} from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { graphql, useLazyLoadQuery, usePaginationFragment } from 'react-relay';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
@@ -329,7 +335,6 @@ const CardTemplateList = (
     return item.id;
   };
 
-  const { height: windowHeight } = useWindowDimensions();
   const { top } = useSafeAreaInsets();
 
   const [selectedCardTemplateType, setSelectedCaredtemplateType] = useState<
@@ -512,6 +517,8 @@ type CoverTemplatePreviewModalProps = {
   onRequestClose: () => void;
 };
 
+const { height: windowHeight, width: windowWidth } = Dimensions.get('screen');
+
 const CardTemplatePreviewModal = ({
   visible,
   webCard,
@@ -526,7 +533,6 @@ const CardTemplatePreviewModal = ({
 
   const intl = useIntl();
 
-  const { height: windowHeight, width: windowWidth } = useWindowDimensions();
   const insets = useScreenInsets();
 
   const previewHeight = windowHeight - insets.top - HEADER_HEIGHT;
