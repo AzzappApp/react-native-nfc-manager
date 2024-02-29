@@ -54,32 +54,34 @@ const CommentItem = ({ item }: CommentItemProps) => {
       />
       <View style={{ flex: 1 }}>
         <View style={{ flexDirection: 'row' }}>
-          {postComment.webCard.cardIsPublished ||
-          (isEditor(profileInfos?.profileRole) &&
-            profileInfos?.webCardId === postComment.webCard.id) ? (
-            <Link
-              route="WEBCARD"
-              params={{ userName: postComment.webCard.userName }}
-            >
-              <Text variant="smallbold">{postComment.webCard.userName} </Text>
-            </Link>
-          ) : (
-            <PressableNative
-              onPress={() =>
-                Toast.show({
-                  type: 'error',
-                  text1: intl.formatMessage({
-                    defaultMessage: 'Oops, this WebCard could not be found.',
-                    description:
-                      'Comment Item - Error message toast when accessing an unpublished webcard',
-                  }) as string,
-                })
-              }
-            >
-              <Text variant="smallbold">{postComment.webCard.userName} </Text>
-            </PressableNative>
-          )}
-          <Text variant="small">{postComment.comment}</Text>
+          <Text variant="small">
+            {postComment.webCard.cardIsPublished ||
+            (isEditor(profileInfos?.profileRole) &&
+              profileInfos?.webCardId === postComment.webCard.id) ? (
+              <Link
+                route="WEBCARD"
+                params={{ userName: postComment.webCard.userName }}
+              >
+                <Text variant="smallbold">{postComment.webCard.userName} </Text>
+              </Link>
+            ) : (
+              <PressableNative
+                onPress={() =>
+                  Toast.show({
+                    type: 'error',
+                    text1: intl.formatMessage({
+                      defaultMessage: 'Oops, this WebCard could not be found.',
+                      description:
+                        'Comment Item - Error message toast when accessing an unpublished webcard',
+                    }) as string,
+                  })
+                }
+              >
+                <Text variant="smallbold">{postComment.webCard.userName} </Text>
+              </PressableNative>
+            )}
+            {postComment.comment.trim()}
+          </Text>
         </View>
         <Text variant="small" style={styles.relativeTime}>
           <FormattedRelativeTime
