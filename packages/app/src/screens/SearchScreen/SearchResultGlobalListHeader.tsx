@@ -82,15 +82,16 @@ const SearchResultGlobalListHeader = ({
           style={styles.coverListStyle}
           withShadow
         />
-        <Button
-          variant="little_round"
-          label={intl.formatMessage({
-            defaultMessage: 'See all',
-            description: 'See all found profiles',
-          })}
-          onPress={goToProfilesTab}
-          style={styles.seeAll}
-        />
+        <View style={styles.seeAll}>
+          <Button
+            variant="little_round"
+            label={intl.formatMessage({
+              defaultMessage: 'See all',
+              description: 'See all found profiles',
+            })}
+            onPress={goToProfilesTab}
+          />
+        </View>
       </View>
       <Text variant="button" style={styles.titleSection}>
         <FormattedMessage
