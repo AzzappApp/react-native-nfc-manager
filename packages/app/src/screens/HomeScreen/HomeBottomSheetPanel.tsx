@@ -332,7 +332,7 @@ const HomeBottomSheetPanel = ({
           }
           return <HomeBottomSheetPanelOption key={index} {...element} />;
         })}
-        {!isOwner(profile?.profileRole) && (
+        {profile && !isOwner(profile?.profileRole) && (
           <PressableNative style={styles.removeButton} onPress={onQuitWebCard}>
             <Text variant="button" style={styles.removeText}>
               <FormattedMessage
