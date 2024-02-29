@@ -1,5 +1,6 @@
-## 0.5.5-canary.118
+## 0.5.5-canary.119
 
+* **fix:**  - 🐛 add option to activate/deactivate offline ([#2973](https://github.com/AzzappApp/azzapp/pull/2973))
 * **fix:**  - remove redundant indexes ([#2969](https://github.com/AzzappApp/azzapp/pull/2969))
 * **fix:**  - **android:** [#2955](https://github.com/AzzappApp/azzapp/pull/2955) seeAll button not visible on android ([#2963](https://github.com/AzzappApp/azzapp/pull/2963))
 * **fix:**  - **android:** [#2962](https://github.com/AzzappApp/azzapp/pull/2962) adjust font size on toast to avoid being cut ([#2964](https://github.com/AzzappApp/azzapp/pull/2964))
