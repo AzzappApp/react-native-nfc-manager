@@ -5,7 +5,6 @@ import ERRORS from '@azzapp/shared/errors';
 import serializeAndSignContactCard from '@azzapp/shared/serializeAndSignContactCard';
 import { simpleHash } from '@azzapp/shared/stringHelpers';
 import {
-  getUserProfileWithWebCardId,
   db,
   getStaticMediasByUsage,
   PostTable,
@@ -38,19 +37,6 @@ export const Profile: ProfileResolvers = {
           assetKind: 'contactCard',
         }
       : null,
-  contactCard: async (profile, _, { auth }) => {
-    const userProfile = auth.userId
-      ? await getUserProfileWithWebCardId(auth.userId, profile.webCardId)
-      : null;
-
-    const isSameWebCard = userProfile?.webCardId === profile.webCardId;
-
-    if (!isSameWebCard && profile.userId !== auth.userId) {
-      return null;
-    }
-
-    return profile.contactCard;
-  },
   statsSummary: async profile => {
     //get data for the last 30 day
     const result = await getLastProfileStatisticsFor(profile.id, 30);

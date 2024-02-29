@@ -1,14 +1,9 @@
-import {
-  connectionFromArray,
-  connectionFromArraySlice,
-  cursorToOffset,
-} from 'graphql-relay';
-import { isAdmin } from '@azzapp/shared/profileHelpers';
+import { connectionFromArraySlice, cursorToOffset } from 'graphql-relay';
 import {
   getCompanyActivitiesByWebCardCategory,
   getCompanyActivityById,
   getWebCardCategoryById,
-  getProfilesPosts,
+  getWebCardPosts,
   isFollowing,
   getCardModules,
   getLastWebCardStatisticsFor,
@@ -84,7 +79,7 @@ export const WebCard: WebCardResolvers = {
 
     const offset = after ? cursorToOffset(after) : 0;
     return connectionFromArraySlice(
-      await getProfilesPosts(webCard.id, first, offset),
+      await getWebCardPosts(webCard.id, first, offset),
       { after, first },
       {
         sliceStart: offset,
@@ -169,47 +164,15 @@ export const WebCard: WebCardResolvers = {
       hasPreviousPage: offset !== null,
     });
   },
-  nbProfiles: async (webCard, _, { auth }) => {
-    const userProfile = auth.userId
-      ? await getUserProfileWithWebCardId(auth.userId, webCard.id)
-      : null;
-    if (
-      !userProfile ||
-      !isAdmin(userProfile.profileRole) ||
-      userProfile.invited
-    ) {
-      return 0;
-    }
+  nbProfiles: async (webCard, _) => {
     const count = await countWebCardProfiles(webCard.id);
     return count;
   },
-  profilePendingOwner: async (webCard, _, { auth }) => {
-    const userProfile = auth.userId
-      ? await getUserProfileWithWebCardId(auth.userId, webCard.id)
-      : null;
-
-    if (
-      !userProfile ||
-      !isAdmin(userProfile.profileRole) ||
-      userProfile.invited
-    ) {
-      return null;
-    }
+  profilePendingOwner: async webCard => {
     const pendingUser = await getWebCardPendingOwnerProfile(webCard.id);
     return pendingUser.length > 0 ? pendingUser[0] : null;
   },
-  profiles: async (webCard, { first, after, search }, { auth }) => {
-    const userProfile = auth.userId
-      ? await getUserProfileWithWebCardId(auth.userId, webCard.id)
-      : null;
-
-    if (
-      !userProfile ||
-      !isAdmin(userProfile.profileRole) ||
-      userProfile.invited
-    ) {
-      return connectionFromArray([], { after, first });
-    }
+  profiles: async (webCard, { first, after, search }) => {
     const limit = first ?? 100;
     const offset = after ? cursorToOffset(after) : 0;
     const profiles = await getWebCardProfiles(webCard.id, {

@@ -1,6 +1,6 @@
 import { GraphQLError } from 'graphql';
 import ERRORS from '@azzapp/shared/errors';
-import { getProfilesPosts, updateWebCard } from '#domains';
+import { getWebCardPosts, updateWebCard } from '#domains';
 import fromGlobalIdWithType from '#helpers/relayIdHelpers';
 import type { MutationResolvers } from '#schema/__generated__/types';
 
@@ -33,7 +33,7 @@ const toggleWebCardPublished: MutationResolvers['toggleWebCardPublished'] =
 
     cardUsernamesToRevalidate.add(webCard.userName);
 
-    const posts = await getProfilesPosts(webCard.id);
+    const posts = await getWebCardPosts(webCard.id);
     posts.forEach(post =>
       postsToRevalidate.add({ id: post.id, userName: webCard.userName }),
     );

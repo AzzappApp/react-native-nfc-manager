@@ -1,9 +1,10 @@
 import { GraphQLError } from 'graphql';
-import { shield, rule } from 'graphql-shield';
+import { shield, rule, allow, or } from 'graphql-shield';
 import ERRORS from '@azzapp/shared/errors';
 import { isAdmin, isEditor, isOwner } from '@azzapp/shared/profileHelpers';
 import { getUserProfileWithWebCardId } from '#domains';
 import fromGlobalIdWithType from '#helpers/relayIdHelpers';
+import type { Profile, User, WebCard } from '#domains';
 import type { ProfileRole, Mutation } from '#schema/__generated__/types';
 import type { GraphQLContext } from './schema/GraphQLContext';
 import type { IRule } from 'graphql-shield';
@@ -15,7 +16,7 @@ const hasRole = (
 ) =>
   rule(`hasRole-${key}`, {
     cache: 'strict',
-  })(async (parent, args, ctx: GraphQLContext, _info) => {
+  })(async (_parent: any, args: any, ctx: GraphQLContext) => {
     if ('webCardId' in args && typeof args.webCardId === 'string') {
       const { userId } = ctx.auth;
       const webCardId = fromGlobalIdWithType(args.webCardId, 'WebCard');
@@ -111,9 +112,102 @@ const ProtectedMutation: Record<
   updateWebCard: isEditorRule,
 };
 
+const isCurrentUserRule = rule('sameProfile', {
+  cache: 'contextual',
+})(async (parent: User, _args, ctx: GraphQLContext) => {
+  return ctx.auth.userId === parent.id;
+});
+
+const isCurrentProfileRule = rule('sameUserProfile', {
+  cache: 'contextual',
+})(async (parent: Profile, _args, ctx: GraphQLContext) => {
+  return ctx.auth.userId === parent.userId;
+});
+
+const isSameWebCard = rule('sameWebCard', {
+  cache: 'contextual',
+})(async (parent: Profile, _args, ctx: GraphQLContext) => {
+  const userProfile = ctx.auth.userId
+    ? await getUserProfileWithWebCardId(ctx.auth.userId, parent.webCardId)
+    : null;
+
+  const isSameWebCard = userProfile?.webCardId === parent.webCardId;
+
+  return isSameWebCard;
+});
+
+const isCurrentWebCardRule = rule('sameUserWebCard', {
+  cache: 'contextual',
+})(async (parent: WebCard, _args, ctx: GraphQLContext) => {
+  const userProfile = ctx.auth.userId
+    ? await getUserProfileWithWebCardId(ctx.auth.userId, parent.id)
+    : null;
+
+  return userProfile !== null;
+});
+
+const hasProfileOnWebCardWithRole = (
+  key: string,
+  checkRole: (p: ProfileRole) => boolean,
+  acceptInvited?: boolean,
+) =>
+  rule(`hasProfileWithRole-${key}`, {
+    cache: 'contextual',
+  })(async (parent: WebCard, _args, ctx: GraphQLContext) => {
+    const profile = ctx.auth.userId
+      ? await getUserProfileWithWebCardId(ctx.auth.userId, parent.id)
+      : null;
+
+    if (
+      !profile ||
+      !checkRole(profile.profileRole) ||
+      (profile.invited && !acceptInvited)
+    ) {
+      throw new GraphQLError(ERRORS.FORBIDDEN);
+    }
+
+    return true;
+  });
+
+const isAdminOnWebCard = hasProfileOnWebCardWithRole('admin', isAdmin);
+
 const permissions = shield(
   {
     Mutation: ProtectedMutation,
+    User: {
+      '*': isCurrentUserRule,
+      email: allow,
+      phoneNumber: allow,
+    },
+    Profile: {
+      '*': isCurrentProfileRule,
+      contactCard: or(isCurrentUserRule, isSameWebCard),
+      user: or(isCurrentUserRule, isSameWebCard),
+      avatar: or(isCurrentUserRule, isSameWebCard),
+      promotedAsOwner: or(isCurrentUserRule, isSameWebCard),
+      invited: or(isCurrentUserRule, isSameWebCard),
+      statsSummary: or(isCurrentUserRule, isSameWebCard),
+      nbContactCardScans: or(isCurrentUserRule, isSameWebCard),
+      profileRole: or(isCurrentUserRule, isSameWebCard),
+    },
+    WebCard: {
+      '*': isCurrentWebCardRule,
+      profilePendingOwner: isAdminOnWebCard,
+      profiles: isAdminOnWebCard,
+      nbProfiles: isAdminOnWebCard,
+      userName: allow,
+      cardIsPublished: allow,
+      cardCover: allow,
+      cardColors: allow,
+      cardStyle: allow,
+      cardModules: allow,
+      isFollowing: allow,
+      posts: allow,
+      nbPosts: allow,
+      nbFollowers: allow,
+      nbFollowings: allow,
+      id: allow,
+    },
   },
   {
     allowExternalErrors: true,

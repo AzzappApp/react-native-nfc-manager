@@ -3,7 +3,7 @@ import type { UserResolvers } from './__generated__/types';
 
 export const User: UserResolvers = {
   profiles: async (user, _args, { auth }) => {
-    if (!auth.userId || auth.userId !== user.id) {
+    if (!auth.userId) {
       return null;
     }
 

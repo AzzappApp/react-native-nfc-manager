@@ -132,7 +132,7 @@ export const getWebCardsPostsWithMedias = async (
  * @param offset The offset of the first post to retrieve
  * @returns A list of post
  */
-export const getProfilesPosts = async (
+export const getWebCardPosts = async (
   webCardId: string,
   limit?: number,
   offset?: number,

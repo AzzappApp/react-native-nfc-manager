@@ -11,7 +11,7 @@ import ERRORS from '@azzapp/shared/errors';
 import {
   checkMedias,
   db,
-  getProfilesPosts,
+  getWebCardPosts,
   referencesMedias,
   updateWebCard,
 } from '#domains';
@@ -121,7 +121,7 @@ const saveCover: MutationResolvers['saveCover'] = async (
     });
 
     cardUsernamesToRevalidate.add(webCard.userName);
-    const posts = await getProfilesPosts(webCard.id);
+    const posts = await getWebCardPosts(webCard.id);
     posts.forEach(post =>
       postsToRevalidate.add({ id: post.id, userName: webCard.userName }),
     );

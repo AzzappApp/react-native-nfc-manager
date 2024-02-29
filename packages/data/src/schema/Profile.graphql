@@ -180,7 +180,7 @@ type Profile implements Node {
   """
   cardTemplates(
     cardTemplateTypeId: String
-    first: Int @max(value: 20)
+    first: Int @max(value: 50)
     after: String
   ): CardTemplateConnection!
 

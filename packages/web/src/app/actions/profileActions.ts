@@ -2,7 +2,7 @@
 
 import { headers } from 'next/headers';
 import {
-  getProfilesPosts,
+  getWebCardPosts,
   getProfilesPostsWithTopComment,
   getPostCommentsWithWebCard,
   getPostByIdWithMedia,
@@ -18,7 +18,7 @@ export const loadProfilePosts = async (
 ) => {
   // @TODO: make this function dynamic with a better mechanism than headers
   headers();
-  return getProfilesPosts(profileId, limit, offset);
+  return getWebCardPosts(profileId, limit, offset);
 };
 
 export const loadOtherPosts = async (
