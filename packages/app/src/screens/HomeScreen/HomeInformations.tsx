@@ -1,5 +1,5 @@
 import _ from 'lodash';
-import { memo, useMemo } from 'react';
+import { memo, useCallback, useMemo } from 'react';
 import { FormattedMessage } from 'react-intl';
 import { StyleSheet, View } from 'react-native';
 import {
@@ -10,8 +10,7 @@ import {
 import { useFragment, graphql } from 'react-relay';
 import { colors } from '#theme';
 import AnimatedText from '#components/AnimatedText';
-import Link from '#components/Link';
-import useAuthState from '#hooks/useAuthState';
+import { useRouter } from '#components/NativeRouter';
 import PressableOpacity from '#ui/PressableOpacity';
 import Text from '#ui/Text';
 import type { HomeInformations_user$key } from '#relayArtifacts/HomeInformations_user.graphql';
@@ -78,18 +77,16 @@ const HomeInformations = ({
   const nbFollowers = useSharedValue('0');
   const nbFollowings = useSharedValue('0');
   //using profiles object directly in animatedReaction causes error animatedHost(seems to be the case for all relay query result)
-  const { profileInfos } = useAuthState();
 
-  const currentProfile = (profiles ?? []).find(
-    p => p.id === profileInfos?.profileId,
+  const inputRange = useMemo(
+    () => _.range(0, profiles?.length),
+    [profiles?.length],
   );
-
-  const inputRange = _.range(0, profiles?.length);
 
   useAnimatedReaction(
     () => currentProfileIndexSharedValue.value,
     actual => {
-      if (actual >= 0 && profiles && profiles?.length > 1) {
+      if (actual >= 0 && inputRange && inputRange?.length > 1) {
         nbLikes.value = format(interpolate(actual, inputRange, nbLikesValue));
         nbPosts.value = format(interpolate(actual, inputRange, nbPostsValue));
         nbFollowers.value = format(
@@ -105,77 +102,93 @@ const HomeInformations = ({
         nbFollowings.value = '0';
       }
     },
-    [profiles],
+    [
+      inputRange,
+      nbFollowersValue,
+      nbFollowingsValue,
+      nbLikesValue,
+      nbPostsValue,
+    ],
   );
+  const router = useRouter();
+  const goToPosts = useCallback(() => {
+    const currentProfile =
+      profiles?.[Math.round(currentProfileIndexSharedValue.value)];
+    if (currentProfile?.webCard.userName) {
+      router.push({
+        route: 'WEBCARD',
+        params: {
+          userName: currentProfile.webCard.userName,
+          webCardId: currentProfile.webCard.id,
+          showPosts: true,
+        },
+      });
+    }
+  }, [currentProfileIndexSharedValue.value, profiles, router]);
 
-  if (!currentProfile) {
-    return null;
-  }
+  const goToLikedPost = useCallback(() => {
+    router.push({
+      route: 'LIKED_POSTS',
+    });
+  }, [router]);
+
+  const goToFollowing = useCallback(() => {
+    router.push({
+      route: 'FOLLOWINGS',
+    });
+  }, [router]);
+
+  const goToFollower = useCallback(() => {
+    router.push({
+      route: 'FOLLOWERS',
+    });
+  }, [router]);
 
   return (
     <View style={[styles.container, { height }]}>
       <View style={styles.row}>
-        <Link
-          route="WEBCARD"
-          params={{
-            userName: currentProfile.webCard.userName,
-            webCardId: currentProfile.webCard.id,
-            showPosts: true,
-          }}
-        >
-          <PressableOpacity style={styles.square}>
-            <AnimatedText variant="xlarge" text={nbPosts} appearance="dark" />
-            <Text variant="small" style={styles.text}>
-              <FormattedMessage
-                defaultMessage="Posts"
-                description="HomeScreen - information panel - Post label"
-              />
-            </Text>
-          </PressableOpacity>
-        </Link>
-        <Link route="LIKED_POSTS">
-          <PressableOpacity style={styles.square}>
-            <AnimatedText variant="xlarge" text={nbLikes} appearance="dark" />
-            <Text variant="small" style={styles.text}>
-              <FormattedMessage
-                defaultMessage="Likes"
-                description="HomeScreen - information panel - Likes label"
-              />
-            </Text>
-          </PressableOpacity>
-        </Link>
+        <PressableOpacity style={styles.square} onPress={goToPosts}>
+          <AnimatedText variant="xlarge" text={nbPosts} appearance="dark" />
+          <Text variant="small" style={styles.text}>
+            <FormattedMessage
+              defaultMessage="Posts"
+              description="HomeScreen - information panel - Post label"
+            />
+          </Text>
+        </PressableOpacity>
+        <PressableOpacity style={styles.square} onPress={goToLikedPost}>
+          <AnimatedText variant="xlarge" text={nbLikes} appearance="dark" />
+          <Text variant="small" style={styles.text}>
+            <FormattedMessage
+              defaultMessage="Likes"
+              description="HomeScreen - information panel - Likes label"
+            />
+          </Text>
+        </PressableOpacity>
       </View>
       <View style={styles.row}>
-        <Link route="FOLLOWERS">
-          <PressableOpacity style={styles.square}>
-            <AnimatedText
-              variant="xlarge"
-              text={nbFollowers}
-              appearance="dark"
+        <PressableOpacity style={styles.square} onPress={goToFollower}>
+          <AnimatedText variant="xlarge" text={nbFollowers} appearance="dark" />
+          <Text variant="small" style={styles.text}>
+            <FormattedMessage
+              defaultMessage="Followers"
+              description="HomeScreen - information panel - Followers label"
             />
-            <Text variant="small" style={styles.text}>
-              <FormattedMessage
-                defaultMessage="Followers"
-                description="HomeScreen - information panel - Followers label"
-              />
-            </Text>
-          </PressableOpacity>
-        </Link>
-        <Link route="FOLLOWINGS">
-          <PressableOpacity style={styles.square}>
-            <AnimatedText
-              variant="xlarge"
-              text={nbFollowings}
-              appearance="dark"
+          </Text>
+        </PressableOpacity>
+        <PressableOpacity style={styles.square} onPress={goToFollowing}>
+          <AnimatedText
+            variant="xlarge"
+            text={nbFollowings}
+            appearance="dark"
+          />
+          <Text variant="small" style={styles.text}>
+            <FormattedMessage
+              defaultMessage="Followings"
+              description="HomeScreen - information panel - Followings label"
             />
-            <Text variant="small" style={styles.text}>
-              <FormattedMessage
-                defaultMessage="Followings"
-                description="HomeScreen - information panel - Followings label"
-              />
-            </Text>
-          </PressableOpacity>
-        </Link>
+          </Text>
+        </PressableOpacity>
       </View>
     </View>
   );

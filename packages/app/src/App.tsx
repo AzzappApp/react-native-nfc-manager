@@ -229,16 +229,6 @@ const AppRouter = () => {
   const { router, routerState } = useNativeRouter(initialRoutes);
   const { authenticated, profileInfos } = useAuthState();
 
-  const hasProfile = !!profileInfos?.profileId;
-  const prevHasProfile = useRef(hasProfile);
-
-  useEffect(() => {
-    if (!hasProfile && prevHasProfile) {
-      prevHasProfile.current = false;
-      router.replaceAll(mainRoutes(true));
-    }
-  }, [hasProfile, router]);
-
   useEffect(() => {
     const currentRoute = router.getCurrentRoute()?.route;
     if (currentRoute) {
