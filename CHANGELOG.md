@@ -1,5 +1,9 @@
-## 0.5.5-canary.117
+## 0.5.5-canary.118
 
+* **fix:**  - remove redundant indexes ([#2969](https://github.com/AzzappApp/azzapp/pull/2969))
+* **fix:**  - **android:** [#2955](https://github.com/AzzappApp/azzapp/pull/2955) seeAll button not visible on android ([#2963](https://github.com/AzzappApp/azzapp/pull/2963))
+* **fix:**  - **android:** [#2962](https://github.com/AzzappApp/azzapp/pull/2962) adjust font size on toast to avoid being cut ([#2964](https://github.com/AzzappApp/azzapp/pull/2964))
+* **fix:**  - **android:** [#2956](https://github.com/AzzappApp/azzapp/pull/2956) screen size ([#2967](https://github.com/AzzappApp/azzapp/pull/2967))
 * **fix:**  - webcard UI ([#2958](https://github.com/AzzappApp/azzapp/pull/2958))
 * **feat:**  - [#2914](https://github.com/AzzappApp/azzapp/pull/2914) add graphql shield ([#2960](https://github.com/AzzappApp/azzapp/pull/2960))
 * **fix:**  - **android:** [#2941](https://github.com/AzzappApp/azzapp/pull/2941) apply bigger margin top to handle ios and android cases ([#2948](https://github.com/AzzappApp/azzapp/pull/2948))
