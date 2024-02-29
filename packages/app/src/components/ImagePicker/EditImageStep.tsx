@@ -212,7 +212,7 @@ const EditImageStep = () => {
             style={{
               flex: 1,
               marginTop: 20,
-              marginBottom: insetBottom + BOTTOM_MENU_HEIGHT,
+              marginBottom: insetBottom + BOTTOM_MENU_HEIGHT + 15,
             }}
           >
             {currentTab === 'filter' && (

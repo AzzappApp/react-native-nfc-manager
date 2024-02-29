@@ -1,6 +1,6 @@
 import { Suspense, useCallback, useRef, useState } from 'react';
 import { useIntl } from 'react-intl';
-import { View, useWindowDimensions } from 'react-native';
+import { Dimensions, StatusBar, View } from 'react-native';
 import { graphql, usePreloadedQuery } from 'react-relay';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
 import { combineLatest } from '@azzapp/shared/observableHelpers';
@@ -25,6 +25,8 @@ import type { CoverEditionRoute } from '#routes';
 import type { Ref } from 'react';
 import type { PreloadedQuery } from 'react-relay';
 
+const { height: windowHeight } = Dimensions.get('screen');
+
 const CoverEditionScreen = ({
   preloadedQuery,
 }: RelayScreenProps<CoverEditionRoute, CoverEditionScreenQuery>) => {
@@ -46,11 +48,14 @@ const CoverEditionScreen = ({
     router.back();
   }, [router]);
 
-  const { height: windowHeight } = useWindowDimensions();
   const insets = useScreenInsets();
 
   const editorHeight =
-    windowHeight - HEADER_HEIGHT - insets.top - insets.bottom;
+    windowHeight -
+    HEADER_HEIGHT -
+    (StatusBar.currentHeight ?? 0) -
+    insets.top -
+    insets.bottom;
 
   return (
     <Container

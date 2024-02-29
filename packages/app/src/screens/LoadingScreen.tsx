@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Dimensions, Image } from 'react-native';
+import { Dimensions, Image, StatusBar } from 'react-native';
 import Animated, {
   Easing,
   runOnJS,
@@ -75,7 +75,7 @@ const LoadingScreen = ({ visible }: LoadingScreenProps) => {
       <ActivityIndicator
         style={{
           position: 'absolute',
-          top: windowHeight / 2 + 40,
+          top: (windowHeight - (StatusBar.currentHeight ?? 0)) / 2 + 40,
           left: (windowWidth - ACTIVITY_INDICATOR_WIDTH) / 2,
         }}
       />

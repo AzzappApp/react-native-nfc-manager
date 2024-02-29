@@ -195,7 +195,7 @@ type Profile implements Node {
   """
   Fetches color palettes
   """
-  colorPalettes(first: Int  @max(value: 50), after: String): ColorPaletteConnection!
+  colorPalettes(first: Int  @max(value: 100), after: String): ColorPaletteConnection!
 }
 
 type SerializedContactCard {

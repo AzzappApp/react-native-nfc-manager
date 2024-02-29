@@ -16,6 +16,7 @@ import {
   useWindowDimensions,
   ScrollView,
   Dimensions,
+  StatusBar,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { graphql, useLazyLoadQuery, usePaginationFragment } from 'react-relay';
@@ -535,7 +536,8 @@ const CardTemplatePreviewModal = ({
 
   const insets = useScreenInsets();
 
-  const previewHeight = windowHeight - insets.top - HEADER_HEIGHT;
+  const previewHeight =
+    windowHeight - insets.top - HEADER_HEIGHT - (StatusBar.currentHeight ?? 0);
 
   if (!visible) {
     return null;
@@ -547,7 +549,7 @@ const CardTemplatePreviewModal = ({
           position: 'absolute',
           top: 0,
           left: 0,
-          height: windowHeight,
+          height: windowHeight - (StatusBar.currentHeight ?? 0),
           width: windowWidth,
           zIndex: 100,
         },

@@ -1,5 +1,5 @@
 import { useMemo, useRef, forwardRef } from 'react';
-import { Dimensions, useWindowDimensions } from 'react-native';
+import { Dimensions, StatusBar, useWindowDimensions } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import Animated, {
   FadeIn,
@@ -76,7 +76,11 @@ const WebCardScreenScrollView = (
       height: interpolate(
         editProgress,
         [0, 1],
-        [windowHeight, (windowHeight - editToGap) / editScale],
+        [
+          windowHeight - (StatusBar.currentHeight ?? 0),
+          (windowHeight - (StatusBar.currentHeight ?? 0) - editToGap) /
+            editScale,
+        ],
       ),
       width: interpolate(
         editProgress,

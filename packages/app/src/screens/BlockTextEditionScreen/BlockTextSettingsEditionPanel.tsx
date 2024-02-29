@@ -203,6 +203,7 @@ const styles = StyleSheet.create({
   paramContainer: {
     width: '100%',
     flex: 1,
+    paddingBottom: 25,
     rowGap: 25,
     justifyContent: 'center',
   },

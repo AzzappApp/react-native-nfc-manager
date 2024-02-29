@@ -573,7 +573,7 @@ const PhotoWithTextAndTitleEditionScreen = ({
         />
       </PressableOpacity>
       <TabView
-        style={{ height: bottomPanelHeight }}
+        style={{ height: bottomPanelHeight, flex: 1 }}
         currentTab={currentTab}
         tabs={[
           {

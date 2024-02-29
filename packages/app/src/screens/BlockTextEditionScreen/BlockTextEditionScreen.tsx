@@ -390,7 +390,10 @@ const BlockTextEditionScreen = ({
         cardStyle={profile?.webCard.cardStyle}
       />
       <TabView
-        style={{ height: bottomPanelHeight }}
+        style={{
+          height: bottomPanelHeight,
+          flex: 1,
+        }}
         currentTab={currentTab}
         tabs={[
           {

@@ -4,6 +4,7 @@ import {
   Dimensions,
   PixelRatio,
   Platform,
+  StatusBar,
   View,
   useWindowDimensions,
 } from 'react-native';
@@ -173,7 +174,7 @@ export const NewWebCardScreen = ({
   const contentHeight =
     windowHeight -
     insets.top -
-    (Platform.OS === 'android' ? insets.bottom : 0) -
+    (Platform.OS === 'android' ? StatusBar.currentHeight ?? 0 : 0) -
     PAGER_HEADER_HEIGHT;
   // #endregion
 

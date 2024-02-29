@@ -7,7 +7,7 @@ import {
 } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { useIntl } from 'react-intl';
-import { Dimensions, StyleSheet, View } from 'react-native';
+import { Dimensions, StatusBar, StyleSheet, View } from 'react-native';
 import { KeyboardAvoidingView } from 'react-native-keyboard-controller';
 import {
   fetchQuery,
@@ -447,7 +447,12 @@ const WebCardForm = (
                     data={companyActivities}
                     selectedItemKey={value}
                     keyExtractor={companyActivityKeyExtractor}
-                    bottomSheetHeight={windowHeight - 90 - insets.top}
+                    bottomSheetHeight={
+                      windowHeight -
+                      90 -
+                      insets.top -
+                      (StatusBar.currentHeight ?? 0)
+                    }
                     onItemSelected={item => onChange(item.id)}
                     bottomSheetTitle={intl.formatMessage({
                       defaultMessage: 'Select an activity',

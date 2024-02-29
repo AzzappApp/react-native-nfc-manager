@@ -55,7 +55,7 @@ type Query {
   """
   The list of color palettes available in the application
   """
-  colorPalettes(first: Int @max(value: 50), after: String): ColorPaletteConnection!
+  colorPalettes(first: Int @max(value: 100), after: String): ColorPaletteConnection!
 }
 
 type WebCardParameters {

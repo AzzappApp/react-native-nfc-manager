@@ -1,7 +1,7 @@
 import { isEqual } from 'lodash';
 import { useEffect, useState } from 'react';
 import { useIntl } from 'react-intl';
-import { Dimensions, View, useColorScheme } from 'react-native';
+import { Dimensions, StatusBar, View, useColorScheme } from 'react-native';
 import { COVER_CARD_RADIUS, COVER_RATIO } from '@azzapp/shared/coverHelpers';
 import { shadow } from '#theme';
 import { RotateButton } from '#components/commonsButtons';
@@ -96,7 +96,12 @@ const CoverEditorCropModal = ({
   const insets = useScreenInsets();
 
   const coverHeight =
-    windowHeight - insets.top - insets.bottom - HEADER_HEIGHT - 180;
+    windowHeight -
+    insets.top -
+    insets.bottom -
+    HEADER_HEIGHT -
+    180 -
+    (StatusBar.currentHeight ?? 0);
 
   const appearance = useColorScheme();
 

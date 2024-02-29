@@ -10,7 +10,7 @@ type CoverTemplate implements Node {
   previewMedia: Media!
   data: CoverTemplateData!
   colorPalette: ColorPalette!
-  colorPalettes(first: Int @max(value: 50), after: String): ColorPaletteConnection!
+  colorPalettes(first: Int @max(value: 100), after: String): ColorPaletteConnection!
 }
 
 enum CoverTemplateKind {

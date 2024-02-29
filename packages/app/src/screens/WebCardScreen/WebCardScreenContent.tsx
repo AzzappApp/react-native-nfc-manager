@@ -1,5 +1,5 @@
 import { Suspense, memo, useCallback, useRef, useState } from 'react';
-import { View, useWindowDimensions } from 'react-native';
+import { Dimensions, StatusBar, View } from 'react-native';
 import Animated, { useAnimatedStyle } from 'react-native-reanimated';
 import Toast from 'react-native-toast-message';
 import { graphql, useFragment } from 'react-relay';
@@ -74,6 +74,8 @@ type WebCardScreenContentProps = {
    */
   onContentPositionChange?: (atTop: boolean) => void;
 };
+
+const { width: windowWidth, height: windowHeight } = Dimensions.get('screen');
 
 /**
  * This component render the content of the Web card.
@@ -292,7 +294,6 @@ const WebCardScreenContent = ({
     [onContentPositionChange],
   );
 
-  const { width: windowWidth, height: windowHeight } = useWindowDimensions();
   const coverBackgroundColor =
     swapColor(webCard.cardCover?.backgroundColor, webCard.cardColors) ??
     webCard.cardColors?.light ??
@@ -353,7 +354,10 @@ const WebCardScreenContent = ({
               <View
                 style={{
                   height: 60,
-                  maxHeight: windowHeight - windowWidth / COVER_RATIO,
+                  maxHeight:
+                    windowHeight -
+                    (StatusBar.currentHeight ?? 0) -
+                    windowWidth / COVER_RATIO,
                   justifyContent: 'center',
                   alignItems: 'center',
                 }}
