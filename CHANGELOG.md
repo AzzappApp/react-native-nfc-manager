@@ -1,5 +1,8 @@
-## 0.5.5-canary.123
+## 0.5.5-canary.124
 
+* **fix:**  - **android:** [#2978](https://github.com/AzzappApp/azzapp/pull/2978) add padding on top ([#2986](https://github.com/AzzappApp/azzapp/pull/2986))
+* **fix:**  - **webCard:** [#2606](https://github.com/AzzappApp/azzapp/pull/2606) set higher boundaries ([#2987](https://github.com/AzzappApp/azzapp/pull/2987))
+* **fix:**  - force refresh user list on add (best and simple way to handle with pagination)
 * **fix:**  - 🐛 make comment go back to line and avoid empty text ([#2985](https://github.com/AzzappApp/azzapp/pull/2985))
 * **fix:**  - **android:** [#2941](https://github.com/AzzappApp/azzapp/pull/2941) remove status bar from screen height ([#2982](https://github.com/AzzappApp/azzapp/pull/2982))
 * **fix:**  - 🐛 don't display quit webcard when user has no webcard ([#2981](https://github.com/AzzappApp/azzapp/pull/2981))
