@@ -25,6 +25,7 @@ import { useRouter } from '#components/NativeRouter';
 import ScreenModal from '#components/ScreenModal';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import useAuthState from '#hooks/useAuthState';
+import { useFocusEffect } from '#hooks/useFocusEffect';
 import Button from '#ui/Button';
 import Container from '#ui/Container';
 import Icon from '#ui/Icon';
@@ -112,7 +113,7 @@ const MultiUserScreenUserList = ({
         )
         @argumentDefinitions(
           after: { type: String }
-          first: { type: Int, defaultValue: 5 }
+          first: { type: Int, defaultValue: 50 }
           search: { type: String }
         ) {
           profiles(search: $search, after: $after, first: $first)
@@ -178,7 +179,7 @@ const MultiUserScreenUserList = ({
 
   const onEndReached = useCallback(() => {
     if (hasNext && !isLoadingNext) {
-      loadNext(5);
+      loadNext(50);
     }
   }, [hasNext, isLoadingNext, loadNext]);
 
@@ -190,6 +191,8 @@ const MultiUserScreenUserList = ({
       setRefreshing(false);
     }
   }, [isLoadingNext, refetch]);
+
+  useFocusEffect(onRefresh);
 
   const { profileInfos } = useAuthState();
 
