@@ -5,6 +5,7 @@ import {
   useCallback,
   useContext,
   useImperativeHandle,
+  useMemo,
   useRef,
 } from 'react';
 
@@ -81,6 +82,8 @@ export type PostRendererProps = ViewProps & {
   onPressAuthor?: () => void;
 
   actionEnabled?: boolean;
+
+  showUnpublished?: boolean;
 };
 
 export type PostRendererHandle = {
@@ -100,6 +103,7 @@ const PostRenderer = (
     initialTime,
     onPressAuthor,
     actionEnabled = true,
+    showUnpublished = false,
     ...props
   }: PostRendererProps,
   forwardedRef: ForwardedRef<PostRendererHandle>,
@@ -123,6 +127,7 @@ const PostRenderer = (
   const author = useFragment(
     graphql`
       fragment PostRendererFragment_author on WebCard {
+        id
         cardIsPublished
         ...AuthorCartoucheFragment_webCard
       }
@@ -210,6 +215,11 @@ const PostRenderer = (
     openModal();
   };
 
+  const showUnpublishedOverlay = useMemo(() => {
+    if (showUnpublished) return false;
+    else return !author.cardIsPublished;
+  }, [author.cardIsPublished, showUnpublished]);
+
   return (
     <View {...props}>
       <View style={styles.headerView}>
@@ -228,7 +238,7 @@ const PostRenderer = (
         />
       </View>
       <View style={styles.mediaContainer}>
-        {author.cardIsPublished === false ? (
+        {showUnpublishedOverlay ? (
           <View style={styles.unpublishedOverlay}>
             <Icon icon="bloc" size={48} style={styles.unpublishedIcon} />
           </View>

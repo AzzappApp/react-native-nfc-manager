@@ -31,6 +31,7 @@ type PostListProps = ViewProps & {
   loading?: boolean;
   contentContainerStyle?: ContentStyle;
   onPressAuthor?: () => void;
+  showUnpublished?: boolean;
 };
 
 const viewabilityConfig = {
@@ -50,6 +51,7 @@ const PostList = ({
   onEndReached,
   onRefresh,
   onPressAuthor,
+  showUnpublished = false,
   ...props
 }: PostListProps) => {
   const posts = useFragment(
@@ -177,6 +179,7 @@ const PostList = ({
           onPressAuthor={onPressAuthor}
           author={item.webCard ?? extraData.author!}
           actionEnabled={extraData.postActionEnabled}
+          showUnpublished={extraData.showUnpublished}
         />
       );
     },
@@ -184,8 +187,8 @@ const PostList = ({
   );
 
   const extraData = useMemo(
-    () => ({ canPlay, author, postActionEnabled }),
-    [canPlay, author, postActionEnabled],
+    () => ({ canPlay, author, postActionEnabled, showUnpublished }),
+    [canPlay, author, postActionEnabled, showUnpublished],
   );
 
   const ListFooterComponent = useMemo(
