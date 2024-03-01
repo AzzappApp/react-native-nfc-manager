@@ -1,5 +1,6 @@
-## 0.5.5-canary.127
+## 0.5.5-canary.128
 
+* **feat:**  - Email sign v2 ([#3002](https://github.com/AzzappApp/azzapp/pull/3002))
 * **fix:**  - put back method
 * **fix:**  - **post:** [#2991](https://github.com/AzzappApp/azzapp/pull/2991) mixed webcard ids on like ([#2996](https://github.com/AzzappApp/azzapp/pull/2996))
 * **fix:**  - [#2914](https://github.com/AzzappApp/azzapp/pull/2914) security - don’t use raw json input ([#2998](https://github.com/AzzappApp/azzapp/pull/2998))
