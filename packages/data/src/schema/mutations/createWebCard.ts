@@ -40,7 +40,7 @@ const createWebCardMutation: MutationResolvers['createWebCard'] = async (
   if (type !== 'WebCardCategory') {
     throw new GraphQLError(ERRORS.INVALID_REQUEST);
   }
-  const webCardCategory = await getWebCardCategoryById(webCardCategoryId);
+  const webCardCategory = await loaders.WebCardCategory.load(webCardCategoryId);
   if (!webCardCategory) {
     throw new GraphQLError(ERRORS.INVALID_REQUEST);
   }

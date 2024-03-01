@@ -10,6 +10,7 @@ import {
 } from 'drizzle-orm/mysql-core';
 import db, { cols } from './db';
 import { FollowTable } from './follows';
+import { UserTable } from './users';
 import { WebCardTable } from './webCards';
 import type { DbTransaction } from './db';
 import type { WebCard } from './webCards';
@@ -190,7 +191,6 @@ export const updateProfile = async (
     .where(eq(ProfileTable.id, profileId));
 };
 export const getRecommendedWebCards = async (
-  profileId: string,
   webCardId: string,
 ): Promise<WebCard[]> => {
   return db
@@ -283,26 +283,6 @@ export const getWebCardProfiles = async (
   ).rows as Profile[];
 
 /**
- * The the profile owner of a webcard
- *
- * @param {string} webCardId
- * @param {DbTransaction} [tx=db]
- * @returns {Promise<Profile[]>} the list of profiles that are owner (for now there is only one)
- */
-export const getWebCardOwnerProfile = async (
-  webCardId: string,
-  tx: DbTransaction = db,
-) =>
-  tx
-    .select()
-    .from(ProfileTable)
-    .where(
-      and(
-        eq(ProfileTable.webCardId, webCardId),
-        eq(ProfileTable.profileRole, 'owner'),
-      ),
-    );
-/**
  * Count the number of profiles associated to a webCard
  *
  * @param {string} webCardId
@@ -338,3 +318,22 @@ export const getWebCardPendingOwnerProfile = async (
         eq(ProfileTable.promotedAsOwner, true),
       ),
     );
+
+export const getOwner = async (webCardId: string) => {
+  return db
+    .select()
+    .from(ProfileTable)
+    .innerJoin(UserTable, eq(UserTable.id, ProfileTable.userId))
+    .where(
+      and(
+        eq(ProfileTable.webCardId, webCardId),
+        eq(ProfileTable.profileRole, 'owner'),
+      ),
+    )
+    .then(res => {
+      const user = res.pop();
+
+      if (!user) return null;
+      return user.User;
+    });
+};

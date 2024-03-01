@@ -12,7 +12,6 @@ import {
   getFollowerProfiles,
   getFollowingsWebCard,
   getFollowingsPosts,
-  getUserProfileWithWebCardId,
   getWebCardProfiles,
   countWebCardProfiles,
   getWebCardPendingOwnerProfile,
@@ -31,9 +30,9 @@ import type {
 
 export const WebCard: WebCardResolvers = {
   id: idResolver('WebCard'),
-  webCardCategory: async (webCard, _) => {
+  webCardCategory: async (webCard, _, { loaders }) => {
     return webCard.webCardCategoryId
-      ? getWebCardCategoryById(webCard.webCardCategoryId)
+      ? loaders.WebCardCategory.load(webCard.webCardCategoryId)
       : null;
   },
   companyActivity: async (webCard, _) => {
@@ -47,9 +46,12 @@ export const WebCard: WebCardResolvers = {
     }
     return webCard;
   },
-  cardModules: async (webCard, _, { auth }) => {
+  cardModules: async (webCard, _, { auth, loaders }) => {
     const profile = auth.userId
-      ? await getUserProfileWithWebCardId(auth.userId, webCard.id)
+      ? await loaders.profileByWebCardIdAndUserId.load({
+          userId: auth.userId,
+          webCardId: webCard.id,
+        })
       : null;
 
     if (!webCard.cardIsPublished && !profile) {
@@ -103,7 +105,18 @@ export const WebCard: WebCardResolvers = {
       hasPreviousPage: offset !== null,
     });
   },
-  owner: async webCard => getOwner(webCard.id),
+  owner: async (webCard, _args, { auth, loaders }) => {
+    const profile = auth.userId
+      ? await loaders.profileByWebCardIdAndUserId.load({
+          userId: auth.userId,
+          webCardId: webCard.id,
+        })
+      : null;
+
+    return profile?.profileRole === 'owner'
+      ? loaders.User.load(auth.userId!)
+      : getOwner(webCard.id);
+  },
   followers: async (webCard, args) => {
     const first = args.first ?? 50;
     const offset = args.after ? cursorToDate(args.after) : null;

@@ -96,7 +96,7 @@ export const Profile: ProfileResolvers = {
 
     // TODO dummy implementation just to test frontend
     return connectionFromArray(
-      await getRecommendedWebCards(profile.id, profile.webCardId),
+      await getRecommendedWebCards(profile.webCardId),
       args,
     );
   },

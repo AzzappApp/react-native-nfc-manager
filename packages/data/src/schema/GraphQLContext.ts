@@ -18,6 +18,7 @@ import {
   ProfileTable,
   StaticMediaTable,
   UserTable,
+  getUserProfileWithWebCardId,
 } from '#domains';
 import { sortEntitiesByIds } from '#domains/generic';
 import { WebCardTable } from '#domains/webCards';
@@ -131,6 +132,12 @@ type EntityToType<T extends Entity> = {
 
 type Loaders = {
   [T in Entity]: DataLoader<string, EntityToType<T> | null>;
+} & {
+  profileByWebCardIdAndUserId: DataLoader<
+    { userId: string; webCardId: string },
+    Profile | null,
+    string
+  >;
 };
 
 const entitiesTable = {
@@ -181,9 +188,29 @@ const dataLoadersOptions = {
   batchScheduleFn: setTimeout,
 };
 
+const profileByWebCardIdAndUserIdLoader = new DataLoader<
+  { userId: string; webCardId: string },
+  Profile | null,
+  string
+>(
+  async keys => {
+    return Promise.all(
+      keys.map(key => getUserProfileWithWebCardId(key.userId, key.webCardId)),
+    );
+  },
+  {
+    ...dataLoadersOptions,
+    cacheKeyFn: key => `${key.userId}-${key.webCardId}`,
+  },
+);
+
 const createLoaders = (): Loaders =>
   new Proxy({} as Loaders, {
-    get: (loaders: Loaders, entity: Entity) => {
+    get: (loaders: Loaders, entity: Entity | 'profileByWebCardIdAndUserId') => {
+      if (entity === 'profileByWebCardIdAndUserId') {
+        return profileByWebCardIdAndUserIdLoader;
+      }
+
       if (!entities.includes(entity)) {
         throw new Error(`Unknown entity ${entity}`);
       }

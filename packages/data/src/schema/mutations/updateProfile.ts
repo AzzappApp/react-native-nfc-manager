@@ -1,7 +1,7 @@
 import { GraphQLError } from 'graphql';
 import ERRORS from '@azzapp/shared/errors';
 import { isAdmin, isOwner } from '@azzapp/shared/profileHelpers';
-import { getUserProfileWithWebCardId, updateProfile } from '#domains';
+import { updateProfile } from '#domains';
 import fromGlobalIdWithType from '#helpers/relayIdHelpers';
 import type { GraphQLContext } from '#index';
 import type { MutationResolvers } from '#schema/__generated__/types';
@@ -23,7 +23,10 @@ const updateProfileMutation: MutationResolvers['updateProfile'] = async (
 
   const currentProfile =
     userId &&
-    (await getUserProfileWithWebCardId(userId, targetProfile.webCardId));
+    (await loaders.profileByWebCardIdAndUserId.load({
+      userId,
+      webCardId: targetProfile.webCardId,
+    }));
 
   if (!currentProfile) {
     throw new GraphQLError(ERRORS.UNAUTHORIZED);

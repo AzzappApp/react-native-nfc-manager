@@ -2,7 +2,6 @@ import { GraphQLError } from 'graphql';
 import { shield, rule, allow, or } from 'graphql-shield';
 import ERRORS from '@azzapp/shared/errors';
 import { isAdmin, isEditor, isOwner } from '@azzapp/shared/profileHelpers';
-import { getUserProfileWithWebCardId } from '#domains';
 import fromGlobalIdWithType from '#helpers/relayIdHelpers';
 import type { Profile, User, WebCard } from '#domains';
 import type { ProfileRole, Mutation } from '#schema/__generated__/types';
@@ -21,7 +20,11 @@ const hasRole = (
       const { userId } = ctx.auth;
       const webCardId = fromGlobalIdWithType(args.webCardId, 'WebCard');
       const profile =
-        userId && (await getUserProfileWithWebCardId(userId, webCardId));
+        userId &&
+        (await ctx.loaders.profileByWebCardIdAndUserId.load({
+          userId,
+          webCardId,
+        }));
 
       if (
         !profile ||
@@ -128,7 +131,10 @@ const isSameWebCard = rule('sameWebCard', {
   cache: 'contextual',
 })(async (parent: Profile, _args, ctx: GraphQLContext) => {
   const userProfile = ctx.auth.userId
-    ? await getUserProfileWithWebCardId(ctx.auth.userId, parent.webCardId)
+    ? await ctx.loaders.profileByWebCardIdAndUserId.load({
+        userId: ctx.auth.userId,
+        webCardId: parent.webCardId,
+      })
     : null;
 
   const isSameWebCard = userProfile?.webCardId === parent.webCardId;
@@ -140,7 +146,10 @@ const isCurrentWebCardRule = rule('sameUserWebCard', {
   cache: 'contextual',
 })(async (parent: WebCard, _args, ctx: GraphQLContext) => {
   const userProfile = ctx.auth.userId
-    ? await getUserProfileWithWebCardId(ctx.auth.userId, parent.id)
+    ? await ctx.loaders.profileByWebCardIdAndUserId.load({
+        userId: ctx.auth.userId,
+        webCardId: parent.id,
+      })
     : null;
 
   return userProfile !== null;
@@ -155,7 +164,10 @@ const hasProfileOnWebCardWithRole = (
     cache: 'contextual',
   })(async (parent: WebCard, _args, ctx: GraphQLContext) => {
     const profile = ctx.auth.userId
-      ? await getUserProfileWithWebCardId(ctx.auth.userId, parent.id)
+      ? await ctx.loaders.profileByWebCardIdAndUserId.load({
+          userId: ctx.auth.userId,
+          webCardId: parent.id,
+        })
       : null;
 
     if (

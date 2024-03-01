@@ -9,7 +9,6 @@ import {
   getCardModules,
   getCardStyleById,
   getCardTemplateById,
-  getUserProfileWithWebCardId,
   referencesMedias,
   updateProfile,
   updateWebCard,
@@ -26,7 +25,8 @@ const loadCardTemplateMutation: MutationResolvers['loadCardTemplate'] = async (
   const { userId } = auth;
   const webCardId = fromGlobalIdWithType(gqlWebCardId, 'WebCard');
   const profile =
-    userId && (await getUserProfileWithWebCardId(userId, webCardId));
+    userId &&
+    (await loaders.profileByWebCardIdAndUserId.load({ userId, webCardId }));
 
   if (!profile) {
     throw new GraphQLError(ERRORS.UNAUTHORIZED);

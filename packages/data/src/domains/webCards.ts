@@ -11,9 +11,8 @@ import {
 } from 'drizzle-orm/mysql-core';
 import db, { cols } from './db';
 import { FollowTable } from './follows';
-import { ProfileTable } from './profiles';
 import { RedirectWebCardTable } from './redirectWebCard';
-import { getUserById, UserTable } from './users';
+import { getUserById } from './users';
 import type { DbTransaction } from './db';
 import type { CardStyle } from '@azzapp/shared/cardHelpers';
 import type {
@@ -342,24 +341,5 @@ export const getWebCardByUserNameWithRedirection = async (
         }
       }
       return null;
-    });
-};
-
-export const getOwner = async (webCardId: string) => {
-  return db
-    .select()
-    .from(UserTable)
-    .innerJoin(ProfileTable, eq(ProfileTable.userId, UserTable.id))
-    .where(
-      and(
-        eq(ProfileTable.webCardId, webCardId),
-        eq(ProfileTable.profileRole, 'owner'),
-      ),
-    )
-    .then(res => {
-      const user = res.pop();
-
-      if (!user) return null;
-      return user.User;
     });
 };
