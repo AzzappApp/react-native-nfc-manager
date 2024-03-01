@@ -1,7 +1,7 @@
 import { omit } from 'lodash';
 import { useCallback, useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
-import { StyleSheet } from 'react-native';
+import { Platform, StyleSheet } from 'react-native';
 import { useSharedValue } from 'react-native-reanimated';
 import { graphql, useFragment, useMutation } from 'react-relay';
 
@@ -411,7 +411,10 @@ const BlockTextEditionScreen = ({
                 verticalSpacing={verticalSpacing}
                 style={{
                   flex: 1,
-                  marginBottom: insetBottom + BOTTOM_MENU_HEIGHT,
+                  marginBottom:
+                    insetBottom +
+                    BOTTOM_MENU_HEIGHT +
+                    (Platform.OS === 'android' ? 15 : 0),
                 }}
                 bottomSheetHeight={bottomPanelHeight}
                 onTouched={onTouched}
@@ -446,7 +449,10 @@ const BlockTextEditionScreen = ({
                 bottomSheetHeight={bottomPanelHeight}
                 style={{
                   flex: 1,
-                  marginBottom: insetBottom + BOTTOM_MENU_HEIGHT,
+                  marginBottom:
+                    insetBottom +
+                    BOTTOM_MENU_HEIGHT +
+                    (Platform.OS === 'android' ? 15 : 0),
                 }}
                 onTouched={onTouched}
               />

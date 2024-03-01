@@ -1,7 +1,7 @@
 import { omit } from 'lodash';
 import { useCallback, useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
-import { StyleSheet } from 'react-native';
+import { Platform, StyleSheet } from 'react-native';
 import { useSharedValue } from 'react-native-reanimated';
 import Toast from 'react-native-toast-message';
 import { graphql, useFragment, useMutation } from 'react-relay';
@@ -583,7 +583,10 @@ const PhotoWithTextAndTitleEditionScreen = ({
                 webCard={profile?.webCard ?? null}
                 style={{
                   flex: 1,
-                  marginBottom: insetBottom + BOTTOM_MENU_HEIGHT,
+                  marginBottom:
+                    insetBottom +
+                    BOTTOM_MENU_HEIGHT +
+                    (Platform.OS === 'android' ? 15 : 0),
                 }}
                 bottomSheetHeight={bottomPanelHeight}
                 titleFontFamily={titleFontFamily}
@@ -620,7 +623,10 @@ const PhotoWithTextAndTitleEditionScreen = ({
                 aspectRatio={aspectRatio}
                 style={{
                   flex: 1,
-                  marginBottom: insetBottom + BOTTOM_MENU_HEIGHT,
+                  marginBottom:
+                    insetBottom +
+                    BOTTOM_MENU_HEIGHT +
+                    (Platform.OS === 'android' ? 15 : 0),
                 }}
                 onTouched={onTouched}
               />
@@ -636,7 +642,10 @@ const PhotoWithTextAndTitleEditionScreen = ({
                 gap={gap}
                 style={{
                   flex: 1,
-                  marginBottom: insetBottom + BOTTOM_MENU_HEIGHT,
+                  marginBottom:
+                    insetBottom +
+                    BOTTOM_MENU_HEIGHT +
+                    (Platform.OS === 'android' ? 15 : 0),
                 }}
                 onTouched={onTouched}
               />
