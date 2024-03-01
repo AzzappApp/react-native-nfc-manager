@@ -189,6 +189,8 @@ const permissions = shield(
       statsSummary: or(isCurrentUserRule, isSameWebCard),
       nbContactCardScans: or(isCurrentUserRule, isSameWebCard),
       profileRole: or(isCurrentUserRule, isSameWebCard),
+      id: or(isCurrentUserRule, isSameWebCard),
+      webCard: or(isCurrentUserRule, isSameWebCard),
     },
     WebCard: {
       '*': isCurrentWebCardRule,
