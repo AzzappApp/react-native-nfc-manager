@@ -1,5 +1,10 @@
-## 0.5.5-canary.126
+## 0.5.5-canary.127
 
+* **fix:**  - put back method
+* **fix:**  - **post:** [#2991](https://github.com/AzzappApp/azzapp/pull/2991) mixed webcard ids on like ([#2996](https://github.com/AzzappApp/azzapp/pull/2996))
+* **fix:**  - [#2914](https://github.com/AzzappApp/azzapp/pull/2914) security - don’t use raw json input ([#2998](https://github.com/AzzappApp/azzapp/pull/2998))
+* **fix:**  - **modules:** [#2954](https://github.com/AzzappApp/azzapp/pull/2954) increase a bit margin for android ([#2999](https://github.com/AzzappApp/azzapp/pull/2999))
+* **perf:**  - [#2446](https://github.com/AzzappApp/azzapp/pull/2446) improve owner query and use cached profile when himself ([#3000](https://github.com/AzzappApp/azzapp/pull/3000))
 * **fix:**  - **multiUser:** [#2992](https://github.com/AzzappApp/azzapp/pull/2992) extend permissions when same webCard ([#2995](https://github.com/AzzappApp/azzapp/pull/2995))
 * **fix:**  - show unpublished post in my post list ([#2997](https://github.com/AzzappApp/azzapp/pull/2997))
 * **fix:**  - **android:** [#2978](https://github.com/AzzappApp/azzapp/pull/2978) add padding on top ([#2986](https://github.com/AzzappApp/azzapp/pull/2986))
