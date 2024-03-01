@@ -32,6 +32,7 @@ const title = style({
   textAlign: 'center',
   fontFamily: 'Helvetica Neue',
   fontSize: '20px',
+  marginBottom: '20px',
 });
 
 const openIcon = style({
@@ -91,7 +92,7 @@ const simpleButton = style({
   width: 125,
   padding: '10px, 15px, 10px, 15px',
   borderRadius: 48,
-  boxShadow: '0px 4px 16px 0px rgba(0, 0, 0, 0.25)',
+  border: '1px solid black',
   fontSize: 12,
   flexDirection: 'row',
   display: 'flex',
@@ -111,7 +112,7 @@ const tableFull = style({
   borderRadius: ' 20px',
   overflow: 'hidden',
   gap: ' 15px',
-  marginTop: 50,
+  marginTop: 30,
 });
 
 const tableButton = style({

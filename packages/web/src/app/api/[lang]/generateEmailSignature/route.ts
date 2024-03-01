@@ -53,34 +53,50 @@ const generateEmailSignature = async (req: Request) => {
         res.WebCard.commonInformation,
       );
 
+    const mailParam: Record<string, Array<{ number: string }> | string> = {
+      webCardUrl,
+      qrCode: await QRCode.toDataURL(
+        `${process.env.NEXT_PUBLIC_URL}${res.WebCard?.userName}`,
+      ), // qrCode is a simple to send to the profile page only (per spec)
+      linkUrl: buildEmailSignatureGenerationUrl(
+        res.WebCard.userName,
+        data,
+        signature,
+        contactCardData,
+        contactCardSignature,
+      ),
+    };
+    const displayName = formatDisplayName(
+      res?.Profile?.contactCard?.firstName,
+      res?.Profile?.contactCard?.lastName,
+    );
+    if (displayName) {
+      mailParam.displayName = displayName;
+    }
+    if (res?.Profile?.contactCard?.title) {
+      mailParam.title = res?.Profile?.contactCard?.title;
+    }
+    if (res?.Profile?.contactCard?.company) {
+      mailParam.company = res?.Profile?.contactCard?.company;
+    }
+    if (res?.Profile?.contactCard?.phoneNumbers) {
+      mailParam.phones = res?.Profile?.contactCard?.phoneNumbers.map(item => ({
+        number: item.number,
+      }));
+    }
+
+    const formattedAvatarUrl = await buildAvatarUrl(res.Profile, null);
+    if (formattedAvatarUrl) {
+      mailParam.avatarUrl = formattedAvatarUrl;
+    }
     const userEmail = await getUserById(userId);
+
     if (userEmail?.email) {
       const msg = {
         to: userEmail.email,
         from: SENDGRIP_NOREPLY_SENDER,
         templateId: 'd-4a7abf7cd3274be1b59bd825618b50c5',
-        dynamic_template_data: {
-          webCardUrl,
-          displayName: formatDisplayName(
-            res?.Profile?.contactCard?.firstName,
-            res?.Profile?.contactCard?.lastName,
-          ),
-          qrCode: await QRCode.toDataURL(
-            `${process.env.NEXT_PUBLIC_URL}${res.WebCard?.userName}`,
-          ), // qrCode is a simple to send to the profile page only (per spec)
-          title: res?.Profile?.contactCard?.title,
-          company: res?.Profile?.contactCard?.company,
-          phones: res?.Profile?.contactCard?.phoneNumbers,
-          //we only want the profile avatar not the webcard as spec
-          avatarUrl: await buildAvatarUrl(res.Profile, null),
-          linkUrl: buildEmailSignatureGenerationUrl(
-            res.WebCard.userName,
-            data,
-            signature,
-            contactCardData,
-            contactCardSignature,
-          ),
-        },
+        dynamic_template_data: mailParam,
       };
 
       await sgMail.send(msg);

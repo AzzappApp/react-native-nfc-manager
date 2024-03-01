@@ -86,11 +86,10 @@ const FullEmailSignature = ({
 
   const handleCopySignature = async (mode: 'full' | 'simple') => {
     const compressedContactCard = searchParams.get('c') ?? '';
-
     const url =
       mode === 'full'
         ? buildCardSignature(
-            buildUserUrl(webCard.userName) + compressedContactCard,
+            buildUserUrl(webCard.userName) + '?c=' + compressedContactCard,
             contact?.avatar,
             webCardUrl,
             formatDisplayName(contact?.firstName, contact?.lastName),
@@ -100,7 +99,7 @@ const FullEmailSignature = ({
             contact?.phoneNumbers,
           )
         : buildSaveMyContactSignature(
-            buildUserUrl(webCard.userName) + compressedContactCard,
+            buildUserUrl(webCard.userName) + '?c=' + compressedContactCard,
           );
 
     const type = 'text/html';
@@ -297,6 +296,42 @@ const FullEmailSignature = ({
       >
         Copy my email signature
       </Button>
+      <div
+        style={{
+          alignItems: 'flex-start',
+          display: 'flex',
+          flexDirection: 'column',
+        }}
+      >
+        <div className={styles.title}>
+          How to add the button to your email signature
+        </div>
+        <div className={styles.stepText}>STEP 1</div>
+        <div className={styles.stepDesc}> Copy the button</div>
+        <div className={styles.separator} />
+        <div className={styles.stepText}>STEP 2</div>
+        <div className={styles.stepDesc}>
+          Within your Gmail account, click the gear icon on the top right,
+          select the “See all settings” option and scroll down to the
+          “Signature” section
+        </div>
+        <div className={styles.separator} />
+        <div className={styles.stepText}>STEP 3</div>
+        <div className={styles.stepDesc}>
+          {mode === 'simple'
+            ? `Select the “Create new” option and paste your button into the text
+            box, or paste the button in an existing signature`
+            : `Select the “Create new” option and paste your signature into the text box.`}
+        </div>
+        <div className={styles.separator} />
+        <div className={styles.stepText}>STEP 4</div>
+        <div className={styles.stepDesc}>
+          In the “Signature Defaults” subsection, select your newly created
+          signature as default and then scroll down to the very bottom of the
+          page and select the “Save” button
+        </div>
+        <div className={styles.separator} />
+      </div>
     </React.Fragment>
   );
 };

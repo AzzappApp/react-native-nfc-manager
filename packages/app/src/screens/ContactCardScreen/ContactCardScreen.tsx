@@ -158,13 +158,33 @@ export const ContactCardScreen = ({
   );
 
   const generateEmail = useCallback(async () => {
+    if (!currentUser?.email) {
+      Toast.show({
+        type: 'error',
+        text1: intl.formatMessage({
+          defaultMessage:
+            'Please add an email address to your account to receive your email signature',
+          description:
+            'Toast message  if the user as not mail while generating email signature for the user',
+        }),
+      });
+      return;
+    }
     if (profile?.id && webCard?.id) {
       await generateEmailSignature({
         locale: intl.locale,
         profileId: fromGlobalId(profile.id).id,
       });
+      Toast.show({
+        type: 'success',
+        text1: intl.formatMessage({
+          defaultMessage: 'An email has been sent to you',
+          description:
+            'Toast message while generating email signature for the user',
+        }),
+      });
     }
-  }, [intl.locale, profile?.id, webCard?.id]);
+  }, [currentUser?.email, intl, profile?.id, webCard?.id]);
 
   const [contactCardEditModal, toggleContactEditModal] = useToggle(false);
 
@@ -296,22 +316,19 @@ export const ContactCardScreen = ({
                 </Text>
               </PressableNative>
             </View>
-
             {webCard && (
               <ContactCardExportVcf
                 userName={webCard.userName}
                 profile={profile}
               />
             )}
-            {currentUser?.email && (
-              <Button
-                label={intl.formatMessage({
-                  defaultMessage: 'Generate an email Signature',
-                  description: 'Generate an email Signature button label',
-                })}
-                onPress={generateEmail}
-              />
-            )}
+            <Button
+              label={intl.formatMessage({
+                defaultMessage: 'Generate an email Signature',
+                description: 'Generate an email Signature button label',
+              })}
+              onPress={generateEmail}
+            />
           </View>
         </Animated.View>
         <ScreenModal visible={contactCardEditModal} animationType="slide">
