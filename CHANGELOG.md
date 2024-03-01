@@ -1,5 +1,6 @@
-## 0.5.5-canary.125
+## 0.5.5-canary.126
 
+* **fix:**  - **multiUser:** [#2992](https://github.com/AzzappApp/azzapp/pull/2992) extend permissions when same webCard ([#2995](https://github.com/AzzappApp/azzapp/pull/2995))
 * **fix:**  - show unpublished post in my post list ([#2997](https://github.com/AzzappApp/azzapp/pull/2997))
 * **fix:**  - **android:** [#2978](https://github.com/AzzappApp/azzapp/pull/2978) add padding on top ([#2986](https://github.com/AzzappApp/azzapp/pull/2986))
 * **fix:**  - **webCard:** [#2606](https://github.com/AzzappApp/azzapp/pull/2606) set higher boundaries ([#2987](https://github.com/AzzappApp/azzapp/pull/2987))
