@@ -106,7 +106,29 @@ const CoverEditor = (
           cardCover {
             title
             subTitle
-            mediaParameters
+            mediaParameters {
+              brightness
+              contrast
+              highlights
+              saturation
+              shadow
+              sharpness
+              structure
+              temperature
+              tint
+              vibrance
+              vignetting
+              pitch
+              roll
+              yaw
+              cropData {
+                originX
+                originY
+                width
+                height
+              }
+              orientation
+            }
             mediaFilter
             mediaAnimation
             sourceMedia {
@@ -290,9 +312,14 @@ const CoverEditor = (
               ? 'video'
               : 'image',
         },
-        mediaCropParameters: extractLayoutParameters(
-          cardCover.mediaParameters,
-        )[0],
+        mediaCropParameters: extractLayoutParameters({
+          ...cardCover.mediaParameters,
+          orientation:
+            cardCover.mediaParameters?.orientation &&
+            cardCover.mediaParameters.orientation !== '%future added value'
+              ? cardCover.mediaParameters.orientation
+              : null,
+        })[0],
         maskMedia: cardCover.maskMedia,
       };
     },

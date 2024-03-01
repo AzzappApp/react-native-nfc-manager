@@ -201,7 +201,29 @@ const CoverEditorTemplateList = ({
               }
               foregroundColor
               mediaFilter
-              mediaParameters
+              mediaParameters {
+                brightness
+                contrast
+                highlights
+                saturation
+                shadow
+                sharpness
+                structure
+                temperature
+                tint
+                vibrance
+                vignetting
+                pitch
+                roll
+                yaw
+                cropData {
+                  originX
+                  originY
+                  width
+                  height
+                }
+                orientation
+              }
               mediaAnimation
               subTitleStyle {
                 color

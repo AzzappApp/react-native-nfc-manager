@@ -7,7 +7,6 @@ import {
   createWebCard,
   db,
   getCompanyActivitiesByWebCardCategory,
-  getWebCardCategoryById,
   buildDefaultContactCard,
   createProfile,
   getWebCardByUserNameWithRedirection,

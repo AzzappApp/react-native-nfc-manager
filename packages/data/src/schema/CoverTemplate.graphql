@@ -34,7 +34,7 @@ type CoverTemplateData {
   foreground: StaticMedia
   foregroundColor: String
   mediaFilter: String
-  mediaParameters: JSON
+  mediaParameters: MediaParameters
   mediaAnimation: String
 }
 

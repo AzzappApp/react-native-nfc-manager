@@ -48,7 +48,29 @@ const useSaveCover = (
       fragment useSaveCover_webCard on WebCard {
         id
         cardCover {
-          mediaParameters
+          mediaParameters {
+            brightness
+            contrast
+            highlights
+            saturation
+            shadow
+            sharpness
+            structure
+            temperature
+            tint
+            vibrance
+            vignetting
+            pitch
+            roll
+            yaw
+            cropData {
+              originX
+              originY
+              width
+              height
+            }
+            orientation
+          }
           mediaFilter
           sourceMedia {
             id

@@ -53,7 +53,7 @@ input SaveCoverInput {
   """
   The transform applied to the source media to generate the media
   """
-  mediaParameters: JSON
+  mediaParameters: MediaParametersInput
   """
   The animation of the media
   """

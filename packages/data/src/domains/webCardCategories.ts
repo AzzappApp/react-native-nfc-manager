@@ -33,15 +33,3 @@ export const getWebCardCategories = async () =>
     .from(WebCardCategoryTable)
     .where(eq(WebCardCategoryTable.enabled, true))
     .orderBy(asc(WebCardCategoryTable.order));
-
-/**
- * Retrieves a WebCard category by its id
- * @param id - The id of the WebCard category to retrieve
- * @returns The WebCard category if found, otherwise null
- */
-export const getWebCardCategoryById = async (id: string) =>
-  db
-    .select()
-    .from(WebCardCategoryTable)
-    .where(eq(WebCardCategoryTable.id, id))
-    .then(res => res.pop() ?? null);

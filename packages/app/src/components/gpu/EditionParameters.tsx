@@ -91,10 +91,12 @@ export type CropData = {
   height: number;
 };
 
+export const KNOWN_ORIENTATIONS = ['DOWN', 'LEFT', 'RIGHT', 'UP'] as const;
+
 /**
  * The orientation of an image or video
  */
-export type ImageOrientation = 'DOWN' | 'LEFT' | 'RIGHT' | 'UP';
+export type ImageOrientation = (typeof KNOWN_ORIENTATIONS)[number];
 
 /**
  * Information about the parameters used by Controls UI

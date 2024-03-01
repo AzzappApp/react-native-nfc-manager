@@ -2,7 +2,6 @@ import { connectionFromArraySlice, cursorToOffset } from 'graphql-relay';
 import {
   getCompanyActivitiesByWebCardCategory,
   getCompanyActivityById,
-  getWebCardCategoryById,
   getWebCardPosts,
   isFollowing,
   getCardModules,

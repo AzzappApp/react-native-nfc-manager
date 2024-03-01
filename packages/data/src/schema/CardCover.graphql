@@ -49,7 +49,7 @@ type CardCover {
   """
   The transform applied to the source media to generate the media
   """
-  mediaParameters: JSON
+  mediaParameters: MediaParameters
   """
   The media animation of the card cover
   """
