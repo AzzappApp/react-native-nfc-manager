@@ -19,7 +19,7 @@ const togglePostReaction: MutationResolvers['togglePostReaction'] = async (
 
   const postId = fromGlobalIdWithType(gqlPostId, 'Post');
   const post = await loaders.Post.load(postId);
-  if (!post || post.webCardId !== webCardId) {
+  if (!post) {
     throw new GraphQLError(ERRORS.INVALID_REQUEST);
   }
 

@@ -65,12 +65,11 @@ const PostRendererActionBar = ({
     mutation PostRendererActionBarReactionMutation(
       $webCardId: ID!
       $input: TogglePostReactionInput!
-      $viewerWebCardId: ID!
     ) {
       togglePostReaction(webCardId: $webCardId, input: $input) {
         post {
           id
-          postReaction(webCardId: $viewerWebCardId)
+          postReaction(webCardId: $webCardId)
           counterReactions
         }
       }
@@ -98,8 +97,7 @@ const PostRendererActionBar = ({
         const add = viewerPostReaction !== reaction;
         commit({
           variables: {
-            viewerWebCardId: profileInfos.webCardId,
-            webCardId: webCard.id,
+            webCardId: profileInfos.webCardId,
             input: {
               postId,
               reactionKind: 'like',
