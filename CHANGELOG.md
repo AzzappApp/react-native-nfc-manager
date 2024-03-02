@@ -1,5 +1,6 @@
-## 0.5.5-canary.128
+## 0.5.5-canary.129
 
+* **fix:**  - block the share on unpublish ([#3003](https://github.com/AzzappApp/azzapp/pull/3003))
 * **feat:**  - Email sign v2 ([#3002](https://github.com/AzzappApp/azzapp/pull/3002))
 * **fix:**  - put back method
 * **fix:**  - **post:** [#2991](https://github.com/AzzappApp/azzapp/pull/2991) mixed webcard ids on like ([#2996](https://github.com/AzzappApp/azzapp/pull/2996))
