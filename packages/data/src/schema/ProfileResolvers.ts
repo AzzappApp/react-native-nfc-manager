@@ -17,7 +17,6 @@ import {
 } from '#domains';
 import { getCardStyles } from '#domains/cardStyles';
 import { getMediaSuggestions } from '#domains/mediasSuggestion';
-import { getLastProfileStatisticsFor } from '#domains/profileStatistics';
 import { emptyConnection } from '#helpers/connectionsHelpers';
 import { idResolver } from './utils';
 import type { ProfileResolvers } from './__generated__/types';
@@ -37,10 +36,9 @@ export const Profile: ProfileResolvers = {
           assetKind: 'contactCard',
         }
       : null,
-  statsSummary: async profile => {
+  statsSummary: async (profile, _args, { loaders }) => {
     //get data for the last 30 day
-    const result = await getLastProfileStatisticsFor(profile.id, 30);
-    return result;
+    return loaders.profileStatistics.load(profile.id);
   },
   serializedContactCard: async (profile, _, { loaders }) => {
     const webCard = await loaders.WebCard.load(profile.webCardId);
@@ -89,18 +87,24 @@ export const Profile: ProfileResolvers = {
       args,
     );
   },
-  recommendedWebCards: async (profile, { ...args }, { auth: { userId } }) => {
+  recommendedWebCards: async (
+    profile,
+    { ...args },
+    { auth: { userId }, loaders },
+  ) => {
     if (!userId || profile.userId !== userId) {
       return connectionFromArray([], args);
     }
 
     // TODO dummy implementation just to test frontend
-    return connectionFromArray(
-      await getRecommendedWebCards(profile.webCardId),
-      args,
-    );
+    const recommendedWebCards = await getRecommendedWebCards(profile.webCardId);
+    recommendedWebCards.forEach(webCard => {
+      loaders.WebCard.prime(webCard.id, webCard);
+    });
+
+    return connectionFromArray(recommendedWebCards, args);
   },
-  searchPosts: async (_, args) => {
+  searchPosts: async (_, args, { loaders }) => {
     const posts = await db
       .select()
       .from(PostTable)
@@ -111,6 +115,11 @@ export const Profile: ProfileResolvers = {
           eq(WebCardTable.cardIsPublished, true),
         ),
       );
+
+    posts.forEach(({ WebCard }) => {
+      loaders.WebCard.prime(WebCard.id, WebCard);
+    });
+
     return connectionFromArray(
       posts.map(({ Post }) => Post),
       args,

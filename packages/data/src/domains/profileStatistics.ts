@@ -1,4 +1,4 @@
-import { and, eq, sql } from 'drizzle-orm';
+import { and, eq, inArray, sql } from 'drizzle-orm';
 import { primaryKey, int, mysqlTable, date } from 'drizzle-orm/mysql-core';
 
 import db, { cols } from './db';
@@ -14,7 +14,7 @@ export const ProfileStatisticTable = mysqlTable(
   },
   table => {
     return {
-      id: primaryKey({ columns: [table.day, table.profileId] }),
+      id: primaryKey({ columns: [table.profileId, table.day] }),
     };
   },
 );
@@ -74,8 +74,8 @@ export const incrementContactCardScans = async (
     .onDuplicateKeyUpdate(onDuplicateSet);
 };
 
-export const getLastProfileStatisticsFor = (
-  profileId: string,
+export const getLastProfileListStatisticsFor = (
+  profileIds: string[],
   days: number,
 ) => {
   return db
@@ -83,7 +83,7 @@ export const getLastProfileStatisticsFor = (
     .from(ProfileStatisticTable)
     .where(
       and(
-        eq(ProfileStatisticTable.profileId, profileId),
+        inArray(ProfileStatisticTable.profileId, profileIds),
         sql`${ProfileStatisticTable.day} >= DATE_SUB(CURDATE(), INTERVAL ${days} DAY)`,
       ),
     );

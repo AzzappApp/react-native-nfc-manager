@@ -47,7 +47,8 @@ const signin = async (req: Request) => {
     }
     if (user) {
       // if we found a user by email or phonenumber, we look for the profile
-      [profile] = await getProfilesOfUser(user.id);
+      const profiles = await getProfilesOfUser(user.id, 1);
+      profile = profiles[0].Profile;
     } else {
       // in all other case, look for username
       profile = await getProfileByUserName(credential);

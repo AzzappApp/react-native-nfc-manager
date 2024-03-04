@@ -4,7 +4,6 @@ import {
   db,
   getPostCommentsByDate,
   getPostReaction,
-  getWebCardById,
   PostTable,
 } from '#domains';
 import {
@@ -20,8 +19,8 @@ import type {
 
 export const Post: PostResolvers = {
   id: idResolver('Post'),
-  webCard: async post => {
-    const webCard = await getWebCardById(post.webCardId);
+  webCard: async (post, _args, { loaders }) => {
+    const webCard = await loaders.WebCard.load(post.webCardId);
     if (webCard) {
       return webCard;
     }
@@ -86,8 +85,8 @@ export const Post: PostResolvers = {
 
 export const PostComment: PostCommentResolvers = {
   id: idResolver('PostComment'),
-  webCard: async post => {
-    const author = await getWebCardById(post.webCardId);
+  webCard: async (post, _args, { loaders }) => {
+    const author = await loaders.WebCard.load(post.webCardId);
     if (author) {
       return author;
     }

@@ -7,6 +7,7 @@ import {
   varchar,
   int,
   uniqueIndex,
+  index,
 } from 'drizzle-orm/mysql-core';
 import db, { cols } from './db';
 import { FollowTable } from './follows';
@@ -49,6 +50,10 @@ export const ProfileTable = mysqlTable(
       profileKey: uniqueIndex('Profile_user_webcard_key').on(
         table.userId,
         table.webCardId,
+      ),
+      webCardKey: index('Profile_webCardId_key').on(
+        table.webCardId,
+        table.profileRole,
       ),
     };
   },
@@ -113,14 +118,15 @@ export const getUserProfileWithWebCardId = async (
  * @param userId - The id of the user
  * @returns The list of profile associated to the user
  */
-export const getProfilesOfUser = async (userId: string) => {
-  return db
+export const getProfilesOfUser = async (userId: string, limit?: number) => {
+  const query = db
     .select()
     .from(ProfileTable)
     .innerJoin(WebCardTable, eq(WebCardTable.id, ProfileTable.webCardId))
     .where(eq(ProfileTable.userId, userId))
-    .orderBy(asc(WebCardTable.userName))
-    .then(res => res.map(({ Profile }) => Profile));
+    .orderBy(asc(WebCardTable.userName));
+
+  return limit ? query.limit(limit) : query;
 };
 
 /**

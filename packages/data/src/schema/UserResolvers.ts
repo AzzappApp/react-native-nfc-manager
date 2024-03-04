@@ -9,13 +9,17 @@ export const User: UserResolvers = {
 
     const result = await getProfilesOfUser(auth.userId);
 
-    result.forEach(profile => {
+    result.forEach(({ Profile }) => {
       loaders.profileByWebCardIdAndUserId.prime(
-        { userId: auth.userId!, webCardId: profile.webCardId },
-        profile,
+        { userId: auth.userId!, webCardId: Profile.webCardId },
+        Profile,
       );
     });
 
-    return result;
+    result.forEach(({ WebCard }) => {
+      loaders.WebCard.prime(WebCard.id, WebCard);
+    });
+
+    return result.map(({ Profile }) => Profile);
   },
 };

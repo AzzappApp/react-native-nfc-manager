@@ -1,5 +1,5 @@
 import { createId } from '@paralleldrive/cuid2';
-import { eq, sql, lt, desc, and, or } from 'drizzle-orm';
+import { eq, sql, lt, desc, and } from 'drizzle-orm';
 import {
   mysqlEnum,
   uniqueIndex,
@@ -300,46 +300,40 @@ export const getWebCardByUserName = async (webCardName: string) => {
 export const getWebCardByUserNameWithRedirection = async (
   profileName: string,
 ) => {
-  return db
+  const webCard = await db
     .select()
     .from(WebCardTable)
-    .leftJoin(
-      RedirectWebCardTable,
-      eq(WebCardTable.userName, RedirectWebCardTable.toUserName),
-    )
-    .where(
-      or(
-        eq(WebCardTable.userName, profileName),
-        eq(RedirectWebCardTable.fromUserName, profileName),
-      ),
-    )
-    .then(res => {
-      const result = res.pop();
-      if (result) {
-        const { WebCard, RedirectWebCard } = result;
-        if (WebCard?.userName) {
-          //TODO: use a cron task should be better, for now check if the redirection is expired
-          if (
-            RedirectWebCard?.expiresAt &&
-            RedirectWebCard.expiresAt > new Date()
-          ) {
-            //delete the expired redirection
-            db.delete(RedirectWebCardTable).where(
-              eq(RedirectWebCardTable.fromUserName, profileName),
-            );
-          }
+    .where(eq(WebCardTable.userName, profileName))
+    .then(res => res.pop() ?? null);
 
-          return WebCard;
-        } else if (RedirectWebCard?.toUserName) {
-          // with the join, it should match all redirections,Secruity, not sure it will be required.If a profile was not found in the ProfileTable, but a redirect profile was found,
-          // get the profile with the toUserName
-          return db
-            .select()
-            .from(WebCardTable)
-            .where(eq(WebCardTable.userName, RedirectWebCard.toUserName))
-            .then(res => res.pop() ?? null);
-        }
-      }
+  if (webCard) {
+    return webCard;
+  }
+
+  const redirectionList = await db
+    .select()
+    .from(RedirectWebCardTable)
+    .where(eq(RedirectWebCardTable.fromUserName, profileName));
+
+  if (redirectionList.length > 0) {
+    const redirection = redirectionList[0];
+    if (redirection.expiresAt && redirection.expiresAt > new Date()) {
+      //delete the expired redirection
+      db.delete(RedirectWebCardTable).where(
+        eq(RedirectWebCardTable.fromUserName, profileName),
+      );
+
       return null;
-    });
+    }
+
+    const webCard = await db
+      .select()
+      .from(WebCardTable)
+      .where(eq(WebCardTable.userName, redirection.toUserName))
+      .then(res => res.pop() ?? null);
+
+    return webCard;
+  }
+
+  return null;
 };

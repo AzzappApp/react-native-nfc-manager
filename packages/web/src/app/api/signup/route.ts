@@ -32,16 +32,16 @@ const handleExistingUser = async (user: User, password: string) => {
     // instead of bcrypt.compareSync() to compare passwords. This helps prevent timing attacks.
     if (user?.password && bcrypt.compareSync(password, user.password)) {
       // we can log the user
-      const profiles = await getProfilesOfUser(user.id);
-      return await handleSignInAuthMethod(user, profiles.shift());
+      const profiles = await getProfilesOfUser(user.id, 1);
+      return await handleSignInAuthMethod(user, profiles.shift()?.Profile);
     } else if (user.invited) {
       await updateUser(user.id, {
         password: bcrypt.hashSync(password, 12),
         roles: null,
       });
 
-      const profiles = await getProfilesOfUser(user.id);
-      return await handleSignInAuthMethod(user, profiles.shift());
+      const profiles = await getProfilesOfUser(user.id, 1);
+      return await handleSignInAuthMethod(user, profiles.shift()?.Profile);
     }
   } catch (error) {
     return NextResponse.json(

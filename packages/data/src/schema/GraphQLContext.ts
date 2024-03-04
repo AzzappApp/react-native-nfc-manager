@@ -19,6 +19,8 @@ import {
   StaticMediaTable,
   UserTable,
   getUserProfileWithWebCardId,
+  getLastWebCardListStatisticsFor,
+  getLastProfileListStatisticsFor,
 } from '#domains';
 import { sortEntitiesByIds } from '#domains/generic';
 import { WebCardTable } from '#domains/webCards';
@@ -39,6 +41,8 @@ import type {
   MediaSuggestion,
   WebCardCategory,
   WebCard,
+  WebCardStatistic,
+  ProfileStatistic,
 } from '#domains';
 
 export type GraphQLContext = {
@@ -138,6 +142,8 @@ type Loaders = {
     Profile | null,
     string
   >;
+  webCardStatistics: DataLoader<string, WebCardStatistic[]>;
+  profileStatistics: DataLoader<string, ProfileStatistic[]>;
 };
 
 const entitiesTable = {
@@ -204,11 +210,50 @@ const profileByWebCardIdAndUserIdLoader = new DataLoader<
   },
 );
 
+const webCardStatisticsLoader = new DataLoader<string, WebCardStatistic[]>(
+  async keys => {
+    const stats = await getLastWebCardListStatisticsFor(keys as string[], 30);
+
+    return keys.map(key => stats.filter(stat => stat.webCardId === key));
+  },
+  {
+    ...dataLoadersOptions,
+    cacheKeyFn: key => `${key}`,
+  },
+);
+
+const profileStatisticsLoader = new DataLoader<string, ProfileStatistic[]>(
+  async keys => {
+    const stats = await getLastProfileListStatisticsFor(keys as string[], 30);
+
+    return keys.map(key => stats.filter(stat => stat.profileId === key));
+  },
+  {
+    ...dataLoadersOptions,
+    cacheKeyFn: key => `${key}`,
+  },
+);
+
 const createLoaders = (): Loaders =>
   new Proxy({} as Loaders, {
-    get: (loaders: Loaders, entity: Entity | 'profileByWebCardIdAndUserId') => {
+    get: (
+      loaders: Loaders,
+      entity:
+        | Entity
+        | 'profileByWebCardIdAndUserId'
+        | 'profileStatistics'
+        | 'webCardStatistics',
+    ) => {
       if (entity === 'profileByWebCardIdAndUserId') {
         return profileByWebCardIdAndUserIdLoader;
+      }
+
+      if (entity === 'webCardStatistics') {
+        return webCardStatisticsLoader;
+      }
+
+      if (entity === 'profileStatistics') {
+        return profileStatisticsLoader;
       }
 
       if (!entities.includes(entity)) {

@@ -5,7 +5,6 @@ import {
   getWebCardPosts,
   isFollowing,
   getCardModules,
-  getLastWebCardStatisticsFor,
   getLikedPosts,
   getOwner,
   getFollowerProfiles,
@@ -88,10 +87,9 @@ export const WebCard: WebCardResolvers = {
       },
     );
   },
-  statsSummary: async webCard => {
+  statsSummary: async (webCard, _args, { loaders }) => {
     //get data for the last 30 day
-    const result = await getLastWebCardStatisticsFor(webCard.id, 30);
-    return result;
+    return loaders.webCardStatistics.load(webCard.id);
   },
   likedPosts: async (webCard, args) => {
     const limit = args.first ?? 100;

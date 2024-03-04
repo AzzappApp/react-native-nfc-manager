@@ -1,16 +1,29 @@
 import { createId } from '@paralleldrive/cuid2';
 import { sql } from 'drizzle-orm';
-import { mysqlTable } from 'drizzle-orm/mysql-core';
+import { index, mysqlTable } from 'drizzle-orm/mysql-core';
 import db, { cols } from './db';
 import type { Media } from './medias';
 import type { InferInsertModel, InferSelectModel } from 'drizzle-orm';
 
-export const MediaSuggestionTable = mysqlTable('MediaSuggestion', {
-  id: cols.cuid('id').notNull().primaryKey().$defaultFn(createId),
-  mediaId: cols.mediaId('mediaId').notNull(),
-  webCardCategoryId: cols.cuid('webCardCategoryId'),
-  companyActivityId: cols.cuid('companyActivityId'),
-});
+export const MediaSuggestionTable = mysqlTable(
+  'MediaSuggestion',
+  {
+    id: cols.cuid('id').notNull().primaryKey().$defaultFn(createId),
+    mediaId: cols.mediaId('mediaId').notNull(),
+    webCardCategoryId: cols.cuid('webCardCategoryId'),
+    companyActivityId: cols.cuid('companyActivityId'),
+  },
+  table => {
+    return {
+      webCardCategoryKey: index('MediaSuggestion_webCardCategoryId_key').on(
+        table.webCardCategoryId,
+      ),
+      companyActivityKey: index('MediaSuggestion_companyActivityId_key').on(
+        table.companyActivityId,
+      ),
+    };
+  },
+);
 
 export type MediaSuggestion = InferSelectModel<typeof MediaSuggestionTable>;
 export type NewMediaSuggestion = InferInsertModel<typeof MediaSuggestionTable>;

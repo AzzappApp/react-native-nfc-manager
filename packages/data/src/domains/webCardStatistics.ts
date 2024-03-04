@@ -1,4 +1,4 @@
-import { and, eq, sql } from 'drizzle-orm';
+import { and, eq, inArray, sql } from 'drizzle-orm';
 import { primaryKey, int, mysqlTable, date } from 'drizzle-orm/mysql-core';
 
 import db, { cols } from './db';
@@ -16,7 +16,7 @@ export const WebCardStatisticTable = mysqlTable(
   },
   table => {
     return {
-      id: primaryKey({ columns: [table.day, table.webCardId] }),
+      id: primaryKey({ columns: [table.webCardId, table.day] }),
     };
   },
 );
@@ -99,8 +99,8 @@ export const incrementWebCardViews = async (webCardId: string) =>
       .where(eq(WebCardTable.id, webCardId));
   });
 
-export const getLastWebCardStatisticsFor = (
-  webCardId: string,
+export const getLastWebCardListStatisticsFor = (
+  webCardIds: string[],
   days: number,
 ) => {
   return db
@@ -108,7 +108,7 @@ export const getLastWebCardStatisticsFor = (
     .from(WebCardStatisticTable)
     .where(
       and(
-        eq(WebCardStatisticTable.webCardId, webCardId),
+        inArray(WebCardStatisticTable.webCardId, webCardIds),
         sql`${WebCardStatisticTable.day} > DATE_SUB(CURDATE(), INTERVAL ${days} DAY)`,
       ),
     );
