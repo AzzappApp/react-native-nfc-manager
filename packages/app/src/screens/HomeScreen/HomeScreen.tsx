@@ -1,6 +1,8 @@
-import { useEffect } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import { graphql, usePreloadedQuery } from 'react-relay';
+import { mainRoutes } from '#mobileRoutes';
 import { useMainTabBarVisibilityController } from '#components/MainTabBar';
+import { useRouter } from '#components/NativeRouter';
 import { dispatchGlobalEvent } from '#helpers/globalEvents';
 import relayScreen from '#helpers/relayScreen';
 import { useDeepLinkStoredRoute } from '#hooks/useDeepLink';
@@ -30,12 +32,27 @@ const HomeScreen = ({
   useDeepLinkStoredRoute();
   // dat
   const { currentUser } = usePreloadedQuery(homeScreenQuery, preloadedQuery);
+  const router = useRouter();
 
   useEffect(() => {
     if (hasFocus) {
       dispatchGlobalEvent({ type: 'READY' });
     }
   }, [hasFocus]);
+
+  const hasProfile = useMemo(() => {
+    if (!currentUser?.profiles) return false;
+    return currentUser.profiles.length > 0;
+  }, [currentUser?.profiles]);
+
+  const prevHasProfile = useRef(hasProfile);
+
+  useEffect(() => {
+    if (!hasProfile && prevHasProfile.current) {
+      prevHasProfile.current = false;
+      router.replaceAll(mainRoutes(true));
+    }
+  }, [hasProfile, router]);
 
   if (!currentUser) {
     // should never happen
