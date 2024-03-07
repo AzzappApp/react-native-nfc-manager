@@ -1,5 +1,6 @@
-## 0.5.5-canary.132
+## 0.5.5-canary.133
 
+* **fix:**  - 🐛 apply fix for react-native-reanimated crash on ios ([#3009](https://github.com/AzzappApp/azzapp/pull/3009))
 * **fix:**  - 🐛 correctly redirect to onboarding ([#2988](https://github.com/AzzappApp/azzapp/pull/2988))
 * **docs:**  - Update README.md
 * **perf:**  - [#2446](https://github.com/AzzappApp/azzapp/pull/2446) add and fix indexes to avoid full scans ([#3004](https://github.com/AzzappApp/azzapp/pull/3004))
