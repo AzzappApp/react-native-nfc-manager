@@ -281,12 +281,18 @@ export const resetCardModulesPositions = async (
   trx: DbTransaction = db,
 ) => {
   const modules = await getCardModules(webCardId, true, trx);
-  await Promise.all(
-    modules.map((module, index) =>
-      trx
-        .update(CardModuleTable)
-        .set({ position: index })
-        .where(eq(CardModuleTable.id, module.id)),
-    ),
-  );
+  const isOrdered = modules.every((module, i) => {
+    return module.position === i;
+  });
+
+  if (!isOrdered) {
+    await Promise.all(
+      modules.map((module, index) =>
+        trx
+          .update(CardModuleTable)
+          .set({ position: index })
+          .where(eq(CardModuleTable.id, module.id)),
+      ),
+    );
+  }
 };
