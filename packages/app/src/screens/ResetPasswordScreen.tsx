@@ -2,7 +2,13 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useCallback, useRef } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { View, StyleSheet, KeyboardAvoidingView, Platform } from 'react-native';
+import {
+  View,
+  StyleSheet,
+  KeyboardAvoidingView,
+  Platform,
+  Keyboard,
+} from 'react-native';
 import Toast from 'react-native-toast-message';
 import * as z from 'zod';
 import { REGEX_PWD } from '@azzapp/shared/stringHelpers';
@@ -63,6 +69,7 @@ const ResetPasswordScreen = ({
   const onSubmit = useCallback(
     () =>
       handleSubmit(async data => {
+        Keyboard.dismiss();
         try {
           await changePassword({
             password: data.password,
