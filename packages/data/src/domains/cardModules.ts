@@ -35,7 +35,7 @@ import type {
   MODULE_KIND_VIDEO,
   MODULE_KIND_IMAGEGRID,
 } from '@azzapp/shared/cardModuleHelpers';
-import type { InferInsertModel, InferSelectModel } from 'drizzle-orm';
+import type { InferInsertModel, InferSelectModel, SQL } from 'drizzle-orm';
 
 export const CardModuleTable = mysqlTable(
   'CardModule',
@@ -286,13 +286,22 @@ export const resetCardModulesPositions = async (
   });
 
   if (!isOrdered) {
-    await Promise.all(
-      modules.map((module, index) =>
-        trx
-          .update(CardModuleTable)
-          .set({ position: index })
-          .where(eq(CardModuleTable.id, module.id)),
-      ),
+    const positionChunk: SQL[] = [];
+    const ids: string[] = [];
+
+    modules.forEach((module, index) => {
+      positionChunk.push(sql`when id = ${module.id} then ${index}`);
+      ids.push(module.id);
+    });
+
+    const position: SQL = sql.join(
+      [sql`(case`, ...positionChunk, sql`end)`],
+      sql.raw(' '),
     );
+
+    await db
+      .update(CardModuleTable)
+      .set({ position })
+      .where(inArray(CardModuleTable.id, ids));
   }
 };
