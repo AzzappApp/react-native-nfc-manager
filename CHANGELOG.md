@@ -1,5 +1,6 @@
-## 0.5.5-canary.136
+## 0.5.5-canary.137
 
+* **feat:**  - 🎸 indicate email is generating ([#3042](https://github.com/AzzappApp/azzapp/pull/3042))
 * **fix:**  - **multiUser:** auto set flag on csv import ([#3036](https://github.com/AzzappApp/azzapp/pull/3036))
 * **fix:**  - 🐛 properly reset card module position ([#3041](https://github.com/AzzappApp/azzapp/pull/3041))
 * **fix:**  - 🐛 don't reset order when unneeded ([#3040](https://github.com/AzzappApp/azzapp/pull/3040))
