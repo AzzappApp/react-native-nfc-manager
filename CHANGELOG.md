@@ -1,5 +1,6 @@
-## 0.5.5-canary.137
+## 0.5.5-canary.138
 
+* **perf:**  - **home:** reduce number of queries + generate qr code server side ([#3033](https://github.com/AzzappApp/azzapp/pull/3033))
 * **feat:**  - 🎸 indicate email is generating ([#3042](https://github.com/AzzappApp/azzapp/pull/3042))
 * **fix:**  - **multiUser:** auto set flag on csv import ([#3036](https://github.com/AzzappApp/azzapp/pull/3036))
 * **fix:**  - 🐛 properly reset card module position ([#3041](https://github.com/AzzappApp/azzapp/pull/3041))
