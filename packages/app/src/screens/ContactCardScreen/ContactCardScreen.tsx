@@ -88,6 +88,7 @@ export const ContactCardScreen = ({
   const profile = node?.profile;
   const webCard = profile?.webCard;
   const intl = useIntl();
+  const [isGeneratingEmail, setIsGeneratingEmail] = useState(false);
 
   const [fullScreen, setFullscreen] = useToggle(false);
 
@@ -171,6 +172,7 @@ export const ContactCardScreen = ({
       return;
     }
     if (profile?.id && webCard?.id) {
+      setIsGeneratingEmail(true);
       await generateEmailSignature({
         locale: intl.locale,
         profileId: fromGlobalId(profile.id).id,
@@ -183,6 +185,7 @@ export const ContactCardScreen = ({
             'Toast message while generating email signature for the user',
         }),
       });
+      setIsGeneratingEmail(false);
     }
   }, [currentUser?.email, intl, profile?.id, webCard?.id]);
 
@@ -328,6 +331,7 @@ export const ContactCardScreen = ({
                 description: 'Generate an email Signature button label',
               })}
               onPress={generateEmail}
+              loading={isGeneratingEmail}
             />
           </View>
         </Animated.View>
