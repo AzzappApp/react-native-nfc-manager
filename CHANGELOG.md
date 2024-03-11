@@ -1,5 +1,7 @@
-## 0.5.5-canary.134
+## 0.5.5-canary.135
 
+* **fix:**  - 🐛 don't reset order when unneeded ([#3040](https://github.com/AzzappApp/azzapp/pull/3040))
+* **feat:**  - 🎸 first version of confirmation email ([#3017](https://github.com/AzzappApp/azzapp/pull/3017))
 * **fix:**  - 🐛 hide keyboard on reset password submit to show toast ([#3035](https://github.com/AzzappApp/azzapp/pull/3035))
 * **fix:**  - 🐛 apply fix for react-native-reanimated crash on ios ([#3009](https://github.com/AzzappApp/azzapp/pull/3009))
 * **fix:**  - 🐛 correctly redirect to onboarding ([#2988](https://github.com/AzzappApp/azzapp/pull/2988))
