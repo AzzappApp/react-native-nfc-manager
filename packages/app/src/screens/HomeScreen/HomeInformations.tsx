@@ -96,10 +96,10 @@ const HomeInformations = ({
           interpolate(actual, inputRange, nbFollowingsValue),
         );
       } else if (actual >= 0) {
-        nbPosts.value = '0';
-        nbLikes.value = '0';
-        nbFollowers.value = '0';
-        nbFollowings.value = '0';
+        nbPosts.value = format(nbPostsValue[0] ?? 0);
+        nbLikes.value = format(nbLikesValue[0] ?? 0);
+        nbFollowers.value = format(nbFollowersValue[0] ?? 0);
+        nbFollowings.value = format(nbFollowingsValue[0] ?? 0);
       }
     },
     [
