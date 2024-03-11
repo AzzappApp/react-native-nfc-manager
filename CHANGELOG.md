@@ -1,5 +1,7 @@
-## 0.5.5-canary.135
+## 0.5.5-canary.136
 
+* **fix:**  - **multiUser:** auto set flag on csv import ([#3036](https://github.com/AzzappApp/azzapp/pull/3036))
+* **fix:**  - 🐛 properly reset card module position ([#3041](https://github.com/AzzappApp/azzapp/pull/3041))
 * **fix:**  - 🐛 don't reset order when unneeded ([#3040](https://github.com/AzzappApp/azzapp/pull/3040))
 * **feat:**  - 🎸 first version of confirmation email ([#3017](https://github.com/AzzappApp/azzapp/pull/3017))
 * **fix:**  - 🐛 hide keyboard on reset password submit to show toast ([#3035](https://github.com/AzzappApp/azzapp/pull/3035))
