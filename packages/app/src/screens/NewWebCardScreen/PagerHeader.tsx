@@ -44,7 +44,7 @@ const PagerHeader = ({
         </View>
         <Animated.View
           key={currentPage}
-          style={[styles.titleTextContainer]}
+          style={styles.titleTextContainer}
           exiting={FadeOutDown.duration(TRANSITION_DURATION)}
           entering={FadeInDown.duration(TRANSITION_DURATION)}
         >

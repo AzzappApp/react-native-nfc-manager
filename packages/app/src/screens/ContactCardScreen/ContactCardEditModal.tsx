@@ -108,10 +108,7 @@ const ContactCardEditModal = ({
             selected
           }
         }
-        serializedContactCard {
-          data
-          signature
-        }
+        serializedContactCard
         avatar {
           id
           uri: uri(width: 112, pixelRatio: $pixelRatio)
@@ -163,10 +160,7 @@ const ContactCardEditModal = ({
               selected
             }
           }
-          serializedContactCard {
-            data
-            signature
-          }
+          serializedContactCard
           avatar {
             id
             uri: uri(width: 112, pixelRatio: $pixelRatio)

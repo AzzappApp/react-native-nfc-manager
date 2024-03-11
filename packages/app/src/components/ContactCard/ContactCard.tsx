@@ -1,13 +1,19 @@
+import {
+  BlendColor,
+  Canvas,
+  Group,
+  ImageSVG,
+  Paint,
+  Skia,
+  fitbox,
+  rect,
+} from '@shopify/react-native-skia';
 import { memo, useMemo } from 'react';
 import { Image, View } from 'react-native';
-import QRCode from 'react-native-qrcode-svg';
 import { useFragment, graphql } from 'react-relay';
 import { getTextColor } from '@azzapp/shared/colorsHelpers';
 import { formatDisplayName } from '@azzapp/shared/stringHelpers';
-import {
-  buildUserUrl,
-  buildUserUrlWithContactCard,
-} from '@azzapp/shared/urlHelpers';
+import { buildUserUrl } from '@azzapp/shared/urlHelpers';
 import { colors, shadow } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import Text from '#ui/Text';
@@ -26,11 +32,14 @@ const ContactCard = ({
 }: ContactCardProps) => {
   const {
     contactCard,
-    serializedContactCard,
+    contactCardQrCode,
     webCard: { userName, cardColors, commonInformation, isMultiUser },
   } = useFragment(
     graphql`
-      fragment ContactCard_profile on Profile {
+      fragment ContactCard_profile on Profile
+      @argumentDefinitions(
+        width: { type: "Int!", provider: "qrCodeWidth.relayprovider" }
+      ) {
         webCard {
           userName
           cardColors {
@@ -47,10 +56,7 @@ const ContactCard = ({
           title
           company
         }
-        serializedContactCard {
-          data
-          signature
-        }
+        contactCardQrCode(width: $width)
       }
     `,
     profileKey,
@@ -64,14 +70,6 @@ const ContactCard = ({
     [backgroundColor],
   );
 
-  const contactCardUrl = useMemo(() => {
-    if (!contactCard) {
-      return null;
-    }
-    const { data, signature } = serializedContactCard;
-    return buildUserUrlWithContactCard(userName, data, signature);
-  }, [contactCard, serializedContactCard, userName]);
-
   const company = useMemo(() => {
     if (isMultiUser) {
       return commonInformation?.company ?? contactCard?.company;
@@ -79,6 +77,13 @@ const ContactCard = ({
       return contactCard?.company;
     }
   }, [commonInformation?.company, contactCard?.company, isMultiUser]);
+
+  const svg = contactCardQrCode
+    ? Skia.SVG.MakeFromString(contactCardQrCode)
+    : null;
+
+  const src = rect(0, 0, svg?.width() ?? 0, svg?.height() ?? 0);
+  const dst = rect(0, 0, 80, 80);
 
   if (!contactCard) {
     return null;
@@ -133,7 +138,7 @@ const ContactCard = ({
           />
         </View>
 
-        <View style={[styles.webCardContent]}>
+        <View style={styles.webCardContent}>
           <View style={styles.webcardText}>
             <Text
               variant="large"
@@ -163,15 +168,22 @@ const ContactCard = ({
             )}
           </View>
           <View style={styles.qrCodeContainer}>
-            {contactCardUrl && (
-              <QRCode
-                value={contactCardUrl}
-                size={80}
-                color={readableColor}
-                backgroundColor={'transparent'}
-                ecl="L"
-              />
-            )}
+            {svg ? (
+              <Canvas
+                style={{ width: 81 /** to avoid to be cut */, height: 80 }}
+              >
+                <Group
+                  layer={
+                    <Paint>
+                      <BlendColor color={readableColor} mode="srcATop" />
+                    </Paint>
+                  }
+                  transform={fitbox('contain', src, dst)}
+                >
+                  <ImageSVG svg={svg} />
+                </Group>
+              </Canvas>
+            ) : null}
           </View>
         </View>
         <View style={styles.webCardFooter}>

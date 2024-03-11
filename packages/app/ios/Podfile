@@ -78,7 +78,6 @@ abstract_target 'common' do
              config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '16.0'
         end
     end
-
     # This is necessary for Xcode 14, because it signs resource bundles by default
     # when building for devices.
     installer.target_installation_results.pod_target_installation_results

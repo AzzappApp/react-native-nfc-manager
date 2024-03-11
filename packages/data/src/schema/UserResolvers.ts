@@ -9,14 +9,17 @@ export const User: UserResolvers = {
 
     const result = await getProfilesOfUser(auth.userId);
 
-    result.forEach(({ Profile }) => {
+    result.forEach(({ Profile, WebCard }) => {
       loaders.profileByWebCardIdAndUserId.prime(
         { userId: auth.userId!, webCardId: Profile.webCardId },
         Profile,
       );
-    });
+      loaders.Profile.prime(Profile.id, Profile);
 
-    result.forEach(({ WebCard }) => {
+      if (Profile.profileRole === 'owner') {
+        loaders.webCardOwners.prime(Profile.webCardId, user);
+      }
+
       loaders.WebCard.prime(WebCard.id, WebCard);
     });
 

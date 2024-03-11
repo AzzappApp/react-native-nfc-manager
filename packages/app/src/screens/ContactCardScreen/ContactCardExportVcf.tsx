@@ -49,9 +49,7 @@ const ContactCardExportVcf = ({
             selected
           }
         }
-        serializedContactCard {
-          data
-        }
+        serializedContactCard
         avatar {
           exportUri: uri(width: 720, pixelRatio: 1, extension: jpg)
         }
@@ -85,7 +83,7 @@ const ContactCardExportVcf = ({
 
         const { vCard } = await buildVCard(
           userName,
-          profile.serializedContactCard.data,
+          profile.serializedContactCard,
           {
             urls: [
               ...(profile.webCard.commonInformation?.urls ?? []),

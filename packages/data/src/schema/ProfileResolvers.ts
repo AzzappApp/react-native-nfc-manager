@@ -1,9 +1,12 @@
 import { and, desc, eq, like } from 'drizzle-orm';
 import { connectionFromArray } from 'graphql-relay';
+import { toString } from 'qrcode';
 import { shuffle } from '@azzapp/shared/arrayHelpers';
+import { serializeContactCard } from '@azzapp/shared/contactCardHelpers';
 import ERRORS from '@azzapp/shared/errors';
 import serializeAndSignContactCard from '@azzapp/shared/serializeAndSignContactCard';
 import { simpleHash } from '@azzapp/shared/stringHelpers';
+import { buildUserUrlWithContactCard } from '@azzapp/shared/urlHelpers';
 import {
   db,
   getStaticMediasByUsage,
@@ -42,14 +45,43 @@ export const Profile: ProfileResolvers = {
   },
   serializedContactCard: async (profile, _, { loaders }) => {
     const webCard = await loaders.WebCard.load(profile.webCardId);
+    return serializeContactCard(
+      profile.id,
+      profile.webCardId,
+      profile.contactCard ?? {},
+      webCard?.commonInformation,
+    );
+  },
+  contactCardQrCode: async (profile, { width }, { loaders }) => {
+    const webCard = await loaders.WebCard.load(profile.webCardId);
+    if (!webCard) throw new Error(ERRORS.GRAPHQL_ERROR);
 
-    return serializeAndSignContactCard(
+    const { data, signature } = await serializeAndSignContactCard(
       webCard?.userName ?? '',
       profile.id,
       profile.webCardId,
       profile.contactCard ?? {},
       webCard?.commonInformation,
     );
+
+    const url = buildUserUrlWithContactCard(
+      webCard?.userName ?? '',
+      data,
+      signature,
+    );
+
+    const result = await toString(url, {
+      errorCorrectionLevel: 'L',
+      width,
+      type: 'svg',
+      color: {
+        dark: '#000',
+        light: '#0000',
+      },
+      margin: 0,
+    });
+
+    return result;
   },
   webCard: async (profile, _, { loaders }) => {
     const webCard = await loaders.WebCard.load(profile.webCardId);
@@ -57,7 +89,6 @@ export const Profile: ProfileResolvers = {
     if (!webCard) throw new Error(ERRORS.GRAPHQL_ERROR);
     return webCard;
   },
-
   trendingWebCards: async (_, args) => {
     // TODO dummy implementation just to test frontend
     return connectionFromArray(

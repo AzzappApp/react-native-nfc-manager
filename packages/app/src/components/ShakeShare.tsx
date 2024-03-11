@@ -1,13 +1,22 @@
+import {
+  BlendColor,
+  Canvas,
+  Group,
+  ImageSVG,
+  Paint,
+  Skia,
+  fitbox,
+  rect,
+} from '@shopify/react-native-skia';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Suspense, useCallback, useMemo, useState } from 'react';
-import { View, StyleSheet, useWindowDimensions } from 'react-native';
+import { Suspense, useCallback, useState } from 'react';
+import { View, StyleSheet, Dimensions } from 'react-native';
 import {
   Directions,
   Gesture,
   GestureDetector,
   GestureHandlerRootView,
 } from 'react-native-gesture-handler';
-import QRCode from 'react-native-qrcode-svg';
 import {
   SensorType,
   runOnJS,
@@ -17,10 +26,10 @@ import {
   useSharedValue,
 } from 'react-native-reanimated';
 import { graphql, useClientQuery } from 'react-relay';
-import { buildUserUrlWithContactCard } from '@azzapp/shared/urlHelpers';
 import { colors } from '#theme';
 import useAuthState from '#hooks/useAuthState';
 import useLatestCallback from '#hooks/useLatestCallback';
+import { get as qrCodeWidth } from '#relayProviders/qrCodeWidth.relayprovider';
 import ActivityIndicator from '#ui/ActivityIndicator';
 import IconButton from '#ui/IconButton';
 import CoverRenderer from './CoverRenderer';
@@ -72,45 +81,42 @@ const ShakeShare = () => {
 
 export default ShakeShare;
 
+const { width } = Dimensions.get('screen');
+
+const QR_CODE_WIDTH = Math.round(width * 0.6);
+
 const ShakeShareDisplay = ({ onClose }: { onClose: () => void }) => {
   const { profileInfos } = useAuthState();
+
   const { node } = useClientQuery<ShakeShareScreenQuery>(
     graphql`
-      query ShakeShareScreenQuery($profileId: ID!) {
+      query ShakeShareScreenQuery($profileId: ID!, $width: Int!) {
         node(id: $profileId) {
           ... on Profile @alias(as: "profile") {
             webCard {
               userName
               ...CoverRenderer_webCard
             }
-            serializedContactCard {
-              data
-              signature
-            }
+            contactCardQrCode(width: $width)
           }
         }
       }
     `,
     {
       profileId: profileInfos?.profileId ?? '',
+      width: qrCodeWidth(),
     },
   );
 
   const profile = node?.profile;
 
-  const contactCardUrl = useMemo(() => {
-    if (!profile?.serializedContactCard) {
-      return null;
-    }
-    const { data, signature } = profile.serializedContactCard;
-    return buildUserUrlWithContactCard(
-      profile.webCard.userName,
-      data,
-      signature,
-    );
-  }, [profile?.serializedContactCard, profile?.webCard]);
+  const svg = profile?.contactCardQrCode
+    ? Skia.SVG.MakeFromString(profile?.contactCardQrCode)
+    : null;
 
-  const { width } = useWindowDimensions();
+  const src = rect(0, 0, svg?.width() ?? 0, svg?.height() ?? 0);
+  const dst = rect(0, 0, QR_CODE_WIDTH, QR_CODE_WIDTH);
+
   return (
     <>
       <View style={styles.container}>
@@ -127,15 +133,20 @@ const ShakeShareDisplay = ({ onClose }: { onClose: () => void }) => {
           locations={[0.22, 0.66]}
           style={styles.linear}
         />
-        {contactCardUrl && (
+        {svg && (
           <View style={styles.qrCodeContainer}>
-            <QRCode
-              value={contactCardUrl}
-              size={width * 0.6}
-              color={colors.white}
-              backgroundColor="transparent"
-              ecl="L"
-            />
+            <Canvas style={styles.canvas}>
+              <Group
+                layer={
+                  <Paint>
+                    <BlendColor color="white" mode="srcATop" />
+                  </Paint>
+                }
+                transform={fitbox('contain', src, dst)}
+              >
+                <ImageSVG svg={svg} />
+              </Group>
+            </Canvas>
           </View>
         )}
 
@@ -163,6 +174,7 @@ const styles = StyleSheet.create({
     padding: 17,
     bottom: 123,
   },
+  canvas: { width: QR_CODE_WIDTH, height: QR_CODE_WIDTH },
   linear: {
     height: '100%',
     position: 'absolute',

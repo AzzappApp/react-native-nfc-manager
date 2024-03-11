@@ -149,11 +149,10 @@ const WebCardScreenScrollView = (
           {children}
           {editing && (
             <Animated.View
-              style={footerStyle}
               entering={FadeIn.duration(EDIT_TRANSITION_DURATION)}
               exiting={FadeOut.duration(EDIT_TRANSITION_DURATION)}
             >
-              {editFooter}
+              <Animated.View style={footerStyle}>{editFooter}</Animated.View>
             </Animated.View>
           )}
         </Animated.View>

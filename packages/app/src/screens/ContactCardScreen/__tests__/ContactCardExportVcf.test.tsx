@@ -105,9 +105,11 @@ describe('ContactCardExportVcf', () => {
               },
             },
             contactCard,
-            serializedContactCard: {
-              data: serializeContactCard('profileId', 'webCardId', contactCard),
-            },
+            serializedContactCard: serializeContactCard(
+              'profileId',
+              'webCardId',
+              contactCard,
+            ),
             avatar: {
               exportUri: null,
             },

@@ -39,6 +39,15 @@ jest.mock('#helpers/MobileWebAPI', () => ({
 
 jest.mock('react-native-share', () => ({ open: jest.fn() }));
 
+jest.mock('@shopify/react-native-skia', () => ({
+  rect: jest.fn(),
+  Skia: {
+    SVG: {
+      MakeFromString: jest.fn(),
+    },
+  },
+}));
+
 const getAppleWalletPassMock = getAppleWalletPass as jest.MockedFunction<
   typeof getAppleWalletPass
 >;

@@ -1,5 +1,5 @@
 import { createId } from '@paralleldrive/cuid2';
-import { and, asc, desc, eq, isNull, ne, sql } from 'drizzle-orm';
+import { and, asc, desc, eq, inArray, isNull, ne, sql } from 'drizzle-orm';
 import {
   boolean,
   json,
@@ -325,21 +325,18 @@ export const getWebCardPendingOwnerProfile = async (
       ),
     );
 
-export const getOwner = async (webCardId: string) => {
+export const getOwners = async (webCardIds: string[]) => {
   return db
-    .select()
+    .select({
+      user: UserTable,
+      webCardId: ProfileTable.webCardId,
+    })
     .from(ProfileTable)
     .innerJoin(UserTable, eq(UserTable.id, ProfileTable.userId))
     .where(
       and(
-        eq(ProfileTable.webCardId, webCardId),
+        inArray(ProfileTable.webCardId, webCardIds),
         eq(ProfileTable.profileRole, 'owner'),
       ),
-    )
-    .then(res => {
-      const user = res.pop();
-
-      if (!user) return null;
-      return user.User;
-    });
+    );
 };

@@ -7,6 +7,7 @@ const esModules = [
   'use-debounce',
   'expo(nent)?',
   '@expo(nent)?/.*',
+  '@shopify/react-native-skia',
 ];
 
 /** @type {import('@jest/types').Config.InitialOptions} */
@@ -17,7 +18,10 @@ module.exports = {
   transform: {
     '^.+\\.(j|t)sx?$': './scripts/reactNativeJestTransformer.js',
   },
-  setupFilesAfterEnv: ['./scripts/jestSetup.js'],
+  setupFilesAfterEnv: [
+    './scripts/jestSetup.js',
+    '@shopify/react-native-skia/jestSetup',
+  ],
   testMatch: ['<rootDir>/src/**/*.test.{js,jsx,ts,tsx}'],
   transformIgnorePatterns: [`/node_modules/(?!${esModules.join('|')})`],
   moduleNameMapper: {

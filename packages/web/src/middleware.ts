@@ -7,7 +7,7 @@ import type { NextRequest } from 'next/server';
 const rateLimit = {
   api: new Ratelimit({
     redis: kv,
-    limiter: Ratelimit.slidingWindow(10, '1 s'),
+    limiter: Ratelimit.slidingWindow(20, '1 s'),
   }),
   web: new Ratelimit({
     redis: kv,

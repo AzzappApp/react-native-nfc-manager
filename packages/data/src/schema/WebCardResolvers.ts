@@ -1,12 +1,10 @@
 import { connectionFromArraySlice, cursorToOffset } from 'graphql-relay';
 import {
   getCompanyActivitiesByWebCardCategory,
-  getCompanyActivityById,
   getWebCardPosts,
   isFollowing,
   getCardModules,
   getLikedPosts,
-  getOwner,
   getFollowerProfiles,
   getFollowingsWebCard,
   getFollowingsPosts,
@@ -33,9 +31,9 @@ export const WebCard: WebCardResolvers = {
       ? loaders.WebCardCategory.load(webCard.webCardCategoryId)
       : null;
   },
-  companyActivity: async (webCard, _) => {
+  companyActivity: async (webCard, _, { loaders }) => {
     return webCard.companyActivityId
-      ? getCompanyActivityById(webCard.companyActivityId)
+      ? loaders.CompanyActivity.load(webCard.companyActivityId)
       : null;
   },
   cardCover: async (webCard, _) => {
@@ -102,17 +100,8 @@ export const WebCard: WebCardResolvers = {
       hasPreviousPage: offset !== null,
     });
   },
-  owner: async (webCard, _args, { auth, loaders }) => {
-    const profile = auth.userId
-      ? await loaders.profileByWebCardIdAndUserId.load({
-          userId: auth.userId,
-          webCardId: webCard.id,
-        })
-      : null;
-
-    return profile?.profileRole === 'owner'
-      ? loaders.User.load(auth.userId!)
-      : getOwner(webCard.id);
+  owner: async (webCard, _args, { loaders }) => {
+    return loaders.webCardOwners.load(webCard.id);
   },
   followers: async (webCard, args) => {
     const first = args.first ?? 50;

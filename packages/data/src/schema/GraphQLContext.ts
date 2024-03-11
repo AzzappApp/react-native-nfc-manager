@@ -21,6 +21,7 @@ import {
   getUserProfileWithWebCardId,
   getLastWebCardListStatisticsFor,
   getLastProfileListStatisticsFor,
+  getOwners,
 } from '#domains';
 import { sortEntitiesByIds } from '#domains/generic';
 import { WebCardTable } from '#domains/webCards';
@@ -144,6 +145,7 @@ type Loaders = {
   >;
   webCardStatistics: DataLoader<string, WebCardStatistic[]>;
   profileStatistics: DataLoader<string, ProfileStatistic[]>;
+  webCardOwners: DataLoader<string, User | null>;
 };
 
 const entitiesTable = {
@@ -234,6 +236,12 @@ const profileStatisticsLoader = new DataLoader<string, ProfileStatistic[]>(
   },
 );
 
+const webCardOwnerLoader = new DataLoader<string, User | null>(async keys => {
+  const profiles = await getOwners(keys as string[]);
+
+  return keys.map(k => profiles.find(p => p.webCardId === k)?.user ?? null);
+}, dataLoadersOptions);
+
 const createLoaders = (): Loaders =>
   new Proxy({} as Loaders, {
     get: (
@@ -242,6 +250,7 @@ const createLoaders = (): Loaders =>
         | Entity
         | 'profileByWebCardIdAndUserId'
         | 'profileStatistics'
+        | 'webCardOwners'
         | 'webCardStatistics',
     ) => {
       if (entity === 'profileByWebCardIdAndUserId') {
@@ -254,6 +263,10 @@ const createLoaders = (): Loaders =>
 
       if (entity === 'profileStatistics') {
         return profileStatisticsLoader;
+      }
+
+      if (entity === 'webCardOwners') {
+        return webCardOwnerLoader;
       }
 
       if (!entities.includes(entity)) {

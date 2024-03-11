@@ -285,10 +285,6 @@ const AppRouter = () => {
   }, [profileInfos]);
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  useEffect(() => {
     const previous = router.getCurrentRoute();
     const disposable = router.addRouteWillChangeListener(route => {
       routingInstrumentation.onRouteWillChange({
@@ -437,7 +433,7 @@ const AppRouter = () => {
           <Suspense>
             <ShakeShare />
           </Suspense>
-          <LoadingScreen visible={showLoadingScreen} />
+          {showLoadingScreen && <LoadingScreen />}
         </SafeAreaProvider>
       </ScreenPrefetcherProvider>
     </RelayEnvironmentProvider>

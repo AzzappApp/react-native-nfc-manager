@@ -370,7 +370,6 @@ const WebCardBlockContainer = ({
 
   return (
     <Animated.View
-      style={blockStyle}
       entering={
         id !== 'cover' ? FadeIn.duration(EDIT_TRANSITION_DURATION) : undefined
       }
@@ -379,253 +378,255 @@ const WebCardBlockContainer = ({
       }
       layout={layoutTransition}
     >
-      <GestureDetector gesture={Gesture.Race(tapGesture, panGesture)}>
-        <Animated.View
-          style={[moduleContainerStyle, editing && shadow(appearance)]}
-        >
-          {/** this View is only here because ios bug with shadow and overflow hidden */}
+      <Animated.View style={blockStyle}>
+        <GestureDetector gesture={Gesture.Race(tapGesture, panGesture)}>
           <Animated.View
-            style={moduleInnerContainerStyle}
-            accessibilityHint={
-              editing
-                ? intl.formatMessage({
-                    defaultMessage: `Press to edit this section of your profile`,
-                    description: `Accessibility hint for the profile block container`,
-                  })
-                : undefined
-            }
+            style={[moduleContainerStyle, editing && shadow(appearance)]}
           >
-            <View pointerEvents={editing ? 'none' : 'box-none'}>
-              {children}
-            </View>
-            {!visible && (
-              <View
-                style={{
-                  ...StyleSheet.absoluteFillObject,
-                  //prettier-ignore
-                  backgroundColor: `${appearance === 'dark' ? colors.black : colors.white}99`,
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                }}
-              >
-                <Icon
-                  icon="hide"
-                  style={{ width: iconSize, height: iconSize * 2 }}
-                />
-              </View>
-            )}
-          </Animated.View>
-        </Animated.View>
-      </GestureDetector>
-
-      {displayEditionButtons && (
-        <>
-          {!isLast && (
+            {/** this View is only here because ios bug with shadow and overflow hidden */}
             <Animated.View
-              style={[
-                moveButtonStyle,
-                actionSectionBaseStyle,
-                {
-                  left: -buttonSize - 20,
-                  pointerEvents: activeSection !== 'none' ? 'none' : 'auto',
-                },
-              ]}
-            >
-              <IconButton
-                onPress={onMoveDown}
-                disabled={activeSection !== 'none' || !canMove}
-                icon="arrow_down"
-                size={buttonSize}
-                iconSize={iconSize}
-                style={{
-                  borderColor: colors.grey200,
-                }}
-                iconStyle={{
-                  tintColor: colors.grey200,
-                }}
-                accessibilityLabel={intl.formatMessage({
-                  defaultMessage: 'Move down',
-                  description:
-                    'Accessibility label for the move down button in the profile edition screen',
-                })}
-                accessibilityHint={intl.formatMessage({
-                  defaultMessage: 'Moves the module down',
-                  description:
-                    'Accessibility hint for the move down button in the profile edition screen',
-                })}
-              />
-            </Animated.View>
-          )}
-
-          {!isFirst && (
-            <Animated.View
-              style={[
-                moveButtonStyle,
-                actionSectionBaseStyle,
-                { right: -buttonSize - 20 },
-              ]}
-              pointerEvents={activeSection !== 'none' ? 'none' : 'auto'}
-            >
-              <IconButton
-                onPress={onMoveUp}
-                disabled={activeSection !== 'none' || !canMove}
-                icon="arrow_up"
-                size={buttonSize}
-                iconSize={iconSize}
-                style={{
-                  borderColor: colors.grey200,
-                }}
-                iconStyle={{
-                  tintColor: colors.grey200,
-                }}
-                accessibilityLabel={intl.formatMessage({
-                  defaultMessage: 'Move up',
-                  description:
-                    'Accessibility label for the move up button in the profile edition screen',
-                })}
-                accessibilityHint={intl.formatMessage({
-                  defaultMessage: 'Moves the module up',
-                  description:
-                    'Accessibility hint for the move up button in the profile edition screen',
-                })}
-              />
-            </Animated.View>
-          )}
-
-          <Animated.View
-            style={[
-              leftSectionStyle,
-              actionSectionBaseStyle,
-              { left: -buttonSize - 20 },
-            ]}
-            pointerEvents={
-              activeSection !== 'left' || selectionMode ? 'none' : 'auto'
-            }
-          >
-            <IconButton
-              onPress={() => onToggleVisibility?.(!visible)}
-              disabled={
-                activeSection !== 'left' ||
-                selectionMode ||
-                !canToggleVisibility
-              }
-              icon={visible ? 'hide' : 'preview'}
-              size={buttonSize}
-              iconSize={iconSize}
-              accessibilityLabel={
-                visible
-                  ? intl.formatMessage({
-                      defaultMessage: 'Hide',
-                      description:
-                        'Accessibility label for the hide button in the profile edition screen',
-                    })
-                  : intl.formatMessage({
-                      defaultMessage: 'Show',
-                      description:
-                        'Accessibility label for the show button in the profile edition screen',
-                    })
-              }
+              style={moduleInnerContainerStyle}
               accessibilityHint={
-                visible
+                editing
                   ? intl.formatMessage({
-                      defaultMessage: 'Hides the module in your webcard',
-                      description:
-                        'Accessibility hint for the hide button in the profile edition screen',
+                      defaultMessage: `Press to edit this section of your profile`,
+                      description: `Accessibility hint for the profile block container`,
                     })
-                  : intl.formatMessage({
-                      defaultMessage: 'Shows the module in your webcard',
-                      description:
-                        'Accessibility hint for the show button in the profile edition screen',
-                    })
+                  : undefined
               }
-            />
-            <IconButton
-              onPress={onDuplicate}
-              disabled={
-                activeSection !== 'left' || selectionMode || !canDuplicate
-              }
-              icon="background"
-              size={buttonSize}
-              iconSize={iconSize}
-              accessibilityLabel={intl.formatMessage({
-                defaultMessage: 'Duplicate',
-                description:
-                  'Accessibility label for the duplicate button in the profile edition screen',
-              })}
-              accessibilityHint={intl.formatMessage({
-                defaultMessage: 'Duplicates the module in your webcard',
-                description:
-                  'Accessibility hint for the duplicate button in the profile edition screen',
-              })}
-            />
+            >
+              <View pointerEvents={editing ? 'none' : 'box-none'}>
+                {children}
+              </View>
+              {!visible && (
+                <View
+                  style={{
+                    ...StyleSheet.absoluteFillObject,
+                    //prettier-ignore
+                    backgroundColor: `${appearance === 'dark' ? colors.black : colors.white}99`,
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}
+                >
+                  <Icon
+                    icon="hide"
+                    style={{ width: iconSize, height: iconSize * 2 }}
+                  />
+                </View>
+              )}
+            </Animated.View>
           </Animated.View>
+        </GestureDetector>
 
-          <Animated.View
-            style={[
-              selectionSectionStyle,
-              actionSectionBaseStyle,
-              { left: (-buttonSize - 20) / 2 },
-            ]}
-            pointerEvents={
-              activeSection !== 'left' || !selectionMode ? 'none' : 'auto'
-            }
-          >
-            <IconButton
-              onPress={() => onSelect?.(!selected)}
-              disabled={activeSection !== 'left' || !selectionMode}
-              icon="check"
-              size={buttonSize}
-              iconSize={iconSize}
-              iconStyle={{ tintColor: 'white', opacity: selected ? 1 : 0 }}
-              style={{
-                backgroundColor: selected ? colors.black : 'white',
-              }}
-              accessibilityRole="checkbox"
-              accessibilityState={{ checked: selected }}
-              accessibilityLabel={
-                selected
-                  ? intl.formatMessage({
-                      defaultMessage: 'Unselect',
-                      description:
-                        'Accessibility label for the select button in the profile edition screen',
-                    })
-                  : intl.formatMessage({
-                      defaultMessage: 'Select',
-                      description:
-                        'Accessibility label for the select button in the profile edition screen',
-                    })
-              }
-            />
-          </Animated.View>
+        {displayEditionButtons && (
+          <>
+            {!isLast && (
+              <Animated.View
+                style={[
+                  moveButtonStyle,
+                  actionSectionBaseStyle,
+                  {
+                    left: -buttonSize - 20,
+                    pointerEvents: activeSection !== 'none' ? 'none' : 'auto',
+                  },
+                ]}
+              >
+                <IconButton
+                  onPress={onMoveDown}
+                  disabled={activeSection !== 'none' || !canMove}
+                  icon="arrow_down"
+                  size={buttonSize}
+                  iconSize={iconSize}
+                  style={{
+                    borderColor: colors.grey200,
+                  }}
+                  iconStyle={{
+                    tintColor: colors.grey200,
+                  }}
+                  accessibilityLabel={intl.formatMessage({
+                    defaultMessage: 'Move down',
+                    description:
+                      'Accessibility label for the move down button in the profile edition screen',
+                  })}
+                  accessibilityHint={intl.formatMessage({
+                    defaultMessage: 'Moves the module down',
+                    description:
+                      'Accessibility hint for the move down button in the profile edition screen',
+                  })}
+                />
+              </Animated.View>
+            )}
 
-          <Animated.View
-            style={[
-              rightSectionStyle,
-              actionSectionBaseStyle,
-              { right: (-buttonSize - 20) / 2 },
-            ]}
-            pointerEvents={activeSection !== 'right' ? 'none' : 'auto'}
-          >
-            <IconButton
-              onPress={onRemove}
-              disabled={activeSection !== 'right' || !canDelete}
-              icon="delete"
-              size={buttonSize}
-              iconSize={iconSize}
-              accessibilityLabel={intl.formatMessage({
-                defaultMessage: 'Delete',
-                description:
-                  'Accessibility label for the delete button in the profile edition screen',
-              })}
-              accessibilityHint={intl.formatMessage({
-                defaultMessage: 'Deletes the module from your webcard',
-                description:
-                  'Accessibility hint for the delete button in the profile edition screen',
-              })}
-            />
-          </Animated.View>
-        </>
-      )}
+            {!isFirst && (
+              <Animated.View
+                style={[
+                  moveButtonStyle,
+                  actionSectionBaseStyle,
+                  { right: -buttonSize - 20 },
+                ]}
+                pointerEvents={activeSection !== 'none' ? 'none' : 'auto'}
+              >
+                <IconButton
+                  onPress={onMoveUp}
+                  disabled={activeSection !== 'none' || !canMove}
+                  icon="arrow_up"
+                  size={buttonSize}
+                  iconSize={iconSize}
+                  style={{
+                    borderColor: colors.grey200,
+                  }}
+                  iconStyle={{
+                    tintColor: colors.grey200,
+                  }}
+                  accessibilityLabel={intl.formatMessage({
+                    defaultMessage: 'Move up',
+                    description:
+                      'Accessibility label for the move up button in the profile edition screen',
+                  })}
+                  accessibilityHint={intl.formatMessage({
+                    defaultMessage: 'Moves the module up',
+                    description:
+                      'Accessibility hint for the move up button in the profile edition screen',
+                  })}
+                />
+              </Animated.View>
+            )}
+
+            <Animated.View
+              style={[
+                leftSectionStyle,
+                actionSectionBaseStyle,
+                { left: -buttonSize - 20 },
+              ]}
+              pointerEvents={
+                activeSection !== 'left' || selectionMode ? 'none' : 'auto'
+              }
+            >
+              <IconButton
+                onPress={() => onToggleVisibility?.(!visible)}
+                disabled={
+                  activeSection !== 'left' ||
+                  selectionMode ||
+                  !canToggleVisibility
+                }
+                icon={visible ? 'hide' : 'preview'}
+                size={buttonSize}
+                iconSize={iconSize}
+                accessibilityLabel={
+                  visible
+                    ? intl.formatMessage({
+                        defaultMessage: 'Hide',
+                        description:
+                          'Accessibility label for the hide button in the profile edition screen',
+                      })
+                    : intl.formatMessage({
+                        defaultMessage: 'Show',
+                        description:
+                          'Accessibility label for the show button in the profile edition screen',
+                      })
+                }
+                accessibilityHint={
+                  visible
+                    ? intl.formatMessage({
+                        defaultMessage: 'Hides the module in your webcard',
+                        description:
+                          'Accessibility hint for the hide button in the profile edition screen',
+                      })
+                    : intl.formatMessage({
+                        defaultMessage: 'Shows the module in your webcard',
+                        description:
+                          'Accessibility hint for the show button in the profile edition screen',
+                      })
+                }
+              />
+              <IconButton
+                onPress={onDuplicate}
+                disabled={
+                  activeSection !== 'left' || selectionMode || !canDuplicate
+                }
+                icon="background"
+                size={buttonSize}
+                iconSize={iconSize}
+                accessibilityLabel={intl.formatMessage({
+                  defaultMessage: 'Duplicate',
+                  description:
+                    'Accessibility label for the duplicate button in the profile edition screen',
+                })}
+                accessibilityHint={intl.formatMessage({
+                  defaultMessage: 'Duplicates the module in your webcard',
+                  description:
+                    'Accessibility hint for the duplicate button in the profile edition screen',
+                })}
+              />
+            </Animated.View>
+
+            <Animated.View
+              style={[
+                selectionSectionStyle,
+                actionSectionBaseStyle,
+                { left: (-buttonSize - 20) / 2 },
+              ]}
+              pointerEvents={
+                activeSection !== 'left' || !selectionMode ? 'none' : 'auto'
+              }
+            >
+              <IconButton
+                onPress={() => onSelect?.(!selected)}
+                disabled={activeSection !== 'left' || !selectionMode}
+                icon="check"
+                size={buttonSize}
+                iconSize={iconSize}
+                iconStyle={{ tintColor: 'white', opacity: selected ? 1 : 0 }}
+                style={{
+                  backgroundColor: selected ? colors.black : 'white',
+                }}
+                accessibilityRole="checkbox"
+                accessibilityState={{ checked: selected }}
+                accessibilityLabel={
+                  selected
+                    ? intl.formatMessage({
+                        defaultMessage: 'Unselect',
+                        description:
+                          'Accessibility label for the select button in the profile edition screen',
+                      })
+                    : intl.formatMessage({
+                        defaultMessage: 'Select',
+                        description:
+                          'Accessibility label for the select button in the profile edition screen',
+                      })
+                }
+              />
+            </Animated.View>
+
+            <Animated.View
+              style={[
+                rightSectionStyle,
+                actionSectionBaseStyle,
+                { right: (-buttonSize - 20) / 2 },
+              ]}
+              pointerEvents={activeSection !== 'right' ? 'none' : 'auto'}
+            >
+              <IconButton
+                onPress={onRemove}
+                disabled={activeSection !== 'right' || !canDelete}
+                icon="delete"
+                size={buttonSize}
+                iconSize={iconSize}
+                accessibilityLabel={intl.formatMessage({
+                  defaultMessage: 'Delete',
+                  description:
+                    'Accessibility label for the delete button in the profile edition screen',
+                })}
+                accessibilityHint={intl.formatMessage({
+                  defaultMessage: 'Deletes the module from your webcard',
+                  description:
+                    'Accessibility hint for the delete button in the profile edition screen',
+                })}
+              />
+            </Animated.View>
+          </>
+        )}
+      </Animated.View>
     </Animated.View>
   );
 };
