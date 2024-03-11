@@ -1,5 +1,6 @@
-## 0.5.5-canary.133
+## 0.5.5-canary.134
 
+* **fix:**  - 🐛 hide keyboard on reset password submit to show toast ([#3035](https://github.com/AzzappApp/azzapp/pull/3035))
 * **fix:**  - 🐛 apply fix for react-native-reanimated crash on ios ([#3009](https://github.com/AzzappApp/azzapp/pull/3009))
 * **fix:**  - 🐛 correctly redirect to onboarding ([#2988](https://github.com/AzzappApp/azzapp/pull/2988))
 * **docs:**  - Update README.md
