@@ -10,6 +10,7 @@ import {
   createProfiles,
   createUsers,
   db,
+  updateWebCard,
 } from '#domains';
 import fromGlobalIdWithType from '#helpers/relayIdHelpers';
 import type { NewProfile } from '#domains';
@@ -58,11 +59,15 @@ const inviteUsersListMutation: MutationResolvers['inviteUsersList'] = async (
   }
 
   const webCard = await loaders.WebCard.load(profile.webCardId);
-  if (!webCard || !webCard.isMultiUser) {
+  if (!webCard) {
     throw new GraphQLError(ERRORS.INVALID_REQUEST);
   }
 
   const { createdAt, users } = await db.transaction(async trx => {
+    if (!webCard.isMultiUser) {
+      await updateWebCard(webCard.id, { isMultiUser: true }, trx);
+    }
+
     let userId;
 
     await createUsers(
