@@ -13,6 +13,7 @@ import {
 import { colors } from '#theme';
 import EmailOrPhoneInput from '#components/EmailOrPhoneInput';
 import Link from '#components/Link';
+import { useRouter } from '#components/NativeRouter';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import { dispatchGlobalEvent } from '#helpers/globalEvents';
 import { getCurrentLocale } from '#helpers/localeHelpers';
@@ -30,6 +31,7 @@ import type { CheckboxStatus } from '#ui/CheckBox';
 import type { TextInput as NativeTextInput } from 'react-native';
 
 const SignupScreen = () => {
+  const router = useRouter();
   const [contact, setContact] = useState<EmailPhoneInput>({
     countryCodeOrEmail: 'email',
     value: '',
@@ -118,20 +120,16 @@ const SignupScreen = () => {
             },
           });
         } else {
-          await dispatchGlobalEvent({
-            type: 'SIGN_UP',
-            payload: {
-              authTokens: {
-                token: tokens.token,
-                refreshToken: tokens.refreshToken,
-              },
-              email: tokens.email,
-              phoneNumber: tokens.phoneNumber,
-              userId: tokens.userId,
+          const { issuer } = tokens;
+
+          router.push({
+            route: 'CONFIRM_REGISTRATION',
+            params: {
+              issuer: issuer!,
             },
           });
-          setIsSubmitting(false);
         }
+        setIsSubmitting(false);
       } catch (error: any) {
         if (error.message === ERRORS.EMAIL_ALREADY_EXISTS) {
           setPhoneOrEmailError(
@@ -167,6 +165,7 @@ const SignupScreen = () => {
     contact.value,
     intl,
     password,
+    router,
   ]);
 
   const keyboardHeight = useAnimatedKeyboardHeight();

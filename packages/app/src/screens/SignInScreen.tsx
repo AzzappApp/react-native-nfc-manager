@@ -10,6 +10,7 @@ import {
 } from '@azzapp/shared/stringHelpers';
 import { colors } from '#theme';
 import Link from '#components/Link';
+import { useRouter } from '#components/NativeRouter';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import { dispatchGlobalEvent } from '#helpers/globalEvents';
 import { getLocales } from '#helpers/localeHelpers';
@@ -30,6 +31,8 @@ const SignInScreen = () => {
   const [credentialInvalid, setCredentialInvalid] = useState(false);
   const [signinError, setSigninError] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const router = useRouter();
 
   const onSubmit = useCallback(async () => {
     if (!isNotFalsyString(credential) || !isNotFalsyString(password)) {
@@ -53,29 +56,47 @@ const SignInScreen = () => {
 
     try {
       setIsSubmitting(true);
-      const { token, refreshToken, profileInfos, email, phoneNumber, userId } =
-        await signin({
-          credential: intlPhoneNumber ?? credential,
-          password,
-        });
 
-      await dispatchGlobalEvent({
-        type: 'SIGN_IN',
-        payload: {
-          authTokens: { token, refreshToken },
+      const signedIn = await signin({
+        credential: intlPhoneNumber ?? credential,
+        password,
+      });
+
+      if (signedIn.issuer) {
+        router.push({
+          route: 'CONFIRM_REGISTRATION',
+          params: {
+            issuer: signedIn.issuer,
+          },
+        });
+      } else {
+        const {
+          token,
+          refreshToken,
           profileInfos,
           email,
           phoneNumber,
           userId,
-        },
-      });
+        } = signedIn;
+
+        await dispatchGlobalEvent({
+          type: 'SIGN_IN',
+          payload: {
+            authTokens: { token, refreshToken },
+            profileInfos,
+            email,
+            phoneNumber,
+            userId,
+          },
+        });
+      }
     } catch (error) {
       //TODO handle more error cases ?
       setSigninError(true);
       setIsSubmitting(false);
       return;
     }
-  }, [credential, password]);
+  }, [credential, password, router]);
 
   const passwordRef = useRef<NativeTextInput>(null);
   // #endregion

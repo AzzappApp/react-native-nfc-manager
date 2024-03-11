@@ -17,6 +17,10 @@ export const UserTable = mysqlTable(
     roles: json('roles').$type<string[]>(),
     invited: boolean('invited').default(false).notNull(),
     locale: cols.defaultVarchar('locale'),
+    emailConfirmed: boolean('emailConfirmed').default(false).notNull(),
+    phoneNumberConfirmed: boolean('phoneNumberConfirmed')
+      .default(false)
+      .notNull(),
   },
   table => {
     return {

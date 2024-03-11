@@ -1,26 +1,26 @@
-import { RelayEnvironmentProvider } from 'react-relay';
-import { createMockEnvironment } from 'relay-test-utils/lib/RelayModernMockEnvironment';
+import { requestUpdateContact } from '#helpers/MobileWebAPI';
 import { screen, render, fireEvent, act, waitFor } from '#helpers/testHelpers';
 import AccountDetailsEmailForm from '../AccountDetailsEmailForm';
-import type { RelayMockEnvironment } from 'relay-test-utils/lib/RelayModernMockEnvironment';
+
+jest.mock('#helpers/MobileWebAPI');
 
 describe('AccountDetailsEmailForm', () => {
-  let environment: RelayMockEnvironment;
+  const requestUpdateContactMock = jest.mocked(requestUpdateContact);
+
+  beforeEach(() => {
+    requestUpdateContactMock.mockReset();
+  });
 
   const renderAccountDetailsEmailForm = () => {
-    environment = createMockEnvironment();
-
     return render(
-      <RelayEnvironmentProvider environment={environment}>
-        <AccountDetailsEmailForm
-          currentUser={{
-            email: 'default@email.com',
-            phoneNumber: '',
-          }}
-          toggleBottomSheet={() => void 0}
-          visible
-        />
-      </RelayEnvironmentProvider>,
+      <AccountDetailsEmailForm
+        currentUser={{
+          email: 'default@email.com',
+          phoneNumber: '',
+        }}
+        toggleBottomSheet={() => void 0}
+        visible
+      />,
     );
   };
 
@@ -30,7 +30,11 @@ describe('AccountDetailsEmailForm', () => {
     expect(screen.getByDisplayValue('default@email.com')).toBeOnTheScreen();
   });
 
-  test('Should submit updated user', async () => {
+  test('Should request updated user change', async () => {
+    requestUpdateContactMock.mockResolvedValueOnce({
+      issuer: 'new@email.fr',
+    });
+
     renderAccountDetailsEmailForm();
 
     act(() => {
@@ -46,14 +50,9 @@ describe('AccountDetailsEmailForm', () => {
       expect(screen.getByText('Save')).toBeDefined();
     });
 
-    const operation = environment.mock.getMostRecentOperation();
-
-    expect(operation.request.node.operation.name).toBe(
-      'useUpdateUser_Mutation',
-    );
-
-    expect(operation.request.variables.input).toEqual({
+    expect(requestUpdateContactMock).toHaveBeenCalledWith({
       email: 'new@email.fr',
+      locale: 'fr',
     });
   });
 });

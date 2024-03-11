@@ -57,6 +57,8 @@ import { useDeepLink } from '#hooks/useDeepLink';
 import AboutScreen from '#screens/AboutScreen';
 import AccountDetailsScreen from '#screens/AccountDetailsScreen';
 import CardModuleEditionScreen from '#screens/CardModuleEditionScreen';
+import ConfirmChangeContactScreen from '#screens/ConfirmChangeContactScreen';
+import ConfirmRegistrationScreen from '#screens/ConfirmRegistrationScreen';
 import ContactCardScreen from '#screens/ContactCardScreen';
 import CoverEditionScreen from '#screens/CoverEditionScreen';
 import FollowersScreen from '#screens/FollowersScreen';
@@ -199,9 +201,11 @@ const screens = {
   RESET_PASSWORD: ResetPasswordScreen,
   SIGN_IN: SignInScreen,
   SIGN_UP: SignupScreen,
+  CONFIRM_REGISTRATION: ConfirmRegistrationScreen,
   SEARCH: SearchScreen,
   WEBCARD: WebCardScreen,
   WEBCARD_PARAMETERS: WebCardParametersScreen,
+  CONFIRM_CHANGE_CONTACT: ConfirmChangeContactScreen,
 };
 
 const tabs = {
@@ -210,7 +214,12 @@ const tabs = {
 
 // #endregion
 
-const unauthenticatedRoutes = ['SIGN_IN', 'SIGN_UP', 'FORGOT_PASSWORD'];
+const unauthenticatedRoutes = [
+  'SIGN_IN',
+  'SIGN_UP',
+  'FORGOT_PASSWORD',
+  'CONFIRM_REGISTRATION',
+];
 
 /**
  * The main application component

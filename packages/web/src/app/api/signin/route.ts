@@ -16,6 +16,7 @@ import {
 } from '@azzapp/shared/stringHelpers';
 import { handleSignInAuthMethod } from '#helpers/auth';
 import cors from '#helpers/cors';
+import { twilioVerificationService } from '#helpers/twilioHelpers';
 import type { Profile, User } from '@azzapp/data/domains';
 
 type SignInBody = {
@@ -48,7 +49,7 @@ const signin = async (req: Request) => {
     if (user) {
       // if we found a user by email or phonenumber, we look for the profile
       const profiles = await getProfilesOfUser(user.id, 1);
-      profile = profiles[0].Profile;
+      profile = profiles[0]?.Profile;
     } else {
       // in all other case, look for username
       profile = await getProfileByUserName(credential);
@@ -60,6 +61,24 @@ const signin = async (req: Request) => {
         { message: ERRORS.INVALID_CREDENTIALS },
         { status: 401 },
       );
+    }
+
+    if (!user.emailConfirmed && !user.phoneNumberConfirmed) {
+      const issuer = (user.email ?? user.phoneNumber) as string;
+      const verification =
+        await twilioVerificationService().verifications.create({
+          to: issuer,
+          channel: user.email ? 'email' : 'sms',
+          locale: user.locale ?? undefined,
+        });
+
+      if (verification && verification.status === 'canceled') {
+        throw new Error('Verification canceled');
+      }
+
+      return NextResponse.json({
+        issuer,
+      });
     }
 
     //TODO: review Security: Use a constant-time compairson function like crypto.timingSafeEqual()
@@ -82,3 +101,5 @@ const signin = async (req: Request) => {
 };
 
 export const { POST, OPTIONS } = cors({ POST: signin });
+
+export const runtime = 'nodejs';

@@ -59,6 +59,25 @@ export type SignUpParams = {
 );
 
 /**
+ * Parameters for the confirm registration API call.
+ */
+export type ConfirmRegistrationParams = {
+  token: string;
+  issuer: string;
+};
+
+/**
+ * Reponse for the confirm registration API call.
+ */
+export type ConfirmRegistrationReponse = {
+  token: string;
+  refreshToken: string;
+  email: string | null;
+  phoneNumber: string | null;
+  userId: string;
+};
+
+/**
  * API call to signup a new user.
  */
 export const signup: APIMethod<
@@ -72,9 +91,23 @@ export const signup: APIMethod<
     } | null;
     email: string | null;
     phoneNumber: string | null;
+    issuer?: string;
   }
 > = (data, init) =>
   apiFetch(`${API_ENDPOINT}/signup`, {
+    ...init,
+    method: 'POST',
+    body: JSON.stringify(data),
+  });
+
+/**
+ * API call to confirm registration email or phone after signup.
+ */
+export const confirmRegistration: APIMethod<
+  ConfirmRegistrationParams,
+  ConfirmRegistrationReponse
+> = (data, init) =>
+  apiFetch(`${API_ENDPOINT}/confirmRegistration`, {
     ...init,
     method: 'POST',
     body: JSON.stringify(data),
@@ -108,6 +141,7 @@ export const signin: APIMethod<
     } | null;
     email: string | null;
     phoneNumber: string | null;
+    issuer?: string;
   }
 > = (data, init) =>
   apiFetch(`${API_ENDPOINT}/signin`, {
@@ -284,3 +318,13 @@ export const generateEmailSignature: APIMethod<
       method: 'POST',
     },
   );
+
+export const requestUpdateContact: APIMethod<
+  { email?: string | null; phoneNumber?: string | null; locale: string },
+  { issuer: string }
+> = ({ email, phoneNumber, locale }, init) =>
+  apiFetch(`${API_ENDPOINT}/requestUpdateContact`, {
+    ...init,
+    method: 'POST',
+    body: JSON.stringify({ email, phoneNumber, locale }),
+  });

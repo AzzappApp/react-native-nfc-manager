@@ -6,9 +6,9 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import { View, StyleSheet } from 'react-native';
 import { getCountry } from 'react-native-localize';
 import { z } from 'zod';
-import ERRORS from '@azzapp/shared/errors';
 import { isPhoneNumber } from '@azzapp/shared/stringHelpers';
-import useUpdateUser from '#screens/AccountDetailsScreen/useUpdateUser';
+import { useRouter } from '#components/NativeRouter';
+import { requestUpdateContact } from '#helpers/MobileWebAPI';
 import Button from '#ui/Button';
 import CountryCodeListWithOptions from '#ui/CountryCodeListWithOptions';
 import COUNTRY_FLAG from '#ui/CountrySelector/CountryFlag';
@@ -16,7 +16,6 @@ import Header from '#ui/Header';
 import InputAccessoryView from '#ui/InputAccessoryView';
 import Text from '#ui/Text';
 import TextInput from '#ui/TextInput';
-import type { GraphQLError } from 'graphql';
 import type { CountryCode } from 'libphonenumber-js';
 import type { TextInput as NativeTextInput } from 'react-native';
 
@@ -33,6 +32,7 @@ const AccountDetailsPhoneNumberForm = ({
   };
 }) => {
   const hasEmail = currentUser.email != null;
+  const router = useRouter();
 
   const phoneNumberFormSchema = z
     .object({
@@ -83,8 +83,6 @@ const AccountDetailsPhoneNumberForm = ({
 
   const intl = useIntl();
 
-  const [commitMutation] = useUpdateUser();
-
   const submit = handleSubmit(async ({ phoneNumber, countryCode }) => {
     let storedPhoneNumber: string | null = null;
     if (phoneNumber) {
@@ -94,56 +92,30 @@ const AccountDetailsPhoneNumberForm = ({
       ).formatInternational();
     }
 
-    commitMutation({
-      variables: {
-        input: {
-          phoneNumber: storedPhoneNumber,
+    try {
+      const { issuer } = await requestUpdateContact({
+        locale: intl.locale,
+        phoneNumber: storedPhoneNumber,
+      });
+
+      toggleBottomSheet();
+
+      router.push({
+        route: 'CONFIRM_CHANGE_CONTACT',
+        params: {
+          issuer,
         },
-      },
-      optimisticResponse: {
-        updateUser: {
-          user: {
-            ...currentUser,
-            phoneNumber: storedPhoneNumber,
-          },
-        },
-      },
-      updater: store => {
-        store
-          .getRoot()
-          .getLinkedRecord('currentUser')
-          ?.setValue(storedPhoneNumber, 'phoneNumber');
-      },
-      onCompleted: () => {
-        toggleBottomSheet();
-      },
-      onError: error => {
-        const response = ('response' in error ? error.response : undefined) as
-          | { errors: GraphQLError[] }
-          | undefined;
-        if (
-          response?.errors.some(
-            r => r.message === ERRORS.PHONENUMBER_ALREADY_EXISTS,
-          )
-        ) {
-          setError('root.server', {
-            message: intl.formatMessage({
-              defaultMessage: 'This phone number is already registered',
-              description:
-                'Account Details Screen - Error This phone number is already registered ',
-            }),
-          });
-        } else {
-          setError('root.server', {
-            message: intl.formatMessage({
-              defaultMessage: 'Unknown error - Please retry',
-              description:
-                'Account Details Screen - Error Unknown error - Please retry',
-            }),
-          });
-        }
-      },
-    });
+      });
+    } catch (e) {
+      console.error(e);
+      setError('root.server', {
+        message: intl.formatMessage({
+          defaultMessage: 'Unknown error - Please retry',
+          description:
+            'Account Details Screen - Error Unknown error - Please retry',
+        }),
+      });
+    }
   });
 
   const phoneNumberInputRef = useRef<NativeTextInput>(null);

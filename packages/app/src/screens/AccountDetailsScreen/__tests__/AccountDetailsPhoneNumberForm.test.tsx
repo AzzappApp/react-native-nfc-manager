@@ -1,26 +1,26 @@
-import { RelayEnvironmentProvider } from 'react-relay';
-import { createMockEnvironment } from 'relay-test-utils/lib/RelayModernMockEnvironment';
+import { requestUpdateContact } from '#helpers/MobileWebAPI';
 import { screen, render, fireEvent, act, waitFor } from '#helpers/testHelpers';
 import AccountDetailsPhoneNumberForm from '../AccountDetailsPhoneNumberForm';
-import type { RelayMockEnvironment } from 'relay-test-utils/lib/RelayModernMockEnvironment';
+
+jest.mock('#helpers/MobileWebAPI');
 
 describe('AccountDetailsPhoneNumberForm', () => {
-  let environment: RelayMockEnvironment;
+  const requestUpdateContactMock = jest.mocked(requestUpdateContact);
+
+  beforeEach(() => {
+    requestUpdateContactMock.mockReset();
+  });
 
   const renderAccountDetailsEmailForm = ({ phoneNumber = '+33612345678' }) => {
-    environment = createMockEnvironment();
-
     return render(
-      <RelayEnvironmentProvider environment={environment}>
-        <AccountDetailsPhoneNumberForm
-          currentUser={{
-            email: '',
-            phoneNumber,
-          }}
-          toggleBottomSheet={() => void 0}
-          visible
-        />
-      </RelayEnvironmentProvider>,
+      <AccountDetailsPhoneNumberForm
+        currentUser={{
+          email: '',
+          phoneNumber,
+        }}
+        toggleBottomSheet={() => void 0}
+        visible
+      />,
     );
   };
 
@@ -31,6 +31,10 @@ describe('AccountDetailsPhoneNumberForm', () => {
   });
 
   test('Should submit updated user', async () => {
+    requestUpdateContactMock.mockResolvedValueOnce({
+      issuer: '06 12 34 56 79',
+    });
+
     renderAccountDetailsEmailForm({});
 
     act(() => {
@@ -46,18 +50,17 @@ describe('AccountDetailsPhoneNumberForm', () => {
       expect(screen.getByText('Save')).toBeDefined();
     });
 
-    const operation = environment.mock.getMostRecentOperation();
-
-    expect(operation.request.node.operation.name).toBe(
-      'useUpdateUser_Mutation',
-    );
-
-    expect(operation.request.variables.input).toEqual({
+    expect(requestUpdateContactMock).toHaveBeenCalledWith({
       phoneNumber: '+33 6 12 34 56 79',
+      locale: 'fr',
     });
   });
 
   test('Should use device country - US in test context', async () => {
+    requestUpdateContactMock.mockResolvedValueOnce({
+      issuer: '+1 201 555 0123',
+    });
+
     renderAccountDetailsEmailForm({ phoneNumber: '' });
 
     act(() => {
@@ -73,14 +76,9 @@ describe('AccountDetailsPhoneNumberForm', () => {
       expect(screen.getByText('Save')).toBeDefined();
     });
 
-    const operation = environment.mock.getMostRecentOperation();
-
-    expect(operation.request.node.operation.name).toBe(
-      'useUpdateUser_Mutation',
-    );
-
-    expect(operation.request.variables.input).toEqual({
+    expect(requestUpdateContactMock).toHaveBeenCalledWith({
       phoneNumber: '+1 201 555 0123',
+      locale: 'fr',
     });
   });
 });

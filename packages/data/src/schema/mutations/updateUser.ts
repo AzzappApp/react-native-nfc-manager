@@ -5,6 +5,7 @@ import {
   formatPhoneNumber,
   isInternationalPhoneNumber,
 } from '@azzapp/shared/stringHelpers';
+import { twilioVerificationService } from '@azzapp/web/src/helpers/twilioHelpers';
 import { getUserByEmail, getUserByPhoneNumber, updateUser } from '#domains';
 import type { User } from '#domains';
 import type { MutationResolvers } from '#schema/__generated__/types';
@@ -19,9 +20,24 @@ const updateUserMutation: MutationResolvers['updateUser'] = async (
     return null;
   }
 
-  const { email, phoneNumber, currentPassword, newPassword } = args.input;
+  const { email, phoneNumber, currentPassword, newPassword, token } =
+    args.input;
 
   const partialUser: Partial<User> = {};
+
+  if (phoneNumber) {
+    await twilioVerificationService().verificationChecks.create({
+      to: phoneNumber,
+      code: token ?? undefined,
+    });
+  }
+
+  if (email) {
+    await twilioVerificationService().verificationChecks.create({
+      to: email,
+      code: token ?? undefined,
+    });
+  }
 
   if (email) {
     const existingUser = await getUserByEmail(email);

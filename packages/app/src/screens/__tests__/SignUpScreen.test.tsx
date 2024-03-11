@@ -85,18 +85,6 @@ describe('SignUpScreen', () => {
     expect(submitButton).toHaveAccessibilityState({ busy: true });
 
     await act(flushPromises);
-    expect(dispatchGlobalEventMock).toHaveBeenCalledWith({
-      type: 'SIGN_UP',
-      payload: {
-        authTokens: {
-          token: 'fake-token',
-          refreshToken: 'fake-refreshToken',
-        },
-        email: 'test@azzapp.com',
-        phoneNumber: null,
-        userId: '',
-      },
-    });
   });
 
   test('should call the `signup` callback if form is filled with a valid phone number', async () => {
@@ -139,18 +127,6 @@ describe('SignUpScreen', () => {
 
     expect(submitButton).toHaveAccessibilityState({ busy: true });
     await act(flushPromises);
-    expect(dispatchGlobalEventMock).toHaveBeenCalledWith({
-      type: 'SIGN_UP',
-      payload: {
-        authTokens: {
-          token: 'fake-token',
-          refreshToken: 'fake-refreshToken',
-        },
-        email: null,
-        phoneNumber: '+1 212 688 0188',
-        userId: '',
-      },
-    });
   });
 
   test('should not call the `signup` callback if phone number is not valid', () => {

@@ -3,15 +3,14 @@ import { Controller, useForm } from 'react-hook-form';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { StyleSheet, View } from 'react-native';
 import { z } from 'zod';
-import ERRORS from '@azzapp/shared/errors';
 import { isNotFalsyString } from '@azzapp/shared/stringHelpers';
-import useUpdateUser from '#screens/AccountDetailsScreen/useUpdateUser';
+import { useRouter } from '#components/NativeRouter';
+import { requestUpdateContact } from '#helpers/MobileWebAPI';
 import Button from '#ui/Button';
 import Header from '#ui/Header';
 import InputAccessoryView from '#ui/InputAccessoryView';
 import Text from '#ui/Text';
 import TextInput from '#ui/TextInput';
-import type { GraphQLError } from '#helpers/relayEnvironment';
 
 const AccountDetailsEmailForm = ({
   currentUser,
@@ -25,6 +24,7 @@ const AccountDetailsEmailForm = ({
     phoneNumber: string | null;
   };
 }) => {
+  const router = useRouter();
   const hasPhoneNumber = currentUser.phoneNumber != null;
   const emailFormSchema = z.object({
     email: hasPhoneNumber
@@ -47,62 +47,36 @@ const AccountDetailsEmailForm = ({
 
   const intl = useIntl();
 
-  const [commitMutation] = useUpdateUser();
-
   const submit = handleSubmit(async ({ email }) => {
     let storedEmail: string | null = null;
     if (isNotFalsyString(email)) {
       storedEmail = email!;
     }
 
-    commitMutation({
-      variables: {
-        input: {
-          email: storedEmail,
+    try {
+      const { issuer } = await requestUpdateContact({
+        locale: intl.locale,
+        email: storedEmail,
+      });
+
+      toggleBottomSheet();
+
+      router.push({
+        route: 'CONFIRM_CHANGE_CONTACT',
+        params: {
+          issuer,
         },
-      },
-      optimisticResponse: {
-        updateUser: {
-          user: {
-            ...currentUser,
-            email: storedEmail,
-          },
-        },
-      },
-      updater: store => {
-        store
-          .getRoot()
-          .getLinkedRecord('currentUser')
-          ?.setValue(storedEmail, 'email');
-      },
-      onCompleted: () => {
-        toggleBottomSheet();
-      },
-      onError: error => {
-        const response = ('response' in error ? error.response : undefined) as
-          | { errors: GraphQLError[] }
-          | undefined;
-        if (
-          response?.errors.some(r => r.message === ERRORS.EMAIL_ALREADY_EXISTS)
-        ) {
-          setError('root.server', {
-            message: intl.formatMessage({
-              defaultMessage: 'This email address is already registered',
-              description:
-                'Account Details Screen - Error This email address is already registered ',
-            }),
-          });
-        } else {
-          setError('root.server', {
-            message: intl.formatMessage({
-              defaultMessage: 'Unknown error - Please retry',
-              description:
-                'Account Details Screen - Error Unknown error - Please retry',
-            }),
-          });
-        }
-      },
-    });
+      });
+    } catch (e) {
+      console.error(e);
+      setError('root.server', {
+        message: intl.formatMessage({
+          defaultMessage: 'Unknown error - Please retry',
+          description:
+            'Account Details Screen - Error Unknown error - Please retry',
+        }),
+      });
+    }
   });
 
   return (

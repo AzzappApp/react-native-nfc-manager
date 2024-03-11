@@ -33,6 +33,13 @@ export type SignUpRoute = {
   params?: never;
 };
 
+export type ConfirmRegistrationRoute = {
+  route: 'CONFIRM_REGISTRATION';
+  params: {
+    issuer: string;
+  };
+};
+
 export type ForgotPasswordRoute = {
   route: 'FORGOT_PASSWORD';
   params?: never;
@@ -161,10 +168,19 @@ export type WebCardParametersRoute = {
   params?: never;
 };
 
+export type ConfirmChangeContactRoute = {
+  route: 'CONFIRM_CHANGE_CONTACT';
+  params: {
+    issuer: string;
+  };
+};
+
 export type Route =
   | AboutRoute
   | AccountDetailsRoute
   | CardModuleEditionRoute
+  | ConfirmChangeContactRoute
+  | ConfirmRegistrationRoute
   | ContactCardRoute
   | CoverEditionRoute
   | FollowersRoute

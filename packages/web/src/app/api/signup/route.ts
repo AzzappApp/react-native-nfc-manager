@@ -15,7 +15,7 @@ import {
   isValidEmail,
 } from '@azzapp/shared/stringHelpers';
 import { handleSignInAuthMethod } from '#helpers/auth';
-import { generateTokens } from '#helpers/tokens';
+import { twilioVerificationService } from '#helpers/twilioHelpers';
 import type { User } from '@azzapp/data/domains';
 
 type SignupBody = {
@@ -88,7 +88,7 @@ export const POST = async (req: Request) => {
       }
     }
     const userPhoneNumber = phoneNumber?.replace(/\s/g, '') ?? null;
-    const userId = await createUser({
+    await createUser({
       email: email ?? null,
       phoneNumber: userPhoneNumber,
       password: bcrypt.hashSync(password, 12),
@@ -96,17 +96,21 @@ export const POST = async (req: Request) => {
       roles: null,
     });
 
-    const { token, refreshToken } = await generateTokens({
-      userId,
-    });
+    const issuer = (email ?? userPhoneNumber) as string;
+    const verification = await twilioVerificationService().verifications.create(
+      {
+        to: issuer,
+        channel: email ? 'email' : 'sms',
+        locale,
+      },
+    );
+
+    if (verification && verification.status === 'canceled') {
+      throw new Error('Verification canceled');
+    }
 
     return NextResponse.json({
-      ok: true,
-      token,
-      refreshToken,
-      email: email ?? null,
-      phoneNumber: userPhoneNumber,
-      userId,
+      issuer,
     });
   } catch (error) {
     console.error(error);
@@ -117,3 +121,5 @@ export const POST = async (req: Request) => {
     );
   }
 };
+
+export const runtime = 'nodejs';

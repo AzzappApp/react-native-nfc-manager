@@ -28,6 +28,11 @@ export const signup = withFetchFunction(
   unauthenticatedFetchJSON,
 );
 
+export const confirmRegistration = withFetchFunction(
+  WebAPI.confirmRegistration,
+  authenticatedFetchJSON,
+);
+
 export const forgotPassword = withFetchFunction(
   WebAPI.forgotPassword,
   unauthenticatedFetchJSON,
@@ -65,5 +70,10 @@ export const getGoogleWalletPass = withFetchFunction(
 );
 export const generateEmailSignature = withFetchFunction(
   WebAPI.generateEmailSignature,
+  authenticatedFetchJSON,
+);
+
+export const requestUpdateContact = withFetchFunction(
+  WebAPI.requestUpdateContact,
   authenticatedFetchJSON,
 );
