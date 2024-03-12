@@ -196,51 +196,51 @@ const dataLoadersOptions = {
   batchScheduleFn: setTimeout,
 };
 
-const profileByWebCardIdAndUserIdLoader = new DataLoader<
-  { userId: string; webCardId: string },
-  Profile | null,
-  string
->(
-  async keys => {
-    return Promise.all(
-      keys.map(key => getUserProfileWithWebCardId(key.userId, key.webCardId)),
-    );
-  },
-  {
-    ...dataLoadersOptions,
-    cacheKeyFn: key => `${key.userId}-${key.webCardId}`,
-  },
-);
+const profileByWebCardIdAndUserIdLoader = () =>
+  new DataLoader<{ userId: string; webCardId: string }, Profile | null, string>(
+    async keys => {
+      return Promise.all(
+        keys.map(key => getUserProfileWithWebCardId(key.userId, key.webCardId)),
+      );
+    },
+    {
+      ...dataLoadersOptions,
+      cacheKeyFn: key => `${key.userId}-${key.webCardId}`,
+    },
+  );
 
-const webCardStatisticsLoader = new DataLoader<string, WebCardStatistic[]>(
-  async keys => {
-    const stats = await getLastWebCardListStatisticsFor(keys as string[], 30);
+const webCardStatisticsLoader = () =>
+  new DataLoader<string, WebCardStatistic[]>(
+    async keys => {
+      const stats = await getLastWebCardListStatisticsFor(keys as string[], 30);
 
-    return keys.map(key => stats.filter(stat => stat.webCardId === key));
-  },
-  {
-    ...dataLoadersOptions,
-    cacheKeyFn: key => `${key}`,
-  },
-);
+      return keys.map(key => stats.filter(stat => stat.webCardId === key));
+    },
+    {
+      ...dataLoadersOptions,
+      cacheKeyFn: key => `${key}`,
+    },
+  );
 
-const profileStatisticsLoader = new DataLoader<string, ProfileStatistic[]>(
-  async keys => {
-    const stats = await getLastProfileListStatisticsFor(keys as string[], 30);
+const profileStatisticsLoader = () =>
+  new DataLoader<string, ProfileStatistic[]>(
+    async keys => {
+      const stats = await getLastProfileListStatisticsFor(keys as string[], 30);
 
-    return keys.map(key => stats.filter(stat => stat.profileId === key));
-  },
-  {
-    ...dataLoadersOptions,
-    cacheKeyFn: key => `${key}`,
-  },
-);
+      return keys.map(key => stats.filter(stat => stat.profileId === key));
+    },
+    {
+      ...dataLoadersOptions,
+      cacheKeyFn: key => `${key}`,
+    },
+  );
 
-const webCardOwnerLoader = new DataLoader<string, User | null>(async keys => {
-  const profiles = await getOwners(keys as string[]);
+const webCardOwnerLoader = () =>
+  new DataLoader<string, User | null>(async keys => {
+    const profiles = await getOwners(keys as string[]);
 
-  return keys.map(k => profiles.find(p => p.webCardId === k)?.user ?? null);
-}, dataLoadersOptions);
+    return keys.map(k => profiles.find(p => p.webCardId === k)?.user ?? null);
+  }, dataLoadersOptions);
 
 const createLoaders = (): Loaders =>
   new Proxy({} as Loaders, {
@@ -254,19 +254,19 @@ const createLoaders = (): Loaders =>
         | 'webCardStatistics',
     ) => {
       if (entity === 'profileByWebCardIdAndUserId') {
-        return profileByWebCardIdAndUserIdLoader;
+        return profileByWebCardIdAndUserIdLoader();
       }
 
       if (entity === 'webCardStatistics') {
-        return webCardStatisticsLoader;
+        return webCardStatisticsLoader();
       }
 
       if (entity === 'profileStatistics') {
-        return profileStatisticsLoader;
+        return profileStatisticsLoader();
       }
 
       if (entity === 'webCardOwners') {
-        return webCardOwnerLoader;
+        return webCardOwnerLoader();
       }
 
       if (!entities.includes(entity)) {

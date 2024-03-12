@@ -14,7 +14,7 @@ const hasRole = (
   acceptInvited?: boolean,
 ) =>
   rule(`hasRole-${key}`, {
-    cache: 'no_cache',
+    cache: 'contextual',
   })(async (_parent: any, args: any, ctx: GraphQLContext) => {
     if ('webCardId' in args && typeof args.webCardId === 'string') {
       const { userId } = ctx.auth;
