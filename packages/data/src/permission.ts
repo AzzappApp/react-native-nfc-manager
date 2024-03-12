@@ -14,7 +14,7 @@ const hasRole = (
   acceptInvited?: boolean,
 ) =>
   rule(`hasRole-${key}`, {
-    cache: 'strict',
+    cache: 'no_cache',
   })(async (_parent: any, args: any, ctx: GraphQLContext) => {
     if ('webCardId' in args && typeof args.webCardId === 'string') {
       const { userId } = ctx.auth;
@@ -155,34 +155,6 @@ const isCurrentWebCardRule = rule('sameUserWebCard', {
   return userProfile !== null;
 });
 
-const hasProfileOnWebCardWithRole = (
-  key: string,
-  checkRole: (p: ProfileRole) => boolean,
-  acceptInvited?: boolean,
-) =>
-  rule(`hasProfileWithRole-${key}`, {
-    cache: 'contextual',
-  })(async (parent: WebCard, _args, ctx: GraphQLContext) => {
-    const profile = ctx.auth.userId
-      ? await ctx.loaders.profileByWebCardIdAndUserId.load({
-          userId: ctx.auth.userId,
-          webCardId: parent.id,
-        })
-      : null;
-
-    if (
-      !profile ||
-      !checkRole(profile.profileRole) ||
-      (profile.invited && !acceptInvited)
-    ) {
-      throw new GraphQLError(ERRORS.FORBIDDEN);
-    }
-
-    return true;
-  });
-
-const isAdminOnWebCard = hasProfileOnWebCardWithRole('admin', isAdmin);
-
 const permissions = shield(
   {
     Mutation: ProtectedMutation,
@@ -206,9 +178,10 @@ const permissions = shield(
     },
     WebCard: {
       '*': isCurrentWebCardRule,
-      profilePendingOwner: isAdminOnWebCard,
-      profiles: isAdminOnWebCard,
-      nbProfiles: isAdminOnWebCard,
+      profilePendingOwner: isSameWebCard,
+      profiles: isSameWebCard,
+      nbProfiles: isSameWebCard,
+      owner: isSameWebCard,
       userName: allow,
       cardIsPublished: allow,
       cardCover: allow,

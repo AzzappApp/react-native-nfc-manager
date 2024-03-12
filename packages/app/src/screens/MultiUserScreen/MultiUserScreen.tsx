@@ -8,6 +8,7 @@ import {
 } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { ActivityIndicator, View } from 'react-native';
+import Toast from 'react-native-toast-message';
 import { graphql, useMutation, usePreloadedQuery } from 'react-relay';
 import { isAdmin } from '@azzapp/shared/profileHelpers';
 import { colors } from '#theme';
@@ -138,10 +139,21 @@ const MultiUserScreen = ({
           onCompleted: () => {
             setConfirmDeleteMultiUser(false);
           },
+          onError: () => {
+            Toast.show({
+              type: 'error',
+              text1: intl.formatMessage({
+                defaultMessage:
+                  'Error while updating your multi user settings.',
+                description:
+                  'Error toast message when updating multi user fails',
+              }),
+            });
+          },
         });
       }
     },
-    [commit, profile?.id, profile?.webCard],
+    [commit, intl, profile?.id, profile?.webCard],
   );
 
   const toggleMultiUser = useCallback(
