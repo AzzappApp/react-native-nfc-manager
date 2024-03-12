@@ -1,5 +1,6 @@
-## 0.5.5-canary.139
+## 0.5.5-canary.140
 
+* **fix:**  - adapt permissions for user mgmt ([#3053](https://github.com/AzzappApp/azzapp/pull/3053))
 * **fix:**  - HomeInformation Counter error one profile ([#3045](https://github.com/AzzappApp/azzapp/pull/3045))
 * **perf:**  - **home:** reduce number of queries + generate qr code server side ([#3033](https://github.com/AzzappApp/azzapp/pull/3033))
 * **feat:**  - 🎸 indicate email is generating ([#3042](https://github.com/AzzappApp/azzapp/pull/3042))
