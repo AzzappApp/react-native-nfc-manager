@@ -1,6 +1,6 @@
 {
   "name": "@azzapp/backoffice",
-  "version": "0.5.5-canary.141",
+  "version": "0.5.5-canary.142",
   "private": true,
   "scripts": {
     "dev": "next dev -p 3005",
@@ -13,8 +13,8 @@
     "dev"
   ],
   "dependencies": {
-    "@azzapp/data": "0.5.5-canary.141",
-    "@azzapp/shared": "0.5.5-canary.141",
+    "@azzapp/data": "0.5.5-canary.142",
+    "@azzapp/shared": "0.5.5-canary.142",
     "@dnd-kit/core": "^6.0.8",
     "@dnd-kit/sortable": "^7.0.2",
     "@dnd-kit/utilities": "^3.2.1",

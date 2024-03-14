@@ -1,5 +1,6 @@
-## 0.5.5-canary.141
+## 0.5.5-canary.142
 
+* **fix:**  - only check when value is different ([#3075](https://github.com/AzzappApp/azzapp/pull/3075))
 * **fix:**  - **multiUser:** [#3056](https://github.com/AzzappApp/azzapp/pull/3056) dataloader cache issue ([#3057](https://github.com/AzzappApp/azzapp/pull/3057))
 * **fix:**  - adapt permissions for user mgmt ([#3053](https://github.com/AzzappApp/azzapp/pull/3053))
 * **fix:**  - HomeInformation Counter error one profile ([#3045](https://github.com/AzzappApp/azzapp/pull/3045))
