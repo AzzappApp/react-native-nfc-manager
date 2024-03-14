@@ -62,6 +62,12 @@ const isNotOwnerRule = hasRole('notOwner', role => role !== 'owner', true);
 
 type MutationMethod = Exclude<keyof Mutation, '__typename'>;
 
+const isCurrentProfileRule = rule('sameUserProfile', {
+  cache: 'contextual',
+})(async (parent: Profile, _args, ctx: GraphQLContext) => {
+  return ctx.auth.userId === parent.userId;
+});
+
 const ProtectedMutation: Record<
   Exclude<
     MutationMethod,
@@ -77,7 +83,7 @@ const ProtectedMutation: Record<
   inviteUsersList: isAdminRule,
   loadCardTemplate: isEditorRule,
   acceptInvitation: isAnyRoleRule,
-  declineInvitation: isAnyRoleRule,
+  declineInvitation: isCurrentProfileRule,
   createPost: isEditorRule,
   createPostComment: isEditorRule,
   declineOwnership: isAnyRoleRule,
@@ -119,12 +125,6 @@ const isCurrentUserRule = rule('sameProfile', {
   cache: 'contextual',
 })(async (parent: User, _args, ctx: GraphQLContext) => {
   return ctx.auth.userId === parent.id;
-});
-
-const isCurrentProfileRule = rule('sameUserProfile', {
-  cache: 'contextual',
-})(async (parent: Profile, _args, ctx: GraphQLContext) => {
-  return ctx.auth.userId === parent.userId;
 });
 
 const isSameWebCard = rule('sameWebCard', {
