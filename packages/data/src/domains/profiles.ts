@@ -340,3 +340,19 @@ export const getOwners = async (webCardIds: string[]) => {
       ),
     );
 };
+
+export const getUsersFromProfileIds = async (
+  webCardId: string,
+  profileIds: string[],
+) => {
+  return db
+    .select()
+    .from(ProfileTable)
+    .innerJoin(UserTable, eq(UserTable.id, ProfileTable.userId))
+    .where(
+      and(
+        eq(ProfileTable.webCardId, webCardId),
+        inArray(ProfileTable.id, profileIds),
+      ),
+    );
+};

@@ -25,13 +25,14 @@ import {
 import togglePostReaction from './postReaction';
 import quitWebCard from './quitWebCard';
 import removeFollower from './removeFollower';
-import removeUserFromWebCard from './removeUserFromWebCard';
+import removeUsersFromWebCard from './removeUsersFromWebCard';
 import reorderModules from './reorderModules';
 import saveCardColors from './saveCardColors';
 import saveCardStyle from './saveCardStyle';
 import saveCommonInformation from './saveCommonInformation';
 import saveContactCard from './saveContactCard';
 import saveCover from './saveCover';
+import sendInvitations from './sendInvitations';
 import toggleFollowing from './toggleFollowing';
 import toggleWebCardPublished from './toggleWebCardPublished';
 import transferOwnership from './transferOwnership';
@@ -85,9 +86,10 @@ export const Mutation: MutationResolvers = {
   updateWebCardUserName,
   updateProfile,
   inviteUser,
-  removeUserFromWebCard,
+  removeUsersFromWebCard,
   transferOwnership,
   cancelTransferOwnership,
   quitWebCard,
   inviteUsersList,
+  sendInvitations,
 };

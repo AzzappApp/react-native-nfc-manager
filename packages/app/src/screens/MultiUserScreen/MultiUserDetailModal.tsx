@@ -360,21 +360,24 @@ const MultiUserDetailModal = ({
   const [commitDelete, deletionIsActive] =
     useMutation<MultiUserDetailModal_RemoveUserMutation>(graphql`
       mutation MultiUserDetailModal_RemoveUserMutation(
-        $profileId: ID!
-        $input: RemoveUserFromWebCardInput!
+        $webCardId: ID!
+        $input: [ID!]!
       ) {
-        removeUserFromWebCard(profileId: $profileId, input: $input) {
-          profileId
+        removeUsersFromWebCard(
+          webCardId: $webCardId
+          removedProfileIds: $input
+        ) {
+          profileIds
         }
       }
     `);
 
   const onRemoveUser = () => {
-    if (profileInfos?.profileId == null || profile == null) return;
+    if (profileInfos?.webCardId == null || profile == null) return;
     commitDelete({
       variables: {
-        profileId: profileInfos?.profileId,
-        input: { removeProfileId: profile.id },
+        webCardId: profileInfos?.webCardId,
+        input: [profile.id],
       },
       onCompleted: () => {
         onClose();
@@ -390,7 +393,21 @@ const MultiUserDetailModal = ({
           }),
         });
       },
-      updater: store => {
+      updater: (store, response) => {
+        if (
+          !response?.removeUsersFromWebCard?.profileIds.includes(profile.id)
+        ) {
+          Toast.show({
+            type: 'error',
+            text1: intl.formatMessage({
+              defaultMessage: 'Error, could not remove user. Please try again.',
+              description:
+                'Error toast message when removing user from MultiUserDetailModal',
+            }),
+          });
+          return;
+        }
+
         const webCardRecord = store.get(webCard.id);
         if (webCardRecord) {
           const connection = ConnectionHandler.getConnection(

@@ -101,7 +101,7 @@ const ProtectedMutation: Record<
   togglePostReaction: isEditorRule,
   quitWebCard: isNotOwnerRule,
   removeFollower: isEditorRule,
-  removeUserFromWebCard: isAdminRule,
+  removeUsersFromWebCard: isAdminRule,
   reorderModules: isEditorRule,
   saveCardColors: isEditorRule,
   acceptOwnership: isAnyRoleRule,
@@ -119,6 +119,7 @@ const ProtectedMutation: Record<
   updatePostComment: isEditorRule,
   updateWebCardUserName: isAdminRule,
   updateWebCard: isEditorRule,
+  sendInvitations: isAdminRule,
 };
 
 const isCurrentUserRule = rule('sameProfile', {
