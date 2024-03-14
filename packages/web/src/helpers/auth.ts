@@ -1,12 +1,32 @@
 import { toGlobalId } from 'graphql-relay';
 import { NextResponse } from 'next/server';
 import { generateTokens } from './tokens';
+import { twilioVerificationService } from './twilioHelpers';
 import type { Profile, User } from '@azzapp/data/domains';
 
 export const handleSignInAuthMethod = async (
   user: User,
   profile: Profile | null | undefined,
 ) => {
+  if (!user.emailConfirmed && !user.phoneNumberConfirmed) {
+    const issuer = (user.email ?? user.phoneNumber) as string;
+    const verification = await twilioVerificationService().verifications.create(
+      {
+        to: issuer,
+        channel: user.email ? 'email' : 'sms',
+        locale: user.locale ?? undefined,
+      },
+    );
+
+    if (verification && verification.status === 'canceled') {
+      throw new Error('Verification canceled');
+    }
+
+    return NextResponse.json({
+      issuer,
+    });
+  }
+
   const { token, refreshToken } = await generateTokens({
     userId: user.id,
   });
