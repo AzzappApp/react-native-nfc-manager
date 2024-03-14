@@ -238,7 +238,7 @@ type WebCard implements Node {
   """
   Return the webCard updated at
   """
-  updatedAt: String
+  updatedAt: String!
 }
 
 type WebCardStyle {
