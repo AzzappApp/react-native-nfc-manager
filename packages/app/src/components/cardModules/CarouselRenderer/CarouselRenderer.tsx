@@ -152,13 +152,19 @@ const CarouselRenderer = ({
   style,
   ...props
 }: CarouselRendererProps) => {
-  const { images, squareRatio, borderColor, background, backgroundStyle } =
-    getModuleDataValues({
-      data,
-      cardStyle,
-      defaultValues: CAROUSEL_DEFAULT_VALUES,
-      styleValuesMap: CAROUSEL_STYLE_VALUES,
-    });
+  const {
+    images,
+    squareRatio,
+    borderColor,
+    background,
+    backgroundStyle,
+    ...rest
+  } = getModuleDataValues({
+    data,
+    cardStyle,
+    defaultValues: CAROUSEL_DEFAULT_VALUES,
+    styleValuesMap: CAROUSEL_STYLE_VALUES,
+  });
 
   const {
     borderRadius,
@@ -169,9 +175,14 @@ const CarouselRenderer = ({
     gap,
   } = animatedData;
 
+  const defaultImageHeight =
+    'imageHeight' in rest ? (rest['imageHeight'] as number) : 0;
+
   const cardModuleBackgroundStyle = useAnimatedStyle(() => {
     const imageHeightValue =
-      typeof imageHeight === 'number' ? imageHeight : imageHeight?.value ?? 0;
+      typeof imageHeight === 'number'
+        ? imageHeight
+        : imageHeight?.value ?? defaultImageHeight;
     const marginVerticalValue =
       typeof marginVertical === 'number'
         ? marginVertical
@@ -203,7 +214,9 @@ const CarouselRenderer = ({
   const imageStyle = useAnimatedStyle(
     () => ({
       height:
-        typeof imageHeight === 'number' ? imageHeight : imageHeight?.value ?? 0,
+        typeof imageHeight === 'number'
+          ? imageHeight
+          : imageHeight?.value ?? defaultImageHeight,
       borderRadius:
         typeof borderRadius === 'number'
           ? borderRadius
