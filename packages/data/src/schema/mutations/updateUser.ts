@@ -25,14 +25,20 @@ const updateUserMutation: MutationResolvers['updateUser'] = async (
 
   const partialUser: Partial<User> = {};
 
-  if (phoneNumber) {
+  const dbUser = await loaders.User.load(userId);
+
+  if (!dbUser) {
+    throw new GraphQLError(ERRORS.INVALID_REQUEST);
+  }
+
+  if (phoneNumber && phoneNumber !== dbUser.phoneNumber) {
     await twilioVerificationService().verificationChecks.create({
       to: phoneNumber,
       code: token ?? undefined,
     });
   }
 
-  if (email) {
+  if (email && email !== dbUser.email) {
     await twilioVerificationService().verificationChecks.create({
       to: email,
       code: token ?? undefined,
@@ -64,12 +70,6 @@ const updateUserMutation: MutationResolvers['updateUser'] = async (
   if (phoneNumber === null) {
     //voluntary remove phone number
     partialUser.phoneNumber = null;
-  }
-
-  const dbUser = await loaders.User.load(userId);
-
-  if (!dbUser) {
-    throw new GraphQLError(ERRORS.INVALID_REQUEST);
   }
 
   if (newPassword) {
