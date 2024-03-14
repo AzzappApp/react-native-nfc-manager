@@ -1,5 +1,6 @@
-## 0.5.5-canary.142
+## 0.5.5-canary.143
 
+* **fix:**  - **multiUser:** [#3065](https://github.com/AzzappApp/azzapp/pull/3065) don’t check that profile is invited on declining ([#3067](https://github.com/AzzappApp/azzapp/pull/3067))
 * **fix:**  - only check when value is different ([#3075](https://github.com/AzzappApp/azzapp/pull/3075))
 * **fix:**  - **multiUser:** [#3056](https://github.com/AzzappApp/azzapp/pull/3056) dataloader cache issue ([#3057](https://github.com/AzzappApp/azzapp/pull/3057))
 * **fix:**  - adapt permissions for user mgmt ([#3053](https://github.com/AzzappApp/azzapp/pull/3053))
