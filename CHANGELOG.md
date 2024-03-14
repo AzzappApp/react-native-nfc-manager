@@ -1,5 +1,6 @@
-## 0.5.5-canary.144
+## 0.5.5-canary.145
 
+* **fix:**  - 🐛 correctly display carousel ([#3077](https://github.com/AzzappApp/azzapp/pull/3077))
 * **fix:**  - **auth:** [#3043](https://github.com/AzzappApp/azzapp/pull/3043) check email/phone confirmation for every authent ([#3074](https://github.com/AzzappApp/azzapp/pull/3074))
 * **fix:**  - webCards have always an update date ([#3073](https://github.com/AzzappApp/azzapp/pull/3073))
 * **feat:**  - delete multiple + resend invites ([#3072](https://github.com/AzzappApp/azzapp/pull/3072))
