@@ -1,10 +1,13 @@
 import { style } from '@vanilla-extract/css';
+import { MediaQuery } from '../theme.css';
+
 const background = style({
   backgroundColor: '#FFFFFF',
   display: 'flex',
   flexDirection: 'column',
   alignItems: 'center',
   alignSelf: 'center',
+  width: '100%',
 });
 
 const container = style({
@@ -13,7 +16,16 @@ const container = style({
   alignItems: 'center',
   alignSelf: 'center',
   marginTop: '70px',
-  width: '500px',
+  '@media': {
+    [MediaQuery.Desktop]: {
+      flex: 1,
+      width: '500px',
+    },
+    [MediaQuery.Mobile]: {
+      height: '100%',
+      width: '100%',
+    },
+  },
 });
 
 const image = style({
@@ -32,7 +44,7 @@ const title = style({
   textAlign: 'center',
   fontFamily: 'Helvetica Neue',
   fontSize: '20px',
-  marginBottom: '20px',
+  marginBottom: '15px',
 });
 
 const openIcon = style({
@@ -72,12 +84,42 @@ const pageContainer = style({
   flexDirection: 'row',
   display: 'flex',
   alignItems: 'center',
+  justifyContent: 'center',
   marginTop: 70,
-  width: 500,
+  '@media': {
+    [MediaQuery.Desktop]: {
+      flex: 1,
+      width: '500px',
+    },
+    [MediaQuery.Mobile]: {
+      height: '100%',
+      width: '100%',
+    },
+  },
+});
+
+const coverContainer = style({
+  '@media': {
+    [MediaQuery.Desktop]: {
+      flex: 1,
+      width: '200px',
+    },
+    [MediaQuery.Mobile]: {
+      width: '35%',
+    },
+  },
 });
 
 const simpleContainer = style({
-  width: 200,
+  '@media': {
+    [MediaQuery.Desktop]: {
+      flex: 1,
+      width: '200px',
+    },
+    [MediaQuery.Mobile]: {
+      width: '35%',
+    },
+  },
   height: 320,
   display: 'flex',
   justifyContent: 'center',
@@ -94,6 +136,7 @@ const simpleButton = style({
   borderRadius: 48,
   border: '1px solid black',
   fontSize: 12,
+  fontWeight: 'bold',
   flexDirection: 'row',
   display: 'flex',
   alignItems: 'center',
@@ -103,7 +146,16 @@ const simpleButton = style({
 const tableFull = style({
   border: '1px solid black',
   tableLayout: 'fixed',
-  width: '450px',
+  '@media': {
+    [MediaQuery.Desktop]: {
+      flex: 1,
+      width: '450',
+    },
+    [MediaQuery.Mobile]: {
+      height: '100%',
+      width: '90%',
+    },
+  },
   paddingLeft: ' 15px',
   paddingRight: ' 15px',
   paddingTop: '20px',
@@ -138,6 +190,7 @@ const styles = {
   stepDesc,
   separator,
   pageContainer,
+  coverContainer,
   simpleContainer,
   simpleButton,
   tableFull,

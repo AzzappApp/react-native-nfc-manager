@@ -12,7 +12,7 @@ import cors from '#helpers/cors';
 import { getSessionData } from '#helpers/tokens';
 
 sgMail.setApiKey(process.env.SENDGRID_API_KEY!);
-
+const PUBLIC_URL = process.env.NEXT_PUBLIC_URL!; // replace with ngrok for dev
 const SENDGRIP_NOREPLY_SENDER = process.env.SENDGRIP_NOREPLY_SENDER!;
 const generateEmailSignature = async (req: Request) => {
   try {
@@ -31,7 +31,7 @@ const generateEmailSignature = async (req: Request) => {
       return new Response('Invalid request', { status: 400 });
     }
 
-    const webCardUrl = `${process.env.NEXT_PUBLIC_URL}/api/cover/${
+    const webCardUrl = `${PUBLIC_URL}/api/cover/${
       res.WebCard?.userName
     }?width=${630}&updatedAt=${res.WebCard?.updatedAt.toISOString()}`;
     const avatarUrl = await buildAvatarUrl(res.Profile, null);
@@ -55,9 +55,7 @@ const generateEmailSignature = async (req: Request) => {
 
     const mailParam: Record<string, Array<{ number: string }> | string> = {
       webCardUrl,
-      qrCode: await QRCode.toDataURL(
-        `${process.env.NEXT_PUBLIC_URL}${res.WebCard?.userName}`,
-      ), // qrCode is a simple to send to the profile page only (per spec)
+      qrCode: await QRCode.toDataURL(`${PUBLIC_URL}/${res.WebCard?.userName}`), // qrCode is a simple to send to the profile page only (per spec)
       linkUrl: buildEmailSignatureGenerationUrl(
         res.WebCard.userName,
         data,

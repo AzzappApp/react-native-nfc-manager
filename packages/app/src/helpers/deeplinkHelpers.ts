@@ -1,3 +1,4 @@
+import * as Sentry from '@sentry/react-native';
 import { toGlobalId } from 'graphql-relay';
 import { decompressFromEncodedURIComponent } from 'lz-string';
 import { verifySign } from './MobileWebAPI';
@@ -77,7 +78,8 @@ export const matchUrlWithRoute = async (
         [contactData, signature] = JSON.parse(
           decompressFromEncodedURIComponent(compressedContactCard),
         );
-      } catch {
+      } catch (error) {
+        Sentry.captureException(error);
         return {
           route: 'WEBCARD',
           params: {
