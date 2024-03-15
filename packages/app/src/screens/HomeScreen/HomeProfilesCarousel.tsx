@@ -14,6 +14,7 @@ import {
   StyleSheet,
   Platform,
   Pressable,
+  PixelRatio,
 } from 'react-native';
 import { graphql, useFragment } from 'react-relay';
 import { COVER_CARD_RADIUS, COVER_RATIO } from '@azzapp/shared/coverHelpers';
@@ -35,7 +36,11 @@ import type { HomeProfilesCarouselItem_profile$key } from '#relayArtifacts/HomeP
 import type { CarouselSelectListHandle } from '#ui/CarouselSelectList';
 import type { ArrayItemType } from '@azzapp/shared/arrayHelpers';
 import type { ForwardedRef } from 'react';
-import type { ListRenderItemInfo, ViewStyle } from 'react-native';
+import type {
+  LayoutChangeEvent,
+  ListRenderItemInfo,
+  ViewStyle,
+} from 'react-native';
 import type { SharedValue } from 'react-native-reanimated';
 
 type HomeProfilesCarouselProps = {
@@ -56,10 +61,6 @@ type HomeProfilesCarouselProps = {
    * the callback passed should be a worklet
    */
   currentProfileIndexSharedValue: SharedValue<number>;
-  /**
-   * The height of the carousel
-   */
-  height: number;
 };
 
 export type HomeProfilesCarouselHandle = {
@@ -69,13 +70,23 @@ export type HomeProfilesCarouselHandle = {
 const HomeProfilesCarousel = (
   {
     user: userKey,
-    height,
     onCurrentProfileIndexChange,
     currentProfileIndexSharedValue,
     initialProfileIndex = 0,
   }: HomeProfilesCarouselProps,
   ref: ForwardedRef<HomeProfilesCarouselHandle>,
 ) => {
+  const [coverWidth, setCoverWidth] = useState(0);
+
+  const onLayout = useCallback(
+    ({ nativeEvent: { layout } }: LayoutChangeEvent) => {
+      setCoverWidth(
+        PixelRatio.roundToNearestPixel(layout.height * COVER_RATIO),
+      );
+    },
+    [],
+  );
+  const coverHeight = useMemo(() => coverWidth / COVER_RATIO, [coverWidth]);
   const { profiles } = useFragment(
     graphql`
       fragment HomeProfilesCarousel_user on User {
@@ -91,14 +102,7 @@ const HomeProfilesCarousel = (
   );
 
   const { width: windowWidth } = useWindowDimensions();
-  const coverHeight = useMemo(() => height - 2 * VERTICAL_MARGIN, [height]);
-  const coverWidth = useMemo(
-    () => Math.trunc(coverHeight * COVER_RATIO),
-    [coverHeight],
-    // Platform.OS === 'ios'
-    //   ? Math.trunc(coverHeight * COVER_RATIO) //roundToNearestPixel is not working fine on some IOS (i.eiphone 13 mini)
-    //   : Math.trunc(coverHeight * COVER_RATIO),
-  );
+
   const carouselRef = useRef<CarouselSelectListHandle | null>(null);
   const [selectedIndex, setSelectedIndex] = useState(
     profiles?.length ? initialProfileIndex + 1 : 0,
@@ -160,10 +164,9 @@ const HomeProfilesCarousel = (
       styles.carousel,
       {
         width: windowWidth,
-        height,
       },
     ],
-    [windowWidth, height],
+    [windowWidth],
   );
 
   if (profiles == null) {
@@ -171,27 +174,27 @@ const HomeProfilesCarousel = (
   }
 
   return (
-    <CarouselSelectList
-      ref={carouselRef}
-      data={data}
-      keyExtractor={keyExtractor}
-      renderItem={renderItem}
-      width={windowWidth}
-      height={coverHeight}
-      itemWidth={coverWidth}
-      scaleRatio={SCALE_RATIO}
-      style={style}
-      itemContainerStyle={styles.carouselContentContainer}
-      onSelectedIndexChange={onSelectedIndexChange}
-      currentProfileIndexSharedValue={currentProfileIndexSharedValue}
-      initialScrollIndex={
-        profiles.length ? initialProfileIndex + 1 : initialProfileIndex
-      }
-    />
+    <View style={styles.container} onLayout={onLayout}>
+      <CarouselSelectList
+        ref={carouselRef}
+        data={data}
+        keyExtractor={keyExtractor}
+        renderItem={renderItem}
+        width={windowWidth}
+        height={coverHeight}
+        itemWidth={coverWidth}
+        scaleRatio={SCALE_RATIO}
+        style={style}
+        itemContainerStyle={styles.carouselContentContainer}
+        onSelectedIndexChange={onSelectedIndexChange}
+        currentProfileIndexSharedValue={currentProfileIndexSharedValue}
+        initialScrollIndex={
+          profiles.length ? initialProfileIndex + 1 : initialProfileIndex
+        }
+      />
+    </View>
   );
 };
-
-const VERTICAL_MARGIN = 15;
 
 const SCALE_RATIO = 108 / 291;
 
@@ -398,11 +401,11 @@ const CreateItem = ({
 const CreateItemMemo = memo(CreateItem);
 
 const styles = StyleSheet.create({
+  container: { flex: 1, marginVertical: 15 },
   carousel: {
     flexGrow: 0,
     overflow: 'visible',
     alignSelf: 'center',
-    paddingVertical: VERTICAL_MARGIN,
   },
   carouselContentContainer: {
     flexGrow: 0,

@@ -1,16 +1,8 @@
 import { isEqual } from 'lodash';
-import { useState, useCallback, useRef, useMemo, useEffect } from 'react';
-import {
-  StyleSheet,
-  View,
-  PixelRatio,
-  StatusBar,
-  Dimensions,
-  Platform,
-} from 'react-native';
+import { useState, useCallback, useRef, useMemo, useEffect, memo } from 'react';
+import { StyleSheet, View } from 'react-native';
 import { useDerivedValue, useSharedValue } from 'react-native-reanimated';
 import { graphql, useFragment } from 'react-relay';
-import { CONTACT_CARD_RATIO } from '#components/ContactCard/ContactCard';
 import { useOnFocus, useRouteWillChange } from '#components/NativeRouter';
 import { addAuthStateListener, getAuthState } from '#helpers/authStore';
 import { dispatchGlobalEvent } from '#helpers/globalEvents';
@@ -23,12 +15,8 @@ import HomeBackground from './HomeBackground';
 import HomeBottomPanel from './HomeBottomPanel';
 import HomeBottomSheetPanel from './HomeBottomSheetPanel';
 import HomeContactCardLandscape from './HomeContactCardLandscape';
-import HomeHeader, { HOME_HEADER_HEIGHT } from './HomeHeader';
-import { HOME_MENU_HEIGHT } from './HomeMenu';
-import HomeProfileLink, {
-  PROFILE_LINK_HEIGHT,
-  PROFILE_LINK_MARGIN_TOP,
-} from './HomeProfileLink';
+import HomeHeader from './HomeHeader';
+import HomeProfileLink from './HomeProfileLink';
 import HomeProfilesCarousel from './HomeProfilesCarousel';
 import type { HomeScreenContent_user$key } from '#relayArtifacts/HomeScreenContent_user.graphql';
 import type { HomeProfilesCarouselHandle } from './HomeProfilesCarousel';
@@ -37,8 +25,6 @@ import type { Disposable } from 'react-relay';
 type HomeScreenContentProps = {
   user: HomeScreenContent_user$key;
 };
-
-const { height: windowHeight, width: windowWidth } = Dimensions.get('screen');
 
 const HomeScreenContent = ({ user: userKey }: HomeScreenContentProps) => {
   // #regions data
@@ -67,7 +53,7 @@ const HomeScreenContent = ({ user: userKey }: HomeScreenContentProps) => {
   );
 
   //#endregion
-
+  const { bottom } = useScreenInsets();
   //#region profile switch
   const initialProfileIndex = useMemo(() => {
     const index = user.profiles?.findIndex(
@@ -231,33 +217,7 @@ const HomeScreenContent = ({ user: userKey }: HomeScreenContentProps) => {
 
   // windowsHeight return by android can have some issue (navbar/statusbar).
   ///navbar is not included in useWindowsDimensions.onLayout is the way to go in case of further ratio issue on multiple android
-  const contentHeight = useMemo(
-    () =>
-      Math.floor(windowHeight) -
-      insets.top -
-      HOME_HEADER_HEIGHT -
-      PROFILE_LINK_HEIGHT -
-      PROFILE_LINK_MARGIN_TOP -
-      BOTTOM_MENU_GAP -
-      BOTTOM_MENU_HEIGHT -
-      insets.bottom -
-      (Platform.OS === 'android' && StatusBar?.currentHeight
-        ? StatusBar.currentHeight + 10
-        : 0),
-    [insets.bottom, insets.top],
-  );
 
-  const bottomPanelHeight = useMemo(() => {
-    return PixelRatio.roundToNearestPixel(
-      (windowWidth - 40) / CONTACT_CARD_RATIO + HOME_MENU_HEIGHT,
-    );
-  }, []);
-
-  //used PixelRatio because different amount of pixels per square inch on android.
-  const carouselHeight = useMemo(
-    () => PixelRatio.roundToNearestPixel(contentHeight - bottomPanelHeight),
-    [bottomPanelHeight, contentHeight],
-  );
   // #endregion
 
   // #region bottomMenu
@@ -271,7 +231,12 @@ const HomeScreenContent = ({ user: userKey }: HomeScreenContentProps) => {
         user={user}
         currentProfileIndexSharedValue={actualCurrentProfileIndex}
       />
-      <View style={styles.contentContainer}>
+      <View
+        style={[
+          styles.contentContainer,
+          { paddingBottom: bottom + BOTTOM_MENU_HEIGHT + 15 },
+        ]}
+      >
         <HomeHeader
           openPanel={toggleShowMenu}
           user={user}
@@ -285,13 +250,11 @@ const HomeScreenContent = ({ user: userKey }: HomeScreenContentProps) => {
         <HomeProfilesCarousel
           ref={carouselRef}
           user={user}
-          height={carouselHeight}
           onCurrentProfileIndexChange={onCurrentProfileIndexChange}
           currentProfileIndexSharedValue={currentProfileIndexSharedValue}
           initialProfileIndex={initialProfileIndex}
         />
         <HomeBottomPanel
-          height={bottomPanelHeight}
           user={user}
           currentProfileIndexSharedValue={actualCurrentProfileIndex}
         />
@@ -308,9 +271,7 @@ const HomeScreenContent = ({ user: userKey }: HomeScreenContentProps) => {
   );
 };
 
-export default HomeScreenContent;
-
-const BOTTOM_MENU_GAP = 15;
+export default memo(HomeScreenContent);
 
 const styles = StyleSheet.create({
   contentContainer: {

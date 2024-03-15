@@ -1,6 +1,6 @@
 import _ from 'lodash';
 import { useState, memo, useMemo } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { Dimensions, StyleSheet, View } from 'react-native';
 import Animated, {
   interpolate,
   useAnimatedStyle,
@@ -8,6 +8,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import { graphql, useFragment } from 'react-relay';
 import { colors } from '#theme';
+import { CONTACT_CARD_RATIO } from '#components/ContactCard/ContactCard';
 import { useMainTabBarVisibilityController } from '#components/MainTabBar';
 import HomeBottomPanelMessage from './HomeBottomPanelMessage';
 import HomeContactCard from './HomeContactCard';
@@ -20,12 +21,6 @@ import type { HOME_TAB } from './HomeMenu';
 import type { SharedValue } from 'react-native-reanimated';
 
 type HomeBottomPanelProps = {
-  /**
-   * the height unit determined at main screen to have a adaptable layout based on screen size
-   *
-   * @type {number}
-   */
-  height: number;
   user: HomeBottomPanel_user$key;
   /**
    * current position of the scrolling profile (based on profile index and not scrollValue )
@@ -40,7 +35,6 @@ type HomeBottomPanelProps = {
 const HomeBottomPanel = ({
   user: userKey,
   currentProfileIndexSharedValue,
-  height,
 }: HomeBottomPanelProps) => {
   //#region data
   const user = useFragment(
@@ -130,8 +124,6 @@ const HomeBottomPanel = ({
   useMainTabBarVisibilityController(mainTabBarVisible);
   //#endregion
 
-  const panelHeight = height - HOME_MENU_HEIGHT;
-
   return (
     <View style={styles.container}>
       <View style={styles.informationPanel}>
@@ -142,7 +134,6 @@ const HomeBottomPanel = ({
       </View>
       <Animated.View style={[styles.bottomPanel, bottomPanelStyle]}>
         <HomeMenu selected={selectedPanel} setSelected={setSelectedPanel} />
-
         <View
           style={{
             flex: 1,
@@ -150,8 +141,8 @@ const HomeBottomPanel = ({
           }}
         >
           <HomeContactCard
+            height={PANEL_HEIGHT}
             user={user}
-            height={panelHeight}
             currentProfileIndexSharedValue={currentProfileIndexSharedValue}
           />
         </View>
@@ -164,7 +155,7 @@ const HomeBottomPanel = ({
         >
           <HomeStatistics
             user={profiles!}
-            height={panelHeight}
+            height={PANEL_HEIGHT}
             currentProfileIndexSharedValue={currentProfileIndexSharedValue}
           />
         </View>
@@ -177,7 +168,7 @@ const HomeBottomPanel = ({
         >
           <HomeInformations
             user={user}
-            height={panelHeight}
+            height={PANEL_HEIGHT}
             currentProfileIndexSharedValue={currentProfileIndexSharedValue}
           />
         </View>
@@ -186,8 +177,13 @@ const HomeBottomPanel = ({
   );
 };
 
+const { width: windowWidth } = Dimensions.get('screen');
+const PANEL_HEIGHT = (windowWidth - 40) / CONTACT_CARD_RATIO;
+
 const styles = StyleSheet.create({
-  container: { flex: 1 },
+  container: {
+    height: PANEL_HEIGHT + HOME_MENU_HEIGHT,
+  },
   informationText: {
     textAlign: 'center',
     color: colors.white,

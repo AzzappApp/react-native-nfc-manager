@@ -150,10 +150,14 @@ function CarouselSelectList<TItem = any>(
 
   const onMomentumScrollEnd = useCallback(
     (event: NativeSyntheticEvent<NativeScrollEvent>) => {
+      'worklet';
       const index = event.nativeEvent.contentOffset.x / itemWidth;
       onSelectedIndexChange?.(Math.round(index));
+      if (currentProfileIndexSharedValue) {
+        currentProfileIndexSharedValue.value = Math.round(index);
+      }
     },
-    [itemWidth, onSelectedIndexChange],
+    [currentProfileIndexSharedValue, itemWidth, onSelectedIndexChange],
   );
 
   const getItemLayout = useCallback(
@@ -194,6 +198,7 @@ function CarouselSelectList<TItem = any>(
           containerStyle={itemContainerStyle}
           offset={offset}
           offsetCenter={offsetCenter}
+          width={itemWidth}
         >
           {renderItem(info)}
         </AnimatedItem>
@@ -205,6 +210,7 @@ function CarouselSelectList<TItem = any>(
       itemContainerStyle,
       offset,
       offsetCenter,
+      itemWidth,
       renderItem,
     ],
   );
@@ -257,6 +263,7 @@ const AnimatedItemWrapper = ({
   offsetCenter,
   containerStyle,
   children,
+  width,
 }: {
   index: number;
   scrollIndex: SharedValue<number>;
@@ -265,6 +272,7 @@ const AnimatedItemWrapper = ({
   scaleRatio: number;
   children: ReactNode;
   containerStyle: StyleProp<ViewStyle>;
+  width: number;
 }) => {
   const inputRange = [index - 1, index, index + 1];
 
@@ -283,6 +291,7 @@ const AnimatedItemWrapper = ({
     );
 
     return {
+      width,
       transform: [{ translateX }, { scale }],
     };
   });
