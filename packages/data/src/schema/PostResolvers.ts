@@ -1,3 +1,4 @@
+import { eq } from 'drizzle-orm';
 import { connectionFromArray } from 'graphql-relay';
 import ERRORS from '@azzapp/shared/errors';
 import {
@@ -5,6 +6,7 @@ import {
   getPostCommentsByDate,
   getPostReaction,
   PostTable,
+  WebCardTable,
 } from '#domains';
 import {
   cursorToDate,
@@ -79,7 +81,15 @@ export const Post: PostResolvers = {
   },
   relatedPosts: async (_post, args) => {
     // TODO dummy implementation just to test frontend
-    return connectionFromArray(await db.select().from(PostTable), args);
+    return connectionFromArray(
+      await db
+        .select()
+        .from(PostTable)
+        .innerJoin(WebCardTable, eq(WebCardTable.id, PostTable.webCardId))
+        .where(eq(WebCardTable.cardIsPublished, true))
+        .then(results => results.map(result => result.Post)),
+      args,
+    );
   },
 };
 
