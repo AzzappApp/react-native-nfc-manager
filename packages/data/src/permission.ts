@@ -18,30 +18,35 @@ const hasRole = (
   })(async (_parent: any, args: any, ctx: GraphQLContext) => {
     if ('webCardId' in args && typeof args.webCardId === 'string') {
       const { userId } = ctx.auth;
+      if (!userId) {
+        throw new GraphQLError(ERRORS.UNAUTHORIZED);
+      }
       const webCardId = fromGlobalIdWithType(args.webCardId, 'WebCard');
-      const profile =
-        userId &&
-        (await ctx.loaders.profileByWebCardIdAndUserId.load({
-          userId,
-          webCardId,
-        }));
+      const profile = await ctx.loaders.profileByWebCardIdAndUserId.load({
+        userId,
+        webCardId,
+      });
 
       if (
         !profile ||
         !checkRole(profile.profileRole) ||
         (profile.invited && !acceptInvited)
       ) {
-        throw new GraphQLError(ERRORS.FORBIDDEN);
+        throw new GraphQLError(ERRORS.FORBIDDEN, {
+          extensions: { role: profile?.profileRole },
+        });
       }
     } else if ('profileId' in args && typeof args.profileId === 'string') {
       const profileId = fromGlobalIdWithType(args.profileId, 'Profile');
-      const profile = profileId && (await ctx.loaders.Profile.load(profileId));
+      const profile = await ctx.loaders.Profile.load(profileId);
       if (
         !profile ||
         !checkRole(profile.profileRole) ||
         (profile.invited && !acceptInvited)
       ) {
-        throw new GraphQLError(ERRORS.FORBIDDEN);
+        throw new GraphQLError(ERRORS.FORBIDDEN, {
+          extensions: { role: profile?.profileRole },
+        });
       }
 
       if (profile.userId !== ctx.auth.userId) {

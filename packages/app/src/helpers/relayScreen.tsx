@@ -288,7 +288,7 @@ const isRelayNetworkError = (error: Error) => {
   if (error instanceof FetchError && error.message !== ERRORS.INVALID_TOKEN) {
     return true;
   }
-  if (error instanceof GraphQLError) {
+  if (error instanceof GraphQLError || error.name === 'GraphQLError') {
     return true;
   }
   if (

@@ -17,7 +17,8 @@ import CoverRenderer from '#components/CoverRenderer';
 import { useRouter } from '#components/NativeRouter';
 import ScreenModal from '#components/ScreenModal';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
-import relayScreen from '#helpers/relayScreen';
+import relayScreen, { RelayScreenErrorBoundary } from '#helpers/relayScreen';
+import useHandleProfileActionError from '#hooks/useHandleProfileError';
 import useToggle from '#hooks/useToggle';
 import Button from '#ui/Button';
 import Container from '#ui/Container';
@@ -492,13 +493,35 @@ const styleSheet = createStyleSheet(appearance => ({
   },
 }));
 
-export default relayScreen(MultiUserScreen, {
-  query: multiUserScreenQuery,
-  getVariables: (_, profileInfos) => ({
-    profileId: profileInfos?.profileId ?? '',
-  }),
-  fetchPolicy: 'store-and-network',
-});
+export default relayScreen(
+  (props: RelayScreenProps<MultiUserRoute, MultiUserScreenQuery>) => {
+    const intl = useIntl();
+
+    const handleProfileActionError = useHandleProfileActionError(
+      intl.formatMessage({
+        defaultMessage: 'An error occured',
+        description:
+          'Error toast message when loading MultiUserScreen fails for unknown reason.',
+      }) as string,
+    );
+
+    return (
+      <RelayScreenErrorBoundary
+        onError={handleProfileActionError}
+        fallback={null}
+      >
+        <MultiUserScreen {...props} />
+      </RelayScreenErrorBoundary>
+    );
+  },
+  {
+    query: multiUserScreenQuery,
+    getVariables: (_, profileInfos) => ({
+      profileId: profileInfos?.profileId ?? '',
+    }),
+    fetchPolicy: 'store-and-network',
+  },
+);
 
 type MultiUserTransferOwnerContextProps = {
   selectedProfileId: string | undefined;
