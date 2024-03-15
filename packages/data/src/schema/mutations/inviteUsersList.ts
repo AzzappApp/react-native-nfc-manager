@@ -45,6 +45,13 @@ const inviteUsersListMutation: MutationResolvers['inviteUsersList'] = async (
     throw new GraphQLError(ERRORS.PAYLOAD_TOO_LARGE);
   }
 
+  if (invited.length === 0) {
+    return {
+      rejected: [],
+      added: [],
+    };
+  }
+
   for (const input of invited) {
     const { email } = input;
 
