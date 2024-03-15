@@ -1,5 +1,7 @@
-## 0.5.5-canary.147
+## 0.5.5-canary.148
 
+* **fix:**  - HomeScreen. - fix scroll index discrepency and perf ([#3060](https://github.com/AzzappApp/azzapp/pull/3060))
+* **feat:**  - **moderation:** [#2943](https://github.com/AzzappApp/azzapp/pull/2943) add report this comment & report this webcard ([#3061](https://github.com/AzzappApp/azzapp/pull/3061))
 * **fix:**  - Update from spec email signature ([#3076](https://github.com/AzzappApp/azzapp/pull/3076))
 * **fix:**  - **android:** [#2690](https://github.com/AzzappApp/azzapp/pull/2690) deactivate shutter noise ([#3058](https://github.com/AzzappApp/azzapp/pull/3058))
 * **feat:**  - 🎸 handle error on MultiUserScreen when losing right ([#3005](https://github.com/AzzappApp/azzapp/pull/3005))
