@@ -1,5 +1,6 @@
-## 0.5.5-canary.148
+## 0.5.5-canary.149
 
+* **fix:**  - wrong permission on sendReport
 * **fix:**  - HomeScreen. - fix scroll index discrepency and perf ([#3060](https://github.com/AzzappApp/azzapp/pull/3060))
 * **feat:**  - **moderation:** [#2943](https://github.com/AzzappApp/azzapp/pull/2943) add report this comment & report this webcard ([#3061](https://github.com/AzzappApp/azzapp/pull/3061))
 * **fix:**  - Update from spec email signature ([#3076](https://github.com/AzzappApp/azzapp/pull/3076))
