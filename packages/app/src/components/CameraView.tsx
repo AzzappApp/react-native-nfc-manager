@@ -142,6 +142,7 @@ const CameraView = (
         }
         const photo = await camera.current.takePhoto({
           flash: supportsFlash ? flash : 'off',
+          enableShutterSound: false,
           // TODO investigate those parameters
           // enableAutoDistortionCorrection: true,
           // enableAutoRedEyeReduction: true,

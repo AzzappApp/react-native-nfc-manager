@@ -5685,7 +5685,7 @@
   dependencies:
     "@types/react" "*"
 
-"@types/react@*", "@types/react@16 || 17 || 18", "@types/react@^18.2.45", "@types/react@^18.2.64", "@types/react@^18.2.65":
+"@types/react@*", "@types/react@16 || 17 || 18", "@types/react@^18.2.45", "@types/react@^18.2.65":
   version "18.2.48"
   resolved "https://registry.yarnpkg.com/@types/react/-/react-18.2.48.tgz#11df5664642d0bd879c1f58bc1d37205b064e8f1"
   integrity sha512-qboRCl6Ie70DQQG9hhNREz81jqC1cs9EVNcjQ1AU+jH6NFfSAhVVbrrY/+nSF+Bsk4AOwm9Qa61InvMCyV+H3w==
@@ -11224,10 +11224,10 @@ libphonenumber-js@^1.10.45:
   resolved "https://registry.yarnpkg.com/libphonenumber-js/-/libphonenumber-js-1.10.54.tgz#8dfba112f49d1b9c2a160e55f9697f22e50f0841"
   integrity sha512-P+38dUgJsmh0gzoRDoM4F5jLbyfztkU6PY6eSK6S5HwTi/LPvnwXqVCQZlAy1FxZ5c48q25QhxGQ0pq+WQcSlQ==
 
-libphonenumber-js@^1.10.57:
-  version "1.10.57"
-  resolved "https://registry.yarnpkg.com/libphonenumber-js/-/libphonenumber-js-1.10.57.tgz#4a8174014c758b8ffd865e06a43c3885706f7a9c"
-  integrity sha512-OjsEd9y4LgcX+Ig09SbxWqcGESxliDDFNVepFhB9KEsQZTrnk3UdEU+cO0sW1APvLprHstQpS23OQpZ3bwxy6Q==
+libphonenumber-js@^1.10.58:
+  version "1.10.58"
+  resolved "https://registry.yarnpkg.com/libphonenumber-js/-/libphonenumber-js-1.10.58.tgz#2015877bd47fd3d32d9fbfcedd75df35be230c9a"
+  integrity sha512-53A0IpJFL9LdHbpeatwizf8KSwPICrqn9H0g3Y7WQ+Jgeu9cQ4Ew3WrRtrLBu/CX2lXd5+rgT01/tGlkbkzOjw==
 
 lie@3.1.1:
   version "3.1.1"
@@ -13462,10 +13462,10 @@ react-native-version@^4.0.0:
     resolve-from "^5.0.0"
     semver "^7.0.0"
 
-react-native-vision-camera@^4.0.0-beta.3:
-  version "4.0.0-beta.3"
-  resolved "https://registry.yarnpkg.com/react-native-vision-camera/-/react-native-vision-camera-4.0.0-beta.3.tgz#d374e292d3a32e6a14636bf96ea6bca304711d5f"
-  integrity sha512-OL5kr58c5dZfciYYslUU3QrZfljVEmR3XEJLx4/q4E8PuHt+SgYHKZ+lW09XgLQPLSjY/ZGOZCyE0h+KPe6+hw==
+react-native-vision-camera@^4.0.0-beta.6:
+  version "4.0.0-beta.6"
+  resolved "https://registry.yarnpkg.com/react-native-vision-camera/-/react-native-vision-camera-4.0.0-beta.6.tgz#da311dfbc712ab2450fac71fda72f40910225772"
+  integrity sha512-ydRV5JeNqsx944f8DhReaA9KYvhvQtRCedCCSFGx7z6VH0cXQAC0hXSGYuCrVQ+1hxcP9qWKvSMgJ0Qtcr8Mig==
 
 react-native@^0.73.6:
   version "0.73.6"

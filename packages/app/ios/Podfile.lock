@@ -1275,7 +1275,7 @@ PODS:
     - SentryPrivate (= 8.20.0)
   - SentryPrivate (8.20.0)
   - SocketRocket (0.6.1)
-  - VisionCamera (4.0.0-beta.3):
+  - VisionCamera (4.0.0-beta.6):
     - React
     - React-callinvoker
     - React-Core
@@ -1733,9 +1733,9 @@ SPEC CHECKSUMS:
   Sentry: a8d7b373b9f9868442b02a0c425192f693103cbf
   SentryPrivate: 006b24af16828441f70e2ab6adf241bd0a8ad130
   SocketRocket: f32cd54efbe0f095c4d7594881e52619cfe80b17
-  VisionCamera: bb04db2c8eabc0a6bb7b3587ecfd81119d4039ba
+  VisionCamera: c1a3baa5d6b56a684fd55e87e6a2c3d449bf1d18
   Yoga: 805bf71192903b20fc14babe48080582fee65a80
 
-PODFILE CHECKSUM: 7a49880a0ab51bc06ee57c262a2167f37a3d26d2
+PODFILE CHECKSUM: 98c8d4205febb3f5c87147ae82cc67a37bb2a686
 
 COCOAPODS: 1.14.3
