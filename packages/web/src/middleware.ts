@@ -4,35 +4,41 @@ import { NextResponse } from 'next/server';
 import { getRedirectWebCardByUserName } from '@azzapp/data/domains';
 import type { NextRequest } from 'next/server';
 
+const cache = new Map();
+
 const rateLimit = {
   api: new Ratelimit({
     redis: kv,
     limiter: Ratelimit.slidingWindow(20, '1 s'),
+    ephemeralCache: cache,
   }),
   web: new Ratelimit({
     redis: kv,
     limiter: Ratelimit.slidingWindow(15, '1 s'),
+    ephemeralCache: cache,
   }),
 };
 
 export async function middleware(request: NextRequest) {
   const { nextUrl } = request;
 
-  const ip = request.ip ?? '127.0.0.1';
+  if (process.env.NODE_ENV === 'production') {
+    const ip = request.ip ?? '127.0.0.1';
 
-  const { success } = nextUrl.pathname.startsWith('/api')
-    ? await rateLimit.api.limit(ip)
-    : await rateLimit.web.limit(ip);
+    const { success } = nextUrl.pathname.startsWith('/api')
+      ? await rateLimit.api.limit(ip)
+      : await rateLimit.web.limit(ip);
 
-  if (!success) {
-    return NextResponse.json(
-      {
-        message: 'Too Many Requests',
-      },
-      {
-        status: 429,
-      },
-    );
+    if (!success) {
+      return NextResponse.json(
+        {
+          message: 'Too Many Requests',
+        },
+        {
+          status: 429,
+        },
+      );
+    }
   }
 
   if (nextUrl.pathname.startsWith('/api')) {
