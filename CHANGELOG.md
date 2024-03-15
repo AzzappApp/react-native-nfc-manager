@@ -1,5 +1,6 @@
-## 0.5.5-canary.149
+## 0.5.5-canary.150
 
+* **fix:**  - 🐛 only display related posts from published webcard ([#3088](https://github.com/AzzappApp/azzapp/pull/3088))
 * **fix:**  - wrong permission on sendReport
 * **fix:**  - HomeScreen. - fix scroll index discrepency and perf ([#3060](https://github.com/AzzappApp/azzapp/pull/3060))
 * **feat:**  - **moderation:** [#2943](https://github.com/AzzappApp/azzapp/pull/2943) add report this comment & report this webcard ([#3061](https://github.com/AzzappApp/azzapp/pull/3061))
