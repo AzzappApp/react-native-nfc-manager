@@ -1,5 +1,11 @@
-## 0.5.5-canary.145
+## 0.5.5-canary.146
 
+* **fix:**  - **android:** [#2690](https://github.com/AzzappApp/azzapp/pull/2690) deactivate shutter noise ([#3058](https://github.com/AzzappApp/azzapp/pull/3058))
+* **feat:**  - 🎸 handle error on MultiUserScreen when losing right ([#3005](https://github.com/AzzappApp/azzapp/pull/3005))
+* **fix:**  - **posts:** warning on flashlist style ([#3059](https://github.com/AzzappApp/azzapp/pull/3059))
+* **fix:**  - **multiUser:** [#3063](https://github.com/AzzappApp/azzapp/pull/3063) manage case with no data in list ([#3064](https://github.com/AzzappApp/azzapp/pull/3064))
+* **fix:**  - only rate limit in production ([#3066](https://github.com/AzzappApp/azzapp/pull/3066))
+* **fix:**  - **multiUser:** [#3605](https://github.com/AzzappApp/azzapp/pull/3605) remove duplicated mutation ([#3078](https://github.com/AzzappApp/azzapp/pull/3078))
 * **fix:**  - 🐛 correctly display carousel ([#3077](https://github.com/AzzappApp/azzapp/pull/3077))
 * **fix:**  - **auth:** [#3043](https://github.com/AzzappApp/azzapp/pull/3043) check email/phone confirmation for every authent ([#3074](https://github.com/AzzappApp/azzapp/pull/3074))
 * **fix:**  - webCards have always an update date ([#3073](https://github.com/AzzappApp/azzapp/pull/3073))
