@@ -163,7 +163,6 @@ const PostScreen = ({
         }
       />
       <PostList
-        style={{ flex: 1 }}
         canPlay={ready && hasFocus}
         posts={posts}
         webCard={webCard}
