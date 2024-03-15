@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { forwardRef, useCallback, useImperativeHandle, useRef } from 'react';
 
 import { Swipeable } from 'react-native-gesture-handler';
 import type { ReactNode } from 'react';
@@ -14,27 +14,37 @@ export type SwipeableRowActionsProps = {
   onClose: () => void;
 };
 
-const SwipeableRow = (props: SwipeableRowProps) => {
-  const { children, RightActions } = props;
-  const swipeable = useRef<Swipeable>(null);
-
-  const close = () => {
-    swipeable.current?.close();
-  };
-
-  return (
-    <Swipeable
-      ref={swipeable}
-      friction={2}
-      rightThreshold={40}
-      overshootRight={false}
-      renderRightActions={progress => (
-        <RightActions progress={progress} onClose={close} />
-      )}
-    >
-      {children}
-    </Swipeable>
-  );
+export type SwipeableRowHandle = {
+  close: () => void;
 };
+
+const SwipeableRow = forwardRef<SwipeableRowHandle, SwipeableRowProps>(
+  function SwipeableRowInner(props, ref) {
+    const { children, RightActions } = props;
+    const swipeable = useRef<Swipeable>(null);
+
+    const close = useCallback(() => {
+      swipeable.current?.close();
+    }, []);
+
+    useImperativeHandle(ref, () => ({
+      close,
+    }));
+
+    return (
+      <Swipeable
+        ref={swipeable}
+        friction={2}
+        rightThreshold={40}
+        overshootRight={false}
+        renderRightActions={progress => (
+          <RightActions progress={progress} onClose={close} />
+        )}
+      >
+        {children}
+      </Swipeable>
+    );
+  },
+);
 
 export default SwipeableRow;

@@ -31,9 +31,9 @@ import Input from '#ui/Input';
 import ListLoadingFooter from '#ui/ListLoadingFooter';
 import PressableOpacity from '#ui/PressableOpacity';
 import Text from '#ui/Text';
-import CommentItem from './CommentItem';
 import DeletableCommentItem from './DeletableCommentItem';
 import PostCommentsScreenHeader from './PostCommentsScreenHeader';
+import ReportableCommentItem from './ReportableCommentItem';
 import type { CommentItemFragment_comment$key } from '#relayArtifacts/CommentItemFragment_comment.graphql';
 import type { PostCommentsList_myWebCard$key } from '#relayArtifacts/PostCommentsList_myWebCard.graphql';
 import type { PostCommentsList_post$key } from '#relayArtifacts/PostCommentsList_post.graphql';
@@ -96,6 +96,7 @@ const PostCommentsList = ({
                 }
                 ...CommentItemFragment_comment
                 ...DeletableCommentItemFragment_comment
+                ...ReportableCommentItemFragment_comment
               }
             }
           }
@@ -273,7 +274,7 @@ const PostCommentsList = ({
       item: CommentItemFragment_comment$key & { webCard: { id: string } };
     }) => {
       if (auth.profileInfos?.webCardId !== item.webCard.id) {
-        return <CommentItem item={item} />;
+        return <ReportableCommentItem item={item} />;
       }
       return <DeletableCommentItem item={item} postId={postId} />;
     },

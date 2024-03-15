@@ -2,12 +2,15 @@ import * as Sentry from '@sentry/react-native';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { View, useWindowDimensions, Share } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import Toast from 'react-native-toast-message';
 import { graphql, useFragment } from 'react-relay';
 import { useDebouncedCallback } from 'use-debounce';
 import { buildUserUrl } from '@azzapp/shared/urlHelpers';
 import { colors, shadow } from '#theme';
 import CoverRenderer from '#components/CoverRenderer';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
+import { useSendReport } from '#hooks/useSendReport';
+import ActivityIndicator from '#ui/ActivityIndicator';
 import BottomSheetModal from '#ui/BottomSheetModal';
 import Container from '#ui/Container';
 import Header from '#ui/Header';
@@ -107,6 +110,40 @@ const WebCardModal = ({
   }, 600);
 
   const styles = useStyleSheet(stylesheet);
+
+  const [sendReport, commitSendReportLoading] = useSendReport(
+    webCard.id,
+    ({ sendReport }) => {
+      if (sendReport.created) {
+        Toast.show({
+          type: 'success',
+          text1: intl.formatMessage({
+            defaultMessage: 'Report on webCard sent',
+            description: 'Success toast message when sending report succeeds.',
+          }),
+          onHide: close,
+        });
+      } else {
+        Toast.show({
+          type: 'info',
+          text1: intl.formatMessage({
+            defaultMessage: 'You already reported this webCard',
+            description:
+              'Info toast message when sending report on webCard is already done.',
+          }),
+          onHide: close,
+        });
+      }
+    },
+    () =>
+      Toast.show({
+        type: 'error',
+        text1: intl.formatMessage({
+          defaultMessage: 'Error while sending the report, please try again.',
+          description: 'Error toast message when sending report fails.',
+        }),
+      }),
+  );
 
   return (
     <BottomSheetModal
@@ -215,6 +252,25 @@ const WebCardModal = ({
               </View>
             </PressableNative>
           )}
+
+          {!isViewer && (
+            <PressableNative
+              onPress={sendReport}
+              style={[styles.bottomSheetOptionButton, styles.report]}
+              disabled={commitSendReportLoading}
+            >
+              {commitSendReportLoading ? (
+                <ActivityIndicator color="black" />
+              ) : (
+                <Text variant="error">
+                  <FormattedMessage
+                    defaultMessage="Report this webCard"
+                    description="Label for the button to report a webCard"
+                  />
+                </Text>
+              )}
+            </PressableNative>
+          )}
         </View>
       </Container>
     </BottomSheetModal>
@@ -242,6 +298,9 @@ const stylesheet = createStyleSheet(appearance => ({
   },
   bottomSheetOptionButton: {
     height: 32,
+  },
+  report: {
+    alignSelf: 'center',
   },
   bottomSheetOptionContainer: {
     flexDirection: 'row',

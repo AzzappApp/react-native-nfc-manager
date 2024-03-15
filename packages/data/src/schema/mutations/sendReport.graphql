@@ -1,0 +1,15 @@
+extend type Mutation {
+  """
+  Return true when report is created (false when already created)
+  """
+  sendReport(id: ID!): ReportPayload!
+}
+
+type ReportPayload {
+  report: Report!
+  created: Boolean!
+}
+
+type Report {
+  targetId: ID!
+}

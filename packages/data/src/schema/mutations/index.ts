@@ -32,6 +32,7 @@ import saveCommonInformation from './saveCommonInformation';
 import saveContactCard from './saveContactCard';
 import saveCover from './saveCover';
 import sendInvitations from './sendInvitations';
+import sendReport from './sendReport';
 import toggleFollowing from './toggleFollowing';
 import toggleWebCardPublished from './toggleWebCardPublished';
 import transferOwnership from './transferOwnership';
@@ -90,4 +91,5 @@ export const Mutation: MutationResolvers = {
   quitWebCard,
   inviteUsersList,
   sendInvitations,
+  sendReport,
 };

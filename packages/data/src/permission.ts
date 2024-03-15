@@ -124,6 +124,7 @@ const ProtectedMutation: Record<
   updateWebCardUserName: isAdminRule,
   updateWebCard: isEditorRule,
   sendInvitations: isAdminRule,
+  sendReport: isAnyRoleRule,
 };
 
 const isCurrentUserRule = rule('sameProfile', {

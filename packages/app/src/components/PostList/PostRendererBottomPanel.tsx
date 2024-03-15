@@ -13,7 +13,9 @@ import { colors } from '#theme';
 import { useRouter } from '#components/NativeRouter';
 import { relativeDateMinute } from '#helpers/dateHelpers';
 import useAuthState from '#hooks/useAuthState';
+import { useSendReport } from '#hooks/useSendReport';
 import useToggleFollow from '#hooks/useToggleFollow';
+import ActivityIndicator from '#ui/ActivityIndicator';
 import BottomSheetModal from '#ui/BottomSheetModal';
 import ExpendableText from '#ui/ExpendableText';
 import PressableNative from '#ui/PressableNative';
@@ -140,12 +142,6 @@ const PostRendererBottomPanel = ({
     toggleModal();
   };
 
-  const report = () => {
-    //TODO
-    alert('TODO');
-    toggleModal();
-  };
-
   const [commitUpdatePostComments] =
     useMutation<PostRendererBottomPanelUpdatePostAllowCommentsMutation>(graphql`
       mutation PostRendererBottomPanelUpdatePostAllowCommentsMutation(
@@ -264,6 +260,45 @@ const PostRendererBottomPanel = ({
       });
     }
   };
+
+  const deletePost = () => {
+    //TODO: implement delete post
+  };
+
+  const [sendReport, commitSendReportLoading] = useSendReport(
+    post.id,
+    ({ sendReport }) => {
+      if (sendReport.created) {
+        Toast.show({
+          type: 'success',
+          text1: intl.formatMessage({
+            defaultMessage: 'Report on post sent',
+            description:
+              'Success toast message when sending report on post succeeds.',
+          }),
+          onHide: toggleModal,
+        });
+      } else {
+        Toast.show({
+          type: 'info',
+          text1: intl.formatMessage({
+            defaultMessage: 'You already reported this post',
+            description:
+              'Info toast message when sending report on post is already done.',
+          }),
+          onHide: toggleModal,
+        });
+      }
+    },
+    () =>
+      Toast.show({
+        type: 'error',
+        text1: intl.formatMessage({
+          defaultMessage: 'Error while sending the report, please try again.',
+          description: 'Error toast message when sending report fails.',
+        }),
+      }),
+  );
 
   return (
     <>
@@ -405,20 +440,25 @@ const PostRendererBottomPanel = ({
           )}
           {!isViewer && (
             <PressableNative
-              onPress={report}
+              onPress={sendReport}
               style={[styles.modalLine, styles.errorModalLine]}
+              disabled={commitSendReportLoading}
             >
-              <Text variant="error">
-                <FormattedMessage
-                  defaultMessage="Report this post"
-                  description="PostItem Modal - Likes Label"
-                />
-              </Text>
+              {commitSendReportLoading ? (
+                <ActivityIndicator color="black" />
+              ) : (
+                <Text variant="error">
+                  <FormattedMessage
+                    defaultMessage="Report this post"
+                    description="PostItem Modal - Report this post"
+                  />
+                </Text>
+              )}
             </PressableNative>
           )}
           {isViewer && (
             <PressableNative
-              onPress={report}
+              onPress={deletePost}
               style={[styles.modalLine, styles.errorModalLine]}
             >
               <Text variant="error">
