@@ -77,6 +77,7 @@ const ProtectedMutation: Record<
   Exclude<
     MutationMethod,
     | 'createWebCard'
+    | 'sendReport'
     | 'updateContactCardScans'
     | 'updateProfile'
     | 'updateUser'
@@ -124,7 +125,6 @@ const ProtectedMutation: Record<
   updateWebCardUserName: isAdminRule,
   updateWebCard: isEditorRule,
   sendInvitations: isAdminRule,
-  sendReport: isAnyRoleRule,
 };
 
 const isCurrentUserRule = rule('sameProfile', {
