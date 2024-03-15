@@ -1,5 +1,6 @@
-## 0.5.5-canary.146
+## 0.5.5-canary.147
 
+* **fix:**  - Update from spec email signature ([#3076](https://github.com/AzzappApp/azzapp/pull/3076))
 * **fix:**  - **android:** [#2690](https://github.com/AzzappApp/azzapp/pull/2690) deactivate shutter noise ([#3058](https://github.com/AzzappApp/azzapp/pull/3058))
 * **feat:**  - 🎸 handle error on MultiUserScreen when losing right ([#3005](https://github.com/AzzappApp/azzapp/pull/3005))
 * **fix:**  - **posts:** warning on flashlist style ([#3059](https://github.com/AzzappApp/azzapp/pull/3059))
