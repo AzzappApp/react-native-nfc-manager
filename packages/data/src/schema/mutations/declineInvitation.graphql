@@ -1,7 +1,0 @@
-extend type Mutation {
-  declineInvitation(profileId: ID!): DeclineInvitationPayload!
-}
-
-type DeclineInvitationPayload {
-  profileId: ID!
-}

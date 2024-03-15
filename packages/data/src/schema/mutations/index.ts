@@ -4,7 +4,6 @@ import cancelTransferOwnership from './cancelTransferOwnership';
 import createPost from './createPost';
 import createPostComment from './createPostComment';
 import createWebCard from './createWebCard';
-import declineInvitation from './declineInvitation';
 import declineOwnership from './declineOwnership';
 import deleteModules from './deleteModules';
 import deletePostComment from './deletePostComment';
@@ -78,7 +77,6 @@ export const Mutation: MutationResolvers = {
   updateWebCardViews,
   updateModulesVisibility,
   acceptInvitation,
-  declineInvitation,
   saveCommonInformation,
   updateMultiUser,
   acceptOwnership,

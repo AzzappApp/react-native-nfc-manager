@@ -3,13 +3,14 @@ import { memo, useCallback, useMemo } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { Platform, StyleSheet, View, Share } from 'react-native';
 import Toast from 'react-native-toast-message';
-import { graphql, useFragment, useMutation } from 'react-relay';
+import { graphql, useFragment } from 'react-relay';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
 import { isAdmin, isOwner } from '@azzapp/shared/profileHelpers';
 import { buildUserUrl } from '@azzapp/shared/urlHelpers';
 import { colors } from '#theme';
 import Link from '#components/Link';
 import { dispatchGlobalEvent } from '#helpers/globalEvents';
+import useQuitWebCard from '#hooks/useQuitWebCard';
 import useScreenInsets from '#hooks/useScreenInsets';
 import useToggle from '#hooks/useToggle';
 import BottomSheetModal from '#ui/BottomSheetModal';
@@ -18,7 +19,6 @@ import PressableNative from '#ui/PressableNative';
 import Text from '#ui/Text';
 import type { LinkProps } from '#components/Link';
 import type { HomeBottomSheetPanel_profile$key } from '#relayArtifacts/HomeBottomSheetPanel_profile.graphql';
-import type { HomeBottomSheetPanelQuitWebCardMutation } from '#relayArtifacts/HomeBottomSheetPanelQuitWebCardMutation.graphql';
 import type { Icons } from '#ui/Icon';
 import type { ReactNode } from 'react';
 
@@ -73,54 +73,20 @@ const HomeBottomSheetPanel = ({
     profileKey ?? null,
   );
 
-  const [commitQuitWebCard] =
-    useMutation<HomeBottomSheetPanelQuitWebCardMutation>(graphql`
-      mutation HomeBottomSheetPanelQuitWebCardMutation($profileId: ID!) {
-        quitWebCard(profileId: $profileId) {
-          profileId
-        }
-      }
-    `);
-
-  const onQuitWebCard = () => {
-    if (!profile) return;
-
-    commitQuitWebCard({
-      variables: {
-        profileId: profile.id,
-      },
-
-      updater: store => {
-        const root = store.getRoot();
-        const user = root.getLinkedRecord('currentUser');
-        const profiles = user?.getLinkedRecords('profiles');
-        if (!profiles) {
-          return;
-        }
-
-        user?.setLinkedRecords(
-          profiles?.filter(
-            linkedProfile => linkedProfile.getDataID() !== profile.id,
-          ),
-          'profiles',
-        );
-        root.setLinkedRecord(user, 'currentUser');
-      },
-      onCompleted: () => {
-        close();
-      },
-      onError: e => {
-        console.error(e);
-        Toast.show({
-          type: 'error',
-          text1: intl.formatMessage({
-            defaultMessage: "Error, couldn't quit WebCard. Please try again.",
-            description: 'Error toast message when quitting WebCard',
-          }),
-        });
-      },
-    });
-  };
+  const [quitWebCard, isLoadingQuitWebCard] = useQuitWebCard(
+    profile?.id ?? '',
+    close,
+    e => {
+      console.error(e);
+      Toast.show({
+        type: 'error',
+        text1: intl.formatMessage({
+          defaultMessage: "Error, couldn't quit WebCard. Please try again.",
+          description: 'Error toast message when quitting WebCard',
+        }),
+      });
+    },
+  );
 
   const { bottom } = useScreenInsets();
   const [requestedLogout, toggleRequestLogout] = useToggle(false);
@@ -333,7 +299,11 @@ const HomeBottomSheetPanel = ({
           return <HomeBottomSheetPanelOption key={index} {...element} />;
         })}
         {profile && !isOwner(profile?.profileRole) && (
-          <PressableNative style={styles.removeButton} onPress={onQuitWebCard}>
+          <PressableNative
+            style={styles.removeButton}
+            onPress={quitWebCard}
+            disabled={isLoadingQuitWebCard}
+          >
             <Text variant="button" style={styles.removeText}>
               <FormattedMessage
                 defaultMessage="Quit this WebCard{azzappA}"

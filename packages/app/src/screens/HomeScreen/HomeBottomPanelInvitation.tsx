@@ -1,22 +1,17 @@
-import { fromGlobalId } from 'graphql-relay';
 import { memo, useCallback } from 'react';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 import { StyleSheet, View } from 'react-native';
+import Toast from 'react-native-toast-message';
 import { graphql, commitMutation } from 'react-relay';
 import { colors } from '#theme';
-import { getAuthState } from '#helpers/authStore';
 import { dispatchGlobalEvent } from '#helpers/globalEvents';
 import { getRelayEnvironment } from '#helpers/relayEnvironment';
+import useQuitWebCard from '#hooks/useQuitWebCard';
 import Button from '#ui/Button';
 import Text from '#ui/Text';
 import type { HomeBottomPanelInvitationAcceptMutation } from '#relayArtifacts/HomeBottomPanelInvitationAcceptMutation.graphql';
-import type {
-  HomeBottomPanelInvitationDeclineMutation,
-  HomeBottomPanelInvitationDeclineMutation$data,
-} from '#relayArtifacts/HomeBottomPanelInvitationDeclineMutation.graphql';
 import type { HomeBottomPanelMessage_profiles$data } from '#relayArtifacts/HomeBottomPanelMessage_profiles.graphql';
 import type { ArrayItemType } from '@azzapp/shared/arrayHelpers';
-import type { SelectorStoreUpdater } from 'relay-runtime';
 
 type HomeBottomPanelInvitationProps = {
   profile: ArrayItemType<HomeBottomPanelMessage_profiles$data>;
@@ -69,44 +64,23 @@ const HomeBottomPanelInvitation = ({
     });
   }, [profile]);
 
-  const onDeclineInvitation = useCallback(() => {
-    const environment = getRelayEnvironment();
+  const intl = useIntl();
 
-    const declineInvitationMutation = graphql`
-      mutation HomeBottomPanelInvitationDeclineMutation($profileId: ID!) {
-        declineInvitation(profileId: $profileId) {
-          profileId
-        }
-      }
-    `;
-    const profileId = getAuthState().profileInfos?.profileId;
-    if (profileId) {
-      const { id } = fromGlobalId(profileId);
-
-      const updater: SelectorStoreUpdater<
-        HomeBottomPanelInvitationDeclineMutation$data
-      > = store => {
-        const root = store.getRoot();
-
-        const user = root.getLinkedRecord('currentUser');
-
-        const profiles = user?.getLinkedRecords('profiles');
-
-        user?.setLinkedRecords(
-          profiles?.filter(p => p.getDataID() !== profileId) ?? [],
-          'profiles',
-        );
-        root.setLinkedRecord(user, 'currentUser');
-      };
-
-      commitMutation<HomeBottomPanelInvitationDeclineMutation>(environment, {
-        mutation: declineInvitationMutation,
-        variables: { profileId: id },
-        optimisticUpdater: updater,
-        updater,
+  const [quitWebCard, isLoadingQuitWebCard] = useQuitWebCard(
+    profile.id,
+    undefined,
+    e => {
+      console.error(e);
+      Toast.show({
+        type: 'error',
+        text1: intl.formatMessage({
+          defaultMessage:
+            "Error, couldn't decline invitation. Please try again.",
+          description: 'Error toast message when declining invitation',
+        }),
       });
-    }
-  }, []);
+    },
+  );
 
   return (
     <>
@@ -154,7 +128,8 @@ const HomeBottomPanelInvitation = ({
             />
           }
           style={styles.invitationPanelButton}
-          onPress={onDeclineInvitation}
+          loading={isLoadingQuitWebCard}
+          onPress={quitWebCard}
         />
       </View>
     </>

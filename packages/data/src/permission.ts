@@ -83,7 +83,6 @@ const ProtectedMutation: Record<
   inviteUsersList: isAdminRule,
   loadCardTemplate: isEditorRule,
   acceptInvitation: isAnyRoleRule,
-  declineInvitation: isCurrentProfileRule,
   createPost: isEditorRule,
   createPostComment: isEditorRule,
   declineOwnership: isAnyRoleRule,
