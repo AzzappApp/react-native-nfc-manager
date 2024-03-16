@@ -52,14 +52,16 @@ const ConfirmRegistrationScreen = ({
         issuer: params.issuer,
         token: code,
       });
+      const { profileInfos } = tokens;
 
       await dispatchGlobalEvent({
-        type: 'SIGN_UP',
+        type: 'SIGN_IN',
         payload: {
           authTokens: {
             token: tokens.token,
             refreshToken: tokens.refreshToken,
           },
+          profileInfos: profileInfos ?? null,
           email: tokens.email,
           phoneNumber: tokens.phoneNumber,
           userId: tokens.userId,

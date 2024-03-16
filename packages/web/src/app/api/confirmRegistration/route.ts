@@ -1,13 +1,14 @@
 import * as Sentry from '@sentry/nextjs';
 import { NextResponse } from 'next/server';
 import {
+  getProfilesOfUser,
   getUserByEmail,
   getUserByPhoneNumber,
   updateUser,
 } from '@azzapp/data/domains';
 import ERRORS from '@azzapp/shared/errors';
 import { isValidEmail } from '@azzapp/shared/stringHelpers';
-import { generateTokens } from '#helpers/tokens';
+import { handleSignInAuthMethod } from '#helpers/auth';
 import { twilioVerificationService } from '#helpers/twilioHelpers';
 
 type ConfirmRegistrationBody = {
@@ -46,22 +47,17 @@ export const POST = async (req: Request) => {
         );
       }
 
-      await updateUser(user.id, {
+      const update = {
         [isEmail ? 'emailConfirmed' : 'phoneNumberConfirmed']: true,
-      });
+      };
 
-      const tokens = await generateTokens({
-        userId: user.id,
-      });
+      await updateUser(user.id, update);
 
-      return NextResponse.json({
-        ok: true,
-        token: tokens.token,
-        refreshToken: tokens.refreshToken,
-        email: user.email ?? null,
-        phoneNumber: user.phoneNumber,
-        userId: user.id,
-      });
+      // if we found a user by email or phonenumber, we look for the profile
+      const profiles = await getProfilesOfUser(user.id, 1);
+      const profile = profiles[0]?.Profile;
+
+      return handleSignInAuthMethod({ ...user, ...update }, profile);
     }
   } catch (error) {
     console.error(error);

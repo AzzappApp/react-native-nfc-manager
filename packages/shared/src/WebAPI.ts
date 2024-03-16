@@ -70,6 +70,11 @@ export type ConfirmRegistrationParams = {
  * Reponse for the confirm registration API call.
  */
 export type ConfirmRegistrationReponse = {
+  profileInfos: {
+    profileRole: string;
+    profileId: string;
+    webCardId: string;
+  } | null;
   token: string;
   refreshToken: string;
   email: string | null;
