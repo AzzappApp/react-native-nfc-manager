@@ -1,5 +1,6 @@
-## 0.5.5-canary.150
+## 0.5.5-canary.151
 
+* **fix:**  - 🐛 correctly redirect with profile infos after register ([#3093](https://github.com/AzzappApp/azzapp/pull/3093))
 * **fix:**  - 🐛 only display related posts from published webcard ([#3088](https://github.com/AzzappApp/azzapp/pull/3088))
 * **fix:**  - wrong permission on sendReport
 * **fix:**  - HomeScreen. - fix scroll index discrepency and perf ([#3060](https://github.com/AzzappApp/azzapp/pull/3060))
