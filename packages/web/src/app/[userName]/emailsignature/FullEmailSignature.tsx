@@ -99,7 +99,7 @@ const FullEmailSignature = ({
   useEffect(() => {
     if (webCard) {
       setWebCardUrl(
-        `https://azzapp-dev.vercel.app/api/cover/${webCard.userName}?width=${630}&updatedAt=${webCard?.updatedAt.toISOString()}`,
+        `${process.env.NEXT_PUBLIC_API_ENDPOINT}/cover/${webCard.userName}?width=${630}&updatedAt=${webCard?.updatedAt.toISOString()}`,
       );
     }
   }, [webCard]);

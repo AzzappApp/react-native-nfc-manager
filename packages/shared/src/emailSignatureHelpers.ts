@@ -14,9 +14,9 @@ export function buildCardSignature(
   let card = `
   <a href="${url}"
   rel=“noopener” noreferrer target=“_blank”
-  style="text-decoration: none; color: black;padding-left: 30px;padding-right: 30px">
+  style="text-decoration: none; color: black;padding-left: 30px;padding-right: 30px";max-width:100% !important; width:100%;>
   <table  border="0" cellpadding="0" cellspacing="0" width="100%"
-    style="border: 1px solid black;table-layout: fixed;width: 450px; padding-left: 15px; padding-right: 15px; padding-top: 20px; padding-bottom: 20px; background: white; border-radius: 20px; overflow: hidden;gap: 15px;box-shadow:0px 4px 16px 0px rgba(0, 0, 0, 0.25);text-decoration: none">
+    style="border: 1px solid black;table-layout: fixed;max-width: 450px; padding-left: 15px; padding-right: 15px; padding-top: 20px; padding-bottom: 20px; background: white; border-radius: 20px; overflow: hidden;gap: 15px;text-decoration: none">
     <tbody>`;
   if (avatarUrl) {
     card += `<tr> 
