@@ -174,7 +174,7 @@ const WebCardScrenHeader = ({
               />
             )
           }
-          style={{ backgroundColor: 'transparent', paddingBottom: 4 }}
+          style={{ backgroundColor: 'transparent', paddingBottom: 6 }}
         />
       </Animated.View>
       <Animated.View

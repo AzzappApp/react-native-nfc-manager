@@ -108,6 +108,7 @@ const Toast = ({
           text1Style={[textStyles.smallbold, styles.toastText]}
           text1Props={{
             adjustsFontSizeToFit: true,
+            numberOfLines: 2,
           }}
         />
       ),
@@ -137,6 +138,7 @@ const Toast = ({
             onPress={ExternalToast.hide}
             text1Props={{
               adjustsFontSizeToFit: true,
+              numberOfLines: 2,
             }}
           />
         </>
@@ -174,7 +176,6 @@ const styleSheet = createStyleSheet(appearance => ({
     borderRadius: 15,
     borderLeftWidth: 0,
     alignItems: 'center',
-    justifyContent: 'center',
     paddingLeft: 10,
     paddingRight: 10,
     marginHorizontal: 20,
