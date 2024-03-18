@@ -38,7 +38,7 @@ const computedStyle = createVariantsStyleSheet(appearance => ({
       color: appearance === 'light' ? colors.grey200 : colors.grey800,
     },
     thumbColor: {
-      color: appearance === 'light' ? colors.white : colors.black,
+      color: appearance === 'light' ? colors.white : colors.grey200,
     },
   },
   small: {
