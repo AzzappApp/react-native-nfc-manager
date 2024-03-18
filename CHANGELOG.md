@@ -1,5 +1,7 @@
-## 0.5.5-canary.154
+## 0.5.5-canary.155
 
+* **fix:**  - remove emailSignature from android appLink ([#3108](https://github.com/AzzappApp/azzapp/pull/3108))
+* **fix:**  - use unset to avoid chrome removing none text-decoration ([#3104](https://github.com/AzzappApp/azzapp/pull/3104))
 * **fix:**  - email signature should use data from multi user common informaiton ([#3099](https://github.com/AzzappApp/azzapp/pull/3099))
 * **fix:**  - **android:** [#2962](https://github.com/AzzappApp/azzapp/pull/2962) allow toast on 2 lines and avoid icon out of toast ([#3092](https://github.com/AzzappApp/azzapp/pull/3092))
 * **test:**  - fix switch unit test
