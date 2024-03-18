@@ -14,9 +14,9 @@ export function buildCardSignature(
   let card = `
   <a href="${url}"
   rel=“noopener” noreferrer target=“_blank”
-  style="text-decoration: none; color: black;padding-left: 30px;padding-right: 30px";max-width:100% !important; width:100%;>
+  style="text-decoration: unset !important; color: black;padding-left: 30px;padding-right: 30px";max-width:100% !important; width:100%;>
   <table  border="0" cellpadding="0" cellspacing="0" width="100%"
-    style="border: 1px solid black;table-layout: fixed;max-width: 450px; padding-left: 15px; padding-right: 15px; padding-top: 20px; padding-bottom: 20px; background: white; border-radius: 20px; overflow: hidden;gap: 15px;text-decoration: none">
+    style="border: 1px solid black;table-layout: fixed;max-width: 450px; padding-left: 15px; padding-right: 15px; padding-top: 20px; padding-bottom: 20px; background: white; border-radius: 20px; overflow: hidden;gap: 15px;text-decoration: unset !important">
     <tbody>`;
   if (avatarUrl) {
     card += `<tr> 
@@ -33,17 +33,17 @@ export function buildCardSignature(
               <div
                 style="gap: 5px; ">`;
   if (displayName) {
-    card += `<div style="text-align: left; color: black; font-size: 16px; font-family: Helvetica Neue; font-weight: 700; word-wrap: break-word">${displayName}</div>`;
+    card += `<div style="text-align: left; color: black; font-size: 16px; font-family: Helvetica Neue; font-weight: 700; word-wrap: break-word;text-decoration: unset !important">${displayName}</div>`;
   }
   if (title) {
-    card += `<div style="text-align: left; color: black; font-size: 14px; font-family: Helvetica Neue; font-weight: 400; word-wrap: break-word">${title}</div>`;
+    card += `<div style="text-align: left; color: black; font-size: 14px; font-family: Helvetica Neue; font-weight: 400; word-wrap: break-word;text-decoration: unset !important">${title}</div>`;
   }
   if (company) {
-    card += `<div  style="text-align: left; color: black; font-size: 14px; font-family: Helvetica Neue; font-weight: 400; word-wrap: break-word">${company}</div>`;
+    card += `<div  style="text-align: left; color: black; font-size: 14px; font-family: Helvetica Neue; font-weight: 400; word-wrap: break-word;text-decoration: unset !important">${company}</div>`;
   }
   card += `</div> </div>`;
   if (phones) {
-    card += ` <div style="text-align: left; color: black; font-size: 14px; font-family: Helvetica Neue; font-weight: 400; word-wrap: break-word; margin-top:10px;">`;
+    card += ` <div style="text-align: left; color: black; font-size: 14px; font-family: Helvetica Neue; font-weight: 400; word-wrap: break-word; margin-top:10px;text-decoration: unset !important">`;
     for (let index = 0; index < phones.length; index++) {
       card += ` <div style="margin-top:4px">${phones[index]}</div>`;
     }
@@ -53,7 +53,7 @@ export function buildCardSignature(
             style="border: 1px solid black;background: white;height:34px;padding-left: 10px;padding-right: 10px;border-radius:48px;box-shadow:0px 4px 16px 0px rgba(0, 0, 0, 0.25);font-size:12px;margin-top:12px">
             <tbody> 
               <tr>
-                <td style="background: white;vertical-align: middle; text-align: center;color: black; font-size: 12px; font-family: Helvetica; font-weight: 700">
+                <td style="background: white;vertical-align: middle; text-align: center;color: black; font-size: 12px; font-family: Helvetica; font-weight: 700;text-decoration: unset !important">
                   Save my contact
                 </td>
               </tr>
@@ -74,10 +74,10 @@ export function buildCardSignature(
 
 export function buildSaveMyContactSignature(url: string) {
   return `
-  <a href="${url}" rel=“noopener” noreferrer target=“_blank” style="text-decoration: none; color: black;padding-left: 30px;padding-right: 30px">
-    <table style="border: 1px solid black;height:34px;padding-left: 10px;padding-right: 10px;border-radius:48px;box-shadow:0px 4px 16px 0px rgba(0, 0, 0, 0.25);font-size:12px;border: 1px solid black;">
+  <a href="${url}" rel=“noopener” noreferrer target=“_blank” style="text-decoration: unset !important; color: black;padding-left: 30px;padding-right: 30px">
+    <table style="border: 1px solid black;height:34px;padding-left: 10px;padding-right: 10px;border-radius:48px;box-shadow:0px 4px 16px 0px rgba(0, 0, 0, 0.25);font-size:12px;border: 1px solid black;text-decoration: unset !important">
       <tr>
-        <td style="vertical-align: middle; text-align: center;">
+        <td style="vertical-align: middle; text-align: center;text-decoration: unset !important">
           Save my contact
         </td>
       </tr>
