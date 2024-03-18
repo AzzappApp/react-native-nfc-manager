@@ -6,7 +6,7 @@ import {
   useRef,
   useState,
 } from 'react';
-import { Dimensions, Image, StyleSheet, View } from 'react-native';
+import { Dimensions, Image, View } from 'react-native';
 import {
   useSharedValue,
   withRepeat,
@@ -23,7 +23,8 @@ import {
   textOrientationOrDefault,
   textPositionOrDefault,
 } from '@azzapp/shared/coverHelpers';
-import { colors } from '#theme';
+import { colors, shadow } from '#theme';
+import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import useLatestCallback from '#hooks/useLatestCallback';
 import { MediaImageRenderer, MediaVideoRenderer } from '../medias';
 import CoverStaticMediaLayer from './CoverStaticMediaLayer';
@@ -355,6 +356,8 @@ const CoverRenderer = (
     [mediaUri, requestedSize, media?.id],
   );
 
+  const styles = useStyleSheet(stylesheet);
+
   const containerStyle = useMemo(
     () => [
       styles.root,
@@ -363,9 +366,18 @@ const CoverRenderer = (
         width,
         backgroundColor: swapColor(backgroundColor, cardColors) as any,
       },
+      styles.shadow,
       style,
     ],
-    [borderRadius, width, backgroundColor, cardColors, style],
+    [
+      styles.root,
+      styles.shadow,
+      borderRadius,
+      width,
+      backgroundColor,
+      cardColors,
+      style,
+    ],
   );
   //#endregion
 
@@ -516,11 +528,14 @@ const CoverRenderer = (
 
 export default forwardRef(CoverRenderer);
 
-const styles = StyleSheet.create({
+const stylesheet = createStyleSheet(theme => ({
   root: {
     aspectRatio: COVER_RATIO,
     overflow: 'hidden',
     borderCurve: 'continuous',
+  },
+  shadow: {
+    ...shadow(theme, 'center'),
   },
   layer: {
     position: 'absolute',
@@ -536,4 +551,4 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-});
+}));
