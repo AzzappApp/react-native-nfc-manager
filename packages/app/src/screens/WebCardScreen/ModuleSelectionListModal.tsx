@@ -202,9 +202,7 @@ const ModuleSelectionListModal = ({
     <ScreenModal {...props}>
       <Container style={[styles.root, { paddingTop: top }]}>
         <Header
-          leftElement={
-            <IconButton icon="arrow_down" onPress={onRequestClose} />
-          }
+          leftElement={<IconButton icon="close" onPress={onRequestClose} />}
           middleElement={intl.formatMessage({
             defaultMessage: 'Add a new section',
             description: 'Module selection list modal header title',
