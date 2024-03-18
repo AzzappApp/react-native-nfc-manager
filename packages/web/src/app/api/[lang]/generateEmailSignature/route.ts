@@ -74,15 +74,21 @@ const generateEmailSignature = async (req: Request) => {
     if (res?.Profile?.contactCard?.title) {
       mailParam.title = res?.Profile?.contactCard?.title;
     }
-    if (res?.Profile?.contactCard?.company) {
-      mailParam.company = res?.Profile?.contactCard?.company;
+    const comp =
+      res?.WebCard?.commonInformation?.company ??
+      res?.Profile?.contactCard?.company;
+    if (comp) {
+      mailParam.company = comp;
     }
-    if (res?.Profile?.contactCard?.phoneNumbers) {
-      mailParam.phones = res?.Profile?.contactCard?.phoneNumbers.map(item => ({
+    const phones = (res?.WebCard?.commonInformation?.phoneNumbers ?? []).concat(
+      res?.Profile?.contactCard?.phoneNumbers?.filter(p => p.selected) ?? [],
+    );
+
+    if (phones && phones.length > 0) {
+      mailParam.phones = phones.map(item => ({
         number: item.number,
       }));
     }
-
     const formattedAvatarUrl = await buildAvatarUrl(res.Profile, null);
     if (formattedAvatarUrl) {
       mailParam.avatarUrl = formattedAvatarUrl;
