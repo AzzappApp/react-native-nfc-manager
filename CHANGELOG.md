@@ -1,4 +1,4 @@
-## 0.5.5-canary.153
+## 0.5.5-canary.154
 
 * **fix:**  - email signature should use data from multi user common informaiton ([#3099](https://github.com/AzzappApp/azzapp/pull/3099))
 * **fix:**  - **android:** [#2962](https://github.com/AzzappApp/azzapp/pull/2962) allow toast on 2 lines and avoid icon out of toast ([#3092](https://github.com/AzzappApp/azzapp/pull/3092))
