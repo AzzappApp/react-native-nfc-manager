@@ -12,7 +12,7 @@ input InviteUserInput {
 
 input InviteUserEmailInput {
   email: String!
-  profileRole: ProfileRole!
+  profileRole: ProfileRole
   contactCard: ContactCardInput
 }
 
