@@ -1,5 +1,9 @@
-## 0.5.5-canary.151
+## 0.5.5-canary.152
 
+* **fix:**  - **android:** [#2962](https://github.com/AzzappApp/azzapp/pull/2962) allow toast on 2 lines and avoid icon out of toast ([#3092](https://github.com/AzzappApp/azzapp/pull/3092))
+* **test:**  - fix switch unit test
+* **fix:**  - **multiUser:** profile role must be optional ([#3097](https://github.com/AzzappApp/azzapp/pull/3097))
+* **fix:**  - email signature on gmail mobile app ([#3095](https://github.com/AzzappApp/azzapp/pull/3095))
 * **fix:**  - 🐛 correctly redirect with profile infos after register ([#3093](https://github.com/AzzappApp/azzapp/pull/3093))
 * **fix:**  - 🐛 only display related posts from published webcard ([#3088](https://github.com/AzzappApp/azzapp/pull/3088))
 * **fix:**  - wrong permission on sendReport
