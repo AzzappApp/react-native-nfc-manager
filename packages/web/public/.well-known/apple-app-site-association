@@ -18,13 +18,13 @@
             "comment": "Matches any URL with a path that starts with /*. (profile)"
           },
           {
-            "/:profileID/:postID": "/:profileID/postID",
-            "comment": "Matches any URL with a path that starts with /*. (profile)"
-          },
-          {
-            "/:profileID/emailSignature*": "/:profileID/emailSignature*",
+            "/:profileID/emailSignature": "/:profileID/emailSignature*",
             "exclude": true,
             "comment": "Excludes any URL with a path that starts with /:profileID/emailSignature"
+          },
+          {
+            "/:profileID/:postID": "/:profileID/postID",
+            "comment": "Matches any URL with a path that starts with /*. (profile)"
           }
         ]
       }
