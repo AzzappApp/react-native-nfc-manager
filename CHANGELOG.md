@@ -1,4 +1,4 @@
-## 0.5.5-canary.161
+## 0.5.5-canary.162
 
 * **fix:**  - **android:** cover creation error + upgrade deps + fix header height ([#3114](https://github.com/AzzappApp/azzapp/pull/3114))
 * **feat:**  - new aasa
