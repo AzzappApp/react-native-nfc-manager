@@ -1,5 +1,6 @@
-## 0.5.5-canary.157
+## 0.5.5-canary.158
 
+* **fix:**  - 🐛 use right avatar to update ([#3113](https://github.com/AzzappApp/azzapp/pull/3113))
 * **text:**  - add mock snetry
 * **debug:**  - add capture event in sentry to debug production issue not repro in dev mode
 * **fix:**  - 🐛 properly display phone number from owner invitation ([#3111](https://github.com/AzzappApp/azzapp/pull/3111))
