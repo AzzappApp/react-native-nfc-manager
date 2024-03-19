@@ -1,5 +1,7 @@
-## 0.5.5-canary.160
+## 0.5.5-canary.161
 
+* **fix:**  - **android:** cover creation error + upgrade deps + fix header height ([#3114](https://github.com/AzzappApp/azzapp/pull/3114))
+* **feat:**  - new aasa
 * **fix:**  - aasa
 * **feat:**  - update aasa to avoid emailSignautre
 * **fix:**  - 🐛 use right avatar to update ([#3113](https://github.com/AzzappApp/azzapp/pull/3113))
