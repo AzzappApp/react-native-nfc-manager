@@ -1,5 +1,7 @@
-## 0.5.5-canary.155
+## 0.5.5-canary.156
 
+* **fix:**  - 🐛 properly display phone number from owner invitation ([#3111](https://github.com/AzzappApp/azzapp/pull/3111))
+* **fix:**  - 🐛 correctly verify contact change ([#3110](https://github.com/AzzappApp/azzapp/pull/3110))
 * **fix:**  - remove emailSignature from android appLink ([#3108](https://github.com/AzzappApp/azzapp/pull/3108))
 * **fix:**  - use unset to avoid chrome removing none text-decoration ([#3104](https://github.com/AzzappApp/azzapp/pull/3104))
 * **fix:**  - email signature should use data from multi user common informaiton ([#3099](https://github.com/AzzappApp/azzapp/pull/3099))
