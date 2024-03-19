@@ -1,5 +1,6 @@
-## 0.5.5-canary.159
+## 0.5.5-canary.160
 
+* **fix:**  - aasa
 * **feat:**  - update aasa to avoid emailSignautre
 * **fix:**  - 🐛 use right avatar to update ([#3113](https://github.com/AzzappApp/azzapp/pull/3113))
 * **text:**  - add mock snetry
