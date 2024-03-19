@@ -137,10 +137,21 @@ const ConfirmRegistrationScreen = ({
         } else {
           Toast.show({
             type: 'error',
-            text1: intl.formatMessage({
-              defaultMessage: 'Unknown error - Please retry',
+            text1: isEmail
+              ? intl.formatMessage({
+                  defaultMessage: 'Error while confirming your email.',
+                  description:
+                    'Toast Error message when confirming email fails',
+                })
+              : intl.formatMessage({
+                  defaultMessage: 'Error while confirming your phone number.',
+                  description:
+                    'Toast Error message when confirming phone number',
+                }),
+            text2: intl.formatMessage({
+              defaultMessage: 'Please try again.',
               description:
-                'ConfirmChangeContactScreen - Error Unknown error - Please retry',
+                'Toast Error message when confirm email or phone number fails',
             }),
             visibilityTime: 5000,
           });

@@ -511,6 +511,8 @@ const CoverRenderer = (
       readyForDisplay,
       requestedSize,
       smallThumbnail,
+      styles.coverPlaceHolder,
+      styles.layer,
       subTitle,
       subTitleStyle,
       textAnimation,
