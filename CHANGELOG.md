@@ -1,5 +1,6 @@
-## 0.5.5-canary.158
+## 0.5.5-canary.159
 
+* **feat:**  - update aasa to avoid emailSignautre
 * **fix:**  - 🐛 use right avatar to update ([#3113](https://github.com/AzzappApp/azzapp/pull/3113))
 * **text:**  - add mock snetry
 * **debug:**  - add capture event in sentry to debug production issue not repro in dev mode
