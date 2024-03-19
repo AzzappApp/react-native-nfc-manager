@@ -46,6 +46,7 @@ const HomeBottomPanelMessage = ({
           }
           owner {
             email
+            phoneNumber
           }
           id
         }

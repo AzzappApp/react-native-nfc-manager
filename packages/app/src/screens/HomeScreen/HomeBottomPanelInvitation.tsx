@@ -92,10 +92,13 @@ const HomeBottomPanelInvitation = ({
       </Text>
       <Text variant="medium" style={styles.informationText}>
         <FormattedMessage
-          defaultMessage={`{email} invited you to the WebCard{azzappA} {company}`}
+          defaultMessage={`{contact} invited you to the WebCard{azzappA} {company}`}
           description="Home bottom panel invitation"
           values={{
-            email: profile?.webCard?.owner?.email ?? '',
+            contact:
+              profile?.webCard?.owner?.email ||
+              profile?.webCard?.owner?.phoneNumber ||
+              '',
             company: profile?.webCard?.userName ?? '',
             azzappA: (
               <Text style={styles.icon} variant="azzapp">
