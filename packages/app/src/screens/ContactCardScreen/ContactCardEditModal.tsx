@@ -269,7 +269,10 @@ const ContactCardEditModal = ({
 
   return (
     <Container style={styles.container}>
-      <SafeAreaView>
+      <SafeAreaView
+        style={{ flex: 1 }}
+        edges={{ bottom: 'off', top: 'additive' }}
+      >
         <Header
           middleElement={intl.formatMessage({
             defaultMessage: 'Edit Contact Card',
