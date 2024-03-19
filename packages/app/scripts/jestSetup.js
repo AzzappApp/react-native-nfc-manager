@@ -63,7 +63,11 @@ require('@shopify/flash-list/jestSetup');
 //#endregion
 
 //#region Sentry
-jest.mock('@sentry/react-native', () => ({ init: () => jest.fn() }));
+jest.mock('@sentry/react-native', () => ({
+  init: () => jest.fn(),
+  captureEvent: () => jest.fn(),
+  captureMessage: () => jest.fn(),
+}));
 //#endRegion
 
 jest.mock('react-native-device-info', () => ({
