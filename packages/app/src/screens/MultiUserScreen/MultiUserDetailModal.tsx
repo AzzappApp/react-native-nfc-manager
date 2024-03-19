@@ -267,7 +267,7 @@ const MultiUserDetailModal = ({
 
       const input = {};
 
-      let avatarId: string | null = profile?.avatar?.id ?? null;
+      let avatarId: string | null = avatar?.id ?? null;
 
       if (avatar?.local && avatar.uri) {
         const fileName = getFileName(avatar.uri);
