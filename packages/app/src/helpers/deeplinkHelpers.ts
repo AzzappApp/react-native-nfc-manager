@@ -22,6 +22,13 @@ export const matchUrlWithRoute = async (
   url: string,
 ): Promise<Route | undefined> => {
   const prefix = prefixes.find(prefix => prefix && url.startsWith(prefix));
+  Sentry.captureEvent({
+    message: 'deeplinking - init',
+    extra: {
+      url,
+      prefix,
+    },
+  });
   if (!prefix) {
     return;
   }
@@ -46,12 +53,20 @@ export const matchUrlWithRoute = async (
   }
 
   const matchProfile = withoutPrefix.match(profileUrl);
+
   if (matchProfile) {
     const username = matchProfile[1];
     if (!username) {
       return;
     }
-
+    Sentry.captureEvent({
+      message: 'deeplinking - matchProfile',
+      extra: {
+        matchProfile0: matchProfile[0],
+        matchProfile1: matchProfile[1],
+        matchProfile2: matchProfile[2],
+      },
+    });
     if (matchProfile && matchProfile[2] != null) {
       const postId = matchProfile[2];
       if (postId) {
