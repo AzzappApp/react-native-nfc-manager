@@ -26,7 +26,7 @@ object RNHelpers {
     sortHashMapDeep(value.toHashMap()).toString()
 
   fun readDoubleIfHasKey(readableMap: ReadableMap, key: String): Double? {
-    if (readableMap.hasKey(key)) {
+    if (readableMap.hasKey(key) && !readableMap.isNull(key)) {
       return readableMap.getDouble(key)
     }
     return null

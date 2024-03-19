@@ -64,7 +64,7 @@ export default Header;
  * The height of the header. Styling guide is defining 102 px height wiht 45 paddingTop margin.
  * All other part of figma does not use their template button
  */
-export const HEADER_HEIGHT = Platform.OS === 'android' ? 52 : 47;
+export const HEADER_HEIGHT = Platform.OS === 'android' ? 54 : 47;
 
 const styles = StyleSheet.create({
   header: {

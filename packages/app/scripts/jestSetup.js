@@ -69,7 +69,3 @@ jest.mock('@sentry/react-native', () => ({
   captureMessage: () => jest.fn(),
 }));
 //#endRegion
-
-jest.mock('react-native-device-info', () => ({
-  getManufacturer: jest.fn(() => 'Apple'),
-}));
