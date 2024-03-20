@@ -1,5 +1,8 @@
-## 0.5.5-canary.165
+## 0.5.5-canary.166
 
+* **perf:**  - database - limit size of ids for storage ([#3122](https://github.com/AzzappApp/azzapp/pull/3122))
+* **fix:**  - **user:** [#3119](https://github.com/AzzappApp/azzapp/pull/3119) you can’t be still invited once you set a password ([#3123](https://github.com/AzzappApp/azzapp/pull/3123))
+* **fix:**  - **user:** check password format on signup ([#3128](https://github.com/AzzappApp/azzapp/pull/3128))
 * **fix:**  - homeProfile Sroll discrenpency ([#3127](https://github.com/AzzappApp/azzapp/pull/3127))
 * **test:**  - aasa put exclusion first
 * **fix:**  - **android:** cover creation error + upgrade deps + fix header height ([#3114](https://github.com/AzzappApp/azzapp/pull/3114))
