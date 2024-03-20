@@ -1,5 +1,6 @@
-## 0.5.5-canary.164
+## 0.5.5-canary.165
 
+* **fix:**  - homeProfile Sroll discrenpency ([#3127](https://github.com/AzzappApp/azzapp/pull/3127))
 * **test:**  - aasa put exclusion first
 * **fix:**  - **android:** cover creation error + upgrade deps + fix header height ([#3114](https://github.com/AzzappApp/azzapp/pull/3114))
 * **feat:**  - new aasa
