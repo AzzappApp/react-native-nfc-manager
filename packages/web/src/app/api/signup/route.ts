@@ -51,10 +51,11 @@ const handleExistingUser = async (user: User, password: string) => {
       // we can log the user
       const profiles = await getProfilesOfUser(user.id, 1);
       return await handleSignInAuthMethod(user, profiles.shift()?.Profile);
-    } else if (user.invited) {
+    } else if (!user?.password && user.invited) {
       await updateUser(user.id, {
         password: bcrypt.hashSync(password, 12),
         roles: null,
+        invited: false,
       });
 
       const profiles = await getProfilesOfUser(user.id, 1);
