@@ -10,17 +10,17 @@
         ],
         "components": [
           {
+            "/:profileID/emailSignature": "/:profileID/emailSignature*",
+            "exclude": true,
+            "comment": "Excludes any URL with a path that starts with /:profileID/emailSignature"
+          },
+          {
             "/": "/",
             "comment": "Matches any root URL."
           },
           {
             "/:profileID": "/:profileID",
             "comment": "Matches any URL with a path that starts with /*. (profile)"
-          },
-          {
-            "/:profileID/emailSignature": "/:profileID/emailSignature*",
-            "exclude": true,
-            "comment": "Excludes any URL with a path that starts with /:profileID/emailSignature"
           },
           {
             "/:profileID/:postID": "/:profileID/postID",
