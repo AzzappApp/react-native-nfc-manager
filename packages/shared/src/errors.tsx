@@ -23,6 +23,16 @@ const ERRORS = {
    */
   EMAIL_NOT_VALID: 'EMAIL_NOT_VALID',
   /**
+   * The password is not valid.
+   * This may happen when a user tries to register with a password that is not valid.
+   */
+  PASSWORD_NOT_VALID: 'PASSWORD_NOT_VALID',
+  /**
+   * The phone number is not valid.
+   * This may happen when a user tries to register with a phone number that is not valid.
+   */
+  PHONENUMBER_NOT_VALID: 'PHONENUMBER_NOT_VALID',
+  /**
    * The username is already used by another user.
    * This may happen when a user tries to create a profile with a username that is already used by another user.
    */

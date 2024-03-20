@@ -1,6 +1,7 @@
 import * as Sentry from '@sentry/nextjs';
 import * as bcrypt from 'bcrypt-ts';
 import { NextResponse } from 'next/server';
+import * as z from 'zod';
 import {
   createUser,
   getProfilesOfUser,
@@ -10,25 +11,41 @@ import {
 } from '@azzapp/data/domains';
 import ERRORS from '@azzapp/shared/errors';
 import {
+  REGEX_PWD,
   formatPhoneNumber,
   isInternationalPhoneNumber,
-  isValidEmail,
 } from '@azzapp/shared/stringHelpers';
 import { handleSignInAuthMethod } from '#helpers/auth';
 import { twilioVerificationService } from '#helpers/twilioHelpers';
 import type { User } from '@azzapp/data/domains';
 
-type SignupBody = {
-  email?: string | null;
-  phoneNumber?: string | null;
-  password?: string;
-  locale?: string;
-};
+const SignupSchema = z
+  .object({
+    email: z.string().email(ERRORS.EMAIL_NOT_VALID).optional().nullable(),
+    phoneNumber: z
+      .string()
+      .optional()
+      .nullable()
+      .refine(val => (val ? isInternationalPhoneNumber(val) : true), {
+        message: ERRORS.PHONENUMBER_NOT_VALID,
+      }),
+    password: z.string().regex(REGEX_PWD, ERRORS.PASSWORD_NOT_VALID),
+    locale: z.string().optional(),
+  })
+  .refine(
+    ({ phoneNumber, email }) => {
+      return phoneNumber || email;
+    },
+    () => ({
+      message: ERRORS.EMAIL_NOT_VALID,
+      path: ['phoneNumber', 'email'],
+    }),
+  );
 
 const handleExistingUser = async (user: User, password: string) => {
   //try to login the user
   try {
-    //TODO: review Security: Use a constant-time compairson function like crypto.timingSafeEqual()
+    //TODO: review Security: Use a constant-time comparison function like crypto.timingSafeEqual()
     // instead of bcrypt.compareSync() to compare passwords. This helps prevent timing attacks.
     if (user?.password && bcrypt.compareSync(password, user.password)) {
       // we can log the user
@@ -56,37 +73,42 @@ const handleExistingUser = async (user: User, password: string) => {
 };
 
 export const POST = async (req: Request) => {
-  const { email, phoneNumber, password, locale } =
-    ((await req.json()) as SignupBody) || {};
+  const result = SignupSchema.safeParse(await req.json());
 
-  //we need at least one email or one phone number
-  if ((!email && !phoneNumber) || !password) {
+  if (result.success === false) {
+    for (const error of result.error.errors) {
+      if (
+        error.path[0] === 'phoneNumber' ||
+        error.path[0] === 'email' ||
+        error.path[0] === 'password'
+      ) {
+        return NextResponse.json({ message: error.message }, { status: 400 });
+      }
+    }
+
     return NextResponse.json(
       { message: ERRORS.INVALID_REQUEST },
       { status: 400 },
     );
   }
 
+  const { email, phoneNumber, password, locale } = result.data;
+
   try {
-    if (email != null) {
-      if (!isValidEmail(email)) {
-        return NextResponse.json(
-          { message: ERRORS.EMAIL_NOT_VALID },
-          { status: 400 },
-        );
-      }
+    if (email) {
       const user = await getUserByEmail(email);
       if (user != null) {
         return handleExistingUser(user, password);
       }
     }
 
-    if (isInternationalPhoneNumber(phoneNumber)) {
+    if (phoneNumber) {
       const user = await getUserByPhoneNumber(formatPhoneNumber(phoneNumber!));
       if (user != null) {
         return handleExistingUser(user, password);
       }
     }
+
     const userPhoneNumber = phoneNumber?.replace(/\s/g, '') ?? null;
     await createUser({
       email: email ?? null,
