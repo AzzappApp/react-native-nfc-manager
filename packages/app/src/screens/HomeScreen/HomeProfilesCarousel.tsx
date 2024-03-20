@@ -81,7 +81,7 @@ const HomeProfilesCarousel = (
   const onLayout = useCallback(
     ({ nativeEvent: { layout } }: LayoutChangeEvent) => {
       setCoverWidth(
-        PixelRatio.roundToNearestPixel(layout.height * COVER_RATIO),
+        Math.trunc(PixelRatio.roundToNearestPixel(layout.height * COVER_RATIO)),
       );
     },
     [],
@@ -175,23 +175,25 @@ const HomeProfilesCarousel = (
 
   return (
     <View style={styles.container} onLayout={onLayout}>
-      <CarouselSelectList
-        ref={carouselRef}
-        data={data}
-        keyExtractor={keyExtractor}
-        renderItem={renderItem}
-        width={windowWidth}
-        height={coverHeight}
-        itemWidth={coverWidth}
-        scaleRatio={SCALE_RATIO}
-        style={style}
-        itemContainerStyle={styles.carouselContentContainer}
-        onSelectedIndexChange={onSelectedIndexChange}
-        currentProfileIndexSharedValue={currentProfileIndexSharedValue}
-        initialScrollIndex={
-          profiles.length ? initialProfileIndex + 1 : initialProfileIndex
-        }
-      />
+      {coverWidth > 0 && (
+        <CarouselSelectList
+          ref={carouselRef}
+          data={data}
+          keyExtractor={keyExtractor}
+          renderItem={renderItem}
+          width={windowWidth}
+          height={coverHeight}
+          itemWidth={coverWidth}
+          scaleRatio={SCALE_RATIO}
+          style={style}
+          itemContainerStyle={styles.carouselContentContainer}
+          onSelectedIndexChange={onSelectedIndexChange}
+          currentProfileIndexSharedValue={currentProfileIndexSharedValue}
+          initialScrollIndex={
+            profiles.length ? initialProfileIndex + 1 : initialProfileIndex
+          }
+        />
+      )}
     </View>
   );
 };

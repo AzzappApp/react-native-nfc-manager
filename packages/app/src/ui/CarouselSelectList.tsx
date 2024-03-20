@@ -7,7 +7,7 @@ import {
   useRef,
 } from 'react';
 import Animated, {
-  Extrapolate,
+  Extrapolation,
   interpolate,
   useAnimatedScrollHandler,
   useAnimatedStyle,
@@ -281,13 +281,13 @@ const AnimatedItemWrapper = ({
       scrollIndex.value,
       inputRange,
       [scaleRatio, 1, scaleRatio],
-      Extrapolate.CLAMP,
+      Extrapolation.CLAMP,
     );
     const translateX = interpolate(
       scrollIndex.value,
       inputRange,
       [-offset + offsetCenter / 2, 0, offset - offsetCenter / 2],
-      Extrapolate.EXTEND,
+      Extrapolation.EXTEND,
     );
 
     return {
