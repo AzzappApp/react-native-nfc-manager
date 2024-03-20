@@ -316,6 +316,7 @@ const WebCardColorPicker = ({
       disableGestureInteraction
       showGestureIndicator={false}
       onRequestClose={onRequestCloseInner}
+      avoidKeyboard={true}
     >
       {editedColor ? (
         <ColorChooser
