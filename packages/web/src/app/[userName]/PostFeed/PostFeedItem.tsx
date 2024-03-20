@@ -139,7 +139,7 @@ const PostFeedItem = (
           )}
           <Link
             className={styles.postSeeMore}
-            href={`/${webCard.userName}/${post.id}`}
+            href={`/${webCard.userName}/post/${post.id}`}
           >
             See post details
           </Link>

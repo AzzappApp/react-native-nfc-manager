@@ -15,15 +15,11 @@
             "comment": "Excludes any URL with a path that starts with /:profileID/emailSignature"
           },
           {
-            "/": "/",
-            "comment": "Matches any root URL."
-          },
-          {
             "/:profileID": "/:profileID",
             "comment": "Matches any URL with a path that starts with /*. (profile)"
           },
           {
-            "/:profileID/:postID": "/:profileID/postID",
+            "/:profileID/post/:postID": "/:profileID/postID",
             "comment": "Matches any URL with a path that starts with /*. (profile)"
           }
         ]

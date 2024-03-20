@@ -16,7 +16,7 @@ export function buildUserUrl(
  * Builds a post URL from a user name and post.
  */
 export function buildPostUrl(userName: string, postId: string) {
-  return `${buildUserUrl(userName)}/${postId}`;
+  return `${buildUserUrl(userName)}/post/${postId}`;
 }
 
 /**

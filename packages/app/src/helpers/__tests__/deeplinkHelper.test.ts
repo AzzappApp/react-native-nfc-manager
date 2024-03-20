@@ -119,4 +119,39 @@ describe('deeplinkHelpers', () => {
       },
     });
   });
+
+  test('should redirect to a post', async () => {
+    const res = await matchUrlWithRoute('https://fake-azzapp.com/123/post/456');
+
+    expect(res).toEqual({
+      route: 'POST',
+      params: {
+        postId: 'UG9zdDo0NTY=', //fromGlobalId post
+      },
+    });
+  });
+
+  test('should redirect to a webcard if there is not post id', async () => {
+    const res = await matchUrlWithRoute('https://fake-azzapp.com/123/post');
+
+    expect(res).toEqual({
+      route: 'WEBCARD',
+      params: {
+        userName: '123',
+      },
+    });
+  });
+
+  test('should redirect to a webcard if there emailSignature', async () => {
+    const res = await matchUrlWithRoute(
+      'https://fake-azzapp.com/123/emailSignature',
+    );
+
+    expect(res).toEqual({
+      route: 'WEBCARD',
+      params: {
+        userName: '123',
+      },
+    });
+  });
 });

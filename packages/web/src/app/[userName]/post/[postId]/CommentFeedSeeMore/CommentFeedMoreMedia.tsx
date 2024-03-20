@@ -16,7 +16,7 @@ const CommentFeedMoreMedia = (props: CommentFeedMoreMediaProps) => {
 
   return (
     <Link
-      href={`/${webCard.userName}/${post.id}`}
+      href={`/${webCard.userName}/post/${post.id}`}
       className={styles.media}
       style={{
         aspectRatio: `${media.width / media.height}`,

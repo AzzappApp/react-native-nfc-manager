@@ -15,24 +15,20 @@ const getSearchParamFromURL = (url: string, param: string) => {
   return value;
 };
 
-const profileUrl = /^\/?([^/?]+)(?:\/([^/?]+))?.*$/;
+const profileUrl = /^([^/?]+)(?:\/([^/?]+)\/([^/?]+))?.*$/;
 const resetPasswordUrl = new RegExp('^reset-password');
 const prefixes = [process.env.APP_SCHEME, process.env.NEXT_PUBLIC_URL];
 export const matchUrlWithRoute = async (
   url: string,
 ): Promise<Route | undefined> => {
   const prefix = prefixes.find(prefix => prefix && url.startsWith(prefix));
-  Sentry.captureEvent({
-    message: 'deeplinking - init',
-    extra: {
-      url,
-      prefix,
-    },
-  });
   if (!prefix) {
     return;
   }
-  const withoutPrefix = url.replace(prefix, '');
+  let withoutPrefix = url.replace(prefix, '');
+  if (withoutPrefix.startsWith('/')) {
+    withoutPrefix = withoutPrefix.slice(1);
+  }
   const matchResetPassword = withoutPrefix.match(resetPasswordUrl);
   if (matchResetPassword) {
     const token = decodeURIComponent(getSearchParamFromURL(url, 'token') ?? '');
@@ -53,30 +49,24 @@ export const matchUrlWithRoute = async (
   }
 
   const matchProfile = withoutPrefix.match(profileUrl);
-
   if (matchProfile) {
     const username = matchProfile[1];
+    const route = matchProfile[2];
+    const routeId = matchProfile[3];
     if (!username) {
       return;
     }
-    Sentry.captureEvent({
-      message: 'deeplinking - matchProfile',
-      extra: {
-        matchProfile0: matchProfile[0],
-        matchProfile1: matchProfile[1],
-        matchProfile2: matchProfile[2],
-      },
-    });
-    if (matchProfile && matchProfile[2] != null) {
-      const postId = matchProfile[2];
-      if (postId) {
+    if (route === 'post' && routeId) {
+      if (routeId) {
         return {
           route: 'POST',
           params: {
-            postId: toGlobalId('Post', postId),
+            postId: toGlobalId('Post', routeId),
           },
         };
       }
+    } else if (route === 'emailSignature') {
+      //this should not happen only if the user uf the open on azzap smart banner
       return {
         route: 'WEBCARD',
         params: {
@@ -84,7 +74,7 @@ export const matchUrlWithRoute = async (
         },
       };
     }
-    //this is a webCard
+    //this is a webCard and maybe container a download liink
     const compressedContactCard = getSearchParamFromURL(url, 'c');
     if (compressedContactCard) {
       let contactData: string;
@@ -94,7 +84,9 @@ export const matchUrlWithRoute = async (
           decompressFromEncodedURIComponent(compressedContactCard),
         );
       } catch (error) {
-        Sentry.captureException(error);
+        Sentry.captureException(error, {
+          data: 'app-deeplink-decompressFromEncodedURIComponent',
+        });
         return {
           route: 'WEBCARD',
           params: {
@@ -138,4 +130,8 @@ export const matchUrlWithRoute = async (
       };
     }
   }
+  //if nothing was trigger, return to home
+  return {
+    route: 'HOME',
+  };
 };

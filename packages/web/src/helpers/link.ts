@@ -3,5 +3,5 @@ export const generateShareProfileLink = (username: string) => {
 };
 
 export const generateSharePostLink = (username: string, postId: string) => {
-  return `${process.env.NEXT_PUBLIC_URL}${username}/${postId}`;
+  return `${process.env.NEXT_PUBLIC_URL}${username}/post/${postId}`;
 };

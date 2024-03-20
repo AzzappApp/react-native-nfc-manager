@@ -12,7 +12,7 @@ import { decodeMediaId } from '@azzapp/shared/imagesHelpers';
 import { getMetaData } from '#helpers/seo';
 import CloudinaryImage from '#ui/CloudinaryImage';
 import CloudinaryVideoPlayer from '#ui/CloudinaryVideoPlayer';
-import PostFeedHeader from '../PostFeed/PostFeedHeader';
+import PostFeedHeader from '../../PostFeed/PostFeedHeader';
 import CommentFeed from './CommentFeed';
 import CommentFeedSeeMore from './CommentFeedSeeMore';
 import styles from './PostPage.css';
@@ -46,7 +46,7 @@ const PostPage = async (props: PostPageProps) => {
     : [];
 
   if (post && author && author.userName !== userName) {
-    redirect(`/${author.userName}/${post.id}`);
+    redirect(`/${author.userName}/post/${post.id}`);
   }
 
   if (!author || !post || !media || !author.cardIsPublished) return notFound();
