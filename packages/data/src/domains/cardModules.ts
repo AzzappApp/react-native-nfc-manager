@@ -1,4 +1,3 @@
-import { createId } from '@paralleldrive/cuid2';
 import { inArray, eq, asc, sql, and } from 'drizzle-orm';
 import {
   int,
@@ -8,6 +7,7 @@ import {
   json,
   boolean,
 } from 'drizzle-orm/mysql-core';
+import { createId } from '#helpers/createId';
 import db, { cols } from './db';
 import { sortEntitiesByIds } from './generic';
 import type { DbTransaction } from './db';

@@ -1,4 +1,3 @@
-import { createId } from '@paralleldrive/cuid2';
 import { eq, sql, lt, desc, and } from 'drizzle-orm';
 import {
   mysqlEnum,
@@ -9,6 +8,7 @@ import {
   boolean,
   int,
 } from 'drizzle-orm/mysql-core';
+import { createId } from '#helpers/createId';
 import db, { cols } from './db';
 import { FollowTable } from './follows';
 import { RedirectWebCardTable } from './redirectWebCard';

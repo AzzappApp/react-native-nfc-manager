@@ -1,4 +1,3 @@
-import { createId } from '@paralleldrive/cuid2';
 import { and, asc, desc, eq, inArray, isNull, ne, sql } from 'drizzle-orm';
 import {
   boolean,
@@ -9,6 +8,7 @@ import {
   uniqueIndex,
   index,
 } from 'drizzle-orm/mysql-core';
+import { createId } from '#helpers/createId';
 import db, { cols } from './db';
 import { FollowTable } from './follows';
 import { UserTable } from './users';

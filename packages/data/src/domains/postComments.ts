@@ -1,7 +1,7 @@
-import { createId } from '@paralleldrive/cuid2';
 import { eq, sql, and, desc, inArray } from 'drizzle-orm';
 import { text, index, mysqlTable } from 'drizzle-orm/mysql-core';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
+import { createId } from '#helpers/createId';
 import db, { cols } from './db';
 import { getMediasByIds, type Media } from './medias';
 import { PostTable } from './posts';

@@ -1,6 +1,6 @@
-import { createId } from '@paralleldrive/cuid2';
 import { eq, sql } from 'drizzle-orm';
 import { mysqlTable, mysqlEnum, boolean, json } from 'drizzle-orm/mysql-core';
+import { createId } from '#helpers/createId';
 import db, { cols } from './db';
 import type {
   TextOrientation,

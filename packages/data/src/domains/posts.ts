@@ -1,4 +1,3 @@
-import { createId } from '@paralleldrive/cuid2';
 import { eq, desc, sql, and, lt, notInArray } from 'drizzle-orm';
 import {
   json,
@@ -9,6 +8,7 @@ import {
   boolean,
 } from 'drizzle-orm/mysql-core';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
+import { createId } from '#helpers/createId';
 import db, { cols } from './db';
 import { FollowTable } from './follows';
 import { getMediasByIds, type Media } from './medias';

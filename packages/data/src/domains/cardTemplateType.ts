@@ -1,6 +1,6 @@
-import { createId } from '@paralleldrive/cuid2';
 import { eq } from 'drizzle-orm';
 import { boolean, mysqlTable } from 'drizzle-orm/mysql-core';
+import { createId } from '#helpers/createId';
 import db, { cols } from './db';
 
 import type { InferInsertModel, InferSelectModel } from 'drizzle-orm';
