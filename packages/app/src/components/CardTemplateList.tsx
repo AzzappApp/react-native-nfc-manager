@@ -592,7 +592,7 @@ const keyExtractor = (item: { id: string }) => item.id;
 const GAP = 20;
 const ITEM_RADIUS = 20;
 const BUTTON_GAP = 10;
-const SKIP_BUTTON_HEIGHT = 18;
+const SKIP_BUTTON_HEIGHT = 20;
 const LABEL_CONTAINER_HEIGHT = 40;
 const SELECT_INPUT_HEIGHT = 43;
 
