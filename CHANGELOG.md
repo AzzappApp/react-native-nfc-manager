@@ -1,5 +1,7 @@
-## 0.5.5-canary.167
+## 0.5.5-canary.168
 
+* **fix:**  - 🐛 show keyboard below bottomsheetmodal in color picker ([#3134](https://github.com/AzzappApp/azzapp/pull/3134))
+* **feat:**  - 🎸 hide multi user screen content on search ([#3125](https://github.com/AzzappApp/azzapp/pull/3125))
 * **feat:**  - update web post url to avoid issue with email signature and other futur route ([#3130](https://github.com/AzzappApp/azzapp/pull/3130))
 * **perf:**  - database - limit size of ids for storage ([#3122](https://github.com/AzzappApp/azzapp/pull/3122))
 * **fix:**  - **user:** [#3119](https://github.com/AzzappApp/azzapp/pull/3119) you can’t be still invited once you set a password ([#3123](https://github.com/AzzappApp/azzapp/pull/3123))
