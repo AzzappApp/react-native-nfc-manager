@@ -1,5 +1,6 @@
-## 0.5.5-canary.166
+## 0.5.5-canary.167
 
+* **feat:**  - update web post url to avoid issue with email signature and other futur route ([#3130](https://github.com/AzzappApp/azzapp/pull/3130))
 * **perf:**  - database - limit size of ids for storage ([#3122](https://github.com/AzzappApp/azzapp/pull/3122))
 * **fix:**  - **user:** [#3119](https://github.com/AzzappApp/azzapp/pull/3119) you can’t be still invited once you set a password ([#3123](https://github.com/AzzappApp/azzapp/pull/3123))
 * **fix:**  - **user:** check password format on signup ([#3128](https://github.com/AzzappApp/azzapp/pull/3128))
