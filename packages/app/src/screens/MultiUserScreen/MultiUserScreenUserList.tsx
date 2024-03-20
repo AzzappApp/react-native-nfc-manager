@@ -203,19 +203,21 @@ const MultiUserScreenUserList = ({
 
   const { transferOwnerMode } = useContext(MultiUserTransferOwnerContext);
 
+  const [searching, setSearching] = useState(false);
+
   const renderListItem = useCallback<ListRenderItem<Profile>>(
     ({ item }) => {
       if (isWebCardOwner && item.id === profileInfos?.profileId) {
         return (
           <View>
             <UserListItem profileKey={item} onPress={setSelectedProfile} />
-            <MultiUserPendingProfileOwner webCard={webCard} />
+            {!searching && <MultiUserPendingProfileOwner webCard={webCard} />}
           </View>
         );
       }
       return <UserListItem profileKey={item} onPress={setSelectedProfile} />;
     },
-    [isWebCardOwner, profileInfos?.profileId, webCard],
+    [isWebCardOwner, profileInfos?.profileId, searching, webCard],
   );
 
   //filter the sections without having to reparse all the data
@@ -284,6 +286,8 @@ const MultiUserScreenUserList = ({
         })}
         onChangeText={setSearchValue}
         value={searchValue}
+        onFocus={() => setSearching(true)}
+        onBlur={() => setSearching(false)}
       />
       <Suspense
         fallback={
@@ -299,7 +303,7 @@ const MultiUserScreenUserList = ({
         }
       >
         <SectionList
-          ListHeaderComponent={ListHeaderComponent}
+          ListHeaderComponent={searching ? undefined : ListHeaderComponent}
           accessibilityRole="list"
           sections={filteredSections}
           keyExtractor={sectionKeyExtractor}
