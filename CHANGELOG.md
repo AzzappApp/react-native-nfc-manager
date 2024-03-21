@@ -1,5 +1,7 @@
-## 0.5.5-canary.168
+## 0.5.5-canary.169
 
+* **fix:**  - **contactCard:** [#2922](https://github.com/AzzappApp/azzapp/pull/2922) ensure update is made once webcard id is available ([#3135](https://github.com/AzzappApp/azzapp/pull/3135))
+* **feat:**  - on user mgmt we can delay invitations ([#3132](https://github.com/AzzappApp/azzapp/pull/3132))
 * **fix:**  - 🐛 show keyboard below bottomsheetmodal in color picker ([#3134](https://github.com/AzzappApp/azzapp/pull/3134))
 * **feat:**  - 🎸 hide multi user screen content on search ([#3125](https://github.com/AzzappApp/azzapp/pull/3125))
 * **feat:**  - update web post url to avoid issue with email signature and other futur route ([#3130](https://github.com/AzzappApp/azzapp/pull/3130))
