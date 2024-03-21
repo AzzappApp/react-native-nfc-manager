@@ -73,8 +73,6 @@
     "@sentry/react-native": "^5.20.0",
     "@shopify/flash-list": "1.6.4",
     "@shopify/react-native-skia": "^1.0.4",
-    "@types/chroma-js": "^2.4.4",
-    "@types/react": "^18.2.65",
     "chroma-js": "^2.4.2",
     "events": "^3.3.0",
     "expo": "^50.0.13",
