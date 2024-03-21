@@ -1,5 +1,9 @@
-## 0.5.5-canary.171
+## 0.5.5-canary.172
 
+* **fix:**  - **profile:** missing permission on inviteSent ([#3144](https://github.com/AzzappApp/azzapp/pull/3144))
+* **fix:**  - 🐛 add footer for webcard list ([#3143](https://github.com/AzzappApp/azzapp/pull/3143))
+* **fix:**  - **user:** [#3137](https://github.com/AzzappApp/azzapp/pull/3137) use well formatted phone number to update password ([#3138](https://github.com/AzzappApp/azzapp/pull/3138))
+* **feat:**  - add ability to remove all profiles - except owner and ourself ([#3142](https://github.com/AzzappApp/azzapp/pull/3142))
 * **fix:**  - 🐛 correctly remove email and phone number ([#3121](https://github.com/AzzappApp/azzapp/pull/3121))
 * **fix:**  - restore webcardModal for viewer and add option menu ([#3140](https://github.com/AzzappApp/azzapp/pull/3140))
 * **fix:**  - return relay id format ([#3139](https://github.com/AzzappApp/azzapp/pull/3139))
