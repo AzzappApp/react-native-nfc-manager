@@ -181,6 +181,7 @@ const permissions = shield(
       profileRole: or(isCurrentUserRule, isSameWebCard),
       id: or(isCurrentUserRule, isSameWebCard),
       webCard: or(isCurrentUserRule, isSameWebCard),
+      inviteSent: or(isCurrentUserRule, isSameWebCard),
     },
     WebCard: {
       '*': isCurrentWebCardRule,
