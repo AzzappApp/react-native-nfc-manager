@@ -282,22 +282,36 @@ const WebCardScreenButtonActionButton = ({
 
   return isViewer ? (
     isWebCardDisplayed ? (
-      <BlurredFloatingButton
-        onPress={onEdit}
-        style={styles.mainButton}
-        variant="grey"
-        accessibilityLabel={intl.formatMessage({
-          defaultMessage: 'Tap to edit your WebCard',
-          description: 'ProfileScreenButtonBar edit button accessibility label',
-        })}
-      >
-        <Text variant="button" style={styles.textButton}>
-          <FormattedMessage
-            defaultMessage="Build my webcard"
-            description="Build my webcard button label in Profile Screen Button Bar"
-          />
-        </Text>
-      </BlurredFloatingButton>
+      <>
+        <BlurredFloatingButton
+          onPress={onEdit}
+          style={styles.mainButton}
+          variant="grey"
+          accessibilityLabel={intl.formatMessage({
+            defaultMessage: 'Tap to edit your WebCard',
+            description:
+              'ProfileScreenButtonBar edit button accessibility label',
+          })}
+        >
+          <Text variant="button" style={styles.textButton}>
+            <FormattedMessage
+              defaultMessage="Build my webcard"
+              description="Build my webcard button label in Profile Screen Button Bar"
+            />
+          </Text>
+        </BlurredFloatingButton>
+        <BlurredFloatingIconButton
+          icon="more"
+          variant="grey"
+          onPress={onShowWebcardModalCallback}
+          iconStyle={{ tintColor: colors.white }}
+          accessibilityLabel={intl.formatMessage({
+            defaultMessage: 'Tap to show the webcard informations',
+            description:
+              'ProfileScreenButtonBar show webcard informations button accessibility label',
+          })}
+        />
+      </>
     ) : (
       <BlurredFloatingButton
         variant="grey"

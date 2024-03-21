@@ -1,6 +1,7 @@
 import * as Sentry from '@sentry/react-native';
+import { useCallback } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { View, useWindowDimensions, Share } from 'react-native';
+import { View, useWindowDimensions, Share, Alert } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
 import { graphql, useFragment } from 'react-relay';
@@ -8,6 +9,7 @@ import { useDebouncedCallback } from 'use-debounce';
 import { buildUserUrl } from '@azzapp/shared/urlHelpers';
 import { colors, shadow } from '#theme';
 import CoverRenderer from '#components/CoverRenderer';
+import { useRouter } from '#components/NativeRouter';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import { useSendReport } from '#hooks/useSendReport';
 import ActivityIndicator from '#ui/ActivityIndicator';
@@ -145,11 +147,27 @@ const WebCardModal = ({
       }),
   );
 
+  const router = useRouter();
+  const onWebCardParameters = useCallback(() => {
+    close();
+    router.push({
+      route: 'WEBCARD_PARAMETERS',
+    });
+  }, [close, router]);
+
+  const onMultiUser = useCallback(() => {
+    close();
+    router.push({
+      route: 'MULTI_USER',
+    });
+  }, [router, close]);
+
   return (
     <BottomSheetModal
-      height={windowsHeight - top - 30}
+      height={Math.min(600, windowsHeight - top - 30)}
       visible={visible}
       onRequestClose={close}
+      contentContainerStyle={styles.bottomSheetContentContainer}
     >
       <Container>
         <Header
@@ -210,6 +228,41 @@ const WebCardModal = ({
           </View>
         </View>
         <View style={styles.bottomSheetOptionsContainer}>
+          {isViewer && (
+            <PressableNative
+              style={styles.bottomSheetOptionButton}
+              onPress={onWebCardParameters}
+            >
+              <View style={styles.bottomSheetOptionIconLabel}>
+                <Icon icon="parameters" />
+                <Text>
+                  <FormattedMessage
+                    defaultMessage="WebCard{azzappA} parameters"
+                    description="Link to open webcard parameters form to change webcard parameters in the webcard modal screen"
+                    values={{
+                      azzappA: <Text variant="azzapp">a</Text>,
+                    }}
+                  />
+                </Text>
+              </View>
+            </PressableNative>
+          )}
+          {isViewer && (
+            <PressableNative
+              style={styles.bottomSheetOptionButton}
+              onPress={onMultiUser}
+            >
+              <View style={styles.bottomSheetOptionIconLabel}>
+                <Icon icon="shared_webcard" />
+                <Text>
+                  <FormattedMessage
+                    defaultMessage="Multi user"
+                    description="Link to open the multi user panel in the webcard modal screen"
+                  />
+                </Text>
+              </View>
+            </PressableNative>
+          )}
           <PressableNative
             style={styles.bottomSheetOptionButton}
             onPress={onShare}
@@ -229,6 +282,7 @@ const WebCardModal = ({
               </View>
             </View>
           </PressableNative>
+
           {!isViewer && (
             <PressableNative
               style={styles.bottomSheetOptionButton}
@@ -252,7 +306,6 @@ const WebCardModal = ({
               </View>
             </PressableNative>
           )}
-
           {!isViewer && (
             <PressableNative
               onPress={sendReport}
@@ -272,6 +325,19 @@ const WebCardModal = ({
             </PressableNative>
           )}
         </View>
+        {isViewer && (
+          <PressableNative
+            onPress={() => Alert.alert('TODO delete webcard')}
+            style={styles.errorModalLine}
+          >
+            <Text variant="error">
+              <FormattedMessage
+                defaultMessage="Delete this post"
+                description="PostItem Modal - Delete this post"
+              />
+            </Text>
+          </PressableNative>
+        )}
       </Container>
     </BottomSheetModal>
   );
@@ -280,6 +346,7 @@ const WebCardModal = ({
 export default WebCardModal;
 
 const stylesheet = createStyleSheet(appearance => ({
+  bottomSheetContentContainer: { paddingHorizontal: 0 },
   countersContainer: {
     flexDirection: 'row',
     columnGap: 12,
@@ -290,6 +357,7 @@ const stylesheet = createStyleSheet(appearance => ({
   },
   bottomSheetOptionsContainer: {
     paddingTop: 20,
+    paddingHorizontal: 20,
     rowGap: 20,
   },
   counterContainer: { width: 12, alignItems: 'center', flex: 1 },
@@ -312,6 +380,14 @@ const stylesheet = createStyleSheet(appearance => ({
     flexDirection: 'row',
     alignItems: 'center',
     columnGap: 10,
+  },
+  errorModalLine: {
+    height: 42,
+    paddingTop: 30,
+    paddingHorizontal: 20,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   coverStyle: {
     ...shadow(appearance, 'bottom'),
