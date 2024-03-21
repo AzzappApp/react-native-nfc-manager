@@ -5,6 +5,7 @@ import { Controller, useForm } from 'react-hook-form';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { View, StyleSheet } from 'react-native';
 import { getCountry } from 'react-native-localize';
+import Toast from 'react-native-toast-message';
 import { z } from 'zod';
 import { isPhoneNumber } from '@azzapp/shared/stringHelpers';
 import { useRouter } from '#components/NativeRouter';
@@ -16,6 +17,7 @@ import Header from '#ui/Header';
 import InputAccessoryView from '#ui/InputAccessoryView';
 import Text from '#ui/Text';
 import TextInput from '#ui/TextInput';
+import useUpdateUser from './useUpdateUser';
 import type { CountryCode } from 'libphonenumber-js';
 import type { TextInput as NativeTextInput } from 'react-native';
 
@@ -83,19 +85,11 @@ const AccountDetailsPhoneNumberForm = ({
 
   const intl = useIntl();
 
-  const submit = handleSubmit(async ({ phoneNumber, countryCode }) => {
-    let storedPhoneNumber: string | null = null;
-    if (phoneNumber) {
-      storedPhoneNumber = parsePhoneNumber(
-        phoneNumber,
-        countryCode as CountryCode,
-      ).formatInternational();
-    }
-
+  const updatePhoneNumber = async (phoneNumber: string) => {
     try {
       const { issuer } = await requestUpdateContact({
         locale: intl.locale,
-        phoneNumber: storedPhoneNumber,
+        phoneNumber,
       });
 
       toggleBottomSheet();
@@ -115,6 +109,59 @@ const AccountDetailsPhoneNumberForm = ({
             'Account Details Screen - Error Unknown error - Please retry',
         }),
       });
+    }
+  };
+
+  const [commit, isLoading] = useUpdateUser();
+
+  const deletePhoneNumber = () => {
+    commit({
+      variables: {
+        input: {
+          phoneNumber: null,
+        },
+      },
+      optimisticResponse: {
+        updateUser: {
+          user: {
+            email: currentUser?.email,
+            phoneNumber: null,
+          },
+        },
+      },
+      updater: store => {
+        store
+          .getRoot()
+          .getLinkedRecord('currentUser')
+          ?.setValue(null, 'phoneNumber');
+      },
+      onCompleted: () => {
+        toggleBottomSheet();
+      },
+      onError: () => {
+        Toast.show({
+          type: 'error',
+          text1: intl.formatMessage({
+            defaultMessage: 'Unknown error - Please retry',
+            description:
+              'AccountDetailsPhoneNumberForm - Error Unknown error - Please retry',
+          }),
+          visibilityTime: 5000,
+        });
+      },
+    });
+  };
+
+  const submit = handleSubmit(async ({ phoneNumber, countryCode }) => {
+    if (phoneNumber) {
+      const storedPhoneNumber = parsePhoneNumber(
+        phoneNumber,
+        countryCode as CountryCode,
+      ).formatInternational();
+
+      updatePhoneNumber(storedPhoneNumber);
+    } else {
+      deletePhoneNumber();
     }
   });
 
@@ -136,8 +183,8 @@ const AccountDetailsPhoneNumberForm = ({
         }
         rightElement={
           <Button
-            loading={isSubmitting}
-            disabled={isSubmitting}
+            loading={isSubmitting || isLoading}
+            disabled={isSubmitting || isLoading}
             label={intl.formatMessage({
               defaultMessage: 'Save',
               description: 'Edit phone number modal save button label',

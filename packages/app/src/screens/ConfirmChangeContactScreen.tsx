@@ -83,7 +83,8 @@ const ConfirmRegistrationScreen = ({
       optimisticResponse: {
         updateUser: {
           user: {
-            ...currentUser,
+            email: currentUser?.email,
+            phoneNumber: currentUser?.phoneNumber,
             ...input,
           },
         },

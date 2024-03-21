@@ -1,3 +1,5 @@
+import { RelayEnvironmentProvider } from 'react-relay';
+import { createMockEnvironment } from 'relay-test-utils';
 import { requestUpdateContact } from '#helpers/MobileWebAPI';
 import { screen, render, fireEvent, act, waitFor } from '#helpers/testHelpers';
 import AccountDetailsEmailForm from '../AccountDetailsEmailForm';
@@ -12,15 +14,19 @@ describe('AccountDetailsEmailForm', () => {
   });
 
   const renderAccountDetailsEmailForm = () => {
+    const environment = createMockEnvironment();
+
     return render(
-      <AccountDetailsEmailForm
-        currentUser={{
-          email: 'default@email.com',
-          phoneNumber: '',
-        }}
-        toggleBottomSheet={() => void 0}
-        visible
-      />,
+      <RelayEnvironmentProvider environment={environment}>
+        <AccountDetailsEmailForm
+          currentUser={{
+            email: 'default@email.com',
+            phoneNumber: '',
+          }}
+          toggleBottomSheet={() => void 0}
+          visible
+        />
+      </RelayEnvironmentProvider>,
     );
   };
 

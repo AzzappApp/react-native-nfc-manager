@@ -2,6 +2,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Controller, useForm } from 'react-hook-form';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { StyleSheet, View } from 'react-native';
+import Toast from 'react-native-toast-message';
 import { z } from 'zod';
 import { isNotFalsyString } from '@azzapp/shared/stringHelpers';
 import { useRouter } from '#components/NativeRouter';
@@ -11,6 +12,7 @@ import Header from '#ui/Header';
 import InputAccessoryView from '#ui/InputAccessoryView';
 import Text from '#ui/Text';
 import TextInput from '#ui/TextInput';
+import useUpdateUser from './useUpdateUser';
 
 const AccountDetailsEmailForm = ({
   currentUser,
@@ -28,7 +30,7 @@ const AccountDetailsEmailForm = ({
   const hasPhoneNumber = currentUser.phoneNumber != null;
   const emailFormSchema = z.object({
     email: hasPhoneNumber
-      ? z.string().email().optional()
+      ? z.string().email().optional().or(z.literal(''))
       : z.string().email().min(1),
   });
 
@@ -47,16 +49,11 @@ const AccountDetailsEmailForm = ({
 
   const intl = useIntl();
 
-  const submit = handleSubmit(async ({ email }) => {
-    let storedEmail: string | null = null;
-    if (isNotFalsyString(email)) {
-      storedEmail = email!;
-    }
-
+  const updateEmail = async (email: string) => {
     try {
       const { issuer } = await requestUpdateContact({
         locale: intl.locale,
-        email: storedEmail,
+        email,
       });
 
       toggleBottomSheet();
@@ -77,6 +74,49 @@ const AccountDetailsEmailForm = ({
         }),
       });
     }
+  };
+
+  const [commit, isLoading] = useUpdateUser();
+
+  const deleteEmail = () => {
+    commit({
+      variables: {
+        input: {
+          email: null,
+        },
+      },
+      optimisticResponse: {
+        updateUser: {
+          user: {
+            email: null,
+            phoneNumber: currentUser?.phoneNumber,
+          },
+        },
+      },
+      updater: store => {
+        store.getRoot().getLinkedRecord('currentUser')?.setValue(null, 'email');
+      },
+      onCompleted: () => {
+        toggleBottomSheet();
+      },
+      onError: () => {
+        Toast.show({
+          type: 'error',
+          text1: intl.formatMessage({
+            defaultMessage: 'Unknown error - Please retry',
+            description:
+              'ConfirmChangeContactScreen - Error Unknown error - Please retry',
+          }),
+          visibilityTime: 5000,
+        });
+      },
+    });
+  };
+
+  const submit = handleSubmit(async ({ email }) => {
+    if (isNotFalsyString(email)) {
+      updateEmail(email!);
+    } else deleteEmail();
   });
 
   return (
@@ -95,8 +135,8 @@ const AccountDetailsEmailForm = ({
         }
         rightElement={
           <Button
-            loading={isSubmitting}
-            disabled={isSubmitting}
+            loading={isSubmitting || isLoading}
+            disabled={isSubmitting || isLoading}
             label={intl.formatMessage({
               defaultMessage: 'Save',
               description: 'Edit email address modal save button label',
@@ -117,31 +157,33 @@ const AccountDetailsEmailForm = ({
         render={({
           field: { onChange, onBlur, value },
           formState: { errors },
-        }) => (
-          <View style={styles.field}>
-            <TextInput
-              value={value}
-              onChangeText={onChange}
-              onBlur={onBlur}
-              autoCapitalize="none"
-              autoComplete="email"
-              keyboardType="email-address"
-              autoCorrect={false}
-              isErrored={errors.email != null}
-              onSubmitEditing={submit}
-              returnKeyType="done"
-              autoFocus
-            />
-            {errors.email ? (
-              <Text variant="error">
-                <FormattedMessage
-                  defaultMessage="Please enter a valid email address"
-                  description="Error message when the user enters an invalid email address"
-                />
-              </Text>
-            ) : null}
-          </View>
-        )}
+        }) => {
+          return (
+            <View style={styles.field}>
+              <TextInput
+                value={value}
+                onChangeText={onChange}
+                onBlur={onBlur}
+                autoCapitalize="none"
+                autoComplete="email"
+                keyboardType="email-address"
+                autoCorrect={false}
+                isErrored={errors.email != null}
+                onSubmitEditing={submit}
+                returnKeyType="done"
+                autoFocus
+              />
+              {errors.email ? (
+                <Text variant="error">
+                  <FormattedMessage
+                    defaultMessage="Please enter a valid email address"
+                    description="Error message when the user enters an invalid email address"
+                  />
+                </Text>
+              ) : null}
+            </View>
+          );
+        }}
       />
       {errors.root?.server ? (
         <Text variant="error">{errors.root.server.message}</Text>

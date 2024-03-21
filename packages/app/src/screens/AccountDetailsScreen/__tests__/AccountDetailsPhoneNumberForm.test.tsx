@@ -1,3 +1,5 @@
+import { RelayEnvironmentProvider } from 'react-relay';
+import { createMockEnvironment } from 'relay-test-utils';
 import { requestUpdateContact } from '#helpers/MobileWebAPI';
 import { screen, render, fireEvent, act, waitFor } from '#helpers/testHelpers';
 import AccountDetailsPhoneNumberForm from '../AccountDetailsPhoneNumberForm';
@@ -12,15 +14,19 @@ describe('AccountDetailsPhoneNumberForm', () => {
   });
 
   const renderAccountDetailsEmailForm = ({ phoneNumber = '+33612345678' }) => {
+    const environment = createMockEnvironment();
+
     return render(
-      <AccountDetailsPhoneNumberForm
-        currentUser={{
-          email: '',
-          phoneNumber,
-        }}
-        toggleBottomSheet={() => void 0}
-        visible
-      />,
+      <RelayEnvironmentProvider environment={environment}>
+        <AccountDetailsPhoneNumberForm
+          currentUser={{
+            email: '',
+            phoneNumber,
+          }}
+          toggleBottomSheet={() => void 0}
+          visible
+        />
+      </RelayEnvironmentProvider>,
     );
   };
 
