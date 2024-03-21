@@ -101,13 +101,20 @@ const WebCardScreen = ({
 
   const environment = useRelayEnvironment();
 
+  const scannedContactCard = useRef<string | null>(null);
+
   // contact card scan
   const [commit] = useMutation(UPDATE_CONTACT_CARD_SCANS);
+
   useEffect(() => {
     if (params.contactData && data.webCard?.id) {
       const contactData = parseContactCard(params.contactData);
 
-      if (contactData.webCardId === fromGlobalId(data.webCard?.id).id) {
+      if (
+        contactData.webCardId === fromGlobalId(data.webCard?.id).id &&
+        scannedContactCard.current !== contactData.profileId
+      ) {
+        scannedContactCard.current = contactData.profileId;
         // the profile is open from a scan contact card with the phone
         commit({
           variables: {
@@ -118,8 +125,7 @@ const WebCardScreen = ({
         });
       }
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [commit, data.webCard?.id, params.contactData]);
 
   useEffect(() => {
     let disposables: Disposable[];
