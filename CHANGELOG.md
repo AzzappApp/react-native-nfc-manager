@@ -1,5 +1,8 @@
-## 0.5.5-canary.169
+## 0.5.5-canary.170
 
+* **fix:**  - restore webcardModal for viewer and add option menu ([#3140](https://github.com/AzzappApp/azzapp/pull/3140))
+* **fix:**  - return relay id format ([#3139](https://github.com/AzzappApp/azzapp/pull/3139))
+* **test:**  - aasa update
 * **fix:**  - **contactCard:** [#2922](https://github.com/AzzappApp/azzapp/pull/2922) ensure update is made once webcard id is available ([#3135](https://github.com/AzzappApp/azzapp/pull/3135))
 * **feat:**  - on user mgmt we can delay invitations ([#3132](https://github.com/AzzappApp/azzapp/pull/3132))
 * **fix:**  - 🐛 show keyboard below bottomsheetmodal in color picker ([#3134](https://github.com/AzzappApp/azzapp/pull/3134))
