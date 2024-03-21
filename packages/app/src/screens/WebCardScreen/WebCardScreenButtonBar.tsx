@@ -229,7 +229,7 @@ const WebCardScreenButtonActionButton = ({
   };
 
   const onShowWebcardModalCallback = () => {
-    if (cardIsPublished) {
+    if (cardIsPublished || isViewer) {
       onShowWebcardModal();
     } else {
       showWebcardUnpublishAlert();
