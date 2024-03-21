@@ -146,6 +146,7 @@ const WebCardList = ({
           <Text variant="medium">{noProfileFoundLabel}</Text>
         </View>
       }
+      ListFooterComponent={<View style={styles.footer} />}
     />
   );
 };
@@ -183,6 +184,10 @@ const styleSheet = createStyleSheet(appareance =>
       flex: 1,
       alignItems: 'center',
       justifyContent: 'center',
+    },
+    footer: {
+      height: 10,
+      width: '100%',
     },
   }),
 );
