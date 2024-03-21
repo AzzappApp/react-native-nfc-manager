@@ -4,7 +4,7 @@ import * as Clipboard from 'expo-clipboard';
 import { fromGlobalId } from 'graphql-relay';
 import { useCallback } from 'react';
 import { FormattedMessage, FormattedRelativeTime, useIntl } from 'react-intl';
-import { View, StyleSheet, Share } from 'react-native';
+import { View, StyleSheet, Share, Platform } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { graphql, useFragment, useMutation } from 'react-relay';
 import { isEditor } from '@azzapp/shared/profileHelpers';
@@ -121,9 +121,25 @@ const PostRendererBottomPanel = ({
 
   const onShare = async () => {
     // a quick share method using the native share component. If we want to make a custom share (like tiktok for example, when they are recompressiong the media etc) we can use react-native-shares
+    const url = buildPostUrl(post.webCard.userName, fromGlobalId(post.id).id);
     try {
       await Share.share({
-        url: buildPostUrl(post.webCard.userName, fromGlobalId(post.id).id),
+        title: intl.formatMessage({
+          defaultMessage: 'Post on azzapp',
+          description:
+            'Post BottomPanel, message use when sharing the Post on azzapp',
+        }),
+        message:
+          intl.formatMessage({
+            defaultMessage: 'Check out this azzapp WebCard: ',
+            description:
+              'Post BottomPanel, message use when sharing the Post on azzapp',
+          }) +
+            Platform.OS ===
+          'android'
+            ? url
+            : '',
+        url,
       });
       //TODO: handle result of the share when specified
     } catch (error: any) {

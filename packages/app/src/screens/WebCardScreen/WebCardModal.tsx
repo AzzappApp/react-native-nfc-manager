@@ -1,7 +1,13 @@
 import * as Sentry from '@sentry/react-native';
 import { useCallback } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { View, useWindowDimensions, Share, Alert } from 'react-native';
+import {
+  View,
+  useWindowDimensions,
+  Share,
+  Alert,
+  Platform,
+} from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
 import { graphql, useFragment } from 'react-relay';
@@ -83,10 +89,26 @@ const WebCardModal = ({
 
   const onShare = async () => {
     // a quick share method using the native share component. If we want to make a custom share (like tiktok for example, when they are recompressiong the media etc) we can use react-native-shares
+    const url = buildUserUrl(webCard.userName);
     try {
       await Share.share(
         {
-          url: buildUserUrl(webCard.userName),
+          title: intl.formatMessage({
+            defaultMessage: 'WebCard on azzapp',
+            description:
+              'Profile WebcardModal, message use when sharing the contact card',
+          }),
+          message:
+            intl.formatMessage({
+              defaultMessage: 'Check out this azzapp WebCard: ',
+              description:
+                'Profile WebcardModal, message use when sharing the contact card',
+            }) +
+              Platform.OS ===
+            'android'
+              ? url
+              : '',
+          url,
         },
         {
           dialogTitle: intl.formatMessage({

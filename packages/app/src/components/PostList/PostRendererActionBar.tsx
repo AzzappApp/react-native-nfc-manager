@@ -2,7 +2,7 @@ import * as Sentry from '@sentry/react-native';
 import { fromGlobalId } from 'graphql-relay';
 import { memo, useCallback, useEffect, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { View, StyleSheet, Share, Alert } from 'react-native';
+import { View, StyleSheet, Share, Alert, Platform } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { useMutation, graphql, useFragment } from 'react-relay';
 import { useDebouncedCallback } from 'use-debounce';
@@ -279,8 +279,24 @@ const PostRendererActionBar = ({
     }
     // a quick share method using the native share component. If we want to make a custom share (like tiktok for example, when they are recompressiong the media etc) we can use react-native-shares
     try {
+      const url = buildPostUrl(webCard.userName, fromGlobalId(postId).id);
       await Share.share({
-        url: buildPostUrl(webCard.userName, fromGlobalId(postId).id),
+        title: intl.formatMessage({
+          defaultMessage: 'Post on azzapp',
+          description:
+            'Post ActionBar, message use when sharing the Post on azzapp',
+        }),
+        message:
+          intl.formatMessage({
+            defaultMessage: 'Check out this azzapp WebCard: ',
+            description:
+              'Post ActionBar, message use when sharing the Post on azzapp',
+          }) +
+            Platform.OS ===
+          'android'
+            ? url
+            : '',
+        url,
       });
       //TODO: handle result of the share when specified
     } catch (error: any) {
