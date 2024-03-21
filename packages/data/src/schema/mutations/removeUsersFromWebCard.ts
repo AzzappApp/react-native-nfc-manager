@@ -28,8 +28,8 @@ const removeUsersFromWebCard: MutationResolvers['removeUsersFromWebCard'] =
     const webCardId = fromGlobalIdWithType(gqlWebCardId, 'WebCard');
 
     const removedProfileIds = allProfiles
-      ? gqlRemovedProfileIds?.map(id => fromGlobalIdWithType(id, 'Profile'))
-      : null;
+      ? null
+      : gqlRemovedProfileIds?.map(id => fromGlobalIdWithType(id, 'Profile'));
 
     const profileToDelete = allProfiles
       ? await db
@@ -58,6 +58,7 @@ const removeUsersFromWebCard: MutationResolvers['removeUsersFromWebCard'] =
           : and(
               eq(ProfileTable.webCardId, webCardId),
               ne(ProfileTable.profileRole, 'owner'),
+              ne(ProfileTable.userId, auth.userId),
             ),
       );
 
