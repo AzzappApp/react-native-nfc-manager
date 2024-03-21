@@ -1,4 +1,4 @@
-## 0.5.5-canary.173
+## 0.5.5-canary.174
 
 * **fix:**  - wrong condition on delete all ([#3146](https://github.com/AzzappApp/azzapp/pull/3146))
 * **fix:**  - **profile:** missing permission on inviteSent ([#3144](https://github.com/AzzappApp/azzapp/pull/3144))
