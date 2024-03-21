@@ -363,12 +363,7 @@ const MultiUserDetailModal = ({
         $webCardId: ID!
         $input: [ID!]!
       ) {
-        removeUsersFromWebCard(
-          webCardId: $webCardId
-          removedProfileIds: $input
-        ) {
-          profileIds
-        }
+        removeUsersFromWebCard(webCardId: $webCardId, removedProfileIds: $input)
       }
     `);
 
@@ -394,9 +389,7 @@ const MultiUserDetailModal = ({
         });
       },
       updater: (store, response) => {
-        if (
-          !response?.removeUsersFromWebCard?.profileIds.includes(profile.id)
-        ) {
+        if (!response?.removeUsersFromWebCard?.includes(profile.id)) {
           Toast.show({
             type: 'error',
             text1: intl.formatMessage({

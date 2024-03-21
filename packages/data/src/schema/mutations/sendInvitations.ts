@@ -16,13 +16,15 @@ const sendInvitations: MutationResolvers['sendInvitations'] = async (
 ) => {
   const webCardId = fromGlobalIdWithType(gqlWebCardId, 'WebCard');
 
-  if (!profileIds && !allProfiles) {
+  if (!profileIds?.length && !allProfiles) {
     throw new GraphQLError(ERRORS.INVALID_REQUEST);
   }
 
   const users = await getUsersFromWebCardId(
     webCardId,
-    profileIds?.map(id => fromGlobalIdWithType(id, 'Profile')),
+    allProfiles
+      ? undefined
+      : profileIds?.map(id => fromGlobalIdWithType(id, 'Profile')),
   );
 
   const webCard = await loaders.WebCard.load(webCardId);
