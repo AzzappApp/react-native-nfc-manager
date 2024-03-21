@@ -1,5 +1,6 @@
-## 0.5.5-canary.174
+## 0.5.5-canary.175
 
+* **fix:**  - allow using webcard modal if unpublished and owner ([#3150](https://github.com/AzzappApp/azzapp/pull/3150))
 * **fix:**  - wrong condition on delete all ([#3146](https://github.com/AzzappApp/azzapp/pull/3146))
 * **fix:**  - **profile:** missing permission on inviteSent ([#3144](https://github.com/AzzappApp/azzapp/pull/3144))
 * **fix:**  - 🐛 add footer for webcard list ([#3143](https://github.com/AzzappApp/azzapp/pull/3143))
