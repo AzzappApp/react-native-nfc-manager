@@ -42,12 +42,16 @@ export const POST = async (req: Request) => {
     const user = isValidEmail(issuer)
       ? await getUserByEmail(issuer)
       : await getUserByPhoneNumber(issuer);
-
     if (user) {
       await updateUser(user.id, {
         password: bcrypt.hashSync(password, 12),
       });
       return NextResponse.json({ ok: true });
+    } else {
+      return NextResponse.json(
+        { message: ERRORS.INVALID_REQUEST },
+        { status: 400 },
+      );
     }
   } catch (error) {
     console.error(error);

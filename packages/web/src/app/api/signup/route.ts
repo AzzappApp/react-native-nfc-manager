@@ -104,13 +104,13 @@ export const POST = async (req: Request) => {
     }
 
     if (phoneNumber) {
-      const user = await getUserByPhoneNumber(formatPhoneNumber(phoneNumber!));
+      const user = await getUserByPhoneNumber(formatPhoneNumber(phoneNumber));
       if (user != null) {
         return handleExistingUser(user, password);
       }
     }
 
-    const userPhoneNumber = phoneNumber?.replace(/\s/g, '') ?? null;
+    const userPhoneNumber = phoneNumber ? formatPhoneNumber(phoneNumber) : null;
     await createUser({
       email: email ?? null,
       phoneNumber: userPhoneNumber,

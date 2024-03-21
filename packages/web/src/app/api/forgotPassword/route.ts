@@ -3,6 +3,7 @@ import { NextResponse } from 'next/server';
 import { getUserByEmail, getUserByPhoneNumber } from '@azzapp/data/domains';
 import ERRORS from '@azzapp/shared/errors';
 import {
+  formatPhoneNumber,
   isInternationalPhoneNumber,
   isValidEmail,
 } from '@azzapp/shared/stringHelpers';
@@ -33,7 +34,7 @@ export const POST = async (req: Request) => {
         channel = 'email';
       }
     } else if (isInternationalPhoneNumber(credential)) {
-      user = await getUserByPhoneNumber(credential);
+      user = await getUserByPhoneNumber(formatPhoneNumber(credential));
       if (user) {
         issuer = user.phoneNumber!;
         channel = 'sms';
@@ -56,7 +57,7 @@ export const POST = async (req: Request) => {
     if (verification && verification.status === 'canceled') {
       throw new Error('Verification canceled');
     }
-    return NextResponse.json({ issuer: credential });
+    return NextResponse.json({ issuer });
   } catch (error) {
     Sentry.captureException(error);
     console.error(error);

@@ -111,7 +111,7 @@ export const isValidHex = (value: string, shortFormat?: boolean): boolean => {
  * @return {*}
  */
 export function formatPhoneNumber(phoneNumber: string) {
-  return parsePhoneNumber(phoneNumber).format('E.164');
+  return parsePhoneNumber(phoneNumber).format('E.164').replace(/\s/g, '');
 }
 
 /**

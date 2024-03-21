@@ -75,7 +75,7 @@ const updateUserMutation: MutationResolvers['updateUser'] = async (
     if (existingUser && existingUser.id !== userId) {
       throw new GraphQLError(ERRORS.PHONENUMBER_ALREADY_EXISTS);
     }
-    partialUser.phoneNumber = phoneNumber?.replace(/\s/g, '');
+    partialUser.phoneNumber = formatPhoneNumber(phoneNumber);
   }
   if (phoneNumber === null) {
     //voluntary remove phone number
