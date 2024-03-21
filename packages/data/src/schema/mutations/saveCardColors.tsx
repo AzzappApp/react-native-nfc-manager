@@ -22,6 +22,7 @@ const saveCardColors: MutationResolvers['saveCardColors'] = async (
       await updateProfiles(
         webCardId,
         { lastContactCardUpdate: new Date() },
+        undefined,
         trx,
       );
     });

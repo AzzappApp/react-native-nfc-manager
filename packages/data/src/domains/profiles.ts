@@ -31,6 +31,7 @@ export const ProfileTable = mysqlTable(
       .notNull()
       .default('owner'),
     invited: boolean('invited').default(false).notNull(),
+    inviteSent: boolean('inviteSent').default(false).notNull(),
     promotedAsOwner: boolean('promotedAsOwner').default(false).notNull(),
     avatarId: cols.mediaId('avatarId'),
     /* Contact cards infos */
@@ -178,12 +179,20 @@ export const getProfileByUserName = async (userName: string) => {
 export const updateProfiles = async (
   webCardId: string,
   updates: Partial<Profile>,
+  profileIds?: string[],
   tx: DbTransaction = db,
 ) => {
   await tx
     .update(ProfileTable)
     .set(updates)
-    .where(eq(ProfileTable.webCardId, webCardId));
+    .where(
+      profileIds
+        ? and(
+            eq(ProfileTable.webCardId, webCardId),
+            inArray(ProfileTable.id, profileIds),
+          )
+        : eq(ProfileTable.webCardId, webCardId),
+    );
 };
 
 export const updateProfile = async (
@@ -341,18 +350,25 @@ export const getOwners = async (webCardIds: string[]) => {
     );
 };
 
-export const getUsersFromProfileIds = async (
+export const getUsersFromWebCardId = async (
   webCardId: string,
-  profileIds: string[],
+  profileIds?: string[],
 ) => {
   return db
-    .select()
+    .select({
+      profileId: ProfileTable.id,
+      email: UserTable.email,
+      phoneNumber: UserTable.phoneNumber,
+      id: UserTable.id,
+    })
     .from(ProfileTable)
     .innerJoin(UserTable, eq(UserTable.id, ProfileTable.userId))
     .where(
-      and(
-        eq(ProfileTable.webCardId, webCardId),
-        inArray(ProfileTable.id, profileIds),
-      ),
+      profileIds
+        ? and(
+            eq(ProfileTable.webCardId, webCardId),
+            inArray(ProfileTable.id, profileIds),
+          )
+        : eq(ProfileTable.webCardId, webCardId),
     );
 };

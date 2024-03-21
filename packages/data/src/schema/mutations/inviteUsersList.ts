@@ -23,7 +23,7 @@ import type {
 
 const inviteUsersListMutation: MutationResolvers['inviteUsersList'] = async (
   _,
-  { profileId: gqlProfileId, invited },
+  { profileId: gqlProfileId, invited, sendInvite },
   { auth, loaders, sendMail }: GraphQLContext,
 ) => {
   const { userId } = auth;
@@ -123,6 +123,7 @@ const inviteUsersListMutation: MutationResolvers['inviteUsersList'] = async (
         userId,
         avatarId,
         invited: true,
+        inviteSent: sendInvite ?? false,
         contactCard: {
           ...data,
           birthday: undefined,
@@ -176,7 +177,7 @@ const inviteUsersListMutation: MutationResolvers['inviteUsersList'] = async (
   }
 
   try {
-    if (sentEmail.length > 0) {
+    if (sentEmail.length > 0 && sendInvite) {
       await sendMail(
         sentEmail.map(email => ({
           email,

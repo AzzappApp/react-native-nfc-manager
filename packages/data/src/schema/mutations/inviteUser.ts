@@ -21,7 +21,7 @@ import type { SQLWrapper } from 'drizzle-orm';
 
 const inviteUserMutation: MutationResolvers['inviteUser'] = async (
   _,
-  { profileId: gqlProfileId, invited },
+  { profileId: gqlProfileId, invited, sendInvite },
   { loaders, sendMail, sendSms }: GraphQLContext,
 ) => {
   const profileId = fromGlobalIdWithType(gqlProfileId, 'Profile');
@@ -89,6 +89,7 @@ const inviteUserMutation: MutationResolvers['inviteUser'] = async (
       userId,
       avatarId,
       invited: true,
+      inviteSent: sendInvite ?? false,
       contactCard: {
         ...data,
         birthday: undefined,
@@ -114,20 +115,22 @@ const inviteUserMutation: MutationResolvers['inviteUser'] = async (
   const createdProfile = await loaders.Profile.load(createdProfileId);
 
   try {
-    if (phoneNumber) {
-      await sendSms({
-        body: `You have been invited to join ${webCard.userName} on Azzapp! Download the app and sign up with this phone number to join: ${phoneNumber}`,
-        phoneNumber,
-      });
-    } else if (email) {
-      await sendMail([
-        {
-          email,
-          subject: `You have been invited to join ${webCard.userName}`,
-          text: `You have been invited to join ${webCard.userName} on Azzapp! Download the app and sign up with this email to join: ${email}`,
-          html: `<div>You have been invited to join ${webCard.userName} on Azzapp! Download the app and sign up with this email to join: ${email}</div>`,
-        },
-      ]);
+    if (sendInvite) {
+      if (phoneNumber) {
+        await sendSms({
+          body: `You have been invited to join ${webCard.userName} on Azzapp! Download the app and sign up with this phone number to join: ${phoneNumber}`,
+          phoneNumber,
+        });
+      } else if (email) {
+        await sendMail([
+          {
+            email,
+            subject: `You have been invited to join ${webCard.userName}`,
+            text: `You have been invited to join ${webCard.userName} on Azzapp! Download the app and sign up with this email to join: ${email}`,
+            html: `<div>You have been invited to join ${webCard.userName} on Azzapp! Download the app and sign up with this email to join: ${email}</div>`,
+          },
+        ]);
+      }
     }
   } catch (e) {
     Sentry.captureException(e);

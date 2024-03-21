@@ -1,6 +1,6 @@
 extend type Mutation {
-  inviteUser(profileId: ID!, invited: InviteUserInput!): InviteUserPayload
-  inviteUsersList(profileId: ID!, invited: [InviteUserEmailInput!]!): InviteUsersListPayload
+  inviteUser(profileId: ID!, sendInvite: Boolean, invited: InviteUserInput!): InviteUserPayload
+  inviteUsersList(profileId: ID!, sendInvite: Boolean, invited: [InviteUserEmailInput!]!): InviteUsersListPayload
 }
 
 input InviteUserInput {

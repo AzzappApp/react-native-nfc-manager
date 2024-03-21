@@ -291,7 +291,7 @@ const MultiUserAddModal = (
         $profileId: ID!
         $invited: InviteUserInput!
       ) {
-        inviteUser(profileId: $profileId, invited: $invited) {
+        inviteUser(profileId: $profileId, invited: $invited, sendInvite: true) {
           profile {
             id
             profileRole

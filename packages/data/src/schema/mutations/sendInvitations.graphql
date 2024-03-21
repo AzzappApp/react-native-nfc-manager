@@ -1,7 +1,7 @@
 extend type Mutation {
   sendInvitations(
-     webCardId: ID!, profileIds: [ID!]!
-  ): [Profile!]!
+     webCardId: ID!, profileIds: [ID!], allProfiles: Boolean
+  ): [ID!]!
 }
 
 

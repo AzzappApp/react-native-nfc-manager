@@ -32,6 +32,10 @@ type Profile implements Node {
   """
   invited: Boolean!
   """
+  True if user has received an invite
+  """
+  inviteSent: Boolean!
+  """
   True if user has been promoted to become owner
   """
   promotedAsOwner: Boolean!
