@@ -1,5 +1,6 @@
 import * as Sentry from '@sentry/nextjs';
 import { GraphQLError } from 'graphql';
+import { toGlobalId } from 'graphql-relay';
 import ERRORS from '@azzapp/shared/errors';
 import { getUsersFromWebCardId, updateProfiles } from '#domains';
 import fromGlobalIdWithType from '#helpers/relayIdHelpers';
@@ -11,7 +12,7 @@ const MAX_INVITATIONS_BY_SMS = 20;
 const sendInvitations: MutationResolvers['sendInvitations'] = async (
   _,
   { webCardId: gqlWebCardId, profileIds, allProfiles },
-  { sendMail, sendSms, loaders, auth },
+  { sendMail, sendSms, loaders },
 ) => {
   const webCardId = fromGlobalIdWithType(gqlWebCardId, 'WebCard');
 
@@ -35,12 +36,10 @@ const sendInvitations: MutationResolvers['sendInvitations'] = async (
     withPhoneNumbers: typeof users;
   }>(
     (acc, user) => {
-      if (user.id !== auth.userId) {
-        if (user.email) {
-          acc.withEmail.push(user);
-        } else if (user.phoneNumber) {
-          acc.withPhoneNumbers.push(user);
-        }
+      if (user.email) {
+        acc.withEmail.push(user);
+      } else if (user.phoneNumber) {
+        acc.withPhoneNumbers.push(user);
       }
       return acc;
     },
@@ -52,7 +51,7 @@ const sendInvitations: MutationResolvers['sendInvitations'] = async (
   }
 
   try {
-    if (users.length > 0) {
+    if (withPhoneNumbers.length > 0 || withEmail.length > 0) {
       await updateProfiles(
         webCardId,
         { inviteSent: true },
@@ -89,7 +88,7 @@ const sendInvitations: MutationResolvers['sendInvitations'] = async (
     throw new GraphQLError(ERRORS.INTERNAL_SERVER_ERROR);
   }
 
-  return users.map(({ profileId }) => profileId);
+  return users.map(({ profileId }) => toGlobalId('Profile', profileId));
 };
 
 export default sendInvitations;
