@@ -1,5 +1,6 @@
-## 0.5.5-canary.170
+## 0.5.5-canary.171
 
+* **fix:**  - 🐛 correctly remove email and phone number ([#3121](https://github.com/AzzappApp/azzapp/pull/3121))
 * **fix:**  - restore webcardModal for viewer and add option menu ([#3140](https://github.com/AzzappApp/azzapp/pull/3140))
 * **fix:**  - return relay id format ([#3139](https://github.com/AzzappApp/azzapp/pull/3139))
 * **test:**  - aasa update
