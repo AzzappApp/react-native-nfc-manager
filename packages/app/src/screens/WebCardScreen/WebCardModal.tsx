@@ -90,6 +90,15 @@ const WebCardModal = ({
   const onShare = async () => {
     // a quick share method using the native share component. If we want to make a custom share (like tiktok for example, when they are recompressiong the media etc) we can use react-native-shares
     const url = buildUserUrl(webCard.userName);
+    let message = intl.formatMessage({
+      defaultMessage: 'Check out this azzapp WebCard: ',
+      description:
+        'Profile WebcardModal, message use when sharing the contact card',
+    });
+    if (Platform.OS === 'android') {
+      // for android we need to add the message to the share
+      message = `${message} ${url}`;
+    }
     try {
       await Share.share(
         {
@@ -98,16 +107,7 @@ const WebCardModal = ({
             description:
               'Profile WebcardModal, message use when sharing the contact card',
           }),
-          message:
-            intl.formatMessage({
-              defaultMessage: 'Check out this azzapp WebCard: ',
-              description:
-                'Profile WebcardModal, message use when sharing the contact card',
-            }) +
-              Platform.OS ===
-            'android'
-              ? url
-              : '',
+          message,
           url,
         },
         {

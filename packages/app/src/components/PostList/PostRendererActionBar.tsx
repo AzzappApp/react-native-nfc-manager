@@ -280,22 +280,22 @@ const PostRendererActionBar = ({
     // a quick share method using the native share component. If we want to make a custom share (like tiktok for example, when they are recompressiong the media etc) we can use react-native-shares
     try {
       const url = buildPostUrl(webCard.userName, fromGlobalId(postId).id);
+      let message = intl.formatMessage({
+        defaultMessage: 'Check out this azzapp WebCard: ',
+        description:
+          'Post ActionBar, message use when sharing the Post on azzapp',
+      });
+      if (Platform.OS === 'android') {
+        // for android we need to add the message to the share
+        message = `${message} ${url}`;
+      }
       await Share.share({
         title: intl.formatMessage({
           defaultMessage: 'Post on azzapp',
           description:
             'Post ActionBar, message use when sharing the Post on azzapp',
         }),
-        message:
-          intl.formatMessage({
-            defaultMessage: 'Check out this azzapp WebCard: ',
-            description:
-              'Post ActionBar, message use when sharing the Post on azzapp',
-          }) +
-            Platform.OS ===
-          'android'
-            ? url
-            : '',
+        message,
         url,
       });
       //TODO: handle result of the share when specified
