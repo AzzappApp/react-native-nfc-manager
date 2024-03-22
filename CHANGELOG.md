@@ -1,5 +1,6 @@
-## 0.5.5-canary.177
+## 0.5.5-canary.178
 
+* **fix:**  - android counter information on home
 * **fix:**  - sharing syntax for android
 * **fix:**  - stuck welcome screen ([#3153](https://github.com/AzzappApp/azzapp/pull/3153))
 * **fix:**  - allow using webcard modal if unpublished and owner ([#3150](https://github.com/AzzappApp/azzapp/pull/3150))
