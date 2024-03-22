@@ -72,10 +72,28 @@ const HomeInformations = ({
     [profiles],
   );
 
-  const nbPosts = useSharedValue('0');
-  const nbLikes = useSharedValue('0');
-  const nbFollowers = useSharedValue('0');
-  const nbFollowings = useSharedValue('0');
+  const nbPosts = useSharedValue(
+    format(
+      nbPostsValue[Math.round(currentProfileIndexSharedValue.value)] ?? '-1',
+    ),
+  );
+  const nbLikes = useSharedValue(
+    format(
+      nbLikesValue[Math.round(currentProfileIndexSharedValue.value)] ?? '-1',
+    ),
+  );
+  const nbFollowers = useSharedValue(
+    format(
+      nbFollowersValue[Math.round(currentProfileIndexSharedValue.value)] ??
+        '-1',
+    ),
+  );
+  const nbFollowings = useSharedValue(
+    format(
+      nbFollowingsValue[Math.round(currentProfileIndexSharedValue.value)] ??
+        '-1',
+    ),
+  );
   //using profiles object directly in animatedReaction causes error animatedHost(seems to be the case for all relay query result)
 
   const inputRange = useMemo(
@@ -96,10 +114,10 @@ const HomeInformations = ({
           interpolate(actual, inputRange, nbFollowingsValue),
         );
       } else if (actual >= 0) {
-        nbPosts.value = format(nbPostsValue[0] ?? 0);
-        nbLikes.value = format(nbLikesValue[0] ?? 0);
-        nbFollowers.value = format(nbFollowersValue[0] ?? 0);
-        nbFollowings.value = format(nbFollowingsValue[0] ?? 0);
+        nbPosts.value = format(nbPostsValue[actual]);
+        nbLikes.value = format(nbLikesValue[actual]);
+        nbFollowers.value = format(nbFollowersValue[actual]);
+        nbFollowings.value = format(nbFollowingsValue[actual]);
       }
     },
     [

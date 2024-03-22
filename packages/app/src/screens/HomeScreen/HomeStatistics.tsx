@@ -69,9 +69,7 @@ const HomeStatistics = ({
   const scrollHandler = useAnimatedScrollHandler(event => {
     scrollIndexOffset.value = event.contentOffset.x / BOX_NUMBER_WIDTH;
   });
-  const totalLikes = useSharedValue(format(0));
-  const totalScans = useSharedValue(format(0));
-  const totalViews = useSharedValue(format(0));
+
   const inputRange = _.range(0, profiles?.length);
 
   const likes = useMemo(
@@ -85,6 +83,21 @@ const HomeStatistics = ({
   const webCardViews = useMemo(
     () => profiles?.map(profile => profile.webCard.nbWebCardViews) ?? [],
     [profiles],
+  );
+
+  const totalLikes = useSharedValue(
+    format(likes[Math.round(currentProfileIndexSharedValue.value)] ?? '-1'),
+  );
+  const totalScans = useSharedValue(
+    format(
+      contactCardScans[Math.round(currentProfileIndexSharedValue.value)] ??
+        '-1',
+    ),
+  );
+  const totalViews = useSharedValue(
+    format(
+      webCardViews[Math.round(currentProfileIndexSharedValue.value)] ?? '-1',
+    ),
   );
 
   useAnimatedReaction(
@@ -109,9 +122,9 @@ const HomeStatistics = ({
           ),
         );
       } else if (actual >= 0) {
-        totalLikes.value = format(likes[0] ?? 0);
-        totalScans.value = format(contactCardScans[0] ?? 0);
-        totalViews.value = format(webCardViews[0] ?? 0);
+        totalLikes.value = format(likes[actual]);
+        totalScans.value = format(contactCardScans[actual]);
+        totalViews.value = format(webCardViews[actual]);
       }
     },
 
