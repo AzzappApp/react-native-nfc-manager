@@ -1,5 +1,6 @@
-## 0.5.5-canary.176
+## 0.5.5-canary.177
 
+* **fix:**  - sharing syntax for android
 * **fix:**  - stuck welcome screen ([#3153](https://github.com/AzzappApp/azzapp/pull/3153))
 * **fix:**  - allow using webcard modal if unpublished and owner ([#3150](https://github.com/AzzappApp/azzapp/pull/3150))
 * **fix:**  - wrong condition on delete all ([#3146](https://github.com/AzzappApp/azzapp/pull/3146))
