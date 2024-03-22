@@ -86,7 +86,7 @@ const HomeScreenContent = ({ user: userKey }: HomeScreenContentProps) => {
   );
 
   useEffect(() => {
-    if (currentProfile === undefined) {
+    if (user.profiles?.length === 0) {
       dispatchGlobalEvent({
         type: 'WEBCARD_CHANGE',
         payload: {
@@ -96,7 +96,7 @@ const HomeScreenContent = ({ user: userKey }: HomeScreenContentProps) => {
         },
       });
     }
-  }, [currentProfile]);
+  }, [currentProfile, user.profiles?.length]);
 
   useRouteWillChange('HOME', () => {
     const roundedProfileIndexSharedValue = Math.round(

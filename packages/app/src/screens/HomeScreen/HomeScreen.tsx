@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef } from 'react';
+import { Suspense, useEffect, useMemo } from 'react';
 import { graphql, usePreloadedQuery } from 'react-relay';
 import { mainRoutes } from '#mobileRoutes';
 import { useMainTabBarVisibilityController } from '#components/MainTabBar';
@@ -45,11 +45,9 @@ const HomeScreen = ({
     return currentUser.profiles.length > 0;
   }, [currentUser?.profiles]);
 
-  const prevHasProfile = useRef(hasProfile);
-
   useEffect(() => {
-    if (!hasProfile && prevHasProfile.current) {
-      prevHasProfile.current = false;
+    //if not profile, launch onboarding
+    if (!hasProfile) {
       router.replaceAll(mainRoutes(true));
     }
   }, [hasProfile, router]);
@@ -59,7 +57,11 @@ const HomeScreen = ({
     return null;
   }
 
-  return <HomeScreenContent user={currentUser} />;
+  return (
+    <Suspense>
+      <HomeScreenContent user={currentUser} />
+    </Suspense>
+  );
 };
 
 const HomeScreenFallback = () => {

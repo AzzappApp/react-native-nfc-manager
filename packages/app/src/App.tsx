@@ -227,9 +227,9 @@ const unauthenticatedRoutes = [
 const AppRouter = () => {
   // #region Routing
   const initialRoutes = useMemo(() => {
-    const { authenticated, hasBeenSignedIn, profileInfos } = getAuthState();
+    const { authenticated, hasBeenSignedIn } = getAuthState();
     return authenticated
-      ? mainRoutes(!profileInfos?.profileId)
+      ? mainRoutes(false)
       : hasBeenSignedIn
         ? signInRoutes
         : signUpRoutes;
@@ -247,7 +247,7 @@ const AppRouter = () => {
         authenticated &&
         unauthenticatedRoutes.includes(currentRoute)
       ) {
-        router.replaceAll(mainRoutes(!profileInfos?.profileId));
+        router.replaceAll(mainRoutes(false));
       }
     }
   }, [authenticated, profileInfos, router]);
