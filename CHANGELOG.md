@@ -1,5 +1,6 @@
-## 0.5.5-canary.175
+## 0.5.5-canary.176
 
+* **fix:**  - stuck welcome screen ([#3153](https://github.com/AzzappApp/azzapp/pull/3153))
 * **fix:**  - allow using webcard modal if unpublished and owner ([#3150](https://github.com/AzzappApp/azzapp/pull/3150))
 * **fix:**  - wrong condition on delete all ([#3146](https://github.com/AzzappApp/azzapp/pull/3146))
 * **fix:**  - **profile:** missing permission on inviteSent ([#3144](https://github.com/AzzappApp/azzapp/pull/3144))
