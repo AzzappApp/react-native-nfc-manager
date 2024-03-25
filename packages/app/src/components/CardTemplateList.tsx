@@ -618,6 +618,7 @@ const stylesheet = createStyleSheet(theme => ({
     width: '100%',
     justifyContent: 'center',
     alignItems: 'center',
+    marginBottom: BUTTON_GAP,
   },
   skip: {
     color: colors.grey200,
