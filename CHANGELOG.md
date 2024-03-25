@@ -1,5 +1,9 @@
-## 0.5.5-canary.178
+## 0.5.5-canary.179
 
+* **fix:**  - don’t indicate that email is already used in signup ([#3149](https://github.com/AzzappApp/azzapp/pull/3149))
+* **feat:**  - 🎸 display login with email phone selector ([#3157](https://github.com/AzzappApp/azzapp/pull/3157))
+* **fix:**  - 🐛 don't display multi user option for user and editor ([#3158](https://github.com/AzzappApp/azzapp/pull/3158))
+* **try:**  - using effect to set the initial value properly ([#3159](https://github.com/AzzappApp/azzapp/pull/3159))
 * **fix:**  - android counter information on home
 * **fix:**  - sharing syntax for android
 * **fix:**  - stuck welcome screen ([#3153](https://github.com/AzzappApp/azzapp/pull/3153))
