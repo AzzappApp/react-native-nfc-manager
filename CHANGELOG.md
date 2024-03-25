@@ -1,5 +1,6 @@
-## 0.5.5-canary.179
+## 0.5.5-canary.180
 
+* **fix:**  - add bottom padding to display message rror ([#3160](https://github.com/AzzappApp/azzapp/pull/3160))
 * **fix:**  - don’t indicate that email is already used in signup ([#3149](https://github.com/AzzappApp/azzapp/pull/3149))
 * **feat:**  - 🎸 display login with email phone selector ([#3157](https://github.com/AzzappApp/azzapp/pull/3157))
 * **fix:**  - 🐛 don't display multi user option for user and editor ([#3158](https://github.com/AzzappApp/azzapp/pull/3158))
