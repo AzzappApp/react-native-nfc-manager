@@ -63,12 +63,12 @@ const handleExistingUser = async (user: User, password: string) => {
     }
   } catch (error) {
     return NextResponse.json(
-      { message: ERRORS.EMAIL_ALREADY_EXISTS },
+      { message: ERRORS.INVALID_REQUEST },
       { status: 400 },
     );
   }
   return NextResponse.json(
-    { message: ERRORS.EMAIL_ALREADY_EXISTS },
+    { message: ERRORS.INVALID_REQUEST },
     { status: 400 },
   );
 };

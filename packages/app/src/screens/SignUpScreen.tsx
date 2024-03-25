@@ -3,7 +3,6 @@ import { useCallback, useState, useRef, memo } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { View, Image, Keyboard } from 'react-native';
 import Animated, { useAnimatedStyle } from 'react-native-reanimated';
-import ERRORS from '@azzapp/shared/errors';
 import {
   isNotFalsyString,
   isPhoneNumber,
@@ -131,30 +130,13 @@ const SignupScreen = () => {
         }
         setIsSubmitting(false);
       } catch (error: any) {
-        if (error.message === ERRORS.EMAIL_ALREADY_EXISTS) {
-          setPhoneOrEmailError(
-            intl.formatMessage({
-              defaultMessage: 'This email address is already registered',
-              description:
-                'Signup Screen - Error This email address is already registered ',
-            }),
-          );
-        } else if (error.message === ERRORS.PHONENUMBER_ALREADY_EXISTS) {
-          setPhoneOrEmailError(
-            intl.formatMessage({
-              defaultMessage: 'This phone number is already registered',
-              description:
-                'Signup Screen - Error This phone number is already registered ',
-            }),
-          );
-        } else {
-          setPhoneOrEmailError(
-            intl.formatMessage({
-              defaultMessage: 'Unknown error - Please retry',
-              description: 'Signup Screen - Error unkown',
-            }),
-          );
-        }
+        setPhoneOrEmailError(
+          intl.formatMessage({
+            defaultMessage: 'Unknown error - Please retry',
+            description: 'Signup Screen - Error unknown',
+          }),
+        );
+
         setIsSubmitting(false);
       }
     }

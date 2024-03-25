@@ -256,7 +256,7 @@ describe('SignUpScreen', () => {
     act(() => fireEvent(checkboxes[1], 'onPress'));
     act(() => fireEvent(submitButton, 'onPress'));
 
-    const emailAlreadyExistError = 'This email address is already registered';
+    const emailAlreadyExistError = 'Unknown error - Please retry';
     expect(screen.queryByText(emailAlreadyExistError)).not.toBeTruthy();
 
     await act(flushPromises);
