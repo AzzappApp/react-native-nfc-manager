@@ -1,4 +1,4 @@
-## 0.5.5-canary.180
+## 0.5.5-canary.181
 
 * **fix:**  - add bottom padding to display message rror ([#3160](https://github.com/AzzappApp/azzapp/pull/3160))
 * **fix:**  - don’t indicate that email is already used in signup ([#3149](https://github.com/AzzappApp/azzapp/pull/3149))
