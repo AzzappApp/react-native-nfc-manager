@@ -1,5 +1,5 @@
 import _ from 'lodash';
-import { memo, useCallback, useMemo } from 'react';
+import { memo, useCallback, useEffect, useMemo } from 'react';
 import { FormattedMessage } from 'react-intl';
 import { StyleSheet, View } from 'react-native';
 import {
@@ -72,29 +72,38 @@ const HomeInformations = ({
     [profiles],
   );
 
-  const nbPosts = useSharedValue(
-    format(
-      nbPostsValue[Math.round(currentProfileIndexSharedValue.value)] ?? '-1',
-    ),
-  );
-  const nbLikes = useSharedValue(
-    format(
-      nbLikesValue[Math.round(currentProfileIndexSharedValue.value)] ?? '-1',
-    ),
-  );
-  const nbFollowers = useSharedValue(
-    format(
-      nbFollowersValue[Math.round(currentProfileIndexSharedValue.value)] ??
-        '-1',
-    ),
-  );
-  const nbFollowings = useSharedValue(
-    format(
-      nbFollowingsValue[Math.round(currentProfileIndexSharedValue.value)] ??
-        '-1',
-    ),
-  );
+  const nbPosts = useSharedValue('-1');
+  const nbLikes = useSharedValue('-1');
+  const nbFollowers = useSharedValue('-1');
+  const nbFollowings = useSharedValue('-1');
+
   //using profiles object directly in animatedReaction causes error animatedHost(seems to be the case for all relay query result)
+
+  useEffect(() => {
+    const currentIndex = Math.round(currentProfileIndexSharedValue.value);
+    if (nbPosts.value === '-1') {
+      nbPosts.value = format(nbPostsValue[currentIndex]);
+    }
+    if (nbLikes.value === '-1') {
+      nbLikes.value = format(nbLikesValue[currentIndex]);
+    }
+    if (nbFollowings.value === '-1') {
+      nbFollowings.value = format(nbFollowingsValue[currentIndex]);
+    }
+    if (nbFollowers.value === '-1') {
+      nbFollowers.value = format(nbFollowersValue[currentIndex]);
+    }
+  }, [
+    currentProfileIndexSharedValue.value,
+    nbFollowers,
+    nbFollowersValue,
+    nbFollowings,
+    nbFollowingsValue,
+    nbLikes,
+    nbLikesValue,
+    nbPosts,
+    nbPostsValue,
+  ]);
 
   const inputRange = useMemo(
     () => _.range(0, profiles?.length),
@@ -219,7 +228,7 @@ export const format = (value: number) => {
   if (typeof value === 'number') {
     return Math.round(value).toString();
   }
-  return '0';
+  return '-1';
 };
 
 const styles = StyleSheet.create({
