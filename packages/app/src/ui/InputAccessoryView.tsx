@@ -2,17 +2,20 @@ import { TouchableWithoutFeedback, View } from 'react-native';
 import { KeyboardStickyView } from 'react-native-keyboard-controller';
 import { colors, shadow } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
+import type { StyleProp, ViewStyle } from 'react-native';
 
 type InputAccessoryViewProps = {
   visible: boolean;
   children: React.ReactNode;
   onClose: () => void;
+  style?: StyleProp<ViewStyle>;
 };
 
 const InputAccessoryView = ({
   visible,
   children,
   onClose,
+  style,
 }: InputAccessoryViewProps) => {
   const styles = useStyleSheet(styleSheet);
 
@@ -21,7 +24,7 @@ const InputAccessoryView = ({
   }
 
   return (
-    <View style={styles.titleModal}>
+    <View style={[styles.titleModal, style]}>
       <TouchableWithoutFeedback onPress={onClose} style={styles.overlay}>
         <View style={styles.overlay} />
       </TouchableWithoutFeedback>

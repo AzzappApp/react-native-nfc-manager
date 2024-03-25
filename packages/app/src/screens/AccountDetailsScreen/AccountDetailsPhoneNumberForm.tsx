@@ -10,6 +10,7 @@ import { z } from 'zod';
 import { isPhoneNumber } from '@azzapp/shared/stringHelpers';
 import { useRouter } from '#components/NativeRouter';
 import { requestUpdateContact } from '#helpers/MobileWebAPI';
+import useScreenInsets from '#hooks/useScreenInsets';
 import Button from '#ui/Button';
 import CountryCodeListWithOptions from '#ui/CountryCodeListWithOptions';
 import COUNTRY_FLAG from '#ui/CountrySelector/CountryFlag';
@@ -165,10 +166,16 @@ const AccountDetailsPhoneNumberForm = ({
     }
   });
 
+  const { bottom } = useScreenInsets();
+
   const phoneNumberInputRef = useRef<NativeTextInput>(null);
 
   return (
-    <InputAccessoryView visible={visible} onClose={toggleBottomSheet}>
+    <InputAccessoryView
+      visible={visible}
+      onClose={toggleBottomSheet}
+      style={{ paddingBottom: bottom }}
+    >
       <Header
         leftElement={
           <Button
