@@ -12,11 +12,13 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
 import { graphql, useFragment } from 'react-relay';
 import { useDebouncedCallback } from 'use-debounce';
+import { isAdmin } from '@azzapp/shared/profileHelpers';
 import { buildUserUrl } from '@azzapp/shared/urlHelpers';
 import { colors, shadow } from '#theme';
 import CoverRenderer from '#components/CoverRenderer';
 import { useRouter } from '#components/NativeRouter';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
+import useAuthState from '#hooks/useAuthState';
 import { useSendReport } from '#hooks/useSendReport';
 import ActivityIndicator from '#ui/ActivityIndicator';
 import BottomSheetModal from '#ui/BottomSheetModal';
@@ -82,6 +84,7 @@ const WebCardModal = ({
     webCardKey,
   );
   const isFollowing = webCard.webCardModal_isFollowing;
+  const { profileInfos } = useAuthState();
 
   const { width: windowsWith, height: windowsHeight } = useWindowDimensions();
   const { top } = useSafeAreaInsets();
@@ -250,7 +253,7 @@ const WebCardModal = ({
           </View>
         </View>
         <View style={styles.bottomSheetOptionsContainer}>
-          {isViewer && (
+          {isViewer && isAdmin(profileInfos?.profileRole) && (
             <PressableNative
               style={styles.bottomSheetOptionButton}
               onPress={onWebCardParameters}
@@ -269,7 +272,7 @@ const WebCardModal = ({
               </View>
             </PressableNative>
           )}
-          {isViewer && (
+          {isViewer && isAdmin(profileInfos?.profileRole) && (
             <PressableNative
               style={styles.bottomSheetOptionButton}
               onPress={onMultiUser}
