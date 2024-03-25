@@ -9,11 +9,11 @@ import {
   isValidUserName,
 } from '@azzapp/shared/stringHelpers';
 import { colors } from '#theme';
+import EmailOrPhoneInput from '#components/EmailOrPhoneInput';
 import Link from '#components/Link';
 import { useRouter } from '#components/NativeRouter';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import { dispatchGlobalEvent } from '#helpers/globalEvents';
-import { getLocales } from '#helpers/localeHelpers';
 import { signin } from '#helpers/MobileWebAPI';
 import useAnimatedKeyboardHeight from '#hooks/useAnimatedKeyboardHeight';
 import useScreenInsets from '#hooks/useScreenInsets';
@@ -22,11 +22,14 @@ import Form, { Submit } from '#ui/Form/Form';
 import PressableOpacity from '#ui/PressableOpacity';
 import SecuredTextInput from '#ui/SecuredTextInput';
 import Text from '#ui/Text';
-import TextInput from '#ui/TextInput';
+import type { EmailPhoneInput } from '#components/EmailOrPhoneInput';
 import type { TextInput as NativeTextInput } from 'react-native';
 
 const SignInScreen = () => {
-  const [credential, setCredential] = useState('');
+  const [credential, setCredential] = useState<EmailPhoneInput>({
+    countryCodeOrEmail: 'email',
+    value: '',
+  });
   const [password, setPassword] = useState('');
   const [credentialInvalid, setCredentialInvalid] = useState(false);
   const [signinError, setSigninError] = useState(false);
@@ -35,30 +38,31 @@ const SignInScreen = () => {
   const router = useRouter();
 
   const onSubmit = useCallback(async () => {
-    if (!isNotFalsyString(credential) || !isNotFalsyString(password)) {
+    if (!isNotFalsyString(credential.value) || !isNotFalsyString(password)) {
       return;
     }
-    const locales = getLocales();
+
     const intlPhoneNumber = tryGetPhoneNumber(
-      credential,
-      locales[0]?.countryCode,
+      credential.value,
+      credential.countryCodeOrEmail,
     );
 
     if (
       !intlPhoneNumber &&
-      !isValidEmail(credential) &&
-      !isValidUserName(credential)
+      !isValidEmail(credential.value) &&
+      !isValidUserName(credential.value)
     ) {
       setCredentialInvalid(true);
       return;
     }
+
     setCredentialInvalid(false);
 
     try {
       setIsSubmitting(true);
 
       const signedIn = await signin({
-        credential: intlPhoneNumber ?? credential,
+        credential: intlPhoneNumber ?? credential.value,
         password,
       });
 
@@ -147,15 +151,23 @@ const SignInScreen = () => {
           style={[styles.form, { marginBottom: insets.bottom }]}
           onSubmit={onSubmit}
         >
-          <TextInput
+          <EmailOrPhoneInput
+            input={
+              credential || {
+                countryCodeOrEmail: 'email',
+                value: '',
+              }
+            }
+            onChange={input => {
+              if (!isSubmitting) setCredential(input);
+            }}
             testID="credential-input"
             placeholder={intl.formatMessage({
               defaultMessage: 'Phone number or email address',
               description:
                 'SignIn Screen Phone number or email address input placeholder',
             })}
-            value={credential}
-            onChangeText={isSubmitting ? undefined : setCredential}
+            hasError={credentialInvalid}
             autoCapitalize="none"
             autoComplete="email"
             keyboardType="email-address"
@@ -213,7 +225,8 @@ const SignInScreen = () => {
                   'SignIn Screen - AccessibilityLabel Sign In button',
               })}
               disabled={
-                !isNotFalsyString(credential) || !isNotFalsyString(password)
+                !isNotFalsyString(credential.value) ||
+                !isNotFalsyString(password)
               }
               loading={isSubmitting}
             />

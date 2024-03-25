@@ -10,13 +10,16 @@ import PhoneInput from './PhoneInput';
 import type { CountryCodeListOption } from '#ui/CountryCodeListWithOptions';
 import type { CountryCode } from 'libphonenumber-js';
 import type { Ref } from 'react';
-import type { TextInput as NativeTextInput } from 'react-native';
+import type {
+  TextInput as NativeTextInput,
+  TextInputProps,
+} from 'react-native';
 
 export type EmailPhoneInput = {
   countryCodeOrEmail: CountryCode | 'email';
   value: string;
 };
-type EmailOrPhoneInputProps = {
+type EmailOrPhoneInputProps = Omit<TextInputProps, 'onChange' | 'value'> & {
   input: EmailPhoneInput;
   onChange: (value: EmailPhoneInput) => void;
   hasError: boolean;
@@ -32,6 +35,7 @@ const EmailOrPhoneInput = ({
   inputRef,
   onSubmitEditing,
   blurOnSubmit,
+  ...others
 }: EmailOrPhoneInputProps) => {
   const intl = useIntl();
 
@@ -138,6 +142,7 @@ const EmailOrPhoneInput = ({
           returnKeyType="next"
           style={styles.flex}
           blurOnSubmit={blurOnSubmit}
+          {...others}
         />
       ) : (
         <PhoneInput
@@ -162,6 +167,7 @@ const EmailOrPhoneInput = ({
           returnKeyType="next"
           style={styles.flex}
           blurOnSubmit={blurOnSubmit}
+          {...others}
         />
       )}
     </View>
