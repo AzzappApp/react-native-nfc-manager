@@ -56,6 +56,10 @@ export const ProfileTable = mysqlTable(
         table.webCardId,
         table.profileRole,
       ),
+      promotedAsOwnerKey: index('Profile_promotedAsOwner_key').on(
+        table.webCardId,
+        table.promotedAsOwner,
+      ),
     };
   },
 );
