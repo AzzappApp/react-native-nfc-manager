@@ -281,7 +281,7 @@ const PostRendererActionBar = ({
     try {
       const url = buildPostUrl(webCard.userName, fromGlobalId(postId).id);
       let message = intl.formatMessage({
-        defaultMessage: 'Check out this azzapp WebCard: ',
+        defaultMessage: 'Check out this post on azzapp: ',
         description:
           'Post ActionBar, message use when sharing the Post on azzapp',
       });

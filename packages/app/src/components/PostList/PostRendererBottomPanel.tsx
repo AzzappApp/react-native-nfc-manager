@@ -123,7 +123,7 @@ const PostRendererBottomPanel = ({
     // a quick share method using the native share component. If we want to make a custom share (like tiktok for example, when they are recompressiong the media etc) we can use react-native-shares
     const url = buildPostUrl(post.webCard.userName, fromGlobalId(post.id).id);
     let message = intl.formatMessage({
-      defaultMessage: 'Check out this azzapp WebCard: ',
+      defaultMessage: 'Check out this post on azzapp: ',
       description:
         'Post BottomPanel, message use when sharing the Post on azzapp',
     });
