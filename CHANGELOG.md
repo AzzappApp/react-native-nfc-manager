@@ -1,5 +1,10 @@
-## 0.5.5-canary.182
+## 0.5.5-canary.183
 
+* **feat:**  - [#2073](https://github.com/AzzappApp/azzapp/pull/2073) add missing locales ([#3168](https://github.com/AzzappApp/azzapp/pull/3168))
+* **fix:**  - add azzapA on contactCard ([#3172](https://github.com/AzzappApp/azzapp/pull/3172))
+* **fix:**  - **user:** add explicit error - was unguessable on usr mgmt side ([#3165](https://github.com/AzzappApp/azzapp/pull/3165))
+* **perf:**  - add index to get promoted as owner ([#3151](https://github.com/AzzappApp/azzapp/pull/3151))
+* **build:**  - upgrade deps ([#3167](https://github.com/AzzappApp/azzapp/pull/3167))
 * **fix:**  - sharing message ([#3170](https://github.com/AzzappApp/azzapp/pull/3170))
 * **fix:**  - webcard modal improvement ([#3169](https://github.com/AzzappApp/azzapp/pull/3169))
 * **fix:**  - increase inset available info ([#3171](https://github.com/AzzappApp/azzapp/pull/3171))
