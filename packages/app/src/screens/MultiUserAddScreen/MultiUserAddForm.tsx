@@ -101,7 +101,10 @@ const MultiUserAddForm = ({ contacts, control }: MultiUserAddFormProps) => {
             />
           </Text>
           {contacts?.length > 0 && (
-            <PressableOpacity onPress={toggleShowAvailableInfo}>
+            <PressableOpacity
+              onPress={toggleShowAvailableInfo}
+              hitSlop={{ top: 10, left: 10, bottom: 10, right: 10 }}
+            >
               <Text variant="xsmall" style={styles.info}>
                 <FormattedMessage
                   defaultMessage="See available Info"
