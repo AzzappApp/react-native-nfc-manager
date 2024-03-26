@@ -32,26 +32,34 @@ const updateUserMutation: MutationResolvers['updateUser'] = async (
   }
 
   if (phoneNumber && phoneNumber !== dbUser.phoneNumber) {
+    if (!token) {
+      throw new GraphQLError(ERRORS.INVALID_TOKEN);
+    }
+
     const verificationCheck =
       await twilioVerificationService().verificationChecks.create({
         to: phoneNumber,
-        code: token ?? undefined,
+        code: token,
       });
 
     if (verificationCheck.status !== 'approved') {
-      throw new GraphQLError(ERRORS.INVALID_REQUEST);
+      throw new GraphQLError(ERRORS.INVALID_TOKEN);
     }
   }
 
   if (email && email !== dbUser.email) {
+    if (!token) {
+      throw new GraphQLError(ERRORS.INVALID_TOKEN);
+    }
+
     const verificationCheck =
       await twilioVerificationService().verificationChecks.create({
         to: email,
-        code: token ?? undefined,
+        code: token,
       });
 
     if (verificationCheck.status !== 'approved') {
-      throw new GraphQLError(ERRORS.INVALID_REQUEST);
+      throw new GraphQLError(ERRORS.INVALID_TOKEN);
     }
   }
 
