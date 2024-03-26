@@ -77,6 +77,7 @@ const WebCardModal = ({
         nbPosts
         nbFollowers
         nbFollowings
+        cardIsPublished
         webCardModal_isFollowing: isFollowing(webCardId: $viewerWebCardId)
         ...CoverRenderer_webCard
       }
@@ -189,7 +190,7 @@ const WebCardModal = ({
 
   return (
     <BottomSheetModal
-      height={Math.min(600, windowsHeight - top - 30)}
+      height={Math.min(600, windowsHeight - top + 50)}
       visible={visible}
       onRequestClose={close}
       contentContainerStyle={styles.bottomSheetContentContainer}
@@ -288,26 +289,27 @@ const WebCardModal = ({
               </View>
             </PressableNative>
           )}
-          <PressableNative
-            style={styles.bottomSheetOptionButton}
-            onPress={onShare}
-          >
-            <View style={styles.bottomSheetOptionContainer}>
-              <View style={styles.bottomSheetOptionIconLabel}>
-                <Icon icon="share" />
-                <Text>
-                  <FormattedMessage
-                    defaultMessage="Share this Webcard{azzappA}"
-                    description="Profile webcard modal - Share thie Webcard"
-                    values={{
-                      azzappA: <Text variant="azzapp">a</Text>,
-                    }}
-                  />
-                </Text>
+          {webCard.cardIsPublished && (
+            <PressableNative
+              style={styles.bottomSheetOptionButton}
+              onPress={onShare}
+            >
+              <View style={styles.bottomSheetOptionContainer}>
+                <View style={styles.bottomSheetOptionIconLabel}>
+                  <Icon icon="share" />
+                  <Text>
+                    <FormattedMessage
+                      defaultMessage="Share this Webcard{azzappA}"
+                      description="Profile webcard modal - Share thie Webcard"
+                      values={{
+                        azzappA: <Text variant="azzapp">a</Text>,
+                      }}
+                    />
+                  </Text>
+                </View>
               </View>
-            </View>
-          </PressableNative>
-
+            </PressableNative>
+          )}
           {!isViewer && (
             <PressableNative
               style={styles.bottomSheetOptionButton}
@@ -357,8 +359,11 @@ const WebCardModal = ({
           >
             <Text variant="error">
               <FormattedMessage
-                defaultMessage="Delete this post"
+                defaultMessage="Delete this WebCard{azzappA}"
                 description="PostItem Modal - Delete this post"
+                values={{
+                  azzappA: <Text variant="azzapp">a</Text>,
+                }}
               />
             </Text>
           </PressableNative>
@@ -408,7 +413,8 @@ const stylesheet = createStyleSheet(appearance => ({
   },
   errorModalLine: {
     height: 42,
-    paddingTop: 30,
+    marginTop: 30,
+    marginBottom: 30,
     paddingHorizontal: 20,
     flexDirection: 'row',
     justifyContent: 'center',
