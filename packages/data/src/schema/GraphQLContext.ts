@@ -45,6 +45,7 @@ import type {
   WebCardStatistic,
   ProfileStatistic,
 } from '#domains';
+import type { Locale } from '@azzapp/i18n';
 
 export type GraphQLContext = {
   cardUsernamesToRevalidate: Set<string>;
@@ -69,7 +70,7 @@ export const createGraphQLContext = (
   sendMail: GraphQLContext['sendMail'],
   sendSms: GraphQLContext['sendSms'],
   buildCoverAvatarUrl: GraphQLContext['buildCoverAvatarUrl'],
-  locale = DEFAULT_LOCALE,
+  locale: Locale = DEFAULT_LOCALE,
 ): Omit<GraphQLContext, 'auth'> => {
   const loaders = createLoaders();
 

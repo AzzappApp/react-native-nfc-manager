@@ -1,19 +1,47 @@
 import { createIntl, IntlErrorCode } from '@formatjs/intl';
 import { cache } from 'react';
 import { DEFAULT_LOCALE } from '@azzapp/i18n';
+import type { Locale } from '@azzapp/i18n';
 
-const webMessages: { readonly [lang: string]: Record<string, string> } = {
-  get en() {
-    // no english translation yet
-    return {}; //require('@azzapp/i18n/compiled/web/en.json');
+const webMessages: Record<Locale, Record<string, string>> = {
+  get da() {
+    return {}; //require('@azzapp/i18n/compiled/web/da.json');
+  },
+  get 'en-US'() {
+    return {}; //require('@azzapp/i18n/compiled/web/en-US.json');
+  },
+  get 'en-GB'() {
+    return {}; //require('@azzapp/i18n/compiled/web/en-GB.json');
+  },
+  get es() {
+    return {}; //require('@azzapp/i18n/compiled/web/es.json');
   },
   get fr() {
-    // no french translation yet
     return {}; //require('@azzapp/i18n/compiled/web/fr.json');
   },
+  get it() {
+    return {}; //require('@azzapp/i18n/compiled/web/it.json');
+  },
+  get nl() {
+    return {}; //require('@azzapp/i18n/compiled/web/nl.json');
+  },
+  get no() {
+    return {}; //require('@azzapp/i18n/compiled/web/no.json');
+  },
+  get 'pt-BR'() {
+    return {}; //require('@azzapp/i18n/compiled/web/pt-BR.json');
+  },
+  get 'pt-PT'() {
+    return {}; //require('@azzapp/i18n/compiled/web/pt-PT.json');
+  },
+  get sv() {
+    return {}; //require('@azzapp/i18n/compiled/web/sv.json');
+  },
+  get de() {
+    return {}; //require('@azzapp/i18n/compiled/web/de.json');
+  },
 };
-
-export const getTranslationMessages = (locale = DEFAULT_LOCALE) => {
+export const getTranslationMessages = (locale: Locale = DEFAULT_LOCALE) => {
   const messages = Object.assign({}, webMessages[DEFAULT_LOCALE]);
   if (locale !== DEFAULT_LOCALE) {
     Object.assign(messages, webMessages[locale]);

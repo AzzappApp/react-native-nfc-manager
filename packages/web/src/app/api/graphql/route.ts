@@ -15,6 +15,7 @@ import {
   getDatabaseConnectionsInfos,
   startDatabaseConnectionMonitoring,
 } from '@azzapp/data/domains/databaseMonitorer';
+import { isSupportedLocale } from '@azzapp/i18n';
 import ERRORS from '@azzapp/shared/errors';
 import queryMap from '#persisted-query-map.json';
 import { buildCoverAvatarUrl } from '#helpers/avatar';
@@ -278,7 +279,7 @@ const { handleRequest } = createYoga({
       sendMail,
       sendSms,
       buildCoverAvatarUrl,
-      locale ?? undefined,
+      isSupportedLocale(locale) ? locale : undefined,
     );
   },
 });
