@@ -195,20 +195,29 @@ const MultiUserAddForm = ({ contacts, control }: MultiUserAddFormProps) => {
       <Text variant="xsmall" style={styles.description}>
         {field.value === 'user' && (
           <FormattedMessage
-            defaultMessage="A user has a ContactCard linked to the shared webcard but cannot publish posts or edit the WebCard."
+            defaultMessage="A user has a ContactCard{azzappA} linked to the shared webcard but cannot publish posts or edit the WebCard{azzappA}."
             description="MultiUserDetailModal - User description"
+            values={{
+              azzappA: <Text variant="azzapp">a</Text>,
+            }}
           />
         )}
         {field.value === 'editor' && (
           <FormattedMessage
-            defaultMessage="An editor can create and publish posts, edit the WebCard, but they cannot manage other aspects of the WebCard, such as settings and permissions."
+            defaultMessage="An editor can create and publish posts, edit the WebCard{azzappA}, but they cannot manage other aspects of the WebCard{azzappA}, such as settings and permissions."
             description="MultiUserDetailModal - Editor description"
+            values={{
+              azzappA: <Text variant="azzapp">a</Text>,
+            }}
           />
         )}
         {field.value === 'admin' && (
           <FormattedMessage
-            defaultMessage="The admin has full control over the WebCard, including the ability to add and remove collaborators. "
+            defaultMessage="The admin has full control over the WebCard{azzappA}, including the ability to add and remove collaborators. "
             description="MultiUserDetailModal - admin description"
+            values={{
+              azzappA: <Text variant="azzapp">a</Text>,
+            }}
           />
         )}
       </Text>

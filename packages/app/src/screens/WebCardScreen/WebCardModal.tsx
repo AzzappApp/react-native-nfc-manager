@@ -362,7 +362,11 @@ const WebCardModal = ({
                 defaultMessage="Delete this WebCard{azzappA}"
                 description="PostItem Modal - Delete this post"
                 values={{
-                  azzappA: <Text variant="azzapp">a</Text>,
+                  azzappA: (
+                    <Text variant="azzapp" style={{ color: colors.red400 }}>
+                      a
+                    </Text>
+                  ),
                 }}
               />
             </Text>

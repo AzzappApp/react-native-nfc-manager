@@ -218,26 +218,39 @@ export const ContactCardScreen = ({
         <Animated.View style={[footerStyle, styles.footer]}>
           <Text variant="xsmall" style={styles.contactCardDescriptionText}>
             <FormattedMessage
-              defaultMessage="Your Contact Card is a convenient way to share your contact information."
+              defaultMessage="Your Contact Card{azzappA} is a convenient way to share your contact information."
               description="Description of the contact card screen."
+              values={{
+                azzappA: <Text variant="azzapp">a</Text>,
+              }}
             />
           </Text>
 
           <Button
             variant="secondary"
             style={styles.editContactCardButton}
-            label={intl.formatMessage({
-              defaultMessage: 'Edit card details',
-              description: 'Edit card details button label',
-            })}
+            label={
+              intl.formatMessage(
+                {
+                  defaultMessage: 'Edit ContactCard{azzappA} details',
+                  description: 'Edit card details button label',
+                },
+                {
+                  azzappA: <Text variant="azzapp">a</Text>,
+                },
+              ) as string
+            }
             onPress={toggleContactEditModal}
           />
 
           <View style={{ width: '100%' }}>
             <Text variant="xsmall">
               <FormattedMessage
-                defaultMessage="Your contact card is not visible on your Webcard. Only you can share your contact card with other users."
+                defaultMessage="Your contact card{azzappA} is not visible on your Webcard{azzappA}. Only you can share your contact card with other users."
                 description="Description message when contact card is private."
+                values={{
+                  azzappA: <Text variant="azzapp">a</Text>,
+                }}
               />
             </Text>
           </View>
@@ -282,10 +295,14 @@ export const ContactCardScreen = ({
                         defaultMessage: 'Error',
                         description: 'Error toast title',
                       }),
-                      text2: intl.formatMessage({
-                        defaultMessage: 'Could not add pass to Apple Wallet',
-                        description: 'Error toast message',
-                      }),
+                      text2: intl.formatMessage(
+                        {
+                          defaultMessage:
+                            'Oops, ContactCard{azzappA} could not add pass to Apple Wallet',
+                          description: 'Error toast message',
+                        },
+                        { azzappA: <Text variant="azzapp">a</Text> },
+                      ) as string,
                       type: 'error',
                     });
                   } finally {
@@ -357,11 +374,18 @@ const ContactCardScreenHeader = ({
   return (
     <AccountHeader
       webCard={webCard}
-      title={intl.formatMessage({
-        defaultMessage: 'Contact Card',
-        description:
-          'Title of the contact card screen where user can edit their contact card.',
-      })}
+      title={
+        intl.formatMessage(
+          {
+            defaultMessage: 'Contact Card{azzappA}',
+            description:
+              'Title of the contact card screen where user can edit their contact card.',
+          },
+          {
+            azzappA: <Text variant="azzapp">a</Text>,
+          },
+        ) as string
+      }
     />
   );
 };

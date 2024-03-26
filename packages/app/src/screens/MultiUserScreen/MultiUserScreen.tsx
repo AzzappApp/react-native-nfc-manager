@@ -242,8 +242,11 @@ const MultiUserScreen = ({
             />
           ) : (
             <FormattedMessage
-              defaultMessage="Allow your team members to have their own personal Contact Cards, connected to the same company or organisation’s WebCard."
+              defaultMessage="Allow your team members to have their own personal Contact Cards{azzappA}, connected to the same company or organisation’s WebCard{azzappA}."
               description="Description for MultiUserScreen"
+              values={{
+                azzappA: <Text variant="azzapp">a</Text>,
+              }}
             />
           )}
         </Text>
@@ -416,8 +419,11 @@ const MultiUserScreen = ({
               </Text>
               <Text variant="medium">
                 <FormattedMessage
-                  defaultMessage="By deactivating multi user, you will delete the Contact Cards of your team members."
+                  defaultMessage="By deactivating multi user, you will delete the Contact Cards{azzappA} of your team members."
                   description="Description for confirm delete multi user modal"
+                  values={{
+                    azzappA: <Text variant="azzapp">a</Text>,
+                  }}
                 />
               </Text>
 

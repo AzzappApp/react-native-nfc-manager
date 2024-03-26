@@ -17,8 +17,8 @@ import Button from '#ui/Button';
 import Container from '#ui/Container';
 import Header from '#ui/Header';
 import SafeAreaView from '#ui/SafeAreaView';
+import Text from '#ui/Text';
 import UploadProgressModal from '#ui/UploadProgressModal';
-
 import ContactCardEditForm from './ContactCardEditForm';
 import { contactCardEditSchema } from './ContactCardEditModalSchema';
 import type { ContactCardEditModal_card$key } from '#relayArtifacts/ContactCardEditModal_card.graphql';
@@ -255,11 +255,17 @@ const ContactCardEditModal = ({
         console.error(e);
         Toast.show({
           type: 'error',
-          text1: intl.formatMessage({
-            defaultMessage:
-              'Error, could not save your contact card. Please try again.',
-            description: 'Error toast message when saving contact card failed',
-          }),
+          text1: intl.formatMessage(
+            {
+              defaultMessage:
+                'Error, could not save your contact card{azzappA}. Please try again.',
+              description:
+                'Error toast message when saving contact card failed',
+            },
+            {
+              azzappA: <Text variant="azzapp">a</Text>,
+            },
+          ) as string,
         });
       },
     });
@@ -274,10 +280,17 @@ const ContactCardEditModal = ({
         edges={{ bottom: 'off', top: 'additive' }}
       >
         <Header
-          middleElement={intl.formatMessage({
-            defaultMessage: 'Edit Contact Card',
-            description: 'Edit Contact Card Modal title',
-          })}
+          middleElement={
+            intl.formatMessage(
+              {
+                defaultMessage: 'Edit Contact Card{azzappA}',
+                description: 'Edit Contact Card Modal title',
+              },
+              {
+                azzappA: <Text variant="azzapp">a</Text>,
+              },
+            ) as string
+          }
           leftElement={
             <Button
               label={intl.formatMessage({

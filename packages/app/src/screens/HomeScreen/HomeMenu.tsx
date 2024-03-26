@@ -2,6 +2,7 @@ import { FormattedMessage } from 'react-intl';
 import { View, StyleSheet } from 'react-native';
 import { colors } from '#theme';
 import TabBarMenuItem from '#ui/TabBarMenuItem';
+import Text from '#ui/Text';
 
 export type HOME_TAB = 'CONTACT_CARD' | 'INFORMATION' | 'STATS';
 
@@ -22,8 +23,11 @@ const HomeMenu = ({ selected, setSelected }: HomeMenuProps) => {
         selectedLabelColor={colors.white}
       >
         <FormattedMessage
-          defaultMessage="Contact card"
+          defaultMessage="Contact card{azzappA}"
           description="Home Screen menu - Contact Card"
+          values={{
+            azzappA: <Text variant="azzapp">a</Text>,
+          }}
         />
       </TabBarMenuItem>
       <TabBarMenuItem

@@ -201,8 +201,11 @@ const CommonInformationForm = ({
               <Icon icon="lock_line" style={styles.icon} />
               <Text variant="xsmall" style={styles.description}>
                 <FormattedMessage
-                  defaultMessage="Common information will be displayed on each team member’s Contact Card and won’t be editable."
+                  defaultMessage="Common information will be displayed on each team member’s Contact Card{azzappA} and won’t be editable."
                   description="Common information form description"
+                  values={{
+                    azzappA: <Text variant="azzapp">a</Text>,
+                  }}
                 />
               </Text>
             </View>

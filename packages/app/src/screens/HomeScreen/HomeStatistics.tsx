@@ -201,10 +201,17 @@ const HomeStatistics = ({
           <StatisticItems
             variant={variant}
             value={totalScans}
-            title={intl.formatMessage({
-              defaultMessage: 'Contact card scans',
-              description: 'Home statistics - Contact card scans label',
-            })}
+            title={
+              intl.formatMessage(
+                {
+                  defaultMessage: 'Contact card{azzappA} scans',
+                  description: 'Home statistics - Contact card scans label',
+                },
+                {
+                  azzappA: <Text variant="azzapp">a</Text>,
+                },
+              ) as string
+            }
             scrollIndex={scrollIndexOffset}
             index={1}
             onSelect={onSelectStat}
@@ -233,10 +240,17 @@ const HomeStatistics = ({
           <StatisticItems
             variant={variant}
             value={totalScans}
-            title={intl.formatMessage({
-              defaultMessage: 'Contact card scans',
-              description: 'Home statistics - Contact card scans label',
-            })}
+            title={
+              intl.formatMessage(
+                {
+                  defaultMessage: 'Contact card{azzappA} scans',
+                  description: 'Home statistics - Contact card scans label',
+                },
+                {
+                  azzappA: <Text variant="azzapp">a</Text>,
+                },
+              ) as string
+            }
             scrollIndex={scrollIndexOffset}
             index={1}
             onSelect={onSelectStat}
