@@ -1,5 +1,8 @@
-## 0.5.5-canary.181
+## 0.5.5-canary.182
 
+* **fix:**  - sharing message ([#3170](https://github.com/AzzappApp/azzapp/pull/3170))
+* **fix:**  - webcard modal improvement ([#3169](https://github.com/AzzappApp/azzapp/pull/3169))
+* **fix:**  - increase inset available info ([#3171](https://github.com/AzzappApp/azzapp/pull/3171))
 * **fix:**  - add bottom padding to display message rror ([#3160](https://github.com/AzzappApp/azzapp/pull/3160))
 * **fix:**  - don’t indicate that email is already used in signup ([#3149](https://github.com/AzzappApp/azzapp/pull/3149))
 * **feat:**  - 🎸 display login with email phone selector ([#3157](https://github.com/AzzappApp/azzapp/pull/3157))
