@@ -1,5 +1,6 @@
-## 0.5.5-canary.183
+## 0.5.5-canary.184
 
+* **fix:**  - missing method on i18n - wrong merge
 * **feat:**  - [#2073](https://github.com/AzzappApp/azzapp/pull/2073) add missing locales ([#3168](https://github.com/AzzappApp/azzapp/pull/3168))
 * **fix:**  - add azzapA on contactCard ([#3172](https://github.com/AzzappApp/azzapp/pull/3172))
 * **fix:**  - **user:** add explicit error - was unguessable on usr mgmt side ([#3165](https://github.com/AzzappApp/azzapp/pull/3165))
