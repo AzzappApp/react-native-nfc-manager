@@ -5,8 +5,9 @@ import {
   mysqlTable,
   primaryKey,
 } from 'drizzle-orm/mysql-core';
-import db, { cols } from './db';
+import db, { DEFAULT_DATETIME_VALUE, cols } from './db';
 import type { DbTransaction } from './db';
+import type { InferSelectModel } from 'drizzle-orm';
 
 export const ReportTable = mysqlTable(
   'Report',
@@ -18,8 +19,12 @@ export const ReportTable = mysqlTable(
       'post',
       'comment',
     ]).notNull(),
-    createdAt: cols.dateTime('createdAt').notNull(),
+    createdAt: cols
+      .dateTime('createdAt')
+      .notNull()
+      .default(DEFAULT_DATETIME_VALUE),
     treatedBy: cols.defaultVarchar('treatedBy'),
+    treatedAt: cols.dateTime('treatedAt'),
   },
   table => {
     return {
@@ -34,6 +39,10 @@ export const ReportTable = mysqlTable(
     };
   },
 );
+
+export type Report = InferSelectModel<typeof ReportTable>;
+
+export type TargetType = Report['targetType'];
 
 export const createReport = async (
   targetId: string,

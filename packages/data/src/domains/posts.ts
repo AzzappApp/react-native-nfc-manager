@@ -9,12 +9,12 @@ import {
 } from 'drizzle-orm/mysql-core';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
 import { createId } from '#helpers/createId';
-import db, { cols } from './db';
+import db, { DEFAULT_DATETIME_VALUE, cols } from './db';
 import { FollowTable } from './follows';
 import { getMediasByIds, type Media } from './medias';
 import { getTopPostsComment } from './postComments';
 import { PostReactionTable } from './postReactions';
-import { type WebCard } from './webCards';
+import { WebCardTable, type WebCard } from './webCards';
 import type { DbTransaction } from './db';
 import type { PostComment } from './postComments';
 import type { InferInsertModel, InferSelectModel, SQL } from 'drizzle-orm';
@@ -30,8 +30,17 @@ export const PostTable = mysqlTable(
     medias: json('medias').$type<string[]>().notNull(),
     counterReactions: int('counterReactions').default(0).notNull(),
     counterComments: int('counterComments').default(0).notNull(),
-    createdAt: cols.dateTime('createdAt').notNull(),
-    updatedAt: cols.dateTime('updatedAt').notNull(),
+    createdAt: cols
+      .dateTime('createdAt')
+      .notNull()
+      .default(DEFAULT_DATETIME_VALUE),
+    updatedAt: cols
+      .dateTime('updatedAt')
+      .notNull()
+      .default(DEFAULT_DATETIME_VALUE),
+    deleted: boolean('deleted').notNull().default(false),
+    deletedBy: cols.cuid('deletedBy'),
+    deletedAt: cols.dateTime('deletedAt'),
   },
   table => {
     return {
@@ -228,9 +237,11 @@ export const getFollowingsPosts = async (
     })
     .from(PostTable)
     .innerJoin(FollowTable, eq(PostTable.webCardId, FollowTable.followingId))
+    .innerJoin(WebCardTable, eq(PostTable.webCardId, WebCardTable.id))
     .where(
       and(
         eq(FollowTable.followerId, webCardId),
+        eq(WebCardTable.deleted, false),
         after ? lt(PostTable.createdAt, after) : undefined,
       ),
     )
@@ -251,8 +262,13 @@ export const getFollowingsPostsCount = async (webCardId: string) =>
     .select({ count: sql`count(*)`.mapWith(Number) })
     .from(PostTable)
     .innerJoin(FollowTable, eq(PostTable.webCardId, FollowTable.followingId))
-    .where(eq(FollowTable.followerId, webCardId))
-
+    .innerJoin(WebCardTable, eq(PostTable.webCardId, WebCardTable.id))
+    .where(
+      and(
+        eq(FollowTable.followerId, webCardId),
+        eq(WebCardTable.deleted, false),
+      ),
+    )
     .then(res => res[0].count);
 
 /**

@@ -40,9 +40,9 @@ const ReportableCommentItem = (props: ReportableCommentItemProps) => {
         Toast.show({
           type: 'success',
           text1: intl.formatMessage({
-            defaultMessage: 'Report on post sent',
+            defaultMessage: 'Report on comment sent',
             description:
-              'Success toast message when sending report on post succeeds.',
+              'Success toast message when sending report on comment succeeds.',
           }),
           onHide: swipeableRef.current?.close,
         });
@@ -50,9 +50,9 @@ const ReportableCommentItem = (props: ReportableCommentItemProps) => {
         Toast.show({
           type: 'info',
           text1: intl.formatMessage({
-            defaultMessage: 'You already reported this post',
+            defaultMessage: 'You already reported this comment',
             description:
-              'Info toast message when sending report on post is already done.',
+              'Info toast message when sending report on comment is already done.',
           }),
           onHide: swipeableRef.current?.close,
         });

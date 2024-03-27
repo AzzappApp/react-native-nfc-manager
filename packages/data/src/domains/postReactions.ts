@@ -5,7 +5,7 @@ import {
   mysqlTable,
   index,
 } from 'drizzle-orm/mysql-core';
-import db, { cols } from './db';
+import db, { DEFAULT_DATETIME_VALUE, cols } from './db';
 import type { DbTransaction } from './db';
 import type { InferInsertModel, InferSelectModel } from 'drizzle-orm';
 
@@ -15,7 +15,10 @@ export const PostReactionTable = mysqlTable(
     webCardId: cols.cuid('webCardId').notNull(),
     postId: cols.cuid('postId').notNull(),
     reactionKind: mysqlEnum('reactionKind', ['like']).notNull(),
-    createdAt: cols.dateTime('createdAt').notNull(),
+    createdAt: cols
+      .dateTime('createdAt')
+      .notNull()
+      .default(DEFAULT_DATETIME_VALUE),
   },
   table => {
     return {

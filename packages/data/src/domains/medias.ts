@@ -3,7 +3,7 @@ import { mysqlEnum, double, mysqlTable, int } from 'drizzle-orm/mysql-core';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
 import { getMediaInfoByPublicIds } from '@azzapp/shared/cloudinaryHelpers';
 import { encodeMediaId, decodeMediaId } from '@azzapp/shared/imagesHelpers';
-import db, { cols } from './db';
+import db, { DEFAULT_DATETIME_VALUE, cols } from './db';
 import { sortEntitiesByIds } from './generic';
 import type { DbTransaction } from './db';
 import type { InferInsertModel, InferSelectModel } from 'drizzle-orm';
@@ -14,7 +14,10 @@ export const MediaTable = mysqlTable('Media', {
   height: double('height').notNull(),
   width: double('width').notNull(),
   refCount: int('refCount').default(0).notNull(),
-  createdAt: cols.dateTime('createdAt').notNull(),
+  createdAt: cols
+    .dateTime('createdAt')
+    .notNull()
+    .default(DEFAULT_DATETIME_VALUE),
 });
 
 export type Media = InferSelectModel<typeof MediaTable>;

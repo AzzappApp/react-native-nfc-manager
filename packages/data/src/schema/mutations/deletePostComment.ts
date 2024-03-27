@@ -2,24 +2,25 @@ import { eq, sql } from 'drizzle-orm';
 import { GraphQLError } from 'graphql';
 import { fromGlobalId } from 'graphql-relay';
 import ERRORS from '@azzapp/shared/errors';
-import { PostTable, db, getPostCommentById, removeComment } from '#domains';
+import { PostTable, db, removeComment } from '#domains';
 import fromGlobalIdWithType from '#helpers/relayIdHelpers';
 import type { MutationResolvers } from '#schema/__generated__/types';
 
 const deletePostComment: MutationResolvers['deletePostComment'] = async (
   _,
   { webCardId: gqlWebCardId, commentId: gqlCommentId },
-  { loaders },
+  { loaders, auth },
 ) => {
   const commentId = fromGlobalId(gqlCommentId).id;
   const comment = await loaders.PostComment.load(commentId);
   const webCardId = fromGlobalIdWithType(gqlWebCardId, 'WebCard');
-  if (comment?.webCardId !== webCardId) {
+  const userId = auth.userId;
+  if (comment?.webCardId !== webCardId || !userId) {
     throw new GraphQLError(ERRORS.INVALID_REQUEST);
   }
 
   try {
-    const originalComment = await getPostCommentById(commentId);
+    const originalComment = await loaders.PostComment.load(commentId);
     if (!originalComment) throw new GraphQLError(ERRORS.INVALID_REQUEST);
     if (originalComment.webCardId !== webCardId)
       throw new GraphQLError(ERRORS.FORBIDDEN);
@@ -32,8 +33,9 @@ const deletePostComment: MutationResolvers['deletePostComment'] = async (
         })
         .where(eq(PostTable.id, originalComment.postId));
 
-      await removeComment(commentId, trx);
+      await removeComment(commentId, userId, trx);
     });
+    loaders.PostComment.clear(commentId);
 
     return {
       commentId: gqlCommentId,

@@ -43,6 +43,11 @@ const backOfficeSections = [
     href: '/cardTemplateTypes',
     roles: [ADMIN],
   },
+  {
+    text: 'Reports',
+    href: '/reports',
+    roles: [ADMIN],
+  },
 ];
 
 export default backOfficeSections;

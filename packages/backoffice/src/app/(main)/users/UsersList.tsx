@@ -121,7 +121,7 @@ const columns: GridColDef[] = [
     headerName: 'ID',
     width: 250,
     renderCell: params => (
-      <Link href={`/users/${params.id}`}>${params.row.id}</Link>
+      <Link href={`/users/${params.id}`}>{params.row.id}</Link>
     ),
   },
   { field: 'email', headerName: 'Email', flex: 1 },

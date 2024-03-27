@@ -1,7 +1,7 @@
 import { eq } from 'drizzle-orm';
 import { uniqueIndex, mysqlTable, json, boolean } from 'drizzle-orm/mysql-core';
 import { createId } from '#helpers/createId';
-import db, { cols } from './db';
+import db, { DEFAULT_DATETIME_VALUE, cols } from './db';
 import type { DbTransaction } from './db';
 import type { InferInsertModel, InferSelectModel } from 'drizzle-orm';
 
@@ -12,8 +12,14 @@ export const UserTable = mysqlTable(
     email: cols.defaultVarchar('email'),
     password: cols.defaultVarchar('password'),
     phoneNumber: cols.defaultVarchar('phoneNumber'),
-    createdAt: cols.dateTime('createdAt').notNull(),
-    updatedAt: cols.dateTime('updatedAt').notNull(),
+    createdAt: cols
+      .dateTime('createdAt')
+      .notNull()
+      .default(DEFAULT_DATETIME_VALUE),
+    updatedAt: cols
+      .dateTime('updatedAt')
+      .notNull()
+      .default(DEFAULT_DATETIME_VALUE),
     roles: json('roles').$type<string[]>(),
     invited: boolean('invited').default(false).notNull(),
     locale: cols.defaultVarchar('locale'),
@@ -65,6 +71,7 @@ export const getUserByEmail = async (email: string): Promise<User | null> => {
 export const getUserByPhoneNumber = async (
   phoneNumber: string,
 ): Promise<User | null> => {
+  console.log({ phoneNumber });
   return db
     .select()
     .from(UserTable)

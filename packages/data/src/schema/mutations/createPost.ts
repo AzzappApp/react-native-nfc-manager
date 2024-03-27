@@ -53,6 +53,9 @@ const createPostMutation: MutationResolvers['createPost'] = async (
         id: postId,
         createdAt: new Date(),
         updatedAt: new Date(),
+        deleted: false,
+        deletedBy: null,
+        deletedAt: null,
       };
     });
 

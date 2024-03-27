@@ -1,8 +1,8 @@
 import { eq, sql, and, desc, inArray } from 'drizzle-orm';
-import { text, index, mysqlTable } from 'drizzle-orm/mysql-core';
+import { text, index, mysqlTable, boolean } from 'drizzle-orm/mysql-core';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
 import { createId } from '#helpers/createId';
-import db, { cols } from './db';
+import db, { DEFAULT_DATETIME_VALUE, cols } from './db';
 import { getMediasByIds, type Media } from './medias';
 import { PostTable } from './posts';
 import { WebCardTable, type WebCard } from './webCards';
@@ -16,7 +16,13 @@ export const PostCommentTable = mysqlTable(
     webCardId: cols.cuid('webCardId').notNull(),
     postId: cols.cuid('postId').notNull(),
     comment: text('comment').notNull(),
-    createdAt: cols.dateTime('createdAt').notNull(),
+    createdAt: cols
+      .dateTime('createdAt')
+      .notNull()
+      .default(DEFAULT_DATETIME_VALUE),
+    deleted: boolean('deleted').notNull().default(false),
+    deletedBy: cols.cuid('deletedBy'),
+    deletedAt: cols.dateTime('deletedAt'),
   },
   table => {
     return {
@@ -71,6 +77,7 @@ export const getPostCommentsWithWebCard = async (
     .where(
       and(
         eq(PostCommentTable.postId, postId),
+        eq(PostCommentTable.deleted, false),
         before ? sql`${PostCommentTable.createdAt} < ${before}` : undefined,
       ),
     )
@@ -129,6 +136,7 @@ export const getPostCommentsByDate = async (
     .where(
       and(
         eq(PostCommentTable.postId, postId),
+        eq(PostCommentTable.deleted, false),
         after ? sql`${PostCommentTable.createdAt} < ${after}` : undefined,
       ),
     )
@@ -163,9 +171,12 @@ export const getTopPostsComment = async (
     .select()
     .from(PostCommentTable)
     .where(
-      inArray(
-        PostCommentTable.postId,
-        comments.map(comment => comment.postsId),
+      and(
+        inArray(
+          PostCommentTable.postId,
+          comments.map(comment => comment.postsId),
+        ),
+        eq(PostCommentTable.deleted, false),
       ),
     )
     .innerJoin(WebCardTable, eq(PostCommentTable.webCardId, WebCardTable.id))
@@ -177,16 +188,6 @@ export const getTopPostsComment = async (
     );
 };
 
-export const getPostCommentById = async (id: string) => {
-  const comments = await db
-    .select()
-    .from(PostCommentTable)
-    .where(eq(PostCommentTable.id, id));
-
-  if (comments.length < 1) return null;
-  return comments[0];
-};
-
 export const updatePostComment = async (id: string, comment: string) => {
   return db
     .update(PostCommentTable)
@@ -194,6 +195,17 @@ export const updatePostComment = async (id: string, comment: string) => {
     .where(eq(PostCommentTable.id, id));
 };
 
-export const removeComment = async (id: string, trx: DbTransaction = db) => {
-  return trx.delete(PostCommentTable).where(eq(PostCommentTable.id, id));
+export const removeComment = async (
+  id: string,
+  userId: string,
+  trx: DbTransaction = db,
+) => {
+  return trx
+    .update(PostCommentTable)
+    .set({
+      deleted: true,
+      deletedAt: new Date(),
+      deletedBy: userId,
+    })
+    .where(eq(PostCommentTable.id, id));
 };

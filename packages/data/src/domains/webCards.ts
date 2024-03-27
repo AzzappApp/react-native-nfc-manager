@@ -9,7 +9,7 @@ import {
   int,
 } from 'drizzle-orm/mysql-core';
 import { createId } from '#helpers/createId';
-import db, { cols } from './db';
+import db, { DEFAULT_DATETIME_VALUE, cols } from './db';
 import { FollowTable } from './follows';
 import { RedirectWebCardTable } from './redirectWebCard';
 import { getUserById } from './users';
@@ -32,7 +32,10 @@ export const WebCardTable = mysqlTable(
     /* Profile infos */
     id: cols.cuid('id').primaryKey().notNull().$defaultFn(createId),
     userName: cols.defaultVarchar('userName').notNull(),
-    lastUserNameUpdate: cols.dateTime('lastUserNameUpdate').notNull(),
+    lastUserNameUpdate: cols
+      .dateTime('lastUserNameUpdate')
+      .notNull()
+      .default(DEFAULT_DATETIME_VALUE),
     webCardKind: mysqlEnum('webCardKind', ['personal', 'business']).notNull(),
     webCardCategoryId: cols.cuid('webCardCategoryId'),
     firstName: cols.defaultVarchar('firstName'),
@@ -40,8 +43,14 @@ export const WebCardTable = mysqlTable(
     commonInformation: json('commonInformation').$type<CommonInformation>(),
     companyName: cols.defaultVarchar('companyName'),
     companyActivityId: cols.cuid('companyActivityId'),
-    createdAt: cols.dateTime('createdAt').notNull(),
-    updatedAt: cols.dateTime('updatedAt').notNull(),
+    createdAt: cols
+      .dateTime('createdAt')
+      .notNull()
+      .default(DEFAULT_DATETIME_VALUE),
+    updatedAt: cols
+      .dateTime('updatedAt')
+      .notNull()
+      .default(DEFAULT_DATETIME_VALUE),
     isMultiUser: boolean('isMultiUser').default(false).notNull(),
 
     /* Cards infos */
@@ -56,7 +65,10 @@ export const WebCardTable = mysqlTable(
     cardIsPrivate: boolean('cardIsPrivate').default(false).notNull(),
     cardIsPublished: boolean('cardIsPublished').default(false).notNull(),
     alreadyPublished: boolean('alreadyPublished').default(false).notNull(),
-    lastCardUpdate: cols.dateTime('lastCardUpdate').notNull(),
+    lastCardUpdate: cols
+      .dateTime('lastCardUpdate')
+      .notNull()
+      .default(DEFAULT_DATETIME_VALUE),
 
     /* Covers infos */
     coverTitle: cols.defaultVarchar('coverTitle'),
@@ -88,6 +100,9 @@ export const WebCardTable = mysqlTable(
     nbPostsLiked: int('nbPostsLiked').default(0).notNull(), // this is the informations postLiked
     nbLikes: int('nbLikes').default(0).notNull(), //this is the stats TotalLikes (number of likes received)
     nbWebCardViews: int('nbWebCardViews').default(0).notNull(),
+    deleted: boolean('deleted').default(false).notNull(),
+    deletedAt: cols.dateTime('deletedAt'),
+    deletedBy: cols.cuid('deletedBy'),
   },
   table => {
     return {
@@ -202,6 +217,7 @@ export const getFollowingsWebCard = async (
     .where(
       and(
         eq(FollowTable.followerId, webCardId),
+        eq(WebCardTable.deleted, false),
         after ? lt(FollowTable.createdAt, after) : undefined,
         userName
           ? sql`MATCH (${WebCardTable.userName}) AGAINST ("${userName}*" IN BOOLEAN MODE)`

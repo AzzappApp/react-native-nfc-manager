@@ -36,6 +36,9 @@ const createPostComment: MutationResolvers['createPostComment'] = async (
     return {
       postComment: {
         id: postCommentId,
+        deleted: false,
+        deletedBy: null,
+        deletedAt: null,
         ...postComment,
         createdAt: new Date(),
       },

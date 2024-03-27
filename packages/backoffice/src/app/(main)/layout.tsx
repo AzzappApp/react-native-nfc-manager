@@ -6,6 +6,7 @@ import {
   ImageAspectRatio,
   Person,
   Person2,
+  Report,
   Style,
 } from '@mui/icons-material';
 import DashboardIcon from '@mui/icons-material/Dashboard';
@@ -117,4 +118,5 @@ const SectionIcons: Record<string, React.ComponentType> = {
   '/cardTemplates': AddCard,
   '/cardTemplateTypes': MergeTypeIcon,
   '/companyActivities': LocalActivityIcon,
+  '/reports': Report,
 };

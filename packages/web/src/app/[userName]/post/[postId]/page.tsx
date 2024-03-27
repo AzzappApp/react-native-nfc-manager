@@ -32,6 +32,11 @@ const PostPage = async (props: PostPageProps) => {
   } = props;
 
   const post = await getPostByIdWithMedia(postId);
+
+  if (post?.deleted) {
+    return notFound();
+  }
+
   const author = post ? await getWebCardById(post.webCardId) : null;
   const seeMorePosts =
     author && post

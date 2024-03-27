@@ -68,7 +68,7 @@ export const DEFAULT_VARCHAR_LENGTH = 191;
 
 const DEFAULT_DATETIME_PRECISION = 3;
 
-const DEFAULT_DATETIME_VALUE = sql`CURRENT_TIMESTAMP(3)`;
+export const DEFAULT_DATETIME_VALUE = sql`CURRENT_TIMESTAMP(3)`;
 
 export const cols = {
   cuid: (name: string) => char(name, { length: 24 }),
@@ -80,7 +80,7 @@ export const cols = {
     datetime(name, {
       mode: 'date',
       fsp: DEFAULT_DATETIME_PRECISION,
-    }).default(DEFAULT_DATETIME_VALUE),
+    }),
   labels: (name: string) => json(name).$type<{ [key: string]: string }>(),
 };
 

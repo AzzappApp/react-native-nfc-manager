@@ -9,7 +9,7 @@ import {
   index,
 } from 'drizzle-orm/mysql-core';
 import { createId } from '#helpers/createId';
-import db, { cols } from './db';
+import db, { DEFAULT_DATETIME_VALUE, cols } from './db';
 import { FollowTable } from './follows';
 import { UserTable } from './users';
 import { WebCardTable } from './webCards';
@@ -42,9 +42,18 @@ export const ProfileTable = mysqlTable(
     contactCardDisplayedOnWebCard: boolean('contactCardDisplayedOnWebCard')
       .default(false)
       .notNull(),
-    createdAt: cols.dateTime('createdAt').notNull(),
-    lastContactCardUpdate: cols.dateTime('lastContactCardUpdate').notNull(),
+    createdAt: cols
+      .dateTime('createdAt')
+      .notNull()
+      .default(DEFAULT_DATETIME_VALUE),
+    lastContactCardUpdate: cols
+      .dateTime('lastContactCardUpdate')
+      .notNull()
+      .default(DEFAULT_DATETIME_VALUE),
     nbContactCardScans: int('nbContactCardScans').default(0).notNull(),
+    deleted: boolean('deleted').default(false).notNull(),
+    deletedAt: cols.dateTime('deletedAt'),
+    deletedBy: cols.cuid('deletedBy'),
   },
   table => {
     return {
@@ -128,7 +137,9 @@ export const getProfilesOfUser = async (userId: string, limit?: number) => {
     .select()
     .from(ProfileTable)
     .innerJoin(WebCardTable, eq(WebCardTable.id, ProfileTable.webCardId))
-    .where(eq(ProfileTable.userId, userId))
+    .where(
+      and(eq(ProfileTable.userId, userId), eq(ProfileTable.deleted, false)),
+    )
     .orderBy(asc(WebCardTable.userName));
 
   return limit ? query.limit(limit) : query;
@@ -169,6 +180,7 @@ export const getProfileByUserName = async (userName: string) => {
     .where(
       and(
         eq(WebCardTable.userName, userName),
+        eq(ProfileTable.deleted, false),
         eq(ProfileTable.profileRole, 'owner'),
       ),
     )
@@ -230,6 +242,7 @@ export const getRecommendedWebCards = async (
         ne(WebCardTable.id, webCardId),
         isNull(FollowTable.followerId),
         eq(WebCardTable.cardIsPublished, true),
+        eq(WebCardTable.deleted, false),
       ),
     )
     .orderBy(desc(WebCardTable.createdAt))

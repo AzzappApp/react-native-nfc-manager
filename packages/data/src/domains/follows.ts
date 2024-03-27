@@ -1,6 +1,6 @@
 import { eq, and } from 'drizzle-orm';
 import { primaryKey, mysqlTable, index } from 'drizzle-orm/mysql-core';
-import db, { cols } from './db';
+import db, { DEFAULT_DATETIME_VALUE, cols } from './db';
 import type { DbTransaction } from './db';
 import type { InferInsertModel, InferSelectModel } from 'drizzle-orm';
 
@@ -9,7 +9,10 @@ export const FollowTable = mysqlTable(
   {
     followerId: cols.cuid('followerId').notNull(),
     followingId: cols.cuid('followingId').notNull(),
-    createdAt: cols.dateTime('createdAt').notNull(),
+    createdAt: cols
+      .dateTime('createdAt')
+      .notNull()
+      .default(DEFAULT_DATETIME_VALUE),
   },
   table => {
     return {
