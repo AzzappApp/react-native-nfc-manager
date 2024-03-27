@@ -1,5 +1,6 @@
-## 0.5.5-canary.184
+## 0.5.5-canary.185
 
+* **feat:**  - add moderation of reports in backoffice ([#3156](https://github.com/AzzappApp/azzapp/pull/3156))
 * **fix:**  - missing method on i18n - wrong merge
 * **feat:**  - [#2073](https://github.com/AzzappApp/azzapp/pull/2073) add missing locales ([#3168](https://github.com/AzzappApp/azzapp/pull/3168))
 * **fix:**  - add azzapA on contactCard ([#3172](https://github.com/AzzappApp/azzapp/pull/3172))
