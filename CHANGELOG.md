@@ -1,5 +1,6 @@
-## 0.5.5-canary.185
+## 0.5.5-canary.186
 
+* **feat:**  - shake n share change gradient color ([#3174](https://github.com/AzzappApp/azzapp/pull/3174))
 * **feat:**  - add moderation of reports in backoffice ([#3156](https://github.com/AzzappApp/azzapp/pull/3156))
 * **fix:**  - missing method on i18n - wrong merge
 * **feat:**  - [#2073](https://github.com/AzzappApp/azzapp/pull/2073) add missing locales ([#3168](https://github.com/AzzappApp/azzapp/pull/3168))
