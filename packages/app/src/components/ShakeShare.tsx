@@ -127,7 +127,7 @@ const ShakeShareDisplay = ({ onClose }: { onClose: () => void }) => {
           animationEnabled={true}
         />
         <LinearGradient
-          colors={['rgba(14, 18, 22,0)', 'rgba(14, 18, 22, 1)']}
+          colors={['rgba(14, 18, 22,0)', 'rgba(0, 0, 0, 1)']}
           start={{ x: 0.5, y: 0 }}
           end={{ x: 0.5, y: 1 }}
           locations={[0.22, 0.66]}
