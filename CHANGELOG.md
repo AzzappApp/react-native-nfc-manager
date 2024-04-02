@@ -1,5 +1,6 @@
-## 0.5.5-canary.188
+## 0.5.5-canary.189
 
+* **build:**  - fix crash on home
 * **fix:**  - build file
 * **docs:**  - fix typo
 * **build:**  - upgrade deps of mobile app ([#3180](https://github.com/AzzappApp/azzapp/pull/3180))
