@@ -37,7 +37,7 @@ const useScrollToTopInterceptor: UseseScrollToTopInterceptor =
       }
     }, []);
 
-    const addListerner = useCallback((scrollView: ScrollView) => {
+    const addListener = useCallback((scrollView: ScrollView) => {
       const nodeHandle = findNodeHandle(scrollView);
       if (nodeHandle == null) {
         return;
@@ -53,7 +53,7 @@ const useScrollToTopInterceptor: UseseScrollToTopInterceptor =
     return scrollView => {
       if (scrollView) {
         removeListener();
-        addListerner(scrollView);
+        addListener(scrollView);
       } else {
         removeListener();
       }

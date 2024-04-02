@@ -96,12 +96,15 @@ const HomeStatisticsChart = ({
           profile.webCard?.statsSummary?.forEach(stats => {
             if (stats) {
               const index = result.findIndex(item => item.day === stats.day);
-              //find the stats in webcard stats for the day
-              result[index].data[indexProfile] = {
-                ...result[index].data[indexProfile],
-                webCardViews: stats.webCardViews,
-                likes: stats.likes,
-              };
+
+              if (index !== -1) {
+                //find the stats in webcard stats for the day
+                result[index].data[indexProfile] = {
+                  ...result[index].data[indexProfile],
+                  webCardViews: stats.webCardViews,
+                  likes: stats.likes,
+                };
+              }
             }
           });
         }
