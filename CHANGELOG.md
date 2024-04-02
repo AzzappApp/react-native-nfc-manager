@@ -1,5 +1,6 @@
-## 0.5.5-canary.190
+## 0.5.5-canary.191
 
+* **fix:**  - add webCardKind on allowed fields
 * **fix:**  - see all users as subscribers
 * **build:**  - fix crash on home
 * **fix:**  - build file
