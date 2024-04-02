@@ -1,4 +1,4 @@
-## 0.5.5-canary.187
+## 0.5.5-canary.188
 
 * **fix:**  - build file
 * **docs:**  - fix typo
