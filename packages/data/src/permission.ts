@@ -216,6 +216,7 @@ const permissions = shield(
       nbFollowers: allow,
       nbFollowings: allow,
       id: allow,
+      webCardKind: allow,
     },
   },
   {
