@@ -6,6 +6,7 @@ import { useRouter } from '#components/NativeRouter';
 import { dispatchGlobalEvent } from '#helpers/globalEvents';
 import relayScreen from '#helpers/relayScreen';
 import { useDeepLinkStoredRoute } from '#hooks/useDeepLink';
+import { useSetRevenueCatUserInfo } from '#hooks/useSetRevenueCatUserInfo';
 import ActivityIndicator from '#ui/ActivityIndicator';
 import Container from '#ui/Container';
 import HomeScreenContent from './HomeScreenContent';
@@ -30,7 +31,7 @@ const HomeScreen = ({
 }: RelayScreenProps<HomeRoute, HomeScreenQuery>) => {
   //we need to wait the initial screen to be load before doing any deep link
   useDeepLinkStoredRoute();
-  // dat
+  useSetRevenueCatUserInfo();
   const { currentUser } = usePreloadedQuery(homeScreenQuery, preloadedQuery);
   const router = useRouter();
 

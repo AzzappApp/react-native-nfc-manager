@@ -19,6 +19,7 @@ export * from './webCardCategories';
 export * from './profiles';
 export * from './redirectWebCard';
 export * from './staticMedias';
+export * from './userSubscriptions';
 export * from './users';
 export * from './webCardStatistics';
 export * from './profileStatistics';

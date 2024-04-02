@@ -1,0 +1,22 @@
+"""
+Represent a Subscription User
+"""
+type UserSubscription {
+  userId: String!
+  """
+  expiration Date of the Subscription
+  """
+  endAt: DateTime!
+  """
+  Returns the subscriptionId (appstore/google play unique code identifier)
+  """
+  subscriptionId: String!
+  """
+  Return the number of seats for the multiUser Subscription
+  """
+  totalSeats: Int!
+  """
+  Return the number of available seats for the multiUser Subscription accross all profiles
+  """
+  availableSeats: Int!
+}

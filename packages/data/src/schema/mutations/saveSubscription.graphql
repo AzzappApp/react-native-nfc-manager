@@ -1,0 +1,28 @@
+extend type Mutation {
+  """
+  Mutation to save common information of a profile
+  """
+  saveSubscription(
+    userId: ID!
+    input: SaveSubscriptionInput!
+  ): SaveSubscriptionPayload!
+}
+
+input SaveSubscriptionInput {
+  subscriptionId: String!
+  startAt: DateTime!
+  endAt: DateTime!
+  revenueCatId: String
+  issuer: IssuerSubscription!
+  totalSeats: Int
+}
+
+enum IssuerSubscription {
+  apple
+  google
+  web
+}
+
+type SaveSubscriptionPayload {
+  userSubscription: UserSubscription!
+}

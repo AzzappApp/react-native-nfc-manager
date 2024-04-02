@@ -43,6 +43,7 @@ generates:
         ColorPalette: ../../domains#ColorPalette as ColorPaletteModel
         WebCardStatistic: ../../domains#WebCardStatistic as WebCardStatisticModel
         ProfileStatistic: ../../domains#ProfileStatistic as ProfileStatisticModel
+        UserSubscription: ../../domains#UserSubscription as UserSubscriptionModel
         WebCard: ../../domains#WebCard as WebCardModel
         User: ../../domains#User as UserModel
         RedirectWebCard: ../../domains#RedirectWebCard as RedirectWebCard

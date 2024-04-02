@@ -6,7 +6,10 @@ import CardTemplateList from '#components/CardTemplateList';
 import useLoadCardTemplateMutation from '#hooks/useLoadCardTemplateMutation';
 import useScreenInsets from '#hooks/useScreenInsets';
 import ActivityIndicator from '#ui/ActivityIndicator';
-import type { CardTemplateListHandle } from '#components/CardTemplateList';
+import type {
+  CardTemplateItem,
+  CardTemplateListHandle,
+} from '#components/CardTemplateList';
 import type { ForwardedRef } from 'react';
 
 type CardEditionStepPros = {
@@ -17,6 +20,7 @@ type CardEditionStepPros = {
   onCoverTemplateApplied: () => void;
   hideHeader: () => void;
   showHeader: () => void;
+  onSelectTemplate?: (template: CardTemplateItem) => void;
 };
 
 const CardEditionStep = (
@@ -28,6 +32,7 @@ const CardEditionStep = (
     onCoverTemplateApplied,
     hideHeader,
     showHeader,
+    onSelectTemplate,
   }: CardEditionStepPros,
   forwardRef: ForwardedRef<CardTemplateListHandle>,
 ) => {
@@ -79,6 +84,7 @@ const CardEditionStep = (
           transform: [{ translateY: -insets.top }],
         }}
         ref={forwardRef}
+        onSelectTemplate={onSelectTemplate}
       />
     </Suspense>
   );

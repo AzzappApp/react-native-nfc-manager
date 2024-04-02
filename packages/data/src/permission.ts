@@ -52,6 +52,17 @@ const hasRole = (
       if (profile.userId !== ctx.auth.userId) {
         throw new GraphQLError(ERRORS.FORBIDDEN);
       }
+    } else if ('userId' in args && typeof args.userId === 'string') {
+      const userId = args.userId;
+      const user = userId && (await ctx.loaders.User.load(userId));
+
+      if (!user) {
+        throw new GraphQLError(ERRORS.FORBIDDEN);
+      }
+
+      if (userId !== ctx.auth.userId) {
+        throw new GraphQLError(ERRORS.FORBIDDEN);
+      }
     } else {
       throw new GraphQLError(ERRORS.FORBIDDEN);
     }
@@ -112,6 +123,7 @@ const ProtectedMutation: Record<
   acceptOwnership: isAnyRoleRule,
   saveCardStyle: isEditorRule,
   saveCommonInformation: isAdminRule,
+  saveSubscription: isAnyRoleRule,
   cancelTransferOwnership: isOwnerRule,
   saveContactCard: isAnyRoleRule,
   saveCover: isEditorRule,
@@ -165,9 +177,12 @@ const permissions = shield(
   {
     Mutation: ProtectedMutation,
     User: {
-      '*': isCurrentUserRule,
+      '*': allow,
       email: allow,
       phoneNumber: allow,
+      userSubscription: allow,
+      publishedWebCards: allow,
+      id: or(isCurrentUserRule, isSameWebCard),
     },
     Profile: {
       '*': isCurrentProfileRule,

@@ -69,3 +69,15 @@ jest.mock('@sentry/react-native', () => ({
   captureMessage: () => jest.fn(),
 }));
 //#endRegion
+
+//#region react-native-purchase
+jest.mock('react-native-purchases', () => ({
+  Purchases: {
+    setup: jest.fn(),
+    addPurchaserInfoUpdateListener: jest.fn(),
+    removePurchaserInfoUpdateListener: jest.fn(),
+    getOfferings: jest.fn(),
+    purchasePackage: jest.fn(),
+    restoreTransactions: jest.fn(),
+  },
+}));

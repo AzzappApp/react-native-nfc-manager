@@ -1,8 +1,10 @@
 import { memo, useCallback } from 'react';
 import { FormattedMessage } from 'react-intl';
 import { Image, View, useColorScheme } from 'react-native';
+import { isModuleKindSubscription } from '@azzapp/shared/subscriptionHelpers';
 import { colors, shadow } from '#theme';
 import { useStyleSheet, createStyleSheet } from '#helpers/createStyles';
+
 import Icon from '#ui/Icon';
 import PressableOpacity from '#ui/PressableOpacity';
 import Text from '#ui/Text';
@@ -14,6 +16,7 @@ export type ModuleSelectionListItem = {
   readonly image_light: number;
   readonly image_dark: number;
   readonly ready: boolean;
+  readonly isSubscriber?: boolean;
 };
 
 type ModuleSelectionListModalItemProps = {
@@ -92,6 +95,9 @@ const ModuleSelectionListModalItem = ({
             <Icon icon="add" style={styles.addIconStyle} />
           </View>
         </View>
+        {isModuleKindSubscription(module.moduleKind) && (
+          <Icon icon="plus_white_border" size={30} style={styles.badge} />
+        )}
       </View>
     </PressableOpacity>
   );
@@ -147,5 +153,10 @@ const styleSheet = createStyleSheet(appearance => ({
   },
   comingSoonText: {
     color: colors.white,
+  },
+  badge: {
+    position: 'absolute',
+    top: 1,
+    right: 9.5,
   },
 }));

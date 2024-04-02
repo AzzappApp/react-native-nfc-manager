@@ -1,7 +1,9 @@
-import { eq } from 'drizzle-orm';
+import { eq, and, inArray, sql } from 'drizzle-orm';
 import { uniqueIndex, mysqlTable, json, boolean } from 'drizzle-orm/mysql-core';
 import { createId } from '#helpers/createId';
 import db, { DEFAULT_DATETIME_VALUE, cols } from './db';
+import { ProfileTable } from './profiles';
+import { WebCardTable } from './webCards';
 import type { DbTransaction } from './db';
 import type { InferInsertModel, InferSelectModel } from 'drizzle-orm';
 
@@ -103,4 +105,28 @@ export const updateUser = async (
     ...data,
   };
   await db.update(UserTable).set(updatedUser).where(eq(UserTable.id, userId));
+};
+
+export const getTotalMultiUser = async (userId: string) => {
+  const webCardIds = await db
+    .select()
+    .from(ProfileTable)
+    .leftJoin(WebCardTable, eq(ProfileTable.webCardId, WebCardTable.id))
+    .where(
+      and(
+        eq(ProfileTable.userId, userId),
+        eq(ProfileTable.profileRole, 'owner'),
+        eq(WebCardTable.isMultiUser, true),
+      ),
+    );
+
+  // Extract the webCardIds from the result
+  const webCardIdList = webCardIds.map(profile => profile.Profile.webCardId);
+
+  // Count the number of profiles associated with the webCardIds
+  return db
+    .select({ count: sql`count(*)`.mapWith(Number) })
+    .from(ProfileTable)
+    .where(inArray(ProfileTable.webCardId, webCardIdList))
+    .then(res => res[0].count);
 };

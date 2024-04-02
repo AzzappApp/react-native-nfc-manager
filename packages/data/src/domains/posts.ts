@@ -270,7 +270,6 @@ export const getFollowingsPostsCount = async (webCardId: string) =>
       ),
     )
     .then(res => res[0].count);
-
 /**
  * Create a post.
  *

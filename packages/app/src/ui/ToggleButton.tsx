@@ -7,6 +7,7 @@ import {
 } from '#helpers/createStyles';
 import PressableBackground from '#ui/PressableBackground';
 import Text from '#ui/Text';
+import type { ReactNode } from 'react';
 
 type ToggleButtonProps = {
   label: string | null | undefined;
@@ -14,6 +15,7 @@ type ToggleButtonProps = {
   variant?: 'primary' | 'rounded_menu';
   onPress: () => void;
   style?: StyleProp<ViewStyle>;
+  rightElement?: ReactNode;
 };
 
 const ToggleButton = ({
@@ -22,6 +24,7 @@ const ToggleButton = ({
   onPress,
   variant = 'primary',
   style = {},
+  rightElement,
 }: ToggleButtonProps) => {
   const colorScheme = useColorScheme();
 
@@ -50,6 +53,7 @@ const ToggleButton = ({
       >
         {label}
       </Text>
+      {rightElement}
     </PressableBackground>
   );
 };
@@ -70,6 +74,7 @@ const styleSheet = createVariantsStyleSheet(appearance => ({
       alignItems: 'center',
       justifyContent: 'center',
       overflow: 'hidden',
+      flexDirection: 'row',
     },
   },
   primary: {

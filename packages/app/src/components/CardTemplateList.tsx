@@ -29,6 +29,7 @@ import Button, { BUTTON_HEIGHT } from '#ui/Button';
 import Container from '#ui/Container';
 import Header, { HEADER_HEIGHT } from '#ui/Header';
 import HeaderButton from '#ui/HeaderButton';
+import Icon from '#ui/Icon';
 import PressableNative from '#ui/PressableNative';
 import SelectSection from '#ui/SelectSection';
 import Text from '#ui/Text';
@@ -64,6 +65,7 @@ type CardTemplateListProps = Omit<ViewProps, 'children'> & {
   onPreviewModal?: () => void;
   onPreviewModalClose?: () => void;
   previewModalStyle?: ViewProps['style'];
+  onSelectTemplate?: (template: CardTemplateItem) => void;
 };
 
 export type CardTemplateListHandle = {
@@ -81,6 +83,7 @@ const CardTemplateList = (
     previewModalStyle,
     onPreviewModal,
     onPreviewModalClose,
+    onSelectTemplate,
     ...props
   }: CardTemplateListProps,
   forwardRef: ForwardedRef<CardTemplateListHandle>,
@@ -181,16 +184,6 @@ const CardTemplateList = (
   const itemWidth = windowWidth - 100;
 
   const selectedIndexRef = useRef(0);
-  const onScroll = useCallback(
-    ({
-      nativeEvent: { contentOffset },
-    }: NativeSyntheticEvent<NativeScrollEvent>) => {
-      selectedIndexRef.current = Math.round(
-        contentOffset.x / (itemWidth + GAP),
-      );
-    },
-    [itemWidth],
-  );
 
   const templates = useMemo<CardTemplateItem[]>(
     () =>
@@ -218,6 +211,22 @@ const CardTemplateList = (
         }) ?? [],
       ).sort((a, b) => (a.label ?? '').localeCompare(b.label ?? '')),
     [data?.cardTemplates?.edges, profile],
+  );
+
+  useEffect(() => {
+    onSelectTemplate?.(templates[0]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const onScroll = useCallback(
+    ({
+      nativeEvent: { contentOffset },
+    }: NativeSyntheticEvent<NativeScrollEvent>) => {
+      const templateIndex = Math.round(contentOffset.x / (itemWidth + GAP));
+      selectedIndexRef.current = templateIndex;
+      onSelectTemplate?.(templates[templateIndex]);
+    },
+    [itemWidth, onSelectTemplate, templates],
   );
 
   useImperativeHandle(forwardRef, () => ({
@@ -290,7 +299,6 @@ const CardTemplateList = (
           <View style={styles.labelContainerHeight}>
             <Text variant="smallbold">{item.label}</Text>
           </View>
-
           <View
             style={[
               styles.webCardContainer,
@@ -318,6 +326,13 @@ const CardTemplateList = (
                 )}
               </View>
             </ScrollView>
+            {item.modules.length > 3 && (
+              <Icon
+                icon="plus_white_border"
+                size={26}
+                style={{ position: 'absolute', right: 17, top: 9 }}
+              />
+            )}
           </View>
         </View>
       );
@@ -494,7 +509,7 @@ const CardTemplateList = (
 
 export default forwardRef(CardTemplateList);
 
-type CardTemplateItem = {
+export type CardTemplateItem = {
   id: string;
   previewMedia: { uri: string; aspectRatio: number } | null;
   label: string | null;

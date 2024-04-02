@@ -1,13 +1,17 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { View } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { graphql, useFragment, useMutation } from 'react-relay';
+import { webcardRequiresSubscription } from '@azzapp/shared/subscriptionHelpers';
 import { buildUserUrl } from '@azzapp/shared/urlHelpers';
 import { colors } from '#theme';
+import { useRouter } from '#components/NativeRouter';
 import ScreenModal from '#components/ScreenModal';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
+import { useIsSubscriber } from '#helpers/SubscriptionContext';
 import useScreenInsets from '#hooks/useScreenInsets';
+
 import { BOTTOM_MENU_HEIGHT } from '#ui/BottomMenu';
 import Button from '#ui/Button';
 import Container from '#ui/Container';
@@ -29,12 +33,19 @@ const WebCardScreenPublishHelper = ({
     id: webCardId,
     userName,
     cardIsPublished,
+    cardModules,
+    webCardKind,
   } = useFragment(
     graphql`
       fragment WebCardScreenPublishHelper_webCard on WebCard {
         id
         userName
         cardIsPublished
+        cardModules {
+          id
+          kind
+        }
+        webCardKind
       }
     `,
     webCard,
@@ -92,6 +103,14 @@ const WebCardScreenPublishHelper = ({
   const [showPublishModal, setShowPublishModal] = useState(false);
 
   const editModeRef = useRef(editMode);
+  const router = useRouter();
+
+  const requireSubscription = useMemo(
+    () => webcardRequiresSubscription(cardModules, webCardKind),
+    [cardModules, webCardKind],
+  );
+
+  const isSubscriber = useIsSubscriber();
 
   useEffect(() => {
     if (!cardIsPublished && !editMode && editModeRef.current) {
@@ -101,6 +120,11 @@ const WebCardScreenPublishHelper = ({
   }, [cardIsPublished, editMode]);
 
   const onPublish = () => {
+    if (requireSubscription && !isSubscriber) {
+      router.push({ route: 'USER_PAY_WALL' });
+      return;
+    }
+
     commit({
       variables: {
         webCardId,
@@ -183,17 +207,35 @@ const WebCardScreenPublishHelper = ({
           <Button
             onPress={onPublish}
             label={
-              <FormattedMessage
-                defaultMessage="Ok, publish my WebCard{azzappA}!"
-                description="Publish modal publish button label"
-                values={{
-                  azzappA: (
-                    <Text style={styles.icon} variant="azzapp">
-                      a
-                    </Text>
-                  ),
+              <View
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  height: '100%',
+                  paddingTop: 5,
                 }}
-              />
+              >
+                <Text
+                  variant="button"
+                  style={{ color: colors.white }}
+                  numberOfLines={1}
+                >
+                  <FormattedMessage
+                    defaultMessage="Ok, publish my WebCard{azzappA}!"
+                    description="Publish modal publish button label"
+                    values={{
+                      azzappA: (
+                        <Text style={styles.icon} variant="azzapp">
+                          a
+                        </Text>
+                      ),
+                    }}
+                  />
+                </Text>
+                {requireSubscription && (
+                  <Icon icon="plus" size={15} style={styles.badge} />
+                )}
+              </View>
             }
             loading={publishing}
           />
@@ -250,5 +292,8 @@ const stylesheet = createStyleSheet(appearance => ({
   },
   icon: {
     color: appearance === 'dark' ? colors.black : colors.white,
+  },
+  badge: {
+    marginLeft: 5,
   },
 }));

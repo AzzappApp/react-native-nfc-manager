@@ -3,6 +3,8 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import { StatusBar, StyleSheet, View, useWindowDimensions } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { graphql, useFragment } from 'react-relay';
+import { moduleCountRequiresSubscription } from '@azzapp/shared/subscriptionHelpers';
+import { colors } from '#theme';
 import CardTemplateList from '#components/CardTemplateList';
 import ScreenModal from '#components/ScreenModal';
 import useAuthState from '#hooks/useAuthState';
@@ -16,7 +18,10 @@ import HeaderButton from '#ui/HeaderButton';
 import Icon from '#ui/Icon';
 import IconButton from '#ui/IconButton';
 import Text from '#ui/Text';
-import type { CardTemplateListHandle } from '#components/CardTemplateList';
+import type {
+  CardTemplateListHandle,
+  CardTemplateItem,
+} from '#components/CardTemplateList';
 import type { LoadCardTemplateModal_webCard$key } from '#relayArtifacts/LoadCardTemplateModal_webCard.graphql';
 
 type LoadCardTemplateModalProps = {
@@ -31,6 +36,8 @@ const LoadCardTemplateModal = ({
   webCard: webCardKey,
 }: LoadCardTemplateModalProps) => {
   const [cardTemplateId, setCardTemplateId] = useState<string | null>(null);
+  const [selectedTemplate, setSelectedTemplate] =
+    useState<CardTemplateItem | null>(null);
 
   const webCard = useFragment(
     graphql`
@@ -38,6 +45,7 @@ const LoadCardTemplateModal = ({
         id
         cardModules {
           id
+          kind
         }
       }
     `,
@@ -124,10 +132,31 @@ const LoadCardTemplateModal = ({
                 variant="icon"
               />
             }
-            middleElement={intl.formatMessage({
-              defaultMessage: 'Load a template',
-              description: 'WebCard creation screen title',
-            })}
+            middleElement={
+              <View style={styles.middleContainer}>
+                <Text variant="large">
+                  <FormattedMessage
+                    defaultMessage="Load a template"
+                    description="WebCard creation screen title"
+                  />
+                </Text>
+
+                {selectedTemplate &&
+                  moduleCountRequiresSubscription(
+                    selectedTemplate.modules.length,
+                  ) && (
+                    <View style={styles.proContainer}>
+                      <Text variant="medium" style={styles.proText}>
+                        <FormattedMessage
+                          defaultMessage="3+ visible sections"
+                          description="WebCard create pro description"
+                        />
+                      </Text>
+                      <Icon icon="plus" size={15} style={styles.badge} />
+                    </View>
+                  )}
+              </View>
+            }
             rightElement={
               <HeaderButton
                 onPress={() => cardTemplateHandle.current?.onSubmit()}
@@ -153,6 +182,7 @@ const LoadCardTemplateModal = ({
               onApplyTemplate={applyTemplate}
               loading={inFlight}
               ref={cardTemplateHandle}
+              onSelectTemplate={setSelectedTemplate}
             />
           </Suspense>
         </Container>
@@ -235,5 +265,22 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     paddingHorizontal: 40,
     width: '100%',
+  },
+  middleContainer: {
+    flex: 1,
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  proContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  proText: {
+    color: colors.grey400,
+  },
+  badge: {
+    marginLeft: 5,
   },
 });

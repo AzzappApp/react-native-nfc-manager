@@ -1,6 +1,5 @@
-import { getProfilesOfUser } from '#domains';
+import { activeUserSubscription, getProfilesOfUser } from '#domains';
 import type { UserResolvers } from './__generated__/types';
-
 export const User: UserResolvers = {
   profiles: async (user, _args, { auth, loaders }) => {
     if (!auth.userId) {
@@ -24,5 +23,15 @@ export const User: UserResolvers = {
     });
 
     return result.map(({ Profile }) => Profile);
+  },
+  userSubscription: async (user, _args, { auth }) => {
+    if (!auth.userId || auth.userId !== user.id) {
+      return null;
+    }
+    const subscription = await activeUserSubscription(auth.userId);
+    if (!subscription || activeUserSubscription.length === 0) {
+      return null;
+    }
+    return subscription[0];
   },
 };

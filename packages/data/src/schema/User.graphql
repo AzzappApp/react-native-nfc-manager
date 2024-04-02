@@ -3,6 +3,10 @@ Represent an Application User
 """
 type User {
   """
+  The ID of an object
+  """
+  id: ID!
+  """
   Returns the email of the user
   """
   email: String
@@ -16,4 +20,13 @@ type User {
   Returns a list of Profiles of the user
   """
   profiles: [Profile!]
+
+  """
+  Returns a list of published WebCards of the user
+  """
+  publishedWebCards: [WebCard!]
+  """
+  Returns the active Subscription
+  """
+  userSubscription: UserSubscription
 }

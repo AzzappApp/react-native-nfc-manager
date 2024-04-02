@@ -7,10 +7,13 @@ import { graphql, useFragment } from 'react-relay';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
 import { COVER_CARD_RADIUS, COVER_RATIO } from '@azzapp/shared/coverHelpers';
 import { combineLatest } from '@azzapp/shared/observableHelpers';
+import { isWebCardKindSubscription } from '@azzapp/shared/subscriptionHelpers';
 import { colors, shadow } from '#theme';
 import { MediaImageRenderer } from '#components/medias';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import { prefetchImage } from '#helpers/mediaHelpers';
+
+import Icon from '#ui/Icon';
 import InfiniteCarousel from '#ui/InfiniteCaroussel';
 import { TAB_BAR_HEIGHT } from '#ui/TabsBar';
 import ToggleButton from '#ui/ToggleButton';
@@ -41,6 +44,7 @@ const webCardCategoriesFragment = graphql`
       uri(pixelRatio: $pixelRatio, width: 256)
     }
     label
+    webCardKind
   }
 `;
 
@@ -148,9 +152,19 @@ const WebCardKinStep = ({
         toggled={webCardCategoryId === item.id}
         onPress={() => onWebCardCategoryChange(item.id)}
         style={styles.webCardCategoryItem}
+        rightElement={
+          isWebCardKindSubscription(item.webCardKind) && (
+            <Icon icon="plus" size={15} style={styles.badge} />
+          )
+        }
       />
     ),
-    [webCardCategoryId, styles.webCardCategoryItem, onWebCardCategoryChange],
+    [
+      webCardCategoryId,
+      styles.webCardCategoryItem,
+      styles.badge,
+      onWebCardCategoryChange,
+    ],
   );
 
   const getWebCardCategoryItemLayout = useCallback(
@@ -275,5 +289,8 @@ const styleSheet = createStyleSheet(apperance => ({
   },
   webCardCategoryItem: {
     marginVertical: 9,
+  },
+  badge: {
+    marginLeft: 5,
   },
 }));

@@ -12,12 +12,14 @@ import {
 } from '@azzapp/shared/cardModuleHelpers';
 import { encodeMediaId } from '@azzapp/shared/imagesHelpers';
 import { combineMultiUploadProgresses } from '@azzapp/shared/networkHelpers';
+import { addingModuleRequireSubscription } from '@azzapp/shared/subscriptionHelpers';
 import { exportLayersToImage, getFilterUri } from '#components/gpu';
 import ImagePicker from '#components/ImagePicker';
 import { useRouter } from '#components/NativeRouter';
 import ScreenModal from '#components/ScreenModal';
 import { getFileName } from '#helpers/fileHelpers';
 import { uploadMedia, uploadSign } from '#helpers/MobileWebAPI';
+import { useIsSubscriber } from '#helpers/SubscriptionContext';
 import useEditorLayout from '#hooks/useEditorLayout';
 import useHandleProfileActionError from '#hooks/useHandleProfileError';
 import useModuleDataEditor from '#hooks/useModuleDataEditor';
@@ -25,6 +27,7 @@ import { BOTTOM_MENU_HEIGHT } from '#ui/BottomMenu';
 import Container from '#ui/Container';
 import Header from '#ui/Header';
 import HeaderButton from '#ui/HeaderButton';
+import ModuleEditionScreenTitle from '#ui/ModuleEditionScreenTitle';
 import TabView from '#ui/TabView';
 import UploadProgressModal from '#ui/UploadProgressModal';
 import CarouselEditionBackgroundPanel from './CarouselEditionBackgroundPanel';
@@ -99,6 +102,7 @@ const CarouselEditionScreen = ({
       fragment CarouselEditionScreen_profile on Profile {
         webCard {
           id
+          cardIsPublished
           cardColors {
             primary
             light
@@ -115,6 +119,9 @@ const CarouselEditionScreen = ({
             gap
             titleFontFamily
             titleFontSize
+          }
+          cardModules {
+            id
           }
           ...WebCardColorPicker_webCard
           ...CarouselEditionBorderPanel_webCard
@@ -206,6 +213,10 @@ const CarouselEditionScreen = ({
   const intl = useIntl();
   const [progressIndicator, setProgressIndicator] =
     useState<Observable<number> | null>(null);
+  const isSubscriber = useIsSubscriber();
+
+  const cardModulesCount =
+    profile.webCard.cardModules.length + (carousel ? 0 : 1);
 
   const onCancel = router.back;
 
@@ -318,6 +329,21 @@ const CarouselEditionScreen = ({
     if (!canSave) {
       return;
     }
+
+    const requireSubscription = addingModuleRequireSubscription(
+      'carousel',
+      cardModulesCount,
+    );
+
+    if (
+      profile.webCard.cardIsPublished &&
+      requireSubscription &&
+      !isSubscriber
+    ) {
+      router.push({ route: 'USER_PAY_WALL' });
+      return;
+    }
+
     const { images, ...rest } = value;
 
     let mediasMap: Record<
@@ -425,18 +451,21 @@ const CarouselEditionScreen = ({
     });
   }, [
     canSave,
+    cardModulesCount,
+    profile.webCard.cardIsPublished,
+    profile.webCard.id,
+    isSubscriber,
     value,
     commit,
-    profile.webCard.id,
     carousel?.id,
-    borderWidth,
-    borderRadius,
-    imageHeight,
-    marginHorizontal,
-    marginVertical,
-    gap,
-    intl,
+    borderWidth.value,
+    borderRadius.value,
+    imageHeight.value,
+    marginHorizontal.value,
+    marginVertical.value,
+    gap.value,
     router,
+    intl,
     handleProfileActionError,
   ]);
 
@@ -452,10 +481,16 @@ const CarouselEditionScreen = ({
   return (
     <Container style={[styles.root, { paddingTop: insetTop }]}>
       <Header
-        middleElement={intl.formatMessage({
-          defaultMessage: 'Image carousel',
-          description: 'Image carousel screen title',
-        })}
+        middleElement={
+          <ModuleEditionScreenTitle
+            label={intl.formatMessage({
+              defaultMessage: 'Image carousel',
+              description: 'Image carousel screen title',
+            })}
+            kind="carousel"
+            moduleCount={cardModulesCount}
+          />
+        }
         leftElement={
           <HeaderButton
             variant="secondary"

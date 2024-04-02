@@ -70,19 +70,30 @@ const multiUserScreenQuery = graphql`
         }
       }
     }
+    currentUser {
+      userSubscription {
+        availableSeats
+        totalSeats
+        endAt
+      }
+    }
   }
 `;
 
 const MultiUserScreen = ({
   preloadedQuery,
 }: RelayScreenProps<MultiUserRoute, MultiUserScreenQuery>) => {
-  const { node } = usePreloadedQuery(multiUserScreenQuery, preloadedQuery);
+  const { node, currentUser } = usePreloadedQuery(
+    multiUserScreenQuery,
+    preloadedQuery,
+  );
   const profile = node?.profile;
 
   const intl = useIntl();
   const router = useRouter();
 
   const styles = useStyleSheet(styleSheet);
+  const isMultiUserSubscription = currentUser?.userSubscription != null;
 
   const [commonInfoFormIsOpened, toggleCommonInfoForm] = useToggle(false);
 
@@ -159,13 +170,17 @@ const MultiUserScreen = ({
 
   const toggleMultiUser = useCallback(
     (value: boolean) => {
+      if (!isMultiUserSubscription) {
+        router.push({ route: 'USER_PAY_WALL' });
+        return;
+      }
       if (value) {
         setAllowMultiUser(value);
       } else {
         setConfirmDeleteMultiUser(true);
       }
     },
-    [setAllowMultiUser],
+    [isMultiUserSubscription, router, setAllowMultiUser],
   );
 
   //#region Transfert ownership

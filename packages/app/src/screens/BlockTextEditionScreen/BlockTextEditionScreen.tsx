@@ -10,7 +10,9 @@ import {
   BLOCK_TEXT_MAX_LENGTH,
   BLOCK_TEXT_STYLE_VALUES,
 } from '@azzapp/shared/cardModuleHelpers';
+import { addingModuleRequireSubscription } from '@azzapp/shared/subscriptionHelpers';
 import { useRouter } from '#components/NativeRouter';
+import { useIsSubscriber } from '#helpers/SubscriptionContext';
 import useEditorLayout from '#hooks/useEditorLayout';
 import useHandleProfileActionError from '#hooks/useHandleProfileError';
 import useModuleDataEditor from '#hooks/useModuleDataEditor';
@@ -18,6 +20,7 @@ import { BOTTOM_MENU_HEIGHT } from '#ui/BottomMenu';
 import Container from '#ui/Container';
 import Header from '#ui/Header';
 import HeaderButton from '#ui/HeaderButton';
+import ModuleEditionScreenTitle from '#ui/ModuleEditionScreenTitle';
 import TabView from '#ui/TabView';
 import TextAreaModal from '#ui/TextAreaModal';
 import BlockTextEditionBottomMenu from './BlockTextEditionBottomMenu';
@@ -100,6 +103,7 @@ const BlockTextEditionScreen = ({
         }
         webCard {
           id
+          cardIsPublished
           cardColors {
             primary
             light
@@ -116,6 +120,9 @@ const BlockTextEditionScreen = ({
             gap
             titleFontFamily
             titleFontSize
+          }
+          cardModules {
+            id
           }
           ...BlockTextSettingsEditionPanel_webCard
         }
@@ -211,6 +218,10 @@ const BlockTextEditionScreen = ({
   const router = useRouter();
 
   const intl = useIntl();
+  const isSubscriber = useIsSubscriber();
+
+  const cardModulesCount =
+    profile.webCard.cardModules.length + (blockText ? 0 : 1);
 
   const onCancel = useCallback(() => {
     router.back();
@@ -270,6 +281,20 @@ const BlockTextEditionScreen = ({
       return;
     }
 
+    const requireSubscription = addingModuleRequireSubscription(
+      'blockText',
+      cardModulesCount,
+    );
+
+    if (
+      profile.webCard.cardIsPublished &&
+      requireSubscription &&
+      !isSubscriber
+    ) {
+      router.push({ route: 'USER_PAY_WALL' });
+      return;
+    }
+
     const input: SaveBlockTextModuleInput = {
       ...value,
       moduleId: blockText?.id,
@@ -297,15 +322,18 @@ const BlockTextEditionScreen = ({
     });
   }, [
     canSave,
+    cardModulesCount,
+    profile.webCard.cardIsPublished,
+    profile.webCard.id,
+    isSubscriber,
     value,
     blockText?.id,
-    profile.webCard.id,
-    textMarginHorizontal,
-    textMarginVertical,
-    marginHorizontal,
-    marginVertical,
-    fontSize,
-    verticalSpacing,
+    textMarginHorizontal.value,
+    textMarginVertical.value,
+    marginHorizontal.value,
+    marginVertical.value,
+    fontSize.value,
+    verticalSpacing.value,
     commit,
     router,
     handleProfileActionError,
@@ -349,10 +377,16 @@ const BlockTextEditionScreen = ({
   return (
     <Container style={[styles.root, { paddingTop: insetTop }]}>
       <Header
-        middleElement={intl.formatMessage({
-          defaultMessage: 'Text Block',
-          description: 'BlockText text screen title',
-        })}
+        middleElement={
+          <ModuleEditionScreenTitle
+            label={intl.formatMessage({
+              defaultMessage: 'Text Block',
+              description: 'BlockText text screen title',
+            })}
+            kind="blockText"
+            moduleCount={cardModulesCount}
+          />
+        }
         leftElement={
           <HeaderButton
             variant="secondary"

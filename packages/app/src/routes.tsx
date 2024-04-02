@@ -175,6 +175,11 @@ export type ConfirmChangeContactRoute = {
   };
 };
 
+export type UserPayWallRoute = {
+  route: 'USER_PAY_WALL';
+  params?: never;
+};
+
 export type Route =
   | AboutRoute
   | AccountDetailsRoute
@@ -203,6 +208,7 @@ export type Route =
   | SearchRoute
   | SignInRoute
   | SignUpRoute
+  | UserPayWallRoute
   | WebCardParametersRoute
   | WebCardRoute;
 

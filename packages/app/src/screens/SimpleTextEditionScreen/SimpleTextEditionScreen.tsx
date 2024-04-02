@@ -11,7 +11,9 @@ import {
   SIMPLE_TEXT_STYLE_VALUES,
   SIMPLE_TITLE_STYLE_VALUES,
 } from '@azzapp/shared/cardModuleHelpers';
+import { addingModuleRequireSubscription } from '@azzapp/shared/subscriptionHelpers';
 import { useRouter } from '#components/NativeRouter';
+import { useIsSubscriber } from '#helpers/SubscriptionContext';
 import useEditorLayout from '#hooks/useEditorLayout';
 import useHandleProfileActionError from '#hooks/useHandleProfileError';
 import useModuleDataEditor from '#hooks/useModuleDataEditor';
@@ -20,6 +22,7 @@ import { BOTTOM_MENU_HEIGHT } from '#ui/BottomMenu';
 import Container from '#ui/Container';
 import Header from '#ui/Header';
 import HeaderButton from '#ui/HeaderButton';
+import ModuleEditionScreenTitle from '#ui/ModuleEditionScreenTitle';
 import TabView from '#ui/TabView';
 import TextAreaModal from '#ui/TextAreaModal';
 import SimpleTextEditionBackgroundPanel from './SimpleTextEditionBackgroundPanel';
@@ -115,6 +118,7 @@ const SimpleTextEditionScreen = ({
       fragment SimpleTextEditionScreen_profile on Profile {
         webCard {
           id
+          cardIsPublished
           cardStyle {
             borderColor
             borderRadius
@@ -131,6 +135,9 @@ const SimpleTextEditionScreen = ({
             primary
             light
             dark
+          }
+          cardModules {
+            id
           }
           ...WebCardColorPicker_webCard
           ...SimpleTextStyleEditionPanel_webCard
@@ -249,6 +256,11 @@ const SimpleTextEditionScreen = ({
 
   const onCancel = router.back;
 
+  const isSubscriber = useIsSubscriber();
+
+  const cardModulesCount =
+    (profile.webCard.cardModules.length ?? 0) + (moduleData ? 0 : 1);
+
   const handleProfileActionError = useHandleProfileActionError(
     intl.formatMessage({
       defaultMessage: 'Error, could not save your module',
@@ -283,6 +295,20 @@ const SimpleTextEditionScreen = ({
       return;
     }
 
+    const requireSubscription = addingModuleRequireSubscription(
+      moduleKind,
+      cardModulesCount,
+    );
+
+    if (
+      profile.webCard.cardIsPublished &&
+      requireSubscription &&
+      !isSubscriber
+    ) {
+      router.push({ route: 'USER_PAY_WALL' });
+      return;
+    }
+
     commit({
       variables: {
         webCardId: profile.webCard.id,
@@ -308,14 +334,16 @@ const SimpleTextEditionScreen = ({
   }, [
     canSave,
     profile.webCard,
+    moduleKind,
+    cardModulesCount,
+    isSubscriber,
     commit,
     value,
-    fontSize,
-    verticalSpacing,
-    marginHorizontal,
-    marginVertical,
+    fontSize.value,
+    verticalSpacing.value,
+    marginHorizontal.value,
+    marginVertical.value,
     moduleData?.id,
-    moduleKind,
     router,
     handleProfileActionError,
   ]);
@@ -355,16 +383,23 @@ const SimpleTextEditionScreen = ({
     windowWidth,
   } = useEditorLayout();
 
-  const middleElement =
-    moduleKind === 'simpleText'
-      ? intl.formatMessage({
-          defaultMessage: 'Simple text',
-          description: 'Simple text screen title',
-        })
-      : intl.formatMessage({
-          defaultMessage: 'Simple title',
-          description: 'Simple title screen title',
-        });
+  const middleElement = (
+    <ModuleEditionScreenTitle
+      label={
+        moduleKind === 'simpleText'
+          ? intl.formatMessage({
+              defaultMessage: 'Simple text',
+              description: 'Simple text screen title',
+            })
+          : intl.formatMessage({
+              defaultMessage: 'Simple title',
+              description: 'Simple title screen title',
+            })
+      }
+      kind={moduleKind}
+      moduleCount={cardModulesCount}
+    />
+  );
 
   return (
     <Container style={[styles.root, { paddingTop: insetTop }]}>

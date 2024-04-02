@@ -61,6 +61,10 @@ const HomeBottomPanel = ({
               email
               phoneNumber
             }
+            cardModules {
+              kind
+            }
+            webCardKind
           }
           ...HomeStatistics_profiles
           ...HomeBottomPanelMessage_profiles

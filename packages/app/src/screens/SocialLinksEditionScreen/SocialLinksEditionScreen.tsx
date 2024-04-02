@@ -8,7 +8,9 @@ import { graphql, useFragment, useMutation } from 'react-relay';
 import * as z from 'zod';
 import { SOCIAL_LINKS_DEFAULT_VALUES } from '@azzapp/shared/cardModuleHelpers';
 import { isValidUrl } from '@azzapp/shared/stringHelpers';
+import { addingModuleRequireSubscription } from '@azzapp/shared/subscriptionHelpers';
 import { useRouter } from '#components/NativeRouter';
+import { useIsSubscriber } from '#helpers/SubscriptionContext';
 import useEditorLayout from '#hooks/useEditorLayout';
 import useHandleProfileActionError from '#hooks/useHandleProfileError';
 import useModuleDataEditor from '#hooks/useModuleDataEditor';
@@ -16,6 +18,7 @@ import { BOTTOM_MENU_HEIGHT } from '#ui/BottomMenu';
 import Container from '#ui/Container';
 import Header from '#ui/Header';
 import HeaderButton from '#ui/HeaderButton';
+import ModuleEditionScreenTitle from '#ui/ModuleEditionScreenTitle';
 import TabView from '#ui/TabView';
 import SocialLinksBackgroundEditionPanel from './SocialLinksBackgroundEditionPanel';
 import SocialLinksEditionBottomMenu from './SocialLinksEditionBottomMenu';
@@ -109,10 +112,14 @@ const SocialLinksEditionScreen = ({
         }
         webCard {
           id
+          cardIsPublished
           cardColors {
             primary
             light
             dark
+          }
+          cardModules {
+            id
           }
           ...SocialLinksSettingsEditionPanel_webCard
         }
@@ -191,6 +198,10 @@ const SocialLinksEditionScreen = ({
 
   const router = useRouter();
   const intl = useIntl();
+  const isSubscriber = useIsSubscriber();
+
+  const cardModulesCount =
+    profile.webCard.cardModules.length + (socialLinks ? 0 : 1);
 
   const onCancel = router.back;
 
@@ -247,6 +258,20 @@ const SocialLinksEditionScreen = ({
       return;
     }
 
+    const requireSubscription = addingModuleRequireSubscription(
+      'socialLinks',
+      cardModulesCount,
+    );
+
+    if (
+      profile.webCard.cardIsPublished &&
+      requireSubscription &&
+      !isSubscriber
+    ) {
+      router.push({ route: 'USER_PAY_WALL' });
+      return;
+    }
+
     const input: SaveSocialLinksModuleInput = {
       ...value,
       iconSize: iconSize.value,
@@ -273,15 +298,18 @@ const SocialLinksEditionScreen = ({
     });
   }, [
     canSave,
-    value,
-    iconSize,
-    borderWidth,
-    columnGap,
-    marginTop,
-    marginBottom,
-    marginHorizontal,
-    socialLinks?.id,
+    cardModulesCount,
+    profile.webCard.cardIsPublished,
     profile.webCard.id,
+    isSubscriber,
+    value,
+    iconSize.value,
+    borderWidth.value,
+    columnGap.value,
+    marginTop.value,
+    marginBottom.value,
+    marginHorizontal.value,
+    socialLinks?.id,
     commit,
     router,
     handleProfileActionError,
@@ -306,10 +334,16 @@ const SocialLinksEditionScreen = ({
   return (
     <Container style={[styles.root, { paddingTop: insetTop }]}>
       <Header
-        middleElement={intl.formatMessage({
-          defaultMessage: 'Links',
-          description: 'SocialLinks text screen title',
-        })}
+        middleElement={
+          <ModuleEditionScreenTitle
+            label={intl.formatMessage({
+              defaultMessage: 'Links',
+              description: 'SocialLinks text screen title',
+            })}
+            kind="socialLinks"
+            moduleCount={cardModulesCount}
+          />
+        }
         leftElement={
           <HeaderButton
             variant="secondary"

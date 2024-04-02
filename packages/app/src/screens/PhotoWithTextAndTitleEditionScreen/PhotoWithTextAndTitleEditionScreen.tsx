@@ -13,6 +13,7 @@ import {
 } from '@azzapp/shared/cardModuleHelpers';
 import { encodeMediaId } from '@azzapp/shared/imagesHelpers';
 import { isNotFalsyString } from '@azzapp/shared/stringHelpers';
+import { addingModuleRequireSubscription } from '@azzapp/shared/subscriptionHelpers';
 import { colors } from '#theme';
 import { exportLayersToImage, getFilterUri } from '#components/gpu';
 import ImagePicker, {
@@ -24,6 +25,7 @@ import ScreenModal from '#components/ScreenModal';
 import { getFileName } from '#helpers/fileHelpers';
 import { downScaleImage } from '#helpers/mediaHelpers';
 import { uploadMedia, uploadSign } from '#helpers/MobileWebAPI';
+import { useIsSubscriber } from '#helpers/SubscriptionContext';
 import useEditorLayout from '#hooks/useEditorLayout';
 import useHandleProfileActionError from '#hooks/useHandleProfileError';
 import useModuleDataEditor from '#hooks/useModuleDataEditor';
@@ -31,6 +33,7 @@ import { BOTTOM_MENU_HEIGHT } from '#ui/BottomMenu';
 import Container from '#ui/Container';
 import Header from '#ui/Header';
 import HeaderButton from '#ui/HeaderButton';
+import ModuleEditionScreenTitle from '#ui/ModuleEditionScreenTitle';
 import PressableOpacity from '#ui/PressableOpacity';
 import TabView from '#ui/TabView';
 import Text from '#ui/Text';
@@ -130,6 +133,7 @@ const PhotoWithTextAndTitleEditionScreen = ({
         }
         webCard {
           id
+          cardIsPublished
           cardColors {
             primary
             dark
@@ -146,6 +150,9 @@ const PhotoWithTextAndTitleEditionScreen = ({
             gap
             titleFontFamily
             titleFontSize
+          }
+          cardModules {
+            id
           }
           ...PhotoWithTextAndTitleSettingsEditionPanel_webCard
         }
@@ -256,6 +263,10 @@ const PhotoWithTextAndTitleEditionScreen = ({
   const intl = useIntl();
   const [progressIndicator, setProgressIndicator] =
     useState<Observable<number> | null>(null);
+  const isSubscriber = useIsSubscriber();
+
+  const cardModulesCount =
+    (profile.webCard.cardModules.length ?? 0) + (photoWithTextAndTitle ? 0 : 1);
 
   const onCancel = router.back;
 
@@ -395,6 +406,21 @@ const PhotoWithTextAndTitleEditionScreen = ({
     if (!canSave) {
       return;
     }
+
+    const requireSubscription = addingModuleRequireSubscription(
+      'photoWithTextAndTitle',
+      cardModulesCount,
+    );
+
+    if (
+      profile.webCard.cardIsPublished &&
+      requireSubscription &&
+      !isSubscriber
+    ) {
+      router.push({ route: 'USER_PAY_WALL' });
+      return;
+    }
+
     const { image: updateImage, ...rest } = value;
     let mediaId = updateImage?.id;
 
@@ -473,21 +499,24 @@ const PhotoWithTextAndTitleEditionScreen = ({
     });
   }, [
     canSave,
+    cardModulesCount,
+    profile.webCard.cardIsPublished,
+    profile.webCard.id,
+    isSubscriber,
     value,
     photoWithTextAndTitle?.id,
-    titleFontSize,
-    titleVerticalSpacing,
-    contentFontSize,
-    contentVerticalSpacing,
-    marginHorizontal,
-    borderRadius,
-    marginVertical,
-    gap,
-    aspectRatio,
-    profile.webCard.id,
+    titleFontSize.value,
+    titleVerticalSpacing.value,
+    contentFontSize.value,
+    contentVerticalSpacing.value,
+    marginHorizontal.value,
+    borderRadius.value,
+    marginVertical.value,
+    gap.value,
+    aspectRatio.value,
     commit,
-    intl,
     router,
+    intl,
     handleProfileActionError,
   ]);
 
@@ -526,10 +555,16 @@ const PhotoWithTextAndTitleEditionScreen = ({
   return (
     <Container style={[styles.root, { paddingTop: insetTop }]}>
       <Header
-        middleElement={intl.formatMessage({
-          defaultMessage: 'Image & Text',
-          description: 'PhotoWithTextAndTitle text screen title',
-        })}
+        middleElement={
+          <ModuleEditionScreenTitle
+            label={intl.formatMessage({
+              defaultMessage: 'Image & Text',
+              description: 'PhotoWithTextAndTitle text screen title',
+            })}
+            kind="photoWithTextAndTitle"
+            moduleCount={cardModulesCount}
+          />
+        }
         leftElement={
           <HeaderButton
             variant="secondary"

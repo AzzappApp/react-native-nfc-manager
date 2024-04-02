@@ -11,6 +11,7 @@ import {
   MODULE_IMAGE_MAX_WIDTH,
 } from '@azzapp/shared/cardModuleHelpers';
 import { encodeMediaId } from '@azzapp/shared/imagesHelpers';
+import { addingModuleRequireSubscription } from '@azzapp/shared/subscriptionHelpers';
 import { CameraButton } from '#components/commonsButtons';
 import { exportLayersToImage, getFilterUri } from '#components/gpu';
 import ImagePicker, {
@@ -22,6 +23,7 @@ import ScreenModal from '#components/ScreenModal';
 import { getFileName } from '#helpers/fileHelpers';
 import { downScaleImage } from '#helpers/mediaHelpers';
 import { uploadMedia, uploadSign } from '#helpers/MobileWebAPI';
+import { useIsSubscriber } from '#helpers/SubscriptionContext';
 import useEditorLayout from '#hooks/useEditorLayout';
 import useHandleProfileActionError from '#hooks/useHandleProfileError';
 import useModuleDataEditor from '#hooks/useModuleDataEditor';
@@ -29,6 +31,7 @@ import { BOTTOM_MENU_HEIGHT } from '#ui/BottomMenu';
 import Container from '#ui/Container';
 import Header from '#ui/Header';
 import HeaderButton from '#ui/HeaderButton';
+import ModuleEditionScreenTitle from '#ui/ModuleEditionScreenTitle';
 import PressableOpacity from '#ui/PressableOpacity';
 import TabView from '#ui/TabView';
 import UploadProgressModal from '#ui/UploadProgressModal';
@@ -112,6 +115,7 @@ const HorizontalPhotoEditionScreen = ({
         }
         webCard {
           id
+          cardIsPublished
           cardColors {
             primary
             light
@@ -128,6 +132,9 @@ const HorizontalPhotoEditionScreen = ({
             gap
             titleFontFamily
             titleFontSize
+          }
+          cardModules {
+            id
           }
           ...HorizontalPhotoBorderEditionPanel_webCard
         }
@@ -204,6 +211,10 @@ const HorizontalPhotoEditionScreen = ({
 
   const [progressIndicator, setProgressIndicator] =
     useState<Observable<number> | null>(null);
+  const isSubscriber = useIsSubscriber();
+
+  const cardModulesCount =
+    profile.webCard.cardModules.length + (horizontalPhoto ? 0 : 1);
 
   const onCancel = router.back;
 
@@ -290,6 +301,21 @@ const HorizontalPhotoEditionScreen = ({
     if (!canSave) {
       return;
     }
+
+    const requireSubscription = addingModuleRequireSubscription(
+      'horizontalPhoto',
+      cardModulesCount,
+    );
+
+    if (
+      profile.webCard.cardIsPublished &&
+      requireSubscription &&
+      !isSubscriber
+    ) {
+      router.push({ route: 'USER_PAY_WALL' });
+      return;
+    }
+
     const { image: updateMedia, ...rest } = value;
 
     let mediaId = updateMedia?.id;
@@ -360,17 +386,20 @@ const HorizontalPhotoEditionScreen = ({
     });
   }, [
     canSave,
-    value,
+    cardModulesCount,
+    profile.webCard.cardIsPublished,
     profile.webCard.id,
+    isSubscriber,
+    value,
     horizontalPhoto?.id,
-    marginHorizontal,
-    marginVertical,
-    borderWidth,
-    borderRadius,
-    imageHeight,
+    marginHorizontal.value,
+    marginVertical.value,
+    borderWidth.value,
+    borderRadius.value,
+    imageHeight.value,
     commit,
-    intl,
     router,
+    intl,
     handleProfileActionError,
   ]);
 
@@ -399,10 +428,16 @@ const HorizontalPhotoEditionScreen = ({
   return (
     <Container style={[styles.root, { paddingTop: insetTop }]}>
       <Header
-        middleElement={intl.formatMessage({
-          defaultMessage: 'Horizontal Image',
-          description: 'HorizontalPhoto text screen title',
-        })}
+        middleElement={
+          <ModuleEditionScreenTitle
+            label={intl.formatMessage({
+              defaultMessage: 'Horizontal Image',
+              description: 'HorizontalPhoto text screen title',
+            })}
+            kind="horizontalPhoto"
+            moduleCount={cardModulesCount}
+          />
+        }
         leftElement={
           <HeaderButton
             variant="secondary"

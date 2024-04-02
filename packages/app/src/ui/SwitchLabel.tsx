@@ -21,20 +21,39 @@ type SwitchLabelProps = Omit<SwitchProps, 'style'> & {
    * The native id of the label (used for accessibility)
    */
   labelID?: string;
+  /**
+   *position of the label compare to the switch
+   *
+   * @type {('left' | 'right')}
+   */
+  labelPosition?: 'left' | 'right';
 };
 
-const SwitchLabel = ({ label, style, labelID, ...props }: SwitchLabelProps) => {
+const SwitchLabel = ({
+  label,
+  style,
+  labelID,
+  labelPosition = 'right',
+  ...props
+}: SwitchLabelProps) => {
   return (
     <View style={[styles.root, style]}>
+      {labelPosition === 'left' && (
+        <Text variant="smallbold" style={styles.text} nativeID={labelID}>
+          {label}
+        </Text>
+      )}
       <Switch
         {...props}
         accessibilityRole="switch"
         accessibilityState={{ selected: props.value, disabled: props.disabled }}
         accessibilityLabelledBy={labelID}
       />
-      <Text variant="smallbold" style={styles.text} nativeID={labelID}>
-        {label}
-      </Text>
+      {labelPosition === 'right' && (
+        <Text variant="smallbold" style={styles.text} nativeID={labelID}>
+          {label}
+        </Text>
+      )}
     </View>
   );
 };

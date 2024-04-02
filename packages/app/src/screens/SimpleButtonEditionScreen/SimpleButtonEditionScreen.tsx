@@ -10,7 +10,9 @@ import {
   SIMPLE_BUTTON_STYLE_VALUES,
 } from '@azzapp/shared/cardModuleHelpers';
 import { isValidUrl, isPhoneNumber } from '@azzapp/shared/stringHelpers';
+import { addingModuleRequireSubscription } from '@azzapp/shared/subscriptionHelpers';
 import { useRouter } from '#components/NativeRouter';
+import { useIsSubscriber } from '#helpers/SubscriptionContext';
 import useEditorLayout from '#hooks/useEditorLayout';
 import useHandleProfileActionError from '#hooks/useHandleProfileError';
 import useModuleDataEditor from '#hooks/useModuleDataEditor';
@@ -18,6 +20,7 @@ import { BOTTOM_MENU_HEIGHT } from '#ui/BottomMenu';
 import Container from '#ui/Container';
 import Header from '#ui/Header';
 import HeaderButton from '#ui/HeaderButton';
+import ModuleEditionScreenTitle from '#ui/ModuleEditionScreenTitle';
 import TabView from '#ui/TabView';
 import SimpleButtonBackgroundEditionPanel from './SimpleButtonBackgroundEditionPanel';
 import SimpleButtonBordersEditionPanel from './SimpleButtonBordersEditionPanel';
@@ -121,6 +124,7 @@ const SimpleButtonEditionScreen = ({
         }
         webCard {
           id
+          cardIsPublished
           cardColors {
             primary
             dark
@@ -137,6 +141,9 @@ const SimpleButtonEditionScreen = ({
             gap
             titleFontFamily
             titleFontSize
+          }
+          cardModules {
+            id
           }
           ...SimpleButtonBordersEditionPanel_webCard
           ...SimpleButtonSettingsEditionPanel_webCard
@@ -251,6 +258,10 @@ const SimpleButtonEditionScreen = ({
 
   const router = useRouter();
   const intl = useIntl();
+  const isSubscriber = useIsSubscriber();
+
+  const cardModulesCount =
+    (profile.webCard.cardModules.length ?? 0) + (simpleButton ? 0 : 1);
 
   const onCancel = router.back;
 
@@ -302,6 +313,20 @@ const SimpleButtonEditionScreen = ({
       return;
     }
 
+    const requireSubscription = addingModuleRequireSubscription(
+      'simpleButton',
+      cardModulesCount,
+    );
+
+    if (
+      profile.webCard.cardIsPublished &&
+      requireSubscription &&
+      !isSubscriber
+    ) {
+      router.push({ route: 'USER_PAY_WALL' });
+      return;
+    }
+
     const input: SaveSimpleButtonModuleInput = {
       ...value,
       moduleId: simpleButton?.id,
@@ -333,15 +358,17 @@ const SimpleButtonEditionScreen = ({
   }, [
     canSave,
     profile.webCard,
+    cardModulesCount,
+    isSubscriber,
     value,
     simpleButton?.id,
-    fontSize,
-    borderWidth,
-    borderRadius,
-    marginTop,
-    marginBottom,
-    width,
-    height,
+    fontSize.value,
+    borderWidth.value,
+    borderRadius.value,
+    marginTop.value,
+    marginBottom.value,
+    width.value,
+    height.value,
     commit,
     router,
     handleProfileActionError,
@@ -364,10 +391,16 @@ const SimpleButtonEditionScreen = ({
   return (
     <Container style={[styles.root, { paddingTop: insetTop }]}>
       <Header
-        middleElement={intl.formatMessage({
-          defaultMessage: 'Simple button',
-          description: 'SimpleButton text screen title',
-        })}
+        middleElement={
+          <ModuleEditionScreenTitle
+            label={intl.formatMessage({
+              defaultMessage: 'Simple button',
+              description: 'SimpleButton text screen title',
+            })}
+            kind="simpleButton"
+            moduleCount={cardModulesCount}
+          />
+        }
         leftElement={
           <HeaderButton
             variant="secondary"

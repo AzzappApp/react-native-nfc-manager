@@ -1,10 +1,11 @@
 import { useState, useCallback, useRef } from 'react';
-import { useIntl } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 import {
   Dimensions,
-  PixelRatio,
   Platform,
   StatusBar,
+  PixelRatio,
+  StyleSheet,
   View,
   useWindowDimensions,
 } from 'react-native';
@@ -12,6 +13,8 @@ import { graphql, usePreloadedQuery } from 'react-relay';
 import { Observable } from 'relay-runtime';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
 import { combineLatest } from '@azzapp/shared/observableHelpers';
+import { moduleCountRequiresSubscription } from '@azzapp/shared/subscriptionHelpers';
+import { colors } from '#theme';
 import { NextHeaderButton } from '#components/commonsButtons';
 import { useRouter } from '#components/NativeRouter';
 import fetchQueryAndRetain from '#helpers/fetchQueryAndRetain';
@@ -21,6 +24,7 @@ import useAuthState from '#hooks/useAuthState';
 import useScreenInsets from '#hooks/useScreenInsets';
 import ActivityIndicator from '#ui/ActivityIndicator';
 import Container from '#ui/Container';
+import Icon from '#ui/Icon';
 import Text from '#ui/Text';
 import CardEditionStep from './CardEditionStep';
 import CoverEditionStep from './CoverEditionStep';
@@ -28,7 +32,10 @@ import PagerHeader, { PAGER_HEADER_HEIGHT } from './PagerHeader';
 import WebCardForm from './WebCardForm';
 import WebCardKinStep from './WebCardKindStep';
 import WizardTransitioner from './WizardTransitioner';
-import type { CardTemplateListHandle } from '#components/CardTemplateList';
+import type {
+  CardTemplateItem,
+  CardTemplateListHandle,
+} from '#components/CardTemplateList';
 import type { CoverEditorHandle } from '#components/CoverEditor/CoverEditor';
 import type { RelayScreenProps } from '#helpers/relayScreen';
 import type { NewWebCardScreenPreloadQuery } from '#relayArtifacts/NewWebCardScreenPreloadQuery.graphql';
@@ -194,6 +201,9 @@ export const NewWebCardScreen = ({
     webCardTemplateRef.current?.onSubmit();
   };
 
+  const [selectedTemplate, setSelectedTemplate] =
+    useState<CardTemplateItem | null>(null);
+
   const intl = useIntl();
   const steps = [
     {
@@ -218,15 +228,30 @@ export const NewWebCardScreen = ({
     },
     {
       title:
-        webCardKind === 'personal'
-          ? intl.formatMessage({
-              defaultMessage: 'What’s your name?',
-              description: 'Profile creation form title for personal webCard',
-            })
-          : intl.formatMessage({
-              defaultMessage: 'Provide more details',
-              description: 'Profile creation form title for business webCard',
-            }),
+        webCardKind === 'personal' ? (
+          intl.formatMessage({
+            defaultMessage: 'What’s your name?',
+            description: 'Profile creation form title for personal webCard',
+          })
+        ) : (
+          <View>
+            <Text variant="large">
+              <FormattedMessage
+                defaultMessage="Provide more details"
+                description="Profile creation form title for business webCard"
+              />
+            </Text>
+            <View style={styles.proContainer}>
+              <Text variant="medium" style={styles.proText}>
+                <FormattedMessage
+                  description="NewWebCardScreen - Description for pro category"
+                  defaultMessage="Professional WebCard"
+                />
+              </Text>
+              <Icon icon="plus" size={15} style={styles.badge} />
+            </View>
+          </View>
+        ),
       element:
         webCardCategory && currentStepIndex === 1 ? (
           <WebCardForm
@@ -246,10 +271,31 @@ export const NewWebCardScreen = ({
       rightElementWidth: 80,
     },
     {
-      title: intl.formatMessage({
-        defaultMessage: 'Create your cover',
-        description: 'Cover creation screen title',
-      }),
+      title:
+        webCardKind === 'personal' ? (
+          intl.formatMessage({
+            defaultMessage: 'Create your cover',
+            description: 'Cover creation screen title',
+          })
+        ) : (
+          <View style={styles.container}>
+            <Text variant="large">
+              <FormattedMessage
+                defaultMessage="Create your cover"
+                description="Cover creation screen title"
+              />
+            </Text>
+            <View style={styles.proContainer}>
+              <Text variant="medium" style={styles.proText}>
+                <FormattedMessage
+                  description="NewWebCardScreen - Description for pro category"
+                  defaultMessage="Professional WebCard"
+                />
+              </Text>
+              <Icon icon="plus" size={15} style={styles.badge} />
+            </View>
+          </View>
+        ),
       element:
         webCardInfo != null && currentStepIndex === 2 ? (
           <CoverEditionStep
@@ -271,10 +317,31 @@ export const NewWebCardScreen = ({
       rightElementWidth: 80,
     },
     {
-      title: intl.formatMessage({
-        defaultMessage: 'Select a template',
-        description: 'WebCard creation screen title',
-      }),
+      title: (
+        <View style={styles.middleContainer}>
+          <Text variant="large">
+            <FormattedMessage
+              defaultMessage="Load a template"
+              description="WebCard creation screen title"
+            />
+          </Text>
+
+          {selectedTemplate &&
+            moduleCountRequiresSubscription(
+              selectedTemplate.modules.length,
+            ) && (
+              <View style={styles.proContainer}>
+                <Text variant="medium" style={styles.proText}>
+                  <FormattedMessage
+                    defaultMessage="3+ visible sections"
+                    description="WebCard create pro description"
+                  />
+                </Text>
+                <Icon icon="plus" size={15} style={styles.badge} />
+              </View>
+            )}
+        </View>
+      ),
       element:
         webCardInfo !== null && currentStepIndex === 3 ? (
           <CardEditionStep
@@ -286,6 +353,7 @@ export const NewWebCardScreen = ({
             hideHeader={() => setHeaderHidden(true)}
             showHeader={() => setHeaderHidden(false)}
             ref={webCardTemplateRef}
+            onSelectTemplate={setSelectedTemplate}
           />
         ) : null,
 
@@ -389,5 +457,30 @@ export default relayScreen(NewWebCardScreen, {
       }
       return combineLatest(observables);
     });
+  },
+});
+
+const styles = StyleSheet.create({
+  container: {
+    display: 'flex',
+    alignItems: 'center',
+  },
+  proText: {
+    color: colors.grey400,
+  },
+  proContainer: {
+    display: 'flex',
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  middleContainer: {
+    flex: 1,
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  badge: {
+    marginLeft: 5,
   },
 });

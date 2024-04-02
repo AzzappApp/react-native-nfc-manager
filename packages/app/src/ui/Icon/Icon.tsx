@@ -328,6 +328,12 @@ const icons = {
   get play_store() {
     return require('./assets/play_store.png');
   },
+  get plus() {
+    return require('./assets/plus.png');
+  },
+  get plus_white_border() {
+    return require('./assets/plus_white_border.png');
+  },
   get rotate() {
     return require('./assets/rotate.png');
   },
@@ -477,6 +483,10 @@ const shouldTintColor = (icon: Icons) => {
     case 'account':
       return false;
     case 'missing':
+      return false;
+    case 'plus':
+      return false;
+    case 'plus_white_border':
       return false;
     default:
       return true;

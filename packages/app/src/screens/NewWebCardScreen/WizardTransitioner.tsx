@@ -15,7 +15,7 @@ import type { Icons } from '#ui/Icon';
 type WizardTransitionerProps = {
   currentStepIndex: number;
   steps: Array<{
-    title: string;
+    title: React.ReactNode;
     element: React.ReactNode;
     backIcon?: Icons;
     rightElement?: React.ReactNode;

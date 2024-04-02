@@ -13,6 +13,7 @@ import {
   MODULE_KIND_SOCIAL_LINKS,
 } from '@azzapp/shared/cardModuleHelpers';
 import ERRORS from '@azzapp/shared/errors';
+import { addingModuleRequireSubscription } from '@azzapp/shared/subscriptionHelpers';
 import {
   getCardModulesByIds,
   type CardModule,
@@ -22,6 +23,9 @@ import {
   updateCardModule,
   createCardModule,
   getCardModuleNextPosition,
+  getUserProfileWithWebCardId,
+  getCardModules,
+  activeUserSubscription,
 } from '#domains';
 import fromGlobalIdWithType from '#helpers/relayIdHelpers';
 import type { GraphQLContext } from '#index';
@@ -41,9 +45,34 @@ const createModuleSavingMutation =
         moduleId?: string | null;
       };
     },
-    { cardUsernamesToRevalidate, loaders }: GraphQLContext,
+    { auth, cardUsernamesToRevalidate, loaders }: GraphQLContext,
   ) => {
+    const { userId } = auth;
     const webCardId = fromGlobalIdWithType(gqlWebCardId, 'WebCard');
+
+    const profile =
+      userId && (await getUserProfileWithWebCardId(userId, webCardId));
+
+    if (!profile) {
+      throw new GraphQLError(ERRORS.INVALID_REQUEST);
+    }
+
+    let webCard = await loaders.WebCard.load(profile.webCardId);
+    if (!webCard) {
+      throw new GraphQLError(ERRORS.INTERNAL_SERVER_ERROR);
+    }
+
+    const modules = await getCardModules(profile.webCardId);
+    const moduleCount = modules.length + (moduleId ? 0 : 1);
+
+    if (
+      addingModuleRequireSubscription(moduleKind, moduleCount) &&
+      webCard.cardIsPublished
+    ) {
+      const subscription = await activeUserSubscription(userId);
+      if (!subscription || subscription.length === 0)
+        throw new GraphQLError(ERRORS.UNAUTHORIZED);
+    }
 
     const { validator, getMedias } = MODULES_SAVE_RULES[moduleKind] ?? {};
 
@@ -102,7 +131,7 @@ const createModuleSavingMutation =
       throw new GraphQLError(ERRORS.INTERNAL_SERVER_ERROR);
     }
 
-    const webCard = await loaders.WebCard.load(webCardId);
+    webCard = await loaders.WebCard.load(webCardId);
     if (!webCard) {
       throw new GraphQLError(ERRORS.INTERNAL_SERVER_ERROR);
     }

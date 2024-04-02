@@ -4,8 +4,10 @@ import { StyleSheet } from 'react-native';
 import { useSharedValue } from 'react-native-reanimated';
 import { graphql, useFragment, useMutation } from 'react-relay';
 import { LINE_DIVIDER_DEFAULT_VALUES } from '@azzapp/shared/cardModuleHelpers';
+import { addingModuleRequireSubscription } from '@azzapp/shared/subscriptionHelpers';
 import { useRouter } from '#components/NativeRouter';
 import WebCardColorPicker from '#components/WebCardColorPicker';
+import { useIsSubscriber } from '#helpers/SubscriptionContext';
 import useEditorLayout from '#hooks/useEditorLayout';
 import useHandleProfileActionError from '#hooks/useHandleProfileError';
 import useModuleDataEditor from '#hooks/useModuleDataEditor';
@@ -13,6 +15,7 @@ import { BOTTOM_MENU_HEIGHT } from '#ui/BottomMenu';
 import Container from '#ui/Container';
 import Header from '#ui/Header';
 import HeaderButton from '#ui/HeaderButton';
+import ModuleEditionScreenTitle from '#ui/ModuleEditionScreenTitle';
 import TabView from '#ui/TabView';
 
 import LineDividerEditionBottomMenu from './LineDividerEditionBottomMenu';
@@ -62,6 +65,7 @@ const LineDividerEditionScreen = ({
     graphql`
       fragment LineDividerEditionScreen_webCard on WebCard {
         id
+        cardIsPublished
         cardColors {
           primary
           light
@@ -78,6 +82,9 @@ const LineDividerEditionScreen = ({
           gap
           titleFontFamily
           titleFontSize
+        }
+        cardModules {
+          id
         }
         ...WebCardColorPicker_webCard
       }
@@ -175,8 +182,23 @@ const LineDividerEditionScreen = ({
     data.marginBottom ?? LINE_DIVIDER_DEFAULT_VALUES.marginBottom,
   );
 
+  const isSubscriber = useIsSubscriber();
+
+  const cardModulesCount =
+    (webCard?.cardModules.length ?? 0) + (lineDivider ? 0 : 1);
+
   const onSave = useCallback(() => {
     if (!canSave || !webCard) {
+      return;
+    }
+
+    const requireSubscription = addingModuleRequireSubscription(
+      'lineDivider',
+      cardModulesCount,
+    );
+
+    if (webCard.cardIsPublished && requireSubscription && !isSubscriber) {
+      router.push({ route: 'USER_PAY_WALL' });
       return;
     }
 
@@ -202,12 +224,14 @@ const LineDividerEditionScreen = ({
   }, [
     canSave,
     webCard,
+    cardModulesCount,
+    isSubscriber,
     commit,
-    height,
-    marginBottom,
-    marginTop,
-    lineDivider?.id,
     value,
+    height.value,
+    marginBottom.value,
+    marginTop.value,
+    lineDivider?.id,
     router,
     handleProfileActionError,
   ]);
@@ -250,10 +274,16 @@ const LineDividerEditionScreen = ({
   return (
     <Container style={[styles.root, { paddingTop: insetTop }]}>
       <Header
-        middleElement={intl.formatMessage({
-          defaultMessage: 'Divider #1',
-          description: 'Line Divider text screen title',
-        })}
+        middleElement={
+          <ModuleEditionScreenTitle
+            label={intl.formatMessage({
+              defaultMessage: 'Divider #1',
+              description: 'Line Divider text screen title',
+            })}
+            kind="lineDivider"
+            moduleCount={cardModulesCount}
+          />
+        }
         leftElement={
           <HeaderButton
             variant="secondary"

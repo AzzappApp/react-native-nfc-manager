@@ -63,7 +63,6 @@ const MultiUserDetailModal = ({
   const { profileInfos } = useAuthState();
   const intl = useIntl();
   const styles = useStyleSheet(styleSheet);
-
   const profile = useFragment(
     graphql`
       fragment MultiUserDetailModal_Profile on Profile

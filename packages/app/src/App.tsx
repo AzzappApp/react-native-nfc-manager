@@ -51,6 +51,7 @@ import {
   ScreenPrefetcherProvider,
   createScreenPrefetcher,
 } from '#helpers/ScreenPrefetcher';
+import SubscriptionProvider from '#helpers/SubscriptionContext';
 import useApplicationFonts from '#hooks/useApplicationFonts';
 import useAuthState from '#hooks/useAuthState';
 import { useDeepLink } from '#hooks/useDeepLink';
@@ -83,6 +84,7 @@ import SearchScreen from '#screens/SearchScreen';
 import SignInScreen from '#screens/SignInScreen';
 import SignupScreen from '#screens/SignUpScreen';
 import UpdateApplicationScreen from '#screens/UpdateApplicationScreen';
+import UserPayWallScreen from '#screens/UserPayWallScreen';
 import WebCardParametersScreen from '#screens/WebCardParametersScreen';
 import WebCardScreen from '#screens/WebCardScreen';
 import Button from '#ui/Button';
@@ -192,6 +194,7 @@ const screens = {
   LIKED_POSTS: LikedPostsScreen,
   MULTI_USER: MultiUserScreen,
   MULTI_USER_ADD: MultiUserAddScreen,
+  USER_PAY_WALL: UserPayWallScreen,
   MEDIA: MediaScreen,
   NEW_POST: PostCreationScreen,
   NEW_WEBCARD: NewWebCardScreen,
@@ -415,27 +418,29 @@ const AppRouter = () => {
 
   return (
     <RelayEnvironmentProvider environment={environment}>
-      <ScreenPrefetcherProvider value={screenPrefetcher}>
-        <SafeAreaProvider
-          initialMetrics={initialWindowMetrics}
-          style={safeAreaBackgroundStyle}
-        >
-          <RouterProvider value={router}>
-            <ScreensRenderer
-              routerState={routerState}
-              screens={screens}
-              tabs={tabs}
-              onScreenDismissed={onScreenDismissed}
-              onFinishTransitioning={onFinishTransitioning}
-            />
-          </RouterProvider>
-          <Toast />
-          <Suspense>
-            <ShakeShare />
-          </Suspense>
-          {showLoadingScreen && <LoadingScreen />}
-        </SafeAreaProvider>
-      </ScreenPrefetcherProvider>
+      <SubscriptionProvider>
+        <ScreenPrefetcherProvider value={screenPrefetcher}>
+          <SafeAreaProvider
+            initialMetrics={initialWindowMetrics}
+            style={safeAreaBackgroundStyle}
+          >
+            <RouterProvider value={router}>
+              <ScreensRenderer
+                routerState={routerState}
+                screens={screens}
+                tabs={tabs}
+                onScreenDismissed={onScreenDismissed}
+                onFinishTransitioning={onFinishTransitioning}
+              />
+            </RouterProvider>
+            <Toast />
+            <Suspense>
+              <ShakeShare />
+            </Suspense>
+            {showLoadingScreen && <LoadingScreen />}
+          </SafeAreaProvider>
+        </ScreenPrefetcherProvider>
+      </SubscriptionProvider>
     </RelayEnvironmentProvider>
   );
 };
