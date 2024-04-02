@@ -1,7 +1,7 @@
 import { FlashList } from '@shopify/flash-list';
 import { useCallback, useMemo, useState } from 'react';
 import { FormattedMessage } from 'react-intl';
-import { Dimensions, StatusBar, useColorScheme, View } from 'react-native';
+import { Dimensions, useColorScheme, View } from 'react-native';
 import { graphql, useFragment } from 'react-relay';
 import { colors } from '#theme';
 import PostRenderer from '#components/PostList/PostRenderer';
@@ -202,12 +202,7 @@ const PostList = ({
     () => (
       <View
         style={{
-          height:
-            windowHeight -
-            (StatusBar.currentHeight ?? 0) -
-            HEADER_HEIGHT -
-            insets.bottom -
-            insets.top,
+          height: windowHeight - HEADER_HEIGHT - insets.bottom - insets.top,
           alignItems: 'center',
           justifyContent: 'center',
         }}

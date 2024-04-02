@@ -1,6 +1,6 @@
 import { Suspense, useCallback, useRef, useState } from 'react';
 import { useIntl } from 'react-intl';
-import { Dimensions, StatusBar, View } from 'react-native';
+import { Dimensions, View } from 'react-native';
 import { graphql, usePreloadedQuery } from 'react-relay';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
 import { combineLatest } from '@azzapp/shared/observableHelpers';
@@ -51,11 +51,7 @@ const CoverEditionScreen = ({
   const insets = useScreenInsets();
 
   const editorHeight =
-    windowHeight -
-    HEADER_HEIGHT -
-    (StatusBar.currentHeight ?? 0) -
-    insets.top -
-    insets.bottom;
+    windowHeight - HEADER_HEIGHT - insets.top - insets.bottom;
 
   return (
     <Container

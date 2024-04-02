@@ -551,8 +551,7 @@ const CardTemplatePreviewModal = ({
 
   const insets = useScreenInsets();
 
-  const previewHeight =
-    windowHeight - insets.top - HEADER_HEIGHT - (StatusBar.currentHeight ?? 0);
+  const previewHeight = windowHeight - insets.top - HEADER_HEIGHT;
 
   if (!visible) {
     return null;

@@ -1,7 +1,7 @@
 import { pick } from 'lodash';
 import { Suspense, useCallback, useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
-import { StatusBar, View, useWindowDimensions } from 'react-native';
+import { View, useWindowDimensions } from 'react-native';
 import { FlatList } from 'react-native-gesture-handler';
 import Toast from 'react-native-toast-message';
 import {
@@ -178,7 +178,6 @@ const CardStyleModal = ({ visible, onRequestClose }: CardStyleModalProps) => {
     HEADER_HEIGHT -
     CARD_STYLE_LIST_HEIGHT -
     CARD_STYLE_BORDER_HEIGHT -
-    (StatusBar.currentHeight ?? 0) -
     insets.bottom;
 
   return (

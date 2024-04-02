@@ -1,6 +1,6 @@
 import { Suspense } from 'react';
 import { useIntl } from 'react-intl';
-import { Dimensions, StatusBar, StyleSheet, View } from 'react-native';
+import { Dimensions, StyleSheet, View } from 'react-native';
 import { graphql, useFragment } from 'react-relay';
 import { useModulesData } from '#components/cardModules/ModuleData';
 import ScreenModal from '#components/ScreenModal';
@@ -74,8 +74,7 @@ const PreviewModal = ({
 
   const insets = useScreenInsets();
 
-  const previewHeight =
-    windowHeight - insets.top - HEADER_HEIGHT - (StatusBar.currentHeight ?? 0);
+  const previewHeight = windowHeight - insets.top - HEADER_HEIGHT;
 
   return (
     <ScreenModal visible={visible} animationType="slide">

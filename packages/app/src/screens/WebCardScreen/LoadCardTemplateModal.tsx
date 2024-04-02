@@ -1,6 +1,6 @@
 import { Suspense, useCallback, useRef, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { StatusBar, StyleSheet, View, useWindowDimensions } from 'react-native';
+import { StyleSheet, View, useWindowDimensions } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { graphql, useFragment } from 'react-relay';
 import { moduleCountRequiresSubscription } from '@azzapp/shared/subscriptionHelpers';
@@ -56,12 +56,7 @@ const LoadCardTemplateModal = ({
   const intl = useIntl();
   const insets = useScreenInsets();
   const { height: windowHeight } = useWindowDimensions();
-  const height =
-    windowHeight -
-    insets.top -
-    insets.bottom -
-    HEADER_HEIGHT -
-    (StatusBar.currentHeight ?? 0);
+  const height = windowHeight - insets.top - insets.bottom - HEADER_HEIGHT;
 
   const [commit, inFlight] = useLoadCardTemplateMutation();
 
