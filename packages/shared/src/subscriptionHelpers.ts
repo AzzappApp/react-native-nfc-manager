@@ -12,15 +12,16 @@ export const moduleCountRequiresSubscription = (moduleCount: number) => {
 };
 
 export const webcardRequiresSubscription = (
-  modules: ReadonlyArray<{ readonly kind: string }>,
-  kind?: string | null,
+  _modules: ReadonlyArray<{ readonly kind: string }>,
+  _kind?: string | null,
 ) => {
-  // return false; //TODO: CHANGE THIS. (did it here to not block the dev test in merge)
-  if (kind && isWebCardKindSubscription(kind)) return true;
+  return false; //TODO: CHANGE THIS. (did it here to not block the dev test in merge)
+  /** if (kind && isWebCardKindSubscription(kind)) return true;
   return (
     moduleCountRequiresSubscription(modules.length) ||
     modules.some(module => isModuleKindSubscription(module.kind))
   );
+  */
 };
 
 export const addingModuleRequireSubscription = (
