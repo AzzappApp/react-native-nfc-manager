@@ -1,5 +1,11 @@
-## 0.5.5-canary.186
+## 0.5.5-canary.187
 
+* **fix:**  - build file
+* **docs:**  - fix typo
+* **build:**  - upgrade deps of mobile app ([#3180](https://github.com/AzzappApp/azzapp/pull/3180))
+* **fix:**  - **android:** header height on samsung ([#3178](https://github.com/AzzappApp/azzapp/pull/3178))
+* **fix:**  - **contactCard:** [#3176](https://github.com/AzzappApp/azzapp/pull/3176) titles with azzapp icon are arrays ([#3179](https://github.com/AzzappApp/azzapp/pull/3179))
+* **feat:**  - Premium with Pro and MultiUser feature ([#2615](https://github.com/AzzappApp/azzapp/pull/2615))
 * **feat:**  - shake n share change gradient color ([#3174](https://github.com/AzzappApp/azzapp/pull/3174))
 * **feat:**  - add moderation of reports in backoffice ([#3156](https://github.com/AzzappApp/azzapp/pull/3156))
 * **fix:**  - missing method on i18n - wrong merge
