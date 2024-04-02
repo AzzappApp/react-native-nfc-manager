@@ -28,7 +28,9 @@
       "env": {
         "NEXT_PUBLIC_URL": "https://azzapp-dev.vercel.app/",
         "NEXT_PUBLIC_API_ENDPOINT": "https://azzapp-dev.vercel.app/api",
-        "DEPLOYMENT_ENVIRONMENT": "development"
+        "DEPLOYMENT_ENVIRONMENT": "development",
+        "PURCHASE_IOS_KEY": "appl_XWlrdgSwpfsScIXTNWeFxtyCqzz",
+        "PURCHASE_ANDROID_KEY": "goog_oeNrOyuTiDWViuGRRPpDIGlVKMR"
       }
     },
     "staging": {
@@ -44,7 +46,9 @@
       "env": {
         "NEXT_PUBLIC_URL": "https://azzapp-staging.vercel.app/",
         "NEXT_PUBLIC_API_ENDPOINT": "https://azzapp-staging.vercel.app/api",
-        "DEPLOYMENT_ENVIRONMENT": "staging"
+        "DEPLOYMENT_ENVIRONMENT": "staging",
+        "PURCHASE_IOS_KEY": "appl_XWlrdgSwpfsScIXTNWeFxtyCqzz",
+        "PURCHASE_ANDROID_KEY": "goog_oeNrOyuTiDWViuGRRPpDIGlVKMR"
       }
     },
     "production": {
