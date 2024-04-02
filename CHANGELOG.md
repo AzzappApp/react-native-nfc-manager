@@ -1,5 +1,6 @@
-## 0.5.5-canary.189
+## 0.5.5-canary.190
 
+* **fix:**  - see all users as subscribers
 * **build:**  - fix crash on home
 * **fix:**  - build file
 * **docs:**  - fix typo
