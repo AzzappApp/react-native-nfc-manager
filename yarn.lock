@@ -5451,10 +5451,10 @@
     "@babel/runtime" "^7.12.5"
     react-error-boundary "^3.1.0"
 
-"@testing-library/react-native@^12.4.4":
-  version "12.4.4"
-  resolved "https://registry.yarnpkg.com/@testing-library/react-native/-/react-native-12.4.4.tgz#300473ae7459f5287c192cfc9fd46c474be2f16d"
-  integrity sha512-2j8ycuQvsTT8s7q4NwnFnnbTQ29/wC22LnMwwnNF+QzqKXz0jcABTkQ/x3xKZsG2lf5F79ZF5ijGsurBuVGRxw==
+"@testing-library/react-native@^12.4.5":
+  version "12.4.5"
+  resolved "https://registry.yarnpkg.com/@testing-library/react-native/-/react-native-12.4.5.tgz#16528aeae7b29238872478f3d1132a2bf821365d"
+  integrity sha512-SfwFwV1MrnvL//9T4C4UyusnZfWy2IOftNU7mG+bspk23bDM9HH1TxsMvec7JVZleraicDO7tP1odFqwb4KPcg==
   dependencies:
     jest-matcher-utils "^29.7.0"
     pretty-format "^29.7.0"
@@ -5715,7 +5715,7 @@
   dependencies:
     "@types/react" "*"
 
-"@types/react@*", "@types/react@16 || 17 || 18", "@types/react@^18.2.67", "@types/react@^18.2.70":
+"@types/react@*", "@types/react@16 || 17 || 18", "@types/react@^18.2.67", "@types/react@^18.2.73":
   version "18.2.67"
   resolved "https://registry.yarnpkg.com/@types/react/-/react-18.2.67.tgz#96b7af0b5e79c756f4bdd981de2ca28472c858e5"
   integrity sha512-vkIE2vTIMHQ/xL0rgmuoECBCkZFZeHr49HeWSc24AptMbNRo7pwSBvj73rlJJs9fGKj0koS+V7kQB1jHS0uCgw==
@@ -9511,6 +9511,11 @@ graphql-relay@^0.10.0:
   resolved "https://registry.yarnpkg.com/graphql-relay/-/graphql-relay-0.10.0.tgz#3b661432edf1cb414cd4a132cf595350e524db2b"
   integrity sha512-44yBuw2/DLNEiMypbNZBt1yMDbBmyVPVesPywnteGGALiBmdyy1JP8jSg8ClLePg8ZZxk0O4BLhd1a6U/1jDOQ==
 
+graphql-relay@^0.10.1:
+  version "0.10.1"
+  resolved "https://registry.yarnpkg.com/graphql-relay/-/graphql-relay-0.10.1.tgz#4729ec92b5cf73879cf76d817ddbee7808d1cec9"
+  integrity sha512-8AtwSe6B0/b4+YzynHr38PP7S+zX5Vs5LEo0BEzGCPq/THAiHa5H5ZLf3bRbKbok15ADxDQSsGJmlqXeJDDPIw==
+
 graphql-request@^6.0.0:
   version "6.1.0"
   resolved "https://registry.yarnpkg.com/graphql-request/-/graphql-request-6.1.0.tgz#f4eb2107967af3c7a5907eb3131c671eac89be4f"
@@ -11219,10 +11224,10 @@ libphonenumber-js@^1.10.45:
   resolved "https://registry.yarnpkg.com/libphonenumber-js/-/libphonenumber-js-1.10.54.tgz#8dfba112f49d1b9c2a160e55f9697f22e50f0841"
   integrity sha512-P+38dUgJsmh0gzoRDoM4F5jLbyfztkU6PY6eSK6S5HwTi/LPvnwXqVCQZlAy1FxZ5c48q25QhxGQ0pq+WQcSlQ==
 
-libphonenumber-js@^1.10.58:
-  version "1.10.58"
-  resolved "https://registry.yarnpkg.com/libphonenumber-js/-/libphonenumber-js-1.10.58.tgz#2015877bd47fd3d32d9fbfcedd75df35be230c9a"
-  integrity sha512-53A0IpJFL9LdHbpeatwizf8KSwPICrqn9H0g3Y7WQ+Jgeu9cQ4Ew3WrRtrLBu/CX2lXd5+rgT01/tGlkbkzOjw==
+libphonenumber-js@^1.10.59:
+  version "1.10.59"
+  resolved "https://registry.yarnpkg.com/libphonenumber-js/-/libphonenumber-js-1.10.59.tgz#ece26801dcf11fe3f8265bbc01981d9d808f9e6c"
+  integrity sha512-HeTsOrDF/hWhEiKqZVwg9Cqlep5x2T+IYDENvT2VRj3iX8JQ7Y+omENv+AIn0vC8m6GYhivfCed5Cgfw27r5SA==
 
 lie@3.1.1:
   version "3.1.1"
@@ -13190,10 +13195,10 @@ react-freeze@^1.0.0:
   resolved "https://registry.yarnpkg.com/react-freeze/-/react-freeze-1.0.3.tgz#5e3ca90e682fed1d73a7cb50c2c7402b3e85618d"
   integrity sha512-ZnXwLQnGzrDpHBHiC56TXFXvmolPeMjTn1UOm610M4EXGzbEDR7oOIyS2ZiItgbs6eZc4oU/a0hpk8PrcKvv5g==
 
-react-hook-form@^7.51.1:
-  version "7.51.1"
-  resolved "https://registry.yarnpkg.com/react-hook-form/-/react-hook-form-7.51.1.tgz#3ce5f8b5ef41903b4054a641cef8c0dc8bf8ae85"
-  integrity sha512-ifnBjl+kW0ksINHd+8C/Gp6a4eZOdWyvRv0UBaByShwU8JbVx5hTcTWEcd5VdybvmPTATkVVXk9npXArHmo56w==
+react-hook-form@^7.51.2:
+  version "7.51.2"
+  resolved "https://registry.yarnpkg.com/react-hook-form/-/react-hook-form-7.51.2.tgz#79f7f72ee217c5114ff831012d1a7ec344096e7f"
+  integrity sha512-y++lwaWjtzDt/XNnyGDQy6goHskFualmDlf+jzEZvjvz6KWDf7EboL7pUvRCzPTJd0EOPpdekYaQLEvvG6m6HA==
 
 react-intl@^6.6.2:
   version "6.6.2"
@@ -13211,10 +13216,10 @@ react-intl@^6.6.2:
     intl-messageformat "10.5.11"
     tslib "^2.4.0"
 
-react-intl@^6.6.3:
-  version "6.6.3"
-  resolved "https://registry.yarnpkg.com/react-intl/-/react-intl-6.6.3.tgz#ac2dd81e7ec7003195163970ebf1db4f1af03b9d"
-  integrity sha512-vLKI0f+Q3pXD5szmCUPikTY7CJDPtxCBMG5YABQZ3IGEKzNB47zlvXyasUFfT25zpgQXeOfhRCdx4q6ubuR6bA==
+react-intl@^6.6.4:
+  version "6.6.4"
+  resolved "https://registry.yarnpkg.com/react-intl/-/react-intl-6.6.4.tgz#4322942dbaf4f6edd3a227dc5e20d768ef071541"
+  integrity sha512-bD+7hVTX3zBFI3z/ffIVZrNkCVK0/sQguQ/DqW5uZ6JFWsuiwOieVcLnmtFiUgMQZLdmwNl2Ur5c10RaO7NWBQ==
   dependencies:
     "@formatjs/ecma402-abstract" "1.18.2"
     "@formatjs/icu-messageformat-parser" "2.7.6"
@@ -13255,10 +13260,10 @@ react-native-blob-util@^0.19.8:
     base-64 "0.1.0"
     glob "^10.3.10"
 
-react-native-bootsplash@^5.4.1:
-  version "5.4.1"
-  resolved "https://registry.yarnpkg.com/react-native-bootsplash/-/react-native-bootsplash-5.4.1.tgz#adfd54a668f65f71d061ac8d2abe55f56c484183"
-  integrity sha512-ldhKjIr6S6wPQicux55r3/l8zVKuvy6bPoij/77t29MR3Tm0D7U9RSgxU1tOi8HFmwx95cUZTxRC3P8GjO5FCA==
+react-native-bootsplash@^5.5.0:
+  version "5.5.0"
+  resolved "https://registry.yarnpkg.com/react-native-bootsplash/-/react-native-bootsplash-5.5.0.tgz#6bce0cab3339743063d2d0703604802c79dc62cb"
+  integrity sha512-AWAGZ1bXvb5b1Z9J0f/nuUCiK2srOClw7ZMtoEbFhWeMy7dPSoDkdueXLvwD/hvK4/PaJHgga2a2ujwOltQyWA==
   dependencies:
     "@emotion/hash" "^0.9.1"
     "@expo/config-plugins" "^7.8.4"
@@ -13292,10 +13297,10 @@ react-native-encrypted-storage@^4.0.3:
   resolved "https://registry.yarnpkg.com/react-native-encrypted-storage/-/react-native-encrypted-storage-4.0.3.tgz#2a4d65459870511e8f4ccd22f02433dab7fa5e91"
   integrity sha512-0pJA4Aj2S1PIJEbU7pN/Qvf7JIJx3hFywx+i+bLHtgK0/6Zryf1V2xVsWcrD50dfiu3jY1eN2gesQ5osGxE7jA==
 
-react-native-gesture-handler@~2.15.0:
-  version "2.15.0"
-  resolved "https://registry.yarnpkg.com/react-native-gesture-handler/-/react-native-gesture-handler-2.15.0.tgz#f8e6c0451a7bdf065edb7b9be605480db402baa0"
-  integrity sha512-cmMGW8k86o/xgVTBZZOPohvR5re4Vh65PUxH4HbBBJAYTog4aN4wTVTUlnoky01HuSN8/X4h3tI/K3XLPoDnsg==
+react-native-gesture-handler@^2.16.0:
+  version "2.16.0"
+  resolved "https://registry.yarnpkg.com/react-native-gesture-handler/-/react-native-gesture-handler-2.16.0.tgz#45a00b5988e74ebc58f130c8d1443319c8e678db"
+  integrity sha512-1hFkx7RIfeJSyTQQ0Nkv4icFVZ5+XjQkd47OgZMBFzoB7ecL+nFSz8KLi3OCWOhq+nbHpSPlSG5VF3CQNCJpWA==
   dependencies:
     "@egjs/hammerjs" "^2.0.17"
     hoist-non-react-statics "^3.3.0"
@@ -13313,10 +13318,10 @@ react-native-image-size@^1.1.6:
   resolved "https://registry.yarnpkg.com/react-native-image-size/-/react-native-image-size-1.1.6.tgz#a380a605cd43ebfc13c30dad12b4e456f5647345"
   integrity sha512-UlfyBqYvmf2TjHSV25mh4Se7xw6zTkodvt6DjSZJefqEfz4ZECk+petIadSDFVWgPOqULB+3LIrj6U6t/SlKQA==
 
-react-native-keyboard-controller@^1.11.4:
-  version "1.11.4"
-  resolved "https://registry.yarnpkg.com/react-native-keyboard-controller/-/react-native-keyboard-controller-1.11.4.tgz#1b7bbd3b72f742d4616225715caedbd53ffb63ea"
-  integrity sha512-Gn/3d7dut8IyCZikvywKivwrYFfpj3YFaT8YcxtTL46jeoG61qFIjzEV2OPdRy476c6Mea3rByhrdiR30XCfVg==
+react-native-keyboard-controller@^1.11.5:
+  version "1.11.5"
+  resolved "https://registry.yarnpkg.com/react-native-keyboard-controller/-/react-native-keyboard-controller-1.11.5.tgz#480fb0093e421f6947e302c9dd31bf8e349bc1e0"
+  integrity sha512-AtlJVz+Sm9uh5Y+k0AhqJDVnbpYkieOE+qHwO8046Fyt9blxK5pGprOQLNy9hcJjfxwhiwiSFk9VyZlZfaYe6Q==
 
 react-native-localize@^3.0.6:
   version "3.0.6"
@@ -13343,10 +13348,10 @@ react-native-monorepo-tools@^1.2.1:
     find-root "^1.1.0"
     glob "^7.1.7"
 
-react-native-pager-view@^6.2.3:
-  version "6.2.3"
-  resolved "https://registry.yarnpkg.com/react-native-pager-view/-/react-native-pager-view-6.2.3.tgz#698f6387fdf06cecc3d8d4792604419cb89cb775"
-  integrity sha512-dqVpXWFtPNfD3D2QQQr8BP+ullS5MhjRJuF8Z/qml4QTILcrWaW8F5iAxKkQR3Jl0ikcEryG/+SQlNcwlo0Ggg==
+react-native-pager-view@^6.3.0:
+  version "6.3.0"
+  resolved "https://registry.yarnpkg.com/react-native-pager-view/-/react-native-pager-view-6.3.0.tgz#7e734e84b1692f877591335373f6fd92f0d67aa6"
+  integrity sha512-ufJOoVa9pFL1J/yb4hpsCqp8n1qTlcF5VvwqvCacHX//D7hSeRscsiIXg1u1pXNWwllvACb+mqxec/3Uj2mxrA==
 
 react-native-permissions@^4.1.5:
   version "4.1.5"
@@ -13386,10 +13391,10 @@ react-native-safe-area-context@^4.9.0:
   resolved "https://registry.yarnpkg.com/react-native-safe-area-context/-/react-native-safe-area-context-4.9.0.tgz#21a570ca3594cb4259ba65f93befaa60d91bcbd0"
   integrity sha512-/OJD9Pb8IURyvn+1tWTszWPJqsbZ4hyHBU9P0xhOmk7h5owSuqL0zkfagU0pg7Vh0G2NKQkaPpUKUMMCUMDh/w==
 
-react-native-screens@~3.29.0:
-  version "3.29.0"
-  resolved "https://registry.yarnpkg.com/react-native-screens/-/react-native-screens-3.29.0.tgz#1dee0326defbc1d4ef4e68287abb32a8e6b76b29"
-  integrity sha512-yB1GoAMamFAcYf4ku94uBPn0/ani9QG7NdI98beJ5cet2YFESYYzuEIuU+kt+CNRcO8qqKeugxlfgAa3HyTqlg==
+react-native-screens@^3.30.1:
+  version "3.30.1"
+  resolved "https://registry.yarnpkg.com/react-native-screens/-/react-native-screens-3.30.1.tgz#254f5cbbeed649492da112756f85ecae3ccf313e"
+  integrity sha512-/muEvjocCtFb+j5J3YmLvB25+f4rIU8hnnxgGTkXcAf2omPBY8uhPjJaaFUlvj64VEoEzJcRpugbXWsjfPPIFg==
   dependencies:
     react-freeze "^1.0.0"
     warn-once "^0.1.0"
@@ -13438,10 +13443,10 @@ react-native-version@^4.0.0:
     resolve-from "^5.0.0"
     semver "^7.0.0"
 
-react-native-vision-camera@^4.0.0-beta.10:
-  version "4.0.0-beta.10"
-  resolved "https://registry.yarnpkg.com/react-native-vision-camera/-/react-native-vision-camera-4.0.0-beta.10.tgz#4f6564a8355a809d2dc9789fc5ebee5cf8f7e21d"
-  integrity sha512-PLXaFuBUmxeNCsFpzLmApj7OkcQ0vzJCVAEDCgNI8HQ7NSCuPnGyiUU8UHdtfPpXmILQjn+u5gnte99+a/qtKw==
+react-native-vision-camera@^4.0.0-beta.11:
+  version "4.0.0-beta.11"
+  resolved "https://registry.yarnpkg.com/react-native-vision-camera/-/react-native-vision-camera-4.0.0-beta.11.tgz#862e3ed77b2930a4c9cfc8f408eb12e8251ea8b7"
+  integrity sha512-cKg/nwT0q0H1ivEVG+PQt/QxhFgf/dd7SiMm7bCzlSCmt0T2tXyIdLsuY312iKBB2qasQZOYtzRsoQjipHQkDw==
 
 react-native@^0.73.6:
   version "0.73.6"

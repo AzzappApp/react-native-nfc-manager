@@ -18,7 +18,7 @@ import { isRouteEqual, type Route, type ROUTES } from '#routes';
 import { createId } from '#helpers/idHelpers';
 import type { ComponentType, ReactNode, Provider, Ref } from 'react';
 import type { NativeSyntheticEvent, TargetedEvent } from 'react-native';
-import type { NativeScreen, ScreenProps } from 'react-native-screens';
+import type { ScreenProps } from 'react-native-screens';
 
 // TODO some use case of TABS usage and screen listener might be wrong
 
@@ -701,7 +701,7 @@ export type ScreenOptions = Omit<
   | 'onTransitionProgress'
   | 'onWillAppear'
   | 'onWillDisappear'
-> & { ref?: Ref<NativeScreen> };
+> & { ref?: Ref<Screen> };
 
 export type NativeScreenProps<T extends Route> = {
   screenId: string;
