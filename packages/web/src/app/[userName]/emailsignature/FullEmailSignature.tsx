@@ -16,7 +16,7 @@ import { Button } from '#ui';
 import CoverRenderer from '#components/renderer/CoverRenderer';
 import notFound from '../not-found';
 import styles from './page.css';
-import type { Media, WebCard } from '@azzapp/data/domains';
+import type { Media, WebCard } from '@azzapp/data';
 import type { EmailSignatureParsed } from '@azzapp/shared/emailSignatureHelpers';
 
 const FullEmailSignature = ({

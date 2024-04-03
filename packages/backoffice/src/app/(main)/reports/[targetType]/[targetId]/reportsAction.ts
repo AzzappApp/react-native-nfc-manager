@@ -7,10 +7,10 @@ import {
   PostTable,
   WebCardTable,
   db,
-} from '@azzapp/data/domains';
-import { ReportTable } from '@azzapp/data/domains/report';
+  ReportTable,
+} from '@azzapp/data';
 import { getSession } from '#helpers/session';
-import type { TargetType } from '@azzapp/data/domains/report';
+import type { TargetType } from '@azzapp/data';
 
 export const ignoreReport = async (
   targetId: string,

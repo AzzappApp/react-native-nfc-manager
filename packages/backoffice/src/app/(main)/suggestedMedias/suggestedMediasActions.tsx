@@ -8,10 +8,10 @@ import {
   MediaTable,
   checkMedias,
   db,
-} from '@azzapp/data/domains';
+} from '@azzapp/data';
 import { ADMIN } from '#roles';
 import { currentUserHasRole } from '#helpers/roleHelpers';
-import type { MediaSuggestion, NewMediaSuggestion } from '@azzapp/data/domains';
+import type { MediaSuggestion, NewMediaSuggestion } from '@azzapp/data';
 
 export const addSuggestions = async ({
   medias,

@@ -10,10 +10,6 @@
     "./*": {
       "types": "./lib/*.d.ts",
       "default": "./lib/*.js"
-    },
-    "./domains": {
-      "types": "./lib/domains/index.d.ts",
-      "default": "./lib/domains/index.js"
     }
   },
   "scripts": {
@@ -37,22 +33,11 @@
   "dependencies": {
     "@azzapp/i18n": "0.5.5-canary.193",
     "@azzapp/shared": "0.5.5-canary.193",
-    "@graphql-tools/schema": "^10.0.3",
     "@paralleldrive/cuid2": "^2.2.2",
     "@planetscale/database": "^1.16.0",
-    "dataloader": "^2.2.2",
-    "drizzle-orm": "^0.30.6",
-    "graphql": "^16.8.1",
-    "graphql-middleware": "^6.1.35",
-    "graphql-relay": "^0.10.1",
-    "graphql-scalars": "^1.23.0",
-    "graphql-shield": "^7.6.5",
-    "graphql-tag": "^2.12.6",
-    "lodash": "^4.17.21",
-    "zod": "^3.22.4"
+    "drizzle-orm": "^0.30.6"
   },
   "devDependencies": {
-    "@types/lodash": "4.17.0",
     "drizzle-kit": "0.20.14",
     "node-fetch": "^3"
   }

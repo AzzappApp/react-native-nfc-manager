@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { getUserById } from '@azzapp/data/domains';
+import { getUserById } from '@azzapp/data';
 import backOfficeSections from '#backOfficeSections';
 import { destroySession, getRequestSession } from '#helpers/session';
 import type { SubSection } from '#backOfficeSections';

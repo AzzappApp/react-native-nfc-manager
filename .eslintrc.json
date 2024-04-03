@@ -34,6 +34,7 @@
     "packages/app/vendor",
     "packages/data/lib",
     "packages/shared/lib",
+    "packages/schema/lib",
     "packages/web/.next",
     "trash"
   ],

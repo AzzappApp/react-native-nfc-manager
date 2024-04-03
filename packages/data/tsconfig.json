@@ -3,8 +3,8 @@
   "compilerOptions": {
     "noEmit": true,
     "paths": {
-      "@azzapp/shared/*": ["../../shared/src/*"],
-      "#*": ["./src/*"]
+      "@azzapp/shared/*": ["../shared/src/*"],
+      "#*": ["./src/*"],
     }
   },
   "include": ["**/*.ts", "**/*.tsx", "**/*.js", "**/*.jsx", "**/*.json"],

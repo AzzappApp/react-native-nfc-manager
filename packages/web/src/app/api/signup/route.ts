@@ -8,7 +8,7 @@ import {
   getUserByEmail,
   getUserByPhoneNumber,
   updateUser,
-} from '@azzapp/data/domains';
+} from '@azzapp/data';
 import ERRORS from '@azzapp/shared/errors';
 import {
   REGEX_PWD,
@@ -17,7 +17,7 @@ import {
 } from '@azzapp/shared/stringHelpers';
 import { handleSignInAuthMethod } from '#helpers/auth';
 import { twilioVerificationService } from '#helpers/twilioHelpers';
-import type { User } from '@azzapp/data/domains';
+import type { User } from '@azzapp/data';
 
 const SignupSchema = z
   .object({

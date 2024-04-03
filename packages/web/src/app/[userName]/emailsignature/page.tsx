@@ -1,5 +1,5 @@
 import Image from 'next/image';
-import { getMediasByIds } from '@azzapp/data/domains';
+import { getMediasByIds } from '@azzapp/data';
 import azzappFull from '#assets/images/azzapp-full.png';
 import dlAndroid from '#assets/images/download_android.png';
 import dlIos from '#assets/images/download_ios.png';

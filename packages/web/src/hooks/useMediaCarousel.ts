@@ -1,5 +1,5 @@
 import { useEffect, useMemo } from 'react';
-import type { Media } from '@azzapp/data/domains';
+import type { Media } from '@azzapp/data';
 import type { RefObject } from 'react';
 
 const useMediaCarousel = (

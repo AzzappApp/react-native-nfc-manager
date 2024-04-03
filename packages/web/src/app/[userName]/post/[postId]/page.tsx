@@ -7,7 +7,7 @@ import {
   getPostCommentsWithWebCard,
   getWebCardById,
   getWebCardsPostsWithMedias,
-} from '@azzapp/data/domains';
+} from '@azzapp/data';
 import { decodeMediaId } from '@azzapp/shared/imagesHelpers';
 import { getMetaData } from '#helpers/seo';
 import CloudinaryImage from '#ui/CloudinaryImage';

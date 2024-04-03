@@ -9,7 +9,7 @@ import DownloadAppModal from '#components/DownloadAppModal';
 import ShareModal from '#components/ShareModal';
 import styles from './CommentFeedActions.css';
 import type { ModalActions } from '#ui/Modal';
-import type { Media, PostWithMedias, WebCard } from '@azzapp/data/domains';
+import type { Media, PostWithMedias, WebCard } from '@azzapp/data';
 
 type CommentFeedActionsProps = {
   defaultPost: PostWithMedias;

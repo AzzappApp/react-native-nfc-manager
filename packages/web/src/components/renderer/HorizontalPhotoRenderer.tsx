@@ -7,7 +7,7 @@ import {
 import CloudinaryImage from '#ui/CloudinaryImage';
 import CardModuleBackground from '../CardModuleBackground';
 import type { ModuleRendererProps } from './ModuleRenderer';
-import type { CardModuleHorizontalPhoto } from '@azzapp/data/domains';
+import type { CardModuleHorizontalPhoto } from '@azzapp/data';
 
 export type HorizontalPhotoRendererProps =
   ModuleRendererProps<CardModuleHorizontalPhoto> &

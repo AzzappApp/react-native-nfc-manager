@@ -5,7 +5,7 @@ import {
   getUserByEmail,
   getUserByPhoneNumber,
   updateUser,
-} from '@azzapp/data/domains';
+} from '@azzapp/data';
 import ERRORS from '@azzapp/shared/errors';
 import { isValidEmail } from '@azzapp/shared/stringHelpers';
 import { handleSignInAuthMethod } from '#helpers/auth';

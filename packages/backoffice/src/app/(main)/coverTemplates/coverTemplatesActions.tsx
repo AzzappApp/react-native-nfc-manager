@@ -12,12 +12,12 @@ import {
   getMediasByIds,
   getWebCardByUserName,
   referencesMedias,
-} from '@azzapp/data/domains';
+} from '@azzapp/data';
 import { ADMIN } from '#roles';
 import { currentUserHasRole } from '#helpers/roleHelpers';
 import { coverTemplateSchema } from './coverTemplateSchema';
 import type { CoverTemplateFormValue } from './coverTemplateSchema';
-import type { NewCoverTemplate } from '@azzapp/data/domains';
+import type { NewCoverTemplate } from '@azzapp/data';
 
 export const saveCoverTemplate = async (
   data: CoverTemplateFormValue & { id?: string },

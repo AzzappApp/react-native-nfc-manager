@@ -1,11 +1,11 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
-import { createColorPalette, updateColorPalette } from '@azzapp/data/domains';
+import { createColorPalette, updateColorPalette } from '@azzapp/data';
 import { ADMIN } from '#roles';
 import { currentUserHasRole } from '#helpers/roleHelpers';
 import { colorPaletteSchema } from './colorPaletteSchema';
-import type { ColorPalette, NewColorPalette } from '@azzapp/data/domains';
+import type { ColorPalette, NewColorPalette } from '@azzapp/data';
 
 export const saveColorPalette = async (
   data: ColorPalette | NewColorPalette,

@@ -6,7 +6,7 @@ import { useMediaCarousel } from '#hooks';
 import { ButtonIcon } from '#ui';
 import CarouselMedia from './CarouselMedia';
 import styles from './CarouselRenderer.css';
-import type { Media } from '@azzapp/data/domains';
+import type { Media } from '@azzapp/data';
 
 type CarouselProps = {
   imageHeight: number;

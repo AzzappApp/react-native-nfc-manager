@@ -3,7 +3,7 @@ import {
   getMediasByIds,
   buildDefaultContactCard,
   getProfileWithWebCardById,
-} from '@azzapp/data/domains';
+} from '@azzapp/data';
 import { getTextColor } from '@azzapp/shared/colorsHelpers';
 import { seal } from '@azzapp/shared/crypto';
 import serializeAndSignContactCard from '@azzapp/shared/serializeAndSignContactCard';

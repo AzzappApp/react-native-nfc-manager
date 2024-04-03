@@ -1,7 +1,7 @@
 import sgMail from '@sendgrid/mail';
 import { NextResponse } from 'next/server';
 import QRCode from 'qrcode';
-import { getProfileWithWebCardById, getUserById } from '@azzapp/data/domains';
+import { getProfileWithWebCardById, getUserById } from '@azzapp/data';
 import ERRORS from '@azzapp/shared/errors';
 import serializeAndSignContactCard from '@azzapp/shared/serializeAndSignContactCard';
 import serializeAndSignEmailSignature from '@azzapp/shared/serializeAndSignEmailSignature';

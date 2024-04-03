@@ -11,7 +11,7 @@ import {
   buildDefaultContactCard,
   getUserProfileWithWebCardId,
   getWebCardById,
-} from '@azzapp/data/domains';
+} from '@azzapp/data';
 import ERRORS from '@azzapp/shared/errors';
 import serializeAndSignContactCard from '@azzapp/shared/serializeAndSignContactCard';
 import { buildUserUrlWithContactCard } from '@azzapp/shared/urlHelpers';

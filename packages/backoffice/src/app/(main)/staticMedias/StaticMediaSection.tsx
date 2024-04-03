@@ -22,7 +22,7 @@ import {
   getCloudinaryAssetURL,
   getImageURL,
 } from '@azzapp/shared/imagesHelpers';
-import type { StaticMedia } from '@azzapp/data/domains';
+import type { StaticMedia } from '@azzapp/data';
 import type { DragStartEvent, DragEndEvent } from '@dnd-kit/core';
 import type { BoxProps } from '@mui/material';
 

@@ -30,11 +30,7 @@ import type {
   CardTemplateErrors,
   CardTemplateFormValue,
 } from './cardTemplateSchema';
-import type {
-  CardStyle,
-  CardTemplate,
-  CardTemplateType,
-} from '@azzapp/data/domains';
+import type { CardStyle, CardTemplate, CardTemplateType } from '@azzapp/data';
 
 type CoverTemplateFormProps = {
   cardTemplate?: CardTemplate;

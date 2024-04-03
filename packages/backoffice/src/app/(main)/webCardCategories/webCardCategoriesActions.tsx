@@ -10,7 +10,7 @@ import {
   db,
   referencesMedias,
   checkMedias,
-} from '@azzapp/data/domains';
+} from '@azzapp/data';
 import { ADMIN } from '#roles';
 import { currentUserHasRole } from '#helpers/roleHelpers';
 import { webCardCategorySchema } from './webCardCategorySchema';
@@ -18,7 +18,7 @@ import type {
   NewWebCardCategory,
   WebCardCategory,
   CompanyActivity,
-} from '@azzapp/data/domains';
+} from '@azzapp/data';
 
 export const saveWebCardCategory = async (
   data: {

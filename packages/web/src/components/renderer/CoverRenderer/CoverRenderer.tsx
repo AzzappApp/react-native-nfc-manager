@@ -20,7 +20,7 @@ import { animations } from './CoverRendererAnimations';
 import CoverTextRenderer from './CoverTextRenderer';
 import type { CoverLottiePlayerHandle } from './CoverLottiePlayer';
 import type { CoverTextRenderHandler } from './CoverTextRenderer';
-import type { Media, WebCard } from '@azzapp/data/domains';
+import type { Media, WebCard } from '@azzapp/data';
 
 type CoverRendererProps = Omit<
   React.HTMLProps<HTMLDivElement>,

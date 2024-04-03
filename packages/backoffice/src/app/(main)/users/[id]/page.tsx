@@ -1,5 +1,5 @@
 import { notFound } from 'next/navigation';
-import { getUserById } from '@azzapp/data/domains';
+import { getUserById } from '@azzapp/data';
 import UserForm from './UserForm';
 
 type UserPageProps = {

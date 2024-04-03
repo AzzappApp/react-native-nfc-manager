@@ -1,10 +1,7 @@
 import * as Sentry from '@sentry/nextjs';
 import { ImageResponse } from 'next/og';
 import { NextResponse, type NextRequest } from 'next/server';
-import {
-  getProfile,
-  getWebCardByUserNameWithRedirection,
-} from '@azzapp/data/domains';
+import { getProfile, getWebCardByUserNameWithRedirection } from '@azzapp/data';
 import { swapColor, DEFAULT_COLOR_PALETTE } from '@azzapp/shared/cardHelpers';
 import {
   COVER_BASE_WIDTH,

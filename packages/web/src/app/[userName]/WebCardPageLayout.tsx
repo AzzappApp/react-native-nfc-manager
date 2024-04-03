@@ -8,11 +8,7 @@ import DownloadVCard from './DownloadVCard';
 import PostFeed from './PostFeed';
 import styles from './WebCardPage.css';
 import WebCardPostNavigation from './WebCardPostNavigation';
-import type {
-  Media,
-  PostWithCommentAndAuthor,
-  WebCard,
-} from '@azzapp/data/domains';
+import type { Media, PostWithCommentAndAuthor, WebCard } from '@azzapp/data';
 import type { PropsWithChildren } from 'react';
 
 type ProfilePageLayoutProps = PropsWithChildren<{

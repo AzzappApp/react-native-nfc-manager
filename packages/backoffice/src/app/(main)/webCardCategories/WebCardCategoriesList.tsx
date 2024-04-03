@@ -2,7 +2,7 @@
 import { Box, Typography } from '@mui/material';
 import Link from 'next/link';
 import DataGrid from '#components/DataGrid';
-import type { WebCardCategory } from '@azzapp/data/domains';
+import type { WebCardCategory } from '@azzapp/data';
 import type { GridColDef } from '@mui/x-data-grid';
 
 type WebCardCategoriesListProps = {

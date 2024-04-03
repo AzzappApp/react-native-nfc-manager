@@ -6,7 +6,7 @@ import {
   createFilterOptions,
 } from '@mui/material';
 import { useRef } from 'react';
-import type { CardTemplateType } from '@azzapp/data/domains';
+import type { CardTemplateType } from '@azzapp/data';
 import type { BoxProps } from '@mui/material';
 
 type WebCardTemplateTypeListInputProps = Omit<BoxProps, 'onChange'> & {

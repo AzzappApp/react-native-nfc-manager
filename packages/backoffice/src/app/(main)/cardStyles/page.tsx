@@ -1,4 +1,4 @@
-import { CardStyleTable, db } from '@azzapp/data/domains';
+import { CardStyleTable, db } from '@azzapp/data';
 import CardStylesList from './CardStylesList';
 
 const CardStylesPage = async () => {

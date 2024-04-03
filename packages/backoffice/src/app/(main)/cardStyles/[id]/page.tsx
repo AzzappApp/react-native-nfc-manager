@@ -1,5 +1,5 @@
 import { notFound } from 'next/navigation';
-import { getCardStyleById } from '@azzapp/data/domains';
+import { getCardStyleById } from '@azzapp/data';
 import CardStyleForm from '../CardStyleForm';
 
 type CardStylePageProps = {

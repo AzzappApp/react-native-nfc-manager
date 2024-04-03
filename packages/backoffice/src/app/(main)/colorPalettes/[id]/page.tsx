@@ -1,5 +1,5 @@
 import { notFound } from 'next/navigation';
-import { getColorPaletteById } from '@azzapp/data/domains';
+import { getColorPaletteById } from '@azzapp/data';
 import ColorPaletteForm from '../ColorPaletteForm';
 
 type ColorPalettePageProps = {

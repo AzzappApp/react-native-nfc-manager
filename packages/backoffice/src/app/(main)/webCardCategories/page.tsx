@@ -1,5 +1,5 @@
 import { asc } from 'drizzle-orm';
-import { WebCardCategoryTable, db } from '@azzapp/data/domains';
+import { WebCardCategoryTable, db } from '@azzapp/data';
 import WebCardCategoriesList from './WebCardCategoriesList';
 
 const ProfileCategoriesPage = async () => {

@@ -11,11 +11,7 @@ import CloudinaryVideoPlayer from '#ui/CloudinaryVideoPlayer';
 import styles from './PostFeedItem.css';
 import type { CloudinaryVideoPlayerActions } from '#ui/CloudinaryVideoPlayer';
 import type { ModalActions } from '#ui/Modal';
-import type {
-  Media,
-  PostWithCommentAndAuthor,
-  WebCard,
-} from '@azzapp/data/domains';
+import type { Media, PostWithCommentAndAuthor, WebCard } from '@azzapp/data';
 import type { ForwardedRef } from 'react';
 
 type PostFeedItemProps = {

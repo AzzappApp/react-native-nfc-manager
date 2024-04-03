@@ -5,7 +5,7 @@ import DownloadAppModal from '#components/DownloadAppModal';
 import CoverRenderer from '#components/renderer/CoverRenderer';
 import styles from './CommentFeedHeader.css';
 import type { ModalActions } from '#ui/Modal';
-import type { Media, WebCard } from '@azzapp/data/domains';
+import type { Media, WebCard } from '@azzapp/data';
 
 type CommentFeedHeaderProps = {
   webCard: WebCard;

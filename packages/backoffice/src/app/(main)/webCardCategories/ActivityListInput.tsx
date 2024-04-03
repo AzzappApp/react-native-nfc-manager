@@ -25,7 +25,7 @@ import {
 } from '@mui/material';
 import { uniqBy } from 'lodash';
 import { useRef, useState } from 'react';
-import type { CompanyActivity } from '@azzapp/data/domains';
+import type { CompanyActivity } from '@azzapp/data';
 import type { DragStartEvent, DragEndEvent } from '@dnd-kit/core';
 import type { BoxProps } from '@mui/material';
 

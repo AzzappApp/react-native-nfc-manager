@@ -2,7 +2,7 @@ import Link from 'next/link';
 import CloudinaryImage from '#ui/CloudinaryImage';
 import CloudinaryVideo from '#ui/CloudinaryVideo';
 import styles from './CommentFeedSeeMore.css';
-import type { PostWithMedias, WebCard } from '@azzapp/data/domains';
+import type { PostWithMedias, WebCard } from '@azzapp/data';
 
 type CommentFeedMoreMediaProps = {
   webCard: WebCard;

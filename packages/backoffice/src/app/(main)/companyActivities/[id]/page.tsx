@@ -2,7 +2,7 @@ import {
   db,
   CardTemplateTypeTable,
   getCompanyActivityById,
-} from '@azzapp/data/domains';
+} from '@azzapp/data';
 import CompanyActivityForm from '../CompanyActivityForm';
 type CardTemplatePageProps = {
   params: {

@@ -4,7 +4,7 @@ import { DEFAULT_COLOR_PALETTE, swapColor } from '@azzapp/shared/cardHelpers';
 import { COVER_RATIO } from '@azzapp/shared/coverHelpers';
 import { decodeMediaId } from '@azzapp/shared/imagesHelpers';
 import styles from './CoverRenderer.css';
-import type { Media, WebCard } from '@azzapp/data/domains';
+import type { Media, WebCard } from '@azzapp/data';
 
 type CoverRendererBackgroundProps = {
   media: Media | null;

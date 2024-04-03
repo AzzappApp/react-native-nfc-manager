@@ -7,7 +7,7 @@ import DownloadAppModal from '#components/DownloadAppModal';
 import ShareModal from '#components/ShareModal';
 import styles from './PostFeed.css';
 import type { ModalActions } from '#ui/Modal';
-import type { Media, WebCard } from '@azzapp/data/domains';
+import type { Media, WebCard } from '@azzapp/data';
 
 type PostFeedHeaderProps = {
   webCard: WebCard;

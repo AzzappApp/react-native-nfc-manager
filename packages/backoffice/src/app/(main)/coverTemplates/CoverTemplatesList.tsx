@@ -3,7 +3,7 @@
 import { Box, Typography } from '@mui/material';
 import Link from 'next/link';
 import DataGrid from '#components/DataGrid';
-import type { CoverTemplate } from '@azzapp/data/domains';
+import type { CoverTemplate } from '@azzapp/data';
 import type { GridColDef } from '@mui/x-data-grid';
 
 type CoverTemplatesListProps = {

@@ -12,7 +12,7 @@ import {
 import Link from 'next/link';
 import { useState } from 'react';
 import type { Section } from '#backOfficeSections';
-import type { User } from '@azzapp/data/domains';
+import type { User } from '@azzapp/data';
 
 const CollapseListItem = ({
   section: { text, subSections },

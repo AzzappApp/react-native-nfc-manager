@@ -2,13 +2,13 @@
 import { createId } from '@paralleldrive/cuid2';
 import { eq } from 'drizzle-orm';
 import { revalidatePath } from 'next/cache';
-import { CardTemplateTypeTable, db } from '@azzapp/data/domains';
+import { CardTemplateTypeTable, db } from '@azzapp/data';
 import { cardTemplateTypeSchema } from './cardTemplateTypeSchema';
 import type {
   CardTemplateType,
   NewCardTemplateType,
   WebCardCategory,
-} from '@azzapp/data/domains';
+} from '@azzapp/data';
 
 export const saveCardTemplateType = async (
   data: { webCardCategory: WebCardCategory } & (

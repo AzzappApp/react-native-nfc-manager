@@ -1,24 +1,29 @@
-import { makeExecutableSchema } from '@graphql-tools/schema';
-import { applyMiddleware } from 'graphql-middleware';
-import { applyDirectiveSchemaTransform, directivesTypeDefs } from '#directives';
-import permissions from '#permission';
-import { typeDefs } from '#schema/__generated__/types';
-import resolvers from './schema';
-import { createGraphQLContext } from './schema/GraphQLContext';
-import type { GraphQLContext } from './schema/GraphQLContext';
+import db from './db';
 
-const buildSchema = () => {
-  return makeExecutableSchema({
-    typeDefs: [directivesTypeDefs, typeDefs],
-    resolvers,
-  });
-};
+export { db };
 
-const schema = applyMiddleware(
-  applyDirectiveSchemaTransform(buildSchema()),
-  permissions,
-);
-
-export { schema, createGraphQLContext };
-
-export type { GraphQLContext };
+export * from './cardModules';
+export * from './cardStyles';
+export * from './cardTemplate';
+export * from './cardTemplateType';
+export * from './colorPalettes';
+export * from './companyActivities';
+export * from './coverTemplates';
+export * from './follows';
+export * from './medias';
+export * from './mediasSuggestion';
+export * from './postComments';
+export * from './postReactions';
+export * from './posts';
+export * from './webCardCategories';
+export * from './profiles';
+export * from './redirectWebCard';
+export * from './staticMedias';
+export * from './userSubscriptions';
+export * from './users';
+export * from './webCardStatistics';
+export * from './profileStatistics';
+export * from './webCards';
+export * from './report';
+export * from './generic';
+export * from './databaseMonitorer';

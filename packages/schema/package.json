@@ -1,0 +1,48 @@
+{
+  "name": "@azzapp/schema",
+  "version": "0.5.5-canary.193",
+  "private": true,
+  "exports": {
+    ".": {
+      "types": "./lib/index.d.ts",
+      "default": "./lib/index.js"
+    },
+    "./*": {
+      "types": "./lib/*.d.ts",
+      "default": "./lib/*.js"
+    }
+  },
+  "scripts": {
+    "build": "yarn compile && yarn definition",
+    "dev": "yarn compile:watch & yarn definition:watch",
+    "typecheck": "yarn definition",
+    "definition": "tsc -p tsconfig.build.json",
+    "definition:watch": "yarn definition --watch",
+    "compile": "babel src --config-file ./babel.config.js -d lib --extensions '.ts,.tsx,.js,.jsx,.json'",
+    "compile:watch": "yarn compile --watch",
+    "clean": "rm -rf lib && rm -f tsconfig.build.tsbuildinfo && rm -rf node_modules"
+  },
+  "devScripts": [
+    "compile:watch",
+    "definition:watch"
+  ],
+  "dependencies": {
+    "@azzapp/i18n": "0.5.5-canary.193",
+    "@azzapp/shared": "0.5.5-canary.193",
+    "@azzapp/data": "0.5.5-canary.193",
+    "@graphql-tools/schema": "^10.0.3",
+    "@paralleldrive/cuid2": "^2.2.2",
+    "dataloader": "^2.2.2",
+    "graphql": "^16.8.1",
+    "graphql-middleware": "^6.1.35",
+    "graphql-relay": "^0.10.1",
+    "graphql-scalars": "^1.23.0",
+    "graphql-shield": "^7.6.5",
+    "graphql-tag": "^2.12.6",
+    "lodash": "^4.17.21",
+    "zod": "^3.22.4"
+  },
+  "devDependencies": {
+    "@types/lodash": "4.17.0"
+  }
+}

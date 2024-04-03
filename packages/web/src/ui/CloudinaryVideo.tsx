@@ -3,7 +3,7 @@ import { forwardRef, type ForwardedRef } from 'react';
 import { COVER_ASSET_SIZES } from '@azzapp/shared/coverHelpers';
 import { decodeMediaId } from '@azzapp/shared/imagesHelpers';
 import { POST_VIDEO_SIZES } from '@azzapp/shared/postHelpers';
-import type { Media } from '@azzapp/data/domains';
+import type { Media } from '@azzapp/data';
 
 export type CloudinaryVideoProps = Omit<
   React.HTMLProps<HTMLVideoElement>,

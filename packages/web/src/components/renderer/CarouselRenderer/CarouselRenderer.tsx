@@ -1,5 +1,5 @@
 import 'server-only';
-import { getMediasByIds } from '@azzapp/data/domains';
+import { getMediasByIds } from '@azzapp/data';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
 import { swapColor } from '@azzapp/shared/cardHelpers';
 import {
@@ -10,7 +10,7 @@ import {
 import CardModuleBackground from '../../CardModuleBackground';
 import Carousel from './Carousel';
 import type { ModuleRendererProps } from '../ModuleRenderer';
-import type { CardModuleCarousel } from '@azzapp/data/domains';
+import type { CardModuleCarousel } from '@azzapp/data';
 
 export type CarouselRendererProps = ModuleRendererProps<CardModuleCarousel> &
   Omit<React.HTMLProps<HTMLDivElement>, 'children'>;

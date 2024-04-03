@@ -15,12 +15,12 @@ import {
   PostTable,
   WebCardTable,
   db,
-} from '@azzapp/data/domains';
-import { ReportTable } from '@azzapp/data/domains/report';
+  ReportTable,
+} from '@azzapp/data';
 import { getImageURLForSize, getVideoURL } from '@azzapp/shared/imagesHelpers';
 import { deleteRelatedItem, ignoreReport } from './reportsAction';
 import ReportsList from './ReportsList';
-import type { TargetType } from '@azzapp/data/domains/report';
+import type { TargetType } from '@azzapp/data';
 
 type ReportPageProps = {
   params: {

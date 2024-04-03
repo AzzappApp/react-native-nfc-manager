@@ -2,7 +2,7 @@ import {
   db,
   getCardTemplateTypeById,
   WebCardCategoryTable,
-} from '@azzapp/data/domains';
+} from '@azzapp/data';
 import CardTemplateTypesForm from '../CardTemplateTypesForm';
 type CardTemplatePageProps = {
   params: {

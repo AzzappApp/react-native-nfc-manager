@@ -5,7 +5,7 @@ import {
   getMediasByIds,
   getProfilesPostsWithTopComment,
   getStaticMediasByIds,
-} from '@azzapp/data/domains';
+} from '@azzapp/data';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
 import {
   DEFAULT_CARD_STYLE,

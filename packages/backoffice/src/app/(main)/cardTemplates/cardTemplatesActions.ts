@@ -9,12 +9,12 @@ import {
   getCardTemplateById,
   referencesMedias,
   updateCardTemplate,
-} from '@azzapp/data/domains';
+} from '@azzapp/data';
 import {
   cardTemplateSchema,
   type CardTemplateFormValue,
 } from './cardTemplateSchema';
-import type { CardTemplateType } from '@azzapp/data/domains';
+import type { CardTemplateType } from '@azzapp/data';
 
 export const getModulesData = async (profileUserName: string) => {
   const res = await db

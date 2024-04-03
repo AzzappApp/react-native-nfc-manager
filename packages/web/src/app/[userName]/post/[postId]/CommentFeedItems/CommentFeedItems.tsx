@@ -13,7 +13,7 @@ import type {
   Media,
   PostCommentWithWebCard,
   PostWithMedias,
-} from '@azzapp/data/domains';
+} from '@azzapp/data';
 
 type CommentFeedItemsProps = {
   post: PostWithMedias;

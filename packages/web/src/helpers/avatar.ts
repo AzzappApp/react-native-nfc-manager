@@ -1,7 +1,7 @@
 import { constructCloudinaryUrl } from '@cloudinary-util/url-loader';
 import { decodeMediaId } from '@azzapp/shared/imagesHelpers';
 import { buildCoverImageUrl } from './cover';
-import type { Profile, WebCard } from '@azzapp/data/domains';
+import type { Profile, WebCard } from '@azzapp/data';
 
 const AVATAR_WIDTH = 720;
 

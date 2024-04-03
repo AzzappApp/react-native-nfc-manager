@@ -8,7 +8,7 @@ import type {
   PostCommentWithWebCard,
   PostWithMedias,
   WebCard,
-} from '@azzapp/data/domains';
+} from '@azzapp/data';
 
 type CommentFeedProps = {
   comments: PostCommentWithWebCard[];

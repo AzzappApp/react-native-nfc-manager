@@ -1,5 +1,5 @@
 import { asc, desc, like, or, sql } from 'drizzle-orm';
-import { UserTable, db } from '@azzapp/data/domains';
+import { UserTable, db } from '@azzapp/data';
 import UsersList from './UsersList';
 
 const sortsColumns = {

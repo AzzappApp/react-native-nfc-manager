@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { activeUserSubscription } from '@azzapp/data/domains';
+import { activeUserSubscription } from '@azzapp/data';
 import { getSessionData } from '#helpers/tokens';
 
 /**

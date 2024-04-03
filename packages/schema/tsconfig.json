@@ -1,0 +1,13 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "paths": {
+      "@azzapp/shared/*": ["../shared/src/*"],
+      "@azzapp/data/*": ["../data/src/*"],
+      "#*": ["./src/*"],
+    },
+  },
+  "include": ["**/*.ts", "**/*.tsx", "**/*.js", "**/*.jsx", "**/*.json"],
+  "exclude": ["lib", "node_modules", "package.json", "tsconfig.json"],
+}

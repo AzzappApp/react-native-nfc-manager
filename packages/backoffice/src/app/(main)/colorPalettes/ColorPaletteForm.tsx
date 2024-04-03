@@ -15,7 +15,7 @@ import ColorInput from '#components/ColorInput';
 import { useForm } from '#helpers/formHelpers';
 import { saveColorPalette } from './colorPaletteActions';
 import type { ColorPaletteErrors } from './colorPaletteSchema';
-import type { ColorPalette } from '@azzapp/data/domains';
+import type { ColorPalette } from '@azzapp/data';
 
 type ColorPaletteFormProps = {
   colorPalette?: ColorPalette | null;

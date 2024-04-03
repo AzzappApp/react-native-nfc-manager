@@ -37,7 +37,7 @@ import type {
   CoverTemplate,
   Media,
   StaticMedia,
-} from '@azzapp/data/domains';
+} from '@azzapp/data';
 
 type CoverTemplateFormProps = {
   coverTemplate?: CoverTemplate | null;

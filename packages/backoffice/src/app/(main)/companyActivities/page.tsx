@@ -1,4 +1,4 @@
-import { CompanyActivityTable, db } from '@azzapp/data/domains';
+import { CompanyActivityTable, db } from '@azzapp/data';
 import CompanyActivitiesList from './CompanyActivitiesList';
 
 const CompanyActivitiesPage = async () => {

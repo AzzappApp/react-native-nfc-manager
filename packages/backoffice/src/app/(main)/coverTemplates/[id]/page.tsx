@@ -4,7 +4,7 @@ import {
   getCoverTemplateById,
   getMediasByIds,
   getStaticMediasByUsage,
-} from '@azzapp/data/domains';
+} from '@azzapp/data';
 import CoverTemplateForm from '../CoverTemplatesForm';
 
 type CoverTemplatePageProps = {

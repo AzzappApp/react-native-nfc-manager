@@ -11,7 +11,7 @@ import CloudinaryImage from '#ui/CloudinaryImage';
 import CardModuleBackground from '../../CardModuleBackground';
 import styles, { wrapperMarginTop } from './PhotoWithTextAndTitleRenderer.css';
 import type { ModuleRendererProps } from '../ModuleRenderer';
-import type { CardModulePhotoWithTextAndTitle } from '@azzapp/data/domains';
+import type { CardModulePhotoWithTextAndTitle } from '@azzapp/data';
 import type { CSSProperties } from 'react';
 
 export type PhotoWithTextAndTitleRendererProps =

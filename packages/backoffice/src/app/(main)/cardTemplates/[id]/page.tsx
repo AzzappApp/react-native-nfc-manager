@@ -3,7 +3,7 @@ import {
   CardTemplateTypeTable,
   db,
   getCardTemplateById,
-} from '@azzapp/data/domains';
+} from '@azzapp/data';
 import CardTemplatesForm from '../CardTemplatesForm';
 
 type CardTemplatePageProps = {

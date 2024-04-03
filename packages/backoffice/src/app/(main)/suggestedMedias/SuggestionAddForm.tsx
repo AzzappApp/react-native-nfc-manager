@@ -10,7 +10,7 @@ import {
 import { useEffect, useState } from 'react';
 import MediasListInput from '#components/MediasListInput';
 import ItemWithLabelSelectionList from './ItemWithLabelSelectionList';
-import type { CompanyActivity, WebCardCategory } from '@azzapp/data/domains';
+import type { CompanyActivity, WebCardCategory } from '@azzapp/data';
 
 type SuggesionAddFormProps = {
   open: boolean;

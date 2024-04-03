@@ -5,7 +5,7 @@ import {
   WebCardCategoryTable,
   db,
   getMediasByIds,
-} from '@azzapp/data/domains';
+} from '@azzapp/data';
 import MediaSuggestionsList from './MediaSuggestionsList';
 
 const StaticMediasPage = async () => {

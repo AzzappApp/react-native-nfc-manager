@@ -3,7 +3,7 @@
 import { Box, Typography } from '@mui/material';
 import Link from 'next/link';
 import DataGrid from '#components/DataGrid';
-import type { CardTemplateType } from '@azzapp/data/domains';
+import type { CardTemplateType } from '@azzapp/data';
 import type { GridColDef } from '@mui/x-data-grid';
 
 type CardTemplateTypesListProps = {

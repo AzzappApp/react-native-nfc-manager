@@ -11,7 +11,7 @@ import {
 } from './staticMediaActions';
 import StaticMediaAddForm from './StaticMediaAddForm';
 import StaticMediaSection from './StaticMediaSection';
-import type { StaticMedia } from '@azzapp/data/domains';
+import type { StaticMedia } from '@azzapp/data';
 
 type StaticMediasListProps = {
   staticMedias: StaticMedia[];

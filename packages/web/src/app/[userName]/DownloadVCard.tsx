@@ -6,7 +6,7 @@ import { buildVCard } from '@azzapp/shared/vCardHelpers';
 import { updateContactCardScanCounter } from '#app/actions/statisticsAction';
 import LinkButton from '#ui/Button/LinkButton';
 import styles from './DownloadVCard.css';
-import type { WebCard } from '@azzapp/data/domains';
+import type { WebCard } from '@azzapp/data';
 
 const DownloadVCard = ({ webCard }: { webCard: WebCard }) => {
   const searchParams = useSearchParams();

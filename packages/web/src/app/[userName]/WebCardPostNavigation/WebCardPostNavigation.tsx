@@ -7,7 +7,7 @@ import CoverRenderer from '#components/renderer/CoverRenderer';
 import ShareModal from '#components/ShareModal';
 import styles from './WebCardPostNavigation.css';
 import type { ModalActions } from '#ui/Modal';
-import type { Media, WebCard } from '@azzapp/data/domains';
+import type { Media, WebCard } from '@azzapp/data';
 
 export type WebCardPostNavigationProps = Omit<
   HTMLAttributes<HTMLDivElement>,

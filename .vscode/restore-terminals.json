@@ -50,6 +50,14 @@
         {
           "name": "graphQL codegen",
           "commands": ["yarn graphql-codegen  --watch"]
+        },
+        {
+          "name": "schema compile",
+          "commands": ["cd packages/schema", "yarn compile:watch"]
+        },
+        {
+          "name": "schema definition",
+          "commands": ["cd packages/schema", "yarn definition:watch"]
         }
       ]
     },

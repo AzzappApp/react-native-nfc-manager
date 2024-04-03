@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { getUserProfileWithWebCardId } from '@azzapp/data/domains';
+import { getUserProfileWithWebCardId } from '@azzapp/data';
 import ERRORS from '@azzapp/shared/errors';
 import { buildApplePass } from '#helpers/pass/apple';
 import { getSessionData } from '#helpers/tokens';

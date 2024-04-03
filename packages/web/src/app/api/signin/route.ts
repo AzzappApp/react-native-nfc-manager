@@ -7,7 +7,7 @@ import {
   getUserById,
   getProfilesOfUser,
   getProfileByUserName,
-} from '@azzapp/data/domains';
+} from '@azzapp/data';
 import ERRORS from '@azzapp/shared/errors';
 import {
   formatPhoneNumber,
@@ -16,7 +16,7 @@ import {
 } from '@azzapp/shared/stringHelpers';
 import { handleSignInAuthMethod } from '#helpers/auth';
 import cors from '#helpers/cors';
-import type { Profile, User } from '@azzapp/data/domains';
+import type { Profile, User } from '@azzapp/data';
 
 type SignInBody = {
   credential?: string; //email or username or phone number

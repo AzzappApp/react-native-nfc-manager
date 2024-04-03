@@ -6,7 +6,7 @@ import {
   incrementContactCardScans,
   db,
   updateContactCardTotalScans,
-} from '@azzapp/data/domains';
+} from '@azzapp/data';
 
 export const updateWebCardViewsCounter = async (webcardId: string) => {
   // @TODO: make this function dynamic with a better mechanism than headers

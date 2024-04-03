@@ -10,7 +10,7 @@ import SocialLink from './SocialLink';
 import styles from './SocialLinksRenderer.css';
 import type { SocialLinkType } from './SocialLink';
 import type { ModuleRendererProps } from '../ModuleRenderer';
-import type { CardModuleSocialLinks } from '@azzapp/data/domains';
+import type { CardModuleSocialLinks } from '@azzapp/data';
 
 export type SocialLinksRendererProps =
   ModuleRendererProps<CardModuleSocialLinks> &

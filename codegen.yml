@@ -4,9 +4,9 @@ hooks:
     - prettier --write
 ignoreNoDocuments: true
 schema:
-  - './packages/data/src/schema/**/*.graphql'
+  - './packages/schema/src/**/*.graphql'
 generates:
-  ./packages/data/src/schema/__generated__/types.ts:
+  ./packages/schema/src/__generated__/types.ts:
     plugins:
       - typescript
       - typescript-resolvers
@@ -16,37 +16,37 @@ generates:
       enumsAsTypes: true
       useImplementingTypes: true
       mappers:
-        Profile: ../../domains#Profile as ProfileModel
+        Profile: \@azzapp/data#Profile as ProfileModel
         StaticMedia: ../MediaResolvers#StaticMediaResolverBaseType as StaticMediaModel
-        WebCardCategory: ../../domains#WebCardCategory as WebCardCategoryModel
+        WebCardCategory: \@azzapp/data#WebCardCategory as WebCardCategoryModel
         MediaImage: ../MediaResolvers#MediaResolverBaseType as MediaImageModel
         MediaVideo: ../MediaResolvers#MediaResolverBaseType as MediaVideoModel
-        CompanyActivity: ../../domains#CompanyActivity as CompanyActivityModel
-        Post: ../../domains#Post as PostModel
-        PostComment: ../../domains#PostComment as PostCommentModel
-        CardTemplate: ../../domains#CardTemplate as CardTemplateModel
-        CardTemplateType: ../../domains#CardTemplateType as CardTemplateTypeModel
-        CoverTemplate: ../../domains#CoverTemplate as CoverTemplateModel
-        CoverTemplateData: ../../domains#CoverTemplateData as CoverTemplateDataModel
-        CardCover: ../../domains#WebCard as WebCardModel
-        CardModule: ../../domains#CardModule as CardModuleModel
-        CardModuleCarousel: ../../domains#CardModuleCarousel as CardModuleCarouselModel
-        CardModuleHorizontalPhoto: ../../domains#CardModuleHorizontalPhoto as CardModuleHorizontalPhotoModel
-        CardModuleSimpleText: ../../domains#CardModuleSimpleText as CardModuleSimpleTextModel
-        CardModuleSimpleTitle: ../../domains#CardModuleSimpleText as CardModuleSimpleTitleModel
-        CardModuleSimpleButton: ../../domains#CardModuleSimpleButton as CardModuleSimpleButtonModel
-        CardModulePhotoWithTextAndTitle: ../../domains#CardModulePhotoWithTextAndTitle as CardModulePhotoWithTextAndTitleModel
-        CardModuleSocialLinks: ../../domains#CardModuleSocialLinks as CardModuleSocialLinksModel
-        CardModuleBlockText: ../../domains#CardModuleBlockText as CardModuleBlockTextModel
-        CardModuleLineDivider: ../../domains#CardModuleLineDivider as CardModuleLineDividerModel
-        CardStyle: ../../domains#CardStyle as CardStyleModel
-        ColorPalette: ../../domains#ColorPalette as ColorPaletteModel
-        WebCardStatistic: ../../domains#WebCardStatistic as WebCardStatisticModel
-        ProfileStatistic: ../../domains#ProfileStatistic as ProfileStatisticModel
-        UserSubscription: ../../domains#UserSubscription as UserSubscriptionModel
-        WebCard: ../../domains#WebCard as WebCardModel
-        User: ../../domains#User as UserModel
-        RedirectWebCard: ../../domains#RedirectWebCard as RedirectWebCard
+        CompanyActivity: \@azzapp/data#CompanyActivity as CompanyActivityModel
+        Post: \@azzapp/data#Post as PostModel
+        PostComment: \@azzapp/data#PostComment as PostCommentModel
+        CardTemplate: \@azzapp/data#CardTemplate as CardTemplateModel
+        CardTemplateType: \@azzapp/data#CardTemplateType as CardTemplateTypeModel
+        CoverTemplate: \@azzapp/data#CoverTemplate as CoverTemplateModel
+        CoverTemplateData: \@azzapp/data#CoverTemplateData as CoverTemplateDataModel
+        CardCover: \@azzapp/data#WebCard as WebCardModel
+        CardModule: \@azzapp/data#CardModule as CardModuleModel
+        CardModuleCarousel: \@azzapp/data#CardModuleCarousel as CardModuleCarouselModel
+        CardModuleHorizontalPhoto: \@azzapp/data#CardModuleHorizontalPhoto as CardModuleHorizontalPhotoModel
+        CardModuleSimpleText: \@azzapp/data#CardModuleSimpleText as CardModuleSimpleTextModel
+        CardModuleSimpleTitle: \@azzapp/data#CardModuleSimpleText as CardModuleSimpleTitleModel
+        CardModuleSimpleButton: \@azzapp/data#CardModuleSimpleButton as CardModuleSimpleButtonModel
+        CardModulePhotoWithTextAndTitle: \@azzapp/data#CardModulePhotoWithTextAndTitle as CardModulePhotoWithTextAndTitleModel
+        CardModuleSocialLinks: \@azzapp/data#CardModuleSocialLinks as CardModuleSocialLinksModel
+        CardModuleBlockText: \@azzapp/data#CardModuleBlockText as CardModuleBlockTextModel
+        CardModuleLineDivider: \@azzapp/data#CardModuleLineDivider as CardModuleLineDividerModel
+        CardStyle: \@azzapp/data#CardStyle as CardStyleModel
+        ColorPalette: \@azzapp/data#ColorPalette as ColorPaletteModel
+        WebCardStatistic: \@azzapp/data#WebCardStatistic as WebCardStatisticModel
+        ProfileStatistic: \@azzapp/data#ProfileStatistic as ProfileStatisticModel
+        UserSubscription: \@azzapp/data#UserSubscription as UserSubscriptionModel
+        WebCard: \@azzapp/data#WebCard as WebCardModel
+        User: \@azzapp/data#User as UserModel
+        RedirectWebCard: \@azzapp/data#RedirectWebCard as RedirectWebCard
       defaultMapper: 'Partial<{T}>'
       maybeValue: 'T extends PromiseLike<infer U> ? Promise<U | null> : T | null'
       scalars:

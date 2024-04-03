@@ -1,5 +1,5 @@
 import { cache } from 'react';
-import { getUserById, type User } from '@azzapp/data/domains';
+import { getUserById, type User } from '@azzapp/data';
 import { getSession } from '#helpers/session';
 
 const getCurrentUser = cache(async () => {

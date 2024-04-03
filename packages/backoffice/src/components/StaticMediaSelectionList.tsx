@@ -1,6 +1,6 @@
 import { Box, FormControl, FormHelperText, FormLabel } from '@mui/material';
 import { getImageURL } from '@azzapp/shared/imagesHelpers';
-import type { StaticMedia } from '@azzapp/data/domains';
+import type { StaticMedia } from '@azzapp/data';
 
 type StaticMediaSelectionListProps = {
   value: string | null | undefined;

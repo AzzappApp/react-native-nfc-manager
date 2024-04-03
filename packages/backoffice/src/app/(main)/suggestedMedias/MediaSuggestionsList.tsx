@@ -24,7 +24,7 @@ import {
   setSuggestionsForMedia,
 } from './suggestedMediasActions';
 import SuggesionAddForm from './SuggestionAddForm';
-import type { CompanyActivity, WebCardCategory } from '@azzapp/data/domains';
+import type { CompanyActivity, WebCardCategory } from '@azzapp/data';
 
 type MediaSuggestionsListProps = {
   activities: CompanyActivity[];

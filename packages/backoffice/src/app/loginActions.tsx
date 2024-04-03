@@ -2,7 +2,7 @@
 import * as bcrypt from 'bcrypt-ts';
 import { redirect } from 'next/navigation';
 import isEmail from 'validator/lib/isEmail';
-import { getUserByEmail } from '@azzapp/data/domains';
+import { getUserByEmail } from '@azzapp/data';
 import { destroySessionServerActions, setSession } from '#helpers/session';
 
 export type LoginErrors = {

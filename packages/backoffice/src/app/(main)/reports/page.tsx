@@ -1,6 +1,5 @@
 import { asc, desc, isNull, sql } from 'drizzle-orm';
-import { db } from '@azzapp/data/domains';
-import { ReportTable } from '@azzapp/data/domains/report';
+import { db, ReportTable } from '@azzapp/data';
 import ReportsList from './ReportsList';
 
 const sortsColumns = {

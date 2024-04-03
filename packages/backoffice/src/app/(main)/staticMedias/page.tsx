@@ -1,5 +1,5 @@
 import { asc } from 'drizzle-orm';
-import { StaticMediaTable, db } from '@azzapp/data/domains';
+import { StaticMediaTable, db } from '@azzapp/data';
 import StaticMediasList from './StaticMediasList';
 
 const StaticMediasPage = async () => {

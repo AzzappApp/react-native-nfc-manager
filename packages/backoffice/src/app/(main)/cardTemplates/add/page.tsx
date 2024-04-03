@@ -1,8 +1,4 @@
-import {
-  CardStyleTable,
-  CardTemplateTypeTable,
-  db,
-} from '@azzapp/data/domains';
+import { CardStyleTable, CardTemplateTypeTable, db } from '@azzapp/data';
 import CardTemplatesForm from '../CardTemplatesForm';
 
 const NewCardTemplatePage = async () => {

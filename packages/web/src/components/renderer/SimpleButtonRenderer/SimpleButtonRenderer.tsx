@@ -9,7 +9,7 @@ import { fontsMap } from '#helpers/fonts';
 import CardModuleBackground from '../../CardModuleBackground';
 import styles from './SimpleButtonRenderer.css';
 import type { ModuleRendererProps } from '../ModuleRenderer';
-import type { CardModuleSimpleButton } from '@azzapp/data/domains';
+import type { CardModuleSimpleButton } from '@azzapp/data';
 
 export type SimpleButtonRendererProps =
   ModuleRendererProps<CardModuleSimpleButton> &

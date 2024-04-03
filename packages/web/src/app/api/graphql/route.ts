@@ -10,18 +10,18 @@ import { useDisableIntrospection } from '@graphql-yoga/plugin-disable-introspect
 import { usePersistedOperations } from '@graphql-yoga/plugin-persisted-operations';
 import { createYoga } from 'graphql-yoga';
 import { compare } from 'semver';
-import { createGraphQLContext, schema } from '@azzapp/data';
 import {
   getDatabaseConnectionsInfos,
   startDatabaseConnectionMonitoring,
-} from '@azzapp/data/domains/databaseMonitorer';
+} from '@azzapp/data';
 import { isSupportedLocale } from '@azzapp/i18n';
+import { createGraphQLContext, schema } from '@azzapp/schema';
 import ERRORS from '@azzapp/shared/errors';
 import queryMap from '#persisted-query-map.json';
 import { buildCoverAvatarUrl } from '#helpers/avatar';
 import { AZZAPP_SERVER_HEADER, getSessionData } from '#helpers/tokens';
 import packageJSON from '../../../../package.json';
-import type { GraphQLContext } from '@azzapp/data';
+import type { GraphQLContext } from '@azzapp/schema';
 import type { Plugin } from '@envelop/types';
 import type { GraphQLError } from 'graphql';
 import type { LogLevel, Plugin as YogaPlugin } from 'graphql-yoga';

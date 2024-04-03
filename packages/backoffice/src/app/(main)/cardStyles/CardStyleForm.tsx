@@ -16,7 +16,7 @@ import FontSelect from '#components/FontSelect';
 import { intParser, labelsOptions, useForm } from '#helpers/formHelpers';
 import { saveCardStyle } from './cardStylesActions';
 import type { CardStyleErrors } from './cardStyleSchema';
-import type { CardStyle } from '@azzapp/data/domains';
+import type { CardStyle } from '@azzapp/data';
 
 type CardStyleFormProps = {
   cardStyle?: CardStyle | null;

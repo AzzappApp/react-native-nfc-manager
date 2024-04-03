@@ -10,7 +10,7 @@ import {
   useTransition,
 } from 'react';
 import DataGrid from '#components/DataGrid';
-import type { User } from '@azzapp/data/domains';
+import type { User } from '@azzapp/data';
 import type {
   GridColDef,
   GridPaginationModel,

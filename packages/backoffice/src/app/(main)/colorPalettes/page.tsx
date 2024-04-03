@@ -1,4 +1,4 @@
-import { getColorPalettes } from '@azzapp/data/domains';
+import { getColorPalettes } from '@azzapp/data';
 import ColorPalettesList from './ColorPalettesList';
 
 const ColorPalettesPage = async () => {

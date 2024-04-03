@@ -7,9 +7,9 @@ import {
   createCompanyActivity,
   db,
   updateCompanyActivity,
-} from '@azzapp/data/domains';
+} from '@azzapp/data';
 import { companyActivitySchema } from './companyActivitySchema';
-import type { CompanyActivity, NewCompanyActivity } from '@azzapp/data/domains';
+import type { CompanyActivity, NewCompanyActivity } from '@azzapp/data';
 
 export const getModulesData = async (profileUserName: string) => {
   const res = await db

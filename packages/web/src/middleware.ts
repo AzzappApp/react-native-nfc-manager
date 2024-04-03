@@ -1,7 +1,7 @@
 import { Ratelimit } from '@upstash/ratelimit';
 import { kv } from '@vercel/kv';
 import { NextResponse } from 'next/server';
-import { getRedirectWebCardByUserName } from '@azzapp/data/domains';
+import { getRedirectWebCardByUserName } from '@azzapp/data';
 import type { NextRequest } from 'next/server';
 
 const cache = new Map();

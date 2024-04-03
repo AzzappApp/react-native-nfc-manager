@@ -33,7 +33,7 @@ import type {
   CardTemplateType,
   CompanyActivity,
   WebCardCategory,
-} from '@azzapp/data/domains';
+} from '@azzapp/data';
 
 type WebCardCategoryFormProps = {
   webCardCategory?: WebCardCategory | null;

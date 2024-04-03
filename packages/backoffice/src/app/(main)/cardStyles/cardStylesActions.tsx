@@ -1,11 +1,11 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
-import { createCardStyle, updateCardStyle } from '@azzapp/data/domains';
+import { createCardStyle, updateCardStyle } from '@azzapp/data';
 import { ADMIN } from '#roles';
 import { currentUserHasRole } from '#helpers/roleHelpers';
 import { cardStyleSchema } from './cardStyleSchema';
-import type { CardStyle, NewCardStyle } from '@azzapp/data/domains';
+import type { CardStyle, NewCardStyle } from '@azzapp/data';
 
 export const saveCardStyle = async (data: CardStyle | NewCardStyle) => {
   if (!(await currentUserHasRole(ADMIN))) {

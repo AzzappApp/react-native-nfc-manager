@@ -2,7 +2,7 @@
 import { createId } from '@paralleldrive/cuid2';
 import { eq, sql } from 'drizzle-orm';
 import { revalidatePath } from 'next/cache';
-import { StaticMediaTable, db } from '@azzapp/data/domains';
+import { StaticMediaTable, db } from '@azzapp/data';
 import { createPresignedUpload } from '@azzapp/shared/cloudinaryHelpers';
 import { COVER_ASSET_SIZES } from '@azzapp/shared/coverHelpers';
 import { encodeMediaId } from '@azzapp/shared/imagesHelpers';

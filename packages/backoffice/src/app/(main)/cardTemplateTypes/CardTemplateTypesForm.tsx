@@ -16,7 +16,7 @@ import { useState } from 'react';
 import { labelsOptions, useForm } from '#helpers/formHelpers';
 import { saveCardTemplateType } from './cardTemplateTypesActions';
 import type { CardTemplateTypeErrors } from './cardTemplateTypeSchema';
-import type { CardTemplateType, WebCardCategory } from '@azzapp/data/domains';
+import type { CardTemplateType, WebCardCategory } from '@azzapp/data';
 
 type CardTemplateTypeFormProps = {
   cardTemplateType?: CardTemplateType | null;

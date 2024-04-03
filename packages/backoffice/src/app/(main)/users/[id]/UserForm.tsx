@@ -10,7 +10,7 @@ import {
 import { useTransition } from 'react';
 import * as ROLES from '#roles';
 import { toggleRole } from './userActions';
-import type { User } from '@azzapp/data/domains';
+import type { User } from '@azzapp/data';
 
 type UserFormProps = {
   user: User;

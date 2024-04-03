@@ -1,10 +1,6 @@
 'use client';
 import { useCallback, useEffect, useRef, useState, useTransition } from 'react';
-import {
-  type Media,
-  type PostWithMedias,
-  type WebCard,
-} from '@azzapp/data/domains';
+import { type Media, type PostWithMedias, type WebCard } from '@azzapp/data';
 import { Button } from '#ui';
 
 import { loadOtherPosts } from '#app/actions/profileActions';

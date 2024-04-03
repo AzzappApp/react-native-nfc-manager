@@ -1,6 +1,6 @@
 'use client';
 import CloudinaryImage from '#ui/CloudinaryImage';
-import type { Media } from '@azzapp/data/domains';
+import type { Media } from '@azzapp/data';
 
 type CarouselMediaProps = {
   media: Media;

@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { getFormatedElapsedTime } from '@azzapp/shared/timeHelpers';
 import CoverRenderer from '#components/renderer/CoverRenderer';
 import styles from './CommentFeedItems.css';
-import type { PostCommentWithWebCard } from '@azzapp/data/domains';
+import type { PostCommentWithWebCard } from '@azzapp/data';
 
 type CommentFeedItemProps = {
   comment: PostCommentWithWebCard;

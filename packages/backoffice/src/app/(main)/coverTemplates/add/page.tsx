@@ -1,4 +1,4 @@
-import { getColorPalettes, getStaticMediasByUsage } from '@azzapp/data/domains';
+import { getColorPalettes, getStaticMediasByUsage } from '@azzapp/data';
 import CoverTemplateForm from '../CoverTemplatesForm';
 
 const NewCoverTemplatePage = async () => {

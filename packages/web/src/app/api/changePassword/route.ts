@@ -1,11 +1,7 @@
 import * as Sentry from '@sentry/nextjs';
 import * as bcrypt from 'bcrypt-ts';
 import { NextResponse } from 'next/server';
-import {
-  updateUser,
-  getUserByPhoneNumber,
-  getUserByEmail,
-} from '@azzapp/data/domains';
+import { updateUser, getUserByPhoneNumber, getUserByEmail } from '@azzapp/data';
 import ERRORS from '@azzapp/shared/errors';
 import { isValidEmail } from '@azzapp/shared/stringHelpers';
 import { twilioVerificationService } from '#helpers/twilioHelpers';

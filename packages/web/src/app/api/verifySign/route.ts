@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { getProfileById, getWebCardById } from '@azzapp/data/domains';
+import { getProfileById, getWebCardById } from '@azzapp/data';
 import { parseContactCard } from '@azzapp/shared/contactCardHelpers';
 import { verifyHmacWithPassword } from '@azzapp/shared/crypto';
 import ERRORS from '@azzapp/shared/errors';

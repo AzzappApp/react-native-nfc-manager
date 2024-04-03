@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { upsertSubscription } from '@azzapp/data/domains';
+import { upsertSubscription } from '@azzapp/data';
 import cors from '#helpers/cors';
 
 const BEARER_HEADER = 'DkAgYzjiRxns4ty'; //dev value test and release

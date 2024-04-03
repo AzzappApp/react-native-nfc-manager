@@ -9,7 +9,7 @@ import {
 import { fontsMap } from '#helpers/fonts';
 import CardModuleBackground from '../CardModuleBackground';
 import type { ModuleRendererProps } from './ModuleRenderer';
-import type { CardModuleSimpleText } from '@azzapp/data/domains';
+import type { CardModuleSimpleText } from '@azzapp/data';
 
 type SimpleTextRendererProps = ModuleRendererProps<CardModuleSimpleText> &
   Omit<React.HTMLProps<HTMLDivElement>, 'children'>;

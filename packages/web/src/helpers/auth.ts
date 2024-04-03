@@ -2,7 +2,7 @@ import { toGlobalId } from 'graphql-relay';
 import { NextResponse } from 'next/server';
 import { generateTokens } from './tokens';
 import { twilioVerificationService } from './twilioHelpers';
-import type { Profile, User } from '@azzapp/data/domains';
+import type { Profile, User } from '@azzapp/data';
 
 export const handleSignInAuthMethod = async (
   user: User,

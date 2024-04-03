@@ -1,7 +1,7 @@
 'use client';
 
 import DataGrid from '#components/DataGrid';
-import type { Report } from '@azzapp/data/domains/report';
+import type { Report } from '@azzapp/data';
 import type { GridColDef } from '@mui/x-data-grid';
 
 type ReportListProps = {

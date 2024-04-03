@@ -5,7 +5,7 @@ import {
   db,
   getCompanyActivitiesByWebCardCategory,
   getWebCardCategoryById,
-} from '@azzapp/data/domains';
+} from '@azzapp/data';
 import WebCardCategoryForm from '../WebCardCategoryForm';
 
 type WebCardCategoryPageProps = {

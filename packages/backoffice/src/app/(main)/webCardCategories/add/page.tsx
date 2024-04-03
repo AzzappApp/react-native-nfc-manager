@@ -1,8 +1,4 @@
-import {
-  CardTemplateTypeTable,
-  CompanyActivityTable,
-  db,
-} from '@azzapp/data/domains';
+import { CardTemplateTypeTable, CompanyActivityTable, db } from '@azzapp/data';
 import WebCardCategoryForm from '../WebCardCategoryForm';
 
 const NewWebCardCategoryPage = async () => {

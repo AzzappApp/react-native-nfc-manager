@@ -4,7 +4,7 @@ import {
   getModuleDataValues,
 } from '@azzapp/shared/cardModuleHelpers';
 import type { ModuleRendererProps } from './ModuleRenderer';
-import type { CardModuleLineDivider } from '@azzapp/data/domains';
+import type { CardModuleLineDivider } from '@azzapp/data';
 
 export type LineDividerRendererProps =
   ModuleRendererProps<CardModuleLineDivider> &

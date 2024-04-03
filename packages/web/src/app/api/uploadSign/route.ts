@@ -2,7 +2,7 @@
 import { createId } from '@paralleldrive/cuid2';
 import { NextResponse } from 'next/server';
 import * as z from 'zod';
-import { createMedia } from '@azzapp/data/domains';
+import { createMedia } from '@azzapp/data';
 import { MODULE_IMAGES_SIZES } from '@azzapp/shared/cardModuleHelpers';
 import { createPresignedUpload } from '@azzapp/shared/cloudinaryHelpers';
 import { COVER_ASSET_SIZES } from '@azzapp/shared/coverHelpers';

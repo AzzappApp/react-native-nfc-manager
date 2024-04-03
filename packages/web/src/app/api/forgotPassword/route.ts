@@ -1,6 +1,6 @@
 import * as Sentry from '@sentry/nextjs';
 import { NextResponse } from 'next/server';
-import { getUserByEmail, getUserByPhoneNumber } from '@azzapp/data/domains';
+import { getUserByEmail, getUserByPhoneNumber } from '@azzapp/data';
 import ERRORS from '@azzapp/shared/errors';
 import {
   formatPhoneNumber,

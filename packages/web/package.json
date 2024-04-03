@@ -17,6 +17,7 @@
     "@azzapp/data": "0.5.5-canary.193",
     "@azzapp/i18n": "0.5.5-canary.193",
     "@azzapp/shared": "0.5.5-canary.193",
+    "@azzapp/schema": "0.5.5-canary.193",
     "@envelop/dataloader": "^6.0.0",
     "@envelop/generic-auth": "^7.0.0",
     "@envelop/parser-cache": "^7.0.0",

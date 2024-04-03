@@ -3,7 +3,7 @@ import { Button, Modal, type ModalProps } from '#ui';
 import CoverRenderer from '#components/renderer/CoverRenderer';
 import styles from './DownloadAppModal.css';
 import type { ModalActions } from '#ui/Modal';
-import type { Media, WebCard } from '@azzapp/data/domains';
+import type { Media, WebCard } from '@azzapp/data';
 import type { ForwardedRef } from 'react';
 
 type DownloadAppModalProps = Omit<ModalProps, 'children'> & {

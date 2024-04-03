@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { getProfileById } from '@azzapp/data/domains';
+import { getProfileById } from '@azzapp/data';
 import { unseal } from '@azzapp/shared/crypto';
 import ERRORS from '@azzapp/shared/errors';
 import { buildApplePass } from '#helpers/pass/apple';

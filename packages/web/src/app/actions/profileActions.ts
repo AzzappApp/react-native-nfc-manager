@@ -9,7 +9,7 @@ import {
   getPostById,
   getWebCardById,
   getWebCardsPostsWithMedias,
-} from '@azzapp/data/domains';
+} from '@azzapp/data';
 
 export const loadProfilePosts = async (
   profileId: string,

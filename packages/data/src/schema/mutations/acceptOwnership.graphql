@@ -1,8 +1,0 @@
-extend type Mutation {
-  acceptOwnership(profileId: ID!): AcceptOwnershipPayload
-}
-
-
-type AcceptOwnershipPayload {
-  profile: Profile
-}

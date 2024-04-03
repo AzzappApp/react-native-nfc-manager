@@ -7,7 +7,7 @@ import { labelsOptions, useForm } from '#helpers/formHelpers';
 import { saveCompanyActivity } from './companyActivityActions';
 import WebCardTemplateTypeListInput from './WebCardTemplateTypeListInput';
 import type { CompanyActivityErrors } from './companyActivitySchema';
-import type { CompanyActivity, CardTemplateType } from '@azzapp/data/domains';
+import type { CompanyActivity, CardTemplateType } from '@azzapp/data';
 
 type CompanyActivityFormProps = {
   companyActivity?: CompanyActivity | null;

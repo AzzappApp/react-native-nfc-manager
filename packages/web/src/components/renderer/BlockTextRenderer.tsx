@@ -7,7 +7,7 @@ import {
 import { fontsMap } from '#helpers/fonts';
 import CardModuleBackground from '../CardModuleBackground';
 import type { ModuleRendererProps } from './ModuleRenderer';
-import type { CardModuleBlockText } from '@azzapp/data/domains';
+import type { CardModuleBlockText } from '@azzapp/data';
 
 export type BlockTextRendererProps = ModuleRendererProps<CardModuleBlockText> &
   Omit<React.HTMLProps<HTMLDivElement>, 'children'>;

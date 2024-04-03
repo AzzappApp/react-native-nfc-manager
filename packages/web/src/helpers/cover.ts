@@ -1,4 +1,4 @@
-import { getMediasByIds, type WebCard } from '@azzapp/data/domains';
+import { getMediasByIds, type WebCard } from '@azzapp/data';
 import { swapColor } from '@azzapp/shared/cardHelpers';
 import { decodeMediaId } from '@azzapp/shared/imagesHelpers';
 
