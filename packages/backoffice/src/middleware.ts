@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { getUserById } from '@azzapp/data/domains';
 import backOfficeSections from '#backOfficeSections';
 import { destroySession, getRequestSession } from '#helpers/session';
+import type { SubSection } from '#backOfficeSections';
 import type { NextURL } from 'next/dist/server/web/next-url';
 import type { NextRequest } from 'next/server';
 
@@ -32,9 +33,11 @@ export async function middleware(request: NextRequest) {
   if (!user) {
     return destroySession(redirectToLogin(nextUrl));
   }
-  const section = backOfficeSections.find(section =>
-    nextUrl.pathname.startsWith(section.href),
-  );
+  const section = backOfficeSections
+    .reduce((acc, { subSections }) => {
+      return [...acc, ...subSections];
+    }, [] as SubSection[])
+    .find(section => nextUrl.pathname.startsWith(section.href));
   if (section && !user.roles?.some(role => section.roles.includes(role))) {
     return new NextResponse('Forbidden', { status: 403 });
   }

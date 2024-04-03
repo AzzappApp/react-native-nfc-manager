@@ -1,17 +1,11 @@
 import {
-  AddCard,
-  CardGiftcard,
-  Colorize,
-  Image,
-  ImageAspectRatio,
-  Person,
-  Person2,
-  Report,
-  Style,
+  AccountCircle,
+  Layers,
+  People,
+  PhoneIphone,
+  StarsSharp,
 } from '@mui/icons-material';
-import DashboardIcon from '@mui/icons-material/Dashboard';
-import LocalActivityIcon from '@mui/icons-material/LocalActivity';
-import MergeTypeIcon from '@mui/icons-material/MergeType';
+import MenuIcon from '@mui/icons-material/Menu';
 import {
   AppBar,
   Box,
@@ -19,13 +13,10 @@ import {
   Drawer,
   List,
   ListItem,
-  ListItemButton,
-  ListItemIcon,
-  ListItemText,
   Toolbar,
   Typography,
 } from '@mui/material';
-import Link from 'next/link';
+import CollapseListItem from '#components/CollapseListItem';
 import LogoutButton from '#components/LogoutButton';
 import getCurrentUser from '#helpers/getCurrentUser';
 import backOfficeSections from '../../backOfficeSections';
@@ -33,18 +24,15 @@ import backOfficeSections from '../../backOfficeSections';
 const MainLayout = async ({ children }: { children: React.ReactNode }) => {
   const user = await getCurrentUser();
 
-  const pages = backOfficeSections.filter(({ roles }) =>
-    roles.some(role => user?.roles?.includes(role)),
-  );
-
   return (
     <>
-      <AppBar position="fixed" sx={{ zIndex: 2000 }}>
-        <Toolbar sx={{ backgroundColor: 'background.paper' }}>
-          <DashboardIcon
-            sx={{ color: '#444', mr: 2, transform: 'translateY(-2px)' }}
-          />
-          <Typography variant="h6" noWrap component="div" color="black">
+      <AppBar
+        position="fixed"
+        sx={{ zIndex: 2000, backgroundColor: '#263238' }}
+      >
+        <Toolbar>
+          <MenuIcon sx={{ mr: 2 }} />
+          <Typography variant="h6" noWrap component="div" color="white">
             Azzapp - Backoffice
           </Typography>
         </Toolbar>
@@ -65,20 +53,15 @@ const MainLayout = async ({ children }: { children: React.ReactNode }) => {
         anchor="left"
       >
         <Divider />
-        <List>
-          {pages.map(({ text, href }) => {
-            const Icon = SectionIcons[href];
-            return (
-              <ListItem key={href} disablePadding>
-                <ListItemButton component={Link} href={href}>
-                  <ListItemIcon>
-                    <Icon />
-                  </ListItemIcon>
-                  <ListItemText primary={text} />
-                </ListItemButton>
-              </ListItem>
-            );
-          })}
+        <List style={{ paddingTop: 40 }}>
+          {backOfficeSections.map(section => (
+            <CollapseListItem
+              key={section.text}
+              section={section}
+              user={user}
+              Icon={SectionIcons[section.id]}
+            />
+          ))}
         </List>
         <Divider sx={{ mt: 'auto' }} />
         <List>
@@ -105,18 +88,12 @@ const MainLayout = async ({ children }: { children: React.ReactNode }) => {
 
 export default MainLayout;
 
-const DRAWER_WIDTH = 240;
+const DRAWER_WIDTH = 308;
 
 const SectionIcons: Record<string, React.ComponentType> = {
-  '/users': Person,
-  '/colorPalettes': Colorize,
-  '/cardStyles': Style,
-  '/webCardCategories': Person2,
-  '/staticMedias': Image,
-  '/suggestedMedias': ImageAspectRatio,
-  '/coverTemplates': CardGiftcard,
-  '/cardTemplates': AddCard,
-  '/cardTemplateTypes': MergeTypeIcon,
-  '/companyActivities': LocalActivityIcon,
-  '/reports': Report,
+  userActivity: AccountCircle,
+  profileType: People,
+  webcards: PhoneIphone,
+  covers: StarsSharp,
+  sections: Layers,
 };

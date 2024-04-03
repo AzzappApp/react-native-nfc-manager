@@ -1,52 +1,119 @@
 import { ADMIN } from '#roles';
 
-const backOfficeSections = [
-  { text: 'Users', href: '/users', roles: [ADMIN] },
-  { text: 'Colors', href: '/colorPalettes', roles: [ADMIN] },
+export type SubSection = {
+  text: string;
+  href: string;
+  roles: string[];
+};
+
+export type Section = {
+  id: string;
+  text: string;
+  subSections: SubSection[];
+};
+
+const backOfficeSections: Section[] = [
   {
-    text: 'Card Styles',
-    href: '/cardStyles',
-    roles: [ADMIN],
+    id: 'userActivity',
+    text: 'Users activity',
+    subSections: [
+      { text: 'Account', href: '/users', roles: [ADMIN] },
+      {
+        text: 'Moderation',
+        href: '/reports',
+        roles: [ADMIN],
+      },
+      {
+        text: 'Metrics',
+        href: '#',
+        roles: [ADMIN],
+      },
+    ],
   },
   {
-    text: 'Profile Categories',
-    href: '/webCardCategories',
-    roles: [ADMIN],
+    id: 'profileType',
+    text: 'Profiles types',
+    subSections: [
+      {
+        text: 'Categories',
+        href: '/webCardCategories',
+        roles: [ADMIN],
+      },
+      {
+        text: 'Activities',
+        href: '/companyActivities',
+        roles: [ADMIN],
+      },
+    ],
   },
   {
-    text: 'Company Activities',
-    href: '/companyActivities',
-    roles: [ADMIN],
+    id: 'webcards',
+    text: 'Webcards',
+    subSections: [
+      {
+        text: 'Styles',
+        href: '/cardStyles',
+        roles: [ADMIN],
+      },
+      { text: 'Colors', href: '/colorPalettes', roles: [ADMIN] },
+      {
+        text: 'Webcards templates',
+        href: '/cardTemplates',
+        roles: [ADMIN],
+      },
+      {
+        text: 'Webcards templates types',
+        href: '/cardTemplateTypes',
+        roles: [ADMIN],
+      },
+    ],
   },
   {
-    text: 'Medias',
-    href: '/staticMedias',
-    roles: [ADMIN],
+    id: 'covers',
+    text: 'Covers',
+    subSections: [
+      {
+        text: 'Covers templates',
+        href: '/coverTemplates',
+        roles: [ADMIN],
+      },
+      {
+        text: 'Covers templates types',
+        href: '#',
+        roles: [ADMIN],
+      },
+      {
+        text: 'Cover filters',
+        href: '#',
+        roles: [ADMIN],
+      },
+      {
+        text: 'Cover suggestions',
+        href: '/suggestedMedias',
+        roles: [ADMIN],
+      },
+    ],
   },
   {
-    text: 'Cover Suggestions',
-    href: '/suggestedMedias',
-    roles: [ADMIN],
-  },
-  {
-    text: 'Cover Templates',
-    href: '/coverTemplates',
-    roles: [ADMIN],
-  },
-  {
-    text: 'Card Templates',
-    href: '/cardTemplates',
-    roles: [ADMIN],
-  },
-  {
-    text: 'Card Template Types',
-    href: '/cardTemplateTypes',
-    roles: [ADMIN],
-  },
-  {
-    text: 'Reports',
-    href: '/reports',
-    roles: [ADMIN],
+    id: 'sections',
+    text: 'Sections',
+    subSections: [
+      {
+        text: 'Sections',
+        href: '#',
+        roles: [ADMIN],
+      },
+      {
+        text: 'Sections types',
+        href: '#',
+        roles: [ADMIN],
+      },
+      {
+        text: 'Sections backgrounds',
+        href: '/staticMedias',
+        roles: [ADMIN],
+      },
+    ],
   },
 ];
 
