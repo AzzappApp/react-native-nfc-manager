@@ -2,7 +2,7 @@ import type { Config } from 'drizzle-kit';
 import 'dotenv/config';
 
 export default {
-  schema: './src/domains/*',
+  schema: './src/*',
   dbCredentials: {
     uri: process.env.DATABASE_URL ?? '',
   },
