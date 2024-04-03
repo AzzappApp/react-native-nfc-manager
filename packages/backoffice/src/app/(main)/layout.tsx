@@ -53,7 +53,7 @@ const MainLayout = async ({ children }: { children: React.ReactNode }) => {
         anchor="left"
       >
         <Divider />
-        <List style={{ paddingTop: 40 }}>
+        <List style={{ paddingTop: 40, overflow: 'auto' }}>
           {backOfficeSections.map(section => (
             <CollapseListItem
               key={section.text}
@@ -73,11 +73,11 @@ const MainLayout = async ({ children }: { children: React.ReactNode }) => {
       <Box
         component="main"
         sx={{
-          flexGrow: 1,
-          bgcolor: 'background.default',
           ml: `${DRAWER_WIDTH}px`,
           mt: ['48px', '56px', '64px'],
           p: 3,
+          overflow: 'auto',
+          height: 'calc(100% - 64px)',
         }}
       >
         {children}

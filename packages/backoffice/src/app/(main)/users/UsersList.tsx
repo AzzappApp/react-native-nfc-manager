@@ -1,5 +1,6 @@
 'use client';
-import { Box, TextField, Typography } from '@mui/material';
+import { Search } from '@mui/icons-material';
+import { Box, InputAdornment, TextField, Typography } from '@mui/material';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import {
@@ -50,7 +51,7 @@ const UsersList = ({
   );
 
   const onPageChange = (model: GridPaginationModel) => {
-    updateSearchParams(model.page, sortField, sortOrder, search);
+    updateSearchParams(model.page + 1, sortField, sortOrder, search);
   };
 
   const onSortModelChange = (model: GridSortModel) => {
@@ -73,7 +74,13 @@ const UsersList = ({
   }, [defferedSearch, page, search, sortField, sortOrder, updateSearchParams]);
 
   return (
-    <>
+    <Box
+      sx={{
+        display: 'flex',
+        flexDirection: 'column',
+        height: '100%',
+      }}
+    >
       <Typography variant="h4" component="h1" sx={{ mb: 2 }}>
         Users
       </Typography>
@@ -85,6 +92,13 @@ const UsersList = ({
         onChange={e => setCurrentSearch(e.target.value)}
         value={currentSearch}
         sx={{ mb: 2, width: 500 }}
+        InputProps={{
+          startAdornment: (
+            <InputAdornment position="start">
+              <Search />
+            </InputAdornment>
+          ),
+        }}
       />
 
       <DataGrid
@@ -111,7 +125,7 @@ const UsersList = ({
         rowSelection={false}
         sortingOrder={['asc', 'desc']}
       />
-    </>
+    </Box>
   );
 };
 

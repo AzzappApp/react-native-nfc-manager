@@ -26,7 +26,7 @@ const getUsers = (
     );
   }
   return query
-    .offset(page * PAGE_SIZE)
+    .offset(page * (PAGE_SIZE - 1))
     .limit(PAGE_SIZE)
     .orderBy(
       order === 'asc' ? asc(sortsColumns[sort]) : desc(sortsColumns[sort]),
