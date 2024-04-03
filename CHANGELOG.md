@@ -1,5 +1,6 @@
-## 0.5.5-canary.191
+## 0.5.5-canary.192
 
+* **build:**  - upgrade web & data dependencies ([#3199](https://github.com/AzzappApp/azzapp/pull/3199))
 * **fix:**  - add webCardKind on allowed fields
 * **fix:**  - see all users as subscribers
 * **build:**  - fix crash on home
