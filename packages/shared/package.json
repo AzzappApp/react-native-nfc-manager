@@ -19,17 +19,17 @@
     "dev"
   ],
   "dependencies": {
-    "libphonenumber-js": "^1.10.45",
+    "libphonenumber-js": "^1.10.59",
     "lz-string": "^1.5.0",
     "validator": "^13.11.0",
-    "vcard-creator": "^0.6.0",
-    "iron-webcrypto": "^0.8.0",
+    "vcard-creator": "^0.7.0",
+    "iron-webcrypto": "^1.1.0",
     "chroma-js": "^2.4.2",
     "csv42": "5.0.0"
   },
   "devDependencies": {
-    "@types/relay-runtime": "^14.1.22",
-    "@types/validator": "^13.11.1",
-    "@types/chroma-js": "^2.4.3"
+    "@types/relay-runtime": "^14.1.23",
+    "@types/validator": "^13.11.9",
+    "@types/chroma-js": "^2.4.4"
   }
 }

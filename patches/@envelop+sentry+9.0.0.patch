@@ -24,7 +24,7 @@ index 3de73bd..b5aed07 100644
  export const useSentry = (options = {}) => {
      function pick(key, defaultValue) {
 diff --git a/node_modules/@envelop/sentry/typings/index.d.cts b/node_modules/@envelop/sentry/typings/index.d.cts
-index 53c1f3d..d82c1ef 100644
+index 5f191dd..2832fcc 100644
 --- a/node_modules/@envelop/sentry/typings/index.d.cts
 +++ b/node_modules/@envelop/sentry/typings/index.d.cts
 @@ -1,5 +1,5 @@
@@ -35,7 +35,7 @@ index 53c1f3d..d82c1ef 100644
  export type SentryPluginOptions<PluginContext extends Record<string, any>> = {
      /**
 diff --git a/node_modules/@envelop/sentry/typings/index.d.ts b/node_modules/@envelop/sentry/typings/index.d.ts
-index 53c1f3d..d82c1ef 100644
+index 5f191dd..2832fcc 100644
 --- a/node_modules/@envelop/sentry/typings/index.d.ts
 +++ b/node_modules/@envelop/sentry/typings/index.d.ts
 @@ -1,5 +1,5 @@

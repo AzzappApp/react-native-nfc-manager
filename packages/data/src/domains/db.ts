@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/consistent-type-imports */
-import { connect } from '@planetscale/database';
+import { Client } from '@planetscale/database';
 import { sql } from 'drizzle-orm';
 import { char, datetime, varchar, json } from 'drizzle-orm/mysql-core';
 import { drizzle } from 'drizzle-orm/planetscale-serverless';
@@ -40,7 +40,7 @@ export const ConnectionMonitorer = {
 };
 
 // create the connection
-const connection = connect({
+const connection = new Client({
   host: process.env.DATABASE_HOST,
   username: process.env.DATABASE_USERNAME,
   password: process.env.DATABASE_PASSWORD,

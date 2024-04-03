@@ -37,7 +37,8 @@ export const PostTable = mysqlTable(
     updatedAt: cols
       .dateTime('updatedAt')
       .notNull()
-      .default(DEFAULT_DATETIME_VALUE),
+      .default(DEFAULT_DATETIME_VALUE)
+      .$onUpdate(() => new Date()),
     deleted: boolean('deleted').notNull().default(false),
     deletedBy: cols.cuid('deletedBy'),
     deletedAt: cols.dateTime('deletedAt'),
@@ -291,10 +292,7 @@ export const createPost = async (values: NewPost, tx: DbTransaction = db) => {
  * @return {*}  {Promise<Partial<Post>>}
  */
 export const updatePost = async (postId: string, data: Partial<NewPost>) => {
-  await db
-    .update(PostTable)
-    .set({ ...data, updatedAt: new Date() })
-    .where(eq(PostTable.id, postId));
+  await db.update(PostTable).set(data).where(eq(PostTable.id, postId));
 };
 
 /**

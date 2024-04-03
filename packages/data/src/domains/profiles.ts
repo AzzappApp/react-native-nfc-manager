@@ -49,7 +49,8 @@ export const ProfileTable = mysqlTable(
     lastContactCardUpdate: cols
       .dateTime('lastContactCardUpdate')
       .notNull()
-      .default(DEFAULT_DATETIME_VALUE),
+      .default(DEFAULT_DATETIME_VALUE)
+      .$onUpdate(() => new Date()),
     nbContactCardScans: int('nbContactCardScans').default(0).notNull(),
     deleted: boolean('deleted').default(false).notNull(),
     deletedAt: cols.dateTime('deletedAt'),

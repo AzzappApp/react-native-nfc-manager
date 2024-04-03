@@ -21,7 +21,8 @@ export const UserTable = mysqlTable(
     updatedAt: cols
       .dateTime('updatedAt')
       .notNull()
-      .default(DEFAULT_DATETIME_VALUE),
+      .default(DEFAULT_DATETIME_VALUE)
+      .$onUpdate(() => new Date()),
     roles: json('roles').$type<string[]>(),
     invited: boolean('invited').default(false).notNull(),
     locale: cols.defaultVarchar('locale'),
@@ -100,11 +101,7 @@ export const updateUser = async (
   userId: string,
   data: Partial<User>,
 ): Promise<void> => {
-  const updatedUser = {
-    updatedAt: new Date(),
-    ...data,
-  };
-  await db.update(UserTable).set(updatedUser).where(eq(UserTable.id, userId));
+  await db.update(UserTable).set(data).where(eq(UserTable.id, userId));
 };
 
 export const getTotalMultiUser = async (userId: string) => {

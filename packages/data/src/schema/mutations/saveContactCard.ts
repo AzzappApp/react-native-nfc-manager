@@ -32,7 +32,6 @@ const saveContactCard: MutationResolvers['saveContactCard'] = async (
         (await buildDefaultContactCard(webCard, userId))),
       ...contactCard,
     },
-    lastContactCardUpdate: new Date(),
   };
 
   updates.avatarId = contactCard.avatarId;

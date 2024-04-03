@@ -37,23 +37,23 @@
   "dependencies": {
     "@azzapp/i18n": "0.5.5-canary.191",
     "@azzapp/shared": "0.5.5-canary.191",
-    "@graphql-tools/schema": "^10.0.0",
-    "@paralleldrive/cuid2": "^2.2.0",
-    "@planetscale/database": "^1.11.0",
+    "@graphql-tools/schema": "^10.0.3",
+    "@paralleldrive/cuid2": "^2.2.2",
+    "@planetscale/database": "^1.16.0",
     "dataloader": "^2.2.2",
-    "drizzle-orm": "^0.29.3",
-    "graphql": "^16.8.0",
+    "drizzle-orm": "^0.30.6",
+    "graphql": "^16.8.1",
     "graphql-middleware": "^6.1.35",
-    "graphql-relay": "^0.10.0",
-    "graphql-scalars": "^1.22.2",
+    "graphql-relay": "^0.10.1",
+    "graphql-scalars": "^1.23.0",
     "graphql-shield": "^7.6.5",
     "graphql-tag": "^2.12.6",
     "lodash": "^4.17.21",
     "zod": "^3.22.4"
   },
   "devDependencies": {
-    "@types/lodash": "4.14.197",
-    "drizzle-kit": "0.20.13",
+    "@types/lodash": "4.17.0",
+    "drizzle-kit": "0.20.14",
     "node-fetch": "^3"
   }
 }

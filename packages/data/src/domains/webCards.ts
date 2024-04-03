@@ -50,7 +50,8 @@ export const WebCardTable = mysqlTable(
     updatedAt: cols
       .dateTime('updatedAt')
       .notNull()
-      .default(DEFAULT_DATETIME_VALUE),
+      .default(DEFAULT_DATETIME_VALUE)
+      .$onUpdate(() => new Date()),
     isMultiUser: boolean('isMultiUser').default(false).notNull(),
 
     /* Cards infos */
@@ -93,7 +94,6 @@ export const WebCardTable = mysqlTable(
       mediaId?: string | null;
       segmented: boolean;
     }>(),
-
     nbFollowers: int('nbFollowers').default(0).notNull(),
     nbFollowings: int('nbFollowings').default(0).notNull(),
     nbPosts: int('nbPosts').default(0).notNull(),
@@ -246,14 +246,9 @@ export const updateWebCard = async (
   updates: Partial<WebCard>,
   tx: DbTransaction = db,
 ) => {
-  const updatedWebCard = {
-    updatedAt: new Date(),
-    ...updates,
-  };
-
   await tx
     .update(WebCardTable)
-    .set(updatedWebCard)
+    .set(updates)
     .where(eq(WebCardTable.id, webCardId));
 };
 

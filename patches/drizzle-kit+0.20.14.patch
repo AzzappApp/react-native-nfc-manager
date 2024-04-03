@@ -1,5 +1,5 @@
 diff --git a/node_modules/drizzle-kit/bin.cjs b/node_modules/drizzle-kit/bin.cjs
-index 403348d..c1d2dd9 100755
+index 0edfed8..9fd74bc 100755
 --- a/node_modules/drizzle-kit/bin.cjs
 +++ b/node_modules/drizzle-kit/bin.cjs
 @@ -4564,6 +4564,7 @@ var init_mysqlSchema = __esm({

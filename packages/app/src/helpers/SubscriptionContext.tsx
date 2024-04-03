@@ -12,6 +12,7 @@ import Purchases from 'react-native-purchases';
 import { graphql, useMutation } from 'react-relay';
 import { useAppState } from '#hooks/useAppState';
 import useAuthState from '#hooks/useAuthState';
+import { getAuthState } from './authStore';
 import { getActiveSubscription } from './MobileWebAPI';
 import type { ReactNode } from 'react';
 import type {
@@ -108,7 +109,7 @@ const SubscriptionProvider = ({ children }: { children: ReactNode }) => {
   const appState = useAppState();
 
   useEffect(() => {
-    if (appState === 'active') {
+    if (appState === 'active' && getAuthState().authenticated) {
       getActiveSubscription().then(response => {
         relaySubscription.current = response.subscription;
         mergeRelayRcResponses();
