@@ -1,5 +1,7 @@
-## 0.5.5-canary.193
+## 0.5.5-canary.194
 
+* **fix:**  - add missing locales in country selector ([#3183](https://github.com/AzzappApp/azzapp/pull/3183))
+* **build:**  - split graphql-schema and database access ([#3200](https://github.com/AzzappApp/azzapp/pull/3200))
 * **build:**  - upgrade web & data dependencies ([#3199](https://github.com/AzzappApp/azzapp/pull/3199))
 * **fix:**  - add webCardKind on allowed fields
 * **fix:**  - see all users as subscribers
