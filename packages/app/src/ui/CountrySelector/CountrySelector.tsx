@@ -11,9 +11,16 @@ import COUNTRY_FLAG from './CountryFlag';
 import type { SelectListItemInfo, SelectListProps } from './../SelectList';
 import type { CountryCode } from 'libphonenumber-js';
 
-//TODO FIND a way to get the locales from the SUPPORTED_LOCALES
+i18nCountries.registerLocale(require('i18n-iso-countries/langs/da.json'));
+i18nCountries.registerLocale(require('i18n-iso-countries/langs/de.json'));
 i18nCountries.registerLocale(require('i18n-iso-countries/langs/en.json'));
+i18nCountries.registerLocale(require('i18n-iso-countries/langs/es.json'));
 i18nCountries.registerLocale(require('i18n-iso-countries/langs/fr.json'));
+i18nCountries.registerLocale(require('i18n-iso-countries/langs/it.json'));
+i18nCountries.registerLocale(require('i18n-iso-countries/langs/nl.json'));
+i18nCountries.registerLocale(require('i18n-iso-countries/langs/no.json'));
+i18nCountries.registerLocale(require('i18n-iso-countries/langs/pt.json'));
+i18nCountries.registerLocale(require('i18n-iso-countries/langs/sv.json'));
 
 type CountrySelectorProps = Omit<
   SelectListProps<CountryItem>,
@@ -38,7 +45,11 @@ const CountrySelector = ({
     );
     return countries
       .map(country => {
-        const name = i18nCountries.getName(country, locale);
+        let name = i18nCountries.getName(country, locale);
+        if (!name) {
+          //fallback to english
+          name = i18nCountries.getName(country, 'en');
+        }
         const callingCode = getCountryCallingCode(country);
         return { callingCode, name, code: country };
       })
