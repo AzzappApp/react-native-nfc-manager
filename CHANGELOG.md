@@ -1,4 +1,4 @@
-## 0.5.5-canary.195
+## 0.5.5-canary.196
 
 * **fix:**  - drizzle-kit config
 * **fix:**  - add missing locales in country selector ([#3183](https://github.com/AzzappApp/azzapp/pull/3183))
