@@ -1,22 +1,32 @@
 'use client';
 
-import { Box, Typography } from '@mui/material';
-import Link from 'next/link';
+import { Box, Button, Typography } from '@mui/material';
+import { useRouter } from 'next/navigation';
 import DataGrid from '#components/DataGrid';
 import type { CardTemplateType } from '@azzapp/data';
 import type { GridColDef } from '@mui/x-data-grid';
 
 type CardTemplateTypesListProps = {
   cardTemplateTypes: CardTemplateType[];
+  pageSize: number;
 };
 
 const CardTemplateTypesList = ({
   cardTemplateTypes,
+  pageSize,
 }: CardTemplateTypesListProps) => {
+  const router = useRouter();
+
   return (
-    <>
+    <Box
+      sx={{
+        display: 'flex',
+        flexDirection: 'column',
+        height: '100%',
+      }}
+    >
       <Typography variant="h4" component="h1" sx={{ mb: 2 }}>
-        Card Template Types
+        WebCards templates types
       </Typography>
       <Box
         sx={{
@@ -25,31 +35,35 @@ const CardTemplateTypesList = ({
           mb: 2,
         }}
       >
-        <Link href="/cardTemplateTypes/add">
-          <Typography variant="body1">+ Card Template Type</Typography>
-        </Link>
+        <Button
+          variant="contained"
+          onClick={() => {
+            router.push('/cardTemplateTypes/add');
+          }}
+        >
+          NEW TYPE
+        </Button>
       </Box>
       <DataGrid
         columns={columns}
         rows={cardTemplateTypes}
-        pageSizeOptions={[25]}
+        pageSizeOptions={[pageSize]}
         rowSelection={false}
         sortingOrder={['asc', 'desc']}
+        onRowClick={params => {
+          router.push(`/cardTemplateTypes/${params.id}`);
+        }}
+        sx={{
+          '& .MuiDataGrid-row:hover': {
+            cursor: 'pointer',
+          },
+        }}
       />
-    </>
+    </Box>
   );
 };
 
 const columns: GridColDef[] = [
-  {
-    field: 'id',
-    headerName: 'ID',
-    width: 250,
-    renderCell: params => (
-      // Bypass cache to avoid getting out-of-date data
-      <a href={`/cardTemplateTypes/${params.id}`}>${params.row.id}</a>
-    ),
-  },
   {
     field: 'labelKey',
     headerName: 'Label Key',

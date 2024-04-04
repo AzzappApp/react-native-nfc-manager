@@ -56,12 +56,13 @@ const MainLayout = async ({ children }: { children: React.ReactNode }) => {
       >
         <Divider />
         <List style={{ paddingTop: 40, overflow: 'auto' }}>
-          {backOfficeSections.map(section => (
+          {backOfficeSections.map((section, i) => (
             <CollapseListItem
               key={section.text}
               section={section}
               user={user}
               Icon={SectionIcons[section.id]}
+              isOpen={i === 0}
             />
           ))}
         </List>

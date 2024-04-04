@@ -8,7 +8,14 @@ const ProfileCategoriesPage = async () => {
     .from(WebCardCategoryTable)
     .orderBy(asc(WebCardCategoryTable.order));
 
-  return <WebCardCategoriesList webCardCategories={webCardCategories} />;
+  return (
+    <WebCardCategoriesList
+      webCardCategories={webCardCategories}
+      pageSize={PAGE_SIZE}
+    />
+  );
 };
 
 export default ProfileCategoriesPage;
+
+const PAGE_SIZE = 25;

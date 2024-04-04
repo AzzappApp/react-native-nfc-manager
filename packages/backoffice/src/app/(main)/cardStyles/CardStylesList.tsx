@@ -1,19 +1,28 @@
 'use client';
-import { Box, Typography } from '@mui/material';
-import Link from 'next/link';
+import { Box, Button, Typography } from '@mui/material';
+import { useRouter } from 'next/navigation';
 import DataGrid from '#components/DataGrid';
 import type { CardStyle } from '@azzapp/data';
 import type { GridColDef } from '@mui/x-data-grid';
 
 type CardStylesListProps = {
   cardStyles: CardStyle[];
+  pageSize: number;
 };
 
-const CardStylesList = ({ cardStyles }: CardStylesListProps) => {
+const CardStylesList = ({ cardStyles, pageSize }: CardStylesListProps) => {
+  const router = useRouter();
+
   return (
-    <>
+    <Box
+      sx={{
+        display: 'flex',
+        flexDirection: 'column',
+        height: '100%',
+      }}
+    >
       <Typography variant="h4" component="h1" sx={{ mb: 2 }}>
-        CardStyles
+        WebCards Styles
       </Typography>
       <Box
         sx={{
@@ -22,30 +31,35 @@ const CardStylesList = ({ cardStyles }: CardStylesListProps) => {
           mb: 2,
         }}
       >
-        <Link href="/cardStyles/add">
-          <Typography variant="body1">+ New CardStyle</Typography>
-        </Link>
+        <Button
+          variant="contained"
+          onClick={() => {
+            router.push('/cardStyles/add');
+          }}
+        >
+          NEW STYLE
+        </Button>
       </Box>
       <DataGrid
         columns={columns}
         rows={cardStyles}
-        pageSizeOptions={[25]}
+        pageSizeOptions={[pageSize]}
         rowSelection={false}
         sortingOrder={['asc', 'desc']}
+        onRowClick={params => {
+          router.push(`/cardStyles/${params.id}`);
+        }}
+        sx={{
+          '& .MuiDataGrid-row:hover': {
+            cursor: 'pointer',
+          },
+        }}
       />
-    </>
+    </Box>
   );
 };
 
 const columns: GridColDef[] = [
-  {
-    field: 'id',
-    headerName: 'ID',
-    width: 250,
-    renderCell: params => (
-      <Link href={`/cardStyles/${params.id}`}>${params.row.id}</Link>
-    ),
-  },
   {
     field: 'labelKey',
     headerName: 'Label Key',

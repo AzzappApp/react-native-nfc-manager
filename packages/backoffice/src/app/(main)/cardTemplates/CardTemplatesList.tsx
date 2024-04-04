@@ -1,22 +1,30 @@
 'use client';
 
-import { Box, Typography } from '@mui/material';
-import Link from 'next/link';
+import { Box, Button, Typography } from '@mui/material';
+import { useRouter } from 'next/navigation';
 import DataGrid from '#components/DataGrid';
 import type { CardTemplate } from '@azzapp/data';
 import type { GridColDef } from '@mui/x-data-grid';
 
 type CardTemplatesListProps = {
   cardTemplates: CardTemplate[];
+  pageSize: number;
 };
 
 const CardTemplatesList = (props: CardTemplatesListProps) => {
-  const { cardTemplates } = props;
+  const { cardTemplates, pageSize } = props;
+  const router = useRouter();
 
   return (
-    <>
+    <Box
+      sx={{
+        display: 'flex',
+        flexDirection: 'column',
+        height: '100%',
+      }}
+    >
       <Typography variant="h4" component="h1" sx={{ mb: 2 }}>
-        CardTemplates
+        WebCards templates
       </Typography>
       <Box
         sx={{
@@ -25,31 +33,35 @@ const CardTemplatesList = (props: CardTemplatesListProps) => {
           mb: 2,
         }}
       >
-        <Link href="/cardTemplates/add">
-          <Typography variant="body1">+ New CardTemplate</Typography>
-        </Link>
+        <Button
+          variant="contained"
+          onClick={() => {
+            router.push('/cardTemplates/add');
+          }}
+        >
+          NEW TEMPLATE
+        </Button>
       </Box>
       <DataGrid
         columns={columns}
         rows={cardTemplates}
-        pageSizeOptions={[25]}
+        pageSizeOptions={[pageSize]}
         rowSelection={false}
         sortingOrder={['asc', 'desc']}
+        onRowClick={params => {
+          router.push(`/cardTemplates/${params.id}`);
+        }}
+        sx={{
+          '& .MuiDataGrid-row:hover': {
+            cursor: 'pointer',
+          },
+        }}
       />
-    </>
+    </Box>
   );
 };
 
 const columns: GridColDef[] = [
-  {
-    field: 'id',
-    headerName: 'ID',
-    width: 250,
-    renderCell: params => (
-      // Bypass cache to avoid getting out-of-date data
-      <a href={`/cardTemplates/${params.id}`}>${params.row.id}</a>
-    ),
-  },
   {
     field: 'labelKey',
     headerName: 'Label Key',

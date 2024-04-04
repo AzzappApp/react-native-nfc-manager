@@ -7,7 +7,11 @@ const CoverTemplatesPage = async () => {
     .select()
     .from(CoverTemplateTable)
     .orderBy(asc(CoverTemplateTable.name));
-  return <CoverTemplatesList coverTemplates={CoverTemplates} />;
+  return (
+    <CoverTemplatesList coverTemplates={CoverTemplates} pageSize={PAGE_SIZE} />
+  );
 };
 
 export default CoverTemplatesPage;
+
+const PAGE_SIZE = 100;

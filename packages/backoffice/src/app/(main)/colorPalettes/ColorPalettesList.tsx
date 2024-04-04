@@ -1,19 +1,30 @@
 'use client';
-import { Box, Typography } from '@mui/material';
-import Link from 'next/link';
+import { Box, Button, Typography } from '@mui/material';
+import { useRouter } from 'next/navigation';
 import DataGrid from '#components/DataGrid';
 import type { ColorPalette } from '@azzapp/data';
 import type { GridColDef } from '@mui/x-data-grid';
 
 type ColorPalettesListProps = {
   colorPalettes: ColorPalette[];
+  pageSize: number;
 };
 
-const ColorPalettesList = ({ colorPalettes }: ColorPalettesListProps) => {
+const ColorPalettesList = ({
+  colorPalettes,
+  pageSize,
+}: ColorPalettesListProps) => {
+  const router = useRouter();
   return (
-    <>
+    <Box
+      sx={{
+        display: 'flex',
+        flexDirection: 'column',
+        height: '100%',
+      }}
+    >
       <Typography variant="h4" component="h1" sx={{ mb: 2 }}>
-        ColorPalettes
+        Colors
       </Typography>
       <Box
         sx={{
@@ -22,18 +33,31 @@ const ColorPalettesList = ({ colorPalettes }: ColorPalettesListProps) => {
           mb: 2,
         }}
       >
-        <Link href="/colorPalettes/add">
-          <Typography variant="body1">+ New ColorPalette</Typography>
-        </Link>
+        <Button
+          variant="contained"
+          onClick={() => {
+            router.push('/colorPalettes/add');
+          }}
+        >
+          NEW COLOR
+        </Button>
       </Box>
       <DataGrid
         columns={columns}
         rows={colorPalettes}
-        pageSizeOptions={[25]}
+        pageSizeOptions={[pageSize]}
         rowSelection={false}
         sortingOrder={['asc', 'desc']}
+        onRowClick={params => {
+          router.push(`/colorPalettes/${params.id}`);
+        }}
+        sx={{
+          '& .MuiDataGrid-row:hover': {
+            cursor: 'pointer',
+          },
+        }}
       />
-    </>
+    </Box>
   );
 };
 
@@ -50,14 +74,6 @@ const renderColor = (field: string) => (params: any) => (
 );
 
 const columns: GridColDef[] = [
-  {
-    field: 'id',
-    headerName: 'ID',
-    width: 250,
-    renderCell: params => (
-      <Link href={`/colorPalettes/${params.id}`}>${params.row.id}</Link>
-    ),
-  },
   {
     field: 'primary',
     headerName: 'Primary Color',

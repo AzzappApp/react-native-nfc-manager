@@ -25,7 +25,7 @@ const backOfficeSections: Section[] = [
       },
       {
         text: 'Metrics',
-        href: '#',
+        href: '/metrics',
         roles: [ADMIN],
       },
     ],
@@ -79,12 +79,12 @@ const backOfficeSections: Section[] = [
       },
       {
         text: 'Covers templates types',
-        href: '#',
+        href: '/coverTemplateTypes',
         roles: [ADMIN],
       },
       {
         text: 'Cover filters',
-        href: '#',
+        href: '/coverFilters',
         roles: [ADMIN],
       },
       {

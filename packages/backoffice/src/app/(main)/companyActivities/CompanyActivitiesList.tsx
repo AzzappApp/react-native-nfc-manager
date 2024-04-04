@@ -1,22 +1,30 @@
 'use client';
 
-import { Box, Typography } from '@mui/material';
-import Link from 'next/link';
+import { Box, Button, Typography } from '@mui/material';
+import { useRouter } from 'next/navigation';
 import DataGrid from '#components/DataGrid';
 import type { CompanyActivity } from '@azzapp/data';
 import type { GridColDef } from '@mui/x-data-grid';
 
 type CompanyActivitiesListProps = {
   companyActivities: CompanyActivity[];
+  pageSize: number;
 };
 
 const CompanyActivitiesList = (props: CompanyActivitiesListProps) => {
-  const { companyActivities } = props;
+  const { companyActivities, pageSize } = props;
+  const router = useRouter();
 
   return (
-    <>
+    <Box
+      sx={{
+        display: 'flex',
+        flexDirection: 'column',
+        height: '100%',
+      }}
+    >
       <Typography variant="h4" component="h1" sx={{ mb: 2 }}>
-        Company Activities
+        Activities
       </Typography>
       <Box
         sx={{
@@ -25,31 +33,35 @@ const CompanyActivitiesList = (props: CompanyActivitiesListProps) => {
           mb: 2,
         }}
       >
-        <Link href="/companyActivities/add">
-          <Typography variant="body1">+ New Company Activity</Typography>
-        </Link>
+        <Button
+          variant="contained"
+          onClick={() => {
+            router.push('/companyActivities/add');
+          }}
+        >
+          NEW ACTIVITY
+        </Button>
       </Box>
       <DataGrid
         columns={columns}
         rows={companyActivities}
-        pageSizeOptions={[25]}
+        pageSizeOptions={[pageSize]}
         rowSelection={false}
         sortingOrder={['asc', 'desc']}
+        onRowClick={params => {
+          router.push(`/companyActivities/${params.id}`);
+        }}
+        sx={{
+          '& .MuiDataGrid-row:hover': {
+            cursor: 'pointer',
+          },
+        }}
       />
-    </>
+    </Box>
   );
 };
 
 const columns: GridColDef[] = [
-  {
-    field: 'id',
-    headerName: 'ID',
-    width: 250,
-    renderCell: params => (
-      // Bypass cache to avoid getting out-of-date data
-      <a href={`/companyActivities/${params.id}`}>${params.row.id}</a>
-    ),
-  },
   {
     field: 'labelKey',
     headerName: 'Label Key',

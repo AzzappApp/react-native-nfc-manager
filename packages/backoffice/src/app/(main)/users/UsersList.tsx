@@ -1,7 +1,6 @@
 'use client';
 import { Search } from '@mui/icons-material';
 import { Box, InputAdornment, TextField, Typography } from '@mui/material';
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import {
   useCallback,
@@ -116,6 +115,14 @@ const UsersList = ({
             sort: sortOrder,
           },
         ]}
+        onRowClick={params => {
+          router.push(`/users/${params.id}`);
+        }}
+        sx={{
+          '& .MuiDataGrid-row:hover': {
+            cursor: 'pointer',
+          },
+        }}
         paginationMode="server"
         sortingMode="server"
         onPaginationModelChange={onPageChange}
@@ -130,14 +137,6 @@ const UsersList = ({
 };
 
 const columns: GridColDef[] = [
-  {
-    field: 'id',
-    headerName: 'ID',
-    width: 250,
-    renderCell: params => (
-      <Link href={`/users/${params.id}`}>{params.row.id}</Link>
-    ),
-  },
   { field: 'email', headerName: 'Email', flex: 1 },
   {
     field: 'phoneNumber',

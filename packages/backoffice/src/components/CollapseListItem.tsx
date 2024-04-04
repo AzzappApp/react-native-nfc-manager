@@ -17,13 +17,15 @@ import type { User } from '@azzapp/data';
 const CollapseListItem = ({
   section: { text, subSections },
   user,
+  isOpen,
   Icon,
 }: {
   section: Section;
   user: User | null;
+  isOpen: boolean;
   Icon?: React.ComponentType;
 }) => {
-  const [open, setOpen] = useState(true);
+  const [open, setOpen] = useState(isOpen);
 
   const pages = subSections.filter(({ roles }) =>
     roles.some(role => user?.roles?.includes(role)),

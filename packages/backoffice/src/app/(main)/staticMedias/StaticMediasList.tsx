@@ -1,5 +1,15 @@
 'use client';
-import { Box, Button, Dialog, DialogContent, Typography } from '@mui/material';
+import { ExpandMore } from '@mui/icons-material';
+import {
+  Accordion,
+  AccordionDetails,
+  AccordionSummary,
+  Box,
+  Button,
+  Dialog,
+  DialogContent,
+  Typography,
+} from '@mui/material';
 import { useOptimistic, useState } from 'react';
 import { uploadMedia } from '@azzapp/shared/WebAPI';
 import { getMediaFileKind } from '#helpers/fileHelpers';
@@ -136,32 +146,57 @@ const StaticMediasList = ({ staticMedias }: StaticMediasListProps) => {
   };
 
   return (
-    <>
+    <Box
+      sx={{
+        display: 'flex',
+        flexDirection: 'column',
+        height: '100%',
+      }}
+    >
       <Typography variant="h4" component="h1" sx={{ mb: 2 }}>
-        StaticMedias
+        Section Background
       </Typography>
       <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
         {Object.keys(usageLabels).map(usage => (
-          <Box key={usage}>
-            <Typography variant="h6" component="h2" sx={{ mb: 2 }}>
-              {usageLabels[usage]}
-            </Typography>
-            <StaticMediaSection
-              value={optimisticStaticMedias.filter(
-                media => media.usage === usage,
-              )}
-              onChange={onMediasOrderChange}
-              onSetEnabled={onSetEnabled}
-            />
-            <Button
-              variant="contained"
-              color="primary"
-              sx={{ mt: 2 }}
-              onClick={() => setAddingMediaUsage(usage as any)}
+          <Accordion key={usage}>
+            <AccordionSummary
+              expandIcon={<ExpandMore />}
+              aria-controls="panel1-content"
+              id={usage}
             >
-              Add
-            </Button>
-          </Box>
+              <Box
+                width="100%"
+                display="flex"
+                justifyContent="space-between"
+                alignItems="center"
+              >
+                {usageLabels[usage]}
+                <Button
+                  variant="contained"
+                  color="primary"
+                  sx={{ m: 2 }}
+                  onClick={() => setAddingMediaUsage(usage as any)}
+                >
+                  Add
+                </Button>
+              </Box>
+            </AccordionSummary>
+
+            <AccordionDetails
+              sx={{
+                height: 400,
+                overflow: 'auto',
+              }}
+            >
+              <StaticMediaSection
+                value={optimisticStaticMedias.filter(
+                  media => media.usage === usage,
+                )}
+                onChange={onMediasOrderChange}
+                onSetEnabled={onSetEnabled}
+              />
+            </AccordionDetails>
+          </Accordion>
         ))}
 
         {addingMediaUsage && (
@@ -179,7 +214,7 @@ const StaticMediasList = ({ staticMedias }: StaticMediasListProps) => {
           <DialogContent>Uploading ...</DialogContent>
         </Dialog>
       </Box>
-    </>
+    </Box>
   );
 };
 
