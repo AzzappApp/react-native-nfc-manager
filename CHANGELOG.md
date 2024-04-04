@@ -1,5 +1,6 @@
-## 0.5.5-canary.197
+## 0.5.5-canary.198
 
+* **docs:**  - add schema package
 * **feat:**  - translate backoffice labels ([#3177](https://github.com/AzzappApp/azzapp/pull/3177))
 * **fix:**  - drizzle-kit config
 * **fix:**  - add missing locales in country selector ([#3183](https://github.com/AzzappApp/azzapp/pull/3183))
