@@ -7,7 +7,7 @@ import type { InferInsertModel, InferSelectModel } from 'drizzle-orm';
 
 export const CardStyleTable = mysqlTable('CardStyle', {
   id: cols.cuid('id').primaryKey().notNull().$defaultFn(createId),
-  labels: cols.labels('labels').notNull(),
+  labelKey: cols.defaultVarchar('labelKey').notNull().default("''"),
   fontFamily: cols.defaultVarchar('fontFamily').notNull(),
   fontSize: smallint('fontSize').notNull(),
   titleFontFamily: cols.defaultVarchar('titleFontFamily').notNull(),

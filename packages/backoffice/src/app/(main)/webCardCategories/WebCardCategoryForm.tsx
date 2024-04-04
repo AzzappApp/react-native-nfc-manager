@@ -24,7 +24,7 @@ import { encodeMediaId } from '@azzapp/shared/imagesHelpers';
 import { uploadMedia } from '@azzapp/shared/WebAPI';
 import { getSignedUpload } from '#app/mediaActions';
 import MediasListInput from '#components/MediasListInput';
-import { intParser, labelsOptions, useForm } from '#helpers/formHelpers';
+import { intParser, useForm } from '#helpers/formHelpers';
 import WebCardTemplateTypeListInput from '../companyActivities/WebCardTemplateTypeListInput';
 import ActivityListInput from './ActivityListInput';
 import { saveWebCardCategory } from './webCardCategoriesActions';
@@ -32,6 +32,7 @@ import type { WebCardCategoryErrors } from './webCardCategorySchema';
 import type {
   CardTemplateType,
   CompanyActivity,
+  Label,
   WebCardCategory,
 } from '@azzapp/data';
 
@@ -41,13 +42,16 @@ type WebCardCategoryFormProps = {
   cardTemplateTypes: CardTemplateType[];
   categoryCompanyActivities?: string[];
   saved?: boolean;
+  label?: Label | null;
+  labels: Label[];
 };
 
-type FormValue = Omit<WebCardCategory, 'medias'> & {
-  medias: Array<File | string>;
-  activities: Array<CompanyActivity | string>;
-  cardTemplateType: CardTemplateType | string;
-};
+type FormValue = Label &
+  Omit<WebCardCategory, 'medias'> & {
+    medias: Array<File | string>;
+    activities: Array<CompanyActivity | string>;
+    cardTemplateType: CardTemplateType | string;
+  };
 
 const WebCardCategoryForm = ({
   webCardCategory,
@@ -55,6 +59,8 @@ const WebCardCategoryForm = ({
   cardTemplateTypes,
   categoryCompanyActivities,
   saved = false,
+  label,
+  labels,
 }: WebCardCategoryFormProps) => {
   const isCreation = !webCardCategory;
   const [saving, setIsSaving] = useState(false);
@@ -169,7 +175,7 @@ const WebCardCategoryForm = ({
     <>
       <Typography variant="h4" component="h1" sx={{ mb: 10 }}>
         {webCardCategory
-          ? `WebCardCategory : ${webCardCategory.labels.en}`
+          ? `WebCardCategory : ${label?.baseLabelValue}`
           : 'New WebCardCategory'}
       </Typography>
       <Box
@@ -185,11 +191,20 @@ const WebCardCategoryForm = ({
         onSubmit={handleSubmit}
       >
         <TextField
-          name="label"
-          label="Label"
+          name="labelKey"
+          label="Label key"
+          disabled={saving || !isCreation}
+          required
+          fullWidth
+          {...fieldProps('labelKey')}
+        />
+        <TextField
+          name="baseLabelValue"
+          label="Label base value"
           disabled={saving}
           required
-          {...fieldProps('labels', labelsOptions)}
+          fullWidth
+          {...fieldProps('baseLabelValue')}
         />
         <FormControl fullWidth error={webCardKindProps.error}>
           <InputLabel id="webCardKind-label">Profile Kind</InputLabel>
@@ -198,7 +213,7 @@ const WebCardCategoryForm = ({
             id="webCardKind"
             name="webCardKind"
             value={webCardKindProps.value}
-            label="Profile Kind"
+            label="WebCard Kind"
             onChange={webCardKindProps.onChange as any}
           >
             <MenuItem value="personal">Personal</MenuItem>
@@ -212,18 +227,21 @@ const WebCardCategoryForm = ({
           label="Order"
           disabled={saving}
           required
+          fullWidth
           {...fieldProps('order', { parse: intParser })}
         />
         <WebCardTemplateTypeListInput
           label="Webcard template type"
           name="cardTemplateType"
           options={cardTemplateTypes}
+          cardTemplateTypesLabels={labels}
           {...fieldProps('cardTemplateType')}
         />
         {data.webCardKind === 'business' && (
           <ActivityListInput
             label="Activities"
             name="activities"
+            activityLabels={labels}
             options={companyActivities}
             {...fieldProps('activities')}
           />

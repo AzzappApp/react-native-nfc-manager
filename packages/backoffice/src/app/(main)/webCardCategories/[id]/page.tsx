@@ -4,6 +4,8 @@ import {
   CompanyActivityTable,
   db,
   getCompanyActivitiesByWebCardCategory,
+  getLabel,
+  getLabels,
   getWebCardCategoryById,
 } from '@azzapp/data';
 import WebCardCategoryForm from '../WebCardCategoryForm';
@@ -27,9 +29,16 @@ const WebCardCategoryPage = async ({
   }
   const companyActivities = await db.select().from(CompanyActivityTable);
   const cardTemplateTypes = await db.select().from(CardTemplateTypeTable);
+  const labels = await getLabels(
+    cardTemplateTypes
+      .map(({ labelKey }) => labelKey)
+      .concat(companyActivities.map(({ labelKey }) => labelKey)),
+  );
   const categoryCompanyActivities = await getCompanyActivitiesByWebCardCategory(
     id,
   ).then(activities => activities.map(activity => activity.id));
+
+  const label = await getLabel(webCardCategory.labelKey);
 
   return (
     <WebCardCategoryForm
@@ -37,7 +46,9 @@ const WebCardCategoryPage = async ({
       companyActivities={companyActivities}
       categoryCompanyActivities={categoryCompanyActivities}
       cardTemplateTypes={cardTemplateTypes}
+      labels={labels}
       saved={!!searchParams?.saved}
+      label={label}
     />
   );
 };

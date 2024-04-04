@@ -71,8 +71,3 @@ export const useForm = <TData>(
 };
 
 export const intParser = (value: string) => parseInt(value, 10);
-
-export const labelsOptions = {
-  parse: (value: string) => ({ en: value }),
-  format: (value?: Record<string, string> | null) => value?.en ?? '',
-};

@@ -24,7 +24,7 @@ import {
   setSuggestionsForMedia,
 } from './suggestedMediasActions';
 import SuggesionAddForm from './SuggestionAddForm';
-import type { CompanyActivity, WebCardCategory } from '@azzapp/data';
+import type { CompanyActivity, Label, WebCardCategory } from '@azzapp/data';
 
 type MediaSuggestionsListProps = {
   activities: CompanyActivity[];
@@ -37,12 +37,14 @@ type MediaSuggestionsListProps = {
       categories: Record<string, boolean>;
     }
   >;
+  labels: Label[];
 };
 
 const MediaSuggestionsList = ({
   activities,
   categories,
   mediasSuggestions,
+  labels,
 }: MediaSuggestionsListProps) => {
   const itemsPerPage = 15;
   const [page, setPage] = useState(1);
@@ -194,14 +196,18 @@ const MediaSuggestionsList = ({
           <Autocomplete
             value={selectedCategory}
             options={categories}
-            getOptionLabel={option => option.labels.en}
+            getOptionLabel={option =>
+              labels.find(l => l.labelKey === option.labelKey)
+                ?.baseLabelValue ?? option.labelKey
+            }
             renderInput={params => (
               <TextField {...params} label="Filter by category" />
             )}
             sx={{ width: 300 }}
             renderOption={(props, option) => (
               <li {...props} key={option.id}>
-                {option.labels.en}
+                {labels.find(l => l.labelKey === option.labelKey)
+                  ?.baseLabelValue ?? option.labelKey}
               </li>
             )}
             onChange={(_, value) => setSelectedCategory(value)}
@@ -209,14 +215,14 @@ const MediaSuggestionsList = ({
           <Autocomplete
             value={selectedActivity}
             options={activities}
-            getOptionLabel={option => option.labels.en}
+            getOptionLabel={option => option.labelKey}
             renderInput={params => (
               <TextField {...params} label="Filter by activity" />
             )}
             sx={{ width: 300 }}
             renderOption={(props, option) => (
               <li {...props} key={option.id}>
-                {option.labels.en}
+                {option.labelKey}
               </li>
             )}
             onChange={(_, value) => setSelectedActivity(value)}
@@ -255,6 +261,7 @@ const MediaSuggestionsList = ({
               categories={categories}
               selectedActivities={selectedActivities}
               selectedCategories={selectedCategories}
+              labels={labels}
               onChange={(categories, activities) => {
                 void onSuggestionsChange(mediaId, categories, activities);
               }}
@@ -269,6 +276,7 @@ const MediaSuggestionsList = ({
         onClose={() => setShowAddForm(false)}
         error={saveError}
         onAdd={saveMedias}
+        labels={labels}
       />
 
       <Dialog
@@ -293,6 +301,7 @@ type SuggestionRendererProps = {
   activities: CompanyActivity[];
   selectedActivities: string[];
   onChange?: (categories: string[], activities: string[]) => void;
+  labels: Label[];
 };
 
 const SuggestionRenderer = ({
@@ -303,6 +312,7 @@ const SuggestionRenderer = ({
   activities,
   selectedActivities,
   onChange,
+  labels,
 }: SuggestionRendererProps) => {
   const onActivitiesChange = (selectedActivities: Set<string>) => {
     onChange?.(selectedCategories, [...selectedActivities]);
@@ -328,14 +338,24 @@ const SuggestionRenderer = ({
         <img src={getImageURLForSize(mediaId, null, 600)} />
       )}
       <ItemWithLabelSelectionList
-        label="Profile Categories"
-        options={categories}
+        label="WebCard Categories"
+        options={categories.map(category => ({
+          ...category,
+          baseLabelValue:
+            labels.find(l => l.labelKey === category.labelKey)
+              ?.baseLabelValue ?? '',
+        }))}
         selectedOptions={new Set(selectedCategories)}
         onChange={onCategoriesChange}
       />
       <ItemWithLabelSelectionList
         label="Activities"
-        options={activities}
+        options={activities.map(activity => ({
+          ...activity,
+          baseLabelValue:
+            labels.find(l => l.labelKey === activity.labelKey)
+              ?.baseLabelValue ?? '',
+        }))}
         selectedOptions={new Set(selectedActivities)}
         onChange={onActivitiesChange}
       />

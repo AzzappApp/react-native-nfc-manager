@@ -13,24 +13,28 @@ import { omit } from 'lodash';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import FontSelect from '#components/FontSelect';
-import { intParser, labelsOptions, useForm } from '#helpers/formHelpers';
+import { intParser, useForm } from '#helpers/formHelpers';
 import { saveCardStyle } from './cardStylesActions';
 import type { CardStyleErrors } from './cardStyleSchema';
-import type { CardStyle } from '@azzapp/data';
+import type { CardStyle, Label } from '@azzapp/data';
 
 type CardStyleFormProps = {
   cardStyle?: CardStyle | null;
   saved?: boolean;
+  label?: Label | null;
 };
 
-const CardStyleForm = ({ cardStyle, saved }: CardStyleFormProps) => {
+const CardStyleForm = ({ cardStyle, saved, label }: CardStyleFormProps) => {
   const isCreation = !cardStyle;
   const [saving, setIsSaving] = useState(false);
   const [displaySaveSuccess, setDisplaySaveSuccess] = useState(saved);
   const [error, setError] = useState<any>(null);
   const [formErrors, setFormErrors] = useState<CardStyleErrors | null>(null);
-  const { data, fieldProps } = useForm(
-    () => cardStyle ?? ({ enabled: true } as Partial<CardStyle>),
+  const { data, fieldProps } = useForm<CardStyle & Label>(
+    () => ({
+      ...(cardStyle ?? { enabled: true }),
+      ...label,
+    }),
     formErrors?.fieldErrors,
     [cardStyle],
   );
@@ -46,7 +50,7 @@ const CardStyleForm = ({ cardStyle, saved }: CardStyleFormProps) => {
     e.preventDefault();
     setIsSaving(true);
     try {
-      const result = await saveCardStyle(data as CardStyle);
+      const result = await saveCardStyle(data);
       if (result.success) {
         setFormErrors(null);
         if (isCreation) {
@@ -67,7 +71,7 @@ const CardStyleForm = ({ cardStyle, saved }: CardStyleFormProps) => {
   return (
     <>
       <Typography variant="h4" component="h1" sx={{ mb: 10 }}>
-        {cardStyle ? `CardStyle ${cardStyle.labels.en}` : 'New CardStyle'}
+        {cardStyle ? `CardStyle ${label?.baseLabelValue}` : 'New CardStyle'}
       </Typography>
       <Box
         sx={{
@@ -82,17 +86,27 @@ const CardStyleForm = ({ cardStyle, saved }: CardStyleFormProps) => {
         onSubmit={handleSubmit}
       >
         <TextField
-          name="label"
-          label="Label"
+          name="labelKey"
+          label="Label Key"
+          disabled={saving || !isCreation}
+          required
+          fullWidth
+          {...fieldProps('labelKey')}
+        />
+        <TextField
+          name="baseLabelValue"
+          label="Base Label Value"
           disabled={saving}
           required
-          {...fieldProps('labels', labelsOptions)}
+          fullWidth
+          {...fieldProps('baseLabelValue')}
         />
         <FontSelect
           name="fontFamily"
           label="Texts font family"
           disabled={saving}
           required
+          fullWidth
           {...fieldProps('fontFamily')}
         />
         <TextField
@@ -101,6 +115,7 @@ const CardStyleForm = ({ cardStyle, saved }: CardStyleFormProps) => {
           label="Texts font size"
           disabled={saving}
           required
+          fullWidth
           {...fieldProps('fontSize', { parse: intParser })}
         />
         <FontSelect
@@ -108,6 +123,7 @@ const CardStyleForm = ({ cardStyle, saved }: CardStyleFormProps) => {
           label="Titles font family"
           disabled={saving}
           required
+          fullWidth
           {...fieldProps('titleFontFamily')}
         />
         <TextField
@@ -116,6 +132,7 @@ const CardStyleForm = ({ cardStyle, saved }: CardStyleFormProps) => {
           label="Titles font size"
           disabled={saving}
           required
+          fullWidth
           {...fieldProps('titleFontSize', { parse: intParser })}
         />
         <TextField
@@ -124,6 +141,7 @@ const CardStyleForm = ({ cardStyle, saved }: CardStyleFormProps) => {
           label="Border Radius"
           disabled={saving}
           required
+          fullWidth
           {...fieldProps('borderRadius', { parse: intParser })}
         />
         <TextField
@@ -132,6 +150,7 @@ const CardStyleForm = ({ cardStyle, saved }: CardStyleFormProps) => {
           label="Border Size"
           disabled={saving}
           required
+          fullWidth
           {...fieldProps('borderWidth', { parse: intParser })}
         />
         <TextField
@@ -139,6 +158,7 @@ const CardStyleForm = ({ cardStyle, saved }: CardStyleFormProps) => {
           label="Border Color"
           disabled={saving}
           required
+          fullWidth
           {...fieldProps('borderColor')}
         />
         <TextField
@@ -146,6 +166,7 @@ const CardStyleForm = ({ cardStyle, saved }: CardStyleFormProps) => {
           label="Button Color"
           disabled={saving}
           required
+          fullWidth
           {...fieldProps('buttonColor')}
         />
         <TextField
@@ -154,6 +175,7 @@ const CardStyleForm = ({ cardStyle, saved }: CardStyleFormProps) => {
           label="Button Radius"
           disabled={saving}
           required
+          fullWidth
           {...fieldProps('buttonRadius', { parse: intParser })}
         />
         <TextField
@@ -162,6 +184,7 @@ const CardStyleForm = ({ cardStyle, saved }: CardStyleFormProps) => {
           label="Gap"
           disabled={saving}
           required
+          fullWidth
           {...fieldProps('gap', { parse: intParser })}
         />
         <FormControlLabel

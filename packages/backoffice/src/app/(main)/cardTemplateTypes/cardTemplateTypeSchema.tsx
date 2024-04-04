@@ -1,7 +1,8 @@
 import { z } from 'zod';
 
 export const cardTemplateTypeSchema = z.object({
-  labels: z.record(z.string()),
+  labelKey: z.string().min(1),
+  baseLabelValue: z.string().min(1),
   webCardCategory: z.string().or(z.object({ id: z.string() })),
 });
 

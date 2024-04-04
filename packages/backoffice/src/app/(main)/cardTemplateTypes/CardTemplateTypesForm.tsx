@@ -13,25 +13,30 @@ import {
 import { omit } from 'lodash';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
-import { labelsOptions, useForm } from '#helpers/formHelpers';
+import { useForm } from '#helpers/formHelpers';
 import { saveCardTemplateType } from './cardTemplateTypesActions';
 import type { CardTemplateTypeErrors } from './cardTemplateTypeSchema';
-import type { CardTemplateType, WebCardCategory } from '@azzapp/data';
+import type { CardTemplateType, Label, WebCardCategory } from '@azzapp/data';
 
 type CardTemplateTypeFormProps = {
   cardTemplateType?: CardTemplateType | null;
   webCardCategories: WebCardCategory[];
   saved?: boolean;
+  label?: Label | null;
+  webCardCategoriesLabels: Label[];
 };
 
-type FormValue = CardTemplateType & {
-  webCardCategory: WebCardCategory;
-};
+type FormValue = CardTemplateType &
+  Label & {
+    webCardCategory: WebCardCategory;
+  };
 
 const CardTemplateTypeForm = ({
   cardTemplateType,
   saved = false,
   webCardCategories,
+  label,
+  webCardCategoriesLabels,
 }: CardTemplateTypeFormProps) => {
   const isCreation = !cardTemplateType;
   const [saving, setIsSaving] = useState(false);
@@ -42,15 +47,14 @@ const CardTemplateTypeForm = ({
   );
 
   const { data, fieldProps } = useForm<FormValue>(
-    () =>
-      ({
-        ...cardTemplateType,
-        webCardCategory: cardTemplateType?.webCardCategoryId
-          ? webCardCategories?.find(item => {
-              return item.id === cardTemplateType?.webCardCategoryId;
-            })
-          : null,
-      }) as Partial<CardTemplateType>,
+    () => ({
+      ...cardTemplateType,
+      webCardCategory: cardTemplateType?.webCardCategoryId
+        ? webCardCategories?.find(item => {
+            return item.id === cardTemplateType?.webCardCategoryId;
+          })
+        : undefined,
+    }),
     formErrors?.fieldErrors,
     [saveCardTemplateType],
   );
@@ -83,7 +87,7 @@ const CardTemplateTypeForm = ({
     <>
       <Typography variant="h4" component="h1" sx={{ mb: 10 }}>
         {cardTemplateType
-          ? `Card Template Type ${cardTemplateType.labels.en} - ${cardTemplateType.id}`
+          ? `Card Template Type ${label?.baseLabelValue} - ${cardTemplateType.id}`
           : 'New Card Template Type'}
       </Typography>
 
@@ -100,11 +104,19 @@ const CardTemplateTypeForm = ({
         onSubmit={handleSubmit}
       >
         <TextField
-          name="label"
-          label="Label"
+          name="labelKey"
+          label="Label Key"
+          disabled={saving || !isCreation}
           required
           fullWidth
-          {...fieldProps('labels', labelsOptions)}
+          {...fieldProps('labelKey')}
+        />
+        <TextField
+          name="baseLabelValue"
+          label="Label default value"
+          required
+          fullWidth
+          {...fieldProps('baseLabelValue')}
         />
 
         <Autocomplete
@@ -113,7 +125,11 @@ const CardTemplateTypeForm = ({
           id="profile-categories"
           options={webCardCategories}
           getOptionLabel={option => {
-            return option.labels.en;
+            const label = webCardCategoriesLabels.find(
+              item => item.labelKey === option.labelKey,
+            );
+
+            return label?.baseLabelValue ?? option.labelKey;
           }}
           value={fieldProps('webCardCategory').value as WebCardCategory}
           onChange={(_, value) => {
@@ -127,7 +143,7 @@ const CardTemplateTypeForm = ({
             />
           )}
           renderOption={(props, option) => {
-            const label = option.labels.en;
+            const label = option.labelKey;
             return (
               <li {...props} key={option.id}>
                 {label}

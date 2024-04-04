@@ -6,7 +6,7 @@ import {
   createFilterOptions,
 } from '@mui/material';
 import { useRef } from 'react';
-import type { CardTemplateType } from '@azzapp/data';
+import type { CardTemplateType, Label } from '@azzapp/data';
 import type { BoxProps } from '@mui/material';
 
 type WebCardTemplateTypeListInputProps = Omit<BoxProps, 'onChange'> & {
@@ -17,11 +17,13 @@ type WebCardTemplateTypeListInputProps = Omit<BoxProps, 'onChange'> & {
   error?: boolean | null;
   helperText?: string | null;
   onChange: (value: CardTemplateType | string | null | undefined) => void;
+  cardTemplateTypesLabels: Label[];
 };
 
 const WebCardTemplateTypeListInput = ({
   name,
   label,
+  cardTemplateTypesLabels,
   value,
   error,
   options,
@@ -49,7 +51,10 @@ const WebCardTemplateTypeListInput = ({
         multiple={false}
         options={options as Array<CardTemplateType | string>}
         getOptionLabel={option =>
-          typeof option === 'string' ? option : option.labels?.en
+          typeof option === 'string'
+            ? option
+            : cardTemplateTypesLabels.find(l => l.labelKey === option.labelKey)
+                ?.baseLabelValue ?? option.labelKey
         }
         renderInput={params => (
           <TextField
@@ -62,7 +67,12 @@ const WebCardTemplateTypeListInput = ({
         sx={{ width: 300 }}
         renderOption={(props, option) => {
           const id = typeof option === 'string' ? option : option.id;
-          const label = typeof option === 'string' ? option : option.labels.en;
+          const label =
+            typeof option === 'string'
+              ? option
+              : cardTemplateTypesLabels.find(
+                  l => l.labelKey === option.labelKey,
+                )?.baseLabelValue ?? option.labelKey;
           return (
             <li {...props} key={id}>
               {label}

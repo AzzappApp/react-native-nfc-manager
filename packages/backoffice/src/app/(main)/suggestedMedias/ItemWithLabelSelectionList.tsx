@@ -15,7 +15,7 @@ const ItemWithLabelSelectionList = ({
   onChange,
 }: {
   label: string;
-  options: Array<{ id: string; labels: Record<string, string> }>;
+  options: Array<{ id: string; labelKey: string; baseLabelValue: string }>;
   selectedOptions: Set<string>;
   onChange: (selectedOptions: Set<string>) => void;
 }) => {
@@ -46,7 +46,7 @@ const ItemWithLabelSelectionList = ({
           overflow: 'auto',
         }}
       >
-        {options.map(({ id, labels }) => {
+        {options.map(({ id, baseLabelValue }) => {
           const labelId = `transfer-list-item-${id}-label`;
 
           return (
@@ -61,7 +61,7 @@ const ItemWithLabelSelectionList = ({
                   }}
                 />
               </ListItemIcon>
-              <ListItemText id={labelId} primary={labels.en} />
+              <ListItemText id={labelId} primary={baseLabelValue} />
             </ListItemButton>
           );
         })}

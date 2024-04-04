@@ -25,7 +25,7 @@ import {
 } from '@mui/material';
 import { uniqBy } from 'lodash';
 import { useRef, useState } from 'react';
-import type { CompanyActivity } from '@azzapp/data';
+import type { CompanyActivity, Label } from '@azzapp/data';
 import type { DragStartEvent, DragEndEvent } from '@dnd-kit/core';
 import type { BoxProps } from '@mui/material';
 
@@ -37,6 +37,7 @@ type ActivityListInputProps = Omit<BoxProps, 'onChange'> & {
   error?: boolean | null;
   helperText?: string | null;
   onChange: (value: Array<CompanyActivity | string>) => void;
+  activityLabels: Label[];
 };
 
 const ActivityListInput = ({
@@ -47,6 +48,7 @@ const ActivityListInput = ({
   options,
   helperText,
   onChange,
+  activityLabels,
   ...props
 }: ActivityListInputProps) => {
   const selectedActivities = value ?? [];
@@ -108,7 +110,7 @@ const ActivityListInput = ({
         value={autoCompleteValue}
         options={options as Array<CompanyActivity | string>}
         getOptionLabel={option =>
-          typeof option === 'string' ? option : option.labels.en
+          typeof option === 'string' ? option : option.labelKey
         }
         renderInput={params => (
           <TextField {...params} inputRef={inputRef} label="Add an activity" />
@@ -116,7 +118,7 @@ const ActivityListInput = ({
         sx={{ width: 300 }}
         renderOption={(props, option) => {
           const id = typeof option === 'string' ? option : option.id;
-          const label = typeof option === 'string' ? option : option.labels.en;
+          const label = typeof option === 'string' ? option : option.labelKey;
           return (
             <li {...props} key={id}>
               {label}
@@ -130,7 +132,7 @@ const ActivityListInput = ({
           // Suggest the creation of a new value
           const isExisting = options.some(
             option =>
-              typeof option === 'object' && inputValue === option.labels.en,
+              typeof option === 'object' && inputValue === option.labelKey,
           );
           if (inputValue !== '' && !isExisting) {
             filtered.push(`${ADD_ACTIVITY_PREFIX}${inputValue}`);
@@ -156,6 +158,7 @@ const ActivityListInput = ({
                 key={getItemID(item)}
                 item={item}
                 onDelete={handleDelete}
+                activityLabels={activityLabels}
               />
             ))}
           </SortableContext>
@@ -165,6 +168,7 @@ const ActivityListInput = ({
                 id={getItemID(activeItem)}
                 item={activeItem}
                 onDelete={handleDelete}
+                activityLabels={activityLabels}
               />
             )}
           </DragOverlay>
@@ -180,12 +184,14 @@ type SortableItemProps = {
   id: string;
   item: CompanyActivity | string;
   onDelete?: (item: CompanyActivity | string) => void;
+  activityLabels: Label[];
 };
 
 export const SortableItem: React.FC<SortableItemProps> = ({
   id,
   item,
   onDelete,
+  activityLabels,
 }) => {
   const { attributes, listeners, setNodeRef, transform, transition } =
     useSortable({ id });
@@ -211,7 +217,10 @@ export const SortableItem: React.FC<SortableItemProps> = ({
       }}
     >
       <Typography variant="body1" sx={{ flex: 1 }}>
-        {typeof item === 'string' ? item : item.labels.en}
+        {typeof item === 'string'
+          ? item
+          : activityLabels.find(a => a.labelKey === item.labelKey)
+              ?.baseLabelValue ?? item.labelKey}
       </Typography>
       <IconButton
         onClick={() => onDelete?.(item)}

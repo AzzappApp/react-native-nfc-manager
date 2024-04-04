@@ -49,10 +49,9 @@ const columns: GridColDef[] = [
     ),
   },
   {
-    field: 'labels.en',
-    headerName: 'Label',
+    field: 'labelKey',
+    headerName: 'Label Key',
     flex: 1,
-    renderCell: params => params.row.labels?.en,
   },
   {
     field: 'webCardKind',

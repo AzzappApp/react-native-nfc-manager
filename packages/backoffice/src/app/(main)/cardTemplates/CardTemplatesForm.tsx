@@ -23,27 +23,38 @@ import { encodeMediaId } from '@azzapp/shared/imagesHelpers';
 import { uploadMedia } from '@azzapp/shared/WebAPI';
 import { getSignedUpload } from '#app/mediaActions';
 import MediaInput from '#components/MediaInput';
-import { labelsOptions, useForm } from '#helpers/formHelpers';
+import { useForm } from '#helpers/formHelpers';
 import WebCardTemplateTypeListInput from '../companyActivities/WebCardTemplateTypeListInput';
 import { getModulesData, saveCardTemplate } from './cardTemplatesActions';
 import type {
   CardTemplateErrors,
   CardTemplateFormValue,
 } from './cardTemplateSchema';
-import type { CardStyle, CardTemplate, CardTemplateType } from '@azzapp/data';
+import type {
+  CardStyle,
+  CardTemplate,
+  CardTemplateType,
+  Label,
+} from '@azzapp/data';
 
 type CoverTemplateFormProps = {
   cardTemplate?: CardTemplate;
   cardTemplateTypes: CardTemplateType[];
   cardStyles: CardStyle[];
+  label?: Label | null;
+  labels: Label[];
 };
 
 const CardTemplateForm = ({
   cardStyles,
   cardTemplate,
   cardTemplateTypes,
+  label,
+  labels,
 }: CoverTemplateFormProps) => {
-  const [profileUserName, setProfileUserName] = useState<string | null>(null);
+  const isCreation = !cardTemplate;
+
+  const [webCardUserName, setWebCardUserName] = useState<string | null>(null);
   const [modulesLoading, loadModules] = useTransition();
   const [modulesError, setModulesError] = useState<string | null>(null);
 
@@ -61,7 +72,8 @@ const CardTemplateForm = ({
     () => {
       if (cardTemplate) {
         return {
-          labels: cardTemplate.labels,
+          labelKey: label?.labelKey ?? '',
+          baseLabelValue: label?.baseLabelValue ?? '',
           cardStyle: cardTemplate.cardStyleId!,
           modules: cardTemplate.modules,
           businessEnabled: cardTemplate.businessEnabled,
@@ -86,14 +98,14 @@ const CardTemplateForm = ({
   const handleFetchModules = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    if (modulesLoading || !profileUserName) return;
+    if (modulesLoading || !webCardUserName) return;
 
     loadModules(async () => {
       setModulesError(null);
-      const modulesData = await getModulesData(profileUserName);
+      const modulesData = await getModulesData(webCardUserName);
       if (!modulesData)
         setModulesError(
-          `Unable to find modules related to profile ${profileUserName}`,
+          `Unable to find modules related to webCard ${webCardUserName}`,
         );
       else {
         const modules = modulesData;
@@ -158,7 +170,8 @@ const CardTemplateForm = ({
   };
 
   const fields = {
-    label: fieldProps('labels', labelsOptions),
+    labelKey: fieldProps('labelKey'),
+    baseLabelValue: fieldProps('baseLabelValue'),
     cardStyle: fieldProps('cardStyle'),
     businessEnabled: fieldProps('businessEnabled'),
     personalEnabled: fieldProps('personalEnabled'),
@@ -168,7 +181,7 @@ const CardTemplateForm = ({
     <div>
       <Typography variant="h4" component="h1" sx={{ mb: 2 }}>
         {cardTemplate
-          ? `CardTemplate : ${cardTemplate.labels.en}`
+          ? `CardTemplate : ${label?.baseLabelValue}`
           : 'New CardTemplate'}
       </Typography>
       <Box
@@ -188,7 +201,7 @@ const CardTemplateForm = ({
           {data.modules && (
             <Link
               target="_blank"
-              href={`${process.env.NEXT_PUBLIC_FRONTEND}/${profileUserName}`}
+              href={`${process.env.NEXT_PUBLIC_FRONTEND}/${webCardUserName}`}
             >
               ({data.modules.length})
             </Link>
@@ -196,9 +209,10 @@ const CardTemplateForm = ({
         </Typography>
         <TextField
           name="baseProfileUserName"
-          label="Profile name"
+          label="WebCard name"
           required
-          onChange={e => setProfileUserName(e.target.value)}
+          fullWidth
+          onChange={e => setWebCardUserName(e.target.value)}
         />
         <Button type="submit" variant="contained">
           Load
@@ -229,11 +243,26 @@ const CardTemplateForm = ({
         <Typography variant="h6" component="h6">
           General
         </Typography>
-        <TextField name="label" label="Label" required {...fields.label} />
+        <TextField
+          name="labelKey"
+          label="Label key"
+          disabled={saving || !isCreation}
+          required
+          fullWidth
+          {...fields.labelKey}
+        />
+        <TextField
+          name="baseLabelValue"
+          label="Label default value"
+          required
+          fullWidth
+          {...fields.baseLabelValue}
+        />
         <WebCardTemplateTypeListInput
           label="Webcard template type"
           name="cardTemplateType"
           options={cardTemplateTypes}
+          cardTemplateTypesLabels={labels}
           {...fieldProps('cardTemplateType')}
         />
         <FormControl fullWidth error={fields.cardStyle.error}>
@@ -248,7 +277,8 @@ const CardTemplateForm = ({
           >
             {cardStyles.map(cardStyle => (
               <MenuItem key={cardStyle.id} value={cardStyle.id}>
-                {cardStyle.labels.en}
+                {labels.find(label => label.labelKey === cardStyle.labelKey)
+                  ?.baseLabelValue ?? cardStyle.labelKey}
               </MenuItem>
             ))}
           </Select>

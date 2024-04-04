@@ -40,7 +40,8 @@
     "graphql-shield": "^7.6.5",
     "graphql-tag": "^2.12.6",
     "lodash": "^4.17.21",
-    "zod": "^3.22.4"
+    "zod": "^3.22.4",
+    "expiry-map": "^2.0.0"
   },
   "devDependencies": {
     "@types/lodash": "4.17.0"

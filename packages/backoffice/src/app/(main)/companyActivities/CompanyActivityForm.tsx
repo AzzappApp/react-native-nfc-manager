@@ -3,26 +3,31 @@
 import { Box, Button, Snackbar, TextField, Typography } from '@mui/material';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
-import { labelsOptions, useForm } from '#helpers/formHelpers';
+import { useForm } from '#helpers/formHelpers';
 import { saveCompanyActivity } from './companyActivityActions';
 import WebCardTemplateTypeListInput from './WebCardTemplateTypeListInput';
 import type { CompanyActivityErrors } from './companyActivitySchema';
-import type { CompanyActivity, CardTemplateType } from '@azzapp/data';
+import type { CompanyActivity, CardTemplateType, Label } from '@azzapp/data';
 
 type CompanyActivityFormProps = {
   companyActivity?: CompanyActivity | null;
   cardTemplateTypes: CardTemplateType[];
   saved?: boolean;
+  label?: Label | null;
+  cardTemplateTypesLabels: Label[];
 };
 
-type FormValue = CompanyActivity & {
-  cardTemplateType: CardTemplateType | string;
-};
+type FormValue = CompanyActivity &
+  Label & {
+    cardTemplateType: CardTemplateType | string;
+  };
 
 const CompanyActivityForm = ({
   companyActivity,
   saved = false,
   cardTemplateTypes,
+  label,
+  cardTemplateTypesLabels,
 }: CompanyActivityFormProps) => {
   const isCreation = !companyActivity;
   const [saving, setIsSaving] = useState(false);
@@ -33,15 +38,15 @@ const CompanyActivityForm = ({
   );
 
   const { data, fieldProps } = useForm<FormValue>(
-    () =>
-      ({
-        ...companyActivity,
-        cardTemplateType: companyActivity?.cardTemplateTypeId
-          ? cardTemplateTypes?.find(item => {
-              return item.id === companyActivity?.cardTemplateTypeId;
-            })
-          : null,
-      }) as Partial<CompanyActivity>,
+    () => ({
+      ...label,
+      ...companyActivity,
+      cardTemplateType: companyActivity?.cardTemplateTypeId
+        ? cardTemplateTypes?.find(item => {
+            return item.id === companyActivity?.cardTemplateTypeId;
+          })
+        : undefined,
+    }),
     formErrors?.fieldErrors,
     [companyActivity],
   );
@@ -75,7 +80,7 @@ const CompanyActivityForm = ({
     <>
       <Typography variant="h4" component="h1" sx={{ mb: 10 }}>
         {companyActivity
-          ? `Company activity ${companyActivity.labels.en} - ${companyActivity.id}`
+          ? `Company activity ${label?.baseLabelValue} - ${companyActivity.id}`
           : 'New Company Activity'}
       </Typography>
 
@@ -92,15 +97,25 @@ const CompanyActivityForm = ({
         onSubmit={handleSubmit}
       >
         <TextField
-          name="label"
-          label="Label"
+          name="labelKey"
+          label="Label Key"
+          disabled={saving || !isCreation}
           required
-          {...fieldProps('labels', labelsOptions)}
+          fullWidth
+          {...fieldProps('labelKey')}
+        />
+        <TextField
+          name="baseLabelValue"
+          label="Label base value"
+          required
+          fullWidth
+          {...fieldProps('baseLabelValue')}
         />
         <WebCardTemplateTypeListInput
           label="Webcard template type"
           name="cardTemplateType"
           options={cardTemplateTypes}
+          cardTemplateTypesLabels={cardTemplateTypesLabels}
           {...fieldProps('cardTemplateType')}
         />
         <Button

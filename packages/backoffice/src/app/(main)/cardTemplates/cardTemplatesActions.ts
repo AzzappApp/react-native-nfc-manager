@@ -5,11 +5,13 @@ import {
   WebCardTable,
   checkMedias,
   createCardTemplate,
+  createLabel,
   db,
   getCardTemplateById,
   referencesMedias,
   updateCardTemplate,
 } from '@azzapp/data';
+import { saveLabelKey } from '#helpers/lokaliseHelperts';
 import {
   cardTemplateSchema,
   type CardTemplateFormValue,
@@ -48,13 +50,19 @@ export const saveCardTemplate = async (
   }
 
   const template = {
-    labels: validation.data.labels,
+    labelKey: validation.data.labelKey,
     cardStyleId: validation.data.cardStyle,
     modules: validation.data.modules,
     previewMediaId: validation.data.previewMediaId,
     businessEnabled: validation.data.businessEnabled,
     personalEnabled: validation.data.personalEnabled,
     cardTemplateTypeId: cardTemplateType ? cardTemplateType.id : null,
+  };
+
+  const label = {
+    labelKey: validation.data.labelKey,
+    baseLabelValue: validation.data.baseLabelValue,
+    translations: {},
   };
 
   await checkMedias([validation.data.previewMediaId]);
@@ -65,9 +73,24 @@ export const saveCardTemplate = async (
     if (id) {
       const cardTemplate = await getCardTemplateById(id);
       previousMediaId = cardTemplate.previewMediaId;
-      await updateCardTemplate(id, template);
+
+      await db.transaction(async trx => {
+        await updateCardTemplate(id, template, trx);
+        await createLabel(label, trx);
+        await saveLabelKey({
+          labelKey: validation.data.labelKey,
+          baseLabelValue: validation.data.baseLabelValue,
+        });
+      });
     } else {
-      await createCardTemplate(template);
+      await db.transaction(async trx => {
+        await createCardTemplate(template, trx);
+        await createLabel(label, trx);
+        await saveLabelKey({
+          labelKey: validation.data.labelKey,
+          baseLabelValue: validation.data.baseLabelValue,
+        });
+      });
     }
     await referencesMedias([template.previewMediaId], [previousMediaId], trx);
   });

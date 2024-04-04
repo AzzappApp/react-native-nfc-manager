@@ -10,7 +10,7 @@ import {
 import { useEffect, useState } from 'react';
 import MediasListInput from '#components/MediasListInput';
 import ItemWithLabelSelectionList from './ItemWithLabelSelectionList';
-import type { CompanyActivity, WebCardCategory } from '@azzapp/data';
+import type { CompanyActivity, Label, WebCardCategory } from '@azzapp/data';
 
 type SuggesionAddFormProps = {
   open: boolean;
@@ -19,6 +19,7 @@ type SuggesionAddFormProps = {
   activities: CompanyActivity[];
   onClose: () => void;
   onAdd: (medias: File[], categories: string[], activities: string[]) => void;
+  labels: Label[];
 };
 
 const SuggesionAddForm = ({
@@ -28,6 +29,7 @@ const SuggesionAddForm = ({
   activities,
   onClose,
   onAdd,
+  labels,
 }: SuggesionAddFormProps) => {
   const [medias, setMedias] = useState<File[] | null>(null);
   const [selectedCategories, setSelectedCategories] = useState(
@@ -118,17 +120,27 @@ const SuggesionAddForm = ({
             }}
           >
             <ItemWithLabelSelectionList
-              label="Profile Categories"
+              label="WebCard Categories"
               selectedOptions={selectedCategories}
               onChange={setSelectedCategories}
-              options={categories}
+              options={categories.map(category => ({
+                ...category,
+                baseLabelValue:
+                  labels.find(label => label.labelKey === category.labelKey)
+                    ?.baseLabelValue ?? '',
+              }))}
             />
             <Box style={{ width: 1, backgroundColor: '#000' }} />
             <ItemWithLabelSelectionList
               label="Activities"
               selectedOptions={selectedActivities}
               onChange={setSelectedActivities}
-              options={activities}
+              options={activities.map(activity => ({
+                ...activity,
+                baseLabelValue:
+                  labels.find(label => label.labelKey === activity.labelKey)
+                    ?.baseLabelValue ?? '',
+              }))}
             />
           </Box>
         </DialogContent>

@@ -51,11 +51,8 @@ const columns: GridColDef[] = [
     ),
   },
   {
-    field: 'labels',
-    valueGetter: params => {
-      return params.row.labels.en;
-    },
-    headerName: 'Name',
+    field: 'labelKey',
+    headerName: 'Label Key',
     flex: 1,
   },
   {

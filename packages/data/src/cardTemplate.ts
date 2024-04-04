@@ -10,7 +10,7 @@ export type CardModuleTemplate = Pick<CardModule, 'data' | 'kind'>;
 
 export const CardTemplateTable = mysqlTable('CardTemplate', {
   id: cols.cuid('id').notNull().primaryKey().$defaultFn(createId),
-  labels: cols.labels('labels').notNull(),
+  labelKey: cols.defaultVarchar('labelKey').notNull().default("''"),
   cardStyleId: cols.cuid('cardStyleId').notNull(),
   cardTemplateTypeId: cols.cuid('cardTemplateTypeId'),
   previewMediaId: cols.mediaId('previewMediaId'),

@@ -5,9 +5,11 @@ import {
   CardModuleTable,
   WebCardTable,
   createCompanyActivity,
+  createLabel,
   db,
   updateCompanyActivity,
 } from '@azzapp/data';
+import { saveLabelKey } from '#helpers/lokaliseHelperts';
 import { companyActivitySchema } from './companyActivitySchema';
 import type { CompanyActivity, NewCompanyActivity } from '@azzapp/data';
 
@@ -52,22 +54,47 @@ export const saveCompanyActivity = async (
         await updateCompanyActivity(
           data.id,
           {
-            labels: data.labels,
+            labelKey: validation.data.labelKey,
             cardTemplateTypeId: data.cardTemplateType?.id ?? null,
           },
           trx,
         );
+
+        await createLabel(
+          {
+            labelKey: validation.data.labelKey,
+            baseLabelValue: validation.data.baseLabelValue,
+            translations: {},
+          },
+          trx,
+        );
+
         companyActivityId = data.id;
       } else {
         const id = await createCompanyActivity(
           {
-            labels: data.labels,
+            labelKey: data.labelKey,
             cardTemplateTypeId: data.cardTemplateType?.id ?? null,
           },
           trx,
         );
+
+        await createLabel(
+          {
+            labelKey: validation.data.labelKey,
+            baseLabelValue: validation.data.baseLabelValue,
+            translations: {},
+          },
+          trx,
+        );
+
         companyActivityId = id;
       }
+
+      await saveLabelKey({
+        labelKey: validation.data.labelKey,
+        baseLabelValue: validation.data.baseLabelValue,
+      });
 
       return companyActivityId;
     });

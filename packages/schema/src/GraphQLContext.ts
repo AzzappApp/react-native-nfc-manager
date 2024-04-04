@@ -1,5 +1,6 @@
 import DataLoader from 'dataloader';
 import { eq, inArray } from 'drizzle-orm';
+import ExpiryMap from 'expiry-map';
 import {
   db,
   CardModuleTable,
@@ -23,6 +24,7 @@ import {
   getOwners,
   WebCardTable,
   sortEntitiesByIds,
+  getLabels,
 } from '@azzapp/data';
 import { DEFAULT_LOCALE } from '@azzapp/i18n';
 import type {
@@ -44,6 +46,7 @@ import type {
   WebCard,
   WebCardStatistic,
   ProfileStatistic,
+  Label,
 } from '@azzapp/data';
 import type { Locale } from '@azzapp/i18n';
 
@@ -147,6 +150,7 @@ type Loaders = {
   webCardStatistics: DataLoader<string, WebCardStatistic[]>;
   profileStatistics: DataLoader<string, ProfileStatistic[]>;
   webCardOwners: DataLoader<string, User | null>;
+  labels: DataLoader<string, Label | null>;
 };
 
 const entitiesTable = {
@@ -243,12 +247,25 @@ const webCardOwnerLoader = () =>
     return keys.map(k => profiles.find(p => p.webCardId === k)?.user ?? null);
   }, dataLoadersOptions);
 
+const labelLoader = new DataLoader<string, Label | null>(
+  async keys => {
+    const labels = await getLabels(keys as string[]);
+
+    return keys.map(k => labels.find(l => l.labelKey === k) ?? null);
+  },
+  {
+    ...dataLoadersOptions,
+    cacheMap: new ExpiryMap(1000 * 60 * 60), // 1 hour,
+  },
+);
+
 const createLoaders = (): Loaders =>
   new Proxy({} as Loaders, {
     get: (
       loaders: Loaders,
       entity:
         | Entity
+        | 'labels'
         | 'profileByWebCardIdAndUserId'
         | 'profileStatistics'
         | 'webCardOwners'
@@ -268,6 +285,10 @@ const createLoaders = (): Loaders =>
 
       if (entity === 'webCardOwners') {
         return webCardOwnerLoader();
+      }
+
+      if (entity === 'labels') {
+        return labelLoader;
       }
 
       if (!entities.includes(entity)) {

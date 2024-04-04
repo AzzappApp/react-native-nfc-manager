@@ -1,5 +1,4 @@
 import { toGlobalId } from 'graphql-relay';
-import { DEFAULT_LOCALE } from '@azzapp/i18n';
 import type { GraphQLContext } from './GraphQLContext';
 
 export const idResolver =
@@ -7,8 +6,14 @@ export const idResolver =
   <T extends { id: string }>(obj: T) =>
     toGlobalId(typeName, obj.id);
 
-export const getLabel = <T extends { labels: { [key: string]: string } }>(
-  { labels }: T,
+export const getLabel = async <T extends { labelKey: string }>(
+  { labelKey }: T,
   _: unknown,
-  { locale }: GraphQLContext,
-) => (labels ? labels[locale] ?? labels[DEFAULT_LOCALE] : null);
+  { locale, loaders }: GraphQLContext,
+) => {
+  const label = await loaders.labels.load(labelKey);
+  if (label) {
+    return label.translations[locale] ?? label.baseLabelValue;
+  }
+  return null;
+};

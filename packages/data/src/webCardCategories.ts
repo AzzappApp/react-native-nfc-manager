@@ -14,7 +14,7 @@ export const WebCardCategoryTable = mysqlTable('WebCardCategory', {
   id: cols.cuid('id').primaryKey().notNull().$defaultFn(createId),
   webCardKind: mysqlEnum('webCardKind', ['personal', 'business']).notNull(),
   cardTemplateTypeId: cols.cuid('cardTemplateTypeId'),
-  labels: cols.labels('labels').notNull(),
+  labelKey: cols.defaultVarchar('labelKey').notNull().default("''"),
   medias: json('medias').$type<string[]>().notNull(),
   order: int('order').notNull(),
   enabled: boolean('enabled').default(true).notNull(),

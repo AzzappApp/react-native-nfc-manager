@@ -4,6 +4,7 @@ import {
   MediaSuggestionTable,
   WebCardCategoryTable,
   db,
+  getLabels,
   getMediasByIds,
 } from '@azzapp/data';
 import MediaSuggestionsList from './MediaSuggestionsList';
@@ -66,10 +67,18 @@ const StaticMediasPage = async () => {
   );
 
   companyActivities.sort((a, b) =>
-    (a.labels?.en ?? '').localeCompare(b.labels?.en ?? ''),
+    (a.labelKey ?? '').localeCompare(b.labelKey ?? ''),
   );
   webCardCategories.sort((a, b) =>
-    (a.labels?.en ?? '').localeCompare(b.labels?.en ?? ''),
+    (a.labelKey ?? '').localeCompare(b.labelKey ?? ''),
+  );
+
+  const labels = await getLabels(
+    companyActivities
+      .map(companyActivity => companyActivity.labelKey)
+      .concat(
+        webCardCategories.map(webCardCategory => webCardCategory.labelKey),
+      ),
   );
 
   return (
@@ -77,6 +86,7 @@ const StaticMediasPage = async () => {
       activities={companyActivities}
       categories={webCardCategories}
       mediasSuggestions={sortedMediasSuggestions}
+      labels={labels}
     />
   );
 };

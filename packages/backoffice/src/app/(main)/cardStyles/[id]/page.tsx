@@ -1,5 +1,5 @@
 import { notFound } from 'next/navigation';
-import { getCardStyleById } from '@azzapp/data';
+import { getCardStyleById, getLabel } from '@azzapp/data';
 import CardStyleForm from '../CardStyleForm';
 
 type CardStylePageProps = {
@@ -16,10 +16,19 @@ const CardStylePage = async ({
   searchParams,
 }: CardStylePageProps) => {
   const cardStyle = await getCardStyleById(id);
+
   if (!cardStyle) {
     return notFound();
   }
-  return <CardStyleForm cardStyle={cardStyle} saved={!!searchParams?.saved} />;
+  const label = await getLabel(cardStyle.labelKey);
+
+  return (
+    <CardStyleForm
+      cardStyle={cardStyle}
+      saved={!!searchParams?.saved}
+      label={label}
+    />
+  );
 };
 
 export default CardStylePage;

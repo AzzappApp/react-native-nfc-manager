@@ -27,3 +27,4 @@ export * from './webCards';
 export * from './report';
 export * from './generic';
 export * from './databaseMonitorer';
+export * from './labels';

@@ -3,6 +3,8 @@ import {
   CardTemplateTypeTable,
   db,
   getCardTemplateById,
+  getLabel,
+  getLabels,
 } from '@azzapp/data';
 import CardTemplatesForm from '../CardTemplatesForm';
 
@@ -21,11 +23,23 @@ const CardTemplatePage = async (props: CardTemplatePageProps) => {
     db.select().from(CardTemplateTypeTable),
   ]);
 
+  const cardStylesLabelKeys = cardStyles.map(cardStyles => cardStyles.labelKey);
+
+  const labels = await getLabels(
+    cardStylesLabelKeys.concat(
+      cardTemplateTypes.map(cardTemplateType => cardTemplateType.labelKey),
+    ),
+  );
+
+  const label = await getLabel(template.labelKey);
+
   return (
     <CardTemplatesForm
       cardStyles={cardStyles}
       cardTemplate={template}
       cardTemplateTypes={cardTemplateTypes}
+      labels={labels}
+      label={label}
     />
   );
 };

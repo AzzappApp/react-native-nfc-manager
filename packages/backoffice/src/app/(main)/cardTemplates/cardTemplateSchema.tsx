@@ -1,10 +1,11 @@
 import { z } from 'zod';
 
 export const cardTemplateSchema = z.object({
-  labels: z.record(z.string()),
-  cardStyle: z.string().nonempty(),
+  labelKey: z.string().min(1),
+  baseLabelValue: z.string().min(1),
+  cardStyle: z.string().min(1),
   modules: z.array(z.any()),
-  previewMediaId: z.string().nonempty(),
+  previewMediaId: z.string().min(1),
   businessEnabled: z.boolean(),
   personalEnabled: z.boolean(),
 });

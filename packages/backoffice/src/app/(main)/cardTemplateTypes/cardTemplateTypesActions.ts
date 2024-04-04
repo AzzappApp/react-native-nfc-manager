@@ -2,7 +2,8 @@
 import { createId } from '@paralleldrive/cuid2';
 import { eq } from 'drizzle-orm';
 import { revalidatePath } from 'next/cache';
-import { CardTemplateTypeTable, db } from '@azzapp/data';
+import { CardTemplateTypeTable, createLabel, db } from '@azzapp/data';
+import { saveLabelKey } from '#helpers/lokaliseHelperts';
 import { cardTemplateTypeSchema } from './cardTemplateTypeSchema';
 import type {
   CardTemplateType,
@@ -28,23 +29,54 @@ export const saveCardTemplateType = async (
     //check if WebCard Template type exist
 
     if (data.id) {
-      await db
-        .update(CardTemplateTypeTable)
-        .set({
-          labels: data.labels,
-          webCardCategoryId: data.webCardCategory.id,
-          enabled: data.enabled,
-        })
-        .where(eq(CardTemplateTypeTable.id, data.id));
+      const id = data.id;
+      await db.transaction(async trx => {
+        await db
+          .update(CardTemplateTypeTable)
+          .set({
+            labelKey: validation.data.labelKey,
+            webCardCategoryId: data.webCardCategory.id,
+            enabled: data.enabled,
+          })
+          .where(eq(CardTemplateTypeTable.id, id));
+
+        await createLabel(
+          {
+            labelKey: validation.data.labelKey,
+            baseLabelValue: validation.data.baseLabelValue,
+            translations: {},
+          },
+          trx,
+        );
+        await saveLabelKey({
+          labelKey: validation.data.labelKey,
+          baseLabelValue: validation.data.baseLabelValue,
+        });
+      });
 
       templateTypeId = data.id;
     } else {
       templateTypeId = createId();
-      await db.insert(CardTemplateTypeTable).values({
-        id: templateTypeId,
-        labels: data.labels,
-        webCardCategoryId: data.webCardCategory.id,
-        enabled: data.enabled,
+      await db.transaction(async trx => {
+        await trx.insert(CardTemplateTypeTable).values({
+          id: templateTypeId,
+          labelKey: data.labelKey,
+          webCardCategoryId: data.webCardCategory.id,
+          enabled: data.enabled,
+        });
+
+        await createLabel(
+          {
+            labelKey: validation.data.labelKey,
+            baseLabelValue: validation.data.baseLabelValue,
+            translations: {},
+          },
+          trx,
+        );
+        await saveLabelKey({
+          labelKey: validation.data.labelKey,
+          baseLabelValue: validation.data.baseLabelValue,
+        });
       });
     }
   } catch (error) {

@@ -6,7 +6,8 @@ import {
 } from '#helpers/validationHelpers';
 
 export const cardStyleSchema = z.object({
-  labels: z.record(z.string()),
+  labelKey: z.string().min(1),
+  baseLabelValue: z.string().min(1),
   fontFamily: defaultStringValidator,
   fontSize: fontSizeValidator,
   titleFontFamily: defaultStringValidator,
@@ -17,6 +18,7 @@ export const cardStyleSchema = z.object({
   buttonColor: colorValidatorWithPalette,
   gap: z.number().int().gte(0).max(100),
   enabled: z.boolean(),
+  buttonRadius: z.number(),
 });
 
 export type CardStyleErrors = z.inferFlattenedErrors<typeof cardStyleSchema>;
