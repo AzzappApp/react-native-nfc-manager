@@ -1,5 +1,6 @@
-## 0.5.5-canary.198
+## 0.5.5-canary.199
 
+* **fix:**  - default values
 * **docs:**  - add schema package
 * **feat:**  - translate backoffice labels ([#3177](https://github.com/AzzappApp/azzapp/pull/3177))
 * **fix:**  - drizzle-kit config
