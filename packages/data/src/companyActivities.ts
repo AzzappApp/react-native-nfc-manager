@@ -7,7 +7,7 @@ import type { InferInsertModel, InferSelectModel } from 'drizzle-orm';
 
 export const CompanyActivityTable = mysqlTable('CompanyActivity', {
   id: cols.cuid('id').notNull().primaryKey().$defaultFn(createId),
-  labelKey: cols.defaultVarchar('labelKey').notNull().default("''"),
+  labelKey: cols.defaultVarchar('labelKey').notNull().default(''),
   cardTemplateTypeId: cols.cuid('cardTemplateTypeId'),
 });
 

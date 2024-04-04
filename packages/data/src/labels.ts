@@ -6,8 +6,8 @@ import type { InferSelectModel } from 'drizzle-orm';
 
 export const LabelTable = mysqlTable('Label', {
   labelKey: cols.defaultVarchar('labelKey').notNull().primaryKey(),
-  baseLabelValue: cols.defaultVarchar('baseLabelValue').notNull().default("''"),
-  translations: cols.labels('translations').notNull().default({}),
+  baseLabelValue: cols.defaultVarchar('baseLabelValue').notNull().default(''),
+  translations: cols.labels('translations').notNull(),
 });
 
 export type Label = InferSelectModel<typeof LabelTable>;
