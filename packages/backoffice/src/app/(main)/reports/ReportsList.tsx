@@ -1,6 +1,7 @@
 'use client';
 
-import { Typography } from '@mui/material';
+import { Box, Typography } from '@mui/material';
+import { useRouter } from 'next/navigation';
 import DataGrid from '#components/DataGrid';
 import type { GridColDef } from '@mui/x-data-grid';
 
@@ -19,38 +20,45 @@ type ReportListProps = {
   sortOrder: 'asc' | 'desc';
 };
 
-const ReportsList = ({ reports, count }: ReportListProps) => {
+const ReportsList = ({ reports, count, pageSize }: ReportListProps) => {
+  const router = useRouter();
+
   return (
-    <>
+    <Box
+      sx={{
+        display: 'flex',
+        flexDirection: 'column',
+        height: '100%',
+      }}
+    >
       <Typography variant="h4" component="h1" sx={{ mb: 2 }}>
-        Reports
+        Moderation
       </Typography>
 
       <DataGrid
         columns={columns}
         rows={reports}
         rowCount={count}
-        pageSizeOptions={[25]}
+        pageSizeOptions={[pageSize]}
         rowSelection={false}
         sortingOrder={['asc', 'desc']}
         getRowId={row => `${row.targetId}-${row.targetType}`}
+        onRowClick={params => {
+          router.push(
+            `/reports/${params.row.targetType}/${params.row.targetId}`,
+          );
+        }}
+        sx={{
+          '& .MuiDataGrid-row:hover': {
+            cursor: 'pointer',
+          },
+        }}
       />
-    </>
+    </Box>
   );
 };
 
 const columns: GridColDef[] = [
-  {
-    field: 'targetId',
-    headerName: 'ID',
-    width: 250,
-    renderCell: params => (
-      // Bypass cache to avoid getting out-of-date data
-      <a href={`/reports/${params.row.targetType}/${params.row.targetId}`}>
-        {params.row.targetId}
-      </a>
-    ),
-  },
   {
     field: 'targetType',
     headerName: 'Type',

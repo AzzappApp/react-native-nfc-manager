@@ -21,6 +21,8 @@ import LogoutButton from '#components/LogoutButton';
 import getCurrentUser from '#helpers/getCurrentUser';
 import backOfficeSections from '../../backOfficeSections';
 
+const APPBAR_HEIGHT = 64;
+
 const MainLayout = async ({ children }: { children: React.ReactNode }) => {
   const user = await getCurrentUser();
 
@@ -28,7 +30,7 @@ const MainLayout = async ({ children }: { children: React.ReactNode }) => {
     <>
       <AppBar
         position="fixed"
-        sx={{ zIndex: 2000, backgroundColor: '#263238' }}
+        sx={{ zIndex: 2000, backgroundColor: '#263238', height: APPBAR_HEIGHT }}
       >
         <Toolbar>
           <MenuIcon sx={{ mr: 2 }} />
@@ -44,7 +46,7 @@ const MainLayout = async ({ children }: { children: React.ReactNode }) => {
           '& .MuiDrawer-paper': {
             width: DRAWER_WIDTH,
             boxSizing: 'border-box',
-            top: ['48px', '56px', '64px'],
+            top: APPBAR_HEIGHT,
             height: 'auto',
             bottom: 0,
           },
@@ -74,10 +76,10 @@ const MainLayout = async ({ children }: { children: React.ReactNode }) => {
         component="main"
         sx={{
           ml: `${DRAWER_WIDTH}px`,
-          mt: ['48px', '56px', '64px'],
+          mt: `${APPBAR_HEIGHT}px`,
           p: 3,
           overflow: 'auto',
-          height: 'calc(100% - 64px)',
+          height: `calc(100% - ${APPBAR_HEIGHT}px)`,
         }}
       >
         {children}
