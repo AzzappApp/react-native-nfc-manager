@@ -39,6 +39,7 @@
   },
   "devDependencies": {
     "drizzle-kit": "0.20.14",
-    "node-fetch": "^3"
+    "node-fetch": "^3",
+    "mysql2": "^2.3.0"
   }
 }
