@@ -1,6 +1,7 @@
 import * as Sentry from '@sentry/nextjs';
 import * as bcrypt from 'bcrypt-ts';
 import { NextResponse } from 'next/server';
+import { withAxiom } from 'next-axiom';
 import {
   getUserByEmail,
   getUserByPhoneNumber,
@@ -81,6 +82,6 @@ const signin = async (req: Request) => {
   }
 };
 
-export const { POST, OPTIONS } = cors({ POST: signin });
+export const { POST, OPTIONS } = cors({ POST: withAxiom(signin) });
 
 export const runtime = 'nodejs';

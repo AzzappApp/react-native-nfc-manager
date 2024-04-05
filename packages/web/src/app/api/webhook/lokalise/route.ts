@@ -1,5 +1,6 @@
 import { headers } from 'next/headers';
 import { NextResponse } from 'next/server';
+import { withAxiom } from 'next-axiom';
 import * as z from 'zod';
 import { updateLabel } from '@azzapp/data';
 
@@ -52,7 +53,7 @@ const AZZAPP_SERVER_HEADER = 'x-lokalise-azzapp';
 
 const TOKEN = process.env.WEBHOOK_LOKALISE_API_KEY;
 
-export const POST = async (req: Request) => {
+export const POST = withAxiom(async (req: Request) => {
   const token = headers().get(AZZAPP_SERVER_HEADER) ?? null;
 
   if (token === TOKEN) {
@@ -94,4 +95,4 @@ export const POST = async (req: Request) => {
   }
 
   return NextResponse.json({ message: 'ok' }, { status: 200 });
-};
+});

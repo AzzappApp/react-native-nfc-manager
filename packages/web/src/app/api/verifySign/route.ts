@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { withAxiom } from 'next-axiom';
 import { getProfileById, getWebCardById } from '@azzapp/data';
 import { parseContactCard } from '@azzapp/shared/contactCardHelpers';
 import { verifyHmacWithPassword } from '@azzapp/shared/crypto';
@@ -56,6 +57,6 @@ const verifySignApi = async (req: Request) => {
   }
 };
 
-export const { POST, OPTIONS } = cors({ POST: verifySignApi });
+export const { POST, OPTIONS } = cors({ POST: withAxiom(verifySignApi) });
 
 export const runtime = 'edge';

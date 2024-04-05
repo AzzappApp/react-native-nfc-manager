@@ -1,6 +1,7 @@
 import * as Sentry from '@sentry/nextjs';
 import * as bcrypt from 'bcrypt-ts';
 import { NextResponse } from 'next/server';
+import { withAxiom } from 'next-axiom';
 import * as z from 'zod';
 import {
   createUser,
@@ -73,7 +74,7 @@ const handleExistingUser = async (user: User, password: string) => {
   );
 };
 
-export const POST = async (req: Request) => {
+export const POST = withAxiom(async (req: Request) => {
   const result = SignupSchema.safeParse(await req.json());
 
   if (result.success === false) {
@@ -143,6 +144,6 @@ export const POST = async (req: Request) => {
       { status: 500 },
     );
   }
-};
+});
 
 export const runtime = 'nodejs';

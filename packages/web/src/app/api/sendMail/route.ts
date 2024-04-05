@@ -1,5 +1,6 @@
 import sgMail from '@sendgrid/mail';
 import { NextResponse } from 'next/server';
+import { withAxiom } from 'next-axiom';
 import * as z from 'zod';
 import ERRORS from '@azzapp/shared/errors';
 import { checkServerAuth } from '#helpers/tokens';
@@ -18,7 +19,7 @@ sgMail.setApiKey(process.env.SENDGRID_API_KEY!);
 
 const SENDGRIP_NOREPLY_SENDER = process.env.SENDGRIP_NOREPLY_SENDER!;
 
-export const POST = async (req: Request) => {
+export const POST = withAxiom(async (req: Request) => {
   try {
     checkServerAuth();
     const body = await req.json();
@@ -55,6 +56,6 @@ export const POST = async (req: Request) => {
       { status: 400 },
     );
   }
-};
+});
 
 export const runtime = 'nodejs';

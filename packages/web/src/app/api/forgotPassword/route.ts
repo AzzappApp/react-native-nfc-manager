@@ -1,5 +1,6 @@
 import * as Sentry from '@sentry/nextjs';
 import { NextResponse } from 'next/server';
+import { withAxiom } from 'next-axiom';
 import { getUserByEmail, getUserByPhoneNumber } from '@azzapp/data';
 import ERRORS from '@azzapp/shared/errors';
 import {
@@ -14,7 +15,7 @@ type ForgotPasswordBody = {
   locale: string;
 };
 
-export const POST = async (req: Request) => {
+export const POST = withAxiom(async (req: Request) => {
   const { credential, locale } = (await req.json()) as ForgotPasswordBody;
   if (!credential) {
     return NextResponse.json(
@@ -66,6 +67,6 @@ export const POST = async (req: Request) => {
       { status: 500 },
     );
   }
-};
+});
 
 export const runtime = 'nodejs';

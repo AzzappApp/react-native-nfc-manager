@@ -9,6 +9,7 @@ import { maxTokensPlugin } from '@escape.tech/graphql-armor-max-tokens';
 import { useDisableIntrospection } from '@graphql-yoga/plugin-disable-introspection';
 import { usePersistedOperations } from '@graphql-yoga/plugin-persisted-operations';
 import { createYoga } from 'graphql-yoga';
+import { withAxiom } from 'next-axiom';
 import { compare } from 'semver';
 import {
   getDatabaseConnectionsInfos,
@@ -284,7 +285,9 @@ const { handleRequest } = createYoga({
   },
 });
 
-export { handleRequest as GET, handleRequest as POST };
+const handleRequestWithAxiom = withAxiom(handleRequest);
+
+export { handleRequestWithAxiom as GET, handleRequestWithAxiom as POST };
 
 const removePreRelease = (version: string) => {
   const versionParts = version.split('-');

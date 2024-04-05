@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { withAxiom } from 'next-axiom';
 import cors from '#helpers/cors';
 import { getSessionData } from '#helpers/tokens';
 import { twilioVerificationService } from '#helpers/twilioHelpers';
@@ -34,6 +35,8 @@ const requestUpdateContact = async (req: Request) => {
   });
 };
 
-export const { POST, OPTIONS } = cors({ POST: requestUpdateContact });
+export const { POST, OPTIONS } = cors({
+  POST: withAxiom(requestUpdateContact),
+});
 
 export const runtime = 'nodejs';

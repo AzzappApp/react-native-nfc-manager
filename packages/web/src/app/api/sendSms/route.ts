@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { withAxiom } from 'next-axiom';
 import * as z from 'zod';
 import ERRORS from '@azzapp/shared/errors';
 import { checkServerAuth } from '#helpers/tokens';
@@ -12,7 +13,7 @@ const SendSMSSchema = z.object({
   body: z.string(),
 });
 
-export const POST = async (req: Request) => {
+export const POST = withAxiom(async (req: Request) => {
   try {
     checkServerAuth();
     const reqBody = await req.json();
@@ -47,6 +48,6 @@ export const POST = async (req: Request) => {
       { status: 400 },
     );
   }
-};
+});
 
 export const runtime = 'nodejs';

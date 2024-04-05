@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { withAxiom } from 'next-axiom';
 import { activeUserSubscription } from '@azzapp/data';
 import { getSessionData } from '#helpers/tokens';
 
@@ -26,6 +27,6 @@ const getActiveSubscription = async () => {
   }
 };
 
-export const { GET } = { GET: getActiveSubscription };
+export const { GET } = { GET: withAxiom(getActiveSubscription) };
 
 export const runtime = 'edge';

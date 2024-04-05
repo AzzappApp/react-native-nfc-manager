@@ -2,6 +2,7 @@ import cn from 'classnames';
 import { Plus_Jakarta_Sans } from 'next/font/google';
 import { headers } from 'next/headers';
 import Script from 'next/script';
+import { AxiomWebVitals } from 'next-axiom';
 import { DEFAULT_LOCALE, isSupportedLocale } from '@azzapp/i18n';
 import ClientWrapper from '#components/ClientWrapper';
 import { getTranslationMessages } from '#helpers/i18nHelpers';
@@ -89,6 +90,7 @@ const RootLayout = async ({
          `}
         </Script>
       </body>
+      <AxiomWebVitals />
     </html>
   );
 };

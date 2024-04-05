@@ -4,7 +4,7 @@
  * web APIs. Feel free to use it in your own projects.
  */
 
-import type { NextRequest } from 'next/server';
+import type { AxiomRequest } from 'next-axiom';
 
 type StaticOrigin =
   | Array<RegExp | boolean | string>
@@ -104,7 +104,7 @@ type HTTPMethod =
   | 'POST'
   | 'PUT';
 
-type RequestHandler = (req: NextRequest) => Promise<Response> | Response;
+type RequestHandler = (req: AxiomRequest) => Promise<Response> | Response;
 
 type CorsMethodMap = Partial<
   Record<Exclude<HTTPMethod, 'OPTIONS'>, RequestHandler>
@@ -120,7 +120,7 @@ const mergeHeaders = (headers: Headers, v: string, k: string) => {
 };
 
 const setOriginHeaders = async (
-  req: NextRequest,
+  req: AxiomRequest,
   headers: Headers,
   opts: CorsOptions,
 ) => {
@@ -176,23 +176,24 @@ const cors = <T extends CorsMethodMap>(
 
   const results: CorsResult<T> = {} as CorsResult<T>;
 
-  const corsWrapper = (handler: RequestHandler) => async (req: NextRequest) => {
-    const res = await handler(req);
-    const { headers } = res;
-    const updated = await setOriginHeaders(req, headers, opts);
-    if (!updated) {
+  const corsWrapper =
+    (handler: RequestHandler) => async (req: AxiomRequest) => {
+      const res = await handler(req);
+      const { headers } = res;
+      const updated = await setOriginHeaders(req, headers, opts);
+      if (!updated) {
+        return res;
+      }
+
+      const exposed = Array.isArray(opts.exposedHeaders)
+        ? opts.exposedHeaders.join(',')
+        : opts.exposedHeaders;
+
+      if (exposed) {
+        headers.set('Access-Control-Expose-Headers', exposed);
+      }
       return res;
-    }
-
-    const exposed = Array.isArray(opts.exposedHeaders)
-      ? opts.exposedHeaders.join(',')
-      : opts.exposedHeaders;
-
-    if (exposed) {
-      headers.set('Access-Control-Expose-Headers', exposed);
-    }
-    return res;
-  };
+    };
 
   results.OPTIONS = optionsRequestHandler;
   Object.entries(methodsMap).forEach(([method, handler]) => {

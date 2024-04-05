@@ -1,5 +1,6 @@
 import * as Sentry from '@sentry/nextjs';
 import { NextResponse } from 'next/server';
+import { withAxiom } from 'next-axiom';
 import {
   getProfilesOfUser,
   getUserByEmail,
@@ -16,7 +17,7 @@ type ConfirmRegistrationBody = {
   issuer?: string;
 };
 
-export const POST = async (req: Request) => {
+export const POST = withAxiom(async (req: Request) => {
   const { token, issuer } = (await req.json()) as ConfirmRegistrationBody;
 
   if (!token || !issuer) {
@@ -72,6 +73,6 @@ export const POST = async (req: Request) => {
     { message: ERRORS.INVALID_REQUEST },
     { status: 400 },
   );
-};
+});
 
 export const runtime = 'nodejs';

@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { withAxiom } from 'next-axiom';
 import ERRORS from '@azzapp/shared/errors';
 import cors from '#helpers/cors';
 import { refreshTokens } from '#helpers/tokens';
@@ -22,4 +23,4 @@ const refreshTokensApi = async (req: Request) => {
   }
 };
 
-export const { POST, OPTIONS } = cors({ POST: refreshTokensApi });
+export const { POST, OPTIONS } = cors({ POST: withAxiom(refreshTokensApi) });

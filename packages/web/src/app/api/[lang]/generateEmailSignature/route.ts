@@ -1,5 +1,6 @@
 import sgMail from '@sendgrid/mail';
 import { NextResponse } from 'next/server';
+import { withAxiom } from 'next-axiom';
 import QRCode from 'qrcode';
 import { getProfileWithWebCardById, getUserById } from '@azzapp/data';
 import ERRORS from '@azzapp/shared/errors';
@@ -10,11 +11,12 @@ import { buildEmailSignatureGenerationUrl } from '@azzapp/shared/urlHelpers';
 import { buildAvatarUrl } from '#helpers/avatar';
 import cors from '#helpers/cors';
 import { getSessionData } from '#helpers/tokens';
+import type { NextRequest } from 'next/server';
 
 sgMail.setApiKey(process.env.SENDGRID_API_KEY!);
 const PUBLIC_URL = process.env.NEXT_PUBLIC_URL!; // replace with ngrok for dev
 const SENDGRIP_NOREPLY_SENDER = process.env.SENDGRIP_NOREPLY_SENDER!;
-const generateEmailSignature = async (req: Request) => {
+const generateEmailSignature = async (req: NextRequest) => {
   try {
     const { userId } = (await getSessionData()) ?? {};
     if (!userId) {
@@ -133,6 +135,8 @@ const generateEmailSignature = async (req: Request) => {
   }
 };
 
-export const { POST, OPTIONS } = cors({ POST: generateEmailSignature });
+export const { POST, OPTIONS } = cors({
+  POST: withAxiom(generateEmailSignature),
+});
 
 export const runtime = 'nodejs';

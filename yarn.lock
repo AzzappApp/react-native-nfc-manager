@@ -13453,6 +13453,14 @@ nested-error-stacks@~2.0.1:
   resolved "https://registry.yarnpkg.com/nested-error-stacks/-/nested-error-stacks-2.0.1.tgz#d2cc9fc5235ddb371fc44d506234339c8e4b0a4b"
   integrity sha512-SrQrok4CATudVzBS7coSz26QRSmlK9TzzoFbeKfcPBUFPjcQM9Rqvr/DlJkOrwI/0KcgvMub1n1g5Jt9EgRn4A==
 
+next-axiom@^1.1.1:
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/next-axiom/-/next-axiom-1.1.1.tgz#2dc16e7a1b3752bfdd6402cad753967e989d21b7"
+  integrity sha512-0r/TJ+/zetD+uDc7B+2E7WpC86hEtQ1U+DuWYrP/JNmUz+ZdPFbrZgzOSqaZ6TwYbXP56VVlPfYwq1YsKHTHYQ==
+  dependencies:
+    remeda "^1.29.0"
+    whatwg-fetch "^3.6.2"
+
 next-cloudinary@^6.3.0:
   version "6.3.0"
   resolved "https://registry.yarnpkg.com/next-cloudinary/-/next-cloudinary-6.3.0.tgz#a7480955591b901967839cde7b450f554430afc0"
@@ -15046,6 +15054,11 @@ relay-test-utils@^16.2.0:
     fbjs "^3.0.2"
     invariant "^2.2.4"
     relay-runtime "16.2.0"
+
+remeda@^1.29.0:
+  version "1.57.1"
+  resolved "https://registry.yarnpkg.com/remeda/-/remeda-1.57.1.tgz#2ff66a7314c7081204eabea7a92f20462045ddfb"
+  integrity sha512-CHrQFjgGw7y7d5WDDG21nzES2Z3Ae+s1ZjVAYjLOsoCceM1EMzVrSd4dx+Eb3QooR16tbbHeJhzk0q8qsaquTg==
 
 remedial@^1.0.7:
   version "1.0.8"
@@ -17151,7 +17164,7 @@ whatwg-encoding@^2.0.0:
   dependencies:
     iconv-lite "0.6.3"
 
-whatwg-fetch@^3.0.0:
+whatwg-fetch@^3.0.0, whatwg-fetch@^3.6.2:
   version "3.6.20"
   resolved "https://registry.yarnpkg.com/whatwg-fetch/-/whatwg-fetch-3.6.20.tgz#580ce6d791facec91d37c72890995a0b48d31c70"
   integrity sha512-EqhiFU6daOA8kpjOWTL0olhVOF3i7OrFzSYiGsEMB8GcXS+RrzauAERX65xMeNWVqxA6HXH2m69Z9LaKKdisfg==

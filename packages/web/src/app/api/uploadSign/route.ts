@@ -1,6 +1,7 @@
 /* eslint-disable no-bitwise */
 import { createId } from '@paralleldrive/cuid2';
 import { NextResponse } from 'next/server';
+import { withAxiom } from 'next-axiom';
 import * as z from 'zod';
 import { createMedia } from '@azzapp/data';
 import { MODULE_IMAGES_SIZES } from '@azzapp/shared/cardModuleHelpers';
@@ -91,6 +92,6 @@ const getPregeneratedSizes = (body: uploadSignParams) => {
   }
 };
 
-export const { POST, OPTIONS } = cors({ POST: uploadSignApi });
+export const { POST, OPTIONS } = cors({ POST: withAxiom(uploadSignApi) });
 
 export const runtime = 'edge';

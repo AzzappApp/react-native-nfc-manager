@@ -1,6 +1,7 @@
 import * as Sentry from '@sentry/nextjs';
 import * as bcrypt from 'bcrypt-ts';
 import { NextResponse } from 'next/server';
+import { withAxiom } from 'next-axiom';
 import { updateUser, getUserByPhoneNumber, getUserByEmail } from '@azzapp/data';
 import ERRORS from '@azzapp/shared/errors';
 import { isValidEmail } from '@azzapp/shared/stringHelpers';
@@ -12,7 +13,7 @@ type ChangePasswordBody = {
   issuer: string;
 };
 
-export const POST = async (req: Request) => {
+export const POST = withAxiom(async (req: Request) => {
   const { password, token, issuer } = (await req.json()) as ChangePasswordBody;
   if (!password || !token) {
     return NextResponse.json(
@@ -62,6 +63,6 @@ export const POST = async (req: Request) => {
     { message: ERRORS.INVALID_REQUEST },
     { status: 400 },
   );
-};
+});
 
 export const runtime = 'nodejs';

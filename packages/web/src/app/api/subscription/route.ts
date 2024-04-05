@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { withAxiom } from 'next-axiom';
 import { upsertSubscription } from '@azzapp/data';
 import cors from '#helpers/cors';
 
@@ -96,7 +97,7 @@ const subscriptionWebHook = async (req: Request) => {
   return NextResponse.json(null, { status: 200 });
 };
 
-export const { POST, OPTIONS } = cors({ POST: subscriptionWebHook });
+export const { POST, OPTIONS } = cors({ POST: withAxiom(subscriptionWebHook) });
 
 export const runtime = 'edge';
 

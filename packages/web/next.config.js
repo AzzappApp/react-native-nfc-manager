@@ -1,5 +1,6 @@
 const { withSentryConfig } = require('@sentry/nextjs');
 const { createVanillaExtractPlugin } = require('@vanilla-extract/next-plugin');
+const { withAxiom } = require('next-axiom');
 
 const withVanillaExtract = createVanillaExtractPlugin({
   identifiers: 'short',
@@ -56,43 +57,45 @@ const config = {
   transpilePackages: ['@azzapp/shared/', '@azzapp/data'],
 };
 
-module.exports = withSentryConfig(
-  withVanillaExtract(config),
-  {
-    // For all available options, see:
-    // https://github.com/getsentry/sentry-webpack-plugin#options
+module.exports = withAxiom(
+  withSentryConfig(
+    withVanillaExtract(config),
+    {
+      // For all available options, see:
+      // https://github.com/getsentry/sentry-webpack-plugin#options
 
-    // An auth token is required for uploading source maps.
-    authToken: process.env.SENTRY_AUTH_TOKEN,
+      // An auth token is required for uploading source maps.
+      authToken: process.env.SENTRY_AUTH_TOKEN,
 
-    // Suppresses source map uploading logs during build
-    silent: true,
-    org: 'azzapp',
-    project: 'web',
-  },
-  {
-    // For all available options, see:
-    // https://docs.sentry.io/platforms/javascript/guides/nextjs/manual-setup/
+      // Suppresses source map uploading logs during build
+      silent: true,
+      org: 'azzapp',
+      project: 'web',
+    },
+    {
+      // For all available options, see:
+      // https://docs.sentry.io/platforms/javascript/guides/nextjs/manual-setup/
 
-    // Upload a larger set of source maps for prettier stack traces (increases build time)
-    widenClientFileUpload: true,
+      // Upload a larger set of source maps for prettier stack traces (increases build time)
+      widenClientFileUpload: true,
 
-    // Transpiles SDK to be compatible with IE11 (increases bundle size)
-    transpileClientSDK: true,
+      // Transpiles SDK to be compatible with IE11 (increases bundle size)
+      transpileClientSDK: true,
 
-    // Routes browser requests to Sentry through a Next.js rewrite to circumvent ad-blockers (increases server load)
-    tunnelRoute: '/_monitoring',
+      // Routes browser requests to Sentry through a Next.js rewrite to circumvent ad-blockers (increases server load)
+      tunnelRoute: '/_monitoring',
 
-    // Hides source maps from generated client bundles
-    hideSourceMaps: true,
+      // Hides source maps from generated client bundles
+      hideSourceMaps: true,
 
-    // Automatically tree-shake Sentry logger statements to reduce bundle size
-    disableLogger: true,
+      // Automatically tree-shake Sentry logger statements to reduce bundle size
+      disableLogger: true,
 
-    // Enables automatic instrumentation of Vercel Cron Monitors.
-    // See the following for more information:
-    // https://docs.sentry.io/product/crons/
-    // https://vercel.com/docs/cron-jobs
-    automaticVercelMonitors: true,
-  },
+      // Enables automatic instrumentation of Vercel Cron Monitors.
+      // See the following for more information:
+      // https://docs.sentry.io/product/crons/
+      // https://vercel.com/docs/cron-jobs
+      automaticVercelMonitors: true,
+    },
+  ),
 );

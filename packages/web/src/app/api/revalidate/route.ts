@@ -1,5 +1,6 @@
 import { revalidatePath } from 'next/cache';
 import { NextResponse } from 'next/server';
+import { withAxiom } from 'next-axiom';
 import * as z from 'zod';
 import ERRORS from '@azzapp/shared/errors';
 import { checkServerAuth } from '#helpers/tokens';
@@ -9,7 +10,7 @@ const RevalidateSchema = z.object({
   posts: z.array(z.object({ userName: z.string(), id: z.string() })).nullable(),
 });
 
-export const POST = async (req: Request) => {
+export const POST = withAxiom(async (req: Request) => {
   try {
     checkServerAuth();
     const body = await req.json();
@@ -39,6 +40,6 @@ export const POST = async (req: Request) => {
       { status: 400 },
     );
   }
-};
+});
 
 export const runtime = 'nodejs';
