@@ -1,4 +1,4 @@
-## 0.5.5-canary.201
+## 0.5.5-canary.202
 
 * **build:**  - add missing dependency fro drizzle-studio
 * **fix:**  - default values
