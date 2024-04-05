@@ -10,7 +10,7 @@ import {
   useTransition,
 } from 'react';
 import DataGrid from '#components/DataGrid';
-import type { User } from '@azzapp/data';
+import type { UserTable } from './page';
 import type {
   GridColDef,
   GridPaginationModel,
@@ -18,7 +18,7 @@ import type {
 } from '@mui/x-data-grid';
 
 type UsersListProps = {
-  users: User[];
+  users: UserTable[];
   count: number;
   page: number;
   pageSize: number;
@@ -37,6 +37,7 @@ const UsersList = ({
   search,
 }: UsersListProps) => {
   const router = useRouter();
+  // console.log(users);
   const [loading, startTransition] = useTransition();
   const updateSearchParams = useCallback(
     (page: number, sort: string, order: string, search: string | null) => {
@@ -137,16 +138,19 @@ const UsersList = ({
 };
 
 const columns: GridColDef[] = [
-  { field: 'email', headerName: 'Email', flex: 1 },
+  {
+    field: 'email',
+    headerName: 'Email',
+    flex: 1,
+    valueFormatter: params => params.value || '-',
+  },
   {
     field: 'phoneNumber',
     headerName: 'Phone number',
     flex: 1,
-    renderCell: params => (
-      <Box sx={{ width: 50, height: 50, backgroundColor: params.row.value }} />
-    ),
+    valueFormatter: params => params.value || '-',
   },
-  { field: 'roles', headerName: 'Roles', width: 150 },
+  { field: 'webcardsCount', headerName: 'WebCards', width: 150 },
   {
     field: 'createdAt',
     headerName: 'Inscription date',

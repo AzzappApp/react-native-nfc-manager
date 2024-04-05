@@ -1,6 +1,14 @@
-import { asc, desc, like, or, sql } from 'drizzle-orm';
-import { UserTable, db } from '@azzapp/data';
+import { asc, desc, like, or, sql, eq, and } from 'drizzle-orm';
+import { UserTable, db, ProfileTable } from '@azzapp/data';
 import UsersList from './UsersList';
+
+export type UserTable = {
+  id: string;
+  email: string | null;
+  phoneNumber: string | null;
+  webcardsCount: number;
+  createdAt: Date;
+};
 
 const sortsColumns = {
   createdAt: UserTable.createdAt,
@@ -15,18 +23,33 @@ const getUsers = (
   order: 'asc' | 'desc',
   search: string | null,
 ) => {
-  let query = db.select().from(UserTable).$dynamic();
+  let query = db
+    .select({
+      id: UserTable.id,
+      email: UserTable.email,
+      phoneNumber: UserTable.phoneNumber,
+      webcardsCount: sql`count(*)`.mapWith(Number),
+      createdAt: UserTable.createdAt,
+    })
+    .from(ProfileTable)
+    .where(eq(ProfileTable.deleted, false))
+    .groupBy(UserTable.id)
+    .innerJoin(UserTable, eq(UserTable.id, ProfileTable.userId))
+    .$dynamic();
 
   if (search) {
     query = query.where(
-      or(
-        like(UserTable.email, `%${search}%`),
-        like(UserTable.phoneNumber, `%${search}%`),
+      and(
+        eq(ProfileTable.deleted, false),
+        or(
+          like(UserTable.email, `%${search}%`),
+          like(UserTable.phoneNumber, `%${search}%`),
+        ),
       ),
     );
   }
   return query
-    .offset(page * (PAGE_SIZE - 1))
+    .offset(page * PAGE_SIZE)
     .limit(PAGE_SIZE)
     .orderBy(
       order === 'asc' ? asc(sortsColumns[sort]) : desc(sortsColumns[sort]),

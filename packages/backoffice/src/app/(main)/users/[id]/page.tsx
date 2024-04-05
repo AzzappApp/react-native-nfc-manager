@@ -1,5 +1,5 @@
 import { notFound } from 'next/navigation';
-import { getUserById } from '@azzapp/data';
+import { getUserById, getProfilesOfUser } from '@azzapp/data';
 import UserForm from './UserForm';
 
 type UserPageProps = {
@@ -13,8 +13,11 @@ const UserPage = async ({ params: { id } }: UserPageProps) => {
   if (!user) {
     return notFound();
   }
+  const profiles = await getProfilesOfUser(user.id);
 
-  return <UserForm user={user} />;
+  return (
+    <UserForm user={user} webCards={profiles.map(({ WebCard }) => WebCard)} />
+  );
 };
 
 export default UserPage;

@@ -1,9 +1,17 @@
 'use server';
 
+import { eq, inArray, sql } from 'drizzle-orm';
 import { revalidatePath } from 'next/cache';
-import { getUserById, updateUser } from '@azzapp/data';
+import {
+  getUserById,
+  updateUser,
+  db,
+  WebCardTable,
+  ProfileTable,
+} from '@azzapp/data';
 import { ADMIN } from '#roles';
 import { currentUserHasRole } from '#helpers/roleHelpers';
+import { getSession } from '#helpers/session';
 
 export const toggleRole = async (userId: string, role: string) => {
   if (!(await currentUserHasRole(ADMIN))) {
@@ -26,4 +34,44 @@ export const toggleRole = async (userId: string, role: string) => {
   }
 
   revalidatePath('/users/[id]');
+};
+
+export const removeWebcard = async (webcardId: string) => {
+  const session = await getSession();
+
+  if (session?.userId) {
+    await db.transaction(async trx => {
+      await trx
+        .update(WebCardTable)
+        .set({
+          deletedAt: new Date(),
+          deletedBy: session.userId,
+          deleted: true,
+          cardIsPublished: false,
+        })
+        .where(eq(WebCardTable.id, webcardId));
+
+      await trx
+        .update(WebCardTable)
+        .set({
+          nbFollowers: sql`GREATEST(nbFollowers - 1, 0)`,
+        })
+        .where(
+          inArray(
+            WebCardTable.id,
+            sql`(select followingId from Follow where followerId = "${webcardId}")`,
+          ),
+        );
+
+      await trx
+        .update(ProfileTable)
+        .set({
+          deletedAt: new Date(),
+          deletedBy: session.userId,
+          deleted: true,
+        })
+        .where(eq(ProfileTable.webCardId, webcardId));
+    });
+    revalidatePath('/users/[id]');
+  }
 };
