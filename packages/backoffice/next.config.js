@@ -1,6 +1,16 @@
 /** @type {import('next').NextConfig} */
 
-const url = new URL(process.env.NEXT_PUBLIC_URL);
+const remotePatterns = [];
+
+if (process.env.NEXT_PUBLIC_URL) {
+  const url = new URL(process.env.NEXT_PUBLIC_URL);
+  remotePatterns.push({
+    protocol: url.protocol.replace(':', ''),
+    hostname: url.hostname,
+    port: url.port,
+    pathname: '/api/cover/**',
+  });
+}
 
 const config = {
   productionBrowserSourceMaps: true,
@@ -18,14 +28,7 @@ const config = {
     },
   },
   images: {
-    remotePatterns: [
-      {
-        protocol: url.protocol.replace(':', ''),
-        hostname: url.hostname,
-        port: url.port,
-        pathname: '/api/cover/**',
-      },
-    ],
+    remotePatterns,
   },
 };
 
