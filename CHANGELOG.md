@@ -1,5 +1,6 @@
-## 0.5.5-canary.202
+## 0.5.5-canary.203
 
+* **fix:**  - env var missing during build
 * **build:**  - add missing dependency fro drizzle-studio
 * **fix:**  - default values
 * **docs:**  - add schema package
