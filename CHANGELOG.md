@@ -1,5 +1,6 @@
-## 0.5.5-canary.200
+## 0.5.5-canary.201
 
+* **build:**  - add missing dependency fro drizzle-studio
 * **fix:**  - default values
 * **docs:**  - add schema package
 * **feat:**  - translate backoffice labels ([#3177](https://github.com/AzzappApp/azzapp/pull/3177))
