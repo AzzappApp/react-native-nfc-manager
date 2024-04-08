@@ -1,18 +1,16 @@
-import { eq } from 'drizzle-orm';
-import { ProfileTable, db } from '@azzapp/data';
+import { removeProfileById } from '@azzapp/data';
 import fromGlobalIdWithType from '#helpers/relayIdHelpers';
 import type { MutationResolvers } from '#/__generated__/types';
 
-const quitWebCard: MutationResolvers['quitWebCard'] = async (
-  _,
-  { profileId: gqlProfileId },
-) => {
-  const profileId = fromGlobalIdWithType(gqlProfileId, 'Profile');
+type Mutation = MutationResolvers['quitWebCard'];
 
-  await db.delete(ProfileTable).where(eq(ProfileTable.id, profileId));
+const quitWebCard: Mutation = async (_, params) => {
+  const profileId = fromGlobalIdWithType(params.profileId, 'Profile');
+
+  await removeProfileById(profileId);
 
   return {
-    profileId: gqlProfileId,
+    profileId: params.profileId,
   };
 };
 

@@ -10,7 +10,7 @@
   },
   "scripts": {
     "test": "jest",
-    "dev": "tsc --watch",
+    "dev": "tsc --watch -p tsconfig.lib.json",
     "build": "tsc -p tsconfig.lib.json",
     "typecheck": "tsc --noEmit",
     "clean": "rm -rf lib && rm -f tsconfig.tsbuildinfo"

@@ -1,20 +1,19 @@
 import { and, eq, inArray, sql } from 'drizzle-orm';
-import { primaryKey, int, mysqlTable, date } from 'drizzle-orm/mysql-core';
 
 import db, { cols } from './db';
 import type { DbTransaction } from './db';
 import type { InferSelectModel } from 'drizzle-orm';
 
-export const ProfileStatisticTable = mysqlTable(
+export const ProfileStatisticTable = cols.table(
   'ProfileStatistic',
   {
     profileId: cols.cuid('profileId').notNull(),
-    day: date('day').notNull(),
-    contactCardScans: int('contactCardScans').default(0).notNull(),
+    day: cols.date('day').notNull(),
+    contactCardScans: cols.int('contactCardScans').default(0).notNull(),
   },
   table => {
     return {
-      id: primaryKey({ columns: [table.profileId, table.day] }),
+      id: cols.primaryKey({ columns: [table.profileId, table.day] }),
     };
   },
 );

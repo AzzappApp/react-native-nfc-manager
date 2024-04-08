@@ -11,4 +11,9 @@ module.exports = {
     ],
   ],
   ignore: ['**/__mocks__/*', '**/__tests__/*'],
+  env: {
+    test: {
+      plugins: ['@babel/plugin-transform-modules-commonjs'],
+    },
+  },
 };

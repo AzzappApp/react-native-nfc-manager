@@ -1,22 +1,21 @@
 import { and, eq, inArray, sql } from 'drizzle-orm';
-import { primaryKey, int, mysqlTable, date } from 'drizzle-orm/mysql-core';
 
 import db, { cols } from './db';
 import { WebCardTable } from './webCards';
 import type { DbTransaction } from './db';
 import type { InferSelectModel } from 'drizzle-orm';
 
-export const WebCardStatisticTable = mysqlTable(
+export const WebCardStatisticTable = cols.table(
   'WebCardStatistic',
   {
     webCardId: cols.cuid('webCardId').notNull(),
-    day: date('day').notNull(),
-    webCardViews: int('webCardViews').default(0).notNull(),
-    likes: int('likes').default(0).notNull(),
+    day: cols.date('day').notNull(),
+    webCardViews: cols.int('webCardViews').default(0).notNull(),
+    likes: cols.int('likes').default(0).notNull(),
   },
   table => {
     return {
-      id: primaryKey({ columns: [table.webCardId, table.day] }),
+      id: cols.primaryKey({ columns: [table.webCardId, table.day] }),
     };
   },
 );

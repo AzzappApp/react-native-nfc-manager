@@ -1,23 +1,16 @@
 import { eq, asc } from 'drizzle-orm';
-import {
-  json,
-  int,
-  mysqlEnum,
-  mysqlTable,
-  boolean,
-} from 'drizzle-orm/mysql-core';
-import { createId } from '#helpers/createId';
 import db, { cols } from './db';
+import { createId } from './helpers/createId';
 import type { InferInsertModel, InferSelectModel } from 'drizzle-orm';
 
-export const WebCardCategoryTable = mysqlTable('WebCardCategory', {
+export const WebCardCategoryTable = cols.table('WebCardCategory', {
   id: cols.cuid('id').primaryKey().notNull().$defaultFn(createId),
-  webCardKind: mysqlEnum('webCardKind', ['personal', 'business']).notNull(),
+  webCardKind: cols.enum('webCardKind', ['personal', 'business']).notNull(),
   cardTemplateTypeId: cols.cuid('cardTemplateTypeId'),
   labelKey: cols.defaultVarchar('labelKey').notNull().default(''),
-  medias: json('medias').$type<string[]>().notNull(),
-  order: int('order').notNull(),
-  enabled: boolean('enabled').default(true).notNull(),
+  medias: cols.json('medias').$type<string[]>().notNull(),
+  order: cols.int('order').notNull(),
+  enabled: cols.boolean('enabled').default(true).notNull(),
 });
 
 export type WebCardCategory = InferSelectModel<typeof WebCardCategoryTable>;

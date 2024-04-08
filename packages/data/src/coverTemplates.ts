@@ -1,7 +1,6 @@
 import { eq, sql } from 'drizzle-orm';
-import { mysqlTable, mysqlEnum, boolean, json } from 'drizzle-orm/mysql-core';
-import { createId } from '#helpers/createId';
 import db, { cols } from './db';
+import { createId } from './helpers/createId';
 import type {
   TextOrientation,
   TextPosition,
@@ -25,15 +24,15 @@ export type CoverTemplateData = {
   mediaAnimation?: string | null;
 };
 
-export const CoverTemplateTable = mysqlTable('CoverTemplate', {
+export const CoverTemplateTable = cols.table('CoverTemplate', {
   id: cols.cuid('id').notNull().primaryKey().$defaultFn(createId),
   name: cols.defaultVarchar('name').notNull(),
-  kind: mysqlEnum('kind', ['people', 'video', 'others']).notNull(),
+  kind: cols.enum('kind', ['people', 'video', 'others']).notNull(),
   previewMediaId: cols.mediaId('previewMediaId').notNull(),
-  data: json('data').$type<CoverTemplateData>().notNull(),
+  data: cols.json('data').$type<CoverTemplateData>().notNull(),
   colorPaletteId: cols.cuid('colorPaletteId').notNull(),
-  businessEnabled: boolean('businessEnabled').default(true).notNull(),
-  personalEnabled: boolean('personalEnabled').default(true).notNull(),
+  businessEnabled: cols.boolean('businessEnabled').default(true).notNull(),
+  personalEnabled: cols.boolean('personalEnabled').default(true).notNull(),
 });
 
 export type CoverTemplate = InferSelectModel<typeof CoverTemplateTable>;

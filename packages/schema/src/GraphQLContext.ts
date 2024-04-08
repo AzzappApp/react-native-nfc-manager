@@ -1,8 +1,7 @@
 import DataLoader from 'dataloader';
-import { eq, inArray } from 'drizzle-orm';
+import { and, eq, inArray } from 'drizzle-orm';
 import ExpiryMap from 'expiry-map';
 import {
-  db,
   CardModuleTable,
   CardStyleTable,
   CardTemplateTable,
@@ -18,37 +17,46 @@ import {
   ProfileTable,
   StaticMediaTable,
   UserTable,
-  getUserProfileWithWebCardId,
   getLastWebCardListStatisticsFor,
   getLastProfileListStatisticsFor,
   getOwners,
+  db,
+  sortEntitiesByIds,
+  WebCardTable,
+  getLabels,
+} from '@azzapp/data';
+import { DEFAULT_LOCALE } from '@azzapp/i18n';
+import type {
+  WebCard,
+  CardModule,
+  Label,
+  User,
+  ProfileStatistic,
+  Profile,
+  WebCardStatistic,
+  StaticMedia,
+  WebCardCategory,
+  Post,
+  PostComment,
+  MediaSuggestion,
+  Media,
+  CoverTemplate,
+  CompanyActivity,
+  ColorPalette,
+  CardTemplateType,
+  CardTemplate,
+  CardStyle,
+} from '@azzapp/data';
+
+import type { Locale } from '@azzapp/i18n';
+
+/*
   WebCardTable,
   sortEntitiesByIds,
   getLabels,
 } from '@azzapp/data';
 import { DEFAULT_LOCALE } from '@azzapp/i18n';
-import type {
-  Post,
-  Media,
-  Profile,
-  CoverTemplate,
-  StaticMedia,
-  PostComment,
-  User,
-  CardStyle,
-  CardTemplate,
-  CardTemplateType,
-  ColorPalette,
-  CardModule,
-  CompanyActivity,
-  MediaSuggestion,
-  WebCardCategory,
-  WebCard,
-  WebCardStatistic,
-  ProfileStatistic,
-  Label,
-} from '@azzapp/data';
-import type { Locale } from '@azzapp/i18n';
+*/
 
 export type GraphQLContext = {
   cardUsernamesToRevalidate: Set<string>;
@@ -73,10 +81,9 @@ export const createGraphQLContext = (
   sendMail: GraphQLContext['sendMail'],
   sendSms: GraphQLContext['sendSms'],
   buildCoverAvatarUrl: GraphQLContext['buildCoverAvatarUrl'],
+  loaders: Loaders,
   locale: Locale = DEFAULT_LOCALE,
 ): Omit<GraphQLContext, 'auth'> => {
-  const loaders = createLoaders();
-
   const sessionMemoizedCache = new Map<any, any>();
   const sessionMemoized = <T>(fn: () => T): T => {
     if (sessionMemoizedCache.has(fn)) {
@@ -139,7 +146,7 @@ type EntityToType<T extends Entity> = {
   User: User;
 }[T];
 
-type Loaders = {
+export type Loaders = {
   [T in Entity]: DataLoader<string, EntityToType<T> | null>;
 } & {
   profileByWebCardIdAndUserId: DataLoader<
@@ -181,6 +188,7 @@ const getEntitiesByIds = async (
   }
   if (ids.length === 1) {
     const entityById = await db
+      .client()
       .select()
       .from(entitiesTable[entity])
       .where(eq(entitiesTable[entity].id, ids[0]));
@@ -189,6 +197,7 @@ const getEntitiesByIds = async (
   return sortEntitiesByIds(
     ids,
     (await db
+      .client()
       .select()
       .from(entitiesTable[entity])
       .where(inArray(entitiesTable[entity].id, ids as string[]))) as Array<
@@ -201,11 +210,23 @@ const dataLoadersOptions = {
   batchScheduleFn: setTimeout,
 };
 
-const profileByWebCardIdAndUserIdLoader = () =>
+const createProfileByWebCardIdAndUserIdLoader = () =>
   new DataLoader<{ userId: string; webCardId: string }, Profile | null, string>(
     async keys => {
       return Promise.all(
-        keys.map(key => getUserProfileWithWebCardId(key.userId, key.webCardId)),
+        keys.map(key => {
+          return db
+            .client()
+            .select()
+            .from(ProfileTable)
+            .where(
+              and(
+                eq(ProfileTable.userId, key.userId),
+                eq(ProfileTable.webCardId, key.webCardId),
+              ),
+            )
+            .then(res => res.pop() || null);
+        }),
       );
     },
     {
@@ -259,7 +280,7 @@ const labelLoader = new DataLoader<string, Label | null>(
   },
 );
 
-const createLoaders = (): Loaders =>
+export const createLoaders = (): Loaders =>
   new Proxy({} as Loaders, {
     get: (
       loaders: Loaders,
@@ -271,10 +292,6 @@ const createLoaders = (): Loaders =>
         | 'webCardOwners'
         | 'webCardStatistics',
     ) => {
-      if (entity === 'profileByWebCardIdAndUserId') {
-        return profileByWebCardIdAndUserIdLoader();
-      }
-
       if (entity === 'webCardStatistics') {
         return webCardStatisticsLoader();
       }
@@ -291,10 +308,15 @@ const createLoaders = (): Loaders =>
         return labelLoader;
       }
 
-      if (!entities.includes(entity)) {
+      if (!['profileByWebCardIdAndUserId', ...entities].includes(entity)) {
         throw new Error(`Unknown entity ${entity}`);
       }
+
       if (!loaders[entity]) {
+        if (entity === 'profileByWebCardIdAndUserId') {
+          return createProfileByWebCardIdAndUserIdLoader();
+        }
+
         loaders[entity] = new DataLoader<string, EntityToType<Entity> | null>(
           ids => getEntitiesByIds(entity, ids),
           dataLoadersOptions,

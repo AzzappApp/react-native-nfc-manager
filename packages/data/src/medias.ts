@@ -1,5 +1,4 @@
 import { eq, inArray, sql } from 'drizzle-orm';
-import { mysqlEnum, double, mysqlTable, int } from 'drizzle-orm/mysql-core';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
 import { getMediaInfoByPublicIds } from '@azzapp/shared/cloudinaryHelpers';
 import { decodeMediaId, encodeMediaId } from '@azzapp/shared/imagesHelpers';
@@ -8,12 +7,12 @@ import { sortEntitiesByIds } from './generic';
 import type { DbTransaction } from './db';
 import type { InferInsertModel, InferSelectModel } from 'drizzle-orm';
 
-export const MediaTable = mysqlTable('Media', {
+export const MediaTable = cols.table('Media', {
   id: cols.mediaId('id').notNull().primaryKey(),
-  kind: mysqlEnum('kind', ['image', 'video']).notNull(),
-  height: double('height').notNull(),
-  width: double('width').notNull(),
-  refCount: int('refCount').default(0).notNull(),
+  kind: cols.enum('kind', ['image', 'video']).notNull(),
+  height: cols.double('height').notNull(),
+  width: cols.double('width').notNull(),
+  refCount: cols.int('refCount').default(0).notNull(),
   createdAt: cols
     .dateTime('createdAt')
     .notNull()

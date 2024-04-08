@@ -1,15 +1,14 @@
 import { eq } from 'drizzle-orm';
-import { boolean, mysqlTable } from 'drizzle-orm/mysql-core';
-import { createId } from '#helpers/createId';
 import db, { cols } from './db';
+import { createId } from './helpers/createId';
 
 import type { InferInsertModel, InferSelectModel } from 'drizzle-orm';
 
-export const CardTemplateTypeTable = mysqlTable('CardTemplateType', {
+export const CardTemplateTypeTable = cols.table('CardTemplateType', {
   id: cols.cuid('id').notNull().primaryKey().$defaultFn(createId),
   labelKey: cols.defaultVarchar('labelKey').notNull().default(''),
   webCardCategoryId: cols.cuid('webCardCategoryId').notNull(),
-  enabled: boolean('enabled').default(true).notNull(),
+  enabled: cols.boolean('enabled').default(true).notNull(),
 });
 
 export type CardTemplateType = InferSelectModel<typeof CardTemplateTypeTable>;

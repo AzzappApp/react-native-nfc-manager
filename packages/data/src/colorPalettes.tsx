@@ -1,16 +1,15 @@
 import { createId } from '@paralleldrive/cuid2';
 import { eq, and } from 'drizzle-orm';
-import { mysqlTable, boolean } from 'drizzle-orm/mysql-core';
 import db, { cols } from './db';
 import type { DbTransaction } from './db';
 import type { InferInsertModel, InferSelectModel } from 'drizzle-orm';
 
-export const ColorPaletteTable = mysqlTable('ColorPalette', {
+export const ColorPaletteTable = cols.table('ColorPalette', {
   id: cols.cuid('id').notNull().primaryKey().$defaultFn(createId),
   primary: cols.color('primary').notNull(),
   dark: cols.color('dark').notNull(),
   light: cols.color('light').notNull(),
-  enabled: boolean('enabled').default(true).notNull(),
+  enabled: cols.boolean('enabled').default(true).notNull(),
 });
 
 export type ColorPalette = InferSelectModel<typeof ColorPaletteTable>;

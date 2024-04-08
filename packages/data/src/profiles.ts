@@ -1,16 +1,7 @@
 import { and, asc, desc, eq, inArray, isNull, ne, sql } from 'drizzle-orm';
-import {
-  boolean,
-  json,
-  mysqlTable,
-  varchar,
-  int,
-  uniqueIndex,
-  index,
-} from 'drizzle-orm/mysql-core';
-import { createId } from '#helpers/createId';
 import db, { DEFAULT_DATETIME_VALUE, cols } from './db';
 import { FollowTable } from './follows';
+import { createId } from './helpers/createId';
 import { UserTable } from './users';
 import { WebCardTable } from './webCards';
 import type { DbTransaction } from './db';
@@ -18,28 +9,31 @@ import type { WebCard } from './webCards';
 import type { ContactCard } from '@azzapp/shared/contactCardHelpers';
 import type { InferInsertModel, InferSelectModel } from 'drizzle-orm';
 
-export const ProfileTable = mysqlTable(
+export const ProfileTable = cols.table(
   'Profile',
   {
     id: cols.cuid('id').primaryKey().notNull().$defaultFn(createId),
     userId: cols.cuid('userId').notNull(),
     webCardId: cols.cuid('webCardId').notNull(),
-    profileRole: varchar('profileRole', {
-      length: 6,
-      enum: ['owner', 'admin', 'editor', 'user'],
-    })
+    profileRole: cols
+      .varchar('profileRole', {
+        length: 6,
+        enum: ['owner', 'admin', 'editor', 'user'],
+      })
       .notNull()
       .default('owner'),
-    invited: boolean('invited').default(false).notNull(),
-    inviteSent: boolean('inviteSent').default(false).notNull(),
-    promotedAsOwner: boolean('promotedAsOwner').default(false).notNull(),
+    invited: cols.boolean('invited').default(false).notNull(),
+    inviteSent: cols.boolean('inviteSent').default(false).notNull(),
+    promotedAsOwner: cols.boolean('promotedAsOwner').default(false).notNull(),
     avatarId: cols.mediaId('avatarId'),
     /* Contact cards infos */
-    contactCard: json('contactCard').$type<ContactCard>(),
-    contactCardIsPrivate: boolean('contactCardIsPrivate')
+    contactCard: cols.json('contactCard').$type<ContactCard>(),
+    contactCardIsPrivate: cols
+      .boolean('contactCardIsPrivate')
       .default(true)
       .notNull(),
-    contactCardDisplayedOnWebCard: boolean('contactCardDisplayedOnWebCard')
+    contactCardDisplayedOnWebCard: cols
+      .boolean('contactCardDisplayedOnWebCard')
       .default(false)
       .notNull(),
     createdAt: cols
@@ -51,25 +45,22 @@ export const ProfileTable = mysqlTable(
       .notNull()
       .default(DEFAULT_DATETIME_VALUE)
       .$onUpdate(() => new Date()),
-    nbContactCardScans: int('nbContactCardScans').default(0).notNull(),
-    deleted: boolean('deleted').default(false).notNull(),
+    nbContactCardScans: cols.int('nbContactCardScans').default(0).notNull(),
+    deleted: cols.boolean('deleted').default(false).notNull(),
     deletedAt: cols.dateTime('deletedAt'),
     deletedBy: cols.cuid('deletedBy'),
   },
   table => {
     return {
-      profileKey: uniqueIndex('Profile_user_webcard_key').on(
-        table.userId,
-        table.webCardId,
-      ),
-      webCardKey: index('Profile_webCardId_key').on(
-        table.webCardId,
-        table.profileRole,
-      ),
-      promotedAsOwnerKey: index('Profile_promotedAsOwner_key').on(
-        table.webCardId,
-        table.promotedAsOwner,
-      ),
+      profileKey: cols
+        .uniqueIndex('Profile_user_webcard_key')
+        .on(table.userId, table.webCardId),
+      webCardKey: cols
+        .index('Profile_webCardId_key')
+        .on(table.webCardId, table.profileRole),
+      promotedAsOwnerKey: cols
+        .index('Profile_promotedAsOwner_key')
+        .on(table.webCardId, table.promotedAsOwner),
     };
   },
 );
@@ -389,4 +380,8 @@ export const getUsersFromWebCardId = async (
           )
         : eq(ProfileTable.webCardId, webCardId),
     );
+};
+
+export const removeProfileById = async (id: string) => {
+  await db.client().delete(ProfileTable).where(eq(ProfileTable.id, id));
 };

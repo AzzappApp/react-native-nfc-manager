@@ -1,16 +1,8 @@
 import { eq, desc, sql, and, lt, notInArray } from 'drizzle-orm';
-import {
-  json,
-  text,
-  int,
-  index,
-  mysqlTable,
-  boolean,
-} from 'drizzle-orm/mysql-core';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
-import { createId } from '#helpers/createId';
 import db, { DEFAULT_DATETIME_VALUE, cols } from './db';
 import { FollowTable } from './follows';
+import { createId } from './helpers/createId';
 import { getMediasByIds, type Media } from './medias';
 import { getTopPostsComment } from './postComments';
 import { PostReactionTable } from './postReactions';
@@ -19,17 +11,17 @@ import type { DbTransaction } from './db';
 import type { PostComment } from './postComments';
 import type { InferInsertModel, InferSelectModel, SQL } from 'drizzle-orm';
 
-export const PostTable = mysqlTable(
+export const PostTable = cols.table(
   'Post',
   {
     id: cols.cuid('id').primaryKey().notNull().$defaultFn(createId),
     webCardId: cols.cuid('webCardId').notNull(),
-    content: text('content'),
-    allowComments: boolean('allowComments').notNull(),
-    allowLikes: boolean('allowLikes').notNull(),
-    medias: json('medias').$type<string[]>().notNull(),
-    counterReactions: int('counterReactions').default(0).notNull(),
-    counterComments: int('counterComments').default(0).notNull(),
+    content: cols.text('content'),
+    allowComments: cols.boolean('allowComments').notNull(),
+    allowLikes: cols.boolean('allowLikes').notNull(),
+    medias: cols.json('medias').$type<string[]>().notNull(),
+    counterReactions: cols.int('counterReactions').default(0).notNull(),
+    counterComments: cols.int('counterComments').default(0).notNull(),
     createdAt: cols
       .dateTime('createdAt')
       .notNull()
@@ -39,13 +31,13 @@ export const PostTable = mysqlTable(
       .notNull()
       .default(DEFAULT_DATETIME_VALUE)
       .$onUpdate(() => new Date()),
-    deleted: boolean('deleted').notNull().default(false),
+    deleted: cols.boolean('deleted').notNull().default(false),
     deletedBy: cols.cuid('deletedBy'),
     deletedAt: cols.dateTime('deletedAt'),
   },
   table => {
     return {
-      authorIdIdx: index('Post_webCardId_idx').on(table.webCardId),
+      authorIdIdx: cols.index('Post_webCardId_idx').on(table.webCardId),
     };
   },
 );

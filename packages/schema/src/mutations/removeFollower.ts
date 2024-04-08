@@ -1,32 +1,28 @@
 import { GraphQLError } from 'graphql';
-import { unfollows } from '@azzapp/data';
 import ERRORS from '@azzapp/shared/errors';
+import { CannotAccessWebCardException, removeFollower } from '#use-cases';
 import fromGlobalIdWithType from '#helpers/relayIdHelpers';
 import type { MutationResolvers } from '#/__generated__/types';
 
-const removeFollowerMutation: MutationResolvers['removeFollower'] = async (
-  _,
-  {
-    webCardId: gqlWebCardId,
-    input: { removedFollowerId: gqlRemovedFollowerId },
-  },
-  { loaders },
-) => {
-  const webCardId = fromGlobalIdWithType(gqlWebCardId, 'WebCard');
+type Mutation = MutationResolvers['removeFollower'];
 
-  const webCard = await loaders.WebCard.load(webCardId);
-
-  if (!webCard?.cardIsPrivate) {
-    throw new GraphQLError(ERRORS.FORBIDDEN);
-  }
-
+const removeFollowerMutation: Mutation = async (_, params, context) => {
+  const webCardId = fromGlobalIdWithType(params.webCardId, 'WebCard');
   const removedFollowerId = fromGlobalIdWithType(
-    gqlRemovedFollowerId,
+    params.input.removedFollowerId,
     'WebCard',
   );
+
   try {
-    await unfollows(removedFollowerId, webCardId);
+    await removeFollower({
+      removedFollowerId,
+      webCardId,
+      loaders: context.loaders,
+    });
   } catch (e) {
+    if (e instanceof CannotAccessWebCardException) {
+      throw new GraphQLError(ERRORS.FORBIDDEN);
+    }
     throw new GraphQLError(ERRORS.INTERNAL_SERVER_ERROR);
   }
 

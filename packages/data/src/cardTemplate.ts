@@ -1,22 +1,20 @@
 import { eq, sql } from 'drizzle-orm';
-import { mysqlTable, json, boolean } from 'drizzle-orm/mysql-core';
-import { createId } from '#helpers/createId';
-import db, { cols } from './db';
+import db, { cols, type DbTransaction } from './db';
+import { createId } from './helpers/createId';
 import type { CardModule } from './cardModules';
-import type { DbTransaction } from './db';
 import type { InferInsertModel, InferSelectModel } from 'drizzle-orm';
 
 export type CardModuleTemplate = Pick<CardModule, 'data' | 'kind'>;
 
-export const CardTemplateTable = mysqlTable('CardTemplate', {
+export const CardTemplateTable = cols.table('CardTemplate', {
   id: cols.cuid('id').notNull().primaryKey().$defaultFn(createId),
   labelKey: cols.defaultVarchar('labelKey').notNull().default(''),
   cardStyleId: cols.cuid('cardStyleId').notNull(),
   cardTemplateTypeId: cols.cuid('cardTemplateTypeId'),
   previewMediaId: cols.mediaId('previewMediaId'),
-  modules: json('modules').$type<CardModuleTemplate[]>().notNull(),
-  businessEnabled: boolean('businessEnabled').default(true).notNull(),
-  personalEnabled: boolean('personalEnabled').default(true).notNull(),
+  modules: cols.json('modules').$type<CardModuleTemplate[]>().notNull(),
+  businessEnabled: cols.boolean('businessEnabled').default(true).notNull(),
+  personalEnabled: cols.boolean('personalEnabled').default(true).notNull(),
 });
 
 export type CardTemplate = InferSelectModel<typeof CardTemplateTable>;

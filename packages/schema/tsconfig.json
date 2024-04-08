@@ -2,12 +2,14 @@
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
     "noEmit": true,
+    "esModuleInterop": true,
     "paths": {
       "@azzapp/shared/*": ["../shared/src/*"],
       "@azzapp/data/*": ["../data/src/*"],
-      "#*": ["./src/*"],
-    },
+      "#testing/*": ["./testing/*"],
+      "#*": ["./src/*"]
+    }
   },
   "include": ["**/*.ts", "**/*.tsx", "**/*.js", "**/*.jsx", "**/*.json"],
-  "exclude": ["lib", "node_modules", "package.json", "tsconfig.json"],
+  "exclude": ["lib", "node_modules", "package.json", "tsconfig.json"]
 }

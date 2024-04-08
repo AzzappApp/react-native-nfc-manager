@@ -1,10 +1,9 @@
 import { eq, and } from 'drizzle-orm';
-import { primaryKey, mysqlTable, index } from 'drizzle-orm/mysql-core';
 import db, { DEFAULT_DATETIME_VALUE, cols } from './db';
 import type { DbTransaction } from './db';
 import type { InferInsertModel, InferSelectModel } from 'drizzle-orm';
 
-export const FollowTable = mysqlTable(
+export const FollowTable = cols.table(
   'Follow',
   {
     followerId: cols.cuid('followerId').notNull(),
@@ -16,10 +15,12 @@ export const FollowTable = mysqlTable(
   },
   table => {
     return {
-      followFollowerIdFollowingId: primaryKey({
+      followFollowerIdFollowingId: cols.primaryKey({
         columns: [table.followerId, table.followingId],
       }),
-      followingIdKey: index('Follow_followingId_key').on(table.followingId),
+      followingIdKey: cols
+        .index('Follow_followingId_key')
+        .on(table.followingId),
     };
   },
 );
@@ -96,14 +97,10 @@ export const unfollows = (
  *
  * @param {string} followerId
  * @param {string} followingId
- * @param {DbTransaction} [trx=db]
  */
-export const getFollows = (
-  followerId: string,
-  followingId: string,
-  trx: DbTransaction = db,
-) =>
-  trx
+export const getFollows = (followerId: string, followingId: string) => {
+  return db
+    .client()
     .select()
     .from(FollowTable)
     .where(
@@ -112,3 +109,4 @@ export const getFollows = (
         eq(FollowTable.followingId, followingId),
       ),
     );
+};

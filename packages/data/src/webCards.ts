@@ -1,16 +1,8 @@
 import { eq, sql, lt, desc, and } from 'drizzle-orm';
-import {
-  mysqlEnum,
-  uniqueIndex,
-  fulltextIndex,
-  mysqlTable,
-  json,
-  boolean,
-  int,
-} from 'drizzle-orm/mysql-core';
-import { createId } from '#helpers/createId';
 import db, { DEFAULT_DATETIME_VALUE, cols } from './db';
 import { FollowTable } from './follows';
+import { createId } from './helpers/createId';
+import { ProfileTable } from './profiles';
 import { RedirectWebCardTable } from './redirectWebCard';
 import { getUserById } from './users';
 import type { DbTransaction } from './db';
@@ -26,7 +18,7 @@ import type {
 } from '@azzapp/shared/coverHelpers';
 import type { InferInsertModel, InferSelectModel } from 'drizzle-orm';
 
-export const WebCardTable = mysqlTable(
+export const WebCardTable = cols.table(
   'WebCard',
   {
     /* Profile infos */
@@ -36,11 +28,13 @@ export const WebCardTable = mysqlTable(
       .dateTime('lastUserNameUpdate')
       .notNull()
       .default(DEFAULT_DATETIME_VALUE),
-    webCardKind: mysqlEnum('webCardKind', ['personal', 'business']).notNull(),
+    webCardKind: cols.enum('webCardKind', ['personal', 'business']).notNull(),
     webCardCategoryId: cols.cuid('webCardCategoryId'),
     firstName: cols.defaultVarchar('firstName'),
     lastName: cols.defaultVarchar('lastName'),
-    commonInformation: json('commonInformation').$type<CommonInformation>(),
+    commonInformation: cols
+      .json('commonInformation')
+      .$type<CommonInformation>(),
     companyName: cols.defaultVarchar('companyName'),
     companyActivityId: cols.cuid('companyActivityId'),
     createdAt: cols
@@ -52,20 +46,20 @@ export const WebCardTable = mysqlTable(
       .notNull()
       .default(DEFAULT_DATETIME_VALUE)
       .$onUpdate(() => new Date()),
-    isMultiUser: boolean('isMultiUser').default(false).notNull(),
+    isMultiUser: cols.boolean('isMultiUser').default(false).notNull(),
 
     /* Cards infos */
     locale: cols.defaultVarchar('locale'),
-    cardColors: json('cardColors').$type<{
+    cardColors: cols.json('cardColors').$type<{
       primary: string;
       light: string;
       dark: string;
       otherColors: string[];
     } | null>(),
-    cardStyle: json('cardStyle').$type<CardStyle>(),
-    cardIsPrivate: boolean('cardIsPrivate').default(false).notNull(),
-    cardIsPublished: boolean('cardIsPublished').default(false).notNull(),
-    alreadyPublished: boolean('alreadyPublished').default(false).notNull(),
+    cardStyle: cols.json('cardStyle').$type<CardStyle>(),
+    cardIsPrivate: cols.boolean('cardIsPrivate').default(false).notNull(),
+    cardIsPublished: cols.boolean('cardIsPublished').default(false).notNull(),
+    alreadyPublished: cols.boolean('alreadyPublished').default(false).notNull(),
     lastCardUpdate: cols
       .dateTime('lastCardUpdate')
       .notNull()
@@ -74,7 +68,7 @@ export const WebCardTable = mysqlTable(
     /* Covers infos */
     coverTitle: cols.defaultVarchar('coverTitle'),
     coverSubTitle: cols.defaultVarchar('coverSubTitle'),
-    coverData: json('coverData').$type<{
+    coverData: cols.json('coverData').$type<{
       kind: 'others' | 'people' | 'video' | null;
       titleStyle: TextStyle;
       subTitleStyle: TextStyle;
@@ -94,20 +88,21 @@ export const WebCardTable = mysqlTable(
       mediaId?: string | null;
       segmented: boolean;
     }>(),
-    nbFollowers: int('nbFollowers').default(0).notNull(),
-    nbFollowings: int('nbFollowings').default(0).notNull(),
-    nbPosts: int('nbPosts').default(0).notNull(),
-    nbPostsLiked: int('nbPostsLiked').default(0).notNull(), // this is the informations postLiked
-    nbLikes: int('nbLikes').default(0).notNull(), //this is the stats TotalLikes (number of likes received)
-    nbWebCardViews: int('nbWebCardViews').default(0).notNull(),
-    deleted: boolean('deleted').default(false).notNull(),
+
+    nbFollowers: cols.int('nbFollowers').default(0).notNull(),
+    nbFollowings: cols.int('nbFollowings').default(0).notNull(),
+    nbPosts: cols.int('nbPosts').default(0).notNull(),
+    nbPostsLiked: cols.int('nbPostsLiked').default(0).notNull(), // this is the informations postLiked
+    nbLikes: cols.int('nbLikes').default(0).notNull(), //this is the stats TotalLikes (number of likes received)
+    nbWebCardViews: cols.int('nbWebCardViews').default(0).notNull(),
+    deleted: cols.boolean('deleted').default(false).notNull(),
     deletedAt: cols.dateTime('deletedAt'),
     deletedBy: cols.cuid('deletedBy'),
   },
   table => {
     return {
-      userNameKey: uniqueIndex('WebCard_userName_key').on(table.userName),
-      webCardSearch: fulltextIndex('WebCard_search').on(table.userName),
+      userNameKey: cols.uniqueIndex('WebCard_userName_key').on(table.userName),
+      webCardSearch: cols.fulltextIndex('WebCard_search').on(table.userName),
     };
   },
 );
@@ -244,9 +239,9 @@ export const createWebCard = async (
 export const updateWebCard = async (
   webCardId: string,
   updates: Partial<WebCard>,
-  tx: DbTransaction = db,
+  trx = db.client(),
 ) => {
-  await tx
+  await trx
     .update(WebCardTable)
     .set(updates)
     .where(eq(WebCardTable.id, webCardId));
@@ -347,4 +342,19 @@ export const getWebCardByUserNameWithRedirection = async (
   }
 
   return null;
+};
+
+export const getWebCardByProfileId = (id: string): Promise<WebCard | null> => {
+  return db
+    .client()
+    .select()
+    .from(ProfileTable)
+    .innerJoin(WebCardTable, eq(WebCardTable.id, ProfileTable.webCardId))
+    .where(eq(ProfileTable.id, id))
+    .then(results => {
+      const result = results.pop();
+      if (!result) return null;
+
+      return result.WebCard;
+    });
 };

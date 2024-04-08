@@ -10,6 +10,9 @@
     "typecheck": {
       "dependsOn": ["^build"],
       "inputs": ["src/**"]
+    },
+    "test": {
+      "inputs": ["src/**", "jest.config.js", "scripts/jestSetup.js"]
     }
   }
 }

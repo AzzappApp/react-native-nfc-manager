@@ -12,7 +12,7 @@ export const SUPPORTED_LOCALES: Array<
   | 'pt-PT'
   | 'sv'
 >;
-export const DEFAULT_LOCALE: 'en-US';
+export const DEFAULT_LOCALE: Locale = 'en-US';
 
 export type Locale = (typeof SUPPORTED_LOCALES)[number];
 

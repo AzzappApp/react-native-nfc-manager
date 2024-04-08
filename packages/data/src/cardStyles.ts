@@ -1,24 +1,23 @@
 import { sql, eq } from 'drizzle-orm';
-import { mysqlTable, boolean, smallint } from 'drizzle-orm/mysql-core';
-import { createId } from '#helpers/createId';
 import db, { cols } from './db';
+import { createId } from './helpers/createId';
 import type { DbTransaction } from './db';
 import type { InferInsertModel, InferSelectModel } from 'drizzle-orm';
 
-export const CardStyleTable = mysqlTable('CardStyle', {
+export const CardStyleTable = cols.table('CardStyle', {
   id: cols.cuid('id').primaryKey().notNull().$defaultFn(createId),
   labelKey: cols.defaultVarchar('labelKey').notNull().default(''),
   fontFamily: cols.defaultVarchar('fontFamily').notNull(),
-  fontSize: smallint('fontSize').notNull(),
+  fontSize: cols.smallint('fontSize').notNull(),
   titleFontFamily: cols.defaultVarchar('titleFontFamily').notNull(),
-  titleFontSize: smallint('titleFontSize').notNull(),
-  borderRadius: smallint('borderRadius').notNull(),
-  borderWidth: smallint('borderWidth').notNull(),
+  titleFontSize: cols.smallint('titleFontSize').notNull(),
+  borderRadius: cols.smallint('borderRadius').notNull(),
+  borderWidth: cols.smallint('borderWidth').notNull(),
   borderColor: cols.color('borderColor').notNull(),
   buttonColor: cols.color('buttonColor').notNull(),
-  buttonRadius: smallint('buttonRadius').notNull(),
-  gap: smallint('gap').notNull(),
-  enabled: boolean('enabled').default(true).notNull(),
+  buttonRadius: cols.smallint('buttonRadius').notNull(),
+  gap: cols.smallint('gap').notNull(),
+  enabled: cols.boolean('enabled').default(true).notNull(),
 });
 
 export type CardStyle = InferSelectModel<typeof CardStyleTable>;

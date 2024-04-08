@@ -1,20 +1,15 @@
 import { eq, and } from 'drizzle-orm';
-import {
-  primaryKey,
-  mysqlEnum,
-  mysqlTable,
-  index,
-} from 'drizzle-orm/mysql-core';
+
 import db, { DEFAULT_DATETIME_VALUE, cols } from './db';
 import type { DbTransaction } from './db';
 import type { InferInsertModel, InferSelectModel } from 'drizzle-orm';
 
-export const PostReactionTable = mysqlTable(
+export const PostReactionTable = cols.table(
   'PostReaction',
   {
     webCardId: cols.cuid('webCardId').notNull(),
     postId: cols.cuid('postId').notNull(),
-    reactionKind: mysqlEnum('reactionKind', ['like']).notNull(),
+    reactionKind: cols.enum('reactionKind', ['like']).notNull(),
     createdAt: cols
       .dateTime('createdAt')
       .notNull()
@@ -24,10 +19,12 @@ export const PostReactionTable = mysqlTable(
     return {
       // TODO : not sure about this one : do we want to support several reactions on the same post (like and dislike) ?
       // We could imagine to user the last one but do we need to keep an historic of reactions ?
-      postReactionPostIdReactionKindProfileId: primaryKey({
+      postReactionPostIdReactionKindProfileId: cols.primaryKey({
         columns: [table.postId, table.webCardId, table.reactionKind],
       }),
-      webCardIdKey: index('PostReaction_webCardId_key').on(table.webCardId),
+      webCardIdKey: cols
+        .index('PostReaction_webCardId_key')
+        .on(table.webCardId),
     };
   },
 );

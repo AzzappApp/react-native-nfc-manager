@@ -1,26 +1,25 @@
 import { eq } from 'drizzle-orm';
-import { int, mysqlTable, primaryKey } from 'drizzle-orm/mysql-core';
-import { createId } from '#helpers/createId';
 import db, { cols } from './db';
+import { createId } from './helpers/createId';
 import type { DbTransaction } from './db';
 import type { InferInsertModel, InferSelectModel } from 'drizzle-orm';
 
-export const CompanyActivityTable = mysqlTable('CompanyActivity', {
+export const CompanyActivityTable = cols.table('CompanyActivity', {
   id: cols.cuid('id').notNull().primaryKey().$defaultFn(createId),
   labelKey: cols.defaultVarchar('labelKey').notNull().default(''),
   cardTemplateTypeId: cols.cuid('cardTemplateTypeId'),
 });
 
-export const WebCardCategoryCompanyActivityTable = mysqlTable(
+export const WebCardCategoryCompanyActivityTable = cols.table(
   'WebCardCategoryCompanyActivity',
   {
     webCardCategoryId: cols.cuid('categoryId').notNull(),
     companyActivityId: cols.cuid('companyActivityId').notNull(),
-    order: int('order').notNull(),
+    order: cols.int('order').notNull(),
   },
   table => {
     return {
-      pk: primaryKey({
+      pk: cols.primaryKey({
         columns: [table.companyActivityId, table.webCardCategoryId],
       }),
     };

@@ -1,11 +1,10 @@
 import { sql } from 'drizzle-orm';
-import { index, mysqlTable } from 'drizzle-orm/mysql-core';
-import { createId } from '#helpers/createId';
 import db, { cols } from './db';
+import { createId } from './helpers/createId';
 import type { Media } from './medias';
 import type { InferInsertModel, InferSelectModel } from 'drizzle-orm';
 
-export const MediaSuggestionTable = mysqlTable(
+export const MediaSuggestionTable = cols.table(
   'MediaSuggestion',
   {
     id: cols.cuid('id').notNull().primaryKey().$defaultFn(createId),
@@ -15,12 +14,12 @@ export const MediaSuggestionTable = mysqlTable(
   },
   table => {
     return {
-      webCardCategoryKey: index('MediaSuggestion_webCardCategoryId_key').on(
-        table.webCardCategoryId,
-      ),
-      companyActivityKey: index('MediaSuggestion_companyActivityId_key').on(
-        table.companyActivityId,
-      ),
+      webCardCategoryKey: cols
+        .index('MediaSuggestion_webCardCategoryId_key')
+        .on(table.webCardCategoryId),
+      companyActivityKey: cols
+        .index('MediaSuggestion_companyActivityId_key')
+        .on(table.companyActivityId),
     };
   },
 );

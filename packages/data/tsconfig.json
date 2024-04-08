@@ -4,7 +4,7 @@
     "noEmit": true,
     "paths": {
       "@azzapp/shared/*": ["../shared/src/*"],
-      "#*": ["./src/*"],
+      "#*": ["./src/*"]
     }
   },
   "include": ["**/*.ts", "**/*.tsx", "**/*.js", "**/*.jsx", "**/*.json"],

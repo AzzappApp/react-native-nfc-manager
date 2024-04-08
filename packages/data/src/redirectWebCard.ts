@@ -1,8 +1,7 @@
 import { eq, type InferSelectModel } from 'drizzle-orm';
-import { mysqlTable } from 'drizzle-orm/mysql-core';
 import db, { cols, DEFAULT_DATETIME_VALUE } from './db';
 
-export const RedirectWebCardTable = mysqlTable('RedirectWebCard', {
+export const RedirectWebCardTable = cols.table('RedirectWebCard', {
   fromUserName: cols.defaultVarchar('fromUserName').primaryKey().notNull(),
   toUserName: cols.defaultVarchar('toUserName').notNull(),
   createdAt: cols

@@ -1,13 +1,16 @@
 import { eq, and, inArray, sql } from 'drizzle-orm';
-import { uniqueIndex, mysqlTable, json, boolean } from 'drizzle-orm/mysql-core';
-import { createId } from '#helpers/createId';
 import db, { DEFAULT_DATETIME_VALUE, cols } from './db';
+import { createId } from './helpers/createId';
 import { ProfileTable } from './profiles';
 import { WebCardTable } from './webCards';
 import type { DbTransaction } from './db';
-import type { InferInsertModel, InferSelectModel } from 'drizzle-orm';
+import type {
+  InferInsertModel,
+  InferSelectModel,
+  SQLWrapper,
+} from 'drizzle-orm';
 
-export const UserTable = mysqlTable(
+export const UserTable = cols.table(
   'User',
   {
     id: cols.cuid('id').primaryKey().$defaultFn(createId),
@@ -23,18 +26,21 @@ export const UserTable = mysqlTable(
       .notNull()
       .default(DEFAULT_DATETIME_VALUE)
       .$onUpdate(() => new Date()),
-    roles: json('roles').$type<string[]>(),
-    invited: boolean('invited').default(false).notNull(),
+    roles: cols.json('roles').$type<string[]>(),
+    invited: cols.boolean('invited').default(false).notNull(),
     locale: cols.defaultVarchar('locale'),
-    emailConfirmed: boolean('emailConfirmed').default(false).notNull(),
-    phoneNumberConfirmed: boolean('phoneNumberConfirmed')
+    emailConfirmed: cols.boolean('emailConfirmed').default(false).notNull(),
+    phoneNumberConfirmed: cols
+      .boolean('phoneNumberConfirmed')
       .default(false)
       .notNull(),
   },
   table => {
     return {
-      emailKey: uniqueIndex('User_email_key').on(table.email),
-      phoneNumberKey: uniqueIndex('User_phoneNumber_key').on(table.phoneNumber),
+      emailKey: cols.uniqueIndex('User_email_key').on(table.email),
+      phoneNumberKey: cols
+        .uniqueIndex('User_phoneNumber_key')
+        .on(table.phoneNumber),
     };
   },
 );
@@ -87,9 +93,12 @@ export const getUserByPhoneNumber = async (
  * @param data - The user fields, excluding the id
  * @returns The newly created user
  */
-export const createUser = async (data: NewUser, tx: DbTransaction = db) => {
+export const createUser = async (data: NewUser) => {
   const id = createId();
-  await tx.insert(UserTable).values({ ...data, id });
+  await db
+    .client()
+    .insert(UserTable)
+    .values({ ...data, id });
   return id;
 };
 
@@ -126,4 +135,21 @@ export const getTotalMultiUser = async (userId: string) => {
     .from(ProfileTable)
     .where(inArray(ProfileTable.webCardId, webCardIdList))
     .then(res => res[0].count);
+};
+
+export const getUserByEmailPhoneNumber = (
+  email?: string,
+  phoneNumber?: string,
+) => {
+  const filters: SQLWrapper[] = [];
+
+  if (email) filters.push(eq(UserTable.email, email));
+  if (phoneNumber) filters.push(eq(UserTable.phoneNumber, phoneNumber));
+
+  return db
+    .client()
+    .select()
+    .from(UserTable)
+    .where(and(...filters))
+    .then(results => results.pop() ?? null);
 };

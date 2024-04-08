@@ -1,24 +1,16 @@
 import { and, eq } from 'drizzle-orm';
-import {
-  index,
-  mysqlEnum,
-  mysqlTable,
-  primaryKey,
-} from 'drizzle-orm/mysql-core';
 import db, { DEFAULT_DATETIME_VALUE, cols } from './db';
 import type { DbTransaction } from './db';
 import type { InferSelectModel } from 'drizzle-orm';
 
-export const ReportTable = mysqlTable(
+export const ReportTable = cols.table(
   'Report',
   {
     targetId: cols.defaultVarchar('targetId').notNull(),
     userId: cols.defaultVarchar('userId').notNull(),
-    targetType: mysqlEnum('targetType', [
-      'webCard',
-      'post',
-      'comment',
-    ]).notNull(),
+    targetType: cols
+      .enum('targetType', ['webCard', 'post', 'comment'])
+      .notNull(),
     createdAt: cols
       .dateTime('createdAt')
       .notNull()
@@ -28,14 +20,12 @@ export const ReportTable = mysqlTable(
   },
   table => {
     return {
-      id: primaryKey({
+      id: cols.primaryKey({
         columns: [table.targetId, table.userId, table.targetType],
       }),
-      targetTypeKey: index('Report_targetType_key').on(
-        table.targetType,
-        table.createdAt,
-        table.treatedBy,
-      ),
+      targetTypeKey: cols
+        .index('Report_targetType_key')
+        .on(table.targetType, table.createdAt, table.treatedBy),
     };
   },
 );

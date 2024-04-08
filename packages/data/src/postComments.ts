@@ -1,32 +1,31 @@
 import { eq, sql, and, desc, inArray } from 'drizzle-orm';
-import { text, index, mysqlTable, boolean } from 'drizzle-orm/mysql-core';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
-import { createId } from '#helpers/createId';
 import db, { DEFAULT_DATETIME_VALUE, cols } from './db';
+import { createId } from './helpers/createId';
 import { getMediasByIds, type Media } from './medias';
 import { PostTable } from './posts';
 import { WebCardTable, type WebCard } from './webCards';
 import type { DbTransaction } from './db';
 import type { InferInsertModel, InferSelectModel } from 'drizzle-orm';
 
-export const PostCommentTable = mysqlTable(
+export const PostCommentTable = cols.table(
   'PostComment',
   {
     id: cols.cuid('id').notNull().primaryKey().$defaultFn(createId),
     webCardId: cols.cuid('webCardId').notNull(),
     postId: cols.cuid('postId').notNull(),
-    comment: text('comment').notNull(),
+    comment: cols.text('comment').notNull(),
     createdAt: cols
       .dateTime('createdAt')
       .notNull()
       .default(DEFAULT_DATETIME_VALUE),
-    deleted: boolean('deleted').notNull().default(false),
+    deleted: cols.boolean('deleted').notNull().default(false),
     deletedBy: cols.cuid('deletedBy'),
     deletedAt: cols.dateTime('deletedAt'),
   },
   table => {
     return {
-      postIdIdx: index('PostComment_postId_idx').on(table.postId),
+      postIdIdx: cols.index('PostComment_postId_idx').on(table.postId),
     };
   },
 );

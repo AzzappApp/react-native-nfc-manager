@@ -18,6 +18,9 @@
     "./drizzle/*",
     "babel.config.js",
     "**/__mocks__/*",
-    "**/__tests__/*"
+    "**/__tests__/*",
+    "jest.config.js",
+    "jest-e2e.config.js",
+    "testing"
   ]
 }

@@ -1,34 +1,24 @@
-import * as Sentry from '@sentry/nextjs';
-import { and, eq } from 'drizzle-orm';
 import { GraphQLError } from 'graphql';
-import {
-  UserTable,
-  createProfile,
-  createUser,
-  db,
-  updateWebCard,
-} from '@azzapp/data';
 import ERRORS from '@azzapp/shared/errors';
 import {
   formatPhoneNumber,
   isInternationalPhoneNumber,
   isValidEmail,
 } from '@azzapp/shared/stringHelpers';
+import { inviteUser } from '#use-cases';
 import fromGlobalIdWithType from '#helpers/relayIdHelpers';
-import type { MutationResolvers } from '#/__generated__/types';
+import { ProfileAlreadyExistsException } from '#use-cases/exceptions/profile-already-exists.exception';
+import { ProfileDoesNotExistException } from '#use-cases/exceptions/profile-does-not-exist.exception';
+import type { MutationResolvers } from '#__generated__/types';
 import type { GraphQLContext } from '#index';
-import type { SQLWrapper } from 'drizzle-orm';
 
+// @TODO do we verify given profileId belongs to the current user?
 const inviteUserMutation: MutationResolvers['inviteUser'] = async (
   _,
   { profileId: gqlProfileId, invited, sendInvite },
-  { loaders, sendMail, sendSms }: GraphQLContext,
+  { sendMail, sendSms }: GraphQLContext,
 ) => {
   const profileId = fromGlobalIdWithType(gqlProfileId, 'Profile');
-  const profile = profileId && (await loaders.Profile.load(profileId));
-  if (!profile) {
-    throw new GraphQLError(ERRORS.UNAUTHORIZED);
-  }
 
   const { email, phoneNumber: rawPhoneNumber } = invited;
 
@@ -46,101 +36,43 @@ const inviteUserMutation: MutationResolvers['inviteUser'] = async (
 
   if (!email && !phoneNumber) throw new GraphQLError(ERRORS.INVALID_REQUEST);
 
-  const filters: SQLWrapper[] = [];
-
-  if (email) filters.push(eq(UserTable.email, email));
-  if (phoneNumber) filters.push(eq(UserTable.phoneNumber, phoneNumber));
-
-  const existingUser = await db
-    .select()
-    .from(UserTable)
-    .where(and(...filters))
-    .then(res => res.pop());
-
-  const webCard = await loaders.WebCard.load(profile.webCardId);
-  if (!webCard) {
-    throw new GraphQLError(ERRORS.INVALID_REQUEST);
-  }
-
-  const createdProfileId = await db.transaction(async trx => {
-    if (!webCard.isMultiUser) {
-      await updateWebCard(webCard.id, { isMultiUser: true }, trx);
-    }
-
-    let userId;
-    if (!existingUser) {
-      userId = await createUser(
-        {
-          email,
-          phoneNumber,
-          invited: true,
-        },
-        trx,
-      );
-    } else {
-      userId = existingUser.id;
-    }
-
-    const { displayedOnWebCard, isPrivate, avatarId, ...data } =
-      invited.contactCard ?? {};
-
-    const payload = {
-      webCardId: profile.webCardId,
-      userId,
-      avatarId,
-      invited: true,
-      inviteSent: sendInvite ?? false,
-      contactCard: {
-        ...data,
-        birthday: undefined,
-      },
-      contactCardDisplayedOnWebCard: displayedOnWebCard ?? true,
-      contactCardIsPrivate: displayedOnWebCard ?? false,
-      profileRole: invited.profileRole,
-      lastContactCardUpdate: new Date(),
-      nbContactCardScans: 0,
-      promotedAsOwner: false,
-    };
-
-    try {
-      const profileId = await createProfile(payload, trx);
-      return profileId;
-    } catch (e) {
-      throw new GraphQLError(ERRORS.PROFILE_ALREADY_EXISTS);
-    }
-  });
-
-  if (!createdProfileId) throw new GraphQLError(ERRORS.INTERNAL_SERVER_ERROR);
-
-  const createdProfile = await loaders.Profile.load(createdProfileId);
+  const contactCard = invited.contactCard
+    ? {
+        ...invited.contactCard,
+        displayedOnWebCard: invited.contactCard.displayedOnWebCard ?? undefined,
+        isPrivate: invited.contactCard.isPrivate ?? undefined,
+        avatarId: invited.contactCard.avatarId ?? undefined,
+      }
+    : undefined;
 
   try {
-    if (sendInvite) {
-      if (phoneNumber) {
-        await sendSms({
-          body: `You have been invited to join ${webCard.userName} on Azzapp! Download the app and sign up with this phone number to join: ${phoneNumber}`,
-          phoneNumber,
-        });
-      } else if (email) {
-        await sendMail([
-          {
-            email,
-            subject: `You have been invited to join ${webCard.userName}`,
-            text: `You have been invited to join ${webCard.userName} on Azzapp! Download the app and sign up with this email to join: ${email}`,
-            html: `<div>You have been invited to join ${webCard.userName} on Azzapp! Download the app and sign up with this email to join: ${email}</div>`,
-          },
-        ]);
-      }
-    }
+    const profile = await inviteUser({
+      auth: {
+        profileId,
+      },
+      invited: {
+        profileRole: invited.profileRole,
+        contactCard,
+        email: invited.email ?? undefined,
+        phoneNumber: invited.phoneNumber ?? undefined,
+      },
+      sendInvite: sendInvite ?? false,
+      sendMail,
+      sendSms,
+    });
+
+    return { profile };
   } catch (e) {
-    Sentry.captureException(e);
-    console.error(e);
+    if (e instanceof ProfileDoesNotExistException) {
+      throw new GraphQLError(ERRORS.INVALID_REQUEST);
+    }
+
+    if (e instanceof ProfileAlreadyExistsException) {
+      throw new GraphQLError(ERRORS.PROFILE_ALREADY_EXISTS);
+    }
+
     throw new GraphQLError(ERRORS.INTERNAL_SERVER_ERROR);
   }
-
-  return {
-    profile: createdProfile,
-  };
 };
 
 export default inviteUserMutation;

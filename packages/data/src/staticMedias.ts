@@ -1,27 +1,20 @@
 import { and, asc, eq, inArray } from 'drizzle-orm';
-import { mysqlEnum, mysqlTable, int, boolean } from 'drizzle-orm/mysql-core';
 import db, { cols } from './db';
 import { sortEntitiesByIds } from './generic';
 import type { InferInsertModel, InferSelectModel } from 'drizzle-orm';
 
-export const StaticMediaTable = mysqlTable('StaticMedia', {
+export const StaticMediaTable = cols.table('StaticMedia', {
   // we keep defaultVarchar here because raw media id in cloudinary needs to keep
   // an extension, which would be too long for the mediaId (char(26)) column size
   id: cols.defaultVarchar('id').primaryKey().notNull(),
-  usage: mysqlEnum('usage', [
-    'coverForeground',
-    'coverBackground',
-    'moduleBackground',
-  ]).notNull(),
-  resizeMode: mysqlEnum('resizeMode', [
-    'cover',
-    'contain',
-    'center',
-    'repeat',
-    'stretch',
-  ]).default('cover'),
-  order: int('order').notNull(),
-  enabled: boolean('enabled').default(true).notNull(),
+  usage: cols
+    .enum('usage', ['coverForeground', 'coverBackground', 'moduleBackground'])
+    .notNull(),
+  resizeMode: cols
+    .enum('resizeMode', ['cover', 'contain', 'center', 'repeat', 'stretch'])
+    .default('cover'),
+  order: cols.int('order').notNull(),
+  enabled: cols.boolean('enabled').default(true).notNull(),
 });
 
 export type StaticMedia = InferSelectModel<typeof StaticMediaTable>;

@@ -1,15 +1,7 @@
 import { inArray, eq, asc, sql, and } from 'drizzle-orm';
-import {
-  int,
-  mysqlEnum,
-  index,
-  mysqlTable,
-  json,
-  boolean,
-} from 'drizzle-orm/mysql-core';
-import { createId } from '#helpers/createId';
 import db, { cols } from './db';
 import { sortEntitiesByIds } from './generic';
+import { createId } from './helpers/createId';
 import type { DbTransaction } from './db';
 import type {
   CardModuleBlockTextData,
@@ -37,34 +29,36 @@ import type {
 } from '@azzapp/shared/cardModuleHelpers';
 import type { InferInsertModel, InferSelectModel, SQL } from 'drizzle-orm';
 
-export const CardModuleTable = mysqlTable(
+export const CardModuleTable = cols.table(
   'CardModule',
   {
     id: cols.cuid('id').notNull().primaryKey().$defaultFn(createId),
     webCardId: cols.cuid('webCardId').notNull(),
-    kind: mysqlEnum('kind', [
-      'blockText',
-      'carousel',
-      'horizontalPhoto',
-      'imageGrid',
-      'lineDivider',
-      'parallax',
-      'photoWithTextAndTitle',
-      'schedule',
-      'simpleButton',
-      'simpleText',
-      'simpleTitle',
-      'socialLinks',
-      'video',
-      'webCardsCarousel',
-    ]).notNull(),
-    data: json('data').$type<any>().notNull(),
-    position: int('position').notNull(),
-    visible: boolean('visible').default(true).notNull(),
+    kind: cols
+      .enum('kind', [
+        'blockText',
+        'carousel',
+        'horizontalPhoto',
+        'imageGrid',
+        'lineDivider',
+        'parallax',
+        'photoWithTextAndTitle',
+        'schedule',
+        'simpleButton',
+        'simpleText',
+        'simpleTitle',
+        'socialLinks',
+        'video',
+        'webCardsCarousel',
+      ])
+      .notNull(),
+    data: cols.json('data').$type<any>().notNull(),
+    position: cols.int('position').notNull(),
+    visible: cols.boolean('visible').default(true).notNull(),
   },
   table => {
     return {
-      webCardIdIdx: index('CardModule_webCardId_idx').on(table.webCardId),
+      webCardIdIdx: cols.index('CardModule_webCardId_idx').on(table.webCardId),
     };
   },
 );
