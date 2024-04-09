@@ -8,8 +8,9 @@ import {
   CardActions,
   Button,
   Alert,
+  Chip,
 } from '@mui/material';
-import { and, eq } from 'drizzle-orm';
+import { and, eq, sql } from 'drizzle-orm';
 import {
   PostCommentTable,
   PostTable,
@@ -20,12 +21,16 @@ import {
 import { getImageURLForSize, getVideoURL } from '@azzapp/shared/imagesHelpers';
 import { deleteRelatedItem, ignoreReport } from './reportsAction';
 import ReportsList from './ReportsList';
-import type { TargetType } from '@azzapp/data';
+import type { ReportStatus } from '../../page';
+import type { Report, TargetType } from '@azzapp/data';
 
 type ReportPageProps = {
   params: {
     targetId: string;
     targetType: TargetType;
+  };
+  searchParams: {
+    page?: string;
   };
 };
 
@@ -53,11 +58,41 @@ const getItem = async (targetId: string, targetType: TargetType) => {
   throw new Error('Invalid targetType');
 };
 
+const getStatus = (reports: Report[]): ReportStatus => {
+  const treated = reports.find(({ treatedAt }) => !!treatedAt);
+  if (!treated || !treated.treatedAt) {
+    return 'Opened';
+  }
+
+  const lastReportDate = reports.reduce(
+    (max, report) => Math.max(max, report.createdAt.getTime()),
+    -Infinity,
+  );
+
+  return treated.treatedAt.getTime() < lastReportDate ? 'Opened' : 'Closed';
+};
+
 const ReportPage = async ({
   params: { targetId, targetType },
+  searchParams,
 }: ReportPageProps) => {
+  let page = searchParams.page ? parseInt(searchParams.page, 10) : 1;
+  page = Math.max(isNaN(page) ? 1 : page, 1);
+
   const reports = await db
     .select()
+    .from(ReportTable)
+    .where(
+      and(
+        eq(ReportTable.targetId, targetId),
+        eq(ReportTable.targetType, targetType),
+      ),
+    )
+    .offset((page - 1) * PAGE_SIZE)
+    .limit(PAGE_SIZE);
+
+  const [reportCount] = await db
+    .select({ count: sql`count(*)`.mapWith(Number) })
     .from(ReportTable)
     .where(
       and(
@@ -69,8 +104,8 @@ const ReportPage = async ({
   const item = await getItem(targetId, targetType);
 
   const ignoreWithData = ignoreReport.bind(null, targetId, targetType);
-
   const deleteWithData = deleteRelatedItem.bind(null, targetId, targetType);
+  const status = getStatus(reports);
 
   return (
     <div>
@@ -88,6 +123,11 @@ const ReportPage = async ({
             <Typography variant="body2" color="text.secondary">
               {item.comment}
             </Typography>
+            <Chip
+              sx={{ marginTop: 2 }}
+              label={status}
+              color={status === 'Opened' ? 'warning' : 'default'}
+            />
           </CardContent>
         ) : item.targetType === 'post' ? (
           <>
@@ -117,6 +157,11 @@ const ReportPage = async ({
               <Typography variant="body2" color="text.secondary">
                 {item.content}
               </Typography>
+              <Chip
+                sx={{ marginTop: 2 }}
+                label={status}
+                color={status === 'Opened' ? 'warning' : 'default'}
+              />
             </CardContent>
           </>
         ) : item.targetType === 'webCard' ? (
@@ -127,12 +172,19 @@ const ReportPage = async ({
             <Typography variant="body2" color="text.secondary">
               {item.userName}
             </Typography>
+            <Chip
+              sx={{ marginTop: 2 }}
+              label={status}
+              color={status === 'Opened' ? 'warning' : 'default'}
+            />
           </CardContent>
         ) : null}
         <CardActions>
           <form action={ignoreWithData}>
             <Button
               size="medium"
+              variant="contained"
+              color="primary"
               startIcon={<IgnoreIcon />}
               type="submit"
               disabled={item.deleted}
@@ -155,9 +207,16 @@ const ReportPage = async ({
         </CardActions>
       </Card>
 
-      <ReportsList reports={reports} />
+      <ReportsList
+        reports={reports}
+        count={reportCount.count}
+        page={page}
+        pageSize={PAGE_SIZE}
+      />
     </div>
   );
 };
 
 export default ReportPage;
+
+const PAGE_SIZE = 25;

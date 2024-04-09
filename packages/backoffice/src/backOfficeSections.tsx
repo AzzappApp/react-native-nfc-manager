@@ -20,7 +20,7 @@ const backOfficeSections: Section[] = [
       { text: 'Account', href: '/users', roles: [ADMIN] },
       {
         text: 'Moderation',
-        href: '/reports',
+        href: '/moderations',
         roles: [ADMIN],
       },
       {

@@ -1,6 +1,13 @@
 'use client';
+
 import { Search } from '@mui/icons-material';
-import { Box, InputAdornment, TextField, Typography } from '@mui/material';
+import {
+  Box,
+  Chip,
+  InputAdornment,
+  TextField,
+  Typography,
+} from '@mui/material';
 import { useRouter } from 'next/navigation';
 import {
   useCallback,
@@ -10,39 +17,39 @@ import {
   useTransition,
 } from 'react';
 import DataGrid from '#components/DataGrid';
-import type { UserTable } from './page';
+import type { ModerationItem } from './page';
 import type {
   GridColDef,
   GridPaginationModel,
   GridSortModel,
 } from '@mui/x-data-grid';
 
-type UsersListProps = {
-  users: UserTable[];
+type ModerationListProps = {
+  reports: ModerationItem[];
   count: number;
   page: number;
   pageSize: number;
-  sortField: 'createdAt' | 'email' | 'phoneNumber' | 'roles';
+  sortField: 'targetId' | 'targetType';
   sortOrder: 'asc' | 'desc';
   search: string | null;
 };
 
-const UsersList = ({
-  users,
-  count,
+const ModerationsList = ({
+  reports,
   page,
+  count,
   pageSize,
   sortField,
   sortOrder,
   search,
-}: UsersListProps) => {
+}: ModerationListProps) => {
   const router = useRouter();
   const [loading, startTransition] = useTransition();
   const updateSearchParams = useCallback(
     (page: number, sort: string, order: string, search: string | null) => {
       startTransition(() => {
         router.replace(
-          `/users?page=${page}&sort=${sort}&order=${order}&s=${search ?? ''}`,
+          `/moderations?page=${page}&sort=${sort}&order=${order}&s=${search ?? ''}`,
         );
       });
     },
@@ -81,8 +88,9 @@ const UsersList = ({
       }}
     >
       <Typography variant="h4" component="h1" sx={{ mb: 2 }}>
-        Users
+        Moderation
       </Typography>
+
       <TextField
         margin="normal"
         name="search"
@@ -102,7 +110,7 @@ const UsersList = ({
 
       <DataGrid
         columns={columns}
-        rows={users}
+        rows={reports}
         rowCount={count}
         initialState={{
           pagination: {
@@ -115,22 +123,25 @@ const UsersList = ({
             sort: sortOrder,
           },
         ]}
+        pageSizeOptions={[pageSize]}
+        rowSelection={false}
+        sortingOrder={['asc', 'desc']}
+        getRowId={row => `${row.targetId}-${row.targetType}`}
         onRowClick={params => {
-          router.push(`/users/${params.id}`);
+          router.push(
+            `/moderations/${params.row.targetType}/${params.row.targetId}`,
+          );
         }}
         sx={{
           '& .MuiDataGrid-row:hover': {
             cursor: 'pointer',
           },
         }}
-        paginationMode="server"
         sortingMode="server"
-        onPaginationModelChange={onPageChange}
+        paginationMode="server"
         onSortModelChange={onSortModelChange}
+        onPaginationModelChange={onPageChange}
         loading={loading}
-        pageSizeOptions={[pageSize]}
-        rowSelection={false}
-        sortingOrder={['asc', 'desc']}
       />
     </Box>
   );
@@ -138,24 +149,40 @@ const UsersList = ({
 
 const columns: GridColDef[] = [
   {
-    field: 'email',
-    headerName: 'Email',
+    field: 'url',
+    headerName: 'Url',
     flex: 1,
-    valueFormatter: params => params.value || '-',
+    renderCell: () => 'url',
   },
   {
-    field: 'phoneNumber',
-    headerName: 'Phone number',
+    field: 'reportCount',
+    headerName: 'Reports',
     flex: 1,
-    valueFormatter: params => params.value || '-',
   },
-  { field: 'webcardsCount', headerName: 'WebCards', width: 150 },
   {
-    field: 'createdAt',
-    headerName: 'Inscription date',
+    field: 'status',
+    headerName: 'Status',
+    flex: 1,
+    renderCell: params => (
+      <Chip
+        color={params.value === 'Opened' ? 'warning' : 'default'}
+        label={params.value}
+      />
+    ),
+  },
+  {
+    field: 'targetType',
+    headerName: 'Kind',
+    flex: 1,
+    renderCell: params => <Chip label={params.value} />,
+  },
+  {
+    field: 'latestReport',
+    headerName: 'Latest report',
     type: 'date',
-    width: 150,
+    valueGetter: params => (params.value ? new Date(params.value) : null),
+    flex: 1,
   },
 ];
 
-export default UsersList;
+export default ModerationsList;
