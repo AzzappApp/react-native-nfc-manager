@@ -1,5 +1,6 @@
-## 0.5.5-canary.205
+## 0.5.5-canary.206
 
+* **fix:**  - manage drizzle-studio case
 * **fix:**  - env var missing during build
 * **build:**  - add missing dependency fro drizzle-studio
 * **fix:**  - default values
