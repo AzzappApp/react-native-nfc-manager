@@ -40,6 +40,16 @@ export const createDrizzleTransactionManager = (
   database: DrizzleDatabase,
 ): DrizzleTransactionManager => {
   // @ts-ignore Missing type for async local storage
+  if (typeof AsyncLocalStorage === 'undefined') {
+    return {
+      getTransaction: () => undefined,
+      startTransaction: async _cb => {
+        throw new Error('AsyncLocalStorage is not defined');
+      },
+    };
+  }
+
+  // @ts-ignore Missing type for async local storage
   const store = new AsyncLocalStorage<DatabaseTransaction>();
 
   const startTransaction = <T>(cb: () => Promise<T>) => {
