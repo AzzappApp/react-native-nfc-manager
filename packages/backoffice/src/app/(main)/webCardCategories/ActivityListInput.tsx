@@ -22,6 +22,7 @@ import {
   Autocomplete,
   TextField,
   createFilterOptions,
+  Paper,
 } from '@mui/material';
 import { uniqBy } from 'lodash';
 import { useRef, useState } from 'react';
@@ -115,7 +116,7 @@ const ActivityListInput = ({
         renderInput={params => (
           <TextField {...params} inputRef={inputRef} label="Add an activity" />
         )}
-        sx={{ width: 300 }}
+        sx={{ width: 300, paddingBottom: 2 }}
         renderOption={(props, option) => {
           const id = typeof option === 'string' ? option : option.id;
           const label = typeof option === 'string' ? option : option.labelKey;
@@ -141,7 +142,17 @@ const ActivityListInput = ({
         }}
         onChange={(_, value) => handleActivitySelect(value)}
       />
-      <Box>
+      <Paper
+        sx={{
+          display: 'flex',
+          flexDirection: 'column',
+          overflow: 'auto',
+          minHeight: 100,
+          maxHeight: 400,
+          padding: 1,
+          gap: 1,
+        }}
+      >
         <DndContext
           sensors={sensors}
           onDragStart={handleDragStart}
@@ -173,7 +184,7 @@ const ActivityListInput = ({
             )}
           </DragOverlay>
         </DndContext>
-      </Box>
+      </Paper>
     </Box>
   );
 };
@@ -208,14 +219,30 @@ export const SortableItem: React.FC<SortableItemProps> = ({
         ...style,
         position: 'relative',
         display: 'flex',
-        border: `1px solid black`,
-        borderRadius: 2,
+        borderRadius: 5,
         padding: 10,
         margin: 2,
         alignItems: 'center',
-        backgroundColor: 'white',
+        backgroundColor: '#F9F9F9',
       }}
     >
+      <Box
+        {...listeners}
+        {...attributes}
+        sx={{
+          padding: 1,
+          marginRight: 1,
+          outline: 0,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          borderRadius: 1,
+          cursor: 'grab',
+        }}
+      >
+        <DragHandle />
+      </Box>
+
       <Typography variant="body1" sx={{ flex: 1 }}>
         {typeof item === 'string'
           ? item
@@ -230,22 +257,6 @@ export const SortableItem: React.FC<SortableItemProps> = ({
       >
         <DeleteIcon />
       </IconButton>
-      <Box
-        {...listeners}
-        {...attributes}
-        sx={{
-          padding: 1,
-          marginRight: 1,
-          backgroundColor: '#DDD',
-          outline: 0,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          borderRadius: 1,
-        }}
-      >
-        <DragHandle />
-      </Box>
     </Box>
   );
 };

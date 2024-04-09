@@ -48,6 +48,7 @@ const WebCardTemplateTypeListInput = ({
       {error && <Typography color="error">{helperText}</Typography>}
       <Autocomplete
         value={value}
+        fullWidth
         multiple={false}
         options={options as Array<CardTemplateType | string>}
         getOptionLabel={option =>
@@ -62,9 +63,9 @@ const WebCardTemplateTypeListInput = ({
             inputRef={inputRef}
             label="Add a default webcard template type"
             variant="outlined"
+            fullWidth
           />
         )}
-        sx={{ width: 300 }}
         renderOption={(props, option) => {
           const id = typeof option === 'string' ? option : option.id;
           const label =

@@ -1,17 +1,115 @@
-import { asc } from 'drizzle-orm';
+import { asc, desc, eq, like, or, sql, and } from 'drizzle-orm';
 import { WebCardCategoryTable, db } from '@azzapp/data';
 import WebCardCategoriesList from './WebCardCategoriesList';
+import type { SQLWrapper } from 'drizzle-orm';
 
-const ProfileCategoriesPage = async () => {
-  const webCardCategories = await db
+const sortsColumns = {
+  labelKey: WebCardCategoryTable.labelKey,
+  webCardKind: WebCardCategoryTable.webCardKind,
+  order: WebCardCategoryTable.order,
+  enabled: WebCardCategoryTable.enabled,
+};
+
+export type Filters = {
+  enabled?: string | null;
+};
+
+const getFilters = (filters: Filters): SQLWrapper[] => {
+  const f: SQLWrapper[] = [];
+  if (filters.enabled) {
+    f.push(eq(WebCardCategoryTable.enabled, filters.enabled === 'true'));
+  }
+
+  return f;
+};
+
+const getSearch = (search: string | null) => {
+  if (search) {
+    return or(
+      like(WebCardCategoryTable.labelKey, `%${search}%`),
+      like(WebCardCategoryTable.webCardKind, `%${search}%`),
+      like(WebCardCategoryTable.order, `%${search}%`),
+    );
+  }
+};
+
+const getCategories = (
+  page: number,
+  sort: 'enabled' | 'labelKey' | 'order' | 'webCardKind',
+  order: 'asc' | 'desc',
+  search: string | null,
+  filters: Filters,
+) => {
+  const query = db
     .select()
     .from(WebCardCategoryTable)
-    .orderBy(asc(WebCardCategoryTable.order));
+    .orderBy(asc(WebCardCategoryTable.order))
+    .where(and(getSearch(search), ...getFilters(filters)))
+    .$dynamic();
+
+  query
+    .offset(page * PAGE_SIZE)
+    .limit(PAGE_SIZE)
+    .orderBy(
+      order === 'asc' ? asc(sortsColumns[sort]) : desc(sortsColumns[sort]),
+    );
+
+  return query;
+};
+
+const getCategoriesCount = async (search: string | null, filters: Filters) => {
+  const query = db
+    .select({ count: sql`count(*)`.mapWith(Number) })
+    .from(WebCardCategoryTable)
+    .orderBy(asc(WebCardCategoryTable.order))
+    .where(and(getSearch(search), ...getFilters(filters)));
+
+  return query.then(rows => rows[0].count);
+};
+
+type Props = {
+  searchParams?: {
+    page?: string;
+    sort?: string;
+    order?: string;
+    s?: string;
+    status?: string;
+  };
+};
+
+const ProfileCategoriesPage = async ({ searchParams = {} }: Props) => {
+  let page = searchParams.page ? parseInt(searchParams.page, 10) : 1;
+  page = Math.max(isNaN(page) ? 1 : page, 1);
+
+  const sort = Object.keys(sortsColumns).includes(searchParams.sort as any)
+    ? (searchParams.sort as any)
+    : 'order';
+
+  const order = searchParams.order === 'desc' ? 'desc' : 'asc';
+  const search = searchParams.s ?? null;
+  const filters: Filters = {
+    enabled: searchParams.status ?? null,
+  };
+
+  const webCardCategories = await getCategories(
+    page - 1,
+    sort,
+    order,
+    search,
+    filters,
+  );
+  const count = await getCategoriesCount(search, filters);
 
   return (
     <WebCardCategoriesList
       webCardCategories={webCardCategories}
+      count={count}
+      page={page}
       pageSize={PAGE_SIZE}
+      sortField={sort}
+      sortOrder={order}
+      search={search}
+      filters={filters}
     />
   );
 };

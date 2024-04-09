@@ -75,6 +75,7 @@ const WebCardCategoryForm = ({
       webCardCategory
         ? {
             ...webCardCategory,
+            baseLabelValue: label?.baseLabelValue,
             activities:
               categoryCompanyActivities?.map(
                 id =>
@@ -173,23 +174,36 @@ const WebCardCategoryForm = ({
 
   return (
     <>
-      <Typography variant="h4" component="h1" sx={{ mb: 10 }}>
-        {webCardCategory
-          ? `WebCardCategory : ${label?.baseLabelValue}`
-          : 'New WebCardCategory'}
+      <Typography variant="h4" component="h1">
+        {webCardCategory ? label?.baseLabelValue : 'New WebCardCategory'}
       </Typography>
       <Box
         sx={{
           display: 'flex',
           flexDirection: 'column',
-          alignItems: 'flex-start',
           gap: 2,
           padding: 2,
         }}
-        maxWidth={500}
         component="form"
         onSubmit={handleSubmit}
       >
+        <Box>
+          <FormControlLabel
+            control={
+              <Switch
+                name="enabled"
+                checked={!!data.enabled}
+                disabled={saving}
+                {...omit(
+                  fieldProps('enabled', { format: value => value ?? null }),
+                  'error',
+                  'helperText',
+                )}
+              />
+            }
+            label="Enabled"
+          />
+        </Box>
         <TextField
           name="labelKey"
           label="Label key"
@@ -198,45 +212,50 @@ const WebCardCategoryForm = ({
           fullWidth
           {...fieldProps('labelKey')}
         />
-        <TextField
-          name="baseLabelValue"
-          label="Label base value"
-          disabled={saving}
-          required
-          fullWidth
-          {...fieldProps('baseLabelValue')}
-        />
-        <FormControl fullWidth error={webCardKindProps.error}>
-          <InputLabel id="webCardKind-label">Profile Kind</InputLabel>
-          <Select
-            labelId={'webCardKind-label'}
-            id="webCardKind"
-            name="webCardKind"
-            value={webCardKindProps.value}
-            label="WebCard Kind"
-            onChange={webCardKindProps.onChange as any}
-          >
-            <MenuItem value="personal">Personal</MenuItem>
-            <MenuItem value="business">Business</MenuItem>
-          </Select>
-          <FormHelperText>{webCardKindProps.helperText}</FormHelperText>
-        </FormControl>
-        <TextField
-          name="fontSize"
-          type="number"
-          label="Order"
-          disabled={saving}
-          required
-          fullWidth
-          {...fieldProps('order', { parse: intParser })}
-        />
-        <WebCardTemplateTypeListInput
-          label="Webcard template type"
-          name="cardTemplateType"
-          options={cardTemplateTypes}
-          cardTemplateTypesLabels={labels}
-          {...fieldProps('cardTemplateType')}
-        />
+        <Box display="flex" alignItems="center" gap={2} width="100%">
+          <TextField
+            name="baseLabelValue"
+            label="Label base value"
+            disabled={saving}
+            required
+            fullWidth
+            {...fieldProps('baseLabelValue')}
+          />
+          <FormControl fullWidth error={webCardKindProps.error}>
+            <InputLabel id="webCardKind-label">Profile Kind</InputLabel>
+            <Select
+              labelId={'webCardKind-label'}
+              id="webCardKind"
+              name="webCardKind"
+              value={webCardKindProps.value}
+              label="WebCard Kind"
+              onChange={webCardKindProps.onChange as any}
+            >
+              <MenuItem value="personal">Personal</MenuItem>
+              <MenuItem value="business">Business</MenuItem>
+            </Select>
+            <FormHelperText>{webCardKindProps.helperText}</FormHelperText>
+          </FormControl>
+        </Box>
+        <Box display="flex" alignItems="center" gap={2} width="100%">
+          <TextField
+            name="fontSize"
+            type="number"
+            label="Order"
+            disabled={saving}
+            required
+            fullWidth
+            {...fieldProps('order', { parse: intParser })}
+          />
+          <WebCardTemplateTypeListInput
+            label="Webcard template type"
+            name="cardTemplateType"
+            options={cardTemplateTypes}
+            cardTemplateTypesLabels={labels}
+            width="100%"
+            {...fieldProps('cardTemplateType')}
+          />
+        </Box>
         {data.webCardKind === 'business' && (
           <ActivityListInput
             label="Activities"
@@ -252,29 +271,16 @@ const WebCardCategoryForm = ({
           accept="image/jpeg"
           {...fieldProps('medias')}
         />
-        <FormControlLabel
-          control={
-            <Switch
-              name="enabled"
-              checked={!!data.enabled}
-              disabled={saving}
-              {...omit(
-                fieldProps('enabled', { format: value => value ?? null }),
-                'error',
-                'helperText',
-              )}
-            />
-          }
-          label="Enabled"
-        />
-        <Button
-          type="submit"
-          variant="contained"
-          sx={{ mt: 3, mb: 2 }}
-          disabled={saving}
-        >
-          Save
-        </Button>
+        <Box>
+          <Button
+            type="submit"
+            variant="contained"
+            sx={{ mt: 3, mb: 2 }}
+            disabled={saving}
+          >
+            Save
+          </Button>
+        </Box>
         {error && (
           <Typography variant="body1" color="error">
             Something went wrong {error?.message}
