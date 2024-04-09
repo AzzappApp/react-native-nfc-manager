@@ -1,4 +1,4 @@
-## 0.5.5-canary.206
+## 0.5.5-canary.207
 
 * **fix:**  - manage drizzle-studio case
 * **fix:**  - env var missing during build
