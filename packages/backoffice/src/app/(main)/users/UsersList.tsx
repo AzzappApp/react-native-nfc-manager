@@ -22,7 +22,7 @@ type UsersListProps = {
   count: number;
   page: number;
   pageSize: number;
-  sortField: 'createdAt' | 'email' | 'phoneNumber' | 'roles';
+  sortField: 'createdAt' | 'email' | 'phoneNumber' | 'webcardsCount';
   sortOrder: 'asc' | 'desc';
   search: string | null;
 };
@@ -54,10 +54,6 @@ const UsersList = ({
   };
 
   const onSortModelChange = (model: GridSortModel) => {
-    if (!model.length) {
-      updateSearchParams(page, 'createdAt', 'desc', search);
-      return;
-    }
     updateSearchParams(page, model[0].field, model[0].sort ?? 'asc', search);
   };
 

@@ -14,12 +14,12 @@ const sortsColumns = {
   createdAt: UserTable.createdAt,
   email: UserTable.email,
   phoneNumber: UserTable.phoneNumber,
-  roles: UserTable.roles,
+  webcardsCount: sql`webcardsCount`,
 };
 
 const getUsers = (
   page: number,
-  sort: 'createdAt' | 'email' | 'phoneNumber' | 'roles',
+  sort: 'createdAt' | 'email' | 'phoneNumber' | 'webcardsCount',
   order: 'asc' | 'desc',
   search: string | null,
 ) => {
@@ -28,7 +28,7 @@ const getUsers = (
       id: UserTable.id,
       email: UserTable.email,
       phoneNumber: UserTable.phoneNumber,
-      webcardsCount: sql`count(*)`.mapWith(Number),
+      webcardsCount: sql`count(*) as webcardsCount`.mapWith(Number),
       createdAt: UserTable.createdAt,
     })
     .from(ProfileTable)
@@ -48,12 +48,14 @@ const getUsers = (
       ),
     );
   }
-  return query
+  query
     .offset(page * PAGE_SIZE)
     .limit(PAGE_SIZE)
     .orderBy(
       order === 'asc' ? asc(sortsColumns[sort]) : desc(sortsColumns[sort]),
     );
+
+  return query;
 };
 
 const getUsersCount = async (search: string | null) => {
@@ -90,16 +92,9 @@ const UsersPage = async ({ searchParams = {} }: UsersPageProps) => {
     ? (searchParams.sort as any)
     : 'createdAt';
 
-  const order =
-    searchParams.order === 'desc'
-      ? 'desc'
-      : sort === 'createdAt' && !searchParams.order
-        ? 'desc'
-        : 'asc';
+  const order = searchParams.order === 'asc' ? 'asc' : 'desc';
   const search = searchParams.s ?? null;
-
   const users = await getUsers(page - 1, sort, order, search);
-
   const count = await getUsersCount(search);
 
   return (

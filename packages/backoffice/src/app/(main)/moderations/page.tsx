@@ -16,7 +16,9 @@ export type ModerationItem = {
 const sortsColumns = {
   targetId: ReportTable.targetId,
   targetType: ReportTable.targetType,
+  reportCount: sql`reportCount`,
   latestReport: sql`latestReport`,
+  treatedAt: sql`treatedAt`,
 };
 
 const getReports = (
@@ -29,9 +31,11 @@ const getReports = (
     .select({
       targetId: ReportTable.targetId,
       targetType: ReportTable.targetType,
-      reportCount: sql`count(*)`.mapWith(Number),
-      latestReport: sql`max(${ReportTable.createdAt})`.mapWith(Date),
-      treatedAt: sql`max(${ReportTable.treatedAt})`.mapWith(Date),
+      reportCount: sql`count(*) as reportCount`.mapWith(Number),
+      latestReport: sql`max(${ReportTable.createdAt}) as latestReport`.mapWith(
+        Date,
+      ),
+      treatedAt: sql`max(${ReportTable.treatedAt}) as treatedAt`.mapWith(Date),
     })
     .from(ReportTable)
     .groupBy(ReportTable.targetId, ReportTable.targetType)
@@ -73,14 +77,9 @@ const ModerationsPage = async ({ searchParams = {} }: ModerationsPageProps) => {
 
   const sort = Object.keys(sortsColumns).includes(searchParams.sort as any)
     ? (searchParams.sort as any)
-    : 'targetId';
+    : 'latestReport';
 
-  const order =
-    searchParams.order === 'desc'
-      ? 'desc'
-      : sort === 'targetId' && !searchParams.order
-        ? 'desc'
-        : 'asc';
+  const order = searchParams.order === 'asc' ? 'asc' : 'desc';
   const search = searchParams.s ?? null;
 
   const reports = await getReports(page - 1, sort, order, search);
