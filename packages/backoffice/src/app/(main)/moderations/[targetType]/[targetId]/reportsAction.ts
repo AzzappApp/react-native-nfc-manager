@@ -83,7 +83,7 @@ export const deleteRelatedItem = async (
                   .from(WebCardTable)
                   .where(eq(WebCardTable.id, post[0].webCardId));
 
-                await fetch(
+                const res = await fetch(
                   `${process.env.NEXT_PUBLIC_API_ENDPOINT}/revalidate`,
                   {
                     method: 'POST',
@@ -101,6 +101,9 @@ export const deleteRelatedItem = async (
                     }),
                   },
                 );
+                if (!res.ok) {
+                  console.error('Error revalidating pages');
+                }
               }
             } catch (e) {
               console.error('Error revalidating pages');
@@ -212,16 +215,23 @@ export const deleteRelatedItem = async (
               .from(WebCardTable)
               .where(eq(WebCardTable.id, targetId));
 
-            await fetch(`${process.env.NEXT_PUBLIC_API_ENDPOINT}/revalidate`, {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-                [AZZAPP_SERVER_HEADER]: process.env.API_SERVER_TOKEN ?? '',
+            const res = await fetch(
+              `${process.env.NEXT_PUBLIC_API_ENDPOINT}/revalidate`,
+              {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                  [AZZAPP_SERVER_HEADER]: process.env.API_SERVER_TOKEN ?? '',
+                },
+                body: JSON.stringify({
+                  cards: webCard.map(({ userName }) => userName),
+                }),
               },
-              body: JSON.stringify({
-                cards: webCard.map(({ userName }) => userName),
-              }),
-            });
+            );
+
+            if (!res.ok) {
+              console.error('Error revalidating pages');
+            }
           } catch (e) {
             console.error('Error revalidating pages');
           }
