@@ -225,6 +225,7 @@ export const deleteRelatedItem = async (
                 },
                 body: JSON.stringify({
                   cards: webCard.map(({ userName }) => userName),
+                  posts: [],
                 }),
               },
             );
