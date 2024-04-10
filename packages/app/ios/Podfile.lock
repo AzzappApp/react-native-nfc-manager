@@ -1041,11 +1041,9 @@ PODS:
     - React-Core
   - react-native-passkit (0.1.3):
     - React-Core
-  - react-native-quick-base64 (2.0.8):
-    - React-Core
   - react-native-safe-area-context (4.9.0):
     - React-Core
-  - react-native-skia (1.0.5):
+  - react-native-skia (1.1.0):
     - glog
     - RCT-Folly (= 2022.05.16.00)
     - React
@@ -1225,7 +1223,7 @@ PODS:
     - React-Core
   - RNCMaskedView (0.3.1):
     - React-Core
-  - RNDateTimePicker (7.6.3):
+  - RNDateTimePicker (7.6.4):
     - React-Core
   - RNFlashList (1.6.4):
     - React-Core
@@ -1275,7 +1273,7 @@ PODS:
     - SentryPrivate (= 8.21.0)
   - SentryPrivate (8.21.0)
   - SocketRocket (0.6.1)
-  - VisionCamera (4.0.0-beta.11):
+  - VisionCamera (4.0.0-beta.13):
     - React
     - React-callinvoker
     - React-Core
@@ -1357,7 +1355,6 @@ DEPENDENCIES:
   - react-native-mmkv (from `../../../node_modules/react-native-mmkv`)
   - react-native-pager-view (from `../../../node_modules/react-native-pager-view`)
   - "react-native-passkit (from `../../../node_modules/@reeq/react-native-passkit`)"
-  - react-native-quick-base64 (from `../../../node_modules/react-native-quick-base64`)
   - react-native-safe-area-context (from `../../../node_modules/react-native-safe-area-context`)
   - "react-native-skia (from `../../../node_modules/@shopify/react-native-skia`)"
   - React-nativeconfig (from `../../../node_modules/react-native/ReactCommon`)
@@ -1531,8 +1528,6 @@ EXTERNAL SOURCES:
     :path: "../../../node_modules/react-native-pager-view"
   react-native-passkit:
     :path: "../../../node_modules/@reeq/react-native-passkit"
-  react-native-quick-base64:
-    :path: "../../../node_modules/react-native-quick-base64"
   react-native-safe-area-context:
     :path: "../../../node_modules/react-native-safe-area-context"
   react-native-skia:
@@ -1683,9 +1678,8 @@ SPEC CHECKSUMS:
   react-native-mmkv: 1fdc81aa70c1aba09370718e6a63a09cbbbac8d2
   react-native-pager-view: 0eb900a8c5d83c02a74b0125d4b5f9fdcc5b8f44
   react-native-passkit: aaf4f946eb981b872104192aadaa7d6c94011f86
-  react-native-quick-base64: 777057ea4286f806b00259ede65dc79c7c706320
   react-native-safe-area-context: b97eb6f9e3b7f437806c2ce5983f479f8eb5de4b
-  react-native-skia: 6da30aeaa315fcec5c27ebfb016b9eca2b57b66f
+  react-native-skia: 39c0571e3e7b97adaa1fbcfd3cb217faf16a5557
   React-nativeconfig: b4d4e9901d4cabb57be63053fd2aa6086eb3c85f
   React-NativeModulesApple: cd26e56d56350e123da0c1e3e4c76cb58a05e1ee
   React-perflogger: 5f49905de275bac07ac7ea7f575a70611fa988f2
@@ -1710,7 +1704,7 @@ SPEC CHECKSUMS:
   RNBootSplash: 43323bde30fb54736d96543e2c20f2cb0531abc1
   RNCAsyncStorage: 826b603ae9c0f88b5ac4e956801f755109fa4d5c
   RNCMaskedView: 090213d32d8b3bb83a4dcb7d12c18f0152591906
-  RNDateTimePicker: 7b38b71bcd7c4cfa1cb95f2dff9a4f1faed2dced
+  RNDateTimePicker: 08f00a2c341bf96e4b30da15799fbdd4c5fa48a3
   RNFlashList: b521ebdd7f9352673817f1d98e8bdc0c8cf8545b
   RNGestureHandler: bc2cdb2dc42facdf34992ae364b8a728e19a3686
   RNLocalize: 4222a3756cdbe2dc9a5bdf445765a4d2572107cb
@@ -1729,7 +1723,7 @@ SPEC CHECKSUMS:
   Sentry: ebc12276bd17613a114ab359074096b6b3725203
   SentryPrivate: d651efb234cf385ec9a1cdd3eff94b5e78a0e0fe
   SocketRocket: f32cd54efbe0f095c4d7594881e52619cfe80b17
-  VisionCamera: b6b6f46949eae83b71429c971162af337ef34fa3
+  VisionCamera: 9f26224fce1233ffdad9fa4e56863e3de2190dc0
   Yoga: 805bf71192903b20fc14babe48080582fee65a80
 
 PODFILE CHECKSUM: 98c8d4205febb3f5c87147ae82cc67a37bb2a686

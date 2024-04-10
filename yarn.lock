@@ -5217,10 +5217,10 @@
     prompts "^2.4.2"
     semver "^7.5.2"
 
-"@react-native-community/datetimepicker@^7.6.3":
-  version "7.6.3"
-  resolved "https://registry.yarnpkg.com/@react-native-community/datetimepicker/-/datetimepicker-7.6.3.tgz#c6b7b84a3d6a824b55d2710658d86fe64ce12a72"
-  integrity sha512-Ceb+zWwX67tJKK8gTk6JRRIlU1DqIuwe2kaFwz28s6SKrU8bn/nSSB8/y9B4vic3hb8Z0WTo22807GA1Kg4W7A==
+"@react-native-community/datetimepicker@^7.6.4":
+  version "7.6.4"
+  resolved "https://registry.yarnpkg.com/@react-native-community/datetimepicker/-/datetimepicker-7.6.4.tgz#b11ae425a51234bab36ba88755cd2a430c53e862"
+  integrity sha512-mbnZ5xYl4d2dkWPumQD2mTbLrvMunxUQdbmu0CriOLn48Hy1dQLilQcFg3SfVynND0ydJXo5CRPyXWvUaVkrLQ==
   dependencies:
     invariant "^2.2.4"
 
@@ -6121,10 +6121,10 @@
     recyclerlistview "4.2.0"
     tslib "2.4.0"
 
-"@shopify/react-native-skia@^1.0.5":
-  version "1.0.5"
-  resolved "https://registry.yarnpkg.com/@shopify/react-native-skia/-/react-native-skia-1.0.5.tgz#aee503f1b6f5390cfa5fa080843b3a467d9a0964"
-  integrity sha512-AeB7jlgUmFolWf/c/Vr4kzoWs1oFvaFCDMHmW55aqRtyhDen83NKJ7UDGtX9KYRjF6Rwz7P9g+6m7QuzlnwH5w==
+"@shopify/react-native-skia@^1.1.0":
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/@shopify/react-native-skia/-/react-native-skia-1.1.0.tgz#627322ef0d2615f661abe67144b6ed5f8fa6469c"
+  integrity sha512-0UglaRyD9R4Fd7BgDJN88oZg+ZMcnSIprqp0l1dupPE4dBvHe6gZVhwvfiL+Cq6lWo9RI7KyJKp7fEAGgKj7sw==
   dependencies:
     canvaskit-wasm "0.39.1"
     react-reconciler "0.27.0"
@@ -6576,7 +6576,7 @@
   dependencies:
     "@types/react" "*"
 
-"@types/react@*", "@types/react@16 || 17 || 18", "@types/react@^18.2.67", "@types/react@^18.2.73", "@types/react@^18.2.74":
+"@types/react@*", "@types/react@16 || 17 || 18", "@types/react@^18.2.67", "@types/react@^18.2.74":
   version "18.2.67"
   resolved "https://registry.yarnpkg.com/@types/react/-/react-18.2.67.tgz#96b7af0b5e79c756f4bdd981de2ca28472c858e5"
   integrity sha512-vkIE2vTIMHQ/xL0rgmuoECBCkZFZeHr49HeWSc24AptMbNRo7pwSBvj73rlJJs9fGKj0koS+V7kQB1jHS0uCgw==
@@ -14706,10 +14706,10 @@ react-native-purchases@^7.25.0:
   dependencies:
     "@revenuecat/purchases-typescript-internal" "10.3.2"
 
-react-native-quick-base64@^2.0.8:
-  version "2.0.8"
-  resolved "https://registry.yarnpkg.com/react-native-quick-base64/-/react-native-quick-base64-2.0.8.tgz#7a75ea8bd85ca3c5bb38a814c1d63e0688e19531"
-  integrity sha512-2kMlnLSy0qz4NA0KXMGugd3qNB5EAizxZ6ghEVNGIxAOlc9CGvC8miv35wgpFbSKeiaBRfcPfkdTM/5Erb/6SQ==
+react-native-quick-base64@^2.1.0:
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/react-native-quick-base64/-/react-native-quick-base64-2.1.0.tgz#6759a9f9b94b2b7c951917ce7d1970afdf62865d"
+  integrity sha512-5T5qhEuHcqeP/GGAOaeNsz0c5jZsMemy2svlgRc7PfUQSH6ABakwTT0tYNZ1XImJZWc8najYgVG8mrJgml5DNw==
   dependencies:
     base64-js "^1.5.1"
 
@@ -14784,10 +14784,10 @@ react-native-version@^4.0.0:
     resolve-from "^5.0.0"
     semver "^7.0.0"
 
-react-native-vision-camera@^4.0.0-beta.11:
-  version "4.0.0-beta.11"
-  resolved "https://registry.yarnpkg.com/react-native-vision-camera/-/react-native-vision-camera-4.0.0-beta.11.tgz#862e3ed77b2930a4c9cfc8f408eb12e8251ea8b7"
-  integrity sha512-cKg/nwT0q0H1ivEVG+PQt/QxhFgf/dd7SiMm7bCzlSCmt0T2tXyIdLsuY312iKBB2qasQZOYtzRsoQjipHQkDw==
+react-native-vision-camera@^4.0.0-beta.13:
+  version "4.0.0-beta.13"
+  resolved "https://registry.yarnpkg.com/react-native-vision-camera/-/react-native-vision-camera-4.0.0-beta.13.tgz#bb58ffc8d1f6ca507c54b3648b681739c1bca202"
+  integrity sha512-a5ypYsr9XsERfx2UCmL1oSMC/Irra6X0Ixv0/hCgM/2ndt/aK94A6FwONr1kA/GRyU67ekOhk8HwUfxx+hi6dQ==
 
 react-native@^0.73.6:
   version "0.73.6"
