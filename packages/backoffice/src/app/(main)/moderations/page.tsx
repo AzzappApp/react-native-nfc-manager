@@ -1,8 +1,10 @@
-import { asc, desc, like, or, sql } from 'drizzle-orm';
+import { asc, desc, eq, sql, and } from 'drizzle-orm';
 import { db, ReportTable } from '@azzapp/data';
 import ReportsList from './ModerationList';
+import type { SQLWrapper } from 'drizzle-orm';
 
 export type ReportStatus = 'Closed' | 'Opened';
+export type ReportKind = 'comment' | 'post' | 'webCard';
 
 export type ModerationItem = {
   targetId: string;
@@ -13,6 +15,23 @@ export type ModerationItem = {
   status: ReportStatus;
 };
 
+export type Filters = {
+  status?: ReportStatus | 'all';
+  kind?: ReportKind | 'all';
+};
+
+const getFilters = (filters: Filters): SQLWrapper[] => {
+  const f: SQLWrapper[] = [];
+  if (filters.status && filters.status !== 'all') {
+    f.push(eq(sql`status`, filters.status === 'Opened' ? 1 : 0));
+  }
+  if (filters.kind && filters.kind !== 'all') {
+    f.push(eq(sql`targetType`, filters.kind));
+  }
+
+  return f;
+};
+
 const sortsColumns = {
   targetId: ReportTable.targetId,
   targetType: ReportTable.targetType,
@@ -21,45 +40,65 @@ const sortsColumns = {
   treatedAt: sql`treatedAt`,
 };
 
-const getReports = (
-  page: number,
-  sort: 'latestReport' | 'targetId' | 'targetType',
-  order: 'asc' | 'desc',
-  search: string | null,
-) => {
-  let query = db
+const getReportsQuery = () => {
+  const query = db
     .select({
       targetId: ReportTable.targetId,
       targetType: ReportTable.targetType,
-      reportCount: sql`count(*) as reportCount`.mapWith(Number),
-      latestReport: sql`max(${ReportTable.createdAt}) as latestReport`.mapWith(
-        Date,
-      ),
-      treatedAt: sql`max(${ReportTable.treatedAt}) as treatedAt`.mapWith(Date),
+      reportCount: sql`count(*)`.mapWith(Number).as('reportCount'),
+      latestReport: sql`max(${ReportTable.createdAt})`
+        .mapWith(Date)
+        .as('latestReport'),
+      treatedAt: sql`max(${ReportTable.treatedAt})`
+        .mapWith(Date)
+        .as('treatedAt'),
+      status:
+        sql`(ISNULL(MAX(${ReportTable.treatedAt})) OR DATEDIFF(MAX(${ReportTable.treatedAt}), MAX(${ReportTable.createdAt})) < 0)`
+          .mapWith(Number)
+          .as('status'),
     })
     .from(ReportTable)
     .groupBy(ReportTable.targetId, ReportTable.targetType)
     .$dynamic();
 
-  if (search) {
-    query = query.where(or(like(ReportTable.targetType, `%${search}%`)));
-  }
+  return query;
+};
 
-  return query
+const getFilteredReports = (
+  page: number,
+  sort: 'latestReport' | 'targetId' | 'targetType',
+  order: 'asc' | 'desc',
+  filters: Filters,
+) => {
+  const subQuery = getReportsQuery();
+  const query = db
+    .select()
+    .from(subQuery.as('Report'))
+    .where(and(...getFilters(filters)));
+
+  query
     .offset(page * PAGE_SIZE)
     .limit(PAGE_SIZE)
     .orderBy(
       order === 'asc' ? asc(sortsColumns[sort]) : desc(sortsColumns[sort]),
     );
+
+  return query;
 };
 
-const countReports = async () => {
+const countReports = async (
+  page: number,
+  sort: 'latestReport' | 'targetId' | 'targetType',
+  order: 'asc' | 'desc',
+  filters: Filters,
+) => {
+  const subQuery = getReportsQuery();
   const query = db
     .select({ count: sql`count(*)`.mapWith(Number) })
-    .from(ReportTable)
-    .groupBy(ReportTable.targetId, ReportTable.targetType);
+    .from(subQuery.as('Report'))
+    .where(and(...getFilters(filters)));
 
-  return query.then(rows => rows.length);
+  return query.then(rows => rows[0].count);
 };
 
 type ModerationsPageProps = {
@@ -67,7 +106,8 @@ type ModerationsPageProps = {
     page?: string;
     sort?: string;
     order?: string;
-    s?: string;
+    status?: string;
+    kind?: string;
   };
 };
 
@@ -80,18 +120,17 @@ const ModerationsPage = async ({ searchParams = {} }: ModerationsPageProps) => {
     : 'latestReport';
 
   const order = searchParams.order === 'asc' ? 'asc' : 'desc';
-  const search = searchParams.s ?? null;
+  const filters: Filters = {
+    status: (searchParams.status as ReportStatus) || 'Opened',
+    kind: (searchParams.kind as ReportKind) || 'all',
+  };
 
-  const reports = await getReports(page - 1, sort, order, search);
+  const reports = await getFilteredReports(page - 1, sort, order, filters);
   const moderationReports: ModerationItem[] = reports.map(report => ({
     ...report,
-    status:
-      !report.treatedAt ||
-      new Date(report.treatedAt) < new Date(report.latestReport)
-        ? 'Opened'
-        : 'Closed',
+    status: report.status ? 'Opened' : 'Closed',
   }));
-  const count = await countReports();
+  const count = await countReports(page - 1, sort, order, filters);
 
   return (
     <ReportsList
@@ -101,7 +140,7 @@ const ModerationsPage = async ({ searchParams = {} }: ModerationsPageProps) => {
       pageSize={PAGE_SIZE}
       sortField={sort}
       sortOrder={order}
-      search={search}
+      filters={filters}
     />
   );
 };

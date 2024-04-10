@@ -1,5 +1,5 @@
+import { Check } from '@mui/icons-material';
 import DeleteIcon from '@mui/icons-material/Delete';
-import IgnoreIcon from '@mui/icons-material/VolumeOff';
 import {
   Typography,
   Card,
@@ -9,20 +9,29 @@ import {
   Button,
   Alert,
   Chip,
+  Box,
 } from '@mui/material';
 import { and, eq, sql } from 'drizzle-orm';
+import Link from 'next/link';
 import {
   PostCommentTable,
   PostTable,
   WebCardTable,
   db,
   ReportTable,
+  ProfileTable,
 } from '@azzapp/data';
 import { getImageURLForSize, getVideoURL } from '@azzapp/shared/imagesHelpers';
 import { deleteRelatedItem, ignoreReport } from './reportsAction';
 import ReportsList from './ReportsList';
 import type { ReportStatus } from '../../page';
-import type { Report, TargetType } from '@azzapp/data';
+import type {
+  Post,
+  PostComment,
+  Report,
+  TargetType,
+  WebCard,
+} from '@azzapp/data';
 
 type ReportPageProps = {
   params: {
@@ -34,28 +43,55 @@ type ReportPageProps = {
   };
 };
 
-const getItem = async (targetId: string, targetType: TargetType) => {
+type Item = {
+  targetType: TargetType;
+  WebCard: WebCard;
+  Post?: Post;
+  PostComment?: PostComment;
+};
+
+const getItem = async (
+  targetId: string,
+  targetType: TargetType,
+): Promise<Item> => {
   if (targetType === 'comment') {
     return db
       .select()
       .from(PostCommentTable)
       .where(eq(PostCommentTable.id, targetId))
+      .innerJoin(PostTable, eq(PostTable.id, PostCommentTable.postId))
+      .innerJoin(WebCardTable, eq(PostTable.webCardId, WebCardTable.id))
       .then(rows => ({ ...rows[0], targetType }));
   } else if (targetType === 'post') {
     return db
       .select()
       .from(PostTable)
       .where(eq(PostTable.id, targetId))
+      .innerJoin(WebCardTable, eq(PostTable.webCardId, WebCardTable.id))
       .then(rows => ({ ...rows[0], targetType }));
   } else if (targetType === 'webCard') {
     return db
       .select()
       .from(WebCardTable)
       .where(eq(WebCardTable.id, targetId))
-      .then(rows => ({ ...rows[0], targetType }));
+      .then(rows => ({ WebCard: { ...rows[0] }, targetType }));
   }
 
   throw new Error('Invalid targetType');
+};
+
+const getOwner = async (webCardId: string) => {
+  const query = db
+    .select()
+    .from(ProfileTable)
+    .where(
+      and(
+        eq(ProfileTable.webCardId, webCardId),
+        eq(ProfileTable.profileRole, 'owner'),
+      ),
+    );
+
+  return query.then(rows => rows[0]);
 };
 
 const getStatus = (reports: Report[]): ReportStatus => {
@@ -102,110 +138,166 @@ const ReportPage = async ({
     );
 
   const item = await getItem(targetId, targetType);
+  const owner = await getOwner(item.WebCard.id);
 
   const ignoreWithData = ignoreReport.bind(null, targetId, targetType);
   const deleteWithData = deleteRelatedItem.bind(null, targetId, targetType);
   const status = getStatus(reports);
+  const deleted =
+    item.PostComment?.deleted || item.Post?.deleted || item.WebCard?.deleted;
 
   return (
     <div>
-      {item.deleted && (
+      {deleted && (
         <Alert variant="filled" severity="warning" sx={{ mb: 5 }}>
           This item has been removed
         </Alert>
       )}
-      <Card sx={{ maxWidth: 400, mb: 5 }}>
-        {item.targetType === 'comment' ? (
-          <CardContent>
-            <Typography gutterBottom variant="h5" component="div">
-              Comment {item.id}
-            </Typography>
-            <Typography variant="body2" color="text.secondary">
-              {item.comment}
-            </Typography>
-            <Chip
-              sx={{ marginTop: 2 }}
-              label={status}
-              color={status === 'Opened' ? 'warning' : 'default'}
-            />
-          </CardContent>
-        ) : item.targetType === 'post' ? (
-          <>
-            {item.medias.map(media =>
-              media.startsWith('v') ? (
-                <CardMedia
-                  key={media}
-                  component="video"
-                  height="400"
-                  image={getVideoURL(media)}
-                  controls
-                />
-              ) : (
-                <CardMedia
-                  key={media}
-                  component="img"
-                  height="400"
-                  image={getImageURLForSize(media)}
-                />
-              ),
-            )}
-
+      <Box display="flex" flexDirection="column" alignItems="flex-Start">
+        <Card sx={{ mb: 5 }} raised>
+          {item.targetType === 'comment' && item.PostComment && item.Post ? (
             <CardContent>
-              <Typography gutterBottom variant="h5" component="div">
-                Post {item.id}
-              </Typography>
               <Typography variant="body2" color="text.secondary">
-                {item.content}
+                {item.PostComment.comment}
               </Typography>
               <Chip
-                sx={{ marginTop: 2 }}
+                sx={{ mt: 2, mb: 2 }}
                 label={status}
                 color={status === 'Opened' ? 'warning' : 'default'}
               />
+              <Typography variant="body2" color="text.secondary">
+                Post:
+                <Link
+                  href={`${process.env.NEXT_PUBLIC_URL}/${item.WebCard.userName}/post/${item.Post.id}`}
+                  target="_blank"
+                >{`${process.env.NEXT_PUBLIC_URL}/${item.WebCard.userName}/post/${item.Post.id}`}</Link>
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                Webcard:
+                <Link
+                  href={`${process.env.NEXT_PUBLIC_URL}/${item.WebCard.userName}`}
+                  target="_blank"
+                >{`${process.env.NEXT_PUBLIC_URL}/${item.WebCard.userName}`}</Link>
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                Owner:
+                <Link href={`/users/${owner.userId}`} target="_blank">
+                  {owner.userId}
+                </Link>
+              </Typography>
             </CardContent>
-          </>
-        ) : item.targetType === 'webCard' ? (
-          <CardContent>
-            <Typography gutterBottom variant="h5" component="div">
-              WebCard {item.id}
-            </Typography>
-            <Typography variant="body2" color="text.secondary">
-              {item.userName}
-            </Typography>
-            <Chip
-              sx={{ marginTop: 2 }}
-              label={status}
-              color={status === 'Opened' ? 'warning' : 'default'}
-            />
-          </CardContent>
-        ) : null}
-        <CardActions>
-          <form action={ignoreWithData}>
-            <Button
-              size="medium"
-              variant="contained"
-              color="primary"
-              startIcon={<IgnoreIcon />}
-              type="submit"
-              disabled={item.deleted}
-            >
-              IGNORE
-            </Button>
-          </form>
-          <form action={deleteWithData}>
-            <Button
-              size="medium"
-              variant="contained"
-              color="error"
-              startIcon={<DeleteIcon />}
-              type="submit"
-              disabled={item.deleted}
-            >
-              REMOVE
-            </Button>
-          </form>
-        </CardActions>
-      </Card>
+          ) : item.targetType === 'post' && item.Post ? (
+            <>
+              {item.Post.medias.map(media =>
+                media.startsWith('v') ? (
+                  <CardMedia
+                    key={media}
+                    component="video"
+                    height={400}
+                    image={getVideoURL(media)}
+                    controls
+                  />
+                ) : (
+                  <CardMedia
+                    key={media}
+                    component="img"
+                    height={400}
+                    image={getImageURLForSize(media)}
+                  />
+                ),
+              )}
+
+              <CardContent>
+                <Typography variant="body2" color="text.secondary">
+                  {item.Post.content}
+                </Typography>
+                <Chip
+                  sx={{ mt: 2, mb: 2 }}
+                  label={status}
+                  color={status === 'Opened' ? 'warning' : 'default'}
+                />
+                <Typography
+                  display="flex"
+                  component="div"
+                  variant="body2"
+                  color="text.secondary"
+                >
+                  Post:
+                  <Typography variant="body2" color="text.secondary">
+                    <Link
+                      href={`${process.env.NEXT_PUBLIC_URL}/${item.WebCard.userName}/post/${item.Post.id}`}
+                      target="_blank"
+                    >{`${process.env.NEXT_PUBLIC_URL}/${item.WebCard.userName}/post/${item.Post.id}`}</Link>
+                  </Typography>
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  Webcard:
+                  <Link
+                    href={`${process.env.NEXT_PUBLIC_URL}/${item.WebCard.userName}`}
+                    target="_blank"
+                  >{`${process.env.NEXT_PUBLIC_URL}/${item.WebCard.userName}`}</Link>
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  Owner:
+                  <Link href={`/users/${owner.userId}`} target="_blank">
+                    {owner.userId}
+                  </Link>
+                </Typography>
+              </CardContent>
+            </>
+          ) : item.targetType === 'webCard' && item.WebCard ? (
+            <CardContent>
+              <Typography variant="body2" color="text.secondary">
+                {item.WebCard.userName}
+              </Typography>
+              <Chip
+                sx={{ mt: 2, mb: 2 }}
+                label={status}
+                color={status === 'Opened' ? 'warning' : 'default'}
+              />
+              <Typography variant="body2" color="text.secondary">
+                Webcard:
+                <Link
+                  href={`${process.env.NEXT_PUBLIC_URL}/${item.WebCard.userName}`}
+                  target="_blank"
+                >{`${process.env.NEXT_PUBLIC_URL}/${item.WebCard.userName}`}</Link>
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                Owner:
+                <Link href={`/users/${owner.userId}`} target="_blank">
+                  {owner.userId}
+                </Link>
+              </Typography>
+            </CardContent>
+          ) : null}
+          <CardActions>
+            <form action={ignoreWithData}>
+              <Button
+                size="medium"
+                variant="contained"
+                color="primary"
+                startIcon={<Check />}
+                type="submit"
+                disabled={deleted}
+              >
+                IGNORE
+              </Button>
+            </form>
+            <form action={deleteWithData}>
+              <Button
+                size="medium"
+                variant="contained"
+                color="error"
+                startIcon={<DeleteIcon />}
+                type="submit"
+                disabled={deleted}
+              >
+                REMOVE
+              </Button>
+            </form>
+          </CardActions>
+        </Card>
+      </Box>
 
       <ReportsList
         reports={reports}

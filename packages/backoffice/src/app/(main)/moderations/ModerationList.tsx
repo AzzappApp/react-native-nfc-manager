@@ -1,23 +1,19 @@
 'use client';
 
-import { Search } from '@mui/icons-material';
 import {
   Box,
   Chip,
-  InputAdornment,
-  TextField,
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Select,
   Typography,
 } from '@mui/material';
 import { useRouter } from 'next/navigation';
-import {
-  useCallback,
-  useDeferredValue,
-  useEffect,
-  useState,
-  useTransition,
-} from 'react';
+import { useCallback, useEffect, useState, useTransition } from 'react';
 import DataGrid from '#components/DataGrid';
-import type { ModerationItem } from './page';
+import type { Filters, ModerationItem, ReportKind, ReportStatus } from './page';
+import type { SelectChangeEvent } from '@mui/material';
 import type {
   GridColDef,
   GridPaginationModel,
@@ -31,7 +27,7 @@ type ModerationListProps = {
   pageSize: number;
   sortField: 'targetId' | 'targetType';
   sortOrder: 'asc' | 'desc';
-  search: string | null;
+  filters: Filters;
 };
 
 const ModerationsList = ({
@@ -41,15 +37,15 @@ const ModerationsList = ({
   pageSize,
   sortField,
   sortOrder,
-  search,
+  filters,
 }: ModerationListProps) => {
   const router = useRouter();
   const [loading, startTransition] = useTransition();
   const updateSearchParams = useCallback(
-    (page: number, sort: string, order: string, search: string | null) => {
+    (page: number, sort: string, order: string, filters?: Filters) => {
       startTransition(() => {
         router.replace(
-          `/moderations?page=${page}&sort=${sort}&order=${order}&s=${search ?? ''}`,
+          `/moderations?page=${page}&sort=${sort}&order=${order}&status=${filters?.status ?? ''}&kind=${filters?.kind ?? ''}`,
         );
       });
     },
@@ -57,27 +53,48 @@ const ModerationsList = ({
   );
 
   const onPageChange = (model: GridPaginationModel) => {
-    updateSearchParams(model.page + 1, sortField, sortOrder, search);
+    updateSearchParams(model.page + 1, sortField, sortOrder);
   };
 
   const onSortModelChange = (model: GridSortModel) => {
-    if (!model.length) {
-      updateSearchParams(page, 'createdAt', 'desc', search);
-      return;
-    }
-    updateSearchParams(page, model[0].field, model[0].sort ?? 'asc', search);
+    updateSearchParams(page, model[0].field, model[0].sort ?? 'asc');
   };
 
-  const [currentSearch, setCurrentSearch] = useState(search ?? '');
+  const [statusFilter, setStatusFilter] = useState(filters.status);
+  const [kindFilter, setKindFilter] = useState(filters.kind);
 
-  const defferedSearch = useDeferredValue(currentSearch);
+  const onStatusChange = useCallback(
+    (event: SelectChangeEvent) => {
+      const newStatus = event.target.value as ReportStatus;
+      setStatusFilter(newStatus);
+      updateSearchParams(1, sortField, sortOrder, {
+        status: newStatus,
+        kind: kindFilter,
+      });
+    },
+    [kindFilter, sortField, sortOrder, updateSearchParams],
+  );
+
+  const onKindChange = useCallback(
+    (event: SelectChangeEvent) => {
+      const newKind = event.target.value as ReportKind;
+      setKindFilter(newKind);
+      updateSearchParams(1, sortField, sortOrder, {
+        status: statusFilter,
+        kind: newKind,
+      });
+    },
+    [sortField, sortOrder, statusFilter, updateSearchParams],
+  );
 
   useEffect(() => {
-    if (search === defferedSearch) {
-      return;
+    if (filters.status !== statusFilter) {
+      setStatusFilter(filters.status);
     }
-    updateSearchParams(1, sortField, sortOrder, defferedSearch);
-  }, [defferedSearch, page, search, sortField, sortOrder, updateSearchParams]);
+    if (filters.kind !== kindFilter) {
+      setKindFilter(filters.kind);
+    }
+  }, [filters, kindFilter, statusFilter]);
 
   return (
     <Box
@@ -91,22 +108,37 @@ const ModerationsList = ({
         Moderation
       </Typography>
 
-      <TextField
-        margin="normal"
-        name="search"
-        label="Search"
-        type="text"
-        onChange={e => setCurrentSearch(e.target.value)}
-        value={currentSearch}
-        sx={{ mb: 2, width: 500 }}
-        InputProps={{
-          startAdornment: (
-            <InputAdornment position="start">
-              <Search />
-            </InputAdornment>
-          ),
-        }}
-      />
+      <Box display="flex" alignItems="center" gap={2} mb={2} mt={2}>
+        <FormControl sx={{ width: 130 }}>
+          <InputLabel id="status">Status</InputLabel>
+          <Select
+            labelId="status"
+            id="status"
+            value={statusFilter}
+            label="Status"
+            onChange={onStatusChange}
+          >
+            <MenuItem value={'all'}>All</MenuItem>
+            <MenuItem value={'Opened'}>Opened</MenuItem>
+            <MenuItem value={'Closed'}>Closed</MenuItem>
+          </Select>
+        </FormControl>
+        <FormControl sx={{ width: 130 }}>
+          <InputLabel id="kind">Kind</InputLabel>
+          <Select
+            labelId="kind"
+            id="kind"
+            value={kindFilter}
+            label="Kind"
+            onChange={onKindChange}
+          >
+            <MenuItem value={'all'}>All</MenuItem>
+            <MenuItem value={'webCard'}>webCard</MenuItem>
+            <MenuItem value={'post'}>post</MenuItem>
+            <MenuItem value={'comment'}>comment</MenuItem>
+          </Select>
+        </FormControl>
+      </Box>
 
       <DataGrid
         columns={columns}
@@ -149,10 +181,9 @@ const ModerationsList = ({
 
 const columns: GridColDef[] = [
   {
-    field: 'url',
-    headerName: 'Url',
+    field: 'targetId',
+    headerName: 'ID',
     flex: 1,
-    renderCell: () => 'url',
   },
   {
     field: 'reportCount',
