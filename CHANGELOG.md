@@ -1,5 +1,7 @@
-## 0.5.5-canary.208
+## 0.5.5-canary.209
 
+* **fix:**  - **moderation:** ensure path are revalidate and filter correctly data ([#3241](https://github.com/AzzappApp/azzapp/pull/3241))
+* **fix:**  - **android:** enhance taken pictures ([#3218](https://github.com/AzzappApp/azzapp/pull/3218))
 * **fix:**  - manage drizzle-studio case
 * **fix:**  - env var missing during build
 * **build:**  - add missing dependency fro drizzle-studio
