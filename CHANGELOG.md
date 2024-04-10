@@ -1,5 +1,7 @@
-## 0.5.5-canary.209
+## 0.5.5-canary.210
 
+* **fix:**  - **moderation:** [#3240](https://github.com/AzzappApp/azzapp/pull/3240) wrong revalidation call
+* **fix:**  - **moderation:** [#3240](https://github.com/AzzappApp/azzapp/pull/3240) wrong revalidation call
 * **fix:**  - **moderation:** ensure path are revalidate and filter correctly data ([#3241](https://github.com/AzzappApp/azzapp/pull/3241))
 * **fix:**  - **android:** enhance taken pictures ([#3218](https://github.com/AzzappApp/azzapp/pull/3218))
 * **fix:**  - manage drizzle-studio case
