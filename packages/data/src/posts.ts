@@ -104,6 +104,7 @@ export const getWebCardsPostsWithMedias = async (
       and(
         ...conditions,
         before ? sql`${PostTable.createdAt} < ${before}` : undefined,
+        eq(PostTable.deleted, false),
       ),
     )
     .orderBy(desc(PostTable.createdAt))
@@ -142,7 +143,9 @@ export const getWebCardPosts = async (
   const query = db
     .select()
     .from(PostTable)
-    .where(eq(PostTable.webCardId, webCardId))
+    .where(
+      and(eq(PostTable.webCardId, webCardId), eq(PostTable.deleted, false)),
+    )
     .orderBy(desc(PostTable.createdAt));
 
   if (limit) {
@@ -168,7 +171,9 @@ export const getProfilesPostsWithTopComment = async (
   const posts = await db
     .select()
     .from(PostTable)
-    .where(eq(PostTable.webCardId, webCardId))
+    .where(
+      and(eq(PostTable.webCardId, webCardId), eq(PostTable.deleted, false)),
+    )
     .orderBy(desc(PostTable.createdAt))
     .limit(limit)
     .offset(offset);
@@ -320,5 +325,6 @@ export const getLikedPosts = async (
     .select()
     .from(PostTable)
     .innerJoin(subquery, eq(PostTable.id, subquery.postId))
+    .where(eq(PostTable.deleted, false))
     .then(res => res.map(({ Post }) => Post));
 };

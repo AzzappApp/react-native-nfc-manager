@@ -29,7 +29,8 @@ const hasRole = (
       if (
         !profile ||
         !checkRole(profile.profileRole) ||
-        (profile.invited && !acceptInvited)
+        (profile.invited && !acceptInvited) ||
+        profile.deleted
       ) {
         throw new GraphQLError(ERRORS.FORBIDDEN);
       }
@@ -39,7 +40,8 @@ const hasRole = (
       if (
         !profile ||
         !checkRole(profile.profileRole) ||
-        (profile.invited && !acceptInvited)
+        (profile.invited && !acceptInvited) ||
+        profile.deleted
       ) {
         throw new GraphQLError(ERRORS.FORBIDDEN);
       }

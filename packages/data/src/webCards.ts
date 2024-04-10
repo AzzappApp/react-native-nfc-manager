@@ -176,6 +176,7 @@ export const getFollowerProfiles = async (
     .where(
       and(
         eq(FollowTable.followingId, webCardId),
+        eq(WebCardTable.deleted, false),
         after ? lt(FollowTable.createdAt, after) : undefined,
         userName
           ? sql`MATCH (${WebCardTable.userName}) AGAINST ("${userName}*" IN BOOLEAN MODE)`
