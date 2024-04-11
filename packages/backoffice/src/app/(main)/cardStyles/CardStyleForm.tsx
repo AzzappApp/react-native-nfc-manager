@@ -1,9 +1,12 @@
 'use client';
 
+import { PhoneIphone } from '@mui/icons-material';
 import {
   Box,
+  Breadcrumbs,
   Button,
   FormControlLabel,
+  Link,
   Snackbar,
   Switch,
   TextField,
@@ -69,28 +72,55 @@ const CardStyleForm = ({ cardStyle, saved, label }: CardStyleFormProps) => {
   };
 
   return (
-    <>
-      <Typography variant="h4" component="h1" sx={{ mb: 10 }}>
+    <Box
+      sx={{
+        display: 'flex',
+        flexDirection: 'column',
+      }}
+      component="form"
+      onSubmit={handleSubmit}
+    >
+      <Breadcrumbs aria-label="breadcrumb" sx={{ mb: 2 }}>
+        <Link
+          underline="hover"
+          sx={{ display: 'flex', alignItems: 'center' }}
+          color="inherit"
+          href="/cardStyles"
+        >
+          <PhoneIphone sx={{ mr: 0.5 }} fontSize="inherit" />
+          Styles
+        </Link>
+      </Breadcrumbs>
+      <Typography variant="h4" component="h1" sx={{ mb: 2 }}>
         {cardStyle ? `CardStyle ${label?.baseLabelValue}` : 'New CardStyle'}
       </Typography>
+      <FormControlLabel
+        control={
+          <Switch
+            name="enabled"
+            checked={!!data.enabled}
+            disabled={saving}
+            {...omit(fieldProps('enabled'), 'error', 'helperText')}
+          />
+        }
+        sx={{ mb: 2 }}
+        label="Enabled"
+      />
       <Box
         sx={{
           display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'flex-start',
+          flexWrap: 'wrap',
           gap: 2,
-          padding: 2,
+          mb: 2,
         }}
-        maxWidth={500}
-        component="form"
-        onSubmit={handleSubmit}
+        maxWidth={600}
       >
         <TextField
           name="labelKey"
           label="Label Key"
           disabled={saving || !isCreation}
           required
-          fullWidth
+          sx={{ width: 250 }}
           {...fieldProps('labelKey')}
         />
         <TextField
@@ -98,7 +128,7 @@ const CardStyleForm = ({ cardStyle, saved, label }: CardStyleFormProps) => {
           label="Base Label Value"
           disabled={saving}
           required
-          fullWidth
+          sx={{ width: 250 }}
           {...fieldProps('baseLabelValue')}
         />
         <FontSelect
@@ -106,7 +136,7 @@ const CardStyleForm = ({ cardStyle, saved, label }: CardStyleFormProps) => {
           label="Texts font family"
           disabled={saving}
           required
-          fullWidth
+          sx={{ width: 250 }}
           {...fieldProps('fontFamily')}
         />
         <TextField
@@ -115,7 +145,7 @@ const CardStyleForm = ({ cardStyle, saved, label }: CardStyleFormProps) => {
           label="Texts font size"
           disabled={saving}
           required
-          fullWidth
+          sx={{ width: 250 }}
           {...fieldProps('fontSize', { parse: intParser })}
         />
         <FontSelect
@@ -123,7 +153,7 @@ const CardStyleForm = ({ cardStyle, saved, label }: CardStyleFormProps) => {
           label="Titles font family"
           disabled={saving}
           required
-          fullWidth
+          sx={{ width: 250 }}
           {...fieldProps('titleFontFamily')}
         />
         <TextField
@@ -132,7 +162,7 @@ const CardStyleForm = ({ cardStyle, saved, label }: CardStyleFormProps) => {
           label="Titles font size"
           disabled={saving}
           required
-          fullWidth
+          sx={{ width: 250 }}
           {...fieldProps('titleFontSize', { parse: intParser })}
         />
         <TextField
@@ -141,7 +171,7 @@ const CardStyleForm = ({ cardStyle, saved, label }: CardStyleFormProps) => {
           label="Border Radius"
           disabled={saving}
           required
-          fullWidth
+          sx={{ width: 250 }}
           {...fieldProps('borderRadius', { parse: intParser })}
         />
         <TextField
@@ -150,7 +180,7 @@ const CardStyleForm = ({ cardStyle, saved, label }: CardStyleFormProps) => {
           label="Border Size"
           disabled={saving}
           required
-          fullWidth
+          sx={{ width: 250 }}
           {...fieldProps('borderWidth', { parse: intParser })}
         />
         <TextField
@@ -158,7 +188,7 @@ const CardStyleForm = ({ cardStyle, saved, label }: CardStyleFormProps) => {
           label="Border Color"
           disabled={saving}
           required
-          fullWidth
+          sx={{ width: 250 }}
           {...fieldProps('borderColor')}
         />
         <TextField
@@ -166,7 +196,7 @@ const CardStyleForm = ({ cardStyle, saved, label }: CardStyleFormProps) => {
           label="Button Color"
           disabled={saving}
           required
-          fullWidth
+          sx={{ width: 250 }}
           {...fieldProps('buttonColor')}
         />
         <TextField
@@ -175,7 +205,7 @@ const CardStyleForm = ({ cardStyle, saved, label }: CardStyleFormProps) => {
           label="Button Radius"
           disabled={saving}
           required
-          fullWidth
+          sx={{ width: 250 }}
           {...fieldProps('buttonRadius', { parse: intParser })}
         />
         <TextField
@@ -184,24 +214,15 @@ const CardStyleForm = ({ cardStyle, saved, label }: CardStyleFormProps) => {
           label="Gap"
           disabled={saving}
           required
-          fullWidth
+          sx={{ width: 250 }}
           {...fieldProps('gap', { parse: intParser })}
         />
-        <FormControlLabel
-          control={
-            <Switch
-              name="enabled"
-              checked={!!data.enabled}
-              disabled={saving}
-              {...omit(fieldProps('enabled'), 'error', 'helperText')}
-            />
-          }
-          label="Enabled"
-        />
+      </Box>
+      <div>
         <Button
           type="submit"
           variant="contained"
-          sx={{ mt: 3, mb: 2 }}
+          sx={{ mb: 2 }}
           disabled={saving}
         >
           Save
@@ -211,7 +232,7 @@ const CardStyleForm = ({ cardStyle, saved, label }: CardStyleFormProps) => {
             Something went wrong {error?.message}
           </Typography>
         )}
-      </Box>
+      </div>
       <Snackbar
         open={displaySaveSuccess}
         onClose={() => setDisplaySaveSuccess(false)}
@@ -219,7 +240,7 @@ const CardStyleForm = ({ cardStyle, saved, label }: CardStyleFormProps) => {
         message="CardStyle saved"
         anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
       />
-    </>
+    </Box>
   );
 };
 

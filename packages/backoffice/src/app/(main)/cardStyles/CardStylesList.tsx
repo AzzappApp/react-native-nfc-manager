@@ -1,17 +1,79 @@
 'use client';
-import { Box, Button, Typography } from '@mui/material';
+import { Search } from '@mui/icons-material';
+import {
+  Box,
+  Button,
+  Chip,
+  InputAdornment,
+  TextField,
+  Typography,
+} from '@mui/material';
 import { useRouter } from 'next/navigation';
+import {
+  useCallback,
+  useDeferredValue,
+  useEffect,
+  useState,
+  useTransition,
+} from 'react';
 import DataGrid from '#components/DataGrid';
+import type { SortColumn } from './page';
 import type { CardStyle } from '@azzapp/data';
-import type { GridColDef } from '@mui/x-data-grid';
+import type {
+  GridColDef,
+  GridPaginationModel,
+  GridSortModel,
+} from '@mui/x-data-grid';
 
 type CardStylesListProps = {
   cardStyles: CardStyle[];
+  count: number;
+  page: number;
   pageSize: number;
+  sortField: SortColumn;
+  sortOrder: 'asc' | 'desc';
+  search: string | null;
 };
 
-const CardStylesList = ({ cardStyles, pageSize }: CardStylesListProps) => {
+const CardStylesList = ({
+  cardStyles,
+  count,
+  page,
+  pageSize,
+  sortField,
+  sortOrder,
+  search,
+}: CardStylesListProps) => {
   const router = useRouter();
+  const [loading, startTransition] = useTransition();
+  const updateSearchParams = useCallback(
+    (page: number, sort: string, order: string, search: string | null) => {
+      startTransition(() => {
+        router.replace(
+          `/cardStyles?page=${page}&sort=${sort}&order=${order}&s=${search ?? ''}`,
+        );
+      });
+    },
+    [router, startTransition],
+  );
+
+  const onPageChange = (model: GridPaginationModel) => {
+    updateSearchParams(model.page + 1, sortField, sortOrder, search);
+  };
+
+  const onSortModelChange = (model: GridSortModel) => {
+    updateSearchParams(page, model[0].field, model[0].sort ?? 'asc', search);
+  };
+
+  const [currentSearch, setCurrentSearch] = useState(search ?? '');
+  const defferedSearch = useDeferredValue(currentSearch);
+
+  useEffect(() => {
+    if (search === defferedSearch) {
+      return;
+    }
+    updateSearchParams(1, sortField, sortOrder, defferedSearch);
+  }, [defferedSearch, page, search, sortField, sortOrder, updateSearchParams]);
 
   return (
     <Box
@@ -27,25 +89,52 @@ const CardStylesList = ({ cardStyles, pageSize }: CardStylesListProps) => {
       <Box
         sx={{
           display: 'flex',
-          justifyContent: 'flex-end',
+          justifyContent: 'space-between',
           mb: 2,
         }}
       >
-        <Button
-          variant="contained"
-          onClick={() => {
-            router.push('/cardStyles/add');
+        <TextField
+          margin="normal"
+          name="search"
+          label="Search"
+          type="text"
+          onChange={e => setCurrentSearch(e.target.value)}
+          value={currentSearch}
+          sx={{ mb: 2, width: 500 }}
+          InputProps={{
+            startAdornment: (
+              <InputAdornment position="start">
+                <Search />
+              </InputAdornment>
+            ),
           }}
-        >
-          NEW STYLE
-        </Button>
+        />
+        <Box display="flex" alignItems="center">
+          <Button
+            variant="contained"
+            onClick={() => {
+              router.push('/cardStyles/add');
+            }}
+          >
+            NEW STYLE
+          </Button>
+        </Box>
       </Box>
       <DataGrid
         columns={columns}
         rows={cardStyles}
-        pageSizeOptions={[pageSize]}
-        rowSelection={false}
-        sortingOrder={['asc', 'desc']}
+        rowCount={count}
+        initialState={{
+          pagination: {
+            paginationModel: { pageSize, page: page - 1 },
+          },
+        }}
+        sortModel={[
+          {
+            field: sortField,
+            sort: sortOrder,
+          },
+        ]}
         onRowClick={params => {
           router.push(`/cardStyles/${params.id}`);
         }}
@@ -54,6 +143,14 @@ const CardStylesList = ({ cardStyles, pageSize }: CardStylesListProps) => {
             cursor: 'pointer',
           },
         }}
+        paginationMode="server"
+        sortingMode="server"
+        onPaginationModelChange={onPageChange}
+        onSortModelChange={onSortModelChange}
+        loading={loading}
+        pageSizeOptions={[pageSize]}
+        rowSelection={false}
+        sortingOrder={['asc', 'desc']}
       />
     </Box>
   );
@@ -66,25 +163,16 @@ const columns: GridColDef[] = [
     flex: 1,
   },
   {
-    field: 'fontFamily',
-    headerName: 'Font Falimy',
-    flex: 1,
-  },
-  {
-    field: 'titleFontFamily',
-    headerName: 'Title Font Family',
-    flex: 1,
-  },
-  {
-    field: 'buttonColor',
-    headerName: 'Button Color',
-    flex: 1,
-  },
-  {
     field: 'enabled',
-    headerName: 'Inscription date',
+    headerName: 'Status',
     type: 'boolean',
-    width: 100,
+    flex: 1,
+    renderCell: params => (
+      <Chip
+        color={params.value ? 'warning' : 'default'}
+        label={params.value ? 'Enabled' : 'Disabled'}
+      />
+    ),
   },
 ];
 
