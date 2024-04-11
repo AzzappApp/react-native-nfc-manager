@@ -11,7 +11,7 @@ import {
   Chip,
   Box,
 } from '@mui/material';
-import { and, eq, sql } from 'drizzle-orm';
+import { and, desc, eq, sql } from 'drizzle-orm';
 import Link from 'next/link';
 import {
   PostCommentTable,
@@ -125,6 +125,7 @@ const ReportPage = async ({
       ),
     )
     .offset((page - 1) * PAGE_SIZE)
+    .orderBy(desc(ReportTable.createdAt))
     .limit(PAGE_SIZE);
 
   const [reportCount] = await db
@@ -278,7 +279,7 @@ const ReportPage = async ({
                 color="primary"
                 startIcon={<Check />}
                 type="submit"
-                disabled={deleted}
+                disabled={deleted || status === 'Closed'}
               >
                 IGNORE
               </Button>

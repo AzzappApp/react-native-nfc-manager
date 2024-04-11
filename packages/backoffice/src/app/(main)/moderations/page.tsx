@@ -53,7 +53,7 @@ const getReportsQuery = () => {
         .mapWith(Date)
         .as('treatedAt'),
       status:
-        sql`(ISNULL(MAX(${ReportTable.treatedAt})) OR DATEDIFF(MAX(${ReportTable.treatedAt}), MAX(${ReportTable.createdAt})) < 0)`
+        sql`(ISNULL(MAX(${ReportTable.treatedAt})) OR MAX(${ReportTable.treatedAt}) < MAX(${ReportTable.createdAt}))`
           .mapWith(Number)
           .as('status'),
     })
