@@ -1,6 +1,15 @@
 'use client';
 
-import { Box, Button, Snackbar, TextField, Typography } from '@mui/material';
+import { People } from '@mui/icons-material';
+import {
+  Box,
+  Breadcrumbs,
+  Button,
+  Link,
+  Snackbar,
+  TextField,
+  Typography,
+} from '@mui/material';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { useForm } from '#helpers/formHelpers';
@@ -77,61 +86,79 @@ const CompanyActivityForm = ({
   };
 
   return (
-    <>
-      <Typography variant="h4" component="h1" sx={{ mb: 10 }}>
+    <Box
+      sx={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'flex-start',
+        gap: 2,
+      }}
+      component="form"
+      onSubmit={handleSubmit}
+    >
+      <Breadcrumbs aria-label="breadcrumb">
+        <Link
+          underline="hover"
+          sx={{ display: 'flex', alignItems: 'center' }}
+          color="inherit"
+          href="/companyActivities"
+        >
+          <People sx={{ mr: 0.5 }} fontSize="inherit" />
+          Activities
+        </Link>
+      </Breadcrumbs>
+      <Typography variant="h4" component="h1" sx={{ mb: 2 }}>
         {companyActivity
-          ? `Company activity ${label?.baseLabelValue} - ${companyActivity.id}`
+          ? `Company activity ${label?.baseLabelValue}`
           : 'New Company Activity'}
       </Typography>
 
       <Box
         sx={{
           display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'flex-start',
+          flexWrap: 'wrap',
           gap: 2,
-          padding: 2,
+          width: '100%',
+          mb: 2,
         }}
-        maxWidth={500}
-        component="form"
-        onSubmit={handleSubmit}
       >
         <TextField
           name="labelKey"
           label="Label Key"
           disabled={saving || !isCreation}
           required
-          fullWidth
+          sx={{ flex: 1, minWidth: 200 }}
           {...fieldProps('labelKey')}
         />
         <TextField
           name="baseLabelValue"
           label="Label base value"
           required
-          fullWidth
+          sx={{ flex: 1, minWidth: 200 }}
           {...fieldProps('baseLabelValue')}
         />
-        <WebCardTemplateTypeListInput
-          label="Webcard template type"
-          name="cardTemplateType"
-          options={cardTemplateTypes}
-          cardTemplateTypesLabels={cardTemplateTypesLabels}
-          {...fieldProps('cardTemplateType')}
-        />
-        <Button
-          type="submit"
-          variant="contained"
-          sx={{ mt: 3, mb: 2 }}
-          disabled={saving}
-        >
-          Save
-        </Button>
-        {error && (
-          <Typography variant="body1" color="error">
-            Something went wrong {error?.message}
-          </Typography>
-        )}
       </Box>
+      <WebCardTemplateTypeListInput
+        label="Webcard template type"
+        name="cardTemplateType"
+        options={cardTemplateTypes}
+        cardTemplateTypesLabels={cardTemplateTypesLabels}
+        sx={{ flex: 1, minWidth: 200 }}
+        {...fieldProps('cardTemplateType')}
+      />
+      <Button
+        type="submit"
+        variant="contained"
+        sx={{ mt: 3, mb: 2 }}
+        disabled={saving}
+      >
+        Save
+      </Button>
+      {error && (
+        <Typography variant="body1" color="error">
+          Something went wrong {error?.message}
+        </Typography>
+      )}
       <Snackbar
         open={displaySaveSuccess}
         onClose={() => setDisplaySaveSuccess(false)}
@@ -139,7 +166,7 @@ const CompanyActivityForm = ({
         message="Company Activity saved"
         anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
       />
-    </>
+    </Box>
   );
 };
 

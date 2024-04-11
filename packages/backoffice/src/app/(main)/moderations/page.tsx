@@ -38,6 +38,7 @@ const sortsColumns = {
   reportCount: sql`reportCount`,
   latestReport: sql`latestReport`,
   treatedAt: sql`treatedAt`,
+  status: sql`status`,
 };
 
 const getReportsQuery = () => {
@@ -86,12 +87,7 @@ const getFilteredReports = (
   return query;
 };
 
-const countReports = async (
-  page: number,
-  sort: 'latestReport' | 'targetId' | 'targetType',
-  order: 'asc' | 'desc',
-  filters: Filters,
-) => {
+const countReports = async (filters: Filters) => {
   const subQuery = getReportsQuery();
   const query = db
     .select({ count: sql`count(*)`.mapWith(Number) })
@@ -130,7 +126,7 @@ const ModerationsPage = async ({ searchParams = {} }: ModerationsPageProps) => {
     ...report,
     status: report.status ? 'Opened' : 'Closed',
   }));
-  const count = await countReports(page - 1, sort, order, filters);
+  const count = await countReports(filters);
 
   return (
     <ReportsList

@@ -1,4 +1,4 @@
-import { Check } from '@mui/icons-material';
+import { AccountCircle, Check } from '@mui/icons-material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import {
   Typography,
@@ -10,6 +10,8 @@ import {
   Alert,
   Chip,
   Box,
+  Link as MuiLink,
+  Breadcrumbs,
 } from '@mui/material';
 import { and, desc, eq, sql } from 'drizzle-orm';
 import Link from 'next/link';
@@ -149,6 +151,17 @@ const ReportPage = async ({
 
   return (
     <div>
+      <Breadcrumbs aria-label="breadcrumb" sx={{ mb: 2 }}>
+        <MuiLink
+          underline="hover"
+          sx={{ display: 'flex', alignItems: 'center' }}
+          color="inherit"
+          href="/moderations"
+        >
+          <AccountCircle sx={{ mr: 0.5 }} fontSize="inherit" />
+          Users
+        </MuiLink>
+      </Breadcrumbs>
       {deleted && (
         <Alert variant="filled" severity="warning" sx={{ mb: 5 }}>
           This item has been removed

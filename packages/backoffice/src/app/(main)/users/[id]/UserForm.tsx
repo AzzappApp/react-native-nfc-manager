@@ -1,5 +1,6 @@
 'use client';
 
+import { AccountCircle } from '@mui/icons-material';
 import {
   Box,
   TextField,
@@ -7,6 +8,8 @@ import {
   Checkbox,
   FormControlLabel,
   Card,
+  Breadcrumbs,
+  Link,
 } from '@mui/material';
 import { useTransition } from 'react';
 import * as ROLES from '#roles';
@@ -29,6 +32,18 @@ const UserForm = ({ user, webCards }: UserFormProps) => {
 
   return (
     <Box display="flex" flexDirection="column">
+      <Breadcrumbs aria-label="breadcrumb" sx={{ mb: 2 }}>
+        <Link
+          underline="hover"
+          sx={{ display: 'flex', alignItems: 'center' }}
+          color="inherit"
+          href="/users"
+        >
+          <AccountCircle sx={{ mr: 0.5 }} fontSize="inherit" />
+          Users
+        </Link>
+      </Breadcrumbs>
+
       <Typography variant="h4" component="h1" sx={{ mb: 10 }}>
         User {user.id}
       </Typography>

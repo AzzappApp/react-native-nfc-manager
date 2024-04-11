@@ -1,5 +1,6 @@
 'use client';
 
+import { People } from '@mui/icons-material';
 import {
   Box,
   Button,
@@ -15,6 +16,8 @@ import {
   Dialog,
   DialogContent,
   Snackbar,
+  Breadcrumbs,
+  Link,
 } from '@mui/material';
 import { omit } from 'lodash';
 import { useRouter } from 'next/navigation';
@@ -174,6 +177,17 @@ const WebCardCategoryForm = ({
 
   return (
     <>
+      <Breadcrumbs aria-label="breadcrumb">
+        <Link
+          underline="hover"
+          sx={{ display: 'flex', alignItems: 'center' }}
+          color="inherit"
+          href="/webCardCategories"
+        >
+          <People sx={{ mr: 0.5 }} fontSize="inherit" />
+          Categories
+        </Link>
+      </Breadcrumbs>
       <Typography variant="h4" component="h1">
         {webCardCategory ? label?.baseLabelValue : 'New WebCardCategory'}
       </Typography>

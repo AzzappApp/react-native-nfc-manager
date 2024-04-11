@@ -41,8 +41,11 @@ const ModerationsList = ({
 }: ModerationListProps) => {
   const router = useRouter();
   const [loading, startTransition] = useTransition();
+  const [statusFilter, setStatusFilter] = useState(filters.status);
+  const [kindFilter, setKindFilter] = useState(filters.kind);
+
   const updateSearchParams = useCallback(
-    (page: number, sort: string, order: string, filters?: Filters) => {
+    (page: number, sort: string, order: string, filters: Filters) => {
       startTransition(() => {
         router.replace(
           `/moderations?page=${page}&sort=${sort}&order=${order}&status=${filters?.status ?? ''}&kind=${filters?.kind ?? ''}`,
@@ -52,16 +55,25 @@ const ModerationsList = ({
     [router, startTransition],
   );
 
-  const onPageChange = (model: GridPaginationModel) => {
-    updateSearchParams(model.page + 1, sortField, sortOrder);
-  };
+  const onPageChange = useCallback(
+    (model: GridPaginationModel) => {
+      updateSearchParams(model.page + 1, sortField, sortOrder, {
+        status: statusFilter,
+        kind: kindFilter,
+      });
+    },
+    [kindFilter, sortField, sortOrder, statusFilter, updateSearchParams],
+  );
 
-  const onSortModelChange = (model: GridSortModel) => {
-    updateSearchParams(page, model[0].field, model[0].sort ?? 'asc');
-  };
-
-  const [statusFilter, setStatusFilter] = useState(filters.status);
-  const [kindFilter, setKindFilter] = useState(filters.kind);
+  const onSortModelChange = useCallback(
+    (model: GridSortModel) => {
+      updateSearchParams(page, model[0].field, model[0].sort ?? 'asc', {
+        status: statusFilter,
+        kind: kindFilter,
+      });
+    },
+    [kindFilter, page, statusFilter, updateSearchParams],
+  );
 
   const onStatusChange = useCallback(
     (event: SelectChangeEvent) => {
