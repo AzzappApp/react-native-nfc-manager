@@ -1,4 +1,4 @@
-## 0.5.5-canary.212
+## 0.5.5-canary.213
 
 * **fix:**  - **moderation:** [#3240](https://github.com/AzzappApp/azzapp/pull/3240) wrong revalidation call
 * **fix:**  - **moderation:** [#3240](https://github.com/AzzappApp/azzapp/pull/3240) wrong revalidation call
