@@ -1,5 +1,7 @@
-## 0.5.5-canary.215
+## 0.5.5-canary.216
 
+* **fix:**  - **moderation:** [#3258](https://github.com/AzzappApp/azzapp/pull/3258) await for update ([#3260](https://github.com/AzzappApp/azzapp/pull/3260))
+* **fix:**  - webcard counter update ([#3259](https://github.com/AzzappApp/azzapp/pull/3259))
 * **fix:**  - **moderation:** [#3236](https://github.com/AzzappApp/azzapp/pull/3236) update counters and don’t display removed posts ([#3249](https://github.com/AzzappApp/azzapp/pull/3249))
 * **fix:**  - **moderation:** [#3240](https://github.com/AzzappApp/azzapp/pull/3240) wrong revalidation call
 * **fix:**  - **moderation:** [#3240](https://github.com/AzzappApp/azzapp/pull/3240) wrong revalidation call
