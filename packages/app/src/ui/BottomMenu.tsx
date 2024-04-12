@@ -5,7 +5,7 @@
  * https://www.figma.com/file/fmJgyUlpDU8G77GqH9H4rE/STYLE-GUIDE?node-id=3-344&t=xIPXRnOW3B8NjRW4-0
  *
  * **/
-import React, { cloneElement } from 'react';
+import React, { cloneElement, useCallback } from 'react';
 import { View } from 'react-native';
 import { shadow, colors, fontFamilies } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
@@ -171,7 +171,10 @@ const BottomMenuItemRenderer = ({
   }
   const styles = useStyleSheet(styleSheet);
 
-  const onPress = () => onItemPress?.(tabKey);
+  const onPress = useCallback(
+    () => onItemPress?.(tabKey),
+    [onItemPress, tabKey],
+  );
 
   const shouldNotTint = tint === false || (tint === 'unactive' && isSelected);
 

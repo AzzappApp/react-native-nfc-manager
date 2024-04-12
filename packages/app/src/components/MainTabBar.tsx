@@ -1,4 +1,10 @@
-import { useEffect, useLayoutEffect, useMemo, useState } from 'react';
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useState,
+} from 'react';
 import { useIntl } from 'react-intl';
 import {
   useWindowDimensions,
@@ -116,25 +122,30 @@ const MainTabBar = ({
     };
   }, [visibilityState]);
 
-  const onItemPress = (key: string) => {
-    const hasFinishedTransition =
-      visibilityState === true ||
-      (visibilityState as SharedValue<number>)?.value === 1;
+  const intl = useIntl();
 
-    if (!hasFinishedTransition) return;
+  const onItemPress = useCallback(
+    (key: string) => {
+      const hasFinishedTransition =
+        visibilityState === true ||
+        (visibilityState as SharedValue<number>)?.value !== 0;
 
-    if (key !== 'NEW_POST' || isEditor(profileInfos?.profileRole)) {
-      router.push({ route: key as any });
-    } else {
-      Toast.show({
-        type: 'error',
-        text1: intl.formatMessage({
-          defaultMessage: 'Only admins & editors can create a post',
-          description: 'Error message when trying to create a post',
-        }),
-      });
-    }
-  };
+      if (!hasFinishedTransition) return;
+
+      if (key !== 'NEW_POST' || isEditor(profileInfos?.profileRole)) {
+        router.push({ route: key as any });
+      } else {
+        Toast.show({
+          type: 'error',
+          text1: intl.formatMessage({
+            defaultMessage: 'Only admins & editors can create a post',
+            description: 'Error message when trying to create a post',
+          }),
+        });
+      }
+    },
+    [intl, profileInfos?.profileRole, router, visibilityState],
+  );
 
   useEffect(() => {
     const listener = () => {
@@ -145,8 +156,6 @@ const MainTabBar = ({
       mainTabBarVisibleListeners.delete(listener);
     };
   }, []);
-
-  const intl = useIntl();
 
   const tabs = useMemo(
     () =>
