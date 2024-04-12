@@ -1,9 +1,12 @@
 'use client';
 
+import { PhoneIphone } from '@mui/icons-material';
 import {
   Box,
+  Breadcrumbs,
   Button,
   FormControlLabel,
+  Link,
   Snackbar,
   Switch,
   Typography,
@@ -68,26 +71,45 @@ const ColorPaletteForm = ({
 
   return (
     <>
-      <Typography variant="h4" component="h1" sx={{ mb: 10 }}>
-        {colorPalette ? `ColorPalette ${colorPalette.id}` : 'New ColorPalette'}
+      <Breadcrumbs aria-label="breadcrumb" sx={{ mb: 2 }}>
+        <Link
+          underline="hover"
+          sx={{ display: 'flex', alignItems: 'center' }}
+          color="inherit"
+          href="/colorPalettes"
+        >
+          <PhoneIphone sx={{ mr: 0.5 }} fontSize="inherit" />
+          Colors
+        </Link>
+      </Breadcrumbs>
+
+      <Typography variant="h4" component="h1" sx={{ mb: 2 }}>
+        {colorPalette ? colorPalette.id : 'New ColorPalette'}
       </Typography>
-      {error && (
-        <Typography variant="body1" color="error">
-          Something went wrong {error?.message}
-        </Typography>
-      )}
+
       <Box
         sx={{
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'flex-start',
           gap: 2,
-          padding: 2,
         }}
         maxWidth={500}
         component="form"
         onSubmit={handleSubmit}
       >
+        <FormControlLabel
+          control={
+            <Switch
+              name="enabled"
+              checked={!!data.enabled}
+              disabled={saving}
+              {...omit(fieldProps('enabled'), 'error', 'helperText')}
+            />
+          }
+          label="Enabled"
+        />
+
         <ColorInput
           name="primary"
           label="Primary color"
@@ -109,17 +131,6 @@ const ColorPaletteForm = ({
           disabled={saving}
           {...fieldProps('light')}
         />
-        <FormControlLabel
-          control={
-            <Switch
-              name="enabled"
-              checked={!!data.enabled}
-              disabled={saving}
-              {...omit(fieldProps('enabled'), 'error', 'helperText')}
-            />
-          }
-          label="Enabled"
-        />
 
         <Button
           type="submit"
@@ -129,6 +140,11 @@ const ColorPaletteForm = ({
         >
           Save
         </Button>
+        {error && (
+          <Typography variant="body1" color="error">
+            Something went wrong {error?.message}
+          </Typography>
+        )}
       </Box>
       <Snackbar
         open={displaySaveSuccess}
