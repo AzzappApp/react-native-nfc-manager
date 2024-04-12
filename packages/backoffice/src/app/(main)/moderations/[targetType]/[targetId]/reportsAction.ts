@@ -140,7 +140,7 @@ export const deleteRelatedItem = async (
                 .from(WebCardTable)
                 .where(eq(WebCardTable.id, post[0].webCardId));
 
-              trx
+              await trx
                 .update(WebCardTable)
                 .set({
                   nbPosts: sql`GREATEST(nbPosts - 1, 0)`,
