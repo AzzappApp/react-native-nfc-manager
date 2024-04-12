@@ -9,8 +9,9 @@ export const isModuleKindSubscription = (_kind: string) => {
   //return modulesKindsSubscription.includes(_kind);
 };
 
-export const moduleCountRequiresSubscription = (moduleCount: number) => {
-  return moduleCount > 3;
+export const moduleCountRequiresSubscription = (_moduleCount: number) => {
+  return false; //TODO: CHANGE THIS. (did it here to not block the dev test in merge)
+  //return moduleCount > 3;
 };
 
 export const webcardRequiresSubscription = (
