@@ -95,7 +95,12 @@ export const Profile: ProfileResolvers = {
       await db
         .select()
         .from(WebCardTable)
-        .where(eq(WebCardTable.cardIsPublished, true))
+        .where(
+          and(
+            eq(WebCardTable.cardIsPublished, true),
+            eq(WebCardTable.deleted, false),
+          ),
+        )
         .orderBy(desc(WebCardTable.createdAt)),
       args,
     );
@@ -111,6 +116,7 @@ export const Profile: ProfileResolvers = {
           and(
             eq(PostTable.webCardId, WebCardTable.id),
             eq(WebCardTable.cardIsPublished, true),
+            eq(PostTable.deleted, false),
           ),
         )
         .orderBy(desc(PostTable.createdAt))
@@ -144,6 +150,7 @@ export const Profile: ProfileResolvers = {
         and(
           like(PostTable.content, `%${args.search}%`),
           eq(WebCardTable.cardIsPublished, true),
+          eq(PostTable.deleted, false),
         ),
       );
 
@@ -165,6 +172,7 @@ export const Profile: ProfileResolvers = {
         .where(
           and(
             eq(WebCardTable.cardIsPublished, true),
+            eq(PostTable.deleted, false),
             like(WebCardTable.userName, `%${args.search}%`),
           ),
         ),

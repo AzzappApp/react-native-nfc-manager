@@ -1,4 +1,4 @@
-import { eq } from 'drizzle-orm';
+import { eq, and } from 'drizzle-orm';
 import { connectionFromArray } from 'graphql-relay';
 import {
   db,
@@ -86,7 +86,12 @@ export const Post: PostResolvers = {
         .select()
         .from(PostTable)
         .innerJoin(WebCardTable, eq(WebCardTable.id, PostTable.webCardId))
-        .where(eq(WebCardTable.cardIsPublished, true))
+        .where(
+          and(
+            eq(WebCardTable.cardIsPublished, true),
+            eq(PostTable.deleted, false),
+          ),
+        )
         .then(results => results.map(result => result.Post)),
       args,
     );

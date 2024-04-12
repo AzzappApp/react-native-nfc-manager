@@ -33,7 +33,7 @@ export const ignoreReport = async (
         ),
       );
   }
-  revalidatePath('/reports/[targetType]/[targetId]');
+  revalidatePath(`/reports/${targetType}/${targetId}`);
 };
 
 export const deleteRelatedItem = async (
@@ -139,6 +139,22 @@ export const deleteRelatedItem = async (
                 .select()
                 .from(WebCardTable)
                 .where(eq(WebCardTable.id, post[0].webCardId));
+
+              trx.update(WebCardTable).set({
+                nbPosts: sql`GREATEST(nbPosts - 1, 0)`,
+              });
+
+              await trx
+                .update(WebCardTable)
+                .set({
+                  nbPostsLiked: sql`GREATEST(nbPostsLiked - 1, 0)`,
+                })
+                .where(
+                  inArray(
+                    WebCardTable.id,
+                    sql`(select webCardId from PostReaction where postId = ${targetId})`,
+                  ),
+                );
 
               await fetch(
                 `${process.env.NEXT_PUBLIC_API_ENDPOINT}/revalidate`,
