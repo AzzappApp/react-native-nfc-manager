@@ -1,5 +1,6 @@
-## 0.5.5-canary.216
+## 0.5.5-canary.217
 
+* **fix:**  - **webCard:** [#3254](https://github.com/AzzappApp/azzapp/pull/3254) remove temporary check on subscription ([#3262](https://github.com/AzzappApp/azzapp/pull/3262))
 * **fix:**  - **moderation:** [#3258](https://github.com/AzzappApp/azzapp/pull/3258) await for update ([#3260](https://github.com/AzzappApp/azzapp/pull/3260))
 * **fix:**  - webcard counter update ([#3259](https://github.com/AzzappApp/azzapp/pull/3259))
 * **fix:**  - **moderation:** [#3236](https://github.com/AzzappApp/azzapp/pull/3236) update counters and don’t display removed posts ([#3249](https://github.com/AzzappApp/azzapp/pull/3249))
