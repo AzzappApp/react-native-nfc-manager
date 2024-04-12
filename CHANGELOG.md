@@ -1,5 +1,7 @@
-## 0.5.5-canary.217
+## 0.5.5-canary.218
 
+* **fix:**  - **webCard:** remove temporary constraint on module count
+* **fix:**  - **android:** [#3261](https://github.com/AzzappApp/azzapp/pull/3261) unresponsive bottom menu due to approximated value ([#3265](https://github.com/AzzappApp/azzapp/pull/3265))
 * **fix:**  - **webCard:** [#3254](https://github.com/AzzappApp/azzapp/pull/3254) remove temporary check on subscription ([#3262](https://github.com/AzzappApp/azzapp/pull/3262))
 * **fix:**  - **moderation:** [#3258](https://github.com/AzzappApp/azzapp/pull/3258) await for update ([#3260](https://github.com/AzzappApp/azzapp/pull/3260))
 * **fix:**  - webcard counter update ([#3259](https://github.com/AzzappApp/azzapp/pull/3259))
