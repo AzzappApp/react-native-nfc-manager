@@ -1,5 +1,6 @@
-## 0.5.5-canary.214
+## 0.5.5-canary.215
 
+* **fix:**  - **moderation:** [#3236](https://github.com/AzzappApp/azzapp/pull/3236) update counters and don’t display removed posts ([#3249](https://github.com/AzzappApp/azzapp/pull/3249))
 * **fix:**  - **moderation:** [#3240](https://github.com/AzzappApp/azzapp/pull/3240) wrong revalidation call
 * **fix:**  - **moderation:** [#3240](https://github.com/AzzappApp/azzapp/pull/3240) wrong revalidation call
 * **fix:**  - **moderation:** ensure path are revalidate and filter correctly data ([#3241](https://github.com/AzzappApp/azzapp/pull/3241))
