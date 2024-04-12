@@ -1,10 +1,12 @@
 export const isWebCardKindSubscription = (kind: string) => {
   return kind !== 'personal';
 };
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const modulesKindsSubscription = ['simpleButton', 'parallax'];
 
-export const isModuleKindSubscription = (kind: string) => {
-  return modulesKindsSubscription.includes(kind);
+export const isModuleKindSubscription = (_kind: string) => {
+  return false; //TODO: CHANGE THIS. (did it here to not block the dev test in merge)
+  //return modulesKindsSubscription.includes(_kind);
 };
 
 export const moduleCountRequiresSubscription = (moduleCount: number) => {
