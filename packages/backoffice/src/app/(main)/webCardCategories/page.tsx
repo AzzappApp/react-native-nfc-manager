@@ -16,7 +16,7 @@ export type Filters = {
 
 const getFilters = (filters: Filters): SQLWrapper[] => {
   const f: SQLWrapper[] = [];
-  if (filters.enabled) {
+  if (filters.enabled && filters.enabled !== 'all') {
     f.push(eq(WebCardCategoryTable.enabled, filters.enabled === 'true'));
   }
 
@@ -88,7 +88,7 @@ const ProfileCategoriesPage = async ({ searchParams = {} }: Props) => {
   const order = searchParams.order === 'desc' ? 'desc' : 'asc';
   const search = searchParams.s ?? null;
   const filters: Filters = {
-    enabled: searchParams.status ?? null,
+    enabled: searchParams.status ?? 'all',
   };
 
   const webCardCategories = await getCategories(

@@ -3,6 +3,7 @@ import { IconButton, Box, Button, Typography } from '@mui/material';
 import { useEffect, useState } from 'react';
 import { getImageURL, getVideoURL } from '@azzapp/shared/imagesHelpers';
 import type { BoxProps } from '@mui/material';
+import type { Variant } from '@mui/material/styles/createTypography';
 import type { ChangeEvent } from 'react';
 
 type MediasListInputProps = Omit<BoxProps, 'onChange'> & {
@@ -10,6 +11,7 @@ type MediasListInputProps = Omit<BoxProps, 'onChange'> & {
   label: string;
   value: File | { kind: 'image' | 'video'; id: string } | null | undefined;
   kind: 'image' | 'video';
+  titleVariant?: Variant;
   error?: boolean | null;
   helperText?: string | null;
   onChange: (media: File | null | undefined) => void;
@@ -23,6 +25,7 @@ const MediaInput = ({
   kind,
   helperText,
   onChange,
+  titleVariant = 'h6',
   ...props
 }: MediasListInputProps) => {
   const handleImageUpload = (event: ChangeEvent<HTMLInputElement>) => {
@@ -59,9 +62,11 @@ const MediaInput = ({
 
   return (
     <Box {...props}>
-      <Typography variant="h6">{label}</Typography>
+      <Typography variant={titleVariant} mb={2}>
+        {label}
+      </Typography>
       {error && <Typography color="error">{helperText}</Typography>}
-      <Box style={{ position: 'relative' }}>
+      <Box style={{ position: 'relative' }} mb={2}>
         {kind === 'video' ? (
           <video src={src!} style={{ maxWidth: 120 }} />
         ) : (

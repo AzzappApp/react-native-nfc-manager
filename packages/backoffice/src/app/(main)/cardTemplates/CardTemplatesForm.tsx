@@ -1,7 +1,9 @@
 'use client';
 
+import { PhoneIphone } from '@mui/icons-material';
 import {
   Box,
+  Breadcrumbs,
   Button,
   Dialog,
   DialogContent,
@@ -15,9 +17,9 @@ import {
   Switch,
   TextField,
   Typography,
+  Link,
 } from '@mui/material';
 import { omit } from 'lodash';
-import Link from 'next/link';
 import { useState, useTransition } from 'react';
 import { encodeMediaId } from '@azzapp/shared/imagesHelpers';
 import { uploadMedia } from '@azzapp/shared/WebAPI';
@@ -179,10 +181,19 @@ const CardTemplateForm = ({
 
   return (
     <div>
+      <Breadcrumbs aria-label="breadcrumb" sx={{ mb: 2 }}>
+        <Link
+          underline="hover"
+          sx={{ display: 'flex', alignItems: 'center' }}
+          color="inherit"
+          href="/cardTemplates"
+        >
+          <PhoneIphone sx={{ mr: 0.5 }} fontSize="inherit" />
+          WebCards templates
+        </Link>
+      </Breadcrumbs>
       <Typography variant="h4" component="h1" sx={{ mb: 2 }}>
-        {cardTemplate
-          ? `CardTemplate : ${label?.baseLabelValue}`
-          : 'New CardTemplate'}
+        {cardTemplate ? label?.baseLabelValue : 'New CardTemplate'}
       </Typography>
       <Box
         sx={{
@@ -192,31 +203,63 @@ const CardTemplateForm = ({
           gap: 2,
           padding: 2,
         }}
-        maxWidth={500}
         component="form"
         onSubmit={handleFetchModules}
       >
-        <Typography variant="h6" component="h6">
-          Modules{' '}
-          {data.modules && (
-            <Link
-              target="_blank"
-              href={`${process.env.NEXT_PUBLIC_FRONTEND}/${webCardUserName}`}
-            >
-              ({data.modules.length})
-            </Link>
-          )}
+        <Box display="flex" gap={2}>
+          <FormControlLabel
+            control={
+              <Switch
+                name="businessEnabled"
+                checked={!!data.businessEnabled}
+                disabled={saving}
+                {...omit(
+                  fieldProps('businessEnabled', {
+                    format: value => value ?? null,
+                  }),
+                  'error',
+                  'helperText',
+                )}
+              />
+            }
+            label="Business Enabled"
+          />
+          <FormControlLabel
+            control={
+              <Switch
+                name="personalEnabled"
+                checked={!!data.personalEnabled}
+                disabled={saving}
+                {...omit(
+                  fieldProps('personalEnabled', {
+                    format: value => value ?? null,
+                  }),
+                  'error',
+                  'helperText',
+                )}
+              />
+            }
+            label="Personal Enabled"
+          />
+        </Box>
+        <Typography variant="body1" component="h6">
+          Load from WebCard ...
         </Typography>
-        <TextField
-          name="baseProfileUserName"
-          label="WebCard name"
-          required
-          fullWidth
-          onChange={e => setWebCardUserName(e.target.value)}
-        />
-        <Button type="submit" variant="contained">
-          Load
-        </Button>
+        <Box display="flex" gap={2}>
+          <TextField
+            name="baseProfileUserName"
+            label="WebCard name"
+            required
+            fullWidth
+            onChange={e => setWebCardUserName(e.target.value)}
+          />
+          <Box display="flex" alignItems="center">
+            <Button type="submit" variant="contained">
+              Load
+            </Button>
+          </Box>
+        </Box>
+
         {formErrors?.fieldErrors.modules && (
           <Typography variant="body1" color="error">
             Missing modules
@@ -236,56 +279,73 @@ const CardTemplateForm = ({
           gap: 2,
           padding: 2,
         }}
-        maxWidth={500}
+        maxWidth={600}
         component="form"
         onSubmit={handleSubmit}
       >
-        <Typography variant="h6" component="h6">
-          General
+        <Typography variant="body1" component="h6">
+          Informations
         </Typography>
-        <TextField
-          name="labelKey"
-          label="Label key"
-          disabled={saving || !isCreation}
-          required
-          fullWidth
-          {...fields.labelKey}
-        />
-        <TextField
-          name="baseLabelValue"
-          label="Label default value"
-          required
-          fullWidth
-          {...fields.baseLabelValue}
-        />
-        <WebCardTemplateTypeListInput
-          label="Webcard template type"
-          name="cardTemplateType"
-          options={cardTemplateTypes}
-          cardTemplateTypesLabels={labels}
-          {...fieldProps('cardTemplateType')}
-        />
-        <FormControl fullWidth error={fields.cardStyle.error}>
-          <InputLabel id="cardStyle-label">Card Style</InputLabel>
-          <Select
-            labelId={'cardStyle-label'}
-            id="cardStyle"
-            name="cardStyle"
-            value={fields.cardStyle.value}
-            label="Card Style"
-            onChange={fields.cardStyle.onChange as any}
+        <Box display="flex" gap={2} flexWrap="wrap">
+          <TextField
+            name="labelKey"
+            label="Label key"
+            disabled={saving || !isCreation}
+            required
+            sx={{ width: 250 }}
+            {...fields.labelKey}
+          />
+          <TextField
+            name="baseLabelValue"
+            label="Label default value"
+            required
+            sx={{ width: 250 }}
+            {...fields.baseLabelValue}
+          />
+          <WebCardTemplateTypeListInput
+            label="Webcard template type"
+            name="cardTemplateType"
+            options={cardTemplateTypes}
+            cardTemplateTypesLabels={labels}
+            sx={{ width: 250 }}
+            {...fieldProps('cardTemplateType')}
+          />
+          {
+            <TextField
+              name="modules"
+              label="Modules"
+              disabled
+              sx={{ width: 250 }}
+              value={data.modules?.length || 0}
+            />
+          }
+          <FormControl
+            fullWidth
+            error={fields.cardStyle.error}
+            sx={{ width: 250 }}
           >
-            {cardStyles.map(cardStyle => (
-              <MenuItem key={cardStyle.id} value={cardStyle.id}>
-                {labels.find(label => label.labelKey === cardStyle.labelKey)
-                  ?.baseLabelValue ?? cardStyle.labelKey}
-              </MenuItem>
-            ))}
-          </Select>
-          <FormHelperText>{fields.cardStyle.helperText}</FormHelperText>
-        </FormControl>
+            <InputLabel id="cardStyle-label">Card Style</InputLabel>
+            <Select
+              labelId={'cardStyle-label'}
+              id="cardStyle"
+              name="cardStyle"
+              value={fields.cardStyle.value}
+              label="Card Style"
+              onChange={fields.cardStyle.onChange as any}
+            >
+              {cardStyles.map(cardStyle => (
+                <MenuItem key={cardStyle.id} value={cardStyle.id}>
+                  {labels.find(label => label.labelKey === cardStyle.labelKey)
+                    ?.baseLabelValue ?? cardStyle.labelKey}
+                </MenuItem>
+              ))}
+            </Select>
+            <FormHelperText>{fields.cardStyle.helperText}</FormHelperText>
+          </FormControl>
+        </Box>
         {/*@ts-expect-error bad type */}
         <MediaInput
+          titleVariant="body1"
           label="Preview Media"
           name="previewMedia"
           kind="image"
@@ -298,40 +358,6 @@ const CardTemplateForm = ({
                   }
                 : value ?? null,
           })}
-        />
-        <FormControlLabel
-          control={
-            <Switch
-              name="businessEnabled"
-              checked={!!data.businessEnabled}
-              disabled={saving}
-              {...omit(
-                fieldProps('businessEnabled', {
-                  format: value => value ?? null,
-                }),
-                'error',
-                'helperText',
-              )}
-            />
-          }
-          label="Business Enabled"
-        />
-        <FormControlLabel
-          control={
-            <Switch
-              name="personalEnabled"
-              checked={!!data.personalEnabled}
-              disabled={saving}
-              {...omit(
-                fieldProps('personalEnabled', {
-                  format: value => value ?? null,
-                }),
-                'error',
-                'helperText',
-              )}
-            />
-          }
-          label="Personal Enabled"
         />
 
         <Button

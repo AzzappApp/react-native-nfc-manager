@@ -53,13 +53,17 @@ const WebCardCategoriesList = ({
 }: WebCardCategoriesListProps) => {
   const router = useRouter();
   const [loading, startTransition] = useTransition();
+  const [currentSearch, setCurrentSearch] = useState(search ?? '');
+  const defferedSearch = useDeferredValue(currentSearch);
+  const [statusFilter, setStatusFilter] = useState(filters?.enabled || 'all');
+
   const updateSearchParams = useCallback(
     (
       page: number,
       sort: string,
       order: string,
       search: string | null,
-      status?: string | null,
+      status: string | null,
     ) => {
       startTransition(() => {
         router.replace(
@@ -70,41 +74,61 @@ const WebCardCategoriesList = ({
     [router, startTransition],
   );
 
-  const onPageChange = (model: GridPaginationModel) => {
-    updateSearchParams(model.page + 1, sortField, sortOrder, search);
-  };
+  const onPageChange = useCallback(
+    (model: GridPaginationModel) => {
+      updateSearchParams(
+        model.page + 1,
+        sortField,
+        sortOrder,
+        search,
+        statusFilter,
+      );
+    },
+    [search, sortField, sortOrder, statusFilter, updateSearchParams],
+  );
 
-  const onSortModelChange = (model: GridSortModel) => {
-    if (!model.length) {
-      updateSearchParams(page, 'order', 'asc', search);
-      return;
-    }
-    updateSearchParams(page, model[0].field, model[0].sort ?? 'asc', search);
-  };
-
-  const [currentSearch, setCurrentSearch] = useState(search ?? '');
-  const defferedSearch = useDeferredValue(currentSearch);
+  const onSortModelChange = useCallback(
+    (model: GridSortModel) => {
+      updateSearchParams(
+        page,
+        model[0]?.field ?? 'order',
+        model[0]?.sort ?? 'asc',
+        search,
+        statusFilter,
+      );
+    },
+    [page, search, statusFilter, updateSearchParams],
+  );
 
   useEffect(() => {
     if (search === defferedSearch) {
       return;
     }
-    updateSearchParams(1, sortField, sortOrder, defferedSearch);
-  }, [defferedSearch, page, search, sortField, sortOrder, updateSearchParams]);
+    updateSearchParams(1, sortField, sortOrder, defferedSearch, statusFilter);
+  }, [
+    defferedSearch,
+    page,
+    search,
+    sortField,
+    sortOrder,
+    statusFilter,
+    updateSearchParams,
+  ]);
 
-  const [statusFilter, setStatusFilter] = useState(filters?.enabled || 'all');
-
-  const onStatusChange = (event: SelectChangeEvent) => {
-    const newStatus = event.target.value as string;
-    setStatusFilter(newStatus);
-    updateSearchParams(
-      1,
-      sortField,
-      sortOrder,
-      search,
-      newStatus === 'all' ? '' : newStatus,
-    );
-  };
+  const onStatusChange = useCallback(
+    (event: SelectChangeEvent) => {
+      const newStatus = event.target.value as string;
+      setStatusFilter(newStatus);
+      updateSearchParams(
+        1,
+        sortField,
+        sortOrder,
+        search,
+        newStatus === 'all' ? '' : newStatus,
+      );
+    },
+    [search, sortField, sortOrder, updateSearchParams],
+  );
 
   return (
     <Box
