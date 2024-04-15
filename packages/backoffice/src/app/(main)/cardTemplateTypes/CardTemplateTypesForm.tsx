@@ -1,10 +1,13 @@
 'use client';
 
+import { PhoneIphone } from '@mui/icons-material';
 import {
   Autocomplete,
   Box,
+  Breadcrumbs,
   Button,
   FormControlLabel,
+  Link,
   Snackbar,
   Switch,
   TextField,
@@ -49,6 +52,9 @@ const CardTemplateTypeForm = ({
   const { data, fieldProps } = useForm<FormValue>(
     () => ({
       ...cardTemplateType,
+      labelKey: label?.labelKey || '',
+      baseLabelValue: label?.baseLabelValue || '',
+      enabled: cardTemplateType?.enabled || false,
       webCardCategory: cardTemplateType?.webCardCategoryId
         ? webCardCategories?.find(item => {
             return item.id === cardTemplateType?.webCardCategoryId;
@@ -85,9 +91,20 @@ const CardTemplateTypeForm = ({
 
   return (
     <>
-      <Typography variant="h4" component="h1" sx={{ mb: 10 }}>
+      <Breadcrumbs aria-label="breadcrumb" sx={{ mb: 2 }}>
+        <Link
+          underline="hover"
+          sx={{ display: 'flex', alignItems: 'center' }}
+          color="inherit"
+          href="/cardTemplateTypes"
+        >
+          <PhoneIphone sx={{ mr: 0.5 }} fontSize="inherit" />
+          WebCards templates type
+        </Link>
+      </Breadcrumbs>
+      <Typography variant="h4" component="h1" sx={{ mb: 4 }}>
         {cardTemplateType
-          ? `Card Template Type ${label?.baseLabelValue} - ${cardTemplateType.id}`
+          ? `Card Template Type ${label?.baseLabelValue}`
           : 'New Card Template Type'}
       </Typography>
 
@@ -99,28 +116,47 @@ const CardTemplateTypeForm = ({
           gap: 2,
           padding: 2,
         }}
-        maxWidth={500}
+        maxWidth={600}
         component="form"
         onSubmit={handleSubmit}
       >
-        <TextField
-          name="labelKey"
-          label="Label Key"
-          disabled={saving || !isCreation}
-          required
-          fullWidth
-          {...fieldProps('labelKey')}
-        />
-        <TextField
-          name="baseLabelValue"
-          label="Label default value"
-          required
-          fullWidth
-          {...fieldProps('baseLabelValue')}
+        <FormControlLabel
+          control={
+            <Switch
+              name="enabled"
+              checked={!!data.enabled}
+              disabled={saving}
+              {...omit(
+                fieldProps('enabled', {
+                  format: value => value ?? null,
+                }),
+                'error',
+                'helperText',
+              )}
+            />
+          }
+          label="Enabled"
         />
 
+        <Box display="flex" gap={2}>
+          <TextField
+            name="labelKey"
+            label="Label Key"
+            disabled={saving || !isCreation}
+            required
+            sx={{ width: 300 }}
+            {...fieldProps('labelKey')}
+          />
+          <TextField
+            name="baseLabelValue"
+            label="Label default value"
+            required
+            sx={{ width: 300 }}
+            {...fieldProps('baseLabelValue')}
+          />
+        </Box>
         <Autocomplete
-          fullWidth
+          sx={{ width: 300 }}
           multiple={false}
           id="profile-categories"
           options={webCardCategories}
@@ -138,7 +174,7 @@ const CardTemplateTypeForm = ({
           renderInput={params => (
             <TextField
               {...params}
-              variant="standard"
+              variant="outlined"
               label="Profile categories"
             />
           )}
@@ -150,23 +186,6 @@ const CardTemplateTypeForm = ({
               </li>
             );
           }}
-        />
-        <FormControlLabel
-          control={
-            <Switch
-              name="enabled"
-              checked={!!data.enabled}
-              disabled={saving}
-              {...omit(
-                fieldProps('enabled', {
-                  format: value => value ?? null,
-                }),
-                'error',
-                'helperText',
-              )}
-            />
-          }
-          label="Enabled"
         />
 
         <Button
