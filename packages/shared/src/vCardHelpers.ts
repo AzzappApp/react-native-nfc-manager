@@ -8,7 +8,7 @@ import type { CommonInformation } from './contactCardHelpers';
  * @param contactCardData The serialized contact card
  * @returns The vCard
  */
-export const buildVCard = async (
+export const buildVCardFromSerializedContact = async (
   userName: string,
   contactCardData: string,
   additionalData?:
@@ -82,4 +82,34 @@ export const buildVCard = async (
       company: contactCard.company,
     },
   };
+};
+
+export type ShareBackContact = {
+  lastName?: string;
+  firstName?: string;
+  company?: string;
+  title?: string;
+  email?: string;
+  phone?: string;
+};
+
+/**
+ * Generates a vCard from a share back contact
+ * @param shareBackContact The share back contact
+ * @returns The vCard
+ */
+export const buildVCardFromShareBackContact = (
+  shareBackContact: ShareBackContact,
+) => {
+  const vcard = new VCard();
+  vcard.addName(
+    shareBackContact.lastName ?? '',
+    shareBackContact.firstName ?? '',
+  );
+  vcard.addCompany(shareBackContact.company ?? '');
+  vcard.addJobtitle(shareBackContact.title ?? '');
+  vcard.addEmail(shareBackContact.email ?? '', 'type=PREF');
+  vcard.addPhoneNumber(shareBackContact.phone ?? '', 'type=CELL');
+
+  return vcard;
 };

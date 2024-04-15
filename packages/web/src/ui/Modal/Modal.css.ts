@@ -7,7 +7,7 @@ const wrapper = style({
   top: 0,
   width: '100vw',
   height: '100vh',
-  backgroundColor: convertHexToRGBA('#000000', 50),
+  backgroundColor: convertHexToRGBA('#000000', 70),
   zIndex: 999,
   display: 'flex',
   alignItems: 'center',
@@ -23,6 +23,7 @@ const modal = style({
   backgroundColor: vars.color.white,
   width: '375px',
   maxWidth: '100%',
+  boxShadow: '0px 1px 25px 0px rgba(0, 0, 0, 0.45)',
 });
 
 const close = style({

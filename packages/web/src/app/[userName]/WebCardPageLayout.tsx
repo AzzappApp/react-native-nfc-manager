@@ -1,14 +1,19 @@
 'use client';
+import * as Sentry from '@sentry/nextjs';
 import cn from 'classnames';
-import { useEffect, useState } from 'react';
+import { jwtDecode } from 'jwt-decode';
+import { useEffect, useRef, useState } from 'react';
 import { FlipIcon } from '#assets';
 import { ButtonIcon } from '#ui';
 import { updateWebCardViewsCounter } from '#app/actions/statisticsAction';
+import ShareBackModal from '#components/ShareBackModal/ShareBackModal';
 import DownloadVCard from './DownloadVCard';
 import PostFeed from './PostFeed';
 import styles from './WebCardPage.css';
 import WebCardPostNavigation from './WebCardPostNavigation';
+import type { ModalActions } from '#ui/Modal';
 import type { Media, PostWithCommentAndAuthor, WebCard } from '@azzapp/data';
+import type { JwtPayload } from 'jwt-decode';
 import type { PropsWithChildren } from 'react';
 
 type ProfilePageLayoutProps = PropsWithChildren<{
@@ -34,7 +39,50 @@ const WebCardPageLayout = (props: ProfilePageLayoutProps) => {
   const [display, setDisplay] = useState<'card' | 'posts'>('card');
   const [postsOpen, setPostsOpen] = useState(false);
 
+  const [contactDataVCard, setContactDataVCard] = useState({
+    userId: '',
+    avatarUrl: '',
+    token: '',
+    firstName: '',
+    lastName: '',
+    isMultiUser: false,
+  });
+
+  const shareBackModal = useRef<ModalActions>(null);
+
   const hasPosts = posts.length > 0;
+
+  type DownloadVCardJwtPayload = JwtPayload & {
+    userId: string;
+    avatarUrl?: string;
+    isMultiUser: boolean;
+    firstName?: string;
+    lastName?: string;
+  };
+
+  const handleCloseDownloadVCard = ({ token }: { token?: string }) => {
+    if (token) {
+      try {
+        const tokenDecoded = jwtDecode<DownloadVCardJwtPayload>(token);
+        setContactDataVCard({
+          userId: tokenDecoded.userId,
+          avatarUrl: tokenDecoded.avatarUrl ?? '',
+          isMultiUser: tokenDecoded.isMultiUser,
+          token,
+          firstName: tokenDecoded.firstName ?? '',
+          lastName: tokenDecoded.lastName ?? '',
+        });
+      } catch (error) {
+        Sentry.captureException(
+          new Error(
+            `Error while decoding token: 
+            ${error}`,
+          ),
+        );
+      }
+      shareBackModal.current?.open();
+    }
+  };
 
   useEffect(() => {
     if (webCard?.id) {
@@ -125,8 +173,18 @@ const WebCardPageLayout = (props: ProfilePageLayoutProps) => {
             }}
           />
         )}
-        <DownloadVCard webCard={webCard} />
+
+        <DownloadVCard webCard={webCard} onClose={handleCloseDownloadVCard} />
       </div>
+      <ShareBackModal
+        ref={shareBackModal}
+        fullname={`${contactDataVCard.firstName} ${contactDataVCard.lastName}`}
+        initials={`${contactDataVCard.firstName && contactDataVCard.lastName ? `${contactDataVCard.firstName[0]}${contactDataVCard.lastName[0]}` : webCard.companyName ? webCard.companyName.slice(0, 2) : webCard.userName.slice(0, 2)}`}
+        userId={contactDataVCard.userId}
+        avatarUrl={contactDataVCard.avatarUrl}
+        token={contactDataVCard.token}
+        isMultiUser={contactDataVCard.isMultiUser}
+      />
     </>
   );
 };

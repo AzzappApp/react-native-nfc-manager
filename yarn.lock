@@ -2008,6 +2008,25 @@
   dependencies:
     "@cloudinary/transformation-builder-sdk" "^1.10.0"
 
+"@conform-to/dom@1.1.0":
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/@conform-to/dom/-/dom-1.1.0.tgz#403075b515d191846e56c5c15755f1fe1cd29da9"
+  integrity sha512-KtiGwke6qeh8xDMwebbT/EanxhVX40uZtyHr8VH2V8jBHwavy94V673F4YdlhHpXoqRcZcewie/GQ7tIi2mC/A==
+
+"@conform-to/react@^1.1.0":
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/@conform-to/react/-/react-1.1.0.tgz#618f5d6629188bb4bcb9dcc0f9976ff6929df477"
+  integrity sha512-zEgesgfllN29SdVZhlm3CGIufQm/gkFia7QMrKX/fH4L+iYgQ7n1LVgu+3Jxr4jXE8wW5YDbemwo1cqhE++xZg==
+  dependencies:
+    "@conform-to/dom" "1.1.0"
+
+"@conform-to/zod@^1.1.0":
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/@conform-to/zod/-/zod-1.1.0.tgz#2e101e363fb8882514ab885441207c34395abdee"
+  integrity sha512-0ukglFJ1gknFf81j9zB/mZq68fhhSu0s2bxZIkBqPocdGBA6LvHnV7ORyE+27WUNyJ36L2sjksNXVm9SDSUexw==
+  dependencies:
+    "@conform-to/dom" "1.1.0"
+
 "@dnd-kit/accessibility@^3.1.0":
   version "3.1.0"
   resolved "https://registry.yarnpkg.com/@dnd-kit/accessibility/-/accessibility-3.1.0.tgz#1054e19be276b5f1154ced7947fc0cb5d99192e0"
@@ -12190,6 +12209,11 @@ jose@^5.0.0:
   resolved "https://registry.yarnpkg.com/jose/-/jose-5.2.0.tgz#d0ffd7f7e31253f633eefb190a930cd14a916995"
   integrity sha512-oW3PCnvyrcm1HMvGTzqjxxfnEs9EoFOFWi2HsEGhlFVOXxTE3K9GKWVMFoFw06yPUqwpvEWic1BmtUZBI/tIjw==
 
+jose@^5.2.3:
+  version "5.2.4"
+  resolved "https://registry.yarnpkg.com/jose/-/jose-5.2.4.tgz#c0d296caeeed0b8444a8b8c3b68403d61aa4ed72"
+  integrity sha512-6ScbIk2WWCeXkmzF6bRPmEuaqy1m8SbsRFMa/FLrSCkGIhj8OLVG/IH+XHVmNMx/KUo8cVWEE6oKR4dJ+S0Rkg==
+
 js-beautify@^1.7.4:
   version "1.14.11"
   resolved "https://registry.yarnpkg.com/js-beautify/-/js-beautify-1.14.11.tgz#57b17e009549ac845bdc58eddf8e1862e311314e"
@@ -12499,6 +12523,11 @@ jws@^4.0.0:
   dependencies:
     jwa "^2.0.0"
     safe-buffer "^5.0.1"
+
+jwt-decode@^4.0.0:
+  version "4.0.0"
+  resolved "https://registry.yarnpkg.com/jwt-decode/-/jwt-decode-4.0.0.tgz#2270352425fd413785b2faf11f6e755c5151bd4b"
+  integrity sha512-+KJGIyHgkGuIq3IEBNftfhW/LfWhXUIY6OmyVWjliu5KH1y0fw7VQ8YndE2O4qZdMSd9SqbnC8GOcZEy0Om7sA==
 
 keyv@^4.5.3:
   version "4.5.4"

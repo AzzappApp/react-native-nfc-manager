@@ -2,13 +2,19 @@
 import { decompressFromEncodedURIComponent } from 'lz-string';
 import { useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { buildVCard } from '@azzapp/shared/vCardHelpers';
+import { buildVCardFromSerializedContact } from '@azzapp/shared/vCardHelpers';
 import { updateContactCardScanCounter } from '#app/actions/statisticsAction';
 import LinkButton from '#ui/Button/LinkButton';
 import styles from './DownloadVCard.css';
 import type { WebCard } from '@azzapp/data';
 
-const DownloadVCard = ({ webCard }: { webCard: WebCard }) => {
+const DownloadVCard = ({
+  webCard,
+  onClose,
+}: {
+  webCard: WebCard;
+  onClose?: (data: { token?: string; avatarUrl?: string }) => void;
+}) => {
   const searchParams = useSearchParams();
 
   const [fileUrl, setFileUrl] = useState<string | undefined>();
@@ -20,6 +26,8 @@ const DownloadVCard = ({ webCard }: { webCard: WebCard }) => {
     lastName: string;
     company: string;
   }>();
+
+  const [token, setToken] = useState('');
 
   useEffect(() => {
     const compressedContactCard = searchParams.get('c');
@@ -61,7 +69,7 @@ const DownloadVCard = ({ webCard }: { webCard: WebCard }) => {
               };
             }
 
-            const { vCard, contact } = await buildVCard(
+            const { vCard, contact } = await buildVCardFromSerializedContact(
               webCard.userName,
               contactData,
               additionalData,
@@ -74,6 +82,7 @@ const DownloadVCard = ({ webCard }: { webCard: WebCard }) => {
               setFileUrl(fileURL);
               setOpened(true);
               updateContactCardScanCounter(contact.profileId);
+              setToken(additionalData.token);
             }
           }
         })
@@ -81,13 +90,20 @@ const DownloadVCard = ({ webCard }: { webCard: WebCard }) => {
     }
   }, [webCard.userName, webCard.id, searchParams]);
 
+  const handleClose = () => {
+    setOpened(false);
+    if (onClose) {
+      onClose({ token });
+    }
+  };
+
   return (
     <div
       id="contactCard"
       className={opened ? styles.openedOverlay : styles.overlay}
       onClick={event => {
         if ('id' in event.target && event.target.id === 'contactCard') {
-          setOpened(false);
+          handleClose();
         }
       }}
       role="button"
@@ -119,12 +135,7 @@ const DownloadVCard = ({ webCard }: { webCard: WebCard }) => {
           </LinkButton>
         )}
 
-        <button
-          className={styles.closeButton}
-          onClick={() => {
-            setOpened(false);
-          }}
-        >
+        <button className={styles.closeButton} onClick={handleClose}>
           Close
         </button>
       </div>

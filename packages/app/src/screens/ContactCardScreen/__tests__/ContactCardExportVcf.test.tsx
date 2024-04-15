@@ -8,7 +8,7 @@ import {
 import { MockPayloadGenerator } from 'relay-test-utils';
 import { createMockEnvironment } from 'relay-test-utils/lib/RelayModernMockEnvironment';
 import { serializeContactCard } from '@azzapp/shared/contactCardHelpers';
-import { buildVCard } from '@azzapp/shared/vCardHelpers';
+import { buildVCardFromSerializedContact } from '@azzapp/shared/vCardHelpers';
 import { screen, render, fireEvent, act } from '#helpers/testHelpers';
 import ContactCardExportVcf from '../ContactCardExportVcf';
 import type { ContactCardExportVcfTestQuery } from '#relayArtifacts/ContactCardExportVcfTestQuery.graphql';
@@ -168,7 +168,7 @@ describe('ContactCardExportVcf', () => {
       fireEvent.press(screen.getByRole('button'));
     });
 
-    const { vCard } = await buildVCard(
+    const { vCard } = await buildVCardFromSerializedContact(
       'userNameTest',
       serializeContactCard('profileId', 'webCardId', contactCard),
       {

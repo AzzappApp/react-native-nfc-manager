@@ -1,8 +1,8 @@
-import sgMail from '@sendgrid/mail';
 import { NextResponse } from 'next/server';
 import { withAxiom } from 'next-axiom';
 import * as z from 'zod';
 import ERRORS from '@azzapp/shared/errors';
+import { sendEmail } from '#helpers/contactHelpers';
 import { checkServerAuth } from '#helpers/tokens';
 
 const SendEmailSchema = z
@@ -15,20 +15,15 @@ const SendEmailSchema = z
   .array()
   .nonempty();
 
-sgMail.setApiKey(process.env.SENDGRID_API_KEY!);
-
-const SENDGRIP_NOREPLY_SENDER = process.env.SENDGRIP_NOREPLY_SENDER!;
-
 export const POST = withAxiom(async (req: Request) => {
   try {
     checkServerAuth();
     const body = await req.json();
     const input = SendEmailSchema.parse(body);
 
-    await sgMail.send(
+    await sendEmail(
       input.map(msg => ({
-        to: msg.email,
-        from: SENDGRIP_NOREPLY_SENDER, // Change to your verified sender
+        email: msg.email,
         subject: msg.subject,
         text: msg.text,
         html: msg.html,

@@ -1,3 +1,6 @@
+import { createId } from '@paralleldrive/cuid2';
+import { SignJWT } from 'jose';
+
 import { NextResponse } from 'next/server';
 import { withAxiom } from 'next-axiom';
 import { getProfileById, getWebCardById } from '@azzapp/data';
@@ -6,6 +9,8 @@ import { verifyHmacWithPassword } from '@azzapp/shared/crypto';
 import ERRORS from '@azzapp/shared/errors';
 import { buildAvatarUrl } from '#helpers/avatar';
 import cors from '#helpers/cors';
+
+const JWT_SECRET = process.env.JWT_SECRET as string;
 
 const verifySignApi = async (req: Request) => {
   const { signature, data, salt } =
@@ -35,6 +40,21 @@ const verifySignApi = async (req: Request) => {
     const avatarUrl =
       storedProfile && (await buildAvatarUrl(storedProfile, webCard));
 
+    const token = await new SignJWT({
+      avatarUrl,
+      userId: storedProfile?.userId,
+      isMultiUser: webCard?.isMultiUser,
+      firstName: foundContactCard.firstName,
+      lastname: foundContactCard.lastName,
+    })
+      .setJti(createId())
+      .setIssuer('azzapp')
+      .setSubject('contact-card')
+      .setIssuedAt()
+      .setExpirationTime('10m')
+      .setProtectedHeader({ alg: 'HS256' })
+      .sign(new TextEncoder().encode(JWT_SECRET));
+
     return NextResponse.json(
       {
         urls: (webCard?.commonInformation?.urls ?? []).concat(
@@ -46,6 +66,7 @@ const verifySignApi = async (req: Request) => {
           ) ?? [],
         ),
         avatarUrl,
+        token,
       },
       { status: 200 },
     );

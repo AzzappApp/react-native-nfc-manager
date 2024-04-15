@@ -8,6 +8,7 @@ export const [themeClass, vars] = createTheme({
     grey200: '#c8c7ca',
     grey400: '#a1a1a5',
     grey900: '#45444c',
+    green: '#0FD59E',
     black: '#0e1216',
     white: '#fff',
     transparent: 'transparent',
@@ -114,3 +115,10 @@ globalStyle('.root', {
 globalStyle('.root, *, *:before, *:after', {
   boxSizing: 'border-box',
 });
+
+globalStyle(
+  'input:-internal-autofill-selected, input:-webkit-autofill, input:-webkit-autofill:focus',
+  {
+    backgroundColor: 'none !important',
+  },
+);

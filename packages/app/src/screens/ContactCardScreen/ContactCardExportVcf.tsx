@@ -5,7 +5,7 @@ import { fromByteArray } from 'react-native-quick-base64';
 import ShareCommand from 'react-native-share';
 import { graphql, useFragment } from 'react-relay';
 import { formatDisplayName } from '@azzapp/shared/stringHelpers';
-import { buildVCard } from '@azzapp/shared/vCardHelpers';
+import { buildVCardFromSerializedContact } from '@azzapp/shared/vCardHelpers';
 import Button from '#ui/Button';
 import type { ContactCardExportVcf_card$key } from '#relayArtifacts/ContactCardExportVcf_card.graphql';
 
@@ -81,7 +81,7 @@ const ContactCardExportVcf = ({
           };
         }
 
-        const { vCard } = await buildVCard(
+        const { vCard } = await buildVCardFromSerializedContact(
           userName,
           profile.serializedContactCard,
           {

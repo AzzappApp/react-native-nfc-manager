@@ -2,11 +2,8 @@ import { NextResponse } from 'next/server';
 import { withAxiom } from 'next-axiom';
 import * as z from 'zod';
 import ERRORS from '@azzapp/shared/errors';
+import { sendSMS } from '#helpers/contactHelpers';
 import { checkServerAuth } from '#helpers/tokens';
-import {
-  TWILIO_PHONE_NUMBER,
-  twilioMessagesService,
-} from '#helpers/twilioHelpers';
 
 const SendSMSSchema = z.object({
   phoneNumber: z.string(),
@@ -21,11 +18,7 @@ export const POST = withAxiom(async (req: Request) => {
 
     const { phoneNumber, body } = input;
 
-    await twilioMessagesService().create({
-      body,
-      to: phoneNumber,
-      from: TWILIO_PHONE_NUMBER,
-    });
+    await sendSMS([{ phoneNumber, body }]);
 
     return NextResponse.json(
       {

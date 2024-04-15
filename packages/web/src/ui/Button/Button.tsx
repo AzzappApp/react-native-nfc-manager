@@ -5,7 +5,7 @@ import LinkButton from './LinkButton';
 import type { MouseEventHandler } from 'react';
 
 type ButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
-  type?: 'primary' | 'secondary';
+  variant?: 'primary' | 'secondary';
   size?: 'large' | 'medium' | 'none' | 'small';
   disabled?: boolean;
   loading?: boolean;
@@ -14,7 +14,7 @@ type ButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
 const Button = (props: ButtonProps) => {
   const {
     className,
-    type = 'primary',
+    variant = 'primary',
     size = 'medium',
     disabled,
     loading,
@@ -23,8 +23,8 @@ const Button = (props: ButtonProps) => {
   } = props;
 
   const classnames = cn(styles.button, className, {
-    [styles.primary]: type === 'primary',
-    [styles.primaryDisabled]: type === 'primary' && disabled,
+    [styles.primary]: variant === 'primary',
+    [styles.primaryDisabled]: variant === 'primary' && disabled,
     [styles.small]: size === 'small',
     [styles.medium]: size === 'medium',
     [styles.large]: size === 'large',
@@ -35,7 +35,14 @@ const Button = (props: ButtonProps) => {
     if (!disabled && !loading) onClick?.(event);
   };
 
-  return <button {...others} onClick={handleClick} className={classnames} />;
+  return (
+    <button
+      {...others}
+      onClick={handleClick}
+      className={classnames}
+      {...(disabled || loading ? { disabled: true } : {})}
+    />
+  );
 };
 
 Button.Link = LinkButton;
