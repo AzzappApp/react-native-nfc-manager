@@ -1,4 +1,10 @@
-import { Box, FormControl, FormHelperText, FormLabel } from '@mui/material';
+import {
+  Box,
+  FormControl,
+  FormHelperText,
+  FormLabel,
+  Card,
+} from '@mui/material';
 import { getImageURL } from '@azzapp/shared/imagesHelpers';
 import type { StaticMedia } from '@azzapp/data';
 
@@ -21,7 +27,17 @@ const StaticMediaSelectionList = ({
 }: StaticMediaSelectionListProps) => (
   <FormControl error={error}>
     <FormLabel>{label}</FormLabel>
-    <Box sx={{ display: 'flex', overflow: 'auto' }} role="listbox">
+    <Card
+      sx={{
+        display: 'flex',
+        overflow: 'auto',
+        flexWrap: 'wrap',
+        gap: 2,
+        height: 400,
+        padding: 2,
+      }}
+      role="listbox"
+    >
       {staticMedias.map(staticMedia => (
         <Box
           component="button"
@@ -49,7 +65,7 @@ const StaticMediaSelectionList = ({
           />
         </Box>
       ))}
-    </Box>
+    </Card>
     {helperText && <FormHelperText>{helperText}</FormHelperText>}
   </FormControl>
 );

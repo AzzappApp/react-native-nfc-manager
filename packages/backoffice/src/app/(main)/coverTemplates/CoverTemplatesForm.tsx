@@ -1,5 +1,6 @@
 'use client';
 
+import { StarsSharp } from '@mui/icons-material';
 import {
   Box,
   Button,
@@ -15,6 +16,8 @@ import {
   Dialog,
   DialogContent,
   Snackbar,
+  Breadcrumbs,
+  Link,
 } from '@mui/material';
 import { capitalize, omit, pick } from 'lodash';
 import { useRouter } from 'next/navigation';
@@ -201,11 +204,23 @@ const CoverTemplateForm = ({
 
   return (
     <>
+      <Breadcrumbs aria-label="breadcrumb" sx={{ mb: 2 }}>
+        <Link
+          underline="hover"
+          sx={{ display: 'flex', alignItems: 'center' }}
+          color="inherit"
+          href="/cardTemplates"
+        >
+          <StarsSharp sx={{ mr: 0.5 }} fontSize="inherit" />
+          Cover templates
+        </Link>
+      </Breadcrumbs>
       <Typography variant="h4" component="h1" sx={{ mb: 2 }}>
         {coverTemplate
           ? `CoverTemplate : ${coverTemplate.name}`
           : 'New CoverTemplate'}
       </Typography>
+
       <Box
         sx={{
           display: 'flex',
@@ -214,11 +229,11 @@ const CoverTemplateForm = ({
           gap: 2,
           padding: 2,
         }}
-        maxWidth={500}
+        maxWidth={600}
         component="form"
         onSubmit={loadDataFromCover}
       >
-        <Typography variant="h6" component="h6">
+        <Typography variant="body1" component="h6">
           Load data from cover
         </Typography>
         <TextField
@@ -242,11 +257,7 @@ const CoverTemplateForm = ({
           </Typography>
         )}
       </Box>
-      <hr />
 
-      <Typography variant="h6" component="h6">
-        Cover Templates Data
-      </Typography>
       <Box
         sx={{
           display: 'flex',
@@ -255,39 +266,82 @@ const CoverTemplateForm = ({
           gap: 2,
           padding: 2,
         }}
-        maxWidth={500}
+        maxWidth={700}
         component="form"
         onSubmit={handleSubmit}
       >
-        <TextField
-          name="name"
-          label="Name"
-          disabled={saving}
-          required
-          {...fieldProps('name')}
-        />
+        <Box display="flex" alignItems="center" gap={2}>
+          <FormControlLabel
+            control={
+              <Switch
+                name="businessEnabled"
+                checked={!!data.businessEnabled}
+                disabled={saving}
+                {...omit(
+                  fieldProps('businessEnabled', {
+                    format: value => value ?? null,
+                  }),
+                  'error',
+                  'helperText',
+                )}
+              />
+            }
+            label="Business Enabled"
+          />
+          <FormControlLabel
+            control={
+              <Switch
+                name="personalEnabled"
+                checked={!!data.personalEnabled}
+                disabled={saving}
+                {...omit(
+                  fieldProps('personalEnabled', {
+                    format: value => value ?? null,
+                  }),
+                  'error',
+                  'helperText',
+                )}
+              />
+            }
+            label="Personal Enabled"
+          />
+        </Box>
+        <Typography variant="body1">Informations</Typography>
+        <Box display="flex" alignItems="center" gap={2}>
+          <TextField
+            name="name"
+            label="Name"
+            disabled={saving}
+            required
+            sx={{ width: 300 }}
+            {...fieldProps('name')}
+          />
 
-        <FormControl fullWidth error={kindProps.error}>
-          <InputLabel id="kind-label">Profile Kind</InputLabel>
-          <Select
-            labelId={'kind-label'}
-            id="kind"
-            name="kind"
-            value={kindProps.value}
-            label="Template Kind"
-            onChange={kindProps.onChange as any}
-          >
-            <MenuItem value="people">People</MenuItem>
-            <MenuItem value="video">Video</MenuItem>
-            <MenuItem value="others">Others</MenuItem>
-          </Select>
-          <FormHelperText>{kindProps.helperText}</FormHelperText>
-        </FormControl>
+          <FormControl fullWidth error={kindProps.error} sx={{ width: 300 }}>
+            <InputLabel id="kind-label">Profile Kind</InputLabel>
+            <Select
+              labelId={'kind-label'}
+              id="kind"
+              name="kind"
+              value={kindProps.value}
+              label="Template Kind"
+              onChange={kindProps.onChange as any}
+            >
+              <MenuItem value="people">People</MenuItem>
+              <MenuItem value="video">Video</MenuItem>
+              <MenuItem value="others">Others</MenuItem>
+            </Select>
+            <FormHelperText>{kindProps.helperText}</FormHelperText>
+          </FormControl>
+        </Box>
+
+        <Typography variant="body1">Media</Typography>
 
         <MediaInput
-          label="Preview Media"
+          label="Lottie"
           name="previewMedia"
           kind={kindProps.value === 'video' ? 'video' : 'image'}
+          buttonLabel="Add lottie"
           {...fieldProps('previewMedia')}
         />
 
@@ -297,238 +351,238 @@ const CoverTemplateForm = ({
           {...fieldProps('backgroundId')}
         />
 
-        <TextField
-          name="backgroundColor"
-          label="Background Color"
-          disabled={saving}
-          {...fieldProps('backgroundColor')}
-        />
-
-        <TextField
-          name="backgroundPatternColor"
-          label="Pattern Color"
-          disabled={saving}
-          {...fieldProps('backgroundPatternColor')}
-        />
         <StaticMediaSelectionList
           label="Foreground"
           staticMedias={coverForegrounds}
           {...fieldProps('foregroundId')}
         />
-        <TextField
-          name="foregroundColor"
-          label="Foreground Color"
-          disabled={saving}
-          {...fieldProps('foregroundColor')}
-        />
 
-        <FormControl fullWidth error={colorPaletteIdProps.error}>
-          <InputLabel id="colorPalette-label">Color Palette</InputLabel>
-          <Select
-            labelId={'colorPalette-label'}
-            id="colorPalette"
-            name="kicolorPalettend"
-            value={colorPaletteIdProps.value}
-            label="Color Palette"
-            onChange={colorPaletteIdProps.onChange as any}
+        <Typography variant="body1">Styles</Typography>
+
+        <Box display="flex" flexWrap="wrap" gap={2}>
+          <TextField
+            name="backgroundColor"
+            label="Background Color"
+            disabled={saving}
+            sx={{ width: 300 }}
+            {...fieldProps('backgroundColor')}
+          />
+
+          <TextField
+            name="backgroundPatternColor"
+            label="Pattern Color"
+            disabled={saving}
+            sx={{ width: 300 }}
+            {...fieldProps('backgroundPatternColor')}
+          />
+          <TextField
+            name="foregroundColor"
+            label="Foreground Color"
+            disabled={saving}
+            sx={{ width: 300 }}
+            {...fieldProps('foregroundColor')}
+          />
+
+          <FormControl
+            fullWidth
+            error={colorPaletteIdProps.error}
+            sx={{ width: 300 }}
           >
-            {colorPalettes.map(colorPalette => (
-              <MenuItem key={colorPalette.id} value={colorPalette.id}>
-                <Box
-                  sx={{
-                    display: 'flex',
-                    gap: 1,
-                  }}
-                >
-                  <div
-                    style={{
-                      width: 20,
-                      height: 20,
-                      backgroundColor: colorPalette.primary,
+            <InputLabel id="colorPalette-label">Color Palette</InputLabel>
+            <Select
+              labelId={'colorPalette-label'}
+              id="colorPalette"
+              name="kicolorPalettend"
+              value={colorPaletteIdProps.value}
+              label="Color Palette"
+              onChange={colorPaletteIdProps.onChange as any}
+            >
+              {colorPalettes.map(colorPalette => (
+                <MenuItem key={colorPalette.id} value={colorPalette.id}>
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      gap: 1,
                     }}
-                  />
-                  <div
-                    style={{
-                      width: 20,
-                      height: 20,
-                      backgroundColor: colorPalette.light,
-                    }}
-                  />
-                  <div
-                    style={{
-                      width: 20,
-                      height: 20,
-                      backgroundColor: colorPalette.dark,
-                    }}
-                  />
-                </Box>
-              </MenuItem>
-            ))}
-          </Select>
-          <FormHelperText>{kindProps.helperText}</FormHelperText>
-        </FormControl>
+                  >
+                    <div
+                      style={{
+                        width: 20,
+                        height: 20,
+                        backgroundColor: colorPalette.primary,
+                      }}
+                    />
+                    <div
+                      style={{
+                        width: 20,
+                        height: 20,
+                        backgroundColor: colorPalette.light,
+                      }}
+                    />
+                    <div
+                      style={{
+                        width: 20,
+                        height: 20,
+                        backgroundColor: colorPalette.dark,
+                      }}
+                    />
+                  </Box>
+                </MenuItem>
+              ))}
+            </Select>
+            <FormHelperText>{kindProps.helperText}</FormHelperText>
+          </FormControl>
 
-        <TextField
-          name="filter"
-          label="Filter"
-          disabled={saving}
-          {...fieldProps('mediaFilter')}
-        />
+          <TextField
+            name="filter"
+            label="Filter"
+            disabled={saving}
+            sx={{ width: 300 }}
+            {...fieldProps('mediaFilter')}
+          />
 
-        <FormControl fullWidth error={textAnimationProps.error}>
-          <InputLabel id="textAnimation-label">Text Animation</InputLabel>
-          <Select
-            labelId={'textAnimation-label'}
-            id="textAnimation"
-            name="textAnimation"
-            value={textAnimationProps.value}
-            label="Text Animation"
-            onChange={textAnimationProps.onChange as any}
+          <FormControl
+            fullWidth
+            error={textAnimationProps.error}
+            sx={{ width: 300 }}
           >
-            <MenuItem value="">None</MenuItem>
-            {textAnimations.map(animation => (
-              <MenuItem key={animation} value={animation}>
-                {capitalize(animation)}
-              </MenuItem>
-            ))}
-          </Select>
-          <FormHelperText>{textAnimationProps.helperText}</FormHelperText>
-        </FormControl>
+            <InputLabel id="textAnimation-label">Text Animation</InputLabel>
+            <Select
+              labelId={'textAnimation-label'}
+              id="textAnimation"
+              name="textAnimation"
+              value={textAnimationProps.value}
+              label="Text Animation"
+              onChange={textAnimationProps.onChange as any}
+            >
+              <MenuItem value="">None</MenuItem>
+              {textAnimations.map(animation => (
+                <MenuItem key={animation} value={animation}>
+                  {capitalize(animation)}
+                </MenuItem>
+              ))}
+            </Select>
+            <FormHelperText>{textAnimationProps.helperText}</FormHelperText>
+          </FormControl>
 
-        <FormControl fullWidth error={mediaAnimationProps.error}>
-          <InputLabel id="mediaAnimation-label">Media Animation</InputLabel>
-          <Select
-            labelId={'mediaAnimation-label'}
-            id="mediaAnimation"
-            name="mediaAnimation"
-            value={mediaAnimationProps.value}
-            label="Media Animation"
-            onChange={mediaAnimationProps.onChange as any}
+          <FormControl
+            fullWidth
+            error={mediaAnimationProps.error}
+            sx={{ width: 300 }}
           >
-            <MenuItem value="">None</MenuItem>
-            {mediaAnimations.map(animation => (
-              <MenuItem key={animation} value={animation}>
-                {capitalize(animation)}
-              </MenuItem>
-            ))}
-          </Select>
-          <FormHelperText>{mediaAnimationProps.helperText}</FormHelperText>
-        </FormControl>
+            <InputLabel id="mediaAnimation-label">Media Animation</InputLabel>
+            <Select
+              labelId={'mediaAnimation-label'}
+              id="mediaAnimation"
+              name="mediaAnimation"
+              value={mediaAnimationProps.value}
+              label="Media Animation"
+              onChange={mediaAnimationProps.onChange as any}
+            >
+              <MenuItem value="">None</MenuItem>
+              {mediaAnimations.map(animation => (
+                <MenuItem key={animation} value={animation}>
+                  {capitalize(animation)}
+                </MenuItem>
+              ))}
+            </Select>
+            <FormHelperText>{mediaAnimationProps.helperText}</FormHelperText>
+          </FormControl>
 
-        <FormControl fullWidth error={textOrientationProps.error}>
-          <InputLabel id="textOrientation-label">Orientation</InputLabel>
-          <Select
-            labelId={'textOrientation-label'}
-            id="textOrientation"
-            name="textOrientation"
-            value={textOrientationProps.value}
-            label="Orientation"
-            onChange={textOrientationProps.onChange as any}
+          <FormControl
+            fullWidth
+            error={textOrientationProps.error}
+            sx={{ width: 300 }}
           >
-            <MenuItem value="horizontal">Horizontal</MenuItem>
-            <MenuItem value="bottomToTop">Bottom To Top</MenuItem>
-            <MenuItem value="topToBottom">Top to Bottom</MenuItem>
-          </Select>
-          <FormHelperText>{textOrientationProps.helperText}</FormHelperText>
-        </FormControl>
+            <InputLabel id="textOrientation-label">Orientation</InputLabel>
+            <Select
+              labelId={'textOrientation-label'}
+              id="textOrientation"
+              name="textOrientation"
+              value={textOrientationProps.value}
+              label="Orientation"
+              onChange={textOrientationProps.onChange as any}
+            >
+              <MenuItem value="horizontal">Horizontal</MenuItem>
+              <MenuItem value="bottomToTop">Bottom To Top</MenuItem>
+              <MenuItem value="topToBottom">Top to Bottom</MenuItem>
+            </Select>
+            <FormHelperText>{textOrientationProps.helperText}</FormHelperText>
+          </FormControl>
 
-        <FormControl fullWidth error={textPositionProps.error}>
-          <InputLabel id="textPosition-label">Placement</InputLabel>
-          <Select
-            labelId={'textPosition-label'}
-            id="textPosition"
-            name="textPosition"
-            value={textPositionProps.value}
-            label="Template Kind"
-            onChange={textPositionProps.onChange as any}
+          <FormControl
+            fullWidth
+            error={textPositionProps.error}
+            sx={{ width: 300 }}
           >
-            {TEXT_POSITIONS.map(position => (
-              <MenuItem key={position} value={position}>
-                {position}
-              </MenuItem>
-            ))}
-          </Select>
-          <FormHelperText>{textPositionProps.helperText}</FormHelperText>
-        </FormControl>
+            <InputLabel id="textPosition-label">Placement</InputLabel>
+            <Select
+              labelId={'textPosition-label'}
+              id="textPosition"
+              name="textPosition"
+              value={textPositionProps.value}
+              label="Template Kind"
+              onChange={textPositionProps.onChange as any}
+            >
+              {TEXT_POSITIONS.map(position => (
+                <MenuItem key={position} value={position}>
+                  {position}
+                </MenuItem>
+              ))}
+            </Select>
+            <FormHelperText>{textPositionProps.helperText}</FormHelperText>
+          </FormControl>
 
-        <TextField
-          name="titleColor"
-          label="Title Color"
-          disabled={saving}
-          {...fieldProps('titleColor')}
-        />
+          <TextField
+            name="titleColor"
+            label="Title Color"
+            disabled={saving}
+            sx={{ width: 300 }}
+            {...fieldProps('titleColor')}
+          />
 
-        <TextField
-          name="titleFontSize"
-          type="number"
-          label="Title Font Size"
-          disabled={saving}
-          {...fieldProps('titleFontSize', { parse: intParser })}
-        />
+          <TextField
+            name="titleFontSize"
+            type="number"
+            label="Title Font Size"
+            disabled={saving}
+            sx={{ width: 300 }}
+            {...fieldProps('titleFontSize', { parse: intParser })}
+          />
 
-        <FontSelect
-          name="titleFontFamily"
-          label="Title Font Family"
-          disabled={saving}
-          {...fieldProps('titleFontFamily')}
-        />
+          <FontSelect
+            name="titleFontFamily"
+            label="Title Font Family"
+            disabled={saving}
+            sx={{ width: 300 }}
+            {...fieldProps('titleFontFamily')}
+          />
 
-        <TextField
-          name="subTitleColor"
-          label="Sub Title Color"
-          disabled={saving}
-          {...fieldProps('subTitleColor')}
-        />
+          <TextField
+            name="subTitleColor"
+            label="Sub Title Color"
+            disabled={saving}
+            sx={{ width: 300 }}
+            {...fieldProps('subTitleColor')}
+          />
 
-        <TextField
-          name="subTitleFontSize"
-          type="number"
-          label="Sub Title Font Size"
-          disabled={saving}
-          {...fieldProps('subTitleFontSize', { parse: intParser })}
-        />
+          <TextField
+            name="subTitleFontSize"
+            type="number"
+            label="Sub Title Font Size"
+            disabled={saving}
+            sx={{ width: 300 }}
+            {...fieldProps('subTitleFontSize', { parse: intParser })}
+          />
 
-        <FontSelect
-          name="subTitleFontFamily"
-          label="Sub Title Font Family"
-          disabled={saving}
-          {...fieldProps('subTitleFontFamily')}
-        />
-
-        <FormControlLabel
-          control={
-            <Switch
-              name="businessEnabled"
-              checked={!!data.businessEnabled}
-              disabled={saving}
-              {...omit(
-                fieldProps('businessEnabled', {
-                  format: value => value ?? null,
-                }),
-                'error',
-                'helperText',
-              )}
-            />
-          }
-          label="Business Enabled"
-        />
-        <FormControlLabel
-          control={
-            <Switch
-              name="personalEnabled"
-              checked={!!data.personalEnabled}
-              disabled={saving}
-              {...omit(
-                fieldProps('personalEnabled', {
-                  format: value => value ?? null,
-                }),
-                'error',
-                'helperText',
-              )}
-            />
-          }
-          label="Personal Enabled"
-        />
+          <FontSelect
+            name="subTitleFontFamily"
+            label="Sub Title Font Family"
+            disabled={saving}
+            sx={{ width: 300 }}
+            {...fieldProps('subTitleFontFamily')}
+          />
+        </Box>
 
         <Button
           type="submit"

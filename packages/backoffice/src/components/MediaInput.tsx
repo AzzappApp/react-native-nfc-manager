@@ -14,6 +14,7 @@ type MediasListInputProps = Omit<BoxProps, 'onChange'> & {
   titleVariant?: Variant;
   error?: boolean | null;
   helperText?: string | null;
+  buttonLabel?: string;
   onChange: (media: File | null | undefined) => void;
 };
 
@@ -24,6 +25,7 @@ const MediaInput = ({
   error,
   kind,
   helperText,
+  buttonLabel,
   onChange,
   titleVariant = 'h6',
   ...props
@@ -88,7 +90,7 @@ const MediaInput = ({
         )}
       </Box>
       <Button component="label" variant="outlined">
-        Add Media
+        {buttonLabel || 'Add Media'}
         <input
           name={name}
           type="file"
