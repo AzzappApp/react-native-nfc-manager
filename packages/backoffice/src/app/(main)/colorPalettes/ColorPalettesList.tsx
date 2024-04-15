@@ -1,16 +1,25 @@
 'use client';
+import { Search } from '@mui/icons-material';
 import {
   Box,
   Button,
   Chip,
   FormControl,
+  InputAdornment,
   InputLabel,
   MenuItem,
   Select,
+  TextField,
   Typography,
 } from '@mui/material';
 import { useRouter } from 'next/navigation';
-import { useCallback, useState, useTransition } from 'react';
+import {
+  useCallback,
+  useDeferredValue,
+  useEffect,
+  useState,
+  useTransition,
+} from 'react';
 import DataGrid from '#components/DataGrid';
 import type { ColorStatus, Filters, SortColumn } from './page';
 import type { ColorPalette } from '@azzapp/data';
@@ -28,6 +37,7 @@ type ColorPalettesListProps = {
   pageSize: number;
   sortField: SortColumn;
   sortOrder: 'asc' | 'desc';
+  search: string | null;
   filters: Filters;
 };
 
@@ -38,17 +48,26 @@ const ColorPalettesList = ({
   pageSize,
   sortField,
   sortOrder,
+  search,
   filters,
 }: ColorPalettesListProps) => {
   const router = useRouter();
   const [loading, startTransition] = useTransition();
+  const [currentSearch, setCurrentSearch] = useState(search ?? '');
+  const defferedSearch = useDeferredValue(currentSearch);
   const [statusFilter, setStatusFilter] = useState(filters.status);
 
   const updateSearchParams = useCallback(
-    (page: number, sort: string, order: string, filters: Filters) => {
+    (
+      page: number,
+      sort: string,
+      order: string,
+      search: string | null,
+      filters: Filters,
+    ) => {
       startTransition(() => {
         router.replace(
-          `/colorPalettes?page=${page}&sort=${sort}&order=${order}&status=${filters?.status ?? ''}`,
+          `/colorPalettes?page=${page}&sort=${sort}&order=${order}&s=${search ?? ''}&status=${filters?.status ?? ''}`,
         );
       });
     },
@@ -57,11 +76,11 @@ const ColorPalettesList = ({
 
   const onPageChange = useCallback(
     (model: GridPaginationModel) => {
-      updateSearchParams(model.page + 1, sortField, sortOrder, {
+      updateSearchParams(model.page + 1, sortField, sortOrder, search, {
         status: statusFilter,
       });
     },
-    [sortField, sortOrder, statusFilter, updateSearchParams],
+    [search, sortField, sortOrder, statusFilter, updateSearchParams],
   );
 
   const onSortModelChange = useCallback(
@@ -70,24 +89,42 @@ const ColorPalettesList = ({
         page,
         model[0]?.field ?? 'id',
         model[0]?.sort ?? 'asc',
+        search,
         {
           status: statusFilter,
         },
       );
     },
-    [page, statusFilter, updateSearchParams],
+    [page, search, statusFilter, updateSearchParams],
   );
 
   const onStatusChange = useCallback(
     (event: SelectChangeEvent) => {
       const newStatus = event.target.value as ColorStatus;
       setStatusFilter(newStatus);
-      updateSearchParams(1, sortField, sortOrder, {
+      updateSearchParams(1, sortField, sortOrder, search, {
         status: newStatus,
       });
     },
-    [sortField, sortOrder, updateSearchParams],
+    [search, sortField, sortOrder, updateSearchParams],
   );
+
+  useEffect(() => {
+    if (search === defferedSearch) {
+      return;
+    }
+    updateSearchParams(1, sortField, sortOrder, defferedSearch, {
+      status: statusFilter,
+    });
+  }, [
+    defferedSearch,
+    page,
+    search,
+    sortField,
+    sortOrder,
+    statusFilter,
+    updateSearchParams,
+  ]);
 
   return (
     <Box
@@ -101,20 +138,38 @@ const ColorPalettesList = ({
         Colors
       </Typography>
       <Box display="flex" justifyContent="space-between" gap={2} mb={2} mt={2}>
-        <FormControl sx={{ width: 130 }}>
-          <InputLabel id="status">Status</InputLabel>
-          <Select
-            labelId="status"
-            id="status"
-            value={statusFilter}
-            label="Status"
-            onChange={onStatusChange}
-          >
-            <MenuItem value={'all'}>All</MenuItem>
-            <MenuItem value={'Enabled'}>Enabled</MenuItem>
-            <MenuItem value={'Disabled'}>Disabled</MenuItem>
-          </Select>
-        </FormControl>
+        <Box display="flex" gap={2} alignItems="center">
+          <TextField
+            margin="normal"
+            name="search"
+            label="Search"
+            type="text"
+            onChange={e => setCurrentSearch(e.target.value)}
+            value={currentSearch}
+            sx={{ mb: 2, width: 500 }}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <Search />
+                </InputAdornment>
+              ),
+            }}
+          />
+          <FormControl sx={{ width: 130 }}>
+            <InputLabel id="status">Status</InputLabel>
+            <Select
+              labelId="status"
+              id="status"
+              value={statusFilter}
+              label="Status"
+              onChange={onStatusChange}
+            >
+              <MenuItem value={'all'}>All</MenuItem>
+              <MenuItem value={'Enabled'}>Enabled</MenuItem>
+              <MenuItem value={'Disabled'}>Disabled</MenuItem>
+            </Select>
+          </FormControl>
+        </Box>
         <Box display="flex" alignItems="center" gap={2} mb={2} mt={2}>
           <Button
             variant="contained"
@@ -175,6 +230,12 @@ const renderColor = (field: string) => (params: any) => (
 );
 
 const columns: GridColDef[] = [
+  {
+    field: 'id',
+    headerName: 'ID',
+    width: 250,
+  },
+
   {
     field: 'primary',
     headerName: 'Primary Color',

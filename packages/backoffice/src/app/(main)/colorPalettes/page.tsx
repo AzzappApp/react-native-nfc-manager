@@ -1,4 +1,4 @@
-import { and, asc, desc, eq, sql } from 'drizzle-orm';
+import { and, asc, desc, eq, like, or, sql } from 'drizzle-orm';
 import { ColorPaletteTable, db } from '@azzapp/data';
 import ColorPalettesList from './ColorPalettesList';
 import type { SQLWrapper } from 'drizzle-orm';
@@ -24,8 +24,18 @@ const getFilters = (filters: Filters): SQLWrapper[] => {
   return f;
 };
 
-const getColorPalettesQuery = () => {
-  const query = db.select().from(ColorPaletteTable).$dynamic();
+const getSearch = (search: string | null) => {
+  if (search) {
+    return or(like(ColorPaletteTable.id, `%${search}%`));
+  }
+};
+
+const getColorPalettesQuery = (search: string | null, filters: Filters) => {
+  const query = db
+    .select()
+    .from(ColorPaletteTable)
+    .where(and(getSearch(search), ...getFilters(filters)))
+    .$dynamic();
 
   return query;
 };
@@ -34,13 +44,10 @@ const getColorPalettes = (
   page: number,
   sort: SortColumn,
   order: 'asc' | 'desc',
+  search: string | null,
   filters: Filters,
 ) => {
-  const subQuery = getColorPalettesQuery();
-  const query = db
-    .select()
-    .from(subQuery.as('Subquery'))
-    .where(and(...getFilters(filters)));
+  const query = getColorPalettesQuery(search, filters);
 
   query
     .offset(page * PAGE_SIZE)
@@ -52,12 +59,11 @@ const getColorPalettes = (
   return query;
 };
 
-const getCount = async (filters: Filters) => {
-  const subQuery = getColorPalettesQuery();
+const getCount = async (search: string | null, filters: Filters) => {
+  const subQuery = getColorPalettesQuery(search, filters);
   const query = db
     .select({ count: sql`count(*)`.mapWith(Number) })
-    .from(subQuery.as('Subquery'))
-    .where(and(...getFilters(filters)));
+    .from(subQuery.as('Subquery'));
 
   return query.then(rows => rows[0].count);
 };
@@ -67,6 +73,7 @@ type Props = {
     page?: string;
     sort?: string;
     order?: string;
+    s?: string;
     status?: string;
   };
 };
@@ -80,11 +87,18 @@ const ColorPalettesPage = async ({ searchParams = {} }: Props) => {
     : 'id';
 
   const order = searchParams.order === 'desc' ? 'desc' : 'asc';
+  const search = searchParams.s ?? null;
   const filters: Filters = {
     status: (searchParams.status as ColorStatus) || 'Enabled',
   };
-  const colorsPalettes = await getColorPalettes(page - 1, sort, order, filters);
-  const count = await getCount(filters);
+  const colorsPalettes = await getColorPalettes(
+    page - 1,
+    sort,
+    order,
+    search,
+    filters,
+  );
+  const count = await getCount(search, filters);
 
   return (
     <ColorPalettesList
@@ -94,6 +108,7 @@ const ColorPalettesPage = async ({ searchParams = {} }: Props) => {
       pageSize={PAGE_SIZE}
       sortField={sort}
       sortOrder={order}
+      search={search}
       filters={filters}
     />
   );
