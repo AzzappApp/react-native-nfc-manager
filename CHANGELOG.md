@@ -1,4 +1,4 @@
-## 0.5.5-canary.222
+## 0.5.5-canary.223
 
 * **fix:**  - **webCard:** remove temporary constraint on module count
 * **fix:**  - **android:** [#3261](https://github.com/AzzappApp/azzapp/pull/3261) unresponsive bottom menu due to approximated value ([#3265](https://github.com/AzzappApp/azzapp/pull/3265))
