@@ -150,7 +150,7 @@ const ShareBackFormSubmitButton = ({
       loading={pending}
       type="submit"
       variant="primary"
-      disabled={pending || isSuccess || (hasErrors && !isDirty)}
+      disabled={pending || isSuccess || hasErrors || !isDirty}
       className={cx(
         styles.formButton,
         !isSuccess ? styles.formButtonSuccess : '',
