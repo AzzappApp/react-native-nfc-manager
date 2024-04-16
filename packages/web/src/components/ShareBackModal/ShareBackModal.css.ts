@@ -5,7 +5,6 @@ const AVATAR_CONTAINER_TOP_POSITION = 35;
 
 const headerContainsAvatars = style({});
 const header = style({
-  marginLeft: '10px',
   display: 'flex',
   flexDirection: 'column',
   alignItems: 'center',

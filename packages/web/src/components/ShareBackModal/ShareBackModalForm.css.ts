@@ -1,5 +1,5 @@
 import { style } from '@vanilla-extract/css';
-import { textSmall, vars } from '#app/[userName]/theme.css';
+import { MediaQuery, textSmall, vars } from '#app/[userName]/theme.css';
 
 const content = style({
   position: 'relative',
@@ -20,6 +20,11 @@ const formFields = style({
 
 const formSpacingInner = style({
   padding: '10px 25px',
+  '@media': {
+    [MediaQuery.Mobile]: {
+      padding: '10px',
+    },
+  },
 });
 
 const form = style({
@@ -32,7 +37,6 @@ const formFieldContainer = style([
     display: 'flex',
     flexDirection: 'row',
     alignItems: 'center',
-    flexWrap: 'wrap',
   },
   formSpacingInner,
 ]);
@@ -83,6 +87,7 @@ const formFieldError = style([
 const formInput = style({
   flexGrow: 1,
   backgroundColor: 'transparent',
+  padding: 0,
   '::placeholder': {
     color: vars.color.grey200,
   },
@@ -90,11 +95,12 @@ const formInput = style({
 
 const formButtonSuccess = style({});
 const formButton = style({
-  margin: '25px 25px 0',
+  margin: '25px auto 0',
   transition: 'all 400ms cubic-bezier(.47,1.64,.41,.8)',
   border: 0,
   // mandatory to create an animation effect on the button width
-  width: '325px',
+  maxWidth: '325px',
+  width: '80%',
 
   selectors: {
     [`&:not(${formButtonSuccess})`]: {
