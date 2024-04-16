@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
-export const emailSchema = z.string().email().optional();
-export const phoneNumberSchema = z.string().min(10).max(15).optional();
+export const emailSchema = z.string().optional();
+export const phoneNumberSchema = z.string().optional();
 
 export const ShareBackFormSchema = z
   .object({
