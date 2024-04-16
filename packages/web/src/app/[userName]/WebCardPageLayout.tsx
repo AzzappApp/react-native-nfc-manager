@@ -179,7 +179,7 @@ const WebCardPageLayout = (props: ProfilePageLayoutProps) => {
       <ShareBackModal
         ref={shareBackModal}
         fullname={`${contactDataVCard.firstName} ${contactDataVCard.lastName}`}
-        initials={`${contactDataVCard.firstName && contactDataVCard.lastName ? `${contactDataVCard.firstName[0]}${contactDataVCard.lastName[0]}` : webCard.companyName ? webCard.companyName.slice(0, 2) : webCard.userName.slice(0, 2)}`}
+        initials={`${(contactDataVCard.firstName?.length ?? 0) > 0 && (contactDataVCard.lastName?.length ?? 0) > 0 ? `${contactDataVCard.firstName[0]}${contactDataVCard.lastName[0]}` : webCard.companyName ? webCard.companyName.slice(0, 2) : webCard.userName.slice(0, 2)}`}
         userId={contactDataVCard.userId}
         avatarUrl={contactDataVCard.avatarUrl}
         token={contactDataVCard.token}

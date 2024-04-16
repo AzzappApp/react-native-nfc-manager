@@ -1,7 +1,6 @@
 'use client';
 
 import cx from 'classnames';
-import Image from 'next/image';
 import { forwardRef } from 'react';
 import { ShareBackIcon } from '#assets';
 import { Modal, type ModalProps } from '#ui';
@@ -42,7 +41,7 @@ const ShareBackModal = forwardRef<ModalActions, ShareBackModalProps>(
                 </div>
                 {avatarUrl ? (
                   <div className={styles.avatarWrapper}>
-                    <Image
+                    <img
                       className={styles.avatarImage}
                       src={avatarUrl}
                       alt={fullname}

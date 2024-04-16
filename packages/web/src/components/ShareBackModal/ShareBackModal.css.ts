@@ -64,6 +64,7 @@ const iconWrapper = style({
 const avatarInitials = style([
   {
     color: vars.color.grey100,
+    textTransform: 'uppercase',
   },
   iconWrapper,
   textXLarge,
