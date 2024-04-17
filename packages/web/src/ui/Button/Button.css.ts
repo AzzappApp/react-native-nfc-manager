@@ -1,5 +1,5 @@
 import { style } from '@vanilla-extract/css';
-import { textSmallBold, vars } from '#app/[userName]/theme.css';
+import { textButtonMedium, vars } from '#app/[userName]/theme.css';
 
 const empty = style({
   cursor: 'pointer',
@@ -10,13 +10,12 @@ const empty = style({
 
 const button = style([
   empty,
-  textSmallBold,
+  textButtonMedium,
   {
     display: 'inline-flex',
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: '12px',
-    fontWeight: 600,
     cursor: 'pointer',
     lineHeight: '18px',
     textDecoration: 'none',

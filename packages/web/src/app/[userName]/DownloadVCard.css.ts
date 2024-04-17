@@ -1,5 +1,7 @@
 import { style } from '@vanilla-extract/css';
-import { vars } from '#app/[userName]/theme.css';
+import { textLargeSemiBold } from '#app/[userName]/theme.css';
+
+const AVATAR_CONTAINER_TOP_POSITION = 35;
 
 const overlay = style({
   position: 'absolute',
@@ -28,7 +30,7 @@ const dialog = style({
   backgroundColor: 'white',
   padding: '20px',
   boxShadow: '0px -8px 8px 0px #0000001A',
-  borderRadius: '16px 16px 0 0',
+  borderRadius: '22px 22px 0 0',
   display: 'flex',
   alignItems: 'center',
   flexDirection: 'column',
@@ -44,20 +46,35 @@ const openedDialog = style([
   },
 ]);
 
-const message = style({
-  fontWeight: vars.fontWeight.regular,
-  fontSize: '15px',
-  lineHeight: '24px',
-  textAlign: 'center',
-  maxWidth: '335px',
-});
+const messageContainsAvatars = style({});
+const message = style(
+  {
+    textAlign: 'center',
+    maxWidth: '335px',
+    marginTop: `${AVATAR_CONTAINER_TOP_POSITION}px`,
+
+    selectors: {
+      [`&:not(${messageContainsAvatars})`]: {
+        marginTop: 0,
+      },
+    },
+  },
+  textLargeSemiBold,
+);
 
 const closeButton = style({
-  backgroundColor: 'transparent',
-  border: 'none',
-  color: vars.color.grey400,
-  fontWeight: vars.fontWeight.medium,
-  fontSize: '14px',
+  position: 'absolute',
+  top: '20px',
+  right: '20px',
+});
+
+const avatarContainer = style({
+  position: 'absolute',
+  top: `-${AVATAR_CONTAINER_TOP_POSITION}px`,
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  gap: '20px',
 });
 
 const styles = {
@@ -67,6 +84,8 @@ const styles = {
   closeButton,
   openedOverlay,
   openedDialog,
+  avatarContainer,
+  messageContainsAvatars,
 };
 
 export default styles;

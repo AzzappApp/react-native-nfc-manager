@@ -5,6 +5,7 @@ import { forwardRef } from 'react';
 import { ShareBackIcon } from '#assets';
 import { Modal, type ModalProps } from '#ui';
 
+import Avatar from '#ui/Avatar/Avatar';
 import styles from './ShareBackModal.css';
 import ShareBackModalForm from './ShareBackModalForm';
 import type { ModalActions } from '#ui/Modal';
@@ -34,30 +35,16 @@ const ShareBackModal = forwardRef<ModalActions, ShareBackModalProps>(
           <div className={styles.avatarContainer}>
             {isMultiUser ? (
               <>
-                <div className={styles.avatarWrapper}>
-                  <div className={styles.iconWrapper}>
-                    <ShareBackIcon />
-                  </div>
-                </div>
+                <Avatar variant="icon" icon={<ShareBackIcon />} />
                 {avatarUrl ? (
-                  <div className={styles.avatarWrapper}>
-                    <img
-                      className={styles.avatarImage}
-                      src={avatarUrl}
-                      alt={fullname}
-                      width="70"
-                      height="70"
-                    />
-                  </div>
+                  <Avatar variant="image" url={avatarUrl} alt={fullname} />
                 ) : (
-                  <div className={styles.avatarWrapper}>
-                    <span className={styles.avatarInitials}>{initials}</span>
-                  </div>
+                  <Avatar variant="initials" initials={initials} />
                 )}
               </>
             ) : null}
           </div>
-          <span className={styles.title}>Share yours details with</span>
+          <span className={styles.title}>Share your details with</span>
           <span className={styles.title}>{fullname}</span>
         </div>
 

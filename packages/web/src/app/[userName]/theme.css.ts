@@ -34,6 +34,12 @@ export const textLarge = style({
   lineHeight: '20px',
 });
 
+export const textLargeSemiBold = style({
+  fontWeight: vars.fontWeight.semiBold,
+  fontSize: '16px',
+  lineHeight: '20px',
+});
+
 export const textField = style({
   fontWeight: vars.fontWeight.regular,
   fontSize: '16px',
@@ -46,8 +52,20 @@ export const textButton = style({
   lineHeight: '17px',
 });
 
+export const textButtonMedium = style({
+  fontWeight: vars.fontWeight.medium,
+  fontSize: '14px',
+  lineHeight: '17px',
+});
+
 export const textSmallBold = style({
   fontWeight: vars.fontWeight.semiBold,
+  fontSize: '12px',
+  lineHeight: '15px',
+});
+
+export const textSmallMedium = style({
+  fontWeight: vars.fontWeight.medium,
   fontSize: '12px',
   lineHeight: '15px',
 });

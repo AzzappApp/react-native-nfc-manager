@@ -19,7 +19,7 @@ const modal = style({
   position: 'relative',
   paddingTop: '20px',
   paddingBottom: '20px',
-  borderRadius: '20px',
+  borderRadius: '24px',
   backgroundColor: vars.color.white,
   width: '375px',
   maxWidth: '100%',

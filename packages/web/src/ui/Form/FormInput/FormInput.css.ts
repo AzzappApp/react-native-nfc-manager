@@ -1,8 +1,8 @@
 import { style } from '@vanilla-extract/css';
-import { textMedium, vars } from '#app/[userName]/theme.css';
+import { textField, vars } from '#app/[userName]/theme.css';
 
 const input = style([
-  textMedium,
+  textField,
   {
     height: '47px',
     backgroundColor: vars.color.grey50,

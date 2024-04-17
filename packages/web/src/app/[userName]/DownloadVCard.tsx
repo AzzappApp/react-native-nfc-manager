@@ -1,9 +1,13 @@
 'use client';
+import cx from 'classnames';
 import { decompressFromEncodedURIComponent } from 'lz-string';
 import { useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { buildVCardFromSerializedContact } from '@azzapp/shared/vCardHelpers';
+import { CloseIcon } from '#assets';
+import { ButtonIcon } from '#ui';
 import { updateContactCardScanCounter } from '#app/actions/statisticsAction';
+import Avatar from '#ui/Avatar/Avatar';
 import LinkButton from '#ui/Button/LinkButton';
 import styles from './DownloadVCard.css';
 import type { WebCard } from '@azzapp/data';
@@ -25,6 +29,7 @@ const DownloadVCard = ({
     firstName: string;
     lastName: string;
     company: string;
+    avatarUrl?: string;
   }>();
 
   const [token, setToken] = useState('');
@@ -76,7 +81,7 @@ const DownloadVCard = ({
             );
 
             if (contact.webCardId === webCard.id) {
-              setContact(contact);
+              setContact({ ...contact, avatarUrl: additionalData.avatarUrl });
               const file = new Blob([vCard.toString()], { type: 'text/vcard' });
               const fileURL = URL.createObjectURL(file);
               setFileUrl(fileURL);
@@ -113,15 +118,40 @@ const DownloadVCard = ({
         role="dialog"
         aria-label="Modal with contact card download link"
       >
-        <span className={styles.message}>{`You can download the Contact Card ${
+        <div className={styles.avatarContainer}>
+          {webCard.isMultiUser && contact ? (
+            contact?.avatarUrl ? (
+              <Avatar
+                variant="image"
+                url={contact.avatarUrl}
+                alt={
+                  `${contact.firstName ?? ''}  ${contact.lastName ?? ''}`.trim() ||
+                  contact.company ||
+                  webCard.userName
+                }
+              />
+            ) : (
+              <Avatar
+                variant="initials"
+                initials={`${contact.firstName?.length ?? 0 > 0 ? contact.firstName[0] : ''}${contact.lastName?.length ?? 0 > 0 ? contact.lastName[0] : ''}`}
+              />
+            )
+          ) : null}
+        </div>
+        <span
+          className={cx(
+            styles.message,
+            webCard.isMultiUser ? styles.messageContainsAvatars : '',
+          )}
+        >{`Add ${
           contact
-            ? `of ${
+            ? `${
                 `${contact.firstName ?? ''}  ${
                   contact.lastName ?? ''
                 }`.trim() ||
                 contact.company ||
                 webCard.userName
-              }   🎉`
+              } to your contacts`
             : ''
         }`}</span>
 
@@ -131,13 +161,16 @@ const DownloadVCard = ({
             href={fileUrl}
             download={`${webCard.userName}.vcf`}
           >
-            Download the Contact Card
+            Save Contact Card
           </LinkButton>
         )}
 
-        <button className={styles.closeButton} onClick={handleClose}>
-          Close
-        </button>
+        <ButtonIcon
+          onClick={handleClose}
+          size={30}
+          Icon={CloseIcon}
+          className={styles.closeButton}
+        />
       </div>
     </div>
   );
