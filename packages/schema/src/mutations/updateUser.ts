@@ -6,14 +6,13 @@ import {
   formatPhoneNumber,
   isInternationalPhoneNumber,
 } from '@azzapp/shared/stringHelpers';
-import { twilioVerificationService } from '@azzapp/web/src/helpers/twilioHelpers';
 import type { MutationResolvers } from '#/__generated__/types';
 import type { User } from '@azzapp/data';
 
 const updateUserMutation: MutationResolvers['updateUser'] = async (
   _,
   args,
-  { auth, loaders },
+  { auth, loaders, validateMailOrPhone },
 ) => {
   const userId = auth.userId;
   if (!userId) {
@@ -35,14 +34,9 @@ const updateUserMutation: MutationResolvers['updateUser'] = async (
     if (!token) {
       throw new GraphQLError(ERRORS.INVALID_TOKEN);
     }
-
-    const verificationCheck =
-      await twilioVerificationService().verificationChecks.create({
-        to: phoneNumber,
-        code: token,
-      });
-
-    if (verificationCheck.status !== 'approved') {
+    try {
+      await validateMailOrPhone('phone', phoneNumber, token);
+    } catch (e) {
       throw new GraphQLError(ERRORS.INVALID_TOKEN);
     }
   }
@@ -52,13 +46,9 @@ const updateUserMutation: MutationResolvers['updateUser'] = async (
       throw new GraphQLError(ERRORS.INVALID_TOKEN);
     }
 
-    const verificationCheck =
-      await twilioVerificationService().verificationChecks.create({
-        to: email,
-        code: token,
-      });
-
-    if (verificationCheck.status !== 'approved') {
+    try {
+      await validateMailOrPhone('email', email, token);
+    } catch (e) {
       throw new GraphQLError(ERRORS.INVALID_TOKEN);
     }
   }

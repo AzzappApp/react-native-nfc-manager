@@ -37,6 +37,11 @@ type CreateEndpointOptions = {
     }>,
   ) => Promise<void>;
   sendSms: (p: { phoneNumber: string; body: string }) => Promise<void>;
+  validateMailOrPhone: (
+    type: 'email' | 'phone',
+    issuer: string,
+    token: string,
+  ) => Promise<void>;
   buildCoverAvatarUrl: (webCard: WebCard | null) => Promise<string | null>;
   fetchAPI?: Partial<Record<keyof FetchAPI, any>>;
   graphqlEndpoint?: string;
@@ -113,6 +118,7 @@ export const createGraphqlEndpoint = (options: CreateEndpointOptions) => {
       return createGraphQLContext(
         options.sendMail,
         options.sendSms,
+        options.validateMailOrPhone,
         options.buildCoverAvatarUrl,
         loaders,
         locale ?? DEFAULT_LOCALE,

@@ -27,6 +27,7 @@ export const createAppFixture = () => {
     buildCoverAvatarUrl: webcard => Promise.resolve(webcard?.userName ?? null),
     sendMail: () => Promise.resolve(),
     sendSms: () => Promise.resolve(),
+    validateMailOrPhone: () => Promise.resolve(),
     plugins: [
       usePersistedOperations({
         extractPersistedOperationId: params => {

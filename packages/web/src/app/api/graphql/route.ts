@@ -203,6 +203,27 @@ const { handleRequest } = createGraphqlEndpoint({
       throw new Error('Error sending sms');
     }
   },
+  validateMailOrPhone: async (
+    type: 'email' | 'phone',
+    issuer: string,
+    token: string,
+  ) => {
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_API_ENDPOINT}/validateMailOrPhone`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          [AZZAPP_SERVER_HEADER]: process.env.API_SERVER_TOKEN ?? '',
+        },
+        body: JSON.stringify({ type, issuer, token }),
+      },
+    );
+
+    if (!res.ok) {
+      throw new Error('Error validating mail or phone');
+    }
+  },
 });
 
 const handleRequestWithAxiom = withAxiom(handleRequest);
