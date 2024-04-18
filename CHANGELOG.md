@@ -1,5 +1,8 @@
-## 0.5.5-canary.226
+## 0.5.5-canary.227
 
+* **fix:**  - unused import
+* **fix:**  - don’t use web helpers in schema ([#3304](https://github.com/AzzappApp/azzapp/pull/3304))
+* **build:**  - upgrade to node 20 ([#3298](https://github.com/AzzappApp/azzapp/pull/3298))
 * **fix:**  - **webCard:** remove temporary constraint on module count
 * **fix:**  - **android:** [#3261](https://github.com/AzzappApp/azzapp/pull/3261) unresponsive bottom menu due to approximated value ([#3265](https://github.com/AzzappApp/azzapp/pull/3265))
 * **fix:**  - **webCard:** [#3254](https://github.com/AzzappApp/azzapp/pull/3254) remove temporary check on subscription ([#3262](https://github.com/AzzappApp/azzapp/pull/3262))
