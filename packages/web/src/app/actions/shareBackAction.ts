@@ -116,7 +116,7 @@ export const processShareBackSubmission = async (
         JSON.stringify([shareBackContactDetails, signature]),
       );
 
-      const shareBackContactVCardUrl = `${buildUserUrl('/shareBackVCard')}?c=${shareBackContactCompressedData}`;
+      const shareBackContactVCardUrl = `${process.env.NEXT_PUBLIC_API_ENDPOINT}/shareBackVCard?c=${shareBackContactCompressedData}`;
 
       await sendSMS([
         {
