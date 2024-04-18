@@ -6,8 +6,6 @@ import { jwtDecode } from 'jwt-decode';
 import { compressToEncodedURIComponent } from 'lz-string';
 import { headers } from 'next/headers';
 import { getUserById } from '@azzapp/data';
-
-import { buildUserUrl } from '@azzapp/shared/urlHelpers';
 import { buildVCardFromShareBackContact } from '@azzapp/shared/vCardHelpers';
 import { ShareBackFormSchema } from '#components/ShareBackModal/shareBackFormSchema';
 import { sendSMS, sendEmail } from '#helpers/contactHelpers';
