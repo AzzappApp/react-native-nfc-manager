@@ -213,5 +213,3 @@ const removePreRelease = (version: string) => {
   const versionParts = version.split('-');
   return versionParts[0];
 };
-
-export const runtime = 'nodejs';
