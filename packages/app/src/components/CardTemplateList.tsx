@@ -31,6 +31,7 @@ import Header, { HEADER_HEIGHT } from '#ui/Header';
 import HeaderButton from '#ui/HeaderButton';
 import Icon from '#ui/Icon';
 import PressableNative from '#ui/PressableNative';
+import SearchBarStatic from '#ui/SearchBarStatic';
 import SelectSection from '#ui/SelectSection';
 import Text from '#ui/Text';
 import { useModulesData } from './cardModules/ModuleData';
@@ -278,11 +279,14 @@ const CardTemplateList = (
 
   const intl = useIntl();
 
-  const getItemLayout = (_data: any, index: number) => ({
-    length: itemWidth,
-    offset: itemWidth * index + GAP * (index - 1),
-    index,
-  });
+  const getItemLayout = useCallback(
+    (_data: any, index: number) => ({
+      length: itemWidth,
+      offset: itemWidth * index + GAP * (index - 1),
+      index,
+    }),
+    [itemWidth],
+  );
 
   const renderItem = useCallback<ListRenderItem<CardTemplateItem>>(
     ({ item, index }) => {
@@ -353,9 +357,11 @@ const CardTemplateList = (
 
   const { top } = useSafeAreaInsets();
 
-  const [selectedCardTemplateType, setSelectedCaredtemplateType] = useState<
+  const [selectedCardTemplateType, setSelectedCardTemplateType] = useState<
     { id: string; title: string } | undefined
   >(undefined);
+
+  const [search, setSearch] = useState('');
 
   const templateTypesByWebCardCategory = useMemo(() => {
     return (
@@ -381,16 +387,24 @@ const CardTemplateList = (
           const existingSection = acc.find(section => section.title === label);
 
           if (existingSection) {
-            existingSection.data.push({
-              id: curr.id,
-              title: curr.label ?? '-',
-              data: [],
-            });
+            if (
+              !search.trim() ||
+              curr.label?.toLowerCase().includes(search.trim().toLowerCase())
+            ) {
+              existingSection.data.push({
+                id: curr.id,
+                title: curr.label ?? '-',
+                data: [],
+              });
 
-            existingSection.data = existingSection.data.sort((a, b) =>
-              a.title.localeCompare(b.title),
-            );
-          } else {
+              existingSection.data = existingSection.data.sort((a, b) =>
+                a.title.localeCompare(b.title),
+              );
+            }
+          } else if (
+            !search.trim() ||
+            curr.label?.toLowerCase().includes(search.trim().toLowerCase())
+          ) {
             acc.push({
               title: label,
               data: [{ id: curr.id, title: curr.label ?? '-', data: [] }],
@@ -402,19 +416,22 @@ const CardTemplateList = (
         [],
       ) ?? []
     ).sort((a, b) => a.title.localeCompare(b.title));
-  }, [cardTemplateTypes]);
+  }, [cardTemplateTypes, search]);
 
-  const onSelectSection = (item: { id: string; title: string }) => {
-    setSelectedCaredtemplateType(item);
-    refetch(
-      { cardTemplateTypeId: fromGlobalId(item.id).id, after: null },
-      { fetchPolicy: 'store-and-network' },
-    );
-  };
+  const onSelectSection = useCallback(
+    (item: { id: string; title: string }) => {
+      setSelectedCardTemplateType(item);
+      refetch(
+        { cardTemplateTypeId: fromGlobalId(item.id).id, after: null },
+        { fetchPolicy: 'store-and-network' },
+      );
+    },
+    [refetch],
+  );
 
   useEffect(() => {
     if (!selectedCardTemplateType && templates?.length > 0) {
-      setSelectedCaredtemplateType({
+      setSelectedCardTemplateType({
         id: templates[0].cardTemplateType?.id ?? '-',
         title: templates[0].cardTemplateType?.label ?? '-',
       });
@@ -442,6 +459,9 @@ const CardTemplateList = (
                 'Card Template list - Accessibility TextInput Placeholder to select a type of template',
             })}
             style={{ marginHorizontal: 20 }}
+            ListHeaderComponent={
+              <SearchHeader onChangeText={setSearch} initialValue={search} />
+            }
           />
 
           {templates && (
@@ -504,6 +524,38 @@ const CardTemplateList = (
         />
       )}
     </>
+  );
+};
+
+// separate component to mitigate re-rendering of the whole list (see https://github.com/facebook/react-native/issues/23400)
+const SearchHeader = ({
+  initialValue,
+  onChangeText,
+}: {
+  initialValue: string;
+  onChangeText: (p: string) => void;
+}) => {
+  const [search, setSearch] = useState<string | undefined>(initialValue);
+
+  useEffect(() => {
+    onChangeText(search ?? '');
+  }, [search, onChangeText]);
+
+  const styles = useStyleSheet(stylesheet);
+  const intl = useIntl();
+
+  return (
+    <View style={styles.searchContainer}>
+      <SearchBarStatic
+        value={search}
+        placeholder={intl.formatMessage({
+          defaultMessage: 'Search',
+          description: 'Search placeholder in card template list',
+        })}
+        onChangeText={setSearch}
+        autoFocus={!!initialValue}
+      />
+    </View>
   );
 };
 
@@ -664,4 +716,5 @@ const stylesheet = createStyleSheet(theme => ({
     paddingLeft: 6,
     height: 20,
   },
+  searchContainer: { paddingBottom: 20 },
 }));

@@ -7,6 +7,7 @@ import BottomSheetModal from './BottomSheetModal';
 import Icon from './Icon';
 import PressableNative from './PressableNative';
 import SelectSectionList from './SelectSectionList';
+import type { ReactElement } from 'react';
 import type {
   SectionListData,
   SectionListRenderItem,
@@ -16,6 +17,12 @@ import type {
 } from 'react-native';
 
 type SelectProps<ItemT, SectionT> = Omit<ViewProps, 'children'> & {
+  ListHeaderComponent?:
+    | React.ComponentType<any>
+    | ReactElement
+    | null
+    | undefined;
+
   sections: Array<{ title: string; data: [{ id: string; title: string }] }>;
   /**
    * Used to extract a unique key for a given item at the specified index. Key is used for caching
@@ -106,6 +113,7 @@ const SelectSection = <ItemT, SectionT>({
   selectedItemContainerStyle,
   isErrored,
   style,
+  ListHeaderComponent,
   ...props
 }: SelectProps<ItemT, SectionT>) => {
   const [showDropDown, setShowDropDown] = useState(false);
@@ -167,6 +175,7 @@ const SelectSection = <ItemT, SectionT>({
           ItemSeparatorComponent={() => <View style={{ height: 20 }} />}
           SectionSeparatorComponent={() => <View style={{ height: 15 }} />}
           style={{ marginTop: 20, marginHorizontal: 30 }}
+          ListHeaderComponent={ListHeaderComponent}
         />
       </BottomSheetModal>
     </>
