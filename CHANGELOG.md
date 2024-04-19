@@ -1,5 +1,6 @@
-## 0.5.5-canary.227
+## 0.5.5-canary.228
 
+* **fix:**  - wrong route for validation
 * **fix:**  - unused import
 * **fix:**  - don’t use web helpers in schema ([#3304](https://github.com/AzzappApp/azzapp/pull/3304))
 * **build:**  - upgrade to node 20 ([#3298](https://github.com/AzzappApp/azzapp/pull/3298))
