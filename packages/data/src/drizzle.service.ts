@@ -29,7 +29,7 @@ export type DatabaseTransaction = Parameters<
 >[0];
 
 export type TransactionManager = {
-  startTransaction<T>(cb: () => Promise<T>): Promise<T>;
+  startTransaction<T>(cb: (trx: DatabaseTransaction) => Promise<T>): Promise<T>;
 };
 
 type DrizzleTransactionManager = TransactionManager & {
@@ -52,11 +52,18 @@ export const createDrizzleTransactionManager = (
   // @ts-ignore Missing type for async local storage
   const store = new AsyncLocalStorage<DatabaseTransaction>();
 
-  const startTransaction = <T>(cb: () => Promise<T>) => {
+  const startTransaction = <T>(cb: (tx: DatabaseTransaction) => Promise<T>) => {
     return database.transaction(trx => {
       return new Promise<T>((resolve, reject) => {
         store.run(trx, () => {
-          cb().then(resolve).catch(reject);
+          cb(trx)
+            .then(r => {
+              resolve(r);
+            })
+            .catch(err => {
+              console.log(err);
+              reject(err);
+            });
         });
       });
     });

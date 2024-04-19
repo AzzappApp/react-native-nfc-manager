@@ -94,7 +94,7 @@ export const getUserByPhoneNumber = async (
  * @returns The newly created user
  */
 export const createUser = async (data: NewUser) => {
-  const id = createId();
+  const id = data.id ?? createId();
   await db
     .client()
     .insert(UserTable)

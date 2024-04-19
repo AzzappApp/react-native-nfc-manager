@@ -10,7 +10,6 @@ import {
 } from '@azzapp/data';
 import { ProfileAlreadyExistsException } from './exceptions/profile-already-exists.exception';
 import { ProfileDoesNotExistException } from './exceptions/profile-does-not-exist.exception';
-
 import type { GraphQLContext } from '#GraphQLContext';
 import type { Profile, WebCard } from '@azzapp/data';
 import type { ContactCard } from '@azzapp/shared/contactCardHelpers';
@@ -48,11 +47,10 @@ export const inviteUser = async (input: Input) => {
   if (!webCard) throw new ProfileDoesNotExistException();
 
   const createdProfile = await db.transactionManager.startTransaction(
-    async () => {
+    async tx => {
       if (!webCard.isMultiUser) {
         await updateWebCard(webCard.id, { isMultiUser: true });
       }
-
       const existingUser = await getUserByEmailPhoneNumber(
         input.invited.email,
         input.invited.phoneNumber,
@@ -96,7 +94,7 @@ export const inviteUser = async (input: Input) => {
           deletedBy: null,
         };
 
-        await createProfile(profile);
+        await createProfile(profile, tx);
         return profile;
       } catch (e) {
         throw new ProfileAlreadyExistsException();
