@@ -1,5 +1,6 @@
-## 0.5.5-canary.234
+## 0.5.5-canary.235
 
+* **fix:**  - **backoffice:** try with external method
 * **build:**  - missing dependency on backoffice
 * **build:**  - remove wrong filter
 * **feat:**  - **cover:** [#3245](https://github.com/AzzappApp/azzapp/pull/3245) add search bar on activities ([#3313](https://github.com/AzzappApp/azzapp/pull/3313))
