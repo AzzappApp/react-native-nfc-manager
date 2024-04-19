@@ -72,6 +72,14 @@
     {
       "splitTerminals": [
         {
+          "name": "payment",
+          "commands": ["cd packages/payment", "yarn dev"]
+        }
+      ]
+    },
+    {
+      "splitTerminals": [
+        {
           "name": "web",
           "commands": ["cd packages/web", "yarn dev"]
         }

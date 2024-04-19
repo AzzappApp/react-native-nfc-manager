@@ -1,0 +1,65 @@
+extend type Mutation {
+  estimateSubscriptionCost(
+    totalSeats: Int!
+    interval: Interval!
+  ): SubscriptionEstimation!
+  createPaymentIntent(
+    webCardId: ID!
+    intent: PaymentIntentInput!
+  ): PaymentIntentPayload!
+  createSubscriptionFromPaymentMean(
+    webCardId: ID!
+    paymentMeanId: ID!
+    intent: PaymentIntentInput!
+  ): UserSubscription!
+  updateSubscription(
+    webCardId: ID!
+    totalSeats: Int
+    paymentMeanId: ID
+  ): UserSubscription!
+  createPaymentMean(
+    webCardId: ID!
+    locale: String!
+    redirectUrl: String!
+    customer: Customer!
+  ): String!
+  generatePaymentInvoice(webCardId: ID!, paymentId: ID!): String!
+  upgradeSubscriptionPlan(webCardId: ID!): UserSubscription!
+}
+
+enum Interval {
+  monthly
+  yearly
+}
+
+input PaymentIntentInput {
+  totalSeats: Int!
+  locale: String!
+  interval: Interval!
+  customer: Customer!
+  redirectUrl: String!
+}
+
+input Customer {
+  email: String!
+  name: String!
+  phone: String
+  address: String!
+  city: String!
+  zip: String!
+  country: String!
+  vatNumber: String
+}
+
+type PaymentIntentPayload {
+  clientRedirectUrl: String!
+  amount: Int!
+  taxes: Int!
+}
+
+type SubscriptionEstimation {
+  """
+  The estimated cost of the subscription in cents
+  """
+  cost: Int!
+}

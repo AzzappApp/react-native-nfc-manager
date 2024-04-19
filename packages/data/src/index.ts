@@ -28,3 +28,5 @@ export * from './report';
 export * from './generic';
 export * from './databaseMonitorer';
 export * from './labels';
+export * from './payments';
+export * from './paymentMeans';

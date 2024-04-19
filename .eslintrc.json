@@ -35,6 +35,7 @@
     "packages/data/lib",
     "packages/shared/lib",
     "packages/schema/lib",
+    "packages/payment/lib",
     "packages/web/.next",
     "trash"
   ],

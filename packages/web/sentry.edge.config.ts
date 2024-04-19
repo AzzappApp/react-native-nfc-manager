@@ -11,6 +11,8 @@ const ENVIRONMENT = process.env.NEXT_PUBLIC_PLATFORM || 'development';
 Sentry.init({
   dsn: DNS,
 
+  environment: ENVIRONMENT,
+
   enabled: process.env.NODE_ENV !== 'development',
 
   // Adjust this value in production, or use tracesSampler for greater control

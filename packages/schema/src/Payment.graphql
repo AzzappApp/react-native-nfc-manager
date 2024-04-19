@@ -1,0 +1,72 @@
+type Payment {
+  """
+  The ID of an object
+  """
+  id: ID!
+  """
+  The payment amount
+  """
+  amount: Int!
+  """
+  The payment taxes
+  """
+  taxes: Int!
+  """
+  The payment status
+  """
+  status: PaymentStatus!
+  """
+  The payment date
+  """
+  createdAt: DateTime!
+  """
+  The payment invoice PDF URL
+  """
+  invoicePdfUrl: String
+}
+
+enum PaymentStatus {
+  paid
+  failed
+}
+
+"""
+A connection to a list of items.
+"""
+type PaymentConnection {
+  """
+  Information to aid in pagination.
+  """
+  pageInfo: PageInfo!
+
+  """
+  A list of edges.
+  """
+  edges: [PaymentEdge]
+}
+
+"""
+An edge in a connection.
+"""
+type PaymentEdge {
+  """
+  A cursor for use in pagination
+  """
+  cursor: String!
+
+  """
+  The item at the end of the edge
+  """
+  node: Payment
+}
+
+type PaymentMean {
+  """
+  The ID of an object
+  """
+  id: ID!
+  """
+  Returns the masked card number
+  """
+  maskedCard: String
+}

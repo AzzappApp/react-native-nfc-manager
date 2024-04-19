@@ -172,7 +172,7 @@ export const Profile: ProfileResolvers = {
         .where(
           and(
             eq(WebCardTable.cardIsPublished, true),
-            eq(PostTable.deleted, false),
+            eq(WebCardTable.deleted, false),
             like(WebCardTable.userName, `%${args.search}%`),
           ),
         ),

@@ -2,7 +2,6 @@
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
     "noEmit": true,
-    "esModuleInterop": true,
     "paths": {
       "@azzapp/shared/*": ["../shared/src/*"],
       "@azzapp/data/*": ["../data/src/*"],
@@ -10,6 +9,15 @@
       "#*": ["./src/*"]
     }
   },
-  "include": ["**/*.ts", "**/*.tsx", "**/*.js", "**/*.jsx", "**/*.json"],
-  "exclude": ["lib", "node_modules", "package.json", "tsconfig.json"]
+  "exclude": [
+    "node_modules",
+    "lib",
+    "scripts",
+    "tsconfig.json",
+    "tsconfig.lib.json",
+    "jest.config.js",
+    "babel.config.js",
+    "jest-e2e.config.js",
+    "testing"
+  ]
 }

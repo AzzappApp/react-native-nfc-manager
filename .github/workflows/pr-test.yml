@@ -14,6 +14,7 @@ jobs:
       TURBO_TOKEN: ${{secrets.VERCEL_TOKEN}}
       TURBO_TEAM: azzapp
       NODE_OPTIONS: --max-old-space-size=4096
+      PAYMENT_API_URL: ${{ vars.PAYMENT_API_URL }}
     steps:
       - uses: actions/checkout@v3
 

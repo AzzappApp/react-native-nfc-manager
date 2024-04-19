@@ -112,6 +112,14 @@ const ERRORS = {
    * The payload is too large.
    */
   PAYLOAD_TOO_LARGE: 'PAYLOAD_TOO_LARGE',
+  /**
+   * The payment failed.
+   */
+  PAYMENT_ERROR: 'PAYMENT_ERROR',
+  /**
+   * The subscription is required.
+   */
+  SUBSCRIPTION_REQUIRED: 'SUBSCRIPTION_REQUIRED',
 } as const;
 
 export default ERRORS;

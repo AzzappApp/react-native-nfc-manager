@@ -11,6 +11,9 @@ import {
   getWebCardProfiles,
   countWebCardProfiles,
   getWebCardPendingOwnerProfile,
+  getUserSubscriptionForWebCard,
+  getActivePaymentMeans,
+  getWebCardPayments,
 } from '@azzapp/data';
 import {
   connectionFromDateSortedItems,
@@ -208,6 +211,41 @@ export const WebCard: WebCardResolvers = {
     return buildCoverAvatarUrl(webCard);
   },
   updatedAt: webCard => webCard.updatedAt.toISOString(),
+  subscription: async (webCard, _, { auth }) => {
+    if (!auth.userId) {
+      return null;
+    }
+
+    const subscription = await getUserSubscriptionForWebCard(
+      auth.userId,
+      webCard.id,
+    );
+
+    return subscription ?? null;
+  },
+  paymentMeans: async (webCard, _args, { auth }) => {
+    if (!auth.userId) {
+      return null;
+    }
+
+    return getActivePaymentMeans(auth.userId, webCard.id);
+  },
+  payments: async (webCard, args) => {
+    let { after, first } = args;
+    after = after ?? null;
+    first = first ?? 100;
+
+    const offset = after ? cursorToOffset(after) : 0;
+
+    return connectionFromArraySlice(
+      await getWebCardPayments(webCard.id, first, offset),
+      { after, first },
+      {
+        sliceStart: offset,
+        arrayLength: await countWebCardProfiles(webCard.id),
+      },
+    );
+  },
 };
 
 export const WebCardCategory: WebCardCategoryResolvers = {

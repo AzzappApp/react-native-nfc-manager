@@ -91,7 +91,7 @@ const updateWebCardUserNameMutation: MutationResolvers['updateWebCardUserName'] 
           await trx
             .update(RedirectWebCardTable)
             .set({ toUserName: userName })
-            .where(and(eq(RedirectWebCardTable.toUserName, webCard.userName)));
+            .where(eq(RedirectWebCardTable.toUserName, webCard.userName));
         }
       });
     } catch (error) {

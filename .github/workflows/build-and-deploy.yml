@@ -22,6 +22,7 @@ jobs:
       NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME: ${{ vars.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}}
       PHRASE_ACCESS_TOKEN: ${{ secrets.PHRASE_ACCESS_TOKEN }}
       SENTRY_AUTH_TOKEN: ${{ vars.SENTRY_AUTH_TOKEN }}
+      PAYMENT_API_URL: ${{ vars.PAYMENT_API_URL }}
     steps:
       ############################################
       #

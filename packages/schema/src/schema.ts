@@ -15,6 +15,7 @@ import { createGraphQLContext } from './GraphQLContext';
 import * as MediaResolvers from './MediaResolvers';
 import * as MutationResolvers from './mutations';
 import { Node } from './NodeResolvers';
+import * as PaymentResolvers from './PaymentResolvers';
 import * as PostResolvers from './PostResolvers';
 import * as ProfileResolvers from './ProfileResolvers';
 import * as QueryResolvers from './QueryResolvers';
@@ -43,6 +44,7 @@ const resolvers: Resolvers = {
   ...CardTemplateTypeResolvers,
   ...StatisticResolvers,
   ...UserSubscriptionResolvers,
+  ...PaymentResolvers,
   Node,
 };
 

@@ -5,26 +5,22 @@ export const isWebCardKindSubscription = (kind: string) => {
 const modulesKindsSubscription = ['simpleButton', 'parallax'];
 
 export const isModuleKindSubscription = (_kind: string) => {
-  return false; //TODO: CHANGE THIS. (did it here to not block the dev test in merge)
-  //return modulesKindsSubscription.includes(_kind);
+  return modulesKindsSubscription.includes(_kind);
 };
 
 export const moduleCountRequiresSubscription = (_moduleCount: number) => {
-  return false; //TODO: CHANGE THIS. (did it here to not block the dev test in merge)
-  //return moduleCount > 3;
+  return _moduleCount > 3;
 };
 
 export const webcardRequiresSubscription = (
   _modules: ReadonlyArray<{ readonly kind: string }>,
   _kind?: string | null,
 ) => {
-  return false; //TODO: CHANGE THIS. (did it here to not block the dev test in merge)
-  /** if (kind && isWebCardKindSubscription(kind)) return true;
+  if (_kind && isWebCardKindSubscription(_kind)) return true;
   return (
-    moduleCountRequiresSubscription(modules.length) ||
-    modules.some(module => isModuleKindSubscription(module.kind))
+    moduleCountRequiresSubscription(_modules.length) ||
+    _modules.some(module => isModuleKindSubscription(module.kind))
   );
-  */
 };
 
 export const addingModuleRequireSubscription = (

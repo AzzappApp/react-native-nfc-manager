@@ -20,7 +20,6 @@ input SaveSubscriptionInput {
 enum IssuerSubscription {
   apple
   google
-  web
 }
 
 type SaveSubscriptionPayload {

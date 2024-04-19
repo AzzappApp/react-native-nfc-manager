@@ -2,7 +2,6 @@ import { GraphQLError } from 'graphql';
 import { upsertSubscription } from '@azzapp/data';
 import ERRORS from '@azzapp/shared/errors';
 import type { MutationResolvers } from '#/__generated__/types';
-import type { UserSubscription } from '@azzapp/data';
 
 const saveSubscription: MutationResolvers['saveSubscription'] = async (
   _,
@@ -17,13 +16,11 @@ const saveSubscription: MutationResolvers['saveSubscription'] = async (
     throw new GraphQLError(ERRORS.UNAUTHORIZED);
   }
   let totalSeatsFix = 0;
-  if (issuer !== 'web' && !totalSeats) {
+  if (!totalSeats) {
     totalSeatsFix = extractSeatsFromSubscriptionId(subscriptionId);
-  } else if (issuer === 'web' && totalSeats) {
-    totalSeatsFix = totalSeats;
   }
 
-  const userSub: UserSubscription = {
+  const userSub = {
     userId,
     subscriptionId,
     startAt: new Date(startAt),
@@ -37,7 +34,27 @@ const saveSubscription: MutationResolvers['saveSubscription'] = async (
     await upsertSubscription(userSub);
 
     return {
-      userSubscription: userSub,
+      userSubscription: {
+        ...userSub,
+        subscriberEmail: '',
+        subscriberPhoneNumber: '',
+        subscriberName: '',
+        subscriberAddress: '',
+        subscriberCity: '',
+        subscriberCountry: '',
+        subscriberVatNumber: '',
+        subscriberZip: '',
+        paymentIntentId: null,
+        webCardId: '',
+        paymentIntentUlId: '',
+        subscriptionPlan: null,
+        amount: null,
+        taxes: null,
+        rebillManagerId: null,
+        paymentMeanId: '',
+        canceledAt: null,
+        status: 'active',
+      },
     };
   } catch (e) {
     console.error(e);

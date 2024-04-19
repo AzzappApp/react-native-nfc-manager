@@ -10,6 +10,8 @@ const ENVIRONMENT = process.env.NEXT_PUBLIC_PLATFORM || 'development';
 Sentry.init({
   dsn: DNS,
 
+  environment: ENVIRONMENT,
+
   enabled: process.env.NODE_ENV !== 'development',
 
   // Adjust this value in production, or use tracesSampler for greater control
@@ -26,7 +28,7 @@ Sentry.init({
 
   // You can remove this option if you're not planning to use the Sentry Session Replay feature:
   integrations: [
-    new Sentry.Replay({
+    Sentry.replayIntegration({
       // Additional Replay configuration goes in here, for example:
       maskAllText: true,
       blockAllMedia: true,

@@ -1,5 +1,5 @@
 import { csv2json, json2csv } from 'csv42';
-import type { ContactCard, CommonInformation } from 'contactCardHelpers';
+import type { ContactCard, CommonInformation } from './contactCardHelpers';
 
 export function buildCardSignature(
   url: string,

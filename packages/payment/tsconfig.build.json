@@ -1,0 +1,23 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "emitDeclarationOnly": true,
+    "rootDir": "./src",
+    "baseUrl": "./src",
+    "outDir": "./lib",
+    "paths": {
+      "#*": ["./*"],
+      "@azzapp/data/*": ["../data/src/*"]
+    }
+  },
+  "exclude": [
+    "lib",
+    "node_modules",
+    "package.json",
+    "tsconfig.json",
+    "tsconfig.build.json",
+    "babel.config.js",
+    "**/__mocks__/*",
+    "**/__tests__/*"
+  ]
+}

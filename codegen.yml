@@ -16,37 +16,39 @@ generates:
       enumsAsTypes: true
       useImplementingTypes: true
       mappers:
-        Profile: \@azzapp/data#Profile as ProfileModel
+        Profile: '@azzapp/data#Profile as ProfileModel'
         StaticMedia: ../MediaResolvers#StaticMediaResolverBaseType as StaticMediaModel
-        WebCardCategory: \@azzapp/data#WebCardCategory as WebCardCategoryModel
+        WebCardCategory: '@azzapp/data#WebCardCategory as WebCardCategoryModel'
         MediaImage: ../MediaResolvers#MediaResolverBaseType as MediaImageModel
         MediaVideo: ../MediaResolvers#MediaResolverBaseType as MediaVideoModel
-        CompanyActivity: \@azzapp/data#CompanyActivity as CompanyActivityModel
-        Post: \@azzapp/data#Post as PostModel
-        PostComment: \@azzapp/data#PostComment as PostCommentModel
-        CardTemplate: \@azzapp/data#CardTemplate as CardTemplateModel
-        CardTemplateType: \@azzapp/data#CardTemplateType as CardTemplateTypeModel
-        CoverTemplate: \@azzapp/data#CoverTemplate as CoverTemplateModel
-        CoverTemplateData: \@azzapp/data#CoverTemplateData as CoverTemplateDataModel
-        CardCover: \@azzapp/data#WebCard as WebCardModel
-        CardModule: \@azzapp/data#CardModule as CardModuleModel
-        CardModuleCarousel: \@azzapp/data#CardModuleCarousel as CardModuleCarouselModel
-        CardModuleHorizontalPhoto: \@azzapp/data#CardModuleHorizontalPhoto as CardModuleHorizontalPhotoModel
-        CardModuleSimpleText: \@azzapp/data#CardModuleSimpleText as CardModuleSimpleTextModel
-        CardModuleSimpleTitle: \@azzapp/data#CardModuleSimpleText as CardModuleSimpleTitleModel
-        CardModuleSimpleButton: \@azzapp/data#CardModuleSimpleButton as CardModuleSimpleButtonModel
-        CardModulePhotoWithTextAndTitle: \@azzapp/data#CardModulePhotoWithTextAndTitle as CardModulePhotoWithTextAndTitleModel
-        CardModuleSocialLinks: \@azzapp/data#CardModuleSocialLinks as CardModuleSocialLinksModel
-        CardModuleBlockText: \@azzapp/data#CardModuleBlockText as CardModuleBlockTextModel
-        CardModuleLineDivider: \@azzapp/data#CardModuleLineDivider as CardModuleLineDividerModel
-        CardStyle: \@azzapp/data#CardStyle as CardStyleModel
-        ColorPalette: \@azzapp/data#ColorPalette as ColorPaletteModel
-        WebCardStatistic: \@azzapp/data#WebCardStatistic as WebCardStatisticModel
-        ProfileStatistic: \@azzapp/data#ProfileStatistic as ProfileStatisticModel
-        UserSubscription: \@azzapp/data#UserSubscription as UserSubscriptionModel
-        WebCard: \@azzapp/data#WebCard as WebCardModel
-        User: \@azzapp/data#User as UserModel
-        RedirectWebCard: \@azzapp/data#RedirectWebCard as RedirectWebCard
+        CompanyActivity: '@azzapp/data#CompanyActivity as CompanyActivityModel'
+        Post: '@azzapp/data#Post as PostModel'
+        PostComment: '@azzapp/data#PostComment as PostCommentModel'
+        CardTemplate: '@azzapp/data#CardTemplate as CardTemplateModel'
+        CardTemplateType: '@azzapp/data#CardTemplateType as CardTemplateTypeModel'
+        CoverTemplate: '@azzapp/data#CoverTemplate as CoverTemplateModel'
+        CoverTemplateData: '@azzapp/data#CoverTemplateData as CoverTemplateDataModel'
+        CardCover: '@azzapp/data#WebCard as WebCardModel'
+        CardModule: '@azzapp/data#CardModule as CardModuleModel'
+        CardModuleCarousel: '@azzapp/data#CardModuleCarousel as CardModuleCarouselModel'
+        CardModuleHorizontalPhoto: '@azzapp/data#CardModuleHorizontalPhoto as CardModuleHorizontalPhotoModel'
+        CardModuleSimpleText: '@azzapp/data#CardModuleSimpleText as CardModuleSimpleTextModel'
+        CardModuleSimpleTitle: '@azzapp/data#CardModuleSimpleText as CardModuleSimpleTitleModel'
+        CardModuleSimpleButton: '@azzapp/data#CardModuleSimpleButton as CardModuleSimpleButtonModel'
+        CardModulePhotoWithTextAndTitle: '@azzapp/data#CardModulePhotoWithTextAndTitle as CardModulePhotoWithTextAndTitleModel'
+        CardModuleSocialLinks: '@azzapp/data#CardModuleSocialLinks as CardModuleSocialLinksModel'
+        CardModuleBlockText: '@azzapp/data#CardModuleBlockText as CardModuleBlockTextModel'
+        CardModuleLineDivider: '@azzapp/data#CardModuleLineDivider as CardModuleLineDividerModel'
+        CardStyle: '@azzapp/data#CardStyle as CardStyleModel'
+        ColorPalette: '@azzapp/data#ColorPalette as ColorPaletteModel'
+        WebCardStatistic: '@azzapp/data#WebCardStatistic as WebCardStatisticModel'
+        ProfileStatistic: '@azzapp/data#ProfileStatistic as ProfileStatisticModel'
+        UserSubscription: '@azzapp/data#UserSubscription as UserSubscriptionModel'
+        WebCard: '@azzapp/data#WebCard as WebCardModel'
+        User: '@azzapp/data#User as UserModel'
+        RedirectWebCard: '@azzapp/data#RedirectWebCard as RedirectWebCard'
+        PaymentMean: '@azzapp/data#PaymentMean as PaymentMeanModel'
+        Payment: '@azzapp/data#Payment as PaymentModel'
       defaultMapper: 'Partial<{T}>'
       maybeValue: 'T extends PromiseLike<infer U> ? Promise<U | null> : T | null'
       scalars:

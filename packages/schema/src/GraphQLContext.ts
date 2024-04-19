@@ -24,6 +24,8 @@ import {
   sortEntitiesByIds,
   WebCardTable,
   getLabels,
+  PaymentTable,
+  PaymentMeanTable,
 } from '@azzapp/data';
 import { DEFAULT_LOCALE } from '@azzapp/i18n';
 import type {
@@ -46,6 +48,8 @@ import type {
   CardTemplateType,
   CardTemplate,
   CardStyle,
+  PaymentMean,
+  Payment,
 } from '@azzapp/data';
 
 import type { Locale } from '@azzapp/i18n';
@@ -130,6 +134,8 @@ const entities = [
   'StaticMedia',
   'User',
   'WebCard',
+  'Payment',
+  'PaymentMean',
 ] as const;
 
 type Entity = (typeof entities)[number];
@@ -151,6 +157,8 @@ type EntityToType<T extends Entity> = {
   WebCard: WebCard;
   StaticMedia: StaticMedia;
   User: User;
+  Payment: Payment;
+  PaymentMean: PaymentMean;
 }[T];
 
 export type Loaders = {
@@ -184,6 +192,8 @@ const entitiesTable = {
   WebCard: WebCardTable,
   StaticMedia: StaticMediaTable,
   User: UserTable,
+  Payment: PaymentTable,
+  PaymentMean: PaymentMeanTable,
 } as const;
 
 const getEntitiesByIds = async (

@@ -15,6 +15,7 @@
     "resolvePackageJsonExports": true,
     "resolveJsonModule": true,
     "incremental": true,
-    "noErrorTruncation": true
+    "noErrorTruncation": true,
+    "declarationMap": true
   }
 }

@@ -12,7 +12,7 @@ import {
   getCardModuleNextPosition,
   getUserProfileWithWebCardId,
   getCardModules,
-  activeUserSubscription,
+  getActiveUserSubscriptionForWebCard,
 } from '@azzapp/data';
 import {
   MODULE_KIND_BLOCK_TEXT,
@@ -69,9 +69,13 @@ const createModuleSavingMutation =
       addingModuleRequireSubscription(moduleKind, moduleCount) &&
       webCard.cardIsPublished
     ) {
-      const subscription = await activeUserSubscription(userId);
-      if (!subscription || subscription.length === 0)
-        throw new GraphQLError(ERRORS.UNAUTHORIZED);
+      const subscription = await getActiveUserSubscriptionForWebCard(
+        userId,
+        webCard.id,
+      );
+      if (!subscription.some(s => !s.webCardId || s.webCardId === webCardId)) {
+        throw new GraphQLError(ERRORS.SUBSCRIPTION_REQUIRED);
+      }
     }
 
     const { validator, getMedias } = MODULES_SAVE_RULES[moduleKind] ?? {};

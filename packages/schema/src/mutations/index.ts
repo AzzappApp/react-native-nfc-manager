@@ -21,6 +21,15 @@ import {
   saveSimpleTextModule,
   saveSocialLinksModule,
 } from './ModulesMutationsResolvers';
+import {
+  createPaymentIntent,
+  createPaymentMean,
+  createSubscriptionFromPaymentMean,
+  estimateSubscriptionCost,
+  generatePaymentInvoice,
+  updateSubscription,
+  upgradeSubscriptionPlan,
+} from './payment';
 import togglePostReaction from './postReaction';
 import quitWebCard from './quitWebCard';
 import removeFollower from './removeFollower';
@@ -94,4 +103,11 @@ export const Mutation: MutationResolvers = {
   inviteUsersList,
   sendInvitations,
   sendReport,
+  createPaymentIntent,
+  createPaymentMean,
+  createSubscriptionFromPaymentMean,
+  estimateSubscriptionCost,
+  generatePaymentInvoice,
+  updateSubscription,
+  upgradeSubscriptionPlan,
 };

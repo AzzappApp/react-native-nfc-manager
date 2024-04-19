@@ -72,6 +72,7 @@ const SubscriptionProvider = ({ children }: { children: ReactNode }) => {
 
   const mergeRelayRcResponses = useCallback(() => {
     const relay = relaySubscription.current;
+
     const rc = rcSubscription.current;
     if (rc && !relay) {
       //no relay can occurs when the user subscribe from the app and we did not fetch from the server yet(not realtime/push)
@@ -97,10 +98,12 @@ const SubscriptionProvider = ({ children }: { children: ReactNode }) => {
       setIsSubscriber(isActive);
     } else if (relay && !rc) {
       // it has to be web
-      setIsSubscriber(relay.endAt.getTime() > Date.now());
+      setIsSubscriber(new Date(relay.endAt).getTime() > Date.now());
     } else if (relay && rc) {
       //TODO; need the server notification (so an apple store account)to do real time to test the concept....
-      setIsSubscriber(rc.isActive || relay.endAt.getTime() > Date.now());
+      setIsSubscriber(
+        rc.isActive || new Date(relay.endAt).getTime() > Date.now(),
+      );
     } else {
       setIsSubscriber(false);
     }

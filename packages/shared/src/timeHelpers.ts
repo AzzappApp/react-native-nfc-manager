@@ -60,3 +60,14 @@ export const formatBirthday = (year: number, month: number, day: number) => {
 
   return `${year}-${formattedMonth}-${formattedDay}`;
 };
+
+export const dateDiffInMonths = (startDate: Date, endDate: Date) =>
+  Math.max(
+    (endDate.getFullYear() - startDate.getFullYear()) * 12 +
+      endDate.getMonth() -
+      startDate.getMonth(),
+    0,
+  );
+
+export const dateDiffInMinutes = (startDate: Date, endDate: Date) =>
+  (endDate.getTime() - startDate.getTime()) / 1000 / 60;

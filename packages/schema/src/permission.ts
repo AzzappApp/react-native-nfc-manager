@@ -85,6 +85,7 @@ const ProtectedMutation: Record<
   Exclude<
     MutationMethod,
     | 'createWebCard'
+    | 'estimateSubscriptionCost'
     | 'sendReport'
     | 'updateContactCardScans'
     | 'updateProfile'
@@ -134,11 +135,18 @@ const ProtectedMutation: Record<
   updateWebCardUserName: isAdminRule,
   updateWebCard: isEditorRule,
   sendInvitations: isAdminRule,
+  createPaymentIntent: isOwnerRule,
+  createSubscriptionFromPaymentMean: isOwnerRule,
+  createPaymentMean: isOwnerRule,
+  updateSubscription: isOwnerRule,
+  generatePaymentInvoice: isOwnerRule,
+  upgradeSubscriptionPlan: isOwnerRule,
 };
 
-const isCurrentUserRule = rule('sameProfile', {
+const isCurrentUserRule = rule('sameUser', {
   cache: 'contextual',
 })(async (parent: User, _args, ctx: GraphQLContext) => {
+  console.log(ctx.auth.userId, parent.id);
   return ctx.auth.userId === parent.id;
 });
 
@@ -174,26 +182,24 @@ const permissions = shield(
   {
     Mutation: ProtectedMutation,
     User: {
-      '*': allow,
+      '*': isCurrentUserRule,
       email: allow,
       phoneNumber: allow,
-      userSubscription: allow,
-      publishedWebCards: allow,
       id: or(isCurrentUserRule, isSameWebCard),
     },
     Profile: {
       '*': isCurrentProfileRule,
-      contactCard: or(isCurrentUserRule, isSameWebCard),
-      user: or(isCurrentUserRule, isSameWebCard),
-      avatar: or(isCurrentUserRule, isSameWebCard),
-      promotedAsOwner: or(isCurrentUserRule, isSameWebCard),
-      invited: or(isCurrentUserRule, isSameWebCard),
-      statsSummary: or(isCurrentUserRule, isSameWebCard),
-      nbContactCardScans: or(isCurrentUserRule, isSameWebCard),
-      profileRole: or(isCurrentUserRule, isSameWebCard),
-      id: or(isCurrentUserRule, isSameWebCard),
-      webCard: or(isCurrentUserRule, isSameWebCard),
-      inviteSent: or(isCurrentUserRule, isSameWebCard),
+      contactCard: or(isCurrentProfileRule, isSameWebCard),
+      user: or(isCurrentProfileRule, isSameWebCard),
+      avatar: or(isCurrentProfileRule, isSameWebCard),
+      promotedAsOwner: or(isCurrentProfileRule, isSameWebCard),
+      invited: or(isCurrentProfileRule, isSameWebCard),
+      statsSummary: or(isCurrentProfileRule, isSameWebCard),
+      nbContactCardScans: or(isCurrentProfileRule, isSameWebCard),
+      profileRole: or(isCurrentProfileRule, isSameWebCard),
+      id: or(isCurrentProfileRule, isSameWebCard),
+      webCard: or(isCurrentProfileRule, isSameWebCard),
+      inviteSent: or(isCurrentProfileRule, isSameWebCard),
     },
     WebCard: {
       '*': isCurrentWebCardRule,

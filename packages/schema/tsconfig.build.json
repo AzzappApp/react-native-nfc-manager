@@ -2,12 +2,12 @@
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
     "emitDeclarationOnly": true,
-    "esModuleInterop": true,
     "rootDir": "./src",
     "baseUrl": "./src",
     "outDir": "./lib",
     "paths": {
-      "#*": ["./*"]
+      "#*": ["./*"],
+      "@azzapp/data/*": ["../data/src/*"],
     }
   },
   "exclude": [
@@ -21,8 +21,6 @@
     "**/__tests__/*",
     "jest.config.js",
     "jest-e2e.config.js",
-    "testing",
-    "**/__mocks__/*",
-    "**/__tests__/*"
+    "testing"
   ]
 }

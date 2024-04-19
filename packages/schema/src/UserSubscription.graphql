@@ -19,4 +19,12 @@ type UserSubscription {
   Return the number of available seats for the multiUser Subscription accross all profiles
   """
   availableSeats: Int!
+  """
+  Return the amount of the subscription (in cents)
+  """
+  amount: Int
+  """
+  Return the amount of the subscription (in cents)
+  """
+  taxes: Int
 }

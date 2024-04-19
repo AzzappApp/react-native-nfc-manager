@@ -1,0 +1,35 @@
+{
+  "name": "@azzapp/payment",
+  "version": "0.5.5-canary.228",
+  "private": true,
+  "exports": {
+    ".": {
+      "types": "./lib/index.d.ts",
+      "default": "./lib/index.js"
+    },
+    "./*": {
+      "types": "./lib/*.d.ts",
+      "default": "./lib/*.js"
+    }
+  },
+  "scripts": {
+    "build": "yarn compile && yarn definition",
+    "dev": "yarn compile:watch & yarn definition:watch",
+    "typecheck": "yarn definition",
+    "definition": "tsc -p tsconfig.build.json",
+    "definition:watch": "yarn definition --watch",
+    "compile": "babel src --config-file ./babel.config.js -d lib --extensions '.ts,.tsx,.js,.jsx,.json'",
+    "compile:watch": "yarn compile --watch",
+    "clean": "rm -rf lib && rm -f tsconfig.build.tsbuildinfo && rm -rf node_modules"
+  },
+  "devScripts": [
+    "compile:watch",
+    "definition:watch"
+  ],
+  "dependencies": {
+    "@azzapp/data": "0.5.5-canary.228",
+    "@azzapp/shared": "0.5.5-canary.228",
+    "openapi-fetch": "^0.9.3",
+    "dayjs": "^1.11.10"
+  }
+}

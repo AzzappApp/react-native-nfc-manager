@@ -10,16 +10,16 @@
   },
   "scripts": {
     "test": "jest",
-    "dev": "tsc --watch -p tsconfig.lib.json",
-    "build": "tsc -p tsconfig.lib.json",
+    "dev": "tsc --watch",
+    "build": "tsc -p tsconfig.build.json",
     "typecheck": "tsc --noEmit",
-    "clean": "rm -rf lib && rm -f tsconfig.tsbuildinfo"
+    "clean": "rm -rf lib && rm -f tsconfig.build.tsbuildinfo && rm -rf node_modules"
   },
   "devScripts": [
     "dev"
   ],
   "dependencies": {
-    "libphonenumber-js": "^1.10.59",
+    "libphonenumber-js": "^1.10.60",
     "lz-string": "^1.5.0",
     "validator": "^13.11.0",
     "vcard-creator": "^0.7.0",

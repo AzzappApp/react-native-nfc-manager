@@ -10,25 +10,44 @@ import {
   Card,
   Breadcrumbs,
   Link,
+  Switch,
 } from '@mui/material';
 import { useTransition } from 'react';
 import * as ROLES from '#roles';
-import { toggleRole, removeWebcard } from './userActions';
+import {
+  toggleRole,
+  removeWebcard,
+  setLifetimeSubscription,
+} from './userActions';
 import WebcardCover from './WebcardCover';
-import type { User, WebCard } from '@azzapp/data';
+import type { User, UserSubscription, WebCard } from '@azzapp/data';
 
 type UserFormProps = {
   user: User;
   webCards: WebCard[];
+  userSubscriptions: UserSubscription[];
 };
 
-const UserForm = ({ user, webCards }: UserFormProps) => {
+const UserForm = ({ user, webCards, userSubscriptions }: UserFormProps) => {
   const [loading, startTransition] = useTransition();
   const onToggleRole = (role: string) => {
     startTransition(async () => {
       await toggleRole(user.id, role).catch(console.error);
     });
   };
+
+  const isAlreadySubscribed = userSubscriptions.some(
+    subscription =>
+      subscription.endAt > new Date() &&
+      subscription.status === 'active' &&
+      subscription.subscriptionPlan !== 'web.lifetime',
+  );
+
+  const hasLifetimeSubscription = userSubscriptions.some(
+    subscription =>
+      subscription.subscriptionPlan === 'web.lifetime' &&
+      subscription.status === 'active',
+  );
 
   return (
     <Box display="flex" flexDirection="column">
@@ -109,6 +128,25 @@ const UserForm = ({ user, webCards }: UserFormProps) => {
           disabled={loading}
         />
       ))}
+
+      <Typography variant="h4" component="h1" sx={{ mt: 5, mb: 5 }}>
+        Subscriptions
+      </Typography>
+
+      <FormControlLabel
+        control={
+          <Switch
+            disabled={isAlreadySubscribed}
+            checked={hasLifetimeSubscription}
+            onChange={event => {
+              startTransition(async () => {
+                await setLifetimeSubscription(user.id, event.target.checked);
+              });
+            }}
+          />
+        }
+        label="Free & unlimited access"
+      />
     </Box>
   );
 };
