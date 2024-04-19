@@ -1,6 +1,6 @@
 {
   "name": "@azzapp/schema",
-  "version": "0.5.5-canary.232",
+  "version": "0.5.5-canary.233",
   "private": true,
   "exports": {
     ".": {
@@ -30,10 +30,10 @@
     "definition:watch"
   ],
   "dependencies": {
-    "@azzapp/i18n": "0.5.5-canary.232",
-    "@azzapp/shared": "0.5.5-canary.232",
-    "@azzapp/data": "0.5.5-canary.232",
-    "@azzapp/payment": "0.5.5-canary.232",
+    "@azzapp/i18n": "0.5.5-canary.233",
+    "@azzapp/shared": "0.5.5-canary.233",
+    "@azzapp/data": "0.5.5-canary.233",
+    "@azzapp/payment": "0.5.5-canary.233",
     "@graphql-tools/schema": "^10.0.3",
     "@paralleldrive/cuid2": "^2.2.2",
     "dataloader": "^2.2.2",

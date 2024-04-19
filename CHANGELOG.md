@@ -1,5 +1,6 @@
-## 0.5.5-canary.232
+## 0.5.5-canary.233
 
+* **build:**  - remove wrong filter
 * **feat:**  - **cover:** [#3245](https://github.com/AzzappApp/azzapp/pull/3245) add search bar on activities ([#3313](https://github.com/AzzappApp/azzapp/pull/3313))
 * **build:**  - filter payment for app build
 * **fix:**  - **webCard:** [#3166](https://github.com/AzzappApp/azzapp/pull/3166) format phone number ([#3312](https://github.com/AzzappApp/azzapp/pull/3312))
