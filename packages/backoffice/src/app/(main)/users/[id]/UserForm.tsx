@@ -36,11 +36,9 @@ const UserForm = ({ user, webCards, userSubscriptions }: UserFormProps) => {
     });
   };
 
-  const onSetLifetimeSubscription = (
-    event: React.ChangeEvent<HTMLInputElement>,
-  ) => {
+  const onSetLifetimeSubscription = (activated: boolean) => {
     startTransition(async () => {
-      await setLifetimeSubscription(user.id, event.target.checked);
+      await setLifetimeSubscription(user.id, activated);
     });
   };
 
@@ -146,7 +144,9 @@ const UserForm = ({ user, webCards, userSubscriptions }: UserFormProps) => {
           <Switch
             disabled={isAlreadySubscribed || loading}
             checked={hasLifetimeSubscription}
-            onChange={onSetLifetimeSubscription}
+            onChange={() => {
+              onSetLifetimeSubscription(!isAlreadySubscribed);
+            }}
           />
         }
         label="Free & unlimited access"
