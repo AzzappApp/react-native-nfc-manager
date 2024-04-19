@@ -1,5 +1,6 @@
-## 0.5.5-canary.231
+## 0.5.5-canary.232
 
+* **feat:**  - **cover:** [#3245](https://github.com/AzzappApp/azzapp/pull/3245) add search bar on activities ([#3313](https://github.com/AzzappApp/azzapp/pull/3313))
 * **build:**  - filter payment for app build
 * **fix:**  - **webCard:** [#3166](https://github.com/AzzappApp/azzapp/pull/3166) format phone number ([#3312](https://github.com/AzzappApp/azzapp/pull/3312))
 * **fix:**  - **multiUser:** [#3256](https://github.com/AzzappApp/azzapp/pull/3256) correctly store profile and related user ([#3308](https://github.com/AzzappApp/azzapp/pull/3308))
