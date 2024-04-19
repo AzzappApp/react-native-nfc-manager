@@ -38,7 +38,6 @@ export const POST = withAxiom(async (req: Request) => {
       },
     );
   } catch (e) {
-    console.error(e);
     if ((e as Error).message === ERRORS.INVALID_TOKEN) {
       return NextResponse.json(
         { message: ERRORS.INVALID_TOKEN },
