@@ -1,5 +1,7 @@
-## 0.5.5-canary.228
+## 0.5.5-canary.229
 
+* **fix:**  - **multiUser:** [#3256](https://github.com/AzzappApp/azzapp/pull/3256) correctly store profile and related user ([#3308](https://github.com/AzzappApp/azzapp/pull/3308))
+* **feat:**  - add web payment mutations ([#3297](https://github.com/AzzappApp/azzapp/pull/3297))
 * **fix:**  - wrong route for validation
 * **fix:**  - unused import
 * **fix:**  - don’t use web helpers in schema ([#3304](https://github.com/AzzappApp/azzapp/pull/3304))
