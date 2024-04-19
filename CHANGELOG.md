@@ -1,5 +1,6 @@
-## 0.5.5-canary.229
+## 0.5.5-canary.230
 
+* **fix:**  - **webCard:** [#3166](https://github.com/AzzappApp/azzapp/pull/3166) format phone number ([#3312](https://github.com/AzzappApp/azzapp/pull/3312))
 * **fix:**  - **multiUser:** [#3256](https://github.com/AzzappApp/azzapp/pull/3256) correctly store profile and related user ([#3308](https://github.com/AzzappApp/azzapp/pull/3308))
 * **feat:**  - add web payment mutations ([#3297](https://github.com/AzzappApp/azzapp/pull/3297))
 * **fix:**  - wrong route for validation
