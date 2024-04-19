@@ -1,6 +1,6 @@
 'use server';
 
-import { eq, inArray, sql } from 'drizzle-orm';
+import { eq, and, inArray, sql } from 'drizzle-orm';
 import { revalidatePath } from 'next/cache';
 import {
   getUserById,
@@ -9,6 +9,7 @@ import {
   WebCardTable,
   ProfileTable,
   upsertSubscription,
+  UserSubscriptionTable,
 } from '@azzapp/data';
 import { createId } from '@azzapp/data/helpers/createId';
 import { ADMIN } from '#roles';
@@ -38,10 +39,21 @@ export const toggleRole = async (userId: string, role: string) => {
   revalidatePath(`/users/${userId}`);
 };
 
-export const setLifetimeSubscription = async (
-  userId: string,
-  active: boolean,
-) => {
+export const toggleLifeTimeSubscription = async (userId: string) => {
+  const existingSubscription = await db
+    .select()
+    .from(UserSubscriptionTable)
+    .where(
+      and(
+        eq(UserSubscriptionTable.userId, userId),
+        eq(UserSubscriptionTable.subscriptionPlan, 'web.lifetime'),
+      ),
+    );
+
+  const active =
+    existingSubscription.length > 0 &&
+    existingSubscription[0].status !== 'active';
+
   await upsertSubscription({
     userId,
     subscriptionPlan: 'web.lifetime',

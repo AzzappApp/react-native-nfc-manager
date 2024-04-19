@@ -17,7 +17,7 @@ import * as ROLES from '#roles';
 import {
   toggleRole,
   removeWebcard,
-  setLifetimeSubscription,
+  toggleLifeTimeSubscription,
 } from './userActions';
 import WebcardCover from './WebcardCover';
 import type { User, UserSubscription, WebCard } from '@azzapp/data';
@@ -36,9 +36,9 @@ const UserForm = ({ user, webCards, userSubscriptions }: UserFormProps) => {
     });
   };
 
-  const onSetLifetimeSubscription = (activated: boolean) => {
+  const onSetLifetimeSubscription = () => {
     startTransition(async () => {
-      await setLifetimeSubscription(user.id, activated);
+      await toggleLifeTimeSubscription(user.id).catch(console.error);
     });
   };
 
@@ -144,9 +144,7 @@ const UserForm = ({ user, webCards, userSubscriptions }: UserFormProps) => {
           <Switch
             disabled={isAlreadySubscribed || loading}
             checked={hasLifetimeSubscription}
-            onChange={() => {
-              onSetLifetimeSubscription(!isAlreadySubscribed);
-            }}
+            onChange={onSetLifetimeSubscription}
           />
         }
         label="Free & unlimited access"
