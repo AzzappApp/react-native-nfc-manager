@@ -10,13 +10,14 @@ import {
   Card,
   Breadcrumbs,
   Link,
+  Switch,
 } from '@mui/material';
 import { useTransition } from 'react';
 import * as ROLES from '#roles';
 import {
   toggleRole,
   removeWebcard,
-  toggleLifeTimeSubscription,
+  setLifetimeSubscription,
 } from './userActions';
 import WebcardCover from './WebcardCover';
 import type { User, UserSubscription, WebCard } from '@azzapp/data';
@@ -35,9 +36,11 @@ const UserForm = ({ user, webCards, userSubscriptions }: UserFormProps) => {
     });
   };
 
-  const onSetLifetimeSubscription = () => {
+  const onSetLifetimeSubscription = (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
     startTransition(async () => {
-      await toggleLifeTimeSubscription(user.id).catch(console.error);
+      await setLifetimeSubscription(user.id, event.target.checked);
     });
   };
 
@@ -140,13 +143,14 @@ const UserForm = ({ user, webCards, userSubscriptions }: UserFormProps) => {
 
       <FormControlLabel
         control={
-          <Checkbox
-            disabled={isAlreadySubscribed || loading}
+          <Switch
+            name="lifeTimeSubscription"
             checked={hasLifetimeSubscription}
             onChange={onSetLifetimeSubscription}
           />
         }
         label="Free & unlimited access"
+        disabled={isAlreadySubscribed || loading}
       />
     </Box>
   );
