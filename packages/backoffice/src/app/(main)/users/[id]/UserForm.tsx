@@ -36,6 +36,14 @@ const UserForm = ({ user, webCards, userSubscriptions }: UserFormProps) => {
     });
   };
 
+  const onSetLifetimeSubscription = (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    startTransition(async () => {
+      await setLifetimeSubscription(user.id, event.target.checked);
+    });
+  };
+
   const isAlreadySubscribed = userSubscriptions.some(
     subscription =>
       subscription.endAt > new Date() &&
@@ -136,13 +144,9 @@ const UserForm = ({ user, webCards, userSubscriptions }: UserFormProps) => {
       <FormControlLabel
         control={
           <Switch
-            disabled={isAlreadySubscribed}
+            disabled={isAlreadySubscribed || loading}
             checked={hasLifetimeSubscription}
-            onChange={event => {
-              startTransition(async () => {
-                await setLifetimeSubscription(user.id, event.target.checked);
-              });
-            }}
+            onChange={onSetLifetimeSubscription}
           />
         }
         label="Free & unlimited access"
