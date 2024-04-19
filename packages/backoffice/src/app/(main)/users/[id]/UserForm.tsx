@@ -10,7 +10,6 @@ import {
   Card,
   Breadcrumbs,
   Link,
-  Switch,
 } from '@mui/material';
 import { useTransition } from 'react';
 import * as ROLES from '#roles';
@@ -141,7 +140,7 @@ const UserForm = ({ user, webCards, userSubscriptions }: UserFormProps) => {
 
       <FormControlLabel
         control={
-          <Switch
+          <Checkbox
             disabled={isAlreadySubscribed || loading}
             checked={hasLifetimeSubscription}
             onChange={onSetLifetimeSubscription}
