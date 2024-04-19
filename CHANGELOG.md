@@ -1,5 +1,6 @@
-## 0.5.5-canary.237
+## 0.5.5-canary.238
 
+* **fix:**  - **backoffice:** try with toggle method
 * **fix:**  - try without event
 * **fix:**  - **signin:** [#3162](https://github.com/AzzappApp/azzapp/pull/3162) adapt placeholder ([#3314](https://github.com/AzzappApp/azzapp/pull/3314))
 * **fix:**  - **backoffice:** try with external method
