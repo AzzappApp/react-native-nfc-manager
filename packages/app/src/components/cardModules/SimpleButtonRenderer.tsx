@@ -1,3 +1,4 @@
+import { parsePhoneNumber } from 'libphonenumber-js';
 import { useCallback } from 'react';
 import { Linking } from 'react-native';
 import Animated, { useAnimatedStyle } from 'react-native-reanimated';
@@ -16,6 +17,7 @@ import type {
 } from '#relayArtifacts/SimpleButtonRenderer_module.graphql';
 import type { CardStyle, ColorPalette } from '@azzapp/shared/cardHelpers';
 import type { NullableFields } from '@azzapp/shared/objectHelpers';
+import type { CountryCode } from 'libphonenumber-js';
 import type { StyleProp, ViewProps, ViewStyle } from 'react-native';
 import type { SharedValue } from 'react-native-reanimated';
 
@@ -151,8 +153,13 @@ export const SimpleButtonRenderer = ({
         await Linking.openURL(actionLink);
       } else if (actionType === 'email') {
         await Linking.openURL(`mailto:${actionLink}`);
-      } else {
-        await Linking.openURL(`tel:${actionLink}`);
+      } else if (actionType) {
+        await Linking.openURL(
+          `tel:${parsePhoneNumber(
+            actionLink,
+            actionType as CountryCode,
+          ).formatInternational()}`,
+        );
       }
     }
   }, [actionLink, actionType]);
