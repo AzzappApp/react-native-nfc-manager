@@ -1,5 +1,6 @@
-## 0.5.5-canary.235
+## 0.5.5-canary.236
 
+* **fix:**  - **signin:** [#3162](https://github.com/AzzappApp/azzapp/pull/3162) adapt placeholder ([#3314](https://github.com/AzzappApp/azzapp/pull/3314))
 * **fix:**  - **backoffice:** try with external method
 * **build:**  - missing dependency on backoffice
 * **build:**  - remove wrong filter
