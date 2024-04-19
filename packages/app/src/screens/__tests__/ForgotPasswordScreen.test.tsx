@@ -40,7 +40,7 @@ describe('ForgotPassword Screen', () => {
     const { getByRole, getByPlaceholderText } = render(
       <ForgotPasswordScreen />,
     );
-    const inputLogin = getByPlaceholderText('Phone number or email address');
+    const inputLogin = getByPlaceholderText('Email address');
     act(() => {
       fireEvent(inputLogin, 'onChangeText', 'test@com');
     });
@@ -56,7 +56,7 @@ describe('ForgotPassword Screen', () => {
     const { queryByRole, getByPlaceholderText } = render(
       <ForgotPasswordScreen />,
     );
-    const inputLogin = getByPlaceholderText('Phone number or email address');
+    const inputLogin = getByPlaceholderText('Email address');
     act(() => fireEvent(inputLogin, 'onChangeText', 'test@com'));
     const ubutton = queryByRole('button');
     expect(ubutton).toBeDisabled();

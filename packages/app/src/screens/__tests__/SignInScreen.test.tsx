@@ -21,9 +21,7 @@ describe('Signin Screen', () => {
   xtest('submit button should be `disabled` if both credential and password are empty', () => {
     render(<SignInScreen />);
 
-    const credentialInput = screen.getByPlaceholderText(
-      'Phone number or email address',
-    );
+    const credentialInput = screen.getByPlaceholderText('Email address');
     const passwordInput = screen.getByPlaceholderText('Password');
     const buttonComponent = screen.getByTestId('submitButton');
 
@@ -51,9 +49,7 @@ describe('Signin Screen', () => {
       phoneNumber: 'fake-phoneNumber',
     });
 
-    const credentialInput = screen.getByPlaceholderText(
-      'Phone number or email address',
-    );
+    const credentialInput = screen.getByPlaceholderText('Email address');
     const passwordInput = screen.getByPlaceholderText('Password');
     const buttonComponent = screen.getByTestId('submitButton');
 
@@ -91,9 +87,7 @@ describe('Signin Screen', () => {
     render(<SignInScreen />);
     signinMock.mockRejectedValueOnce(new Error(ERRORS.INVALID_CREDENTIALS));
 
-    const credentialInput = screen.getByPlaceholderText(
-      'Phone number or email address',
-    );
+    const credentialInput = screen.getByPlaceholderText('Email address');
     const passwordInput = screen.getByPlaceholderText('Password');
     const buttonComponent = screen.getByTestId('submitButton');
 

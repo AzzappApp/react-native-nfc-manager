@@ -162,11 +162,18 @@ const SignInScreen = () => {
               if (!isSubmitting) setCredential(input);
             }}
             testID="credential-input"
-            placeholder={intl.formatMessage({
-              defaultMessage: 'Phone number or email address',
-              description:
-                'SignIn Screen Phone number or email address input placeholder',
-            })}
+            placeholder={
+              credential.countryCodeOrEmail === 'email'
+                ? intl.formatMessage({
+                    defaultMessage: 'Email address',
+                    description:
+                      'SignIn Screen email address input placeholder',
+                  })
+                : intl.formatMessage({
+                    defaultMessage: 'Phone number',
+                    description: 'SignIn Screen phone number input placeholder',
+                  })
+            }
             hasError={credentialInvalid}
             autoCapitalize="none"
             autoComplete="email"
