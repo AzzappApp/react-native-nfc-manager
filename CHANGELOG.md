@@ -1,5 +1,7 @@
-## 0.5.5-canary.239
+## 0.5.5-canary.240
 
+* **fix:**  - **backoffice:** rollback to switch
+* **fix:**  - **multiUser:** [#3257](https://github.com/AzzappApp/azzapp/pull/3257) use correct phone number format
 * **fix:**  - **backoffice:** try with checkbox
 * **fix:**  - **backoffice:** try with toggle method
 * **fix:**  - try without event
