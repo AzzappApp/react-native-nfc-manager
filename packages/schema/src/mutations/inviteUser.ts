@@ -54,7 +54,7 @@ const inviteUserMutation: MutationResolvers['inviteUser'] = async (
         profileRole: invited.profileRole,
         contactCard,
         email: invited.email ?? undefined,
-        phoneNumber: invited.phoneNumber ?? undefined,
+        phoneNumber,
       },
       sendInvite: sendInvite ?? false,
       sendMail,
