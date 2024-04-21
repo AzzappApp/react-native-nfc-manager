@@ -16,9 +16,8 @@ const LoginForm = () => {
   const [errors, setErrors] = useState<LoginErrors | null>(null);
 
   const router = useRouter();
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    const formData = new FormData(event.currentTarget);
+
+  async function handleSubmit(formData: FormData) {
     const errors = await login(formData);
     if (!errors) {
       router.replace(
@@ -28,7 +27,7 @@ const LoginForm = () => {
     } else {
       setErrors(errors);
     }
-  };
+  }
 
   return (
     <Container component="main" maxWidth="xs">
@@ -44,7 +43,7 @@ const LoginForm = () => {
         <Typography component="h1" variant="h5">
           Azzapp - Sign in
         </Typography>
-        <Box component="form" onSubmit={handleSubmit} sx={{ mt: 1 }}>
+        <Box component="form" action={handleSubmit} sx={{ mt: 1 }}>
           <TextField
             margin="normal"
             required
