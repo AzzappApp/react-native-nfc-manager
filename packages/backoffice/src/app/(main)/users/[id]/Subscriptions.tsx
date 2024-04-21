@@ -21,6 +21,7 @@ export const Subscriptions = ({
       console.log('onSetLifetimeSubscription', event.target.checked);
       try {
         await setLifetimeSubscription(user.id, event.target.checked);
+        console.log('onSetLifetimeSubscription done');
       } catch (e) {
         console.error(e);
       }
