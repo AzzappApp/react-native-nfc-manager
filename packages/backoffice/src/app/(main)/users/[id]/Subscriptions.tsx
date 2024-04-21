@@ -18,7 +18,12 @@ export const Subscriptions = ({
     event: React.ChangeEvent<HTMLInputElement>,
   ) => {
     startTransition(async () => {
-      await setLifetimeSubscription(user.id, event.target.checked);
+      console.log('onSetLifetimeSubscription', event.target.checked);
+      try {
+        await setLifetimeSubscription(user.id, event.target.checked);
+      } catch (e) {
+        console.error(e);
+      }
     });
   };
 

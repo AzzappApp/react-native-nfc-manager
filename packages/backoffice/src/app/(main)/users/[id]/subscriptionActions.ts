@@ -8,6 +8,7 @@ export const setLifetimeSubscription = async (
   userId: string,
   active: boolean,
 ) => {
+  console.log('setLifetimeSubscription', userId, active);
   await upsertSubscription({
     userId,
     subscriptionPlan: 'web.lifetime',
@@ -19,6 +20,6 @@ export const setLifetimeSubscription = async (
     status: active ? 'active' : 'canceled',
     canceledAt: active ? null : new Date(),
   });
-
+  console.log('setLifetimeSubscription done');
   revalidatePath(`/users/${userId}`);
 };
