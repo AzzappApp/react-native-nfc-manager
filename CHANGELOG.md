@@ -1,4 +1,4 @@
-## 0.5.5-canary.241
+## 0.5.5-canary.242
 
 * **fix:**  - **backoffice:** attempt by splitting code into files
 * **fix:**  - **backoffice:** rollback to switch
