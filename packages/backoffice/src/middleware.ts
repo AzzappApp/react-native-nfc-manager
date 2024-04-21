@@ -13,7 +13,7 @@ export async function middleware(request: NextRequest) {
     PUBLIC_FILE.test(nextUrl.pathname) ||
     nextUrl.pathname.startsWith('/login')
   ) {
-    return undefined;
+    return NextResponse.next();
   }
 
   const session = await getRequestSession(request).catch(e => {
@@ -41,6 +41,8 @@ export async function middleware(request: NextRequest) {
   if (section && !user.roles?.some(role => section.roles.includes(role))) {
     return new NextResponse('Forbidden', { status: 403 });
   }
+
+  return NextResponse.next();
 }
 
 const redirectToLogin = (nextUrl: NextURL) => {
