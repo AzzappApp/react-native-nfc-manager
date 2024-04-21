@@ -21,7 +21,7 @@ const config = {
     tsconfigPath: './tsconfig.next.json',
     ignoreBuildErrors: true,
   },
-  transpilePackages: ['@azzapp/shared/', '@azzapp/data'],
+  transpilePackages: ['@azzapp/shared', '@azzapp/data', '@azzapp/payment'],
   modularizeImports: {
     '@mui/icons-material': {
       transform: '@mui/icons-material/{{member}}',
