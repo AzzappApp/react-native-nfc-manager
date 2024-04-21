@@ -1,5 +1,6 @@
-## 0.5.5-canary.240
+## 0.5.5-canary.241
 
+* **fix:**  - **backoffice:** attempt by splitting code into files
 * **fix:**  - **backoffice:** rollback to switch
 * **fix:**  - **multiUser:** [#3257](https://github.com/AzzappApp/azzapp/pull/3257) use correct phone number format
 * **fix:**  - **backoffice:** try with checkbox
