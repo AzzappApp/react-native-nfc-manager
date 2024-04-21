@@ -1,5 +1,6 @@
-## 0.5.5-canary.244
+## 0.5.5-canary.245
 
+* **fix:**  - **backoffice:** simplify login form
 * **fix:**  - **backoffice:** enhance middleware
 * **build:**  - modify transpile packages
 * **fix:**  - **backoffice:** attempt by splitting code into files
