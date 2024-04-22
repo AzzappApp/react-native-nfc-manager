@@ -1,5 +1,7 @@
-## 0.5.5-canary.252
+## 0.5.5-canary.253
 
+* **docs:**  - go to node 30
+* **build:**  - move declarationMap in submodules
 * **fix:**  - **backoffice:** try with external form tag
 * **fix:**  - type issue on intl
 * **fix:**  - type issue on intl
