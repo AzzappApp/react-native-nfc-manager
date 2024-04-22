@@ -17744,7 +17744,12 @@ yup@^0.32.0:
     property-expr "^2.0.4"
     toposort "^2.0.2"
 
-zod@3.22.4, zod@3.22.5, zod@^3.20.2, zod@^3.22.4, zod@^3.22.5:
+zod@^3.20.2, zod@^3.22.4:
   version "3.22.4"
   resolved "https://registry.yarnpkg.com/zod/-/zod-3.22.4.tgz#f31c3a9386f61b1f228af56faa9255e845cf3fff"
   integrity sha512-iC+8Io04lddc+mVqQ9AZ7OQ2MrUKGN+oIQyq1vemgt46jwCwLfhq7/pwnBnNXXXZb8VTVLKwp9EDkx+ryxIWmg==
+
+zod@^3.22.5:
+  version "3.23.0"
+  resolved "https://registry.yarnpkg.com/zod/-/zod-3.23.0.tgz#a25dab5052702834233e0041e9dd8b6a8480e744"
+  integrity sha512-OFLT+LTocvabn6q76BTwVB0hExEBS0IduTr3cqZyMqEDbOnYmcU+y0tUAYbND4uwclpBGi4I4UUBGzylWpjLGA==

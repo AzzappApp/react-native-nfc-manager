@@ -1,3 +1,4 @@
+import * as Sentry from '@sentry/nextjs';
 import { headers } from 'next/headers';
 import { NextResponse } from 'next/server';
 import { withAxiom } from 'next-axiom';
@@ -57,40 +58,45 @@ export const POST = withAxiom(async (req: Request) => {
   const token = headers().get(AZZAPP_SERVER_HEADER) ?? null;
 
   if (token === TOKEN) {
-    const body = await req.json();
+    try {
+      const body = await req.json();
 
-    const input = TranslationUpdatedSchema.safeParse(body);
+      const input = TranslationUpdatedSchema.safeParse(body);
 
-    if (input.success) {
-      const readData =
-        ENVIRONMENT === 'production'
-          ? input.data.project.branch === 'stable'
-          : input.data.project.branch !== 'stable';
+      if (input.success) {
+        const readData =
+          ENVIRONMENT === 'production'
+            ? input.data.project.branch === 'stable'
+            : input.data.project.branch !== 'stable';
 
-      if (input.data.event === 'project.translation.updated') {
-        if (readData) {
-          const key = input.data.key.name;
+        if (input.data.event === 'project.translation.updated') {
+          if (readData) {
+            const key = input.data.key.name;
 
-          await updateLabel(
-            key,
-            input.data.language.iso.replace('_', '-'),
-            input.data.translation.value,
+            await updateLabel(
+              key,
+              input.data.language.iso.replace('_', '-'),
+              input.data.translation.value,
+            );
+          }
+        } else {
+          await Promise.all(
+            input.data.translations.map(translation => {
+              if (readData) {
+                return updateLabel(
+                  translation.key.name,
+                  translation.language.iso.replace('_', '-'),
+                  translation.value,
+                );
+              }
+              return Promise.resolve();
+            }),
           );
         }
-      } else {
-        await Promise.all(
-          input.data.translations.map(translation => {
-            if (readData) {
-              return updateLabel(
-                translation.key.name,
-                translation.language.iso.replace('_', '-'),
-                translation.value,
-              );
-            }
-            return Promise.resolve();
-          }),
-        );
       }
+    } catch (error) {
+      //unrecognized body
+      Sentry.captureException(error);
     }
   }
 
