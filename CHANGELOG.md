@@ -1,5 +1,6 @@
-## 0.5.5-canary.247
+## 0.5.5-canary.248
 
+* **fix:**  - **backoffice:** put back force-dynamic
 * **fix:**  - **backoffice:** remove edge runtime
 * **fix:**  - **backoffice:** try with edge runtime
 * **build:**  - simplify turbo configuration
