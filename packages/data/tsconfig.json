@@ -5,7 +5,8 @@
     "paths": {
       "@azzapp/shared/*": ["../shared/src/*"],
       "#*": ["./src/*"]
-    }
+    },
+    "declarationMap": true
   },
   "include": ["**/*.ts", "**/*.tsx", "**/*.js", "**/*.jsx", "**/*.json"],
   "exclude": [
