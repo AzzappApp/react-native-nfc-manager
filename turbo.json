@@ -12,6 +12,9 @@
         "packages/web/src/persisted-query-map.json"
       ]
     },
+    "app:build": {
+      "dependsOn": ["build", "//#relay:build"]
+    },
     "//#relay:prepare": {
       "dependsOn": [],
       "inputs": [],
