@@ -1,5 +1,6 @@
-## 0.5.5-canary.245
+## 0.5.5-canary.246
 
+* **build:**  - simplify turbo configuration
 * **fix:**  - **backoffice:** simplify login form
 * **fix:**  - **backoffice:** enhance middleware
 * **build:**  - modify transpile packages
