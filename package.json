@@ -33,7 +33,7 @@
     "bump-version": "node ./scripts/bumpVersion.js",
     "write-dev-changelog": "node ./scripts/writeDevChangeLog.js",
     "persist-queries": "yarn workspace @azzapp/web persist-queries",
-    "payment-api-client": "node --env-file=.env ./scripts/generatePaymentApiClient.js"
+    "payment-api-client": "touch .env && node --env-file=.env ./scripts/generatePaymentApiClient.js"
   },
   "devScripts": [
     "relay:watch",
