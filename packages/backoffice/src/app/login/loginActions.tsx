@@ -1,9 +1,8 @@
 'use server';
 import * as bcrypt from 'bcrypt-ts';
-import { redirect } from 'next/navigation';
 import isEmail from 'validator/lib/isEmail';
 import { getUserByEmail } from '@azzapp/data';
-import { destroySessionServerActions, setSession } from '#helpers/session';
+import { setSession } from '#helpers/session';
 
 export type LoginErrors = {
   email?: string;
@@ -42,9 +41,4 @@ export const login = async (data: FormData): Promise<LoginErrors | null> => {
   });
 
   return null;
-};
-
-export const logout = async () => {
-  await destroySessionServerActions();
-  redirect('/login');
 };

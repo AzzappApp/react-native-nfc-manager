@@ -1,9 +1,8 @@
 'use client';
 import LogoutIcon from '@mui/icons-material/Logout';
-
 import { ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
 import { startTransition, useCallback } from 'react';
-import { logout } from '../app/loginActions';
+import { logout } from './logoutAction';
 
 const LogoutButton = () => {
   const onLogout = useCallback(() => {

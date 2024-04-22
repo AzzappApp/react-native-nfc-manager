@@ -10,7 +10,7 @@ import {
 } from '@mui/material';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
-import { login, type LoginErrors } from '../loginActions';
+import { login, type LoginErrors } from './loginActions';
 
 const LoginForm = () => {
   const [errors, setErrors] = useState<LoginErrors | null>(null);
