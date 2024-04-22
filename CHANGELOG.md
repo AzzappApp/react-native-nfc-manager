@@ -1,5 +1,6 @@
-## 0.5.5-canary.255
+## 0.5.5-canary.256
 
+* **build:**  - upgrade zod & react-native-vision-camera
 * **build:**  - add sentry on backoffice project
 * **build:**  - missing relay step
 * **docs:**  - go to node 30
