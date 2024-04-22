@@ -1,5 +1,6 @@
-## 0.5.5-canary.253
+## 0.5.5-canary.254
 
+* **build:**  - missing relay step
 * **docs:**  - go to node 30
 * **build:**  - move declarationMap in submodules
 * **fix:**  - **backoffice:** try with external form tag
