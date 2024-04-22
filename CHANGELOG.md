@@ -1,5 +1,6 @@
-## 0.5.5-canary.254
+## 0.5.5-canary.255
 
+* **build:**  - add sentry on backoffice project
 * **build:**  - missing relay step
 * **docs:**  - go to node 30
 * **build:**  - move declarationMap in submodules
