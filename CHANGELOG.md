@@ -1,5 +1,6 @@
-## 0.5.5-canary.248
+## 0.5.5-canary.249
 
+* **build:**  - remove zod resolution
 * **fix:**  - **backoffice:** put back force-dynamic
 * **fix:**  - **backoffice:** remove edge runtime
 * **fix:**  - **backoffice:** try with edge runtime
