@@ -5,7 +5,7 @@ import { IntlProvider } from 'react-intl';
 import { DEFAULT_LOCALE } from '@azzapp/i18n';
 import { intlErrorHandler } from '#helpers/i18nHelpers';
 
-type ClientWrapperProps = {
+export type ClientWrapperProps = {
   children: IntlProvider['props']['children'];
   locale?: string | null;
   messages: Record<string, string>;

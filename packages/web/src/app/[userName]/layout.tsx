@@ -8,6 +8,7 @@ import ClientWrapper from '#components/ClientWrapper';
 import { getTranslationMessages } from '#helpers/i18nHelpers';
 import { cachedGetWebCardByUserName } from './dataAccess';
 import { themeClass } from './theme.css';
+import type { ClientWrapperProps } from '#components/ClientWrapper';
 import './styles.css';
 
 const plusJakarta = Plus_Jakarta_Sans({
@@ -19,7 +20,7 @@ const RootLayout = async ({
   children,
   params: { userName } = {},
 }: {
-  children: React.ReactNode;
+  children: ClientWrapperProps['children'];
   params?: { userName?: string };
 }) => {
   const webCard = userName ? await cachedGetWebCardByUserName(userName) : null;
