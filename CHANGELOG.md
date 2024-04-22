@@ -1,5 +1,7 @@
-## 0.5.5-canary.246
+## 0.5.5-canary.247
 
+* **fix:**  - **backoffice:** remove edge runtime
+* **fix:**  - **backoffice:** try with edge runtime
 * **build:**  - simplify turbo configuration
 * **fix:**  - **backoffice:** simplify login form
 * **fix:**  - **backoffice:** enhance middleware
