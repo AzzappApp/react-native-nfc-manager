@@ -1,5 +1,9 @@
-## 0.5.5-canary.250
+## 0.5.5-canary.251
 
+* **fix:**  - type issue on intl
+* **fix:**  - type issue on intl
+* **build:**  - don’t fail on missing env
+* **build:**  - remove resolution on react type
 * **build:**  - remove zod resolution
 * **fix:**  - **backoffice:** put back force-dynamic
 * **fix:**  - **backoffice:** remove edge runtime
