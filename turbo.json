@@ -2,10 +2,10 @@
   "$schema": "https://turbo.build/schema.json",
   "pipeline": {
     "build": {
-      "dependsOn": ["//#relay:build"]
+      "dependsOn": []
     },
     "//#relay:build": {
-      "dependsOn": ["relay:prepare", "graphql-codegen", "payment-api-client"],
+      "dependsOn": ["relay:prepare", "graphql-codegen"],
       "inputs": ["packages/**/*.{js,jsx,ts,tsx}", "schema.graphql"],
       "outputs": [
         "packages/app/src/relayArtifacts/**",

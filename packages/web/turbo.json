@@ -3,12 +3,12 @@
   "extends": ["//"],
   "pipeline": {
     "build": {
-      "dependsOn": ["//#relay:build", "^build"],
+      "dependsOn": ["^build"],
       "inputs": ["src/**", "public/**"],
       "outputs": [".next/**"]
     },
     "typecheck": {
-      "dependsOn": ["//#relay:build", "^build"]
+      "dependsOn": ["^build"]
     }
   }
 }

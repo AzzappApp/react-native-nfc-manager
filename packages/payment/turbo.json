@@ -3,7 +3,7 @@
   "extends": ["//"],
   "pipeline": {
     "build": {
-      "dependsOn": ["^build"],
+      "dependsOn": ["^build", "//#payment-api-client"],
       "outputs": ["lib/**"],
       "inputs": ["src/**"]
     },

@@ -30,8 +30,7 @@
         "NEXT_PUBLIC_API_ENDPOINT": "https://azzapp-dev.vercel.app/api",
         "DEPLOYMENT_ENVIRONMENT": "development",
         "PURCHASE_IOS_KEY": "appl_XWlrdgSwpfsScIXTNWeFxtyCqzz",
-        "PURCHASE_ANDROID_KEY": "goog_oeNrOyuTiDWViuGRRPpDIGlVKMR",
-        "PAYMENT_API_URL": "https://multipsp.preprod.msfapi.com"
+        "PURCHASE_ANDROID_KEY": "goog_oeNrOyuTiDWViuGRRPpDIGlVKMR"
       }
     },
     "staging": {
@@ -49,8 +48,7 @@
         "NEXT_PUBLIC_API_ENDPOINT": "https://azzapp-staging.vercel.app/api",
         "DEPLOYMENT_ENVIRONMENT": "staging",
         "PURCHASE_IOS_KEY": "appl_XWlrdgSwpfsScIXTNWeFxtyCqzz",
-        "PURCHASE_ANDROID_KEY": "goog_oeNrOyuTiDWViuGRRPpDIGlVKMR",
-        "PAYMENT_API_URL": "https://multipsp.preprod.msfapi.com"
+        "PURCHASE_ANDROID_KEY": "goog_oeNrOyuTiDWViuGRRPpDIGlVKMR"
       }
     },
     "production": {
@@ -65,8 +63,7 @@
       "env": {
         "NEXT_PUBLIC_URL": "https://azzapp.vercel.app/",
         "NEXT_PUBLIC_API_ENDPOINT": "https://azzapp.vercel.app/api",
-        "DEPLOYMENT_ENVIRONMENT": "production",
-        "PAYMENT_API_URL": "https://multipsp.preprod.msfapi.com"
+        "DEPLOYMENT_ENVIRONMENT": "production"
       }
     }
   },
