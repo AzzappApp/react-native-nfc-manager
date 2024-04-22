@@ -17,7 +17,7 @@ const LoginForm = () => {
 
   const router = useRouter();
 
-  async function handleSubmit(formData: FormData) {
+  const handleSubmit = async (formData: FormData) => {
     const errors = await login(formData);
     if (!errors) {
       router.replace(
@@ -27,7 +27,7 @@ const LoginForm = () => {
     } else {
       setErrors(errors);
     }
-  }
+  };
 
   return (
     <Container component="main" maxWidth="xs">
@@ -43,39 +43,41 @@ const LoginForm = () => {
         <Typography component="h1" variant="h5">
           Azzapp - Sign in
         </Typography>
-        <Box component="form" action={handleSubmit} sx={{ mt: 1 }}>
-          <TextField
-            margin="normal"
-            required
-            fullWidth
-            id="email"
-            label="Email Address"
-            name="email"
-            autoComplete="email"
-            autoFocus
-            error={!!errors?.email}
-            helperText={errors?.email}
-          />
-          <TextField
-            margin="normal"
-            required
-            fullWidth
-            name="password"
-            label="Password"
-            type="password"
-            id="password"
-            autoComplete="current-password"
-            error={!!errors?.password}
-            helperText={errors?.password}
-          />
-          <Button
-            type="submit"
-            fullWidth
-            variant="contained"
-            sx={{ mt: 3, mb: 2 }}
-          >
-            Sign In
-          </Button>
+        <Box sx={{ mt: 1 }}>
+          <form action={handleSubmit}>
+            <TextField
+              margin="normal"
+              required
+              fullWidth
+              id="email"
+              label="Email Address"
+              name="email"
+              autoComplete="email"
+              autoFocus
+              error={!!errors?.email}
+              helperText={errors?.email}
+            />
+            <TextField
+              margin="normal"
+              required
+              fullWidth
+              name="password"
+              label="Password"
+              type="password"
+              id="password"
+              autoComplete="current-password"
+              error={!!errors?.password}
+              helperText={errors?.password}
+            />
+            <Button
+              type="submit"
+              fullWidth
+              variant="contained"
+              sx={{ mt: 3, mb: 2 }}
+            >
+              Sign In
+            </Button>
+          </form>
         </Box>
         <Typography component="p" variant="body1" color="error">
           {errors?.failed ?? ''}
