@@ -38,3 +38,7 @@ const RootLayout = ({ children }: { children: React.ReactNode }) => (
 );
 
 export default RootLayout;
+
+export const preferredRegion = ['fra1'];
+
+export const dynamic = 'force-dynamic';
