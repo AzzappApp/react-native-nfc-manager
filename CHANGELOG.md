@@ -1,5 +1,6 @@
-## 0.5.5-canary.251
+## 0.5.5-canary.252
 
+* **fix:**  - **backoffice:** try with external form tag
 * **fix:**  - type issue on intl
 * **fix:**  - type issue on intl
 * **build:**  - don’t fail on missing env
