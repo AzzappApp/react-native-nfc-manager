@@ -55,5 +55,5 @@ const redirectToLogin = (nextUrl: NextURL) => {
 };
 
 export const config = {
-  matcher: ['/((?!_next).*)'],
+  matcher: ['/((?!_.*).*)'],
 };

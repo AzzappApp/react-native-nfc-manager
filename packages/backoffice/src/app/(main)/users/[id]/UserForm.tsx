@@ -8,6 +8,7 @@ import {
   FormControlLabel,
   Card,
 } from '@mui/material';
+import * as Sentry from '@sentry/nextjs';
 import { useTransition } from 'react';
 import * as ROLES from '#roles';
 import { toggleRole, removeWebcard } from './userActions';
@@ -23,7 +24,9 @@ const UserForm = ({ user, webCards }: UserFormProps) => {
   const [loading, startTransition] = useTransition();
   const onToggleRole = (role: string) => {
     startTransition(async () => {
-      await toggleRole(user.id, role).catch(console.error);
+      await toggleRole(user.id, role).catch(e => {
+        Sentry.captureException(e);
+      });
     });
   };
 

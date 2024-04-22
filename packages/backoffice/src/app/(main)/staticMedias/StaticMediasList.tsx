@@ -10,6 +10,7 @@ import {
   DialogContent,
   Typography,
 } from '@mui/material';
+import * as Sentry from '@sentry/nextjs';
 import { useOptimistic, useState } from 'react';
 import { uploadMedia } from '@azzapp/shared/WebAPI';
 import { getMediaFileKind } from '#helpers/fileHelpers';
@@ -28,7 +29,6 @@ type StaticMediasListProps = {
 };
 
 const StaticMediasList = ({ staticMedias }: StaticMediasListProps) => {
-  console.log(useOptimistic);
   const [optimisticStaticMedias, dispatchOptimistic] = useOptimistic<
     StaticMedia[],
     | {
@@ -128,7 +128,7 @@ const StaticMediasList = ({ staticMedias }: StaticMediasListProps) => {
       });
       await reorderStaticMedias(mediasIds);
     } catch (error) {
-      console.error(error);
+      Sentry.captureException(error);
     }
   };
 
@@ -141,7 +141,7 @@ const StaticMediasList = ({ staticMedias }: StaticMediasListProps) => {
       });
       await setStaticMediaEnabled(mediaId, enabled);
     } catch (error) {
-      console.error(error);
+      Sentry.captureException(error);
     }
   };
 

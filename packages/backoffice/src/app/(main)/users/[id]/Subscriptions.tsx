@@ -1,6 +1,7 @@
 'use client';
 
 import { Box, FormControlLabel, Switch, Typography } from '@mui/material';
+import * as Sentry from '@sentry/nextjs';
 import { useTransition } from 'react';
 import { setLifetimeSubscription } from './subscriptionActions';
 import type { User, UserSubscription } from '@azzapp/data';
@@ -18,12 +19,10 @@ export const Subscriptions = ({
     event: React.ChangeEvent<HTMLInputElement>,
   ) => {
     startTransition(async () => {
-      console.log('onSetLifetimeSubscription', event.target.checked);
       try {
         await setLifetimeSubscription(user.id, event.target.checked);
-        console.log('onSetLifetimeSubscription done');
       } catch (e) {
-        console.error(e);
+        Sentry.captureException(e);
       }
     });
   };

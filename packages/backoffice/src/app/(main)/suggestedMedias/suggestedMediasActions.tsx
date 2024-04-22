@@ -1,6 +1,7 @@
 'use server';
 
 import { createId } from '@paralleldrive/cuid2';
+import * as Sentry from '@sentry/nextjs';
 import { eq, inArray, sql } from 'drizzle-orm';
 import { revalidatePath } from 'next/cache';
 import {
@@ -62,7 +63,7 @@ export const addSuggestions = async ({
       await trx.insert(MediaSuggestionTable).values(suggestions);
     });
   } catch (error) {
-    console.error(error);
+    Sentry.captureException(error);
     throw new Error('Error while saving suggestions');
   }
 
@@ -117,7 +118,7 @@ export const setSuggestionsForMedia = async ({
       );
     });
   } catch (error) {
-    console.error(error);
+    Sentry.captureException(error);
     throw new Error('Error while saving suggestions');
   }
 
