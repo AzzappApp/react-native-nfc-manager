@@ -1271,9 +1271,11 @@ PODS:
     - SDWebImage/Core (~> 5.17)
   - Sentry/HybridSDK (8.24.0)
   - SocketRocket (0.6.1)
-  - VisionCamera (4.0.0-beta.13):
-    - React
-    - React-callinvoker
+  - VisionCamera (4.0.1):
+    - VisionCamera/Core (= 4.0.1)
+    - VisionCamera/React (= 4.0.1)
+  - VisionCamera/Core (4.0.1)
+  - VisionCamera/React (4.0.1):
     - React-Core
   - Yoga (1.14.0)
 
@@ -1719,7 +1721,7 @@ SPEC CHECKSUMS:
   SDWebImageWebPCoder: af09429398d99d524cae2fe00f6f0f6e491ed102
   Sentry: 2f6baed15a3f8056b875fc903dc3dcb2903117f4
   SocketRocket: f32cd54efbe0f095c4d7594881e52619cfe80b17
-  VisionCamera: 9f26224fce1233ffdad9fa4e56863e3de2190dc0
+  VisionCamera: 5787602f86d8521f17af0e606259b6d367754e74
   Yoga: 47d399a73c0c0caa9ff824e5c657eae31215bfee
 
 PODFILE CHECKSUM: 98c8d4205febb3f5c87147ae82cc67a37bb2a686

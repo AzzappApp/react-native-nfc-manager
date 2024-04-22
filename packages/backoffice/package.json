@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "next dev -p 3005",
     "build": "next build",
-    "start": "next start",
+    "start": "dotenv -e ./../../.env -- next start",
     "typecheck": "tsc -p tsconfig.next.json --noEmit",
     "clean": "rm -rf lib && rm -f tsconfig.tsbuildinfo || true && rm -rf .next && rm -rf node_modules"
   },
@@ -34,7 +34,7 @@
     "next": "^14.2.2",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "zod": "^3.22.5",
+    "zod": "^3.23.0",
     "@lokalise/node-api": "^12.4.0"
   },
   "devDependencies": {

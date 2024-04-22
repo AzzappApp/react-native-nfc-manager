@@ -123,10 +123,10 @@
     "react-native-svg": "^15.1.0",
     "react-native-tab-view": "^3.5.2",
     "react-native-toast-message": "^2.2.0",
-    "react-native-vision-camera": "^4.0.0-beta.13",
+    "react-native-vision-camera": "^4.0.1",
     "react-relay": "^16.2.0",
     "use-debounce": "^10.0.0",
-    "zod": "^3.22.5"
+    "zod": "^3.23.0"
   },
   "devDependencies": {
     "@testing-library/react-native": "^12.4.5",
