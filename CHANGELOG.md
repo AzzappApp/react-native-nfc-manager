@@ -1,5 +1,6 @@
-## 0.5.5-canary.260
+## 0.5.5-canary.261
 
+* **fix:**  - adapt middleware
 * **test:**  - put back backoffice middleware
 * **test:**  - try backoffice without middleware
 * **build:**  - upgrade shared dependencies
