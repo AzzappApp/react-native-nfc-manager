@@ -1,5 +1,6 @@
-## 0.5.5-canary.266
+## 0.5.5-canary.267
 
+* **build:**  - putting back 14.1.4
 * **feat:**  - **shareBack:** [#3300](https://github.com/AzzappApp/azzapp/pull/3300) autoclose on send ([#3316](https://github.com/AzzappApp/azzapp/pull/3316))
 * **build:**  - try back 14.2.2
 * **build:**  - try 14.1.4
