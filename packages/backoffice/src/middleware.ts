@@ -52,5 +52,5 @@ const redirectToLogin = (nextUrl: NextURL) => {
 };
 
 export const config = {
-  matcher: ['/((?!_next|_monitoring).*)'],
+  matcher: '/((?!api|static|.*\\..*|_next|_monitoring).*)',
 };
