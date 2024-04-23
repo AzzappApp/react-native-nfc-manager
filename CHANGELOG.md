@@ -1,5 +1,6 @@
-## 0.5.5-canary.263
+## 0.5.5-canary.264
 
+* **fix:**  - sentry error on backoffice build
 * **fix:**  - remove dotenv calls
 * **build:**  - try next 14.2.1
 * **build:**  - try canary version
