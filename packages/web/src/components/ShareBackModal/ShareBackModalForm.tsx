@@ -1,6 +1,7 @@
 import { getFormProps, getInputProps, useForm } from '@conform-to/react';
 import { parseWithZod } from '@conform-to/zod';
 import cx from 'classnames';
+import { useEffect } from 'react';
 import { useFormState, useFormStatus } from 'react-dom';
 import { SuccessIcon } from '#assets';
 import { processShareBackSubmission } from '#app/actions/shareBackAction';
@@ -12,10 +13,11 @@ import styles from './ShareBackModalForm.css';
 type ShareBackModalContentProps = {
   token: string;
   userId: string;
+  onSuccess: () => void;
 };
 
 const ShareBackModalForm = (props: ShareBackModalContentProps) => {
-  const { token, userId } = props;
+  const { token, userId, onSuccess } = props;
 
   const shareBackActionWithUserIdAndToken = processShareBackSubmission.bind(
     null,
@@ -37,6 +39,20 @@ const ShareBackModalForm = (props: ShareBackModalContentProps) => {
     shouldValidate: 'onSubmit',
     shouldRevalidate: 'onSubmit',
   });
+
+  useEffect(() => {
+    let timeout: NodeJS.Timeout | null = null;
+    if (lastResult?.status === 'success') {
+      timeout = setTimeout(() => {
+        onSuccess();
+      }, 2000);
+    }
+    return () => {
+      if (timeout) {
+        clearTimeout(timeout);
+      }
+    };
+  }, [lastResult?.status, onSuccess]);
 
   return (
     <div className={styles.content}>

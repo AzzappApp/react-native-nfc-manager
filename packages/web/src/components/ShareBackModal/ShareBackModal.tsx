@@ -1,7 +1,7 @@
 'use client';
 
 import cx from 'classnames';
-import { forwardRef } from 'react';
+import { forwardRef, useImperativeHandle, useRef } from 'react';
 import { ShareBackIcon } from '#assets';
 import { Modal, type ModalProps } from '#ui';
 
@@ -24,8 +24,19 @@ const ShareBackModal = forwardRef<ModalActions, ShareBackModalProps>(
   (props, ref) => {
     const { fullname, avatarUrl, token, userId, isMultiUser, initials } = props;
 
+    const internalRef = useRef<ModalActions>(null);
+
+    useImperativeHandle(ref, () => ({
+      close: () => {
+        internalRef.current?.close();
+      },
+      open: () => {
+        internalRef.current?.open();
+      },
+    }));
+
     return (
-      <Modal ref={ref}>
+      <Modal ref={internalRef}>
         <div
           className={cx(
             styles.header,
@@ -48,7 +59,13 @@ const ShareBackModal = forwardRef<ModalActions, ShareBackModalProps>(
           <span className={styles.title}>{fullname}</span>
         </div>
 
-        <ShareBackModalForm token={token} userId={userId} />
+        <ShareBackModalForm
+          token={token}
+          userId={userId}
+          onSuccess={() => {
+            internalRef.current?.close();
+          }}
+        />
       </Modal>
     );
   },
