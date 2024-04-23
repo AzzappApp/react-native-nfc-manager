@@ -1,6 +1,6 @@
 {
   "name": "@azzapp/data",
-  "version": "0.5.5-canary.259",
+  "version": "0.5.5-canary.260",
   "private": true,
   "exports": {
     ".": {
@@ -31,7 +31,7 @@
     "definition:watch"
   ],
   "dependencies": {
-    "@azzapp/shared": "0.5.5-canary.259",
+    "@azzapp/shared": "0.5.5-canary.260",
     "@paralleldrive/cuid2": "^2.2.2",
     "@planetscale/database": "^1.16.0",
     "drizzle-orm": "^0.30.8",

@@ -1,5 +1,6 @@
-## 0.5.5-canary.259
+## 0.5.5-canary.260
 
+* **test:**  - put back backoffice middleware
 * **test:**  - try backoffice without middleware
 * **build:**  - upgrade shared dependencies
 * **feat:**  - **webCard:** [#3215](https://github.com/AzzappApp/azzapp/pull/3215) new assets for modules
