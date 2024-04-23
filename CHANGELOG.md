@@ -1,5 +1,6 @@
-## 0.5.5-canary.258
+## 0.5.5-canary.259
 
+* **test:**  - try backoffice without middleware
 * **build:**  - upgrade shared dependencies
 * **feat:**  - **webCard:** [#3215](https://github.com/AzzappApp/azzapp/pull/3215) new assets for modules
 * **build:**  - upgrade zod & react-native-vision-camera
