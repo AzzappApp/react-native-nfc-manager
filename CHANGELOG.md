@@ -1,5 +1,7 @@
-## 0.5.5-canary.262
+## 0.5.5-canary.263
 
+* **fix:**  - remove dotenv calls
+* **build:**  - try next 14.2.1
 * **build:**  - try canary version
 * **build:**  - try canary version
 * **fix:**  - adapt middleware
