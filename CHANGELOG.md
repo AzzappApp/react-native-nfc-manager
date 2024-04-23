@@ -1,5 +1,7 @@
-## 0.5.5-canary.261
+## 0.5.5-canary.262
 
+* **build:**  - try canary version
+* **build:**  - try canary version
 * **fix:**  - adapt middleware
 * **test:**  - put back backoffice middleware
 * **test:**  - try backoffice without middleware
