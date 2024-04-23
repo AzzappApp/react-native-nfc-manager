@@ -1,0 +1,56 @@
+import { NextResponse } from 'next/server';
+import { getUserById } from '@azzapp/data';
+import backOfficeSections from '#backOfficeSections';
+import { destroySession, getRequestSession } from '#helpers/session';
+import type { SubSection } from '#backOfficeSections';
+import type { NextURL } from 'next/dist/server/web/next-url';
+import type { NextRequest } from 'next/server';
+
+export async function middleware(request: NextRequest) {
+  const { nextUrl } = request;
+  if (nextUrl.pathname.startsWith('/login')) {
+    return NextResponse.next();
+  }
+
+  const session = await getRequestSession(request).catch(e => {
+    if (
+      process.env.NODE_ENV === 'development' ||
+      process.env.DEPLOYMENT_ENVIRONMENT === 'development'
+    ) {
+      console.error(e);
+    }
+    return null;
+  });
+
+  if (!session?.userId) {
+    return redirectToLogin(nextUrl);
+  }
+  const user = await getUserById(session.userId);
+  if (!user) {
+    return destroySession(redirectToLogin(nextUrl));
+  }
+  const section = backOfficeSections
+    .reduce((acc, { subSections }) => {
+      return [...acc, ...subSections];
+    }, [] as SubSection[])
+    .find(section => nextUrl.pathname.startsWith(section.href));
+
+  if (section && !user.roles?.some(role => section.roles.includes(role))) {
+    return new NextResponse('Forbidden', { status: 403 });
+  }
+
+  return NextResponse.next();
+}
+
+const redirectToLogin = (nextUrl: NextURL) => {
+  const url = nextUrl.clone();
+  url.pathname = `/login`;
+  if (nextUrl.pathname !== '/') {
+    url.searchParams.set('redirect', encodeURIComponent(nextUrl.pathname));
+  }
+  return NextResponse.redirect(url);
+};
+
+export const config = {
+  matcher: ['/((?!_next|_monitoring).*)'],
+};
