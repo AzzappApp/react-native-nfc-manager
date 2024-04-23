@@ -3,8 +3,8 @@
   "version": "0.5.5-canary.262",
   "private": true,
   "scripts": {
-    "dev": "next dev -p 3005",
-    "build": "next build",
+    "dev": "dotenv -e ./../../.env -- next dev -p 3005",
+    "build": "dotenv -e ./../../.env -- next build",
     "start": "dotenv -e ./../../.env -- next start",
     "typecheck": "tsc -p tsconfig.next.json --noEmit",
     "clean": "rm -rf lib && rm -f tsconfig.tsbuildinfo || true && rm -rf .next && rm -rf node_modules"
@@ -31,7 +31,7 @@
     "drizzle-orm": "^0.30.8",
     "lodash": "^4.17.21",
     "lottie-web": "^5.12.2",
-    "next": "14.3.0-canary.18",
+    "next": "14.2.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "zod": "^3.23.0",
