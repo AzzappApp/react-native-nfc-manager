@@ -52,7 +52,7 @@ jobs:
             ${{ runner.os }}-yarn-
       
       - name: Install Vercel CLI
-        run: yarn global add vercel@34.0.0
+        run: yarn global add vercel@latest
         
       - name: Install dependencies
         run: yarn install --frozen-lockfile  --immutable
