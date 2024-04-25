@@ -380,7 +380,7 @@ const WebCardModal = ({
         {isViewer && (
           <PressableNative
             onPress={quitWebCard}
-            style={styles.errorModalLine}
+            style={[styles.bottomSheetOptionButton, styles.report]}
             disabled={isLoadingQuitWebCard}
           >
             <Text variant="error">
@@ -428,7 +428,9 @@ const stylesheet = createStyleSheet(appearance => ({
     height: 32,
   },
   report: {
+    marginVertical: 10,
     alignSelf: 'center',
+    justifyContent: 'center',
   },
   bottomSheetOptionContainer: {
     flexDirection: 'row',
@@ -441,15 +443,7 @@ const stylesheet = createStyleSheet(appearance => ({
     alignItems: 'center',
     columnGap: 10,
   },
-  errorModalLine: {
-    height: 42,
-    marginTop: 30,
-    marginBottom: 30,
-    paddingHorizontal: 20,
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
+
   coverStyle: {
     ...shadow(appearance, 'bottom'),
   },
