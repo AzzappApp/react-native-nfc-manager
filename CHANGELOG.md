@@ -1,5 +1,6 @@
-## 0.5.5-canary.272
+## 0.5.5-canary.273
 
+* **feat:**  - **multiUser:** [#3248](https://github.com/AzzappApp/azzapp/pull/3248) add logo in common information ([#3337](https://github.com/AzzappApp/azzapp/pull/3337))
 * **feat:**  - **user:** [#3242](https://github.com/AzzappApp/azzapp/pull/3242) implement user is blocked ([#3324](https://github.com/AzzappApp/azzapp/pull/3324))
 * **fix:**  - **webCard:** [#3203](https://github.com/AzzappApp/azzapp/pull/3203) update delete webcard position ([#3315](https://github.com/AzzappApp/azzapp/pull/3315))
 * **feat:**  - **webCard:** [#3321](https://github.com/AzzappApp/azzapp/pull/3321) implement remove this webCard ([#3322](https://github.com/AzzappApp/azzapp/pull/3322))
