@@ -58,6 +58,7 @@ import { useDeepLink } from '#hooks/useDeepLink';
 import AboutScreen from '#screens/AboutScreen';
 import AccountDetailsScreen from '#screens/AccountDetailsScreen';
 import CardModuleEditionScreen from '#screens/CardModuleEditionScreen';
+import CommonInformationScreen from '#screens/CommonInformationScreen';
 import ConfirmChangeContactScreen from '#screens/ConfirmChangeContactScreen';
 import ConfirmRegistrationScreen from '#screens/ConfirmRegistrationScreen';
 import ContactCardScreen from '#screens/ContactCardScreen';
@@ -209,6 +210,7 @@ const screens = {
   WEBCARD: WebCardScreen,
   WEBCARD_PARAMETERS: WebCardParametersScreen,
   CONFIRM_CHANGE_CONTACT: ConfirmChangeContactScreen,
+  COMMON_INFORMATION: CommonInformationScreen,
 };
 
 const tabs = {

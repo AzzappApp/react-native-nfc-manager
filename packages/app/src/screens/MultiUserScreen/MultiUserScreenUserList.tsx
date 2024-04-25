@@ -48,13 +48,11 @@ import type { ListRenderItem, SectionListData } from 'react-native';
 
 export type MultiUserScreenListProps = {
   webCard: MultiUserScreenUserList_webCard$key;
-  toggleCommonInfosForm: () => void;
   Header: React.ReactElement;
 };
 
 const MultiUserScreenUserList = ({
   webCard: webCardKey,
-  toggleCommonInfosForm,
   Header,
 }: MultiUserScreenListProps) => {
   const intl = useIntl();
@@ -259,7 +257,9 @@ const MultiUserScreenUserList = ({
                 description:
                   'Button to add common information to the contact card in MultiUserScreen',
               })} (${nbCommonInformation})`}
-              onPress={toggleCommonInfosForm}
+              onPress={() => {
+                router.push({ route: 'COMMON_INFORMATION' });
+              }}
             />
           </>
         )}
@@ -270,9 +270,9 @@ const MultiUserScreenUserList = ({
     intl,
     nbCommonInformation,
     onAddUsers,
+    router,
     styles.button,
     styles.headerContainer,
-    toggleCommonInfosForm,
     transferOwnerMode,
   ]);
 

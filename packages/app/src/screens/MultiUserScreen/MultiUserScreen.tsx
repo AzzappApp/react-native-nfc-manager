@@ -30,7 +30,6 @@ import PressableNative from '#ui/PressableNative';
 import SafeAreaView from '#ui/SafeAreaView';
 import Switch from '#ui/Switch';
 import Text from '#ui/Text';
-import CommonInformationForm from './CommonInformationForm';
 import MultiUserScreenUserList from './MultiUserScreenUserList';
 import type { RelayScreenProps } from '#helpers/relayScreen';
 import type { MultiUserScreen_transferOwnershipMutation } from '#relayArtifacts/MultiUserScreen_transferOwnershipMutation.graphql';
@@ -62,9 +61,6 @@ const multiUserScreenQuery = graphql`
           id
           isMultiUser
           ...CoverRenderer_webCard
-          commonInformation {
-            ...CommonInformationForm_data
-          }
           nbProfiles
           ...MultiUserScreenUserList_webCard
         }
@@ -94,8 +90,6 @@ const MultiUserScreen = ({
 
   const styles = useStyleSheet(styleSheet);
   const isMultiUserSubscription = currentUser?.userSubscription != null;
-
-  const [commonInfoFormIsOpened, toggleCommonInfoForm] = useToggle(false);
 
   useEffect(() => {
     // users that loose their admin role should not be able to access this screen
@@ -402,7 +396,6 @@ const MultiUserScreen = ({
               >
                 <MultiUserScreenUserList
                   Header={ScrollableHeader}
-                  toggleCommonInfosForm={toggleCommonInfoForm}
                   webCard={profile.webCard}
                 />
               </MultiUserTransferOwnerContext.Provider>
@@ -413,14 +406,6 @@ const MultiUserScreen = ({
         </View>
       </SafeAreaView>
 
-      {profile ? (
-        <CommonInformationForm
-          commonInfoFormIsOpened={commonInfoFormIsOpened}
-          toggleCommonInfoForm={toggleCommonInfoForm}
-          commonInformation={profile.webCard.commonInformation}
-          webCardId={profile.webCard.id}
-        />
-      ) : null}
       <ScreenModal visible={confirmDeletMultiUser}>
         <Container style={styles.confirmModalContainer}>
           <View style={styles.confirmModalContentContainer}>

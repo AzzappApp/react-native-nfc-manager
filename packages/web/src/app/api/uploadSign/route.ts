@@ -18,7 +18,7 @@ import type { SessionData } from '#helpers/tokens';
 
 const UploadSignSchema = z.object({
   kind: z.enum(['image', 'video']),
-  target: z.enum(['cover', 'coverSource', 'module', 'post', 'avatar']),
+  target: z.enum(['cover', 'coverSource', 'module', 'post', 'avatar', 'logo']),
 });
 
 type uploadSignParams = z.infer<typeof UploadSignSchema>;

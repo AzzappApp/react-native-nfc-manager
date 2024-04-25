@@ -32,6 +32,7 @@ export const WebCardTable = cols.table(
     webCardCategoryId: cols.cuid('webCardCategoryId'),
     firstName: cols.defaultVarchar('firstName'),
     lastName: cols.defaultVarchar('lastName'),
+    logoId: cols.mediaId('logoId'),
     commonInformation: cols
       .json('commonInformation')
       .$type<CommonInformation>(),

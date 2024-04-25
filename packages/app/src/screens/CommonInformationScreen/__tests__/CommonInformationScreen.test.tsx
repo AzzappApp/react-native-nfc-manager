@@ -1,14 +1,11 @@
-import {
-  RelayEnvironmentProvider,
-  graphql,
-  useLazyLoadQuery,
-} from 'react-relay';
+import { Suspense } from 'react';
+import { RelayEnvironmentProvider, loadQuery } from 'react-relay';
 import { MockPayloadGenerator } from 'relay-test-utils';
 import { createMockEnvironment } from 'relay-test-utils/lib/RelayModernMockEnvironment';
 import { screen, render, fireEvent, act, waitFor } from '#helpers/testHelpers';
-import CommonInformationForm from '../CommonInformationForm';
-import type { CommonInformationFormTestQuery } from '#relayArtifacts/CommonInformationFormTestQuery.graphql';
-import type { CommonInformationFormProps } from '../CommonInformationForm';
+import CommonInformationScreenQueryNode from '#relayArtifacts/CommonInformationScreenQuery.graphql';
+import { CommonInformationScreen } from '../CommonInformationScreen';
+import type { CommonInformationScreenQuery } from '#relayArtifacts/CommonInformationScreenQuery.graphql';
 import type { RelayMockEnvironment } from 'relay-test-utils/lib/RelayModernMockEnvironment';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -17,15 +14,18 @@ jest.mock('#components/ScreenModal', () => require('react-native').View);
 describe('CommonInformationForm', () => {
   let environment: RelayMockEnvironment;
 
-  const renderCommonInformationForm = (
-    props?: Partial<CommonInformationFormProps>,
-  ) => {
+  const renderCommonInformationForm = () => {
     environment = createMockEnvironment();
+    environment.mock.queuePendingOperation(CommonInformationScreenQueryNode, {
+      webCardId: 'testWebCardId',
+    });
     environment.mock.queueOperationResolver(operation => {
+      console.log({ operation });
       return MockPayloadGenerator.generate(operation, {
         WebCard() {
           return {
             id: 'test-webcard',
+            logo: null,
             commonInformation: {
               company: 'Facebook',
               emails: [
@@ -54,37 +54,32 @@ describe('CommonInformationForm', () => {
       });
     });
 
-    const TestRenderer = (props?: Partial<CommonInformationFormProps>) => {
-      const { webCard } = useLazyLoadQuery<CommonInformationFormTestQuery>(
-        graphql`
-          query CommonInformationFormTestQuery @relay_test_operation {
-            webCard: node(id: "test-webcard") {
-              ... on WebCard {
-                id
-                commonInformation {
-                  ...CommonInformationForm_data
-                }
-              }
-            }
-          }
-        `,
-        {},
-      );
+    const preloadedQuery = loadQuery<CommonInformationScreenQuery>(
+      environment,
+      CommonInformationScreenQueryNode,
+      {
+        webCardId: 'testWebCardId',
+      },
+    );
 
+    const TestRenderer = () => {
       return (
-        <CommonInformationForm
-          commonInformation={webCard!.commonInformation ?? null}
-          commonInfoFormIsOpened
-          toggleCommonInfoForm={() => {}}
-          webCardId="test-webcard"
-          {...props}
-        />
+        <Suspense>
+          <CommonInformationScreen
+            preloadedQuery={preloadedQuery}
+            screenId="screenId"
+            hasFocus
+            route={{
+              route: 'COMMON_INFORMATION',
+            }}
+          />
+        </Suspense>
       );
     };
 
     return render(
       <RelayEnvironmentProvider environment={environment}>
-        <TestRenderer {...props} />
+        <TestRenderer />
       </RelayEnvironmentProvider>,
     );
   };
@@ -138,11 +133,12 @@ describe('CommonInformationForm', () => {
     const operation = environment.mock.getMostRecentOperation();
 
     expect(operation.request.node.operation.name).toBe(
-      'CommonInformationFormMutation',
+      'CommonInformationScreenMutation',
     );
 
     expect(operation.request.variables.input).toEqual({
       company: 'Facebook 2',
+      logoId: null,
       emails: [
         {
           label: 'Work',

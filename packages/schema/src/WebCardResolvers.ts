@@ -246,6 +246,13 @@ export const WebCard: WebCardResolvers = {
       },
     );
   },
+  logo: async webCard =>
+    webCard.logoId
+      ? {
+          media: webCard.logoId,
+          assetKind: 'logo',
+        }
+      : null,
 };
 
 export const WebCardCategory: WebCardCategoryResolvers = {

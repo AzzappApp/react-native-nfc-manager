@@ -32,6 +32,14 @@ export const commonInformationSchema = z.object({
       label: z.string(),
     }),
   ),
+  logo: z
+    .object({
+      uri: z.string(),
+      id: z.string().optional(),
+      local: z.boolean().optional(),
+    })
+    .optional()
+    .nullable(),
 });
 
 export type CommonInformationForm = z.infer<typeof commonInformationSchema>;

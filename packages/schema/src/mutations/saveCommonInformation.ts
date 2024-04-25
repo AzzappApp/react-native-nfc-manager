@@ -7,11 +7,16 @@ import type { MutationResolvers } from '#/__generated__/types';
 import type { WebCard } from '@azzapp/data';
 
 const saveCommonInformation: MutationResolvers['saveCommonInformation'] =
-  async (_, { webCardId: gqlWebCardId, input: data }, { loaders }) => {
+  async (
+    _,
+    { webCardId: gqlWebCardId, input: { logoId, ...data } },
+    { loaders },
+  ) => {
     const webCardId = fromGlobalIdWithType(gqlWebCardId, 'WebCard');
 
     const updates: Partial<WebCard> = {
       commonInformation: data,
+      logoId,
     };
     try {
       await db.transaction(async trx => {

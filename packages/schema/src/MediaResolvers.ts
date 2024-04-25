@@ -26,16 +26,22 @@ import type {
 } from '@azzapp/data';
 import type DataLoader from 'dataloader';
 
-export type DefferedMedia = MediaModel | string;
+export type DeferredMedia = MediaModel | string;
 
 export type MediaWithAssetKind = {
-  media: DefferedMedia;
-  assetKind: 'contactCard' | 'cover' | 'coverSource' | 'module' | 'post';
+  media: DeferredMedia;
+  assetKind:
+    | 'contactCard'
+    | 'cover'
+    | 'coverSource'
+    | 'logo'
+    | 'module'
+    | 'post';
 };
 
-export type MediaResolverBaseType = DefferedMedia | MediaWithAssetKind;
+export type MediaResolverBaseType = DeferredMedia | MediaWithAssetKind;
 
-const getDefferedMedia = (media: MediaResolverBaseType) => {
+const getDeferredMedia = (media: MediaResolverBaseType) => {
   if (typeof media === 'object' && 'assetKind' in media) {
     return media.media;
   }
@@ -46,7 +52,7 @@ const getActualMedia = async (
   media: MediaResolverBaseType,
   loader: DataLoader<string, MediaModel | null>,
 ) => {
-  media = getDefferedMedia(media);
+  media = getDeferredMedia(media);
   if (typeof media === 'string') {
     const dbMedia = await loader.load(media);
     if (!dbMedia) {
@@ -67,7 +73,7 @@ const getAssetKind = (media: MediaResolverBaseType) => {
 
 const MediaResolversBase = {
   id: (media: MediaResolverBaseType) => {
-    media = getDefferedMedia(media);
+    media = getDeferredMedia(media);
     return typeof media === 'string' ? media : media.id;
   },
   aspectRatio: async (
@@ -139,7 +145,7 @@ const uriResolver =
     },
   ) => {
     const assetKind = getAssetKind(media);
-    media = getDefferedMedia(media);
+    media = getDeferredMedia(media);
     const id = decodeMediaId(typeof media === 'string' ? media : media.id);
     if (assetKind === 'coverSource' || raw) {
       return getCloudinaryAssetURL(

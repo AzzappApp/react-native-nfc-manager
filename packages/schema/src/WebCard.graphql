@@ -260,6 +260,10 @@ type WebCard implements Node {
     """
     first: Int @max(value: 50)
   ): PaymentConnection!
+  """
+  The webCard logo
+  """
+  logo: Media
 }
 
 type WebCardStyle {

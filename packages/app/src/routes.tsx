@@ -180,10 +180,16 @@ export type UserPayWallRoute = {
   params?: never;
 };
 
+export type CommonInformationRoute = {
+  route: 'COMMON_INFORMATION';
+  params?: never;
+};
+
 export type Route =
   | AboutRoute
   | AccountDetailsRoute
   | CardModuleEditionRoute
+  | CommonInformationRoute
   | ConfirmChangeContactRoute
   | ConfirmRegistrationRoute
   | ContactCardRoute

@@ -235,7 +235,7 @@ export const refreshTokens: APIMethod<string, TokensResponse> = (
 export const uploadSign: APIMethod<
   {
     kind: 'image' | 'video';
-    target: 'avatar' | 'cover' | 'coverSource' | 'module' | 'post';
+    target: 'avatar' | 'cover' | 'coverSource' | 'logo' | 'module' | 'post';
   },
   { uploadURL: string; uploadParameters: Record<string, any> }
 > = async ({ kind, target }, init) =>

@@ -26,6 +26,7 @@ import {
   loadQueryFor,
   useManagedQuery,
 } from './RelayQueryManager';
+import type { ScreenOptions } from '#components/NativeRouter';
 import type { Route } from '#routes';
 import type { LoadQueryOptions } from './RelayQueryManager';
 import type { ScreenPrefetchOptions } from './ScreenPrefetcher';
@@ -110,7 +111,9 @@ function relayScreen<TRoute extends Route>(
     ...options
   }: RelayScreenOptions<TRoute>,
 ): ComponentType<Omit<RelayScreenProps<TRoute, any>, 'preloadedQuery'>> &
-  typeof options {
+  typeof options & {
+    getScreenOptions?: () => ScreenOptions;
+  } {
   const RelayWrapper = (props: RelayScreenProps<TRoute, any>) => {
     const {
       screenId,
