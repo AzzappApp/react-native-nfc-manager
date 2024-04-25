@@ -31,6 +31,11 @@ type SelectProps<ItemT> = Omit<ViewProps, 'children'> & {
   keyExtractor: (item: ItemT, index: number) => string;
 
   /**
+   * Component to render at the top of the list
+   */
+  ListHeaderComponent?: React.ComponentType<any> | React.ReactElement | null;
+
+  /**
    * The selected item key
    */
   selectedItemKey?: string | null;
@@ -89,6 +94,8 @@ type SelectProps<ItemT> = Omit<ViewProps, 'children'> & {
    * Whether the select is disabled
    */
   disabled?: boolean;
+
+  avoidKeyboard?: boolean;
 };
 
 /**
@@ -110,6 +117,8 @@ const Select = <ItemT,>({
   isErrored,
   inputTextStyle,
   style,
+  ListHeaderComponent,
+  avoidKeyboard,
   ...props
 }: SelectProps<ItemT>) => {
   const [showDropDown, setShowDropDown] = useState(false);
@@ -192,6 +201,7 @@ const Select = <ItemT,>({
         contentContainerStyle={styles.bottomSheetContentContainer}
         onRequestClose={() => setShowDropDown(false)}
         nestedScroll
+        avoidKeyboard={avoidKeyboard}
       >
         <SelectList
           data={data}
@@ -202,6 +212,7 @@ const Select = <ItemT,>({
           onItemSelected={onSelectListItemSelected}
           itemContainerStyle={itemContainerStyle}
           selectedItemContainerStyle={selectedItemContainerStyle}
+          ListHeaderComponent={ListHeaderComponent}
         />
       </BottomSheetModal>
     </>

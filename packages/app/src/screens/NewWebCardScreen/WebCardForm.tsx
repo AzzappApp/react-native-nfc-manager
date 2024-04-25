@@ -4,6 +4,8 @@ import {
   useRef,
   forwardRef,
   useImperativeHandle,
+  useState,
+  useMemo,
 } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { useIntl } from 'react-intl';
@@ -26,6 +28,7 @@ import { dispatchGlobalEvent } from '#helpers/globalEvents';
 import useScreenInsets from '#hooks/useScreenInsets';
 import Icon from '#ui/Icon';
 import Label from '#ui/Label';
+import SearchBarStatic from '#ui/SearchBarStatic';
 import Select from '#ui/Select';
 import Text from '#ui/Text';
 import TextInput from '#ui/TextInput';
@@ -82,6 +85,20 @@ const WebCardForm = (
       }
     `,
     webCardCategory,
+  );
+
+  const [searchActivities, setSearchActivities] = useState('');
+
+  const filteredCompanyActivities = useMemo(
+    () =>
+      searchActivities.trim()
+        ? companyActivities.filter(activity =>
+            activity.label
+              ?.toLowerCase()
+              .includes(searchActivities.toLowerCase()),
+          )
+        : companyActivities,
+    [companyActivities, searchActivities],
   );
 
   const intl = useIntl();
@@ -444,7 +461,7 @@ const WebCardForm = (
                   <Select
                     nativeID="activities"
                     accessibilityLabelledBy="activitiesLabel"
-                    data={companyActivities}
+                    data={filteredCompanyActivities}
                     selectedItemKey={value}
                     keyExtractor={companyActivityKeyExtractor}
                     bottomSheetHeight={
@@ -464,6 +481,19 @@ const WebCardForm = (
                         'NewProfile Name Company Screen - Accessibility TextInput Placeholder Choose a company activity',
                     })}
                     itemContainerStyle={styles.selectItemContainerStyle}
+                    ListHeaderComponent={
+                      <View style={styles.searchContainer}>
+                        <SearchBarStatic
+                          placeholder={intl.formatMessage({
+                            defaultMessage: 'Search an activity',
+                            description:
+                              'WebCardParameters screen - Activity SearchBar - Placeholder',
+                          })}
+                          onChangeText={text => setSearchActivities(text ?? '')}
+                          value={searchActivities}
+                        />
+                      </View>
+                    }
                   />
                 )}
               />
@@ -569,4 +599,5 @@ const styles = StyleSheet.create({
   urlText: {
     marginLeft: 5,
   },
+  searchContainer: { paddingBottom: 20, paddingHorizontal: 20 },
 });

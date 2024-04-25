@@ -1,4 +1,4 @@
-import { useCallback, useMemo } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { View } from 'react-native';
 import Toast from 'react-native-toast-message';
@@ -16,6 +16,7 @@ import Container from '#ui/Container';
 import Icon from '#ui/Icon';
 import PressableNative from '#ui/PressableNative';
 import SafeAreaView from '#ui/SafeAreaView';
+import SearchBarStatic from '#ui/SearchBarStatic';
 import Select from '#ui/Select';
 import Switch from '#ui/Switch';
 import Text from '#ui/Text';
@@ -90,11 +91,21 @@ const WebCardParametersScreen = ({
   const intl = useIntl();
   const styles = useStyleSheet(styleSheet);
   const [userNameFormVisible, toggleUserNameFormVisible] = useToggle(false);
+
+  const [searchActivities, setSearchActivities] = useState('');
+
   const activities = useMemo(
     () =>
-      webCardCategories?.find(a => a.id === webCard?.webCardCategory?.id)
-        ?.companyActivities,
-    [webCard?.webCardCategory?.id, webCardCategories],
+      webCardCategories
+        ?.find(a => a.id === webCard?.webCardCategory?.id)
+        ?.companyActivities.filter(
+          activity =>
+            !searchActivities.trim() ||
+            activity.label
+              ?.toLowerCase()
+              .includes(searchActivities.toLowerCase().trim()),
+        ),
+    [searchActivities, webCard?.webCardCategory?.id, webCardCategories],
   );
 
   const [commitToggleWebCardPublished] =
@@ -405,6 +416,20 @@ const WebCardParametersScreen = ({
               </Text>
               <Select
                 nativeID="activities"
+                ListHeaderComponent={
+                  <View style={styles.searchContainer}>
+                    <SearchBarStatic
+                      placeholder={intl.formatMessage({
+                        defaultMessage: 'Search an activity',
+                        description:
+                          'WebCardParameters screen - Activity SearchBar - Placeholder',
+                      })}
+                      onChangeText={text => setSearchActivities(text ?? '')}
+                      value={searchActivities}
+                    />
+                  </View>
+                }
+                avoidKeyboard
                 accessibilityLabelledBy="activitiesLabel"
                 data={activities ?? []}
                 selectedItemKey={webCard.companyActivity?.id}
@@ -488,6 +513,7 @@ const styleSheet = createStyleSheet(appearance => ({
     marginBottom: 18,
     paddingHorizontal: 30,
   },
+  searchContainer: { paddingBottom: 20, paddingHorizontal: 20 },
 }));
 
 export default relayScreen(WebCardParametersScreen, {
