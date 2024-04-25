@@ -1,5 +1,6 @@
-## 0.5.5-canary.271
+## 0.5.5-canary.272
 
+* **feat:**  - **user:** [#3242](https://github.com/AzzappApp/azzapp/pull/3242) implement user is blocked ([#3324](https://github.com/AzzappApp/azzapp/pull/3324))
 * **fix:**  - **webCard:** [#3203](https://github.com/AzzappApp/azzapp/pull/3203) update delete webcard position ([#3315](https://github.com/AzzappApp/azzapp/pull/3315))
 * **feat:**  - **webCard:** [#3321](https://github.com/AzzappApp/azzapp/pull/3321) implement remove this webCard ([#3322](https://github.com/AzzappApp/azzapp/pull/3322))
 * **feat:**  - **webCard:** [#3245](https://github.com/AzzappApp/azzapp/pull/3245) add search on activities bottom sheets ([#3329](https://github.com/AzzappApp/azzapp/pull/3329))
