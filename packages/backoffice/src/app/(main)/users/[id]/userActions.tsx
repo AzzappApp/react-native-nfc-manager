@@ -1,6 +1,6 @@
 'use server';
 
-import { eq, inArray, sql } from 'drizzle-orm';
+import { and, eq, inArray, sql } from 'drizzle-orm';
 import { revalidatePath } from 'next/cache';
 import {
   getUserById,
@@ -8,6 +8,7 @@ import {
   db,
   WebCardTable,
   ProfileTable,
+  getUserProfileWithWebCardId,
 } from '@azzapp/data';
 import { ADMIN } from '#roles';
 import { currentUserHasRole } from '#helpers/roleHelpers';
@@ -36,42 +37,68 @@ export const toggleRole = async (userId: string, role: string) => {
   revalidatePath(`/users/${userId}`);
 };
 
-export const removeWebcard = async (webcardId: string) => {
+export const removeWebcard = async (userId: string, webcardId: string) => {
   const session = await getSession();
 
-  if (session?.userId) {
+  const profile = await getUserProfileWithWebCardId(userId, webcardId);
+
+  if (session?.userId && profile) {
+    const updates = {
+      deletedAt: new Date(),
+      deletedBy: session.userId,
+      deleted: true,
+    };
+
     await db.transaction(async trx => {
-      await trx
-        .update(WebCardTable)
-        .set({
-          deletedAt: new Date(),
-          deletedBy: session.userId,
-          deleted: true,
-          cardIsPublished: false,
-        })
-        .where(eq(WebCardTable.id, webcardId));
+      if (profile.profileRole === 'owner') {
+        await trx
+          .update(WebCardTable)
+          .set({
+            ...updates,
+            cardIsPublished: false,
+          })
+          .where(eq(WebCardTable.id, webcardId));
 
-      await trx
-        .update(WebCardTable)
-        .set({
-          nbFollowers: sql`GREATEST(nbFollowers - 1, 0)`,
-        })
-        .where(
-          inArray(
-            WebCardTable.id,
-            sql`(select followingId from Follow where followerId = "${webcardId}")`,
-          ),
-        );
+        await trx
+          .update(ProfileTable)
+          .set(updates)
+          .where(eq(ProfileTable.webCardId, webcardId));
 
-      await trx
-        .update(ProfileTable)
-        .set({
-          deletedAt: new Date(),
-          deletedBy: session.userId,
-          deleted: true,
-        })
-        .where(eq(ProfileTable.webCardId, webcardId));
+        await trx
+          .update(WebCardTable)
+          .set({
+            nbFollowers: sql`GREATEST(nbFollowers - 1, 0)`,
+          })
+          .where(
+            inArray(
+              WebCardTable.id,
+              sql`(select followingId from Follow where followerId = "${webcardId}")`,
+            ),
+          );
+
+        await trx
+          .update(WebCardTable)
+          .set({
+            nbFollowings: sql`GREATEST(nbFollowings - 1, 0)`,
+          })
+          .where(
+            inArray(
+              WebCardTable.id,
+              sql`(select followerId from Follow where followingId = ${webcardId})`,
+            ),
+          );
+      } else {
+        await trx
+          .update(ProfileTable)
+          .set(updates)
+          .where(
+            and(
+              eq(ProfileTable.webCardId, webcardId),
+              eq(ProfileTable.userId, userId),
+            ),
+          );
+      }
     });
-    revalidatePath(`/users/${session.userId}`);
+    revalidatePath(`/users/${userId}`);
   }
 };

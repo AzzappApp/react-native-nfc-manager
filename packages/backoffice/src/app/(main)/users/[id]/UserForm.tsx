@@ -52,7 +52,9 @@ const UserForm = ({ user, webCards }: UserFormProps) => {
           <WebcardCover
             key={webCard.id}
             webcard={webCard}
-            onRemoveWebcard={removeWebcard}
+            onRemoveWebcard={(webCardId: string) => {
+              removeWebcard(user.id, webCardId);
+            }}
           />
         ))}
       </Card>
