@@ -71,7 +71,6 @@ const isAdminRule = hasRole('admin', isAdmin);
 const isEditorRule = hasRole('editor', isEditor);
 const isOwnerRule = hasRole('owner', isOwner);
 const isAnyRoleRule = hasRole('any', () => true, true);
-const isNotOwnerRule = hasRole('notOwner', role => role !== 'owner', true);
 
 type MutationMethod = Exclude<keyof Mutation, '__typename'>;
 
@@ -113,7 +112,7 @@ const ProtectedMutation: Record<
   saveSocialLinksModule: isEditorRule,
   saveBlockTextModule: isEditorRule,
   togglePostReaction: isEditorRule,
-  quitWebCard: isNotOwnerRule,
+  quitWebCard: isAnyRoleRule,
   removeFollower: isEditorRule,
   removeUsersFromWebCard: isAdminRule,
   reorderModules: isEditorRule,

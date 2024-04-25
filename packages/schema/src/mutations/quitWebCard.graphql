@@ -1,7 +1,7 @@
 extend type Mutation {
-  quitWebCard(profileId: ID!): QuitWebCardPayload
+  quitWebCard(webCardId: ID!): QuitWebCardPayload
 }
 
 type QuitWebCardPayload {
-  profileId: ID!
+  webCardId: ID!
 }

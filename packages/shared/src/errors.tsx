@@ -120,6 +120,10 @@ const ERRORS = {
    * The subscription is required.
    */
   SUBSCRIPTION_REQUIRED: 'SUBSCRIPTION_REQUIRED',
+  /**
+   * The subscription is active.
+   */
+  SUBSCRIPTION_IS_ACTIVE: 'SUBSCRIPTION_IS_ACTIVE',
 } as const;
 
 export default ERRORS;

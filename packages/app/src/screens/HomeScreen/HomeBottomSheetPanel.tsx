@@ -61,6 +61,7 @@ const HomeBottomSheetPanel = ({
         id
         profileRole
         webCard {
+          id
           userName
           cardIsPublished
           cardCover {
@@ -74,7 +75,7 @@ const HomeBottomSheetPanel = ({
   );
 
   const [quitWebCard, isLoadingQuitWebCard] = useQuitWebCard(
-    profile?.id ?? '',
+    profile?.webCard.id ?? '',
     close,
     e => {
       console.error(e);

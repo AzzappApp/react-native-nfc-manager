@@ -1,17 +1,12 @@
 import * as Sentry from '@sentry/react-native';
 import { useCallback } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
-import {
-  View,
-  useWindowDimensions,
-  Share,
-  Alert,
-  Platform,
-} from 'react-native';
+import { View, useWindowDimensions, Share, Platform } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
 import { graphql, useFragment } from 'react-relay';
 import { useDebouncedCallback } from 'use-debounce';
+import ERRORS from '@azzapp/shared/errors';
 import { isAdmin } from '@azzapp/shared/profileHelpers';
 import { buildUserUrl } from '@azzapp/shared/urlHelpers';
 import { colors, shadow } from '#theme';
@@ -19,6 +14,7 @@ import CoverRenderer from '#components/CoverRenderer';
 import { useRouter } from '#components/NativeRouter';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import useAuthState from '#hooks/useAuthState';
+import useQuitWebCard from '#hooks/useQuitWebCard';
 import { useSendReport } from '#hooks/useSendReport';
 import ActivityIndicator from '#ui/ActivityIndicator';
 import BottomSheetModal from '#ui/BottomSheetModal';
@@ -188,6 +184,35 @@ const WebCardModal = ({
     });
   }, [router, close]);
 
+  const [quitWebCard, isLoadingQuitWebCard] = useQuitWebCard(
+    webCard.id,
+    () => {
+      close();
+      router.back();
+    },
+    e => {
+      if (e.message === ERRORS.SUBSCRIPTION_IS_ACTIVE) {
+        Toast.show({
+          type: 'error',
+          text1: intl.formatMessage({
+            defaultMessage:
+              "You have an active subscription on this WebCard. You can't delete it.",
+            description:
+              'Error toast message when quitting WebCard with an active subscription',
+          }),
+        });
+      } else {
+        Toast.show({
+          type: 'error',
+          text1: intl.formatMessage({
+            defaultMessage: "Error, couldn't quit WebCard. Please try again.",
+            description: 'Error toast message when quitting WebCard',
+          }),
+        });
+      }
+    },
+  );
+
   return (
     <BottomSheetModal
       height={Math.min(600, windowsHeight - top + 50)}
@@ -354,8 +379,9 @@ const WebCardModal = ({
         </View>
         {isViewer && (
           <PressableNative
-            onPress={() => Alert.alert('TODO delete webcard')}
+            onPress={quitWebCard}
             style={styles.errorModalLine}
+            disabled={isLoadingQuitWebCard}
           >
             <Text variant="error">
               <FormattedMessage

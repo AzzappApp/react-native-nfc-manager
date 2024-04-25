@@ -174,6 +174,26 @@ export const getActiveUserSubscriptionForWebCard = async (
     );
 };
 
+export const getActiveWebCardSubscription = async (
+  userId: string,
+  webCardId: string,
+  trx: DbTransaction = db,
+) => {
+  const currentDate = new Date();
+  return trx
+    .select()
+    .from(UserSubscriptionTable)
+    .where(
+      and(
+        eq(UserSubscriptionTable.userId, userId),
+        eq(UserSubscriptionTable.webCardId, webCardId),
+        eq(UserSubscriptionTable.status, 'active'),
+        gte(UserSubscriptionTable.endAt, currentDate),
+      ),
+    )
+    .then(res => res[0]);
+};
+
 export const getUserSubscriptionForWebCard = async (
   userId: string,
   webCardId: string,

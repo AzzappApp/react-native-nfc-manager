@@ -4,7 +4,7 @@ import type { RecordSourceSelectorProxy } from 'relay-runtime';
 
 const updater = (
   store: RecordSourceSelectorProxy<object>,
-  profileId: string,
+  webCardId: string,
 ) => {
   const root = store.getRoot();
   const user = root.getLinkedRecord('currentUser');
@@ -14,21 +14,24 @@ const updater = (
   }
 
   user?.setLinkedRecords(
-    profiles?.filter(linkedProfile => linkedProfile.getDataID() !== profileId),
+    profiles?.filter(
+      linkedProfile =>
+        linkedProfile?.getLinkedRecord('webCard')?.getDataID() !== webCardId,
+    ),
     'profiles',
   );
   root.setLinkedRecord(user, 'currentUser');
 };
 
 const useQuitWebCard = (
-  profileId: string,
+  webCardId: string,
   onCompleted?: () => void,
   onError?: (error: Error) => void,
 ) => {
   const quitWebCardMutation = graphql`
-    mutation useQuitWebCardMutation($profileId: ID!) @raw_response_type {
-      quitWebCard(profileId: $profileId) {
-        profileId
+    mutation useQuitWebCardMutation($webCardId: ID!) @raw_response_type {
+      quitWebCard(webCardId: $webCardId) {
+        webCardId
       }
     }
   `;
@@ -39,19 +42,19 @@ const useQuitWebCard = (
     () =>
       commitMutationFn({
         variables: {
-          profileId,
+          webCardId,
         },
         optimisticResponse: {
           quitWebCard: {
-            profileId,
+            webCardId,
           },
         },
-        optimisticUpdater: store => updater(store, profileId),
-        updater: store => updater(store, profileId),
+        optimisticUpdater: store => updater(store, webCardId),
+        updater: store => updater(store, webCardId),
         onCompleted,
         onError,
       }),
-    [commitMutationFn, onCompleted, onError, profileId],
+    [commitMutationFn, onCompleted, onError, webCardId],
   );
 
   return [quitWebCard, isLoading] as const;
