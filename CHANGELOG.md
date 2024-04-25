@@ -1,5 +1,10 @@
-## 0.5.5-canary.269
+## 0.5.5-canary.270
 
+* **feat:**  - **webCard:** [#3321](https://github.com/AzzappApp/azzapp/pull/3321) implement remove this webCard ([#3322](https://github.com/AzzappApp/azzapp/pull/3322))
+* **feat:**  - **webCard:** [#3245](https://github.com/AzzappApp/azzapp/pull/3245) add search on activities bottom sheets ([#3329](https://github.com/AzzappApp/azzapp/pull/3329))
+* **fix:**  - **subscription:** [#3320](https://github.com/AzzappApp/azzapp/pull/3320) handle no webCard case ([#3326](https://github.com/AzzappApp/azzapp/pull/3326))
+* **feat:**  - calculate taxes ([#3330](https://github.com/AzzappApp/azzapp/pull/3330))
+* **feat:**  - **contactCard:** [#2517](https://github.com/AzzappApp/azzapp/pull/2517) add firstname and lastname in vcf file name ([#3331](https://github.com/AzzappApp/azzapp/pull/3331))
 * **build:**  - put back latest version
 * **build:**  - try with downgrading vercel cli
 * **build:**  - putting back 14.1.4
