@@ -129,6 +129,7 @@ export const getTotalMultiUser = async (userId: string) => {
   // Extract the webCardIds from the result
   const webCardIdList = webCardIds.map(profile => profile.Profile.webCardId);
 
+  if (webCardIdList.length === 0) return 0;
   // Count the number of profiles associated with the webCardIds
   return db
     .select({ count: sql`count(*)`.mapWith(Number) })
