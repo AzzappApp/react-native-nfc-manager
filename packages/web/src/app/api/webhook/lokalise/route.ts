@@ -50,12 +50,12 @@ const TranslationUpdatedSchema = z.union([
 
 const ENVIRONMENT = process.env.NEXT_PUBLIC_PLATFORM || 'development';
 
-const AZZAPP_SERVER_HEADER = 'x-lokalise-azzapp';
+const AZZAPP_SERVER_LOKALISE_HEADER = 'x-lokalise-azzapp';
 
 const TOKEN = process.env.WEBHOOK_LOKALISE_API_KEY;
 
 export const POST = withAxiom(async (req: Request) => {
-  const token = headers().get(AZZAPP_SERVER_HEADER) ?? null;
+  const token = headers().get(AZZAPP_SERVER_LOKALISE_HEADER) ?? null;
 
   if (token === TOKEN) {
     try {

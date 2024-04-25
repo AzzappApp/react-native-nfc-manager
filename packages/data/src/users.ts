@@ -34,6 +34,9 @@ export const UserTable = cols.table(
       .boolean('phoneNumberConfirmed')
       .default(false)
       .notNull(),
+    deleted: cols.boolean('deleted').default(false).notNull(),
+    deletedAt: cols.dateTime('deletedAt'),
+    deletedBy: cols.cuid('deletedBy'),
   },
   table => {
     return {

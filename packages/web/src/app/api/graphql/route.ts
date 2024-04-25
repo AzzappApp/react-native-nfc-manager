@@ -7,9 +7,10 @@ import { withAxiom } from 'next-axiom';
 import { compare } from 'semver';
 import { createGraphqlEndpoint, type GraphQLContext } from '@azzapp/schema';
 import ERRORS from '@azzapp/shared/errors';
+import { AZZAPP_SERVER_HEADER } from '@azzapp/shared/urlHelpers';
 import queryMap from '#persisted-query-map.json';
 import { buildCoverAvatarUrl } from '#helpers/avatar';
-import { AZZAPP_SERVER_HEADER, getSessionData } from '#helpers/tokens';
+import { getSessionData } from '#helpers/tokens';
 import packageJSON from '../../../../package.json';
 
 import type { LogLevel, Plugin as YogaPlugin } from 'graphql-yoga';

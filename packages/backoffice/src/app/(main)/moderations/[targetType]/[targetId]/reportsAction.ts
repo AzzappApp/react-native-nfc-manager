@@ -10,10 +10,9 @@ import {
   ReportTable,
   ProfileTable,
 } from '@azzapp/data';
+import { AZZAPP_SERVER_HEADER } from '@azzapp/shared/urlHelpers';
 import { getSession } from '#helpers/session';
 import type { TargetType } from '@azzapp/data';
-
-const AZZAPP_SERVER_HEADER = 'azzapp-server-auth';
 
 export const ignoreReport = async (
   targetId: string,

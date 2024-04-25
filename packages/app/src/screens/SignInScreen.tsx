@@ -3,6 +3,7 @@ import { useCallback, useState, useRef } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { Image, View, Keyboard } from 'react-native';
 import Animated, { useAnimatedStyle } from 'react-native-reanimated';
+import ERRORS from '@azzapp/shared/errors';
 import {
   isNotFalsyString,
   isValidEmail,
@@ -32,7 +33,9 @@ const SignInScreen = () => {
   });
   const [password, setPassword] = useState('');
   const [credentialInvalid, setCredentialInvalid] = useState(false);
-  const [signinError, setSigninError] = useState(false);
+  const [signinError, setSigninError] = useState<
+    'default' | 'forbidden' | undefined
+  >(undefined);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const router = useRouter();
@@ -96,7 +99,14 @@ const SignInScreen = () => {
       }
     } catch (error) {
       //TODO handle more error cases ?
-      setSigninError(true);
+      setSigninError(
+        typeof error === 'object' &&
+          error &&
+          'message' in error &&
+          error.message === ERRORS.FORBIDDEN
+          ? 'forbidden'
+          : 'default',
+      );
       setIsSubmitting(false);
       return;
     }
@@ -250,10 +260,15 @@ const SignInScreen = () => {
                   defaultMessage="Please use a valid phone number or email address"
                   description="SigninScreen - Invalid email or phone number"
                 />
-              ) : signinError ? (
+              ) : signinError === 'default' ? (
                 <FormattedMessage
                   defaultMessage="Invalid credentials"
                   description="SigninScreen - Invalid Credentials"
+                />
+              ) : signinError === 'forbidden' ? (
+                <FormattedMessage
+                  defaultMessage="Your account has been disabled. Please contact support."
+                  description="SigninScreen - Account disabled"
                 />
               ) : (
                 // just to keep the same height

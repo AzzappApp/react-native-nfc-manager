@@ -1,13 +1,12 @@
 import { headers } from 'next/headers';
 import { seal, unseal } from '@azzapp/shared/crypto';
 import ERRORS from '@azzapp/shared/errors';
+import { AZZAPP_SERVER_HEADER } from '@azzapp/shared/urlHelpers';
 
 const TOKEN_EXP_TIME = 3600 * 1000;
 const REFRESH_TOKEN_EXP_TIME = 7 * 24 * 3600 * 1000;
 const TOKEN_SECRET = process.env.TOKEN_SECRET!;
 const REFRESH_TOKEN_SECRET = process.env.REFRESH_TOKEN_SECRET!;
-
-export const AZZAPP_SERVER_HEADER = 'azzapp-server-auth';
 
 export type SessionData = {
   userId: string;

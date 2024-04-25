@@ -1,6 +1,7 @@
 'use server';
 
-import { and, eq, inArray, sql } from 'drizzle-orm';
+import * as Sentry from '@sentry/nextjs';
+import { eq, ne, and, inArray, sql, or } from 'drizzle-orm';
 import { revalidatePath } from 'next/cache';
 import {
   getUserById,
@@ -9,7 +10,9 @@ import {
   WebCardTable,
   ProfileTable,
   getUserProfileWithWebCardId,
+  UserTable,
 } from '@azzapp/data';
+import { AZZAPP_SERVER_HEADER } from '@azzapp/shared/urlHelpers';
 import { ADMIN } from '#roles';
 import { currentUserHasRole } from '#helpers/roleHelpers';
 import { getSession } from '#helpers/session';
@@ -101,4 +104,121 @@ export const removeWebcard = async (userId: string, webcardId: string) => {
     });
     revalidatePath(`/users/${userId}`);
   }
+};
+
+export const toggleUserActive = async (userId: string) => {
+  const user = await getUserById(userId);
+
+  const session = await getSession();
+
+  if (user && session?.userId) {
+    const deleteFlagsUpdate = {
+      deleted: !user.deleted,
+      deletedAt: user.deleted ? null : new Date(),
+      deletedBy: user.deleted ? null : session.userId,
+    };
+
+    await db.transaction(async trx => {
+      await trx
+        .update(UserTable)
+        .set(deleteFlagsUpdate)
+        .where(eq(UserTable.id, userId));
+
+      const webCards = await trx
+        .select({ id: WebCardTable.id, userName: WebCardTable.userName })
+        .from(WebCardTable)
+        .innerJoin(ProfileTable, eq(WebCardTable.id, ProfileTable.webCardId))
+        .where(
+          and(
+            or(
+              eq(WebCardTable.deleted, false),
+              ne(WebCardTable.deletedBy, userId),
+            ),
+            eq(ProfileTable.profileRole, 'owner'),
+            eq(ProfileTable.userId, userId),
+          ),
+        );
+
+      const webCardIds = webCards.map(wc => wc.id);
+
+      if (webCardIds.length > 0) {
+        await trx
+          .update(WebCardTable)
+          .set({
+            ...deleteFlagsUpdate,
+            cardIsPublished: false,
+          })
+          .where(inArray(WebCardTable.id, webCardIds));
+
+        await trx
+          .update(ProfileTable)
+          .set(deleteFlagsUpdate)
+          .where(
+            or(
+              inArray(ProfileTable.webCardId, webCardIds),
+              and(
+                eq(ProfileTable.userId, userId),
+                or(
+                  eq(ProfileTable.deleted, false),
+                  ne(ProfileTable.deletedBy, userId),
+                ),
+              ),
+            ),
+          );
+
+        await trx
+          .update(WebCardTable)
+          .set({
+            nbFollowers: user.deleted
+              ? sql`GREATEST(nbFollowers + 1, 0)`
+              : sql`GREATEST(nbFollowers - 1, 0)`,
+          })
+          .where(
+            inArray(
+              WebCardTable.id,
+              sql`(select followingId from Follow where followerId in ${webCardIds})`,
+            ),
+          );
+
+        await trx
+          .update(WebCardTable)
+          .set({
+            nbFollowings: user.deleted
+              ? sql`GREATEST(nbFollowings + 1, 0)`
+              : sql`GREATEST(nbFollowings - 1, 0)`,
+          })
+          .where(
+            inArray(
+              WebCardTable.id,
+              sql`(select followerId from Follow where followingId in ${webCardIds})`,
+            ),
+          );
+      }
+
+      try {
+        const res = await fetch(
+          `${process.env.NEXT_PUBLIC_API_ENDPOINT}/revalidate`,
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              [AZZAPP_SERVER_HEADER]: process.env.API_SERVER_TOKEN ?? '',
+            },
+            body: JSON.stringify({
+              cards: webCards.map(({ userName }) => userName),
+              posts: [],
+            }),
+          },
+        );
+
+        if (!res.ok) {
+          throw new Error(res.statusText, { cause: res });
+        }
+      } catch (e) {
+        Sentry.captureException(e);
+      }
+    });
+  }
+
+  revalidatePath(`/users/${userId}`);
 };

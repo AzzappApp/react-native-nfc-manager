@@ -1,4 +1,3 @@
-export const AZZAPP_SERVER_HEADER = 'azzapp-server-auth';
 import sgMail from '@sendgrid/mail';
 import * as Sentry from '@sentry/nextjs';
 import {

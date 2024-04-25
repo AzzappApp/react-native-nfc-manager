@@ -7,11 +7,12 @@ import {
   Checkbox,
   FormControlLabel,
   Card,
+  Switch,
 } from '@mui/material';
 import * as Sentry from '@sentry/nextjs';
 import { useTransition } from 'react';
 import * as ROLES from '#roles';
-import { toggleRole, removeWebcard } from './userActions';
+import { toggleRole, removeWebcard, toggleUserActive } from './userActions';
 import WebcardCover from './WebcardCover';
 import type { User, WebCard } from '@azzapp/data';
 
@@ -30,12 +31,29 @@ const UserForm = ({ user, webCards }: UserFormProps) => {
     });
   };
 
+  const onToggleUserActive = async () => {
+    startTransition(async () => {
+      await toggleUserActive(user.id);
+    });
+  };
+
   return (
     <Box display="flex" flexDirection="column">
       <Typography variant="h4" component="h1" sx={{ mb: 5 }}>
         User {user.id}
       </Typography>
-      <Typography variant="h5" sx={{ mb: 1 }}>
+      <FormControlLabel
+        control={
+          <Switch
+            name="active"
+            checked={!user.deleted}
+            onChange={onToggleUserActive}
+          />
+        }
+        label="Active"
+        disabled={loading}
+      />
+      <Typography variant="h5" sx={{ mb: 5, mt: 5 }}>
         Webcards: {webCards.length}
       </Typography>
       <Card
@@ -52,9 +70,9 @@ const UserForm = ({ user, webCards }: UserFormProps) => {
           <WebcardCover
             key={webCard.id}
             webcard={webCard}
-            onRemoveWebcard={(webCardId: string) => {
-              removeWebcard(user.id, webCardId);
-            }}
+            onRemoveWebcard={(webCardId: string) =>
+              removeWebcard(user.id, webCardId)
+            }
           />
         ))}
       </Card>

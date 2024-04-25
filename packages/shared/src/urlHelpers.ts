@@ -52,3 +52,5 @@ export function buildEmailSignatureGenerationUrl(
 
   return `${buildUserUrl(userName)}/emailsignature?e=${compressedData}&c=${compressedContactCardData}`;
 }
+
+export const AZZAPP_SERVER_HEADER = 'azzapp-server-auth';

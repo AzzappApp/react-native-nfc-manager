@@ -63,6 +63,10 @@ const signin = async (req: Request) => {
       );
     }
 
+    if (user?.deleted) {
+      return NextResponse.json({ message: ERRORS.FORBIDDEN }, { status: 403 });
+    }
+
     //TODO: review Security: Use a constant-time compairson function like crypto.timingSafeEqual()
     // instead of bcrypt.compareSync() to compare passwords. This helps prevent timing attacks.
     if (!bcrypt.compareSync(password, user.password)) {
