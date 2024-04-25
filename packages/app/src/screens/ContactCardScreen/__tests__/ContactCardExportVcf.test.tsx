@@ -178,7 +178,7 @@ describe('ContactCardExportVcf', () => {
     );
 
     expect(writeFileMock).toHaveBeenCalledWith(
-      `CacheDir/userNameTest.vcf`,
+      `CacheDir/userNameTest-John-Doe.vcf`,
       vCard.toString(),
       'utf8',
     );
@@ -186,7 +186,7 @@ describe('ContactCardExportVcf', () => {
     await expect(writeFileMock).resolves;
 
     expect(openMock).toHaveBeenCalledWith({
-      url: `file://${'CacheDir/userNameTest.vcf'}`,
+      url: `file://${'CacheDir/userNameTest-John-Doe.vcf'}`,
       title: 'John Doe',
       type: 'text/vcard',
       failOnCancel: false,

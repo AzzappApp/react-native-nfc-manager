@@ -97,7 +97,7 @@ const ContactCardExportVcf = ({
           },
         );
         const docPath = ReactNativeBlobUtil.fs.dirs.CacheDir;
-        const filePath = `${docPath}/${userName}.vcf`;
+        const filePath = `${docPath}/${userName}${profile.contactCard?.firstName?.trim() ? `-${profile.contactCard.firstName.trim()}` : ''}${profile.contactCard?.lastName?.trim() ? `-${profile.contactCard.lastName.trim()}` : ''}.vcf`;
         try {
           await ReactNativeBlobUtil.fs.writeFile(
             filePath,

@@ -159,7 +159,7 @@ const DownloadVCard = ({
           <LinkButton
             size="medium"
             href={fileUrl}
-            download={`${webCard.userName}.vcf`}
+            download={`${webCard.userName}${contact?.firstName.trim() ? `-${contact.firstName.trim()}` : ''}${contact?.lastName.trim() ? `-${contact.lastName.trim()}` : ''}.vcf`}
           >
             Save Contact Card
           </LinkButton>
