@@ -7,8 +7,7 @@
       "@azzapp/data/*": ["../data/src/*"],
       "#testing/*": ["./testing/*"],
       "#*": ["./src/*"]
-    },
-    "declarationMap": true
+    }
   },
   "exclude": [
     "node_modules",

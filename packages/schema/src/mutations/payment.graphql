@@ -2,6 +2,8 @@ extend type Mutation {
   estimateSubscriptionCost(
     totalSeats: Int!
     interval: Interval!
+    countryCode: String
+    vatNumber: String
   ): SubscriptionEstimation!
   createPaymentIntent(
     webCardId: ID!
@@ -48,6 +50,7 @@ input Customer {
   city: String!
   zip: String!
   country: String!
+  countryCode: String!
   vatNumber: String
 }
 
@@ -59,7 +62,11 @@ type PaymentIntentPayload {
 
 type SubscriptionEstimation {
   """
-  The estimated cost of the subscription in cents
+  The estimated amout of the subscription in cents
   """
-  cost: Int!
+  amount: Int!
+  """
+  The estimated taxes of the subscription in cents
+  """
+  taxes: Int!
 }

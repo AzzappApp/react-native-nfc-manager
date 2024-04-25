@@ -13,12 +13,15 @@ import fromGlobalIdWithType from '#helpers/relayIdHelpers';
 import type { MutationResolvers } from '#__generated__/types';
 
 export const estimateSubscriptionCost: MutationResolvers['estimateSubscriptionCost'] =
-  (_, { totalSeats, interval }) => {
-    const cost = estimate(totalSeats, interval);
+  async (_, { totalSeats, interval, countryCode, vatNumber }) => {
+    const cost = await estimate(
+      totalSeats,
+      interval,
+      countryCode ?? undefined,
+      vatNumber ?? undefined,
+    );
 
-    return {
-      cost,
-    };
+    return cost;
   };
 
 export const createPaymentIntent: MutationResolvers['createPaymentIntent'] =

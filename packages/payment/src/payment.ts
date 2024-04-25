@@ -15,6 +15,7 @@ import client from './client';
 import {
   calculateAmount,
   calculateNextPaymentIntervalInMinutes,
+  calculateTaxes,
   generateRebillFailRule,
   getNextPaymentDate,
   type SubscriptionPlan,
@@ -48,6 +49,18 @@ const findLocale = (locale: string): Locale => {
   return 'en';
 };
 
+type Customer = {
+  email: string;
+  name: string;
+  address: string;
+  city: string;
+  zip: string;
+  country: string;
+  countryCode: string;
+  vatNumber?: string | null;
+  phoneNumber?: string;
+};
+
 export const createPaymentRequest = async ({
   totalSeats,
   userId,
@@ -63,23 +76,20 @@ export const createPaymentRequest = async ({
   locale: string;
   interval: 'monthly' | 'yearly';
   redirectUrl: string;
-  customer: {
-    email: string;
-    name: string;
-    address: string;
-    city: string;
-    zip: string;
-    country: string;
-    vatNumber?: string | null;
-    phoneNumber?: string;
-  };
+  customer: Customer;
 }) => {
   const ORDERID = createId();
   const TRANSACTION_HASH = createId();
 
   const subscriptionPlan: SubscriptionPlan = `web.${interval}`;
 
-  const amount = calculateAmount(totalSeats, subscriptionPlan); //TODO manage taxes
+  const amount = calculateAmount(totalSeats, subscriptionPlan);
+
+  const taxes = await calculateTaxes(
+    amount,
+    customer.countryCode,
+    customer.vatNumber ?? undefined,
+  );
 
   const token = await login();
 
@@ -95,7 +105,7 @@ export const createPaymentRequest = async ({
         Authorization: `Bearer ${token}`,
       },
       body: {
-        AMOUNT: amount,
+        AMOUNT: amount + taxes,
         LANGUAGE: findLocale(locale),
         '3DSECURE': 'yes',
         '3DSECUREAUTHENTICATIONAMOUNT': 0,
@@ -176,7 +186,7 @@ export const createPaymentRequest = async ({
         paymentMeanId: ulid,
         endAt: date,
         amount,
-        taxes: 0, //TODO manage taxes
+        taxes,
         rebillManagerId: null,
       },
       trx,
@@ -188,7 +198,7 @@ export const createPaymentRequest = async ({
   return {
     clientRedirectUrl,
     amount,
-    taxes: 0, //TODO manage taxes
+    taxes,
   };
 };
 
@@ -205,20 +215,17 @@ export const createSubscriptionRequest = async ({
   userId: string;
   webCardId: string;
   interval: 'monthly' | 'yearly';
-  customer: {
-    email: string;
-    name: string;
-    address: string;
-    city: string;
-    zip: string;
-    country: string;
-    vatNumber?: string | null;
-    phoneNumber?: string;
-  };
+  customer: Customer;
 }) => {
   const subscriptionPlan: SubscriptionPlan = `web.${interval}`;
 
-  const amount = calculateAmount(totalSeats, subscriptionPlan); //TODO manage taxes
+  const amount = calculateAmount(totalSeats, subscriptionPlan);
+
+  const taxes = await calculateTaxes(
+    amount,
+    customer.countryCode,
+    customer.vatNumber ?? undefined,
+  );
 
   const token = await login();
 
@@ -276,6 +283,7 @@ export const createSubscriptionRequest = async ({
     subscriberCity: customer.city,
     subscriberZip: customer.zip,
     subscriberCountry: customer.country,
+    subscriberCountryCode: customer.countryCode,
     subscriberVatNumber: customer.vatNumber ?? null,
     startAt: date,
     subscriptionId,
@@ -283,7 +291,7 @@ export const createSubscriptionRequest = async ({
     paymentMeanId,
     endAt: nextPaymentDate,
     amount,
-    taxes: 0, //TODO manage taxes
+    taxes,
     rebillManagerId: rebillManager.data.rebillManagerId,
     revenueCatId: null,
     status: 'active',
@@ -307,16 +315,7 @@ export const createNewPaymentMean = async ({
   userId: string;
   webCardId: string;
   locale: string;
-  customer: {
-    email: string;
-    name: string;
-    address: string;
-    city: string;
-    zip: string;
-    country: string;
-    vatNumber?: string | null;
-    phoneNumber?: string;
-  };
+  customer: Customer;
   redirectUrl: string;
 }) => {
   const token = await login();

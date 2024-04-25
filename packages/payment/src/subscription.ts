@@ -14,6 +14,7 @@ import client from '#client';
 import {
   calculateAmount,
   calculateNextPaymentIntervalInMinutes,
+  calculateTaxes,
   generateRebillFailRule,
 } from '#helpers';
 
@@ -43,9 +44,6 @@ export const updateExistingSubscription = async ({
   }
 
   const token = await login();
-
-  console.log('existingSubscription', existingSubscription);
-  console.log('paymentMeanId', paymentMeanId);
 
   const newPaymentMean = paymentMeanId ?? existingSubscription.paymentMeanId;
 
@@ -106,7 +104,15 @@ export const updateExistingSubscription = async ({
 
       const amount = totalSeats
         ? calculateAmount(totalSeats, existingSubscription.subscriptionPlan)
-        : existingSubscription.amount; //TODO manage taxes
+        : existingSubscription.amount;
+
+      const taxes = totalSeats
+        ? await calculateTaxes(
+            amount ?? 0,
+            existingSubscription.subscriberCountryCode ?? undefined,
+            existingSubscription.subscriberVatNumber ?? undefined,
+          )
+        : 0;
 
       const intervalInMinutes = calculateNextPaymentIntervalInMinutes(
         existingSubscription.subscriptionPlan,
@@ -130,7 +136,7 @@ export const updateExistingSubscription = async ({
             rebill_manager_initial_type: 'FREE',
             rebill_manager_initial_price_cnts: '0',
             rebill_manager_initial_duration_min: `${timeUntilNextPayment}`,
-            rebill_manager_rebill_price_cnts: `${amount}`,
+            rebill_manager_rebill_price_cnts: `${(amount ?? 0) + taxes}`,
             rebill_manager_rebill_duration_mins: `0`,
             rebill_manager_rebill_period_mins: `${intervalInMinutes}`,
             clientPaymentRequestUlid: existingSubscription.paymentMeanId,
@@ -165,6 +171,7 @@ export const updateExistingSubscription = async ({
           status: 'active',
           paymentMeanId: newPaymentMean,
           amount,
+          taxes,
         })
         .where(
           and(
@@ -235,9 +242,25 @@ export const updateExistingSubscription = async ({
         )
       : 0;
 
+    const taxesForTheRestOfTheYear = totalSeats
+      ? await calculateTaxes(
+          amountForTheRestOfTheYear,
+          existingSubscription.subscriberCountryCode ?? undefined,
+          existingSubscription.subscriberVatNumber ?? undefined,
+        )
+      : 0;
+
     const amount = totalSeats
       ? calculateAmount(totalSeats, existingSubscription.subscriptionPlan)
-      : existingSubscription.amount; //TODO manage taxes
+      : existingSubscription.amount;
+
+    const taxes = totalSeats
+      ? await calculateTaxes(
+          amount ?? 0,
+          existingSubscription.subscriberCountryCode ?? undefined,
+          existingSubscription.subscriberVatNumber ?? undefined,
+        )
+      : 0;
 
     const subscriptionId = createId();
 
@@ -250,9 +273,9 @@ export const updateExistingSubscription = async ({
         body: {
           billing_description: `Subscription ${existingSubscription.subscriptionPlan} for ${totalSeats} seats`,
           rebill_manager_initial_type: 'PAID',
-          rebill_manager_initial_price_cnts: `${amountForTheRestOfTheYear}`,
+          rebill_manager_initial_price_cnts: `${amountForTheRestOfTheYear + taxesForTheRestOfTheYear}`,
           rebill_manager_initial_duration_min: `${intervalInMinutes}`,
-          rebill_manager_rebill_price_cnts: `${amount}`,
+          rebill_manager_rebill_price_cnts: `${(amount ?? 0) + taxes}`,
           rebill_manager_rebill_duration_mins: '0',
           rebill_manager_rebill_period_mins: `${calculateNextPaymentIntervalInMinutes(existingSubscription.subscriptionPlan)}`,
           clientPaymentRequestUlid: existingSubscription.paymentMeanId,
@@ -282,6 +305,7 @@ export const updateExistingSubscription = async ({
       .set({
         totalSeats: totalSeats ?? existingSubscription.totalSeats,
         amount,
+        taxes,
         rebillManagerId: newRebillManagerId,
         subscriptionId,
         canceledAt: null,
@@ -321,7 +345,13 @@ export const upgradePlan = async (userId: string, webCardId: string) => {
     const amount = calculateAmount(
       existingSubscription.totalSeats,
       'web.yearly',
-    ); //TODO manage taxes
+    );
+
+    const taxes = await calculateTaxes(
+      amount,
+      existingSubscription.subscriberCountryCode ?? undefined,
+      existingSubscription.subscriberVatNumber ?? undefined,
+    );
 
     const intervalInMinutes =
       calculateNextPaymentIntervalInMinutes('web.yearly');
@@ -339,9 +369,9 @@ export const upgradePlan = async (userId: string, webCardId: string) => {
         body: {
           billing_description: `Subscription web.yearly for ${existingSubscription.totalSeats} seats`,
           rebill_manager_initial_type: 'PAID',
-          rebill_manager_initial_price_cnts: `${amount}`,
+          rebill_manager_initial_price_cnts: `${amount + taxes}`,
           rebill_manager_initial_duration_min: `${intervalInMinutes + intervalInMinutesForPreviousSubscription}`,
-          rebill_manager_rebill_price_cnts: `${amount}`,
+          rebill_manager_rebill_price_cnts: `${amount + taxes}`,
           rebill_manager_rebill_duration_mins: `0`,
           rebill_manager_rebill_period_mins: `${intervalInMinutes}`,
           clientPaymentRequestUlid: existingSubscription.paymentMeanId,
@@ -370,6 +400,7 @@ export const upgradePlan = async (userId: string, webCardId: string) => {
         subscriptionPlan: 'web.yearly',
         rebillManagerId: rebillManager.data.rebillManagerId,
         amount,
+        taxes,
         subscriptionId,
       })
       .where(

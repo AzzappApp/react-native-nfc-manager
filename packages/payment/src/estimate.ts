@@ -1,10 +1,17 @@
-import { calculateAmount } from '#helpers';
+import { calculateAmount, calculateTaxes } from '#helpers';
 
-export const estimate = (
+export const estimate = async (
   totalSeats: number,
   interval: 'monthly' | 'yearly',
+  countryCode?: string,
+  vatNumber?: string,
 ) => {
-  const amount = calculateAmount(totalSeats, `web.${interval}`); //TODO manage taxes
+  const amount = calculateAmount(totalSeats, `web.${interval}`);
 
-  return amount;
+  const taxes = await calculateTaxes(amount, countryCode, vatNumber);
+
+  return {
+    amount,
+    taxes,
+  };
 };

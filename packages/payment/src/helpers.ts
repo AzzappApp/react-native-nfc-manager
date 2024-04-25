@@ -1,3 +1,4 @@
+import { getTaxRate } from '#taxes';
 import type { UserSubscription } from '@azzapp/data';
 
 export type SubscriptionPlan = UserSubscription['subscriptionPlan'];
@@ -31,6 +32,15 @@ export const calculateAmount = (
       ? totalSeats * 1.2
       : totalSeats * 0.99) * 100
   ); // cents;
+};
+
+export const calculateTaxes = async (
+  amount: number,
+  countryCode?: string,
+  vatNumber?: string,
+) => {
+  const taxRate = await getTaxRate(countryCode, vatNumber);
+  return Math.round(taxRate * amount);
 };
 
 export const calculateNextPaymentIntervalInMinutes = (

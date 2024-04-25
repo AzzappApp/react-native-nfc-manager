@@ -4,8 +4,7 @@
     "noEmit": true,
     "paths": {
       "#*": ["./src/*"]
-    },
-    "declarationMap": true
+    }
   },
   "include": ["**/*.ts", "**/*.tsx", "**/*.js", "**/*.jsx", "**/*.json"],
   "exclude": ["lib", "node_modules", "package.json", "tsconfig.json"]

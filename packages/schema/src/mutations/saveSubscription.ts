@@ -42,6 +42,7 @@ const saveSubscription: MutationResolvers['saveSubscription'] = async (
         subscriberAddress: '',
         subscriberCity: '',
         subscriberCountry: '',
+        subscriberCountryCode: '',
         subscriberVatNumber: '',
         subscriberZip: '',
         paymentIntentId: null,

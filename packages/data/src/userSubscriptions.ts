@@ -43,6 +43,7 @@ export const UserSubscriptionTable = mysqlTable(
     subscriberZip: cols.defaultVarchar('subscriberZip'),
     subscriberCity: cols.defaultVarchar('subscriberCity'),
     subscriberCountry: cols.defaultVarchar('subscriberCountry'),
+    subscriberCountryCode: cols.defaultVarchar('subscriberCountryCode'),
     paymentMeanId: cols.defaultVarchar('paymentMeanId'),
     amount: int('amount'),
     taxes: int('taxes'),
