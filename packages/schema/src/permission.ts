@@ -16,8 +16,8 @@ const hasRole = (
   rule(`hasRole-${key}`, {
     cache: 'contextual',
   })(async (_parent: any, args: any, ctx: GraphQLContext) => {
+    const { userId } = ctx.auth;
     if ('webCardId' in args && typeof args.webCardId === 'string') {
-      const { userId } = ctx.auth;
       const webCardId = fromGlobalIdWithType(args.webCardId, 'WebCard');
       const profile =
         userId &&
@@ -26,22 +26,29 @@ const hasRole = (
           webCardId,
         }));
 
+      const user = userId ? await ctx.loaders.User.load(userId) : null;
+
       if (
         !profile ||
         !checkRole(profile.profileRole) ||
         (profile.invited && !acceptInvited) ||
-        profile.deleted
+        profile.deleted ||
+        user?.deleted
       ) {
         throw new GraphQLError(ERRORS.FORBIDDEN);
       }
     } else if ('profileId' in args && typeof args.profileId === 'string') {
       const profileId = fromGlobalIdWithType(args.profileId, 'Profile');
       const profile = profileId && (await ctx.loaders.Profile.load(profileId));
+
+      const user = userId ? await ctx.loaders.User.load(userId) : null;
+
       if (
         !profile ||
         !checkRole(profile.profileRole) ||
         (profile.invited && !acceptInvited) ||
-        profile.deleted
+        profile.deleted ||
+        user?.deleted
       ) {
         throw new GraphQLError(ERRORS.FORBIDDEN);
       }

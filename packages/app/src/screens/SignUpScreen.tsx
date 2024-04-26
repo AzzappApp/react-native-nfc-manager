@@ -3,6 +3,7 @@ import { useCallback, useState, useRef, memo } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { View, Image, Keyboard } from 'react-native';
 import Animated, { useAnimatedStyle } from 'react-native-reanimated';
+import ERRORS from '@azzapp/shared/errors';
 import {
   isNotFalsyString,
   isPhoneNumber,
@@ -131,10 +132,20 @@ const SignupScreen = () => {
         setIsSubmitting(false);
       } catch (error: any) {
         setPhoneOrEmailError(
-          intl.formatMessage({
-            defaultMessage: 'Unknown error - Please retry',
-            description: 'Signup Screen - Error unknown',
-          }),
+          typeof error === 'object' &&
+            error &&
+            'message' in error &&
+            error.message === ERRORS.FORBIDDEN
+            ? intl.formatMessage({
+                defaultMessage:
+                  'Your account has been disabled. Please contact support.',
+                description:
+                  'Signup Screen - Error message when the account has been disabled',
+              })
+            : intl.formatMessage({
+                defaultMessage: 'Unknown error - Please retry',
+                description: 'Signup Screen - Error unknown',
+              }),
         );
 
         setIsSubmitting(false);

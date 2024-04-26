@@ -1,5 +1,6 @@
 import { toGlobalId } from 'graphql-relay';
 import { NextResponse } from 'next/server';
+import ERRORS from '@azzapp/shared/errors';
 import { generateTokens } from './tokens';
 import { twilioVerificationService } from './twilioHelpers';
 import type { Profile, User } from '@azzapp/data';
@@ -8,6 +9,10 @@ export const handleSignInAuthMethod = async (
   user: User,
   profile: Profile | null | undefined,
 ) => {
+  if (user.deleted) {
+    return NextResponse.json({ message: ERRORS.FORBIDDEN }, { status: 403 });
+  }
+
   if (!user.emailConfirmed && !user.phoneNumberConfirmed) {
     const issuer = (user.email ?? user.phoneNumber) as string;
     const verification = await twilioVerificationService().verifications.create(
