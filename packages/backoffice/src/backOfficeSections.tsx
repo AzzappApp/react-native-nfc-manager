@@ -100,7 +100,7 @@ const backOfficeSections: Section[] = [
     subSections: [
       {
         text: 'Sections',
-        href: '#',
+        href: '/sections',
         roles: [ADMIN],
       },
       {
