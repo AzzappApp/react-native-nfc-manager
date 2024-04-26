@@ -1,5 +1,7 @@
-## 0.5.5-canary.273
+## 0.5.5-canary.274
 
+* **fix:**  - **home:** [#3340](https://github.com/AzzappApp/azzapp/pull/3340) avoid accessing media from webCard ([#3346](https://github.com/AzzappApp/azzapp/pull/3346))
+* **fix:**  - **authent:** [#3344](https://github.com/AzzappApp/azzapp/pull/3344) refuse login on every ways ([#3345](https://github.com/AzzappApp/azzapp/pull/3345))
 * **feat:**  - **multiUser:** [#3248](https://github.com/AzzappApp/azzapp/pull/3248) add logo in common information ([#3337](https://github.com/AzzappApp/azzapp/pull/3337))
 * **feat:**  - **user:** [#3242](https://github.com/AzzappApp/azzapp/pull/3242) implement user is blocked ([#3324](https://github.com/AzzappApp/azzapp/pull/3324))
 * **fix:**  - **webCard:** [#3203](https://github.com/AzzappApp/azzapp/pull/3203) update delete webcard position ([#3315](https://github.com/AzzappApp/azzapp/pull/3315))

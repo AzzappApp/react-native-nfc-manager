@@ -1,6 +1,6 @@
 {
   "name": "@azzapp/web",
-  "version": "0.5.5-canary.273",
+  "version": "0.5.5-canary.274",
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -15,11 +15,11 @@
     "dev"
   ],
   "dependencies": {
-    "@azzapp/data": "0.5.5-canary.273",
-    "@azzapp/i18n": "0.5.5-canary.273",
-    "@azzapp/shared": "0.5.5-canary.273",
-    "@azzapp/schema": "0.5.5-canary.273",
-    "@azzapp/payment": "0.5.5-canary.273",
+    "@azzapp/data": "0.5.5-canary.274",
+    "@azzapp/i18n": "0.5.5-canary.274",
+    "@azzapp/shared": "0.5.5-canary.274",
+    "@azzapp/schema": "0.5.5-canary.274",
+    "@azzapp/payment": "0.5.5-canary.274",
     "@conform-to/react": "^1.1.0",
     "@conform-to/zod": "^1.1.0",
     "@envelop/dataloader": "^6.0.0",
