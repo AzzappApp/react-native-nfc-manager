@@ -1,6 +1,6 @@
 {
   "name": "@azzapp/payment",
-  "version": "0.5.5-canary.275",
+  "version": "0.5.5-canary.276",
   "private": true,
   "exports": {
     ".": {
@@ -27,8 +27,8 @@
     "definition:watch"
   ],
   "dependencies": {
-    "@azzapp/data": "0.5.5-canary.275",
-    "@azzapp/shared": "0.5.5-canary.275",
+    "@azzapp/data": "0.5.5-canary.276",
+    "@azzapp/shared": "0.5.5-canary.276",
     "openapi-fetch": "^0.9.3",
     "dayjs": "^1.11.10",
     "@mlecoq/sales-tax": "2.14.0"

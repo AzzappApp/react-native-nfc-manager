@@ -1,5 +1,8 @@
-## 0.5.5-canary.275
+## 0.5.5-canary.276
 
+* **fix:**  - missing permission on endSubscription
+* **fix:**  - **webCard:** [#3166](https://github.com/AzzappApp/azzapp/pull/3166) wrong link on web ([#3350](https://github.com/AzzappApp/azzapp/pull/3350))
+* **feat:**  - add `endSubscription` method ([#3349](https://github.com/AzzappApp/azzapp/pull/3349))
 * **feat:**  - **contactCard:** [#3248](https://github.com/AzzappApp/azzapp/pull/3248) add logo ([#3347](https://github.com/AzzappApp/azzapp/pull/3347))
 * **fix:**  - **home:** [#3340](https://github.com/AzzappApp/azzapp/pull/3340) avoid accessing media from webCard ([#3346](https://github.com/AzzappApp/azzapp/pull/3346))
 * **fix:**  - **authent:** [#3344](https://github.com/AzzappApp/azzapp/pull/3344) refuse login on every ways ([#3345](https://github.com/AzzappApp/azzapp/pull/3345))
