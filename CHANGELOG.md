@@ -1,5 +1,6 @@
-## 0.5.5-canary.274
+## 0.5.5-canary.275
 
+* **feat:**  - **contactCard:** [#3248](https://github.com/AzzappApp/azzapp/pull/3248) add logo ([#3347](https://github.com/AzzappApp/azzapp/pull/3347))
 * **fix:**  - **home:** [#3340](https://github.com/AzzappApp/azzapp/pull/3340) avoid accessing media from webCard ([#3346](https://github.com/AzzappApp/azzapp/pull/3346))
 * **fix:**  - **authent:** [#3344](https://github.com/AzzappApp/azzapp/pull/3344) refuse login on every ways ([#3345](https://github.com/AzzappApp/azzapp/pull/3345))
 * **feat:**  - **multiUser:** [#3248](https://github.com/AzzappApp/azzapp/pull/3248) add logo in common information ([#3337](https://github.com/AzzappApp/azzapp/pull/3337))
