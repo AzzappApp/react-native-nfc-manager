@@ -42,6 +42,7 @@ const inviteUserMutation: MutationResolvers['inviteUser'] = async (
         displayedOnWebCard: invited.contactCard.displayedOnWebCard ?? undefined,
         isPrivate: invited.contactCard.isPrivate ?? undefined,
         avatarId: invited.contactCard.avatarId ?? undefined,
+        logoId: invited.contactCard.logoId ?? undefined,
       }
     : undefined;
 

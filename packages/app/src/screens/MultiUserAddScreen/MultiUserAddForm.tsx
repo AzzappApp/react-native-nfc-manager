@@ -13,7 +13,7 @@ import Select from '#ui/Select';
 import SelectList from '#ui/SelectList';
 import Text from '#ui/Text';
 import type { ProfileRole } from '#relayArtifacts/MultiUserScreenQuery.graphql';
-import type { ContactCardEditFormValues } from '#screens/ContactCardScreen/ContactCardEditModalSchema';
+import type { ContactCardEditFormValues } from '#screens/ContactCardEditScreen/ContactCardEditModalSchema';
 import type { SelectListItemInfo } from '#ui/SelectList';
 import type { ContactCard } from '@azzapp/shared/contactCardHelpers';
 import type { CountryCode } from 'libphonenumber-js';

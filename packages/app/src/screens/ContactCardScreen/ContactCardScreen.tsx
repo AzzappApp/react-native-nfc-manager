@@ -23,7 +23,7 @@ import AccountHeader from '#components/AccountHeader';
 import ContactCard, {
   CONTACT_CARD_RATIO,
 } from '#components/ContactCard/ContactCard';
-import ScreenModal from '#components/ScreenModal';
+import { useRouter } from '#components/NativeRouter';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import {
   generateEmailSignature,
@@ -40,7 +40,6 @@ import PressableAnimated from '#ui/PressableAnimated';
 import PressableNative from '#ui/PressableNative';
 import SafeAreaView from '#ui/SafeAreaView';
 import Text from '#ui/Text';
-import ContactCardEditModal from './ContactCardEditModal';
 import ContactCardExportVcf from './ContactCardExportVcf';
 import type { RelayScreenProps } from '#helpers/relayScreen';
 import type { AccountHeader_webCard$key } from '#relayArtifacts/AccountHeader_webCard.graphql';
@@ -63,7 +62,6 @@ const contactCardMobileScreenQuery = graphql`
         }
         ...ContactCard_profile
         ...ContactCardExportVcf_card
-        ...ContactCardEditModal_card
       }
     }
     currentUser {
@@ -189,13 +187,14 @@ export const ContactCardScreen = ({
     }
   }, [currentUser?.email, intl, profile?.id, webCard?.id]);
 
-  const [contactCardEditModal, toggleContactEditModal] = useToggle(false);
-
   const styles = useStyleSheet(styleSheet);
 
   const [loadingPass, setLoadingPass] = useState(false);
 
   const colorScheme = useColorScheme();
+
+  const router = useRouter();
+
   if (!webCard) {
     return null;
   }
@@ -240,7 +239,11 @@ export const ContactCardScreen = ({
                 },
               ) as string
             }
-            onPress={toggleContactEditModal}
+            onPress={() => {
+              router.push({
+                route: 'CONTACT_CARD_EDIT',
+              });
+            }}
           />
 
           <View style={{ width: '100%' }}>
@@ -352,14 +355,6 @@ export const ContactCardScreen = ({
             />
           </View>
         </Animated.View>
-        <ScreenModal visible={contactCardEditModal} animationType="slide">
-          <ContactCardEditModal
-            key={webCard.id}
-            profile={profile}
-            visible={contactCardEditModal}
-            toggleBottomSheet={toggleContactEditModal}
-          />
-        </ScreenModal>
       </SafeAreaView>
     </Container>
   );

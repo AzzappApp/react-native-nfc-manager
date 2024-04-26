@@ -52,13 +52,14 @@ const updateProfileMutation: MutationResolvers['updateProfile'] = async (
     throw new GraphQLError(ERRORS.INVALID_REQUEST);
   }
 
-  const { avatarId, ...restContactCard } = contactCard || {};
+  const { avatarId, logoId, ...restContactCard } = contactCard || {};
 
   await updateProfile(targetProfileId, {
     profileRole: profileRole ?? undefined,
     contactCard: {
       ...restContactCard,
     },
+    logoId,
     avatarId,
   });
 

@@ -185,6 +185,11 @@ export type CommonInformationRoute = {
   params?: never;
 };
 
+export type ContactCardEditRoute = {
+  route: 'CONTACT_CARD_EDIT';
+  params?: never;
+};
+
 export type Route =
   | AboutRoute
   | AccountDetailsRoute
@@ -192,6 +197,7 @@ export type Route =
   | CommonInformationRoute
   | ConfirmChangeContactRoute
   | ConfirmRegistrationRoute
+  | ContactCardEditRoute
   | ContactCardRoute
   | CoverEditionRoute
   | FollowersRoute

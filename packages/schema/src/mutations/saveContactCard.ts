@@ -35,6 +35,7 @@ const saveContactCard: MutationResolvers['saveContactCard'] = async (
   };
 
   updates.avatarId = contactCard.avatarId;
+  updates.logoId = contactCard.logoId;
 
   try {
     await updateProfile(profileId, updates);

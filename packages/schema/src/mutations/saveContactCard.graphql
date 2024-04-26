@@ -21,6 +21,7 @@ input ContactCardInput {
   isPrivate: Boolean
   displayedOnWebCard: Boolean
   avatarId: String
+  logoId: String
 }
 
 

@@ -22,6 +22,7 @@ import { getFileName } from '#helpers/fileHelpers';
 import { uploadMedia, uploadSign } from '#helpers/MobileWebAPI';
 import relayScreen from '#helpers/relayScreen';
 import useScreenInsets from '#hooks/useScreenInsets';
+import { get as CappedPixelRatio } from '#relayProviders/CappedPixelRatio.relayprovider';
 import ActivityIndicator from '#ui/ActivityIndicator';
 import Button from '#ui/Button';
 import Container from '#ui/Container';
@@ -47,13 +48,13 @@ import type { CommonInformationScreenQuery } from '#relayArtifacts/CommonInforma
 import type { CommonInformationRoute } from '#routes';
 
 const commonInformationScreenQuery = graphql`
-  query CommonInformationScreenQuery($webCardId: ID!) {
+  query CommonInformationScreenQuery($webCardId: ID!, $pixelRatio: Float!) {
     node(id: $webCardId) {
       ... on WebCard @alias(as: "webCard") {
         id
         logo {
           id
-          uri(width: 180)
+          uri(width: 180, pixelRatio: $pixelRatio)
         }
         commonInformation {
           company
@@ -173,13 +174,14 @@ export const CommonInformationScreen = ({
     mutation CommonInformationScreenMutation(
       $webCardId: ID!
       $input: SaveCommonInformationInput!
+      $pixelRatio: Float!
     ) {
       saveCommonInformation(webCardId: $webCardId, input: $input) {
         webCard {
           id
           logo {
             id
-            uri(width: 180)
+            uri(width: 180, pixelRatio: $pixelRatio)
           }
           commonInformation {
             company
@@ -252,6 +254,7 @@ export const CommonInformationScreen = ({
             socials: data.socials.filter(social => social.url),
             logoId,
           },
+          pixelRatio: CappedPixelRatio(),
         },
         onCompleted: () => {
           router.back();
@@ -284,10 +287,6 @@ export const CommonInformationScreen = ({
   useEffect(() => {
     if (logo?.uri) {
       Image.getSize(logo.uri, (width, height) => {
-        console.log({
-          width,
-          height,
-        });
         setSize({
           width,
           height,
@@ -503,6 +502,7 @@ const commonInfoScreen = relayScreen(CommonInformationScreen, {
   query: commonInformationScreenQuery,
   getVariables: (_, profileInfos) => ({
     webCardId: profileInfos?.webCardId ?? '',
+    pixelRatio: CappedPixelRatio(),
   }),
   fallback: CommonInformationScreenFallback,
 });

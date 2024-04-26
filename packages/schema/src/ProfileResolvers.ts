@@ -39,6 +39,13 @@ export const Profile: ProfileResolvers = {
           assetKind: 'contactCard',
         }
       : null,
+  logo: async profile =>
+    profile.logoId
+      ? {
+          media: profile.logoId,
+          assetKind: 'logo',
+        }
+      : null,
   statsSummary: async (profile, _args, { loaders }) => {
     //get data for the last 30 day
     return loaders.profileStatistics.load(profile.id);

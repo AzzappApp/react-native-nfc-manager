@@ -2,16 +2,22 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useIntl } from 'react-intl';
-import { StyleSheet } from 'react-native';
+import { ActivityIndicator, StyleSheet, View } from 'react-native';
 import * as mime from 'react-native-mime-types';
 import Toast from 'react-native-toast-message';
-import { graphql, useFragment, useMutation } from 'react-relay';
+import { graphql, useMutation, usePreloadedQuery } from 'react-relay';
 import { Observable } from 'relay-runtime';
+import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
 import { encodeMediaId } from '@azzapp/shared/imagesHelpers';
+import { combineMultiUploadProgresses } from '@azzapp/shared/networkHelpers';
+import { colors } from '#theme';
+import { CancelHeaderButton } from '#components/commonsButtons';
+import { useRouter } from '#components/NativeRouter';
 import ScreenModal from '#components/ScreenModal';
 import { getFileName } from '#helpers/fileHelpers';
 import { addLocalCachedMediaFile } from '#helpers/mediaHelpers';
 import { uploadMedia, uploadSign } from '#helpers/MobileWebAPI';
+import relayScreen from '#helpers/relayScreen';
 import { get as CappedPixelRatio } from '#relayProviders/CappedPixelRatio.relayprovider';
 import Button from '#ui/Button';
 import Container from '#ui/Container';
@@ -21,33 +27,16 @@ import Text from '#ui/Text';
 import UploadProgressModal from '#ui/UploadProgressModal';
 import ContactCardEditForm from './ContactCardEditForm';
 import { contactCardEditSchema } from './ContactCardEditModalSchema';
-import type { ContactCardEditModal_card$key } from '#relayArtifacts/ContactCardEditModal_card.graphql';
+import type { ScreenOptions } from '#components/NativeRouter';
+import type { RelayScreenProps } from '#helpers/relayScreen';
+import type { ContactCardEditScreenQuery } from '#relayArtifacts/ContactCardEditScreenQuery.graphql';
+import type { ContactCardEditRoute } from '#routes';
 import type { ContactCardEditFormValues } from './ContactCardEditModalSchema';
 
-export type ContactCardEditModalProps = {
-  visible: boolean;
-  toggleBottomSheet: () => void;
-  profile: ContactCardEditModal_card$key;
-};
-
-const ContactCardEditModal = ({
-  toggleBottomSheet,
-  profile: profileKey,
-}: ContactCardEditModalProps) => {
-  const {
-    id,
-    contactCard,
-    webCard: { commonInformation, isMultiUser },
-    avatar,
-  } = useFragment(
-    graphql`
-      fragment ContactCardEditModal_card on Profile
-      @argumentDefinitions(
-        pixelRatio: {
-          type: "Float!"
-          provider: "CappedPixelRatio.relayprovider"
-        }
-      ) {
+const contactCardEditScreenQuery = graphql`
+  query ContactCardEditScreenQuery($profileId: ID!, $pixelRatio: Float!) {
+    node(id: $profileId) {
+      ... on Profile @alias(as: "profile") {
         id
         webCard {
           isMultiUser
@@ -72,6 +61,10 @@ const ContactCardEditModal = ({
               label
               url
             }
+          }
+          logo {
+            id
+            uri: uri(width: 180, pixelRatio: $pixelRatio)
           }
         }
         contactCard {
@@ -113,13 +106,35 @@ const ContactCardEditModal = ({
           id
           uri: uri(width: 112, pixelRatio: $pixelRatio)
         }
+        logo {
+          id
+          uri: uri(width: 180, pixelRatio: $pixelRatio)
+        }
       }
-    `,
-    profileKey,
+    }
+  }
+`;
+
+const ContactCardEditScreen = ({
+  preloadedQuery,
+}: RelayScreenProps<ContactCardEditRoute, ContactCardEditScreenQuery>) => {
+  const { node } = usePreloadedQuery(
+    contactCardEditScreenQuery,
+    preloadedQuery,
   );
 
+  const profile = node?.profile;
+
+  const { id, contactCard, webCard, avatar, logo } = profile ?? {
+    id: null,
+    contactCard: null,
+    webCard: null,
+    avatar: null,
+    logo: null,
+  };
+
   const [commit] = useMutation(graphql`
-    mutation ContactCardEditModalMutation(
+    mutation ContactCardEditScreenMutation(
       $profileId: ID!
       $contactCard: ContactCardInput!
       $pixelRatio: Float!
@@ -165,6 +180,10 @@ const ContactCardEditModal = ({
             id
             uri: uri(width: 112, pixelRatio: $pixelRatio)
           }
+          logo {
+            id
+            uri: uri(width: 180, pixelRatio: $pixelRatio)
+          }
         }
       }
     }
@@ -190,14 +209,18 @@ const ContactCardEditModal = ({
       birthday: contactCard?.birthday,
       socials: contactCard?.socials?.map(p => ({ ...p })) ?? [],
       avatar,
+      logo,
     },
   });
 
   const [progressIndicator, setProgressIndicator] =
     useState<Observable<number> | null>(null);
 
-  const submit = handleSubmit(async ({ avatar, ...data }) => {
-    let avatarId: string | null = avatar?.id ?? null;
+  const router = useRouter();
+
+  const submit = handleSubmit(async ({ avatar, logo, ...data }) => {
+    const uploads = [];
+
     if (avatar?.local && avatar.uri) {
       setProgressIndicator(Observable.from(0));
 
@@ -212,17 +235,48 @@ const ContactCardEditModal = ({
         kind: 'image',
         target: 'avatar',
       });
-      const { progress: uploadProgress, promise: uploadPromise } = uploadMedia(
-        file,
-        uploadURL,
-        uploadParameters,
-      );
-      setProgressIndicator(
-        uploadProgress.map(({ loaded, total }) => loaded / total),
-      );
-      const { public_id } = await uploadPromise;
-      avatarId = encodeMediaId(public_id, 'image');
+      uploads.push(uploadMedia(file, uploadURL, uploadParameters));
+    } else {
+      uploads.push(null);
     }
+
+    if (logo?.local && logo.uri) {
+      setProgressIndicator(Observable.from(0));
+
+      const fileName = getFileName(logo.uri);
+      const file: any = {
+        name: fileName,
+        uri: logo.uri,
+        type: mime.lookup(fileName) || 'image/jpeg',
+      };
+
+      const { uploadURL, uploadParameters } = await uploadSign({
+        kind: 'image',
+        target: 'logo',
+      });
+      uploads.push(uploadMedia(file, uploadURL, uploadParameters));
+    } else {
+      uploads.push(null);
+    }
+
+    setProgressIndicator(
+      combineMultiUploadProgresses(
+        convertToNonNullArray(uploads.map(upload => upload?.progress)),
+      ),
+    );
+
+    const [uploadedAvatarId, uploadedLogoId] = await Promise.all(
+      uploads.map(upload =>
+        upload?.promise.then(({ public_id }) => {
+          return encodeMediaId(public_id, 'image');
+        }),
+      ),
+    );
+
+    const avatarId =
+      avatar === null ? null : avatar?.local ? uploadedAvatarId : avatar?.id;
+    const logoId =
+      logo === null ? null : logo?.local ? uploadedLogoId : logo?.id;
 
     commit({
       variables: {
@@ -238,6 +292,7 @@ const ContactCardEditModal = ({
           birthday: data.birthday,
           socials: data.socials.filter(social => social.url),
           avatarId,
+          logoId,
         },
         pixelRatio: CappedPixelRatio(),
       },
@@ -249,7 +304,7 @@ const ContactCardEditModal = ({
             avatar.uri,
           );
         }
-        toggleBottomSheet();
+        router.back();
       },
       onError: e => {
         console.error(e);
@@ -270,8 +325,6 @@ const ContactCardEditModal = ({
       },
     });
   });
-
-  const [showImagePicker, setShowImagePicker] = useState(false);
 
   return (
     <Container style={styles.container}>
@@ -297,7 +350,7 @@ const ContactCardEditModal = ({
                 defaultMessage: 'Cancel',
                 description: 'Edit contact card modal cancel button title',
               })}
-              onPress={toggleBottomSheet}
+              onPress={router.back}
               variant="secondary"
               style={styles.headerButton}
             />
@@ -317,14 +370,7 @@ const ContactCardEditModal = ({
           }
         />
 
-        <ContactCardEditForm
-          commonInformation={commonInformation}
-          isMultiUser={isMultiUser}
-          control={control}
-          showImagePicker={() => setShowImagePicker(true)}
-          hideImagePicker={() => setShowImagePicker(false)}
-          imagePickerVisible={showImagePicker}
-        />
+        {webCard && <ContactCardEditForm webCard={webCard} control={control} />}
         <ScreenModal visible={!!progressIndicator}>
           {progressIndicator && (
             <UploadProgressModal progressIndicator={progressIndicator} />
@@ -342,4 +388,34 @@ const styles = StyleSheet.create({
   container: { flex: 1 },
 });
 
-export default ContactCardEditModal;
+const ContactCardEditScreenFallback = () => {
+  const router = useRouter();
+  return (
+    <Container style={{ flex: 1 }}>
+      <SafeAreaView style={{ flex: 1 }}>
+        <Header leftElement={<CancelHeaderButton onPress={router.back} />} />
+        <View style={{ aspectRatio: 1, backgroundColor: colors.grey100 }} />
+        <View
+          style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}
+        >
+          <ActivityIndicator />
+        </View>
+      </SafeAreaView>
+    </Container>
+  );
+};
+
+const contactCardEditScreen = relayScreen(ContactCardEditScreen, {
+  query: contactCardEditScreenQuery,
+  getVariables: (_, profileInfos) => ({
+    profileId: profileInfos?.profileId ?? '',
+    pixelRatio: CappedPixelRatio(),
+  }),
+  fallback: ContactCardEditScreenFallback,
+});
+
+contactCardEditScreen.getScreenOptions = (): ScreenOptions => ({
+  stackAnimation: 'slide_from_bottom',
+});
+
+export default contactCardEditScreen;

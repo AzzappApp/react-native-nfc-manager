@@ -28,6 +28,10 @@ type Profile implements Node {
   """
   avatar: Media
   """
+  The contact card logo
+  """
+  logo: Media
+  """
   True if user has been invited
   """
   invited: Boolean!

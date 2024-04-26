@@ -206,9 +206,11 @@ const permissions = shield(
       id: or(isCurrentProfileRule, isSameWebCard),
       webCard: or(isCurrentProfileRule, isSameWebCard),
       inviteSent: or(isCurrentProfileRule, isSameWebCard),
+      logo: or(isCurrentProfileRule, isSameWebCard),
     },
     WebCard: {
       '*': isCurrentWebCardRule,
+      logo: isSameWebCard,
       profilePendingOwner: isSameWebCard,
       profiles: isSameWebCard,
       nbProfiles: isSameWebCard,

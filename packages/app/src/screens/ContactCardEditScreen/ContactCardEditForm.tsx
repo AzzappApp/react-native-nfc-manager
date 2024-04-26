@@ -1,7 +1,7 @@
-import { Fragment, useCallback } from 'react';
+import { Fragment, useCallback, useEffect, useState } from 'react';
 import { Controller, useController } from 'react-hook-form';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { View } from 'react-native';
+import { Pressable, View, Image } from 'react-native';
 import { AVATAR_MAX_WIDTH } from '@azzapp/shared/contactCardHelpers';
 import { colors, shadow } from '#theme';
 import { MEDIA_WIDTH } from '#components/AuthorCartouche';
@@ -10,6 +10,7 @@ import { exportLayersToImage, getFilterUri } from '#components/gpu';
 import ImagePicker, {
   EditImageStep,
   ImagePickerContactCardMediaWrapper,
+  SelectImageStep,
   SelectImageStepWithFrontCameraByDefault,
 } from '#components/ImagePicker';
 import { MediaImageRenderer } from '#components/medias';
@@ -32,82 +33,136 @@ import ContactCardEditModalPhones from './ContactCardEditModalPhones';
 import ContactCardEditModalSocials from './ContactCardEditModalSocials';
 import ContactCardEditModalUrls from './ContactCardEditModalUrls';
 import type { ImagePickerResult } from '#components/ImagePicker';
-import type { ContactCardEditModal_card$data } from '#relayArtifacts/ContactCardEditModal_card.graphql';
+import type { ContactCardEditScreenQuery$data } from '#relayArtifacts/ContactCardEditScreenQuery.graphql';
 import type { ContactCardEditFormValues } from './ContactCardEditModalSchema';
 import type { ReactNode } from 'react';
 import type { Control } from 'react-hook-form';
 
 type ContactCardEditFormProps = {
-  isMultiUser: boolean;
-  showImagePicker: () => void;
-  hideImagePicker: () => void;
-  imagePickerVisible: boolean;
   control: Control<ContactCardEditFormValues>;
-  commonInformation: ContactCardEditModal_card$data['webCard']['commonInformation'];
+  webCard: NonNullable<
+    NonNullable<ContactCardEditScreenQuery$data['node']>['profile']
+  >['webCard'];
   children?: ReactNode;
   footer?: ReactNode;
 };
 
 const ContactCardEditForm = ({
-  isMultiUser,
-  showImagePicker,
-  hideImagePicker,
-  imagePickerVisible,
   control,
-  commonInformation,
   children,
   footer,
+  webCard,
 }: ContactCardEditFormProps) => {
   const styles = useStyleSheet(styleSheet);
   const intl = useIntl();
 
-  const { field } = useController({
+  const { field: avatarField } = useController({
     control,
     name: 'avatar',
   });
+
+  const { field: logoField } = useController({
+    control,
+    name: 'logo',
+  });
+  const [imagePicker, setImagePicker] = useState<'avatar' | 'logo' | null>(
+    null,
+  );
+
+  const [size, setSize] = useState<{ width: number; height: number } | null>(
+    null,
+  );
+
+  useEffect(() => {
+    if (logoField.value?.uri) {
+      Image.getSize(logoField.value.uri, (width, height) => {
+        setSize(size => (size ? size : { width, height }));
+      });
+    }
+  }, [logoField.value?.uri]);
 
   const onImagePickerFinished = useCallback(
     async ({
       uri,
       width,
+      height,
       editionParameters,
       filter,
       aspectRatio,
     }: ImagePickerResult) => {
-      const exportWidth = Math.min(AVATAR_MAX_WIDTH, width);
-      const exportHeight = exportWidth / aspectRatio;
-      const localPath = await exportLayersToImage({
-        size: { width: exportWidth, height: exportHeight },
-        quality: 95,
-        format: 'auto',
-        layers: [
-          {
-            kind: 'image',
-            uri,
-            parameters: editionParameters,
-            lutFilterUri: getFilterUri(filter),
-          },
-        ],
-      });
-      field.onChange({
-        local: true,
-        id: localPath,
-        uri: localPath.startsWith('file://')
-          ? localPath
-          : `file://${localPath}`,
-      });
+      if (imagePicker === 'avatar') {
+        const exportWidth = Math.min(AVATAR_MAX_WIDTH, width);
+        const exportHeight = exportWidth / aspectRatio;
+        const localPath = await exportLayersToImage({
+          size: { width: exportWidth, height: exportHeight },
+          quality: 95,
+          format: 'auto',
+          layers: [
+            {
+              kind: 'image',
+              uri,
+              parameters: editionParameters,
+              lutFilterUri: getFilterUri(filter),
+            },
+          ],
+        });
+        avatarField.onChange({
+          local: true,
+          id: localPath,
+          uri: localPath.startsWith('file://')
+            ? localPath
+            : `file://${localPath}`,
+        });
+      } else {
+        const localPath = await exportLayersToImage({
+          size: { width, height },
+          quality: 100,
+          format: 'auto',
+          layers: [
+            {
+              kind: 'image',
+              uri,
+              parameters: editionParameters,
+              lutFilterUri: getFilterUri(filter),
+            },
+          ],
+        });
+        logoField.onChange({
+          local: true,
+          id: localPath,
+          uri: localPath.startsWith('file://')
+            ? localPath
+            : `file://${localPath}`,
+        });
+        setSize({ width, height });
+      }
 
-      hideImagePicker();
+      setImagePicker(null);
     },
-    [field, hideImagePicker],
+    [avatarField, imagePicker, logoField],
   );
+
+  const { commonInformation, logo } = webCard ?? {};
+
+  const [webCardLogoSize, setWebCardLogoSize] = useState<{
+    width: number;
+    height: number;
+  } | null>(null);
+
+  useEffect(() => {
+    if (logo?.uri) {
+      Image.getSize(logo.uri, (width, height) => {
+        setWebCardLogoSize({ width, height });
+      });
+    }
+  }, [logo]);
 
   return (
     <>
       <FormDeleteFieldOverlay>
         <View style={styles.sectionsContainer}>
           {children}
-          {isMultiUser ? (
+          {webCard.isMultiUser ? (
             <View style={styles.avatarSection}>
               <Controller
                 control={control}
@@ -116,7 +171,7 @@ const ContactCardEditForm = ({
                   value?.uri ? (
                     <View style={styles.avatarContainer}>
                       <PressableNative
-                        onPress={showImagePicker}
+                        onPress={() => setImagePicker('avatar')}
                         android_ripple={{ borderless: true, foreground: true }}
                       >
                         <MediaImageRenderer
@@ -139,7 +194,7 @@ const ContactCardEditForm = ({
                   ) : (
                     <View style={styles.noAvatarContainer}>
                       <PressableNative
-                        onPress={showImagePicker}
+                        onPress={() => setImagePicker('avatar')}
                         android_ripple={{ borderless: true, foreground: true }}
                       >
                         <View style={styles.noAvatar}>
@@ -235,7 +290,7 @@ const ContactCardEditForm = ({
             )}
           />
           <Separation />
-          {isMultiUser && commonInformation?.company ? (
+          {webCard.isMultiUser && commonInformation?.company ? (
             <View style={styles.fieldCommon}>
               <View style={styles.fieldTitleWithLock}>
                 <Icon icon="locked" />
@@ -277,9 +332,112 @@ const ContactCardEditForm = ({
               )}
             />
           )}
+          {webCard.isMultiUser && logo ? (
+            <View style={styles.logoField}>
+              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                <View style={styles.logoButton}>
+                  <Icon icon={'locked'} style={{}} />
+                  <Text variant="smallbold">
+                    <FormattedMessage
+                      defaultMessage="Logo"
+                      description="Logo field registered for the contact card"
+                    />
+                  </Text>
+                </View>
+
+                {webCardLogoSize ? (
+                  <View style={styles.logoContainer}>
+                    <View style={styles.logoWrapper}>
+                      <Image
+                        source={{ uri: logo.uri }}
+                        style={{
+                          height: 55,
+                          width:
+                            webCardLogoSize.width *
+                            (55 / webCardLogoSize.height),
+                        }}
+                        resizeMode="contain"
+                      />
+                    </View>
+                  </View>
+                ) : null}
+              </View>
+              <View style={styles.companyLogoDescription}>
+                <Text variant="xsmall" style={{ color: colors.grey400 }}>
+                  <FormattedMessage
+                    defaultMessage="Company logo will be used in your email signature"
+                    description="Company logo field description"
+                  />
+                </Text>
+              </View>
+            </View>
+          ) : (
+            <Controller
+              control={control}
+              name="logo"
+              render={({ field: { value, onChange } }) => (
+                <View style={styles.logoField}>
+                  <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                    <Pressable
+                      onPress={() => {
+                        if (value?.uri) {
+                          onChange(null);
+                        } else {
+                          setImagePicker('logo');
+                        }
+                      }}
+                    >
+                      <View style={styles.logoButton}>
+                        <Icon
+                          icon={value?.uri ? 'delete_filled' : 'add_filled'}
+                          style={{
+                            tintColor: value?.uri
+                              ? colors.red400
+                              : colors.green,
+                          }}
+                        />
+                        <Text variant="smallbold">
+                          <FormattedMessage
+                            defaultMessage="Logo"
+                            description="Logo field registered for the contact card"
+                          />
+                        </Text>
+                      </View>
+                    </Pressable>
+
+                    {value?.uri && size ? (
+                      <View style={styles.logoContainer}>
+                        <Pressable
+                          style={styles.logoWrapper}
+                          onPress={() => setImagePicker('logo')}
+                        >
+                          <Image
+                            source={{ uri: value?.uri }}
+                            style={{
+                              height: 55,
+                              width: size.width * (55 / size.height),
+                            }}
+                            resizeMode="contain"
+                          />
+                        </Pressable>
+                      </View>
+                    ) : null}
+                  </View>
+                  <View style={styles.companyLogoDescription}>
+                    <Text variant="xsmall" style={{ color: colors.grey400 }}>
+                      <FormattedMessage
+                        defaultMessage="Company logo will be used in your email signature"
+                        description="Company logo field description"
+                      />
+                    </Text>
+                  </View>
+                </View>
+              )}
+            />
+          )}
 
           <Separation />
-          {isMultiUser &&
+          {webCard.isMultiUser &&
             commonInformation?.phoneNumbers?.map((phoneNumber, index) => (
               <Fragment key={index}>
                 <CommonInformationField
@@ -292,7 +450,7 @@ const ContactCardEditForm = ({
             ))}
           <ContactCardEditModalPhones control={control} />
           <Separation />
-          {isMultiUser &&
+          {webCard.isMultiUser &&
             commonInformation?.emails?.map((email, index) => (
               <Fragment key={index}>
                 <CommonInformationField
@@ -305,7 +463,7 @@ const ContactCardEditForm = ({
             ))}
           <ContactCardEditModalEmails control={control} />
           <Separation />
-          {isMultiUser &&
+          {webCard.isMultiUser &&
             commonInformation?.urls?.map((url, index) => (
               <Fragment key={index}>
                 <CommonInformationField value={url.address} labelMargin={18} />
@@ -314,7 +472,7 @@ const ContactCardEditForm = ({
             ))}
           <ContactCardEditModalUrls control={control} />
           <Separation />
-          {isMultiUser &&
+          {webCard.isMultiUser &&
             commonInformation?.addresses?.map((address, index) => (
               <CommonInformationField
                 key={index}
@@ -327,7 +485,7 @@ const ContactCardEditForm = ({
           <Separation />
           <ContactCardEditModalBirthdays control={control} />
           <Separation />
-          {isMultiUser &&
+          {webCard.isMultiUser &&
             commonInformation?.socials?.map((social, index) => (
               <Fragment key={index}>
                 <CommonInformationField
@@ -343,22 +501,32 @@ const ContactCardEditForm = ({
         {footer}
       </FormDeleteFieldOverlay>
 
-      <ScreenModal visible={imagePickerVisible} animationType="slide">
+      <ScreenModal visible={imagePicker !== null} animationType="slide">
         <ImagePicker
           kind="image"
-          forceAspectRatio={1}
-          TopPanelWrapper={ImagePickerContactCardMediaWrapper}
-          steps={steps}
+          forceAspectRatio={imagePicker === 'avatar' ? 1 : undefined}
+          TopPanelWrapper={
+            imagePicker === 'avatar'
+              ? ImagePickerContactCardMediaWrapper
+              : undefined
+          }
+          steps={
+            imagePicker === 'avatar'
+              ? [SelectImageStepWithFrontCameraByDefault, EditImageStep]
+              : [SelectImageStep]
+          }
           onFinished={onImagePickerFinished}
-          onCancel={hideImagePicker}
-          cameraButtonsLeftRightPosition={70}
+          onCancel={() => {
+            setImagePicker(null);
+          }}
+          cameraButtonsLeftRightPosition={
+            imagePicker === 'avatar' ? 70 : undefined
+          }
         />
       </ScreenModal>
     </>
   );
 };
-
-export const steps = [SelectImageStepWithFrontCameraByDefault, EditImageStep];
 
 const CommonInformationField = ({
   label,
@@ -441,6 +609,31 @@ const styleSheet = createStyleSheet(appearance => ({
   },
   removeAvatarIcon: {
     tintColor: colors.red400,
+  },
+  companyLogoDescription: {
+    paddingLeft: 30,
+    paddingVertical: 10,
+  },
+  logoField: {
+    padding: 20,
+    borderColor: colors.grey50,
+    borderTopWidth: 1,
+  },
+  logoButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    columnGap: 7,
+  },
+  logoContainer: {
+    flex: 1,
+    paddingLeft: 65,
+    alignItems: 'flex-start',
+  },
+  logoWrapper: {
+    borderStyle: 'dashed',
+    borderWidth: 1,
+    borderColor: colors.grey100,
+    borderRadius: 5,
   },
   ...buildContactCardModalStyleSheet(appearance),
 }));

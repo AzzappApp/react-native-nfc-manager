@@ -1,6 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { parsePhoneNumber } from 'libphonenumber-js';
-import { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { StyleSheet, View, useColorScheme } from 'react-native';
@@ -22,7 +21,7 @@ import { addLocalCachedMediaFile } from '#helpers/mediaHelpers';
 import { uploadMedia, uploadSign } from '#helpers/MobileWebAPI';
 import useAuthState from '#hooks/useAuthState';
 import { get as CappedPixelRatio } from '#relayProviders/CappedPixelRatio.relayprovider';
-import ContactCardEditForm from '#screens/ContactCardScreen/ContactCardEditForm';
+import ContactCardEditForm from '#screens/ContactCardEditScreen/ContactCardEditForm';
 import HomeStatistics from '#screens/HomeScreen/HomeStatistics';
 import Button from '#ui/Button';
 import Container from '#ui/Container';
@@ -39,7 +38,7 @@ import type { MultiUserDetailModal_RemoveUserMutation } from '#relayArtifacts/Mu
 import type { MultiUserDetailModal_UpdateProfileMutation } from '#relayArtifacts/MultiUserDetailModal_UpdateProfileMutation.graphql';
 import type { MultiUserDetailModal_webCard$key } from '#relayArtifacts/MultiUserDetailModal_webCard.graphql';
 import type { ProfileRole } from '#relayArtifacts/MultiUserScreenQuery.graphql';
-import type { ContactCardEditFormValues } from '#screens/ContactCardScreen/ContactCardEditModalSchema';
+import type { ContactCardEditFormValues } from '#screens/ContactCardEditScreen/ContactCardEditModalSchema';
 import type { ReactNode } from 'react';
 import type { Control } from 'react-hook-form';
 
@@ -59,7 +58,6 @@ const MultiUserDetailModal = ({
   profile: profileKey,
   onClose,
 }: MultiUserDetailModalProps) => {
-  const [showImagePicker, setShowImagePicker] = useState(false);
   const { profileInfos } = useAuthState();
   const intl = useIntl();
   const styles = useStyleSheet(styleSheet);
@@ -114,6 +112,10 @@ const MultiUserDetailModal = ({
           id
           uri: uri(width: 112, pixelRatio: $pixelRatio)
         }
+        logo {
+          id
+          uri: uri(width: 180, pixelRatio: $pixelRatio)
+        }
         user {
           email
           phoneNumber
@@ -160,12 +162,19 @@ const MultiUserDetailModal = ({
               value: phoneNumber.formatInternational()!,
             }
           : null,
+      logo: profile?.logo,
     },
   });
 
   const webCard = useFragment(
     graphql`
-      fragment MultiUserDetailModal_webCard on WebCard {
+      fragment MultiUserDetailModal_webCard on WebCard
+      @argumentDefinitions(
+        pixelRatio: {
+          type: "Float!"
+          provider: "CappedPixelRatio.relayprovider"
+        }
+      ) {
         id
         profilePendingOwner {
           id
@@ -196,6 +205,11 @@ const MultiUserDetailModal = ({
             url
           }
         }
+        logo {
+          id
+          uri: uri(width: 180, pixelRatio: $pixelRatio)
+        }
+        isMultiUser
       }
     `,
     webCardKey,
@@ -262,11 +276,11 @@ const MultiUserDetailModal = ({
   const submit = handleSubmit(
     async data => {
       if (profile == null) return;
-      const { avatar, role, selectedContact, ...contactCard } = data;
+      const { avatar, logo, role, selectedContact, ...contactCard } = data;
 
       const input = {};
 
-      let avatarId: string | null = avatar?.id ?? null;
+      const uploads = [];
 
       if (avatar?.local && avatar.uri) {
         const fileName = getFileName(avatar.uri);
@@ -280,15 +294,40 @@ const MultiUserDetailModal = ({
           kind: 'image',
           target: 'avatar',
         });
-        const { promise: uploadPromise } = uploadMedia(
-          file,
-          uploadURL,
-          uploadParameters,
-        );
-
-        const { public_id } = await uploadPromise;
-        avatarId = encodeMediaId(public_id, 'image');
+        uploads.push(uploadMedia(file, uploadURL, uploadParameters));
+      } else {
+        uploads.push(null);
       }
+
+      if (logo?.local && logo.uri) {
+        const fileName = getFileName(logo.uri);
+        const file: any = {
+          name: fileName,
+          uri: logo.uri,
+          type: mime.lookup(fileName) || 'image/jpeg',
+        };
+
+        const { uploadURL, uploadParameters } = await uploadSign({
+          kind: 'image',
+          target: 'logo',
+        });
+        uploads.push(uploadMedia(file, uploadURL, uploadParameters));
+      } else {
+        uploads.push(null);
+      }
+
+      const [uploadedAvatarId, uploadedLogoId] = await Promise.all(
+        uploads.map(upload =>
+          upload?.promise.then(({ public_id }) => {
+            return encodeMediaId(public_id, 'image');
+          }),
+        ),
+      );
+
+      const avatarId =
+        avatar === null ? null : avatar?.local ? uploadedAvatarId : avatar?.id;
+      const logoId =
+        logo === null ? null : logo?.local ? uploadedLogoId : logo?.id;
 
       if (dirtyFields.role) Object.assign(input, { profileRole: role });
 
@@ -300,6 +339,7 @@ const MultiUserDetailModal = ({
             contactCard: {
               ...contactCard,
               avatarId,
+              logoId,
             },
           },
           pixelRatio: CappedPixelRatio(),
@@ -455,12 +495,8 @@ const MultiUserDetailModal = ({
           }
         />
         <ContactCardEditForm
-          commonInformation={webCard.commonInformation}
+          webCard={webCard}
           control={control as unknown as Control<ContactCardEditFormValues>}
-          hideImagePicker={() => setShowImagePicker(false)}
-          showImagePicker={() => setShowImagePicker(true)}
-          imagePickerVisible={showImagePicker}
-          isMultiUser={true}
           footer={
             !isCurrentProfile &&
             role !== 'owner' && (

@@ -27,6 +27,7 @@ type Input = {
       displayedOnWebCard?: boolean;
       isPrivate?: boolean;
       avatarId?: string;
+      logoId?: string;
     };
     email?: string;
     phoneNumber?: string;
@@ -67,7 +68,7 @@ export const inviteUser = async (input: Input) => {
         });
       }
 
-      const { displayedOnWebCard, isPrivate, avatarId, ...data } =
+      const { displayedOnWebCard, isPrivate, avatarId, logoId, ...data } =
         input.invited.contactCard ?? {};
 
       try {
@@ -76,6 +77,7 @@ export const inviteUser = async (input: Input) => {
           webCardId: webCard.id,
           userId,
           avatarId: avatarId ?? null,
+          logoId: logoId ?? null,
           invited: true,
           contactCard: {
             ...data,

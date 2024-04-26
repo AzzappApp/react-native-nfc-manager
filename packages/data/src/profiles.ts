@@ -26,6 +26,7 @@ export const ProfileTable = cols.table(
     inviteSent: cols.boolean('inviteSent').default(false).notNull(),
     promotedAsOwner: cols.boolean('promotedAsOwner').default(false).notNull(),
     avatarId: cols.mediaId('avatarId'),
+    logoId: cols.mediaId('logoId'),
     /* Contact cards infos */
     contactCard: cols.json('contactCard').$type<ContactCard>(),
     contactCardIsPrivate: cols

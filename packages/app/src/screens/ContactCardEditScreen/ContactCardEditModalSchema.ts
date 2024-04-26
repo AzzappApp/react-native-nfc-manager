@@ -54,6 +54,14 @@ export const contactCardEditSchema = z.object({
     })
     .optional()
     .nullable(),
+  logo: z
+    .object({
+      uri: z.string(),
+      id: z.string().optional(),
+      local: z.boolean().optional(),
+    })
+    .optional()
+    .nullable(),
 });
 
 export type ContactCardEditFormValues = z.infer<typeof contactCardEditSchema>;

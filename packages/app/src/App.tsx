@@ -61,6 +61,7 @@ import CardModuleEditionScreen from '#screens/CardModuleEditionScreen';
 import CommonInformationScreen from '#screens/CommonInformationScreen';
 import ConfirmChangeContactScreen from '#screens/ConfirmChangeContactScreen';
 import ConfirmRegistrationScreen from '#screens/ConfirmRegistrationScreen';
+import ContactCardEditScreen from '#screens/ContactCardEditScreen';
 import ContactCardScreen from '#screens/ContactCardScreen';
 import CoverEditionScreen from '#screens/CoverEditionScreen';
 import FollowersScreen from '#screens/FollowersScreen';
@@ -184,6 +185,7 @@ const screens = {
   ACCOUNT_DETAILS: AccountDetailsScreen,
   CARD_MODULE_EDITION: CardModuleEditionScreen,
   CONTACT_CARD: ContactCardScreen,
+  CONTACT_CARD_EDIT: ContactCardEditScreen,
   COVER_EDITION: CoverEditionScreen,
   FOLLOWINGS: FollowingsScreen,
   FOLLOWINGS_MOSAIC: FollowingsMosaicScreen,

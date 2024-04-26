@@ -28,7 +28,7 @@ import { getLocales, useCurrentLocale } from '#helpers/localeHelpers';
 import { addLocalCachedMediaFile } from '#helpers/mediaHelpers';
 import { uploadMedia, uploadSign } from '#helpers/MobileWebAPI';
 import useAuthState from '#hooks/useAuthState';
-import ContactCardEditForm from '#screens/ContactCardScreen/ContactCardEditForm';
+import ContactCardEditForm from '#screens/ContactCardEditScreen/ContactCardEditForm';
 import Button from '#ui/Button';
 import Container from '#ui/Container';
 import Header from '#ui/Header';
@@ -38,7 +38,7 @@ import MultiUserAddForm from './MultiUserAddForm';
 import type { EmailPhoneInput } from '#components/EmailOrPhoneInput';
 import type { MultiUserAddModal_InviteUserMutation } from '#relayArtifacts/MultiUserAddModal_InviteUserMutation.graphql';
 import type { MultiUserAddModal_webCard$key } from '#relayArtifacts/MultiUserAddModal_webCard.graphql';
-import type { ContactCardEditFormValues } from '#screens/ContactCardScreen/ContactCardEditModalSchema';
+import type { ContactCardEditFormValues } from '#screens/ContactCardEditScreen/ContactCardEditModalSchema';
 import type { MultiUserAddFormValues } from './MultiUserAddForm';
 import type { Contact } from 'expo-contacts';
 import type { CountryCode } from 'libphonenumber-js';
@@ -113,6 +113,13 @@ const multiUserAddFormSchema = z.object({
       local: z.boolean(),
     })
     .optional(),
+  logo: z
+    .object({
+      uri: z.string(),
+      id: z.string().optional(),
+      local: z.boolean().optional(),
+    })
+    .optional(),
 });
 
 // eslint-disable-next-line @typescript-eslint/ban-types
@@ -130,10 +137,17 @@ const MultiUserAddModal = (
   props: MultiUserAddModalProps,
   ref: ForwardedRef<MultiUserAddModalActions>,
 ) => {
-  const { commonInformation } = useFragment(
+  const webCard = useFragment(
     graphql`
-      fragment MultiUserAddModal_webCard on WebCard {
+      fragment MultiUserAddModal_webCard on WebCard
+      @argumentDefinitions(
+        pixelRatio: {
+          type: "Float!"
+          provider: "CappedPixelRatio.relayprovider"
+        }
+      ) {
         id
+        isMultiUser
         commonInformation {
           company
           addresses {
@@ -155,6 +169,10 @@ const MultiUserAddModal = (
             label
             url
           }
+        }
+        logo {
+          uri: uri(width: 180, pixelRatio: $pixelRatio)
+          id
         }
       }
     `,
@@ -283,8 +301,6 @@ const MultiUserAddModal = (
     },
   }));
 
-  const [showImagePicker, setShowImagePicker] = useState(false);
-
   const [commit, saving] = useMutation<MultiUserAddModal_InviteUserMutation>(
     graphql`
       mutation MultiUserAddModal_InviteUserMutation(
@@ -312,11 +328,12 @@ const MultiUserAddModal = (
     async value => {
       if (profileInfos) {
         Keyboard.dismiss();
-        let avatarId: string | undefined = undefined;
-        const { avatar, ...data } = value;
-        if (avatar?.local && avatar.uri) {
-          // setProgressIndicator(Observable.from(0));
 
+        const uploads = [];
+
+        const { avatar, logo, ...data } = value;
+
+        if (avatar?.local && avatar.uri) {
           const fileName = getFileName(avatar.uri);
           const file: any = {
             name: fileName,
@@ -328,12 +345,44 @@ const MultiUserAddModal = (
             kind: 'image',
             target: 'avatar',
           });
-          const { /* progress: uploadProgress, */ promise: uploadPromise } =
-            uploadMedia(file, uploadURL, uploadParameters);
-          // setProgressIndicator(uploadProgress);
-          const { public_id } = await uploadPromise;
-          avatarId = public_id;
+          uploads.push(uploadMedia(file, uploadURL, uploadParameters));
+        } else {
+          uploads.push(null);
         }
+
+        if (logo?.local && logo.uri) {
+          const fileName = getFileName(logo.uri);
+          const file: any = {
+            name: fileName,
+            uri: logo.uri,
+            type: mime.lookup(fileName) || 'image/jpeg',
+          };
+
+          const { uploadURL, uploadParameters } = await uploadSign({
+            kind: 'image',
+            target: 'logo',
+          });
+          uploads.push(uploadMedia(file, uploadURL, uploadParameters));
+        } else {
+          uploads.push(null);
+        }
+
+        const [uploadedAvatarId, uploadedLogoId] = await Promise.all(
+          uploads.map(upload =>
+            upload?.promise.then(({ public_id }) => {
+              return encodeMediaId(public_id, 'image');
+            }),
+          ),
+        );
+
+        const avatarId =
+          avatar === null
+            ? null
+            : avatar?.local
+              ? uploadedAvatarId
+              : avatar?.id;
+        const logoId =
+          logo === null ? null : logo?.local ? uploadedLogoId : null;
 
         const {
           selectedContact,
@@ -376,7 +425,8 @@ const MultiUserAddModal = (
             urls,
             birthday,
             socials,
-            avatarId: avatarId ? encodeMediaId(avatarId, 'image') : avatarId,
+            avatarId,
+            logoId,
             addresses,
           },
         };
@@ -526,12 +576,8 @@ const MultiUserAddModal = (
             }
           />
           <ContactCardEditForm
-            commonInformation={commonInformation}
+            webCard={webCard}
             control={control as unknown as Control<ContactCardEditFormValues>}
-            hideImagePicker={() => setShowImagePicker(false)}
-            showImagePicker={() => setShowImagePicker(true)}
-            imagePickerVisible={showImagePicker}
-            isMultiUser={true}
           >
             <MultiUserAddForm contacts={contacts} control={control} />
           </ContactCardEditForm>
