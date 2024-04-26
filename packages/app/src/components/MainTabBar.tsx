@@ -128,7 +128,7 @@ const MainTabBar = ({
     (key: string) => {
       const hasFinishedTransition =
         visibilityState === true ||
-        (visibilityState as SharedValue<number>)?.value !== 0;
+        Math.round((visibilityState as SharedValue<number>).value) === 1;
 
       if (!hasFinishedTransition) return;
 
