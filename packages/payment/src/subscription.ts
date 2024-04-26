@@ -465,5 +465,7 @@ export const endSubscription = async (userId: string, webCardId: string) => {
           eq(UserSubscriptionTable.userId, userId),
         ),
       );
+
+    return (await getUserSubscriptionForWebCard(userId, webCardId))!;
   }
 };

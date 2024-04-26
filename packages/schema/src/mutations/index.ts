@@ -25,6 +25,7 @@ import {
   createPaymentIntent,
   createPaymentMean,
   createSubscriptionFromPaymentMean,
+  endSubscription,
   estimateSubscriptionCost,
   generatePaymentInvoice,
   updateSubscription,
@@ -110,4 +111,5 @@ export const Mutation: MutationResolvers = {
   generatePaymentInvoice,
   updateSubscription,
   upgradeSubscriptionPlan,
+  endSubscription,
 };

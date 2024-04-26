@@ -7,6 +7,7 @@ import {
   generateInvoice,
   updateExistingSubscription,
   upgradePlan,
+  endSubscription as endExistingSubscription,
 } from '@azzapp/payment';
 import ERRORS from '@azzapp/shared/errors';
 import fromGlobalIdWithType from '#helpers/relayIdHelpers';
@@ -133,3 +134,23 @@ export const upgradeSubscriptionPlan: MutationResolvers['upgradeSubscriptionPlan
 
     return upgradePlan(auth.userId, webCardId);
   };
+
+export const endSubscription: MutationResolvers['endSubscription'] = async (
+  _,
+  { webCardId: gqlWebCardId },
+  { auth },
+) => {
+  if (!auth.userId) {
+    throw new GraphQLError(ERRORS.UNAUTHORIZED);
+  }
+
+  const webCardId = fromGlobalIdWithType(gqlWebCardId, 'WebCard');
+
+  const subscription = await endExistingSubscription(auth.userId, webCardId);
+
+  if (!subscription) {
+    throw new GraphQLError(ERRORS.INTERNAL_SERVER_ERROR);
+  }
+
+  return subscription;
+};

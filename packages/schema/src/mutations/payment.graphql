@@ -27,6 +27,7 @@ extend type Mutation {
   ): String!
   generatePaymentInvoice(webCardId: ID!, paymentId: ID!): String!
   upgradeSubscriptionPlan(webCardId: ID!): UserSubscription!
+  endSubscription(webCardId: ID!): UserSubscription!
 }
 
 enum Interval {
