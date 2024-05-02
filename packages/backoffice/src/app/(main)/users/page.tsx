@@ -1,6 +1,9 @@
 import { asc, desc, like, or, sql, eq, and } from 'drizzle-orm';
 import { UserTable, db, ProfileTable } from '@azzapp/data';
 import UsersList from './UsersList';
+import type { SQLWrapper } from 'drizzle-orm';
+
+export type AccountStatus = 'Active' | 'Suspended';
 
 export type UserTable = {
   id: string;
@@ -10,44 +13,69 @@ export type UserTable = {
   createdAt: Date;
 };
 
+export type Filters = {
+  status?: AccountStatus | 'all';
+};
+
 const sortsColumns = {
   createdAt: UserTable.createdAt,
   email: UserTable.email,
   phoneNumber: UserTable.phoneNumber,
   webcardsCount: sql`webcardsCount`,
+  status: UserTable.deleted,
 };
 
-const getUsers = (
-  page: number,
-  sort: 'createdAt' | 'email' | 'phoneNumber' | 'webcardsCount',
-  order: 'asc' | 'desc',
-  search: string | null,
-) => {
-  let query = db
+const getFilters = (filters: Filters): SQLWrapper[] => {
+  const f: SQLWrapper[] = [];
+  if (filters.status && filters.status !== 'all') {
+    f.push(eq(UserTable.deleted, filters.status === 'Suspended'));
+  }
+
+  return f;
+};
+
+const getSearch = (search: string | null) => {
+  if (search) {
+    return or(
+      like(UserTable.email, `%${search}%`),
+      like(UserTable.phoneNumber, `%${search}%`),
+    );
+  }
+};
+
+const getQuery = (search: string | null, filters: Filters) => {
+  const query = db
     .select({
       id: UserTable.id,
       email: UserTable.email,
       phoneNumber: UserTable.phoneNumber,
       webcardsCount: sql`count(*) as webcardsCount`.mapWith(Number),
       createdAt: UserTable.createdAt,
+      status: UserTable.deleted,
     })
     .from(ProfileTable)
-    .where(eq(ProfileTable.deleted, false))
+    .where(
+      and(
+        eq(ProfileTable.deleted, false),
+        getSearch(search),
+        ...getFilters(filters),
+      ),
+    )
     .groupBy(UserTable.id)
     .innerJoin(UserTable, eq(UserTable.id, ProfileTable.userId))
     .$dynamic();
 
-  if (search) {
-    query = query.where(
-      and(
-        eq(ProfileTable.deleted, false),
-        or(
-          like(UserTable.email, `%${search}%`),
-          like(UserTable.phoneNumber, `%${search}%`),
-        ),
-      ),
-    );
-  }
+  return query;
+};
+const getUsers = (
+  page: number,
+  sort: 'createdAt' | 'email' | 'phoneNumber' | 'webcardsCount',
+  order: 'asc' | 'desc',
+  search: string | null,
+  filters: Filters,
+) => {
+  const query = getQuery(search, filters);
+
   query
     .offset(page * PAGE_SIZE)
     .limit(PAGE_SIZE)
@@ -58,20 +86,12 @@ const getUsers = (
   return query;
 };
 
-const getUsersCount = async (search: string | null) => {
-  let query = db
+const getCount = async (search: string | null, filters: Filters) => {
+  const subQuery = getQuery(search, filters);
+  const query = db
     .select({ count: sql`count(*)`.mapWith(Number) })
-    .from(UserTable)
-    .$dynamic();
+    .from(subQuery.as('Subquery'));
 
-  if (search) {
-    query = query.where(
-      or(
-        like(UserTable.email, `%${search}%`),
-        like(UserTable.phoneNumber, `%${search}%`),
-      ),
-    );
-  }
   return query.then(rows => rows[0].count);
 };
 
@@ -81,6 +101,7 @@ type UsersPageProps = {
     sort?: string;
     order?: string;
     s?: string;
+    status?: string;
   };
 };
 
@@ -94,8 +115,11 @@ const UsersPage = async ({ searchParams = {} }: UsersPageProps) => {
 
   const order = searchParams.order === 'asc' ? 'asc' : 'desc';
   const search = searchParams.s ?? null;
-  const users = await getUsers(page - 1, sort, order, search);
-  const count = await getUsersCount(search);
+  const filters: Filters = {
+    status: (searchParams.status as AccountStatus) || 'all',
+  };
+  const users = await getUsers(page - 1, sort, order, search, filters);
+  const count = await getCount(search, filters);
 
   return (
     <UsersList
@@ -106,6 +130,7 @@ const UsersPage = async ({ searchParams = {} }: UsersPageProps) => {
       sortField={sort}
       sortOrder={order}
       search={search}
+      filters={filters}
     />
   );
 };

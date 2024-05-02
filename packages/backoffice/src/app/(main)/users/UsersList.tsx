@@ -1,6 +1,16 @@
 'use client';
 import { Search } from '@mui/icons-material';
-import { Box, InputAdornment, TextField, Typography } from '@mui/material';
+import {
+  Box,
+  Chip,
+  FormControl,
+  InputAdornment,
+  InputLabel,
+  MenuItem,
+  Select,
+  TextField,
+  Typography,
+} from '@mui/material';
 import { useRouter } from 'next/navigation';
 import {
   useCallback,
@@ -10,7 +20,8 @@ import {
   useTransition,
 } from 'react';
 import DataGrid from '#components/DataGrid';
-import type { UserTable } from './page';
+import type { AccountStatus, Filters, UserTable } from './page';
+import type { SelectChangeEvent } from '@mui/material';
 import type {
   GridColDef,
   GridPaginationModel,
@@ -25,6 +36,7 @@ type UsersListProps = {
   sortField: 'createdAt' | 'email' | 'phoneNumber' | 'webcardsCount';
   sortOrder: 'asc' | 'desc';
   search: string | null;
+  filters: Filters;
 };
 
 const UsersList = ({
@@ -35,38 +47,76 @@ const UsersList = ({
   sortField,
   sortOrder,
   search,
+  filters,
 }: UsersListProps) => {
   const router = useRouter();
   const [loading, startTransition] = useTransition();
+  const [currentSearch, setCurrentSearch] = useState(search ?? '');
+  const [statusFilter, setStatusFilter] = useState(filters.status);
+  const defferedSearch = useDeferredValue(currentSearch);
+
   const updateSearchParams = useCallback(
-    (page: number, sort: string, order: string, search: string | null) => {
+    (
+      page: number,
+      sort: string,
+      order: string,
+      search: string | null,
+      filters: Filters,
+    ) => {
       startTransition(() => {
         router.replace(
-          `/users?page=${page}&sort=${sort}&order=${order}&s=${search ?? ''}`,
+          `/users?page=${page}&sort=${sort}&order=${order}&s=${search ?? ''}&status=${filters?.status ?? ''}`,
         );
       });
     },
     [router, startTransition],
   );
 
-  const onPageChange = (model: GridPaginationModel) => {
-    updateSearchParams(model.page + 1, sortField, sortOrder, search);
-  };
+  const onPageChange = useCallback(
+    (model: GridPaginationModel) => {
+      updateSearchParams(model.page + 1, sortField, sortOrder, search, {
+        status: statusFilter,
+      });
+    },
+    [search, sortField, sortOrder, statusFilter, updateSearchParams],
+  );
 
-  const onSortModelChange = (model: GridSortModel) => {
-    updateSearchParams(page, model[0].field, model[0].sort ?? 'asc', search);
-  };
+  const onSortModelChange = useCallback(
+    (model: GridSortModel) => {
+      updateSearchParams(page, model[0].field, model[0].sort ?? 'asc', search, {
+        status: statusFilter,
+      });
+    },
+    [page, search, statusFilter, updateSearchParams],
+  );
 
-  const [currentSearch, setCurrentSearch] = useState(search ?? '');
-
-  const defferedSearch = useDeferredValue(currentSearch);
+  const onStatusChange = useCallback(
+    (event: SelectChangeEvent) => {
+      const newStatus = event.target.value as AccountStatus;
+      setStatusFilter(newStatus);
+      updateSearchParams(1, sortField, sortOrder, search, {
+        status: newStatus,
+      });
+    },
+    [search, sortField, sortOrder, updateSearchParams],
+  );
 
   useEffect(() => {
     if (search === defferedSearch) {
       return;
     }
-    updateSearchParams(1, sortField, sortOrder, defferedSearch);
-  }, [defferedSearch, page, search, sortField, sortOrder, updateSearchParams]);
+    updateSearchParams(1, sortField, sortOrder, defferedSearch, {
+      status: statusFilter,
+    });
+  }, [
+    defferedSearch,
+    page,
+    search,
+    sortField,
+    sortOrder,
+    statusFilter,
+    updateSearchParams,
+  ]);
 
   return (
     <Box
@@ -79,22 +129,38 @@ const UsersList = ({
       <Typography variant="h4" component="h1" sx={{ mb: 2 }}>
         Users
       </Typography>
-      <TextField
-        margin="normal"
-        name="search"
-        label="Search"
-        type="text"
-        onChange={e => setCurrentSearch(e.target.value)}
-        value={currentSearch}
-        sx={{ mb: 2, width: 500 }}
-        InputProps={{
-          startAdornment: (
-            <InputAdornment position="start">
-              <Search />
-            </InputAdornment>
-          ),
-        }}
-      />
+      <Box display="flex" gap={2} alignItems="center">
+        <TextField
+          margin="normal"
+          name="search"
+          label="Search"
+          type="text"
+          onChange={e => setCurrentSearch(e.target.value)}
+          value={currentSearch}
+          sx={{ mb: 2, width: 500 }}
+          InputProps={{
+            startAdornment: (
+              <InputAdornment position="start">
+                <Search />
+              </InputAdornment>
+            ),
+          }}
+        />
+        <FormControl sx={{ width: 130 }}>
+          <InputLabel id="status">Status</InputLabel>
+          <Select
+            labelId="status"
+            id="status"
+            value={statusFilter}
+            label="Status"
+            onChange={onStatusChange}
+          >
+            <MenuItem value={'all'}>All</MenuItem>
+            <MenuItem value={'Active'}>Active</MenuItem>
+            <MenuItem value={'Suspended'}>Suspended</MenuItem>
+          </Select>
+        </FormControl>
+      </Box>
 
       <DataGrid
         columns={columns}
@@ -144,6 +210,17 @@ const columns: GridColDef[] = [
     headerName: 'Phone number',
     flex: 1,
     valueFormatter: params => params.value || '-',
+  },
+  {
+    field: 'status',
+    headerName: 'Account Status',
+    flex: 1,
+    renderCell: params => (
+      <Chip
+        color={params.value ? 'warning' : 'default'}
+        label={params.value ? 'Suspended' : 'Active'}
+      />
+    ),
   },
   { field: 'webcardsCount', headerName: 'WebCards', width: 150 },
   {
