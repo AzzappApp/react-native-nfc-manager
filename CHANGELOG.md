@@ -1,4 +1,4 @@
-## 0.5.5-canary.277
+## 0.5.5-canary.278
 
 * **docs:**  - update package description
 * **fix:**  - missing permission on endSubscription
