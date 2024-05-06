@@ -3,7 +3,7 @@
     "relation": ["delegate_permission/common.handle_all_urls"],
     "target": {
       "namespace": "android_app",
-      "package_name": "com.azzapp.app-dev",
+      "package_name": "com.azzapp.app_dev",
       "sha256_cert_fingerprints": [
         "52:8E:67:D7:3F:62:5B:2D:96:BD:57:A5:89:C0:8A:27:49:6B:CD:EE:45:80:3A:0C:9F:5B:2A:55:69:E0:6B:8D"
       ]
@@ -13,7 +13,7 @@
     "relation": ["delegate_permission/common.handle_all_urls"],
     "target": {
       "namespace": "android_app",
-      "package_name": "com.azzapp.app-staging",
+      "package_name": "com.azzapp.app_staging",
       "sha256_cert_fingerprints": [
         "52:8E:67:D7:3F:62:5B:2D:96:BD:57:A5:89:C0:8A:27:49:6B:CD:EE:45:80:3A:0C:9F:5B:2A:55:69:E0:6B:8D"
       ]

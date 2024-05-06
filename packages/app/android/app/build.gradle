@@ -95,11 +95,11 @@ android {
         }
         staging {
             dimension "env"
-            applicationId 'com.azzapp.app-staging'
+            applicationId 'com.azzapp.app_staging'
         }
         development {
             dimension "env"
-            applicationId 'com.azzapp.app-dev'
+            applicationId 'com.azzapp.app_dev'
         }
     }
     signingConfigs {
