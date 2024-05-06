@@ -1,5 +1,6 @@
-## 0.5.5-canary.281
+## 0.5.5-canary.282
 
+* **build:**  - fix android package name
 * **build:**  - update apple account
 * **fix:**  - **routing:** [#3340](https://github.com/AzzappApp/azzapp/pull/3340) try to narrow value to get it working for both ios and android ([#3376](https://github.com/AzzappApp/azzapp/pull/3376))
 * **feat:**  - return subscription plans ([#3375](https://github.com/AzzappApp/azzapp/pull/3375))
