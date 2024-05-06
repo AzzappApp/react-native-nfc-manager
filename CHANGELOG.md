@@ -1,5 +1,6 @@
-## 0.5.5-canary.278
+## 0.5.5-canary.279
 
+* **feat:**  - return subscription plans ([#3375](https://github.com/AzzappApp/azzapp/pull/3375))
 * **docs:**  - update package description
 * **fix:**  - missing permission on endSubscription
 * **fix:**  - **webCard:** [#3166](https://github.com/AzzappApp/azzapp/pull/3166) wrong link on web ([#3350](https://github.com/AzzappApp/azzapp/pull/3350))
