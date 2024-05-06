@@ -4,9 +4,9 @@
     "details": [
       {
         "appIDs": [
-          "N349L99RA9.com.azzapp.azzapp",
-          "N349L99RA9.com.azzapp.azzapp-dev",
-          "N349L99RA9.com.azzapp.azzapp-staging"
+          "66D3U3GLN6.com.azzapp.app",
+          "66D3U3GLN6.com.azzapp.app-dev",
+          "66D3U3GLN6.com.azzapp.app-staging"
         ],
         "components": [
           {
@@ -32,9 +32,9 @@
   },
   "webcredentials": {
     "apps": [
-      "N349L99RA9.com.azzapp.azzapp",
-      "N349L99RA9.com.azzapp.azzapp-dev",
-      "N349L99RA9.com.azzapp.azzapp-staging"
+      "66D3U3GLN6.com.azzapp.app",
+      "66D3U3GLN6.com.azzapp.app-dev",
+      "66D3U3GLN6.com.azzapp.app-staging"
     ]
   }
 }

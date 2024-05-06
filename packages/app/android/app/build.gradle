@@ -91,15 +91,15 @@ android {
     productFlavors {
         production {
             dimension "env"
-            applicationId 'com.azzapp.azzapp'
+            applicationId 'com.azzapp.app'
         }
         staging {
             dimension "env"
-            applicationId 'com.azzapp.azzapp_staging'
+            applicationId 'com.azzapp.app-staging'
         }
         development {
             dimension "env"
-            applicationId 'com.azzapp.azzapp_dev'
+            applicationId 'com.azzapp.app-dev'
         }
     }
     signingConfigs {

@@ -8,6 +8,6 @@
     }
   },
   "ios": {
-    "bundleIdentifier": "com.azzapp.azzapp"
+    "bundleIdentifier": "com.azzapp.app"
   }
 }

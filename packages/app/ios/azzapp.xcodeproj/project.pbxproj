@@ -1457,7 +1457,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = N349L99RA9;
+				DEVELOPMENT_TEAM = 66D3U3GLN6;
 				DISPLAY_NAME = Azzapp;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = azzapp/Info.plist;
@@ -1473,7 +1473,7 @@
 					"-lc++",
 				);
 				OTHER_SWIFT_FLAGS = "$(inherited) -D EXPO_CONFIGURATION_DEBUG";
-				PRODUCT_BUNDLE_IDENTIFIER = com.azzapp.azzapp;
+				PRODUCT_BUNDLE_IDENTIFIER = com.azzapp.app;
 				PRODUCT_NAME = azzapp;
 				SWIFT_OBJC_BRIDGING_HEADER = "azzapp-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
@@ -1490,7 +1490,7 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = azzapp/azzappRelease.entitlements;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = N349L99RA9;
+				DEVELOPMENT_TEAM = 66D3U3GLN6;
 				DISPLAY_NAME = Azzapp;
 				INFOPLIST_FILE = azzapp/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
@@ -1505,7 +1505,7 @@
 					"-lc++",
 				);
 				OTHER_SWIFT_FLAGS = "$(inherited) -D EXPO_CONFIGURATION_RELEASE";
-				PRODUCT_BUNDLE_IDENTIFIER = com.azzapp.azzapp;
+				PRODUCT_BUNDLE_IDENTIFIER = com.azzapp.app;
 				PRODUCT_NAME = azzapp;
 				SWIFT_OBJC_BRIDGING_HEADER = "azzapp-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
@@ -1669,7 +1669,7 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = "azzapp-devDebug.entitlements";
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = N349L99RA9;
+				DEVELOPMENT_TEAM = 66D3U3GLN6;
 				DISPLAY_NAME = "Azzapp - Dev";
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = azzapp/Info.plist;
@@ -1685,7 +1685,7 @@
 					"-lc++",
 				);
 				OTHER_SWIFT_FLAGS = "$(inherited) -D EXPO_CONFIGURATION_DEBUG";
-				PRODUCT_BUNDLE_IDENTIFIER = "com.azzapp.azzapp-dev";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.azzapp.app-dev";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "azzapp-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
@@ -1702,7 +1702,7 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = "azzapp-devRelease.entitlements";
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = N349L99RA9;
+				DEVELOPMENT_TEAM = 66D3U3GLN6;
 				DISPLAY_NAME = "Azzapp - Dev";
 				INFOPLIST_FILE = azzapp/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
@@ -1717,7 +1717,7 @@
 					"-lc++",
 				);
 				OTHER_SWIFT_FLAGS = "$(inherited) -D EXPO_CONFIGURATION_RELEASE";
-				PRODUCT_BUNDLE_IDENTIFIER = "com.azzapp.azzapp-dev";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.azzapp.app-dev";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "azzapp-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
@@ -1733,7 +1733,7 @@
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CLANG_ENABLE_MODULES = YES;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = N349L99RA9;
+				DEVELOPMENT_TEAM = 66D3U3GLN6;
 				DISPLAY_NAME = "Azzapp - Staging";
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = azzapp/Info.plist;
@@ -1749,7 +1749,7 @@
 					"-lc++",
 				);
 				OTHER_SWIFT_FLAGS = "$(inherited) -D EXPO_CONFIGURATION_DEBUG";
-				PRODUCT_BUNDLE_IDENTIFIER = "com.azzapp.azzapp-staging";
+				PRODUCT_BUNDLE_IDENTIFIER = com.azzapp.app-staging;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "azzapp-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
@@ -1767,7 +1767,7 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = "azzapp-stagingRelease.entitlements";
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = N349L99RA9;
+				DEVELOPMENT_TEAM = 66D3U3GLN6;
 				DISPLAY_NAME = "Azzapp - Staging";
 				INFOPLIST_FILE = azzapp/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
@@ -1782,7 +1782,7 @@
 					"-lc++",
 				);
 				OTHER_SWIFT_FLAGS = "$(inherited) -D EXPO_CONFIGURATION_RELEASE";
-				PRODUCT_BUNDLE_IDENTIFIER = "com.azzapp.azzapp-staging";
+				PRODUCT_BUNDLE_IDENTIFIER = com.azzapp.app-staging;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "azzapp-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
