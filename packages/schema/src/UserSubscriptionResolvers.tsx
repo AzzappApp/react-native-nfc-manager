@@ -12,4 +12,16 @@ export const UserSubscription: UserSubscriptionResolvers = {
     const totalUsed = await getTotalMultiUser(auth.userId);
     return userSubscription.totalSeats - totalUsed;
   },
+  subscriptionPlan: async (userSubscription, _args) => {
+    switch (userSubscription.subscriptionPlan) {
+      case 'web.lifetime':
+        return 'LIFETIME';
+      case 'web.monthly':
+        return 'MONTHLY';
+      case 'web.yearly':
+        return 'YEARLY';
+      default:
+        return null;
+    }
+  },
 };

@@ -27,4 +27,23 @@ type UserSubscription {
   Return the amount of the subscription (in cents)
   """
   taxes: Int
+  """
+  Return the subscription plan
+  """
+  subscriptionPlan: SubscriptionPlan
+}
+
+enum SubscriptionPlan {
+  """
+  The subscription plan is monthly
+  """
+  MONTHLY
+  """
+  The subscription plan is yearly
+  """
+  YEARLY
+  """
+  The subscription plan is lifetime
+  """
+  LIFETIME
 }
