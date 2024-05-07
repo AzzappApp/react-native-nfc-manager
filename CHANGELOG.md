@@ -1,5 +1,8 @@
-## 0.5.5-canary.283
+## 0.5.5-canary.284
 
+* **build:**  - remove `yarn global`
+* **build:**  - try to install globally after
+* **build:**  - upgrade to yarn v3 ([#3380](https://github.com/AzzappApp/azzapp/pull/3380))
 * **build:**  - update dep to use cross-fetch as requested ([#3378](https://github.com/AzzappApp/azzapp/pull/3378))
 * **build:**  - fix android package name
 * **build:**  - update apple account
