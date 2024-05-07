@@ -1,5 +1,6 @@
-## 0.5.5-canary.285
+## 0.5.5-canary.286
 
+* **build:**  - don’t update dependencies
 * **build:**  - use workspace versions
 * **build:**  - remove `yarn global`
 * **build:**  - try to install globally after
