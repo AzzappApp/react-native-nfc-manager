@@ -29,8 +29,12 @@
   "dependencies": {
     "@azzapp/data": "0.5.5-canary.283",
     "@azzapp/shared": "0.5.5-canary.283",
-    "openapi-fetch": "^0.9.3",
-    "dayjs": "^1.11.10",
-    "@mlecoq/sales-tax": "2.14.1"
+    "@mlecoq/sales-tax": "2.14.1",
+    "dayjs": "^1.11.11",
+    "openapi-fetch": "^0.9.5"
+  },
+  "devDependencies": {
+    "@babel/cli": "7.24.5",
+    "typescript": "^5.4.5"
   }
 }

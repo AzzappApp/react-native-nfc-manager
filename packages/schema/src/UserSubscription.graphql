@@ -37,13 +37,13 @@ enum SubscriptionPlan {
   """
   The subscription plan is monthly
   """
-  MONTHLY
+  monthly
   """
   The subscription plan is yearly
   """
-  YEARLY
+  yearly
   """
   The subscription plan is lifetime
   """
-  LIFETIME
+  lifetime
 }

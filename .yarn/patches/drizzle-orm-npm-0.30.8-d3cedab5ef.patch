@@ -1,7 +1,7 @@
-diff --git a/node_modules/drizzle-orm/mysql-core/indexes.cjs b/node_modules/drizzle-orm/mysql-core/indexes.cjs
-index bef9aff..9a0e598 100644
---- a/node_modules/drizzle-orm/mysql-core/indexes.cjs
-+++ b/node_modules/drizzle-orm/mysql-core/indexes.cjs
+diff --git a/mysql-core/indexes.cjs b/mysql-core/indexes.cjs
+index bef9affe0cd24797e8c2256b5c42a712bbdde992..9a0e598756c267b6a4bbb7615b71806bfd2d5c73 100644
+--- a/mysql-core/indexes.cjs
++++ b/mysql-core/indexes.cjs
 @@ -22,29 +22,32 @@ __export(indexes_exports, {
    IndexBuilder: () => IndexBuilder,
    IndexBuilderOn: () => IndexBuilderOn,
@@ -59,20 +59,20 @@ index bef9aff..9a0e598 100644
  });
  //# sourceMappingURL=indexes.cjs.map
 \ No newline at end of file
-diff --git a/node_modules/drizzle-orm/mysql-core/indexes.d.ts b/node_modules/drizzle-orm/mysql-core/indexes.d.ts
-index 987a8e0..9069437 100644
---- a/node_modules/drizzle-orm/mysql-core/indexes.d.ts
-+++ b/node_modules/drizzle-orm/mysql-core/indexes.d.ts
+diff --git a/mysql-core/indexes.d.ts b/mysql-core/indexes.d.ts
+index 987a8e012dac2ee79a0bffb462d9d272f598bd4e..906943721d419d76ed5dc4e77694cce827664c38 100644
+--- a/mysql-core/indexes.d.ts
++++ b/mysql-core/indexes.d.ts
 @@ -56,4 +56,5 @@ export type GetColumnsTableName<TColumns> = TColumns extends AnyMySqlColumn<{
  }>[] ? TTableName : never;
  export declare function index(name: string): IndexBuilderOn;
  export declare function uniqueIndex(name: string): IndexBuilderOn;
 +export declare function fulltextIndex(name: string): IndexBuilderOn;
  export {};
-diff --git a/node_modules/drizzle-orm/mysql-core/indexes.js b/node_modules/drizzle-orm/mysql-core/indexes.js
-index 18df3c9..2a689b4 100644
---- a/node_modules/drizzle-orm/mysql-core/indexes.js
-+++ b/node_modules/drizzle-orm/mysql-core/indexes.js
+diff --git a/mysql-core/indexes.js b/mysql-core/indexes.js
+index 18df3c9bad73d60a766b0ea2d7800a504ba5c074..b7049cb739c43e338335e42953d630b8ec70c1a8 100644
+--- a/mysql-core/indexes.js
++++ b/mysql-core/indexes.js
 @@ -1,23 +1,25 @@
  import { entityKind } from "../entity.js";
  class IndexBuilderOn {
@@ -99,7 +99,7 @@ index 18df3c9..2a689b4 100644
        columns,
 -      unique
 +      unique,
-+      fulltext,
++      fulltext
      };
    }
    using(using) {
@@ -117,14 +117,14 @@ index 18df3c9..2a689b4 100644
    index,
 -  uniqueIndex
 +  uniqueIndex,
-+  fulltextIndex,
++  fulltextIndex
  };
  //# sourceMappingURL=indexes.js.map
 \ No newline at end of file
-diff --git a/node_modules/drizzle-orm/mysql-core/primary-keys.cjs b/node_modules/drizzle-orm/mysql-core/primary-keys.cjs
-index 2da5d87..9a9e7fc 100644
---- a/node_modules/drizzle-orm/mysql-core/primary-keys.cjs
-+++ b/node_modules/drizzle-orm/mysql-core/primary-keys.cjs
+diff --git a/mysql-core/primary-keys.cjs b/mysql-core/primary-keys.cjs
+index 2da5d8735961ca8fe78a0e4453f0a6c37382a719..9a9e7fc701567aeb8ad334bd9570a5017596050b 100644
+--- a/mysql-core/primary-keys.cjs
++++ b/mysql-core/primary-keys.cjs
 @@ -56,7 +56,7 @@ class PrimaryKey {
    columns;
    name;

@@ -17,14 +17,15 @@ jobs:
       PAYMENT_API_URL: ${{ vars.PAYMENT_API_URL }}
     steps:
       - uses: actions/checkout@v3
-
+      - name: Enable Corepack
+        run: corepack enable
       - uses: actions/setup-node@v3
         with:
           node-version: '20'
           
       - name: Get yarn cache directory path
         id: yarn-cache-dir-path
-        run: echo "::set-output name=dir::$(yarn cache dir)"    
+        run: echo "::set-output name=dir::$(yarn config get cacheFolder)"    
         
       - name: Cache yarn
         uses: actions/cache@v3
@@ -36,7 +37,7 @@ jobs:
             ${{ runner.os }}-yarn-
 
       - name: Install dependencies
-        run: yarn install --frozen-lockfile  --immutable
+        run: yarn install --immutable
   
 
       # Testing

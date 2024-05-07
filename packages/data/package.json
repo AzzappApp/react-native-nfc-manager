@@ -33,18 +33,20 @@
   "dependencies": {
     "@azzapp/shared": "0.5.5-canary.283",
     "@paralleldrive/cuid2": "^2.2.2",
-    "@planetscale/database": "^1.16.0",
+    "@planetscale/database": "^1.18.0",
     "drizzle-orm": "^0.30.8",
     "lodash": "^4.17.21",
-    "zod": "^3.23.3"
+    "zod": "^3.23.6"
   },
   "devDependencies": {
-    "better-sqlite3": "^9.5.0",
-    "@types/better-sqlite3": "7.6.9",
-    "@types/lodash": "4.17.0",
+    "@babel/cli": "7.24.5",
+    "@types/better-sqlite3": "7.6.10",
+    "@types/lodash": "4.17.1",
     "@types/node-fetch": "2.6.11",
+    "better-sqlite3": "^9.6.0",
     "drizzle-kit": "0.20.14",
+    "mysql2": "^3.9.7",
     "node-fetch": "^3",
-    "mysql2": "^3.9.6"
+    "typescript": "^5.4.5"
   }
 }

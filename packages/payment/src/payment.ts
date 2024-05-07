@@ -66,7 +66,7 @@ export const createPaymentRequest = async ({
   userId,
   webCardId,
   locale,
-  interval,
+  plan,
   customer,
   redirectUrl,
 }: {
@@ -74,14 +74,14 @@ export const createPaymentRequest = async ({
   userId: string;
   webCardId: string;
   locale: string;
-  interval: 'monthly' | 'yearly';
+  plan: 'monthly' | 'yearly';
   redirectUrl: string;
   customer: Customer;
 }) => {
   const ORDERID = createId();
   const TRANSACTION_HASH = createId();
 
-  const subscriptionPlan: SubscriptionPlan = `web.${interval}`;
+  const subscriptionPlan: SubscriptionPlan = `web.${plan}`;
 
   const amount = calculateAmount(totalSeats, subscriptionPlan);
 
@@ -112,7 +112,7 @@ export const createPaymentRequest = async ({
         IDENTIFIER,
         ORDERID,
         VERSION: '3.0',
-        DESCRIPTION: `Payment for ${interval} subscription`,
+        DESCRIPTION: `Payment for ${plan} subscription`,
         CLIENTIDENT: userId,
         CLIENTEMAIL: customer.email,
         CARDFULLNAME: customer.name,
@@ -207,17 +207,17 @@ export const createSubscriptionRequest = async ({
   totalSeats,
   userId,
   webCardId,
-  interval,
+  plan,
   customer,
 }: {
   paymentMeanId: string;
   totalSeats: number;
   userId: string;
   webCardId: string;
-  interval: 'monthly' | 'yearly';
+  plan: 'monthly' | 'yearly';
   customer: Customer;
 }) => {
-  const subscriptionPlan: SubscriptionPlan = `web.${interval}`;
+  const subscriptionPlan: SubscriptionPlan = `web.${plan}`;
 
   const amount = calculateAmount(totalSeats, subscriptionPlan);
 

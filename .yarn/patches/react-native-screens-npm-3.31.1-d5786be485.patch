@@ -1,7 +1,7 @@
-diff --git a/node_modules/react-native-screens/ios/RNSConvert.mm b/node_modules/react-native-screens/ios/RNSConvert.mm
-index 650da91..6b61b4e 100644
---- a/node_modules/react-native-screens/ios/RNSConvert.mm
-+++ b/node_modules/react-native-screens/ios/RNSConvert.mm
+diff --git a/ios/RNSConvert.mm b/ios/RNSConvert.mm
+index 650da916318585ba588e7108bafae118d78a5e23..6b61b4ea115805157b9cb8d9602acadc03a2f354 100644
+--- a/ios/RNSConvert.mm
++++ b/ios/RNSConvert.mm
 @@ -46,6 +46,8 @@ + (RNSScreenStackAnimation)RNSScreenStackAnimationFromCppEquivalent:(react::RNSS
        return RNSScreenStackAnimationSlideFromBottom;
      case react::RNSScreenStackAnimation::Fade_from_bottom:
@@ -11,10 +11,10 @@ index 650da91..6b61b4e 100644
    }
  }
  
-diff --git a/node_modules/react-native-screens/ios/RNSEnums.h b/node_modules/react-native-screens/ios/RNSEnums.h
-index ff2560b..de63719 100644
---- a/node_modules/react-native-screens/ios/RNSEnums.h
-+++ b/node_modules/react-native-screens/ios/RNSEnums.h
+diff --git a/ios/RNSEnums.h b/ios/RNSEnums.h
+index ff2560b3a31eac74b4f5f41bab274416360b4975..de6371983b6687e2af066b66a5a3e9e244885538 100644
+--- a/ios/RNSEnums.h
++++ b/ios/RNSEnums.h
 @@ -17,6 +17,7 @@ typedef NS_ENUM(NSInteger, RNSScreenStackAnimation) {
    RNSScreenStackAnimationSlideFromBottom,
    RNSScreenStackAnimationSimplePush,
@@ -23,11 +23,11 @@ index ff2560b..de63719 100644
  };
  
  typedef NS_ENUM(NSInteger, RNSScreenReplaceAnimation) {
-diff --git a/node_modules/react-native-screens/ios/RNSScreen.h b/node_modules/react-native-screens/ios/RNSScreen.h
-index 073cdfa..69b2b87 100644
---- a/node_modules/react-native-screens/ios/RNSScreen.h
-+++ b/node_modules/react-native-screens/ios/RNSScreen.h
-@@ -64,6 +64,7 @@ namespace react = facebook::react;
+diff --git a/ios/RNSScreen.h b/ios/RNSScreen.h
+index bbdedcdb9a4579377545cf011fa8f5d87d0ec05f..b582d4fa34a91f0303d358b938d71e43f5961607 100644
+--- a/ios/RNSScreen.h
++++ b/ios/RNSScreen.h
+@@ -63,6 +63,7 @@ namespace react = facebook::react;
  @property (nonatomic) BOOL hasHomeIndicatorHiddenSet;
  @property (nonatomic) BOOL hasOrientationSet;
  @property (nonatomic) RNSScreenStackAnimation stackAnimation;
@@ -35,11 +35,11 @@ index 073cdfa..69b2b87 100644
  @property (nonatomic) RNSScreenStackPresentation stackPresentation;
  @property (nonatomic) RNSScreenSwipeDirection swipeDirection;
  @property (nonatomic) RNSScreenReplaceAnimation replaceAnimation;
-diff --git a/node_modules/react-native-screens/ios/RNSScreen.mm b/node_modules/react-native-screens/ios/RNSScreen.mm
-index f9b87c3..a8b2593 100644
---- a/node_modules/react-native-screens/ios/RNSScreen.mm
-+++ b/node_modules/react-native-screens/ios/RNSScreen.mm
-@@ -200,6 +200,7 @@ - (void)setStackAnimation:(RNSScreenStackAnimation)stackAnimation
+diff --git a/ios/RNSScreen.mm b/ios/RNSScreen.mm
+index ac6479feaf95a84682cb5048c6fa9e9c1dbd7f38..75df2c1883aba12909a9f0b727ff6f1cfdf29aab 100644
+--- a/ios/RNSScreen.mm
++++ b/ios/RNSScreen.mm
+@@ -198,6 +198,7 @@ - (void)setStackAnimation:(RNSScreenStackAnimation)stackAnimation
      case RNSScreenStackAnimationSlideFromBottom:
      case RNSScreenStackAnimationFadeFromBottom:
      case RNSScreenStackAnimationSlideFromLeft:
@@ -47,15 +47,15 @@ index f9b87c3..a8b2593 100644
        // Default
        break;
    }
-@@ -1478,6 +1479,7 @@ @implementation RNSScreenManager
+@@ -1432,6 +1433,7 @@ @implementation RNSScreenManager
+ RCT_EXPORT_VIEW_PROPERTY(preventNativeDismiss, BOOL)
  RCT_EXPORT_VIEW_PROPERTY(replaceAnimation, RNSScreenReplaceAnimation)
  RCT_EXPORT_VIEW_PROPERTY(stackPresentation, RNSScreenStackPresentation)
++RCT_EXPORT_VIEW_PROPERTY(stackAnimationOptions, NSDictionary)
  RCT_EXPORT_VIEW_PROPERTY(stackAnimation, RNSScreenStackAnimation)
-+RCT_EXPORT_VIEW_PROPERTY(stackAnimationOptions, NSDictionary);
  RCT_EXPORT_VIEW_PROPERTY(swipeDirection, RNSScreenSwipeDirection)
  RCT_EXPORT_VIEW_PROPERTY(transitionDuration, NSNumber)
- 
-@@ -1574,6 +1576,7 @@ @implementation RCTConvert (RNSScreen)
+@@ -1529,6 +1531,7 @@ @implementation RCTConvert (RNSScreen)
        @"slide_from_bottom" : @(RNSScreenStackAnimationSlideFromBottom),
        @"slide_from_right" : @(RNSScreenStackAnimationDefault),
        @"slide_from_left" : @(RNSScreenStackAnimationSlideFromLeft),
@@ -63,10 +63,10 @@ index f9b87c3..a8b2593 100644
        @"ios" : @(RNSScreenStackAnimationDefault),
      }),
      RNSScreenStackAnimationDefault,
-diff --git a/node_modules/react-native-screens/ios/RNSScreenStackAnimator.h b/node_modules/react-native-screens/ios/RNSScreenStackAnimator.h
-index f96eae7..415b0d1 100644
---- a/node_modules/react-native-screens/ios/RNSScreenStackAnimator.h
-+++ b/node_modules/react-native-screens/ios/RNSScreenStackAnimator.h
+diff --git a/ios/RNSScreenStackAnimator.h b/ios/RNSScreenStackAnimator.h
+index f96eae77566c46367b3d8323669d2295f85f3dbf..415b0d1a471e208c21cba5ea6e0043d9f2452b1c 100644
+--- a/ios/RNSScreenStackAnimator.h
++++ b/ios/RNSScreenStackAnimator.h
 @@ -1,8 +1,20 @@
  #import "RNSScreen.h"
  
@@ -88,23 +88,24 @@ index f96eae7..415b0d1 100644
 ++ (void)registerCustomAnimator:(id<RNSScreenCustomStackAnimator>)animator forName:(NSString *)name;
  
  @end
-diff --git a/node_modules/react-native-screens/ios/RNSScreenStackAnimator.mm b/node_modules/react-native-screens/ios/RNSScreenStackAnimator.mm
-index e31d20d..3778863 100644
---- a/node_modules/react-native-screens/ios/RNSScreenStackAnimator.mm
-+++ b/node_modules/react-native-screens/ios/RNSScreenStackAnimator.mm
-@@ -400,9 +400,53 @@ - (void)animateTransitionWithStackAnimation:(RNSScreenStackAnimation)animation
+diff --git a/ios/RNSScreenStackAnimator.mm b/ios/RNSScreenStackAnimator.mm
+index e31d20d4eaa6aa4627cc95e1d0e83c90ab460620..e1eeb903855f3170ea5c8446689eb09f9993f6e0 100644
+--- a/ios/RNSScreenStackAnimator.mm
++++ b/ios/RNSScreenStackAnimator.mm
+@@ -400,9 +400,56 @@ - (void)animateTransitionWithStackAnimation:(RNSScreenStackAnimation)animation
    } else if (animation == RNSScreenStackAnimationFadeFromBottom) {
      [self animateFadeFromBottomWithTransitionContext:transitionContext toVC:toVC fromVC:fromVC];
      return;
--  }
 +  } else if (animation == RNSScreenStackAnimationCustom) {
 +    [self animateCustomWithTransitionContext:transitionContext toVC:toVC fromVC:fromVC];
 +    return;
-+   }
+   }
++
    // simple_push is the default custom animation
    [self animateSimplePushWithTransitionContext:transitionContext toVC:toVC fromVC:fromVC];
  }
  
++
 +static NSMutableDictionary<NSString *, id<RNSScreenCustomStackAnimator>> *customAnimators;
 ++ (void)registerCustomAnimator:(id<RNSScreenCustomStackAnimator>)animator forName:(NSString *)name {
 +  if (customAnimators == nil) {
@@ -146,11 +147,12 @@ index e31d20d..3778863 100644
 +                                   withOptions:options];
 +}
 +
++
  @end
-diff --git a/node_modules/react-native-screens/lib/typescript/fabric/ScreenNativeComponent.d.ts b/node_modules/react-native-screens/lib/typescript/fabric/ScreenNativeComponent.d.ts
-index e60971c..a2f692d 100644
---- a/node_modules/react-native-screens/lib/typescript/fabric/ScreenNativeComponent.d.ts
-+++ b/node_modules/react-native-screens/lib/typescript/fabric/ScreenNativeComponent.d.ts
+diff --git a/lib/typescript/fabric/ScreenNativeComponent.d.ts b/lib/typescript/fabric/ScreenNativeComponent.d.ts
+index b1653f26e3a7ab7a4cd62b839b8de458dd3f7a00..868aaf60e3a03847acaacf463faf7546ce625928 100644
+--- a/lib/typescript/fabric/ScreenNativeComponent.d.ts
++++ b/lib/typescript/fabric/ScreenNativeComponent.d.ts
 @@ -20,7 +20,7 @@ declare type GestureResponseDistanceType = Readonly<{
      bottom: Float;
  }>;
@@ -160,10 +162,10 @@ index e60971c..a2f692d 100644
  declare type SwipeDirection = 'vertical' | 'horizontal';
  declare type ReplaceAnimation = 'pop' | 'push';
  declare type SheetDetentTypes = 'large' | 'medium' | 'all';
-diff --git a/node_modules/react-native-screens/lib/typescript/types.d.ts b/node_modules/react-native-screens/lib/typescript/types.d.ts
-index 42aebb0..ff83e85 100644
---- a/node_modules/react-native-screens/lib/typescript/types.d.ts
-+++ b/node_modules/react-native-screens/lib/typescript/types.d.ts
+diff --git a/lib/typescript/types.d.ts b/lib/typescript/types.d.ts
+index 42aebb0c7e847b924488f9c5904b99511fff3698..ff83e851950df5e579293091d9efff2d02a75491 100644
+--- a/lib/typescript/types.d.ts
++++ b/lib/typescript/types.d.ts
 @@ -10,7 +10,7 @@ export declare type SearchBarCommands = {
      cancelSearch: () => void;
  };

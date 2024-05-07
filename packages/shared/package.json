@@ -19,17 +19,19 @@
     "dev"
   ],
   "dependencies": {
-    "libphonenumber-js": "^1.10.61",
+    "chroma-js": "^2.4.2",
+    "csv42": "5.0.0",
+    "iron-webcrypto": "^1.1.1",
+    "libphonenumber-js": "^1.11.1",
     "lz-string": "^1.5.0",
     "validator": "^13.11.0",
-    "vcard-creator": "^0.7.0",
-    "iron-webcrypto": "^1.1.1",
-    "chroma-js": "^2.4.2",
-    "csv42": "5.0.0"
+    "vcard-creator": "^0.7.0"
   },
   "devDependencies": {
+    "@babel/cli": "7.24.5",
+    "@types/chroma-js": "^2.4.4",
     "@types/relay-runtime": "^14.1.23",
     "@types/validator": "^13.11.9",
-    "@types/chroma-js": "^2.4.4"
+    "typescript": "^5.4.5"
   }
 }

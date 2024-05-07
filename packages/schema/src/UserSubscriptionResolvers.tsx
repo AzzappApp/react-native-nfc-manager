@@ -15,11 +15,11 @@ export const UserSubscription: UserSubscriptionResolvers = {
   subscriptionPlan: async (userSubscription, _args) => {
     switch (userSubscription.subscriptionPlan) {
       case 'web.lifetime':
-        return 'LIFETIME';
+        return 'lifetime';
       case 'web.monthly':
-        return 'MONTHLY';
+        return 'monthly';
       case 'web.yearly':
-        return 'YEARLY';
+        return 'yearly';
       default:
         return null;
     }

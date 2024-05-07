@@ -1,7 +1,7 @@
-diff --git a/node_modules/drizzle-kit/bin.cjs b/node_modules/drizzle-kit/bin.cjs
-index 0edfed8..9fd74bc 100755
---- a/node_modules/drizzle-kit/bin.cjs
-+++ b/node_modules/drizzle-kit/bin.cjs
+diff --git a/bin.cjs b/bin.cjs
+index 0edfed8ed6f8f56c408bedcdf2ec4f139641772f..6fad056a7e8a71cb02b30b6c4493a6d11859363c 100755
+--- a/bin.cjs
++++ b/bin.cjs
 @@ -4564,6 +4564,7 @@ var init_mysqlSchema = __esm({
        name: stringType(),
        columns: stringType().array(),
@@ -106,15 +106,7 @@ index 0edfed8..9fd74bc 100755
            statements.push({
              type: "alter_table_alter_column_set_type",
              tableName,
-@@ -16870,6 +16875,7 @@ var init_jsonStatements = __esm({
-           });
-         }
-         if (((_e = column7.primaryKey) == null ? void 0 : _e.type) === "deleted" || ((_f = column7.primaryKey) == null ? void 0 : _f.type) === "changed" && !column7.primaryKey.new && typeof compositePk === "undefined") {
-+          
-           dropPkStatements.push({
-             ////
-             type: "alter_table_alter_column_drop_pk",
-@@ -16892,7 +16898,7 @@ var init_jsonStatements = __esm({
+@@ -16892,7 +16897,7 @@ var init_jsonStatements = __esm({
              columnPk
            });
          }

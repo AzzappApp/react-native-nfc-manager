@@ -18,6 +18,7 @@ import {
   useRouter,
   type NativeScreenProps,
   useScreenHasFocus,
+  type ScreenOptions,
 } from '#components/NativeRouter';
 import useAuthState from '#hooks/useAuthState';
 import {
@@ -26,7 +27,6 @@ import {
   loadQueryFor,
   useManagedQuery,
 } from './RelayQueryManager';
-import type { ScreenOptions } from '#components/NativeRouter';
 import type { Route } from '#routes';
 import type { LoadQueryOptions } from './RelayQueryManager';
 import type { ScreenPrefetchOptions } from './ScreenPrefetcher';

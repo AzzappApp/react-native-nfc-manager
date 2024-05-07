@@ -138,7 +138,7 @@ dist
 **/__generated__/*
 
 trash
-packages/app/ios/.xcode.env.local
+**/.xcode.env.local
 packages/web/.vscode/settings.json
 schema.graphql
 
@@ -149,3 +149,12 @@ packages/backoffice/.vscode/settings.json
 
 # turbo
 .turbo
+
+
+# Yarn
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/sdks
+!.yarn/versions

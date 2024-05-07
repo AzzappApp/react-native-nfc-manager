@@ -1,7 +1,7 @@
 extend type Mutation {
   estimateSubscriptionCost(
     totalSeats: Int!
-    interval: Interval!
+    plan: PaymentPlan!
     countryCode: String
     vatNumber: String
   ): SubscriptionEstimation!
@@ -30,7 +30,7 @@ extend type Mutation {
   endSubscription(webCardId: ID!): UserSubscription!
 }
 
-enum Interval {
+enum PaymentPlan {
   monthly
   yearly
 }
@@ -38,7 +38,7 @@ enum Interval {
 input PaymentIntentInput {
   totalSeats: Int!
   locale: String!
-  interval: Interval!
+  plan: PaymentPlan!
   customer: Customer!
   redirectUrl: String!
 }
