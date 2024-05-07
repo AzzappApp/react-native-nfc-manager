@@ -9,7 +9,8 @@
     "run:ios": "react-native run-ios --no-packager --scheme azzapp-dev",
     "pod-install": "cd ios && bundle exec pod install",
     "clean": "watchman watch-del-all && rm -Rf node_modules && rm -Rf ios/Pods && rm -Rf ios/build",
-    "eas-build-post-install": "(cd ../.. && yarn build-app-dependencies)"
+    "eas-build-post-install": "(cd ../.. && yarn build-app-dependencies)",
+    "eas-build-pre-install": "corepack enable"
   },
   "devScripts": [
     "rn:watch"
