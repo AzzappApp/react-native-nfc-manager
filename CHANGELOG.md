@@ -1,5 +1,6 @@
-## 0.5.5-canary.293
+## 0.5.5-canary.294
 
+* **build:**  - put back expo-image 1.10.6
 * **build:**  - try with a newer expo-image
 * **build:**  - eas - enable corepack
 * **fix:**  - **webcard:** [#3362](https://github.com/AzzappApp/azzapp/pull/3362) change label ([#3382](https://github.com/AzzappApp/azzapp/pull/3382))

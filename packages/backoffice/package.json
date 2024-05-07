@@ -1,6 +1,6 @@
 {
   "name": "@azzapp/backoffice",
-  "version": "0.5.5-canary.293",
+  "version": "0.5.5-canary.294",
   "private": true,
   "packageManager": "yarn@3.6.4",
   "scripts": {
