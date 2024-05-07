@@ -51,12 +51,12 @@ jobs:
           key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
           restore-keys: |
             ${{ runner.os }}-yarn-
-      
-      - name: Install Vercel CLI
-        run: yarn global add vercel@latest
         
       - name: Install dependencies
         run: yarn install --immutable
+      
+      - name: Install Vercel CLI
+        run: yarn global add vercel@latest
 
       ############################################
       #
