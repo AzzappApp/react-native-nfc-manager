@@ -149,7 +149,7 @@ __metadata:
     expo-contacts: ~12.8.2
     expo-font: ~11.10.3
     expo-haptics: ~12.8.1
-    expo-image: ^1.11.0
+    expo-image: ~1.10.6
     expo-linear-gradient: ~12.7.2
     expo-media-library: ~15.9.2
     expo-sensors: ~12.9.1
@@ -7945,13 +7945,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@react-native/assets-registry@npm:~0.74.83":
-  version: 0.74.83
-  resolution: "@react-native/assets-registry@npm:0.74.83"
-  checksum: 034ff52a5bec8dd7c2b31edb4ca4a09d537f10ec39b9a3a62c7e028a15905760c308d489697f6a40b051797bbe4bd0ac2f1d4ce526820f5f71393b3cf9a9397e
-  languageName: node
-  linkType: hard
-
 "@react-native/babel-plugin-codegen@npm:0.73.4":
   version: 0.73.4
   resolution: "@react-native/babel-plugin-codegen@npm:0.73.4"
@@ -14404,14 +14397,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"expo-image@npm:^1.11.0":
-  version: 1.12.8
-  resolution: "expo-image@npm:1.12.8"
+"expo-image@npm:~1.10.6":
+  version: 1.10.6
+  resolution: "expo-image@npm:1.10.6"
   dependencies:
-    "@react-native/assets-registry": ~0.74.83
+    "@react-native/assets-registry": ~0.73.1
   peerDependencies:
     expo: "*"
-  checksum: 002593352c97381fac7512ec500448d212cae816d0f7d682b84d6c493dd98861834b48686be361dbb2194536e34736e63579ed3ac22dfc37d1d9ff07fc712a0c
+  checksum: c847caf52e507d75a8d66a2f1f56d0c05669fe565510a9c24e4a5644e521a638e7171cfa67a4af89cc2db20f6d6a9cb25ee75471a9b2a4e167b91eb48d8eed35
   languageName: node
   linkType: hard
 
