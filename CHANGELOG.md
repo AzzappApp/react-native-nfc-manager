@@ -1,5 +1,6 @@
-## 0.5.5-canary.294
+## 0.5.5-canary.295
 
+* **build:**  - update podfile.lock for expo-image
 * **build:**  - put back expo-image 1.10.6
 * **build:**  - try with a newer expo-image
 * **build:**  - eas - enable corepack

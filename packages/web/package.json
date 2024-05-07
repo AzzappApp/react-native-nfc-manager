@@ -1,6 +1,6 @@
 {
   "name": "@azzapp/web",
-  "version": "0.5.5-canary.294",
+  "version": "0.5.5-canary.295",
   "private": true,
   "packageManager": "yarn@3.6.4",
   "scripts": {
