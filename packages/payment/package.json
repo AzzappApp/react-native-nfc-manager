@@ -31,6 +31,6 @@
     "@azzapp/shared": "0.5.5-canary.282",
     "openapi-fetch": "^0.9.3",
     "dayjs": "^1.11.10",
-    "@mlecoq/sales-tax": "2.14.0"
+    "@mlecoq/sales-tax": "2.14.1"
   }
 }
