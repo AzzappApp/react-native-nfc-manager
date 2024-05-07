@@ -1,5 +1,6 @@
-## 0.5.5-canary.286
+## 0.5.5-canary.287
 
+* **fix:**  - **home:** [#3363](https://github.com/AzzappApp/azzapp/pull/3363) white icon ([#3381](https://github.com/AzzappApp/azzapp/pull/3381))
 * **build:**  - don’t update dependencies
 * **build:**  - use workspace versions
 * **build:**  - remove `yarn global`

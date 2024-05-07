@@ -84,7 +84,7 @@ android {
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 5005
-        versionName "0.5.5-canary.286"
+        versionName "0.5.5-canary.287"
     }
 
     flavorDimensions "env"
