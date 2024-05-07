@@ -1,5 +1,6 @@
-## 0.5.5-canary.289
+## 0.5.5-canary.290
 
+* **build:**  - try to set package manager
 * **build:**  - remove --prebuild option
 * **build:**  - run in one step
 * **fix:**  - **home:** [#3363](https://github.com/AzzappApp/azzapp/pull/3363) white icon ([#3381](https://github.com/AzzappApp/azzapp/pull/3381))
