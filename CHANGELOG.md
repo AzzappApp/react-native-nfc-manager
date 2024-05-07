@@ -1,5 +1,6 @@
-## 0.5.5-canary.291
+## 0.5.5-canary.292
 
+* **build:**  - eas - enable corepack
 * **fix:**  - **webcard:** [#3362](https://github.com/AzzappApp/azzapp/pull/3362) change label ([#3382](https://github.com/AzzappApp/azzapp/pull/3382))
 * **build:**  - try to set package manager
 * **build:**  - remove --prebuild option
