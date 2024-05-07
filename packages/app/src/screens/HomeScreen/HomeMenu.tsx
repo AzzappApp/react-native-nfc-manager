@@ -26,7 +26,11 @@ const HomeMenu = ({ selected, setSelected }: HomeMenuProps) => {
           defaultMessage="Contact card{azzappA}"
           description="Home Screen menu - Contact Card"
           values={{
-            azzappA: <Text variant="azzapp">a</Text>,
+            azzappA: (
+              <Text variant="azzapp" style={styles.menuLabelStyle}>
+                a
+              </Text>
+            ),
           }}
         />
       </TabBarMenuItem>
@@ -78,6 +82,6 @@ const styles = StyleSheet.create({
     overflow: 'visible',
   },
   menuLabelStyle: {
-    color: 'white',
+    color: colors.white,
   },
 });
