@@ -41,6 +41,10 @@ type WebCardModalProps = {
    */
   isViewer: boolean;
   /**
+   * true when the viewer the owner of the webCard
+   */
+  isOwner: boolean;
+  /**
    *
    *
    * @type {boolean}
@@ -63,6 +67,7 @@ const WebCardModal = ({
   visible,
   close,
   isViewer,
+  isOwner,
 }: WebCardModalProps) => {
   const webCard = useFragment(
     graphql`
@@ -384,17 +389,31 @@ const WebCardModal = ({
             disabled={isLoadingQuitWebCard}
           >
             <Text variant="error">
-              <FormattedMessage
-                defaultMessage="Delete this WebCard{azzappA}"
-                description="PostItem Modal - Delete this post"
-                values={{
-                  azzappA: (
-                    <Text variant="azzapp" style={{ color: colors.red400 }}>
-                      a
-                    </Text>
-                  ),
-                }}
-              />
+              {isOwner ? (
+                <FormattedMessage
+                  defaultMessage="Delete this WebCard{azzappA}"
+                  description="label for button to delete a webcard"
+                  values={{
+                    azzappA: (
+                      <Text variant="azzapp" style={styles.deleteButton}>
+                        a
+                      </Text>
+                    ),
+                  }}
+                />
+              ) : (
+                <FormattedMessage
+                  defaultMessage="Quit this WebCard{azzappA}"
+                  description="label for button to quit a webcard (multi-user)"
+                  values={{
+                    azzappA: (
+                      <Text style={styles.deleteButton} variant="azzapp">
+                        a
+                      </Text>
+                    ),
+                  }}
+                />
+              )}
             </Text>
           </PressableNative>
         )}
@@ -443,7 +462,7 @@ const stylesheet = createStyleSheet(appearance => ({
     alignItems: 'center',
     columnGap: 10,
   },
-
+  deleteButton: { color: colors.red400 },
   coverStyle: {
     ...shadow(appearance, 'bottom'),
   },

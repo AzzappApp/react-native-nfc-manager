@@ -35,7 +35,7 @@ import {
 import { MODULE_KINDS } from '@azzapp/shared/cardModuleHelpers';
 import { parseContactCard } from '@azzapp/shared/contactCardHelpers';
 import { COVER_CARD_RADIUS, COVER_RATIO } from '@azzapp/shared/coverHelpers';
-import { isEditor } from '@azzapp/shared/profileHelpers';
+import { isEditor, isOwner } from '@azzapp/shared/profileHelpers';
 import {
   useDidAppear,
   useRouter,
@@ -97,6 +97,7 @@ const WebCardScreen = ({
 
   const { profileInfos } = useAuthState();
   const isViewer = profileInfos?.webCardId === data.webCard?.id;
+  const isWebCardOwner = isViewer && isOwner(profileInfos?.profileRole);
   const canEdit = isViewer && isEditor(profileInfos?.profileRole);
 
   const environment = useRelayEnvironment();
@@ -449,6 +450,7 @@ const WebCardScreen = ({
           close={toggleWebcardModal}
           onToggleFollow={toggleFollow}
           isViewer={isViewer}
+          isOwner={isWebCardOwner}
         />
       </Suspense>
     </View>
