@@ -149,7 +149,7 @@ __metadata:
     expo-contacts: ~12.8.2
     expo-font: ~11.10.3
     expo-haptics: ~12.8.1
-    expo-image: ^1.10.6
+    expo-image: ^1.11.0
     expo-linear-gradient: ~12.7.2
     expo-media-library: ~15.9.2
     expo-sensors: ~12.9.1
@@ -14404,7 +14404,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"expo-image@npm:^1.10.6":
+"expo-image@npm:^1.11.0":
   version: 1.12.8
   resolution: "expo-image@npm:1.12.8"
   dependencies:
