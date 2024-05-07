@@ -2,6 +2,7 @@
   "name": "@azzapp/backoffice",
   "version": "0.5.5-canary.289",
   "private": true,
+  "packageManager": "yarn@3.6.4",
   "scripts": {
     "dev": "next dev -p 3005",
     "build": "next build",

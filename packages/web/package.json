@@ -2,6 +2,7 @@
   "name": "@azzapp/web",
   "version": "0.5.5-canary.289",
   "private": true,
+  "packageManager": "yarn@3.6.4",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
