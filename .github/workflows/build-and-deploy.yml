@@ -259,16 +259,6 @@ jobs:
             ADDITIONAL_ARGS="--prod"
           fi
           yarn dlx vercel@latest --token=${{ secrets.VERCEL_TOKEN }} $ADDITIONAL_ARGS
-
-      - name: Azzapp Web - Vercel deployment
-        env:
-          VERCEL_PROJECT_ID: "azzapp"
-        run: |
-          ADDITIONAL_ARGS=""
-          GITHUB_REF="${{ github.ref }}"
-          if [ "$GITHUB_REF" == "refs/heads/stable" ]; then
-            ADDITIONAL_ARGS="--prod"
-          fi
           yarn dlx vercel@latest deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }} --meta githubCommitRef=${{ github.ref_name }} $ADDITIONAL_ARGS
 
       ############################################
