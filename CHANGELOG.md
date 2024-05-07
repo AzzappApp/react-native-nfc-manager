@@ -1,5 +1,6 @@
-## 0.5.5-canary.284
+## 0.5.5-canary.285
 
+* **build:**  - use workspace versions
 * **build:**  - remove `yarn global`
 * **build:**  - try to install globally after
 * **build:**  - upgrade to yarn v3 ([#3380](https://github.com/AzzappApp/azzapp/pull/3380))
