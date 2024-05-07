@@ -54,9 +54,6 @@ jobs:
         
       - name: Install dependencies
         run: yarn install --immutable
-      
-      - name: Install Vercel CLI
-        run: yarn global add vercel@latest
 
       ############################################
       #
@@ -250,7 +247,7 @@ jobs:
           elif [ "$GITHUB_REF" == "refs/heads/main" ]; then
             ADDITIONAL_ARGS="--git-branch=main"
           fi
-          vercel pull --yes --environment=$ENVIRONMENT --token=${{ secrets.VERCEL_TOKEN }} $ADDITIONAL_ARGS
+          yarn dlx vercel@latest pull --yes --environment=$ENVIRONMENT --token=${{ secrets.VERCEL_TOKEN }} $ADDITIONAL_ARGS
 
       - name: Azzapp Web - Vercel build
         env:
@@ -261,7 +258,7 @@ jobs:
           if [ "$GITHUB_REF" == "refs/heads/stable" ]; then
             ADDITIONAL_ARGS="--prod"
           fi
-          vercel build --token=${{ secrets.VERCEL_TOKEN }} $ADDITIONAL_ARGS
+          yarn dlx vercel@latest --token=${{ secrets.VERCEL_TOKEN }} $ADDITIONAL_ARGS
 
       - name: Azzapp Web - Vercel deployment
         env:
@@ -272,7 +269,7 @@ jobs:
           if [ "$GITHUB_REF" == "refs/heads/stable" ]; then
             ADDITIONAL_ARGS="--prod"
           fi
-          vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }} --meta githubCommitRef=${{ github.ref_name }} $ADDITIONAL_ARGS
+          yarn dlx vercel@latest deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }} --meta githubCommitRef=${{ github.ref_name }} $ADDITIONAL_ARGS
 
       ############################################
       #
@@ -294,7 +291,7 @@ jobs:
           elif [ "$GITHUB_REF" == "refs/heads/main" ]; then
             ADDITIONAL_ARGS="--git-branch=main"
           fi
-          vercel pull --yes --environment=$ENVIRONMENT --token=${{ secrets.VERCEL_TOKEN }} $ADDITIONAL_ARGS
+          yarn dlx vercel@latest pull --yes --environment=$ENVIRONMENT --token=${{ secrets.VERCEL_TOKEN }} $ADDITIONAL_ARGS
 
       - name: Azzapp Backoffice - Vercel build
         env:
@@ -305,7 +302,7 @@ jobs:
           if [ "$GITHUB_REF" == "refs/heads/stable" ]; then
             ADDITIONAL_ARGS="--prod"
           fi
-          vercel build --token=${{ secrets.VERCEL_TOKEN }} $ADDITIONAL_ARGS
+          yarn dlx vercel@latest build --token=${{ secrets.VERCEL_TOKEN }} $ADDITIONAL_ARGS
 
       - name: Azzapp Backoffice - Vercel deployment
         env:
@@ -317,7 +314,7 @@ jobs:
             ADDITIONAL_ARGS="--prod"
           fi
           rm -fr ./packages/web/.next
-          vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }} --meta githubCommitRef=${{ github.ref_name }} $ADDITIONAL_ARGS
+          yarn dlx vercel@latest deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }} --meta githubCommitRef=${{ github.ref_name }} $ADDITIONAL_ARGS
       
       ############################################
       #
