@@ -1,5 +1,6 @@
-## 0.5.5-canary.295
+## 0.5.5-canary.296
 
+* **build:**  - put back global install of vercel cli
 * **build:**  - update podfile.lock for expo-image
 * **build:**  - put back expo-image 1.10.6
 * **build:**  - try with a newer expo-image
