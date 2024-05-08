@@ -1,5 +1,6 @@
-## 0.5.5-canary.296
+## 0.5.5-canary.297
 
+* **build:**  - set yarn version
 * **build:**  - put back global install of vercel cli
 * **build:**  - update podfile.lock for expo-image
 * **build:**  - put back expo-image 1.10.6
