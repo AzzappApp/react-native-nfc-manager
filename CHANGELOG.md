@@ -1,5 +1,6 @@
-## 0.5.5-canary.299
+## 0.5.5-canary.300
 
+* **fix:**  - improve monthly subscription behaviour ([#3394](https://github.com/AzzappApp/azzapp/pull/3394))
 * **fix:**  - **webcard:** [#3335](https://github.com/AzzappApp/azzapp/pull/3335) use sub transactions for handling two updates on same row ([#3391](https://github.com/AzzappApp/azzapp/pull/3391))
 * **feat:**  - **post:** [#1297](https://github.com/AzzappApp/azzapp/pull/1297) implement delete post mutation ([#3386](https://github.com/AzzappApp/azzapp/pull/3386))
 * **feat:**  - add i18n on emails and sms ([#3387](https://github.com/AzzappApp/azzapp/pull/3387))
