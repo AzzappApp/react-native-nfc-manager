@@ -109,6 +109,7 @@ const ProtectedMutation: Record<
   declineOwnership: isAnyRoleRule,
   deleteModules: isEditorRule,
   deletePostComment: isEditorRule,
+  deletePost: isEditorRule,
   duplicateModule: isEditorRule,
   saveSimpleTextModule: isEditorRule,
   saveLineDividerModule: isEditorRule,

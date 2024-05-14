@@ -1,0 +1,7 @@
+extend type Mutation {
+  deletePost(webCardId: ID!, postId: ID!): DeletePostPayload!
+}
+
+type DeletePostPayload {
+  postId: ID!
+}

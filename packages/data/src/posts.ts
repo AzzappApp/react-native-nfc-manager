@@ -1,4 +1,4 @@
-import { eq, desc, sql, and, lt, notInArray } from 'drizzle-orm';
+import { eq, desc, sql, and, lt, notInArray, inArray } from 'drizzle-orm';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
 import db, { DEFAULT_DATETIME_VALUE, cols } from './db';
 import { FollowTable } from './follows';
@@ -327,4 +327,60 @@ export const getLikedPosts = async (
     .innerJoin(subquery, eq(PostTable.id, subquery.postId))
     .where(eq(PostTable.deleted, false))
     .then(res => res.map(({ Post }) => Post));
+};
+
+export const deletePost = async (
+  postId: string,
+  userId: string,
+  trx: DbTransaction,
+) => {
+  const post = await trx
+    .select()
+    .from(PostTable)
+    .where(eq(PostTable.id, postId))
+    .then(res => res[0]);
+  if (post) {
+    const deleteInfos = {
+      deleted: true,
+      deletedBy: userId,
+      deletedAt: new Date(),
+    };
+    await trx
+      .update(PostTable)
+      .set(deleteInfos)
+      .where(eq(PostTable.id, postId));
+
+    await trx
+      .update(WebCardTable)
+      .set({
+        nbPosts: sql`GREATEST(${WebCardTable.nbPostsLiked} - 1, 0)`,
+      })
+      .where(eq(WebCardTable.id, post.webCardId));
+
+    await trx
+      .update(WebCardTable)
+      .set({
+        nbPosts: sql`GREATEST(nbPosts - 1, 0)`,
+      })
+      .where(eq(WebCardTable.id, post.webCardId));
+
+    await trx
+      .update(WebCardTable)
+      .set({
+        nbPostsLiked: sql`GREATEST(nbPostsLiked - 1, 0)`,
+      })
+      .where(
+        inArray(
+          WebCardTable.id,
+          sql`(select webCardId from PostReaction where postId = ${post.id})`,
+        ),
+      );
+
+    return {
+      ...post,
+      ...deleteInfos,
+    };
+  }
+
+  return null;
 };

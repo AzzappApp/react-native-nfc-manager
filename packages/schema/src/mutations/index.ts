@@ -6,6 +6,7 @@ import createPostComment from './createPostComment';
 import createWebCard from './createWebCard';
 import declineOwnership from './declineOwnership';
 import deleteModules from './deleteModules';
+import deletePost from './deletePost';
 import deletePostComment from './deletePostComment';
 import duplicateModule from './duplicateModule';
 import inviteUser from './inviteUser';
@@ -112,4 +113,5 @@ export const Mutation: MutationResolvers = {
   updateSubscription,
   upgradeSubscriptionPlan,
   endSubscription,
+  deletePost,
 };

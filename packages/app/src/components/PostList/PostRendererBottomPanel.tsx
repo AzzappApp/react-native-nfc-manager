@@ -25,6 +25,7 @@ import PostRendererActionBar, {
   PostRendererActionBarSkeleton,
 } from './PostRendererActionBar';
 import type { PostRendererActionBar_post$key } from '#relayArtifacts/PostRendererActionBar_post.graphql';
+import type { PostRendererBottomPanelDeletePostMutation } from '#relayArtifacts/PostRendererBottomPanelDeletePostMutation.graphql';
 import type { PostRendererBottomPanelFragment_post$key } from '#relayArtifacts/PostRendererBottomPanelFragment_post.graphql';
 import type { PostRendererBottomPanelUpdateAllowLikesPostMutation } from '#relayArtifacts/PostRendererBottomPanelUpdateAllowLikesPostMutation.graphql';
 import type { PostRendererBottomPanelUpdatePostAllowCommentsMutation } from '#relayArtifacts/PostRendererBottomPanelUpdatePostAllowCommentsMutation.graphql';
@@ -277,9 +278,46 @@ const PostRendererBottomPanel = ({
     }
   };
 
-  const deletePost = () => {
-    //TODO: implement delete post
-  };
+  const [commit, deleteLoading] =
+    useMutation<PostRendererBottomPanelDeletePostMutation>(graphql`
+      mutation PostRendererBottomPanelDeletePostMutation(
+        $webCardId: ID!
+        $postId: ID!
+      ) {
+        deletePost(webCardId: $webCardId, postId: $postId) {
+          postId @deleteRecord
+        }
+      }
+    `);
+
+  const deletePost = useCallback(() => {
+    if (isEditor(profileInfos?.profileRole) && profileInfos?.webCardId) {
+      commit({
+        variables: {
+          webCardId: profileInfos?.webCardId,
+          postId: post.id,
+        },
+        onCompleted() {
+          toggleModal();
+        },
+      });
+    } else {
+      Toast.show({
+        type: 'error',
+        text1: intl.formatMessage({
+          defaultMessage: 'Only admins & editors can delete a post',
+          description: 'Error message when trying to delete a comment',
+        }),
+      });
+    }
+  }, [
+    commit,
+    intl,
+    post.id,
+    profileInfos?.profileRole,
+    profileInfos?.webCardId,
+    toggleModal,
+  ]);
 
   const [sendReport, commitSendReportLoading] = useSendReport(
     post.id,
@@ -461,7 +499,7 @@ const PostRendererBottomPanel = ({
               disabled={commitSendReportLoading}
             >
               {commitSendReportLoading ? (
-                <ActivityIndicator color="black" />
+                <ActivityIndicator />
               ) : (
                 <Text variant="error">
                   <FormattedMessage
@@ -475,14 +513,19 @@ const PostRendererBottomPanel = ({
           {isViewer && (
             <PressableNative
               onPress={deletePost}
+              disabled={deleteLoading}
               style={[styles.modalLine, styles.errorModalLine]}
             >
-              <Text variant="error">
-                <FormattedMessage
-                  defaultMessage="Delete this post"
-                  description="PostItem Modal - Delete this post"
-                />
-              </Text>
+              {deleteLoading ? (
+                <ActivityIndicator />
+              ) : (
+                <Text variant="error">
+                  <FormattedMessage
+                    defaultMessage="Delete this post"
+                    description="PostItem Modal - Delete this post"
+                  />
+                </Text>
+              )}
             </PressableNative>
           )}
         </View>

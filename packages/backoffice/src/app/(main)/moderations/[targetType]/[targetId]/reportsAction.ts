@@ -9,6 +9,7 @@ import {
   db,
   ReportTable,
   ProfileTable,
+  deletePost,
 } from '@azzapp/data';
 import { AZZAPP_SERVER_HEADER } from '@azzapp/shared/urlHelpers';
 import { getSession } from '#helpers/session';
@@ -119,44 +120,14 @@ export const deleteRelatedItem = async (
           break;
         }
         case 'post': {
-          await trx
-            .update(PostTable)
-            .set({
-              deletedAt: new Date(),
-              deletedBy: session.userId,
-              deleted: true,
-            })
-            .where(eq(PostTable.id, targetId));
-
           try {
-            const post = await trx
-              .select()
-              .from(PostTable)
-              .where(eq(PostTable.id, targetId));
-            if (post.length > 0) {
+            const post = await deletePost(targetId, session.userId, trx);
+
+            if (post) {
               const webCard = await trx
                 .select()
                 .from(WebCardTable)
-                .where(eq(WebCardTable.id, post[0].webCardId));
-
-              await trx
-                .update(WebCardTable)
-                .set({
-                  nbPosts: sql`GREATEST(nbPosts - 1, 0)`,
-                })
-                .where(eq(WebCardTable.id, post[0].webCardId));
-
-              await trx
-                .update(WebCardTable)
-                .set({
-                  nbPostsLiked: sql`GREATEST(nbPostsLiked - 1, 0)`,
-                })
-                .where(
-                  inArray(
-                    WebCardTable.id,
-                    sql`(select webCardId from PostReaction where postId = ${targetId})`,
-                  ),
-                );
+                .where(eq(WebCardTable.id, post.webCardId));
 
               await fetch(
                 `${process.env.NEXT_PUBLIC_API_ENDPOINT}/revalidate`,
