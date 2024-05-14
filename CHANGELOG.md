@@ -1,5 +1,7 @@
-## 0.5.5-canary.297
+## 0.5.5-canary.298
 
+* **build:**  - rollback shellscripts
+* **build:**  - migrate app to rn 0.74 ([#3388](https://github.com/AzzappApp/azzapp/pull/3388))
 * **build:**  - set yarn version
 * **build:**  - put back global install of vercel cli
 * **build:**  - update podfile.lock for expo-image
