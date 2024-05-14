@@ -1,5 +1,8 @@
-## 0.5.5-canary.298
+## 0.5.5-canary.299
 
+* **fix:**  - **webcard:** [#3335](https://github.com/AzzappApp/azzapp/pull/3335) use sub transactions for handling two updates on same row ([#3391](https://github.com/AzzappApp/azzapp/pull/3391))
+* **feat:**  - **post:** [#1297](https://github.com/AzzappApp/azzapp/pull/1297) implement delete post mutation ([#3386](https://github.com/AzzappApp/azzapp/pull/3386))
+* **feat:**  - add i18n on emails and sms ([#3387](https://github.com/AzzappApp/azzapp/pull/3387))
 * **build:**  - rollback shellscripts
 * **build:**  - migrate app to rn 0.74 ([#3388](https://github.com/AzzappApp/azzapp/pull/3388))
 * **build:**  - set yarn version
