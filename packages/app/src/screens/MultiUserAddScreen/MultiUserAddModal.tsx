@@ -600,28 +600,44 @@ const MultiUserAddModal = (
 const getUserContacts = (user: Contact) => {
   const phoneNumber = convertToNonNullArray(
     (user.phoneNumbers ?? []).map(a => {
-      if (a.digits) {
-        let formattedNumber = a.digits;
-        if (a.digits.startsWith('+') && parsePhoneNumberFromString(a.digits)) {
-          formattedNumber = parsePhoneNumberFromString(
-            a.digits,
-          )!.formatInternational();
+      const phoneNumber = a.digits || a.number;
+      if (phoneNumber) {
+        let formattedNumber = phoneNumber;
+        let countryCode = a.countryCode as CountryCode;
+
+        const parsedPhoneNumber = parsePhoneNumberFromString(phoneNumber);
+        if (phoneNumber.startsWith('+') && parsedPhoneNumber?.isValid()) {
+          formattedNumber = parsedPhoneNumber.formatInternational();
+          countryCode =
+            (parsedPhoneNumber.country as CountryCode) ?? countryCode;
         } else if (
           a.countryCode &&
           parsePhoneNumberFromString(
-            a.digits,
+            phoneNumber,
             a.countryCode?.toUpperCase() as CountryCode,
           )
         ) {
           formattedNumber = parsePhoneNumberFromString(
-            a.digits,
+            phoneNumber,
             a.countryCode?.toUpperCase() as CountryCode,
           )!.formatInternational();
+        } else {
+          const country =
+            user.addresses?.find(a => a.isoCountryCode)?.isoCountryCode ??
+            getLocales()[0].countryCode;
+
+          if (country) {
+            countryCode = country as CountryCode;
+            const parsed = parsePhoneNumberFromString(phoneNumber, countryCode);
+            if (parsed?.isValid()) {
+              formattedNumber = parsed.formatInternational();
+            }
+          }
         }
         return {
           id: formattedNumber,
           label: normalizePhoneMailLabel(a.label),
-          countryCodeOrEmail: a.countryCode?.toUpperCase() as CountryCode,
+          countryCodeOrEmail: countryCode,
         };
       }
       return null;
@@ -630,15 +646,31 @@ const getUserContacts = (user: Contact) => {
   const emails = convertToNonNullArray(
     (user.emails ?? []).map(a => {
       if (a.email)
-        return { id: a.email!, label: a.email!, countryCodeOrEmail: 'email' };
+        return {
+          id: a.email!,
+          label: a.email!,
+          countryCodeOrEmail: 'email' as const,
+        };
       return null;
     }),
   );
-  return [...phoneNumber, ...emails] as Array<{
-    id: string;
-    label: string;
-    countryCodeOrEmail: CountryCode | 'email';
-  }>;
+
+  return [...phoneNumber, ...emails].reduce(
+    (
+      acc: Array<{
+        id: string;
+        label: string;
+        countryCodeOrEmail: CountryCode | 'email';
+      }>,
+      data,
+    ) => {
+      if (!acc.find(a => a.id === data.id)) {
+        acc.push(data);
+      }
+      return acc;
+    },
+    [],
+  );
 };
 
 const normalizePhoneMailLabel = (label?: string) => {
