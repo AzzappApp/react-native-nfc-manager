@@ -10,7 +10,7 @@ import {
 import type { EditionParameters } from './gpu';
 import type { ScrollViewProps } from 'react-native';
 
-type EditionParametersListProps = ScrollViewProps & {
+type EditionParametersListProps = Omit<ScrollViewProps, 'hitSlop'> & {
   /**
    * A callback called when the user selects a parameter.
    * @param param Theselected parameter .

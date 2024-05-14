@@ -84,7 +84,6 @@
     "eslint-plugin-react-hooks": "^4.6.0",
     "git-spawned-stream": "^1.0.1",
     "jest": "^29.7.0",
-    "jest-expo": "^50.0.4",
     "openapi-typescript": "^6.7.5",
     "prettier": "^3.2.5",
     "react-native-version": "^4.0.0",
@@ -102,7 +101,8 @@
     "@envelop/sentry@^9.0.0": "patch:@envelop/sentry@npm%3A9.0.0#./.yarn/patches/@envelop-sentry-npm-9.0.0-d01d6a8911.patch",
     "drizzle-kit@0.20.14": "patch:drizzle-kit@npm%3A0.20.14#./.yarn/patches/drizzle-kit-npm-0.20.14-cf0918f896.patch",
     "drizzle-orm@^0.30.8": "patch:drizzle-orm@npm%3A0.30.8#./.yarn/patches/drizzle-orm-npm-0.30.8-d3cedab5ef.patch",
-    "react-native-screens@^3.31.1": "patch:react-native-screens@npm%3A3.31.1#./.yarn/patches/react-native-screens-npm-3.31.1-d5786be485.patch"
+    "react-native-screens@^3.31.1": "patch:react-native-screens@npm%3A3.31.1#./.yarn/patches/react-native-screens-npm-3.31.1-d5786be485.patch",
+    "react-native-vision-camera@^4.0.3": "patch:react-native-vision-camera@npm%3A4.0.3#./.yarn/patches/react-native-vision-camera-npm-4.0.3-c45a932223.patch"
   },
   "dependencies": {
     "node-gyp": "^10.1.0"

@@ -20,7 +20,7 @@ export type BoxButtonItemInfo<T> = {
   height: number;
 };
 
-export type BoxSelectionListProps<T> = ViewProps & {
+export type BoxSelectionListProps<T> = Omit<ViewProps, 'hitSlop'> & {
   data: readonly T[];
   selectedItem: T | null;
   imageRatio?: number;

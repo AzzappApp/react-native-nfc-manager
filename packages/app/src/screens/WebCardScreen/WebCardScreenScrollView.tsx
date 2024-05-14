@@ -19,7 +19,7 @@ import { useEditTransition } from './WebCardScreenTransitions';
 import type { ForwardedRef, ReactNode } from 'react';
 import type { ScrollViewProps } from 'react-native';
 
-export type WebCardScreenScrollViewProps = ScrollViewProps & {
+export type WebCardScreenScrollViewProps = Omit<ScrollViewProps, 'hitSlop'> & {
   /**
    * Whether the webCard is in edit mode
    */
