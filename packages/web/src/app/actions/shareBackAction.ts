@@ -13,6 +13,7 @@ import {
   CONTACT_METHODS,
   getPreferredContactMethod,
 } from '#helpers/contactMethodsHelpers';
+import { getServerIntl } from '#helpers/i18nHelpers';
 import {
   getValuesFromSubmitData,
   shareBackSignature,
@@ -29,6 +30,8 @@ export type ShareBackFormData = FormData & {
   phone: string;
   email: string;
 };
+
+const intl = getServerIntl();
 
 export const processShareBackSubmission = async (
   userId: string,
@@ -94,11 +97,11 @@ export const processShareBackSubmission = async (
     }
 
     // @todo: wording for contact share back message
-    const shareBackBody = `Hello,
-
-    You've received a new contact ShareBack.
-
-    Best.`;
+    const shareBackBody = intl.formatMessage({
+      id: 'dMfROA',
+      defaultMessage: `Hello, You've received a new contact ShareBack. Best.`,
+      description: 'Email body for new contact share back',
+    });
 
     if (contactMethod.method === CONTACT_METHODS.SMS) {
       const shareBackContactDetails = getValuesFromSubmitData(
@@ -139,7 +142,11 @@ export const processShareBackSubmission = async (
       await sendEmail([
         {
           email: user.email as string,
-          subject: 'New Contact ShareBack Received',
+          subject: intl.formatMessage({
+            id: 'ivEKQ2',
+            defaultMessage: 'New Contact ShareBack Received',
+            description: 'Email subject for new contact share back received',
+          }),
           text: shareBackBody,
           html: shareBackBody,
           attachments: [shareBackContactVCardAttachment],

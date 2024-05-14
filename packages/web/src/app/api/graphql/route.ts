@@ -10,6 +10,7 @@ import ERRORS from '@azzapp/shared/errors';
 import { AZZAPP_SERVER_HEADER } from '@azzapp/shared/urlHelpers';
 import queryMap from '#persisted-query-map.json';
 import { buildCoverAvatarUrl } from '#helpers/avatar';
+import { notifyUsers } from '#helpers/sendMessages';
 import { getSessionData } from '#helpers/tokens';
 import packageJSON from '../../../../package.json';
 
@@ -167,43 +168,7 @@ const { handleRequest } = createGraphqlEndpoint({
       includeExecuteVariables: true,
     }),
   ],
-  sendMail: async (
-    p: Array<{
-      email: string;
-      subject: string;
-      text: string;
-      html: string;
-    }>,
-  ) => {
-    const res = await fetch(
-      `${process.env.NEXT_PUBLIC_API_ENDPOINT}/sendMail`,
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          [AZZAPP_SERVER_HEADER]: process.env.API_SERVER_TOKEN ?? '',
-        },
-        body: JSON.stringify(p),
-      },
-    );
-    if (!res.ok) {
-      throw new Error('Error sending sms');
-    }
-  },
-  sendSms: async (p: { phoneNumber: string; body: string }) => {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_ENDPOINT}/sendSms`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        [AZZAPP_SERVER_HEADER]: process.env.API_SERVER_TOKEN ?? '',
-      },
-      body: JSON.stringify(p),
-    });
-
-    if (!res.ok) {
-      throw new Error('Error sending sms');
-    }
-  },
+  notifyUsers,
   validateMailOrPhone: async (
     type: 'email' | 'phone',
     issuer: string,

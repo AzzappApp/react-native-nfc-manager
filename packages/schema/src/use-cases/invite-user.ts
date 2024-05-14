@@ -5,13 +5,19 @@ import {
   createUser,
   db,
   getUserByEmailPhoneNumber,
+  getUserById,
   getWebCardByProfileId,
   updateWebCard,
 } from '@azzapp/data';
+import { guessLocale } from '@azzapp/i18n';
 import { ProfileAlreadyExistsException } from './exceptions/profile-already-exists.exception';
-import { ProfileDoesNotExistException } from './exceptions/profile-does-not-exist.exception';
+import {
+  ProfileDoesNotExistException,
+  UserDoesNotExistException,
+} from './exceptions/profile-does-not-exist.exception';
 import type { GraphQLContext } from '#GraphQLContext';
 import type { Profile, WebCard } from '@azzapp/data';
+import type { Locale } from '@azzapp/i18n';
 import type { ContactCard } from '@azzapp/shared/contactCardHelpers';
 
 type Executable<Input, Output> = {
@@ -20,6 +26,7 @@ type Executable<Input, Output> = {
 
 type Input = {
   auth: {
+    userId: string;
     profileId: string;
   };
   invited: {
@@ -34,8 +41,7 @@ type Input = {
     profileRole: Profile['profileRole'];
   };
   sendInvite: boolean;
-  sendMail: GraphQLContext['sendMail'];
-  sendSms: GraphQLContext['sendSms'];
+  notifyUsers: GraphQLContext['notifyUsers'];
 };
 
 type Output = Profile;
@@ -45,10 +51,13 @@ export type InviteUserUseCase = Executable<Input, Output>;
 export const inviteUser = async (input: Input) => {
   const webCard = await getWebCardByProfileId(input.auth.profileId);
 
-  if (!webCard) throw new ProfileDoesNotExistException();
+  const user = await getUserById(input.auth.userId);
 
-  const createdProfile = await db.transactionManager.startTransaction(
-    async tx => {
+  if (!webCard) throw new ProfileDoesNotExistException();
+  if (!user) throw new UserDoesNotExistException();
+
+  const { profile: createdProfile, user: existingUser } =
+    await db.transactionManager.startTransaction(async tx => {
       if (!webCard.isMultiUser) {
         await updateWebCard(webCard.id, { isMultiUser: true });
       }
@@ -97,20 +106,19 @@ export const inviteUser = async (input: Input) => {
         };
 
         await createProfile(profile, tx);
-        return profile;
+        return { profile, user: existingUser };
       } catch (e) {
         throw new ProfileAlreadyExistsException();
       }
-    },
-  );
+    });
 
   await notifyInvitedUser(
     webCard,
     input.sendInvite,
     input.invited.phoneNumber,
     input.invited.email,
-    input.sendMail,
-    input.sendSms,
+    input.notifyUsers,
+    guessLocale(existingUser?.locale ?? user?.locale),
   );
 
   return createdProfile;
@@ -121,32 +129,21 @@ async function notifyInvitedUser(
   sendInvite: boolean,
   phoneNumber: string | undefined,
   email: string | undefined,
-  sendMail: (
-    p: Array<{
-      email: string;
-      subject: string;
-      text: string;
-      html: string;
-    }>,
-  ) => Promise<void>,
-  sendSms: (p: { phoneNumber: string; body: string }) => Promise<void>,
+  notifyUsers: GraphQLContext['notifyUsers'],
+  locale: Locale,
 ) {
   try {
     if (sendInvite) {
       if (phoneNumber) {
-        await sendSms({
-          body: `You have been invited to join ${webCard.userName} on Azzapp! Download the app and sign up with this phone number to join: ${phoneNumber}`,
-          phoneNumber,
-        });
+        await notifyUsers(
+          'phone',
+          [phoneNumber],
+          webCard,
+          'invitation',
+          locale,
+        );
       } else if (email) {
-        await sendMail([
-          {
-            email,
-            subject: `You have been invited to join ${webCard.userName}`,
-            text: `You have been invited to join ${webCard.userName} on Azzapp! Download the app and sign up with this email to join: ${email}`,
-            html: `<div>You have been invited to join ${webCard.userName} on Azzapp! Download the app and sign up with this email to join: ${email}</div>`,
-          },
-        ]);
+        await notifyUsers('email', [email], webCard, 'invitation', locale);
       }
     }
   } catch (e) {

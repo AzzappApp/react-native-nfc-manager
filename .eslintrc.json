@@ -136,8 +136,7 @@
     "formatjs/enforce-description": "error",
     "formatjs/enforce-default-message": "error",
     "formatjs/enforce-placeholders": "error",
-    "formatjs/no-multiple-whitespaces": "error",
-    "formatjs/no-id": "error"
+    "formatjs/no-multiple-whitespaces": "error"
   },
   "overrides": [
     {
@@ -208,6 +207,23 @@
           }
         }
       ]
+    },
+    {
+      "files": ["packages/web/**/*.ts", "packages/web/**/*.tsx"],
+      "rules": {
+        "formatjs/enforce-id": [
+          "error",
+          {
+            "idInterpolationPattern": "[sha1:contenthash:base64:6]"
+          }
+        ]
+      }
+    },
+    {
+      "files": ["packages/app/**/*.ts", "packages/app/**/*.tsx"],
+      "rules": {
+        "formatjs/no-id": "error"
+      }
     }
   ]
 }

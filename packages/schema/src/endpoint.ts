@@ -21,6 +21,7 @@ import ERRORS from '@azzapp/shared/errors';
 
 import { createGraphQLContext, createLoaders } from '#GraphQLContext';
 import { schema } from './schema';
+import type { GraphQLContext } from '#GraphQLContext';
 import type { WebCard } from '@azzapp/data';
 import type { Locale } from '@azzapp/i18n';
 import type { GraphQLError } from 'graphql';
@@ -28,15 +29,7 @@ import type { GraphQLError } from 'graphql';
 type CreateEndpointOptions = {
   logging?: LogLevel | YogaLogger | boolean;
   plugins?: Plugin[];
-  sendMail: (
-    p: Array<{
-      email: string;
-      subject: string;
-      text: string;
-      html: string;
-    }>,
-  ) => Promise<void>;
-  sendSms: (p: { phoneNumber: string; body: string }) => Promise<void>;
+  notifyUsers: GraphQLContext['notifyUsers'];
   validateMailOrPhone: (
     type: 'email' | 'phone',
     issuer: string,
@@ -116,8 +109,7 @@ export const createGraphqlEndpoint = (options: CreateEndpointOptions) => {
       const loaders = createLoaders();
 
       return createGraphQLContext(
-        options.sendMail,
-        options.sendSms,
+        options.notifyUsers,
         options.validateMailOrPhone,
         options.buildCoverAvatarUrl,
         loaders,

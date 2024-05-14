@@ -69,15 +69,13 @@ export type GraphQLContext = {
   locale: string;
   loaders: Loaders;
   sessionMemoized: <T>(t: () => T) => T;
-  sendMail: (
-    p: Array<{
-      email: string;
-      subject: string;
-      text: string;
-      html: string;
-    }>,
+  notifyUsers: (
+    type: 'email' | 'phone',
+    receivers: string[],
+    webCard: WebCard,
+    notificationType: 'invitation' | 'transferOwnership',
+    locale: Locale,
   ) => Promise<void>;
-  sendSms: (p: { phoneNumber: string; body: string }) => Promise<void>;
   validateMailOrPhone: (
     type: 'email' | 'phone',
     issuer: string,
@@ -87,8 +85,7 @@ export type GraphQLContext = {
 };
 
 export const createGraphQLContext = (
-  sendMail: GraphQLContext['sendMail'],
-  sendSms: GraphQLContext['sendSms'],
+  notifyUsers: GraphQLContext['notifyUsers'],
   validateMailOrPhone: GraphQLContext['validateMailOrPhone'],
   buildCoverAvatarUrl: GraphQLContext['buildCoverAvatarUrl'],
   loaders: Loaders,
@@ -106,8 +103,7 @@ export const createGraphQLContext = (
 
   return {
     locale,
-    sendMail,
-    sendSms,
+    notifyUsers,
     validateMailOrPhone,
     cardUsernamesToRevalidate: new Set<string>(),
     postsToRevalidate: new Set<{ userName: string; id: string }>(),

@@ -3,13 +3,14 @@ import { eq, and } from 'drizzle-orm';
 import { GraphQLError } from 'graphql';
 import { fromGlobalId } from 'graphql-relay';
 import { ProfileTable, db } from '@azzapp/data';
+import { guessLocale } from '@azzapp/i18n';
 import ERRORS from '@azzapp/shared/errors';
 import type { MutationResolvers } from '#/__generated__/types';
 
 const acceptOwnership: MutationResolvers['acceptOwnership'] = async (
   _,
   { profileId: gqlProfileId },
-  { auth, loaders, sendMail, sendSms },
+  { auth, loaders, notifyUsers },
 ) => {
   const { userId } = auth;
   const profileId = fromGlobalId(gqlProfileId).id;
@@ -48,19 +49,21 @@ const acceptOwnership: MutationResolvers['acceptOwnership'] = async (
   const { email, phoneNumber } = user;
   try {
     if (phoneNumber) {
-      await sendSms({
-        body: `Dear user, you are invited to take over the ownership of ${webCard.userName}. You can accept or decline the invitation from the app home page.`,
-        phoneNumber,
-      });
+      await notifyUsers(
+        'phone',
+        [phoneNumber],
+        webCard,
+        'transferOwnership',
+        guessLocale(user.locale),
+      );
     } else if (email) {
-      await sendMail([
-        {
-          email,
-          subject: `WebCard ownership transfer invitation.`,
-          text: `Dear user, you are invited to take over the ownership of ${webCard.userName}. You can accept or decline the invitation from the app home page.`,
-          html: `<div>Dear user, you are invited to take over the ownership of ${webCard.userName}. You can accept or decline the invitation from the app home page.</div>`,
-        },
-      ]);
+      await notifyUsers(
+        'email',
+        [email],
+        webCard,
+        'transferOwnership',
+        guessLocale(user.locale),
+      );
     }
   } catch (e) {
     Sentry.captureException(e);

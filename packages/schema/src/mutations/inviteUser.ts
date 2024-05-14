@@ -16,7 +16,7 @@ import type { GraphQLContext } from '#index';
 const inviteUserMutation: MutationResolvers['inviteUser'] = async (
   _,
   { profileId: gqlProfileId, invited, sendInvite },
-  { sendMail, sendSms }: GraphQLContext,
+  { notifyUsers, auth }: GraphQLContext,
 ) => {
   const profileId = fromGlobalIdWithType(gqlProfileId, 'Profile');
 
@@ -46,10 +46,15 @@ const inviteUserMutation: MutationResolvers['inviteUser'] = async (
       }
     : undefined;
 
+  if (!auth.userId) {
+    throw new GraphQLError(ERRORS.UNAUTHORIZED);
+  }
+
   try {
     const profile = await inviteUser({
       auth: {
         profileId,
+        userId: auth.userId,
       },
       invited: {
         profileRole: invited.profileRole,
@@ -58,8 +63,7 @@ const inviteUserMutation: MutationResolvers['inviteUser'] = async (
         phoneNumber,
       },
       sendInvite: sendInvite ?? false,
-      sendMail,
-      sendSms,
+      notifyUsers,
     });
 
     return { profile };

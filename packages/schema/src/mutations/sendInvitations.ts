@@ -2,6 +2,7 @@ import * as Sentry from '@sentry/nextjs';
 import { GraphQLError } from 'graphql';
 import { toGlobalId } from 'graphql-relay';
 import { getUsersFromWebCardId, updateProfiles } from '@azzapp/data';
+import { guessLocale } from '@azzapp/i18n';
 import ERRORS from '@azzapp/shared/errors';
 import fromGlobalIdWithType from '#helpers/relayIdHelpers';
 import type { MutationResolvers } from '#/__generated__/types';
@@ -12,7 +13,7 @@ const MAX_INVITATIONS_BY_SMS = 20;
 const sendInvitations: MutationResolvers['sendInvitations'] = async (
   _,
   { webCardId: gqlWebCardId, profileIds, allProfiles },
-  { sendMail, sendSms, loaders },
+  { notifyUsers, loaders, auth },
 ) => {
   const webCardId = fromGlobalIdWithType(gqlWebCardId, 'WebCard');
 
@@ -32,6 +33,12 @@ const sendInvitations: MutationResolvers['sendInvitations'] = async (
   if (!webCard) {
     throw new GraphQLError(ERRORS.INVALID_REQUEST);
   }
+
+  if (!auth.userId) {
+    throw new GraphQLError(ERRORS.UNAUTHORIZED);
+  }
+
+  const user = await loaders.User.load(auth.userId);
 
   const { withEmail, withPhoneNumbers } = users.reduce<{
     withEmail: typeof users;
@@ -64,24 +71,22 @@ const sendInvitations: MutationResolvers['sendInvitations'] = async (
     }
 
     if (withEmail.length > 0) {
-      await sendMail(
-        withEmail.map(({ email }) => ({
-          email: email!,
-          subject: `You have been invited to join ${webCard.userName}`,
-          text: `You have been invited to join ${webCard.userName} on Azzapp! Download the app and sign up with this email to join: ${email}`,
-          html: `<div>You have been invited to join ${webCard.userName} on Azzapp! Download the app and sign up with this email to join: ${email}</div>`,
-        })),
+      await notifyUsers(
+        'email',
+        withEmail.map(({ email }) => email!),
+        webCard,
+        'invitation',
+        guessLocale(user?.locale),
       );
     }
 
     if (withPhoneNumbers.length > 0) {
-      await Promise.allSettled(
-        withPhoneNumbers.map(({ phoneNumber }) =>
-          sendSms({
-            phoneNumber: phoneNumber!,
-            body: `You have been invited to join ${webCard.userName} on Azzapp! Download the app and sign up with this phone number to join: ${phoneNumber}`,
-          }),
-        ),
+      await notifyUsers(
+        'phone',
+        withPhoneNumbers.map(({ phoneNumber }) => phoneNumber!),
+        webCard,
+        'invitation',
+        guessLocale(user?.locale),
       );
     }
   } catch (e) {

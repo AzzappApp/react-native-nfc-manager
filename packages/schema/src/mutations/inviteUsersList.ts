@@ -10,6 +10,7 @@ import {
   db,
   updateWebCard,
 } from '@azzapp/data';
+import { guessLocale } from '@azzapp/i18n';
 import ERRORS from '@azzapp/shared/errors';
 import { isValidEmail } from '@azzapp/shared/stringHelpers';
 import fromGlobalIdWithType from '#helpers/relayIdHelpers';
@@ -24,9 +25,15 @@ import type { NewProfile } from '@azzapp/data';
 const inviteUsersListMutation: MutationResolvers['inviteUsersList'] = async (
   _,
   { profileId: gqlProfileId, invited, sendInvite },
-  { auth, loaders, sendMail }: GraphQLContext,
+  { auth, loaders, notifyUsers }: GraphQLContext,
 ) => {
   const { userId } = auth;
+
+  if (!userId) {
+    throw new GraphQLError(ERRORS.UNAUTHORIZED);
+  }
+
+  const user = await loaders.User.load(userId);
 
   const profileId = fromGlobalIdWithType(gqlProfileId, 'Profile');
   const profile = profileId && (await loaders.Profile.load(profileId));
@@ -177,13 +184,12 @@ const inviteUsersListMutation: MutationResolvers['inviteUsersList'] = async (
 
   try {
     if (sentEmail.length > 0 && sendInvite) {
-      await sendMail(
-        sentEmail.map(email => ({
-          email,
-          subject: `You have been invited to join ${webCard.userName}`,
-          text: `You have been invited to join ${webCard.userName} on Azzapp! Download the app and sign up with this email to join: ${email}`,
-          html: `<div>You have been invited to join ${webCard.userName} on Azzapp! Download the app and sign up with this email to join: ${email}</div>`,
-        })),
+      await notifyUsers(
+        'email',
+        sentEmail,
+        webCard,
+        'invitation',
+        guessLocale(user?.locale),
       );
     }
   } catch (e) {

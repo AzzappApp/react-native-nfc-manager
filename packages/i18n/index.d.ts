@@ -17,3 +17,5 @@ export const DEFAULT_LOCALE: Locale = 'en-US';
 export type Locale = (typeof SUPPORTED_LOCALES)[number];
 
 export function isSupportedLocale(string: unknown): string is Locale;
+
+export function guessLocale(string?: string | null): Locale;

@@ -5,40 +5,40 @@ import type { Locale } from '@azzapp/i18n';
 
 const webMessages: Record<Locale, Record<string, string>> = {
   get da() {
-    return {}; //require('@azzapp/i18n/compiled/web/da.json');
+    return require('@azzapp/i18n/compiled/web/da.json');
   },
   get 'en-US'() {
-    return {}; //require('@azzapp/i18n/compiled/web/en-US.json');
+    return require('@azzapp/i18n/compiled/web/en-US.json');
   },
   get 'en-GB'() {
-    return {}; //require('@azzapp/i18n/compiled/web/en-GB.json');
+    return require('@azzapp/i18n/compiled/web/en-GB.json');
   },
   get es() {
-    return {}; //require('@azzapp/i18n/compiled/web/es.json');
+    return require('@azzapp/i18n/compiled/web/es.json');
   },
   get fr() {
-    return {}; //require('@azzapp/i18n/compiled/web/fr.json');
+    return require('@azzapp/i18n/compiled/web/fr.json');
   },
   get it() {
-    return {}; //require('@azzapp/i18n/compiled/web/it.json');
+    return require('@azzapp/i18n/compiled/web/it.json');
   },
   get nl() {
-    return {}; //require('@azzapp/i18n/compiled/web/nl.json');
+    return require('@azzapp/i18n/compiled/web/nl.json');
   },
   get no() {
-    return {}; //require('@azzapp/i18n/compiled/web/no.json');
+    return require('@azzapp/i18n/compiled/web/no.json');
   },
   get 'pt-BR'() {
-    return {}; //require('@azzapp/i18n/compiled/web/pt-BR.json');
+    return require('@azzapp/i18n/compiled/web/pt-BR.json');
   },
   get 'pt-PT'() {
-    return {}; //require('@azzapp/i18n/compiled/web/pt-PT.json');
+    return require('@azzapp/i18n/compiled/web/pt-PT.json');
   },
   get sv() {
-    return {}; //require('@azzapp/i18n/compiled/web/sv.json');
+    return require('@azzapp/i18n/compiled/web/sv.json');
   },
   get de() {
-    return {}; //require('@azzapp/i18n/compiled/web/de.json');
+    return require('@azzapp/i18n/compiled/web/de.json');
   },
 };
 export const getTranslationMessages = (locale: Locale = DEFAULT_LOCALE) => {
