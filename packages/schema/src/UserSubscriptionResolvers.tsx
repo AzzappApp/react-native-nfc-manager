@@ -1,4 +1,4 @@
-import { getTotalMultiUser } from '@azzapp/data';
+import { calculateAvailableSeats } from '#use-cases/subscription';
 import type { UserSubscriptionResolvers } from './__generated__/types';
 
 export const UserSubscription: UserSubscriptionResolvers = {
@@ -9,8 +9,8 @@ export const UserSubscription: UserSubscriptionResolvers = {
     if (userSubscription.userId !== auth.userId) {
       return 0;
     }
-    const totalUsed = await getTotalMultiUser(auth.userId);
-    return userSubscription.totalSeats - totalUsed;
+
+    return calculateAvailableSeats(userSubscription);
   },
   subscriptionPlan: async (userSubscription, _args) => {
     switch (userSubscription.subscriptionPlan) {

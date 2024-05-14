@@ -234,6 +234,7 @@ const permissions = shield(
   },
   {
     allowExternalErrors: true,
+    fallbackError: new GraphQLError(ERRORS.FORBIDDEN),
   },
 );
 

@@ -5,9 +5,9 @@ import {
   createNewPaymentMean,
   estimate,
   generateInvoice,
-  updateExistingSubscription,
   upgradePlan,
   endSubscription as endExistingSubscription,
+  updateSubscriptionForWebCard,
 } from '@azzapp/payment';
 import ERRORS from '@azzapp/shared/errors';
 import fromGlobalIdWithType from '#helpers/relayIdHelpers';
@@ -30,18 +30,20 @@ export const createPaymentIntent: MutationResolvers['createPaymentIntent'] =
     if (!auth.userId) {
       throw new GraphQLError(ERRORS.UNAUTHORIZED);
     }
+    try {
+      const result = await createPaymentRequest({
+        ...intent,
+        webCardId: fromGlobalIdWithType(webCardId, 'WebCard'),
+        userId: auth.userId,
+      });
 
-    const result = await createPaymentRequest({
-      ...intent,
-      webCardId: fromGlobalIdWithType(webCardId, 'WebCard'),
-      userId: auth.userId,
-    });
-
-    if (!result?.clientRedirectUrl) {
+      if (!result?.clientRedirectUrl) {
+        throw new GraphQLError(ERRORS.PAYMENT_ERROR);
+      }
+      return result;
+    } catch (error) {
       throw new GraphQLError(ERRORS.PAYMENT_ERROR);
     }
-
-    return result;
   };
 
 export const createSubscriptionFromPaymentMean: MutationResolvers['createSubscriptionFromPaymentMean'] =
@@ -114,7 +116,7 @@ export const updateSubscription: MutationResolvers['updateSubscription'] =
 
     const webCardId = fromGlobalIdWithType(gqlWebCardId, 'WebCard');
 
-    return updateExistingSubscription({
+    return updateSubscriptionForWebCard({
       webCardId,
       totalSeats,
       paymentMeanId: gqlPaymentMeanId

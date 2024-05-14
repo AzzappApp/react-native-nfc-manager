@@ -1,7 +1,8 @@
 import dayjs from 'dayjs';
-import { eq } from 'drizzle-orm';
+import { eq, and } from 'drizzle-orm';
 import {
   PaymentTable,
+  UserSubscriptionTable,
   createPaymentMean,
   createSubscription,
   db,
@@ -165,6 +166,21 @@ export const createPaymentRequest = async ({
       },
       trx,
     );
+
+    const subscription = await getUserSubscriptionForWebCard(userId, webCardId);
+
+    if (subscription && subscription.status === 'active') {
+      throw new Error('Subscription already active');
+    }
+
+    await trx
+      .delete(UserSubscriptionTable)
+      .where(
+        and(
+          eq(UserSubscriptionTable.webCardId, webCardId),
+          eq(UserSubscriptionTable.userId, userId),
+        ),
+      );
 
     await createSubscription(
       {

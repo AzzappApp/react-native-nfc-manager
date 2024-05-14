@@ -14,6 +14,7 @@ import { guessLocale } from '@azzapp/i18n';
 import ERRORS from '@azzapp/shared/errors';
 import { isValidEmail } from '@azzapp/shared/stringHelpers';
 import fromGlobalIdWithType from '#helpers/relayIdHelpers';
+import { checkSubscription } from '#use-cases/subscription';
 import type {
   InviteUserEmailInput,
   InviteUserRejected,
@@ -77,7 +78,7 @@ const inviteUsersListMutation: MutationResolvers['inviteUsersList'] = async (
     throw new GraphQLError(ERRORS.INVALID_REQUEST);
   }
 
-  const { createdAt, users } = await db.transaction(async trx => {
+  const { users, createdProfiles } = await db.transaction(async trx => {
     if (!webCard.isMultiUser) {
       await updateWebCard(webCard.id, { isMultiUser: true }, trx);
     }
@@ -150,19 +151,33 @@ const inviteUsersListMutation: MutationResolvers['inviteUsersList'] = async (
       await createProfiles(profileToCreate, trx);
     }
 
-    return { createdAt, users };
-  });
+    const createdProfiles = await db
+      .select()
+      .from(ProfileTable)
+      .where(
+        and(
+          eq(ProfileTable.webCardId, profile.webCardId),
+          eq(ProfileTable.createdAt, createdAt),
+        ),
+      )
+      .then(res => res);
 
-  const createdProfiles = await db
-    .select()
-    .from(ProfileTable)
-    .where(
-      and(
-        eq(ProfileTable.webCardId, profile.webCardId),
-        eq(ProfileTable.createdAt, createdAt),
-      ),
-    )
-    .then(res => res);
+    if (!auth.userId) {
+      throw new GraphQLError(ERRORS.UNAUTHORIZED);
+    }
+
+    const canBeAdded = await checkSubscription(
+      auth.userId,
+      webCard.id,
+      createdProfiles.length,
+    );
+
+    if (!canBeAdded) {
+      throw new GraphQLError(ERRORS.SUBSCRIPTION_REQUIRED);
+    }
+
+    return { users, createdProfiles };
+  });
 
   const sentEmail: string[] = [];
   for (const invited of filtered) {

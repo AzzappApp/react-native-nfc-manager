@@ -27,10 +27,10 @@ export const calculateAmount = (
   totalSeats: number,
   subscriptionPlan: SubscriptionPlan,
 ) => {
-  return (
+  return Math.round(
     (subscriptionPlan === 'web.monthly'
       ? totalSeats * 1.2
-      : totalSeats * 0.99) * 100
+      : totalSeats * 0.99) * 100,
   ); // cents;
 };
 

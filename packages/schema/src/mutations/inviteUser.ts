@@ -9,6 +9,7 @@ import { inviteUser } from '#use-cases';
 import fromGlobalIdWithType from '#helpers/relayIdHelpers';
 import { ProfileAlreadyExistsException } from '#use-cases/exceptions/profile-already-exists.exception';
 import { ProfileDoesNotExistException } from '#use-cases/exceptions/profile-does-not-exist.exception';
+import { InsufficientSubscriptionException } from '#use-cases/exceptions/subscription.exception';
 import type { MutationResolvers } from '#__generated__/types';
 import type { GraphQLContext } from '#index';
 
@@ -74,6 +75,10 @@ const inviteUserMutation: MutationResolvers['inviteUser'] = async (
 
     if (e instanceof ProfileAlreadyExistsException) {
       throw new GraphQLError(ERRORS.PROFILE_ALREADY_EXISTS);
+    }
+
+    if (e instanceof InsufficientSubscriptionException) {
+      throw new GraphQLError(ERRORS.SUBSCRIPTION_REQUIRED);
     }
 
     throw new GraphQLError(ERRORS.INTERNAL_SERVER_ERROR);

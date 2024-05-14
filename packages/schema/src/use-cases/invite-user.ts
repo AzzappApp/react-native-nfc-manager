@@ -15,6 +15,8 @@ import {
   ProfileDoesNotExistException,
   UserDoesNotExistException,
 } from './exceptions/profile-does-not-exist.exception';
+import { InsufficientSubscriptionException } from './exceptions/subscription.exception';
+import { checkSubscription } from './subscription';
 import type { GraphQLContext } from '#GraphQLContext';
 import type { Profile, WebCard } from '@azzapp/data';
 import type { Locale } from '@azzapp/i18n';
@@ -61,6 +63,7 @@ export const inviteUser = async (input: Input) => {
       if (!webCard.isMultiUser) {
         await updateWebCard(webCard.id, { isMultiUser: true });
       }
+
       const existingUser = await getUserByEmailPhoneNumber(
         input.invited.email,
         input.invited.phoneNumber,
@@ -79,9 +82,9 @@ export const inviteUser = async (input: Input) => {
 
       const { displayedOnWebCard, isPrivate, avatarId, logoId, ...data } =
         input.invited.contactCard ?? {};
-
+      let profile: Profile;
       try {
-        const profile: Profile = {
+        profile = {
           id: createId(),
           webCardId: webCard.id,
           userId,
@@ -106,10 +109,20 @@ export const inviteUser = async (input: Input) => {
         };
 
         await createProfile(profile, tx);
-        return { profile, user: existingUser };
       } catch (e) {
         throw new ProfileAlreadyExistsException();
       }
+
+      const canBeAdded = await checkSubscription(
+        input.auth.userId,
+        webCard.id,
+        1,
+      );
+
+      if (!canBeAdded) {
+        throw new InsufficientSubscriptionException();
+      }
+      return { profile, user: existingUser };
     });
 
   await notifyInvitedUser(

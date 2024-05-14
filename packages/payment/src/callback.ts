@@ -84,6 +84,7 @@ export const acknowledgeFirstPayment = async (
       );
 
       updates.rebillManagerId = rebillManager.data?.rebillManagerId;
+      updates.status = 'active';
 
       if (!rebillManager.data || rebillManager.data.status !== 'OK') {
         updates.status = 'canceled';

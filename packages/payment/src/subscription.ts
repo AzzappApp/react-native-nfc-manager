@@ -17,8 +17,9 @@ import {
   calculateTaxes,
   generateRebillFailRule,
 } from '#helpers';
+import type { UserSubscription } from '@azzapp/data';
 
-export const updateExistingSubscription = async ({
+export const updateSubscriptionForWebCard = async ({
   userId,
   webCardId,
   totalSeats,
@@ -36,6 +37,29 @@ export const updateExistingSubscription = async ({
 
   if (!existingSubscription) {
     throw new Error('No subscription found');
+  }
+
+  return updateExistingSubscription({
+    userSubscription: existingSubscription,
+    totalSeats,
+    paymentMeanId,
+  });
+};
+
+export const updateExistingSubscription = async ({
+  userSubscription: existingSubscription,
+  totalSeats,
+  paymentMeanId,
+}: {
+  userSubscription: UserSubscription;
+  totalSeats?: number | null;
+  paymentMeanId?: string | null;
+}) => {
+  if (
+    existingSubscription.subscriptionPlan !== 'web.monthly' &&
+    existingSubscription.subscriptionPlan !== 'web.yearly'
+  ) {
+    throw new Error('Invalid subscription plan');
   }
 
   if (!totalSeats && !paymentMeanId) {
@@ -175,8 +199,8 @@ export const updateExistingSubscription = async ({
         })
         .where(
           and(
-            eq(UserSubscriptionTable.webCardId, webCardId),
-            eq(UserSubscriptionTable.userId, userId),
+            eq(UserSubscriptionTable.webCardId, existingSubscription.webCardId),
+            eq(UserSubscriptionTable.userId, existingSubscription.userId),
           ),
         );
     } else {
@@ -313,13 +337,16 @@ export const updateExistingSubscription = async ({
       })
       .where(
         and(
-          eq(UserSubscriptionTable.webCardId, webCardId),
-          eq(UserSubscriptionTable.userId, userId),
+          eq(UserSubscriptionTable.webCardId, existingSubscription.webCardId),
+          eq(UserSubscriptionTable.userId, existingSubscription.userId),
         ),
       );
   }
 
-  return (await getUserSubscriptionForWebCard(userId, webCardId))!;
+  return (await getUserSubscriptionForWebCard(
+    existingSubscription.userId,
+    existingSubscription.webCardId,
+  ))!;
 };
 
 export const upgradePlan = async (userId: string, webCardId: string) => {

@@ -1,4 +1,4 @@
-import { eq, sql, lt, desc, and } from 'drizzle-orm';
+import { eq, sql, lt, desc, and, ne } from 'drizzle-orm';
 import db, { DEFAULT_DATETIME_VALUE, cols } from './db';
 import { FollowTable } from './follows';
 import { createId } from './helpers/createId';
@@ -360,3 +360,16 @@ export const getWebCardByProfileId = (id: string): Promise<WebCard | null> => {
       return result.WebCard;
     });
 };
+
+export const getWebCardProfilesCount = async (webCardId: string) =>
+  db
+    .select({ count: sql`count(*)`.mapWith(Number) })
+    .from(ProfileTable)
+
+    .where(
+      and(
+        eq(ProfileTable.webCardId, webCardId),
+        ne(ProfileTable.deleted, true),
+      ),
+    )
+    .then(res => res[0].count);
