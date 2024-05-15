@@ -1,4 +1,4 @@
-## 0.5.5-canary.303
+## 0.5.5-canary.304
 
 * **fix:**  - set correct external reference ([#3405](https://github.com/AzzappApp/azzapp/pull/3405))
 * **fix:**  - **shareBack:** [#3306](https://github.com/AzzappApp/azzapp/pull/3306) change order of fields and add i18n ([#3398](https://github.com/AzzappApp/azzapp/pull/3398))
