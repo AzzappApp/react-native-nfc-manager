@@ -1,5 +1,9 @@
-## 0.5.5-canary.301
+## 0.5.5-canary.302
 
+* **fix:**  - **shareBack:** [#3306](https://github.com/AzzappApp/azzapp/pull/3306) change order of fields and add i18n ([#3398](https://github.com/AzzappApp/azzapp/pull/3398))
+* **fix:**  - **searchBar:** [#3395](https://github.com/AzzappApp/azzapp/pull/3395) containerWidth is read as zero sometimes ([#3399](https://github.com/AzzappApp/azzapp/pull/3399))
+* **fix:**  - **deletePost:** [#1297](https://github.com/AzzappApp/azzapp/pull/1297) mistake on webcard nbPost update ([#3401](https://github.com/AzzappApp/azzapp/pull/3401))
+* **fix:**  - don’t update all subscription ([#3404](https://github.com/AzzappApp/azzapp/pull/3404))
 * **fix:**  - **multiUser:** [#3029](https://github.com/AzzappApp/azzapp/pull/3029) read phone numbers on android ([#3392](https://github.com/AzzappApp/azzapp/pull/3392))
 * **fix:**  - improve monthly subscription behaviour ([#3394](https://github.com/AzzappApp/azzapp/pull/3394))
 * **fix:**  - **webcard:** [#3335](https://github.com/AzzappApp/azzapp/pull/3335) use sub transactions for handling two updates on same row ([#3391](https://github.com/AzzappApp/azzapp/pull/3391))
