@@ -1,9 +1,11 @@
 import { ADMIN } from '#roles';
 
 export type SubSection = {
+  id: string;
   text: string;
   href: string;
   roles: string[];
+  badge?: number;
 };
 
 export type Section = {
@@ -17,13 +19,15 @@ const backOfficeSections: Section[] = [
     id: 'userActivity',
     text: 'Users activity',
     subSections: [
-      { text: 'Account', href: '/users', roles: [ADMIN] },
+      { id: 'account', text: 'Account', href: '/users', roles: [ADMIN] },
       {
+        id: 'moderations',
         text: 'Moderation',
         href: '/moderations',
         roles: [ADMIN],
       },
       {
+        id: 'metrics',
         text: 'Metrics',
         href: '/metrics',
         roles: [ADMIN],
@@ -35,11 +39,13 @@ const backOfficeSections: Section[] = [
     text: 'Profiles types',
     subSections: [
       {
+        id: 'webCardCategories',
         text: 'Categories',
         href: '/webCardCategories',
         roles: [ADMIN],
       },
       {
+        id: 'companyActivities',
         text: 'Activities',
         href: '/companyActivities',
         roles: [ADMIN],
@@ -51,17 +57,20 @@ const backOfficeSections: Section[] = [
     text: 'Webcards',
     subSections: [
       {
+        id: 'cardStyles',
         text: 'Styles',
         href: '/cardStyles',
         roles: [ADMIN],
       },
-      { text: 'Colors', href: '/colorPalettes', roles: [ADMIN] },
+      { id: 'colors', text: 'Colors', href: '/colorPalettes', roles: [ADMIN] },
       {
+        id: 'cardTemplates',
         text: 'Webcards templates',
         href: '/cardTemplates',
         roles: [ADMIN],
       },
       {
+        id: 'cardTemplateTypes',
         text: 'Webcards templates types',
         href: '/cardTemplateTypes',
         roles: [ADMIN],
@@ -73,21 +82,25 @@ const backOfficeSections: Section[] = [
     text: 'Covers',
     subSections: [
       {
+        id: 'coverTemplates',
         text: 'Covers templates',
         href: '/coverTemplates',
         roles: [ADMIN],
       },
       {
+        id: 'coverTemplateTypes',
         text: 'Covers templates types',
         href: '/coverTemplateTypes',
         roles: [ADMIN],
       },
       {
+        id: 'coverFilters',
         text: 'Cover filters',
         href: '/coverFilters',
         roles: [ADMIN],
       },
       {
+        id: 'suggestedMedias',
         text: 'Cover suggestions',
         href: '/suggestedMedias',
         roles: [ADMIN],
@@ -99,16 +112,19 @@ const backOfficeSections: Section[] = [
     text: 'Sections',
     subSections: [
       {
+        id: 'sections',
         text: 'Sections',
         href: '/sections',
         roles: [ADMIN],
       },
       {
+        id: 'sectionsTypes',
         text: 'Sections types',
         href: '#',
         roles: [ADMIN],
       },
       {
+        id: 'staticMedias',
         text: 'Sections backgrounds',
         href: '/staticMedias',
         roles: [ADMIN],

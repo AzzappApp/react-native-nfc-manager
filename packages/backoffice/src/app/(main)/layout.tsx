@@ -16,6 +16,8 @@ import {
   Toolbar,
   Typography,
 } from '@mui/material';
+import { sql } from 'drizzle-orm';
+import { db, ReportTable } from '@azzapp/data';
 import CollapseListItem from '#components/CollapseListItem';
 import LogoutButton from '#components/LogoutButton';
 import getCurrentUser from '#helpers/getCurrentUser';
@@ -25,6 +27,26 @@ const APPBAR_HEIGHT = 64;
 
 const MainLayout = async ({ children }: { children: React.ReactNode }) => {
   const user = await getCurrentUser();
+  const report = await db
+    .select({
+      status:
+        sql`(ISNULL(MAX(${ReportTable.treatedAt})) OR MAX(${ReportTable.treatedAt}) < MAX(${ReportTable.createdAt}))`
+          .mapWith(Number)
+          .as('status'),
+    })
+    .from(ReportTable)
+    .groupBy(ReportTable.targetId, ReportTable.targetType);
+
+  const sections = backOfficeSections.map(section => ({
+    ...section,
+    subSections: section.subSections.map(subSection => ({
+      ...subSection,
+      badge:
+        subSection.id === 'moderations'
+          ? report.filter(({ status }) => status > 0).length
+          : 0,
+    })),
+  }));
 
   return (
     <>
@@ -56,7 +78,7 @@ const MainLayout = async ({ children }: { children: React.ReactNode }) => {
       >
         <Divider />
         <List style={{ paddingTop: 40, overflow: 'auto' }}>
-          {backOfficeSections.map((section, i) => (
+          {sections.map((section, i) => (
             <CollapseListItem
               key={section.text}
               section={section}
