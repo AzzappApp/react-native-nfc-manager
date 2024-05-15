@@ -44,11 +44,6 @@ describe('SearchBar component', () => {
     ).toHaveAnimatedStyle({ width: 440 });
   });
 
-  test('TextInput should be null is `onLayout` is not call', () => {
-    render(<SearchBar placeholder={placeholder} onChangeText={onChangeText} />);
-    expect(screen.queryByTestId('azzapp__searchbar__textInput')).toBeNull();
-  });
-
   test('should call the `onChangeText` callback when writting text', () => {
     render(<SearchBar placeholder={placeholder} onChangeText={onChangeText} />);
 

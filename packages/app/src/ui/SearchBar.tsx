@@ -1,10 +1,11 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { TextInput, View, useColorScheme } from 'react-native';
 import Animated, {
   interpolate,
   interpolateColor,
   useAnimatedStyle,
+  useSharedValue,
 } from 'react-native-reanimated';
 import { isNotFalsyString } from '@azzapp/shared/stringHelpers';
 import { colors } from '#theme';
@@ -78,14 +79,22 @@ const SearchBar = ({
     onSubmitEditing?.(searchValue);
   };
 
-  const [containerWidth, setContainerWidth] = useState(0);
-  const onLayout = (e: LayoutChangeEvent) =>
-    setContainerWidth(e.nativeEvent.layout.width);
+  const containerWidth = useSharedValue(0);
+  const onLayout = useCallback(
+    (e: LayoutChangeEvent) => {
+      containerWidth.value = e.nativeEvent.layout.width;
+    },
+    [containerWidth],
+  );
 
   //button width depends on the length of the text(i18n)
-  const [cancelButtonWidth, setCancelButtonWidth] = useState<number>(0);
-  const onButtonLayout = (e: LayoutChangeEvent) =>
-    setCancelButtonWidth(e.nativeEvent.layout.width);
+  const cancelButtonWidth = useSharedValue(0);
+  const onButtonLayout = useCallback(
+    (e: LayoutChangeEvent) => {
+      cancelButtonWidth.value = e.nativeEvent.layout.width;
+    },
+    [cancelButtonWidth],
+  );
 
   const focus = (event: GestureResponderEvent) => {
     event.preventDefault();
@@ -97,17 +106,23 @@ const SearchBar = ({
   const [isFocused, setIsFocused] = useState(false);
   const timing = useAnimatedState(isFocused, { duration: animationDuration });
 
-  const onInputFocus = (e: NativeSyntheticEvent<TextInputFocusEventData>) => {
-    setIsFocused(true);
-    onFocus?.(e);
-  };
+  const onInputFocus = useCallback(
+    (e: NativeSyntheticEvent<TextInputFocusEventData>) => {
+      setIsFocused(true);
+      onFocus?.(e);
+    },
+    [onFocus],
+  );
 
-  const onInputBlur = (e: NativeSyntheticEvent<TextInputFocusEventData>) => {
-    setIsFocused(false);
-    if (onBlur) {
-      onBlur(e);
-    }
-  };
+  const onInputBlur = useCallback(
+    (e: NativeSyntheticEvent<TextInputFocusEventData>) => {
+      setIsFocused(false);
+      if (onBlur) {
+        onBlur(e);
+      }
+    },
+    [onBlur],
+  );
 
   const intl = useIntl();
   const colorScheme = useColorScheme();
@@ -117,11 +132,10 @@ const SearchBar = ({
         timing.value,
         [0, 1],
         [
-          containerWidth,
-          containerWidth - cancelButtonWidth - MARGIN_LEFT_BUTTON,
+          containerWidth.value,
+          containerWidth.value - cancelButtonWidth.value - MARGIN_LEFT_BUTTON,
         ],
       ),
-
       borderWidth: timing.value,
       borderColor: interpolateColor(
         timing.value,
@@ -132,7 +146,7 @@ const SearchBar = ({
         ],
       ),
     };
-  }, [containerWidth, cancelButtonWidth]);
+  });
 
   return (
     <Container style={containerStyle}>
@@ -142,71 +156,63 @@ const SearchBar = ({
         onLayout={onLayout}
       >
         <View style={styles.wrapper}>
-          {containerWidth > 0 && (
-            <>
-              <Animated.View
-                testID="azzapp__SearchBar__view-inputcontainer"
-                style={[
-                  styles.innerSearchBarView,
-                  { width: containerWidth },
-                  animatedStyle,
-                ]}
-                onTouchStart={focus}
-              >
-                <Icon
-                  icon="search"
-                  style={[styles.lensIcon, isFocused && styles.lensIconFocuses]}
-                />
-                <TextInput
-                  testID="azzapp__searchbar__textInput"
-                  accessibilityLabel={intl.formatMessage({
-                    defaultMessage: 'Enter your search word',
-                    description: 'Seach bar - accessibility label',
-                  })}
-                  placeholder={placeholder}
-                  ref={textInputRef}
-                  onFocus={onInputFocus}
-                  onBlur={onInputBlur}
-                  style={styles.input}
-                  value={searchValue}
-                  onChangeText={onSetValueText}
-                  selectionColor={colors.primary400}
-                  returnKeyType="search"
-                  onSubmitEditing={onSubmitEditingLocal}
-                  autoFocus={autoFocus}
-                />
-                {isNotFalsyString(searchValue) && (
-                  <PressableNative
-                    accessibilityRole="button"
-                    accessibilityLabel={intl.formatMessage({
-                      defaultMessage: 'Tap to clear your search',
-                      description: 'SearchBar accessibilityLabel Clear Button',
-                    })}
-                    onPress={onPressClear}
-                    testID="azzapp__SearchBar__clear-button"
-                    style={styles.cancelPressable}
-                  >
-                    <Icon icon="closeFull" style={styles.cancelIcon} />
-                  </PressableNative>
-                )}
-              </Animated.View>
-              <Button
+          <Animated.View
+            testID="azzapp__SearchBar__view-inputcontainer"
+            style={[styles.innerSearchBarView, animatedStyle]}
+            onTouchStart={focus}
+          >
+            <Icon
+              icon="search"
+              style={[styles.lensIcon, isFocused && styles.lensIconFocuses]}
+            />
+            <TextInput
+              testID="azzapp__searchbar__textInput"
+              accessibilityLabel={intl.formatMessage({
+                defaultMessage: 'Enter your search word',
+                description: 'Seach bar - accessibility label',
+              })}
+              placeholder={placeholder}
+              ref={textInputRef}
+              onFocus={onInputFocus}
+              onBlur={onInputBlur}
+              style={styles.input}
+              value={searchValue}
+              onChangeText={onSetValueText}
+              selectionColor={colors.primary400}
+              returnKeyType="search"
+              onSubmitEditing={onSubmitEditingLocal}
+              autoFocus={autoFocus}
+            />
+            {isNotFalsyString(searchValue) && (
+              <PressableNative
                 accessibilityRole="button"
                 accessibilityLabel={intl.formatMessage({
-                  defaultMessage: 'Tap to cancel your search',
-                  description: 'SearchBar accessibilityLabel Cancel Button',
+                  defaultMessage: 'Tap to clear your search',
+                  description: 'SearchBar accessibilityLabel Clear Button',
                 })}
-                testID="azzapp__SearchBar__cancel-button"
-                variant="secondary"
-                onLayout={onButtonLayout}
-                onPress={onPressCancel}
-                label={intl.formatMessage({
-                  defaultMessage: 'Cancel',
-                  description: 'SearchBar - Cancel button',
-                })}
-              />
-            </>
-          )}
+                onPress={onPressClear}
+                testID="azzapp__SearchBar__clear-button"
+                style={styles.cancelPressable}
+              >
+                <Icon icon="closeFull" style={styles.cancelIcon} />
+              </PressableNative>
+            )}
+          </Animated.View>
+          <Button
+            accessibilityRole="button"
+            accessibilityLabel={intl.formatMessage({
+              defaultMessage: 'Tap to cancel your search',
+              description: 'SearchBar accessibilityLabel Cancel Button',
+            })}
+            testID="azzapp__SearchBar__cancel-button"
+            variant="secondary"
+            onLayout={onButtonLayout}
+            onPress={onPressCancel}
+            label={intl.formatMessage({
+              defaultMessage: 'Cancel',
+              description: 'SearchBar - Cancel button',
+            })}
+          />
         </View>
       </View>
     </Container>
