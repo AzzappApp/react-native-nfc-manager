@@ -47,11 +47,11 @@ const getReportsQuery = () => {
       targetId: ReportTable.targetId,
       targetType: ReportTable.targetType,
       reportCount: sql`count(*)`.mapWith(Number).as('reportCount'),
-      latestReport: sql`max(${ReportTable.createdAt})`
-        .mapWith(Date)
+      latestReport: sql`MAX(${ReportTable.createdAt})`
+        .mapWith(String)
         .as('latestReport'),
-      treatedAt: sql`max(${ReportTable.treatedAt})`
-        .mapWith(Date)
+      treatedAt: sql`MAX(${ReportTable.treatedAt})`
+        .mapWith(String)
         .as('treatedAt'),
       status:
         sql`(ISNULL(MAX(${ReportTable.treatedAt})) OR MAX(${ReportTable.treatedAt}) < MAX(${ReportTable.createdAt}))`
