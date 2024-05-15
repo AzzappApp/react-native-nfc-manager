@@ -77,7 +77,7 @@ export const acknowledgeFirstPayment = async (
             rebill_manager_rebill_period_mins: `${intervalInMinutes}`,
             clientPaymentRequestUlid: paymentMeanId,
             rebill_manager_fail_rule: generateRebillFailRule(),
-            rebill_manager_external_reference: webCardId,
+            rebill_manager_external_reference: subscription.subscriptionId,
             rebill_manager_callback_url: `${process.env.NEXT_PUBLIC_WEB_URL}/api/webhook/subscription`,
           },
         },
