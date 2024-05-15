@@ -1,6 +1,7 @@
 'use client';
 
 import cx from 'classnames';
+import dynamic from 'next/dynamic';
 import { forwardRef, useImperativeHandle, useRef } from 'react';
 import { FormattedMessage } from 'react-intl';
 import { ShareBackIcon } from '#assets';
@@ -10,6 +11,10 @@ import Avatar from '#ui/Avatar/Avatar';
 import styles from './ShareBackModal.css';
 import ShareBackModalForm from './ShareBackModalForm';
 import type { ModalActions } from '#ui/Modal';
+
+const AppIntlProvider = dynamic(() => import('../AppIntlProvider'), {
+  ssr: false,
+});
 
 type ShareBackModalProps = Omit<ModalProps, 'children'> & {
   fullname: string;
@@ -37,43 +42,45 @@ const ShareBackModal = forwardRef<ModalActions, ShareBackModalProps>(
     }));
 
     return (
-      <Modal ref={internalRef}>
-        <div
-          className={cx(
-            styles.header,
-            isMultiUser ? styles.headerContainsAvatars : '',
-          )}
-        >
-          <div className={styles.avatarContainer}>
-            {isMultiUser ? (
-              <>
-                <Avatar variant="icon" icon={<ShareBackIcon />} />
-                {avatarUrl ? (
-                  <Avatar variant="image" url={avatarUrl} alt={fullname} />
-                ) : (
-                  <Avatar variant="initials" initials={initials} />
-                )}
-              </>
-            ) : null}
+      <AppIntlProvider>
+        <Modal ref={internalRef}>
+          <div
+            className={cx(
+              styles.header,
+              isMultiUser ? styles.headerContainsAvatars : '',
+            )}
+          >
+            <div className={styles.avatarContainer}>
+              {isMultiUser ? (
+                <>
+                  <Avatar variant="icon" icon={<ShareBackIcon />} />
+                  {avatarUrl ? (
+                    <Avatar variant="image" url={avatarUrl} alt={fullname} />
+                  ) : (
+                    <Avatar variant="initials" initials={initials} />
+                  )}
+                </>
+              ) : null}
+            </div>
+            <span className={styles.title}>
+              <FormattedMessage
+                defaultMessage="Share your details with"
+                id="vkuk13"
+                description="Share back modal title"
+              />
+            </span>
+            <span className={styles.title}>{fullname}</span>
           </div>
-          <span className={styles.title}>
-            <FormattedMessage
-              defaultMessage="Share your details with"
-              id="vkuk13"
-              description="Share back modal title"
-            />
-          </span>
-          <span className={styles.title}>{fullname}</span>
-        </div>
 
-        <ShareBackModalForm
-          token={token}
-          userId={userId}
-          onSuccess={() => {
-            internalRef.current?.close();
-          }}
-        />
-      </Modal>
+          <ShareBackModalForm
+            token={token}
+            userId={userId}
+            onSuccess={() => {
+              internalRef.current?.close();
+            }}
+          />
+        </Modal>
+      </AppIntlProvider>
     );
   },
 );

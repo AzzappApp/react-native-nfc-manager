@@ -1,6 +1,7 @@
 'use client';
 import cx from 'classnames';
 import { decompressFromEncodedURIComponent } from 'lz-string';
+import dynamic from 'next/dynamic';
 import { useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
@@ -8,11 +9,18 @@ import { buildVCardFromSerializedContact } from '@azzapp/shared/vCardHelpers';
 import { CloseIcon } from '#assets';
 import { ButtonIcon } from '#ui';
 import { updateContactCardScanCounter } from '#app/actions/statisticsAction';
+
 import Avatar from '#ui/Avatar/Avatar';
 import LinkButton from '#ui/Button/LinkButton';
 import styles from './DownloadVCard.css';
 import type { WebCard } from '@azzapp/data';
 
+const AppIntlProvider = dynamic(
+  () => import('../../components/AppIntlProvider'),
+  {
+    ssr: false,
+  },
+);
 const DownloadVCard = ({
   webCard,
   onClose,
@@ -106,89 +114,91 @@ const DownloadVCard = ({
   const intl = useIntl();
 
   return (
-    <div
-      id="contactCard"
-      className={opened ? styles.openedOverlay : styles.overlay}
-      onClick={event => {
-        if ('id' in event.target && event.target.id === 'contactCard') {
-          handleClose();
-        }
-      }}
-      role="button"
-    >
+    <AppIntlProvider>
       <div
-        className={opened ? styles.openedDialog : styles.dialog}
-        role="dialog"
-        aria-label={intl.formatMessage({
-          defaultMessage: 'Modal with contact card download link',
-          id: 'aumcS0',
-          description: 'Download vCard modal aria label',
-        })}
+        id="contactCard"
+        className={opened ? styles.openedOverlay : styles.overlay}
+        onClick={event => {
+          if ('id' in event.target && event.target.id === 'contactCard') {
+            handleClose();
+          }
+        }}
+        role="button"
       >
-        <div className={styles.avatarContainer}>
-          {webCard.isMultiUser && contact ? (
-            contact?.avatarUrl ? (
-              <Avatar
-                variant="image"
-                url={contact.avatarUrl}
-                alt={
-                  `${contact.firstName ?? ''}  ${contact.lastName ?? ''}`.trim() ||
-                  contact.company ||
-                  webCard.userName
-                }
-              />
-            ) : (
-              <Avatar
-                variant="initials"
-                initials={`${contact.firstName?.length ?? 0 > 0 ? contact.firstName[0] : ''}${contact.lastName?.length ?? 0 > 0 ? contact.lastName[0] : ''}`}
-              />
-            )
-          ) : null}
-        </div>
-        <span
-          className={cx(
-            styles.message,
-            webCard.isMultiUser ? styles.messageContainsAvatars : '',
-          )}
+        <div
+          className={opened ? styles.openedDialog : styles.dialog}
+          role="dialog"
+          aria-label={intl.formatMessage({
+            defaultMessage: 'Modal with contact card download link',
+            id: 'aumcS0',
+            description: 'Download vCard modal aria label',
+          })}
         >
-          <FormattedMessage
-            defaultMessage="Add {userName} to your contacts"
-            id="5AubE3"
-            description="Download vCard modal message"
-            values={{
-              userName: contact
-                ? `${contact.firstName ?? ''}  ${
-                    contact.lastName ?? ''
-                  }`.trim() ||
-                  contact.company ||
-                  webCard.userName
-                : '',
-            }}
-          />
-        </span>
-
-        {fileUrl && (
-          <LinkButton
-            size="medium"
-            href={fileUrl}
-            download={`${webCard.userName}${contact?.firstName.trim() ? `-${contact.firstName.trim()}` : ''}${contact?.lastName.trim() ? `-${contact.lastName.trim()}` : ''}.vcf`}
+          <div className={styles.avatarContainer}>
+            {webCard.isMultiUser && contact ? (
+              contact?.avatarUrl ? (
+                <Avatar
+                  variant="image"
+                  url={contact.avatarUrl}
+                  alt={
+                    `${contact.firstName ?? ''}  ${contact.lastName ?? ''}`.trim() ||
+                    contact.company ||
+                    webCard.userName
+                  }
+                />
+              ) : (
+                <Avatar
+                  variant="initials"
+                  initials={`${contact.firstName?.length ?? 0 > 0 ? contact.firstName[0] : ''}${contact.lastName?.length ?? 0 > 0 ? contact.lastName[0] : ''}`}
+                />
+              )
+            ) : null}
+          </div>
+          <span
+            className={cx(
+              styles.message,
+              webCard.isMultiUser ? styles.messageContainsAvatars : '',
+            )}
           >
             <FormattedMessage
-              defaultMessage="Save Contact Card"
-              id="a4m505"
+              defaultMessage="Add {userName} to your contacts"
+              id="5AubE3"
               description="Download vCard modal message"
+              values={{
+                userName: contact
+                  ? `${contact.firstName ?? ''}  ${
+                      contact.lastName ?? ''
+                    }`.trim() ||
+                    contact.company ||
+                    webCard.userName
+                  : '',
+              }}
             />
-          </LinkButton>
-        )}
+          </span>
 
-        <ButtonIcon
-          onClick={handleClose}
-          size={30}
-          Icon={CloseIcon}
-          className={styles.closeButton}
-        />
+          {fileUrl && (
+            <LinkButton
+              size="medium"
+              href={fileUrl}
+              download={`${webCard.userName}${contact?.firstName.trim() ? `-${contact.firstName.trim()}` : ''}${contact?.lastName.trim() ? `-${contact.lastName.trim()}` : ''}.vcf`}
+            >
+              <FormattedMessage
+                defaultMessage="Save Contact Card"
+                id="a4m505"
+                description="Download vCard modal message"
+              />
+            </LinkButton>
+          )}
+
+          <ButtonIcon
+            onClick={handleClose}
+            size={30}
+            Icon={CloseIcon}
+            className={styles.closeButton}
+          />
+        </div>
       </div>
-    </div>
+    </AppIntlProvider>
   );
 };
 
