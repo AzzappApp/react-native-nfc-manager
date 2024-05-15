@@ -353,13 +353,6 @@ export const deletePost = async (
     await trx
       .update(WebCardTable)
       .set({
-        nbPosts: sql`GREATEST(${WebCardTable.nbPostsLiked} - 1, 0)`,
-      })
-      .where(eq(WebCardTable.id, post.webCardId));
-
-    await trx
-      .update(WebCardTable)
-      .set({
         nbPosts: sql`GREATEST(nbPosts - 1, 0)`,
       })
       .where(eq(WebCardTable.id, post.webCardId));
