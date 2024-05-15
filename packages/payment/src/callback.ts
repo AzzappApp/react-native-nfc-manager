@@ -201,10 +201,13 @@ export const rejectFirstPayment = async (
             ),
           );
 
-        await tx.update(UserSubscriptionTable).set({
-          status: 'canceled',
-          canceledAt: new Date(),
-        });
+        await tx
+          .update(UserSubscriptionTable)
+          .set({
+            status: 'canceled',
+            canceledAt: new Date(),
+          })
+          .where(eq(UserSubscriptionTable.paymentMeanId, paymentMeanId));
       });
     } else {
       await db
