@@ -2,6 +2,7 @@
 
 import cx from 'classnames';
 import { forwardRef, useImperativeHandle, useRef } from 'react';
+import { FormattedMessage } from 'react-intl';
 import { ShareBackIcon } from '#assets';
 import { Modal, type ModalProps } from '#ui';
 
@@ -55,7 +56,13 @@ const ShareBackModal = forwardRef<ModalActions, ShareBackModalProps>(
               </>
             ) : null}
           </div>
-          <span className={styles.title}>Share your details with</span>
+          <span className={styles.title}>
+            <FormattedMessage
+              defaultMessage="Share your details with"
+              id="vkuk13"
+              description="Share back modal title"
+            />
+          </span>
           <span className={styles.title}>{fullname}</span>
         </div>
 

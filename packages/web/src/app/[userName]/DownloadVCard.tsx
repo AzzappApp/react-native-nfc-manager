@@ -3,6 +3,7 @@ import cx from 'classnames';
 import { decompressFromEncodedURIComponent } from 'lz-string';
 import { useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import { FormattedMessage, useIntl } from 'react-intl';
 import { buildVCardFromSerializedContact } from '@azzapp/shared/vCardHelpers';
 import { CloseIcon } from '#assets';
 import { ButtonIcon } from '#ui';
@@ -102,6 +103,8 @@ const DownloadVCard = ({
     }
   };
 
+  const intl = useIntl();
+
   return (
     <div
       id="contactCard"
@@ -116,7 +119,11 @@ const DownloadVCard = ({
       <div
         className={opened ? styles.openedDialog : styles.dialog}
         role="dialog"
-        aria-label="Modal with contact card download link"
+        aria-label={intl.formatMessage({
+          defaultMessage: 'Modal with contact card download link',
+          id: 'aumcS0',
+          description: 'Download vCard modal aria label',
+        })}
       >
         <div className={styles.avatarContainer}>
           {webCard.isMultiUser && contact ? (
@@ -143,17 +150,22 @@ const DownloadVCard = ({
             styles.message,
             webCard.isMultiUser ? styles.messageContainsAvatars : '',
           )}
-        >{`Add ${
-          contact
-            ? `${
-                `${contact.firstName ?? ''}  ${
-                  contact.lastName ?? ''
-                }`.trim() ||
-                contact.company ||
-                webCard.userName
-              } to your contacts`
-            : ''
-        }`}</span>
+        >
+          <FormattedMessage
+            defaultMessage="Add {userName} to your contacts"
+            id="5AubE3"
+            description="Download vCard modal message"
+            values={{
+              userName: contact
+                ? `${contact.firstName ?? ''}  ${
+                    contact.lastName ?? ''
+                  }`.trim() ||
+                  contact.company ||
+                  webCard.userName
+                : '',
+            }}
+          />
+        </span>
 
         {fileUrl && (
           <LinkButton
@@ -161,7 +173,11 @@ const DownloadVCard = ({
             href={fileUrl}
             download={`${webCard.userName}${contact?.firstName.trim() ? `-${contact.firstName.trim()}` : ''}${contact?.lastName.trim() ? `-${contact.lastName.trim()}` : ''}.vcf`}
           >
-            Save Contact Card
+            <FormattedMessage
+              defaultMessage="Save Contact Card"
+              id="a4m505"
+              description="Download vCard modal message"
+            />
           </LinkButton>
         )}
 

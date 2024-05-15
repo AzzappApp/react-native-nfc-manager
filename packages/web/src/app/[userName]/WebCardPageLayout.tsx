@@ -6,6 +6,7 @@ import { useEffect, useRef, useState } from 'react';
 import { FlipIcon } from '#assets';
 import { ButtonIcon } from '#ui';
 import { updateWebCardViewsCounter } from '#app/actions/statisticsAction';
+import AppIntlProvider from '#components/AppIntlProvider';
 import ShareBackModal from '#components/ShareBackModal/ShareBackModal';
 import DownloadVCard from './DownloadVCard';
 import PostFeed from './PostFeed';
@@ -92,7 +93,7 @@ const WebCardPageLayout = (props: ProfilePageLayoutProps) => {
   }, []);
 
   return (
-    <>
+    <AppIntlProvider>
       <div className={styles.wrapper}>
         <div
           className={styles.background}
@@ -185,7 +186,7 @@ const WebCardPageLayout = (props: ProfilePageLayoutProps) => {
         token={contactDataVCard.token}
         isMultiUser={contactDataVCard.isMultiUser}
       />
-    </>
+    </AppIntlProvider>
   );
 };
 

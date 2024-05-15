@@ -3,6 +3,7 @@ import { parseWithZod } from '@conform-to/zod';
 import cx from 'classnames';
 import { useEffect } from 'react';
 import { useFormState, useFormStatus } from 'react-dom';
+import { FormattedMessage, useIntl } from 'react-intl';
 import { SuccessIcon } from '#assets';
 import { processShareBackSubmission } from '#app/actions/shareBackAction';
 import Button from '#ui/Button';
@@ -54,6 +55,8 @@ const ShareBackModalForm = (props: ShareBackModalContentProps) => {
     };
   }, [lastResult?.status, onSuccess]);
 
+  const intl = useIntl();
+
   return (
     <div className={styles.content}>
       {
@@ -80,9 +83,17 @@ const ShareBackModalForm = (props: ShareBackModalContentProps) => {
               id={fields.firstName.id}
               key={fields.firstName.id}
               className={styles.formInput}
-              placeholder="Enter your firstname"
+              placeholder={intl.formatMessage({
+                defaultMessage: 'Enter your firstName',
+                id: 'gwABd7',
+                description: 'Enter your firstName placeholder',
+              })}
               withLabel
-              labelText="First Name"
+              labelText={intl.formatMessage({
+                defaultMessage: 'First Name',
+                id: 'v7tRnI',
+                description: 'First Name label',
+              })}
             />
           </div>
 
@@ -91,29 +102,17 @@ const ShareBackModalForm = (props: ShareBackModalContentProps) => {
               {...getInputProps(fields.lastName, { type: 'text' })}
               key={fields.lastName.id}
               className={styles.formInput}
-              placeholder="Enter your lastname"
+              placeholder={intl.formatMessage({
+                defaultMessage: 'Enter your lastName',
+                id: 'EXZ52x',
+                description: 'Enter your lastName placeholder',
+              })}
               withLabel
-              labelText="Last Name"
-            />
-          </div>
-          <div className={styles.formField}>
-            <FormInput
-              {...getInputProps(fields.title, { type: 'text' })}
-              key={fields.title.id}
-              className={styles.formInput}
-              placeholder="Enter your title"
-              withLabel
-              labelText="Title"
-            />
-          </div>
-          <div className={styles.formField}>
-            <FormInput
-              {...getInputProps(fields.company, { type: 'text' })}
-              key={fields.company.id}
-              className={styles.formInput}
-              placeholder="Enter your company name"
-              withLabel
-              labelText="Company"
+              labelText={intl.formatMessage({
+                defaultMessage: 'Last Name',
+                id: 'A5iAGb',
+                description: 'Last Name label',
+              })}
             />
           </div>
           <div className={styles.formField}>
@@ -121,9 +120,17 @@ const ShareBackModalForm = (props: ShareBackModalContentProps) => {
               {...getInputProps(fields.phone, { type: 'text' })}
               key={fields.phone.id}
               className={styles.formInput}
-              placeholder="Enter your number"
+              placeholder={intl.formatMessage({
+                defaultMessage: 'Enter your number',
+                id: 'kj0dVs',
+                description: 'Enter your phone number placeholder',
+              })}
               withLabel
-              labelText="Phone"
+              labelText={intl.formatMessage({
+                defaultMessage: 'Phone',
+                id: 'tZyK9Z',
+                description: 'Phone label',
+              })}
             />
           </div>
           <div className={styles.formField}>
@@ -131,9 +138,53 @@ const ShareBackModalForm = (props: ShareBackModalContentProps) => {
               {...getInputProps(fields.email, { type: 'text' })}
               key={fields.email.id}
               className={styles.formInput}
-              placeholder="Enter your email address"
+              placeholder={intl.formatMessage({
+                defaultMessage: 'Enter your email address',
+                id: 'zHfOL+',
+                description: 'Enter your email placeholder',
+              })}
               withLabel
-              labelText="Email"
+              labelText={intl.formatMessage({
+                defaultMessage: 'Email',
+                id: 'pf0OWK',
+                description: 'Email label',
+              })}
+            />
+          </div>
+          <div className={styles.formField}>
+            <FormInput
+              {...getInputProps(fields.company, { type: 'text' })}
+              key={fields.company.id}
+              className={styles.formInput}
+              placeholder={intl.formatMessage({
+                defaultMessage: 'Enter your company name',
+                id: 'RLIWP8',
+                description: 'Enter your company name placeholder',
+              })}
+              withLabel
+              labelText={intl.formatMessage({
+                defaultMessage: 'Company',
+                id: 'tZcw8b',
+                description: 'Company label',
+              })}
+            />
+          </div>
+          <div className={styles.formField}>
+            <FormInput
+              {...getInputProps(fields.title, { type: 'text' })}
+              key={fields.title.id}
+              className={styles.formInput}
+              placeholder={intl.formatMessage({
+                defaultMessage: 'Enter your title',
+                id: 'vl4cm6',
+                description: 'Enter your title placeholder',
+              })}
+              withLabel
+              labelText={intl.formatMessage({
+                defaultMessage: 'Title',
+                id: 'LrvwcI',
+                description: 'Title label',
+              })}
             />
           </div>
         </div>
@@ -176,7 +227,11 @@ const ShareBackFormSubmitButton = ({
           isSuccess ? styles.formButtonSuccess : '',
         )}
       >
-        Send
+        <FormattedMessage
+          defaultMessage="Send"
+          id="Gm+qSm"
+          description="Share back - Send button label"
+        />
       </span>
       <div
         className={cx(

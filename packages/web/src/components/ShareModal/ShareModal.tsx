@@ -1,6 +1,8 @@
 'use client';
 import { forwardRef } from 'react';
+import { FormattedMessage } from 'react-intl';
 import { Modal, type ModalProps } from '#ui';
+import AppIntlProvider from '#components/AppIntlProvider';
 import styles from './ShareModal.css';
 import ShareModalContent from './ShareModalContent';
 import type { ModalActions } from '#ui/Modal';
@@ -14,12 +16,20 @@ const ShareModal = forwardRef<ModalActions, ShareModalProps>((props, ref) => {
   const { link, ...others } = props;
 
   return (
-    <Modal ref={ref} {...others}>
-      <div className={styles.header}>
-        <span className={styles.title}>Share</span>
-      </div>
-      <ShareModalContent link={link} />
-    </Modal>
+    <AppIntlProvider>
+      <Modal ref={ref} {...others}>
+        <div className={styles.header}>
+          <span className={styles.title}>
+            <FormattedMessage
+              defaultMessage="Share"
+              id="XabmbX"
+              description="Share modal title"
+            />
+          </span>
+        </div>
+        <ShareModalContent link={link} />
+      </Modal>
+    </AppIntlProvider>
   );
 });
 
