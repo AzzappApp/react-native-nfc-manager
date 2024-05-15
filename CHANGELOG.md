@@ -1,5 +1,6 @@
-## 0.5.5-canary.304
+## 0.5.5-canary.305
 
+* **fix:**  - **web:** [#3408](https://github.com/AzzappApp/azzapp/pull/3408) don’t render on server side i18n ([#3410](https://github.com/AzzappApp/azzapp/pull/3410))
 * **fix:**  - set correct external reference ([#3405](https://github.com/AzzappApp/azzapp/pull/3405))
 * **fix:**  - **shareBack:** [#3306](https://github.com/AzzappApp/azzapp/pull/3306) change order of fields and add i18n ([#3398](https://github.com/AzzappApp/azzapp/pull/3398))
 * **fix:**  - **searchBar:** [#3395](https://github.com/AzzappApp/azzapp/pull/3395) containerWidth is read as zero sometimes ([#3399](https://github.com/AzzappApp/azzapp/pull/3399))
