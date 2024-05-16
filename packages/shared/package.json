@@ -1,6 +1,6 @@
 {
   "name": "@azzapp/shared",
-  "version": "0.5.5-canary.309",
+  "version": "0.5.5-canary.310",
   "private": true,
   "exports": {
     "./*": {

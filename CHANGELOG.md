@@ -1,5 +1,6 @@
-## 0.5.5-canary.309
+## 0.5.5-canary.310
 
+* **feat:**  - add applied tax rate in estimate ([#3419](https://github.com/AzzappApp/azzapp/pull/3419))
 * **fix:**  - **payment:** wrong comparison of seats ([#3417](https://github.com/AzzappApp/azzapp/pull/3417))
 * **fix:**  - **multiUser:** wrong transaction used ([#3416](https://github.com/AzzappApp/azzapp/pull/3416))
 * **fix:**  - **posts:** [#3384](https://github.com/AzzappApp/azzapp/pull/3384) missing link to the webCard ([#3406](https://github.com/AzzappApp/azzapp/pull/3406))
