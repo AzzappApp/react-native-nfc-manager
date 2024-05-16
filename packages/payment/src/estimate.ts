@@ -8,10 +8,15 @@ export const estimate = async (
 ) => {
   const amount = calculateAmount(totalSeats, `web.${interval}`);
 
-  const taxes = await calculateTaxes(amount, countryCode, vatNumber);
+  const { rate: taxRate, amount: taxes } = await calculateTaxes(
+    amount,
+    countryCode,
+    vatNumber,
+  );
 
   return {
     amount,
     taxes,
+    taxRate,
   };
 };

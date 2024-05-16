@@ -71,4 +71,8 @@ type SubscriptionEstimation {
   The estimated taxes of the subscription in cents
   """
   taxes: Int!
+  """
+  The applied rate
+  """
+  taxRate: Float!
 }

@@ -140,13 +140,13 @@ export const updateExistingSubscription = async ({
         ? calculateAmount(totalSeats, existingSubscription.subscriptionPlan)
         : existingSubscription.amount;
 
-      const taxes = totalSeats
+      const { amount: taxes } = totalSeats
         ? await calculateTaxes(
             amount ?? 0,
             existingSubscription.subscriberCountryCode ?? undefined,
             existingSubscription.subscriberVatNumber ?? undefined,
           )
-        : 0;
+        : { amount: 0 };
 
       const intervalInMinutes = calculateNextPaymentIntervalInMinutes(
         existingSubscription.subscriptionPlan,
@@ -276,25 +276,25 @@ export const updateExistingSubscription = async ({
         )
       : 0;
 
-    const taxesForTheRestOfTheYear = totalSeats
+    const { amount: taxesForTheRestOfTheYear } = totalSeats
       ? await calculateTaxes(
           amountForTheRestOfTheYear,
           existingSubscription.subscriberCountryCode ?? undefined,
           existingSubscription.subscriberVatNumber ?? undefined,
         )
-      : 0;
+      : { amount: 0 };
 
     const amount = totalSeats
       ? calculateAmount(totalSeats, existingSubscription.subscriptionPlan)
       : existingSubscription.amount;
 
-    const taxes = totalSeats
+    const { amount: taxes } = totalSeats
       ? await calculateTaxes(
           amount ?? 0,
           existingSubscription.subscriberCountryCode ?? undefined,
           existingSubscription.subscriberVatNumber ?? undefined,
         )
-      : 0;
+      : { amount: 0 };
 
     const subscriptionId = createId();
 
@@ -393,7 +393,7 @@ export const upgradePlan = async (
       'web.yearly',
     );
 
-    const taxes = await calculateTaxes(
+    const { amount: taxes } = await calculateTaxes(
       amount,
       existingSubscription.subscriberCountryCode ?? undefined,
       existingSubscription.subscriberVatNumber ?? undefined,

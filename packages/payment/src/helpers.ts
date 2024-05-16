@@ -40,7 +40,10 @@ export const calculateTaxes = async (
   vatNumber?: string,
 ) => {
   const taxRate = await getTaxRate(countryCode, vatNumber);
-  return Math.round(taxRate * amount);
+  return {
+    rate: taxRate,
+    amount: Math.round(taxRate * amount),
+  };
 };
 
 export const calculateNextPaymentIntervalInMinutes = (

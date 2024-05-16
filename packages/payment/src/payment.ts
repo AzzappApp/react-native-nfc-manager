@@ -84,7 +84,7 @@ export const createPaymentRequest = async ({
 
   const amount = calculateAmount(totalSeats, subscriptionPlan);
 
-  const taxes = await calculateTaxes(
+  const { amount: taxes } = await calculateTaxes(
     amount,
     customer.countryCode,
     customer.vatNumber ?? undefined,
@@ -228,7 +228,7 @@ export const createSubscriptionRequest = async ({
 
   const amount = calculateAmount(totalSeats, subscriptionPlan);
 
-  const taxes = await calculateTaxes(
+  const { amount: taxes } = await calculateTaxes(
     amount,
     customer.countryCode,
     customer.vatNumber ?? undefined,
