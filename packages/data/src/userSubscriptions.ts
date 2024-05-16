@@ -8,6 +8,7 @@ import {
   or,
   ne,
   asc,
+  isNull,
 } from 'drizzle-orm';
 import {
   text,
@@ -24,7 +25,7 @@ export const UserSubscriptionTable = mysqlTable(
   {
     id: cols.cuid('id').primaryKey().notNull().$defaultFn(createId),
     userId: cols.cuid('userId').notNull(),
-    webCardId: cols.cuid('webCardId').notNull().default(''),
+    webCardId: cols.cuid('webCardId'),
     subscriptionId: text('subscriptionId').notNull(),
     subscriptionPlan: cols.enum('subscriptionPlan', [
       'web.monthly',
@@ -81,6 +82,22 @@ export const createSubscription = async (
   return id;
 };
 
+export const updateActiveUserSubscription = async (
+  userId: string,
+  subscription: Partial<UserSubscription>,
+) => {
+  await db
+    .update(UserSubscriptionTable)
+    .set(subscription)
+    .where(
+      and(
+        eq(UserSubscriptionTable.userId, userId),
+        isNull(UserSubscriptionTable.webCardId),
+        ne(UserSubscriptionTable.status, 'canceled'),
+      ),
+    );
+};
+
 /**
 /**
  * Retrieve active subscription for given userId
@@ -119,7 +136,7 @@ export const getActiveUserSubscriptionForWebCard = async (
         eq(UserSubscriptionTable.userId, userId),
         or(
           eq(UserSubscriptionTable.webCardId, webCardId),
-          eq(UserSubscriptionTable.webCardId, ''),
+          isNull(UserSubscriptionTable.webCardId),
         ),
         eq(UserSubscriptionTable.status, 'active'),
         gte(UserSubscriptionTable.endAt, currentDate),

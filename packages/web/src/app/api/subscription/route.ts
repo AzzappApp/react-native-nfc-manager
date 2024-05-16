@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { withAxiom } from 'next-axiom';
-import { upsertSubscription } from '@azzapp/data';
+import { createSubscription, updateActiveUserSubscription } from '@azzapp/data';
 import cors from '#helpers/cors';
 
 const BEARER_HEADER = 'DkAgYzjiRxns4ty'; //dev value test and release
@@ -28,12 +28,7 @@ const subscriptionWebHook = async (req: Request) => {
   //https://www.revenuecat.com/docs/event-types-and-fields
   switch (type) {
     case 'INITIAL_PURCHASE':
-    case 'CANCELLATION':
-    case 'SUBSCRIPTION_EXTENDED':
-    case 'UNCANCELLATION':
-    case 'EXPIRATION':
-      //expiration at a expiration_reason if we need it to know the reason
-      await upsertSubscription({
+      await createSubscription({
         userId,
         subscriptionId,
         startAt: new Date(purchased_at_ms),
@@ -48,8 +43,27 @@ const subscriptionWebHook = async (req: Request) => {
         totalSeats: extractSeatsFromSubscriptionId(subscriptionId),
       });
       break;
+    case 'CANCELLATION':
+    case 'SUBSCRIPTION_EXTENDED':
+    case 'UNCANCELLATION':
+    case 'EXPIRATION':
+      //expiration at a expiration_reason if we need it to know the reason
+      await updateActiveUserSubscription(userId, {
+        subscriptionId,
+        startAt: new Date(purchased_at_ms),
+        endAt: new Date(expiration_at_ms),
+        revenueCatId: rcId,
+        issuer:
+          store === 'APP_STORE'
+            ? 'apple'
+            : store === 'PLAY_STORE'
+              ? 'google'
+              : 'web',
+        totalSeats: extractSeatsFromSubscriptionId(subscriptionId),
+      });
+      break;
     case 'RENEWAL':
-      await upsertSubscription({
+      await updateActiveUserSubscription(userId, {
         userId,
         subscriptionId,
         startAt: new Date(purchased_at_ms),
@@ -66,8 +80,7 @@ const subscriptionWebHook = async (req: Request) => {
       break;
     case 'BILLING_ISSUE':
       //in case of billing issue, look at the grace period and revoke access if the grace period is over
-      await upsertSubscription({
-        userId,
+      await updateActiveUserSubscription(userId, {
         subscriptionId,
         startAt: new Date(purchased_at_ms),
         endAt: new Date(body.grace_period_expiration_at_ms),
