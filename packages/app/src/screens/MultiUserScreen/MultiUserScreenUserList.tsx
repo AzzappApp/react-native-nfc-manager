@@ -181,14 +181,18 @@ const MultiUserScreenUserList = ({
     }
   }, [hasNext, isLoadingNext, loadNext]);
 
+  //#region Search
+  const [searchValue, setSearchValue] = useState<string | undefined>('');
+  const [debounceText] = useDebounce(searchValue, 500);
+
   const [refreshing, setRefreshing] = useState(false);
   const onRefresh = useCallback(() => {
     if (!isLoadingNext) {
       setRefreshing(true);
-      refetch({}, { fetchPolicy: 'store-and-network' });
+      refetch({ search: debounceText }, { fetchPolicy: 'store-and-network' });
       setRefreshing(false);
     }
-  }, [isLoadingNext, refetch]);
+  }, [debounceText, isLoadingNext, refetch]);
 
   useFocusEffect(onRefresh);
 
@@ -225,10 +229,6 @@ const MultiUserScreenUserList = ({
     }
     return sections;
   }, [sections, transferOwnerMode]);
-
-  //#region Search
-  const [searchValue, setSearchValue] = useState<string | undefined>('');
-  const [debounceText] = useDebounce(searchValue, 500);
 
   useEffect(() => {
     refetch({ search: debounceText }, { fetchPolicy: 'store-and-network' });
