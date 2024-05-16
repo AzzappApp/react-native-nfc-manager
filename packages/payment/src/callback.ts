@@ -89,6 +89,8 @@ export const acknowledgeFirstPayment = async (
       if (!rebillManager.data || rebillManager.data.status !== 'OK') {
         updates.status = 'canceled';
         updates.canceledAt = new Date();
+      } else {
+        updates.endAt = getNextPaymentDate(subscription.subscriptionPlan);
       }
 
       await db.transaction(async tx => {
