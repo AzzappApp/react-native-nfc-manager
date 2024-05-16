@@ -151,7 +151,7 @@ const inviteUsersListMutation: MutationResolvers['inviteUsersList'] = async (
       await createProfiles(profileToCreate, trx);
     }
 
-    const createdProfiles = await db
+    const createdProfiles = await trx
       .select()
       .from(ProfileTable)
       .where(
