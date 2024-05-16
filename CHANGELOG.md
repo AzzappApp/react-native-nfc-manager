@@ -1,5 +1,10 @@
-## 0.5.5-canary.306
+## 0.5.5-canary.307
 
+* **fix:**  - **posts:** [#3384](https://github.com/AzzappApp/azzapp/pull/3384) missing link to the webCard ([#3406](https://github.com/AzzappApp/azzapp/pull/3406))
+* **fix:**  - handle case with no webcard id
+* **fix:**  - **payment:** handle properly appstore case
+* **fix:**  - **multiUser:** [#3351](https://github.com/AzzappApp/azzapp/pull/3351) keep search on refresh ([#3412](https://github.com/AzzappApp/azzapp/pull/3412))
+* **fix:**  - **backoffice:** set lifetime subscription
 * **fix:**  - **home:** [#3402](https://github.com/AzzappApp/azzapp/pull/3402) hide appearing borders ([#3411](https://github.com/AzzappApp/azzapp/pull/3411))
 * **fix:**  - **payment:** update endAt ([#3413](https://github.com/AzzappApp/azzapp/pull/3413))
 * **fix:**  - **web:** [#3408](https://github.com/AzzappApp/azzapp/pull/3408) don’t render on server side i18n ([#3410](https://github.com/AzzappApp/azzapp/pull/3410))
