@@ -9,5 +9,5 @@ export const getTaxRate = async (countryCode?: string, vatNumber?: string) => {
     vatNumber,
   );
 
-  return taxes.rate;
+  return taxes.area === 'worldwide' ? 0 : taxes.rate;
 };
