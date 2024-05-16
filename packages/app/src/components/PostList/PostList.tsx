@@ -171,7 +171,7 @@ const PostList = ({
 
   const renderItem = useCallback(
     ({ item, extraData }: ListRenderItemInfo<Post>) => {
-      return (
+      return item ? (
         <PostRenderer
           post={item}
           videoDisabled={!extraData.canPlay}
@@ -181,7 +181,7 @@ const PostList = ({
           actionEnabled={extraData.postActionEnabled}
           showUnpublished={extraData.showUnpublished}
         />
-      );
+      ) : null;
     },
     [onPressAuthor],
   );
