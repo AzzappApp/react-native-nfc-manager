@@ -258,6 +258,7 @@ const styleSheet = createStyleSheet(appearance => ({
     flex: 1,
     overflow: 'hidden',
     minWidth: 50,
+    borderColor: 'transparent',
     borderRadius: 20,
   },
   firstTabContainer: {
