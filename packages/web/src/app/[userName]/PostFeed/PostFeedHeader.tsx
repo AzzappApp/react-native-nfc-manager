@@ -1,4 +1,5 @@
 'use client';
+import Link from 'next/link';
 import { useRef } from 'react';
 import { CloseIcon, ShareIcon } from '#assets';
 import { generateShareProfileLink } from '#helpers';
@@ -31,7 +32,9 @@ const PostFeedHeader = (props: PostFeedHeaderProps) => {
           aria-label="close"
         />
         <div className={styles.headerData}>
-          <span className={styles.headerName}>{webCard.userName}</span>
+          <Link href={`/${webCard.userName}`} className={styles.headerName}>
+            {webCard.userName}
+          </Link>
           <span className={styles.headerPostsCount}>{postsCount} posts</span>
           <Button
             onClick={() => download.current?.open()}

@@ -52,6 +52,8 @@ const headerData = style({
 
 const headerName = style({
   fontWeight: vars.fontWeight.bold,
+  textDecoration: 'none',
+  color: vars.color.black,
 });
 
 const headerPostsCount = style([textSmall, { color: vars.color.grey200 }]);
