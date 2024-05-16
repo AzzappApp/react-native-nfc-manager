@@ -1,5 +1,6 @@
-## 0.5.5-canary.311
+## 0.5.5-canary.312
 
+* **fix:**  - **posts:** [#1297](https://github.com/AzzappApp/azzapp/pull/1297) post may be null on delete ([#3422](https://github.com/AzzappApp/azzapp/pull/3422))
 * **fix:**  - tax rate worldwide ([#3421](https://github.com/AzzappApp/azzapp/pull/3421))
 * **feat:**  - add applied tax rate in estimate ([#3419](https://github.com/AzzappApp/azzapp/pull/3419))
 * **fix:**  - **payment:** wrong comparison of seats ([#3417](https://github.com/AzzappApp/azzapp/pull/3417))
