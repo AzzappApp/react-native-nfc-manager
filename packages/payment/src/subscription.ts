@@ -77,6 +77,10 @@ export const updateExistingSubscription = async ({
 
   const newPaymentMean = paymentMeanId ?? existingSubscription.paymentMeanId;
 
+  if (existingSubscription.webCardId === null) {
+    throw new Error('No web card id found');
+  }
+
   if (existingSubscription.subscriptionPlan === 'web.monthly') {
     //update amount of next subscription
 
