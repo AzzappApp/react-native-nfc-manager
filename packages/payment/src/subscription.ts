@@ -222,7 +222,7 @@ export const updateExistingSubscription = async ({
   ) {
     //update amount of next subscription for yearly
 
-    if (totalSeats && existingSubscription.totalSeats < totalSeats) {
+    if (totalSeats && existingSubscription.totalSeats > totalSeats) {
       throw new Error('Cannot update to a lower number of seats');
     }
 

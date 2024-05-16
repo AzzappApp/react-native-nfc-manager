@@ -83,7 +83,6 @@ export const getUserByEmail = async (email: string): Promise<User | null> => {
 export const getUserByPhoneNumber = async (
   phoneNumber: string,
 ): Promise<User | null> => {
-  console.log({ phoneNumber });
   return db
     .select()
     .from(UserTable)

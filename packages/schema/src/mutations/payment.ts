@@ -120,7 +120,10 @@ export const updateSubscription: MutationResolvers['updateSubscription'] =
     }
 
     const webCardId = fromGlobalIdWithType(gqlWebCardId, 'WebCard');
-    const subscriptionId = fromGlobalIdWithType(gqlSubscriptionId, 'WebCard');
+    const subscriptionId = fromGlobalIdWithType(
+      gqlSubscriptionId,
+      'UserSubscription',
+    );
 
     return updateSubscriptionForWebCard({
       subscriptionId,
