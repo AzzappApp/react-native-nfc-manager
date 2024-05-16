@@ -1,5 +1,6 @@
+import { eq, and } from 'drizzle-orm';
 import { GraphQLError } from 'graphql';
-import { upsertSubscription } from '@azzapp/data';
+import { UserSubscriptionTable, createSubscription, db } from '@azzapp/data';
 import ERRORS from '@azzapp/shared/errors';
 import type { MutationResolvers } from '#/__generated__/types';
 
@@ -31,11 +32,29 @@ const saveSubscription: MutationResolvers['saveSubscription'] = async (
   };
 
   try {
-    await upsertSubscription(userSub);
+    const id = await db.transaction(async tx => {
+      await tx
+        .update(UserSubscriptionTable)
+        .set({
+          status: 'canceled',
+          canceledAt: new Date(),
+        })
+        .where(
+          and(
+            eq(UserSubscriptionTable.userId, userId),
+            eq(UserSubscriptionTable.webCardId, ''),
+            eq(UserSubscriptionTable.status, 'active'),
+          ),
+        );
+
+      const id = await createSubscription(userSub, tx);
+      return id;
+    });
 
     return {
       userSubscription: {
         ...userSub,
+        id,
         subscriberEmail: '',
         subscriberPhoneNumber: '',
         subscriberName: '',

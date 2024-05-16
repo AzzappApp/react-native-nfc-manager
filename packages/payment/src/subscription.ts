@@ -2,6 +2,7 @@ import { eq, and } from 'drizzle-orm';
 import {
   UserSubscriptionTable,
   db,
+  getSubscriptionById,
   getUserSubscriptionForWebCard,
 } from '@azzapp/data';
 import { createId } from '@azzapp/data/helpers/createId';
@@ -20,23 +21,28 @@ import {
 import type { UserSubscription } from '@azzapp/data';
 
 export const updateSubscriptionForWebCard = async ({
-  userId,
+  subscriptionId,
   webCardId,
   totalSeats,
   paymentMeanId,
 }: {
-  userId: string;
+  subscriptionId: string;
   webCardId: string;
   totalSeats?: number | null;
   paymentMeanId?: string | null;
 }) => {
-  const existingSubscription = await getUserSubscriptionForWebCard(
-    userId,
-    webCardId,
-  );
+  const existingSubscription = await getSubscriptionById(subscriptionId);
 
   if (!existingSubscription) {
     throw new Error('No subscription found');
+  }
+
+  if (existingSubscription.status === 'canceled') {
+    throw new Error('Subscription is canceled');
+  }
+
+  if (existingSubscription.webCardId !== webCardId) {
+    throw new Error('Web card id does not match');
   }
 
   return updateExistingSubscription({
@@ -349,14 +355,23 @@ export const updateExistingSubscription = async ({
   ))!;
 };
 
-export const upgradePlan = async (userId: string, webCardId: string) => {
-  const existingSubscription = await getUserSubscriptionForWebCard(
-    userId,
-    webCardId,
-  );
+export const upgradePlan = async (
+  userId: string,
+  webCardId: string,
+  subscriptionId: string,
+) => {
+  const existingSubscription = await getSubscriptionById(subscriptionId);
 
   if (!existingSubscription) {
     throw new Error('No subscription found');
+  }
+
+  if (existingSubscription.status === 'canceled') {
+    throw new Error('Subscription is canceled');
+  }
+
+  if (existingSubscription.webCardId !== webCardId) {
+    throw new Error('Web card id does not match');
   }
 
   if (!existingSubscription.paymentMeanId) {

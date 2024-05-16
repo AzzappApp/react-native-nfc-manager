@@ -1,3 +1,4 @@
+import { createId } from '@paralleldrive/cuid2';
 import {
   and,
   eq,
@@ -5,13 +6,15 @@ import {
   type InferSelectModel,
   gte,
   or,
+  ne,
+  asc,
 } from 'drizzle-orm';
 import {
   text,
   mysqlTable,
   mysqlEnum,
   int,
-  primaryKey,
+  index,
 } from 'drizzle-orm/mysql-core';
 import db, { cols } from './db';
 import type { DbTransaction } from './db';
@@ -19,6 +22,7 @@ import type { DbTransaction } from './db';
 export const UserSubscriptionTable = mysqlTable(
   'UserSubscription',
   {
+    id: cols.cuid('id').primaryKey().notNull().$defaultFn(createId),
     userId: cols.cuid('userId').notNull(),
     webCardId: cols.cuid('webCardId').notNull().default(''),
     subscriptionId: text('subscriptionId').notNull(),
@@ -48,16 +52,17 @@ export const UserSubscriptionTable = mysqlTable(
     amount: int('amount'),
     taxes: int('taxes'),
     rebillManagerId: cols.defaultVarchar('rebillManagerId'),
-    status: mysqlEnum('status', ['active', 'canceled'])
+    status: mysqlEnum('status', ['active', 'canceled', 'waiting_payment'])
       .notNull()
       .default('active'),
     canceledAt: cols.dateTime('canceledAt'),
   },
   table => {
     return {
-      userIdWebCardId: primaryKey({
-        columns: [table.userId, table.webCardId],
-      }),
+      userIdWebCardIDIdx: index('userId_webCardId_idx').on(
+        table.userId,
+        table.webCardId,
+      ),
     };
   },
 );
@@ -67,65 +72,13 @@ export type NewUserSubscription = InferInsertModel<
   typeof UserSubscriptionTable
 >;
 
-/**
- * Add a subscription
- *
- * @param {string} userId
- * @param {string} subscriptionId
- * @param {Date} startAt
- * @param {Date} endAt
- * @param {DbTransaction} [trx=db]
- * @return {*}  {Promise<Subscription>}
- */
-export const upsertSubscription = async (
-  {
-    userId,
-    subscriptionId,
-    startAt,
-    endAt,
-    revenueCatId,
-    issuer,
-    totalSeats,
-    subscriptionPlan,
-    status,
-    canceledAt,
-  }: NewUserSubscription | UserSubscription,
+export const createSubscription = async (
+  subscription: NewUserSubscription,
   trx: DbTransaction = db,
 ) => {
-  const onDuplicateSet = {
-    set: {
-      subscriptionId,
-      revenueCatId,
-      startAt,
-      endAt,
-      subscriptionPlan,
-      totalSeats,
-      status,
-      canceledAt,
-    },
-  };
-
-  await trx
-    .insert(UserSubscriptionTable)
-    .values({
-      userId,
-      issuer,
-      subscriptionId,
-      revenueCatId,
-      startAt,
-      endAt,
-      totalSeats,
-      subscriptionPlan,
-      status,
-    })
-    .onDuplicateKeyUpdate(onDuplicateSet);
-};
-
-export const createSubscription = (
-  subScription: NewUserSubscription,
-  trx: DbTransaction = db,
-) => {
-  return trx.insert(UserSubscriptionTable).values(subScription);
+  const id = createId();
+  await trx.insert(UserSubscriptionTable).values({ ...subscription, id });
+  return id;
 };
 
 /**
@@ -194,6 +147,17 @@ export const getActiveWebCardSubscription = async (
     .then(res => res[0]);
 };
 
+export const getSubscriptionById = async (
+  id: string,
+  trx: DbTransaction = db,
+) => {
+  return trx
+    .select()
+    .from(UserSubscriptionTable)
+    .where(eq(UserSubscriptionTable.id, id))
+    .then(res => res[0]);
+};
+
 export const getUserSubscriptionForWebCard = async (
   userId: string,
   webCardId: string,
@@ -206,8 +170,10 @@ export const getUserSubscriptionForWebCard = async (
       and(
         eq(UserSubscriptionTable.userId, userId),
         eq(UserSubscriptionTable.webCardId, webCardId),
+        ne(UserSubscriptionTable.status, 'canceled'),
       ),
     )
+    .orderBy(asc(UserSubscriptionTable.status))
     .then(res => res[0]);
 };
 

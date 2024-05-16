@@ -1,8 +1,7 @@
 import dayjs from 'dayjs';
-import { eq, and } from 'drizzle-orm';
+import { eq } from 'drizzle-orm';
 import {
   PaymentTable,
-  UserSubscriptionTable,
   createPaymentMean,
   createSubscription,
   db,
@@ -21,7 +20,6 @@ import {
   getNextPaymentDate,
   type SubscriptionPlan,
 } from './helpers';
-import type { UserSubscription } from '@azzapp/data';
 
 const IDENTIFIER = 'POOL_AZZAP';
 
@@ -173,15 +171,6 @@ export const createPaymentRequest = async ({
       throw new Error('Subscription already active');
     }
 
-    await trx
-      .delete(UserSubscriptionTable)
-      .where(
-        and(
-          eq(UserSubscriptionTable.webCardId, webCardId),
-          eq(UserSubscriptionTable.userId, userId),
-        ),
-      );
-
     await createSubscription(
       {
         userId,
@@ -195,6 +184,7 @@ export const createPaymentRequest = async ({
         subscriberCity: customer.city,
         subscriberZip: customer.zip,
         subscriberCountry: customer.country,
+        subscriberCountryCode: customer.countryCode,
         subscriberVatNumber: customer.vatNumber,
         startAt: date,
         subscriptionId: createId(),
@@ -204,6 +194,7 @@ export const createPaymentRequest = async ({
         amount,
         taxes,
         rebillManagerId: null,
+        status: 'waiting_payment',
       },
       trx,
     );
@@ -282,12 +273,12 @@ export const createSubscriptionRequest = async ({
     });
   }
 
-  if (rebillManager.data.status !== 'OK') {
+  if ((rebillManager.data.status as string) !== 'CREATED') {
     throw new Error(
       rebillManager.data.reason || 'Failed to create rebill manager',
     );
   }
-  const subscription: UserSubscription = {
+  const subscription = {
     userId,
     webCardId,
     issuer: 'web' as const,
@@ -310,15 +301,16 @@ export const createSubscriptionRequest = async ({
     taxes,
     rebillManagerId: rebillManager.data.rebillManagerId,
     revenueCatId: null,
-    status: 'active',
+    status: 'active' as const,
     canceledAt: null,
   };
-  await db.transaction(async trx => {
-    await createSubscription(subscription, trx);
+  const id = await db.transaction(async trx => {
+    const id = await createSubscription(subscription, trx);
     await updateWebCard(webCardId, { isMultiUser: true });
+    return id;
   });
 
-  return subscription;
+  return { ...subscription, id };
 };
 
 export const createNewPaymentMean = async ({

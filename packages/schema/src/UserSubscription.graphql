@@ -2,6 +2,10 @@
 Represent a Subscription User
 """
 type UserSubscription {
+  """
+  The ID of an object
+  """
+  id: ID!
   userId: String!
   """
   expiration Date of the Subscription
@@ -31,6 +35,26 @@ type UserSubscription {
   Return the subscription plan
   """
   subscriptionPlan: SubscriptionPlan
+
+  subscriberEmail: String,
+  subscriberPhoneNumber: String,
+  subscriberName: String,
+  subscriberAddress: String,
+  subscriberVatNumber: String,
+  subscriberZip: String,
+  subscriberCity: String,
+  subscriberCountry: String,
+  subscriberCountryCode: String,
+
+  paymentMean: PaymentMean
+
+  status: SubscriptionStatus
+}
+
+enum SubscriptionStatus {
+  waiting_payment
+  active
+  canceled
 }
 
 enum SubscriptionPlan {

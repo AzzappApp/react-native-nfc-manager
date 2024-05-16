@@ -69,4 +69,12 @@ type PaymentMean {
   Returns the masked card number
   """
   maskedCard: String
+
+  status: PaymentMeanStatus!
+}
+
+enum PaymentMeanStatus {
+  pending
+  active
+  inactive
 }

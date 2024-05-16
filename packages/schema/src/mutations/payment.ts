@@ -55,7 +55,7 @@ export const createSubscriptionFromPaymentMean: MutationResolvers['createSubscri
     const result = await createSubscriptionRequest({
       ...intent,
       webCardId: fromGlobalIdWithType(webCardId, 'WebCard'),
-      paymentMeanId,
+      paymentMeanId: fromGlobalIdWithType(paymentMeanId, 'PaymentMean'),
       userId: auth.userId,
     });
 
@@ -107,7 +107,12 @@ export const generatePaymentInvoice: MutationResolvers['generatePaymentInvoice']
 export const updateSubscription: MutationResolvers['updateSubscription'] =
   async (
     _,
-    { webCardId: gqlWebCardId, totalSeats, paymentMeanId: gqlPaymentMeanId },
+    {
+      webCardId: gqlWebCardId,
+      paymentMeanId: gqlPaymentMeanId,
+      subscriptionId: gqlSubscriptionId,
+      totalSeats,
+    },
     { auth },
   ) => {
     if (!auth.userId) {
@@ -115,26 +120,35 @@ export const updateSubscription: MutationResolvers['updateSubscription'] =
     }
 
     const webCardId = fromGlobalIdWithType(gqlWebCardId, 'WebCard');
+    const subscriptionId = fromGlobalIdWithType(gqlSubscriptionId, 'WebCard');
 
     return updateSubscriptionForWebCard({
+      subscriptionId,
       webCardId,
       totalSeats,
       paymentMeanId: gqlPaymentMeanId
         ? fromGlobalIdWithType(gqlPaymentMeanId, 'PaymentMean')
         : null,
-      userId: auth.userId,
     });
   };
 
 export const upgradeSubscriptionPlan: MutationResolvers['upgradeSubscriptionPlan'] =
-  async (_, { webCardId: gqlWebCardId }, { auth }) => {
+  async (
+    _,
+    { webCardId: gqlWebCardId, subscriptionId: gqlSubscriptionId },
+    { auth },
+  ) => {
     if (!auth.userId) {
       throw new GraphQLError(ERRORS.UNAUTHORIZED);
     }
 
     const webCardId = fromGlobalIdWithType(gqlWebCardId, 'WebCard');
+    const subscriptionId = fromGlobalIdWithType(
+      gqlSubscriptionId,
+      'UserSubscription',
+    );
 
-    return upgradePlan(auth.userId, webCardId);
+    return upgradePlan(auth.userId, webCardId, subscriptionId);
   };
 
 export const endSubscription: MutationResolvers['endSubscription'] = async (
