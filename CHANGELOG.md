@@ -1,5 +1,7 @@
-## 0.5.5-canary.305
+## 0.5.5-canary.306
 
+* **fix:**  - **home:** [#3402](https://github.com/AzzappApp/azzapp/pull/3402) hide appearing borders ([#3411](https://github.com/AzzappApp/azzapp/pull/3411))
+* **fix:**  - **payment:** update endAt ([#3413](https://github.com/AzzappApp/azzapp/pull/3413))
 * **fix:**  - **web:** [#3408](https://github.com/AzzappApp/azzapp/pull/3408) don’t render on server side i18n ([#3410](https://github.com/AzzappApp/azzapp/pull/3410))
 * **fix:**  - set correct external reference ([#3405](https://github.com/AzzappApp/azzapp/pull/3405))
 * **fix:**  - **shareBack:** [#3306](https://github.com/AzzappApp/azzapp/pull/3306) change order of fields and add i18n ([#3398](https://github.com/AzzappApp/azzapp/pull/3398))
