@@ -1,5 +1,8 @@
-## 0.5.5-canary.314
+## 0.5.5-canary.315
 
+* **fix:**  - **android:** [#2689](https://github.com/AzzappApp/azzapp/pull/2689) force keyboard opening by waiting a bit before focus ([#3429](https://github.com/AzzappApp/azzapp/pull/3429))
+* **fix:**  - **multiUser:** [#3397](https://github.com/AzzappApp/azzapp/pull/3397) manage aspect ratio ([#3428](https://github.com/AzzappApp/azzapp/pull/3428))
+* **fix:**  - **web:** [#3136](https://github.com/AzzappApp/azzapp/pull/3136) wrong apple site association configuration - try with wildcards
 * **fix:**  - **auth:** [#3400](https://github.com/AzzappApp/azzapp/pull/3400) properly handle obsolete refresh token ([#3427](https://github.com/AzzappApp/azzapp/pull/3427))
 * **fix:**  - **web:** [#3136](https://github.com/AzzappApp/azzapp/pull/3136) wrong apple site association configuration ([#3430](https://github.com/AzzappApp/azzapp/pull/3430))
 * **fix:**  - **webCard:** [#3335](https://github.com/AzzappApp/azzapp/pull/3335) nbFollowers were not updated via backoffice ([#3426](https://github.com/AzzappApp/azzapp/pull/3426))
