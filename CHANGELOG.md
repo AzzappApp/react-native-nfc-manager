@@ -1,5 +1,8 @@
-## 0.5.5-canary.312
+## 0.5.5-canary.313
 
+* **fix:**  - **webCard:** [#3335](https://github.com/AzzappApp/azzapp/pull/3335) nbFollowers were not updated via backoffice ([#3426](https://github.com/AzzappApp/azzapp/pull/3426))
+* **fix:**  - **contactCard:** share url on copy to clipboard ([#3425](https://github.com/AzzappApp/azzapp/pull/3425))
+* **fix:**  - **webCard:** check that given userName is valid on server side ([#3424](https://github.com/AzzappApp/azzapp/pull/3424))
 * **fix:**  - **posts:** [#1297](https://github.com/AzzappApp/azzapp/pull/1297) post may be null on delete ([#3422](https://github.com/AzzappApp/azzapp/pull/3422))
 * **fix:**  - tax rate worldwide ([#3421](https://github.com/AzzappApp/azzapp/pull/3421))
 * **feat:**  - add applied tax rate in estimate ([#3419](https://github.com/AzzappApp/azzapp/pull/3419))
