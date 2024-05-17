@@ -138,12 +138,15 @@ export const CommonInformationScreen = ({
     async ({
       uri,
       width,
-      height,
       editionParameters,
       filter,
+      aspectRatio,
     }: ImagePickerResult) => {
+      const exportWidth = width;
+      const exportHeight = exportWidth / aspectRatio;
+
       const localPath = await exportLayersToImage({
-        size: { width, height },
+        size: { width: exportWidth, height: exportHeight },
         quality: 100,
         format: 'auto',
         layers: [
@@ -163,7 +166,10 @@ export const CommonInformationScreen = ({
           : `file://${localPath}`,
       });
 
-      setSize({ width, height });
+      setSize({
+        width: exportWidth,
+        height: exportHeight,
+      });
 
       setShowImagePicker(false);
     },

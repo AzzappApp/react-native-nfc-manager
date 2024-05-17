@@ -85,7 +85,6 @@ const ContactCardEditForm = ({
     async ({
       uri,
       width,
-      height,
       editionParameters,
       filter,
       aspectRatio,
@@ -114,8 +113,10 @@ const ContactCardEditForm = ({
             : `file://${localPath}`,
         });
       } else {
+        const exportWidth = width;
+        const exportHeight = exportWidth / aspectRatio;
         const localPath = await exportLayersToImage({
-          size: { width, height },
+          size: { width: exportWidth, height: exportHeight },
           quality: 100,
           format: 'auto',
           layers: [
@@ -134,7 +135,10 @@ const ContactCardEditForm = ({
             ? localPath
             : `file://${localPath}`,
         });
-        setSize({ width, height });
+        setSize({
+          width: exportWidth,
+          height: exportHeight,
+        });
       }
 
       setImagePicker(null);
