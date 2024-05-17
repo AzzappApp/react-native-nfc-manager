@@ -1,4 +1,4 @@
-import { memo, useContext, useState } from 'react';
+import { memo, useCallback, useContext, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { View } from 'react-native';
 import { colors } from '#theme';
@@ -32,12 +32,14 @@ const PostContentPanel = ({
   } = useContext(PostCreationScreenContext);
 
   const [showContentModal, setShowContentModal] = useState(false);
-  const onFocus = () => {
+  const onFocus = useCallback(() => {
     setShowContentModal(true);
-  };
-  const onModalClose = () => {
+  }, []);
+
+  const onModalClose = useCallback(() => {
     setShowContentModal(false);
-  };
+  }, []);
+
   const intl = useIntl();
   const textAraPlaceHolder = intl.formatMessage({
     defaultMessage: 'Describe your post',

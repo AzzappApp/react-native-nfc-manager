@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import { useIntl } from 'react-intl';
 import {
   KeyboardAvoidingView,
@@ -70,16 +70,26 @@ const TextAreaModal = ({
 
   const [text, setText] = useState(value);
 
-  const onCancel = () => {
+  const onCancel = useCallback(() => {
     setText(value);
     onClose();
-  };
+  }, [onClose, value]);
 
-  const onBlur = () => {
+  const onBlur = useCallback(() => {
     if (closeOnBlur) {
       onClose();
     }
-  };
+  }, [closeOnBlur, onClose]);
+
+  const onShow = useCallback(() => {
+    // hack - on android autofocus doesn't open the keyboard
+    if (Platform.OS === 'android') {
+      setTimeout(() => {
+        textInputRef.current?.focus();
+      }, 150);
+    }
+  }, []);
+
   const textInputRef = useRef<TextInputBase>(null);
 
   return (
@@ -88,18 +98,11 @@ const TextAreaModal = ({
       transparent
       animationType="fade"
       {...props}
-      onShow={() => {
-        // hack - on android autofocus doesn't open the keyboard
-        if (Platform.OS === 'android') {
-          textInputRef.current?.focus();
-        }
-      }}
+      onShow={onShow}
     >
       <SafeAreaView style={styles.modal}>
         <Header
-          style={{
-            marginBottom: 10,
-          }}
+          style={styles.header}
           leftElement={
             <HeaderButton
               label={intl.formatMessage({
@@ -167,6 +170,9 @@ export default TextAreaModal;
 const styles = StyleSheet.create({
   modal: {
     flex: 1,
+  },
+  header: {
+    marginBottom: 10,
   },
   contentModal: {
     flex: 1,
