@@ -52,6 +52,9 @@ type Profile implements Node {
 
   contactCardQrCode(width: Int!) : String!
 
+  contactCardUrl: String!
+
+
 
   webCard: WebCard!
 

@@ -93,6 +93,7 @@ describe('ContactCardExportVcf', () => {
       return MockPayloadGenerator.generate(operation, {
         Profile() {
           return {
+            contactCardUrl: 'contactCardUrl',
             webCard: {
               coverAvatarUrl: null,
               commonInformation: {
@@ -190,6 +191,23 @@ describe('ContactCardExportVcf', () => {
       title: 'John Doe',
       type: 'text/vcard',
       failOnCancel: false,
+      activityItemSources: [
+        {
+          item: {
+            copyToPasteBoard: {
+              content: 'contactCardUrl',
+              type: 'url',
+            },
+          },
+          placeholderItem: {
+            content: 'John Doe',
+            type: 'text',
+          },
+          subject: {
+            default: 'John Doe',
+          },
+        },
+      ],
     });
   });
 });

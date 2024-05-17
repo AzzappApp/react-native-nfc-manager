@@ -24,6 +24,7 @@ const ContactCardExportVcf = ({
   const profile = useFragment(
     graphql`
       fragment ContactCardExportVcf_card on Profile {
+        contactCardUrl
         webCard {
           commonInformation {
             socials {
@@ -114,6 +115,31 @@ const ContactCardExportVcf = ({
             url: `file://${filePath}`,
             type: 'text/vcard',
             failOnCancel: false,
+            activityItemSources: [
+              {
+                placeholderItem: {
+                  type: 'text',
+                  content:
+                    formatDisplayName(
+                      profile.contactCard?.firstName,
+                      profile.contactCard?.lastName,
+                    ) ?? '',
+                },
+                item: {
+                  copyToPasteBoard: {
+                    type: 'url',
+                    content: profile.contactCardUrl,
+                  },
+                },
+                subject: {
+                  default:
+                    formatDisplayName(
+                      profile.contactCard?.firstName,
+                      profile.contactCard?.lastName,
+                    ) ?? '',
+                },
+              },
+            ],
           });
         } catch (e) {
           console.error(e);

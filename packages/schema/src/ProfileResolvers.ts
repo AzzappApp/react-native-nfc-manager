@@ -59,6 +59,26 @@ export const Profile: ProfileResolvers = {
       webCard?.commonInformation,
     );
   },
+  contactCardUrl: async (profile, _, { loaders }) => {
+    const webCard = await loaders.WebCard.load(profile.webCardId);
+    if (!webCard) throw new Error(ERRORS.GRAPHQL_ERROR);
+
+    const { data, signature } = await serializeAndSignContactCard(
+      webCard?.userName ?? '',
+      profile.id,
+      profile.webCardId,
+      profile.contactCard ?? {},
+      webCard?.commonInformation,
+    );
+
+    const url = buildUserUrlWithContactCard(
+      webCard?.userName ?? '',
+      data,
+      signature,
+    );
+
+    return url;
+  },
   contactCardQrCode: async (profile, { width }, { loaders }) => {
     const webCard = await loaders.WebCard.load(profile.webCardId);
     if (!webCard) throw new Error(ERRORS.GRAPHQL_ERROR);
