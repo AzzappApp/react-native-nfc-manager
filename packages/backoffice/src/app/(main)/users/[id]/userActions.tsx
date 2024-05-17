@@ -75,23 +75,21 @@ export const removeWebcard = async (userId: string, webcardId: string) => {
           .where(
             inArray(
               WebCardTable.id,
-              sql`(select followingId from Follow where followerId = "${webcardId}")`,
+              sql`(select followingId from Follow where followerId = ${webcardId})`,
             ),
           );
 
-        await trx.transaction(async subTransaction => {
-          await subTransaction
-            .update(WebCardTable)
-            .set({
-              nbFollowings: sql`GREATEST(nbFollowings - 1, 0)`,
-            })
-            .where(
-              inArray(
-                WebCardTable.id,
-                sql`(select followerId from Follow where followingId = ${webcardId})`,
-              ),
-            );
-        });
+        await trx
+          .update(WebCardTable)
+          .set({
+            nbFollowings: sql`GREATEST(nbFollowings - 1, 0)`,
+          })
+          .where(
+            inArray(
+              WebCardTable.id,
+              sql`(select followerId from Follow where followingId = ${webcardId})`,
+            ),
+          );
       } else {
         await trx
           .update(ProfileTable)

@@ -77,19 +77,17 @@ const quitWebCard: Mutation = async (
           ),
         );
 
-      await trx.transaction(async subTransaction => {
-        await subTransaction
-          .update(WebCardTable)
-          .set({
-            nbFollowings: sql`GREATEST(nbFollowings - 1, 0)`,
-          })
-          .where(
-            inArray(
-              WebCardTable.id,
-              sql`(select followerId from Follow where followingId = ${profile.webCardId})`,
-            ),
-          );
-      });
+      await trx
+        .update(WebCardTable)
+        .set({
+          nbFollowings: sql`GREATEST(nbFollowings - 1, 0)`,
+        })
+        .where(
+          inArray(
+            WebCardTable.id,
+            sql`(select followerId from Follow where followingId = ${profile.webCardId})`,
+          ),
+        );
     });
 
     if (webCard) {
