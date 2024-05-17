@@ -1,5 +1,7 @@
-## 0.5.5-canary.313
+## 0.5.5-canary.314
 
+* **fix:**  - **auth:** [#3400](https://github.com/AzzappApp/azzapp/pull/3400) properly handle obsolete refresh token ([#3427](https://github.com/AzzappApp/azzapp/pull/3427))
+* **fix:**  - **web:** [#3136](https://github.com/AzzappApp/azzapp/pull/3136) wrong apple site association configuration ([#3430](https://github.com/AzzappApp/azzapp/pull/3430))
 * **fix:**  - **webCard:** [#3335](https://github.com/AzzappApp/azzapp/pull/3335) nbFollowers were not updated via backoffice ([#3426](https://github.com/AzzappApp/azzapp/pull/3426))
 * **fix:**  - **contactCard:** share url on copy to clipboard ([#3425](https://github.com/AzzappApp/azzapp/pull/3425))
 * **fix:**  - **webCard:** check that given userName is valid on server side ([#3424](https://github.com/AzzappApp/azzapp/pull/3424))
