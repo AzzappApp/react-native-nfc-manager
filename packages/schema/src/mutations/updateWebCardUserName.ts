@@ -3,6 +3,7 @@ import { and, eq, lt } from 'drizzle-orm';
 import { GraphQLError } from 'graphql';
 import { db, updateWebCard, RedirectWebCardTable } from '@azzapp/data';
 import ERRORS from '@azzapp/shared/errors';
+import { isValidUserName } from '@azzapp/shared/stringHelpers';
 import fromGlobalIdWithType from '#helpers/relayIdHelpers';
 import type { MutationResolvers } from '#/__generated__/types';
 import type { GraphQLContext } from '#/GraphQLContext';
@@ -24,6 +25,10 @@ const updateWebCardUserNameMutation: MutationResolvers['updateWebCardUserName'] 
     { loaders, cardUsernamesToRevalidate }: GraphQLContext,
   ) => {
     const webCardId = fromGlobalIdWithType(gqlWebCardId, 'WebCard');
+
+    if (!isValidUserName(userName)) {
+      throw new GraphQLError(ERRORS.INVALID_WEBCARD_USERNAME);
+    }
 
     const webCard = await loaders.WebCard.load(webCardId);
 

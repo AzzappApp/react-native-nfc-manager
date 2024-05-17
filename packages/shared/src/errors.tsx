@@ -124,6 +124,10 @@ const ERRORS = {
    * The subscription is active.
    */
   SUBSCRIPTION_IS_ACTIVE: 'SUBSCRIPTION_IS_ACTIVE',
+  /**
+   * The webCard userName is not valid
+   */
+  INVALID_WEBCARD_USERNAME: 'INVALID_WEBCARD_USERNAME',
 } as const;
 
 export default ERRORS;
