@@ -17,7 +17,7 @@ const refreshTokensApi = async (req: Request) => {
     return NextResponse.json({ ok: true, token, refreshToken });
   } catch (e) {
     return NextResponse.json(
-      { message: ERRORS.UNAUTHORIZED_INVALID_ACCESS_TOKEN },
+      { message: ERRORS.INVALID_TOKEN },
       { status: 401 },
     );
   }

@@ -67,8 +67,6 @@ const ERRORS = {
    * This may happen when a user tries to access a protected resource without the required permissions.
    */
   FORBIDDEN: 'FORBIDDEN',
-  // TODO why do we have two different errors for the same thing?
-  UNAUTHORIZED_INVALID_ACCESS_TOKEN: 'UNAUTHORIZED_INVALID_ACCESS_TOKEN',
   /**
    * Internal server error.
    * This may happen when the server encounters an unexpected error.
