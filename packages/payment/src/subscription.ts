@@ -445,7 +445,6 @@ export const upgradePlan = async (
 };
 
 export const endSubscription = async (
-  userId: string,
   webCardId: string,
   subscriptionId: string,
 ) => {
@@ -464,8 +463,8 @@ export const endSubscription = async (
   const rebillManagerId = existingSubscription.rebillManagerId;
 
   if (rebillManagerId && existingSubscription.paymentMeanId) {
-    const result = await client.POST(
-      '/api/client-payment-requests/stop-rebill-manager',
+    const state = await client.POST(
+      `/api/client-payment-requests/check-rebill-manager`,
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -473,17 +472,40 @@ export const endSubscription = async (
         body: {
           rebillManagerId,
           clientPaymentRequestUlid: existingSubscription.paymentMeanId,
-          stopReason: 'End subscription',
         },
       },
     );
 
-    if (!result.data) {
-      throw new Error('Failed to stop rebill manager', { cause: result.error });
+    if (!state.data) {
+      throw new Error('Failed to check rebill manager', {
+        cause: state.error,
+      });
     }
 
-    if ((result.data.status as string) !== 'STOPPED') {
-      throw new Error(result.data.reason || 'Failed to stop rebill manager');
+    if (state.data.rebill_manager_state === 'ON') {
+      const result = await client.POST(
+        '/api/client-payment-requests/stop-rebill-manager',
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          body: {
+            rebillManagerId,
+            clientPaymentRequestUlid: existingSubscription.paymentMeanId,
+            stopReason: 'End subscription',
+          },
+        },
+      );
+
+      if (!result.data) {
+        throw new Error('Failed to stop rebill manager', {
+          cause: result.error,
+        });
+      }
+
+      if ((result.data.status as string) !== 'STOPPED') {
+        throw new Error(result.data.reason || 'Failed to stop rebill manager');
+      }
     }
 
     await db

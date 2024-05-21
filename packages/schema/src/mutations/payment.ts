@@ -169,11 +169,7 @@ export const endSubscription: MutationResolvers['endSubscription'] = async (
     'UserSubscription',
   );
 
-  const subscription = await endExistingSubscription(
-    auth.userId,
-    webCardId,
-    subscriptionId,
-  );
+  const subscription = await endExistingSubscription(webCardId, subscriptionId);
 
   if (!subscription) {
     throw new GraphQLError(ERRORS.INTERNAL_SERVER_ERROR);
