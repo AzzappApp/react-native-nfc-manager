@@ -1,4 +1,4 @@
-import { eq, and } from 'drizzle-orm';
+import { eq } from 'drizzle-orm';
 import { UserSubscriptionTable, db, getSubscriptionById } from '@azzapp/data';
 import { createId } from '@azzapp/data/helpers/createId';
 import {
@@ -13,6 +13,7 @@ import {
   calculateTaxes,
   generateRebillFailRule,
 } from '#helpers';
+import type { Customer } from '#types';
 import type { UserSubscription } from '@azzapp/data';
 
 export const updateSubscriptionForWebCard = async ({
@@ -342,7 +343,6 @@ export const updateExistingSubscription = async ({
 };
 
 export const upgradePlan = async (
-  userId: string,
   webCardId: string,
   subscriptionId: string,
 ) => {
@@ -431,12 +431,7 @@ export const upgradePlan = async (
         taxes,
         subscriptionId,
       })
-      .where(
-        and(
-          eq(UserSubscriptionTable.webCardId, webCardId),
-          eq(UserSubscriptionTable.userId, userId),
-        ),
-      );
+      .where(eq(UserSubscriptionTable.id, subscriptionId));
 
     return (await getSubscriptionById(subscriptionId))!;
   } else {
@@ -518,4 +513,42 @@ export const endSubscription = async (
 
     return (await getSubscriptionById(subscriptionId))!;
   }
+};
+
+export const updateCustomer = async (
+  webCardId: string,
+  subscriptionId: string,
+  customer: Customer,
+) => {
+  const subscription = await getSubscriptionById(subscriptionId);
+
+  if (!subscription) {
+    throw new Error('No subscription found');
+  }
+
+  if (subscription.webCardId !== webCardId) {
+    throw new Error('Web card id does not match');
+  }
+
+  const updates = {
+    subscriberName: customer.name,
+    subscriberEmail: customer.email,
+    subscriberPhoneNumber: customer.phoneNumber ?? null,
+    subscriberAddress: customer.address,
+    subscriberCity: customer.city,
+    subscriberZip: customer.zip,
+    subscriberCountry: customer.country,
+    subscriberCountryCode: customer.countryCode,
+    subscriberVatNumber: customer.vatNumber ?? null,
+  };
+
+  await db
+    .update(UserSubscriptionTable)
+    .set(updates)
+    .where(eq(UserSubscriptionTable.id, subscriptionId));
+
+  return {
+    ...subscription,
+    ...updates,
+  };
 };

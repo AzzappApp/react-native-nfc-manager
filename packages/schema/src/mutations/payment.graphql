@@ -29,6 +29,11 @@ extend type Mutation {
   generatePaymentInvoice(webCardId: ID!, paymentId: ID!): String!
   upgradeSubscriptionPlan(webCardId: ID!, subscriptionId: ID!): UserSubscription!
   endSubscription(webCardId: ID!, subscriptionId: ID!): UserSubscription!
+  updateSubscriptionCustomer(
+    webCardId: ID!
+    subscriptionId: ID!
+    customer: Customer!
+  ): UserSubscription!
 }
 
 enum PaymentPlan {

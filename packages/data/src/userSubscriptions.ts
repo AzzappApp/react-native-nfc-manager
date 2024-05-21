@@ -9,6 +9,7 @@ import {
   ne,
   asc,
   isNull,
+  desc,
 } from 'drizzle-orm';
 import {
   text,
@@ -191,6 +192,24 @@ export const getUserSubscriptionForWebCard = async (
       ),
     )
     .orderBy(asc(UserSubscriptionTable.status))
+    .then(res => res[0]);
+};
+
+export const getLastSubscription = async (
+  userId: string,
+  webCardId: string,
+  trx: DbTransaction = db,
+) => {
+  return trx
+    .select()
+    .from(UserSubscriptionTable)
+    .where(
+      and(
+        eq(UserSubscriptionTable.userId, userId),
+        eq(UserSubscriptionTable.webCardId, webCardId),
+      ),
+    )
+    .orderBy(desc(UserSubscriptionTable.startAt))
     .then(res => res[0]);
 };
 

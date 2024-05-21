@@ -20,6 +20,7 @@ import {
   getNextPaymentDate,
   type SubscriptionPlan,
 } from './helpers';
+import type { Customer } from '#types';
 
 const IDENTIFIER = 'POOL_AZZAP';
 
@@ -46,18 +47,6 @@ const findLocale = (locale: string): Locale => {
     return locale as Locale;
   }
   return 'en';
-};
-
-type Customer = {
-  email: string;
-  name: string;
-  address: string;
-  city: string;
-  zip: string;
-  country: string;
-  countryCode: string;
-  vatNumber?: string | null;
-  phoneNumber?: string;
 };
 
 export const createPaymentRequest = async ({

@@ -149,6 +149,7 @@ const ProtectedMutation: Record<
   generatePaymentInvoice: isOwnerRule,
   upgradeSubscriptionPlan: isOwnerRule,
   endSubscription: isOwnerRule,
+  updateSubscriptionCustomer: isAdminRule,
 };
 
 const isCurrentUserRule = rule('sameUser', {

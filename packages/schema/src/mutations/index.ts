@@ -30,6 +30,7 @@ import {
   estimateSubscriptionCost,
   generatePaymentInvoice,
   updateSubscription,
+  updateSubscriptionCustomer,
   upgradeSubscriptionPlan,
 } from './payment';
 import togglePostReaction from './postReaction';
@@ -114,4 +115,5 @@ export const Mutation: MutationResolvers = {
   upgradeSubscriptionPlan,
   endSubscription,
   deletePost,
+  updateSubscriptionCustomer,
 };

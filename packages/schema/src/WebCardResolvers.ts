@@ -11,9 +11,9 @@ import {
   getWebCardProfiles,
   countWebCardProfiles,
   getWebCardPendingOwnerProfile,
-  getUserSubscriptionForWebCard,
   getActivePaymentMeans,
   getWebCardPayments,
+  getLastSubscription,
 } from '@azzapp/data';
 import {
   connectionFromDateSortedItems,
@@ -216,10 +216,7 @@ export const WebCard: WebCardResolvers = {
       return null;
     }
 
-    const subscription = await getUserSubscriptionForWebCard(
-      auth.userId,
-      webCard.id,
-    );
+    const subscription = await getLastSubscription(auth.userId, webCard.id);
 
     return subscription ?? null;
   },
