@@ -1,3 +1,4 @@
+import { BlurView } from 'expo-blur';
 import {
   forwardRef,
   memo,
@@ -18,15 +19,17 @@ import {
 } from 'react-native';
 import { graphql, useFragment } from 'react-relay';
 import { COVER_CARD_RADIUS, COVER_RATIO } from '@azzapp/shared/coverHelpers';
+import { isAdmin } from '@azzapp/shared/profileHelpers';
 import { colors, shadow } from '#theme';
 import CoverErrorRenderer from '#components/CoverErrorRenderer';
 import CoverLink from '#components/CoverLink';
 import CoverLoadingIndicator from '#components/CoverLoadingIndicator';
 import CoverRenderer from '#components/CoverRenderer';
 import Link from '#components/Link';
-import { useScreenHasFocus } from '#components/NativeRouter';
+import { useRouter, useScreenHasFocus } from '#components/NativeRouter';
 import CarouselSelectList from '#ui/CarouselSelectList';
 import Icon from '#ui/Icon';
+import PressableNative from '#ui/PressableNative';
 import PressableOpacity from '#ui/PressableOpacity';
 import type {
   HomeProfilesCarousel_user$key,
@@ -231,8 +234,10 @@ const ItemRenderComponent = ({
       fragment HomeProfilesCarouselItem_profile on Profile {
         id
         invited
+        profileRole
         webCard {
           id
+          isMultiUser
           userName
           cardCover {
             media {
@@ -262,6 +267,29 @@ const ItemRenderComponent = ({
     setLoadingFailed(false);
     setReady(false);
   }, []);
+
+  const router = useRouter();
+
+  const onPressMultiUser = useCallback(() => {
+    if (isAdmin(profile.profileRole)) {
+      router.push({
+        route: 'MULTI_USER',
+      });
+    } else {
+      router.push({
+        route: 'WEBCARD',
+        params: {
+          webCardId: profile.webCard.id,
+          userName: profile.webCard.userName,
+        },
+      });
+    }
+  }, [
+    router,
+    profile.profileRole,
+    profile.webCard.id,
+    profile.webCard.userName,
+  ]);
 
   const hasFocus = useScreenHasFocus();
 
@@ -319,14 +347,26 @@ const ItemRenderComponent = ({
           />
         </View>
       ) : profile.webCard.cardCover?.media?.id != null ? (
-        <CoverLink
-          webCard={profile.webCard}
-          width={coverWidth}
-          webCardId={profile.webCard.id}
-          animationEnabled={isCurrent && hasFocus}
-          onReadyForDisplay={onReady}
-          onError={onError}
-        />
+        <View style={styles.coverLinkWrapper}>
+          <CoverLink
+            webCard={profile.webCard}
+            width={coverWidth}
+            webCardId={profile.webCard.id}
+            animationEnabled={isCurrent && hasFocus}
+            onReadyForDisplay={onReady}
+            onError={onError}
+          />
+          {profile.webCard.isMultiUser && (
+            <PressableNative
+              style={styles.multiUserContainer}
+              onPress={onPressMultiUser}
+            >
+              <BlurView style={styles.multiUserIconContainer}>
+                <Icon icon="shared_webcard" style={styles.multiUserIcon} />
+              </BlurView>
+            </PressableNative>
+          )}
+        </View>
       ) : (
         <Link
           route="NEW_WEBCARD"
@@ -435,5 +475,30 @@ const styles = StyleSheet.create({
   coverContainer: {
     overflow: 'visible',
     // trick to have the shadow on the cover
+  },
+  coverLinkWrapper: { position: 'relative' },
+  multiUserContainer: {
+    position: 'absolute',
+    bottom: 8,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: '#FFFFFF66',
+    right: 8,
+    ...shadow('light', 'bottom'),
+  },
+  multiUserIconContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: 31,
+    height: 31,
+    borderRadius: 16,
+    overflow: 'hidden',
+    backgroundColor: '#00000033',
+  },
+  multiUserIcon: {
+    width: 17,
+    height: 17,
+    tintColor: colors.white,
   },
 });
