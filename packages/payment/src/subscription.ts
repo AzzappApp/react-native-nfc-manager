@@ -1,10 +1,5 @@
 import { eq, and } from 'drizzle-orm';
-import {
-  UserSubscriptionTable,
-  db,
-  getSubscriptionById,
-  getUserSubscriptionForWebCard,
-} from '@azzapp/data';
+import { UserSubscriptionTable, db, getSubscriptionById } from '@azzapp/data';
 import { createId } from '@azzapp/data/helpers/createId';
 import {
   dateDiffInMinutes,
@@ -207,12 +202,7 @@ export const updateExistingSubscription = async ({
           amount,
           taxes,
         })
-        .where(
-          and(
-            eq(UserSubscriptionTable.webCardId, existingSubscription.webCardId),
-            eq(UserSubscriptionTable.userId, existingSubscription.userId),
-          ),
-        );
+        .where(eq(UserSubscriptionTable.id, existingSubscription.id));
     } else {
       throw new Error('No payment mean found');
     }
@@ -345,18 +335,10 @@ export const updateExistingSubscription = async ({
         canceledAt: null,
         status: 'active',
       })
-      .where(
-        and(
-          eq(UserSubscriptionTable.webCardId, existingSubscription.webCardId),
-          eq(UserSubscriptionTable.userId, existingSubscription.userId),
-        ),
-      );
+      .where(eq(UserSubscriptionTable.id, existingSubscription.id));
   }
 
-  return (await getUserSubscriptionForWebCard(
-    existingSubscription.userId,
-    existingSubscription.webCardId,
-  ))!;
+  return (await getSubscriptionById(existingSubscription.id))!;
 };
 
 export const upgradePlan = async (
@@ -456,20 +438,25 @@ export const upgradePlan = async (
         ),
       );
 
-    return (await getUserSubscriptionForWebCard(userId, webCardId))!;
+    return (await getSubscriptionById(subscriptionId))!;
   } else {
     throw new Error('Cannot upgrade plan for yearly subscription');
   }
 };
 
-export const endSubscription = async (userId: string, webCardId: string) => {
-  const existingSubscription = await getUserSubscriptionForWebCard(
-    userId,
-    webCardId,
-  );
+export const endSubscription = async (
+  userId: string,
+  webCardId: string,
+  subscriptionId: string,
+) => {
+  const existingSubscription = await getSubscriptionById(subscriptionId);
 
   if (!existingSubscription) {
     throw new Error('No subscription found');
+  }
+
+  if (existingSubscription.webCardId !== webCardId) {
+    throw new Error('Web card id does not match');
   }
 
   const token = await login();
@@ -505,13 +492,8 @@ export const endSubscription = async (userId: string, webCardId: string) => {
         canceledAt: new Date(),
         status: 'canceled',
       })
-      .where(
-        and(
-          eq(UserSubscriptionTable.webCardId, webCardId),
-          eq(UserSubscriptionTable.userId, userId),
-        ),
-      );
+      .where(eq(UserSubscriptionTable.id, subscriptionId));
 
-    return (await getUserSubscriptionForWebCard(userId, webCardId))!;
+    return (await getSubscriptionById(subscriptionId))!;
   }
 };

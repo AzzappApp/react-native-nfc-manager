@@ -156,7 +156,7 @@ export const upgradeSubscriptionPlan: MutationResolvers['upgradeSubscriptionPlan
 
 export const endSubscription: MutationResolvers['endSubscription'] = async (
   _,
-  { webCardId: gqlWebCardId },
+  { webCardId: gqlWebCardId, subscriptionId: gqlSubscriptionId },
   { auth },
 ) => {
   if (!auth.userId) {
@@ -164,8 +164,16 @@ export const endSubscription: MutationResolvers['endSubscription'] = async (
   }
 
   const webCardId = fromGlobalIdWithType(gqlWebCardId, 'WebCard');
+  const subscriptionId = fromGlobalIdWithType(
+    gqlSubscriptionId,
+    'UserSubscription',
+  );
 
-  const subscription = await endExistingSubscription(auth.userId, webCardId);
+  const subscription = await endExistingSubscription(
+    auth.userId,
+    webCardId,
+    subscriptionId,
+  );
 
   if (!subscription) {
     throw new GraphQLError(ERRORS.INTERNAL_SERVER_ERROR);
