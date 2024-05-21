@@ -3,7 +3,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import { View } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { graphql, useFragment, useMutation } from 'react-relay';
-import { webcardRequiresSubscription } from '@azzapp/shared/subscriptionHelpers';
+import { webCardRequiresSubscription } from '@azzapp/shared/subscriptionHelpers';
 import { buildUserUrl } from '@azzapp/shared/urlHelpers';
 import { colors } from '#theme';
 import { useRouter } from '#components/NativeRouter';
@@ -106,7 +106,7 @@ const WebCardScreenPublishHelper = ({
   const router = useRouter();
 
   const requireSubscription = useMemo(
-    () => webcardRequiresSubscription(cardModules, webCardKind),
+    () => webCardRequiresSubscription(cardModules, webCardKind),
     [cardModules, webCardKind],
   );
 

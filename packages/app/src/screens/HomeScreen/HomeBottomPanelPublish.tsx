@@ -4,7 +4,7 @@ import { StyleSheet } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { graphql, commitMutation } from 'react-relay';
 import { isAdmin } from '@azzapp/shared/profileHelpers';
-import { webcardRequiresSubscription } from '@azzapp/shared/subscriptionHelpers';
+import { webCardRequiresSubscription } from '@azzapp/shared/subscriptionHelpers';
 import { colors } from '#theme';
 import { useRouter } from '#components/NativeRouter';
 import { getAuthState } from '#helpers/authStore';
@@ -54,7 +54,7 @@ const HomeBottomPanelPublish = ({ profile }: HomeBottomPanelPublishProps) => {
     if (!isAdmin(profile.profileRole)) {
       return;
     }
-    const requireSubscription = webcardRequiresSubscription(
+    const requireSubscription = webCardRequiresSubscription(
       profile.webCard.cardModules,
       profile.webCard.webCardKind,
     );

@@ -12,7 +12,7 @@ export const moduleCountRequiresSubscription = (_moduleCount: number) => {
   return _moduleCount > 3;
 };
 
-export const webcardRequiresSubscription = (
+export const webCardRequiresSubscription = (
   _modules: ReadonlyArray<{ readonly kind: string }>,
   _kind?: string | null,
 ) => {

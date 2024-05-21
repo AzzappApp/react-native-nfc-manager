@@ -1,12 +1,12 @@
 import { GraphQLError } from 'graphql';
 import {
-  activeUserSubscription,
   getWebCardPosts,
   updateWebCard,
   getCardModules,
+  getActiveUserSubscriptionForWebCard,
 } from '@azzapp/data';
 import ERRORS from '@azzapp/shared/errors';
-import { webcardRequiresSubscription } from '@azzapp/shared/subscriptionHelpers';
+import { webCardRequiresSubscription } from '@azzapp/shared/subscriptionHelpers';
 import fromGlobalIdWithType from '#helpers/relayIdHelpers';
 import type { MutationResolvers } from '#/__generated__/types';
 
@@ -26,10 +26,15 @@ const toggleWebCardPublished: MutationResolvers['toggleWebCardPublished'] =
 
     const modules = await getCardModules(webCardId);
 
-    if (webcardRequiresSubscription(modules, webCard.webCardKind)) {
-      const subscription = await activeUserSubscription(userId);
-      if (!subscription || subscription.length === 0)
-        throw new GraphQLError(ERRORS.UNAUTHORIZED);
+    const owner = await loaders.webCardOwners.load(webCard.id);
+
+    if (webCardRequiresSubscription(modules, webCard.webCardKind)) {
+      const subscription = owner
+        ? await getActiveUserSubscriptionForWebCard(owner.id, webCardId)
+        : [];
+      if (subscription.length === 0) {
+        throw new GraphQLError(ERRORS.SUBSCRIPTION_REQUIRED);
+      }
     }
 
     const updates = {
