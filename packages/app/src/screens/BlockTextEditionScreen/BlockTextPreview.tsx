@@ -1,6 +1,7 @@
 import { useIntl } from 'react-intl';
 import BlockTextRenderer from '#components/cardModules/BlockTextRenderer';
 import EditorScaledPreview from '#components/EditorScaledPreview';
+import Text from '#ui/Text';
 import type { BlockTextRendererProps } from '#components/cardModules/BlockTextRenderer';
 
 type BlockTextPreviewProps = Pick<
@@ -30,11 +31,16 @@ const BlockTextPreview = ({
     ...data,
     text:
       data?.text ||
-      intl.formatMessage({
-        defaultMessage:
-          "Add section Text here. To edit this section, simply click on the text and start typing. You can change the font style, size, color, and alignment using the editing tools provided. Adjust the margins, the spacing, the text background, and the section background for this section to match your webcard's design and branding.",
-        description: 'Default text for the BlockText module',
-      }),
+      (intl.formatMessage(
+        {
+          defaultMessage:
+            'Add section contents here. To edit the text, simply open the editor and start typing. You can also change the font style, size, color, and alignment using the editing tools provided. Adjust the margins and the background for this section to match the design and branding of your WebCard{azzappA}.',
+          description: 'Default text for the BlockText module',
+        },
+        {
+          azzappA: <Text variant="azzapp">a</Text>,
+        },
+      ) as string),
   };
   return (
     <EditorScaledPreview onPreviewPress={onPreviewPress} {...props}>

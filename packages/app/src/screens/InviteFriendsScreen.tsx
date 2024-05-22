@@ -36,12 +36,17 @@ const InviteFriendsScreen = ({
   const message = intl.formatMessage(
     {
       defaultMessage:
-        "Hey, I'm using azzapp, the ultimate networking app for businesses and individuals. Install the app here: {url}",
+        // eslint-disable-next-line formatjs/enforce-placeholders
+        'Hey, I’m using azzapp as {userName}. Install the app to follow my WebCard{azzappA} and to see my posts. {url}',
       description:
         'Invite message to share with friends - avoid specific characters like &',
     },
-    { url: 'https://azzapp.com' },
-  );
+    {
+      url: 'https://azzapp.com',
+      azzappA: <Text variant="azzapp">a</Text>,
+      userName: webCard?.userName,
+    },
+  ) as string;
 
   // const subject = intl.formatMessage({
   //   defaultMessage: "I'm using Azzapp",

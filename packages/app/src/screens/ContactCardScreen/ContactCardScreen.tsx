@@ -249,7 +249,7 @@ export const ContactCardScreen = ({
           <View style={{ width: '100%' }}>
             <Text variant="xsmall">
               <FormattedMessage
-                defaultMessage="Your contact card{azzappA} is not visible on your Webcard{azzappA}. Only you can share your contact card with other users."
+                defaultMessage="Your ContactCard{azzappA} is not publicly visible on your WebCard{azzappA}. Only you can share your ContactCard{azzappA} with others."
                 description="Description message when contact card is private."
                 values={{
                   azzappA: <Text variant="azzapp">a</Text>,

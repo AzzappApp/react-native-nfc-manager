@@ -59,10 +59,15 @@ const SearchTabContainer = ({
       },
       {
         key: 'searchProfiles',
-        label: intl.formatMessage({
-          defaultMessage: 'Webcards',
-          description: 'Search screen tab label : webcard',
-        }),
+        label: intl.formatMessage(
+          {
+            defaultMessage: 'Webcards{azzappA}',
+            description: 'Search screen tab label : webcard',
+          },
+          {
+            azzappA: <Text variant="azzapp">a</Text>,
+          },
+        ) as string,
         query: searchResultProfilesQuery,
       },
       {

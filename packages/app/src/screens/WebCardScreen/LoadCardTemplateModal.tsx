@@ -215,10 +215,16 @@ const LoadCardTemplateModal = ({
           <View style={styles.buttons}>
             <Button
               style={{ marginTop: 20, width: '100%' }}
-              label={intl.formatMessage({
-                defaultMessage: 'Remove current contents',
-                description: 'Confirmation button for load card template modal',
-              })}
+              label={intl.formatMessage(
+                {
+                  defaultMessage: 'Remove WebCard{azzappA} contents',
+                  description:
+                    'Confirmation button for load card template modal',
+                },
+                {
+                  azzappA: <Text variant="azzapp">a</Text>,
+                },
+              )}
               onPress={onSubmit}
             />
             <Button

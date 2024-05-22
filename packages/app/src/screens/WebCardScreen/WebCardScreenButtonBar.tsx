@@ -295,8 +295,12 @@ const WebCardScreenButtonActionButton = ({
         >
           <Text variant="button" style={styles.textButton}>
             <FormattedMessage
-              defaultMessage="Build my webcard"
+              // eslint-disable-next-line formatjs/enforce-placeholders
+              defaultMessage="Build my WebCard{azzappA}"
               description="Build my webcard button label in Profile Screen Button Bar"
+              values={{
+                azzappA: <Text variant="azzapp">a</Text>,
+              }}
             />
           </Text>
         </BlurredFloatingButton>
@@ -305,11 +309,18 @@ const WebCardScreenButtonActionButton = ({
           variant="grey"
           onPress={onShowWebcardModalCallback}
           iconStyle={{ tintColor: colors.white }}
-          accessibilityLabel={intl.formatMessage({
-            defaultMessage: 'Tap to show the webcard informations',
-            description:
-              'ProfileScreenButtonBar show webcard informations button accessibility label',
-          })}
+          accessibilityLabel={
+            intl.formatMessage(
+              {
+                defaultMessage: 'Tap to show the WebCard{azzappA} information',
+                description:
+                  'ProfileScreenButtonBar show webcard informations button accessibility label',
+              },
+              {
+                azzappA: <Text variant="azzapp">a</Text>,
+              },
+            ) as string
+          }
         />
       </>
     ) : (
@@ -317,10 +328,18 @@ const WebCardScreenButtonActionButton = ({
         variant="grey"
         onPress={onCreateNewPost}
         style={styles.mainButton}
-        accessibilityLabel={intl.formatMessage({
-          defaultMessage: 'Tap to create a new post',
-          description: 'ProfileScreenButtonBar edit button accessibility label',
-        })}
+        accessibilityLabel={
+          intl.formatMessage(
+            {
+              defaultMessage: 'Tap to edit your WebCard{azzappA}',
+              description:
+                'ProfileScreenButtonBar edit button accessibility label',
+            },
+            {
+              azzappA: <Text variant="azzapp">a</Text>,
+            },
+          ) as string
+        }
       >
         <Text variant="button" style={styles.textButton}>
           <FormattedMessage
@@ -336,10 +355,18 @@ const WebCardScreenButtonActionButton = ({
         onPress={debouncedToggleFollowing}
         style={styles.mainButton}
         variant="grey"
-        accessibilityLabel={intl.formatMessage({
-          defaultMessage: 'Tap to follow the WebCard',
-          description: 'UserScreenButtonBar follow WebCard accessibility label',
-        })}
+        accessibilityLabel={
+          intl.formatMessage(
+            {
+              defaultMessage: 'Tap to follow the WebCard{azzappA}',
+              description:
+                'UserScreenButtonBar follow WebCard accessibility label',
+            },
+            {
+              azzappA: <Text variant="azzapp">a</Text>,
+            },
+          ) as string
+        }
       >
         <Text variant="button" style={styles.textButton}>
           {isFollowing ? (

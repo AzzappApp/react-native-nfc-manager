@@ -591,26 +591,38 @@ const MultiUserDetailModal = ({
               <Text variant="xsmall" style={styles.description}>
                 {role === 'user' && (
                   <FormattedMessage
-                    defaultMessage="A user has a ContactCard linked to the shared webcard but cannot publish posts or edit the WebCard."
+                    defaultMessage="A 'user' can edit and use the ContactCard linked to the shared WebCard{azzappA}. However, a 'user' has a view-only access to the WebCard{azzappA} itself and to the posts, and 'user' cannot 'like', 'comment', or 'follow' on the posts and WebCards{azzappA} of others."
                     description="MultiUserDetailModal - User description"
+                    values={{
+                      azzappA: <Text variant="azzapp">a</Text>,
+                    }}
                   />
                 )}
                 {role === 'editor' && (
                   <FormattedMessage
-                    defaultMessage="An editor can create and publish posts, edit the WebCard, but they cannot manage other aspects of the WebCard, such as settings and permissions."
+                    defaultMessage="An 'editor' can publish posts, edit WebCard{azzappA} contents, and interact with WebCards{azzappA} and posts of others. However, 'editor' does not have access to WebCard{azzappA} parameters and to the Multi-User settings."
                     description="MultiUserDetailModal - Editor description"
+                    values={{
+                      azzappA: <Text variant="azzapp">a</Text>,
+                    }}
                   />
                 )}
                 {role === 'admin' && (
                   <FormattedMessage
-                    defaultMessage="The admin has full control over the WebCard, including the ability to add and remove collaborators."
+                    defaultMessage="An 'admin' has a full control over the shared WebCard{azzappA}, including the ability to publish and unpublish it, to change the WebCard{azzappA} name, and to manage Multi-User collaborators. Also, ‘admin’ can manage payment details. However, an 'admin' cannot deactivate the Multi-User mode or delete the WebCard{azzappA}."
                     description="MultiUserDetailModal - admin description"
+                    values={{
+                      azzappA: <Text variant="azzapp">a</Text>,
+                    }}
                   />
                 )}
                 {role === 'owner' && (
                   <FormattedMessage
-                    defaultMessage="The owner has full control over the WebCard, including the ability to add and remove collaborators. This is also the person who will be billed for multi-user."
+                    defaultMessage="The 'owner' has a full control of the WebCard{azzappA}, including ability to deactivate the Multi-User mode, to transfer WebCard{azzappA} ownership, and to delete the WebCard{azzappA}. Also, ‘owner’ can manage payment details."
                     description="MultiUserDetailModal - admin description"
+                    values={{
+                      azzappA: <Text variant="azzapp">a</Text>,
+                    }}
                   />
                 )}
               </Text>

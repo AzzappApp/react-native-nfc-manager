@@ -150,17 +150,27 @@ const PostCommentsList = ({
   const onSubmit = () => {
     if (!viewerWebCard.cardIsPublished) {
       Alert.alert(
-        intl.formatMessage({
-          defaultMessage: 'Unpublished WebCard.',
-          description:
-            'PostList - Alert Message title when the user is viewing a post (from deeplinking) with an unpublished WebCard',
-        }),
-        intl.formatMessage({
-          defaultMessage:
-            'This action can only be done from a published WebCard.',
-          description:
-            'PostList - AlertMessage when the user is viewing a post (from deeplinking) with an unpublished WebCard',
-        }),
+        intl.formatMessage(
+          {
+            defaultMessage: 'Unpublished WebCard{azzappA}.',
+            description:
+              'PostList - Alert Message title when the user is viewing a post (from deeplinking) with an unpublished WebCard',
+          },
+          {
+            azzappA: <Text variant="azzapp">a</Text>,
+          },
+        ) as string,
+        intl.formatMessage(
+          {
+            defaultMessage:
+              'Oops, looks like your WebCard{azzappA} is not published. Publish it first!',
+            description:
+              'PostList - AlertMessage when the user is viewing a post (from deeplinking) with an unpublished WebCard',
+          },
+          {
+            azzappA: <Text variant="azzapp">a</Text>,
+          },
+        ) as string,
         [
           {
             text: intl.formatMessage({
@@ -203,11 +213,17 @@ const PostCommentsList = ({
             if (error.message === ERRORS.UNPUBLISHED_WEB_CARD) {
               Toast.show({
                 type: 'error',
-                text1: intl.formatMessage({
-                  defaultMessage: 'Error, the related webCard is unpublished',
-                  description:
-                    'Error when a user tries to comment a post from an unpublished webCard',
-                }),
+                text1: intl.formatMessage(
+                  {
+                    defaultMessage:
+                      'Oops, this WebCard{azzappA} is not published.',
+                    description:
+                      'Error when a user tries to comment a post from an unpublished webCard',
+                  },
+                  {
+                    azzappA: <Text variant="azzapp">a</Text>,
+                  },
+                ) as string,
               });
             } else {
               console.error(error);

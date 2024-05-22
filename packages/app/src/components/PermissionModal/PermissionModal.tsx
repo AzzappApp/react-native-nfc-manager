@@ -3,10 +3,12 @@ import { useIntl } from 'react-intl';
 import { StyleSheet, View, SafeAreaView, Linking, Modal } from 'react-native';
 import { RESULTS } from 'react-native-permissions';
 
+import { colors } from '#theme';
 import { usePermissionContext } from '#helpers/PermissionContext';
 import Container from '#ui/Container';
 import Header from '#ui/Header';
 import IconButton from '#ui/IconButton';
+import Text from '#ui/Text';
 import PermissionScreen from './PermissionScreen';
 
 type CameraModalProps = {
@@ -166,12 +168,23 @@ const PermissionModal = ({
                   description:
                     'Camera authorization screen title for photos permission',
                 })}
-                content={intl.formatMessage({
-                  defaultMessage:
-                    'Access to the photos allows you to create publications.',
-                  description:
-                    'Camera authorization screen content for photos permission',
-                })}
+                content={
+                  intl.formatMessage(
+                    {
+                      defaultMessage:
+                        'Access to the media library allows you to create posts, Covers{azzappA}, and to add images to your WebCard{azzappA}.',
+                      description:
+                        'Camera authorization screen content for photos permission',
+                    },
+                    {
+                      azzappA: (
+                        <Text variant="azzapp" style={{ color: colors.red400 }}>
+                          a
+                        </Text>
+                      ),
+                    },
+                  ) as string
+                }
                 onNext={onAllowsGallery}
               />
             </View>

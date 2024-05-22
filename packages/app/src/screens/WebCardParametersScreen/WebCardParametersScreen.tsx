@@ -150,11 +150,16 @@ const WebCardParametersScreen = ({
 
           Toast.show({
             type: 'error',
-            text1: intl.formatMessage({
-              defaultMessage:
-                'The webCard could not be updated. Please try again.',
-              description: 'Error toast message when saving webCard failed',
-            }),
+            text1: intl.formatMessage(
+              {
+                defaultMessage:
+                  'Oops, the WebCard{azzappA} could not be updated.',
+                description: 'Error toast message when saving webCard failed',
+              },
+              {
+                azzappA: <Text variant="azzapp">a</Text>,
+              },
+            ) as string,
           });
         },
       });
@@ -204,11 +209,16 @@ const WebCardParametersScreen = ({
 
           Toast.show({
             type: 'error',
-            text1: intl.formatMessage({
-              defaultMessage:
-                'The webCard could not be updated. Please try again.',
-              description: 'Error toast message when saving webCard failed',
-            }),
+            text1: intl.formatMessage(
+              {
+                defaultMessage:
+                  'Oops, the WebCard{azzappA} could not be updated.',
+                description: 'Error toast message when saving webCard failed',
+              },
+              {
+                azzappA: <Text variant="azzapp">a</Text>,
+              },
+            ) as string,
           });
         },
       });
@@ -231,11 +241,16 @@ const WebCardParametersScreen = ({
         onError: () => {
           Toast.show({
             type: 'error',
-            text1: intl.formatMessage({
-              defaultMessage:
-                'The webCard could not be updated. Please try again.',
-              description: 'Error toast message when saving webCard failed',
-            }),
+            text1: intl.formatMessage(
+              {
+                defaultMessage:
+                  'Oops, the WebCard{azzappA} could not be updated.',
+                description: 'Error toast message when saving webCard failed',
+              },
+              {
+                azzappA: <Text variant="azzapp">a</Text>,
+              },
+            ) as string,
           });
         },
       });

@@ -105,15 +105,30 @@ const WebcardParametersNameForm = ({
 
   const intl = useIntl();
 
-  const userNameAlreadyExistsError = intl.formatMessage({
-    defaultMessage: 'This username is already used by someone else',
-    description: 'Webcardparameters name form - Username already taken error',
-  });
+  const userNameAlreadyExistsError = intl.formatMessage(
+    {
+      defaultMessage: 'This WebCard{azzappA} name is already registered',
+      description: 'Webcardparameters name form - Username already taken error',
+    },
+    {
+      azzappA: (
+        <Text variant="azzapp" style={{ color: colors.red400 }}>
+          a
+        </Text>
+      ),
+    },
+  ) as string;
 
-  const userNameInvalidError = intl.formatMessage({
-    defaultMessage: 'Username can’t contain space or special characters',
-    description: 'Webcardparameters name form - Username Error',
-  });
+  const userNameInvalidError = intl.formatMessage(
+    {
+      defaultMessage:
+        'WebCard{azzappA} name can not contain space or special characters',
+      description: 'Webcardparameters name form - Username Error',
+    },
+    {
+      azzappA: <Text variant="azzapp">a</Text>,
+    },
+  ) as string;
 
   const environment = useRelayEnvironment();
 
@@ -154,11 +169,21 @@ const WebcardParametersNameForm = ({
           )
         ) {
           setError('root.server', {
-            message: intl.formatMessage({
-              defaultMessage: 'This username is already used',
-              description:
-                'WebcardParameters Name form - Error This userName is already used ',
-            }),
+            message: intl.formatMessage(
+              {
+                defaultMessage:
+                  'This WebCard{azzappA} name is already registered',
+                description:
+                  'WebcardParameters Name form - Error This userName is already used ',
+              },
+              {
+                azzappA: (
+                  <Text variant="azzapp" style={{ color: colors.red400 }}>
+                    a
+                  </Text>
+                ),
+              },
+            ) as string,
           });
         } else if (
           response?.errors.some(
@@ -258,10 +283,17 @@ const WebcardParametersNameForm = ({
               <TextInput
                 nativeID="userName"
                 accessibilityLabelledBy="userNameLabel"
-                placeholder={intl.formatMessage({
-                  defaultMessage: 'Choose an username',
-                  description: 'ProfileForm username textinput placeholder',
-                })}
+                placeholder={
+                  intl.formatMessage(
+                    {
+                      defaultMessage: 'Select a WebCard{azzappA} name',
+                      description: 'ProfileForm username textinput placeholder',
+                    },
+                    {
+                      azzappA: <Text variant="azzapp">a</Text>,
+                    },
+                  ) as string
+                }
                 isErrored={!!userNameError}
                 value={value}
                 onChangeText={text => onChange(text.toLowerCase())}

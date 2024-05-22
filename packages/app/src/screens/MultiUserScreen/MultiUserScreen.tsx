@@ -251,7 +251,7 @@ const MultiUserScreen = ({
             />
           ) : (
             <FormattedMessage
-              defaultMessage="Allow your team members to have their own personal Contact Cards{azzappA}, connected to the same company or organisation’s WebCard{azzappA}."
+              defaultMessage="Enhance teamwork: provide each member with a personalized ContactCard{azzappA}, seamlessly connected to the shared WebCard{azzappA}, fostering individual identity within a cohesive system."
               description="Description for MultiUserScreen"
               values={{
                 azzappA: <Text variant="azzapp">a</Text>,
@@ -419,7 +419,7 @@ const MultiUserScreen = ({
               </Text>
               <Text variant="medium">
                 <FormattedMessage
-                  defaultMessage="By deactivating multi user, you will delete the Contact Cards{azzappA} of your team members."
+                  defaultMessage="If you deactivate the Multi-User, other collaborators will no longer be able to access this WebCard{azzappA} or their linked ContactCards{azzappA}. This action is irreversible."
                   description="Description for confirm delete multi user modal"
                   values={{
                     azzappA: <Text variant="azzapp">a</Text>,

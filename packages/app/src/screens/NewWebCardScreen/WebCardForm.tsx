@@ -103,15 +103,26 @@ const WebCardForm = (
 
   const intl = useIntl();
 
-  const userNameAlreadyExistsError = intl.formatMessage({
-    defaultMessage: 'This username is already used by someone else',
-    description: 'NewProfileScreen - Username already taken error',
-  });
+  const userNameAlreadyExistsError = intl.formatMessage(
+    {
+      defaultMessage: 'This WebCard{azzappA} name is already registered',
+      description: 'NewProfileScreen - Username already taken error',
+    },
+    {
+      azzappA: <Text variant="azzapp">a</Text>,
+    },
+  ) as string;
 
-  const userNameInvalidError = intl.formatMessage({
-    defaultMessage: 'Username can’t contain space or special characters',
-    description: 'NewProfileScreen - Username Error',
-  });
+  const userNameInvalidError = intl.formatMessage(
+    {
+      defaultMessage:
+        'WebCard{azzappA} name can not contain space or special characters',
+      description: 'NewProfileScreen - Username Error',
+    },
+    {
+      azzappA: <Text variant="azzapp">a</Text>,
+    },
+  );
 
   const environment = useRelayEnvironment();
 
@@ -528,10 +539,17 @@ const WebCardForm = (
                 nativeID="userName"
                 accessibilityLabelledBy="userNameLabel"
                 ref={userNameInputRef}
-                placeholder={intl.formatMessage({
-                  defaultMessage: 'Choose a name',
-                  description: 'ProfileForm username textinput placeholder',
-                })}
+                placeholder={
+                  intl.formatMessage(
+                    {
+                      defaultMessage: 'Select a WebCard{azzappA} name"',
+                      description: 'ProfileForm username textinput placeholder',
+                    },
+                    {
+                      azzappA: <Text variant="azzapp">a</Text>,
+                    },
+                  ) as string
+                }
                 isErrored={Boolean(error)}
                 value={userName}
                 onChangeText={text => onChange(text.toLowerCase())}

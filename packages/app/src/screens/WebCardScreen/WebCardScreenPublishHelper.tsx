@@ -241,10 +241,15 @@ const WebCardScreenPublishHelper = ({
           />
           <Button
             onPress={onClose}
-            label={intl.formatMessage({
-              defaultMessage: 'Hide my content for the moment',
-              description: 'Publish modal publish later button label',
-            })}
+            label={intl.formatMessage(
+              {
+                defaultMessage: 'Hide my WebCard{azzappA} for the moment.',
+                description: 'Publish modal publish later button label',
+              },
+              {
+                azzappA: <Text variant="azzapp">a</Text>,
+              },
+            )}
             disabled={publishing}
           />
         </View>

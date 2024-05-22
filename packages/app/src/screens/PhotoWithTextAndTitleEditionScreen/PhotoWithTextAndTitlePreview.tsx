@@ -1,6 +1,7 @@
 import { useIntl } from 'react-intl';
 import PhotoWithTextAndTitleRenderer from '#components/cardModules/PhotoWithTextAndTitleRenderer';
 import EditorScaledPreview from '#components/EditorScaledPreview';
+import Text from '#ui/Text';
 import type { PhotoWithTextAndTitleRendererProps } from '#components/cardModules/PhotoWithTextAndTitleRenderer';
 
 type PhotoWithTextAndTitlePreviewProps = Pick<
@@ -36,11 +37,16 @@ const PhotoWithTextAndTitlePreview = ({
       }),
     content:
       data.content ||
-      intl.formatMessage({
-        defaultMessage:
-          "Add section Text here. To edit this section, simply open the editor and start typing. You can change the font style, size, color, and alignment using the editing tools provided. Adjust the margins and the background for this section to match your webcard's design and branding.",
-        description: 'PhotoWithTextAndTitle default module text',
-      }),
+      (intl.formatMessage(
+        {
+          defaultMessage:
+            'Add section contents here. To edit the text, simply open the editor and start typing. You can also change the font style, size, color, and alignment using the editing tools provided. Adjust the margins and the background for this section to match the design and branding of your WebCard{azzappA}.',
+          description: 'PhotoWithTextAndTitle default module text',
+        },
+        {
+          azzappA: <Text variant="azzapp">a</Text>,
+        },
+      ) as string),
   };
   return (
     <EditorScaledPreview onPreviewPress={onPreviewPress} {...props}>
