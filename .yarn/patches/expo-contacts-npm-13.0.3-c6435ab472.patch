@@ -1,0 +1,13 @@
+diff --git a/ios/Serialization.swift b/ios/Serialization.swift
+index 0cbed547fb4380dc9f2edc31051589277a511ae3..bc217048efbae64641e8bec874c6120b21defc02 100644
+--- a/ios/Serialization.swift
++++ b/ios/Serialization.swift
+@@ -236,7 +236,7 @@ func serializeContact(person: CNContact, keys: [String]?, directory: URL?) throw
+     contact[ContactsKey.jobTitle] = person.jobTitle
+   }
+   if fieldHasValue(field: person.departmentName) {
+-    contact[ContactsKey.department] = person.dates
++    contact[ContactsKey.department] = person.departmentName
+   }
+ 
+   if keysToFetch.contains(CNContactNamePrefixKey) && fieldHasValue(field: person.namePrefix) {
