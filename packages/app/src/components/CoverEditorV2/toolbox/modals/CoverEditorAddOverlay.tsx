@@ -1,0 +1,40 @@
+import { CoverEditorActionType } from '#components/CoverEditorV2/coverEditorActions';
+import { useCoverEditorContext } from '#components/CoverEditorV2/CoverEditorContext';
+import ImagePicker, { SelectImageStep } from '#components/ImagePicker';
+import ScreenModal from '#components/ScreenModal';
+import type { ImagePickerResult } from '#components/ImagePicker';
+
+type Props = {
+  open: boolean;
+  onClose: () => void;
+};
+
+const CoverEditorAddOverlay = ({ open, onClose }: Props) => {
+  const { dispatch } = useCoverEditorContext();
+
+  const onFinish = (param: ImagePickerResult) => {
+    dispatch({
+      type: CoverEditorActionType.AddOverlayLayer,
+      payload: {
+        uri: param.uri,
+        width: param.width,
+        height: param.height,
+      },
+    });
+
+    onClose();
+  };
+
+  return (
+    <ScreenModal visible={open} animationType="slide">
+      <ImagePicker
+        kind="image"
+        steps={[SelectImageStep]}
+        onFinished={onFinish}
+        onCancel={onClose}
+      />
+    </ScreenModal>
+  );
+};
+
+export default CoverEditorAddOverlay;

@@ -42,6 +42,10 @@ export type ImagePickerStepDefinition = {
    */
   preventNavigation?: boolean;
   /**
+   * Show buttons in header only if defined
+   */
+  headerButtonsShowIfDefined?: boolean;
+  /**
    * the title of the header
    */
   headerTitle?: ReactNode;
@@ -49,6 +53,10 @@ export type ImagePickerStepDefinition = {
    * the content to display in the top panel of the image picker
    */
   topPanel: ReactNode;
+  /**
+   * the aspect ratio of the top panel
+   */
+  topPanelAspectRatio?: number;
   /**
    * the content to display in the bottom panel of the image picker
    */
@@ -138,11 +146,13 @@ const ImagePickerWizardRenderer = ({
   headerLeftButton,
   headerRightButton,
   headerTitle,
+  headerButtonsShowIfDefined = false,
   preventNavigation,
   isFirstStep,
   isLastStep,
   busy,
   topPanel,
+  topPanelAspectRatio = 1,
   bottomPanel,
   menuBarProps,
   headerRightButtonTitle,
@@ -155,7 +165,7 @@ const ImagePickerWizardRenderer = ({
 }: ImagePickerWizardRendererProps) => {
   const intl = useIntl();
   let leftButton = headerLeftButton;
-  if (!leftButton) {
+  if (!leftButton && !headerButtonsShowIfDefined) {
     if (isFirstStep && canCancel) {
       leftButton = (
         <HeaderButton
@@ -186,7 +196,7 @@ const ImagePickerWizardRenderer = ({
     leftButton = null;
   }
   let rightButton = headerRightButton;
-  if (!rightButton && !preventNavigation) {
+  if (!rightButton && !preventNavigation && !headerButtonsShowIfDefined) {
     rightButton = (
       <HeaderButton
         label={
@@ -208,7 +218,7 @@ const ImagePickerWizardRenderer = ({
   }
 
   const { insetBottom, bottomPanelHeight, insetTop, topPanelHeight } =
-    useEditorLayout({ topPanelAspectRatio: 1 });
+    useEditorLayout({ topPanelAspectRatio });
 
   if (busy) {
     rightButton = <ActivityIndicator style={styles.activityIndicator} />;
@@ -226,7 +236,7 @@ const ImagePickerWizardRenderer = ({
         style={styles.header}
       />
 
-      <View style={{ height: topPanelHeight }}>
+      <View style={{ height: !topPanel ? 0 : topPanelHeight }}>
         {!!topPanel && <TopPanelWrapper>{topPanel}</TopPanelWrapper>}
       </View>
       <View style={{ height: bottomPanelHeight }}>

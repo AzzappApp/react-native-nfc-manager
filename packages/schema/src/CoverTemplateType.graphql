@@ -1,0 +1,42 @@
+"""
+Cover Template Type
+"""
+type CoverTemplateType implements Node {
+  """
+  The ID of an object
+  """
+  id: ID!
+  label: String
+  order: Float!
+  coverTemplates(tag: ID): [CoverTemplate!]!
+}
+
+"""
+A connection to a list of items.
+"""
+type CoverTemplateTypeConnection {
+  """
+  Information to aid in pagination.
+  """
+  pageInfo: PageInfo!
+
+  """
+  A list of edges.
+  """
+  edges: [CoverTemplateTypeEdge]
+}
+
+"""
+An edge in a connection.
+"""
+type CoverTemplateTypeEdge {
+  """
+  The item at the end of the edge
+  """
+  node: CoverTemplateType
+
+  """
+  A cursor for use in pagination
+  """
+  cursor: String!
+}

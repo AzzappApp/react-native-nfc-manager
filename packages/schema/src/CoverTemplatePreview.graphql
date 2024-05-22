@@ -1,0 +1,11 @@
+"""
+Cover Template Preview
+"""
+type CoverTemplatePreview implements Node {
+  """
+  The ID of an object
+  """
+  id: ID!
+  media: Media
+  coverTemplate: CoverTemplate
+}

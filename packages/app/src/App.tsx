@@ -384,7 +384,7 @@ const AppRouter = () => {
   // #endregion
 
   // #region Loading Screen
-  const [showLoadingScreen, setShowLoadingScreen] = useState(true);
+  const [showLoadingScreen, setShowLoadingScreen] = useState(!__DEV__);
 
   useEffect(
     () =>

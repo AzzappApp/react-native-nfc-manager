@@ -1,38 +1,20 @@
-import { eq, sql } from 'drizzle-orm';
+import { and, asc, eq, gt, sql } from 'drizzle-orm';
+import { CoverTemplateTypeTable } from '#coverTemplateType';
 import db, { cols } from './db';
 import { createId } from './helpers/createId';
 import type {
-  TextOrientation,
-  TextPosition,
-  TextStyle,
-} from '@azzapp/shared/coverHelpers';
-import type { InferInsertModel, InferSelectModel } from 'drizzle-orm';
-
-export type CoverTemplateData = {
-  titleStyle?: TextStyle | null;
-  subTitleStyle?: TextStyle | null;
-  textOrientation: TextOrientation;
-  textPosition: TextPosition;
-  textAnimation?: string | null;
-  backgroundId?: string | null;
-  backgroundColor?: string | null;
-  backgroundPatternColor?: string | null;
-  foregroundId?: string | null;
-  foregroundColor?: string | null;
-  mediaFilter?: string | null;
-  mediaParameters?: Record<string, any> | null;
-  mediaAnimation?: string | null;
-};
+  InferInsertModel,
+  InferSelectModel,
+  SQLWrapper,
+} from 'drizzle-orm';
 
 export const CoverTemplateTable = cols.table('CoverTemplate', {
   id: cols.cuid('id').notNull().primaryKey().$defaultFn(createId),
   name: cols.defaultVarchar('name').notNull(),
-  kind: cols.enum('kind', ['people', 'video', 'others']).notNull(),
-  previewMediaId: cols.mediaId('previewMediaId').notNull(),
-  data: cols.json('data').$type<CoverTemplateData>().notNull(),
-  colorPaletteId: cols.cuid('colorPaletteId').notNull(),
-  businessEnabled: cols.boolean('businessEnabled').default(true).notNull(),
-  personalEnabled: cols.boolean('personalEnabled').default(true).notNull(),
+  order: cols.int('order').notNull().default(1),
+  mediaCount: cols.int('mediaCount').notNull().default(0),
+  tags: cols.json('tags').$type<string[]>().notNull(),
+  type: cols.cuid('type').notNull(),
 });
 
 export type CoverTemplate = InferSelectModel<typeof CoverTemplateTable>;
@@ -68,13 +50,17 @@ export const getCoverTemplates = async (
 ) => {
   const query = sql`
     SELECT *, RAND(${randomSeed}) as cursor
-    FROM CoverTemplate
-    WHERE ${
-      webCardKind === 'business'
-        ? CoverTemplateTable.businessEnabled
-        : CoverTemplateTable.personalEnabled
-    } = 1
-    AND ${CoverTemplateTable.kind} = ${templateKind}`;
+    FROM CoverTemplate`;
+
+  // const query = sql`
+  //   SELECT *, RAND(${randomSeed}) as cursor
+  //   FROM CoverTemplate
+  //   WHERE ${
+  //     webCardKind === 'business'
+  //       ? CoverTemplateTable.businessEnabled
+  //       : CoverTemplateTable.personalEnabled
+  //   } = 1
+  //   AND ${CoverTemplateTable.kind} = ${templateKind}`;
   if (offset) {
     query.append(sql` HAVING cursor > ${offset} `);
   }
@@ -86,4 +72,61 @@ export const getCoverTemplates = async (
   return (await db.execute(query)).rows as Array<
     CoverTemplate & { cursor: string }
   >;
+};
+
+export const getCoverTemplatesByType = (typeId: string) =>
+  db
+    .select()
+    .from(CoverTemplateTable)
+    .where(eq(CoverTemplateTable.type, typeId));
+
+export const getCoverTemplatesByTypeAndTag = async (
+  typeId: string,
+  tagId: string,
+) => {
+  const query = sql`
+  SELECT *
+  FROM CoverTemplate
+  WHERE type = ${typeId}
+  AND JSON_CONTAINS (tags, ${tagId})`;
+
+  const executed = await db.execute(query);
+  return executed.rows as CoverTemplate[];
+};
+
+export const getCoverTemplatesWithType = async (
+  limit: number,
+  cursor?: string,
+  tagId?: string,
+) => {
+  const filters: SQLWrapper[] = [];
+
+  if (tagId) {
+    const contains = `JSON_CONTAINS(tags, '"${tagId}"')`;
+    filters.push(sql.raw(contains));
+  }
+
+  const request = db
+    .select({
+      CoverTemplate: CoverTemplateTable,
+      CoverTemplateType: CoverTemplateTypeTable,
+      cursor: CoverTemplateTable.id,
+    })
+    .from(CoverTemplateTable)
+    .innerJoin(
+      CoverTemplateTypeTable,
+      eq(CoverTemplateTypeTable.id, CoverTemplateTable.type),
+    )
+    .where(and(...filters))
+    .orderBy((asc(CoverTemplateTypeTable.order), asc(CoverTemplateTable.order)))
+    .limit(limit);
+
+  const rows = await (cursor
+    ? request.having(item => gt(item.cursor, cursor))
+    : request);
+
+  return rows.map(({ CoverTemplate, cursor }) => ({
+    ...CoverTemplate,
+    cursor,
+  }));
 };

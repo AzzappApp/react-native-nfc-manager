@@ -10,6 +10,9 @@ const icons = {
   get about() {
     return require('./assets/about.png');
   },
+  get add_media() {
+    return require('./assets/add_media.png');
+  },
   get account() {
     return require('./assets/account.png');
   },
@@ -30,6 +33,9 @@ const icons = {
   },
   get add() {
     return require('./assets/add.png');
+  },
+  get animate() {
+    return require('./assets/animate.png');
   },
   get azzapp() {
     return require('./assets/azzapp.png');
@@ -148,6 +154,9 @@ const icons = {
   get down() {
     return require('./assets/down.png');
   },
+  get duplicate() {
+    return require('./assets/duplicate.png');
+  },
   get earth() {
     return require('./assets/earth.png');
   },
@@ -189,6 +198,9 @@ const icons = {
   },
   get font() {
     return require('./assets/font.png');
+  },
+  get font_size() {
+    return require('./assets/font_size.png');
   },
   get foreground_text() {
     return require('./assets/foreground_text.png');
@@ -358,6 +370,12 @@ const icons = {
   get shadow() {
     return require('./assets/shadow.png');
   },
+  get shadow_element() {
+    return require('./assets/shadow_element.png');
+  },
+  get shadow_element_off() {
+    return require('./assets/shadow_element_off.png');
+  },
   get share() {
     return require('./assets/share.png');
   },
@@ -400,11 +418,17 @@ const icons = {
   get tips() {
     return require('./assets/tips.png');
   },
+  get trash() {
+    return require('./assets/trash.png');
+  },
+  get trash_line() {
+    return require('./assets/trash_line.png');
+  },
   get txt_align_center() {
     return require('./assets/txt_align_center.png');
   },
-  get txt_align_justif() {
-    return require('./assets/txt_align_justif.png');
+  get txt_align_justify() {
+    return require('./assets/txt_align_justify.png');
   },
   get txt_align_left() {
     return require('./assets/txt_align_left.png');
@@ -439,8 +463,11 @@ const icons = {
   get width_limited() {
     return require('./assets/width-limited.png');
   },
-  get trash() {
-    return require('./assets/trash.png');
+  get bloc_text() {
+    return require('./assets/bloc_text.png');
+  },
+  get overlay() {
+    return require('./assets/overlay.png');
   },
 } as const;
 

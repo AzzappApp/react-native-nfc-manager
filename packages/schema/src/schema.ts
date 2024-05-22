@@ -10,7 +10,10 @@ import * as CardTemplateResolvers from './CardTemplateResolver';
 import * as CardTemplateTypeResolvers from './CardTemplateTypeResolver';
 import * as ColorPaletteResolvers from './ColorPaletteResolvers';
 import * as ContactCardResolvers from './ContactCardResolvers';
+import * as CoverTemplatePreviewResolver from './CoverTemplatePreviewResolvers';
 import * as CoverTemplateResolvers from './CoverTemplateResolvers';
+import * as CoverTemplateTagResolvers from './CoverTemplateTagResolvers';
+import * as CoverTemplateTypeResolvers from './CoverTemplateTypeResolvers';
 import { createGraphQLContext } from './GraphQLContext';
 import * as MediaResolvers from './MediaResolvers';
 import * as MutationResolvers from './mutations';
@@ -32,7 +35,10 @@ const resolvers: Resolvers = {
   ...CardStyleResolvers,
   ...ColorPaletteResolvers,
   ...ContactCardResolvers,
+  ...CoverTemplatePreviewResolver,
   ...CoverTemplateResolvers,
+  ...CoverTemplateTagResolvers,
+  ...CoverTemplateTypeResolvers,
   ...MediaResolvers,
   ...MutationResolvers,
   ...PostResolvers,

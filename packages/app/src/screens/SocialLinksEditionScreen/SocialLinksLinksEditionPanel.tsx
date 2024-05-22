@@ -42,10 +42,6 @@ type SocialLinksLinksEditionPanelProps = ViewProps & {
    * A callback called when the user update the links
    */
   onLinksChange: (links: Array<SocialLinkInput | null>) => void;
-  /**
-   * The height of the bottom sheet
-   */
-  bottomSheetHeight: number;
 };
 
 /**

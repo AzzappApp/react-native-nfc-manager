@@ -5,7 +5,6 @@ import {
   db,
   getStaticMediasByUsage,
   PostTable,
-  getCoverTemplates,
   getCardTemplates,
   getColorPalettes,
   getCardTemplateTypes,
@@ -13,6 +12,9 @@ import {
   WebCardTable,
   getCardStyles,
   getMediaSuggestions,
+  getCoverTemplateTags,
+  getCoverTemplatesWithType,
+  getCoverTemplateTypes,
 } from '@azzapp/data';
 import { shuffle } from '@azzapp/shared/arrayHelpers';
 import { serializeContactCard } from '@azzapp/shared/contactCardHelpers';
@@ -227,36 +229,42 @@ export const Profile: ProfileResolvers = {
         assetKind: 'module',
       })),
     ),
+  coverTemplateTags: () => {
+    return getCoverTemplateTags();
+  },
+  coverTemplateTypes: () => {
+    return getCoverTemplateTypes();
+  },
   coverTemplates: async (
     profile,
-    { kind, after, first },
-    { auth: { userId }, loaders },
+    { tagId, after, first },
+    { auth: { userId } },
   ) => {
-    const webCard = profile?.webCardId
-      ? await loaders.WebCard.load(profile.webCardId)
-      : null;
     if (!userId || profile.userId !== userId) {
       return emptyConnection;
     }
+
     const limit = first ?? 100;
-    const templates = await getCoverTemplates(
-      webCard?.webCardKind ?? 'business',
-      kind,
-      profile.webCardId,
-      after,
+
+    const templatesWithType = await getCoverTemplatesWithType(
       limit + 1,
+      after ?? undefined,
+      tagId ?? undefined,
     );
-    const sizedTemplate = templates.slice(0, limit);
+
+    if (templatesWithType.length === 0) return emptyConnection;
+    const sizedTemplateType = templatesWithType.slice(0, limit);
+
     return {
-      edges: sizedTemplate.map(template => ({
-        node: template,
-        cursor: template.cursor,
+      edges: sizedTemplateType.map(templateType => ({
+        node: templateType,
+        cursor: templateType.cursor,
       })),
       pageInfo: {
-        hasNextPage: templates.length > limit,
+        hasNextPage: sizedTemplateType.length > limit,
         hasPreviousPage: false,
-        startCursor: templates[0]?.cursor,
-        endCursor: sizedTemplate[sizedTemplate.length - 1].cursor,
+        startCursor: sizedTemplateType[0]?.cursor,
+        endCursor: sizedTemplateType[sizedTemplateType.length - 1].cursor,
       },
     };
   },

@@ -6,11 +6,15 @@ type CoverTemplate implements Node {
   The ID of an object
   """
   id: ID!
-  kind: CoverTemplateKind!
-  previewMedia: Media!
-  data: CoverTemplateData!
-  colorPalette: ColorPalette!
-  colorPalettes(first: Int @max(value: 100), after: String): ColorPaletteConnection!
+  order: Float!
+  # textLayers: [CoverTemplateTextLayer!]!
+  # overlay: CoverTemplateOverlay!
+  # mediaFilters: [CoverTemplateMediaFilter!]!
+  # links: [CoverTemplateLink!]!
+  type: CoverTemplateType
+  tags: [CoverTemplateTag!]!
+  previews: [CoverTemplatePreview!]!
+  mediaCount: Float!
 }
 
 enum CoverTemplateKind {
@@ -19,24 +23,21 @@ enum CoverTemplateKind {
   others
 }
 
-"""
-Card cover display informations
-"""
-type CoverTemplateData {
-  titleStyle: CardCoverTextStyle!
-  subTitleStyle: CardCoverTextStyle!
-  textOrientation: CardCoverTextOrientation!
-  textPosition: CardCoverTextPosition!
-  textAnimation: String
-  background: StaticMedia
-  backgroundColor: String
-  backgroundPatternColor: String
-  foreground: StaticMedia
-  foregroundColor: String
-  mediaFilter: String
-  mediaParameters: MediaParameters
-  mediaAnimation: String
-}
+# type CoverTemplateTextLayer {
+
+# }
+
+# type CoverTemplateOverlay {
+
+# }
+
+# type CoverTemplateMediaFilter {
+
+# }
+
+# type CoverTemplateLink {
+
+# }
 
 """
 A connection to a list of items.

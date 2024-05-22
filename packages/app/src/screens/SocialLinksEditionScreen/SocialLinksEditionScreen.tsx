@@ -402,7 +402,6 @@ const SocialLinksEditionScreen = ({
                     flex: 1,
                     marginBottom: insetBottom + BOTTOM_MENU_HEIGHT,
                   }}
-                  bottomSheetHeight={bottomPanelHeight}
                 />
               ),
             },

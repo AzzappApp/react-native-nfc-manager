@@ -47,7 +47,8 @@ const AnimatedText = ({
       // Here we use any because the text prop is not available in the type
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } as any;
-  });
+  }, [text]);
+
   return (
     <View pointerEvents="box-only">
       <AnimatedTextInput
@@ -55,7 +56,7 @@ const AnimatedText = ({
         accessibilityRole="text"
         underlineColorAndroid="transparent"
         editable={false}
-        value={text.value}
+        defaultValue={text.value}
         style={[styles.text, { padding: 0 }, style]}
         pointerEvents="none"
         {...{ animatedProps }}

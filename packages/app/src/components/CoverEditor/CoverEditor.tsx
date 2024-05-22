@@ -47,7 +47,7 @@ import FloatingIconButton from '#ui/FloatingIconButton';
 import UploadProgressModal from '#ui/UploadProgressModal';
 import CoverEditorCropModal from './CoverEditorCropModal';
 import CoverEditorCustom from './CoverEditorCustom/CoverEditorCustom';
-import CoverEditorImagePicker from './CoverEditorImagePicker';
+import CoverEditorMediaPicker from './CoverEditorMediaPicker';
 import CoverEditorSuggestionButton from './CoverEditorSuggestionButton';
 import CoverEditorTemplateList from './CoverEditorTemplateList';
 import CoverEditorTitleModal from './CoverEditorTitleModal';
@@ -179,7 +179,7 @@ const CoverEditor = (
           ...useSaveCover_webCard
         }
         ...CoverEditorCustom_profile
-        ...CoverEditorTemplateList_profile
+        # ...CoverEditorTemplateList_profile
         ...useSuggestedMedias_profile
       }
     `,
@@ -831,8 +831,8 @@ const CoverEditor = (
         onClose={closeTitleModal}
       />
       <ScreenModal visible={showImagePicker} animationType="slide">
-        <CoverEditorImagePicker
-          kind={templateKind === 'video' ? 'video' : 'image'}
+        <CoverEditorMediaPicker
+          kind={'mixed'}
           onFinished={onMediaSelected}
           onCancel={closeImagePicker}
         />

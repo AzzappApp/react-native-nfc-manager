@@ -1,3 +1,7 @@
+// @TODO: temporary disable for feat_cover_v2
+/* eslint-disable eslint-comments/no-unlimited-disable */
+/* eslint-disable */
+// @ts-nocheck
 import MaskedView from '@react-native-masked-view/masked-view';
 import { LinearGradient } from 'expo-linear-gradient';
 import { isEqual, omit } from 'lodash';
@@ -13,12 +17,7 @@ import {
 } from 'react-relay';
 import { convertToNonNullArray, shuffle } from '@azzapp/shared/arrayHelpers';
 import { DEFAULT_COLOR_PALETTE } from '@azzapp/shared/cardHelpers';
-import {
-  COVER_CARD_RADIUS,
-  COVER_RATIO,
-  textOrientationOrDefault,
-  textPositionOrDefault,
-} from '@azzapp/shared/coverHelpers';
+import { COVER_CARD_RADIUS, COVER_RATIO } from '@azzapp/shared/coverHelpers';
 import { colors, shadow } from '#theme';
 import ColorTriptychRenderer from '#components/ColorTriptychRenderer';
 import CoverLoadingIndicator from '#components/CoverLoadingIndicator';
@@ -43,14 +42,14 @@ import type { CoverEditorTemplateList_templates$key } from '#relayArtifacts/Cove
 import type { CoverEditorTemplateList_templatesOthers$key } from '#relayArtifacts/CoverEditorTemplateList_templatesOthers.graphql';
 import type { CoverEditorTemplateList_templatesPeople$key } from '#relayArtifacts/CoverEditorTemplateList_templatesPeople.graphql';
 import type { CoverEditorTemplateList_templatesVideos$key } from '#relayArtifacts/CoverEditorTemplateList_templatesVideos.graphql';
-import type {
-  CoverEditorTemplateListItem_coverTemplate$key,
-  CoverTemplateKind,
-} from '#relayArtifacts/CoverEditorTemplateListItem_coverTemplate.graphql';
+import type { CoverEditorTemplateListItem_coverTemplate$key } from '#relayArtifacts/CoverEditorTemplateListItem_coverTemplate.graphql';
 import type { CarouselSelectListHandle } from '#ui/CarouselSelectList';
 import type { CoverStyleData, MediaInfos } from './coverEditorTypes';
 import type { ColorPalette } from '@azzapp/shared/cardHelpers';
+import type { TextStyle } from '@azzapp/shared/coverHelpers';
 import type { ListRenderItemInfo, ViewStyle, ViewToken } from 'react-native';
+
+type CoverTemplateKind = string;
 
 export type CoverEditorProps = {
   profile: CoverEditorTemplateList_profile$key;
@@ -100,28 +99,28 @@ const CoverEditorTemplateList = ({
   onSelectedIndexChange,
   videoPaused,
 }: CoverEditorProps) => {
-  const profile = useFragment(
-    graphql`
-      fragment CoverEditorTemplateList_profile on Profile {
-        colorPalettes(first: 100) {
-          edges {
-            node {
-              id
-              dark
-              primary
-              light
-            }
-          }
-        }
-        webCard {
-          id
-          webCardKind
-        }
-        ...CoverEditorTemplateList_templates
-      }
-    `,
-    profileKey,
-  );
+  // const profile = useFragment(
+  //   graphql`
+  //     fragment CoverEditorTemplateList_profile on Profile {
+  //       colorPalettes(first: 100) {
+  //         edges {
+  //           node {
+  //             id
+  //             dark
+  //             primary
+  //             light
+  //           }
+  //         }
+  //       }
+  //       webCard {
+  //         id
+  //         webCardKind
+  //       }
+  //       ...CoverEditorTemplateList_templates
+  //     }
+  //   `,
+  //   profileKey,
+  // );
 
   const { coverTemplates, loadNext, isLoadingNext, hasNext } =
     useCoverTemplates(profile, templateKind);
@@ -144,101 +143,46 @@ const CoverEditorTemplateList = ({
       (coverTemplates?.edges ?? []).map(edge => edge?.node ?? null),
     );
     const items = templates.map((item, index): TemplateListItem => {
+      const previewMedia = {
+        id: '',
+        uri: '',
+        __typename: '',
+        width: 0,
+        height: 0,
+        rawUri: '',
+      };
+      const kind = '' as string;
+      const titleStyle = {} as TextStyle;
+      const subTitleStyle = {} as TextStyle;
+
+      const mediaParameters = {};
+      const colorPalette = {} as any;
+
       const {
         id,
-        previewMedia,
-        kind,
-        data: {
-          titleStyle,
-          subTitleStyle,
-          textOrientation,
-          textPosition,
-          textAnimation,
-          background,
-          backgroundColor,
-          backgroundPatternColor,
-          foreground,
-          foregroundColor,
-          mediaFilter,
-          mediaParameters,
-          mediaAnimation,
-        },
-        colorPalette,
+        // previewMedia,
+        // kind,
+        // data: {
+        //   titleStyle,
+        //   subTitleStyle,
+        //   textOrientation,
+        //   textPosition,
+        //   textAnimation,
+        //   background,
+        //   backgroundColor,
+        //   backgroundPatternColor,
+        //   foreground,
+        //   foregroundColor,
+        //   mediaFilter,
+        //   mediaParameters,
+        //   mediaAnimation,
+        // },
+        // colorPalette,
       } = readInlineData(
         graphql`
           fragment CoverEditorTemplateListItem_coverTemplate on CoverTemplate
-          @inline
-          @argumentDefinitions(
-            cappedPixelRatio: {
-              type: "Float!"
-              provider: "CappedPixelRatio.relayprovider"
-            }
-          ) {
+          @inline {
             id
-            kind
-            colorPalette {
-              id
-            }
-            previewMedia {
-              __typename
-              id
-              uri(width: 256, pixelRatio: $cappedPixelRatio)
-              rawUri: uri(raw: true)
-              width
-              height
-            }
-            data {
-              background {
-                id
-                uri
-              }
-              backgroundColor
-              backgroundPatternColor
-              foreground {
-                id
-                kind
-                uri
-              }
-              foregroundColor
-              mediaFilter
-              mediaParameters {
-                brightness
-                contrast
-                highlights
-                saturation
-                shadow
-                sharpness
-                structure
-                temperature
-                tint
-                vibrance
-                vignetting
-                pitch
-                roll
-                yaw
-                cropData {
-                  originX
-                  originY
-                  width
-                  height
-                }
-                orientation
-              }
-              mediaAnimation
-              subTitleStyle {
-                color
-                fontFamily
-                fontSize
-              }
-              textOrientation
-              textPosition
-              textAnimation
-              titleStyle {
-                color
-                fontFamily
-                fontSize
-              }
-            }
           }
         `,
         item as CoverEditorTemplateListItem_coverTemplate$key,
@@ -308,19 +252,9 @@ const CoverEditorTemplateList = ({
         style: {
           titleStyle,
           subTitleStyle,
-          textOrientation: textOrientationOrDefault(textOrientation),
-          textPosition: textPositionOrDefault(textPosition),
-          textAnimation,
-          mediaFilter,
           mediaParameters: templateStyleParameter,
-          mediaAnimation: mediaAnimation ?? null,
-          background: background ?? null,
-          backgroundColor,
-          backgroundPatternColor,
-          foreground: foreground ?? null,
-          foregroundColor,
           segmented: kind === 'people' && !!templateMediaInfos?.maskMedia?.uri,
-        },
+        } as any,
         colorPalettes: templateColorPalettes,
       };
     });
@@ -661,102 +595,102 @@ const useCoverTemplates = (
   profileKey: CoverEditorTemplateList_templates$key,
   kind: string,
 ) => {
-  const profile = useFragment(
-    graphql`
-      fragment CoverEditorTemplateList_templates on Profile
-      @argumentDefinitions(
-        isAndroid: { type: "Boolean!", provider: "isAndroid.relayprovider" }
-      ) {
-        ...CoverEditorTemplateList_templatesPeople @skip(if: $isAndroid)
-        ...CoverEditorTemplateList_templatesVideos
-        ...CoverEditorTemplateList_templatesOthers
-      }
-    `,
-    profileKey,
-  );
+  // const profile = useFragment(
+  //   graphql`
+  //     fragment CoverEditorTemplateList_templates on Profile
+  //     @argumentDefinitions(
+  //       isAndroid: { type: "Boolean!", provider: "isAndroid.relayprovider" }
+  //     ) {
+  //       ...CoverEditorTemplateList_templatesPeople @skip(if: $isAndroid)
+  //       ...CoverEditorTemplateList_templatesVideos
+  //       ...CoverEditorTemplateList_templatesOthers
+  //     }
+  //   `,
+  //   profileKey,
+  // );
 
-  const peopleFragmentResult = usePaginationFragment(
-    graphql`
-      fragment CoverEditorTemplateList_templatesPeople on Profile
-      @refetchable(queryName: "CoverEditorTemplateList_people_templates_query")
-      @argumentDefinitions(
-        after: { type: String }
-        first: { type: Int, defaultValue: 15 }
-      ) {
-        peopleCoverTemplates: coverTemplates(
-          kind: people
-          after: $after
-          first: $first
-        )
-          @connection(
-            key: "CoverEditorTemplateList_connection_peopleCoverTemplates"
-          ) {
-          edges {
-            node {
-              ...CoverEditorTemplateListItem_coverTemplate
-            }
-          }
-        }
-      }
-    `,
-    Platform.OS !== 'android'
-      ? (profile as CoverEditorTemplateList_templatesPeople$key)
-      : null,
-  );
+  // const peopleFragmentResult = usePaginationFragment(
+  //   graphql`
+  //     fragment CoverEditorTemplateList_templatesPeople on Profile
+  //     @refetchable(queryName: "CoverEditorTemplateList_people_templates_query")
+  //     @argumentDefinitions(
+  //       after: { type: String }
+  //       first: { type: Int, defaultValue: 15 }
+  //     ) {
+  //       peopleCoverTemplates: coverTemplates(
+  //         kind: people
+  //         after: $after
+  //         first: $first
+  //       )
+  //         @connection(
+  //           key: "CoverEditorTemplateList_connection_peopleCoverTemplates"
+  //         ) {
+  //         edges {
+  //           node {
+  //             ...CoverEditorTemplateListItem_coverTemplate
+  //           }
+  //         }
+  //       }
+  //     }
+  //   `,
+  //   Platform.OS !== 'android'
+  //     ? (profile as CoverEditorTemplateList_templatesPeople$key)
+  //     : null,
+  // );
 
-  const videosFragmentResult = usePaginationFragment(
-    graphql`
-      fragment CoverEditorTemplateList_templatesVideos on Profile
-      @refetchable(queryName: "CoverEditorTemplateList_videos_templates_query")
-      @argumentDefinitions(
-        after: { type: String }
-        first: { type: Int, defaultValue: 15 }
-      ) {
-        videosCoverTemplates: coverTemplates(
-          kind: video
-          after: $after
-          first: $first
-        )
-          @connection(
-            key: "CoverEditorTemplateList_connection_videosCoverTemplates"
-          ) {
-          edges {
-            node {
-              ...CoverEditorTemplateListItem_coverTemplate
-            }
-          }
-        }
-      }
-    `,
-    profile as CoverEditorTemplateList_templatesVideos$key,
-  );
+  // const videosFragmentResult = usePaginationFragment(
+  //   graphql`
+  //     fragment CoverEditorTemplateList_templatesVideos on Profile
+  //     @refetchable(queryName: "CoverEditorTemplateList_videos_templates_query")
+  //     @argumentDefinitions(
+  //       after: { type: String }
+  //       first: { type: Int, defaultValue: 15 }
+  //     ) {
+  //       videosCoverTemplates: coverTemplates(
+  //         kind: video
+  //         after: $after
+  //         first: $first
+  //       )
+  //         @connection(
+  //           key: "CoverEditorTemplateList_connection_videosCoverTemplates"
+  //         ) {
+  //         edges {
+  //           node {
+  //             ...CoverEditorTemplateListItem_coverTemplate
+  //           }
+  //         }
+  //       }
+  //     }
+  //   `,
+  //   profile as CoverEditorTemplateList_templatesVideos$key,
+  // );
 
-  const othersFragmentResult = usePaginationFragment(
-    graphql`
-      fragment CoverEditorTemplateList_templatesOthers on Profile
-      @refetchable(queryName: "CoverEditorTemplateList_others_templates_query")
-      @argumentDefinitions(
-        after: { type: String }
-        first: { type: Int, defaultValue: 15 }
-      ) {
-        othersCoverTemplates: coverTemplates(
-          kind: others
-          after: $after
-          first: $first
-        )
-          @connection(
-            key: "CoverEditorTemplateList_connection_othersCoverTemplates"
-          ) {
-          edges {
-            node {
-              ...CoverEditorTemplateListItem_coverTemplate
-            }
-          }
-        }
-      }
-    `,
-    profile as CoverEditorTemplateList_templatesOthers$key,
-  );
+  // const othersFragmentResult = usePaginationFragment(
+  //   graphql`
+  //     fragment CoverEditorTemplateList_templatesOthers on Profile
+  //     @refetchable(queryName: "CoverEditorTemplateList_others_templates_query")
+  //     @argumentDefinitions(
+  //       after: { type: String }
+  //       first: { type: Int, defaultValue: 15 }
+  //     ) {
+  //       othersCoverTemplates: coverTemplates(
+  //         kind: others
+  //         after: $after
+  //         first: $first
+  //       )
+  //         @connection(
+  //           key: "CoverEditorTemplateList_connection_othersCoverTemplates"
+  //         ) {
+  //         edges {
+  //           node {
+  //             ...CoverEditorTemplateListItem_coverTemplate
+  //           }
+  //         }
+  //       }
+  //     }
+  //   `,
+  //   profile as CoverEditorTemplateList_templatesOthers$key,
+  // );
 
   switch (kind) {
     case 'video':

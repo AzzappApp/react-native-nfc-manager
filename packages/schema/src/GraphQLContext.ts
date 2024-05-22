@@ -8,7 +8,10 @@ import {
   CardTemplateTypeTable,
   ColorPaletteTable,
   CompanyActivityTable,
+  CoverTemplatePreviewTable,
   CoverTemplateTable,
+  CoverTemplateTypeTable,
+  CoverTemplateTagTable,
   MediaTable,
   MediaSuggestionTable,
   PostCommentTable,
@@ -43,6 +46,9 @@ import type {
   MediaSuggestion,
   Media,
   CoverTemplate,
+  CoverTemplateType,
+  CoverTemplatePreview,
+  CoverTemplateTag,
   CompanyActivity,
   ColorPalette,
   CardTemplateType,
@@ -120,7 +126,10 @@ const entities = [
   'CardTemplateType',
   'ColorPalette',
   'CompanyActivity',
+  'CoverTemplatePreview',
   'CoverTemplate',
+  'CoverTemplateType',
+  'CoverTemplateTag',
   'Media',
   'MediaSuggestion',
   'PostComment',
@@ -144,6 +153,9 @@ type EntityToType<T extends Entity> = {
   ColorPalette: ColorPalette;
   CompanyActivity: CompanyActivity;
   CoverTemplate: CoverTemplate;
+  CoverTemplatePreview: CoverTemplatePreview;
+  CoverTemplateType: CoverTemplateType;
+  CoverTemplateTag: CoverTemplateTag;
   Media: Media;
   MediaSuggestion: MediaSuggestion;
   PostComment: PostComment;
@@ -179,6 +191,9 @@ const entitiesTable = {
   ColorPalette: ColorPaletteTable,
   CompanyActivity: CompanyActivityTable,
   CoverTemplate: CoverTemplateTable,
+  CoverTemplateType: CoverTemplateTypeTable,
+  CoverTemplatePreview: CoverTemplatePreviewTable,
+  CoverTemplateTag: CoverTemplateTagTable,
   Media: MediaTable,
   MediaSuggestion: MediaSuggestionTable,
   PostComment: PostCommentTable,

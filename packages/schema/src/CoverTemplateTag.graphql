@@ -1,0 +1,10 @@
+"""
+Cover Template Type
+"""
+type CoverTemplateTag implements Node {
+  """
+  The ID of an object
+  """
+  id: ID!
+  label: String
+}

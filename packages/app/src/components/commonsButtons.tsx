@@ -89,6 +89,20 @@ export const CancelHeaderButton = (props: Omit<ButtonProps, 'label'>) => {
   );
 };
 
+export const DoneHeaderButton = (props: Omit<ButtonProps, 'label'>) => {
+  const intl = useIntl();
+  return (
+    <HeaderButton
+      variant="primary"
+      label={intl.formatMessage({
+        defaultMessage: 'Done',
+        description: 'Done header button label',
+      })}
+      {...props}
+    />
+  );
+};
+
 export const SaveHeaderButton = (props: Omit<ButtonProps, 'label'>) => {
   const intl = useIntl();
   return (
