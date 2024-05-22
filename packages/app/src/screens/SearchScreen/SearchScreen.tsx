@@ -10,7 +10,6 @@ import useScreenInsets from '#hooks/useScreenInsets';
 import Container from '#ui/Container';
 import IconButton from '#ui/IconButton';
 import SearchBar from '#ui/SearchBar';
-import Text from '#ui/Text';
 import RecentSearch from './RecentSearch';
 import SearchTabContainer from './SearchTabContainer';
 import useRecentSearch from './useRecentSearch';
@@ -87,17 +86,10 @@ export const SearchScreen = ({ hasFocus = true }: { hasFocus: boolean }) => {
         )}
         <View style={{ flex: 1 }}>
           <SearchBar
-            placeholder={
-              intl.formatMessage(
-                {
-                  defaultMessage: 'Search for WebCards{azzappA}, posts...',
-                  description: 'SearchScreen - search bar placeholder',
-                },
-                {
-                  azzappA: <Text variant="azzapp">a</Text>,
-                },
-              ) as string
-            }
+            placeholder={intl.formatMessage({
+              defaultMessage: 'Search for WebCards, posts...',
+              description: 'SearchScreen - search bar placeholder',
+            })}
             onChangeText={onChangeText}
             onFocus={onFocus}
             onBlur={onBlur}

@@ -1,13 +1,14 @@
 import { StyleSheet, View } from 'react-native';
 import { isNotFalsyString } from '@azzapp/shared/stringHelpers';
 import Text from '#ui/Text';
+import type { ReactNode } from 'react';
 import type { StyleProp, ViewProps, TextStyle } from 'react-native';
 
 export type LabelProps = ViewProps & {
   /**
    * The label text to display.
    */
-  label: string;
+  label: ReactNode;
   /**
    * The native id of the label (used for accessibility)
    */

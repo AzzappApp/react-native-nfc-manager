@@ -309,18 +309,11 @@ const WebCardScreenButtonActionButton = ({
           variant="grey"
           onPress={onShowWebcardModalCallback}
           iconStyle={{ tintColor: colors.white }}
-          accessibilityLabel={
-            intl.formatMessage(
-              {
-                defaultMessage: 'Tap to show the WebCard{azzappA} information',
-                description:
-                  'ProfileScreenButtonBar show webcard informations button accessibility label',
-              },
-              {
-                azzappA: <Text variant="azzapp">a</Text>,
-              },
-            ) as string
-          }
+          accessibilityLabel={intl.formatMessage({
+            defaultMessage: 'Tap to show the WebCard information',
+            description:
+              'ProfileScreenButtonBar show webcard informations button accessibility label',
+          })}
         />
       </>
     ) : (
@@ -328,18 +321,10 @@ const WebCardScreenButtonActionButton = ({
         variant="grey"
         onPress={onCreateNewPost}
         style={styles.mainButton}
-        accessibilityLabel={
-          intl.formatMessage(
-            {
-              defaultMessage: 'Tap to edit your WebCard{azzappA}',
-              description:
-                'ProfileScreenButtonBar edit button accessibility label',
-            },
-            {
-              azzappA: <Text variant="azzapp">a</Text>,
-            },
-          ) as string
-        }
+        accessibilityLabel={intl.formatMessage({
+          defaultMessage: 'Tap to edit your WebCard',
+          description: 'ProfileScreenButtonBar edit button accessibility label',
+        })}
       >
         <Text variant="button" style={styles.textButton}>
           <FormattedMessage
@@ -355,18 +340,10 @@ const WebCardScreenButtonActionButton = ({
         onPress={debouncedToggleFollowing}
         style={styles.mainButton}
         variant="grey"
-        accessibilityLabel={
-          intl.formatMessage(
-            {
-              defaultMessage: 'Tap to follow the WebCard{azzappA}',
-              description:
-                'UserScreenButtonBar follow WebCard accessibility label',
-            },
-            {
-              azzappA: <Text variant="azzapp">a</Text>,
-            },
-          ) as string
-        }
+        accessibilityLabel={intl.formatMessage({
+          defaultMessage: 'Tap to follow the WebCard',
+          description: 'UserScreenButtonBar follow WebCard accessibility label',
+        })}
       >
         <Text variant="button" style={styles.textButton}>
           {isFollowing ? (

@@ -168,23 +168,21 @@ const PermissionModal = ({
                   description:
                     'Camera authorization screen title for photos permission',
                 })}
-                content={
-                  intl.formatMessage(
-                    {
-                      defaultMessage:
-                        'Access to the media library allows you to create posts, Covers{azzappA}, and to add images to your WebCard{azzappA}.',
-                      description:
-                        'Camera authorization screen content for photos permission',
-                    },
-                    {
-                      azzappA: (
-                        <Text variant="azzapp" style={{ color: colors.red400 }}>
-                          a
-                        </Text>
-                      ),
-                    },
-                  ) as string
-                }
+                content={intl.formatMessage(
+                  {
+                    defaultMessage:
+                      'Access to the media library allows you to create posts, Covers{azzappA}, and to add images to your WebCard{azzappA}.',
+                    description:
+                      'Camera authorization screen content for photos permission',
+                  },
+                  {
+                    azzappA: (
+                      <Text variant="azzapp" style={{ color: colors.red400 }}>
+                        a
+                      </Text>
+                    ),
+                  },
+                )}
                 onNext={onAllowsGallery}
               />
             </View>

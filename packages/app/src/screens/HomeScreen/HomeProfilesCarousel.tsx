@@ -31,7 +31,6 @@ import CarouselSelectList from '#ui/CarouselSelectList';
 import Icon from '#ui/Icon';
 import PressableNative from '#ui/PressableNative';
 import PressableOpacity from '#ui/PressableOpacity';
-import Text from '#ui/Text';
 import type {
   HomeProfilesCarousel_user$key,
   HomeProfilesCarousel_user$data,
@@ -384,17 +383,10 @@ const ItemRenderComponent = ({
                 overflow: 'visible',
               },
             ]}
-            accessibilityLabel={
-              intl.formatMessage(
-                {
-                  defaultMessage: 'Create a new WebCard{azzappA}',
-                  description: 'Start new profile creation from account screen',
-                },
-                {
-                  azzappA: <Text variant="azzapp">a</Text>,
-                },
-              ) as string
-            }
+            accessibilityLabel={intl.formatMessage({
+              defaultMessage: 'Create a new WebCard',
+              description: 'Start new profile creation from account screen',
+            })}
           >
             <CoverRenderer
               width={coverWidth}

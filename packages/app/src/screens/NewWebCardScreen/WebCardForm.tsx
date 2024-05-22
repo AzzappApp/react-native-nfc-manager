@@ -519,18 +519,16 @@ const WebCardForm = (
           <>
             <Label
               labelID="userNameLabel"
-              label={
-                intl.formatMessage(
-                  {
-                    defaultMessage:
-                      'Webcard{azzappA} name* (You can modify it later)',
-                    description: 'ProfileForm username textinput label',
-                  },
-                  {
-                    azzappA: <Text variant="azzapp">a</Text>,
-                  },
-                ) as string
-              }
+              label={intl.formatMessage(
+                {
+                  defaultMessage:
+                    'Webcard{azzappA} name* (You can modify it later)',
+                  description: 'ProfileForm username textinput label',
+                },
+                {
+                  azzappA: <Text variant="azzapp">a</Text>,
+                },
+              )}
               error={error?.message}
               style={styles.formElement}
               errorStyle={{ minHeight: 25 }}
@@ -539,17 +537,10 @@ const WebCardForm = (
                 nativeID="userName"
                 accessibilityLabelledBy="userNameLabel"
                 ref={userNameInputRef}
-                placeholder={
-                  intl.formatMessage(
-                    {
-                      defaultMessage: 'Select a WebCard{azzappA} name"',
-                      description: 'ProfileForm username textinput placeholder',
-                    },
-                    {
-                      azzappA: <Text variant="azzapp">a</Text>,
-                    },
-                  ) as string
-                }
+                placeholder={intl.formatMessage({
+                  defaultMessage: 'Select a WebCard name"',
+                  description: 'ProfileForm username textinput placeholder',
+                })}
                 isErrored={Boolean(error)}
                 value={userName}
                 onChangeText={text => onChange(text.toLowerCase())}

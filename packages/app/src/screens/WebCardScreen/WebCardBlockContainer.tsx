@@ -22,7 +22,6 @@ import { COVER_CARD_RADIUS } from '@azzapp/shared/coverHelpers';
 import { colors, shadow } from '#theme';
 import Icon from '#ui/Icon';
 import IconButton from '#ui/IconButton';
-import Text from '#ui/Text';
 import {
   BUTTON_SIZE,
   EDIT_BLOCK_GAP,
@@ -528,28 +527,17 @@ const WebCardBlockContainer = ({
                 }
                 accessibilityHint={
                   visible
-                    ? (intl.formatMessage(
-                        {
-                          defaultMessage:
-                            'This action hides a section of your WebCard{azzappA}.',
-                          description:
-                            'Accessibility hint for the hide button in the profile edition screen',
-                        },
-                        {
-                          azzappA: <Text variant="azzapp">a</Text>,
-                        },
-                      ) as string)
-                    : (intl.formatMessage(
-                        {
-                          defaultMessage:
-                            'Shows the section in your WebCard{azzappA}',
-                          description:
-                            'Accessibility hint for the show button in the profile edition screen',
-                        },
-                        {
-                          azzappA: <Text variant="azzapp">a</Text>,
-                        },
-                      ) as string)
+                    ? intl.formatMessage({
+                        defaultMessage:
+                          'This action hides a section of your WebCard.',
+                        description:
+                          'Accessibility hint for the hide button in the profile edition screen',
+                      })
+                    : intl.formatMessage({
+                        defaultMessage: 'Shows the section in your WebCard',
+                        description:
+                          'Accessibility hint for the show button in the profile edition screen',
+                      })
                 }
               />
               <IconButton
@@ -565,19 +553,11 @@ const WebCardBlockContainer = ({
                   description:
                     'Accessibility label for the duplicate button in the profile edition screen',
                 })}
-                accessibilityHint={
-                  intl.formatMessage(
-                    {
-                      defaultMessage:
-                        'This action duplicates a WebCard{azzappA} section.',
-                      description:
-                        'Accessibility hint for the duplicate button in the profile edition screen',
-                    },
-                    {
-                      azzappA: <Text variant="azzapp">a</Text>,
-                    },
-                  ) as string
-                }
+                accessibilityHint={intl.formatMessage({
+                  defaultMessage: 'This action duplicates a WebCard section.',
+                  description:
+                    'Accessibility hint for the duplicate button in the profile edition screen',
+                })}
               />
             </Animated.View>
 
@@ -638,19 +618,12 @@ const WebCardBlockContainer = ({
                   description:
                     'Accessibility label for the delete button in the profile edition screen',
                 })}
-                accessibilityHint={
-                  intl.formatMessage(
-                    {
-                      defaultMessage:
-                        'This action deletes the section from your WebCard{azzappA}',
-                      description:
-                        'Accessibility hint for the delete button in the profile edition screen',
-                    },
-                    {
-                      azzappA: <Text variant="azzapp">a</Text>,
-                    },
-                  ) as string
-                }
+                accessibilityHint={intl.formatMessage({
+                  defaultMessage:
+                    'This action deletes the section from your WebCard',
+                  description:
+                    'Accessibility hint for the delete button in the profile edition screen',
+                })}
               />
             </Animated.View>
           </>

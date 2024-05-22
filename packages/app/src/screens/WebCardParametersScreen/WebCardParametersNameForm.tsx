@@ -105,19 +105,10 @@ const WebcardParametersNameForm = ({
 
   const intl = useIntl();
 
-  const userNameAlreadyExistsError = intl.formatMessage(
-    {
-      defaultMessage: 'This WebCard{azzappA} name is already registered',
-      description: 'Webcardparameters name form - Username already taken error',
-    },
-    {
-      azzappA: (
-        <Text variant="azzapp" style={{ color: colors.red400 }}>
-          a
-        </Text>
-      ),
-    },
-  ) as string;
+  const userNameAlreadyExistsError = intl.formatMessage({
+    defaultMessage: 'This WebCard name is already registered',
+    description: 'Webcardparameters name form - Username already taken error',
+  });
 
   const userNameInvalidError = intl.formatMessage(
     {
@@ -283,17 +274,10 @@ const WebcardParametersNameForm = ({
               <TextInput
                 nativeID="userName"
                 accessibilityLabelledBy="userNameLabel"
-                placeholder={
-                  intl.formatMessage(
-                    {
-                      defaultMessage: 'Select a WebCard{azzappA} name',
-                      description: 'ProfileForm username textinput placeholder',
-                    },
-                    {
-                      azzappA: <Text variant="azzapp">a</Text>,
-                    },
-                  ) as string
-                }
+                placeholder={intl.formatMessage({
+                  defaultMessage: 'Select a WebCard name',
+                  description: 'ProfileForm username textinput placeholder',
+                })}
                 isErrored={!!userNameError}
                 value={value}
                 onChangeText={text => onChange(text.toLowerCase())}
