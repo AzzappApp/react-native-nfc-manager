@@ -107,7 +107,14 @@ jobs:
       ############################################
       - name: Bump version
         run: |
-          yarn bump-version
+          NEXT_VERSION=""
+          if [ "$GITHUB_REF" == "refs/heads/staging" ]; then
+            NEXT_VERSION="rc"
+          elif [ "$GITHUB_REF" == "refs/heads/main" ]; then
+            NEXT_VERSION="canary"
+          fi
+
+          yarn bump-version $NEXT_VERSION
           if [ "$GITHUB_REF" == "refs/heads/main" ]; then
             yarn write-dev-changelog
           fi
