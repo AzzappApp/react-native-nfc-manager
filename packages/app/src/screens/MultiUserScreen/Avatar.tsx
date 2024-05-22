@@ -36,4 +36,6 @@ const styleSheet = createStyleSheet(appearance => ({
   },
 }));
 
+export const AVATAR_WIDTH = 112;
+
 export default Avatar;

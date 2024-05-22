@@ -52,6 +52,7 @@ const ContactCardExportVcf = ({
         }
         serializedContactCard
         avatar {
+          id
           exportUri: uri(width: 720, pixelRatio: 1, extension: jpg)
         }
       }

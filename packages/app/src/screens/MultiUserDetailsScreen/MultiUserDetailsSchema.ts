@@ -1,7 +1,7 @@
 import * as z from 'zod';
 import { isValidUrl } from '@azzapp/shared/stringHelpers';
 
-export const multiUSerDetailModalSchema = z.object({
+export const multiUserDetailsSchema = z.object({
   role: z.string(),
   firstName: z.string().nullable(),
   lastName: z.string().nullable(),

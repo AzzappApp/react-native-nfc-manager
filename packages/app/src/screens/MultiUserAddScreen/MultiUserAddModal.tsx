@@ -315,8 +315,6 @@ const MultiUserAddModal = (
               firstName
               lastName
             }
-            ...MultiUserScreenUserListItem_Profile
-            ...MultiUserDetailModal_Profile
           }
         }
       }

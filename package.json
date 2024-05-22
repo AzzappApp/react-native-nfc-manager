@@ -102,8 +102,8 @@
     "drizzle-kit@0.20.14": "patch:drizzle-kit@npm%3A0.20.14#./.yarn/patches/drizzle-kit-npm-0.20.14-cf0918f896.patch",
     "drizzle-orm@^0.30.8": "patch:drizzle-orm@npm%3A0.30.8#./.yarn/patches/drizzle-orm-npm-0.30.8-d3cedab5ef.patch",
     "react-native-screens@^3.31.1": "patch:react-native-screens@npm%3A3.31.1#./.yarn/patches/react-native-screens-npm-3.31.1-d5786be485.patch",
-    "react-native-vision-camera@^4.0.3": "patch:react-native-vision-camera@npm%3A4.0.3#./.yarn/patches/react-native-vision-camera-npm-4.0.3-c45a932223.patch",
-    "expo-contacts@~13.0.3": "patch:expo-contacts@npm%3A13.0.3#./.yarn/patches/expo-contacts-npm-13.0.3-c6435ab472.patch"
+    "expo-contacts@~13.0.3": "patch:expo-contacts@npm%3A13.0.3#./.yarn/patches/expo-contacts-npm-13.0.3-c6435ab472.patch",
+    "react-native-vision-camera@^4.0.5": "patch:react-native-vision-camera@npm%3A4.0.5#./.yarn/patches/react-native-vision-camera-npm-4.0.5-0f2bdc9daa.patch"
   },
   "dependencies": {
     "node-gyp": "^10.1.0"

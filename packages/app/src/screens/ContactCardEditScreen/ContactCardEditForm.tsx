@@ -4,7 +4,6 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import { Pressable, View, Image } from 'react-native';
 import { AVATAR_MAX_WIDTH } from '@azzapp/shared/contactCardHelpers';
 import { colors, shadow } from '#theme';
-import { MEDIA_WIDTH } from '#components/AuthorCartouche';
 import FormDeleteFieldOverlay from '#components/ContactCard/FormDeleteFieldOverlay';
 import { exportLayersToImage, getFilterUri } from '#components/gpu';
 import ImagePicker, {
@@ -20,6 +19,7 @@ import {
   buildContactCardModalStyleSheet,
 } from '#helpers/contactCardHelpers';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
+import { AVATAR_WIDTH } from '#screens/MultiUserScreen/Avatar';
 import Icon from '#ui/Icon';
 import IconButton from '#ui/IconButton';
 import PressableNative from '#ui/PressableNative';
@@ -182,7 +182,7 @@ const ContactCardEditForm = ({
                           source={{
                             uri: value.uri,
                             mediaId: value.id ?? '',
-                            requestedSize: MEDIA_WIDTH,
+                            requestedSize: AVATAR_WIDTH,
                           }}
                           style={styles.avatar}
                         />
@@ -568,7 +568,6 @@ const CommonInformationField = ({
   );
 };
 
-const AVATAR_WIDTH = 112;
 const ICON_WIDTH = 24;
 
 const styleSheet = createStyleSheet(appearance => ({

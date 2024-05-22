@@ -76,6 +76,7 @@ import LikedPostsScreen from '#screens/LikedPostsScreen';
 import LoadingScreen from '#screens/LoadingScreen';
 import MediaScreen from '#screens/MediaScreen';
 import MultiUserAddScreen from '#screens/MultiUserAddScreen';
+import MultiUserDetailsScreen from '#screens/MultiUserDetailsScreen';
 import MultiUserScreen from '#screens/MultiUserScreen';
 import NewWebCardScreen from '#screens/NewWebCardScreen';
 import PostCommentsMobileScreen from '#screens/PostCommentsScreen';
@@ -213,6 +214,7 @@ const screens = {
   WEBCARD_PARAMETERS: WebCardParametersScreen,
   CONFIRM_CHANGE_CONTACT: ConfirmChangeContactScreen,
   COMMON_INFORMATION: CommonInformationScreen,
+  MULTI_USER_DETAIL: MultiUserDetailsScreen,
 };
 
 const tabs = {

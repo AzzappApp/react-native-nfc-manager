@@ -9,20 +9,24 @@ import Toast from 'react-native-toast-message';
 import {
   ConnectionHandler,
   graphql,
-  useFragment,
   useMutation,
+  usePreloadedQuery,
 } from 'react-relay';
 import ERRORS from '@azzapp/shared/errors';
 import { encodeMediaId } from '@azzapp/shared/imagesHelpers';
 import { colors } from '#theme';
+import { CancelHeaderButton } from '#components/commonsButtons';
+import { useRouter, type ScreenOptions } from '#components/NativeRouter';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import { getFileName } from '#helpers/fileHelpers';
 import { addLocalCachedMediaFile } from '#helpers/mediaHelpers';
 import { uploadMedia, uploadSign } from '#helpers/MobileWebAPI';
+import relayScreen from '#helpers/relayScreen';
 import useAuthState from '#hooks/useAuthState';
 import { get as CappedPixelRatio } from '#relayProviders/CappedPixelRatio.relayprovider';
 import ContactCardEditForm from '#screens/ContactCardEditScreen/ContactCardEditForm';
 import HomeStatistics from '#screens/HomeScreen/HomeStatistics';
+import ActivityIndicator from '#ui/ActivityIndicator';
 import Button from '#ui/Button';
 import Container from '#ui/Container';
 import Header from '#ui/Header';
@@ -31,99 +35,36 @@ import SafeAreaView from '#ui/SafeAreaView';
 import Select from '#ui/Select';
 import Text from '#ui/Text';
 import TextInput from '#ui/TextInput';
-import { multiUSerDetailModalSchema } from './MultiUserDetailModalSchema';
+import { multiUserDetailsSchema } from './MultiUserDetailsSchema';
 import type { EmailPhoneInput } from '#components/EmailOrPhoneInput';
-import type { MultiUserDetailModal_Profile$key } from '#relayArtifacts/MultiUserDetailModal_Profile.graphql';
-import type { MultiUserDetailModal_RemoveUserMutation } from '#relayArtifacts/MultiUserDetailModal_RemoveUserMutation.graphql';
-import type { MultiUserDetailModal_UpdateProfileMutation } from '#relayArtifacts/MultiUserDetailModal_UpdateProfileMutation.graphql';
-import type { MultiUserDetailModal_webCard$key } from '#relayArtifacts/MultiUserDetailModal_webCard.graphql';
+import type { RelayScreenProps } from '#helpers/relayScreen';
+import type { MultiUserDetailsScreen_RemoveUserMutation } from '#relayArtifacts/MultiUserDetailsScreen_RemoveUserMutation.graphql';
+import type { MultiUserDetailsScreen_UpdateProfileMutation } from '#relayArtifacts/MultiUserDetailsScreen_UpdateProfileMutation.graphql';
+import type { MultiUserDetailsScreenQuery } from '#relayArtifacts/MultiUserDetailsScreenQuery.graphql';
 import type { ProfileRole } from '#relayArtifacts/MultiUserScreenQuery.graphql';
+import type { MultiUserDetailRoute } from '#routes';
 import type { ContactCardEditFormValues } from '#screens/ContactCardEditScreen/ContactCardEditModalSchema';
 import type { ReactNode } from 'react';
 import type { Control } from 'react-hook-form';
-
-type MultiUserDetailModalProps = {
-  webCard: MultiUserDetailModal_webCard$key;
-  profile: MultiUserDetailModal_Profile$key | undefined;
-  onClose: () => void;
-};
 
 export type MultiUserDetailFormValues = ContactCardEditFormValues & {
   role: ProfileRole;
   selectedContact: EmailPhoneInput | null;
 };
 
-const MultiUserDetailModal = ({
-  webCard: webCardKey,
-  profile: profileKey,
-  onClose,
-}: MultiUserDetailModalProps) => {
+const MultiUserDetailsScreen = ({
+  preloadedQuery,
+}: RelayScreenProps<MultiUserDetailRoute, MultiUserDetailsScreenQuery>) => {
   const { profileInfos } = useAuthState();
   const intl = useIntl();
   const styles = useStyleSheet(styleSheet);
-  const profile = useFragment(
-    graphql`
-      fragment MultiUserDetailModal_Profile on Profile
-      @argumentDefinitions(
-        pixelRatio: {
-          type: "Float!"
-          provider: "CappedPixelRatio.relayprovider"
-        }
-      ) {
-        id
-        profileRole
-        promotedAsOwner
-        contactCard {
-          firstName
-          lastName
-          title
-          company
-          emails {
-            label
-            address
-            selected
-          }
-          phoneNumbers {
-            label
-            number
-            selected
-          }
-          urls {
-            address
-            selected
-          }
-          addresses {
-            address
-            label
-            selected
-          }
-          birthday {
-            birthday
-            selected
-          }
-          socials {
-            url
-            label
-            selected
-          }
-        }
-        ...HomeStatistics_profiles
-        avatar {
-          id
-          uri: uri(width: 112, pixelRatio: $pixelRatio)
-        }
-        logo {
-          id
-          uri: uri(width: 180, pixelRatio: $pixelRatio)
-        }
-        user {
-          email
-          phoneNumber
-        }
-      }
-    `,
-    profileKey,
+
+  const { node } = usePreloadedQuery(
+    multiUserDetailsScreenQuery,
+    preloadedQuery,
   );
+
+  const profile = node?.profile;
 
   const phoneNumber =
     profile?.user.phoneNumber && parsePhoneNumber(profile.user.phoneNumber);
@@ -135,7 +76,7 @@ const MultiUserDetailModal = ({
     formState: { dirtyFields, isSubmitting },
   } = useForm<MultiUserDetailFormValues>({
     mode: 'onBlur',
-    resolver: zodResolver(multiUSerDetailModalSchema),
+    resolver: zodResolver(multiUserDetailsSchema),
     shouldFocusError: true,
     defaultValues: {
       role: profile?.profileRole,
@@ -166,58 +107,9 @@ const MultiUserDetailModal = ({
     },
   });
 
-  const webCard = useFragment(
-    graphql`
-      fragment MultiUserDetailModal_webCard on WebCard
-      @argumentDefinitions(
-        pixelRatio: {
-          type: "Float!"
-          provider: "CappedPixelRatio.relayprovider"
-        }
-      ) {
-        id
-        profilePendingOwner {
-          id
-          user {
-            email
-            phoneNumber
-          }
-        }
-        commonInformation {
-          company
-          addresses {
-            label
-            address
-          }
-          emails {
-            label
-            address
-          }
-          phoneNumbers {
-            label
-            number
-          }
-          urls {
-            address
-          }
-          socials {
-            label
-            url
-          }
-        }
-        logo {
-          id
-          uri: uri(width: 180, pixelRatio: $pixelRatio)
-        }
-        isMultiUser
-      }
-    `,
-    webCardKey,
-  );
-
   const [commit, saving] =
-    useMutation<MultiUserDetailModal_UpdateProfileMutation>(graphql`
-      mutation MultiUserDetailModal_UpdateProfileMutation(
+    useMutation<MultiUserDetailsScreen_UpdateProfileMutation>(graphql`
+      mutation MultiUserDetailsScreen_UpdateProfileMutation(
         $profileId: ID!
         $input: UpdateProfileInput!
         $pixelRatio: Float!
@@ -352,7 +244,7 @@ const MultiUserDetailModal = ({
               avatar.uri,
             );
           }
-          onClose();
+          router.back();
         },
         onError: e => {
           console.error(e);
@@ -366,7 +258,7 @@ const MultiUserDetailModal = ({
                   'Error toast message when updating user who declined the invitation from MultiUserDetailModal',
               }),
               onHide: () => {
-                onClose();
+                router.back();
               },
             });
           } else {
@@ -397,14 +289,16 @@ const MultiUserDetailModal = ({
   const isCurrentProfile = profile?.id === profileInfos?.profileId;
 
   const [commitDelete, deletionIsActive] =
-    useMutation<MultiUserDetailModal_RemoveUserMutation>(graphql`
-      mutation MultiUserDetailModal_RemoveUserMutation(
+    useMutation<MultiUserDetailsScreen_RemoveUserMutation>(graphql`
+      mutation MultiUserDetailsScreen_RemoveUserMutation(
         $webCardId: ID!
         $input: [ID!]!
       ) {
         removeUsersFromWebCard(webCardId: $webCardId, removedProfileIds: $input)
       }
     `);
+
+  const router = useRouter();
 
   const onRemoveUser = () => {
     if (profileInfos?.webCardId == null || profile == null) return;
@@ -414,7 +308,7 @@ const MultiUserDetailModal = ({
         input: [profile.id],
       },
       onCompleted: () => {
-        onClose();
+        router.back();
       },
       onError: e => {
         console.error(e);
@@ -440,7 +334,7 @@ const MultiUserDetailModal = ({
           return;
         }
 
-        const webCardRecord = store.get(webCard.id);
+        const webCardRecord = store.get(profile.webCard.id);
         if (webCardRecord) {
           const connection = ConnectionHandler.getConnection(
             webCardRecord,
@@ -475,7 +369,7 @@ const MultiUserDetailModal = ({
                 defaultMessage: 'Cancel',
                 description: 'MultiUserDetailModal - Cancel button label',
               })}
-              onPress={onClose}
+              onPress={router.back}
             />
           }
           middleElement={
@@ -495,7 +389,7 @@ const MultiUserDetailModal = ({
           }
         />
         <ContactCardEditForm
-          webCard={webCard}
+          webCard={profile.webCard}
           control={control as unknown as Control<ContactCardEditFormValues>}
           footer={
             !isCurrentProfile &&
@@ -587,7 +481,7 @@ const MultiUserDetailModal = ({
               )}
             />
 
-            {!webCard.profilePendingOwner && (
+            {!profile.webCard.profilePendingOwner && (
               <Text variant="xsmall" style={styles.description}>
                 {role === 'user' && (
                   <FormattedMessage
@@ -627,7 +521,7 @@ const MultiUserDetailModal = ({
                 )}
               </Text>
             )}
-            {webCard.profilePendingOwner && (
+            {profile.webCard.profilePendingOwner && (
               <Text variant="xsmall" style={styles.description}>
                 <FormattedMessage
                   defaultMessage="An ownership request has been sent. Ownership will be transfered as soon as the request is accepted."
@@ -756,4 +650,130 @@ const styleSheet = createStyleSheet(appearance => ({
   },
 }));
 
-export default MultiUserDetailModal;
+const MultiUserDetailsScreenFallback = () => {
+  const router = useRouter();
+  return (
+    <Container style={{ flex: 1 }}>
+      <SafeAreaView style={{ flex: 1 }}>
+        <Header leftElement={<CancelHeaderButton onPress={router.back} />} />
+        <View style={{ aspectRatio: 1, backgroundColor: colors.grey100 }} />
+        <View
+          style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}
+        >
+          <ActivityIndicator />
+        </View>
+      </SafeAreaView>
+    </Container>
+  );
+};
+
+const multiUserDetailsScreenQuery = graphql`
+  query MultiUserDetailsScreenQuery($profileId: ID!, $pixelRatio: Float!) {
+    node(id: $profileId) {
+      ... on Profile @alias(as: "profile") {
+        id
+        profileRole
+        promotedAsOwner
+        contactCard {
+          firstName
+          lastName
+          title
+          company
+          emails {
+            label
+            address
+            selected
+          }
+          phoneNumbers {
+            label
+            number
+            selected
+          }
+          urls {
+            address
+            selected
+          }
+          addresses {
+            address
+            label
+            selected
+          }
+          birthday {
+            birthday
+            selected
+          }
+          socials {
+            url
+            label
+            selected
+          }
+        }
+        ...HomeStatistics_profiles
+        avatar {
+          id
+          uri: uri(width: 112, pixelRatio: $pixelRatio)
+        }
+        logo {
+          id
+          uri: uri(width: 180, pixelRatio: $pixelRatio)
+        }
+        user {
+          email
+          phoneNumber
+        }
+        webCard {
+          id
+          profilePendingOwner {
+            id
+            user {
+              email
+              phoneNumber
+            }
+          }
+          commonInformation {
+            company
+            addresses {
+              label
+              address
+            }
+            emails {
+              label
+              address
+            }
+            phoneNumbers {
+              label
+              number
+            }
+            urls {
+              address
+            }
+            socials {
+              label
+              url
+            }
+          }
+          logo {
+            id
+            uri: uri(width: 180, pixelRatio: $pixelRatio)
+          }
+          isMultiUser
+        }
+      }
+    }
+  }
+`;
+
+const multiUserDetailModal = relayScreen(MultiUserDetailsScreen, {
+  query: multiUserDetailsScreenQuery,
+  getVariables: ({ profileId }) => ({
+    profileId,
+    pixelRatio: CappedPixelRatio(),
+  }),
+  fallback: MultiUserDetailsScreenFallback,
+});
+
+multiUserDetailModal.getScreenOptions = (): ScreenOptions => ({
+  stackAnimation: 'slide_from_bottom',
+});
+
+export default multiUserDetailModal;

@@ -190,6 +190,13 @@ export type ContactCardEditRoute = {
   params?: never;
 };
 
+export type MultiUserDetailRoute = {
+  route: 'MULTI_USER_DETAIL';
+  params: {
+    profileId: string;
+  };
+};
+
 export type Route =
   | AboutRoute
   | AccountDetailsRoute
@@ -210,6 +217,7 @@ export type Route =
   | LikedPostsRoute
   | MediaRoute
   | MultiUserAddRoute
+  | MultiUserDetailRoute
   | MultiUserRoute
   | NewPostRoute
   | NewWebCardRoute

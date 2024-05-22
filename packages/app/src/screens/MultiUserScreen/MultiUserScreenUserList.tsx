@@ -19,10 +19,8 @@ import {
 } from '@azzapp/shared/arrayHelpers';
 import { isOwner } from '@azzapp/shared/profileHelpers';
 import { colors } from '#theme';
-import { MEDIA_WIDTH } from '#components/AuthorCartouche';
 import { MediaImageRenderer } from '#components/medias';
 import { useRouter } from '#components/NativeRouter';
-import ScreenModal from '#components/ScreenModal';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import useAuthState from '#hooks/useAuthState';
 import { useFocusEffect } from '#hooks/useFocusEffect';
@@ -33,17 +31,14 @@ import PressableNative from '#ui/PressableNative';
 import RadioButton from '#ui/RadioButton';
 import SearchBar from '#ui/SearchBar';
 import Text from '#ui/Text';
-import Avatar from './Avatar';
-import MultiUserDetailModal from './MultiUserDetailModal';
+import Avatar, { AVATAR_WIDTH } from './Avatar';
 import MultiUserPendingProfileOwner from './MultiUserPendingProfileOwner';
 import { MultiUserTransferOwnerContext } from './MultiUserScreen';
-import type { MultiUserDetailModal_Profile$key } from '#relayArtifacts/MultiUserDetailModal_Profile.graphql';
 import type {
   MultiUserScreenUserList_profiles$data,
   MultiUserScreenUserList_profiles$key,
 } from '#relayArtifacts/MultiUserScreenUserList_profiles.graphql';
 import type { MultiUserScreenUserList_webCard$key } from '#relayArtifacts/MultiUserScreenUserList_webCard.graphql';
-import type { MultiUserScreenUserListItem_Profile$key } from '#relayArtifacts/MultiUserScreenUserListItem_Profile.graphql';
 import type { ListRenderItem, SectionListData } from 'react-native';
 
 export type MultiUserScreenListProps = {
@@ -81,7 +76,6 @@ const MultiUserScreenUserList = ({
             url
           }
         }
-        ...MultiUserDetailModal_webCard
         ...MultiUserScreenUserList_profiles
         ...MultiUserPendingProfileOwner
       }
@@ -113,6 +107,10 @@ const MultiUserScreenUserList = ({
           after: { type: String }
           first: { type: Int, defaultValue: 50 }
           search: { type: String }
+          pixelRatio: {
+            type: "Float!"
+            provider: "CappedPixelRatio.relayprovider"
+          }
         ) {
           profiles(search: $search, after: $after, first: $first)
             @connection(
@@ -122,8 +120,18 @@ const MultiUserScreenUserList = ({
               node {
                 id
                 profileRole
-                ...MultiUserScreenUserListItem_Profile
-                ...MultiUserDetailModal_Profile
+                contactCard {
+                  firstName
+                  lastName
+                }
+                user {
+                  email
+                  phoneNumber
+                }
+                avatar {
+                  id
+                  uri: uri(width: 112, pixelRatio: $pixelRatio)
+                }
               }
             }
           }
@@ -169,12 +177,6 @@ const MultiUserScreenUserList = ({
     );
   }, [data.profiles.edges]);
 
-  const [selectedProfile, setSelectedProfile] = useState<
-    MultiUserDetailModal_Profile$key | undefined
-  >();
-
-  const closeModal = useCallback(() => setSelectedProfile(undefined), []);
-
   const onEndReached = useCallback(() => {
     if (hasNext && !isLoadingNext) {
       loadNext(50);
@@ -212,12 +214,12 @@ const MultiUserScreenUserList = ({
       if (isWebCardOwner && item.id === profileInfos?.profileId) {
         return (
           <View>
-            <UserListItem profileKey={item} onPress={setSelectedProfile} />
+            <UserListItem item={item} />
             {!searching && <MultiUserPendingProfileOwner webCard={webCard} />}
           </View>
         );
       }
-      return <UserListItem profileKey={item} onPress={setSelectedProfile} />;
+      return <UserListItem item={item} />;
     },
     [isWebCardOwner, profileInfos?.profileId, searching, webCard],
   );
@@ -318,13 +320,6 @@ const MultiUserScreenUserList = ({
           keyboardShouldPersistTaps="always"
         />
       </Suspense>
-      <ScreenModal visible={Boolean(selectedProfile)} animationType="slide">
-        <MultiUserDetailModal
-          webCard={webCard}
-          profile={selectedProfile}
-          onClose={closeModal}
-        />
-      </ScreenModal>
     </View>
   );
 };
@@ -349,82 +344,55 @@ const SectionHeader = ({ title }: { title: string }) => {
   );
 };
 
-const ItemList = ({
-  onPress,
-  profileKey,
-}: {
-  onPress: (
-    profile: MultiUserDetailModal_Profile$key &
-      MultiUserScreenUserListItem_Profile$key,
-  ) => void;
-  profileKey: MultiUserDetailModal_Profile$key &
-    MultiUserScreenUserListItem_Profile$key;
-  selectProfile?: (profileId: string) => void;
-}) => {
+const ItemList = ({ item }: { item: Profile }) => {
   const styles = useStyleSheet(styleSheet);
-  const data = useFragment(
-    graphql`
-      fragment MultiUserScreenUserListItem_Profile on Profile
-      @argumentDefinitions(
-        pixelRatio: {
-          type: "Float!"
-          provider: "CappedPixelRatio.relayprovider"
-        }
-      ) {
-        id
-        contactCard {
-          firstName
-          lastName
-        }
-        user {
-          email
-          phoneNumber
-        }
-        avatar {
-          id
-          uri: uri(width: 112, pixelRatio: $pixelRatio)
-        }
-      }
-    `,
-    profileKey as MultiUserDetailModal_Profile$key,
-  );
+
   const { profileInfos } = useAuthState();
   const { transferOwnerMode, selectedProfileId, setSelectedProfileId } =
     useContext(MultiUserTransferOwnerContext);
 
+  const router = useRouter();
+
   const onPressItem = useCallback(() => {
     if (transferOwnerMode) {
-      setSelectedProfileId(data.id);
+      setSelectedProfileId(item.id);
     } else {
-      onPress(profileKey);
+      router.push({
+        route: 'MULTI_USER_DETAIL',
+        params: { profileId: item.id },
+      });
     }
-  }, [data.id, onPress, profileKey, setSelectedProfileId, transferOwnerMode]);
+  }, [item.id, router, setSelectedProfileId, transferOwnerMode]);
 
   //#region Transfert ownership
   const onPressRadio = useCallback(() => {
-    setSelectedProfileId(data.id);
-  }, [data.id, setSelectedProfileId]);
+    setSelectedProfileId(item.id);
+  }, [item.id, setSelectedProfileId]);
 
   //#endregion
 
-  if (!data || !data.contactCard) {
+  const avatarSource = useMemo(() => {
+    if (item.avatar?.uri) {
+      return {
+        uri: item.avatar.uri,
+        mediaId: item.avatar.id ?? '',
+        requestedSize: AVATAR_WIDTH,
+      };
+    }
+    return null;
+  }, [item.avatar]);
+
+  if (!item || !item.contactCard) {
     return null;
   }
-  const contactCard = data.contactCard;
-  const isCurrentUser = data.id === profileInfos?.profileId;
+  const contactCard = item.contactCard;
+  const isCurrentUser = item.id === profileInfos?.profileId;
 
   return (
     <Animated.View entering={FadeIn} exiting={FadeOut}>
       <PressableNative onPress={onPressItem} style={styles.user}>
-        {data.avatar ? (
-          <MediaImageRenderer
-            source={{
-              uri: data.avatar.uri,
-              mediaId: data.avatar.id ?? '',
-              requestedSize: MEDIA_WIDTH,
-            }}
-            style={styles.avatar}
-          />
+        {avatarSource ? (
+          <MediaImageRenderer source={avatarSource} style={styles.avatar} />
         ) : (
           <Avatar
             firstName={contactCard.firstName ?? ''}
@@ -437,12 +405,12 @@ const ItemList = ({
             {isCurrentUser && '(me)'}
           </Text>
           <Text style={styles.contact}>
-            {data.user.email ?? data.user.phoneNumber}
+            {item.user.email ?? item.user.phoneNumber}
           </Text>
         </View>
         {transferOwnerMode ? (
           <RadioButton
-            checked={selectedProfileId === data.id}
+            checked={selectedProfileId === item.id}
             onChange={onPressRadio}
           />
         ) : (
