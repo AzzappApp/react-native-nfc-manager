@@ -315,6 +315,7 @@ const MultiUserScreenUserList = ({
           onRefresh={onRefresh}
           contentContainerStyle={{ paddingBottom: 40 + bottom }}
           onEndReachedThreshold={0.5}
+          keyboardShouldPersistTaps="always"
         />
       </Suspense>
       <ScreenModal visible={Boolean(selectedProfile)} animationType="slide">
