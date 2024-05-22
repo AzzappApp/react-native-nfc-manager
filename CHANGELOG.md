@@ -1,4 +1,4 @@
-## 0.5.15-canary.1
+## 0.5.15-canary.2
 
 * **feat:**  - cover v2 (Main branch for the new cover) ([#3373](https://github.com/AzzappApp/azzapp/pull/3373))
 * **build:**  - increment version according to branch
