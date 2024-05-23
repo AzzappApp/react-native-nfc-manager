@@ -1,5 +1,6 @@
-## 0.5.15-canary.6
+## 0.5.15-canary.7
 
+* **fix:**  - **payment:** wrong id used in upgrade ([#3454](https://github.com/AzzappApp/azzapp/pull/3454))
 * **fix:**  - **payment:** incorrect id used in upgrade plan update ([#3453](https://github.com/AzzappApp/azzapp/pull/3453))
 * **fix:**  - many errors due to pr [#3440](https://github.com/AzzappApp/azzapp/pull/3440) ([#3449](https://github.com/AzzappApp/azzapp/pull/3449))
 * **build:**  - fix podfile
