@@ -394,9 +394,6 @@ const icons = {
   get stop() {
     return require('./assets/stop.png');
   },
-  get structure() {
-    return require('./assets/structure.png');
-  },
   get suggested_photo() {
     return require('./assets/suggested_photo.png');
   },
@@ -411,9 +408,6 @@ const icons = {
   },
   get text() {
     return require('./assets/text.png');
-  },
-  get tint() {
-    return require('./assets/tint.png');
   },
   get tips() {
     return require('./assets/tips.png');

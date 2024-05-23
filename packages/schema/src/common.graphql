@@ -44,14 +44,10 @@ type MediaParameters {
   saturation: Float
   shadow: Float
   sharpness: Float
-  structure: Float
   temperature: Float
-  tint: Float
   vibrance: Float
   vignetting: Float
-  pitch: Float
   roll: Float
-  yaw: Float
   cropData: CropData
   orientation: ImageOrientation
 } 
@@ -63,14 +59,10 @@ input MediaParametersInput {
   saturation: Float
   shadow: Float
   sharpness: Float
-  structure: Float
   temperature: Float
-  tint: Float
   vibrance: Float
   vignetting: Float
-  pitch: Float
   roll: Float
-  yaw: Float
   cropData: CropDataInput
   orientation: ImageOrientation
 }

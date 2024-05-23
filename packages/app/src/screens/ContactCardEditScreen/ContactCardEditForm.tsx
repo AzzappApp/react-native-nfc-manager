@@ -1,3 +1,4 @@
+import { ImageFormat } from '@shopify/react-native-skia';
 import { Fragment, useCallback, useEffect, useState } from 'react';
 import { Controller, useController } from 'react-hook-form';
 import { FormattedMessage, useIntl } from 'react-intl';
@@ -5,7 +6,6 @@ import { Pressable, View, Image } from 'react-native';
 import { AVATAR_MAX_WIDTH } from '@azzapp/shared/contactCardHelpers';
 import { colors, shadow } from '#theme';
 import FormDeleteFieldOverlay from '#components/ContactCard/FormDeleteFieldOverlay';
-import { exportLayersToImage, getFilterUri } from '#components/gpu';
 import ImagePicker, {
   EditImageStep,
   ImagePickerContactCardMediaWrapper,
@@ -19,6 +19,7 @@ import {
   buildContactCardModalStyleSheet,
 } from '#helpers/contactCardHelpers';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
+import { saveTransformedImageToFile } from '#helpers/mediaEditions';
 import { AVATAR_WIDTH } from '#screens/MultiUserScreen/Avatar';
 import Icon from '#ui/Icon';
 import IconButton from '#ui/IconButton';
@@ -92,48 +93,34 @@ const ContactCardEditForm = ({
       if (imagePicker === 'avatar') {
         const exportWidth = Math.min(AVATAR_MAX_WIDTH, width);
         const exportHeight = exportWidth / aspectRatio;
-        const localPath = await exportLayersToImage({
-          size: { width: exportWidth, height: exportHeight },
+        const localPath = await saveTransformedImageToFile({
+          uri,
+          resolution: { width: exportWidth, height: exportHeight },
+          format: ImageFormat.JPEG,
           quality: 95,
-          format: 'auto',
-          layers: [
-            {
-              kind: 'image',
-              uri,
-              parameters: editionParameters,
-              lutFilterUri: getFilterUri(filter),
-            },
-          ],
+          filter,
+          editionParameters,
         });
         avatarField.onChange({
           local: true,
           id: localPath,
-          uri: localPath.startsWith('file://')
-            ? localPath
-            : `file://${localPath}`,
+          uri: `file://${localPath}`,
         });
       } else {
         const exportWidth = width;
         const exportHeight = exportWidth / aspectRatio;
-        const localPath = await exportLayersToImage({
-          size: { width: exportWidth, height: exportHeight },
-          quality: 100,
-          format: 'auto',
-          layers: [
-            {
-              kind: 'image',
-              uri,
-              parameters: editionParameters,
-              lutFilterUri: getFilterUri(filter),
-            },
-          ],
+        const localPath = await saveTransformedImageToFile({
+          uri,
+          resolution: { width: exportWidth, height: exportHeight },
+          format: ImageFormat.JPEG,
+          quality: 95,
+          filter,
+          editionParameters,
         });
         logoField.onChange({
           local: true,
           id: localPath,
-          uri: localPath.startsWith('file://')
-            ? localPath
-            : `file://${localPath}`,
+          uri: `file://${localPath}`,
         });
         setSize({
           width: exportWidth,

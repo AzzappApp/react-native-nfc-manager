@@ -1,3 +1,4 @@
+import { ImageFormat } from '@shopify/react-native-skia';
 import { omit } from 'lodash';
 import { useCallback, useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
@@ -13,7 +14,6 @@ import {
 import { encodeMediaId } from '@azzapp/shared/imagesHelpers';
 import { addingModuleRequireSubscription } from '@azzapp/shared/subscriptionHelpers';
 import { CameraButton } from '#components/commonsButtons';
-import { exportLayersToImage, getFilterUri } from '#components/gpu';
 import ImagePicker, {
   EditImageStep,
   SelectImageStep,
@@ -21,6 +21,7 @@ import ImagePicker, {
 import { useRouter } from '#components/NativeRouter';
 import ScreenModal from '#components/ScreenModal';
 import { getFileName } from '#helpers/fileHelpers';
+import { saveTransformedImageToFile } from '#helpers/mediaEditions';
 import { downScaleImage } from '#helpers/mediaHelpers';
 import { uploadMedia, uploadSign } from '#helpers/MobileWebAPI';
 import { useIsSubscriber } from '#helpers/SubscriptionContext';
@@ -243,22 +244,17 @@ const HorizontalPhotoEditionScreen = ({
     filter,
   }: ImagePickerResult) => {
     const size = downScaleImage(width, height, MODULE_IMAGE_MAX_WIDTH);
-    const exportUri = await exportLayersToImage({
-      size,
+    const exportPath = await saveTransformedImageToFile({
+      uri,
+      resolution: size,
+      format: ImageFormat.JPEG,
       quality: 95,
-      format: 'auto',
-      layers: [
-        {
-          kind: 'image',
-          uri,
-          parameters: editionParameters,
-          lutFilterUri: getFilterUri(filter),
-        },
-      ],
+      filter,
+      editionParameters,
     });
     setShowImagePicker(false);
     onImageChange({
-      uri: exportUri.startsWith('file://') ? exportUri : `file://${exportUri}`,
+      uri: `file://${exportPath}`,
       width: size.width,
       height: size.height,
       kind: 'image',

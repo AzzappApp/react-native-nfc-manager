@@ -9,8 +9,14 @@ import {
   useMemo,
   useState,
 } from 'react';
-import type { EditionParameters, ImageOrientation } from '#components/gpu';
+import { useSkImage } from '#helpers/mediaEditions';
+import type {
+  EditionParameters,
+  Filter,
+  ImageOrientation,
+} from '#helpers/mediaEditions';
 import type { Media, TimeRange } from './imagePickerTypes';
+import type { SkImage } from '@shopify/react-native-skia';
 import type { ReactNode, ForwardedRef } from 'react';
 
 /**
@@ -39,6 +45,10 @@ export type ImagePickerState = {
    */
   media: Media | null;
   /**
+   * The SkImage of the media
+   */
+  skImage: SkImage | null;
+  /**
    * the aspect ratio of the media
    */
   aspectRatio: number;
@@ -49,7 +59,7 @@ export type ImagePickerState = {
   /**
    * the filter applied to the media
    */
-  mediaFilter: string | null;
+  mediaFilter: Filter | null;
   /**
    * the time range of the video selected
    */
@@ -84,7 +94,7 @@ export type ImagePickerState = {
    * an event dispatched by picker step to change the filter applied to the media
    * @param filter the new filter
    */
-  onMediaFilterChange(filter: string | null): void;
+  onMediaFilterChange(filter: Filter | null): void;
   /**
    * an event dispatched by picker step to change the edition parameters applied to the media
    * @param editionParameters the new edition parameters
@@ -172,7 +182,7 @@ const _ImagePickerContextProvider = (
     {},
   );
   const [timeRange, setTimeRange] = useState<TimeRange | null>(null);
-  const [mediaFilter, setMediaFilter] = useState<string | null>(null);
+  const [mediaFilter, setMediaFilter] = useState<Filter | null>(null);
 
   useEffect(() => {
     setEditionParameters({});
@@ -251,12 +261,19 @@ const _ImagePickerContextProvider = (
     [],
   );
 
+  const skImage = useSkImage({
+    uri: media?.uri,
+    kind: media?.kind,
+    time: timeRange?.startTime,
+  });
+
   const pickerState = useMemo<ImagePickerState>(
     () => ({
       kind,
       forceAspectRatio,
       maxVideoDuration,
       media,
+      skImage,
       aspectRatio:
         aspectRatio ??
         (media != null
@@ -281,6 +298,7 @@ const _ImagePickerContextProvider = (
       forceAspectRatio,
       maxVideoDuration,
       media,
+      skImage,
       aspectRatio,
       editionParameters,
       mediaFilter,

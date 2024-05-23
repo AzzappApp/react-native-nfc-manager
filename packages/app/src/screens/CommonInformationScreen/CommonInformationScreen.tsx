@@ -1,4 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod';
+import { ImageFormat } from '@shopify/react-native-skia';
 import { useCallback, useEffect, useState } from 'react';
 import { Controller, useController, useForm } from 'react-hook-form';
 import { FormattedMessage, useIntl } from 'react-intl';
@@ -12,13 +13,13 @@ import { encodeMediaId } from '@azzapp/shared/imagesHelpers';
 import { colors } from '#theme';
 import { CancelHeaderButton } from '#components/commonsButtons';
 import FormDeleteFieldOverlay from '#components/ContactCard/FormDeleteFieldOverlay';
-import { exportLayersToImage, getFilterUri } from '#components/gpu';
 import ImagePicker, { SelectImageStep } from '#components/ImagePicker';
 import { useRouter } from '#components/NativeRouter';
 import ScreenModal from '#components/ScreenModal';
 import { buildContactCardModalStyleSheet } from '#helpers/contactCardHelpers';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import { getFileName } from '#helpers/fileHelpers';
+import { saveTransformedImageToFile } from '#helpers/mediaEditions';
 import { uploadMedia, uploadSign } from '#helpers/MobileWebAPI';
 import relayScreen from '#helpers/relayScreen';
 import useScreenInsets from '#hooks/useScreenInsets';
@@ -144,26 +145,18 @@ export const CommonInformationScreen = ({
     }: ImagePickerResult) => {
       const exportWidth = width;
       const exportHeight = exportWidth / aspectRatio;
-
-      const localPath = await exportLayersToImage({
-        size: { width: exportWidth, height: exportHeight },
-        quality: 100,
-        format: 'auto',
-        layers: [
-          {
-            kind: 'image',
-            uri,
-            parameters: editionParameters,
-            lutFilterUri: getFilterUri(filter),
-          },
-        ],
+      const localPath = await saveTransformedImageToFile({
+        uri,
+        resolution: { width: exportWidth, height: exportHeight },
+        format: ImageFormat.JPEG,
+        quality: 95,
+        filter,
+        editionParameters,
       });
       field.onChange({
         local: true,
         id: localPath,
-        uri: localPath.startsWith('file://')
-          ? localPath
-          : `file://${localPath}`,
+        uri: `file://${localPath}`,
       });
 
       setSize({

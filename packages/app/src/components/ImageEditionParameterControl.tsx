@@ -2,14 +2,9 @@ import { useCallback } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { useSharedValue } from 'react-native-reanimated';
 import LabeledDashedSlider from '#ui/LabeledDashedSlider';
-import { editionParametersSettings } from './gpu';
-import type { EditionParameters } from './gpu';
+import type { ParametersSettings } from '#helpers/mediaEditions';
 import type { ViewProps } from 'react-native';
 type ImageEditionParameterControlProps = ViewProps & {
-  /**
-   * The parameter to control.
-   */
-  parameter?: keyof EditionParameters | null | undefined;
   /**
    * The value of the parameter.
    */
@@ -26,6 +21,10 @@ type ImageEditionParameterControlProps = ViewProps & {
    * The label to display before the value.
    */
   label?: string;
+  /**
+   * The settings of the parameter.
+   */
+  parameterSettings?: ParametersSettings;
 };
 
 function lerp(min: number, max: number, value: number) {
@@ -59,16 +58,14 @@ export function range(
  * the limits of the parameter and the step are defined in the editionParametersSettings.
  */
 const ImageEditionParameterControl = ({
-  parameter,
   value: propsValue,
   onChange,
   style,
   labelSuffix,
   label,
+  parameterSettings,
   ...props
 }: ImageEditionParameterControlProps) => {
-  const parameterSettings = parameter && editionParametersSettings[parameter];
-
   const formatValue = useCallback(
     (value: number) => {
       'worklet';

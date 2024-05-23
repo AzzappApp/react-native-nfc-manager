@@ -1,3 +1,4 @@
+import { ImageFormat } from '@shopify/react-native-skia';
 import { useCallback, useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { Platform, View } from 'react-native';
@@ -13,9 +14,14 @@ import {
 import { Observable } from 'relay-runtime';
 import { waitTime } from '@azzapp/shared/asyncHelpers';
 import { encodeMediaId } from '@azzapp/shared/imagesHelpers';
+import {
+  POST_IMAGE_MAX_SIZE,
+  POST_VIDEO_BIT_RATE,
+  POST_VIDEO_FRAME_RATE,
+  POST_VIDEO_MAX_SIZE,
+} from '@azzapp/shared/postHelpers';
 import { colors } from '#theme';
 import { CancelHeaderButton } from '#components/commonsButtons';
-import { getFilterUri } from '#components/gpu';
 import ImagePicker, {
   SelectImageStep,
   EditImageStep,
@@ -23,6 +29,10 @@ import ImagePicker, {
 import { useRouter } from '#components/NativeRouter';
 import ScreenModal from '#components/ScreenModal';
 import { getFileName } from '#helpers/fileHelpers';
+import {
+  saveTransformedImageToFile,
+  saveTransformedVideoToFile,
+} from '#helpers/mediaEditions';
 import { addLocalCachedMediaFile } from '#helpers/mediaHelpers';
 import { uploadMedia, uploadSign } from '#helpers/MobileWebAPI';
 import relayScreen from '#helpers/relayScreen';
@@ -35,7 +45,6 @@ import ActivityIndicator from '#ui/ActivityIndicator';
 import Container from '#ui/Container';
 import Header from '#ui/Header';
 import UploadProgressModal from '#ui/UploadProgressModal';
-import exportMedia from './exportMedia';
 import PostContentStep from './PostContentStep';
 import PostCreationScreenContext from './PostCreationScreenContext';
 import type { ImagePickerResult } from '#components/ImagePicker';
@@ -150,21 +159,36 @@ const PostCreationScreen = ({
           // on Android we need to be sure that the player is released to avoid memory overload
           await waitTime(50);
         }
-        const exportedMedia = await exportMedia({
-          uri,
-          kind,
-          editionParameters,
-          aspectRatio,
-          filterUri: getFilterUri(filter),
-          ...timeRange,
-        });
+        const maxSize =
+          kind === 'image' ? POST_IMAGE_MAX_SIZE : POST_VIDEO_MAX_SIZE;
+        const resolution = {
+          width: aspectRatio >= 1 ? maxSize : maxSize * aspectRatio,
+          height: aspectRatio < 1 ? maxSize : maxSize / aspectRatio,
+        };
+        const path = await (kind === 'image'
+          ? saveTransformedImageToFile({
+              uri,
+              resolution,
+              format: ImageFormat.JPEG,
+              quality: 95,
+              filter,
+              editionParameters,
+            })
+          : saveTransformedVideoToFile({
+              uri,
+              resolution,
+              bitRate: POST_VIDEO_BIT_RATE,
+              frameRate: POST_VIDEO_FRAME_RATE,
+              duration: timeRange?.duration,
+              startTime: timeRange?.startTime,
+              filter,
+              editionParameters,
+            }));
 
-        const fileName = getFileName(exportedMedia.path);
+        const fileName = getFileName(path);
         const file: any = {
           name: fileName,
-          uri: exportedMedia.path.startsWith('file://')
-            ? exportMedia
-            : `file://${exportedMedia.path}`,
+          uri: `file://${path}`,
           type:
             mime.lookup(fileName) ||
             (kind === 'image' ? 'image/jpeg' : 'video/quicktime'),
@@ -215,7 +239,7 @@ const PostCreationScreen = ({
               addLocalCachedMediaFile(
                 `${kind.slice(0, 1)}:${public_id}`,
                 kind === 'video' ? 'video' : 'image',
-                `file://${exportedMedia.path}`,
+                `file://${path}`,
               );
               // TODO use fragment instead of response
               // if (params?.fromProfile) {
@@ -250,6 +274,7 @@ const PostCreationScreen = ({
           },
         });
       } catch (e) {
+        console.warn(e);
         Toast.show({
           type: 'error',
           text1: intl.formatMessage({

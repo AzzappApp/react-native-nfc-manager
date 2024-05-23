@@ -36,7 +36,6 @@ import type {
   CardTemplateItem,
   CardTemplateListHandle,
 } from '#components/CardTemplateList';
-import type { CoverEditorHandle } from '#components/CoverEditor/CoverEditor';
 import type { RelayScreenProps } from '#helpers/relayScreen';
 import type { NewWebCardScreenPreloadQuery } from '#relayArtifacts/NewWebCardScreenPreloadQuery.graphql';
 import type { NewWebCardScreenQuery } from '#relayArtifacts/NewWebCardScreenQuery.graphql';
@@ -191,7 +190,7 @@ export const NewWebCardScreen = ({
     webCardFormRef.current?.onSubmit();
   };
   const [canSave, setCanSave] = useState(false);
-  const coverEditionRef = useRef<CoverEditorHandle>(null);
+  const coverEditionRef = useRef<any>(null);
   const onCoverEditionRef = () => {
     coverEditionRef.current?.save();
   };

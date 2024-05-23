@@ -1,3 +1,4 @@
+import { ImageFormat } from '@shopify/react-native-skia';
 import { useCallback, useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { StyleSheet } from 'react-native';
@@ -13,11 +14,11 @@ import {
 import { encodeMediaId } from '@azzapp/shared/imagesHelpers';
 import { combineMultiUploadProgresses } from '@azzapp/shared/networkHelpers';
 import { addingModuleRequireSubscription } from '@azzapp/shared/subscriptionHelpers';
-import { exportLayersToImage, getFilterUri } from '#components/gpu';
 import ImagePicker from '#components/ImagePicker';
 import { useRouter } from '#components/NativeRouter';
 import ScreenModal from '#components/ScreenModal';
 import { getFileName } from '#helpers/fileHelpers';
+import { saveTransformedImageToFile } from '#helpers/mediaEditions';
 import { uploadMedia, uploadSign } from '#helpers/MobileWebAPI';
 import { useIsSubscriber } from '#helpers/SubscriptionContext';
 import useEditorLayout from '#hooks/useEditorLayout';
@@ -254,18 +255,13 @@ const CarouselEditionScreen = ({
     }: ImagePickerResult) => {
       const exportWidth = Math.min(MODULE_IMAGE_MAX_WIDTH, width);
       const exportHeight = exportWidth / aspectRatio;
-      const localPath = await exportLayersToImage({
-        size: { width: exportWidth, height: exportHeight },
+      const localPath = await saveTransformedImageToFile({
+        uri,
+        resolution: { width: exportWidth, height: exportHeight },
+        format: ImageFormat.JPEG,
         quality: 95,
-        format: 'auto',
-        layers: [
-          {
-            kind: 'image',
-            uri,
-            parameters: editionParameters,
-            lutFilterUri: getFilterUri(filter),
-          },
-        ],
+        filter,
+        editionParameters,
       });
 
       updateFields({

@@ -26,7 +26,7 @@ import {
   extractLayoutParameters,
   type EditionParameters,
   cropDataForAspectRatio,
-} from '#components/gpu';
+} from '#helpers/mediaEditions';
 import { useScreenHasFocus } from '#components/NativeRouter';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import { get as getCappedPixelRatio } from '#relayProviders/CappedPixelRatio.relayprovider';

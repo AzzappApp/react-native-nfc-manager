@@ -5,7 +5,7 @@ import { useIntl } from 'react-intl';
 import { Alert, Platform, StyleSheet } from 'react-native';
 import { RESULTS } from 'react-native-permissions';
 import { useDebouncedCallback } from 'use-debounce';
-import { cropDataForAspectRatio } from '#components/gpu';
+import { cropDataForAspectRatio } from '#helpers/mediaEditions';
 import { getImageSize, getVideoSize } from '#helpers/mediaHelpers';
 import { usePermissionContext } from '#helpers/PermissionContext';
 import useEditorLayout from '#hooks/useEditorLayout';

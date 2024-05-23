@@ -8,7 +8,6 @@ import CoverEditorV2TemplateList from '#components/CoverEditorV2/templateList/Co
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 // import useScreenInsets from '#hooks/useScreenInsets';
 import ActivityIndicator from '#ui/ActivityIndicator';
-import type { CoverEditorHandle } from '#components/CoverEditor/CoverEditor';
 import type { CoverEditionStepV2Query } from '#relayArtifacts/CoverEditionStepV2Query.graphql';
 import type { ForwardedRef } from 'react';
 
@@ -17,6 +16,10 @@ type CoverEditionStepProps = {
   height: number;
   onCoverSaved: () => void;
   setCanSave: (value: boolean) => void;
+};
+
+export type CoverEditorHandle = {
+  save: () => void;
 };
 
 const CoverEditionStep = (

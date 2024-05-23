@@ -1,15 +1,12 @@
-import { ActivityIndicator, Platform, StyleSheet, View } from 'react-native';
+import isEqual from 'lodash/isEqual';
+import { useCallback, useMemo, useState } from 'react';
+import { View } from 'react-native';
 import { colors } from '#theme';
 import Cropper from '#components/Cropper';
-import {
-  GPUImageView,
-  GPUVideoView,
-  Image,
-  Video,
-  VideoFrame,
-  getFilterUri,
-} from '#components/gpu';
+import TransformedImageRenderer from '#components/TransformedImageRenderer';
+import TransformedVideoRenderer from '#components/TransformedVideoRenderer';
 import { useImagePickerState } from './ImagePickerContext';
+import type { LayoutChangeEvent } from 'react-native';
 
 type ImagePickerMediaRendererProps = {
   /**
@@ -36,6 +33,7 @@ const ImagePickerMediaRenderer = ({
   const {
     media,
     aspectRatio,
+    skImage,
     editionParameters,
     timeRange,
     mediaFilter,
@@ -43,44 +41,29 @@ const ImagePickerMediaRenderer = ({
     onParameterValueChange,
   } = useImagePickerState();
 
+  const [dimensions, setDimensions] = useState<{
+    width: number;
+    height: number;
+  } | null>(null);
+  const onLayout = useCallback((event: LayoutChangeEvent) => {
+    const { width, height } = event.nativeEvent.layout;
+    setDimensions(dimensions =>
+      isEqual(dimensions, { width, height }) ? dimensions : { width, height },
+    );
+  }, []);
+
+  const imageDimensions = useMemo(() => {
+    if (!dimensions) {
+      return null;
+    }
+
+    return aspectRatio > 1
+      ? { width: dimensions.width, height: dimensions.width / aspectRatio }
+      : { width: dimensions.height * aspectRatio, height: dimensions.height };
+  }, [aspectRatio, dimensions]);
+
   if (!media) {
     return null;
-  }
-
-  if (Platform.OS === 'android' && exporting && media.kind === 'video') {
-    // Displaying edited video and exporting is too much for android
-    const sizeStyles =
-      aspectRatio > 1
-        ? ({ aspectRatio, width: '100%' } as const)
-        : ({ aspectRatio, height: '100%' } as const);
-
-    return (
-      <View
-        style={{
-          width: '100%',
-          alignItems: 'center',
-          justifyContent: 'center',
-        }}
-      >
-        <View
-          style={[
-            sizeStyles,
-            { alignItems: 'center', justifyContent: 'center' },
-          ]}
-        >
-          <GPUImageView style={StyleSheet.absoluteFill}>
-            <VideoFrame uri={media.uri} parameters={editionParameters} />
-          </GPUImageView>
-          <View
-            style={[
-              StyleSheet.absoluteFill,
-              { backgroundColor: 'rgba(0,0, 0, 0.4)' },
-            ]}
-          />
-          <ActivityIndicator size="large" color="white" />
-        </View>
-      </View>
-    );
   }
 
   return (
@@ -92,58 +75,49 @@ const ImagePickerMediaRenderer = ({
         justifyContent: 'center',
         backgroundColor: colors.grey500,
       }}
+      onLayout={onLayout}
     >
-      <Cropper
-        // avoid unwanted transition effect when changing media or aspect ratio
-        key={`${media.uri}-${aspectRatio}`}
-        cropEditionMode={cropEditionMode}
-        mediaSize={media}
-        aspectRatio={aspectRatio}
-        cropData={editionParameters.cropData}
-        pitch={editionParameters.pitch}
-        roll={editionParameters.roll}
-        yaw={editionParameters.yaw}
-        orientation={editionParameters.orientation}
-        onCropDataChange={cropData =>
-          onParameterValueChange('cropData', cropData)
-        }
-        style={{
-          width: aspectRatio >= 1 ? '100%' : 'auto',
-          height: aspectRatio <= 1 ? '100%' : 'auto',
-          aspectRatio,
-          backgroundColor: 'black',
-        }}
-      >
-        {cropData =>
-          media.kind === 'image' ? (
-            <GPUImageView
-              style={{ flex: 1, aspectRatio }}
-              testID="image-picker-media-image"
-            >
-              <Image
-                uri={media.uri}
-                parameters={{ ...editionParameters, cropData }}
-                lutFilterUri={getFilterUri(mediaFilter)}
-                backgroundColor="#FFFFFF"
-              />
-            </GPUImageView>
-          ) : (
-            <GPUVideoView
-              style={{ flex: 1, aspectRatio }}
-              testID="image-picker-media-video"
-            >
-              <Video
-                uri={media.uri}
-                parameters={{ ...editionParameters, cropData }}
-                lutFilterUri={getFilterUri(mediaFilter)}
-                startTime={timeRange?.startTime}
-                duration={timeRange?.duration}
-              />
-            </GPUVideoView>
-          )
-        }
-      </Cropper>
-      {children}
+      {imageDimensions && (
+        <>
+          <Cropper
+            // avoid unwanted transition effect when changing media or aspect ratio
+            key={`${media.uri}-${aspectRatio}`}
+            cropEditionMode={cropEditionMode}
+            mediaSize={media}
+            aspectRatio={aspectRatio}
+            cropData={editionParameters.cropData}
+            roll={editionParameters.roll}
+            orientation={editionParameters.orientation}
+            onCropDataChange={cropData =>
+              onParameterValueChange('cropData', cropData)
+            }
+            style={{ ...imageDimensions, backgroundColor: 'black' }}
+          >
+            {cropData =>
+              media.kind === 'image' || exporting ? (
+                <TransformedImageRenderer
+                  testID="image-picker-media-image"
+                  image={skImage}
+                  {...imageDimensions}
+                  filter={mediaFilter}
+                  editionParameters={{ ...editionParameters, cropData }}
+                />
+              ) : (
+                <TransformedVideoRenderer
+                  testID="image-picker-media-video"
+                  uri={media.uri}
+                  {...imageDimensions}
+                  filter={mediaFilter}
+                  editionParameters={{ ...editionParameters, cropData }}
+                  startTime={timeRange?.startTime ?? 0}
+                  duration={timeRange?.duration ?? 15}
+                />
+              )
+            }
+          </Cropper>
+          {children}
+        </>
+      )}
     </View>
   );
 };

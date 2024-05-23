@@ -1,6 +1,5 @@
 import { useCallback } from 'react';
-import { FlatList, ScrollView, StyleSheet, View } from 'react-native';
-import { CoverMediaPreview } from '#components/CoverPreviewRenderer';
+import { FlatList, Image, ScrollView, StyleSheet, View } from 'react-native';
 import Badge from '#ui/Badge';
 import Icon from '#ui/Icon';
 import PressableNative from '#ui/PressableNative';
@@ -63,11 +62,7 @@ const CoverEditorV2TemplateTypePreview = ({
 }) => {
   return (
     <PressableNative key={preview.id} style={styles.preview} onPress={onSelect}>
-      <CoverMediaPreview
-        kind="image"
-        uri={preview.media.uri}
-        style={styles.previewMedia}
-      />
+      <Image source={{ uri: preview.media.uri }} style={styles.previewMedia} />
       <Badge style={styles.badge}>
         <View style={styles.badgeElements}>
           <Icon size={16} icon="landscape" />

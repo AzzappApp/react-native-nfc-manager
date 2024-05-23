@@ -18,9 +18,14 @@ export const COVER_ANIMATION_DURATION = 5000;
 export const COVER_MAX_VIDEO_DURATION = 12;
 
 /**
- * Cover video maxium duration in seconds
+ * Cover video bitrate
  */
 export const COVER_VIDEO_BITRATE = 5000000;
+
+/**
+ * Cover video frame rate
+ */
+export const COVER_FRAME_RATE = 30;
 
 /**
  * The border radius that should be used when a cover is not displayed full screen

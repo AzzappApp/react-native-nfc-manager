@@ -54,12 +54,18 @@ jest.mock('#components/medias/NativeMediaImageRenderer');
 jest.mock('#components/medias/NativeMediaVideoRenderer');
 // we completely mock the medias module for problems related to querying the wrapper around the native module
 jest.mock('#components/medias');
-
-jest.mock('#components/gpu/GPUHelpers');
 //#endregion
 
 //#region flashlist
 require('@shopify/flash-list/jestSetup');
+//#endregion
+
+//#region ReactNativeBlobUtil
+jest.mock('react-native-blob-util', () => {});
+//#endregion
+
+//#region ReactNativeSkia video
+jest.mock('@azzapp/react-native-skia-video', () => {});
 //#endregion
 
 //#region Sentry

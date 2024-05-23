@@ -77,6 +77,7 @@ __metadata:
   resolution: "@azzapp/app@workspace:packages/app"
   dependencies:
     "@azzapp/i18n": "workspace:^"
+    "@azzapp/react-native-skia-video": v0.1.2
     "@azzapp/shared": "workspace:^"
     "@expo-google-fonts/amatic-sc": ^0.2.3
     "@expo-google-fonts/anton": ^0.2.3
@@ -344,6 +345,18 @@ __metadata:
     typescript: ^5.4.5
   languageName: unknown
   linkType: soft
+
+"@azzapp/react-native-skia-video@npm:v0.1.2":
+  version: 0.1.2
+  resolution: "@azzapp/react-native-skia-video@npm:0.1.2"
+  peerDependencies:
+    "@shopify/react-native-skia": ">= 1.2.3"
+    react: "*"
+    react-native: "*"
+    react-native-reanimated: ">= 3.10.0"
+  checksum: 87c2e733da1aedb82bc55d3a3bde92f8c387d93560872964acc43c3afa2949546a5ef6fe326ad667f032a4c00c26775b2e247b932f82788d17794231e3413ea5
+  languageName: node
+  linkType: hard
 
 "@azzapp/schema@workspace:^, @azzapp/schema@workspace:packages/schema":
   version: 0.0.0-use.local
@@ -8816,7 +8829,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@shopify/react-native-skia@npm:^1.3.0":
+"@shopify/react-native-skia@npm:1.3.0":
   version: 1.3.0
   resolution: "@shopify/react-native-skia@npm:1.3.0"
   dependencies:
@@ -8834,6 +8847,27 @@ __metadata:
   bin:
     setup-skia-web: scripts/setup-canvaskit.js
   checksum: a9349a6065c9bee50a5bc1ed1df23db25d3d95cfe551e04e011331a727155cb4d9747a023ebad9675481c4794cd72ea5eb3d2a9b0cfa8f3129dd9673cd676cc4
+  languageName: node
+  linkType: hard
+
+"@shopify/react-native-skia@patch:@shopify/react-native-skia@npm%3A1.3.0#./.yarn/patches/@shopify-react-native-skia-npm-1.3.0-85f18b81fd.patch::locator=%40azzapp%2Fmonorepo%40workspace%3A.":
+  version: 1.3.0
+  resolution: "@shopify/react-native-skia@patch:@shopify/react-native-skia@npm%3A1.3.0#./.yarn/patches/@shopify-react-native-skia-npm-1.3.0-85f18b81fd.patch::version=1.3.0&hash=afce90&locator=%40azzapp%2Fmonorepo%40workspace%3A."
+  dependencies:
+    canvaskit-wasm: 0.39.1
+    react-reconciler: 0.27.0
+  peerDependencies:
+    react: ">=18.0"
+    react-native: ">=0.64"
+    react-native-reanimated: ">=2.0.0"
+  peerDependenciesMeta:
+    react-native:
+      optional: true
+    react-native-reanimated:
+      optional: true
+  bin:
+    setup-skia-web: scripts/setup-canvaskit.js
+  checksum: 1010b375720aa1504db4aec0c65259100253b1020d18a68192996249f148796c048fb08b9117b9c458a30c57f16c173a3a787f45f544ee9e2d25567212b6af79
   languageName: node
   linkType: hard
 

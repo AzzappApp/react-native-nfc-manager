@@ -1,5 +1,6 @@
+import { Canvas, Image, type SkImage } from '@shopify/react-native-skia';
 import range from 'lodash/range';
-import { useCallback } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { View } from 'react-native';
 import { PanGestureHandler } from 'react-native-gesture-handler';
 import Animated, {
@@ -11,9 +12,8 @@ import Animated, {
 import { formatDuration } from '@azzapp/shared/stringHelpers';
 import { colors } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
+import { SKImageLoader, type EditionParameters } from '#helpers/mediaEditions';
 import Text from '#ui/Text';
-import { GPUImageView, VideoFrame } from './gpu';
-import type { EditionParameters } from './gpu';
 import type { ViewProps } from 'react-native';
 import type { PanGestureHandlerGestureEvent } from 'react-native-gesture-handler';
 
@@ -194,6 +194,14 @@ const VideoTimelineEditor = ({
     [leftPosition.value, rightPosition.value],
   );
 
+  const [images, setImages] = useState<SkImage[]>([]);
+  useEffect(() => {
+    const promises = range(0, video.duration, video.duration / nbImage).map(
+      second => SKImageLoader.loadVideoThumbnail(video.uri, second),
+    );
+    Promise.all(promises).then(setImages);
+  }, [video.uri, video.duration, nbImage]);
+
   const formatDurationMarker = (index: number) => {
     const duration =
       (video.duration / (NUMBER_MAX_TICK - 1)) *
@@ -206,18 +214,19 @@ const VideoTimelineEditor = ({
   return (
     <View {...props}>
       <View style={styles.root}>
-        {range(0, video.duration, video.duration / nbImage).map(second => (
-          <GPUImageView
-            key={second}
-            style={{ height: imagesHeight, width: itemWidth }}
-          >
-            <VideoFrame
-              uri={video.uri}
-              parameters={editionParameters}
-              time={second}
+        <Canvas style={{ height: imagesHeight, width: sliderWidth }}>
+          {images.map((image, index) => (
+            <Image
+              fit={'cover'}
+              key={index}
+              image={image}
+              y={0}
+              x={index * itemWidth}
+              width={itemWidth}
+              height={imagesHeight}
             />
-          </GPUImageView>
-        ))}
+          ))}
+        </Canvas>
       </View>
       <PanGestureHandler onGestureEvent={eventHandler}>
         <Animated.View

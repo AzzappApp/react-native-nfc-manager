@@ -24,6 +24,7 @@ class MainApplication : Application(), ReactApplication {
     fun getMainApplicationContext(): Context {
       return instance!!.applicationContext
     }
+
   }
 
 

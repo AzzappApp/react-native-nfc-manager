@@ -53,9 +53,7 @@
 		FD39DA982A52AB5F00C49A82 /* MediaImageRendererManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD1EA60F28B8D7F400916DBC /* MediaImageRendererManager.swift */; };
 		FD39DA992A52AB5F00C49A82 /* AZPScrollToTopInterceptor.m in Sources */ = {isa = PBXBuildFile; fileRef = FD1EA62828BBA1BE00916DBC /* AZPScrollToTopInterceptor.m */; };
 		FD39DA9A2A52AB5F00C49A82 /* AZPCustomReavealTransition.m in Sources */ = {isa = PBXBuildFile; fileRef = FD5BFC3628C8EF8D0010B34E /* AZPCustomReavealTransition.m */; };
-		FD39DA9C2A52AB5F00C49A82 /* GPUVideoViewManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = FDA79D6729E6F93E00E16407 /* GPUVideoViewManager.swift */; };
 		FD39DA9D2A52AB5F00C49A82 /* MediaPipeline.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD1404302A0299BA00CCA6B9 /* MediaPipeline.swift */; };
-		FD39DA9E2A52AB5F00C49A82 /* GPULayerImageLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = FDA79D3729DD9A4900E16407 /* GPULayerImageLoader.swift */; };
 		FD39DA9F2A52AB5F00C49A82 /* ReactLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = FDA79D7729EE8AAC00E16407 /* ReactLogger.swift */; };
 		FD39DAA02A52AB5F00C49A82 /* FileUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = FDA79D7E29EEA61A00E16407 /* FileUtils.swift */; };
 		FD39DAA12A52AB5F00C49A82 /* AZPMediaVideoRendererManager.m in Sources */ = {isa = PBXBuildFile; fileRef = FD55E4C228B6649F00321128 /* AZPMediaVideoRendererManager.m */; };
@@ -63,19 +61,14 @@
 		FD39DAA32A52AB5F00C49A82 /* AZPMediaHelpers.m in Sources */ = {isa = PBXBuildFile; fileRef = FD8F774528EC310F00E27551 /* AZPMediaHelpers.m */; };
 		FD39DAA42A52AB5F00C49A82 /* AZPMediaImageRendererManager.m in Sources */ = {isa = PBXBuildFile; fileRef = FD1EA61228B920A700916DBC /* AZPMediaImageRendererManager.m */; };
 		FD39DAA52A52AB5F00C49A82 /* MediaHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD1404442A03FDA700CCA6B9 /* MediaHelpers.swift */; };
-		FD39DAA62A52AB5F00C49A82 /* AZPGPUVideoViewManager.m in Sources */ = {isa = PBXBuildFile; fileRef = FDA79D6A29E85A2600E16407 /* AZPGPUVideoViewManager.m */; };
 		FD39DAA72A52AB5F00C49A82 /* AVAssetCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD1404502A07EA4900CCA6B9 /* AVAssetCache.swift */; };
 		FD39DAA82A52AB5F00C49A82 /* AVAssetTrack+orientationTransform.swift in Sources */ = {isa = PBXBuildFile; fileRef = FDA79D3B29DD9B3F00E16407 /* AVAssetTrack+orientationTransform.swift */; };
 		FD39DAA92A52AB5F00C49A82 /* AZPSnapshot.m in Sources */ = {isa = PBXBuildFile; fileRef = FD4EC42928A5503400DDC5C9 /* AZPSnapshot.m */; };
 		FD39DAAA2A52AB5F00C49A82 /* AZPSnapshotManager.m in Sources */ = {isa = PBXBuildFile; fileRef = FD4EC42528A54C8F00DDC5C9 /* AZPSnapshotManager.m */; };
 		FD39DAAB2A52AB5F00C49A82 /* AppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB01A68108700A75B9A /* AppDelegate.mm */; };
-		FD39DAAC2A52AB5F00C49A82 /* GPUViewError.swift in Sources */ = {isa = PBXBuildFile; fileRef = FDA79D7329EE844000E16407 /* GPUViewError.swift */; };
 		FD39DAAD2A52AB5F00C49A82 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
-		FD39DAAE2A52AB5F00C49A82 /* GPUImageViewManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = FDA79D5B29DF1F8000E16407 /* GPUImageViewManager.swift */; };
 		FD39DAAF2A52AB5F00C49A82 /* MediaVideoRendererManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD1404332A02AE4B00CCA6B9 /* MediaVideoRendererManager.swift */; };
-		FD39DAB02A52AB5F00C49A82 /* GPULayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = FDA79D3129DD99D500E16407 /* GPULayer.swift */; };
 		FD39DAB22A52AB5F00C49A82 /* MediaURICache.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD1404532A0949C000CCA6B9 /* MediaURICache.swift */; };
-		FD39DAB32A52AB5F00C49A82 /* AZPGPUImageViewManager.m in Sources */ = {isa = PBXBuildFile; fileRef = FDA79D6429E596F400E16407 /* AZPGPUImageViewManager.m */; };
 		FD39DAB62A52AB5F00C49A82 /* Nuke.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = FDA79D6D29EDA43C00E16407 /* Nuke.xcframework */; };
 		FD39DAB92A52AB5F00C49A82 /* PlusJakartaSans-ExtraBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 96678DDF29D5CFF80073D683 /* PlusJakartaSans-ExtraBold.ttf */; };
 		FD39DABB2A52AB5F00C49A82 /* PlusJakartaSans-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 96678DDD29D5CFF80073D683 /* PlusJakartaSans-Bold.ttf */; };
@@ -88,9 +81,7 @@
 		FD39DACF2A52AC2100C49A82 /* MediaImageRendererManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD1EA60F28B8D7F400916DBC /* MediaImageRendererManager.swift */; };
 		FD39DAD02A52AC2100C49A82 /* AZPScrollToTopInterceptor.m in Sources */ = {isa = PBXBuildFile; fileRef = FD1EA62828BBA1BE00916DBC /* AZPScrollToTopInterceptor.m */; };
 		FD39DAD12A52AC2100C49A82 /* AZPCustomReavealTransition.m in Sources */ = {isa = PBXBuildFile; fileRef = FD5BFC3628C8EF8D0010B34E /* AZPCustomReavealTransition.m */; };
-		FD39DAD32A52AC2100C49A82 /* GPUVideoViewManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = FDA79D6729E6F93E00E16407 /* GPUVideoViewManager.swift */; };
 		FD39DAD42A52AC2100C49A82 /* MediaPipeline.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD1404302A0299BA00CCA6B9 /* MediaPipeline.swift */; };
-		FD39DAD52A52AC2100C49A82 /* GPULayerImageLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = FDA79D3729DD9A4900E16407 /* GPULayerImageLoader.swift */; };
 		FD39DAD62A52AC2100C49A82 /* ReactLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = FDA79D7729EE8AAC00E16407 /* ReactLogger.swift */; };
 		FD39DAD72A52AC2100C49A82 /* FileUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = FDA79D7E29EEA61A00E16407 /* FileUtils.swift */; };
 		FD39DAD82A52AC2100C49A82 /* AZPMediaVideoRendererManager.m in Sources */ = {isa = PBXBuildFile; fileRef = FD55E4C228B6649F00321128 /* AZPMediaVideoRendererManager.m */; };
@@ -98,19 +89,14 @@
 		FD39DADA2A52AC2100C49A82 /* AZPMediaHelpers.m in Sources */ = {isa = PBXBuildFile; fileRef = FD8F774528EC310F00E27551 /* AZPMediaHelpers.m */; };
 		FD39DADB2A52AC2100C49A82 /* AZPMediaImageRendererManager.m in Sources */ = {isa = PBXBuildFile; fileRef = FD1EA61228B920A700916DBC /* AZPMediaImageRendererManager.m */; };
 		FD39DADC2A52AC2100C49A82 /* MediaHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD1404442A03FDA700CCA6B9 /* MediaHelpers.swift */; };
-		FD39DADD2A52AC2100C49A82 /* AZPGPUVideoViewManager.m in Sources */ = {isa = PBXBuildFile; fileRef = FDA79D6A29E85A2600E16407 /* AZPGPUVideoViewManager.m */; };
 		FD39DADE2A52AC2100C49A82 /* AVAssetCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD1404502A07EA4900CCA6B9 /* AVAssetCache.swift */; };
 		FD39DADF2A52AC2100C49A82 /* AVAssetTrack+orientationTransform.swift in Sources */ = {isa = PBXBuildFile; fileRef = FDA79D3B29DD9B3F00E16407 /* AVAssetTrack+orientationTransform.swift */; };
 		FD39DAE02A52AC2100C49A82 /* AZPSnapshot.m in Sources */ = {isa = PBXBuildFile; fileRef = FD4EC42928A5503400DDC5C9 /* AZPSnapshot.m */; };
 		FD39DAE12A52AC2100C49A82 /* AZPSnapshotManager.m in Sources */ = {isa = PBXBuildFile; fileRef = FD4EC42528A54C8F00DDC5C9 /* AZPSnapshotManager.m */; };
 		FD39DAE22A52AC2100C49A82 /* AppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB01A68108700A75B9A /* AppDelegate.mm */; };
-		FD39DAE32A52AC2100C49A82 /* GPUViewError.swift in Sources */ = {isa = PBXBuildFile; fileRef = FDA79D7329EE844000E16407 /* GPUViewError.swift */; };
 		FD39DAE42A52AC2100C49A82 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
-		FD39DAE52A52AC2100C49A82 /* GPUImageViewManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = FDA79D5B29DF1F8000E16407 /* GPUImageViewManager.swift */; };
 		FD39DAE62A52AC2100C49A82 /* MediaVideoRendererManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD1404332A02AE4B00CCA6B9 /* MediaVideoRendererManager.swift */; };
-		FD39DAE72A52AC2100C49A82 /* GPULayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = FDA79D3129DD99D500E16407 /* GPULayer.swift */; };
 		FD39DAE92A52AC2100C49A82 /* MediaURICache.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD1404532A0949C000CCA6B9 /* MediaURICache.swift */; };
-		FD39DAEA2A52AC2100C49A82 /* AZPGPUImageViewManager.m in Sources */ = {isa = PBXBuildFile; fileRef = FDA79D6429E596F400E16407 /* AZPGPUImageViewManager.m */; };
 		FD39DAED2A52AC2100C49A82 /* Nuke.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = FDA79D6D29EDA43C00E16407 /* Nuke.xcframework */; };
 		FD39DAF02A52AC2100C49A82 /* PlusJakartaSans-ExtraBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 96678DDF29D5CFF80073D683 /* PlusJakartaSans-ExtraBold.ttf */; };
 		FD39DAF22A52AC2100C49A82 /* PlusJakartaSans-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 96678DDD29D5CFF80073D683 /* PlusJakartaSans-Bold.ttf */; };
@@ -128,6 +114,7 @@
 		FD4EC42728A54C9000DDC5C9 /* AZPSnapshotManager.m in Sources */ = {isa = PBXBuildFile; fileRef = FD4EC42528A54C8F00DDC5C9 /* AZPSnapshotManager.m */; };
 		FD4EC42A28A5503400DDC5C9 /* AZPSnapshot.m in Sources */ = {isa = PBXBuildFile; fileRef = FD4EC42928A5503400DDC5C9 /* AZPSnapshot.m */; };
 		FD4EC42B28A5503400DDC5C9 /* AZPSnapshot.m in Sources */ = {isa = PBXBuildFile; fileRef = FD4EC42928A5503400DDC5C9 /* AZPSnapshot.m */; };
+		FD52718E2BF112BB00140A12 /* CIImageLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD52718D2BF112BB00140A12 /* CIImageLoader.swift */; };
 		FD55E4C328B6649F00321128 /* AZPMediaVideoRendererManager.m in Sources */ = {isa = PBXBuildFile; fileRef = FD55E4C228B6649F00321128 /* AZPMediaVideoRendererManager.m */; };
 		FD55E4C428B6649F00321128 /* AZPMediaVideoRendererManager.m in Sources */ = {isa = PBXBuildFile; fileRef = FD55E4C228B6649F00321128 /* AZPMediaVideoRendererManager.m */; };
 		FD5BFC3728C8EF8D0010B34E /* AZPCustomReavealTransition.m in Sources */ = {isa = PBXBuildFile; fileRef = FD5BFC3628C8EF8D0010B34E /* AZPCustomReavealTransition.m */; };
@@ -136,41 +123,21 @@
 		FD79CACD2AE01ED900EB4E33 /* CGImagePropertyOrientation+init_uiOrientation.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD79CACB2AE01ED900EB4E33 /* CGImagePropertyOrientation+init_uiOrientation.swift */; };
 		FD79CACE2AE01ED900EB4E33 /* CGImagePropertyOrientation+init_uiOrientation.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD79CACB2AE01ED900EB4E33 /* CGImagePropertyOrientation+init_uiOrientation.swift */; };
 		FD79CACF2AE01ED900EB4E33 /* CGImagePropertyOrientation+init_uiOrientation.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD79CACB2AE01ED900EB4E33 /* CGImagePropertyOrientation+init_uiOrientation.swift */; };
+		FD7AA9DF2BF4DA1500BEC0E9 /* AZPJSIModulesInstaller.mm in Sources */ = {isa = PBXBuildFile; fileRef = FD7AA9DE2BF4DA1500BEC0E9 /* AZPJSIModulesInstaller.mm */; };
+		FD7AA9E32BF4DAE800BEC0E9 /* BufferLoader.mm in Sources */ = {isa = PBXBuildFile; fileRef = FD7AA9E22BF4DAE800BEC0E9 /* BufferLoader.mm */; };
 		FD8F774628EC310F00E27551 /* AZPMediaHelpers.m in Sources */ = {isa = PBXBuildFile; fileRef = FD8F774528EC310F00E27551 /* AZPMediaHelpers.m */; };
 		FD8F774728EC310F00E27551 /* AZPMediaHelpers.m in Sources */ = {isa = PBXBuildFile; fileRef = FD8F774528EC310F00E27551 /* AZPMediaHelpers.m */; };
-		FDA79D3229DD99D500E16407 /* GPULayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = FDA79D3129DD99D500E16407 /* GPULayer.swift */; };
-		FDA79D3329DD99D500E16407 /* GPULayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = FDA79D3129DD99D500E16407 /* GPULayer.swift */; };
-		FDA79D3829DD9A4900E16407 /* GPULayerImageLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = FDA79D3729DD9A4900E16407 /* GPULayerImageLoader.swift */; };
-		FDA79D3929DD9A4900E16407 /* GPULayerImageLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = FDA79D3729DD9A4900E16407 /* GPULayerImageLoader.swift */; };
 		FDA79D3C29DD9B3F00E16407 /* AVAssetTrack+orientationTransform.swift in Sources */ = {isa = PBXBuildFile; fileRef = FDA79D3B29DD9B3F00E16407 /* AVAssetTrack+orientationTransform.swift */; };
 		FDA79D3D29DD9B3F00E16407 /* AVAssetTrack+orientationTransform.swift in Sources */ = {isa = PBXBuildFile; fileRef = FDA79D3B29DD9B3F00E16407 /* AVAssetTrack+orientationTransform.swift */; };
-		FDA79D5C29DF1F8000E16407 /* GPUImageViewManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = FDA79D5B29DF1F8000E16407 /* GPUImageViewManager.swift */; };
-		FDA79D5D29DF1F8000E16407 /* GPUImageViewManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = FDA79D5B29DF1F8000E16407 /* GPUImageViewManager.swift */; };
 		FDA79D6229E4891100E16407 /* UIColor.swift in Sources */ = {isa = PBXBuildFile; fileRef = FDA79D6129E4891100E16407 /* UIColor.swift */; };
 		FDA79D6329E4891100E16407 /* UIColor.swift in Sources */ = {isa = PBXBuildFile; fileRef = FDA79D6129E4891100E16407 /* UIColor.swift */; };
-		FDA79D6529E596F400E16407 /* AZPGPUImageViewManager.m in Sources */ = {isa = PBXBuildFile; fileRef = FDA79D6429E596F400E16407 /* AZPGPUImageViewManager.m */; };
-		FDA79D6629E596F400E16407 /* AZPGPUImageViewManager.m in Sources */ = {isa = PBXBuildFile; fileRef = FDA79D6429E596F400E16407 /* AZPGPUImageViewManager.m */; };
-		FDA79D6829E6F93E00E16407 /* GPUVideoViewManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = FDA79D6729E6F93E00E16407 /* GPUVideoViewManager.swift */; };
-		FDA79D6929E6F93E00E16407 /* GPUVideoViewManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = FDA79D6729E6F93E00E16407 /* GPUVideoViewManager.swift */; };
-		FDA79D6B29E85A2600E16407 /* AZPGPUVideoViewManager.m in Sources */ = {isa = PBXBuildFile; fileRef = FDA79D6A29E85A2600E16407 /* AZPGPUVideoViewManager.m */; };
-		FDA79D6C29E85A2600E16407 /* AZPGPUVideoViewManager.m in Sources */ = {isa = PBXBuildFile; fileRef = FDA79D6A29E85A2600E16407 /* AZPGPUVideoViewManager.m */; };
 		FDA79D6F29EDA43C00E16407 /* Nuke.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = FDA79D6D29EDA43C00E16407 /* Nuke.xcframework */; };
 		FDA79D7029EDA47700E16407 /* Nuke.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = FDA79D6D29EDA43C00E16407 /* Nuke.xcframework */; };
 		FDA79D7129EDA47700E16407 /* Nuke.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = FDA79D6D29EDA43C00E16407 /* Nuke.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		FDA79D7429EE844000E16407 /* GPUViewError.swift in Sources */ = {isa = PBXBuildFile; fileRef = FDA79D7329EE844000E16407 /* GPUViewError.swift */; };
-		FDA79D7529EE844000E16407 /* GPUViewError.swift in Sources */ = {isa = PBXBuildFile; fileRef = FDA79D7329EE844000E16407 /* GPUViewError.swift */; };
 		FDA79D7829EE8AAC00E16407 /* ReactLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = FDA79D7729EE8AAC00E16407 /* ReactLogger.swift */; };
 		FDA79D7929EE8AAC00E16407 /* ReactLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = FDA79D7729EE8AAC00E16407 /* ReactLogger.swift */; };
 		FDA79D7F29EEA61A00E16407 /* FileUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = FDA79D7E29EEA61A00E16407 /* FileUtils.swift */; };
 		FDA79D8029EEA61A00E16407 /* FileUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = FDA79D7E29EEA61A00E16407 /* FileUtils.swift */; };
-		FDC39C262ABDF15E0074EF19 /* AZPGPUHelpers.m in Sources */ = {isa = PBXBuildFile; fileRef = FDC39C252ABDF15E0074EF19 /* AZPGPUHelpers.m */; };
-		FDC39C272ABDF15E0074EF19 /* AZPGPUHelpers.m in Sources */ = {isa = PBXBuildFile; fileRef = FDC39C252ABDF15E0074EF19 /* AZPGPUHelpers.m */; };
-		FDC39C282ABDF15E0074EF19 /* AZPGPUHelpers.m in Sources */ = {isa = PBXBuildFile; fileRef = FDC39C252ABDF15E0074EF19 /* AZPGPUHelpers.m */; };
-		FDC39C292ABDF15E0074EF19 /* AZPGPUHelpers.m in Sources */ = {isa = PBXBuildFile; fileRef = FDC39C252ABDF15E0074EF19 /* AZPGPUHelpers.m */; };
-		FDC39C2B2ABDF1880074EF19 /* GPUHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = FDC39C2A2ABDF1880074EF19 /* GPUHelpers.swift */; };
-		FDC39C2C2ABDF1880074EF19 /* GPUHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = FDC39C2A2ABDF1880074EF19 /* GPUHelpers.swift */; };
-		FDC39C2D2ABDF1880074EF19 /* GPUHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = FDC39C2A2ABDF1880074EF19 /* GPUHelpers.swift */; };
-		FDC39C2E2ABDF1880074EF19 /* GPUHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = FDC39C2A2ABDF1880074EF19 /* GPUHelpers.swift */; };
 		FEE31A6C38E0F391C4EB6A15 /* libPods-common-azzappTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = CE74E534C6FFD9C022819045 /* libPods-common-azzappTests.a */; };
 /* End PBXBuildFile section */
 
@@ -262,11 +229,11 @@
 		C760EC6F6E4C3A84D4886FFA /* Pods-common-azzapp.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-common-azzapp.debug.xcconfig"; path = "Target Support Files/Pods-common-azzapp/Pods-common-azzapp.debug.xcconfig"; sourceTree = "<group>"; };
 		CA026B00F3848AA15FD79C9E /* libPods-common-azzapp.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-common-azzapp.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		CE74E534C6FFD9C022819045 /* libPods-common-azzappTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-common-azzappTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
-		D98307CB348705F89E1DE6DA /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; includeInIndex = 1; name = PrivacyInfo.xcprivacy; path = azzapp/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
-		E39398FBB9147FF432195F49 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; includeInIndex = 1; name = PrivacyInfo.xcprivacy; path = azzapp/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		D98307CB348705F89E1DE6DA /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xml; name = PrivacyInfo.xcprivacy; path = azzapp/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		E39398FBB9147FF432195F49 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xml; name = PrivacyInfo.xcprivacy; path = azzapp/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		E3F48B659A3DD647D58E1E1E /* Pods-common-azzappTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-common-azzappTests.debug.xcconfig"; path = "Target Support Files/Pods-common-azzappTests/Pods-common-azzappTests.debug.xcconfig"; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
-		FB58ADB2576D4F2277CBDD50 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; includeInIndex = 1; name = PrivacyInfo.xcprivacy; path = azzapp/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		FB58ADB2576D4F2277CBDD50 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xml; name = PrivacyInfo.xcprivacy; path = azzapp/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		FD1404302A0299BA00CCA6B9 /* MediaPipeline.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MediaPipeline.swift; sourceTree = "<group>"; };
 		FD1404332A02AE4B00CCA6B9 /* MediaVideoRendererManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MediaVideoRendererManager.swift; sourceTree = "<group>"; };
 		FD1404442A03FDA700CCA6B9 /* MediaHelpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MediaHelpers.swift; sourceTree = "<group>"; };
@@ -285,25 +252,21 @@
 		FD4EC42528A54C8F00DDC5C9 /* AZPSnapshotManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = AZPSnapshotManager.m; path = azzapp/AZPSnapshotManager.m; sourceTree = "<group>"; };
 		FD4EC42828A5503400DDC5C9 /* AZPSnapshot.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = AZPSnapshot.h; path = azzapp/AZPSnapshot.h; sourceTree = "<group>"; };
 		FD4EC42928A5503400DDC5C9 /* AZPSnapshot.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = AZPSnapshot.m; path = azzapp/AZPSnapshot.m; sourceTree = "<group>"; };
+		FD52718D2BF112BB00140A12 /* CIImageLoader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CIImageLoader.swift; sourceTree = "<group>"; };
 		FD55E4C228B6649F00321128 /* AZPMediaVideoRendererManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AZPMediaVideoRendererManager.m; sourceTree = "<group>"; };
 		FD5BFC3528C8EF8D0010B34E /* AZPCustomReavealTransition.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = AZPCustomReavealTransition.h; path = azzapp/AZPCustomReavealTransition.h; sourceTree = "<group>"; };
 		FD5BFC3628C8EF8D0010B34E /* AZPCustomReavealTransition.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = AZPCustomReavealTransition.m; path = azzapp/AZPCustomReavealTransition.m; sourceTree = "<group>"; };
 		FD79CACB2AE01ED900EB4E33 /* CGImagePropertyOrientation+init_uiOrientation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CGImagePropertyOrientation+init_uiOrientation.swift"; sourceTree = "<group>"; };
+		FD7AA9DD2BF4DA1500BEC0E9 /* AZPJSIModulesInstaller.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AZPJSIModulesInstaller.h; sourceTree = "<group>"; };
+		FD7AA9DE2BF4DA1500BEC0E9 /* AZPJSIModulesInstaller.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = AZPJSIModulesInstaller.mm; sourceTree = "<group>"; };
+		FD7AA9E12BF4DAE800BEC0E9 /* BufferLoader.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BufferLoader.h; sourceTree = "<group>"; };
+		FD7AA9E22BF4DAE800BEC0E9 /* BufferLoader.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = BufferLoader.mm; sourceTree = "<group>"; };
 		FD8F774528EC310F00E27551 /* AZPMediaHelpers.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AZPMediaHelpers.m; sourceTree = "<group>"; };
-		FDA79D3129DD99D500E16407 /* GPULayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GPULayer.swift; sourceTree = "<group>"; };
-		FDA79D3729DD9A4900E16407 /* GPULayerImageLoader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GPULayerImageLoader.swift; sourceTree = "<group>"; };
 		FDA79D3B29DD9B3F00E16407 /* AVAssetTrack+orientationTransform.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AVAssetTrack+orientationTransform.swift"; sourceTree = "<group>"; };
-		FDA79D5B29DF1F8000E16407 /* GPUImageViewManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GPUImageViewManager.swift; sourceTree = "<group>"; };
 		FDA79D6129E4891100E16407 /* UIColor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIColor.swift; sourceTree = "<group>"; };
-		FDA79D6429E596F400E16407 /* AZPGPUImageViewManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AZPGPUImageViewManager.m; sourceTree = "<group>"; };
-		FDA79D6729E6F93E00E16407 /* GPUVideoViewManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GPUVideoViewManager.swift; sourceTree = "<group>"; };
-		FDA79D6A29E85A2600E16407 /* AZPGPUVideoViewManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AZPGPUVideoViewManager.m; sourceTree = "<group>"; };
 		FDA79D6D29EDA43C00E16407 /* Nuke.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; path = Nuke.xcframework; sourceTree = "<group>"; };
-		FDA79D7329EE844000E16407 /* GPUViewError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GPUViewError.swift; sourceTree = "<group>"; };
 		FDA79D7729EE8AAC00E16407 /* ReactLogger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReactLogger.swift; sourceTree = "<group>"; };
 		FDA79D7E29EEA61A00E16407 /* FileUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileUtils.swift; sourceTree = "<group>"; };
-		FDC39C252ABDF15E0074EF19 /* AZPGPUHelpers.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AZPGPUHelpers.m; sourceTree = "<group>"; };
-		FDC39C2A2ABDF1880074EF19 /* GPUHelpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GPUHelpers.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -377,7 +340,7 @@
 				FDA79D7629EE8A9E00E16407 /* ReactUtils */,
 				FDA79D3A29DD9A6600E16407 /* Extensions */,
 				FD14042F2A0298A900CCA6B9 /* Medias */,
-				FDA79D3029DD993200E16407 /* GPU */,
+				FD7AA9E02BF4DA8E00BEC0E9 /* jsi */,
 				13B07FAF1A68108700A75B9A /* AppDelegate.h */,
 				13B07FB01A68108700A75B9A /* AppDelegate.mm */,
 				13B07FB51A68108700A75B9A /* Images.xcassets */,
@@ -530,21 +493,17 @@
 			path = Medias;
 			sourceTree = "<group>";
 		};
-		FDA79D3029DD993200E16407 /* GPU */ = {
+		FD7AA9E02BF4DA8E00BEC0E9 /* jsi */ = {
 			isa = PBXGroup;
 			children = (
-				FDA79D3129DD99D500E16407 /* GPULayer.swift */,
-				FDA79D3729DD9A4900E16407 /* GPULayerImageLoader.swift */,
-				FDA79D6429E596F400E16407 /* AZPGPUImageViewManager.m */,
-				FDA79D5B29DF1F8000E16407 /* GPUImageViewManager.swift */,
-				FDA79D6A29E85A2600E16407 /* AZPGPUVideoViewManager.m */,
-				FDA79D6729E6F93E00E16407 /* GPUVideoViewManager.swift */,
-				FDA79D7329EE844000E16407 /* GPUViewError.swift */,
-				FDC39C252ABDF15E0074EF19 /* AZPGPUHelpers.m */,
-				FDC39C2A2ABDF1880074EF19 /* GPUHelpers.swift */,
+				FD7AA9DD2BF4DA1500BEC0E9 /* AZPJSIModulesInstaller.h */,
+				FD7AA9DE2BF4DA1500BEC0E9 /* AZPJSIModulesInstaller.mm */,
+				FD52718D2BF112BB00140A12 /* CIImageLoader.swift */,
+				FD7AA9E12BF4DAE800BEC0E9 /* BufferLoader.h */,
+				FD7AA9E22BF4DAE800BEC0E9 /* BufferLoader.mm */,
 			);
-			name = GPU;
-			path = azzapp/GPU;
+			name = jsi;
+			path = azzapp/jsi;
 			sourceTree = "<group>";
 		};
 		FDA79D3A29DD9A6600E16407 /* Extensions */ = {
@@ -824,7 +783,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-common-azzapp/expo-configure-project.sh\"\n";
+			shellScript = "# This script configures Expo modules and generates the modules provider file.\nbash -l -c \"./Pods/Target\\ Support\\ Files/Pods-common-azzapp/expo-configure-project.sh\"\n";
 		};
 		0CF0FDAD64DB4AD1480B116A /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -904,7 +863,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-common-azzapp-staging/expo-configure-project.sh\"\n";
+			shellScript = "# This script configures Expo modules and generates the modules provider file.\nbash -l -c \"./Pods/Target\\ Support\\ Files/Pods-common-azzapp-staging/expo-configure-project.sh\"\n";
 		};
 		5F06472D76E90B141A1DE7C5 /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -1013,7 +972,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-common-azzapp-dev/expo-configure-project.sh\"\n";
+			shellScript = "# This script configures Expo modules and generates the modules provider file.\nbash -l -c \"./Pods/Target\\ Support\\ Files/Pods-common-azzapp-dev/expo-configure-project.sh\"\n";
 		};
 		B98CDACE60DE2789924723D0 /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -1080,7 +1039,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-common-azzappTests/expo-configure-project.sh\"\n";
+			shellScript = "# This script configures Expo modules and generates the modules provider file.\nbash -l -c \"./Pods/Target\\ Support\\ Files/Pods-common-azzappTests/expo-configure-project.sh\"\n";
 		};
 		F536081CC5A29BABA1410187 /* [CP] Copy Pods Resources */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -1248,26 +1207,17 @@
 				FD1404352A02AE4B00CCA6B9 /* MediaVideoRendererManager.swift in Sources */,
 				FD1EA61428B920A700916DBC /* AZPMediaImageRendererManager.m in Sources */,
 				FD1EA61128B8D7F400916DBC /* MediaImageRendererManager.swift in Sources */,
-				FDA79D3329DD99D500E16407 /* GPULayer.swift in Sources */,
 				FD1404552A0949C000CCA6B9 /* MediaURICache.swift in Sources */,
-				FDA79D7529EE844000E16407 /* GPUViewError.swift in Sources */,
 				FD1EA62A28BBA1BE00916DBC /* AZPScrollToTopInterceptor.m in Sources */,
 				FDA79D8029EEA61A00E16407 /* FileUtils.swift in Sources */,
-				FDA79D3929DD9A4900E16407 /* GPULayerImageLoader.swift in Sources */,
-				FDA79D6929E6F93E00E16407 /* GPUVideoViewManager.swift in Sources */,
 				FDA79D6329E4891100E16407 /* UIColor.swift in Sources */,
 				FD1404322A0299BA00CCA6B9 /* MediaPipeline.swift in Sources */,
-				FDC39C292ABDF15E0074EF19 /* AZPGPUHelpers.m in Sources */,
 				FDA79D3D29DD9B3F00E16407 /* AVAssetTrack+orientationTransform.swift in Sources */,
 				FD4EC42728A54C9000DDC5C9 /* AZPSnapshotManager.m in Sources */,
 				FD8F774728EC310F00E27551 /* AZPMediaHelpers.m in Sources */,
-				FDA79D6629E596F400E16407 /* AZPGPUImageViewManager.m in Sources */,
-				FDA79D5D29DF1F8000E16407 /* GPUImageViewManager.swift in Sources */,
 				FD79CACF2AE01ED900EB4E33 /* CGImagePropertyOrientation+init_uiOrientation.swift in Sources */,
 				FD4EC42B28A5503400DDC5C9 /* AZPSnapshot.m in Sources */,
-				FDA79D6C29E85A2600E16407 /* AZPGPUVideoViewManager.m in Sources */,
 				FD5BFC3828C8EF8D0010B34E /* AZPCustomReavealTransition.m in Sources */,
-				FDC39C2E2ABDF1880074EF19 /* GPUHelpers.swift in Sources */,
 				FD1404462A03FDA800CCA6B9 /* MediaHelpers.swift in Sources */,
 				FD1404522A07EA4900CCA6B9 /* AVAssetCache.swift in Sources */,
 				FD55E4C428B6649F00321128 /* AZPMediaVideoRendererManager.m in Sources */,
@@ -1282,12 +1232,12 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				FD52718E2BF112BB00140A12 /* CIImageLoader.swift in Sources */,
 				FD1EA61028B8D7F400916DBC /* MediaImageRendererManager.swift in Sources */,
 				FD1EA62928BBA1BE00916DBC /* AZPScrollToTopInterceptor.m in Sources */,
+				FD7AA9DF2BF4DA1500BEC0E9 /* AZPJSIModulesInstaller.mm in Sources */,
 				FD5BFC3728C8EF8D0010B34E /* AZPCustomReavealTransition.m in Sources */,
-				FDA79D6829E6F93E00E16407 /* GPUVideoViewManager.swift in Sources */,
 				FD1404312A0299BA00CCA6B9 /* MediaPipeline.swift in Sources */,
-				FDA79D3829DD9A4900E16407 /* GPULayerImageLoader.swift in Sources */,
 				FDA79D7829EE8AAC00E16407 /* ReactLogger.swift in Sources */,
 				FDA79D7F29EEA61A00E16407 /* FileUtils.swift in Sources */,
 				FD55E4C328B6649F00321128 /* AZPMediaVideoRendererManager.m in Sources */,
@@ -1295,22 +1245,16 @@
 				FD8F774628EC310F00E27551 /* AZPMediaHelpers.m in Sources */,
 				FD1EA61328B920A700916DBC /* AZPMediaImageRendererManager.m in Sources */,
 				FD1404452A03FDA800CCA6B9 /* MediaHelpers.swift in Sources */,
-				FDC39C262ABDF15E0074EF19 /* AZPGPUHelpers.m in Sources */,
-				FDA79D6B29E85A2600E16407 /* AZPGPUVideoViewManager.m in Sources */,
 				FD1404512A07EA4900CCA6B9 /* AVAssetCache.swift in Sources */,
 				FDA79D3C29DD9B3F00E16407 /* AVAssetTrack+orientationTransform.swift in Sources */,
 				FD4EC42A28A5503400DDC5C9 /* AZPSnapshot.m in Sources */,
 				FD4EC42628A54C9000DDC5C9 /* AZPSnapshotManager.m in Sources */,
 				FD79CACC2AE01ED900EB4E33 /* CGImagePropertyOrientation+init_uiOrientation.swift in Sources */,
 				13B07FBC1A68108700A75B9A /* AppDelegate.mm in Sources */,
-				FDA79D7429EE844000E16407 /* GPUViewError.swift in Sources */,
 				13B07FC11A68108700A75B9A /* main.m in Sources */,
-				FDC39C2B2ABDF1880074EF19 /* GPUHelpers.swift in Sources */,
-				FDA79D5C29DF1F8000E16407 /* GPUImageViewManager.swift in Sources */,
 				FD1404342A02AE4B00CCA6B9 /* MediaVideoRendererManager.swift in Sources */,
-				FDA79D3229DD99D500E16407 /* GPULayer.swift in Sources */,
+				FD7AA9E32BF4DAE800BEC0E9 /* BufferLoader.mm in Sources */,
 				FD1404542A0949C000CCA6B9 /* MediaURICache.swift in Sources */,
-				FDA79D6529E596F400E16407 /* AZPGPUImageViewManager.m in Sources */,
 				92A812FC3DCC67A8944B9ED9 /* ExpoModulesProvider.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1322,9 +1266,7 @@
 				FD39DA982A52AB5F00C49A82 /* MediaImageRendererManager.swift in Sources */,
 				FD39DA992A52AB5F00C49A82 /* AZPScrollToTopInterceptor.m in Sources */,
 				FD39DA9A2A52AB5F00C49A82 /* AZPCustomReavealTransition.m in Sources */,
-				FD39DA9C2A52AB5F00C49A82 /* GPUVideoViewManager.swift in Sources */,
 				FD39DA9D2A52AB5F00C49A82 /* MediaPipeline.swift in Sources */,
-				FD39DA9E2A52AB5F00C49A82 /* GPULayerImageLoader.swift in Sources */,
 				FD39DA9F2A52AB5F00C49A82 /* ReactLogger.swift in Sources */,
 				FD39DAA02A52AB5F00C49A82 /* FileUtils.swift in Sources */,
 				FD39DAA12A52AB5F00C49A82 /* AZPMediaVideoRendererManager.m in Sources */,
@@ -1332,22 +1274,15 @@
 				FD39DAA32A52AB5F00C49A82 /* AZPMediaHelpers.m in Sources */,
 				FD39DAA42A52AB5F00C49A82 /* AZPMediaImageRendererManager.m in Sources */,
 				FD39DAA52A52AB5F00C49A82 /* MediaHelpers.swift in Sources */,
-				FDC39C272ABDF15E0074EF19 /* AZPGPUHelpers.m in Sources */,
-				FD39DAA62A52AB5F00C49A82 /* AZPGPUVideoViewManager.m in Sources */,
 				FD39DAA72A52AB5F00C49A82 /* AVAssetCache.swift in Sources */,
 				FD39DAA82A52AB5F00C49A82 /* AVAssetTrack+orientationTransform.swift in Sources */,
 				FD39DAA92A52AB5F00C49A82 /* AZPSnapshot.m in Sources */,
 				FD39DAAA2A52AB5F00C49A82 /* AZPSnapshotManager.m in Sources */,
 				FD79CACD2AE01ED900EB4E33 /* CGImagePropertyOrientation+init_uiOrientation.swift in Sources */,
 				FD39DAAB2A52AB5F00C49A82 /* AppDelegate.mm in Sources */,
-				FD39DAAC2A52AB5F00C49A82 /* GPUViewError.swift in Sources */,
 				FD39DAAD2A52AB5F00C49A82 /* main.m in Sources */,
-				FDC39C2C2ABDF1880074EF19 /* GPUHelpers.swift in Sources */,
-				FD39DAAE2A52AB5F00C49A82 /* GPUImageViewManager.swift in Sources */,
 				FD39DAAF2A52AB5F00C49A82 /* MediaVideoRendererManager.swift in Sources */,
-				FD39DAB02A52AB5F00C49A82 /* GPULayer.swift in Sources */,
 				FD39DAB22A52AB5F00C49A82 /* MediaURICache.swift in Sources */,
-				FD39DAB32A52AB5F00C49A82 /* AZPGPUImageViewManager.m in Sources */,
 				D12BE8C9C8CFB933AEF16748 /* ExpoModulesProvider.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1359,9 +1294,7 @@
 				FD39DACF2A52AC2100C49A82 /* MediaImageRendererManager.swift in Sources */,
 				FD39DAD02A52AC2100C49A82 /* AZPScrollToTopInterceptor.m in Sources */,
 				FD39DAD12A52AC2100C49A82 /* AZPCustomReavealTransition.m in Sources */,
-				FD39DAD32A52AC2100C49A82 /* GPUVideoViewManager.swift in Sources */,
 				FD39DAD42A52AC2100C49A82 /* MediaPipeline.swift in Sources */,
-				FD39DAD52A52AC2100C49A82 /* GPULayerImageLoader.swift in Sources */,
 				FD39DAD62A52AC2100C49A82 /* ReactLogger.swift in Sources */,
 				FD39DAD72A52AC2100C49A82 /* FileUtils.swift in Sources */,
 				FD39DAD82A52AC2100C49A82 /* AZPMediaVideoRendererManager.m in Sources */,
@@ -1369,22 +1302,15 @@
 				FD39DADA2A52AC2100C49A82 /* AZPMediaHelpers.m in Sources */,
 				FD39DADB2A52AC2100C49A82 /* AZPMediaImageRendererManager.m in Sources */,
 				FD39DADC2A52AC2100C49A82 /* MediaHelpers.swift in Sources */,
-				FDC39C282ABDF15E0074EF19 /* AZPGPUHelpers.m in Sources */,
-				FD39DADD2A52AC2100C49A82 /* AZPGPUVideoViewManager.m in Sources */,
 				FD39DADE2A52AC2100C49A82 /* AVAssetCache.swift in Sources */,
 				FD39DADF2A52AC2100C49A82 /* AVAssetTrack+orientationTransform.swift in Sources */,
 				FD39DAE02A52AC2100C49A82 /* AZPSnapshot.m in Sources */,
 				FD39DAE12A52AC2100C49A82 /* AZPSnapshotManager.m in Sources */,
 				FD79CACE2AE01ED900EB4E33 /* CGImagePropertyOrientation+init_uiOrientation.swift in Sources */,
 				FD39DAE22A52AC2100C49A82 /* AppDelegate.mm in Sources */,
-				FD39DAE32A52AC2100C49A82 /* GPUViewError.swift in Sources */,
 				FD39DAE42A52AC2100C49A82 /* main.m in Sources */,
-				FDC39C2D2ABDF1880074EF19 /* GPUHelpers.swift in Sources */,
-				FD39DAE52A52AC2100C49A82 /* GPUImageViewManager.swift in Sources */,
 				FD39DAE62A52AC2100C49A82 /* MediaVideoRendererManager.swift in Sources */,
-				FD39DAE72A52AC2100C49A82 /* GPULayer.swift in Sources */,
 				FD39DAE92A52AC2100C49A82 /* MediaURICache.swift in Sources */,
-				FD39DAEA2A52AC2100C49A82 /* AZPGPUImageViewManager.m in Sources */,
 				51C74448A13281FB32E24633 /* ExpoModulesProvider.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

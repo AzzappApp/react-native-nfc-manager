@@ -1,16 +1,11 @@
 import { Suspense, forwardRef } from 'react';
 import { FormattedMessage } from 'react-intl';
 import { View } from 'react-native';
-import { graphql, useLazyLoadQuery } from 'react-relay';
 import { colors } from '#theme';
-import CoverEditor from '#components/CoverEditor';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import useScreenInsets from '#hooks/useScreenInsets';
 import ActivityIndicator from '#ui/ActivityIndicator';
-import { BUTTON_HEIGHT } from '#ui/Button';
 import Text from '#ui/Text';
-import type { CoverEditorHandle } from '#components/CoverEditor/CoverEditor';
-import type { CoverEditionStepQuery } from '#relayArtifacts/CoverEditionStepQuery.graphql';
 import type { ForwardedRef } from 'react';
 
 type CoverEditionStepProps = {
@@ -21,23 +16,10 @@ type CoverEditionStepProps = {
 };
 
 const CoverEditionStep = (
-  { profileId, height, onCoverSaved, setCanSave }: CoverEditionStepProps,
-  forwardRef: ForwardedRef<CoverEditorHandle>,
+  { height }: CoverEditionStepProps,
+  _forwardRef: ForwardedRef<any>,
 ) => {
-  const data = useLazyLoadQuery<CoverEditionStepQuery>(
-    graphql`
-      query CoverEditionStepQuery($profileId: ID!) {
-        profile: node(id: $profileId) {
-          ...CoverEditor_profile
-        }
-      }
-    `,
-    { profileId },
-  );
-
   const insets = useScreenInsets();
-  const editorHeight =
-    height - SUBTITLE_HEIGHT - BUTTON_HEIGHT - 16 - Math.min(insets.bottom, 16);
 
   const styles = useStyleSheet(stylesheet);
 
@@ -61,21 +43,7 @@ const CoverEditionStep = (
             />
           </Text>
         </View>
-        <View style={{ flex: 1, paddingBottom: Math.min(insets.bottom, 16) }}>
-          {/*
-            the profile from CoverEditor_profile is null in some case 
-            (this condition fix https://github.com/AzzappApp/azzapp/issues/1384. ) 
-          */}
-          {data.profile != null && (
-            <CoverEditor
-              ref={forwardRef}
-              profile={data.profile}
-              height={editorHeight}
-              onCoverSaved={onCoverSaved}
-              onCanSaveChange={setCanSave}
-            />
-          )}
-        </View>
+        <View style={{ flex: 1, paddingBottom: Math.min(insets.bottom, 16) }} />
       </Suspense>
     </View>
   );

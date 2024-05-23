@@ -1,4 +1,29 @@
 PODS:
+  - azzapp-react-native-skia-video (0.1.2):
+    - DoubleConversion
+    - glog
+    - hermes-engine
+    - RCT-Folly (= 2024.01.01.00)
+    - RCTRequired
+    - RCTTypeSafety
+    - React
+    - React-callinvoker
+    - React-Codegen
+    - React-Core
+    - React-debug
+    - React-Fabric
+    - React-featureflags
+    - React-graphics
+    - React-ImageManager
+    - react-native-skia
+    - React-NativeModulesApple
+    - React-RCTFabric
+    - React-rendererdebug
+    - React-utils
+    - ReactCommon/turbomodule/bridging
+    - ReactCommon/turbomodule/core
+    - RNReanimated
+    - Yoga
   - boost (1.83.0)
   - DoubleConversion (1.1.6)
   - EXAV (14.0.5):
@@ -1510,6 +1535,7 @@ PODS:
   - Yoga (0.0.0)
 
 DEPENDENCIES:
+  - "azzapp-react-native-skia-video (from `../../../node_modules/@azzapp/react-native-skia-video`)"
   - boost (from `../../../node_modules/react-native/third-party-podspecs/boost.podspec`)
   - DoubleConversion (from `../../../node_modules/react-native/third-party-podspecs/DoubleConversion.podspec`)
   - EXAV (from `../../../node_modules/expo-av/ios`)
@@ -1630,6 +1656,8 @@ SPEC REPOS:
     - SocketRocket
 
 EXTERNAL SOURCES:
+  azzapp-react-native-skia-video:
+    :path: "../../../node_modules/@azzapp/react-native-skia-video"
   boost:
     :podspec: "../../../node_modules/react-native/third-party-podspecs/boost.podspec"
   DoubleConversion:
@@ -1831,6 +1859,7 @@ EXTERNAL SOURCES:
     :path: "../../../node_modules/react-native/ReactCommon/yoga"
 
 SPEC CHECKSUMS:
+  azzapp-react-native-skia-video: 57b72bb8f537023c2a8ec6c1efbbc20545914a79
   boost: d3f49c53809116a5d38da093a8aa78bf551aed09
   DoubleConversion: 76ab83afb40bddeeee456813d9c04f67f78771b5
   EXAV: cb6e8dbcc40873d8a386af357e6c2eb55d6d739e
@@ -1943,8 +1972,8 @@ SPEC CHECKSUMS:
   Sentry: cd86fc55628f5b7c572cabe66cc8f95a9d2f165a
   SocketRocket: abac6f5de4d4d62d24e11868d7a2f427e0ef940d
   VisionCamera: 59949b04a51c00a52a6d7125425d01664792c9bd
-  Yoga: 348f8b538c3ed4423eb58a8e5730feec50bce372
+  Yoga: b9a182ab00cf25926e7f79657d08c5d23c2d03b0
 
 PODFILE CHECKSUM: b53934a587b007df3ef8109841539094ed70e432
 
-COCOAPODS: 1.15.2
+COCOAPODS: 1.14.3

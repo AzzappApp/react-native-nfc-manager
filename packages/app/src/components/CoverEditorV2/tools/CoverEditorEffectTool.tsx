@@ -6,11 +6,11 @@ import { typedEntries } from '@azzapp/shared/objectHelpers';
 import { colors, shadow } from '#theme';
 import { DoneHeaderButton } from '#components/commonsButtons';
 import { useAnimationLabel } from '#components/CoverRenderer/MediaAnimator';
-import { useFilterLabels } from '#components/gpu';
 import {
   createVariantsStyleSheet,
   useVariantStyleSheet,
 } from '#helpers/createStyles';
+import { useFilterLabels } from '#helpers/mediaEditions';
 import useScreenInsets from '#hooks/useScreenInsets';
 import useToggle from '#hooks/useToggle';
 import BottomSheetModal from '#ui/BottomSheetModal';

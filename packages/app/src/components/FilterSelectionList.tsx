@@ -1,22 +1,24 @@
 import { useCallback } from 'react';
 import { useIntl } from 'react-intl';
 import { typedEntries } from '@azzapp/shared/objectHelpers';
+import { useFilterLabels } from '#helpers/mediaEditions';
 import BoxSelectionList from './BoxSelectionList';
-import { GPUImageView, getFilterUri, useFilterLabels } from './gpu';
+import TransformedImageRenderer from './TransformedImageRenderer';
+import type { Filter } from '#helpers/mediaEditions';
 import type { BoxButtonItemInfo } from './BoxSelectionList';
-import type { ImageLayer, VideoFrameLayer } from './gpu';
+import type { SkImage } from '@shopify/react-native-skia';
 import type { ViewProps } from 'react-native';
 
 type FilterSelectionListProps = ViewProps & {
-  layer: ImageLayer | VideoFrameLayer;
+  skImage: SkImage | null;
   aspectRatio: number;
   selectedFilter: string | null;
   cardRadius?: number;
-  onChange(value: string | null): void;
+  onChange(value: Filter | null): void;
 };
 
 const FilterSelectionList = ({
-  layer,
+  skImage,
   aspectRatio,
   selectedFilter,
   onChange,
@@ -25,25 +27,22 @@ const FilterSelectionList = ({
   const filters = typedEntries(useFilterLabels());
 
   const renderItem = useCallback(
-    ({ item, height, width }: BoxButtonItemInfo<[string, string]>) => {
+    ({ item, height, width }: BoxButtonItemInfo<[Filter, string] | null>) => {
       const filter = item?.[0];
       return (
-        <GPUImageView
-          style={{ height, width }}
-          layers={[
-            {
-              ...layer,
-              lutFilterUri: getFilterUri(filter),
-            },
-          ]}
+        <TransformedImageRenderer
+          image={skImage}
+          width={width}
+          height={height}
+          filter={filter}
         />
       );
     },
-    [layer],
+    [skImage],
   );
 
   const onSelect = useCallback(
-    (item: [string, string] | null) => {
+    (item: [Filter, string] | null) => {
       onChange(item ? item[0] : null);
     },
     [onChange],

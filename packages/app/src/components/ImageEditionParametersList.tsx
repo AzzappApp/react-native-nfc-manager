@@ -6,8 +6,8 @@ import Text from '#ui/Text';
 import {
   editionParametersSettings,
   useEditionParametersDisplayInfos,
-} from './gpu';
-import type { EditionParameters } from './gpu';
+} from '../helpers/mediaEditions';
+import type { EditionParameters } from '../helpers/mediaEditions';
 import type { ScrollViewProps } from 'react-native';
 
 type EditionParametersListProps = Omit<ScrollViewProps, 'hitSlop'> & {
@@ -86,10 +86,8 @@ const parametersList: Array<keyof EditionParameters> = [
   'highlights',
   'shadow',
   'temperature',
-  'tint',
   'saturation',
   'vibrance',
   'sharpness',
-  'structure',
   'vignetting',
 ];
