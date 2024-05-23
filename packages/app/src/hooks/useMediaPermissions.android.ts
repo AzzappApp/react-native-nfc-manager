@@ -10,13 +10,16 @@ function useMediaPermission(): {
 
   const ask = useCallback(async () => {
     const result: MediaLibrary.PermissionResponse =
-      await MediaLibrary.requestPermissionsAsync();
+      await MediaLibrary.requestPermissionsAsync(false, ['photo', 'video']);
     setStatus(convertPermissionResponse(result));
   }, []);
 
   useEffect(() => {
     const checkStatus = async () => {
-      const newStatus = await MediaLibrary.getPermissionsAsync();
+      const newStatus = await MediaLibrary.getPermissionsAsync(false, [
+        'photo',
+        'video',
+      ]);
       setStatus(convertPermissionResponse(newStatus));
     };
     checkStatus();

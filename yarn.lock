@@ -122,9 +122,9 @@ __metadata:
     "@expo-google-fonts/ultra": ^0.2.3
     "@expo-google-fonts/water-brush": ^0.2.3
     "@expo-google-fonts/yeseva-one": ^0.2.3
-    "@formatjs/intl-locale": ^3.4.5
-    "@formatjs/intl-pluralrules": ^5.2.12
-    "@formatjs/intl-relativetimeformat": ^11.2.12
+    "@formatjs/intl-locale": ^3.4.6
+    "@formatjs/intl-pluralrules": ^5.2.14
+    "@formatjs/intl-relativetimeformat": ^11.2.14
     "@hookform/resolvers": ^3.3.4
     "@miblanchard/react-native-slider": 2.6.0
     "@react-native-async-storage/async-storage": ^1.23.1
@@ -134,7 +134,7 @@ __metadata:
     "@reeq/react-native-passkit": ^0.1.3
     "@sentry/react-native": ^5.22.2
     "@shopify/flash-list": 1.6.4
-    "@shopify/react-native-skia": ^1.2.3
+    "@shopify/react-native-skia": ^1.3.0
     "@testing-library/react-native": ^12.5.0
     "@types/chroma-js": ^2.4.4
     "@types/react": ^18.3.2
@@ -5280,6 +5280,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@formatjs/ecma402-abstract@npm:1.18.3":
+  version: 1.18.3
+  resolution: "@formatjs/ecma402-abstract@npm:1.18.3"
+  dependencies:
+    "@formatjs/intl-localematcher": 0.5.4
+    tslib: ^2.4.0
+  checksum: f41b42c93f80b1150171405e1a73be2f56efe108f4307da294024713521acd76a802b5d21d9846800bf41089d08676c4349fd8eecad59866a2f9a4815fcb250f
+  languageName: node
+  linkType: hard
+
 "@formatjs/ecma402-abstract@npm:2.0.0":
   version: 2.0.0
   resolution: "@formatjs/ecma402-abstract@npm:2.0.0"
@@ -5363,12 +5373,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@formatjs/intl-enumerator@npm:1.4.5":
-  version: 1.4.5
-  resolution: "@formatjs/intl-enumerator@npm:1.4.5"
+"@formatjs/intl-enumerator@npm:1.4.6":
+  version: 1.4.6
+  resolution: "@formatjs/intl-enumerator@npm:1.4.6"
   dependencies:
     tslib: ^2.4.0
-  checksum: 674dbbbd00fb1ac96545780a58de2716eabbfb32da47ff8bd07e94ba4e24a722c0bac37eb3781123576fc7ab044ed60d7f57b96c7f3d4521bfc63811f0f63d26
+  checksum: 563c63fbf3f3d0062099cb1fb4d6472423de8c585bd121648ddaa244623b265b72b92e0d8facb78686085ffc412b770e9ab35a66c2276703462783b4321f3245
   languageName: node
   linkType: hard
 
@@ -5403,15 +5413,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@formatjs/intl-locale@npm:^3.4.5":
-  version: 3.4.5
-  resolution: "@formatjs/intl-locale@npm:3.4.5"
+"@formatjs/intl-locale@npm:^3.4.6":
+  version: 3.4.6
+  resolution: "@formatjs/intl-locale@npm:3.4.6"
   dependencies:
-    "@formatjs/ecma402-abstract": 1.18.2
-    "@formatjs/intl-enumerator": 1.4.5
+    "@formatjs/ecma402-abstract": 1.18.3
+    "@formatjs/intl-enumerator": 1.4.6
     "@formatjs/intl-getcanonicallocales": 2.3.0
     tslib: ^2.4.0
-  checksum: f479eda0cae9146209e3cd2bf10da40bff3a9aba7b420a3268c4b545d5a03160a394b9bf9a8a50a76b9160332c67c2fce3cc63221f9ad3c0825482963774a78b
+  checksum: cd0d27277246068da912c359a3bb22f8eda2b64f5226d6fe93ade7545ab2e9d66efcebcdfd7c592c56196bebb9bf0a1f4d402b7afb3f4551c290d175c0a7c3da
   languageName: node
   linkType: hard
 
@@ -5424,25 +5434,25 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@formatjs/intl-pluralrules@npm:^5.2.12":
-  version: 5.2.12
-  resolution: "@formatjs/intl-pluralrules@npm:5.2.12"
+"@formatjs/intl-pluralrules@npm:^5.2.14":
+  version: 5.2.14
+  resolution: "@formatjs/intl-pluralrules@npm:5.2.14"
   dependencies:
-    "@formatjs/ecma402-abstract": 1.18.2
+    "@formatjs/ecma402-abstract": 2.0.0
     "@formatjs/intl-localematcher": 0.5.4
     tslib: ^2.4.0
-  checksum: d85a15f3a83a2fa1d0154ba26837dfcc0b703f2f82762258e6f12fe0604d2b3faffc67c184bf6118df45b2c755da91022d4a8a126d5c88f3efb1c92da96348b8
+  checksum: 515d95cd46bebba4745b7e7b2e8a90111013ff3ebb6e4d7a0422f38c7de0ed58c0e936a4a37e4501941dda474523d4af5d5dddf9dd38184d8d2f8330336f6be5
   languageName: node
   linkType: hard
 
-"@formatjs/intl-relativetimeformat@npm:^11.2.12":
-  version: 11.2.12
-  resolution: "@formatjs/intl-relativetimeformat@npm:11.2.12"
+"@formatjs/intl-relativetimeformat@npm:^11.2.14":
+  version: 11.2.14
+  resolution: "@formatjs/intl-relativetimeformat@npm:11.2.14"
   dependencies:
-    "@formatjs/ecma402-abstract": 1.18.2
+    "@formatjs/ecma402-abstract": 2.0.0
     "@formatjs/intl-localematcher": 0.5.4
     tslib: ^2.4.0
-  checksum: 035a1f68c3f9d90049e67a4afb60b7bb34ac4b4c28399b56b3df7ab11b78d9bc9f90da47b55a2ad9e10056590806616eccf6ac2983f7739505942b4588e817fe
+  checksum: 2209acbd96928fa49bc806c80380bcfc85547c357e19899190d97c248ed5cf184fdcd47eb8a3c73b4bac8da320c443e4db3131704e98f38754911c1d62683c86
   languageName: node
   linkType: hard
 
@@ -8806,9 +8816,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@shopify/react-native-skia@npm:^1.2.3":
-  version: 1.2.3
-  resolution: "@shopify/react-native-skia@npm:1.2.3"
+"@shopify/react-native-skia@npm:^1.3.0":
+  version: 1.3.0
+  resolution: "@shopify/react-native-skia@npm:1.3.0"
   dependencies:
     canvaskit-wasm: 0.39.1
     react-reconciler: 0.27.0
@@ -8823,7 +8833,7 @@ __metadata:
       optional: true
   bin:
     setup-skia-web: scripts/setup-canvaskit.js
-  checksum: 9fd9dc0546c32b153171265d0932b27e10d3755e8befceb3daaecd649fb2a2d6e9972ffd8f88759e10112fb21c95a119da8fc06c62d6df30615d99aa3ea0425a
+  checksum: a9349a6065c9bee50a5bc1ed1df23db25d3d95cfe551e04e011331a727155cb4d9747a023ebad9675481c4794cd72ea5eb3d2a9b0cfa8f3129dd9673cd676cc4
   languageName: node
   linkType: hard
 
