@@ -431,8 +431,8 @@ export const upgradePlan = async (
         taxes,
         subscriptionId,
       })
-      .where(eq(UserSubscriptionTable.id, subscriptionId));
-    return (await getSubscriptionById(subscriptionId))!;
+      .where(eq(UserSubscriptionTable.id, existingSubscription.id));
+    return (await getSubscriptionById(existingSubscription.id))!;
   } else {
     throw new Error('Cannot upgrade plan for yearly subscription');
   }
