@@ -1,5 +1,6 @@
-## 0.5.15-canary.5
+## 0.5.15-canary.6
 
+* **fix:**  - **payment:** incorrect id used in upgrade plan update ([#3453](https://github.com/AzzappApp/azzapp/pull/3453))
 * **fix:**  - many errors due to pr [#3440](https://github.com/AzzappApp/azzapp/pull/3440) ([#3449](https://github.com/AzzappApp/azzapp/pull/3449))
 * **build:**  - fix podfile
 * **fix:**  - **multiUser:** [#3353](https://github.com/AzzappApp/azzapp/pull/3353) avatar is overriden by exportVcf ([#3445](https://github.com/AzzappApp/azzapp/pull/3445))
