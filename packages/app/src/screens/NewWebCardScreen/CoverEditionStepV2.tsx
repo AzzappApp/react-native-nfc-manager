@@ -1,4 +1,4 @@
-import { Suspense, forwardRef, useState } from 'react';
+import { Suspense, forwardRef, useImperativeHandle, useState } from 'react';
 import { View } from 'react-native';
 import { graphql, useLazyLoadQuery } from 'react-relay';
 import { colors } from '#theme';
@@ -8,7 +8,9 @@ import CoverEditorV2TemplateList from '#components/CoverEditorV2/templateList/Co
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 // import useScreenInsets from '#hooks/useScreenInsets';
 import ActivityIndicator from '#ui/ActivityIndicator';
+import type { CoverEditorHandle } from '#components/CoverEditor/CoverEditor';
 import type { CoverEditionStepV2Query } from '#relayArtifacts/CoverEditionStepV2Query.graphql';
+import type { ForwardedRef } from 'react';
 
 type CoverEditionStepProps = {
   profileId: string;
@@ -17,12 +19,15 @@ type CoverEditionStepProps = {
   setCanSave: (value: boolean) => void;
 };
 
-const CoverEditionStep = ({
-  height,
-  profileId,
-  // onCoverSaved,
-  // setCanSave,
-}: CoverEditionStepProps) => {
+const CoverEditionStep = (
+  {
+    height,
+    profileId,
+    // onCoverSaved,
+    // setCanSave,
+  }: CoverEditionStepProps,
+  ref: ForwardedRef<CoverEditorHandle>,
+) => {
   const [coverTemplatePreview, setCoverTemplatePreview] = useState<
     string | null
   >(null);
@@ -39,6 +44,12 @@ const CoverEditionStep = ({
     `,
     { profileId },
   );
+
+  useImperativeHandle(ref, () => ({
+    save: () => {
+      console.log('save');
+    },
+  }));
 
   // const insets = useScreenInsets();
 

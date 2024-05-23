@@ -69,11 +69,13 @@ export type BlurredFloatingIconButtonProps = FloatingIconButtonProps & {
   blurIntensty?: number;
 };
 
-export const BlurredFloatingIconButtonRef = (
-  { icon, iconSize = 18, iconStyle, ...props }: BlurredFloatingIconButtonProps,
-  ref: ForwardedRef<View>,
-) => (
-  <BlurredFloatingButtonRef ref={ref} {...props}>
+export const BlurredFloatingIconButton = ({
+  icon,
+  iconSize = 18,
+  iconStyle,
+  ...props
+}: BlurredFloatingIconButtonProps) => (
+  <BlurredFloatingButtonRef {...props}>
     <Icon
       icon={icon}
       style={[
@@ -85,10 +87,6 @@ export const BlurredFloatingIconButtonRef = (
       ]}
     />
   </BlurredFloatingButtonRef>
-);
-
-export const BlurredFloatingIconButton = forwardRef(
-  BlurredFloatingIconButtonRef,
 );
 
 export const FLOATING_BUTTON_SIZE = 50;
