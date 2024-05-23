@@ -162,12 +162,14 @@ const inviteUsersListMutation: MutationResolvers['inviteUsersList'] = async (
       )
       .then(res => res);
 
-    if (!auth.userId) {
-      throw new GraphQLError(ERRORS.UNAUTHORIZED);
+    const owner = await loaders.webCardOwners.load(profile.webCardId);
+
+    if (!owner) {
+      throw new GraphQLError(ERRORS.INVALID_REQUEST);
     }
 
     const canBeAdded = await checkSubscription(
-      auth.userId,
+      owner.id,
       webCard.id,
       createdProfiles.length,
     );
