@@ -432,7 +432,6 @@ export const upgradePlan = async (
         subscriptionId,
       })
       .where(eq(UserSubscriptionTable.id, subscriptionId));
-
     return (await getSubscriptionById(subscriptionId))!;
   } else {
     throw new Error('Cannot upgrade plan for yearly subscription');
@@ -509,9 +508,9 @@ export const endSubscription = async (
         canceledAt: new Date(),
         status: 'canceled',
       })
-      .where(eq(UserSubscriptionTable.id, subscriptionId));
+      .where(eq(UserSubscriptionTable.id, existingSubscription.id));
 
-    return (await getSubscriptionById(subscriptionId))!;
+    return (await getSubscriptionById(existingSubscription.id))!;
   }
 };
 
