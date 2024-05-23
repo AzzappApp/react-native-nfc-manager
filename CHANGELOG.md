@@ -1,4 +1,4 @@
-## 0.5.15-canary.10
+## 0.5.15-canary.11
 
 * **fix:**  - **multiUser:** [#3450](https://github.com/AzzappApp/azzapp/pull/3450) check subscription of owner ([#3451](https://github.com/AzzappApp/azzapp/pull/3451))
 * **fix:**  - **home:** [#3340](https://github.com/AzzappApp/azzapp/pull/3340) use value as closest as possible ([#3467](https://github.com/AzzappApp/azzapp/pull/3467))
