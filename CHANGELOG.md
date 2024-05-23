@@ -1,5 +1,6 @@
-## 0.5.15-canary.9
+## 0.5.15-canary.10
 
+* **fix:**  - **multiUser:** [#3450](https://github.com/AzzappApp/azzapp/pull/3450) check subscription of owner ([#3451](https://github.com/AzzappApp/azzapp/pull/3451))
 * **fix:**  - **home:** [#3340](https://github.com/AzzappApp/azzapp/pull/3340) use value as closest as possible ([#3467](https://github.com/AzzappApp/azzapp/pull/3467))
 * **fix:**  - warning on forward ref ([#3452](https://github.com/AzzappApp/azzapp/pull/3452))
 * **fix:**  - **payment:** wrong id used in upgrade ([#3454](https://github.com/AzzappApp/azzapp/pull/3454))
