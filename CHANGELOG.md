@@ -1,4 +1,4 @@
-## 0.5.15-canary.15
+## 0.5.15-canary.16
 
 * **build:**  - try to build within vercel
 * **build:**  - upgrade iron-webcrypto
