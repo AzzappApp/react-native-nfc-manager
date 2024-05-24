@@ -3,7 +3,9 @@ import { NextResponse } from 'next/server';
 import { withAxiom } from 'next-axiom';
 import QRCode from 'qrcode';
 import { getProfileWithWebCardById, getUserById } from '@azzapp/data';
+import { getTextColor } from '@azzapp/shared/colorsHelpers';
 import ERRORS from '@azzapp/shared/errors';
+import { getImageURLForSize } from '@azzapp/shared/imagesHelpers';
 import serializeAndSignContactCard from '@azzapp/shared/serializeAndSignContactCard';
 import serializeAndSignEmailSignature from '@azzapp/shared/serializeAndSignEmailSignature';
 import { formatDisplayName } from '@azzapp/shared/stringHelpers';
@@ -55,7 +57,10 @@ const generateEmailSignature = async (req: NextRequest) => {
         res.WebCard.commonInformation,
       );
 
-    const mailParam: Record<string, Array<{ number: string }> | string> = {
+    const mailParam: Record<
+      string,
+      Array<{ mail: string }> | Array<{ number: string }> | string
+    > = {
       webCardUrl,
       qrCode: await QRCode.toDataURL(`${PUBLIC_URL}/${res.WebCard?.userName}`), // qrCode is a simple to send to the profile page only (per spec)
       linkUrl: buildEmailSignatureGenerationUrl(
@@ -91,9 +96,38 @@ const generateEmailSignature = async (req: NextRequest) => {
         number: item.number,
       }));
     }
+    //mails
+    const mails = (res?.WebCard?.commonInformation?.emails ?? []).concat(
+      res?.Profile?.contactCard?.emails?.filter(p => p.selected) ?? [],
+    );
+
+    if (mails && mails.length > 0) {
+      mailParam.mails = mails.map(item => ({
+        mail: item.address,
+      }));
+    }
     const formattedAvatarUrl = await buildAvatarUrl(res.Profile, null);
     if (formattedAvatarUrl) {
       mailParam.avatarUrl = formattedAvatarUrl;
+    }
+
+    // Readable Color
+    if (res.WebCard.cardColors?.primary) {
+      mailParam.readableColor = getTextColor(res.WebCard.cardColors.primary);
+    } else {
+      mailParam.readableColor = '#000000';
+    }
+
+    // Primary color
+    if (res.WebCard.cardColors?.primary) {
+      mailParam.primaryColor = res.WebCard.cardColors.primary;
+    } else {
+      mailParam.primaryColor = '#FFFFFF';
+    }
+
+    // Company Logo
+    if (res.WebCard.logoId) {
+      mailParam.companyUrl = getImageURLForSize(res.WebCard.logoId, 140, 140);
     }
     const userEmail = await getUserById(userId);
 

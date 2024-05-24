@@ -1,14 +1,15 @@
 'use client';
 import { decompressFromEncodedURIComponent } from 'lz-string';
 import { useSearchParams } from 'next/navigation';
-import QRCode from 'qrcode';
 import React, { useEffect, useState } from 'react';
+import { colors, getTextColor } from '@azzapp/shared/colorsHelpers';
 import { COVER_RATIO } from '@azzapp/shared/coverHelpers';
 import {
   buildCardSignature,
   buildSaveMyContactSignature,
   parseEmailSignature,
 } from '@azzapp/shared/emailSignatureHelpers';
+import { getImageURLForSize } from '@azzapp/shared/imagesHelpers';
 import { formatDisplayName } from '@azzapp/shared/stringHelpers';
 import { buildUserUrl } from '@azzapp/shared/urlHelpers';
 import { ArrowRightIcon } from '#assets';
@@ -88,13 +89,6 @@ const FullEmailSignature = ({
     }
   }, [searchParams, webCard.userName]);
 
-  const [qrCodePreview, setQrCodePreview] = useState<string | null>();
-  useEffect(() => {
-    QRCode.toDataURL(`${process.env.NEXT_PUBLIC_URL}${webCard.userName}`).then(
-      setQrCodePreview,
-    );
-  }, [webCard.userName]);
-
   const [webCardUrl, setWebCardUrl] = useState<string>('');
   useEffect(() => {
     if (webCard) {
@@ -104,6 +98,9 @@ const FullEmailSignature = ({
     }
   }, [webCard]);
 
+  const companyLogo = webCard.logoId
+    ? getImageURLForSize(webCard.logoId, 140, 140)
+    : null;
   const handleCopySignature = async (mode: 'full' | 'simple') => {
     const compressedContactCard = searchParams.get('c') ?? '';
     const url =
@@ -115,8 +112,11 @@ const FullEmailSignature = ({
             formatDisplayName(contact?.firstName, contact?.lastName),
             contact?.title,
             contact?.company,
-            qrCodePreview!,
             contact?.phoneNumbers,
+            contact?.emails,
+            companyLogo,
+            webCard.cardColors?.primary ?? colors.white,
+            getTextColor(webCard.cardColors?.primary ?? colors.white),
           )
         : buildSaveMyContactSignature(
             buildUserUrl(webCard.userName) + '?c=' + compressedContactCard,
@@ -175,7 +175,7 @@ const FullEmailSignature = ({
       </React.Fragment>
     );
   }
-
+  console.log(contact);
   return (
     <React.Fragment>
       <div className={styles.title}>
@@ -193,13 +193,13 @@ const FullEmailSignature = ({
         <tbody>
           {contact?.avatar && (
             <tr>
-              <td height="100%" valign="top">
+              <td height="60px" valign="top" colSpan={2}>
                 <img
                   style={{
-                    width: '70px',
-                    height: '70px',
-                    borderRadius: '35px',
-                    marginBottom: '10px',
+                    width: '60px',
+                    height: '60px',
+                    borderRadius: '30px',
+                    marginBottom: '20px',
                   }}
                   src={contact?.avatar}
                 />
@@ -207,16 +207,18 @@ const FullEmailSignature = ({
             </tr>
           )}
           <tr>
-            <td height="60%" valign="top">
-              <div style={{ gap: '12.50px' }}>
-                <div style={{ gap: '5px' }}>
+            <td height="100%" valign="top" width="100%">
+              <div>
+                <div>
                   <div
                     style={{
                       textAlign: 'left',
                       color: 'black',
                       fontSize: '16px',
                       fontFamily: 'Helvetica Neue',
-                      fontWeight: 700,
+                      fontWeight: 500,
+                      lineHeight: '20px',
+                      marginBottom: '5px',
                     }}
                   >
                     {formatDisplayName(contact?.firstName, contact?.lastName)}
@@ -226,10 +228,12 @@ const FullEmailSignature = ({
                     <div
                       style={{
                         textAlign: 'left',
-                        color: 'black',
                         fontSize: '14px',
                         fontFamily: 'Helvetica Neue',
-                        fontWeight: 400,
+                        fontWeight: 500,
+                        lineHeight: '18px',
+                        marginBottom: '5px',
+                        color: webCard.cardColors?.primary ?? colors.black,
                       }}
                     >
                       {contact.title}
@@ -239,49 +243,36 @@ const FullEmailSignature = ({
                     <div
                       style={{
                         textAlign: 'left',
-                        color: 'black',
-                        fontSize: '14px',
+                        color: '#87878',
+                        fontSize: '12px',
                         fontFamily: 'Helvetica Neue',
                         fontWeight: 400,
+                        marginBottom: '5px',
                       }}
                     >
                       {contact.company}
                     </div>
                   )}
-                </div>{' '}
-              </div>
-              {contact?.phoneNumbers && contact?.phoneNumbers.length > 0 && (
-                <div
-                  style={{
-                    textAlign: 'left',
-                    color: 'black',
-                    fontSize: '14px',
-                    fontFamily: 'Helvetica Neue',
-                    fontWeight: 400,
-                    marginTop: '10px',
-                  }}
-                >
-                  {contact?.phoneNumbers.map(phone => {
-                    return (
-                      <div key={phone} style={{ marginTop: '4px' }}>
-                        {phone}
-                      </div>
-                    );
-                  })}
                 </div>
-              )}
-              <table className={styles.tableButton}>
+              </div>
+              <table
+                className={styles.tableButton}
+                style={{
+                  backgroundColor: webCard.cardColors?.primary ?? colors.white,
+                }}
+              >
                 <tbody>
                   <tr>
                     <td
                       style={{
-                        background: 'white',
                         verticalAlign: 'middle',
                         textAlign: 'center',
-                        color: 'black',
                         fontSize: '12px',
                         fontFamily: 'Helvetica Neue',
                         fontWeight: 700,
+                        color: getTextColor(
+                          webCard.cardColors?.primary ?? colors.white,
+                        ),
                       }}
                     >
                       Save my contact
@@ -290,21 +281,99 @@ const FullEmailSignature = ({
                 </tbody>
               </table>
             </td>
-            <td height="40%" valign="top" align="right">
-              <img
-                style={{
-                  width: '43.32px',
-                  height: '69.50px',
-                  borderRadius: '8px',
-                }}
-                src={webCardUrl}
-              />
-              {/* {qrCodePreview && (
+            <td
+              valign="middle"
+              style={{
+                width: '50%',
+                paddingLeft: '30px',
+                borderLeft: '1px solid  #E2E1E3',
+              }}
+            >
+              {contact?.phoneNumbers && contact?.phoneNumbers.length > 0 && (
+                <div
+                  style={{
+                    textAlign: 'left',
+                    color: 'black',
+                    fontSize: '12px',
+                    fontFamily: 'Helvetica Neue',
+                    fontWeight: 400,
+                  }}
+                >
+                  {contact?.phoneNumbers.map(phone => {
+                    return (
+                      <div
+                        key={phone}
+                        style={{
+                          height: '12px',
+                          width: '100%',
+                          display: 'inline-block',
+                          verticalAlign: 'middle',
+                        }}
+                      >
+                        <img
+                          src="http://cdn.mcauto-images-production.sendgrid.net/b45e0397500ee742/1a9d2a65-3d9d-4759-9ad5-c23b4b8cdcaa/43x42.png"
+                          style={{
+                            width: '14px',
+                            height: '14px',
+                            marginRight: '4px',
+                          }}
+                        />
+                        {phone}
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+              {contact?.emails && contact?.emails.length > 0 && (
+                <div
+                  style={{
+                    textAlign: 'left',
+                    color: 'black',
+                    fontSize: '12px',
+                    fontFamily: 'Helvetica Neue',
+                    fontWeight: 400,
+                    marginTop: '5px',
+                  }}
+                >
+                  {contact?.emails.map(mail => {
+                    return (
+                      <div
+                        key={mail}
+                        style={{
+                          height: '14px',
+                          width: '100%',
+                          display: 'inline-block',
+                          verticalAlign: 'middle',
+                        }}
+                      >
+                        <img
+                          src="http://cdn.mcauto-images-production.sendgrid.net/b45e0397500ee742/cc231bce-ec78-42f8-aeb8-92d200de2a81/43x42.png"
+                          style={{
+                            width: '14px',
+                            height: '14px',
+                            marginRight: '4px',
+                          }}
+                        />
+                        <span
+                          style={{ fontSize: '12px', verticalAlign: 'top' }}
+                        >
+                          {mail}
+                        </span>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+              {companyLogo && (
                 <img
-                  style={{ width: ' 69.50px', alignSelf: 'stretch' }}
-                  src={qrCodePreview}
+                  style={{
+                    marginTop: '15px',
+                    height: '60px',
+                    objectFit: 'contain',
+                  }}
+                  src={companyLogo}
                 />
-              )} */}
+              )}
             </td>
           </tr>
         </tbody>

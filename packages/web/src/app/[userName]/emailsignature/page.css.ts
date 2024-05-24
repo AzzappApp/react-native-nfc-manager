@@ -144,7 +144,6 @@ const simpleButton = style({
 });
 
 const tableFull = style({
-  border: '1px solid black',
   tableLayout: 'fixed',
   '@media': {
     [MediaQuery.Desktop]: {
@@ -168,9 +167,8 @@ const tableFull = style({
 });
 
 const tableButton = style({
-  border: '1px solid black',
-  background: 'white',
   height: '34px',
+  width: '140px',
   paddingLeft: '10px',
   paddingRight: ' 10px',
   borderRadius: '48px',
