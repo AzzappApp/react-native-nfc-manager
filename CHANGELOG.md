@@ -1,5 +1,6 @@
-## 0.5.15-canary.22
+## 0.5.15-canary.23
 
+* **docs:**  - update Xcode version
 * **build:**  - move payment script to payment package ([#3390](https://github.com/AzzappApp/azzapp/pull/3390))
 * **fix:**  - 🐛 correctly display video player ([#3486](https://github.com/AzzappApp/azzapp/pull/3486))
 * **feat:**  - 🎸 start media implementation ([#3470](https://github.com/AzzappApp/azzapp/pull/3470))
