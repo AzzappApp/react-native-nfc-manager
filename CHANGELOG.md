@@ -1,5 +1,6 @@
-## 0.5.15-canary.16
+## 0.5.15-canary.17
 
+* **fix:**  - Restore cover menu behavior ([#3480](https://github.com/AzzappApp/azzapp/pull/3480))
 * **build:**  - try to build within vercel
 * **build:**  - upgrade iron-webcrypto
 * **feat:**  - **Media:** replace GPUView with Skia ([#3432](https://github.com/AzzappApp/azzapp/pull/3432))
