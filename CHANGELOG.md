@@ -1,5 +1,6 @@
-## 0.5.15-canary.14
+## 0.5.15-canary.15
 
+* **build:**  - try to build within vercel
 * **build:**  - upgrade iron-webcrypto
 * **feat:**  - **Media:** replace GPUView with Skia ([#3432](https://github.com/AzzappApp/azzapp/pull/3432))
 * **fix:**  - **multiUser:** [#3450](https://github.com/AzzappApp/azzapp/pull/3450) check subscription of owner ([#3451](https://github.com/AzzappApp/azzapp/pull/3451))
