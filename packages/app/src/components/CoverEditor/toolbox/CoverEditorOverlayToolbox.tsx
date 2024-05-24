@@ -4,6 +4,7 @@ import { colors } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import Icon from '#ui/Icon';
 import PressableOpacity from '#ui/PressableOpacity';
+import { TOOLBOX_SECTION_HEIGHT } from '#ui/ToolBoxSection';
 import { CoverEditorActionType } from '../coverEditorActions';
 import {
   useCoverEditorContext,
@@ -16,7 +17,6 @@ import CoverEditorBorderTool from './../tools/CoverEditorBorderTool';
 import CoverEditorEffectTool from './../tools/CoverEditorEffectTool';
 import CoverEditorImageCropTool from './../tools/CoverEditorImageCropTool';
 import CoverEditorShadowTool from './../tools/CoverEditorShadowTool';
-import { TOOLBOX_SECTION_HEIGHT } from './CoverEditorToolboxItem';
 
 const CoverEditorOverlayToolbox = () => {
   const styles = useStyleSheet(styleSheet);

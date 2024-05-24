@@ -1,4 +1,4 @@
-import { useCallback, useMemo } from 'react';
+import { useMemo } from 'react';
 import { useIntl } from 'react-intl';
 import { ScrollView, StyleSheet, View } from 'react-native';
 import Animated, {
@@ -8,15 +8,16 @@ import Animated, {
 import { graphql, useFragment } from 'react-relay';
 import useToggle from '#hooks/useToggle';
 import WebCardColorPicker from '#screens/WebCardScreen/WebCardColorPicker';
-import ToolBoxSection from '#ui/ToolBoxSection';
+import { TOOLBOX_SECTION_HEIGHT } from '#ui/ToolBoxSection';
 import { useCoverEditorContext } from '../CoverEditorContext';
 import CoverEditorLinksToolbox from './CoverEditorLinkToolbox';
 import CoverEditorOverlayToolbox from './CoverEditorOverlayToolbox';
 import CoverEditorTextToolbox from './CoverEditorTextToolbox';
-import { TOOLBOX_SECTION_HEIGHT } from './CoverEditorToolboxItem';
+import CoverEditorToolboxItem from './CoverEditorToolboxItem';
 import CoverEditorAddOverlay from './modals/CoverEditorAddOverlay';
 import CoverEditorAddTextModal from './modals/CoverEditorAddTextModal';
 import type { CoverEditorToolbox_profile$key } from '#relayArtifacts/CoverEditorToolbox_profile.graphql';
+import type { CoverEditorToolboxItemProps } from './CoverEditorToolboxItem';
 
 type Props = {
   profile: CoverEditorToolbox_profile$key;
@@ -28,7 +29,7 @@ const CoverEditorToolbox = (props: Props) => {
   const [textModalVisible, toggleTextModalVisible] = useToggle();
   const [colorPickerVisible, toggleColorPickerVisible] = useToggle();
   const [showOverlayImagePicker, toggleOverlayImagePicker] = useToggle(false);
-  const { cover, setCurrentEditableItem } = useCoverEditorContext();
+  const { cover } = useCoverEditorContext();
 
   const profile = useFragment(
     graphql`
@@ -65,17 +66,7 @@ const CoverEditorToolbox = (props: Props) => {
     profileKey,
   );
 
-  const onSelectLayerMenu = useCallback(
-    (id: string | null) => {
-      if (!id) setCurrentEditableItem(null);
-      setCurrentEditableItem({
-        type: id as 'links' | 'overlay',
-      });
-    },
-    [setCurrentEditableItem],
-  );
-
-  const toolboxes = useMemo(
+  const toolboxes: CoverEditorToolboxItemProps[] = useMemo(
     () =>
       [
         {
@@ -85,7 +76,6 @@ const CoverEditorToolbox = (props: Props) => {
             description: 'Cover Edition - Toolbox medias',
           }),
           icon: 'landscape',
-          onPress: () => onSelectLayerMenu('media'),
         },
         {
           id: 'text',
@@ -103,8 +93,7 @@ const CoverEditorToolbox = (props: Props) => {
             description: 'Cover Edition - Toolbox overlay',
           }),
           icon: 'overlay',
-          // onPress: toggleOverlayImagePicker,
-          onPress: () => onSelectLayerMenu('overlay'),
+          onPress: toggleOverlayImagePicker,
         },
         {
           id: 'media',
@@ -113,7 +102,6 @@ const CoverEditorToolbox = (props: Props) => {
             description: 'Cover Edition - Toolbox media',
           }),
           icon: 'add_media',
-          onPress: () => onSelectLayerMenu('media'),
         },
         {
           id: 'links',
@@ -122,7 +110,6 @@ const CoverEditorToolbox = (props: Props) => {
             description: 'Cover Edition - Toolbox links',
           }),
           icon: 'link',
-          onPress: () => onSelectLayerMenu('links'),
         },
         {
           id: 'colors',
@@ -134,7 +121,12 @@ const CoverEditorToolbox = (props: Props) => {
           onPress: toggleColorPickerVisible,
         },
       ] as const,
-    [intl, onSelectLayerMenu, toggleColorPickerVisible, toggleTextModalVisible],
+    [
+      intl,
+      toggleColorPickerVisible,
+      toggleOverlayImagePicker,
+      toggleTextModalVisible,
+    ],
   );
 
   const overlayLayerStyle = useAnimatedStyle(() => {
@@ -179,9 +171,10 @@ const CoverEditorToolbox = (props: Props) => {
       >
         {toolboxes.map((toolbox, index) => {
           return (
-            <ToolBoxSection
+            <CoverEditorToolboxItem
               key={`toolBoxSection_${toolbox.icon}_${index}`}
               label={toolbox.label}
+              id={toolbox.id}
               icon={toolbox.icon}
               onPress={toolbox.onPress}
             />

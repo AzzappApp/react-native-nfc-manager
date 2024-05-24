@@ -4,6 +4,7 @@ import { colors } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import Icon from '#ui/Icon';
 import PressableOpacity from '#ui/PressableOpacity';
+import { TOOLBOX_SECTION_HEIGHT } from '#ui/ToolBoxSection';
 import { CoverEditorActionType } from '../coverEditorActions';
 import { useCoverEditorContext } from '../CoverEditorContext';
 import CoverEditorColorTool from '../tools/CoverEditorColorTool';
@@ -11,7 +12,6 @@ import CoverEditorDeleteTool from '../tools/CoverEditorDeleteTool';
 import CoverEditorFontSizeTool from '../tools/CoverEditorFontSizeTool';
 import CoverEditorLinksTool from '../tools/CoverEditorLinksTool';
 import CoverEditorShadowTool from '../tools/CoverEditorShadowTool';
-import { TOOLBOX_SECTION_HEIGHT } from './CoverEditorToolboxItem';
 import type { CoverEditorColorTool_webCard$key } from '#relayArtifacts/CoverEditorColorTool_webCard.graphql';
 
 type Props = {
