@@ -27,7 +27,7 @@ import Container from '#ui/Container';
 import Icon from '#ui/Icon';
 import Text from '#ui/Text';
 import CardEditionStep from './CardEditionStep';
-import CoverEditionStepV2 from './CoverEditionStepV2';
+import CoverEditionStep from './CoverEditionStep';
 import PagerHeader, { PAGER_HEADER_HEIGHT } from './PagerHeader';
 import WebCardForm from './WebCardForm';
 import WebCardKinStep from './WebCardKindStep';
@@ -297,7 +297,7 @@ export const NewWebCardScreen = ({
         ),
       element:
         webCardInfo != null && currentStepIndex === 2 ? (
-          <CoverEditionStepV2
+          <CoverEditionStep
             profileId={webCardInfo.profileId}
             height={contentHeight}
             setCanSave={setCanSave}

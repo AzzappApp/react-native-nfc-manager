@@ -1,5 +1,5 @@
-import { CoverEditorActionType } from '#components/CoverEditorV2/coverEditorActions';
-import { useCoverEditorContext } from '#components/CoverEditorV2/CoverEditorContext';
+import { CoverEditorActionType } from '#components/CoverEditor/coverEditorActions';
+import { useCoverEditorContext } from '#components/CoverEditor/CoverEditorContext';
 import ImagePicker, { SelectImageStep } from '#components/ImagePicker';
 import ScreenModal from '#components/ScreenModal';
 import type { ImagePickerResult } from '#components/ImagePicker';

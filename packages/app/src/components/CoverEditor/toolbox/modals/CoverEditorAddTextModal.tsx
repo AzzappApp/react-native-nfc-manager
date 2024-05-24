@@ -3,8 +3,8 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import { FlatList, ScrollView, StyleSheet, View } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { colors } from '#theme';
-import { CoverEditorActionType } from '#components/CoverEditorV2/coverEditorActions';
-import { useCoverEditorContext } from '#components/CoverEditorV2/CoverEditorContext';
+import { CoverEditorActionType } from '#components/CoverEditor/coverEditorActions';
+import { useCoverEditorContext } from '#components/CoverEditor/CoverEditorContext';
 import ScreenModal from '#components/ScreenModal';
 import Button from '#ui/Button';
 import Container from '#ui/Container';
@@ -12,7 +12,7 @@ import Header from '#ui/Header';
 import RoundedMenuComponent from '#ui/RoundedMenuComponent';
 import SafeAreaView from '#ui/SafeAreaView';
 import Text from '#ui/Text';
-import type { CoverEditorAction } from '#components/CoverEditorV2/coverEditorActions';
+import type { CoverEditorAction } from '#components/CoverEditor/coverEditorActions';
 import type { ListRenderItemInfo } from 'react-native';
 
 type Props = {

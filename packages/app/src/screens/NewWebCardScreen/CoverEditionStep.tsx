@@ -1,11 +1,14 @@
-import { Suspense, forwardRef } from 'react';
-import { FormattedMessage } from 'react-intl';
+import { Suspense, forwardRef, useImperativeHandle, useState } from 'react';
 import { View } from 'react-native';
+import { graphql, useLazyLoadQuery } from 'react-relay';
 import { colors } from '#theme';
+import CoverEditor from '#components/CoverEditor';
+import CoverEditorContextProvider from '#components/CoverEditor/CoverEditorContext';
+import CoverEditorTemplateList from '#components/CoverEditor/templateList/CoverEditorTemplateList';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
-import useScreenInsets from '#hooks/useScreenInsets';
+// import useScreenInsets from '#hooks/useScreenInsets';
 import ActivityIndicator from '#ui/ActivityIndicator';
-import Text from '#ui/Text';
+import type { CoverEditionStepQuery } from '#relayArtifacts/CoverEditionStepQuery.graphql';
 import type { ForwardedRef } from 'react';
 
 type CoverEditionStepProps = {
@@ -15,11 +18,43 @@ type CoverEditionStepProps = {
   setCanSave: (value: boolean) => void;
 };
 
+export type CoverEditorHandle = {
+  save: () => void;
+};
+
 const CoverEditionStep = (
-  { height }: CoverEditionStepProps,
-  _forwardRef: ForwardedRef<any>,
+  {
+    height,
+    profileId,
+    // onCoverSaved,
+    // setCanSave,
+  }: CoverEditionStepProps,
+  ref: ForwardedRef<CoverEditorHandle>,
 ) => {
-  const insets = useScreenInsets();
+  const [coverTemplatePreview, setCoverTemplatePreview] = useState<
+    string | null
+  >(null);
+
+  const data = useLazyLoadQuery<CoverEditionStepQuery>(
+    graphql`
+      query CoverEditionStepQuery($profileId: ID!) {
+        profile: node(id: $profileId) {
+          ...CoverEditorTemplateList_profile
+          ...useTemplateCover_coverTemplates
+          ...CoverEditor_profile
+        }
+      }
+    `,
+    { profileId },
+  );
+
+  useImperativeHandle(ref, () => ({
+    save: () => {
+      console.log('save');
+    },
+  }));
+
+  // const insets = useScreenInsets();
 
   const styles = useStyleSheet(stylesheet);
 
@@ -32,18 +67,20 @@ const CoverEditionStep = (
           </View>
         }
       >
-        <View style={styles.subTitleContainer}>
-          <Text variant="medium" style={styles.subTitle}>
-            <FormattedMessage
-              defaultMessage="The cover is the first and most visible section of your WebCard{azzappA}"
-              description="New profile - cover creation subtitle"
-              values={{
-                azzappA: <Text variant="azzapp">a</Text>,
-              }}
+        <View style={{ flex: 1 }}>
+          {data.profile && !coverTemplatePreview && (
+            <CoverEditorTemplateList
+              profile={data.profile}
+              coverTemplates={data.profile}
+              onSelectCoverTemplatePreview={setCoverTemplatePreview}
             />
-          </Text>
+          )}
+          {data.profile && coverTemplatePreview && (
+            <CoverEditorContextProvider>
+              <CoverEditor profile={data.profile} />
+            </CoverEditorContextProvider>
+          )}
         </View>
-        <View style={{ flex: 1, paddingBottom: Math.min(insets.bottom, 16) }} />
       </Suspense>
     </View>
   );

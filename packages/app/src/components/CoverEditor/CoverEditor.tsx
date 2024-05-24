@@ -10,16 +10,16 @@ import PressableNative from '#ui/PressableNative';
 import Text from '#ui/Text';
 import { useCoverEditorContext } from './CoverEditorContext';
 import CoverEditorToolbox from './toolbox/CoverEditorToolbox';
-import type { CoverEditorV2_profile$key } from '#relayArtifacts/CoverEditorV2_profile.graphql';
+import type { CoverEditor_profile$key } from '#relayArtifacts/CoverEditor_profile.graphql';
 import type { SocialLinkId } from '@azzapp/shared/socialLinkHelpers';
 
 type Props = {
-  profile: CoverEditorV2_profile$key;
+  profile: CoverEditor_profile$key;
 };
 
 export type CoverLayerType = 'links' | 'overlay' | 'text' | null;
 
-const CoverEditorV2 = ({ profile: profileKey }: Props) => {
+const CoverEditor = ({ profile: profileKey }: Props) => {
   const { bottom } = useScreenInsets();
 
   const { cover, setCurrentEditableItem } = useCoverEditorContext();
@@ -42,7 +42,7 @@ const CoverEditorV2 = ({ profile: profileKey }: Props) => {
 
   const profile = useFragment(
     graphql`
-      fragment CoverEditorV2_profile on Profile {
+      fragment CoverEditor_profile on Profile {
         webCard {
           cardColors {
             primary
@@ -133,4 +133,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default CoverEditorV2;
+export default CoverEditor;

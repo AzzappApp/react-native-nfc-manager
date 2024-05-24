@@ -4,16 +4,16 @@ import { FlatList, View } from 'react-native';
 import { graphql, useFragment } from 'react-relay';
 import { useTemplateCover } from '#hooks/useTemplateCover';
 import Separation from '#ui/Separation';
-import { CoverEditorTemplateTypePreviews } from './CoverEditorV2TemplateTypePreviews';
+import { CoverEditorTemplateTypePreviews } from './CoverEditorTemplateTypePreviews';
 import CoverTemplateScratchStarters from './CoverTemplateScratchStarter';
 import CoverTemplateTagSelector from './CoverTemplateTagSelector';
 import type { CoverTemplatePreviewItem } from '#hooks/useTemplateCover';
-import type { CoverEditorV2TemplateList_profile$key } from '#relayArtifacts/CoverEditorV2TemplateList_profile.graphql';
+import type { CoverEditorTemplateList_profile$key } from '#relayArtifacts/CoverEditorTemplateList_profile.graphql';
 import type { useTemplateCover_coverTemplates$key } from '#relayArtifacts/useTemplateCover_coverTemplates.graphql';
 import type { ListRenderItemInfo } from 'react-native';
 
 export type CoverEditorProps = {
-  profile: CoverEditorV2TemplateList_profile$key;
+  profile: CoverEditorTemplateList_profile$key;
   coverTemplates: useTemplateCover_coverTemplates$key;
   onSelectCoverTemplatePreview: (id: string) => void;
 };
@@ -23,7 +23,7 @@ const keyExtractor = ([coverTemplateTypeId]: [
   CoverTemplatePreviewItem[],
 ]) => coverTemplateTypeId;
 
-const CoverEditorV2TemplateList = ({
+const CoverEditorTemplateList = ({
   profile: profileKey,
   coverTemplates: coverTemplatesKey,
   onSelectCoverTemplatePreview,
@@ -32,7 +32,7 @@ const CoverEditorV2TemplateList = ({
 
   const { coverTemplateTags, coverTemplateTypes } = useFragment(
     graphql`
-      fragment CoverEditorV2TemplateList_profile on Profile {
+      fragment CoverEditorTemplateList_profile on Profile {
         coverTemplateTags {
           ...CoverTemplateTagSelector_tags
         }
@@ -126,4 +126,4 @@ const CoverEditorV2TemplateList = ({
   );
 };
 
-export default CoverEditorV2TemplateList;
+export default CoverEditorTemplateList;

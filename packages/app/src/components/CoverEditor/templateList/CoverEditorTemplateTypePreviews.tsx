@@ -20,7 +20,7 @@ export const CoverEditorTemplateTypePreviews = (props: Props) => {
   const renderItem = useCallback(
     ({ item }: ListRenderItemInfo<TemplateTypePreview>) => {
       return (
-        <CoverEditorV2TemplateTypePreview
+        <CoverEditorTemplateTypePreview
           preview={item}
           onSelect={() => onSelect(item.coverTemplateId)}
         />
@@ -53,7 +53,7 @@ export const CoverEditorTemplateTypePreviews = (props: Props) => {
   );
 };
 
-const CoverEditorV2TemplateTypePreview = ({
+const CoverEditorTemplateTypePreview = ({
   preview,
   onSelect,
 }: {
