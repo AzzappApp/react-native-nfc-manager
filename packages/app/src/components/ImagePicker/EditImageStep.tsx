@@ -238,6 +238,7 @@ const EditImageStep = () => {
                     <FilterSelectionList
                       skImage={skImage}
                       aspectRatio={aspectRatio}
+                      cropData={editionParameters.cropData}
                       selectedFilter={mediaFilter}
                       onChange={onMediaFilterChange}
                       style={styles.filterSelectionStyle}

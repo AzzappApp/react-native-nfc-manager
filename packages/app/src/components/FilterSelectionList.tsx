@@ -4,7 +4,7 @@ import { typedEntries } from '@azzapp/shared/objectHelpers';
 import { useFilterLabels } from '#helpers/mediaEditions';
 import BoxSelectionList from './BoxSelectionList';
 import TransformedImageRenderer from './TransformedImageRenderer';
-import type { Filter } from '#helpers/mediaEditions';
+import type { CropData, Filter } from '#helpers/mediaEditions';
 import type { BoxButtonItemInfo } from './BoxSelectionList';
 import type { SkImage } from '@shopify/react-native-skia';
 import type { ViewProps } from 'react-native';
@@ -13,6 +13,7 @@ type FilterSelectionListProps = ViewProps & {
   skImage: SkImage | null;
   aspectRatio: number;
   selectedFilter: string | null;
+  cropData?: CropData | null;
   cardRadius?: number;
   onChange(value: Filter | null): void;
 };
@@ -21,6 +22,7 @@ const FilterSelectionList = ({
   skImage,
   aspectRatio,
   selectedFilter,
+  cropData,
   onChange,
   ...props
 }: FilterSelectionListProps) => {
@@ -35,10 +37,13 @@ const FilterSelectionList = ({
           width={width}
           height={height}
           filter={filter}
+          editionParameters={{
+            cropData,
+          }}
         />
       );
     },
-    [skImage],
+    [skImage, cropData],
   );
 
   const onSelect = useCallback(

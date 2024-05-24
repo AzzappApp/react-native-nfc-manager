@@ -251,11 +251,21 @@ const Cropper = ({
             height: offsetHeight,
           } = gestureContext.current;
 
+          const scale =
+            mediaWidth / mediaHeight > aspectRatio
+              ? displayedHeight / offsetHeight
+              : displayedWidth / offsetWidth;
+
+          const centerX = offsetX + e.focalX / scale;
+          const centerY = offsetY + e.focalY / scale;
+          const newWidth = offsetWidth / e.scale;
+          const newHeight = offsetHeight / e.scale;
+
           const cropData = {
-            originX: offsetX - (offsetWidth - displayedWidth) / 2,
-            originY: offsetY - (offsetHeight - displayedHeight) / 2,
-            width: offsetWidth / e.scale,
-            height: offsetHeight / e.scale,
+            originX: centerX - newWidth / 2,
+            originY: centerY - newHeight / 2,
+            width: newWidth,
+            height: newHeight,
           };
 
           setCropDataCurrentValue(

@@ -3,7 +3,6 @@ import {
   MipmapMode,
   Skia,
   TileMode,
-  processUniforms,
 } from '@shopify/react-native-skia';
 import {
   EditionParametersSkiaEffects,
@@ -126,10 +125,7 @@ export const transformImage = ({
   }
   if (vignetting) {
     shader = EditionParametersSkiaEffects.vignetting(
-      processUniforms(EditionParametersSkiaEffects.vignetting.effect!, {
-        vignetting,
-        iResolution: [width, height],
-      }),
+      [vignetting, width, height],
       shader,
     );
   }
@@ -154,7 +150,7 @@ export const transformVideoFrame = ({
   lutShader?: SkShader | null;
 }) => {
   'worklet';
-  const image = frame
+  const image = frame?.buffer
     ? Skia.Image.MakeImageFromNativeBuffer(frame.buffer)
     : null;
   if (!image) {
