@@ -125,6 +125,12 @@
 		FD79CACF2AE01ED900EB4E33 /* CGImagePropertyOrientation+init_uiOrientation.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD79CACB2AE01ED900EB4E33 /* CGImagePropertyOrientation+init_uiOrientation.swift */; };
 		FD7AA9DF2BF4DA1500BEC0E9 /* AZPJSIModulesInstaller.mm in Sources */ = {isa = PBXBuildFile; fileRef = FD7AA9DE2BF4DA1500BEC0E9 /* AZPJSIModulesInstaller.mm */; };
 		FD7AA9E32BF4DAE800BEC0E9 /* BufferLoader.mm in Sources */ = {isa = PBXBuildFile; fileRef = FD7AA9E22BF4DAE800BEC0E9 /* BufferLoader.mm */; };
+		FD7BAE642C008CE600427FE0 /* CIImageLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD52718D2BF112BB00140A12 /* CIImageLoader.swift */; };
+		FD7BAE652C008D1C00427FE0 /* AZPJSIModulesInstaller.mm in Sources */ = {isa = PBXBuildFile; fileRef = FD7AA9DE2BF4DA1500BEC0E9 /* AZPJSIModulesInstaller.mm */; };
+		FD7BAE662C008D2300427FE0 /* BufferLoader.mm in Sources */ = {isa = PBXBuildFile; fileRef = FD7AA9E22BF4DAE800BEC0E9 /* BufferLoader.mm */; };
+		FD7BAE672C008D3000427FE0 /* CIImageLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD52718D2BF112BB00140A12 /* CIImageLoader.swift */; };
+		FD7BAE682C008D3800427FE0 /* BufferLoader.mm in Sources */ = {isa = PBXBuildFile; fileRef = FD7AA9E22BF4DAE800BEC0E9 /* BufferLoader.mm */; };
+		FD7BAE692C008D4900427FE0 /* AZPJSIModulesInstaller.mm in Sources */ = {isa = PBXBuildFile; fileRef = FD7AA9DE2BF4DA1500BEC0E9 /* AZPJSIModulesInstaller.mm */; };
 		FD8F774628EC310F00E27551 /* AZPMediaHelpers.m in Sources */ = {isa = PBXBuildFile; fileRef = FD8F774528EC310F00E27551 /* AZPMediaHelpers.m */; };
 		FD8F774728EC310F00E27551 /* AZPMediaHelpers.m in Sources */ = {isa = PBXBuildFile; fileRef = FD8F774528EC310F00E27551 /* AZPMediaHelpers.m */; };
 		FDA79D3C29DD9B3F00E16407 /* AVAssetTrack+orientationTransform.swift in Sources */ = {isa = PBXBuildFile; fileRef = FDA79D3B29DD9B3F00E16407 /* AVAssetTrack+orientationTransform.swift */; };
@@ -1263,6 +1269,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				FD7BAE662C008D2300427FE0 /* BufferLoader.mm in Sources */,
+				FD7BAE652C008D1C00427FE0 /* AZPJSIModulesInstaller.mm in Sources */,
+				FD7BAE642C008CE600427FE0 /* CIImageLoader.swift in Sources */,
 				FD39DA982A52AB5F00C49A82 /* MediaImageRendererManager.swift in Sources */,
 				FD39DA992A52AB5F00C49A82 /* AZPScrollToTopInterceptor.m in Sources */,
 				FD39DA9A2A52AB5F00C49A82 /* AZPCustomReavealTransition.m in Sources */,
@@ -1291,6 +1300,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				FD7BAE692C008D4900427FE0 /* AZPJSIModulesInstaller.mm in Sources */,
+				FD7BAE682C008D3800427FE0 /* BufferLoader.mm in Sources */,
+				FD7BAE672C008D3000427FE0 /* CIImageLoader.swift in Sources */,
 				FD39DACF2A52AC2100C49A82 /* MediaImageRendererManager.swift in Sources */,
 				FD39DAD02A52AC2100C49A82 /* AZPScrollToTopInterceptor.m in Sources */,
 				FD39DAD12A52AC2100C49A82 /* AZPCustomReavealTransition.m in Sources */,
