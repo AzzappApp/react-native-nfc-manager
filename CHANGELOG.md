@@ -1,4 +1,4 @@
-## 0.5.15-canary.17
+## 0.5.15-canary.18
 
 * **fix:**  - Restore cover menu behavior ([#3480](https://github.com/AzzappApp/azzapp/pull/3480))
 * **build:**  - try to build within vercel
