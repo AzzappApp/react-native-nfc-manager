@@ -54,7 +54,7 @@ const HomeBottomPanelNewCover = ({
           appearance="dark"
           label={
             <FormattedMessage
-              defaultMessage="Create your WebCard{azzappA} cover"
+              defaultMessage="Create your WebCard{azzappA} cover{azzappA}"
               description="Home Screen - Missing cover button"
               values={{
                 azzappA: (
