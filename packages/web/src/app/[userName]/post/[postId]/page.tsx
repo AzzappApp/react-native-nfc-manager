@@ -81,6 +81,7 @@ const PostPage = async (props: PostPageProps) => {
                     style={{
                       objectFit: 'contain',
                       width: '100%',
+                      maxHeight: '100%',
                     }}
                   />
                 </>

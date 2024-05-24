@@ -1,5 +1,16 @@
 import { style } from '@vanilla-extract/css';
 
+const container = style({
+  position: 'relative',
+});
+
+const containerFluid = style({
+  height: '100%',
+  display: 'flex',
+  flexDirection: 'row',
+  justifyContent: 'center',
+});
+
 const sound = style({
   borderRadius: 28,
   backgroundColor: 'rgba(0, 0, 0, 0.5)',
@@ -23,6 +34,8 @@ const play = style({
 });
 
 const styles = {
+  container,
+  containerFluid,
   sound,
   play,
 };

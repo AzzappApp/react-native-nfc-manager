@@ -1,4 +1,5 @@
 'use client';
+import cn from 'classnames';
 import {
   useCallback,
   useImperativeHandle,
@@ -66,7 +67,11 @@ const CloudinaryVideoPlayer = (
   );
 
   return (
-    <div style={{ position: 'relative' }}>
+    <div
+      className={cn(styles.container, {
+        [styles.containerFluid]: others.fluid,
+      })}
+    >
       <CloudinaryVideo
         ref={video}
         {...others}
