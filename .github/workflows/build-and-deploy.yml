@@ -19,9 +19,7 @@ jobs:
       VERCEL_ORG_ID: "team_nigXfZEKLJrpoK0ZHytix9jX"
       TURBO_TOKEN: ${{ secrets.VERCEL_TOKEN }}
       TURBO_TEAM: "azzapp"
-      NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME: ${{ vars.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}}
       PHRASE_ACCESS_TOKEN: ${{ secrets.PHRASE_ACCESS_TOKEN }}
-      SENTRY_AUTH_TOKEN: ${{ vars.SENTRY_AUTH_TOKEN }}
       PAYMENT_API_URL: ${{ vars.PAYMENT_API_URL }}
     steps:
       ############################################
@@ -88,7 +86,7 @@ jobs:
       ############################################
    
       - name: JavaScript build
-        run: yarn build
+        run: yarn build-app-dependencies
 
       - name: Lint
         run: yarn lint
@@ -259,17 +257,6 @@ jobs:
           fi
           vercel pull --yes --environment=$ENVIRONMENT --token=${{ secrets.VERCEL_TOKEN }} $ADDITIONAL_ARGS
 
-      - name: Azzapp Web - Vercel build
-        env:
-          VERCEL_PROJECT_ID: "azzapp"
-        run: |
-          ADDITIONAL_ARGS=""
-          GITHUB_REF="${{ github.ref }}"
-          if [ "$GITHUB_REF" == "refs/heads/stable" ]; then
-            ADDITIONAL_ARGS="--prod"
-          fi
-          vercel build --token=${{ secrets.VERCEL_TOKEN }} $ADDITIONAL_ARGS
-
       - name: Azzapp Web - Vercel deployment
         env:
           VERCEL_PROJECT_ID: "azzapp"
@@ -279,7 +266,7 @@ jobs:
           if [ "$GITHUB_REF" == "refs/heads/stable" ]; then
             ADDITIONAL_ARGS="--prod"
           fi
-          vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }} --meta githubCommitRef=${{ github.ref_name }} $ADDITIONAL_ARGS
+          vercel deploy --token=${{ secrets.VERCEL_TOKEN }} --meta githubCommitRef=${{ github.ref_name }} $ADDITIONAL_ARGS
 
       ############################################
       #
@@ -303,17 +290,6 @@ jobs:
           fi
           vercel pull --yes --environment=$ENVIRONMENT --token=${{ secrets.VERCEL_TOKEN }} $ADDITIONAL_ARGS
 
-      - name: Azzapp Backoffice - Vercel build
-        env:
-          VERCEL_PROJECT_ID: "azzapp-backoffice"
-        run: |
-          ADDITIONAL_ARGS=""
-          GITHUB_REF="${{ github.ref }}"
-          if [ "$GITHUB_REF" == "refs/heads/stable" ]; then
-            ADDITIONAL_ARGS="--prod"
-          fi
-          vercel build --token=${{ secrets.VERCEL_TOKEN }} $ADDITIONAL_ARGS
-
       - name: Azzapp Backoffice - Vercel deployment
         env:
           VERCEL_PROJECT_ID: "azzapp-backoffice"
@@ -324,7 +300,7 @@ jobs:
             ADDITIONAL_ARGS="--prod"
           fi
           rm -fr ./packages/web/.next
-          vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }} --meta githubCommitRef=${{ github.ref_name }} $ADDITIONAL_ARGS
+          vercel deploy --token=${{ secrets.VERCEL_TOKEN }} --meta githubCommitRef=${{ github.ref_name }} $ADDITIONAL_ARGS
       
       ############################################
       #
