@@ -9,7 +9,7 @@ In addition developpers should install the followings dependencies:
 
 - [NodeJS](https://nodejs.org/en/) version **20** (recommended install through [nvm](https://github.com/nvm-sh/nvm))
 - [yarn](https://yarnpkg.com/)
-- [XCode](https://apps.apple.com/fr/app/xcode/id497799835?mt=12) version **13+**
+- [XCode](https://apps.apple.com/fr/app/xcode/id497799835?mt=12) version **15+**
 - [Android Studio](https://developer.android.com/studio)
 - [watchman](https://facebook.github.io/watchman/)
 - [ruby](https://www.ruby-lang.org/fr/) version **2.7.6** (recommended install through **brew**)
