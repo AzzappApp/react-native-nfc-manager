@@ -1,5 +1,7 @@
-## 0.5.15-canary.21
+## 0.5.15-canary.22
 
+* **build:**  - move payment script to payment package ([#3390](https://github.com/AzzappApp/azzapp/pull/3390))
+* **fix:**  - 🐛 correctly display video player ([#3486](https://github.com/AzzappApp/azzapp/pull/3486))
 * **feat:**  - 🎸 start media implementation ([#3470](https://github.com/AzzappApp/azzapp/pull/3470))
 * **build:**  - change clean command
 * **fix:**  - Restore cover menu behavior ([#3480](https://github.com/AzzappApp/azzapp/pull/3480))
