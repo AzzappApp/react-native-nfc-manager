@@ -1,4 +1,4 @@
-## 0.5.15-canary.19
+## 0.5.15-canary.20
 
 * **build:**  - change clean command
 * **fix:**  - Restore cover menu behavior ([#3480](https://github.com/AzzappApp/azzapp/pull/3480))
