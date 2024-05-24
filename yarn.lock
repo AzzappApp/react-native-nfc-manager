@@ -395,7 +395,7 @@ __metadata:
     "@types/validator": ^13.11.9
     chroma-js: ^2.4.2
     csv42: 5.0.0
-    iron-webcrypto: ^1.1.1
+    iron-webcrypto: ^1.2.1
     libphonenumber-js: ^1.11.1
     lz-string: ^1.5.0
     typescript: ^5.4.5
@@ -16186,10 +16186,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"iron-webcrypto@npm:^1.1.1":
-  version: 1.1.1
-  resolution: "iron-webcrypto@npm:1.1.1"
-  checksum: 659530b7821b51f81342dc73299801cff2fecb07bc9bf36d03a83337f3d12806aa03721067fa49fff393ad46202fcbb18011dbd11d716fa5a570c7880fb558d8
+"iron-webcrypto@npm:^1.2.1":
+  version: 1.2.1
+  resolution: "iron-webcrypto@npm:1.2.1"
+  checksum: b158d1893c8d037c11a7dcfd1998b519f31f979643c2c505c6eb1170fd63553498a58b05947d5dea116975df8f12ede5ca235cb68e4c1f404fa6695e4508c60c
   languageName: node
   linkType: hard
 
