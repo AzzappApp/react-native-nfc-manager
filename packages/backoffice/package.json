@@ -8,7 +8,7 @@
     "build": "next build",
     "start": "next start",
     "typecheck": "tsc -p tsconfig.next.json --noEmit",
-    "clean": "rm -rf lib && rm -f tsconfig.tsbuildinfo || true && rm -rf .next && rm -rf node_modules"
+    "clean": "rm -rf lib && rm -f tsconfig.next.tsbuildinfo || true && rm -rf .next && rm -rf node_modules"
   },
   "devScripts": [
     "dev"
