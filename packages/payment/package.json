@@ -20,7 +20,8 @@
     "definition:watch": "yarn definition --watch",
     "compile": "babel src --config-file ./babel.config.js -d lib --extensions '.ts,.tsx,.js,.jsx,.json'",
     "compile:watch": "yarn compile --watch",
-    "clean": "rm -rf lib && rm -f tsconfig.build.tsbuildinfo && rm -rf node_modules"
+    "clean": "rm -rf lib && rm -f tsconfig.build.tsbuildinfo && rm -rf node_modules",
+    "payment-api-client": "touch .env && node --env-file=.env ./scripts/generatePaymentApiClient.js"
   },
   "devScripts": [
     "compile:watch",

@@ -27,12 +27,6 @@
       "dependsOn": [],
       "inputs": ["packages/**/*.graphql"],
       "cache": false
-    },
-    "//#payment-api-client": {
-      "passThroughEnv": ["PAYMENT_API_URL"],
-      "dependsOn": [],
-      "inputs": [],
-      "cache": false
     }
   },
   "globalDependencies": ["patches/*.patch"]
