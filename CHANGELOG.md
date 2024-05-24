@@ -1,5 +1,6 @@
-## 0.5.15-canary.24
+## 0.5.15-canary.25
 
+* **fix:**  - **payment:** wrong amount per year ([#3483](https://github.com/AzzappApp/azzapp/pull/3483))
 * **build:**  - try with alias import
 * **docs:**  - update Xcode version
 * **build:**  - move payment script to payment package ([#3390](https://github.com/AzzappApp/azzapp/pull/3390))
