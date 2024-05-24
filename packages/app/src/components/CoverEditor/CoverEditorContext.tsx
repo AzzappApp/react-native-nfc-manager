@@ -34,6 +34,7 @@ const CoverEditorContextProvider = ({
       },
     },
     layerMode: null,
+    medias: [],
   });
 
   const setCurrentEditableItem = useCallback(
@@ -93,4 +94,11 @@ export const useCoverEditorLinksLayer = () => {
 
   if (currentEditableItem?.type !== 'links') return null;
   return cover.linksLayer;
+};
+
+export const useCoverEditorMedia = () => {
+  const { cover, currentEditableItem } = useCoverEditorContext();
+
+  if (currentEditableItem?.type !== 'media') return null;
+  return cover.medias[currentEditableItem.index];
 };

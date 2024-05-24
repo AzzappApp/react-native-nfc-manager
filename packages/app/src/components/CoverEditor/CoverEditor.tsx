@@ -11,15 +11,17 @@ import Text from '#ui/Text';
 import { useCoverEditorContext } from './CoverEditorContext';
 import CoverEditorToolbox from './toolbox/CoverEditorToolbox';
 import type { CoverEditor_profile$key } from '#relayArtifacts/CoverEditor_profile.graphql';
+import type { TemplateTypePreview } from './templateList/CoverEditorTemplateTypePreviews';
 import type { SocialLinkId } from '@azzapp/shared/socialLinkHelpers';
 
 type Props = {
   profile: CoverEditor_profile$key;
+  coverTemplatePreview: TemplateTypePreview;
 };
 
 export type CoverLayerType = 'links' | 'overlay' | 'text' | null;
 
-const CoverEditor = ({ profile: profileKey }: Props) => {
+const CoverEditor = ({ profile: profileKey, coverTemplatePreview }: Props) => {
   const { bottom } = useScreenInsets();
 
   const { cover, setCurrentEditableItem } = useCoverEditorContext();
@@ -114,7 +116,10 @@ const CoverEditor = ({ profile: profileKey }: Props) => {
         )}
       </View>
       <View style={{ height: 50 }} />
-      <CoverEditorToolbox profile={profile} />
+      <CoverEditorToolbox
+        coverTemplatePreview={coverTemplatePreview}
+        profile={profile}
+      />
     </View>
   );
 };

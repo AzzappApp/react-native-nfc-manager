@@ -4,6 +4,7 @@ export type CoverLayerType =
   | 'colors'
   | 'links'
   | 'media'
+  | 'mediaEdit'
   | 'overlay'
   | 'text'
   | null;
@@ -48,6 +49,10 @@ export type CoverEditorOverlayItem = {
 export type CoverEditorSelectedLayer =
   | {
       type: 'links';
+    }
+  | {
+      type: 'media';
+      index: number;
     }
   | {
       type: 'overlay';

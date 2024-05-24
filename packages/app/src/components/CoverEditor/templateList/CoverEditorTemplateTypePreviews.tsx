@@ -9,7 +9,7 @@ import type { ListRenderItemInfo } from 'react-native';
 type Props = {
   label: string;
   previews: TemplateTypePreview[];
-  onSelect: (id: string) => void;
+  onSelect: (preview: TemplateTypePreview) => void;
 };
 
 const keyExtractor = (item: TemplateTypePreview) => item.id;
@@ -22,7 +22,7 @@ export const CoverEditorTemplateTypePreviews = (props: Props) => {
       return (
         <CoverEditorTemplateTypePreview
           preview={item}
-          onSelect={() => onSelect(item.coverTemplateId)}
+          onSelect={() => onSelect(item)}
         />
       );
     },
@@ -73,7 +73,7 @@ const CoverEditorTemplateTypePreview = ({
   );
 };
 
-type TemplateTypePreview = {
+export type TemplateTypePreview = {
   coverTemplateId: string;
   id: string;
   media: {

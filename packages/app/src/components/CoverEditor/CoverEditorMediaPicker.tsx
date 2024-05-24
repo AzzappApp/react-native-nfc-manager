@@ -22,24 +22,29 @@ import type {
 } from '#components/ImagePicker/ImagePicker';
 import type { Media } from '../ImagePicker/imagePickerTypes';
 
-// @todo: use values limits from template cover
-const _for_dev_templateCoverCompositionNumber =
-  Math.floor(Math.random() * 4) + 2;
-// fill array with random durations in seconds for testing before real values
-const _for_dev_compositionsDurations: number[] = Array.from(
-  { length: _for_dev_templateCoverCompositionNumber },
-  () => Math.floor(Math.random() * (COVER_MAX_VIDEO_DURATION - 2 + 1)) + 2,
-);
+type Props = Omit<
+  ImagePickerProps,
+  | 'forceAspectRatio'
+  | 'maxVideoDuration'
+  | 'onFinished'
+  | 'steps'
+  | 'TopPanelWrapper'
+> & {
+  maxMediaCount: number;
+  onFinished: (results: Media[]) => void;
+};
 
-const CoverEditorImagePicker = (
-  props: Omit<
-    ImagePickerProps,
-    'forceAspectRatio' | 'maxVideoDuration' | 'steps' | 'TopPanelWrapper'
-  >,
-) => {
+const CoverEditorImagePicker = (propsaa: Props) => {
+  const { maxMediaCount, onFinished, ...others } = propsaa;
   const styles = useStyleSheet(stylesheet);
   const intl = useIntl();
   const [mediasPicked, setMediasPicked] = useState<Media[]>([]);
+
+  // @TODO: ???
+  const _for_dev_compositionsDurations: number[] = Array.from(
+    { length: maxMediaCount },
+    () => Math.floor(Math.random() * (COVER_MAX_VIDEO_DURATION - 2 + 1)) + 2,
+  );
 
   // remove media by index
   const handleRemoveMedia = (index: number) => {
@@ -49,7 +54,7 @@ const CoverEditorImagePicker = (
   // @todo better define the expected type according to the evolution of the new cover
   const handleMediaSelected = (media: ImagePickerResult | Media) => {
     setMediasPicked(currentMedias => {
-      if (currentMedias.length < _for_dev_templateCoverCompositionNumber) {
+      if (currentMedias.length < maxMediaCount) {
         const updatedMedias = [...currentMedias, media as Media];
         return updatedMedias;
       }
@@ -58,13 +63,14 @@ const CoverEditorImagePicker = (
   };
 
   const handleDuplicateMedia = () => {
-    setMediasPicked(currentMedias => {
-      const duplicatedMedias = duplicateMediaToFillSlots(
-        _for_dev_templateCoverCompositionNumber,
-        currentMedias,
-      );
-      return duplicatedMedias;
-    });
+    const duplicatedMedias = duplicateMediaToFillSlots(
+      maxMediaCount,
+      mediasPicked,
+    );
+
+    setMediasPicked(duplicatedMedias);
+
+    return duplicatedMedias;
   };
 
   const handleOnFinished = () => {
@@ -82,7 +88,7 @@ const CoverEditorImagePicker = (
       return;
     }
 
-    if (mediasPicked.length < _for_dev_templateCoverCompositionNumber) {
+    if (mediasPicked.length < maxMediaCount) {
       Alert.alert(
         intl.formatMessage(
           {
@@ -93,7 +99,7 @@ const CoverEditorImagePicker = (
           },
           {
             mediaPickedNumber: mediasPicked.length,
-            totalMediaNumber: _for_dev_templateCoverCompositionNumber,
+            totalMediaNumber: maxMediaCount,
           },
         ),
         intl.formatMessage({
@@ -108,7 +114,10 @@ const CoverEditorImagePicker = (
               defaultMessage: 'Duplicate media',
               description: 'Button to duplicate media',
             }),
-            onPress: handleDuplicateMedia,
+            onPress: () => {
+              const medias = handleDuplicateMedia();
+              onFinished(medias);
+            },
           },
           {
             text: intl.formatMessage({
@@ -120,12 +129,11 @@ const CoverEditorImagePicker = (
           },
         ],
       );
-    }
-    setMediasPicked(mediasPicked);
 
-    // handle trigger onFinished callback
-    // @todo: Continue to update props.onFinished on the progress of the redesign of the new cover.
-    props.onFinished(mediasPicked[0] as ImagePickerResult);
+      return;
+    }
+
+    onFinished(mediasPicked);
   };
 
   return (
@@ -134,14 +142,13 @@ const CoverEditorImagePicker = (
         forceAspectRatio={COVER_RATIO}
         maxVideoDuration={COVER_MAX_VIDEO_DURATION}
         steps={[SelectMediaStep]}
-        {...props}
+        {...others}
         onFinished={handleMediaSelected}
       />
       <View style={styles.container}>
         <View style={styles.selection}>
           <Text variant="medium" style={styles.labelMediaSelected}>
-            {mediasPicked.length ?? 0}/{_for_dev_templateCoverCompositionNumber}{' '}
-            media selected
+            {mediasPicked.length ?? 0}/{maxMediaCount} media selected
           </Text>
           <Button label="Done" onPress={handleOnFinished} />
         </View>

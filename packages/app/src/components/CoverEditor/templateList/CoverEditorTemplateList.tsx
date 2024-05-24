@@ -10,12 +10,13 @@ import CoverTemplateTagSelector from './CoverTemplateTagSelector';
 import type { CoverTemplatePreviewItem } from '#hooks/useTemplateCover';
 import type { CoverEditorTemplateList_profile$key } from '#relayArtifacts/CoverEditorTemplateList_profile.graphql';
 import type { useTemplateCover_coverTemplates$key } from '#relayArtifacts/useTemplateCover_coverTemplates.graphql';
+import type { TemplateTypePreview } from './CoverEditorTemplateTypePreviews';
 import type { ListRenderItemInfo } from 'react-native';
 
 export type CoverEditorProps = {
   profile: CoverEditorTemplateList_profile$key;
   coverTemplates: useTemplateCover_coverTemplates$key;
-  onSelectCoverTemplatePreview: (id: string) => void;
+  onSelectCoverTemplatePreview: (preview: TemplateTypePreview) => void;
 };
 
 const keyExtractor = ([coverTemplateTypeId]: [

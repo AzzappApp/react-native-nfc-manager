@@ -11,6 +11,8 @@ import WebCardColorPicker from '#screens/WebCardScreen/WebCardColorPicker';
 import { TOOLBOX_SECTION_HEIGHT } from '#ui/ToolBoxSection';
 import { useCoverEditorContext } from '../CoverEditorContext';
 import CoverEditorLinksToolbox from './CoverEditorLinkToolbox';
+import CoverEditorMediaEditToolbox from './CoverEditorMediaEditToolbox';
+import CoverEditorMediaToolbox from './CoverEditorMediaToolbox';
 import CoverEditorOverlayToolbox from './CoverEditorOverlayToolbox';
 import CoverEditorTextToolbox from './CoverEditorTextToolbox';
 import CoverEditorToolboxItem from './CoverEditorToolboxItem';
@@ -18,13 +20,15 @@ import CoverEditorAddOverlay from './modals/CoverEditorAddOverlay';
 import CoverEditorAddTextModal from './modals/CoverEditorAddTextModal';
 import type { CoverEditorToolbox_profile$key } from '#relayArtifacts/CoverEditorToolbox_profile.graphql';
 import type { CoverEditorToolboxItemProps } from './CoverEditorToolboxItem';
+import type { TemplateTypePreview } from '../templateList/CoverEditorTemplateTypePreviews';
 
 type Props = {
   profile: CoverEditorToolbox_profile$key;
+  coverTemplatePreview: TemplateTypePreview;
 };
 
 const CoverEditorToolbox = (props: Props) => {
-  const { profile: profileKey } = props;
+  const { profile: profileKey, coverTemplatePreview } = props;
   const intl = useIntl();
   const [textModalVisible, toggleTextModalVisible] = useToggle();
   const [colorPickerVisible, toggleColorPickerVisible] = useToggle();
@@ -69,14 +73,6 @@ const CoverEditorToolbox = (props: Props) => {
   const toolboxes: CoverEditorToolboxItemProps[] = useMemo(
     () =>
       [
-        {
-          id: 'media',
-          label: intl.formatMessage({
-            defaultMessage: 'Medias',
-            description: 'Cover Edition - Toolbox medias',
-          }),
-          icon: 'landscape',
-        },
         {
           id: 'text',
           label: intl.formatMessage({
@@ -162,6 +158,28 @@ const CoverEditorToolbox = (props: Props) => {
     };
   }, [cover.layerMode]);
 
+  const mediaEditLayerStyle = useAnimatedStyle(() => {
+    // translation is less consumin that resizing direclty the height and will better match upmitt recommendation
+    const translation = withTiming(
+      cover.layerMode === 'mediaEdit' ? 0 : TOOLBOX_SECTION_HEIGHT,
+      { duration: 500 },
+    );
+    return {
+      transform: [{ translateY: translation }],
+    };
+  }, [cover.layerMode]);
+
+  const mediaLayerStyle = useAnimatedStyle(() => {
+    // translation is less consumin that resizing direclty the height and will better match upmitt recommendation
+    const translation = withTiming(
+      cover.layerMode === 'media' ? 0 : TOOLBOX_SECTION_HEIGHT,
+      { duration: 500 },
+    );
+    return {
+      transform: [{ translateY: translation }],
+    };
+  }, [cover.layerMode]);
+
   return (
     <View style={{ height: TOOLBOX_SECTION_HEIGHT, overflow: 'hidden' }}>
       <ScrollView
@@ -181,6 +199,7 @@ const CoverEditorToolbox = (props: Props) => {
           );
         })}
       </ScrollView>
+
       <Animated.View style={[styles.layerContainer, overlayLayerStyle]}>
         <CoverEditorOverlayToolbox />
       </Animated.View>
@@ -191,6 +210,14 @@ const CoverEditorToolbox = (props: Props) => {
 
       <Animated.View style={[styles.layerContainer, linksEditLayerStyle]}>
         <CoverEditorLinksToolbox webcard={profile.webCard} />
+      </Animated.View>
+
+      <Animated.View style={[styles.layerContainer, mediaLayerStyle]}>
+        <CoverEditorMediaToolbox count={coverTemplatePreview.mediaCount} />
+      </Animated.View>
+
+      <Animated.View style={[styles.layerContainer, mediaEditLayerStyle]}>
+        <CoverEditorMediaEditToolbox />
       </Animated.View>
 
       <CoverEditorAddTextModal

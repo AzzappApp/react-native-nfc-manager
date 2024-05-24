@@ -1,3 +1,4 @@
+import type { Media } from '#components/ImagePicker/imagePickerTypes';
 import type {
   CoverEditorAnimationItem,
   CoverEditorOverlayItem,
@@ -27,6 +28,7 @@ export enum CoverEditorActionType {
   DeleteOverlayLayer,
   UpdateLayerFilter,
   UpdateLinks,
+  UpdateMedias,
 }
 
 /**
@@ -100,12 +102,12 @@ export type CoverEditorAddOverlayLayerAction = {
   };
 };
 
-export type CoverEditonUpdateOverlayLayerAction = {
+export type CoverEditionUpdateOverlayLayerAction = {
   type: CoverEditorActionType.UpdateOverlayLayer;
   payload: Partial<CoverEditorOverlayItem>;
 };
 
-export type CoverEditonUpdateLayerShadowAction = {
+export type CoverEditionUpdateLayerShadowAction = {
   type: CoverEditorActionType.UpdateLayerShadow;
   payload: { shadow: ShadowStyleIOS | undefined; elevation: number };
 };
@@ -115,7 +117,7 @@ export type CoverEditonUpdateLayerShadowAction = {
  * @property {CoverEditorActionType} type
  * @property {CoverLayerType} payload
  */
-export type CoverEditonUpdateLayerBorderAction = {
+export type CoverEditionUpdateLayerBorderAction = {
   type: CoverEditorActionType.UpdateLayerBorder;
   payload: Partial<{
     borderWidth: number;
@@ -124,12 +126,12 @@ export type CoverEditonUpdateLayerBorderAction = {
   }>;
 };
 
-export type CoverEditonUpdateLayerAnimationAction = {
+export type CoverEditionUpdateLayerAnimationAction = {
   type: CoverEditorActionType.UpdateLayerAnimation;
   payload: Partial<CoverEditorAnimationItem>;
 };
 
-export type CoverEditonUpdateLayerFilterAction = {
+export type CoverEditionUpdateLayerFilterAction = {
   type: CoverEditorActionType.UpdateLayerFilter;
   payload: string | null;
 };
@@ -139,26 +141,32 @@ export type CoverEditonUpdateLayerFilterAction = {
  * @property {CoverEditorActionType} type
  * @property {CoverLayerType} payload
  */
-export type CoverEditonUpdateOverlayLayerDeleteAction = {
+export type CoverEditionUpdateOverlayLayerDeleteAction = {
   type: CoverEditorActionType.DeleteOverlayLayer;
   payload?: null; //typescript error in reducer if payload missing or null
 };
 //#endregion
 
-export type CoverEditonUpdateLinksAction = {
+export type CoverEditionUpdateLinksAction = {
   type: CoverEditorActionType.UpdateLinks;
   payload: CoverEditorSocialLink[];
 };
 
+export type CoverEditionUpdateMediasAction = {
+  type: CoverEditorActionType.UpdateMedias;
+  payload: Media[];
+};
+
 export type CoverEditorAction =
+  | CoverEditionUpdateLayerAnimationAction
+  | CoverEditionUpdateLayerBorderAction
+  | CoverEditionUpdateLayerFilterAction
+  | CoverEditionUpdateLayerShadowAction
+  | CoverEditionUpdateLinksAction
+  | CoverEditionUpdateMediasAction
+  | CoverEditionUpdateOverlayLayerAction
+  | CoverEditionUpdateOverlayLayerDeleteAction
   | CoverEditiorSetLayerModeAction
-  | CoverEditonUpdateLayerAnimationAction
-  | CoverEditonUpdateLayerBorderAction
-  | CoverEditonUpdateLayerFilterAction
-  | CoverEditonUpdateLayerShadowAction
-  | CoverEditonUpdateLinksAction
-  | CoverEditonUpdateOverlayLayerAction
-  | CoverEditonUpdateOverlayLayerDeleteAction
   | CoverEditorAddOverlayLayerAction
   | CoverEditorAddTextLayerAction
   | CoverEditorChangeAlignmentAction

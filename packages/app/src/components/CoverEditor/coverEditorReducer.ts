@@ -4,6 +4,7 @@ import {
   CoverEditorActionType,
   type CoverEditorAction,
 } from './coverEditorActions';
+import type { Media } from '#components/ImagePicker/imagePickerTypes';
 import type {
   CoverEditorLinksLayerItem,
   CoverEditorOverlayItem,
@@ -18,6 +19,7 @@ export type CoverEditorState = {
   overlayLayer: CoverEditorOverlayItem | null;
   layerMode: CoverLayerType; //add it here instead of animated value in context  because It could been use for reducer action in some case. TO IMPROVE
   linksLayer: CoverEditorLinksLayerItem;
+  medias: Media[];
 };
 
 export function coverEditorReducer(
@@ -46,7 +48,8 @@ export function coverEditorReducer(
       return {
         ...state,
         selectedLayer: payload,
-        layerMode: payload?.type ?? null,
+        // @TODO: sometimes we want to remove the selected object but keep the layer mode (no media selected but media menu open)
+        layerMode: payload?.type ?? state.layerMode,
       };
     case CoverEditorActionType.ChangeAlignment:
       if (selectedTextLayerIndex === null) return state;
@@ -258,6 +261,11 @@ export function coverEditorReducer(
           ...state.linksLayer,
           links: payload,
         },
+      };
+    case CoverEditorActionType.UpdateMedias:
+      return {
+        ...state,
+        medias: payload,
       };
     default:
       return state;

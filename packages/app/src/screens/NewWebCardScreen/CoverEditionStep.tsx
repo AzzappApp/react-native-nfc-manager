@@ -8,6 +8,7 @@ import CoverEditorTemplateList from '#components/CoverEditor/templateList/CoverE
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 // import useScreenInsets from '#hooks/useScreenInsets';
 import ActivityIndicator from '#ui/ActivityIndicator';
+import type { TemplateTypePreview } from '#components/CoverEditor/templateList/CoverEditorTemplateTypePreviews';
 import type { CoverEditionStepQuery } from '#relayArtifacts/CoverEditionStepQuery.graphql';
 import type { ForwardedRef } from 'react';
 
@@ -31,9 +32,8 @@ const CoverEditionStep = (
   }: CoverEditionStepProps,
   ref: ForwardedRef<CoverEditorHandle>,
 ) => {
-  const [coverTemplatePreview, setCoverTemplatePreview] = useState<
-    string | null
-  >(null);
+  const [coverTemplatePreview, setCoverTemplatePreview] =
+    useState<TemplateTypePreview | null>(null);
 
   const data = useLazyLoadQuery<CoverEditionStepQuery>(
     graphql`
@@ -77,7 +77,10 @@ const CoverEditionStep = (
           )}
           {data.profile && coverTemplatePreview && (
             <CoverEditorContextProvider>
-              <CoverEditor profile={data.profile} />
+              <CoverEditor
+                profile={data.profile}
+                coverTemplatePreview={coverTemplatePreview}
+              />
             </CoverEditorContextProvider>
           )}
         </View>
