@@ -1,7 +1,7 @@
 import { and, eq } from 'drizzle-orm';
 import db, { DEFAULT_DATETIME_VALUE, cols } from './db';
 import type { DbTransaction } from './db';
-import type { InferSelectModel } from 'drizzle-orm';
+import type { InferInsertModel, InferSelectModel } from 'drizzle-orm';
 
 export const ReportTable = cols.table(
   'Report',
@@ -31,20 +31,15 @@ export const ReportTable = cols.table(
 );
 
 export type Report = InferSelectModel<typeof ReportTable>;
+export type NewReport = InferInsertModel<typeof ReportTable>;
 
 export type TargetType = Report['targetType'];
 
 export const createReport = async (
-  targetId: string,
-  userId: string,
-  targetType: 'comment' | 'post' | 'webCard',
+  report: NewReport,
   tx: DbTransaction = db,
 ) => {
-  await tx.insert(ReportTable).values({
-    targetId,
-    userId,
-    targetType,
-  });
+  await tx.insert(ReportTable).values(report);
 };
 
 export const getReport = async (
