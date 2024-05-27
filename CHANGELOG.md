@@ -1,5 +1,6 @@
-## 0.5.15-canary.25
+## 0.5.15-canary.26
 
+* **fix:**  - **payment:** use subscription id in payments ([#3461](https://github.com/AzzappApp/azzapp/pull/3461))
 * **fix:**  - **payment:** wrong amount per year ([#3483](https://github.com/AzzappApp/azzapp/pull/3483))
 * **build:**  - try with alias import
 * **docs:**  - update Xcode version
