@@ -80,7 +80,11 @@ const WebCardPageLayout = (props: ProfilePageLayoutProps) => {
           ),
         );
       }
-      shareBackModal.current?.open();
+
+      // Open share back modal after 1s (see issue #3305)
+      setTimeout(() => {
+        shareBackModal.current?.open();
+      }, 1000);
     }
   };
 

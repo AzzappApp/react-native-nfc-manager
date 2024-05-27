@@ -1,6 +1,26 @@
-import { style } from '@vanilla-extract/css';
+import { style, keyframes } from '@vanilla-extract/css';
 import { convertHexToRGBA } from '#helpers';
 import { vars } from '#app/[userName]/theme.css';
+
+const slideDown = keyframes({
+  '0%': { transform: 'translateY(-100%)' },
+  '100%': { transform: 'translateY(0)' },
+});
+
+const slideUp = keyframes({
+  '0%': { transform: 'translateY(0)' },
+  '100%': { transform: 'translateY(-100%)' },
+});
+
+const fadeIn = keyframes({
+  '0%': { opacity: 0 },
+  '100%': { opacity: 1 },
+});
+
+const fadeOut = keyframes({
+  '0%': { opacity: 1 },
+  '100%': { opacity: 0 },
+});
 
 const wrapper = style({
   position: 'fixed',
@@ -13,6 +33,11 @@ const wrapper = style({
   alignItems: 'center',
   justifyContent: 'center',
   padding: '20px',
+  animation: `${fadeIn} 0.3s ease-out`,
+});
+
+const wrapperClosing = style({
+  animation: `${fadeOut} 0.3s ease-in`,
 });
 
 const modal = style({
@@ -24,6 +49,11 @@ const modal = style({
   width: '375px',
   maxWidth: '100%',
   boxShadow: '0px 1px 25px 0px rgba(0, 0, 0, 0.45)',
+  animation: `${slideDown} 0.3s ease-out`,
+});
+
+const modalClosing = style({
+  animation: `${slideUp} 0.3s ease-in`,
 });
 
 const close = style({
@@ -34,7 +64,9 @@ const close = style({
 
 const styles = {
   wrapper,
+  wrapperClosing,
   modal,
+  modalClosing,
   close,
 };
 
