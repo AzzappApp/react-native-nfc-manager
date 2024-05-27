@@ -68,6 +68,7 @@ const saveSubscription: MutationResolvers['saveSubscription'] = async (
         paymentMeanId: '',
         canceledAt: null,
         status: 'active',
+        freeSeats: 0,
       },
     };
   } catch (e) {
