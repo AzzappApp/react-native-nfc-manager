@@ -114,7 +114,7 @@ export const acknowledgeFirstPayment = async (
           {
             status: 'paid',
             transactionId,
-            userId: subscription.userId,
+            subscriptionId: subscription.id,
             webCardId,
             amount,
             taxes,
@@ -182,7 +182,7 @@ export const rejectFirstPayment = async (
         await createPayment(
           {
             status: 'failed',
-            userId: subscriptions[0].userId,
+            subscriptionId: subscription.id,
             webCardId,
             amount,
             taxes,
@@ -263,7 +263,7 @@ export const acknowledgeRecurringPayment = async (
         await createPayment(
           {
             status: 'paid',
-            userId: subscription.userId,
+            subscriptionId: subscription.id,
             webCardId,
             amount,
             taxes,
@@ -302,7 +302,7 @@ export const rejectRecurringPayment = async (
         await createPayment(
           {
             status: 'failed',
-            userId: subscriptions[0].userId,
+            subscriptionId: subscription.id,
             webCardId,
             amount,
             taxes,

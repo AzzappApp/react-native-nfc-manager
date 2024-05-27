@@ -6,6 +6,7 @@ import {
   createSubscription,
   db,
   getPaymentById,
+  getSubscriptionById,
   getUserSubscriptionForWebCard,
   updateWebCard,
 } from '@azzapp/data';
@@ -402,10 +403,7 @@ export const generateInvoice = async (webCardId: string, paymentId: string) => {
     throw new Error('Payment does not match the webCard');
   }
 
-  const subscription = await getUserSubscriptionForWebCard(
-    payment.userId,
-    payment.webCardId,
-  );
+  const subscription = await getSubscriptionById(payment.subscriptionId);
 
   if (!subscription) {
     throw new Error('Subscription not found');
