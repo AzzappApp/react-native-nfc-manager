@@ -1,4 +1,4 @@
-## 0.5.15-canary.28
+## 0.5.15-canary.29
 
 * **feat:**  - add free seats ([#3495](https://github.com/AzzappApp/azzapp/pull/3495))
 * **fix:**  - **payment:** use subscription id in payments ([#3461](https://github.com/AzzappApp/azzapp/pull/3461))
