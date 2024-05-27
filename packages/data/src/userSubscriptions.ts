@@ -100,6 +100,16 @@ export const updateActiveUserSubscription = async (
     );
 };
 
+export const updateSubscriptionFreeSeats = async (
+  subscriptionId: string,
+  freeSeats: number,
+) => {
+  await db
+    .update(UserSubscriptionTable)
+    .set({ freeSeats })
+    .where(eq(UserSubscriptionTable.id, subscriptionId));
+};
+
 /**
 /**
  * Retrieve active subscription for given userId

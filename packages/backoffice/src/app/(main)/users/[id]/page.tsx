@@ -5,9 +5,15 @@ import {
   getUserById,
   getProfilesOfUser,
   getSubscriptionsOfUser,
+  getWebCardProfilesCount,
 } from '@azzapp/data';
 import { Subscriptions } from './Subscriptions';
 import UserForm from './UserForm';
+import type { UserSubscription } from '@azzapp/data';
+
+export type SubscriptionWithProfilesCount = UserSubscription & {
+  profilesCount: number;
+};
 
 type UserPageProps = {
   params: {
@@ -23,6 +29,13 @@ const UserPage = async ({ params: { id } }: UserPageProps) => {
   const profiles = await getProfilesOfUser(user.id);
 
   const subscriptions = await getSubscriptionsOfUser(user.id);
+  const userSubscriptions: SubscriptionWithProfilesCount[] = await Promise.all(
+    subscriptions.map(async s => {
+      const count = await getWebCardProfilesCount(s.webCardId as string);
+
+      return { ...s, profilesCount: count };
+    }),
+  );
 
   return (
     <Box display="flex" flexDirection="column">
@@ -38,7 +51,15 @@ const UserPage = async ({ params: { id } }: UserPageProps) => {
         </Link>
       </Breadcrumbs>
       <UserForm user={user} webCards={profiles.map(({ WebCard }) => WebCard)} />
-      <Subscriptions user={user} userSubscriptions={subscriptions} />
+      {(subscriptions.length > 0 && (
+        <Subscriptions
+          user={user}
+          userSubscriptions={userSubscriptions.sort(
+            ({ startAt: a }, { startAt: b }) => b.getTime() - a.getTime(),
+          )}
+        />
+      )) ||
+        'No subscription'}
     </Box>
   );
 };
