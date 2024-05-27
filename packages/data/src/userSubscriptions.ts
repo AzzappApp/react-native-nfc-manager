@@ -34,6 +34,7 @@ export const UserSubscriptionTable = mysqlTable(
       'web.lifetime',
     ]),
     totalSeats: int('totalSeats').default(0).notNull(),
+    freeSeats: int('freeSeats').default(0).notNull(),
     revenueCatId: text('revenueCatId'),
     issuer: mysqlEnum('issuer', ['apple', 'google', 'web']).notNull(), //web should be user over revenue cat
     startAt: cols.dateTime('startAt').notNull(),

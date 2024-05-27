@@ -15,7 +15,7 @@ export const calculateAvailableSeats = async (
   } else {
     totalUsed = await getTotalMultiUser(userSubscription.userId);
   }
-  return userSubscription.totalSeats - totalUsed;
+  return userSubscription.totalSeats + userSubscription.freeSeats - totalUsed;
 };
 
 export const checkSubscription = async (
