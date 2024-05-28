@@ -14443,7 +14443,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"expo-font@npm:~12.0.5":
+"expo-font@npm:12.0.5":
   version: 12.0.5
   resolution: "expo-font@npm:12.0.5"
   dependencies:
@@ -14451,6 +14451,17 @@ __metadata:
   peerDependencies:
     expo: "*"
   checksum: 74284f7aaa809de1432e98090eca61f255c584f1a66e979a8caf435bf6d97f7322c1a6c9428ebb6ce5f4dd20a2987e8ee714a8170cc2782d1f7b87900ccc4b7e
+  languageName: node
+  linkType: hard
+
+"expo-font@patch:expo-font@npm%3A12.0.5#./.yarn/patches/expo-font-npm-12.0.5-a20030dadb.patch::locator=%40azzapp%2Fmonorepo%40workspace%3A.":
+  version: 12.0.5
+  resolution: "expo-font@patch:expo-font@npm%3A12.0.5#./.yarn/patches/expo-font-npm-12.0.5-a20030dadb.patch::version=12.0.5&hash=ca97d1&locator=%40azzapp%2Fmonorepo%40workspace%3A."
+  dependencies:
+    fontfaceobserver: ^2.1.0
+  peerDependencies:
+    expo: "*"
+  checksum: 156f3335b339911170d2cd1bb9afb2197862e2a744c8d7ba3a9e9786e1763ea6024eaea57107a36265b6b655075389a75aae30dfdf7d24bddcc826486fd5c949
   languageName: node
   linkType: hard
 
