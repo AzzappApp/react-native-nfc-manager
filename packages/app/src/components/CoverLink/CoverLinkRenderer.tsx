@@ -13,6 +13,7 @@ const CoverLink = ({
   coverStyle,
   prefetch = false,
   onPress,
+  disabled,
   ...props
 }: CoverLinkRendererProps) => {
   const containerStyle = useMemo(
@@ -28,7 +29,12 @@ const CoverLink = ({
   );
 
   return (
-    <Link route="WEBCARD" params={props} prefetch={prefetch}>
+    <Link
+      route="WEBCARD"
+      params={props}
+      prefetch={prefetch}
+      disabled={disabled}
+    >
       <PressableScaleHighlight style={containerStyle} onPress={onPress}>
         <CoverRenderer {...props} style={coverStyle} />
       </PressableScaleHighlight>

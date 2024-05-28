@@ -11,6 +11,8 @@ import {
   ProfileTable,
   getUserProfileWithWebCardId,
   UserTable,
+  deleteWebCard,
+  PostTable,
 } from '@azzapp/data';
 import { AZZAPP_SERVER_HEADER } from '@azzapp/shared/urlHelpers';
 import { ADMIN } from '#roles';
@@ -54,42 +56,7 @@ export const removeWebcard = async (userId: string, webcardId: string) => {
 
     await db.transaction(async trx => {
       if (profile.profileRole === 'owner') {
-        await trx
-          .update(WebCardTable)
-          .set({
-            ...updates,
-            cardIsPublished: false,
-          })
-          .where(eq(WebCardTable.id, webcardId));
-
-        await trx
-          .update(ProfileTable)
-          .set(updates)
-          .where(eq(ProfileTable.webCardId, webcardId));
-
-        await trx
-          .update(WebCardTable)
-          .set({
-            nbFollowers: sql`GREATEST(nbFollowers - 1, 0)`,
-          })
-          .where(
-            inArray(
-              WebCardTable.id,
-              sql`(select followingId from Follow where followerId = ${webcardId})`,
-            ),
-          );
-
-        await trx
-          .update(WebCardTable)
-          .set({
-            nbFollowings: sql`GREATEST(nbFollowings - 1, 0)`,
-          })
-          .where(
-            inArray(
-              WebCardTable.id,
-              sql`(select followerId from Follow where followingId = ${webcardId})`,
-            ),
-          );
+        await deleteWebCard(webcardId, userId, trx);
       } else {
         await trx
           .update(ProfileTable)
@@ -149,6 +116,28 @@ export const toggleUserActive = async (userId: string) => {
             cardIsPublished: false,
           })
           .where(inArray(WebCardTable.id, webCardIds));
+
+        await trx
+          .update(PostTable)
+          .set(deleteFlagsUpdate)
+          .where(
+            and(
+              inArray(PostTable.webCardId, webCardIds),
+              or(eq(PostTable.deleted, false), ne(PostTable.deletedBy, userId)),
+            ),
+          );
+
+        await trx
+          .update(WebCardTable)
+          .set({
+            nbPostsLiked: sql`GREATEST(nbPostsLiked - 1, 0)`,
+          })
+          .where(
+            inArray(
+              WebCardTable.id,
+              sql`(select r.webCardId from PostReaction r inner join Post p on p.id = r.postId where p.webCardId in ${webCardIds})`,
+            ),
+          );
 
         await trx
           .update(ProfileTable)

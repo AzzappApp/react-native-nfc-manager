@@ -1,9 +1,7 @@
-import { inArray, sql, eq } from 'drizzle-orm';
 import { GraphQLError } from 'graphql';
 import {
-  ProfileTable,
-  WebCardTable,
   db,
+  deleteWebCard,
   getActiveWebCardSubscription,
   removeProfileById,
 } from '@azzapp/data';
@@ -46,48 +44,7 @@ const quitWebCard: Mutation = async (
     }
 
     await db.transaction(async trx => {
-      await trx
-        .update(WebCardTable)
-        .set({
-          deletedAt: new Date(),
-          deletedBy: auth.userId,
-          deleted: true,
-          cardIsPublished: false,
-        })
-        .where(eq(WebCardTable.id, profile.webCardId));
-
-      await trx
-        .update(ProfileTable)
-        .set({
-          deletedAt: new Date(),
-          deletedBy: auth.userId,
-          deleted: true,
-        })
-        .where(eq(ProfileTable.webCardId, profile.webCardId));
-
-      await trx
-        .update(WebCardTable)
-        .set({
-          nbFollowers: sql`GREATEST(nbFollowers - 1, 0)`,
-        })
-        .where(
-          inArray(
-            WebCardTable.id,
-            sql`(select followingId from Follow where followerId = ${profile.webCardId})`,
-          ),
-        );
-
-      await trx
-        .update(WebCardTable)
-        .set({
-          nbFollowings: sql`GREATEST(nbFollowings - 1, 0)`,
-        })
-        .where(
-          inArray(
-            WebCardTable.id,
-            sql`(select followerId from Follow where followingId = ${profile.webCardId})`,
-          ),
-        );
+      await deleteWebCard(profile.webCardId, auth.userId ?? '', trx);
     });
 
     if (webCard) {

@@ -1,6 +1,6 @@
 'use server';
 
-import { and, eq, inArray, isNull, sql } from 'drizzle-orm';
+import { and, eq, isNull, sql } from 'drizzle-orm';
 import { revalidatePath } from 'next/cache';
 import {
   PostCommentTable,
@@ -8,8 +8,8 @@ import {
   WebCardTable,
   db,
   ReportTable,
-  ProfileTable,
   deletePost,
+  deleteWebCard,
 } from '@azzapp/data';
 import { AZZAPP_SERVER_HEADER } from '@azzapp/shared/urlHelpers';
 import { getSession } from '#helpers/session';
@@ -155,48 +155,7 @@ export const deleteRelatedItem = async (
         }
 
         case 'webCard': {
-          await trx
-            .update(WebCardTable)
-            .set({
-              deletedAt: new Date(),
-              deletedBy: session.userId,
-              deleted: true,
-              cardIsPublished: false,
-            })
-            .where(eq(WebCardTable.id, targetId));
-
-          await trx
-            .update(ProfileTable)
-            .set({
-              deletedAt: new Date(),
-              deletedBy: session.userId,
-              deleted: true,
-            })
-            .where(eq(ProfileTable.webCardId, targetId));
-
-          await trx
-            .update(WebCardTable)
-            .set({
-              nbFollowers: sql`GREATEST(nbFollowers - 1, 0)`,
-            })
-            .where(
-              inArray(
-                WebCardTable.id,
-                sql`(select followingId from Follow where followerId = ${targetId})`,
-              ),
-            );
-
-          await trx
-            .update(WebCardTable)
-            .set({
-              nbFollowings: sql`GREATEST(nbFollowings - 1, 0)`,
-            })
-            .where(
-              inArray(
-                WebCardTable.id,
-                sql`(select followerId from Follow where followingId = ${targetId})`,
-              ),
-            );
+          await deleteWebCard(targetId, session.userId, trx);
 
           try {
             const webCard = await trx

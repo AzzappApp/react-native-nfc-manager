@@ -1,4 +1,5 @@
-import { eq, sql, lt, desc, and, ne } from 'drizzle-orm';
+import { eq, sql, lt, desc, and, ne, inArray } from 'drizzle-orm';
+import { PostTable } from '#posts';
 import db, { DEFAULT_DATETIME_VALUE, cols } from './db';
 import { FollowTable } from './follows';
 import { createId } from './helpers/createId';
@@ -373,3 +374,73 @@ export const getWebCardProfilesCount = async (webCardId: string) =>
       ),
     )
     .then(res => res[0].count);
+
+export const deleteWebCard = async (
+  webCardId: string,
+  userId: string,
+  trx: DbTransaction,
+) => {
+  await trx
+    .update(WebCardTable)
+    .set({
+      deletedAt: new Date(),
+      deletedBy: userId,
+      deleted: true,
+      cardIsPublished: false,
+    })
+    .where(eq(WebCardTable.id, webCardId));
+
+  await trx
+    .update(ProfileTable)
+    .set({
+      deletedAt: new Date(),
+      deletedBy: userId,
+      deleted: true,
+    })
+    .where(eq(ProfileTable.webCardId, webCardId));
+
+  await trx
+    .update(PostTable)
+    .set({
+      deletedAt: new Date(),
+      deletedBy: userId,
+      deleted: true,
+    })
+    .where(eq(PostTable.webCardId, webCardId));
+
+  await trx
+    .update(WebCardTable)
+    .set({
+      nbPostsLiked: sql`GREATEST(nbPostsLiked - 1, 0)`,
+    })
+    .where(
+      inArray(
+        WebCardTable.id,
+        sql`(select r.webCardId from PostReaction r inner join Post p on p.id = r.postId where p.webCardId = ${webCardId})`,
+      ),
+    );
+
+  await trx
+    .update(WebCardTable)
+    .set({
+      nbFollowers: sql`GREATEST(nbFollowers - 1, 0)`,
+    })
+    .where(
+      inArray(
+        WebCardTable.id,
+        sql`(select followingId from Follow where followerId = ${webCardId})`,
+      ),
+    );
+
+  await trx
+    .update(WebCardTable)
+    .set({
+      nbFollowings: sql`GREATEST(nbFollowings - 1, 0)`,
+    })
+    .where(
+      inArray(
+        WebCardTable.id,
+        sql`(select followerId from Follow where followingId = ${webCardId})`,
+      ),
+    );
+};

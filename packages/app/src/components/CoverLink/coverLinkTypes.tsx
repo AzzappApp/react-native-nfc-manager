@@ -24,4 +24,6 @@ export type CoverLinkRendererProps = CoverRendererProps & {
    * onPress callback, can be used to prevent the default navigation
    */
   onPress?: (e: GestureResponderEvent) => void;
+
+  disabled?: boolean;
 };
