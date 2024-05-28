@@ -123,6 +123,14 @@ export const saveTransformedVideoToFile = async ({
         height: maxResolution,
       };
     }
+
+    if (video.rotation === 90 || video.rotation === 270) {
+      decoderResolution = {
+        width: decoderResolution.height,
+        height: decoderResolution.width,
+      };
+    }
+
     const cropData = editionParameters?.cropData;
     editionParameters = {
       ...editionParameters,
