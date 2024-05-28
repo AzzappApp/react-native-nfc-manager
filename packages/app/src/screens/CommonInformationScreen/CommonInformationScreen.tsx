@@ -145,10 +145,12 @@ export const CommonInformationScreen = ({
     }: ImagePickerResult) => {
       const exportWidth = width;
       const exportHeight = exportWidth / aspectRatio;
+      const mimeType =
+        mime.lookup(uri) === 'image/png' ? ImageFormat.PNG : ImageFormat.JPEG;
       const localPath = await saveTransformedImageToFile({
         uri,
         resolution: { width: exportWidth, height: exportHeight },
-        format: ImageFormat.JPEG,
+        format: mimeType,
         quality: 95,
         filter,
         editionParameters,

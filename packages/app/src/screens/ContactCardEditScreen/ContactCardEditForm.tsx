@@ -3,6 +3,7 @@ import { Fragment, useCallback, useEffect, useState } from 'react';
 import { Controller, useController } from 'react-hook-form';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { Pressable, View, Image } from 'react-native';
+import * as mime from 'react-native-mime-types';
 import { AVATAR_MAX_WIDTH } from '@azzapp/shared/contactCardHelpers';
 import { colors, shadow } from '#theme';
 import FormDeleteFieldOverlay from '#components/ContactCard/FormDeleteFieldOverlay';
@@ -109,10 +110,12 @@ const ContactCardEditForm = ({
       } else {
         const exportWidth = width;
         const exportHeight = exportWidth / aspectRatio;
+        const mimeType =
+          mime.lookup(uri) === 'image/png' ? ImageFormat.PNG : ImageFormat.JPEG;
         const localPath = await saveTransformedImageToFile({
           uri,
           resolution: { width: exportWidth, height: exportHeight },
-          format: ImageFormat.JPEG,
+          format: mimeType,
           quality: 95,
           filter,
           editionParameters,
