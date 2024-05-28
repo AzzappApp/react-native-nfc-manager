@@ -21,7 +21,7 @@ public:
   static void registerNatives();
 
   std::string loadImage(std::string uri);
-  std::string loadVideoFrame(std::string uri, double time);
+  std::string loadVideoFrame(std::string uri, double width, double height, double time);
   void releaseBuffer(std::string bufferId);
 
   static void postTaskResult(jni::alias_ref<jni::JClass>, jlong bufferLoaderPtr,

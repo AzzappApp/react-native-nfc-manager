@@ -43,7 +43,7 @@ public class BufferLoader {
     );
   }
 
-  public String loadVideoFrame(String uriStr, double time) {
+  public String loadVideoFrame(String uriStr, double width, double height, double time) {
     return enqueueTask(() -> {
       Uri uri = Uri.parse(uriStr);
       if (uri == null) {
@@ -56,6 +56,15 @@ public class BufferLoader {
         retriever.setDataSource(uri.toString(), new HashMap<>());
       }
       Bitmap bitmap = retriever.getFrameAtTime(Math.round(time * 1000000));
+      if (width != 0 && height != 0 && bitmap != null &&
+        (bitmap.getWidth() > width || bitmap.getHeight() > height)) {
+        double aspectRatio = (double) bitmap.getWidth() / bitmap.getHeight();
+        if (aspectRatio > width / height) {
+          bitmap = Bitmap.createScaledBitmap(bitmap, (int) width, (int) (width / aspectRatio), true);
+        } else {
+          bitmap = Bitmap.createScaledBitmap(bitmap, (int) (height * aspectRatio), (int) height, true);
+        }
+      }
       retriever.release();
       return bitmap;
     });

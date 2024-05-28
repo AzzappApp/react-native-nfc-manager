@@ -99,11 +99,18 @@ jsi::Value BufferLoaderHostObject::get(jsi::Runtime& runtime,
                                                       .utf8(runtime)
                                                       .c_str()];
         double time = arguments[1].asNumber();
-        auto callback = std::make_shared<jsi::Function>(arguments[2].asObject(runtime).asFunction(runtime));
+        CGSize maxSize;
+        if (arguments[2].isObject()) {
+          auto size = arguments[2].asObject(runtime);
+          maxSize.width = size.getProperty(runtime, "width").asNumber();
+          maxSize.height = size.getProperty(runtime, "height").asNumber();
+        }
+        auto callback = std::make_shared<jsi::Function>(arguments[3].asObject(runtime).asFunction(runtime));
 
         [AZPCIImageLoader
           loadVideoThumbnailWithUrl:url
           time:CMTimeMakeWithSeconds(time, NSEC_PER_SEC)
+          maxSize:maxSize
           onSuccess:^(CIImage* _Nonnull ciImage) {
               
             CVPixelBufferRef pixelBuffer;

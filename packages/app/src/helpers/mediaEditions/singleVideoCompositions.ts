@@ -12,6 +12,7 @@ export const createSingleVideoComposition = (
   videoFilePath: string,
   startTime: number,
   duration: number,
+  resolution?: { width: number; height: number },
 ): VideoComposition => ({
   duration,
   items: [
@@ -21,6 +22,7 @@ export const createSingleVideoComposition = (
       compositionStartTime: 0,
       startTime,
       duration,
+      resolution,
     },
   ],
 });

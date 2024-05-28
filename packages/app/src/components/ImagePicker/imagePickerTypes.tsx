@@ -29,6 +29,7 @@ export type MediaImage = MediaBase & { kind: 'image' };
 export type MediaVideo = MediaBase & {
   kind: 'video';
   duration: number;
+  rotation: number;
 };
 
 /**

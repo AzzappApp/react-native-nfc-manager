@@ -150,13 +150,14 @@ const SelectImageStep = ({
         if (duration) {
           const { uri: _uri } = result;
           const uri = _uri.startsWith('file://') ? _uri : `file://${_uri}`;
-          const { width, height } = await getVideoSize(_uri);
+          const { width, height, rotation } = await getVideoSize(_uri);
           onMediaChange(
             {
               kind: 'video',
               uri,
               height,
               width,
+              rotation,
               duration: duration as number,
             },
             forceCameraRatio,

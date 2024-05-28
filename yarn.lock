@@ -77,7 +77,7 @@ __metadata:
   resolution: "@azzapp/app@workspace:packages/app"
   dependencies:
     "@azzapp/i18n": "workspace:^"
-    "@azzapp/react-native-skia-video": v0.1.4
+    "@azzapp/react-native-skia-video": v0.2.2
     "@azzapp/shared": "workspace:^"
     "@expo-google-fonts/amatic-sc": ^0.2.3
     "@expo-google-fonts/anton": ^0.2.3
@@ -347,15 +347,15 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@azzapp/react-native-skia-video@npm:v0.1.4":
-  version: 0.1.4
-  resolution: "@azzapp/react-native-skia-video@npm:0.1.4"
+"@azzapp/react-native-skia-video@npm:v0.2.2":
+  version: 0.2.2
+  resolution: "@azzapp/react-native-skia-video@npm:0.2.2"
   peerDependencies:
     "@shopify/react-native-skia": ">= 1.2.3"
     react: "*"
     react-native: "*"
     react-native-reanimated: ">= 3.10.0"
-  checksum: b52340d0cc0129b4718696c6670a50dbc07176da6174be867502c3acb806f51051f5dd268357d05568bed337035aa0243c2302e084dfa54c9ff0aa7c6c957934
+  checksum: ebab415e0d03df52ba002ee84ecf1f8b54f959fd87e4e1c5d3af84ae51663fa54524e6cd8ddcc170cd98245c4435a1d1169e20b3121ee861e3f40a822fc63119
   languageName: node
   linkType: hard
 

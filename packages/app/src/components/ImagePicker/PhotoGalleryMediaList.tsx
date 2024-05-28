@@ -134,15 +134,15 @@ const PhotoGalleryMediaList = ({
       }
       let { width, height } = asset;
       if (asset.mediaType === 'video') {
-        if (asset.width == null || asset.height == null) {
-          ({ width, height } = await getVideoSize(uri));
-        }
+        let rotation: number;
+        ({ width, height, rotation } = await getVideoSize(uri));
         onMediaSelected({
           galleryUri: asset.uri,
           kind: 'video',
           uri,
           width,
           height,
+          rotation,
           duration: asset.duration,
         });
       } else {

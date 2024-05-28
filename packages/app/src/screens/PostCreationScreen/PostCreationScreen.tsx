@@ -1,7 +1,7 @@
 import { ImageFormat } from '@shopify/react-native-skia';
 import { useCallback, useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
-import { Platform, View } from 'react-native';
+import { View } from 'react-native';
 import * as mime from 'react-native-mime-types';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
@@ -146,6 +146,9 @@ const PostCreationScreen = ({
       kind,
       uri,
       aspectRatio,
+      rotation,
+      width,
+      height,
       editionParameters,
       filter,
       timeRange,
@@ -155,8 +158,9 @@ const PostCreationScreen = ({
       }
       try {
         setProgressIndicator(Observable.from(0));
-        if (Platform.OS === 'android' && kind === 'video') {
-          // on Android we need to be sure that the player is released to avoid memory overload
+        if (kind === 'video') {
+          // we need to wait for the video player to be released before we can start the video export
+          // to avoid memory issues
           await waitTime(50);
         }
         const maxSize =
@@ -175,7 +179,12 @@ const PostCreationScreen = ({
               editionParameters,
             })
           : saveTransformedVideoToFile({
-              uri,
+              video: {
+                uri,
+                width,
+                height,
+                rotation,
+              },
               resolution,
               bitRate: POST_VIDEO_BIT_RATE,
               frameRate: POST_VIDEO_FRAME_RATE,

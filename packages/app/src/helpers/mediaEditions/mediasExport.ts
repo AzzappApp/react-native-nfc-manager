@@ -4,6 +4,7 @@ import {
   createPicture,
   drawAsImageFromPicture,
 } from '@shopify/react-native-skia';
+import { Platform } from 'react-native';
 import ReactNativeBlobUtil from 'react-native-blob-util';
 import { exportVideoComposition } from '@azzapp/react-native-skia-video';
 import { createId } from '#helpers/idHelpers';
@@ -64,8 +65,11 @@ export const saveTransformedImageToFile = async ({
   return path;
 };
 
+// TODO differentiate by OS and models ? the resolution has great impact on the memory usage
+const MAX_EXPORT_DECODER_RESOLUTION = 1920;
+
 export const saveTransformedVideoToFile = async ({
-  uri,
+  video,
   resolution,
   frameRate,
   bitRate,
@@ -76,7 +80,12 @@ export const saveTransformedVideoToFile = async ({
   startTime,
   duration,
 }: {
-  uri: string;
+  video: {
+    uri: string;
+    width: number;
+    height: number;
+    rotation: number;
+  };
   resolution: { width: number; height: number };
   frameRate: number;
   bitRate: number;
@@ -86,14 +95,53 @@ export const saveTransformedVideoToFile = async ({
   startTime?: number;
   duration?: number;
 }): Promise<string> => {
-  const sourcePath = await getVideoLocalPath(uri);
+  const sourcePath = await getVideoLocalPath(video.uri);
   if (!sourcePath) {
     throw new Error('Video not found');
   }
+
+  let decoderResolution: { width: number; height: number } | undefined =
+    undefined;
+  if (
+    Platform.OS === 'ios' &&
+    (video.width > MAX_EXPORT_DECODER_RESOLUTION ||
+      video.height > MAX_EXPORT_DECODER_RESOLUTION)
+  ) {
+    const aspectRatio = video.width / video.height;
+    const maxResolution = MAX_EXPORT_DECODER_RESOLUTION;
+    let videoScale = 1;
+    if (aspectRatio > 1) {
+      videoScale = maxResolution / video.width;
+      decoderResolution = {
+        width: maxResolution,
+        height: maxResolution / aspectRatio,
+      };
+    } else {
+      videoScale = maxResolution / video.height;
+      decoderResolution = {
+        width: maxResolution * aspectRatio,
+        height: maxResolution,
+      };
+    }
+    const cropData = editionParameters?.cropData;
+    editionParameters = {
+      ...editionParameters,
+      cropData: cropData
+        ? {
+            originX: cropData.originX * videoScale,
+            originY: cropData.originY * videoScale,
+            width: cropData.width * videoScale,
+            height: cropData.height * videoScale,
+          }
+        : undefined,
+    };
+  }
+
   const videoComposition = createSingleVideoComposition(
     sourcePath,
     startTime ?? 0,
     duration ?? 0,
+    decoderResolution,
   );
 
   const drawFrame = createSingleVideoFrameDrawer(

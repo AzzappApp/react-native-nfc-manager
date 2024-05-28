@@ -105,7 +105,7 @@ const ImagePickerMediaRenderer = ({
               ) : (
                 <TransformedVideoRenderer
                   testID="image-picker-media-video"
-                  uri={media.uri}
+                  video={media}
                   {...imageDimensions}
                   filter={mediaFilter}
                   editionParameters={{ ...editionParameters, cropData }}

@@ -6,12 +6,14 @@ import type { SkImage } from '@shopify/react-native-skia';
 const useSkImage = ({
   uri,
   kind,
+  maxVideoThumbnailSize,
   time = 0,
   onLoad,
   onError,
 }: {
   uri: string | null | undefined;
   kind: 'image' | 'video' | null | undefined;
+  maxVideoThumbnailSize?: { width: number; height: number } | null | undefined;
   time?: number | null | undefined;
   onLoad?: () => void;
   onError?: (error?: Error) => void;
@@ -21,20 +23,24 @@ const useSkImage = ({
   const onErrorInner = useLatestCallback(onError);
   useEffect(() => {
     let canceled = false;
-    let hasRef = false;
     setSkImage(null);
+    let refKey: string | null = null;
     if (uri && kind) {
-      const promise =
+      const { key, promise } =
         kind === 'image'
-          ? SKImageLoader.loadImage(uri)
-          : SKImageLoader.loadVideoThumbnail(uri, time ?? 0);
+          ? { key: uri, promise: SKImageLoader.loadImage(uri) }
+          : SKImageLoader.loadVideoThumbnail(
+              uri,
+              time ?? 0,
+              maxVideoThumbnailSize,
+            );
       promise.then(
         image => {
           if (canceled) {
             return;
           }
-          SKImageLoader.refImage(uri);
-          hasRef = true;
+          refKey = key;
+          SKImageLoader.refImage(key);
           setSkImage(image);
           onLoadInner();
         },
@@ -48,11 +54,11 @@ const useSkImage = ({
     }
     return () => {
       canceled = true;
-      if (uri && hasRef) {
-        SKImageLoader.unrefImage(uri);
+      if (refKey) {
+        SKImageLoader.unrefImage(refKey);
       }
     };
-  }, [uri, kind, time, onLoadInner, onErrorInner]);
+  }, [uri, kind, time, onLoadInner, onErrorInner, maxVideoThumbnailSize]);
 
   return skImage;
 };

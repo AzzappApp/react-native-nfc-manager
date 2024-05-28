@@ -33,6 +33,10 @@ export type ImagePickerResult = {
    */
   height: number;
   /**
+   * The rotation of the media selected in pixels
+   */
+  rotation: number;
+  /**
    * The aspect ratio of the media selected
    */
   aspectRatio: number;
@@ -164,6 +168,7 @@ const ImagePicker = ({
       }
       onFinished?.({
         ...media,
+        rotation: 'rotation' in media ? media.rotation : 0,
         aspectRatio,
         editionParameters,
         filter: mediaFilter,

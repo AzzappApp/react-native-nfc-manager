@@ -14,6 +14,7 @@ type BufferLoader = {
   loadVideoFrame: (
     uri: string,
     time: number,
+    maximumSize: { width: number; height: number } | null | undefined,
     callback: (error: any, buffer: bigint | null) => void,
   ) => void;
   unrefBuffer(buffer: bigint): void;
@@ -30,6 +31,19 @@ const skImages = new Map<
   { image: SkImage; buffer: bigint; refCount: number }
 >();
 
+let cleanupTimeout: any = null;
+const scheduleCleanUp = () => {
+  clearTimeout(cleanupTimeout);
+  cleanupTimeout = setTimeout(() => {
+    for (const [key, ref] of skImages) {
+      if (ref.refCount <= 0) {
+        skImages.delete(key);
+        getBufferLoader().unrefBuffer(ref.buffer);
+      }
+    }
+  }, 1000);
+};
+
 type ImageLoader = (
   callback: (error: any, buffer: bigint | null) => void,
 ) => void;
@@ -40,7 +54,6 @@ const loadImageWithCache = async (
 ): Promise<SkImage> => {
   if (skImages.has(key)) {
     const ref = skImages.get(key)!;
-    ref.refCount++;
     return ref.image;
   }
   if (!loadImageTasks.has(key)) {
@@ -76,13 +89,7 @@ const loadImageWithCache = async (
             buffer,
             refCount: 0,
           });
-          setTimeout(() => {
-            // in case of orphaned task we will clean up the image
-            if (skImages.has(key) && skImages.get(key)!.refCount === 0) {
-              skImages.delete(key);
-              getBufferLoader().unrefBuffer(buffer);
-            }
-          }, 1000);
+          scheduleCleanUp();
           resolve(image);
         });
       }),
@@ -97,37 +104,39 @@ const loadImage = (uri: string): Promise<SkImage> => {
   );
 };
 
-const loadVideoThumbnail = (uri: string, time = 0): Promise<SkImage> => {
-  return loadImageWithCache(`${uri}-${time}`, callback =>
-    getBufferLoader().loadVideoFrame(uri, time, callback),
-  );
+const loadVideoThumbnail = (
+  uri: string,
+  time = 0,
+  maximumSize?: { width: number; height: number } | null,
+): { key: string; promise: Promise<SkImage> } => {
+  const key = [
+    uri,
+    time,
+    maximumSize ? `${maximumSize.width}-${maximumSize.height}` : 'full',
+  ].join('-');
+  return {
+    key,
+    promise: loadImageWithCache(key, callback =>
+      getBufferLoader().loadVideoFrame(uri, time, maximumSize, callback),
+    ),
+  };
 };
 
-const refImage = (uri: string) => {
-  const ref = skImages.get(uri);
+const refImage = (key: string) => {
+  const ref = skImages.get(key);
   if (ref) {
     ref.refCount++;
   }
-  // logCacheInfo();
+  scheduleCleanUp();
 };
 
-const unrefImage = (uri: string) => {
-  const ref = skImages.get(uri);
+const unrefImage = (key: string) => {
+  const ref = skImages.get(key);
   if (ref) {
     ref.refCount--;
-    if (ref.refCount === 0) {
-      skImages.delete(uri);
-      getBufferLoader().unrefBuffer(ref.buffer);
-    }
   }
-  // logCacheInfo();
+  scheduleCleanUp();
 };
-
-// const logCacheInfo = () => {
-//   skImages.forEach((value, key) => {
-//     console.log(key, value.refCount);
-//   });
-// };
 
 const SKImageLoader = {
   loadImage,

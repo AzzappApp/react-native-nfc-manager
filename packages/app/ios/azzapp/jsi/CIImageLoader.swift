@@ -49,6 +49,7 @@ class CIImageLoader: NSObject {
   static func loadVideoThumbnail(
     url: NSString,
     time: CMTime,
+    maxSize: CGSize,
     onSuccess: @escaping (_ image: CIImage) -> Void,
     onError: @escaping (_ error: NSError?
   ) -> Void) {
@@ -64,22 +65,13 @@ class CIImageLoader: NSObject {
       do {
         let asset = AVAsset(url: url)
         let generator = AVAssetImageGenerator(asset: asset)
-        guard let videoTrack = try await asset.loadTracks(withMediaType: .video).first else  {
-          let error = NSError(domain: "com.azzapp.app", code: 0, userInfo: [
-            NSLocalizedDescriptionKey: "Failed to load video thumbnail",
-          ]);
-          onError(error);
-          return;
+        generator.appliesPreferredTrackTransform = true
+        if (!CGSizeEqualToSize(maxSize, CGSizeZero)) {
+          generator.maximumSize = maxSize
         }
-         
-        let orientationTransform = videoTrack.orientationTransform
         let cgiImage = try generator.copyCGImage(at: time, actualTime: nil)
-        var image = CIImage(cgImage: cgiImage);
-        image = image.transformed(by: orientationTransform)
-        image = image.transformed(by: CGAffineTransform(
-          translationX: -image.extent.origin.x,
-          y: -image.extent.origin.y
-        ))
+        let image = CIImage(cgImage: cgiImage);
+        generator.cancelAllCGImageGeneration();
         onSuccess(image)
       } catch {
         let nsError = NSError(domain: "com.azzapp.app", code: 0, userInfo: [

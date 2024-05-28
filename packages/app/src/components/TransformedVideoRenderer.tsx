@@ -1,7 +1,7 @@
 import { Canvas, Skia } from '@shopify/react-native-skia';
 import { SkiaViewApi } from '@shopify/react-native-skia/lib/module/views/api';
 import { useCallback, useEffect, useMemo } from 'react';
-import { PixelRatio, type ViewProps } from 'react-native';
+import { Dimensions, PixelRatio, Platform, type ViewProps } from 'react-native';
 import { useFrameCallback, useSharedValue } from 'react-native-reanimated';
 import { __RNSkiaVideoPrivateAPI } from '@azzapp/react-native-skia-video';
 import {
@@ -16,7 +16,12 @@ import type { VideoComposition } from '@azzapp/react-native-skia-video';
 import type { SkCanvas } from '@shopify/react-native-skia';
 
 export type TransformedVideoRendererProps = Exclude<ViewProps, 'children'> & {
-  uri: string | null;
+  video: {
+    uri: string;
+    width: number;
+    height: number;
+    rotation: number;
+  } | null;
   editionParameters?: EditionParameters | null;
   filter?: Filter | null;
   startTime: number;
@@ -27,8 +32,13 @@ export type TransformedVideoRendererProps = Exclude<ViewProps, 'children'> & {
   onError?: (error?: Error) => void;
 };
 
+const MAX_DISPLAY_DECODER_RESOLUTION = Math.min(
+  Dimensions.get('window').width * PixelRatio.get(),
+  1920,
+);
+
 const TransformedVideoRenderer = ({
-  uri,
+  video,
   editionParameters,
   filter,
   startTime,
@@ -41,14 +51,59 @@ const TransformedVideoRenderer = ({
 }: TransformedVideoRendererProps) => {
   const lutShader = useLutShader(filter);
 
-  const videoPath = useVideoLocalPath(uri, onLoad, onError);
+  const videoPath = useVideoLocalPath(video?.uri ?? null, onLoad, onError);
 
-  const composition = useMemo<VideoComposition | null>(() => {
-    if (!videoPath) {
+  const infos = useMemo<{
+    composition: VideoComposition;
+    videoScale: number;
+  } | null>(() => {
+    if (!videoPath || !video) {
       return null;
     }
-    return createSingleVideoComposition(videoPath, startTime, duration);
-  }, [videoPath, duration, startTime]);
+    const { height, width, rotation } = video;
+    let resolution: { width: number; height: number } | undefined = undefined;
+    let videoScale = 1;
+    if (
+      Platform.OS === 'ios' &&
+      (video.width > MAX_DISPLAY_DECODER_RESOLUTION ||
+        video.height > MAX_DISPLAY_DECODER_RESOLUTION)
+    ) {
+      const aspectRatio = width / height;
+      const maxResolution = MAX_DISPLAY_DECODER_RESOLUTION;
+      if (aspectRatio > 1) {
+        videoScale = maxResolution / width;
+        resolution = {
+          width: maxResolution,
+          height: maxResolution / aspectRatio,
+        };
+      } else {
+        videoScale = maxResolution / height;
+        resolution = {
+          width: maxResolution * aspectRatio,
+          height: maxResolution,
+        };
+      }
+      if (rotation === 90 || rotation === 270) {
+        resolution = {
+          width: resolution.height,
+          height: resolution.width,
+        };
+      }
+    }
+
+    return {
+      composition: createSingleVideoComposition(
+        videoPath,
+        startTime,
+        duration,
+        resolution,
+      ),
+      videoScale,
+    };
+  }, [videoPath, video, startTime, duration]);
+
+  const composition = infos?.composition ?? null;
+  const videoScale = infos?.videoScale ?? 1;
 
   const framesExtractor = useMemo(() => {
     if (composition) {
@@ -97,11 +152,22 @@ const TransformedVideoRenderer = ({
           return;
         }
         const paint = Skia.Paint();
+        const cropData = editionParameters?.cropData;
         const shader = transformVideoFrame({
           frame,
           width: width * pixelRatio,
           height: height * pixelRatio,
-          editionParameters,
+          editionParameters: {
+            ...editionParameters,
+            cropData: cropData
+              ? {
+                  originX: cropData.originX * videoScale,
+                  originY: cropData.originY * videoScale,
+                  width: cropData.width * videoScale,
+                  height: cropData.height * videoScale,
+                }
+              : undefined,
+          },
           lutShader,
         });
         if (!shader) {

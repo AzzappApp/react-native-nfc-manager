@@ -265,6 +265,7 @@ const _ImagePickerContextProvider = (
     uri: media?.uri,
     kind: media?.kind,
     time: timeRange?.startTime,
+    maxVideoThumbnailSize: MAX_VIDEO_THUMBNAIL_SIZE,
   });
 
   const pickerState = useMemo<ImagePickerState>(
@@ -321,6 +322,11 @@ const _ImagePickerContextProvider = (
       {children}
     </ImagePickerContext.Provider>
   );
+};
+
+export const MAX_VIDEO_THUMBNAIL_SIZE = {
+  width: 512,
+  height: 512,
 };
 
 /**

@@ -23,10 +23,10 @@ std::string JBufferLoader::loadImage(std::string uri) {
   return loadImageMethod(self(), uri)->toStdString();
 }
 
-std::string JBufferLoader::loadVideoFrame( std::string uri, double time) {
+std::string JBufferLoader::loadVideoFrame(std::string uri, double width, double height, double time) {
   static const auto loadVideoFrameMethod =
-      getClass()->getMethod<jstring (std::string, double)>("loadVideoFrame");
-  return loadVideoFrameMethod(self(), uri, time)->toStdString();
+      getClass()->getMethod<jstring (std::string, double, double, double)>("loadVideoFrame");
+  return loadVideoFrameMethod(self(), uri, width, height, time)->toStdString();
 }
 
 void JBufferLoader::postTaskResult(jni::alias_ref<jni::JClass>, jlong bufferLoaderPtr,
@@ -87,11 +87,18 @@ jsi::Value BufferLoaderHostObject::get(jsi::Runtime& runtime,
                const jsi::Value *arguments, size_t count) -> jsi::Value {
           auto uri = arguments[0].asString(runtime).utf8(runtime);
           auto time = arguments[1].asNumber();
+          double width = 0;
+          double height = 0;
+          if (arguments[2].isObject()) {
+            auto size = arguments[2].asObject(runtime);
+            width = size.getProperty(runtime, "width").asNumber();
+            height = size.getProperty(runtime, "height").asNumber();
+          }
           auto callback = std::make_shared<jsi::Function>(
-              arguments[2].asObject(runtime).asFunction(runtime));
+              arguments[3].asObject(runtime).asFunction(runtime));
 
 
-          auto taskId = jbufferLoader->loadVideoFrame(uri, time);
+          auto taskId = jbufferLoader->loadVideoFrame(uri, width, height, time);
           tasks[taskId] = callback;
           return jsi::Value::undefined();
         });

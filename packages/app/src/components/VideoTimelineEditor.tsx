@@ -196,10 +196,33 @@ const VideoTimelineEditor = ({
 
   const [images, setImages] = useState<SkImage[]>([]);
   useEffect(() => {
-    const promises = range(0, video.duration, video.duration / nbImage).map(
-      second => SKImageLoader.loadVideoThumbnail(video.uri, second),
+    let canceled = false;
+    let keys: string[] = [];
+    const thumbnails = range(0, video.duration, video.duration / nbImage).map(
+      second =>
+        SKImageLoader.loadVideoThumbnail(video.uri, second, {
+          width: 256,
+          height: 256,
+        }),
     );
-    Promise.all(promises).then(setImages);
+    Promise.all(thumbnails.map(video => video.promise))
+      .then(setImages)
+      .then(
+        () => {
+          if (canceled) {
+            return;
+          }
+          keys = thumbnails.map(video => video.key);
+          keys.forEach(SKImageLoader.refImage);
+        },
+        () => {
+          console.warn('error loading images');
+        },
+      );
+    return () => {
+      canceled = true;
+      keys.forEach(SKImageLoader.unrefImage);
+    };
   }, [video.uri, video.duration, nbImage]);
 
   const formatDurationMarker = (index: number) => {
