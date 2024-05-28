@@ -1,5 +1,6 @@
-## 0.5.15-canary.32
+## 0.5.15-canary.33
 
+* **fix:**  - **webCard:** [#3469](https://github.com/AzzappApp/azzapp/pull/3469) cascade delete on post when webcard is removed ([#3492](https://github.com/AzzappApp/azzapp/pull/3492))
 * **feat:**  - configure regions in production ([#3494](https://github.com/AzzappApp/azzapp/pull/3494))
 * **fix:**  - **multiUser:** [#3497](https://github.com/AzzappApp/azzapp/pull/3497) support png files for logos ([#3501](https://github.com/AzzappApp/azzapp/pull/3501))
 * **fix:**  - **PosctCreationScreen:** improve memory usage on IOS ([#3502](https://github.com/AzzappApp/azzapp/pull/3502))
