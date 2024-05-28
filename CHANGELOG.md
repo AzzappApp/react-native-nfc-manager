@@ -1,4 +1,4 @@
-## 0.5.15-canary.35
+## 0.5.15-canary.36
 
 * **fix:**  - error on font reload ([#3509](https://github.com/AzzappApp/azzapp/pull/3509))
 * **fix:**  - **webCard:** [#3469](https://github.com/AzzappApp/azzapp/pull/3469) cascade delete on post when webcard is removed ([#3492](https://github.com/AzzappApp/azzapp/pull/3492))
