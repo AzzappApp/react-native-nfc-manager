@@ -1,5 +1,6 @@
-## 0.5.15-canary.30
+## 0.5.15-canary.31
 
+* **fix:**  - **PosctCreationScreen:** improve memory usage on IOS ([#3502](https://github.com/AzzappApp/azzapp/pull/3502))
 * **feat:**  - add free seats ([#3495](https://github.com/AzzappApp/azzapp/pull/3495))
 * **fix:**  - **payment:** use subscription id in payments ([#3461](https://github.com/AzzappApp/azzapp/pull/3461))
 * **fix:**  - **payment:** wrong amount per year ([#3483](https://github.com/AzzappApp/azzapp/pull/3483))
