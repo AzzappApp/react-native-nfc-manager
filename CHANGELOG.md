@@ -1,5 +1,6 @@
-## 0.5.15-canary.36
+## 0.5.15-canary.37
 
+* **fix:**  - **media:** [#3508](https://github.com/AzzappApp/azzapp/pull/3508) apply rotation on decoder resolution ([#3514](https://github.com/AzzappApp/azzapp/pull/3514))
 * **fix:**  - error on font reload ([#3509](https://github.com/AzzappApp/azzapp/pull/3509))
 * **fix:**  - **webCard:** [#3469](https://github.com/AzzappApp/azzapp/pull/3469) cascade delete on post when webcard is removed ([#3492](https://github.com/AzzappApp/azzapp/pull/3492))
 * **feat:**  - configure regions in production ([#3494](https://github.com/AzzappApp/azzapp/pull/3494))
