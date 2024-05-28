@@ -1,22 +1,61 @@
-import { Ratelimit } from '@upstash/ratelimit';
-import { kv } from '@vercel/kv';
+import { MultiRegionRatelimit, Ratelimit } from '@upstash/ratelimit';
+import { waitUntil } from '@vercel/functions';
+import { kv, createClient } from '@vercel/kv';
 import { NextResponse } from 'next/server';
 import { getRedirectWebCardByUserName } from '@azzapp/data';
 import type { NextRequest } from 'next/server';
 
 const cache = new Map();
 
+const redisClient =
+  process.env.NEXT_PUBLIC_PLATFORM === 'production'
+    ? [
+        createClient({
+          url: process.env.KV_PROD_FRA1_REST_API_URL ?? '',
+          token: process.env.KV_PROD_FRA1_REST_API_TOKEN ?? '',
+        }),
+        createClient({
+          url: process.env.KV_PROD_PDX1_REST_API_URL ?? '',
+          token: process.env.KV_PROD_PDX1_REST_API_TOKEN ?? '',
+        }),
+        createClient({
+          url: process.env.KV_PROD_IAD1_REST_API_URL ?? '',
+          token: process.env.KV_PROD_IAD1_REST_API_TOKEN ?? '',
+        }),
+        createClient({
+          url: process.env.KV_PROD_GRU1_REST_API_URL ?? '',
+          token: process.env.KV_PROD_GRU1_REST_API_TOKEN ?? '',
+        }),
+        createClient({
+          url: process.env.KV_PROD_SIN1_REST_API_URL ?? '',
+          token: process.env.KV_PROD_SIN1_REST_API_TOKEN ?? '',
+        }),
+      ]
+    : kv;
+
 const rateLimit = {
-  api: new Ratelimit({
-    redis: kv,
-    limiter: Ratelimit.slidingWindow(20, '1 s'),
-    ephemeralCache: cache,
-  }),
-  web: new Ratelimit({
-    redis: kv,
-    limiter: Ratelimit.slidingWindow(15, '1 s'),
-    ephemeralCache: cache,
-  }),
+  api: Array.isArray(redisClient)
+    ? new MultiRegionRatelimit({
+        redis: redisClient,
+        limiter: MultiRegionRatelimit.slidingWindow(20, '1 s'),
+        ephemeralCache: cache,
+      })
+    : new Ratelimit({
+        redis: redisClient,
+        limiter: Ratelimit.slidingWindow(20, '1 s'),
+        ephemeralCache: cache,
+      }),
+  web: Array.isArray(redisClient)
+    ? new MultiRegionRatelimit({
+        redis: redisClient,
+        limiter: MultiRegionRatelimit.slidingWindow(15, '1 s'),
+        ephemeralCache: cache,
+      })
+    : new Ratelimit({
+        redis: redisClient,
+        limiter: Ratelimit.slidingWindow(15, '1 s'),
+        ephemeralCache: cache,
+      }),
 };
 
 export async function middleware(request: NextRequest) {
@@ -25,9 +64,11 @@ export async function middleware(request: NextRequest) {
   if (process.env.NODE_ENV === 'production') {
     const ip = request.ip ?? '127.0.0.1';
 
-    const { success } = nextUrl.pathname.startsWith('/api')
+    const { pending, success } = nextUrl.pathname.startsWith('/api')
       ? await rateLimit.api.limit(ip)
       : await rateLimit.web.limit(ip);
+
+    waitUntil(pending);
 
     if (!success) {
       return NextResponse.json(
