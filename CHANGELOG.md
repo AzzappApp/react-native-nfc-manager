@@ -1,5 +1,6 @@
-## 0.5.15-canary.33
+## 0.5.15-canary.34
 
+* **fix:**  - error on font reload ([#3509](https://github.com/AzzappApp/azzapp/pull/3509))
 * **fix:**  - **webCard:** [#3469](https://github.com/AzzappApp/azzapp/pull/3469) cascade delete on post when webcard is removed ([#3492](https://github.com/AzzappApp/azzapp/pull/3492))
 * **feat:**  - configure regions in production ([#3494](https://github.com/AzzappApp/azzapp/pull/3494))
 * **fix:**  - **multiUser:** [#3497](https://github.com/AzzappApp/azzapp/pull/3497) support png files for logos ([#3501](https://github.com/AzzappApp/azzapp/pull/3501))
