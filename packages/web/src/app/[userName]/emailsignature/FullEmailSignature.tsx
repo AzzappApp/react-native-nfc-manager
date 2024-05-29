@@ -1,17 +1,16 @@
 'use client';
 import { decompressFromEncodedURIComponent } from 'lz-string';
+import Image from 'next/image';
 import { useSearchParams } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
 import { colors, getTextColor } from '@azzapp/shared/colorsHelpers';
 import { COVER_RATIO } from '@azzapp/shared/coverHelpers';
-import {
-  buildCardSignature,
-  buildSaveMyContactSignature,
-  parseEmailSignature,
-} from '@azzapp/shared/emailSignatureHelpers';
+import { parseEmailSignature } from '@azzapp/shared/emailSignatureHelpers';
 import { getImageURLForSize } from '@azzapp/shared/imagesHelpers';
 import { formatDisplayName } from '@azzapp/shared/stringHelpers';
 import { buildUserUrl } from '@azzapp/shared/urlHelpers';
+import mailLogo from '@azzapp/web/public/signature/mail.png';
+import phoneLogo from '@azzapp/web/public/signature/phone.png';
 import { ArrowRightIcon } from '#assets';
 import { Button } from '#ui';
 import CoverRenderer from '#components/renderer/CoverRenderer';
@@ -23,9 +22,11 @@ import type { EmailSignatureParsed } from '@azzapp/shared/emailSignatureHelpers'
 const FullEmailSignature = ({
   webCard,
   media,
+  companyLogo,
 }: {
   webCard: WebCard;
   media: Media | null;
+  companyLogo: string | null;
 }) => {
   const searchParams = useSearchParams();
   const [contact, setContact] = useState<EmailSignatureParsed | undefined>();
@@ -89,17 +90,8 @@ const FullEmailSignature = ({
     }
   }, [searchParams, webCard.userName]);
 
-  const [webCardUrl, setWebCardUrl] = useState<string>('');
-  useEffect(() => {
-    if (webCard) {
-      setWebCardUrl(
-        `${process.env.NEXT_PUBLIC_API_ENDPOINT}/cover/${webCard.userName}?width=${630}&updatedAt=${webCard?.updatedAt.toISOString()}`,
-      );
-    }
-  }, [webCard]);
-
-  const companyLogo = webCard.logoId
-    ? getImageURLForSize(webCard.logoId, 140, 140)
+  const companyLogoUrl = companyLogo
+    ? getImageURLForSize(companyLogo, null, 140)
     : null;
   const handleCopySignature = async (mode: 'full' | 'simple') => {
     const compressedContactCard = searchParams.get('c') ?? '';
@@ -108,13 +100,12 @@ const FullEmailSignature = ({
         ? buildCardSignature(
             buildUserUrl(webCard.userName) + '?c=' + compressedContactCard,
             contact?.avatar,
-            webCardUrl,
             formatDisplayName(contact?.firstName, contact?.lastName),
             contact?.title,
             contact?.company,
             contact?.phoneNumbers,
             contact?.emails,
-            companyLogo,
+            companyLogoUrl,
             webCard.cardColors?.primary ?? colors.white,
             getTextColor(webCard.cardColors?.primary ?? colors.white),
           )
@@ -243,7 +234,7 @@ const FullEmailSignature = ({
                     <div
                       style={{
                         textAlign: 'left',
-                        color: '#87878',
+                        color: '#87878E',
                         fontSize: '12px',
                         fontFamily: 'Helvetica Neue',
                         fontWeight: 400,
@@ -282,96 +273,92 @@ const FullEmailSignature = ({
               </table>
             </td>
             <td
-              valign="middle"
+              valign="top"
               style={{
                 width: '50%',
                 paddingLeft: '30px',
                 borderLeft: '1px solid  #E2E1E3',
               }}
             >
-              {contact?.phoneNumbers && contact?.phoneNumbers.length > 0 && (
-                <div
-                  style={{
-                    textAlign: 'left',
-                    color: 'black',
-                    fontSize: '12px',
-                    fontFamily: 'Helvetica Neue',
-                    fontWeight: 400,
-                  }}
-                >
-                  {contact?.phoneNumbers.map(phone => {
-                    return (
-                      <div
-                        key={phone}
+              {contact?.phoneNumbers &&
+                contact?.phoneNumbers.length > 0 &&
+                contact?.phoneNumbers.map(phone => {
+                  return (
+                    <div
+                      key={phone}
+                      style={{
+                        height: '20px',
+                        width: '100%',
+                        display: 'inline-block',
+                      }}
+                    >
+                      <Image
+                        src={mailLogo}
                         style={{
-                          height: '12px',
-                          width: '100%',
-                          display: 'inline-block',
-                          verticalAlign: 'middle',
-                        }}
-                      >
-                        <img
-                          src="http://cdn.mcauto-images-production.sendgrid.net/b45e0397500ee742/1a9d2a65-3d9d-4759-9ad5-c23b4b8cdcaa/43x42.png"
-                          style={{
-                            width: '14px',
-                            height: '14px',
-                            marginRight: '4px',
-                          }}
-                        />
-                        {phone}
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
-              {contact?.emails && contact?.emails.length > 0 && (
-                <div
-                  style={{
-                    textAlign: 'left',
-                    color: 'black',
-                    fontSize: '12px',
-                    fontFamily: 'Helvetica Neue',
-                    fontWeight: 400,
-                    marginTop: '5px',
-                  }}
-                >
-                  {contact?.emails.map(mail => {
-                    return (
-                      <div
-                        key={mail}
-                        style={{
+                          width: '14px',
                           height: '14px',
-                          width: '100%',
-                          display: 'inline-block',
                           verticalAlign: 'middle',
                         }}
+                        alt={'maillogo'}
+                      />
+                      <span
+                        style={{
+                          fontFamily: 'Helvetica Neue',
+                          fontSize: '12px',
+                          fontWeight: 400,
+                          textAlign: 'center',
+                          marginLeft: '4px',
+                        }}
                       >
-                        <img
-                          src="http://cdn.mcauto-images-production.sendgrid.net/b45e0397500ee742/cc231bce-ec78-42f8-aeb8-92d200de2a81/43x42.png"
-                          style={{
-                            width: '14px',
-                            height: '14px',
-                            marginRight: '4px',
-                          }}
-                        />
-                        <span
-                          style={{ fontSize: '12px', verticalAlign: 'top' }}
-                        >
-                          {mail}
-                        </span>
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
-              {companyLogo && (
+                        {phone}
+                      </span>
+                    </div>
+                  );
+                })}
+
+              {contact?.emails &&
+                contact?.emails.length > 0 &&
+                contact?.emails.map(mail => {
+                  return (
+                    <div
+                      key={mail}
+                      style={{
+                        height: '20px',
+                        width: '100%',
+                        display: 'inline-block',
+                      }}
+                    >
+                      <Image
+                        src={phoneLogo}
+                        style={{
+                          width: '14px',
+                          height: '14px',
+                          verticalAlign: 'middle',
+                        }}
+                        alt={'phonelogo'}
+                      />
+                      <span
+                        style={{
+                          fontFamily: 'Helvetica Neue',
+                          fontSize: '12px',
+                          fontWeight: 400,
+                          textAlign: 'center',
+                          marginLeft: '4px',
+                        }}
+                      >
+                        {mail}
+                      </span>
+                    </div>
+                  );
+                })}
+              {companyLogoUrl && (
                 <img
                   style={{
                     marginTop: '15px',
                     height: '60px',
                     objectFit: 'contain',
                   }}
-                  src={companyLogo}
+                  src={companyLogoUrl}
                 />
               )}
             </td>
@@ -444,3 +431,96 @@ const CommonExplanation = ({ mode }: { mode: string }) => {
 };
 
 export default FullEmailSignature;
+
+export function buildCardSignature(
+  url: string,
+  avatarUrl: string | null | undefined,
+  displayName: string | null | undefined,
+  title: string | null | undefined,
+  company: string | null | undefined,
+  phones: string[] | null | undefined,
+  mails: string[] | null | undefined,
+  companyLogo: string | null | undefined,
+  primaryColor: string,
+  readableColor: string,
+) {
+  let card = `
+  <table  border="0" cellpadding="0" cellspacing="0" 
+    style="table-layout: fixed;max-width:  560px; text-decoration: unset !important;padding-left: 30px;padding-right: 30px;max-width: 560px !important; width:100%;">
+    <tbody>`;
+  if (avatarUrl) {
+    card += `<tr>
+              <td height="60px" valign="top" colspan="2">
+                <img style="width: 60px; height: 60px; border-radius: 30px; margin-bottom: 20px;"  src="${avatarUrl}" />
+              </td>
+            </tr>`;
+  }
+  card += `<tr style="max-width: 100% !important">
+            <td height="100%" valign="top" style="width:100% !important; flex-direction:column; justify-content:space-evenly">
+           <div style="height: 100%">`;
+  if (displayName) {
+    card += `<div style="text-align: left; color: black; font-size: 16px; font-family: Helvetica Neue; font-weight: 500 !important; word-wrap: break-word; line-height: 20px; margin-bottom:5px">${displayName}</div>`;
+  }
+  if (title) {
+    card += `<div style="text-align: left; color: black; font-size: 14px; font-family: Helvetica Neue; font-weight: 500; word-wrap: break-word; color: ${primaryColor};line-height: 18px; margin-bottom:5px">${title}</div>`;
+  }
+  if (company) {
+    card += ` <div style="text-align: left; color: black; font-size: 12px; font-family: Helvetica Neue; font-weight: 400; word-wrap: break-word; color : #87878E; margin-bottom:5px">${company}</div>`;
+  }
+  card += `</div>`;
+  card += `<a href="${url}" rel=“noopener” noreferrer target=“_blank”  style="text-decoration: unset !important;">
+            <table style="background-color: ${primaryColor};height:34px;width:125px;padding-left: 10px;padding-right: 10px;border-radius:48px;font-size:12px;margin-top:12px">
+            <tbody> 
+              <tr>
+                <td style="vertical-align: middle; text-align: center;color: ${readableColor}; font-size: 12px; font-family: Helvetica; font-weight: 700">
+                  Save my contact
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          </a>
+        </td>
+   <td  height="100%" valign="top" style="width:100% !important; padding-left: 30px; border-left: 1px solid  #E2E1E3">`;
+
+  if (phones) {
+    for (let index = 0; index < phones.length; index++) {
+      card += `<div style="height:20px; width:100%; display:inline-block; vertical-align: middle;">
+                  <img src="${process.env.NEXT_PUBLIC_URL}${phoneLogo.src}"  style="width: 14px; height: 14px;vertical-align: middle"/>
+                   <a href="mailto:${phones[index]}" rel=“noopener” noreferrer target=“_blank”  style="text-decoration: unset !important;color:black;font-size: 12px;font-weight:400px; color: black">
+                    ${phones[index]}
+                  </span>
+              </div>`;
+    }
+  }
+  if (mails) {
+    for (let index = 0; index < mails.length; index++) {
+      card += `<div style="height:20px; width:100%; display:inline-block; vertical-align: middle;">
+                  <img src="${process.env.NEXT_PUBLIC_URL}${mailLogo.src}"  style="width: 14px; height: 14px;vertical-align: middle"/>
+                   <a href="tel:${mails[index]}" rel=“noopener” noreferrer target=“_blank”  style="text-decoration: unset !important;color:black;font-size: 12px;font-weight:400px; color: black">
+                    ${mails[index]}
+                    </a>
+              </div>`;
+    }
+  }
+  if (companyLogo) {
+    card += `<img style="margin-top:15px; height: 60px; object-fit: contain;" src="${companyLogo}" />`;
+  }
+  card += `</td>
+      </tr>
+    </tbody>
+  </table>`;
+  return card;
+}
+
+export function buildSaveMyContactSignature(url: string) {
+  return `
+  <a href="${url}" rel=“noopener” noreferrer target=“_blank” style="text-decoration: unset !important; color: black;padding-left: 30px;padding-right: 30px">
+    <table style="border: 1px solid black;height:34px;padding-left: 10px;padding-right: 10px;border-radius:48px;box-shadow:0px 4px 16px 0px rgba(0, 0, 0, 0.25);font-size:12px;border: 1px solid black;text-decoration: unset !important">
+      <tr>
+        <td style="vertical-align: middle; text-align: center;text-decoration: unset !important">
+          Save my contact
+        </td>
+      </tr>
+    </table>
+  </a>`;
+}

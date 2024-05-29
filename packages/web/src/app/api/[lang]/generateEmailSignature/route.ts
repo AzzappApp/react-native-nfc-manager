@@ -1,7 +1,6 @@
 import sgMail from '@sendgrid/mail';
 import { NextResponse } from 'next/server';
 import { withAxiom } from 'next-axiom';
-import QRCode from 'qrcode';
 import { getProfileWithWebCardById, getUserById } from '@azzapp/data';
 import { getTextColor } from '@azzapp/shared/colorsHelpers';
 import ERRORS from '@azzapp/shared/errors';
@@ -62,7 +61,6 @@ const generateEmailSignature = async (req: NextRequest) => {
       Array<{ mail: string }> | Array<{ number: string }> | string
     > = {
       webCardUrl,
-      qrCode: await QRCode.toDataURL(`${PUBLIC_URL}/${res.WebCard?.userName}`), // qrCode is a simple to send to the profile page only (per spec)
       linkUrl: buildEmailSignatureGenerationUrl(
         res.WebCard.userName,
         data,
@@ -126,8 +124,12 @@ const generateEmailSignature = async (req: NextRequest) => {
     }
 
     // Company Logo
-    if (res.WebCard.logoId) {
-      mailParam.companyUrl = getImageURLForSize(res.WebCard.logoId, 140, 140);
+    if (res.WebCard.logoId != null || res.Profile.logoId != null) {
+      mailParam.companyUrl = getImageURLForSize(
+        res.WebCard.logoId ?? (res.Profile.logoId as string),
+        null,
+        140,
+      );
     }
     const userEmail = await getUserById(userId);
 
@@ -138,7 +140,6 @@ const generateEmailSignature = async (req: NextRequest) => {
         templateId: 'd-4a7abf7cd3274be1b59bd825618b50c5',
         dynamic_template_data: mailParam,
       };
-
       await sgMail.send(msg);
 
       return NextResponse.json(

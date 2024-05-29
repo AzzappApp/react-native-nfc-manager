@@ -168,7 +168,7 @@ const tableFull = style({
 
 const tableButton = style({
   height: '34px',
-  width: '140px',
+  width: '125px',
   paddingLeft: '10px',
   paddingRight: ' 10px',
   borderRadius: '48px',

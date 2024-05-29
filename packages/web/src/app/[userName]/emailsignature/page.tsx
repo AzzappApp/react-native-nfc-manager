@@ -1,5 +1,5 @@
 import Image from 'next/image';
-import { getMediasByIds } from '@azzapp/data';
+import { getMediasByIds, getProfileByUserName } from '@azzapp/data';
 import azzappFull from '#assets/images/azzapp-full.png';
 import dlAndroid from '#assets/images/download_android.png';
 import dlIos from '#assets/images/download_ios.png';
@@ -25,6 +25,12 @@ const EmailSignature = async ({ params }: EmailSignatureProps) => {
     ? getMediasByIds([webCard.coverData.mediaId]).then(([media]) => media)
     : null);
 
+  const profile = await getProfileByUserName(userName);
+
+  if (!profile) {
+    return notFound();
+  }
+
   return (
     <div className={styles.background}>
       <div className={styles.container}>
@@ -34,7 +40,11 @@ const EmailSignature = async ({ params }: EmailSignatureProps) => {
           width={150}
           className={styles.image}
         />
-        <FullSignature webCard={webCard} media={media} />
+        <FullSignature
+          webCard={webCard}
+          media={media}
+          companyLogo={webCard.logoId ?? profile.logoId}
+        />
         <Image
           src={azzappFull}
           alt="azzapp-logo"
