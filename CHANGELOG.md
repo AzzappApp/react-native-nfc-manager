@@ -1,5 +1,6 @@
-## 0.5.15-canary.41
+## 0.5.15-canary.42
 
+* **fix:**  - only returns subscriptions on user ([#3522](https://github.com/AzzappApp/azzapp/pull/3522))
 * **feat:**  - **subscription:** add issuer in graphql api ([#3519](https://github.com/AzzappApp/azzapp/pull/3519))
 * **fix:**  - signature email review ([#3516](https://github.com/AzzappApp/azzapp/pull/3516))
 * **fix:**  - **contactCard:** [#3507](https://github.com/AzzappApp/azzapp/pull/3507) check status response ([#3517](https://github.com/AzzappApp/azzapp/pull/3517))
