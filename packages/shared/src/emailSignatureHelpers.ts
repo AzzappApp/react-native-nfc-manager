@@ -86,8 +86,8 @@ export const parseEmailSignature = (
     lastName,
     company,
     title,
-    emails: emails && emails.length > 0 ? emails : ['talere', 'tamere2'],
-    phoneNumbers: phoneNumbers ?? ['phone1', 'phone 2'],
+    emails: emails && emails.length > 0 ? emails : [],
+    phoneNumbers: phoneNumbers && phoneNumbers.length > 0 ? phoneNumbers : [],
     avatar,
     createdAt,
   };

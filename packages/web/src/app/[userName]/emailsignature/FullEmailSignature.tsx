@@ -166,7 +166,6 @@ const FullEmailSignature = ({
       </React.Fragment>
     );
   }
-  console.log(contact);
   return (
     <React.Fragment>
       <div className={styles.title}>
@@ -293,7 +292,7 @@ const FullEmailSignature = ({
                       }}
                     >
                       <Image
-                        src={mailLogo}
+                        src={phoneLogo}
                         style={{
                           width: '14px',
                           height: '14px',
@@ -329,7 +328,7 @@ const FullEmailSignature = ({
                       }}
                     >
                       <Image
-                        src={phoneLogo}
+                        src={mailLogo}
                         style={{
                           width: '14px',
                           height: '14px',
@@ -446,7 +445,7 @@ export function buildCardSignature(
 ) {
   let card = `
   <table  border="0" cellpadding="0" cellspacing="0" 
-    style="table-layout: fixed;max-width:  560px; text-decoration: unset !important;padding-left: 30px;padding-right: 30px;max-width: 560px !important; width:100%;">
+    style="table-layout: fixed;max-width:  500px; text-decoration: unset !important; width:100%;">
     <tbody>`;
   if (avatarUrl) {
     card += `<tr>
@@ -486,7 +485,7 @@ export function buildCardSignature(
     for (let index = 0; index < phones.length; index++) {
       card += `<div style="height:20px; width:100%; display:inline-block; vertical-align: middle;">
                   <img src="${process.env.NEXT_PUBLIC_URL}${phoneLogo.src}"  style="width: 14px; height: 14px;vertical-align: middle"/>
-                   <a href="mailto:${phones[index]}" rel=“noopener” noreferrer target=“_blank”  style="text-decoration: unset !important;color:black;font-size: 12px;font-weight:400px; color: black">
+                   <a href="tel:${phones[index]}" rel=“noopener” noreferrer target=“_blank”  style="text-decoration: unset !important;color:black;font-size: 12px;font-weight:400px; color: black">
                     ${phones[index]}
                   </span>
               </div>`;
@@ -496,7 +495,7 @@ export function buildCardSignature(
     for (let index = 0; index < mails.length; index++) {
       card += `<div style="height:20px; width:100%; display:inline-block; vertical-align: middle;">
                   <img src="${process.env.NEXT_PUBLIC_URL}${mailLogo.src}"  style="width: 14px; height: 14px;vertical-align: middle"/>
-                   <a href="tel:${mails[index]}" rel=“noopener” noreferrer target=“_blank”  style="text-decoration: unset !important;color:black;font-size: 12px;font-weight:400px; color: black">
+                   <a href="mailto:${mails[index]}" rel=“noopener” noreferrer target=“_blank”  style="text-decoration: unset !important;color:black;font-size: 12px;font-weight:400px; color: black">
                     ${mails[index]}
                     </a>
               </div>`;
