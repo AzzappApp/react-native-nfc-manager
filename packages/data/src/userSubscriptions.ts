@@ -130,6 +130,7 @@ export const activeUserSubscription = async (
         eq(UserSubscriptionTable.userId, userId),
         eq(UserSubscriptionTable.status, 'active'),
         gte(UserSubscriptionTable.endAt, currentDate),
+        isNull(UserSubscriptionTable.webCardId),
       ),
     );
 };
