@@ -1,4 +1,10 @@
-import { Suspense, forwardRef, useImperativeHandle, useState } from 'react';
+import {
+  Suspense,
+  forwardRef,
+  useCallback,
+  useImperativeHandle,
+  useState,
+} from 'react';
 import { View } from 'react-native';
 import { graphql, useLazyLoadQuery } from 'react-relay';
 import { colors } from '#theme';
@@ -34,6 +40,7 @@ const CoverEditionStep = (
 ) => {
   const [coverTemplatePreview, setCoverTemplatePreview] =
     useState<TemplateTypePreview | null>(null);
+  const [templateListSelected, setTemplateListSelected] = useState(false);
 
   const data = useLazyLoadQuery<CoverEditionStepQuery>(
     graphql`
@@ -54,6 +61,14 @@ const CoverEditionStep = (
     },
   }));
 
+  const onTemplateSelected = useCallback(
+    (template?: TemplateTypePreview | null) => {
+      setCoverTemplatePreview(template ?? null);
+      setTemplateListSelected(true);
+    },
+    [],
+  );
+
   // const insets = useScreenInsets();
 
   const styles = useStyleSheet(stylesheet);
@@ -68,14 +83,14 @@ const CoverEditionStep = (
         }
       >
         <View style={{ flex: 1 }}>
-          {data.profile && !coverTemplatePreview && (
+          {data.profile && !templateListSelected && (
             <CoverEditorTemplateList
               profile={data.profile}
               coverTemplates={data.profile}
-              onSelectCoverTemplatePreview={setCoverTemplatePreview}
+              onSelectCoverTemplatePreview={onTemplateSelected}
             />
           )}
-          {data.profile && coverTemplatePreview && (
+          {data.profile && templateListSelected && (
             <CoverEditorContextProvider>
               <CoverEditor
                 profile={data.profile}

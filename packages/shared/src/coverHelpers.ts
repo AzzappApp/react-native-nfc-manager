@@ -13,11 +13,6 @@ export const COVER_RATIO = 0.625;
 export const COVER_ANIMATION_DURATION = 5000;
 
 /**
- * Cover video maxium duration in seconds
- */
-export const COVER_MAX_VIDEO_DURATION = 12;
-
-/**
  * Cover video bitrate
  */
 export const COVER_VIDEO_BITRATE = 5000000;
@@ -184,3 +179,13 @@ export const COVER_ASSET_SIZES = [128, 256, 512, 1024];
  * The color to replace in foreground lottie animation
  */
 export const COVER_FOREGROUND_BASE_COLOR = '#010101';
+
+/**
+ * Maximum number of media that can compose a cover
+ */
+export const COVER_MAX_MEDIA = 6;
+
+/**
+ *  Maximum duration that a media can be displayed in a cover
+ */
+export const COVER_MAX_MEDIA_DURATION = 5;

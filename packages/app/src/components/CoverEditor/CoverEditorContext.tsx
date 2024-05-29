@@ -3,8 +3,10 @@ import { colors } from '#theme';
 import { CoverEditorActionType } from './coverEditorActions';
 import { coverEditorReducer } from './coverEditorReducer';
 import type { CoverEditorAction } from './coverEditorActions';
-import type { CoverEditorState } from './coverEditorReducer';
-import type { CoverEditorSelectedLayer } from './CoverTypes';
+import type {
+  CoverEditorSelectedLayer,
+  CoverEditorState,
+} from './coverEditorTypes';
 
 export type CoverEditorContextType = {
   cover: CoverEditorState;
@@ -35,6 +37,8 @@ const CoverEditorContextProvider = ({
     },
     layerMode: null,
     medias: [],
+    template: null,
+    coverTransition: 'slide',
   });
 
   const setCurrentEditableItem = useCallback(

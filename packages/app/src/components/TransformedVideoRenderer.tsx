@@ -1,19 +1,22 @@
-import { Canvas, Skia } from '@shopify/react-native-skia';
-import { SkiaViewApi } from '@shopify/react-native-skia/lib/module/views/api';
+import { Skia } from '@shopify/react-native-skia';
 import { useCallback, useEffect, useMemo } from 'react';
-import { Dimensions, PixelRatio, Platform, type ViewProps } from 'react-native';
-import { useFrameCallback, useSharedValue } from 'react-native-reanimated';
+import { Dimensions, PixelRatio, type ViewProps } from 'react-native';
 import { __RNSkiaVideoPrivateAPI } from '@azzapp/react-native-skia-video';
 import {
   useLutShader,
   createSingleVideoComposition,
   SINGLE_VIDEO_COMPOSITION_ITEM_ID,
   transformVideoFrame,
+  reduceVideoResolutionIfNecessary,
+  scaleCropData,
 } from '#helpers/mediaEditions';
 import { useVideoLocalPath } from '#helpers/mediaHelpers';
+import VideoCompositionRenderer from './VideoCompositionRenderer';
 import type { Filter, EditionParameters } from '#helpers/mediaEditions';
-import type { VideoComposition } from '@azzapp/react-native-skia-video';
-import type { SkCanvas } from '@shopify/react-native-skia';
+import type {
+  VideoComposition,
+  FrameDrawer,
+} from '@azzapp/react-native-skia-video';
 
 export type TransformedVideoRendererProps = Exclude<ViewProps, 'children'> & {
   video: {
@@ -36,7 +39,6 @@ const MAX_DISPLAY_DECODER_RESOLUTION = Math.min(
   Dimensions.get('window').width * PixelRatio.get(),
   1920,
 );
-
 const TransformedVideoRenderer = ({
   video,
   editionParameters,
@@ -61,35 +63,12 @@ const TransformedVideoRenderer = ({
       return null;
     }
     const { height, width, rotation } = video;
-    let resolution: { width: number; height: number } | undefined = undefined;
-    let videoScale = 1;
-    if (
-      Platform.OS === 'ios' &&
-      (video.width > MAX_DISPLAY_DECODER_RESOLUTION ||
-        video.height > MAX_DISPLAY_DECODER_RESOLUTION)
-    ) {
-      const aspectRatio = width / height;
-      const maxResolution = MAX_DISPLAY_DECODER_RESOLUTION;
-      if (aspectRatio > 1) {
-        videoScale = maxResolution / width;
-        resolution = {
-          width: maxResolution,
-          height: maxResolution / aspectRatio,
-        };
-      } else {
-        videoScale = maxResolution / height;
-        resolution = {
-          width: maxResolution * aspectRatio,
-          height: maxResolution,
-        };
-      }
-      if (rotation === 90 || rotation === 270) {
-        resolution = {
-          width: resolution.height,
-          height: resolution.width,
-        };
-      }
-    }
+    const { resolution, videoScale } = reduceVideoResolutionIfNecessary(
+      width,
+      height,
+      rotation,
+      MAX_DISPLAY_DECODER_RESOLUTION,
+    );
 
     return {
       composition: createSingleVideoComposition(
@@ -124,69 +103,43 @@ const TransformedVideoRenderer = ({
     };
   }, [framesExtractor]);
 
-  const nativeId = useSharedValue<number | null>(null);
-  const skiaViewRef = useCallback(
-    (ref: any) => {
-      nativeId.value = ref?._nativeId;
+  const drawFrame = useCallback<FrameDrawer>(
+    ({ canvas, frames, width, height }) => {
+      'worklet';
+      const frame = frames[SINGLE_VIDEO_COMPOSITION_ITEM_ID];
+      if (!frame) {
+        return;
+      }
+      const paint = Skia.Paint();
+      const cropData = editionParameters?.cropData;
+      const shader = transformVideoFrame({
+        frame,
+        width,
+        height,
+        editionParameters: {
+          ...editionParameters,
+          cropData: cropData ? scaleCropData(cropData, videoScale) : undefined,
+        },
+        lutShader,
+      });
+      if (!shader) {
+        return;
+      }
+      if (!shader) {
+        return;
+      }
+      paint.setShader(shader);
+      canvas.drawPaint(paint);
     },
-    [nativeId],
+    [editionParameters, lutShader, videoScale],
   );
 
-  const pixelRatio = PixelRatio.get();
-  useFrameCallback(() => {
-    'worklet';
-    if (!framesExtractor) {
-      return;
-    }
-
-    const frames = framesExtractor.decodeCompositionFrames();
-    const frame = frames[SINGLE_VIDEO_COMPOSITION_ITEM_ID];
-    if (!nativeId.value || !frame) {
-      return;
-    }
-    SkiaViewApi.callJsiMethod(
-      nativeId.value,
-      'renderToCanvas',
-      (canvas: SkCanvas) => {
-        if (!frame) {
-          return;
-        }
-        const paint = Skia.Paint();
-        const cropData = editionParameters?.cropData;
-        const shader = transformVideoFrame({
-          frame,
-          width: width * pixelRatio,
-          height: height * pixelRatio,
-          editionParameters: {
-            ...editionParameters,
-            cropData: cropData
-              ? {
-                  originX: cropData.originX * videoScale,
-                  originY: cropData.originY * videoScale,
-                  width: cropData.width * videoScale,
-                  height: cropData.height * videoScale,
-                }
-              : undefined,
-          },
-          lutShader,
-        });
-        if (!shader) {
-          return;
-        }
-        if (!shader) {
-          return;
-        }
-        paint.setShader(shader);
-        canvas.drawPaint(paint);
-      },
-    );
-  }, true);
-
   return (
-    <Canvas
-      //@ts-expect-error - `ref` is not a valid prop for Canvas
-      ref={skiaViewRef}
-      style={[{ width, height }, props.style]}
+    <VideoCompositionRenderer
+      composition={composition}
+      drawFrame={drawFrame}
+      width={width}
+      height={height}
       {...props}
     />
   );

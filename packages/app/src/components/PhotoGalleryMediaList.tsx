@@ -7,9 +7,9 @@ import {
   presentPermissionsPickerAsync,
   removeAllListeners,
 } from 'expo-media-library';
-import { useCallback, useRef, useState, useEffect, memo } from 'react';
+import { memo, useCallback, useEffect, useRef, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { Platform, useWindowDimensions, View } from 'react-native';
+import { Platform, View, useWindowDimensions } from 'react-native';
 import { colors } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import {
@@ -21,7 +21,7 @@ import { usePermissionContext } from '#helpers/PermissionContext';
 import Button from '#ui/Button';
 import PressableNative from '#ui/PressableNative';
 import Text from '#ui/Text';
-import type { Media } from './imagePickerTypes';
+import type { Media } from '#helpers/mediaHelpers';
 
 import type { FlashListProps, ListRenderItemInfo } from '@shopify/flash-list';
 import type { Album, Asset } from 'expo-media-library';
@@ -33,7 +33,12 @@ type PhotoGalleryMediaListProps = Omit<
    * The ID of the media that is currently selected.
    * this id is the uri of the media as in camera roll (phassets on ios).
    */
-  selectedMediaID?: string;
+  selectedMediaId?: string | null;
+  /**
+   * The IDs of the multiple medias that are currently selected.
+   * this id is the uri of the media as in camera roll (phassets on ios).
+   */
+  selectedMediasIds?: string[] | null;
   /**
    * The kind of media to display.
    */
@@ -56,7 +61,8 @@ type PhotoGalleryMediaListProps = Omit<
  * and allows the user to select one of them.
  */
 const PhotoGalleryMediaList = ({
-  selectedMediaID,
+  selectedMediaId,
+  selectedMediasIds,
   album,
   kind,
   onMediaSelected,
@@ -175,21 +181,24 @@ const PhotoGalleryMediaList = ({
     ({ item }: ListRenderItemInfo<Asset>) => (
       <MemoPhotoGalleyMediaItem
         item={item}
-        selected={selectedMediaID === item.id}
+        selected={
+          selectedMediaId === item.uri ||
+          (selectedMediasIds?.includes(item.uri) ?? false)
+        }
         height={itemHeight}
         onMediaPress={onMediaPress}
       />
     ),
 
-    [itemHeight, onMediaPress, selectedMediaID],
+    [itemHeight, onMediaPress, selectedMediaId, selectedMediasIds],
   );
 
   //should select the first media when the list if no media is selected
   useEffect(() => {
-    if (autoSelectFirstItem && selectedMediaID == null && medias?.length > 0) {
+    if (autoSelectFirstItem && selectedMediaId == null && medias?.length > 0) {
       void onMediaPress(medias[0]);
     }
-  }, [autoSelectFirstItem, medias, onMediaPress, selectedMediaID]);
+  }, [autoSelectFirstItem, medias, onMediaPress, selectedMediaId]);
 
   useEffect(() => {
     addListener(() => {
@@ -243,9 +252,10 @@ const PhotoGalleryMediaList = ({
         accessibilityRole="list"
         contentContainerStyle={contentContainerStyle}
         ItemSeparatorComponent={ItemSeparatorComponent}
-        {...props}
         estimatedItemSize={itemHeight}
+        extraData={{ selectedMediasIds, selectedMediaId }}
         testID="photo-gallery-list"
+        {...props}
       />
     </View>
   );
@@ -253,13 +263,15 @@ const PhotoGalleryMediaList = ({
 
 const keyExtractor = (item: Asset) => item.id;
 
-// This list can be a litle laggy (due to the library we use for image at the moment). Using the RN preconisation for this list to try to improve a bit
+// This list can be a litle laggy (due to the library we use for image at the moment).
+// Using the RN preconisation for this list to try to improve a bit
 type PhotoGalleyMediaItemProps = {
   item: Asset;
   height: number;
   selected: boolean;
   onMediaPress: (media: Asset) => void;
 };
+
 const PhotoGalleyMediaItem = ({
   item,
   selected,
@@ -275,15 +287,10 @@ const PhotoGalleyMediaItem = ({
 
   return (
     <PressableNative
-      style={[
-        {
-          aspectRatio: 1,
-          height,
-        },
-        selected && {
-          opacity: 0.5,
-        },
-      ]}
+      style={{
+        aspectRatio: 1,
+        height,
+      }}
       accessibilityRole="button"
       accessibilityHint={intl.formatMessage({
         defaultMessage: 'tap to select this media',
@@ -296,10 +303,15 @@ const PhotoGalleyMediaItem = ({
       <Image
         accessibilityRole="image"
         accessibilityIgnoresInvertColors={true}
-        style={{
-          width: height,
-          height,
-        }}
+        style={[
+          {
+            width: height,
+            height,
+          },
+          selected && {
+            opacity: 0.5,
+          },
+        ]}
         source={{ uri: item.uri, width: height, height }}
         recyclingKey={item.id}
       />

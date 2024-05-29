@@ -1,4 +1,40 @@
+import type { EditionParameters, Filter } from '#helpers/mediaEditions';
+import type { MediaVideo, MediaImage, TimeRange } from '#helpers/mediaHelpers';
 import type { ShadowStyleIOS } from 'react-native';
+
+export type CoverEditorState = {
+  selectedLayer: CoverEditorSelectedLayer;
+  textLayers: CoverEditorTextLayerItem[];
+  overlayLayer: CoverEditorOverlayItem | null;
+  layerMode: CoverLayerType; //add it here instead of animated value in context  because It could been use for reducer action in some case. TO IMPROVE
+  linksLayer: CoverEditorLinksLayerItem;
+  medias: MediaInfo[];
+  template: TemplateInfo | null;
+  coverTransition: CoverEditorTransition | null;
+};
+
+export type TemplateInfo = {
+  __todoTemplateInfo: unknown;
+};
+
+export type CoverEditorTransition = 'fade' | 'none' | 'slide';
+
+export type MediaInfoBase = {
+  filter: Filter | null;
+  editionParameters: EditionParameters | null;
+};
+
+export type MediaInfoVideo = MediaInfoBase & {
+  media: MediaVideo;
+  timeRange: TimeRange;
+};
+
+export type MediaInfoImage = MediaInfoBase & {
+  media: MediaImage;
+  duration: number;
+};
+
+export type MediaInfo = MediaInfoImage | MediaInfoVideo;
 
 export type CoverLayerType =
   | 'colors'

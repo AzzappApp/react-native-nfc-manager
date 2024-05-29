@@ -4,13 +4,13 @@ import { useCameraPermission } from '#hooks/usePermissions';
 import ImagePicker from '..';
 import type { ImagePickerProps } from '../ImagePicker';
 
-jest.mock('../PhotoGalleryMediaList', () =>
+jest.mock('#components/PhotoGalleryMediaList', () =>
   mockReactComponent('PhotoGalleryMediaList', {
     testID: 'photo-gallery-media-list',
   }),
 );
 
-jest.mock('../AlbumPicker', () =>
+jest.mock('#components/AlbumPicker', () =>
   mockReactComponent('AlbumPicker', {
     testID: 'album-picker',
   }),

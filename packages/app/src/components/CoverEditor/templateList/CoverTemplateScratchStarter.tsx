@@ -4,10 +4,19 @@ import { colors } from '#theme';
 import Icon from '#ui/Icon';
 import PressableNative from '#ui/PressableNative';
 import Text from '#ui/Text';
+import type { TemplateTypePreview } from './CoverEditorTemplateTypePreviews';
+import type { ViewProps } from 'react-native';
 
-const CoverTemplateScratchStarters = () => {
+type CoverTemplateScratchStartersProps = ViewProps & {
+  onSelectCoverTemplatePreview: (preview?: TemplateTypePreview | null) => void;
+};
+
+const CoverTemplateScratchStarters = ({
+  onSelectCoverTemplatePreview,
+  ...props
+}: CoverTemplateScratchStartersProps) => {
   return (
-    <View>
+    <View {...props}>
       <Text variant="smallbold" style={styles.label}>
         <FormattedMessage
           defaultMessage="Start from scratch"
@@ -15,16 +24,27 @@ const CoverTemplateScratchStarters = () => {
         />
       </Text>
       <View style={styles.scratchs}>
-        <PressableNative style={styles.scratch}>
+        <PressableNative
+          style={styles.scratch}
+          onPress={() => {
+            onSelectCoverTemplatePreview();
+          }}
+        >
           <Icon icon="landscape" style={{ tintColor: '#C8C7CA' }} />
         </PressableNative>
         <PressableNative
           style={[styles.scratch, { backgroundColor: colors.black }]}
+          onPress={() => {
+            onSelectCoverTemplatePreview();
+          }}
         >
           <Icon icon="landscape" style={{ tintColor: '#54535B' }} />
         </PressableNative>
         <PressableNative
           style={[styles.scratch, { backgroundColor: colors.grey400 }]}
+          onPress={() => {
+            onSelectCoverTemplatePreview();
+          }}
         >
           <Icon icon="landscape" style={{ tintColor: '#87878E' }} />
         </PressableNative>

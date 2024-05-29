@@ -16,7 +16,7 @@ import type { ListRenderItemInfo } from 'react-native';
 export type CoverEditorProps = {
   profile: CoverEditorTemplateList_profile$key;
   coverTemplates: useTemplateCover_coverTemplates$key;
-  onSelectCoverTemplatePreview: (preview: TemplateTypePreview) => void;
+  onSelectCoverTemplatePreview: (preview?: TemplateTypePreview | null) => void;
 };
 
 const keyExtractor = ([coverTemplateTypeId]: [
@@ -108,7 +108,9 @@ const CoverEditorTemplateList = ({
         onSelect={onSelect}
       />
       <Separation small style={{ marginTop: 10 }} />
-      <CoverTemplateScratchStarters />
+      <CoverTemplateScratchStarters
+        onSelectCoverTemplatePreview={onSelectCoverTemplatePreview}
+      />
       <FlatList
         testID="cover-editor-template-list"
         accessibilityRole="list"

@@ -1,6 +1,6 @@
 export * from './EditionParameters';
 export * from './LUTFilters';
-export * from './helpers';
+export * from './mediaEdtionHelpers';
 export * from './mediasTransformations';
 export * from './mediasExport';
 export * from './singleVideoCompositions';

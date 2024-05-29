@@ -18,7 +18,8 @@ const CoverEditorMediaEditToolbox = () => {
   const styles = useStyleSheet(styleSheet);
 
   const { setCurrentEditableItem, dispatch } = useCoverEditorContext();
-  const media = useCoverEditorMedia();
+  const mediaInfos = useCoverEditorMedia();
+  const { media } = mediaInfos ?? {};
 
   const onClose = () => {
     dispatch({

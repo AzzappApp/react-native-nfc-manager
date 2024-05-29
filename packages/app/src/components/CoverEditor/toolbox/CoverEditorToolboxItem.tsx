@@ -3,7 +3,7 @@ import ToolBoxSection from '#ui/ToolBoxSection';
 import { CoverEditorActionType } from '../coverEditorActions';
 import { useCoverEditorContext } from '../CoverEditorContext';
 import type { Icons } from '#ui/Icon';
-import type { CoverLayerType } from '../CoverTypes';
+import type { CoverLayerType } from '../coverEditorTypes';
 
 export type CoverEditorToolboxItemProps = {
   id: CoverLayerType;

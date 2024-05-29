@@ -2,10 +2,10 @@ import { useCallback } from 'react';
 import ScreenModal from '#components/ScreenModal';
 import useToggle from '#hooks/useToggle';
 import IconButton from '#ui/IconButton';
-import CoverEditorMediaPicker from '../../CoverEditor/CoverEditorMediaPicker';
 import { CoverEditorActionType } from '../coverEditorActions';
 import { useCoverEditorContext } from '../CoverEditorContext';
-import type { Media } from '#components/ImagePicker/imagePickerTypes';
+import CoverEditorMediaPicker from '../CoverEditorMediaPicker';
+import type { Media } from '#helpers/mediaHelpers';
 
 type Props = {
   count: number;
@@ -13,7 +13,7 @@ type Props = {
 
 const CoverEditorMediaPickerFloatingTool = ({ count }: Props) => {
   const [showImagePicker, toggleShowImage] = useToggle();
-  const { dispatch } = useCoverEditorContext();
+  const { dispatch, cover } = useCoverEditorContext();
 
   const onMediasPicked = useCallback(
     (medias: Media[]) => {
@@ -46,9 +46,8 @@ const CoverEditorMediaPickerFloatingTool = ({ count }: Props) => {
       />
       <ScreenModal visible={showImagePicker} animationType="slide">
         <CoverEditorMediaPicker
-          kind={'mixed'}
+          initialMedias={cover.medias.map(({ media }) => media)}
           onFinished={onMediasPicked}
-          onCancel={toggleShowImage}
           maxMediaCount={count}
         />
       </ScreenModal>

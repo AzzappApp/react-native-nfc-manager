@@ -1,26 +1,15 @@
 /* eslint-disable no-case-declarations */
+import {
+  COVER_MAX_MEDIA_DURATION,
+  COVER_RATIO,
+} from '@azzapp/shared/coverHelpers';
 import { colors } from '#theme';
+import { cropDataForAspectRatio } from '#helpers/mediaEditions';
 import {
   CoverEditorActionType,
   type CoverEditorAction,
 } from './coverEditorActions';
-import type { Media } from '#components/ImagePicker/imagePickerTypes';
-import type {
-  CoverEditorLinksLayerItem,
-  CoverEditorOverlayItem,
-  CoverEditorSelectedLayer,
-  CoverEditorTextLayerItem,
-  CoverLayerType,
-} from './CoverTypes';
-
-export type CoverEditorState = {
-  selectedLayer: CoverEditorSelectedLayer;
-  textLayers: CoverEditorTextLayerItem[];
-  overlayLayer: CoverEditorOverlayItem | null;
-  layerMode: CoverLayerType; //add it here instead of animated value in context  because It could been use for reducer action in some case. TO IMPROVE
-  linksLayer: CoverEditorLinksLayerItem;
-  medias: Media[];
-};
+import type { CoverEditorState } from './coverEditorTypes';
 
 export function coverEditorReducer(
   state: CoverEditorState,
@@ -265,7 +254,37 @@ export function coverEditorReducer(
     case CoverEditorActionType.UpdateMedias:
       return {
         ...state,
-        medias: payload,
+        medias: payload.map(media => {
+          const mediaInfo = state.medias.find(
+            info => info.media.uri === media.uri,
+          );
+          if (mediaInfo) {
+            return mediaInfo;
+          }
+          const cropData = cropDataForAspectRatio(
+            media.width,
+            media.height,
+            COVER_RATIO,
+          );
+          if (media.kind === 'image') {
+            return {
+              media,
+              filter: null,
+              editionParameters: { cropData },
+              duration: COVER_MAX_MEDIA_DURATION,
+            };
+          } else {
+            return {
+              media,
+              filter: null,
+              editionParameters: { cropData },
+              timeRange: {
+                startTime: 0,
+                duration: Math.min(COVER_MAX_MEDIA_DURATION, media.duration),
+              },
+            };
+          }
+        }),
       };
     default:
       return state;

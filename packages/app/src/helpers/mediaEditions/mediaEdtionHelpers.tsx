@@ -1,3 +1,4 @@
+import { Platform } from 'react-native';
 import { typedEntries } from '@azzapp/shared/objectHelpers';
 import type {
   CropData,
@@ -64,4 +65,47 @@ export const getNextOrientation = (
     default:
       return 'LEFT';
   }
+};
+
+export const reduceVideoResolutionIfNecessary = (
+  videoWidth: number,
+  videoHeight: number,
+  rotation: number,
+  maxSize: number,
+) => {
+  let resolution: { width: number; height: number } | undefined = undefined;
+  let videoScale = 1;
+  if (
+    Platform.OS === 'ios' &&
+    (videoWidth > maxSize || videoHeight > maxSize)
+  ) {
+    const aspectRatio = videoWidth / videoHeight;
+    if (aspectRatio > 1) {
+      videoScale = maxSize / videoWidth;
+      resolution = {
+        width: maxSize,
+        height: maxSize / aspectRatio,
+      };
+    } else {
+      videoScale = maxSize / videoHeight;
+      resolution = {
+        width: maxSize * aspectRatio,
+        height: maxSize,
+      };
+    }
+    if (rotation === 90 || rotation === 270) {
+      resolution = {
+        width: resolution.height,
+        height: resolution.width,
+      };
+    }
+  }
+  return { resolution, videoScale };
+};
+
+export const scaleCropData = (cropData: CropData, scale: number): CropData => {
+  'worklet';
+  return Object.fromEntries(
+    Object.entries(cropData).map(([key, value]) => [key, value * scale]),
+  ) as CropData;
 };

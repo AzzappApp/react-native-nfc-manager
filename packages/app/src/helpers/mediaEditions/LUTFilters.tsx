@@ -9,6 +9,7 @@ import {
 import { useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { Image } from 'react-native';
+import { typedEntries } from '@azzapp/shared/objectHelpers';
 import { compileEffect } from './shaderUtils';
 import type { SkShader } from '@shopify/react-native-skia';
 import type { ImageSourcePropType } from 'react-native';
@@ -165,6 +166,22 @@ export const getLutShader = (filter: Filter) => {
     }
     return shader ?? null;
   });
+};
+
+export const loadAllLUTShaders = async () => {
+  const record: Record<Filter, SkShader> = {} as any;
+  const shaders = await Promise.all(
+    typedEntries(FILTERS).map(async ([filter]) => ({
+      filter,
+      shader: await getLutShader(filter),
+    })),
+  );
+  shaders.forEach(({ filter, shader }) => {
+    if (shader) {
+      record[filter] = shader;
+    }
+  });
+  return record;
 };
 
 export const preloadLUTShaders = () => {

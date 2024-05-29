@@ -26,31 +26,36 @@ const CoverEditorMediaToolbox = ({ count }: Props) => {
   };
 
   const displayedMedias = useMemo(() => {
-    return Array.from({ length: count }, (_, i) => {
-      const media = cover.medias[i];
+    return Array.from(
+      { length: count <= 0 ? cover.medias.length : count },
+      (_, i) => {
+        const { media } = cover.medias[i];
 
-      if (!media) return <View key={i} style={styles.previewContent} />;
-      return (
-        <PressableNative
-          key={`${media.uri}-${i}`}
-          onPress={() => {
-            dispatch({
-              type: CoverEditorActionType.SelectLayer,
-              payload: {
-                type: 'media',
-                index: i,
-              },
-            });
-            dispatch({
-              type: CoverEditorActionType.SetLayerMode,
-              payload: 'mediaEdit',
-            });
-          }}
-        >
-          <Image source={{ uri: media.uri }} style={styles.previewContent} />
-        </PressableNative>
-      );
-    });
+        return (
+          <PressableNative
+            key={`${media.uri}-${i}`}
+            onPress={() => {
+              dispatch({
+                type: CoverEditorActionType.SelectLayer,
+                payload: {
+                  type: 'media',
+                  index: i,
+                },
+              });
+              dispatch({
+                type: CoverEditorActionType.SetLayerMode,
+                payload: 'mediaEdit',
+              });
+            }}
+          >
+            <Image
+              source={{ uri: media?.galleryUri ?? media.uri }}
+              style={styles.previewContent}
+            />
+          </PressableNative>
+        );
+      },
+    );
   }, [count, cover.medias, dispatch, styles.previewContent]);
 
   return (

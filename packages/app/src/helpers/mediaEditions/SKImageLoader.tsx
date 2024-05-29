@@ -132,7 +132,7 @@ const refImage = (key: string) => {
 
 const unrefImage = (key: string) => {
   const ref = skImages.get(key);
-  if (ref) {
+  if (ref && ref.refCount > 0) {
     ref.refCount--;
   }
   scheduleCleanUp();

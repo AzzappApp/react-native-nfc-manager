@@ -12,14 +12,14 @@ import useEditorLayout from '#hooks/useEditorLayout';
 
 import { BOTTOM_MENU_HEIGHT } from '#ui/BottomMenu';
 import FloatingIconButton from '#ui/FloatingIconButton';
+import AlbumPicker from '../AlbumPicker';
 import CameraControlPanel from '../CameraControlPanel';
 import CameraView from '../CameraView';
 import PermissionModal from '../PermissionModal';
-import AlbumPicker from './AlbumPicker';
+import PhotoGalleryMediaList from '../PhotoGalleryMediaList';
 import { useImagePickerState } from './ImagePickerContext';
 import ImagePickerMediaRenderer from './ImagePickerMediaRenderer';
 import { ImagePickerStep } from './ImagePickerWizardContainer';
-import PhotoGalleryMediaList from './PhotoGalleryMediaList';
 import type { BottomMenuItem } from '#ui/BottomMenu';
 import type { CameraViewHandle } from '../CameraView';
 
@@ -335,7 +335,7 @@ const SelectImageStep = ({
             mediaPermission === RESULTS.GRANTED ||
             mediaPermission === RESULTS.LIMITED ? (
               <PhotoGalleryMediaList
-                selectedMediaID={media?.galleryUri}
+                selectedMediaId={media?.galleryUri}
                 album={selectedAlbum}
                 onMediaSelected={onMediaChange}
                 kind={kind}

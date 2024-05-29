@@ -1,4 +1,4 @@
-import type { Media } from '#components/ImagePicker/imagePickerTypes';
+import type { Media } from '#helpers/mediaHelpers';
 import type {
   CoverEditorAnimationItem,
   CoverEditorOverlayItem,
@@ -6,7 +6,7 @@ import type {
   CoverEditorSocialLink,
   CoverLayerType,
   CoverTextLayerStyle,
-} from './CoverTypes';
+} from './coverEditorTypes';
 import type { ShadowStyleIOS } from 'react-native';
 
 /* eslint-disable @typescript-eslint/no-invalid-void-type */

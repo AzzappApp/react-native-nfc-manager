@@ -4,12 +4,15 @@ import {
   createPicture,
   drawAsImageFromPicture,
 } from '@shopify/react-native-skia';
-import { Platform } from 'react-native';
 import ReactNativeBlobUtil from 'react-native-blob-util';
 import { exportVideoComposition } from '@azzapp/react-native-skia-video';
 import { createId } from '#helpers/idHelpers';
 import { getVideoLocalPath } from '#helpers/mediaHelpers';
 import { getLutShader } from './LUTFilters';
+import {
+  reduceVideoResolutionIfNecessary,
+  scaleCropData,
+} from './mediaEdtionHelpers';
 import { transformImage } from './mediasTransformations';
 import {
   createSingleVideoComposition,
@@ -100,50 +103,19 @@ export const saveTransformedVideoToFile = async ({
     throw new Error('Video not found');
   }
 
-  let decoderResolution: { width: number; height: number } | undefined =
-    undefined;
-  if (
-    Platform.OS === 'ios' &&
-    (video.width > MAX_EXPORT_DECODER_RESOLUTION ||
-      video.height > MAX_EXPORT_DECODER_RESOLUTION)
-  ) {
-    const aspectRatio = video.width / video.height;
-    const maxResolution = MAX_EXPORT_DECODER_RESOLUTION;
-    let videoScale = 1;
-    if (aspectRatio > 1) {
-      videoScale = maxResolution / video.width;
-      decoderResolution = {
-        width: maxResolution,
-        height: maxResolution / aspectRatio,
-      };
-    } else {
-      videoScale = maxResolution / video.height;
-      decoderResolution = {
-        width: maxResolution * aspectRatio,
-        height: maxResolution,
-      };
-    }
+  const { resolution: decoderResolution, videoScale } =
+    reduceVideoResolutionIfNecessary(
+      video.width,
+      video.height,
+      video.rotation,
+      MAX_EXPORT_DECODER_RESOLUTION,
+    );
 
-    if (video.rotation === 90 || video.rotation === 270) {
-      decoderResolution = {
-        width: decoderResolution.height,
-        height: decoderResolution.width,
-      };
-    }
-
-    const cropData = editionParameters?.cropData;
-    editionParameters = {
-      ...editionParameters,
-      cropData: cropData
-        ? {
-            originX: cropData.originX * videoScale,
-            originY: cropData.originY * videoScale,
-            width: cropData.width * videoScale,
-            height: cropData.height * videoScale,
-          }
-        : undefined,
-    };
-  }
+  const cropData = editionParameters?.cropData;
+  editionParameters = {
+    ...editionParameters,
+    cropData: cropData ? scaleCropData(cropData, videoScale) : undefined,
+  };
 
   const videoComposition = createSingleVideoComposition(
     sourcePath,

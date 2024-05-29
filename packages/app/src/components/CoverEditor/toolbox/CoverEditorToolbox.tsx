@@ -24,7 +24,7 @@ import type { TemplateTypePreview } from '../templateList/CoverEditorTemplateTyp
 
 type Props = {
   profile: CoverEditorToolbox_profile$key;
-  coverTemplatePreview: TemplateTypePreview;
+  coverTemplatePreview: TemplateTypePreview | null;
 };
 
 const CoverEditorToolbox = (props: Props) => {
@@ -213,7 +213,9 @@ const CoverEditorToolbox = (props: Props) => {
       </Animated.View>
 
       <Animated.View style={[styles.layerContainer, mediaLayerStyle]}>
-        <CoverEditorMediaToolbox count={coverTemplatePreview.mediaCount} />
+        <CoverEditorMediaToolbox
+          count={coverTemplatePreview?.mediaCount ?? -1}
+        />
       </Animated.View>
 
       <Animated.View style={[styles.layerContainer, mediaEditLayerStyle]}>

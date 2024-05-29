@@ -11,8 +11,8 @@ import { ImagePickerContextProvider } from './ImagePickerContext';
 import { ImagePickerWizardContainer } from './ImagePickerWizardContainer';
 import SelectImageStep from './SelectImageStep';
 import type { EditionParameters, Filter } from '#helpers/mediaEditions';
+import type { Media, TimeRange } from '#helpers/mediaHelpers';
 import type { ImagePickerState } from './ImagePickerContext';
-import type { Media, TimeRange } from './imagePickerTypes';
 import type { ComponentType } from 'react';
 
 export type ImagePickerResult = {

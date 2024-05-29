@@ -1,22 +1,21 @@
-import { Image } from 'expo-image';
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { graphql, useFragment } from 'react-relay';
 import { swapColor } from '@azzapp/shared/cardHelpers';
-import { colors } from '#theme';
 import useScreenInsets from '#hooks/useScreenInsets';
 import { SocialIcon } from '#ui/Icon';
 import PressableNative from '#ui/PressableNative';
-import Text from '#ui/Text';
 import { useCoverEditorContext } from './CoverEditorContext';
+import CoverPreview from './CoverPreview';
 import CoverEditorToolbox from './toolbox/CoverEditorToolbox';
 import type { CoverEditor_profile$key } from '#relayArtifacts/CoverEditor_profile.graphql';
 import type { TemplateTypePreview } from './templateList/CoverEditorTemplateTypePreviews';
 import type { SocialLinkId } from '@azzapp/shared/socialLinkHelpers';
+import type { LayoutChangeEvent } from 'react-native';
 
 type Props = {
   profile: CoverEditor_profile$key;
-  coverTemplatePreview: TemplateTypePreview;
+  coverTemplatePreview: TemplateTypePreview | null;
 };
 
 export type CoverLayerType = 'links' | 'overlay' | 'text' | null;
@@ -25,15 +24,19 @@ const CoverEditor = ({ profile: profileKey, coverTemplatePreview }: Props) => {
   const { bottom } = useScreenInsets();
 
   const { cover, setCurrentEditableItem } = useCoverEditorContext();
+  const [contentSize, setContentSize] = useState<{
+    width: number;
+    height: number;
+  } | null>(null);
 
-  const onEditText = useCallback(
-    (index: number) => {
-      setCurrentEditableItem({
-        type: 'text',
-        index,
+  const onContentLayout = useCallback(
+    ({ nativeEvent: { layout } }: LayoutChangeEvent) => {
+      setContentSize({
+        width: layout.width,
+        height: layout.height,
       });
     },
-    [setCurrentEditableItem],
+    [],
   );
 
   const onEditLinks = useCallback(() => {
@@ -60,35 +63,19 @@ const CoverEditor = ({ profile: profileKey, coverTemplatePreview }: Props) => {
 
   return (
     <View style={[styles.container, { marginBottom: bottom }]}>
-      <View style={styles.content}>
-        {cover.textLayers.map((textLayer, index) => {
-          return (
-            <PressableNative
-              style={{ width: '100%' }}
-              key={index}
-              onPress={() => onEditText(index)}
-            >
-              <Text
-                style={[
-                  {
-                    ...textLayer.style,
-                    color: swapColor(
-                      textLayer.style.color,
-                      profile.webCard?.cardColors,
-                    ),
-                  },
-                  { width: '100%' },
-                ]}
-              >
-                {textLayer.text}
-              </Text>
-            </PressableNative>
-          );
-        })}
+      <View style={styles.content} onLayout={onContentLayout}>
         <PressableNative
           style={{ width: '100%', flexDirection: 'row' }}
           onPress={() => onEditLinks()}
         >
+          {contentSize && (
+            <CoverPreview
+              cover={cover}
+              width={contentSize.width}
+              height={contentSize.height}
+              style={styles.coverPreview}
+            />
+          )}
           {cover.linksLayer.links.map(link => {
             return (
               <SocialIcon
@@ -106,14 +93,6 @@ const CoverEditor = ({ profile: profileKey, coverTemplatePreview }: Props) => {
             );
           })}
         </PressableNative>
-        {cover.overlayLayer && (
-          <Image
-            source={{ uri: cover.overlayLayer.uri }}
-            contentFit="cover"
-            contentPosition="center"
-            style={[cover.overlayLayer.style, { width: 200, height: 200 }]}
-          />
-        )}
       </View>
       <View style={{ height: 50 }} />
       <CoverEditorToolbox
@@ -130,11 +109,12 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
-    backgroundColor: colors.grey200,
     margin: 40,
-    borderRadius: 40,
-    justifyContent: 'center',
-    alignItems: 'center',
+  },
+  coverPreview: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
   },
 });
 

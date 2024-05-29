@@ -15,7 +15,7 @@ import type {
   Filter,
   ImageOrientation,
 } from '#helpers/mediaEditions';
-import type { Media, TimeRange } from './imagePickerTypes';
+import type { Media, TimeRange } from '#helpers/mediaHelpers';
 import type { SkImage } from '@shopify/react-native-skia';
 import type { ReactNode, ForwardedRef } from 'react';
 
