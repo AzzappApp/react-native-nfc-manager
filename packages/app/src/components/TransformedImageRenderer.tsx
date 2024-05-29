@@ -4,6 +4,8 @@ import {
   SkiaPictureView,
 } from '@shopify/react-native-skia';
 import { useMemo } from 'react';
+import { colors } from '#theme';
+import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import {
   useLutShader,
   type Filter,
@@ -52,13 +54,22 @@ const TransformedImageRenderer = ({
     [image, editionParameters, width, height, lutShader],
   );
 
+  const styles = useStyleSheet(styleSheet);
+
   return (
     <SkiaPictureView
       picture={picture}
       {...props}
-      style={[{ width, height }, props.style]}
+      style={[{ width, height }, styles.picture, props.style]}
     />
   );
 };
+
+const styleSheet = createStyleSheet(appearance => ({
+  picture: {
+    //this will hack a bug on SKiaPictureView not accepting transparent background
+    backgroundColor: appearance === 'light' ? colors.white : colors.black,
+  },
+}));
 
 export default TransformedImageRenderer;
