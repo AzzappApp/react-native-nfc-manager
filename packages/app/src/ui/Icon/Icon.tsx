@@ -509,6 +509,8 @@ const shouldTintColor = (icon: Icons) => {
       return false;
     case 'plus_white_border':
       return false;
+    case 'menu':
+      return false;
     default:
       return true;
   }
