@@ -1,5 +1,6 @@
-## 0.5.15-canary.38
+## 0.5.15-canary.39
 
+* **fix:**  - signature email review ([#3516](https://github.com/AzzappApp/azzapp/pull/3516))
 * **fix:**  - **contactCard:** [#3507](https://github.com/AzzappApp/azzapp/pull/3507) check status response ([#3517](https://github.com/AzzappApp/azzapp/pull/3517))
 * **fix:**  - **home:** [#3515](https://github.com/AzzappApp/azzapp/pull/3515) clash in tint colors ([#3518](https://github.com/AzzappApp/azzapp/pull/3518))
 * **fix:**  - **media:** [#3508](https://github.com/AzzappApp/azzapp/pull/3508) apply rotation on decoder resolution ([#3514](https://github.com/AzzappApp/azzapp/pull/3514))
