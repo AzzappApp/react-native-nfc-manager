@@ -36,19 +36,36 @@ type UserSubscription {
   """
   subscriptionPlan: SubscriptionPlan
 
-  subscriberEmail: String,
-  subscriberPhoneNumber: String,
-  subscriberName: String,
-  subscriberAddress: String,
-  subscriberVatNumber: String,
-  subscriberZip: String,
-  subscriberCity: String,
-  subscriberCountry: String,
-  subscriberCountryCode: String,
+  issuer: UserSubscriptionIssuer
+
+  subscriberEmail: String
+  subscriberPhoneNumber: String
+  subscriberName: String
+  subscriberAddress: String
+  subscriberVatNumber: String
+  subscriberZip: String
+  subscriberCity: String
+  subscriberCountry: String
+  subscriberCountryCode: String
 
   paymentMean: PaymentMean
 
   status: SubscriptionStatus
+}
+
+enum UserSubscriptionIssuer {
+  """
+  The subscription is issued by the appstore
+  """
+  apple
+  """
+  The subscription is issued by the google play
+  """
+  google
+  """
+  The subscription is issued by the web
+  """
+  web
 }
 
 enum SubscriptionStatus {
