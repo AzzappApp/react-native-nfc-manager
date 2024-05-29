@@ -1,5 +1,6 @@
-## 0.5.15-canary.39
+## 0.5.15-canary.40
 
+* **feat:**  - **subscription:** add issuer in graphql api ([#3519](https://github.com/AzzappApp/azzapp/pull/3519))
 * **fix:**  - signature email review ([#3516](https://github.com/AzzappApp/azzapp/pull/3516))
 * **fix:**  - **contactCard:** [#3507](https://github.com/AzzappApp/azzapp/pull/3507) check status response ([#3517](https://github.com/AzzappApp/azzapp/pull/3517))
 * **fix:**  - **home:** [#3515](https://github.com/AzzappApp/azzapp/pull/3515) clash in tint colors ([#3518](https://github.com/AzzappApp/azzapp/pull/3518))
