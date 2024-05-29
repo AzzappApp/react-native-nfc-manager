@@ -1,5 +1,6 @@
-## 0.5.15-canary.42
+## 0.5.15-canary.43
 
+* **fix:**  - **home:** [#3515](https://github.com/AzzappApp/azzapp/pull/3515) memoize icon to avoid tintColor issue on rerender ([#3524](https://github.com/AzzappApp/azzapp/pull/3524))
 * **fix:**  - only returns subscriptions on user ([#3522](https://github.com/AzzappApp/azzapp/pull/3522))
 * **feat:**  - **subscription:** add issuer in graphql api ([#3519](https://github.com/AzzappApp/azzapp/pull/3519))
 * **fix:**  - signature email review ([#3516](https://github.com/AzzappApp/azzapp/pull/3516))
