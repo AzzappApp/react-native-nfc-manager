@@ -1,4 +1,4 @@
-## 0.5.15-canary.40
+## 0.5.15-canary.41
 
 * **feat:**  - **subscription:** add issuer in graphql api ([#3519](https://github.com/AzzappApp/azzapp/pull/3519))
 * **fix:**  - signature email review ([#3516](https://github.com/AzzappApp/azzapp/pull/3516))
