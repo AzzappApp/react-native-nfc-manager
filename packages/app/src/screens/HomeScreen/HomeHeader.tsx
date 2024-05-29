@@ -65,11 +65,13 @@ const HomeHeader = ({
       return readableColors[0];
     }
     return colors.white;
-  }, [currentProfileIndexSharedValue, readableColors]);
+  }, [readableColors]);
 
   const svgProps = useAnimatedProps(() => ({ color: colorValue.value }));
 
-  const iconStyles = useAnimatedStyle(() => ({ tintColor: colorValue.value }));
+  const iconStyles = useAnimatedStyle(() => ({
+    tintColor: colorValue.value,
+  }));
 
   return (
     <Header

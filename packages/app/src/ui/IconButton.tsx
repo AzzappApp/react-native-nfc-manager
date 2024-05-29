@@ -74,7 +74,7 @@ const IconButton = ({
       ]}
       {...props}
     >
-      <Icon icon={icon} size={iconSize} style={[styles.image, iconStyle]} />
+      <Icon icon={icon} size={iconSize} style={iconStyle} />
     </PressableOpacity>
   );
 };
@@ -87,9 +87,6 @@ const computedStyle = createVariantsStyleSheet(appearance => ({
       overflow: 'hidden',
       alignItems: 'center',
       justifyContent: 'center',
-    },
-    image: {
-      resizeMode: 'contain',
     },
   },
   icon: {},

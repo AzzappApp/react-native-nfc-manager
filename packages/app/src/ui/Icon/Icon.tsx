@@ -1,7 +1,8 @@
+import { memo } from 'react';
+import { type ImageProps } from 'react-native';
 import Animated from 'react-native-reanimated';
 import { colors } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
-import type { ImageProps } from 'react-native';
 
 const icons = {
   get missing() {
@@ -478,7 +479,11 @@ const Icon = ({ icon, size = 24, ...props }: IconProps) => {
     <Animated.Image
       {...props}
       style={[
-        { resizeMode: 'contain', width: size, height: size },
+        {
+          resizeMode: 'contain',
+          width: size,
+          height: size,
+        },
         shouldTintColor(icon) && styles.tintColor,
         props.style,
       ]}
@@ -493,7 +498,7 @@ const styleSheet = createStyleSheet(appearance => ({
   },
 }));
 
-export default Icon;
+export default memo(Icon);
 
 const shouldTintColor = (icon: Icons) => {
   switch (icon) {
