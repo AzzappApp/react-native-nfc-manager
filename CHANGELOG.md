@@ -1,5 +1,6 @@
-## 0.5.15-canary.44
+## 0.5.15-canary.45
 
+* **fix:**  - use correct mailto and logo ([#3526](https://github.com/AzzappApp/azzapp/pull/3526))
 * **feat:**  - **Cover:** basic cover preview for medias ([#3523](https://github.com/AzzappApp/azzapp/pull/3523))
 * **fix:**  - **home:** [#3515](https://github.com/AzzappApp/azzapp/pull/3515) memoize icon to avoid tintColor issue on rerender ([#3524](https://github.com/AzzappApp/azzapp/pull/3524))
 * **fix:**  - only returns subscriptions on user ([#3522](https://github.com/AzzappApp/azzapp/pull/3522))
