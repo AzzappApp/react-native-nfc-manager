@@ -1,5 +1,7 @@
-## 0.5.15-canary.37
+## 0.5.15-canary.38
 
+* **fix:**  - **contactCard:** [#3507](https://github.com/AzzappApp/azzapp/pull/3507) check status response ([#3517](https://github.com/AzzappApp/azzapp/pull/3517))
+* **fix:**  - **home:** [#3515](https://github.com/AzzappApp/azzapp/pull/3515) clash in tint colors ([#3518](https://github.com/AzzappApp/azzapp/pull/3518))
 * **fix:**  - **media:** [#3508](https://github.com/AzzappApp/azzapp/pull/3508) apply rotation on decoder resolution ([#3514](https://github.com/AzzappApp/azzapp/pull/3514))
 * **fix:**  - error on font reload ([#3509](https://github.com/AzzappApp/azzapp/pull/3509))
 * **fix:**  - **webCard:** [#3469](https://github.com/AzzappApp/azzapp/pull/3469) cascade delete on post when webcard is removed ([#3492](https://github.com/AzzappApp/azzapp/pull/3492))
