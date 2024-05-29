@@ -156,12 +156,13 @@ const buildContact = async (
         additionalContactData.avatarUrl,
         FileSystem.cacheDirectory + 'avatar',
       );
-
-      image = {
-        width: 720,
-        height: 720,
-        uri: avatar.uri,
-      };
+      if (avatar.status >= 200 && avatar.status < 300) {
+        image = {
+          width: 720,
+          height: 720,
+          uri: avatar.uri,
+        };
+      }
     } catch (e) {
       Sentry.captureException(e);
     }
