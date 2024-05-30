@@ -1,5 +1,7 @@
-## 0.5.15-canary.58
+## 0.5.15-canary.59
 
+* **fix:**  - lint issue
+* **feat:**  - CoverEditor animate for media and overlay, including effect for media image ([#3544](https://github.com/AzzappApp/azzapp/pull/3544))
 * **fix:**  - **webCard:** check correctly update date ([#3542](https://github.com/AzzappApp/azzapp/pull/3542))
 * **fix:**  - consider a subscription as active until it ends ([#3540](https://github.com/AzzappApp/azzapp/pull/3540))
 * **fix:**  - update monthly subscription when users are removed ([#3539](https://github.com/AzzappApp/azzapp/pull/3539))
