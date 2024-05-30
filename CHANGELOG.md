@@ -1,5 +1,7 @@
-## 0.5.15-canary.59
+## 0.5.15-canary.60
 
+* **build:**  - upgrade web dependencies ([#3547](https://github.com/AzzappApp/azzapp/pull/3547))
+* **fix:**  - **media:** [#3476](https://github.com/AzzappApp/azzapp/pull/3476) try to slow down updates ([#3545](https://github.com/AzzappApp/azzapp/pull/3545))
 * **fix:**  - lint issue
 * **feat:**  - CoverEditor animate for media and overlay, including effect for media image ([#3544](https://github.com/AzzappApp/azzapp/pull/3544))
 * **fix:**  - **webCard:** check correctly update date ([#3542](https://github.com/AzzappApp/azzapp/pull/3542))
