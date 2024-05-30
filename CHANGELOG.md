@@ -1,5 +1,6 @@
-## 0.5.15-canary.56
+## 0.5.15-canary.57
 
+* **fix:**  - **webCard:** check correctly update date ([#3542](https://github.com/AzzappApp/azzapp/pull/3542))
 * **fix:**  - consider a subscription as active until it ends ([#3540](https://github.com/AzzappApp/azzapp/pull/3540))
 * **fix:**  - update monthly subscription when users are removed ([#3539](https://github.com/AzzappApp/azzapp/pull/3539))
 * **feat:**  - Cover migrate overlay media ([#3538](https://github.com/AzzappApp/azzapp/pull/3538))
