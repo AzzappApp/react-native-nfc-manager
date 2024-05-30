@@ -1,6 +1,5 @@
 import { useCallback } from 'react';
 import { useIntl } from 'react-intl';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import useToggle from '#hooks/useToggle';
 import FontPicker from '#ui/FontPicker';
 import ToolBoxSection from '#ui/ToolBoxSection';
@@ -15,7 +14,6 @@ const CoverEditorFontFamilyTool = () => {
   const { dispatch } = useCoverEditorContext();
 
   const [show, toggleBottomSheet] = useToggle(false);
-  const { bottom } = useSafeAreaInsets();
 
   const currentFontFamily = layer?.style.fontFamily ?? '';
   const onFontFamilyChange = useCallback(
@@ -40,7 +38,7 @@ const CoverEditorFontFamilyTool = () => {
         onPress={() => toggleBottomSheet()}
       />
       <FontPicker
-        height={BOTTOM_SHEET_MODAL_HEIGHT + bottom}
+        height={BOTTOM_SHEET_MODAL_HEIGHT}
         onChange={onFontFamilyChange}
         onRequestClose={toggleBottomSheet}
         title={intl.formatMessage({

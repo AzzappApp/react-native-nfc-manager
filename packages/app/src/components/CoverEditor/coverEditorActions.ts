@@ -4,6 +4,7 @@ import type {
   CoverEditorAnimationItem,
   CoverEditorOverlayItem,
   CoverEditorSocialLink,
+  CoverEditorTransition,
   CoverLayerType,
   CoverTextLayerStyle,
 } from './coverEditorTypes';
@@ -128,6 +129,10 @@ export type UpdateMediasAction = {
   type: 'UPDATE_MEDIAS';
   payload: Media[];
 };
+export type UpdateMediasTransitionAction = {
+  type: 'UPDATE_MEDIA_TRANSITION';
+  payload: CoverEditorTransition;
+};
 
 // #region resources loaded actions
 export type LoadingStartAction = {
@@ -173,5 +178,6 @@ export type CoverEditorAction =
   | UpdateLayerShadowAction
   | UpdateLinksAction
   | UpdateMediasAction
+  | UpdateMediasTransitionAction
   | UpdateOverlayLayerAction
   | UpdateOverlayLayerDeleteAction;

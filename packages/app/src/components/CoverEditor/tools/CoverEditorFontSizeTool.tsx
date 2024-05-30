@@ -2,7 +2,6 @@ import { useCallback, useEffect } from 'react';
 import { useIntl } from 'react-intl';
 import { StyleSheet, View } from 'react-native';
 import { useSharedValue } from 'react-native-reanimated';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import useToggle from '#hooks/useToggle';
 import BottomSheetModal from '#ui/BottomSheetModal';
 import Button from '#ui/Button';
@@ -26,7 +25,6 @@ const CoverEditorFontSizeTool = ({ title }: Props) => {
   const textLayer = useCoverEditorTextLayer();
   const linksLayer = useCoverEditorLinksLayer();
   const { dispatch } = useCoverEditorContext();
-  const { bottom } = useSafeAreaInsets();
 
   const [show, toggleBottomSheet] = useToggle(false);
 
@@ -63,7 +61,7 @@ const CoverEditorFontSizeTool = ({ title }: Props) => {
       <BottomSheetModal
         visible={show}
         onRequestClose={toggleBottomSheet}
-        height={165 + bottom}
+        height={165}
       >
         <Container>
           <Header

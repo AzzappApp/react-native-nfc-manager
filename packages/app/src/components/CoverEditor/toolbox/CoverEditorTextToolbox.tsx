@@ -37,28 +37,6 @@ const CoverEditorTextToolbox = ({ webcard }: Props) => {
   // const [shadow, setShadow] = useState(true);
   // const toggleShadow = () => setShadow(value => !value);
 
-  // const textEditToolboxs = useMemo(() => {
-  //   const menu: Array<{ label: string; icon: Icons; onPress?: () => void }> = [
-  //     {
-  //       label: intl.formatMessage({
-  //         defaultMessage: 'Animate',
-  //         description: 'Cover Edition - Toolbox sub-menu text - Animate',
-  //       }),
-  //       icon: 'animate',
-  //     },
-  //     {
-  //       label: intl.formatMessage({
-  //         defaultMessage: 'Shadow',
-  //         description: 'Cover Edition - Toolbox sub-menu text - Shadow',
-  //       }),
-  //       onPress: toggleShadow,
-  //       icon: shadow ? 'shadow_element' : 'shadow_element_off',
-  //     },
-  //   ];
-
-  //   return menu;
-  // }, [intl, shadow]);
-
   return (
     <View style={styles.container}>
       <PressableOpacity style={styles.previewButton} onPress={onClose}>

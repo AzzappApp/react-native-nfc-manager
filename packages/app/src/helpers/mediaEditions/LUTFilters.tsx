@@ -46,6 +46,165 @@ export const FILTERS = {
 
 export type Filter = keyof typeof FILTERS;
 
+// create an array to have filter in the same order as the designer want
+export const useOrdonedFilters = (): Array<{
+  id: Filter | 'none';
+  label: string;
+}> => {
+  const intl = useIntl();
+  return [
+    {
+      id: 'none',
+      label: intl.formatMessage({
+        defaultMessage: 'None',
+        description: 'None filter name',
+      }),
+    },
+    {
+      id: 'nah',
+      label: intl.formatMessage({
+        defaultMessage: 'Nah',
+        description: 'Nah filter name',
+      }),
+    },
+    {
+      id: 'once',
+      label: intl.formatMessage({
+        defaultMessage: 'Once',
+        description: 'Once filter name',
+      }),
+    },
+    {
+      id: 'passing_by',
+      label: intl.formatMessage({
+        defaultMessage: 'Passing by',
+        description: 'Passing by filter name',
+      }),
+    },
+    {
+      id: 'serenity',
+      label: intl.formatMessage({
+        defaultMessage: 'Serenity',
+        description: 'Serenity filter name',
+      }),
+    },
+    {
+      id: 'solar',
+      label: intl.formatMessage({
+        defaultMessage: 'Solar',
+        description: 'Solar filter name',
+      }),
+    },
+    {
+      id: 'undeniable',
+      label: intl.formatMessage({
+        defaultMessage: 'Undeniable',
+        description: 'Undeniable filter name',
+      }),
+    },
+    {
+      id: 'undeniable2',
+      label: intl.formatMessage({
+        defaultMessage: 'Undeniable 2',
+        description: 'Undeniable 2 filter name',
+      }),
+    },
+    {
+      id: 'you_can_do_it',
+      label: intl.formatMessage({
+        defaultMessage: 'You can do it',
+        description: 'You can do it filter name',
+      }),
+    },
+    {
+      id: 'pure',
+      label: intl.formatMessage({
+        defaultMessage: 'Pure',
+        description: 'Pure filter name',
+      }),
+    },
+    {
+      id: 'syrah',
+      label: intl.formatMessage({
+        defaultMessage: 'Syrah',
+        description: 'Syrah filter name',
+      }),
+    },
+    {
+      id: 'paper',
+      label: intl.formatMessage({
+        defaultMessage: 'Paper',
+        description: 'Paper filter name',
+      }),
+    },
+    {
+      id: 'rock',
+      label: intl.formatMessage({
+        defaultMessage: 'Rock',
+        description: 'Rock filter name',
+      }),
+    },
+    {
+      id: 'vouzon',
+      label: intl.formatMessage({
+        defaultMessage: 'Vouzon',
+        description: 'Vouzon filter name',
+      }),
+    },
+    // BIG UP @mlecoq
+    {
+      id: 'transparency',
+      label: intl.formatMessage({
+        defaultMessage: 'Transparency',
+        description: 'Transparency filter name',
+      }),
+    },
+    {
+      id: 'autumn',
+      label: intl.formatMessage({
+        defaultMessage: 'Autumn',
+        description: 'Autaumn filter name',
+      }),
+    },
+    {
+      id: 'one_of_us',
+      label: intl.formatMessage({
+        defaultMessage: 'One of us',
+        description: 'One of us filter name',
+      }),
+    },
+    {
+      id: 'bourbon',
+      label: intl.formatMessage({
+        defaultMessage: 'Bourbon',
+        description: 'Bourbon filter name',
+      }),
+    },
+    {
+      id: 'black_and_white_light',
+      label: intl.formatMessage({
+        defaultMessage: 'B&W light',
+        description: 'B&W light filter name',
+      }),
+    },
+    {
+      id: 'black_and_white_neutral',
+      label: intl.formatMessage({
+        defaultMessage: 'B&W neutral',
+        description: 'B&W neutral filter name',
+      }),
+    },
+    {
+      id: 'black_and_white_old',
+      label: intl.formatMessage({
+        defaultMessage: 'B&W old',
+        description: 'B&W old filter name',
+      }),
+    },
+  ] as const;
+};
+
+//TODO: depreacted this one and une an array for ordonned filter
 export const useFilterLabels = (): Record<Filter, string> => {
   const intl = useIntl();
   return useMemo(

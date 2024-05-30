@@ -9,6 +9,7 @@ import PressableOpacity from '#ui/PressableOpacity';
 import { TOOLBOX_SECTION_HEIGHT } from '#ui/ToolBoxSection';
 import { useCoverEditorContext } from '../CoverEditorContext';
 import CoverEditorMediaPickerFloatingTool from '../tools/CoverEditorMediaPickerFloatingTool';
+import CoverEditorTransitionTool from '../tools/CoverEditorTransitionTool';
 
 type Props = {
   count: number;
@@ -69,6 +70,7 @@ const CoverEditorMediaToolbox = ({ count }: Props) => {
         contentContainerStyle={styles.scrollContentContainer}
         showsHorizontalScrollIndicator={false}
       >
+        {coverEditorState.medias.length > 1 && <CoverEditorTransitionTool />}
         {displayedMedias}
       </ScrollView>
       <CoverEditorMediaPickerFloatingTool count={count} />

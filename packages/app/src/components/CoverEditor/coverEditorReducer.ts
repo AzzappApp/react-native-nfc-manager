@@ -245,6 +245,12 @@ export function coverEditorReducer(
           links: payload,
         },
       };
+    case 'UPDATE_MEDIA_TRANSITION': {
+      return {
+        ...state,
+        coverTransition: payload,
+      };
+    }
     case 'UPDATE_MEDIAS':
       return {
         ...state,

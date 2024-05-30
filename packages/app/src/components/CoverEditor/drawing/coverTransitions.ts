@@ -1,4 +1,5 @@
 import { Skia } from '@shopify/react-native-skia';
+import { useIntl } from 'react-intl';
 import type { CoverEditorTransition } from '../coverEditorTypes';
 import type { SkShader, SkCanvas } from '@shopify/react-native-skia';
 
@@ -81,5 +82,42 @@ const coverTransitions: Record<CoverEditorTransition, TransitionDefinition> = {
     drawer: noneTransitionDrawer,
   },
 };
+
+export type TransitionListItem = {
+  label: string;
+  id: CoverEditorTransition;
+  lottie: any; //lazy typing
+};
+
+export function useCoverTransitionOrdonned() {
+  const intl = useIntl();
+  //i need to define all those code.....(and cannot use param in the render item)..; kind of ulgy
+  return [
+    {
+      label: intl.formatMessage({
+        defaultMessage: 'None',
+        description: 'Cover Edition Transition - None',
+      }),
+      id: 'none',
+      lottie: require('./coverTransitionLottie/none.json'),
+    },
+    {
+      id: 'fade',
+      label: intl.formatMessage({
+        defaultMessage: 'Fade',
+        description: 'Cover Edition Transition- Fade',
+      }),
+      lottie: require('./coverTransitionLottie/fade.json'), //use slide_right temporarily because fade.json return error
+    },
+    {
+      id: 'slide',
+      label: intl.formatMessage({
+        defaultMessage: 'Slide Rigth',
+        description: 'Cover Edition Transition - Slide right',
+      }),
+      lottie: require('./coverTransitionLottie/slide_right.json'),
+    },
+  ] as TransitionListItem[];
+}
 
 export default coverTransitions;

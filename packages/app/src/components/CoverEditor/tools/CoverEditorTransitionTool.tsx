@@ -1,36 +1,37 @@
-import { Image } from 'expo-image';
+import LottieView from 'lottie-react-native';
 import { memo, useCallback } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { View } from 'react-native';
 import { shadow } from '#theme';
 import { DoneHeaderButton } from '#components/commonsButtons';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
-import { FILTERS, useOrdonedFilters } from '#helpers/mediaEditions';
 import useToggle from '#hooks/useToggle';
 import BottomSheetModal from '#ui/BottomSheetModal';
 import Text from '#ui/Text';
 import ToolBoxSection from '#ui/ToolBoxSection';
-import {
-  useCoverEditorOverlayLayer,
-  useCoverEditorContext,
-} from '../CoverEditorContext';
+import { useCoverEditorContext } from '../CoverEditorContext';
+import { useCoverTransitionOrdonned } from '../drawing/coverTransitions';
 import CoverEditorSelectionList, {
   BORDER_RADIUS_RATIO,
   BOX_WIDTH,
 } from './CoverEditorSelectionList';
-import type { Filter } from '#helpers/mediaEditions';
+import type { CoverEditorTransition } from '../coverEditorTypes';
+import type { TransitionListItem } from '../drawing/coverTransitions';
 
-const CoverEditorEffectTool = () => {
-  const filters = useOrdonedFilters();
+const CoverEditorTransitionTool = () => {
   const [show, toggleBottomSheet] = useToggle(false);
-  const layer = useCoverEditorOverlayLayer(); //use directly the layer for now, only one animated
+  const { coverEditorState } = useCoverEditorContext();
+
   const { dispatch } = useCoverEditorContext();
 
+  const save = () => {
+    toggleBottomSheet();
+  };
+
   const onSelect = useCallback(
-    (filter: string) => {
+    (transition: string) => {
       dispatch({
-        type: 'UPDATE_OVERLAY_LAYER',
-        payload: { filter },
+        type: 'UPDATE_MEDIA_TRANSITION',
+        payload: transition as CoverEditorTransition,
       });
     },
     [dispatch],
@@ -38,39 +39,43 @@ const CoverEditorEffectTool = () => {
 
   const intl = useIntl();
 
+  const transitions = useCoverTransitionOrdonned().map((transition, index) => {
+    return { ...transition, index };
+  });
+
   return (
     <>
       <ToolBoxSection
-        icon="filters"
+        icon="animate"
         label={intl.formatMessage({
-          defaultMessage: 'Effects',
-          description: 'Cover Edition Overlay Tool Button- Effect',
+          defaultMessage: 'Animations',
+          description: 'Cover Edition Transition Tool Button- Animations',
         })}
         onPress={toggleBottomSheet}
       />
-      {layer != null && (
+      {coverEditorState.medias && coverEditorState.medias.length > 0 && (
         <BottomSheetModal
           onRequestClose={toggleBottomSheet}
           visible={show}
-          height={271}
+          height={276}
           headerTitle={
             <Text variant="large">
               <FormattedMessage
-                defaultMessage="Effects(TODO DEFINE LIST FOR SKIA)"
-                description="CoverEditor Effects Tool - Title"
+                defaultMessage="Transition"
+                description="CoverEditor Transition Tool - Title"
               />
             </Text>
           }
-          headerRightButton={<DoneHeaderButton onPress={toggleBottomSheet} />}
+          headerRightButton={<DoneHeaderButton onPress={save} />}
           contentContainerStyle={{ paddingHorizontal: 0 }}
           headerStyle={{ paddingHorizontal: 20 }}
         >
           <CoverEditorSelectionList
-            data={filters}
+            data={transitions}
             renderItem={renderItem}
             accessibilityRole="list"
             onSelect={onSelect}
-            selectedItemId={layer.filter ?? 'none'}
+            selectedItemId={coverEditorState.coverTransition ?? 'none'}
           />
         </BottomSheetModal>
       )}
@@ -78,24 +83,26 @@ const CoverEditorEffectTool = () => {
   );
 };
 
-export default memo(CoverEditorEffectTool);
-
-type FilterItem = { id: string; label: string };
-
-const renderItem = (item: FilterItem) => {
-  return <FilterOverlay filter={item} />;
+const renderItem = (item: TransitionListItem) => {
+  return <TransitionOverlay transition={item} />;
 };
 
-const FilterOverlay = ({ filter }: { filter: FilterItem }) => {
+export default memo(CoverEditorTransitionTool);
+
+type TransitionOverlayProps = {
+  transition: TransitionListItem;
+};
+
+const TransitionOverlay = ({ transition }: TransitionOverlayProps) => {
   const styles = useStyleSheet(styleSheet);
 
   return (
-    <View style={styles.itemPreview}>
-      <Image
-        style={{ width: BOX_WIDTH, aspectRatio: 1, borderRadius: 7 }}
-        source={FILTERS[filter.id as Filter]}
-      />
-    </View>
+    <LottieView
+      style={styles.itemPreview}
+      source={transition.lottie}
+      autoPlay
+      loop
+    />
   );
 };
 
