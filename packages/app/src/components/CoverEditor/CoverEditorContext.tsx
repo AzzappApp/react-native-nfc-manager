@@ -65,9 +65,9 @@ const CoverEditorContextProvider = ({
       }
     }
     if (coverEditorState.overlayLayer) {
-      const { uri } = coverEditorState.overlayLayer;
-      if (!coverEditorState.images[uri]) {
-        imagesToLoad.push(uri);
+      const { media } = coverEditorState.overlayLayer;
+      if (!coverEditorState.images[media?.uri]) {
+        imagesToLoad.push(media.uri);
       }
     }
 

@@ -8,7 +8,7 @@ import { useCoverEditorContext } from '../CoverEditorContext';
 
 import type { ImagePickerResult } from '#components/ImagePicker';
 
-const CoverEditorOverlayReplace = () => {
+const CoverEditorMediaReplace = () => {
   const [show, toggleShowImagePicker] = useToggle(false);
   const { dispatch } = useCoverEditorContext();
   const intl = useIntl();
@@ -29,11 +29,12 @@ const CoverEditorOverlayReplace = () => {
           steps={[SelectImageStep]}
           onFinished={(param: ImagePickerResult) => {
             dispatch({
-              type: 'UPDATE_OVERLAY_LAYER',
+              type: 'UPDATE_ACTIVE_MEDIA',
               payload: {
                 uri: param.uri,
                 width: param.width,
                 height: param.height,
+                kind: 'image',
               },
             });
 
@@ -48,4 +49,4 @@ const CoverEditorOverlayReplace = () => {
   );
 };
 
-export default memo(CoverEditorOverlayReplace);
+export default memo(CoverEditorMediaReplace);

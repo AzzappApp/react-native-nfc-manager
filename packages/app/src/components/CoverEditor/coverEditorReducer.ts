@@ -142,7 +142,7 @@ export function coverEditorReducer(
       return {
         ...state,
         overlayLayer: {
-          ...payload,
+          media: payload,
           style: {
             borderColor: colors.black,
             borderRadius: 0,
@@ -247,6 +247,19 @@ export function coverEditorReducer(
           links: payload,
         },
       };
+    case 'UPDATE_ACTIVE_MEDIA': {
+      if (state.layerMode === 'overlay' && payload.kind === 'image') {
+        return {
+          ...state,
+          overlayLayer: {
+            ...state.overlayLayer!,
+            media: payload,
+          },
+        };
+      }
+
+      return state;
+    }
     case 'UPDATE_MEDIA_TRANSITION': {
       return {
         ...state,

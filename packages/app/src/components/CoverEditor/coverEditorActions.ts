@@ -1,5 +1,5 @@
 import type { Filter } from '#helpers/mediaEditions';
-import type { Media } from '#helpers/mediaHelpers';
+import type { MediaImage, Media } from '#helpers/mediaHelpers';
 import type {
   CoverEditorAnimationItem,
   CoverEditorOverlayItem,
@@ -68,11 +68,7 @@ export type DeleteAction = {
 //#region OverlayLayer
 export type AddOverlayLayerAction = {
   type: 'ADD_OVERLAY_LAYER';
-  payload: {
-    uri: string;
-    width: number;
-    height: number;
-  };
+  payload: MediaImage;
 };
 
 export type UpdateOverlayLayerAction = {
@@ -129,6 +125,11 @@ export type UpdateMediasAction = {
   type: 'UPDATE_MEDIAS';
   payload: Media[];
 };
+
+export type UpdateActiveMediaAction = {
+  type: 'UPDATE_ACTIVE_MEDIA';
+  payload: Media;
+};
 export type UpdateMediasTransitionAction = {
   type: 'UPDATE_MEDIA_TRANSITION';
   payload: CoverEditorTransition;
@@ -172,6 +173,7 @@ export type CoverEditorAction =
   | LoadingStartAction
   | LoadingSuccessAction
   | SelectLayerAction
+  | UpdateActiveMediaAction
   | UpdateLayerAnimationAction
   | UpdateLayerBorderAction
   | UpdateLayerFilterAction

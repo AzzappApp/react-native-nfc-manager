@@ -79,9 +79,7 @@ export type CoverEditorAnimationItem = {
 export type CoverEditorFilterItem = string | null;
 
 export type CoverEditorOverlayItem = {
-  uri: string;
-  width: number;
-  height: number;
+  media: MediaImage;
   style: {
     borderRadius: number;
     borderWidth: number;

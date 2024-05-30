@@ -11,7 +11,7 @@ import {
 } from '../CoverEditorContext';
 import CoverEditorEffectTool from '../tools/CoverEditorEffectTool';
 import CoverEditorImageCropTool from '../tools/CoverEditorImageCropTool';
-import CoverEditorOverlayReplace from '../tools/CoverEditorOverlayReplace';
+import CoverEditorMediaReplace from '../tools/CoverEditorMediaReplace';
 
 const CoverEditorMediaEditToolbox = () => {
   const styles = useStyleSheet(styleSheet);
@@ -49,7 +49,7 @@ const CoverEditorMediaEditToolbox = () => {
           <ToolBoxSection icon="chrono" label="cut" onPress={console.log} />
         )}
         <CoverEditorEffectTool />
-        <CoverEditorOverlayReplace />
+        <CoverEditorMediaReplace />
         <CoverEditorImageCropTool />
       </ScrollView>
     </View>

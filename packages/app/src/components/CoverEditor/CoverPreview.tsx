@@ -55,7 +55,7 @@ const CoverPreview = ({
           (media.kind === 'image' && images[media.uri]) ||
           (media.kind === 'video' && videoPaths[media.uri]),
       ) &&
-      (!overlayLayer || images[overlayLayer.uri]);
+      (!overlayLayer || images[overlayLayer.media.uri]);
     if (loadingLocalMedia || loadingRemoteMedia || !allItemsLoaded) {
       return { composition: null, videoScales: {} };
     }

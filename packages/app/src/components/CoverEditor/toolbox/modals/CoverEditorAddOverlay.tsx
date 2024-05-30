@@ -18,6 +18,7 @@ const CoverEditorAddOverlay = ({ open, onClose }: Props) => {
         uri: param.uri,
         width: param.width,
         height: param.height,
+        kind: 'image',
       },
     });
 

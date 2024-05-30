@@ -10,7 +10,7 @@ import {
   useCoverEditorOverlayLayer,
 } from '../CoverEditorContext';
 import CoverEditorDelete from '../tools/CoverEditorDelete';
-import CoverEditorOverlayReplace from '../tools/CoverEditorOverlayReplace';
+import CoverEditorMediaReplace from '../tools/CoverEditorMediaReplace';
 import CoverEditorAnimationTool from './../tools/CoverEditorAnimationTool';
 import CoverEditorBorderTool from './../tools/CoverEditorBorderTool';
 import CoverEditorEffectTool from './../tools/CoverEditorEffectTool';
@@ -38,7 +38,10 @@ const CoverEditorOverlayToolbox = () => {
       <PressableOpacity style={styles.previewButton} onPress={onClose}>
         <Icon icon="arrow_down" />
         {layer ? (
-          <Image source={{ uri: layer.uri }} style={styles.previewContent} />
+          <Image
+            source={{ uri: layer.media.uri }}
+            style={styles.previewContent}
+          />
         ) : (
           <View style={styles.previewContent} />
         )}
@@ -52,7 +55,7 @@ const CoverEditorOverlayToolbox = () => {
         <CoverEditorEffectTool />
         <CoverEditorShadowTool />
         <CoverEditorImageCropTool />
-        <CoverEditorOverlayReplace />
+        <CoverEditorMediaReplace />
         <CoverEditorDelete />
       </ScrollView>
     </View>

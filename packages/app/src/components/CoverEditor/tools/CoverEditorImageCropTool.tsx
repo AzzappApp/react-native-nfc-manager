@@ -34,8 +34,8 @@ const CoverEditorImageCropTool = () => {
   const layer = useCoverEditorOverlayLayer();
   const { dispatch } = useCoverEditorContext();
   const [imageAreaHeight, setImageAreaHeight] = useState(() => {
-    if (layer) {
-      return IMAGE_AREA_WDITH * (layer?.height / layer.width);
+    if (layer?.media) {
+      return IMAGE_AREA_WDITH * (layer.media?.height / layer.media.width);
     } else {
       return IMAGE_AREA_WDITH;
     }
@@ -47,24 +47,16 @@ const CoverEditorImageCropTool = () => {
 
   useEffect(() => {
     //resetting on change image
-    if (layer) {
-      setImageAreaHeight(IMAGE_AREA_WDITH * (layer.height / layer.width));
+    if (layer?.media) {
+      setImageAreaHeight(
+        IMAGE_AREA_WDITH * (layer.media.height / layer.media.width),
+      );
       top.value = 0;
       left.value = 0;
       boxWidth.value = IMAGE_AREA_WDITH;
       boxHeight.value = imageAreaHeight;
     }
-  }, [
-    boxHeight,
-    boxWidth,
-    imageAreaHeight,
-    left,
-    layer?.uri,
-    layer?.height,
-    layer?.width,
-    top,
-    layer,
-  ]);
+  }, [boxHeight, boxWidth, imageAreaHeight, left, layer, top]);
 
   //#region animation
 
@@ -162,7 +154,7 @@ const CoverEditorImageCropTool = () => {
 
   const save = useCallback(async () => {
     //cropping the item
-    if (layer == null) {
+    if (layer?.media == null) {
       //should not happen in "normal way"
       dispatch({
         type: 'DELETE_OVERLAY_LAYER',
@@ -170,34 +162,41 @@ const CoverEditorImageCropTool = () => {
       toggleBottomSheet();
       return;
     }
-    const ratio = layer.width / IMAGE_AREA_WDITH;
-    const res = await manipulateAsync(
-      layer.uri,
-      [
-        {
-          crop: {
-            originX: left.value * ratio,
-            originY: top.value * ratio,
-            width: boxWidth.value * ratio,
-            height: boxHeight.value * ratio,
+    if (layer.media) {
+      const ratio = layer.media.width / IMAGE_AREA_WDITH;
+      const res = await manipulateAsync(
+        layer?.media.uri,
+        [
+          {
+            crop: {
+              originX: left.value * ratio,
+              originY: top.value * ratio,
+              width: boxWidth.value * ratio,
+              height: boxHeight.value * ratio,
+            },
           },
+        ],
+        {
+          compress: 1.0,
+          format: SaveFormat.PNG,
         },
-      ],
-      {
-        compress: 1.0,
-        format: SaveFormat.PNG,
-      },
-    );
-    dispatch({
-      type: 'UPDATE_OVERLAY_LAYER',
-      payload: { uri: res.uri, width: res.width, height: res.height },
-    });
-    toggleBottomSheet();
+      );
+      dispatch({
+        type: 'UPDATE_ACTIVE_MEDIA',
+        payload: {
+          uri: res.uri,
+          width: res.width,
+          height: res.height,
+          kind: 'image',
+        },
+      });
+      toggleBottomSheet();
+    }
   }, [
     boxHeight.value,
     boxWidth.value,
     dispatch,
-    layer,
+    layer?.media,
     left.value,
     toggleBottomSheet,
     top.value,
@@ -232,7 +231,7 @@ const CoverEditorImageCropTool = () => {
               <View style={styles.container}>
                 <Animated.View style={imageStyle}>
                   <Image
-                    source={layer.uri}
+                    source={layer?.media.uri}
                     contentFit="cover"
                     style={imageStyle}
                   />
