@@ -1,5 +1,6 @@
-## 0.5.15-canary.49
+## 0.5.15-canary.50
 
+* **feat:**  - add apple meta info ([#3531](https://github.com/AzzappApp/azzapp/pull/3531))
 * **build:**  - remove expo-font patch ([#3530](https://github.com/AzzappApp/azzapp/pull/3530))
 * **build:**  - increase ios resource class to avoid build failures
 * **feat:**  - 🎸 add cover template type ([#3511](https://github.com/AzzappApp/azzapp/pull/3511))
