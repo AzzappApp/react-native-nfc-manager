@@ -1,5 +1,6 @@
-## 0.5.15-canary.52
+## 0.5.15-canary.53
 
+* **fix:**  - add default firstname and lastname values to generate an invoice ([#3537](https://github.com/AzzappApp/azzapp/pull/3537))
 * **fix:**  - **media:** [#3476](https://github.com/AzzappApp/azzapp/pull/3476) ensure we are using the last selected value ([#3536](https://github.com/AzzappApp/azzapp/pull/3536))
 * **fix:**  - **logo:** [#3521](https://github.com/AzzappApp/azzapp/pull/3521) accept wider aspect ratios ([#3525](https://github.com/AzzappApp/azzapp/pull/3525))
 * **feat:**  - coverEdition - fix bottom sheet sizing , use a common box list … ([#3535](https://github.com/AzzappApp/azzapp/pull/3535))
