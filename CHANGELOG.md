@@ -1,5 +1,10 @@
-## 0.5.15-canary.51
+## 0.5.15-canary.52
 
+* **fix:**  - **media:** [#3476](https://github.com/AzzappApp/azzapp/pull/3476) ensure we are using the last selected value ([#3536](https://github.com/AzzappApp/azzapp/pull/3536))
+* **fix:**  - **logo:** [#3521](https://github.com/AzzappApp/azzapp/pull/3521) accept wider aspect ratios ([#3525](https://github.com/AzzappApp/azzapp/pull/3525))
+* **feat:**  - coverEdition - fix bottom sheet sizing , use a common box list … ([#3535](https://github.com/AzzappApp/azzapp/pull/3535))
+* **fix:**  - **android:** [#3435](https://github.com/AzzappApp/azzapp/pull/3435) fingerprints were not updated after package name changes ([#3532](https://github.com/AzzappApp/azzapp/pull/3532))
+* **fix:**  - **contactCard:** [#3504](https://github.com/AzzappApp/azzapp/pull/3504) missing fields in stored contact in contact book ([#3528](https://github.com/AzzappApp/azzapp/pull/3528))
 * **feat:**  - add cover transition ([#3533](https://github.com/AzzappApp/azzapp/pull/3533))
 * **feat:**  - add apple meta info ([#3531](https://github.com/AzzappApp/azzapp/pull/3531))
 * **build:**  - remove expo-font patch ([#3530](https://github.com/AzzappApp/azzapp/pull/3530))
