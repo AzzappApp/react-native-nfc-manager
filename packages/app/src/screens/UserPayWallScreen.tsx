@@ -31,6 +31,9 @@ import type { ScreenOptions } from '#components/NativeRouter';
 import type { PurchasesPackage } from 'react-native-purchases';
 import type { SharedValue } from 'react-native-reanimated';
 
+const TERMS_OF_SERVICE = process.env.TERMS_OF_SERVICE;
+const PRIVACY_POLICY = process.env.TERMS_OF_SERVICE;
+
 const UserPayWallScreen = () => {
   const intl = useIntl();
   const router = useRouter();
@@ -305,7 +308,7 @@ const UserPayWallScreen = () => {
           />
           <View style={styles.footer}>
             <PressableOpacity
-              onPress={() => Linking.openURL('http://www.azzapp.com/tos')}
+              onPress={() => Linking.openURL(`${TERMS_OF_SERVICE}`)}
             >
               <Text variant="medium" style={styles.descriptionText}>
                 <FormattedMessage
@@ -318,7 +321,7 @@ const UserPayWallScreen = () => {
               |
             </Text>
             <PressableOpacity
-              onPress={() => Linking.openURL('http://www.azzapp.com/tos')}
+              onPress={() => Linking.openURL(`${TERMS_OF_SERVICE}`)}
             >
               <Text variant="medium" style={styles.descriptionText}>
                 <FormattedMessage
@@ -331,7 +334,7 @@ const UserPayWallScreen = () => {
               |
             </Text>
             <PressableOpacity
-              onPress={() => Linking.openURL('http://www.azzapp.com/privacy')}
+              onPress={() => Linking.openURL(`${PRIVACY_POLICY}`)}
             >
               <Text variant="medium" style={styles.descriptionText}>
                 <FormattedMessage

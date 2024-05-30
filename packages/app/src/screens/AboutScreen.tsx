@@ -9,6 +9,9 @@ import Icon from '#ui/Icon';
 import PressableNative from '#ui/PressableNative';
 import Text from '#ui/Text';
 
+const TERMS_OF_SERVICE = process.env.TERMS_OF_SERVICE;
+const PRIVACY_POLICY = process.env.TERMS_OF_SERVICE;
+
 const AboutScreen = () => {
   const intl = useIntl();
 
@@ -50,7 +53,7 @@ const AboutScreen = () => {
         </PressableNative>
         <PressableNative
           style={styles.rowStyle}
-          onPress={() => Linking.openURL('http://www.azzapp.com/tos')}
+          onPress={() => Linking.openURL(`${TERMS_OF_SERVICE}`)}
         >
           <Text variant="medium">
             <FormattedMessage
@@ -62,7 +65,7 @@ const AboutScreen = () => {
         </PressableNative>
         <PressableNative
           style={styles.rowStyle}
-          onPress={() => Linking.openURL('http://www.azzapp.com/privacy')}
+          onPress={() => Linking.openURL(`${PRIVACY_POLICY}`)}
         >
           <Text variant="medium">
             <FormattedMessage
