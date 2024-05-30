@@ -1,5 +1,6 @@
-## 0.5.15-canary.48
+## 0.5.15-canary.49
 
+* **build:**  - remove expo-font patch ([#3530](https://github.com/AzzappApp/azzapp/pull/3530))
 * **build:**  - increase ios resource class to avoid build failures
 * **feat:**  - 🎸 add cover template type ([#3511](https://github.com/AzzappApp/azzapp/pull/3511))
 * **feat:**  - **CoverEdition:** loading system ([#3529](https://github.com/AzzappApp/azzapp/pull/3529))
