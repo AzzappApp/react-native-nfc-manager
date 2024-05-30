@@ -1,4 +1,4 @@
-## 0.5.15-canary.57
+## 0.5.15-canary.58
 
 * **fix:**  - **webCard:** check correctly update date ([#3542](https://github.com/AzzappApp/azzapp/pull/3542))
 * **fix:**  - consider a subscription as active until it ends ([#3540](https://github.com/AzzappApp/azzapp/pull/3540))
