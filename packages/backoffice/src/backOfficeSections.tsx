@@ -94,9 +94,9 @@ const backOfficeSections: Section[] = [
         roles: [ADMIN],
       },
       {
-        id: 'coverFilters',
-        text: 'Cover filters',
-        href: '/coverFilters',
+        id: 'coverTemplateFilters',
+        text: 'Cover template filters',
+        href: '/coverTemplateFilters',
         roles: [ADMIN],
       },
       {

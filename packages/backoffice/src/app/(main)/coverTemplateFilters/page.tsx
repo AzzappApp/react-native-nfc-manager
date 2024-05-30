@@ -1,6 +1,6 @@
 import { and, asc, desc, eq, like, or, sql } from 'drizzle-orm';
-import { CoverTemplateTable, CoverTemplateTypeTable, db } from '@azzapp/data';
-import CoverTemplateTypesList from './CoverTemplateTypesList';
+import { CoverTemplateTable, CoverTemplateTagTable, db } from '@azzapp/data';
+import CoverTemplateTypesList from './CoverTemplateTagsList';
 import type { SQLWrapper } from 'drizzle-orm';
 
 export type Filters = {
@@ -8,15 +8,15 @@ export type Filters = {
 };
 
 const sortsColumns = {
-  labelKey: CoverTemplateTypeTable.labelKey,
-  order: CoverTemplateTypeTable.order,
-  enabled: CoverTemplateTypeTable.enabled,
+  labelKey: CoverTemplateTagTable.labelKey,
+  order: CoverTemplateTagTable.order,
+  enabled: CoverTemplateTagTable.enabled,
 };
 
 const getFilters = (filters: Filters): SQLWrapper[] => {
   const f: SQLWrapper[] = [];
   if (filters.enabled && filters.enabled !== 'all') {
-    f.push(eq(CoverTemplateTypeTable.enabled, filters.enabled === 'true'));
+    f.push(eq(CoverTemplateTagTable.enabled, filters.enabled === 'true'));
   }
 
   return f;
@@ -25,13 +25,13 @@ const getFilters = (filters: Filters): SQLWrapper[] => {
 const getSearch = (search: string | null) => {
   if (search) {
     return or(
-      like(CoverTemplateTypeTable.labelKey, `%${search}%`),
-      like(CoverTemplateTypeTable.order, `%${search}%`),
+      like(CoverTemplateTagTable.labelKey, `%${search}%`),
+      like(CoverTemplateTagTable.order, `%${search}%`),
     );
   }
 };
 
-const getCoverTemplateTypes = (
+const getCoverTemplateTags = (
   page: number,
   sort: 'enabled' | 'labelKey' | 'order',
   order: 'asc' | 'desc',
@@ -40,8 +40,8 @@ const getCoverTemplateTypes = (
 ) => {
   const query = db
     .select()
-    .from(CoverTemplateTypeTable)
-    .orderBy(asc(CoverTemplateTypeTable.order))
+    .from(CoverTemplateTagTable)
+    .orderBy(asc(CoverTemplateTagTable.order))
     .where(and(getSearch(search), ...getFilters(filters)))
     .$dynamic();
 
@@ -55,14 +55,14 @@ const getCoverTemplateTypes = (
   return query;
 };
 
-const getCoverTemplateTypesCount = async (
+const getCoverTemplateTagsCount = async (
   search: string | null,
   filters: Filters,
 ) => {
   const query = db
     .select({ count: sql`count(*)`.mapWith(Number) })
-    .from(CoverTemplateTypeTable)
-    .orderBy(asc(CoverTemplateTypeTable.order))
+    .from(CoverTemplateTagTable)
+    .orderBy(asc(CoverTemplateTagTable.order))
     .where(and(getSearch(search), ...getFilters(filters)));
 
   return query.then(rows => rows[0].count);
@@ -78,7 +78,7 @@ type Props = {
   };
 };
 
-const CoverTemplateTypesPage = async ({ searchParams = {} }: Props) => {
+const CoverTemplateTagsPage = async ({ searchParams = {} }: Props) => {
   let page = searchParams.page ? parseInt(searchParams.page, 10) : 1;
   page = Math.max(isNaN(page) ? 1 : page, 1);
 
@@ -92,7 +92,7 @@ const CoverTemplateTypesPage = async ({ searchParams = {} }: Props) => {
     enabled: searchParams.status ?? 'all',
   };
 
-  const coverTemplateTypes = await getCoverTemplateTypes(
+  const coverTemplateTags = await getCoverTemplateTags(
     page - 1,
     sort,
     order,
@@ -101,22 +101,22 @@ const CoverTemplateTypesPage = async ({ searchParams = {} }: Props) => {
   );
 
   const templatesCounts = await Promise.all(
-    coverTemplateTypes.map(coverTemplateType => {
+    coverTemplateTags.map(coverTemplateTag => {
       return db
         .select({ count: sql`count(*)`.mapWith(Number) })
         .from(CoverTemplateTable)
-        .where(eq(CoverTemplateTable.type, coverTemplateType.id))
+        .where(eq(CoverTemplateTable.type, coverTemplateTag.id))
         .then(res => res[0].count);
     }),
   );
 
-  const count = await getCoverTemplateTypesCount(search, filters);
+  const count = await getCoverTemplateTagsCount(search, filters);
 
   return (
     <CoverTemplateTypesList
       search={null}
       count={count}
-      coverTemplateTypes={coverTemplateTypes.map((coverTemplateType, i) => ({
+      coverTemplateTags={coverTemplateTags.map((coverTemplateType, i) => ({
         ...coverTemplateType,
         templates: templatesCounts[i],
       }))}
@@ -130,4 +130,4 @@ const CoverTemplateTypesPage = async ({ searchParams = {} }: Props) => {
 
 const PAGE_SIZE = 25;
 
-export default CoverTemplateTypesPage;
+export default CoverTemplateTagsPage;

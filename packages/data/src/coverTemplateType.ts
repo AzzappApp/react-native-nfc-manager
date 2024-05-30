@@ -8,6 +8,7 @@ export const CoverTemplateTypeTable = cols.table('CoverTemplateType', {
   id: cols.cuid('id').notNull().primaryKey().$defaultFn(createId),
   labelKey: cols.defaultVarchar('labelKey').notNull().default(''),
   order: cols.int('order').notNull().default(0),
+  enabled: cols.boolean('enabled').default(true).notNull(),
 });
 
 export type CoverTemplateType = InferSelectModel<typeof CoverTemplateTypeTable>;
