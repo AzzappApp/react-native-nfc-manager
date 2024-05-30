@@ -47,7 +47,7 @@ const CoverEditorSelectionList = <T,>({
   );
 
   return (
-    <View style={{ height: 159 }}>
+    <View style={styles.container}>
       <FlatList
         {...props}
         renderItem={renderItemList}
@@ -106,7 +106,13 @@ const ListItem = <T,>({
           <View style={styles.buttonInnerBorder} pointerEvents="none" />
         </>
       )}
-      <Text variant="small" style={styles.label}>
+      <Text
+        variant="small"
+        style={styles.label}
+        numberOfLines={1}
+        adjustsFontSizeToFit
+        ellipsizeMode="tail"
+      >
         {item.label}
       </Text>
     </View>
@@ -123,10 +129,11 @@ export const BOX_WIDTH = 80;
 export const BORDER_RADIUS_RATIO = (BOX_WIDTH * 12) / 80;
 
 const styleSheet = createStyleSheet(appearance => ({
+  container: { height: ITEM_HEIGHT + 2 * VERTICAL_PADDING },
   listContentContainer: {
     paddingTop: VERTICAL_PADDING,
     paddingHorizontal: 20,
-    height: 159,
+    height: ITEM_HEIGHT + 2 * VERTICAL_PADDING,
   },
   viewItem: {
     width: BOX_WIDTH,

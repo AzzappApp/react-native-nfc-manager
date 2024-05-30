@@ -149,7 +149,12 @@ export function coverEditorReducer(
             borderWidth: 0,
             elevation: 0,
           },
-          filter: null,
+          animation: {
+            id: 'none',
+            start: 0,
+            end: 500, //TODO define based on the duration of the total COVER which we dont have for now
+          },
+          filter: 'none',
         },
         layerMode: 'overlay',
         selectedLayerIndex: null,
@@ -207,10 +212,7 @@ export function coverEditorReducer(
           ...state,
           overlayLayer: {
             ...state.overlayLayer,
-            animation:
-              payload == null
-                ? null
-                : { ...state.overlayLayer.animation, ...payload },
+            animation: { ...state.overlayLayer.animation, ...payload },
           },
         };
       } else return state;

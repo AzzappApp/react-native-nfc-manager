@@ -2,7 +2,6 @@ import { memo, useCallback } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { View } from 'react-native';
 import { DoneHeaderButton } from '#components/commonsButtons';
-import useScreenInsets from '#hooks/useScreenInsets';
 import useToggle from '#hooks/useToggle';
 import BottomSheetModal from '#ui/BottomSheetModal';
 import LabeledWheelSelector from '#ui/LabeledWheelSelector';
@@ -15,12 +14,9 @@ import {
 
 const CoverEditorBorderTool = () => {
   const intl = useIntl();
-  const { bottom } = useScreenInsets();
   const [show, toggleBottomSheet] = useToggle(false);
   const { dispatch } = useCoverEditorContext();
-  const save = () => {
-    toggleBottomSheet();
-  };
+
   const layer = useCoverEditorOverlayLayer();
   const onChangeBorderRadius = useCallback(
     (borderRadius: number) => {
@@ -56,7 +52,7 @@ const CoverEditorBorderTool = () => {
         <BottomSheetModal
           onRequestClose={toggleBottomSheet}
           visible={show}
-          height={bottom + 271}
+          height={271}
           headerTitle={
             <Text variant="large">
               <FormattedMessage
@@ -65,7 +61,7 @@ const CoverEditorBorderTool = () => {
               />
             </Text>
           }
-          headerRightButton={<DoneHeaderButton onPress={save} />}
+          headerRightButton={<DoneHeaderButton onPress={toggleBottomSheet} />}
         >
           <View style={{ rowGap: 10 }}>
             <LabeledWheelSelector

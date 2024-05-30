@@ -105,7 +105,7 @@ export function useCoverTransitionOrdonned() {
       id: 'fade',
       label: intl.formatMessage({
         defaultMessage: 'Fade',
-        description: 'Cover Edition Transition- Fade',
+        description: 'Cover Edition Transition - Fade',
       }),
       lottie: require('./coverTransitionLottie/fade.json'), //use slide_right temporarily because fade.json return error
     },

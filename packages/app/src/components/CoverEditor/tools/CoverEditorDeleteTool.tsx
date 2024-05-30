@@ -11,7 +11,6 @@ const CoverEditorDeleteTool = () => {
   const onDeletePress = useCallback(() => {
     dispatch({
       type: 'DELETE',
-      payload: undefined,
     });
   }, [dispatch]);
 

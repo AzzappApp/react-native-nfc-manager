@@ -23,10 +23,6 @@ const CoverEditorTransitionTool = () => {
 
   const { dispatch } = useCoverEditorContext();
 
-  const save = () => {
-    toggleBottomSheet();
-  };
-
   const onSelect = useCallback(
     (transition: string) => {
       dispatch({
@@ -46,9 +42,9 @@ const CoverEditorTransitionTool = () => {
   return (
     <>
       <ToolBoxSection
-        icon="animate"
+        icon="transition"
         label={intl.formatMessage({
-          defaultMessage: 'Animations',
+          defaultMessage: 'Transition',
           description: 'Cover Edition Transition Tool Button- Animations',
         })}
         onPress={toggleBottomSheet}
@@ -66,7 +62,7 @@ const CoverEditorTransitionTool = () => {
               />
             </Text>
           }
-          headerRightButton={<DoneHeaderButton onPress={save} />}
+          headerRightButton={<DoneHeaderButton onPress={toggleBottomSheet} />}
           contentContainerStyle={{ paddingHorizontal: 0 }}
           headerStyle={{ paddingHorizontal: 20 }}
         >

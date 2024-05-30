@@ -1,4 +1,3 @@
-import { useMemo } from 'react';
 import { useIntl } from 'react-intl';
 import {
   type TransformsStyle,
@@ -251,7 +250,13 @@ const Rotate = ({ animationSharedValue }: AnimationProps) => {
   };
 };
 
+const EMPTY_MEDIA_ANIMATION: ViewStyle = {
+  opacity: 1,
+  transform: [],
+};
+
 const ANIMATORS: Record<string, (param: AnimationProps) => ViewStyle> = {
+  none: () => EMPTY_MEDIA_ANIMATION,
   smoothZoomOut: SmoothZoomOut,
   linearZoomOut: LinearZoomOut,
   appearZoomOut: AppearZoomOut,
@@ -261,74 +266,85 @@ const ANIMATORS: Record<string, (param: AnimationProps) => ViewStyle> = {
   fadeInOut: FadeInOut,
   pop: Pop,
   rotate: Rotate,
-};
+} as const;
 
-export const MEDIA_ANIMATIONS = Object.keys(ANIMATORS);
+export type MEDIA_ANIMATIONS = keyof typeof ANIMATORS;
 
-export function useAnimationLabel(animation: string) {
+export const useOrdonedAnimation = (): Array<{
+  id: MEDIA_ANIMATIONS;
+  label: string;
+}> => {
   const intl = useIntl();
-  //i need to define all those code.....(and cannot use param in the render item)..; kind of ulgy
-  const label = useMemo(() => {
-    switch (animation) {
-      case 'smoothZoomOut':
-        return intl.formatMessage({
-          defaultMessage: 'Smooth Zoom Out',
-          description: 'Cover Edition Animation - Smooth Zoom Out',
-        });
-      case 'linearZoomOut':
-        return intl.formatMessage({
-          defaultMessage: 'Linear Zoom Out',
-          description: 'Cover Edition Animation - Linear Zoom Out',
-        });
-      case 'appearZoomOut':
-        return intl.formatMessage({
-          defaultMessage: 'Appear Zoom Out',
-          description: 'Cover Edition Animation - Appear Zoom Out',
-        });
-      case 'smoothZoomIn':
-        return intl.formatMessage({
-          defaultMessage: 'Smooth Zoom In',
-          description: 'Cover Edition Animation - Smooth Zoom In',
-        });
-      case 'linearZoomIn':
-        return intl.formatMessage({
-          defaultMessage: 'Linear Zoom In',
-          description: 'Cover Edition Animation - Linear Zoom In',
-        });
-      case 'appearZoomIn':
-        return intl.formatMessage({
-          defaultMessage: 'Zoom In',
-          description: 'Cover Edition Animation - Appear Zoom In',
-        });
-      case 'fadeInOut':
-        return intl.formatMessage({
-          defaultMessage: 'Fade In',
-          description: 'Cover Edition Animation - Fade In',
-        });
-      case 'pop':
-        return intl.formatMessage({
-          defaultMessage: 'Pop',
-          description: 'Cover Edition Animation - Pop',
-        });
-      case 'rotate':
-        return intl.formatMessage({
-          defaultMessage: 'Rotate',
-          description: 'Cover Edition Animation - Rotate',
-        });
-      case 'none':
-        return intl.formatMessage({
-          defaultMessage: 'None',
-          description: 'Cover Edition Animation - None',
-        });
-      default:
-        console.warn('Animation not translated: ' + animation);
-        return animation;
-    }
-  }, [animation, intl]);
-  return label;
-}
-
-const EMPTY_MEDIA_ANIMATION: ViewStyle = {
-  opacity: 1,
-  transform: [],
+  return [
+    {
+      id: 'none',
+      label: intl.formatMessage({
+        defaultMessage: 'None',
+        description: 'Cover Edition Animation - None',
+      }),
+    },
+    {
+      id: 'smoothZoomOut',
+      label: intl.formatMessage({
+        defaultMessage: 'Smooth Zoom Out',
+        description: 'Cover Edition Animation - Smooth Zoom Out',
+      }),
+    },
+    {
+      id: 'linearZoomOut',
+      label: intl.formatMessage({
+        defaultMessage: 'Linear Zoom Out',
+        description: 'Cover Edition Animation - Linear Zoom Out',
+      }),
+    },
+    {
+      id: 'appearZoomOut',
+      label: intl.formatMessage({
+        defaultMessage: 'Appear Zoom Out',
+        description: 'Cover Edition Animation - Appear Zoom Out',
+      }),
+    },
+    {
+      id: 'smoothZoomIn',
+      label: intl.formatMessage({
+        defaultMessage: 'Smooth Zoom In',
+        description: 'Cover Edition Animation - Smooth Zoom In',
+      }),
+    },
+    {
+      id: 'linearZoomIn',
+      label: intl.formatMessage({
+        defaultMessage: 'Linear Zoom In',
+        description: 'Cover Edition Animation - Linear Zoom In',
+      }),
+    },
+    {
+      id: 'appearZoomIn',
+      label: intl.formatMessage({
+        defaultMessage: 'Zoom In',
+        description: 'Cover Edition Animation - Appear Zoom In',
+      }),
+    },
+    {
+      id: 'fadeInOut',
+      label: intl.formatMessage({
+        defaultMessage: 'Fade In',
+        description: 'Cover Edition Animation - Fade In',
+      }),
+    },
+    {
+      id: 'pop',
+      label: intl.formatMessage({
+        defaultMessage: 'Pop',
+        description: 'Cover Edition Animation - Pop',
+      }),
+    },
+    {
+      id: 'rotate',
+      label: intl.formatMessage({
+        defaultMessage: 'Rotate',
+        description: 'Cover Edition Animation - Rotate',
+      }),
+    },
+  ] as const;
 };

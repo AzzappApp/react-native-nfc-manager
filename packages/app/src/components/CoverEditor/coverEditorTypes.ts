@@ -89,7 +89,7 @@ export type CoverEditorOverlayItem = {
     shadow?: ShadowStyleIOS; //WILL CHANGE WHEN we look a skia shadow
     elevation: number;
   };
-  animation?: Partial<CoverEditorAnimationItem> | null;
+  animation: CoverEditorAnimationItem;
   filter: CoverEditorFilterItem;
 };
 

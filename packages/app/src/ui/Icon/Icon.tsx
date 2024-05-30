@@ -77,6 +77,9 @@ const icons = {
   get bloc() {
     return require('./assets/bloc.png');
   },
+  get bloc_text() {
+    return require('./assets/bloc_text.png');
+  },
   get border() {
     return require('./assets/border.png');
   },
@@ -308,6 +311,9 @@ const icons = {
   get notification() {
     return require('./assets/notification.png');
   },
+  get overlay() {
+    return require('./assets/overlay.png');
+  },
   get palette() {
     return require('./assets/palette.png');
   },
@@ -413,6 +419,9 @@ const icons = {
   get tips() {
     return require('./assets/tips.png');
   },
+  get transition() {
+    return require('./assets/transition.png');
+  },
   get trash() {
     return require('./assets/trash.png');
   },
@@ -457,12 +466,6 @@ const icons = {
   },
   get width_limited() {
     return require('./assets/width-limited.png');
-  },
-  get bloc_text() {
-    return require('./assets/bloc_text.png');
-  },
-  get overlay() {
-    return require('./assets/overlay.png');
   },
 } as const;
 
