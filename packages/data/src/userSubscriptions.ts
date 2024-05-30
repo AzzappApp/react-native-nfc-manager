@@ -156,7 +156,8 @@ export const getActiveUserSubscriptionForWebCard = async (
           gte(UserSubscriptionTable.endAt, currentDate),
         ),
       ),
-    );
+    )
+    .orderBy(asc(UserSubscriptionTable.status));
 };
 
 export const getActiveWebCardSubscription = async (

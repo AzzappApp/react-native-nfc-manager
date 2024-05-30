@@ -48,7 +48,7 @@ export const checkSubscription = async (
     return true;
   }
 
-  if (monthly) {
+  if (monthly && monthly.status === 'active') {
     await updateExistingSubscription({
       userSubscription: monthly,
       totalSeats: monthly.totalSeats + addedSeats,
