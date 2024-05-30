@@ -1,5 +1,6 @@
-## 0.5.15-canary.50
+## 0.5.15-canary.51
 
+* **feat:**  - add cover transition ([#3533](https://github.com/AzzappApp/azzapp/pull/3533))
 * **feat:**  - add apple meta info ([#3531](https://github.com/AzzappApp/azzapp/pull/3531))
 * **build:**  - remove expo-font patch ([#3530](https://github.com/AzzappApp/azzapp/pull/3530))
 * **build:**  - increase ios resource class to avoid build failures
