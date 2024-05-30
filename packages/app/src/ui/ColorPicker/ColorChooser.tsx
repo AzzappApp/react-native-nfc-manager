@@ -21,7 +21,9 @@ const ColorChooser = ({ value, onColorChange, style }: ColorChooserProps) => {
     value: hexToHSV(value)[2],
   });
 
-  const onColorChangeDebounced = useDebouncedCallback(onColorChange, 200);
+  const onColorChangeDebounced = useDebouncedCallback(onColorChange, 200, {
+    leading: true,
+  });
 
   const onSatValChange = useCallback(
     ([saturation, value]: [number, number]) => {
