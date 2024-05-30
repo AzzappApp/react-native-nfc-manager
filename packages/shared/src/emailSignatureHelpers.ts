@@ -26,7 +26,7 @@ export const serializeEmailSignature = (
     webCardId,
     card?.firstName ?? '',
     card?.lastName ?? '',
-    commonInformation?.company ?? card?.company ?? '',
+    (commonInformation?.company || card?.company) ?? '',
     card?.title ?? '',
     (commonInformation?.emails ?? [])
       .concat(card?.emails?.filter(p => p.selected) ?? [])

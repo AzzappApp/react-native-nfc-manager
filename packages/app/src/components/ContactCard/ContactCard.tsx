@@ -72,7 +72,7 @@ const ContactCard = ({
 
   const company = useMemo(() => {
     if (isMultiUser) {
-      return commonInformation?.company ?? contactCard?.company;
+      return commonInformation?.company || contactCard?.company;
     } else {
       return contactCard?.company;
     }

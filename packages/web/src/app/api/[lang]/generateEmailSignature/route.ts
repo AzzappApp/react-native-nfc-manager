@@ -80,7 +80,7 @@ const generateEmailSignature = async (req: NextRequest) => {
       mailParam.title = res?.Profile?.contactCard?.title;
     }
     const comp =
-      res?.WebCard?.commonInformation?.company ??
+      res?.WebCard?.commonInformation?.company ||
       res?.Profile?.contactCard?.company;
     if (comp) {
       mailParam.company = comp;
