@@ -438,6 +438,8 @@ export const generateInvoice = async (webCardId: string, paymentId: string) => {
         invoicingCountry: process.env.INVOICING_COUNTRY ?? 'France',
         invoicingVat: process.env.INVOICING_VAT ?? 'FR68923096283',
         invoicedCompany: subscription.subscriberName ?? '',
+        invoicedFirstname: '',
+        invoicedLastname: '',
         invoicedEmail: subscription.subscriberEmail ?? '',
         invoicedAddress1: subscription.subscriberAddress,
         invoicedAddress2: '',
