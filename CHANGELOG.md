@@ -1,5 +1,6 @@
-## 0.5.15-canary.47
+## 0.5.15-canary.48
 
+* **build:**  - increase ios resource class to avoid build failures
 * **feat:**  - 🎸 add cover template type ([#3511](https://github.com/AzzappApp/azzapp/pull/3511))
 * **feat:**  - **CoverEdition:** loading system ([#3529](https://github.com/AzzappApp/azzapp/pull/3529))
 * **fix:**  - use correct mailto and logo ([#3526](https://github.com/AzzappApp/azzapp/pull/3526))
