@@ -1,6 +1,6 @@
 import { MultiRegionRatelimit, Ratelimit } from '@upstash/ratelimit';
 import { waitUntil } from '@vercel/functions';
-import { createClient } from '@vercel/kv';
+import { createClient, kv } from '@vercel/kv';
 import { NextResponse } from 'next/server';
 import { getRedirectWebCardByUserName } from '@azzapp/data';
 import type { NextRequest } from 'next/server';
@@ -31,16 +31,7 @@ const redisClient =
           token: process.env.KV_PROD_SIN1_REST_API_TOKEN ?? '',
         }),
       ]
-    : [
-        createClient({
-          url: process.env.KV_REST_API_URL ?? '',
-          token: process.env.KV_REST_API_TOKEN ?? '',
-        }),
-        createClient({
-          url: process.env.KV_DEV_IAD1_REST_API_URL ?? '',
-          token: process.env.KV_DEV_IAD1_REST_API_TOKEN ?? '',
-        }),
-      ];
+    : kv;
 
 const rateLimit = {
   api: Array.isArray(redisClient)
