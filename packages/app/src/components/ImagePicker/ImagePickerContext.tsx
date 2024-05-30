@@ -350,7 +350,7 @@ const getMediaAspectRatio = (
   );
 };
 
-const MAX_ASPECT_RATIO = 2;
+const MAX_ASPECT_RATIO = 3.5;
 const MIN_ASPECT_RATIO = 0.5;
 
 const clampAspectRatio = (aspectRatio: number) =>
