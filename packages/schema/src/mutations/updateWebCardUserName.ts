@@ -46,7 +46,7 @@ const updateWebCardUserNameMutation: MutationResolvers['updateWebCardUserName'] 
     );
 
     //user can change if it was never published nor updated
-    if (webCard.alreadyPublished && nextChangeDate < now) {
+    if (webCard.alreadyPublished && nextChangeDate > now) {
       throw new GraphQLError(ERRORS.USERNAME_CHANGE_NOT_ALLOWED_DELAY, {
         extensions: {
           alloweChangeUserNameDate: nextChangeDate,
