@@ -21,7 +21,7 @@ const ColorChooser = ({ value, onColorChange, style }: ColorChooserProps) => {
     value: hexToHSV(value)[2],
   });
 
-  const onColorChangeDebounced = useDebouncedCallback(onColorChange, 200, {
+  const onColorChangeDebounced = useDebouncedCallback(onColorChange, 400, {
     leading: true,
   });
 
