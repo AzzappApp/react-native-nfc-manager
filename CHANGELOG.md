@@ -1,4 +1,4 @@
-## 0.5.15-canary.45
+## 0.5.15-canary.46
 
 * **fix:**  - use correct mailto and logo ([#3526](https://github.com/AzzappApp/azzapp/pull/3526))
 * **feat:**  - **Cover:** basic cover preview for medias ([#3523](https://github.com/AzzappApp/azzapp/pull/3523))
