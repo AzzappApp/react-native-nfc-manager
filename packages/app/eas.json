@@ -10,10 +10,12 @@
         "PRIVACY_POLICY": "https://www.azzapp.com/legal/privacy-policy"
       },
       "ios": {
-        "image": "latest"
+        "image": "latest",
+        "resourceClass": "large"
       },
       "android": {
-        "image": "latest"
+        "image": "latest",
+        "resourceClass": "medium"
       }
     },
     "development": {
