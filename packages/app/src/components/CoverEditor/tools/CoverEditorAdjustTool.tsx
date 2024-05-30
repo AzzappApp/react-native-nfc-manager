@@ -1,4 +1,4 @@
-import { memo, useCallback } from 'react';
+import { useCallback } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { View } from 'react-native';
 import { DoneHeaderButton } from '#components/commonsButtons';
