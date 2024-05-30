@@ -76,6 +76,7 @@ const RootLayout = async ({
         />
         <link rel="manifest" href="/site.webmanifest" />
         <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#ef3962" />
+        <meta name="apple-itunes-app" content="app-id=6502694267" />
       </head>
       <body>
         <ClientWrapper locale={locale} messages={messages}>
