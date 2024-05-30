@@ -1,5 +1,7 @@
-## 0.5.15-canary.46
+## 0.5.15-canary.47
 
+* **feat:**  - 🎸 add cover template type ([#3511](https://github.com/AzzappApp/azzapp/pull/3511))
+* **feat:**  - **CoverEdition:** loading system ([#3529](https://github.com/AzzappApp/azzapp/pull/3529))
 * **fix:**  - use correct mailto and logo ([#3526](https://github.com/AzzappApp/azzapp/pull/3526))
 * **feat:**  - **Cover:** basic cover preview for medias ([#3523](https://github.com/AzzappApp/azzapp/pull/3523))
 * **fix:**  - **home:** [#3515](https://github.com/AzzappApp/azzapp/pull/3515) memoize icon to avoid tintColor issue on rerender ([#3524](https://github.com/AzzappApp/azzapp/pull/3524))
