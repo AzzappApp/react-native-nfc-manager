@@ -1,5 +1,6 @@
-## 0.5.15-canary.54
+## 0.5.15-canary.55
 
+* **fix:**  - update monthly subscription when users are removed ([#3539](https://github.com/AzzappApp/azzapp/pull/3539))
 * **feat:**  - Cover migrate overlay media ([#3538](https://github.com/AzzappApp/azzapp/pull/3538))
 * **fix:**  - add default firstname and lastname values to generate an invoice ([#3537](https://github.com/AzzappApp/azzapp/pull/3537))
 * **fix:**  - **media:** [#3476](https://github.com/AzzappApp/azzapp/pull/3476) ensure we are using the last selected value ([#3536](https://github.com/AzzappApp/azzapp/pull/3536))
