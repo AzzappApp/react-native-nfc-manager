@@ -5,7 +5,6 @@ import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import Icon from '#ui/Icon';
 import PressableOpacity from '#ui/PressableOpacity';
 import { TOOLBOX_SECTION_HEIGHT } from '#ui/ToolBoxSection';
-import { CoverEditorActionType } from '../coverEditorActions';
 import {
   useCoverEditorContext,
   useCoverEditorOverlayLayer,
@@ -25,7 +24,13 @@ const CoverEditorOverlayToolbox = () => {
   const layer = useCoverEditorOverlayLayer();
 
   const onClose = () => {
-    dispatch({ type: CoverEditorActionType.SetLayerMode, payload: null });
+    dispatch({
+      type: 'SELECT_LAYER',
+      payload: {
+        layerMode: null,
+        index: null,
+      },
+    });
   };
 
   return (

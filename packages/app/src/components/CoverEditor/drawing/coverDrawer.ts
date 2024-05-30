@@ -10,15 +10,18 @@ import type { CoverEditorState } from '../coverEditorTypes';
 import type { VideoFrame } from '@azzapp/react-native-skia-video';
 import type { SkCanvas, SkImage, SkShader } from '@shopify/react-native-skia';
 
-type CoverDrawerOptions = {
+type BaseDrawerOptions = {
   canvas: SkCanvas;
   currentTime: number;
+  width: number;
+  height: number;
+};
+
+type CoverDrawerOptions = BaseDrawerOptions & {
   cover: CoverEditorState;
   frames: Record<string, VideoFrame>;
   images: Record<string, SkImage | null>;
   lutShaders: Record<string, SkShader>;
-  width: number;
-  height: number;
   videoScales: Record<string, number>;
 };
 
@@ -38,7 +41,6 @@ const coverDrawer = ({
   const { duration: transitionDuration, drawer: transitionDrawer } =
     coverTransitions[cover.coverTransition ?? 'none'] ?? coverTransitions.none;
 
-  // console.log(currentTime);
   for (let i = 0; i < cover.medias.length; i++) {
     const mediaInfo = cover.medias[i];
     const isLast = i === cover.medias.length - 1;

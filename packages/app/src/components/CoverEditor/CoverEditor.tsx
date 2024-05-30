@@ -23,7 +23,8 @@ export type CoverLayerType = 'links' | 'overlay' | 'text' | null;
 const CoverEditor = ({ profile: profileKey, coverTemplatePreview }: Props) => {
   const { bottom } = useScreenInsets();
 
-  const { cover, setCurrentEditableItem } = useCoverEditorContext();
+  const { coverEditorState, dispatch } = useCoverEditorContext();
+
   const [contentSize, setContentSize] = useState<{
     width: number;
     height: number;
@@ -40,10 +41,14 @@ const CoverEditor = ({ profile: profileKey, coverTemplatePreview }: Props) => {
   );
 
   const onEditLinks = useCallback(() => {
-    setCurrentEditableItem({
-      type: 'links',
+    dispatch({
+      type: 'SELECT_LAYER',
+      payload: {
+        index: null,
+        layerMode: 'links',
+      },
     });
-  }, [setCurrentEditableItem]);
+  }, [dispatch]);
 
   const profile = useFragment(
     graphql`
@@ -61,6 +66,8 @@ const CoverEditor = ({ profile: profileKey, coverTemplatePreview }: Props) => {
     profileKey,
   );
 
+  const { linksLayer } = coverEditorState;
+
   return (
     <View style={[styles.container, { marginBottom: bottom }]}>
       <View style={styles.content} onLayout={onContentLayout}>
@@ -70,20 +77,20 @@ const CoverEditor = ({ profile: profileKey, coverTemplatePreview }: Props) => {
         >
           {contentSize && (
             <CoverPreview
-              cover={cover}
+              coverEditorState={coverEditorState}
               width={contentSize.width}
               height={contentSize.height}
               style={styles.coverPreview}
             />
           )}
-          {cover.linksLayer.links.map(link => {
+          {linksLayer.links.map(link => {
             return (
               <SocialIcon
                 style={{
-                  height: cover.linksLayer.style.size,
-                  width: cover.linksLayer.style.size,
+                  height: linksLayer.style.size,
+                  width: linksLayer.style.size,
                   tintColor: swapColor(
-                    cover.linksLayer.style.color,
+                    linksLayer.style.color,
                     profile.webCard?.cardColors,
                   ),
                 }}

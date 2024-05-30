@@ -5,7 +5,6 @@ import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import Icon from '#ui/Icon';
 import PressableOpacity from '#ui/PressableOpacity';
 import { TOOLBOX_SECTION_HEIGHT } from '#ui/ToolBoxSection';
-import { CoverEditorActionType } from '../coverEditorActions';
 import { useCoverEditorContext } from '../CoverEditorContext';
 import CoverEditorAlignmentTool from '../tools/CoverEditorAligmentTool';
 import CoverEditorColorTool from '../tools/CoverEditorColorTool';
@@ -23,11 +22,16 @@ const CoverEditorTextToolbox = ({ webcard }: Props) => {
   const styles = useStyleSheet(styleSheet);
 
   const intl = useIntl();
-  const { setCurrentEditableItem, dispatch } = useCoverEditorContext();
+  const { dispatch } = useCoverEditorContext();
 
   const onClose = () => {
-    dispatch({ type: CoverEditorActionType.SetLayerMode, payload: null });
-    setCurrentEditableItem(null);
+    dispatch({
+      type: 'SELECT_LAYER',
+      payload: {
+        layerMode: null,
+        index: null,
+      },
+    });
   };
 
   // const [shadow, setShadow] = useState(true);

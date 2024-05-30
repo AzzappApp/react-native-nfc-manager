@@ -7,7 +7,6 @@ import Icon from '#ui/Icon';
 import PressableNative from '#ui/PressableNative';
 import PressableOpacity from '#ui/PressableOpacity';
 import { TOOLBOX_SECTION_HEIGHT } from '#ui/ToolBoxSection';
-import { CoverEditorActionType } from '../coverEditorActions';
 import { useCoverEditorContext } from '../CoverEditorContext';
 import CoverEditorMediaPickerFloatingTool from '../tools/CoverEditorMediaPickerFloatingTool';
 
@@ -18,33 +17,35 @@ type Props = {
 const CoverEditorMediaToolbox = ({ count }: Props) => {
   const styles = useStyleSheet(styleSheet);
 
-  const { setCurrentEditableItem, dispatch, cover } = useCoverEditorContext();
+  const { dispatch, coverEditorState } = useCoverEditorContext();
+  const { medias } = coverEditorState;
 
   const onClose = () => {
-    dispatch({ type: CoverEditorActionType.SetLayerMode, payload: null });
-    setCurrentEditableItem(null);
+    dispatch({
+      type: 'SELECT_LAYER',
+      payload: {
+        layerMode: null,
+        index: null,
+      },
+    });
   };
 
   const displayedMedias = useMemo(() => {
     return Array.from(
-      { length: count <= 0 ? cover.medias.length : count },
+      { length: count <= 0 ? medias.length : count },
       (_, i) => {
-        const { media } = cover.medias[i];
+        const { media } = medias[i];
 
         return (
           <PressableNative
             key={`${media.uri}-${i}`}
             onPress={() => {
               dispatch({
-                type: CoverEditorActionType.SelectLayer,
+                type: 'SELECT_LAYER',
                 payload: {
-                  type: 'media',
+                  layerMode: 'mediaEdit',
                   index: i,
                 },
-              });
-              dispatch({
-                type: CoverEditorActionType.SetLayerMode,
-                payload: 'mediaEdit',
               });
             }}
           >
@@ -56,7 +57,7 @@ const CoverEditorMediaToolbox = ({ count }: Props) => {
         );
       },
     );
-  }, [count, cover.medias, dispatch, styles.previewContent]);
+  }, [count, dispatch, medias, styles.previewContent]);
 
   return (
     <View style={styles.container}>

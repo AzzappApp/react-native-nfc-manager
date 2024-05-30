@@ -4,7 +4,6 @@ import { graphql, useFragment } from 'react-relay';
 import WebCardColorPicker from '#components/WebCardColorPicker';
 import useToggle from '#hooks/useToggle';
 import ToolBoxSection from '#ui/ToolBoxSection';
-import { CoverEditorActionType } from '../coverEditorActions';
 import {
   useCoverEditorContext,
   useCoverEditorTextLayer,
@@ -39,7 +38,7 @@ const CoverEditorColorTool = ({ webcard: webcardKey }: Props) => {
   const onColorChange = useCallback(
     (fontColor: string) => {
       dispatch({
-        type: CoverEditorActionType.ChangeFontColor,
+        type: 'CHANGE_FONT_COLOR',
         payload: {
           fontColor,
         },

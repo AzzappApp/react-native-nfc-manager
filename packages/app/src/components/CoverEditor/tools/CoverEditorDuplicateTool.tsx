@@ -1,7 +1,6 @@
 import { useCallback } from 'react';
 import { useIntl } from 'react-intl';
 import ToolBoxSection from '#ui/ToolBoxSection';
-import { CoverEditorActionType } from '../coverEditorActions';
 import { useCoverEditorContext } from '../CoverEditorContext';
 
 const CoverEditorDuplicateTool = () => {
@@ -11,8 +10,7 @@ const CoverEditorDuplicateTool = () => {
 
   const onDuplicatePress = useCallback(() => {
     dispatch({
-      type: CoverEditorActionType.Duplicate,
-      payload: undefined,
+      type: 'DUPLICATE',
     });
   }, [dispatch]);
 

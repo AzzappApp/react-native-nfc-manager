@@ -8,7 +8,9 @@ const CoverEditorLinksTool = () => {
   const intl = useIntl();
 
   const [linksModalVisible, toggleLinksModalVisible] = useToggle();
-  const { cover } = useCoverEditorContext();
+  const {
+    coverEditorState: { linksLayer },
+  } = useCoverEditorContext();
 
   return (
     <>
@@ -18,7 +20,7 @@ const CoverEditorLinksTool = () => {
             defaultMessage: '{links} links',
             description: 'Cover Edition - Toolbox sub-menu links - Links',
           },
-          { links: cover.linksLayer.links.length },
+          { links: linksLayer.links.length },
         )}
         icon={`link`}
         onPress={toggleLinksModalVisible}

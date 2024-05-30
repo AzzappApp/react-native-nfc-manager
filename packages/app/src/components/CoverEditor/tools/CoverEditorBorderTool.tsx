@@ -8,7 +8,6 @@ import BottomSheetModal from '#ui/BottomSheetModal';
 import LabeledWheelSelector from '#ui/LabeledWheelSelector';
 import Text from '#ui/Text';
 import ToolBoxSection from '#ui/ToolBoxSection';
-import { CoverEditorActionType } from '../coverEditorActions';
 import {
   useCoverEditorContext,
   useCoverEditorOverlayLayer,
@@ -26,7 +25,7 @@ const CoverEditorBorderTool = () => {
   const onChangeBorderRadius = useCallback(
     (borderRadius: number) => {
       dispatch({
-        type: CoverEditorActionType.UpdateLayerBorder,
+        type: 'UPDATE_LAYER_BORDER',
         payload: { borderRadius },
       });
     },
@@ -36,7 +35,7 @@ const CoverEditorBorderTool = () => {
   const onChangeBorderWidth = useCallback(
     (borderWidth: number) => {
       dispatch({
-        type: CoverEditorActionType.UpdateLayerBorder,
+        type: 'UPDATE_LAYER_BORDER',
         payload: { borderWidth },
       });
     },

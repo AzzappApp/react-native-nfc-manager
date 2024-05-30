@@ -4,7 +4,6 @@ import { StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
 import { colors } from '#theme';
-import { CoverEditorActionType } from '#components/CoverEditor/coverEditorActions';
 import { useCoverEditorContext } from '#components/CoverEditor/CoverEditorContext';
 import ScreenModal from '#components/ScreenModal';
 import SocialLinksLinksEditionPanel from '#screens/SocialLinksEditionScreen/SocialLinksLinksEditionPanel';
@@ -27,7 +26,7 @@ type Props = {
 };
 
 const CoverEditorLinksModal = ({ open, onClose }: Props) => {
-  const { cover, dispatch } = useCoverEditorContext();
+  const { coverEditorState: cover, dispatch } = useCoverEditorContext();
   const [links, setLinks] = useState<Array<SocialLink | null>>(
     cover.linksLayer.links,
   );
@@ -41,7 +40,7 @@ const CoverEditorLinksModal = ({ open, onClose }: Props) => {
 
   const onDone = useCallback(() => {
     dispatch({
-      type: CoverEditorActionType.UpdateLinks,
+      type: 'UPDATE_LINKS',
       payload: shownLinks,
     });
     onClose();

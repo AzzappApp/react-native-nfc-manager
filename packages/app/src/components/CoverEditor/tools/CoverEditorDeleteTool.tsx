@@ -1,7 +1,6 @@
 import { useCallback } from 'react';
 import { useIntl } from 'react-intl';
 import ToolBoxSection from '#ui/ToolBoxSection';
-import { CoverEditorActionType } from '../coverEditorActions';
 import { useCoverEditorContext } from '../CoverEditorContext';
 
 const CoverEditorDeleteTool = () => {
@@ -11,7 +10,7 @@ const CoverEditorDeleteTool = () => {
 
   const onDeletePress = useCallback(() => {
     dispatch({
-      type: CoverEditorActionType.Delete,
+      type: 'DELETE',
       payload: undefined,
     });
   }, [dispatch]);

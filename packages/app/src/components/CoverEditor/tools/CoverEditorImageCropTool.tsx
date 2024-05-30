@@ -23,7 +23,6 @@ import useToggle from '#hooks/useToggle';
 import Header from '#ui/Header';
 import SafeAreaView from '#ui/SafeAreaView';
 import ToolBoxSection from '#ui/ToolBoxSection';
-import { CoverEditorActionType } from '../coverEditorActions';
 import {
   useCoverEditorContext,
   useCoverEditorOverlayLayer,
@@ -166,7 +165,7 @@ const CoverEditorImageCropTool = () => {
     if (layer == null) {
       //should not happen in "normal way"
       dispatch({
-        type: CoverEditorActionType.DeleteOverlayLayer,
+        type: 'DELETE_OVERLAY_LAYER',
       });
       toggleBottomSheet();
       return;
@@ -190,7 +189,7 @@ const CoverEditorImageCropTool = () => {
       },
     );
     dispatch({
-      type: CoverEditorActionType.UpdateOverlayLayer,
+      type: 'UPDATE_OVERLAY_LAYER',
       payload: { uri: res.uri, width: res.width, height: res.height },
     });
     toggleBottomSheet();

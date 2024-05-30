@@ -4,7 +4,6 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import useToggle from '#hooks/useToggle';
 import FontPicker from '#ui/FontPicker';
 import ToolBoxSection from '#ui/ToolBoxSection';
-import { CoverEditorActionType } from '../coverEditorActions';
 import {
   useCoverEditorContext,
   useCoverEditorTextLayer,
@@ -22,7 +21,7 @@ const CoverEditorFontFamilyTool = () => {
   const onFontFamilyChange = useCallback(
     (fontFamily: string) => {
       dispatch({
-        type: CoverEditorActionType.ChangeFontFamily,
+        type: 'CHANGE_FONT_FAMILY',
         payload: {
           fontFamily,
         },

@@ -5,7 +5,6 @@ import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import Icon from '#ui/Icon';
 import PressableOpacity from '#ui/PressableOpacity';
 import ToolBoxSection, { TOOLBOX_SECTION_HEIGHT } from '#ui/ToolBoxSection';
-import { CoverEditorActionType } from '../coverEditorActions';
 import {
   useCoverEditorContext,
   useCoverEditorMedia,
@@ -17,17 +16,18 @@ import CoverEditorOverlayReplace from '../tools/CoverEditorOverlayReplace';
 const CoverEditorMediaEditToolbox = () => {
   const styles = useStyleSheet(styleSheet);
 
-  const { setCurrentEditableItem, dispatch } = useCoverEditorContext();
+  const { dispatch } = useCoverEditorContext();
   const mediaInfos = useCoverEditorMedia();
   const { media } = mediaInfos ?? {};
 
   const onClose = () => {
     dispatch({
-      type: CoverEditorActionType.SetLayerMode,
-      payload: 'media',
+      type: 'SELECT_LAYER',
+      payload: {
+        layerMode: 'media',
+        index: null,
+      },
     });
-
-    setCurrentEditableItem(null);
   };
 
   return (

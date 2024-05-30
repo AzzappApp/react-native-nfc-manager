@@ -8,32 +8,32 @@ import Animated, {
 import { graphql, useFragment } from 'react-relay';
 import useToggle from '#hooks/useToggle';
 import WebCardColorPicker from '#screens/WebCardScreen/WebCardColorPicker';
-import { TOOLBOX_SECTION_HEIGHT } from '#ui/ToolBoxSection';
+import ToolBoxSection, { TOOLBOX_SECTION_HEIGHT } from '#ui/ToolBoxSection';
 import { useCoverEditorContext } from '../CoverEditorContext';
 import CoverEditorLinksToolbox from './CoverEditorLinkToolbox';
 import CoverEditorMediaEditToolbox from './CoverEditorMediaEditToolbox';
 import CoverEditorMediaToolbox from './CoverEditorMediaToolbox';
 import CoverEditorOverlayToolbox from './CoverEditorOverlayToolbox';
 import CoverEditorTextToolbox from './CoverEditorTextToolbox';
-import CoverEditorToolboxItem from './CoverEditorToolboxItem';
 import CoverEditorAddOverlay from './modals/CoverEditorAddOverlay';
 import CoverEditorAddTextModal from './modals/CoverEditorAddTextModal';
 import type { CoverEditorToolbox_profile$key } from '#relayArtifacts/CoverEditorToolbox_profile.graphql';
-import type { CoverEditorToolboxItemProps } from './CoverEditorToolboxItem';
 import type { TemplateTypePreview } from '../templateList/CoverEditorTemplateTypePreviews';
 
-type Props = {
+type CoverEditorToolboxProps = {
   profile: CoverEditorToolbox_profile$key;
   coverTemplatePreview: TemplateTypePreview | null;
 };
 
-const CoverEditorToolbox = (props: Props) => {
-  const { profile: profileKey, coverTemplatePreview } = props;
+const CoverEditorToolbox = ({
+  profile: profileKey,
+  coverTemplatePreview,
+}: CoverEditorToolboxProps) => {
   const intl = useIntl();
   const [textModalVisible, toggleTextModalVisible] = useToggle();
   const [colorPickerVisible, toggleColorPickerVisible] = useToggle();
   const [showOverlayImagePicker, toggleOverlayImagePicker] = useToggle(false);
-  const { cover } = useCoverEditorContext();
+  const { coverEditorState, dispatch } = useCoverEditorContext();
 
   const profile = useFragment(
     graphql`
@@ -70,7 +70,7 @@ const CoverEditorToolbox = (props: Props) => {
     profileKey,
   );
 
-  const toolboxes: CoverEditorToolboxItemProps[] = useMemo(
+  const toolboxes = useMemo(
     () =>
       [
         {
@@ -98,6 +98,15 @@ const CoverEditorToolbox = (props: Props) => {
             description: 'Cover Edition - Toolbox media',
           }),
           icon: 'add_media',
+          onPress: () => {
+            dispatch({
+              type: 'SELECT_LAYER',
+              payload: {
+                layerMode: 'media',
+                index: null,
+              },
+            });
+          },
         },
         {
           id: 'links',
@@ -106,6 +115,15 @@ const CoverEditorToolbox = (props: Props) => {
             description: 'Cover Edition - Toolbox links',
           }),
           icon: 'link',
+          onPress: () => {
+            dispatch({
+              type: 'SELECT_LAYER',
+              payload: {
+                layerMode: 'links',
+                index: null,
+              },
+            });
+          },
         },
         {
           id: 'colors',
@@ -118,6 +136,7 @@ const CoverEditorToolbox = (props: Props) => {
         },
       ] as const,
     [
+      dispatch,
       intl,
       toggleColorPickerVisible,
       toggleOverlayImagePicker,
@@ -128,57 +147,57 @@ const CoverEditorToolbox = (props: Props) => {
   const overlayLayerStyle = useAnimatedStyle(() => {
     // translation is less consumin that resizing direclty the height and will better match upmitt recommendation
     const translation = withTiming(
-      cover.layerMode === 'overlay' ? 0 : TOOLBOX_SECTION_HEIGHT,
+      coverEditorState.layerMode === 'overlay' ? 0 : TOOLBOX_SECTION_HEIGHT,
       { duration: 500 },
     );
     return {
       transform: [{ translateY: translation }],
     };
-  }, [cover.layerMode]);
+  }, [coverEditorState.layerMode]);
 
   const textEditLayerStyle = useAnimatedStyle(() => {
     // translation is less consumin that resizing direclty the height and will better match upmitt recommendation
     const translation = withTiming(
-      cover.layerMode === 'text' ? 0 : TOOLBOX_SECTION_HEIGHT,
+      coverEditorState.layerMode === 'text' ? 0 : TOOLBOX_SECTION_HEIGHT,
       { duration: 500 },
     );
     return {
       transform: [{ translateY: translation }],
     };
-  }, [cover.layerMode]);
+  }, [coverEditorState.layerMode]);
 
   const linksEditLayerStyle = useAnimatedStyle(() => {
     // translation is less consumin that resizing direclty the height and will better match upmitt recommendation
     const translation = withTiming(
-      cover.layerMode === 'links' ? 0 : TOOLBOX_SECTION_HEIGHT,
+      coverEditorState.layerMode === 'links' ? 0 : TOOLBOX_SECTION_HEIGHT,
       { duration: 500 },
     );
     return {
       transform: [{ translateY: translation }],
     };
-  }, [cover.layerMode]);
+  }, [coverEditorState.layerMode]);
 
   const mediaEditLayerStyle = useAnimatedStyle(() => {
     // translation is less consumin that resizing direclty the height and will better match upmitt recommendation
     const translation = withTiming(
-      cover.layerMode === 'mediaEdit' ? 0 : TOOLBOX_SECTION_HEIGHT,
+      coverEditorState.layerMode === 'mediaEdit' ? 0 : TOOLBOX_SECTION_HEIGHT,
       { duration: 500 },
     );
     return {
       transform: [{ translateY: translation }],
     };
-  }, [cover.layerMode]);
+  }, [coverEditorState.layerMode]);
 
   const mediaLayerStyle = useAnimatedStyle(() => {
     // translation is less consumin that resizing direclty the height and will better match upmitt recommendation
     const translation = withTiming(
-      cover.layerMode === 'media' ? 0 : TOOLBOX_SECTION_HEIGHT,
+      coverEditorState.layerMode === 'media' ? 0 : TOOLBOX_SECTION_HEIGHT,
       { duration: 500 },
     );
     return {
       transform: [{ translateY: translation }],
     };
-  }, [cover.layerMode]);
+  }, [coverEditorState.layerMode]);
 
   return (
     <View style={{ height: TOOLBOX_SECTION_HEIGHT, overflow: 'hidden' }}>
@@ -189,10 +208,9 @@ const CoverEditorToolbox = (props: Props) => {
       >
         {toolboxes.map((toolbox, index) => {
           return (
-            <CoverEditorToolboxItem
+            <ToolBoxSection
               key={`toolBoxSection_${toolbox.icon}_${index}`}
               label={toolbox.label}
-              id={toolbox.id}
               icon={toolbox.icon}
               onPress={toolbox.onPress}
             />

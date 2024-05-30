@@ -16,7 +16,6 @@ import useToggle from '#hooks/useToggle';
 import BottomSheetModal from '#ui/BottomSheetModal';
 import Text from '#ui/Text';
 import ToolBoxSection from '#ui/ToolBoxSection';
-import { CoverEditorActionType } from '../coverEditorActions';
 import {
   useCoverEditorOverlayLayer,
   useCoverEditorContext,
@@ -33,7 +32,7 @@ const CoverEditorEffectTool = () => {
   const save = useCallback(
     () => (filter: string) => {
       dispatch({
-        type: CoverEditorActionType.UpdateOverlayLayer,
+        type: 'UPDATE_OVERLAY_LAYER',
         payload: { filter },
       });
       toggleBottomSheet();

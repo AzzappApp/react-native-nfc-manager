@@ -3,7 +3,6 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import { FlatList, ScrollView, StyleSheet, View } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { colors } from '#theme';
-import { CoverEditorActionType } from '#components/CoverEditor/coverEditorActions';
 import { useCoverEditorContext } from '#components/CoverEditor/CoverEditorContext';
 import ScreenModal from '#components/ScreenModal';
 import Button from '#ui/Button';
@@ -146,7 +145,7 @@ const AddTextModalItem = ({
 }) => {
   const onPress = useCallback(() => {
     dispatch({
-      type: CoverEditorActionType.AddTextLayer,
+      type: 'ADD_TEXT_LAYER',
       payload: {
         text: 'Title 01',
         style: { ...style, textAlign: 'justify' },

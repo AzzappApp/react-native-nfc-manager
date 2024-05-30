@@ -1,4 +1,3 @@
-import { CoverEditorActionType } from '#components/CoverEditor/coverEditorActions';
 import { useCoverEditorContext } from '#components/CoverEditor/CoverEditorContext';
 import ImagePicker, { SelectImageStep } from '#components/ImagePicker';
 import ScreenModal from '#components/ScreenModal';
@@ -14,7 +13,7 @@ const CoverEditorAddOverlay = ({ open, onClose }: Props) => {
 
   const onFinish = (param: ImagePickerResult) => {
     dispatch({
-      type: CoverEditorActionType.AddOverlayLayer,
+      type: 'ADD_OVERLAY_LAYER',
       payload: {
         uri: param.uri,
         width: param.width,

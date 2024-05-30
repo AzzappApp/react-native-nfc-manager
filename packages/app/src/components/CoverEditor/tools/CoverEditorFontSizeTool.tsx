@@ -11,7 +11,6 @@ import Header from '#ui/Header';
 import LabeledDashedSlider from '#ui/LabeledDashedSlider';
 import Text from '#ui/Text';
 import ToolBoxSection from '#ui/ToolBoxSection';
-import { CoverEditorActionType } from '../coverEditorActions';
 import {
   useCoverEditorContext,
   useCoverEditorLinksLayer,
@@ -35,7 +34,7 @@ const CoverEditorFontSizeTool = ({ title }: Props) => {
   const onFontSizeChange = useCallback(
     (fontSize: number) => {
       dispatch({
-        type: CoverEditorActionType.ChangeFontSize,
+        type: 'CHANGE_FONT_SIZE',
         payload: {
           fontSize,
         },

@@ -1,7 +1,6 @@
 import { memo } from 'react';
 import { useIntl } from 'react-intl';
 import ToolBoxSection from '#ui/ToolBoxSection';
-import { CoverEditorActionType } from '../coverEditorActions';
 import {
   useCoverEditorOverlayLayer,
   useCoverEditorContext,
@@ -12,7 +11,7 @@ const CoverEditorShadowTool = () => {
   const { dispatch } = useCoverEditorContext();
   const save = () => {
     dispatch({
-      type: CoverEditorActionType.UpdateLayerShadow,
+      type: 'UPDATE_LAYER_SHADOW',
       payload: {
         shadow: layer?.style.shadow
           ? undefined

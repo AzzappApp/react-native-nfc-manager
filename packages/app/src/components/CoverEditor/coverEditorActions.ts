@@ -1,100 +1,72 @@
+import type { Filter } from '#helpers/mediaEditions';
 import type { Media } from '#helpers/mediaHelpers';
 import type {
   CoverEditorAnimationItem,
   CoverEditorOverlayItem,
-  CoverEditorSelectedLayer,
   CoverEditorSocialLink,
   CoverLayerType,
   CoverTextLayerStyle,
 } from './coverEditorTypes';
+import type { SkImage, SkShader } from '@shopify/react-native-skia';
 import type { ShadowStyleIOS } from 'react-native';
 
-/* eslint-disable @typescript-eslint/no-invalid-void-type */
-export enum CoverEditorActionType {
-  SetLayerMode,
-  SelectLayer,
-  AddTextLayer,
-  ChangeAlignment,
-  ChangeFontSize,
-  ChangeFontFamily,
-  ChangeFontColor,
-  Duplicate,
-  Delete,
-  AddOverlayLayer,
-  UpdateOverlayLayer,
-  UpdateLayerBorder,
-  UpdateLayerShadow,
-  UpdateLayerAnimation,
-  DeleteOverlayLayer,
-  UpdateLayerFilter,
-  UpdateLinks,
-  UpdateMedias,
-}
-
-/**
- * Action to change the layer mode in a cover editor. which will update the bottom menu
- * @property {CoverEditorActionType} type
- * @property {CoverLayerType} payload
- */
-export type CoverEditiorSetLayerModeAction = {
-  type: CoverEditorActionType.SetLayerMode;
-  payload: CoverLayerType;
+export type SelectLayerAction = {
+  type: 'SELECT_LAYER';
+  payload: {
+    index: number | null;
+    layerMode: CoverLayerType;
+  };
 };
 
-export type CoverEditorSelectLayerAction = {
-  type: CoverEditorActionType.SelectLayer;
-  payload: CoverEditorSelectedLayer;
-};
-
-export type CoverEditorAddTextLayerAction = {
-  type: CoverEditorActionType.AddTextLayer;
+export type AddTextLayerAction = {
+  type: 'ADD_TEXT_LAYER';
   payload: {
     text: string;
     style: CoverTextLayerStyle;
   };
 };
 
-export type CoverEditorChangeAlignmentAction = {
-  type: CoverEditorActionType.ChangeAlignment;
+export type ChangeAlignmentAction = {
+  type: 'CHANGE_ALIGNMENT';
   payload: {
     alignment: 'center' | 'justify' | 'left' | 'right';
   };
 };
 
-export type CoverEditorChangeFontSizeAction = {
-  type: CoverEditorActionType.ChangeFontSize;
+export type ChangeFontSizeAction = {
+  type: 'CHANGE_FONT_SIZE';
   payload: {
     fontSize: number;
   };
 };
 
-export type CoverEditorChangeFontFamilyAction = {
-  type: CoverEditorActionType.ChangeFontFamily;
+export type ChangeFontFamilyAction = {
+  type: 'CHANGE_FONT_FAMILY';
   payload: {
     fontFamily: string;
   };
 };
 
-export type CoverEditorChangeFontColorAction = {
-  type: CoverEditorActionType.ChangeFontColor;
+export type ChangeFontColorAction = {
+  type: 'CHANGE_FONT_COLOR';
   payload: {
     fontColor: string;
   };
 };
 
-export type CoverEditorDuplicateAction = {
-  type: CoverEditorActionType.Duplicate;
-  payload: void;
+export type DuplicateAction = {
+  type: 'DUPLICATE';
+  payload?: undefined;
 };
 
-export type CoverEditorDeleteAction = {
-  type: CoverEditorActionType.Delete;
-  payload: void;
+export type DeleteAction = {
+  type: 'DELETE';
+  payload?: undefined;
 };
 
 //#region OverlayLayer
-export type CoverEditorAddOverlayLayerAction = {
-  type: CoverEditorActionType.AddOverlayLayer;
+export type AddOverlayLayerAction = {
+  type: 'ADD_OVERLAY_LAYER';
   payload: {
     uri: string;
     width: number;
@@ -102,13 +74,13 @@ export type CoverEditorAddOverlayLayerAction = {
   };
 };
 
-export type CoverEditionUpdateOverlayLayerAction = {
-  type: CoverEditorActionType.UpdateOverlayLayer;
+export type UpdateOverlayLayerAction = {
+  type: 'UPDATE_OVERLAY_LAYER';
   payload: Partial<CoverEditorOverlayItem>;
 };
 
-export type CoverEditionUpdateLayerShadowAction = {
-  type: CoverEditorActionType.UpdateLayerShadow;
+export type UpdateLayerShadowAction = {
+  type: 'UPDATE_LAYER_SHADOW';
   payload: { shadow: ShadowStyleIOS | undefined; elevation: number };
 };
 
@@ -117,8 +89,8 @@ export type CoverEditionUpdateLayerShadowAction = {
  * @property {CoverEditorActionType} type
  * @property {CoverLayerType} payload
  */
-export type CoverEditionUpdateLayerBorderAction = {
-  type: CoverEditorActionType.UpdateLayerBorder;
+export type UpdateLayerBorderAction = {
+  type: 'UPDATE_LAYER_BORDER';
   payload: Partial<{
     borderWidth: number;
     borderColor: string;
@@ -126,13 +98,13 @@ export type CoverEditionUpdateLayerBorderAction = {
   }>;
 };
 
-export type CoverEditionUpdateLayerAnimationAction = {
-  type: CoverEditorActionType.UpdateLayerAnimation;
+export type UpdateLayerAnimationAction = {
+  type: 'UPDATE_LAYER_ANIMATION';
   payload: Partial<CoverEditorAnimationItem>;
 };
 
-export type CoverEditionUpdateLayerFilterAction = {
-  type: CoverEditorActionType.UpdateLayerFilter;
+export type UpdateLayerFilterAction = {
+  type: 'UPDATE_LAYER_FILTER';
   payload: string | null;
 };
 
@@ -141,38 +113,65 @@ export type CoverEditionUpdateLayerFilterAction = {
  * @property {CoverEditorActionType} type
  * @property {CoverLayerType} payload
  */
-export type CoverEditionUpdateOverlayLayerDeleteAction = {
-  type: CoverEditorActionType.DeleteOverlayLayer;
-  payload?: null; //typescript error in reducer if payload missing or null
+export type UpdateOverlayLayerDeleteAction = {
+  type: 'DELETE_OVERLAY_LAYER';
+  payload?: undefined;
 };
 //#endregion
 
-export type CoverEditionUpdateLinksAction = {
-  type: CoverEditorActionType.UpdateLinks;
+export type UpdateLinksAction = {
+  type: 'UPDATE_LINKS';
   payload: CoverEditorSocialLink[];
 };
 
-export type CoverEditionUpdateMediasAction = {
-  type: CoverEditorActionType.UpdateMedias;
+export type UpdateMediasAction = {
+  type: 'UPDATE_MEDIAS';
   payload: Media[];
 };
 
+// #region resources loaded actions
+export type LoadingStartAction = {
+  type: 'LOADING_START';
+  payload: {
+    remote: boolean;
+  };
+};
+
+export type LoadingSuccessAction = {
+  type: 'LOADING_SUCCESS';
+  payload: {
+    lutShaders: Partial<Record<Filter, SkShader>>;
+    images: Record<string, SkImage>;
+    videoPaths: Record<string, string>;
+  };
+};
+
+export type LoadingErrorAction = {
+  type: 'LOADING_ERROR';
+  payload: {
+    error: any;
+  };
+};
+// #endregion
+
 export type CoverEditorAction =
-  | CoverEditionUpdateLayerAnimationAction
-  | CoverEditionUpdateLayerBorderAction
-  | CoverEditionUpdateLayerFilterAction
-  | CoverEditionUpdateLayerShadowAction
-  | CoverEditionUpdateLinksAction
-  | CoverEditionUpdateMediasAction
-  | CoverEditionUpdateOverlayLayerAction
-  | CoverEditionUpdateOverlayLayerDeleteAction
-  | CoverEditiorSetLayerModeAction
-  | CoverEditorAddOverlayLayerAction
-  | CoverEditorAddTextLayerAction
-  | CoverEditorChangeAlignmentAction
-  | CoverEditorChangeFontColorAction
-  | CoverEditorChangeFontFamilyAction
-  | CoverEditorChangeFontSizeAction
-  | CoverEditorDeleteAction
-  | CoverEditorDuplicateAction
-  | CoverEditorSelectLayerAction;
+  | AddOverlayLayerAction
+  | AddTextLayerAction
+  | ChangeAlignmentAction
+  | ChangeFontColorAction
+  | ChangeFontFamilyAction
+  | ChangeFontSizeAction
+  | DeleteAction
+  | DuplicateAction
+  | LoadingErrorAction
+  | LoadingStartAction
+  | LoadingSuccessAction
+  | SelectLayerAction
+  | UpdateLayerAnimationAction
+  | UpdateLayerBorderAction
+  | UpdateLayerFilterAction
+  | UpdateLayerShadowAction
+  | UpdateLinksAction
+  | UpdateMediasAction
+  | UpdateOverlayLayerAction
+  | UpdateOverlayLayerDeleteAction;

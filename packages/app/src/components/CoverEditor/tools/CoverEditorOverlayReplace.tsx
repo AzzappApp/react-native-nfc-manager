@@ -4,7 +4,6 @@ import ImagePicker, { SelectImageStep } from '#components/ImagePicker';
 import ScreenModal from '#components/ScreenModal';
 import useToggle from '#hooks/useToggle';
 import ToolBoxSection from '#ui/ToolBoxSection';
-import { CoverEditorActionType } from '../coverEditorActions';
 import { useCoverEditorContext } from '../CoverEditorContext';
 
 import type { ImagePickerResult } from '#components/ImagePicker';
@@ -30,7 +29,7 @@ const CoverEditorOverlayReplace = () => {
           steps={[SelectImageStep]}
           onFinished={(param: ImagePickerResult) => {
             dispatch({
-              type: CoverEditorActionType.UpdateOverlayLayer,
+              type: 'UPDATE_OVERLAY_LAYER',
               payload: {
                 uri: param.uri,
                 width: param.width,

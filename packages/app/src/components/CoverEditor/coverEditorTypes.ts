@@ -1,16 +1,27 @@
 import type { EditionParameters, Filter } from '#helpers/mediaEditions';
 import type { MediaVideo, MediaImage, TimeRange } from '#helpers/mediaHelpers';
+import type { SkImage, SkShader } from '@shopify/react-native-skia';
 import type { ShadowStyleIOS } from 'react-native';
 
 export type CoverEditorState = {
-  selectedLayer: CoverEditorSelectedLayer;
+  // Cover data
+  layerMode: CoverLayerType;
+  selectedLayerIndex: number | null;
   textLayers: CoverEditorTextLayerItem[];
   overlayLayer: CoverEditorOverlayItem | null;
-  layerMode: CoverLayerType; //add it here instead of animated value in context  because It could been use for reducer action in some case. TO IMPROVE
   linksLayer: CoverEditorLinksLayerItem;
   medias: MediaInfo[];
   template: TemplateInfo | null;
   coverTransition: CoverEditorTransition | null;
+
+  // Resources used for displaying/updating the cover
+  images: Record<string, SkImage>;
+  videoPaths: Record<string, string>;
+  lutShaders: Partial<Record<Filter, SkShader>>;
+
+  // Loading state
+  loadingRemoteMedia: boolean;
+  loadingLocalMedia: boolean;
 };
 
 export type TemplateInfo = {
@@ -81,23 +92,6 @@ export type CoverEditorOverlayItem = {
   animation?: Partial<CoverEditorAnimationItem> | null;
   filter: CoverEditorFilterItem;
 };
-
-export type CoverEditorSelectedLayer =
-  | {
-      type: 'links';
-    }
-  | {
-      type: 'media';
-      index: number;
-    }
-  | {
-      type: 'overlay';
-    }
-  | {
-      type: 'text';
-      index: number;
-    }
-  | null;
 
 export type CoverEditorSocialLink = {
   link: string;

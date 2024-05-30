@@ -1,7 +1,6 @@
 import { useCallback } from 'react';
 import { useIntl } from 'react-intl';
 import ToolBoxSection from '#ui/ToolBoxSection';
-import { CoverEditorActionType } from '../coverEditorActions';
 import {
   useCoverEditorContext,
   useCoverEditorTextLayer,
@@ -17,7 +16,7 @@ const CoverEditorAlignmentTool = () => {
   const onSetAlignment = useCallback(
     (alignment: 'center' | 'justify' | 'left' | 'right') => {
       dispatch({
-        type: CoverEditorActionType.ChangeAlignment,
+        type: 'CHANGE_ALIGNMENT',
         payload: {
           alignment,
         },

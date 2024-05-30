@@ -18,7 +18,6 @@ import BottomSheetModal from '#ui/BottomSheetModal';
 import DoubleSlider from '#ui/DoubleSlider';
 import Text from '#ui/Text';
 import ToolBoxSection from '#ui/ToolBoxSection';
-import { CoverEditorActionType } from '../coverEditorActions';
 import {
   useCoverEditorContext,
   useCoverEditorOverlayLayer,
@@ -38,7 +37,7 @@ const CoverEditorAnimationTool = () => {
   const onSelect = useCallback(
     (animation: string) => {
       dispatch({
-        type: CoverEditorActionType.UpdateLayerAnimation,
+        type: 'UPDATE_LAYER_ANIMATION',
         payload: { id: animation },
       });
     },
@@ -65,7 +64,7 @@ const CoverEditorAnimationTool = () => {
   const onChangeDuration = useCallback(
     (values: number[], _index: number) => {
       dispatch({
-        type: CoverEditorActionType.UpdateLayerAnimation,
+        type: 'UPDATE_LAYER_ANIMATION',
         payload: { start: values[0], end: values[1] },
       });
     },

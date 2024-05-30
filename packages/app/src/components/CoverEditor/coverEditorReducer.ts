@@ -5,10 +5,7 @@ import {
 } from '@azzapp/shared/coverHelpers';
 import { colors } from '#theme';
 import { cropDataForAspectRatio } from '#helpers/mediaEditions';
-import {
-  CoverEditorActionType,
-  type CoverEditorAction,
-} from './coverEditorActions';
+import type { CoverEditorAction } from './coverEditorActions';
 import type { CoverEditorState } from './coverEditorTypes';
 
 export function coverEditorReducer(
@@ -18,29 +15,25 @@ export function coverEditorReducer(
   const { type, payload } = action;
 
   const selectedTextLayerIndex =
-    state.selectedLayer?.type === 'text' ? state.selectedLayer.index : null;
+    state.layerMode === 'text' ? state.selectedLayerIndex : null;
 
   const textLayers = [...state.textLayers];
 
   switch (type) {
-    case CoverEditorActionType.SetLayerMode:
+    case 'SELECT_LAYER':
       return {
         ...state,
-        layerMode: payload,
+        layerMode: payload.layerMode,
+        selectedLayerIndex: payload.index,
       };
-    case CoverEditorActionType.AddTextLayer:
+    case 'ADD_TEXT_LAYER':
       return {
         ...state,
         textLayers: [...state.textLayers, payload],
+        selectedLayerIndex: state.textLayers.length,
+        layerMode: 'text',
       };
-    case CoverEditorActionType.SelectLayer:
-      return {
-        ...state,
-        selectedLayer: payload,
-        // @TODO: sometimes we want to remove the selected object but keep the layer mode (no media selected but media menu open)
-        layerMode: payload?.type ?? state.layerMode,
-      };
-    case CoverEditorActionType.ChangeAlignment:
+    case 'CHANGE_ALIGNMENT':
       if (selectedTextLayerIndex === null) return state;
       textLayers[selectedTextLayerIndex].style.textAlign = payload.alignment;
 
@@ -48,8 +41,8 @@ export function coverEditorReducer(
         ...state,
         textLayers,
       };
-    case CoverEditorActionType.ChangeFontSize:
-      if (state.selectedLayer?.type === 'links') {
+    case 'CHANGE_FONT_SIZE':
+      if (state.layerMode === 'links') {
         return {
           ...state,
           linksLayer: {
@@ -76,7 +69,7 @@ export function coverEditorReducer(
         };
       }
       return state;
-    case CoverEditorActionType.ChangeFontFamily:
+    case 'CHANGE_FONT_FAMILY':
       if (selectedTextLayerIndex === null) return state;
       textLayers[selectedTextLayerIndex].style.fontFamily = payload.fontFamily;
 
@@ -84,8 +77,8 @@ export function coverEditorReducer(
         ...state,
         textLayers,
       };
-    case CoverEditorActionType.ChangeFontColor:
-      if (state.selectedLayer?.type === 'links') {
+    case 'CHANGE_FONT_COLOR':
+      if (state.layerMode === 'links') {
         return {
           ...state,
           linksLayer: {
@@ -113,7 +106,7 @@ export function coverEditorReducer(
         };
       }
       return state;
-    case CoverEditorActionType.Duplicate:
+    case 'DUPLICATE':
       if (selectedTextLayerIndex === null || textLayers.length >= 3)
         return state;
 
@@ -123,8 +116,8 @@ export function coverEditorReducer(
         ...state,
         textLayers,
       };
-    case CoverEditorActionType.Delete:
-      if (state.selectedLayer?.type === 'links') {
+    case 'DELETE':
+      if (state.layerMode === 'links') {
         return {
           ...state,
           linksLayer: {
@@ -145,7 +138,7 @@ export function coverEditorReducer(
 
       return state;
     //#Region OverlayLayer
-    case CoverEditorActionType.AddOverlayLayer:
+    case 'ADD_OVERLAY_LAYER':
       return {
         ...state,
         overlayLayer: {
@@ -158,9 +151,10 @@ export function coverEditorReducer(
           },
           filter: null,
         },
-        selectedLayer: { type: 'overlay' },
+        layerMode: 'overlay',
+        selectedLayerIndex: null,
       };
-    case CoverEditorActionType.UpdateOverlayLayer:
+    case 'UPDATE_OVERLAY_LAYER':
       if (state.overlayLayer == null) return state;
       return {
         ...state,
@@ -169,7 +163,7 @@ export function coverEditorReducer(
           ...payload,
         },
       };
-    case CoverEditorActionType.UpdateLayerBorder:
+    case 'UPDATE_LAYER_BORDER':
       //IMPROVE the way of updating the correct layer more generic not listing all case
       //maybe renaming overlayer to some name as CoverType and use something like
       // [layerMode] : {
@@ -185,7 +179,7 @@ export function coverEditorReducer(
           },
         };
       } else return state;
-    case CoverEditorActionType.UpdateLayerShadow:
+    case 'UPDATE_LAYER_SHADOW':
       //IMPROVE the way of updating the correct layer more generic not listing all case
       //maybe renaming overlayer to some name as CoverType and use something like
       // [layerMode] : {
@@ -201,7 +195,7 @@ export function coverEditorReducer(
           },
         };
       } else return state;
-    case CoverEditorActionType.UpdateLayerAnimation:
+    case 'UPDATE_LAYER_ANIMATION':
       //IMPROVE the way of updating the correct layer more generic not listing all case
       //maybe renaming overlayer to some name as CoverType and use something like
       // [layerMode] : {
@@ -220,7 +214,7 @@ export function coverEditorReducer(
           },
         };
       } else return state;
-    case CoverEditorActionType.UpdateLayerFilter:
+    case 'UPDATE_LAYER_FILTER':
       //IMPROVE the way of updating the correct layer more generic not listing all case
       //maybe renaming overlayer to some name as CoverType and use something like
       // [layerMode] : {
@@ -236,14 +230,14 @@ export function coverEditorReducer(
           },
         };
       } else return state;
-    case CoverEditorActionType.DeleteOverlayLayer:
+    case 'DELETE_OVERLAY_LAYER':
       if (state.overlayLayer == null) return state;
       return {
         ...state,
         overlayLayer: null,
         layerMode: null,
       };
-    case CoverEditorActionType.UpdateLinks:
+    case 'UPDATE_LINKS':
       return {
         ...state,
         linksLayer: {
@@ -251,7 +245,7 @@ export function coverEditorReducer(
           links: payload,
         },
       };
-    case CoverEditorActionType.UpdateMedias:
+    case 'UPDATE_MEDIAS':
       return {
         ...state,
         medias: payload.map(media => {
@@ -286,6 +280,28 @@ export function coverEditorReducer(
           }
         }),
       };
+    case 'LOADING_START':
+      return {
+        ...state,
+        loadingRemoteMedia: payload.remote,
+        loadingLocalMedia: !payload.remote,
+      };
+    case 'LOADING_ERROR': {
+      console.error(payload.error);
+      // TODO handle error
+      return state;
+    }
+    case 'LOADING_SUCCESS': {
+      const { images, lutShaders, videoPaths } = payload;
+      return {
+        ...state,
+        loadingRemoteMedia: false,
+        loadingLocalMedia: false,
+        images,
+        lutShaders,
+        videoPaths,
+      };
+    }
     default:
       return state;
   }

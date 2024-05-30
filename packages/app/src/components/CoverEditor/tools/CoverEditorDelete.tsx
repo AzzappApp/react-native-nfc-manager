@@ -1,14 +1,13 @@
 import { memo } from 'react';
 import { useIntl } from 'react-intl';
 import ToolBoxSection from '#ui/ToolBoxSection';
-import { CoverEditorActionType } from '../coverEditorActions';
 import { useCoverEditorContext } from '../CoverEditorContext';
 
 const CoverEditorDelete = () => {
   const { dispatch } = useCoverEditorContext();
   const intl = useIntl();
   const onDelete = () => {
-    dispatch({ type: CoverEditorActionType.DeleteOverlayLayer });
+    dispatch({ type: 'DELETE_OVERLAY_LAYER' });
   };
   return (
     <ToolBoxSection
