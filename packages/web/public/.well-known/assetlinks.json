@@ -5,7 +5,7 @@
       "namespace": "android_app",
       "package_name": "com.azzapp.app_dev",
       "sha256_cert_fingerprints": [
-        "52:8E:67:D7:3F:62:5B:2D:96:BD:57:A5:89:C0:8A:27:49:6B:CD:EE:45:80:3A:0C:9F:5B:2A:55:69:E0:6B:8D"
+        "93:3D:F6:5F:53:0D:38:46:95:51:63:92:0E:EA:7D:30:98:27:2F:8E:85:2D:50:80:89:59:1F:2D:09:4F:57:46"
       ]
     }
   },
@@ -15,7 +15,7 @@
       "namespace": "android_app",
       "package_name": "com.azzapp.app_staging",
       "sha256_cert_fingerprints": [
-        "52:8E:67:D7:3F:62:5B:2D:96:BD:57:A5:89:C0:8A:27:49:6B:CD:EE:45:80:3A:0C:9F:5B:2A:55:69:E0:6B:8D"
+        "4E:42:AE:77:21:0E:99:55:18:45:C9:65:90:F5:48:9B:32:22:6C:E6:46:A3:DE:9B:75:69:88:80:AE:F6:09:D7"
       ]
     }
   },
@@ -25,7 +25,7 @@
       "namespace": "android_app",
       "package_name": "com.azzapp.app",
       "sha256_cert_fingerprints": [
-        "52:8E:67:D7:3F:62:5B:2D:96:BD:57:A5:89:C0:8A:27:49:6B:CD:EE:45:80:3A:0C:9F:5B:2A:55:69:E0:6B:8D"
+        "9C:36:16:58:B0:68:C4:96:41:BE:4C:14:86:03:42:62:58:97:05:89:82:7D:E6:12:1F:84:6F:8A:2C:93:59:80"
       ]
     }
   }
