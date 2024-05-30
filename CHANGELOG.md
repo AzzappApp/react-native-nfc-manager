@@ -1,5 +1,6 @@
-## 0.5.15-canary.60
+## 0.5.15-canary.61
 
+* **build:**  - rollback sentry upgrade ([#3549](https://github.com/AzzappApp/azzapp/pull/3549))
 * **build:**  - upgrade web dependencies ([#3547](https://github.com/AzzappApp/azzapp/pull/3547))
 * **fix:**  - **media:** [#3476](https://github.com/AzzappApp/azzapp/pull/3476) try to slow down updates ([#3545](https://github.com/AzzappApp/azzapp/pull/3545))
 * **fix:**  - lint issue
