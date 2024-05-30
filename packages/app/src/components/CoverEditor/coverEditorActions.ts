@@ -1,7 +1,7 @@
+import type { Animation } from '#components/CoverRenderer/MediaAnimator';
 import type { Filter } from '#helpers/mediaEditions';
 import type { MediaImage, Media } from '#helpers/mediaHelpers';
 import type {
-  CoverEditorAnimationItem,
   CoverEditorOverlayItem,
   CoverEditorSocialLink,
   CoverEditorTransition,
@@ -95,14 +95,14 @@ export type UpdateLayerBorderAction = {
   }>;
 };
 
-export type UpdateLayerAnimationAction = {
-  type: 'UPDATE_LAYER_ANIMATION';
-  payload: Partial<CoverEditorAnimationItem>;
+export type UpdateMediaAnimationAction = {
+  type: 'UPDATE_MEDIA_ANIMATION';
+  payload: Animation;
 };
 
 export type UpdateLayerFilterAction = {
-  type: 'UPDATE_LAYER_FILTER';
-  payload: string | null;
+  type: 'UPDATE_MEDIA_FILTER';
+  payload: Filter | null;
 };
 
 /**
@@ -174,11 +174,11 @@ export type CoverEditorAction =
   | LoadingSuccessAction
   | SelectLayerAction
   | UpdateActiveMediaAction
-  | UpdateLayerAnimationAction
   | UpdateLayerBorderAction
   | UpdateLayerFilterAction
   | UpdateLayerShadowAction
   | UpdateLinksAction
+  | UpdateMediaAnimationAction
   | UpdateMediasAction
   | UpdateMediasTransitionAction
   | UpdateOverlayLayerAction

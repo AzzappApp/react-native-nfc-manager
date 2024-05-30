@@ -5,6 +5,7 @@ import {
 } from '@azzapp/shared/coverHelpers';
 import { colors } from '#theme';
 import { cropDataForAspectRatio } from '#helpers/mediaEditions';
+import { mediaInfoIsImage } from './coverEditorHelpers';
 import type { CoverEditorAction } from './coverEditorActions';
 import type { CoverEditorState } from './coverEditorTypes';
 
@@ -139,6 +140,12 @@ export function coverEditorReducer(
       return state;
     //#Region OverlayLayer
     case 'ADD_OVERLAY_LAYER':
+      const totalDuration = state.medias.reduce(
+        (acc, media) =>
+          acc +
+          (mediaInfoIsImage(media) ? media.duration : media.timeRange.duration),
+        0,
+      );
       return {
         ...state,
         overlayLayer: {
@@ -149,12 +156,9 @@ export function coverEditorReducer(
             borderWidth: 0,
             elevation: 0,
           },
-          animation: {
-            id: 'none',
-            start: 0,
-            end: 500, //TODO define based on the duration of the total COVER which we dont have for now
-          },
-          filter: 'none',
+          animation: { id: 'none', start: 0, duration: totalDuration }, //define this value based on total
+          filter: null,
+          editionParameters: null,
         },
         layerMode: 'overlay',
         selectedLayerIndex: null,
@@ -200,12 +204,7 @@ export function coverEditorReducer(
           },
         };
       } else return state;
-    case 'UPDATE_LAYER_ANIMATION':
-      //IMPROVE the way of updating the correct layer more generic not listing all case
-      //maybe renaming overlayer to some name as CoverType and use something like
-      // [layerMode] : {
-      //
-      //}
+    case 'UPDATE_MEDIA_ANIMATION':
       if (state.layerMode === 'overlay') {
         if (state.overlayLayer == null) return state;
         return {
@@ -215,13 +214,30 @@ export function coverEditorReducer(
             animation: { ...state.overlayLayer.animation, ...payload },
           },
         };
-      } else return state;
-    case 'UPDATE_LAYER_FILTER':
-      //IMPROVE the way of updating the correct layer more generic not listing all case
-      //maybe renaming overlayer to some name as CoverType and use something like
-      // [layerMode] : {
-      //
-      //}
+      } else if (
+        state.layerMode === 'mediaEdit' &&
+        state.selectedLayerIndex != null
+      ) {
+        const newMedias = [...state.medias]; //making a new array
+        const media = state.medias[state.selectedLayerIndex];
+        if (mediaInfoIsImage(media)) {
+          newMedias[state.selectedLayerIndex] = {
+            ...media,
+            animation: payload.id,
+            duration: payload.duration,
+          };
+        }
+        return {
+          ...state,
+          medias: newMedias,
+        };
+      } else {
+        console.warn(
+          `Update animation on ${state.layerMode} is not implemented`,
+        );
+        return state;
+      }
+    case 'UPDATE_MEDIA_FILTER':
       if (state.layerMode === 'overlay') {
         if (state.overlayLayer == null) return state;
         return {
@@ -231,7 +247,26 @@ export function coverEditorReducer(
             filter: payload,
           },
         };
-      } else return state;
+      } else if (
+        state.layerMode === 'mediaEdit' &&
+        state.selectedLayerIndex != null
+      ) {
+        const newMedias = [...state.medias]; //making a new array
+        const media = state.medias[state.selectedLayerIndex];
+        newMedias[state.selectedLayerIndex] = {
+          ...media,
+          filter: payload,
+        };
+        return {
+          ...state,
+          medias: newMedias,
+        };
+      } else {
+        console.warn(
+          `Update Filter effect on ${state.layerMode} is not implemented`,
+        );
+        return state;
+      }
     case 'DELETE_OVERLAY_LAYER':
       if (state.overlayLayer == null) return state;
       return {
@@ -285,6 +320,7 @@ export function coverEditorReducer(
             return {
               media,
               filter: null,
+              animation: 'none',
               editionParameters: { cropData },
               duration: COVER_MAX_MEDIA_DURATION,
             };
@@ -292,6 +328,7 @@ export function coverEditorReducer(
             return {
               media,
               filter: null,
+              animation: 'none',
               editionParameters: { cropData },
               timeRange: {
                 startTime: 0,

@@ -9,6 +9,7 @@ import {
   useCoverEditorContext,
   useCoverEditorMedia,
 } from '../CoverEditorContext';
+import CoverEditorAnimationTool from '../tools/CoverEditorAnimationTool';
 import CoverEditorEffectTool from '../tools/CoverEditorEffectTool';
 import CoverEditorImageCropTool from '../tools/CoverEditorImageCropTool';
 import CoverEditorMediaReplace from '../tools/CoverEditorMediaReplace';
@@ -48,9 +49,11 @@ const CoverEditorMediaEditToolbox = () => {
         {media?.kind === 'video' && (
           <ToolBoxSection icon="chrono" label="cut" onPress={console.log} />
         )}
+        {media?.kind === 'image' && <CoverEditorAnimationTool />}
         <CoverEditorEffectTool />
+        <ToolBoxSection icon="settings" label="Adjust" onPress={console.log} />
         <CoverEditorMediaReplace />
-        <CoverEditorImageCropTool />
+        {media?.kind === 'image' && <CoverEditorImageCropTool />}
       </ScrollView>
     </View>
   );

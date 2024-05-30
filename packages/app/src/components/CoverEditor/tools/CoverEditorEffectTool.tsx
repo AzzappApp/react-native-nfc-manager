@@ -11,8 +11,8 @@ import BottomSheetModal from '#ui/BottomSheetModal';
 import Text from '#ui/Text';
 import ToolBoxSection from '#ui/ToolBoxSection';
 import {
-  useCoverEditorOverlayLayer,
   useCoverEditorContext,
+  useCoverEditoActiveMedia,
 } from '../CoverEditorContext';
 import CoverEditorSelectionList, {
   BORDER_RADIUS_RATIO,
@@ -23,19 +23,19 @@ import type { Filter } from '#helpers/mediaEditions';
 const CoverEditorEffectTool = () => {
   const filters = useOrdonedFilters();
   const [show, toggleBottomSheet] = useToggle(false);
-  const layer = useCoverEditorOverlayLayer(); //use directly the layer for now, only one animated
+  const mediaInfo = useCoverEditoActiveMedia();
   const { dispatch } = useCoverEditorContext();
 
   const onSelect = useCallback(
     (filter: string) => {
+      console.log(filter);
       dispatch({
-        type: 'UPDATE_OVERLAY_LAYER',
-        payload: { filter },
+        type: 'UPDATE_MEDIA_FILTER',
+        payload: filter as Filter, // Add index signature to allow indexing with a string
       });
     },
     [dispatch],
   );
-
   const intl = useIntl();
 
   return (
@@ -48,7 +48,7 @@ const CoverEditorEffectTool = () => {
         })}
         onPress={toggleBottomSheet}
       />
-      {layer != null && (
+      {mediaInfo != null && (
         <BottomSheetModal
           onRequestClose={toggleBottomSheet}
           visible={show}
@@ -70,7 +70,7 @@ const CoverEditorEffectTool = () => {
             renderItem={renderItem}
             accessibilityRole="list"
             onSelect={onSelect}
-            selectedItemId={layer.filter ?? 'none'}
+            selectedItemId={mediaInfo.filter ?? 'none'}
           />
         </BottomSheetModal>
       )}

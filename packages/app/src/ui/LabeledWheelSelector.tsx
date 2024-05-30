@@ -1,8 +1,6 @@
-import { type ReactNode } from 'react';
 import { StyleSheet, View } from 'react-native';
-import { useDerivedValue } from 'react-native-reanimated';
+import { useSharedValue } from 'react-native-reanimated';
 import AnimatedText from '#components/AnimatedText';
-import { getClampedValue } from './DashedSlider';
 import Text from './Text';
 import WheelSelector from './WheelSelector';
 import type { DashedSliderProps } from './DashedSlider';
@@ -11,22 +9,15 @@ export type LabeledDashedSliderProps = Omit<
   DashedSliderProps,
   'sharedValue'
 > & {
-  label?: ReactNode;
+  label: string;
   value: number;
-  formatValue?: (value: number) => number | string;
+  variant?: 'default' | 'small';
+  min: number;
+  max: number;
+  step: number;
+  interval?: number;
+  onChange?: (value: number) => void;
 };
-
-function getPrecision(a: number) {
-  'worklet';
-  if (!isFinite(a)) return 0;
-  let e = 1;
-  let p = 0;
-  while (Math.round(a * e) / e !== a) {
-    e *= 10;
-    p++;
-  }
-  return p;
-}
 
 const LabeledDashedSlider = ({
   label,
@@ -36,16 +27,10 @@ const LabeledDashedSlider = ({
   max,
   step,
   interval,
-  formatValue,
-  onTouched,
   onChange,
   ...props
 }: LabeledDashedSliderProps) => {
-  const textValue = useDerivedValue(() => {
-    return formatValue
-      ? `${formatValue(getClampedValue(value, step, min, max))}`
-      : getClampedValue(value, step, min, max).toFixed(getPrecision(step));
-  }, [value, formatValue]);
+  const animatedValue = useSharedValue(`${value}`);
 
   return (
     <View {...props}>
@@ -55,7 +40,11 @@ const LabeledDashedSlider = ({
             {label}
           </Text>
         )}
-        <AnimatedText text={textValue} variant="small" style={styles.text} />
+        <AnimatedText
+          text={animatedValue}
+          variant="small"
+          style={styles.text}
+        />
       </View>
       <WheelSelector
         variant={variant}
@@ -65,6 +54,7 @@ const LabeledDashedSlider = ({
         step={step}
         interval={interval}
         onChange={onChange}
+        animatedValue={animatedValue}
       />
     </View>
   );

@@ -270,6 +270,12 @@ const ANIMATORS: Record<string, (param: AnimationProps) => ViewStyle> = {
 
 export type MEDIA_ANIMATIONS = keyof typeof ANIMATORS;
 
+export type Animation = {
+  id: MEDIA_ANIMATIONS;
+  start: number;
+  duration: number;
+};
+
 export const useOrdonedAnimation = (): Array<{
   id: MEDIA_ANIMATIONS;
   label: string;

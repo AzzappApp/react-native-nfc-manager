@@ -1,4 +1,4 @@
-import { memo, useCallback } from 'react';
+import { memo, useCallback, useEffect, useMemo, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { View } from 'react-native';
 import { shadow } from '#theme';
@@ -8,31 +8,75 @@ import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import useToggle from '#hooks/useToggle';
 import BottomSheetModal from '#ui/BottomSheetModal';
 import DoubleSlider from '#ui/DoubleSlider';
+import LabeledWheelSelector from '#ui/LabeledWheelSelector';
 import Text from '#ui/Text';
 import ToolBoxSection from '#ui/ToolBoxSection';
 import {
   useCoverEditorContext,
+  useCoverEditorMedia,
   useCoverEditorOverlayLayer,
 } from '../CoverEditorContext';
+import { mediaInfoIsImage } from '../coverEditorHelpers';
 import CoverEditorSelectionList, {
   BORDER_RADIUS_RATIO,
   BOX_WIDTH,
 } from './CoverEditorSelectionList';
 import type { MEDIA_ANIMATIONS } from '#components/CoverRenderer/MediaAnimator';
+
+/**
+ * This componet should handle the animation of an image (not user for video)
+ * fort now, overlay and mediaImage
+ *
+ * @return {*}
+ */
 const CoverEditorAnimationTool = () => {
   const [show, toggleBottomSheet] = useToggle(false);
-  const layer = useCoverEditorOverlayLayer(); //use directly the layer for now, only one animated
+  const mediaInfo = useCoverEditorMedia();
+  const overlay = useCoverEditorOverlayLayer();
+  const {
+    coverEditorState: { layerMode, medias },
+  } = useCoverEditorContext();
   const { dispatch } = useCoverEditorContext();
   const animations = useOrdonedAnimation();
+  const [animationId, setAnimationId] = useState('none');
+  const [start, setStart] = useState(0);
+  const [duration, setDuration] = useState(0);
+
+  const totalDuration = useMemo(
+    () =>
+      medias.reduce(
+        (acc, media) =>
+          acc +
+          (mediaInfoIsImage(media) ? media.duration : media.timeRange.duration),
+        0,
+      ),
+    [medias],
+  );
+
+  useEffect(() => {
+    if (layerMode === 'overlay' && overlay) {
+      setStart(overlay.animation.start);
+      setDuration(overlay.animation.duration);
+      setAnimationId(overlay.animation.id);
+    }
+  }, [layerMode, overlay]);
+
+  useEffect(() => {
+    if (layerMode === 'mediaEdit' && mediaInfo?.media) {
+      if (mediaInfoIsImage(mediaInfo)) {
+        setDuration(mediaInfo.duration);
+        setAnimationId(mediaInfo.animation);
+      }
+    }
+  }, [layerMode, mediaInfo]);
 
   const onSelect = useCallback(
-    (animation: string) => {
+    (animation: string) =>
       dispatch({
-        type: 'UPDATE_LAYER_ANIMATION',
-        payload: { id: animation },
-      });
-    },
-    [dispatch],
+        type: 'UPDATE_MEDIA_ANIMATION',
+        payload: { start, duration, id: animation as MEDIA_ANIMATIONS },
+      }),
+    [dispatch, duration, start],
   );
 
   const renderItem = useCallback(
@@ -46,11 +90,29 @@ const CoverEditorAnimationTool = () => {
   const onChangeDuration = useCallback(
     (values: number[], _index: number) => {
       dispatch({
-        type: 'UPDATE_LAYER_ANIMATION',
-        payload: { start: values[0], end: values[1] },
+        type: 'UPDATE_MEDIA_ANIMATION',
+        payload: {
+          id: animationId,
+          start: values[0],
+          duration: values[1] - values[0],
+        },
       });
     },
-    [dispatch],
+    [dispatch, animationId],
+  );
+
+  const onChangeDurationSlider = useCallback(
+    (duration: number) => {
+      dispatch({
+        type: 'UPDATE_MEDIA_ANIMATION',
+        payload: {
+          id: animationId,
+          start: 0,
+          duration,
+        },
+      });
+    },
+    [dispatch, animationId],
   );
 
   const intl = useIntl();
@@ -64,7 +126,7 @@ const CoverEditorAnimationTool = () => {
         })}
         onPress={toggleBottomSheet}
       />
-      {layer != null && (
+      {(mediaInfo != null || overlay != null) && (
         <BottomSheetModal
           onRequestClose={toggleBottomSheet}
           visible={show}
@@ -84,14 +146,30 @@ const CoverEditorAnimationTool = () => {
             renderItem={renderItem}
             accessibilityRole="list"
             onSelect={onSelect}
-            selectedItemId={layer?.animation?.id ?? 'none'}
+            selectedItemId={animationId}
           />
-          <DoubleSlider
-            minimumValue={0}
-            maximumValue={500} //to define based on the duration of the total COVER which we dont have for now
-            value={[layer.animation?.start ?? 0, layer.animation?.end ?? 500]}
-            onValueChange={onChangeDuration}
-          />
+          {layerMode === 'overlay' && (
+            <DoubleSlider
+              minimumValue={0}
+              maximumValue={totalDuration} //to define based on the duration of the total COVER which we dont have for now
+              value={[start, duration + start]}
+              onValueChange={onChangeDuration}
+            />
+          )}
+          {layerMode === 'mediaEdit' && (
+            <LabeledWheelSelector
+              min={1} //TODO to be specified
+              max={15} //TODO to be specified
+              step={1}
+              interval={10}
+              onChange={onChangeDurationSlider}
+              value={duration}
+              label={intl.formatMessage({
+                defaultMessage: 'Duration: ',
+                description: 'Duration label in cover edition animation',
+              })}
+            />
+          )}
         </BottomSheetModal>
       )}
     </>

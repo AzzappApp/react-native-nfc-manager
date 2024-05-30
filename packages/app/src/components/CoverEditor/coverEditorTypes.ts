@@ -1,3 +1,7 @@
+import type {
+  Animation,
+  MEDIA_ANIMATIONS,
+} from '#components/CoverRenderer/MediaAnimator';
 import type { EditionParameters, Filter } from '#helpers/mediaEditions';
 import type { MediaVideo, MediaImage, TimeRange } from '#helpers/mediaHelpers';
 import type { SkImage, SkShader } from '@shopify/react-native-skia';
@@ -42,6 +46,7 @@ export type MediaInfoVideo = MediaInfoBase & {
 
 export type MediaInfoImage = MediaInfoBase & {
   media: MediaImage;
+  animation: MEDIA_ANIMATIONS;
   duration: number;
 };
 
@@ -68,17 +73,10 @@ export type CoverEditorTextLayerItem = {
   style: CoverTextLayerStyle;
 };
 
-//TODO define when skia animation are chosen
-export type CoverEditorAnimationItem = {
-  id: string; // to defined with skia;
-  start: number;
-  end: number;
-};
-
 //TODO IMPROVE Type
 export type CoverEditorFilterItem = string | null;
 
-export type CoverEditorOverlayItem = {
+export type CoverEditorOverlayItem = MediaInfoBase & {
   media: MediaImage;
   style: {
     borderRadius: number;
@@ -87,8 +85,7 @@ export type CoverEditorOverlayItem = {
     shadow?: ShadowStyleIOS; //WILL CHANGE WHEN we look a skia shadow
     elevation: number;
   };
-  animation: CoverEditorAnimationItem;
-  filter: CoverEditorFilterItem;
+  animation: Animation;
 };
 
 export type CoverEditorSocialLink = {

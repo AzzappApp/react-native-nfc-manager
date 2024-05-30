@@ -5,7 +5,11 @@ import { getVideoLocalPath } from '#helpers/mediaHelpers';
 import { mediaInfoIsImage } from './coverEditorHelpers';
 import { coverEditorReducer } from './coverEditorReducer';
 import type { CoverEditorAction } from './coverEditorActions';
-import type { CoverEditorState } from './coverEditorTypes';
+import type {
+  CoverEditorOverlayItem,
+  CoverEditorState,
+  MediaInfo,
+} from './coverEditorTypes';
 
 export type CoverEditorContextType = {
   coverEditorState: CoverEditorState;
@@ -66,7 +70,7 @@ const CoverEditorContextProvider = ({
     }
     if (coverEditorState.overlayLayer) {
       const { media } = coverEditorState.overlayLayer;
-      if (!coverEditorState.images[media?.uri]) {
+      if (!coverEditorState.images[media.uri]) {
         imagesToLoad.push(media.uri);
       }
     }
@@ -244,4 +248,23 @@ export const useCoverEditorMedia = () => {
     return null;
   }
   return coverEditorState.medias[coverEditorState.selectedLayerIndex];
+};
+
+export const useCoverEditoActiveMedia: () =>
+  | CoverEditorOverlayItem
+  | MediaInfo
+  | null = () => {
+  const { coverEditorState } = useCoverEditorContext();
+  if (
+    coverEditorState.layerMode === 'overlay' &&
+    coverEditorState.overlayLayer
+  ) {
+    return coverEditorState.overlayLayer;
+  } else if (
+    coverEditorState.layerMode === 'mediaEdit' &&
+    coverEditorState.selectedLayerIndex != null
+  ) {
+    return coverEditorState.medias[coverEditorState.selectedLayerIndex];
+  }
+  return null;
 };

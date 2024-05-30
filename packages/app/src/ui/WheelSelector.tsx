@@ -11,6 +11,7 @@ import type {
   NativeScrollEvent,
   NativeSyntheticEvent,
 } from 'react-native';
+import type { SharedValue } from 'react-native-reanimated';
 
 export type WheelSelectorProps = {
   variant?: 'default' | 'small';
@@ -18,10 +19,10 @@ export type WheelSelectorProps = {
   min: number;
   max: number;
   step: number;
-  label?: string;
   interval?: number;
   onChange?: (value: number) => void;
   withHaptics?: boolean;
+  animatedValue?: SharedValue<string>;
 };
 const windowWidth = Dimensions.get('window').width;
 const defaultInterval = Math.floor((windowWidth - 80) / 60);
@@ -35,6 +36,7 @@ const WheelSelector = ({
   onChange,
   interval,
   withHaptics = true,
+  animatedValue,
 }: WheelSelectorProps) => {
   const factor = variant === 'small' ? 0.5 : 1;
   const itemWidth = (interval ? interval : defaultInterval) * factor;
@@ -65,6 +67,7 @@ const WheelSelector = ({
   }, [itemWidth, styles.dash]);
 
   const [layoutWidth, setLayoutWidth] = useState(0);
+
   const onLayout = useCallback((event: LayoutChangeEvent) => {
     setLayoutWidth(event.nativeEvent.layout.width);
   }, []);
@@ -90,28 +93,30 @@ const WheelSelector = ({
     (event: NativeSyntheticEvent<NativeScrollEvent>) => {
       const scrollPosition = event.nativeEvent.contentOffset.x;
       const index = Math.round(scrollPosition / itemWidth);
-
       if (lastIndexRef.current !== index) {
+        lastIndexRef.current = index; // Update the ref with the current index
+        onChange?.(steps[index]);
+        if (animatedValue) {
+          animatedValue.value = `${steps[index]}`;
+        }
         if (withHaptics) {
           trigger('impactLight');
         }
-        lastIndexRef.current = index; // Update the ref with the current index
-        onChange?.(steps[index]);
       }
     },
-    [itemWidth, onChange, steps, withHaptics],
+    [animatedValue, itemWidth, onChange, steps, withHaptics],
   );
 
   const flatListRef = useRef<FlatList>(null);
   useEffect(() => {
-    if (flatListRef.current != null) {
-      flatListRef.current?.scrollToIndex({
-        index: value - min,
+    if (layoutWidth > 0 && flatListRef.current != null) {
+      flatListRef.current?.scrollToOffset({
+        offset: (value - min) * itemWidth,
         animated: false,
       });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [flatListRef?.current]);
+  }, [flatListRef?.current, layoutWidth]);
 
   const getItemLayout = useCallback(
     (_data: any, index: number) => ({
