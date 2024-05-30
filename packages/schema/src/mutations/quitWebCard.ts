@@ -7,6 +7,7 @@ import {
 } from '@azzapp/data';
 import ERRORS from '@azzapp/shared/errors';
 import fromGlobalIdWithType from '#helpers/relayIdHelpers';
+import { updateMonthlySubscription } from '#use-cases/subscription';
 import type { MutationResolvers } from '#/__generated__/types';
 
 type Mutation = MutationResolvers['quitWebCard'];
@@ -18,13 +19,14 @@ const quitWebCard: Mutation = async (
 ) => {
   const webCardId = fromGlobalIdWithType(params.webCardId, 'WebCard');
 
-  if (!auth.userId) {
+  const { userId } = auth;
+  if (!userId) {
     throw new GraphQLError(ERRORS.UNAUTHORIZED);
   }
 
   const profile = await loaders.profileByWebCardIdAndUserId.load({
     webCardId,
-    userId: auth.userId,
+    userId,
   });
 
   const webCard = await loaders.WebCard.load(webCardId);
@@ -35,7 +37,7 @@ const quitWebCard: Mutation = async (
 
   if (profile?.profileRole === 'owner') {
     const subscription = await getActiveWebCardSubscription(
-      auth.userId,
+      userId,
       profile.webCardId,
     );
 
@@ -51,7 +53,10 @@ const quitWebCard: Mutation = async (
       cardUsernamesToRevalidate.add(webCard.userName);
     }
   } else {
-    await removeProfileById(profile.id);
+    await db.transaction(async trx => {
+      await removeProfileById(profile.id, trx);
+      await updateMonthlySubscription(userId, profile.webCardId, trx);
+    });
   }
 
   return {

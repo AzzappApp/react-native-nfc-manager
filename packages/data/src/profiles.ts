@@ -383,6 +383,9 @@ export const getUsersFromWebCardId = async (
     );
 };
 
-export const removeProfileById = async (id: string) => {
-  await db.client().delete(ProfileTable).where(eq(ProfileTable.id, id));
+export const removeProfileById = async (
+  id: string,
+  trx: DbTransaction = db,
+) => {
+  await trx.delete(ProfileTable).where(eq(ProfileTable.id, id));
 };

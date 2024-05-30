@@ -1,10 +1,12 @@
 import {
+  db,
   getActiveUserSubscriptionForWebCard,
   getTotalMultiUser,
   getWebCardProfilesCount,
   type UserSubscription,
 } from '@azzapp/data';
 import { updateExistingSubscription } from '@azzapp/payment';
+import type { DbTransaction } from '@azzapp/data/db';
 
 export const calculateAvailableSeats = async (
   userSubscription: UserSubscription,
@@ -61,4 +63,32 @@ export const checkSubscription = async (
   }
 
   return false;
+};
+
+export const updateMonthlySubscription = async (
+  userId: string,
+  webCardId: string,
+  trx: DbTransaction = db,
+) => {
+  const subs = await getActiveUserSubscriptionForWebCard(
+    userId,
+    webCardId,
+    trx,
+  );
+
+  const monthly = subs.find(
+    subscription => subscription.subscriptionPlan === 'web.monthly',
+  );
+
+  if (monthly) {
+    const seats = await getWebCardProfilesCount(webCardId, trx);
+
+    await updateExistingSubscription(
+      {
+        userSubscription: monthly,
+        totalSeats: seats,
+      },
+      trx,
+    );
+  }
 };

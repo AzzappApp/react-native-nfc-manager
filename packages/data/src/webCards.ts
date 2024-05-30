@@ -362,8 +362,11 @@ export const getWebCardByProfileId = (id: string): Promise<WebCard | null> => {
     });
 };
 
-export const getWebCardProfilesCount = async (webCardId: string) =>
-  db
+export const getWebCardProfilesCount = async (
+  webCardId: string,
+  trx: DbTransaction = db,
+) =>
+  trx
     .select({ count: sql`count(*)`.mapWith(Number) })
     .from(ProfileTable)
 

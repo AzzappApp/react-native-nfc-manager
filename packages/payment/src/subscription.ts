@@ -15,6 +15,7 @@ import {
 } from '#helpers';
 import type { Customer } from '#types';
 import type { UserSubscription } from '@azzapp/data';
+import type { DbTransaction } from '@azzapp/data/db';
 
 export const updateSubscriptionForWebCard = async ({
   subscriptionId,
@@ -48,15 +49,18 @@ export const updateSubscriptionForWebCard = async ({
   });
 };
 
-export const updateExistingSubscription = async ({
-  userSubscription: existingSubscription,
-  totalSeats,
-  paymentMeanId,
-}: {
-  userSubscription: UserSubscription;
-  totalSeats?: number | null;
-  paymentMeanId?: string | null;
-}) => {
+export const updateExistingSubscription = async (
+  {
+    userSubscription: existingSubscription,
+    totalSeats,
+    paymentMeanId,
+  }: {
+    userSubscription: UserSubscription;
+    totalSeats?: number | null;
+    paymentMeanId?: string | null;
+  },
+  trx: DbTransaction = db,
+) => {
   if (
     existingSubscription.subscriptionPlan !== 'web.monthly' &&
     existingSubscription.subscriptionPlan !== 'web.yearly'
@@ -191,7 +195,7 @@ export const updateExistingSubscription = async ({
 
       const newRebillManagerId = rebillManager.data.rebillManagerId;
 
-      await db
+      await trx
         .update(UserSubscriptionTable)
         .set({
           totalSeats: totalSeats ?? existingSubscription.totalSeats,
@@ -325,7 +329,7 @@ export const updateExistingSubscription = async ({
 
     const newRebillManagerId = rebillManager.data.rebillManagerId;
 
-    await db
+    await trx
       .update(UserSubscriptionTable)
       .set({
         totalSeats: totalSeats ?? existingSubscription.totalSeats,
