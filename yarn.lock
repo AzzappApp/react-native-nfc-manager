@@ -304,7 +304,7 @@ __metadata:
     "@typescript-eslint/eslint-plugin": ^7.8.0
     "@typescript-eslint/parser": ^7.8.0
     babel-jest: ^29.7.0
-    babel-plugin-formatjs: ^10.5.14
+    babel-plugin-formatjs: ^10.5.16
     babel-plugin-module-resolver: ^5.0.2
     babel-plugin-relay: ^16.2.0
     blessed: ^0.1.81
@@ -5470,6 +5470,26 @@ __metadata:
     ts-jest:
       optional: true
   checksum: fbdc1476021220f88612cb182ec35b2eca76a905225c480e7d5450e1684919f92b5860af6545e7a6d6a2d2b0d06b07b507707852de6680b6a360a3bd8f313d5a
+  languageName: node
+  linkType: hard
+
+"@formatjs/ts-transformer@npm:3.13.14":
+  version: 3.13.14
+  resolution: "@formatjs/ts-transformer@npm:3.13.14"
+  dependencies:
+    "@formatjs/icu-messageformat-parser": 2.7.8
+    "@types/json-stable-stringify": ^1.0.32
+    "@types/node": 14 || 16 || 17
+    chalk: ^4.0.0
+    json-stable-stringify: ^1.0.1
+    tslib: ^2.4.0
+    typescript: 5
+  peerDependencies:
+    ts-jest: ">=27"
+  peerDependenciesMeta:
+    ts-jest:
+      optional: true
+  checksum: 00ba3812ef370ff1dc19f3b60b928231f79a43f3414146a0bc4db1a599b501dd8156ffdcced781b9cea355bc6d8cec481ec3dfb2ac3efd58725c5d23b99d9348
   languageName: node
   linkType: hard
 
@@ -10797,22 +10817,22 @@ __metadata:
   languageName: node
   linkType: hard
 
-"babel-plugin-formatjs@npm:^10.5.14":
-  version: 10.5.14
-  resolution: "babel-plugin-formatjs@npm:10.5.14"
+"babel-plugin-formatjs@npm:^10.5.16":
+  version: 10.5.16
+  resolution: "babel-plugin-formatjs@npm:10.5.16"
   dependencies:
     "@babel/core": ^7.10.4
     "@babel/helper-plugin-utils": ^7.10.4
     "@babel/plugin-syntax-jsx": 7
     "@babel/traverse": 7
     "@babel/types": ^7.12.11
-    "@formatjs/icu-messageformat-parser": 2.7.6
-    "@formatjs/ts-transformer": 3.13.12
+    "@formatjs/icu-messageformat-parser": 2.7.8
+    "@formatjs/ts-transformer": 3.13.14
     "@types/babel__core": ^7.1.7
     "@types/babel__helper-plugin-utils": ^7.10.0
     "@types/babel__traverse": ^7.1.7
     tslib: ^2.4.0
-  checksum: 38b7b6a1bda261834cad4af3db5ad7972ca35d143d5f342c82109332333f71aafc4c175e9ac41dff14e6c5ed2fc3638d59f58209c62337010887f06d1f02a701
+  checksum: 75e40ffc3f363b71df20c5150a414ea7c1dfc8c4794724a6b08958d6f45b9616f229cbbcdd83a979cbd9be6422e81a0207ab7fdffe2929707fabab19fb270a5c
   languageName: node
   linkType: hard
 
