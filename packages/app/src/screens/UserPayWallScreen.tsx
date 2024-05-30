@@ -32,7 +32,7 @@ import type { PurchasesPackage } from 'react-native-purchases';
 import type { SharedValue } from 'react-native-reanimated';
 
 const TERMS_OF_SERVICE = process.env.TERMS_OF_SERVICE;
-const PRIVACY_POLICY = process.env.TERMS_OF_SERVICE;
+const PRIVACY_POLICY = process.env.PRIVACY_POLICY;
 
 const UserPayWallScreen = () => {
   const intl = useIntl();

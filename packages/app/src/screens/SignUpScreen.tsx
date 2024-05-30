@@ -31,7 +31,7 @@ import type { CheckboxStatus } from '#ui/CheckBox';
 import type { TextInput as NativeTextInput } from 'react-native';
 
 const TERMS_OF_SERVICE = process.env.TERMS_OF_SERVICE;
-const PRIVACY_POLICY = process.env.TERMS_OF_SERVICE;
+const PRIVACY_POLICY = process.env.PRIVACY_POLICY;
 
 const SignupScreen = () => {
   const router = useRouter();
