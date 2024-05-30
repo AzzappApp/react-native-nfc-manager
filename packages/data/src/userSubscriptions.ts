@@ -151,8 +151,10 @@ export const getActiveUserSubscriptionForWebCard = async (
           eq(UserSubscriptionTable.webCardId, webCardId),
           isNull(UserSubscriptionTable.webCardId),
         ),
-        eq(UserSubscriptionTable.status, 'active'),
-        gte(UserSubscriptionTable.endAt, currentDate),
+        or(
+          eq(UserSubscriptionTable.status, 'active'),
+          gte(UserSubscriptionTable.endAt, currentDate),
+        ),
       ),
     );
 };
