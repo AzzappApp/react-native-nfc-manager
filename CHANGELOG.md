@@ -1,4 +1,4 @@
-## 0.5.15-canary.67
+## 0.5.15-canary.68
 
 * **feat:**  - apply effet properly ([#3556](https://github.com/AzzappApp/azzapp/pull/3556))
 * **fix:**  - **user:** check validation result ([#3554](https://github.com/AzzappApp/azzapp/pull/3554))
