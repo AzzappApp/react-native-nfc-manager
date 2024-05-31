@@ -13,7 +13,7 @@ import CoverEditorDelete from '../tools/CoverEditorDelete';
 import CoverEditorMediaReplace from '../tools/CoverEditorMediaReplace';
 import CoverEditorAnimationTool from './../tools/CoverEditorAnimationTool';
 import CoverEditorBorderTool from './../tools/CoverEditorBorderTool';
-import CoverEditorEffectTool from './../tools/CoverEditorEffectTool';
+import CoverEditorFiltersTool from './../tools/CoverEditorFiltersTool';
 import CoverEditorImageCropTool from './../tools/CoverEditorImageCropTool';
 import CoverEditorShadowTool from './../tools/CoverEditorShadowTool';
 
@@ -52,7 +52,7 @@ const CoverEditorOverlayToolbox = () => {
       >
         <CoverEditorBorderTool />
         <CoverEditorAnimationTool />
-        <CoverEditorEffectTool />
+        <CoverEditorFiltersTool />
         <CoverEditorShadowTool />
         <CoverEditorImageCropTool />
         <CoverEditorMediaReplace />

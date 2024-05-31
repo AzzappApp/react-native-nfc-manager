@@ -1,11 +1,13 @@
-import { Image } from 'expo-image';
 import { memo, useCallback } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { View } from 'react-native';
 import { shadow } from '#theme';
 import { DoneHeaderButton } from '#components/commonsButtons';
+import { MAX_VIDEO_THUMBNAIL_SIZE } from '#components/ImagePicker/ImagePickerContext';
+import TransformedImageRenderer from '#components/TransformedImageRenderer';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
-import { FILTERS, useOrdonedFilters } from '#helpers/mediaEditions';
+import { useOrdonedFilters, useSkImage } from '#helpers/mediaEditions';
+
 import useToggle from '#hooks/useToggle';
 import BottomSheetModal from '#ui/BottomSheetModal';
 import Text from '#ui/Text';
@@ -20,7 +22,7 @@ import CoverEditorSelectionList, {
 } from './CoverEditorSelectionList';
 import type { Filter } from '#helpers/mediaEditions';
 
-const CoverEditorEffectTool = () => {
+const CoverEditorFiltersTool = () => {
   const filters = useOrdonedFilters();
   const [show, toggleBottomSheet] = useToggle(false);
   const mediaInfo = useCoverEditorActiveMedia();
@@ -55,7 +57,7 @@ const CoverEditorEffectTool = () => {
           headerTitle={
             <Text variant="large">
               <FormattedMessage
-                defaultMessage="Effects(TODO DEFINE LIST FOR SKIA)"
+                defaultMessage="Effects"
                 description="CoverEditor Effects Tool - Title"
               />
             </Text>
@@ -77,7 +79,7 @@ const CoverEditorEffectTool = () => {
   );
 };
 
-export default memo(CoverEditorEffectTool);
+export default memo(CoverEditorFiltersTool);
 
 type FilterItem = { id: string; label: string };
 
@@ -87,12 +89,23 @@ const renderItem = (item: FilterItem) => {
 
 const FilterOverlay = ({ filter }: { filter: FilterItem }) => {
   const styles = useStyleSheet(styleSheet);
+  const mediaInfo = useCoverEditorActiveMedia();
 
+  const skImage = useSkImage({
+    uri: mediaInfo?.media?.uri,
+    kind: mediaInfo?.media?.kind,
+    maxVideoThumbnailSize: MAX_VIDEO_THUMBNAIL_SIZE,
+  });
+  if (!skImage) {
+    return null;
+  }
   return (
     <View style={styles.itemPreview}>
-      <Image
-        style={{ width: BOX_WIDTH, aspectRatio: 1, borderRadius: 7 }}
-        source={FILTERS[filter.id as Filter]}
+      <TransformedImageRenderer
+        image={skImage}
+        width={BOX_WIDTH}
+        height={BOX_WIDTH}
+        filter={filter.id as Filter}
       />
     </View>
   );

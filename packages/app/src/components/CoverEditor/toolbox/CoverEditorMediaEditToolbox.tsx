@@ -11,7 +11,7 @@ import {
 } from '../CoverEditorContext';
 import CoverEditorAdjustTool from '../tools/CoverEditorAdjustTool';
 import CoverEditorAnimationTool from '../tools/CoverEditorAnimationTool';
-import CoverEditorEffectTool from '../tools/CoverEditorEffectTool';
+import CoverEditorFiltersTool from '../tools/CoverEditorFiltersTool';
 import CoverEditorImageCropTool from '../tools/CoverEditorImageCropTool';
 import CoverEditorMediaReplace from '../tools/CoverEditorMediaReplace';
 
@@ -51,7 +51,7 @@ const CoverEditorMediaEditToolbox = () => {
           <ToolBoxSection icon="chrono" label="cut" onPress={console.log} />
         )}
         {media?.kind === 'image' && <CoverEditorAnimationTool />}
-        <CoverEditorEffectTool />
+        <CoverEditorFiltersTool />
         <CoverEditorAdjustTool />
         <CoverEditorMediaReplace />
         {media?.kind === 'image' && <CoverEditorImageCropTool />}
