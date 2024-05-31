@@ -1,5 +1,6 @@
-## 0.5.15-canary.66
+## 0.5.15-canary.67
 
+* **feat:**  - apply effet properly ([#3556](https://github.com/AzzappApp/azzapp/pull/3556))
 * **fix:**  - **user:** check validation result ([#3554](https://github.com/AzzappApp/azzapp/pull/3554))
 * **Feat:**  - CoverEditor adjust Tolol ([#3553](https://github.com/AzzappApp/azzapp/pull/3553))
 * **fix:**  - **emailSignature:** [#3543](https://github.com/AzzappApp/azzapp/pull/3543) don’t crash when lottie is missing ([#3550](https://github.com/AzzappApp/azzapp/pull/3550))
