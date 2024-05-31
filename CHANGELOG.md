@@ -1,5 +1,8 @@
-## 0.5.15-canary.64
+## 0.5.15-canary.65
 
+* **Feat:**  - CoverEditor adjust Tolol ([#3553](https://github.com/AzzappApp/azzapp/pull/3553))
+* **fix:**  - **emailSignature:** [#3543](https://github.com/AzzappApp/azzapp/pull/3543) don’t crash when lottie is missing ([#3550](https://github.com/AzzappApp/azzapp/pull/3550))
+* **feat:**  - **webCard:** [#3244](https://github.com/AzzappApp/azzapp/pull/3244) add activity types ([#3552](https://github.com/AzzappApp/azzapp/pull/3552))
 * **fix:**  - [#3365](https://github.com/AzzappApp/azzapp/pull/3365) issue on legal link in second screen ([#3551](https://github.com/AzzappApp/azzapp/pull/3551))
 * **build:**  - update babel-plugin for formatjs
 * **build:**  - rollback sentry upgrade ([#3549](https://github.com/AzzappApp/azzapp/pull/3549))
