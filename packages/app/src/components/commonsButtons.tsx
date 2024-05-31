@@ -130,3 +130,17 @@ export const NextHeaderButton = (props: Omit<ButtonProps, 'label'>) => {
     />
   );
 };
+
+export const ResetHeaderButton = (props: Omit<ButtonProps, 'label'>) => {
+  const intl = useIntl();
+  return (
+    <HeaderButton
+      variant="secondary"
+      label={intl.formatMessage({
+        defaultMessage: 'Reset',
+        description: 'Reset header button label',
+      })}
+      {...props}
+    />
+  );
+};

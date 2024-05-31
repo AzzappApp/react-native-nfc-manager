@@ -9,7 +9,6 @@ import { cropDataForAspectRatio } from '#helpers/mediaEditions';
 import { getImageSize, getVideoSize } from '#helpers/mediaHelpers';
 import { usePermissionContext } from '#helpers/PermissionContext';
 import useEditorLayout from '#hooks/useEditorLayout';
-
 import { BOTTOM_MENU_HEIGHT } from '#ui/BottomMenu';
 import FloatingIconButton from '#ui/FloatingIconButton';
 import AlbumPicker from '../AlbumPicker';

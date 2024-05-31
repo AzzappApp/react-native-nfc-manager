@@ -1,5 +1,5 @@
 import type { Animation } from '#components/CoverRenderer/MediaAnimator';
-import type { Filter } from '#helpers/mediaEditions';
+import type { EditionParameters, Filter } from '#helpers/mediaEditions';
 import type { MediaImage, Media } from '#helpers/mediaHelpers';
 import type {
   CoverEditorOverlayItem,
@@ -100,9 +100,14 @@ export type UpdateMediaAnimationAction = {
   payload: Animation;
 };
 
-export type UpdateLayerFilterAction = {
+export type UpdateMediaFilterAction = {
   type: 'UPDATE_MEDIA_FILTER';
   payload: Filter | null;
+};
+
+export type UpdateMediaEditionParameters = {
+  type: 'UPDATE_MEDIA_EDITION_PARAMETERS';
+  payload: EditionParameters | null;
 };
 
 /**
@@ -175,10 +180,11 @@ export type CoverEditorAction =
   | SelectLayerAction
   | UpdateActiveMediaAction
   | UpdateLayerBorderAction
-  | UpdateLayerFilterAction
   | UpdateLayerShadowAction
   | UpdateLinksAction
   | UpdateMediaAnimationAction
+  | UpdateMediaEditionParameters
+  | UpdateMediaFilterAction
   | UpdateMediasAction
   | UpdateMediasTransitionAction
   | UpdateOverlayLayerAction

@@ -40,7 +40,6 @@ const WheelSelector = ({
 }: WheelSelectorProps) => {
   const factor = variant === 'small' ? 0.5 : 1;
   const itemWidth = (interval ? interval : defaultInterval) * factor;
-  const styles = useStyleSheet(styleSheet);
   const steps = range(min, max + 1, step);
   const size = steps.length * itemWidth;
   const colorScheme = useColorScheme();
@@ -53,18 +52,8 @@ const WheelSelector = ({
   );
 
   const renderItem = useCallback(() => {
-    return (
-      <View
-        style={{
-          width: itemWidth,
-          justifyContent: 'center',
-          alignItems: 'center',
-        }}
-      >
-        <View style={styles.dash} />
-      </View>
-    );
-  }, [itemWidth, styles.dash]);
+    return <DashedItem itemWidth={itemWidth} />;
+  }, [itemWidth]);
 
   const [layoutWidth, setLayoutWidth] = useState(0);
 
@@ -228,3 +217,20 @@ const styleSheet = createStyleSheet(appearance => ({
     backgroundColor: appearance === 'light' ? colors.black : colors.white,
   },
 }));
+
+const Item = ({ itemWidth }: { itemWidth: number }) => {
+  const styles = useStyleSheet(styleSheet);
+  return (
+    <View
+      style={{
+        width: itemWidth,
+        justifyContent: 'center',
+        alignItems: 'center',
+      }}
+    >
+      <View style={styles.dash} />
+    </View>
+  );
+};
+
+const DashedItem = memo(Item);

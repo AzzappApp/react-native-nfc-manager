@@ -86,6 +86,7 @@ export type CoverEditorOverlayItem = MediaInfoBase & {
     elevation: number;
   };
   animation: Animation;
+  editionParameters: EditionParameters | null;
 };
 
 export type CoverEditorSocialLink = {

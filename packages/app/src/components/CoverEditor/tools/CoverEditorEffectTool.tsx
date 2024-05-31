@@ -12,7 +12,7 @@ import Text from '#ui/Text';
 import ToolBoxSection from '#ui/ToolBoxSection';
 import {
   useCoverEditorContext,
-  useCoverEditoActiveMedia,
+  useCoverEditorActiveMedia,
 } from '../CoverEditorContext';
 import CoverEditorSelectionList, {
   BORDER_RADIUS_RATIO,
@@ -23,12 +23,11 @@ import type { Filter } from '#helpers/mediaEditions';
 const CoverEditorEffectTool = () => {
   const filters = useOrdonedFilters();
   const [show, toggleBottomSheet] = useToggle(false);
-  const mediaInfo = useCoverEditoActiveMedia();
+  const mediaInfo = useCoverEditorActiveMedia();
   const { dispatch } = useCoverEditorContext();
 
   const onSelect = useCallback(
     (filter: string) => {
-      console.log(filter);
       dispatch({
         type: 'UPDATE_MEDIA_FILTER',
         payload: filter as Filter, // Add index signature to allow indexing with a string

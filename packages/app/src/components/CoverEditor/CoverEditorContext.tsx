@@ -250,7 +250,7 @@ export const useCoverEditorMedia = () => {
   return coverEditorState.medias[coverEditorState.selectedLayerIndex];
 };
 
-export const useCoverEditoActiveMedia: () =>
+export const useCoverEditorActiveMedia: () =>
   | CoverEditorOverlayItem
   | MediaInfo
   | null = () => {

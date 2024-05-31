@@ -9,6 +9,7 @@ import {
   useCoverEditorContext,
   useCoverEditorMedia,
 } from '../CoverEditorContext';
+import CoverEditorAdjustTool from '../tools/CoverEditorAdjustTool';
 import CoverEditorAnimationTool from '../tools/CoverEditorAnimationTool';
 import CoverEditorEffectTool from '../tools/CoverEditorEffectTool';
 import CoverEditorImageCropTool from '../tools/CoverEditorImageCropTool';
@@ -51,7 +52,7 @@ const CoverEditorMediaEditToolbox = () => {
         )}
         {media?.kind === 'image' && <CoverEditorAnimationTool />}
         <CoverEditorEffectTool />
-        <ToolBoxSection icon="settings" label="Adjust" onPress={console.log} />
+        <CoverEditorAdjustTool />
         <CoverEditorMediaReplace />
         {media?.kind === 'image' && <CoverEditorImageCropTool />}
       </ScrollView>

@@ -89,7 +89,19 @@ const CoverEditorToolbox = ({
             description: 'Cover Edition - Toolbox overlay',
           }),
           icon: 'overlay',
-          onPress: toggleOverlayImagePicker,
+          onPress: () => {
+            if (coverEditorState.overlayLayer) {
+              dispatch({
+                type: 'SELECT_LAYER',
+                payload: {
+                  layerMode: 'overlay',
+                  index: null,
+                },
+              });
+            } else {
+              toggleOverlayImagePicker();
+            }
+          },
         },
         {
           id: 'media',
@@ -136,6 +148,7 @@ const CoverEditorToolbox = ({
         },
       ] as const,
     [
+      coverEditorState.overlayLayer,
       dispatch,
       intl,
       toggleColorPickerVisible,
@@ -143,6 +156,14 @@ const CoverEditorToolbox = ({
       toggleTextModalVisible,
     ],
   );
+
+  const mainBarAnimatedStyle = useAnimatedStyle(() => {
+    return {
+      opacity: withTiming(coverEditorState.layerMode != null ? 0 : 1, {
+        duration: 500,
+      }),
+    };
+  });
 
   const overlayLayerStyle = useAnimatedStyle(() => {
     // translation is less consumin that resizing direclty the height and will better match upmitt recommendation
@@ -191,7 +212,10 @@ const CoverEditorToolbox = ({
   const mediaLayerStyle = useAnimatedStyle(() => {
     // translation is less consumin that resizing direclty the height and will better match upmitt recommendation
     const translation = withTiming(
-      coverEditorState.layerMode === 'media' ? 0 : TOOLBOX_SECTION_HEIGHT,
+      coverEditorState.layerMode === 'media' ||
+        coverEditorState.layerMode === 'mediaEdit'
+        ? 0
+        : TOOLBOX_SECTION_HEIGHT,
       { duration: 500 },
     );
     return {
@@ -201,22 +225,24 @@ const CoverEditorToolbox = ({
 
   return (
     <View style={{ height: TOOLBOX_SECTION_HEIGHT, overflow: 'hidden' }}>
-      <ScrollView
-        horizontal
-        contentContainerStyle={styles.scrollContentContainer}
-        showsHorizontalScrollIndicator={false}
-      >
-        {toolboxes.map((toolbox, index) => {
-          return (
-            <ToolBoxSection
-              key={`toolBoxSection_${toolbox.icon}_${index}`}
-              label={toolbox.label}
-              icon={toolbox.icon}
-              onPress={toolbox.onPress}
-            />
-          );
-        })}
-      </ScrollView>
+      <Animated.View style={mainBarAnimatedStyle}>
+        <ScrollView
+          horizontal
+          contentContainerStyle={styles.scrollContentContainer}
+          showsHorizontalScrollIndicator={false}
+        >
+          {toolboxes.map((toolbox, index) => {
+            return (
+              <ToolBoxSection
+                key={`toolBoxSection_${toolbox.icon}_${index}`}
+                label={toolbox.label}
+                icon={toolbox.icon}
+                onPress={toolbox.onPress}
+              />
+            );
+          })}
+        </ScrollView>
+      </Animated.View>
 
       <Animated.View style={[styles.layerContainer, overlayLayerStyle]}>
         <CoverEditorOverlayToolbox />

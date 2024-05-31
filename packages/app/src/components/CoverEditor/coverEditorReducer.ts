@@ -267,6 +267,37 @@ export function coverEditorReducer(
         );
         return state;
       }
+    case 'UPDATE_MEDIA_EDITION_PARAMETERS': {
+      if (state.layerMode === 'overlay') {
+        if (state.overlayLayer == null) return state;
+        return {
+          ...state,
+          overlayLayer: {
+            ...state.overlayLayer,
+            editionParameters: payload,
+          },
+        };
+      } else if (
+        state.layerMode === 'mediaEdit' &&
+        state.selectedLayerIndex != null
+      ) {
+        const newMedias = [...state.medias];
+        const media = state.medias[state.selectedLayerIndex];
+        newMedias[state.selectedLayerIndex] = {
+          ...media,
+          editionParameters: payload,
+        };
+        return {
+          ...state,
+          medias: newMedias,
+        };
+      } else {
+        console.warn(
+          `Update Edition Parameters effect on ${state.layerMode} is not implemented`,
+        );
+        return state;
+      }
+    }
     case 'DELETE_OVERLAY_LAYER':
       if (state.overlayLayer == null) return state;
       return {
