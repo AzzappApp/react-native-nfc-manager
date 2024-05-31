@@ -170,6 +170,7 @@ const WheelSelector = ({
               width: 6,
               borderRadius: 3,
               backgroundColor: colors.black,
+              pointerEvents: 'box-none',
             }}
           />
         </View>

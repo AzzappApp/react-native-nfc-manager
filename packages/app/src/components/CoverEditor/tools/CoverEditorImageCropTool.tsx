@@ -1,5 +1,4 @@
 import { Image } from 'expo-image';
-import { manipulateAsync, SaveFormat } from 'expo-image-manipulator';
 import { memo, useCallback, useEffect, useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { Dimensions, StyleSheet, View } from 'react-native';
@@ -24,61 +23,78 @@ import Header from '#ui/Header';
 import SafeAreaView from '#ui/SafeAreaView';
 import ToolBoxSection from '#ui/ToolBoxSection';
 import {
+  useCoverEditorActiveMedia,
   useCoverEditorContext,
-  useCoverEditorOverlayLayer,
 } from '../CoverEditorContext';
 import type { SharedValue } from 'react-native-reanimated';
 
 const CoverEditorImageCropTool = () => {
   const [show, toggleBottomSheet] = useToggle(false);
-  const layer = useCoverEditorOverlayLayer();
+  const layer = useCoverEditorActiveMedia();
   const { dispatch } = useCoverEditorContext();
+
   const [imageAreaHeight, setImageAreaHeight] = useState(() => {
     if (layer?.media) {
-      return IMAGE_AREA_WDITH * (layer.media?.height / layer.media.width);
+      return IMAGE_AREA_WIDTH * (layer.media?.height / layer.media.width);
     } else {
-      return IMAGE_AREA_WDITH;
+      return IMAGE_AREA_WIDTH;
     }
   });
-  const top = useSharedValue(0);
+  const bottom = useSharedValue(0);
   const left = useSharedValue(0);
-  const boxWidth = useSharedValue(IMAGE_AREA_WDITH);
+  const boxWidth = useSharedValue(IMAGE_AREA_WIDTH);
   const boxHeight = useSharedValue(imageAreaHeight);
 
   useEffect(() => {
-    //resetting on change image
     if (layer?.media) {
       setImageAreaHeight(
-        IMAGE_AREA_WDITH * (layer.media.height / layer.media.width),
+        IMAGE_AREA_WIDTH * (layer.media.height / layer.media.width),
       );
-      top.value = 0;
-      left.value = 0;
-      boxWidth.value = IMAGE_AREA_WDITH;
-      boxHeight.value = imageAreaHeight;
+      if (layer?.editionParameters?.cropData) {
+        const cropData = layer?.editionParameters?.cropData;
+        bottom.value =
+          (cropData.originY * imageAreaHeight) / layer.media.height;
+        left.value = (cropData.originX * IMAGE_AREA_WIDTH) / layer.media.width;
+        boxWidth.value =
+          (cropData.width / layer.media.width) * IMAGE_AREA_WIDTH;
+        boxHeight.value =
+          (cropData.height / layer.media.height) * imageAreaHeight;
+      } else {
+        bottom.value = 0;
+        left.value = 0;
+        boxWidth.value = IMAGE_AREA_WIDTH;
+        boxHeight.value = imageAreaHeight;
+      }
     }
-  }, [boxHeight, boxWidth, imageAreaHeight, left, layer, top]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    imageAreaHeight,
+    layer?.editionParameters?.cropData,
+    boxWidth,
+    boxHeight,
+  ]);
 
   //#region animation
 
   const cropViewAnimatedStyle = useAnimatedStyle(() => {
     return {
       position: 'absolute',
-      top: top.value,
+      bottom: bottom.value,
       height: boxHeight.value,
       left: left.value,
       width: boxWidth.value,
     };
-  }, []);
+  });
 
   const initialPosition = useSharedValue({
-    top: 0,
+    bottom: 0,
     left: 0,
   });
   const panGesture = Gesture.Pan()
     .minPointers(1)
     .onStart(() => {
       initialPosition.value = {
-        top: top.value,
+        bottom: bottom.value,
         left: left.value,
       };
     })
@@ -86,10 +102,10 @@ const CoverEditorImageCropTool = () => {
       left.value = clamp(
         initialPosition.value.left + event.translationX,
         0,
-        IMAGE_AREA_WDITH - boxWidth.value,
+        IMAGE_AREA_WIDTH - boxWidth.value,
       );
-      top.value = clamp(
-        initialPosition.value.top + event.translationY,
+      bottom.value = clamp(
+        initialPosition.value.bottom - event.translationY,
         0,
         imageAreaHeight - boxHeight.value,
       );
@@ -107,18 +123,18 @@ const CoverEditorImageCropTool = () => {
       boxWidth.value = clamp(
         initialDimension.value.width * event.scale,
         DRAG_ITEM_HEIGHT * 1.5,
-        IMAGE_AREA_WDITH - left.value,
+        IMAGE_AREA_WIDTH - left.value,
       );
       boxHeight.value = clamp(
         initialDimension.value.height * event.scale,
         DRAG_ITEM_HEIGHT * 1.5,
-        imageAreaHeight - top.value,
+        imageAreaHeight - bottom.value,
       );
     });
 
   const leftWhiteAreaStyle = useAnimatedStyle(() => {
     return {
-      top: 0,
+      bottom: 0,
       left: 0,
       width: left.value,
       height: imageAreaHeight,
@@ -126,26 +142,26 @@ const CoverEditorImageCropTool = () => {
   });
   const topWhiteAreaStyle = useAnimatedStyle(() => {
     return {
-      top: 0,
+      bottom: bottom.value + boxHeight.value,
       left: left.value,
       width: boxWidth.value,
-      height: top.value,
+      height: imageAreaHeight - bottom.value,
     };
   });
   const rightWhiteAreaStyle = useAnimatedStyle(() => {
     return {
-      top: 0,
+      bottom: 0,
       left: left.value + boxWidth.value,
-      width: IMAGE_AREA_WDITH - left.value - boxWidth.value,
+      width: IMAGE_AREA_WIDTH - left.value - boxWidth.value,
       height: imageAreaHeight,
     };
   });
   const bottomWhiteAreaStyle = useAnimatedStyle(() => {
     return {
-      top: top.value + boxHeight.value,
+      bottom: 0,
       left: left.value,
       width: boxWidth.value,
-      height: imageAreaHeight - top.value - boxHeight.value,
+      height: bottom.value,
     };
   });
   //#endRegion
@@ -153,58 +169,38 @@ const CoverEditorImageCropTool = () => {
   //#region image manipulation
 
   const save = useCallback(async () => {
-    //cropping the item
-    if (layer?.media == null) {
-      //should not happen in "normal way"
+    if (layer?.media) {
+      const cropData = {
+        originX: (left.value * layer.media.width) / IMAGE_AREA_WIDTH,
+        originY: (bottom.value * layer.media.height) / imageAreaHeight,
+        width: (layer.media.width * boxWidth.value) / IMAGE_AREA_WIDTH,
+        height: (layer.media.height * boxHeight.value) / imageAreaHeight,
+      };
+
       dispatch({
-        type: 'DELETE_OVERLAY_LAYER',
-      });
-      toggleBottomSheet();
-      return;
-    }
-    if (layer.media) {
-      const ratio = layer.media.width / IMAGE_AREA_WDITH;
-      const res = await manipulateAsync(
-        layer?.media.uri,
-        [
-          {
-            crop: {
-              originX: left.value * ratio,
-              originY: top.value * ratio,
-              width: boxWidth.value * ratio,
-              height: boxHeight.value * ratio,
-            },
-          },
-        ],
-        {
-          compress: 1.0,
-          format: SaveFormat.PNG,
-        },
-      );
-      dispatch({
-        type: 'UPDATE_ACTIVE_MEDIA',
+        type: 'UPDATE_MEDIA_EDITION_PARAMETERS',
         payload: {
-          uri: res.uri,
-          width: res.width,
-          height: res.height,
-          kind: 'image',
+          ...(layer.editionParameters ?? {}),
+          cropData,
         },
       });
       toggleBottomSheet();
     }
   }, [
-    boxHeight.value,
-    boxWidth.value,
-    dispatch,
     layer?.media,
+    layer?.editionParameters,
+    boxHeight.value,
+    imageAreaHeight,
+    dispatch,
     left.value,
+    bottom.value,
+    boxWidth.value,
     toggleBottomSheet,
-    top.value,
   ]);
 
   const imageStyle = useMemo(() => {
     return {
-      width: IMAGE_AREA_WDITH,
+      width: IMAGE_AREA_WIDTH,
       height: imageAreaHeight,
     };
   }, [imageAreaHeight]);
@@ -244,30 +240,6 @@ const CoverEditorImageCropTool = () => {
                   <Animated.View
                     style={[styles.areaBox, bottomWhiteAreaStyle]}
                   />
-                  <TopDragItem
-                    top={top}
-                    height={boxHeight}
-                    left={left}
-                    width={boxWidth}
-                  />
-                  <BottomDragItem
-                    top={top}
-                    height={boxHeight}
-                    left={left}
-                    width={boxWidth}
-                  />
-                  <LeftDragItem
-                    top={top}
-                    height={boxHeight}
-                    left={left}
-                    width={boxWidth}
-                  />
-                  <RightDragItem
-                    top={top}
-                    height={boxHeight}
-                    left={left}
-                    width={boxWidth}
-                  />
                   <GestureDetector
                     gesture={Gesture.Simultaneous(panGesture, pinch)}
                   >
@@ -275,6 +247,31 @@ const CoverEditorImageCropTool = () => {
                       style={[cropViewAnimatedStyle, styles.dashedBorder]}
                     />
                   </GestureDetector>
+                  <TopDragItem
+                    bottom={bottom}
+                    height={boxHeight}
+                    left={left}
+                    width={boxWidth}
+                    maxHeight={imageAreaHeight}
+                  />
+                  <BottomDragItem
+                    bottom={bottom}
+                    height={boxHeight}
+                    left={left}
+                    width={boxWidth}
+                  />
+                  <LeftDragItem
+                    bottom={bottom}
+                    height={boxHeight}
+                    left={left}
+                    width={boxWidth}
+                  />
+                  <RightDragItem
+                    bottom={bottom}
+                    height={boxHeight}
+                    left={left}
+                    width={boxWidth}
+                  />
                 </Animated.View>
               </View>
             </GestureHandlerRootView>
@@ -285,16 +282,16 @@ const CoverEditorImageCropTool = () => {
   );
 };
 type DragItemProps = {
-  top: SharedValue<number>;
+  bottom: SharedValue<number>;
   height: SharedValue<number>;
   left: SharedValue<number>;
   width: SharedValue<number>;
 };
-const LeftDragItem = ({ top, left, width, height }: DragItemProps) => {
+const LeftDragItem = ({ bottom, left, width, height }: DragItemProps) => {
   const animatedStyle = useAnimatedStyle(() => {
     return {
       left: left.value - DRAG_ITEM_WIDTH / 2,
-      top: top.value + height.value / 2 - DRAG_ITEM_HEIGHT / 2,
+      bottom: bottom.value + height.value / 2 - DRAG_ITEM_HEIGHT / 2,
     };
   });
   const initialWidth = useSharedValue(0);
@@ -312,24 +309,29 @@ const LeftDragItem = ({ top, left, width, height }: DragItemProps) => {
             initialLeft.value + event.translationX,
           );
           left.value = increasing;
-          width.value = initialWidth.value - event.translationX;
+          if (increasing > 0 && initialWidth.value - event.translationX > 20) {
+            width.value = initialWidth.value - event.translationX;
+          }
         }),
     [initialLeft, initialWidth, left, width],
   );
   return (
     <GestureDetector gesture={pan}>
-      <Animated.View style={[styles.dragItemContainer, animatedStyle]}>
+      <Animated.View
+        style={[styles.dragItemContainer, animatedStyle]}
+        hitSlop={{ left: 20, right: 20, top: 20, bottom: 20 }}
+      >
         <View style={styles.dragItem} />
       </Animated.View>
     </GestureDetector>
   );
 };
 
-const RightDragItem = ({ top, left, width, height }: DragItemProps) => {
+const RightDragItem = ({ bottom, left, width, height }: DragItemProps) => {
   const animatedStyle = useAnimatedStyle(() => {
     return {
       left: left.value + width.value - DRAG_ITEM_WIDTH / 2,
-      top: top.value + height.value / 2 - DRAG_ITEM_HEIGHT / 2,
+      bottom: bottom.value + height.value / 2 - DRAG_ITEM_HEIGHT / 2,
     };
   });
   const initialWidth = useSharedValue(0);
@@ -340,64 +342,46 @@ const RightDragItem = ({ top, left, width, height }: DragItemProps) => {
           initialWidth.value = width.value;
         })
         .onUpdate(event => {
-          width.value = Math.max(0, initialWidth.value + event.translationX);
+          if (
+            initialWidth.value + event.translationX <
+            IMAGE_AREA_WIDTH - left.value
+          ) {
+            width.value = Math.max(20, initialWidth.value + event.translationX);
+          } else {
+            width.value = IMAGE_AREA_WIDTH - left.value;
+          }
         }),
-    [initialWidth, width],
+    [initialWidth, left.value, width],
   );
 
   return (
     <GestureDetector gesture={pan}>
-      <Animated.View style={[styles.dragItemContainer, animatedStyle]}>
+      <Animated.View
+        style={[styles.dragItemContainer, animatedStyle]}
+        hitSlop={{ left: 20, right: 20, top: 20, bottom: 20 }}
+      >
         <View style={styles.dragItem} />
       </Animated.View>
     </GestureDetector>
   );
 };
 
-const TopDragItem = ({ top, left, width, height }: DragItemProps) => {
+const TopDragItem = ({
+  bottom,
+  left,
+  width,
+  height,
+  maxHeight,
+}: DragItemProps & { maxHeight: number }) => {
   const animatedStyle = useAnimatedStyle(() => {
     return {
       transform: [{ rotate: '90deg' }],
       left: width.value / 2 + left.value - DRAG_ITEM_WIDTH / 2,
-      top: top.value - DRAG_ITEM_HEIGHT / 2,
+      bottom: height.value + bottom.value - DRAG_ITEM_HEIGHT / 2,
     };
   });
   const initialHeight = useSharedValue(0);
-  const initialTop = useSharedValue(0);
-  const pan = useMemo(
-    () =>
-      Gesture.Pan()
-        .onStart(() => {
-          initialTop.value = top.value;
-          initialHeight.value = height.value;
-        })
-        .onUpdate(event => {
-          const increasing = Math.max(0, initialTop.value + event.translationY);
-          top.value = increasing;
-          height.value = initialHeight.value - event.translationY;
-        }),
-    [initialTop, top, initialHeight, height],
-  );
 
-  return (
-    <GestureDetector gesture={pan}>
-      <Animated.View style={[styles.dragItemContainer, animatedStyle]}>
-        <View style={styles.dragItem} />
-      </Animated.View>
-    </GestureDetector>
-  );
-};
-
-const BottomDragItem = ({ top, left, width, height }: DragItemProps) => {
-  const animatedStyle = useAnimatedStyle(() => {
-    return {
-      transform: [{ rotate: '90deg' }],
-      left: width.value / 2 + left.value - DRAG_ITEM_WIDTH / 2,
-      top: height.value + top.value - DRAG_ITEM_HEIGHT / 2,
-    };
-  });
-
-  const initialHeight = useSharedValue(0);
   const pan = useMemo(
     () =>
       Gesture.Pan()
@@ -405,13 +389,65 @@ const BottomDragItem = ({ top, left, width, height }: DragItemProps) => {
           initialHeight.value = height.value;
         })
         .onUpdate(event => {
-          height.value = Math.max(0, initialHeight.value + event.translationY);
+          height.value = Math.min(
+            initialHeight.value - event.translationY,
+            maxHeight - bottom.value,
+          );
         }),
-    [height, initialHeight],
+    [initialHeight, height, maxHeight, bottom.value],
+  );
+
+  return (
+    <GestureDetector gesture={pan}>
+      <Animated.View
+        style={[styles.dragItemContainer, animatedStyle]}
+        hitSlop={{ left: 20, right: 20, top: 20, bottom: 20 }}
+      >
+        <View style={styles.dragItem} />
+      </Animated.View>
+    </GestureDetector>
+  );
+};
+
+const BottomDragItem = ({ bottom, left, width, height }: DragItemProps) => {
+  const animatedStyle = useAnimatedStyle(() => {
+    return {
+      transform: [{ rotate: '90deg' }],
+      left: width.value / 2 + left.value - DRAG_ITEM_WIDTH / 2,
+      bottom: bottom.value - DRAG_ITEM_HEIGHT / 2,
+    };
+  });
+
+  const initialHeight = useSharedValue(0);
+  const initialBottom = useSharedValue(0);
+  const pan = useMemo(
+    () =>
+      Gesture.Pan()
+        .onStart(() => {
+          initialHeight.value = height.value;
+          initialBottom.value = bottom.value;
+        })
+        .onUpdate(event => {
+          const increasing = Math.max(
+            0,
+            initialBottom.value - event.translationY,
+          );
+          if (increasing > 0 && initialHeight.value + event.translationY > 20) {
+            bottom.value = increasing;
+            height.value = Math.max(
+              0,
+              initialHeight.value + event.translationY,
+            );
+          }
+        }),
+    [bottom, height, initialBottom, initialHeight],
   );
   return (
     <GestureDetector gesture={pan}>
-      <Animated.View style={[styles.dragItemContainer, animatedStyle]}>
+      <Animated.View
+        style={[styles.dragItemContainer, animatedStyle]}
+        hitSlop={{ left: 20, right: 20, top: 20, bottom: 20 }}
+      >
         <View style={styles.dragItem} />
       </Animated.View>
     </GestureDetector>
@@ -423,7 +459,7 @@ const DRAG_ITEM_HEIGHT = 30;
 const DRAG_ITEM_WIDTH = 14;
 const screenWidth = Dimensions.get('screen').width;
 const IMAGE_MARGIN = 26;
-const IMAGE_AREA_WDITH = screenWidth - 2 * IMAGE_MARGIN;
+const IMAGE_AREA_WIDTH = screenWidth - 2 * IMAGE_MARGIN;
 
 const styles = StyleSheet.create({
   dashedBorder: {
@@ -450,6 +486,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     position: 'absolute',
+    zIndex: 100,
   },
   dragItem: {
     width: DRAG_ITEM_WIDTH - 12,
@@ -461,33 +498,3 @@ const styles = StyleSheet.create({
     position: 'absolute',
   },
 });
-export function rotate_aabb(
-  xmin: number,
-  ymin: number,
-  width: number,
-  height: number,
-  angle: number,
-) {
-  const c = Math.cos(angle);
-  const s = Math.sin(angle);
-
-  const x1 = c * width;
-  const y1 = s * width;
-  const x2 = -s * height;
-  const y2 = c * height;
-
-  const x3 = x1 + x2;
-  const y3 = y1 + y2;
-
-  const txmin = Math.min(0, x1, x2, x3);
-  const txmax = Math.max(0, x1, x2, x3);
-  const tymin = Math.min(0, y1, y2, y3);
-  const tymax = Math.max(0, y1, y2, y3);
-
-  const owidth = txmax - txmin;
-  const oheight = tymax - tymin;
-  const oxmin = xmin + txmin;
-  const oymin = ymin + tymin;
-
-  return { xmin: oxmin, ymin: oymin, width: owidth, height: oheight };
-}

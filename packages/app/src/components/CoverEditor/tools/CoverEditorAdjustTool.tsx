@@ -35,6 +35,16 @@ const CoverEditorAdjustTool = () => {
   const { dispatch } = useCoverEditorContext();
 
   const activeMedia = useCoverEditorActiveMedia();
+
+  useEffect(() => {
+    if (activeMedia?.editionParameters) {
+      setCurrentEditionParameters({
+        ...activeMedia?.editionParameters,
+        cropData: null,
+      });
+    }
+  }, [activeMedia?.editionParameters]);
+
   const [currentEditionParameters, setCurrentEditionParameters] =
     useState<EditionParameters>({});
 
@@ -70,16 +80,9 @@ const CoverEditorAdjustTool = () => {
   // reset the current edition parameters to the context one
   const onReset = useCallback(() => {
     setCurrentEditionParameters({
-      ...activeMedia?.editionParameters,
       cropData: null,
     });
-  }, [activeMedia?.editionParameters]);
-
-  useEffect(() => {
-    if (activeMedia?.editionParameters) {
-      onReset();
-    }
-  }, [activeMedia?.editionParameters, onReset]);
+  }, []);
 
   //save the current modified parameters to be able to cancel on second layer (by each value). Lazy to save all the parameters that the selected value
   const previousParametersValue = useRef(currentEditionParameters);
@@ -161,8 +164,7 @@ const CoverEditorAdjustTool = () => {
                   <TransformedVideoRenderer
                     testID="image-picker-media-video"
                     video={activeMedia.media}
-                    width={activeMedia.media.width}
-                    height={activeMedia.media.height}
+                    {...dimensions}
                     filter={activeMedia.filter}
                     editionParameters={currentEditionParameters}
                     startTime={

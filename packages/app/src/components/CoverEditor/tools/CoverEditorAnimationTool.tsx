@@ -160,8 +160,8 @@ const CoverEditorAnimationTool = () => {
             <LabeledWheelSelector
               min={1} //TODO to be specified
               max={15} //TODO to be specified
-              step={1}
-              interval={10}
+              step={0.5}
+              interval={15}
               onChange={onChangeDurationSlider}
               value={duration}
               label={intl.formatMessage({

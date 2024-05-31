@@ -322,6 +322,41 @@ export function coverEditorReducer(
             media: payload,
           },
         };
+      } else if (
+        state.layerMode === 'mediaEdit' &&
+        state.selectedLayerIndex != null
+      ) {
+        const newMedias = [...state.medias]; //making a new array
+
+        const cropData = cropDataForAspectRatio(
+          payload.width,
+          payload.height,
+          COVER_RATIO,
+        );
+        if (payload.kind === 'image') {
+          newMedias[state.selectedLayerIndex] = {
+            media: payload,
+            filter: null,
+            animation: 'none',
+            editionParameters: { cropData },
+            duration: COVER_MAX_MEDIA_DURATION,
+          };
+        } else if (payload.kind === 'video') {
+          newMedias[state.selectedLayerIndex] = {
+            media: payload,
+            filter: null,
+            animation: 'none',
+            editionParameters: { cropData },
+            timeRange: {
+              startTime: 0,
+              duration: Math.min(COVER_MAX_MEDIA_DURATION, payload.duration),
+            },
+          };
+        }
+        return {
+          ...state,
+          medias: newMedias,
+        };
       }
 
       return state;
