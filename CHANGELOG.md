@@ -1,4 +1,4 @@
-## 0.5.15-canary.62
+## 0.5.15-canary.63
 
 * **build:**  - update babel-plugin for formatjs
 * **build:**  - rollback sentry upgrade ([#3549](https://github.com/AzzappApp/azzapp/pull/3549))
