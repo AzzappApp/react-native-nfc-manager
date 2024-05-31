@@ -3,7 +3,8 @@ import { ImageFormat } from '@shopify/react-native-skia';
 import { useCallback, useEffect, useState } from 'react';
 import { Controller, useController, useForm } from 'react-hook-form';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { Pressable, View, Image } from 'react-native';
+import { Pressable, View, Image, Platform } from 'react-native';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
 import * as mime from 'react-native-mime-types';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
@@ -12,6 +13,7 @@ import { Observable } from 'relay-runtime';
 import { encodeMediaId } from '@azzapp/shared/imagesHelpers';
 import { colors } from '#theme';
 import { CancelHeaderButton } from '#components/commonsButtons';
+import ConditionalWrapper from '#components/ConditionalWrapper';
 import FormDeleteFieldOverlay from '#components/ContactCard/FormDeleteFieldOverlay';
 import ImagePicker, { SelectImageStep } from '#components/ImagePicker';
 import { useRouter } from '#components/NativeRouter';
@@ -352,119 +354,133 @@ export const CommonInformationScreen = ({
           />
         }
       />
-      <FormDeleteFieldOverlay>
-        <View style={styles.sectionsContainer}>
-          <View style={styles.container}>
-            <Icon icon="lock_line" style={styles.icon} />
-            <Text variant="xsmall" style={styles.description}>
-              <FormattedMessage
-                defaultMessage="Common information will be displayed on each team member’s Contact Card{azzappA} and won’t be editable."
-                description="Common information form description"
-                values={{
-                  azzappA: <Text variant="azzapp">a</Text>,
-                }}
-              />
-            </Text>
-          </View>
-
-          <Controller
-            control={control}
-            name="company"
-            render={({ field: { onChange, onBlur, value } }) => (
-              <View style={styles.field}>
-                <Text variant="smallbold" style={styles.fieldName}>
-                  <FormattedMessage
-                    defaultMessage="Company"
-                    description="Company name field registered for the contact card"
-                  />
-                </Text>
-                <TextInput
-                  value={value ?? ''}
-                  onChangeText={onChange}
-                  onBlur={onBlur}
-                  style={styles.input}
-                  clearButtonMode="while-editing"
-                  placeholder={intl.formatMessage({
-                    defaultMessage: 'Enter a company name',
-                    description:
-                      'Placeholder for company name inside contact card',
-                  })}
+      <ConditionalWrapper
+        condition={Platform.OS === 'ios'}
+        wrapper={children => (
+          <KeyboardAwareScrollView
+            automaticallyAdjustKeyboardInsets
+            bottomOffset={30}
+          >
+            {children}
+          </KeyboardAwareScrollView>
+        )}
+      >
+        <FormDeleteFieldOverlay>
+          <View style={styles.sectionsContainer}>
+            <View style={styles.container}>
+              <Icon icon="lock_line" style={styles.icon} />
+              <Text variant="xsmall" style={styles.description}>
+                <FormattedMessage
+                  defaultMessage="Common information will be displayed on each team member’s Contact Card{azzappA} and won’t be editable."
+                  description="Common information form description"
+                  values={{
+                    azzappA: <Text variant="azzapp">a</Text>,
+                  }}
                 />
-              </View>
-            )}
-          />
-          <Controller
-            control={control}
-            name="logo"
-            render={({ field: { value, onChange } }) => (
-              <View style={styles.logoField}>
-                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                  <Pressable
-                    onPress={() => {
-                      if (value?.uri) {
-                        onChange(null);
-                      } else {
-                        setShowImagePicker(true);
-                      }
-                    }}
-                  >
-                    <View style={styles.logoButton}>
-                      <Icon
-                        icon={value?.uri ? 'delete_filled' : 'add_filled'}
-                        style={{
-                          tintColor: value?.uri ? colors.red400 : colors.green,
-                        }}
-                      />
-                      <Text variant="smallbold">
-                        <FormattedMessage
-                          defaultMessage="Logo"
-                          description="Logo field registered for the contact card"
-                        />
-                      </Text>
-                    </View>
-                  </Pressable>
+              </Text>
+            </View>
 
-                  {value?.uri && size ? (
-                    <View style={styles.logoContainer}>
-                      <Pressable
-                        style={styles.logoWrapper}
-                        onPress={() => setShowImagePicker(true)}
-                      >
-                        <Image
-                          source={{ uri: value?.uri }}
-                          style={{
-                            height: 55,
-                            width: size.width * (55 / size.height),
-                          }}
-                          resizeMode="contain"
-                        />
-                      </Pressable>
-                    </View>
-                  ) : null}
-                </View>
-                <View style={styles.companyLogoDescription}>
-                  <Text variant="xsmall" style={{ color: colors.grey400 }}>
+            <Controller
+              control={control}
+              name="company"
+              render={({ field: { onChange, onBlur, value } }) => (
+                <View style={styles.field}>
+                  <Text variant="smallbold" style={styles.fieldName}>
                     <FormattedMessage
-                      defaultMessage="Company logo will be used in your email signature"
-                      description="Company logo field description"
+                      defaultMessage="Company"
+                      description="Company name field registered for the contact card"
                     />
                   </Text>
+                  <TextInput
+                    value={value ?? ''}
+                    onChangeText={onChange}
+                    onBlur={onBlur}
+                    style={styles.input}
+                    clearButtonMode="while-editing"
+                    placeholder={intl.formatMessage({
+                      defaultMessage: 'Enter a company name',
+                      description:
+                        'Placeholder for company name inside contact card',
+                    })}
+                  />
                 </View>
-              </View>
-            )}
-          />
-          <Separation />
-          <CommonInformationAddresses control={control} />
-          <Separation />
-          <CommonInformationPhones control={control} />
-          <Separation />
-          <CommonInformationEmails control={control} />
-          <Separation />
-          <CommonInformationUrls control={control} />
-          <Separation />
-          <CommonInformationSocials control={control} />
-        </View>
-      </FormDeleteFieldOverlay>
+              )}
+            />
+            <Controller
+              control={control}
+              name="logo"
+              render={({ field: { value, onChange } }) => (
+                <View style={styles.logoField}>
+                  <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                    <Pressable
+                      onPress={() => {
+                        if (value?.uri) {
+                          onChange(null);
+                        } else {
+                          setShowImagePicker(true);
+                        }
+                      }}
+                    >
+                      <View style={styles.logoButton}>
+                        <Icon
+                          icon={value?.uri ? 'delete_filled' : 'add_filled'}
+                          style={{
+                            tintColor: value?.uri
+                              ? colors.red400
+                              : colors.green,
+                          }}
+                        />
+                        <Text variant="smallbold">
+                          <FormattedMessage
+                            defaultMessage="Logo"
+                            description="Logo field registered for the contact card"
+                          />
+                        </Text>
+                      </View>
+                    </Pressable>
+
+                    {value?.uri && size ? (
+                      <View style={styles.logoContainer}>
+                        <Pressable
+                          style={styles.logoWrapper}
+                          onPress={() => setShowImagePicker(true)}
+                        >
+                          <Image
+                            source={{ uri: value?.uri }}
+                            style={{
+                              height: 55,
+                              width: size.width * (55 / size.height),
+                            }}
+                            resizeMode="contain"
+                          />
+                        </Pressable>
+                      </View>
+                    ) : null}
+                  </View>
+                  <View style={styles.companyLogoDescription}>
+                    <Text variant="xsmall" style={{ color: colors.grey400 }}>
+                      <FormattedMessage
+                        defaultMessage="Company logo will be used in your email signature"
+                        description="Company logo field description"
+                      />
+                    </Text>
+                  </View>
+                </View>
+              )}
+            />
+            <Separation />
+            <CommonInformationAddresses control={control} />
+            <Separation />
+            <CommonInformationPhones control={control} />
+            <Separation />
+            <CommonInformationEmails control={control} />
+            <Separation />
+            <CommonInformationUrls control={control} />
+            <Separation />
+            <CommonInformationSocials control={control} />
+          </View>
+        </FormDeleteFieldOverlay>
+      </ConditionalWrapper>
       <ScreenModal visible={showImagePicker}>
         <ImagePicker
           onFinished={onImagePickerFinished}
