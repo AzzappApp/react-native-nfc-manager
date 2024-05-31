@@ -2,6 +2,7 @@ import { asc, desc, eq, like, or, sql } from 'drizzle-orm';
 import {
   CardTemplateTypeTable,
   CompanyActivityTable,
+  CompanyActivityTypeTable,
   WebCardCategoryTable,
   db,
 } from '@azzapp/data';
@@ -14,16 +15,14 @@ export type CompanyActivityItem = {
   webCardCategoryLabelKey: string;
 };
 
-export type SortColumn =
-  | 'cardTemplateTypeLabelKey'
-  | 'labelKey'
-  | 'webCardCategoryLabelKey';
-
 const sortsColumns = {
   labelKey: CompanyActivityTable.labelKey,
   cardTemplateTypeLabelKey: CardTemplateTypeTable.labelKey,
   webCardCategoryLabelKey: WebCardCategoryTable.labelKey,
+  companyActivityTypeLabelKey: CompanyActivityTypeTable.labelKey,
 };
+
+export type SortColumn = keyof typeof sortsColumns;
 
 const getActivitiesQuery = (search: string | null) => {
   let query = db
@@ -36,6 +35,9 @@ const getActivitiesQuery = (search: string | null) => {
       webCardCategoryLabelKey: sql`${WebCardCategoryTable.labelKey}`
         .mapWith(String)
         .as('webCardCategoryLabelKey'),
+      companyActivityTypeLabelKey: sql`${CompanyActivityTypeTable.labelKey}`
+        .mapWith(String)
+        .as('companyActivityTypeLabelKey'),
     })
     .from(CompanyActivityTable)
     .innerJoin(
@@ -46,12 +48,20 @@ const getActivitiesQuery = (search: string | null) => {
       WebCardCategoryTable,
       eq(WebCardCategoryTable.id, CardTemplateTypeTable.webCardCategoryId),
     )
+    .leftJoin(
+      CompanyActivityTypeTable,
+      eq(
+        CompanyActivityTypeTable.id,
+        CompanyActivityTable.companyActivityTypeId,
+      ),
+    )
     .$dynamic();
 
   if (search) {
     query = query.where(
       or(
         like(CompanyActivityTable.labelKey, `%${search}%`),
+        like(CompanyActivityTypeTable.labelKey, `%${search}%`),
         like(CardTemplateTypeTable.labelKey, `%${search}%`),
         like(WebCardCategoryTable.labelKey, `%${search}%`),
       ),

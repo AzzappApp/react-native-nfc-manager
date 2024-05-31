@@ -6,39 +6,45 @@ import {
   createFilterOptions,
 } from '@mui/material';
 import { useRef } from 'react';
-import type { CardTemplateType, Label } from '@azzapp/data';
+import type {
+  CardTemplateType,
+  CompanyActivityType,
+  Label,
+} from '@azzapp/data';
 import type { BoxProps } from '@mui/material';
 
-type WebCardTemplateTypeListInputProps = Omit<BoxProps, 'onChange'> & {
+type Value = CardTemplateType | CompanyActivityType | string | null | undefined;
+
+type TypeListInput = Omit<BoxProps, 'onChange'> & {
   name: string;
   label: string;
-  value: CardTemplateType | string | null | undefined;
-  options: CardTemplateType[];
+  value: Value;
+  options: Array<CardTemplateType | CompanyActivityType>;
   error?: boolean | null;
   helperText?: string | null;
-  onChange: (value: CardTemplateType | string | null | undefined) => void;
-  cardTemplateTypesLabels: Label[];
+  onChange: (value: Value) => void;
+  typesLabels: Label[];
 };
 
-const WebCardTemplateTypeListInput = ({
+const TypeListInput = ({
   name,
   label,
-  cardTemplateTypesLabels,
+  typesLabels,
   value,
   error,
   options,
   helperText,
   onChange,
   ...props
-}: WebCardTemplateTypeListInputProps) => {
+}: TypeListInput) => {
   const inputRef = useRef<HTMLInputElement>(null);
-  const handleActivitySelect = (field: CardTemplateType | string | null) => {
+  const handleActivitySelect = (field: typeof value) => {
     inputRef.current?.blur();
     if (!field) {
       return;
     }
     if (typeof field === 'string') {
-      field = field.replace(ADD_CARDTEMPLATE_PREFIX, '');
+      field = field.replace(ADD_PREFIX, '');
     }
     onChange(field);
   };
@@ -54,14 +60,14 @@ const WebCardTemplateTypeListInput = ({
         getOptionLabel={option =>
           typeof option === 'string'
             ? option
-            : cardTemplateTypesLabels.find(l => l.labelKey === option.labelKey)
+            : typesLabels.find(l => l.labelKey === option.labelKey)
                 ?.baseLabelValue ?? option.labelKey
         }
         renderInput={params => (
           <TextField
             {...params}
             inputRef={inputRef}
-            label="Add a default webcard template type"
+            label={label}
             variant="outlined"
             fullWidth
           />
@@ -71,9 +77,8 @@ const WebCardTemplateTypeListInput = ({
           const label =
             typeof option === 'string'
               ? option
-              : cardTemplateTypesLabels.find(
-                  l => l.labelKey === option.labelKey,
-                )?.baseLabelValue ?? option.labelKey;
+              : typesLabels.find(l => l.labelKey === option.labelKey)
+                  ?.baseLabelValue ?? option.labelKey;
           return (
             <li {...props} key={id}>
               {label}
@@ -81,7 +86,7 @@ const WebCardTemplateTypeListInput = ({
           );
         }}
         filterOptions={(options, params) => {
-          const filtered = filterCardTemplateType(options, params);
+          const filtered = filterType(options, params);
           return filtered;
         }}
         onChange={(_, value) => handleActivitySelect(value)}
@@ -90,8 +95,10 @@ const WebCardTemplateTypeListInput = ({
   );
 };
 
-export default WebCardTemplateTypeListInput;
+export default TypeListInput;
 
-const filterCardTemplateType = createFilterOptions<CardTemplateType | string>();
+const filterType = createFilterOptions<
+  CardTemplateType | CompanyActivityType | string
+>();
 
-const ADD_CARDTEMPLATE_PREFIX = 'Add card template Type : ';
+const ADD_PREFIX = 'Add type : ';

@@ -19,6 +19,7 @@ import { useModulesData } from '#components/cardModules/ModuleData';
 import ScreenModal from '#components/ScreenModal';
 import WebCardPreview from '#components/WebCardPreview';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
+import { keyExtractor } from '#helpers/idHelpers';
 import useAuthState from '#hooks/useAuthState';
 import useScreenInsets from '#hooks/useScreenInsets';
 import ActivityIndicator from '#ui/ActivityIndicator';
@@ -412,8 +413,6 @@ const CardStyleList = ({
     />
   );
 };
-
-const keyExtractor = (item: CardStyleItem) => item.id;
 
 const CURRENT_STYLE_ID = 'CURRENT_STYLE_ID';
 

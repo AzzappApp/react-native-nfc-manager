@@ -1,5 +1,6 @@
 import { useCallback } from 'react';
 import { FlatList, Image, ScrollView, StyleSheet, View } from 'react-native';
+import { keyExtractor } from '#helpers/idHelpers';
 import Badge from '#ui/Badge';
 import Icon from '#ui/Icon';
 import PressableNative from '#ui/PressableNative';
@@ -11,8 +12,6 @@ type Props = {
   previews: TemplateTypePreview[];
   onSelect: (preview: TemplateTypePreview) => void;
 };
-
-const keyExtractor = (item: TemplateTypePreview) => item.id;
 
 export const CoverEditorTemplateTypePreviews = (props: Props) => {
   const { label, previews, onSelect } = props;

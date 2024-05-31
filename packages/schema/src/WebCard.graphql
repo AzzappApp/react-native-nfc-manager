@@ -340,6 +340,16 @@ type CompanyActivity implements Node {
   """
   id: ID!
   label: String
+
+  companyActivityType: CompanyActivityType
+}
+
+type CompanyActivityType implements Node {
+  """
+  The ID of an object
+  """
+  id: ID!
+  label: String
 }
 
 """

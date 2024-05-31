@@ -9,7 +9,7 @@ import {
   CoverTemplateTypeTable,
 } from '@azzapp/data';
 import { ADMIN } from '#roles';
-import { saveLabelKey } from '#helpers/lokaliseHelperts';
+import { saveLabelKey } from '#helpers/lokaliseHelpers';
 import { currentUserHasRole } from '#helpers/roleHelpers';
 import { coverTemplateTypesSchema } from './coverTemplateTypesSchema';
 import type {

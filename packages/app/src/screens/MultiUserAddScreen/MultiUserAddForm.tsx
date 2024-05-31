@@ -6,6 +6,7 @@ import { View } from 'react-native';
 import { colors } from '#theme';
 import EmailOrPhoneInput from '#components/EmailOrPhoneInput';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
+import { keyExtractor } from '#helpers/idHelpers';
 import useToggle from '#hooks/useToggle';
 import BottomSheetModal from '#ui/BottomSheetModal';
 import PressableOpacity from '#ui/PressableOpacity';
@@ -177,7 +178,7 @@ const MultiUserAddForm = ({ contacts, control }: MultiUserAddFormProps) => {
             accessibilityLabelledBy="roleLabel"
             data={roles}
             selectedItemKey={value}
-            keyExtractor={role => role.id}
+            keyExtractor={keyExtractor}
             onItemSelected={item => onChange(item.id)}
             itemContainerStyle={[styles.selectItemContainerStyle]}
             bottomSheetHeight={

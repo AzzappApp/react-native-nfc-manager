@@ -7,6 +7,7 @@ import { getTextColor } from '@azzapp/shared/colorsHelpers';
 import { colors, shadow } from '#theme';
 import ColorTriptychRenderer from '#components/ColorTriptychRenderer';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
+import { keyExtractor } from '#helpers/idHelpers';
 import useAuthState from '#hooks/useAuthState';
 import Icon from '#ui/Icon';
 import PressableOpacity from '#ui/PressableOpacity';
@@ -251,7 +252,7 @@ const ColorTriptychChooser = ({
           style={{ height: 30 }}
           contentContainerStyle={{ columnGap: 5 }}
           data={colorPalettesList}
-          keyExtractor={paletteKeyExtract}
+          keyExtractor={keyExtractor}
           renderItem={renderTryptich}
           extraData={colorPalette}
         />
@@ -261,7 +262,6 @@ const ColorTriptychChooser = ({
 };
 
 type ColorPaletteItem = ColorPalette & { id: string };
-const paletteKeyExtract = (item: ColorPaletteItem) => item.id;
 
 export default ColorTriptychChooser;
 

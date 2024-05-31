@@ -23,6 +23,7 @@ import { maybeFromGlobalIdWithType } from '#helpers/relayIdHelpers';
 import { getLabel, idResolver } from './utils';
 import type {
   CompanyActivityResolvers,
+  CompanyActivityTypeResolvers,
   WebCardCategoryResolvers,
   WebCardResolvers,
 } from './__generated__/types';
@@ -263,6 +264,16 @@ export const WebCardCategory: WebCardCategoryResolvers = {
 
 export const CompanyActivity: CompanyActivityResolvers = {
   id: idResolver('CompanyActivity'),
+  label: getLabel,
+  companyActivityType: async (companyActivity, _, { loaders }) => {
+    return companyActivity.companyActivityTypeId
+      ? loaders.CompanyActivityType.load(companyActivity.companyActivityTypeId)
+      : null;
+  },
+};
+
+export const CompanyActivityType: CompanyActivityTypeResolvers = {
+  id: idResolver('CompanyActivityType'),
   label: getLabel,
 };
 

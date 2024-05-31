@@ -28,7 +28,7 @@ import { uploadMedia } from '@azzapp/shared/WebAPI';
 import { getSignedUpload } from '#app/mediaActions';
 import MediasListInput from '#components/MediasListInput';
 import { intParser, useForm } from '#helpers/formHelpers';
-import WebCardTemplateTypeListInput from '../companyActivities/WebCardTemplateTypeListInput';
+import TypeListInput from '../../../components/TypeListInput';
 import ActivityListInput from './ActivityListInput';
 import { saveWebCardCategory } from './webCardCategoriesActions';
 import type { WebCardCategoryErrors } from './webCardCategorySchema';
@@ -261,11 +261,11 @@ const WebCardCategoryForm = ({
             fullWidth
             {...fieldProps('order', { parse: intParser })}
           />
-          <WebCardTemplateTypeListInput
+          <TypeListInput
             label="Webcard template type"
             name="cardTemplateType"
             options={cardTemplateTypes}
-            cardTemplateTypesLabels={labels}
+            typesLabels={labels}
             width="100%"
             {...fieldProps('cardTemplateType')}
           />

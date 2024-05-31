@@ -17,7 +17,8 @@ import {
   useTransition,
 } from 'react';
 import DataGrid from '#components/DataGrid';
-import type { CompanyActivityItem, SortColumn } from './page';
+import type { SortColumn } from './page';
+import type { CompanyActivityType } from '@azzapp/data';
 import type {
   GridColDef,
   GridPaginationModel,
@@ -25,7 +26,7 @@ import type {
 } from '@mui/x-data-grid';
 
 type CompanyActivitiesListProps = {
-  companyActivities: CompanyActivityItem[];
+  companyActivitiesTypes: CompanyActivityType[];
   count: number;
   page: number;
   pageSize: number;
@@ -34,8 +35,8 @@ type CompanyActivitiesListProps = {
   search: string | null;
 };
 
-const CompanyActivitiesList = ({
-  companyActivities,
+const CompanyActivitiesTypesList = ({
+  companyActivitiesTypes,
   count,
   page,
   pageSize,
@@ -49,7 +50,7 @@ const CompanyActivitiesList = ({
     (page: number, sort: string, order: string, search: string | null) => {
       startTransition(() => {
         router.replace(
-          `/companyActivities?page=${page}&sort=${sort}&order=${order}&s=${search ?? ''}`,
+          `/companyActivitiesTypes?page=${page}&sort=${sort}&order=${order}&s=${search ?? ''}`,
         );
       });
     },
@@ -83,7 +84,7 @@ const CompanyActivitiesList = ({
       }}
     >
       <Typography variant="h4" component="h1" sx={{ mb: 2 }}>
-        Activities
+        Activities Types
       </Typography>
       <Box
         sx={{
@@ -112,16 +113,16 @@ const CompanyActivitiesList = ({
           <Button
             variant="contained"
             onClick={() => {
-              router.push('/companyActivities/add');
+              router.push('/companyActivitiesTypes/add');
             }}
           >
-            NEW ACTIVITY
+            NEW ACTIVITY TYPE
           </Button>
         </Box>
       </Box>
       <DataGrid
         columns={columns}
-        rows={companyActivities}
+        rows={companyActivitiesTypes}
         rowCount={count}
         initialState={{
           pagination: {
@@ -135,7 +136,7 @@ const CompanyActivitiesList = ({
           },
         ]}
         onRowClick={params => {
-          router.push(`/companyActivities/${params.id}`);
+          router.push(`/companyActivitiesTypes/${params.id}`);
         }}
         sx={{
           '& .MuiDataGrid-row:hover': {
@@ -161,21 +162,6 @@ const columns: GridColDef[] = [
     headerName: 'Label',
     flex: 1,
   },
-  {
-    field: 'companyActivityTypeLabelKey',
-    headerName: 'Activity Type',
-    flex: 1,
-  },
-  {
-    field: 'webCardCategoryLabelKey',
-    headerName: 'Category',
-    flex: 1,
-  },
-  {
-    field: 'cardTemplateTypeLabelKey',
-    headerName: 'Webcard Template Type',
-    flex: 1,
-  },
 ];
 
-export default CompanyActivitiesList;
+export default CompanyActivitiesTypesList;

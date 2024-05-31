@@ -10,6 +10,7 @@ import {
 } from 'react-relay';
 import { colors } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
+import { keyExtractor } from '#helpers/idHelpers';
 import relayScreen from '#helpers/relayScreen';
 import useToggle from '#hooks/useToggle';
 import Container from '#ui/Container';
@@ -18,6 +19,7 @@ import PressableNative from '#ui/PressableNative';
 import SafeAreaView from '#ui/SafeAreaView';
 import SearchBarStatic from '#ui/SearchBarStatic';
 import Select from '#ui/Select';
+import SelectSection from '#ui/SelectSection';
 import Switch from '#ui/Switch';
 import Text from '#ui/Text';
 import WebCardParametersHeader from './WebCardParametersHeader';
@@ -46,6 +48,10 @@ const webCardParametersScreenQuery = graphql`
       companyActivities {
         id
         label
+        companyActivityType {
+          id
+          label
+        }
       }
     }
     webCardParameters {
@@ -94,6 +100,11 @@ const WebCardParametersScreen = ({
 
   const [searchActivities, setSearchActivities] = useState('');
 
+  const otherActivityType = intl.formatMessage({
+    defaultMessage: 'Other',
+    description: 'Default activity type label',
+  });
+
   const activities = useMemo(
     () =>
       webCardCategories
@@ -104,8 +115,49 @@ const WebCardParametersScreen = ({
             activity.label
               ?.toLowerCase()
               .includes(searchActivities.toLowerCase().trim()),
-        ),
-    [searchActivities, webCard?.webCardCategory?.id, webCardCategories],
+        )
+        .reduce<
+          Array<{ title: string; data: [{ id: string; title: string }] }>
+        >((acc, activity) => {
+          const type = acc.find(
+            a =>
+              a.title ===
+              (activity.companyActivityType?.label ?? otherActivityType),
+          );
+
+          if (type) {
+            type.data.push({
+              id: activity.id,
+              title: activity.label ?? '',
+            });
+
+            type.data = type.data.sort((a, b) => {
+              return a.title.localeCompare(b.title);
+            });
+          } else {
+            acc.push({
+              title: activity.companyActivityType?.label ?? otherActivityType,
+              data: [
+                {
+                  id: activity.id,
+                  title: activity.label ?? '',
+                },
+              ],
+            });
+
+            acc = acc.sort((a, b) => {
+              return a.title.localeCompare(b.title);
+            });
+          }
+
+          return acc;
+        }, []),
+    [
+      otherActivityType,
+      searchActivities,
+      webCard?.webCardCategory?.id,
+      webCardCategories,
+    ],
   );
 
   const [commitToggleWebCardPublished] =
@@ -227,7 +279,7 @@ const WebCardParametersScreen = ({
   );
 
   const updateProfileActivity = useCallback(
-    (activity: CompanyActivity) => {
+    (activity: { id: string }) => {
       if (!webCard) {
         return;
       }
@@ -429,7 +481,7 @@ const WebCardParametersScreen = ({
                   description="Activity field in the webcard parameters screen"
                 />
               </Text>
-              <Select
+              <SelectSection
                 nativeID="activities"
                 ListHeaderComponent={
                   <View style={styles.searchContainer}>
@@ -446,13 +498,13 @@ const WebCardParametersScreen = ({
                 }
                 avoidKeyboard
                 accessibilityLabelledBy="activitiesLabel"
-                data={activities ?? []}
+                sections={activities ?? []}
                 selectedItemKey={webCard.companyActivity?.id}
-                keyExtractor={keyExtractor}
                 bottomSheetHeight={Math.max(
                   Math.min((webCardCategories?.length ?? 0) * 50 + 80, 400),
                   300,
                 )}
+                keyExtractor={keyExtractor}
                 onItemSelected={updateProfileActivity}
                 bottomSheetTitle={intl.formatMessage({
                   defaultMessage: 'Select an activity',
@@ -496,8 +548,6 @@ const WebCardParametersScreen = ({
   );
 };
 
-const keyExtractor = (item: CompanyActivity | WebCardCategory) => item.id;
-
 const styleSheet = createStyleSheet(appearance => ({
   warningIcon: { width: 50, height: 50, alignSelf: 'center' },
   content: { rowGap: 15, paddingHorizontal: 10 },
@@ -528,7 +578,7 @@ const styleSheet = createStyleSheet(appearance => ({
     marginBottom: 18,
     paddingHorizontal: 30,
   },
-  searchContainer: { paddingBottom: 20, paddingHorizontal: 20 },
+  searchContainer: { paddingBottom: 20 },
 }));
 
 export default relayScreen(WebCardParametersScreen, {
@@ -543,4 +593,3 @@ export default relayScreen(WebCardParametersScreen, {
 type WebCardCategory = ArrayItemType<
   WebCardParametersScreenQuery$data['webCardCategories']
 >;
-type CompanyActivity = ArrayItemType<WebCardCategory['companyActivities']>;

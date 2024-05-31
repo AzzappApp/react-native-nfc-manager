@@ -26,7 +26,7 @@ import { uploadMedia } from '@azzapp/shared/WebAPI';
 import { getSignedUpload } from '#app/mediaActions';
 import MediaInput from '#components/MediaInput';
 import { useForm } from '#helpers/formHelpers';
-import WebCardTemplateTypeListInput from '../companyActivities/WebCardTemplateTypeListInput';
+import TypeListInput from '../../../components/TypeListInput';
 import { getModulesData, saveCardTemplate } from './cardTemplatesActions';
 import type {
   CardTemplateErrors,
@@ -302,11 +302,11 @@ const CardTemplateForm = ({
             sx={{ width: 250 }}
             {...fields.baseLabelValue}
           />
-          <WebCardTemplateTypeListInput
+          <TypeListInput
             label="Webcard template type"
             name="cardTemplateType"
             options={cardTemplateTypes}
-            cardTemplateTypesLabels={labels}
+            typesLabels={labels}
             sx={{ width: 250 }}
             {...fieldProps('cardTemplateType')}
           />

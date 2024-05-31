@@ -4,6 +4,7 @@ import { FlatList, StyleSheet, View } from 'react-native';
 import Animated from 'react-native-reanimated';
 import { graphql, useFragment } from 'react-relay';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
+import { keyExtractor } from '#helpers/idHelpers';
 import IconButton from '#ui/IconButton';
 import PressableNative from '#ui/PressableNative';
 import SearchBar from '#ui/SearchBar';
@@ -90,8 +91,6 @@ const getItemLayout = (_data: any, index: number) => ({
   offset: COVER_HEIGHT * index + SEPARATOR_HEIGHT * (index - 1),
   index,
 });
-
-const keyExtractor = (item: ArrayItemType<WebCardList_webCard$data>) => item.id;
 
 const WebCardList = ({
   users: usersKey,

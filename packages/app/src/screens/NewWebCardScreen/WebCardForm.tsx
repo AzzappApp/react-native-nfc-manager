@@ -1,5 +1,4 @@
 import {
-  useCallback,
   useEffect,
   useRef,
   forwardRef,
@@ -25,20 +24,17 @@ import { isValidUserName } from '@azzapp/shared/stringHelpers';
 import { buildUserUrl } from '@azzapp/shared/urlHelpers';
 import { colors } from '#theme';
 import { dispatchGlobalEvent } from '#helpers/globalEvents';
+import { keyExtractor } from '#helpers/idHelpers';
 import useScreenInsets from '#hooks/useScreenInsets';
 import Icon from '#ui/Icon';
 import Label from '#ui/Label';
 import SearchBarStatic from '#ui/SearchBarStatic';
-import Select from '#ui/Select';
+import SelectSection from '#ui/SelectSection';
 import Text from '#ui/Text';
 import TextInput from '#ui/TextInput';
-import type {
-  WebCardForm_webCardCategory$data,
-  WebCardForm_webCardCategory$key,
-} from '#relayArtifacts/WebCardForm_webCardCategory.graphql';
+import type { WebCardForm_webCardCategory$key } from '#relayArtifacts/WebCardForm_webCardCategory.graphql';
 import type { WebCardFormMutation } from '#relayArtifacts/WebCardFormMutation.graphql';
 import type { WebCardFormQuery } from '#relayArtifacts/WebCardFormQuery.graphql';
-import type { ArrayItemType } from '@azzapp/shared/arrayHelpers';
 import type { ForwardedRef } from 'react';
 import type { TextInput as RNTextInput } from 'react-native';
 
@@ -81,6 +77,10 @@ const WebCardForm = (
         companyActivities {
           id
           label
+          companyActivityType {
+            id
+            label
+          }
         }
       }
     `,
@@ -89,19 +89,61 @@ const WebCardForm = (
 
   const [searchActivities, setSearchActivities] = useState('');
 
+  const intl = useIntl();
+
+  const otherActivityType = intl.formatMessage({
+    defaultMessage: 'Other',
+    description: 'Default activity type label',
+  });
+
   const filteredCompanyActivities = useMemo(
     () =>
-      searchActivities.trim()
+      (searchActivities.trim()
         ? companyActivities.filter(activity =>
             activity.label
               ?.toLowerCase()
               .includes(searchActivities.toLowerCase()),
           )
-        : companyActivities,
-    [companyActivities, searchActivities],
-  );
+        : companyActivities
+      ).reduce<Array<{ title: string; data: [{ id: string; title: string }] }>>(
+        (acc, activity) => {
+          const type = acc.find(
+            a =>
+              a.title ===
+              (activity.companyActivityType?.label ?? otherActivityType),
+          );
 
-  const intl = useIntl();
+          if (type) {
+            type.data.push({
+              id: activity.id,
+              title: activity.label ?? '',
+            });
+
+            type.data = type.data.sort((a, b) => {
+              return a.title.localeCompare(b.title);
+            });
+          } else {
+            acc.push({
+              title: activity.companyActivityType?.label ?? otherActivityType,
+              data: [
+                {
+                  id: activity.id,
+                  title: activity.label ?? '',
+                },
+              ],
+            });
+
+            acc = acc.sort((a, b) => {
+              return a.title.localeCompare(b.title);
+            });
+          }
+
+          return acc;
+        },
+        [],
+      ),
+    [companyActivities, otherActivityType, searchActivities],
+  );
 
   const userNameAlreadyExistsError = intl.formatMessage(
     {
@@ -348,11 +390,6 @@ const WebCardForm = (
 
   const insets = useScreenInsets();
 
-  const companyActivityKeyExtractor = useCallback(
-    (item: CompanyActivity) => item.id,
-    [],
-  );
-
   return (
     <KeyboardAvoidingView
       behavior="padding"
@@ -469,12 +506,12 @@ const WebCardForm = (
                 control={control}
                 name="companyActivityId"
                 render={({ field: { onChange, value } }) => (
-                  <Select
+                  <SelectSection
                     nativeID="activities"
                     accessibilityLabelledBy="activitiesLabel"
-                    data={filteredCompanyActivities}
+                    sections={filteredCompanyActivities}
                     selectedItemKey={value}
-                    keyExtractor={companyActivityKeyExtractor}
+                    keyExtractor={keyExtractor}
                     bottomSheetHeight={
                       windowHeight -
                       90 -
@@ -580,10 +617,6 @@ const WebCardForm = (
 
 export default forwardRef(WebCardForm);
 
-type CompanyActivity = ArrayItemType<
-  WebCardForm_webCardCategory$data['companyActivities']
->;
-
 const styles = StyleSheet.create({
   root: {
     flex: 1,
@@ -608,5 +641,5 @@ const styles = StyleSheet.create({
   urlText: {
     marginLeft: 5,
   },
-  searchContainer: { paddingBottom: 20, paddingHorizontal: 20 },
+  searchContainer: { paddingBottom: 20 },
 });

@@ -19,6 +19,7 @@ import { CancelHeaderButton } from '#components/commonsButtons';
 import { useRouter, type ScreenOptions } from '#components/NativeRouter';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import { getFileName } from '#helpers/fileHelpers';
+import { keyExtractor } from '#helpers/idHelpers';
 import { addLocalCachedMediaFile } from '#helpers/mediaHelpers';
 import { uploadMedia, uploadSign } from '#helpers/MobileWebAPI';
 import relayScreen from '#helpers/relayScreen';
@@ -462,7 +463,7 @@ const MultiUserDetailsScreen = ({
                         : roles
                     }
                     selectedItemKey={value}
-                    keyExtractor={role => role.id}
+                    keyExtractor={keyExtractor}
                     onItemSelected={item => onChange(item.id)}
                     itemContainerStyle={styles.selectItemContainerStyle}
                     bottomSheetHeight={

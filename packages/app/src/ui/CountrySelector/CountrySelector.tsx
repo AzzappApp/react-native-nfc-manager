@@ -68,8 +68,6 @@ const CountrySelector = ({
       });
   }, [locale]);
 
-  const keyExtractor = useCallback((item: CountryItem) => item.code, []);
-
   const onItemSelected = useCallback(
     (country: CountryItem) => {
       onChange(country.code);
@@ -89,6 +87,8 @@ const CountrySelector = ({
     />
   );
 };
+
+const keyExtractor = (item: CountryItem) => item.code;
 
 export default CountrySelector;
 

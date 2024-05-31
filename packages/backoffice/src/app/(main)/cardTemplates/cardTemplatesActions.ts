@@ -11,7 +11,7 @@ import {
   referencesMedias,
   updateCardTemplate,
 } from '@azzapp/data';
-import { saveLabelKey } from '#helpers/lokaliseHelperts';
+import { saveLabelKey } from '#helpers/lokaliseHelpers';
 import {
   cardTemplateSchema,
   type CardTemplateFormValue,

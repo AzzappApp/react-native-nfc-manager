@@ -50,6 +50,12 @@ const backOfficeSections: Section[] = [
         href: '/companyActivities',
         roles: [ADMIN],
       },
+      {
+        id: 'companyActivitiesTypes',
+        text: 'Activities Types',
+        href: '/companyActivitiesTypes',
+        roles: [ADMIN],
+      },
     ],
   },
   {

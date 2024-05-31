@@ -11,6 +11,7 @@ import { isWebCardKindSubscription } from '@azzapp/shared/subscriptionHelpers';
 import { colors, shadow } from '#theme';
 import { MediaImageRenderer } from '#components/medias';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
+import { keyExtractor } from '#helpers/idHelpers';
 import { prefetchImage } from '#helpers/mediaHelpers';
 
 import Icon from '#ui/Icon';
@@ -101,7 +102,6 @@ const WebCardKinStep = ({
   const intl = useIntl();
   const styles = useStyleSheet(styleSheet);
 
-  const mediasKeyExtractor = useCallback((item: Media) => item.id, []);
   const borderRadius = COVER_CARD_RADIUS * cardWidth;
 
   const mediaStyle = useMemo(
@@ -138,11 +138,6 @@ const WebCardKinStep = ({
 
   const selectedCategory = webCardCategories.find(
     category => category.id === webCardCategoryId,
-  );
-
-  const webCardCategoriesKeyExtractor = useCallback(
-    (item: WebCardCategory) => item.id,
-    [],
   );
 
   const renderWebCardCategoryItem = useCallback(
@@ -206,7 +201,7 @@ const WebCardKinStep = ({
         <InfiniteCarousel
           key={selectedCategory.id}
           items={selectedCategory.medias ?? []}
-          keyExtractor={mediasKeyExtractor}
+          keyExtractor={keyExtractor}
           renderItem={renderMediasItem}
           itemWidth={cardWidth + 20}
           style={styles.mediasList}
@@ -226,7 +221,7 @@ const WebCardKinStep = ({
         <FlatList
           ref={categoryListRef}
           data={webCardCategories}
-          keyExtractor={webCardCategoriesKeyExtractor}
+          keyExtractor={keyExtractor}
           renderItem={renderWebCardCategoryItem}
           getItemLayout={getWebCardCategoryItemLayout}
           style={[

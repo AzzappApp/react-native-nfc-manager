@@ -3,6 +3,7 @@ import { Platform, StyleSheet, View } from 'react-native';
 import { FlatList } from 'react-native-gesture-handler';
 import { colors, shadow } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
+import { keyExtractor } from '#helpers/idHelpers';
 import PressableScaleHighlight from '#ui/PressableScaleHighlight';
 import Text from '#ui/Text';
 import type { ReactNode } from 'react';
@@ -62,8 +63,6 @@ const CoverEditorSelectionList = <T,>({
 };
 
 export default CoverEditorSelectionList;
-
-const keyExtractor = (item: { id: string }) => item.id;
 
 const getItemLayout = (_data: unknown, index: number) => ({
   length: BOX_WIDTH + 10,

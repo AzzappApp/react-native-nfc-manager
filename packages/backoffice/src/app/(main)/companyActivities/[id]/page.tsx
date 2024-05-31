@@ -5,6 +5,7 @@ import {
   getCompanyActivityById,
   getLabels,
   getLabel,
+  CompanyActivityTypeTable,
 } from '@azzapp/data';
 import CompanyActivityForm from '../CompanyActivityForm';
 type CardTemplatePageProps = {
@@ -19,8 +20,14 @@ const CardTemplatePage = async (props: CardTemplatePageProps) => {
   const template = await getCompanyActivityById(params.id);
   const cardTemplateTypes = await db.select().from(CardTemplateTypeTable);
 
-  const cardTemplateTypesLabels = await getLabels(
-    cardTemplateTypes.map(({ labelKey }) => labelKey),
+  const companyActivitiesTypes = await db
+    .select()
+    .from(CompanyActivityTypeTable);
+
+  const labels = await getLabels(
+    cardTemplateTypes
+      .map(type => type.labelKey)
+      .concat(companyActivitiesTypes.map(type => type.labelKey)),
   );
 
   if (!template) {
@@ -33,7 +40,13 @@ const CardTemplatePage = async (props: CardTemplatePageProps) => {
     <CompanyActivityForm
       companyActivity={template}
       cardTemplateTypes={cardTemplateTypes}
-      cardTemplateTypesLabels={cardTemplateTypesLabels}
+      cardTemplateTypesLabels={labels.filter(label =>
+        cardTemplateTypes.some(type => type.labelKey === label.labelKey),
+      )}
+      companyActivityTypesLabels={labels.filter(label =>
+        companyActivitiesTypes.some(type => type.labelKey === label.labelKey),
+      )}
+      companyActivitiesTypes={companyActivitiesTypes}
       label={label}
     />
   );

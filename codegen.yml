@@ -22,6 +22,7 @@ generates:
         MediaImage: ../MediaResolvers#MediaResolverBaseType as MediaImageModel
         MediaVideo: ../MediaResolvers#MediaResolverBaseType as MediaVideoModel
         CompanyActivity: '@azzapp/data#CompanyActivity as CompanyActivityModel'
+        CompanyActivityType: '@azzapp/data#CompanyActivityType as CompanyActivityTypeModel'
         Post: '@azzapp/data#Post as PostModel'
         PostComment: '@azzapp/data#PostComment as PostCommentModel'
         CardTemplate: '@azzapp/data#CardTemplate as CardTemplateModel'

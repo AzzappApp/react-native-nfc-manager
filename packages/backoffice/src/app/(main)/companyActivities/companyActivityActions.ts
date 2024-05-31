@@ -9,7 +9,7 @@ import {
   db,
   updateCompanyActivity,
 } from '@azzapp/data';
-import { saveLabelKey } from '#helpers/lokaliseHelperts';
+import { saveLabelKey } from '#helpers/lokaliseHelpers';
 import { companyActivitySchema } from './companyActivitySchema';
 import type { CompanyActivity, NewCompanyActivity } from '@azzapp/data';
 
@@ -30,10 +30,10 @@ export const getModulesData = async (profileUserName: string) => {
 };
 
 export const saveCompanyActivity = async (
-  data: { cardTemplateType?: { id: string } } & (
-    | CompanyActivity
-    | NewCompanyActivity
-  ),
+  data: {
+    cardTemplateType?: { id: string };
+    companyActivityType?: { id: string };
+  } & (CompanyActivity | NewCompanyActivity),
 ) => {
   const validation = companyActivitySchema.safeParse(data);
   if (!validation.success) {
@@ -42,6 +42,8 @@ export const saveCompanyActivity = async (
       formErrors: validation.error.formErrors,
     } as const;
   }
+
+  console.log({ data });
 
   let companyActivityId: string;
   try {
@@ -56,6 +58,7 @@ export const saveCompanyActivity = async (
           {
             labelKey: validation.data.labelKey,
             cardTemplateTypeId: data.cardTemplateType?.id ?? null,
+            companyActivityTypeId: data.companyActivityType?.id ?? null,
           },
           trx,
         );
@@ -75,6 +78,7 @@ export const saveCompanyActivity = async (
           {
             labelKey: data.labelKey,
             cardTemplateTypeId: data.cardTemplateType?.id ?? null,
+            companyActivityTypeId: data.companyActivityType?.id ?? null,
           },
           trx,
         );

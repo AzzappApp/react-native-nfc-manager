@@ -13,66 +13,37 @@ import {
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { useForm } from '#helpers/formHelpers';
-import TypeListInput from '../../../components/TypeListInput';
-import { saveCompanyActivity } from './companyActivityActions';
-import type { CompanyActivityErrors } from './companyActivitySchema';
-import type {
-  CompanyActivity,
-  CardTemplateType,
-  Label,
-  CompanyActivityType,
-} from '@azzapp/data';
+import { saveCompanyActivitiesType } from './companyActivitiesTypeActions';
+import type { CompanyActivitiesTypeErrors } from './companyActivitiesTypeSchema';
+import type { Label, CompanyActivityType } from '@azzapp/data';
 
-type CompanyActivityFormProps = {
-  companyActivity?: CompanyActivity | null;
-  cardTemplateTypes: CardTemplateType[];
-  companyActivitiesTypes: CompanyActivityType[];
+type CompanyActivityTypeFormProps = {
+  companyActivitiesType?: CompanyActivityType | null;
   saved?: boolean;
   label?: Label | null;
-  cardTemplateTypesLabels: Label[];
-  companyActivityTypesLabels: Label[];
 };
 
-type FormValue = CompanyActivity &
-  Label & {
-    cardTemplateType: CardTemplateType | string;
-    companyActivityType: CompanyActivityType | string;
-  };
+type FormValue = CompanyActivityType & Label;
 
-const CompanyActivityForm = ({
-  companyActivity,
+const CompanyActivitiesTypeForm = ({
+  companyActivitiesType,
   saved = false,
-  cardTemplateTypes,
-  companyActivitiesTypes,
   label,
-  cardTemplateTypesLabels,
-  companyActivityTypesLabels,
-}: CompanyActivityFormProps) => {
-  const isCreation = !companyActivity;
+}: CompanyActivityTypeFormProps) => {
+  const isCreation = !companyActivitiesType;
   const [saving, setIsSaving] = useState(false);
   const [displaySaveSuccess, setDisplaySaveSuccess] = useState(saved);
   const [error, setError] = useState<any>(null);
-  const [formErrors, setFormErrors] = useState<CompanyActivityErrors | null>(
-    null,
-  );
+  const [formErrors, setFormErrors] =
+    useState<CompanyActivitiesTypeErrors | null>(null);
 
   const { data, fieldProps } = useForm<FormValue>(
     () => ({
       ...label,
-      ...companyActivity,
-      cardTemplateType: companyActivity?.cardTemplateTypeId
-        ? cardTemplateTypes?.find(item => {
-            return item.id === companyActivity?.cardTemplateTypeId;
-          })
-        : undefined,
-      companyActivityType: companyActivity?.companyActivityTypeId
-        ? companyActivitiesTypes?.find(item => {
-            return item.id === companyActivity?.companyActivityTypeId;
-          })
-        : undefined,
+      ...companyActivitiesType,
     }),
     formErrors?.fieldErrors,
-    [companyActivity],
+    [companyActivitiesType],
   );
 
   const router = useRouter();
@@ -80,12 +51,12 @@ const CompanyActivityForm = ({
     e.preventDefault();
     setIsSaving(true);
     try {
-      const result = await saveCompanyActivity(data as CompanyActivity);
+      const result = await saveCompanyActivitiesType(data);
       if (result.success) {
         setFormErrors(null);
         if (isCreation) {
           router.replace(
-            `/companyActivities/${result.companyActivityId}?saved=true`,
+            `/companyActivitiesTypes/${result.companyActivityId}?saved=true`,
           );
         } else {
           setDisplaySaveSuccess(true);
@@ -116,16 +87,16 @@ const CompanyActivityForm = ({
           underline="hover"
           sx={{ display: 'flex', alignItems: 'center' }}
           color="inherit"
-          href="/companyActivities"
+          href="/companyActivitiesTypes"
         >
           <People sx={{ mr: 0.5 }} fontSize="inherit" />
-          Activities
+          Activities Types
         </Link>
       </Breadcrumbs>
       <Typography variant="h4" component="h1" sx={{ mb: 2 }}>
-        {companyActivity
-          ? `Company activity ${label?.baseLabelValue}`
-          : 'New Company Activity'}
+        {companyActivitiesType
+          ? `Company activities type ${label?.baseLabelValue}`
+          : 'New Company Activities type'}
       </Typography>
 
       <Box
@@ -153,22 +124,6 @@ const CompanyActivityForm = ({
           {...fieldProps('baseLabelValue')}
         />
       </Box>
-      <TypeListInput
-        label="Webcard template type"
-        name="cardTemplateType"
-        options={cardTemplateTypes}
-        typesLabels={cardTemplateTypesLabels}
-        sx={{ flex: 1, minWidth: 200 }}
-        {...fieldProps('cardTemplateType')}
-      />
-      <TypeListInput
-        label="Activity Type"
-        name="companyActivityType"
-        options={companyActivitiesTypes}
-        typesLabels={companyActivityTypesLabels}
-        sx={{ flex: 1, minWidth: 200 }}
-        {...fieldProps('companyActivityType')}
-      />
       <Button
         type="submit"
         variant="contained"
@@ -193,4 +148,4 @@ const CompanyActivityForm = ({
   );
 };
 
-export default CompanyActivityForm;
+export default CompanyActivitiesTypeForm;

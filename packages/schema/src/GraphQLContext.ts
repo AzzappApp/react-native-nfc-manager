@@ -29,6 +29,7 @@ import {
   getLabels,
   PaymentTable,
   PaymentMeanTable,
+  CompanyActivityTypeTable,
 } from '@azzapp/data';
 import { DEFAULT_LOCALE } from '@azzapp/i18n';
 import type {
@@ -56,6 +57,7 @@ import type {
   CardStyle,
   PaymentMean,
   Payment,
+  CompanyActivityType,
 } from '@azzapp/data';
 
 import type { Locale } from '@azzapp/i18n';
@@ -126,6 +128,7 @@ const entities = [
   'CardTemplateType',
   'ColorPalette',
   'CompanyActivity',
+  'CompanyActivityType',
   'CoverTemplatePreview',
   'CoverTemplate',
   'CoverTemplateType',
@@ -152,6 +155,7 @@ type EntityToType<T extends Entity> = {
   CardTemplateType: CardTemplateType;
   ColorPalette: ColorPalette;
   CompanyActivity: CompanyActivity;
+  CompanyActivityType: CompanyActivityType;
   CoverTemplate: CoverTemplate;
   CoverTemplatePreview: CoverTemplatePreview;
   CoverTemplateType: CoverTemplateType;
@@ -190,6 +194,7 @@ const entitiesTable = {
   CardTemplateType: CardTemplateTypeTable,
   ColorPalette: ColorPaletteTable,
   CompanyActivity: CompanyActivityTable,
+  CompanyActivityType: CompanyActivityTypeTable,
   CoverTemplate: CoverTemplateTable,
   CoverTemplateType: CoverTemplateTypeTable,
   CoverTemplatePreview: CoverTemplatePreviewTable,

@@ -14,7 +14,7 @@ import {
   LabelTable,
 } from '@azzapp/data';
 import { ADMIN } from '#roles';
-import { saveLabelKey } from '#helpers/lokaliseHelperts';
+import { saveLabelKey } from '#helpers/lokaliseHelpers';
 import { currentUserHasRole } from '#helpers/roleHelpers';
 import { webCardCategorySchema } from './webCardCategorySchema';
 import type {
@@ -118,6 +118,7 @@ export const saveWebCardCategory = async (
               id,
               labelKey: activity,
               cardTemplateTypeId: data.cardTemplateType?.id ?? null,
+              companyActivityTypeId: null,
             });
             categoriesToAssociate.push(id);
           } else {
