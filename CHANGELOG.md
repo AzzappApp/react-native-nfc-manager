@@ -1,5 +1,6 @@
-## 0.5.15-canary.63
+## 0.5.15-canary.64
 
+* **fix:**  - [#3365](https://github.com/AzzappApp/azzapp/pull/3365) issue on legal link in second screen ([#3551](https://github.com/AzzappApp/azzapp/pull/3551))
 * **build:**  - update babel-plugin for formatjs
 * **build:**  - rollback sentry upgrade ([#3549](https://github.com/AzzappApp/azzapp/pull/3549))
 * **build:**  - upgrade web dependencies ([#3547](https://github.com/AzzappApp/azzapp/pull/3547))
