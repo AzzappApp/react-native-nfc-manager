@@ -1,5 +1,6 @@
-## 0.5.15-canary.65
+## 0.5.15-canary.66
 
+* **fix:**  - **user:** check validation result ([#3554](https://github.com/AzzappApp/azzapp/pull/3554))
 * **Feat:**  - CoverEditor adjust Tolol ([#3553](https://github.com/AzzappApp/azzapp/pull/3553))
 * **fix:**  - **emailSignature:** [#3543](https://github.com/AzzappApp/azzapp/pull/3543) don’t crash when lottie is missing ([#3550](https://github.com/AzzappApp/azzapp/pull/3550))
 * **feat:**  - **webCard:** [#3244](https://github.com/AzzappApp/azzapp/pull/3244) add activity types ([#3552](https://github.com/AzzappApp/azzapp/pull/3552))
