@@ -127,5 +127,5 @@ const CoverLottiePlayer = (
 export default forwardRef(CoverLottiePlayer);
 
 const fetchLottie = memoize((src: string) =>
-  fetch(src).then(res => res.json()),
+  fetch(src).then(res => (res.ok ? res.json() : null)),
 );

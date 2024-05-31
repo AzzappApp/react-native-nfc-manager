@@ -68,7 +68,7 @@ const round = (n: number) => Math.round(n * 1000) / 1000;
 export const replaceColor = (
   sourceColor: number[] | string,
   targetColor: number[] | string,
-  lottieObj: any,
+  lottieObj?: any,
   immutable = true,
 ) => {
   const genSourceLottieColor = convertColorToLottieColor(sourceColor);
@@ -81,7 +81,7 @@ export const replaceColor = (
     targetLottieColor: number[],
     obj: any,
   ) {
-    if (obj.s && Array.isArray(obj.s) && obj.s.length === 4) {
+    if (obj && obj.s && Array.isArray(obj.s) && obj.s.length === 4) {
       if (
         sourceLottieColor[0] === obj.s[0] &&
         sourceLottieColor[1] === obj.s[1] &&
@@ -89,7 +89,7 @@ export const replaceColor = (
       ) {
         obj.s = [...targetLottieColor, 1];
       }
-    } else if (obj.c && obj.c.k) {
+    } else if (obj && obj.c && obj.c.k) {
       if (Array.isArray(obj.c.k) && typeof obj.c.k[0] !== 'number') {
         doReplace(sourceLottieColor, targetLottieColor, obj.c.k);
       } else if (
