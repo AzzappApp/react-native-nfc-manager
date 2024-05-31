@@ -7,7 +7,7 @@
       "env": {
         "SENTRY_DSN": "https://13a33b3788344ceea14cf298a220fead@o4505353883680768.ingest.sentry.io/4505358469038080",
         "TERMS_OF_SERVICE": "https://www.azzapp.com/legal/terms-of-service",
-        "PRIVACY_POLICY": "https://www.azzapp.com/legal/privacy-policy"
+        "PRIVACY_POLICY": "https://www.azzapp.com/legal/privacy"
       },
       "ios": {
         "image": "latest",

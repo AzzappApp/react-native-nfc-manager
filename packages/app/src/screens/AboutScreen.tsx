@@ -10,7 +10,7 @@ import PressableNative from '#ui/PressableNative';
 import Text from '#ui/Text';
 
 const TERMS_OF_SERVICE = process.env.TERMS_OF_SERVICE;
-const PRIVACY_POLICY = process.env.TERMS_OF_SERVICE;
+const PRIVACY_POLICY = process.env.PRIVACY_POLICY;
 
 const AboutScreen = () => {
   const intl = useIntl();
