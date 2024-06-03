@@ -1,5 +1,6 @@
-## 0.5.15-canary.72
+## 0.5.15-canary.73
 
+* **feat:**  - use lottie ([#3557](https://github.com/AzzappApp/azzapp/pull/3557))
 * **feat:**  - all link to webcard around emial signature logo ([#3567](https://github.com/AzzappApp/azzapp/pull/3567))
 * **feat:**  - **cover:** remove cover api with new cover ([#3565](https://github.com/AzzappApp/azzapp/pull/3565))
 * **feat:**  - **CoverEdition:** basic functional cover editor ([#3563](https://github.com/AzzappApp/azzapp/pull/3563))
