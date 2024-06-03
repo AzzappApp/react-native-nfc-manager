@@ -13,7 +13,6 @@ const overlay = style({
 });
 
 const openedOverlay = style([
-  overlay,
   {
     position: 'fixed',
     top: 0,
@@ -35,14 +34,13 @@ const dialog = style({
   alignItems: 'center',
   flexDirection: 'column',
   rowGap: '20px',
-  transform: 'translate(0,100%)',
-  transition: 'all 450ms cubic-bezier(0.32,1,0.23,1) 100ms',
+  transform: 'translate(0,0)',
+  transition: 'all 450ms cubic-bezier(0.32,1,0.23,1) 0ms',
 });
 
-const openedDialog = style([
-  dialog,
+const closedDialog = style([
   {
-    transform: 'translate(0, 0)',
+    transform: 'translate(0, 100%)',
   },
 ]);
 
@@ -83,7 +81,7 @@ const styles = {
   message,
   closeButton,
   openedOverlay,
-  openedDialog,
+  closedDialog,
   avatarContainer,
   messageContainsAvatars,
 };

@@ -37,10 +37,7 @@ const Modal = forwardRef(
     const handleClose = useCallback(() => {
       if (open) {
         setClosing(true);
-        setTimeout(() => {
-          setOpen(false);
-          setClosing(false);
-        }, 300);
+        setOpen(false);
       }
     }, [open]);
 
@@ -62,10 +59,19 @@ const Modal = forwardRef(
       };
     }, [open]);
 
+    const handleAnimationEnd = useCallback(() => {
+      if (!open) {
+        setClosing(false);
+      }
+    }, [open]);
+
     if (!open && !closing) return null;
 
     return createPortal(
-      <div className={cn(styles.wrapper, { [styles.wrapperClosing]: closing })}>
+      <div
+        className={cn(styles.wrapper, { [styles.wrapperClosing]: closing })}
+        onAnimationEnd={handleAnimationEnd}
+      >
         <div
           {...others}
           className={cn(classnames, { [styles.modalClosing]: closing })}

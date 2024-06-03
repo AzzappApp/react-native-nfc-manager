@@ -81,10 +81,10 @@ const WebCardPageLayout = (props: ProfilePageLayoutProps) => {
         );
       }
 
-      // Open share back modal after 1s (see issue #3305)
+      // Opening of the shareback modal after 450ms depending on the Save CC closing animation(see issue #3305)
       setTimeout(() => {
         shareBackModal.current?.open();
-      }, 1000);
+      }, 450);
     }
   };
 
