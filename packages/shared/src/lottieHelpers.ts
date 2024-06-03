@@ -5,6 +5,7 @@
  *
  * package is not maintained anymore so we internalized it
  */
+import { Animation } from '@lottiefiles/lottie-js';
 import cloneDeep from 'lodash/cloneDeep';
 
 export const colorify = (
@@ -221,3 +222,15 @@ export const getColors = (lottieObj: any): any => {
   doGet(lottieObj);
   return res;
 };
+
+export function extractMediasDuration(lottie: Record<string, any>) {
+  const animation = new Animation();
+  animation.fromJSON(lottie);
+
+  const medias = animation.assets.map(asset => asset.toJSON());
+  const mediaLayers = animation.layers.filter(layer =>
+    medias.find(media => media.id === layer.toJSON().refId),
+  );
+
+  return mediaLayers.map(layer => layer.totalFrames / animation.frameRate);
+}

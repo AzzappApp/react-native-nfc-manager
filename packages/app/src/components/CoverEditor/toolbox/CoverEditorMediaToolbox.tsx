@@ -1,25 +1,27 @@
 import { Image } from 'expo-image';
 import { useMemo } from 'react';
+import { FormattedMessage } from 'react-intl';
 import { ScrollView, View } from 'react-native';
+import { extractMediasDuration } from '@azzapp/shared/lottieHelpers';
 import { colors } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import Icon from '#ui/Icon';
 import PressableNative from '#ui/PressableNative';
 import PressableOpacity from '#ui/PressableOpacity';
+import Text from '#ui/Text';
 import { TOOLBOX_SECTION_HEIGHT } from '#ui/ToolBoxSection';
 import { useCoverEditorContext } from '../CoverEditorContext';
 import CoverEditorMediaPickerFloatingTool from '../tools/CoverEditorMediaPickerFloatingTool';
 import CoverEditorTransitionTool from '../tools/CoverEditorTransitionTool';
 
 type Props = {
-  count: number;
+  lottie: Record<string, any>;
 };
 
-const CoverEditorMediaToolbox = ({ count }: Props) => {
+const CoverEditorMediaToolbox = ({ lottie }: Props) => {
   const styles = useStyleSheet(styleSheet);
 
   const { dispatch, coverEditorState } = useCoverEditorContext();
-  const { medias } = coverEditorState;
 
   const onClose = () => {
     dispatch({
@@ -31,34 +33,69 @@ const CoverEditorMediaToolbox = ({ count }: Props) => {
     });
   };
 
-  const displayedMedias = useMemo(() => {
-    return Array.from(
-      { length: count <= 0 ? medias.length : count },
-      (_, i) => {
-        const { media } = medias[i];
+  const durations = useMemo(() => {
+    return extractMediasDuration(lottie).map(duration => Math.round(duration));
+  }, [lottie]);
 
+  const displayedMedias = useMemo(() => {
+    return durations.map((duration, i) => {
+      const media = coverEditorState.medias[i];
+
+      if (!media) {
         return (
-          <PressableNative
-            key={`${media.uri}-${i}`}
-            onPress={() => {
-              dispatch({
-                type: 'SELECT_LAYER',
-                payload: {
-                  layerMode: 'mediaEdit',
-                  index: i,
-                },
-              });
-            }}
-          >
-            <Image
-              source={{ uri: media?.galleryUri ?? media.uri }}
-              style={styles.previewContent}
-            />
-          </PressableNative>
+          <View key={i} style={styles.previewContent}>
+            <View style={styles.duration}>
+              <Text variant="xsmall">
+                {' '}
+                <FormattedMessage
+                  defaultMessage="{duration}s"
+                  description="CoverEditorMediaToolbox - duration in seconds"
+                  values={{ duration }}
+                />
+              </Text>
+            </View>
+          </View>
         );
-      },
-    );
-  }, [count, dispatch, medias, styles.previewContent]);
+      }
+
+      return (
+        <PressableNative
+          key={`${media.media.uri}-${i}`}
+          onPress={() => {
+            dispatch({
+              type: 'SELECT_LAYER',
+              payload: {
+                layerMode: 'mediaEdit',
+                index: i,
+              },
+            });
+          }}
+          style={styles.previewPressable}
+        >
+          <Image
+            source={{ uri: media?.media.galleryUri ?? media?.media.uri }}
+            style={styles.previewContent}
+          />
+          <View style={styles.duration}>
+            <Text variant="xsmall">
+              <FormattedMessage
+                defaultMessage="{duration}s"
+                description="CoverEditorMediaToolbox - duration in seconds"
+                values={{ duration }}
+              />
+            </Text>
+          </View>
+        </PressableNative>
+      );
+    });
+  }, [
+    coverEditorState.medias,
+    dispatch,
+    durations,
+    styles.duration,
+    styles.previewContent,
+    styles.previewPressable,
+  ]);
 
   return (
     <View style={styles.container}>
@@ -73,7 +110,7 @@ const CoverEditorMediaToolbox = ({ count }: Props) => {
         {coverEditorState.medias.length > 1 && <CoverEditorTransitionTool />}
         {displayedMedias}
       </ScrollView>
-      <CoverEditorMediaPickerFloatingTool count={count} />
+      <CoverEditorMediaPickerFloatingTool durations={durations} />
     </View>
   );
 };
@@ -107,11 +144,24 @@ const styleSheet = createStyleSheet(appearance => ({
     height: TOOLBOX_SECTION_HEIGHT,
   },
   previewContent: {
+    position: 'relative',
     display: 'flex',
     backgroundColor: appearance === 'light' ? colors.grey600 : colors.grey400,
     borderRadius: 8,
     width: TOOLBOX_SECTION_HEIGHT,
     height: TOOLBOX_SECTION_HEIGHT,
+  },
+  duration: {
+    backgroundColor: colors.white,
+    borderRadius: 14,
+    position: 'absolute',
+    bottom: 5,
+    right: 5,
+    paddingHorizontal: 4,
+    paddingVertical: 2,
+  },
+  previewPressable: {
+    position: 'relative',
   },
 }));
 

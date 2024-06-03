@@ -7,10 +7,10 @@ import CoverEditorMediaPicker from '../CoverEditorMediaPicker';
 import type { Media } from '#helpers/mediaHelpers';
 
 type Props = {
-  count: number;
+  durations: number[];
 };
 
-const CoverEditorMediaPickerFloatingTool = ({ count }: Props) => {
+const CoverEditorMediaPickerFloatingTool = ({ durations }: Props) => {
   const [showImagePicker, toggleShowImage] = useToggle();
   const { dispatch, coverEditorState: cover } = useCoverEditorContext();
 
@@ -47,7 +47,7 @@ const CoverEditorMediaPickerFloatingTool = ({ count }: Props) => {
         <CoverEditorMediaPicker
           initialMedias={cover.medias.map(({ media }) => media)}
           onFinished={onMediasPicked}
-          maxMediaCount={count}
+          durations={durations}
         />
       </ScreenModal>
     </>

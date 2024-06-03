@@ -260,9 +260,7 @@ const CoverEditorToolbox = ({
       </Animated.View>
 
       <Animated.View style={[styles.layerContainer, mediaLayerStyle]}>
-        <CoverEditorMediaToolbox
-          count={coverTemplatePreview?.mediaCount ?? -1}
-        />
+        <CoverEditorMediaToolbox lottie={coverTemplatePreview?.lottie ?? {}} />
       </Animated.View>
 
       <Animated.View style={[styles.layerContainer, mediaEditLayerStyle]}>

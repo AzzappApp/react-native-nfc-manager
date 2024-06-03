@@ -14,7 +14,7 @@ type CoverTemplate implements Node {
   type: CoverTemplateType
   tags: [CoverTemplateTag!]!
   previews: [CoverTemplatePreview!]!
-  mediaCount: Float!
+  lottie: JSON!
 }
 
 enum CoverTemplateKind {

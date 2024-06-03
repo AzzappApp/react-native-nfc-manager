@@ -24,7 +24,6 @@ export function useCoverTemplates(
                 type {
                   id
                 }
-                mediaCount
                 previews {
                   id
                   media {
@@ -35,6 +34,7 @@ export function useCoverTemplates(
                     width
                   }
                 }
+                lottie
               }
             }
           }
@@ -59,7 +59,7 @@ export function useCoverTemplates(
             coverTemplateId: coverTemplate.id,
             id: coverTemplatePreview.id,
             media: coverTemplatePreview.media!,
-            mediaCount: coverTemplate.mediaCount,
+            lottie: coverTemplate.lottie,
           })),
         );
 
@@ -97,7 +97,7 @@ export type CoverTemplatePreviewItem = {
     height: number;
     width: number;
   };
-  mediaCount: number;
+  lottie: Record<string, unknown>;
 };
 
 export type CoverTemplatePreviewsByType = Record<

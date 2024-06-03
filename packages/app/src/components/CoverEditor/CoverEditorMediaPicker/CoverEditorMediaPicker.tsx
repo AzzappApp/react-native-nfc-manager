@@ -1,6 +1,6 @@
 import { Image } from 'expo-image';
 import { useState } from 'react';
-import { useIntl } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 import { View, Alert } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import {
@@ -20,13 +20,13 @@ import type { Media } from '#helpers/mediaHelpers';
 import type { ViewProps } from 'react-native-svg/lib/typescript/fabric/utils';
 
 type CoverEditorImagePickerProps = Omit<ViewProps, 'children'> & {
-  maxMediaCount: number;
+  durations: number[];
   initialMedias: Media[] | null;
   onFinished: (results: Media[]) => void;
 };
 
 const CoverEditorImagePicker = ({
-  maxMediaCount,
+  durations,
   initialMedias,
   onFinished,
   style,
@@ -35,6 +35,7 @@ const CoverEditorImagePicker = ({
   const [selectedMedias, setSelectedMedias] = useState<Media[]>(
     initialMedias ?? [],
   );
+  const maxMediaCount = durations.length;
 
   // remove media by index
   const handleRemoveMedia = (index: number) => {
@@ -230,7 +231,11 @@ const CoverEditorImagePicker = ({
                   )}
                   <View style={styles.mediaDuration}>
                     <Text variant="button" style={styles.textDuration}>
-                      {`${duration}s`}
+                      <FormattedMessage
+                        defaultMessage="{duration}s"
+                        description="CoverEditorMediaPicker - duration in seconds"
+                        values={{ duration }}
+                      />
                     </Text>
                   </View>
                 </View>

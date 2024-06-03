@@ -1,5 +1,6 @@
 import { useCallback } from 'react';
 import { FlatList, Image, ScrollView, StyleSheet, View } from 'react-native';
+import { extractMediasDuration } from '@azzapp/shared/lottieHelpers';
 import { keyExtractor } from '#helpers/idHelpers';
 import Badge from '#ui/Badge';
 import Icon from '#ui/Icon';
@@ -61,13 +62,14 @@ const CoverEditorTemplateTypePreview = ({
   preview: TemplateTypePreview;
   onSelect: () => void;
 }) => {
+  const medias = extractMediasDuration(preview.lottie);
   return (
     <PressableNative key={preview.id} style={styles.preview} onPress={onSelect}>
       <Image source={{ uri: preview.media.uri }} style={styles.previewMedia} />
       <Badge style={styles.badge}>
         <View style={styles.badgeElements}>
           <Icon size={16} icon="landscape" />
-          <Text variant="xsmall">{preview.mediaCount}</Text>
+          <Text variant="xsmall">{medias.length}</Text>
         </View>
       </Badge>
     </PressableNative>
@@ -84,7 +86,7 @@ export type TemplateTypePreview = {
     height: number;
     width: number;
   };
-  mediaCount: number;
+  lottie: Record<string, unknown>;
 };
 
 const styles = StyleSheet.create({

@@ -12,9 +12,9 @@ export const CoverTemplateTable = cols.table('CoverTemplate', {
   id: cols.cuid('id').notNull().primaryKey().$defaultFn(createId),
   name: cols.defaultVarchar('name').notNull(),
   order: cols.int('order').notNull().default(1),
-  mediaCount: cols.int('mediaCount').notNull().default(0),
   tags: cols.json('tags').$type<string[]>().notNull(),
   type: cols.cuid('type').notNull(),
+  lottie: cols.json('lottie').notNull(),
 });
 
 export type CoverTemplate = InferSelectModel<typeof CoverTemplateTable>;
