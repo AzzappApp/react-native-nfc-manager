@@ -7,7 +7,7 @@ const CoverEditorDelete = () => {
   const { dispatch } = useCoverEditorContext();
   const intl = useIntl();
   const onDelete = () => {
-    dispatch({ type: 'DELETE_OVERLAY_LAYER' });
+    dispatch({ type: 'DELETE_CURRENT_LAYER' });
   };
   return (
     <ToolBoxSection

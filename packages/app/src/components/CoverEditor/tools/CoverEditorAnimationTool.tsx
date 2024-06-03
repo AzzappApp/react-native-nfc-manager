@@ -3,7 +3,6 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import { View } from 'react-native';
 import { shadow } from '#theme';
 import { DoneHeaderButton } from '#components/commonsButtons';
-import { useOrdonedAnimation } from '#components/CoverRenderer/MediaAnimator';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import useToggle from '#hooks/useToggle';
 import BottomSheetModal from '#ui/BottomSheetModal';
@@ -11,6 +10,7 @@ import DoubleSlider from '#ui/DoubleSlider';
 import LabeledWheelSelector from '#ui/LabeledWheelSelector';
 import Text from '#ui/Text';
 import ToolBoxSection from '#ui/ToolBoxSection';
+import { useOrdonedAnimation } from '../coverDrawer/mediaAnimation';
 import {
   useCoverEditorContext,
   useCoverEditorMedia,
@@ -21,7 +21,7 @@ import CoverEditorSelectionList, {
   BORDER_RADIUS_RATIO,
   BOX_WIDTH,
 } from './CoverEditorSelectionList';
-import type { MEDIA_ANIMATIONS } from '#components/CoverRenderer/MediaAnimator';
+import type { MEDIA_ANIMATIONS } from '../coverDrawer/mediaAnimation';
 
 /**
  * This componet should handle the animation of an image (not user for video)
@@ -65,7 +65,7 @@ const CoverEditorAnimationTool = () => {
     if (layerMode === 'mediaEdit' && mediaInfo?.media) {
       if (mediaInfoIsImage(mediaInfo)) {
         setDuration(mediaInfo.duration);
-        setAnimationId(mediaInfo.animation);
+        setAnimationId(mediaInfo.animation as MEDIA_ANIMATIONS);
       }
     }
   }, [layerMode, mediaInfo]);

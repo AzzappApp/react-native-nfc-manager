@@ -40,12 +40,15 @@ export const WebCard: WebCardResolvers = {
       ? loaders.CompanyActivity.load(webCard.companyActivityId)
       : null;
   },
-  cardCover: async (webCard, _) => {
-    if (!webCard.coverData) {
-      return null;
-    }
-    return webCard;
+  coverMedia: async (webCard, _) => {
+    return webCard.coverMediaId
+      ? {
+          assetKind: 'cover',
+          media: webCard.coverMediaId,
+        }
+      : null;
   },
+  hasCover: webCard => !!webCard.coverMediaId,
   cardModules: async (webCard, _, { auth, loaders }) => {
     const profile = auth.userId
       ? await loaders.profileByWebCardIdAndUserId.load({

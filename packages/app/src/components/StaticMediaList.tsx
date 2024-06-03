@@ -2,7 +2,6 @@ import chroma from 'chroma-js';
 import { memo, useCallback, useEffect, useMemo } from 'react';
 import { Image, View } from 'react-native';
 import {
-  useAnimatedProps,
   useSharedValue,
   withRepeat,
   withTiming,
@@ -16,7 +15,6 @@ import {
 } from '@azzapp/shared/coverHelpers';
 import BoxSelectionList from './BoxSelectionList';
 import CardModuleBackgroundImage from './cardModules/CardModuleBackgroundImage';
-import CoverLottiePlayer from './CoverRenderer/CoverLottiePlayer';
 import type {
   StaticMediaList_staticMedias$data,
   StaticMediaList_staticMedias$key,
@@ -24,7 +22,6 @@ import type {
 import type { BoxButtonItemInfo } from './BoxSelectionList';
 import type { ArrayItemType } from '@azzapp/shared/arrayHelpers';
 import type { ColorValue } from 'react-native';
-import type { SharedValue } from 'react-native-reanimated';
 
 import type { ViewProps } from 'react-native-svg/lib/typescript/fabric/utils';
 
@@ -121,11 +118,10 @@ const StaticMediaList = ({
           tintColor={tintColor}
           height={height}
           width={width}
-          animationSharedValue={animationSharedValue}
         />
       );
     },
-    [visibleBackgroundColor, imageRatio, tintColor, animationSharedValue],
+    [visibleBackgroundColor, imageRatio, tintColor],
   );
 
   const onSelect = useCallback(
@@ -165,7 +161,6 @@ type StaticMediaListItemProps = {
   tintColor: ColorValue | string;
   width: number;
   height: number;
-  animationSharedValue: SharedValue<number>;
 };
 
 const StaticMediaListItem = ({
@@ -175,14 +170,7 @@ const StaticMediaListItem = ({
   tintColor,
   width,
   height,
-  animationSharedValue,
 }: StaticMediaListItemProps) => {
-  const animationProps = useAnimatedProps(() => {
-    return {
-      progress: animationSharedValue.value,
-    };
-  }, [animationSharedValue]);
-
   return (
     <View
       style={[
@@ -205,18 +193,6 @@ const StaticMediaListItem = ({
           backgroundUri={item.smallURI}
           patternColor={tintColor}
           backgroundOpacity={1}
-        />
-      ) : item?.kind === 'lottie' ? (
-        <CoverLottiePlayer
-          src={item.smallURI}
-          tintColor={tintColor as string}
-          animatedProps={animationProps}
-          hardwareAccelerationAndroid
-          style={{
-            height: '100%',
-            backgroundColor,
-            aspectRatio: imageRatio,
-          }}
         />
       ) : item?.kind === 'png' ? (
         <Image

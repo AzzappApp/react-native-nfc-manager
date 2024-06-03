@@ -48,6 +48,7 @@ export const swapColor = <T extends string | null | undefined>(
     | null
     | undefined,
 ): T | string => {
+  'worklet';
   if (!colorPalette) {
     colorPalette = DEFAULT_COLOR_PALETTE;
   }

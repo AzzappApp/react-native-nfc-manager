@@ -10,7 +10,7 @@ const CoverEditorDeleteTool = () => {
 
   const onDeletePress = useCallback(() => {
     dispatch({
-      type: 'DELETE',
+      type: 'DELETE_CURRENT_LAYER',
     });
   }, [dispatch]);
 

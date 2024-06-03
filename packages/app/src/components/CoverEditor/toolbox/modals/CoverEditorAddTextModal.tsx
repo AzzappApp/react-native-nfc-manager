@@ -148,7 +148,7 @@ const AddTextModalItem = ({
       type: 'ADD_TEXT_LAYER',
       payload: {
         text: 'Title 01',
-        style: { ...style, textAlign: 'justify' },
+        style: { ...style, textAlign: 'left' },
       },
     });
     onClose();

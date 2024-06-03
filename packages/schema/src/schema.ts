@@ -3,7 +3,6 @@ import { applyMiddleware } from 'graphql-middleware';
 import { applyDirectiveSchemaTransform, directivesTypeDefs } from '#directives';
 import permissions from '#permission';
 import { typeDefs } from '#/__generated__/types';
-import * as CardCoverResolvers from './CardCoverResolvers';
 import * as CardModuleResolvers from './CardModuleResolvers';
 import * as CardStyleResolvers from './CardStyleResolvers';
 import * as CardTemplateResolvers from './CardTemplateResolver';
@@ -30,7 +29,6 @@ import type { Resolvers } from './__generated__/types';
 import type { GraphQLContext, Loaders } from './GraphQLContext';
 
 const resolvers: Resolvers = {
-  ...CardCoverResolvers,
   ...CardModuleResolvers,
   ...CardStyleResolvers,
   ...ColorPaletteResolvers,

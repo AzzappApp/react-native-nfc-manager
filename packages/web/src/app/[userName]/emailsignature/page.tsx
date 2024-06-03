@@ -21,8 +21,8 @@ const EmailSignature = async ({ params }: EmailSignatureProps) => {
     return notFound();
   }
 
-  const media = await (webCard.coverData?.mediaId
-    ? getMediasByIds([webCard.coverData.mediaId]).then(([media]) => media)
+  const media = await (webCard.coverMediaId
+    ? getMediasByIds([webCard.coverMediaId]).then(([media]) => media)
     : null);
 
   const profile = await getProfileByUserName(userName);

@@ -47,7 +47,6 @@ type StaticMedia {
   id: ID!
   uri(width: Float, pixelRatio: Float): String!
   kind: StaticMediaKind!
-  usage: StaticMediaUsage!
   resizeMode: StaticMediaResizeMode!
 }
 
@@ -55,13 +54,6 @@ type StaticMedia {
 enum StaticMediaKind {
   svg
   png
-  lottie
-}
-
-enum StaticMediaUsage {
-  coverBackground
-  coverForeground
-  moduleBackground
 }
 
 enum StaticMediaResizeMode {

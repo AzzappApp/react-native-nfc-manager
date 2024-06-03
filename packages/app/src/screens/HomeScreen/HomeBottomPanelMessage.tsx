@@ -41,9 +41,7 @@ const HomeBottomPanelMessage = ({
         webCard {
           userName
           cardIsPublished
-          cardCover {
-            segmented #segmented is the only mandatory field in a card Cover
-          }
+          hasCover
           owner {
             email
             phoneNumber
@@ -67,7 +65,7 @@ const HomeBottomPanelMessage = ({
         return { type: 'transfert', profile };
       } else if (profile.invited) {
         return { type: 'invitation', profile };
-      } else if (!profile.webCard?.cardCover) {
+      } else if (!profile.webCard?.hasCover) {
         return { type: 'cover', profile };
       } else if (!profile.webCard?.cardIsPublished) {
         return { type: 'publish', profile };

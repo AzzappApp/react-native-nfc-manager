@@ -1,10 +1,12 @@
-import type {
-  Animation,
-  MEDIA_ANIMATIONS,
-} from '#components/CoverRenderer/MediaAnimator';
 import type { EditionParameters, Filter } from '#helpers/mediaEditions';
 import type { MediaVideo, MediaImage, TimeRange } from '#helpers/mediaHelpers';
-import type { SkImage, SkShader } from '@shopify/react-native-skia';
+import type { Animation, MEDIA_ANIMATIONS } from './coverDrawer/mediaAnimation';
+import type {
+  SkImage,
+  SkPoint,
+  SkRect,
+  SkShader,
+} from '@shopify/react-native-skia';
 import type { ShadowStyleIOS } from 'react-native';
 
 export type CoverEditorState = {
@@ -17,6 +19,7 @@ export type CoverEditorState = {
   medias: MediaInfo[];
   template: TemplateInfo | null;
   coverTransition: CoverEditorTransition | null;
+  backgroundColor: string | null;
 
   // Resources used for displaying/updating the cover
   images: Record<string, SkImage>;
@@ -46,7 +49,7 @@ export type MediaInfoVideo = MediaInfoBase & {
 
 export type MediaInfoImage = MediaInfoBase & {
   media: MediaImage;
-  animation: MEDIA_ANIMATIONS;
+  animation: MEDIA_ANIMATIONS | null;
   duration: number;
 };
 
@@ -59,6 +62,7 @@ export type CoverLayerType =
   | 'mediaEdit'
   | 'overlay'
   | 'text'
+  | 'textEdit'
   | null;
 
 export type CoverTextLayerStyle = {
@@ -71,12 +75,12 @@ export type CoverTextLayerStyle = {
 export type CoverEditorTextLayerItem = {
   text: string;
   style: CoverTextLayerStyle;
+  position: SkPoint;
+  width: number;
+  rotation: number;
 };
 
-//TODO IMPROVE Type
-export type CoverEditorFilterItem = string | null;
-
-export type CoverEditorOverlayItem = MediaInfoBase & {
+export type CoverEditorOverlayItem = {
   media: MediaImage;
   style: {
     borderRadius: number;
@@ -86,7 +90,10 @@ export type CoverEditorOverlayItem = MediaInfoBase & {
     elevation: number;
   };
   animation: Animation;
-  editionParameters: EditionParameters | null;
+  filter?: Filter | null;
+  editionParameters?: EditionParameters | null;
+  bounds: SkRect;
+  rotation: number;
 };
 
 export type CoverEditorSocialLink = {

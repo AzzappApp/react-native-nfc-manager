@@ -51,9 +51,7 @@ const HomeBottomPanel = ({
             id
             userName
             cardIsPublished
-            cardCover {
-              title
-            }
+            hasCover
             webCardCategory {
               id
             }
@@ -81,7 +79,7 @@ const HomeBottomPanel = ({
     const res =
       profiles?.map(profile => {
         if (!profile) return 0;
-        return profile?.webCard?.cardCover != null &&
+        return profile?.webCard?.hasCover &&
           profile?.webCard?.cardIsPublished &&
           !profile?.invited &&
           !profile.promotedAsOwner

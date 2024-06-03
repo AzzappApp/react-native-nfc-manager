@@ -1,3 +1,6 @@
+import ReactNativeBlobUtil from 'react-native-blob-util';
+import { createId } from './idHelpers';
+
 /**
  * Get file name from path
  * @param path - file path
@@ -16,3 +19,9 @@ export const getFileName = (path: string) => {
 export const isFileURL = (url: string) => {
   return url.startsWith('file://');
 };
+
+/**
+ * Create random file path with given extension in the cache directory
+ */
+export const createRandomFilePath = (ext: string) =>
+  `${ReactNativeBlobUtil.fs.dirs.CacheDir}/${createId()}.${ext}`;

@@ -1,21 +1,23 @@
 import { useMemo } from 'react';
 import { graphql, usePaginationFragment } from 'react-relay';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
-import type { useTemplateCover_coverTemplates$key } from '#relayArtifacts/useTemplateCover_coverTemplates.graphql';
+import type { useCoverTemplates_coverTemplates$key } from '#relayArtifacts/useCoverTemplates_coverTemplates.graphql';
 
-export function useTemplateCover(key: useTemplateCover_coverTemplates$key) {
+export function useCoverTemplates(
+  key: useCoverTemplates_coverTemplates$key | null,
+) {
   const { data, refetch, isLoadingPrevious, isLoadingNext, loadNext, hasNext } =
     usePaginationFragment(
       graphql`
-        fragment useTemplateCover_coverTemplates on Profile
-        @refetchable(queryName: "useTemplateCover_coverTemplates_Query")
+        fragment useCoverTemplates_coverTemplates on Profile
+        @refetchable(queryName: "useCoverTemplates_coverTemplates_Query")
         @argumentDefinitions(
           after: { type: String }
           first: { type: Int, defaultValue: 2 }
           tagId: { type: ID, defaultValue: null }
         ) {
           coverTemplates(tagId: $tagId, first: $first, after: $after)
-            @connection(key: "useTemplateCover_connection_coverTemplates") {
+            @connection(key: "useCoverTemplates_connection_coverTemplates") {
             edges {
               node {
                 id

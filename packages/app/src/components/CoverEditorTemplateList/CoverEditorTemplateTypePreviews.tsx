@@ -7,15 +7,17 @@ import PressableNative from '#ui/PressableNative';
 import Text from '#ui/Text';
 import type { ListRenderItemInfo } from 'react-native';
 
-type Props = {
+type CoverEditorTemplateTypePreviewsProps = {
   label: string;
   previews: TemplateTypePreview[];
   onSelect: (preview: TemplateTypePreview) => void;
 };
 
-export const CoverEditorTemplateTypePreviews = (props: Props) => {
-  const { label, previews, onSelect } = props;
-
+export const CoverEditorTemplateTypePreviews = ({
+  label,
+  previews,
+  onSelect,
+}: CoverEditorTemplateTypePreviewsProps) => {
   const renderItem = useCallback(
     ({ item }: ListRenderItemInfo<TemplateTypePreview>) => {
       return (

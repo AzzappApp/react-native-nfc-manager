@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { type StyleProp, type ViewStyle } from 'react-native';
+import { KeyboardProvider } from 'react-native-keyboard-controller';
 import Animated, {
   Easing,
   runOnJS,
@@ -114,7 +115,9 @@ const WizardTransitioner = ({
             width={width}
             height={contentHeight}
           >
-            {element}
+            {/* if we don't enclose the element in another KeyboardProvider,
+               the Animations seems to be "eaten" by the ScreenContainer */}
+            <KeyboardProvider statusBarTranslucent>{element}</KeyboardProvider>
           </TransitionScreen>
         ))}
       </ScreenContainer>

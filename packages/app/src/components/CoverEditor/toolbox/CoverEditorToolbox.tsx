@@ -17,8 +17,8 @@ import CoverEditorOverlayToolbox from './CoverEditorOverlayToolbox';
 import CoverEditorTextToolbox from './CoverEditorTextToolbox';
 import CoverEditorAddOverlay from './modals/CoverEditorAddOverlay';
 import CoverEditorAddTextModal from './modals/CoverEditorAddTextModal';
+import type { TemplateTypePreview } from '#components/CoverEditorTemplateList';
 import type { CoverEditorToolbox_profile$key } from '#relayArtifacts/CoverEditorToolbox_profile.graphql';
-import type { TemplateTypePreview } from '../templateList/CoverEditorTemplateTypePreviews';
 
 type CoverEditorToolboxProps = {
   profile: CoverEditorToolbox_profile$key;
@@ -179,7 +179,10 @@ const CoverEditorToolbox = ({
   const textEditLayerStyle = useAnimatedStyle(() => {
     // translation is less consumin that resizing direclty the height and will better match upmitt recommendation
     const translation = withTiming(
-      coverEditorState.layerMode === 'text' ? 0 : TOOLBOX_SECTION_HEIGHT,
+      coverEditorState.layerMode === 'text' ||
+        coverEditorState.layerMode === 'textEdit'
+        ? 0
+        : TOOLBOX_SECTION_HEIGHT,
       { duration: 500 },
     );
     return {

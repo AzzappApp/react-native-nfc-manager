@@ -30,17 +30,36 @@ export function coverEditorReducer(
     case 'ADD_TEXT_LAYER':
       return {
         ...state,
-        textLayers: [...state.textLayers, payload],
+        textLayers: [
+          ...state.textLayers,
+          {
+            ...payload,
+            width: 0.4,
+            position: { x: 0.3, y: 0.5 },
+            rotation: 0,
+          },
+        ],
         selectedLayerIndex: state.textLayers.length,
         layerMode: 'text',
       };
     case 'CHANGE_ALIGNMENT':
-      if (selectedTextLayerIndex === null) return state;
-      textLayers[selectedTextLayerIndex].style.textAlign = payload.alignment;
-
+      if (selectedTextLayerIndex === null) {
+        return state;
+      }
       return {
         ...state,
-        textLayers,
+        textLayers: textLayers.map((layer, index) => {
+          if (index === selectedTextLayerIndex) {
+            return {
+              ...layer,
+              style: {
+                ...layer.style,
+                textAlign: payload.alignment,
+              },
+            };
+          }
+          return layer;
+        }),
       };
     case 'CHANGE_FONT_SIZE':
       if (state.layerMode === 'links') {
@@ -117,27 +136,39 @@ export function coverEditorReducer(
         ...state,
         textLayers,
       };
-    case 'DELETE':
-      if (state.layerMode === 'links') {
-        return {
-          ...state,
-          linksLayer: {
-            ...state.linksLayer,
-            links: [],
-          },
-        };
+    case 'DELETE_CURRENT_LAYER':
+      switch (state.layerMode) {
+        case 'overlay':
+          return state.overlayLayer
+            ? {
+                ...state,
+                layerMode: null,
+                overlayLayer: null,
+              }
+            : state;
+        case 'text':
+          if (selectedTextLayerIndex !== null) {
+            textLayers.splice(selectedTextLayerIndex, 1);
+
+            return {
+              ...state,
+              layerMode: null,
+              textLayers,
+            };
+          }
+          return state;
+        case 'links':
+          return {
+            ...state,
+            layerMode: null,
+            linksLayer: {
+              ...state.linksLayer,
+              links: [],
+            },
+          };
+        default:
+          return state;
       }
-
-      if (selectedTextLayerIndex !== null) {
-        textLayers.splice(selectedTextLayerIndex, 1);
-
-        return {
-          ...state,
-          textLayers,
-        };
-      }
-
-      return state;
     //#Region OverlayLayer
     case 'ADD_OVERLAY_LAYER':
       const totalDuration = state.medias.reduce(
@@ -157,6 +188,13 @@ export function coverEditorReducer(
             elevation: 0,
           },
           animation: { id: 'none', start: 0, duration: totalDuration }, //define this value based on total
+          bounds: {
+            x: 0.25,
+            y: 0.25,
+            width: 0.5,
+            height: 0.5,
+          },
+          rotation: 0,
           filter: null,
           editionParameters: null,
         },
@@ -298,13 +336,6 @@ export function coverEditorReducer(
         return state;
       }
     }
-    case 'DELETE_OVERLAY_LAYER':
-      if (state.overlayLayer == null) return state;
-      return {
-        ...state,
-        overlayLayer: null,
-        layerMode: null,
-      };
     case 'UPDATE_LINKS':
       return {
         ...state,
@@ -404,6 +435,60 @@ export function coverEditorReducer(
           }
         }),
       };
+    case 'UPDATE_OVERLAY_BOUNDS': {
+      const { bounds, rotation } = payload;
+      if (state.overlayLayer) {
+        return {
+          ...state,
+          overlayLayer: {
+            ...state.overlayLayer,
+            bounds,
+            rotation,
+          },
+        };
+      }
+      return state;
+    }
+    case 'UPDATE_TEXT_SIZE': {
+      const { index, fontSize, position, rotation, width } = payload;
+      if (textLayers[index]) {
+        return {
+          ...state,
+          textLayers: [
+            ...textLayers.slice(0, index),
+            {
+              ...textLayers[index],
+              style: {
+                ...textLayers[index].style,
+                fontSize,
+              },
+              position,
+              width,
+              rotation,
+            },
+            ...textLayers.slice(index + 1),
+          ],
+        };
+      }
+      return state;
+    }
+    case 'UPDATE_TEXT': {
+      const { index, text } = payload;
+      if (textLayers[index]) {
+        return {
+          ...state,
+          textLayers: [
+            ...textLayers.slice(0, index),
+            {
+              ...textLayers[index],
+              text,
+            },
+            ...textLayers.slice(index + 1),
+          ],
+        };
+      }
+      return state;
+    }
     case 'LOADING_START':
       return {
         ...state,

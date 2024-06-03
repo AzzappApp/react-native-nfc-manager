@@ -43,8 +43,8 @@ const ProfilePage = async ({ params }: ProfilePageProps) => {
   const [posts, modules, media] = await Promise.all([
     getProfilesPostsWithTopComment(webCard.id, 5, 0),
     getCardModules(webCard.id),
-    webCard.coverData?.mediaId
-      ? getMediasByIds([webCard.coverData.mediaId]).then(([media]) => media)
+    webCard.coverMediaId
+      ? getMediasByIds([webCard.coverMediaId]).then(([media]) => media)
       : null,
   ]);
 
@@ -67,7 +67,7 @@ const ProfilePage = async ({ params }: ProfilePageProps) => {
   const cardColors = webCard.cardColors ?? DEFAULT_COLOR_PALETTE;
 
   const cardBackgroundColor = swapColor(
-    webCard.coverData?.backgroundColor ?? cardColors.light,
+    webCard.coverBackgroundColor ?? cardColors.light,
     cardColors,
   );
   let lastModuleBackgroundColor = cardBackgroundColor;
@@ -97,7 +97,7 @@ const ProfilePage = async ({ params }: ProfilePageProps) => {
       media={media}
       cover={
         <>
-          <CoverRendererBackground media={media} webCard={webCard} />
+          <CoverRendererBackground media={media} />
           <div
             className={styles.coverContainer}
             style={{

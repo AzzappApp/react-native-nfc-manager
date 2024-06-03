@@ -103,9 +103,7 @@ const WebCardScreenContent = ({
         ...WebCardBackgroundPreview_webCard
         ...PreviewModal_webCard
         ...LoadCardTemplateModal_webCard
-        cardCover {
-          backgroundColor
-        }
+        coverBackgroundColor
         cardColors {
           primary
           dark
@@ -295,7 +293,7 @@ const WebCardScreenContent = ({
   );
 
   const coverBackgroundColor =
-    swapColor(webCard.cardCover?.backgroundColor, webCard.cardColors) ??
+    swapColor(webCard.coverBackgroundColor, webCard.cardColors) ??
     webCard.cardColors?.light ??
     colors.white;
 

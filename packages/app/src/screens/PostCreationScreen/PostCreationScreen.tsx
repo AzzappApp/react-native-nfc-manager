@@ -200,7 +200,7 @@ const PostCreationScreen = ({
           uri: `file://${path}`,
           type:
             mime.lookup(fileName) ||
-            (kind === 'image' ? 'image/jpeg' : 'video/quicktime'),
+            (kind === 'image' ? 'image/jpeg' : 'video/mp4'),
         };
 
         const { uploadURL, uploadParameters } = await uploadSign({

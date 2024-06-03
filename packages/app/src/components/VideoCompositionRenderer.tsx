@@ -1,6 +1,6 @@
 import { Canvas, Skia } from '@shopify/react-native-skia';
 import { SkiaViewApi } from '@shopify/react-native-skia/lib/module/views/api';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo } from 'react';
 import { PixelRatio, type ViewProps } from 'react-native';
 import { useFrameCallback, useSharedValue } from 'react-native-reanimated';
 import { __RNSkiaVideoPrivateAPI } from '@azzapp/react-native-skia-video';
@@ -25,16 +25,6 @@ const VideoCompositionRenderer = ({
   style,
   ...props
 }: VideoCompositionRendererProps) => {
-  const [ready, setReady] = useState(false);
-  useEffect(() => {
-    const timeout = setTimeout(() => {
-      setReady(true);
-    }, 100);
-    return () => {
-      clearTimeout(timeout);
-    };
-  }, []);
-
   const framesExtractor = useMemo(() => {
     if (composition) {
       return __RNSkiaVideoPrivateAPI.createVideoCompositionFramesExtractor(
@@ -54,10 +44,10 @@ const VideoCompositionRenderer = ({
   }, [framesExtractor]);
 
   useEffect(() => {
-    if (framesExtractor && ready) {
+    if (framesExtractor) {
       framesExtractor.play();
     }
-  }, [framesExtractor, ready]);
+  }, [framesExtractor]);
 
   const nativeId = useSharedValue<number | null>(null);
   const skiaViewRef = useCallback(
@@ -69,30 +59,34 @@ const VideoCompositionRenderer = ({
   const pixelRatio = PixelRatio.get();
   useFrameCallback(() => {
     'worklet';
-    if (!framesExtractor || !nativeId.value || !ready) {
+    if (!framesExtractor || !nativeId.value) {
       return;
     }
 
     const currentTime = framesExtractor.currentTime;
     const frames = framesExtractor.decodeCompositionFrames();
-    SkiaViewApi.callJsiMethod(
-      nativeId.value,
-      'renderToCanvas',
-      (canvas: SkCanvas) => {
-        canvas.clear(Skia.Color('#00000000'));
-        if (!composition) {
-          return;
-        }
-        drawFrame({
-          canvas,
-          width: width * pixelRatio,
-          height: height * pixelRatio,
-          currentTime,
-          frames,
-          videoComposition: composition,
-        });
-      },
-    );
+    try {
+      SkiaViewApi.callJsiMethod(
+        nativeId.value,
+        'renderToCanvas',
+        (canvas: SkCanvas) => {
+          canvas.clear(Skia.Color('#00000000'));
+          if (!composition) {
+            return;
+          }
+          drawFrame({
+            canvas,
+            width: width * pixelRatio,
+            height: height * pixelRatio,
+            currentTime,
+            frames,
+            videoComposition: composition,
+          });
+        },
+      );
+    } catch {
+      // sometimes the canvas is not ready yet
+    }
   }, true);
 
   return (

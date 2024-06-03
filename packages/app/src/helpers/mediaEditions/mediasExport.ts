@@ -6,7 +6,7 @@ import {
 } from '@shopify/react-native-skia';
 import ReactNativeBlobUtil from 'react-native-blob-util';
 import { exportVideoComposition } from '@azzapp/react-native-skia-video';
-import { createId } from '#helpers/idHelpers';
+import { createRandomFilePath } from '#helpers/fileHelpers';
 import { getVideoLocalPath } from '#helpers/mediaHelpers';
 import { getLutShader } from './LUTFilters';
 import {
@@ -143,6 +143,3 @@ export const saveTransformedVideoToFile = async ({
   );
   return outPath;
 };
-
-const createRandomFilePath = (ext: string) =>
-  `${ReactNativeBlobUtil.fs.dirs.CacheDir}/${createId()}.${ext}`;

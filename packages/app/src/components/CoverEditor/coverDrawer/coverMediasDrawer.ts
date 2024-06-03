@@ -6,30 +6,14 @@ import {
 } from '#helpers/mediaEditions';
 import { mediaInfoIsImage } from '../coverEditorHelpers';
 import coverTransitions from './coverTransitions';
-import type { CoverEditorState } from '../coverEditorTypes';
-import type { VideoFrame } from '@azzapp/react-native-skia-video';
-import type { SkCanvas, SkImage, SkShader } from '@shopify/react-native-skia';
+import type { CoverDrawerOptions } from './types';
+import type { SkShader } from '@shopify/react-native-skia';
 
-type BaseDrawerOptions = {
-  canvas: SkCanvas;
-  currentTime: number;
-  width: number;
-  height: number;
-};
-
-type CoverDrawerOptions = BaseDrawerOptions & {
-  cover: CoverEditorState;
-  frames: Record<string, VideoFrame>;
-  images: Record<string, SkImage | null>;
-  lutShaders: Record<string, SkShader>;
-  videoScales: Record<string, number>;
-};
-
-const coverDrawer = ({
+const coverMediasDrawer = ({
   canvas,
   width,
   height,
-  cover,
+  coverEditorState: { coverTransition, medias },
   currentTime,
   images,
   lutShaders,
@@ -39,11 +23,11 @@ const coverDrawer = ({
   'worklet';
   let duration = 0;
   const { duration: transitionDuration, drawer: transitionDrawer } =
-    coverTransitions[cover.coverTransition ?? 'none'] ?? coverTransitions.none;
+    coverTransitions[coverTransition ?? 'none'] ?? coverTransitions.none;
 
-  for (let i = 0; i < cover.medias.length; i++) {
-    const mediaInfo = cover.medias[i];
-    const isLast = i === cover.medias.length - 1;
+  for (let i = 0; i < medias.length; i++) {
+    const mediaInfo = medias[i];
+    const isLast = i === medias.length - 1;
     const isFirst = i === 0;
 
     let mediaDuration: number;
@@ -130,4 +114,4 @@ const coverDrawer = ({
   }
 };
 
-export default coverDrawer;
+export default coverMediasDrawer;

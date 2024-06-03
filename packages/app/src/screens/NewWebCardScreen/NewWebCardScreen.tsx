@@ -28,6 +28,7 @@ import Icon from '#ui/Icon';
 import Text from '#ui/Text';
 import CardEditionStep from './CardEditionStep';
 import CoverEditionStep from './CoverEditionStep';
+import CoverTemplateSelectionStep from './CoverTemplateSelectionStep';
 import PagerHeader, { PAGER_HEADER_HEIGHT } from './PagerHeader';
 import WebCardForm from './WebCardForm';
 import WebCardKinStep from './WebCardKindStep';
@@ -36,12 +37,14 @@ import type {
   CardTemplateItem,
   CardTemplateListHandle,
 } from '#components/CardTemplateList';
+import type { TemplateTypePreview } from '#components/CoverEditorTemplateList';
 import type { RelayScreenProps } from '#helpers/relayScreen';
 import type { NewWebCardScreenPreloadQuery } from '#relayArtifacts/NewWebCardScreenPreloadQuery.graphql';
 import type { NewWebCardScreenQuery } from '#relayArtifacts/NewWebCardScreenQuery.graphql';
 import type { NewWebCardScreenWithWebCardQuery } from '#relayArtifacts/NewWebCardScreenWithWebCardQuery.graphql';
 import type { NewWebCardRoute } from '#routes';
 import type { ProfileFormHandle } from './WebCardForm';
+import type { ColorPaletteColor } from '@azzapp/shared/cardHelpers';
 
 const newWebCardScreenQuery = graphql`
   query NewWebCardScreenQuery {
@@ -130,7 +133,7 @@ export const NewWebCardScreen = ({
   const [currentStepIndex, setCurrentStepIndex] = useState(webCardInfo ? 2 : 0);
 
   const next = useCallback(() => {
-    setCurrentStepIndex(page => Math.min(page + 1, 4));
+    setCurrentStepIndex(page => Math.min(page + 1, 5));
   }, [setCurrentStepIndex]);
 
   const prev = useCallback(() => {
@@ -162,10 +165,6 @@ export const NewWebCardScreen = ({
   // #endregion
 
   // #region Card creation
-  const onCoverSaved = useCallback(() => {
-    next();
-  }, [next]);
-
   const onCoverTemplateApplied = useCallback(() => {
     router.replace({
       route: 'WEBCARD',
@@ -189,10 +188,27 @@ export const NewWebCardScreen = ({
   const onSubmitProfileForm = () => {
     webCardFormRef.current?.onSubmit();
   };
+
+  const [coverTemplate, setCoverTemplate] = useState<{
+    template: TemplateTypePreview | null;
+    backgroundColor: ColorPaletteColor | null;
+  } | null>(null);
+
+  const onCoverTemplateSelected = useCallback(
+    (template: {
+      template: TemplateTypePreview | null;
+      backgroundColor: ColorPaletteColor | null;
+    }) => {
+      setCoverTemplate(template);
+      next();
+    },
+    [next],
+  );
+
   const [canSave, setCanSave] = useState(false);
   const coverEditionRef = useRef<any>(null);
   const onCoverEditionRef = () => {
-    coverEditionRef.current?.save();
+    coverEditionRef.current?.save().then(next);
   };
 
   const webCardTemplateRef = useRef<CardTemplateListHandle>(null);
@@ -270,6 +286,30 @@ export const NewWebCardScreen = ({
       rightElementWidth: 80,
     },
     {
+      title: intl.formatMessage({
+        defaultMessage: 'Select a cover template',
+        description: 'Cover template selection screen title',
+      }),
+      element:
+        webCardInfo != null && currentStepIndex === 2 ? (
+          <CoverTemplateSelectionStep
+            profileId={webCardInfo.profileId}
+            height={contentHeight}
+            onTemplateSelected={onCoverTemplateSelected}
+            ref={coverEditionRef}
+          />
+        ) : null,
+      backIcon: 'arrow_down' as const,
+      rightElement: (
+        <NextHeaderButton
+          style={{ width: 70, marginRight: 10 }}
+          onPress={onCoverEditionRef}
+          disabled={!canSave}
+        />
+      ),
+      rightElementWidth: 80,
+    },
+    {
       title:
         webCardKind === 'personal' ? (
           intl.formatMessage({
@@ -296,12 +336,13 @@ export const NewWebCardScreen = ({
           </View>
         ),
       element:
-        webCardInfo != null && currentStepIndex === 2 ? (
+        webCardInfo != null && coverTemplate && currentStepIndex === 3 ? (
           <CoverEditionStep
             profileId={webCardInfo.profileId}
             height={contentHeight}
             setCanSave={setCanSave}
-            onCoverSaved={onCoverSaved}
+            coverTemplatePreview={coverTemplate.template}
+            backgroundColor={coverTemplate.backgroundColor}
             ref={coverEditionRef}
           />
         ) : null,
@@ -403,7 +444,7 @@ const NewProfileScreenFallback = () => {
   return (
     <Container style={{ flex: 1, paddingTop: insets.top }}>
       <PagerHeader
-        nbPages={4}
+        nbPages={5}
         currentPage={0}
         onBack={onBack}
         title=""

@@ -67,6 +67,7 @@ import { SourceSansPro_400Regular } from '@expo-google-fonts/source-sans-pro';
 import { Ultra_400Regular } from '@expo-google-fonts/ultra';
 import { WaterBrush_400Regular } from '@expo-google-fonts/water-brush';
 import { YesevaOne_400Regular } from '@expo-google-fonts/yeseva-one';
+import { useFonts as useRNSkiaFonts } from '@shopify/react-native-skia';
 import { useFonts } from 'expo-font';
 import type { ApplicationFonts } from '@azzapp/shared/fontHelpers';
 
@@ -132,6 +133,14 @@ const fontMap: Record<ApplicationFonts, any> = {
 
 const useApplicationFonts = () => {
   return useFonts(fontMap);
+};
+
+export const useSkiaApplicationFonts = () => {
+  return useRNSkiaFonts(
+    Object.fromEntries(
+      Object.entries(fontMap).map(([font, source]) => [font, [source]]),
+    ),
+  );
 };
 
 export default useApplicationFonts;

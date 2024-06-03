@@ -34,6 +34,7 @@ export const cropDataForAspectRatio = (
   mediaHeight: number,
   aspectRatio: number,
 ): CropData => {
+  'worklet';
   if (mediaWidth / mediaHeight > aspectRatio) {
     return {
       originX: (mediaWidth - mediaHeight * aspectRatio) / 2,

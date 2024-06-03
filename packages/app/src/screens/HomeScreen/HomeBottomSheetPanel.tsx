@@ -64,9 +64,7 @@ const HomeBottomSheetPanel = ({
           id
           userName
           cardIsPublished
-          cardCover {
-            segmented #segmented is the only mandatory field in a card Cover
-          }
+          hasCover
         }
         invited
       }
@@ -220,7 +218,7 @@ const HomeBottomSheetPanel = ({
         profileRole &&
         !profile?.invited &&
         isAdmin(profileRole) &&
-        profile?.webCard.cardCover
+        profile?.webCard.hasCover
           ? {
               type: 'row',
               icon: 'shared_webcard',

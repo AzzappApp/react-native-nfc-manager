@@ -239,11 +239,7 @@ const ItemRenderComponent = ({
           id
           isMultiUser
           userName
-          cardCover {
-            media {
-              id
-            }
-          }
+          hasCover
           ...CoverLink_webCard
           ...CoverRenderer_webCard
         }
@@ -252,7 +248,7 @@ const ItemRenderComponent = ({
     item as HomeProfilesCarouselItem_profile$key,
   );
 
-  const [ready, setReady] = useState(!profile?.webCard?.cardCover);
+  const [ready, setReady] = useState(!profile?.webCard?.hasCover);
   const [loadingFailed, setLoadingFailed] = useState(false);
   const onReady = useCallback(() => {
     setReady(true);
@@ -346,7 +342,7 @@ const ItemRenderComponent = ({
             tintColor={colors.white}
           />
         </View>
-      ) : profile.webCard.cardCover?.media?.id != null ? (
+      ) : profile.webCard.hasCover ? (
         <View style={styles.coverLinkWrapper}>
           <CoverLink
             webCard={profile.webCard}

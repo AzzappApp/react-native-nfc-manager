@@ -8,14 +8,14 @@ import useToggle from '#hooks/useToggle';
 import BottomSheetModal from '#ui/BottomSheetModal';
 import Text from '#ui/Text';
 import ToolBoxSection from '#ui/ToolBoxSection';
+import { useCoverTransitionOrdonned } from '../coverDrawer/coverTransitions';
 import { useCoverEditorContext } from '../CoverEditorContext';
-import { useCoverTransitionOrdonned } from '../drawing/coverTransitions';
 import CoverEditorSelectionList, {
   BORDER_RADIUS_RATIO,
   BOX_WIDTH,
 } from './CoverEditorSelectionList';
+import type { TransitionListItem } from '../coverDrawer/coverTransitions';
 import type { CoverEditorTransition } from '../coverEditorTypes';
-import type { TransitionListItem } from '../drawing/coverTransitions';
 
 const CoverEditorTransitionTool = () => {
   const [show, toggleBottomSheet] = useToggle(false);

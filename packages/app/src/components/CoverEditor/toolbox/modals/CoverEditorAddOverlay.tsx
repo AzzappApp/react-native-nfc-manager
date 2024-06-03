@@ -15,10 +15,10 @@ const CoverEditorAddOverlay = ({ open, onClose }: Props) => {
     dispatch({
       type: 'ADD_OVERLAY_LAYER',
       payload: {
+        kind: 'image',
         uri: param.uri,
         width: param.width,
         height: param.height,
-        kind: 'image',
       },
     });
 

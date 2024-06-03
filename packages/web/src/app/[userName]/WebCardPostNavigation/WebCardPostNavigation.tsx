@@ -82,7 +82,7 @@ const ProfilePostNavigation = (props: WebCardPostNavigationProps) => {
         <button
           className={styles.coverContainer}
           onClick={onClickCover}
-          aria-label={`Go to top of ${webCard.coverTitle} ${webCard.coverSubTitle} webCard`}
+          aria-label={`Go to top of WebCard`}
         >
           <CoverRenderer
             width={40}

@@ -10,7 +10,12 @@ import {
 } from './EditionParameters';
 import { applyLutFilter } from './LUTFilters';
 import type { VideoFrame } from '@azzapp/react-native-skia-video';
-import type { SkImage, SkMatrix, SkShader } from '@shopify/react-native-skia';
+import type {
+  Matrix4,
+  SkImage,
+  SkMatrix,
+  SkShader,
+} from '@shopify/react-native-skia';
 
 export const transformImage = ({
   image,
@@ -23,7 +28,7 @@ export const transformImage = ({
   lutShader,
 }: {
   image: SkImage;
-  localMatrix?: SkMatrix | null;
+  localMatrix?: Matrix4 | SkMatrix | null;
   imageWidth?: number;
   imageHeight?: number;
   width: number;

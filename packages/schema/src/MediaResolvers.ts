@@ -220,8 +220,6 @@ const getStaticMediaKind = (staticMedia: StaticMediaResolverBaseType) => {
   const id = getStaticMediaId(staticMedia);
   if (id.startsWith('s:')) {
     return 'svg';
-  } else if (id.startsWith('l:')) {
-    return 'lottie';
   }
   return 'png';
 };
@@ -252,9 +250,5 @@ export const StaticMedia: StaticMediaResolvers = {
   resizeMode: async (staticMedia, _, { loaders }) =>
     getActualStaticMedia(staticMedia, loaders.StaticMedia).then(
       staticMedia => staticMedia?.resizeMode ?? 'cover',
-    ),
-  usage: async (staticMedia, _, { loaders }) =>
-    getActualStaticMedia(staticMedia, loaders.StaticMedia).then(
-      staticMedia => staticMedia?.usage ?? 'moduleBackground',
     ),
 };

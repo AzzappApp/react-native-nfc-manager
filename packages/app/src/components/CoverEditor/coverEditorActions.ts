@@ -1,6 +1,6 @@
-import type { Animation } from '#components/CoverRenderer/MediaAnimator';
 import type { EditionParameters, Filter } from '#helpers/mediaEditions';
 import type { MediaImage, Media } from '#helpers/mediaHelpers';
+import type { Animation } from './coverDrawer/mediaAnimation';
 import type {
   CoverEditorOverlayItem,
   CoverEditorSocialLink,
@@ -8,7 +8,12 @@ import type {
   CoverLayerType,
   CoverTextLayerStyle,
 } from './coverEditorTypes';
-import type { SkImage, SkShader } from '@shopify/react-native-skia';
+import type {
+  SkImage,
+  SkPoint,
+  SkRect,
+  SkShader,
+} from '@shopify/react-native-skia';
 import type { ShadowStyleIOS } from 'react-native';
 
 export type SelectLayerAction = {
@@ -60,8 +65,8 @@ export type DuplicateAction = {
   payload?: undefined;
 };
 
-export type DeleteAction = {
-  type: 'DELETE';
+export type DeleteCurrentLayerAction = {
+  type: 'DELETE_CURRENT_LAYER';
   payload?: undefined;
 };
 
@@ -110,14 +115,36 @@ export type UpdateMediaEditionParameters = {
   payload: EditionParameters | null;
 };
 
-/**
- * Action to delete the overlya layer
- * @property {CoverEditorActionType} type
- * @property {CoverLayerType} payload
- */
-export type UpdateOverlayLayerDeleteAction = {
-  type: 'DELETE_OVERLAY_LAYER';
-  payload?: undefined;
+export type UpdateLayerFilterAction = {
+  type: 'UPDATE_LAYER_FILTER';
+  payload: Filter | null;
+};
+
+export type UpdateOverlayBoundsAction = {
+  type: 'UPDATE_OVERLAY_BOUNDS';
+  payload: {
+    bounds: SkRect;
+    rotation: number;
+  };
+};
+
+export type UpdateTextSizeAction = {
+  type: 'UPDATE_TEXT_SIZE';
+  payload: {
+    index: number;
+    position: SkPoint;
+    width: number;
+    fontSize: number;
+    rotation: number;
+  };
+};
+
+export type UpdateTextAction = {
+  type: 'UPDATE_TEXT';
+  payload: {
+    index: number;
+    text: string;
+  };
 };
 //#endregion
 
@@ -163,6 +190,7 @@ export type LoadingErrorAction = {
     error: any;
   };
 };
+
 // #endregion
 
 export type CoverEditorAction =
@@ -172,7 +200,7 @@ export type CoverEditorAction =
   | ChangeFontColorAction
   | ChangeFontFamilyAction
   | ChangeFontSizeAction
-  | DeleteAction
+  | DeleteCurrentLayerAction
   | DuplicateAction
   | LoadingErrorAction
   | LoadingStartAction
@@ -187,5 +215,7 @@ export type CoverEditorAction =
   | UpdateMediaFilterAction
   | UpdateMediasAction
   | UpdateMediasTransitionAction
+  | UpdateOverlayBoundsAction
   | UpdateOverlayLayerAction
-  | UpdateOverlayLayerDeleteAction;
+  | UpdateTextAction
+  | UpdateTextSizeAction;

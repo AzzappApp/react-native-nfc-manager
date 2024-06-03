@@ -47,9 +47,21 @@ type WebCard implements Node {
   """
   cardColors: CardColors
   """
-  The webCard cover
+  Wether the WebCard has a cover
   """
-  cardCover: CardCover
+  hasCover: Boolean!
+  """
+  The webCard cover media
+  """
+  coverMedia: Media
+  """
+  The webCard cover texts
+  """
+  coverTexts: [String!]
+  """
+  The webCard cover background color
+  """
+  coverBackgroundColor: String
   """
   the webCard style
   """

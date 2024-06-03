@@ -22,8 +22,8 @@ const getCoverUrl = (userName: string, size: number, updatedAt: Date) =>
 export const buildApplePass = async (profileId: string, locale: string) => {
   const res = await getProfileWithWebCardById(profileId);
   if (res) {
-    const [media] = res.WebCard.coverData?.mediaId
-      ? await getMediasByIds([res.WebCard.coverData?.mediaId])
+    const [media] = res.WebCard.coverMediaId
+      ? await getMediasByIds([res.WebCard.coverMediaId])
       : [];
 
     const thumbnails: Record<string, Buffer> = {};

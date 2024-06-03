@@ -12,11 +12,6 @@ import type {
   CommonInformation,
   ContactCard,
 } from '@azzapp/shared/contactCardHelpers';
-import type {
-  TextOrientation,
-  TextPosition,
-  TextStyle,
-} from '@azzapp/shared/coverHelpers';
 import type { InferInsertModel, InferSelectModel } from 'drizzle-orm';
 
 export const WebCardTable = cols.table(
@@ -68,35 +63,19 @@ export const WebCardTable = cols.table(
       .default(DEFAULT_DATETIME_VALUE),
 
     /* Covers infos */
-    coverTitle: cols.defaultVarchar('coverTitle'),
-    coverSubTitle: cols.defaultVarchar('coverSubTitle'),
-    coverData: cols.json('coverData').$type<{
-      kind: 'others' | 'people' | 'video' | null;
-      titleStyle: TextStyle;
-      subTitleStyle: TextStyle;
-      textOrientation: TextOrientation;
-      textPosition: TextPosition;
-      textAnimation?: string | null;
-      backgroundId?: string | null;
-      backgroundColor?: string | null;
-      backgroundPatternColor?: string | null;
-      foregroundId?: string | null;
-      foregroundColor?: string | null;
-      sourceMediaId: string | null;
-      maskMediaId?: string | null;
-      mediaFilter?: string | null;
-      mediaAnimation?: string | null;
-      mediaParameters?: Record<string, any> | null;
-      mediaId?: string | null;
-      segmented: boolean;
-    }>(),
+    coverMediaId: cols.mediaId('coverMediaId'),
+    coverTexts: cols.json('coverTexts').$type<string[]>(),
+    coverBackgroundColor: cols.defaultVarchar('coverBackgroundColor'),
 
+    /* Social medias infos */
     nbFollowers: cols.int('nbFollowers').default(0).notNull(),
     nbFollowings: cols.int('nbFollowings').default(0).notNull(),
     nbPosts: cols.int('nbPosts').default(0).notNull(),
     nbPostsLiked: cols.int('nbPostsLiked').default(0).notNull(), // this is the informations postLiked
     nbLikes: cols.int('nbLikes').default(0).notNull(), //this is the stats TotalLikes (number of likes received)
     nbWebCardViews: cols.int('nbWebCardViews').default(0).notNull(),
+
+    /* Deletion infos */
     deleted: cols.boolean('deleted').default(false).notNull(),
     deletedAt: cols.dateTime('deletedAt'),
     deletedBy: cols.cuid('deletedBy'),

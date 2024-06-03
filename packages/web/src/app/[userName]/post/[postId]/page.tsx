@@ -46,8 +46,8 @@ const PostPage = async (props: PostPageProps) => {
     ? await getPostCommentsWithWebCard(post.id, 5)
     : [];
 
-  const [media] = author?.coverData?.mediaId
-    ? await getMediasByIds([author.coverData.mediaId])
+  const [media] = author?.coverMediaId
+    ? await getMediasByIds([author.coverMediaId])
     : [];
 
   if (post && author && author.userName !== userName) {

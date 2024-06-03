@@ -2,21 +2,25 @@ import { fromGlobalId } from 'graphql-relay';
 import { useCallback, useMemo, useState } from 'react';
 import { FlatList, View } from 'react-native';
 import { graphql, useFragment } from 'react-relay';
-import { useTemplateCover } from '#hooks/useTemplateCover';
 import Separation from '#ui/Separation';
 import { CoverEditorTemplateTypePreviews } from './CoverEditorTemplateTypePreviews';
 import CoverTemplateScratchStarters from './CoverTemplateScratchStarter';
 import CoverTemplateTagSelector from './CoverTemplateTagSelector';
-import type { CoverTemplatePreviewItem } from '#hooks/useTemplateCover';
+import {
+  useCoverTemplates,
+  type CoverTemplatePreviewItem,
+} from './useCoverTemplates';
 import type { CoverEditorTemplateList_profile$key } from '#relayArtifacts/CoverEditorTemplateList_profile.graphql';
-import type { useTemplateCover_coverTemplates$key } from '#relayArtifacts/useTemplateCover_coverTemplates.graphql';
 import type { TemplateTypePreview } from './CoverEditorTemplateTypePreviews';
+import type { ColorPaletteColor } from '@azzapp/shared/cardHelpers';
 import type { ListRenderItemInfo } from 'react-native';
 
 export type CoverEditorProps = {
   profile: CoverEditorTemplateList_profile$key;
-  coverTemplates: useTemplateCover_coverTemplates$key;
-  onSelectCoverTemplatePreview: (preview?: TemplateTypePreview | null) => void;
+  onSelectCoverTemplatePreview: (args: {
+    template: TemplateTypePreview | null;
+    backgroundColor: ColorPaletteColor | null;
+  }) => void;
 };
 
 const keyExtractor = ([coverTemplateTypeId]: [
@@ -26,24 +30,49 @@ const keyExtractor = ([coverTemplateTypeId]: [
 
 const CoverEditorTemplateList = ({
   profile: profileKey,
-  coverTemplates: coverTemplatesKey,
   onSelectCoverTemplatePreview,
 }: CoverEditorProps) => {
   const [tag, setTag] = useState<string | null>(null);
 
-  const { coverTemplateTags, coverTemplateTypes } = useFragment(
-    graphql`
-      fragment CoverEditorTemplateList_profile on Profile {
-        coverTemplateTags {
-          ...CoverTemplateTagSelector_tags
+  const { coverTemplateTags, coverTemplateTypes, webCard, coverTemplates } =
+    useFragment(
+      graphql`
+        fragment CoverEditorTemplateList_profile on Profile {
+          coverTemplateTags {
+            ...CoverTemplateTagSelector_tags
+          }
+          coverTemplateTypes {
+            id
+            label
+          }
+          webCard {
+            cardColors {
+              light
+              dark
+              primary
+            }
+          }
+          ...useCoverTemplates_coverTemplates @alias(as: "coverTemplates")
         }
-        coverTemplateTypes {
-          id
-          label
-        }
-      }
-    `,
-    profileKey,
+      `,
+      profileKey,
+    );
+
+  const onColorSelect = useCallback(
+    (color: ColorPaletteColor) => {
+      onSelectCoverTemplatePreview({
+        template: null,
+        backgroundColor: color,
+      });
+    },
+    [onSelectCoverTemplatePreview],
+  );
+
+  const onTemplateSelect = useCallback(
+    (template: TemplateTypePreview) => {
+      onSelectCoverTemplatePreview({ template, backgroundColor: null });
+    },
+    [onSelectCoverTemplatePreview],
   );
 
   const {
@@ -52,7 +81,7 @@ const CoverEditorTemplateList = ({
     isLoadingPrevious,
     isLoadingNext,
     loadNext,
-  } = useTemplateCover(coverTemplatesKey);
+  } = useCoverTemplates(coverTemplates);
 
   const data = useMemo(() => {
     return Object.entries(templateCovers);
@@ -77,11 +106,11 @@ const CoverEditorTemplateList = ({
           key={typeId}
           label={label ?? 'Label'}
           previews={previews}
-          onSelect={onSelectCoverTemplatePreview}
+          onSelect={onTemplateSelect}
         />
       );
     },
-    [coverTemplateTypes, onSelectCoverTemplatePreview],
+    [coverTemplateTypes, onTemplateSelect],
   );
 
   const onRefresh = useCallback(() => {
@@ -109,7 +138,8 @@ const CoverEditorTemplateList = ({
       />
       <Separation small style={{ marginTop: 10 }} />
       <CoverTemplateScratchStarters
-        onSelectCoverTemplatePreview={onSelectCoverTemplatePreview}
+        onColorSelect={onColorSelect}
+        cardColors={webCard?.cardColors}
       />
       <FlatList
         testID="cover-editor-template-list"

@@ -4,8 +4,7 @@ import { Platform, StyleSheet, View } from 'react-native';
 import { useFragment } from 'react-relay';
 import { swapColor } from '@azzapp/shared/cardHelpers';
 import { getModuleDataValues } from '@azzapp/shared/cardModuleHelpers';
-import { COVER_BASE_WIDTH, COVER_RATIO } from '@azzapp/shared/coverHelpers';
-import { MediaImageRenderer } from '#components/medias';
+import { COVER_RATIO } from '@azzapp/shared/coverHelpers';
 import CoverRendererFragment from '#relayArtifacts/CoverRenderer_webCard.graphql';
 import CoverRenderer from './CoverRenderer';
 import type { ModuleRenderInfo } from '#components/cardModules/CardModuleRenderer';
@@ -35,12 +34,10 @@ const CoverRendererPreviewDesktop = ({
   firstModule,
   ...props
 }: CoverRendererPreviewDesktopProps) => {
-  const { cardCover, cardColors } =
+  const { coverMedia, cardColors } =
     useFragment(CoverRendererFragment, coverKey) ?? {};
 
-  const { media, background, backgroundPatternColor } = cardCover ?? {};
-
-  const { __typename, uri, thumbnail } = media ?? {};
+  const { __typename, uri, thumbnail } = coverMedia ?? {};
 
   const mediaUri = __typename === 'MediaVideo' ? thumbnail : uri;
   const moduleData = firstModule?.data
@@ -49,7 +46,7 @@ const CoverRendererPreviewDesktop = ({
 
   return (
     <View {...props} style={[style, styles.wrapper]}>
-      {background && (
+      {/* {background && (
         <MediaImageRenderer
           testID="CoverRenderer_background"
           source={{
@@ -60,7 +57,7 @@ const CoverRendererPreviewDesktop = ({
           tintColor={swapColor(backgroundPatternColor, cardColors)}
           style={styles.layer}
         />
-      )}
+      )} */}
       <Image
         style={StyleSheet.absoluteFill}
         source={{ uri: mediaUri }}
