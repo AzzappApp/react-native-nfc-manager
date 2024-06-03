@@ -45,7 +45,8 @@
         <data android:scheme="http" />
         <data android:scheme="https" />
         <data android:host="@string/azzapp_domain" />
-        <data android:pathPattern=".*[^emailSignature].*" />
+        <data android:pathPattern="/[^/]*" />
+        <data android:pathPattern="/[^/]*/post/.*" />
       </intent-filter>
     </activity>
   </application>
