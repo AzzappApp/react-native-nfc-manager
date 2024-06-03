@@ -3,6 +3,7 @@ import { NextResponse } from 'next/server';
 import { withAxiom } from 'next-axiom';
 import { getProfileWithWebCardById, getUserById } from '@azzapp/data';
 import { getTextColor } from '@azzapp/shared/colorsHelpers';
+import { COVER_RATIO } from '@azzapp/shared/coverHelpers';
 import ERRORS from '@azzapp/shared/errors';
 import { getImageURLForSize } from '@azzapp/shared/imagesHelpers';
 import serializeAndSignContactCard from '@azzapp/shared/serializeAndSignContactCard';
@@ -11,11 +12,13 @@ import { formatDisplayName } from '@azzapp/shared/stringHelpers';
 import { buildEmailSignatureGenerationUrl } from '@azzapp/shared/urlHelpers';
 import { buildAvatarUrl } from '#helpers/avatar';
 import cors from '#helpers/cors';
+import { buildCoverImageUrl } from '#helpers/cover';
 import { getSessionData } from '#helpers/tokens';
 import type { NextRequest } from 'next/server';
 
+const COVER_WIDTH = 630;
+
 sgMail.setApiKey(process.env.SENDGRID_API_KEY!);
-const PUBLIC_URL = process.env.NEXT_PUBLIC_URL!; // replace with ngrok for dev
 const SENDGRIP_NOREPLY_SENDER = process.env.SENDGRIP_NOREPLY_SENDER!;
 const generateEmailSignature = async (req: NextRequest) => {
   try {
@@ -34,9 +37,12 @@ const generateEmailSignature = async (req: NextRequest) => {
       return new Response('Invalid request', { status: 400 });
     }
 
-    const webCardUrl = `${PUBLIC_URL}/api/cover/${
-      res.WebCard?.userName
-    }?width=${630}&updatedAt=${res.WebCard?.updatedAt.toISOString()}`;
+    const webCardUrl = await buildCoverImageUrl(res.WebCard, {
+      width: COVER_WIDTH,
+      height: COVER_WIDTH / COVER_RATIO,
+      crop: 'fit',
+    });
+
     const avatarUrl = await buildAvatarUrl(res.Profile, null);
     const { data, signature } = await serializeAndSignEmailSignature(
       res.WebCard.userName,
@@ -60,7 +66,6 @@ const generateEmailSignature = async (req: NextRequest) => {
       string,
       Array<{ mail: string }> | Array<{ number: string }> | string
     > = {
-      webCardUrl,
       linkUrl: buildEmailSignatureGenerationUrl(
         res.WebCard.userName,
         data,
@@ -69,6 +74,11 @@ const generateEmailSignature = async (req: NextRequest) => {
         contactCardSignature,
       ),
     };
+
+    if (webCardUrl) {
+      mailParam.webCardUrl = webCardUrl;
+    }
+
     const displayName = formatDisplayName(
       res?.Profile?.contactCard?.firstName,
       res?.Profile?.contactCard?.lastName,

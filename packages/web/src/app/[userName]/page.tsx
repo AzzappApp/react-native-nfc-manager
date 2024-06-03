@@ -17,9 +17,11 @@ import {
   MODULES_STYLES_VALUES,
   getModuleDataValues,
 } from '@azzapp/shared/cardModuleHelpers';
+import { COVER_RATIO } from '@azzapp/shared/coverHelpers';
 import CoverRenderer from '#components/renderer/CoverRenderer';
 import CoverRendererBackground from '#components/renderer/CoverRenderer/CoverRendererBackground';
 import ModuleRenderer from '#components/renderer/ModuleRenderer';
+import { buildCoverImageUrl } from '#helpers/cover';
 import { getMetaData } from '#helpers/seo';
 import { cachedGetWebCardByUserName } from './dataAccess';
 import styles from './WebCardPage.css';
@@ -142,29 +144,38 @@ export default ProfilePage;
 
 export const dynamic = 'force-static';
 
+const COVER_WIDTH = 630;
+
 export async function generateMetadata({
   params,
 }: ProfilePageProps): Promise<Metadata> {
   const userName = params.userName.toLowerCase();
   const webCard = await cachedGetWebCardByUserName(userName);
 
-  const imageUrl = `${process.env.NEXT_PUBLIC_URL}api/cover/${
-    params.userName
-  }?width=${630}&updatedAt=${webCard?.updatedAt.toISOString()}`;
-
-  const twitterCard = `${process.env.NEXT_PUBLIC_URL}api/cover/${
-    params.userName
-  }?width=${630}&height=${630}&updatedAt=${webCard?.updatedAt.toISOString()}`;
+  const [imageUrl, twitterCard] = webCard
+    ? await Promise.all([
+        buildCoverImageUrl(webCard, {
+          width: COVER_WIDTH,
+          height: COVER_WIDTH / COVER_RATIO,
+          crop: 'fit',
+        }),
+        buildCoverImageUrl(webCard, {
+          width: COVER_WIDTH,
+          height: COVER_WIDTH,
+          crop: 'fill',
+        }),
+      ])
+    : [null, null];
 
   const meta = getMetaData({
     url: params.userName,
     title: capitalize(params.userName),
-    ogImage: imageUrl,
+    ogImage: imageUrl ?? undefined,
     description: `${params.userName} | Azzapp WebCard`,
     other: {
       twitter: {
         card: 'summary_large_image',
-        images: twitterCard,
+        images: twitterCard ?? undefined,
       },
     },
   });
