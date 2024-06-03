@@ -1,5 +1,6 @@
-## 0.5.15-canary.70
+## 0.5.15-canary.71
 
+* **feat:**  - **cover:** remove cover api with new cover ([#3565](https://github.com/AzzappApp/azzapp/pull/3565))
 * **feat:**  - **CoverEdition:** basic functional cover editor ([#3563](https://github.com/AzzappApp/azzapp/pull/3563))
 * **feat:**  - apply effet properly ([#3556](https://github.com/AzzappApp/azzapp/pull/3556))
 * **fix:**  - **user:** check validation result ([#3554](https://github.com/AzzappApp/azzapp/pull/3554))
