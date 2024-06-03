@@ -1,5 +1,6 @@
-## 0.5.15-canary.74
+## 0.5.15-canary.75
 
+* **feat:**  - allow to share the cover video directly ([#3572](https://github.com/AzzappApp/azzapp/pull/3572))
 * **fix:**  - **android:** [#3435](https://github.com/AzzappApp/azzapp/pull/3435) try another pathPattern ([#3571](https://github.com/AzzappApp/azzapp/pull/3571))
 * **feat:**  - use lottie ([#3557](https://github.com/AzzappApp/azzapp/pull/3557))
 * **feat:**  - all link to webcard around emial signature logo ([#3567](https://github.com/AzzappApp/azzapp/pull/3567))
