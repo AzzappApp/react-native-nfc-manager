@@ -449,6 +449,9 @@ const icons = {
   get video() {
     return require('./assets/video.png');
   },
+  get video_film() {
+    return require('./assets/video_film.png');
+  },
   get vignetting() {
     return require('./assets/vignetting.png');
   },

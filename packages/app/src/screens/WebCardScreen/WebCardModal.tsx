@@ -2,7 +2,9 @@ import * as Sentry from '@sentry/react-native';
 import { useCallback } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { View, useWindowDimensions, Share, Platform } from 'react-native';
+import ReactNativeBlobUtil from 'react-native-blob-util';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import ShareCommand from 'react-native-share';
 import Toast from 'react-native-toast-message';
 import { graphql, useFragment } from 'react-relay';
 import { useDebouncedCallback } from 'use-debounce';
@@ -79,6 +81,10 @@ const WebCardModal = ({
         nbFollowers
         nbFollowings
         cardIsPublished
+        coverMedia {
+          __typename
+          uriDownload: uri(width: 1080, pixelRatio: 1)
+        }
         webCardModal_isFollowing: isFollowing(webCardId: $viewerWebCardId)
         ...CoverRenderer_webCard
       }
@@ -128,11 +134,39 @@ const WebCardModal = ({
           }),
         },
       );
-      //TODO: handle result of the share when specified
     } catch (error: any) {
       Sentry.captureException(error);
     }
   };
+
+  const onShareCoverVideo = useCallback(async () => {
+    if (!webCard.coverMedia?.uriDownload) {
+      return null;
+    }
+    try {
+      //download the coverurl locally
+      const dirs = ReactNativeBlobUtil.fs.dirs;
+      const localPath = await ReactNativeBlobUtil.config({
+        fileCache: true,
+        path: `${dirs.CacheDir}/${webCard.userName}_{}.${webCard.coverMedia.__typename === 'MediaVideo' ? 'mp4' : 'png'}`,
+      }).fetch('GET', webCard.coverMedia.uriDownload);
+
+      await ShareCommand.open({
+        url: `file://${localPath.path()}`,
+        type:
+          webCard.coverMedia.__typename === 'MediaVideo'
+            ? 'video/mp4'
+            : 'image/png',
+        failOnCancel: true,
+      });
+    } catch (error: any) {
+      Sentry.captureException(error);
+    }
+  }, [
+    webCard.coverMedia?.__typename,
+    webCard.coverMedia?.uriDownload,
+    webCard.userName,
+  ]);
 
   const debouncedToggleFollowing = useDebouncedCallback(() => {
     onToggleFollow(webCard.id, webCard.userName, !isFollowing);
@@ -220,7 +254,7 @@ const WebCardModal = ({
 
   return (
     <BottomSheetModal
-      height={Math.min(600, windowsHeight - top + 50)}
+      height={Math.min(650, windowsHeight - top + 50)}
       visible={visible}
       onRequestClose={close}
       contentContainerStyle={styles.bottomSheetContentContainer}
@@ -330,10 +364,28 @@ const WebCardModal = ({
                   <Text>
                     <FormattedMessage
                       defaultMessage="Share this Webcard{azzappA}"
-                      description="Profile webcard modal - Share thie Webcard"
+                      description="Profile webcard modal - Share this Webcard"
                       values={{
                         azzappA: <Text variant="azzapp">a</Text>,
                       }}
+                    />
+                  </Text>
+                </View>
+              </View>
+            </PressableNative>
+          )}
+          {isViewer && webCard.cardIsPublished && (
+            <PressableNative
+              style={styles.bottomSheetOptionButton}
+              onPress={onShareCoverVideo}
+            >
+              <View style={styles.bottomSheetOptionContainer}>
+                <View style={styles.bottomSheetOptionIconLabel}>
+                  <Icon icon="video_film" />
+                  <Text>
+                    <FormattedMessage
+                      defaultMessage="Share this cover video"
+                      description="Profile webcard modal - Share this video"
                     />
                   </Text>
                 </View>
