@@ -502,7 +502,9 @@ export function buildCardSignature(
     }
   }
   if (companyLogo) {
-    card += `<img style="margin-top:15px; height: 60px; object-fit: contain;" src="${companyLogo}" />`;
+    card += `<a href="${url}" rel=“noopener” noreferrer target=“_blank”  style="text-decoration: unset !important;">
+      <img style="margin-top:15px; height: 60px; object-fit: contain;" src="${companyLogo}" />
+    </a>`;
   }
   card += `</td>
       </tr>
