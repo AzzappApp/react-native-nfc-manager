@@ -78,32 +78,26 @@ const HomeInformations = ({
   const nbFollowings = useSharedValue('-1');
 
   //using profiles object directly in animatedReaction causes error animatedHost(seems to be the case for all relay query result)
+  const currentIndex = Math.round(currentProfileIndexSharedValue.value);
+  useEffect(() => {
+    nbPosts.value = format(nbPostsValue[currentIndex]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentIndex, nbPostsValue]);
 
   useEffect(() => {
-    const currentIndex = Math.round(currentProfileIndexSharedValue.value);
-    if (nbPosts.value === '-1') {
-      nbPosts.value = format(nbPostsValue[currentIndex]);
-    }
-    if (nbLikes.value === '-1') {
-      nbLikes.value = format(nbLikesValue[currentIndex]);
-    }
-    if (nbFollowings.value === '-1') {
-      nbFollowings.value = format(nbFollowingsValue[currentIndex]);
-    }
-    if (nbFollowers.value === '-1') {
-      nbFollowers.value = format(nbFollowersValue[currentIndex]);
-    }
-  }, [
-    currentProfileIndexSharedValue.value,
-    nbFollowers,
-    nbFollowersValue,
-    nbFollowings,
-    nbFollowingsValue,
-    nbLikes,
-    nbLikesValue,
-    nbPosts,
-    nbPostsValue,
-  ]);
+    nbLikes.value = format(nbLikesValue[currentIndex]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentIndex, nbLikesValue]);
+
+  useEffect(() => {
+    nbFollowings.value = format(nbFollowingsValue[currentIndex]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentIndex, nbFollowingsValue]);
+
+  useEffect(() => {
+    nbFollowers.value = format(nbFollowersValue[currentIndex]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentIndex, nbFollowersValue]);
 
   const inputRange = useMemo(
     () => _.range(0, profiles?.length),
@@ -173,6 +167,10 @@ const HomeInformations = ({
 
   return (
     <View style={[styles.container, { height }]}>
+      {/* // TODO remove this is a test for prod only trying to fix data not updated correclty from relay */}
+      <Text style={{ color: colors.white }}>
+        {nbFollowersValue[currentIndex]} - {nbPostsValue[currentIndex]}
+      </Text>
       <View style={styles.row}>
         <PressableOpacity style={styles.square} onPress={goToPosts}>
           <AnimatedText variant="xlarge" text={nbPosts} appearance="dark" />
