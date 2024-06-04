@@ -216,7 +216,7 @@ const ReportPage = async ({
                     key={media}
                     component="img"
                     height={400}
-                    image={getImageURLForSize(media)}
+                    image={getImageURLForSize({ id: media })}
                   />
                 ),
               )}

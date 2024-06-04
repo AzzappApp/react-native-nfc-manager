@@ -12,7 +12,7 @@ const CLOUDINARY_BASE_URL = `https://res.cloudinary.com/${CLOUDINARY_CLOUDNAME}`
 export const getCloudinaryAssetURL = (
   id: string,
   kind: 'image' | 'raw' | 'video',
-  extension?: 'jpg' | 'mp4' | 'svg' | 'webp',
+  extension?: 'jpg' | 'mp4' | 'png' | 'svg' | 'webp',
 ) => {
   assetNotRN('getCloudinaryAssetURL');
   const ext = extension ? `.${extension}` : '';
@@ -30,6 +30,15 @@ export const getImageURL = (id: string) => {
   return assembleCloudinaryUrl(decodeMediaId(id), 'image', resizeTransforms());
 };
 
+export type UrLForSizeParam = {
+  id: string;
+  width?: number | null;
+  height?: number | null;
+  pixelRatio?: number | null;
+  pregeneratedSizes?: number[] | null;
+  extension?: string | null;
+};
+
 /**
  * Helpers used to create cloudinary url for an image given cloudinary id and size parameters
  *
@@ -39,14 +48,14 @@ export const getImageURL = (id: string) => {
  * @param pixelRatio the desired pixeld density - default 1
  * @returns the url of a transformed image
  */
-export const getImageURLForSize = (
-  id: string,
-  width?: number | null,
-  height?: number | null,
-  pixelRatio: number | null = 1,
-  pregeneratedSizes?: number[] | null,
-  extension?: string | null,
-) => {
+export const getImageURLForSize = ({
+  id,
+  width,
+  height,
+  pixelRatio = 1,
+  pregeneratedSizes,
+  extension,
+}: UrLForSizeParam) => {
   assetNotRN('getImageURLForSize');
   id = decodeMediaId(id);
   const transforms = resizeTransforms(
@@ -83,15 +92,15 @@ export const getVideoURL = (id: string) => {
  * @param pixelRatio the desired pixeld density - default 1
  * @returns the url of a transformed video
  */
-export const getVideoUrlForSize = (
-  id: string,
-  width?: number | null,
-  height?: number | null,
-  pixelRatio?: number | null,
-  pregeneratedSizes?: number[] | null,
-  extension?: string | null,
+export const getVideoUrlForSize = ({
+  id,
+  width,
+  height,
+  pixelRatio = 1,
+  pregeneratedSizes,
+  extension,
   streaming = false,
-) => {
+}: UrLForSizeParam & { streaming?: boolean }) => {
   assetNotRN('getVideoUrlForSize');
   id = decodeMediaId(id);
   if (streaming) {
@@ -115,13 +124,13 @@ export const getVideoUrlForSize = (
  * @param aspectRatio the desired height
  * @returns the url of a transformed imate
  */
-export const getVideoThumbnailURL = (
-  id: string,
-  width?: number | null,
-  height?: number | null,
-  pixelRatio: number | null = 1,
-  pregeneratedSizes?: number[] | null,
-) => {
+export const getVideoThumbnailURL = ({
+  id,
+  width,
+  height,
+  pixelRatio = 1,
+  pregeneratedSizes,
+}: UrLForSizeParam) => {
   assetNotRN('getVideoThumbnailURL');
   id = decodeMediaId(id);
   const transforms = resizeTransforms(

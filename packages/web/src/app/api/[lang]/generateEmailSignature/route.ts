@@ -135,11 +135,11 @@ const generateEmailSignature = async (req: NextRequest) => {
 
     // Company Logo
     if (res.WebCard.logoId != null || res.Profile.logoId != null) {
-      mailParam.companyUrl = getImageURLForSize(
-        res.WebCard.logoId ?? (res.Profile.logoId as string),
-        null,
-        140,
-      );
+      mailParam.companyUrl = getImageURLForSize({
+        id: res.WebCard.logoId ?? (res.Profile.logoId as string),
+        height: 140,
+        extension: 'png',
+      });
     }
     const userEmail = await getUserById(userId);
 

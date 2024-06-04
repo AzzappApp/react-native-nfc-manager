@@ -166,7 +166,7 @@ const uriResolver =
                 ? POST_IMAGES_SIZES
                 : POST_VIDEO_SIZES
               : null;
-    return uriGenerator(
+    return uriGenerator({
       id,
       width,
       height,
@@ -175,7 +175,7 @@ const uriResolver =
       extension,
       // @ts-expect-error streaming is not in the getImageURLForSize signature
       streaming,
-    );
+    });
   };
 
 export const MediaImage: MediaImageResolvers = {
@@ -231,16 +231,17 @@ export const StaticMedia: StaticMediaResolvers = {
     const cloudinaryId = decodeMediaId(getStaticMediaId(staticMedia));
     const kind = getStaticMediaKind(staticMedia);
     if (kind === 'png') {
-      return getImageURLForSize(
-        cloudinaryId,
+      return getImageURLForSize({
+        id: cloudinaryId,
         width,
-        undefined,
+
         pixelRatio,
-        staticMedia.assetKind === 'cover'
-          ? COVER_ASSET_SIZES
-          : MODULE_IMAGES_SIZES,
-        'png',
-      );
+        pregeneratedSizes:
+          staticMedia.assetKind === 'cover'
+            ? COVER_ASSET_SIZES
+            : MODULE_IMAGES_SIZES,
+        extension: 'png',
+      });
     } else if (kind === 'svg') {
       return getCloudinaryAssetURL(cloudinaryId, 'image', 'svg');
     } else {

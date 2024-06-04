@@ -335,7 +335,7 @@ const SuggestionRenderer = ({
       {kind === 'video' ? (
         <video src={getVideoURL(mediaId)} />
       ) : (
-        <img src={getImageURLForSize(mediaId, null, 600)} />
+        <img src={getImageURLForSize({ id: mediaId, height: 600 })} />
       )}
       <ItemWithLabelSelectionList
         label="WebCard Categories"
