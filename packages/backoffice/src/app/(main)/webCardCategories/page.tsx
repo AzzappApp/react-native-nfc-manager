@@ -1,3 +1,4 @@
+import { Box, TextField, Typography } from '@mui/material';
 import { asc, desc, eq, like, or, sql, and } from 'drizzle-orm';
 import { WebCardCategoryTable, db } from '@azzapp/data';
 import WebCardCategoriesList from './WebCardCategoriesList';
@@ -101,16 +102,40 @@ const ProfileCategoriesPage = async ({ searchParams = {} }: Props) => {
   const count = await getCategoriesCount(search, filters);
 
   return (
-    <WebCardCategoriesList
-      webCardCategories={webCardCategories}
-      count={count}
-      page={page}
-      pageSize={PAGE_SIZE}
-      sortField={sort}
-      sortOrder={order}
-      search={search}
-      filters={filters}
-    />
+    <Box
+      sx={{
+        display: 'flex',
+        flexDirection: 'column',
+        height: '100%',
+      }}
+    >
+      <Typography variant="h4" component="h1" sx={{ mb: 2 }}>
+        Categories
+      </Typography>
+      <TextField
+        id="note"
+        inputProps={{
+          readOnly: true,
+        }}
+        label="Note"
+        multiline
+        rows={3}
+        maxRows={4}
+        value={
+          'Categories of the WebCard are at the top level, it defines the kind of WebCard users will create.\nCategories (even disabled) are also used in the WebCard template list view in order to group different Templates types together.'
+        }
+      />
+      <WebCardCategoriesList
+        webCardCategories={webCardCategories}
+        count={count}
+        page={page}
+        pageSize={PAGE_SIZE}
+        sortField={sort}
+        sortOrder={order}
+        search={search}
+        filters={filters}
+      />
+    </Box>
   );
 };
 

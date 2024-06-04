@@ -1,3 +1,4 @@
+import { Box, TextField, Typography } from '@mui/material';
 import { asc, desc, like, or, sql } from 'drizzle-orm';
 import { CompanyActivityTypeTable, db } from '@azzapp/data';
 import CompanyActivitiesTypesList from './CompanyActivitiesTypesList';
@@ -75,15 +76,39 @@ const CompanyActivitiesTypesPage = async ({ searchParams = {} }: Props) => {
   const count = await countActivitiesTypes(search);
 
   return (
-    <CompanyActivitiesTypesList
-      companyActivitiesTypes={companyActivitiesTypes}
-      count={count}
-      page={page}
-      pageSize={PAGE_SIZE}
-      sortField={sort}
-      sortOrder={order}
-      search={search}
-    />
+    <Box
+      sx={{
+        display: 'flex',
+        flexDirection: 'column',
+        height: '100%',
+      }}
+    >
+      <Typography variant="h4" component="h1" sx={{ mb: 2 }}>
+        Activities Types
+      </Typography>
+      <TextField
+        id="note"
+        inputProps={{
+          readOnly: true,
+        }}
+        label="Note"
+        multiline
+        rows={1}
+        maxRows={3}
+        value={
+          'Activities types are used to group different activities in the activity list view'
+        }
+      />
+      <CompanyActivitiesTypesList
+        companyActivitiesTypes={companyActivitiesTypes}
+        count={count}
+        page={page}
+        pageSize={PAGE_SIZE}
+        sortField={sort}
+        sortOrder={order}
+        search={search}
+      />
+    </Box>
   );
 };
 

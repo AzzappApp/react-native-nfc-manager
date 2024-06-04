@@ -10,7 +10,6 @@ import {
   MenuItem,
   Select,
   TextField,
-  Typography,
 } from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
 import { useRouter } from 'next/navigation';
@@ -129,17 +128,7 @@ const CoverTemplateTagsList = ({
   );
 
   return (
-    <Box
-      sx={{
-        display: 'flex',
-        flexDirection: 'column',
-        height: '100%',
-      }}
-    >
-      <Typography variant="h4" component="h1" sx={{ mb: 2 }}>
-        Covers templates filters
-      </Typography>
-
+    <>
       <TextField
         margin="normal"
         name="search"
@@ -232,7 +221,7 @@ const CoverTemplateTagsList = ({
         rowSelection={false}
         sortingOrder={['asc', 'desc']}
       />
-    </Box>
+    </>
   );
 };
 

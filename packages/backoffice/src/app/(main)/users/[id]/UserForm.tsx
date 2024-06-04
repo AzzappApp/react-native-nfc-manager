@@ -10,11 +10,18 @@ import {
   Switch,
 } from '@mui/material';
 import * as Sentry from '@sentry/nextjs';
-import { useTransition } from 'react';
+import { useEffect, useState, useTransition } from 'react';
+import { useDebounce } from 'use-debounce';
 import * as ROLES from '#roles';
-import { toggleRole, removeWebcard, toggleUserActive } from './userActions';
+import {
+  toggleRole,
+  removeWebcard,
+  toggleUserActive,
+  updateNote,
+} from './userActions';
 import WebcardCover from './WebcardCover';
 import type { User, WebCard } from '@azzapp/data';
+import type { ChangeEvent } from 'react';
 
 type UserFormProps = {
   user: User;
@@ -23,6 +30,9 @@ type UserFormProps = {
 
 const UserForm = ({ user, webCards }: UserFormProps) => {
   const [loading, startTransition] = useTransition();
+  const [currentNote, setCurrentNote] = useState(user.note ?? '');
+  const [debouncedNote] = useDebounce(currentNote, 300);
+
   const onToggleRole = (role: string) => {
     startTransition(async () => {
       await toggleRole(user.id, role).catch(e => {
@@ -36,6 +46,18 @@ const UserForm = ({ user, webCards }: UserFormProps) => {
       await toggleUserActive(user.id);
     });
   };
+
+  const onNoteChange = async ({
+    target: { value },
+  }: ChangeEvent<HTMLInputElement>) => {
+    setCurrentNote(value);
+  };
+
+  useEffect(() => {
+    startTransition(async () => {
+      await updateNote(user.id, debouncedNote);
+    });
+  }, [debouncedNote, user.id]);
 
   return (
     <Box display="flex" flexDirection="column">
@@ -82,6 +104,7 @@ const UserForm = ({ user, webCards }: UserFormProps) => {
           gap: 2,
           width: '100%',
           marginTop: 2,
+          marginBottom: 2,
         }}
       >
         <TextField
@@ -103,6 +126,15 @@ const UserForm = ({ user, webCards }: UserFormProps) => {
           disabled={!user.phoneNumber}
         />
       </Box>
+      <TextField
+        id="note"
+        label="Note"
+        multiline
+        rows={4}
+        maxRows={8}
+        value={user.note}
+        onChange={onNoteChange}
+      />
       {Object.values(ROLES).map(role => (
         <FormControlLabel
           key={role}

@@ -1,13 +1,6 @@
 'use client';
 import { Search } from '@mui/icons-material';
-import {
-  Box,
-  Button,
-  Chip,
-  InputAdornment,
-  TextField,
-  Typography,
-} from '@mui/material';
+import { Box, Button, Chip, InputAdornment, TextField } from '@mui/material';
 import { useRouter } from 'next/navigation';
 import {
   useCallback,
@@ -76,16 +69,7 @@ const CardStylesList = ({
   }, [defferedSearch, page, search, sortField, sortOrder, updateSearchParams]);
 
   return (
-    <Box
-      sx={{
-        display: 'flex',
-        flexDirection: 'column',
-        height: '100%',
-      }}
-    >
-      <Typography variant="h4" component="h1" sx={{ mb: 2 }}>
-        WebCards Styles
-      </Typography>
+    <>
       <Box
         sx={{
           display: 'flex',
@@ -152,7 +136,7 @@ const CardStylesList = ({
         rowSelection={false}
         sortingOrder={['asc', 'desc']}
       />
-    </Box>
+    </>
   );
 };
 

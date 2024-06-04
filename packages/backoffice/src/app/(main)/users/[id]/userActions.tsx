@@ -211,3 +211,16 @@ export const toggleUserActive = async (userId: string) => {
 
   revalidatePath(`/users/${userId}`);
 };
+
+export const updateNote = async (userId: string, note: string) => {
+  try {
+    await updateUser(userId, {
+      note,
+    });
+  } catch (e) {
+    Sentry.captureException(e);
+    throw e;
+  }
+
+  revalidatePath(`/users/${userId}`);
+};

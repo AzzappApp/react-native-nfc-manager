@@ -37,6 +37,7 @@ export const UserTable = cols.table(
     deleted: cols.boolean('deleted').default(false).notNull(),
     deletedAt: cols.dateTime('deletedAt'),
     deletedBy: cols.cuid('deletedBy'),
+    note: cols.text('note'),
   },
   table => {
     return {

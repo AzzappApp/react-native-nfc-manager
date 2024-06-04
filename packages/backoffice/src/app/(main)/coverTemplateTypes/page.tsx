@@ -1,3 +1,4 @@
+import { Box, TextField, Typography } from '@mui/material';
 import { and, asc, desc, eq, like, or, sql } from 'drizzle-orm';
 import { CoverTemplateTable, CoverTemplateTypeTable, db } from '@azzapp/data';
 import CoverTemplateTypesList from './CoverTemplateTypesList';
@@ -113,18 +114,40 @@ const CoverTemplateTypesPage = async ({ searchParams = {} }: Props) => {
   const count = await getCoverTemplateTypesCount(search, filters);
 
   return (
-    <CoverTemplateTypesList
-      search={null}
-      count={count}
-      coverTemplateTypes={coverTemplateTypes.map((coverTemplateType, i) => ({
-        ...coverTemplateType,
-        templates: templatesCounts[i],
-      }))}
-      page={page}
-      pageSize={PAGE_SIZE}
-      sortField={sort}
-      sortOrder={order}
-    />
+    <Box
+      sx={{
+        display: 'flex',
+        flexDirection: 'column',
+        height: '100%',
+      }}
+    >
+      <Typography variant="h4" component="h1" sx={{ mb: 2 }}>
+        Covers templates types
+      </Typography>
+      <TextField
+        id="note"
+        inputProps={{
+          readOnly: true,
+        }}
+        label="Note"
+        multiline
+        rows={1}
+        maxRows={3}
+        value={'Cover filters are displayed at the top of the cover list view'}
+      />
+      <CoverTemplateTypesList
+        search={null}
+        count={count}
+        coverTemplateTypes={coverTemplateTypes.map((coverTemplateType, i) => ({
+          ...coverTemplateType,
+          templates: templatesCounts[i],
+        }))}
+        page={page}
+        pageSize={PAGE_SIZE}
+        sortField={sort}
+        sortOrder={order}
+      />
+    </Box>
   );
 };
 

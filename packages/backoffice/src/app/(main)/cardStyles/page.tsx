@@ -1,3 +1,4 @@
+import { Box, TextField, Typography } from '@mui/material';
 import { like, or, asc, desc, sql } from 'drizzle-orm';
 import { CardStyleTable, db } from '@azzapp/data';
 import CardStylesList from './CardStylesList';
@@ -68,15 +69,39 @@ const CardStylesPage = async ({ searchParams = {} }: Props) => {
   const count = await getCount(search);
 
   return (
-    <CardStylesList
-      cardStyles={cardStyles}
-      count={count}
-      page={page}
-      pageSize={PAGE_SIZE}
-      sortField={sort}
-      sortOrder={order}
-      search={search}
-    />
+    <Box
+      sx={{
+        display: 'flex',
+        flexDirection: 'column',
+        height: '100%',
+      }}
+    >
+      <Typography variant="h4" component="h1" sx={{ mb: 2 }}>
+        WebCards Styles
+      </Typography>
+      <TextField
+        id="note"
+        inputProps={{
+          readOnly: true,
+        }}
+        label="Note"
+        multiline
+        rows={1}
+        maxRows={3}
+        value={
+          'WebCard styles allows to set different parameters like border radius, title font etc... of all the WebCard'
+        }
+      />
+      <CardStylesList
+        cardStyles={cardStyles}
+        count={count}
+        page={page}
+        pageSize={PAGE_SIZE}
+        sortField={sort}
+        sortOrder={order}
+        search={search}
+      />
+    </Box>
   );
 };
 

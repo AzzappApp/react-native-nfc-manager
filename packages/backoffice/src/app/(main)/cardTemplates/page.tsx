@@ -1,3 +1,4 @@
+import { Box, TextField, Typography } from '@mui/material';
 import { eq, like, or, sql, and, asc, desc } from 'drizzle-orm';
 import { CardTemplateTable, CardTemplateTypeTable, db } from '@azzapp/data';
 import CardTemplatesList from './CardTemplatesList';
@@ -133,16 +134,40 @@ const CardTemplatesPage = async ({ searchParams = {} }: Props) => {
   );
   const count = await getCount(search, filters);
   return (
-    <CardTemplatesList
-      cardTemplates={cardTemplates}
-      count={count}
-      page={page}
-      pageSize={PAGE_SIZE}
-      sortField={sort}
-      sortOrder={order}
-      search={search}
-      filters={filters}
-    />
+    <Box
+      sx={{
+        display: 'flex',
+        flexDirection: 'column',
+        height: '100%',
+      }}
+    >
+      <Typography variant="h4" component="h1" sx={{ mb: 2 }}>
+        WebCards templates
+      </Typography>
+      <TextField
+        id="note"
+        inputProps={{
+          readOnly: true,
+        }}
+        label="Note"
+        multiline
+        rows={1}
+        maxRows={3}
+        value={
+          'WebCard templates are associated to a template type, and displayed horizontally in the “load template” view'
+        }
+      />
+      <CardTemplatesList
+        cardTemplates={cardTemplates}
+        count={count}
+        page={page}
+        pageSize={PAGE_SIZE}
+        sortField={sort}
+        sortOrder={order}
+        search={search}
+        filters={filters}
+      />
+    </Box>
   );
 };
 

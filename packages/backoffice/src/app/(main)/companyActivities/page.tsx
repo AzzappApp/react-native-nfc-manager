@@ -1,3 +1,4 @@
+import { Box, TextField, Typography } from '@mui/material';
 import { asc, desc, eq, like, or, sql } from 'drizzle-orm';
 import {
   CardTemplateTypeTable,
@@ -121,15 +122,37 @@ const CompanyActivitiesPage = async ({ searchParams = {} }: Props) => {
   const count = await countActivities(search);
 
   return (
-    <CompanyActivitiesList
-      companyActivities={companyActivities}
-      count={count}
-      page={page}
-      pageSize={PAGE_SIZE}
-      sortField={sort}
-      sortOrder={order}
-      search={search}
-    />
+    <Box
+      sx={{
+        display: 'flex',
+        flexDirection: 'column',
+        height: '100%',
+      }}
+    >
+      <Typography variant="h4" component="h1" sx={{ mb: 2 }}>
+        Activities
+      </Typography>
+      <TextField
+        id="note"
+        inputProps={{
+          readOnly: true,
+        }}
+        label="Note"
+        multiline
+        rows={1}
+        maxRows={3}
+        value={'Activities will impact the suggested media'}
+      />
+      <CompanyActivitiesList
+        companyActivities={companyActivities}
+        count={count}
+        page={page}
+        pageSize={PAGE_SIZE}
+        sortField={sort}
+        sortOrder={order}
+        search={search}
+      />
+    </Box>
   );
 };
 

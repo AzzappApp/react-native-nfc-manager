@@ -10,7 +10,6 @@ import {
   MenuItem,
   Select,
   TextField,
-  Typography,
 } from '@mui/material';
 import { useRouter } from 'next/navigation';
 import {
@@ -131,17 +130,7 @@ const WebCardCategoriesList = ({
   );
 
   return (
-    <Box
-      sx={{
-        display: 'flex',
-        flexDirection: 'column',
-        height: '100%',
-      }}
-    >
-      <Typography variant="h4" component="h1" sx={{ mb: 2 }}>
-        Categories
-      </Typography>
-
+    <>
       <Box
         sx={{
           display: 'flex',
@@ -224,7 +213,7 @@ const WebCardCategoriesList = ({
         rowSelection={false}
         sortingOrder={['asc', 'desc']}
       />
-    </Box>
+    </>
   );
 };
 

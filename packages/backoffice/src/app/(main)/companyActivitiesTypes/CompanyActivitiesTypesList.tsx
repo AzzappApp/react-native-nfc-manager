@@ -1,13 +1,7 @@
 'use client';
 
 import { Search } from '@mui/icons-material';
-import {
-  Box,
-  Button,
-  InputAdornment,
-  TextField,
-  Typography,
-} from '@mui/material';
+import { Box, Button, InputAdornment, TextField } from '@mui/material';
 import { useRouter } from 'next/navigation';
 import {
   useCallback,
@@ -76,16 +70,7 @@ const CompanyActivitiesTypesList = ({
   }, [defferedSearch, page, search, sortField, sortOrder, updateSearchParams]);
 
   return (
-    <Box
-      sx={{
-        display: 'flex',
-        flexDirection: 'column',
-        height: '100%',
-      }}
-    >
-      <Typography variant="h4" component="h1" sx={{ mb: 2 }}>
-        Activities Types
-      </Typography>
+    <>
       <Box
         sx={{
           display: 'flex',
@@ -152,7 +137,7 @@ const CompanyActivitiesTypesList = ({
         rowSelection={false}
         sortingOrder={['asc', 'desc']}
       />
-    </Box>
+    </>
   );
 };
 

@@ -11,7 +11,6 @@ import {
   MenuItem,
   Select,
   TextField,
-  Typography,
 } from '@mui/material';
 import { useRouter } from 'next/navigation';
 import {
@@ -127,16 +126,7 @@ const CardTemplateTypesList = ({
   );
 
   return (
-    <Box
-      sx={{
-        display: 'flex',
-        flexDirection: 'column',
-        height: '100%',
-      }}
-    >
-      <Typography variant="h4" component="h1" sx={{ mb: 2 }}>
-        WebCards templates types
-      </Typography>
+    <>
       <Box
         sx={{
           display: 'flex',
@@ -220,7 +210,7 @@ const CardTemplateTypesList = ({
         rowSelection={false}
         sortingOrder={['asc', 'desc']}
       />
-    </Box>
+    </>
   );
 };
 
