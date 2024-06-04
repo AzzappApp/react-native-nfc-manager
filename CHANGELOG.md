@@ -1,4 +1,4 @@
-## 0.5.15-canary.81
+## 0.5.15-canary.82
 
 * **fix:**  - 🐛 remove next button ([#3578](https://github.com/AzzappApp/azzapp/pull/3578))
 * **feat:**  - **user:** [#3558](https://github.com/AzzappApp/azzapp/pull/3558) delete user option ([#3575](https://github.com/AzzappApp/azzapp/pull/3575))
