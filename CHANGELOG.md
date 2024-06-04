@@ -1,4 +1,4 @@
-## 0.5.15-canary.76
+## 0.5.15-canary.77
 
 * **perf:**  - **post:** [#3435](https://github.com/AzzappApp/azzapp/pull/3435) try to improve performance while editing video ([#3568](https://github.com/AzzappApp/azzapp/pull/3568))
 * **fix:**  - **webCard:** [#3562](https://github.com/AzzappApp/azzapp/pull/3562) check role on cover creation ([#3569](https://github.com/AzzappApp/azzapp/pull/3569))
