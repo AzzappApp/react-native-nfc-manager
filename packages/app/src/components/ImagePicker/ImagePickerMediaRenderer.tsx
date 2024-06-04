@@ -1,11 +1,12 @@
 import isEqual from 'lodash/isEqual';
 import { useCallback, useMemo, useState } from 'react';
-import { View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { colors } from '#theme';
 import Cropper from '#components/Cropper';
 import TransformedImageRenderer from '#components/TransformedImageRenderer';
 import TransformedVideoRenderer from '#components/TransformedVideoRenderer';
 import { useImagePickerState } from './ImagePickerContext';
+import type { CropData } from '#helpers/mediaEditions';
 import type { LayoutChangeEvent } from 'react-native';
 
 type ImagePickerMediaRendererProps = {
@@ -62,21 +63,21 @@ const ImagePickerMediaRenderer = ({
       : { width: dimensions.height * aspectRatio, height: dimensions.height };
   }, [aspectRatio, dimensions]);
 
+  const onCropDataChange = useCallback(
+    (cropData: CropData) => onParameterValueChange('cropData', cropData),
+    [onParameterValueChange],
+  );
+
+  const cropperStyle = useMemo(() => {
+    return { ...imageDimensions, backgroundColor: 'black' };
+  }, [imageDimensions]);
+
   if (!media) {
     return null;
   }
 
   return (
-    <View
-      style={{
-        width: '100%',
-        height: '100%',
-        alignItems: 'center',
-        justifyContent: 'center',
-        backgroundColor: colors.grey500,
-      }}
-      onLayout={onLayout}
-    >
+    <View style={styles.container} onLayout={onLayout}>
       {imageDimensions && (
         <>
           <Cropper
@@ -88,10 +89,8 @@ const ImagePickerMediaRenderer = ({
             cropData={editionParameters.cropData}
             roll={editionParameters.roll}
             orientation={editionParameters.orientation}
-            onCropDataChange={cropData =>
-              onParameterValueChange('cropData', cropData)
-            }
-            style={{ ...imageDimensions, backgroundColor: 'black' }}
+            onCropDataChange={onCropDataChange}
+            style={cropperStyle}
           >
             {cropData =>
               media.kind === 'image' || exporting ? (
@@ -121,5 +120,15 @@ const ImagePickerMediaRenderer = ({
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    width: '100%',
+    height: '100%',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: colors.grey500,
+  },
+});
 
 export default ImagePickerMediaRenderer;

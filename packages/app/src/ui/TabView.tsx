@@ -5,12 +5,20 @@ import type { ViewProps } from 'react-native';
 export type TabViewProps = Omit<ViewProps, 'children'> & {
   currentTab: string;
   tabs: Array<{ id: string; element: ReactElement }>;
+  mountOnlyCurrentTab?: boolean;
 };
 
-const TabView = ({ tabs, currentTab, style, ...props }: TabViewProps) => (
+const TabView = ({
+  tabs,
+  currentTab,
+  style,
+  mountOnlyCurrentTab,
+  ...props
+}: TabViewProps) => (
   <View {...props} style={[{ overflow: 'hidden' }, style]}>
     {tabs.map(({ id, element }) =>
-      Platform.OS === 'android' && id !== currentTab ? null : (
+      (Platform.OS === 'android' || mountOnlyCurrentTab) &&
+      id !== currentTab ? null : (
         <View
           key={id}
           style={[

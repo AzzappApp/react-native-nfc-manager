@@ -236,6 +236,7 @@ const EditImageStep = () => {
             marginTop: 20,
             marginBottom: insetBottom + BOTTOM_MENU_HEIGHT + 15,
           }}
+          mountOnlyCurrentTab
           tabs={[
             {
               id: 'filter',
@@ -295,7 +296,6 @@ const EditImageStep = () => {
                     <View style={{ flex: 1, justifyContent: 'center' }}>
                       <VideoTimelineEditor
                         video={media}
-                        editionParameters={editionParameters}
                         aspectRatio={aspectRatio}
                         maxDuration={maxVideoDuration}
                         onChange={onTimeRangeChange}

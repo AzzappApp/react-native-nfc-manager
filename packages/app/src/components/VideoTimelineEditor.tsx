@@ -12,7 +12,7 @@ import Animated, {
 import { formatDuration } from '@azzapp/shared/stringHelpers';
 import { colors } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
-import { SKImageLoader, type EditionParameters } from '#helpers/mediaEditions';
+import { SKImageLoader } from '#helpers/mediaEditions';
 import Text from '#ui/Text';
 import type { ViewProps } from 'react-native';
 import type { PanGestureHandlerGestureEvent } from 'react-native-gesture-handler';
@@ -44,12 +44,6 @@ type VideoTimelineEditorProps = ViewProps & {
    * @type {number}
    */
   aspectRatio: number;
-  /**
-   * edition parameters
-   *
-   * @type {EditionParameters}
-   */
-  editionParameters: EditionParameters;
   /**
    * maxDuration for the edited video
    *
@@ -90,7 +84,6 @@ type VideoTimelineEditorProps = ViewProps & {
 const VideoTimelineEditor = ({
   video,
   aspectRatio,
-  editionParameters,
   maxDuration,
   width,
   imagesHeight,

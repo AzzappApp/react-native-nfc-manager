@@ -9,13 +9,8 @@ import VideoTimelineEditor from '#components/VideoTimelineEditor';
 
 const VideoTimeRangeStep = () => {
   const intl = useIntl();
-  const {
-    maxVideoDuration,
-    media,
-    aspectRatio,
-    editionParameters,
-    onTimeRangeChange,
-  } = useImagePickerState();
+  const { maxVideoDuration, media, aspectRatio, onTimeRangeChange } =
+    useImagePickerState();
 
   const { width: windowWidth } = useWindowDimensions();
 
@@ -34,7 +29,6 @@ const VideoTimeRangeStep = () => {
         <View style={{ flex: 1, justifyContent: 'center' }}>
           <VideoTimelineEditor
             video={media}
-            editionParameters={editionParameters}
             aspectRatio={aspectRatio}
             maxDuration={maxVideoDuration}
             onChange={onTimeRangeChange}

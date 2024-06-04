@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { memo, useCallback } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { useSharedValue } from 'react-native-reanimated';
 import LabeledDashedSlider from '#ui/LabeledDashedSlider';
@@ -114,7 +114,7 @@ const ImageEditionParameterControl = ({
   );
 };
 
-export default ImageEditionParameterControl;
+export default memo(ImageEditionParameterControl);
 
 const styles = StyleSheet.create({
   root: {
