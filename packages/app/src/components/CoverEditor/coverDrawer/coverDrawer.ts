@@ -8,8 +8,12 @@ import type { CoverDrawerOptions } from './types';
 const coverDrawer = (options: CoverDrawerOptions) => {
   'worklet';
   const {
-    coverEditorState: { backgroundColor },
-    cardColors,
+    coverEditorState: {
+      backgroundColor,
+      textLayers,
+      overlayLayers,
+      cardColors,
+    },
   } = options;
   if (backgroundColor) {
     options.canvas.drawColor(
@@ -17,10 +21,10 @@ const coverDrawer = (options: CoverDrawerOptions) => {
     );
   }
   coverMediasDrawer(options);
-  coverOverlayDrawer(options);
-  const {
-    coverEditorState: { textLayers },
-  } = options;
+
+  for (let i = 0; i < overlayLayers.length; i++) {
+    coverOverlayDrawer({ ...options, index: i });
+  }
   for (let i = 0; i < textLayers.length; i++) {
     coverTextDrawer({ ...options, index: i });
   }

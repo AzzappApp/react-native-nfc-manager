@@ -1,67 +1,28 @@
 import type { EditionParameters, Filter } from '#helpers/mediaEditions';
-import type { MediaImage, Media } from '#helpers/mediaHelpers';
+import type { MediaImage, Media, TimeRange } from '#helpers/mediaHelpers';
+import type { CoverTransitions } from './coverDrawer/coverTransitions';
 import type { Animation } from './coverDrawer/mediaAnimation';
 import type {
   CoverEditorOverlayItem,
   CoverEditorSocialLink,
-  CoverEditorTransition,
-  CoverLayerType,
-  CoverTextLayerStyle,
+  CoverEditionMode,
+  CoverEditorTextLayerItem,
+  CardColors,
+  MediaInfo,
 } from './coverEditorTypes';
-import type {
-  SkImage,
-  SkPoint,
-  SkRect,
-  SkShader,
-} from '@shopify/react-native-skia';
-import type { ShadowStyleIOS } from 'react-native';
+import type { SkImage, SkShader } from '@shopify/react-native-skia';
 
-export type SelectLayerAction = {
-  type: 'SELECT_LAYER';
+// #region Generic Layer Actions
+export type SetEditionModeAction = {
+  type: 'SET_EDITION_MODE';
   payload: {
-    index: number | null;
-    layerMode: CoverLayerType;
+    selectedItemIndex: number | null;
+    editionMode: CoverEditionMode;
   };
 };
 
-export type AddTextLayerAction = {
-  type: 'ADD_TEXT_LAYER';
-  payload: {
-    text: string;
-    style: CoverTextLayerStyle;
-  };
-};
-
-export type ChangeAlignmentAction = {
-  type: 'CHANGE_ALIGNMENT';
-  payload: {
-    alignment: 'center' | 'justify' | 'left' | 'right';
-  };
-};
-
-export type ChangeFontSizeAction = {
-  type: 'CHANGE_FONT_SIZE';
-  payload: {
-    fontSize: number;
-  };
-};
-
-export type ChangeFontFamilyAction = {
-  type: 'CHANGE_FONT_FAMILY';
-  payload: {
-    fontFamily: string;
-  };
-};
-
-export type ChangeFontColorAction = {
-  type: 'CHANGE_FONT_COLOR';
-  payload: {
-    fontColor: string;
-  };
-};
-
-export type DuplicateAction = {
-  type: 'DUPLICATE';
+export type DuplicateCurrentLayerAction = {
+  type: 'DUPLICATE_CURRENT_LAYER';
   payload?: undefined;
 };
 
@@ -70,27 +31,11 @@ export type DeleteCurrentLayerAction = {
   payload?: undefined;
 };
 
-//#region OverlayLayer
-export type AddOverlayLayerAction = {
-  type: 'ADD_OVERLAY_LAYER';
-  payload: MediaImage;
-};
-
-export type UpdateOverlayLayerAction = {
-  type: 'UPDATE_OVERLAY_LAYER';
-  payload: Partial<CoverEditorOverlayItem>;
-};
-
 export type UpdateLayerShadowAction = {
   type: 'UPDATE_LAYER_SHADOW';
-  payload: { shadow: ShadowStyleIOS | undefined; elevation: number };
+  payload: { enabled: boolean };
 };
 
-/**
- * Action to update the border (width, color, radius) of a layer
- * @property {CoverEditorActionType} type
- * @property {CoverLayerType} payload
- */
 export type UpdateLayerBorderAction = {
   type: 'UPDATE_LAYER_BORDER';
   payload: Partial<{
@@ -98,6 +43,19 @@ export type UpdateLayerBorderAction = {
     borderColor: string;
     borderRadius: number;
   }>;
+};
+// #endregion
+
+// #region Colors
+export type UpdateCardColorsAction = {
+  type: 'UPDATE_CARD_COLORS';
+  payload: CardColors;
+};
+
+// #region Medias
+export type UpdateMediasAction = {
+  type: 'UPDATE_MEDIAS';
+  payload: Media[];
 };
 
 export type UpdateMediaAnimationAction = {
@@ -115,59 +73,61 @@ export type UpdateMediaEditionParameters = {
   payload: EditionParameters | null;
 };
 
-export type UpdateLayerFilterAction = {
-  type: 'UPDATE_LAYER_FILTER';
-  payload: Filter | null;
+export type UpdateActiveMediaAction = {
+  type: 'UPDATE_ACTIVE_MEDIA';
+  payload: MediaInfo;
 };
 
-export type UpdateOverlayBoundsAction = {
-  type: 'UPDATE_OVERLAY_BOUNDS';
-  payload: {
-    bounds: SkRect;
-    rotation: number;
-  };
+export type UpdateMediasTransitionAction = {
+  type: 'UPDATE_MEDIA_TRANSITION';
+  payload: CoverTransitions | null;
 };
 
-export type UpdateTextSizeAction = {
-  type: 'UPDATE_TEXT_SIZE';
-  payload: {
-    index: number;
-    position: SkPoint;
-    width: number;
-    fontSize: number;
-    rotation: number;
-  };
+export type UpdateCurrentVideoTimeRangeAction = {
+  type: 'UPDATE_CURRENT_VIDEO_TIME_RANGE';
+  payload: TimeRange;
 };
 
-export type UpdateTextAction = {
-  type: 'UPDATE_TEXT';
+// #endregion
+
+// #region TextLayer
+export type AddTextLayerAction = {
+  type: 'ADD_TEXT_LAYER';
   payload: {
-    index: number;
     text: string;
+    fontFamily: string;
+    fontSize: number;
+    textAlign: 'center' | 'left' | 'right';
+    color: string;
   };
 };
-//#endregion
 
+export type UpdateTextLayerAction = {
+  type: 'UPDATE_TEXT_LAYER';
+  payload: Partial<CoverEditorTextLayerItem>;
+};
+// #endregion
+
+// #region OverlayLayer
+export type AddOverlayLayerAction = {
+  type: 'ADD_OVERLAY_LAYER';
+  payload: MediaImage;
+};
+
+export type UpdateOverlayLayerAction = {
+  type: 'UPDATE_OVERLAY_LAYER';
+  payload: Partial<CoverEditorOverlayItem>;
+};
+// #endregion
+
+// #region Links Actions
 export type UpdateLinksAction = {
   type: 'UPDATE_LINKS';
   payload: CoverEditorSocialLink[];
 };
+// #endregion
 
-export type UpdateMediasAction = {
-  type: 'UPDATE_MEDIAS';
-  payload: Media[];
-};
-
-export type UpdateActiveMediaAction = {
-  type: 'UPDATE_ACTIVE_MEDIA';
-  payload: Media;
-};
-export type UpdateMediasTransitionAction = {
-  type: 'UPDATE_MEDIA_TRANSITION';
-  payload: CoverEditorTransition;
-};
-
-// #region resources loaded actions
+// #region resources loading actions
 export type LoadingStartAction = {
   type: 'LOADING_START';
   payload: {
@@ -190,23 +150,20 @@ export type LoadingErrorAction = {
     error: any;
   };
 };
-
 // #endregion
 
 export type CoverEditorAction =
   | AddOverlayLayerAction
   | AddTextLayerAction
-  | ChangeAlignmentAction
-  | ChangeFontColorAction
-  | ChangeFontFamilyAction
-  | ChangeFontSizeAction
   | DeleteCurrentLayerAction
-  | DuplicateAction
+  | DuplicateCurrentLayerAction
   | LoadingErrorAction
   | LoadingStartAction
   | LoadingSuccessAction
-  | SelectLayerAction
+  | SetEditionModeAction
   | UpdateActiveMediaAction
+  | UpdateCardColorsAction
+  | UpdateCurrentVideoTimeRangeAction
   | UpdateLayerBorderAction
   | UpdateLayerShadowAction
   | UpdateLinksAction
@@ -215,7 +172,5 @@ export type CoverEditorAction =
   | UpdateMediaFilterAction
   | UpdateMediasAction
   | UpdateMediasTransitionAction
-  | UpdateOverlayBoundsAction
   | UpdateOverlayLayerAction
-  | UpdateTextAction
-  | UpdateTextSizeAction;
+  | UpdateTextLayerAction;

@@ -20,7 +20,7 @@ import LoadCardTemplateModal from './LoadCardTemplateModal';
 import ModuleSelectionListModal from './ModuleSelectionListModal';
 import PreviewModal from './PreviewModal';
 import WebCardBlockContainer from './WebCardBlockContainer';
-import WebCardColorPicker from './WebCardColorPicker';
+import WebCardColorsManager from './WebCardColorsManager';
 import WebCardScreenBody from './WebCardScreenBody';
 import WebCardScreenEditModeFooter, {
   WEBCARD_SCREEN_EDIT_MODE_FOOTER_HEIGHT,
@@ -455,7 +455,7 @@ const WebCardScreenContent = ({
               visible={loadTemplate}
               webCard={webCard}
             />
-            <WebCardColorPicker
+            <WebCardColorsManager
               webCard={webCard}
               visible={showWebcardColorPicker}
               onRequestClose={onClosWebcardColorPicker}

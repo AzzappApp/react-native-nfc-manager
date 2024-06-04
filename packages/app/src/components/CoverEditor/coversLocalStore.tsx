@@ -11,7 +11,7 @@ export type CoverInfos = Pick<
   | 'coverTransition'
   | 'linksLayer'
   | 'medias'
-  | 'overlayLayer'
+  | 'overlayLayers'
   | 'template'
   | 'textLayers'
 >;
@@ -64,7 +64,7 @@ const saveCover = (state: CoverEditorState) => {
         'coverTransition',
         'linksLayer',
         'medias',
-        'overlayLayer',
+        'overlayLayers',
         'template',
         'textLayers',
       ]),

@@ -1,3 +1,4 @@
+import { Skia, type SkShader } from '@shopify/react-native-skia';
 import { COVER_MAX_MEDIA_DURATION } from '@azzapp/shared/coverHelpers';
 import {
   scaleCropData,
@@ -7,7 +8,6 @@ import {
 import { mediaInfoIsImage } from '../coverEditorHelpers';
 import coverTransitions from './coverTransitions';
 import type { CoverDrawerOptions } from './types';
-import type { SkShader } from '@shopify/react-native-skia';
 
 const coverMediasDrawer = ({
   canvas,
@@ -22,14 +22,15 @@ const coverMediasDrawer = ({
 }: CoverDrawerOptions) => {
   'worklet';
   let duration = 0;
-  const { duration: transitionDuration, drawer: transitionDrawer } =
-    coverTransitions[coverTransition ?? 'none'] ?? coverTransitions.none;
+  const { transition, duration: transitionDuration } = (coverTransition &&
+    coverTransitions[coverTransition]) || { transition: null, duration: 0 };
 
+  let inShader: SkShader | null = null;
+  let outShader: SkShader | null = null;
+  let transitionTime = 0;
   for (let i = 0; i < medias.length; i++) {
     const mediaInfo = medias[i];
     const isLast = i === medias.length - 1;
-    const isFirst = i === 0;
-
     let mediaDuration: number;
     if (mediaInfoIsImage(mediaInfo)) {
       mediaDuration = mediaInfo.duration;
@@ -40,6 +41,7 @@ const coverMediasDrawer = ({
 
     const compositionStartTime = Math.max(duration - transitionDuration, 0);
     const compositionEndTime = compositionStartTime + mediaDuration;
+
     if (
       compositionStartTime <= currentTime &&
       currentTime < compositionEndTime
@@ -80,37 +82,38 @@ const coverMediasDrawer = ({
       if (!shader) {
         continue;
       }
-      let transitionTime = 0;
-      if (currentTime < compositionStartTime + transitionDuration) {
-        // Transition in
-        transitionTime = isFirst ? 1 : currentTime - compositionStartTime;
-      } else if (currentTime >= compositionEndTime - transitionDuration) {
-        // Transition out
-        transitionTime = isLast ? 1 : currentTime - compositionEndTime;
+      if (currentTime >= compositionEndTime - transitionDuration && !isLast) {
+        outShader = shader;
+        transitionTime =
+          currentTime - (compositionEndTime - transitionDuration);
       } else {
-        // No transition
-        transitionTime = 1;
-      }
-      if (transitionTime === 1) {
-        coverTransitions.none.drawer({
-          canvas,
-          shader,
-          time: 0,
-          width,
-          height,
-        });
-      } else {
-        transitionDrawer({
-          canvas,
-          shader,
-          time: transitionTime,
-          width,
-          height,
-        });
+        inShader = shader;
       }
     }
     duration = Math.max(0, duration - transitionDuration);
     duration += mediaDuration;
+  }
+  if (inShader && outShader && transition) {
+    transition({
+      canvas,
+      inShader,
+      outShader,
+      time: transitionTime,
+      width,
+      height,
+    });
+  } else if (inShader) {
+    const paint = Skia.Paint();
+    paint.setShader(inShader);
+    canvas.drawRect(
+      {
+        x: 0,
+        y: 0,
+        width,
+        height,
+      },
+      paint,
+    );
   }
 };
 

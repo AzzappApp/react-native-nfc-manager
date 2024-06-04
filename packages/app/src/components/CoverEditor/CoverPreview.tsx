@@ -1,9 +1,5 @@
-import {
-  clamp,
-  type SkRect,
-  type SkTypefaceFontProvider,
-} from '@shopify/react-native-skia';
-import { useCallback, useMemo, useRef } from 'react';
+import { Canvas, Image, clamp } from '@shopify/react-native-skia';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   Dimensions,
   PixelRatio,
@@ -19,34 +15,42 @@ import Animated, {
   useAnimatedStyle,
   useSharedValue,
 } from 'react-native-reanimated';
+import { waitTime } from '@azzapp/shared/asyncHelpers';
 import { swapColor } from '@azzapp/shared/cardHelpers';
+import { COVER_CARD_RADIUS, COVER_RATIO } from '@azzapp/shared/coverHelpers';
+import { colors, shadow } from '#theme';
+import ImagePicker, { EditImageStep } from '#components/ImagePicker';
 import {
-  COVER_CARD_RADIUS,
-  COVER_MAX_MEDIA_DURATION,
-} from '@azzapp/shared/coverHelpers';
-import { shadow } from '#theme';
+  useModalInterceptor,
+  useScreenHasFocus,
+} from '#components/NativeRouter';
+import ScreenModal from '#components/ScreenModal';
 import VideoCompositionRenderer from '#components/VideoCompositionRenderer';
 import { reduceVideoResolutionIfNecessary } from '#helpers/mediaEditions';
+import useToggle from '#hooks/useToggle';
 import ActivityIndicator from '#ui/ActivityIndicator';
 import { SocialIcon } from '#ui/Icon';
 import PressableNative from '#ui/PressableNative';
 import coverDrawer, { coverTransitions } from './coverDrawer';
 import { createParagraph } from './coverDrawer/coverTextDrawer';
+import { convertToBaseCanvasRatio } from './coverDrawer/utils';
 import { useCoverEditorContext } from './CoverEditorContext';
 import { mediaInfoIsImage } from './coverEditorHelpers';
 import CoverLayerBoundsEditor from './CoverLayerBoundsEditor';
+import type { VideoCompositionRendererHandle } from '#components/VideoCompositionRenderer';
+import type { EditionParameters } from '#helpers/mediaEditions';
 import type { ResizeAxis } from './CoverLayerBoundsEditor/coverBoundsLayerEditorTypes';
 import type {
   FrameDrawer,
   VideoCompositionItem,
 } from '@azzapp/react-native-skia-video';
-import type { ColorPalette } from '@azzapp/shared/cardHelpers';
 import type { SocialLinkId } from '@azzapp/shared/socialLinkHelpers';
 import type {
-  ColorValue,
-  LayoutChangeEvent,
-  LayoutRectangle,
-} from 'react-native';
+  SkImage,
+  SkRect,
+  SkTypefaceFontProvider,
+} from '@shopify/react-native-skia';
+import type { LayoutChangeEvent, LayoutRectangle } from 'react-native';
 import type { ViewProps } from 'react-native-svg/lib/typescript/fabric/utils';
 
 type CoverPreviewProps = Exclude<ViewProps, 'children'> & {
@@ -62,10 +66,6 @@ type CoverPreviewProps = Exclude<ViewProps, 'children'> & {
    * Height of the cover preview
    */
   height: number;
-  /**
-   * Color tryptic of the card
-   */
-  cardColors: Readonly<ColorPalette> | null;
   /**
    * A callback to update the translation of the preview when the keyboard is displayed
    * this function must be a worklet
@@ -84,7 +84,6 @@ const CoverPreview = ({
   height,
   style,
   fontManager,
-  cardColors,
   onKeyboardTranslateWorklet,
   ...props
 }: CoverPreviewProps) => {
@@ -93,10 +92,10 @@ const CoverPreview = ({
   const {
     coverTransition,
     medias,
-    overlayLayer,
+    overlayLayers,
     textLayers,
     linksLayer,
-    backgroundColor,
+    cardColors,
 
     images,
     videoPaths,
@@ -104,8 +103,8 @@ const CoverPreview = ({
     loadingLocalMedia,
     loadingRemoteMedia,
 
-    layerMode,
-    selectedLayerIndex,
+    editionMode,
+    selectedItemIndex: selectedLayerIndex,
   } = coverEditorState;
 
   /**
@@ -136,7 +135,6 @@ const CoverPreview = ({
           : `${mediaInfo.media.uri}-${mediaInfo.timeRange.startTime}-${mediaInfo.timeRange.duration}`,
       )
       .join(''),
-    overlayLayer?.media.uri,
     videoPaths,
   ];
 
@@ -146,13 +144,11 @@ const CoverPreview = ({
    * in the video decoder to avoid decoding videos at full resolution
    */
   const { composition, videoScales } = useMemo(() => {
-    const allItemsLoaded =
-      medias.every(
-        ({ media }) =>
-          (media.kind === 'image' && images[media.uri]) ||
-          (media.kind === 'video' && videoPaths[media.uri]),
-      ) &&
-      (!overlayLayer?.media.uri || images[overlayLayer.media.uri]);
+    const allItemsLoaded = medias.every(
+      ({ media }) =>
+        (media.kind === 'image' && images[media.uri]) ||
+        (media.kind === 'video' && videoPaths[media.uri]),
+    );
     if (loadingLocalMedia || loadingRemoteMedia || !allItemsLoaded) {
       return { composition: null, videoScales: {} };
     }
@@ -164,14 +160,15 @@ const CoverPreview = ({
     const videoScales: Record<string, number> = {};
     const items: VideoCompositionItem[] = [];
     const transitionDuration =
-      coverTransitions[coverTransition ?? 'none']?.duration ?? 0;
-    for (const { media } of medias) {
+      (coverTransition && coverTransitions[coverTransition]?.duration) || 0;
+    for (const mediaInfo of medias) {
       duration = Math.max(0, duration - transitionDuration);
-      if (media.kind === 'image') {
-        duration += COVER_MAX_MEDIA_DURATION;
-      } else if (media.kind === 'video') {
+      if (mediaInfoIsImage(mediaInfo)) {
+        duration += mediaInfo.duration;
+      } else {
+        const { media, timeRange } = mediaInfo;
         const path = videoPaths[media.uri];
-        const itemDuration = Math.min(media.duration, COVER_MAX_MEDIA_DURATION);
+        const itemDuration = timeRange.duration;
         const { resolution, videoScale } = reduceVideoResolutionIfNecessary(
           media.width,
           media.height,
@@ -182,7 +179,7 @@ const CoverPreview = ({
         items.push({
           id: media.uri,
           path,
-          startTime: 0,
+          startTime: timeRange.startTime,
           compositionStartTime: duration,
           duration: itemDuration,
           resolution,
@@ -232,24 +229,31 @@ const CoverPreview = ({
       let state = coverEditorState;
       if (boundsOverridesSharedValue.value) {
         const { bounds, rotation } = boundsOverridesSharedValue.value;
-        if (state.layerMode === 'overlay' && state.overlayLayer) {
+        if (
+          state.editionMode === 'overlay' &&
+          state.selectedItemIndex != null
+        ) {
           state = {
             ...state,
-            overlayLayer: {
-              ...state.overlayLayer,
-              bounds,
-              rotation,
-            },
+            overlayLayers: state.overlayLayers.map((overlayLayer, i) => {
+              if (i === state.selectedItemIndex) {
+                return {
+                  ...overlayLayer,
+                  bounds,
+                  rotation,
+                };
+              }
+              return overlayLayer;
+            }),
           };
-        }
-        if (
-          state.layerMode === 'text' ||
-          (state.layerMode === 'textEdit' && state.selectedLayerIndex != null)
+        } else if (
+          state.editionMode === 'text' ||
+          (state.editionMode === 'textEdit' && state.selectedItemIndex != null)
         ) {
           state = {
             ...state,
             textLayers: state.textLayers.map((textLayer, i) => {
-              if (i === state.selectedLayerIndex) {
+              if (i === state.selectedItemIndex) {
                 return {
                   ...textLayer,
                   width: bounds.width,
@@ -257,12 +261,8 @@ const CoverPreview = ({
                     x: bounds.x,
                     y: bounds.y,
                   },
-                  style: {
-                    ...textLayer.style,
-                    fontSize:
-                      fontSizeOverrideSharedValue.value ??
-                      textLayer.style.fontSize,
-                  },
+                  fontSize:
+                    fontSizeOverrideSharedValue.value ?? textLayer.fontSize,
                   rotation,
                 };
               }
@@ -271,7 +271,7 @@ const CoverPreview = ({
           };
         }
       }
-      if (layerMode === 'textEdit') {
+      if (editionMode === 'textEdit') {
         state = {
           ...state,
           textLayers: state.textLayers.filter(
@@ -286,18 +286,16 @@ const CoverPreview = ({
         lutShaders,
         videoScales,
         fontManager,
-        cardColors,
       });
     },
     [
       lutShaders,
       coverEditorState,
       boundsOverridesSharedValue,
-      layerMode,
+      editionMode,
       images,
       videoScales,
       fontManager,
-      cardColors,
       fontSizeOverrideSharedValue,
       selectedLayerIndex,
     ],
@@ -309,12 +307,15 @@ const CoverPreview = ({
    * Callback to handle the tap on the overlay layer
    * This will select the overlay layer for edition
    */
-  const handleOverlayLayerTap = useCallback(() => {
-    dispatch({
-      type: 'SELECT_LAYER',
-      payload: { layerMode: 'overlay', index: null },
-    });
-  }, [dispatch]);
+  const handleOverlayLayerTap = useCallback(
+    (index: number) => {
+      dispatch({
+        type: 'SET_EDITION_MODE',
+        payload: { editionMode: 'overlay', selectedItemIndex: index },
+      });
+    },
+    [dispatch],
+  );
 
   /**
    * Callback to handle the tap on a text layer
@@ -323,8 +324,8 @@ const CoverPreview = ({
   const handleTextLayerTap = useCallback(
     (index: number) => {
       dispatch({
-        type: 'SELECT_LAYER',
-        payload: { layerMode: 'text', index },
+        type: 'SET_EDITION_MODE',
+        payload: { editionMode: 'text', selectedItemIndex: index },
       });
     },
     [dispatch],
@@ -336,10 +337,10 @@ const CoverPreview = ({
    */
   const handleLinksPress = useCallback(() => {
     dispatch({
-      type: 'SELECT_LAYER',
+      type: 'SET_EDITION_MODE',
       payload: {
-        index: null,
-        layerMode: 'links',
+        selectedItemIndex: null,
+        editionMode: 'links',
       },
     });
   }, [dispatch]);
@@ -350,10 +351,13 @@ const CoverPreview = ({
    */
   const handlePressOutsideLayer = useCallback(() => {
     dispatch({
-      type: 'SELECT_LAYER',
-      payload: { layerMode: null, index: null },
+      type: 'SET_EDITION_MODE',
+      payload:
+        editionMode === 'textEdit'
+          ? { editionMode: 'text', selectedItemIndex: selectedLayerIndex }
+          : { editionMode: 'none', selectedItemIndex: null },
     });
-  }, [dispatch]);
+  }, [dispatch, editionMode, selectedLayerIndex]);
 
   /**
    * Callback to delete the layer currently being edited
@@ -385,25 +389,25 @@ const CoverPreview = ({
    */
   const onUpdateEnd = useCallback(
     (bounds: SkRect, rotation: number) => {
-      if (layerMode === 'overlay') {
+      if (editionMode === 'overlay') {
         dispatch({
-          type: 'UPDATE_OVERLAY_BOUNDS',
+          type: 'UPDATE_OVERLAY_LAYER',
           payload: {
             bounds,
             rotation,
           },
         });
       } else if (
-        (layerMode === 'text' || layerMode === 'textEdit') &&
+        (editionMode === 'text' || editionMode === 'textEdit') &&
         selectedLayerIndex != null
       ) {
         const fontSize =
           fontSizeOverrideSharedValue.value ??
-          textLayers[selectedLayerIndex].style.fontSize;
+          textLayers[selectedLayerIndex].fontSize ??
+          14;
         dispatch({
-          type: 'UPDATE_TEXT_SIZE',
+          type: 'UPDATE_TEXT_LAYER',
           payload: {
-            index: selectedLayerIndex,
             position: {
               x: bounds.x,
               y: bounds.y,
@@ -423,7 +427,7 @@ const CoverPreview = ({
       boundsOverridesSharedValue,
       dispatch,
       fontSizeOverrideSharedValue,
-      layerMode,
+      editionMode,
       selectedLayerIndex,
       textLayers,
     ],
@@ -439,11 +443,11 @@ const CoverPreview = ({
       'worklet';
       if (selectedLayerIndex != null) {
         const { x, y, width: layerWidth } = bounds;
-        const paragraph = createParagraph(
-          { ...textLayers[selectedLayerIndex], width: layerWidth },
+        const paragraph = createParagraph({
+          layer: { ...textLayers[selectedLayerIndex], width: layerWidth },
           fontManager,
-          width,
-        );
+          canvasWidth: width,
+        });
         return {
           x,
           y,
@@ -471,20 +475,17 @@ const CoverPreview = ({
       const layer = textLayers[selectedLayerIndex];
 
       const layerWidth = clamp(offsetWidth * scale, 0.2, 1);
-      const fontSize = clamp(layer.style.fontSize * scale, 10, 48);
+      const fontSize = Math.round(clamp(layer.fontSize * scale, 10, 48));
       fontSizeOverrideSharedValue.value = fontSize;
-      const paragraph = createParagraph(
-        {
+      const paragraph = createParagraph({
+        layer: {
           ...layer,
-          style: {
-            ...layer.style,
-            fontSize,
-          },
+          fontSize,
           width: layerWidth,
         },
         fontManager,
-        width,
-      );
+        canvasWidth: width,
+      });
       const layerHeight = paragraph.getHeight() / height;
       return {
         x: x - (layerWidth - offsetWidth) / 2,
@@ -504,6 +505,20 @@ const CoverPreview = ({
   );
   // #endregion
 
+  // #region Image overlay edition
+  const activeOverlay =
+    selectedLayerIndex != null && editionMode === 'overlay'
+      ? overlayLayers[selectedLayerIndex] ?? null
+      : null;
+  const [showOverlayCropper, toggleShowOverlayCropper] = useToggle(false);
+
+  const onOverlayCropSave = (editionParameters: EditionParameters) => {
+    dispatch({
+      type: 'UPDATE_MEDIA_EDITION_PARAMETERS',
+      payload: editionParameters,
+    });
+    toggleShowOverlayCropper();
+  };
   // #region Text edition
   const inputRef = useRef<TextInput | null>(null);
   /**
@@ -515,23 +530,37 @@ const CoverPreview = ({
       return;
     }
     dispatch({
-      type: 'SELECT_LAYER',
-      payload: { layerMode: 'textEdit', index: selectedLayerIndex },
+      type: 'SET_EDITION_MODE',
+      payload: {
+        editionMode: 'textEdit',
+        selectedItemIndex: selectedLayerIndex,
+      },
     });
-    const length = textLayers[selectedLayerIndex].text?.length ?? 0;
-    // Since the TextInput is not displayed yet, we need to wait a bit before focusing it
-    setTimeout(() => {
-      inputRef.current?.focus();
-      inputRef.current?.setSelection(0, length);
-    }, 10);
-  }, [dispatch, selectedLayerIndex, textLayers]);
+  }, [dispatch, selectedLayerIndex]);
+
+  const oldEditionMode = useRef(editionMode);
+  useEffect(() => {
+    if (
+      editionMode === 'textEdit' &&
+      oldEditionMode.current !== 'textEdit' &&
+      selectedLayerIndex != null
+    ) {
+      const length = textLayers[selectedLayerIndex].text?.length ?? 0;
+      // Since the TextInput is not displayed yet, we need to wait a bit before focusing it
+      setTimeout(() => {
+        inputRef.current?.focus();
+        inputRef.current?.setSelection(0, length);
+      }, 10);
+    }
+    oldEditionMode.current = editionMode;
+  }, [editionMode, selectedLayerIndex, textLayers]);
 
   const handleChangeText = useCallback(
     (text: string) => {
       if (selectedLayerIndex != null) {
         dispatch({
-          type: 'UPDATE_TEXT',
-          payload: { index: selectedLayerIndex, text },
+          type: 'UPDATE_TEXT_LAYER',
+          payload: { text },
         });
       }
     },
@@ -540,7 +569,11 @@ const CoverPreview = ({
 
   const textLayersWidthBounds = useMemo(() => {
     return textLayers.map(textLayer => {
-      const paragraph = createParagraph(textLayer, fontManager, width);
+      const paragraph = createParagraph({
+        layer: textLayer,
+        fontManager,
+        canvasWidth: width,
+      });
       return {
         textLayer,
         bounds: {
@@ -556,7 +589,7 @@ const CoverPreview = ({
    * The text layer currently being edited
    */
   const editedTextLayer =
-    layerMode === 'textEdit' && selectedLayerIndex != null
+    editionMode === 'textEdit' && selectedLayerIndex != null
       ? textLayers[selectedLayerIndex] ?? null
       : null;
 
@@ -568,10 +601,13 @@ const CoverPreview = ({
   const animatedTextInputStyle = useAnimatedStyle(() => {
     if (boundsOverridesSharedValue.value) {
       const { bounds, rotation } = boundsOverridesSharedValue.value;
+      const fontSize =
+        fontSizeOverrideSharedValue.value ?? editedTextLayer?.fontSize ?? 14;
       return {
         top: bounds.y * height,
         left: bounds.x * width,
         width: bounds.width * width,
+        fontSize: convertToBaseCanvasRatio(fontSize, width),
         transform: [{ rotate: `${rotation}rad` }],
       };
     }
@@ -614,7 +650,7 @@ const CoverPreview = ({
     [pageYSharedValue],
   );
 
-  const handeTextInputLayout = useCallback(
+  const handleTextInputLayout = useCallback(
     (event: LayoutChangeEvent) => {
       inputSize.value = event.nativeEvent.layout;
     },
@@ -646,146 +682,219 @@ const CoverPreview = ({
   );
   // #endregion
 
+  // #region Screen shot replacement
+  const hasFocus = useScreenHasFocus();
+  const [screenShot, setScreenShot] = useState<SkImage | null>(null);
+  const compositionRendererRef = useRef<VideoCompositionRendererHandle | null>(
+    null,
+  );
+  useModalInterceptor(async () => {
+    let screenShot: SkImage | null = null;
+    try {
+      screenShot =
+        (await compositionRendererRef.current?.makeSnapshot()) ?? null;
+    } catch {
+      screenShot = null;
+    }
+    setScreenShot(screenShot);
+    await waitTime(10);
+  });
+
+  useEffect(() => {
+    if (hasFocus) {
+      setScreenShot(null);
+    }
+  }, [hasFocus]);
+  // #endregion
+
   return (
-    <View
-      style={[
-        style,
-        {
-          width,
-          height,
-          backgroundColor:
-            (swapColor(backgroundColor, cardColors) as ColorValue) ?? '#fff',
-          borderRadius: COVER_CARD_RADIUS * width,
-        },
-        shadow('light'),
-      ]}
-    >
+    <>
       <View
-        ref={containerRef}
         style={[
           style,
           {
-            borderRadius: COVER_CARD_RADIUS * width,
             width,
             height,
-            overflow: 'hidden',
+            backgroundColor: colors.grey300,
+            borderRadius: COVER_CARD_RADIUS * width,
           },
+          shadow('light'),
         ]}
-        {...props}
       >
-        {loadingRemoteMedia ? (
-          <ActivityIndicator />
-        ) : (
-          <View style={{ width, height }}>
-            <VideoCompositionRenderer
-              composition={composition}
-              width={width}
-              height={height}
-              drawFrame={drawFrame}
-            />
-            <Pressable
-              style={{ width, height, position: 'absolute' }}
-              onPress={handlePressOutsideLayer}
-            >
-              {overlayLayer && (
-                <CoverLayerBoundsEditor
-                  active={layerMode === 'overlay'}
-                  bounds={overlayLayer.bounds}
-                  rotation={overlayLayer.rotation}
-                  resizeAxis={OVERLAY_RESIZE_AXIS}
-                  canvasSize={{ width, height }}
-                  controlsPosition="top"
-                  onTap={handleOverlayLayerTap}
-                  onUpdateProgressWorklet={onUpdateProgressWorklet}
-                  onUpdateEnd={onUpdateEnd}
-                  onCrop={() => {}}
-                  onDelete={handleDeleteCurrentLayer}
+        <View
+          ref={containerRef}
+          style={[
+            style,
+            {
+              borderRadius: COVER_CARD_RADIUS * width,
+              width,
+              height,
+              overflow: 'hidden',
+            },
+          ]}
+          {...props}
+        >
+          {/* Not rendering when modal are displayed reduce memory usage */}
+          {loadingRemoteMedia || (!hasFocus && !screenShot) ? (
+            <ActivityIndicator />
+          ) : (
+            <View style={{ width, height }}>
+              {screenShot && (
+                <Canvas style={{ width, height }}>
+                  <Image
+                    image={screenShot}
+                    x={0}
+                    y={0}
+                    width={width}
+                    height={height}
+                  />
+                </Canvas>
+              )}
+              {hasFocus && (
+                <VideoCompositionRenderer
+                  ref={compositionRendererRef}
+                  pause={editionMode === 'textEdit'}
+                  composition={composition}
+                  width={width}
+                  height={height}
+                  drawFrame={drawFrame}
                 />
               )}
-              {textLayersWidthBounds.map(({ textLayer, bounds }, index) => (
-                <CoverLayerBoundsEditor
-                  key={index}
-                  active={
-                    (layerMode === 'text' || layerMode === 'textEdit') &&
-                    selectedLayerIndex === index
-                  }
-                  bounds={bounds}
-                  rotation={textLayer.rotation}
-                  resizeAxis={TEXT_RESIZE_AXIS}
-                  controlsPosition="right"
-                  canvasSize={{ width, height }}
-                  transformBoundsAfterResizeWorklet={
-                    transformBoundsAfterResizeWorklet
-                  }
-                  overrideScaleUpdateWorklet={computeTextScaleWorklet}
-                  onTap={() => {
-                    handleTextLayerTap(index);
-                  }}
-                  onUpdateProgressWorklet={onUpdateProgressWorklet}
-                  onUpdateEnd={onUpdateEnd}
-                  onDelete={handleDeleteCurrentLayer}
-                  onEdit={handeTextLayerEdit}
-                  hideControls={layerMode === 'textEdit'}
-                />
-              ))}
-
-              <PressableNative
-                style={{
-                  width: '100%',
-                  height: 100,
-                  flexDirection: 'row',
-                  position: 'absolute',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  bottom: 0,
-                }}
-                onPress={handleLinksPress}
-                pointerEvents="box-none"
+              <Pressable
+                style={{ width, height, position: 'absolute' }}
+                onPress={handlePressOutsideLayer}
               >
-                {linksLayer.links.map(link => (
-                  <SocialIcon
-                    style={{
-                      height: linksLayer.style.size,
-                      width: linksLayer.style.size,
-                      tintColor: swapColor(linksLayer.style.color, cardColors),
-                    }}
-                    key={link.socialId}
-                    icon={link.socialId as SocialLinkId}
+                {overlayLayers.map((layer, index) => (
+                  <CoverLayerBoundsEditor
+                    key={index}
+                    active={
+                      editionMode === 'overlay' && selectedLayerIndex === index
+                    }
+                    bounds={layer.bounds}
+                    rotation={layer.rotation}
+                    resizeAxis={OVERLAY_RESIZE_AXIS}
+                    canvasSize={{ width, height }}
+                    controlsPosition="top"
+                    onTap={() => handleOverlayLayerTap(index)}
+                    onUpdateProgressWorklet={onUpdateProgressWorklet}
+                    onUpdateEnd={onUpdateEnd}
+                    onCrop={toggleShowOverlayCropper}
+                    onDelete={handleDeleteCurrentLayer}
                   />
                 ))}
-              </PressableNative>
+                {textLayersWidthBounds.map(({ textLayer, bounds }, index) => (
+                  <CoverLayerBoundsEditor
+                    key={index}
+                    active={
+                      (editionMode === 'text' || editionMode === 'textEdit') &&
+                      selectedLayerIndex === index
+                    }
+                    bounds={bounds}
+                    rotation={textLayer.rotation}
+                    resizeAxis={TEXT_RESIZE_AXIS}
+                    controlsPosition="right"
+                    canvasSize={{ width, height }}
+                    transformBoundsAfterResizeWorklet={
+                      transformBoundsAfterResizeWorklet
+                    }
+                    overrideScaleUpdateWorklet={computeTextScaleWorklet}
+                    onTap={() => {
+                      handleTextLayerTap(index);
+                    }}
+                    onUpdateProgressWorklet={onUpdateProgressWorklet}
+                    onUpdateEnd={onUpdateEnd}
+                    onDelete={handleDeleteCurrentLayer}
+                    onEdit={handeTextLayerEdit}
+                    hideControls={editionMode === 'textEdit'}
+                  />
+                ))}
 
-              {editedTextLayer && (
-                <AnimatedTextInput
-                  ref={inputRef}
-                  onLayout={handeTextInputLayout}
-                  value={editedTextLayer.text ?? ''}
-                  multiline
-                  style={[
-                    {
-                      position: 'absolute',
-                      fontFamily: editedTextLayer.style.fontFamily,
-                      color: editedTextLayer.style.color ?? '#000',
-                      fontSize: editedTextLayer.style.fontSize * (width / 300),
-                      transformOrigin: 'center',
-                      transform: [{ rotate: `${editedTextLayer.rotation}rad` }],
-                      textAlign: editedTextLayer.style.textAlign,
-                      padding: 0,
-                      top: editedTextLayer.position.y * height,
-                      left: editedTextLayer.position.x * width,
-                      width: editedTextLayer.width * width,
-                    },
-                    animatedTextInputStyle,
-                  ]}
-                  onChangeText={handleChangeText}
-                  scrollEnabled={false}
-                />
-              )}
-            </Pressable>
-          </View>
-        )}
+                <PressableNative
+                  style={{
+                    width: '100%',
+                    height: 100,
+                    flexDirection: 'row',
+                    position: 'absolute',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    bottom: 0,
+                  }}
+                  onPress={handleLinksPress}
+                  pointerEvents="box-none"
+                >
+                  {linksLayer.links.map(link => (
+                    <SocialIcon
+                      style={{
+                        height: linksLayer.size,
+                        width: linksLayer.size,
+                        tintColor: swapColor(linksLayer.color, cardColors),
+                      }}
+                      key={link.socialId}
+                      icon={link.socialId as SocialLinkId}
+                    />
+                  ))}
+                </PressableNative>
+
+                {editedTextLayer && (
+                  <AnimatedTextInput
+                    ref={inputRef}
+                    onLayout={handleTextInputLayout}
+                    value={editedTextLayer.text ?? ''}
+                    multiline
+                    style={[
+                      {
+                        position: 'absolute',
+                        fontFamily: editedTextLayer.fontFamily,
+                        color:
+                          swapColor(editedTextLayer.color, cardColors) ??
+                          '#000',
+                        fontSize: convertToBaseCanvasRatio(
+                          editedTextLayer.fontSize,
+                          width,
+                        ),
+                        transformOrigin: 'center',
+                        transform: [
+                          { rotate: `${editedTextLayer.rotation}rad` },
+                        ],
+                        textAlign: editedTextLayer.textAlign,
+                        padding: 0,
+                        top: editedTextLayer.position.y * height,
+                        left: editedTextLayer.position.x * width,
+                        width: editedTextLayer.width * width,
+                      },
+                      animatedTextInputStyle,
+                    ]}
+                    onChangeText={handleChangeText}
+                    scrollEnabled={false}
+                  />
+                )}
+              </Pressable>
+            </View>
+          )}
+        </View>
       </View>
-    </View>
+      {activeOverlay && (
+        <ScreenModal visible={showOverlayCropper} animationType="slide">
+          <ImagePicker
+            initialData={activeOverlay}
+            additionalData={{
+              selectedParameter: 'cropData',
+              selectedTab: 'edit',
+              showTabs: false,
+              onEditionSave: onOverlayCropSave,
+              onEditionCancel: toggleShowOverlayCropper,
+            }}
+            kind={editionMode === 'overlay' ? 'image' : 'mixed'}
+            forceAspectRatio={
+              (activeOverlay.bounds.width / activeOverlay.bounds.height) *
+              COVER_RATIO
+            }
+            steps={[EditImageStep]}
+            onCancel={toggleShowOverlayCropper}
+          />
+        </ScreenModal>
+      )}
+    </>
   );
 };
 

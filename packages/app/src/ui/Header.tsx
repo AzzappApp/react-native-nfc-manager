@@ -3,7 +3,7 @@ import Text from '#ui/Text';
 import Container from './Container';
 import type { ReactNode } from 'react';
 import type { StyleProp, ViewStyle, ViewProps } from 'react-native';
-export type HeaderProps = ViewProps & {
+export type HeaderProps = Omit<ViewProps, 'children'> & {
   /**
    * The title to display in the header.
    */

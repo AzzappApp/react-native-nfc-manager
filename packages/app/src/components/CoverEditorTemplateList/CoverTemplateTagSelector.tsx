@@ -46,7 +46,7 @@ const CoverTemplateTagSelector = (props: Props) => {
             onSelect(null);
           }}
         />
-        {tags.map(({ id, label }) => (
+        {tags?.map(({ id, label }) => (
           <RoundedMenuComponent
             key={id}
             selected={id === selected}

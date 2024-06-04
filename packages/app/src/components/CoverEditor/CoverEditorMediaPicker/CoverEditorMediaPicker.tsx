@@ -3,10 +3,7 @@ import { useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { View, Alert } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
-import {
-  COVER_MAX_MEDIA,
-  COVER_MAX_MEDIA_DURATION,
-} from '@azzapp/shared/coverHelpers';
+import { COVER_MAX_MEDIA } from '@azzapp/shared/coverHelpers';
 import { colors, shadow } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import { duplicateMediaToFillSlots } from '#helpers/mediaHelpers';
@@ -19,23 +16,27 @@ import MultiMediasSelector from './MultiMediasSelector';
 import type { Media } from '#helpers/mediaHelpers';
 import type { ViewProps } from 'react-native-svg/lib/typescript/fabric/utils';
 
-type CoverEditorImagePickerProps = Omit<ViewProps, 'children'> & {
-  durations: number[];
+type CoverEditorMediaPickerProps = Omit<ViewProps, 'children'> & {
+  durations: number[] | null;
+  durationsFixed?: boolean;
   initialMedias: Media[] | null;
   onFinished: (results: Media[]) => void;
 };
 
-const CoverEditorImagePicker = ({
+const CoverEditorMediaPicker = ({
   durations,
+  durationsFixed,
   initialMedias,
   onFinished,
   style,
   ...props
-}: CoverEditorImagePickerProps) => {
+}: CoverEditorMediaPickerProps) => {
   const [selectedMedias, setSelectedMedias] = useState<Media[]>(
     initialMedias ?? [],
   );
-  const maxMediaCount = durations.length;
+
+  const maxMedias =
+    durationsFixed && durations ? durations.length : COVER_MAX_MEDIA;
 
   // remove media by index
   const handleRemoveMedia = (index: number) => {
@@ -55,10 +56,7 @@ const CoverEditorImagePicker = ({
         currentMedias.splice(index, 1);
         return currentMedias;
       }
-      if (
-        currentMedias.length <
-        (maxMediaCount <= 0 ? COVER_MAX_MEDIA : maxMediaCount)
-      ) {
+      if (currentMedias.length < maxMedias) {
         const updatedMedias = [...currentMedias, media as Media];
         return updatedMedias;
       }
@@ -68,7 +66,7 @@ const CoverEditorImagePicker = ({
 
   const handleDuplicateMedia = () => {
     const duplicatedMedias = duplicateMediaToFillSlots(
-      maxMediaCount,
+      maxMedias,
       selectedMedias,
     );
 
@@ -93,7 +91,7 @@ const CoverEditorImagePicker = ({
       return;
     }
 
-    if (selectedMedias.length < maxMediaCount) {
+    if (durationsFixed && selectedMedias.length < maxMedias) {
       Alert.alert(
         intl.formatMessage(
           {
@@ -104,7 +102,7 @@ const CoverEditorImagePicker = ({
           },
           {
             mediaPickedNumber: selectedMedias.length,
-            totalMediaNumber: maxMediaCount,
+            totalMediaNumber: maxMedias,
           },
         ),
         intl.formatMessage({
@@ -141,35 +139,33 @@ const CoverEditorImagePicker = ({
     onFinished(selectedMedias);
   };
 
-  const mediaOrSlot: Array<Media | null> =
-    maxMediaCount <= 0
-      ? selectedMedias
-      : Array.from(
-          { length: maxMediaCount },
-          (_, index) => selectedMedias[index] ?? null,
-        );
-  const selectionLabel =
-    maxMediaCount <= 0
-      ? intl.formatMessage(
-          {
-            defaultMessage: `{count, plural,
+  const mediaOrSlot: Array<Media | null> = durationsFixed
+    ? Array.from(
+        { length: maxMedias },
+        (_, index) => selectedMedias[index] ?? null,
+      )
+    : selectedMedias;
+  const selectionLabel = durationsFixed
+    ? intl.formatMessage(
+        {
+          defaultMessage: `{count}/{max} medias selected.`,
+          description:
+            'Medias selection label for fixed number multi selection of media in cover edition',
+        },
+        { count: selectedMedias.length, max: maxMedias },
+      )
+    : intl.formatMessage(
+        {
+          defaultMessage: `{count, plural,
               =0 {No media selected}
               =1 {1 media selected}
               other {# medias selected.}
             }`,
-            description:
-              'Medias selection label for free multi selection of media in cover edition',
-          },
-          { count: selectedMedias.length },
-        )
-      : intl.formatMessage(
-          {
-            defaultMessage: `{count}/{max} medias selected.`,
-            description:
-              'Medias selection label for fixed number multi selection of media in cover edition',
-          },
-          { count: selectedMedias.length, max: maxMediaCount },
-        );
+          description:
+            'Medias selection label for free multi selection of media in cover edition',
+        },
+        { count: selectedMedias.length },
+      );
 
   const { top, bottom } = useScreenInsets();
   const styles = useStyleSheet(stylesheet);
@@ -195,13 +191,9 @@ const CoverEditorImagePicker = ({
             contentContainerStyle={styles.selectedMediasList}
           >
             {mediaOrSlot.map((media, index) => {
-              const duration =
-                media?.kind === 'video'
-                  ? Math.min(
-                      Math.round(media.duration),
-                      COVER_MAX_MEDIA_DURATION,
-                    )
-                  : COVER_MAX_MEDIA_DURATION;
+              const duration = durationsFixed
+                ? durations?.[index] ?? null
+                : null;
               return (
                 <View key={index} style={styles.media}>
                   {media && (
@@ -229,15 +221,17 @@ const CoverEditorImagePicker = ({
                       />
                     </>
                   )}
-                  <View style={styles.mediaDuration}>
-                    <Text variant="button" style={styles.textDuration}>
-                      <FormattedMessage
-                        defaultMessage="{duration}s"
-                        description="CoverEditorMediaPicker - duration in seconds"
-                        values={{ duration }}
-                      />
-                    </Text>
-                  </View>
+                  {duration != null && (
+                    <View style={styles.mediaDuration}>
+                      <Text variant="button" style={styles.textDuration}>
+                        <FormattedMessage
+                          defaultMessage="{duration}s"
+                          description="CoverEditorMediaPicker - duration in seconds"
+                          values={{ duration }}
+                        />
+                      </Text>
+                    </View>
+                  )}
                 </View>
               );
             })}
@@ -248,7 +242,7 @@ const CoverEditorImagePicker = ({
   );
 };
 
-export default CoverEditorImagePicker;
+export default CoverEditorMediaPicker;
 
 const stylesheet = createStyleSheet(appearance => ({
   root: {

@@ -8,6 +8,7 @@ import {
   StyleSheet,
   View,
   useWindowDimensions,
+  unstable_batchedUpdates,
 } from 'react-native';
 import { graphql, usePreloadedQuery } from 'react-relay';
 import { Observable } from 'relay-runtime';
@@ -133,9 +134,17 @@ export const NewWebCardScreen = ({
   // #region Navigation
   const [currentStepIndex, setCurrentStepIndex] = useState(webCardInfo ? 2 : 0);
 
-  const next = useCallback(() => {
-    setCurrentStepIndex(page => Math.min(page + 1, 5));
-  }, [setCurrentStepIndex]);
+  const [animationDelay, setAnimationDelay] = useState(0);
+
+  const next = useCallback(
+    (animationDelay?: number) => {
+      unstable_batchedUpdates(() => {
+        setAnimationDelay(animationDelay ?? 0);
+        setCurrentStepIndex(page => Math.min(page + 1, 5));
+      });
+    },
+    [setCurrentStepIndex],
+  );
 
   const prev = useCallback(() => {
     setCurrentStepIndex(page => Math.max(0, page - 1));
@@ -201,15 +210,18 @@ export const NewWebCardScreen = ({
       backgroundColor: ColorPaletteColor | null;
     }) => {
       setCoverTemplate(template);
-      next();
+      // we wait for the modal to open before starting the transition
+      next(500);
     },
     [next],
   );
 
   const [canSave, setCanSave] = useState(false);
   const coverEditionRef = useRef<any>(null);
-  const onCoverEditionRef = () => {
-    coverEditionRef.current?.save().then(next);
+  const onSaveCover = () => {
+    coverEditionRef.current?.save().then(() => {
+      next();
+    });
   };
 
   const webCardTemplateRef = useRef<CardTemplateListHandle>(null);
@@ -292,7 +304,7 @@ export const NewWebCardScreen = ({
         description: 'Cover template selection screen title',
       }),
       element:
-        webCardInfo != null && currentStepIndex === 2 ? (
+        webCardInfo != null && currentStepIndex >= 2 ? (
           <CoverTemplateSelectionStep
             profileId={webCardInfo.profileId}
             height={contentHeight}
@@ -345,7 +357,7 @@ export const NewWebCardScreen = ({
       rightElement: (
         <NextHeaderButton
           style={{ width: 70, marginRight: 10 }}
-          onPress={onCoverEditionRef}
+          onPress={onSaveCover}
           disabled={!canSave}
         />
       ),
@@ -378,7 +390,7 @@ export const NewWebCardScreen = ({
         </View>
       ),
       element:
-        webCardInfo !== null && currentStepIndex === 3 ? (
+        webCardInfo !== null && currentStepIndex === 4 ? (
           <CardEditionStep
             profileId={webCardInfo.profileId}
             webCardId={webCardInfo.webCardId}
@@ -406,6 +418,7 @@ export const NewWebCardScreen = ({
   return (
     <WizardTransitioner
       currentStepIndex={currentStepIndex}
+      animationDelay={animationDelay}
       steps={steps}
       width={windowWidth}
       contentHeight={contentHeight}

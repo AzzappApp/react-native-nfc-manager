@@ -1,7 +1,8 @@
 /* eslint-disable no-case-declarations */
 import {
-  COVER_MAX_MEDIA_DURATION,
+  COVER_IMAGE_DEFAULT_DURATION,
   COVER_RATIO,
+  COVER_VIDEO_DEFAULT_DURATION,
 } from '@azzapp/shared/coverHelpers';
 import { colors } from '#theme';
 import { cropDataForAspectRatio } from '#helpers/mediaEditions';
@@ -15,389 +16,144 @@ export function coverEditorReducer(
 ): CoverEditorState {
   const { type, payload } = action;
 
-  const selectedTextLayerIndex =
-    state.layerMode === 'text' ? state.selectedLayerIndex : null;
-
-  const textLayers = [...state.textLayers];
-
   switch (type) {
-    case 'SELECT_LAYER':
+    // #region Generic Layer Actions
+    case 'SET_EDITION_MODE':
       return {
         ...state,
-        layerMode: payload.layerMode,
-        selectedLayerIndex: payload.index,
+        editionMode: payload.editionMode,
+        selectedItemIndex: payload.selectedItemIndex,
       };
-    case 'ADD_TEXT_LAYER':
-      return {
-        ...state,
-        textLayers: [
-          ...state.textLayers,
-          {
-            ...payload,
-            width: 0.4,
-            position: { x: 0.3, y: 0.5 },
-            rotation: 0,
-          },
-        ],
-        selectedLayerIndex: state.textLayers.length,
-        layerMode: 'text',
-      };
-    case 'CHANGE_ALIGNMENT':
-      if (selectedTextLayerIndex === null) {
-        return state;
-      }
-      return {
-        ...state,
-        textLayers: textLayers.map((layer, index) => {
-          if (index === selectedTextLayerIndex) {
-            return {
-              ...layer,
-              style: {
-                ...layer.style,
-                textAlign: payload.alignment,
-              },
-            };
-          }
-          return layer;
-        }),
-      };
-    case 'CHANGE_FONT_SIZE':
-      if (state.layerMode === 'links') {
+    case 'DUPLICATE_CURRENT_LAYER': {
+      const { selectedItemIndex, editionMode, textLayers, overlayLayers } =
+        state;
+      if (
+        (editionMode === 'text' || editionMode === 'textEdit') &&
+        selectedItemIndex !== null &&
+        textLayers[selectedItemIndex] != null
+      ) {
+        const textLayers = [...state.textLayers];
+        textLayers.push({ ...textLayers[selectedItemIndex] });
         return {
           ...state,
-          linksLayer: {
-            ...state.linksLayer,
-            style: {
-              ...state.linksLayer.style,
-              size: payload.fontSize,
-            },
-          },
-        };
-      }
-      if (selectedTextLayerIndex !== null) {
-        textLayers[selectedTextLayerIndex] = {
-          ...textLayers[selectedTextLayerIndex],
-          style: {
-            ...textLayers[selectedTextLayerIndex].style,
-            fontSize: payload.fontSize,
-          },
-        };
-
-        return {
-          ...state,
+          selectedItemIndex: textLayers.length - 1,
           textLayers,
         };
+      } else if (
+        editionMode === 'overlay' &&
+        selectedItemIndex != null &&
+        overlayLayers[selectedItemIndex] != null
+      ) {
+        const overlayLayers = [...state.overlayLayers];
+        overlayLayers.push({ ...overlayLayers[selectedItemIndex] });
+        return {
+          ...state,
+          selectedItemIndex: overlayLayers.length - 1,
+          overlayLayers,
+        };
       }
+      console.warn('Duplicate layer without selected layer');
       return state;
-    case 'CHANGE_FONT_FAMILY':
-      if (selectedTextLayerIndex === null) return state;
-      textLayers[selectedTextLayerIndex].style.fontFamily = payload.fontFamily;
-
-      return {
-        ...state,
+    }
+    case 'DELETE_CURRENT_LAYER': {
+      const {
+        selectedItemIndex,
+        editionMode,
+        overlayLayers,
         textLayers,
-      };
-    case 'CHANGE_FONT_COLOR':
-      if (state.layerMode === 'links') {
+        linksLayer,
+      } = state;
+      if (
+        (editionMode === 'text' || editionMode === 'textEdit') &&
+        selectedItemIndex !== null &&
+        textLayers[selectedItemIndex] !== undefined
+      ) {
+        const textLayers = [...state.textLayers];
+        textLayers.splice(selectedItemIndex, 1);
         return {
           ...state,
-          linksLayer: {
-            ...state.linksLayer,
-            style: {
-              ...state.linksLayer.style,
-              color: payload.fontColor,
-            },
-          },
-        };
-      }
-
-      if (selectedTextLayerIndex !== null) {
-        textLayers[selectedTextLayerIndex] = {
-          ...textLayers[selectedTextLayerIndex],
-          style: {
-            ...textLayers[selectedTextLayerIndex].style,
-            color: payload.fontColor,
-          },
-        };
-
-        return {
-          ...state,
+          editionMode: 'none',
+          selectedItemIndex: null,
           textLayers,
         };
+      } else if (
+        editionMode === 'overlay' &&
+        selectedItemIndex !== null &&
+        overlayLayers[selectedItemIndex] !== undefined
+      ) {
+        const overlayLayers = [...state.overlayLayers];
+        overlayLayers.splice(selectedItemIndex, 1);
+        return {
+          ...state,
+          editionMode: 'none',
+          selectedItemIndex: null,
+          overlayLayers,
+        };
+      } else if (editionMode === 'links') {
+        return {
+          ...state,
+          editionMode: 'none',
+          linksLayer: {
+            ...linksLayer,
+            links: [],
+          },
+        };
       }
+      console.warn('Delete layer without selected layer');
       return state;
-    case 'DUPLICATE':
-      if (selectedTextLayerIndex === null || textLayers.length >= 3)
-        return state;
-
-      textLayers.push({ ...textLayers[selectedTextLayerIndex] });
-
-      return {
-        ...state,
-        textLayers,
-      };
-    case 'DELETE_CURRENT_LAYER':
-      switch (state.layerMode) {
-        case 'overlay':
-          return state.overlayLayer
-            ? {
-                ...state,
-                layerMode: null,
-                overlayLayer: null,
-              }
-            : state;
-        case 'text':
-          if (selectedTextLayerIndex !== null) {
-            textLayers.splice(selectedTextLayerIndex, 1);
-
-            return {
-              ...state,
-              layerMode: null,
-              textLayers,
-            };
-          }
-          return state;
-        case 'links':
-          return {
-            ...state,
-            layerMode: null,
-            linksLayer: {
-              ...state.linksLayer,
-              links: [],
-            },
-          };
-        default:
-          return state;
-      }
-    //#Region OverlayLayer
-    case 'ADD_OVERLAY_LAYER':
-      const totalDuration = state.medias.reduce(
-        (acc, media) =>
-          acc +
-          (mediaInfoIsImage(media) ? media.duration : media.timeRange.duration),
-        0,
-      );
-      return {
-        ...state,
-        overlayLayer: {
-          media: payload,
-          style: {
-            borderColor: colors.black,
-            borderRadius: 0,
-            borderWidth: 0,
-            elevation: 0,
-          },
-          animation: { id: 'none', start: 0, duration: totalDuration }, //define this value based on total
-          bounds: {
-            x: 0.25,
-            y: 0.25,
-            width: 0.5,
-            height: 0.5,
-          },
-          rotation: 0,
-          filter: null,
-          editionParameters: null,
-        },
-        layerMode: 'overlay',
-        selectedLayerIndex: null,
-      };
-    case 'UPDATE_OVERLAY_LAYER':
-      if (state.overlayLayer == null) return state;
-      return {
-        ...state,
-        overlayLayer: {
-          ...state.overlayLayer,
-          ...payload,
-        },
-      };
+    }
     case 'UPDATE_LAYER_BORDER':
-      //IMPROVE the way of updating the correct layer more generic not listing all case
-      //maybe renaming overlayer to some name as CoverType and use something like
-      // [layerMode] : {
-      //
-      //}
-      if (state.layerMode === 'overlay') {
-        if (state.overlayLayer == null) return state;
-        return {
-          ...state,
-          overlayLayer: {
-            ...state.overlayLayer,
-            style: { ...state.overlayLayer.style, ...payload },
-          },
-        };
-      } else return state;
-    case 'UPDATE_LAYER_SHADOW':
-      //IMPROVE the way of updating the correct layer more generic not listing all case
-      //maybe renaming overlayer to some name as CoverType and use something like
-      // [layerMode] : {
-      //
-      //}
-      if (state.layerMode === 'overlay') {
-        if (state.overlayLayer == null) return state;
-        return {
-          ...state,
-          overlayLayer: {
-            ...state.overlayLayer,
-            style: { ...state.overlayLayer.style, ...payload },
-          },
-        };
-      } else return state;
-    case 'UPDATE_MEDIA_ANIMATION':
-      if (state.layerMode === 'overlay') {
-        if (state.overlayLayer == null) return state;
-        return {
-          ...state,
-          overlayLayer: {
-            ...state.overlayLayer,
-            animation: { ...state.overlayLayer.animation, ...payload },
-          },
-        };
-      } else if (
-        state.layerMode === 'mediaEdit' &&
-        state.selectedLayerIndex != null
-      ) {
-        const newMedias = [...state.medias]; //making a new array
-        const media = state.medias[state.selectedLayerIndex];
-        if (mediaInfoIsImage(media)) {
-          newMedias[state.selectedLayerIndex] = {
-            ...media,
-            animation: payload.id,
-            duration: payload.duration,
-          };
-        }
-        return {
-          ...state,
-          medias: newMedias,
-        };
-      } else {
-        console.warn(
-          `Update animation on ${state.layerMode} is not implemented`,
-        );
-        return state;
-      }
-    case 'UPDATE_MEDIA_FILTER':
-      if (state.layerMode === 'overlay') {
-        if (state.overlayLayer == null) return state;
-        return {
-          ...state,
-          overlayLayer: {
-            ...state.overlayLayer,
-            filter: payload,
-          },
-        };
-      } else if (
-        state.layerMode === 'mediaEdit' &&
-        state.selectedLayerIndex != null
-      ) {
-        const newMedias = [...state.medias]; //making a new array
-        const media = state.medias[state.selectedLayerIndex];
-        newMedias[state.selectedLayerIndex] = {
-          ...media,
-          filter: payload,
+      if (state.editionMode === 'overlay' && state.selectedItemIndex != null) {
+        const overlayLayers = [...state.overlayLayers];
+        overlayLayers[state.selectedItemIndex] = {
+          ...overlayLayers[state.selectedItemIndex],
+          ...payload,
         };
         return {
           ...state,
-          medias: newMedias,
-        };
-      } else {
-        console.warn(
-          `Update Filter effect on ${state.layerMode} is not implemented`,
-        );
-        return state;
-      }
-    case 'UPDATE_MEDIA_EDITION_PARAMETERS': {
-      if (state.layerMode === 'overlay') {
-        if (state.overlayLayer == null) return state;
-        return {
-          ...state,
-          overlayLayer: {
-            ...state.overlayLayer,
-            editionParameters: payload,
-          },
-        };
-      } else if (
-        state.layerMode === 'mediaEdit' &&
-        state.selectedLayerIndex != null
-      ) {
-        const newMedias = [...state.medias];
-        const media = state.medias[state.selectedLayerIndex];
-        newMedias[state.selectedLayerIndex] = {
-          ...media,
-          editionParameters: payload,
-        };
-        return {
-          ...state,
-          medias: newMedias,
-        };
-      } else {
-        console.warn(
-          `Update Edition Parameters effect on ${state.layerMode} is not implemented`,
-        );
-        return state;
-      }
-    }
-    case 'UPDATE_LINKS':
-      return {
-        ...state,
-        linksLayer: {
-          ...state.linksLayer,
-          links: payload,
-        },
-      };
-    case 'UPDATE_ACTIVE_MEDIA': {
-      if (state.layerMode === 'overlay' && payload.kind === 'image') {
-        return {
-          ...state,
-          overlayLayer: {
-            ...state.overlayLayer!,
-            media: payload,
-          },
-        };
-      } else if (
-        state.layerMode === 'mediaEdit' &&
-        state.selectedLayerIndex != null
-      ) {
-        const newMedias = [...state.medias]; //making a new array
-
-        const cropData = cropDataForAspectRatio(
-          payload.width,
-          payload.height,
-          COVER_RATIO,
-        );
-        if (payload.kind === 'image') {
-          newMedias[state.selectedLayerIndex] = {
-            media: payload,
-            filter: null,
-            animation: 'none',
-            editionParameters: { cropData },
-            duration: COVER_MAX_MEDIA_DURATION,
-          };
-        } else if (payload.kind === 'video') {
-          newMedias[state.selectedLayerIndex] = {
-            media: payload,
-            filter: null,
-            animation: 'none',
-            editionParameters: { cropData },
-            timeRange: {
-              startTime: 0,
-              duration: Math.min(COVER_MAX_MEDIA_DURATION, payload.duration),
-            },
-          };
-        }
-        return {
-          ...state,
-          medias: newMedias,
+          overlayLayers,
         };
       }
-
+      console.warn('Update border without selected overlay layer');
       return state;
-    }
-    case 'UPDATE_MEDIA_TRANSITION': {
+    case 'UPDATE_LAYER_SHADOW':
+      if (state.editionMode === 'overlay' && state.selectedItemIndex != null) {
+        const overlayLayers = [...state.overlayLayers];
+        overlayLayers[state.selectedItemIndex] = {
+          ...overlayLayers[state.selectedItemIndex],
+          shadow: payload.enabled,
+        };
+        return {
+          ...state,
+          overlayLayers,
+        };
+      } else if (
+        (state.editionMode === 'text' || state.editionMode === 'textEdit') &&
+        state.selectedItemIndex != null
+      ) {
+        const textLayers = [...state.textLayers];
+        textLayers[state.selectedItemIndex] = {
+          ...textLayers[state.selectedItemIndex],
+          shadow: payload.enabled,
+        };
+        return {
+          ...state,
+          textLayers,
+        };
+      }
+      console.warn('Update shadow without selected layer');
+      return state;
+    // #endregion
+
+    // #region Colors Actions
+    case 'UPDATE_CARD_COLORS':
       return {
         ...state,
-        coverTransition: payload,
+        cardColors: payload,
       };
-    }
+    // #endregion
+
+    // #region Medias Actions
     case 'UPDATE_MEDIAS':
       return {
         ...state,
@@ -417,101 +173,304 @@ export function coverEditorReducer(
             return {
               media,
               filter: null,
-              animation: 'none',
+              animation: null,
               editionParameters: { cropData },
-              duration: COVER_MAX_MEDIA_DURATION,
+              duration: COVER_IMAGE_DEFAULT_DURATION,
             };
           } else {
             return {
               media,
               filter: null,
-              animation: 'none',
+              animation: null,
               editionParameters: { cropData },
               timeRange: {
                 startTime: 0,
-                duration: Math.min(COVER_MAX_MEDIA_DURATION, media.duration),
+                duration: Math.min(
+                  COVER_VIDEO_DEFAULT_DURATION,
+                  media.duration,
+                ),
               },
             };
           }
         }),
       };
-    case 'UPDATE_OVERLAY_BOUNDS': {
-      const { bounds, rotation } = payload;
-      if (state.overlayLayer) {
+    case 'UPDATE_MEDIA_ANIMATION': {
+      //TODO
+      return state;
+    }
+    case 'UPDATE_MEDIA_FILTER': {
+      if (
+        state.editionMode === 'mediaEdit' &&
+        state.selectedItemIndex != null
+      ) {
+        const medias = [...state.medias];
+        medias[state.selectedItemIndex] = {
+          ...medias[state.selectedItemIndex],
+          filter: payload,
+        };
         return {
           ...state,
-          overlayLayer: {
-            ...state.overlayLayer,
-            bounds,
-            rotation,
+          medias,
+        };
+      } else if (
+        state.editionMode === 'overlay' &&
+        state.selectedItemIndex != null
+      ) {
+        const overlayLayers = [...state.overlayLayers];
+        overlayLayers[state.selectedItemIndex] = {
+          ...overlayLayers[state.selectedItemIndex],
+          filter: payload,
+        };
+        return {
+          ...state,
+          overlayLayers,
+        };
+      }
+      console.warn('Update filter without selected media');
+      return state;
+    }
+    case 'UPDATE_MEDIA_EDITION_PARAMETERS': {
+      if (
+        state.editionMode === 'mediaEdit' &&
+        state.selectedItemIndex != null
+      ) {
+        const medias = [...state.medias];
+        medias[state.selectedItemIndex] = {
+          ...medias[state.selectedItemIndex],
+          editionParameters: payload,
+        };
+        return {
+          ...state,
+          medias,
+        };
+      } else if (
+        state.editionMode === 'overlay' &&
+        state.selectedItemIndex != null
+      ) {
+        const overlayLayers = [...state.overlayLayers];
+        overlayLayers[state.selectedItemIndex] = {
+          ...overlayLayers[state.selectedItemIndex],
+          editionParameters: payload,
+        };
+        return {
+          ...state,
+          overlayLayers,
+        };
+      }
+      console.warn('Update editionParameters without selected media');
+      return state;
+    }
+    case 'UPDATE_CURRENT_VIDEO_TIME_RANGE': {
+      if (
+        state.editionMode === 'mediaEdit' &&
+        state.selectedItemIndex != null
+      ) {
+        const medias = [...state.medias];
+        medias[state.selectedItemIndex] = {
+          ...medias[state.selectedItemIndex],
+          timeRange: payload,
+        };
+        return {
+          ...state,
+          medias,
+        };
+      }
+      console.warn('Update time range without selected media');
+      return state;
+    }
+    case 'UPDATE_ACTIVE_MEDIA': {
+      if (
+        state.editionMode === 'mediaEdit' &&
+        state.selectedItemIndex != null
+      ) {
+        const medias = [...state.medias];
+        medias[state.selectedItemIndex] = payload;
+        return {
+          ...state,
+          medias,
+        };
+      } else if (
+        state.editionMode === 'overlay' &&
+        state.selectedItemIndex != null &&
+        mediaInfoIsImage(payload)
+      ) {
+        const overlayLayers = [...state.overlayLayers];
+        overlayLayers[state.selectedItemIndex] = {
+          ...overlayLayers[state.selectedItemIndex],
+          ...payload,
+        };
+        return {
+          ...state,
+          overlayLayers,
+        };
+      }
+      console.warn('Update active media without selected media');
+      return state;
+    }
+    case 'UPDATE_MEDIA_TRANSITION': {
+      return { ...state, coverTransition: payload };
+    }
+    // #endregion
+
+    // #region TextLayer Actions
+    case 'ADD_TEXT_LAYER':
+      return {
+        ...state,
+        textLayers: [
+          ...state.textLayers,
+          {
+            ...payload,
+            width: 0.4,
+            position: { x: 0.3, y: 0.5 },
+            rotation: 0,
+            shadow: false,
           },
+        ],
+        selectedItemIndex: state.textLayers.length,
+        editionMode: 'textEdit',
+      };
+    case 'UPDATE_TEXT_LAYER': {
+      const { editionMode, selectedItemIndex, textLayers } = state;
+      if (
+        (editionMode === 'textEdit' || editionMode === 'text') &&
+        selectedItemIndex !== null &&
+        textLayers[selectedItemIndex] != null
+      ) {
+        const textLayers = [...state.textLayers];
+        textLayers[selectedItemIndex] = {
+          ...textLayers[selectedItemIndex],
+          ...payload,
         };
-      }
-      return state;
-    }
-    case 'UPDATE_TEXT_SIZE': {
-      const { index, fontSize, position, rotation, width } = payload;
-      if (textLayers[index]) {
         return {
           ...state,
-          textLayers: [
-            ...textLayers.slice(0, index),
-            {
-              ...textLayers[index],
-              style: {
-                ...textLayers[index].style,
-                fontSize,
-              },
-              position,
-              width,
-              rotation,
-            },
-            ...textLayers.slice(index + 1),
-          ],
+          textLayers,
         };
       }
+      console.warn('Update text layer without selected text layer');
       return state;
     }
-    case 'UPDATE_TEXT': {
-      const { index, text } = payload;
-      if (textLayers[index]) {
+    // #endregion
+
+    // #region OverlayLayer Actions
+    case 'ADD_OVERLAY_LAYER': {
+      const aspectRatio = payload.width / payload.height;
+      const size =
+        aspectRatio > 1
+          ? { width: 0.5, height: (0.5 / aspectRatio) * COVER_RATIO }
+          : { width: (0.5 * aspectRatio) / COVER_RATIO, height: 0.5 };
+      return {
+        ...state,
+        editionMode: 'overlay',
+        selectedItemIndex: state.overlayLayers.length,
+        overlayLayers: [
+          ...state.overlayLayers,
+          {
+            media: payload,
+            borderColor: colors.black,
+            borderRadius: 0,
+            borderWidth: 0,
+            elevation: 0,
+            // TODO
+            animation: null,
+            bounds: {
+              x: 0.5 - size.width / 2,
+              y: 0.5 - size.height / 2,
+              ...size,
+            },
+            rotation: 0,
+            filter: null,
+            editionParameters: null,
+            shadow: false,
+          },
+        ],
+      };
+    }
+    case 'UPDATE_OVERLAY_LAYER': {
+      const { selectedItemIndex, overlayLayers } = state;
+      if (
+        selectedItemIndex !== null &&
+        overlayLayers[selectedItemIndex] != null
+      ) {
+        const overlayLayers = [...state.overlayLayers];
+        const layer = {
+          ...overlayLayers[selectedItemIndex],
+          ...payload,
+        };
+        const boundsAspectRatio =
+          (layer.bounds.width / layer.bounds.height) * COVER_RATIO;
+        let cropData = layer.editionParameters?.cropData;
+        const cropDataAspectRatio = cropData
+          ? cropData.width / cropData.height
+          : null;
+        const naturalAspectRatio = layer.media.width / layer.media.height;
+
+        if (
+          (cropDataAspectRatio != null &&
+            cropDataAspectRatio !== boundsAspectRatio) ||
+          (cropDataAspectRatio == null &&
+            naturalAspectRatio !== boundsAspectRatio)
+        ) {
+          cropData = cropDataForAspectRatio(
+            layer.media.width,
+            layer.media.height,
+            boundsAspectRatio,
+          );
+          layer.editionParameters = {
+            ...layer.editionParameters,
+            roll: 0,
+            cropData,
+          };
+        }
+        overlayLayers[selectedItemIndex] = layer;
         return {
           ...state,
-          textLayers: [
-            ...textLayers.slice(0, index),
-            {
-              ...textLayers[index],
-              text,
-            },
-            ...textLayers.slice(index + 1),
-          ],
+          overlayLayers,
         };
       }
+      console.warn('Update overlay layer without selected overlay layer');
       return state;
     }
+    // #endregion
+
+    // #region LinksLayer Actions
+    case 'UPDATE_LINKS':
+      return {
+        ...state,
+        linksLayer: {
+          ...state.linksLayer,
+          links: payload,
+        },
+      };
+    // #endregion
+
+    // #region Loading Actions
     case 'LOADING_START':
       return {
         ...state,
+        loadingError: null,
         loadingRemoteMedia: payload.remote,
         loadingLocalMedia: !payload.remote,
       };
-    case 'LOADING_ERROR': {
-      console.error(payload.error);
-      // TODO handle error
-      return state;
-    }
-    case 'LOADING_SUCCESS': {
+    case 'LOADING_ERROR':
+      return {
+        ...state,
+        loadingError: payload.error,
+      };
+    case 'LOADING_SUCCESS':
       const { images, lutShaders, videoPaths } = payload;
       return {
         ...state,
+        loadingError: null,
         loadingRemoteMedia: false,
         loadingLocalMedia: false,
         images,
         lutShaders,
         videoPaths,
       };
-    }
+    // #endregion
+
     default:
+      console.warn(`Action type ${type} not implemented`);
       return state;
   }
 }

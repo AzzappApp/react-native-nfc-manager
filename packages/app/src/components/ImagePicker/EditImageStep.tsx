@@ -27,11 +27,26 @@ import type {
   ImageOrientation,
 } from '#helpers/mediaEditions';
 import type { BottomMenuItem } from '#ui/BottomMenu';
+
+type EditImageStepProps = {
+  selectedTab?: 'edit' | 'filter' | 'timeRange';
+  selectedParameter?: keyof EditionParameters | null;
+  showTabs?: boolean;
+  onEditionSave?: (editionParameters: EditionParameters) => void;
+  onEditionCancel?: () => void;
+};
+
 /**
  * A step of the Image Picker that allows the user to edit the selected image
  * (crop, filter, brightness, contrast etc.)
  */
-const EditImageStep = () => {
+const EditImageStep = ({
+  selectedTab,
+  showTabs = true,
+  selectedParameter = null,
+  onEditionSave: onEditionSaveProp,
+  onEditionCancel: onEditionCancelProp,
+}: EditImageStepProps) => {
   const {
     maxVideoDuration,
     media,
@@ -50,9 +65,9 @@ const EditImageStep = () => {
   const previousTimeRange = useRef(timeRange);
   const [editedParameter, setEditedParam] = useState<
     keyof EditionParameters | null
-  >(null);
+  >(selectedParameter ?? null);
   const [currentTab, setCurrentTab] = useState<'edit' | 'filter' | 'timeRange'>(
-    'filter',
+    selectedTab ?? 'filter',
   );
 
   const onEditionStart = useCallback(
@@ -68,13 +83,15 @@ const EditImageStep = () => {
     previousParameters.current = editionParameters;
     previousTimeRange.current = timeRange;
     setEditedParam(null);
-  }, [editionParameters, timeRange]);
+    onEditionSaveProp?.(editionParameters);
+  }, [editionParameters, onEditionSaveProp, timeRange]);
 
   const onEditionCancel = useCallback(() => {
     onEditionParametersChange(previousParameters.current);
     onTimeRangeChange(previousTimeRange.current);
     setEditedParam(null);
-  }, [onEditionParametersChange, onTimeRangeChange]);
+    onEditionCancelProp?.();
+  }, [onEditionParametersChange, onEditionCancelProp, onTimeRangeChange]);
 
   const onCurrentParamChange = useCallback(
     (value: number) => {
@@ -109,7 +126,7 @@ const EditImageStep = () => {
   const paramsInfos = useEditionParametersDisplayInfos();
 
   const tabs = useMemo<BottomMenuItem[]>(() => {
-    const tabs: BottomMenuItem[] = [
+    let tabs: BottomMenuItem[] = [
       {
         icon: 'filters',
         key: 'filter',
@@ -140,8 +157,11 @@ const EditImageStep = () => {
         }),
       });
     }
+    if (!showTabs) {
+      tabs = tabs.filter(tab => tab.key === currentTab);
+    }
     return tabs;
-  }, [intl, media?.kind]);
+  }, [currentTab, intl, media?.kind, showTabs]);
 
   const filterListerCropData = useMemo(() => {
     let cropData = editionParameters.cropData;
@@ -347,7 +367,7 @@ const EditImageStep = () => {
         />
       )}
       menuBarProps={
-        !isEditing
+        !isEditing && showTabs
           ? {
               currentTab,
               onItemPress: setCurrentTab as any,

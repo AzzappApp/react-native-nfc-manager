@@ -18,6 +18,17 @@ input SaveCoverInput {
   background color of the card cover
   """
   backgroundColor: String!
+  """
+  The colors of the card cover
+  """
+  cardColors: CardColorsInput!
+}
+
+input CardColorsInput {
+  primary: String!
+  light: String!
+  dark: String!
+  otherColors: [String!]!
 }
 
 type SaveCoverPayload {

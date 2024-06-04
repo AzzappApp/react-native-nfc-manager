@@ -15,8 +15,5 @@
   "[css]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode",
     "editor.formatOnSave": true
-  },
-  "relay": {
-    "autoStartCompiler": true
   }
 }

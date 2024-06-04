@@ -3,7 +3,6 @@ import { View } from 'react-native';
 import { graphql, useLazyLoadQuery } from 'react-relay';
 import CoverEditor from '#components/CoverEditor';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
-// import useScreenInsets from '#hooks/useScreenInsets';
 import ActivityIndicator from '#ui/ActivityIndicator';
 import type { CoverEditorHandle } from '#components/CoverEditor/CoverEditor';
 import type { TemplateTypePreview } from '#components/CoverEditorTemplateList';

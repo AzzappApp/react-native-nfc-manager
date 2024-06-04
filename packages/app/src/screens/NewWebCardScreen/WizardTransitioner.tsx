@@ -1,11 +1,16 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { type StyleProp, type ViewStyle } from 'react-native';
+import {
+  unstable_batchedUpdates,
+  type StyleProp,
+  type ViewStyle,
+} from 'react-native';
 import { KeyboardProvider } from 'react-native-keyboard-controller';
 import Animated, {
   Easing,
   runOnJS,
   useAnimatedStyle,
   useSharedValue,
+  withDelay,
   withTiming,
 } from 'react-native-reanimated';
 import { Screen, ScreenContainer } from 'react-native-screens';
@@ -15,6 +20,7 @@ import type { Icons } from '#ui/Icon';
 
 type WizardTransitionerProps = {
   currentStepIndex: number;
+  animationDelay?: number;
   steps: Array<{
     title: React.ReactNode;
     element: React.ReactNode;
@@ -32,15 +38,16 @@ type WizardTransitionerProps = {
 const WizardTransitioner = ({
   steps,
   currentStepIndex,
+  animationDelay = 0,
   contentHeight,
   headerHidden,
   width,
   style,
   onBack,
 }: WizardTransitionerProps) => {
-  const currentStep = steps[currentStepIndex];
   const previousStepIndex = useRef(currentStepIndex);
   const transitionProgress = useSharedValue(0);
+  const [nextStepIndex, setNextStepIndex] = useState<number>(currentStepIndex);
   const [transitionInformation, setTransitionInformation] = useState<{
     transitionKind: 'back' | 'forward';
     transitioningPage: number;
@@ -60,16 +67,19 @@ const WizardTransitioner = ({
     }
     const transitionKind =
       currentStepIndex > previousStepIndex.current ? 'forward' : 'back';
-    setTransitionInformation({
-      transitionKind,
-      transitioningPage:
-        transitionKind === 'forward'
-          ? currentStepIndex
-          : previousStepIndex.current,
-      disappearingPage: previousStepIndex.current,
+    unstable_batchedUpdates(() => {
+      setNextStepIndex(currentStepIndex);
+      setTransitionInformation({
+        transitionKind,
+        transitioningPage:
+          transitionKind === 'forward'
+            ? currentStepIndex
+            : previousStepIndex.current,
+        disappearingPage: previousStepIndex.current,
+      });
     });
     previousStepIndex.current = currentStepIndex;
-    transitionProgress.value = withTiming(
+    let transitionValue = withTiming(
       1,
       {
         duration: TRANSITION_DURATION,
@@ -79,14 +89,19 @@ const WizardTransitioner = ({
         runOnJS(onTransitionEnd)();
       },
     );
-  }, [currentStepIndex, onTransitionEnd, transitionProgress]);
+    if (animationDelay > 0) {
+      transitionValue = withDelay(animationDelay, transitionValue);
+    }
+    transitionProgress.value = transitionValue;
+  }, [animationDelay, currentStepIndex, onTransitionEnd, transitionProgress]);
 
+  const currentStep = steps[nextStepIndex];
   return (
     <Container style={style}>
       {!headerHidden && (
         <PagerHeader
           nbPages={steps.length}
-          currentPage={currentStepIndex}
+          currentPage={nextStepIndex}
           onBack={onBack}
           title={currentStep.title}
           backIcon={currentStep.backIcon}
@@ -100,7 +115,7 @@ const WizardTransitioner = ({
           <TransitionScreen
             key={`NewProfileScreen-${index}`}
             activityState={
-              index === currentStepIndex
+              index === nextStepIndex
                 ? 2
                 : transitionInformation?.disappearingPage === index
                   ? 1

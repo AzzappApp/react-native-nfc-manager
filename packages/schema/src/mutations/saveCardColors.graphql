@@ -2,14 +2,7 @@ extend type Mutation {
   """
   Update the card cover of the current profile
   """
-  saveCardColors(webCardId: ID!, input: SaveCardColorsInput!): SaveCardColorsPayload!
-}
-
-input SaveCardColorsInput {
-  primary: String!
-  light: String!
-  dark: String!
-  otherColors: [String!]!
+  saveCardColors(webCardId: ID!, input: CardColorsInput!): SaveCardColorsPayload!
 }
 
 type SaveCardColorsPayload {

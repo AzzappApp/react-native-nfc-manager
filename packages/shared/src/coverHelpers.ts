@@ -58,7 +58,17 @@ export const COVER_ASSET_SIZES = [128, 256, 512, 1024];
 /**
  * Maximum number of media that can compose a cover
  */
-export const COVER_MAX_MEDIA = 6;
+export const COVER_MAX_MEDIA = 5;
+
+/**
+ *  Maximum duration that a media can be displayed in a cover
+ */
+export const COVER_IMAGE_DEFAULT_DURATION = 2;
+
+/**
+ *  Maximum duration that a media can be displayed in a cover
+ */
+export const COVER_VIDEO_DEFAULT_DURATION = 4;
 
 /**
  *  Maximum duration that a media can be displayed in a cover

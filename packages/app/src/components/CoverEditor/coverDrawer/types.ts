@@ -1,6 +1,5 @@
 import type { CoverEditorState } from '../coverEditorTypes';
 import type { VideoFrame } from '@azzapp/react-native-skia-video';
-import type { ColorPalette } from '@azzapp/shared/cardHelpers';
 import type {
   SkCanvas,
   SkImage,
@@ -19,5 +18,4 @@ export type CoverDrawerOptions = {
   lutShaders: Record<string, SkShader>;
   videoScales: Record<string, number>;
   fontManager: SkTypefaceFontProvider | null;
-  cardColors: ColorPalette | null | undefined;
 };

@@ -14,7 +14,6 @@ import {
   type VideoCompositionItem,
 } from '@azzapp/react-native-skia-video';
 import {
-  COVER_MAX_MEDIA_DURATION,
   COVER_VIDEO_BITRATE,
   COVER_VIDEO_FRAME_RATE,
   COVER_MEDIA_RESOLUTION,
@@ -28,7 +27,6 @@ import { mediaInfoIsImage } from './coverEditorHelpers';
 import coverLocalStore from './coversLocalStore';
 import type { useSaveCoverMutation } from '#relayArtifacts/useSaveCoverMutation.graphql';
 import type { CoverEditorState } from './coverEditorTypes';
-import type { ColorPalette } from '@azzapp/shared/cardHelpers';
 import type { Observable } from 'relay-runtime';
 
 export type SavingStatus =
@@ -42,7 +40,6 @@ const useSaveCover = (
   webCardId: string,
   coverEditorState: CoverEditorState,
   fontManager: SkTypefaceFontProvider | null,
-  cardColors: Readonly<ColorPalette>,
 ) => {
   const [savingStatus, setSavingStatus] = useState<SavingStatus | null>(null);
   const [error, setError] = useState<any>(null);
@@ -66,7 +63,6 @@ const useSaveCover = (
     const { path, kind } = await createCoverMedia(
       coverEditorState,
       fontManager,
-      cardColors,
     );
 
     const { uploadURL, uploadParameters } = await uploadSign({
@@ -96,39 +92,46 @@ const useSaveCover = (
     setSavingStatus('saving');
 
     const texts = coverEditorState.textLayers.map(({ text }) => text);
-    const { backgroundColor } = coverEditorState;
-    commit({
-      variables: {
-        webCardId,
-        input: {
-          mediaId: encodeMediaId(public_id, kind),
-          texts,
-          backgroundColor: backgroundColor ?? 'light',
+    const { backgroundColor, cardColors } = coverEditorState;
+
+    return new Promise<void>((resolve, reject) => {
+      commit({
+        variables: {
+          webCardId,
+          input: {
+            mediaId: encodeMediaId(public_id, kind),
+            texts,
+            backgroundColor: backgroundColor ?? 'light',
+            cardColors,
+          },
         },
-      },
-      onCompleted(response, error) {
-        if (error) {
+        onCompleted(response, error) {
+          if (error) {
+            unstable_batchedUpdates(() => {
+              setSavingStatus('error');
+              setError(error);
+              setProgressIndicator(null);
+            });
+            reject(error);
+            return;
+          }
+          unstable_batchedUpdates(() => {
+            setSavingStatus('complete');
+            setProgressIndicator(null);
+          });
+          resolve();
+        },
+        onError(error) {
           unstable_batchedUpdates(() => {
             setSavingStatus('error');
             setError(error);
             setProgressIndicator(null);
           });
-          return;
-        }
-        unstable_batchedUpdates(() => {
-          setSavingStatus('complete');
-          setProgressIndicator(null);
-        });
-      },
-      onError(error) {
-        unstable_batchedUpdates(() => {
-          setSavingStatus('error');
-          setError(error);
-          setProgressIndicator(null);
-        });
-      },
+          reject(error);
+        },
+      });
     });
-  }, [cardColors, commit, coverEditorState, fontManager, webCardId]);
+  }, [commit, coverEditorState, fontManager, webCardId]);
 
   const reset = useCallback(() => {
     unstable_batchedUpdates(() => {
@@ -153,7 +156,7 @@ export default useSaveCover;
 const isCoverEditorStateValid = (coverEditorState: CoverEditorState) => {
   const {
     medias,
-    overlayLayer,
+    overlayLayers,
     loadingLocalMedia,
     loadingRemoteMedia,
     images,
@@ -172,14 +175,13 @@ const isCoverEditorStateValid = (coverEditorState: CoverEditorState) => {
         return videoPaths[mediaInfo.media.uri] != null;
       }
     }) &&
-    (!overlayLayer || images[overlayLayer.media.uri] != null)
+    overlayLayers.every(overlayLayer => images[overlayLayer.media.uri] != null)
   );
 };
 
 const createCoverMedia = async (
   coverEditorState: CoverEditorState,
   fontManager: SkTypefaceFontProvider | null,
-  cardColors: ColorPalette,
 ) => {
   const {
     coverTransition,
@@ -201,9 +203,10 @@ const createCoverMedia = async (
       mediaInfo => !mediaInfoIsImage(mediaInfo) || mediaInfo.animation != null,
     ) || medias.length > 1;
 
-  const outPath = createRandomFilePath('.mp4');
+  let outPath: string;
 
   if (!isDynamic) {
+    outPath = createRandomFilePath('jpg');
     const image = drawAsImageFromPicture(
       createPicture(canvas => {
         coverDrawer({
@@ -217,7 +220,6 @@ const createCoverMedia = async (
           images,
           lutShaders,
           fontManager,
-          cardColors,
         });
       }),
       COVER_MEDIA_RESOLUTION,
@@ -225,21 +227,22 @@ const createCoverMedia = async (
 
     const blob = await image.encodeToBase64(ImageFormat.JPEG, 95);
 
-    const path = createRandomFilePath('jpg');
-    await ReactNativeBlobUtil.fs.writeFile(path, blob, 'base64');
+    await ReactNativeBlobUtil.fs.writeFile(outPath, blob, 'base64');
   } else {
+    outPath = createRandomFilePath('mp4');
     let duration = 0;
     const videoScales: Record<string, number> = {};
     const items: VideoCompositionItem[] = [];
     const transitionDuration =
-      coverTransitions[coverTransition ?? 'none']?.duration ?? 0;
-    for (const { media } of medias) {
+      (coverTransition && coverTransitions[coverTransition]?.duration) || 0;
+    for (const mediaInfo of medias) {
       duration = Math.max(0, duration - transitionDuration);
-      if (media.kind === 'image') {
-        duration += COVER_MAX_MEDIA_DURATION;
-      } else if (media.kind === 'video') {
+      if (mediaInfoIsImage(mediaInfo)) {
+        duration += mediaInfo.duration;
+      } else {
+        const { media, timeRange } = mediaInfo;
         const path = videoPaths[media.uri];
-        const itemDuration = Math.min(media.duration, COVER_MAX_MEDIA_DURATION);
+        const itemDuration = timeRange.duration;
         const { resolution, videoScale } = reduceVideoResolutionIfNecessary(
           media.width,
           media.height,
@@ -276,7 +279,6 @@ const createCoverMedia = async (
           lutShaders,
           videoScales,
           fontManager,
-          cardColors,
         });
       },
     );

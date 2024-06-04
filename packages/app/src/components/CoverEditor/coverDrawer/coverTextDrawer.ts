@@ -1,5 +1,7 @@
 import { Skia, TextAlign } from '@shopify/react-native-skia';
+import { swapColor, type ColorPalette } from '@azzapp/shared/cardHelpers';
 import { percentRectToRect } from '../coverEditorHelpers';
+import { convertToBaseCanvasRatio } from './utils';
 import type { CoverDrawerOptions } from './types';
 import type { CoverEditorTextLayerItem } from '../coverEditorTypes';
 import type {
@@ -14,22 +16,46 @@ const textAlignMap = {
   right: TextAlign.Right,
 };
 
-export const createParagraph = (
-  layer: CoverEditorTextLayerItem,
-  fontManager: SkTypefaceFontProvider | null,
-  canvasWidth: number,
-): SkParagraph => {
+export const createParagraph = ({
+  layer,
+  fontManager,
+  canvasWidth,
+  cardColors,
+}: {
+  layer: CoverEditorTextLayerItem;
+  fontManager: SkTypefaceFontProvider | null;
+  canvasWidth: number;
+  cardColors?: ColorPalette | null;
+}): SkParagraph => {
   'worklet';
-  const { text, style, width: layerWidth } = layer;
+  const {
+    text,
+    textAlign,
+    fontFamily,
+    fontSize,
+    color,
+    shadow,
+    width: layerWidth,
+  } = layer;
   const textWidth = layerWidth * canvasWidth;
+
   const paragraph = Skia.ParagraphBuilder.Make(
-    { textAlign: textAlignMap[style.textAlign ?? 'left'] },
+    { textAlign: textAlignMap[textAlign ?? 'left'] },
     fontManager ?? Skia.TypefaceFontProvider.Make(),
   )
     .pushStyle({
-      fontFamilies: [style.fontFamily],
-      fontSize: style.fontSize * (canvasWidth / 300),
-      color: Skia.Color(style.color ?? '#000000'),
+      fontFamilies: [fontFamily],
+      fontSize: convertToBaseCanvasRatio(fontSize, canvasWidth),
+      color: Skia.Color(swapColor(color, cardColors) ?? '#000000'),
+      shadows: shadow
+        ? [
+            {
+              color: Skia.Color('#00000099'),
+              offset: { x: 0, y: convertToBaseCanvasRatio(4, canvasWidth) },
+              blurRadius: convertToBaseCanvasRatio(8, canvasWidth),
+            },
+          ]
+        : [],
     })
     .addText(text)
     .build();
@@ -40,7 +66,7 @@ export const createParagraph = (
 
 const coverTextDrawer = ({
   canvas,
-  coverEditorState: { textLayers },
+  coverEditorState: { textLayers, cardColors },
   index,
   fontManager,
   width,
@@ -51,7 +77,12 @@ const coverTextDrawer = ({
   if (!layer) {
     return;
   }
-  const paragraph = createParagraph(layer, fontManager, width);
+  const paragraph = createParagraph({
+    layer,
+    fontManager,
+    canvasWidth: width,
+    cardColors,
+  });
   const { rotation, position, width: layerWidth } = layer;
   const {
     x,

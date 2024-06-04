@@ -7,6 +7,7 @@ import {
   useEffect,
   useImperativeHandle,
   useMemo,
+  useRef,
   useState,
 } from 'react';
 import { useSkImage } from '#helpers/mediaEditions';
@@ -159,6 +160,15 @@ type ImagePickerContextProviderProps = {
   onMediaChange?(media: Media | null): void;
 
   cameraButtonsLeftRightPosition?: number;
+  /**
+   * Initial data for the picker
+   */
+  initialData?: {
+    media: Media;
+    editionParameters: EditionParameters | null;
+    filter: Filter | null;
+    timeRange?: TimeRange | null;
+  } | null;
 };
 
 const _ImagePickerContextProvider = (
@@ -171,30 +181,39 @@ const _ImagePickerContextProvider = (
     forceCameraRatio,
     onMediaChange: onMediaChangeProps,
     cameraButtonsLeftRightPosition,
+    initialData,
   }: ImagePickerContextProviderProps,
   forwardedRef: ForwardedRef<ImagePickerState>,
 ) => {
-  const [media, setMedia] = useState<Media | null>(null);
+  const [media, setMedia] = useState<Media | null>(initialData?.media ?? null);
   const [aspectRatio, setAspectRatio] = useState(
     typeof forceAspectRatio === 'number' ? forceAspectRatio : null,
   );
   const [editionParameters, setEditionParameters] = useState<EditionParameters>(
-    {},
+    initialData?.editionParameters ?? {},
   );
-  const [timeRange, setTimeRange] = useState<TimeRange | null>(null);
-  const [mediaFilter, setMediaFilter] = useState<Filter | null>(null);
+  const [timeRange, setTimeRange] = useState<TimeRange | null>(
+    initialData?.timeRange ?? null,
+  );
+  const [mediaFilter, setMediaFilter] = useState<Filter | null>(
+    initialData?.filter ?? null,
+  );
 
+  const previousMedia = useRef(media);
   useEffect(() => {
-    setEditionParameters({});
-    let initialTimeRange: TimeRange | null = null;
-    if (media?.kind === 'video') {
-      initialTimeRange = {
-        startTime: 0,
-        duration: Math.min(media.duration, maxVideoDuration),
-      };
+    if (previousMedia.current !== media) {
+      setEditionParameters({});
+      let initialTimeRange: TimeRange | null = null;
+      if (media?.kind === 'video') {
+        initialTimeRange = {
+          startTime: 0,
+          duration: Math.min(media.duration, maxVideoDuration),
+        };
+      }
+      setTimeRange(initialTimeRange);
+      setMediaFilter(null);
+      previousMedia.current = media;
     }
-    setTimeRange(initialTimeRange);
-    setMediaFilter(null);
   }, [maxVideoDuration, media]);
 
   const onMediaChange = useCallback(

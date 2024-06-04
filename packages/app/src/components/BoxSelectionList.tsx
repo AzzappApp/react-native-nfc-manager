@@ -28,6 +28,7 @@ export type BoxSelectionListProps<T> = Omit<ViewProps, 'hitSlop'> & {
   renderLabel?: (params: BoxButtonItemInfo<T>) => React.ReactNode;
   keyExtractor: (item: T) => string;
   onSelect: (item: T | null) => void;
+  onItemHeightChange?: (height: number) => void;
 };
 
 const BoxSelectionList = <T,>({
@@ -39,6 +40,7 @@ const BoxSelectionList = <T,>({
   keyExtractor,
   onSelect,
   onLayout,
+  onItemHeightChange,
   ...props
 }: BoxSelectionListProps<T>) => {
   const styles = useStyleSheet(styleSheet);
@@ -50,11 +52,12 @@ const BoxSelectionList = <T,>({
       const { height } = event.nativeEvent.layout;
       setHeight(height);
       onLayout?.(event);
+      onItemHeightChange?.(height - VERTICAL_PADDING * 2);
     },
-    [onLayout],
+    [onItemHeightChange, onLayout],
   );
 
-  const renderbutton = useCallback(
+  const renderButton = useCallback(
     ({ item, index }: ListRenderItemInfo<T | null>) => {
       if (height === null) {
         return null;
@@ -99,7 +102,7 @@ const BoxSelectionList = <T,>({
     <FlatList
       {...props}
       data={innerData}
-      renderItem={renderbutton}
+      renderItem={renderButton}
       keyExtractor={innerKeyExtractor}
       horizontal
       showsHorizontalScrollIndicator={false}

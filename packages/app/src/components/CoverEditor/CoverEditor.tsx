@@ -13,32 +13,41 @@ import Animated, {
   useSharedValue,
 } from 'react-native-reanimated';
 import { graphql, useFragment } from 'react-relay';
-import { DEFAULT_COLOR_PALETTE } from '@azzapp/shared/cardHelpers';
+import {
+  DEFAULT_COLOR_LIST,
+  DEFAULT_COLOR_PALETTE,
+} from '@azzapp/shared/cardHelpers';
+import { COVER_RATIO } from '@azzapp/shared/coverHelpers';
 import { colors } from '#theme';
 import ScreenModal from '#components/ScreenModal';
 import { SKImageLoader, loadAllLUTShaders } from '#helpers/mediaEditions';
 import { getVideoLocalPath } from '#helpers/mediaHelpers';
 import { useSkiaApplicationFonts } from '#hooks/useApplicationFonts';
 import useScreenInsets from '#hooks/useScreenInsets';
+import useToggle from '#hooks/useToggle';
 import Button from '#ui/Button';
 import Container from '#ui/Container';
 import Text from '#ui/Text';
 import CoverEditorContextProvider from './CoverEditorContext';
 import { mediaInfoIsImage } from './coverEditorHelpers';
+import CoverEditorMediaPicker from './CoverEditorMediaPicker';
 import { coverEditorReducer } from './coverEditorReducer';
 import CoverEditorSaveModal from './CoverEditorSaveModal';
+import CoverEditorToolbox from './CoverEditorToolbox';
 import CoverPreview from './CoverPreview';
-import CoverEditorToolbox from './toolbox/CoverEditorToolbox';
 import useSaveCover from './useSaveCover';
 import type { TemplateTypePreview } from '#components/CoverEditorTemplateList';
+import type { Media } from '#helpers/mediaHelpers';
 import type { CoverEditor_profile$key } from '#relayArtifacts/CoverEditor_profile.graphql';
+import type { CoverEditorState } from './coverEditorTypes';
 import type { ForwardedRef } from 'react';
-import type { LayoutChangeEvent } from 'react-native';
+import type { LayoutChangeEvent, ViewProps } from 'react-native';
 
-export type CoverEditorProps = {
+export type CoverEditorProps = Omit<ViewProps, 'children'> & {
   profile: CoverEditor_profile$key;
   coverTemplatePreview: TemplateTypePreview | null;
   backgroundColor: string | null;
+  coverInitialSate?: Partial<CoverEditorState> | null;
   onCanSaveChange?: (canSave: boolean) => void;
 };
 
@@ -52,6 +61,9 @@ const CoverEditor = (
     coverTemplatePreview,
     backgroundColor,
     onCanSaveChange,
+    coverInitialSate,
+    style,
+    ...props
   }: CoverEditorProps,
   ref: ForwardedRef<CoverEditorHandle>,
 ) => {
@@ -65,9 +77,9 @@ const CoverEditor = (
             primary
             light
             dark
+            otherColors
           }
         }
-        ...CoverEditorToolbox_profile
       }
     `,
     profileKey,
@@ -76,30 +88,37 @@ const CoverEditor = (
 
   // #region Store
   const [coverEditorState, dispatch] = useReducer(coverEditorReducer, {
+    template: null,
+    cardColors: {
+      ...DEFAULT_COLOR_PALETTE,
+      otherColors: [...DEFAULT_COLOR_LIST],
+      ...profile.webCard.cardColors,
+    } as any, // typescript is not happy with readonly
+    backgroundColor,
+
+    medias: [],
+    coverTransition: 'fade',
+
+    overlayLayers: [],
     textLayers: [],
-    selectedLayerIndex: null,
-    overlayLayer: null,
     linksLayer: {
       links: [],
-      style: {
-        color: colors.black,
-        size: 24,
-      },
+      color: colors.black,
+      size: 24,
     },
-    layerMode: null,
-    medias: [],
-    template: null,
-    coverTransition: 'slide',
+
+    editionMode: 'none',
+    selectedItemIndex: null,
 
     images: {},
     videoPaths: {},
     lutShaders: {},
 
-    // Loading state
     loadingRemoteMedia: false,
     loadingLocalMedia: false,
+    loadingError: null,
 
-    backgroundColor,
+    ...coverInitialSate,
   });
 
   const contextValue = useMemo(() => {
@@ -129,10 +148,10 @@ const CoverEditor = (
         videoToLoad.push(uri);
       }
     }
-    if (coverEditorState.overlayLayer) {
+    for (const overlayLayer of coverEditorState.overlayLayers) {
       const {
         media: { uri },
-      } = coverEditorState.overlayLayer;
+      } = overlayLayer;
       if (!coverEditorState.images[uri]) {
         imagesToLoad.push(uri);
       }
@@ -238,22 +257,17 @@ const CoverEditor = (
     };
   }, [
     coverEditorState.medias,
-    coverEditorState.overlayLayer,
     coverEditorState.lutShaders,
     coverEditorState.images,
     coverEditorState.videoPaths,
+    coverEditorState.overlayLayers,
   ]);
   const fontManager = useSkiaApplicationFonts();
   // #endregion
 
   // #region Saving
   const { save, reset, savingStatus, progressIndicator, error, canSave } =
-    useSaveCover(
-      profile.webCard.id,
-      coverEditorState,
-      fontManager,
-      profile.webCard.cardColors ?? DEFAULT_COLOR_PALETTE,
-    );
+    useSaveCover(profile.webCard.id, coverEditorState, fontManager);
 
   useEffect(() => {
     if (error) {
@@ -277,8 +291,26 @@ const CoverEditor = (
     }),
     [save, canSave],
   );
-
   // #endregion
+
+  // #region Initial Media picking
+  const [showImagePicker, toggleImagePicker] = useToggle(false);
+  useEffect(() => {
+    if (coverEditorState.medias.length === 0) {
+      toggleImagePicker();
+    }
+  }, [coverEditorState.medias.length, toggleImagePicker]);
+
+  const onMediasPicked = useCallback(
+    (medias: Media[]) => {
+      dispatch({
+        type: 'UPDATE_MEDIAS',
+        payload: medias,
+      });
+      toggleImagePicker();
+    },
+    [dispatch, toggleImagePicker],
+  );
 
   // #region Layout and styles
   const { bottom } = useScreenInsets();
@@ -317,7 +349,13 @@ const CoverEditor = (
     <>
       <CoverEditorContextProvider value={contextValue}>
         <Animated.View
-          style={[styles.container, { marginBottom: bottom }, animatedStyle]}
+          style={[
+            styles.container,
+            { marginBottom: bottom },
+            style,
+            animatedStyle,
+          ]}
+          {...props}
         >
           <Container style={styles.container}>
             <View style={styles.content} onLayout={onContentLayout}>
@@ -327,16 +365,12 @@ const CoverEditor = (
                   height={contentSize.height}
                   style={styles.coverPreview}
                   fontManager={fontManager}
-                  cardColors={profile.webCard.cardColors}
                   onKeyboardTranslateWorklet={onKeyboardTranslateWorklet}
                 />
               )}
             </View>
             <View style={{ height: 50 }} />
-            <CoverEditorToolbox
-              coverTemplatePreview={coverTemplatePreview}
-              profile={profile}
-            />
+            <CoverEditorToolbox coverTemplatePreview={coverTemplatePreview} />
           </Container>
         </Animated.View>
       </CoverEditorContextProvider>
@@ -361,6 +395,13 @@ const CoverEditor = (
           <Button onPress={reset} label="Ok" />
         </Container>
       </ScreenModal>
+      <ScreenModal visible={showImagePicker} animationType="slide">
+        <CoverEditorMediaPicker
+          initialMedias={null}
+          onFinished={onMediasPicked}
+          durations={null}
+        />
+      </ScreenModal>
     </>
   );
 };
@@ -374,6 +415,8 @@ const styles = StyleSheet.create({
   content: {
     flex: 1,
     margin: 40,
+    alignSelf: 'center',
+    aspectRatio: COVER_RATIO,
   },
   coverPreview: {
     position: 'absolute',

@@ -53,6 +53,14 @@ export type ImagePickerResult = {
    * Only available for videos
    */
   timeRange: TimeRange | null;
+  /**
+   * The duration of the video selected
+   */
+  duration: number | null;
+  /**
+   * The gallery uri of the media selected
+   */
+  galleryUri?: string;
 };
 
 export type ImagePickerProps = {
@@ -103,7 +111,7 @@ export type ImagePickerProps = {
   /**
    * A callback called when the media selection process is finished
    */
-  onFinished(params: ImagePickerResult): void;
+  onFinished?: ((params: ImagePickerResult) => void) | null;
   /**
    * A callback called when the media selection process is cancelled
    */
@@ -114,6 +122,21 @@ export type ImagePickerProps = {
   TopPanelWrapper?: ComponentType<any>;
 
   cameraButtonsLeftRightPosition?: number;
+  /**
+   * the initial data of the media to edit
+   */
+  initialData?: {
+    media: Media;
+    editionParameters: EditionParameters | null;
+    filter: Filter | null;
+    timeRange?: TimeRange | null;
+  } | null;
+  /**
+   * additional data to be passed to the step components
+   */
+  additionalData?: {
+    [key: string]: any;
+  };
 };
 /**
  * A component used to select an image or a video and edit it
@@ -133,6 +156,8 @@ const ImagePicker = ({
   onCancel,
   TopPanelWrapper = Fragment,
   cameraButtonsLeftRightPosition,
+  initialData,
+  additionalData,
 }: ImagePickerProps) => {
   const [stepIndex, setStepIndex] = useState(0);
   const [media, setMedia] = useState<Media | null>(null);
@@ -173,6 +198,8 @@ const ImagePicker = ({
         editionParameters,
         filter: mediaFilter,
         timeRange,
+        duration: media.kind === 'video' ? media.duration : null,
+        galleryUri: media.galleryUri,
       });
     } else {
       setStepIndex(stepIndex => stepIndex + 1);
@@ -194,6 +221,7 @@ const ImagePicker = ({
   return (
     <ImagePickerContextProvider
       ref={pickerStateRef}
+      initialData={initialData}
       forceAspectRatio={forceAspectRatio}
       forceCameraRatio={forceCameraRatio}
       maxVideoDuration={maxVideoDuration}
@@ -211,7 +239,7 @@ const ImagePicker = ({
         canCancel={canCancel}
         TopPanelWrapper={TopPanelWrapper}
       >
-        <Component onNext={onNext} onBack={onBack} />
+        <Component onNext={onNext} onBack={onBack} {...additionalData} />
       </ImagePickerWizardContainer>
     </ImagePickerContextProvider>
   );

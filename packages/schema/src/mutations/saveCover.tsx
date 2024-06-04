@@ -13,7 +13,10 @@ import type { WebCard } from '@azzapp/data';
 
 const saveCover: MutationResolvers['saveCover'] = async (
   _,
-  { webCardId: gqlWebCardId, input: { texts, mediaId, backgroundColor } },
+  {
+    webCardId: gqlWebCardId,
+    input: { texts, mediaId, backgroundColor, cardColors },
+  },
   { cardUsernamesToRevalidate, postsToRevalidate, loaders },
 ) => {
   const webCardId = fromGlobalIdWithType(gqlWebCardId, 'WebCard');
@@ -43,6 +46,7 @@ const saveCover: MutationResolvers['saveCover'] = async (
         lastCardUpdate: new Date(),
         coverMediaId: mediaId,
         coverBackgroundColor: backgroundColor,
+        cardColors,
         coverTexts: texts,
       };
       await updateWebCard(webCard.id, updates, trx);

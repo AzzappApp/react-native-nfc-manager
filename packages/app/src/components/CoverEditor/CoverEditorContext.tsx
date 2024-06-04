@@ -1,8 +1,12 @@
 import { createContext, useContext } from 'react';
+import type { EditionParameters, Filter } from '#helpers/mediaEditions';
+import type { Media } from '#helpers/mediaHelpers';
 import type { CoverEditorAction } from './coverEditorActions';
 import type {
+  CoverEditorLinksLayerItem,
   CoverEditorOverlayItem,
   CoverEditorState,
+  CoverEditorTextLayerItem,
   MediaInfo,
 } from './coverEditorTypes';
 
@@ -40,67 +44,100 @@ export const useCoverEditorContext = () => {
   return context;
 };
 
-export const useCoverEditorOverlayLayer = () => {
-  const { coverEditorState } = useCoverEditorContext();
+type UseCurrentLayerReturnType =
+  | { kind: 'links'; layer: CoverEditorLinksLayerItem }
+  | { kind: 'media'; layer: MediaInfo }
+  | { kind: 'none'; layer: null }
+  | { kind: 'overlay'; layer: CoverEditorOverlayItem }
+  | { kind: 'text'; layer: CoverEditorTextLayerItem };
 
-  if (
-    coverEditorState.overlayLayer == null ||
-    coverEditorState.layerMode !== 'overlay'
-  ) {
-    //returning null (when not selected), will reduce the number of bottom sheet/screen modal etc in memory
-    return null;
+export const useCurrentLayer = (): UseCurrentLayerReturnType => {
+  const {
+    coverEditorState: {
+      editionMode,
+      selectedItemIndex,
+      overlayLayers,
+      textLayers,
+      medias,
+      linksLayer,
+    },
+  } = useCoverEditorContext();
+
+  if (selectedItemIndex == null) {
+    return editionMode === 'links'
+      ? { kind: 'links', layer: linksLayer }
+      : { kind: 'none', layer: null };
   }
-  return coverEditorState.overlayLayer!;
+  switch (editionMode) {
+    case 'overlay':
+      return {
+        kind: 'overlay',
+        layer: overlayLayers[selectedItemIndex],
+      };
+    case 'text':
+    case 'textEdit':
+      return {
+        kind: 'text',
+        layer: textLayers[selectedItemIndex],
+      };
+    case 'mediaEdit':
+      return {
+        kind: 'media',
+        layer: medias[selectedItemIndex],
+      };
+    default:
+      return { kind: 'none', layer: null };
+  }
+};
+
+export const useCoverEditorOverlayLayer = () => {
+  const { kind, layer } = useCurrentLayer();
+  return kind === 'overlay' ? layer : null;
 };
 
 export const useCoverEditorTextLayer = () => {
-  const { coverEditorState } = useCoverEditorContext();
-
-  if (
-    coverEditorState.layerMode !== 'text' ||
-    coverEditorState.selectedLayerIndex == null
-  ) {
-    return null;
-  }
-  return coverEditorState.textLayers[coverEditorState.selectedLayerIndex];
+  const { kind, layer } = useCurrentLayer();
+  return kind === 'text' ? layer : null;
 };
 
 export const useCoverEditorLinksLayer = () => {
-  const { coverEditorState } = useCoverEditorContext();
-
-  if (coverEditorState.layerMode !== 'links') {
-    return null;
-  }
-  return coverEditorState.linksLayer;
+  const { kind, layer } = useCurrentLayer();
+  return kind === 'links' ? layer : null;
 };
 
 export const useCoverEditorMedia = () => {
-  const { coverEditorState } = useCoverEditorContext();
-
-  if (
-    coverEditorState.layerMode !== 'mediaEdit' ||
-    coverEditorState.selectedLayerIndex == null
-  ) {
-    return null;
-  }
-  return coverEditorState.medias[coverEditorState.selectedLayerIndex];
+  const { kind, layer } = useCurrentLayer();
+  return kind === 'media' ? layer : null;
 };
 
-export const useCoverEditorActiveMedia: () =>
-  | CoverEditorOverlayItem
-  | MediaInfo
-  | null = () => {
-  const { coverEditorState } = useCoverEditorContext();
-  if (
-    coverEditorState.layerMode === 'overlay' &&
-    coverEditorState.overlayLayer
-  ) {
-    return coverEditorState.overlayLayer;
-  } else if (
-    coverEditorState.layerMode === 'mediaEdit' &&
-    coverEditorState.selectedLayerIndex != null
-  ) {
-    return coverEditorState.medias[coverEditorState.selectedLayerIndex];
+export const useCoverEditorActiveMedia = (): {
+  media: Media;
+  filter: Filter | null;
+  editionParameters: EditionParameters | null;
+} | null => {
+  const {
+    coverEditorState: { editionMode, overlayLayers, medias, selectedItemIndex },
+  } = useCoverEditorContext();
+  if (editionMode === 'overlay' && selectedItemIndex != null) {
+    const overlay = overlayLayers[selectedItemIndex];
+    if (!overlay) {
+      return null;
+    }
+    return {
+      media: overlay.media,
+      filter: overlay.filter,
+      editionParameters: overlay.editionParameters,
+    };
+  } else if (editionMode === 'mediaEdit' && selectedItemIndex != null) {
+    const media = medias[selectedItemIndex];
+    if (!media) {
+      return null;
+    }
+    return {
+      media: media.media,
+      filter: media.filter,
+      editionParameters: media.editionParameters,
+    };
   }
   return null;
 };

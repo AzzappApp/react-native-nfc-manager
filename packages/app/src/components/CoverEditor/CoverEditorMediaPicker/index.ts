@@ -1,3 +1,3 @@
-import CoverEditorImagePicker from './CoverEditorMediaPicker';
+import CoverEditorMediaPicker from './CoverEditorMediaPicker';
 
-export default CoverEditorImagePicker;
+export default CoverEditorMediaPicker;

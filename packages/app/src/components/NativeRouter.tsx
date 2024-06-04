@@ -16,6 +16,7 @@ import { Screen, ScreenContainer, ScreenStack } from 'react-native-screens';
 import { createDeferred } from '@azzapp/shared/asyncHelpers';
 import { isRouteEqual, type Route, type ROUTES } from '#routes';
 import { createId } from '#helpers/idHelpers';
+import useLatestCallback from '#hooks/useLatestCallback';
 import type { ComponentType, ReactNode, Provider, Ref } from 'react';
 import type { NativeSyntheticEvent, TargetedEvent } from 'react-native';
 import type { ScreenProps } from 'react-native-screens';
@@ -356,6 +357,7 @@ export type NativeRouter = {
   hideModal(id: string): void;
   getCurrentRoute(): Route | null;
   getCurrentScreenId(): string | null;
+  addModalInterceptor(callback: () => Promise<void>): () => void;
   addRouteWillChangeListener: (listener: RouteListener) => {
     dispose(): void;
   };
@@ -438,6 +440,7 @@ export const useNativeRouter = (init: NativeRouterInit) => {
   const routeDidChangeListeners = useRef<RouteListener[]>([]).current;
   const screenWillBePushedListeners = useRef<ScreenListener[]>([]).current;
   const screenWillBeRemovedListeners = useRef<ScreenListener[]>([]).current;
+  const modalInterceptors = useRef<Array<() => Promise<void>>>([]).current;
 
   const dispatch = useCallback((action: RouterAction) => {
     const state = routerStateRef.current;
@@ -591,11 +594,24 @@ export const useNativeRouter = (init: NativeRouterInit) => {
           payload: { id, kind: 'route', state: route },
         });
       },
+      addModalInterceptor(callback: () => Promise<void>) {
+        modalInterceptors.push(callback);
+        return () => {
+          const index = modalInterceptors.indexOf(callback);
+          if (index !== -1) {
+            modalInterceptors.slice(index);
+          }
+        };
+      },
       showModal(descriptor: Omit<ModalDescriptor, 'ownerId'>, initialContent) {
-        dispatch({
-          type: 'SHOW_MODAL',
-          payload: { descriptor, initialContent },
-        });
+        Promise.all(modalInterceptors.map(interceptor => interceptor())).then(
+          () => {
+            dispatch({
+              type: 'SHOW_MODAL',
+              payload: { descriptor, initialContent },
+            });
+          },
+        );
       },
       setModalContent(modalId: string, content: ReactNode) {
         dispatch({
@@ -678,6 +694,7 @@ export const useNativeRouter = (init: NativeRouterInit) => {
     };
   }, [
     dispatch,
+    modalInterceptors,
     replaceAll,
     routeDidChangeListeners,
     routeWillChangeListeners,
@@ -855,6 +872,26 @@ export const useOnFocus = (handler: (() => void) | null) => {
   }, [hasFocus]);
 };
 
+export const useRouteWillChange = (route: string, cb: () => void) => {
+  const router = useRouter();
+
+  useEffect(() => {
+    const { dispose } = router.addRouteWillChangeListener(routeEvent => {
+      if (routeEvent.route === route) cb();
+    });
+
+    return dispose;
+  });
+};
+
+export const useModalInterceptor = (callback: () => Promise<void>) => {
+  const router = useRouter();
+  const latestCallback = useLatestCallback(callback);
+  useEffect(() => {
+    router.addModalInterceptor(() => latestCallback());
+  }, [latestCallback, router]);
+};
+
 export const useDidAppear = () => {
   const { didAppear } = useContext(ScreenRendererContext);
   return didAppear;
@@ -878,18 +915,6 @@ export const ScreenDidAppear = ({ children }: { children: ReactNode }) => {
       {children}
     </ScreenDidAppearInner>
   );
-};
-
-export const useRouteWillChange = (route: string, cb: () => void) => {
-  const router = useRouter();
-
-  useEffect(() => {
-    const { dispose } = router.addRouteWillChangeListener(routeEvent => {
-      if (routeEvent.route === route) cb();
-    });
-
-    return dispose;
-  });
 };
 
 const ScreenDidAppearInner = ({
