@@ -91,6 +91,7 @@ const ProtectedMutation: Record<
   Exclude<
     MutationMethod,
     | 'createWebCard'
+    | 'deleteUser'
     | 'estimateSubscriptionCost'
     | 'sendReport'
     | 'updateContactCardScans'

@@ -28,10 +28,8 @@ export const User: UserResolvers = {
     if (!auth.userId || auth.userId !== user.id) {
       return null;
     }
-    const subscription = await activeUserSubscription(auth.userId);
-    if (!subscription || activeUserSubscription.length === 0) {
-      return null;
-    }
-    return subscription[0];
+    const subscription = await activeUserSubscription(auth.userId, true);
+
+    return subscription?.length ? subscription[0] : null;
   },
 };

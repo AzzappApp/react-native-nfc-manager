@@ -8,6 +8,7 @@ import declineOwnership from './declineOwnership';
 import deleteModules from './deleteModules';
 import deletePost from './deletePost';
 import deletePostComment from './deletePostComment';
+import deleteUser from './deleteUser';
 import duplicateModule from './duplicateModule';
 import inviteUser from './inviteUser';
 import inviteUsersList from './inviteUsersList';
@@ -116,4 +117,5 @@ export const Mutation: MutationResolvers = {
   endSubscription,
   deletePost,
   updateSubscriptionCustomer,
+  deleteUser,
 };

@@ -111,16 +111,16 @@ export const updateSubscriptionFreeSeats = async (
 };
 
 /**
-/**
  * Retrieve active subscription for given userId
- *
  * @param userId - The user id
+ * @param excludeWebCards - Exclude subscriptions with webCardId
  * @returns The subscription
  */
 export const activeUserSubscription = async (
   userId: string,
+  excludeWebCards: boolean = false,
   trx: DbTransaction = db,
-): Promise<UserSubscription[] | undefined> => {
+): Promise<UserSubscription[]> => {
   const currentDate = new Date();
   return trx
     .select()
@@ -130,7 +130,7 @@ export const activeUserSubscription = async (
         eq(UserSubscriptionTable.userId, userId),
         eq(UserSubscriptionTable.status, 'active'),
         gte(UserSubscriptionTable.endAt, currentDate),
-        isNull(UserSubscriptionTable.webCardId),
+        excludeWebCards ? isNull(UserSubscriptionTable.webCardId) : undefined,
       ),
     );
 };
