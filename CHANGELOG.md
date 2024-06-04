@@ -1,5 +1,6 @@
-## 0.5.15-canary.82
+## 0.5.15-canary.83
 
+* **fix:**  - email signature using png image to avoid dark background ([#3576](https://github.com/AzzappApp/azzapp/pull/3576))
 * **fix:**  - 🐛 remove next button ([#3578](https://github.com/AzzappApp/azzapp/pull/3578))
 * **feat:**  - **user:** [#3558](https://github.com/AzzappApp/azzapp/pull/3558) delete user option ([#3575](https://github.com/AzzappApp/azzapp/pull/3575))
 * **fix:**  - try something for android issue ([#3577](https://github.com/AzzappApp/azzapp/pull/3577))
