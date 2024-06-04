@@ -1,8 +1,10 @@
 import { fromGlobalId } from 'graphql-relay';
 import { useCallback, useMemo, useState } from 'react';
+import { useIntl } from 'react-intl';
 import { FlatList, View } from 'react-native';
 import { graphql, useFragment } from 'react-relay';
 import Separation from '#ui/Separation';
+import CoverEditorTemplateConfirmationScreenModal from './CoverEditorTemplateConfirmationScreenModal';
 import { CoverEditorTemplateTypePreviews } from './CoverEditorTemplateTypePreviews';
 import CoverTemplateScratchStarters from './CoverTemplateScratchStarter';
 import CoverTemplateTagSelector from './CoverTemplateTagSelector';
@@ -34,6 +36,13 @@ const CoverEditorTemplateList = ({
 }: CoverEditorProps) => {
   const [tag, setTag] = useState<string | null>(null);
 
+  const [selectedTemplate, setSelectedTemplate] = useState<{
+    template: TemplateTypePreview;
+    backgroundColor: ColorPaletteColor | null;
+  } | null>(null);
+
+  const intl = useIntl();
+
   const { coverTemplateTags, coverTemplateTypes, webCard, coverTemplates } =
     useFragment(
       graphql`
@@ -60,6 +69,7 @@ const CoverEditorTemplateList = ({
 
   const onColorSelect = useCallback(
     (color: ColorPaletteColor) => {
+      setSelectedTemplate(null);
       onSelectCoverTemplatePreview({
         template: null,
         backgroundColor: color,
@@ -70,9 +80,9 @@ const CoverEditorTemplateList = ({
 
   const onTemplateSelect = useCallback(
     (template: TemplateTypePreview) => {
-      onSelectCoverTemplatePreview({ template, backgroundColor: null });
+      setSelectedTemplate({ template, backgroundColor: null });
     },
-    [onSelectCoverTemplatePreview],
+    [setSelectedTemplate],
   );
 
   const {
@@ -104,13 +114,19 @@ const CoverEditorTemplateList = ({
       return (
         <CoverEditorTemplateTypePreviews
           key={typeId}
-          label={label ?? 'Label'}
+          label={
+            label ??
+            intl.formatMessage({
+              defaultMessage: 'Unnamed',
+              description: 'CoverEditorTemplateList - Category name - empty',
+            })
+          }
           previews={previews}
           onSelect={onTemplateSelect}
         />
       );
     },
-    [coverTemplateTypes, onTemplateSelect],
+    [coverTemplateTypes, intl, onTemplateSelect],
   );
 
   const onRefresh = useCallback(() => {
@@ -154,6 +170,11 @@ const CoverEditorTemplateList = ({
         contentContainerStyle={{ paddingBottom: 100 }}
         onRefresh={onRefresh}
         refreshing={isLoadingPrevious}
+      />
+      <CoverEditorTemplateConfirmationScreenModal
+        template={selectedTemplate?.template ?? null}
+        onClose={() => setSelectedTemplate(null)}
+        onConfirm={() => onSelectCoverTemplatePreview(selectedTemplate!)}
       />
     </View>
   );
