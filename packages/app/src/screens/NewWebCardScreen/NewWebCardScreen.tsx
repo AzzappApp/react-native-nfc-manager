@@ -24,6 +24,7 @@ import useAuthState from '#hooks/useAuthState';
 import useScreenInsets from '#hooks/useScreenInsets';
 import ActivityIndicator from '#ui/ActivityIndicator';
 import Container from '#ui/Container';
+import { HEADER_HEIGHT } from '#ui/Header';
 import Icon from '#ui/Icon';
 import Text from '#ui/Text';
 import CardEditionStep from './CardEditionStep';
@@ -300,13 +301,7 @@ export const NewWebCardScreen = ({
           />
         ) : null,
       backIcon: 'arrow_down' as const,
-      rightElement: (
-        <NextHeaderButton
-          style={{ width: 70, marginRight: 10 }}
-          onPress={onCoverEditionRef}
-          disabled={!canSave}
-        />
-      ),
+      rightElement: <View style={{ height: HEADER_HEIGHT }} />,
       rightElementWidth: 80,
     },
     {
