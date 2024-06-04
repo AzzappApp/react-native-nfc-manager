@@ -1,5 +1,9 @@
-## 0.5.15-canary.75
+## 0.5.15-canary.76
 
+* **perf:**  - **post:** [#3435](https://github.com/AzzappApp/azzapp/pull/3435) try to improve performance while editing video ([#3568](https://github.com/AzzappApp/azzapp/pull/3568))
+* **fix:**  - **webCard:** [#3562](https://github.com/AzzappApp/azzapp/pull/3562) check role on cover creation ([#3569](https://github.com/AzzappApp/azzapp/pull/3569))
+* **fix:**  - warning on startup with rn 0.74 ([#3573](https://github.com/AzzappApp/azzapp/pull/3573))
+* **fix:**  - **android:** we can’t filter subpath
 * **feat:**  - allow to share the cover video directly ([#3572](https://github.com/AzzappApp/azzapp/pull/3572))
 * **fix:**  - **android:** [#3435](https://github.com/AzzappApp/azzapp/pull/3435) try another pathPattern ([#3571](https://github.com/AzzappApp/azzapp/pull/3571))
 * **feat:**  - use lottie ([#3557](https://github.com/AzzappApp/azzapp/pull/3557))
