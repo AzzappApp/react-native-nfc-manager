@@ -53,30 +53,15 @@ const HomeInformations = ({
     `,
     user,
   );
-  const test = (profiles?.map(({ id }) => id) ?? []).join('-');
-  const test2 = (profiles?.map(({ webCard }) => webCard.nbPosts) ?? []).join(
-    '-',
-  );
-  const nbLikesValue = useMemo(() => {
-    if (profiles) {
-      return profiles.map(({ webCard }) => webCard.nbPostsLiked);
-    }
-    return [];
-  }, [profiles]);
-  const nbFollowersValue = useMemo(
-    () => profiles?.map(({ webCard }) => webCard.nbFollowers) ?? [],
-    [profiles],
+  const nbLikesValue = profiles?.map(({ webCard }) => webCard.nbPostsLiked);
+
+  const nbFollowersValue = profiles?.map(({ webCard }) => webCard.nbFollowers);
+
+  const nbFollowingsValue = profiles?.map(
+    ({ webCard }) => webCard.nbFollowings,
   );
 
-  const nbFollowingsValue = useMemo(
-    () => profiles?.map(({ webCard }) => webCard.nbFollowings) ?? [],
-    [profiles],
-  );
-
-  const nbPostsValue = useMemo(
-    () => profiles?.map(({ webCard }) => webCard.nbPosts) ?? [],
-    [profiles],
-  );
+  const nbPostsValue = profiles?.map(({ webCard }) => webCard.nbPosts);
 
   const nbPosts = useSharedValue('-1');
   const nbLikes = useSharedValue('-1');
@@ -86,22 +71,24 @@ const HomeInformations = ({
   //using profiles object directly in animatedReaction causes error animatedHost(seems to be the case for all relay query result)
   const currentIndex = Math.round(currentProfileIndexSharedValue.value);
   useEffect(() => {
-    nbPosts.value = format(nbPostsValue[currentIndex]);
+    if (nbPostsValue) nbPosts.value = format(nbPostsValue[currentIndex]);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentIndex, nbPostsValue]);
 
   useEffect(() => {
-    nbLikes.value = format(nbLikesValue[currentIndex]);
+    if (nbLikesValue) nbLikes.value = format(nbLikesValue[currentIndex]);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentIndex, nbLikesValue]);
 
   useEffect(() => {
-    nbFollowings.value = format(nbFollowingsValue[currentIndex]);
+    if (nbFollowingsValue)
+      nbFollowings.value = format(nbFollowingsValue[currentIndex]);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentIndex, nbFollowingsValue]);
 
   useEffect(() => {
-    nbFollowers.value = format(nbFollowersValue[currentIndex]);
+    if (nbFollowersValue)
+      nbFollowers.value = format(nbFollowersValue[currentIndex]);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentIndex, nbFollowersValue]);
 
@@ -173,9 +160,6 @@ const HomeInformations = ({
 
   return (
     <View style={[styles.container, { height }]}>
-      {/* // TODO remove this is a test for prod only trying to fix data not updated correclty from relay */}
-      <Text style={{ color: colors.white }}>{test}</Text>
-      <Text style={{ color: colors.white }}>{test2}</Text>
       <View style={styles.row}>
         <PressableOpacity style={styles.square} onPress={goToPosts}>
           <AnimatedText variant="xlarge" text={nbPosts} appearance="dark" />
