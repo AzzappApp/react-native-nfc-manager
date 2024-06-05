@@ -15,8 +15,6 @@
     "build": "turbo run build",
     "build-app-dependencies": "turbo run app:build --filter=./packages/app^...",
     "dev": "turbo watch dev graphql-codegen relay:watch",
-    "build:ios": "turbo run build:ios",
-    "build:android": "turbo run build:android",
     "graphql-codegen": "graphql-codegen",
     "relay:build": "relay-compiler",
     "relay:watch": "relay-compiler --watch ./relay.config.dev.js",
