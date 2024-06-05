@@ -53,15 +53,26 @@ const HomeInformations = ({
     `,
     user,
   );
-  const nbLikesValue = profiles?.map(({ webCard }) => webCard.nbPostsLiked);
 
-  const nbFollowersValue = profiles?.map(({ webCard }) => webCard.nbFollowers);
-
-  const nbFollowingsValue = profiles?.map(
-    ({ webCard }) => webCard.nbFollowings,
+  const nbLikesValue = useMemo(
+    () => profiles?.map(({ webCard }) => webCard.nbPostsLiked) ?? [],
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [profiles, profiles?.length],
+  );
+  const nbFollowersValue = useMemo(
+    () => profiles?.map(({ webCard }) => webCard.nbFollowers) ?? [],
+    [profiles],
   );
 
-  const nbPostsValue = profiles?.map(({ webCard }) => webCard.nbPosts);
+  const nbFollowingsValue = useMemo(
+    () => profiles?.map(({ webCard }) => webCard.nbFollowings) ?? [],
+    [profiles],
+  );
+
+  const nbPostsValue = useMemo(
+    () => profiles?.map(({ webCard }) => webCard.nbPosts) ?? [],
+    [profiles],
+  );
 
   const nbPosts = useSharedValue('-1');
   const nbLikes = useSharedValue('-1');
@@ -71,26 +82,20 @@ const HomeInformations = ({
   //using profiles object directly in animatedReaction causes error animatedHost(seems to be the case for all relay query result)
   const currentIndex = Math.round(currentProfileIndexSharedValue.value);
   useEffect(() => {
-    if (nbPostsValue) nbPosts.value = format(nbPostsValue[currentIndex]);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentIndex, nbPostsValue]);
+    nbPosts.value = format(nbPostsValue[currentIndex]);
+  }, [currentIndex, nbPosts, nbPostsValue]);
 
   useEffect(() => {
-    if (nbLikesValue) nbLikes.value = format(nbLikesValue[currentIndex]);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentIndex, nbLikesValue]);
+    nbLikes.value = format(nbLikesValue[currentIndex]);
+  }, [currentIndex, nbLikes, nbLikesValue]);
 
   useEffect(() => {
-    if (nbFollowingsValue)
-      nbFollowings.value = format(nbFollowingsValue[currentIndex]);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentIndex, nbFollowingsValue]);
+    nbFollowings.value = format(nbFollowingsValue[currentIndex]);
+  }, [currentIndex, nbFollowings, nbFollowingsValue]);
 
   useEffect(() => {
-    if (nbFollowersValue)
-      nbFollowers.value = format(nbFollowersValue[currentIndex]);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentIndex, nbFollowersValue]);
+    nbFollowers.value = format(nbFollowersValue[currentIndex]);
+  }, [currentIndex, nbFollowers, nbFollowersValue]);
 
   const inputRange = useMemo(
     () => _.range(0, profiles?.length),
@@ -101,34 +106,21 @@ const HomeInformations = ({
     () => currentProfileIndexSharedValue.value,
     actual => {
       if (actual >= 0 && inputRange && inputRange?.length > 1) {
-        if (nbLikesValue)
-          nbLikes.value = format(interpolate(actual, inputRange, nbLikesValue));
-        if (nbPostsValue)
-          nbPosts.value = format(interpolate(actual, inputRange, nbPostsValue));
-        if (nbFollowersValue)
-          nbFollowers.value = format(
-            interpolate(actual, inputRange, nbFollowersValue),
-          );
-        if (nbFollowingsValue)
-          nbFollowings.value = format(
-            interpolate(actual, inputRange, nbFollowingsValue),
-          );
+        nbLikes.value = format(interpolate(actual, inputRange, nbLikesValue));
+        nbPosts.value = format(interpolate(actual, inputRange, nbPostsValue));
+        nbFollowers.value = format(
+          interpolate(actual, inputRange, nbFollowersValue),
+        );
+        nbFollowings.value = format(
+          interpolate(actual, inputRange, nbFollowingsValue),
+        );
       } else if (actual >= 0) {
-        if (nbPostsValue) nbPosts.value = format(nbPostsValue[actual]);
-        if (nbLikesValue) nbLikes.value = format(nbLikesValue[actual]);
-        if (nbFollowersValue)
-          nbFollowers.value = format(nbFollowersValue[actual]);
-        if (nbFollowingsValue)
-          nbFollowings.value = format(nbFollowingsValue[actual]);
+        nbPosts.value = format(nbPostsValue[actual]);
+        nbLikes.value = format(nbLikesValue[actual]);
+        nbFollowers.value = format(nbFollowersValue[actual]);
+        nbFollowings.value = format(nbFollowingsValue[actual]);
       }
     },
-    [
-      inputRange,
-      nbFollowersValue,
-      nbFollowingsValue,
-      nbLikesValue,
-      nbPostsValue,
-    ],
   );
   const router = useRouter();
   const goToPosts = useCallback(() => {
@@ -166,6 +158,9 @@ const HomeInformations = ({
 
   return (
     <View style={[styles.container, { height }]}>
+      <Text style={{ color: colors.white }}>
+        {nbFollowersValue[currentIndex]} - {nbPostsValue[currentIndex]}
+      </Text>
       <View style={styles.row}>
         <PressableOpacity style={styles.square} onPress={goToPosts}>
           <AnimatedText variant="xlarge" text={nbPosts} appearance="dark" />
@@ -214,7 +209,7 @@ const HomeInformations = ({
   );
 };
 
-export default memo(HomeInformations);
+export default HomeInformations;
 
 export const format = (value: number) => {
   'worklet';
