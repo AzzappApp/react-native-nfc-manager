@@ -1,5 +1,6 @@
-## 0.5.15-canary.95
+## 0.5.15-canary.96
 
+* **build:**  - try with build:web script
 * **build:**  - move dependency to subpackage
 * **build:**  - try to upgrade yarn version
 * **build:**  - remove useless scripts
