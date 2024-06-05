@@ -1,5 +1,6 @@
-## 0.5.15-canary.85
+## 0.5.15-canary.86
 
+* **fix:**  - **web:** static cover case with video cover ([#3583](https://github.com/AzzappApp/azzapp/pull/3583))
 * **fix:**  - typecheck
 * **fix:**  - **cover:** wrong target while creating cover ([#3584](https://github.com/AzzappApp/azzapp/pull/3584))
 * **fix:**  - remove prod log for test
