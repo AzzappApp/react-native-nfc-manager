@@ -53,10 +53,16 @@ const HomeInformations = ({
     `,
     user,
   );
-  const nbLikesValue = useMemo(
-    () => profiles?.map(({ webCard }) => webCard.nbPostsLiked) ?? [],
-    [profiles],
+  const test = (profiles?.map(({ id }) => id) ?? []).join('-');
+  const test2 = (profiles?.map(({ webCard }) => webCard.nbPosts) ?? []).join(
+    '-',
   );
+  const nbLikesValue = useMemo(() => {
+    if (profiles) {
+      return profiles.map(({ webCard }) => webCard.nbPostsLiked);
+    }
+    return [];
+  }, [profiles]);
   const nbFollowersValue = useMemo(
     () => profiles?.map(({ webCard }) => webCard.nbFollowers) ?? [],
     [profiles],
@@ -168,9 +174,8 @@ const HomeInformations = ({
   return (
     <View style={[styles.container, { height }]}>
       {/* // TODO remove this is a test for prod only trying to fix data not updated correclty from relay */}
-      <Text style={{ color: colors.white }}>
-        {nbFollowersValue[currentIndex]} - {nbPostsValue[currentIndex]}
-      </Text>
+      <Text style={{ color: colors.white }}>{test}</Text>
+      <Text style={{ color: colors.white }}>{test2}</Text>
       <View style={styles.row}>
         <PressableOpacity style={styles.square} onPress={goToPosts}>
           <AnimatedText variant="xlarge" text={nbPosts} appearance="dark" />
