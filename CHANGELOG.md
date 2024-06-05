@@ -1,5 +1,6 @@
-## 0.5.15-canary.90
+## 0.5.15-canary.91
 
+* **feat:**  - simplify mediaId mgmt ([#3592](https://github.com/AzzappApp/azzapp/pull/3592))
 * **fix:**  - fix build
 * **fix:**  - android home information on fistr render
 * **feat:**  - 🎸 inform subscription is on webapp when needed ([#3594](https://github.com/AzzappApp/azzapp/pull/3594))
