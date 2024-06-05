@@ -18,7 +18,6 @@ import DisableIcon from '@mui/icons-material/HideImage';
 import { IconButton, Box } from '@mui/material';
 import { useState } from 'react';
 import {
-  decodeMediaId,
   getCloudinaryAssetURL,
   getImageURL,
 } from '@azzapp/shared/imagesHelpers';
@@ -138,7 +137,7 @@ export const SortableItem: React.FC<SortableItemProps> = ({
           {...listeners}
         >
           <DotLottiePlayer
-            src={getCloudinaryAssetURL(decodeMediaId(media.id), 'raw')}
+            src={getCloudinaryAssetURL(media.id, 'raw')}
             style={{
               height: 400,
               width: 250,

@@ -8,7 +8,6 @@ import Toast from 'react-native-toast-message';
 import { graphql, useMutation, usePreloadedQuery } from 'react-relay';
 import { Observable } from 'relay-runtime';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
-import { encodeMediaId } from '@azzapp/shared/imagesHelpers';
 import { combineMultiUploadProgresses } from '@azzapp/shared/networkHelpers';
 import { colors } from '#theme';
 import { CancelHeaderButton } from '#components/commonsButtons';
@@ -268,7 +267,7 @@ const ContactCardEditScreen = ({
     const [uploadedAvatarId, uploadedLogoId] = await Promise.all(
       uploads.map(upload =>
         upload?.promise.then(({ public_id }) => {
-          return encodeMediaId(public_id, 'image');
+          return public_id;
         }),
       ),
     );

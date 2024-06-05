@@ -13,7 +13,6 @@ import {
   usePreloadedQuery,
 } from 'react-relay';
 import ERRORS from '@azzapp/shared/errors';
-import { encodeMediaId } from '@azzapp/shared/imagesHelpers';
 import { colors } from '#theme';
 import { CancelHeaderButton } from '#components/commonsButtons';
 import { useRouter, type ScreenOptions } from '#components/NativeRouter';
@@ -212,7 +211,7 @@ const MultiUserDetailsScreen = ({
       const [uploadedAvatarId, uploadedLogoId] = await Promise.all(
         uploads.map(upload =>
           upload?.promise.then(({ public_id }) => {
-            return encodeMediaId(public_id, 'image');
+            return public_id;
           }),
         ),
       );

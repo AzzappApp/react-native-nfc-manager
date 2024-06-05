@@ -27,7 +27,7 @@ export const getCloudinaryAssetURL = (
  */
 export const getImageURL = (id: string) => {
   assetNotRN('getImageURL');
-  return assembleCloudinaryUrl(decodeMediaId(id), 'image', resizeTransforms());
+  return assembleCloudinaryUrl(id, 'image', resizeTransforms());
 };
 
 export type UrLForSizeParam = {
@@ -57,7 +57,6 @@ export const getImageURLForSize = ({
   extension,
 }: UrLForSizeParam) => {
   assetNotRN('getImageURLForSize');
-  id = decodeMediaId(id);
   const transforms = resizeTransforms(
     width,
     height,
@@ -75,12 +74,7 @@ export const getImageURLForSize = ({
  */
 export const getVideoURL = (id: string) => {
   assetNotRN('getVideoURL');
-  return assembleCloudinaryUrl(
-    decodeMediaId(id),
-    'video',
-    resizeTransforms(),
-    'mp4',
-  );
+  return assembleCloudinaryUrl(id, 'video', resizeTransforms(), 'mp4');
 };
 
 /**
@@ -102,7 +96,6 @@ export const getVideoUrlForSize = ({
   streaming = false,
 }: UrLForSizeParam & { streaming?: boolean }) => {
   assetNotRN('getVideoUrlForSize');
-  id = decodeMediaId(id);
   if (streaming) {
     return assembleCloudinaryUrl(id, 'video', 'sp_auto', extension ?? 'm3u8');
   }
@@ -132,7 +125,6 @@ export const getVideoThumbnailURL = ({
   pregeneratedSizes,
 }: UrLForSizeParam) => {
   assetNotRN('getVideoThumbnailURL');
-  id = decodeMediaId(id);
   const transforms = resizeTransforms(
     width,
     height,
@@ -140,14 +132,6 @@ export const getVideoThumbnailURL = ({
     pregeneratedSizes,
   );
   return assembleCloudinaryUrl(id, 'video', transforms, 'webp');
-};
-
-/**
- * Extract the media id from a database id
- */
-export const decodeMediaId = (dbId: string) => {
-  const segments = dbId.split(':');
-  return segments[segments.length - 1];
 };
 
 /**

@@ -27,7 +27,6 @@ import { capitalize, omit, pick } from 'lodash';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { TEXT_POSITIONS } from '@azzapp/shared/coverHelpers';
-import { encodeMediaId } from '@azzapp/shared/imagesHelpers';
 import { uploadMedia } from '@azzapp/shared/WebAPI';
 import { getSignedUpload } from '#app/mediaActions';
 import FontSelect from '#components/FontSelect';
@@ -138,7 +137,7 @@ const CoverTemplateForm = ({
       }
 
       media = {
-        id: encodeMediaId(public_id, kind),
+        id: public_id,
         kind,
       };
     } else {

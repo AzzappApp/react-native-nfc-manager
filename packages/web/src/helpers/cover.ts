@@ -1,5 +1,4 @@
 import { getMediasByIds, type WebCard } from '@azzapp/data';
-import { decodeMediaId } from '@azzapp/shared/imagesHelpers';
 
 const CLOUDINARY_CLOUDNAME = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME!;
 const CLOUDINARY_BASE_URL = `https://res.cloudinary.com/${CLOUDINARY_CLOUDNAME}`;
@@ -27,7 +26,7 @@ export const buildCoverImageUrl = async (
       media?.kind === 'video' ? 'video' : 'image'
     }/upload${
       crop ? `/c_${crop}` : '/c_fit'
-    },g_east,w_${width},h_${height},ar_1:1/${decodeMediaId(coverMediaId)}.png`;
+    },g_east,w_${width},h_${height},ar_1:1/${coverMediaId}.png`;
   }
   return undefined;
 };

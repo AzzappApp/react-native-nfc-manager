@@ -19,7 +19,6 @@ import {
   COVER_VIDEO_FRAME_RATE,
   COVER_MEDIA_RESOLUTION,
 } from '@azzapp/shared/coverHelpers';
-import { encodeMediaId } from '@azzapp/shared/imagesHelpers';
 import { createRandomFilePath, getFileName } from '#helpers/fileHelpers';
 import { reduceVideoResolutionIfNecessary } from '#helpers/mediaEditions';
 import { uploadMedia, uploadSign } from '#helpers/MobileWebAPI';
@@ -104,7 +103,7 @@ const useSaveCover = (
         variables: {
           webCardId,
           input: {
-            mediaId: encodeMediaId(public_id, kind),
+            mediaId: public_id,
             texts,
             backgroundColor: backgroundColor ?? 'light',
             cardColors,

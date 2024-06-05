@@ -19,7 +19,6 @@ import * as z from 'zod';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
 
 import ERRORS from '@azzapp/shared/errors';
-import { encodeMediaId } from '@azzapp/shared/imagesHelpers';
 import { isValidEmail } from '@azzapp/shared/stringHelpers';
 import ScreenModal from '#components/ScreenModal';
 import { CardPhoneLabels } from '#helpers/contactCardHelpers';
@@ -368,7 +367,7 @@ const MultiUserAddModal = (
         const [uploadedAvatarId, uploadedLogoId] = await Promise.all(
           uploads.map(upload =>
             upload?.promise.then(({ public_id }) => {
-              return encodeMediaId(public_id, 'image');
+              return public_id;
             }),
           ),
         );

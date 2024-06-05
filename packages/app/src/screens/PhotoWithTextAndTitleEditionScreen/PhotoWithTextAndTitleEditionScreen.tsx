@@ -12,7 +12,6 @@ import {
   PHOTO_WITH_TEXT_AND_TITLE_STYLE_VALUES,
   PHOTO_WITH_TEXT_AND_TITLE_TEXT_MAX_LENGTH,
 } from '@azzapp/shared/cardModuleHelpers';
-import { encodeMediaId } from '@azzapp/shared/imagesHelpers';
 import { isNotFalsyString } from '@azzapp/shared/stringHelpers';
 import { addingModuleRequireSubscription } from '@azzapp/shared/subscriptionHelpers';
 import { colors } from '#theme';
@@ -443,7 +442,7 @@ const PhotoWithTextAndTitleEditionScreen = ({
       );
       try {
         const { public_id } = await uploadPromise;
-        mediaId = encodeMediaId(public_id, 'image');
+        mediaId = public_id;
       } catch (error) {
         Toast.show({
           type: 'error',

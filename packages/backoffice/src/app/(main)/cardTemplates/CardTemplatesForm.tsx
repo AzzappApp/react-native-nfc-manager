@@ -21,7 +21,6 @@ import {
 } from '@mui/material';
 import { omit } from 'lodash';
 import { useState, useTransition } from 'react';
-import { encodeMediaId } from '@azzapp/shared/imagesHelpers';
 import { uploadMedia } from '@azzapp/shared/WebAPI';
 import { getSignedUpload } from '#app/mediaActions';
 import MediaInput from '#components/MediaInput';
@@ -144,7 +143,7 @@ const CardTemplateForm = ({
         return;
       }
 
-      previewMediaId = encodeMediaId(public_id, 'image');
+      previewMediaId = public_id;
     } else {
       previewMediaId = data.previewMediaId as any;
     }

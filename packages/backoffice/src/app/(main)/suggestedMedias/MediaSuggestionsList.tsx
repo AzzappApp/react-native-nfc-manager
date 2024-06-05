@@ -11,11 +11,7 @@ import {
   Typography,
 } from '@mui/material';
 import { useOptimistic, useState } from 'react';
-import {
-  encodeMediaId,
-  getImageURLForSize,
-  getVideoURL,
-} from '@azzapp/shared/imagesHelpers';
+import { getImageURLForSize, getVideoURL } from '@azzapp/shared/imagesHelpers';
 import { uploadMedia } from '@azzapp/shared/WebAPI';
 import { getSignedUpload } from '#app/mediaActions';
 import ItemWithLabelSelectionList from './ItemWithLabelSelectionList';
@@ -100,16 +96,14 @@ const MediaSuggestionsList = ({
       );
 
       const uploadedMedias = await Promise.all(
-        mediaToUploads.map(
-          async ({ media, kind, uploadParameters, uploadURL }) => {
-            const { public_id } = await uploadMedia(
-              media,
-              uploadURL,
-              uploadParameters,
-            ).promise;
-            return encodeMediaId(public_id, kind);
-          },
-        ),
+        mediaToUploads.map(async ({ media, uploadParameters, uploadURL }) => {
+          const { public_id } = await uploadMedia(
+            media,
+            uploadURL,
+            uploadParameters,
+          ).promise;
+          return public_id;
+        }),
       );
 
       await addSuggestions({

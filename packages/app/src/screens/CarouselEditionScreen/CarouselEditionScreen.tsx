@@ -11,7 +11,6 @@ import {
   MODULE_IMAGE_MAX_WIDTH,
   CAROUSEL_STYLE_VALUES,
 } from '@azzapp/shared/cardModuleHelpers';
-import { encodeMediaId } from '@azzapp/shared/imagesHelpers';
 import { combineMultiUploadProgresses } from '@azzapp/shared/networkHelpers';
 import { addingModuleRequireSubscription } from '@azzapp/shared/subscriptionHelpers';
 import ImagePicker from '#components/ImagePicker';
@@ -389,7 +388,7 @@ const CarouselEditionScreen = ({
         const medias = await Promise.all(
           uploads.map(({ promise, uri }) =>
             promise.then(uploadResult => ({
-              id: encodeMediaId(uploadResult.public_id as string, 'image'),
+              id: uploadResult.public_id,
               uri,
             })),
           ),

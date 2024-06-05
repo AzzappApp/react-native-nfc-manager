@@ -11,7 +11,6 @@ import {
   HORIZONTAL_PHOTO_STYLE_VALUES,
   MODULE_IMAGE_MAX_WIDTH,
 } from '@azzapp/shared/cardModuleHelpers';
-import { encodeMediaId } from '@azzapp/shared/imagesHelpers';
 import { addingModuleRequireSubscription } from '@azzapp/shared/subscriptionHelpers';
 import { CameraButton } from '#components/commonsButtons';
 import ImagePicker, {
@@ -339,7 +338,7 @@ const HorizontalPhotoEditionScreen = ({
       );
       try {
         const { public_id } = await uploadPromise;
-        mediaId = encodeMediaId(public_id, 'image');
+        mediaId = public_id;
       } catch (error) {
         console.error(error);
         Toast.show({

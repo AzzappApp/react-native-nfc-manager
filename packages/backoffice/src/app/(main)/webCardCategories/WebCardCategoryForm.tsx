@@ -23,7 +23,6 @@ import { omit } from 'lodash';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
-import { encodeMediaId } from '@azzapp/shared/imagesHelpers';
 import { uploadMedia } from '@azzapp/shared/WebAPI';
 import { getSignedUpload } from '#app/mediaActions';
 import MediasListInput from '#components/MediasListInput';
@@ -129,7 +128,7 @@ const WebCardCategoryForm = ({
             const { uploadURL, uploadParameters } = uploadsInfos[index];
             return uploadMedia(file, uploadURL, uploadParameters).promise.then(
               ({ public_id }) => ({
-                id: encodeMediaId(public_id, 'image'),
+                id: public_id,
                 index: mediaIndex,
               }),
             );

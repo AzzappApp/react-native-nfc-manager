@@ -5,7 +5,6 @@ import { revalidatePath } from 'next/cache';
 import { StaticMediaTable, db } from '@azzapp/data';
 import { createPresignedUpload } from '@azzapp/shared/cloudinaryHelpers';
 import { COVER_ASSET_SIZES } from '@azzapp/shared/coverHelpers';
-import { encodeMediaId } from '@azzapp/shared/imagesHelpers';
 import { ADMIN } from '#roles';
 import getCurrentUser from '#helpers/getCurrentUser';
 import { currentUserHasRole } from '#helpers/roleHelpers';
@@ -57,7 +56,7 @@ export const addStaticMedias = async ({
     const staticMedias = medias.map(
       (media, index) =>
         ({
-          id: encodeMediaId(media.id, media.kind),
+          id: media.id,
           usage,
           resizeMode,
           order: maxOrder + index,

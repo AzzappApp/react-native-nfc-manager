@@ -2,7 +2,6 @@ import { MODULE_IMAGES_SIZES } from '@azzapp/shared/cardModuleHelpers';
 import { CONTACTCARD_ASSET_SIZES } from '@azzapp/shared/contactCardHelpers';
 import { COVER_ASSET_SIZES } from '@azzapp/shared/coverHelpers';
 import {
-  decodeMediaId,
   getCloudinaryAssetURL,
   getImageURLForSize,
   getVideoThumbnailURL,
@@ -146,7 +145,7 @@ const uriResolver =
   ) => {
     const assetKind = getAssetKind(media);
     media = getDeferredMedia(media);
-    const id = decodeMediaId(typeof media === 'string' ? media : media.id);
+    const id = typeof media === 'string' ? media : media.id;
     if (assetKind === 'coverSource' || raw) {
       return getCloudinaryAssetURL(
         id,
@@ -228,7 +227,7 @@ export const StaticMedia: StaticMediaResolvers = {
   id: getStaticMediaId,
   kind: getStaticMediaKind,
   uri: (staticMedia, { width, pixelRatio }) => {
-    const cloudinaryId = decodeMediaId(getStaticMediaId(staticMedia));
+    const cloudinaryId = getStaticMediaId(staticMedia);
     const kind = getStaticMediaKind(staticMedia);
     if (kind === 'png') {
       return getImageURLForSize({

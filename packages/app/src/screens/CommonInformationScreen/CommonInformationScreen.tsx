@@ -10,7 +10,6 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
 import { graphql, useMutation, usePreloadedQuery } from 'react-relay';
 import { Observable } from 'relay-runtime';
-import { encodeMediaId } from '@azzapp/shared/imagesHelpers';
 import { colors } from '#theme';
 import { CancelHeaderButton } from '#components/commonsButtons';
 import ConditionalWrapper from '#components/ConditionalWrapper';
@@ -240,7 +239,7 @@ export const CommonInformationScreen = ({
           uploadProgress.map(({ loaded, total }) => loaded / total),
         );
         const { public_id } = await uploadPromise;
-        logoId = encodeMediaId(public_id, 'image');
+        logoId = public_id;
       }
 
       commit({

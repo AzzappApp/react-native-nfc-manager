@@ -8,6 +8,7 @@ import { MODULE_IMAGES_SIZES } from '@azzapp/shared/cardModuleHelpers';
 import { createPresignedUpload } from '@azzapp/shared/cloudinaryHelpers';
 import { COVER_ASSET_SIZES } from '@azzapp/shared/coverHelpers';
 import ERRORS from '@azzapp/shared/errors';
+import { encodeMediaId } from '@azzapp/shared/imagesHelpers';
 import {
   POST_IMAGES_SIZES,
   POST_VIDEO_SIZES,
@@ -49,7 +50,7 @@ const uploadSignApi = async (req: Request) => {
 
   const { kind, target } = input;
 
-  const mediaId = createId();
+  const mediaId = encodeMediaId(createId(), kind);
   await createMedia({
     id: mediaId,
     kind,

@@ -1,7 +1,6 @@
 import { getCldImageUrl, getCldVideoUrl } from 'next-cloudinary';
 import { forwardRef, type ForwardedRef } from 'react';
 import { COVER_ASSET_SIZES } from '@azzapp/shared/coverHelpers';
-import { decodeMediaId } from '@azzapp/shared/imagesHelpers';
 import { POST_VIDEO_SIZES } from '@azzapp/shared/postHelpers';
 import type { Media } from '@azzapp/data';
 
@@ -60,14 +59,14 @@ const CloudinaryVideo = (
     <video
       ref={ref}
       poster={getCldImageUrl({
-        src: decodeMediaId(media.id),
+        src: media.id,
         assetType: 'video',
         format: 'auto',
         width: posterSize?.width,
         height: posterSize?.height,
       })}
       src={getCldVideoUrl({
-        src: decodeMediaId(media.id),
+        src: media.id,
         width,
         height: width && media.height * (width / media.width),
         aspectRatio: `${media.width / media.height}`,
@@ -84,7 +83,7 @@ const CloudinaryVideo = (
     >
       {pregeneratedSizes.map(size => {
         const src = getCldVideoUrl({
-          src: decodeMediaId(media.id),
+          src: media.id,
           width: size,
           height: media.height * (size / media.width),
           format: 'mp4',
@@ -97,7 +96,7 @@ const CloudinaryVideo = (
       <source
         key={maxSize}
         src={getCldVideoUrl({
-          src: decodeMediaId(media.id),
+          src: media.id,
           width: maxSize,
           height: maxSize && media.height * (maxSize / media.width),
           format: 'mp4',

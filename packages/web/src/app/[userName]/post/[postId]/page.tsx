@@ -8,7 +8,6 @@ import {
   getWebCardById,
   getWebCardsPostsWithMedias,
 } from '@azzapp/data';
-import { decodeMediaId } from '@azzapp/shared/imagesHelpers';
 import { getMetaData } from '#helpers/seo';
 import CloudinaryImage from '#ui/CloudinaryImage';
 import CloudinaryVideoPlayer from '#ui/CloudinaryVideoPlayer';
@@ -131,7 +130,7 @@ export async function generateMetadata({
 
   if (post?.medias && post.medias.length > 0) {
     metaData.ogImage = getCldOgImageUrl({
-      src: decodeMediaId(post.medias[0].id),
+      src: post.medias[0].id,
     });
   }
   return getMetaData(metaData);

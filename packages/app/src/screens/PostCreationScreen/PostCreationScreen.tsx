@@ -13,7 +13,6 @@ import {
 } from 'react-relay';
 import { Observable } from 'relay-runtime';
 import { waitTime } from '@azzapp/shared/asyncHelpers';
-import { encodeMediaId } from '@azzapp/shared/imagesHelpers';
 import {
   POST_IMAGE_MAX_SIZE,
   POST_VIDEO_BIT_RATE,
@@ -217,7 +216,7 @@ const PostCreationScreen = ({
           variables: {
             webCardId: webCard.id,
             input: {
-              mediaId: encodeMediaId(public_id, kind),
+              mediaId: public_id,
               allowComments,
               allowLikes,
               content,

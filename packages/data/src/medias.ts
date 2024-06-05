@@ -1,7 +1,6 @@
 import { eq, inArray, sql } from 'drizzle-orm';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
 import { getMediaInfoByPublicIds } from '@azzapp/shared/cloudinaryHelpers';
-import { decodeMediaId, encodeMediaId } from '@azzapp/shared/imagesHelpers';
 import db, { DEFAULT_DATETIME_VALUE, cols } from './db';
 import { sortEntitiesByIds } from './generic';
 import type { DbTransaction } from './db';
@@ -52,11 +51,8 @@ export const createMedia = async (
   newMedia: NewMedia,
   tx: DbTransaction = db,
 ) => {
-  const { kind, id: mediaId } = newMedia;
-  await tx
-    .insert(MediaTable)
-    .values({ ...newMedia, id: encodeMediaId(mediaId, kind) });
-  return mediaId;
+  await tx.insert(MediaTable).values(newMedia);
+  return newMedia.id;
 };
 
 /**
@@ -147,7 +143,7 @@ export const checkMedias = async (mediaIds: string[]) => {
   if (newMedias.length > 0) {
     const cloudinaryMedias = await getMediaInfoByPublicIds(
       newMedias.map(media => ({
-        publicId: decodeMediaId(media!.id),
+        publicId: media!.id,
         kind: media!.kind,
       })),
     );
@@ -161,15 +157,7 @@ export const checkMedias = async (mediaIds: string[]) => {
             width: cloudinaryMedia!.width,
             height: cloudinaryMedia!.height,
           })
-          .where(
-            eq(
-              MediaTable.id,
-              encodeMediaId(
-                cloudinaryMedia!.public_id,
-                cloudinaryMedia!.resource_type === 'video' ? 'video' : 'image',
-              ),
-            ),
-          ),
+          .where(eq(MediaTable.id, cloudinaryMedia!.public_id)),
       ),
     );
   }
