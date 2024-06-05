@@ -18,6 +18,7 @@ import { useRouter } from '#components/NativeRouter';
 import ScreenModal from '#components/ScreenModal';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import relayScreen, { RelayScreenErrorBoundary } from '#helpers/relayScreen';
+import { useIsSubscriber } from '#helpers/SubscriptionContext';
 import useHandleProfileActionError from '#hooks/useHandleProfileError';
 import useToggle from '#hooks/useToggle';
 import Button from '#ui/Button';
@@ -90,6 +91,7 @@ const MultiUserScreen = ({
 
   const styles = useStyleSheet(styleSheet);
   const isMultiUserSubscription = currentUser?.userSubscription != null;
+  const hasActiveSubscription = useIsSubscriber();
 
   useEffect(() => {
     // users that loose their admin role should not be able to access this screen
@@ -164,6 +166,21 @@ const MultiUserScreen = ({
 
   const toggleMultiUser = useCallback(
     (value: boolean) => {
+      if (!currentUser?.userSubscription && hasActiveSubscription) {
+        Toast.show({
+          type: 'error',
+          text1: intl.formatMessage({
+            defaultMessage:
+              'Please log in to the WebApp to manage your azzapp+ subscription',
+            description:
+              'Error message when trying to activate multi-user on mobile when it is configured on the WebApp.',
+          }),
+          props: {
+            showClose: true,
+          },
+        });
+        return;
+      }
       if (!isMultiUserSubscription) {
         router.push({ route: 'USER_PAY_WALL' });
         return;
@@ -174,7 +191,14 @@ const MultiUserScreen = ({
         setConfirmDeleteMultiUser(true);
       }
     },
-    [isMultiUserSubscription, router, setAllowMultiUser],
+    [
+      currentUser?.userSubscription,
+      intl,
+      isMultiUserSubscription,
+      router,
+      setAllowMultiUser,
+      hasActiveSubscription,
+    ],
   );
 
   //#region Transfert ownership
