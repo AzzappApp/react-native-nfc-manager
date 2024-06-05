@@ -1,10 +1,16 @@
 {
   "$schema": "https://turbo.build/schema.json",
-  "pipeline": {
+  "globalDependencies": ["patches/*.patch"],
+  "tasks": {
     "clean": {
       "dependsOn": []
     },
     "build": {
+      "dependsOn": []
+    },
+    "dev": {
+      "persistent": true,
+      "cache": false,
       "dependsOn": []
     },
     "//#relay:build": {
@@ -27,7 +33,11 @@
       "dependsOn": [],
       "inputs": ["packages/**/*.graphql"],
       "cache": false
+    },
+    "//#relay:watch": {
+      "dependsOn": [],
+      "cache": false,
+      "persistent": true
     }
-  },
-  "globalDependencies": ["patches/*.patch"]
+  }
 }

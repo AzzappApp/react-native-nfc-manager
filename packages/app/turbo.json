@@ -1,13 +1,24 @@
 {
   "$schema": "https://turbo.build/schema.json",
-  "extends": ["//"],
-  "pipeline": {
+  "extends": [
+    "//"
+  ],
+  "tasks": {
     "typecheck": {
-      "dependsOn": ["//#relay:build", "^build"],
-      "inputs": ["src/**"]
+      "dependsOn": [
+        "//#relay:build",
+        "^build"
+      ],
+      "inputs": [
+        "src/**"
+      ]
     },
     "test": {
-      "inputs": ["src/**", "jest.config.js", "scripts/jestSetup.js"]
+      "inputs": [
+        "src/**",
+        "jest.config.js",
+        "scripts/jestSetup.js"
+      ]
     }
   }
 }

@@ -10,9 +10,6 @@
     "typecheck": "tsc -p tsconfig.next.json --noEmit",
     "clean": "rm -rf lib && rm -f tsconfig.next.tsbuildinfo || true && rm -rf .next && rm -rf node_modules"
   },
-  "devScripts": [
-    "dev"
-  ],
   "dependencies": {
     "@azzapp/data": "workspace:^",
     "@azzapp/shared": "workspace:^",

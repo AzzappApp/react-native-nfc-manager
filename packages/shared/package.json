@@ -15,9 +15,6 @@
     "typecheck": "tsc --noEmit",
     "clean": "rm -rf lib && rm -f tsconfig.build.tsbuildinfo && rm -rf node_modules"
   },
-  "devScripts": [
-    "dev"
-  ],
   "dependencies": {
     "chroma-js": "^2.4.2",
     "csv42": "5.0.0",
