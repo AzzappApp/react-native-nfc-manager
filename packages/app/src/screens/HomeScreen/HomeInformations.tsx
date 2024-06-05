@@ -56,8 +56,7 @@ const HomeInformations = ({
 
   const nbLikesValue = useMemo(
     () => profiles?.map(({ webCard }) => webCard.nbPostsLiked) ?? [],
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [profiles, profiles?.length],
+    [profiles],
   );
   const nbFollowersValue = useMemo(
     () => profiles?.map(({ webCard }) => webCard.nbFollowers) ?? [],
@@ -83,19 +82,20 @@ const HomeInformations = ({
   const currentIndex = Math.round(currentProfileIndexSharedValue.value);
   useEffect(() => {
     nbPosts.value = format(nbPostsValue[currentIndex]);
-  }, [currentIndex, nbPosts, nbPostsValue]);
-
-  useEffect(() => {
     nbLikes.value = format(nbLikesValue[currentIndex]);
-  }, [currentIndex, nbLikes, nbLikesValue]);
-
-  useEffect(() => {
     nbFollowings.value = format(nbFollowingsValue[currentIndex]);
-  }, [currentIndex, nbFollowings, nbFollowingsValue]);
-
-  useEffect(() => {
     nbFollowers.value = format(nbFollowersValue[currentIndex]);
-  }, [currentIndex, nbFollowers, nbFollowersValue]);
+  }, [
+    currentIndex,
+    nbFollowers,
+    nbFollowersValue,
+    nbFollowings,
+    nbFollowingsValue,
+    nbLikes,
+    nbLikesValue,
+    nbPosts,
+    nbPostsValue,
+  ]);
 
   const inputRange = useMemo(
     () => _.range(0, profiles?.length),

@@ -42,8 +42,6 @@ const HomeStatistics = ({
   initialStatsIndex = 0,
   mode = 'full',
 }: HomeInformationsProps) => {
-  //TODO: backend part .
-
   const profiles = useFragment(
     graphql`
       fragment HomeStatistics_profiles on Profile @relay(plural: true) {
@@ -265,7 +263,7 @@ const BOX_NUMBER_HEIGHT = 62.3;
 const PADDING_HORIZONTAL = 20;
 const BOX_NUMBER_WIDTH = 140;
 
-export default memo(HomeStatistics);
+export default HomeStatistics;
 
 type StatisticItemsProps = {
   value: SharedValue<string>;
