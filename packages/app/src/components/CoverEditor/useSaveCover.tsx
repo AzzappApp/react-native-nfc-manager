@@ -67,7 +67,7 @@ const useSaveCover = (
 
     const { uploadURL, uploadParameters } = await uploadSign({
       kind: kind === 'video' ? 'video' : 'image',
-      target: 'post',
+      target: 'cover',
     });
     const fileName = getFileName(path);
     const file: any = {
