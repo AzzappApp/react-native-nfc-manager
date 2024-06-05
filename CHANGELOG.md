@@ -1,5 +1,6 @@
-## 0.5.15-canary.87
+## 0.5.15-canary.88
 
+* **fix:**  - cover perf improvments ([#3596](https://github.com/AzzappApp/azzapp/pull/3596))
 * **fix:**  - **deepLink:** handle case when emailSignature is opened on mobile ([#3574](https://github.com/AzzappApp/azzapp/pull/3574))
 * **fix:**  - warning on forward ref ([#3593](https://github.com/AzzappApp/azzapp/pull/3593))
 * **fix:**  - **web:** static cover case with video cover ([#3583](https://github.com/AzzappApp/azzapp/pull/3583))
