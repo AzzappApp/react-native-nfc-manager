@@ -1,5 +1,7 @@
-## 0.5.15-canary.88
+## 0.5.15-canary.89
 
+* **feat:**  - 🎸 inform subscription is on webapp when needed ([#3594](https://github.com/AzzappApp/azzapp/pull/3594))
+* **fix:**  - new release test for HomeInformations
 * **fix:**  - cover perf improvments ([#3596](https://github.com/AzzappApp/azzapp/pull/3596))
 * **fix:**  - **deepLink:** handle case when emailSignature is opened on mobile ([#3574](https://github.com/AzzappApp/azzapp/pull/3574))
 * **fix:**  - warning on forward ref ([#3593](https://github.com/AzzappApp/azzapp/pull/3593))
