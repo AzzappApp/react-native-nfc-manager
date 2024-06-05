@@ -75,7 +75,6 @@
     "eslint-plugin-react-hooks": "^4.6.0",
     "git-spawned-stream": "^1.0.1",
     "jest": "^29.7.0",
-    "openapi-typescript": "^6.7.5",
     "prettier": "^3.2.5",
     "react-native-version": "^4.0.0",
     "relay-compiler": "^16.2.0",

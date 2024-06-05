@@ -32,6 +32,7 @@
   },
   "devDependencies": {
     "@babel/cli": "7.24.5",
+    "openapi-typescript": "^6.7.5",
     "typescript": "^5.4.5"
   }
 }
