@@ -1,5 +1,8 @@
-## 0.5.15-canary.84
+## 0.5.15-canary.85
 
+* **fix:**  - typecheck
+* **fix:**  - **cover:** wrong target while creating cover ([#3584](https://github.com/AzzappApp/azzapp/pull/3584))
+* **fix:**  - remove prod log for test
 * **fix:**  - prod test for evg (to be reverted)
 * **fix:**  - email signature using png image to avoid dark background ([#3576](https://github.com/AzzappApp/azzapp/pull/3576))
 * **fix:**  - 🐛 remove next button ([#3578](https://github.com/AzzappApp/azzapp/pull/3578))
