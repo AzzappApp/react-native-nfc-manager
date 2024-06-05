@@ -1,5 +1,5 @@
 import _ from 'lodash';
-import { memo, useMemo } from 'react';
+import { useMemo } from 'react';
 import { useIntl } from 'react-intl';
 import { Pressable, ScrollView, View, useWindowDimensions } from 'react-native';
 import Animated, {
