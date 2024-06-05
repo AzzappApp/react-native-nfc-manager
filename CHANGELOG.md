@@ -1,5 +1,6 @@
-## 0.5.15-canary.93
+## 0.5.15-canary.94
 
+* **build:**  - try to upgrade yarn version
 * **build:**  - remove useless scripts
 * **build:**  - fix app-dependencies script
 * **build:**  - change restore terminal ([#3597](https://github.com/AzzappApp/azzapp/pull/3597))
