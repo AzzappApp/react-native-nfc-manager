@@ -1,5 +1,8 @@
-## 0.5.15-canary.91
+## 0.5.15-canary.92
 
+* **build:**  - fix app-dependencies script
+* **build:**  - change restore terminal ([#3597](https://github.com/AzzappApp/azzapp/pull/3597))
+* **build:**  - upgrade to turbo v2 ([#3595](https://github.com/AzzappApp/azzapp/pull/3595))
 * **feat:**  - simplify mediaId mgmt ([#3592](https://github.com/AzzappApp/azzapp/pull/3592))
 * **fix:**  - fix build
 * **fix:**  - android home information on fistr render
