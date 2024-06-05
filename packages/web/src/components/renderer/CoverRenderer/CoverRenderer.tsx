@@ -64,6 +64,7 @@ const CoverRenderer = ({
             priority={priority}
             className={styles.coverMedia}
             fetchPriority={priority ? 'high' : 'low'}
+            videoThumbnail={media.kind === 'video'}
           />
         ) : (
           <CloudinaryVideo
