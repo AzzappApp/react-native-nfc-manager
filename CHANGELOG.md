@@ -1,5 +1,6 @@
-## 0.5.15-canary.83
+## 0.5.15-canary.84
 
+* **fix:**  - prod test for evg (to be reverted)
 * **fix:**  - email signature using png image to avoid dark background ([#3576](https://github.com/AzzappApp/azzapp/pull/3576))
 * **fix:**  - 🐛 remove next button ([#3578](https://github.com/AzzappApp/azzapp/pull/3578))
 * **feat:**  - **user:** [#3558](https://github.com/AzzappApp/azzapp/pull/3558) delete user option ([#3575](https://github.com/AzzappApp/azzapp/pull/3575))
