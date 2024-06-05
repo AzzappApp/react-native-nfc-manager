@@ -1,5 +1,6 @@
-## 0.5.15-canary.94
+## 0.5.15-canary.95
 
+* **build:**  - move dependency to subpackage
 * **build:**  - try to upgrade yarn version
 * **build:**  - remove useless scripts
 * **build:**  - fix app-dependencies script
