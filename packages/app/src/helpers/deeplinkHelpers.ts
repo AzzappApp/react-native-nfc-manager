@@ -15,11 +15,12 @@ const getSearchParamFromURL = (url: string, param: string) => {
   return value;
 };
 
-const profileUrl = /^([^/?]+)(?:\/([^/?]+)\/([^/?]+))?.*$/;
+const profileUrl = /^^([^/?]+)(?:\/([^/?]+))?(?:\/([^/?]+))?.*$/;
 const resetPasswordUrl = new RegExp('^reset-password');
 const prefixes = [process.env.APP_SCHEME, process.env.NEXT_PUBLIC_URL];
 export const matchUrlWithRoute = async (
   url: string,
+  onOpeningRoute: (route: string) => void,
 ): Promise<Route | undefined> => {
   const prefix = prefixes.find(prefix => prefix && url.startsWith(prefix));
   if (!prefix) {
@@ -66,7 +67,8 @@ export const matchUrlWithRoute = async (
         };
       }
     } else if (route === 'emailSignature') {
-      //this should not happen only if the user uf the open on azzap smart banner
+      //this should not happen only if the user uf the open on azzap smart banner (or on android)
+      onOpeningRoute('emailSignature');
       return {
         route: 'WEBCARD',
         params: {
