@@ -26,10 +26,7 @@ const getBufferLoader = () => getJSIModule('BufferLoader') as BufferLoader;
 // we will do it manually for now waiting for react-native 0.75
 
 const loadImageTasks = new Map<string, Promise<SkImage>>();
-const skImages = new Map<
-  string,
-  { image: SkImage; buffer: bigint; refCount: number }
->();
+const skImages = new Map<string, { image: SkImage; refCount: number }>();
 
 let cleanupTimeout: any = null;
 const scheduleCleanUp = () => {
@@ -38,7 +35,6 @@ const scheduleCleanUp = () => {
     for (const [key, ref] of skImages) {
       if (ref.refCount <= 0) {
         skImages.delete(key);
-        getBufferLoader().unrefBuffer(ref.buffer);
       }
     }
   }, 1000);
@@ -80,13 +76,14 @@ const loadImageWithCache = async (
                 },
               )
             : null;
+          // we can unref buffer directly since we copied the image
+          getBufferLoader().unrefBuffer(buffer);
           if (!image) {
             reject(new Error('Failed to create image from buffer'));
             return;
           }
           skImages.set(key, {
             image,
-            buffer,
             refCount: 0,
           });
           scheduleCleanUp();

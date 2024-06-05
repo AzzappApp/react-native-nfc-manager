@@ -901,9 +901,10 @@ const CoverPreview = ({
 export default CoverPreview;
 
 const MAX_DISPLAY_DECODER_RESOLUTION = Math.min(
-  (Dimensions.get('window').height / 2) * PixelRatio.get(),
+  (Dimensions.get('window').height / 2) * Math.min(PixelRatio.get(), 2),
   1920,
 );
+
 const OVERLAY_RESIZE_AXIS: ResizeAxis[] = ['x', 'y'];
 const TEXT_RESIZE_AXIS: ResizeAxis[] = ['x'];
 

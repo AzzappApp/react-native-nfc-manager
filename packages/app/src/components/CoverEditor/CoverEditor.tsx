@@ -5,6 +5,7 @@ import {
   useImperativeHandle,
   useMemo,
   useReducer,
+  useRef,
   useState,
 } from 'react';
 import { StyleSheet, View } from 'react-native';
@@ -262,6 +263,22 @@ const CoverEditor = (
     coverEditorState.videoPaths,
     coverEditorState.overlayLayers,
   ]);
+
+  const prevImages = useRef(coverEditorState.images);
+  useEffect(() => {
+    for (const uri in prevImages.current) {
+      if (!coverEditorState.images[uri]) {
+        SKImageLoader.unrefImage(uri);
+      }
+    }
+    for (const uri in coverEditorState.images) {
+      if (!prevImages.current[uri]) {
+        SKImageLoader.refImage(uri);
+      }
+    }
+    prevImages.current = coverEditorState.images;
+  }, [coverEditorState.images]);
+
   const fontManager = useSkiaApplicationFonts();
   // #endregion
 

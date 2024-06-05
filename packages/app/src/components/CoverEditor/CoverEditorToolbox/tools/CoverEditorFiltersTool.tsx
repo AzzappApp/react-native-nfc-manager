@@ -1,49 +1,100 @@
 import { memo, useCallback } from 'react';
-import { FormattedMessage, useIntl } from 'react-intl';
-import { DoneHeaderButton } from '#components/commonsButtons';
-import FilterSelectionList from '#components/FilterSelectionList';
-import { useSkImage } from '#helpers/mediaEditions';
+import { useIntl } from 'react-intl';
+import { Alert } from 'react-native';
+import { COVER_MAX_MEDIA_DURATION } from '@azzapp/shared/coverHelpers';
 
+import ImagePicker, { EditImageStep } from '#components/ImagePicker';
+import ScreenModal from '#components/ScreenModal';
 import useToggle from '#hooks/useToggle';
-import BottomSheetModal from '#ui/BottomSheetModal';
-import Text from '#ui/Text';
 import {
   useCoverEditorContext,
   useCoverEditorActiveMedia,
 } from '../../CoverEditorContext';
 import ToolBoxSection from '../ui/ToolBoxSection';
+import type { ImagePickerResult } from '#components/ImagePicker';
 import type { Filter } from '#helpers/mediaEditions';
 
 const CoverEditorFiltersTool = () => {
-  const [show, toggleBottomSheet] = useToggle(false);
+  const [show, toggleScreenModal] = useToggle(false);
   const mediaInfo = useCoverEditorActiveMedia();
-  const { dispatch } = useCoverEditorContext();
-
-  const onSelect = useCallback(
-    (filter: Filter | null) => {
-      dispatch({
-        type: 'UPDATE_MEDIA_FILTER',
-        payload: filter,
-      });
-    },
-    [dispatch],
-  );
-
-  const media = mediaInfo?.media;
-  const cropData = mediaInfo?.editionParameters?.cropData;
-
-  const image = useSkImage({
-    uri: media?.uri,
-    kind: media?.kind,
-    time: 0,
-  });
-  const aspectRatio = cropData
+  const {
+    dispatch,
+    coverEditorState: { editionMode },
+  } = useCoverEditorContext();
+  const activeMedia = useCoverEditorActiveMedia();
+  const cropData = activeMedia?.editionParameters?.cropData;
+  const media = activeMedia?.media;
+  const mediaAspectRatio = cropData
     ? cropData.width / cropData.height
     : media
       ? media.width / media.height
       : 1;
 
   const intl = useIntl();
+
+  const applyToAllMedias = useCallback(
+    (filter: Filter | null) => {
+      dispatch({
+        type: 'UPDATE_ALL_MEDIA_FILTER',
+        payload: filter,
+      });
+      toggleScreenModal();
+    },
+    [dispatch, toggleScreenModal],
+  );
+
+  const applyToActiveMedia = useCallback(
+    (filter: Filter | null) => {
+      dispatch({
+        type: 'UPDATE_MEDIA_FILTER',
+        payload: filter,
+      });
+      toggleScreenModal();
+    },
+    [dispatch, toggleScreenModal],
+  );
+
+  const onFinished = useCallback(
+    ({ filter }: ImagePickerResult) => {
+      if (editionMode !== 'media' && editionMode !== 'mediaEdit') {
+        applyToActiveMedia(filter);
+        return;
+      }
+      Alert.alert(
+        intl.formatMessage({
+          defaultMessage: 'Apply to all medias ?',
+          description: 'Title of the alert to apply a filter to all medias',
+        }),
+        intl.formatMessage({
+          defaultMessage: 'Do you want to apply this filter to all medias ?',
+          description:
+            'Description of the alert to apply a filter to all medias',
+        }),
+        [
+          {
+            text: intl.formatMessage({
+              defaultMessage: 'No',
+              description: 'Button to not apply the filter to all medias',
+            }),
+            onPress: () => {
+              applyToActiveMedia(filter);
+            },
+          },
+          {
+            text: intl.formatMessage({
+              defaultMessage: 'Yes',
+              description: 'Button to apply the filter to all medias',
+            }),
+            onPress: () => {
+              applyToAllMedias(filter);
+            },
+            isPreferred: true,
+          },
+        ],
+      );
+    },
+    [applyToActiveMedia, applyToAllMedias, editionMode, intl],
+  );
 
   return (
     <>
@@ -53,34 +104,20 @@ const CoverEditorFiltersTool = () => {
           defaultMessage: 'Effects',
           description: 'Cover Edition Overlay Tool Button- Effect',
         })}
-        onPress={toggleBottomSheet}
+        onPress={toggleScreenModal}
       />
       {mediaInfo != null && (
-        <BottomSheetModal
-          onRequestClose={toggleBottomSheet}
-          visible={show}
-          height={271}
-          headerTitle={
-            <Text variant="large">
-              <FormattedMessage
-                defaultMessage="Effects"
-                description="CoverEditor Effects Tool - Title"
-              />
-            </Text>
-          }
-          headerRightButton={<DoneHeaderButton onPress={toggleBottomSheet} />}
-          contentContainerStyle={{ paddingHorizontal: 0 }}
-          headerStyle={{ paddingHorizontal: 20 }}
-        >
-          <FilterSelectionList
-            skImage={image}
-            aspectRatio={aspectRatio}
-            cropData={cropData}
-            selectedFilter={mediaInfo.filter}
-            cardRadius={20}
-            onChange={onSelect}
+        <ScreenModal visible={show} animationType="slide">
+          <ImagePicker
+            initialData={activeMedia}
+            additionalData={{ selectedTab: 'filter', showTabs: false }}
+            forceAspectRatio={mediaAspectRatio}
+            steps={[EditImageStep]}
+            onCancel={toggleScreenModal}
+            onFinished={onFinished}
+            maxVideoDuration={COVER_MAX_MEDIA_DURATION}
           />
-        </BottomSheetModal>
+        </ScreenModal>
       )}
     </>
   );

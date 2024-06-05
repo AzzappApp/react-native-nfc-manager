@@ -13,6 +13,7 @@ import {
   exportVideoComposition,
   type VideoCompositionItem,
 } from '@azzapp/react-native-skia-video';
+import { waitTime } from '@azzapp/shared/asyncHelpers';
 import {
   COVER_VIDEO_BITRATE,
   COVER_VIDEO_FRAME_RATE,
@@ -59,6 +60,10 @@ const useSaveCover = (
   const save = useCallback(async () => {
     setSavingStatus('exporting');
     coverLocalStore.saveCover(coverEditorState);
+
+    // we need to be sure that the cover rendering is stopped
+    // before we start exporting the cover
+    await waitTime(100);
 
     const { path, kind } = await createCoverMedia(
       coverEditorState,

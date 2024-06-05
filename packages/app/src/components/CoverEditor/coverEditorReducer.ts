@@ -229,6 +229,15 @@ export function coverEditorReducer(
       console.warn('Update filter without selected media');
       return state;
     }
+    case 'UPDATE_ALL_MEDIA_FILTER': {
+      return {
+        ...state,
+        medias: state.medias.map(media => ({
+          ...media,
+          filter: payload,
+        })),
+      };
+    }
     case 'UPDATE_MEDIA_EDITION_PARAMETERS': {
       if (
         state.editionMode === 'mediaEdit' &&
