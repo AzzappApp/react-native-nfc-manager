@@ -101,19 +101,25 @@ const HomeInformations = ({
     () => currentProfileIndexSharedValue.value,
     actual => {
       if (actual >= 0 && inputRange && inputRange?.length > 1) {
-        nbLikes.value = format(interpolate(actual, inputRange, nbLikesValue));
-        nbPosts.value = format(interpolate(actual, inputRange, nbPostsValue));
-        nbFollowers.value = format(
-          interpolate(actual, inputRange, nbFollowersValue),
-        );
-        nbFollowings.value = format(
-          interpolate(actual, inputRange, nbFollowingsValue),
-        );
+        if (nbLikesValue)
+          nbLikes.value = format(interpolate(actual, inputRange, nbLikesValue));
+        if (nbPostsValue)
+          nbPosts.value = format(interpolate(actual, inputRange, nbPostsValue));
+        if (nbFollowersValue)
+          nbFollowers.value = format(
+            interpolate(actual, inputRange, nbFollowersValue),
+          );
+        if (nbFollowingsValue)
+          nbFollowings.value = format(
+            interpolate(actual, inputRange, nbFollowingsValue),
+          );
       } else if (actual >= 0) {
-        nbPosts.value = format(nbPostsValue[actual]);
-        nbLikes.value = format(nbLikesValue[actual]);
-        nbFollowers.value = format(nbFollowersValue[actual]);
-        nbFollowings.value = format(nbFollowingsValue[actual]);
+        if (nbPostsValue) nbPosts.value = format(nbPostsValue[actual]);
+        if (nbLikesValue) nbLikes.value = format(nbLikesValue[actual]);
+        if (nbFollowersValue)
+          nbFollowers.value = format(nbFollowersValue[actual]);
+        if (nbFollowingsValue)
+          nbFollowings.value = format(nbFollowingsValue[actual]);
       }
     },
     [
