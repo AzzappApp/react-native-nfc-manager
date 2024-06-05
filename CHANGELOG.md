@@ -1,5 +1,6 @@
-## 0.5.15-canary.92
+## 0.5.15-canary.93
 
+* **build:**  - remove useless scripts
 * **build:**  - fix app-dependencies script
 * **build:**  - change restore terminal ([#3597](https://github.com/AzzappApp/azzapp/pull/3597))
 * **build:**  - upgrade to turbo v2 ([#3595](https://github.com/AzzappApp/azzapp/pull/3595))
