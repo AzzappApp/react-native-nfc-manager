@@ -1,5 +1,7 @@
-## 0.5.15-canary.89
+## 0.5.15-canary.90
 
+* **fix:**  - fix build
+* **fix:**  - android home information on fistr render
 * **feat:**  - 🎸 inform subscription is on webapp when needed ([#3594](https://github.com/AzzappApp/azzapp/pull/3594))
 * **fix:**  - new release test for HomeInformations
 * **fix:**  - cover perf improvments ([#3596](https://github.com/AzzappApp/azzapp/pull/3596))
