@@ -1,4 +1,4 @@
-import { Suspense, forwardRef } from 'react';
+import { Suspense } from 'react';
 import { View } from 'react-native';
 import { graphql, useLazyLoadQuery } from 'react-relay';
 import CoverEditorTemplateList from '#components/CoverEditorTemplateList';
@@ -59,7 +59,7 @@ const CoverTemplateSelectionStep = ({
   );
 };
 
-export default forwardRef(CoverTemplateSelectionStep);
+export default CoverTemplateSelectionStep;
 
 const stylesheet = createStyleSheet(() => ({
   activityIndicatorContainer: {

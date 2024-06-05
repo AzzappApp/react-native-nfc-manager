@@ -309,7 +309,6 @@ export const NewWebCardScreen = ({
             profileId={webCardInfo.profileId}
             height={contentHeight}
             onTemplateSelected={onCoverTemplateSelected}
-            ref={coverEditionRef}
           />
         ) : null,
       backIcon: 'arrow_down' as const,
