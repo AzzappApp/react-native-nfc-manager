@@ -158,9 +158,6 @@ const HomeInformations = ({
 
   return (
     <View style={[styles.container, { height }]}>
-      <Text style={{ color: colors.white }}>
-        {nbFollowersValue[currentIndex]} - {nbPostsValue[currentIndex]}
-      </Text>
       <View style={styles.row}>
         <PressableOpacity style={styles.square} onPress={goToPosts}>
           <AnimatedText variant="xlarge" text={nbPosts} appearance="dark" />
