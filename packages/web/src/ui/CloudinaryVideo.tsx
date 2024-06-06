@@ -58,6 +58,7 @@ const CloudinaryVideo = (
   return (
     <video
       ref={ref}
+      playsInline // for safari mobile: https://webkit.org/blog/6784/new-video-policies-for-ios/
       poster={getCldImageUrl({
         src: media.id,
         assetType: 'video',
