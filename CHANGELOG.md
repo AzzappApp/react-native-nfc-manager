@@ -1,5 +1,6 @@
-## 0.5.15-canary.100
+## 0.5.15-canary.101
 
+* **feat:**  - add rawCover kind to automatically crop covers outside mobile app ([#3601](https://github.com/AzzappApp/azzapp/pull/3601))
 * **build:**  - remove useless dep
 * **build:**  - try with build:web script
 * **build:**  - move dependency to subpackage
