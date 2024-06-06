@@ -1,7 +1,13 @@
 import * as Sentry from '@sentry/react-native';
 import { useCallback } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { View, useWindowDimensions, Share, Platform } from 'react-native';
+import {
+  View,
+  useWindowDimensions,
+  Share,
+  Platform,
+  Alert,
+} from 'react-native';
 import ReactNativeBlobUtil from 'react-native-blob-util';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import ShareCommand from 'react-native-share';
@@ -252,6 +258,52 @@ const WebCardModal = ({
     },
   );
 
+  const handleConfirmationQuitWebCard = useCallback(() => {
+    const descriptionMsg = isOwner
+      ? intl.formatMessage({
+          defaultMessage:
+            'Are you sure you want to delete this WebCard and all its contents? This action is irreversible.',
+          description: 'Delete WebCard confirmation message',
+        })
+      : intl.formatMessage({
+          defaultMessage:
+            'Are you sure you want to quit this WebCard? This action is irreversible.',
+          description: 'Quit WebCard confirmation message',
+        });
+
+    const labelConfirmation = isOwner
+      ? intl.formatMessage({
+          defaultMessage: 'Delete',
+          description: 'Delete button label',
+        })
+      : intl.formatMessage({
+          defaultMessage: 'Quit',
+          description: 'Quit button label',
+        });
+
+    Alert.alert(
+      intl.formatMessage({
+        defaultMessage: 'Quit this WebCard',
+        description: 'Delete WebCard title',
+      }),
+      descriptionMsg,
+      [
+        {
+          text: intl.formatMessage({
+            defaultMessage: 'Cancel',
+            description: 'Cancel button label',
+          }),
+          style: 'cancel',
+        },
+        {
+          text: labelConfirmation,
+          style: 'destructive',
+          onPress: quitWebCard,
+        },
+      ],
+    );
+  }, [intl, isOwner, quitWebCard]);
+
   return (
     <BottomSheetModal
       height={Math.min(650, windowsHeight - top + 50)}
@@ -436,7 +488,7 @@ const WebCardModal = ({
         </View>
         {isViewer && (
           <PressableNative
-            onPress={quitWebCard}
+            onPress={handleConfirmationQuitWebCard}
             style={[styles.bottomSheetOptionButton, styles.report]}
             disabled={isLoadingQuitWebCard}
           >
