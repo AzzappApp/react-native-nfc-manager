@@ -1,4 +1,4 @@
-## 0.5.15-canary.99
+## 0.5.15-canary.100
 
 * **build:**  - remove useless dep
 * **build:**  - try with build:web script
