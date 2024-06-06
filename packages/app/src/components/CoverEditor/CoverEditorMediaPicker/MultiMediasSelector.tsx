@@ -96,12 +96,7 @@ const MultiMediasSelector = ({
           )}
         </View>
       </View>
-      <PermissionModal
-        permissionsFor={'gallery'}
-        autoFocus={false}
-        //TODO handle onRequestClose
-        onRequestClose={() => {}}
-      />
+      <PermissionModal permissionsFor={'gallery'} autoFocus />
     </>
   );
 };

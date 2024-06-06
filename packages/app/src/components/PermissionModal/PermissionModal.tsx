@@ -23,7 +23,7 @@ type CameraModalProps = {
   /**
    * @see https://reactnative.dev/docs/modal#onrequestclose
    */
-  onRequestClose(): void;
+  onRequestClose?: () => void;
   /**
    * allow the popup to auto focus based on condition
    *
