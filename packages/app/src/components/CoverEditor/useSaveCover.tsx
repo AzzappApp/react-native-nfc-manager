@@ -64,10 +64,15 @@ const useSaveCover = (
     // before we start exporting the cover
     await waitTime(100);
 
-    const { path, kind } = await createCoverMedia(
-      coverEditorState,
-      fontManager,
-    );
+    let path: string;
+    let kind: 'image' | 'video';
+    try {
+      ({ path, kind } = await createCoverMedia(coverEditorState, fontManager));
+    } catch (error) {
+      setSavingStatus('error');
+      setError(error);
+      return;
+    }
 
     const { uploadURL, uploadParameters } = await uploadSign({
       kind: kind === 'video' ? 'video' : 'image',
@@ -288,7 +293,7 @@ const createCoverMedia = async (
     );
   }
 
-  return { path: outPath, kind: isDynamic ? 'video' : 'image' };
+  return { path: outPath, kind: isDynamic ? 'video' : 'image' } as const;
 };
 
 const MAX_EXPORT_DECODER_RESOLUTION = 1920;
