@@ -196,7 +196,7 @@ export const createPresignedUpload = async (
       .join('|');
   }
   if (generateVideoStreaming && kind === 'video') {
-    uploadParameters.eager = [uploadParameters.eager, 'sp_auto,f_m3u8']
+    uploadParameters.eager = [uploadParameters.eager, 'sp_auto', 'f_m3u8']
       .filter(val => !!val)
       .join('|');
   }

@@ -103,42 +103,41 @@ const useSaveCover = (
     const texts = coverEditorState.textLayers.map(({ text }) => text);
     const { backgroundColor, cardColors } = coverEditorState;
 
-    return new Promise<void>((resolve, reject) => {
-      commit({
-        variables: {
-          webCardId,
-          input: {
-            mediaId: public_id,
-            texts,
-            backgroundColor: backgroundColor ?? 'light',
-            cardColors,
+    try {
+      await new Promise<void>((resolve, reject) => {
+        commit({
+          variables: {
+            webCardId,
+            input: {
+              mediaId: public_id,
+              texts,
+              backgroundColor: backgroundColor ?? 'light',
+              cardColors,
+            },
           },
-        },
-        onCompleted(response, error) {
-          if (error) {
-            unstable_batchedUpdates(() => {
-              setSavingStatus('error');
-              setError(error);
-              setProgressIndicator(null);
-            });
+          onCompleted(response, error) {
+            if (error) {
+              reject(error);
+              return;
+            }
+            resolve();
+          },
+          onError(error) {
             reject(error);
-            return;
-          }
-          unstable_batchedUpdates(() => {
-            setSavingStatus('complete');
-            setProgressIndicator(null);
-          });
-          resolve();
-        },
-        onError(error) {
-          unstable_batchedUpdates(() => {
-            setSavingStatus('error');
-            setError(error);
-            setProgressIndicator(null);
-          });
-          reject(error);
-        },
+          },
+        });
       });
+    } catch (error) {
+      unstable_batchedUpdates(() => {
+        setSavingStatus('error');
+        setError(error);
+        setProgressIndicator(null);
+      });
+      throw error;
+    }
+    unstable_batchedUpdates(() => {
+      setSavingStatus('complete');
+      setProgressIndicator(null);
     });
   }, [commit, coverEditorState, fontManager, webCardId]);
 
