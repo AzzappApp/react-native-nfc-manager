@@ -299,7 +299,6 @@ __metadata:
     "@svgr/webpack": ^8.1.0
     "@testing-library/jest-native": ^5.4.3
     "@testing-library/react-hooks": ^8.0.1
-    "@types/blessed": ^0.1.21
     "@types/jest": ^29.5.12
     "@typescript-eslint/eslint-plugin": ^7.8.0
     "@typescript-eslint/parser": ^7.8.0
@@ -9288,15 +9287,6 @@ __metadata:
   dependencies:
     "@types/node": "*"
   checksum: 1e3c743f9bf23233ee6a51df4bbe8e9ba3d90c03e70b9ffe96e8c97174405c90a9672ec215c4d9c192ae7b7928bd0c0c83828f54d55ca55ea2642443c4cee422
-  languageName: node
-  linkType: hard
-
-"@types/blessed@npm:^0.1.21":
-  version: 0.1.25
-  resolution: "@types/blessed@npm:0.1.25"
-  dependencies:
-    "@types/node": "*"
-  checksum: f59113100ea053c8379166638c5fd1d31ba6bd8d88b8ebafaaa7282fecd1f69d912a28978388ec391bfe5e68c955803912f04a58a84716ebc8e7cdbe8e1fcad6
   languageName: node
   linkType: hard
 
