@@ -29,13 +29,7 @@ export type DeferredMedia = MediaModel | string;
 
 export type MediaWithAssetKind = {
   media: DeferredMedia;
-  assetKind:
-    | 'contactCard'
-    | 'cover'
-    | 'coverSource'
-    | 'logo'
-    | 'module'
-    | 'post';
+  assetKind: 'contactCard' | 'cover' | 'logo' | 'module' | 'post' | 'rawCover';
 };
 
 export type MediaResolverBaseType = DeferredMedia | MediaWithAssetKind;
@@ -146,7 +140,7 @@ const uriResolver =
     const assetKind = getAssetKind(media);
     media = getDeferredMedia(media);
     const id = typeof media === 'string' ? media : media.id;
-    if (assetKind === 'coverSource' || raw) {
+    if (raw) {
       return getCloudinaryAssetURL(
         id,
         kind,
@@ -154,7 +148,7 @@ const uriResolver =
       );
     }
     const pregeneratedSizes =
-      assetKind === 'cover'
+      assetKind === 'cover' || assetKind === 'rawCover'
         ? COVER_ASSET_SIZES
         : assetKind === 'module'
           ? MODULE_IMAGES_SIZES

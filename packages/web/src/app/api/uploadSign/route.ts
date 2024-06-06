@@ -19,7 +19,7 @@ import type { SessionData } from '#helpers/tokens';
 
 const UploadSignSchema = z.object({
   kind: z.enum(['image', 'video']),
-  target: z.enum(['cover', 'coverSource', 'module', 'post', 'avatar', 'logo']),
+  target: z.enum(['cover', 'rawCover', 'module', 'post', 'avatar', 'logo']),
 });
 
 type uploadSignParams = z.infer<typeof UploadSignSchema>;
@@ -73,6 +73,8 @@ const getAspectRatio = (body: uploadSignParams) => {
   switch (body.target) {
     case 'avatar':
       return '1.0';
+    case 'rawCover':
+      return '0.625';
     default:
       return null;
   }
@@ -80,8 +82,6 @@ const getAspectRatio = (body: uploadSignParams) => {
 
 const getPregeneratedSizes = (body: uploadSignParams) => {
   switch (body.target) {
-    case 'coverSource':
-      return null;
     case 'cover':
       return COVER_ASSET_SIZES;
     case 'module':
