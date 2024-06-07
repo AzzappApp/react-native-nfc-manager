@@ -107,7 +107,7 @@ const getStatus = (reports: Report[]): ReportStatus => {
     -Infinity,
   );
 
-  return treated.treatedAt.getTime() < lastReportDate ? 'Opened' : 'Closed';
+  return treated.treatedAt.getTime() <= lastReportDate ? 'Opened' : 'Closed';
 };
 
 const ReportPage = async ({

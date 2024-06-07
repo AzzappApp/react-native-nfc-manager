@@ -38,8 +38,10 @@ const sendReport: MutationResolvers['sendReport'] = async (
     };
 
     if (target?.deleted) {
+      const date = new Date();
       report.treatedBy = target.deletedBy;
-      report.treatedAt = new Date();
+      report.createdAt = date; // createdAt cannot be after treatedAt
+      report.treatedAt = date;
     }
 
     await createReport(report);
