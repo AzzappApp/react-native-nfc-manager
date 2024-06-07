@@ -1,5 +1,8 @@
-## 0.5.15-canary.110
+## 0.5.15-canary.111
 
+* **perf:**  - **slider:** [#3476](https://github.com/AzzappApp/azzapp/pull/3476) avoid to trigger onChange too often ([#3630](https://github.com/AzzappApp/azzapp/pull/3630))
+* **fix:**  - **webcard:** [#3605](https://github.com/AzzappApp/azzapp/pull/3605) display selected activity ([#3608](https://github.com/AzzappApp/azzapp/pull/3608))
+* **feat:**  - image media animation (zoomIn, zoomOut) ([#3627](https://github.com/AzzappApp/azzapp/pull/3627))
 * **fix:**  - **android:** patch vision camera ([#3623](https://github.com/AzzappApp/azzapp/pull/3623))
 * **fix:**  - put back lifetime check ([#3621](https://github.com/AzzappApp/azzapp/pull/3621))
 * **build:**  - upgrade expo-font version ([#3615](https://github.com/AzzappApp/azzapp/pull/3615))
