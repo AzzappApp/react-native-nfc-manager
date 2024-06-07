@@ -578,6 +578,13 @@ const WebCardParametersScreen = ({
                   borderWidth: 0,
                   paddingRight: 0,
                 }}
+                inputLabel={
+                  webCardCategories
+                    ?.find(a => a.id === webCard?.webCardCategory?.id)
+                    ?.companyActivities.find(
+                      a => a.id === webCard?.companyActivity?.id,
+                    )?.label ?? undefined
+                }
                 itemContainerStyle={styles.selectItemContainerStyle}
                 placeHolder={intl.formatMessage({
                   defaultMessage: 'Select an activity',

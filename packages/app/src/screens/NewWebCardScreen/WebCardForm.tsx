@@ -518,6 +518,13 @@ const WebCardForm = (
                       insets.top -
                       (StatusBar.currentHeight ?? 0)
                     }
+                    inputLabel={
+                      value
+                        ? companyActivities.find(
+                            activity => activity.id === value,
+                          )?.label ?? undefined
+                        : undefined
+                    }
                     onItemSelected={item => onChange(item.id)}
                     bottomSheetTitle={intl.formatMessage({
                       defaultMessage: 'Select an activity',
