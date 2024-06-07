@@ -1,4 +1,4 @@
-## 0.5.15-canary.109
+## 0.5.15-canary.110
 
 * **fix:**  - **android:** patch vision camera ([#3623](https://github.com/AzzappApp/azzapp/pull/3623))
 * **fix:**  - put back lifetime check ([#3621](https://github.com/AzzappApp/azzapp/pull/3621))
