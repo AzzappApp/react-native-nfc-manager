@@ -1,6 +1,6 @@
 import { useCallback, useMemo, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { View } from 'react-native';
+import { Alert, View } from 'react-native';
 import Toast from 'react-native-toast-message';
 import {
   graphql,
@@ -8,10 +8,13 @@ import {
   useMutation,
   usePreloadedQuery,
 } from 'react-relay';
-import { colors } from '#theme';
+import ERRORS from '@azzapp/shared/errors';
+import { colors, textStyles } from '#theme';
+import { useRouter } from '#components/NativeRouter';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import { keyExtractor } from '#helpers/idHelpers';
 import relayScreen from '#helpers/relayScreen';
+import useQuitWebCard from '#hooks/useQuitWebCard';
 import useToggle from '#hooks/useToggle';
 import Container from '#ui/Container';
 import Icon from '#ui/Icon';
@@ -68,6 +71,7 @@ const WebCardParametersScreen = ({
     webCardCategories,
     webCardParameters: { userNameChangeFrequencyDay },
   } = usePreloadedQuery(webCardParametersScreenQuery, preloadedQuery);
+  const router = useRouter();
 
   const webCard = useFragment(
     graphql`
@@ -240,6 +244,35 @@ const WebCardParametersScreen = ({
     `,
   );
 
+  const [quitWebCard, isLoadingQuitWebCard] = useQuitWebCard(
+    webCard?.id ?? '',
+    () => {
+      close();
+      router.back();
+    },
+    e => {
+      if (e.message === ERRORS.SUBSCRIPTION_IS_ACTIVE) {
+        Toast.show({
+          type: 'error',
+          text1: intl.formatMessage({
+            defaultMessage:
+              "You have an active subscription on this WebCard. You can't delete it.",
+            description:
+              'Error toast message when quitting WebCard with an active subscription',
+          }),
+        });
+      } else {
+        Toast.show({
+          type: 'error',
+          text1: intl.formatMessage({
+            defaultMessage: "Error, couldn't quit WebCard. Please try again.",
+            description: 'Error toast message when quitting WebCard',
+          }),
+        });
+      }
+    },
+  );
+
   const updateWebCardCategory = useCallback(
     (webCardCategory: WebCardCategory) => {
       if (!webCard) {
@@ -365,6 +398,37 @@ const WebCardParametersScreen = ({
     toggleUserNameFormVisible,
     webCard?.nextChangeUsernameAllowedAt,
   ]);
+
+  const handleConfirmationQuitWebCard = useCallback(() => {
+    Alert.alert(
+      intl.formatMessage({
+        defaultMessage: 'Quit this WebCard',
+        description: 'Delete WebCard title',
+      }),
+      intl.formatMessage({
+        defaultMessage:
+          'Are you sure you want to delete this WebCard and all its contents? This action is irreversible.',
+        description: 'Delete WebCard confirmation message',
+      }),
+      [
+        {
+          text: intl.formatMessage({
+            defaultMessage: 'Cancel',
+            description: 'Cancel button label',
+          }),
+          style: 'cancel',
+        },
+        {
+          text: intl.formatMessage({
+            defaultMessage: 'Delete',
+            description: 'Delete button label',
+          }),
+          style: 'destructive',
+          onPress: quitWebCard,
+        },
+      ],
+    );
+  }, [intl, quitWebCard]);
 
   if (!webCard) {
     return null;
@@ -533,6 +597,25 @@ const WebCardParametersScreen = ({
               }}
             />
           </Text>
+          <PressableNative
+            onPress={handleConfirmationQuitWebCard}
+            style={[styles.deleteOptionButton]}
+            disabled={isLoadingQuitWebCard}
+          >
+            <Text variant="error" style={textStyles.button}>
+              <FormattedMessage
+                defaultMessage="Delete this WebCard{azzappA}"
+                description="label for button to delete a webcard"
+                values={{
+                  azzappA: (
+                    <Text variant="azzapp" style={styles.deleteButton}>
+                      a
+                    </Text>
+                  ),
+                }}
+              />
+            </Text>
+          </PressableNative>
         </View>
         {webCard && (
           <WebCardParametersNameForm
@@ -577,6 +660,14 @@ const styleSheet = createStyleSheet(appearance => ({
     paddingHorizontal: 30,
   },
   searchContainer: { paddingBottom: 20 },
+  deleteOptionButton: {
+    height: 32,
+    marginVertical: 10,
+    alignSelf: 'center',
+    justifyContent: 'center',
+    fontWeight: 600,
+  },
+  deleteButton: { color: colors.red400 },
 }));
 
 export default relayScreen(WebCardParametersScreen, {
