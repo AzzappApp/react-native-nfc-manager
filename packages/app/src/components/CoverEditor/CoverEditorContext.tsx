@@ -1,6 +1,8 @@
 import { createContext, useContext } from 'react';
+import { mediaInfoIsImage } from './coverEditorHelpers';
 import type { EditionParameters, Filter } from '#helpers/mediaEditions';
 import type { Media } from '#helpers/mediaHelpers';
+import type { MediaAnimations } from './coverDrawer/mediaAnimation';
 import type { CoverEditorAction } from './coverEditorActions';
 import type {
   CoverEditorLinksLayerItem,
@@ -8,6 +10,7 @@ import type {
   CoverEditorState,
   CoverEditorTextLayerItem,
   MediaInfo,
+  MediaInfoImage,
 } from './coverEditorTypes';
 
 export type CoverEditorContextType = {
@@ -110,10 +113,13 @@ export const useCoverEditorMedia = () => {
   return kind === 'media' ? layer : null;
 };
 
+//TODO:(SHE)If perf issue, look at this to use directly the context instead of recreating an object on EACH change
 export const useCoverEditorActiveMedia = (): {
   media: Media;
   filter: Filter | null;
   editionParameters: EditionParameters | null;
+  animation: MediaAnimations | null;
+  duration?: number | null;
 } | null => {
   const {
     coverEditorState: { editionMode, overlayLayers, medias, selectedItemIndex },
@@ -127,6 +133,7 @@ export const useCoverEditorActiveMedia = (): {
       media: overlay.media,
       filter: overlay.filter,
       editionParameters: overlay.editionParameters,
+      animation: overlay.animation,
     };
   } else if (editionMode === 'mediaEdit' && selectedItemIndex != null) {
     const media = medias[selectedItemIndex];
@@ -137,7 +144,26 @@ export const useCoverEditorActiveMedia = (): {
       media: media.media,
       filter: media.filter,
       editionParameters: media.editionParameters,
+      animation: mediaInfoIsImage(media) ? media.animation : null,
+      duration: mediaInfoIsImage(media)
+        ? media.duration
+        : media.timeRange.duration,
     };
+  }
+  return null;
+};
+
+export const useCoverEditorActiveImageMedia = (): MediaInfoImage | null => {
+  const {
+    coverEditorState: { editionMode, medias, selectedItemIndex },
+  } = useCoverEditorContext();
+  if (editionMode === 'mediaEdit' && selectedItemIndex != null) {
+    const media = medias[selectedItemIndex];
+    if (!media || !mediaInfoIsImage(media)) {
+      return null;
+    }
+    //direclty return the object instead of creating a new one
+    return media;
   }
   return null;
 };

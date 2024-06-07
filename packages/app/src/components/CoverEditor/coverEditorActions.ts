@@ -1,7 +1,7 @@
 import type { EditionParameters, Filter } from '#helpers/mediaEditions';
 import type { MediaImage, Media, TimeRange } from '#helpers/mediaHelpers';
 import type { CoverTransitions } from './coverDrawer/coverTransitions';
-import type { Animation } from './coverDrawer/mediaAnimation';
+import type { MediaAnimations } from './coverDrawer/mediaAnimation';
 import type {
   CoverEditorOverlayItem,
   CoverEditorSocialLink,
@@ -58,9 +58,14 @@ export type UpdateMediasAction = {
   payload: Media[];
 };
 
-export type UpdateMediaAnimationAction = {
-  type: 'UPDATE_MEDIA_ANIMATION';
-  payload: Animation;
+export type UpdateMediaImageAnimationAction = {
+  type: 'UPDATE_MEDIA_IMAGE_ANIMATION';
+  payload: MediaAnimations | null;
+};
+
+export type UpdateMediaImageDurationnAction = {
+  type: 'UPDATE_MEDIA_IMAGE_DURATION';
+  payload: number;
 };
 
 export type UpdateMediaFilterAction = {
@@ -173,9 +178,10 @@ export type CoverEditorAction =
   | UpdateLayerBorderAction
   | UpdateLayerShadowAction
   | UpdateLinksAction
-  | UpdateMediaAnimationAction
   | UpdateMediaEditionParameters
   | UpdateMediaFilterAction
+  | UpdateMediaImageAnimationAction
+  | UpdateMediaImageDurationnAction
   | UpdateMediasAction
   | UpdateMediasTransitionAction
   | UpdateOverlayLayerAction

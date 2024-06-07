@@ -76,6 +76,11 @@ export const COVER_VIDEO_DEFAULT_DURATION = 4;
 export const COVER_MAX_MEDIA_DURATION = 5;
 
 /**
+ *  Minimum duration that a media can be displayed in a cover
+ */
+export const COVER_MIN_MEDIA_DURATION = 0.5;
+
+/**
  * A color that can be replaced in a lottie animation
  */
 export const LOTTIE_REPLACE_COLOR = '#010101';

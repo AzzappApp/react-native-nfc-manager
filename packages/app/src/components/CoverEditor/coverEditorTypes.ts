@@ -1,7 +1,7 @@
 import type { EditionParameters, Filter } from '#helpers/mediaEditions';
 import type { MediaVideo, MediaImage, TimeRange } from '#helpers/mediaHelpers';
 import type { CoverTransitions } from './coverDrawer/coverTransitions';
-import type { Animation } from './coverDrawer/mediaAnimation';
+import type { MediaAnimations } from './coverDrawer/mediaAnimation';
 import type { ColorPalette } from '@azzapp/shared/cardHelpers';
 import type {
   SkImage,
@@ -61,7 +61,7 @@ export type MediaInfoVideo = MediaInfoBase & {
 
 export type MediaInfoImage = MediaInfoBase & {
   media: MediaImage;
-  animation: Animation | null;
+  animation: MediaAnimations | null;
   duration: number;
 };
 
@@ -95,7 +95,7 @@ export type CoverEditorOverlayItem = {
   borderWidth: number;
   borderColor: string;
   elevation: number;
-  animation: Animation | null;
+  animation: MediaAnimations | null;
   filter: Filter | null;
   editionParameters: EditionParameters | null;
   bounds: SkRect;

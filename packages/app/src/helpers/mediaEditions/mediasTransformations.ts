@@ -9,6 +9,7 @@ import {
   type EditionParameters,
 } from './EditionParameters';
 import { applyLutFilter } from './LUTFilters';
+import type { MediaAnimation } from '#components/CoverEditor/coverDrawer/mediaAnimation';
 import type { VideoFrame } from '@azzapp/react-native-skia-video';
 import type {
   Matrix4,
@@ -26,6 +27,7 @@ export const transformImage = ({
   height,
   editionParameters,
   lutShader,
+  imageAnimation,
 }: {
   image: SkImage;
   localMatrix?: Matrix4 | SkMatrix | null;
@@ -35,6 +37,11 @@ export const transformImage = ({
   height: number;
   editionParameters?: EditionParameters | null;
   lutShader?: SkShader | null;
+  imageAnimation?: {
+    animation: MediaAnimation;
+    time: number;
+    duration: number;
+  };
 }) => {
   'worklet';
   const {
@@ -83,6 +90,17 @@ export const transformImage = ({
     matrix.postTranslate(-imageWidth / 2, -imageHeight / 2);
     matrix.postRotate(roll * (Math.PI / 180));
     matrix.postTranslate(imageWidth / 2, imageHeight / 2);
+  }
+  //do this before the croping or update the imageWidth and imageHeight
+  if (imageAnimation) {
+    const { animation, time, duration } = imageAnimation;
+    animation.animate({
+      matrix,
+      time,
+      duration,
+      width: imageWidth,
+      height: imageHeight,
+    });
   }
   matrix.postTranslate(-cropData.originX, -cropData.originY);
   matrix.postScale(width / cropData.width, height / cropData.height);

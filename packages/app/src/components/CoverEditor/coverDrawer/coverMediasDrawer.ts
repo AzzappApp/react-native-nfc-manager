@@ -7,6 +7,7 @@ import {
 } from '#helpers/mediaEditions';
 import { mediaInfoIsImage } from '../coverEditorHelpers';
 import coverTransitions from './coverTransitions';
+import mediaAnimations from './mediaAnimation';
 import type { CoverDrawerOptions } from './types';
 
 const coverMediasDrawer = ({
@@ -32,6 +33,7 @@ const coverMediasDrawer = ({
     const mediaInfo = medias[i];
     const isLast = i === medias.length - 1;
     let mediaDuration: number;
+
     if (mediaInfoIsImage(mediaInfo)) {
       mediaDuration = mediaInfo.duration;
     } else {
@@ -57,6 +59,13 @@ const coverMediasDrawer = ({
           image,
           lutShader: filter ? lutShaders[filter] : null,
           editionParameters,
+          imageAnimation: mediaInfo.animation
+            ? {
+                animation: mediaAnimations[mediaInfo.animation],
+                time: currentTime - compositionStartTime,
+                duration: mediaDuration,
+              }
+            : undefined,
           width,
           height,
         });
@@ -105,6 +114,7 @@ const coverMediasDrawer = ({
   } else if (inShader) {
     const paint = Skia.Paint();
     paint.setShader(inShader);
+
     canvas.drawRect(
       {
         x: 0,

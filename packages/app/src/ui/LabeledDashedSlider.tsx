@@ -16,7 +16,7 @@ export type LabeledDashedSliderProps = Omit<
   formatValue?: (value: number) => number | string;
 };
 
-function getPrecision(a: number) {
+export function getPrecision(a: number) {
   'worklet';
   if (!isFinite(a)) return 0;
   let e = 1;

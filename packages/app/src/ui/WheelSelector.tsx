@@ -6,6 +6,7 @@ import { FlatList } from 'react-native-gesture-handler';
 import { trigger } from 'react-native-haptic-feedback';
 import { colors } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
+import { getPrecision } from './LabeledDashedSlider';
 import type {
   LayoutChangeEvent,
   NativeScrollEvent,
@@ -40,7 +41,10 @@ const WheelSelector = ({
 }: WheelSelectorProps) => {
   const factor = variant === 'small' ? 0.5 : 1;
   const itemWidth = (interval ? interval : defaultInterval) * factor;
-  const steps = range(min, max + 1, step);
+  const steps = range(min, max + step, step).map(value =>
+    parseFloat(value.toFixed(getPrecision(step))),
+  );
+
   const size = steps.length * itemWidth;
   const colorScheme = useColorScheme();
   const colorsGradient = useMemo(
@@ -86,21 +90,21 @@ const WheelSelector = ({
         lastIndexRef.current = index; // Update the ref with the current index
         onChange?.(steps[index]);
         if (animatedValue) {
-          animatedValue.value = `${steps[index]}`;
+          animatedValue.value = `${steps[index].toFixed(getPrecision(step))}`;
         }
         if (withHaptics) {
           trigger('impactLight');
         }
       }
     },
-    [animatedValue, itemWidth, onChange, steps, withHaptics],
+    [animatedValue, itemWidth, onChange, step, steps, withHaptics],
   );
 
   const flatListRef = useRef<FlatList>(null);
   useEffect(() => {
     if (layoutWidth > 0 && flatListRef.current != null) {
       flatListRef.current?.scrollToOffset({
-        offset: (value - min) * itemWidth,
+        offset: ((value - min) * itemWidth) / step,
         animated: false,
       });
     }

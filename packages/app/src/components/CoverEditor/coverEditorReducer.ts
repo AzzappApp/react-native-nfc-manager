@@ -1,6 +1,9 @@
 /* eslint-disable no-case-declarations */
+import { clamp } from 'lodash';
 import {
   COVER_IMAGE_DEFAULT_DURATION,
+  COVER_MAX_MEDIA_DURATION,
+  COVER_MIN_MEDIA_DURATION,
   COVER_RATIO,
   COVER_VIDEO_DEFAULT_DURATION,
 } from '@azzapp/shared/coverHelpers';
@@ -194,8 +197,50 @@ export function coverEditorReducer(
           }
         }),
       };
-    case 'UPDATE_MEDIA_ANIMATION': {
-      //TODO
+    case 'UPDATE_MEDIA_IMAGE_DURATION': {
+      if (
+        state.editionMode === 'mediaEdit' &&
+        state.selectedItemIndex != null
+      ) {
+        const media = state.medias[state.selectedItemIndex];
+        if (mediaInfoIsImage(media)) {
+          const medias = [...state.medias];
+          medias[state.selectedItemIndex] = {
+            ...medias[state.selectedItemIndex],
+            duration: clamp(
+              payload,
+              COVER_MIN_MEDIA_DURATION,
+              COVER_MAX_MEDIA_DURATION,
+            ),
+          };
+
+          return {
+            ...state,
+            medias,
+          };
+        }
+      }
+      return state;
+    }
+    case 'UPDATE_MEDIA_IMAGE_ANIMATION': {
+      if (
+        state.editionMode === 'mediaEdit' &&
+        state.selectedItemIndex != null
+      ) {
+        //add a control to only update animation for Image media
+        const media = state.medias[state.selectedItemIndex];
+        if (mediaInfoIsImage(media)) {
+          const medias = [...state.medias];
+          medias[state.selectedItemIndex] = {
+            ...medias[state.selectedItemIndex],
+            animation: payload,
+          };
+          return {
+            ...state,
+            medias,
+          };
+        }
+      }
       return state;
     }
     case 'UPDATE_MEDIA_FILTER': {
