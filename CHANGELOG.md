@@ -1,5 +1,6 @@
-## 0.5.15-canary.108
+## 0.5.15-canary.109
 
+* **fix:**  - **android:** patch vision camera ([#3623](https://github.com/AzzappApp/azzapp/pull/3623))
 * **fix:**  - put back lifetime check ([#3621](https://github.com/AzzappApp/azzapp/pull/3621))
 * **build:**  - upgrade expo-font version ([#3615](https://github.com/AzzappApp/azzapp/pull/3615))
 * **feat:**  - add rawCover kind to automatically crop covers outside mobile app ([#3601](https://github.com/AzzappApp/azzapp/pull/3601))
