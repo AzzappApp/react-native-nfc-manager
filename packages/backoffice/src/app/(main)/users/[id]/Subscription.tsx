@@ -44,6 +44,16 @@ export const Subscription = ({
 
   return (
     <Box display="flex" flexDirection="column" gap={2}>
+      <TextField
+        sx={{ width: 250 }}
+        value={userSubscription.issuer}
+        label="Platform"
+        inputProps={{
+          readOnly: true,
+        }}
+        disabled
+      />
+
       <Typography variant="subtitle1" color="GrayText" sx={{ mt: 5, mb: 5 }}>
         Subscription started at {userSubscription.startAt.toDateString()}
       </Typography>

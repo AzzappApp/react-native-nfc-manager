@@ -51,15 +51,13 @@ const UserPage = async ({ params: { id } }: UserPageProps) => {
         </Link>
       </Breadcrumbs>
       <UserForm user={user} webCards={profiles.map(({ WebCard }) => WebCard)} />
-      {(subscriptions.length > 0 && (
-        <Subscriptions
-          user={user}
-          userSubscriptions={userSubscriptions.sort(
-            ({ startAt: a }, { startAt: b }) => b.getTime() - a.getTime(),
-          )}
-        />
-      )) ||
-        'No subscription'}
+
+      <Subscriptions
+        user={user}
+        userSubscriptions={userSubscriptions.sort(
+          ({ startAt: a }, { startAt: b }) => b.getTime() - a.getTime(),
+        )}
+      />
     </Box>
   );
 };

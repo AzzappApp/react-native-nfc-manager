@@ -1,12 +1,6 @@
 'use client';
 
-import {
-  Box,
-  FormControlLabel,
-  Switch,
-  TextField,
-  Typography,
-} from '@mui/material';
+import { Box, FormControlLabel, Switch, Typography } from '@mui/material';
 import * as Sentry from '@sentry/nextjs';
 import { useTransition } from 'react';
 import Subscription from './Subscription';
@@ -65,16 +59,6 @@ export const Subscriptions = ({
           }
           label="Free & unlimited access"
           disabled={isAlreadySubscribed || pending}
-        />
-
-        <TextField
-          sx={{ width: 250 }}
-          value={userSubscriptions[0].issuer}
-          label="Platform"
-          inputProps={{
-            readOnly: true,
-          }}
-          disabled
         />
 
         {userSubscriptions.map(subscription => (
