@@ -1,6 +1,6 @@
 import { LinearGradient } from 'expo-linear-gradient';
 import range from 'lodash/range';
-import { memo, useMemo } from 'react';
+import { memo, useMemo, useRef } from 'react';
 import { View, useColorScheme, useWindowDimensions } from 'react-native';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import Animated, {
@@ -54,11 +54,17 @@ const DashedSlider = ({
 
   const animationActive = useSharedValue(false);
 
+  const previousValue = useRef<number | null>(null);
+
   useInterval(() => {
     if (!animationActive.value || !onChange) {
       return;
     }
-    onChange(Math.round(pan.value / step) * step);
+    const nextValue = Math.round(pan.value / step) * step;
+    if (previousValue.current !== nextValue) {
+      onChange(Math.round(pan.value / step) * step);
+      previousValue.current = nextValue;
+    }
   }, 16);
 
   const panGesture = Gesture.Pan()
