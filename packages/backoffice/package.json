@@ -26,6 +26,7 @@
     "@sentry/nextjs": "^7.113.0",
     "@sentry/tracing": "^7.114.0",
     "classnames": "^2.5.1",
+    "date-fns": "^3.6.0",
     "drizzle-orm": "^0.30.8",
     "lodash": "^4.17.21",
     "lottie-web": "^5.12.2",

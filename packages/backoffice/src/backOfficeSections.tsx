@@ -21,6 +21,12 @@ const backOfficeSections: Section[] = [
     subSections: [
       { id: 'account', text: 'Account', href: '/users', roles: [ADMIN] },
       {
+        id: 'subscriptions',
+        text: 'Subscriptions',
+        href: '/subscriptions',
+        roles: [ADMIN],
+      },
+      {
         id: 'moderations',
         text: 'Moderation',
         href: '/moderations',
