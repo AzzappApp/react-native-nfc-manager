@@ -1,5 +1,7 @@
-## 0.5.15-canary.107
+## 0.5.15-canary.108
 
+* **fix:**  - put back lifetime check ([#3621](https://github.com/AzzappApp/azzapp/pull/3621))
+* **build:**  - upgrade expo-font version ([#3615](https://github.com/AzzappApp/azzapp/pull/3615))
 * **feat:**  - add rawCover kind to automatically crop covers outside mobile app ([#3601](https://github.com/AzzappApp/azzapp/pull/3601))
 * **build:**  - remove useless dep
 * **build:**  - try with build:web script
