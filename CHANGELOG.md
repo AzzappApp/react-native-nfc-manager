@@ -1,5 +1,6 @@
-## 0.5.15-canary.111
+## 0.5.15-canary.112
 
+* **fix:**  - **Android:** video system
 * **perf:**  - **slider:** [#3476](https://github.com/AzzappApp/azzapp/pull/3476) avoid to trigger onChange too often ([#3630](https://github.com/AzzappApp/azzapp/pull/3630))
 * **fix:**  - **webcard:** [#3605](https://github.com/AzzappApp/azzapp/pull/3605) display selected activity ([#3608](https://github.com/AzzappApp/azzapp/pull/3608))
 * **feat:**  - image media animation (zoomIn, zoomOut) ([#3627](https://github.com/AzzappApp/azzapp/pull/3627))
