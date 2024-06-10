@@ -246,7 +246,6 @@ export function coverEditorReducer(
     case 'UPDATE_ALL_IMAGES_MEDIA_ANIMATION': {
       if (state.editionMode === 'mediaEdit') {
         //add a control to only update animation for Image media
-        console.log(payload);
         return {
           ...state,
           medias: state.medias.map(media => {

@@ -163,15 +163,13 @@ const CoverEditorMediaImageAnimationTool = () => {
               description: 'Button to apply the filter to all images',
             }),
             onPress: () => {
-              if (activeMedia && hasChanges.current) {
-                dispatch({
-                  type: 'UPDATE_ALL_IMAGES_MEDIA_ANIMATION',
-                  payload: {
-                    animation: activeMedia.animation,
-                    duration: activeMedia.duration,
-                  },
-                });
-              }
+              dispatch({
+                type: 'UPDATE_ALL_IMAGES_MEDIA_ANIMATION',
+                payload: {
+                  animation: activeMedia.animation,
+                  duration: activeMedia.duration,
+                },
+              });
               toggleBottomSheet();
             },
             isPreferred: true,
