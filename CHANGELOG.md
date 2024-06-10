@@ -1,5 +1,6 @@
-## 0.5.15-canary.114
+## 0.5.15-canary.115
 
+* **feat:**  - add all required animation ([#3634](https://github.com/AzzappApp/azzapp/pull/3634))
 * **fix:**  - resize with bounds regardless rotation ([#3613](https://github.com/AzzappApp/azzapp/pull/3613))
 * **fix:**  - **Android:** video system
 * **perf:**  - **slider:** [#3476](https://github.com/AzzappApp/azzapp/pull/3476) avoid to trigger onChange too often ([#3630](https://github.com/AzzappApp/azzapp/pull/3630))
