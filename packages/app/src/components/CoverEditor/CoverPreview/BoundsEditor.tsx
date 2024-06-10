@@ -20,7 +20,11 @@ export type BoundsEditorGestureHandlerProps = ViewProps & {
   onRotate: (angle: number) => void;
   onPinch: (scale: number) => void;
   onPan: (x: number, y: number) => void;
-  onResize: (position: ResizeHandlePosition, delta: number) => void;
+  onResize: (
+    position: ResizeHandlePosition,
+    deltaX: number,
+    deltaY: number,
+  ) => void;
   onGestureEnd: () => void;
 };
 
@@ -75,8 +79,8 @@ export const BoundsEditorGestureHandler = ({
     };
     return {
       position: 'absolute',
-      left: x,
-      top: y,
+      left: x - width / 2,
+      top: y - height / 2,
       width,
       height,
       transform: [{ rotate: `${rotation}rad` }],
@@ -120,13 +124,17 @@ const ResizeHandleGestureHandler = ({
   position: ResizeHandlePosition;
   onGestureStart: () => void;
   onGestureEnd: () => void;
-  onResize: (position: ResizeHandlePosition, delta: number) => void;
+  onResize: (
+    position: ResizeHandlePosition,
+    deltaX: number,
+    deltaY: number,
+  ) => void;
 }) => {
   const axis = position === 'left' || position === 'right' ? 'x' : 'y';
   const pan = Gesture.Pan()
     .onStart(onGestureStart)
     .onChange(e => {
-      onResize(position, axis === 'x' ? e.translationX : e.translationY);
+      onResize(position, e.translationX, e.translationY);
     })
     .onEnd(onGestureEnd);
 
@@ -283,7 +291,7 @@ export const drawBoundsEditor = ({
     height: layerHeight,
   } = percentRectToRect(bounds, width, height);
   canvas.save();
-  canvas.translate(x, y);
+  canvas.translate(x - layerWidth / 2, y - layerHeight / 2);
   canvas.rotate((rotation * 180) / Math.PI, layerWidth / 2, layerHeight / 2);
   const paint = Skia.Paint();
   paint.setStyle(PaintStyle.Stroke);

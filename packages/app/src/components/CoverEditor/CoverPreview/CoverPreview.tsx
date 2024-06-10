@@ -104,13 +104,11 @@ const CoverPreview = ({
     textLayers,
     linksLayer,
     cardColors,
-
     images,
     videoPaths,
     lutShaders,
     loadingLocalMedia,
     loadingRemoteMedia,
-
     editionMode,
     selectedItemIndex: selectedLayerIndex,
   } = coverEditorState;
@@ -392,7 +390,7 @@ const CoverPreview = ({
         });
         const bounds = percentRectToRect(
           {
-            x: position.x,
+            x: position.x - layerWidth / 2,
             y: position.y,
             width: layerWidth,
             height: paragraph.getHeight() / canvasHeight,
@@ -475,10 +473,31 @@ const CoverPreview = ({
       const canvasHeight = viewHeight;
       const { bounds, rotation } = activeLayerBounds.value;
       const { x: offsetX, y: offsetY } = gestureOffset.value.bounds;
+
+      const cos = Math.cos(rotation);
+      const sin = Math.sin(rotation);
+
+      const boundingBoxWidth =
+        (Math.abs(bounds.width * canvasWidth * cos) +
+          Math.abs(bounds.height * canvasHeight * sin)) /
+        canvasWidth;
+      const boundingBoxHeight =
+        (Math.abs(bounds.height * canvasHeight * cos) +
+          Math.abs(bounds.width * canvasWidth * sin)) /
+        canvasHeight;
+
       activeLayerBounds.value = {
         bounds: {
-          x: clamp(offsetX + translateX / canvasWidth, 0, 1 - bounds.width),
-          y: clamp(offsetY + translateY / canvasHeight, 0, 1 - bounds.height),
+          x: clamp(
+            offsetX + translateX / canvasWidth,
+            boundingBoxWidth / 2,
+            1 - boundingBoxWidth / 2,
+          ),
+          y: clamp(
+            offsetY + translateY / canvasHeight,
+            boundingBoxHeight / 2,
+            1 - boundingBoxHeight / 2,
+          ),
           width: bounds.width,
           height: bounds.height,
         },
@@ -499,12 +518,7 @@ const CoverPreview = ({
       }
       const { rotation } = activeLayerBounds.value;
       if (activeLayer.kind === 'text') {
-        const {
-          x,
-          y,
-          width: offsetWidth,
-          height: offsetHeight,
-        } = gestureOffset.value.bounds;
+        const { x, y, width: offsetWidth } = gestureOffset.value.bounds;
         const layer = activeLayer.layer;
         const layerWidth = clamp(offsetWidth * scale, 0.2, 0.9);
         const fontSize = Math.round(clamp(layer.fontSize * scale, 10, 48));
@@ -521,8 +535,8 @@ const CoverPreview = ({
         const layerHeight = paragraph.getHeight() / viewHeight;
         activeLayerBounds.value = {
           bounds: {
-            x: x - (layerWidth - offsetWidth) / 2,
-            y: y - (layerHeight - offsetHeight) / 2,
+            x,
+            y,
             width: layerWidth,
             height: layerHeight,
           },
@@ -534,8 +548,8 @@ const CoverPreview = ({
         const scaledHeight = clamp(bounds.height * scale, 0.2, 1);
         activeLayerBounds.value = {
           bounds: {
-            x: bounds.x - (scaledWidth - bounds.width) / 2,
-            y: bounds.y - (scaledHeight - bounds.height) / 2,
+            x: bounds.x,
+            y: bounds.y,
             width: scaledWidth,
             height: scaledHeight,
           },
@@ -582,21 +596,30 @@ const CoverPreview = ({
    * Callback to handle the resizing of the layer currently being edited
    */
   const handleLayerResize = useCallback(
-    (position: ResizeHandlePosition, value: number) => {
+    (position: ResizeHandlePosition, valueX: number, valueY: number) => {
       'worklet';
       if (!gestureOffset.value || !activeLayerBounds.value) {
         return;
       }
+      // Get the rotation angle of the object
+      const rotationAngle = activeLayerBounds.value.rotation;
+
+      // Calculate the changes in the rotated coordinate system
+      const rotatedValueX =
+        valueX * Math.cos(-rotationAngle) - valueY * Math.sin(-rotationAngle);
+      const rotatedValueY =
+        valueX * Math.sin(-rotationAngle) + valueY * Math.cos(-rotationAngle);
+
       const {
         x: offsetX,
         y: offsetY,
         width: offsetWidth,
         height: offsetHeight,
       } = gestureOffset.value.bounds;
-      value =
+      let value =
         position === 'top' || position === 'bottom'
-          ? value / viewHeight
-          : value / viewWidth;
+          ? rotatedValueY / viewHeight
+          : rotatedValueX / viewWidth;
 
       let newBounds: SkRect;
       switch (position) {
@@ -604,14 +627,14 @@ const CoverPreview = ({
           value = clamp(value, -offsetY, offsetHeight - 0.2);
           newBounds = {
             x: offsetX,
-            y: offsetY + value,
+            y: offsetY,
             width: offsetWidth,
             height: offsetHeight - value,
           };
           break;
         }
         case 'bottom':
-          value = clamp(value, 0.2 - offsetHeight, 1 - offsetY - offsetHeight);
+          value = clamp(value, -offsetHeight - 0.2, offsetY);
           newBounds = {
             x: offsetX,
             y: offsetY,
@@ -622,14 +645,14 @@ const CoverPreview = ({
         case 'left':
           value = clamp(value, -offsetX, offsetWidth - 0.2);
           newBounds = {
-            x: offsetX + value,
+            x: offsetX,
             y: offsetY,
             width: offsetWidth - value,
             height: offsetHeight,
           };
           break;
         case 'right':
-          value = clamp(value, 0.2 - offsetWidth, 1 - offsetX - offsetWidth);
+          value = clamp(value, -offsetWidth - 0.2, offsetX);
           newBounds = {
             x: offsetX,
             y: offsetY,
@@ -840,10 +863,12 @@ const CoverPreview = ({
       const { bounds, rotation } = activeLayerBounds.value;
       const fontSize =
         editedTextFontSize.value ?? editedTextLayer?.fontSize ?? 14;
+      const width = bounds.width * viewWidth;
+      const height = bounds.height * viewHeight;
       return {
-        top: bounds.y * viewHeight,
-        left: bounds.x * viewWidth,
-        width: bounds.width * viewWidth,
+        top: bounds.y * viewHeight - height / 2,
+        left: bounds.x * viewWidth - width / 2,
+        width,
         fontSize: convertToBaseCanvasRatio(fontSize, viewWidth),
         transform: [{ rotate: `${rotation}rad` }],
       };
@@ -1174,25 +1199,19 @@ const inBounds = (
   bounds: SkRect,
   rotation: number,
 ): boolean => {
-  const centerX = bounds.x + bounds.width / 2;
-  const centerY = bounds.y + bounds.height / 2;
-
-  const translatedX = x - centerX;
-  const translatedY = y - centerY;
-
   const cos = Math.cos(rotation);
   const sin = Math.sin(rotation);
-  const rotatedX = translatedX * cos - translatedY * sin;
-  const rotatedY = translatedX * sin + translatedY * cos;
 
-  const finalX = rotatedX + centerX;
-  const finalY = rotatedY + centerY;
+  const boundingBoxWidth =
+    Math.abs(bounds.width * cos) + Math.abs(bounds.height * sin);
+  const boundingBoxHeight =
+    Math.abs(bounds.height * cos) + Math.abs(bounds.width * sin);
 
   return (
-    finalX >= bounds.x &&
-    finalX <= bounds.x + bounds.width &&
-    finalY >= bounds.y &&
-    finalY <= bounds.y + bounds.height
+    x >= bounds.x - boundingBoxWidth / 2 &&
+    x <= bounds.x + boundingBoxWidth / 2 &&
+    y >= bounds.y - boundingBoxHeight / 2 &&
+    y <= bounds.y + boundingBoxHeight / 2
   );
 };
 

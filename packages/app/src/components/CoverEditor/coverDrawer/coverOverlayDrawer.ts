@@ -42,7 +42,7 @@ const coverOverlayDrawer = ({
     return;
   }
   canvas.save();
-  canvas.translate(x, y);
+  canvas.translate(x - imageWidth / 2, y - imageHeight / 2);
   if (rotation) {
     canvas.rotate((rotation * 180) / Math.PI, imageWidth / 2, imageHeight / 2);
   }

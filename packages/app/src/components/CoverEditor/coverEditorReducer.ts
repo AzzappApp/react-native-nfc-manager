@@ -427,8 +427,8 @@ export function coverEditorReducer(
             // TODO
             animation: null,
             bounds: {
-              x: 0.5 - size.width / 2,
-              y: 0.5 - size.height / 2,
+              x: 0.5,
+              y: 0.5,
               ...size,
             },
             rotation: 0,

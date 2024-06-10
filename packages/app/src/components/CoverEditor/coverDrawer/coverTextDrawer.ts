@@ -101,13 +101,9 @@ const coverTextDrawer = ({
   canvas.save();
   canvas.translate(x, y);
   if (rotation) {
-    canvas.rotate(
-      (rotation * 180) / Math.PI,
-      textWidth / 2,
-      paragraph.getHeight() / 2,
-    );
+    canvas.rotate((rotation * 180) / Math.PI, 0, 0);
   }
-  paragraph.paint(canvas, 0, 0);
+  paragraph.paint(canvas, -textWidth / 2, -paragraph.getHeight() / 2);
   canvas.restore();
 };
 
