@@ -1,5 +1,6 @@
-## 0.5.15-canary.115
+## 0.5.15-canary.116
 
+* **feat:**  - apply all adjust to all media ([#3637](https://github.com/AzzappApp/azzapp/pull/3637))
 * **feat:**  - add all required animation ([#3634](https://github.com/AzzappApp/azzapp/pull/3634))
 * **fix:**  - resize with bounds regardless rotation ([#3613](https://github.com/AzzappApp/azzapp/pull/3613))
 * **fix:**  - **Android:** video system
