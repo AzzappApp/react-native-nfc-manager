@@ -1,5 +1,6 @@
-## 0.5.15-canary.116
+## 0.5.15-canary.117
 
+* **perf:**  - **post:** [#3476](https://github.com/AzzappApp/azzapp/pull/3476) debounce param changes ([#3631](https://github.com/AzzappApp/azzapp/pull/3631))
 * **feat:**  - apply all adjust to all media ([#3637](https://github.com/AzzappApp/azzapp/pull/3637))
 * **feat:**  - add all required animation ([#3634](https://github.com/AzzappApp/azzapp/pull/3634))
 * **fix:**  - resize with bounds regardless rotation ([#3613](https://github.com/AzzappApp/azzapp/pull/3613))

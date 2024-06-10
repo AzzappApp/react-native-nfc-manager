@@ -1,6 +1,6 @@
 {
   "name": "@azzapp/monorepo",
-  "version": "0.5.15-canary.116",
+  "version": "0.5.15-canary.117",
   "private": true,
   "packageManager": "yarn@3.8.2",
   "workspaces": {
