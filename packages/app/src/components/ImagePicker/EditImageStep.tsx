@@ -1,6 +1,7 @@
 import { useCallback, useMemo, useRef, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { StyleSheet, useWindowDimensions, View } from 'react-native';
+import { useDebouncedCallback } from 'use-debounce';
 import { formatDuration } from '@azzapp/shared/stringHelpers';
 import { colors } from '#theme';
 import {
@@ -98,6 +99,12 @@ const EditImageStep = ({
       onParameterValueChange(editedParameter!, value);
     },
     [editedParameter, onParameterValueChange],
+  );
+
+  const onDebouncedCurrentParamChange = useDebouncedCallback(
+    onCurrentParamChange,
+    50,
+    { trailing: true },
   );
 
   const onNextOrientation = useCallback(() => {
@@ -352,7 +359,7 @@ const EditImageStep = ({
                       parameterSettings={
                         editionParametersSettings[editedParameter]
                       }
-                      onChange={onCurrentParamChange}
+                      onChange={onDebouncedCurrentParamChange}
                       style={styles.filterSelectionStyle}
                     />
                   ) : null}
