@@ -1,5 +1,6 @@
-## 0.5.15-canary.119
+## 0.5.15-canary.120
 
+* **HOTFIX:**  - cover min media duration to 1 sec (for test)
 * **feat:**  - allow saving media images animation and duration to all image medias ([#3635](https://github.com/AzzappApp/azzapp/pull/3635))
 * **fix:**  - **subscription:** [#3607](https://github.com/AzzappApp/azzapp/pull/3607) check that user has at least one subscriptio… ([#3632](https://github.com/AzzappApp/azzapp/pull/3632))
 * **perf:**  - **post:** [#3476](https://github.com/AzzappApp/azzapp/pull/3476) debounce param changes ([#3631](https://github.com/AzzappApp/azzapp/pull/3631))
