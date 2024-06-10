@@ -128,8 +128,10 @@ export const activeUserSubscription = async (
     .where(
       and(
         eq(UserSubscriptionTable.userId, userId),
-        eq(UserSubscriptionTable.status, 'active'),
-        gte(UserSubscriptionTable.endAt, currentDate),
+        or(
+          eq(UserSubscriptionTable.status, 'active'),
+          gte(UserSubscriptionTable.endAt, currentDate),
+        ),
         excludeWebCards ? isNull(UserSubscriptionTable.webCardId) : undefined,
       ),
     );
@@ -173,8 +175,10 @@ export const getActiveWebCardSubscription = async (
       and(
         eq(UserSubscriptionTable.userId, userId),
         eq(UserSubscriptionTable.webCardId, webCardId),
-        eq(UserSubscriptionTable.status, 'active'),
-        gte(UserSubscriptionTable.endAt, currentDate),
+        or(
+          eq(UserSubscriptionTable.status, 'active'),
+          gte(UserSubscriptionTable.endAt, currentDate),
+        ),
       ),
     )
     .then(res => res[0]);

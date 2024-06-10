@@ -3,7 +3,7 @@ import {
   getWebCardPosts,
   updateWebCard,
   getCardModules,
-  getActiveUserSubscriptionForWebCard,
+  activeUserSubscription,
 } from '@azzapp/data';
 import ERRORS from '@azzapp/shared/errors';
 import { webCardRequiresSubscription } from '@azzapp/shared/subscriptionHelpers';
@@ -29,9 +29,7 @@ const toggleWebCardPublished: MutationResolvers['toggleWebCardPublished'] =
     const owner = await loaders.webCardOwners.load(webCard.id);
 
     if (webCardRequiresSubscription(modules, webCard.webCardKind)) {
-      const subscription = owner
-        ? await getActiveUserSubscriptionForWebCard(owner.id, webCardId)
-        : [];
+      const subscription = owner ? await activeUserSubscription(owner.id) : [];
       if (subscription.length === 0) {
         throw new GraphQLError(ERRORS.SUBSCRIPTION_REQUIRED);
       }

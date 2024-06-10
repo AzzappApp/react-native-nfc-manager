@@ -12,7 +12,7 @@ import {
   getCardModuleNextPosition,
   getUserProfileWithWebCardId,
   getCardModules,
-  getActiveUserSubscriptionForWebCard,
+  activeUserSubscription,
 } from '@azzapp/data';
 import {
   MODULE_KIND_BLOCK_TEXT,
@@ -65,15 +65,16 @@ const createModuleSavingMutation =
     const modules = await getCardModules(profile.webCardId);
     const moduleCount = modules.length + (moduleId ? 0 : 1);
 
+    const owner = await loaders.webCardOwners.load(webCard.id);
+
     if (
       addingModuleRequireSubscription(moduleKind, moduleCount) &&
       webCard.cardIsPublished
     ) {
-      const subscription = await getActiveUserSubscriptionForWebCard(
-        userId,
-        webCard.id,
-      );
-      if (!subscription.some(s => !s.webCardId || s.webCardId === webCardId)) {
+      const subscription = owner
+        ? await activeUserSubscription(owner.id)
+        : null;
+      if (!subscription?.length) {
         throw new GraphQLError(ERRORS.SUBSCRIPTION_REQUIRED);
       }
     }
