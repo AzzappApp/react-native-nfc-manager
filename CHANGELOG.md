@@ -1,4 +1,4 @@
-## 0.5.15-canary.113
+## 0.5.15-canary.114
 
 * **fix:**  - resize with bounds regardless rotation ([#3613](https://github.com/AzzappApp/azzapp/pull/3613))
 * **fix:**  - **Android:** video system
