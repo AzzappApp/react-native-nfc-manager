@@ -83,6 +83,11 @@ export type UpdateMediaEditionParameters = {
   payload: EditionParameters | null;
 };
 
+export type UpdateAllMediasEditionParameters = {
+  type: 'UPDATE_ALL_MEDIA_EDITION_PARAMETERS';
+  payload: EditionParameters | null;
+};
+
 export type UpdateActiveMediaAction = {
   type: 'UPDATE_ACTIVE_MEDIA';
   payload: MediaInfo;
@@ -173,6 +178,7 @@ export type CoverEditorAction =
   | SetEditionModeAction
   | UpdateActiveMediaAction
   | UpdateAllMediaFilterAction
+  | UpdateAllMediasEditionParameters
   | UpdateCardColorsAction
   | UpdateCurrentVideoTimeRangeAction
   | UpdateLayerBorderAction

@@ -314,6 +314,33 @@ export function coverEditorReducer(
       console.warn('Update editionParameters without selected media');
       return state;
     }
+    case 'UPDATE_ALL_MEDIA_EDITION_PARAMETERS': {
+      if (
+        state.editionMode === 'mediaEdit' &&
+        state.selectedItemIndex != null
+      ) {
+        const medias = state.medias.map((media, index) => {
+          if (index === state.selectedItemIndex) {
+            //apply editions parameters and crop data
+            return {
+              ...media,
+              editionParameters: payload,
+            };
+          } else {
+            return {
+              ...media,
+              editionParameters: {
+                ...payload,
+                cropData: media.editionParameters?.cropData,
+              },
+            };
+          }
+        });
+        return { ...state, medias };
+      } else {
+        return state;
+      }
+    }
     case 'UPDATE_CURRENT_VIDEO_TIME_RANGE': {
       if (
         state.editionMode === 'mediaEdit' &&

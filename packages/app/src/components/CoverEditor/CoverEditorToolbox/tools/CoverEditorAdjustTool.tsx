@@ -1,4 +1,6 @@
+import { useCallback } from 'react';
 import { useIntl } from 'react-intl';
+import { Alert } from 'react-native';
 import { COVER_MAX_MEDIA_DURATION } from '@azzapp/shared/coverHelpers';
 import ImagePicker, { EditImageStep } from '#components/ImagePicker';
 import ScreenModal from '#components/ScreenModal';
@@ -9,6 +11,7 @@ import {
 } from '../../CoverEditorContext';
 import ToolBoxSection from '../ui/ToolBoxSection';
 import type { ImagePickerResult } from '#components/ImagePicker';
+import type { EditionParameters } from '#helpers/mediaEditions';
 
 const CoverEditorAdjustTool = () => {
   const intl = useIntl();
@@ -27,13 +30,63 @@ const CoverEditorAdjustTool = () => {
       ? media.width / media.height
       : 1;
 
-  const onFinished = (result: ImagePickerResult) => {
-    dispatch({
-      type: 'UPDATE_MEDIA_EDITION_PARAMETERS',
-      payload: result.editionParameters,
-    });
-    toggleScreenModal();
-  };
+  const applyToActiveMedia = useCallback(
+    (editionParam: EditionParameters) => {
+      dispatch({
+        type: 'UPDATE_MEDIA_EDITION_PARAMETERS',
+        payload: editionParam,
+      });
+      toggleScreenModal();
+    },
+    [dispatch, toggleScreenModal],
+  );
+
+  const onFinished = useCallback(
+    (result: ImagePickerResult) => {
+      if (editionMode !== 'media' && editionMode !== 'mediaEdit') {
+        applyToActiveMedia(result.editionParameters);
+        return;
+      }
+      Alert.alert(
+        intl.formatMessage({
+          defaultMessage: 'Apply to all medias ?',
+          description: 'Title of the alert to apply a adjust to all medias',
+        }),
+        intl.formatMessage({
+          defaultMessage:
+            'Do you want to apply thoses edition parameters to all medias ?',
+          description:
+            'Description of the alert to apply a adjust settings to all medias',
+        }),
+        [
+          {
+            text: intl.formatMessage({
+              defaultMessage: 'No',
+              description: 'Button to not apply the filter to all medias',
+            }),
+            onPress: () => {
+              applyToActiveMedia(result.editionParameters);
+            },
+          },
+          {
+            text: intl.formatMessage({
+              defaultMessage: 'Yes',
+              description: 'Button to apply the filter to all medias',
+            }),
+            onPress: () => {
+              dispatch({
+                type: 'UPDATE_ALL_MEDIA_EDITION_PARAMETERS',
+                payload: result.editionParameters,
+              });
+              toggleScreenModal();
+            },
+            isPreferred: true,
+          },
+        ],
+      );
+    },
+    [applyToActiveMedia, dispatch, editionMode, intl, toggleScreenModal],
+  );
 
   return (
     <>
