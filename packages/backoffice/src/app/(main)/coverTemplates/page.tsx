@@ -1,44 +1,22 @@
-// @TODO: temporary disable for feat_cover_v2
-/* eslint-disable eslint-comments/no-unlimited-disable */
-/* eslint-disable */
-// @ts-nocheck
-import { asc, eq, like, or, sql, and, desc } from 'drizzle-orm';
+import { asc, like, or, sql, and, desc } from 'drizzle-orm';
 import { CoverTemplateTable, db } from '@azzapp/data';
 import CoverTemplatesList from './CoverTemplatesList';
+import type { SQL } from 'drizzle-orm';
 
+export type Status = 'Disabled' | 'Enabled';
 export type CoverTemplateItem = {
   id: string;
   name: string;
-  kind: string;
-  personalEnabled: boolean;
-  businessEnabled: boolean;
+  type: string;
+  status: string;
 };
-
-export type Status = 'Disabled' | 'Enabled';
 
 export type Filters = {
-  personalStatus?: Status | 'All';
-  businessStatus?: Status | 'All';
+  status?: Status | 'All';
 };
 
-const getFilters = (filters: Filters) => {
-  const f = [];
-  if (filters.personalStatus && filters.personalStatus !== 'All') {
-    f.push(
-      eq(
-        CoverTemplateTable.personalEnabled,
-        filters.personalStatus === 'Enabled',
-      ),
-    );
-  }
-  if (filters.businessStatus && filters.businessStatus !== 'All') {
-    f.push(
-      eq(
-        CoverTemplateTable.businessEnabled,
-        filters.businessStatus === 'Enabled',
-      ),
-    );
-  }
+const getFilters = (_filters: Filters) => {
+  const f: Array<SQL<unknown>> = [];
 
   return f;
 };
@@ -47,16 +25,16 @@ const getSearch = (search: string | null) => {
   if (search) {
     return or(
       like(CoverTemplateTable.name, `%${search}%`),
-      like(CoverTemplateTable.kind, `%${search}%`),
+      like(CoverTemplateTable.type, `%${search}%`),
     );
   }
 };
 
-export type SortColumn = 'kind' | 'name';
+export type SortColumn = 'name' | 'type';
 
 const sortsColumns = {
   name: CoverTemplateTable.name,
-  kind: CoverTemplateTable.kind,
+  type: CoverTemplateTable.type,
 };
 
 const getQuery = (search: string | null, filters: Filters) => {
@@ -64,9 +42,8 @@ const getQuery = (search: string | null, filters: Filters) => {
     .select({
       id: CoverTemplateTable.id,
       name: CoverTemplateTable.name,
-      kind: CoverTemplateTable.kind,
-      personalEnabled: CoverTemplateTable.personalEnabled,
-      businessEnabled: CoverTemplateTable.businessEnabled,
+      type: CoverTemplateTable.type,
+      status: sql`'Enabled'`.mapWith(String).as('status'),
     })
     .from(CoverTemplateTable)
     .where(and(getSearch(search), ...getFilters(filters)))
@@ -109,8 +86,7 @@ type Props = {
     sort?: string;
     order?: string;
     s?: string;
-    ps?: string;
-    bs?: string;
+    st?: string;
   };
 };
 
@@ -125,8 +101,7 @@ const CoverTemplatesPage = async ({ searchParams = {} }: Props) => {
   const order = searchParams.order === 'desc' ? 'desc' : 'asc';
   const search = searchParams.s ?? null;
   const filters: Filters = {
-    personalStatus: (searchParams.ps as Status) || 'All',
-    businessStatus: (searchParams.bs as Status) || 'All',
+    status: (searchParams.st as Status) || 'All',
   };
 
   const CoverTemplates = await getCoverTemplates(

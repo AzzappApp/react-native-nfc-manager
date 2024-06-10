@@ -26,7 +26,7 @@ import {
 import { capitalize, omit, pick } from 'lodash';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
-import { TEXT_POSITIONS } from '@azzapp/shared/coverHelpers';
+// import { TEXT_POSITIONS } from '@azzapp/shared/coverHelpers';
 import { uploadMedia } from '@azzapp/shared/WebAPI';
 import { getSignedUpload } from '#app/mediaActions';
 import FontSelect from '#components/FontSelect';
@@ -513,7 +513,7 @@ const CoverTemplateForm = ({
             <FormHelperText>{textOrientationProps.helperText}</FormHelperText>
           </FormControl>
 
-          <FormControl
+          {/* <FormControl
             fullWidth
             error={textPositionProps.error}
             sx={{ width: 300 }}
@@ -534,7 +534,7 @@ const CoverTemplateForm = ({
               ))}
             </Select>
             <FormHelperText>{textPositionProps.helperText}</FormHelperText>
-          </FormControl>
+          </FormControl> */}
 
           <TextField
             name="titleColor"

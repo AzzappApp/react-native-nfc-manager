@@ -8,7 +8,7 @@ import {
   CardMedia,
   Typography,
 } from '@mui/material';
-import { getWebcardCoverUri } from '#helpers/webcard';
+import { getImageURLForSize, getVideoURL } from '@azzapp/shared/imagesHelpers';
 import type { WebCard } from '@azzapp/data';
 
 type Props = {
@@ -22,16 +22,22 @@ const HEIGHT = 411;
 const WebcardCover = ({ webcard, onRemoveWebcard }: Props) => {
   return (
     <Card sx={{ minWidth: WIDTH, margin: 1 }}>
-      <CardMedia
-        sx={{ height: HEIGHT }}
-        image={getWebcardCoverUri(
-          webcard.userName,
-          webcard.updatedAt.toDateString(),
-          WIDTH,
-          HEIGHT,
-        )}
-        title={webcard.userName}
-      />
+      {webcard.coverMediaId?.startsWith('v') ? (
+        <CardMedia
+          sx={{ height: HEIGHT }}
+          component="video"
+          title={webcard.userName}
+          image={getVideoURL(webcard.coverMediaId)}
+          controls
+        />
+      ) : (
+        <CardMedia
+          sx={{ height: HEIGHT }}
+          component="img"
+          title={webcard.userName}
+          image={getImageURLForSize({ id: webcard.coverMediaId || '' })}
+        />
+      )}
       <CardContent>
         <Typography variant="subtitle2">name: {webcard.userName}</Typography>
         <Typography variant="body1">id: {webcard.id}</Typography>
