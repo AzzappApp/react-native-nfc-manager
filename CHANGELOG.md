@@ -1,5 +1,6 @@
-## 0.5.15-canary.117
+## 0.5.15-canary.118
 
+* **fix:**  - **subscription:** [#3607](https://github.com/AzzappApp/azzapp/pull/3607) check that user has at least one subscriptio… ([#3632](https://github.com/AzzappApp/azzapp/pull/3632))
 * **perf:**  - **post:** [#3476](https://github.com/AzzappApp/azzapp/pull/3476) debounce param changes ([#3631](https://github.com/AzzappApp/azzapp/pull/3631))
 * **feat:**  - apply all adjust to all media ([#3637](https://github.com/AzzappApp/azzapp/pull/3637))
 * **feat:**  - add all required animation ([#3634](https://github.com/AzzappApp/azzapp/pull/3634))
