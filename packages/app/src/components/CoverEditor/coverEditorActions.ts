@@ -63,6 +63,11 @@ export type UpdateMediaImageAnimationAction = {
   payload: MediaAnimations | null;
 };
 
+export type UpdateAllMediaImagesAnimationAction = {
+  type: 'UPDATE_ALL_IMAGES_MEDIA_ANIMATION';
+  payload: { animation: MediaAnimations | null; duration: number };
+};
+
 export type UpdateMediaImageDurationnAction = {
   type: 'UPDATE_MEDIA_IMAGE_DURATION';
   payload: number;
@@ -178,6 +183,7 @@ export type CoverEditorAction =
   | SetEditionModeAction
   | UpdateActiveMediaAction
   | UpdateAllMediaFilterAction
+  | UpdateAllMediaImagesAnimationAction
   | UpdateAllMediasEditionParameters
   | UpdateCardColorsAction
   | UpdateCurrentVideoTimeRangeAction

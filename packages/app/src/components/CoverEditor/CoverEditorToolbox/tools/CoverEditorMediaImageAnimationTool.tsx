@@ -4,9 +4,9 @@ import {
   Picture,
   Skia,
 } from '@shopify/react-native-skia';
-import { memo, useCallback, useMemo } from 'react';
+import { memo, useCallback, useMemo, useRef } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { View, StyleSheet } from 'react-native';
+import { View, StyleSheet, Alert } from 'react-native';
 import {
   useSharedValue,
   useFrameCallback,
@@ -19,6 +19,7 @@ import {
 } from '@azzapp/shared/coverHelpers';
 import BoxSelectionList from '#components/BoxSelectionList';
 import { DoneHeaderButton } from '#components/commonsButtons';
+import { mediaInfoIsImage } from '#components/CoverEditor/coverEditorHelpers';
 import TransformedImageRenderer from '#components/TransformedImageRenderer';
 import { keyExtractor } from '#helpers/idHelpers';
 import {
@@ -50,15 +51,21 @@ import type { SkImage, SkShader } from '@shopify/react-native-skia';
 const CoverEditorMediaImageAnimationTool = () => {
   const [show, toggleBottomSheet] = useToggle(false);
   const activeMedia = useCoverEditorActiveImageMedia();
+  const hasMultipleMedias =
+    useCoverEditorContext().coverEditorState.medias.filter(media =>
+      mediaInfoIsImage(media),
+    ).length > 1;
   const { dispatch } = useCoverEditorContext();
   const animations = useAnimationList();
-
+  const hasChanges = useRef(false);
   const onSelect = useCallback(
-    (anim: MediaAnimationListItem | null) =>
+    (anim: MediaAnimationListItem | null) => {
       dispatch({
         type: 'UPDATE_MEDIA_IMAGE_ANIMATION',
         payload: anim?.id ?? null,
-      }),
+      });
+      hasChanges.current = true;
+    },
     [dispatch],
   );
 
@@ -69,12 +76,16 @@ const CoverEditorMediaImageAnimationTool = () => {
 
   const onChangeDurationSlider = useCallback(
     (duration: number) => {
-      dispatch({
-        type: 'UPDATE_MEDIA_IMAGE_DURATION',
-        payload: duration,
-      });
+      //initial value of slider call on change, avoid setting the hasChange bool to true
+      if (activeMedia?.duration !== duration) {
+        dispatch({
+          type: 'UPDATE_MEDIA_IMAGE_DURATION',
+          payload: duration,
+        });
+        hasChanges.current = true;
+      }
     },
-    [dispatch],
+    [activeMedia?.duration, dispatch],
   );
 
   const intl = useIntl();
@@ -124,6 +135,55 @@ const CoverEditorMediaImageAnimationTool = () => {
     [activeMedia, lutShader, skImage],
   );
 
+  const onFinished = useCallback(() => {
+    if (hasMultipleMedias && activeMedia && hasChanges.current) {
+      hasChanges.current = false;
+      Alert.alert(
+        intl.formatMessage({
+          defaultMessage: 'Apply to all images ?',
+          description:
+            'Title of the alert to apply this animation to all images',
+        }),
+        intl.formatMessage({
+          defaultMessage: 'Do you want to apply this animation to all images ?',
+          description:
+            'Description of the alert to apply a animation to all images',
+        }),
+        [
+          {
+            text: intl.formatMessage({
+              defaultMessage: 'No',
+              description: 'Button to not apply the animation to all images',
+            }),
+            onPress: toggleBottomSheet,
+          },
+          {
+            text: intl.formatMessage({
+              defaultMessage: 'Yes',
+              description: 'Button to apply the filter to all images',
+            }),
+            onPress: () => {
+              if (activeMedia && hasChanges.current) {
+                dispatch({
+                  type: 'UPDATE_ALL_IMAGES_MEDIA_ANIMATION',
+                  payload: {
+                    animation: activeMedia.animation,
+                    duration: activeMedia.duration,
+                  },
+                });
+              }
+              toggleBottomSheet();
+            },
+            isPreferred: true,
+          },
+        ],
+      );
+    } else {
+      hasChanges.current = false;
+      toggleBottomSheet();
+    }
+  }, [activeMedia, dispatch, hasMultipleMedias, intl, toggleBottomSheet]);
+
   return (
     <>
       <ToolBoxSection
@@ -148,7 +208,7 @@ const CoverEditorMediaImageAnimationTool = () => {
               />
             </Text>
           }
-          headerRightButton={<DoneHeaderButton onPress={toggleBottomSheet} />}
+          headerRightButton={<DoneHeaderButton onPress={onFinished} />}
         >
           <View style={styles.boxContainer}>
             <BoxSelectionList

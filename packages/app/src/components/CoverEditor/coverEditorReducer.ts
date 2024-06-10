@@ -243,6 +243,25 @@ export function coverEditorReducer(
       }
       return state;
     }
+    case 'UPDATE_ALL_IMAGES_MEDIA_ANIMATION': {
+      if (state.editionMode === 'mediaEdit') {
+        //add a control to only update animation for Image media
+        console.log(payload);
+        return {
+          ...state,
+          medias: state.medias.map(media => {
+            if (mediaInfoIsImage(media)) {
+              return {
+                ...media,
+                animation: payload.animation,
+                duration: payload.duration,
+              };
+            } else return media;
+          }),
+        };
+      }
+      return state;
+    }
     case 'UPDATE_MEDIA_FILTER': {
       if (
         state.editionMode === 'mediaEdit' &&
