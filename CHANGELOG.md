@@ -1,5 +1,7 @@
-## 0.5.15-canary.124
+## 0.5.15-canary.125
 
+* **build:**  - upgrade deps ([#3671](https://github.com/AzzappApp/azzapp/pull/3671))
+* **fix:**  - 🐛 Use default image duration for composition image ([#3672](https://github.com/AzzappApp/azzapp/pull/3672))
 * **fix:**  - **home:** [#3617](https://github.com/AzzappApp/azzapp/pull/3617) don’t switch webcard when leaving screen ([#3639](https://github.com/AzzappApp/azzapp/pull/3639))
 * **fix:**  - remove filter ([#3667](https://github.com/AzzappApp/azzapp/pull/3667))
 * **fix:**  - close doesn’t exist on webcard deletion ([#3664](https://github.com/AzzappApp/azzapp/pull/3664))
