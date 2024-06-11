@@ -2,7 +2,7 @@ import { toGlobalId } from 'graphql-relay';
 import { NextResponse } from 'next/server';
 import ERRORS from '@azzapp/shared/errors';
 import { generateTokens } from './tokens';
-import { twilioVerificationService } from './twilioHelpers';
+import { findTwilioLocale, twilioVerificationService } from './twilioHelpers';
 import type { Profile, User } from '@azzapp/data';
 
 export const handleSignInAuthMethod = async (
@@ -19,7 +19,7 @@ export const handleSignInAuthMethod = async (
       {
         to: issuer,
         channel: user.email ? 'email' : 'sms',
-        locale: user.locale ?? undefined,
+        locale: user.locale ? findTwilioLocale(user.locale) : undefined,
       },
     );
 

@@ -8,7 +8,10 @@ import {
   isInternationalPhoneNumber,
   isValidEmail,
 } from '@azzapp/shared/stringHelpers';
-import { twilioVerificationService } from '#helpers/twilioHelpers';
+import {
+  findTwilioLocale,
+  twilioVerificationService,
+} from '#helpers/twilioHelpers';
 
 type ForgotPasswordBody = {
   credential: string;
@@ -51,7 +54,7 @@ export const POST = withAxiom(async (req: Request) => {
       {
         to: issuer,
         channel,
-        locale,
+        locale: locale ? findTwilioLocale(locale) : undefined,
       },
     );
 
