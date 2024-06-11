@@ -1,5 +1,7 @@
-## 0.5.15-canary.123
+## 0.5.15-canary.124
 
+* **fix:**  - **home:** [#3617](https://github.com/AzzappApp/azzapp/pull/3617) don’t switch webcard when leaving screen ([#3639](https://github.com/AzzappApp/azzapp/pull/3639))
+* **fix:**  - remove filter ([#3667](https://github.com/AzzappApp/azzapp/pull/3667))
 * **fix:**  - close doesn’t exist on webcard deletion ([#3664](https://github.com/AzzappApp/azzapp/pull/3664))
 * **perf:**  - try to lazy load bottom sheets
 * **fix:**  - update animation for all media
