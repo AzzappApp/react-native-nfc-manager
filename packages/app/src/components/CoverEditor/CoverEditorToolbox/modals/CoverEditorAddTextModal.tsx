@@ -151,7 +151,7 @@ const AddTextModalItem = ({
       payload: {
         text: 'Title 01',
         ...style,
-        textAlign: 'left',
+        textAlign: 'center',
         color: '#000000',
       },
     });
