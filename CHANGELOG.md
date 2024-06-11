@@ -1,4 +1,4 @@
-## 0.5.15-canary.122
+## 0.5.15-canary.123
 
 * **fix:**  - close doesn’t exist on webcard deletion ([#3664](https://github.com/AzzappApp/azzapp/pull/3664))
 * **perf:**  - try to lazy load bottom sheets
