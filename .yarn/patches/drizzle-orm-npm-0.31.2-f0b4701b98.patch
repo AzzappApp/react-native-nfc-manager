@@ -134,3 +134,16 @@ index 2da5d8735961ca8fe78a0e4453f0a6c37382a719..9a9e7fc701567aeb8ad334bd9570a501
    }
  }
  // Annotate the CommonJS export names for ESM import in node:
+diff --git a/mysql-core/primary-keys.js b/mysql-core/primary-keys.js
+index 3270119f56d61180a8b3ddaa638cf2958857ec84..f5bb55fc81fdf39c0057149fc6ab9559c2618306 100644
+--- a/mysql-core/primary-keys.js
++++ b/mysql-core/primary-keys.js
+@@ -31,7 +31,7 @@ class PrimaryKey {
+   columns;
+   name;
+   getName() {
+-    return this.name ?? `${this.table[MySqlTable.Symbol.Name]}_${this.columns.map((column) => column.name).join("_")}_pk`;
++    return this.name ?? `${this.table[MySqlTable.Symbol.Name]}_${this.columns.map((column) => column.name).join("_")}`;
+   }
+ }
+ export {

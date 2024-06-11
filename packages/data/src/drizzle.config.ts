@@ -2,11 +2,11 @@ import type { Config } from 'drizzle-kit';
 import 'dotenv/config';
 
 export default {
+  dialect: 'mysql',
   schema: './src/*',
   dbCredentials: {
-    uri: process.env.DATABASE_URL ?? '',
+    url: process.env.DATABASE_URL ?? '',
   },
   tablesFilter: ['!_*'],
-  driver: 'mysql2',
   out: './drizzle',
 } satisfies Config;
