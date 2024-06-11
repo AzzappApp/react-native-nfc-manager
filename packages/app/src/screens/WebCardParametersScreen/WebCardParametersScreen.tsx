@@ -246,10 +246,7 @@ const WebCardParametersScreen = ({
 
   const [quitWebCard, isLoadingQuitWebCard] = useQuitWebCard(
     webCard?.id ?? '',
-    () => {
-      close();
-      router.back();
-    },
+    router.back,
     e => {
       if (e.message === ERRORS.SUBSCRIPTION_IS_ACTIVE) {
         Toast.show({
