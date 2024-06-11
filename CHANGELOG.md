@@ -1,5 +1,8 @@
-## 0.5.15-canary.128
+## 0.5.15-canary.129
 
+* **fix:**  - **subscription:** check subscription on multi user + invitation ([#3636](https://github.com/AzzappApp/azzapp/pull/3636))
+* **build:**  - upgrade drizzle ([#3675](https://github.com/AzzappApp/azzapp/pull/3675))
+* **fix:**  - **Android:** upgrade rn-skia-video
 * **fix:**  - **auth:** [#3616](https://github.com/AzzappApp/azzapp/pull/3616) twilio doesn’t support any locale ([#3643](https://github.com/AzzappApp/azzapp/pull/3643))
 * **build:**  - upgrade deps ([#3671](https://github.com/AzzappApp/azzapp/pull/3671))
 * **fix:**  - 🐛 Use default image duration for composition image ([#3672](https://github.com/AzzappApp/azzapp/pull/3672))
