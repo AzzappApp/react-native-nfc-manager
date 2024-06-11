@@ -12,7 +12,6 @@ import CoverEditorAdjustTool from './tools/CoverEditorAdjustTool';
 // import CoverEditorAnimationTool from './tools/CoverEditorAnimationTool';
 import CoverEditorBorderTool from './tools/CoverEditorBorderTool';
 import CoverEditorDelete from './tools/CoverEditorDelete';
-import CoverEditorFiltersTool from './tools/CoverEditorFiltersTool';
 import CoverEditorMediaReplace from './tools/CoverEditorMediaReplace';
 import CoverEditorShadowTool from './tools/CoverEditorShadowTool';
 import { TOOLBOX_SECTION_HEIGHT } from './ui/ToolBoxSection';
@@ -51,7 +50,7 @@ const CoverEditorOverlayToolbox = () => {
         contentContainerStyle={styles.scrollContentContainer}
       >
         <CoverEditorBorderTool />
-        <CoverEditorFiltersTool />
+        {/* <CoverEditorFiltersTool /> TODO: temp removing this for test */}
         <CoverEditorShadowTool />
         <CoverEditorAdjustTool />
         <CoverEditorMediaReplace />
