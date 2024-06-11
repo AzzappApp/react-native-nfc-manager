@@ -1,5 +1,6 @@
-## 0.5.15-canary.127
+## 0.5.15-canary.128
 
+* **fix:**  - **auth:** [#3616](https://github.com/AzzappApp/azzapp/pull/3616) twilio doesn’t support any locale ([#3643](https://github.com/AzzappApp/azzapp/pull/3643))
 * **build:**  - upgrade deps ([#3671](https://github.com/AzzappApp/azzapp/pull/3671))
 * **fix:**  - 🐛 Use default image duration for composition image ([#3672](https://github.com/AzzappApp/azzapp/pull/3672))
 * **fix:**  - **home:** [#3617](https://github.com/AzzappApp/azzapp/pull/3617) don’t switch webcard when leaving screen ([#3639](https://github.com/AzzappApp/azzapp/pull/3639))
