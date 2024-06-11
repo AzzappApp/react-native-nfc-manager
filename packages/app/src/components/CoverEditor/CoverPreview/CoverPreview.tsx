@@ -20,7 +20,11 @@ import Animated, {
 } from 'react-native-reanimated';
 import { waitTime } from '@azzapp/shared/asyncHelpers';
 import { swapColor } from '@azzapp/shared/cardHelpers';
-import { COVER_CARD_RADIUS, COVER_RATIO } from '@azzapp/shared/coverHelpers';
+import {
+  COVER_CARD_RADIUS,
+  COVER_IMAGE_DEFAULT_DURATION,
+  COVER_RATIO,
+} from '@azzapp/shared/coverHelpers';
 import { colors, shadow } from '#theme';
 import ImagePicker, { EditImageStep } from '#components/ImagePicker';
 import {
@@ -160,7 +164,10 @@ const CoverPreview = ({
     }
     if (!isDynamic) {
       // a fake composition with a duration of 5 seconds to display a static image
-      return { composition: { duration: 5, items: [] }, videoScales: {} };
+      return {
+        composition: { duration: COVER_IMAGE_DEFAULT_DURATION, items: [] },
+        videoScales: {},
+      };
     }
     let duration = 0;
     const videoScales: Record<string, number> = {};
