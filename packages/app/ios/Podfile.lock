@@ -31,7 +31,7 @@ PODS:
     - ReactCommon/turbomodule/core
   - EXConstants (16.0.1):
     - ExpoModulesCore
-  - Expo (51.0.11):
+  - Expo (51.0.12):
     - ExpoModulesCore
   - ExpoAsset (10.0.8):
     - ExpoModulesCore
@@ -1161,7 +1161,7 @@ PODS:
     - Yoga
   - react-native-safe-area-context (4.10.4):
     - React-Core
-  - react-native-skia (1.3.0):
+  - react-native-skia (1.3.3):
     - DoubleConversion
     - glog
     - hermes-engine
@@ -1445,7 +1445,7 @@ PODS:
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
     - Yoga
-  - RNLocalize (3.1.0):
+  - RNLocalize (3.2.0):
     - React-Core
   - RNPermissions (4.1.5):
     - React-Core
@@ -1454,7 +1454,7 @@ PODS:
     - React-Core
   - RNReactNativeHapticFeedback (2.2.0):
     - React-Core
-  - RNReanimated (3.11.0):
+  - RNReanimated (3.13.0-rc.1):
     - DoubleConversion
     - glog
     - hermes-engine
@@ -1519,11 +1519,11 @@ PODS:
     - SDWebImage/Core (~> 5.17)
   - Sentry/HybridSDK (8.26.0)
   - SocketRocket (0.7.0)
-  - VisionCamera (4.1.0):
-    - VisionCamera/Core (= 4.1.0)
-    - VisionCamera/React (= 4.1.0)
-  - VisionCamera/Core (4.1.0)
-  - VisionCamera/React (4.1.0):
+  - VisionCamera (4.2.1):
+    - VisionCamera/Core (= 4.2.1)
+    - VisionCamera/React (= 4.2.1)
+  - VisionCamera/Core (4.2.1)
+  - VisionCamera/React (4.2.1):
     - React-Core
   - Yoga (0.0.0)
 
@@ -1846,12 +1846,12 @@ EXTERNAL SOURCES:
     :path: "../../../node_modules/react-native/ReactCommon/yoga"
 
 SPEC CHECKSUMS:
-  azzapp-react-native-skia-video: a3279e3cc8aa2b0f360b4154180dbd3a25ac3af4
+  azzapp-react-native-skia-video: c7098d8069c6e6c3f8ca2f335688105e974b0981
   boost: d3f49c53809116a5d38da093a8aa78bf551aed09
   DoubleConversion: 76ab83afb40bddeeee456813d9c04f67f78771b5
   EXAV: cb6e8dbcc40873d8a386af357e6c2eb55d6d739e
   EXConstants: 9a008dbf262550884e6280dea95b81b51f65ea6f
-  Expo: 8af2fbdfe35b232c2361cc9b9f09a5719ceb4635
+  Expo: be0f48f4f1aa08d863d88480c2810b956e05e813
   ExpoAsset: 100b840e5dc1e1619df2d7c76441d33fb84a3202
   ExpoBlur: fa53f874e7b208bc3756d1bf07903c12e790beb1
   ExpoClipboard: 23d203f5d4843699fbc45be1cc4fe1fbd811a6fa
@@ -1867,7 +1867,7 @@ SPEC CHECKSUMS:
   ExpoSensors: cbcd06ec06602c74648b4ee71f6fe390fb513f72
   FBLazyVector: 4bc164e5b5e6cfc288d2b5ff28643ea15fa1a589
   fmt: 4c2741a687cc09f0634a2e2c72a838b99f1ff120
-  glog: c5d68082e772fa1c511173d6b30a9de2c05a69a2
+  glog: fdfdfe5479092de0c4bdbebedd9056951f092c4f
   hermes-engine: 01d3e052018c2a13937aca1860fbedbccd4a41b7
   libavif: 84bbb62fb232c3018d6f1bab79beea87e35de7b7
   libdav1d: 23581a4d8ec811ff171ed5e2e05cd27bad64c39f
@@ -1910,7 +1910,7 @@ SPEC CHECKSUMS:
   react-native-passkit: aaf4f946eb981b872104192aadaa7d6c94011f86
   react-native-quick-base64: a74c4b2607b9de016877a8edb776b6ac59785809
   react-native-safe-area-context: 399a5859f6acbdf67f671c69b53113f535f3b5b0
-  react-native-skia: b90aca0872599036df89a55a182ea70db5c9ebd7
+  react-native-skia: fe38efae026a4bacc8e9793c741f02062ff0acbf
   React-nativeconfig: 9f223cd321823afdecf59ed00861ab2d69ee0fc1
   React-NativeModulesApple: ff7efaff7098639db5631236cfd91d60abff04c0
   React-perflogger: 32ed45d9cee02cf6639acae34251590dccd30994
@@ -1941,11 +1941,11 @@ SPEC CHECKSUMS:
   RNDateTimePicker: 6dfc4acb94e520ccb1f1697e9d4cd64fd0817314
   RNFlashList: b521ebdd7f9352673817f1d98e8bdc0c8cf8545b
   RNGestureHandler: 2282cfbcf86c360d29f44ace393203afd5c6cff7
-  RNLocalize: e8694475db034bf601e17bd3dfa8986565e769eb
+  RNLocalize: b77875884750cb6a58cd6865863fe2ba2729b72b
   RNPermissions: 515e6bdfab4f8648ad0b2e600374f65981c04dba
   RNPurchases: 3b98545ec62c65bb656ec84210ab58e265b2ba62
   RNReactNativeHapticFeedback: ec56a5f81c3941206fd85625fa669ffc7b4545f9
-  RNReanimated: b4e901db1a474d80b555478ba8704714094e6979
+  RNReanimated: 7f9998a5175727dd86b61bf1e051ccdcf7dc8788
   RNScreens: b32a9ff15bea7fcdbe5dff6477bc503f792b1208
   RNSentry: 7e184247ee04989474d12cce0b7ef7bc4a71632f
   RNShare: 0fad69ae2d71de9d1f7b9a43acf876886a6cb99c
@@ -1956,9 +1956,9 @@ SPEC CHECKSUMS:
   SDWebImageWebPCoder: e38c0a70396191361d60c092933e22c20d5b1380
   Sentry: 74a073c71c998117edb08f56f443c83570a31bed
   SocketRocket: abac6f5de4d4d62d24e11868d7a2f427e0ef940d
-  VisionCamera: 4dcd8498cdb25abf6e2b5122ed3822bca1abde97
-  Yoga: 2f71ecf38d934aecb366e686278102a51679c308
+  VisionCamera: a6e61a6a4f5ca85aff352550bba54e05545ccd7b
+  Yoga: ae3c32c514802d30f687a04a6a35b348506d411f
 
 PODFILE CHECKSUM: b53934a587b007df3ef8109841539094ed70e432
 
-COCOAPODS: 1.14.3
+COCOAPODS: 1.15.2

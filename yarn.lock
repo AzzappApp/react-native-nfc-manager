@@ -137,7 +137,7 @@ __metadata:
     "@reeq/react-native-passkit": ^0.1.3
     "@sentry/react-native": ~5.22.3
     "@shopify/flash-list": 1.6.4
-    "@shopify/react-native-skia": ^1.3.0
+    "@shopify/react-native-skia": ^1.3.3
     "@testing-library/react-native": ^12.5.1
     "@types/chroma-js": ^2.4.4
     "@types/react": ^18.3.3
@@ -146,7 +146,7 @@ __metadata:
     "@types/relay-test-utils": ^14.1.4
     chroma-js: ^2.4.2
     events: ^3.3.0
-    expo: ^51.0.11
+    expo: ^51.0.12
     expo-av: ^14.0.5
     expo-blur: ^13.0.2
     expo-clipboard: ~6.0.3
@@ -182,7 +182,7 @@ __metadata:
     react-native-haptic-feedback: ^2.2.0
     react-native-image-size: ^1.1.6
     react-native-keyboard-controller: ^1.12.2
-    react-native-localize: ^3.1.0
+    react-native-localize: ^3.2.0
     react-native-mime-types: ^2.5.0
     react-native-mmkv: ^2.12.2
     react-native-monorepo-tools: ^1.2.1
@@ -190,14 +190,14 @@ __metadata:
     react-native-permissions: ^4.1.5
     react-native-purchases: ^7.27.3
     react-native-quick-base64: ^2.1.2
-    react-native-reanimated: ~3.11.0
+    react-native-reanimated: ^3.13.0-rc.1
     react-native-safe-area-context: ^4.10.4
     react-native-screens: ^3.31.1
     react-native-share: ^10.2.1
     react-native-svg: ^15.3.0
     react-native-tab-view: ^3.5.2
     react-native-toast-message: ^2.2.0
-    react-native-vision-camera: ^4.1.0
+    react-native-vision-camera: ^4.2.1
     react-relay: ^16.2.0
     react-test-renderer: ^18.3.1
     relay-test-utils: ^16.2.0
@@ -4973,9 +4973,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@expo/cli@npm:0.18.16":
-  version: 0.18.16
-  resolution: "@expo/cli@npm:0.18.16"
+"@expo/cli@npm:0.18.17":
+  version: 0.18.17
+  resolution: "@expo/cli@npm:0.18.17"
   dependencies:
     "@babel/runtime": ^7.20.0
     "@expo/code-signing-certificates": 0.0.5
@@ -4999,6 +4999,7 @@ __metadata:
     accepts: ^1.3.8
     arg: 5.0.2
     better-opn: ~3.0.2
+    bplist-creator: 0.0.7
     bplist-parser: ^0.3.1
     cacache: ^18.0.2
     chalk: ^4.0.0
@@ -5055,7 +5056,7 @@ __metadata:
     ws: ^8.12.1
   bin:
     expo-internal: build/bin/cli
-  checksum: d9ea3014eb73605b75998c8b085623bd22c33db977146c0e205cb06edc767371aedc95706bc98539770e71a2c6707f0fc7f1637e876ce0843e8dbf36a470b102
+  checksum: c221025dc08e573293b8800ab152a8880da82a2de4314775a5b62437151005243466cb4345a83e0b02cdfe67ff7188d30f00f22effafae6cd1828969958968b2
   languageName: node
   linkType: hard
 
@@ -5283,7 +5284,33 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@expo/metro-config@npm:0.18.3, @expo/metro-config@npm:~0.18.0":
+"@expo/metro-config@npm:0.18.5":
+  version: 0.18.5
+  resolution: "@expo/metro-config@npm:0.18.5"
+  dependencies:
+    "@babel/core": ^7.20.0
+    "@babel/generator": ^7.20.5
+    "@babel/parser": ^7.20.0
+    "@babel/types": ^7.20.0
+    "@expo/config": ~9.0.0-beta.0
+    "@expo/env": ~0.3.0
+    "@expo/json-file": ~8.3.0
+    "@expo/spawn-async": ^1.7.2
+    chalk: ^4.1.0
+    debug: ^4.3.2
+    find-yarn-workspace-root: ~2.0.0
+    fs-extra: ^9.1.0
+    getenv: ^1.0.0
+    glob: ^7.2.3
+    jsc-safe-url: ^0.2.4
+    lightningcss: ~1.19.0
+    postcss: ~8.4.32
+    resolve-from: ^5.0.0
+  checksum: e22069334e236e0f570461f99116b6d9d2f8f695410e4566ccd7fa832cb79580891025989c093e9cba5b8b375d4131c29656c7d45feaa6501c96f275900547be
+  languageName: node
+  linkType: hard
+
+"@expo/metro-config@npm:~0.18.0":
   version: 0.18.3
   resolution: "@expo/metro-config@npm:0.18.3"
   dependencies:
@@ -9174,9 +9201,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@shopify/react-native-skia@npm:1.3.0":
-  version: 1.3.0
-  resolution: "@shopify/react-native-skia@npm:1.3.0"
+"@shopify/react-native-skia@npm:1.3.3":
+  version: 1.3.3
+  resolution: "@shopify/react-native-skia@npm:1.3.3"
   dependencies:
     canvaskit-wasm: 0.39.1
     react-reconciler: 0.27.0
@@ -9191,13 +9218,13 @@ __metadata:
       optional: true
   bin:
     setup-skia-web: scripts/setup-canvaskit.js
-  checksum: a9349a6065c9bee50a5bc1ed1df23db25d3d95cfe551e04e011331a727155cb4d9747a023ebad9675481c4794cd72ea5eb3d2a9b0cfa8f3129dd9673cd676cc4
+  checksum: 91d3153a1a39b7392b6469f47007ad5b0046c43a96144cbcd6f2773cbd048dba79d0d4148e25298c9e86be07e2c92793c477c56992010435e3256393d3330cff
   languageName: node
   linkType: hard
 
-"@shopify/react-native-skia@patch:@shopify/react-native-skia@npm%3A1.3.0#./.yarn/patches/@shopify-react-native-skia-npm-1.3.0-85f18b81fd.patch::locator=%40azzapp%2Fmonorepo%40workspace%3A.":
-  version: 1.3.0
-  resolution: "@shopify/react-native-skia@patch:@shopify/react-native-skia@npm%3A1.3.0#./.yarn/patches/@shopify-react-native-skia-npm-1.3.0-85f18b81fd.patch::version=1.3.0&hash=afce90&locator=%40azzapp%2Fmonorepo%40workspace%3A."
+"@shopify/react-native-skia@patch:@shopify/react-native-skia@npm%3A1.3.3#./.yarn/patches/@shopify-react-native-skia-npm-1.3.3-0b443706cc.patch::locator=%40azzapp%2Fmonorepo%40workspace%3A.":
+  version: 1.3.3
+  resolution: "@shopify/react-native-skia@patch:@shopify/react-native-skia@npm%3A1.3.3#./.yarn/patches/@shopify-react-native-skia-npm-1.3.3-0b443706cc.patch::version=1.3.3&hash=626a32&locator=%40azzapp%2Fmonorepo%40workspace%3A."
   dependencies:
     canvaskit-wasm: 0.39.1
     react-reconciler: 0.27.0
@@ -9212,7 +9239,7 @@ __metadata:
       optional: true
   bin:
     setup-skia-web: scripts/setup-canvaskit.js
-  checksum: 1010b375720aa1504db4aec0c65259100253b1020d18a68192996249f148796c048fb08b9117b9c458a30c57f16c173a3a787f45f544ee9e2d25567212b6af79
+  checksum: 768e6c25996790ff0ec286d81f5c1e5a9d54532f0fc17dabad629941c0cac9ca2524b63998b144a7f0e9e986c906215b013de33799cbdc9b5497b3835d550fb1
   languageName: node
   linkType: hard
 
@@ -11252,6 +11279,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"babel-plugin-react-compiler@npm:^0.0.0-experimental-592953e-20240517":
+  version: 0.0.0
+  resolution: "babel-plugin-react-compiler@npm:0.0.0"
+  checksum: 6413005e947f9ee089359e354ab279956a6c7d979c397b3fcc311fe9d6599a83d4343f2de5cb6aebf38b1ebc1dfdc05b5fe1ea37b84c4ff891b31d6d1d59b899
+  languageName: node
+  linkType: hard
+
 "babel-plugin-react-native-web@npm:~0.19.10":
   version: 0.19.11
   resolution: "babel-plugin-react-native-web@npm:0.19.11"
@@ -11308,9 +11342,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"babel-preset-expo@npm:~11.0.8":
-  version: 11.0.8
-  resolution: "babel-preset-expo@npm:11.0.8"
+"babel-preset-expo@npm:~11.0.9":
+  version: 11.0.9
+  resolution: "babel-preset-expo@npm:11.0.9"
   dependencies:
     "@babel/plugin-proposal-decorators": ^7.12.9
     "@babel/plugin-transform-export-namespace-from": ^7.22.11
@@ -11319,9 +11353,10 @@ __metadata:
     "@babel/preset-react": ^7.22.15
     "@babel/preset-typescript": ^7.23.0
     "@react-native/babel-preset": 0.74.84
+    babel-plugin-react-compiler: ^0.0.0-experimental-592953e-20240517
     babel-plugin-react-native-web: ~0.19.10
     react-refresh: ^0.14.2
-  checksum: 4dd2946a71d2b9659c956349d94a2153e2398c9298275523a7b6f005bb1790f1ddd8403b16d06f877f7dc9a353ae65b3c63842ed71b46ebbb5907fcd92f77706
+  checksum: 442b31788defee1872c855650baf6f3e42d2cc40b47b7f55b1077de5072b4e75f1378e484bc4caf44c755a05178dd891b8cdec615c6b5ce250e3550ade890f36
   languageName: node
   linkType: hard
 
@@ -11491,6 +11526,15 @@ __metadata:
   version: 1.0.0
   resolution: "boolbase@npm:1.0.0"
   checksum: 3e25c80ef626c3a3487c73dbfc70ac322ec830666c9ad915d11b701142fab25ec1e63eff2c450c74347acfd2de854ccde865cd79ef4db1683f7c7b046ea43bb0
+  languageName: node
+  linkType: hard
+
+"bplist-creator@npm:0.0.7":
+  version: 0.0.7
+  resolution: "bplist-creator@npm:0.0.7"
+  dependencies:
+    stream-buffers: ~2.2.0
+  checksum: 5bcf4091c5a0e5934d56643d9f2705b5149a0b0b62b8314762f6ad4b3208d313c75ad03bab97a3c42b6e17db3d73530d3642d082ca249b55f952c90056c2b2ad
   languageName: node
   linkType: hard
 
@@ -14848,17 +14892,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"expo@npm:^51.0.11":
-  version: 51.0.11
-  resolution: "expo@npm:51.0.11"
+"expo@npm:^51.0.12":
+  version: 51.0.12
+  resolution: "expo@npm:51.0.12"
   dependencies:
     "@babel/runtime": ^7.20.0
-    "@expo/cli": 0.18.16
+    "@expo/cli": 0.18.17
     "@expo/config": 9.0.1
     "@expo/config-plugins": 8.0.5
-    "@expo/metro-config": 0.18.3
+    "@expo/metro-config": 0.18.5
     "@expo/vector-icons": ^14.0.0
-    babel-preset-expo: ~11.0.8
+    babel-preset-expo: ~11.0.9
     expo-asset: ~10.0.8
     expo-file-system: ~17.0.1
     expo-font: ~12.0.7
@@ -14869,7 +14913,7 @@ __metadata:
     whatwg-url-without-unicode: 8.0.0-3
   bin:
     expo: bin/cli
-  checksum: 18e5291ffcfea157d6652a3708a4396d4bbe3bb722a88ae3bf1d3cb3367bd61df4cedba18df17fba14098a5179352ed9e747d61c71aca92ce37b04ed3459e6b2
+  checksum: 29cc9d68eb84b469419b23308640ecd4f88938fd7e37e659d91406242275861f43c6127adf838939ca937c4f23a093cb8ff5bce5218e3a2c5e571e51d9f4a531
   languageName: node
   linkType: hard
 
@@ -21386,9 +21430,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-native-localize@npm:^3.1.0":
-  version: 3.1.0
-  resolution: "react-native-localize@npm:3.1.0"
+"react-native-localize@npm:^3.2.0":
+  version: 3.2.0
+  resolution: "react-native-localize@npm:3.2.0"
   peerDependencies:
     react: ">=18.1.0"
     react-native: ">=0.70.0"
@@ -21396,7 +21440,7 @@ __metadata:
   peerDependenciesMeta:
     react-native-macos:
       optional: true
-  checksum: 93753788facca7493b21056098f968217a53321d3324a467d4913f5b1b010cb4fde5e6107d538b84eae87ba9390c4a67a32d5a5fe54710b509b8097f1cf437ae
+  checksum: a7493203638535253abfab65631372cbdb064d5af4c321d2b67e7f244a2a4063b57f236e22bb3a8288c987219d9e87271116f0b5fb96824c7effd267f0f0fde7
   languageName: node
   linkType: hard
 
@@ -21477,9 +21521,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-native-reanimated@npm:~3.11.0":
-  version: 3.11.0
-  resolution: "react-native-reanimated@npm:3.11.0"
+"react-native-reanimated@npm:^3.13.0-rc.1":
+  version: 3.13.0-rc.1
+  resolution: "react-native-reanimated@npm:3.13.0-rc.1"
   dependencies:
     "@babel/plugin-transform-arrow-functions": ^7.0.0-0
     "@babel/plugin-transform-nullish-coalescing-operator": ^7.0.0-0
@@ -21493,7 +21537,7 @@ __metadata:
     "@babel/core": ^7.0.0-0
     react: "*"
     react-native: "*"
-  checksum: 5d0c6be5c9b6d933755e50895a1ec903100800a83b7b48fbc6a4242063f0de52a78f5af69d39da4241f6071a4416602f150c3a53e9a97d20880edb3612ffadbd
+  checksum: 55b15091823d37984f77cda0e013b7ece12b2b0ebd5cd13de1f4acc9681e3fa7ad21731567a51cd02df72e5d3c9dcff37870cb3faba29d7e7e62f7b1df2272de
   languageName: node
   linkType: hard
 
@@ -21599,9 +21643,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-native-vision-camera@npm:4.1.0":
-  version: 4.1.0
-  resolution: "react-native-vision-camera@npm:4.1.0"
+"react-native-vision-camera@npm:4.2.1":
+  version: 4.2.1
+  resolution: "react-native-vision-camera@npm:4.2.1"
   peerDependencies:
     "@shopify/react-native-skia": "*"
     react: "*"
@@ -21615,13 +21659,13 @@ __metadata:
       optional: true
     react-native-worklets-core:
       optional: true
-  checksum: 7cdc6014c6fc3191516220a3f72f33766dfb2dd8ddeb02d25348ec452b2aee8449a18d800e7aecf75cb755bed7f5d49132c64eec959add7aa509a08f7f62b538
+  checksum: 73d85b856ddbabba21bd82ccd7ee3c07f375fa4e1500fd02be915e5a4a2e436e82069ebc5b5f70537e9897129381c4fb87b013ce99554e5306b3b8f3230d2396
   languageName: node
   linkType: hard
 
-"react-native-vision-camera@patch:react-native-vision-camera@npm%3A4.1.0#./.yarn/patches/react-native-vision-camera-npm-4.1.0-6827e73cfb.patch::locator=%40azzapp%2Fmonorepo%40workspace%3A.":
-  version: 4.1.0
-  resolution: "react-native-vision-camera@patch:react-native-vision-camera@npm%3A4.1.0#./.yarn/patches/react-native-vision-camera-npm-4.1.0-6827e73cfb.patch::version=4.1.0&hash=c29129&locator=%40azzapp%2Fmonorepo%40workspace%3A."
+"react-native-vision-camera@patch:react-native-vision-camera@npm%3A4.2.1#./.yarn/patches/react-native-vision-camera-npm-4.2.1-fa2391f0f2.patch::locator=%40azzapp%2Fmonorepo%40workspace%3A.":
+  version: 4.2.1
+  resolution: "react-native-vision-camera@patch:react-native-vision-camera@npm%3A4.2.1#./.yarn/patches/react-native-vision-camera-npm-4.2.1-fa2391f0f2.patch::version=4.2.1&hash=c29129&locator=%40azzapp%2Fmonorepo%40workspace%3A."
   peerDependencies:
     "@shopify/react-native-skia": "*"
     react: "*"
@@ -21635,7 +21679,7 @@ __metadata:
       optional: true
     react-native-worklets-core:
       optional: true
-  checksum: 0abc239bff2164501a4cc6b4bbfae2d96cc10e43194f85072e32f309faa6e217b96ff8837316494d27dc6cd7fa195cbbda76b6c8032176e6382860e47dc83b06
+  checksum: bb9749c4d9f5b6b779fa421f2d0331bf04b0d8f9a205666f2695bc0df4ba8ace93798f9f20b75fdc86bb2090ea8290709d7c26b26d06f369557f23b6c20b5a6d
   languageName: node
   linkType: hard
 
@@ -23396,7 +23440,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"stream-buffers@npm:2.2.x":
+"stream-buffers@npm:2.2.x, stream-buffers@npm:~2.2.0":
   version: 2.2.0
   resolution: "stream-buffers@npm:2.2.0"
   checksum: 4587d9e8f050d689fb38b4295e73408401b16de8edecc12026c6f4ae92956705ecfd995ae3845d7fa3ebf19502d5754df9143d91447fd881d86e518f43882c1c

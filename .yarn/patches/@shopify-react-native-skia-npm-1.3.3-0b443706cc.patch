@@ -1,5 +1,5 @@
 diff --git a/cpp/rnskia/RNSkDomView.h b/cpp/rnskia/RNSkDomView.h
-index 27bb74720fdec62871d0639e3a2cd12479612a7a..0ce75b84ccff88e60988a71784d6612b0fa4f6a6 100644
+index 27bb74720fdec62871d0639e3a2cd12479612a7a..d8e5229e38c44dbfc96038a3c09b9f541be36ee3 100644
 --- a/cpp/rnskia/RNSkDomView.h
 +++ b/cpp/rnskia/RNSkDomView.h
 @@ -10,6 +10,7 @@
@@ -22,7 +22,7 @@ index 27bb74720fdec62871d0639e3a2cd12479612a7a..0ce75b84ccff88e60988a71784d6612b
        }
      }
    }
-+  
++
 +  jsi::Value callJsiMethod(jsi::Runtime &runtime,
 +                           const std::string &name,
 +                           const jsi::Value *arguments, size_t count) override {
