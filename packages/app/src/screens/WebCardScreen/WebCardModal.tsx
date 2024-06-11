@@ -259,6 +259,16 @@ const WebCardModal = ({
   );
 
   const handleConfirmationQuitWebCard = useCallback(() => {
+    const titleMsg = isOwner
+      ? intl.formatMessage({
+          defaultMessage: 'Delete this WebCard',
+          description: 'Delete WebCard title',
+        })
+      : intl.formatMessage({
+          defaultMessage: 'Quit this WebCard',
+          description: 'Quit WebCard title',
+        });
+
     const descriptionMsg = isOwner
       ? intl.formatMessage({
           defaultMessage:
@@ -273,35 +283,28 @@ const WebCardModal = ({
 
     const labelConfirmation = isOwner
       ? intl.formatMessage({
-          defaultMessage: 'Delete',
+          defaultMessage: 'Delete this WebCard',
           description: 'Delete button label',
         })
       : intl.formatMessage({
-          defaultMessage: 'Quit',
+          defaultMessage: 'Quit this WebCard',
           description: 'Quit button label',
         });
 
-    Alert.alert(
-      intl.formatMessage({
-        defaultMessage: 'Quit this WebCard',
-        description: 'Delete WebCard title',
-      }),
-      descriptionMsg,
-      [
-        {
-          text: intl.formatMessage({
-            defaultMessage: 'Cancel',
-            description: 'Cancel button label',
-          }),
-          style: 'cancel',
-        },
-        {
-          text: labelConfirmation,
-          style: 'destructive',
-          onPress: quitWebCard,
-        },
-      ],
-    );
+    Alert.alert(titleMsg, descriptionMsg, [
+      {
+        text: intl.formatMessage({
+          defaultMessage: 'Cancel',
+          description: 'Cancel button label',
+        }),
+        style: 'cancel',
+      },
+      {
+        text: labelConfirmation,
+        style: 'destructive',
+        onPress: quitWebCard,
+      },
+    ]);
   }, [intl, isOwner, quitWebCard]);
 
   return (

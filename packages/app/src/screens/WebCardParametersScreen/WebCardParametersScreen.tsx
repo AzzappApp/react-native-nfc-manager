@@ -399,7 +399,7 @@ const WebCardParametersScreen = ({
   const handleConfirmationQuitWebCard = useCallback(() => {
     Alert.alert(
       intl.formatMessage({
-        defaultMessage: 'Quit this WebCard',
+        defaultMessage: 'Delete this WebCard',
         description: 'Delete WebCard title',
       }),
       intl.formatMessage({
@@ -417,7 +417,7 @@ const WebCardParametersScreen = ({
         },
         {
           text: intl.formatMessage({
-            defaultMessage: 'Delete',
+            defaultMessage: 'Delete this WebCard',
             description: 'Delete button label',
           }),
           style: 'destructive',

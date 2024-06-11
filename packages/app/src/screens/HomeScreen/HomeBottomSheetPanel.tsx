@@ -1,11 +1,14 @@
 import * as Sentry from '@sentry/react-native';
 import { memo, useCallback, useMemo } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { Platform, StyleSheet, View, Share } from 'react-native';
+import { Platform, StyleSheet, View, Share, Alert } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { graphql, useFragment } from 'react-relay';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
-import { isAdmin, isOwner } from '@azzapp/shared/profileHelpers';
+import {
+  isAdmin,
+  isOwner as isOwnerByProfileRole,
+} from '@azzapp/shared/profileHelpers';
 import { buildUserUrl } from '@azzapp/shared/urlHelpers';
 import { colors } from '#theme';
 import Link from '#components/Link';
@@ -72,6 +75,8 @@ const HomeBottomSheetPanel = ({
     profileKey ?? null,
   );
 
+  const intl = useIntl();
+
   const [quitWebCard, isLoadingQuitWebCard] = useQuitWebCard(
     profile?.webCard.id ?? '',
     close,
@@ -86,6 +91,57 @@ const HomeBottomSheetPanel = ({
       });
     },
   );
+
+  const handleConfirmationQuitWebCard = useCallback(() => {
+    const isOwner = isOwnerByProfileRole(profile?.profileRole);
+
+    const titleMsg = isOwner
+      ? intl.formatMessage({
+          defaultMessage: 'Delete this WebCard',
+          description: 'Delete WebCard title',
+        })
+      : intl.formatMessage({
+          defaultMessage: 'Quit this WebCard',
+          description: 'Quit WebCard title',
+        });
+
+    const descriptionMsg = isOwner
+      ? intl.formatMessage({
+          defaultMessage:
+            'Are you sure you want to delete this WebCard and all its contents? This action is irreversible.',
+          description: 'Delete WebCard confirmation message',
+        })
+      : intl.formatMessage({
+          defaultMessage:
+            'Are you sure you want to quit this WebCard? This action is irreversible.',
+          description: 'Quit WebCard confirmation message',
+        });
+
+    const labelConfirmation = isOwner
+      ? intl.formatMessage({
+          defaultMessage: 'Delete this WebCard',
+          description: 'Delete button label',
+        })
+      : intl.formatMessage({
+          defaultMessage: 'Quit this WebCard',
+          description: 'Quit button label',
+        });
+
+    Alert.alert(titleMsg, descriptionMsg, [
+      {
+        text: intl.formatMessage({
+          defaultMessage: 'Cancel',
+          description: 'Cancel button label',
+        }),
+        style: 'cancel',
+      },
+      {
+        text: labelConfirmation,
+        style: 'destructive',
+        onPress: quitWebCard,
+      },
+    ]);
+  }, [intl, profile?.profileRole, quitWebCard]);
 
   const { bottom } = useScreenInsets();
   const [requestedLogout, toggleRequestLogout] = useToggle(false);
@@ -108,7 +164,6 @@ const HomeBottomSheetPanel = ({
     }
   }, [close, toggleRequestLogout]);
 
-  const intl = useIntl();
   const onShare = useCallback(async () => {
     if (profile?.webCard.userName) {
       // a quick share method using the native share component. If we want to make a custom share (like tiktok for example, when they are recompressiong the media etc) we can use react-native-shares
@@ -313,10 +368,10 @@ const HomeBottomSheetPanel = ({
           }
           return <HomeBottomSheetPanelOption key={index} {...element} />;
         })}
-        {profile && !isOwner(profile?.profileRole) && (
+        {profile && !isOwnerByProfileRole(profile?.profileRole) && (
           <PressableNative
             style={styles.removeButton}
-            onPress={quitWebCard}
+            onPress={handleConfirmationQuitWebCard}
             disabled={isLoadingQuitWebCard}
           >
             <Text variant="button" style={styles.removeText}>
