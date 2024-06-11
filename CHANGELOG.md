@@ -1,5 +1,7 @@
-## 0.5.15-canary.121
+## 0.5.15-canary.122
 
+* **fix:**  - close doesn’t exist on webcard deletion ([#3664](https://github.com/AzzappApp/azzapp/pull/3664))
+* **perf:**  - try to lazy load bottom sheets
 * **fix:**  - update animation for all media
 * **HOTFIX:**  - cover min media duration to 1 sec (for test)
 * **feat:**  - allow saving media images animation and duration to all image medias ([#3635](https://github.com/AzzappApp/azzapp/pull/3635))
