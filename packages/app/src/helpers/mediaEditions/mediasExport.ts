@@ -4,12 +4,17 @@ import {
   createPicture,
   drawAsImageFromPicture,
 } from '@shopify/react-native-skia';
+import { Platform } from 'react-native';
 import ReactNativeBlobUtil from 'react-native-blob-util';
-import { exportVideoComposition } from '@azzapp/react-native-skia-video';
+import {
+  exportVideoComposition,
+  getValidEncoderConfigurations,
+} from '@azzapp/react-native-skia-video';
 import { createRandomFilePath } from '#helpers/fileHelpers';
 import { getVideoLocalPath } from '#helpers/mediaHelpers';
 import { getLutShader } from './LUTFilters';
 import {
+  getDeviceMaxDecodingResolution,
   reduceVideoResolutionIfNecessary,
   scaleCropData,
 } from './mediaEdtionHelpers';
@@ -108,7 +113,7 @@ export const saveTransformedVideoToFile = async ({
       video.width,
       video.height,
       video.rotation,
-      MAX_EXPORT_DECODER_RESOLUTION,
+      getDeviceMaxDecodingResolution(sourcePath, MAX_EXPORT_DECODER_RESOLUTION),
     );
 
   const cropData = editionParameters?.cropData;
@@ -131,13 +136,32 @@ export const saveTransformedVideoToFile = async ({
 
   const outPath = createRandomFilePath('.mp4');
 
+  const requestedConfigs = {
+    ...resolution,
+    bitRate,
+    frameRate,
+  };
+
+  const validConfigs =
+    Platform.OS === 'android'
+      ? getValidEncoderConfigurations(
+          requestedConfigs.width,
+          requestedConfigs.height,
+          requestedConfigs.frameRate,
+          requestedConfigs.bitRate,
+        )
+      : [requestedConfigs];
+  if (!validConfigs || validConfigs.length === 0) {
+    throw new Error('No valid encoder configuration found');
+  }
+
+  const encoderConfigs = validConfigs[0]!;
+
   await exportVideoComposition(
     videoComposition,
     {
       outPath,
-      ...resolution,
-      bitRate,
-      frameRate,
+      ...encoderConfigs,
     },
     drawFrame,
   );

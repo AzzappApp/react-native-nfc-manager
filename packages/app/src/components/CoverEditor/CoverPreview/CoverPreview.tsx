@@ -33,7 +33,10 @@ import {
 } from '#components/NativeRouter';
 import ScreenModal from '#components/ScreenModal';
 import VideoCompositionRenderer from '#components/VideoCompositionRenderer';
-import { reduceVideoResolutionIfNecessary } from '#helpers/mediaEditions';
+import {
+  getDeviceMaxDecodingResolution,
+  reduceVideoResolutionIfNecessary,
+} from '#helpers/mediaEditions';
 import useToggle from '#hooks/useToggle';
 import ActivityIndicator from '#ui/ActivityIndicator';
 import IconButton from '#ui/IconButton';
@@ -185,7 +188,7 @@ const CoverPreview = ({
           media.width,
           media.height,
           media.rotation,
-          MAX_DISPLAY_DECODER_RESOLUTION,
+          getDeviceMaxDecodingResolution(path, MAX_DISPLAY_DECODER_RESOLUTION),
         );
         videoScales[media.uri] = videoScale;
         items.push({

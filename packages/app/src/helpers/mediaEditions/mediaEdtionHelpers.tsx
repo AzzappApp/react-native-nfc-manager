@@ -1,5 +1,8 @@
 import { Platform } from 'react-native';
+import * as mime from 'react-native-mime-types';
+import { getDecodingCapabilitiesFor } from '@azzapp/react-native-skia-video';
 import { typedEntries } from '@azzapp/shared/objectHelpers';
+import { getFileName } from '#helpers/fileHelpers';
 import type {
   CropData,
   EditionParameters,
@@ -76,10 +79,7 @@ export const reduceVideoResolutionIfNecessary = (
 ) => {
   let resolution: { width: number; height: number } | undefined = undefined;
   let videoScale = 1;
-  if (
-    Platform.OS === 'ios' &&
-    (videoWidth > maxSize || videoHeight > maxSize)
-  ) {
+  if (videoWidth > maxSize || videoHeight > maxSize) {
     const aspectRatio = videoWidth / videoHeight;
     if (aspectRatio > 1) {
       videoScale = maxSize / videoWidth;
@@ -109,4 +109,25 @@ export const scaleCropData = (cropData: CropData, scale: number): CropData => {
   return Object.fromEntries(
     Object.entries(cropData).map(([key, value]) => [key, value * scale]),
   ) as CropData;
+};
+
+export const getDeviceMaxDecodingResolution = (
+  videoPath: string,
+  maxResolution: number,
+) => {
+  if (Platform.OS === 'android') {
+    const mimeType = mime.lookup(getFileName(videoPath)) || 'video/avc';
+    let decoderCapabilities = getDecodingCapabilitiesFor(mimeType);
+    if (!decoderCapabilities && mimeType !== 'video/avc') {
+      decoderCapabilities = getDecodingCapabilitiesFor('video/avc');
+    }
+    if (decoderCapabilities) {
+      maxResolution = Math.min(
+        decoderCapabilities.maxWidth,
+        decoderCapabilities.maxHeight,
+        maxResolution,
+      );
+    }
+  }
+  return maxResolution;
 };

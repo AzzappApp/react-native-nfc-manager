@@ -60,7 +60,7 @@ class MediaHelpers(private val reactContext: ReactApplicationContext) :
     val map = WritableNativeMap();
     map.putInt("width", width);
     map.putInt("height", height);
-    map.putInt("rotation", height);
+    map.putInt("rotation", rotation);
     promise.resolve(map)
   }
 

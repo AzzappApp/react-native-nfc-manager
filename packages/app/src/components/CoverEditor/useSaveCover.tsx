@@ -5,12 +5,13 @@ import {
   type SkTypefaceFontProvider,
 } from '@shopify/react-native-skia';
 import { useCallback, useState } from 'react';
-import { unstable_batchedUpdates } from 'react-native';
+import { Platform, unstable_batchedUpdates } from 'react-native';
 import ReactNativeBlobUtil from 'react-native-blob-util';
 import * as mime from 'react-native-mime-types';
 import { graphql, useMutation } from 'react-relay';
 import {
   exportVideoComposition,
+  getValidEncoderConfigurations,
   type VideoCompositionItem,
 } from '@azzapp/react-native-skia-video';
 import { waitTime } from '@azzapp/shared/asyncHelpers';
@@ -20,7 +21,10 @@ import {
   COVER_MEDIA_RESOLUTION,
 } from '@azzapp/shared/coverHelpers';
 import { createRandomFilePath, getFileName } from '#helpers/fileHelpers';
-import { reduceVideoResolutionIfNecessary } from '#helpers/mediaEditions';
+import {
+  getDeviceMaxDecodingResolution,
+  reduceVideoResolutionIfNecessary,
+} from '#helpers/mediaEditions';
 import { uploadMedia, uploadSign } from '#helpers/MobileWebAPI';
 import coverDrawer, { coverTransitions } from './coverDrawer';
 import { mediaInfoIsImage } from './coverEditorHelpers';
@@ -62,7 +66,7 @@ const useSaveCover = (
 
     // we need to be sure that the cover rendering is stopped
     // before we start exporting the cover
-    await waitTime(100);
+    await waitTime(Platform.OS === 'android' ? 1000 : 100);
 
     let path: string;
     let kind: 'image' | 'video';
@@ -256,7 +260,7 @@ const createCoverMedia = async (
           media.width,
           media.height,
           media.rotation,
-          MAX_EXPORT_DECODER_RESOLUTION,
+          getDeviceMaxDecodingResolution(path, MAX_EXPORT_DECODER_RESOLUTION),
         );
         videoScales[media.uri] = videoScale;
         items.push({
@@ -271,13 +275,32 @@ const createCoverMedia = async (
       }
     }
 
+    const requestedConfigs = {
+      ...COVER_MEDIA_RESOLUTION,
+      bitRate: COVER_VIDEO_BITRATE,
+      frameRate: COVER_VIDEO_FRAME_RATE,
+    };
+
+    const validConfigs =
+      Platform.OS === 'android'
+        ? getValidEncoderConfigurations(
+            requestedConfigs.width,
+            requestedConfigs.height,
+            requestedConfigs.frameRate,
+            requestedConfigs.bitRate,
+          )
+        : [requestedConfigs];
+    if (!validConfigs || validConfigs.length === 0) {
+      throw new Error('No valid encoder configuration found');
+    }
+
+    const encoderConfigs = validConfigs[0]!;
+
     await exportVideoComposition(
       { duration, items },
       {
         outPath,
-        ...COVER_MEDIA_RESOLUTION,
-        bitRate: COVER_VIDEO_BITRATE,
-        frameRate: COVER_VIDEO_FRAME_RATE,
+        ...encoderConfigs,
       },
       infos => {
         'worklet';

@@ -9,6 +9,7 @@ import {
   transformVideoFrame,
   reduceVideoResolutionIfNecessary,
   scaleCropData,
+  getDeviceMaxDecodingResolution,
 } from '#helpers/mediaEditions';
 import { useVideoLocalPath } from '#helpers/mediaHelpers';
 import VideoCompositionRenderer from './VideoCompositionRenderer';
@@ -39,6 +40,7 @@ const MAX_DISPLAY_DECODER_RESOLUTION = Math.min(
   Dimensions.get('window').width * PixelRatio.get(),
   1920,
 );
+
 const TransformedVideoRenderer = ({
   video,
   editionParameters,
@@ -63,11 +65,12 @@ const TransformedVideoRenderer = ({
       return null;
     }
     const { height, width, rotation } = video;
+
     const { resolution, videoScale } = reduceVideoResolutionIfNecessary(
       width,
       height,
       rotation,
-      MAX_DISPLAY_DECODER_RESOLUTION,
+      getDeviceMaxDecodingResolution(videoPath, MAX_DISPLAY_DECODER_RESOLUTION),
     );
 
     return {
