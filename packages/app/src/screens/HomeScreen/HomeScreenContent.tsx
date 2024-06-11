@@ -3,7 +3,11 @@ import { useState, useCallback, useRef, useMemo, useEffect, memo } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { useDerivedValue, useSharedValue } from 'react-native-reanimated';
 import { graphql, useFragment } from 'react-relay';
-import { useOnFocus, useRouteWillChange } from '#components/NativeRouter';
+import {
+  useOnFocus,
+  useRouteWillChange,
+  useScreenHasFocus,
+} from '#components/NativeRouter';
 import { addAuthStateListener, getAuthState } from '#helpers/authStore';
 import { dispatchGlobalEvent } from '#helpers/globalEvents';
 import { getRelayEnvironment } from '#helpers/relayEnvironment';
@@ -107,6 +111,8 @@ const HomeScreenContent = ({ user: userKey }: HomeScreenContentProps) => {
       currentProfileIndexSharedValue.value = roundedProfileIndexSharedValue;
   });
 
+  const focus = useScreenHasFocus();
+
   const onCurrentProfileIndexChange = useCallback(
     (index: number) => {
       currentProfileIndexRef.current = index;
@@ -125,7 +131,8 @@ const HomeScreenContent = ({ user: userKey }: HomeScreenContentProps) => {
           profileRole: invited ? 'invited' : profileRole,
         };
         const auth = getAuthState();
-        if (!isEqual(profileInfos, auth.profileInfos)) {
+
+        if (focus && !isEqual(profileInfos, auth.profileInfos)) {
           void dispatchGlobalEvent({
             type: 'WEBCARD_CHANGE',
             payload: profileInfos,
@@ -133,7 +140,7 @@ const HomeScreenContent = ({ user: userKey }: HomeScreenContentProps) => {
         }
       }
     },
-    [user.profiles],
+    [focus, user.profiles],
   );
 
   const carouselRef = useRef<HomeProfilesCarouselHandle>(null);
