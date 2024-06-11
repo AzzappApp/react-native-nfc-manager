@@ -36,15 +36,15 @@ import VideoCompositionRenderer from '#components/VideoCompositionRenderer';
 import { reduceVideoResolutionIfNecessary } from '#helpers/mediaEditions';
 import useToggle from '#hooks/useToggle';
 import ActivityIndicator from '#ui/ActivityIndicator';
-import { SocialIcon } from '#ui/Icon';
 import IconButton from '#ui/IconButton';
-import PressableNative from '#ui/PressableNative';
 import coverDrawer, { coverTransitions } from '../coverDrawer';
 import { createParagraph } from '../coverDrawer/coverTextDrawer';
 import { convertToBaseCanvasRatio } from '../coverDrawer/utils';
 import { useCoverEditorContext, useCurrentLayer } from '../CoverEditorContext';
 import { mediaInfoIsImage, percentRectToRect } from '../coverEditorHelpers';
+import CoverEditorLinksModal from '../CoverEditorToolbox/modals/CoverEditorLinksModal';
 import { BoundsEditorGestureHandler, drawBoundsEditor } from './BoundsEditor';
+import { DynamicLinkRenderer } from './DynamicLinkRenderer';
 import type { VideoCompositionRendererHandle } from '#components/VideoCompositionRenderer';
 import type { EditionParameters } from '#helpers/mediaEditions';
 import type { ResizeHandlePosition } from './BoundsEditor';
@@ -52,7 +52,6 @@ import type {
   FrameDrawer,
   VideoCompositionItem,
 } from '@azzapp/react-native-skia-video';
-import type { SocialLinkId } from '@azzapp/shared/socialLinkHelpers';
 import type {
   SkImage,
   SkRect,
@@ -261,6 +260,36 @@ const CoverPreview = ({
           rotation: layer.rotation,
         };
         editedTextFontSize.value = layer.fontSize;
+      } else if (activeLayer.kind === 'links') {
+        const layer = activeLayer.layer;
+
+        activeLayerBounds.value = {
+          bounds: {
+            x: layer.position.x,
+            y: layer.position.y,
+            width:
+              convertToBaseCanvasRatio(
+                (linksLayer.size * LINKS_ELEMENT_WRAPPER_MULTIPLER +
+                  LINKS_BORDER_WIDTH) /
+                  viewWidth,
+                viewWidth,
+              ) *
+                linksLayer.links.length +
+              convertToBaseCanvasRatio(
+                Math.max(LINKS_GAP * (linksLayer.links.length - 1), 0) /
+                  viewWidth,
+                viewWidth,
+              ),
+            height:
+              linksLayer.links.length > 0
+                ? convertToBaseCanvasRatio(
+                    (linksLayer.size + LINKS_BORDER_WIDTH) / viewWidth,
+                    viewWidth,
+                  )
+                : 0,
+          },
+          rotation: layer.rotation,
+        };
       } else {
         activeLayerBounds.value = null;
         editedTextFontSize.value = null;
@@ -273,6 +302,8 @@ const CoverPreview = ({
     editedTextFontSize,
     viewHeight,
     viewWidth,
+    linksLayer.size,
+    linksLayer.links.length,
   ]);
   // #endregion
 
@@ -727,6 +758,18 @@ const CoverPreview = ({
           },
         });
       }
+      if (activeLayer.kind === 'links') {
+        dispatch({
+          type: 'UPDATE_LINKS_LAYER',
+          payload: {
+            position: {
+              x: bounds.x,
+              y: bounds.y,
+            },
+            rotation,
+          },
+        });
+      }
     })();
   }, [activeLayer, activeLayerBounds, dispatch, editedTextFontSize]);
 
@@ -976,6 +1019,25 @@ const CoverPreview = ({
   }, [hasFocus]);
   // #endregion
 
+  const animatedLinksStyle = useAnimatedStyle(() => {
+    if (activeLayerBounds.value && activeLayer.kind === 'links') {
+      const { bounds, rotation } = activeLayerBounds.value;
+      return {
+        top: bounds.y * viewHeight,
+        left: bounds.x * viewWidth,
+        // width: bounds.width * viewWidth,
+        transform: [{ rotate: `${rotation}rad` }],
+      };
+    }
+
+    return {
+      top: linksLayer.position.y * viewHeight,
+      left: linksLayer.position.x * viewWidth,
+    };
+  });
+
+  const [linksModalVisible, toggleLinksModalVisible] = useToggle();
+
   return (
     <>
       <View
@@ -1040,34 +1102,52 @@ const CoverPreview = ({
                 }}
                 onPress={handleCanvasPress}
               >
-                <PressableNative
-                  style={{
-                    width: '100%',
-                    height: 100,
-                    flexDirection: 'row',
-                    position: 'absolute',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    bottom: 0,
-                  }}
+                <AnimatedPressable
+                  style={[
+                    {
+                      position: 'absolute',
+                      transformOrigin: 'center',
+                      transform: [{ rotate: `${linksLayer.rotation}rad` }],
+                      top: linksLayer.position.y * viewHeight,
+                      left: linksLayer.position.x * viewWidth,
+                      display: 'flex',
+                      flexDirection: 'row',
+                      width:
+                        convertToBaseCanvasRatio(
+                          linksLayer.size * LINKS_ELEMENT_WRAPPER_MULTIPLER +
+                            LINKS_BORDER_WIDTH,
+                          viewWidth,
+                        ) * linksLayer.links.length,
+                      height: convertToBaseCanvasRatio(
+                        linksLayer.size * LINKS_ELEMENT_WRAPPER_MULTIPLER +
+                          LINKS_BORDER_WIDTH,
+                        viewWidth,
+                      ),
+                      gap: convertToBaseCanvasRatio(LINKS_GAP, viewWidth),
+                    },
+                    animatedLinksStyle,
+                  ]}
                   onPress={handleLinksPress}
                   pointerEvents="box-none"
                 >
                   {linksLayer.links.map(link => (
-                    <SocialIcon
-                      style={{
-                        height: linksLayer.size,
-                        width: linksLayer.size,
-                        tintColor: swapColor(linksLayer.color, cardColors),
-                      }}
+                    <DynamicLinkRenderer
                       key={link.socialId}
-                      icon={link.socialId as SocialLinkId}
+                      as={View}
+                      cardColors={cardColors}
+                      color={linksLayer.color}
+                      link={link}
+                      shadow={linksLayer.shadow}
+                      size={linksLayer.size}
+                      viewWidth={viewWidth}
                     />
                   ))}
-                </PressableNative>
+                </AnimatedPressable>
 
                 {(activeLayer.kind === 'overlay' ||
-                  activeLayer.kind === 'text') &&
+                  activeLayer.kind === 'text' ||
+                  (activeLayer.kind === 'links' &&
+                    linksLayer.links.length > 0)) &&
                   editionMode !== 'textEdit' && (
                     <BoundsEditorGestureHandler
                       position={gestureHandlerPosition}
@@ -1118,6 +1198,26 @@ const CoverPreview = ({
                             style={[styles.controlsButton, controlsButtonStyle]}
                             iconStyle={styles.controlsButtonIcon}
                             onPress={handleTextLayerEdit}
+                            iconSize={CONTROLS_BUTTON_ICON_SIZE}
+                            size={CONTROLS_BUTTON_HEIGHT}
+                          />
+                        </View>
+                      )}
+                      {activeLayer.kind === 'links' && (
+                        <View style={styles.linksControls}>
+                          <IconButton
+                            icon="trash_line"
+                            style={[styles.controlsButton, controlsButtonStyle]}
+                            iconStyle={styles.controlsButtonIcon}
+                            onPress={handleDeleteCurrentLayer}
+                            iconSize={CONTROLS_BUTTON_ICON_SIZE}
+                            size={CONTROLS_BUTTON_HEIGHT}
+                          />
+                          <IconButton
+                            icon="edit"
+                            style={[styles.controlsButton, controlsButtonStyle]}
+                            iconStyle={styles.controlsButtonIcon}
+                            onPress={toggleLinksModalVisible}
                             iconSize={CONTROLS_BUTTON_ICON_SIZE}
                             size={CONTROLS_BUTTON_HEIGHT}
                           />
@@ -1184,6 +1284,10 @@ const CoverPreview = ({
           />
         </ScreenModal>
       )}
+      <CoverEditorLinksModal
+        open={linksModalVisible}
+        onClose={toggleLinksModalVisible}
+      />
     </>
   );
 };
@@ -1199,6 +1303,11 @@ const CONTROLS_BUTTON_ICON_SIZE = 20;
 const CONTROLS_BUTTON_HEIGHT = 30;
 const OVERLAY_CONTROLS_MARGIN = 20;
 
+export const LINKS_GAP = 15;
+export const LINKS_BORDER_WIDTH = 2;
+export const LINKS_ELEMENT_WRAPPER_MULTIPLER = 1.5;
+
+const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 const AnimatedTextInput = Animated.createAnimatedComponent(TextInput);
 const inBounds = (
   x: number,
@@ -1239,6 +1348,14 @@ const styles = StyleSheet.create({
     pointerEvents: 'box-none',
   },
   textControls: {
+    justifyContent: 'space-between',
+    position: 'absolute',
+    top: -CONTROLS_BUTTON_HEIGHT,
+    bottom: -CONTROLS_BUTTON_HEIGHT,
+    right: -CONTROLS_BUTTON_HEIGHT,
+    pointerEvents: 'box-none',
+  },
+  linksControls: {
     justifyContent: 'space-between',
     position: 'absolute',
     top: -CONTROLS_BUTTON_HEIGHT,

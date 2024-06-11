@@ -1,4 +1,4 @@
-import { forwardRef, useMemo } from 'react';
+import { forwardRef, useMemo, useState } from 'react';
 import { Dimensions, Image, View } from 'react-native';
 import { graphql, useFragment } from 'react-relay';
 import { swapColor } from '@azzapp/shared/cardHelpers';
@@ -7,8 +7,13 @@ import {
   COVER_CARD_RADIUS,
   COVER_RATIO,
 } from '@azzapp/shared/coverHelpers';
+
 import { colors, shadow } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
+import PressableNative from '#ui/PressableNative';
+import { convertToBaseCanvasRatio } from './CoverEditor/coverDrawer/utils';
+import { LINKS_GAP } from './CoverEditor/CoverPreview/CoverPreview';
+import { DynamicLinkRenderer } from './CoverEditor/CoverPreview/DynamicLinkRenderer';
 import { MediaImageRenderer, MediaVideoRenderer } from './medias';
 import type { CoverRenderer_webCard$key } from '#relayArtifacts/CoverRenderer_webCard.graphql';
 import type { ForwardedRef } from 'react';
@@ -64,7 +69,7 @@ const CoverRenderer = (
   }: CoverRendererProps,
   forwardRef: ForwardedRef<View>,
 ) => {
-  const { cardColors, coverMedia, coverBackgroundColor } =
+  const { cardColors, coverMedia, coverBackgroundColor, coverDynamicLinks } =
     useFragment(
       graphql`
         fragment CoverRenderer_webCard on WebCard
@@ -103,6 +108,21 @@ const CoverRenderer = (
                 pixelRatio: $cappedPixelRatio
               )
             }
+          }
+          coverDynamicLinks {
+            links {
+              link
+              position
+              socialId
+            }
+            color
+            size
+            position {
+              x
+              y
+            }
+            rotation
+            shadow
           }
         }
       `,
@@ -160,9 +180,28 @@ const CoverRenderer = (
     ],
   );
 
+  const [layout, setLayout] = useState<{
+    width: number;
+    height: number;
+  } | null>(null);
+
+  const showLinks =
+    layout && coverDynamicLinks && coverDynamicLinks.links.length > 0;
+
   return useMemo(
     () => (
-      <View ref={forwardRef} style={containerStyle} testID="cover-renderer">
+      <View
+        ref={forwardRef}
+        style={containerStyle}
+        testID="cover-renderer"
+        onLayout={e => {
+          const { width, height } = e.nativeEvent.layout;
+          setLayout({
+            height,
+            width,
+          });
+        }}
+      >
         {coverSource ? (
           isVideoMedia ? (
             <MediaVideoRenderer
@@ -196,17 +235,47 @@ const CoverRenderer = (
             />
           </View>
         )}
+        {showLinks && (
+          <View
+            style={{
+              flexDirection: 'row',
+              position: 'absolute',
+              transformOrigin: 'center',
+              transform: [{ rotate: `${coverDynamicLinks.rotation}rad` }],
+              top: coverDynamicLinks.position.y * layout.height,
+              left: coverDynamicLinks.position.x * layout.width,
+              gap: convertToBaseCanvasRatio(LINKS_GAP, layout.width),
+            }}
+          >
+            {coverDynamicLinks.links.map(link => (
+              <DynamicLinkRenderer
+                key={link.socialId}
+                as={PressableNative}
+                cardColors={cardColors}
+                color={coverDynamicLinks.color}
+                link={link}
+                shadow={coverDynamicLinks.shadow}
+                size={coverDynamicLinks.size}
+                viewWidth={layout.width}
+              />
+            ))}
+          </View>
+        )}
       </View>
     ),
     [
       animationEnabled,
+      cardColors,
       containerStyle,
+      coverDynamicLinks,
       coverSource,
       forwardRef,
       isSmallCover,
       isVideoMedia,
+      layout,
       onError,
       onReadyForDisplay,
+      showLinks,
       smallThumbnail,
       styles.coverPlaceHolder,
       styles.layer,

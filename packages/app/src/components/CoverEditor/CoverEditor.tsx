@@ -106,6 +106,12 @@ const CoverEditor = (
       links: [],
       color: colors.black,
       size: 24,
+      position: {
+        x: 0.2,
+        y: 0.8,
+      },
+      rotation: 0,
+      shadow: false,
     },
 
     editionMode: 'none',

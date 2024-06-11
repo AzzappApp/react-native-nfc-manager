@@ -46,6 +46,7 @@ jest.mock('@shopify/react-native-skia', () => ({
       MakeFromString: jest.fn(),
     },
   },
+  TextAlign: {},
 }));
 
 const getAppleWalletPassMock = getAppleWalletPass as jest.MockedFunction<

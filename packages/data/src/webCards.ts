@@ -66,6 +66,21 @@ export const WebCardTable = cols.table(
     coverMediaId: cols.mediaId('coverMediaId'),
     coverTexts: cols.json('coverTexts').$type<string[]>(),
     coverBackgroundColor: cols.defaultVarchar('coverBackgroundColor'),
+    coverDynamicLinks: cols
+      .json('coverDynamicLinks')
+      .$type<CoverDynamicLinks>()
+      .notNull()
+      .default({
+        links: [],
+        color: '#000000',
+        size: 24,
+        position: {
+          x: 0,
+          y: 0,
+        },
+        rotation: 0,
+        shadow: false,
+      }),
 
     /* Social medias infos */
     nbFollowers: cols.int('nbFollowers').default(0).notNull(),
@@ -90,6 +105,22 @@ export const WebCardTable = cols.table(
 
 export type WebCard = InferSelectModel<typeof WebCardTable>;
 export type NewWebCard = InferInsertModel<typeof WebCardTable>;
+
+export type CoverDynamicLinks = {
+  links: Array<{
+    link: string;
+    position: number;
+    socialId: string;
+  }>;
+  color: string;
+  size: number;
+  position: {
+    x: number;
+    y: number;
+  };
+  rotation: number;
+  shadow: boolean;
+};
 
 /**
  * Retrieves a webCard by its id

@@ -22,6 +22,10 @@ input SaveCoverInput {
   The colors of the card cover
   """
   cardColors: CardColorsInput!
+  """
+  The links of the card cover
+  """
+  dynamicLinks: DynamicLinksInput!
 }
 
 input CardColorsInput {
@@ -33,4 +37,24 @@ input CardColorsInput {
 
 type SaveCoverPayload {
   webCard: WebCard!
+}
+
+input DynamicLinksInput {
+  links: [LinkInput!]!
+  color: String!
+  size: Int!
+  position: CoordinateInput!
+  rotation: Int!
+  shadow: Boolean!
+}
+
+input LinkInput {
+  link: String!
+  position: Int!
+  socialId: String!
+}
+
+input CoordinateInput {
+  x: Float!
+  y: Float!
 }

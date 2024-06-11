@@ -113,4 +113,7 @@ export type CoverEditorLinksLayerItem = {
   links: CoverEditorSocialLink[];
   color: string;
   size: number;
+  position: SkPoint;
+  rotation: number;
+  shadow: boolean;
 };

@@ -5,11 +5,11 @@ import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import Icon from '#ui/Icon';
 import PressableOpacity from '#ui/PressableOpacity';
 import { useCoverEditorContext } from '../CoverEditorContext';
+import CoverEditorColorTool from './tools/CoverEditorColorTool';
 import CoverEditorDeleteTool from './tools/CoverEditorDeleteTool';
-import CoverEditorFontSizeTool from './tools/CoverEditorFontSizeTool';
 import CoverEditorLinksTool from './tools/CoverEditorLinksTool';
 import CoverEditorShadowTool from './tools/CoverEditorShadowTool';
-import CoverEditorTextColorTool from './tools/CoverEditorTextColorTool';
+import CoverEditorSizeTool from './tools/CoverEditorSizeTool';
 import { TOOLBOX_SECTION_HEIGHT } from './ui/ToolBoxSection';
 
 const CoverEditorLinksToolbox = () => {
@@ -39,8 +39,13 @@ const CoverEditorLinksToolbox = () => {
         showsHorizontalScrollIndicator={false}
       >
         <CoverEditorLinksTool />
-        <CoverEditorTextColorTool />
-        <CoverEditorFontSizeTool
+        <CoverEditorColorTool
+          title={intl.formatMessage({
+            defaultMessage: 'Icon color',
+            description: 'Icon Color Picker title in Cover Editor',
+          })}
+        />
+        <CoverEditorSizeTool
           title={intl.formatMessage({
             defaultMessage: 'Icon size',
             description: 'Cover Edition - Toolbox sub-menu link - Icon size',

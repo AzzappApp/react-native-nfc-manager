@@ -143,6 +143,14 @@ export function coverEditorReducer(
           ...state,
           textLayers,
         };
+      } else if (state.editionMode === 'links') {
+        return {
+          ...state,
+          linksLayer: {
+            ...state.linksLayer,
+            shadow: payload.enabled,
+          },
+        };
       }
       console.warn('Update shadow without selected layer');
       return state;
@@ -530,8 +538,75 @@ export function coverEditorReducer(
       return state;
     }
     // #endregion
+    case 'UPDATE_CURRENT_LAYER_COLOR':
+      if (
+        (state.editionMode === 'text' || state.editionMode === 'textEdit') &&
+        state.selectedItemIndex !== null &&
+        state.textLayers[state.selectedItemIndex] !== undefined
+      ) {
+        const textLayers = [...state.textLayers];
+        textLayers[state.selectedItemIndex] = {
+          ...textLayers[state.selectedItemIndex],
+          color: payload.color,
+        };
+
+        return {
+          ...state,
+          textLayers,
+        };
+      }
+
+      if (state.editionMode === 'links') {
+        return {
+          ...state,
+          linksLayer: {
+            ...state.linksLayer,
+            color: payload.color,
+          },
+        };
+      }
+
+      return state;
+    case 'UPDATE_CURRENT_LAYER_SIZE':
+      if (
+        (state.editionMode === 'text' || state.editionMode === 'textEdit') &&
+        state.selectedItemIndex !== null &&
+        state.textLayers[state.selectedItemIndex] !== undefined
+      ) {
+        const textLayers = [...state.textLayers];
+        textLayers[state.selectedItemIndex] = {
+          ...textLayers[state.selectedItemIndex],
+          fontSize: payload.size,
+        };
+
+        return {
+          ...state,
+          textLayers,
+        };
+      }
+
+      if (state.editionMode === 'links') {
+        return {
+          ...state,
+          linksLayer: {
+            ...state.linksLayer,
+            size: payload.size,
+          },
+        };
+      }
+
+      return state;
 
     // #region LinksLayer Actions
+    case 'UPDATE_LINKS_LAYER':
+      return {
+        ...state,
+        linksLayer: {
+          ...state.linksLayer,
+          ...payload,
+        },
+      };
+
     case 'UPDATE_LINKS':
       return {
         ...state,

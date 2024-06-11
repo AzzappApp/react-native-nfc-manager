@@ -1,4 +1,4 @@
-import { SOCIAL_LINKS } from '@azzapp/shared/socialLinkHelpers';
+import { generateSocialLink } from '@azzapp/shared/socialLinkHelpers';
 import SocialIcon from '#ui/SocialIcons/SocialIcon';
 import type { SocialLinkId } from '@azzapp/shared/socialLinkHelpers';
 
@@ -13,7 +13,6 @@ const SocialLink = (props: SocialLinkProps) => {
   const { link, iconSize, borderWidth, iconColor } = props;
 
   const id = link.socialId;
-  const mask = SOCIAL_LINKS_URL_MAP.get(id)!;
 
   return (
     <div
@@ -22,7 +21,7 @@ const SocialLink = (props: SocialLinkProps) => {
       }}
     >
       <a
-        href={generateLink(mask, link.link, id)}
+        href={generateSocialLink(id, link.link)}
         style={{
           display: 'flex',
           width: iconSize,
@@ -52,20 +51,5 @@ export type SocialLinkType = {
   link: string;
   position: number;
 };
-
-const generateLink = (mask: string, content: string, type: string) => {
-  let link = 'https://';
-
-  if (type === 'phone') link = `tel:`;
-  if (type === 'sms') link = 'sms:';
-  if (type === 'mail') link = 'mailto:';
-  if (type === 'website') return content;
-
-  return `${link}${mask}${content}`;
-};
-
-const SOCIAL_LINKS_URL_MAP = new Map(
-  SOCIAL_LINKS.map(({ id, mask }) => [id, mask]),
-);
 
 export default SocialLink;

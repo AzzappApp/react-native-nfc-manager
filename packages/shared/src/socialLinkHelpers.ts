@@ -41,3 +41,20 @@ export const SOCIAL_LINKS = [
 ] as const;
 
 export type SocialLinkId = (typeof SOCIAL_LINKS)[number]['id'];
+
+export const generateSocialLink = (id: SocialLinkId, content: string) => {
+  let link = 'https://';
+
+  const mask = SOCIAL_LINKS_URL_MAP.get(id)!;
+
+  if (id === 'phone') link = `tel:`;
+  if (id === 'sms') link = 'sms:';
+  if (id === 'mail') link = 'mailto:';
+  if (id === 'website') return content;
+
+  return `${link}${mask}${content}`;
+};
+
+const SOCIAL_LINKS_URL_MAP = new Map(
+  SOCIAL_LINKS.map(({ id, mask }) => [id, mask]),
+);

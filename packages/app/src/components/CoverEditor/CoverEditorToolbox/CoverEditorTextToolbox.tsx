@@ -6,12 +6,12 @@ import Icon from '#ui/Icon';
 import PressableOpacity from '#ui/PressableOpacity';
 import { useCoverEditorContext } from '../CoverEditorContext';
 import CoverEditorAlignmentTool from './tools/CoverEditorAligmentTool';
+import CoverEditorColorTool from './tools/CoverEditorColorTool';
 import CoverEditorDeleteTool from './tools/CoverEditorDeleteTool';
 import CoverEditorDuplicateTool from './tools/CoverEditorDuplicateTool';
 import CoverEditorFontFamilyTool from './tools/CoverEditorFontFamilyTool';
-import CoverEditorFontSizeTool from './tools/CoverEditorFontSizeTool';
 import CoverEditorShadowTool from './tools/CoverEditorShadowTool';
-import CoverEditorTextColorTool from './tools/CoverEditorTextColorTool';
+import CoverEditorSizeTool from './tools/CoverEditorSizeTool';
 import { TOOLBOX_SECTION_HEIGHT } from './ui/ToolBoxSection';
 
 const CoverEditorTextToolbox = () => {
@@ -40,8 +40,13 @@ const CoverEditorTextToolbox = () => {
         contentContainerStyle={styles.scrollContentContainer}
         showsHorizontalScrollIndicator={false}
       >
-        <CoverEditorTextColorTool />
-        <CoverEditorFontSizeTool
+        <CoverEditorColorTool
+          title={intl.formatMessage({
+            defaultMessage: 'Text color',
+            description: 'Text Color Picker title in Cover Editor',
+          })}
+        />
+        <CoverEditorSizeTool
           title={intl.formatMessage({
             defaultMessage: 'Font size',
             description: 'Cover Edition - Toolbox sub-menu text - Font size',

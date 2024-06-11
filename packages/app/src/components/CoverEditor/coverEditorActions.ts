@@ -9,6 +9,7 @@ import type {
   CoverEditorTextLayerItem,
   CardColors,
   MediaInfo,
+  CoverEditorLinksLayerItem,
 } from './coverEditorTypes';
 import type { SkImage, SkShader } from '@shopify/react-native-skia';
 
@@ -141,11 +142,30 @@ export type UpdateOverlayLayerAction = {
 // #endregion
 
 // #region Links Actions
+export type UpdateLinksLayerAction = {
+  type: 'UPDATE_LINKS_LAYER';
+  payload: Partial<CoverEditorLinksLayerItem>;
+};
+
 export type UpdateLinksAction = {
   type: 'UPDATE_LINKS';
   payload: CoverEditorSocialLink[];
 };
 // #endregion
+
+export type UpdateCurrentLayerColor = {
+  type: 'UPDATE_CURRENT_LAYER_COLOR';
+  payload: {
+    color: string;
+  };
+};
+
+export type UpdateCurrentLayerSize = {
+  type: 'UPDATE_CURRENT_LAYER_SIZE';
+  payload: {
+    size: number;
+  };
+};
 
 // #region resources loading actions
 export type LoadingStartAction = {
@@ -186,10 +206,13 @@ export type CoverEditorAction =
   | UpdateAllMediaImagesAnimationAction
   | UpdateAllMediasEditionParameters
   | UpdateCardColorsAction
+  | UpdateCurrentLayerColor
+  | UpdateCurrentLayerSize
   | UpdateCurrentVideoTimeRangeAction
   | UpdateLayerBorderAction
   | UpdateLayerShadowAction
   | UpdateLinksAction
+  | UpdateLinksLayerAction
   | UpdateMediaEditionParameters
   | UpdateMediaFilterAction
   | UpdateMediaImageAnimationAction

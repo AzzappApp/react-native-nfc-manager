@@ -3,22 +3,29 @@ import { useIntl } from 'react-intl';
 import useToggle from '#hooks/useToggle';
 import {
   useCoverEditorContext,
+  useCoverEditorLinksLayer,
   useCoverEditorTextLayer,
 } from '../../CoverEditorContext';
 import ToolBoxSection from '../ui/ToolBoxSection';
 import CoverEditorColorPicker from './CoverEditorColorPicker';
 
-const CoverEditorTextColorTool = () => {
+type Props = {
+  title: string;
+};
+
+const CoverEditorColorTool = ({ title }: Props) => {
   const intl = useIntl();
   const [show, toggleBottomSheet] = useToggle(false);
 
-  const layer = useCoverEditorTextLayer();
+  const textLayer = useCoverEditorTextLayer();
+  const linksLayer = useCoverEditorLinksLayer();
+
   const { dispatch } = useCoverEditorContext();
 
   const onColorChange = useCallback(
     (color: string) => {
       dispatch({
-        type: 'UPDATE_TEXT_LAYER',
+        type: 'UPDATE_CURRENT_LAYER_COLOR',
         payload: { color },
       });
     },
@@ -26,14 +33,14 @@ const CoverEditorTextColorTool = () => {
   );
 
   // @TODO: might be another data source than text layer
-  const selectedColor = layer?.color ?? '#000';
+  const selectedColor = textLayer?.color ?? linksLayer?.color ?? '#000';
 
   return (
     <>
       <ToolBoxSection
         label={intl.formatMessage({
           defaultMessage: 'Color',
-          description: 'Cover Edition - Toolbox sub-menu text - Color',
+          description: 'Cover Edition - Toolbox sub-menu - Color',
         })}
         icon={`font_color`}
         onPress={toggleBottomSheet}
@@ -42,10 +49,7 @@ const CoverEditorTextColorTool = () => {
       <CoverEditorColorPicker
         visible={show}
         height={250}
-        title={intl.formatMessage({
-          defaultMessage: 'Text color',
-          description: 'Text Color Picker title in Cover Editor',
-        })}
+        title={title}
         selectedColor={selectedColor}
         canEditPalette
         onColorChange={onColorChange}
@@ -55,4 +59,4 @@ const CoverEditorTextColorTool = () => {
   );
 };
 
-export default CoverEditorTextColorTool;
+export default CoverEditorColorTool;

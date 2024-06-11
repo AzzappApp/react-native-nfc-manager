@@ -63,6 +63,10 @@ type WebCard implements Node {
   """
   coverBackgroundColor: String
   """
+  The webCard cover links
+  """
+  coverDynamicLinks: DynamicLinks
+  """
   the webCard style
   """
   cardStyle: WebCardStyle
@@ -383,3 +387,22 @@ type CommonInformation {
   addresses: [ContactCardAddress!]
 }
 
+type DynamicLinks {
+  links: [Link!]!
+  color: String!
+  size: Int!
+  position: Coordinate!
+  rotation: Int!
+  shadow: Boolean!
+}
+
+type Link {
+  link: String!
+  position: Int!
+  socialId: String!
+}
+
+type Coordinate {
+  x: Float!
+  y: Float!
+}

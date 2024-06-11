@@ -20,7 +20,7 @@ type Props = {
   title: string;
 };
 
-const CoverEditorFontSizeTool = ({ title }: Props) => {
+const CoverEditorSizeTool = ({ title }: Props) => {
   const intl = useIntl();
   const textLayer = useCoverEditorTextLayer();
   const linksLayer = useCoverEditorLinksLayer();
@@ -28,22 +28,22 @@ const CoverEditorFontSizeTool = ({ title }: Props) => {
 
   const [show, toggleBottomSheet] = useToggle(false);
 
-  const fontSize = textLayer?.fontSize ?? linksLayer?.size ?? 12;
-  const onFontSizeChange = useCallback(
-    (fontSize: number) => {
+  const size = textLayer?.fontSize ?? linksLayer?.size ?? 12;
+  const onSizeChange = useCallback(
+    (size: number) => {
       dispatch({
-        type: 'UPDATE_TEXT_LAYER',
-        payload: { fontSize },
+        type: 'UPDATE_CURRENT_LAYER_SIZE',
+        payload: { size },
       });
     },
     [dispatch],
   );
 
-  const currentFontSize = useSharedValue(fontSize);
+  const currentFontSize = useSharedValue(size);
 
   useEffect(() => {
-    currentFontSize.value = fontSize;
-  }, [currentFontSize, fontSize]);
+    currentFontSize.value = size;
+  }, [currentFontSize, size]);
 
   return (
     <>
@@ -54,7 +54,7 @@ const CoverEditorFontSizeTool = ({ title }: Props) => {
         })}
         icon={
           <Text variant="button" style={{ fontSize: 18 }}>
-            {fontSize}
+            {size}
             <Text variant="small">pt</Text>
           </Text>
         }
@@ -81,7 +81,7 @@ const CoverEditorFontSizeTool = ({ title }: Props) => {
             min={COVER_MIN_FONT_SIZE}
             max={COVER_MAX_FONT_SIZE}
             step={1}
-            onChange={onFontSizeChange}
+            onChange={onSizeChange}
             formatValue={value => {
               'worklet';
               return `${value}pt`;
@@ -115,4 +115,4 @@ const styles = StyleSheet.create({
 const COVER_MIN_FONT_SIZE = 6;
 const COVER_MAX_FONT_SIZE = 48;
 
-export default CoverEditorFontSizeTool;
+export default CoverEditorSizeTool;

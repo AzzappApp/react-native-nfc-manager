@@ -11,7 +11,9 @@ const CoverEditorShadowTool = () => {
   const { kind, layer } = useCurrentLayer();
 
   const hasShadow =
-    ((kind === 'overlay' || kind === 'text') && layer?.shadow) ?? false;
+    ((kind === 'overlay' || kind === 'text' || kind === 'links') &&
+      layer?.shadow) ??
+    false;
 
   const save = () => {
     dispatch({

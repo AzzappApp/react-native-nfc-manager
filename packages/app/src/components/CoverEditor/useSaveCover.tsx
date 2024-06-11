@@ -113,6 +113,7 @@ const useSaveCover = (
               texts,
               backgroundColor: backgroundColor ?? 'light',
               cardColors,
+              dynamicLinks: coverEditorState.linksLayer,
             },
           },
           onCompleted(response, error) {
