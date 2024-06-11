@@ -27,12 +27,14 @@ const CoverEditorAddOverlay = ({ open, onClose }: Props) => {
 
   return (
     <ScreenModal visible={open} animationType="slide">
-      <ImagePicker
-        kind="image"
-        steps={[SelectImageStep]}
-        onFinished={onFinish}
-        onCancel={onClose}
-      />
+      {open && (
+        <ImagePicker
+          kind="image"
+          steps={[SelectImageStep]}
+          onFinished={onFinish}
+          onCancel={onClose}
+        />
+      )}
     </ScreenModal>
   );
 };

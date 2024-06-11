@@ -53,105 +53,107 @@ const CoverEditorLinksModal = ({ open, onClose }: Props) => {
 
   return (
     <ScreenModal visible={open} animationType="slide">
-      <Container style={styles.container}>
-        <SafeAreaView
-          style={styles.container}
-          edges={{ bottom: 'off', top: 'additive' }}
-        >
-          <Header
-            middleElement={
-              <Text variant="large" style={styles.header}>
-                <FormattedMessage
-                  defaultMessage="Add links"
-                  description="CoverEditorLinksModal - Header"
-                />
-              </Text>
-            }
-            leftElement={
-              <Button
-                variant="secondary"
-                label={intl.formatMessage({
-                  defaultMessage: 'Cancel',
-                  description: 'MultiUserAddModal - Cancel button label',
-                })}
-                onPress={onClose}
-              />
-            }
-            rightElement={
-              <Button
-                variant="primary"
-                label={intl.formatMessage({
-                  defaultMessage: 'Done',
-                  description: 'MultiUserAddModal - Cancel button label',
-                })}
-                onPress={onDone}
-              />
-            }
-          />
-          <View
-            style={{
-              height: 120,
-              justifyContent: 'center',
-            }}
+      {open && (
+        <Container style={styles.container}>
+          <SafeAreaView
+            style={styles.container}
+            edges={{ bottom: 'off', top: 'additive' }}
           >
+            <Header
+              middleElement={
+                <Text variant="large" style={styles.header}>
+                  <FormattedMessage
+                    defaultMessage="Add links"
+                    description="CoverEditorLinksModal - Header"
+                  />
+                </Text>
+              }
+              leftElement={
+                <Button
+                  variant="secondary"
+                  label={intl.formatMessage({
+                    defaultMessage: 'Cancel',
+                    description: 'MultiUserAddModal - Cancel button label',
+                  })}
+                  onPress={onClose}
+                />
+              }
+              rightElement={
+                <Button
+                  variant="primary"
+                  label={intl.formatMessage({
+                    defaultMessage: 'Done',
+                    description: 'MultiUserAddModal - Cancel button label',
+                  })}
+                  onPress={onDone}
+                />
+              }
+            />
             <View
               style={{
-                flexDirection: 'row',
+                height: 120,
                 justifyContent: 'center',
-                alignItems: 'center',
-                gap: 15,
               }}
             >
-              {shownLinks.map(link => (
-                <View
-                  key={link.socialId}
-                  style={{
-                    borderWidth: 1,
-                    borderStyle: 'solid',
-                    borderColor: 'black',
-                    height: 50,
-                    width: 50,
-                    borderRadius: 40,
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                  }}
-                >
-                  <SocialIcon
-                    style={{
-                      width: 30,
-                      height: 30,
-                    }}
-                    icon={link.socialId as SocialLinkId}
-                  />
-                </View>
-              ))}
-            </View>
-            {shownLinks.length > 0 && (
-              <Text
-                variant="medium"
+              <View
                 style={{
-                  textAlign: 'center',
-                  marginTop: 15,
-                  color: colors.grey400,
+                  flexDirection: 'row',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  gap: 15,
                 }}
               >
-                <FormattedMessage
-                  defaultMessage={'{links}/4 links'}
-                  description="CoverEditorLinksModal - Links count"
-                  values={{ links: shownLinks.length }}
-                />
-              </Text>
-            )}
-          </View>
-          <SocialLinksLinksEditionPanel
-            links={links}
-            onLinksChange={setLinks}
-            style={{
-              flex: 1,
-            }}
-          />
-        </SafeAreaView>
-      </Container>
+                {shownLinks.map(link => (
+                  <View
+                    key={link.socialId}
+                    style={{
+                      borderWidth: 1,
+                      borderStyle: 'solid',
+                      borderColor: 'black',
+                      height: 50,
+                      width: 50,
+                      borderRadius: 40,
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                    }}
+                  >
+                    <SocialIcon
+                      style={{
+                        width: 30,
+                        height: 30,
+                      }}
+                      icon={link.socialId as SocialLinkId}
+                    />
+                  </View>
+                ))}
+              </View>
+              {shownLinks.length > 0 && (
+                <Text
+                  variant="medium"
+                  style={{
+                    textAlign: 'center',
+                    marginTop: 15,
+                    color: colors.grey400,
+                  }}
+                >
+                  <FormattedMessage
+                    defaultMessage={'{links}/4 links'}
+                    description="CoverEditorLinksModal - Links count"
+                    values={{ links: shownLinks.length }}
+                  />
+                </Text>
+              )}
+            </View>
+            <SocialLinksLinksEditionPanel
+              links={links}
+              onLinksChange={setLinks}
+              style={{
+                flex: 1,
+              }}
+            />
+          </SafeAreaView>
+        </Container>
+      )}
     </ScreenModal>
   );
 };

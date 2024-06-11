@@ -62,6 +62,7 @@ const CoverEditorFontSizeTool = ({ title }: Props) => {
       />
 
       <BottomSheetModal
+        lazy
         visible={show}
         onRequestClose={toggleBottomSheet}
         height={165}

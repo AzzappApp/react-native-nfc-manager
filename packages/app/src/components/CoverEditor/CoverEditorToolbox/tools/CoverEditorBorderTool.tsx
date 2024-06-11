@@ -69,6 +69,7 @@ const CoverEditorBorderTool = () => {
       {layer != null && (
         <>
           <BottomSheetModal
+            lazy
             onRequestClose={toggleBottomSheet}
             visible={showBottomSheet && !showColorPicker}
             height={271}

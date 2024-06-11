@@ -98,6 +98,11 @@ export type BottomSheetModalProps = Omit<
    * @default false
    */
   avoidKeyboard?: boolean;
+  /**
+   * If `true`, the bottom sheet will not be visible by default
+   * @default false
+   */
+  lazy?: boolean;
 };
 
 // TODO in the actual implementation, the height of the bottomsheet is actually the given height + insets.bottom
@@ -135,6 +140,7 @@ const BottomSheetModal = ({
   onRequestClose,
   nestedScroll = false,
   avoidKeyboard,
+  lazy = false,
   ...props
 }: BottomSheetModalProps) => {
   const [isVisible, setIsVisible] = useState(false);
@@ -305,61 +311,63 @@ const BottomSheetModal = ({
       pointerEvents="box-none"
       {...props}
     >
-      <KeyboardAvoidingView
-        behavior={avoidKeyboard ? 'height' : undefined}
-        style={{ height: '100%', width: '100%' }}
-      >
-        {/* required for android */}
-        <GestureHandlerRootView style={{ height: '100%', width: '100%' }}>
-          <TouchableWithoutFeedback
-            style={styles.absoluteFill}
-            onPress={onRequestClose}
-          >
-            <View style={styles.absoluteFill}>
-              {variant === 'modal' && (
-                <Animated.View
-                  style={[
-                    styles.absoluteFill,
-                    {
-                      backgroundColor: colors.black,
-                    },
-                    backgroundOpacity,
-                  ]}
-                />
-              )}
-            </View>
-          </TouchableWithoutFeedback>
-          <Animated.View
-            style={[
-              styles.bottomSheetContainer,
-              {
-                height: height + insets.bottom,
-                paddingBottom: insets.bottom,
-              },
-              contentContainerStyle,
-              animatedStyle,
-            ]}
-          >
-            <BottomSheetModalContext.Provider value={bottomSheetContextValue}>
-              {nestedScroll && Platform.OS === 'android' ? (
-                <>
+      {lazy && !isVisible ? null : (
+        <KeyboardAvoidingView
+          behavior={avoidKeyboard ? 'height' : undefined}
+          style={{ height: '100%', width: '100%' }}
+        >
+          {/* required for android */}
+          <GestureHandlerRootView style={{ height: '100%', width: '100%' }}>
+            <TouchableWithoutFeedback
+              style={styles.absoluteFill}
+              onPress={onRequestClose}
+            >
+              <View style={styles.absoluteFill}>
+                {variant === 'modal' && (
+                  <Animated.View
+                    style={[
+                      styles.absoluteFill,
+                      {
+                        backgroundColor: colors.black,
+                      },
+                      backgroundOpacity,
+                    ]}
+                  />
+                )}
+              </View>
+            </TouchableWithoutFeedback>
+            <Animated.View
+              style={[
+                styles.bottomSheetContainer,
+                {
+                  height: height + insets.bottom,
+                  paddingBottom: insets.bottom,
+                },
+                contentContainerStyle,
+                animatedStyle,
+              ]}
+            >
+              <BottomSheetModalContext.Provider value={bottomSheetContextValue}>
+                {nestedScroll && Platform.OS === 'android' ? (
+                  <>
+                    <GestureDetector gesture={panGesture}>
+                      <View
+                        style={styles.gestureViewAndroid}
+                        collapsable={false}
+                      />
+                    </GestureDetector>
+                    {content}
+                  </>
+                ) : (
                   <GestureDetector gesture={panGesture}>
-                    <View
-                      style={styles.gestureViewAndroid}
-                      collapsable={false}
-                    />
+                    <View style={styles.gestureView}>{content}</View>
                   </GestureDetector>
-                  {content}
-                </>
-              ) : (
-                <GestureDetector gesture={panGesture}>
-                  <View style={styles.gestureView}>{content}</View>
-                </GestureDetector>
-              )}
-            </BottomSheetModalContext.Provider>
-          </Animated.View>
-        </GestureHandlerRootView>
-      </KeyboardAvoidingView>
+                )}
+              </BottomSheetModalContext.Provider>
+            </Animated.View>
+          </GestureHandlerRootView>
+        </KeyboardAvoidingView>
+      )}
       <Toast />
     </Modal>
   );

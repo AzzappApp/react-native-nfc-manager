@@ -195,6 +195,7 @@ const CoverEditorMediaImageAnimationTool = () => {
       />
       {activeMedia != null && (
         <BottomSheetModal
+          lazy
           onRequestClose={toggleBottomSheet}
           visible={show}
           height={210 + 80 / COVER_RATIO}

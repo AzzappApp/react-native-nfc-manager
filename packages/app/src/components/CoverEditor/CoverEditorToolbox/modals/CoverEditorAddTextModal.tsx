@@ -74,62 +74,64 @@ const CoverEditorAddTextModal = (props: Props) => {
 
   return (
     <ScreenModal visible={open} animationType="slide">
-      <Container style={styles.container}>
-        <SafeAreaView
-          style={styles.container}
-          edges={{ bottom: 'off', top: 'additive' }}
-        >
-          <Header
-            middleElement={
-              <Text variant="large" style={styles.header}>
-                <FormattedMessage
-                  defaultMessage="Add text"
-                  description="CoverEditorAddTextModal - Header"
-                />
-              </Text>
-            }
-            leftElement={
-              <Button
-                variant="secondary"
-                label={intl.formatMessage({
-                  defaultMessage: 'Cancel',
-                  description: 'MultiUserAddModal - Cancel button label',
-                })}
-                onPress={onClose}
-              />
-            }
-          />
-          <View style={styles.tagsContainer}>
-            <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-              <View style={styles.tags}>
-                {itemsPerTag.map(({ label }, index) => (
-                  <RoundedMenuComponent
-                    key={label}
-                    selected={index === selectedTag}
-                    label={label}
-                    onPress={() => {
-                      setSelectedTag(index);
-                    }}
+      {open && (
+        <Container style={styles.container}>
+          <SafeAreaView
+            style={styles.container}
+            edges={{ bottom: 'off', top: 'additive' }}
+          >
+            <Header
+              middleElement={
+                <Text variant="large" style={styles.header}>
+                  <FormattedMessage
+                    defaultMessage="Add text"
+                    description="CoverEditorAddTextModal - Header"
                   />
-                ))}
-              </View>
-            </ScrollView>
-          </View>
-          <View style={styles.styleItemsContainer}>
-            <FlatList
-              testID="cover-editor-add-text-modal"
-              contentContainerStyle={styles.styleItems}
-              columnWrapperStyle={styles.styleItemsColumn}
-              accessibilityRole="list"
-              data={items}
-              renderItem={renderItem}
-              directionalLockEnabled
-              showsVerticalScrollIndicator={false}
-              numColumns={2}
+                </Text>
+              }
+              leftElement={
+                <Button
+                  variant="secondary"
+                  label={intl.formatMessage({
+                    defaultMessage: 'Cancel',
+                    description: 'MultiUserAddModal - Cancel button label',
+                  })}
+                  onPress={onClose}
+                />
+              }
             />
-          </View>
-        </SafeAreaView>
-      </Container>
+            <View style={styles.tagsContainer}>
+              <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                <View style={styles.tags}>
+                  {itemsPerTag.map(({ label }, index) => (
+                    <RoundedMenuComponent
+                      key={label}
+                      selected={index === selectedTag}
+                      label={label}
+                      onPress={() => {
+                        setSelectedTag(index);
+                      }}
+                    />
+                  ))}
+                </View>
+              </ScrollView>
+            </View>
+            <View style={styles.styleItemsContainer}>
+              <FlatList
+                testID="cover-editor-add-text-modal"
+                contentContainerStyle={styles.styleItems}
+                columnWrapperStyle={styles.styleItemsColumn}
+                accessibilityRole="list"
+                data={items}
+                renderItem={renderItem}
+                directionalLockEnabled
+                showsVerticalScrollIndicator={false}
+                numColumns={2}
+              />
+            </View>
+          </SafeAreaView>
+        </Container>
+      )}
     </ScreenModal>
   );
 };

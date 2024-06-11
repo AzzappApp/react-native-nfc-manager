@@ -44,21 +44,23 @@ const CoverEditorCutTool = () => {
       />
       {mediaInfo != null && !mediaInfoIsImage(mediaInfo) && (
         <ScreenModal visible={show} animationType="slide">
-          <ImagePicker
-            initialData={{
-              media: mediaInfo.media,
-              timeRange: mediaInfo.timeRange,
-              editionParameters: mediaInfo.editionParameters,
-              filter: mediaInfo.filter,
-            }}
-            forceAspectRatio={aspectRatio}
-            additionalData={{ selectedTab: 'timeRange', showTabs: false }}
-            kind={editionMode === 'overlay' ? 'image' : 'mixed'}
-            steps={[EditImageStep]}
-            onCancel={toggleScreenModal}
-            onFinished={onFinished}
-            maxVideoDuration={COVER_MAX_MEDIA_DURATION}
-          />
+          {show && (
+            <ImagePicker
+              initialData={{
+                media: mediaInfo.media,
+                timeRange: mediaInfo.timeRange,
+                editionParameters: mediaInfo.editionParameters,
+                filter: mediaInfo.filter,
+              }}
+              forceAspectRatio={aspectRatio}
+              additionalData={{ selectedTab: 'timeRange', showTabs: false }}
+              kind={editionMode === 'overlay' ? 'image' : 'mixed'}
+              steps={[EditImageStep]}
+              onCancel={toggleScreenModal}
+              onFinished={onFinished}
+              maxVideoDuration={COVER_MAX_MEDIA_DURATION}
+            />
+          )}
         </ScreenModal>
       )}
     </>

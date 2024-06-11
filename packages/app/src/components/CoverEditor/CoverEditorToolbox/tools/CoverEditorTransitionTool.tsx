@@ -143,6 +143,7 @@ const CoverEditorTransitionTool = () => {
         onPress={toggleBottomSheet}
       />
       <BottomSheetModal
+        lazy
         onRequestClose={toggleBottomSheet}
         visible={show}
         height={276}

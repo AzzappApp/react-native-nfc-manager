@@ -94,17 +94,19 @@ const CoverEditorAdjustTool = () => {
       />
       {activeMedia != null && (
         <ScreenModal visible={show} animationType="slide">
-          <ImagePicker
-            initialData={activeMedia}
-            kind={editionMode === 'overlay' ? 'image' : 'mixed'}
-            forceAspectRatio={
-              editionMode === 'overlay' ? mediaAspectRatio : COVER_RATIO
-            }
-            steps={[SelectImageStep]}
-            onCancel={toggleScreenModal}
-            onFinished={onFinished}
-            maxVideoDuration={COVER_MAX_MEDIA_DURATION}
-          />
+          {show && (
+            <ImagePicker
+              initialData={activeMedia}
+              kind={editionMode === 'overlay' ? 'image' : 'mixed'}
+              forceAspectRatio={
+                editionMode === 'overlay' ? mediaAspectRatio : COVER_RATIO
+              }
+              steps={[SelectImageStep]}
+              onCancel={toggleScreenModal}
+              onFinished={onFinished}
+              maxVideoDuration={COVER_MAX_MEDIA_DURATION}
+            />
+          )}
         </ScreenModal>
       )}
     </>

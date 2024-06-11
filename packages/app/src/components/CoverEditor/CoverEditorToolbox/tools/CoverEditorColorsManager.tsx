@@ -168,6 +168,7 @@ const CoverEditorColorsManager = ({
 
   return (
     <BottomSheetModal
+      lazy
       height={height}
       visible={visible}
       headerTitle={

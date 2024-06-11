@@ -44,11 +44,13 @@ const CoverEditorMediaPickerFloatingTool = ({ durations }: Props) => {
         onPress={toggleShowImage}
       />
       <ScreenModal visible={showImagePicker} animationType="slide">
-        <CoverEditorMediaPicker
-          initialMedias={cover.medias.map(({ media }) => media)}
-          onFinished={onMediasPicked}
-          durations={durations}
-        />
+        {showImagePicker && (
+          <CoverEditorMediaPicker
+            initialMedias={cover.medias.map(({ media }) => media)}
+            onFinished={onMediasPicked}
+            durations={durations}
+          />
+        )}
       </ScreenModal>
     </>
   );

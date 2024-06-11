@@ -108,15 +108,17 @@ const CoverEditorFiltersTool = () => {
       />
       {mediaInfo != null && (
         <ScreenModal visible={show} animationType="slide">
-          <ImagePicker
-            initialData={activeMedia}
-            additionalData={{ selectedTab: 'filter', showTabs: false }}
-            forceAspectRatio={mediaAspectRatio}
-            steps={[EditImageStep]}
-            onCancel={toggleScreenModal}
-            onFinished={onFinished}
-            maxVideoDuration={COVER_MAX_MEDIA_DURATION}
-          />
+          {show && (
+            <ImagePicker
+              initialData={activeMedia}
+              additionalData={{ selectedTab: 'filter', showTabs: false }}
+              forceAspectRatio={mediaAspectRatio}
+              steps={[EditImageStep]}
+              onCancel={toggleScreenModal}
+              onFinished={onFinished}
+              maxVideoDuration={COVER_MAX_MEDIA_DURATION}
+            />
+          )}
         </ScreenModal>
       )}
     </>
