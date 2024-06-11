@@ -1,6 +1,6 @@
 {
   "name": "@azzapp/i18n",
-  "version": "0.5.15-canary.125",
+  "version": "0.5.15-canary.126",
   "private": true,
   "types": "index.d.ts",
   "main": "index.js",

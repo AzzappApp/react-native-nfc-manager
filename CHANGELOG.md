@@ -1,4 +1,4 @@
-## 0.5.15-canary.125
+## 0.5.15-canary.126
 
 * **build:**  - upgrade deps ([#3671](https://github.com/AzzappApp/azzapp/pull/3671))
 * **fix:**  - 🐛 Use default image duration for composition image ([#3672](https://github.com/AzzappApp/azzapp/pull/3672))
