@@ -456,6 +456,16 @@ const MultiUserAddModal = (
                     'Error toast message when inviting user that is already a member from MultiUserAddModal',
                 }),
               });
+            } else if (e.message === ERRORS.SUBSCRIPTION_REQUIRED) {
+              Toast.show({
+                type: 'error',
+                text1: intl.formatMessage({
+                  defaultMessage:
+                    'Error, you don’t have a subscription or you don’t have enough seats in your subscription to invite this user',
+                  description:
+                    'Error toast message when inviting user without correct subscription from MultiUserAddModal',
+                }),
+              });
             } else {
               Toast.show({
                 type: 'error',

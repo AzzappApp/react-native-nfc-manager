@@ -136,7 +136,7 @@ const SubscriptionProvider = ({ children }: { children: ReactNode }) => {
 
   // force subscriber to true
   return (
-    <SubscriptionContext.Provider value={true}>
+    <SubscriptionContext.Provider value={isSubscriber}>
       {children}
     </SubscriptionContext.Provider>
   );

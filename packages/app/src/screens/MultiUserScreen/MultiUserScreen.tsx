@@ -10,6 +10,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import { ActivityIndicator, View } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { graphql, useMutation, usePreloadedQuery } from 'react-relay';
+import ERRORS from '@azzapp/shared/errors';
 import { isAdmin } from '@azzapp/shared/profileHelpers';
 import { colors } from '#theme';
 import { CancelHeaderButton } from '#components/commonsButtons';
@@ -64,6 +65,11 @@ const multiUserScreenQuery = graphql`
           ...CoverRenderer_webCard
           nbProfiles
           ...MultiUserScreenUserList_webCard
+          subscription {
+            id
+            endAt
+            status
+          }
         }
       }
     }
@@ -147,16 +153,40 @@ const MultiUserScreen = ({
           onCompleted: () => {
             setConfirmDeleteMultiUser(false);
           },
-          onError: () => {
-            Toast.show({
-              type: 'error',
-              text1: intl.formatMessage({
-                defaultMessage:
-                  'Error while updating your multi user settings.',
-                description:
-                  'Error toast message when updating multi user fails',
-              }),
-            });
+          onError: error => {
+            if (error.message === ERRORS.SUBSCRIPTION_IS_ACTIVE) {
+              Toast.show({
+                type: 'error',
+                text1: intl.formatMessage({
+                  defaultMessage:
+                    'You cannot deactivate multi user while you have an active subscription.',
+                  description:
+                    'Error toast message when trying to deactivate multi user while having an active subscription.',
+                }),
+              });
+              return;
+            } else if (error.message === ERRORS.SUBSCRIPTION_REQUIRED) {
+              Toast.show({
+                type: 'error',
+                text1: intl.formatMessage({
+                  defaultMessage:
+                    'You need a subscription to activate multi user.',
+                  description:
+                    'Error toast message when trying to activate multi user without a subscription.',
+                }),
+              });
+              return;
+            } else {
+              Toast.show({
+                type: 'error',
+                text1: intl.formatMessage({
+                  defaultMessage:
+                    'Error while updating your multi user settings.',
+                  description:
+                    'Error toast message when updating multi user fails',
+                }),
+              });
+            }
           },
         });
       }
@@ -166,7 +196,12 @@ const MultiUserScreen = ({
 
   const toggleMultiUser = useCallback(
     (value: boolean) => {
-      if (!currentUser?.userSubscription && hasActiveSubscription) {
+      if (
+        !currentUser?.userSubscription &&
+        hasActiveSubscription &&
+        (node?.profile?.webCard.subscription?.status !== 'active' ||
+          node?.profile?.webCard.subscription?.endAt < new Date())
+      ) {
         Toast.show({
           type: 'error',
           text1: intl.formatMessage({
@@ -193,11 +228,13 @@ const MultiUserScreen = ({
     },
     [
       currentUser?.userSubscription,
-      intl,
+      hasActiveSubscription,
+      node?.profile?.webCard.subscription?.status,
+      node?.profile?.webCard.subscription?.endAt,
       isMultiUserSubscription,
+      intl,
       router,
       setAllowMultiUser,
-      hasActiveSubscription,
     ],
   );
 

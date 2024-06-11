@@ -36,10 +36,7 @@ const quitWebCard: Mutation = async (
   }
 
   if (profile?.profileRole === 'owner') {
-    const subscription = await getActiveWebCardSubscription(
-      userId,
-      profile.webCardId,
-    );
+    const subscription = await getActiveWebCardSubscription(profile.webCardId);
 
     if (subscription) {
       throw new GraphQLError(ERRORS.SUBSCRIPTION_IS_ACTIVE);

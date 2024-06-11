@@ -12,7 +12,6 @@ import { InsufficientSubscriptionException } from '#use-cases/exceptions/subscri
 import type { MutationResolvers } from '#__generated__/types';
 import type { GraphQLContext } from '#index';
 
-// @TODO do we verify given profileId belongs to the current user?
 const inviteUserMutation: MutationResolvers['inviteUser'] = async (
   _,
   { profileId: gqlProfileId, invited, sendInvite },
