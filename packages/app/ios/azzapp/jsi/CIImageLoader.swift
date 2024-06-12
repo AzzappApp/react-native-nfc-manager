@@ -14,6 +14,7 @@ class CIImageLoader: NSObject {
   @objc
   static func loadImage(
     url: NSString,
+    maxSize: NSNumber?,
     onSuccess: @escaping (_ image: CIImage) -> Void,
     onError: @escaping (_ error: NSError?
   ) -> Void) {
@@ -28,14 +29,30 @@ class CIImageLoader: NSObject {
       }
       do {
         let image = try await MediaPipeline.pipeline.image(for: url);
-        guard let ciImage = CIImage(image: image)?.oriented(CGImagePropertyOrientation(image.imageOrientation)) else {
+        guard var ciImage = CIImage(image: image)?.oriented(CGImagePropertyOrientation(image.imageOrientation)) else {
           let error = NSError(domain: "com.azzapp.app", code: 0, userInfo: [
             NSLocalizedDescriptionKey: "Failed to handle image",
           ]);
           onError(error);
           return;
         }
-        onSuccess(ciImage)
+       // Only resize the image if targetSize is not null
+        if let maxSize = maxSize {
+          
+          let maxSize = CGFloat(truncating: maxSize)
+          // Create a CIFilter to scale the image
+        
+          
+          // Calculate the scale factor
+          let scaleFactor = min(maxSize / ciImage.extent.width, maxSize / ciImage.extent.height)
+          
+          ciImage = ciImage.transformed(by: CGAffineTransform(scaleX: scaleFactor, y: scaleFactor))
+          
+          onSuccess(ciImage)
+        } else {
+          // If targetSize is null, return the original image
+          onSuccess(ciImage)
+        }
       } catch {
         let nsError = NSError(domain: "com.azzapp.app", code: 0, userInfo: [
           NSLocalizedDescriptionKey: error.localizedDescription,

@@ -18,7 +18,7 @@ import {
   DEFAULT_COLOR_LIST,
   DEFAULT_COLOR_PALETTE,
 } from '@azzapp/shared/cardHelpers';
-import { COVER_RATIO } from '@azzapp/shared/coverHelpers';
+import { COVER_MAX_IMAGE_SIZE, COVER_RATIO } from '@azzapp/shared/coverHelpers';
 import { colors } from '#theme';
 import ScreenModal from '#components/ScreenModal';
 import { SKImageLoader, loadAllLUTShaders } from '#helpers/mediaEditions';
@@ -200,7 +200,7 @@ const CoverEditor = (
     if (imagesToLoad.length > 0) {
       promises.push(
         ...imagesToLoad.map(uri =>
-          SKImageLoader.loadImage(uri).then(image => {
+          SKImageLoader.loadImage(uri, COVER_MAX_IMAGE_SIZE).then(image => {
             if (canceled) {
               return;
             }

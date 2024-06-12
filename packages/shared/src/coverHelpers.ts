@@ -84,3 +84,8 @@ export const COVER_MIN_MEDIA_DURATION = 1;
  * A color that can be replaced in a lottie animation
  */
 export const LOTTIE_REPLACE_COLOR = '#010101';
+
+/**
+ * The maximum size of an image that can be used as a cover
+ */
+export const COVER_MAX_IMAGE_SIZE: number | null = 1920;

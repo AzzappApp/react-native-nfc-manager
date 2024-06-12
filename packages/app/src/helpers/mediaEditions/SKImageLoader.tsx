@@ -9,6 +9,7 @@ import type { SkImage } from '@shopify/react-native-skia';
 type BufferLoader = {
   loadImage: (
     uri: string,
+    maxSize: number | null | undefined,
     callback: (error: any, buffer: bigint | null) => void,
   ) => void;
   loadVideoFrame: (
@@ -95,9 +96,9 @@ const loadImageWithCache = async (
   return loadImageTasks.get(key)!;
 };
 
-const loadImage = (uri: string): Promise<SkImage> => {
+const loadImage = (uri: string, maxSize?: number | null): Promise<SkImage> => {
   return loadImageWithCache(uri, callback =>
-    getBufferLoader().loadImage(uri, callback),
+    getBufferLoader().loadImage(uri, maxSize, callback),
   );
 };
 
