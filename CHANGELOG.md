@@ -1,5 +1,6 @@
-## 0.5.15-canary.129
+## 0.5.15-canary.130
 
+* **feat:**  - cover , add maxSize on image loading for reducing ram consumption ([#3678](https://github.com/AzzappApp/azzapp/pull/3678))
 * **fix:**  - **subscription:** check subscription on multi user + invitation ([#3636](https://github.com/AzzappApp/azzapp/pull/3636))
 * **build:**  - upgrade drizzle ([#3675](https://github.com/AzzappApp/azzapp/pull/3675))
 * **fix:**  - **Android:** upgrade rn-skia-video
