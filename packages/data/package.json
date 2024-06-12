@@ -1,6 +1,6 @@
 {
   "name": "@azzapp/data",
-  "version": "0.5.15-canary.134",
+  "version": "0.5.15-canary.135",
   "private": true,
   "exports": {
     ".": {

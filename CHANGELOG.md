@@ -1,5 +1,7 @@
-## 0.5.15-canary.134
+## 0.5.15-canary.135
 
+* **fix:**  - **subscription:** [#3625](https://github.com/AzzappApp/azzapp/pull/3625) check that owner has a subscription ([#3687](https://github.com/AzzappApp/azzapp/pull/3687))
+* **fix:**  - **home:** [#3617](https://github.com/AzzappApp/azzapp/pull/3617) don’t open contact card after scroll ([#3690](https://github.com/AzzappApp/azzapp/pull/3690))
 * **feat:**  - restore filter cover ([#3688](https://github.com/AzzappApp/azzapp/pull/3688))
 * **fix:**  - **subscription:** [#3319](https://github.com/AzzappApp/azzapp/pull/3319) check when payment is needed ([#3641](https://github.com/AzzappApp/azzapp/pull/3641))
 * **fix:**  - 🐛 remove square aspect ratio ([#3684](https://github.com/AzzappApp/azzapp/pull/3684))
