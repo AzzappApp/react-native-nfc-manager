@@ -1,5 +1,8 @@
-## 0.5.15-canary.131
+## 0.5.15-canary.132
 
+* **fix:**  - **subscription:** [#3319](https://github.com/AzzappApp/azzapp/pull/3319) check when payment is needed ([#3641](https://github.com/AzzappApp/azzapp/pull/3641))
+* **fix:**  - 🐛 remove square aspect ratio ([#3684](https://github.com/AzzappApp/azzapp/pull/3684))
+* **fix:**  - use native buffer directly instead of SkImage ([#3685](https://github.com/AzzappApp/azzapp/pull/3685))
 * **fix:**  - **android:** prefix including colon are not supported on android ([#3683](https://github.com/AzzappApp/azzapp/pull/3683))
 * **feat:**  - cover , add maxSize on image loading for reducing ram consumption ([#3678](https://github.com/AzzappApp/azzapp/pull/3678))
 * **fix:**  - **subscription:** check subscription on multi user + invitation ([#3636](https://github.com/AzzappApp/azzapp/pull/3636))
