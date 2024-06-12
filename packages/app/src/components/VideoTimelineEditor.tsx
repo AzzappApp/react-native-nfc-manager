@@ -1,4 +1,4 @@
-import { Canvas, Image, type SkImage } from '@shopify/react-native-skia';
+import { Canvas } from '@shopify/react-native-skia';
 import range from 'lodash/range';
 import { useCallback, useEffect, useState } from 'react';
 import { View } from 'react-native';
@@ -12,7 +12,8 @@ import Animated, {
 import { formatDuration } from '@azzapp/shared/stringHelpers';
 import { colors } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
-import { SKImageLoader } from '#helpers/mediaEditions';
+import { NativeBufferLoader } from '#helpers/mediaEditions';
+import BufferImage from '#ui/BufferImage';
 import Text from '#ui/Text';
 import type { ViewProps } from 'react-native';
 import type { PanGestureHandlerGestureEvent } from 'react-native-gesture-handler';
@@ -187,26 +188,26 @@ const VideoTimelineEditor = ({
     [leftPosition.value, rightPosition.value],
   );
 
-  const [images, setImages] = useState<SkImage[]>([]);
+  const [buffers, setBuffers] = useState<bigint[]>([]);
   useEffect(() => {
     let canceled = false;
     let keys: string[] = [];
     const thumbnails = range(0, video.duration, video.duration / nbImage).map(
       second =>
-        SKImageLoader.loadVideoThumbnail(video.uri, second, {
+        NativeBufferLoader.loadVideoThumbnail(video.uri, second, {
           width: 256,
           height: 256,
         }),
     );
     Promise.all(thumbnails.map(video => video.promise))
-      .then(setImages)
+      .then(setBuffers)
       .then(
         () => {
           if (canceled) {
             return;
           }
           keys = thumbnails.map(video => video.key);
-          keys.forEach(SKImageLoader.refImage);
+          keys.forEach(NativeBufferLoader.ref);
         },
         () => {
           console.warn('error loading images');
@@ -214,7 +215,7 @@ const VideoTimelineEditor = ({
       );
     return () => {
       canceled = true;
-      keys.forEach(SKImageLoader.unrefImage);
+      keys.forEach(NativeBufferLoader.unref);
     };
   }, [video.uri, video.duration, nbImage]);
 
@@ -231,11 +232,11 @@ const VideoTimelineEditor = ({
     <View {...props}>
       <View style={styles.root}>
         <Canvas style={{ height: imagesHeight, width: sliderWidth }}>
-          {images.map((image, index) => (
-            <Image
+          {buffers.map((buffer, index) => (
+            <BufferImage
               fit={'cover'}
               key={index}
-              image={image}
+              buffer={buffer}
               y={0}
               x={index * itemWidth}
               width={itemWidth}

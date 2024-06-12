@@ -19,11 +19,13 @@ import {
   scaleCropData,
 } from './mediaEdtionHelpers';
 import { transformImage } from './mediasTransformations';
+import NativeBufferLoader, {
+  createImageFromNativeBuffer,
+} from './NativeBufferLoader';
 import {
   createSingleVideoComposition,
   createSingleVideoFrameDrawer,
 } from './singleVideoCompositions';
-import SKImageLoader from './SKImageLoader';
 import type { EditionParameters } from './EditionParameters';
 import type { Filter } from './LUTFilters';
 
@@ -42,8 +44,17 @@ export const saveTransformedImageToFile = async ({
   filter?: Filter | null;
   editionParameters?: EditionParameters | null;
 }) => {
-  const sourceImage = await SKImageLoader.loadImage(uri);
-  SKImageLoader.refImage(uri);
+  const sourceImage = createImageFromNativeBuffer(
+    await NativeBufferLoader.loadImage(uri),
+  );
+  if (!sourceImage) {
+    throw new Error('Image not found');
+  }
+  NativeBufferLoader.ref(uri);
+  if (!sourceImage) {
+    NativeBufferLoader.unref(uri);
+    throw new Error('Image not found');
+  }
   const lutShader = filter ? await getLutShader(filter) : null;
   const transformedImage = drawAsImageFromPicture(
     createPicture(canvas => {
@@ -69,6 +80,8 @@ export const saveTransformedImageToFile = async ({
 
   const path = createRandomFilePath(ext);
   await ReactNativeBlobUtil.fs.writeFile(path, blob, 'base64');
+
+  NativeBufferLoader.unref(uri);
 
   return path;
 };

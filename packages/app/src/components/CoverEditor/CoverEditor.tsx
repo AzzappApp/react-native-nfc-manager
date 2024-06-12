@@ -18,10 +18,10 @@ import {
   DEFAULT_COLOR_LIST,
   DEFAULT_COLOR_PALETTE,
 } from '@azzapp/shared/cardHelpers';
-import { COVER_MAX_IMAGE_SIZE, COVER_RATIO } from '@azzapp/shared/coverHelpers';
+import { COVER_RATIO } from '@azzapp/shared/coverHelpers';
 import { colors } from '#theme';
 import ScreenModal from '#components/ScreenModal';
-import { SKImageLoader, loadAllLUTShaders } from '#helpers/mediaEditions';
+import { NativeBufferLoader, loadAllLUTShaders } from '#helpers/mediaEditions';
 import { getVideoLocalPath } from '#helpers/mediaHelpers';
 import { useSkiaApplicationFonts } from '#hooks/useApplicationFonts';
 import useScreenInsets from '#hooks/useScreenInsets';
@@ -200,13 +200,13 @@ const CoverEditor = (
     if (imagesToLoad.length > 0) {
       promises.push(
         ...imagesToLoad.map(uri =>
-          SKImageLoader.loadImage(uri, COVER_MAX_IMAGE_SIZE).then(image => {
+          NativeBufferLoader.loadImage(uri).then(buffer => {
             if (canceled) {
               return;
             }
             images = {
               ...images,
-              [uri]: image,
+              [uri]: buffer,
             };
           }),
         ),
@@ -274,12 +274,12 @@ const CoverEditor = (
   useEffect(() => {
     for (const uri in prevImages.current) {
       if (!coverEditorState.images[uri]) {
-        SKImageLoader.unrefImage(uri);
+        NativeBufferLoader.unref(uri);
       }
     }
     for (const uri in coverEditorState.images) {
       if (!prevImages.current[uri]) {
-        SKImageLoader.refImage(uri);
+        NativeBufferLoader.ref(uri);
       }
     }
     prevImages.current = coverEditorState.images;

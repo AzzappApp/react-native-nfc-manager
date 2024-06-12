@@ -1,6 +1,7 @@
 import { Skia, type SkShader } from '@shopify/react-native-skia';
 import { COVER_MAX_MEDIA_DURATION } from '@azzapp/shared/coverHelpers';
 import {
+  createImageFromNativeBuffer,
   scaleCropData,
   transformImage,
   transformVideoFrame,
@@ -51,7 +52,7 @@ const coverMediasDrawer = ({
       const { media, filter, editionParameters } = mediaInfo;
       let shader: SkShader | undefined = undefined;
       if (mediaInfoIsImage(mediaInfo)) {
-        const image = images[media.uri];
+        const image = createImageFromNativeBuffer(images[media.uri]);
         if (!image) {
           continue;
         }

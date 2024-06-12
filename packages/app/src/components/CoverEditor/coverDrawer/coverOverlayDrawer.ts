@@ -1,7 +1,11 @@
 /* eslint-disable prefer-const */
 import { PaintStyle, Skia } from '@shopify/react-native-skia';
 import { swapColor } from '@azzapp/shared/cardHelpers';
-import { cropDataForAspectRatio, transformImage } from '#helpers/mediaEditions';
+import {
+  createImageFromNativeBuffer,
+  cropDataForAspectRatio,
+  transformImage,
+} from '#helpers/mediaEditions';
 import { percentRectToRect } from '../coverEditorHelpers';
 import { convertToBaseCanvasRatio, createRRect } from './utils';
 import type { CoverDrawerOptions } from './types';
@@ -31,16 +35,16 @@ const coverOverlayDrawer = ({
     borderWidth,
     shadow,
   } = overlayLayer;
-  const image = images[media.uri];
+  const image = createImageFromNativeBuffer(images[media.uri]);
+  if (!image) {
+    return;
+  }
   let {
     x,
     y,
     width: imageWidth,
     height: imageHeight,
   } = percentRectToRect(bounds, width, height);
-  if (!image) {
-    return;
-  }
   canvas.save();
   canvas.translate(x - imageWidth / 2, y - imageHeight / 2);
   if (rotation) {

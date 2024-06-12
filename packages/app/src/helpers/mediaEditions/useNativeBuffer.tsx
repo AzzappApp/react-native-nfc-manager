@@ -1,9 +1,8 @@
 import { useEffect, useState } from 'react';
 import useLatestCallback from '#hooks/useLatestCallback';
-import SKImageLoader from './SKImageLoader';
-import type { SkImage } from '@shopify/react-native-skia';
+import NativeBufferLoader from './NativeBufferLoader';
 
-const useSkImage = ({
+const useNativeBuffer = ({
   uri,
   kind,
   maxVideoThumbnailSize,
@@ -18,18 +17,18 @@ const useSkImage = ({
   onLoad?: () => void;
   onError?: (error?: Error) => void;
 }) => {
-  const [skImage, setSkImage] = useState<SkImage | null>(null);
+  const [image, setImage] = useState<bigint | null>(null);
   const onLoadInner = useLatestCallback(onLoad);
   const onErrorInner = useLatestCallback(onError);
   useEffect(() => {
     let canceled = false;
-    setSkImage(null);
+    setImage(null);
     let refKey: string | null = null;
     if (uri && kind) {
       const { key, promise } =
         kind === 'image'
-          ? { key: uri, promise: SKImageLoader.loadImage(uri) }
-          : SKImageLoader.loadVideoThumbnail(
+          ? { key: uri, promise: NativeBufferLoader.loadImage(uri) }
+          : NativeBufferLoader.loadVideoThumbnail(
               uri,
               time ?? 0,
               maxVideoThumbnailSize,
@@ -40,8 +39,8 @@ const useSkImage = ({
             return;
           }
           refKey = key;
-          SKImageLoader.refImage(key);
-          setSkImage(image);
+          NativeBufferLoader.ref(key);
+          setImage(image);
           onLoadInner();
         },
         err => {
@@ -55,12 +54,12 @@ const useSkImage = ({
     return () => {
       canceled = true;
       if (refKey) {
-        SKImageLoader.unrefImage(refKey);
+        NativeBufferLoader.unref(refKey);
       }
     };
   }, [uri, kind, time, onLoadInner, onErrorInner, maxVideoThumbnailSize]);
 
-  return skImage;
+  return image;
 };
 
-export default useSkImage;
+export default useNativeBuffer;

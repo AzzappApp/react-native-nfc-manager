@@ -23,9 +23,10 @@ import { mediaInfoIsImage } from '#components/CoverEditor/coverEditorHelpers';
 import TransformedImageRenderer from '#components/TransformedImageRenderer';
 import { keyExtractor } from '#helpers/idHelpers';
 import {
+  createImageFromNativeBuffer,
   transformImage,
   useLutShader,
-  useSkImage,
+  useNativeBuffer,
 } from '#helpers/mediaEditions';
 import useToggle from '#hooks/useToggle';
 import BottomSheetModal from '#ui/BottomSheetModal';
@@ -47,6 +48,7 @@ import type {
   MediaAnimations,
 } from '../../coverDrawer/mediaAnimation';
 import type { SkImage, SkShader } from '@shopify/react-native-skia';
+import type { DerivedValue } from 'react-native-reanimated';
 
 const CoverEditorMediaImageAnimationTool = () => {
   const [show, toggleBottomSheet] = useToggle(false);
@@ -69,10 +71,17 @@ const CoverEditorMediaImageAnimationTool = () => {
     [dispatch],
   );
 
-  const skImage = useSkImage({
+  const buffer = useNativeBuffer({
     uri: activeMedia?.media?.uri,
     kind: activeMedia?.media?.kind,
   });
+
+  const skImage = useDerivedValue(() => {
+    if (!buffer) {
+      return null;
+    }
+    return createImageFromNativeBuffer(buffer);
+  }, [buffer]);
 
   const onChangeDurationSlider = useCallback(
     (duration: number) => {
@@ -257,7 +266,7 @@ const AnimationPreview = ({
   height: number;
   width: number;
   duration: number;
-  skImage: SkImage | null;
+  skImage: DerivedValue<SkImage | null> | null;
   editionParameters?: EditionParameters | null;
   lutShader?: SkShader | null;
 }) => {
@@ -273,12 +282,12 @@ const AnimationPreview = ({
 
   const picture = useDerivedValue(() =>
     createPicture(canvas => {
-      if (!imageAnimation || !skImage) {
+      if (!imageAnimation || !skImage?.value) {
         return;
       }
 
       const shader = transformImage({
-        image: skImage,
+        image: skImage.value,
         width,
         height,
         editionParameters,

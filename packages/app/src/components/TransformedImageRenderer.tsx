@@ -1,9 +1,10 @@
 import {
+  Canvas,
   createPicture,
+  Picture,
   Skia,
-  SkiaPictureView,
 } from '@shopify/react-native-skia';
-import { useMemo } from 'react';
+import { useDerivedValue, type DerivedValue } from 'react-native-reanimated';
 import { colors } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import {
@@ -16,7 +17,7 @@ import type { SkImage } from '@shopify/react-native-skia';
 import type { ViewProps } from 'react-native';
 
 export type TransformedImageRendererProps = Exclude<ViewProps, 'children'> & {
-  image: SkImage | null;
+  image: DerivedValue<SkImage | null>;
   editionParameters?: EditionParameters | null;
   filter?: Filter | null;
   width: number;
@@ -33,16 +34,16 @@ const TransformedImageRenderer = ({
 }: TransformedImageRendererProps) => {
   const lutShader = useLutShader(filter);
 
-  const picture = useMemo(
+  const picture = useDerivedValue(
     () =>
       createPicture(canvas => {
-        if (!image) {
+        if (!image.value) {
           return;
         }
         const paint = Skia.Paint();
         paint.setShader(
           transformImage({
-            image,
+            image: image.value,
             width,
             height,
             editionParameters,
@@ -57,11 +58,9 @@ const TransformedImageRenderer = ({
   const styles = useStyleSheet(styleSheet);
 
   return (
-    <SkiaPictureView
-      picture={picture}
-      {...props}
-      style={[{ width, height }, styles.picture, props.style]}
-    />
+    <Canvas style={[{ width, height }, styles.picture, props.style]} {...props}>
+      <Picture picture={picture} />
+    </Canvas>
   );
 };
 

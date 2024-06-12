@@ -11,7 +11,7 @@ import type {
   MediaInfo,
   CoverEditorLinksLayerItem,
 } from './coverEditorTypes';
-import type { SkImage, SkShader } from '@shopify/react-native-skia';
+import type { SkShader } from '@shopify/react-native-skia';
 
 // #region Generic Layer Actions
 export type SetEditionModeAction = {
@@ -179,7 +179,7 @@ export type LoadingSuccessAction = {
   type: 'LOADING_SUCCESS';
   payload: {
     lutShaders: Partial<Record<Filter, SkShader>>;
-    images: Record<string, SkImage>;
+    images: Record<string, bigint | null>;
     videoPaths: Record<string, string>;
   };
 };

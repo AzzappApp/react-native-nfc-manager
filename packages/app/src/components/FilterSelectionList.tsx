@@ -8,9 +8,10 @@ import type { CropData, Filter } from '#helpers/mediaEditions';
 import type { BoxButtonItemInfo } from './BoxSelectionList';
 import type { SkImage } from '@shopify/react-native-skia';
 import type { ViewProps } from 'react-native';
+import type { DerivedValue } from 'react-native-reanimated';
 
 type FilterSelectionListProps = ViewProps & {
-  skImage: SkImage | null;
+  skImage: DerivedValue<SkImage | null>;
   aspectRatio: number;
   selectedFilter: string | null;
   cropData?: CropData | null;

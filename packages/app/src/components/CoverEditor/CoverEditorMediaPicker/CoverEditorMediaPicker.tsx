@@ -3,10 +3,7 @@ import { useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { View, Alert } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
-import {
-  COVER_MAX_IMAGE_SIZE,
-  COVER_MAX_MEDIA,
-} from '@azzapp/shared/coverHelpers';
+import { COVER_MAX_MEDIA } from '@azzapp/shared/coverHelpers';
 import { colors, shadow } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import { duplicateMediaToFillSlots } from '#helpers/mediaHelpers';
@@ -50,19 +47,6 @@ const CoverEditorMediaPicker = ({
 
   // @todo better define the expected type according to the evolution of the new cover
   const handleMediaSelected = (media: Media) => {
-    // skloading image are on side, media on another, media does not take account skLoading images
-    //we have data in 2 places, no relation between them but still use together.....
-    //quick n dirty for test
-    let scale = 1;
-    if (COVER_MAX_IMAGE_SIZE) {
-      scale = Math.min(
-        COVER_MAX_IMAGE_SIZE / media.width,
-        COVER_MAX_IMAGE_SIZE / media.height,
-      );
-    }
-
-    media.width = media.width * scale;
-    media.height = media.height * scale;
     setSelectedMedias(currentMedias => {
       const index = currentMedias.findIndex(
         value => value.galleryUri === media.galleryUri,

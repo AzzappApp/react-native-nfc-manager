@@ -10,11 +10,13 @@ import {
   useRef,
   useState,
 } from 'react';
-import { useSkImage } from '#helpers/mediaEditions';
-import type {
-  EditionParameters,
-  Filter,
-  ImageOrientation,
+import { useDerivedValue, type DerivedValue } from 'react-native-reanimated';
+import {
+  createImageFromNativeBuffer,
+  useNativeBuffer,
+  type EditionParameters,
+  type Filter,
+  type ImageOrientation,
 } from '#helpers/mediaEditions';
 import type { Media, TimeRange } from '#helpers/mediaHelpers';
 import type { SkImage } from '@shopify/react-native-skia';
@@ -48,7 +50,7 @@ export type ImagePickerState = {
   /**
    * The SkImage of the media
    */
-  skImage: SkImage | null;
+  skImage: DerivedValue<SkImage | null>;
   /**
    * the aspect ratio of the media
    */
@@ -280,12 +282,19 @@ const _ImagePickerContextProvider = (
     [],
   );
 
-  const skImage = useSkImage({
+  const nativeBuffer = useNativeBuffer({
     uri: media?.uri,
     kind: media?.kind,
     time: timeRange?.startTime,
     maxVideoThumbnailSize: MAX_VIDEO_THUMBNAIL_SIZE,
   });
+
+  const skImage = useDerivedValue(() => {
+    if (!nativeBuffer) {
+      return null;
+    }
+    return createImageFromNativeBuffer(nativeBuffer);
+  }, [nativeBuffer]);
 
   const pickerState = useMemo<ImagePickerState>(
     () => ({

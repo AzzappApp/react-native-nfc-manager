@@ -4,5 +4,8 @@ export * from './mediaEdtionHelpers';
 export * from './mediasTransformations';
 export * from './mediasExport';
 export * from './singleVideoCompositions';
-export { default as SKImageLoader } from './SKImageLoader';
-export { default as useSkImage } from './useSKImage';
+export {
+  default as NativeBufferLoader,
+  createImageFromNativeBuffer,
+} from './NativeBufferLoader';
+export { default as useNativeBuffer } from './useNativeBuffer';

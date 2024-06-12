@@ -51,21 +51,16 @@ jsi::Value BufferLoaderHostObject::get(jsi::Runtime& runtime,
 
   if (propName == "loadImage") {
     return jsi::Function::createFromHostFunction(
-      runtime, jsi::PropNameID::forAscii(runtime, "loadImage"), 3, // Change the number of arguments to 3
+      runtime, jsi::PropNameID::forAscii(runtime, "loadImage"), 2,
       [this](jsi::Runtime &runtime, const jsi::Value &thisValue,
           const jsi::Value *arguments, size_t count) -> jsi::Value {
         NSString* url = [NSString stringWithUTF8String:arguments[0]
                                                       .asString(runtime)
                                                       .utf8(runtime)
                                                       .c_str()];
-        NSNumber* maxSize = nil; // Add a maxSize argument
-        if (arguments[1].isNumber()) {
-          maxSize = [NSNumber numberWithDouble:arguments[1].asNumber()];
-        }
-        auto callback = std::make_shared<jsi::Function>(arguments[2].asObject(runtime).asFunction(runtime)); // Change the index of the callback argument to 2
+        auto callback = std::make_shared<jsi::Function>(arguments[1].asObject(runtime).asFunction(runtime));
         [AZPCIImageLoader
           loadImageWithUrl:url
-          maxSize:maxSize // Pass maxSize to the loadImage function
           onSuccess:^(CIImage* _Nonnull ciImage) {
               
             CVPixelBufferRef pixelBuffer;

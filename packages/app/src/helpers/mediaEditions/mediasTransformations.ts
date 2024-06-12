@@ -9,6 +9,7 @@ import {
   type EditionParameters,
 } from './EditionParameters';
 import { applyLutFilter } from './LUTFilters';
+import { createImageFromNativeBuffer } from './NativeBufferLoader';
 import type { MediaAnimation } from '#components/CoverEditor/coverDrawer/mediaAnimation';
 import type { VideoFrame } from '@azzapp/react-native-skia-video';
 import type {
@@ -173,9 +174,7 @@ export const transformVideoFrame = ({
   lutShader?: SkShader | null;
 }) => {
   'worklet';
-  const image = frame?.buffer
-    ? Skia.Image.MakeImageFromNativeBuffer(frame.buffer)
-    : null;
+  const image = createImageFromNativeBuffer(frame?.buffer);
   if (!image) {
     return;
   }

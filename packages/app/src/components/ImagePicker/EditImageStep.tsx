@@ -172,8 +172,13 @@ const EditImageStep = ({
 
   const filterListerCropData = useMemo(() => {
     let cropData = editionParameters.cropData;
-    if (cropData && media && skImage && media?.width !== skImage?.width()) {
-      const scale = skImage.width() / media.width;
+    if (
+      cropData &&
+      media &&
+      skImage.value &&
+      media.width !== skImage.value.width()
+    ) {
+      const scale = skImage.value.width() / media.width;
       cropData = {
         originX: cropData.originX * scale,
         originY: cropData.originY * scale,

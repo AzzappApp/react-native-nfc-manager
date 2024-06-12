@@ -3,12 +3,7 @@ import type { MediaVideo, MediaImage, TimeRange } from '#helpers/mediaHelpers';
 import type { CoverTransitions } from './coverDrawer/coverTransitions';
 import type { MediaAnimations } from './coverDrawer/mediaAnimation';
 import type { ColorPalette } from '@azzapp/shared/cardHelpers';
-import type {
-  SkImage,
-  SkPoint,
-  SkRect,
-  SkShader,
-} from '@shopify/react-native-skia';
+import type { SkPoint, SkRect, SkShader } from '@shopify/react-native-skia';
 
 export type CoverEditorState = {
   // Cover data
@@ -29,7 +24,7 @@ export type CoverEditorState = {
   selectedItemIndex: number | null;
 
   // Resources used for displaying/updating the cover
-  images: Record<string, SkImage>;
+  images: Record<string, bigint | null>;
   videoPaths: Record<string, string>;
   lutShaders: Partial<Record<Filter, SkShader>>;
 
