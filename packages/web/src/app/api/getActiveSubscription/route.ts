@@ -16,7 +16,7 @@ const getActiveSubscription = async () => {
     return new Response('Invalid request', { status: 400 });
   }
 
-  const subscription = await activeUserSubscription(userId);
+  const subscription = await activeUserSubscription([userId]);
   if (!subscription || subscription.length === 0) {
     return NextResponse.json({ subscription: undefined }, { status: 200 });
   } else {

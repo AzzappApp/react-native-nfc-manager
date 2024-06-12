@@ -284,6 +284,10 @@ type WebCard implements Node {
   The webCard requires subscription
   """
   requiresSubscription: Boolean!
+  """
+  The webCard is premium
+  """
+  isPremium: Boolean!
 }
 
 type WebCardStyle {

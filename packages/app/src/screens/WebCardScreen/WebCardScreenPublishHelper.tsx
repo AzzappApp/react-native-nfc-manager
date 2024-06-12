@@ -8,7 +8,6 @@ import { colors } from '#theme';
 import { useRouter } from '#components/NativeRouter';
 import ScreenModal from '#components/ScreenModal';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
-import { useIsSubscriber } from '#helpers/SubscriptionContext';
 import useScreenInsets from '#hooks/useScreenInsets';
 
 import { BOTTOM_MENU_HEIGHT } from '#ui/BottomMenu';
@@ -33,6 +32,7 @@ const WebCardScreenPublishHelper = ({
     userName,
     cardIsPublished,
     requiresSubscription,
+    isPremium,
   } = useFragment(
     graphql`
       fragment WebCardScreenPublishHelper_webCard on WebCard {
@@ -40,6 +40,7 @@ const WebCardScreenPublishHelper = ({
         userName
         cardIsPublished
         requiresSubscription
+        isPremium
       }
     `,
     webCard,
@@ -99,8 +100,6 @@ const WebCardScreenPublishHelper = ({
   const editModeRef = useRef(editMode);
   const router = useRouter();
 
-  const isSubscriber = useIsSubscriber();
-
   useEffect(() => {
     if (!cardIsPublished && !editMode && editModeRef.current) {
       setShowPublishModal(true);
@@ -109,7 +108,7 @@ const WebCardScreenPublishHelper = ({
   }, [cardIsPublished, editMode]);
 
   const onPublish = () => {
-    if (requiresSubscription && !isSubscriber) {
+    if (requiresSubscription && !isPremium) {
       router.push({ route: 'USER_PAY_WALL' });
       return;
     }

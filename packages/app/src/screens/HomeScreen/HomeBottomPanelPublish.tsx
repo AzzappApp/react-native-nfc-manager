@@ -54,7 +54,7 @@ const HomeBottomPanelPublish = ({ profile }: HomeBottomPanelPublishProps) => {
       return;
     }
 
-    if (profile.webCard.requiresSubscription && !isSubscriber) {
+    if (profile.webCard.requiresSubscription && !profile.webCard.isPremium) {
       router.push({ route: 'USER_PAY_WALL' });
       return;
     }

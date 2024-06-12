@@ -12,7 +12,6 @@ import {
   getCardModuleNextPosition,
   getUserProfileWithWebCardId,
   getCardModules,
-  activeUserSubscription,
 } from '@azzapp/data';
 import {
   MODULE_KIND_BLOCK_TEXT,
@@ -72,7 +71,7 @@ const createModuleSavingMutation =
       webCard.cardIsPublished
     ) {
       const subscription = owner
-        ? await activeUserSubscription(owner.id)
+        ? await loaders.activeSubscriptionsLoader.load(owner.id)
         : null;
       if (!subscription?.length) {
         throw new GraphQLError(ERRORS.SUBSCRIPTION_REQUIRED);

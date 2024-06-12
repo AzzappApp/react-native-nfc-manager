@@ -6,7 +6,6 @@ import {
   UserSubscriptionTable,
   UserTable,
   WebCardTable,
-  activeUserSubscription,
   db,
 } from '@azzapp/data';
 import ERRORS from '@azzapp/shared/errors';
@@ -28,7 +27,7 @@ const deleteUser: MutationResolvers['deleteUser'] = async (
     deleted: true,
   };
 
-  if ((await activeUserSubscription(userId)).length > 0) {
+  if ((await loaders.activeSubscriptionsLoader.load(userId)).length > 0) {
     throw new GraphQLError(ERRORS.SUBSCRIPTION_IS_ACTIVE);
   }
 

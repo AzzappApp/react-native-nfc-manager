@@ -92,6 +92,7 @@ const WebCardParametersScreen = ({
         }
         hasCover
         requiresSubscription
+        isPremium
         ...AccountHeader_webCard
       }
     `,
@@ -188,7 +189,7 @@ const WebCardParametersScreen = ({
         return;
       }
 
-      if (published && webCard.requiresSubscription && !isSubscriber) {
+      if (published && webCard.requiresSubscription && !webCard.isPremium) {
         router.push({ route: 'USER_PAY_WALL' });
         return;
       }

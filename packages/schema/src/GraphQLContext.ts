@@ -31,6 +31,7 @@ import {
   PaymentMeanTable,
   CompanyActivityTypeTable,
   getCardModulesForWebCards,
+  activeUserSubscription,
 } from '@azzapp/data';
 import { DEFAULT_LOCALE } from '@azzapp/i18n';
 import type {
@@ -59,6 +60,7 @@ import type {
   PaymentMean,
   Payment,
   CompanyActivityType,
+  UserSubscription,
 } from '@azzapp/data';
 
 import type { Locale } from '@azzapp/i18n';
@@ -187,6 +189,7 @@ export type Loaders = {
   webCardOwners: DataLoader<string, User | null>;
   labels: DataLoader<string, Label | null>;
   cardModuleByWebCardLoader: DataLoader<string, CardModule[]>;
+  activeSubscriptionsLoader: DataLoader<string, UserSubscription[]>;
 };
 
 const entitiesTable = {
@@ -325,12 +328,23 @@ const cardModuleByWebCardLoader = () =>
     return keys.map(k => modules.filter(m => m.webCardId === k));
   }, dataLoadersOptions);
 
+const activeSubscriptionsLoader = () =>
+  new DataLoader<string, UserSubscription[]>(async keys => {
+    if (keys.length === 0) {
+      return [];
+    }
+    const modules = await activeUserSubscription(keys as string[]);
+
+    return keys.map(k => modules.filter(m => m.userId === k));
+  }, dataLoadersOptions);
+
 export const createLoaders = (): Loaders =>
   new Proxy({} as Loaders, {
     get: (
       loaders: Loaders,
       entity:
         | Entity
+        | 'activeSubscriptionsLoader'
         | 'cardModuleByWebCardLoader'
         | 'labels'
         | 'profileByWebCardIdAndUserId'
@@ -356,6 +370,10 @@ export const createLoaders = (): Loaders =>
 
       if (entity === 'cardModuleByWebCardLoader') {
         return cardModuleByWebCardLoader();
+      }
+
+      if (entity === 'activeSubscriptionsLoader') {
+        return activeSubscriptionsLoader();
       }
 
       if (!['profileByWebCardIdAndUserId', ...entities].includes(entity)) {

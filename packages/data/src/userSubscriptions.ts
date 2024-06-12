@@ -9,6 +9,7 @@ import {
   asc,
   isNull,
   desc,
+  inArray,
 } from 'drizzle-orm';
 import {
   text,
@@ -111,14 +112,13 @@ export const updateSubscriptionFreeSeats = async (
 };
 
 /**
- * Retrieve active subscription for given userId
- * @param userId - The user id
+ * Retrieve active subscription for given userIds
+ * @param userIds - The user ids
  * @param excludeWebCards - Exclude subscriptions with webCardId
  * @returns The subscription
  */
 export const activeUserSubscription = async (
-  userId: string,
-  excludeWebCards: boolean = false,
+  userIds: string[],
   trx: DbTransaction = db,
 ): Promise<UserSubscription[]> => {
   const currentDate = new Date();
@@ -127,12 +127,11 @@ export const activeUserSubscription = async (
     .from(UserSubscriptionTable)
     .where(
       and(
-        eq(UserSubscriptionTable.userId, userId),
+        inArray(UserSubscriptionTable.userId, userIds),
         or(
           eq(UserSubscriptionTable.status, 'active'),
           gte(UserSubscriptionTable.endAt, currentDate),
         ),
-        excludeWebCards ? isNull(UserSubscriptionTable.webCardId) : undefined,
       ),
     );
 };

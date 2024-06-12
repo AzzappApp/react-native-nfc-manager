@@ -69,6 +69,15 @@ export const WebCard: WebCardResolvers = {
 
     return webCardRequiresSubscription(modules, webCard.webCardKind);
   },
+  isPremium: async (webCard, _, { loaders }) => {
+    const owner = await loaders.webCardOwners.load(webCard.id);
+
+    const subscription = owner
+      ? await loaders.activeSubscriptionsLoader.load(owner.id)
+      : null;
+
+    return !!subscription?.length;
+  },
   isFollowing: async (webCard, { webCardId: gqlWebCardId }) => {
     if (!gqlWebCardId) {
       return false;

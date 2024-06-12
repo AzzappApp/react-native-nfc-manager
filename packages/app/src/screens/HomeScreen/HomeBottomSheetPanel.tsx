@@ -13,7 +13,6 @@ import { buildUserUrl } from '@azzapp/shared/urlHelpers';
 import { colors } from '#theme';
 import Link from '#components/Link';
 import { dispatchGlobalEvent } from '#helpers/globalEvents';
-import { useIsSubscriber } from '#helpers/SubscriptionContext';
 import useQuitWebCard from '#hooks/useQuitWebCard';
 import useScreenInsets from '#hooks/useScreenInsets';
 import useToggle from '#hooks/useToggle';
@@ -70,6 +69,7 @@ const HomeBottomSheetPanel = ({
           cardIsPublished
           hasCover
           requiresSubscription
+          isPremium
         }
         invited
       }
@@ -212,8 +212,6 @@ const HomeBottomSheetPanel = ({
     }
   }, [close, intl, profile?.webCard.userName]);
 
-  const isSubscriber = useIsSubscriber();
-
   //Restore purchase
   //Manage my subsciption
   const elements = useMemo<
@@ -221,7 +219,7 @@ const HomeBottomSheetPanel = ({
   >(
     () =>
       convertToNonNullArray([
-        profile?.webCard.requiresSubscription && !isSubscriber
+        profile?.webCard.requiresSubscription && !profile?.webCard.isPremium
           ? {
               type: 'row',
               icon: 'plus',

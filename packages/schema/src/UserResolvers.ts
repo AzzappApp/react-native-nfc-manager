@@ -1,4 +1,4 @@
-import { activeUserSubscription, getProfilesOfUser } from '@azzapp/data';
+import { getProfilesOfUser } from '@azzapp/data';
 import type { UserResolvers } from './__generated__/types';
 export const User: UserResolvers = {
   profiles: async (user, _args, { auth, loaders }) => {
@@ -24,12 +24,14 @@ export const User: UserResolvers = {
 
     return result.map(({ Profile }) => Profile);
   },
-  userSubscription: async (user, _args, { auth }) => {
+  userSubscription: async (user, _args, { auth, loaders }) => {
     if (!auth.userId || auth.userId !== user.id) {
       return null;
     }
-    const subscription = await activeUserSubscription(auth.userId, true);
+    const subscriptions = await loaders.activeSubscriptionsLoader.load(
+      auth.userId,
+    );
 
-    return subscription?.length ? subscription[0] : null;
+    return subscriptions.find(sub => sub.webCardId === null) ?? null;
   },
 };

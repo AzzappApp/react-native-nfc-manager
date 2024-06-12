@@ -47,6 +47,7 @@ const HomeBottomPanelMessage = ({
             phoneNumber
           }
           requiresSubscription
+          isPremium
           id
         }
       }
