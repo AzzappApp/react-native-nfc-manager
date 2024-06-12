@@ -1,5 +1,6 @@
-## 0.5.15-canary.133
+## 0.5.15-canary.134
 
+* **feat:**  - restore filter cover ([#3688](https://github.com/AzzappApp/azzapp/pull/3688))
 * **fix:**  - **subscription:** [#3319](https://github.com/AzzappApp/azzapp/pull/3319) check when payment is needed ([#3641](https://github.com/AzzappApp/azzapp/pull/3641))
 * **fix:**  - 🐛 remove square aspect ratio ([#3684](https://github.com/AzzappApp/azzapp/pull/3684))
 * **fix:**  - use native buffer directly instead of SkImage ([#3685](https://github.com/AzzappApp/azzapp/pull/3685))
