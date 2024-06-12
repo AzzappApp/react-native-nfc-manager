@@ -1,4 +1,4 @@
-## 0.5.15-canary.132
+## 0.5.15-canary.133
 
 * **fix:**  - **subscription:** [#3319](https://github.com/AzzappApp/azzapp/pull/3319) check when payment is needed ([#3641](https://github.com/AzzappApp/azzapp/pull/3641))
 * **fix:**  - 🐛 remove square aspect ratio ([#3684](https://github.com/AzzappApp/azzapp/pull/3684))
