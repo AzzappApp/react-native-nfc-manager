@@ -1,9 +1,8 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { View } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { graphql, useFragment, useMutation } from 'react-relay';
-import { webCardRequiresSubscription } from '@azzapp/shared/subscriptionHelpers';
 import { buildUserUrl } from '@azzapp/shared/urlHelpers';
 import { colors } from '#theme';
 import { useRouter } from '#components/NativeRouter';
@@ -33,19 +32,14 @@ const WebCardScreenPublishHelper = ({
     id: webCardId,
     userName,
     cardIsPublished,
-    cardModules,
-    webCardKind,
+    requiresSubscription,
   } = useFragment(
     graphql`
       fragment WebCardScreenPublishHelper_webCard on WebCard {
         id
         userName
         cardIsPublished
-        cardModules {
-          id
-          kind
-        }
-        webCardKind
+        requiresSubscription
       }
     `,
     webCard,
@@ -105,11 +99,6 @@ const WebCardScreenPublishHelper = ({
   const editModeRef = useRef(editMode);
   const router = useRouter();
 
-  const requireSubscription = useMemo(
-    () => webCardRequiresSubscription(cardModules, webCardKind),
-    [cardModules, webCardKind],
-  );
-
   const isSubscriber = useIsSubscriber();
 
   useEffect(() => {
@@ -120,7 +109,7 @@ const WebCardScreenPublishHelper = ({
   }, [cardIsPublished, editMode]);
 
   const onPublish = () => {
-    if (requireSubscription && !isSubscriber) {
+    if (requiresSubscription && !isSubscriber) {
       router.push({ route: 'USER_PAY_WALL' });
       return;
     }
@@ -207,39 +196,25 @@ const WebCardScreenPublishHelper = ({
           <Button
             onPress={onPublish}
             label={
-              <View
-                style={{
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  height: '100%',
-                  paddingTop: 5,
+              <FormattedMessage
+                defaultMessage="Ok, publish my WebCard{azzappA}!"
+                description="Publish modal publish button label"
+                values={{
+                  azzappA: (
+                    <Text style={styles.icon} variant="azzapp">
+                      a
+                    </Text>
+                  ),
                 }}
-              >
-                <Text
-                  variant="button"
-                  style={{ color: colors.white }}
-                  numberOfLines={1}
-                >
-                  <FormattedMessage
-                    defaultMessage="Ok, publish my WebCard{azzappA}!"
-                    description="Publish modal publish button label"
-                    values={{
-                      azzappA: (
-                        <Text style={styles.icon} variant="azzapp">
-                          a
-                        </Text>
-                      ),
-                    }}
-                  />
-                </Text>
-                {requireSubscription && (
-                  <Icon icon="plus" size={15} style={styles.badge} />
-                )}
-              </View>
+              />
+            }
+            rightElement={
+              requiresSubscription && <Icon icon="plus" size={15} />
             }
             loading={publishing}
           />
           <Button
+            variant="secondary"
             onPress={onClose}
             label={intl.formatMessage(
               {
@@ -297,8 +272,5 @@ const stylesheet = createStyleSheet(appearance => ({
   },
   icon: {
     color: appearance === 'dark' ? colors.black : colors.white,
-  },
-  badge: {
-    marginLeft: 5,
   },
 }));

@@ -280,6 +280,10 @@ type WebCard implements Node {
   The webCard logo
   """
   logo: Media
+  """
+  The webCard requires subscription
+  """
+  requiresSubscription: Boolean!
 }
 
 type WebCardStyle {

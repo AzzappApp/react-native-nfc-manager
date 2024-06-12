@@ -14,6 +14,7 @@ import { useRouter } from '#components/NativeRouter';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import { keyExtractor } from '#helpers/idHelpers';
 import relayScreen from '#helpers/relayScreen';
+import { useIsSubscriber } from '#helpers/SubscriptionContext';
 import useQuitWebCard from '#hooks/useQuitWebCard';
 import useToggle from '#hooks/useToggle';
 import Container from '#ui/Container';
@@ -90,6 +91,7 @@ const WebCardParametersScreen = ({
           id
         }
         hasCover
+        requiresSubscription
         ...AccountHeader_webCard
       }
     `,
@@ -178,9 +180,16 @@ const WebCardParametersScreen = ({
       }
     `);
 
+  const isSubscriber = useIsSubscriber();
+
   const onChangeIsPublished = useCallback(
     (published: boolean) => {
       if (!webCard) {
+        return;
+      }
+
+      if (published && webCard.requiresSubscription && !isSubscriber) {
+        router.push({ route: 'USER_PAY_WALL' });
         return;
       }
       commitToggleWebCardPublished({
@@ -218,7 +227,7 @@ const WebCardParametersScreen = ({
         },
       });
     },
-    [commitToggleWebCardPublished, intl, webCard],
+    [commitToggleWebCardPublished, intl, isSubscriber, router, webCard],
   );
 
   const [commitUpdateWebCard] = useMutation<WebCardParametersScreenMutation>(
@@ -441,12 +450,15 @@ const WebCardParametersScreen = ({
           <WebCardParametersHeader webCard={webCard ?? null} />
           <Icon icon="parameters" style={styles.warningIcon} />
           <View style={styles.modalLine}>
-            <Text variant="medium">
-              <FormattedMessage
-                defaultMessage="Publish"
-                description="PostItem Modal - Likes switch Label"
-              />
-            </Text>
+            <View style={styles.publishTitle}>
+              <Text variant="medium">
+                <FormattedMessage
+                  defaultMessage="Publish"
+                  description="PostItem Modal - Likes switch Label"
+                />
+              </Text>
+              {webCard.requiresSubscription && <Icon icon="plus" size={24} />}
+            </View>
             <Switch
               variant="large"
               value={webCard?.cardIsPublished}
@@ -645,6 +657,11 @@ const styleSheet = createStyleSheet(appearance => ({
   sectionTitle: {
     textAlign: 'center',
     textTransform: 'uppercase',
+  },
+  publishTitle: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    columnGap: 10,
   },
   sectionField: {
     flexDirection: 'row',

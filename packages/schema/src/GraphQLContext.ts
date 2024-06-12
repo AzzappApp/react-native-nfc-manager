@@ -30,6 +30,7 @@ import {
   PaymentTable,
   PaymentMeanTable,
   CompanyActivityTypeTable,
+  getCardModulesForWebCards,
 } from '@azzapp/data';
 import { DEFAULT_LOCALE } from '@azzapp/i18n';
 import type {
@@ -185,6 +186,7 @@ export type Loaders = {
   profileStatistics: DataLoader<string, ProfileStatistic[]>;
   webCardOwners: DataLoader<string, User | null>;
   labels: DataLoader<string, Label | null>;
+  cardModuleByWebCardLoader: DataLoader<string, CardModule[]>;
 };
 
 const entitiesTable = {
@@ -313,12 +315,23 @@ const labelLoader = new DataLoader<string, Label | null>(
   },
 );
 
+const cardModuleByWebCardLoader = () =>
+  new DataLoader<string, CardModule[]>(async keys => {
+    if (keys.length === 0) {
+      return [];
+    }
+    const modules = await getCardModulesForWebCards(keys as string[]);
+
+    return keys.map(k => modules.filter(m => m.webCardId === k));
+  }, dataLoadersOptions);
+
 export const createLoaders = (): Loaders =>
   new Proxy({} as Loaders, {
     get: (
       loaders: Loaders,
       entity:
         | Entity
+        | 'cardModuleByWebCardLoader'
         | 'labels'
         | 'profileByWebCardIdAndUserId'
         | 'profileStatistics'
@@ -339,6 +352,10 @@ export const createLoaders = (): Loaders =>
 
       if (entity === 'labels') {
         return labelLoader;
+      }
+
+      if (entity === 'cardModuleByWebCardLoader') {
+        return cardModuleByWebCardLoader();
       }
 
       if (!['profileByWebCardIdAndUserId', ...entities].includes(entity)) {

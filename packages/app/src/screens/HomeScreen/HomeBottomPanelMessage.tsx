@@ -46,11 +46,7 @@ const HomeBottomPanelMessage = ({
             email
             phoneNumber
           }
-          cardModules {
-            id
-            kind
-          }
-          webCardKind
+          requiresSubscription
           id
         }
       }

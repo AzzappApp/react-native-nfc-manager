@@ -4,7 +4,6 @@ import { StyleSheet } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { graphql, commitMutation } from 'react-relay';
 import { isAdmin } from '@azzapp/shared/profileHelpers';
-import { webCardRequiresSubscription } from '@azzapp/shared/subscriptionHelpers';
 import { colors } from '#theme';
 import { useRouter } from '#components/NativeRouter';
 import { getAuthState } from '#helpers/authStore';
@@ -54,12 +53,8 @@ const HomeBottomPanelPublish = ({ profile }: HomeBottomPanelPublishProps) => {
     if (!isAdmin(profile.profileRole)) {
       return;
     }
-    const requireSubscription = webCardRequiresSubscription(
-      profile.webCard.cardModules,
-      profile.webCard.webCardKind,
-    );
 
-    if (requireSubscription && !isSubscriber) {
+    if (profile.webCard.requiresSubscription && !isSubscriber) {
       router.push({ route: 'USER_PAY_WALL' });
       return;
     }
@@ -166,6 +161,11 @@ const HomeBottomPanelPublish = ({ profile }: HomeBottomPanelPublishProps) => {
                 ),
               }}
             />
+          }
+          rightElement={
+            profile.webCard.requiresSubscription && (
+              <Icon icon="plus" size={15} />
+            )
           }
           style={styles.button}
           onPress={onPublish}

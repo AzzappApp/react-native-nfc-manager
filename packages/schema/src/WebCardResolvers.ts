@@ -3,7 +3,6 @@ import {
   getCompanyActivitiesByWebCardCategory,
   getWebCardPosts,
   isFollowing,
-  getCardModules,
   getLikedPosts,
   getFollowerProfiles,
   getFollowingsWebCard,
@@ -15,6 +14,7 @@ import {
   getWebCardPayments,
   getLastSubscription,
 } from '@azzapp/data';
+import { webCardRequiresSubscription } from '@azzapp/shared/subscriptionHelpers';
 import {
   connectionFromDateSortedItems,
   cursorToDate,
@@ -60,8 +60,14 @@ export const WebCard: WebCardResolvers = {
     if (!webCard.cardIsPublished && !profile) {
       return [];
     }
-    const modules = await getCardModules(webCard.id, profile !== null);
-    return modules;
+
+    const modules = await loaders.cardModuleByWebCardLoader.load(webCard.id);
+    return modules.filter(module => module.visible || profile !== null);
+  },
+  requiresSubscription: async (webCard, _, { loaders }) => {
+    const modules = await loaders.cardModuleByWebCardLoader.load(webCard.id);
+
+    return webCardRequiresSubscription(modules, webCard.webCardKind);
   },
   isFollowing: async (webCard, { webCardId: gqlWebCardId }) => {
     if (!gqlWebCardId) {
