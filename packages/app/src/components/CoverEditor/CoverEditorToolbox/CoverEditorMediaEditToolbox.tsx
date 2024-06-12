@@ -11,6 +11,7 @@ import {
 import CoverEditorAdjustTool from './tools/CoverEditorAdjustTool';
 // import CoverEditorAnimationTool from './tools/CoverEditorAnimationTool';
 import CoverEditorCutTool from './tools/CoverEditorCutTool';
+import CoverEditorFiltersTool from './tools/CoverEditorFiltersTool';
 import CoverEditorMediaImageAnimationTool from './tools/CoverEditorMediaImageAnimationTool';
 import CoverEditorMediaReplace from './tools/CoverEditorMediaReplace';
 import { TOOLBOX_SECTION_HEIGHT } from './ui/ToolBoxSection';
@@ -52,7 +53,7 @@ const CoverEditorMediaEditToolbox = () => {
       >
         {media?.kind === 'video' && <CoverEditorCutTool />}
         {media?.kind === 'image' && <CoverEditorMediaImageAnimationTool />}
-        {/* <CoverEditorFiltersTool /> TODO: temp removing this for test */}
+        <CoverEditorFiltersTool />
         <CoverEditorAdjustTool />
         <CoverEditorMediaReplace />
       </ScrollView>
