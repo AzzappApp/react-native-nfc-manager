@@ -1,7 +1,7 @@
-import { createId } from '@paralleldrive/cuid2';
 import { eq, desc, count } from 'drizzle-orm';
 import { mysqlEnum, int, mysqlTable } from 'drizzle-orm/mysql-core';
 import db, { DEFAULT_DATETIME_VALUE, cols } from '#db';
+import { createId } from '#/helpers/createId';
 import type { DbTransaction } from '#db';
 import type { InferInsertModel, InferSelectModel } from 'drizzle-orm';
 

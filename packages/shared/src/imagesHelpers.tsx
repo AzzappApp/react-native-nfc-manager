@@ -175,7 +175,7 @@ export const resizeTransforms = (
  * Create a database id from a media id
  */
 export const encodeMediaId = (mediaId: string, kind: string) => {
-  return `${kind.charAt(0)}:${mediaId}`;
+  return `${kind.charAt(0)}_${mediaId}`;
 };
 
 const assetNotRN = (funcName: string) => {

@@ -1,5 +1,4 @@
 'use server';
-import { createId } from '@paralleldrive/cuid2';
 import { eq } from 'drizzle-orm';
 import { revalidatePath } from 'next/cache';
 import {
@@ -8,6 +7,7 @@ import {
   getCoverTemplateTagById,
   CoverTemplateTagTable,
 } from '@azzapp/data';
+import { createId } from '@azzapp/data/helpers/createId';
 import { ADMIN } from '#roles';
 import { saveLabelKey } from '#helpers/lokaliseHelpers';
 import { currentUserHasRole } from '#helpers/roleHelpers';

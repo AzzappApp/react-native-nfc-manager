@@ -1,4 +1,3 @@
-import { createId } from '@paralleldrive/cuid2';
 import * as Sentry from '@sentry/nextjs';
 import { and, eq, inArray } from 'drizzle-orm';
 import { GraphQLError } from 'graphql';
@@ -10,6 +9,7 @@ import {
   db,
   updateWebCard,
 } from '@azzapp/data';
+import { createId } from '@azzapp/data/helpers/createId';
 import { guessLocale } from '@azzapp/i18n';
 import ERRORS from '@azzapp/shared/errors';
 import { isValidEmail } from '@azzapp/shared/stringHelpers';

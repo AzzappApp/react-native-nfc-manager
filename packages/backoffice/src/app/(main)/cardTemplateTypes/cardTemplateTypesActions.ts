@@ -1,8 +1,8 @@
 'use server';
-import { createId } from '@paralleldrive/cuid2';
 import { eq } from 'drizzle-orm';
 import { revalidatePath } from 'next/cache';
 import { CardTemplateTypeTable, createLabel, db } from '@azzapp/data';
+import { createId } from '@azzapp/data/helpers/createId';
 import { saveLabelKey } from '#helpers/lokaliseHelpers';
 import { cardTemplateTypeSchema } from './cardTemplateTypeSchema';
 import type {

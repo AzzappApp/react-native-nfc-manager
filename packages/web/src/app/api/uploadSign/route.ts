@@ -1,9 +1,9 @@
 /* eslint-disable no-bitwise */
-import { createId } from '@paralleldrive/cuid2';
 import { NextResponse } from 'next/server';
 import { withAxiom } from 'next-axiom';
 import * as z from 'zod';
 import { createMedia } from '@azzapp/data';
+import { createId } from '@azzapp/data/helpers/createId';
 import { MODULE_IMAGES_SIZES } from '@azzapp/shared/cardModuleHelpers';
 import { createPresignedUpload } from '@azzapp/shared/cloudinaryHelpers';
 import { COVER_ASSET_SIZES } from '@azzapp/shared/coverHelpers';

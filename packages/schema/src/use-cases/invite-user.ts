@@ -1,4 +1,3 @@
-import { createId } from '@paralleldrive/cuid2';
 import * as Sentry from '@sentry/nextjs';
 import {
   createProfile,
@@ -7,6 +6,7 @@ import {
   getUserByEmailPhoneNumber,
   updateWebCard,
 } from '@azzapp/data';
+import { createId } from '@azzapp/data/helpers/createId';
 import { guessLocale } from '@azzapp/i18n';
 import { ProfileAlreadyExistsException } from './exceptions/profile-already-exists.exception';
 import { InsufficientSubscriptionException } from './exceptions/subscription.exception';

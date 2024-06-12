@@ -1,4 +1,3 @@
-import { createId } from '@paralleldrive/cuid2';
 import {
   and,
   eq,
@@ -18,6 +17,7 @@ import {
   int,
   index,
 } from 'drizzle-orm/mysql-core';
+import { createId } from '#/helpers/createId';
 import db, { cols } from './db';
 import type { DbTransaction } from './db';
 
