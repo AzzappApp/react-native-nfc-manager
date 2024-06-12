@@ -33,6 +33,9 @@ const CoverEditorAddOverlay = ({ open, onClose }: Props) => {
           steps={[SelectImageStep]}
           onFinished={onFinish}
           onCancel={onClose}
+          additionalData={{
+            hideAspectRatio: true,
+          }}
         />
       )}
     </ScreenModal>

@@ -25,6 +25,7 @@ import type { CameraViewHandle } from '../CameraView';
 export type SelectImageStepProps = {
   onNext(): void;
   initialCameraPosition?: 'back' | 'front';
+  hideAspectRatio?: boolean;
 };
 
 /**
@@ -34,6 +35,7 @@ export type SelectImageStepProps = {
 const SelectImageStep = ({
   onNext,
   initialCameraPosition,
+  hideAspectRatio,
 }: SelectImageStepProps) => {
   // #region State management
   const {
@@ -305,7 +307,7 @@ const SelectImageStep = ({
           pickerMode === 'gallery' ? (
             media != null ? (
               <ImagePickerMediaRenderer>
-                {forceAspectRatio == null && (
+                {!hideAspectRatio && forceAspectRatio == null && (
                   <FloatingIconButton
                     icon={aspectRatio === 1 ? 'reduce' : 'expand'}
                     style={styles.adjustButton}
