@@ -1,4 +1,4 @@
-import { memo } from 'react';
+import { memo, useCallback } from 'react';
 import { View, useWindowDimensions } from 'react-native';
 import Animated, { useAnimatedStyle } from 'react-native-reanimated';
 import { useFragment, graphql } from 'react-relay';
@@ -7,8 +7,9 @@ import ContactCard, {
   CONTACT_CARD_RADIUS_HEIGHT,
   CONTACT_CARD_RATIO,
 } from '#components/ContactCard/ContactCard';
-import Link from '#components/Link';
+import { useRouter } from '#components/NativeRouter';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
+import useAuthState from '#hooks/useAuthState';
 import PressableNative from '#ui/PressableNative';
 import type { HomeContactCard_profile$key } from '#relayArtifacts/HomeContactCard_profile.graphql';
 import type { HomeContactCard_user$key } from '#relayArtifacts/HomeContactCard_user.graphql';
@@ -95,6 +96,7 @@ const ContactCardItem = ({
   const profile = useFragment(
     graphql`
       fragment HomeContactCard_profile on Profile {
+        id
         webCard {
           userName
           cardIsPublished
@@ -106,6 +108,18 @@ const ContactCardItem = ({
     `,
     item,
   );
+
+  const authState = useAuthState();
+  const router = useRouter();
+  const disabled = authState.profileInfos?.profileId !== profile.id;
+
+  const onPressContactCard = useCallback(() => {
+    if (!disabled) {
+      router.push({
+        route: 'CONTACT_CARD',
+      });
+    }
+  }, [disabled, router]);
 
   return (
     <Animated.View
@@ -127,21 +141,20 @@ const ContactCardItem = ({
               overflow: 'hidden',
             }}
           >
-            <Link route="CONTACT_CARD">
-              <PressableNative
-                ripple={{
-                  borderless: true,
-                  foreground: true,
-                  radius: cardHeight,
-                }}
-              >
-                <ContactCard
-                  profile={profile}
-                  height={Math.min(height, maxHeight)}
-                  style={styles.card}
-                />
-              </PressableNative>
-            </Link>
+            <PressableNative
+              ripple={{
+                borderless: true,
+                foreground: true,
+                radius: cardHeight,
+              }}
+              onPress={onPressContactCard}
+            >
+              <ContactCard
+                profile={profile}
+                height={Math.min(height, maxHeight)}
+                style={styles.card}
+              />
+            </PressableNative>
           </View>
         )}
     </Animated.View>
