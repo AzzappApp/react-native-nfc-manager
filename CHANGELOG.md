@@ -1,5 +1,6 @@
-## 0.5.15-canary.130
+## 0.5.15-canary.131
 
+* **fix:**  - **android:** prefix including colon are not supported on android ([#3683](https://github.com/AzzappApp/azzapp/pull/3683))
 * **feat:**  - cover , add maxSize on image loading for reducing ram consumption ([#3678](https://github.com/AzzappApp/azzapp/pull/3678))
 * **fix:**  - **subscription:** check subscription on multi user + invitation ([#3636](https://github.com/AzzappApp/azzapp/pull/3636))
 * **build:**  - upgrade drizzle ([#3675](https://github.com/AzzappApp/azzapp/pull/3675))
