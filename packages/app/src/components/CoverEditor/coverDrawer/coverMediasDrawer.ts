@@ -52,7 +52,7 @@ const coverMediasDrawer = ({
       const { media, filter, editionParameters } = mediaInfo;
       let shader: SkShader | undefined = undefined;
       if (mediaInfoIsImage(mediaInfo)) {
-        const image = createImageFromNativeBuffer(images[media.uri]);
+        const image = createImageFromNativeBuffer(images[media.uri], true);
         if (!image) {
           continue;
         }

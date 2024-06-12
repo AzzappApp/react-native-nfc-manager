@@ -80,7 +80,7 @@ const CoverEditorMediaImageAnimationTool = () => {
     if (!buffer) {
       return null;
     }
-    return createImageFromNativeBuffer(buffer);
+    return createImageFromNativeBuffer(buffer, true);
   }, [buffer]);
 
   const onChangeDurationSlider = useCallback(

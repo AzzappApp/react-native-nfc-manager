@@ -35,7 +35,7 @@ const coverOverlayDrawer = ({
     borderWidth,
     shadow,
   } = overlayLayer;
-  const image = createImageFromNativeBuffer(images[media.uri]);
+  const image = createImageFromNativeBuffer(images[media.uri], true);
   if (!image) {
     return;
   }

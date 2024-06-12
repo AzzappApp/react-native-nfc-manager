@@ -4,6 +4,7 @@ import {
   drawAsImageFromPicture,
 } from '@shopify/react-native-skia';
 import { Platform } from 'react-native';
+import { runOnUI } from 'react-native-reanimated';
 import { getJSIModule } from '#helpers/azzappJSIModules';
 import type { SkImage } from '@shopify/react-native-skia';
 
@@ -39,6 +40,25 @@ const scheduleCleanUp = () => {
         getBufferLoader().unrefBuffer(ref.buffer);
       }
     }
+    const activeBuffers = [...buffers.values()].map(({ buffer }) => buffer);
+    runOnUI(() => {
+      'worklet';
+      const bufferImageCache: Map<bigint, SkImage | null> =
+        ((global as any).____bufferImageCache as any) ?? null;
+      if (!bufferImageCache) {
+        return;
+      }
+      for (const [buffer, image] of bufferImageCache.entries()) {
+        if (!activeBuffers.includes(buffer)) {
+          try {
+            image?.dispose();
+          } catch (e) {
+            console.warn('Error disposing image', e);
+          }
+          bufferImageCache.delete(buffer);
+        }
+      }
+    })();
   }, 1000);
 };
 
@@ -130,9 +150,10 @@ const NativeBufferLoader = {
 export default NativeBufferLoader;
 
 const isAndroid = Platform.OS === 'android';
-export const createImageFromNativeBuffer = (
+const createImageFromNativeBufferInner = (
   buffer: bigint | null | undefined,
-) => {
+  copyAndroid: boolean,
+): SkImage | null => {
   'worklet';
   if (buffer == null) {
     return null;
@@ -144,7 +165,7 @@ export const createImageFromNativeBuffer = (
     console.warn('Error creating image from native buffer', e);
     return null;
   }
-  if (isAndroid) {
+  if (isAndroid && copyAndroid) {
     // copying the image to avoid issues with the original buffer
     if (typeof _WORKLET === 'undefined' || _WORKLET === false) {
       console.warn('createImageFromNativeBuffer should be called in worklet');
@@ -163,4 +184,40 @@ export const createImageFromNativeBuffer = (
     }
   }
   return image;
+};
+
+/**
+ * Converts a native buffer to a SkImage
+ * @param buffer the native buffer
+ * @param fromBufferLoader if the buffer was loaded from the NativeBufferLoader (it will induce a cache)
+ * @returns the SkImage or null if the buffer is null or the image could not be created
+ */
+export const createImageFromNativeBuffer = (
+  buffer: bigint | null | undefined,
+  fromBufferLoader: boolean,
+): SkImage | null => {
+  'worklet';
+  if (!fromBufferLoader) {
+    // we only need to copy the image on android for long lived images
+    // for short lived images like video frames, we can just use the original buffer
+    return createImageFromNativeBufferInner(buffer, false);
+  }
+  if (buffer == null) {
+    return null;
+  }
+  const globalAny = global as any;
+  if (!globalAny.____bufferImageCache) {
+    globalAny.____bufferImageCache = new Map();
+  }
+  const bufferImageCache: Map<bigint, SkImage | null> =
+    globalAny.____bufferImageCache as any;
+
+  if (bufferImageCache.has(buffer)) {
+    return bufferImageCache.get(buffer) ?? null;
+  }
+  const image: SkImage | null = createImageFromNativeBufferInner(buffer, true);
+  if (image) {
+    bufferImageCache.set(buffer, image);
+  }
+  return image ?? null;
 };

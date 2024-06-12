@@ -46,6 +46,7 @@ export const saveTransformedImageToFile = async ({
 }) => {
   const sourceImage = createImageFromNativeBuffer(
     await NativeBufferLoader.loadImage(uri),
+    true,
   );
   if (!sourceImage) {
     throw new Error('Image not found');

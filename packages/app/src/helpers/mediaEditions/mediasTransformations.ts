@@ -174,7 +174,7 @@ export const transformVideoFrame = ({
   lutShader?: SkShader | null;
 }) => {
   'worklet';
-  const image = createImageFromNativeBuffer(frame?.buffer);
+  const image = createImageFromNativeBuffer(frame?.buffer, false);
   if (!image) {
     return;
   }

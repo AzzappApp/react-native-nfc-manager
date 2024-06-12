@@ -293,7 +293,7 @@ const _ImagePickerContextProvider = (
     if (!nativeBuffer) {
       return null;
     }
-    return createImageFromNativeBuffer(nativeBuffer);
+    return createImageFromNativeBuffer(nativeBuffer, true);
   }, [nativeBuffer]);
 
   const pickerState = useMemo<ImagePickerState>(
