@@ -153,7 +153,7 @@ const SelectImageStep = ({
         if (duration) {
           const { uri: _uri } = result;
           const uri = _uri.startsWith('file://') ? _uri : `file://${_uri}`;
-          const { width, height, rotation } = await getVideoSize(_uri);
+          const { width, height, rotation } = await getVideoSize(uri);
           onMediaChange(
             {
               kind: 'video',
