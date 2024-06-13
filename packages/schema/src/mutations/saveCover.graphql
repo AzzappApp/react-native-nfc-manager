@@ -25,7 +25,7 @@ input SaveCoverInput {
   """
   The links of the card cover
   """
-  dynamicLinks: DynamicLinksInput!
+  dynamicLinks: DynamicLinksInput
 }
 
 input CardColorsInput {
