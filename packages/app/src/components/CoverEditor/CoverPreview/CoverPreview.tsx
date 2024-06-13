@@ -420,7 +420,7 @@ const CoverPreview = ({
         });
         const bounds = percentRectToRect(
           {
-            x: position.x - layerWidth / 2,
+            x: position.x,
             y: position.y,
             width: layerWidth,
             height: paragraph.getHeight() / canvasHeight,
