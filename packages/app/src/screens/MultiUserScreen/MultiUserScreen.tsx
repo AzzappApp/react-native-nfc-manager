@@ -216,7 +216,7 @@ const MultiUserScreen = ({
         });
         return;
       }
-      if (!isMultiUserSubscription) {
+      if (!isMultiUserSubscription && value) {
         router.push({ route: 'USER_PAY_WALL' });
         return;
       }
