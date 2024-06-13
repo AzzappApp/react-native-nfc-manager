@@ -1,5 +1,7 @@
-## 0.5.15-canary.136
+## 0.5.15-canary.137
 
+* **fix:**  - **subscription:** [#3703](https://github.com/AzzappApp/azzapp/pull/3703) don’t display paywall on switch off ([#3704](https://github.com/AzzappApp/azzapp/pull/3704))
+* **fix:**  - 🐛 multiple fixes on cover ([#3705](https://github.com/AzzappApp/azzapp/pull/3705))
 * **fix:**  - **subscription:** useless isSubscriber ([#3697](https://github.com/AzzappApp/azzapp/pull/3697))
 * **fix:**  - **subscription:** [#3625](https://github.com/AzzappApp/azzapp/pull/3625) check that owner has a subscription ([#3687](https://github.com/AzzappApp/azzapp/pull/3687))
 * **fix:**  - **home:** [#3617](https://github.com/AzzappApp/azzapp/pull/3617) don’t open contact card after scroll ([#3690](https://github.com/AzzappApp/azzapp/pull/3690))
