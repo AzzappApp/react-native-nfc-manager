@@ -19,7 +19,6 @@ import ScreenModal from '#components/ScreenModal';
 import { getFileName } from '#helpers/fileHelpers';
 import { saveTransformedImageToFile } from '#helpers/mediaEditions';
 import { uploadMedia, uploadSign } from '#helpers/MobileWebAPI';
-import { useIsSubscriber } from '#helpers/SubscriptionContext';
 import useEditorLayout from '#hooks/useEditorLayout';
 import useHandleProfileActionError from '#hooks/useHandleProfileError';
 import useModuleDataEditor from '#hooks/useModuleDataEditor';
@@ -103,6 +102,7 @@ const CarouselEditionScreen = ({
         webCard {
           id
           cardIsPublished
+          isPremium
           cardColors {
             primary
             light
@@ -213,7 +213,6 @@ const CarouselEditionScreen = ({
   const intl = useIntl();
   const [progressIndicator, setProgressIndicator] =
     useState<Observable<number> | null>(null);
-  const isSubscriber = useIsSubscriber();
 
   const cardModulesCount =
     profile.webCard.cardModules.length + (carousel ? 0 : 1);
@@ -333,7 +332,7 @@ const CarouselEditionScreen = ({
     if (
       profile.webCard.cardIsPublished &&
       requireSubscription &&
-      !isSubscriber
+      !profile.webCard.isPremium
     ) {
       router.push({ route: 'USER_PAY_WALL' });
       return;
@@ -448,8 +447,8 @@ const CarouselEditionScreen = ({
     canSave,
     cardModulesCount,
     profile.webCard.cardIsPublished,
+    profile.webCard.isPremium,
     profile.webCard.id,
-    isSubscriber,
     value,
     commit,
     carousel?.id,

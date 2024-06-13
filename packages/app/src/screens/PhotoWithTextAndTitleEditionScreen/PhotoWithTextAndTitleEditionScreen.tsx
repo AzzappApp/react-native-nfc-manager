@@ -25,7 +25,6 @@ import { getFileName } from '#helpers/fileHelpers';
 import { saveTransformedImageToFile } from '#helpers/mediaEditions';
 import { downScaleImage } from '#helpers/mediaHelpers';
 import { uploadMedia, uploadSign } from '#helpers/MobileWebAPI';
-import { useIsSubscriber } from '#helpers/SubscriptionContext';
 import useEditorLayout from '#hooks/useEditorLayout';
 import useHandleProfileActionError from '#hooks/useHandleProfileError';
 import useModuleDataEditor from '#hooks/useModuleDataEditor';
@@ -154,6 +153,7 @@ const PhotoWithTextAndTitleEditionScreen = ({
           cardModules {
             id
           }
+          isPremium
           ...PhotoWithTextAndTitleSettingsEditionPanel_webCard
         }
         ...PhotoWithTextAndTitleBackgroundEditionPanel_profile
@@ -263,7 +263,6 @@ const PhotoWithTextAndTitleEditionScreen = ({
   const intl = useIntl();
   const [progressIndicator, setProgressIndicator] =
     useState<Observable<number> | null>(null);
-  const isSubscriber = useIsSubscriber();
 
   const cardModulesCount =
     (profile.webCard.cardModules.length ?? 0) + (photoWithTextAndTitle ? 0 : 1);
@@ -410,7 +409,7 @@ const PhotoWithTextAndTitleEditionScreen = ({
     if (
       profile.webCard.cardIsPublished &&
       requireSubscription &&
-      !isSubscriber
+      !profile.webCard.isPremium
     ) {
       router.push({ route: 'USER_PAY_WALL' });
       return;
@@ -496,8 +495,8 @@ const PhotoWithTextAndTitleEditionScreen = ({
     canSave,
     cardModulesCount,
     profile.webCard.cardIsPublished,
+    profile.webCard.isPremium,
     profile.webCard.id,
-    isSubscriber,
     value,
     photoWithTextAndTitle?.id,
     titleFontSize.value,

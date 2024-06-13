@@ -23,7 +23,6 @@ import { getFileName } from '#helpers/fileHelpers';
 import { saveTransformedImageToFile } from '#helpers/mediaEditions';
 import { downScaleImage } from '#helpers/mediaHelpers';
 import { uploadMedia, uploadSign } from '#helpers/MobileWebAPI';
-import { useIsSubscriber } from '#helpers/SubscriptionContext';
 import useEditorLayout from '#hooks/useEditorLayout';
 import useHandleProfileActionError from '#hooks/useHandleProfileError';
 import useModuleDataEditor from '#hooks/useModuleDataEditor';
@@ -133,6 +132,7 @@ const HorizontalPhotoEditionScreen = ({
             titleFontFamily
             titleFontSize
           }
+          isPremium
           cardModules {
             id
           }
@@ -211,7 +211,6 @@ const HorizontalPhotoEditionScreen = ({
 
   const [progressIndicator, setProgressIndicator] =
     useState<Observable<number> | null>(null);
-  const isSubscriber = useIsSubscriber();
 
   const cardModulesCount =
     profile.webCard.cardModules.length + (horizontalPhoto ? 0 : 1);
@@ -305,7 +304,7 @@ const HorizontalPhotoEditionScreen = ({
     if (
       profile.webCard.cardIsPublished &&
       requireSubscription &&
-      !isSubscriber
+      !profile.webCard.isPremium
     ) {
       router.push({ route: 'USER_PAY_WALL' });
       return;
@@ -383,8 +382,8 @@ const HorizontalPhotoEditionScreen = ({
     canSave,
     cardModulesCount,
     profile.webCard.cardIsPublished,
+    profile.webCard.isPremium,
     profile.webCard.id,
-    isSubscriber,
     value,
     horizontalPhoto?.id,
     marginHorizontal.value,

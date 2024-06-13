@@ -7,7 +7,6 @@ import { LINE_DIVIDER_DEFAULT_VALUES } from '@azzapp/shared/cardModuleHelpers';
 import { addingModuleRequireSubscription } from '@azzapp/shared/subscriptionHelpers';
 import { useRouter } from '#components/NativeRouter';
 import WebCardColorPicker from '#components/WebCardColorPicker';
-import { useIsSubscriber } from '#helpers/SubscriptionContext';
 import useEditorLayout from '#hooks/useEditorLayout';
 import useHandleProfileActionError from '#hooks/useHandleProfileError';
 import useModuleDataEditor from '#hooks/useModuleDataEditor';
@@ -86,6 +85,7 @@ const LineDividerEditionScreen = ({
         cardModules {
           id
         }
+        isPremium
         ...WebCardColorPicker_webCard
       }
     `,
@@ -182,8 +182,6 @@ const LineDividerEditionScreen = ({
     data.marginBottom ?? LINE_DIVIDER_DEFAULT_VALUES.marginBottom,
   );
 
-  const isSubscriber = useIsSubscriber();
-
   const cardModulesCount =
     (webCard?.cardModules.length ?? 0) + (lineDivider ? 0 : 1);
 
@@ -197,7 +195,7 @@ const LineDividerEditionScreen = ({
       cardModulesCount,
     );
 
-    if (webCard.cardIsPublished && requireSubscription && !isSubscriber) {
+    if (webCard.cardIsPublished && requireSubscription && !webCard.isPremium) {
       router.push({ route: 'USER_PAY_WALL' });
       return;
     }
@@ -225,7 +223,6 @@ const LineDividerEditionScreen = ({
     canSave,
     webCard,
     cardModulesCount,
-    isSubscriber,
     commit,
     value,
     height.value,

@@ -14,7 +14,6 @@ import { useRouter } from '#components/NativeRouter';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import { keyExtractor } from '#helpers/idHelpers';
 import relayScreen from '#helpers/relayScreen';
-import { useIsSubscriber } from '#helpers/SubscriptionContext';
 import useQuitWebCard from '#hooks/useQuitWebCard';
 import useToggle from '#hooks/useToggle';
 import Container from '#ui/Container';
@@ -181,8 +180,6 @@ const WebCardParametersScreen = ({
       }
     `);
 
-  const isSubscriber = useIsSubscriber();
-
   const onChangeIsPublished = useCallback(
     (published: boolean) => {
       if (!webCard) {
@@ -228,7 +225,7 @@ const WebCardParametersScreen = ({
         },
       });
     },
-    [commitToggleWebCardPublished, intl, isSubscriber, router, webCard],
+    [commitToggleWebCardPublished, intl, router, webCard],
   );
 
   const [commitUpdateWebCard] = useMutation<WebCardParametersScreenMutation>(
