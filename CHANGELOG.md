@@ -1,5 +1,6 @@
-## 0.5.15-canary.137
+## 0.5.15-canary.138
 
+* **fix:**  - **subscription:** [#3625](https://github.com/AzzappApp/azzapp/pull/3625) update paywall check on sections ([#3709](https://github.com/AzzappApp/azzapp/pull/3709))
 * **fix:**  - **subscription:** [#3703](https://github.com/AzzappApp/azzapp/pull/3703) don’t display paywall on switch off ([#3704](https://github.com/AzzappApp/azzapp/pull/3704))
 * **fix:**  - 🐛 multiple fixes on cover ([#3705](https://github.com/AzzappApp/azzapp/pull/3705))
 * **fix:**  - **subscription:** useless isSubscriber ([#3697](https://github.com/AzzappApp/azzapp/pull/3697))
