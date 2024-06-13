@@ -1,5 +1,7 @@
-## 0.5.15-canary.141
+## 0.5.15-canary.142
 
+* **fix:**  - **backoffice:** list all template types ([#3720](https://github.com/AzzappApp/azzapp/pull/3720))
+* **fix:**  - 🐛 minor fixes oncreate new webcard screen ([#3717](https://github.com/AzzappApp/azzapp/pull/3717))
 * **fix:**  - **android:** error on recording video ([#3711](https://github.com/AzzappApp/azzapp/pull/3711))
 * **fix:**  - **Android:** video display ([#3714](https://github.com/AzzappApp/azzapp/pull/3714))
 * **fix:**  - **post:** [#3476](https://github.com/AzzappApp/azzapp/pull/3476) try to force slider to send last value ([#3713](https://github.com/AzzappApp/azzapp/pull/3713))
