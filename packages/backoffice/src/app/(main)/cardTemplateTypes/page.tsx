@@ -61,7 +61,7 @@ const getQuery = (search: string | null, filters: Filters) => {
       templates: sql`count(*)`.mapWith(Number).as('templates'),
     })
     .from(CardTemplateTypeTable)
-    .innerJoin(
+    .leftJoin(
       WebCardCategoryTable,
       eq(CardTemplateTypeTable.webCardCategoryId, WebCardCategoryTable.id),
     )
