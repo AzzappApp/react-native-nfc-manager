@@ -236,6 +236,8 @@ const permissions = shield(
       id: allow,
       webCardKind: allow,
       coverDynamicLinks: allow,
+      isPremium: isSameWebCard,
+      requiresSubscription: isSameWebCard,
     },
   },
   {
