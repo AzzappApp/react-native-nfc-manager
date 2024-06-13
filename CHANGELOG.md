@@ -1,5 +1,6 @@
-## 0.5.15-canary.140
+## 0.5.15-canary.141
 
+* **fix:**  - **android:** error on recording video ([#3711](https://github.com/AzzappApp/azzapp/pull/3711))
 * **fix:**  - **Android:** video display ([#3714](https://github.com/AzzappApp/azzapp/pull/3714))
 * **fix:**  - **post:** [#3476](https://github.com/AzzappApp/azzapp/pull/3476) try to force slider to send last value ([#3713](https://github.com/AzzappApp/azzapp/pull/3713))
 * **fix:**  - **subscription:** [#3625](https://github.com/AzzappApp/azzapp/pull/3625) update paywall check on sections ([#3709](https://github.com/AzzappApp/azzapp/pull/3709))
