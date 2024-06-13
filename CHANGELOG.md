@@ -1,5 +1,7 @@
-## 0.5.15-canary.142
+## 0.5.15-canary.143
 
+* **fix:**  - dynamicLinks are optional in cover ([#3719](https://github.com/AzzappApp/azzapp/pull/3719))
+* **fix:**  - 🐛 fixes on display color tryptich and link ui ([#3716](https://github.com/AzzappApp/azzapp/pull/3716))
 * **fix:**  - **backoffice:** list all template types ([#3720](https://github.com/AzzappApp/azzapp/pull/3720))
 * **fix:**  - 🐛 minor fixes oncreate new webcard screen ([#3717](https://github.com/AzzappApp/azzapp/pull/3717))
 * **fix:**  - **android:** error on recording video ([#3711](https://github.com/AzzappApp/azzapp/pull/3711))
