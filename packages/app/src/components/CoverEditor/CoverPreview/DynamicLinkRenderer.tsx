@@ -41,6 +41,8 @@ export const DynamicLinkRenderer = ({
   const height =
     convertToBaseCanvasRatio(size, viewWidth) * LINKS_ELEMENT_WRAPPER_MULTIPLER;
 
+  const borderWidth = convertToBaseCanvasRatio(LINKS_BORDER_WIDTH, viewWidth);
+
   const borderRadius =
     (convertToBaseCanvasRatio(size, viewWidth) *
       LINKS_ELEMENT_WRAPPER_MULTIPLER) /
@@ -61,7 +63,7 @@ export const DynamicLinkRenderer = ({
           width,
           height,
           borderStyle: 'solid',
-          borderWidth: LINKS_BORDER_WIDTH,
+          borderWidth,
           borderRadius,
           borderColor,
           alignItems: 'center',

@@ -245,7 +245,7 @@ const CoverEditorColorsManager = ({
           <ColorTriptychChooser
             size={86}
             colorPalette={cardColors}
-            currentPalette={cardColors}
+            currentPalette={savedColors?.current}
             onUpdateColorPalette={onUpdateColorPalette}
             onEditColor={onEditColor}
           />

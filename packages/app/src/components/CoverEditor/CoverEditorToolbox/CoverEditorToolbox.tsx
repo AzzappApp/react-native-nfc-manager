@@ -1,6 +1,7 @@
 import { useCallback } from 'react';
 import { useIntl } from 'react-intl';
 import { ScrollView, StyleSheet, View } from 'react-native';
+import ColorTriptychRenderer from '#components/ColorTriptychRenderer';
 import useToggle from '#hooks/useToggle';
 import { useCoverEditorContext } from '../CoverEditorContext';
 import CoverEditorLinksToolbox from './CoverEditorLinkToolbox';
@@ -27,7 +28,7 @@ const CoverEditorToolbox = ({
   const [colorPickerVisible, toggleColorPickerVisible] = useToggle();
   const [showOverlayImagePicker, toggleOverlayImagePicker] = useToggle(false);
   const {
-    coverEditorState: { editionMode },
+    coverEditorState: { editionMode, cardColors },
     dispatch,
   } = useCoverEditorContext();
 
@@ -91,7 +92,11 @@ const CoverEditorToolbox = ({
               defaultMessage: 'Colors',
               description: 'Cover Edition - Toolbox colors',
             })}
-            icon="palette"
+            icon={
+              <View style={styles.colors}>
+                <ColorTriptychRenderer {...cardColors} width={16} height={16} />
+              </View>
+            }
             onPress={toggleColorPickerVisible}
           />
         </ScrollView>
@@ -143,6 +148,12 @@ const styles = StyleSheet.create({
     gap: 5,
     height: TOOLBOX_SECTION_HEIGHT,
     paddingLeft: 10,
+  },
+  colors: {
+    borderRadius: 24,
+    borderStyle: 'solid',
+    borderWidth: 2,
+    padding: 2,
   },
 });
 
