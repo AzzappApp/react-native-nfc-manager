@@ -96,7 +96,10 @@ const CoverEditorAdjustTool = () => {
         <ScreenModal visible={show} animationType="slide">
           {show && (
             <ImagePicker
-              initialData={activeMedia}
+              initialData={{
+                ...activeMedia,
+                filter: null,
+              }}
               kind={editionMode === 'overlay' ? 'image' : 'mixed'}
               forceAspectRatio={
                 editionMode === 'overlay' ? mediaAspectRatio : COVER_RATIO
@@ -105,6 +108,9 @@ const CoverEditorAdjustTool = () => {
               onCancel={toggleScreenModal}
               onFinished={onFinished}
               maxVideoDuration={COVER_MAX_MEDIA_DURATION}
+              additionalData={{
+                hideTabs: true,
+              }}
             />
           )}
         </ScreenModal>

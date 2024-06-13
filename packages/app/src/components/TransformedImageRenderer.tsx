@@ -67,7 +67,7 @@ const TransformedImageRenderer = ({
 const styleSheet = createStyleSheet(appearance => ({
   picture: {
     //this will hack a bug on SKiaPictureView not accepting transparent background
-    backgroundColor: appearance === 'light' ? colors.white : colors.black,
+    backgroundColor: appearance === 'light' ? colors.grey500 : colors.black,
   },
 }));
 

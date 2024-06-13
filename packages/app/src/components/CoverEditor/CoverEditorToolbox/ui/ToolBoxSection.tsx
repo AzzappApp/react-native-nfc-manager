@@ -46,6 +46,7 @@ export const stylesToolbox = createStyleSheet(appearance => ({
     height: 24,
     alignItems: 'center',
     justifyContent: 'center',
+    position: 'relative',
   },
 }));
 

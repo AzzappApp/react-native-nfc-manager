@@ -1,6 +1,8 @@
 import { useCallback } from 'react';
 import { useIntl } from 'react-intl';
+import { StyleSheet } from 'react-native';
 import useToggle from '#hooks/useToggle';
+import Icon from '#ui/Icon';
 import {
   useCoverEditorContext,
   useCoverEditorLinksLayer,
@@ -32,7 +34,6 @@ const CoverEditorColorTool = ({ title }: Props) => {
     [dispatch],
   );
 
-  // @TODO: might be another data source than text layer
   const selectedColor = textLayer?.color ?? linksLayer?.color ?? '#000';
 
   return (
@@ -42,7 +43,12 @@ const CoverEditorColorTool = ({ title }: Props) => {
           defaultMessage: 'Color',
           description: 'Cover Edition - Toolbox sub-menu - Color',
         })}
-        icon={`font_color`}
+        icon={
+          <>
+            <Icon icon="font_color_letter" style={styles.icon} />
+            <Icon icon="font_color_dash" style={{ tintColor: selectedColor }} />
+          </>
+        }
         onPress={toggleBottomSheet}
       />
 
@@ -58,5 +64,11 @@ const CoverEditorColorTool = ({ title }: Props) => {
     </>
   );
 };
+
+const styles = StyleSheet.create({
+  icon: {
+    position: 'absolute',
+  },
+});
 
 export default CoverEditorColorTool;

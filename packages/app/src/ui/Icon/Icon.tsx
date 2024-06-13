@@ -470,6 +470,12 @@ const icons = {
   get width_limited() {
     return require('./assets/width-limited.png');
   },
+  get font_color_letter() {
+    return require('./assets/font_color_letter.png');
+  },
+  get font_color_dash() {
+    return require('./assets/font_color_dash.png');
+  },
 } as const;
 
 export type Icons = keyof typeof icons;

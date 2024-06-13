@@ -2,6 +2,8 @@ import { Skia } from '@shopify/react-native-skia';
 import { useCallback, useEffect, useMemo } from 'react';
 import { Dimensions, PixelRatio, type ViewProps } from 'react-native';
 import { __RNSkiaVideoPrivateAPI } from '@azzapp/react-native-skia-video';
+import { colors } from '#theme';
+import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import {
   useLutShader,
   createSingleVideoComposition,
@@ -54,6 +56,7 @@ const TransformedVideoRenderer = ({
   ...props
 }: TransformedVideoRendererProps) => {
   const lutShader = useLutShader(filter);
+  const styles = useStyleSheet(styleSheet);
 
   const videoPath = useVideoLocalPath(video?.uri ?? null, onLoad, onError);
 
@@ -143,9 +146,16 @@ const TransformedVideoRenderer = ({
       drawFrame={drawFrame}
       width={width}
       height={height}
+      style={styles.video}
       {...props}
     />
   );
 };
+
+const styleSheet = createStyleSheet(appearance => ({
+  video: {
+    backgroundColor: appearance === 'light' ? colors.grey500 : colors.black,
+  },
+}));
 
 export default TransformedVideoRenderer;

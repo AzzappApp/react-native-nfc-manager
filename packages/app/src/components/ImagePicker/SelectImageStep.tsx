@@ -26,6 +26,7 @@ export type SelectImageStepProps = {
   onNext(): void;
   initialCameraPosition?: 'back' | 'front';
   hideAspectRatio?: boolean;
+  hideTabs?: boolean;
 };
 
 /**
@@ -36,6 +37,7 @@ const SelectImageStep = ({
   onNext,
   initialCameraPosition,
   hideAspectRatio,
+  hideTabs,
 }: SelectImageStepProps) => {
   // #region State management
   const {
@@ -359,11 +361,15 @@ const SelectImageStep = ({
             />
           )
         }
-        menuBarProps={{
-          currentTab: pickerMode,
-          onItemPress: onChangePickerMode as any,
-          tabs,
-        }}
+        menuBarProps={
+          !hideTabs
+            ? {
+                currentTab: pickerMode,
+                onItemPress: onChangePickerMode as any,
+                tabs,
+              }
+            : null
+        }
       />
       <PermissionModal
         permissionsFor={pickerMode}
