@@ -252,6 +252,8 @@ export const NewWebCardScreen = ({
           onWebCardCategoryChange={onWebCardCategoryChange}
         />
       ),
+      rightElement: <View style={{ height: HEADER_HEIGHT }} />,
+      rightElementWidth: 80,
       backIcon: 'arrow_down' as const,
     },
     {
