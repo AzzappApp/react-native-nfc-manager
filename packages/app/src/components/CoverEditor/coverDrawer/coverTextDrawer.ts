@@ -1,13 +1,11 @@
 import { Skia, TextAlign } from '@shopify/react-native-skia';
 import { swapColor, type ColorPalette } from '@azzapp/shared/cardHelpers';
+import { skiaFontManager } from '#hooks/useApplicationFonts';
 import { percentRectToRect } from '../coverEditorHelpers';
 import { convertToBaseCanvasRatio } from './utils';
 import type { CoverDrawerOptions } from './types';
 import type { CoverEditorTextLayerItem } from '../coverEditorTypes';
-import type {
-  SkParagraph,
-  SkTypefaceFontProvider,
-} from '@shopify/react-native-skia';
+import type { SkParagraph } from '@shopify/react-native-skia';
 
 const textAlignMap = {
   center: TextAlign.Center,
@@ -18,12 +16,10 @@ const textAlignMap = {
 
 export const createParagraph = ({
   layer,
-  fontManager,
   canvasWidth,
   cardColors,
 }: {
   layer: CoverEditorTextLayerItem;
-  fontManager: SkTypefaceFontProvider | null;
   canvasWidth: number;
   cardColors?: ColorPalette | null;
 }): SkParagraph => {
@@ -41,7 +37,7 @@ export const createParagraph = ({
 
   const paragraph = Skia.ParagraphBuilder.Make(
     { textAlign: textAlignMap[textAlign ?? 'left'] },
-    fontManager ?? Skia.TypefaceFontProvider.Make(),
+    skiaFontManager,
   )
     .pushStyle({
       fontFamilies: [fontFamily],
@@ -68,7 +64,6 @@ const coverTextDrawer = ({
   canvas,
   coverEditorState: { textLayers, cardColors },
   index,
-  fontManager,
   width,
   height,
 }: CoverDrawerOptions & { index: number }) => {
@@ -79,7 +74,6 @@ const coverTextDrawer = ({
   }
   const paragraph = createParagraph({
     layer,
-    fontManager,
     canvasWidth: width,
     cardColors,
   });

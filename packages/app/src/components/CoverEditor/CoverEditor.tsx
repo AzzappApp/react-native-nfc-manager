@@ -23,7 +23,6 @@ import { colors } from '#theme';
 import ScreenModal from '#components/ScreenModal';
 import { NativeBufferLoader, loadAllLUTShaders } from '#helpers/mediaEditions';
 import { getVideoLocalPath } from '#helpers/mediaHelpers';
-import { useSkiaApplicationFonts } from '#hooks/useApplicationFonts';
 import useScreenInsets from '#hooks/useScreenInsets';
 import useToggle from '#hooks/useToggle';
 import Button from '#ui/Button';
@@ -285,12 +284,11 @@ const CoverEditor = (
     prevImages.current = coverEditorState.images;
   }, [coverEditorState.images]);
 
-  const fontManager = useSkiaApplicationFonts();
   // #endregion
 
   // #region Saving
   const { save, reset, savingStatus, progressIndicator, error, canSave } =
-    useSaveCover(profile.webCard.id, coverEditorState, fontManager);
+    useSaveCover(profile.webCard.id, coverEditorState);
 
   useEffect(() => {
     if (error) {
@@ -382,12 +380,11 @@ const CoverEditor = (
         >
           <Container style={styles.container}>
             <View style={styles.content} onLayout={onContentLayout}>
-              {contentSize && fontManager && (
+              {contentSize && (
                 <CoverPreview
                   width={contentSize.width}
                   height={contentSize.height}
                   style={styles.coverPreview}
-                  fontManager={fontManager}
                   onKeyboardTranslateWorklet={onKeyboardTranslateWorklet}
                 />
               )}

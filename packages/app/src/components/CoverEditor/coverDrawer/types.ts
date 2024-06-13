@@ -1,10 +1,6 @@
 import type { CoverEditorState } from '../coverEditorTypes';
 import type { VideoFrame } from '@azzapp/react-native-skia-video';
-import type {
-  SkCanvas,
-  SkShader,
-  SkTypefaceFontProvider,
-} from '@shopify/react-native-skia';
+import type { SkCanvas, SkShader } from '@shopify/react-native-skia';
 
 export type CoverDrawerOptions = {
   canvas: SkCanvas;
@@ -16,5 +12,4 @@ export type CoverDrawerOptions = {
   images: Record<string, bigint | null>;
   lutShaders: Record<string, SkShader>;
   videoScales: Record<string, number>;
-  fontManager: SkTypefaceFontProvider | null;
 };

@@ -1,7 +1,6 @@
 import { Skia } from '@shopify/react-native-skia';
-import { useCallback, useEffect, useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 import { Dimensions, PixelRatio, type ViewProps } from 'react-native';
-import { __RNSkiaVideoPrivateAPI } from '@azzapp/react-native-skia-video';
 import { colors } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import {
@@ -89,25 +88,6 @@ const TransformedVideoRenderer = ({
 
   const composition = infos?.composition ?? null;
   const videoScale = infos?.videoScale ?? 1;
-
-  const framesExtractor = useMemo(() => {
-    if (composition) {
-      return __RNSkiaVideoPrivateAPI.createVideoCompositionFramesExtractor(
-        composition,
-      );
-    }
-    return null;
-  }, [composition]);
-
-  useEffect(() => {
-    if (framesExtractor) {
-      framesExtractor.isLooping = true;
-    }
-    framesExtractor?.play();
-    return () => {
-      framesExtractor?.dispose();
-    };
-  }, [framesExtractor]);
 
   const drawFrame = useCallback<FrameDrawer>(
     ({ canvas, frames, width, height }) => {

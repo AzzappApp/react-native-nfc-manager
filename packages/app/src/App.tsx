@@ -52,7 +52,9 @@ import {
   createScreenPrefetcher,
 } from '#helpers/ScreenPrefetcher';
 import SubscriptionProvider from '#helpers/SubscriptionContext';
-import useApplicationFonts from '#hooks/useApplicationFonts';
+import useApplicationFonts, {
+  loadSkiaTypeFonts,
+} from '#hooks/useApplicationFonts';
 import useAuthState from '#hooks/useAuthState';
 import { useDeepLink } from '#hooks/useDeepLink';
 import AboutScreen from '#screens/AboutScreen';
@@ -119,6 +121,7 @@ Sentry.init({
 const init = async () => {
   await initAuthStore();
   initLocaleHelpers();
+  loadSkiaTypeFonts();
   RelayQueryManager.init();
 };
 

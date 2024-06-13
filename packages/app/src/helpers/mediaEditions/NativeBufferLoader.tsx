@@ -1,9 +1,4 @@
-import {
-  Skia,
-  createPicture,
-  drawAsImageFromPicture,
-} from '@shopify/react-native-skia';
-import { Platform } from 'react-native';
+import { Skia } from '@shopify/react-native-skia';
 import { runOnUI } from 'react-native-reanimated';
 import { getJSIModule } from '#helpers/azzappJSIModules';
 import type { SkImage } from '@shopify/react-native-skia';
@@ -149,10 +144,8 @@ const NativeBufferLoader = {
 
 export default NativeBufferLoader;
 
-const isAndroid = Platform.OS === 'android';
 const createImageFromNativeBufferInner = (
   buffer: bigint | null | undefined,
-  copyAndroid: boolean,
 ): SkImage | null => {
   'worklet';
   if (buffer == null) {
@@ -164,24 +157,6 @@ const createImageFromNativeBufferInner = (
   } catch (e) {
     console.warn('Error creating image from native buffer', e);
     return null;
-  }
-  if (isAndroid && copyAndroid) {
-    // copying the image to avoid issues with the original buffer
-    if (typeof _WORKLET === 'undefined' || _WORKLET === false) {
-      console.warn('createImageFromNativeBuffer should be called in worklet');
-    }
-    if (image) {
-      image = drawAsImageFromPicture(
-        createPicture(canvas => canvas.drawImage(image!, 0, 0), {
-          width: image.width(),
-          height: image.height(),
-        }),
-        {
-          width: image.width(),
-          height: image.height(),
-        },
-      );
-    }
   }
   return image;
 };
@@ -198,9 +173,7 @@ export const createImageFromNativeBuffer = (
 ): SkImage | null => {
   'worklet';
   if (!fromBufferLoader) {
-    // we only need to copy the image on android for long lived images
-    // for short lived images like video frames, we can just use the original buffer
-    return createImageFromNativeBufferInner(buffer, false);
+    return createImageFromNativeBufferInner(buffer);
   }
   if (buffer == null) {
     return null;
@@ -215,7 +188,7 @@ export const createImageFromNativeBuffer = (
   if (bufferImageCache.has(buffer)) {
     return bufferImageCache.get(buffer) ?? null;
   }
-  const image: SkImage | null = createImageFromNativeBufferInner(buffer, true);
+  const image: SkImage | null = createImageFromNativeBufferInner(buffer);
   if (image) {
     bufferImageCache.set(buffer, image);
   }

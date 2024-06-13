@@ -1,5 +1,5 @@
 PODS:
-  - azzapp-react-native-skia-video (0.4.1):
+  - azzapp-react-native-skia-video (0.4.2):
     - DoubleConversion
     - glog
     - hermes-engine
@@ -1846,7 +1846,7 @@ EXTERNAL SOURCES:
     :path: "../../../node_modules/react-native/ReactCommon/yoga"
 
 SPEC CHECKSUMS:
-  azzapp-react-native-skia-video: f14e14faa28f9c00844cc497299282468b984bb0
+  azzapp-react-native-skia-video: 897d599d9228744b3549fe31154aa6e0501d4224
   boost: d3f49c53809116a5d38da093a8aa78bf551aed09
   DoubleConversion: 76ab83afb40bddeeee456813d9c04f67f78771b5
   EXAV: cb6e8dbcc40873d8a386af357e6c2eb55d6d739e

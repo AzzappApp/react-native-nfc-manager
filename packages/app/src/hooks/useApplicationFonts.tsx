@@ -67,9 +67,11 @@ import { SourceSansPro_400Regular } from '@expo-google-fonts/source-sans-pro';
 import { Ultra_400Regular } from '@expo-google-fonts/ultra';
 import { WaterBrush_400Regular } from '@expo-google-fonts/water-brush';
 import { YesevaOne_400Regular } from '@expo-google-fonts/yeseva-one';
-import { useFonts as useRNSkiaFonts } from '@shopify/react-native-skia';
+import { Skia } from '@shopify/react-native-skia';
 import { useFonts } from 'expo-font';
+import { Image } from 'react-native';
 import type { ApplicationFonts } from '@azzapp/shared/fontHelpers';
+import type { SkTypefaceFontProvider } from '@shopify/react-native-skia';
 
 const fontMap: Record<ApplicationFonts, any> = {
   AmaticSC_Bold: AmaticSC_700Bold,
@@ -131,16 +133,36 @@ const fontMap: Record<ApplicationFonts, any> = {
   YesevaOne_Regular: YesevaOne_400Regular,
 };
 
-const useApplicationFonts = () => {
-  return useFonts(fontMap);
+export const skiaFontManager: SkTypefaceFontProvider =
+  Skia.TypefaceFontProvider.Make();
+
+let skiaFontManagerLoadingInitialized = false;
+export const loadSkiaTypeFonts = () => {
+  if (skiaFontManagerLoadingInitialized) {
+    return;
+  }
+  skiaFontManagerLoadingInitialized = true;
+  Object.entries(fontMap).map(([familyName, typefaceToLoad]) => {
+    const uri = Image.resolveAssetSource(typefaceToLoad).uri;
+    return Skia.Data.fromURI(uri).then(
+      data => {
+        const tf = Skia.Typeface.MakeFreeTypeFaceFromData(data);
+        if (tf === null) {
+          console.warn(`Couldn't create typeface for ${familyName}`);
+          return null;
+        }
+        skiaFontManager.registerFont(tf, familyName);
+      },
+      err => {
+        console.warn('Failed to load typeface', err);
+        return null;
+      },
+    );
+  });
 };
 
-export const useSkiaApplicationFonts = () => {
-  return useRNSkiaFonts(
-    Object.fromEntries(
-      Object.entries(fontMap).map(([font, source]) => [font, [source]]),
-    ),
-  );
+const useApplicationFonts = () => {
+  return useFonts(fontMap);
 };
 
 export default useApplicationFonts;

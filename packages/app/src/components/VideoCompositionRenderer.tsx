@@ -129,21 +129,21 @@ const VideoCompositionRenderer = (
 
   useFrameCallback(() => {
     'worklet';
-    if (!framesExtractor || !nativeId.value) {
+    if (!nativeId.value) {
       return;
     }
 
-    const currentTime = framesExtractor.currentTime;
-    const frames = framesExtractor.decodeCompositionFrames();
     try {
       SkiaViewApi.callJsiMethod(
         nativeId.value,
         'renderToCanvas',
         (canvas: SkCanvas) => {
           canvas.clear(Skia.Color('#00000000'));
-          if (!composition) {
+          if (!composition || !framesExtractor) {
             return;
           }
+          const currentTime = framesExtractor.currentTime;
+          const frames = framesExtractor.decodeCompositionFrames();
           drawFrame({
             canvas,
             width: width * pixelRatio,

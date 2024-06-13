@@ -2,7 +2,6 @@ import {
   ImageFormat,
   createPicture,
   drawAsImageFromPicture,
-  type SkTypefaceFontProvider,
 } from '@shopify/react-native-skia';
 import { useCallback, useState } from 'react';
 import { Platform, unstable_batchedUpdates } from 'react-native';
@@ -43,7 +42,6 @@ export type SavingStatus =
 const useSaveCover = (
   webCardId: string,
   coverEditorState: CoverEditorState,
-  fontManager: SkTypefaceFontProvider | null,
 ) => {
   const [savingStatus, setSavingStatus] = useState<SavingStatus | null>(null);
   const [error, setError] = useState<any>(null);
@@ -71,7 +69,7 @@ const useSaveCover = (
     let path: string;
     let kind: 'image' | 'video';
     try {
-      ({ path, kind } = await createCoverMedia(coverEditorState, fontManager));
+      ({ path, kind } = await createCoverMedia(coverEditorState));
     } catch (error) {
       setSavingStatus('error');
       setError(error);
@@ -144,7 +142,7 @@ const useSaveCover = (
       setSavingStatus('complete');
       setProgressIndicator(null);
     });
-  }, [commit, coverEditorState, fontManager, webCardId]);
+  }, [commit, coverEditorState, webCardId]);
 
   const reset = useCallback(() => {
     unstable_batchedUpdates(() => {
@@ -192,10 +190,7 @@ const isCoverEditorStateValid = (coverEditorState: CoverEditorState) => {
   );
 };
 
-const createCoverMedia = async (
-  coverEditorState: CoverEditorState,
-  fontManager: SkTypefaceFontProvider | null,
-) => {
+const createCoverMedia = async (coverEditorState: CoverEditorState) => {
   const {
     coverTransition,
     medias,
@@ -232,7 +227,6 @@ const createCoverMedia = async (
           coverEditorState,
           images,
           lutShaders,
-          fontManager,
         });
       }),
       COVER_MEDIA_RESOLUTION,
@@ -310,7 +304,6 @@ const createCoverMedia = async (
           images,
           lutShaders,
           videoScales,
-          fontManager,
         });
       },
     );

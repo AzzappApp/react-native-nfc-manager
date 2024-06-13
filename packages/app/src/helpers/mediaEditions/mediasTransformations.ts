@@ -110,7 +110,7 @@ export const transformImage = ({
     TileMode.Decal,
     TileMode.Decal,
     FilterMode.Linear,
-    MipmapMode.None,
+    MipmapMode.Linear,
     matrix,
   );
 

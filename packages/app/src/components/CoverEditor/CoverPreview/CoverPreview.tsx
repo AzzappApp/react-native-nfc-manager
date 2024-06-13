@@ -24,6 +24,9 @@ import {
   COVER_CARD_RADIUS,
   COVER_IMAGE_DEFAULT_DURATION,
   COVER_RATIO,
+  LINKS_BORDER_WIDTH,
+  LINKS_ELEMENT_WRAPPER_MULTIPLER,
+  LINKS_GAP,
 } from '@azzapp/shared/coverHelpers';
 import { colors, shadow } from '#theme';
 import ImagePicker, { EditImageStep } from '#components/ImagePicker';
@@ -55,11 +58,7 @@ import type {
   FrameDrawer,
   VideoCompositionItem,
 } from '@azzapp/react-native-skia-video';
-import type {
-  SkImage,
-  SkRect,
-  SkTypefaceFontProvider,
-} from '@shopify/react-native-skia';
+import type { SkImage, SkRect } from '@shopify/react-native-skia';
 import type {
   GestureResponderEvent,
   LayoutChangeEvent,
@@ -68,10 +67,6 @@ import type {
 import type { ViewProps } from 'react-native-svg/lib/typescript/fabric/utils';
 
 type CoverPreviewProps = Exclude<ViewProps, 'children'> & {
-  /**
-   * Font manager used to load the fonts used in the cover
-   */
-  fontManager: SkTypefaceFontProvider;
   /**
    * Width of the cover preview
    */
@@ -97,7 +92,6 @@ const CoverPreview = ({
   width: viewWidth,
   height: viewHeight,
   style,
-  fontManager,
   onKeyboardTranslateWorklet,
   ...props
 }: CoverPreviewProps) => {
@@ -249,7 +243,6 @@ const CoverPreview = ({
         const layer = activeLayer.layer;
         const paragraph = createParagraph({
           layer,
-          fontManager,
           canvasWidth: viewWidth,
         });
 
@@ -301,7 +294,6 @@ const CoverPreview = ({
   }, [
     activeLayer,
     activeLayerBounds,
-    fontManager,
     editedTextFontSize,
     viewHeight,
     viewWidth,
@@ -379,7 +371,6 @@ const CoverPreview = ({
         images,
         lutShaders,
         videoScales,
-        fontManager,
       });
 
       if (activeLayerBounds.value) {
@@ -402,7 +393,6 @@ const CoverPreview = ({
       editionMode,
       images,
       videoScales,
-      fontManager,
       editedTextFontSize,
       selectedLayerIndex,
     ],
@@ -426,7 +416,6 @@ const CoverPreview = ({
         const { position, width: layerWidth, rotation } = textLayer;
         const paragraph = createParagraph({
           layer: textLayer,
-          fontManager,
           canvasWidth,
         });
         const bounds = percentRectToRect(
@@ -481,7 +470,6 @@ const CoverPreview = ({
     [
       dispatch,
       editionMode,
-      fontManager,
       viewHeight,
       overlayLayers,
       selectedLayerIndex,
@@ -570,7 +558,6 @@ const CoverPreview = ({
             fontSize,
             width: layerWidth,
           },
-          fontManager,
           canvasWidth: viewWidth,
         });
         const layerHeight = paragraph.getHeight() / viewHeight;
@@ -601,7 +588,6 @@ const CoverPreview = ({
     [
       activeLayer,
       activeLayerBounds,
-      fontManager,
       editedTextFontSize,
       gestureOffset,
       viewHeight,
@@ -705,7 +691,6 @@ const CoverPreview = ({
       if (activeLayer.kind === 'text') {
         const paragraph = createParagraph({
           layer: { ...activeLayer.layer, width: newBounds.width },
-          fontManager,
           canvasWidth: viewWidth,
         });
         newBounds = {
@@ -722,7 +707,6 @@ const CoverPreview = ({
       activeLayer.kind,
       activeLayer.layer,
       activeLayerBounds,
-      fontManager,
       gestureOffset.value,
       viewHeight,
       viewWidth,
@@ -1305,10 +1289,6 @@ const MAX_DISPLAY_DECODER_RESOLUTION = Math.min(
 const CONTROLS_BUTTON_ICON_SIZE = 20;
 const CONTROLS_BUTTON_HEIGHT = 30;
 const OVERLAY_CONTROLS_MARGIN = 20;
-
-export const LINKS_GAP = 15;
-export const LINKS_BORDER_WIDTH = 2;
-export const LINKS_ELEMENT_WRAPPER_MULTIPLER = 1.5;
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 const AnimatedTextInput = Animated.createAnimatedComponent(TextInput);
