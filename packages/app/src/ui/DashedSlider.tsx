@@ -52,25 +52,21 @@ const DashedSlider = ({
 
   const hasBeenTouched = useSharedValue(false);
 
-  const animationActive = useSharedValue(false);
-
   const previousValue = useRef<number | null>(null);
 
   useInterval(() => {
-    if (!animationActive.value || !onChange) {
+    const nextValue = Math.round(pan.value / step) * step;
+    if (previousValue.current === nextValue || !onChange) {
       return;
     }
-    const nextValue = Math.round(pan.value / step) * step;
-    if (previousValue.current !== nextValue) {
-      onChange(Math.round(pan.value / step) * step);
-      previousValue.current = nextValue;
-    }
+
+    onChange(Math.round(pan.value / step) * step);
+    previousValue.current = nextValue;
   }, 16);
 
   const panGesture = Gesture.Pan()
     .onBegin(() => {
       animationOffsetValue.value = pan.value;
-      animationActive.value = true;
       if (!hasBeenTouched.value) {
         hasBeenTouched.value = true;
         if (onTouched) {
@@ -89,16 +85,10 @@ const DashedSlider = ({
     })
     .onEnd(() => {
       const clamped = getClampedValue(pan.value, step, min, max);
-      pan.value = withTiming(
-        clamped,
-        {
-          duration: 50,
-          easing: Easing.out(Easing.exp),
-        },
-        () => {
-          animationActive.value = false;
-        },
-      );
+      pan.value = withTiming(clamped, {
+        duration: 50,
+        easing: Easing.out(Easing.exp),
+      });
     });
 
   const steps = range(min, max, step);
