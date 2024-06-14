@@ -63,8 +63,7 @@ const HomeBottomPanel = ({ user: userKey }: HomeBottomPanelProps) => {
   );
   const { profiles } = user;
   const [selectedPanel, setSelectedPanel] = useState<HOME_TAB>('CONTACT_CARD');
-  const { inputRange, currentIndexSharedValue, currentIndexProfile } =
-    useHomeScreenContext();
+  const { inputRange, currentIndexSharedValue } = useHomeScreenContext();
   //#endregion
 
   const bottomPanelVisible = useMemo(() => {
@@ -80,6 +79,7 @@ const HomeBottomPanel = ({ user: userKey }: HomeBottomPanelProps) => {
       }) ?? [];
     return [0, ...res];
   }, [profiles]);
+
   const mainTabBarVisible = useDerivedValue(() => {
     if (inputRange.length > 1) {
       return Math.pow(
@@ -95,26 +95,16 @@ const HomeBottomPanel = ({ user: userKey }: HomeBottomPanelProps) => {
       return bottomPanelVisible[0];
     }
   }, [bottomPanelVisible, currentIndexSharedValue.value, inputRange]);
-
   const bottomPanelStyle = useAnimatedStyle(() => {
     if (inputRange.length === 0)
       return { opacity: 1, pointerEvents: 'box-none' };
 
     return {
-      opacity: interpolate(
-        currentIndexSharedValue.value,
-        inputRange,
-        bottomPanelVisible,
-      ),
+      opacity: mainTabBarVisible.value,
       pointerEvents:
-        bottomPanelVisible[currentIndexProfile.value] === 1 ? 'auto' : 'none',
+        Math.round(mainTabBarVisible.value) === 1 ? 'auto' : 'none',
     };
-  }, [
-    bottomPanelVisible,
-    currentIndexProfile.value,
-    currentIndexSharedValue.value,
-    inputRange,
-  ]);
+  });
 
   useMainTabBarVisibilityController(mainTabBarVisible);
   //#endregion
@@ -129,7 +119,10 @@ const HomeBottomPanel = ({ user: userKey }: HomeBottomPanelProps) => {
       <View style={styles.informationPanel}>
         <HomeBottomPanelMessage user={profiles!} />
       </View>
-      <Animated.View style={[styles.bottomPanel, bottomPanelStyle]}>
+      <Animated.View
+        style={[styles.bottomPanel, bottomPanelStyle]}
+        collapsable={false}
+      >
         <HomeMenu selected={selectedPanel} setSelected={setSelectedPanel} />
         <View
           style={{

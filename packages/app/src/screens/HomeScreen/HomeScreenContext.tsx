@@ -5,7 +5,11 @@ import {
   useRouteWillChange,
   useScreenHasFocus,
 } from '#components/NativeRouter';
-import { addAuthStateListener, onChangeWebCard } from '#helpers/authStore';
+import {
+  addAuthStateListener,
+  getAuthState,
+  onChangeWebCard,
+} from '#helpers/authStore';
 import { getRelayEnvironment } from '#helpers/relayEnvironment';
 import { usePrefetchRoute } from '#helpers/ScreenPrefetcher';
 import type { HomeScreenContext_user$key } from '#relayArtifacts/HomeScreenContext_user.graphql';
@@ -28,12 +32,10 @@ const HomeScreenContext = React.createContext<
 type HomeScreenProviderProps = {
   children: ReactNode;
   userKey: HomeScreenContext_user$key;
-  initialProfileIndex: number;
 };
 export const HomeScreenProvider = ({
   children,
   userKey,
-  initialProfileIndex,
 }: HomeScreenProviderProps) => {
   const user = useFragment(
     graphql`
@@ -51,7 +53,17 @@ export const HomeScreenProvider = ({
     `,
     userKey,
   );
-  const currentIndexSharedValue = useSharedValue(initialProfileIndex);
+  const initialProfileIndex = useRef(0);
+  useEffect(() => {
+    const index = user?.profiles?.findIndex(
+      profile => profile.id === getAuthState().profileInfos?.profileId,
+    );
+    initialProfileIndex.current =
+      index !== undefined && index !== -1 ? index + 1 : 0;
+    // we only want to run this once
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+  const currentIndexSharedValue = useSharedValue(initialProfileIndex.current);
 
   const currentIndexProfile = useDerivedValue(() => {
     return Math.round(currentIndexSharedValue.value);
@@ -158,12 +170,21 @@ export const HomeScreenProvider = ({
     [currentIndexSharedValue, focus, user.profiles],
   );
 
+  if (
+    profilesRef.current &&
+    user?.profiles &&
+    profilesRef.current.length > user.profiles.length
+  ) {
+    initialProfileIndex.current = 1;
+    onCurrentProfileIndexChange(1);
+  }
+
   return (
     <HomeScreenContext.Provider
       value={{
         currentIndexSharedValue,
         inputRange,
-        initialProfileIndex,
+        initialProfileIndex: initialProfileIndex.current,
         currentIndexProfile,
         onCurrentProfileIndexChange,
       }}

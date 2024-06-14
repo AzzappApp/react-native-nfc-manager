@@ -3,7 +3,6 @@ import { graphql, usePreloadedQuery } from 'react-relay';
 import { mainRoutes } from '#mobileRoutes';
 import { useMainTabBarVisibilityController } from '#components/MainTabBar';
 import { useRouter } from '#components/NativeRouter';
-import { getAuthState } from '#helpers/authStore';
 import { dispatchGlobalEvent } from '#helpers/globalEvents';
 import relayScreen from '#helpers/relayScreen';
 import { useDeepLinkStoredRoute } from '#hooks/useDeepLink';
@@ -56,15 +55,6 @@ const HomeScreen = ({
     }
   }, [hasProfile, router]);
 
-  const initialProfileIndex = useMemo(() => {
-    const index = currentUser?.profiles?.findIndex(
-      profile => profile.id === getAuthState().profileInfos?.profileId,
-    );
-    return index !== undefined && index !== -1 ? index + 1 : 0;
-    // we only want to run this once
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
   if (!currentUser) {
     // should never happen
     return null;
@@ -73,9 +63,8 @@ const HomeScreen = ({
   return (
     <Suspense>
       <HomeScreenProvider
-        key={currentUser.profiles?.length ?? '0'}
-        initialProfileIndex={initialProfileIndex}
         userKey={currentUser}
+        key={currentUser.profiles?.length ?? '0'}
       >
         <HomeScreenContent user={currentUser} />
       </HomeScreenProvider>

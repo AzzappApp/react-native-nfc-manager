@@ -46,7 +46,7 @@ const HomeContactCard = ({ user, height }: HomeContactCardProps) => {
       }}
     >
       {profiles?.map((item, index) => (
-        <MemoContactCardItem
+        <ContactCardItem
           key={item.webCard.id}
           width={windowWidth}
           height={height}
@@ -153,7 +153,6 @@ const ContactCardItem = ({
     </Animated.View>
   );
 };
-const MemoContactCardItem = ContactCardItem;
 
 const styleSheet = createStyleSheet(appearance => ({
   itemContainer: {
