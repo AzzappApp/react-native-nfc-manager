@@ -14,7 +14,7 @@ import PressableOpacity from '#ui/PressableOpacity';
 import Text from '#ui/Text';
 import {
   useHomeScreenInputProfileRange,
-  useHomeScreenProfileIndex,
+  useHomeScreenContext,
 } from './HomeScreenContext';
 import type { HomeInformations_user$key } from '#relayArtifacts/HomeInformations_user.graphql';
 type HomeInformationsProps = {
@@ -85,16 +85,16 @@ const HomeInformations = ({ height, user }: HomeInformationsProps) => {
   const nbFollowers = useSharedValue('-1');
   const nbFollowings = useSharedValue('-1');
 
-  const currentProfileIndex = useHomeScreenProfileIndex();
-  const currentIndex = Math.round(currentProfileIndex.value);
+  const { currentIndexSharedValue, currentIndexProfile } =
+    useHomeScreenContext();
   //using profiles object directly in animatedReaction causes error animatedHost(seems to be the case for all relay query result)
   useEffect(() => {
-    nbPosts.value = format(nbPostsValue[currentIndex]);
-    nbLikes.value = format(nbLikesValue[currentIndex]);
-    nbFollowings.value = format(nbFollowingsValue[currentIndex]);
-    nbFollowers.value = format(nbFollowersValue[currentIndex]);
+    nbPosts.value = format(nbPostsValue[currentIndexProfile.value]);
+    nbLikes.value = format(nbLikesValue[currentIndexProfile.value]);
+    nbFollowings.value = format(nbFollowingsValue[currentIndexProfile.value]);
+    nbFollowers.value = format(nbFollowersValue[currentIndexProfile.value]);
   }, [
-    currentIndex,
+    currentIndexProfile,
     nbFollowers,
     nbFollowersValue,
     nbFollowings,
@@ -108,7 +108,7 @@ const HomeInformations = ({ height, user }: HomeInformationsProps) => {
   const inputRange = useHomeScreenInputProfileRange();
 
   useAnimatedReaction(
-    () => currentProfileIndex.value,
+    () => currentIndexSharedValue.value,
     actual => {
       if (actual >= 0 && inputRange && inputRange?.length > 1) {
         nbLikes.value = format(interpolate(actual, inputRange, nbLikesValue));
@@ -129,7 +129,7 @@ const HomeInformations = ({ height, user }: HomeInformationsProps) => {
   );
   const router = useRouter();
   const goToPosts = useCallback(() => {
-    const currentProfile = profiles?.[Math.round(currentIndex)];
+    const currentProfile = profiles?.[currentIndexProfile.value - 1];
     if (currentProfile?.webCard.userName) {
       router.push({
         route: 'WEBCARD',
@@ -140,7 +140,7 @@ const HomeInformations = ({ height, user }: HomeInformationsProps) => {
         },
       });
     }
-  }, [currentIndex, profiles, router]);
+  }, [currentIndexProfile.value, profiles, router]);
 
   const goToLikedPost = useCallback(() => {
     router.push({

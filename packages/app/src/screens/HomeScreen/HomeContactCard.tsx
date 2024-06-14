@@ -11,7 +11,7 @@ import { useRouter } from '#components/NativeRouter';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import useAuthState from '#hooks/useAuthState';
 import PressableNative from '#ui/PressableNative';
-import { useHomeScreenProfileIndex } from './HomeScreenContext';
+import { useHomeScreenCurrentIndex } from './HomeScreenContext';
 import type { HomeContactCard_profile$key } from '#relayArtifacts/HomeContactCard_profile.graphql';
 import type { HomeContactCard_user$key } from '#relayArtifacts/HomeContactCard_user.graphql';
 
@@ -74,7 +74,7 @@ const ContactCardItem = ({
   index,
 }: ContactCardItemProps) => {
   const styles = useStyleSheet(styleSheet);
-  const currentIndexSharedValue = useHomeScreenProfileIndex();
+  const currentIndexSharedValue = useHomeScreenCurrentIndex();
   const positionStyle = useAnimatedStyle(() => ({
     //index start a 0 for the firstItem, so add +1 in thisd case
     transform: [

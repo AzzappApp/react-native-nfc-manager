@@ -193,7 +193,7 @@ export const useHomeScreenInputProfileRange = () => {
   return context.inputRange;
 };
 
-export const useHomeScreenProfileIndex = () => {
+export const useHomeScreenCurrentIndex = () => {
   const context = React.useContext(HomeScreenContext);
   if (context === undefined) {
     throw new Error(
