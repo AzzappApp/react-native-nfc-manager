@@ -1,4 +1,4 @@
-## 0.5.15-canary.147
+## 0.5.15-canary.148
 
 * **fix:**  - **contactCard:** [#3742](https://github.com/AzzappApp/azzapp/pull/3742) use company name from common info if present ([#3744](https://github.com/AzzappApp/azzapp/pull/3744))
 * **fix:**  - remove context code from homestatistic used in mulituser (to be updated) ([#3746](https://github.com/AzzappApp/azzapp/pull/3746))
