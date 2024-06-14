@@ -13,7 +13,7 @@
     "typecheck": "turbo run typecheck",
     "test": "turbo run test",
     "build": "turbo run build",
-    "build-app-dependencies": "turbo run app:build --filter=app^...",
+    "build-app-dependencies": "turbo run app:build --filter=./packages/app^...",
     "dev": "node ./scripts/dev.js",
     "build:ios": "turbo run build:ios",
     "build:android": "turbo run build:android",

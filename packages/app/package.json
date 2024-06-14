@@ -5,6 +5,7 @@
     "test": "jest",
     "typecheck": "tsc --noEmit",
     "rn:watch": "react-native start",
+    "dev": "react-native start",
     "run:android": "react-native run-android --no-packager --mode developmentDebug --appId=com.azzapp.app_dev",
     "run:ios": "react-native run-ios --no-packager --scheme azzapp-dev",
     "pod-install": "cd ios && bundle exec pod install",
