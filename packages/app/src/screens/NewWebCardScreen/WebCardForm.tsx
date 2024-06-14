@@ -23,7 +23,7 @@ import ERRORS from '@azzapp/shared/errors';
 import { isValidUserName } from '@azzapp/shared/stringHelpers';
 import { buildUserUrl } from '@azzapp/shared/urlHelpers';
 import { colors } from '#theme';
-import { dispatchGlobalEvent } from '#helpers/globalEvents';
+import { onChangeWebCard } from '#helpers/authStore';
 import { keyExtractor } from '#helpers/idHelpers';
 import useScreenInsets from '#hooks/useScreenInsets';
 import Icon from '#ui/Icon';
@@ -343,13 +343,10 @@ const WebCardForm = (
             profileRole,
             webCard,
           } = data.createWebCard.profile;
-          dispatchGlobalEvent({
-            type: 'WEBCARD_CHANGE',
-            payload: {
-              profileId,
-              webCardId: webCard.id,
-              profileRole: profileRole!,
-            },
+          onChangeWebCard({
+            profileId,
+            webCardId: webCard.id,
+            profileRole: profileRole!,
           }).finally(() => {
             onWebCardCreated(profileId, webCard.id, webCard.userName);
             resolve();
