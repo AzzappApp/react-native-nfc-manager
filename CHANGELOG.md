@@ -1,4 +1,4 @@
-## 0.5.15-canary.150
+## 0.5.15-canary.151
 
 * **fix:**  - selecting profile after creating a new one with tempalte ([#3753](https://github.com/AzzappApp/azzapp/pull/3753))
 * **fix:**  - 🐛 always fetch all profiles on multi user screen ([#3752](https://github.com/AzzappApp/azzapp/pull/3752))
