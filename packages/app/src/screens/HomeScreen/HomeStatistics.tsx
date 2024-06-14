@@ -19,7 +19,6 @@ import {
 } from '#helpers/createStyles';
 import Text from '#ui/Text';
 import { format } from './HomeInformations';
-import { useHomeScreenInputProfileRange } from './HomeScreenContext';
 import HomeStatisticsChart from './HomeStatisticsChart';
 import type { HomeStatistics_profiles$key } from '#relayArtifacts/HomeStatistics_profiles.graphql';
 
@@ -67,7 +66,13 @@ const HomeStatistics = ({
   const scrollHandler = useAnimatedScrollHandler(event => {
     scrollIndexOffset.value = event.contentOffset.x / BOX_NUMBER_WIDTH;
   });
-  const inputRange = useHomeScreenInputProfileRange();
+  // cant use the context until we are splitting this screen from the multiuser
+  // const inputRange = useHomeScreenInputProfileRange();
+   const inputRange = useMemo(
+    () => [0, ...(profiles?.map((_, index) => index + 1) ?? [])],
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [profiles?.length],
+  );
 
   const likes = useMemo(
     () => profiles?.map(profile => profile.webCard.nbLikes) ?? [],
