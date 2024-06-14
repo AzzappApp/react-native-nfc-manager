@@ -26,6 +26,10 @@
     "clean": "rm -rf lib && rm -f tsconfig.build.tsbuildinfo && rm -rf node_modules",
     "studio": "drizzle-kit studio --config ./src/drizzle.config.ts"
   },
+  "devScripts": [
+    "compile:watch",
+    "definition:watch"
+  ],
   "dependencies": {
     "@azzapp/shared": "workspace:^",
     "@paralleldrive/cuid2": "^2.2.2",

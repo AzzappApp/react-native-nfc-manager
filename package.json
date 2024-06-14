@@ -13,8 +13,10 @@
     "typecheck": "turbo run typecheck",
     "test": "turbo run test",
     "build": "turbo run build",
-    "build-app-dependencies": "turbo run app:build --filter=./packages/app^...",
-    "dev": "turbo watch dev graphql-codegen relay:watch",
+    "build-app-dependencies": "turbo run app:build --filter=app^...",
+    "dev": "node ./scripts/dev.js",
+    "build:ios": "turbo run build:ios",
+    "build:android": "turbo run build:android",
     "graphql-codegen": "graphql-codegen",
     "relay:build": "relay-compiler",
     "relay:watch": "relay-compiler --watch ./relay.config.dev.js",
@@ -31,6 +33,10 @@
     "write-dev-changelog": "node ./scripts/writeDevChangeLog.js",
     "persist-queries": "yarn workspace @azzapp/web persist-queries"
   },
+  "devScripts": [
+    "relay:watch",
+    "graphql-codegen --watch"
+  ],
   "devDependencies": {
     "@babel/cli": "^7.24.7",
     "@babel/core": "^7.24.7",
@@ -62,6 +68,8 @@
     "babel-plugin-formatjs": "^10.5.16",
     "babel-plugin-module-resolver": "^5.0.2",
     "babel-plugin-relay": "^16.2.0",
+    "blessed": "^0.1.81",
+    "blessed-xterm": "^1.4.4",
     "csv-stringify": "^6.4.6",
     "eslint": "^8.57.0",
     "eslint-config-prettier": "^9.1.0",

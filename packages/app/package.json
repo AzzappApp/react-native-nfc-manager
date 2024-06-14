@@ -4,7 +4,7 @@
   "scripts": {
     "test": "jest",
     "typecheck": "tsc --noEmit",
-    "dev": "react-native start",
+    "rn:watch": "react-native start",
     "run:android": "react-native run-android --no-packager --mode developmentDebug --appId=com.azzapp.app_dev",
     "run:ios": "react-native run-ios --no-packager --scheme azzapp-dev",
     "pod-install": "cd ios && bundle exec pod install",
@@ -12,6 +12,9 @@
     "eas-build-post-install": "(cd ../.. && yarn build-app-dependencies)",
     "eas-build-pre-install": "corepack enable"
   },
+  "devScripts": [
+    "rn:watch"
+  ],
   "dependencies": {
     "@azzapp/i18n": "workspace:^",
     "@azzapp/react-native-skia-video": "v0.4.2",

@@ -25,6 +25,10 @@
     "test": "NODE_OPTIONS=--experimental-vm-modules jest",
     "test:e2e": "NODE_OPTIONS=--experimental-vm-modules jest -c ./jest-e2e.config.js"
   },
+  "devScripts": [
+    "compile:watch",
+    "definition:watch"
+  ],
   "dependencies": {
     "@azzapp/data": "workspace:^",
     "@azzapp/i18n": "workspace:^",
