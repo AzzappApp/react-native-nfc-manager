@@ -112,6 +112,7 @@ const getGoogleWalletPass = async (
               (`${contactCard?.firstName ?? ''} ${
                 contactCard?.lastName ?? ''
               }`.trim() ||
+                webCard?.commonInformation?.company ||
                 contactCard?.company) ??
               '',
           },

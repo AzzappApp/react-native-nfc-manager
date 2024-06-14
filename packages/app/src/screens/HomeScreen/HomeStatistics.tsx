@@ -68,7 +68,7 @@ const HomeStatistics = ({
   });
   // cant use the context until we are splitting this screen from the multiuser
   // const inputRange = useHomeScreenInputProfileRange();
-   const inputRange = useMemo(
+  const inputRange = useMemo(
     () => [0, ...(profiles?.map((_, index) => index + 1) ?? [])],
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [profiles?.length],
