@@ -246,7 +246,7 @@ const PhotoGalleryMediaList = ({
         showsVerticalScrollIndicator={false}
         keyExtractor={keyExtractor}
         renderItem={renderItem}
-        onEndReachedThreshold={medias.length <= 16 ? 0.1 : 1.5}
+        onEndReachedThreshold={medias.length <= 16 ? 0.1 : 0.5}
         drawDistance={1200} //this value will need tweaking with android low end device
         onEndReached={onEndReached}
         accessibilityRole="list"
