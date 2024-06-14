@@ -1,5 +1,6 @@
-## 0.5.15-canary.144
+## 0.5.15-canary.145
 
+* **fix:**  - 🐛 correctly load more media ([#3735](https://github.com/AzzappApp/azzapp/pull/3735))
 * **fix:**  - **cover:** [#3626](https://github.com/AzzappApp/azzapp/pull/3626) once rotated, text are unselectables ([#3721](https://github.com/AzzappApp/azzapp/pull/3721))
 * **fix:**  - dynamicLinks are optional in cover ([#3719](https://github.com/AzzappApp/azzapp/pull/3719))
 * **fix:**  - 🐛 fixes on display color tryptich and link ui ([#3716](https://github.com/AzzappApp/azzapp/pull/3716))
