@@ -33,7 +33,7 @@ export const createParagraph = ({
     shadow,
     width: layerWidth,
   } = layer;
-  const textWidth = layerWidth * canvasWidth;
+  const textWidth = (layerWidth * canvasWidth) / 100;
 
   const paragraph = Skia.ParagraphBuilder.Make(
     { textAlign: textAlignMap[textAlign ?? 'left'] },

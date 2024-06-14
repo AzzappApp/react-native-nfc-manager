@@ -427,8 +427,8 @@ export function coverEditorReducer(
           ...state.textLayers,
           {
             ...payload,
-            width: 0.4,
-            position: { x: 0.3, y: 0.5 },
+            width: 40,
+            position: { x: 30, y: 50 },
             rotation: 0,
             shadow: false,
           },
@@ -463,8 +463,8 @@ export function coverEditorReducer(
       const aspectRatio = payload.width / payload.height;
       const size =
         aspectRatio > 1
-          ? { width: 0.5, height: (0.5 / aspectRatio) * COVER_RATIO }
-          : { width: (0.5 * aspectRatio) / COVER_RATIO, height: 0.5 };
+          ? { width: 50, height: (50 / aspectRatio) * COVER_RATIO }
+          : { width: (50 * aspectRatio) / COVER_RATIO, height: 50 };
       return {
         ...state,
         editionMode: 'overlay',
@@ -480,8 +480,8 @@ export function coverEditorReducer(
             // TODO
             animation: null,
             bounds: {
-              x: 0.5,
-              y: 0.5,
+              x: 50,
+              y: 50,
               ...size,
             },
             rotation: 0,

@@ -34,8 +34,6 @@ const ToggleButton = ({
     colorScheme ?? 'light',
   );
 
-  console.log({ toggled });
-
   return (
     <PressableNative
       onPress={onPress}

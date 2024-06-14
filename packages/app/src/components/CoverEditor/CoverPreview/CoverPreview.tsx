@@ -251,7 +251,7 @@ const CoverPreview = ({
             x: layer.position.x,
             y: layer.position.y,
             width: layer.width,
-            height: paragraph.getHeight() / viewHeight,
+            height: (paragraph.getHeight() * 100) / viewHeight,
           },
           rotation: layer.rotation,
         };
@@ -423,7 +423,7 @@ const CoverPreview = ({
             x: position.x,
             y: position.y,
             width: layerWidth,
-            height: paragraph.getHeight() / canvasHeight,
+            height: (paragraph.getHeight() * 100) / canvasHeight,
           },
           viewWidth,
           viewHeight,
@@ -505,27 +505,27 @@ const CoverPreview = ({
 
       const cos = Math.cos(rotation);
       const sin = Math.sin(rotation);
-
       const boundingBoxWidth =
-        (Math.abs(bounds.width * canvasWidth * cos) +
-          Math.abs(bounds.height * canvasHeight * sin)) /
-        canvasWidth;
+        ((Math.abs(((bounds.width * canvasWidth) / 100) * cos) +
+          Math.abs(((bounds.height * canvasHeight) / 100) * sin)) /
+          canvasWidth) *
+        100;
       const boundingBoxHeight =
-        (Math.abs(bounds.height * canvasHeight * cos) +
-          Math.abs(bounds.width * canvasWidth * sin)) /
-        canvasHeight;
-
+        ((Math.abs(((bounds.height * canvasHeight) / 100) * cos) +
+          Math.abs(((bounds.width * canvasWidth) / 100) * sin)) /
+          canvasHeight) *
+        100;
       activeLayerBounds.value = {
         bounds: {
           x: clamp(
-            offsetX + translateX / canvasWidth,
+            offsetX + (translateX * 100) / canvasWidth,
             boundingBoxWidth / 2,
-            1 - boundingBoxWidth / 2,
+            100 - boundingBoxWidth / 2,
           ),
           y: clamp(
-            offsetY + translateY / canvasHeight,
+            offsetY + (translateY * 100) / canvasHeight,
             boundingBoxHeight / 2,
-            1 - boundingBoxHeight / 2,
+            100 - boundingBoxHeight / 2,
           ),
           width: bounds.width,
           height: bounds.height,
@@ -549,7 +549,7 @@ const CoverPreview = ({
       if (activeLayer.kind === 'text') {
         const { x, y, width: offsetWidth } = gestureOffset.value.bounds;
         const layer = activeLayer.layer;
-        const layerWidth = clamp(offsetWidth * scale, 0.2, 0.9);
+        const layerWidth = clamp(offsetWidth * scale, 20, 90);
         const fontSize = Math.round(clamp(layer.fontSize * scale, 10, 48));
         editedTextFontSize.value = fontSize;
         const paragraph = createParagraph({
@@ -560,7 +560,7 @@ const CoverPreview = ({
           },
           canvasWidth: viewWidth,
         });
-        const layerHeight = paragraph.getHeight() / viewHeight;
+        const layerHeight = (paragraph.getHeight() * 100) / viewHeight;
         activeLayerBounds.value = {
           bounds: {
             x,
@@ -572,8 +572,8 @@ const CoverPreview = ({
         };
       } else {
         const { bounds } = gestureOffset.value;
-        const scaledWidth = clamp(bounds.width * scale, 0.2, 1);
-        const scaledHeight = clamp(bounds.height * scale, 0.2, 1);
+        const scaledWidth = clamp(bounds.width * scale, 20, 100);
+        const scaledHeight = clamp(bounds.height * scale, 20, 100);
         activeLayerBounds.value = {
           bounds: {
             x: bounds.x,
@@ -645,13 +645,13 @@ const CoverPreview = ({
       } = gestureOffset.value.bounds;
       let value =
         position === 'top' || position === 'bottom'
-          ? rotatedValueY / viewHeight
-          : rotatedValueX / viewWidth;
+          ? (rotatedValueY * 100) / viewHeight
+          : (rotatedValueX * 100) / viewWidth;
 
       let newBounds: SkRect;
       switch (position) {
         case 'top': {
-          value = clamp(value, -offsetY, offsetHeight - 0.2);
+          value = clamp(value, -offsetY, offsetHeight - 20);
           newBounds = {
             x: offsetX,
             y: offsetY,
@@ -661,7 +661,7 @@ const CoverPreview = ({
           break;
         }
         case 'bottom':
-          value = clamp(value, -offsetHeight - 0.2, offsetY);
+          value = clamp(value, -offsetHeight - 20, offsetY);
           newBounds = {
             x: offsetX,
             y: offsetY,
@@ -670,7 +670,7 @@ const CoverPreview = ({
           };
           break;
         case 'left':
-          value = clamp(value, -offsetX, offsetWidth - 0.2);
+          value = clamp(value, -offsetX, offsetWidth - 20);
           newBounds = {
             x: offsetX,
             y: offsetY,
@@ -679,7 +679,7 @@ const CoverPreview = ({
           };
           break;
         case 'right':
-          value = clamp(value, -offsetWidth - 0.2, offsetX);
+          value = clamp(value, -offsetWidth - 20, offsetX);
           newBounds = {
             x: offsetX,
             y: offsetY,
@@ -695,7 +695,7 @@ const CoverPreview = ({
         });
         newBounds = {
           ...newBounds,
-          height: paragraph.getHeight() / viewHeight,
+          height: (paragraph.getHeight() * 100) / viewHeight,
         };
       }
       activeLayerBounds.value = {
@@ -900,11 +900,12 @@ const CoverPreview = ({
       const { bounds, rotation } = activeLayerBounds.value;
       const fontSize =
         editedTextFontSize.value ?? editedTextLayer?.fontSize ?? 14;
-      const width = bounds.width * viewWidth;
-      const height = bounds.height * viewHeight;
+      const width = (bounds.width * viewWidth) / 100;
+      const height = (bounds.height * viewHeight) / 100;
+
       return {
-        top: bounds.y * viewHeight - height / 2,
-        left: bounds.x * viewWidth - width / 2,
+        top: (bounds.y * viewHeight) / 100 - height / 2,
+        left: (bounds.x * viewWidth) / 100 - width / 2,
         width,
         fontSize: convertToBaseCanvasRatio(fontSize, viewWidth),
         transform: [{ rotate: `${rotation}rad` }],
@@ -912,9 +913,9 @@ const CoverPreview = ({
     }
     if (editedTextLayer) {
       return {
-        top: editedTextLayer.position.y * viewHeight,
-        left: editedTextLayer.position.x * viewWidth,
-        width: editedTextLayer.width * viewWidth,
+        top: (editedTextLayer.position.y * viewHeight) / 100,
+        left: (editedTextLayer.position.x * viewWidth) / 100,
+        width: (editedTextLayer.width * viewWidth) / 100,
         transform: [{ rotate: `${editedTextLayer.rotation}rad` }],
       };
     }
@@ -1010,16 +1011,16 @@ const CoverPreview = ({
     if (activeLayerBounds.value && activeLayer.kind === 'links') {
       const { bounds, rotation } = activeLayerBounds.value;
       return {
-        top: bounds.y * viewHeight,
-        left: bounds.x * viewWidth,
+        top: (bounds.y * viewHeight) / 100,
+        left: (bounds.x * viewWidth) / 100,
         // width: bounds.width * viewWidth,
         transform: [{ rotate: `${rotation}rad` }],
       };
     }
 
     return {
-      top: linksLayer.position.y * viewHeight,
-      left: linksLayer.position.x * viewWidth,
+      top: (linksLayer.position.y * viewHeight) / 100,
+      left: (linksLayer.position.x * viewWidth) / 100,
     };
   });
 
@@ -1095,8 +1096,8 @@ const CoverPreview = ({
                       position: 'absolute',
                       transformOrigin: 'center',
                       transform: [{ rotate: `${linksLayer.rotation}rad` }],
-                      top: linksLayer.position.y * viewHeight,
-                      left: linksLayer.position.x * viewWidth,
+                      top: (linksLayer.position.y * viewHeight) / 100,
+                      left: (linksLayer.position.x * viewWidth) / 100,
                       display: 'flex',
                       flexDirection: 'row',
                       width:
@@ -1104,12 +1105,15 @@ const CoverPreview = ({
                           linksLayer.size * LINKS_ELEMENT_WRAPPER_MULTIPLER +
                             LINKS_BORDER_WIDTH,
                           viewWidth,
-                        ) * linksLayer.links.length,
-                      height: convertToBaseCanvasRatio(
-                        linksLayer.size * LINKS_ELEMENT_WRAPPER_MULTIPLER +
-                          LINKS_BORDER_WIDTH,
-                        viewWidth,
-                      ),
+                        ) *
+                        linksLayer.links.length *
+                        100,
+                      height:
+                        convertToBaseCanvasRatio(
+                          linksLayer.size * LINKS_ELEMENT_WRAPPER_MULTIPLER +
+                            LINKS_BORDER_WIDTH,
+                          viewWidth,
+                        ) * 100,
                       gap: convertToBaseCanvasRatio(LINKS_GAP, viewWidth),
                     },
                     animatedLinksStyle,
@@ -1235,9 +1239,9 @@ const CoverPreview = ({
                         ],
                         textAlign: editedTextLayer.textAlign,
                         padding: 0,
-                        top: editedTextLayer.position.y * viewHeight,
-                        left: editedTextLayer.position.x * viewWidth,
-                        width: editedTextLayer.width * viewWidth,
+                        top: (editedTextLayer.position.y * viewHeight) / 100,
+                        left: (editedTextLayer.position.x * viewWidth) / 100,
+                        width: (editedTextLayer.width * viewWidth) / 100,
                       },
                       animatedTextInputStyle,
                     ]}

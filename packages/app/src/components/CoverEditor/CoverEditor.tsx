@@ -106,8 +106,8 @@ const CoverEditor = (
       color: colors.black,
       size: 24,
       position: {
-        x: 0.2,
-        y: 0.8,
+        x: 20,
+        y: 80,
       },
       rotation: 0,
       shadow: false,
