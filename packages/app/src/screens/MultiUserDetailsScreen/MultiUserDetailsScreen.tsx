@@ -155,6 +155,10 @@ const MultiUserDetailsScreen = ({
               id
               uri: uri(width: 112, pixelRatio: $pixelRatio)
             }
+            logo {
+              id
+              uri: uri(width: 180, pixelRatio: $pixelRatio)
+            }
             user {
               email
               phoneNumber
