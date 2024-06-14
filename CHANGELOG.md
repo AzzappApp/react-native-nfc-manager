@@ -1,5 +1,10 @@
-## 0.5.15-canary.145
+## 0.5.15-canary.146
 
+* **fix:**  - regression on build after putting back dev script
+* **fix:**  - **multiUser:** [#3737](https://github.com/AzzappApp/azzapp/pull/3737) missing logo back ([#3740](https://github.com/AzzappApp/azzapp/pull/3740))
+* **fix:**  - improve Home Screen ([#3738](https://github.com/AzzappApp/azzapp/pull/3738))
+* **feat:**  - **cover:** [#3589](https://github.com/AzzappApp/azzapp/pull/3589) edit current cover with missing media ([#3734](https://github.com/AzzappApp/azzapp/pull/3734))
+* **fix:**  - **cover:** change percent values ([#3726](https://github.com/AzzappApp/azzapp/pull/3726))
 * **fix:**  - 🐛 correctly load more media ([#3735](https://github.com/AzzappApp/azzapp/pull/3735))
 * **fix:**  - **cover:** [#3626](https://github.com/AzzappApp/azzapp/pull/3626) once rotated, text are unselectables ([#3721](https://github.com/AzzappApp/azzapp/pull/3721))
 * **fix:**  - dynamicLinks are optional in cover ([#3719](https://github.com/AzzappApp/azzapp/pull/3719))
