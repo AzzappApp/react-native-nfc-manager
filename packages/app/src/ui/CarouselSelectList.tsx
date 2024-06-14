@@ -153,7 +153,10 @@ function CarouselSelectList<TItem = any>(
       'worklet';
       const index = event.nativeEvent.contentOffset.x / itemWidth;
       onSelectedIndexChange?.(Math.round(index));
-      if (currentProfileIndexSharedValue) {
+      if (
+        currentProfileIndexSharedValue &&
+        currentProfileIndexSharedValue.value !== Math.round(index)
+      ) {
         currentProfileIndexSharedValue.value = Math.round(index);
       }
     },
@@ -251,7 +254,7 @@ function CarouselSelectList<TItem = any>(
   );
 }
 
-export default memo(forwardRef(CarouselSelectList)) as <T>(
+export default forwardRef(CarouselSelectList) as <T>(
   p: CarouselSelectListProps<T> & { ref?: Ref<CarouselSelectListHandle> },
 ) => ReactElement;
 
@@ -274,7 +277,7 @@ const AnimatedItemWrapper = ({
   containerStyle: StyleProp<ViewStyle>;
   width: number;
 }) => {
-  const inputRange = [index - 1, index, index + 1];
+  const inputRange = useMemo(() => [index - 1, index, index + 1], [index]);
 
   const animatedStyle = useAnimatedStyle(() => {
     const scale = interpolate(
@@ -289,12 +292,11 @@ const AnimatedItemWrapper = ({
       [-offset + offsetCenter / 2, 0, offset - offsetCenter / 2],
       Extrapolation.EXTEND,
     );
-
     return {
       width,
       transform: [{ translateX }, { scale }],
     };
-  });
+  }, [inputRange, offset, offsetCenter, scaleRatio, scrollIndex.value, width]);
   return (
     <Animated.View style={[animatedStyle, containerStyle]}>
       {children}

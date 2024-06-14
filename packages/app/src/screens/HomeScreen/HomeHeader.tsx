@@ -1,4 +1,3 @@
-import _ from 'lodash';
 import { useMemo } from 'react';
 import { StyleSheet, View } from 'react-native';
 import Animated, {
@@ -13,23 +12,17 @@ import { getTextColor } from '@azzapp/shared/colorsHelpers';
 import { colors } from '#theme';
 import Header from '#ui/Header';
 import IconButton from '#ui/IconButton';
+import { useHomeScreenContext } from './HomeScreenContext';
 import type { HomeHeader_user$key } from '#relayArtifacts/HomeHeader_user.graphql';
 import type { ColorValue, StyleProp, ViewStyle } from 'react-native';
-import type { SharedValue } from 'react-native-reanimated';
 
 type HomeHeaderProps = {
   openPanel: () => void;
   user: HomeHeader_user$key;
-  currentProfileIndexSharedValue: SharedValue<number>;
   style?: StyleProp<ViewStyle>;
 };
 
-const HomeHeader = ({
-  openPanel,
-  user: userKey,
-  currentProfileIndexSharedValue,
-  style,
-}: HomeHeaderProps) => {
+const HomeHeader = ({ openPanel, user: userKey, style }: HomeHeaderProps) => {
   const { profiles } = useFragment(
     graphql`
       fragment HomeHeader_user on User {
@@ -46,18 +39,20 @@ const HomeHeader = ({
     userKey,
   );
 
-  const inputRange = _.range(0, profiles?.length);
+  const { inputRange, currentIndexSharedValue } = useHomeScreenContext();
   const readableColors = useMemo(
-    () =>
-      profiles?.map(profile => {
+    () => [
+      colors.white,
+      ...(profiles?.map(profile => {
         return profile?.webCard.cardColors?.primary
           ? getTextColor(profile?.webCard.cardColors?.primary)
           : colors.white;
-      }) ?? [],
+      }) ?? []),
+    ],
     [profiles],
   );
   const colorValue = useDerivedValue<ColorValue>(() => {
-    const currentProfileIndex = currentProfileIndexSharedValue.value;
+    const currentProfileIndex = currentIndexSharedValue.value;
     if (inputRange.length > 1) {
       return interpolateColor(currentProfileIndex, inputRange, readableColors);
     }

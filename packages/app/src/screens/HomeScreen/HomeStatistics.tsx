@@ -1,4 +1,3 @@
-import _ from 'lodash';
 import { useMemo } from 'react';
 import { useIntl } from 'react-intl';
 import { Pressable, ScrollView, View, useWindowDimensions } from 'react-native';
@@ -20,6 +19,7 @@ import {
 } from '#helpers/createStyles';
 import Text from '#ui/Text';
 import { format } from './HomeInformations';
+import { useHomeScreenInputProfileRange } from './HomeScreenContext';
 import HomeStatisticsChart from './HomeStatisticsChart';
 import type { HomeStatistics_profiles$key } from '#relayArtifacts/HomeStatistics_profiles.graphql';
 
@@ -67,8 +67,7 @@ const HomeStatistics = ({
   const scrollHandler = useAnimatedScrollHandler(event => {
     scrollIndexOffset.value = event.contentOffset.x / BOX_NUMBER_WIDTH;
   });
-
-  const inputRange = _.range(0, profiles?.length);
+  const inputRange = useHomeScreenInputProfileRange();
 
   const likes = useMemo(
     () => profiles?.map(profile => profile.webCard.nbLikes) ?? [],

@@ -1,28 +1,25 @@
 import * as Clipboard from 'expo-clipboard';
-import { memo, useMemo } from 'react';
+import { useMemo } from 'react';
 import { useIntl } from 'react-intl';
 import { StyleSheet, View } from 'react-native';
-import Animated, { useAnimatedStyle } from 'react-native-reanimated';
+import Animated, {
+  useAnimatedStyle,
+  useDerivedValue,
+} from 'react-native-reanimated';
 import { Toast } from 'react-native-toast-message/lib/src/Toast';
 import { useFragment, graphql } from 'react-relay';
 import { buildUserUrl } from '@azzapp/shared/urlHelpers';
 import { colors } from '#theme';
-import useAuthState from '#hooks/useAuthState';
+import AnimatedText from '#components/AnimatedText';
 import Icon from '#ui/Icon';
 import PressableOpacity from '#ui/PressableOpacity';
-import Text from '#ui/Text';
+import { useHomeScreenContext } from './HomeScreenContext';
 import type { HomeProfileLink_user$key } from '#relayArtifacts/HomeProfileLink_user.graphql';
 
-import type { SharedValue } from 'react-native-reanimated';
-
 type HomeProfileLinkProps = {
-  currentProfileIndexSharedValue: SharedValue<number>;
   user: HomeProfileLink_user$key;
 };
-const HomeProfileLink = ({
-  currentProfileIndexSharedValue,
-  user: userKey,
-}: HomeProfileLinkProps) => {
+const HomeProfileLink = ({ user: userKey }: HomeProfileLinkProps) => {
   const { profiles } = useFragment(
     graphql`
       fragment HomeProfileLink_user on User {
@@ -37,25 +34,33 @@ const HomeProfileLink = ({
     userKey,
   );
 
-  const { profileInfos } = useAuthState();
-
+  const { currentIndexProfile, currentIndexSharedValue } =
+    useHomeScreenContext();
   const userNames = useMemo(
-    () => new Map(profiles?.map(p => [p.webCard.id, p.webCard.userName])) ?? [],
+    () => profiles?.map(p => p.webCard.userName) ?? [],
     [profiles],
   );
 
   const opacityStyle = useAnimatedStyle(() => {
+    if (currentIndexSharedValue.value < 1) {
+      return {
+        opacity: Math.pow(currentIndexSharedValue.value, 3),
+        pointerEvents: 'none',
+      };
+    }
     return {
-      opacity: 1 + Math.min(0, currentProfileIndexSharedValue.value),
-      pointerEvents:
-        currentProfileIndexSharedValue.value === -1 ? 'none' : 'auto',
+      opacity:
+        1 -
+        currentIndexSharedValue.value +
+        Math.round(currentIndexSharedValue.value),
+      pointerEvents: 'auto',
     };
-  }, [currentProfileIndexSharedValue]);
+  }, [currentIndexProfile.value, currentIndexSharedValue.value]);
 
   const intl = useIntl();
   const onPress = () => {
     Clipboard.setStringAsync(
-      buildUserUrl(userNames.get(profileInfos?.webCardId ?? '') ?? ''),
+      buildUserUrl(userNames[currentIndexProfile.value - 1] ?? ''),
     )
       .then(() => {
         Toast.show({
@@ -71,17 +76,30 @@ const HomeProfileLink = ({
       .catch(() => void 0);
   };
 
+  const text = useDerivedValue(() => {
+    if (currentIndexSharedValue.value > 0.5) {
+      return (
+        'azzapp.com/' +
+          userNames[Math.round(currentIndexSharedValue.value - 1)] ?? ''
+      );
+    }
+
+    return 'azzapp.com';
+  });
+
   return (
     <Animated.View style={[styles.container, opacityStyle]}>
       <PressableOpacity accessibilityRole="button" onPress={onPress}>
         <View style={styles.containerText}>
           <Icon icon="earth" style={styles.iconLink} />
-          <Text variant="button" numberOfLines={1} style={styles.url}>
-            {buildUserUrl(
-              userNames.get(profileInfos?.webCardId ?? '') ?? '',
-              'azzapp.com/',
-            )}
-          </Text>
+
+          <AnimatedText
+            variant="button"
+            numberOfLines={1}
+            style={styles.url}
+            text={text}
+            containerStyle={{ flex: 1 }}
+          />
           <View style={styles.emptyViewCenter} />
         </View>
       </PressableOpacity>
@@ -89,7 +107,7 @@ const HomeProfileLink = ({
   );
 };
 
-export default memo(HomeProfileLink);
+export default HomeProfileLink;
 
 export const PROFILE_LINK_HEIGHT = 29;
 

@@ -1,5 +1,5 @@
 import * as Sentry from '@sentry/react-native';
-import { memo, useCallback, useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { Platform, StyleSheet, View, Share, Alert } from 'react-native';
 import Toast from 'react-native-toast-message';
@@ -492,4 +492,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default memo(HomeBottomSheetPanel);
+export default HomeBottomSheetPanel;

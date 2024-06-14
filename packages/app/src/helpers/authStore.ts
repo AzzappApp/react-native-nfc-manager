@@ -116,17 +116,30 @@ export const init = async () => {
     },
   );
 
-  addGlobalEventListener(
-    'WEBCARD_CHANGE',
-    async ({ payload: { profileId, webCardId, profileRole } }) => {
-      const profileInfos = getAuthState().profileInfos;
-      storage.set(
-        MMKVS_PROFILE_INFOS,
-        JSON.stringify({ ...profileInfos, profileId, webCardId, profileRole }),
-      );
-      emitAuthState();
-    },
-  );
+  //@deprecated don't really see the point to listen in one place the event.
+  // cause some discrepancy with the home (due to a small delay)
+  //will wait to evg test to validate
+  // addGlobalEventListener(
+  //   'WEBCARD_CHANGE',
+  //   async ({ payload: { profileId, webCardId, profileRole } }) => {
+  //     const profileInfos = getAuthState().profileInfos;
+  //     if (
+  //       profileInfos == null ||
+  //       (profileInfos && profileInfos.profileId !== profileId)
+  //     ) {
+  //       storage.set(
+  //         MMKVS_PROFILE_INFOS,
+  //         JSON.stringify({
+  //           ...profileInfos,
+  //           profileId,
+  //           webCardId,
+  //           profileRole,
+  //         }),
+  //       );
+  //       emitAuthState();
+  //     }
+  //   },
+  // );
 
   addGlobalEventListener(
     'PROFILE_ROLE_CHANGE',
@@ -220,3 +233,26 @@ export const getTokens = () => authTokens;
  */
 export const hasBeenSignedIn = () =>
   storage.getBoolean(MMKVS_HAS_BEEN_SIGNED_IN);
+
+export const onChangeWebCard = async ({
+  profileId,
+  webCardId,
+  profileRole,
+}: any) => {
+  const profileInfos = getAuthState().profileInfos;
+  if (
+    profileInfos == null ||
+    (profileInfos && profileInfos.profileId !== profileId)
+  ) {
+    storage.set(
+      MMKVS_PROFILE_INFOS,
+      JSON.stringify({
+        ...profileInfos,
+        profileId,
+        webCardId,
+        profileRole,
+      }),
+    );
+    emitAuthState();
+  }
+};

@@ -1,4 +1,3 @@
-import { memo } from 'react';
 import { FormattedMessage } from 'react-intl';
 import { StyleSheet } from 'react-native';
 import { colors } from '#theme';
@@ -37,7 +36,7 @@ const HomeBottomPanelCreate = () => {
   );
 };
 
-export default memo(HomeBottomPanelCreate);
+export default HomeBottomPanelCreate;
 
 const styles = StyleSheet.create({
   text: {

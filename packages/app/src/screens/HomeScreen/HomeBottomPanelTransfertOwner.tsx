@@ -1,4 +1,4 @@
-import { memo, useCallback } from 'react';
+import { useCallback } from 'react';
 import { FormattedMessage } from 'react-intl';
 import { StyleSheet, View } from 'react-native';
 import { graphql, commitMutation } from 'react-relay';
@@ -153,7 +153,7 @@ const HomeBottomPanelTransfertOwner = ({
   );
 };
 
-export default memo(HomeBottomPanelTransfertOwner);
+export default HomeBottomPanelTransfertOwner;
 
 const styles = StyleSheet.create({
   text: {

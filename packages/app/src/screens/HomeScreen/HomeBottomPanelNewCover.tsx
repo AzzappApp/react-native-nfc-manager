@@ -1,4 +1,3 @@
-import { memo } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { StyleSheet } from 'react-native';
 import Toast from 'react-native-toast-message';
@@ -92,7 +91,7 @@ const HomeBottomPanelNewCover = ({
   );
 };
 
-export default memo(HomeBottomPanelNewCover);
+export default HomeBottomPanelNewCover;
 
 const styles = StyleSheet.create({
   text: {

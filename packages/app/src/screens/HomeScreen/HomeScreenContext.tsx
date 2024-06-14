@@ -1,0 +1,204 @@
+import React, { useCallback, useEffect, useMemo, useRef } from 'react';
+import { useDerivedValue, useSharedValue } from 'react-native-reanimated';
+import { graphql, useFragment } from 'react-relay';
+import {
+  useRouteWillChange,
+  useScreenHasFocus,
+} from '#components/NativeRouter';
+import { addAuthStateListener, onChangeWebCard } from '#helpers/authStore';
+import { getRelayEnvironment } from '#helpers/relayEnvironment';
+import { usePrefetchRoute } from '#helpers/ScreenPrefetcher';
+import type { HomeScreenContext_user$key } from '#relayArtifacts/HomeScreenContext_user.graphql';
+import type { ReactNode } from 'react';
+import type { SharedValue } from 'react-native-reanimated';
+import type { Disposable } from 'react-relay';
+
+type HomeScreenContextType = {
+  currentIndexSharedValue: SharedValue<number>;
+  inputRange: number[];
+  currentIndexProfile: SharedValue<number>;
+  onCurrentProfileIndexChange: (index: number) => void;
+  initialProfileIndex: number;
+};
+
+const HomeScreenContext = React.createContext<
+  HomeScreenContextType | undefined
+>(undefined);
+
+type HomeScreenProviderProps = {
+  children: ReactNode;
+  userKey: HomeScreenContext_user$key;
+  initialProfileIndex: number;
+};
+export const HomeScreenProvider = ({
+  children,
+  userKey,
+  initialProfileIndex,
+}: HomeScreenProviderProps) => {
+  const user = useFragment(
+    graphql`
+      fragment HomeScreenContext_user on User {
+        profiles {
+          id
+          profileRole
+          invited
+          webCard {
+            id
+            userName
+          }
+        }
+      }
+    `,
+    userKey,
+  );
+  const currentIndexSharedValue = useSharedValue(initialProfileIndex);
+
+  const currentIndexProfile = useDerivedValue(() => {
+    return Math.round(currentIndexSharedValue.value);
+  }, [currentIndexSharedValue.value]);
+
+  const inputRange = useMemo(
+    () => [0, ...(user?.profiles?.map((_, index) => index + 1) ?? [])],
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [user?.profiles?.length],
+  );
+  //wondering if we really need this. Force to a fix number when HOME change
+  useRouteWillChange('HOME', () => {
+    if (currentIndexProfile.value !== currentIndexSharedValue.value)
+      currentIndexSharedValue.value = currentIndexProfile.value;
+  });
+
+  // #region prefetch
+  //TODO: have a reflexion on the validity of prefetching, is it really usefull. user can scroll to see thir profile without openit
+  // doing request we don't need on each change
+  const prefetchRoute = usePrefetchRoute();
+
+  useEffect(() => {
+    let disposable: Disposable | undefined;
+    if (currentIndexProfile.value === 0) {
+      disposable = prefetchRoute(getRelayEnvironment(), {
+        route: 'NEW_WEBCARD',
+      });
+    }
+    return () => {
+      disposable?.dispose();
+    };
+  }, [currentIndexProfile, prefetchRoute]);
+
+  // we need to keep a ref to the profiles to avoid prefetching when the user `profiles` field changes
+  const profilesRef = useRef(user.profiles);
+  useEffect(() => {
+    profilesRef.current = user.profiles;
+  }, [user.profiles]);
+
+  const profilesDisposables = useRef<Disposable[]>([]).current;
+  useEffect(() => {
+    const dispose = addAuthStateListener(({ profileInfos }) => {
+      if (profileInfos) {
+        const profile = profilesRef.current?.find(
+          profile => profile.id === profileInfos.profileId,
+        );
+        if (profile) {
+          const environment = getRelayEnvironment();
+          profilesDisposables.push(
+            prefetchRoute(environment, {
+              route: 'WEBCARD',
+              params: {
+                webCardId: profileInfos.webCardId,
+                userName: profile.webCard.userName,
+              },
+            }),
+            prefetchRoute(environment, {
+              route: 'CONTACT_CARD',
+            }),
+          );
+        }
+      }
+    });
+    return dispose;
+  }, [profilesDisposables, prefetchRoute]);
+
+  useEffect(
+    () => () => {
+      profilesDisposables.forEach(disposable => disposable.dispose());
+      profilesDisposables.length = 0;
+    },
+    [profilesDisposables],
+  );
+  // #endregion
+  useEffect(() => {
+    if (user.profiles?.length === 0) {
+      onChangeWebCard({ profileId: '', webCardId: '', profileRole: '' });
+    }
+  }, [user.profiles, user.profiles?.length]);
+
+  const focus = useScreenHasFocus();
+  const onCurrentProfileIndexChange = useCallback(
+    (index: number) => {
+      currentIndexSharedValue.value = index;
+      const newProfile = user.profiles?.[index - 1];
+
+      if (newProfile) {
+        const {
+          id: profileId,
+          webCard: { id: webCardId },
+          profileRole,
+          invited,
+        } = newProfile ?? {};
+
+        if (focus) {
+          onChangeWebCard({
+            profileId,
+            webCardId,
+            profileRole: invited ? 'invited' : profileRole,
+          });
+        }
+      }
+    },
+    [currentIndexSharedValue, focus, user.profiles],
+  );
+
+  return (
+    <HomeScreenContext.Provider
+      value={{
+        currentIndexSharedValue,
+        inputRange,
+        initialProfileIndex,
+        currentIndexProfile,
+        onCurrentProfileIndexChange,
+      }}
+    >
+      {children}
+    </HomeScreenContext.Provider>
+  );
+};
+
+export const useHomeScreenContext = () => {
+  const context = React.useContext(HomeScreenContext);
+  if (context === undefined) {
+    throw new Error(
+      'useHomeScreenContext must be used within a HomeScreenProvider',
+    );
+  }
+  return context;
+};
+
+export const useHomeScreenInputProfileRange = () => {
+  const context = React.useContext(HomeScreenContext);
+  if (context === undefined) {
+    throw new Error(
+      'useHomeScreenContext must be used within a HomeScreenProvider',
+    );
+  }
+  return context.inputRange;
+};
+
+export const useHomeScreenProfileIndex = () => {
+  const context = React.useContext(HomeScreenContext);
+  if (context === undefined) {
+    throw new Error(
+      'useHomeScreenContext must be used within a HomeScreenProvider',
+    );
+  }
+  return context.currentIndexSharedValue;
+};

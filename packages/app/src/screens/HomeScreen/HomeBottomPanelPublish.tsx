@@ -1,4 +1,4 @@
-import { memo, useCallback } from 'react';
+import { useCallback } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { StyleSheet } from 'react-native';
 import Toast from 'react-native-toast-message';
@@ -174,7 +174,7 @@ const HomeBottomPanelPublish = ({ profile }: HomeBottomPanelPublishProps) => {
   );
 };
 
-export default memo(HomeBottomPanelPublish);
+export default HomeBottomPanelPublish;
 
 const styles = StyleSheet.create({
   panel: {

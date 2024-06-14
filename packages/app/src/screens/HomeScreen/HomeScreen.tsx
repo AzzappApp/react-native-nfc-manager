@@ -3,6 +3,7 @@ import { graphql, usePreloadedQuery } from 'react-relay';
 import { mainRoutes } from '#mobileRoutes';
 import { useMainTabBarVisibilityController } from '#components/MainTabBar';
 import { useRouter } from '#components/NativeRouter';
+import { getAuthState } from '#helpers/authStore';
 import { dispatchGlobalEvent } from '#helpers/globalEvents';
 import relayScreen from '#helpers/relayScreen';
 import { useDeepLinkStoredRoute } from '#hooks/useDeepLink';
@@ -10,6 +11,7 @@ import { useSetRevenueCatUserInfo } from '#hooks/useSetRevenueCatUserInfo';
 import ActivityIndicator from '#ui/ActivityIndicator';
 import Container from '#ui/Container';
 import HomeScreenContent from './HomeScreenContent';
+import { HomeScreenProvider } from './HomeScreenContext';
 import type { RelayScreenProps } from '#helpers/relayScreen';
 import type { HomeScreenQuery } from '#relayArtifacts/HomeScreenQuery.graphql';
 import type { HomeRoute } from '#routes';
@@ -21,6 +23,7 @@ export const homeScreenQuery = graphql`
         id
       }
       ...HomeScreenContent_user
+      ...HomeScreenContext_user
     }
   }
 `;
@@ -53,6 +56,15 @@ const HomeScreen = ({
     }
   }, [hasProfile, router]);
 
+  const initialProfileIndex = useMemo(() => {
+    const index = currentUser?.profiles?.findIndex(
+      profile => profile.id === getAuthState().profileInfos?.profileId,
+    );
+    return index !== undefined && index !== -1 ? index + 1 : 0;
+    // we only want to run this once
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   if (!currentUser) {
     // should never happen
     return null;
@@ -60,7 +72,13 @@ const HomeScreen = ({
 
   return (
     <Suspense>
-      <HomeScreenContent user={currentUser} />
+      <HomeScreenProvider
+        key={currentUser.profiles?.length ?? '0'}
+        initialProfileIndex={initialProfileIndex}
+        userKey={currentUser}
+      >
+        <HomeScreenContent user={currentUser} />
+      </HomeScreenProvider>
     </Suspense>
   );
 };

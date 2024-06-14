@@ -1,4 +1,4 @@
-import { memo, useCallback } from 'react';
+import { useCallback } from 'react';
 import { View, useWindowDimensions } from 'react-native';
 import Animated, { useAnimatedStyle } from 'react-native-reanimated';
 import { useFragment, graphql } from 'react-relay';
@@ -11,21 +11,16 @@ import { useRouter } from '#components/NativeRouter';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import useAuthState from '#hooks/useAuthState';
 import PressableNative from '#ui/PressableNative';
+import { useHomeScreenProfileIndex } from './HomeScreenContext';
 import type { HomeContactCard_profile$key } from '#relayArtifacts/HomeContactCard_profile.graphql';
 import type { HomeContactCard_user$key } from '#relayArtifacts/HomeContactCard_user.graphql';
-import type { SharedValue } from 'react-native-reanimated';
 
 type HomeContactCardProps = {
   user: HomeContactCard_user$key;
   height: number;
-  currentProfileIndexSharedValue: SharedValue<number>;
 };
 
-const HomeContactCard = ({
-  user,
-  height,
-  currentProfileIndexSharedValue,
-}: HomeContactCardProps) => {
+const HomeContactCard = ({ user, height }: HomeContactCardProps) => {
   const { profiles } = useFragment(
     graphql`
       fragment HomeContactCard_user on User {
@@ -56,7 +51,6 @@ const HomeContactCard = ({
           width={windowWidth}
           height={height}
           item={item}
-          currentProfileIndexSharedValue={currentProfileIndexSharedValue}
           index={index}
         />
       ))}
@@ -64,14 +58,13 @@ const HomeContactCard = ({
   );
 };
 
-export default memo(HomeContactCard);
+export default HomeContactCard;
 
 type ContactCardItemProps = {
   width: number;
   height: number;
   item: HomeContactCard_profile$key;
   index: number;
-  currentProfileIndexSharedValue: SharedValue<number>;
 };
 
 const ContactCardItem = ({
@@ -79,13 +72,13 @@ const ContactCardItem = ({
   height,
   item,
   index,
-  currentProfileIndexSharedValue,
 }: ContactCardItemProps) => {
   const styles = useStyleSheet(styleSheet);
-
+  const currentIndexSharedValue = useHomeScreenProfileIndex();
   const positionStyle = useAnimatedStyle(() => ({
+    //index start a 0 for the firstItem, so add +1 in thisd case
     transform: [
-      { translateX: (index - currentProfileIndexSharedValue.value) * width },
+      { translateX: (index - currentIndexSharedValue.value + 1) * width },
     ],
   }));
 
@@ -160,7 +153,7 @@ const ContactCardItem = ({
     </Animated.View>
   );
 };
-const MemoContactCardItem = memo(ContactCardItem);
+const MemoContactCardItem = ContactCardItem;
 
 const styleSheet = createStyleSheet(appearance => ({
   itemContainer: {

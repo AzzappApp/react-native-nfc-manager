@@ -1,5 +1,4 @@
-import _ from 'lodash';
-import { useState, memo, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import { Dimensions, StyleSheet, View } from 'react-native';
 import Animated, {
   interpolate,
@@ -14,28 +13,19 @@ import HomeBottomPanelMessage from './HomeBottomPanelMessage';
 import HomeContactCard from './HomeContactCard';
 import HomeInformations from './HomeInformations';
 import HomeMenu, { HOME_MENU_HEIGHT } from './HomeMenu';
+import { useHomeScreenContext } from './HomeScreenContext';
 import HomeStatistics from './HomeStatistics';
 import type { HomeBottomPanel_user$key } from '#relayArtifacts/HomeBottomPanel_user.graphql';
 
 import type { HOME_TAB } from './HomeMenu';
-import type { SharedValue } from 'react-native-reanimated';
 
 type HomeBottomPanelProps = {
   user: HomeBottomPanel_user$key;
-  /**
-   * current position of the scrolling profile (based on profile index and not scrollValue )
-   *
-   * @type {SharedValue<number>}
-   */
-  currentProfileIndexSharedValue: SharedValue<number>;
 };
 
 // TODO the way of we handle the mutations has been made when multi-actor environment was used, we should refactor that
 
-const HomeBottomPanel = ({
-  user: userKey,
-  currentProfileIndexSharedValue,
-}: HomeBottomPanelProps) => {
+const HomeBottomPanel = ({ user: userKey }: HomeBottomPanelProps) => {
   //#region data
   const user = useFragment(
     graphql`
@@ -73,6 +63,8 @@ const HomeBottomPanel = ({
   );
   const { profiles } = user;
   const [selectedPanel, setSelectedPanel] = useState<HOME_TAB>('CONTACT_CARD');
+  const { inputRange, currentIndexSharedValue, currentIndexProfile } =
+    useHomeScreenContext();
   //#endregion
 
   const bottomPanelVisible = useMemo(() => {
@@ -88,14 +80,11 @@ const HomeBottomPanel = ({
       }) ?? [];
     return [0, ...res];
   }, [profiles]);
-
-  const inputRange = _.range(0, (profiles?.length ?? 0) + 1);
-
   const mainTabBarVisible = useDerivedValue(() => {
     if (inputRange.length > 1) {
       return Math.pow(
         interpolate(
-          currentProfileIndexSharedValue.value + 1,
+          currentIndexSharedValue.value,
           inputRange,
           bottomPanelVisible,
         ),
@@ -105,34 +94,40 @@ const HomeBottomPanel = ({
       //use a fixed value is only one profile
       return bottomPanelVisible[0];
     }
-  }, [bottomPanelVisible, currentProfileIndexSharedValue.value, inputRange]);
+  }, [bottomPanelVisible, currentIndexSharedValue.value, inputRange]);
 
   const bottomPanelStyle = useAnimatedStyle(() => {
-    const index = Math.round(currentProfileIndexSharedValue.value + 1);
-    const opacity =
-      inputRange.length > 1
-        ? interpolate(
-            currentProfileIndexSharedValue.value + 1,
-            inputRange,
-            bottomPanelVisible,
-          )
-        : 1;
+    if (inputRange.length === 0)
+      return { opacity: 1, pointerEvents: 'box-none' };
+
     return {
-      opacity: Math.pow(opacity, 3),
-      pointerEvents: bottomPanelVisible[index] === 1 ? 'box-none' : 'none',
+      opacity: interpolate(
+        currentIndexSharedValue.value,
+        inputRange,
+        bottomPanelVisible,
+      ),
+      pointerEvents:
+        bottomPanelVisible[currentIndexProfile.value] === 1 ? 'auto' : 'none',
     };
-  }, [bottomPanelVisible, currentProfileIndexSharedValue.value, inputRange]);
+  }, [
+    bottomPanelVisible,
+    currentIndexProfile.value,
+    currentIndexSharedValue.value,
+    inputRange,
+  ]);
 
   useMainTabBarVisibilityController(mainTabBarVisible);
   //#endregion
 
+  const stateIndex = useDerivedValue(
+    () => currentIndexSharedValue.value - 1,
+    [],
+  );
+
   return (
     <View style={styles.container}>
       <View style={styles.informationPanel}>
-        <HomeBottomPanelMessage
-          currentProfileIndexSharedValue={currentProfileIndexSharedValue}
-          user={profiles!}
-        />
+        <HomeBottomPanelMessage user={profiles!} />
       </View>
       <Animated.View style={[styles.bottomPanel, bottomPanelStyle]}>
         <HomeMenu selected={selectedPanel} setSelected={setSelectedPanel} />
@@ -142,11 +137,7 @@ const HomeBottomPanel = ({
             display: selectedPanel === 'CONTACT_CARD' ? 'flex' : 'none',
           }}
         >
-          <HomeContactCard
-            height={PANEL_HEIGHT}
-            user={user}
-            currentProfileIndexSharedValue={currentProfileIndexSharedValue}
-          />
+          <HomeContactCard height={PANEL_HEIGHT} user={user} />
         </View>
 
         <View
@@ -158,7 +149,7 @@ const HomeBottomPanel = ({
           <HomeStatistics
             user={profiles!}
             height={PANEL_HEIGHT}
-            currentProfileIndexSharedValue={currentProfileIndexSharedValue}
+            currentProfileIndexSharedValue={stateIndex} //we still need to passe it for the MultiUserstats panel. we should split / refactor them for better performance
           />
         </View>
 
@@ -168,11 +159,7 @@ const HomeBottomPanel = ({
             display: selectedPanel === 'INFORMATION' ? 'flex' : 'none',
           }}
         >
-          <HomeInformations
-            user={user}
-            height={PANEL_HEIGHT}
-            currentProfileIndexSharedValue={currentProfileIndexSharedValue}
-          />
+          <HomeInformations user={user} height={PANEL_HEIGHT} />
         </View>
       </Animated.View>
     </View>
@@ -215,4 +202,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default memo(HomeBottomPanel);
+export default HomeBottomPanel;

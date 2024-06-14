@@ -1,4 +1,4 @@
-import { memo, useCallback } from 'react';
+import { useCallback } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { StyleSheet, View } from 'react-native';
 import Toast from 'react-native-toast-message';
@@ -139,7 +139,7 @@ const HomeBottomPanelInvitation = ({
   );
 };
 
-export default memo(HomeBottomPanelInvitation);
+export default HomeBottomPanelInvitation;
 
 const styles = StyleSheet.create({
   panel: {

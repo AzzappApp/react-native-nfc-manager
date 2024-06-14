@@ -1,4 +1,4 @@
-import { memo, useMemo } from 'react';
+import { useMemo } from 'react';
 import { StyleSheet, View } from 'react-native';
 import Animated, {
   interpolate,
@@ -10,12 +10,12 @@ import HomeBottomPanelInvitation from './HomeBottomPanelInvitation';
 import HomeBottomPanelNewCover from './HomeBottomPanelNewCover';
 import HomeBottomPanelPublish from './HomeBottomPanelPublish';
 import HomeBottomPanelTransfertOwner from './HomeBottomPanelTransfertOwner';
+import { useHomeScreenContext } from './HomeScreenContext';
 import type {
   HomeBottomPanelMessage_profiles$data,
   HomeBottomPanelMessage_profiles$key,
 } from '#relayArtifacts/HomeBottomPanelMessage_profiles.graphql';
 import type { ArrayItemType } from '@azzapp/shared/arrayHelpers';
-import type { SharedValue } from 'react-native-reanimated';
 
 export type MessageContentType =
   | 'cover'
@@ -24,13 +24,9 @@ export type MessageContentType =
   | 'transfert';
 
 type HomeBottomPanelMessageProps = {
-  currentProfileIndexSharedValue: SharedValue<number>;
   user: HomeBottomPanelMessage_profiles$key;
 };
-const HomeBottomPanelMessage = ({
-  currentProfileIndexSharedValue,
-  user,
-}: HomeBottomPanelMessageProps) => {
+const HomeBottomPanelMessage = ({ user }: HomeBottomPanelMessageProps) => {
   const profiles = useFragment(
     graphql`
       fragment HomeBottomPanelMessage_profiles on Profile @relay(plural: true) {
@@ -76,35 +72,28 @@ const HomeBottomPanelMessage = ({
   return (
     <View style={styles.container}>
       {(bottomContent ?? []).map((content, index) => {
-        return (
-          <MessageItem
-            key={index}
-            content={content}
-            index={index}
-            currentIndex={currentProfileIndexSharedValue}
-          />
-        );
+        return <MessageItem key={index} content={content} index={index} />;
       })}
     </View>
   );
 };
 
-export default memo(HomeBottomPanelMessage);
+export default HomeBottomPanelMessage;
 
 type MessageItemProps = {
   content: ArrayItemType<MessageArrayType>;
   index: number;
-  currentIndex: SharedValue<number>;
 };
 
-const MessageItem = ({ content, index, currentIndex }: MessageItemProps) => {
+const MessageItem = ({ content, index }: MessageItemProps) => {
+  const { currentIndexSharedValue } = useHomeScreenContext();
   const animatedStyle = useAnimatedStyle(() => {
     //math.pow is used to reduce the superposition of 2 view, the increase is not linear, going slowly at the beginning
     const opacity = Math.pow(
       Math.max(
         0,
         interpolate(
-          currentIndex.value + 1,
+          currentIndexSharedValue.value,
           [index - 1, index, index + 1],
           [0, 1, 0],
         ),
@@ -116,7 +105,7 @@ const MessageItem = ({ content, index, currentIndex }: MessageItemProps) => {
       opacity,
       pointerEvents: opacity > 0.5 ? 'box-none' : 'none',
     };
-  }, [currentIndex]);
+  }, [currentIndexSharedValue]);
 
   return (
     <Animated.View
