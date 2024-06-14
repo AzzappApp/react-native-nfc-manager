@@ -1,5 +1,6 @@
-## 0.5.15-canary.148
+## 0.5.15-canary.149
 
+* **fix:**  - 🐛 always fetch all profiles on multi user screen ([#3752](https://github.com/AzzappApp/azzapp/pull/3752))
 * **fix:**  - **contactCard:** [#3742](https://github.com/AzzappApp/azzapp/pull/3742) use company name from common info if present ([#3744](https://github.com/AzzappApp/azzapp/pull/3744))
 * **fix:**  - remove context code from homestatistic used in mulituser (to be updated) ([#3746](https://github.com/AzzappApp/azzapp/pull/3746))
 * **fix:**  - regression on build after putting back dev script
