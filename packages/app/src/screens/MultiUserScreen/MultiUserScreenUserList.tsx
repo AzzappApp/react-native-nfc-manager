@@ -191,7 +191,10 @@ const MultiUserScreenUserList = ({
   const onRefresh = useCallback(() => {
     if (!isLoadingNext) {
       setRefreshing(true);
-      refetch({ search: debounceText }, { fetchPolicy: 'store-and-network' });
+      refetch(
+        { search: debounceText || undefined },
+        { fetchPolicy: 'store-and-network' },
+      );
       setRefreshing(false);
     }
   }, [debounceText, isLoadingNext, refetch]);
