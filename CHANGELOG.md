@@ -1,5 +1,7 @@
-## 0.5.15-canary.146
+## 0.5.15-canary.147
 
+* **fix:**  - **contactCard:** [#3742](https://github.com/AzzappApp/azzapp/pull/3742) use company name from common info if present ([#3744](https://github.com/AzzappApp/azzapp/pull/3744))
+* **fix:**  - remove context code from homestatistic used in mulituser (to be updated) ([#3746](https://github.com/AzzappApp/azzapp/pull/3746))
 * **fix:**  - regression on build after putting back dev script
 * **fix:**  - **multiUser:** [#3737](https://github.com/AzzappApp/azzapp/pull/3737) missing logo back ([#3740](https://github.com/AzzappApp/azzapp/pull/3740))
 * **fix:**  - improve Home Screen ([#3738](https://github.com/AzzappApp/azzapp/pull/3738))
