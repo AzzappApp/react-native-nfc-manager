@@ -43,29 +43,33 @@ const CoverEditorTemplateList = ({
 
   const intl = useIntl();
 
-  const { coverTemplateTags, coverTemplateTypes, webCard, coverTemplates } =
-    useFragment(
-      graphql`
-        fragment CoverEditorTemplateList_profile on Profile {
-          coverTemplateTags {
-            ...CoverTemplateTagSelector_tags
-          }
-          coverTemplateTypes {
-            id
-            label
-          }
-          webCard {
-            cardColors {
-              light
-              dark
-              primary
-            }
-          }
-          ...useCoverTemplates_coverTemplates @alias(as: "coverTemplates")
+  const {
+    coverTemplateTags,
+    coverTemplateTypes,
+    webCard,
+    coverTemplatesFragment,
+  } = useFragment(
+    graphql`
+      fragment CoverEditorTemplateList_profile on Profile {
+        coverTemplateTags {
+          ...CoverTemplateTagSelector_tags
         }
-      `,
-      profileKey,
-    );
+        coverTemplateTypes {
+          id
+          label
+        }
+        webCard {
+          cardColors {
+            light
+            dark
+            primary
+          }
+        }
+        ...useCoverTemplates_coverTemplates @alias(as: "coverTemplatesFragment")
+      }
+    `,
+    profileKey,
+  );
 
   const onColorSelect = useCallback(
     (color: ColorPaletteColor) => {
@@ -91,7 +95,7 @@ const CoverEditorTemplateList = ({
     isLoadingPrevious,
     isLoadingNext,
     loadNext,
-  } = useCoverTemplates(coverTemplates);
+  } = useCoverTemplates(coverTemplatesFragment);
 
   const data = useMemo(() => {
     return Object.entries(templateCovers);

@@ -130,12 +130,12 @@ __metadata:
     "@lottiefiles/lottie-js": 0.4.2
     "@miblanchard/react-native-slider": 2.6.0
     "@react-native-async-storage/async-storage": ^1.23.1
-    "@react-native-community/datetimepicker": ^8.1.0
+    "@react-native-community/datetimepicker": ^8.1.1
     "@react-native-masked-view/masked-view": ^0.3.1
     "@react-native/babel-preset": ^0.74.84
     "@react-native/metro-config": ^0.74.84
     "@reeq/react-native-passkit": ^0.1.3
-    "@sentry/react-native": ~5.22.3
+    "@sentry/react-native": ^5.24.0
     "@shopify/flash-list": 1.6.4
     "@shopify/react-native-skia": ^1.3.3
     "@testing-library/react-native": ^12.5.1
@@ -168,7 +168,7 @@ __metadata:
     lottie-react-native: ^6.7.2
     lz-string: ^1.5.0
     react: ^18.3.1
-    react-hook-form: ^7.51.5
+    react-hook-form: ^7.52.0
     react-intl: ^6.6.8
     react-native: ^0.74.2
     react-native-blob-jsi-helper: ^0.3.1
@@ -191,16 +191,16 @@ __metadata:
     react-native-purchases: ^7.27.4
     react-native-quick-base64: ^2.1.2
     react-native-reanimated: ^3.13.0-rc.1
-    react-native-safe-area-context: ^4.10.4
+    react-native-safe-area-context: ^4.10.5
     react-native-screens: ^3.31.1
     react-native-share: ^10.2.1
     react-native-svg: ^15.3.0
     react-native-tab-view: ^3.5.2
     react-native-toast-message: ^2.2.0
-    react-native-vision-camera: ^4.3.1
-    react-relay: ^16.2.0
+    react-native-vision-camera: ^4.3.2
+    react-relay: ^17.0.0
     react-test-renderer: ^18.3.1
-    relay-test-utils: ^16.2.0
+    relay-test-utils: ^17.0.0
     rimraf: ^5.0.7
     typescript: ^5.4.5
     use-debounce: ^10.0.1
@@ -308,7 +308,7 @@ __metadata:
     babel-jest: ^29.7.0
     babel-plugin-formatjs: ^10.5.16
     babel-plugin-module-resolver: ^5.0.2
-    babel-plugin-relay: ^16.2.0
+    babel-plugin-relay: ^17.0.0
     blessed: ^0.1.81
     blessed-xterm: ^1.4.4
     csv-stringify: ^6.4.6
@@ -325,7 +325,7 @@ __metadata:
     node-gyp: ^10.1.0
     prettier: ^3.2.5
     react-native-version: ^4.0.0
-    relay-compiler: ^16.2.0
+    relay-compiler: ^17.0.0
     semver: ^7.6.0
     tagged-versions: ^1.3.0
     ts-jest: ^29.1.2
@@ -394,7 +394,7 @@ __metadata:
   dependencies:
     "@babel/cli": 7.24.5
     "@types/chroma-js": ^2.4.4
-    "@types/relay-runtime": ^14.1.23
+    "@types/relay-runtime": ^17.0.0
     "@types/validator": ^13.11.9
     chroma-js: ^2.4.2
     csv42: 5.0.0
@@ -8323,9 +8323,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@react-native-community/datetimepicker@npm:^8.1.0":
-  version: 8.1.0
-  resolution: "@react-native-community/datetimepicker@npm:8.1.0"
+"@react-native-community/datetimepicker@npm:^8.1.1":
+  version: 8.1.1
+  resolution: "@react-native-community/datetimepicker@npm:8.1.1"
   dependencies:
     invariant: ^2.2.4
   peerDependencies:
@@ -8335,7 +8335,7 @@ __metadata:
   peerDependenciesMeta:
     react-native-windows:
       optional: true
-  checksum: f8b9018560a755b5f8644818533f60b2ff6f3226af075db8dcfaf7b596b39580524c462baecc5765cd237a8b7984d49596ba4c7b179faef8b247f608b52bb06d
+  checksum: ef821df963fe59ba9e7d9b7fff569531ef624b2e14e2dcf0216fc07cd1505d246d5bb4cc5fac6e45f335f10449f236937efdc5af7348c6f563f60eb89f16d2a5
   languageName: node
   linkType: hard
 
@@ -8804,6 +8804,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@sentry-internal/feedback@npm:7.117.0":
+  version: 7.117.0
+  resolution: "@sentry-internal/feedback@npm:7.117.0"
+  dependencies:
+    "@sentry/core": 7.117.0
+    "@sentry/types": 7.117.0
+    "@sentry/utils": 7.117.0
+  checksum: 937c1a59723881ac090a8b12669a6f2264d04c7e50ba73a802031a68187a3799cdc7d41f8a5f0023eee3321bce145141f385ee353a880f17f028e45b57e57044
+  languageName: node
+  linkType: hard
+
 "@sentry-internal/replay-canvas@npm:7.113.0":
   version: 7.113.0
   resolution: "@sentry-internal/replay-canvas@npm:7.113.0"
@@ -8813,6 +8824,18 @@ __metadata:
     "@sentry/types": 7.113.0
     "@sentry/utils": 7.113.0
   checksum: 6fda827b93d77bcb37c02cdeac094e8ad1a76fce41619bb8eedfa7cc275e5b84fa98866af2590783786a9848b4dd7a43b3408c02d50a6b83c44fcf66f8d5443b
+  languageName: node
+  linkType: hard
+
+"@sentry-internal/replay-canvas@npm:7.117.0":
+  version: 7.117.0
+  resolution: "@sentry-internal/replay-canvas@npm:7.117.0"
+  dependencies:
+    "@sentry/core": 7.117.0
+    "@sentry/replay": 7.117.0
+    "@sentry/types": 7.117.0
+    "@sentry/utils": 7.117.0
+  checksum: d84e9fa4d777a00b83d5e60aa4a9ca5a74768c3eb8e2aadcec0adc0379900103027a23cd3c228d3e8adca90f45b6c3a0713f051258aaf5ac32656f887ba26350
   languageName: node
   linkType: hard
 
@@ -8838,6 +8861,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@sentry-internal/tracing@npm:7.117.0":
+  version: 7.117.0
+  resolution: "@sentry-internal/tracing@npm:7.117.0"
+  dependencies:
+    "@sentry/core": 7.117.0
+    "@sentry/types": 7.117.0
+    "@sentry/utils": 7.117.0
+  checksum: 3a4b5b4ebfa8da73e324aef2ed20921a840e88b3a1b949c8f092b6cf73c6e7dcb99bb8c47bf6ac56101b53ed959597c29f22a4618fd5d93c05e04c3841ebe256
+  languageName: node
+  linkType: hard
+
 "@sentry/browser@npm:7.113.0":
   version: 7.113.0
   resolution: "@sentry/browser@npm:7.113.0"
@@ -8854,66 +8888,82 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@sentry/cli-darwin@npm:2.30.4":
-  version: 2.30.4
-  resolution: "@sentry/cli-darwin@npm:2.30.4"
+"@sentry/browser@npm:7.117.0":
+  version: 7.117.0
+  resolution: "@sentry/browser@npm:7.117.0"
+  dependencies:
+    "@sentry-internal/feedback": 7.117.0
+    "@sentry-internal/replay-canvas": 7.117.0
+    "@sentry-internal/tracing": 7.117.0
+    "@sentry/core": 7.117.0
+    "@sentry/integrations": 7.117.0
+    "@sentry/replay": 7.117.0
+    "@sentry/types": 7.117.0
+    "@sentry/utils": 7.117.0
+  checksum: 161113058e7c48333d9bbdf278d799d3da355a5b2e77ce12bf796bfc40cd5e099b8569df5372e0d3f6d508e516def768e3251add97a9ddfa007ddb60f0873566
+  languageName: node
+  linkType: hard
+
+"@sentry/cli-darwin@npm:2.31.2":
+  version: 2.31.2
+  resolution: "@sentry/cli-darwin@npm:2.31.2"
   conditions: os=darwin
   languageName: node
   linkType: hard
 
-"@sentry/cli-linux-arm64@npm:2.30.4":
-  version: 2.30.4
-  resolution: "@sentry/cli-linux-arm64@npm:2.30.4"
+"@sentry/cli-linux-arm64@npm:2.31.2":
+  version: 2.31.2
+  resolution: "@sentry/cli-linux-arm64@npm:2.31.2"
   conditions: (os=linux | os=freebsd) & cpu=arm64
   languageName: node
   linkType: hard
 
-"@sentry/cli-linux-arm@npm:2.30.4":
-  version: 2.30.4
-  resolution: "@sentry/cli-linux-arm@npm:2.30.4"
+"@sentry/cli-linux-arm@npm:2.31.2":
+  version: 2.31.2
+  resolution: "@sentry/cli-linux-arm@npm:2.31.2"
   conditions: (os=linux | os=freebsd) & cpu=arm
   languageName: node
   linkType: hard
 
-"@sentry/cli-linux-i686@npm:2.30.4":
-  version: 2.30.4
-  resolution: "@sentry/cli-linux-i686@npm:2.30.4"
+"@sentry/cli-linux-i686@npm:2.31.2":
+  version: 2.31.2
+  resolution: "@sentry/cli-linux-i686@npm:2.31.2"
   conditions: (os=linux | os=freebsd) & (cpu=x86 | cpu=ia32)
   languageName: node
   linkType: hard
 
-"@sentry/cli-linux-x64@npm:2.30.4":
-  version: 2.30.4
-  resolution: "@sentry/cli-linux-x64@npm:2.30.4"
+"@sentry/cli-linux-x64@npm:2.31.2":
+  version: 2.31.2
+  resolution: "@sentry/cli-linux-x64@npm:2.31.2"
   conditions: (os=linux | os=freebsd) & cpu=x64
   languageName: node
   linkType: hard
 
-"@sentry/cli-win32-i686@npm:2.30.4":
-  version: 2.30.4
-  resolution: "@sentry/cli-win32-i686@npm:2.30.4"
+"@sentry/cli-win32-i686@npm:2.31.2":
+  version: 2.31.2
+  resolution: "@sentry/cli-win32-i686@npm:2.31.2"
   conditions: os=win32 & (cpu=x86 | cpu=ia32)
   languageName: node
   linkType: hard
 
-"@sentry/cli-win32-x64@npm:2.30.4":
-  version: 2.30.4
-  resolution: "@sentry/cli-win32-x64@npm:2.30.4"
+"@sentry/cli-win32-x64@npm:2.31.2":
+  version: 2.31.2
+  resolution: "@sentry/cli-win32-x64@npm:2.31.2"
   conditions: os=win32 & cpu=x64
   languageName: node
   linkType: hard
 
-"@sentry/cli@npm:2.30.4":
-  version: 2.30.4
-  resolution: "@sentry/cli@npm:2.30.4"
+"@sentry/cli@npm:2.31.2":
+  version: 2.31.2
+  resolution: "@sentry/cli@npm:2.31.2"
   dependencies:
-    "@sentry/cli-darwin": 2.30.4
-    "@sentry/cli-linux-arm": 2.30.4
-    "@sentry/cli-linux-arm64": 2.30.4
-    "@sentry/cli-linux-i686": 2.30.4
-    "@sentry/cli-linux-x64": 2.30.4
-    "@sentry/cli-win32-i686": 2.30.4
-    "@sentry/cli-win32-x64": 2.30.4
+    "@sentry/cli-darwin": 2.31.2
+    "@sentry/cli-linux-arm": 2.31.2
+    "@sentry/cli-linux-arm64": 2.31.2
+    "@sentry/cli-linux-i686": 2.31.2
+    "@sentry/cli-linux-x64": 2.31.2
+    "@sentry/cli-win32-i686": 2.31.2
+    "@sentry/cli-win32-x64": 2.31.2
     https-proxy-agent: ^5.0.0
     node-fetch: ^2.6.7
     progress: ^2.0.3
@@ -8936,7 +8986,7 @@ __metadata:
       optional: true
   bin:
     sentry-cli: bin/sentry-cli
-  checksum: b1ddf4dc4d200d5d716f8cbc1330968d2e3024d623dda6fda3bbcf3d5cacd43aa65941d26d71e130fbdcb3fb914aa036b6a037c26ba55ebe1a80f210902f1e5c
+  checksum: a03c8ea742ebb7a56e331632e94ada55cd9b761b98c1e48a1e6ed91db8671f21428a900cb02ffa803841a3b6004adef58b0185af88b25ff01f85eed47c779af7
   languageName: node
   linkType: hard
 
@@ -8976,14 +9026,24 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@sentry/hub@npm:7.113.0":
-  version: 7.113.0
-  resolution: "@sentry/hub@npm:7.113.0"
+"@sentry/core@npm:7.117.0":
+  version: 7.117.0
+  resolution: "@sentry/core@npm:7.117.0"
   dependencies:
-    "@sentry/core": 7.113.0
-    "@sentry/types": 7.113.0
-    "@sentry/utils": 7.113.0
-  checksum: d658f25c13346261b3cede7542f4b198ed59c3d1f18a8bf04f7ae6932d37d5e74e57eb0675951b37957fd3873a66895172612a34615971e2f8c65684df4e3514
+    "@sentry/types": 7.117.0
+    "@sentry/utils": 7.117.0
+  checksum: ef22d6d3d358cfae9cee6c1ef62bc425987dd7262089d78b80851b32a1b6ad50282cbe83b7d9c16d411fd5861065775b69bc989656b311d4692a207d8fda8e1c
+  languageName: node
+  linkType: hard
+
+"@sentry/hub@npm:7.117.0":
+  version: 7.117.0
+  resolution: "@sentry/hub@npm:7.117.0"
+  dependencies:
+    "@sentry/core": 7.117.0
+    "@sentry/types": 7.117.0
+    "@sentry/utils": 7.117.0
+  checksum: b1cd0a40ae42b923a37d8a750a32dfc8f91937938f1320ec783360dba6662bcc527257ab48cf723866f3e0808ad185b2da38cf312c98279a184edd577f30d87d
   languageName: node
   linkType: hard
 
@@ -8996,6 +9056,18 @@ __metadata:
     "@sentry/utils": 7.113.0
     localforage: ^1.8.1
   checksum: ce5c951a8036d56dc80ef298597ed43294e78061ea2dfa7fa048a7f9b8be69989f8404fdc7c9753ccea188d02c10101da1a0537cda5ac36e20ee2e8088934bc7
+  languageName: node
+  linkType: hard
+
+"@sentry/integrations@npm:7.117.0":
+  version: 7.117.0
+  resolution: "@sentry/integrations@npm:7.117.0"
+  dependencies:
+    "@sentry/core": 7.117.0
+    "@sentry/types": 7.117.0
+    "@sentry/utils": 7.117.0
+    localforage: ^1.8.1
+  checksum: 5b1ba3fb6e12ea2b79cbd2f2ce592621abfc37bf9809e6fcd2b1d1cfa4c589d40534747ef9bb64ed6a342f847130c29fc737a7297d6197a63e0228091bdf96cb
   languageName: node
   linkType: hard
 
@@ -9040,18 +9112,18 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@sentry/react-native@npm:~5.22.3":
-  version: 5.22.3
-  resolution: "@sentry/react-native@npm:5.22.3"
+"@sentry/react-native@npm:^5.24.0":
+  version: 5.24.0
+  resolution: "@sentry/react-native@npm:5.24.0"
   dependencies:
-    "@sentry/browser": 7.113.0
-    "@sentry/cli": 2.30.4
-    "@sentry/core": 7.113.0
-    "@sentry/hub": 7.113.0
-    "@sentry/integrations": 7.113.0
-    "@sentry/react": 7.113.0
-    "@sentry/types": 7.113.0
-    "@sentry/utils": 7.113.0
+    "@sentry/browser": 7.117.0
+    "@sentry/cli": 2.31.2
+    "@sentry/core": 7.117.0
+    "@sentry/hub": 7.117.0
+    "@sentry/integrations": 7.117.0
+    "@sentry/react": 7.117.0
+    "@sentry/types": 7.117.0
+    "@sentry/utils": 7.117.0
   peerDependencies:
     expo: ">=49.0.0"
     react: ">=17.0.0"
@@ -9061,7 +9133,7 @@ __metadata:
       optional: true
   bin:
     sentry-expo-upload-sourcemaps: scripts/expo-upload-sourcemaps.js
-  checksum: fa21fc41868f28d813c10e1a6f3478f75dc00f07b146ad6bfe6866a964e13a926770ba535f5b4788f0993206976821ab01028dcd3b14fd24f38762410c6ac150
+  checksum: 54a03d8901aebd01a1fed6e82ebaee4e58143b7530608e6f1ce481f4624f467ff1a02ef8e8a32246e96e52f617e285d37e2bb495f2472ebdb5743475e1b0359e
   languageName: node
   linkType: hard
 
@@ -9080,6 +9152,21 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@sentry/react@npm:7.117.0":
+  version: 7.117.0
+  resolution: "@sentry/react@npm:7.117.0"
+  dependencies:
+    "@sentry/browser": 7.117.0
+    "@sentry/core": 7.117.0
+    "@sentry/types": 7.117.0
+    "@sentry/utils": 7.117.0
+    hoist-non-react-statics: ^3.3.2
+  peerDependencies:
+    react: 15.x || 16.x || 17.x || 18.x
+  checksum: b57c0cafd7756fe7a27b757920a930b15bdd88dcc227a68d3cf86d086a174adb89630b31d139d475d5cbfc95dc850681e7dfc8f9f4cd1f766a0fc08e4624bf9f
+  languageName: node
+  linkType: hard
+
 "@sentry/replay@npm:7.113.0":
   version: 7.113.0
   resolution: "@sentry/replay@npm:7.113.0"
@@ -9089,6 +9176,18 @@ __metadata:
     "@sentry/types": 7.113.0
     "@sentry/utils": 7.113.0
   checksum: 5e9aba418646c29256876521d3c704805261cf29b2ea8e37afcccd6b9101f0795cd99dcb726365dc9e31fe1117a1737b0206e14ab50d9b052ee03546c5e0f02f
+  languageName: node
+  linkType: hard
+
+"@sentry/replay@npm:7.117.0":
+  version: 7.117.0
+  resolution: "@sentry/replay@npm:7.117.0"
+  dependencies:
+    "@sentry-internal/tracing": 7.117.0
+    "@sentry/core": 7.117.0
+    "@sentry/types": 7.117.0
+    "@sentry/utils": 7.117.0
+  checksum: de9b8783c1670d652934931d08fd0e0797d476493b36aeda4f945d184bb2a45df570dbd11e4381ae7369b91c758bfb5703fee2dd2ef4ce1d8b5d59e1d08a81b1
   languageName: node
   linkType: hard
 
@@ -9115,6 +9214,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@sentry/types@npm:7.117.0":
+  version: 7.117.0
+  resolution: "@sentry/types@npm:7.117.0"
+  checksum: f3eabf921ecbe1e89c5dc50fd5f52340484ae710333718a6e027f58462bee552d22a70ff50e2a8b9924f935a3b86e3ec4aca20ab3bc3fbee1f77c3a6d49255df
+  languageName: node
+  linkType: hard
+
 "@sentry/utils@npm:7.113.0":
   version: 7.113.0
   resolution: "@sentry/utils@npm:7.113.0"
@@ -9130,6 +9236,15 @@ __metadata:
   dependencies:
     "@sentry/types": 7.116.0
   checksum: f8d2f7fd61409fd52376665f6e87fe7b74706c4a9eb6f05b4d85c2c2fa3dc4cb1c31a4cadddc248a3798a6f01906b16ff8317356a0ab4767cb13e38b0f3f90f0
+  languageName: node
+  linkType: hard
+
+"@sentry/utils@npm:7.117.0":
+  version: 7.117.0
+  resolution: "@sentry/utils@npm:7.117.0"
+  dependencies:
+    "@sentry/types": 7.117.0
+  checksum: d8cf0db1a1b572ed0fa673aa29864bfb47ffa03ddfba13da253b018f5d1fb16b2d5b7e0e302194af30881c1fec2de5896df60a71bd9507b009f9736b24b89b7d
   languageName: node
   linkType: hard
 
@@ -9891,10 +10006,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/relay-runtime@npm:^14.1.23":
-  version: 14.1.23
-  resolution: "@types/relay-runtime@npm:14.1.23"
-  checksum: efaa3c8c769b31f66fc746bccb4ce77d4cc03be70957963c3161894f7adbfce25bf49fbd22e6d6b913081514bd0235bf258dfbcd41793b64c4e7f24705afa8bf
+"@types/relay-runtime@npm:^17.0.0":
+  version: 17.0.0
+  resolution: "@types/relay-runtime@npm:17.0.0"
+  checksum: fd8e882d3e260bfb3c27b1c9f4012d60867998102aca75c702f54ae75c38dd5bbefddd7296dcbb34c6add5013631c79846bb019e9588c9f2da18db1dc9675ce4
   languageName: node
   linkType: hard
 
@@ -11255,14 +11370,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"babel-plugin-relay@npm:^16.2.0":
-  version: 16.2.0
-  resolution: "babel-plugin-relay@npm:16.2.0"
+"babel-plugin-relay@npm:^17.0.0":
+  version: 17.0.0
+  resolution: "babel-plugin-relay@npm:17.0.0"
   dependencies:
     babel-plugin-macros: ^2.0.0
     cosmiconfig: ^5.0.5
     graphql: 15.3.0
-  checksum: 115c3743f0156c47e24eb95f200fc82407e34dc8be126bc6627cd851bd1b14c3bcbac29bd70d23c54f626764636383a4c877d8a226fa6fcf7b3a62f1e49c4e02
+  checksum: 25a82027264e33ba516a7d81610cd9c00c833a6c7ce2b4860e88a71cb8300705ced54b18ceaf67faa44bcd542d5b55778210c1707a4a121e532dd03e38632c3a
   languageName: node
   linkType: hard
 
@@ -21048,12 +21163,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-hook-form@npm:^7.51.5":
-  version: 7.51.5
-  resolution: "react-hook-form@npm:7.51.5"
+"react-hook-form@npm:^7.52.0":
+  version: 7.52.0
+  resolution: "react-hook-form@npm:7.52.0"
   peerDependencies:
-    react: ^16.8.0 || ^17 || ^18
-  checksum: 6b6a56b6520ddb68d491e2f07791538aa611c13fcd76052a499ba10bdaf7f77f4a5f7191e6ca9d9ab0af739bf07171c6e8d97f6c4da06f576aa74caed71828f1
+    react: ^16.8.0 || ^17 || ^18 || ^19
+  checksum: f6c710dbac4462bf0d5aa25dd7d494815395819fbdf594f9bd736c99f77d63e699b4a41663a32486f7b05a75526d6cceae5eeb502189ffd93d12081c84603a38
   languageName: node
   linkType: hard
 
@@ -21364,13 +21479,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-native-safe-area-context@npm:^4.10.4":
-  version: 4.10.4
-  resolution: "react-native-safe-area-context@npm:4.10.4"
+"react-native-safe-area-context@npm:^4.10.5":
+  version: 4.10.5
+  resolution: "react-native-safe-area-context@npm:4.10.5"
   peerDependencies:
     react: "*"
     react-native: "*"
-  checksum: cd87a10298e04f4d065d93effb40e043cd517fa946f79a23728049f6c5758c64fcedaabd2440503791eb5d313ecd92d6a403689cf980440642e77da151d96045
+  checksum: 94e049a5579e8cbe6d08a6da89efc948ff20042c7c08670341ec3629752fa40d0b1f14471860a18fdfc121fbdee1b58d582704f3fd2dc612890a0bd002f908a1
   languageName: node
   linkType: hard
 
@@ -21466,9 +21581,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-native-vision-camera@npm:4.3.1":
-  version: 4.3.1
-  resolution: "react-native-vision-camera@npm:4.3.1"
+"react-native-vision-camera@npm:^4.3.2":
+  version: 4.3.2
+  resolution: "react-native-vision-camera@npm:4.3.2"
   peerDependencies:
     "@shopify/react-native-skia": "*"
     react: "*"
@@ -21482,27 +21597,7 @@ __metadata:
       optional: true
     react-native-worklets-core:
       optional: true
-  checksum: e97ad8503cfd848cc794f95252b5f6385b28cf16c3606c3852654c9ee623288d7e820e3dc95f75e332d31b9a8d01090de281f3bf124d97da8dc786253b1c1283
-  languageName: node
-  linkType: hard
-
-"react-native-vision-camera@patch:react-native-vision-camera@npm%3A4.3.1#./.yarn/patches/react-native-vision-camera-npm-4.3.1-3f4a97f514.patch::locator=%40azzapp%2Fmonorepo%40workspace%3A.":
-  version: 4.3.1
-  resolution: "react-native-vision-camera@patch:react-native-vision-camera@npm%3A4.3.1#./.yarn/patches/react-native-vision-camera-npm-4.3.1-3f4a97f514.patch::version=4.3.1&hash=c29129&locator=%40azzapp%2Fmonorepo%40workspace%3A."
-  peerDependencies:
-    "@shopify/react-native-skia": "*"
-    react: "*"
-    react-native: "*"
-    react-native-reanimated: "*"
-    react-native-worklets-core: "*"
-  peerDependenciesMeta:
-    "@shopify/react-native-skia":
-      optional: true
-    react-native-reanimated:
-      optional: true
-    react-native-worklets-core:
-      optional: true
-  checksum: 68bb1479c8b299d697f24af77538b63a94de66fa687b85194e4d8fd170da5091de4be6bb8d8c9ffa7a25bba8c0cfe4e7aa648f404764d0ab573e26de4ad9b0aa
+  checksum: a4a93e053e3005c007da7e6be5d7160c16015548052e29ff362a7f23c6030a4db536e2a081a56e82e8922613fc1480e4b29cc71ac53635dea31fe7577344096e
   languageName: node
   linkType: hard
 
@@ -21585,18 +21680,18 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-relay@npm:^16.2.0":
-  version: 16.2.0
-  resolution: "react-relay@npm:16.2.0"
+"react-relay@npm:^17.0.0":
+  version: 17.0.0
+  resolution: "react-relay@npm:17.0.0"
   dependencies:
     "@babel/runtime": ^7.0.0
     fbjs: ^3.0.2
     invariant: ^2.2.4
     nullthrows: ^1.1.1
-    relay-runtime: 16.2.0
+    relay-runtime: 17.0.0
   peerDependencies:
     react: ^16.9.0 || ^17 || ^18
-  checksum: fbe58972825ea1ba1d75598f1e85783282a39a9d692f3763ab450a8149a4ac276ff50468273ee1c5f9dc3099d83ed09e45eb79fb46078b9fa26f68f32c926a29
+  checksum: c7c87c447327c105bb627a27581a9db779b8700d176c0c224462df31f58e701df45972e51950064bcc79462f9411ba8c286a2c5ceee3f24617cc1e5546d82648
   languageName: node
   linkType: hard
 
@@ -21860,12 +21955,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"relay-compiler@npm:^16.2.0":
-  version: 16.2.0
-  resolution: "relay-compiler@npm:16.2.0"
+"relay-compiler@npm:^17.0.0":
+  version: 17.0.0
+  resolution: "relay-compiler@npm:17.0.0"
   bin:
     relay-compiler: cli.js
-  checksum: c334aa23721ccb429d228f022564937b297750d41cc20223219d6ef7a9cfada074f066767fdd7a7bf0ce894dc3ba55e92fb52fdb8bd67aa3df2db8b308dce453
+  checksum: b18d20dd963f98d80958eeadca1fb858efcf75915fa8f9e336319dede34d20a1f9cfe3525928647e25e2afd9910fa299c0359a4355d7c31ed51872fd90529f5f
   languageName: node
   linkType: hard
 
@@ -21880,26 +21975,26 @@ __metadata:
   languageName: node
   linkType: hard
 
-"relay-runtime@npm:16.2.0":
-  version: 16.2.0
-  resolution: "relay-runtime@npm:16.2.0"
+"relay-runtime@npm:17.0.0":
+  version: 17.0.0
+  resolution: "relay-runtime@npm:17.0.0"
   dependencies:
     "@babel/runtime": ^7.0.0
     fbjs: ^3.0.2
     invariant: ^2.2.4
-  checksum: 7a6378b48495d014404bf08ba3ed4afa07838727800141ead3cd1b908c61556ef56d1ae7756f4b72134fd4e62b916b9522e65fde4144806feed29aecf57d3bfc
+  checksum: c97d036cdacf218bfd8f14a8e1c302450cd789e94912da31f5a3d4d0410af6f13f1fb2e14aae975513b0549b84e72fab968286f91053301676ceaff88f41b8d2
   languageName: node
   linkType: hard
 
-"relay-test-utils@npm:^16.2.0":
-  version: 16.2.0
-  resolution: "relay-test-utils@npm:16.2.0"
+"relay-test-utils@npm:^17.0.0":
+  version: 17.0.0
+  resolution: "relay-test-utils@npm:17.0.0"
   dependencies:
     "@babel/runtime": ^7.0.0
     fbjs: ^3.0.2
     invariant: ^2.2.4
-    relay-runtime: 16.2.0
-  checksum: 83f520ac5e983fe8cfb7d488e124f227c9b1f40c2e31a9c07e3c3c5fbe97ebb7bdd58de73dc9464597f77f772e65f156928ae5103a985c16396d1ea8d85b7762
+    relay-runtime: 17.0.0
+  checksum: 6af9dadf3cd4b9979690efe708783e6c3d57158afe260eb9e2aa4757a2e0ffb0c1c2c5c1bf6075632815c12a954b5a69b4844bdea140292786e990a24ccbb668
   languageName: node
   linkType: hard
 

@@ -1159,7 +1159,7 @@ PODS:
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
     - Yoga
-  - react-native-safe-area-context (4.10.4):
+  - react-native-safe-area-context (4.10.5):
     - React-Core
   - react-native-skia (1.3.3):
     - DoubleConversion
@@ -1420,7 +1420,7 @@ PODS:
     - React-Core
   - RNCMaskedView (0.3.1):
     - React-Core
-  - RNDateTimePicker (8.1.0):
+  - RNDateTimePicker (8.1.1):
     - React-Core
   - RNFlashList (1.6.4):
     - React-Core
@@ -1497,11 +1497,11 @@ PODS:
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
     - Yoga
-  - RNSentry (5.22.3):
+  - RNSentry (5.24.0):
     - hermes-engine
     - React-Core
     - React-hermes
-    - Sentry/HybridSDK (= 8.26.0)
+    - Sentry/HybridSDK (= 8.28.0)
   - RNShare (10.2.1):
     - React-Core
   - RNSVG (15.3.0):
@@ -1517,13 +1517,13 @@ PODS:
   - SDWebImageWebPCoder (0.14.6):
     - libwebp (~> 1.0)
     - SDWebImage/Core (~> 5.17)
-  - Sentry/HybridSDK (8.26.0)
+  - Sentry/HybridSDK (8.28.0)
   - SocketRocket (0.7.0)
-  - VisionCamera (4.3.1):
-    - VisionCamera/Core (= 4.3.1)
-    - VisionCamera/React (= 4.3.1)
-  - VisionCamera/Core (4.3.1)
-  - VisionCamera/React (4.3.1):
+  - VisionCamera (4.3.2):
+    - VisionCamera/Core (= 4.3.2)
+    - VisionCamera/React (= 4.3.2)
+  - VisionCamera/Core (4.3.2)
+  - VisionCamera/React (4.3.2):
     - React-Core
   - Yoga (0.0.0)
 
@@ -1909,7 +1909,7 @@ SPEC CHECKSUMS:
   react-native-pager-view: e2b7c31147cdc1750cb3867d37a145e487653c34
   react-native-passkit: aaf4f946eb981b872104192aadaa7d6c94011f86
   react-native-quick-base64: a74c4b2607b9de016877a8edb776b6ac59785809
-  react-native-safe-area-context: 399a5859f6acbdf67f671c69b53113f535f3b5b0
+  react-native-safe-area-context: a240ad4b683349e48b1d51fed1611138d1bdad97
   react-native-skia: fe38efae026a4bacc8e9793c741f02062ff0acbf
   React-nativeconfig: 9f223cd321823afdecf59ed00861ab2d69ee0fc1
   React-NativeModulesApple: ff7efaff7098639db5631236cfd91d60abff04c0
@@ -1938,7 +1938,7 @@ SPEC CHECKSUMS:
   RNBootSplash: e025d4ee98d942ee6c8b495a6fe66339a6b5f6dd
   RNCAsyncStorage: 826b603ae9c0f88b5ac4e956801f755109fa4d5c
   RNCMaskedView: 090213d32d8b3bb83a4dcb7d12c18f0152591906
-  RNDateTimePicker: 6dfc4acb94e520ccb1f1697e9d4cd64fd0817314
+  RNDateTimePicker: 430174392d275f0ffefb627d04f0f8677f667fed
   RNFlashList: b521ebdd7f9352673817f1d98e8bdc0c8cf8545b
   RNGestureHandler: 2282cfbcf86c360d29f44ace393203afd5c6cff7
   RNLocalize: b77875884750cb6a58cd6865863fe2ba2729b72b
@@ -1947,16 +1947,16 @@ SPEC CHECKSUMS:
   RNReactNativeHapticFeedback: ec56a5f81c3941206fd85625fa669ffc7b4545f9
   RNReanimated: 7f9998a5175727dd86b61bf1e051ccdcf7dc8788
   RNScreens: b32a9ff15bea7fcdbe5dff6477bc503f792b1208
-  RNSentry: 7e184247ee04989474d12cce0b7ef7bc4a71632f
+  RNSentry: 29360f46d9770060fceafd06c3ae097de1a1847e
   RNShare: 0fad69ae2d71de9d1f7b9a43acf876886a6cb99c
   RNSVG: a48668fd382115bc89761ce291a81c4ca5f2fd2e
   SDWebImage: dfe95b2466a9823cf9f0c6d01217c06550d7b29a
   SDWebImageAVIFCoder: 00310d246aab3232ce77f1d8f0076f8c4b021d90
   SDWebImageSVGCoder: 15a300a97ec1c8ac958f009c02220ac0402e936c
   SDWebImageWebPCoder: e38c0a70396191361d60c092933e22c20d5b1380
-  Sentry: 74a073c71c998117edb08f56f443c83570a31bed
+  Sentry: 1482a20b132098929714143f436a4fe574ad0517
   SocketRocket: abac6f5de4d4d62d24e11868d7a2f427e0ef940d
-  VisionCamera: 58d2120e6e23c155b25f4702b7912dc2b1e5e8c2
+  VisionCamera: 2c4cb89c573c5d54d1191e433bd224998d3b14b7
   Yoga: ae3c32c514802d30f687a04a6a35b348506d411f
 
 PODFILE CHECKSUM: b53934a587b007df3ef8109841539094ed70e432

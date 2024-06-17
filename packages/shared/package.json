@@ -30,7 +30,7 @@
   "devDependencies": {
     "@babel/cli": "7.24.5",
     "@types/chroma-js": "^2.4.4",
-    "@types/relay-runtime": "^14.1.23",
+    "@types/relay-runtime": "^17.0.0",
     "@types/validator": "^13.11.9",
     "typescript": "^5.4.5"
   }
