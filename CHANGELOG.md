@@ -1,4 +1,4 @@
-## 0.5.15-canary.156
+## 0.5.15-canary.157
 
 * **fix:**  - 🐛 Also fetch users with empty information ([#3780](https://github.com/AzzappApp/azzapp/pull/3780))
 * **fix:**  - 🐛 complete previous partial cover fix ([#3778](https://github.com/AzzappApp/azzapp/pull/3778))
