@@ -11,6 +11,7 @@ import Animated, {
   interpolate,
   useAnimatedScrollHandler,
   useAnimatedStyle,
+  useDerivedValue,
   useSharedValue,
 } from 'react-native-reanimated';
 import type { ForwardedRef, ReactElement, ReactNode, Ref } from 'react';
@@ -277,26 +278,32 @@ const AnimatedItemWrapper = ({
   containerStyle: StyleProp<ViewStyle>;
   width: number;
 }) => {
-  const inputRange = useMemo(() => [index - 1, index, index + 1], [index]);
-
-  const animatedStyle = useAnimatedStyle(() => {
-    const scale = interpolate(
+  const translateX = useDerivedValue(() => {
+    return interpolate(
       scrollIndex.value,
-      inputRange,
-      [scaleRatio, 1, scaleRatio],
-      Extrapolation.CLAMP,
-    );
-    const translateX = interpolate(
-      scrollIndex.value,
-      inputRange,
+      [index - 1, index, index + 1],
       [-offset + offsetCenter / 2, 0, offset - offsetCenter / 2],
       Extrapolation.EXTEND,
     );
+  });
+
+  const scale = useDerivedValue(() => {
+    return interpolate(
+      scrollIndex.value,
+      [index - 1, index, index + 1],
+      [scaleRatio, 1, scaleRatio],
+      Extrapolation.CLAMP,
+    );
+  });
+
+  const animatedStyle = useAnimatedStyle(() => {
+    'worklet';
     return {
       width,
-      transform: [{ translateX }, { scale }],
+      transform: [{ translateX: translateX.value }, { scale: scale.value }],
     };
-  }, [inputRange, offset, offsetCenter, scaleRatio, scrollIndex.value, width]);
+  });
+
   return (
     <Animated.View style={[animatedStyle, containerStyle]}>
       {children}

@@ -3,6 +3,7 @@ import { StyleSheet, View } from 'react-native';
 import Animated, {
   interpolate,
   useAnimatedStyle,
+  useDerivedValue,
 } from 'react-native-reanimated';
 import { graphql, useFragment } from 'react-relay';
 import HomeBottomPanelCreate from './HomeBottomPanelCreate';
@@ -87,9 +88,9 @@ type MessageItemProps = {
 
 const MessageItem = ({ content, index }: MessageItemProps) => {
   const { currentIndexSharedValue } = useHomeScreenContext();
-  const animatedStyle = useAnimatedStyle(() => {
-    //math.pow is used to reduce the superposition of 2 view, the increase is not linear, going slowly at the beginning
-    const opacity = Math.pow(
+
+  const opacity = useDerivedValue(() => {
+    return Math.pow(
       Math.max(
         0,
         interpolate(
@@ -100,12 +101,13 @@ const MessageItem = ({ content, index }: MessageItemProps) => {
       ),
       4,
     );
-
+  });
+  const animatedStyle = useAnimatedStyle(() => {
     return {
-      opacity,
-      pointerEvents: opacity > 0.5 ? 'box-none' : 'none',
+      opacity: opacity.value,
+      pointerEvents: opacity.value > 0.5 ? 'box-none' : 'none',
     };
-  }, [currentIndexSharedValue]);
+  });
 
   return (
     <Animated.View

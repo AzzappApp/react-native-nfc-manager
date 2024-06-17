@@ -62,10 +62,7 @@ const HomeScreen = ({
 
   return (
     <Suspense>
-      <HomeScreenProvider
-        userKey={currentUser}
-        key={currentUser.profiles?.length ?? '0'}
-      >
+      <HomeScreenProvider userKey={currentUser}>
         <HomeScreenContent user={currentUser} />
       </HomeScreenProvider>
     </Suspense>

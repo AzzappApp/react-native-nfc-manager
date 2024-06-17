@@ -49,7 +49,7 @@ const HomeScreenContent = ({ user: userKey }: HomeScreenContentProps) => {
 
   const currentProfile = useMemo(
     () => user.profiles?.[currentIndexProfile.value - 1],
-    [currentIndexProfile, user.profiles],
+    [currentIndexProfile.value, user.profiles],
   );
 
   //#endregion
