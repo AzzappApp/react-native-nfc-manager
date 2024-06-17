@@ -1,4 +1,10 @@
-import React, { useCallback, useEffect, useMemo, useRef } from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import { useDerivedValue, useSharedValue } from 'react-native-reanimated';
 import { graphql, useFragment } from 'react-relay';
 import {
@@ -53,17 +59,15 @@ export const HomeScreenProvider = ({
     `,
     userKey,
   );
-  const initialProfileIndex = useRef(0);
-  useEffect(() => {
+  const [initialProfileIndex, setInitialProfileIndex] = useState(() => {
     const index = user?.profiles?.findIndex(
       profile => profile.id === getAuthState().profileInfos?.profileId,
     );
-    initialProfileIndex.current =
-      index !== undefined && index !== -1 ? index + 1 : 0;
-    // we only want to run this once
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-  const currentIndexSharedValue = useSharedValue(initialProfileIndex.current);
+
+    return index !== undefined && index !== -1 ? index + 1 : 0;
+  });
+
+  const currentIndexSharedValue = useSharedValue(initialProfileIndex);
 
   const currentIndexProfile = useDerivedValue(() => {
     return Math.round(currentIndexSharedValue.value);
@@ -170,21 +174,23 @@ export const HomeScreenProvider = ({
     [currentIndexSharedValue, focus, user.profiles],
   );
 
-  if (
-    profilesRef.current &&
-    user?.profiles &&
-    profilesRef.current.length > user.profiles.length
-  ) {
-    initialProfileIndex.current = 1;
-    onCurrentProfileIndexChange(1);
-  }
+  useEffect(() => {
+    if (
+      profilesRef.current &&
+      user?.profiles &&
+      profilesRef.current.length > user.profiles.length
+    ) {
+      setInitialProfileIndex(1);
+      onCurrentProfileIndexChange(1);
+    }
+  }, [onCurrentProfileIndexChange, user.profiles]);
 
   return (
     <HomeScreenContext.Provider
       value={{
         currentIndexSharedValue,
         inputRange,
-        initialProfileIndex: initialProfileIndex.current,
+        initialProfileIndex,
         currentIndexProfile,
         onCurrentProfileIndexChange,
       }}
