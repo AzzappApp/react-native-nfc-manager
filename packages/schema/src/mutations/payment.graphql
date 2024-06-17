@@ -23,7 +23,8 @@ extend type Mutation {
   createPaymentMean(
     webCardId: ID!
     locale: String!
-    redirectUrl: String!
+    redirectUrlSuccess: String!
+    redirectUrlCancel: String!
     customer: Customer!
   ): String!
   generatePaymentInvoice(webCardId: ID!, paymentId: ID!): String!
@@ -46,7 +47,8 @@ input PaymentIntentInput {
   locale: String!
   plan: PaymentPlan!
   customer: Customer!
-  redirectUrl: String!
+  redirectUrlSuccess: String!
+  redirectUrlCancel: String!
 }
 
 input Customer {

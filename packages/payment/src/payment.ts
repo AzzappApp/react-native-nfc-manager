@@ -57,14 +57,16 @@ export const createPaymentRequest = async ({
   locale,
   plan,
   customer,
-  redirectUrl,
+  redirectUrlSuccess,
+  redirectUrlCancel,
 }: {
   totalSeats: number;
   userId: string;
   webCardId: string;
   locale: string;
   plan: 'monthly' | 'yearly';
-  redirectUrl: string;
+  redirectUrlSuccess: string;
+  redirectUrlCancel: string;
   customer: Customer;
 }) => {
   const ORDERID = createId();
@@ -112,7 +114,8 @@ export const createPaymentRequest = async ({
           webCardId,
         }),
         CALLBACKURL: `${process.env.NEXT_PUBLIC_API_ENDPOINT}/webhook/payment`,
-        REDIRECTURL: redirectUrl,
+        REDIRECTURLSUCCESS: redirectUrlSuccess,
+        REDIRECTURLCANCEL: redirectUrlCancel,
         BILLINGADDRESS: customer.address,
         BILLINGCITY: customer.city,
         BILLINGPOSTALCODE: customer.zip,
@@ -309,13 +312,15 @@ export const createNewPaymentMean = async ({
   webCardId,
   customer,
   locale,
-  redirectUrl,
+  redirectUrlSuccess,
+  redirectUrlCancel,
 }: {
   userId: string;
   webCardId: string;
   locale: string;
   customer: Customer;
-  redirectUrl: string;
+  redirectUrlSuccess: string;
+  redirectUrlCancel: string;
 }) => {
   const token = await login();
   const ORDERID = createId();
@@ -350,7 +355,8 @@ export const createNewPaymentMean = async ({
         EXTRADATA: JSON.stringify({
           webCardId,
         }),
-        REDIRECTURL: redirectUrl,
+        REDIRECTURLSUCCESS: redirectUrlSuccess,
+        REDIRECTURLCANCEL: redirectUrlCancel,
         CALLBACKURL: `${process.env.NEXT_PUBLIC_API_ENDPOINT}/webhook/payment`,
         BILLINGADDRESS: customer.address,
         BILLINGCITY: customer.city,

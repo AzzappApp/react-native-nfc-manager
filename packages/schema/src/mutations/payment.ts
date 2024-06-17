@@ -65,7 +65,7 @@ export const createSubscriptionFromPaymentMean: MutationResolvers['createSubscri
 
 export const createPaymentMean: MutationResolvers['createPaymentMean'] = async (
   _,
-  { webCardId, locale, redirectUrl, customer },
+  { webCardId, locale, redirectUrlSuccess, redirectUrlCancel, customer },
   { auth },
 ) => {
   if (!auth.userId) {
@@ -77,7 +77,8 @@ export const createPaymentMean: MutationResolvers['createPaymentMean'] = async (
     userId: auth.userId,
     webCardId: fromGlobalIdWithType(webCardId, 'WebCard'),
     locale,
-    redirectUrl,
+    redirectUrlSuccess,
+    redirectUrlCancel,
   });
 
   if (!result) {
