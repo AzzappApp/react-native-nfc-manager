@@ -1,5 +1,6 @@
-## 0.5.15-canary.160
+## 0.5.15-canary.161
 
+* **build:**  - upgrade to react-relay 17 ([#3793](https://github.com/AzzappApp/azzapp/pull/3793))
 * **feat:**  - implement hash on payment ([#3789](https://github.com/AzzappApp/azzapp/pull/3789))
 * **fix:**  - 🐛 Also fetch users with empty information ([#3780](https://github.com/AzzappApp/azzapp/pull/3780))
 * **fix:**  - 🐛 complete previous partial cover fix ([#3778](https://github.com/AzzappApp/azzapp/pull/3778))
