@@ -260,7 +260,7 @@ const createCoverMedia = async (coverEditorState: CoverEditorState) => {
         items.push({
           id: media.uri,
           path,
-          startTime: 0,
+          startTime: timeRange.startTime,
           compositionStartTime: duration,
           duration: itemDuration,
           resolution,
