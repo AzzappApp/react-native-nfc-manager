@@ -59,9 +59,11 @@ const LoadCardTemplateModal = ({
   const height = windowHeight - insets.top - insets.bottom - HEADER_HEIGHT;
 
   const [commit, inFlight] = useLoadCardTemplateMutation();
+  const [loading, setIsLoading] = useState(false);
 
   const commitCardTemplate = useCallback(
     (id: string) => {
+      setIsLoading(true);
       commit({
         variables: {
           webCardId: webCard.id,
@@ -70,6 +72,7 @@ const LoadCardTemplateModal = ({
         onCompleted: () => {
           setCardTemplateId(null);
           onClose(true);
+          setIsLoading(false);
         },
         onError: error => {
           console.error(error);
@@ -184,7 +187,9 @@ const LoadCardTemplateModal = ({
       </ScreenModal>
       <ScreenModal
         animationType="none"
-        visible={visible && !!cardTemplateId && !inFlight && showWarning}
+        visible={
+          visible && !!cardTemplateId && !loading && !inFlight && showWarning
+        }
       >
         <Container style={styles.confirmation}>
           <Icon icon="warning" style={styles.icon} />
@@ -222,7 +227,11 @@ const LoadCardTemplateModal = ({
                     'Confirmation button for load card template modal',
                 },
                 {
-                  azzappA: <Text variant="azzapp">a</Text>,
+                  azzappA: (
+                    <Text style={{ color: colors.white }} variant="azzapp">
+                      a
+                    </Text>
+                  ),
                 },
               )}
               onPress={onSubmit}

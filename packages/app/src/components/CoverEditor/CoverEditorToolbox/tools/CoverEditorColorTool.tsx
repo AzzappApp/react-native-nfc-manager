@@ -1,6 +1,7 @@
 import { useCallback } from 'react';
 import { useIntl } from 'react-intl';
 import { StyleSheet } from 'react-native';
+import { swapColor } from '@azzapp/shared/cardHelpers';
 import useToggle from '#hooks/useToggle';
 import Icon from '#ui/Icon';
 import {
@@ -22,7 +23,7 @@ const CoverEditorColorTool = ({ title }: Props) => {
   const textLayer = useCoverEditorTextLayer();
   const linksLayer = useCoverEditorLinksLayer();
 
-  const { dispatch } = useCoverEditorContext();
+  const { dispatch, coverEditorState } = useCoverEditorContext();
 
   const onColorChange = useCallback(
     (color: string) => {
@@ -46,7 +47,15 @@ const CoverEditorColorTool = ({ title }: Props) => {
         icon={
           <>
             <Icon icon="font_color_letter" style={styles.icon} />
-            <Icon icon="font_color_dash" style={{ tintColor: selectedColor }} />
+            <Icon
+              icon="font_color_dash"
+              style={{
+                tintColor: swapColor(
+                  selectedColor,
+                  coverEditorState.cardColors,
+                ),
+              }}
+            />
           </>
         }
         onPress={toggleBottomSheet}
