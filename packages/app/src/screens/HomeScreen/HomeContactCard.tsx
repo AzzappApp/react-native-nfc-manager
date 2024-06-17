@@ -1,6 +1,9 @@
 import { useCallback } from 'react';
-import { View, useWindowDimensions } from 'react-native';
-import Animated, { useAnimatedStyle } from 'react-native-reanimated';
+import { Dimensions, View } from 'react-native';
+import Animated, {
+  useAnimatedStyle,
+  useDerivedValue,
+} from 'react-native-reanimated';
 import { useFragment, graphql } from 'react-relay';
 import { shadow } from '#theme';
 import ContactCard, {
@@ -19,7 +22,7 @@ type HomeContactCardProps = {
   user: HomeContactCard_user$key;
   height: number;
 };
-
+const windowWidth = Dimensions.get('screen').width;
 const HomeContactCard = ({ user, height }: HomeContactCardProps) => {
   const { profiles } = useFragment(
     graphql`
@@ -35,8 +38,6 @@ const HomeContactCard = ({ user, height }: HomeContactCardProps) => {
     user,
   );
 
-  const { width: windowWidth } = useWindowDimensions();
-
   return (
     <View
       style={{
@@ -48,7 +49,6 @@ const HomeContactCard = ({ user, height }: HomeContactCardProps) => {
       {profiles?.map((item, index) => (
         <ContactCardItem
           key={item.webCard.id}
-          width={windowWidth}
           height={height}
           item={item}
           index={index}
@@ -61,29 +61,28 @@ const HomeContactCard = ({ user, height }: HomeContactCardProps) => {
 export default HomeContactCard;
 
 type ContactCardItemProps = {
-  width: number;
   height: number;
   item: HomeContactCard_profile$key;
   index: number;
 };
 
-const ContactCardItem = ({
-  width,
-  height,
-  item,
-  index,
-}: ContactCardItemProps) => {
+const ContactCardItem = ({ height, item, index }: ContactCardItemProps) => {
   const styles = useStyleSheet(styleSheet);
   const currentIndexSharedValue = useHomeScreenCurrentIndex();
-  const positionStyle = useAnimatedStyle(() => ({
-    //index start a 0 for the firstItem, so add +1 in thisd case
-    transform: [
-      { translateX: (index - currentIndexSharedValue.value + 1) * width },
-    ],
-  }));
 
-  const maxWidth = width - 40;
-  const maxHeight = maxWidth / CONTACT_CARD_RATIO;
+  const translateX = useDerivedValue(() => {
+    'worklet';
+    return (index - currentIndexSharedValue.value + 1) * windowWidth;
+  }, [index, windowWidth]);
+
+  const positionStyle = useAnimatedStyle(() => {
+    return {
+      //index start a 0 for the firstItem, so add +1 in thisd case
+      transform: [{ translateX: translateX.value }],
+    };
+  });
+
+  const maxHeight = (windowWidth - 40) / CONTACT_CARD_RATIO;
   const cardHeight = Math.min(height, maxHeight);
 
   const profile = useFragment(
@@ -118,7 +117,7 @@ const ContactCardItem = ({
     <Animated.View
       style={[
         {
-          width,
+          width: windowWidth,
           height,
         },
         styles.itemContainer,

@@ -67,6 +67,7 @@ const HomeBottomPanel = ({ user: userKey }: HomeBottomPanelProps) => {
   //#endregion
 
   const bottomPanelVisible = useMemo(() => {
+    'worklet';
     const res =
       profiles?.map(profile => {
         if (!profile) return 0;
@@ -95,7 +96,9 @@ const HomeBottomPanel = ({ user: userKey }: HomeBottomPanelProps) => {
       return bottomPanelVisible[0];
     }
   }, [bottomPanelVisible, currentIndexSharedValue.value, inputRange]);
+
   const bottomPanelStyle = useAnimatedStyle(() => {
+    'worklet';
     if (inputRange.length === 0)
       return { opacity: 1, pointerEvents: 'box-none' };
 
