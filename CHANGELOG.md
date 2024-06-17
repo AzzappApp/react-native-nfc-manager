@@ -1,5 +1,6 @@
-## 0.5.15-canary.152
+## 0.5.15-canary.153
 
+* **fix:**  - ContactCard - animatedStyle threading issue ([#3762](https://github.com/AzzappApp/azzapp/pull/3762))
 * **build:**  - upgrade deps
 * **fix:**  - selecting profile after creating a new one with tempalte ([#3753](https://github.com/AzzappApp/azzapp/pull/3753))
 * **fix:**  - 🐛 always fetch all profiles on multi user screen ([#3752](https://github.com/AzzappApp/azzapp/pull/3752))
