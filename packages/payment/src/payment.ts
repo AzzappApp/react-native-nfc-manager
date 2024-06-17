@@ -19,6 +19,7 @@ import {
   calculateTaxes,
   generateRebillFailRule,
   getNextPaymentDate,
+  signature,
   type SubscriptionPlan,
 } from './helpers';
 import type { Customer } from '#types';
@@ -70,7 +71,6 @@ export const createPaymentRequest = async ({
   customer: Customer;
 }) => {
   const ORDERID = createId();
-  const TRANSACTION_HASH = createId();
 
   const subscriptionPlan: SubscriptionPlan = `web.${plan}`;
 
@@ -89,6 +89,43 @@ export const createPaymentRequest = async ({
   const tomorrow = new Date();
   tomorrow.setDate(date.getDate() + 1);
 
+  const requestBody = {
+    AMOUNT: amount + taxes,
+    LANGUAGE: findLocale(locale),
+    '3DSECURE': 'yes',
+    '3DSECUREAUTHENTICATIONAMOUNT': 0,
+    IDENTIFIER,
+    ORDERID,
+    VERSION: '3.0',
+    DESCRIPTION: `Payment for ${plan} subscription`,
+    CLIENTIDENT: userId,
+    CLIENTEMAIL: customer.email,
+    CARDFULLNAME: customer.name,
+    HIDECLIENTEMAIL: 'no',
+    OPERATIONTYPE: 'payment',
+    EXTRADATA: JSON.stringify({
+      webCardId,
+    }),
+    CALLBACKURL: `${process.env.NEXT_PUBLIC_API_ENDPOINT}/webhook/payment`,
+    REDIRECTURLSUCCESS: redirectUrlSuccess,
+    REDIRECTURLCANCEL: redirectUrlCancel,
+    BILLINGADDRESS: customer.address,
+    BILLINGCITY: customer.city,
+    BILLINGPOSTALCODE: customer.zip,
+    BILLINGCOUNTRY: customer.country,
+    DELIVERYTIMEFRAME: 'electronic',
+    SHIPTOADDRESS: customer.address,
+    SHIPTOADDRESSTYPE: 'billing',
+    SHIPTOCITY: customer.city,
+    SHIPTOPOSTALCODE: customer.zip,
+    SHIPTOCOUNTRY: customer.country,
+    ACCOUNTCREATIONDATE: dayjs(date).format('YYYY-MM-DD'),
+    ACCOUNTCHANGEDATE: dayjs(date).format('YYYY-MM-DD'),
+    TIMEZONE: 'UTC',
+    TRANSACTIONEXPIRATIONDATE: dayjs(tomorrow).format('YYYY-MM-DD HH:mm:ss'),
+    PASSWORDCHANGEDATE: dayjs(tomorrow).format('YYYY-MM-DD'),
+  } as const;
+
   const result = await client.POST(
     '/api/client-payment-requests/create-from-legacy',
     {
@@ -96,43 +133,8 @@ export const createPaymentRequest = async ({
         Authorization: `Bearer ${token}`,
       },
       body: {
-        AMOUNT: amount + taxes,
-        LANGUAGE: findLocale(locale),
-        '3DSECURE': 'yes',
-        '3DSECUREAUTHENTICATIONAMOUNT': 0,
-        IDENTIFIER,
-        ORDERID,
-        VERSION: '3.0',
-        DESCRIPTION: `Payment for ${plan} subscription`,
-        CLIENTIDENT: userId,
-        CLIENTEMAIL: customer.email,
-        CARDFULLNAME: customer.name,
-        HIDECLIENTEMAIL: 'no',
-        HASH: TRANSACTION_HASH,
-        OPERATIONTYPE: 'payment',
-        EXTRADATA: JSON.stringify({
-          webCardId,
-        }),
-        CALLBACKURL: `${process.env.NEXT_PUBLIC_API_ENDPOINT}/webhook/payment`,
-        REDIRECTURLSUCCESS: redirectUrlSuccess,
-        REDIRECTURLCANCEL: redirectUrlCancel,
-        BILLINGADDRESS: customer.address,
-        BILLINGCITY: customer.city,
-        BILLINGPOSTALCODE: customer.zip,
-        BILLINGCOUNTRY: customer.country,
-        DELIVERYTIMEFRAME: 'electronic',
-        SHIPTOADDRESS: customer.address,
-        SHIPTOADDRESSTYPE: 'billing',
-        SHIPTOCITY: customer.city,
-        SHIPTOPOSTALCODE: customer.zip,
-        SHIPTOCOUNTRY: customer.country,
-        ACCOUNTCREATIONDATE: dayjs(date).format('YYYY-MM-DD'),
-        ACCOUNTCHANGEDATE: dayjs(date).format('YYYY-MM-DD'),
-        TIMEZONE: 'UTC',
-        TRANSACTIONEXPIRATIONDATE: dayjs(tomorrow).format(
-          'YYYY-MM-DD HH:mm:ss',
-        ),
-        PASSWORDCHANGEDATE: dayjs(tomorrow).format('YYYY-MM-DD'),
+        ...requestBody,
+        HASH: await signature(requestBody),
       },
     },
   );
@@ -324,12 +326,48 @@ export const createNewPaymentMean = async ({
 }) => {
   const token = await login();
   const ORDERID = createId();
-  const TRANSACTION_HASH = createId();
 
   const date = new Date();
 
   const tomorrow = new Date();
   tomorrow.setDate(date.getDate() + 1);
+
+  const requestBody = {
+    AMOUNT: 0,
+    LANGUAGE: findLocale(locale),
+    '3DSECURE': 'yes',
+    '3DSECUREAUTHENTICATIONAMOUNT': 0,
+    IDENTIFIER,
+    ORDERID,
+    VERSION: '3.0',
+    DESCRIPTION: `New payment request for webCard ${webCardId}`,
+    CLIENTIDENT: userId,
+    CLIENTEMAIL: customer.email,
+    CARDFULLNAME: customer.name,
+    HIDECLIENTEMAIL: 'no',
+    OPERATIONTYPE: 'payment',
+    EXTRADATA: JSON.stringify({
+      webCardId,
+    }),
+    REDIRECTURLSUCCESS: redirectUrlSuccess,
+    REDIRECTURLCANCEL: redirectUrlCancel,
+    CALLBACKURL: `${process.env.NEXT_PUBLIC_API_ENDPOINT}/webhook/payment`,
+    BILLINGADDRESS: customer.address,
+    BILLINGCITY: customer.city,
+    BILLINGPOSTALCODE: customer.zip,
+    BILLINGCOUNTRY: customer.country,
+    DELIVERYTIMEFRAME: 'electronic',
+    SHIPTOADDRESS: customer.address,
+    SHIPTOADDRESSTYPE: 'billing',
+    SHIPTOCITY: customer.city,
+    SHIPTOPOSTALCODE: customer.zip,
+    SHIPTOCOUNTRY: customer.country,
+    ACCOUNTCREATIONDATE: dayjs(date).format('YYYY-MM-DD'),
+    ACCOUNTCHANGEDATE: dayjs(date).format('YYYY-MM-DD'),
+    TIMEZONE: 'Europe/Paris',
+    TRANSACTIONEXPIRATIONDATE: dayjs(tomorrow).format('YYYY-MM-DD HH:mm:ss'),
+    PASSWORDCHANGEDATE: dayjs(tomorrow).format('YYYY-MM-DD'),
+  } as const;
 
   const result = await client.POST(
     '/api/client-payment-requests/create-from-legacy',
@@ -338,43 +376,8 @@ export const createNewPaymentMean = async ({
         Authorization: `Bearer ${token}`,
       },
       body: {
-        AMOUNT: 0,
-        LANGUAGE: findLocale(locale),
-        '3DSECURE': 'yes',
-        '3DSECUREAUTHENTICATIONAMOUNT': 0,
-        IDENTIFIER,
-        ORDERID,
-        VERSION: '3.0',
-        DESCRIPTION: `New payment request for webCard ${webCardId}`,
-        CLIENTIDENT: userId,
-        CLIENTEMAIL: customer.email,
-        CARDFULLNAME: customer.name,
-        HIDECLIENTEMAIL: 'no',
-        HASH: TRANSACTION_HASH,
-        OPERATIONTYPE: 'payment',
-        EXTRADATA: JSON.stringify({
-          webCardId,
-        }),
-        REDIRECTURLSUCCESS: redirectUrlSuccess,
-        REDIRECTURLCANCEL: redirectUrlCancel,
-        CALLBACKURL: `${process.env.NEXT_PUBLIC_API_ENDPOINT}/webhook/payment`,
-        BILLINGADDRESS: customer.address,
-        BILLINGCITY: customer.city,
-        BILLINGPOSTALCODE: customer.zip,
-        BILLINGCOUNTRY: customer.country,
-        DELIVERYTIMEFRAME: 'electronic',
-        SHIPTOADDRESS: customer.address,
-        SHIPTOADDRESSTYPE: 'billing',
-        SHIPTOCITY: customer.city,
-        SHIPTOPOSTALCODE: customer.zip,
-        SHIPTOCOUNTRY: customer.country,
-        ACCOUNTCREATIONDATE: dayjs(date).format('YYYY-MM-DD'),
-        ACCOUNTCHANGEDATE: dayjs(date).format('YYYY-MM-DD'),
-        TIMEZONE: 'Europe/Paris',
-        TRANSACTIONEXPIRATIONDATE: dayjs(tomorrow).format(
-          'YYYY-MM-DD HH:mm:ss',
-        ),
-        PASSWORDCHANGEDATE: dayjs(tomorrow).format('YYYY-MM-DD'),
+        ...requestBody,
+        HASH: await signature(requestBody),
       },
     },
   );

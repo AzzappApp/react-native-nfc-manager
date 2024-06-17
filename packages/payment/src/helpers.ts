@@ -1,3 +1,4 @@
+import { sha256 } from '@azzapp/shared/crypto';
 import { getTaxRate } from '#taxes';
 import type { UserSubscription } from '@azzapp/data';
 
@@ -56,4 +57,53 @@ export const calculateNextPaymentIntervalInMinutes = (
 
 export const generateRebillFailRule = () => {
   return 'PT1H:PT24H:P2D';
+};
+
+type Params = { [key: string]: any };
+
+const SIGNATURE_PASSWORD = process.env.PAYMENT_API_SECRET;
+
+export const signature = async (params: Params = {}): Promise<string> => {
+  const stack: string[] = [];
+  const query: string[] = [];
+
+  const sortedParams = Object.keys(params)
+    .sort()
+    .reduce((result: Params, key: string) => {
+      result[key] = params[key];
+      return result;
+    }, {});
+
+  for (const [key, value] of Object.entries(sortedParams)) {
+    if (key === 'HASH' && stack.length === 0) {
+      continue;
+    }
+    if (!Array.isArray(value) && typeof value !== 'object') {
+      if (stack.length > 0) {
+        query.push(stack.join('') + '[' + key + ']=' + value);
+      } else {
+        query.push(key + '=' + value);
+      }
+    } else {
+      stack.push(stack.length > 0 ? '[' + key + ']' : key);
+      query.push(await signature(value));
+      stack.pop();
+    }
+  }
+
+  if (stack.length === 0) {
+    const result =
+      SIGNATURE_PASSWORD + query.join(SIGNATURE_PASSWORD) + SIGNATURE_PASSWORD;
+    return sha256(result);
+  } else {
+    return query.join(SIGNATURE_PASSWORD);
+  }
+};
+
+export const checkSignature = async (
+  params: Params,
+  hashToCheck: string,
+): Promise<boolean> => {
+  const generatedHash = await signature(params);
+  return generatedHash === hashToCheck;
 };
