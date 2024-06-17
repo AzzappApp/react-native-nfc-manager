@@ -1,5 +1,7 @@
-## 0.5.15-canary.155
+## 0.5.15-canary.156
 
+* **fix:**  - 🐛 Also fetch users with empty information ([#3780](https://github.com/AzzappApp/azzapp/pull/3780))
+* **fix:**  - 🐛 complete previous partial cover fix ([#3778](https://github.com/AzzappApp/azzapp/pull/3778))
 * **fix:**  - apply changes of payment api url ([#3774](https://github.com/AzzappApp/azzapp/pull/3774))
 * **fix:**  - **wallet:** [#3742](https://github.com/AzzappApp/azzapp/pull/3742) use common infos company name ([#3761](https://github.com/AzzappApp/azzapp/pull/3761))
 * **Fix:**  - home carrousel blinking ([#3766](https://github.com/AzzappApp/azzapp/pull/3766))
