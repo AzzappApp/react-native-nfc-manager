@@ -1,5 +1,6 @@
-## 0.5.15-canary.157
+## 0.5.15-canary.158
 
+* **feat:**  - implement hash on payment ([#3789](https://github.com/AzzappApp/azzapp/pull/3789))
 * **fix:**  - 🐛 Also fetch users with empty information ([#3780](https://github.com/AzzappApp/azzapp/pull/3780))
 * **fix:**  - 🐛 complete previous partial cover fix ([#3778](https://github.com/AzzappApp/azzapp/pull/3778))
 * **fix:**  - apply changes of payment api url ([#3774](https://github.com/AzzappApp/azzapp/pull/3774))
