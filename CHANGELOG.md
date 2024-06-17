@@ -1,5 +1,8 @@
-## 0.5.15-canary.154
+## 0.5.15-canary.155
 
+* **fix:**  - apply changes of payment api url ([#3774](https://github.com/AzzappApp/azzapp/pull/3774))
+* **fix:**  - **wallet:** [#3742](https://github.com/AzzappApp/azzapp/pull/3742) use common infos company name ([#3761](https://github.com/AzzappApp/azzapp/pull/3761))
+* **Fix:**  - home carrousel blinking ([#3766](https://github.com/AzzappApp/azzapp/pull/3766))
 * **fix:**  - 🐛 actually use cut version of video ([#3767](https://github.com/AzzappApp/azzapp/pull/3767))
 * **fix:**  - ContactCard - animatedStyle threading issue ([#3762](https://github.com/AzzappApp/azzapp/pull/3762))
 * **build:**  - upgrade deps
