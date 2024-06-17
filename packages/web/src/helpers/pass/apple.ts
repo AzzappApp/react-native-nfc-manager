@@ -159,7 +159,8 @@ export const buildApplePass = async (profileId: string, locale: string) => {
     });
     pass.secondaryFields.push({
       key: 'company',
-      value: contactCard?.company ?? '',
+      value:
+        res.WebCard.commonInformation?.company ?? contactCard?.company ?? '',
       textAlignment: 'PKTextAlignmentLeft',
     });
 
