@@ -1,4 +1,4 @@
-import type { EditionParameters, Filter } from '#helpers/mediaEditions';
+import type { EditionParameters } from '#helpers/mediaEditions';
 import type { MediaImage, Media, TimeRange } from '#helpers/mediaHelpers';
 import type { CoverTransitions } from './coverDrawer/coverTransitions';
 import type { MediaAnimations } from './coverDrawer/mediaAnimation';
@@ -11,6 +11,7 @@ import type {
   MediaInfo,
   CoverEditorLinksLayerItem,
 } from './coverEditorTypes';
+import type { Filter } from '@azzapp/shared/filtersHelper';
 import type { SkShader } from '@shopify/react-native-skia';
 
 // #region Generic Layer Actions

@@ -1,6 +1,6 @@
 import { createContext, useContext } from 'react';
 import { mediaInfoIsImage } from './coverEditorHelpers';
-import type { EditionParameters, Filter } from '#helpers/mediaEditions';
+import type { EditionParameters } from '#helpers/mediaEditions';
 import type { Media } from '#helpers/mediaHelpers';
 import type { MediaAnimations } from './coverDrawer/mediaAnimation';
 import type { CoverEditorAction } from './coverEditorActions';
@@ -12,6 +12,7 @@ import type {
   MediaInfo,
   MediaInfoImage,
 } from './coverEditorTypes';
+import type { Filter } from '@azzapp/shared/filtersHelper';
 
 export type CoverEditorContextType = {
   coverEditorState: CoverEditorState;

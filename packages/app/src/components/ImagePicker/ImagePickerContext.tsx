@@ -15,10 +15,10 @@ import {
   createImageFromNativeBuffer,
   useNativeBuffer,
   type EditionParameters,
-  type Filter,
   type ImageOrientation,
 } from '#helpers/mediaEditions';
 import type { Media, TimeRange } from '#helpers/mediaHelpers';
+import type { Filter } from '@azzapp/shared/filtersHelper';
 import type { SkImage } from '@shopify/react-native-skia';
 import type { ReactNode, ForwardedRef } from 'react';
 

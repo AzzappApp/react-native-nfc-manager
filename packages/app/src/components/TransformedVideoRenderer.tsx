@@ -14,11 +14,12 @@ import {
 } from '#helpers/mediaEditions';
 import { useVideoLocalPath } from '#helpers/mediaHelpers';
 import VideoCompositionRenderer from './VideoCompositionRenderer';
-import type { Filter, EditionParameters } from '#helpers/mediaEditions';
+import type { EditionParameters } from '#helpers/mediaEditions';
 import type {
   VideoComposition,
   FrameDrawer,
 } from '@azzapp/react-native-skia-video';
+import type { Filter } from '@azzapp/shared/filtersHelper';
 
 export type TransformedVideoRendererProps = Exclude<ViewProps, 'children'> & {
   video: {

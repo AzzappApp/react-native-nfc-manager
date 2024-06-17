@@ -27,7 +27,7 @@ import {
   createSingleVideoFrameDrawer,
 } from './singleVideoCompositions';
 import type { EditionParameters } from './EditionParameters';
-import type { Filter } from './LUTFilters';
+import type { Filter } from '@azzapp/shared/filtersHelper';
 
 export const saveTransformedImageToFile = async ({
   uri,

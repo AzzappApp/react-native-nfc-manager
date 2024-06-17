@@ -22,6 +22,7 @@ import {
   // @ts-ignore Missing type for fulltextIndex
   fulltextIndex,
 } from 'drizzle-orm/mysql-core';
+import { DEFAULT_VARCHAR_LENGTH } from '#helpers/constants';
 import { createDrizzleService } from './drizzle.service';
 import { SQLiteCols } from './helpers/cols';
 
@@ -70,8 +71,6 @@ export const ConnectionMonitorer = {
 
 // const db = drizzle(connection);
 const db = createDrizzleService();
-
-export const DEFAULT_VARCHAR_LENGTH = 191;
 
 const DEFAULT_DATETIME_PRECISION = 3;
 

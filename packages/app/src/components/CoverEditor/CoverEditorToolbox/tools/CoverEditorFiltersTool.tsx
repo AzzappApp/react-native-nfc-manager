@@ -12,7 +12,7 @@ import {
 } from '../../CoverEditorContext';
 import ToolBoxSection from '../ui/ToolBoxSection';
 import type { ImagePickerResult } from '#components/ImagePicker';
-import type { Filter } from '#helpers/mediaEditions';
+import type { Filter } from '@azzapp/shared/filtersHelper';
 
 const CoverEditorFiltersTool = () => {
   const [show, toggleScreenModal] = useToggle(false);

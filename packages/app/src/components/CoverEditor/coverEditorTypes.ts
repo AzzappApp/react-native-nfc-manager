@@ -1,8 +1,9 @@
-import type { EditionParameters, Filter } from '#helpers/mediaEditions';
+import type { EditionParameters } from '#helpers/mediaEditions';
 import type { MediaVideo, MediaImage, TimeRange } from '#helpers/mediaHelpers';
 import type { CoverTransitions } from './coverDrawer/coverTransitions';
 import type { MediaAnimations } from './coverDrawer/mediaAnimation';
 import type { ColorPalette } from '@azzapp/shared/cardHelpers';
+import type { Filter } from '@azzapp/shared/filtersHelper';
 import type { SkPoint, SkRect, SkShader } from '@shopify/react-native-skia';
 
 export type CoverEditorState = {

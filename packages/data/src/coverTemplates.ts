@@ -8,13 +8,67 @@ import type {
   SQLWrapper,
 } from 'drizzle-orm';
 
+export type CoverAnimation = {
+  name?: string;
+  start: number;
+  end: number;
+};
+
+export type CoverTextType = 'custom' | 'firstName' | 'mainName';
+
+export type CoverText = {
+  text: CoverTextType;
+  customText?: string;
+  fontFamily: string;
+  color: string;
+  fontSize: number;
+  width: number;
+  orientation: number;
+  position: {
+    x: number;
+    y: number;
+  };
+  animation: CoverAnimation;
+};
+
+export type CoverOverlay = {
+  media?: {
+    id: string;
+  };
+  borderWidth: number;
+  borderColor: string;
+  borderRadius: number;
+  bounds: {
+    x: number;
+    y: number;
+    height: number;
+    width: number;
+  };
+  filter: string;
+  rotation: number;
+};
+
+export type SocialLinks = {
+  links: Array<string | undefined>;
+  color: string;
+};
+
+export type CoverTemplateParams = {
+  textLayers: CoverText[];
+  overlayLayers: CoverOverlay[];
+  linksLayer: SocialLinks;
+};
+
 export const CoverTemplateTable = cols.table('CoverTemplate', {
   id: cols.cuid('id').notNull().primaryKey().$defaultFn(createId),
   name: cols.defaultVarchar('name').notNull(),
   order: cols.int('order').notNull().default(1),
   tags: cols.json('tags').$type<string[]>().notNull(),
   type: cols.cuid('type').notNull(),
-  lottie: cols.json('lottie').notNull(),
+  lottieId: cols.cuid('lottieId').notNull(),
+  colorPaletteId: cols.cuid('colorPaletteId').notNull(),
+  enabled: cols.boolean('enabled').default(true).notNull(),
+  params: cols.json('params').$type<CoverTemplateParams>(),
 });
 
 export type CoverTemplate = InferSelectModel<typeof CoverTemplateTable>;
@@ -129,4 +183,28 @@ export const getCoverTemplatesWithType = async (
     ...CoverTemplate,
     cursor,
   }));
+};
+
+/**
+ * Create a new cover template
+ * @param data - The user fields, excluding the id
+ * @returns The newly created user
+ */
+export const createCoverTemplate = async (data: NewCoverTemplate) => {
+  const id = data.id ?? createId();
+  await db
+    .client()
+    .insert(CoverTemplateTable)
+    .values({ ...data, id });
+  return id;
+};
+
+export const updateCoverTemplate = async (
+  coverTemplateId: string,
+  data: Partial<CoverTemplate>,
+): Promise<void> => {
+  await db
+    .update(CoverTemplateTable)
+    .set(data)
+    .where(eq(CoverTemplateTable.id, coverTemplateId));
 };

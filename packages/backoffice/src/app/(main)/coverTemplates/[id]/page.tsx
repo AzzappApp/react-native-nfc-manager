@@ -1,49 +1,47 @@
-// @TODO: temporary disable for feat_cover_v2
-/* eslint-disable eslint-comments/no-unlimited-disable */
-/* eslint-disable */
-// @ts-nocheck
-import { notFound } from 'next/navigation';
 import {
   getColorPalettes,
   getCoverTemplateById,
-  getMediasByIds,
-  getStaticMediasByUsage,
+  getCoverTemplateTags,
+  getCoverTemplateTypes,
+  getLabel,
 } from '@azzapp/data';
+
 import CoverTemplateForm from '../CoverTemplatesForm';
 
 type CoverTemplatePageProps = {
   params: {
     id: string;
   };
-  searchParams?: {
-    saved?: string;
-  };
 };
 
 const CoverTemplatePage = async ({
   params: { id },
-  searchParams,
 }: CoverTemplatePageProps) => {
-  const coverTemplate = await getCoverTemplateById(id);
-  const [previewMedia] = coverTemplate
-    ? await getMediasByIds([coverTemplate.previewMediaId])
-    : [];
-  if (!coverTemplate || !previewMedia) {
-    return notFound();
-  }
-
-  const coverForegrounds = await getStaticMediasByUsage('coverForeground');
-  const coverBackgrounds = await getStaticMediasByUsage('coverBackground');
   const colorPalettes = await getColorPalettes();
+  const coverTemplateTags = await getCoverTemplateTags();
+  const coverTemplateTagsWithLabels = await Promise.all(
+    coverTemplateTags.map(async tag => {
+      const label = await getLabel(tag.labelKey);
+
+      return { ...tag, label: label?.baseLabelValue || '' };
+    }),
+  );
+  const coverTemplateTypes = await getCoverTemplateTypes();
+  const coverTemplateTypesWithLabels = await Promise.all(
+    coverTemplateTypes.map(async type => {
+      const label = await getLabel(type.labelKey);
+
+      return { ...type, label: label?.baseLabelValue || '' };
+    }),
+  );
+  const coverTemplate = await getCoverTemplateById(id);
 
   return (
     <CoverTemplateForm
       coverTemplate={coverTemplate}
-      coverForegrounds={coverForegrounds}
-      coverBackgrounds={coverBackgrounds}
       colorPalettes={colorPalettes}
-      previewMedia={previewMedia}
-      saved={!!searchParams?.saved}
+      coverTemplateTypes={coverTemplateTypesWithLabels}
+      coverTemplateTags={coverTemplateTagsWithLabels}
     />
   );
 };

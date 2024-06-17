@@ -3,6 +3,7 @@
 import { Search } from '@mui/icons-material';
 import {
   Box,
+  Button,
   // Button,
   Chip,
   FormControl,
@@ -178,7 +179,7 @@ const CoverTemplatesList = ({
             </Select>
           </FormControl>
         </Box>
-        {/* <Box display="flex" alignItems="center">
+        <Box display="flex" alignItems="center">
           <Button
             variant="contained"
             onClick={() => {
@@ -187,7 +188,7 @@ const CoverTemplatesList = ({
           >
             NEW TEMPLATE
           </Button>
-        </Box> */}
+        </Box>
       </Box>
 
       <DataGrid

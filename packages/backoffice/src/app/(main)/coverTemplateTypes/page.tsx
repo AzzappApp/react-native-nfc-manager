@@ -133,7 +133,9 @@ const CoverTemplateTypesPage = async ({ searchParams = {} }: Props) => {
         multiline
         rows={1}
         maxRows={3}
-        value={'Cover filters are displayed at the top of the cover list view'}
+        value={
+          'Cover template types correspond to the different lines in the cover list view'
+        }
       />
       <CoverTemplateTypesList
         search={null}

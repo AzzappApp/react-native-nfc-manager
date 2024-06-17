@@ -9,10 +9,10 @@ import { colors } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import {
   useLutShader,
-  type Filter,
   type EditionParameters,
   transformImage,
 } from '#helpers/mediaEditions';
+import type { Filter } from '@azzapp/shared/filtersHelper';
 import type { SkImage } from '@shopify/react-native-skia';
 import type { ViewProps } from 'react-native';
 

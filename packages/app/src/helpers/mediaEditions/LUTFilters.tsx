@@ -11,6 +11,7 @@ import { useIntl } from 'react-intl';
 import { Image } from 'react-native';
 import { typedEntries } from '@azzapp/shared/objectHelpers';
 import { compileEffect } from './shaderUtils';
+import type { Filter } from '@azzapp/shared/filtersHelper';
 import type { SkShader } from '@shopify/react-native-skia';
 import type { ImageSourcePropType } from 'react-native';
 
@@ -18,7 +19,7 @@ const getUri = (source: ImageSourcePropType) =>
   // question mark for jest
   Image.resolveAssetSource(source)?.uri;
 
-export const FILTERS = {
+export const FILTERS: Record<Filter, any> = {
   nah: require('./assets/nah.png'),
   once: require('./assets/once.png'),
   passing_by: require('./assets/passing_by.png'),
@@ -43,8 +44,6 @@ export const FILTERS = {
   ),
   black_and_white_old: require('./assets/black_and_white_old.png'),
 } as const;
-
-export type Filter = keyof typeof FILTERS;
 
 // create an array to have filter in the same order as the designer want
 export const useOrdonedFilters = (): Array<{

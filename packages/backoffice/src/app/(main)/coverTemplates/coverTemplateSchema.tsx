@@ -1,51 +1,105 @@
 import { z } from 'zod';
 import { colorValidatorWithPalette } from '#helpers/validationHelpers';
 
-export const coverTemplateSchema = z.object({
-  name: z.string().nonempty(),
-  kind: z.union([z.literal('people'), z.literal('video'), z.literal('others')]),
-  previewMedia: z.object({
-    id: z.string().nonempty(),
-    kind: z.union([z.literal('image'), z.literal('video')]),
-  }),
-  mediaAnimation: z.string().optional().nullable(),
-  colorPaletteId: z.string().nonempty(),
-  businessEnabled: z.boolean(),
-  personalEnabled: z.boolean(),
-
-  titleFontSize: z.number(),
-  titleFontFamily: z.string(),
-  titleColor: colorValidatorWithPalette,
-  subTitleFontSize: z.number(),
-  subTitleFontFamily: z.string(),
-  subTitleColor: colorValidatorWithPalette,
-  textOrientation: z.union([
-    z.literal('bottomToTop'),
-    z.literal('horizontal'),
-    z.literal('topToBottom'),
-  ]),
-  textPosition: z.union([
-    z.literal('bottomCenter'),
-    z.literal('bottomLeft'),
-    z.literal('bottomRight'),
-    z.literal('middleCenter'),
-    z.literal('middleLeft'),
-    z.literal('middleRight'),
-    z.literal('topCenter'),
-    z.literal('topLeft'),
-    z.literal('topRight'),
-  ]),
-  textAnimation: z.string().optional().nullable(),
-  backgroundId: z.string().optional().nullable(),
-  backgroundColor: colorValidatorWithPalette.nullable(),
-  backgroundPatternColor: colorValidatorWithPalette.nullable(),
-  foregroundId: z.string().optional().nullable(),
-  foregroundColor: colorValidatorWithPalette.nullable(),
-  mediaFilter: z.string().optional().nullable(),
-  mediaParameters: z.unknown().optional().nullable(),
+export const animationSchema = z.object({
+  name: z.string().optional(),
+  start: z.number().min(1).max(100),
+  end: z.number().min(1).max(100),
 });
 
+export const textSchema = z.object({
+  text: z.union([
+    z.literal('firstName'),
+    z.literal('mainName'),
+    z.literal('custom'),
+  ]),
+  customText: z.string().optional(),
+  fontFamily: z.string(),
+  color: colorValidatorWithPalette,
+  fontSize: z.number(),
+  width: z.number().min(1).max(100),
+  orientation: z.number(),
+  position: z.object({
+    x: z.number().min(1).max(100),
+    y: z.number().min(1).max(100),
+  }),
+  animation: animationSchema,
+});
+
+export const coverOverlaySchema = z.object({
+  image: z.instanceof(File),
+  media: z
+    .object({
+      id: z.string(),
+    })
+    .optional(),
+  borderWidth: z.number().min(1).max(100),
+  borderColor: colorValidatorWithPalette,
+  borderRadius: z.number().min(1).max(100),
+  bounds: z.object({
+    x: z.number().min(1).max(100),
+    y: z.number().min(1).max(100),
+    width: z.number().min(1).max(100),
+    height: z.number().min(1).max(100),
+  }),
+  filter: z.string(),
+  rotation: z.number(),
+  // animation: animationSchema,
+});
+
+export const socialLinksSchema = z.object({
+  links: z.string().optional().array().max(4),
+  color: colorValidatorWithPalette,
+});
+
+export const mediasSchema = z.object({
+  id: z.string(),
+  filter: z.string().optional(),
+});
+
+export const coverTemplateSchema = z.object({
+  id: z.string().optional(),
+  name: z.string(),
+  order: z.number(),
+  tags: z.string().array(),
+  type: z.string(),
+  lottie: z.instanceof(File).optional(),
+  lottieId: z.string().optional(),
+  colorPaletteId: z.string(),
+  enabled: z.string(),
+  params: z.object({
+    medias: mediasSchema.array(),
+    textLayers: textSchema.array(),
+    overlayLayers: coverOverlaySchema.array(),
+    linksLayer: socialLinksSchema,
+  }),
+});
+
+export const coverTemplateSchemaWithoutfile = coverTemplateSchema
+  .omit({
+    lottie: true,
+  })
+  .merge(
+    z.object({
+      lottieId: z.string(),
+      params: z.object({
+        medias: mediasSchema.array(),
+        textLayers: textSchema.array(),
+        overlayLayers: coverOverlaySchema
+          .omit({
+            image: true,
+          })
+          .array(),
+        linksLayer: socialLinksSchema,
+      }),
+    }),
+  );
+
 export type CoverTemplateFormValue = z.infer<typeof coverTemplateSchema>;
+export type TextSchemaType = z.infer<typeof textSchema>;
+export type CoverOverlaySchemaType = z.infer<typeof coverOverlaySchema>;
+export type SocialLinksSchemaType = z.infer<typeof socialLinksSchema>;
+export type MediasSchemaType = z.infer<typeof mediasSchema>;
 
 export type CoverTemplateErrors = z.inferFlattenedErrors<
   typeof coverTemplateSchema

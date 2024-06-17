@@ -1,4 +1,4 @@
-import { asc, like, or, sql, and, desc } from 'drizzle-orm';
+import { asc, like, or, sql, and, desc, eq } from 'drizzle-orm';
 import { CoverTemplateTable, db } from '@azzapp/data';
 import CoverTemplatesList from './CoverTemplatesList';
 import type { SQL } from 'drizzle-orm';
@@ -8,15 +8,19 @@ export type CoverTemplateItem = {
   id: string;
   name: string;
   type: string;
-  status: string;
+  status: boolean;
 };
 
 export type Filters = {
   status?: Status | 'All';
 };
 
-const getFilters = (_filters: Filters) => {
+const getFilters = (filters: Filters) => {
   const f: Array<SQL<unknown>> = [];
+
+  if (filters.status && filters.status !== 'All') {
+    f.push(eq(sql`enabled`, filters.status === 'Enabled'));
+  }
 
   return f;
 };
@@ -43,7 +47,7 @@ const getQuery = (search: string | null, filters: Filters) => {
       id: CoverTemplateTable.id,
       name: CoverTemplateTable.name,
       type: CoverTemplateTable.type,
-      status: sql`'Enabled'`.mapWith(String).as('status'),
+      status: CoverTemplateTable.enabled,
     })
     .from(CoverTemplateTable)
     .where(and(getSearch(search), ...getFilters(filters)))
