@@ -236,7 +236,10 @@ const MultiUserScreenUserList = ({
   }, [sections, transferOwnerMode]);
 
   useEffect(() => {
-    refetch({ search: debounceText }, { fetchPolicy: 'store-and-network' });
+    refetch(
+      { search: debounceText || undefined },
+      { fetchPolicy: 'store-and-network' },
+    );
   }, [debounceText, refetch]);
   //#endregion
 
