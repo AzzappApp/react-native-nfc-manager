@@ -1,5 +1,6 @@
-## 0.5.15-canary.153
+## 0.5.15-canary.154
 
+* **fix:**  - 🐛 actually use cut version of video ([#3767](https://github.com/AzzappApp/azzapp/pull/3767))
 * **fix:**  - ContactCard - animatedStyle threading issue ([#3762](https://github.com/AzzappApp/azzapp/pull/3762))
 * **build:**  - upgrade deps
 * **fix:**  - selecting profile after creating a new one with tempalte ([#3753](https://github.com/AzzappApp/azzapp/pull/3753))
