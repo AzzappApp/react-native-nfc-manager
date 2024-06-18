@@ -63,6 +63,7 @@ export const WebCardTable = cols.table(
       .default(DEFAULT_DATETIME_VALUE),
 
     /* Covers infos */
+    coverId: cols.cuid('coverId').notNull().default(''), // this is used to identify that local cover is different from the last one
     coverMediaId: cols.mediaId('coverMediaId'),
     coverTexts: cols.json('coverTexts').$type<string[]>(),
     coverBackgroundColor: cols.defaultVarchar('coverBackgroundColor'),

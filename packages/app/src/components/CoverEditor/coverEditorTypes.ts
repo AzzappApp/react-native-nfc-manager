@@ -15,6 +15,7 @@ import type {
 
 export type CoverEditorState = {
   // Cover data
+  coverId?: string;
   template: TemplateInfo | null;
   backgroundColor: string | null;
 

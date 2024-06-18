@@ -8,6 +8,7 @@ let coverStore: MMKV | null = null;
 export type CoverInfos = Pick<
   CoverEditorState,
   | 'backgroundColor'
+  | 'coverId'
   | 'coverTransition'
   | 'linksLayer'
   | 'medias'
@@ -60,6 +61,7 @@ const saveCover = (state: CoverEditorState) => {
     webCardId,
     JSON.stringify(
       pick(state, [
+        'coverId',
         'backgroundColor',
         'coverTransition',
         'linksLayer',

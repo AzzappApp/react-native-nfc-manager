@@ -52,6 +52,7 @@ const useSaveCover = (
       saveCover(webCardId: $webCardId, input: $input) {
         webCard {
           hasCover
+          coverId
           ...CoverRenderer_webCard
         }
       }
@@ -119,6 +120,11 @@ const useSaveCover = (
             },
           },
           onCompleted(response, error) {
+            coverLocalStore.saveCover({
+              ...coverEditorState,
+              coverId: response.saveCover?.webCard.coverId,
+            });
+
             if (error) {
               reject(error);
               return;

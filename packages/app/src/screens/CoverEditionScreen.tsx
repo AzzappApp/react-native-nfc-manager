@@ -109,23 +109,29 @@ const CoverEditionScreen = ({
   useEffect(() => {
     (async () => {
       let filesAreOk = false;
-      if (coverInitialSate !== null && !filesAreAvailable) {
-        const fileExists = await Promise.all(
-          coverInitialSate.medias
-            .map(({ media }) => media)
-            .concat(coverInitialSate.overlayLayers.map(o => o.media))
-            .map(async media => {
-              try {
-                return ReactNativeBlobUtil.fs.exists(
-                  media.uri.replace('file://', ''),
-                );
-              } catch (e) {
-                return false;
-              }
-            }),
-        );
 
-        filesAreOk = fileExists.every(e => e);
+      if (
+        coverInitialSate !== null &&
+        coverInitialSate.coverId === profile?.webCard.coverId
+      ) {
+        if (!filesAreAvailable) {
+          const fileExists = await Promise.all(
+            coverInitialSate.medias
+              .map(({ media }) => media)
+              .concat(coverInitialSate.overlayLayers.map(o => o.media))
+              .map(async media => {
+                try {
+                  return ReactNativeBlobUtil.fs.exists(
+                    media.uri.replace('file://', ''),
+                  );
+                } catch (e) {
+                  return false;
+                }
+              }),
+          );
+
+          filesAreOk = fileExists.every(e => e);
+        }
       }
 
       if (!filesAreAvailable) {
@@ -167,7 +173,13 @@ const CoverEditionScreen = ({
         }
       }
     })();
-  }, [coverInitialSate, filesAreAvailable, intl, onCancel]);
+  }, [
+    coverInitialSate,
+    filesAreAvailable,
+    intl,
+    onCancel,
+    profile?.webCard.coverId,
+  ]);
 
   const onBack = useCallback(() => {
     if (currentStepIndex === 1) {
@@ -310,6 +322,7 @@ const query = graphql`
           id
           coverBackgroundColor
           webCardKind
+          coverId
         }
       }
     }

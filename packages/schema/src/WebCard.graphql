@@ -47,6 +47,10 @@ type WebCard implements Node {
   """
   cardColors: CardColors
   """
+  The webCard cover id
+  """
+  coverId: ID!
+  """
   Wether the WebCard has a cover
   """
   hasCover: Boolean!
