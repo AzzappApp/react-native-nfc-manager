@@ -1,5 +1,6 @@
-## 0.5.15-canary.168
+## 0.5.15-canary.169
 
+* **fix:**  - **cover:** [#3820](https://github.com/AzzappApp/azzapp/pull/3820) only store on server response ([#3822](https://github.com/AzzappApp/azzapp/pull/3822))
 * **fix:**  - should stop going to first card after deleting one ([#3819](https://github.com/AzzappApp/azzapp/pull/3819))
 * **fix:**  - cut cover elements ([#3811](https://github.com/AzzappApp/azzapp/pull/3811))
 * **fix:**  - **cover:** [#3670](https://github.com/AzzappApp/azzapp/pull/3670) check case when local cover is out of sync ([#3773](https://github.com/AzzappApp/azzapp/pull/3773))
