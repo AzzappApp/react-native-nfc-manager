@@ -240,12 +240,29 @@ const MultiUserDetailsScreen = ({
           },
           pixelRatio: CappedPixelRatio(),
         },
+        updater: (store, response) => {
+          if (
+            response?.updateProfile?.profile?.id === profileInfos?.profileId
+          ) {
+            store
+              .getRoot()
+              .getLinkedRecord('node', { id: profile.id })
+              ?.invalidateRecord();
+          }
+        },
         onCompleted: () => {
           if (avatar && avatar?.uri) {
             addLocalCachedMediaFile(
               `${'image'.slice(0, 1)}:${avatarId}`,
               'image',
               avatar.uri,
+            );
+          }
+          if (logo && logo?.uri) {
+            addLocalCachedMediaFile(
+              `${'image'.slice(0, 1)}:${logo}`,
+              'image',
+              logo.uri,
             );
           }
           router.back();
