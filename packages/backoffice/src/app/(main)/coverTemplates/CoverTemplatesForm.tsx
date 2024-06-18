@@ -88,6 +88,7 @@ const CoverTemplateForm = ({
     lastResult,
     onValidate({ formData }) {
       const valid = parseWithZod(formData, { schema });
+      console.log(valid);
       return valid;
     },
     shouldValidate: 'onSubmit',
@@ -338,6 +339,9 @@ const CoverTemplateForm = ({
           <Button
             type="submit"
             variant="contained"
+            onKeyDown={e => {
+              e.preventDefault();
+            }}
             sx={{ mt: 2 }}
             {...form.insert.getButtonProps({
               name: fields.params.getFieldset().textLayers.name,
@@ -381,6 +385,9 @@ const CoverTemplateForm = ({
             })}
           <Button
             type="submit"
+            onKeyDown={e => {
+              e.preventDefault();
+            }}
             variant="contained"
             sx={{ mt: 2 }}
             {...form.insert.getButtonProps({

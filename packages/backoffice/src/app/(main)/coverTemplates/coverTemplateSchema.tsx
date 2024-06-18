@@ -3,8 +3,8 @@ import { colorValidatorWithPalette } from '#helpers/validationHelpers';
 
 export const animationSchema = z.object({
   name: z.string().optional(),
-  start: z.number().min(1).max(100),
-  end: z.number().min(1).max(100),
+  start: z.number().min(0).max(100),
+  end: z.number().min(0).max(100),
 });
 
 export const textSchema = z.object({
@@ -20,25 +20,25 @@ export const textSchema = z.object({
   width: z.number().min(1).max(100),
   orientation: z.number(),
   position: z.object({
-    x: z.number().min(1).max(100),
-    y: z.number().min(1).max(100),
+    x: z.number().min(0).max(100),
+    y: z.number().min(0).max(100),
   }),
   animation: animationSchema,
 });
 
 export const coverOverlaySchema = z.object({
-  image: z.instanceof(File),
+  image: z.instanceof(File).optional(),
   media: z
     .object({
-      id: z.string(),
+      id: z.string().optional(),
     })
     .optional(),
-  borderWidth: z.number().min(1).max(100),
+  borderWidth: z.number().min(0).max(100),
   borderColor: colorValidatorWithPalette,
-  borderRadius: z.number().min(1).max(100),
+  borderRadius: z.number().min(0).max(100),
   bounds: z.object({
-    x: z.number().min(1).max(100),
-    y: z.number().min(1).max(100),
+    x: z.number().min(0).max(100),
+    y: z.number().min(0).max(100),
     width: z.number().min(1).max(100),
     height: z.number().min(1).max(100),
   }),

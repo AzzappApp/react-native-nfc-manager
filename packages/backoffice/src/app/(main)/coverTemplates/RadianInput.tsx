@@ -14,10 +14,13 @@ type Props = {
 const RadianInput = ({ field, label }: Props) => {
   const radianInput = useInputControl(field);
   const [degree, setDegree] = useState(() => {
+    let value = 0;
     if (field.value) {
-      return parseFloat(field?.value) * (180 / Math.PI);
+      value = parseFloat(field?.value) * (180 / Math.PI);
     }
-    return 0;
+
+    radianInput.change(value.toString());
+    return value;
   });
 
   const onChangeDegree = (event: ChangeEvent<HTMLInputElement>) => {

@@ -64,6 +64,7 @@ const CoverOverlayForm = ({ field }: Props) => {
           inputProps={{
             min: '1',
             max: '100',
+            defaultValue: '1',
           }}
           {...getInputProps(overlayFields.bounds.getFieldset().height, {
             type: 'number',
@@ -76,6 +77,7 @@ const CoverOverlayForm = ({ field }: Props) => {
           inputProps={{
             min: '1',
             max: '100',
+            defaultValue: '1',
           }}
           error={!!overlayFields.bounds.getFieldset().width.errors}
           {...getInputProps(overlayFields.bounds.getFieldset().width, {
@@ -88,8 +90,9 @@ const CoverOverlayForm = ({ field }: Props) => {
           sx={{ flex: 1 }}
           required
           inputProps={{
-            min: '1',
+            min: '0',
             max: '100',
+            defaultValue: '0',
           }}
           error={!!overlayFields.bounds.getFieldset().x.errors}
           {...getInputProps(overlayFields.bounds.getFieldset().x, {
@@ -101,8 +104,9 @@ const CoverOverlayForm = ({ field }: Props) => {
           sx={{ flex: 1 }}
           required
           inputProps={{
-            min: '1',
+            min: '0',
             max: '100',
+            defaultValue: '0',
           }}
           error={!!overlayFields.bounds.getFieldset().y.errors}
           {...getInputProps(overlayFields.bounds.getFieldset().y, {
@@ -116,8 +120,9 @@ const CoverOverlayForm = ({ field }: Props) => {
           sx={{ flex: 1 }}
           required
           inputProps={{
-            min: '1',
+            min: '0',
             max: '100',
+            defaultValue: '0',
           }}
           error={!!overlayFields.borderWidth.errors}
           {...getInputProps(overlayFields.borderWidth, {
@@ -130,8 +135,9 @@ const CoverOverlayForm = ({ field }: Props) => {
           sx={{ flex: 1 }}
           required
           inputProps={{
-            min: '1',
+            min: '0',
             max: '100',
+            defaultValue: '0',
           }}
           error={!!overlayFields.borderRadius.errors}
           {...getInputProps(overlayFields.borderRadius, {

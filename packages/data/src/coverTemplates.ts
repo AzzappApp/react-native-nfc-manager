@@ -33,7 +33,7 @@ export type CoverText = {
 
 export type CoverOverlay = {
   media?: {
-    id: string;
+    id?: string;
   };
   borderWidth: number;
   borderColor: string;

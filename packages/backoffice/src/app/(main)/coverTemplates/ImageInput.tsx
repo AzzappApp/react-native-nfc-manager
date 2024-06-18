@@ -7,7 +7,7 @@ import { getCloudinaryAssetURL } from '@azzapp/shared/imagesHelpers';
 import type { FieldMetadata } from '@conform-to/react';
 
 type Props = {
-  field: FieldMetadata<File>;
+  field: FieldMetadata<File | undefined>;
   buttonLabel: string;
   imageId?: string;
 };
