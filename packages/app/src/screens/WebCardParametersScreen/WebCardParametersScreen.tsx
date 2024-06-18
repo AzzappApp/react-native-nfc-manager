@@ -9,11 +9,13 @@ import {
   usePreloadedQuery,
 } from 'react-relay';
 import ERRORS from '@azzapp/shared/errors';
+import { isOwner } from '@azzapp/shared/profileHelpers';
 import { colors, textStyles } from '#theme';
 import { useRouter } from '#components/NativeRouter';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import { keyExtractor } from '#helpers/idHelpers';
 import relayScreen from '#helpers/relayScreen';
+import useAuthState from '#hooks/useAuthState';
 import useQuitWebCard from '#hooks/useQuitWebCard';
 import useToggle from '#hooks/useToggle';
 import Container from '#ui/Container';
@@ -72,6 +74,12 @@ const WebCardParametersScreen = ({
     webCardParameters: { userNameChangeFrequencyDay },
   } = usePreloadedQuery(webCardParametersScreenQuery, preloadedQuery);
   const router = useRouter();
+
+  const { profileInfos } = useAuthState();
+  const isWebCardOwner = useMemo(
+    () => isOwner(profileInfos?.profileRole),
+    [profileInfos?.profileRole],
+  );
 
   const webCard = useFragment(
     graphql`
@@ -404,35 +412,52 @@ const WebCardParametersScreen = ({
   ]);
 
   const handleConfirmationQuitWebCard = useCallback(() => {
-    Alert.alert(
-      intl.formatMessage({
-        defaultMessage: 'Delete this WebCard',
-        description: 'Delete WebCard title',
-      }),
-      intl.formatMessage({
-        defaultMessage:
-          'Are you sure you want to delete this WebCard and all its contents? This action is irreversible.',
-        description: 'Delete WebCard confirmation message',
-      }),
-      [
-        {
-          text: intl.formatMessage({
-            defaultMessage: 'Cancel',
-            description: 'Cancel button label',
-          }),
-          style: 'cancel',
-        },
-        {
-          text: intl.formatMessage({
-            defaultMessage: 'Delete this WebCard',
-            description: 'Delete button label',
-          }),
-          style: 'destructive',
-          onPress: quitWebCard,
-        },
-      ],
-    );
-  }, [intl, quitWebCard]);
+    const titleMsg = isWebCardOwner
+      ? intl.formatMessage({
+          defaultMessage: 'Delete this WebCard',
+          description: 'Delete WebCard title',
+        })
+      : intl.formatMessage({
+          defaultMessage: 'Quit this WebCard',
+          description: 'Quit WebCard title',
+        });
+
+    const descriptionMsg = isWebCardOwner
+      ? intl.formatMessage({
+          defaultMessage:
+            'Are you sure you want to delete this WebCard and all its contents? This action is irreversible.',
+          description: 'Delete WebCard confirmation message',
+        })
+      : intl.formatMessage({
+          defaultMessage:
+            'Are you sure you want to quit this WebCard? This action is irreversible.',
+          description: 'Quit WebCard confirmation message',
+        });
+
+    const labelConfirmation = isWebCardOwner
+      ? intl.formatMessage({
+          defaultMessage: 'Delete this WebCard',
+          description: 'Delete button label',
+        })
+      : intl.formatMessage({
+          defaultMessage: 'Quit this WebCard',
+          description: 'Quit button label',
+        });
+    Alert.alert(titleMsg, descriptionMsg, [
+      {
+        text: intl.formatMessage({
+          defaultMessage: 'Cancel',
+          description: 'Cancel button label',
+        }),
+        style: 'cancel',
+      },
+      {
+        text: labelConfirmation,
+        style: 'destructive',
+        onPress: quitWebCard,
+      },
+    ]);
+  }, [intl, isWebCardOwner, quitWebCard]);
 
   if (!webCard) {
     return null;
