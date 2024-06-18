@@ -1,5 +1,10 @@
-## 0.5.15-canary.167
+## 0.5.15-canary.168
 
+* **fix:**  - should stop going to first card after deleting one ([#3819](https://github.com/AzzappApp/azzapp/pull/3819))
+* **fix:**  - cut cover elements ([#3811](https://github.com/AzzappApp/azzapp/pull/3811))
+* **fix:**  - **cover:** [#3670](https://github.com/AzzappApp/azzapp/pull/3670) check case when local cover is out of sync ([#3773](https://github.com/AzzappApp/azzapp/pull/3773))
+* **fix:**  - imporving carousel feeling on android ([#3815](https://github.com/AzzappApp/azzapp/pull/3815))
+* **feat:**  - 🎸 display medias on media toolbox ([#3818](https://github.com/AzzappApp/azzapp/pull/3818))
 * **fix:**  - **subscription:** [#3801](https://github.com/AzzappApp/azzapp/pull/3801) check only on publication ([#3802](https://github.com/AzzappApp/azzapp/pull/3802))
 * **fix:**  - **contactCard:** [#3737](https://github.com/AzzappApp/azzapp/pull/3737) update form on opening it ([#3769](https://github.com/AzzappApp/azzapp/pull/3769))
 * **fix:**  - Restore memo for perfromance issue on android (tested without it cause some lag in android) ([#3799](https://github.com/AzzappApp/azzapp/pull/3799))
