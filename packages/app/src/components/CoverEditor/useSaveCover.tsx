@@ -61,7 +61,6 @@ const useSaveCover = (
 
   const save = useCallback(async () => {
     setSavingStatus('exporting');
-    coverLocalStore.saveCover(coverEditorState);
 
     // we need to be sure that the cover rendering is stopped
     // before we start exporting the cover
