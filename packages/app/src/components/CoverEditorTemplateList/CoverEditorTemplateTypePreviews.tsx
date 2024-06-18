@@ -1,6 +1,7 @@
-import { useCallback } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { FlatList, Image, ScrollView, StyleSheet, View } from 'react-native';
 import { extractMediasDuration } from '@azzapp/shared/lottieHelpers';
+import { fetchJSON } from '@azzapp/shared/networkHelpers';
 import { keyExtractor } from '#helpers/idHelpers';
 import Badge from '#ui/Badge';
 import Icon from '#ui/Icon';
@@ -62,16 +63,38 @@ const CoverEditorTemplateTypePreview = ({
   preview: TemplateTypePreview;
   onSelect: () => void;
 }) => {
-  const medias = extractMediasDuration(preview.lottie);
+  const [loading, setLoading] = useState(true);
+  const [media, setMedia] = useState(0);
+
+  useEffect(() => {
+    const fetchLottie = async () => {
+      if (!preview.lottie) {
+        setLoading(false);
+        return;
+      }
+      setLoading(true);
+      try {
+        const res = await fetchJSON<Record<string, any>>(preview.lottie);
+        setMedia(extractMediasDuration(res).length);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchLottie();
+  }, [preview.lottie, preview.media.uri]);
+
   return (
     <PressableNative key={preview.id} style={styles.preview} onPress={onSelect}>
       <Image source={{ uri: preview.media.uri }} style={styles.previewMedia} />
-      <Badge style={styles.badge}>
-        <View style={styles.badgeElements}>
-          <Icon size={16} icon="landscape" />
-          <Text variant="xsmall">{medias.length}</Text>
-        </View>
-      </Badge>
+      {loading ? null : (
+        <Badge style={styles.badge}>
+          <View style={styles.badgeElements}>
+            <Icon size={16} icon="landscape" />
+            <Text variant="xsmall">{media}</Text>
+          </View>
+        </Badge>
+      )}
     </PressableNative>
   );
 };
@@ -86,7 +109,7 @@ export type TemplateTypePreview = {
     height: number;
     width: number;
   };
-  lottie: Record<string, unknown>;
+  lottie?: string | null;
 };
 
 const styles = StyleSheet.create({

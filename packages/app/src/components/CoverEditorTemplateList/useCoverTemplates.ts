@@ -97,7 +97,7 @@ export type CoverTemplatePreviewItem = {
     height: number;
     width: number;
   };
-  lottie: Record<string, unknown>;
+  lottie?: string | null;
 };
 
 export type CoverTemplatePreviewsByType = Record<

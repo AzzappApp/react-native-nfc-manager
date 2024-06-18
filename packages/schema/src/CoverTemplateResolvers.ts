@@ -1,5 +1,6 @@
 import { getCoverTemplateTagsIn } from '@azzapp/data';
 import { getCoverTemplatePreviewsByCoverTemplateId } from '@azzapp/data/coverTemplatePreview';
+import { getCloudinaryAssetURL } from '@azzapp/shared/imagesHelpers';
 import { idResolver } from './utils';
 import type { CoverTemplateResolvers } from './__generated__/types';
 
@@ -14,4 +15,6 @@ export const CoverTemplate: CoverTemplateResolvers = {
   previews: async ({ id }) => {
     return getCoverTemplatePreviewsByCoverTemplateId(id);
   },
+  lottie: async ({ lottieId }) =>
+    lottieId ? getCloudinaryAssetURL(lottieId, 'raw') : null,
 };

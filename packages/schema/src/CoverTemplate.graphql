@@ -14,7 +14,7 @@ type CoverTemplate implements Node {
   type: CoverTemplateType
   tags: [CoverTemplateTag!]!
   previews: [CoverTemplatePreview!]!
-  lottie: JSON!
+  lottie: String
 }
 
 enum CoverTemplateKind {
