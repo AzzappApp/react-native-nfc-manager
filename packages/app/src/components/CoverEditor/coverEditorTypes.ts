@@ -1,10 +1,17 @@
 import type { EditionParameters } from '#helpers/mediaEditions';
 import type { MediaVideo, MediaImage, TimeRange } from '#helpers/mediaHelpers';
 import type { CoverTransitions } from './coverDrawer/coverTransitions';
-import type { MediaAnimations } from './coverDrawer/mediaAnimation';
+import type { MediaAnimations } from './coverDrawer/mediaAnimations';
+import type { OverlayAnimations } from './coverDrawer/overlayAnimations';
 import type { ColorPalette } from '@azzapp/shared/cardHelpers';
 import type { Filter } from '@azzapp/shared/filtersHelper';
-import type { SkPoint, SkRect, SkShader } from '@shopify/react-native-skia';
+import type {
+  SkMatrix,
+  SkPaint,
+  SkPoint,
+  SkRect,
+  SkShader,
+} from '@shopify/react-native-skia';
 
 export type CoverEditorState = {
   // Cover data
@@ -91,7 +98,9 @@ export type CoverEditorOverlayItem = {
   borderWidth: number;
   borderColor: string;
   elevation: number;
-  animation: MediaAnimations | null;
+  animation: OverlayAnimations | null;
+  startPercentageTotal: number;
+  endPercentageTotal: number;
   filter: Filter | null;
   editionParameters: EditionParameters | null;
   bounds: SkRect;
@@ -112,4 +121,26 @@ export type CoverEditorLinksLayerItem = {
   position: SkPoint;
   rotation: number;
   shadow: boolean;
+};
+
+export type MatrixAnimation = (args: {
+  matrix: SkMatrix;
+  start: number;
+  end: number;
+  time: number;
+  width: number;
+  height: number;
+}) => void;
+
+export type ShaderAnimation = (args: {
+  shader: SkShader;
+  start: number;
+  end: number;
+  time: number;
+}) => SkPaint;
+
+export type CoverLayerAnimation = {
+  id: MediaAnimations | OverlayAnimations;
+  animateMatrix?: MatrixAnimation | null;
+  animateShader?: ShaderAnimation | null;
 };

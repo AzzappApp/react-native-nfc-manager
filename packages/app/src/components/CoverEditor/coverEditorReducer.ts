@@ -404,7 +404,9 @@ export function coverEditorReducer(
         const overlayLayers = [...state.overlayLayers];
         overlayLayers[state.selectedItemIndex] = {
           ...overlayLayers[state.selectedItemIndex],
-          ...payload,
+          //TODO: type as any as quick n dirty because the type was changed compare to initial creation.
+          // MediaInfoImage is not applicable to overlay for duration and animation, but the reducer type was updated without taking this acion in account
+          ...(payload as any),
         };
         return {
           ...state,
@@ -477,8 +479,9 @@ export function coverEditorReducer(
             borderRadius: 0,
             borderWidth: 0,
             elevation: 0,
-            // TODO
             animation: null,
+            startPercentageTotal: 0,
+            endPercentageTotal: 1,
             bounds: {
               x: 50,
               y: 50,

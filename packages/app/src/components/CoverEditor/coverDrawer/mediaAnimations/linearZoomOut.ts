@@ -1,15 +1,16 @@
 import { interpolate } from '@shopify/react-native-skia';
-import type { ImageMediaAnimation } from '../mediaAnimation';
+import type { MatrixAnimation } from '#components/CoverEditor/coverEditorTypes';
 
-const animate: ImageMediaAnimation = ({
+const animateMatrix: MatrixAnimation = ({
   matrix,
   time,
-  duration,
+  start,
+  end,
   width,
   height,
 }) => {
   'worklet';
-  const progress = time / duration;
+  const progress = time / (end - start);
   const scale = interpolate(progress, [0, 1], [1.4, 1]);
   matrix.postTranslate(-width / 2, -height / 2);
   matrix.postScale(scale, scale);
@@ -18,5 +19,5 @@ const animate: ImageMediaAnimation = ({
 
 export default {
   id: 'linearZoomOut' as const,
-  animate,
+  animateMatrix,
 };

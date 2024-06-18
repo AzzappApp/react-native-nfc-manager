@@ -1,14 +1,15 @@
-import type { ImageMediaAnimation } from '../mediaAnimation';
+import type { MatrixAnimation } from '#components/CoverEditor/coverEditorTypes';
 
-const animate: ImageMediaAnimation = ({
+const animateMatrix: MatrixAnimation = ({
   matrix,
   time,
-  duration,
+  start,
+  end,
   width,
   height,
 }) => {
   'worklet';
-  const progress = time / duration;
+  const progress = time / (end - start);
   let scale = 1;
 
   if (progress < 0.2) {
@@ -31,5 +32,5 @@ const animate: ImageMediaAnimation = ({
 
 export default {
   id: 'jerkyIn' as const,
-  animate,
+  animateMatrix,
 };

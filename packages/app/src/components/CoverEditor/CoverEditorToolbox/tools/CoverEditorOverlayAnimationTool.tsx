@@ -4,21 +4,23 @@ import {
   Picture,
   Skia,
 } from '@shopify/react-native-skia';
-import { memo, useCallback, useMemo, useRef } from 'react';
+import { memo, useCallback, useMemo } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { View, StyleSheet, Alert } from 'react-native';
+import { View, StyleSheet } from 'react-native';
 import {
   useSharedValue,
   useFrameCallback,
   useDerivedValue,
 } from 'react-native-reanimated';
 import {
-  COVER_MAX_MEDIA_DURATION,
   COVER_MIN_MEDIA_DURATION,
   COVER_RATIO,
 } from '@azzapp/shared/coverHelpers';
 import BoxSelectionList from '#components/BoxSelectionList';
 import { DoneHeaderButton } from '#components/commonsButtons';
+import overlayAnimations, {
+  useOverlayAnimationList,
+} from '#components/CoverEditor/coverDrawer/overlayAnimations';
 import { mediaInfoIsImage } from '#components/CoverEditor/coverEditorHelpers';
 import TransformedImageRenderer from '#components/TransformedImageRenderer';
 import { keyExtractor } from '#helpers/idHelpers';
@@ -30,50 +32,84 @@ import {
 } from '#helpers/mediaEditions';
 import useToggle from '#hooks/useToggle';
 import BottomSheetModal from '#ui/BottomSheetModal';
-import LabeledWheelSelector from '#ui/LabeledWheelSelector';
+import DoubleSlider from '#ui/DoubleSlider';
 import Text from '#ui/Text';
-import mediaAnimations, {
-  useMediaAnimationList,
-} from '../../coverDrawer/mediaAnimations';
 import {
-  useCoverEditorActiveImageMedia,
   useCoverEditorContext,
+  useCoverEditorOverlayLayer,
 } from '../../CoverEditorContext';
 import ToolBoxSection from '../ui/ToolBoxSection';
 
 import type { BoxButtonItemInfo } from '#components/BoxSelectionList';
-import type { EditionParameters } from '#helpers/mediaEditions';
 import type {
-  MediaAnimationListItem,
-  MediaAnimations,
-} from '../../coverDrawer/mediaAnimations';
+  OverlayAnimationListItem,
+  OverlayAnimations,
+} from '#components/CoverEditor/coverDrawer/overlayAnimations';
+import type { EditionParameters } from '#helpers/mediaEditions';
 import type { SkImage, SkShader } from '@shopify/react-native-skia';
 import type { DerivedValue } from 'react-native-reanimated';
 
-const CoverEditorMediaImageAnimationTool = () => {
+const MIN_DURATION_ANIMATION = 0.5;
+const CoverEditorOverlayImageAnimationTool = () => {
   const [show, toggleBottomSheet] = useToggle(false);
-  const activeMedia = useCoverEditorActiveImageMedia();
-  const hasMultipleMedias =
-    useCoverEditorContext().coverEditorState.medias.filter(media =>
-      mediaInfoIsImage(media),
-    ).length > 1;
+  const activeOverlay = useCoverEditorOverlayLayer();
+  const medias = useCoverEditorContext().coverEditorState.medias;
+
   const { dispatch } = useCoverEditorContext();
-  const animations = useMediaAnimationList();
-  const hasChanges = useRef(false);
+  const animations = useOverlayAnimationList();
+
+  const totalDuration = medias.reduce((acc, media) => {
+    if (mediaInfoIsImage(media)) {
+      return acc + media.duration;
+    } else {
+      return acc + media.timeRange.duration;
+    }
+  }, 0);
+
+  const onChangeAnimationDuration = useCallback(
+    (value: number[], index: number) => {
+      if (activeOverlay) {
+        //duration should be at minimum COVER_MIN_MEDIA_DURATION
+        const duration = value[1] - value[0];
+        let start = value[0];
+        let end = value[1];
+        if (duration < COVER_MIN_MEDIA_DURATION) {
+          if (index === 0) {
+            //left slider is moving
+            start = Math.min(end - MIN_DURATION_ANIMATION, start);
+          } else {
+            end = Math.max(start + MIN_DURATION_ANIMATION, end);
+          }
+        }
+
+        const startPercent = start / totalDuration;
+        const endPercent = end / totalDuration;
+
+        dispatch({
+          type: 'UPDATE_OVERLAY_LAYER',
+          payload: {
+            startPercentageTotal: startPercent,
+            endPercentageTotal: endPercent,
+          },
+        });
+      }
+    },
+    [activeOverlay, dispatch, totalDuration],
+  );
+
   const onSelect = useCallback(
-    (anim: MediaAnimationListItem | null) => {
+    (anim: OverlayAnimationListItem | null) => {
       dispatch({
-        type: 'UPDATE_MEDIA_IMAGE_ANIMATION',
-        payload: anim?.id ?? null,
+        type: 'UPDATE_OVERLAY_LAYER',
+        payload: { animation: anim?.id ?? null },
       });
-      hasChanges.current = true;
     },
     [dispatch],
   );
 
   const buffer = useNativeBuffer({
-    uri: activeMedia?.media?.uri,
-    kind: activeMedia?.media?.kind,
+    uri: activeOverlay?.media?.uri,
+    kind: activeOverlay?.media?.kind,
   });
 
   const skImage = useDerivedValue(() => {
@@ -83,23 +119,9 @@ const CoverEditorMediaImageAnimationTool = () => {
     return createImageFromNativeBuffer(buffer, true);
   }, [buffer]);
 
-  const onChangeDurationSlider = useCallback(
-    (duration: number) => {
-      //initial value of slider call on change, avoid setting the hasChange bool to true
-      if (activeMedia?.duration !== duration) {
-        dispatch({
-          type: 'UPDATE_MEDIA_IMAGE_DURATION',
-          payload: duration,
-        });
-        hasChanges.current = true;
-      }
-    },
-    [activeMedia?.duration, dispatch],
-  );
-
   const intl = useIntl();
   const renderLabel = useCallback(
-    ({ item }: BoxButtonItemInfo<MediaAnimationListItem>) =>
+    ({ item }: BoxButtonItemInfo<OverlayAnimationListItem>) =>
       item
         ? item?.label
         : intl.formatMessage({
@@ -109,23 +131,23 @@ const CoverEditorMediaImageAnimationTool = () => {
     [intl],
   );
 
-  const lutShader = useLutShader(activeMedia?.filter);
+  const lutShader = useLutShader(activeOverlay?.filter);
 
   const renderItem = useCallback(
     ({
       item,
       height,
       width,
-    }: BoxButtonItemInfo<MediaAnimationListItem | null>) => {
-      if (item && activeMedia && skImage) {
+    }: BoxButtonItemInfo<OverlayAnimationListItem | null>) => {
+      if (item && activeOverlay && skImage) {
         return (
           <AnimationPreview
             animationId={item.id}
             height={height}
             width={width}
             skImage={skImage}
-            editionParameters={activeMedia?.editionParameters}
-            duration={activeMedia?.duration}
+            editionParameters={activeOverlay.editionParameters}
+            duration={4}
             lutShader={lutShader}
           />
         );
@@ -136,60 +158,13 @@ const CoverEditorMediaImageAnimationTool = () => {
           image={skImage}
           height={height}
           width={width}
-          filter={activeMedia?.filter}
-          editionParameters={activeMedia?.editionParameters}
+          filter={activeOverlay?.filter}
+          editionParameters={activeOverlay?.editionParameters}
         />
       );
     },
-    [activeMedia, lutShader, skImage],
+    [activeOverlay, lutShader, skImage],
   );
-
-  const onFinished = useCallback(() => {
-    if (hasMultipleMedias && activeMedia && hasChanges.current) {
-      hasChanges.current = false;
-      Alert.alert(
-        intl.formatMessage({
-          defaultMessage: 'Apply to all images ?',
-          description:
-            'Title of the alert to apply this animation to all images',
-        }),
-        intl.formatMessage({
-          defaultMessage: 'Do you want to apply this animation to all images ?',
-          description:
-            'Description of the alert to apply a animation to all images',
-        }),
-        [
-          {
-            text: intl.formatMessage({
-              defaultMessage: 'No',
-              description: 'Button to not apply the animation to all images',
-            }),
-            onPress: toggleBottomSheet,
-          },
-          {
-            text: intl.formatMessage({
-              defaultMessage: 'Yes',
-              description: 'Button to apply the filter to all images',
-            }),
-            onPress: () => {
-              dispatch({
-                type: 'UPDATE_ALL_IMAGES_MEDIA_ANIMATION',
-                payload: {
-                  animation: activeMedia.animation,
-                  duration: activeMedia.duration,
-                },
-              });
-              toggleBottomSheet();
-            },
-            isPreferred: true,
-          },
-        ],
-      );
-    } else {
-      hasChanges.current = false;
-      toggleBottomSheet();
-    }
-  }, [activeMedia, dispatch, hasMultipleMedias, intl, toggleBottomSheet]);
 
   return (
     <>
@@ -198,11 +173,11 @@ const CoverEditorMediaImageAnimationTool = () => {
         label={intl.formatMessage({
           defaultMessage: 'Animations',
           description:
-            'Cover Edition Image Media animation Tool Button - Animations',
+            'Cover Edition Image Overlay animation Tool Button - Animations',
         })}
         onPress={toggleBottomSheet}
       />
-      {activeMedia != null && (
+      {activeOverlay != null && (
         <BottomSheetModal
           lazy
           onRequestClose={toggleBottomSheet}
@@ -216,7 +191,7 @@ const CoverEditorMediaImageAnimationTool = () => {
               />
             </Text>
           }
-          headerRightButton={<DoneHeaderButton onPress={onFinished} />}
+          headerRightButton={<DoneHeaderButton onPress={toggleBottomSheet} />}
         >
           <View style={styles.boxContainer}>
             <BoxSelectionList
@@ -228,22 +203,19 @@ const CoverEditorMediaImageAnimationTool = () => {
               onSelect={onSelect}
               imageRatio={COVER_RATIO}
               selectedItem={
-                animations.find(item => item.id === activeMedia.animation) ??
+                animations.find(item => item.id === activeOverlay.animation) ??
                 null
               }
             />
           </View>
-          <LabeledWheelSelector
-            min={COVER_MIN_MEDIA_DURATION}
-            max={COVER_MAX_MEDIA_DURATION}
-            step={0.1}
-            interval={15}
-            onChange={onChangeDurationSlider}
-            value={activeMedia.duration}
-            label={intl.formatMessage({
-              defaultMessage: 'Duration: ',
-              description: 'Duration label in cover edition animation',
-            })}
+          <DoubleSlider
+            minimumValue={0}
+            maximumValue={totalDuration}
+            value={[
+              activeOverlay.startPercentageTotal * totalDuration,
+              activeOverlay.endPercentageTotal * totalDuration,
+            ]}
+            onValueChange={onChangeAnimationDuration}
           />
         </BottomSheetModal>
       )}
@@ -251,18 +223,17 @@ const CoverEditorMediaImageAnimationTool = () => {
   );
 };
 
-export default memo(CoverEditorMediaImageAnimationTool);
-
+export default memo(CoverEditorOverlayImageAnimationTool);
+const previewDuration = 2;
 const AnimationPreview = ({
   animationId,
   height,
   width,
-  duration,
   skImage,
   editionParameters,
   lutShader,
 }: {
-  animationId: MediaAnimations;
+  animationId: OverlayAnimations;
   height: number;
   width: number;
   duration: number;
@@ -270,19 +241,19 @@ const AnimationPreview = ({
   editionParameters?: EditionParameters | null;
   lutShader?: SkShader | null;
 }) => {
-  const imageAnimation = mediaAnimations[animationId];
+  const animation = overlayAnimations[animationId];
 
   const startTime = useMemo(() => Date.now(), []);
   const animationStateSharedValue = useSharedValue(0);
 
   useFrameCallback(() => {
     animationStateSharedValue.value =
-      ((Date.now() - startTime) / 1000) % duration;
+      ((Date.now() - startTime) / 1000) % previewDuration;
   });
 
   const picture = useDerivedValue(() =>
     createPicture(canvas => {
-      if (!imageAnimation || !skImage?.value) {
+      if (!animation || !skImage?.value) {
         return;
       }
 
@@ -292,15 +263,28 @@ const AnimationPreview = ({
         height,
         editionParameters,
         lutShader,
-        animation: {
-          animateMatrix: imageAnimation.animateMatrix,
-          time: animationStateSharedValue.value,
-          end: duration,
-          start: 0,
-        },
+        animation: animation
+          ? {
+              animateMatrix: animation.animateMatrix,
+              time: animationStateSharedValue.value,
+              end: previewDuration,
+              start: 0,
+            }
+          : null,
       });
-      const paint = Skia.Paint();
-      paint.setShader(shader);
+      let paint;
+      if (animation && animation.animateShader) {
+        paint = animation.animateShader({
+          shader,
+          time: animationStateSharedValue.value,
+          start: 0,
+          end: previewDuration,
+        });
+      } else {
+        paint = Skia.Paint();
+        paint.setShader(shader);
+      }
+
       canvas.save();
       canvas.drawPaint(paint);
       canvas.restore();

@@ -8,11 +8,12 @@ type DoubleSliderProps = {
   maximumValue: number;
   value: [number, number];
   onValueChange: (value: number[], index: number) => void;
+  step?: number;
 };
 
 const DoubleSlider = (props: DoubleSliderProps) => {
   const styles = useStyleSheet(styleSheet);
-  console.log(props.value);
+
   return (
     <Slider
       {...props}

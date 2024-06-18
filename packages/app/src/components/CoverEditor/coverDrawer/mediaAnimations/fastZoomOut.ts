@@ -1,17 +1,18 @@
 import { interpolate } from '@shopify/react-native-skia';
 import { Easing } from 'react-native-reanimated';
-import type { ImageMediaAnimation } from '../mediaAnimation';
+import type { MatrixAnimation } from '#components/CoverEditor/coverEditorTypes';
 
-const animate: ImageMediaAnimation = ({
+const animateMatrix: MatrixAnimation = ({
   matrix,
   time,
-  duration,
+  start,
+  end,
   width,
   height,
 }) => {
   'worklet';
   //const progress = time / duration;
-  const progress = Easing.in(Easing.cubic)(time / duration);
+  const progress = Easing.in(Easing.cubic)(time / (end - start));
   const scale = interpolate(progress, [0, 1], [1.4, 1]);
 
   //preTranslate  does not exist in react native
@@ -22,5 +23,5 @@ const animate: ImageMediaAnimation = ({
 
 export default {
   id: 'fastZoomOut' as const,
-  animate,
+  animateMatrix,
 };

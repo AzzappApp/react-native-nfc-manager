@@ -1,7 +1,7 @@
 import type { EditionParameters } from '#helpers/mediaEditions';
 import type { MediaImage, Media, TimeRange } from '#helpers/mediaHelpers';
 import type { CoverTransitions } from './coverDrawer/coverTransitions';
-import type { MediaAnimations } from './coverDrawer/mediaAnimation';
+import type { MediaAnimations } from './coverDrawer/mediaAnimations';
 import type {
   CoverEditorOverlayItem,
   CoverEditorSocialLink,

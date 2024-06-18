@@ -8,7 +8,7 @@ import {
 } from '#helpers/mediaEditions';
 import { mediaInfoIsImage } from '../coverEditorHelpers';
 import coverTransitions from './coverTransitions';
-import mediaAnimations from './mediaAnimation';
+import mediaAnimations from './mediaAnimations';
 import type { CoverDrawerOptions } from './types';
 
 const coverMediasDrawer = ({
@@ -60,11 +60,13 @@ const coverMediasDrawer = ({
           image,
           lutShader: filter ? lutShaders[filter] : null,
           editionParameters,
-          imageAnimation: mediaInfo.animation
+          animation: mediaInfo.animation
             ? {
-                animation: mediaAnimations[mediaInfo.animation],
+                animateMatrix:
+                  mediaAnimations[mediaInfo.animation].animateMatrix,
                 time: currentTime - compositionStartTime,
-                duration: mediaDuration,
+                end: mediaDuration,
+                start: 0,
               }
             : undefined,
           width,

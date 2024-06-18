@@ -10,7 +10,7 @@ import {
 } from './EditionParameters';
 import { applyLutFilter } from './LUTFilters';
 import { createImageFromNativeBuffer } from './NativeBufferLoader';
-import type { MediaAnimation } from '#components/CoverEditor/coverDrawer/mediaAnimation';
+import type { MatrixAnimation } from '#components/CoverEditor/coverEditorTypes';
 import type { VideoFrame } from '@azzapp/react-native-skia-video';
 import type {
   Matrix4,
@@ -28,7 +28,7 @@ export const transformImage = ({
   height,
   editionParameters,
   lutShader,
-  imageAnimation,
+  animation,
 }: {
   image: SkImage;
   localMatrix?: Matrix4 | SkMatrix | null;
@@ -38,11 +38,12 @@ export const transformImage = ({
   height: number;
   editionParameters?: EditionParameters | null;
   lutShader?: SkShader | null;
-  imageAnimation?: {
-    animation: MediaAnimation;
+  animation?: {
+    animateMatrix?: MatrixAnimation | null;
     time: number;
-    duration: number;
-  };
+    end: number;
+    start: number;
+  } | null;
 }) => {
   'worklet';
   const {
@@ -93,12 +94,13 @@ export const transformImage = ({
     matrix.postTranslate(imageWidth / 2, imageHeight / 2);
   }
   //do this before the croping or update the imageWidth and imageHeight
-  if (imageAnimation) {
-    const { animation, time, duration } = imageAnimation;
-    animation.animate({
+  if (animation && animation.animateMatrix) {
+    const { animateMatrix, start, time, end } = animation;
+    animateMatrix({
       matrix,
       time,
-      duration,
+      start,
+      end,
       width: imageWidth,
       height: imageHeight,
     });

@@ -156,7 +156,6 @@ const ProtectedMutation: Record<
 const isCurrentUserRule = rule('sameUser', {
   cache: 'contextual',
 })(async (parent: User, _args, ctx: GraphQLContext) => {
-  console.log(ctx.auth.userId, parent.id);
   return ctx.auth.userId === parent.id;
 });
 

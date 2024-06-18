@@ -2,7 +2,8 @@ import { createContext, useContext } from 'react';
 import { mediaInfoIsImage } from './coverEditorHelpers';
 import type { EditionParameters } from '#helpers/mediaEditions';
 import type { Media } from '#helpers/mediaHelpers';
-import type { MediaAnimations } from './coverDrawer/mediaAnimation';
+import type { MediaAnimations } from './coverDrawer/mediaAnimations';
+import type { OverlayAnimations } from './coverDrawer/overlayAnimations';
 import type { CoverEditorAction } from './coverEditorActions';
 import type {
   CoverEditorLinksLayerItem,
@@ -119,7 +120,7 @@ export const useCoverEditorActiveMedia = (): {
   media: Media;
   filter: Filter | null;
   editionParameters: EditionParameters | null;
-  animation: MediaAnimations | null;
+  animation: MediaAnimations | OverlayAnimations | null;
   duration?: number | null;
 } | null => {
   const {
