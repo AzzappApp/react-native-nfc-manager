@@ -1,4 +1,4 @@
-## 0.5.15-canary.164
+## 0.5.15-canary.165
 
 * **fix:**  - Restore memo for perfromance issue on android (tested without it cause some lag in android) ([#3799](https://github.com/AzzappApp/azzapp/pull/3799))
 * **fix:**  - cover toolbox lottie ([#3798](https://github.com/AzzappApp/azzapp/pull/3798))

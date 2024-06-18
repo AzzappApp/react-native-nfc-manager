@@ -1,6 +1,6 @@
 {
   "name": "@azzapp/schema",
-  "version": "0.5.15-canary.164",
+  "version": "0.5.15-canary.165",
   "private": true,
   "exports": {
     ".": {
