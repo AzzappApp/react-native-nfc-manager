@@ -1,5 +1,6 @@
-## 0.5.15-canary.163
+## 0.5.15-canary.164
 
+* **fix:**  - Restore memo for perfromance issue on android (tested without it cause some lag in android) ([#3799](https://github.com/AzzappApp/azzapp/pull/3799))
 * **fix:**  - cover toolbox lottie ([#3798](https://github.com/AzzappApp/azzapp/pull/3798))
 * **fix:**  - lottie reading ([#3797](https://github.com/AzzappApp/azzapp/pull/3797))
 * **build:**  - upgrade to react-relay 17 ([#3793](https://github.com/AzzappApp/azzapp/pull/3793))
