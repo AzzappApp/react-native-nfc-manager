@@ -175,15 +175,10 @@ export const HomeScreenProvider = ({
   );
 
   useEffect(() => {
-    if (
-      profilesRef.current &&
-      user?.profiles &&
-      profilesRef.current.length > user.profiles.length
-    ) {
+    if (user?.profiles && user?.profiles?.length > initialProfileIndex) {
       setInitialProfileIndex(1);
-      onCurrentProfileIndexChange(1);
     }
-  }, [onCurrentProfileIndexChange, user.profiles]);
+  }, [initialProfileIndex, onCurrentProfileIndexChange, user?.profiles]);
 
   return (
     <HomeScreenContext.Provider

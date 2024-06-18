@@ -151,6 +151,7 @@ const HomeProfilesCarousel = ({ user: userKey }: HomeProfilesCarouselProps) => {
   useEffect(() => {
     if (dataSize.current > data.length) {
       scrollToIndex(1, true);
+      dataSize.current = data.length;
     }
   }, [data.length, scrollToIndex]);
 
