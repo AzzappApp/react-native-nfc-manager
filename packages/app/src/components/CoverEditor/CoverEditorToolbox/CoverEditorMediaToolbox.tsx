@@ -1,8 +1,9 @@
 import { Image } from 'expo-image';
-import { useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { FormattedMessage } from 'react-intl';
 import { ScrollView, View } from 'react-native';
 import { extractMediasDuration } from '@azzapp/shared/lottieHelpers';
+import { fetchJSON } from '@azzapp/shared/networkHelpers';
 import { colors } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import Icon from '#ui/Icon';
@@ -16,7 +17,7 @@ import CoverEditorTransitionTool from './tools/CoverEditorTransitionTool';
 import { TOOLBOX_SECTION_HEIGHT } from './ui/ToolBoxSection';
 
 type CoverEditorMediaToolboxProps = {
-  lottie: Record<string, any> | null;
+  lottie?: string | null;
 };
 
 const CoverEditorMediaToolbox = ({ lottie }: CoverEditorMediaToolboxProps) => {
@@ -34,10 +35,27 @@ const CoverEditorMediaToolbox = ({ lottie }: CoverEditorMediaToolboxProps) => {
     });
   };
 
-  const durations = useMemo(() => {
-    return lottie
-      ? extractMediasDuration(lottie).map(duration => Math.round(duration))
-      : null;
+  const [loading, setLoading] = useState(true);
+  const [durations, setDurations] = useState<number[]>([]);
+
+  useEffect(() => {
+    const fetchLottie = async () => {
+      if (!lottie) {
+        setLoading(false);
+        return;
+      }
+      setLoading(true);
+      try {
+        const res = await fetchJSON<Record<string, any>>(lottie);
+        setDurations(
+          extractMediasDuration(res).map(duration => Math.round(duration)),
+        );
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchLottie();
   }, [lottie]);
 
   const displayedMedias = useMemo(() => {
@@ -122,7 +140,7 @@ const CoverEditorMediaToolbox = ({ lottie }: CoverEditorMediaToolboxProps) => {
         showsHorizontalScrollIndicator={false}
       >
         {coverEditorState.medias.length > 1 && <CoverEditorTransitionTool />}
-        {displayedMedias}
+        {loading ? null : displayedMedias}
       </ScrollView>
       <CoverEditorMediaPickerFloatingTool durations={durations} />
     </View>
