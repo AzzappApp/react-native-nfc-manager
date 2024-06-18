@@ -1,5 +1,7 @@
-## 0.5.15-canary.162
+## 0.5.15-canary.163
 
+* **fix:**  - cover toolbox lottie ([#3798](https://github.com/AzzappApp/azzapp/pull/3798))
+* **fix:**  - lottie reading ([#3797](https://github.com/AzzappApp/azzapp/pull/3797))
 * **build:**  - upgrade to react-relay 17 ([#3793](https://github.com/AzzappApp/azzapp/pull/3793))
 * **feat:**  - implement hash on payment ([#3789](https://github.com/AzzappApp/azzapp/pull/3789))
 * **fix:**  - 🐛 Also fetch users with empty information ([#3780](https://github.com/AzzappApp/azzapp/pull/3780))
