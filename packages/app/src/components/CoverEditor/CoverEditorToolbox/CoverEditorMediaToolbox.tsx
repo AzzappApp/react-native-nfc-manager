@@ -59,20 +59,21 @@ const CoverEditorMediaToolbox = ({ lottie }: CoverEditorMediaToolboxProps) => {
   }, [lottie]);
 
   const displayedMedias = useMemo(() => {
-    const data = durations
-      ? durations.map((duration, i) => {
-          const media = coverEditorState.medias[i] ?? null;
-          return {
+    const data =
+      durations.length > 0
+        ? durations.map((duration, i) => {
+            const media = coverEditorState.medias[i] ?? null;
+            return {
+              media,
+              duration,
+            };
+          })
+        : coverEditorState.medias.map(media => ({
             media,
-            duration,
-          };
-        })
-      : coverEditorState.medias.map(media => ({
-          media,
-          duration: mediaInfoIsImage(media)
-            ? media.duration
-            : media.timeRange.duration,
-        }));
+            duration: mediaInfoIsImage(media)
+              ? media.duration
+              : media.timeRange.duration,
+          }));
 
     return data.map(({ media, duration }, index) => {
       if (!media) {
