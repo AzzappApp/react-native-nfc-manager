@@ -36,7 +36,29 @@ export function coverEditorReducer(
         textLayers[selectedItemIndex] != null
       ) {
         const textLayers = [...state.textLayers];
-        textLayers.push({ ...textLayers[selectedItemIndex] });
+        const selectedTextLayer = textLayers[selectedItemIndex];
+        const deltaOffset = 10;
+        const threadhold = 50;
+        const xThreshold = threadhold - selectedTextLayer.width / 2;
+        const yThreshold = threadhold;
+
+        const newPosition = {
+          x:
+            selectedTextLayer.position.x < xThreshold
+              ? selectedTextLayer.position.x + deltaOffset
+              : selectedTextLayer.position.x - deltaOffset,
+          y:
+            selectedTextLayer.position.y < yThreshold
+              ? selectedTextLayer.position.y + deltaOffset
+              : selectedTextLayer.position.y - deltaOffset,
+        };
+
+        const duplicatedTextLayer = {
+          ...textLayers[selectedItemIndex],
+          position: newPosition,
+        };
+
+        textLayers.push({ ...duplicatedTextLayer });
         return {
           ...state,
           selectedItemIndex: textLayers.length - 1,
