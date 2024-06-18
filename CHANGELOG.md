@@ -1,5 +1,6 @@
-## 0.5.15-canary.165
+## 0.5.15-canary.166
 
+* **fix:**  - **contactCard:** [#3737](https://github.com/AzzappApp/azzapp/pull/3737) update form on opening it ([#3769](https://github.com/AzzappApp/azzapp/pull/3769))
 * **fix:**  - Restore memo for perfromance issue on android (tested without it cause some lag in android) ([#3799](https://github.com/AzzappApp/azzapp/pull/3799))
 * **fix:**  - cover toolbox lottie ([#3798](https://github.com/AzzappApp/azzapp/pull/3798))
 * **fix:**  - lottie reading ([#3797](https://github.com/AzzappApp/azzapp/pull/3797))
