@@ -3,6 +3,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   Dimensions,
   PixelRatio,
+  Platform,
   Pressable,
   StyleSheet,
   TextInput,
@@ -975,7 +976,12 @@ const CoverPreview = ({
         interpolate(
           keyboardProgress,
           [0, 1],
-          [0, keyboardHeight + windowHeight / 2 - editionInputCenter],
+          [
+            0,
+            (Platform.OS === 'android' ? keyboardHeight / 2 : keyboardHeight) +
+              windowHeight / 2 -
+              editionInputCenter,
+          ],
         ),
       );
     },

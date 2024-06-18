@@ -63,7 +63,7 @@ const CoverEditorColorTool = ({ title }: Props) => {
 
       <CoverEditorColorPicker
         visible={show}
-        height={250}
+        height={COLOR_PICKER_HEIGHT}
         title={title}
         selectedColor={selectedColor}
         canEditPalette
@@ -79,5 +79,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
   },
 });
+
+const COLOR_PICKER_HEIGHT = 300;
 
 export default CoverEditorColorTool;
