@@ -23,7 +23,10 @@ const toggleWebCardPublished: MutationResolvers['toggleWebCardPublished'] =
 
     const owner = await loaders.webCardOwners.load(webCard.id);
 
-    if (webCardRequiresSubscription(modules, webCard.webCardKind)) {
+    if (
+      webCardRequiresSubscription(modules, webCard.webCardKind) &&
+      published
+    ) {
       const subscription = owner
         ? await loaders.activeSubscriptionsLoader.load(owner.id)
         : [];
