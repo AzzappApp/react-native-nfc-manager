@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { memo, useMemo } from 'react';
 import { StyleSheet, View } from 'react-native';
 import Animated, {
   interpolate,
@@ -79,14 +79,14 @@ const HomeBottomPanelMessage = ({ user }: HomeBottomPanelMessageProps) => {
   );
 };
 
-export default HomeBottomPanelMessage;
+export default memo(HomeBottomPanelMessage);
 
 type MessageItemProps = {
   content: ArrayItemType<MessageArrayType>;
   index: number;
 };
 
-const MessageItem = ({ content, index }: MessageItemProps) => {
+const MessageItemComponent = ({ content, index }: MessageItemProps) => {
   const { currentIndexSharedValue } = useHomeScreenContext();
 
   const opacity = useDerivedValue(() => {
@@ -135,6 +135,8 @@ const MessageItem = ({ content, index }: MessageItemProps) => {
     </Animated.View>
   );
 };
+
+const MessageItem = memo(MessageItemComponent);
 type MessageArrayType = Array<{
   type: MessageContentType;
   profile: ArrayItemType<HomeBottomPanelMessage_profiles$data>;

@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { memo, useMemo } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { graphql, useFragment } from 'react-relay';
 import useScreenInsets from '#hooks/useScreenInsets';
@@ -54,12 +54,6 @@ const HomeScreenContent = ({ user: userKey }: HomeScreenContentProps) => {
 
   //#endregion
 
-  // #region Layout
-  const insets = useScreenInsets();
-  const headerStyle = useMemo(() => ({ marginTop: insets.top }), [insets.top]);
-
-  // #endregion
-
   // #region bottomMenu
   const [showMenu, toggleShowMenu] = useToggle(false);
 
@@ -74,11 +68,7 @@ const HomeScreenContent = ({ user: userKey }: HomeScreenContentProps) => {
           { paddingBottom: bottom + BOTTOM_MENU_HEIGHT + 15 },
         ]}
       >
-        <HomeHeader
-          openPanel={toggleShowMenu}
-          user={user}
-          style={headerStyle}
-        />
+        <HomeHeader openPanel={toggleShowMenu} user={user} />
         <HomeProfileLink user={user} />
         <HomeProfilesCarousel user={user} />
         <HomeBottomPanel user={user} />
@@ -94,8 +84,8 @@ const HomeScreenContent = ({ user: userKey }: HomeScreenContentProps) => {
     </View>
   );
 };
-
-export default HomeScreenContent;
+//usage of memo tested with whyDidYouRender, reducing render due to context change
+export default memo(HomeScreenContent);
 
 const styles = StyleSheet.create({
   contentContainer: {

@@ -186,7 +186,7 @@ const SCALE_RATIO = 108 / 291;
 const keyExtractor = (item: ProfileType | null, index: number) =>
   item?.webCard.id ?? `new_${index}`;
 
-export default HomeProfilesCarousel;
+export default memo(HomeProfilesCarousel);
 
 type ProfileType = ArrayItemType<HomeProfilesCarousel_user$data['profiles']>;
 

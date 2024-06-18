@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo } from 'react';
+import { memo, useCallback, useEffect, useMemo } from 'react';
 import { FormattedMessage } from 'react-intl';
 import { StyleSheet, View } from 'react-native';
 import {
@@ -210,7 +210,7 @@ const HomeInformations = ({ height, user }: HomeInformationsProps) => {
   );
 };
 
-export default HomeInformations;
+export default memo(HomeInformations);
 
 export const format = (value: number) => {
   'worklet';

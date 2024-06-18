@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { memo, useCallback } from 'react';
 import { Dimensions, View } from 'react-native';
 import Animated, {
   useAnimatedStyle,
@@ -58,7 +58,7 @@ const HomeContactCard = ({ user, height }: HomeContactCardProps) => {
   );
 };
 
-export default HomeContactCard;
+export default memo(HomeContactCard);
 
 type ContactCardItemProps = {
   height: number;
@@ -66,7 +66,11 @@ type ContactCardItemProps = {
   index: number;
 };
 
-const ContactCardItem = ({ height, item, index }: ContactCardItemProps) => {
+const ContactCardItemComponent = ({
+  height,
+  item,
+  index,
+}: ContactCardItemProps) => {
   const styles = useStyleSheet(styleSheet);
   const currentIndexSharedValue = useHomeScreenCurrentIndex();
 
@@ -152,6 +156,7 @@ const ContactCardItem = ({ height, item, index }: ContactCardItemProps) => {
     </Animated.View>
   );
 };
+const ContactCardItem = memo(ContactCardItemComponent);
 
 const styleSheet = createStyleSheet(appearance => ({
   itemContainer: {

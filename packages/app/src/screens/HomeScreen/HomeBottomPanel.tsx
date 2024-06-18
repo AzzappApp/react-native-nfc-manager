@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, memo } from 'react';
 import { Dimensions, StyleSheet, View } from 'react-native';
 import Animated, {
   interpolate,
@@ -198,4 +198,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default HomeBottomPanel;
+export default memo(HomeBottomPanel);

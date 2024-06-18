@@ -1,5 +1,5 @@
 import * as Clipboard from 'expo-clipboard';
-import { useMemo } from 'react';
+import { memo, useMemo } from 'react';
 import { useIntl } from 'react-intl';
 import { StyleSheet, View } from 'react-native';
 import Animated, {
@@ -107,7 +107,7 @@ const HomeProfileLink = ({ user: userKey }: HomeProfileLinkProps) => {
   );
 };
 
-export default HomeProfileLink;
+export default memo(HomeProfileLink);
 
 export const PROFILE_LINK_HEIGHT = 29;
 

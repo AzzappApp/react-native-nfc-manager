@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { memo, useMemo } from 'react';
 import {
   interpolateColor,
   useDerivedValue,
@@ -85,4 +85,4 @@ const HomeBackground = ({ user: userKey }: HomeBackgroundProps) => {
   return <WebCardBackground colors={skiaGradient} />;
 };
 
-export default HomeBackground;
+export default memo(HomeBackground);

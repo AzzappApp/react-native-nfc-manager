@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { memo, useMemo } from 'react';
 import { StyleSheet, View } from 'react-native';
 import Animated, {
   interpolateColor,
@@ -10,19 +10,19 @@ import Svg, { Path } from 'react-native-svg';
 import { graphql, useFragment } from 'react-relay';
 import { getTextColor } from '@azzapp/shared/colorsHelpers';
 import { colors } from '#theme';
+import useScreenInsets from '#hooks/useScreenInsets';
 import Header from '#ui/Header';
 import IconButton from '#ui/IconButton';
 import { useHomeScreenContext } from './HomeScreenContext';
 import type { HomeHeader_user$key } from '#relayArtifacts/HomeHeader_user.graphql';
-import type { ColorValue, StyleProp, ViewStyle } from 'react-native';
+import type { ColorValue } from 'react-native';
 
 type HomeHeaderProps = {
   openPanel: () => void;
   user: HomeHeader_user$key;
-  style?: StyleProp<ViewStyle>;
 };
 
-const HomeHeader = ({ openPanel, user: userKey, style }: HomeHeaderProps) => {
+const HomeHeader = ({ openPanel, user: userKey }: HomeHeaderProps) => {
   const { profiles } = useFragment(
     graphql`
       fragment HomeHeader_user on User {
@@ -38,7 +38,8 @@ const HomeHeader = ({ openPanel, user: userKey, style }: HomeHeaderProps) => {
     `,
     userKey,
   );
-
+  const insets = useScreenInsets();
+  const headerStyle = useMemo(() => ({ marginTop: insets.top }), [insets.top]);
   const { inputRange, currentIndexSharedValue } = useHomeScreenContext();
   const readableColors = useMemo(
     () => [
@@ -94,13 +95,12 @@ const HomeHeader = ({ openPanel, user: userKey, style }: HomeHeaderProps) => {
           />
         </View>
       }
-      style={[styles.header, style]}
+      style={[styles.header, headerStyle]}
     />
   );
 };
 
-export default HomeHeader;
-
+export default memo(HomeHeader);
 export const HOME_HEADER_HEIGHT = 28;
 
 const styles = StyleSheet.create({
