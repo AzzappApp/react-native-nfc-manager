@@ -255,7 +255,7 @@ function CarouselSelectList<TItem = any>(
   );
 }
 
-export default forwardRef(CarouselSelectList) as <T>(
+export default memo(forwardRef(CarouselSelectList)) as <T>(
   p: CarouselSelectListProps<T> & { ref?: Ref<CarouselSelectListHandle> },
 ) => ReactElement;
 

@@ -199,7 +199,7 @@ type ItemRenderProps = {
   isCurrent: boolean;
 };
 
-const ItemRender = ({
+const ItemRenderComponent = ({
   index,
   isCurrent,
   item,
@@ -382,6 +382,8 @@ const ItemRender = ({
     </Pressable>
   );
 };
+
+const ItemRender = memo(ItemRenderComponent);
 
 const CreateItem = ({
   coverWidth,
