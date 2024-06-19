@@ -1,5 +1,9 @@
-## 0.5.15-canary.169
+## 0.5.15-canary.170
 
+* **fix:**  - **webCard:** [#3801](https://github.com/AzzappApp/azzapp/pull/3801) add paywall on template selection ([#3823](https://github.com/AzzappApp/azzapp/pull/3823))
+* **fix:**  - **coverTemplates:** [#3825](https://github.com/AzzappApp/azzapp/pull/3825) get only enabled cover template types ([#3827](https://github.com/AzzappApp/azzapp/pull/3827))
+* **fix:**  - **account:** [#3763](https://github.com/AzzappApp/azzapp/pull/3763) delete button on top of bottom sheets ([#3828](https://github.com/AzzappApp/azzapp/pull/3828))
+* **fix:**  - **account:** [#3814](https://github.com/AzzappApp/azzapp/pull/3814) don’t invalidate token on wrong code ([#3829](https://github.com/AzzappApp/azzapp/pull/3829))
 * **fix:**  - **cover:** [#3820](https://github.com/AzzappApp/azzapp/pull/3820) only store on server response ([#3822](https://github.com/AzzappApp/azzapp/pull/3822))
 * **fix:**  - should stop going to first card after deleting one ([#3819](https://github.com/AzzappApp/azzapp/pull/3819))
 * **fix:**  - cut cover elements ([#3811](https://github.com/AzzappApp/azzapp/pull/3811))
