@@ -1,4 +1,4 @@
-## 0.5.15-canary.172
+## 0.5.15-canary.173
 
 * **feat:**  - **media:** [#3178](https://github.com/AzzappApp/azzapp/pull/3178) properly download media for skia ([#3821](https://github.com/AzzappApp/azzapp/pull/3821))
 * **fix:**  - **webCard:** [#3801](https://github.com/AzzappApp/azzapp/pull/3801) add paywall on template selection ([#3823](https://github.com/AzzappApp/azzapp/pull/3823))
