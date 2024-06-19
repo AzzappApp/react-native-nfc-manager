@@ -32,6 +32,12 @@ export const getCoverTemplateTypeById = (id: string) =>
  * Retrieve CoverTemplateType
  *
  */
-export const getCoverTemplateTypes = async () => {
-  return db.select().from(CoverTemplateTypeTable);
+export const getCoverTemplateTypes = async (onlyEnabled = false) => {
+  const query = db.select().from(CoverTemplateTypeTable);
+
+  if (onlyEnabled) {
+    query.where(eq(CoverTemplateTypeTable.enabled, true));
+  }
+
+  return query;
 };

@@ -233,7 +233,7 @@ export const Profile: ProfileResolvers = {
     return getCoverTemplateTags();
   },
   coverTemplateTypes: () => {
-    return getCoverTemplateTypes();
+    return getCoverTemplateTypes(true);
   },
   coverTemplates: async (
     profile,

@@ -115,7 +115,7 @@ const CoverEditorTemplateList = ({
         coverTemplateType => coverTemplateType.id === typeId,
       )?.label;
 
-      return (
+      return previews.length ? (
         <CoverEditorTemplateTypePreviews
           key={typeId}
           label={
@@ -128,7 +128,7 @@ const CoverEditorTemplateList = ({
           previews={previews}
           onSelect={onTemplateSelect}
         />
-      );
+      ) : null;
     },
     [coverTemplateTypes, intl, onTemplateSelect],
   );

@@ -174,16 +174,16 @@ type Profile implements Node {
   moduleBackgrounds: [StaticMedia!]!
 
   """
-  Fetches cover template typeq
+  Fetches cover template type
   """
   coverTemplateTags: [CoverTemplateTag!]!
 
   """
-  Fetches cover template typeq
+  Fetches cover template type
   """
   coverTemplateTypes: [CoverTemplateType!]!
   """
-  Fetches cover template typeq
+  Fetches cover template type
   """
   coverTemplates(
     tagId: ID
