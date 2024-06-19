@@ -21,7 +21,7 @@ type WebCard implements Node {
   """
   The kind of the webCard (business, personal)
   """
-  webCardKind: WebCardKind
+  webCardKind: WebCardKind!
   """
   The webCard category
   """

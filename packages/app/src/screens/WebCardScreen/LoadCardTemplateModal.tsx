@@ -3,9 +3,13 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import { StyleSheet, View, useWindowDimensions } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { graphql, useFragment } from 'react-relay';
-import { moduleCountRequiresSubscription } from '@azzapp/shared/subscriptionHelpers';
+import {
+  moduleCountRequiresSubscription,
+  webCardRequiresSubscription,
+} from '@azzapp/shared/subscriptionHelpers';
 import { colors } from '#theme';
 import CardTemplateList from '#components/CardTemplateList';
+import { useRouter } from '#components/NativeRouter';
 import ScreenModal from '#components/ScreenModal';
 import useAuthState from '#hooks/useAuthState';
 import useLoadCardTemplateMutation from '#hooks/useLoadCardTemplateMutation';
@@ -43,6 +47,9 @@ const LoadCardTemplateModal = ({
     graphql`
       fragment LoadCardTemplateModal_webCard on WebCard {
         id
+        webCardKind
+        cardIsPublished
+        isPremium
         cardModules {
           id
           kind
@@ -97,14 +104,37 @@ const LoadCardTemplateModal = ({
 
   const showWarning = Boolean(webCard.cardModules?.length);
 
+  const router = useRouter();
+
   const applyTemplate = useCallback(
-    (templateId: string) => {
-      setCardTemplateId(templateId);
+    (template: CardTemplateItem) => {
+      setCardTemplateId(template.id);
       if (!showWarning) {
-        commitCardTemplate(templateId);
+        const requireSubscription = webCardRequiresSubscription(
+          template.modules,
+          webCard.webCardKind,
+        );
+
+        if (
+          webCard.cardIsPublished &&
+          requireSubscription &&
+          !webCard.isPremium
+        ) {
+          router.push({ route: 'USER_PAY_WALL' });
+          return;
+        }
+
+        commitCardTemplate(template.id);
       }
     },
-    [commitCardTemplate, showWarning],
+    [
+      commitCardTemplate,
+      router,
+      showWarning,
+      webCard.cardIsPublished,
+      webCard.isPremium,
+      webCard.webCardKind,
+    ],
   );
 
   if (!profileId) {

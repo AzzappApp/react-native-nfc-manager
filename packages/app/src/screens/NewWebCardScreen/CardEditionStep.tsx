@@ -42,10 +42,10 @@ const CardEditionStep = (
   const [commit, inFlight] = useLoadCardTemplateMutation();
   const intl = useIntl();
 
-  const onSubmit = (cardTemplateId: string) => {
+  const onSubmit = (cardTemplate: CardTemplateItem) => {
     commit({
       variables: {
-        cardTemplateId,
+        cardTemplateId: cardTemplate.id,
         webCardId,
       },
       onCompleted: () => {

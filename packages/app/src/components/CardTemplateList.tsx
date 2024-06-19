@@ -24,6 +24,7 @@ import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
 import { DEFAULT_COLOR_PALETTE } from '@azzapp/shared/cardHelpers';
 import { colors, shadow } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
+import { keyExtractor } from '#helpers/idHelpers';
 import useScreenInsets from '#hooks/useScreenInsets';
 import Button, { BUTTON_HEIGHT } from '#ui/Button';
 import Container from '#ui/Container';
@@ -37,17 +38,15 @@ import Text from '#ui/Text';
 import { useModulesData } from './cardModules/ModuleData';
 import { CancelHeaderButton } from './commonsButtons';
 import WebCardPreview from './WebCardPreview';
-import type { CardTemplateList_cardTemplates$key } from '#relayArtifacts/CardTemplateList_cardTemplates.graphql';
+import type {
+  CardTemplateList_cardTemplates$data,
+  CardTemplateList_cardTemplates$key,
+} from '#relayArtifacts/CardTemplateList_cardTemplates.graphql';
 import type { CardTemplateListQuery } from '#relayArtifacts/CardTemplateListQuery.graphql';
 import type { CoverRenderer_webCard$key } from '#relayArtifacts/CoverRenderer_webCard.graphql';
-import type { ModuleData_cardModules$key } from '#relayArtifacts/ModuleData_cardModules.graphql';
 import type { WebCardBackground_webCard$key } from '#relayArtifacts/WebCardBackground_webCard.graphql';
 import type { WebCardBackgroundPreview_webCard$key } from '#relayArtifacts/WebCardBackgroundPreview_webCard.graphql';
-import type {
-  CardStyle,
-  ColorPalette,
-  CardTemplateType,
-} from '@azzapp/shared/cardHelpers';
+import type { ColorPalette } from '@azzapp/shared/cardHelpers';
 import type { ForwardedRef, ReactNode } from 'react';
 import type {
   ListRenderItem,
@@ -59,7 +58,7 @@ import type { ViewProps } from 'react-native-svg/lib/typescript/fabric/utils';
 type CardTemplateListProps = Omit<ViewProps, 'children'> & {
   profileId: string;
   height: number;
-  onApplyTemplate: (cardTemplateId: string) => void;
+  onApplyTemplate: (cardTemplate: CardTemplateItem) => void;
   onSkip?: () => void;
   loading: boolean;
   children?: ReactNode;
@@ -164,6 +163,7 @@ const CardTemplateList = (
                   label
                 }
                 modules {
+                  kind
                   ...ModuleData_cardModules
                 }
               }
@@ -235,7 +235,7 @@ const CardTemplateList = (
       if (!templates) {
         return;
       }
-      onApplyTemplate(templates[selectedIndexRef.current].id);
+      onApplyTemplate(templates[selectedIndexRef.current]);
     },
   }));
 
@@ -262,7 +262,7 @@ const CardTemplateList = (
     if (!previewTemplate) {
       return;
     }
-    onApplyTemplate(previewTemplate.id);
+    onApplyTemplate(previewTemplate);
   }, [onApplyTemplate, previewTemplate]);
 
   const styles = useStyleSheet(stylesheet);
@@ -561,14 +561,13 @@ const SearchHeader = ({
 
 export default forwardRef(CardTemplateList);
 
-export type CardTemplateItem = {
-  id: string;
-  previewMedia: { uri: string; aspectRatio: number } | null;
-  label: string | null;
-  cardStyle: CardStyle;
-  cardTemplateType: CardTemplateType;
-  modules: ModuleData_cardModules$key;
-};
+export type CardTemplateItem = NonNullable<
+  NonNullable<
+    NonNullable<
+      CardTemplateList_cardTemplates$data['cardTemplates']['edges']
+    >[number]
+  >['node']
+>;
 
 type CoverTemplatePreviewModalProps = {
   visible: boolean;
@@ -652,8 +651,6 @@ const CardTemplatePreviewModal = ({
     </View>
   );
 };
-
-const keyExtractor = (item: { id: string }) => item.id;
 
 const GAP = 20;
 const ITEM_RADIUS = 20;
