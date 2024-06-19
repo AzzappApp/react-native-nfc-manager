@@ -104,6 +104,22 @@ export const HomeScreenProvider = ({
   // we need to keep a ref to the profiles to avoid prefetching when the user `profiles` field changes
   const profilesRef = useRef(user.profiles);
   useEffect(() => {
+    //in case we are deleting a profile from another menu (cover edition for example,we should update profile even if not focus)
+    //if you still have issue, we can do it in the deleteWecard mutation
+    if (
+      user?.profiles &&
+      profilesRef.current &&
+      user?.profiles?.length < profilesRef.current.length
+    ) {
+      const newProfile = user.profiles?.[0];
+      if (newProfile) {
+        onChangeWebCard({
+          profileId: newProfile.id,
+          webCardId: newProfile.webCard.id,
+          profileRole: newProfile.invited ? 'invited' : newProfile.profileRole,
+        });
+      }
+    }
     profilesRef.current = user.profiles;
   }, [user.profiles]);
 
@@ -149,24 +165,20 @@ export const HomeScreenProvider = ({
   }, [user.profiles, user.profiles?.length]);
 
   const focus = useScreenHasFocus();
+
   const onCurrentProfileIndexChange = useCallback(
     (index: number) => {
+      'worklet';
       currentIndexSharedValue.value = index;
       const newProfile = user.profiles?.[index - 1];
-
       if (newProfile) {
-        const {
-          id: profileId,
-          webCard: { id: webCardId },
-          profileRole,
-          invited,
-        } = newProfile ?? {};
-
         if (focus) {
           onChangeWebCard({
-            profileId,
-            webCardId,
-            profileRole: invited ? 'invited' : profileRole,
+            profileId: newProfile.id,
+            webCardId: newProfile.webCard.id,
+            profileRole: newProfile.invited
+              ? 'invited'
+              : newProfile.profileRole,
           });
         }
       }
@@ -174,6 +186,7 @@ export const HomeScreenProvider = ({
     [currentIndexSharedValue, focus, user.profiles],
   );
 
+  //updating the initialProfileIndex to avoid warning(not sure needed in production)
   useEffect(() => {
     if (user?.profiles && user?.profiles?.length > initialProfileIndex) {
       setInitialProfileIndex(1);
