@@ -1,5 +1,6 @@
-## 0.5.15-canary.170
+## 0.5.15-canary.171
 
+* **feat:**  - **media:** [#3178](https://github.com/AzzappApp/azzapp/pull/3178) properly download media for skia ([#3821](https://github.com/AzzappApp/azzapp/pull/3821))
 * **fix:**  - **webCard:** [#3801](https://github.com/AzzappApp/azzapp/pull/3801) add paywall on template selection ([#3823](https://github.com/AzzappApp/azzapp/pull/3823))
 * **fix:**  - **coverTemplates:** [#3825](https://github.com/AzzappApp/azzapp/pull/3825) get only enabled cover template types ([#3827](https://github.com/AzzappApp/azzapp/pull/3827))
 * **fix:**  - **account:** [#3763](https://github.com/AzzappApp/azzapp/pull/3763) delete button on top of bottom sheets ([#3828](https://github.com/AzzappApp/azzapp/pull/3828))
