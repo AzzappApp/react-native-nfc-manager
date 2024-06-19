@@ -129,16 +129,6 @@ const CoverTemplateTagsList = ({
 
   return (
     <>
-      <TextField
-        margin="normal"
-        name="search"
-        label="Search"
-        type="text"
-        onChange={e => setCurrentSearch(e.target.value)}
-        value={currentSearch}
-        sx={{ mb: 2 }}
-      />
-
       <Box
         sx={{
           display: 'flex',
@@ -205,7 +195,7 @@ const CoverTemplateTagsList = ({
           },
         ]}
         onRowClick={params => {
-          router.push(`/coverTemplateTypes/${params.id}`);
+          router.push(`/coverTemplateFilters/${params.id}`);
         }}
         sx={{
           '& .MuiDataGrid-row:hover': {

@@ -1,4 +1,5 @@
 'use client';
+
 import { People } from '@mui/icons-material';
 import {
   Box,
@@ -18,6 +19,7 @@ import { intParser, useForm } from '#helpers/formHelpers';
 import { saveCoverTemplateTag } from './coverTemplateTagsActions';
 import type { WebCardCategoryErrors } from '../webCardCategories/webCardCategorySchema';
 import type { CoverTemplateTag, Label } from '@azzapp/data';
+import type { FormEvent } from 'react';
 
 type Props = {
   label?: Label | null;
@@ -53,7 +55,9 @@ const CoverTemplateTagForm = ({
     [coverTemplateTag],
   );
 
-  const handleSubmit = () => {
+  const handleSubmit = (event: FormEvent) => {
+    event.preventDefault();
+
     startSaving(async () => {
       try {
         const result = await saveCoverTemplateTag(data as FormValue);
@@ -83,7 +87,7 @@ const CoverTemplateTagForm = ({
           href="/coverTemplateFilters"
         >
           <People sx={{ mr: 0.5 }} fontSize="inherit" />
-          CoverTemplateTag
+          Cover template filters
         </Link>
       </Breadcrumbs>
       <Typography variant="h4" component="h1">
