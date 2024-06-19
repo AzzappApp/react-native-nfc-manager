@@ -220,6 +220,18 @@ const AccountDetailsScreen = ({
             <Text variant="medium">••••••••••</Text>
           </PressableNative>
         </View>
+        <PressableNative
+          onPress={deleteMyAccount}
+          style={styles.removeAccountButton}
+          disabled={isDeleting}
+        >
+          <Text variant="button" style={styles.removeAccountText}>
+            <FormattedMessage
+              defaultMessage="Delete my account"
+              description="Button to delete the user account"
+            />
+          </Text>
+        </PressableNative>
         <AccountDetailsEmailForm
           currentUser={currentUser}
           visible={emailsFormVisible}
@@ -234,19 +246,6 @@ const AccountDetailsScreen = ({
           visible={passwordVisible}
           toggleBottomSheet={togglePasswordVisible}
         />
-
-        <PressableNative
-          onPress={deleteMyAccount}
-          style={styles.removeAccountButton}
-          disabled={isDeleting}
-        >
-          <Text variant="button" style={styles.removeAccountText}>
-            <FormattedMessage
-              defaultMessage="Delete my account"
-              description="Button to delete the user account"
-            />
-          </Text>
-        </PressableNative>
       </SafeAreaView>
     </Container>
   );
