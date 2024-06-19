@@ -1,15 +1,13 @@
+import {
+  CameraRoll,
+  progressUpdateEventEmitter,
+} from '@react-native-camera-roll/camera-roll';
 import { FlashList } from '@shopify/flash-list';
 import { Image } from 'expo-image';
-import {
-  addListener,
-  getAssetInfoAsync,
-  getAssetsAsync,
-  presentPermissionsPickerAsync,
-  removeAllListeners,
-} from 'expo-media-library';
 import { memo, useCallback, useEffect, useRef, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { Platform, View, useWindowDimensions } from 'react-native';
+import { AppState, Platform, View, useWindowDimensions } from 'react-native';
+import { openPhotoPicker } from 'react-native-permissions';
 import { colors } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import {
@@ -18,15 +16,19 @@ import {
   getVideoSize,
 } from '#helpers/mediaHelpers';
 import { usePermissionContext } from '#helpers/PermissionContext';
+import ActivityIndicator from '#ui/ActivityIndicator';
 import Button from '#ui/Button';
 import PressableNative from '#ui/PressableNative';
 import Text from '#ui/Text';
 import type { Media } from '#helpers/mediaHelpers';
+import type {
+  Album,
+  PhotoIdentifier,
+} from '@react-native-camera-roll/camera-roll';
 
 import type { FlashListProps, ListRenderItemInfo } from '@shopify/flash-list';
-import type { Album, Asset } from 'expo-media-library';
 type PhotoGalleryMediaListProps = Omit<
-  FlashListProps<Asset>,
+  FlashListProps<PhotoIdentifier>,
   'children' | 'data' | 'onEndReached' | 'renderItem'
 > & {
   /**
@@ -71,9 +73,9 @@ const PhotoGalleryMediaList = ({
   contentContainerStyle,
   ...props
 }: PhotoGalleryMediaListProps) => {
-  const scrollViewRef = useRef<FlashList<Asset>>(null);
+  const scrollViewRef = useRef<FlashList<PhotoIdentifier>>(null);
   const styles = useStyleSheet(styleSheet);
-  const [medias, setMedias] = useState<Asset[]>([]);
+  const [medias, setMedias] = useState<PhotoIdentifier[]>([]);
   const isLoading = useRef(false);
   const [hasNext, setHasNext] = useState(false);
   const nextCursor = useRef<string | undefined>();
@@ -83,23 +85,24 @@ const PhotoGalleryMediaList = ({
     async (refreshing = false) => {
       if (!isLoading.current) {
         isLoading.current = true;
-        const previous = refreshing ? [] : [...medias];
+
         try {
-          const result = await getAssetsAsync({
+          const result = await CameraRoll.getPhotos({
             first: refreshing ? 16 : 48, //multiple of items per row
             after: refreshing ? undefined : nextCursor.current,
-            mediaType:
-              kind === 'mixed'
-                ? ['photo', 'video']
-                : kind === 'image'
-                  ? ['photo']
-                  : ['video'],
-            sortBy: ['creationTime'],
-            album: album ?? undefined,
+            assetType:
+              kind === 'mixed' ? 'All' : kind === 'image' ? 'Photos' : 'Videos',
+            groupTypes: album?.type,
+            groupName: album?.title,
           });
 
-          const { assets, endCursor, hasNextPage } = result;
-          setMedias([...previous, ...assets]);
+          const hasNextPage = result.page_info.has_next_page;
+          const endCursor = result.page_info.end_cursor;
+          const assets = result.edges;
+
+          setMedias(previous =>
+            refreshing ? assets : [...previous, ...assets],
+          );
           nextCursor.current = endCursor;
           setHasNext(hasNextPage);
         } catch (e) {
@@ -110,11 +113,11 @@ const PhotoGalleryMediaList = ({
         }
       }
     },
-    [album, kind, medias],
+    [album, kind],
   );
 
   useEffect(() => {
-    //force preload more data and inital render,
+    //force preload more data and initial render,
     if (medias.length === 16 && hasNext) {
       void load(false);
     }
@@ -128,40 +131,74 @@ const PhotoGalleryMediaList = ({
     }
   }, [album, load]);
 
-  const onMediaPress = useCallback(
-    async (asset: Asset) => {
-      let uri: string | null = asset.uri;
-      const assets = await getAssetInfoAsync(asset.id);
-      uri = assets.localUri ?? uri;
+  const [downloadingFiles, setDownloadingFiles] = useState<string[]>([]);
 
-      if (uri == null) {
-        // TODO
-        return;
-      }
-      let { width, height } = asset;
-      if (asset.mediaType === 'video') {
-        let rotation: number;
-        ({ width, height, rotation } = await getVideoSize(uri));
-        onMediaSelected({
-          galleryUri: asset.uri,
-          kind: 'video',
-          uri,
-          width,
-          height,
-          rotation,
-          duration: asset.duration,
-        });
-      } else {
-        if (width == null || height == null) {
-          ({ width, height } = await getImageSize(uri));
+  useEffect(() => {
+    const subscription = progressUpdateEventEmitter.addListener(
+      'onProgressUpdate',
+      event => {
+        // Render the progress of the image / video being
+        // downloaded using event.id and event.progress
+
+        if (event.progress === 1) {
+          setDownloadingFiles(previous =>
+            previous.filter(id => id !== event.id),
+          );
+        } else {
+          setDownloadingFiles(previous => {
+            if (!previous.includes(event.id)) {
+              return [...previous, event.id];
+            }
+            return previous;
+          });
         }
-        onMediaSelected({
-          galleryUri: asset.uri,
-          kind: 'image',
-          uri,
-          width,
-          height,
-        });
+      },
+    );
+
+    return () => {
+      subscription.remove();
+    };
+  }, []);
+
+  const onMediaPress = useCallback(
+    async (asset: PhotoIdentifier) => {
+      let uri = asset.node.image.filepath;
+      if (Platform.OS === 'ios') {
+        const fileData = await CameraRoll.iosGetImageDataById(
+          asset.node.image.uri,
+        );
+
+        uri = fileData.node.image.filepath;
+
+        if (uri == null) {
+          // TODO
+          return;
+        }
+        let { width, height } = asset.node.image;
+        if (asset.node.type === 'video') {
+          let rotation: number;
+          ({ width, height, rotation } = await getVideoSize(uri));
+          onMediaSelected({
+            galleryUri: asset.node.image.uri,
+            kind: 'video',
+            uri,
+            width,
+            height,
+            rotation,
+            duration: asset.node.image.playableDuration,
+          });
+        } else {
+          if (width == null || height == null) {
+            ({ width, height } = await getImageSize(uri));
+          }
+          onMediaSelected({
+            galleryUri: asset.node.image.uri,
+            kind: 'image',
+            uri,
+            width,
+            height,
+          });
+        }
       }
     },
     [onMediaSelected],
@@ -178,19 +215,26 @@ const PhotoGalleryMediaList = ({
     numColumns;
 
   const renderItem = useCallback(
-    ({ item }: ListRenderItemInfo<Asset>) => (
+    ({ item }: ListRenderItemInfo<PhotoIdentifier>) => (
       <MemoPhotoGalleyMediaItem
         item={item}
         selected={
-          selectedMediaId === item.uri ||
-          (selectedMediasIds?.includes(item.uri) ?? false)
+          selectedMediaId === item.node.image.uri ||
+          (selectedMediasIds?.includes(item.node.image.uri ?? '') ?? false)
         }
+        isLoading={downloadingFiles.includes(item.node.image.uri)}
         height={itemHeight}
         onMediaPress={onMediaPress}
       />
     ),
 
-    [itemHeight, onMediaPress, selectedMediaId, selectedMediasIds],
+    [
+      itemHeight,
+      downloadingFiles,
+      onMediaPress,
+      selectedMediaId,
+      selectedMediasIds,
+    ],
   );
 
   //should select the first media when the list if no media is selected
@@ -201,12 +245,17 @@ const PhotoGalleryMediaList = ({
   }, [autoSelectFirstItem, medias, onMediaPress, selectedMediaId]);
 
   useEffect(() => {
-    addListener(() => {
-      load(true);
-    });
+    const subscription = AppState.addEventListener(
+      'change',
+      async nextAppState => {
+        if (nextAppState === 'active') {
+          load(true);
+        }
+      },
+    );
 
     return () => {
-      removeAllListeners();
+      subscription.remove();
     };
   }, [load]);
 
@@ -230,7 +279,7 @@ const PhotoGalleryMediaList = ({
           </Text>
           <Button
             variant="little_round"
-            onPress={presentPermissionsPickerAsync}
+            onPress={openPhotoPicker}
             label={intl.formatMessage({
               defaultMessage: 'Manage',
               description: 'Button to manage media permissions',
@@ -261,15 +310,16 @@ const PhotoGalleryMediaList = ({
   );
 };
 
-const keyExtractor = (item: Asset) => item.id;
+const keyExtractor = (item: PhotoIdentifier) => item.node.id;
 
 // This list can be a litle laggy (due to the library we use for image at the moment).
 // Using the RN preconisation for this list to try to improve a bit
 type PhotoGalleyMediaItemProps = {
-  item: Asset;
+  item: PhotoIdentifier;
   height: number;
   selected: boolean;
-  onMediaPress: (media: Asset) => void;
+  onMediaPress: (media: PhotoIdentifier) => void;
+  isLoading: boolean;
 };
 
 const PhotoGalleyMediaItem = ({
@@ -277,6 +327,7 @@ const PhotoGalleyMediaItem = ({
   selected,
   height,
   onMediaPress,
+  isLoading,
 }: PhotoGalleyMediaItemProps) => {
   const intl = useIntl();
   const styles = useStyleSheet(styleSheet);
@@ -290,6 +341,7 @@ const PhotoGalleyMediaItem = ({
       style={{
         aspectRatio: 1,
         height,
+        position: 'relative',
       }}
       accessibilityRole="button"
       accessibilityHint={intl.formatMessage({
@@ -312,12 +364,17 @@ const PhotoGalleyMediaItem = ({
             opacity: 0.5,
           },
         ]}
-        source={{ uri: item.uri, width: height, height }}
-        recyclingKey={item.id}
+        source={{ uri: item.node.image.uri, width: height, height }}
+        recyclingKey={item.node.id}
       />
-      {item.mediaType === 'video' && (
+      {isLoading && (
+        <View style={styles.loader}>
+          <ActivityIndicator />
+        </View>
+      )}
+      {item.node.type === 'video' && (
         <Text variant="button" style={styles.textDuration}>
-          {formatVideoTime(item.duration)}
+          {formatVideoTime(item.node.image.playableDuration)}
         </Text>
       )}
     </PressableNative>
@@ -348,6 +405,15 @@ const styleSheet = createStyleSheet(appearance => ({
     marginRight: 16,
   },
   buttonManageAccessMedia: { marginVertical: 7, marginRight: 16 },
+  loader: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
 }));
 
 const SEPARATOR_WIDTH = 1;

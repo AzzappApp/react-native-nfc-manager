@@ -1,5 +1,5 @@
+import { CameraRoll } from '@react-native-camera-roll/camera-roll';
 import { Image } from 'expo-image';
-import { getAlbumsAsync, getAssetsAsync } from 'expo-media-library';
 import { memo, useCallback, useEffect, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { FlatList, Modal, StyleSheet, View } from 'react-native';
@@ -12,7 +12,7 @@ import IconButton from '#ui/IconButton';
 import PressableNative from '#ui/PressableNative';
 import PressableOpacity from '#ui/PressableOpacity';
 import Text from '#ui/Text';
-import type { Album } from 'expo-media-library';
+import type { Album } from '@react-native-camera-roll/camera-roll';
 import type { IntlShape } from 'react-intl';
 import type { ViewProps, ListRenderItemInfo } from 'react-native';
 
@@ -83,18 +83,20 @@ const AlbumPickerScreen = ({
   const intl = useIntl();
   const [albums, setAlbums] = useState<Array<Album | null> | null>(null);
   useEffect(() => {
-    getAlbumsAsync({ includeSmartAlbums: true }).then(
+    CameraRoll.getAlbums({
+      albumType: 'All',
+    }).then(
       albums => {
         const sortedAlbums = albums
-          .filter(a => a.assetCount > 0)
+          .filter(a => a.count > 0)
           .sort((a, b) => {
             if (a.title?.toLowerCase() === 'recents') {
               return -1;
             } else if (b.title?.toLowerCase() === 'recents') {
               return 1;
-            } else if (a.type === 'smartAlbum' && b.type !== 'smartAlbum') {
+            } else if (a.type === 'SmartAlbum' && b.type !== 'SmartAlbum') {
               return 1;
-            } else if (a.type !== 'smartAlbum' && b.type === 'smartAlbum') {
+            } else if (a.type !== 'SmartAlbum' && b.type === 'SmartAlbum') {
               return -1;
             } else {
               return (
@@ -160,16 +162,16 @@ const AlbumRenderer = ({
 }) => {
   const [imageUri, setImageUri] = useState<string | null>(null);
   const intl = useIntl();
-
+  console.log(album?.title);
   useEffect(() => {
-    getAssetsAsync({
+    CameraRoll.getPhotos({
       first: 1,
-      mediaType: ['photo', 'video'],
-      album: album?.id,
+      groupTypes: album?.type,
+      groupName: album?.title,
     }).then(
       result => {
-        if (result.assets.length > 0) {
-          setImageUri(result.assets[0].uri);
+        if (result.edges.length > 0) {
+          setImageUri(result.edges[0].node.image.uri);
         }
       },
       e => {
@@ -200,7 +202,7 @@ const AlbumRenderer = ({
         <Text variant="medium">
           {album ? album.title : latestAlbumTitme(intl)}
         </Text>
-        <Text variant="small">{album ? album.assetCount : 'all'}</Text>
+        <Text variant="small">{album ? album.count : 'all'}</Text>
       </View>
     </PressableOpacity>
   );

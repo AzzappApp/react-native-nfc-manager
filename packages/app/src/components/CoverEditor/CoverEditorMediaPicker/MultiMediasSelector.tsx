@@ -1,14 +1,14 @@
-import { presentPermissionsPickerAsync, type Album } from 'expo-media-library';
 import { useEffect, useRef, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { Alert, Platform, StyleSheet, View } from 'react-native';
-import { RESULTS } from 'react-native-permissions';
+import { RESULTS, openPhotoPicker } from 'react-native-permissions';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
 import AlbumPicker from '#components/AlbumPicker';
 import PermissionModal from '#components/PermissionModal';
 import PhotoGalleryMediaList from '#components/PhotoGalleryMediaList';
 import { usePermissionContext } from '#helpers/PermissionContext';
 import type { Media } from '#helpers/mediaHelpers';
+import type { Album } from '@react-native-camera-roll/camera-roll';
 import type { ViewProps } from 'react-native-svg/lib/typescript/fabric/utils';
 
 export type MultiMediasSelectorProps = ViewProps & {
@@ -52,7 +52,7 @@ const MultiMediasSelector = ({
               description:
                 'Button to open the permission picker in image picker wizard',
             }),
-            onPress: presentPermissionsPickerAsync,
+            onPress: openPhotoPicker,
           },
           {
             text: intl.formatMessage({

@@ -1,9 +1,8 @@
 import * as Sentry from '@sentry/react-native';
-import { presentPermissionsPickerAsync, type Album } from 'expo-media-library';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { Alert, Platform, StyleSheet } from 'react-native';
-import { RESULTS } from 'react-native-permissions';
+import { RESULTS, openPhotoPicker } from 'react-native-permissions';
 import { useDebouncedCallback } from 'use-debounce';
 import { cropDataForAspectRatio } from '#helpers/mediaEditions';
 import { getImageSize, getVideoSize } from '#helpers/mediaHelpers';
@@ -21,6 +20,7 @@ import ImagePickerMediaRenderer from './ImagePickerMediaRenderer';
 import { ImagePickerStep } from './ImagePickerWizardContainer';
 import type { BottomMenuItem } from '#ui/BottomMenu';
 import type { CameraViewHandle } from '../CameraView';
+import type { Album } from '@react-native-camera-roll/camera-roll';
 
 export type SelectImageStepProps = {
   onNext(): void;
@@ -266,7 +266,7 @@ const SelectImageStep = ({
               description:
                 'Button to open the permission picker in image picker wizard',
             }),
-            onPress: presentPermissionsPickerAsync,
+            onPress: openPhotoPicker,
           },
           {
             text: intl.formatMessage({

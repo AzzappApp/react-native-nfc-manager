@@ -130,6 +130,7 @@ __metadata:
     "@lottiefiles/lottie-js": 0.4.2
     "@miblanchard/react-native-slider": 2.6.0
     "@react-native-async-storage/async-storage": ^1.23.1
+    "@react-native-camera-roll/camera-roll": ^7.8.1
     "@react-native-community/datetimepicker": ^8.1.1
     "@react-native-masked-view/masked-view": ^0.3.1
     "@react-native/babel-preset": ^0.74.84
@@ -155,7 +156,6 @@ __metadata:
     expo-haptics: ~13.0.1
     expo-image: ^1.12.12
     expo-linear-gradient: ~13.0.2
-    expo-media-library: ~16.0.3
     expo-sensors: 13.0.8
     expo-status-bar: ^1.12.1
     graphql: ^16.8.2
@@ -8142,6 +8142,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@react-native-camera-roll/camera-roll@npm:^7.8.1":
+  version: 7.8.1
+  resolution: "@react-native-camera-roll/camera-roll@npm:7.8.1"
+  peerDependencies:
+    react-native: ">=0.59"
+  checksum: 45aca6d3beba88c1c5e42112e3e25776eb9b70834c1f7dd79b2db7d5433bf4f64d7ca073bee54b9b403014e70fefebb4921fbbd9e09b4db79f151a1c66fada5f
+  languageName: node
+  linkType: hard
+
 "@react-native-community/cli-clean@npm:13.6.8":
   version: 13.6.8
   resolution: "@react-native-community/cli-clean@npm:13.6.8"
@@ -14812,15 +14821,6 @@ __metadata:
   peerDependencies:
     expo: "*"
   checksum: 525e0ccdb75d1876d2d0faece669e952a0d5addb543f46705dd73b6d82a2f866847b752c12488acfc62c95877530d69e526eeab317afc0ce8f7042eadf01ccab
-  languageName: node
-  linkType: hard
-
-"expo-media-library@npm:~16.0.3":
-  version: 16.0.3
-  resolution: "expo-media-library@npm:16.0.3"
-  peerDependencies:
-    expo: "*"
-  checksum: 2b75c4ecc1c56b63d6bec7241916db0757d15582f99a4d2f51d252c2238c9842c46d26d858ae3b45a8ff6447d85af31284fe0f323f6e9ff9c69dab4bd12f3209
   languageName: node
   linkType: hard
 
