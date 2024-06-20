@@ -4,6 +4,7 @@ import { useIntl } from 'react-intl';
 import { StyleSheet, View, useColorScheme } from 'react-native';
 import { GestureDetector } from 'react-native-gesture-handler';
 import Toast from 'react-native-toast-message';
+import { useDebouncedCallback } from 'use-debounce';
 import { SOCIAL_LINKS } from '@azzapp/shared/socialLinkHelpers';
 import {
   isNotFalsyString,
@@ -238,70 +239,86 @@ const SocialInputComponent = ({
 }) => {
   const colorScheme = useColorScheme();
   const [localValue, setLocalValue] = useState(value);
-  const onChangeText = (value: string) => {
-    value = value.trim();
-    //handle copy paste from the user with complete link
-    let filterText = value;
-    if (value.includes(mask)) {
-      const index = value.indexOf(mask);
-      filterText = value.substring(index + mask.length);
-      const endIndex = filterText.indexOf('?');
-      if (endIndex !== -1) {
-        filterText = filterText.substring(0, endIndex);
+
+  const debouncedChangeLink = useDebouncedCallback(onChangeLink, 500, {
+    leading: true,
+  });
+
+  const onChangeText = useCallback(
+    (value: string) => {
+      value = value.trim();
+      //handle copy paste from the user with complete link
+      let filterText = value;
+      if (value.includes(mask)) {
+        const index = value.indexOf(mask);
+        filterText = value.substring(index + mask.length);
+        const endIndex = filterText.indexOf('?');
+        if (endIndex !== -1) {
+          filterText = filterText.substring(0, endIndex);
+        }
       }
-    }
-    setLocalValue(filterText);
-  };
+      setLocalValue(filterText);
+      if (
+        icon !== 'website' &&
+        icon !== 'mail' &&
+        icon !== 'phone' // phone number / email / website are validated on end editing
+      ) {
+        debouncedChangeLink(icon, value);
+      }
+    },
+    [debouncedChangeLink, icon, mask],
+  );
 
   const intl = useIntl();
 
-  const onEndEditing = async (
-    e: NativeSyntheticEvent<TextInputEndEditingEventData>,
-  ) => {
-    const validators = {
-      website: (text: string) => {
-        if (!isValidUrl(text)) {
-          return intl.formatMessage({
-            defaultMessage: 'The Website url is not valid.',
-            description:
-              'Error toast message when a website url sociallink is not valid.',
-          });
-        }
-      },
-      phone: (text: string) => {
-        if (!isValidPhoneNumber(text)) {
-          return intl.formatMessage({
-            defaultMessage: 'The phone number is not valid.',
-            description:
-              'Error toast message when a phone number sociallink is not valid.',
-          });
-        }
-      },
-      mail: (text: string) => {
-        if (!isValidEmail(text)) {
-          return intl.formatMessage({
-            defaultMessage: 'The email is not valid.',
-            description:
-              'Error toast message when an email sociallink is not valid.',
-          });
-        }
-      },
-    } as Partial<Record<SocialLinkId, (text: string) => string | undefined>>;
+  const onEndEditing = useCallback(
+    async (e: NativeSyntheticEvent<TextInputEndEditingEventData>) => {
+      const validators = {
+        website: (text: string) => {
+          if (!isValidUrl(text)) {
+            return intl.formatMessage({
+              defaultMessage: 'The Website url is not valid.',
+              description:
+                'Error toast message when a website url sociallink is not valid.',
+            });
+          }
+        },
+        phone: (text: string) => {
+          if (!isValidPhoneNumber(text)) {
+            return intl.formatMessage({
+              defaultMessage: 'The phone number is not valid.',
+              description:
+                'Error toast message when a phone number sociallink is not valid.',
+            });
+          }
+        },
+        mail: (text: string) => {
+          if (!isValidEmail(text)) {
+            return intl.formatMessage({
+              defaultMessage: 'The email is not valid.',
+              description:
+                'Error toast message when an email sociallink is not valid.',
+            });
+          }
+        },
+      } as Partial<Record<SocialLinkId, (text: string) => string | undefined>>;
 
-    const validator = validators[icon];
-    if (validator && e.nativeEvent.text) {
-      const error = validator(e.nativeEvent.text);
+      const validator = validators[icon];
+      if (validator && e.nativeEvent.text) {
+        const error = validator(e.nativeEvent.text);
 
-      if (error) {
-        return Toast.show({
-          type: 'error',
-          text1: error,
-        });
+        if (error) {
+          return Toast.show({
+            type: 'error',
+            text1: error,
+          });
+        }
       }
-    }
 
-    onChangeLink(icon, e.nativeEvent.text);
-  };
+      onChangeLink(icon, e.nativeEvent.text);
+    },
+    [icon, intl, onChangeLink],
+  );
 
   return (
     <View
@@ -338,6 +355,7 @@ const SocialInputComponent = ({
         onChangeText={onChangeText}
         onEndEditing={onEndEditing}
         autoCapitalize="none"
+        autoCorrect={false}
         inputStyle={styles.inputStyleSocial}
       />
       <GestureDetector gesture={panGesture}>
