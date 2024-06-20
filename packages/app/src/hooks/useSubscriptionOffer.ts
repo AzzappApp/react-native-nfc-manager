@@ -12,8 +12,7 @@ export function useUserSubscriptionOffer(period: 'month' | 'year') {
         const month: PurchasesPackage[] = [];
         const year: PurchasesPackage[] = [];
         const purchaserInfo = await Purchases.getOfferings();
-
-        purchaserInfo.all.MultiUser.availablePackages.forEach(
+        purchaserInfo.current?.availablePackages.forEach(
           (offering: PurchasesPackage) => {
             if (offering.product.subscriptionPeriod === 'P1M') {
               month.push(offering);
