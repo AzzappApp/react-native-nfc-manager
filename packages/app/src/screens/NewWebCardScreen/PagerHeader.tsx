@@ -48,9 +48,13 @@ const PagerHeader = ({
           exiting={FadeOutDown.duration(TRANSITION_DURATION)}
           entering={FadeInDown.duration(TRANSITION_DURATION)}
         >
-          <Text variant="large" style={styles.titleText}>
-            {title}
-          </Text>
+          {typeof title === 'string' ? (
+            <Text variant="large" style={styles.titleText}>
+              {title}
+            </Text>
+          ) : (
+            title
+          )}
         </Animated.View>
         <View
           style={[styles.headerSegment, { minWidth: rightElementWidth }]}
