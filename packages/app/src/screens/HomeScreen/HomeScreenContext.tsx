@@ -103,10 +103,14 @@ export const HomeScreenProvider = ({
 
   // we need to keep a ref to the profiles to avoid prefetching when the user `profiles` field changes
   const profilesRef = useRef(user.profiles);
+
+  const focus = useScreenHasFocus();
+
   useEffect(() => {
     //in case we are deleting a profile from another menu (cover edition for example,we should update profile even if not focus)
     //if you still have issue, we can do it in the deleteWecard mutation
     if (
+      focus &&
       user?.profiles &&
       profilesRef.current &&
       user?.profiles?.length < profilesRef.current.length
@@ -121,7 +125,7 @@ export const HomeScreenProvider = ({
       }
     }
     profilesRef.current = user.profiles;
-  }, [user.profiles]);
+  }, [focus, user.profiles]);
 
   const profilesDisposables = useRef<Disposable[]>([]).current;
   useEffect(() => {
@@ -163,8 +167,6 @@ export const HomeScreenProvider = ({
       onChangeWebCard({ profileId: '', webCardId: '', profileRole: '' });
     }
   }, [user.profiles, user.profiles?.length]);
-
-  const focus = useScreenHasFocus();
 
   const onCurrentProfileIndexChange = useCallback(
     (index: number) => {
