@@ -1,5 +1,6 @@
-## 0.5.15-canary.176
+## 0.5.15-canary.177
 
+* **feat:**  - IAP update settings ot use azzapp_dev on RC ([#3848](https://github.com/AzzappApp/azzapp/pull/3848))
 * **fix:**  - **imagePicker:** [#3841](https://github.com/AzzappApp/azzapp/pull/3841) preview are not displayed on android ([#3843](https://github.com/AzzappApp/azzapp/pull/3843))
 * **fix:**  - **home:** [#3682](https://github.com/AzzappApp/azzapp/pull/3682) update once screen is focused ([#3844](https://github.com/AzzappApp/azzapp/pull/3844))
 * **feat:**  - **media:** [#3178](https://github.com/AzzappApp/azzapp/pull/3178) properly download media for skia ([#3821](https://github.com/AzzappApp/azzapp/pull/3821))
