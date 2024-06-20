@@ -162,7 +162,6 @@ const AlbumRenderer = ({
 }) => {
   const [imageUri, setImageUri] = useState<string | null>(null);
   const intl = useIntl();
-  console.log(album?.title);
   useEffect(() => {
     CameraRoll.getPhotos({
       first: 1,

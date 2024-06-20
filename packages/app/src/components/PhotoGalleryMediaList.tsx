@@ -7,6 +7,7 @@ import { Image } from 'expo-image';
 import { memo, useCallback, useEffect, useRef, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { AppState, Platform, View, useWindowDimensions } from 'react-native';
+import ReactNativeBlobUtil from 'react-native-blob-util';
 import { openPhotoPicker } from 'react-native-permissions';
 import { colors } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
@@ -94,6 +95,7 @@ const PhotoGalleryMediaList = ({
               kind === 'mixed' ? 'All' : kind === 'image' ? 'Photos' : 'Videos',
             groupTypes: album?.type,
             groupName: album?.title,
+            include: ['playableDuration'],
           });
 
           const hasNextPage = result.page_info.has_next_page;
@@ -162,43 +164,52 @@ const PhotoGalleryMediaList = ({
 
   const onMediaPress = useCallback(
     async (asset: PhotoIdentifier) => {
-      let uri = asset.node.image.filepath;
+      let uri: string | null =
+        asset.node.image.filepath ?? asset.node.image.uri;
+
       if (Platform.OS === 'ios') {
         const fileData = await CameraRoll.iosGetImageDataById(
           asset.node.image.uri,
         );
 
         uri = fileData.node.image.filepath;
+      } else if (Platform.OS === 'android') {
+        const fileData = await ReactNativeBlobUtil.fs.stat(
+          asset.node.image.uri,
+        );
+        uri = `file://${fileData.path}`;
+      }
 
-        if (uri == null) {
-          // TODO
-          return;
-        }
-        let { width, height } = asset.node.image;
-        if (asset.node.type === 'video') {
-          let rotation: number;
+      if (uri == null) {
+        // TODO
+        return;
+      }
+      let { width, height, orientation: rotation } = asset.node.image;
+      if (asset.node.type.includes('video')) {
+        if (width == null || height == null || rotation == null) {
           ({ width, height, rotation } = await getVideoSize(uri));
-          onMediaSelected({
-            galleryUri: asset.node.image.uri,
-            kind: 'video',
-            uri,
-            width,
-            height,
-            rotation,
-            duration: asset.node.image.playableDuration,
-          });
-        } else {
-          if (width == null || height == null) {
-            ({ width, height } = await getImageSize(uri));
-          }
-          onMediaSelected({
-            galleryUri: asset.node.image.uri,
-            kind: 'image',
-            uri,
-            width,
-            height,
-          });
         }
+
+        onMediaSelected({
+          galleryUri: asset.node.image.uri,
+          kind: 'video',
+          uri,
+          width,
+          height,
+          rotation,
+          duration: asset.node.image.playableDuration,
+        });
+      } else {
+        if (width == null || height == null) {
+          ({ width, height } = await getImageSize(uri));
+        }
+        onMediaSelected({
+          galleryUri: asset.node.image.uri,
+          kind: 'image',
+          uri,
+          width,
+          height,
+        });
       }
     },
     [onMediaSelected],
