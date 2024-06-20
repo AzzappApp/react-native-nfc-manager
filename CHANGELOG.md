@@ -1,5 +1,7 @@
-## 0.5.15-canary.177
+## 0.5.15-canary.178
 
+* **fix:**  - **cover:** [#3728](https://github.com/AzzappApp/azzapp/pull/3728) add links on the fly ([#3852](https://github.com/AzzappApp/azzapp/pull/3852))
+* **fix:**  - **android:** [#3730](https://github.com/AzzappApp/azzapp/pull/3730) wrong title display on android ([#3853](https://github.com/AzzappApp/azzapp/pull/3853))
 * **feat:**  - IAP update settings ot use azzapp_dev on RC ([#3848](https://github.com/AzzappApp/azzapp/pull/3848))
 * **fix:**  - **imagePicker:** [#3841](https://github.com/AzzappApp/azzapp/pull/3841) preview are not displayed on android ([#3843](https://github.com/AzzappApp/azzapp/pull/3843))
 * **fix:**  - **home:** [#3682](https://github.com/AzzappApp/azzapp/pull/3682) update once screen is focused ([#3844](https://github.com/AzzappApp/azzapp/pull/3844))
