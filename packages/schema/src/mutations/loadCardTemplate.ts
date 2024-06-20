@@ -50,7 +50,10 @@ const loadCardTemplateMutation: MutationResolvers['loadCardTemplate'] = async (
 
   const owner = await loaders.webCardOwners.load(webCard.id);
 
-  if (webCardRequiresSubscription(cardTemplate.modules, webCard.webCardKind)) {
+  if (
+    webCard.cardIsPublished &&
+    webCardRequiresSubscription(cardTemplate.modules, webCard.webCardKind)
+  ) {
     const subscription = owner
       ? await loaders.activeSubscriptionsLoader.load(owner.id)
       : [];

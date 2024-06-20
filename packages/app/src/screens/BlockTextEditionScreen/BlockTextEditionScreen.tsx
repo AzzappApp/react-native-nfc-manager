@@ -196,6 +196,7 @@ const BlockTextEditionScreen = ({
         saveBlockTextModule(webCardId: $webCardId, input: $input) {
           webCard {
             id
+            requiresSubscription
             cardModules {
               kind
               visible

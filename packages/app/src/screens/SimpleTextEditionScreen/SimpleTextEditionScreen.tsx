@@ -230,6 +230,7 @@ const SimpleTextEditionScreen = ({
         saveSimpleTextModule(webCardId: $webCardId, input: $input) {
           webCard {
             id
+            requiresSubscription
             cardModules {
               visible
               ...SimpleTextEditionScreen_module

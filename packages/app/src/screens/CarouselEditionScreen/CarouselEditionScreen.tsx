@@ -189,6 +189,7 @@ const CarouselEditionScreen = ({
         saveCarouselModule(webCardId: $webCardId, input: $input) {
           webCard {
             id
+            requiresSubscription
             cardModules {
               kind
               visible

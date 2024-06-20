@@ -39,7 +39,9 @@ const LoadCardTemplateModal = ({
   visible,
   webCard: webCardKey,
 }: LoadCardTemplateModalProps) => {
-  const [cardTemplateId, setCardTemplateId] = useState<string | null>(null);
+  const [cardTemplate, setCardTemplate] = useState<CardTemplateItem | null>(
+    null,
+  );
   const [selectedTemplate, setSelectedTemplate] =
     useState<CardTemplateItem | null>(null);
 
@@ -77,7 +79,7 @@ const LoadCardTemplateModal = ({
           cardTemplateId: id,
         },
         onCompleted: () => {
-          setCardTemplateId(null);
+          setCardTemplate(null);
           onClose(true);
           setIsLoading(false);
         },
@@ -96,19 +98,35 @@ const LoadCardTemplateModal = ({
     [commit, intl, onClose, webCard.id],
   );
 
+  const router = useRouter();
+
   const cardTemplateHandle = useRef<CardTemplateListHandle>(null);
   const onSubmit = useCallback(() => {
-    if (!cardTemplateId) return;
-    commitCardTemplate(cardTemplateId);
-  }, [cardTemplateId, commitCardTemplate]);
+    if (!cardTemplate) return;
+    const requireSubscription = webCardRequiresSubscription(
+      cardTemplate.modules,
+      webCard.webCardKind,
+    );
+
+    if (webCard.cardIsPublished && requireSubscription && !webCard.isPremium) {
+      router.push({ route: 'USER_PAY_WALL' });
+      return;
+    }
+    commitCardTemplate(cardTemplate.id);
+  }, [
+    cardTemplate,
+    commitCardTemplate,
+    router,
+    webCard.cardIsPublished,
+    webCard.isPremium,
+    webCard.webCardKind,
+  ]);
 
   const showWarning = Boolean(webCard.cardModules?.length);
 
-  const router = useRouter();
-
   const applyTemplate = useCallback(
     (template: CardTemplateItem) => {
-      setCardTemplateId(template.id);
+      setCardTemplate(template);
       if (!showWarning) {
         const requireSubscription = webCardRequiresSubscription(
           template.modules,
@@ -218,7 +236,7 @@ const LoadCardTemplateModal = ({
       <ScreenModal
         animationType="none"
         visible={
-          visible && !!cardTemplateId && !loading && !inFlight && showWarning
+          visible && !!cardTemplate && !loading && !inFlight && showWarning
         }
       >
         <Container style={styles.confirmation}>
@@ -273,7 +291,7 @@ const LoadCardTemplateModal = ({
                 defaultMessage: 'Cancel',
                 description: 'Cancel button for load card template modal',
               })}
-              onPress={() => setCardTemplateId(null)}
+              onPress={() => setCardTemplate(null)}
             />
           </View>
         </Container>

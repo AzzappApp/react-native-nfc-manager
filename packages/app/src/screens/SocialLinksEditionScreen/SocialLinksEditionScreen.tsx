@@ -176,6 +176,7 @@ const SocialLinksEditionScreen = ({
         saveSocialLinksModule(webCardId: $webCardId, input: $input) {
           webCard {
             id
+            requiresSubscription
             cardModules {
               kind
               visible

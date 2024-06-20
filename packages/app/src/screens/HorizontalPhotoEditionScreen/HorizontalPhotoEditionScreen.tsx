@@ -186,6 +186,7 @@ const HorizontalPhotoEditionScreen = ({
         saveHorizontalPhotoModule(webCardId: $webCardId, input: $input) {
           webCard {
             id
+            requiresSubscription
             cardModules {
               kind
               visible
