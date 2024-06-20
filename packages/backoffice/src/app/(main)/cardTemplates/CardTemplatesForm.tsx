@@ -54,12 +54,12 @@ const CardTemplateForm = ({
   labels,
 }: CoverTemplateFormProps) => {
   const isCreation = !cardTemplate;
+  const [saving, startSaving] = useTransition();
 
   const [webCardUserName, setWebCardUserName] = useState<string | null>(null);
   const [modulesLoading, loadModules] = useTransition();
   const [modulesError, setModulesError] = useState<string | null>(null);
 
-  const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<any>(null);
   const [formErrors, setFormError] = useState<CardTemplateErrors | null>(null);
@@ -118,56 +118,52 @@ const CardTemplateForm = ({
     });
   };
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    setSaving(true);
+    let public_id: string;
+    startSaving(async () => {
+      let previewMediaId: string;
+      if (data.previewMediaId instanceof File) {
+        const file = data.previewMediaId;
+        setUploading(true);
+        try {
+          const { uploadURL, uploadParameters } = await getSignedUpload(
+            'image',
+            'module',
+          );
+          ({ public_id } = await uploadMedia(file, uploadURL, uploadParameters)
+            .promise);
+          setUploading(false);
+        } catch (error) {
+          setError(error);
+          setUploading(false);
+        }
 
-    let previewMediaId: string;
-    if (data.previewMediaId instanceof File) {
-      const file = data.previewMediaId;
-      setUploading(true);
-      let public_id: string;
+        previewMediaId = public_id;
+      } else {
+        previewMediaId = data.previewMediaId as any;
+      }
+
+      setFormError(null);
+
       try {
-        const { uploadURL, uploadParameters } = await getSignedUpload(
-          'image',
-          'module',
+        const { success, formErrors } = await saveCardTemplate(
+          {
+            ...data,
+            previewMediaId,
+          },
+          cardTemplate?.id,
         );
-        ({ public_id } = await uploadMedia(file, uploadURL, uploadParameters)
-          .promise);
-        setUploading(false);
+        if (!success) {
+          setFormError(formErrors);
+        } else {
+          setDisplaySaveSuccess(true);
+        }
       } catch (error) {
         setError(error);
-        setSaving(false);
-        setUploading(false);
-        return;
       }
-
-      previewMediaId = public_id;
-    } else {
-      previewMediaId = data.previewMediaId as any;
-    }
-
-    setFormError(null);
-
-    try {
-      const { success, formErrors } = await saveCardTemplate(
-        {
-          ...data,
-          previewMediaId,
-        },
-        cardTemplate?.id,
-      );
-      if (!success) {
-        setFormError(formErrors);
-      } else {
-        setDisplaySaveSuccess(true);
-      }
-    } catch (error) {
-      setError(error);
-      setSaving(false);
-      return;
-    }
+    });
   };
 
   const fields = {

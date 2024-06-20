@@ -111,12 +111,6 @@ const backOfficeSections: Section[] = [
         href: '/coverTemplateFilters',
         roles: [ADMIN],
       },
-      {
-        id: 'suggestedMedias',
-        text: 'Cover suggestions',
-        href: '/suggestedMedias',
-        roles: [ADMIN],
-      },
     ],
   },
   {

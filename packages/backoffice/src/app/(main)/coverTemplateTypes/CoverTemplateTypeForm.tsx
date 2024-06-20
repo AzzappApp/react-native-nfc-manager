@@ -18,6 +18,7 @@ import { intParser, useForm } from '#helpers/formHelpers';
 import { saveCoverTemplateType } from './coverTemplateTypesActions';
 import type { WebCardCategoryErrors } from '../webCardCategories/webCardCategorySchema';
 import type { CoverTemplateType, Label } from '@azzapp/data';
+import type { FormEvent } from 'react';
 
 type Props = {
   label?: Label | null;
@@ -53,7 +54,8 @@ const CoverTemplateTypeForm = ({
     [coverTemplateType],
   );
 
-  const handleSubmit = () => {
+  const handleSubmit = (event: FormEvent) => {
+    event.preventDefault();
     startSaving(async () => {
       try {
         const result = await saveCoverTemplateType(data as FormValue);
@@ -83,7 +85,7 @@ const CoverTemplateTypeForm = ({
           href="/coverTemplateTypes"
         >
           <People sx={{ mr: 0.5 }} fontSize="inherit" />
-          CoverTemplateType
+          Cover template type
         </Link>
       </Breadcrumbs>
       <Typography variant="h4" component="h1">

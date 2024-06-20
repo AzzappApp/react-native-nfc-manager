@@ -1,5 +1,6 @@
 'use server';
 import { asc, eq } from 'drizzle-orm';
+import { revalidatePath } from 'next/cache';
 import {
   CardModuleTable,
   WebCardTable,
@@ -94,6 +95,8 @@ export const saveCardTemplate = async (
     }
     await referencesMedias([template.previewMediaId], [previousMediaId], trx);
   });
+
+  revalidatePath(`/cardTemplates/[id]`);
 
   return {
     success: true,
