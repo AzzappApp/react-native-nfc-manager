@@ -1,5 +1,7 @@
-## 0.5.15-canary.175
+## 0.5.15-canary.176
 
+* **fix:**  - **imagePicker:** [#3841](https://github.com/AzzappApp/azzapp/pull/3841) preview are not displayed on android ([#3843](https://github.com/AzzappApp/azzapp/pull/3843))
+* **fix:**  - **home:** [#3682](https://github.com/AzzappApp/azzapp/pull/3682) update once screen is focused ([#3844](https://github.com/AzzappApp/azzapp/pull/3844))
 * **feat:**  - **media:** [#3178](https://github.com/AzzappApp/azzapp/pull/3178) properly download media for skia ([#3821](https://github.com/AzzappApp/azzapp/pull/3821))
 * **fix:**  - **webCard:** [#3801](https://github.com/AzzappApp/azzapp/pull/3801) add paywall on template selection ([#3823](https://github.com/AzzappApp/azzapp/pull/3823))
 * **fix:**  - **coverTemplates:** [#3825](https://github.com/AzzappApp/azzapp/pull/3825) get only enabled cover template types ([#3827](https://github.com/AzzappApp/azzapp/pull/3827))
