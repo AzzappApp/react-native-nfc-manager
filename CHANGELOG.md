@@ -1,5 +1,6 @@
-## 0.5.15-canary.183
+## 0.5.17-canary.0
 
+* **fix:**  - **webCard:** [#3847](https://github.com/AzzappApp/azzapp/pull/3847) check that webCard has sections ([#3849](https://github.com/AzzappApp/azzapp/pull/3849))
 * **build:**  - try with explicit url
 * **build:**  - try another frame url
 * **fix:**  - add framer urls in redirection ([#3857](https://github.com/AzzappApp/azzapp/pull/3857))
