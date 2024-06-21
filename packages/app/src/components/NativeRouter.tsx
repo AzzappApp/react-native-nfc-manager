@@ -820,7 +820,6 @@ export const ScreensRenderer = ({
                     ? 'none'
                     : 'slide_from_bottom'
               }
-              navigationBarTranslucent
             >
               <GestureHandlerRootView style={{ flex: 1 }}>
                 {children}
@@ -967,7 +966,6 @@ const StackRenderer = ({
               enabled
               isNativeStack
               style={StyleSheet.absoluteFill}
-              navigationBarTranslucent
             >
               <TabsRenderer
                 id={routeInfo.id}
@@ -1058,7 +1056,6 @@ const TabsRenderer = ({
                 activityState={isActive ? 2 : 0}
                 enabled
                 style={StyleSheet.absoluteFill}
-                navigationBarTranslucent
               >
                 <StackRenderer
                   stack={routeInfo.state}
@@ -1216,7 +1213,6 @@ const ScreenRenderer = ({
       onWillDisappear={() => navigationEventEmitter.emit('willDisappear')}
       onDismissed={onDismissed}
       style={StyleSheet.absoluteFill}
-      navigationBarTranslucent
     >
       <GestureHandlerRootView style={{ flex: 1 }}>
         <ScreenRendererContext.Provider value={screenContextValue}>
