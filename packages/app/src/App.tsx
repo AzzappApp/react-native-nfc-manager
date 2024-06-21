@@ -65,7 +65,9 @@ import ConfirmChangeContactScreen from '#screens/ConfirmChangeContactScreen';
 import ConfirmRegistrationScreen from '#screens/ConfirmRegistrationScreen';
 import ContactCardEditScreen from '#screens/ContactCardEditScreen';
 import ContactCardScreen from '#screens/ContactCardScreen';
+import CoverCreationScreen from '#screens/CoverCreationScreen';
 import CoverEditionScreen from '#screens/CoverEditionScreen';
+import CoverTemplateSelectionScreen from '#screens/CoverTemplateSelectionScreen';
 import FollowersScreen from '#screens/FollowersScreen';
 import FollowingsMosaicScreen from '#screens/FollowingsMosaicScreen';
 import FollowingsScreen from '#screens/FollowingsScreen';
@@ -80,7 +82,6 @@ import MediaScreen from '#screens/MediaScreen';
 import MultiUserAddScreen from '#screens/MultiUserAddScreen';
 import MultiUserDetailsScreen from '#screens/MultiUserDetailsScreen';
 import MultiUserScreen from '#screens/MultiUserScreen';
-import NewWebCardScreen from '#screens/NewWebCardScreen';
 import PostCommentsMobileScreen from '#screens/PostCommentsScreen';
 import PostCreationScreen from '#screens/PostCreationScreen';
 import PostScreen from '#screens/PostScreen';
@@ -90,14 +91,18 @@ import SignInScreen from '#screens/SignInScreen';
 import SignupScreen from '#screens/SignUpScreen';
 import UpdateApplicationScreen from '#screens/UpdateApplicationScreen';
 import UserPayWallScreen from '#screens/UserPayWallScreen';
+import WebCardFormScreen from '#screens/WebCardFormScreen';
+import WebCardKindSelectionScreen from '#screens/WebCardKindSelectionScreen';
 import WebCardParametersScreen from '#screens/WebCardParametersScreen';
 import WebCardScreen from '#screens/WebCardScreen';
+import WebCardTemplateSelectionScreen from '#screens/WebCardTemplateSelectionScreen';
 import Button from '#ui/Button';
 import Container from '#ui/Container';
 import Text from '#ui/Text';
+import type { NativeScreenProps } from '#components/NativeRouter';
 import type { ScreenPrefetchOptions } from '#helpers/ScreenPrefetcher';
 import type { ROUTES } from '#routes';
-import type { ReactNode } from 'react';
+import type { ComponentType, ReactNode } from 'react';
 import type { IntlShape } from 'react-intl';
 
 const routingInstrumentation = new Sentry.RoutingInstrumentation();
@@ -190,7 +195,11 @@ const screens = {
   CARD_MODULE_EDITION: CardModuleEditionScreen,
   CONTACT_CARD: ContactCardScreen,
   CONTACT_CARD_EDIT: ContactCardEditScreen,
+  CONFIRM_CHANGE_CONTACT: ConfirmChangeContactScreen,
+  COMMON_INFORMATION: CommonInformationScreen,
+  COVER_CREATION: CoverCreationScreen,
   COVER_EDITION: CoverEditionScreen,
+  COVER_TEMPLATE_SELECTION: CoverTemplateSelectionScreen,
   FOLLOWINGS: FollowingsScreen,
   FOLLOWINGS_MOSAIC: FollowingsMosaicScreen,
   FOLLOWERS: FollowersScreen,
@@ -201,10 +210,9 @@ const screens = {
   LIKED_POSTS: LikedPostsScreen,
   MULTI_USER: MultiUserScreen,
   MULTI_USER_ADD: MultiUserAddScreen,
-  USER_PAY_WALL: UserPayWallScreen,
+  MULTI_USER_DETAIL: MultiUserDetailsScreen,
   MEDIA: MediaScreen,
   NEW_POST: PostCreationScreen,
-  NEW_WEBCARD: NewWebCardScreen,
   ONBOARDING: WelcomeScreen,
   POST: PostScreen,
   POST_COMMENTS: PostCommentsMobileScreen,
@@ -213,12 +221,13 @@ const screens = {
   SIGN_UP: SignupScreen,
   CONFIRM_REGISTRATION: ConfirmRegistrationScreen,
   SEARCH: SearchScreen,
+  USER_PAY_WALL: UserPayWallScreen,
   WEBCARD: WebCardScreen,
   WEBCARD_PARAMETERS: WebCardParametersScreen,
-  CONFIRM_CHANGE_CONTACT: ConfirmChangeContactScreen,
-  COMMON_INFORMATION: CommonInformationScreen,
-  MULTI_USER_DETAIL: MultiUserDetailsScreen,
-};
+  WEBCARD_KIND_SELECTION: WebCardKindSelectionScreen,
+  WEBCARD_FORM: WebCardFormScreen,
+  WEBCARD_TEMPLATE_SELECTION: WebCardTemplateSelectionScreen,
+} satisfies Record<ROUTES, ComponentType<NativeScreenProps<any>>>;
 
 const tabs = {
   MAIN_TAB: MainTabBar,

@@ -93,7 +93,7 @@ export const HomeScreenProvider = ({
     let disposable: Disposable | undefined;
     if (currentIndexProfile.value === 0) {
       disposable = prefetchRoute(getRelayEnvironment(), {
-        route: 'NEW_WEBCARD',
+        route: 'WEBCARD_KIND_SELECTION',
       });
     }
     return () => {

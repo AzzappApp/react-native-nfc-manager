@@ -19,6 +19,7 @@ import {
   DEFAULT_COLOR_PALETTE,
 } from '@azzapp/shared/cardHelpers';
 import { COVER_RATIO } from '@azzapp/shared/coverHelpers';
+import { extractLottieInfo } from '@azzapp/shared/lottieHelpers';
 import { colors } from '#theme';
 import ScreenModal from '#components/ScreenModal';
 import { NativeBufferLoader, loadAllLUTShaders } from '#helpers/mediaEditions';
@@ -35,17 +36,19 @@ import { coverEditorReducer } from './coverEditorReducer';
 import CoverEditorSaveModal from './CoverEditorSaveModal';
 import CoverEditorToolbox from './CoverEditorToolbox';
 import CoverPreview from './CoverPreview';
+import useLottie from './useLottie';
 import useSaveCover from './useSaveCover';
-import type { TemplateTypePreview } from '#components/CoverEditorTemplateList';
 import type { Media } from '#helpers/mediaHelpers';
+import type { CoverEditor_coverTemplate$key } from '#relayArtifacts/CoverEditor_coverTemplate.graphql';
 import type { CoverEditor_profile$key } from '#relayArtifacts/CoverEditor_profile.graphql';
+import type { CoverEditorAction } from './coverEditorActions';
 import type { CoverEditorState } from './coverEditorTypes';
-import type { ForwardedRef } from 'react';
+import type { ForwardedRef, Reducer } from 'react';
 import type { LayoutChangeEvent, ViewProps } from 'react-native';
 
 export type CoverEditorProps = Omit<ViewProps, 'children'> & {
   profile: CoverEditor_profile$key;
-  coverTemplatePreview: TemplateTypePreview | null;
+  coverTemplate: CoverEditor_coverTemplate$key | null;
   backgroundColor: string | null;
   coverInitialSate?: Partial<CoverEditorState> | null;
   onCanSaveChange?: (canSave: boolean) => void;
@@ -58,7 +61,7 @@ export type CoverEditorHandle = {
 const CoverEditor = (
   {
     profile: profileKey,
-    coverTemplatePreview,
+    coverTemplate: coverTemplateKey,
     backgroundColor,
     onCanSaveChange,
     coverInitialSate,
@@ -84,47 +87,70 @@ const CoverEditor = (
     `,
     profileKey,
   );
+
+  const coverTemplate = useFragment(
+    graphql`
+      fragment CoverEditor_coverTemplate on CoverTemplate {
+        id
+        lottie
+      }
+    `,
+    coverTemplateKey,
+  );
   // #endregion
 
+  // Suspend
+  const lottie = useLottie(coverTemplate?.lottie);
+
   // #region Store
-  const [coverEditorState, dispatch] = useReducer(coverEditorReducer, {
-    template: null,
-    cardColors: {
-      ...DEFAULT_COLOR_PALETTE,
-      otherColors: [...DEFAULT_COLOR_LIST],
-      ...profile.webCard.cardColors,
-    } as any, // typescript is not happy with readonly
-    backgroundColor,
+  const [coverEditorState, dispatch] = useReducer<
+    Reducer<CoverEditorState, CoverEditorAction>,
+    null
+  >(coverEditorReducer, null, () => {
+    return {
+      template: lottie
+        ? {
+            lottie: JSON.stringify(lottie),
+            lottieInfo: extractLottieInfo(lottie),
+          }
+        : null,
+      cardColors: {
+        ...DEFAULT_COLOR_PALETTE,
+        otherColors: [...DEFAULT_COLOR_LIST],
+        ...profile.webCard.cardColors,
+      } as any, // typescript is not happy with readonly
+      backgroundColor,
 
-    medias: [],
-    coverTransition: 'fade',
+      medias: [],
+      coverTransition: 'fade',
 
-    overlayLayers: [],
-    textLayers: [],
-    linksLayer: {
-      links: [],
-      color: colors.black,
-      size: 24,
-      position: {
-        x: 20,
-        y: 80,
+      overlayLayers: [],
+      textLayers: [],
+      linksLayer: {
+        links: [],
+        color: colors.black,
+        size: 24,
+        position: {
+          x: 20,
+          y: 80,
+        },
+        rotation: 0,
+        shadow: false,
       },
-      rotation: 0,
-      shadow: false,
-    },
 
-    editionMode: 'none',
-    selectedItemIndex: null,
+      editionMode: 'none',
+      selectedItemIndex: null,
 
-    images: {},
-    videoPaths: {},
-    lutShaders: {},
+      images: {},
+      videoPaths: {},
+      lutShaders: {},
 
-    loadingRemoteMedia: false,
-    loadingLocalMedia: false,
-    loadingError: null,
+      loadingRemoteMedia: false,
+      loadingLocalMedia: false,
+      loadingError: null,
 
-    ...coverInitialSate,
+      ...coverInitialSate,
+    };
   });
 
   const contextValue = useMemo(() => {
@@ -322,6 +348,14 @@ const CoverEditor = (
     }
   }, [coverEditorState.medias.length, toggleImagePicker]);
 
+  const durations = useMemo(() => {
+    return coverEditorState.template
+      ? coverEditorState.template.lottieInfo.assetsInfos.map(
+          assetInfo => assetInfo.endTime - assetInfo.startTime,
+        )
+      : null;
+  }, [coverEditorState.template]);
+
   const onMediasPicked = useCallback(
     (medias: Media[]) => {
       dispatch({
@@ -390,7 +424,7 @@ const CoverEditor = (
               )}
             </View>
             <View style={{ height: 50 }} />
-            <CoverEditorToolbox coverTemplatePreview={coverTemplatePreview} />
+            <CoverEditorToolbox />
           </Container>
         </Animated.View>
       </CoverEditorContextProvider>
@@ -419,7 +453,8 @@ const CoverEditor = (
         <CoverEditorMediaPicker
           initialMedias={null}
           onFinished={onMediasPicked}
-          durations={null}
+          durations={durations}
+          durationsFixed={!!coverEditorState.template}
         />
       </ScreenModal>
     </>

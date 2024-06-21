@@ -190,17 +190,26 @@ export function coverEditorReducer(
     case 'UPDATE_MEDIAS':
       return {
         ...state,
-        medias: payload.map(media => {
+        medias: payload.map((media, index) => {
           const mediaInfo = state.medias.find(
             info => info.media.uri === media.uri,
           );
           if (mediaInfo) {
             return mediaInfo;
           }
+          let aspectRatio = COVER_RATIO;
+          if (state.template) {
+            const asset = state.template.lottieInfo.assetsInfos[index];
+            if (!asset) {
+              console.error("Too many medias for the template's assets");
+            } else {
+              aspectRatio = asset.width / asset.height;
+            }
+          }
           const cropData = cropDataForAspectRatio(
             media.width,
             media.height,
-            COVER_RATIO,
+            aspectRatio,
           );
           if (media.kind === 'image') {
             return {

@@ -11,7 +11,6 @@ import { graphql, useMutation } from 'react-relay';
 import {
   exportVideoComposition,
   getValidEncoderConfigurations,
-  type VideoCompositionItem,
 } from '@azzapp/react-native-skia-video';
 import { waitTime } from '@azzapp/shared/asyncHelpers';
 import {
@@ -20,13 +19,14 @@ import {
   COVER_MEDIA_RESOLUTION,
 } from '@azzapp/shared/coverHelpers';
 import { createRandomFilePath, getFileName } from '#helpers/fileHelpers';
-import {
-  getDeviceMaxDecodingResolution,
-  reduceVideoResolutionIfNecessary,
-} from '#helpers/mediaEditions';
 import { uploadMedia, uploadSign } from '#helpers/MobileWebAPI';
-import coverDrawer, { coverTransitions } from './coverDrawer';
+import coverDrawer from './coverDrawer';
 import { mediaInfoIsImage } from './coverEditorHelpers';
+import {
+  createCoverSkottieWithColorReplacement,
+  createCoverVideoComposition,
+  isCoverDynamic,
+} from './coverEditorUtils';
 import coverLocalStore from './coversLocalStore';
 import type { useSaveCoverMutation } from '#relayArtifacts/useSaveCoverMutation.graphql';
 import type { CoverEditorState } from './coverEditorTypes';
@@ -197,24 +197,20 @@ const isCoverEditorStateValid = (coverEditorState: CoverEditorState) => {
 
 const createCoverMedia = async (coverEditorState: CoverEditorState) => {
   const {
-    coverTransition,
-    medias,
+    template,
 
     images,
-    videoPaths,
     lutShaders,
     loadingLocalMedia,
     loadingRemoteMedia,
+    cardColors,
   } = coverEditorState;
 
   if (loadingLocalMedia || loadingRemoteMedia) {
     throw new Error('Cannot save cover while media is loading');
   }
 
-  const isDynamic =
-    medias.some(
-      mediaInfo => !mediaInfoIsImage(mediaInfo) || mediaInfo.animation != null,
-    ) || medias.length > 1;
+  const isDynamic = isCoverDynamic(coverEditorState);
 
   let outPath: string;
 
@@ -232,6 +228,7 @@ const createCoverMedia = async (coverEditorState: CoverEditorState) => {
           coverEditorState,
           images,
           lutShaders,
+          videoComposition: { duration: 0, items: [] },
         });
       }),
       COVER_MEDIA_RESOLUTION,
@@ -242,37 +239,11 @@ const createCoverMedia = async (coverEditorState: CoverEditorState) => {
     await ReactNativeBlobUtil.fs.writeFile(outPath, blob, 'base64');
   } else {
     outPath = createRandomFilePath('mp4');
-    let duration = 0;
-    const videoScales: Record<string, number> = {};
-    const items: VideoCompositionItem[] = [];
-    const transitionDuration =
-      (coverTransition && coverTransitions[coverTransition]?.duration) || 0;
-    for (const mediaInfo of medias) {
-      duration = Math.max(0, duration - transitionDuration);
-      if (mediaInfoIsImage(mediaInfo)) {
-        duration += mediaInfo.duration;
-      } else {
-        const { media, timeRange } = mediaInfo;
-        const path = videoPaths[media.uri];
-        const itemDuration = timeRange.duration;
-        const { resolution, videoScale } = reduceVideoResolutionIfNecessary(
-          media.width,
-          media.height,
-          media.rotation,
-          getDeviceMaxDecodingResolution(path, MAX_EXPORT_DECODER_RESOLUTION),
-        );
-        videoScales[media.uri] = videoScale;
-        items.push({
-          id: media.uri,
-          path,
-          startTime: timeRange.startTime,
-          compositionStartTime: duration,
-          duration: itemDuration,
-          resolution,
-        });
-        duration += itemDuration;
-      }
-    }
+
+    const { composition, videoScales } = createCoverVideoComposition(
+      coverEditorState,
+      MAX_EXPORT_DECODER_RESOLUTION,
+    );
 
     const requestedConfigs = {
       ...COVER_MEDIA_RESOLUTION,
@@ -294,9 +265,13 @@ const createCoverMedia = async (coverEditorState: CoverEditorState) => {
     }
 
     const encoderConfigs = validConfigs[0]!;
+    const skottiePlayer = createCoverSkottieWithColorReplacement(
+      template,
+      cardColors,
+    );
 
     await exportVideoComposition(
-      { duration, items },
+      composition,
       {
         outPath,
         ...encoderConfigs,
@@ -309,6 +284,7 @@ const createCoverMedia = async (coverEditorState: CoverEditorState) => {
           images,
           lutShaders,
           videoScales,
+          skottiePlayer,
         });
       },
     );

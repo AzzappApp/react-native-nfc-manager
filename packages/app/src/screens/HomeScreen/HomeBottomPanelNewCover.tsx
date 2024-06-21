@@ -54,12 +54,8 @@ const HomeBottomPanelNewCover = ({
         onPress={() => {
           if (isAdmin(profile.profileRole)) {
             router.push({
-              route: 'NEW_WEBCARD',
-              params: profile?.webCard.id
-                ? {
-                    webCardId: profile.webCard.id,
-                  }
-                : undefined,
+              route: 'COVER_TEMPLATE_SELECTION',
+              params: { fromHome: true },
             });
           } else {
             Toast.show({

@@ -42,9 +42,9 @@ type PushAction = {
   payload: Exclude<RouteInstance, StackRoute>;
 };
 
-type ReplaceAction = {
-  type: 'REPLACE';
-  payload: Exclude<RouteInstance, StackRoute>;
+type SpliceAction = {
+  type: 'SPLICE';
+  payload: { route: Exclude<RouteInstance, StackRoute>; nbRemoves: number };
 };
 
 type ShowModalAction = {
@@ -97,12 +97,12 @@ type RouterAction =
   | HideModalAction
   | PopAction
   | PushAction
-  | ReplaceAction
   | ReplaceAllAction
   | ScreenDismissedAction
   | SetModalContentAction
   | SetTabAction
-  | ShowModalAction;
+  | ShowModalAction
+  | SpliceAction;
 
 type StackState = Array<Exclude<RouteInstance, StackRoute>>;
 
@@ -127,8 +127,10 @@ const stackReducer = (
       return payload.count === 0
         ? stack
         : stack.slice(0, stack.length - payload.count);
-    case 'REPLACE':
-      return [...stack.slice(0, stack.length - 1), payload];
+    case 'SPLICE': {
+      const { route, nbRemoves } = payload;
+      return [...stack.slice(0, stack.length - nbRemoves), route];
+    }
     case 'SCREEN_DISMISSED':
       return stack.filter(routeInfo => routeInfo.id !== payload.id);
     default:
@@ -224,7 +226,7 @@ const routerReducer = (
         ...state,
         stack: applyActionToDeepestStack(state.stack, action),
       };
-    case 'REPLACE': {
+    case 'SPLICE': {
       return {
         ...state,
         stack: applyActionToDeepestStack(state.stack, action),
@@ -346,6 +348,7 @@ export type RouteListener = (route: Route) => void;
 export type NativeRouter = {
   push<T extends Route>(route: T): void;
   replace(route: Route): void;
+  splice(route: Route, nbRemoves: number): void;
   back(): void;
   canGoBack(): boolean;
   pop(num: number): void;
@@ -577,23 +580,24 @@ export const useNativeRouter = (init: NativeRouterInit) => {
         if (setTabIfExists(route)) {
           return;
         }
+
+        this.splice(route, 1);
+      },
+      splice(route: Route, nbRemoves: number) {
         const id: string = (route as any).id ?? createId();
         route = pick(route, 'route', 'params') as Route;
 
-        const currentRoute = getCurrentRoute();
-        if (currentRoute) {
-          // TODO incorrect if replaced screen is a tab
-          dispatchToListeners(screenWillBeRemovedListeners, {
-            id: currentRoute.id,
-            route: currentRoute.state,
-          });
-        }
-        dispatchToListeners(screenWillBePushedListeners, { id, route });
+        const { stack } = routerStateRef.current;
+        const screenRemoved = getAllRoutesFromStack(stack).slice(0, nbRemoves);
+        screenRemoved.forEach(({ id, state: route }) =>
+          dispatchToListeners(screenWillBeRemovedListeners, { id, route }),
+        );
         dispatch({
-          type: 'REPLACE',
-          payload: { id, kind: 'route', state: route },
+          type: 'SPLICE',
+          payload: { route: { id, kind: 'route', state: route }, nbRemoves },
         });
       },
+
       addModalInterceptor(callback: () => Promise<void>) {
         modalInterceptors.push(callback);
         return () => {

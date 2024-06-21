@@ -1,15 +1,21 @@
 import { Skia, type SkShader } from '@shopify/react-native-skia';
 import { COVER_MAX_MEDIA_DURATION } from '@azzapp/shared/coverHelpers';
 import {
+  applyImageFrameTransformations,
+  applyShaderTransformations,
   createImageFromNativeBuffer,
+  getTransformsForEditionParameters,
+  imageFrameFromImage,
+  imageFrameFromVideoFrame,
+  imageFrameToShaderFrame,
   scaleCropData,
-  transformImage,
-  transformVideoFrame,
 } from '#helpers/mediaEditions';
 import { mediaInfoIsImage } from '../coverEditorHelpers';
 import coverTransitions from './coverTransitions';
 import mediaAnimations from './mediaAnimations';
-import type { CoverDrawerOptions } from './types';
+import type { ImageFrame } from '#helpers/mediaEditions';
+import type { CoverDrawerOptions } from './coverDrawerTypes';
+import type { MediaAnimation } from '../coverEditorTypes';
 
 const coverMediasDrawer = ({
   canvas,
@@ -50,50 +56,61 @@ const coverMediasDrawer = ({
       currentTime < compositionEndTime
     ) {
       const { media, filter, editionParameters } = mediaInfo;
-      let shader: SkShader | undefined = undefined;
+      let imageFrame: ImageFrame | null = null;
+      let scale = 1;
+      let animation: MediaAnimation | null = null;
       if (mediaInfoIsImage(mediaInfo)) {
         const image = createImageFromNativeBuffer(images[media.uri], true);
         if (!image) {
           continue;
         }
-        shader = transformImage({
-          image,
-          lutShader: filter ? lutShaders[filter] : null,
-          editionParameters,
-          animation: mediaInfo.animation
-            ? {
-                animateMatrix:
-                  mediaAnimations[mediaInfo.animation].animateMatrix,
-                time: currentTime - compositionStartTime,
-                end: mediaDuration,
-                start: 0,
-              }
-            : undefined,
-          width,
-          height,
-        });
+        imageFrame = imageFrameFromImage(image);
+        animation = mediaInfo.animation
+          ? mediaAnimations[mediaInfo.animation]
+          : null;
       } else {
         const frame = frames[media.uri];
-        if (!frame?.buffer) {
+        scale = videoScales[media.uri] ?? 1;
+        const imageFrame = imageFrameFromVideoFrame(frame);
+        if (!imageFrame) {
           continue;
         }
-        const videoScale = videoScales[media.uri] ?? 1;
-        shader = transformVideoFrame({
-          frame,
+      }
+      if (!imageFrame) {
+        continue;
+      }
+
+      const { imageTransformations, shaderTransformations } =
+        getTransformsForEditionParameters({
+          width,
+          height,
           lutShader: filter ? lutShaders[filter] : null,
           editionParameters: {
             ...editionParameters,
             cropData: editionParameters?.cropData
-              ? scaleCropData(editionParameters.cropData, videoScale)
+              ? scaleCropData(editionParameters.cropData, scale)
               : undefined,
           },
-          width,
-          height,
         });
+
+      if (animation) {
+        const progress = (currentTime - compositionStartTime) / mediaDuration;
+        const { imageTransform, shaderTransform } = animation(progress);
+        if (imageTransform) {
+          imageTransformations.push(imageTransform);
+        }
+        if (shaderTransform) {
+          shaderTransformations.push(shaderTransform);
+        }
       }
-      if (!shader) {
-        continue;
-      }
+
+      const { shader } = applyShaderTransformations(
+        imageFrameToShaderFrame(
+          applyImageFrameTransformations(imageFrame, imageTransformations),
+        ),
+        shaderTransformations,
+      );
+
       if (currentTime >= compositionEndTime - transitionDuration && !isLast) {
         outShader = shader;
         transitionTime =

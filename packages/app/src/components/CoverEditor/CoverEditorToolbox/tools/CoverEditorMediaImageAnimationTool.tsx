@@ -23,8 +23,12 @@ import { mediaInfoIsImage } from '#components/CoverEditor/coverEditorHelpers';
 import TransformedImageRenderer from '#components/TransformedImageRenderer';
 import { keyExtractor } from '#helpers/idHelpers';
 import {
+  applyImageFrameTransformations,
+  applyShaderTransformations,
   createImageFromNativeBuffer,
-  transformImage,
+  getTransformsForEditionParameters,
+  imageFrameFromImage,
+  imageFrameToShaderFrame,
   useLutShader,
   useNativeBuffer,
 } from '#helpers/mediaEditions';
@@ -285,25 +289,34 @@ const AnimationPreview = ({
       if (!imageAnimation || !skImage?.value) {
         return;
       }
-
-      const shader = transformImage({
-        image: skImage.value,
-        width,
-        height,
-        editionParameters,
-        lutShader,
-        animation: {
-          animateMatrix: imageAnimation.animateMatrix,
-          time: animationStateSharedValue.value,
-          end: duration,
-          start: 0,
-        },
-      });
+      const { imageTransformations, shaderTransformations } =
+        getTransformsForEditionParameters({
+          width,
+          height,
+          lutShader,
+          editionParameters,
+        });
+      const { imageTransform, shaderTransform } = imageAnimation(
+        animationStateSharedValue.value,
+      );
+      if (imageTransform) {
+        imageTransformations.push(imageTransform);
+      }
+      if (shaderTransform) {
+        shaderTransformations.push(shaderTransform);
+      }
+      const { shader } = applyShaderTransformations(
+        imageFrameToShaderFrame(
+          applyImageFrameTransformations(
+            imageFrameFromImage(skImage.value),
+            imageTransformations,
+          ),
+        ),
+        shaderTransformations,
+      );
       const paint = Skia.Paint();
       paint.setShader(shader);
-      canvas.save();
       canvas.drawPaint(paint);
-      canvas.restore();
     }),
   );
 

@@ -15,6 +15,5 @@ export const CoverTemplate: CoverTemplateResolvers = {
   previews: async ({ id }) => {
     return getCoverTemplatePreviewsByCoverTemplateId(id);
   },
-  lottie: async ({ lottieId }) =>
-    lottieId ? getCloudinaryAssetURL(lottieId, 'raw') : null,
+  lottie: async ({ lottieId }) => getCloudinaryAssetURL(lottieId, 'raw'),
 };

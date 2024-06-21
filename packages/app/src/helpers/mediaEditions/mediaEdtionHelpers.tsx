@@ -106,6 +106,9 @@ export const reduceVideoResolutionIfNecessary = (
 
 export const scaleCropData = (cropData: CropData, scale: number): CropData => {
   'worklet';
+  if (scale === 1) {
+    return cropData;
+  }
   return Object.fromEntries(
     Object.entries(cropData).map(([key, value]) => [key, value * scale]),
   ) as CropData;

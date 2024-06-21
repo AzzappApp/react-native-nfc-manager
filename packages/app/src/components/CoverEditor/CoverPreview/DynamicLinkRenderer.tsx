@@ -10,7 +10,7 @@ import {
 } from '@azzapp/shared/socialLinkHelpers';
 import { shadow } from '#theme';
 import { SocialIcon } from '#ui/Icon';
-import { convertToBaseCanvasRatio } from '../coverDrawer/utils';
+import { convertToBaseCanvasRatio } from '../coverDrawer/coverDrawerUtils';
 import type PressableNative from '#ui/PressableNative';
 import type {
   CardColors,

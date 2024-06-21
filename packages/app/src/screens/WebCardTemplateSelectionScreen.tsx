@@ -1,0 +1,223 @@
+import { Suspense, useCallback, useRef, useState } from 'react';
+import { FormattedMessage, useIntl } from 'react-intl';
+import { StyleSheet, View, useWindowDimensions } from 'react-native';
+import Toast from 'react-native-toast-message';
+import { graphql, usePreloadedQuery } from 'react-relay';
+import { moduleCountRequiresSubscription } from '@azzapp/shared/subscriptionHelpers';
+import { colors } from '#theme';
+import CardTemplateList from '#components/CardTemplateList';
+import { NextHeaderButton } from '#components/commonsButtons';
+import { useRouter } from '#components/NativeRouter';
+import relayScreen from '#helpers/relayScreen';
+import useLoadCardTemplateMutation from '#hooks/useLoadCardTemplateMutation';
+import useScreenInsets from '#hooks/useScreenInsets';
+import ActivityIndicator from '#ui/ActivityIndicator';
+import Container from '#ui/Container';
+import Icon from '#ui/Icon';
+import Text from '#ui/Text';
+import WizardPagerHeader, { PAGER_HEADER_HEIGHT } from '#ui/WizardPagerHeader';
+import type {
+  CardTemplateItem,
+  CardTemplateListHandle,
+} from '#components/CardTemplateList';
+import type { RelayScreenProps } from '#helpers/relayScreen';
+import type { WebCardTemplateSelectionScreenQuery } from '#relayArtifacts/WebCardTemplateSelectionScreenQuery.graphql';
+import type { WebCardTemplateSelectionRoute } from '#routes';
+
+const query = graphql`
+  query WebCardTemplateSelectionScreenQuery($profileId: ID!) {
+    node(id: $profileId) {
+      ... on Profile @alias(as: "profile") {
+        id
+        webCard {
+          id
+          userName
+        }
+      }
+    }
+  }
+`;
+
+const WebCardTemplateSelectionScreen = ({
+  preloadedQuery,
+}: RelayScreenProps<
+  WebCardTemplateSelectionRoute,
+  WebCardTemplateSelectionScreenQuery
+>) => {
+  const data = usePreloadedQuery(query, preloadedQuery);
+  const profile = data.node?.profile;
+
+  const [selectedTemplate, setSelectedTemplate] =
+    useState<CardTemplateItem | null>(null);
+  const [headerVisible, setHeaderVisible] = useState(true);
+
+  const cardTemplateListRef = useRef<CardTemplateListHandle>(null);
+  const router = useRouter();
+  const onDone = useCallback(() => {
+    if (!profile || !profile.webCard) {
+      return;
+    }
+    const {
+      webCard: { id: webCardId, userName },
+    } = profile;
+    router.replace({
+      route: 'WEBCARD',
+      params: { webCardId, userName, editing: true },
+    });
+  }, [profile, router]);
+
+  const onNext = useCallback(() => {
+    cardTemplateListRef.current?.onSubmit();
+  }, []);
+
+  const hideHeader = useCallback(() => {
+    setHeaderVisible(false);
+  }, []);
+
+  const showHeader = useCallback(() => {
+    setHeaderVisible(true);
+  }, []);
+
+  const onSelectTemplate = useCallback((template: CardTemplateItem) => {
+    setSelectedTemplate(template);
+  }, []);
+
+  const intl = useIntl();
+
+  const [commit, inFlight] = useLoadCardTemplateMutation();
+  const onSubmit = (cardTemplate: CardTemplateItem) => {
+    const webCardId = profile?.webCard?.id;
+    if (!webCardId) {
+      return;
+    }
+    commit({
+      variables: {
+        cardTemplateId: cardTemplate.id,
+        webCardId,
+      },
+      onCompleted: () => {
+        onDone();
+      },
+      onError: error => {
+        console.error(error);
+        Toast.show({
+          type: 'error',
+          text1: intl.formatMessage({
+            defaultMessage: 'Error, could not load the template',
+            description: 'NewProfile - Card edition step error toast',
+          }),
+        });
+      },
+    });
+  };
+
+  const insets = useScreenInsets();
+
+  const { height: windowHeight } = useWindowDimensions();
+  const editorHeight = windowHeight - insets.top - PAGER_HEADER_HEIGHT;
+
+  return (
+    <Container
+      style={{
+        flex: 1,
+        paddingTop: insets.top,
+      }}
+    >
+      {headerVisible && (
+        <WizardPagerHeader
+          title={
+            <View style={styles.middleContainer}>
+              <Text variant="large">
+                <FormattedMessage
+                  defaultMessage="Load a template"
+                  description="WebCard creation screen title"
+                />
+              </Text>
+
+              {selectedTemplate &&
+                moduleCountRequiresSubscription(
+                  selectedTemplate.modules.length,
+                ) && (
+                  <View style={styles.proContainer}>
+                    <Text variant="medium" style={styles.proText}>
+                      <FormattedMessage
+                        defaultMessage="3+ visible sections"
+                        description="WebCard create pro description"
+                      />
+                    </Text>
+                    <Icon icon="plus" size={15} style={styles.badge} />
+                  </View>
+                )}
+            </View>
+          }
+          rightElement={
+            <NextHeaderButton
+              style={{ width: 70, marginRight: 10 }}
+              onPress={onNext}
+            />
+          }
+          rightElementWidth={80}
+          currentPage={1}
+          nbPages={5}
+        />
+      )}
+      <Suspense
+        fallback={
+          <View style={styles.activityIndicatorContainer}>
+            <ActivityIndicator />
+          </View>
+        }
+      >
+        {profile && (
+          <CardTemplateList
+            profileId={profile.id}
+            height={editorHeight}
+            onSkip={onDone}
+            onApplyTemplate={onSubmit}
+            loading={inFlight}
+            onPreviewModal={hideHeader}
+            onPreviewModalClose={showHeader}
+            previewModalStyle={{
+              transform: [{ translateY: -insets.top }],
+            }}
+            ref={cardTemplateListRef}
+            onSelectTemplate={onSelectTemplate}
+          />
+        )}
+      </Suspense>
+    </Container>
+  );
+};
+
+export default relayScreen(WebCardTemplateSelectionScreen, {
+  query,
+  getVariables: (_, profileInfos) => ({
+    profileId: profileInfos?.profileId ?? '',
+  }),
+});
+
+const styles = StyleSheet.create({
+  activityIndicatorContainer: {
+    flex: 1,
+    alignItems: 'center',
+    marginTop: 200,
+  },
+  middleContainer: {
+    flex: 1,
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  proText: {
+    color: colors.grey400,
+  },
+  proContainer: {
+    display: 'flex',
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  badge: {
+    marginLeft: 5,
+  },
+});

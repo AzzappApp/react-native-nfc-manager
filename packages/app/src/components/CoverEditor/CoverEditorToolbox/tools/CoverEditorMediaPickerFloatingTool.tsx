@@ -8,9 +8,13 @@ import type { Media } from '#helpers/mediaHelpers';
 
 type Props = {
   durations: number[] | null;
+  durationsFixed?: boolean;
 };
 
-const CoverEditorMediaPickerFloatingTool = ({ durations }: Props) => {
+const CoverEditorMediaPickerFloatingTool = ({
+  durations,
+  durationsFixed = false,
+}: Props) => {
   const [showImagePicker, toggleShowImage] = useToggle();
   const { dispatch, coverEditorState: cover } = useCoverEditorContext();
 
@@ -49,6 +53,7 @@ const CoverEditorMediaPickerFloatingTool = ({ durations }: Props) => {
             initialMedias={cover.medias.map(({ media }) => media)}
             onFinished={onMediasPicked}
             durations={durations}
+            durationsFixed={durationsFixed}
           />
         )}
       </ScreenModal>

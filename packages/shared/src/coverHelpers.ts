@@ -83,7 +83,11 @@ export const COVER_MIN_MEDIA_DURATION = 1;
 /**
  * A color that can be replaced in a lottie animation
  */
-export const LOTTIE_REPLACE_COLOR = '#010101';
+export const LOTTIE_REPLACE_COLORS = {
+  dark: '#010101',
+  primary: '#999999',
+  light: '#FEFEFE',
+};
 
 export const LINKS_GAP = 15;
 export const LINKS_BORDER_WIDTH = 2;

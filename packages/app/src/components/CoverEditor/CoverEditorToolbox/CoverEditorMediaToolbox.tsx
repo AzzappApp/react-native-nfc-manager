@@ -1,9 +1,7 @@
 import { Image } from 'expo-image';
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import { FormattedMessage } from 'react-intl';
 import { ScrollView, View } from 'react-native';
-import { extractMediasDuration } from '@azzapp/shared/lottieHelpers';
-import { fetchJSON } from '@azzapp/shared/networkHelpers';
 import { colors } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import Icon from '#ui/Icon';
@@ -16,14 +14,13 @@ import CoverEditorMediaPickerFloatingTool from './tools/CoverEditorMediaPickerFl
 import CoverEditorTransitionTool from './tools/CoverEditorTransitionTool';
 import { TOOLBOX_SECTION_HEIGHT } from './ui/ToolBoxSection';
 
-type CoverEditorMediaToolboxProps = {
-  lottie?: string | null;
-};
-
-const CoverEditorMediaToolbox = ({ lottie }: CoverEditorMediaToolboxProps) => {
+const CoverEditorMediaToolbox = () => {
   const styles = useStyleSheet(styleSheet);
 
-  const { dispatch, coverEditorState } = useCoverEditorContext();
+  const {
+    dispatch,
+    coverEditorState: { medias, template },
+  } = useCoverEditorContext();
 
   const onClose = () => {
     dispatch({
@@ -35,45 +32,29 @@ const CoverEditorMediaToolbox = ({ lottie }: CoverEditorMediaToolboxProps) => {
     });
   };
 
-  const [loading, setLoading] = useState(true);
-  const [durations, setDurations] = useState<number[]>([]);
-
-  useEffect(() => {
-    const fetchLottie = async () => {
-      if (!lottie) {
-        setLoading(false);
-        return;
-      }
-      setLoading(true);
-      try {
-        const res = await fetchJSON<Record<string, any>>(lottie);
-        setDurations(
-          extractMediasDuration(res).map(duration => Math.round(duration)),
-        );
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchLottie();
-  }, [lottie]);
+  const durations = useMemo(() => {
+    return template
+      ? template.lottieInfo.assetsInfos.map(
+          assetInfo => assetInfo.endTime - assetInfo.startTime,
+        )
+      : null;
+  }, [template]);
 
   const displayedMedias = useMemo(() => {
-    const data =
-      durations.length > 0
-        ? durations.map((duration, i) => {
-            const media = coverEditorState.medias[i] ?? null;
-            return {
-              media,
-              duration,
-            };
-          })
-        : coverEditorState.medias.map(media => ({
+    const data = durations
+      ? durations.map((duration, i) => {
+          const media = medias[i] ?? null;
+          return {
             media,
-            duration: mediaInfoIsImage(media)
-              ? media.duration
-              : media.timeRange.duration,
-          }));
+            duration,
+          };
+        })
+      : medias.map(media => ({
+          media,
+          duration: mediaInfoIsImage(media)
+            ? media.duration
+            : media.timeRange.duration,
+        }));
 
     return data.map(({ media, duration }, index) => {
       if (!media) {
@@ -122,13 +103,7 @@ const CoverEditorMediaToolbox = ({ lottie }: CoverEditorMediaToolboxProps) => {
         </PressableNative>
       );
     });
-  }, [
-    coverEditorState.medias,
-    dispatch,
-    durations,
-    styles.duration,
-    styles.previewContent,
-  ]);
+  }, [medias, dispatch, durations, styles.duration, styles.previewContent]);
 
   return (
     <View style={styles.container}>
@@ -140,10 +115,13 @@ const CoverEditorMediaToolbox = ({ lottie }: CoverEditorMediaToolboxProps) => {
         contentContainerStyle={styles.scrollContentContainer}
         showsHorizontalScrollIndicator={false}
       >
-        {coverEditorState.medias.length > 1 && <CoverEditorTransitionTool />}
-        {loading ? null : displayedMedias}
+        {medias.length > 1 && !template && <CoverEditorTransitionTool />}
+        {displayedMedias}
       </ScrollView>
-      <CoverEditorMediaPickerFloatingTool durations={durations} />
+      <CoverEditorMediaPickerFloatingTool
+        durations={durations}
+        durationsFixed={!!template}
+      />
     </View>
   );
 };

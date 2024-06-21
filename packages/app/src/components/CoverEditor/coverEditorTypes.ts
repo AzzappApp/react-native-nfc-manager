@@ -1,12 +1,17 @@
-import type { EditionParameters } from '#helpers/mediaEditions';
+import type {
+  EditionParameters,
+  ImageFrameTransformation,
+  ShaderFrameTransformation,
+} from '#helpers/mediaEditions';
 import type { MediaVideo, MediaImage, TimeRange } from '#helpers/mediaHelpers';
 import type { CoverTransitions } from './coverDrawer/coverTransitions';
 import type { MediaAnimations } from './coverDrawer/mediaAnimations';
 import type { OverlayAnimations } from './coverDrawer/overlayAnimations';
 import type { ColorPalette } from '@azzapp/shared/cardHelpers';
 import type { Filter } from '@azzapp/shared/filtersHelper';
+import type { LottieInfo } from '@azzapp/shared/lottieHelpers';
 import type {
-  SkMatrix,
+  SkCanvas,
   SkPaint,
   SkPoint,
   SkRect,
@@ -50,7 +55,8 @@ export type CardColors = Readonly<
 >;
 
 export type TemplateInfo = {
-  __todoTemplateInfo: unknown;
+  lottie: string;
+  lottieInfo: LottieInfo;
 };
 
 export type MediaInfoBase = {
@@ -124,24 +130,10 @@ export type CoverEditorLinksLayerItem = {
   shadow: boolean;
 };
 
-export type MatrixAnimation = (args: {
-  matrix: SkMatrix;
-  start: number;
-  end: number;
-  time: number;
-  width: number;
-  height: number;
-}) => void;
+export type DrawTransform = (canvas: SkCanvas, paint: SkPaint) => void;
 
-export type ShaderAnimation = (args: {
-  shader: SkShader;
-  start: number;
-  end: number;
-  time: number;
-}) => SkPaint;
-
-export type CoverLayerAnimation = {
-  id: MediaAnimations | OverlayAnimations;
-  animateMatrix?: MatrixAnimation | null;
-  animateShader?: ShaderAnimation | null;
+export type MediaAnimation = (progress: number) => {
+  imageTransform?: ImageFrameTransformation;
+  shaderTransform?: ShaderFrameTransformation;
+  drawTransform?: DrawTransform;
 };

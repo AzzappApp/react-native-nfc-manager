@@ -14,6 +14,7 @@ export type CoverInfos = Pick<
   | 'medias'
   | 'overlayLayers'
   | 'template'
+  | 'template'
   | 'textLayers'
 >;
 

@@ -7,10 +7,11 @@ import {
   useLutShader,
   createSingleVideoComposition,
   SINGLE_VIDEO_COMPOSITION_ITEM_ID,
-  transformVideoFrame,
   reduceVideoResolutionIfNecessary,
   scaleCropData,
   getDeviceMaxDecodingResolution,
+  imageFrameFromVideoFrame,
+  transformImage,
 } from '#helpers/mediaEditions';
 import { useVideoLocalPath } from '#helpers/mediaHelpers';
 import VideoCompositionRenderer from './VideoCompositionRenderer';
@@ -97,10 +98,14 @@ const TransformedVideoRenderer = ({
       if (!frame) {
         return;
       }
+      const imageFrame = imageFrameFromVideoFrame(frame);
+      if (!imageFrame) {
+        return;
+      }
       const paint = Skia.Paint();
       const cropData = editionParameters?.cropData;
-      const shader = transformVideoFrame({
-        frame,
+      const shader = transformImage({
+        imageFrame,
         width,
         height,
         editionParameters: {

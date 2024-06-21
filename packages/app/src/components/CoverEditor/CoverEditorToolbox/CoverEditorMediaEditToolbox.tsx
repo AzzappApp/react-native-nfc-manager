@@ -10,6 +10,7 @@ import {
 } from '../CoverEditorContext';
 import CoverEditorAdjustTool from './tools/CoverEditorAdjustTool';
 // import CoverEditorAnimationTool from './tools/CoverEditorAnimationTool';
+import CoverEditorCropTool from './tools/CoverEditorCropTool';
 import CoverEditorCutTool from './tools/CoverEditorCutTool';
 import CoverEditorFiltersTool from './tools/CoverEditorFiltersTool';
 import CoverEditorMediaImageAnimationTool from './tools/CoverEditorMediaImageAnimationTool';
@@ -18,10 +19,13 @@ import { TOOLBOX_SECTION_HEIGHT } from './ui/ToolBoxSection';
 
 const CoverEditorMediaEditToolbox = () => {
   const styles = useStyleSheet(styleSheet);
-
-  const { dispatch } = useCoverEditorContext();
+  const {
+    dispatch,
+    coverEditorState: { template },
+  } = useCoverEditorContext();
   const mediaInfos = useCoverEditorMedia();
   const { media } = mediaInfos ?? {};
+  const hasTemplate = !!template;
 
   const onClose = () => {
     dispatch({
@@ -52,9 +56,11 @@ const CoverEditorMediaEditToolbox = () => {
         showsHorizontalScrollIndicator={false}
       >
         {media?.kind === 'video' && <CoverEditorCutTool />}
-        {media?.kind === 'image' && <CoverEditorMediaImageAnimationTool />}
-        <CoverEditorFiltersTool />
-        <CoverEditorAdjustTool />
+        {media?.kind === 'image' && !hasTemplate && (
+          <CoverEditorMediaImageAnimationTool />
+        )}
+        {!hasTemplate && <CoverEditorFiltersTool />}
+        {hasTemplate ? <CoverEditorCropTool /> : <CoverEditorAdjustTool />}
         <CoverEditorMediaReplace />
       </ScrollView>
     </View>

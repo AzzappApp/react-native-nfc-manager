@@ -345,12 +345,7 @@ const ItemRenderComponent = ({
           )}
         </View>
       ) : (
-        <Link
-          route="NEW_WEBCARD"
-          params={{
-            webCardId: profile.webCard.id,
-          }}
-        >
+        <Link route="COVER_TEMPLATE_SELECTION" params={{ fromHome: true }}>
           <PressableOpacity
             style={[
               {
@@ -395,7 +390,7 @@ const CreateItem = ({
 }) => {
   const intl = useIntl();
   return (
-    <Link route="NEW_WEBCARD">
+    <Link route="WEBCARD_KIND_SELECTION">
       <PressableOpacity
         style={[
           styles.newCover,

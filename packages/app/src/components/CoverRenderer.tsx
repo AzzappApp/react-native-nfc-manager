@@ -12,7 +12,7 @@ import {
 import { colors, shadow } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import PressableNative from '#ui/PressableNative';
-import { convertToBaseCanvasRatio } from './CoverEditor/coverDrawer/utils';
+import { convertToBaseCanvasRatio } from './CoverEditor/coverDrawer/coverDrawerUtils';
 import { DynamicLinkRenderer } from './CoverEditor/CoverPreview/DynamicLinkRenderer';
 import { MediaImageRenderer, MediaVideoRenderer } from './medias';
 import type { CoverRenderer_webCard$key } from '#relayArtifacts/CoverRenderer_webCard.graphql';

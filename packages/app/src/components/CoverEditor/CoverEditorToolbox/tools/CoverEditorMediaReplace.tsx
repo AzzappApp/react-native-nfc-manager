@@ -14,22 +14,26 @@ import ToolBoxSection from '../ui/ToolBoxSection';
 import type { MediaInfo } from '#components/CoverEditor/coverEditorTypes';
 import type { ImagePickerResult } from '#components/ImagePicker';
 
-const CoverEditorAdjustTool = () => {
+const CoverEditorMediaReplace = () => {
   const intl = useIntl();
   const [show, toggleScreenModal] = useToggle(false);
   const {
-    coverEditorState: { editionMode },
+    coverEditorState: { template, selectedItemIndex, editionMode },
     dispatch,
   } = useCoverEditorContext();
 
+  const asset =
+    selectedItemIndex != null && editionMode === 'mediaEdit'
+      ? template?.lottieInfo.assetsInfos[selectedItemIndex]
+      : null;
   const activeMedia = useCoverEditorActiveMedia();
+
   const cropData = activeMedia?.editionParameters?.cropData;
-  const media = activeMedia?.media;
   const mediaAspectRatio = cropData
     ? cropData.width / cropData.height
-    : media
-      ? media.width / media.height
-      : 1;
+    : asset
+      ? asset.width / asset.height
+      : COVER_RATIO;
 
   const onFinished = ({
     kind,
@@ -101,9 +105,7 @@ const CoverEditorAdjustTool = () => {
                 filter: null,
               }}
               kind={editionMode === 'overlay' ? 'image' : 'mixed'}
-              forceAspectRatio={
-                editionMode === 'overlay' ? mediaAspectRatio : COVER_RATIO
-              }
+              forceAspectRatio={mediaAspectRatio}
               steps={[SelectImageStep]}
               onCancel={toggleScreenModal}
               onFinished={onFinished}
@@ -119,4 +121,4 @@ const CoverEditorAdjustTool = () => {
   );
 };
 
-export default CoverEditorAdjustTool;
+export default CoverEditorMediaReplace;

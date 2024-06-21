@@ -227,7 +227,7 @@ const CoverEditorMediaPicker = ({
                         <FormattedMessage
                           defaultMessage="{duration}s"
                           description="CoverEditorMediaPicker - duration in seconds"
-                          values={{ duration }}
+                          values={{ duration: Math.round(duration * 10) / 10 }}
                         />
                       </Text>
                     </View>

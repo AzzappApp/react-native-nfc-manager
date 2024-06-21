@@ -8,9 +8,10 @@ import { useDerivedValue, type DerivedValue } from 'react-native-reanimated';
 import { colors } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import {
+  imageFrameFromImage,
+  transformImage,
   useLutShader,
   type EditionParameters,
-  transformImage,
 } from '#helpers/mediaEditions';
 import type { Filter } from '@azzapp/shared/filtersHelper';
 import type { SkImage } from '@shopify/react-native-skia';
@@ -43,7 +44,7 @@ const TransformedImageRenderer = ({
         const paint = Skia.Paint();
         paint.setShader(
           transformImage({
-            image: image.value,
+            imageFrame: imageFrameFromImage(image.value),
             width,
             height,
             editionParameters,

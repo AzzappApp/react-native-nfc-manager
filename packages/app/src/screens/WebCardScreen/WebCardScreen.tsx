@@ -516,7 +516,7 @@ const animatedTransitionFactory = ({
   showPosts,
 }: WebCardRoute['params']): ScreenOptions => {
   if (Platform.OS !== 'ios' || !fromRectangle || showPosts) {
-    return { stackAnimation: 'slide_from_bottom' };
+    return { stackAnimation: 'slide_from_bottom', replaceAnimation: 'push' };
   }
   const windowWidth = Dimensions.get('screen').width;
   return {

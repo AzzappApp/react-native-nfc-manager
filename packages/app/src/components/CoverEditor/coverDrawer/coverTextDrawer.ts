@@ -2,8 +2,8 @@ import { Skia, TextAlign } from '@shopify/react-native-skia';
 import { swapColor, type ColorPalette } from '@azzapp/shared/cardHelpers';
 import { skiaFontManager } from '#hooks/useApplicationFonts';
 import { percentRectToRect } from '../coverEditorHelpers';
-import { convertToBaseCanvasRatio } from './utils';
-import type { CoverDrawerOptions } from './types';
+import { convertToBaseCanvasRatio } from './coverDrawerUtils';
+import type { CoverDrawerOptions } from './coverDrawerTypes';
 import type { CoverEditorTextLayerItem } from '../coverEditorTypes';
 import type { SkParagraph } from '@shopify/react-native-skia';
 

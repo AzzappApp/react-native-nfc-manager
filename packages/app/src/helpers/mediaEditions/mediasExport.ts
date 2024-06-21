@@ -18,7 +18,7 @@ import {
   reduceVideoResolutionIfNecessary,
   scaleCropData,
 } from './mediaEdtionHelpers';
-import { transformImage } from './mediasTransformations';
+import { imageFrameFromImage, transformImage } from './mediasTransformations';
 import NativeBufferLoader, {
   createImageFromNativeBuffer,
 } from './NativeBufferLoader';
@@ -62,7 +62,7 @@ export const saveTransformedImageToFile = async ({
       const paint = Skia.Paint();
       paint.setShader(
         transformImage({
-          image: sourceImage,
+          imageFrame: imageFrameFromImage(sourceImage),
           ...resolution,
           editionParameters,
           lutShader,

@@ -1,5 +1,8 @@
 import { Skia, type SkShader } from '@shopify/react-native-skia';
-import { transformVideoFrame } from './mediasTransformations';
+import {
+  imageFrameFromVideoFrame,
+  transformImage,
+} from './mediasTransformations';
 import type { EditionParameters } from './EditionParameters';
 import type {
   FrameDrawer,
@@ -36,8 +39,12 @@ export const createSingleVideoFrameDrawer =
     'worklet';
     const paint = Skia.Paint();
     const frame = frames[SINGLE_VIDEO_COMPOSITION_ITEM_ID];
-    const shader = transformVideoFrame({
-      frame,
+    const imageFrame = imageFrameFromVideoFrame(frame);
+    if (!imageFrame) {
+      return;
+    }
+    const shader = transformImage({
+      imageFrame,
       width,
       height,
       editionParameters,

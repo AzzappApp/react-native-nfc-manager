@@ -2,8 +2,9 @@ import { Skia } from '@shopify/react-native-skia';
 import { swapColor } from '@azzapp/shared/cardHelpers';
 import coverMediasDrawer from './coverMediasDrawer';
 import coverOverlayDrawer from './coverOverlayDrawer';
+import coverSkottieDrawer from './coverSkottieDrawer';
 import coverTextDrawer from './coverTextDrawer';
-import type { CoverDrawerOptions } from './types';
+import type { CoverDrawerOptions } from './coverDrawerTypes';
 
 const coverDrawer = (options: CoverDrawerOptions) => {
   'worklet';
@@ -14,13 +15,18 @@ const coverDrawer = (options: CoverDrawerOptions) => {
       overlayLayers,
       cardColors,
     },
+    skottiePlayer,
   } = options;
   if (backgroundColor) {
     options.canvas.drawColor(
       Skia.Color(swapColor(backgroundColor, cardColors)),
     );
   }
-  coverMediasDrawer(options);
+  if (!skottiePlayer) {
+    coverMediasDrawer(options);
+  } else {
+    coverSkottieDrawer(options);
+  }
 
   for (let i = 0; i < overlayLayers.length; i++) {
     coverOverlayDrawer({ ...options, index: i });

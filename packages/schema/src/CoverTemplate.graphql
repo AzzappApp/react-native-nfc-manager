@@ -14,14 +14,9 @@ type CoverTemplate implements Node {
   type: CoverTemplateType
   tags: [CoverTemplateTag!]!
   previews: [CoverTemplatePreview!]!
-  lottie: String
+  lottie: String!
 }
 
-enum CoverTemplateKind {
-  people
-  video
-  others
-}
 
 # type CoverTemplateTextLayer {
 

@@ -14,16 +14,9 @@ import CoverEditorAddTextModal from './modals/CoverEditorAddTextModal';
 import CoverEditorColorsManager from './tools/CoverEditorColorsManager';
 import ToolBarContainer from './ui/ToolBarTransitioner';
 import ToolBoxSection, { TOOLBOX_SECTION_HEIGHT } from './ui/ToolBoxSection';
-import type { TemplateTypePreview } from '#components/CoverEditorTemplateList';
 import type { CoverEditionMode } from '../coverEditorTypes';
 
-type CoverEditorToolboxProps = {
-  coverTemplatePreview: TemplateTypePreview | null;
-};
-
-const CoverEditorToolbox = ({
-  coverTemplatePreview,
-}: CoverEditorToolboxProps) => {
+const CoverEditorToolbox = () => {
   const [textModalVisible, toggleTextModalVisible] = useToggle();
   const [colorPickerVisible, toggleColorPickerVisible] = useToggle();
   const [showOverlayImagePicker, toggleOverlayImagePicker] = useToggle(false);
@@ -118,9 +111,7 @@ const CoverEditorToolbox = ({
       </ToolBarContainer>
 
       <ToolBarContainer destroyOnHide visible={editionMode === 'media'}>
-        <CoverEditorMediaToolbox
-          lottie={coverTemplatePreview?.lottie ?? null}
-        />
+        <CoverEditorMediaToolbox />
       </ToolBarContainer>
 
       <ToolBarContainer destroyOnHide visible={editionMode === 'mediaEdit'}>

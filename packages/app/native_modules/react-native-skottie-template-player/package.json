@@ -1,0 +1,10 @@
+{
+  "name": "react-native-skottie-template-player",
+  "version": "0.1.0",
+  "main": "src/index",
+  "peerDependencies": {
+    "@shopify/react-native-skia": ">=1.0.0",
+    "react": "*",
+    "react-native": ">=0.71.0"
+  }
+}

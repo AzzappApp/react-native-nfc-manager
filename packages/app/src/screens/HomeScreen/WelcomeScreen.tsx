@@ -81,7 +81,7 @@ const WelcomeScreen = () => {
             }}
           />
         </Text>
-        <Link route="NEW_WEBCARD" prefetch>
+        <Link route="WEBCARD_KIND_SELECTION" prefetch>
           <Button
             label={intl.formatMessage(
               {

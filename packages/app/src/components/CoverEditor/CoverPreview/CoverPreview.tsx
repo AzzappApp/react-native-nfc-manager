@@ -37,28 +37,27 @@ import {
 } from '#components/NativeRouter';
 import ScreenModal from '#components/ScreenModal';
 import VideoCompositionRenderer from '#components/VideoCompositionRenderer';
-import {
-  getDeviceMaxDecodingResolution,
-  reduceVideoResolutionIfNecessary,
-} from '#helpers/mediaEditions';
 import useToggle from '#hooks/useToggle';
 import ActivityIndicator from '#ui/ActivityIndicator';
+import Container from '#ui/Container';
 import IconButton from '#ui/IconButton';
-import coverDrawer, { coverTransitions } from '../coverDrawer';
+import coverDrawer from '../coverDrawer';
+import { convertToBaseCanvasRatio } from '../coverDrawer/coverDrawerUtils';
 import { createParagraph } from '../coverDrawer/coverTextDrawer';
-import { convertToBaseCanvasRatio } from '../coverDrawer/utils';
 import { useCoverEditorContext, useCurrentLayer } from '../CoverEditorContext';
 import { mediaInfoIsImage, percentRectToRect } from '../coverEditorHelpers';
 import CoverEditorLinksModal from '../CoverEditorToolbox/modals/CoverEditorLinksModal';
+import {
+  isCoverDynamic,
+  createCoverSkottieWithColorReplacement,
+  createCoverVideoComposition,
+} from '../coverEditorUtils';
 import { BoundsEditorGestureHandler, drawBoundsEditor } from './BoundsEditor';
 import { DynamicLinkRenderer } from './DynamicLinkRenderer';
 import type { VideoCompositionRendererHandle } from '#components/VideoCompositionRenderer';
 import type { EditionParameters } from '#helpers/mediaEditions';
 import type { ResizeHandlePosition } from './BoundsEditor';
-import type {
-  FrameDrawer,
-  VideoCompositionItem,
-} from '@azzapp/react-native-skia-video';
+import type { FrameDrawer } from '@azzapp/react-native-skia-video';
 import type { SkImage, SkRect } from '@shopify/react-native-skia';
 import type {
   GestureResponderEvent,
@@ -99,6 +98,7 @@ const CoverPreview = ({
   // #region Data and state
   const { dispatch, coverEditorState } = useCoverEditorContext();
   const {
+    template,
     coverTransition,
     medias,
     overlayLayers,
@@ -119,10 +119,7 @@ const CoverPreview = ({
    * Non dynamic covers can be rendered as a single image, while dynamic covers require
    * a video.
    */
-  const isDynamic =
-    medias.some(
-      mediaInfo => !mediaInfoIsImage(mediaInfo) || mediaInfo.animation != null,
-    ) || medias.length > 1;
+  const isDynamic = isCoverDynamic(coverEditorState);
 
   /**
    * Dependencies for the composition displayed in the preview
@@ -166,46 +163,11 @@ const CoverPreview = ({
         videoScales: {},
       };
     }
-    let duration = 0;
-    const videoScales: Record<string, number> = {};
-    const items: VideoCompositionItem[] = [];
-    const transitionDuration =
-      (coverTransition && coverTransitions[coverTransition]?.duration) || 0;
-    for (const mediaInfo of medias) {
-      duration = Math.max(0, duration - transitionDuration);
-      if (mediaInfoIsImage(mediaInfo)) {
-        duration += mediaInfo.duration;
-      } else {
-        const { media, timeRange } = mediaInfo;
-        const path = videoPaths[media.uri];
-        const itemDuration = timeRange.duration;
-        const { resolution, videoScale } = reduceVideoResolutionIfNecessary(
-          media.width,
-          media.height,
-          media.rotation,
-          getDeviceMaxDecodingResolution(path, MAX_DISPLAY_DECODER_RESOLUTION),
-        );
-        videoScales[media.uri] = videoScale;
-        items.push({
-          id: media.uri,
-          path,
-          startTime: timeRange.startTime,
-          compositionStartTime: duration,
-          duration: itemDuration,
-          resolution,
-        });
-        duration += itemDuration;
-      }
-    }
 
-    return {
-      composition: {
-        duration,
-        items,
-      },
-      videoScales,
-    };
-
+    return createCoverVideoComposition(
+      coverEditorState,
+      MAX_DISPLAY_DECODER_RESOLUTION,
+    );
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, compositionDependencies);
 
@@ -304,6 +266,10 @@ const CoverPreview = ({
   // #endregion
 
   // #region Frame drawing
+  const skottiePlayer = useMemo(
+    () => createCoverSkottieWithColorReplacement(template, cardColors),
+    [template, cardColors],
+  );
 
   /**
    * The main function used to draw the frame of the cover in the preview
@@ -366,12 +332,14 @@ const CoverPreview = ({
           ),
         };
       }
+
       coverDrawer({
         ...infos,
         coverEditorState: state,
         images,
         lutShaders,
         videoScales,
+        skottiePlayer,
       });
 
       if (activeLayerBounds.value) {
@@ -389,6 +357,7 @@ const CoverPreview = ({
     },
     [
       lutShaders,
+      skottiePlayer,
       coverEditorState,
       activeLayerBounds,
       editionMode,
@@ -1060,7 +1029,9 @@ const CoverPreview = ({
         >
           {/* Not rendering when modal are displayed reduce memory usage */}
           {loadingRemoteMedia || (!hasFocus && !screenShot) ? (
-            <ActivityIndicator />
+            <Container style={styles.loadingContainer}>
+              <ActivityIndicator />
+            </Container>
           ) : (
             <View style={{ width: viewWidth, height: viewHeight }}>
               {screenShot && (
@@ -1328,6 +1299,11 @@ const styles = StyleSheet.create({
   root: {
     backgroundColor: colors.grey300,
     ...shadow('light'),
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   overlayControls: {
     gap: 15,
