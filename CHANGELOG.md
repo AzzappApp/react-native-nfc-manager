@@ -1,4 +1,4 @@
-## 0.5.17-canary.1
+## 0.5.17-canary.2
 
 * **fix:**  - **webCard:** [#3847](https://github.com/AzzappApp/azzapp/pull/3847) check that webCard has sections ([#3849](https://github.com/AzzappApp/azzapp/pull/3849))
 * **build:**  - try with explicit url
