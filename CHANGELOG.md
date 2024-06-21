@@ -1,5 +1,10 @@
-## 0.5.19-canary.0
+## 0.5.19-canary.1
 
+* **fix:**  - remove id in cover template preview
+* **fix:**  - remove 3.32 feat on rn screen
+* **build:**  - rollback to rnscreen 3.31.1
+* **fix:**  - patch on rn screen
+* **build:**  - upgrade react-native screens ([#3864](https://github.com/AzzappApp/azzapp/pull/3864))
 * **fix:**  - **webCard:** [#3847](https://github.com/AzzappApp/azzapp/pull/3847) check that webCard has sections ([#3849](https://github.com/AzzappApp/azzapp/pull/3849))
 * **build:**  - try with explicit url
 * **build:**  - try another frame url
