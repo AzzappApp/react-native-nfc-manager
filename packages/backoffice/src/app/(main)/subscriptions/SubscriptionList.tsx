@@ -231,6 +231,14 @@ const SubscriptionList = ({
             sort: sortOrder,
           },
         ]}
+        onRowClick={params => {
+          router.push(`/users/${params.row.userId}`);
+        }}
+        sx={{
+          '& .MuiDataGrid-row:hover': {
+            cursor: 'pointer',
+          },
+        }}
         paginationMode="server"
         sortingMode="server"
         onPaginationModelChange={onPageChange}
