@@ -34,6 +34,10 @@
     {
       "source": "/legal/:match*",
       "destination": "https://storefront.azzapp.com/legal/:match*"
+    },
+    {
+      "source": "/_framer/:match*",
+      "destination": "https://storefront.azzapp.com/_framer/:match*"
     }
   ]
 }
