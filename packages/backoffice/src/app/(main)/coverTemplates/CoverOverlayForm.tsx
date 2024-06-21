@@ -28,6 +28,7 @@ const CoverOverlayForm = ({ field }: Props) => {
         {...getInputProps(overlayFields.media.getFieldset().id, {
           type: 'hidden',
         })}
+        key={overlayFields.media.getFieldset().id.key}
       />
       <ImageInput
         field={field.getFieldset().image}
@@ -46,6 +47,7 @@ const CoverOverlayForm = ({ field }: Props) => {
             labelId={'filter-label'}
             label="Filter"
             {...getSelectProps(overlayFields.filter)}
+            key={overlayFields.filter.key}
           >
             {FILTERS.map(filter => (
               <MenuItem key={filter} value={filter}>
@@ -69,6 +71,7 @@ const CoverOverlayForm = ({ field }: Props) => {
           {...getInputProps(overlayFields.bounds.getFieldset().height, {
             type: 'number',
           })}
+          key={overlayFields.bounds.getFieldset().height.key}
         />
         <TextField
           label="Width"
@@ -83,6 +86,7 @@ const CoverOverlayForm = ({ field }: Props) => {
           {...getInputProps(overlayFields.bounds.getFieldset().width, {
             type: 'number',
           })}
+          key={overlayFields.bounds.getFieldset().width.key}
         />
         <RadianInput field={overlayFields.rotation} label="Orientation" />
         <TextField
@@ -98,6 +102,7 @@ const CoverOverlayForm = ({ field }: Props) => {
           {...getInputProps(overlayFields.bounds.getFieldset().x, {
             type: 'number',
           })}
+          key={overlayFields.bounds.getFieldset().x.key}
         />
         <TextField
           label="Y"
@@ -112,6 +117,7 @@ const CoverOverlayForm = ({ field }: Props) => {
           {...getInputProps(overlayFields.bounds.getFieldset().y, {
             type: 'number',
           })}
+          key={overlayFields.bounds.getFieldset().y.key}
         />
       </Box>
       <Box display="flex" gap={2}>
@@ -128,6 +134,7 @@ const CoverOverlayForm = ({ field }: Props) => {
           {...getInputProps(overlayFields.borderWidth, {
             type: 'number',
           })}
+          key={overlayFields.borderWidth.key}
         />
         <ColorInput field={overlayFields.borderColor} label="Boder Color" />
         <TextField
@@ -143,6 +150,7 @@ const CoverOverlayForm = ({ field }: Props) => {
           {...getInputProps(overlayFields.borderRadius, {
             type: 'number',
           })}
+          key={overlayFields.borderRadius.key}
         />
       </Box>
       {/* <Box display="flex" gap={2}>

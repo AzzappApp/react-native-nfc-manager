@@ -44,6 +44,7 @@ const RadianInput = ({ field, label }: Props) => {
         {...getInputProps(field, {
           type: 'hidden',
         })}
+        key={field.key}
       />
     </>
   );

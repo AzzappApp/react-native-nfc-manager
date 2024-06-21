@@ -23,7 +23,6 @@ type Props = {
   lottieField: FieldMetadata<File | undefined>;
   mediaFields: FieldMetadata<MediasSchemaType[]>;
   lottieIdField: FieldMetadata<string>;
-  lottieId?: string;
 };
 
 type LottieData = {

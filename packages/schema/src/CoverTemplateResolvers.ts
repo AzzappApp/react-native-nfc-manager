@@ -1,5 +1,4 @@
 import { getCoverTemplateTagsIn } from '@azzapp/data';
-import { getCoverTemplatePreviewsByCoverTemplateId } from '@azzapp/data/coverTemplatePreview';
 import { getCloudinaryAssetURL } from '@azzapp/shared/imagesHelpers';
 import { idResolver } from './utils';
 import type { CoverTemplateResolvers } from './__generated__/types';
@@ -12,8 +11,11 @@ export const CoverTemplate: CoverTemplateResolvers = {
   type: async ({ type }, _, { loaders }) => {
     return loaders.CoverTemplateType.load(type);
   },
-  previews: async ({ id }) => {
-    return getCoverTemplatePreviewsByCoverTemplateId(id);
+  preview: async ({ previewId }) => {
+    return {
+      media: previewId,
+      assetKind: 'coverPreview',
+    };
   },
   lottie: async ({ lottieId }) => getCloudinaryAssetURL(lottieId, 'raw'),
 };

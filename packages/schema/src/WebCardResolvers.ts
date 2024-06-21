@@ -13,11 +13,13 @@ import {
   getActivePaymentMeans,
   getWebCardPayments,
   getLastSubscription,
+  getCoverTemplatesWithType,
 } from '@azzapp/data';
 import { webCardRequiresSubscription } from '@azzapp/shared/subscriptionHelpers';
 import {
   connectionFromDateSortedItems,
   cursorToDate,
+  emptyConnection,
 } from '#helpers/connectionsHelpers';
 import { maybeFromGlobalIdWithType } from '#helpers/relayIdHelpers';
 import { getLabel, idResolver } from './utils';
@@ -269,6 +271,34 @@ export const WebCard: WebCardResolvers = {
           assetKind: 'logo',
         }
       : null,
+
+  coverTemplates: async (webCard, { tagId, after, first }) => {
+    const limit = first ?? 100;
+
+    const templatesWithType = await getCoverTemplatesWithType({
+      limit: limit + 1,
+      cursor: after ?? undefined,
+      tagId: tagId ?? undefined,
+      companyActivityId: webCard.companyActivityId,
+    });
+
+    if (templatesWithType.length === 0) return emptyConnection;
+
+    const sizedTemplateType = templatesWithType.slice(0, limit);
+
+    return {
+      edges: sizedTemplateType.map(templateType => ({
+        node: templateType,
+        cursor: templateType.cursor,
+      })),
+      pageInfo: {
+        hasNextPage: sizedTemplateType.length > limit,
+        hasPreviousPage: false,
+        startCursor: sizedTemplateType[0]?.cursor,
+        endCursor: sizedTemplateType[sizedTemplateType.length - 1].cursor,
+      },
+    };
+  },
 };
 
 export const WebCardCategory: WebCardCategoryResolvers = {

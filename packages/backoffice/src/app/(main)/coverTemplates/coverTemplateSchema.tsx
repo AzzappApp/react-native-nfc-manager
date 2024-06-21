@@ -28,6 +28,7 @@ export const textSchema = z.object({
 
 export const coverOverlaySchema = z.object({
   image: z.instanceof(File).optional(),
+
   media: z
     .object({
       id: z.string().optional(),
@@ -59,6 +60,8 @@ export const mediasSchema = z.object({
 
 export const coverTemplateSchema = z.object({
   id: z.string().optional(),
+  preview: z.instanceof(File).optional(),
+  previewId: z.string().optional(),
   name: z.string(),
   order: z.number(),
   tags: z.string().array(),
@@ -78,10 +81,12 @@ export const coverTemplateSchema = z.object({
 export const coverTemplateSchemaWithoutfile = coverTemplateSchema
   .omit({
     lottie: true,
+    preview: true,
   })
   .merge(
     z.object({
       lottieId: z.string(),
+      previewId: z.string(),
       params: z.object({
         medias: mediasSchema.array(),
         textLayers: textSchema.array(),

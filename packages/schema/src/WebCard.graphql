@@ -292,6 +292,14 @@ type WebCard implements Node {
   The webCard is premium
   """
   isPremium: Boolean!
+  """
+  Fetches cover template type
+  """
+  coverTemplates(
+    tagId: ID
+    first: Int @max(value: 50)
+    after: String
+  ): CoverTemplateConnection!
 }
 
 type WebCardStyle {

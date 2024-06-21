@@ -1,5 +1,10 @@
 import { asc, like, or, sql, and, desc, eq } from 'drizzle-orm';
-import { CoverTemplateTable, db } from '@azzapp/data';
+import {
+  CoverTemplateTable,
+  CoverTemplateTypeTable,
+  LabelTable,
+  db,
+} from '@azzapp/data';
 import CoverTemplatesList from './CoverTemplatesList';
 import type { SQL } from 'drizzle-orm';
 
@@ -19,7 +24,7 @@ const getFilters = (filters: Filters) => {
   const f: Array<SQL<unknown>> = [];
 
   if (filters.status && filters.status !== 'All') {
-    f.push(eq(sql`enabled`, filters.status === 'Enabled'));
+    f.push(eq(CoverTemplateTable.enabled, filters.status === 'Enabled'));
   }
 
   return f;
@@ -29,7 +34,7 @@ const getSearch = (search: string | null) => {
   if (search) {
     return or(
       like(CoverTemplateTable.name, `%${search}%`),
-      like(CoverTemplateTable.type, `%${search}%`),
+      like(LabelTable.baseLabelValue, `%${search}%`),
     );
   }
 };
@@ -38,7 +43,7 @@ export type SortColumn = 'name' | 'type';
 
 const sortsColumns = {
   name: CoverTemplateTable.name,
-  type: CoverTemplateTable.type,
+  type: LabelTable.baseLabelValue,
 };
 
 const getQuery = (search: string | null, filters: Filters) => {
@@ -46,10 +51,18 @@ const getQuery = (search: string | null, filters: Filters) => {
     .select({
       id: CoverTemplateTable.id,
       name: CoverTemplateTable.name,
-      type: CoverTemplateTable.type,
+      type: LabelTable.baseLabelValue,
       status: CoverTemplateTable.enabled,
     })
     .from(CoverTemplateTable)
+    .innerJoin(
+      CoverTemplateTypeTable,
+      eq(CoverTemplateTypeTable.id, CoverTemplateTable.type),
+    )
+    .innerJoin(
+      LabelTable,
+      eq(CoverTemplateTypeTable.labelKey, LabelTable.labelKey),
+    )
     .where(and(getSearch(search), ...getFilters(filters)))
     .$dynamic();
 

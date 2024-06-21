@@ -55,15 +55,16 @@ const CoverTextForm = ({ field }: TextFormProps) => {
           {...getInputProps(textFields.text, {
             type: 'text',
           })}
+          key={textFields.text.key}
           onChange={onChangeText}
         >
-          <MenuItem value={'firstName'}>
+          <MenuItem key={'firstName'} value={'firstName'}>
             <Typography>First name</Typography>
           </MenuItem>
-          <MenuItem value={'mainName'}>
+          <MenuItem key={'mainName'} value={'mainName'}>
             <Typography>Last name / Company name / name</Typography>
           </MenuItem>
-          <MenuItem value={'custom'}>
+          <MenuItem key={'custom'} value={'custom'}>
             <Typography>Custom label</Typography>
           </MenuItem>
         </TextField>
@@ -76,6 +77,7 @@ const CoverTextForm = ({ field }: TextFormProps) => {
           {...getInputProps(textFields.customText, {
             type: 'text',
           })}
+          key={textFields.customText.key}
         />
         <FormControl
           fullWidth
@@ -88,6 +90,7 @@ const CoverTextForm = ({ field }: TextFormProps) => {
             labelId={'fontFamily-label'}
             label="Font family"
             {...getSelectProps(textFields.fontFamily)}
+            key={textFields.fontFamily.key}
           >
             {APPLICATIONS_FONTS.map(font => (
               <MenuItem key={font} value={font}>
@@ -116,6 +119,7 @@ const CoverTextForm = ({ field }: TextFormProps) => {
             labelId={'size-label'}
             label="Size"
             {...getSelectProps(textFields.fontSize)}
+            key={textFields.fontSize.key}
           >
             {[
               ...Array(COVER_MAX_FONT_SIZE - COVER_MIN_FONT_SIZE + 1).keys(),
@@ -139,6 +143,7 @@ const CoverTextForm = ({ field }: TextFormProps) => {
           {...getInputProps(textFields.width, {
             type: 'number',
           })}
+          key={textFields.width.key}
         />
         <RadianInput field={textFields.orientation} label="Orientation" />
         <TextField
@@ -154,6 +159,7 @@ const CoverTextForm = ({ field }: TextFormProps) => {
           {...getInputProps(textFields.position.getFieldset().x, {
             type: 'number',
           })}
+          key={textFields.position.key}
         />
         <TextField
           label="Y"
@@ -168,6 +174,7 @@ const CoverTextForm = ({ field }: TextFormProps) => {
           {...getInputProps(textFields.position.getFieldset().y, {
             type: 'number',
           })}
+          key={textFields.position.getFieldset().y.key}
         />
       </Box>
       <Box display="flex" gap={2}>
@@ -181,8 +188,9 @@ const CoverTextForm = ({ field }: TextFormProps) => {
             labelId={'animation-label'}
             label="Animation"
             {...getSelectProps(textFields.animation.getFieldset().name)}
+            key={textFields.animation.getFieldset().name.key}
           >
-            <MenuItem value="">
+            <MenuItem key="AnimationNone" value="">
               <em>No Animation</em>
             </MenuItem>
             {textAnimations.map(animation => (
@@ -205,6 +213,7 @@ const CoverTextForm = ({ field }: TextFormProps) => {
           {...getInputProps(textFields.animation.getFieldset().start, {
             type: 'number',
           })}
+          key={textFields.animation.getFieldset().start.key}
         />
         <TextField
           label="End"
@@ -219,6 +228,7 @@ const CoverTextForm = ({ field }: TextFormProps) => {
           {...getInputProps(textFields.animation.getFieldset().end, {
             type: 'number',
           })}
+          key={textFields.animation.getFieldset().end.key}
         />
       </Box>
     </Box>

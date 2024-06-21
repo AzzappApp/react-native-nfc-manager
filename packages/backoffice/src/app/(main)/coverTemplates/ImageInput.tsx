@@ -46,6 +46,7 @@ const LogoInputRow = ({ field, imageId, buttonLabel }: Props) => {
       </Box>
       <input
         {...getInputProps(field, { type: 'file' })}
+        key={field.key}
         accept="image/*"
         style={{
           display: 'none',

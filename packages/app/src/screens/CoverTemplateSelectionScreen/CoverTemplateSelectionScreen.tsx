@@ -67,13 +67,17 @@ const CoverTemplateSelectionScreen = ({
   return (
     <Container style={{ paddingTop: insets.top, flex: 1 }}>
       <WizardPagerHeader
-        title={intl.formatMessage(
-          {
-            defaultMessage: 'Select a Cover{azzappA} template',
-            description: 'Cover template selection screen title',
-          },
-          { azzappA: <Text variant="azzapp">a</Text> },
-        )}
+        title={
+          <Text variant="large" style={styles.titleText}>
+            {intl.formatMessage(
+              {
+                defaultMessage: 'Select a Cover{azzappA} template',
+                description: 'Cover template selection screen title',
+              },
+              { azzappA: <Text variant="azzapp">a</Text> },
+            )}
+          </Text>
+        }
         rightElement={<View style={{ height: HEADER_HEIGHT }} />}
         rightElementWidth={80}
         backIcon="arrow_down"
@@ -146,5 +150,9 @@ const stylesheet = createStyleSheet(() => ({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  titleText: {
+    textAlign: 'center',
+    textAlignVertical: 'center',
   },
 }));

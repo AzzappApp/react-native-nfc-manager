@@ -1,4 +1,5 @@
-import { and, asc, eq, gt, sql } from 'drizzle-orm';
+import { and, asc, eq, gt, isNull, sql } from 'drizzle-orm';
+import { CoverTemplatePreviewTable } from '#coverTemplatePreview';
 import { CoverTemplateTypeTable } from '#coverTemplateType';
 import db, { cols } from './db';
 import { createId } from './helpers/createId';
@@ -66,6 +67,7 @@ export const CoverTemplateTable = cols.table('CoverTemplate', {
   tags: cols.json('tags').$type<string[]>().notNull(),
   type: cols.cuid('type').notNull(),
   lottieId: cols.cuid('lottieId').notNull(),
+  previewId: cols.cuid('previewId').notNull(),
   colorPaletteId: cols.cuid('colorPaletteId').notNull(),
   enabled: cols.boolean('enabled').default(true).notNull(),
   params: cols.json('params').$type<CoverTemplateParams>(),
@@ -148,11 +150,17 @@ export const getCoverTemplatesByTypeAndTag = async (
   return executed.rows as CoverTemplate[];
 };
 
-export const getCoverTemplatesWithType = async (
-  limit: number,
-  cursor?: string,
-  tagId?: string,
-) => {
+export const getCoverTemplatesWithType = async ({
+  limit,
+  cursor,
+  tagId,
+  companyActivityId,
+}: {
+  limit: number;
+  cursor?: string;
+  tagId?: string;
+  companyActivityId?: string | null;
+}) => {
   const filters: SQLWrapper[] = [];
 
   if (tagId) {
@@ -164,6 +172,7 @@ export const getCoverTemplatesWithType = async (
     .select({
       CoverTemplate: CoverTemplateTable,
       CoverTemplateType: CoverTemplateTypeTable,
+      CoverTemplatePreviewMediaId: CoverTemplatePreviewTable.media,
       cursor: CoverTemplateTable.id,
     })
     .from(CoverTemplateTable)
@@ -171,7 +180,18 @@ export const getCoverTemplatesWithType = async (
       CoverTemplateTypeTable,
       eq(CoverTemplateTypeTable.id, CoverTemplateTable.type),
     )
-    .where(and(...filters))
+    .leftJoin(
+      CoverTemplatePreviewTable,
+      eq(CoverTemplateTable.id, CoverTemplatePreviewTable.coverTemplateId),
+    )
+    .where(
+      and(
+        ...filters,
+        companyActivityId
+          ? eq(CoverTemplatePreviewTable.companyActivityId, companyActivityId)
+          : isNull(CoverTemplatePreviewTable.companyActivityId),
+      ),
+    )
     .orderBy((asc(CoverTemplateTypeTable.order), asc(CoverTemplateTable.order)))
     .limit(limit);
 
@@ -179,8 +199,9 @@ export const getCoverTemplatesWithType = async (
     ? request.having(item => gt(item.cursor, cursor))
     : request);
 
-  return rows.map(({ CoverTemplate, cursor }) => ({
+  return rows.map(({ CoverTemplate, CoverTemplatePreviewMediaId, cursor }) => ({
     ...CoverTemplate,
+    previewId: CoverTemplatePreviewMediaId ?? CoverTemplate.previewId,
     cursor,
   }));
 };

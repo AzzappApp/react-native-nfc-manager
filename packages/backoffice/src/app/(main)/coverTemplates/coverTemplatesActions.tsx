@@ -2,7 +2,14 @@
 
 import { parseWithZod } from '@conform-to/zod';
 
-import { createCoverTemplate } from '@azzapp/data';
+import { revalidatePath } from 'next/cache';
+import {
+  createCoverTemplate,
+  createCoverTemplatePreview,
+  removeCoverTemplatePreviewById,
+  updateCoverTemplatePreview,
+  getCoverTemplatePreview,
+} from '@azzapp/data';
 import { updateCoverTemplate } from '@azzapp/data/coverTemplates';
 import { createId } from '@azzapp/data/helpers/createId';
 import { createPresignedUpload } from '@azzapp/shared/cloudinaryHelpers';
@@ -13,7 +20,10 @@ import { currentUserHasRole } from '#helpers/roleHelpers';
 import { coverTemplateSchemaWithoutfile } from './coverTemplateSchema';
 import type { SubmissionResult } from '@conform-to/react';
 
-export const uploadMedia = async (media: File, kind: 'image' | 'raw') => {
+export const uploadMedia = async (
+  media: File,
+  kind: 'image' | 'raw' | 'video',
+) => {
   if (!(await currentUserHasRole(ADMIN))) {
     throw new Error('Unauthorized');
   }
@@ -55,6 +65,13 @@ export const saveCoverTemplate = async (
   }
 
   try {
+    const previewField = formData.get('preview') as File;
+    if (previewField?.size > 0) {
+      const { public_id } = await uploadMedia(previewField, 'video');
+      formData.append(`previewId`, public_id);
+    }
+    formData.delete('preview');
+
     const lottieField = formData.get('lottie') as File;
     if (lottieField?.size > 0) {
       const { public_id } = await uploadMedia(lottieField, 'raw');
@@ -93,18 +110,71 @@ export const saveCoverTemplate = async (
       enabled: submission.value.enabled === 'true',
     };
 
-    if (data.id) {
-      await updateCoverTemplate(data.id, data);
+    let coverTemplateId = data.id;
+    if (coverTemplateId) {
+      await updateCoverTemplate(coverTemplateId, data);
     } else {
-      const coverTemplateId = await createCoverTemplate(data);
-      return {
-        ...submission.reply(),
-        coverTemplateId,
-      };
+      coverTemplateId = await createCoverTemplate(data);
     }
 
-    return submission.reply();
+    return {
+      ...submission.reply(),
+      coverTemplateId,
+    };
   } catch (e) {
     return { status: 'error' };
+  }
+};
+
+export const uploadPreview = async (prevState: unknown, formData: FormData) => {
+  const coverTemplateId = formData.get('coverTemplateId') as string;
+  const companyActivityId = formData.get('activityId') as string;
+
+  let media;
+  const fileField = formData.get('file') as File;
+  if (fileField?.size > 0) {
+    const { public_id } = await uploadMedia(fileField, 'video');
+
+    media = public_id;
+  }
+
+  try {
+    const coverTemplatePreview = await getCoverTemplatePreview(
+      coverTemplateId,
+      companyActivityId,
+    );
+    if (coverTemplatePreview) {
+      await updateCoverTemplatePreview(coverTemplateId, companyActivityId, {
+        coverTemplateId,
+        companyActivityId,
+        media,
+      });
+    } else {
+      await createCoverTemplatePreview({
+        coverTemplateId,
+        companyActivityId,
+        media,
+      });
+    }
+    revalidatePath(`/coverTemplates/[id]`, 'layout');
+
+    return { status: 'success' };
+  } catch (e) {
+    console.log(e);
+
+    return { status: 'error' };
+  }
+};
+
+export const deletePreview = async (
+  coverTemplateId: string,
+  companyActivityId: string,
+) => {
+  try {
+    await removeCoverTemplatePreviewById(coverTemplateId, companyActivityId);
+    revalidatePath(`/coverTemplates/[id]`, 'layout');
+  } catch (e) {
+    console.log(e);
+    throw e;
   }
 };

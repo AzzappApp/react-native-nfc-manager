@@ -33,12 +33,7 @@ const CoverTemplateList = ({
 
   const intl = useIntl();
 
-  const {
-    coverTemplateTags,
-    coverTemplateTypes,
-    webCard,
-    coverTemplatesFragment,
-  } = useFragment(
+  const { coverTemplateTags, coverTemplateTypes, webCard } = useFragment(
     graphql`
       fragment CoverTemplateList_profile on Profile {
         coverTemplateTags {
@@ -54,8 +49,9 @@ const CoverTemplateList = ({
             dark
             primary
           }
+          ...useCoverTemplates_coverTemplates
+            @alias(as: "coverTemplatesFragment")
         }
-        ...useCoverTemplates_coverTemplates @alias(as: "coverTemplatesFragment")
       }
     `,
     profileKey,
@@ -78,7 +74,7 @@ const CoverTemplateList = ({
     isLoadingPrevious,
     isLoadingNext,
     loadNext,
-  } = useCoverTemplates(coverTemplatesFragment);
+  } = useCoverTemplates(webCard.coverTemplatesFragment);
 
   const data = useMemo(() => {
     return Object.entries(templateCovers);

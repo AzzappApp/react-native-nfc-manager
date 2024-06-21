@@ -182,14 +182,7 @@ type Profile implements Node {
   Fetches cover template type
   """
   coverTemplateTypes: [CoverTemplateType!]!
-  """
-  Fetches cover template type
-  """
-  coverTemplates(
-    tagId: ID
-    first: Int @max(value: 50)
-    after: String
-  ): CoverTemplateConnection!
+
 
   """
   Fetches card styles

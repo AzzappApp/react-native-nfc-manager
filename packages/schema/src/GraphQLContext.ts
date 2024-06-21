@@ -50,7 +50,6 @@ import type {
   Media,
   CoverTemplate,
   CoverTemplateType,
-  CoverTemplatePreview,
   CoverTemplateTag,
   CompanyActivity,
   ColorPalette,
@@ -132,7 +131,6 @@ const entities = [
   'ColorPalette',
   'CompanyActivity',
   'CompanyActivityType',
-  'CoverTemplatePreview',
   'CoverTemplate',
   'CoverTemplateType',
   'CoverTemplateTag',
@@ -160,7 +158,6 @@ type EntityToType<T extends Entity> = {
   CompanyActivity: CompanyActivity;
   CompanyActivityType: CompanyActivityType;
   CoverTemplate: CoverTemplate;
-  CoverTemplatePreview: CoverTemplatePreview;
   CoverTemplateType: CoverTemplateType;
   CoverTemplateTag: CoverTemplateTag;
   Media: Media;

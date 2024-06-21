@@ -29,7 +29,14 @@ export type DeferredMedia = MediaModel | string;
 
 export type MediaWithAssetKind = {
   media: DeferredMedia;
-  assetKind: 'contactCard' | 'cover' | 'logo' | 'module' | 'post' | 'rawCover';
+  assetKind:
+    | 'contactCard'
+    | 'cover'
+    | 'coverPreview'
+    | 'logo'
+    | 'module'
+    | 'post'
+    | 'rawCover';
 };
 
 export type MediaResolverBaseType = DeferredMedia | MediaWithAssetKind;

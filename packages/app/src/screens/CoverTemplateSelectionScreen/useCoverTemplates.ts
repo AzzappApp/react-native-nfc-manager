@@ -1,6 +1,5 @@
 import { useMemo } from 'react';
 import { graphql, usePaginationFragment } from 'react-relay';
-import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
 import type { useCoverTemplates_coverTemplates$key } from '#relayArtifacts/useCoverTemplates_coverTemplates.graphql';
 
 type UseCoverTemplatesReturnType = {
@@ -22,7 +21,7 @@ export function useCoverTemplates(
   const { data, refetch, isLoadingPrevious, isLoadingNext, loadNext, hasNext } =
     usePaginationFragment(
       graphql`
-        fragment useCoverTemplates_coverTemplates on Profile
+        fragment useCoverTemplates_coverTemplates on WebCard
         @refetchable(queryName: "useCoverTemplates_coverTemplates_Query")
         @argumentDefinitions(
           after: { type: String }
@@ -37,16 +36,14 @@ export function useCoverTemplates(
                 type {
                   id
                 }
-                previews {
+                preview {
                   id
-                  media {
-                    ... on MediaImage @alias(as: "image") {
-                      uri(width: 512)
-                    }
-                    ... on MediaVideo @alias(as: "video") {
-                      uri(width: 512)
-                      thumbnail(width: 512)
-                    }
+                  ... on MediaImage @alias(as: "image") {
+                    uri(width: 512)
+                  }
+                  ... on MediaVideo @alias(as: "video") {
+                    uri(width: 512)
+                    thumbnail(width: 512)
                   }
                 }
                 # Not used in this component but avoid a refetch when
@@ -71,35 +68,34 @@ export function useCoverTemplates(
         if (!coverTemplate || !coverTemplate.type?.id)
           return templateByTypeAccumulator;
 
-        const previews = convertToNonNullArray(
-          currentCoverTemplate.node.previews?.map(coverTemplatePreview => {
-            const { media: relayMedia, id } = coverTemplatePreview;
-            const { video, image } = relayMedia ?? {};
-            const media = image
-              ? ({ kind: 'image', uri: image.uri } as const)
-              : video
-                ? ({
-                    kind: 'video',
-                    uri: video.uri,
-                    thumbnail: video.thumbnail,
-                  } as const)
-                : null;
-            if (!media) {
-              return null;
-            }
-            return {
-              id,
+        const { preview } = coverTemplate;
+        const { video, image } = preview ?? {};
+        const media = image
+          ? ({ kind: 'image', uri: image.uri } as const)
+          : video
+            ? ({
+                kind: 'video',
+                uri: video.uri,
+                thumbnail: video.thumbnail,
+              } as const)
+            : null;
+
+        const coverTemplatePreview = media
+          ? {
               coverTemplateId: coverTemplate.id,
               media,
-            };
-          }),
-        );
+            }
+          : null;
 
-        if (!templateByTypeAccumulator[coverTemplate.type.id]) {
-          templateByTypeAccumulator[coverTemplate.type.id] = [];
+        if (coverTemplatePreview) {
+          if (!templateByTypeAccumulator[coverTemplate.type.id]) {
+            templateByTypeAccumulator[coverTemplate.type.id] = [];
+          }
+
+          templateByTypeAccumulator[coverTemplate.type.id].push(
+            coverTemplatePreview,
+          );
         }
-
-        templateByTypeAccumulator[coverTemplate.type.id].push(...previews);
 
         return templateByTypeAccumulator;
       },
@@ -121,7 +117,6 @@ export function useCoverTemplates(
 
 export type CoverTemplatePreviewItem = {
   coverTemplateId: string;
-  id: string;
   media:
     | {
         kind: 'image';

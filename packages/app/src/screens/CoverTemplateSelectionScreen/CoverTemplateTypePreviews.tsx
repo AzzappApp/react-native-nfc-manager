@@ -1,6 +1,5 @@
 import { useCallback } from 'react';
 import { FlatList, Image, ScrollView, StyleSheet, View } from 'react-native';
-import { keyExtractor } from '#helpers/idHelpers';
 import Badge from '#ui/Badge';
 import Icon from '#ui/Icon';
 import PressableNative from '#ui/PressableNative';
@@ -43,7 +42,7 @@ export const CoverTemplateTypePreviews = ({
             accessibilityRole="list"
             data={previews}
             contentContainerStyle={styles.previews}
-            keyExtractor={keyExtractor}
+            keyExtractor={item => item.media.uri}
             renderItem={renderItem}
             directionalLockEnabled
             showsVerticalScrollIndicator={false}

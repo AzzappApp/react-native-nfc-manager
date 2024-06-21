@@ -207,13 +207,17 @@ const WebCardKindSelectionScreen = ({
       }}
     >
       <WizardPagerHeader
-        title={intl.formatMessage(
-          {
-            defaultMessage: 'Select a WebCard{azzappA} type',
-            description: 'WebCard kind selection screen title',
-          },
-          { azzappA: <Text variant="azzapp">a</Text> },
-        )}
+        title={
+          <Text variant="large" style={styles.titleText}>
+            {intl.formatMessage(
+              {
+                defaultMessage: 'Select a WebCard{azzappA} type',
+                description: 'WebCard kind selection screen title',
+              },
+              { azzappA: <Text variant="azzapp">a</Text> },
+            )}
+          </Text>
+        }
         rightElement={<View style={{ height: HEADER_HEIGHT }} />}
         rightElementWidth={80}
         backIcon="arrow_down"
@@ -349,5 +353,9 @@ const styleSheet = createStyleSheet(apperance => ({
   },
   badge: {
     marginLeft: 5,
+  },
+  titleText: {
+    textAlign: 'center',
+    textAlignVertical: 'center',
   },
 }));

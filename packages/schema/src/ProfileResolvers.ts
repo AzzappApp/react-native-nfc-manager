@@ -13,7 +13,6 @@ import {
   getCardStyles,
   getMediaSuggestions,
   getCoverTemplateTags,
-  getCoverTemplatesWithType,
   getCoverTemplateTypes,
 } from '@azzapp/data';
 import { shuffle } from '@azzapp/shared/arrayHelpers';
@@ -234,39 +233,6 @@ export const Profile: ProfileResolvers = {
   },
   coverTemplateTypes: () => {
     return getCoverTemplateTypes(true);
-  },
-  coverTemplates: async (
-    profile,
-    { tagId, after, first },
-    { auth: { userId } },
-  ) => {
-    if (!userId || profile.userId !== userId) {
-      return emptyConnection;
-    }
-
-    const limit = first ?? 100;
-
-    const templatesWithType = await getCoverTemplatesWithType(
-      limit + 1,
-      after ?? undefined,
-      tagId ?? undefined,
-    );
-
-    if (templatesWithType.length === 0) return emptyConnection;
-    const sizedTemplateType = templatesWithType.slice(0, limit);
-
-    return {
-      edges: sizedTemplateType.map(templateType => ({
-        node: templateType,
-        cursor: templateType.cursor,
-      })),
-      pageInfo: {
-        hasNextPage: sizedTemplateType.length > limit,
-        hasPreviousPage: false,
-        startCursor: sizedTemplateType[0]?.cursor,
-        endCursor: sizedTemplateType[sizedTemplateType.length - 1].cursor,
-      },
-    };
   },
   cardTemplates: async (
     profile,
