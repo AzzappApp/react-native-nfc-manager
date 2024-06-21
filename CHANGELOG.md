@@ -1,5 +1,6 @@
-## 0.5.15-canary.181
+## 0.5.15-canary.182
 
+* **build:**  - try with explicit url
 * **build:**  - try another frame url
 * **fix:**  - add framer urls in redirection ([#3857](https://github.com/AzzappApp/azzapp/pull/3857))
 * **build:**  - redirect urls to storefront ([#3856](https://github.com/AzzappApp/azzapp/pull/3856))
