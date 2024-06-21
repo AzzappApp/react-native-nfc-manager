@@ -33,6 +33,7 @@ const WebCardScreenPublishHelper = ({
     cardIsPublished,
     requiresSubscription,
     isPremium,
+    cardModules,
   } = useFragment(
     graphql`
       fragment WebCardScreenPublishHelper_webCard on WebCard {
@@ -41,6 +42,9 @@ const WebCardScreenPublishHelper = ({
         cardIsPublished
         requiresSubscription
         isPremium
+        cardModules {
+          id
+        }
       }
     `,
     webCard,
@@ -67,7 +71,7 @@ const WebCardScreenPublishHelper = ({
   const { bottom } = useScreenInsets();
 
   useEffect(() => {
-    if (!cardIsPublished && editMode) {
+    if (!cardIsPublished && editMode && cardModules.length > 0) {
       Toast.show({
         type: 'info',
         bottomOffset: bottom + BOTTOM_MENU_HEIGHT,
