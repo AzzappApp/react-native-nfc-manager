@@ -9,6 +9,7 @@ import Animated, {
   useAnimatedStyle,
   useAnimatedReaction,
   useAnimatedRef,
+  useDerivedValue,
 } from 'react-native-reanimated';
 import { useFragment, graphql } from 'react-relay';
 import { colors, fontFamilies } from '#theme';
@@ -19,6 +20,7 @@ import {
 } from '#helpers/createStyles';
 import Text from '#ui/Text';
 import { format } from './HomeInformations';
+import { useHomeScreenCurrentIndex } from './HomeScreenContext';
 import HomeStatisticsChart from './HomeStatisticsChart';
 import type { HomeStatistics_profiles$key } from '#relayArtifacts/HomeStatistics_profiles.graphql';
 
@@ -27,7 +29,6 @@ const AnimatedScrollView = Animated.createAnimatedComponent(ScrollView);
 type HomeInformationsProps = {
   user: HomeStatistics_profiles$key;
   height: number;
-  currentProfileIndexSharedValue: SharedValue<number>;
   variant?: 'dark' | 'light';
   mode?: 'compact' | 'full';
   initialStatsIndex?: number;
@@ -36,7 +37,6 @@ type HomeInformationsProps = {
 const HomeStatistics = ({
   user,
   height,
-  currentProfileIndexSharedValue,
   variant = 'dark',
   initialStatsIndex = 0,
   mode = 'full',
@@ -56,6 +56,11 @@ const HomeStatistics = ({
     `,
     user,
   );
+  const currentIndexSharedValue = useHomeScreenCurrentIndex();
+  const currentProfileIndexSharedValue = useDerivedValue(() => {
+    if (currentIndexSharedValue == null) return 0;
+    return currentIndexSharedValue.value - 1;
+  });
 
   const styles = useVariantStyleSheet(stylesheet, variant);
 
@@ -146,7 +151,6 @@ const HomeStatistics = ({
         width={width - 2 * PADDING_HORIZONTAL}
         height={height - BOX_NUMBER_HEIGHT}
         statsScrollIndex={scrollIndexOffset}
-        currentProfileIndexSharedValue={currentProfileIndexSharedValue}
         user={profiles}
         variant={variant}
       />

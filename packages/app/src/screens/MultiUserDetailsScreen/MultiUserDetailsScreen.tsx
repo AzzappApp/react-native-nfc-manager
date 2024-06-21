@@ -4,7 +4,6 @@ import { Controller, useForm } from 'react-hook-form';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { StyleSheet, View, useColorScheme } from 'react-native';
 import * as mime from 'react-native-mime-types';
-import { useSharedValue } from 'react-native-reanimated';
 import Toast from 'react-native-toast-message';
 import {
   ConnectionHandler,
@@ -305,8 +304,6 @@ const MultiUserDetailsScreen = ({
   const lastName = watch('lastName');
   const role = watch('role');
 
-  const index = useSharedValue(0);
-
   const isCurrentProfile = profile?.id === profileInfos?.profileId;
 
   const [commitDelete, deletionIsActive] =
@@ -554,7 +551,6 @@ const MultiUserDetailsScreen = ({
               <HomeStatistics
                 user={[profile]}
                 height={250}
-                currentProfileIndexSharedValue={index}
                 variant={colorScheme === 'dark' ? 'dark' : 'light'}
                 initialStatsIndex={1}
                 mode="compact"

@@ -233,9 +233,7 @@ export const useHomeScreenInputProfileRange = () => {
 export const useHomeScreenCurrentIndex = () => {
   const context = React.useContext(HomeScreenContext);
   if (context === undefined) {
-    throw new Error(
-      'useHomeScreenContext must be used within a HomeScreenProvider',
-    );
+    return null;
   }
   return context.currentIndexSharedValue;
 };

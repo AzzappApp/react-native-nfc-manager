@@ -112,11 +112,6 @@ const HomeBottomPanel = ({ user: userKey }: HomeBottomPanelProps) => {
   useMainTabBarVisibilityController(mainTabBarVisible);
   //#endregion
 
-  const stateIndex = useDerivedValue(
-    () => currentIndexSharedValue.value - 1,
-    [],
-  );
-
   return (
     <View style={styles.container}>
       <View style={styles.informationPanel}>
@@ -142,11 +137,7 @@ const HomeBottomPanel = ({ user: userKey }: HomeBottomPanelProps) => {
             display: selectedPanel === 'STATS' ? 'flex' : 'none',
           }}
         >
-          <HomeStatistics
-            user={profiles!}
-            height={PANEL_HEIGHT}
-            currentProfileIndexSharedValue={stateIndex} //we still need to passe it for the MultiUserstats panel. we should split / refactor them for better performance
-          />
+          <HomeStatistics user={profiles!} height={PANEL_HEIGHT} />
         </View>
 
         <View

@@ -43,8 +43,6 @@ export const saveCompanyActivity = async (
     } as const;
   }
 
-  console.log({ data });
-
   let companyActivityId: string;
   try {
     companyActivityId = await db.transaction(async trx => {

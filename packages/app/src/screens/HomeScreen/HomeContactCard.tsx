@@ -76,7 +76,7 @@ const ContactCardItemComponent = ({
 
   const translateX = useDerivedValue(() => {
     'worklet';
-    return (index - currentIndexSharedValue.value + 1) * windowWidth;
+    return (index - (currentIndexSharedValue?.value ?? 0) + 1) * windowWidth;
   }, [index, windowWidth]);
 
   const positionStyle = useAnimatedStyle(() => {
