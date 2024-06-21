@@ -182,3 +182,17 @@ index 17d90bea851f506b340d2feb40243b9a040667db..f5a525e124042c8dbc8c79caf489c09b
  }
  declare const _default: import("react-native/Libraries/Utilities/codegenNativeComponent").NativeComponentType<NativeProps>;
  export default _default;
+diff --git a/src/types.tsx b/src/types.tsx
+index c29f9d90f8ed149beba65f8f8252a87d2e8ad8d7..d2e521ba788376c2b3c1e036f186b48343eac182 100644
+--- a/src/types.tsx
++++ b/src/types.tsx
+@@ -37,7 +37,8 @@ export type StackAnimationTypes =
+   | 'slide_from_bottom'
+   | 'slide_from_right'
+   | 'slide_from_left'
+-  | 'ios';
++  | 'ios'
++  | 'custom';
+ export type BlurEffectTypes =
+   | 'extraLight'
+   | 'light'
