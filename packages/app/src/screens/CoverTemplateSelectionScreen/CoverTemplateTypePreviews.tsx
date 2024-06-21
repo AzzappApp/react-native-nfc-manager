@@ -63,7 +63,11 @@ const CoverTemplateTypePreview = ({
 }) => {
   const { media } = preview;
   return (
-    <PressableNative key={preview.id} style={styles.preview} onPress={onSelect}>
+    <PressableNative
+      key={preview.coverTemplateId}
+      style={styles.preview}
+      onPress={onSelect}
+    >
       <Image
         source={{ uri: media.kind === 'video' ? media.thumbnail : media.uri }}
         style={styles.previewMedia}
