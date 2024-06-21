@@ -136,7 +136,7 @@ __metadata:
     "@react-native/babel-preset": ^0.74.84
     "@react-native/metro-config": ^0.74.84
     "@reeq/react-native-passkit": ^0.1.3
-    "@sentry/react-native": ^5.24.0
+    "@sentry/react-native": ^5.24.1
     "@shopify/flash-list": 1.6.4
     "@shopify/react-native-skia": ^1.3.3
     "@testing-library/react-native": ^12.5.1
@@ -178,21 +178,21 @@ __metadata:
     react-native-dotenv: ^3.4.11
     react-native-email-link: ^1.16.0
     react-native-encrypted-storage: ^4.0.3
-    react-native-gesture-handler: ^2.16.2
+    react-native-gesture-handler: ^2.17.1
     react-native-haptic-feedback: ^2.2.0
     react-native-image-size: ^1.1.6
-    react-native-keyboard-controller: ^1.12.3
+    react-native-keyboard-controller: ^1.12.4
     react-native-localize: ^3.2.0
     react-native-mime-types: ^2.5.0
     react-native-mmkv: ^2.12.2
     react-native-monorepo-tools: ^1.2.1
-    react-native-pager-view: ^6.3.1
+    react-native-pager-view: ^6.3.3
     react-native-permissions: ^4.1.5
     react-native-purchases: ^7.27.4
     react-native-quick-base64: ^2.1.2
     react-native-reanimated: ^3.13.0-rc.1
     react-native-safe-area-context: ^4.10.5
-    react-native-screens: ^3.31.1
+    react-native-screens: ^3.32.0
     react-native-share: ^10.2.1
     react-native-skottie-template-player: "workspace:^"
     react-native-svg: ^15.3.0
@@ -203,7 +203,7 @@ __metadata:
     react-test-renderer: ^18.3.1
     relay-test-utils: ^17.0.0
     rimraf: ^5.0.7
-    typescript: ^5.4.5
+    typescript: ^5.5.2
     use-debounce: ^10.0.1
     zod: ^3.23.8
   languageName: unknown
@@ -9122,9 +9122,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@sentry/react-native@npm:^5.24.0":
-  version: 5.24.0
-  resolution: "@sentry/react-native@npm:5.24.0"
+"@sentry/react-native@npm:^5.24.1":
+  version: 5.24.1
+  resolution: "@sentry/react-native@npm:5.24.1"
   dependencies:
     "@sentry/browser": 7.117.0
     "@sentry/cli": 2.31.2
@@ -9143,7 +9143,7 @@ __metadata:
       optional: true
   bin:
     sentry-expo-upload-sourcemaps: scripts/expo-upload-sourcemaps.js
-  checksum: 54a03d8901aebd01a1fed6e82ebaee4e58143b7530608e6f1ce481f4624f467ff1a02ef8e8a32246e96e52f617e285d37e2bb495f2472ebdb5743475e1b0359e
+  checksum: b124e624065fefb1abf4352056a80f90c83e3d7cc1fef6d7cae8570783d3b42b67a28ac83bd9a9e054ffa9e819d266b30df3f6d2eeb2e76f300dcd89857c1d21
   languageName: node
   linkType: hard
 
@@ -21326,19 +21326,18 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-native-gesture-handler@npm:^2.16.2":
-  version: 2.16.2
-  resolution: "react-native-gesture-handler@npm:2.16.2"
+"react-native-gesture-handler@npm:^2.17.1":
+  version: 2.17.1
+  resolution: "react-native-gesture-handler@npm:2.17.1"
   dependencies:
     "@egjs/hammerjs": ^2.0.17
     hoist-non-react-statics: ^3.3.0
     invariant: ^2.2.4
-    lodash: ^4.17.21
     prop-types: ^15.7.2
   peerDependencies:
     react: "*"
     react-native: "*"
-  checksum: 3f3309de471b8de654624c54793f6d72236869156ee61c1adc8bba0f4aca6ffc8ed02035eb85820473091d33eb5ec8b42a0e387a21ec25dc30ee345dff0c1142
+  checksum: 70da4fc51d92899591aadf03396a8e0b78223fbe71da5b10e76232058c1ef5943d54c1dd8da815d5b6a8b41f259ea9d50457680e2ef7878c88d7396771170ae3
   languageName: node
   linkType: hard
 
@@ -21358,14 +21357,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-native-keyboard-controller@npm:^1.12.3":
-  version: 1.12.3
-  resolution: "react-native-keyboard-controller@npm:1.12.3"
+"react-native-keyboard-controller@npm:^1.12.4":
+  version: 1.12.4
+  resolution: "react-native-keyboard-controller@npm:1.12.4"
   peerDependencies:
     react: "*"
     react-native: "*"
     react-native-reanimated: ">=2.3.0"
-  checksum: b8c29403945e278bd7bae0fdcaa2824a7c12d90cc569314202791ac44adc327a01d409bd32c38d3adcae41bfa7f47a3c5ea3345f692a9cf802eb9b4e73a57bc5
+  checksum: c22b7dbacf80bb95196cbd1fefa012071fd371d60bc2dcc7310a0b487c1a089b4e7a2d0555c7598584035ec6644fc78aba59a383eadece1f5650dda10add2ea1
   languageName: node
   linkType: hard
 
@@ -21412,13 +21411,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-native-pager-view@npm:^6.3.1":
-  version: 6.3.1
-  resolution: "react-native-pager-view@npm:6.3.1"
+"react-native-pager-view@npm:^6.3.3":
+  version: 6.3.3
+  resolution: "react-native-pager-view@npm:6.3.3"
   peerDependencies:
     react: "*"
     react-native: "*"
-  checksum: ef83fb53350d7b4c262a8c4d4bf6fbee8f8941e56469135463a47d496ff8fd43f7efe52d02c3a583427800fc88c96a9bf8e601a45a6e671834d5fffe9541e3e4
+  checksum: b4f6ef33a7de34c254aa0cfdcdb7231c256e5d2b5c5d16f16a7c54379829bae7ec1d86e7daf23ef89dbac6088cf36e9678c3009a20e4ba786498848c86113399
   languageName: node
   linkType: hard
 
@@ -21490,29 +21489,29 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-native-screens@npm:3.31.1":
-  version: 3.31.1
-  resolution: "react-native-screens@npm:3.31.1"
+"react-native-screens@npm:3.32.0":
+  version: 3.32.0
+  resolution: "react-native-screens@npm:3.32.0"
   dependencies:
     react-freeze: ^1.0.0
     warn-once: ^0.1.0
   peerDependencies:
     react: "*"
     react-native: "*"
-  checksum: 1fc61cf7a223b3ef1c8000e74416c8953561c5fa0861557da43659db62a640e37fb51fbdc35dae810a665881a7aa9eeaf1873e90f67404b4dda53a672464a7fe
+  checksum: afcb93e9cd48d5071278213bbc4ddc18112dbdbd16c11e3c7129368614396d8aae13fd70bb299f3c84f52a28e34af06ccdc514de1e97a99f4197069301dab136
   languageName: node
   linkType: hard
 
-"react-native-screens@patch:react-native-screens@npm%3A3.31.1#./.yarn/patches/react-native-screens-npm-3.31.1-d5786be485.patch::locator=%40azzapp%2Fmonorepo%40workspace%3A.":
-  version: 3.31.1
-  resolution: "react-native-screens@patch:react-native-screens@npm%3A3.31.1#./.yarn/patches/react-native-screens-npm-3.31.1-d5786be485.patch::version=3.31.1&hash=a231dd&locator=%40azzapp%2Fmonorepo%40workspace%3A."
+"react-native-screens@patch:react-native-screens@npm%3A3.32.0#./.yarn/patches/react-native-screens-npm-3.32.0-a22eba53a2.patch::locator=%40azzapp%2Fmonorepo%40workspace%3A.":
+  version: 3.32.0
+  resolution: "react-native-screens@patch:react-native-screens@npm%3A3.32.0#./.yarn/patches/react-native-screens-npm-3.32.0-a22eba53a2.patch::version=3.32.0&hash=5449d5&locator=%40azzapp%2Fmonorepo%40workspace%3A."
   dependencies:
     react-freeze: ^1.0.0
     warn-once: ^0.1.0
   peerDependencies:
     react: "*"
     react-native: "*"
-  checksum: 0583bc2026086aece7eb43ca31b54ee2c70dc2620a54d896a199af118378b9c834678f9ff2ab13241dffa16eb602506346fbb4db03d9399fd72f1a693b425f96
+  checksum: ad4db802f1da608975d8f6cc6aed1dc5ec281be97aa2b22a45a6b27ee0cf7156b921c92f680e7a740db03b624903c64bb17b5ae47d77f1093c31a1d0053740cb
   languageName: node
   linkType: hard
 
@@ -24583,6 +24582,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"typescript@npm:^5.5.2":
+  version: 5.5.2
+  resolution: "typescript@npm:5.5.2"
+  bin:
+    tsc: bin/tsc
+    tsserver: bin/tsserver
+  checksum: 9c5a7982dadcb2d38d129c575dd38645ae11588ae0d4a12852fb04482bbc5a1660b2371e48fd5b33b6b605cc57cefe777670054546856945a05e77bd22c8c2cd
+  languageName: node
+  linkType: hard
+
 "typescript@patch:typescript@5#~builtin<compat/typescript>":
   version: 5.3.3
   resolution: "typescript@patch:typescript@npm%3A5.3.3#~builtin<compat/typescript>::version=5.3.3&hash=e012d7"
@@ -24600,6 +24609,16 @@ __metadata:
     tsc: bin/tsc
     tsserver: bin/tsserver
   checksum: d59e26e74f6b444517d0ba16e0ee16e75c652c2b49a59f2ebdbeb16647a855fd50c7fc786a58987e45f03bce0677092e2dd3333649fd53b11d0b0d271455837c
+  languageName: node
+  linkType: hard
+
+"typescript@patch:typescript@^5.5.2#~builtin<compat/typescript>":
+  version: 5.5.2
+  resolution: "typescript@patch:typescript@npm%3A5.5.2#~builtin<compat/typescript>::version=5.5.2&hash=b45daf"
+  bin:
+    tsc: bin/tsc
+    tsserver: bin/tsserver
+  checksum: 9d89bac0de650e15d6846485f238d1e65f1013f2c260d9e53e86a1da6ecf8109d9fad9402575c5c36a6592dc5d4370db090e12971c8630ae84453654baabb6b4
   languageName: node
   linkType: hard
 
