@@ -36,8 +36,8 @@
       "destination": "https://storefront.azzapp.com/legal/:match*"
     },
     {
-      "source": "/_framer/login/?continue=:match*&query=",
-      "destination": "https://storefront.azzapp.com/_framer/login/?continue=:match*&query="
+      "source": "/_framer/login",
+      "destination": "https://storefront.azzapp.com/_framer/login/?continue=/&query="
     }
   ]
 }
