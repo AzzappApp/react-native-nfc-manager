@@ -88,6 +88,7 @@ export const createPaymentRequest = async ({
 
   const tomorrow = new Date();
   tomorrow.setDate(date.getDate() + 1);
+  const expirationDate = new Date(date.getTime() + 5 * 60000);
 
   const requestBody = {
     AMOUNT: amount + taxes,
@@ -122,7 +123,9 @@ export const createPaymentRequest = async ({
     ACCOUNTCREATIONDATE: dayjs(date).format('YYYY-MM-DD'),
     ACCOUNTCHANGEDATE: dayjs(date).format('YYYY-MM-DD'),
     TIMEZONE: 'UTC',
-    TRANSACTIONEXPIRATIONDATE: dayjs(tomorrow).format('YYYY-MM-DD HH:mm:ss'),
+    TRANSACTIONEXPIRATIONDATE: dayjs(expirationDate).format(
+      'YYYY-MM-DD HH:mm:ss',
+    ),
     PASSWORDCHANGEDATE: dayjs(tomorrow).format('YYYY-MM-DD'),
   } as const;
 
@@ -185,7 +188,7 @@ export const createPaymentRequest = async ({
         subscriptionId: createId(),
         subscriptionPlan,
         paymentMeanId: ulid,
-        endAt: date,
+        endAt: expirationDate,
         amount,
         taxes,
         rebillManagerId: null,

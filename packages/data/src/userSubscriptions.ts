@@ -10,6 +10,7 @@ import {
   isNull,
   desc,
   inArray,
+  lt,
 } from 'drizzle-orm';
 import {
   text,
@@ -66,6 +67,10 @@ export const UserSubscriptionTable = mysqlTable(
       userIdWebCardIDIdx: index('userId_webCardId_idx').on(
         table.userId,
         table.webCardId,
+      ),
+      statusExpirationDate: index('status_expiration_date').on(
+        table.status,
+        table.endAt,
       ),
     };
   },
@@ -237,4 +242,20 @@ export const getSubscriptionsOfUser = async (
     .select()
     .from(UserSubscriptionTable)
     .where(eq(UserSubscriptionTable.userId, userId));
+};
+
+export const cancelExpiredSubscription = async (trx: DbTransaction = db) => {
+  const currentDate = new Date();
+  return trx
+    .update(UserSubscriptionTable)
+    .set({
+      status: 'canceled',
+      canceledAt: currentDate,
+    })
+    .where(
+      and(
+        eq(UserSubscriptionTable.status, 'waiting_payment'),
+        lt(UserSubscriptionTable.endAt, currentDate),
+      ),
+    );
 };

@@ -13,6 +13,12 @@
       ]
     }
   ],
+  "crons": [
+    {
+      "path": "/api/cron/cancelPayments",
+      "schedule": "*/1 * * * *"
+    }
+  ],
   "rewrites": [
     { "source": "/", "destination": "https://storefront.azzapp.com/" },
     {
