@@ -1,5 +1,5 @@
 import { asc, desc, like, or, sql, eq, and, isNull } from 'drizzle-orm';
-import { UserTable, db, ProfileTable } from '@azzapp/data';
+import { UserTable, db, ProfileTable, WebCardTable } from '@azzapp/data';
 import UsersList from './UsersList';
 import type { SQLWrapper } from 'drizzle-orm';
 
@@ -40,6 +40,8 @@ const getSearch = (search: string | null) => {
       like(UserTable.email, `%${search}%`),
       like(UserTable.phoneNumber, `%${search}%`),
       like(UserTable.id, `%${search}%`),
+      like(WebCardTable.userName, `%${search}%`),
+      like(WebCardTable.companyName, `%${search}%`),
     );
   }
 };
@@ -56,6 +58,7 @@ const getQuery = (search: string | null, filters: Filters) => {
     })
     .from(UserTable)
     .leftJoin(ProfileTable, eq(UserTable.id, ProfileTable.userId))
+    .leftJoin(WebCardTable, eq(WebCardTable.id, ProfileTable.webCardId))
     .where(
       and(
         or(isNull(ProfileTable.deleted), eq(ProfileTable.deleted, false)),
