@@ -339,12 +339,7 @@ export const ContactCardScreen = ({
                 </Text>
               </PressableNative>
             </View>
-            {webCard && (
-              <ContactCardExportVcf
-                userName={webCard.userName}
-                profile={profile}
-              />
-            )}
+            {webCard && <ContactCardExportVcf profile={profile} />}
             <Button
               label={intl.formatMessage({
                 defaultMessage: 'Generate an email Signature',
