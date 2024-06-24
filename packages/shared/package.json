@@ -32,6 +32,6 @@
     "@types/chroma-js": "^2.4.4",
     "@types/relay-runtime": "^17.0.0",
     "@types/validator": "^13.11.9",
-    "typescript": "^5.4.5"
+    "typescript": "^5.5.2"
   }
 }
