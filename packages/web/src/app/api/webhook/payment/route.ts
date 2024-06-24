@@ -17,8 +17,8 @@ const paymentCallbackBody = z.object({
 export const GET = withAxiom(async (req: Request) => {
   console.log('GET /api/webhook/payment');
   console.log(JSON.stringify(req.headers, null, 2));
-  const json = await req.json();
-  console.log(JSON.stringify(json, null, 2));
+  const { searchParams } = new URL(req.url);
+  console.log(JSON.stringify(searchParams, null, 2));
   return new Response('ok', { status: 200 });
 });
 
