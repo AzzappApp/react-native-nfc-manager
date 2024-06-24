@@ -1,5 +1,6 @@
-## 0.5.19-canary.8
+## 0.5.19-canary.9
 
+* **build:**  - bump ts version ([#3884](https://github.com/AzzappApp/azzapp/pull/3884))
 * **fix:**  - **payment:** [#3882](https://github.com/AzzappApp/azzapp/pull/3882) cancel all out of date subscriptions ([#3883](https://github.com/AzzappApp/azzapp/pull/3883))
 * **fix:**  - **contactCard:** [#3691](https://github.com/AzzappApp/azzapp/pull/3691) only share url ([#3842](https://github.com/AzzappApp/azzapp/pull/3842))
 * **fix:**  - remove id in cover template preview
