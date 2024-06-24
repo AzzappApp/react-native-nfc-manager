@@ -1,4 +1,4 @@
-## 0.5.19-canary.4
+## 0.5.19-canary.5
 
 * **fix:**  - **contactCard:** [#3691](https://github.com/AzzappApp/azzapp/pull/3691) only share url ([#3842](https://github.com/AzzappApp/azzapp/pull/3842))
 * **fix:**  - remove id in cover template preview
