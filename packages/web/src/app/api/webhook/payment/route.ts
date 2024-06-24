@@ -19,6 +19,8 @@ export const GET = withAxiom(async (req: Request) => {
   console.log(JSON.stringify(req.headers, null, 2));
   const { searchParams } = new URL(req.url);
   console.log(JSON.stringify(searchParams, null, 2));
+  const body = await req.text();
+  console.log(JSON.stringify(body, null, 2));
   return new Response('ok', { status: 200 });
 });
 
