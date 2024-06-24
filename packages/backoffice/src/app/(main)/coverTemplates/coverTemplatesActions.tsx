@@ -50,7 +50,7 @@ export const uploadMedia = async (
   });
 
   if (!result.ok) {
-    throw 'Error in overlay image upload';
+    throw 'Error in media upload';
   }
 
   return result.json();
@@ -68,14 +68,14 @@ export const saveCoverTemplate = async (
     const previewField = formData.get('preview') as File;
     if (previewField?.size > 0) {
       const { public_id } = await uploadMedia(previewField, 'video');
-      formData.append(`previewId`, public_id);
+      formData.set(`previewId`, public_id);
     }
     formData.delete('preview');
 
     const lottieField = formData.get('lottie') as File;
     if (lottieField?.size > 0) {
       const { public_id } = await uploadMedia(lottieField, 'raw');
-      formData.append(`lottieId`, public_id);
+      formData.set(`lottieId`, public_id);
     }
     formData.delete('lottie');
 
@@ -91,7 +91,7 @@ export const saveCoverTemplate = async (
         const imageField = formData.get(`${fieldName}.image`) as File;
         if (imageField?.size > 0) {
           const { public_id } = await uploadMedia(imageField, 'image');
-          formData.append(`${fieldName}.media.id`, public_id);
+          formData.set(`${fieldName}.media.id`, public_id);
         }
         formData.delete(`${fieldName}.image`);
       }),
@@ -122,6 +122,7 @@ export const saveCoverTemplate = async (
       coverTemplateId,
     };
   } catch (e) {
+    console.log(e);
     return { status: 'error' };
   }
 };
@@ -160,8 +161,6 @@ export const uploadPreview = async (prevState: unknown, formData: FormData) => {
 
     return { status: 'success' };
   } catch (e) {
-    console.log(e);
-
     return { status: 'error' };
   }
 };
@@ -174,7 +173,7 @@ export const deletePreview = async (
     await removeCoverTemplatePreviewById(coverTemplateId, companyActivityId);
     revalidatePath(`/coverTemplates/[id]`, 'layout');
   } catch (e) {
-    console.log(e);
+    console.error(e);
     throw e;
   }
 };
