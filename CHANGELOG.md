@@ -1,5 +1,6 @@
-## 0.5.19-canary.1
+## 0.5.19-canary.2
 
+* **fix:**  - **contactCard:** [#3691](https://github.com/AzzappApp/azzapp/pull/3691) only share url ([#3842](https://github.com/AzzappApp/azzapp/pull/3842))
 * **fix:**  - remove id in cover template preview
 * **fix:**  - remove 3.32 feat on rn screen
 * **build:**  - rollback to rnscreen 3.31.1
