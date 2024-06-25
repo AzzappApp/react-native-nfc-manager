@@ -3,6 +3,7 @@ import type {
   VideoComposition,
   VideoFrame,
 } from '@azzapp/react-native-skia-video';
+import type { LottieInfo } from '@azzapp/shared/lottieHelpers';
 import type { SkCanvas, SkShader } from '@shopify/react-native-skia';
 import type { SkottieTemplatePlayer } from 'react-native-skottie-template-player';
 
@@ -18,4 +19,5 @@ export type CoverDrawerOptions = {
   lutShaders: Record<string, SkShader>;
   videoScales: Record<string, number>;
   skottiePlayer?: SkottieTemplatePlayer | null;
+  lottieInfo?: LottieInfo;
 };

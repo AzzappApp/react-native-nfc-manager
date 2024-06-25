@@ -20,6 +20,8 @@ public:
 private:
   sk_sp<skottie::Animation> animation;
   sk_sp<TemplateResourceProvider> resourceProvider;
+  
+  void dispose();
 };
 
 class TemplateResourceProvider : public skresources::ResourceProvider {

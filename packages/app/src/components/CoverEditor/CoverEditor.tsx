@@ -19,7 +19,6 @@ import {
   DEFAULT_COLOR_PALETTE,
 } from '@azzapp/shared/cardHelpers';
 import { COVER_RATIO } from '@azzapp/shared/coverHelpers';
-import { extractLottieInfo } from '@azzapp/shared/lottieHelpers';
 import { colors } from '#theme';
 import ScreenModal from '#components/ScreenModal';
 import { NativeBufferLoader, loadAllLUTShaders } from '#helpers/mediaEditions';
@@ -35,6 +34,7 @@ import CoverEditorMediaPicker from './CoverEditorMediaPicker';
 import { coverEditorReducer } from './coverEditorReducer';
 import CoverEditorSaveModal from './CoverEditorSaveModal';
 import CoverEditorToolbox from './CoverEditorToolbox';
+import { extractLottieInfoMemoized } from './coverEditorUtils';
 import CoverPreview from './CoverPreview';
 import useLottie from './useLottie';
 import useSaveCover from './useSaveCover';
@@ -108,12 +108,7 @@ const CoverEditor = (
     null
   >(coverEditorReducer, null, () => {
     return {
-      template: lottie
-        ? {
-            lottie: JSON.stringify(lottie),
-            lottieInfo: extractLottieInfo(lottie),
-          }
-        : null,
+      lottie,
       cardColors: {
         ...DEFAULT_COLOR_PALETTE,
         otherColors: [...DEFAULT_COLOR_LIST],
@@ -349,12 +344,13 @@ const CoverEditor = (
   }, [coverEditorState.medias.length, toggleImagePicker]);
 
   const durations = useMemo(() => {
-    return coverEditorState.template
-      ? coverEditorState.template.lottieInfo.assetsInfos.map(
+    const lottieInfo = extractLottieInfoMemoized(coverEditorState.lottie);
+    return lottieInfo
+      ? lottieInfo.assetsInfos.map(
           assetInfo => assetInfo.endTime - assetInfo.startTime,
         )
       : null;
-  }, [coverEditorState.template]);
+  }, [coverEditorState.lottie]);
 
   const onMediasPicked = useCallback(
     (medias: Media[]) => {
@@ -454,7 +450,7 @@ const CoverEditor = (
           initialMedias={null}
           onFinished={onMediasPicked}
           durations={durations}
-          durationsFixed={!!coverEditorState.template}
+          durationsFixed={!!coverEditorState.lottie}
         />
       </ScreenModal>
     </>

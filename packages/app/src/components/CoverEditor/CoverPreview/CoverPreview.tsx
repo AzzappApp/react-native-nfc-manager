@@ -51,6 +51,7 @@ import {
   isCoverDynamic,
   createCoverSkottieWithColorReplacement,
   createCoverVideoComposition,
+  extractLottieInfoMemoized,
 } from '../coverEditorUtils';
 import { BoundsEditorGestureHandler, drawBoundsEditor } from './BoundsEditor';
 import { DynamicLinkRenderer } from './DynamicLinkRenderer';
@@ -98,7 +99,7 @@ const CoverPreview = ({
   // #region Data and state
   const { dispatch, coverEditorState } = useCoverEditorContext();
   const {
-    template,
+    lottie,
     coverTransition,
     medias,
     overlayLayers,
@@ -267,9 +268,13 @@ const CoverPreview = ({
 
   // #region Frame drawing
   const skottiePlayer = useMemo(
-    () => createCoverSkottieWithColorReplacement(template, cardColors),
-    [template, cardColors],
+    () => createCoverSkottieWithColorReplacement(lottie, cardColors),
+    [lottie, cardColors],
   );
+
+  useEffect(() => () => skottiePlayer?.dispose(), [skottiePlayer]);
+
+  const lottieInfo = extractLottieInfoMemoized(lottie);
 
   /**
    * The main function used to draw the frame of the cover in the preview
@@ -340,6 +345,7 @@ const CoverPreview = ({
         lutShaders,
         videoScales,
         skottiePlayer,
+        lottieInfo,
       });
 
       if (activeLayerBounds.value) {

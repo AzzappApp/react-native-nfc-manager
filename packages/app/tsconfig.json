@@ -11,6 +11,7 @@
   "exclude": [
     ".bundle",
     "android",
+    "native_modules",
     "assets",
     "dist",
     "lib",

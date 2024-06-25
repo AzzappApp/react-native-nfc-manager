@@ -37,20 +37,27 @@ export const replaceColors = (
           obj.s[3] ?? 1,
         ];
       }
-    } else if (obj && obj.c && obj.c.k) {
-      if (Array.isArray(obj.c.k) && typeof obj.c.k[0] !== 'number') {
-        doReplace(replacements, obj.c.k);
-      } else {
-        const identifiedColorIndex = replacements.findIndex(
-          ({ sourceColor }) =>
-            sourceColor[0] === round(obj.c.k[0]) &&
-            sourceColor[1] === round(obj.c.k[1]) &&
-            sourceColor[2] === round(obj.c.k[2]),
-        );
-        if (identifiedColorIndex !== -1) {
-          obj.c.k = replacements[identifiedColorIndex].targetColor;
+    } else if (obj?.c?.k || obj?.g?.k?.k || obj?.v?.k) {
+      const array = obj?.c?.k ?? obj?.g?.k?.k ?? obj?.v?.k;
+      if (Array.isArray(array))
+        if (typeof array[0] !== 'number') {
+          doReplace(replacements, array);
+        } else {
+          replacements.forEach(({ sourceColor, targetColor }) => {
+            for (let i = 0; i < array.length; i += 1) {
+              if (
+                round(array[i]) === sourceColor[0] &&
+                round(array[i + 1]) === sourceColor[1] &&
+                round(array[i + 2]) === sourceColor[2]
+              ) {
+                array[i] = targetColor[0];
+                array[i + 1] = targetColor[1];
+                array[i + 2] = targetColor[2];
+                i += 2;
+              }
+            }
+          });
         }
-      }
     } else {
       for (const key in obj) {
         if (typeof obj[key] === 'object') {

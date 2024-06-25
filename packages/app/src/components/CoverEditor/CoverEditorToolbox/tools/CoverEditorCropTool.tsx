@@ -1,6 +1,7 @@
 import { useCallback } from 'react';
 import { useIntl } from 'react-intl';
 import { COVER_RATIO } from '@azzapp/shared/coverHelpers';
+import { extractLottieInfoMemoized } from '#components/CoverEditor/coverEditorUtils';
 import ImagePicker, { EditImageStep } from '#components/ImagePicker';
 import ScreenModal from '#components/ScreenModal';
 import useToggle from '#hooks/useToggle';
@@ -15,13 +16,13 @@ const CoverEditorCropTool = () => {
   const intl = useIntl();
   const [show, toggleScreenModal] = useToggle(false);
   const {
-    coverEditorState: { template, selectedItemIndex },
+    coverEditorState: { lottie, selectedItemIndex },
     dispatch,
   } = useCoverEditorContext();
 
   const asset =
     selectedItemIndex != null
-      ? template?.lottieInfo.assetsInfos[selectedItemIndex]
+      ? extractLottieInfoMemoized(lottie)?.assetsInfos[selectedItemIndex]
       : null;
   const activeMedia = useCoverEditorActiveMedia();
 

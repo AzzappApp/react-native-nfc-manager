@@ -33,6 +33,7 @@ export type SkottieTemplatePlayer = {
       }
     >,
   ): void;
+  dispose(): void;
 };
 
 type CreateSkottieTemplatePlayer = (

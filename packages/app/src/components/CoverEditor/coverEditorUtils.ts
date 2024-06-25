@@ -1,24 +1,21 @@
+import { memoize } from 'lodash';
 import { createSkottieTemplatePlayer } from 'react-native-skottie-template-player';
 import { LOTTIE_REPLACE_COLORS } from '@azzapp/shared/coverHelpers';
-import { replaceColors } from '@azzapp/shared/lottieHelpers';
+import { extractLottieInfo, replaceColors } from '@azzapp/shared/lottieHelpers';
 import {
   getDeviceMaxDecodingResolution,
   reduceVideoResolutionIfNecessary,
 } from '#helpers/mediaEditions';
 import { coverTransitions } from './coverDrawer';
 import { mediaInfoIsImage } from './coverEditorHelpers';
-import type {
-  CardColors,
-  CoverEditorState,
-  TemplateInfo,
-} from './coverEditorTypes';
+import type { CardColors, CoverEditorState } from './coverEditorTypes';
 import type { VideoCompositionItem } from '@azzapp/react-native-skia-video';
 
 export const createCoverVideoComposition = (
   state: CoverEditorState,
   maxDecoderResolution: number,
 ) => {
-  const { medias, videoPaths, template, coverTransition } = state;
+  const { medias, videoPaths, lottie, coverTransition } = state;
 
   const videoScales: Record<string, number> = {};
   const resolutions: Record<
@@ -42,12 +39,13 @@ export const createCoverVideoComposition = (
 
   let duration = 0;
   const items: VideoCompositionItem[] = [];
+  const lottieInfo = extractLottieInfoMemoized(lottie);
 
-  if (template) {
+  if (lottieInfo) {
     let i = 0;
-    duration = template.lottieInfo.duration;
+    duration = lottieInfo?.duration;
     for (const mediaInfo of medias) {
-      const asset = template.lottieInfo.assetsInfos[i];
+      const asset = lottieInfo.assetsInfos[i];
       if (!asset) {
         // something really wrong happened
         console.error("Too many medias for the template's assets");
@@ -101,36 +99,39 @@ export const createCoverVideoComposition = (
 };
 
 export const createCoverSkottieWithColorReplacement = (
-  template: TemplateInfo | null,
+  lottie: JSON | null,
   cardColors: CardColors,
 ) =>
-  template
+  lottie
     ? createSkottieTemplatePlayer(
-        replaceColors(
-          [
-            {
-              sourceColor: LOTTIE_REPLACE_COLORS.dark,
-              targetColor: cardColors.dark,
-            },
-            {
-              sourceColor: LOTTIE_REPLACE_COLORS.primary,
-              targetColor: cardColors.primary,
-            },
-            {
-              sourceColor: LOTTIE_REPLACE_COLORS.light,
-              targetColor: cardColors.light,
-            },
-          ],
-          template.lottie,
+        JSON.stringify(
+          replaceColors(
+            [
+              {
+                sourceColor: LOTTIE_REPLACE_COLORS.dark,
+                targetColor: cardColors.dark,
+              },
+              {
+                sourceColor: LOTTIE_REPLACE_COLORS.primary,
+                targetColor: cardColors.primary,
+              },
+              {
+                sourceColor: LOTTIE_REPLACE_COLORS.light,
+                targetColor: cardColors.light,
+              },
+            ],
+            lottie,
+          ),
         ),
-        template.lottieInfo.assetsInfos.map(asset => asset.id),
+        extractLottieInfoMemoized(lottie)?.assetsInfos.map(asset => asset.id) ??
+          [],
       )
     : null;
 
 export const isCoverDynamic = (state: CoverEditorState) => {
-  const { template, medias, overlayLayers } = state;
+  const { lottie, medias, overlayLayers } = state;
   return (
-    !!template ||
+    !!lottie ||
     medias.some(
       mediaInfo => !mediaInfoIsImage(mediaInfo) || mediaInfo.animation != null,
     ) ||
@@ -138,3 +139,7 @@ export const isCoverDynamic = (state: CoverEditorState) => {
     medias.length > 1
   );
 };
+
+export const extractLottieInfoMemoized = memoize((lottie: JSON | null) =>
+  lottie ? extractLottieInfo(lottie) : undefined,
+);

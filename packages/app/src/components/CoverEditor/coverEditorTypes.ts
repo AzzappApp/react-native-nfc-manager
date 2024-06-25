@@ -9,7 +9,6 @@ import type { MediaAnimations } from './coverDrawer/mediaAnimations';
 import type { OverlayAnimations } from './coverDrawer/overlayAnimations';
 import type { ColorPalette } from '@azzapp/shared/cardHelpers';
 import type { Filter } from '@azzapp/shared/filtersHelper';
-import type { LottieInfo } from '@azzapp/shared/lottieHelpers';
 import type {
   SkCanvas,
   SkPaint,
@@ -21,7 +20,7 @@ import type {
 export type CoverEditorState = {
   // Cover data
   coverId?: string;
-  template: TemplateInfo | null;
+  lottie: JSON | null;
   backgroundColor: string | null;
 
   medias: MediaInfo[];
@@ -53,11 +52,6 @@ export type CardColors = Readonly<
     otherColors: string[];
   }
 >;
-
-export type TemplateInfo = {
-  lottie: string;
-  lottieInfo: LottieInfo;
-};
 
 export type MediaInfoBase = {
   filter: Filter | null;

@@ -21,11 +21,11 @@ const CoverEditorMediaEditToolbox = () => {
   const styles = useStyleSheet(styleSheet);
   const {
     dispatch,
-    coverEditorState: { template },
+    coverEditorState: { lottie },
   } = useCoverEditorContext();
   const mediaInfos = useCoverEditorMedia();
   const { media } = mediaInfos ?? {};
-  const hasTemplate = !!template;
+  const hasTemplate = !!lottie;
 
   const onClose = () => {
     dispatch({

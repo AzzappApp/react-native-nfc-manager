@@ -3,6 +3,7 @@ import {
   COVER_MAX_MEDIA_DURATION,
   COVER_RATIO,
 } from '@azzapp/shared/coverHelpers';
+import { extractLottieInfoMemoized } from '#components/CoverEditor/coverEditorUtils';
 import ImagePicker, { SelectImageStep } from '#components/ImagePicker';
 import ScreenModal from '#components/ScreenModal';
 import useToggle from '#hooks/useToggle';
@@ -18,13 +19,13 @@ const CoverEditorMediaReplace = () => {
   const intl = useIntl();
   const [show, toggleScreenModal] = useToggle(false);
   const {
-    coverEditorState: { template, selectedItemIndex, editionMode },
+    coverEditorState: { lottie, selectedItemIndex, editionMode },
     dispatch,
   } = useCoverEditorContext();
 
   const asset =
     selectedItemIndex != null && editionMode === 'mediaEdit'
-      ? template?.lottieInfo.assetsInfos[selectedItemIndex]
+      ? extractLottieInfoMemoized(lottie)?.assetsInfos[selectedItemIndex]
       : null;
   const activeMedia = useCoverEditorActiveMedia();
 

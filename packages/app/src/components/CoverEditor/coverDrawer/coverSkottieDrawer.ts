@@ -15,18 +15,18 @@ const coverSkottieDrawer = ({
   canvas,
   width,
   height,
-  coverEditorState: { medias, template },
+  coverEditorState: { medias },
   images,
   frames,
   currentTime,
   skottiePlayer,
   videoScales,
+  lottieInfo,
 }: CoverDrawerOptions) => {
   'worklet';
-  if (!skottiePlayer || !template) {
+  if (!skottiePlayer || !lottieInfo) {
     return;
   }
-  const { lottieInfo } = template;
   const imagesMap: Record<
     string,
     {

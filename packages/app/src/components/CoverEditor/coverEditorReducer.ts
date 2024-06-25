@@ -10,6 +10,7 @@ import {
 import { colors } from '#theme';
 import { cropDataForAspectRatio } from '#helpers/mediaEditions';
 import { mediaInfoIsImage } from './coverEditorHelpers';
+import { extractLottieInfoMemoized } from './coverEditorUtils';
 import type { CoverEditorAction } from './coverEditorActions';
 import type { CoverEditorState } from './coverEditorTypes';
 
@@ -198,8 +199,9 @@ export function coverEditorReducer(
             return mediaInfo;
           }
           let aspectRatio = COVER_RATIO;
-          if (state.template) {
-            const asset = state.template.lottieInfo.assetsInfos[index];
+          if (state.lottie) {
+            const lottieInfo = extractLottieInfoMemoized(state.lottie);
+            const asset = lottieInfo?.assetsInfos[index];
             if (!asset) {
               console.error("Too many medias for the template's assets");
             } else {

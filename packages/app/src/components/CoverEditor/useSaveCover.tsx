@@ -25,6 +25,7 @@ import { mediaInfoIsImage } from './coverEditorHelpers';
 import {
   createCoverSkottieWithColorReplacement,
   createCoverVideoComposition,
+  extractLottieInfoMemoized,
   isCoverDynamic,
 } from './coverEditorUtils';
 import coverLocalStore from './coversLocalStore';
@@ -197,7 +198,7 @@ const isCoverEditorStateValid = (coverEditorState: CoverEditorState) => {
 
 const createCoverMedia = async (coverEditorState: CoverEditorState) => {
   const {
-    template,
+    lottie,
 
     images,
     lutShaders,
@@ -266,10 +267,11 @@ const createCoverMedia = async (coverEditorState: CoverEditorState) => {
 
     const encoderConfigs = validConfigs[0]!;
     const skottiePlayer = createCoverSkottieWithColorReplacement(
-      template,
+      lottie,
       cardColors,
     );
 
+    const lottieInfo = extractLottieInfoMemoized(lottie);
     await exportVideoComposition(
       composition,
       {
@@ -285,9 +287,11 @@ const createCoverMedia = async (coverEditorState: CoverEditorState) => {
           lutShaders,
           videoScales,
           skottiePlayer,
+          lottieInfo,
         });
       },
     );
+    skottiePlayer?.dispose();
   }
 
   return { path: outPath, kind: isDynamic ? 'video' : 'image' } as const;

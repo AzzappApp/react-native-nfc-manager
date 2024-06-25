@@ -9,9 +9,11 @@ namespace RNSkia {
 SkottieTemplatePlayer::SkottieTemplatePlayer(
     const std::string& content, const std::vector<std::string> resourcesIds) {
   resourceProvider = sk_sp(new TemplateResourceProvider(resourcesIds));
+  resourceProvider->ref();
   animation = skottie::Animation::Builder()
                   .setResourceProvider(resourceProvider)
                   .make(content.c_str(), content.length());
+ animation->ref();
 }
 
 jsi::Value SkottieTemplatePlayer::get(jsi::Runtime& runtime,
@@ -40,24 +42,45 @@ jsi::Value SkottieTemplatePlayer::get(jsi::Runtime& runtime,
               auto image = JsiSkImage::fromValue(runtime, frame.getProperty(runtime, "image"));
               auto jsMatrix = frame.getProperty(runtime, "matrix");
               auto matrix =  jsMatrix.isObject() ? JsiSkMatrix::fromValue(runtime, jsMatrix) : nullptr;
-              if (image != nullptr) {
+              if (image != nullptr && resourceProvider != nullptr) {
                 resourceProvider->updateAssetImage(id, image, matrix);
               }
             }
           }
-          animation->seek(progress);
-          animation->render(canvas, rect.get());
+          if (animation != nullptr) {
+            animation->seek(progress);
+            animation->render(canvas, rect.get());
+          }
+          return jsi::Value::undefined();
+        });
+  } else if (propName == "dispose") {
+    return jsi::Function::createFromHostFunction(
+        runtime, jsi::PropNameID::forAscii(runtime, "dispose"), 0,
+        [this](jsi::Runtime& runtime, const jsi::Value& thisValue,
+               const jsi::Value* arguments, size_t count) -> jsi::Value {
+          this->dispose();
           return jsi::Value::undefined();
         });
   }
+  
   return jsi::Value::undefined();
 }
 
-std::vector<jsi::PropNameID>
-SkottieTemplatePlayer::getPropertyNames(jsi::Runtime& rt) {
+std::vector<jsi::PropNameID> SkottieTemplatePlayer::getPropertyNames(jsi::Runtime& rt) {
   std::vector<jsi::PropNameID> result;
   result.push_back(jsi::PropNameID::forUtf8(rt, std::string("render")));
   return result;
+}
+
+void SkottieTemplatePlayer::dispose() {
+  if (animation) {
+    animation.reset();
+  }
+  animation = nullptr;
+  if (resourceProvider) {
+    resourceProvider.reset();
+  }
+  resourceProvider = nullptr;
 }
 
 TemplateResourceProvider::TemplateResourceProvider(

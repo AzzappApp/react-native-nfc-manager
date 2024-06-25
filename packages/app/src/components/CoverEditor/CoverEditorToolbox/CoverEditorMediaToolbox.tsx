@@ -10,6 +10,7 @@ import PressableOpacity from '#ui/PressableOpacity';
 import Text from '#ui/Text';
 import { useCoverEditorContext } from '../CoverEditorContext';
 import { mediaInfoIsImage } from '../coverEditorHelpers';
+import { extractLottieInfoMemoized } from '../coverEditorUtils';
 import CoverEditorMediaPickerFloatingTool from './tools/CoverEditorMediaPickerFloatingTool';
 import CoverEditorTransitionTool from './tools/CoverEditorTransitionTool';
 import { TOOLBOX_SECTION_HEIGHT } from './ui/ToolBoxSection';
@@ -19,7 +20,7 @@ const CoverEditorMediaToolbox = () => {
 
   const {
     dispatch,
-    coverEditorState: { medias, template },
+    coverEditorState: { medias, lottie },
   } = useCoverEditorContext();
 
   const onClose = () => {
@@ -33,12 +34,13 @@ const CoverEditorMediaToolbox = () => {
   };
 
   const durations = useMemo(() => {
-    return template
-      ? template.lottieInfo.assetsInfos.map(
+    const lottieInfo = extractLottieInfoMemoized(lottie);
+    return lottieInfo
+      ? lottieInfo.assetsInfos.map(
           assetInfo => assetInfo.endTime - assetInfo.startTime,
         )
       : null;
-  }, [template]);
+  }, [lottie]);
 
   const displayedMedias = useMemo(() => {
     const data = durations
@@ -115,12 +117,12 @@ const CoverEditorMediaToolbox = () => {
         contentContainerStyle={styles.scrollContentContainer}
         showsHorizontalScrollIndicator={false}
       >
-        {medias.length > 1 && !template && <CoverEditorTransitionTool />}
+        {medias.length > 1 && !lottie && <CoverEditorTransitionTool />}
         {displayedMedias}
       </ScrollView>
       <CoverEditorMediaPickerFloatingTool
         durations={durations}
-        durationsFixed={!!template}
+        durationsFixed={!!lottie}
       />
     </View>
   );
