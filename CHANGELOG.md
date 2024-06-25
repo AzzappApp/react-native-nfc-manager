@@ -1,4 +1,4 @@
-## 0.5.19-canary.16
+## 0.5.19-canary.17
 
 * **fix:**  - **android:** [#3900](https://github.com/AzzappApp/azzapp/pull/3900) display duration on videos ([#3903](https://github.com/AzzappApp/azzapp/pull/3903))
 * **fix:**  - **mediaPicker:** [#3879](https://github.com/AzzappApp/azzapp/pull/3879) only first 16 images are refreshed when app state change ([#3880](https://github.com/AzzappApp/azzapp/pull/3880))
