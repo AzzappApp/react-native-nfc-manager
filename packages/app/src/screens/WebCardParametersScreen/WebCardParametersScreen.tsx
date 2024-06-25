@@ -668,17 +668,31 @@ const WebCardParametersScreen = ({
             disabled={isLoadingQuitWebCard}
           >
             <Text variant="error" style={textStyles.button}>
-              <FormattedMessage
-                defaultMessage="Delete this WebCard{azzappA}"
-                description="label for button to delete a webcard"
-                values={{
-                  azzappA: (
-                    <Text variant="azzapp" style={styles.deleteButton}>
-                      a
-                    </Text>
-                  ),
-                }}
-              />
+              {isWebCardOwner ? (
+                <FormattedMessage
+                  defaultMessage="Delete this WebCard{azzappA}"
+                  description="label for button to delete a webcard"
+                  values={{
+                    azzappA: (
+                      <Text variant="azzapp" style={styles.deleteButton}>
+                        a
+                      </Text>
+                    ),
+                  }}
+                />
+              ) : (
+                <FormattedMessage
+                  defaultMessage="Quit this WebCard{azzappA}"
+                  description="Quit WebCard title"
+                  values={{
+                    azzappA: (
+                      <Text variant="azzapp" style={styles.deleteButton}>
+                        a
+                      </Text>
+                    ),
+                  }}
+                />
+              )}
             </Text>
           </PressableNative>
         </View>
