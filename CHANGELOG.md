@@ -1,4 +1,4 @@
-## 0.5.19-canary.11
+## 0.5.19-canary.12
 
 * **fix:**  - **webCard:** [#3878](https://github.com/AzzappApp/azzapp/pull/3878) check subscription on webCard update ([#3881](https://github.com/AzzappApp/azzapp/pull/3881))
 * **fix:**  - **CoverEditor:** template and text on android ([#3886](https://github.com/AzzappApp/azzapp/pull/3886))
