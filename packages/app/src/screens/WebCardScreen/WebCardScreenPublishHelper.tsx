@@ -6,6 +6,7 @@ import { graphql, useFragment, useMutation } from 'react-relay';
 import { buildUserUrl } from '@azzapp/shared/urlHelpers';
 import { colors } from '#theme';
 import { useRouter } from '#components/NativeRouter';
+import PremiumIndicator from '#components/PremiumIndicator';
 import ScreenModal from '#components/ScreenModal';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import useScreenInsets from '#hooks/useScreenInsets';
@@ -212,7 +213,9 @@ const WebCardScreenPublishHelper = ({
               />
             }
             rightElement={
-              requiresSubscription && <Icon icon="plus" size={15} />
+              <PremiumIndicator
+                isRequired={requiresSubscription && !isPremium}
+              />
             }
             loading={publishing}
           />

@@ -8,12 +8,12 @@ import { colors } from '#theme';
 import CardTemplateList from '#components/CardTemplateList';
 import { NextHeaderButton } from '#components/commonsButtons';
 import { useRouter } from '#components/NativeRouter';
+import PremiumIndicator from '#components/PremiumIndicator';
 import relayScreen from '#helpers/relayScreen';
 import useLoadCardTemplateMutation from '#hooks/useLoadCardTemplateMutation';
 import useScreenInsets from '#hooks/useScreenInsets';
 import ActivityIndicator from '#ui/ActivityIndicator';
 import Container from '#ui/Container';
-import Icon from '#ui/Icon';
 import Text from '#ui/Text';
 import WizardPagerHeader, { PAGER_HEADER_HEIGHT } from '#ui/WizardPagerHeader';
 import type {
@@ -145,7 +145,7 @@ const WebCardTemplateSelectionScreen = ({
                         description="WebCard create pro description"
                       />
                     </Text>
-                    <Icon icon="plus" size={15} style={styles.badge} />
+                    <PremiumIndicator isRequired />
                   </View>
                 )}
             </View>
@@ -216,8 +216,5 @@ const styles = StyleSheet.create({
     display: 'flex',
     flexDirection: 'row',
     alignItems: 'center',
-  },
-  badge: {
-    marginLeft: 5,
   },
 });

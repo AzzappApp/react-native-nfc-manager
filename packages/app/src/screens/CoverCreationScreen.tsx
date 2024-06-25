@@ -6,11 +6,11 @@ import { colors } from '#theme';
 import { NextHeaderButton } from '#components/commonsButtons';
 import CoverEditor from '#components/CoverEditor';
 import { useRouter } from '#components/NativeRouter';
+import PremiumIndicator from '#components/PremiumIndicator';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import relayScreen from '#helpers/relayScreen';
 import useScreenInsets from '#hooks/useScreenInsets';
 import Container from '#ui/Container';
-import Icon from '#ui/Icon';
 import Text from '#ui/Text';
 import WizardPagerHeader from '#ui/WizardPagerHeader';
 import type { CoverEditorHandle } from '#components/CoverEditor/CoverEditor';
@@ -122,7 +122,7 @@ const CoverCreationScreen = ({
                     defaultMessage="Professional WebCard"
                   />
                 </Text>
-                <Icon icon="plus" size={15} style={styles.badge} />
+                <PremiumIndicator isRequired />
               </View>
             </View>
           )
@@ -183,8 +183,5 @@ const stylesheet = createStyleSheet(() => ({
     display: 'flex',
     flexDirection: 'row',
     alignItems: 'center',
-  },
-  badge: {
-    marginLeft: 5,
   },
 }));

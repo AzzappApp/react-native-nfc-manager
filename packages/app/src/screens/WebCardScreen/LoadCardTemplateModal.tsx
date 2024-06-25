@@ -10,6 +10,7 @@ import {
 import { colors } from '#theme';
 import CardTemplateList from '#components/CardTemplateList';
 import { useRouter } from '#components/NativeRouter';
+import PremiumIndicator from '#components/PremiumIndicator';
 import ScreenModal from '#components/ScreenModal';
 import useAuthState from '#hooks/useAuthState';
 import useLoadCardTemplateMutation from '#hooks/useLoadCardTemplateMutation';
@@ -198,7 +199,7 @@ const LoadCardTemplateModal = ({
                           description="WebCard create pro description"
                         />
                       </Text>
-                      <Icon icon="plus" size={15} style={styles.badge} />
+                      <PremiumIndicator isRequired={!webCard.isPremium} />
                     </View>
                   )}
               </View>

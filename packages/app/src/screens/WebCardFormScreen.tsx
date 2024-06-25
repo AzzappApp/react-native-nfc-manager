@@ -18,6 +18,7 @@ import { buildUserUrl } from '@azzapp/shared/urlHelpers';
 import { colors } from '#theme';
 import { NextHeaderButton } from '#components/commonsButtons';
 import { useRouter } from '#components/NativeRouter';
+import PremiumIndicator from '#components/PremiumIndicator';
 import { onChangeWebCard } from '#helpers/authStore';
 import { keyExtractor } from '#helpers/idHelpers';
 import relayScreen from '#helpers/relayScreen';
@@ -405,7 +406,7 @@ const WebCardFormScreen = ({
                     defaultMessage="Professional WebCard"
                   />
                 </Text>
-                <Icon icon="plus" size={15} style={styles.badge} />
+                <PremiumIndicator isRequired />
               </View>
             </View>
           )
@@ -721,8 +722,5 @@ const styles = StyleSheet.create({
     display: 'flex',
     flexDirection: 'row',
     alignItems: 'center',
-  },
-  badge: {
-    marginLeft: 5,
   },
 });

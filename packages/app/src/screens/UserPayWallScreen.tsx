@@ -19,10 +19,10 @@ import Animated, {
 } from 'react-native-reanimated';
 import { colors } from '#theme';
 import { useRouter } from '#components/NativeRouter';
+import PremiumIndicator from '#components/PremiumIndicator';
 import useScreenInsets from '#hooks/useScreenInsets';
 import { useUserSubscriptionOffer } from '#hooks/useSubscriptionOffer';
 import Button from '#ui/Button';
-import Icon from '#ui/Icon';
 import IconButton from '#ui/IconButton';
 import PressableOpacity from '#ui/PressableOpacity';
 import SwitchLabel from '#ui/SwitchLabel';
@@ -224,7 +224,7 @@ const UserPayWallScreen = () => {
             resizeMode="contain"
             style={styles.plusImage}
           />
-          <Icon icon="plus" size={17} />
+          <PremiumIndicator size={17} isRequired />
         </View>
         <SwitchLabel
           variant="small"

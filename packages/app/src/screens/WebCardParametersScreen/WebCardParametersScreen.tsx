@@ -10,8 +10,10 @@ import {
 } from 'react-relay';
 import ERRORS from '@azzapp/shared/errors';
 import { isOwner } from '@azzapp/shared/profileHelpers';
+import { isWebCardKindSubscription } from '@azzapp/shared/subscriptionHelpers';
 import { colors, textStyles } from '#theme';
 import { useRouter } from '#components/NativeRouter';
+import PremiumIndicator from '#components/PremiumIndicator';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import { keyExtractor } from '#helpers/idHelpers';
 import relayScreen from '#helpers/relayScreen';
@@ -486,14 +488,16 @@ const WebCardParametersScreen = ({
           <WebCardParametersHeader webCard={webCard ?? null} />
           <Icon icon="parameters" style={styles.warningIcon} />
           <View style={styles.modalLine}>
-            <View style={styles.publishTitle}>
+            <View style={[styles.publishTitle, styles.proContainer]}>
               <Text variant="medium">
                 <FormattedMessage
                   defaultMessage="Publish"
                   description="PostItem Modal - Likes switch Label"
                 />
               </Text>
-              {webCard.requiresSubscription && <Icon icon="plus" size={24} />}
+              <PremiumIndicator
+                isRequired={webCard.requiresSubscription && !webCard.isPremium}
+              />
             </View>
             <Switch
               variant="large"
@@ -578,6 +582,15 @@ const WebCardParametersScreen = ({
                 paddingRight: 0,
               }}
               itemContainerStyle={styles.selectItemContainerStyle}
+              renderItem={({ item }) => (
+                <View style={styles.selectItem}>
+                  <Text variant="button">{item.label}</Text>
+                  <PremiumIndicator
+                    size={24}
+                    isRequired={isWebCardKindSubscription(item.webCardKind)}
+                  />
+                </View>
+              )}
             />
           </View>
           {webCard.webCardKind !== 'personal' && (
@@ -725,6 +738,18 @@ const styleSheet = createStyleSheet(appearance => ({
     fontWeight: 600,
   },
   deleteButton: { color: colors.red400 },
+  proContainer: {
+    display: 'flex',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  selectItem: {
+    paddingVertical: 10,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
 }));
 
 export default relayScreen(WebCardParametersScreen, {

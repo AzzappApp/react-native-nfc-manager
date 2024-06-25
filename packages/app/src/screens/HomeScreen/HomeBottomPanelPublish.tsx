@@ -6,6 +6,7 @@ import { graphql, commitMutation } from 'react-relay';
 import { isAdmin } from '@azzapp/shared/profileHelpers';
 import { colors } from '#theme';
 import { useRouter } from '#components/NativeRouter';
+import PremiumIndicator from '#components/PremiumIndicator';
 import { getAuthState } from '#helpers/authStore';
 import { getRelayEnvironment } from '#helpers/relayEnvironment';
 import useHandleProfileActionError from '#hooks/useHandleProfileError';
@@ -162,9 +163,12 @@ const HomeBottomPanelPublish = ({ profile }: HomeBottomPanelPublishProps) => {
             />
           }
           rightElement={
-            profile.webCard.requiresSubscription && (
-              <Icon icon="plus" size={15} />
-            )
+            <PremiumIndicator
+              isRequired={
+                profile?.webCard.requiresSubscription &&
+                !profile?.webCard.isPremium
+              }
+            />
           }
           style={styles.button}
           onPress={onPublish}

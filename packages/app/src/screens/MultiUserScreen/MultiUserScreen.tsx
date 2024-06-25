@@ -16,6 +16,7 @@ import { colors } from '#theme';
 import { CancelHeaderButton } from '#components/commonsButtons';
 import CoverRenderer from '#components/CoverRenderer';
 import { useRouter } from '#components/NativeRouter';
+import PremiumIndicator from '#components/PremiumIndicator';
 import ScreenModal from '#components/ScreenModal';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import relayScreen, { RelayScreenErrorBoundary } from '#helpers/relayScreen';
@@ -70,6 +71,8 @@ const multiUserScreenQuery = graphql`
             endAt
             status
           }
+          requiresSubscription
+          isPremium
         }
       }
     }
@@ -342,6 +345,20 @@ const MultiUserScreen = ({
                 description="Title for switch section in MultiUserScreen"
               />
             </Text>
+            <View style={styles.proContainer}>
+              <Text variant="medium">
+                <FormattedMessage
+                  defaultMessage="Publish"
+                  description="PostItem Modal - Likes switch Label"
+                />
+              </Text>
+              <PremiumIndicator
+                isRequired={
+                  profile?.webCard.requiresSubscription &&
+                  !profile?.webCard.isPremium
+                }
+              />
+            </View>
             <Switch
               variant="large"
               value={profile?.webCard.isMultiUser}
@@ -354,9 +371,12 @@ const MultiUserScreen = ({
   }, [
     profile?.profileRole,
     profile?.webCard.isMultiUser,
+    profile?.webCard.isPremium,
     profile?.webCard?.nbProfiles,
+    profile?.webCard.requiresSubscription,
     styles.description,
     styles.price,
+    styles.proContainer,
     styles.sharedIcon,
     styles.switchSection,
     toggleMultiUser,
@@ -557,6 +577,12 @@ const styleSheet = createStyleSheet(appearance => ({
     maxWidth: 295,
     marginTop: 10,
     alignItems: 'center',
+  },
+  proContainer: {
+    display: 'flex',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 }));
 

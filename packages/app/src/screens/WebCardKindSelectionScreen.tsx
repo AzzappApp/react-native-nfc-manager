@@ -12,6 +12,7 @@ import { isWebCardKindSubscription } from '@azzapp/shared/subscriptionHelpers';
 import { colors, shadow } from '#theme';
 import { MediaImageRenderer } from '#components/medias';
 import { useRouter } from '#components/NativeRouter';
+import PremiumIndicator from '#components/PremiumIndicator';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import fetchQueryAndRetain from '#helpers/fetchQueryAndRetain';
 import { keyExtractor } from '#helpers/idHelpers';
@@ -21,7 +22,7 @@ import useScreenInsets from '#hooks/useScreenInsets';
 import Container from '#ui/Container';
 import ContinueButton from '#ui/ContinueButton';
 import { HEADER_HEIGHT } from '#ui/Header';
-import Icon from '#ui/Icon';
+
 import InfiniteCarousel from '#ui/InfiniteCaroussel';
 import { TAB_BAR_HEIGHT } from '#ui/TabsBar';
 import Text from '#ui/Text';
@@ -155,13 +156,13 @@ const WebCardKindSelectionScreen = ({
         onPress={() => setWebCardCategoryId(item.id)}
         style={styles.webCardCategoryItem}
         rightElement={
-          isWebCardKindSubscription(item.webCardKind) && (
-            <Icon icon="plus" size={15} style={styles.badge} />
-          )
+          <PremiumIndicator
+            isRequired={isWebCardKindSubscription(item.webCardKind)}
+          />
         }
       />
     ),
-    [webCardCategoryId, styles.webCardCategoryItem, styles.badge],
+    [webCardCategoryId, styles.webCardCategoryItem],
   );
 
   const getWebCardCategoryItemLayout = useCallback(

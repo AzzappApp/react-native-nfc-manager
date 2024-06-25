@@ -2,7 +2,7 @@ import { FormattedMessage } from 'react-intl';
 import { StyleSheet, View } from 'react-native';
 import { moduleCountRequiresSubscription } from '@azzapp/shared/subscriptionHelpers';
 import { colors } from '#theme';
-import Icon from './Icon';
+import PremiumIndicator from '#components/PremiumIndicator';
 import Text from './Text';
 import type { ModuleKind } from '@azzapp/shared/cardModuleHelpers';
 
@@ -25,7 +25,7 @@ const ModuleEditionScreenTitle = (props: ModuleEditionScreenTitleProps) => {
               description="ModuleEditionScreenTitle - label for pro section"
             />
           </Text>
-          <Icon icon="plus" size={15} />
+          <PremiumIndicator isRequired />
         </View>
       )}
     </View>
