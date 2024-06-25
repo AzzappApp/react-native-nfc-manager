@@ -23,7 +23,7 @@ export type ColorPaletteColor = 'dark' | 'light' | 'primary';
  * The default color palette used to style a card
  */
 export const DEFAULT_COLOR_PALETTE = {
-  primary: '#000000',
+  primary: '#FF2E54',
   light: '#FFFFFF',
   dark: '#000000',
 };
