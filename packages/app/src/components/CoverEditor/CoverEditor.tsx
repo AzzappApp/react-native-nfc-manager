@@ -119,7 +119,7 @@ const CoverEditor = (
         otherColors: [...DEFAULT_COLOR_LIST],
         ...profile.webCard.cardColors,
       } as any, // typescript is not happy with readonly
-      backgroundColor,
+      backgroundColor: backgroundColor ?? 'light',
 
       medias: [],
       coverTransition: 'fade',
