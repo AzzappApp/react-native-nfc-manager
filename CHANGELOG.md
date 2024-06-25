@@ -1,5 +1,6 @@
-## 0.5.19-canary.12
+## 0.5.19-canary.13
 
+* **fix:**  - wrong check on toggle published
 * **fix:**  - **webCard:** [#3878](https://github.com/AzzappApp/azzapp/pull/3878) check subscription on webCard update ([#3881](https://github.com/AzzappApp/azzapp/pull/3881))
 * **fix:**  - **CoverEditor:** template and text on android ([#3886](https://github.com/AzzappApp/azzapp/pull/3886))
 * **config:**  - try with permanent redirect ([#3888](https://github.com/AzzappApp/azzapp/pull/3888))
