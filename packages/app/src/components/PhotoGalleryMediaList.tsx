@@ -381,7 +381,7 @@ const PhotoGalleyMediaItem = ({
           <ActivityIndicator />
         </View>
       )}
-      {item.node.type === 'video' && (
+      {item.node.type.includes('video') && (
         <Text variant="button" style={styles.textDuration}>
           {formatVideoTime(item.node.image.playableDuration)}
         </Text>
