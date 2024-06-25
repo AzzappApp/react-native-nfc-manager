@@ -19,14 +19,17 @@ const toggleWebCardPublished: MutationResolvers['toggleWebCardPublished'] =
       throw new GraphQLError(ERRORS.INVALID_REQUEST);
     }
 
-    await checkWebCardHasSubscription({ webCard }, loaders);
-
     const updates = {
       cardIsPublished: published,
       alreadyPublished: webCard.alreadyPublished || published,
       updatedAt: new Date(),
       lastCardUpdate: new Date(),
     };
+
+    await checkWebCardHasSubscription(
+      { webCard: { ...webCard, ...updates } },
+      loaders,
+    );
 
     try {
       await updateWebCard(webCardId, updates);
