@@ -1,5 +1,6 @@
-## 0.5.19-canary.14
+## 0.5.19-canary.15
 
+* **fix:**  - **android:** [#3900](https://github.com/AzzappApp/azzapp/pull/3900) display duration on videos ([#3903](https://github.com/AzzappApp/azzapp/pull/3903))
 * **fix:**  - **mediaPicker:** [#3879](https://github.com/AzzappApp/azzapp/pull/3879) only first 16 images are refreshed when app state change ([#3880](https://github.com/AzzappApp/azzapp/pull/3880))
 * **fix:**  - wrong check on toggle published
 * **fix:**  - **webCard:** [#3878](https://github.com/AzzappApp/azzapp/pull/3878) check subscription on webCard update ([#3881](https://github.com/AzzappApp/azzapp/pull/3881))
