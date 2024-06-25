@@ -40,6 +40,7 @@ import type {
 import type { WebCardParametersScreenUnPublishMutation } from '#relayArtifacts/WebCardParametersScreenUnPublishMutation.graphql';
 import type { WebCardParametersRoute } from '#routes';
 import type { ArrayItemType } from '@azzapp/shared/arrayHelpers';
+import type { GraphQLError } from 'graphql';
 
 const webCardParametersScreenQuery = graphql`
   query WebCardParametersScreenQuery($webCardId: ID!) {
@@ -302,23 +303,35 @@ const WebCardParametersScreen = ({
         onError: error => {
           console.log(error);
 
-          Toast.show({
-            type: 'error',
-            text1: intl.formatMessage(
-              {
-                defaultMessage:
-                  'Oops, the WebCard{azzappA} could not be updated.',
-                description: 'Error toast message when saving webCard failed',
-              },
-              {
-                azzappA: <Text variant="azzapp">a</Text>,
-              },
-            ) as string,
-          });
+          const response = (
+            'response' in error ? error.response : undefined
+          ) as { errors: GraphQLError[] } | undefined;
+          if (
+            response?.errors.some(
+              r => r.message === ERRORS.SUBSCRIPTION_REQUIRED,
+            )
+          ) {
+            router.push({ route: 'USER_PAY_WALL' });
+            return;
+          } else {
+            Toast.show({
+              type: 'error',
+              text1: intl.formatMessage(
+                {
+                  defaultMessage:
+                    'Oops, the WebCard{azzappA} could not be updated.',
+                  description: 'Error toast message when saving webCard failed',
+                },
+                {
+                  azzappA: <Text variant="azzapp">a</Text>,
+                },
+              ) as string,
+            });
+          }
         },
       });
     },
-    [commitUpdateWebCard, intl, webCard],
+    [commitUpdateWebCard, intl, router, webCard],
   );
 
   const updateProfileActivity = useCallback(

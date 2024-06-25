@@ -4,6 +4,7 @@ import { updateWebCard, type WebCard } from '@azzapp/data';
 import ERRORS from '@azzapp/shared/errors';
 import { isAdmin } from '@azzapp/shared/profileHelpers';
 import fromGlobalIdWithType from '#helpers/relayIdHelpers';
+import { checkWebCardHasSubscription } from '#use-cases/subscription';
 import type { MutationResolvers } from '#/__generated__/types';
 import type { GraphQLContext } from '#/GraphQLContext';
 
@@ -21,19 +22,23 @@ const updateWebCardMutation: MutationResolvers['updateWebCard'] = async (
     ...profileUpdates
   } = updates;
 
-  const partialWebCard: Partial<
-    Omit<WebCard, 'createdAt' | 'id' | 'updatedAt' | 'webCardKind'>
-  > = {
+  const partialWebCard: Partial<WebCard> = {
     ...profileUpdates,
+    webCardKind: profileUpdates.webCardKind ?? undefined,
   };
 
+  const webCard = await loaders.WebCard.load(webCardId);
+
+  if (!webCard) {
+    throw new GraphQLError(ERRORS.INVALID_REQUEST);
+  }
+
+  await checkWebCardHasSubscription(
+    { webCard: { ...webCard, ...partialWebCard } },
+    loaders,
+  );
+
   try {
-    const webCard = await loaders.WebCard.load(webCardId);
-
-    if (!webCard) {
-      throw new GraphQLError(ERRORS.INVALID_REQUEST);
-    }
-
     if (graphqlWebCardCategoryId) {
       const webCardCategoryId = fromGlobalIdWithType(
         graphqlWebCardCategoryId,

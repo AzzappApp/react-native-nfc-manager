@@ -13,8 +13,8 @@ import {
 } from '@azzapp/data';
 import { DEFAULT_CARD_STYLE } from '@azzapp/shared/cardHelpers';
 import ERRORS from '@azzapp/shared/errors';
-import { webCardRequiresSubscription } from '@azzapp/shared/subscriptionHelpers';
 import fromGlobalIdWithType from '#helpers/relayIdHelpers';
+import { checkWebCardHasSubscription } from '#use-cases/subscription';
 import { MODULES_SAVE_RULES } from './ModulesMutationsResolvers';
 import type { MutationResolvers } from '#/__generated__/types';
 
@@ -48,19 +48,10 @@ const loadCardTemplateMutation: MutationResolvers['loadCardTemplate'] = async (
     throw new GraphQLError(ERRORS.INVALID_REQUEST);
   }
 
-  const owner = await loaders.webCardOwners.load(webCard.id);
-
-  if (
-    webCard.cardIsPublished &&
-    webCardRequiresSubscription(cardTemplate.modules, webCard.webCardKind)
-  ) {
-    const subscription = owner
-      ? await loaders.activeSubscriptionsLoader.load(owner.id)
-      : [];
-    if (subscription.length === 0) {
-      throw new GraphQLError(ERRORS.SUBSCRIPTION_REQUIRED);
-    }
-  }
+  await checkWebCardHasSubscription(
+    { webCard, appliedModules: cardTemplate.modules },
+    loaders,
+  );
 
   const cardStyle =
     (await getCardStyleById(cardTemplate.cardStyleId)) ?? DEFAULT_CARD_STYLE;

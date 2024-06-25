@@ -1,11 +1,18 @@
+import { GraphQLError } from 'graphql';
 import {
   db,
   getActiveUserSubscriptionForWebCard,
+  getCardModules,
   getTotalMultiUser,
   getWebCardProfilesCount,
   type UserSubscription,
+  type WebCard,
+  type CardModuleTemplate,
 } from '@azzapp/data';
 import { updateExistingSubscription } from '@azzapp/payment';
+import ERRORS from '@azzapp/shared/errors';
+import { webCardRequiresSubscription } from '@azzapp/shared/subscriptionHelpers';
+import type { GraphQLContext } from '#GraphQLContext';
 import type { DbTransaction } from '@azzapp/data/db';
 
 export const calculateAvailableSeats = async (
@@ -90,5 +97,32 @@ export const updateMonthlySubscription = async (
       },
       trx,
     );
+  }
+};
+
+export const checkWebCardHasSubscription = async (
+  {
+    webCard,
+    appliedModules,
+  }: {
+    webCard: WebCard;
+    appliedModules?: CardModuleTemplate[];
+  },
+  loaders: GraphQLContext['loaders'],
+) => {
+  const modules = appliedModules ?? (await getCardModules(webCard.id));
+
+  const owner = await loaders.webCardOwners.load(webCard.id);
+
+  if (
+    webCardRequiresSubscription(modules, webCard.webCardKind) &&
+    webCard.cardIsPublished
+  ) {
+    const subscription = owner
+      ? await loaders.activeSubscriptionsLoader.load(owner.id)
+      : [];
+    if (subscription.length === 0) {
+      throw new GraphQLError(ERRORS.SUBSCRIPTION_REQUIRED);
+    }
   }
 };

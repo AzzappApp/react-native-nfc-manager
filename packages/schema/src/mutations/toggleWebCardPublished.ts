@@ -1,8 +1,8 @@
 import { GraphQLError } from 'graphql';
-import { getWebCardPosts, updateWebCard, getCardModules } from '@azzapp/data';
+import { getWebCardPosts, updateWebCard } from '@azzapp/data';
 import ERRORS from '@azzapp/shared/errors';
-import { webCardRequiresSubscription } from '@azzapp/shared/subscriptionHelpers';
 import fromGlobalIdWithType from '#helpers/relayIdHelpers';
+import { checkWebCardHasSubscription } from '#use-cases/subscription';
 import type { MutationResolvers } from '#/__generated__/types';
 
 const toggleWebCardPublished: MutationResolvers['toggleWebCardPublished'] =
@@ -19,21 +19,7 @@ const toggleWebCardPublished: MutationResolvers['toggleWebCardPublished'] =
       throw new GraphQLError(ERRORS.INVALID_REQUEST);
     }
 
-    const modules = await getCardModules(webCardId);
-
-    const owner = await loaders.webCardOwners.load(webCard.id);
-
-    if (
-      webCardRequiresSubscription(modules, webCard.webCardKind) &&
-      published
-    ) {
-      const subscription = owner
-        ? await loaders.activeSubscriptionsLoader.load(owner.id)
-        : [];
-      if (subscription.length === 0) {
-        throw new GraphQLError(ERRORS.SUBSCRIPTION_REQUIRED);
-      }
-    }
+    await checkWebCardHasSubscription({ webCard }, loaders);
 
     const updates = {
       cardIsPublished: published,
