@@ -1,5 +1,5 @@
 import { BlurView } from 'expo-blur';
-import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { memo, useCallback, useMemo, useRef, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import {
   View,
@@ -148,12 +148,15 @@ const HomeProfilesCarousel = ({ user: userKey }: HomeProfilesCarouselProps) => {
   );
 
   const dataSize = useRef(data.length);
-  useEffect(() => {
+
+  useOnFocus(() => {
     if (dataSize.current > data.length) {
       scrollToIndex(1, true);
       dataSize.current = data.length;
+    } else if (dataSize.current !== data.length) {
+      dataSize.current = data.length;
     }
-  }, [data.length, scrollToIndex]);
+  });
 
   if (profiles == null) {
     return null;
