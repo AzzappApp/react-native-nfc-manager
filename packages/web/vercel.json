@@ -20,30 +20,40 @@
     }
   ],
   "rewrites": [
-    { "source": "/", "destination": "https://storefront.azzapp.com/" },
+    {
+      "source": "/",
+      "destination": "https://storefront.azzapp.com/",
+      "permanent": true
+    },
     {
       "source": "/plus/:match*",
-      "destination": "https://storefront.azzapp.com/plus/:match*"
+      "destination": "https://storefront.azzapp.com/plus/:match*",
+      "permanent": true
     },
     {
       "source": "/personal/:match*",
-      "destination": "https://storefront.azzapp.com/personal/:match*"
+      "destination": "https://storefront.azzapp.com/personal/:match*",
+      "permanent": true
     },
     {
       "source": "/pricing",
-      "destination": "https://storefront.azzapp.com/pricing"
+      "destination": "https://storefront.azzapp.com/pricing",
+      "permanent": true
     },
     {
       "source": "/company/:match*",
-      "destination": "https://storefront.azzapp.com/company/:match*"
+      "destination": "https://storefront.azzapp.com/company/:match*",
+      "permanent": true
     },
     {
       "source": "/legal/:match*",
-      "destination": "https://storefront.azzapp.com/legal/:match*"
+      "destination": "https://storefront.azzapp.com/legal/:match*",
+      "permanent": true
     },
     {
       "source": "/_framer/:match*",
-      "destination": "https://storefront.azzapp.com/_framer/:match*"
+      "destination": "https://storefront.azzapp.com/_framer/:match*",
+      "permanent": true
     }
   ]
 }
