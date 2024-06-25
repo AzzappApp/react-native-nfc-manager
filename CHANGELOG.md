@@ -1,5 +1,6 @@
-## 0.5.19-canary.10
+## 0.5.19-canary.11
 
+* **fix:**  - **webCard:** [#3878](https://github.com/AzzappApp/azzapp/pull/3878) check subscription on webCard update ([#3881](https://github.com/AzzappApp/azzapp/pull/3881))
 * **fix:**  - **CoverEditor:** template and text on android ([#3886](https://github.com/AzzappApp/azzapp/pull/3886))
 * **config:**  - try with permanent redirect ([#3888](https://github.com/AzzappApp/azzapp/pull/3888))
 * **build:**  - bump ts version ([#3884](https://github.com/AzzappApp/azzapp/pull/3884))
