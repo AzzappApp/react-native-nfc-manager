@@ -21,6 +21,8 @@ import {
   Typography,
   Snackbar,
   Checkbox,
+  Backdrop,
+  CircularProgress,
 } from '@mui/material';
 import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
@@ -84,6 +86,9 @@ const CoverTemplatesParametersForm = ({
       },
     },
     lastResult,
+    onSubmit() {
+      setIsSaving(true);
+    },
     onValidate({ formData }) {
       const valid = parseWithZod(formData, { schema: coverTemplateSchema });
       return valid;
@@ -116,7 +121,7 @@ const CoverTemplatesParametersForm = ({
   );
 
   useEffect(() => {
-    setIsSaving(true);
+    setIsSaving(false);
     if (lastResult?.status === 'success') {
       setDisplaySaveSuccess(true);
     } else if (lastResult?.status === 'error') {
@@ -126,7 +131,6 @@ const CoverTemplatesParametersForm = ({
     if (lastResult?.coverTemplateId) {
       router.push(lastResult.coverTemplateId);
     }
-    setIsSaving(false);
   }, [lastResult, router]);
 
   return (
@@ -435,6 +439,12 @@ const CoverTemplatesParametersForm = ({
         message="CoverTemplate saved"
         anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
       />
+      <Backdrop
+        sx={{ color: '#fff', zIndex: theme => theme.zIndex.drawer + 1 }}
+        open={saving}
+      >
+        <CircularProgress color="inherit" />
+      </Backdrop>
     </>
   );
 };
