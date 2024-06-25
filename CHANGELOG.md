@@ -1,5 +1,6 @@
-## 0.5.19-canary.13
+## 0.5.19-canary.14
 
+* **fix:**  - **mediaPicker:** [#3879](https://github.com/AzzappApp/azzapp/pull/3879) only first 16 images are refreshed when app state change ([#3880](https://github.com/AzzappApp/azzapp/pull/3880))
 * **fix:**  - wrong check on toggle published
 * **fix:**  - **webCard:** [#3878](https://github.com/AzzappApp/azzapp/pull/3878) check subscription on webCard update ([#3881](https://github.com/AzzappApp/azzapp/pull/3881))
 * **fix:**  - **CoverEditor:** template and text on android ([#3886](https://github.com/AzzappApp/azzapp/pull/3886))
