@@ -83,13 +83,13 @@ const PhotoGalleryMediaList = ({
   const { mediaPermission } = usePermissionContext();
 
   const load = useCallback(
-    async (refreshing = false) => {
+    async (refreshing = false, updatePictures = false) => {
       if (!isLoading.current) {
         isLoading.current = true;
 
         try {
           const result = await CameraRoll.getPhotos({
-            first: refreshing ? 16 : 48, //multiple of items per row
+            first: updatePictures ? medias.length || 16 : refreshing ? 16 : 48, //multiple of items per row
             after: refreshing ? undefined : nextCursor.current,
             assetType:
               kind === 'mixed' ? 'All' : kind === 'image' ? 'Photos' : 'Videos',
@@ -115,20 +115,18 @@ const PhotoGalleryMediaList = ({
         }
       }
     },
-    [album, kind],
+    [album?.title, album?.type, kind, medias.length],
   );
 
   useEffect(() => {
     //force preload more data and initial render,
     if (medias.length === 16 && hasNext) {
-      void load(false);
+      void load();
     }
   }, [hasNext, load, medias.length]);
 
   useEffect(() => {
     if (!isLoading.current) {
-      nextCursor.current = undefined;
-      setHasNext(false);
       void load(true);
     }
   }, [album, load]);
@@ -259,8 +257,8 @@ const PhotoGalleryMediaList = ({
     const subscription = AppState.addEventListener(
       'change',
       async nextAppState => {
-        if (nextAppState === 'active') {
-          load(true);
+        if (nextAppState === 'active' && !isLoading.current) {
+          load(true, true);
         }
       },
     );
