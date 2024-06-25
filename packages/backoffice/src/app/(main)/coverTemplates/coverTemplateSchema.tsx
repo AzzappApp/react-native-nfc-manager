@@ -24,6 +24,7 @@ export const textSchema = z.object({
     y: z.number().min(0).max(100),
   }),
   animation: animationSchema,
+  textAlign: z.enum(['left', 'right', 'center']),
 });
 
 export const coverOverlaySchema = z.object({

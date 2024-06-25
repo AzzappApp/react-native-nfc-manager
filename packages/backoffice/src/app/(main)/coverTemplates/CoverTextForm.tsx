@@ -230,6 +230,28 @@ const CoverTextForm = ({ field }: TextFormProps) => {
           })}
           key={textFields.animation.getFieldset().end.key}
         />
+        <TextField
+          label="Text align"
+          sx={{ flex: 1 }}
+          select
+          required
+          defaultValue={'left'}
+          error={!!textFields.textAlign.errors}
+          {...getInputProps(textFields.textAlign, {
+            type: 'text',
+          })}
+          key={textFields.textAlign.key}
+        >
+          <MenuItem key={'left'} value={'left'}>
+            <Typography>Left</Typography>
+          </MenuItem>
+          <MenuItem key={'right'} value={'right'}>
+            <Typography>Right</Typography>
+          </MenuItem>
+          <MenuItem key={'center'} value={'center'}>
+            <Typography>Center</Typography>
+          </MenuItem>
+        </TextField>
       </Box>
     </Box>
   );
