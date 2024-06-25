@@ -1,5 +1,6 @@
-## 0.5.19-canary.18
+## 0.5.19-canary.19
 
+* **fix:**  - **home:** [#3682](https://github.com/AzzappApp/azzapp/pull/3682) manage case on deletion after creation ([#3909](https://github.com/AzzappApp/azzapp/pull/3909))
 * **fix:**  - **Cover:** change default color palette
 * **fix:**  - **CoverTemplate:** color replacement ([#3910](https://github.com/AzzappApp/azzapp/pull/3910))
 * **fix:**  - **android:** [#3900](https://github.com/AzzappApp/azzapp/pull/3900) display duration on videos ([#3903](https://github.com/AzzappApp/azzapp/pull/3903))
