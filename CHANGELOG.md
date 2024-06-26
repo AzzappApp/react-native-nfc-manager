@@ -1,5 +1,6 @@
-## 0.5.19-canary.23
+## 0.5.19-canary.24
 
+* **fix:**  - phone number validation ([#3925](https://github.com/AzzappApp/azzapp/pull/3925))
 * **fix:**  - links ([#3913](https://github.com/AzzappApp/azzapp/pull/3913))
 * **feat:**  - add paymentRedirectUrl field for waitingForPayment subscription ([#3912](https://github.com/AzzappApp/azzapp/pull/3912))
 * **fix:**  - **home:** [#3682](https://github.com/AzzappApp/azzapp/pull/3682) manage case on deletion after creation ([#3909](https://github.com/AzzappApp/azzapp/pull/3909))
