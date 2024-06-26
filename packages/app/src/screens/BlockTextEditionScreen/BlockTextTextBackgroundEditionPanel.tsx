@@ -64,7 +64,7 @@ const BlockTextTextBackgroundEditionPanel = ({
     graphql`
       fragment BlockTextTextBackgroundEditionPanel_profile on Profile {
         moduleBackgrounds {
-          ...StaticMediaList_staticMedias
+          ...ModuleBackgroundList_ModuleBackgrounds
         }
         webCard {
           ...WebCardColorPicker_webCard

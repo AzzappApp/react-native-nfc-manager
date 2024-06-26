@@ -130,9 +130,9 @@ const backOfficeSections: Section[] = [
         roles: [ADMIN],
       },
       {
-        id: 'staticMedias',
-        text: 'Sections backgrounds',
-        href: '/staticMedias',
+        id: 'moduleBackgrounds',
+        text: 'Modules backgrounds',
+        href: '/moduleBackgrounds',
         roles: [ADMIN],
       },
     ],

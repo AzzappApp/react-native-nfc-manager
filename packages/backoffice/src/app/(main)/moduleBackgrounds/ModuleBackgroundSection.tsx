@@ -13,33 +13,29 @@ import {
   useSortable,
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { DotLottiePlayer } from '@dotlottie/react-player';
 import DisableIcon from '@mui/icons-material/HideImage';
 import { IconButton, Box } from '@mui/material';
 import { useState } from 'react';
-import {
-  getCloudinaryAssetURL,
-  getImageURL,
-} from '@azzapp/shared/imagesHelpers';
-import type { StaticMedia } from '@azzapp/data';
+import { getImageURL } from '@azzapp/shared/imagesHelpers';
+import type { ModuleBackground } from '@azzapp/data';
 import type { DragStartEvent, DragEndEvent } from '@dnd-kit/core';
 import type { BoxProps } from '@mui/material';
 
-type StaticMediaSectionProps = Omit<BoxProps, 'onChange'> & {
-  value: StaticMedia[] | null | undefined;
-  onChange: (medias: StaticMedia[]) => void;
+type ModuleBackgroundSectionProps = Omit<BoxProps, 'onChange'> & {
+  value: ModuleBackground[] | null | undefined;
+  onChange: (medias: ModuleBackground[]) => void;
   onSetEnabled: (mediaId: string, enabled: boolean) => void;
 };
 
-const StaticMediaSection = ({
+const ModuleBackgroundSection = ({
   value,
   onChange,
   onSetEnabled,
   ...props
-}: StaticMediaSectionProps) => {
+}: ModuleBackgroundSectionProps) => {
   const medias = value ?? [];
   const sensors = useSensors(useSensor(MouseSensor), useSensor(TouchSensor));
-  const [activeMedia, setActiveMedia] = useState<StaticMedia | null>(null);
+  const [activeMedia, setActiveMedia] = useState<ModuleBackground | null>(null);
 
   function handleDragStart(event: DragStartEvent) {
     setActiveMedia(medias.find(media => media.id === event.active.id) ?? null);
@@ -99,10 +95,10 @@ const StaticMediaSection = ({
   );
 };
 
-export default StaticMediaSection;
+export default ModuleBackgroundSection;
 
 type SortableItemProps = {
-  media: StaticMedia;
+  media: ModuleBackground;
   onSetEnabled?: (id: string, enabled: boolean) => void;
 };
 
@@ -127,37 +123,16 @@ export const SortableItem: React.FC<SortableItemProps> = ({
         position: 'relative',
       }}
     >
-      {media.id.startsWith('l:') ? (
-        <div
-          style={{
-            height: 400,
-            width: 250,
-          }}
-          {...attributes}
-          {...listeners}
-        >
-          <DotLottiePlayer
-            src={getCloudinaryAssetURL(media.id, 'raw')}
-            style={{
-              height: 400,
-              width: 250,
-            }}
-            autoplay
-            loop
-          />
-        </div>
-      ) : (
-        <img
-          src={getImageURL(media.id)}
-          style={{
-            maxWidth: 120,
-            maxHeight: 400,
-            opacity: media.enabled ? 1 : 0.5,
-          }}
-          {...attributes}
-          {...listeners}
-        />
-      )}
+      <img
+        src={getImageURL(media.id)}
+        style={{
+          maxWidth: 120,
+          maxHeight: 400,
+          opacity: media.enabled ? 1 : 0.5,
+        }}
+        {...attributes}
+        {...listeners}
+      />
       <IconButton
         onClick={() => onSetEnabled?.(media.id, !media.enabled)}
         sx={{

@@ -3,7 +3,6 @@ import { connectionFromArray } from 'graphql-relay';
 import { toString } from 'qrcode';
 import {
   db,
-  getStaticMediasByUsage,
   PostTable,
   getCardTemplates,
   getColorPalettes,
@@ -11,9 +10,9 @@ import {
   getRecommendedWebCards,
   WebCardTable,
   getCardStyles,
-  getMediaSuggestions,
   getCoverTemplateTags,
   getCoverTemplateTypes,
+  getModuleBackgrounds,
 } from '@azzapp/data';
 import { shuffle } from '@azzapp/shared/arrayHelpers';
 import { serializeContactCard } from '@azzapp/shared/contactCardHelpers';
@@ -207,27 +206,7 @@ export const Profile: ProfileResolvers = {
       args,
     );
   },
-  coverBackgrounds: async () =>
-    getStaticMediasByUsage('coverBackground').then(medias =>
-      medias.map(media => ({
-        staticMedia: media,
-        assetKind: 'cover',
-      })),
-    ),
-  coverForegrounds: async () =>
-    getStaticMediasByUsage('coverForeground').then(medias =>
-      medias.map(media => ({
-        staticMedia: media,
-        assetKind: 'cover',
-      })),
-    ),
-  moduleBackgrounds: async () =>
-    getStaticMediasByUsage('moduleBackground').then(medias =>
-      medias.map(media => ({
-        staticMedia: media,
-        assetKind: 'module',
-      })),
-    ),
+  moduleBackgrounds: async () => getModuleBackgrounds(),
   coverTemplateTags: () => {
     return getCoverTemplateTags();
   },
@@ -330,49 +309,5 @@ export const Profile: ProfileResolvers = {
       after,
       first,
     });
-  },
-  suggestedMedias: async (
-    profile,
-    { kind, after, first },
-    { auth: { userId }, loaders },
-  ) => {
-    if (!userId || profile.userId !== userId) {
-      return emptyConnection;
-    }
-    const webCard = profile?.webCardId
-      ? await loaders.WebCard.load(profile.webCardId)
-      : null;
-    if (
-      !profile ||
-      webCard?.webCardKind !== 'business' ||
-      webCard.webCardCategoryId == null //profile category Id is mandatory on busness profile
-    ) {
-      return emptyConnection;
-    }
-
-    const limit = first ?? 100;
-    const suggestions = await getMediaSuggestions(
-      profile.webCardId,
-      kind,
-      webCard.webCardCategoryId,
-      webCard.companyActivityId,
-      after,
-      (first ?? 100) + 1,
-    );
-    const sizedSuggestion = suggestions.slice(0, limit);
-    const edges = sizedSuggestion.map(({ cursor, ...media }) => ({
-      node: media,
-      cursor,
-    })) as any[];
-
-    return {
-      edges,
-      pageInfo: {
-        hasNextPage: suggestions.length > limit,
-        hasPreviousPage: false,
-        startCursor: suggestions[0]?.cursor,
-        endCursor: sizedSuggestion[sizedSuggestion.length - 1]?.cursor,
-      },
-    };
   },
 };

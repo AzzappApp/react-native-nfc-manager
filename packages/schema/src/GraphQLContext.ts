@@ -13,12 +13,11 @@ import {
   CoverTemplateTypeTable,
   CoverTemplateTagTable,
   MediaTable,
-  MediaSuggestionTable,
   PostCommentTable,
   PostTable,
   WebCardCategoryTable,
   ProfileTable,
-  StaticMediaTable,
+  ModuleBackgroundTable,
   UserTable,
   getLastWebCardListStatisticsFor,
   getLastProfileListStatisticsFor,
@@ -42,11 +41,9 @@ import type {
   ProfileStatistic,
   Profile,
   WebCardStatistic,
-  StaticMedia,
   WebCardCategory,
   Post,
   PostComment,
-  MediaSuggestion,
   Media,
   CoverTemplate,
   CoverTemplateType,
@@ -60,6 +57,7 @@ import type {
   Payment,
   CompanyActivityType,
   UserSubscription,
+  ModuleBackground,
 } from '@azzapp/data';
 
 import type { Locale } from '@azzapp/i18n';
@@ -135,12 +133,11 @@ const entities = [
   'CoverTemplateType',
   'CoverTemplateTag',
   'Media',
-  'MediaSuggestion',
   'PostComment',
   'Post',
   'WebCardCategory',
   'Profile',
-  'StaticMedia',
+  'ModuleBackground',
   'User',
   'WebCard',
   'Payment',
@@ -161,13 +158,12 @@ type EntityToType<T extends Entity> = {
   CoverTemplateType: CoverTemplateType;
   CoverTemplateTag: CoverTemplateTag;
   Media: Media;
-  MediaSuggestion: MediaSuggestion;
   PostComment: PostComment;
   Post: Post;
   WebCardCategory: WebCardCategory;
   Profile: Profile;
   WebCard: WebCard;
-  StaticMedia: StaticMedia;
+  ModuleBackground: ModuleBackground;
   User: User;
   Payment: Payment;
   PaymentMean: PaymentMean;
@@ -202,13 +198,12 @@ const entitiesTable = {
   CoverTemplatePreview: CoverTemplatePreviewTable,
   CoverTemplateTag: CoverTemplateTagTable,
   Media: MediaTable,
-  MediaSuggestion: MediaSuggestionTable,
   PostComment: PostCommentTable,
   Post: PostTable,
   WebCardCategory: WebCardCategoryTable,
   Profile: ProfileTable,
   WebCard: WebCardTable,
-  StaticMedia: StaticMediaTable,
+  ModuleBackground: ModuleBackgroundTable,
   User: UserTable,
   Payment: PaymentTable,
   PaymentMean: PaymentMeanTable,

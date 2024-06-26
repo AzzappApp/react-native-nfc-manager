@@ -16,13 +16,9 @@ import type {
   MediaImageResolvers,
   MediaResolvers,
   MediaVideoResolvers,
-  StaticMediaResolvers,
 } from './__generated__/types';
 import type { GraphQLContext } from './GraphQLContext';
-import type {
-  StaticMedia as StaticMediaModel,
-  Media as MediaModel,
-} from '@azzapp/data';
+import type { Media as MediaModel } from '@azzapp/data';
 import type DataLoader from 'dataloader';
 
 export type DeferredMedia = MediaModel | string;
@@ -187,69 +183,4 @@ export const MediaVideo: MediaVideoResolvers = {
   uri: uriResolver('video', getVideoUrlForSize),
   thumbnail: uriResolver('image', getVideoThumbnailURL),
   ...MediaResolversBase,
-};
-
-export type StaticMediaResolverBaseType = {
-  staticMedia: StaticMediaModel | string;
-  assetKind: 'cover' | 'module';
-};
-
-const getActualStaticMedia = async (
-  staticMedia: StaticMediaResolverBaseType,
-  loader: DataLoader<string, StaticMediaModel | null>,
-) => {
-  const actualMedia = staticMedia.staticMedia;
-  if (typeof actualMedia === 'string') {
-    const dbMedia = await loader.load(actualMedia);
-    if (!dbMedia) {
-      console.warn(`StaticMedia ${actualMedia} not found`);
-    }
-    return dbMedia;
-  } else {
-    return actualMedia;
-  }
-};
-
-const getStaticMediaId = (staticMedia: StaticMediaResolverBaseType) => {
-  return typeof staticMedia.staticMedia === 'string'
-    ? staticMedia.staticMedia
-    : staticMedia.staticMedia.id;
-};
-
-const getStaticMediaKind = (staticMedia: StaticMediaResolverBaseType) => {
-  const id = getStaticMediaId(staticMedia);
-  if (id.startsWith('s:')) {
-    return 'svg';
-  }
-  return 'png';
-};
-
-export const StaticMedia: StaticMediaResolvers = {
-  id: getStaticMediaId,
-  kind: getStaticMediaKind,
-  uri: (staticMedia, { width, pixelRatio }) => {
-    const cloudinaryId = getStaticMediaId(staticMedia);
-    const kind = getStaticMediaKind(staticMedia);
-    if (kind === 'png') {
-      return getImageURLForSize({
-        id: cloudinaryId,
-        width,
-
-        pixelRatio,
-        pregeneratedSizes:
-          staticMedia.assetKind === 'cover'
-            ? COVER_ASSET_SIZES
-            : MODULE_IMAGES_SIZES,
-        extension: 'png',
-      });
-    } else if (kind === 'svg') {
-      return getCloudinaryAssetURL(cloudinaryId, 'image', 'svg');
-    } else {
-      return getCloudinaryAssetURL(cloudinaryId, 'raw');
-    }
-  },
-  resizeMode: async (staticMedia, _, { loaders }) =>
-    getActualStaticMedia(staticMedia, loaders.StaticMedia).then(
-      staticMedia => staticMedia?.resizeMode ?? 'cover',
-    ),
 };

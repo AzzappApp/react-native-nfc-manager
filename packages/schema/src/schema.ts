@@ -14,6 +14,7 @@ import * as CoverTemplateTagResolvers from './CoverTemplateTagResolvers';
 import * as CoverTemplateTypeResolvers from './CoverTemplateTypeResolvers';
 import { createGraphQLContext } from './GraphQLContext';
 import * as MediaResolvers from './MediaResolvers';
+import * as ModuleBagroundResolvers from './ModuleBagroundResolvers';
 import * as MutationResolvers from './mutations';
 import { Node } from './NodeResolvers';
 import * as PaymentResolvers from './PaymentResolvers';
@@ -36,6 +37,7 @@ const resolvers: Resolvers = {
   ...CoverTemplateTagResolvers,
   ...CoverTemplateTypeResolvers,
   ...MediaResolvers,
+  ...ModuleBagroundResolvers,
   ...MutationResolvers,
   ...PostResolvers,
   ...ProfileResolvers,

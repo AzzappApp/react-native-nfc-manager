@@ -141,7 +141,7 @@ const CompanyActivitiesPage = async ({ searchParams = {} }: Props) => {
         multiline
         rows={1}
         maxRows={3}
-        value={'Activities will impact the suggested media'}
+        value={'Activities will impact the suggested cover template'}
       />
       <CompanyActivitiesList
         companyActivities={companyActivities}

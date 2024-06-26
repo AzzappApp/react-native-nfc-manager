@@ -1,6 +1,6 @@
 import chroma from 'chroma-js';
 import { memo, useCallback, useEffect, useMemo } from 'react';
-import { Image, View } from 'react-native';
+import { View } from 'react-native';
 import {
   useSharedValue,
   withRepeat,
@@ -16,20 +16,20 @@ import {
 import BoxSelectionList from './BoxSelectionList';
 import CardModuleBackgroundImage from './cardModules/CardModuleBackgroundImage';
 import type {
-  StaticMediaList_staticMedias$data,
-  StaticMediaList_staticMedias$key,
-} from '#relayArtifacts/StaticMediaList_staticMedias.graphql';
+  ModuleBackgroundList_ModuleBackgrounds$data,
+  ModuleBackgroundList_ModuleBackgrounds$key,
+} from '#relayArtifacts/ModuleBackgroundList_ModuleBackgrounds.graphql';
 import type { BoxButtonItemInfo } from './BoxSelectionList';
 import type { ArrayItemType } from '@azzapp/shared/arrayHelpers';
 import type { ColorValue } from 'react-native';
 
 import type { ViewProps } from 'react-native-svg/lib/typescript/fabric/utils';
 
-type StaticMediaListProps = ViewProps & {
+type ModuleBackgroundListProps = ViewProps & {
   /**
    * The list of static medias to display.
    */
-  medias: StaticMediaList_staticMedias$key;
+  medias: ModuleBackgroundList_ModuleBackgrounds$key;
   /**
    * the id of the currently selected media.
    */
@@ -56,7 +56,7 @@ type StaticMediaListProps = ViewProps & {
 /**
  * Displays a list of static medias and let the user select one.
  */
-const StaticMediaList = ({
+const ModuleBackgroundList = ({
   medias: mediasKey,
   selectedMedia,
   onSelectMedia,
@@ -65,15 +65,13 @@ const StaticMediaList = ({
   imageRatio = COVER_RATIO,
   testID = 'cover-media-list',
   style,
-}: StaticMediaListProps) => {
-  const staticMedias = useFragment(
+}: ModuleBackgroundListProps) => {
+  const ModuleBackgrounds = useFragment(
     graphql`
-      fragment StaticMediaList_staticMedias on StaticMedia
+      fragment ModuleBackgroundList_ModuleBackgrounds on ModuleBackground
       @relay(plural: true) {
         id
-        kind
-        # we use arbitrary values here, but it should be good enough
-        smallURI: uri(width: 125, pixelRatio: 2)
+        uri
         resizeMode
       }
     `,
@@ -109,9 +107,9 @@ const StaticMediaList = ({
   }, [animationSharedValue]);
 
   const renderItem = useCallback(
-    ({ item, height, width }: BoxButtonItemInfo<StaticMediaItem>) => {
+    ({ item, height, width }: BoxButtonItemInfo<ModuleBackgroundItem>) => {
       return (
-        <StaticMediaListItemMemo
+        <ModuleBackgroundListItemMemo
           item={item}
           imageRatio={imageRatio}
           backgroundColor={visibleBackgroundColor}
@@ -125,7 +123,7 @@ const StaticMediaList = ({
   );
 
   const onSelect = useCallback(
-    (item: StaticMediaItem | null) => {
+    (item: ModuleBackgroundItem | null) => {
       onSelectMedia(item?.id ?? null);
     },
     [onSelectMedia],
@@ -133,7 +131,7 @@ const StaticMediaList = ({
 
   return (
     <BoxSelectionList
-      data={staticMedias}
+      data={ModuleBackgrounds}
       renderItem={renderItem}
       keyExtractor={keyExtractor}
       testID={testID}
@@ -141,21 +139,22 @@ const StaticMediaList = ({
       onSelect={onSelect}
       imageRatio={imageRatio}
       selectedItem={
-        staticMedias.find(item => item.id === selectedMedia) ?? null
+        ModuleBackgrounds.find(item => item.id === selectedMedia) ?? null
       }
       style={style}
     />
   );
 };
 
-type StaticMediaItem = ArrayItemType<StaticMediaList_staticMedias$data>;
+type ModuleBackgroundItem =
+  ArrayItemType<ModuleBackgroundList_ModuleBackgrounds$data>;
 
-const keyExtractor = (item: StaticMediaItem) => item.id;
+const keyExtractor = (item: ModuleBackgroundItem) => item.id;
 
-export default StaticMediaList;
+export default ModuleBackgroundList;
 
-type StaticMediaListItemProps = {
-  item: ArrayItemType<StaticMediaList_staticMedias$data> | null;
+type ModuleBackgroundListItemProps = {
+  item: ArrayItemType<ModuleBackgroundList_ModuleBackgrounds$data> | null;
   imageRatio: number;
   backgroundColor: ColorValue;
   tintColor: ColorValue | string;
@@ -163,14 +162,14 @@ type StaticMediaListItemProps = {
   height: number;
 };
 
-const StaticMediaListItem = ({
+const ModuleBackgroundListItem = ({
   item,
   imageRatio,
   backgroundColor,
   tintColor,
   width,
   height,
-}: StaticMediaListItemProps) => {
+}: ModuleBackgroundListItemProps) => {
   return (
     <View
       style={[
@@ -183,30 +182,20 @@ const StaticMediaListItem = ({
         },
       ]}
     >
-      {item?.kind === 'svg' ? (
+      {item && (
         <CardModuleBackgroundImage
           layout={{
             width,
             height,
           }}
           resizeMode={item.resizeMode}
-          backgroundUri={item.smallURI}
+          backgroundUri={item.uri}
           patternColor={tintColor}
           backgroundOpacity={1}
         />
-      ) : item?.kind === 'png' ? (
-        <Image
-          source={{ uri: item?.smallURI }}
-          style={{
-            height: '100%',
-            backgroundColor,
-            tintColor,
-            aspectRatio: imageRatio,
-          }}
-        />
-      ) : null}
+      )}
     </View>
   );
 };
 
-const StaticMediaListItemMemo = memo(StaticMediaListItem);
+const ModuleBackgroundListItemMemo = memo(ModuleBackgroundListItem);

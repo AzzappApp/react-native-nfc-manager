@@ -17,7 +17,7 @@ generates:
       useImplementingTypes: true
       mappers:
         Profile: '@azzapp/data#Profile as ProfileModel'
-        StaticMedia: ../MediaResolvers#StaticMediaResolverBaseType as StaticMediaModel
+        ModuleBackground: '@azzapp/data#ModuleBackground as ModuleBackgroundModel'
         WebCardCategory: '@azzapp/data#WebCardCategory as WebCardCategoryModel'
         MediaImage: ../MediaResolvers#MediaResolverBaseType as MediaImageModel
         MediaVideo: ../MediaResolvers#MediaResolverBaseType as MediaVideoModel

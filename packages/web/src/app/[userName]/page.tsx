@@ -4,7 +4,7 @@ import {
   getCardModules,
   getMediasByIds,
   getProfilesPostsWithTopComment,
-  getStaticMediasByIds,
+  getModuleBackgroundsByIds,
 } from '@azzapp/data';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
 import {
@@ -55,7 +55,7 @@ const ProfilePage = async ({ params }: ProfilePageProps) => {
   );
 
   const backgrounds = backgroundIds.length
-    ? await getStaticMediasByIds(backgroundIds)
+    ? await getModuleBackgroundsByIds(backgroundIds)
     : [];
 
   if (!media) {

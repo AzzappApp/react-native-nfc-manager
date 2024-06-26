@@ -40,29 +40,6 @@ type MediaImage implements Media {
   uri(pixelRatio: Float, height: Float, width: Float, raw: Boolean, extension: Extension): String!
 }
 
-"""
-Media used in web card edition provided by azzapp
-"""
-type StaticMedia {
-  id: ID!
-  uri(width: Float, pixelRatio: Float): String!
-  kind: StaticMediaKind!
-  resizeMode: StaticMediaResizeMode!
-}
-
-
-enum StaticMediaKind {
-  svg
-  png
-}
-
-enum StaticMediaResizeMode {
-  cover
-  contain
-  center
-  repeat
-  stretch
-}
 
 enum MediaKind {
   video

@@ -159,19 +159,9 @@ type Profile implements Node {
   ): WebCardConnection!
 
   """
-  Return a list of cover backgrounds
-  """
-  coverBackgrounds: [StaticMedia!]!
-
-  """
-  Return a list of cover foregrounds
-  """
-  coverForegrounds: [StaticMedia!]!
-
-  """
   Return a list of module backgrounds
   """
-  moduleBackgrounds: [StaticMedia!]!
+  moduleBackgrounds: [ModuleBackground!]!
 
   """
   Fetches cover template type
@@ -202,14 +192,6 @@ type Profile implements Node {
   Fetches card templates Type
   """
   cardTemplateTypes: [CardTemplateType]
-  """
-  Fetches suggested medias
-  """
-  suggestedMedias(
-    kind: MediaKind!
-    first: Int @max(value: 50)
-    after: String
-  ): MediaConnection!
   """
   Fetches color palettes
   """

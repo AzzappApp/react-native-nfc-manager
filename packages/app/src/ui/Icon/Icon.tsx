@@ -401,12 +401,6 @@ const icons = {
   get stop() {
     return require('./assets/stop.png');
   },
-  get suggested_photo() {
-    return require('./assets/suggested_photo.png');
-  },
-  get suggested_video() {
-    return require('./assets/suggested_video.png');
-  },
   get temperature() {
     return require('./assets/temperature.png');
   },

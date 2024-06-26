@@ -6,25 +6,25 @@ import {
   Card,
 } from '@mui/material';
 import { getImageURL } from '@azzapp/shared/imagesHelpers';
-import type { StaticMedia } from '@azzapp/data';
+import type { ModuleBackground } from '@azzapp/data';
 
-type StaticMediaSelectionListProps = {
+type ModuleBackgroundSelectionListProps = {
   value: string | null | undefined;
   onChange: (value: string | null | undefined) => void;
   error?: boolean;
   helperText?: string | null;
   label: string;
-  staticMedias: StaticMedia[];
+  moduleBackgrounds: ModuleBackground[];
 };
 
-const StaticMediaSelectionList = ({
+const ModuleBackgroundSelectionList = ({
   value,
   onChange,
   error,
   helperText,
   label,
-  staticMedias,
-}: StaticMediaSelectionListProps) => (
+  moduleBackgrounds,
+}: ModuleBackgroundSelectionListProps) => (
   <FormControl error={error}>
     <FormLabel>{label}</FormLabel>
     <Card
@@ -38,25 +38,25 @@ const StaticMediaSelectionList = ({
       }}
       role="listbox"
     >
-      {staticMedias.map(staticMedia => (
+      {moduleBackgrounds.map(moduleBackground => (
         <Box
           component="button"
           type="button"
-          aria-selected={value === staticMedia.id}
-          key={staticMedia.id}
+          aria-selected={value === moduleBackground.id}
+          key={moduleBackground.id}
           sx={{
             width: 120,
             height: 120,
             backgroundColor:
-              value === staticMedia.id ? 'primary.main' : 'transparent',
+              value === moduleBackground.id ? 'primary.main' : 'transparent',
             border: '1px solid #000',
           }}
           onClick={() =>
-            onChange(value === staticMedia.id ? null : staticMedia.id)
+            onChange(value === moduleBackground.id ? null : moduleBackground.id)
           }
         >
           <img
-            src={getImageURL(staticMedia.id)}
+            src={getImageURL(moduleBackground.id)}
             style={{
               width: '100%',
               height: '100%',
@@ -70,4 +70,4 @@ const StaticMediaSelectionList = ({
   </FormControl>
 );
 
-export default StaticMediaSelectionList;
+export default ModuleBackgroundSelectionList;

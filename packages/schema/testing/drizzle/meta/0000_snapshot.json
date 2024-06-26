@@ -54,9 +54,7 @@
       "indexes": {
         "CardModule_webCardId_idx": {
           "name": "CardModule_webCardId_idx",
-          "columns": [
-            "webCardId"
-          ],
+          "columns": ["webCardId"],
           "isUnique": false
         }
       },
@@ -378,10 +376,7 @@
       "foreignKeys": {},
       "compositePrimaryKeys": {
         "WebCardCategoryCompanyActivity_companyActivityId_categoryId_pk": {
-          "columns": [
-            "categoryId",
-            "companyActivityId"
-          ],
+          "columns": ["categoryId", "companyActivityId"],
           "name": "WebCardCategoryCompanyActivity_companyActivityId_categoryId_pk"
         }
       },
@@ -483,19 +478,14 @@
       "indexes": {
         "Follow_followingId_key": {
           "name": "Follow_followingId_key",
-          "columns": [
-            "followingId"
-          ],
+          "columns": ["followingId"],
           "isUnique": false
         }
       },
       "foreignKeys": {},
       "compositePrimaryKeys": {
         "Follow_followerId_followingId_pk": {
-          "columns": [
-            "followerId",
-            "followingId"
-          ],
+          "columns": ["followerId", "followingId"],
           "name": "Follow_followerId_followingId_pk"
         }
       },
@@ -550,58 +540,6 @@
         }
       },
       "indexes": {},
-      "foreignKeys": {},
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {}
-    },
-    "MediaSuggestion": {
-      "name": "MediaSuggestion",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "text(24)",
-          "primaryKey": true,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "mediaId": {
-          "name": "mediaId",
-          "type": "text(26)",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "webCardCategoryId": {
-          "name": "webCardCategoryId",
-          "type": "text(24)",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "companyActivityId": {
-          "name": "companyActivityId",
-          "type": "text(24)",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        }
-      },
-      "indexes": {
-        "MediaSuggestion_webCardCategoryId_key": {
-          "name": "MediaSuggestion_webCardCategoryId_key",
-          "columns": [
-            "webCardCategoryId"
-          ],
-          "isUnique": false
-        },
-        "MediaSuggestion_companyActivityId_key": {
-          "name": "MediaSuggestion_companyActivityId_key",
-          "columns": [
-            "companyActivityId"
-          ],
-          "isUnique": false
-        }
-      },
       "foreignKeys": {},
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
@@ -672,9 +610,7 @@
       "indexes": {
         "PostComment_postId_idx": {
           "name": "PostComment_postId_idx",
-          "columns": [
-            "postId"
-          ],
+          "columns": ["postId"],
           "isUnique": false
         }
       },
@@ -718,20 +654,14 @@
       "indexes": {
         "PostReaction_webCardId_key": {
           "name": "PostReaction_webCardId_key",
-          "columns": [
-            "webCardId"
-          ],
+          "columns": ["webCardId"],
           "isUnique": false
         }
       },
       "foreignKeys": {},
       "compositePrimaryKeys": {
         "PostReaction_postId_webCardId_reactionKind_pk": {
-          "columns": [
-            "postId",
-            "reactionKind",
-            "webCardId"
-          ],
+          "columns": ["postId", "reactionKind", "webCardId"],
           "name": "PostReaction_postId_webCardId_reactionKind_pk"
         }
       },
@@ -841,9 +771,7 @@
       "indexes": {
         "Post_webCardId_idx": {
           "name": "Post_webCardId_idx",
-          "columns": [
-            "webCardId"
-          ],
+          "columns": ["webCardId"],
           "isUnique": false
         }
       },
@@ -1048,26 +976,17 @@
       "indexes": {
         "Profile_user_webcard_key": {
           "name": "Profile_user_webcard_key",
-          "columns": [
-            "userId",
-            "webCardId"
-          ],
+          "columns": ["userId", "webCardId"],
           "isUnique": true
         },
         "Profile_webCardId_key": {
           "name": "Profile_webCardId_key",
-          "columns": [
-            "webCardId",
-            "profileRole"
-          ],
+          "columns": ["webCardId", "profileRole"],
           "isUnique": false
         },
         "Profile_promotedAsOwner_key": {
           "name": "Profile_promotedAsOwner_key",
-          "columns": [
-            "webCardId",
-            "promotedAsOwner"
-          ],
+          "columns": ["webCardId", "promotedAsOwner"],
           "isUnique": false
         }
       },
@@ -1114,20 +1033,13 @@
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     },
-    "StaticMedia": {
-      "name": "StaticMedia",
+    "ModuleBackground": {
+      "name": "ModuleBackground",
       "columns": {
         "id": {
           "name": "id",
           "type": "text(191)",
           "primaryKey": true,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "usage": {
-          "name": "usage",
-          "type": "text",
-          "primaryKey": false,
           "notNull": true,
           "autoincrement": false
         },
@@ -1249,16 +1161,12 @@
       "indexes": {
         "User_email_key": {
           "name": "User_email_key",
-          "columns": [
-            "email"
-          ],
+          "columns": ["email"],
           "isUnique": true
         },
         "User_phoneNumber_key": {
           "name": "User_phoneNumber_key",
-          "columns": [
-            "phoneNumber"
-          ],
+          "columns": ["phoneNumber"],
           "isUnique": true
         }
       },
@@ -1305,10 +1213,7 @@
       "foreignKeys": {},
       "compositePrimaryKeys": {
         "WebCardStatistic_webCardId_day_pk": {
-          "columns": [
-            "day",
-            "webCardId"
-          ],
+          "columns": ["day", "webCardId"],
           "name": "WebCardStatistic_webCardId_day_pk"
         }
       },
@@ -1345,10 +1250,7 @@
       "foreignKeys": {},
       "compositePrimaryKeys": {
         "ProfileStatistic_profileId_day_pk": {
-          "columns": [
-            "day",
-            "profileId"
-          ],
+          "columns": ["day", "profileId"],
           "name": "ProfileStatistic_profileId_day_pk"
         }
       },
@@ -1601,16 +1503,12 @@
       "indexes": {
         "WebCard_userName_key": {
           "name": "WebCard_userName_key",
-          "columns": [
-            "userName"
-          ],
+          "columns": ["userName"],
           "isUnique": true
         },
         "WebCard_search": {
           "name": "WebCard_search",
-          "columns": [
-            "userName"
-          ],
+          "columns": ["userName"],
           "isUnique": false
         }
       },
@@ -1669,22 +1567,14 @@
       "indexes": {
         "Report_targetType_key": {
           "name": "Report_targetType_key",
-          "columns": [
-            "targetType",
-            "createdAt",
-            "treatedBy"
-          ],
+          "columns": ["targetType", "createdAt", "treatedBy"],
           "isUnique": false
         }
       },
       "foreignKeys": {},
       "compositePrimaryKeys": {
         "Report_targetId_userId_targetType_pk": {
-          "columns": [
-            "targetId",
-            "targetType",
-            "userId"
-          ],
+          "columns": ["targetId", "targetType", "userId"],
           "name": "Report_targetId_userId_targetType_pk"
         }
       },
