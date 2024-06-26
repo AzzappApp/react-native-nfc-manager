@@ -1,4 +1,3 @@
-import { isValidPhoneNumber } from 'libphonenumber-js';
 import { memo, useCallback, useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { StyleSheet, View, useColorScheme } from 'react-native';
@@ -289,15 +288,6 @@ const SocialInputComponent = ({
               defaultMessage: 'The Website url is not valid.',
               description:
                 'Error toast message when a website url sociallink is not valid.',
-            });
-          }
-        },
-        phone: (text: string) => {
-          if (!isValidPhoneNumber(text)) {
-            return intl.formatMessage({
-              defaultMessage: 'The phone number is not valid.',
-              description:
-                'Error toast message when a phone number sociallink is not valid.',
             });
           }
         },
