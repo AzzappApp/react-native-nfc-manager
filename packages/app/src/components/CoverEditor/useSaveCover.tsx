@@ -72,9 +72,12 @@ const useSaveCover = (
     try {
       ({ path, kind } = await createCoverMedia(coverEditorState));
     } catch (error) {
-      setSavingStatus('error');
-      setError(error);
-      return;
+      unstable_batchedUpdates(() => {
+        setSavingStatus('error');
+        setError(error);
+        setProgressIndicator(null);
+      });
+      throw error;
     }
 
     const { uploadURL, uploadParameters } = await uploadSign({

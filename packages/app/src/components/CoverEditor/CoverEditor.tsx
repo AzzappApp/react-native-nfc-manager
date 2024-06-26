@@ -9,6 +9,7 @@ import {
   useRef,
   useState,
 } from 'react';
+import { FormattedMessage } from 'react-intl';
 import { StyleSheet, View } from 'react-native';
 import Animated, {
   useAnimatedStyle,
@@ -557,7 +558,12 @@ const CoverEditorCore = (
             padding: 20,
           }}
         >
-          <Text>{error?.message ?? error?.toString()}</Text>
+          <Text>
+            <FormattedMessage
+              defaultMessage="An error occurred, do not close Azzapp while saving your cover"
+              description="Save Cover - Error message show when there is an issue saving the cover"
+            />
+          </Text>
           <Button onPress={reset} label="Ok" />
         </Container>
       </ScreenModal>
