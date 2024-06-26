@@ -1,5 +1,8 @@
-## 0.5.19-canary.24
+## 0.5.19-canary.25
 
+* **perf:**  - **android:** [#3866](https://github.com/AzzappApp/azzapp/pull/3866) avoid lots of rerenders on scroll ([#3928](https://github.com/AzzappApp/azzapp/pull/3928))
+* **fix:**  - add readable error message, avoid coverEditor to unmount while still having the error modal up causing instability ([#3932](https://github.com/AzzappApp/azzapp/pull/3932))
+* **feat:**  - apply cover templates ([#3924](https://github.com/AzzappApp/azzapp/pull/3924))
 * **fix:**  - phone number validation ([#3925](https://github.com/AzzappApp/azzapp/pull/3925))
 * **fix:**  - links ([#3913](https://github.com/AzzappApp/azzapp/pull/3913))
 * **feat:**  - add paymentRedirectUrl field for waitingForPayment subscription ([#3912](https://github.com/AzzappApp/azzapp/pull/3912))
