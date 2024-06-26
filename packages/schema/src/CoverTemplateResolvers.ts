@@ -8,8 +8,8 @@ export const CoverTemplate: CoverTemplateResolvers = {
   tags: ({ tags }) => {
     return getCoverTemplateTagsIn(tags);
   },
-  type: async ({ type }, _, { loaders }) => {
-    return loaders.CoverTemplateType.load(type);
+  type: async ({ typeId }, _, { loaders }) => {
+    return loaders.CoverTemplateType.load(typeId);
   },
   preview: async ({ previewId }) => {
     return {
@@ -18,4 +18,7 @@ export const CoverTemplate: CoverTemplateResolvers = {
     };
   },
   lottie: async ({ lottieId }) => getCloudinaryAssetURL(lottieId, 'raw'),
+  requiredMedias: async ({ params }) => {
+    return params?.medias?.length ?? 0;
+  },
 };

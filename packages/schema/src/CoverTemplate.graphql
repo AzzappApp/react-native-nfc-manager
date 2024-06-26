@@ -15,8 +15,8 @@ type CoverTemplate implements Node {
   tags: [CoverTemplateTag!]!
   preview: Media!
   lottie: String!
+  requiredMedias: Int!
 }
-
 
 # type CoverTemplateTextLayer {
 
@@ -48,6 +48,16 @@ type CoverTemplateConnection {
   """
   edges: [CoverTemplateEdge]
 }
+type CoverTemplateByType {
+  """
+  The ID of an object
+  """
+  id: ID!
+  label: String!
+  order: Int!
+  # Then, add the templates array as a field of type CoverTemplate.
+  data: [CoverTemplate]!
+}
 
 """
 An edge in a connection.
@@ -56,7 +66,7 @@ type CoverTemplateEdge {
   """
   The item at the end of the edge
   """
-  node: CoverTemplate
+  node: CoverTemplateByType
 
   """
   A cursor for use in pagination

@@ -1,29 +1,34 @@
-import { useCallback } from 'react';
-import { FlatList, Image, ScrollView, StyleSheet, View } from 'react-native';
-import Badge from '#ui/Badge';
+import { Image } from 'expo-image';
+import { memo, useCallback } from 'react';
+import { FlatList, StyleSheet, View } from 'react-native';
+import { colors } from '@azzapp/shared/colorsHelpers';
+import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import Icon from '#ui/Icon';
 import PressableNative from '#ui/PressableNative';
 import Text from '#ui/Text';
-import type { CoverTemplatePreviewItem } from './useCoverTemplates';
+import type {
+  CoverTemplateTypeListItem,
+  CoverTemplatePreview,
+} from './useCoverTemplates';
 import type { ListRenderItemInfo } from 'react-native';
 
 type CoverTemplateTypePreviewsProps = {
-  label: string;
-  previews: CoverTemplatePreviewItem[];
-  onSelect: (preview: CoverTemplatePreviewItem) => void;
+  template: CoverTemplateTypeListItem;
+  onSelect: (preview: CoverTemplatePreview) => void;
 };
 
-export const CoverTemplateTypePreviews = ({
-  label,
-  previews,
+const CoverTemplateTypePreviews = ({
+  template,
   onSelect,
 }: CoverTemplateTypePreviewsProps) => {
+  const styles = useStyleSheet(styleSheet);
+
   const renderItem = useCallback(
-    ({ item }: ListRenderItemInfo<CoverTemplatePreviewItem>) => {
+    ({ item }: ListRenderItemInfo<CoverTemplatePreview>) => {
       return (
         <CoverTemplateTypePreview
-          preview={item}
-          onSelect={() => onSelect(item)}
+          coverTemplatePreview={item}
+          onSelect={onSelect}
         />
       );
     },
@@ -32,79 +37,88 @@ export const CoverTemplateTypePreviews = ({
 
   return (
     <View style={styles.container}>
-      <Text variant="smallbold" style={styles.label}>
-        {label}
-      </Text>
-      <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-        <View style={styles.content}>
-          <FlatList
-            testID="cover-editor-template-list"
-            accessibilityRole="list"
-            data={previews}
-            contentContainerStyle={styles.previews}
-            keyExtractor={item => item.media.uri}
-            renderItem={renderItem}
-            directionalLockEnabled
-            showsVerticalScrollIndicator={false}
-            horizontal
-          />
-        </View>
-      </ScrollView>
+      <View style={styles.section}>
+        <Text variant="large">{template.label}</Text>
+      </View>
+      <FlatList
+        testID="cover-editor-template-list"
+        accessibilityRole="list"
+        data={template.data as CoverTemplatePreview[]} //force type due to extract from relay issue
+        contentContainerStyle={styles.previews}
+        keyExtractor={keyExtractor}
+        renderItem={renderItem}
+        showsHorizontalScrollIndicator={false}
+        horizontal
+        ItemSeparatorComponent={Separator}
+      />
     </View>
   );
 };
+const Separator = () => <View style={styles.separator} />;
+const keyExtractor = (item: CoverTemplatePreview) => item.id;
 
-const CoverTemplateTypePreview = ({
-  preview,
+export default memo(CoverTemplateTypePreviews);
+
+type ListItemComponentProps = {
+  coverTemplatePreview: CoverTemplatePreview;
+  onSelect: (item: CoverTemplatePreview) => void;
+};
+
+const ListItemComponent = ({
+  coverTemplatePreview,
   onSelect,
-}: {
-  preview: CoverTemplatePreviewItem;
-  onSelect: () => void;
-}) => {
-  const { media } = preview;
+}: ListItemComponentProps) => {
+  const styles = useStyleSheet(styleSheet);
+  const onPress = useCallback(
+    () => onSelect(coverTemplatePreview), //should maybe use only the id
+    [coverTemplatePreview, onSelect],
+  );
+
   return (
-    <PressableNative
-      key={preview.coverTemplateId}
-      style={styles.preview}
-      onPress={onSelect}
-    >
+    <PressableNative style={styles.preview} onPress={onPress}>
       <Image
-        source={{ uri: media.kind === 'video' ? media.thumbnail : media.uri }}
+        source={{
+          uri:
+            coverTemplatePreview.preview.video?.thumbnail ??
+            coverTemplatePreview.preview.image?.uri,
+        }}
         style={styles.previewMedia}
       />
-      <Badge style={styles.badge}>
-        <View style={styles.badgeElements}>
-          <Icon size={16} icon="landscape" />
-          {/*TODO add nbMedia in database*/}
-          <Text variant="xsmall">{5}</Text>
+      {coverTemplatePreview.requiredMedias != null && (
+        <View style={styles.badge}>
+          <View style={styles.badgeElements}>
+            <Icon size={16} icon="landscape" />
+            <Text variant="xsmall">{coverTemplatePreview.requiredMedias}</Text>
+          </View>
         </View>
-      </Badge>
+      )}
     </PressableNative>
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    marginTop: 20,
-    paddingBottom: 10,
+const CoverTemplateTypePreview = memo(ListItemComponent);
+
+const styleSheet = createStyleSheet(appearance => ({
+  section: {
+    height: 53,
+    paddingTop: 20,
+    paddingLeft: 20,
   },
-  label: {
-    marginLeft: 20,
-    fontSize: 16,
+  container: {
+    height: 298,
   },
   content: {
     paddingHorizontal: 20,
     marginTop: 10,
   },
   previews: {
-    display: 'flex',
-    flexDirection: 'row',
-    gap: 10,
+    paddingLeft: 20,
+    paddingRight: 20,
   },
   preview: {
     borderRadius: 24,
+    height: 240,
     overflow: 'hidden',
-    position: 'relative',
   },
   previewMedia: {
     width: 150,
@@ -114,10 +128,20 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: 10,
     left: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 8,
+    paddingVertical: 5,
+    backgroundColor: appearance === 'light' ? colors.white : colors.black,
+    borderRadius: 28,
   },
   badgeElements: {
     display: 'flex',
     flexDirection: 'row',
     gap: 5,
   },
+}));
+
+const styles = StyleSheet.create({
+  separator: { width: 10 },
 });

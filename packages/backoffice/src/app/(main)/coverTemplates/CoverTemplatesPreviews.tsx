@@ -90,13 +90,13 @@ const CoverTemplatePreviews = ({
               component="img"
               title={`preview-${params.id}`}
               image={
-                preview.media?.startsWith('v')
+                preview.mediaId?.startsWith('v')
                   ? getVideoThumbnailURL({
-                      id: preview.media,
+                      id: preview.mediaId,
                       width: 37.5,
                       height: 60,
                     })
-                  : getImageURLForSize({ id: preview.media || '' })
+                  : getImageURLForSize({ id: preview.mediaId || '' })
               }
             />
             <IconButton

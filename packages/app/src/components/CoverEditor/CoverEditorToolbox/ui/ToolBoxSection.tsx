@@ -30,7 +30,6 @@ const ToolBoxSection = ({ label, icon, onPress }: Props) => {
 
 export const stylesToolbox = createStyleSheet(appearance => ({
   toolbox: {
-    display: 'flex',
     paddingVertical: 8,
     flexDirection: 'column',
     justifyContent: 'center',

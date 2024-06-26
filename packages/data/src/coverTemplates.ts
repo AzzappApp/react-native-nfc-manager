@@ -1,6 +1,9 @@
-import { and, asc, eq, gt, isNull, sql } from 'drizzle-orm';
+import { and, eq, sql } from 'drizzle-orm';
 import { CoverTemplatePreviewTable } from '#coverTemplatePreview';
-import { CoverTemplateTypeTable } from '#coverTemplateType';
+import {
+  CoverTemplateTypeTable,
+  type CoverTemplateType,
+} from '#coverTemplateType';
 import db, { cols } from './db';
 import { createId } from './helpers/createId';
 import type {
@@ -55,6 +58,7 @@ export type SocialLinks = {
 };
 
 export type CoverTemplateParams = {
+  medias: Array<{ id: string }> | null;
   textLayers: CoverText[];
   overlayLayers: CoverOverlay[];
   linksLayer: SocialLinks;
@@ -65,7 +69,7 @@ export const CoverTemplateTable = cols.table('CoverTemplate', {
   name: cols.defaultVarchar('name').notNull(),
   order: cols.int('order').notNull().default(1),
   tags: cols.json('tags').$type<string[]>().notNull(),
-  type: cols.cuid('type').notNull(),
+  typeId: cols.cuid('typeId').notNull(),
   lottieId: cols.cuid('lottieId').notNull(),
   previewId: cols.cuid('previewId').notNull(),
   colorPaletteId: cols.cuid('colorPaletteId').notNull(),
@@ -88,53 +92,11 @@ export const getCoverTemplateById = (id: string) =>
     .where(eq(CoverTemplateTable.id, id))
     .then(rows => rows[0] ?? null);
 
-/**
- * Return a list of cover templates. filtered by profile kind and template kind
- * @param webCardKind the webCard kind to filter by
- * @param templateKind the template kind to filter by
- * @param randomSeed the random seed to use for random ordering
- * @param offset the offset to use for pagination
- * @param limit the limit to use for pagination
- * @return {*}  {Promise<Array<CoverTemplate & { cursor: string }>>}
- */
-export const getCoverTemplates = async (
-  webCardKind: 'business' | 'personal',
-  templateKind: 'others' | 'people' | 'video',
-  randomSeed: string,
-  offset?: string | null,
-  limit?: number | null,
-) => {
-  const query = sql`
-    SELECT *, RAND(${randomSeed}) as cursor
-    FROM CoverTemplate`;
-
-  // const query = sql`
-  //   SELECT *, RAND(${randomSeed}) as cursor
-  //   FROM CoverTemplate
-  //   WHERE ${
-  //     webCardKind === 'business'
-  //       ? CoverTemplateTable.businessEnabled
-  //       : CoverTemplateTable.personalEnabled
-  //   } = 1
-  //   AND ${CoverTemplateTable.kind} = ${templateKind}`;
-  if (offset) {
-    query.append(sql` HAVING cursor > ${offset} `);
-  }
-  query.append(sql` ORDER BY cursor `);
-  if (limit) {
-    query.append(sql` LIMIT ${limit} `);
-  }
-
-  return (await db.execute(query)).rows as Array<
-    CoverTemplate & { cursor: string }
-  >;
-};
-
 export const getCoverTemplatesByType = (typeId: string) =>
   db
     .select()
     .from(CoverTemplateTable)
-    .where(eq(CoverTemplateTable.type, typeId));
+    .where(eq(CoverTemplateTable.typeId, typeId));
 
 export const getCoverTemplatesByTypeAndTag = async (
   typeId: string,
@@ -150,14 +112,14 @@ export const getCoverTemplatesByTypeAndTag = async (
   return executed.rows as CoverTemplate[];
 };
 
-export const getCoverTemplatesWithType = async ({
+export const getCoverTemplatesByTypes = async ({
   limit,
   cursor,
   tagId,
   companyActivityId,
 }: {
   limit: number;
-  cursor?: string;
+  cursor?: number;
   tagId?: string;
   companyActivityId?: string | null;
 }) => {
@@ -168,42 +130,139 @@ export const getCoverTemplatesWithType = async ({
     filters.push(sql.raw(contains));
   }
 
-  const request = db
+  //KEEP THE SQL command temporary until the feature is validated
+  // let query = sql`
+  // SELECT
+  //    t.id, t.name, t.tags, COALESCE(t.previewId, c.mediaId) AS previewId, t.typeId, t.order, t.colorPaletteId, t.lottieId, t.params, t.enabled, tt.order AS typeOrder, tt.labelKey
+  // FROM (
+  //   SELECT  ctt.*
+  //   FROM CoverTemplateType ctt
+  //   JOIN CoverTemplate ct ON ctt.id = ct.typeId
+  //   WHERE ctt.enabled = TRUE
+  //   GROUP BY ctt.id
+  //   ORDER BY ctt.order
+  //   LIMIT ${limit}
+  //   OFFSET ${cursor ?? 0}
+  // ) AS tt
+  // JOIN CoverTemplate AS t ON tt.id = t.typeId and t.enabled = TRUE
+  // LEFT JOIN CoverTemplatePreview AS c ON tt.id = c.coverTemplateId AND c.companyActivityId = ${companyActivityId}`;
+
+  // // Dynamically append filters if any
+  // if (filters.length > 0) {
+  //   query = sql`${query} WHERE ${sql.join(filters, sql.raw(' AND '))}`;
+  // }
+
+  // // Finalize the query with ordering
+  // query = sql`${query} ORDER BY tt.order, t.order`;
+  // const rows = (await db.execute(query)).rows as Array<
+  //   CoverTemplate & { typeOrder: number; labelKey: string }
+  // >;
+
+  //doing it with drizzle orm
+
+  const coverTemplateTypeSubquery = db
     .select({
-      CoverTemplate: CoverTemplateTable,
-      CoverTemplateType: CoverTemplateTypeTable,
-      CoverTemplatePreviewMediaId: CoverTemplatePreviewTable.media,
-      cursor: CoverTemplateTable.id,
+      id: CoverTemplateTypeTable.id,
+      typeOrder: CoverTemplateTypeTable.order,
+      labelKey: CoverTemplateTypeTable.labelKey,
+    })
+    .from(CoverTemplateTypeTable)
+    .innerJoin(
+      CoverTemplateTable,
+      eq(CoverTemplateTypeTable.id, CoverTemplateTable.typeId),
+    )
+    .where(eq(CoverTemplateTypeTable.enabled, true))
+    .groupBy(CoverTemplateTypeTable.id)
+    .orderBy(CoverTemplateTypeTable.order)
+    .limit(limit)
+    .offset(cursor ?? 0)
+    .as('coverTemplateTypeSubquery');
+
+  const queryDrizzle = db
+    .select({
+      id: CoverTemplateTable.id,
+      name: CoverTemplateTable.name,
+      tags: CoverTemplateTable.tags,
+      previewId: sql`COALESCE(${CoverTemplateTable.previewId}, ${CoverTemplatePreviewTable.mediaId})`,
+      typeId: CoverTemplateTable.typeId,
+      order: CoverTemplateTable.order,
+      colorPaletteId: CoverTemplateTable.colorPaletteId,
+      lottieId: CoverTemplateTable.lottieId,
+      params: CoverTemplateTable.params,
+      enabled: CoverTemplateTable.enabled,
+      typeOrder: coverTemplateTypeSubquery.typeOrder,
+      labelKey: coverTemplateTypeSubquery.labelKey,
     })
     .from(CoverTemplateTable)
     .innerJoin(
-      CoverTemplateTypeTable,
-      eq(CoverTemplateTypeTable.id, CoverTemplateTable.type),
+      coverTemplateTypeSubquery,
+      eq(coverTemplateTypeSubquery.id, CoverTemplateTable.typeId),
     )
     .leftJoin(
       CoverTemplatePreviewTable,
-      eq(CoverTemplateTable.id, CoverTemplatePreviewTable.coverTemplateId),
-    )
-    .where(
       and(
-        ...filters,
+        eq(
+          coverTemplateTypeSubquery.id,
+          CoverTemplatePreviewTable.coverTemplateId,
+        ),
         companyActivityId
           ? eq(CoverTemplatePreviewTable.companyActivityId, companyActivityId)
-          : isNull(CoverTemplatePreviewTable.companyActivityId),
+          : undefined,
       ),
-    )
-    .orderBy((asc(CoverTemplateTypeTable.order), asc(CoverTemplateTable.order)))
-    .limit(limit);
+    );
 
-  const rows = await (cursor
-    ? request.having(item => gt(item.cursor, cursor))
-    : request);
+  if (filters.length > 0) {
+    queryDrizzle.where(sql`${sql.join(filters, sql.raw(' AND '))}`);
+  }
 
-  return rows.map(({ CoverTemplate, CoverTemplatePreviewMediaId, cursor }) => ({
-    ...CoverTemplate,
-    previewId: CoverTemplatePreviewMediaId ?? CoverTemplate.previewId,
-    cursor,
-  }));
+  queryDrizzle.orderBy(
+    coverTemplateTypeSubquery.typeOrder,
+    CoverTemplateTable.order,
+  );
+
+  const rows = await queryDrizzle.execute();
+
+  const groupedAndOrdered = rows.reduce(
+    (acc, curr) => {
+      // Initialize the group if it doesn't exist
+      if (!acc[curr.typeId]) {
+        acc[curr.typeId] = {
+          id: curr.typeId,
+          order: curr.typeOrder,
+          enabled: true,
+          labelKey: curr.labelKey,
+          data: [],
+        };
+      }
+
+      // Push the current template into the correct group
+      acc[curr.typeId].data.push({
+        id: curr.id,
+        name: curr.name,
+        tags: curr.tags,
+        previewId: curr.previewId as string,
+        order: curr.order,
+        colorPaletteId: curr.colorPaletteId,
+        lottieId: curr.lottieId,
+        params: curr.params,
+        enabled: curr.enabled,
+        typeId: curr.typeId,
+      });
+
+      return acc;
+    },
+    {} as Record<
+      string,
+      CoverTemplateType & { data: Array<CoverTemplate | null> }
+    >,
+  );
+
+  return Object.values(groupedAndOrdered).filter(a => a.data.length > 0);
+
+  // Optionally, sort templates within each group if needed
+  // return Object.values(groupedAndOrdered).forEach(group => {
+  //   group.templates.sort((a, b) => a.order - b.order);
+  // });
 };
 
 /**

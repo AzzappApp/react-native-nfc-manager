@@ -57,7 +57,7 @@ const getQuery = (search: string | null, filters: Filters) => {
     .from(CoverTemplateTable)
     .innerJoin(
       CoverTemplateTypeTable,
-      eq(CoverTemplateTypeTable.id, CoverTemplateTable.type),
+      eq(CoverTemplateTypeTable.id, CoverTemplateTable.typeId),
     )
     .innerJoin(
       LabelTable,

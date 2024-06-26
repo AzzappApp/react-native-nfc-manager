@@ -1,12 +1,13 @@
+import { useCallback } from 'react';
 import { useIntl } from 'react-intl';
-import { ScrollView, View } from 'react-native';
+import { ScrollView, View, StyleSheet } from 'react-native';
 import { graphql, useFragment } from 'react-relay';
 import RoundedMenuComponent from '#ui/RoundedMenuComponent';
 import type { CoverTemplateTagSelector_tags$key } from '#relayArtifacts/CoverTemplateTagSelector_tags.graphql';
 
 type Props = {
   tagsKey: CoverTemplateTagSelector_tags$key;
-  onSelect: (labelId: string | null) => void;
+  onSelect: (tagId: string | null) => void;
   selected: string | null;
 };
 
@@ -26,39 +27,47 @@ const CoverTemplateTagSelector = (props: Props) => {
     tagsKey,
   );
 
+  const clearSelected = useCallback(() => {
+    onSelect(null);
+  }, [onSelect]);
+
   return (
-    <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-      <View
-        style={{
-          display: 'flex',
-          gap: 10,
-          flexDirection: 'row',
-          paddingHorizontal: 20,
-        }}
+    <View style={styles.container}>
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={styles.contentContainerScrollView}
       >
         <RoundedMenuComponent
-          selected={selected === null}
+          selected={selected == null}
+          id={null}
           label={intl.formatMessage({
             defaultMessage: 'All',
             description: 'CoverTemplateTagSelector - All',
           })}
-          onPress={() => {
-            onSelect(null);
-          }}
+          onSelect={clearSelected}
         />
         {tags?.map(({ id, label }) => (
           <RoundedMenuComponent
-            key={id}
-            selected={id === selected}
+            key={`covertempaltetagselector_${id}`}
+            id={id}
+            selected={selected === id}
             label={label!}
-            onPress={() => {
-              onSelect(id);
-            }}
+            onSelect={onSelect}
           />
         ))}
-      </View>
-    </ScrollView>
+      </ScrollView>
+    </View>
   );
 };
 
 export default CoverTemplateTagSelector;
+
+const styles = StyleSheet.create({
+  contentContainerScrollView: {
+    paddingHorizontal: 20,
+    paddingTop: 10,
+    gap: 10,
+  },
+  container: { height: 52 },
+});

@@ -106,7 +106,7 @@ const CoverTemplateTagsPage = async ({ searchParams = {} }: Props) => {
       return db
         .select({ count: sql`count(*)`.mapWith(Number) })
         .from(CoverTemplateTable)
-        .where(eq(CoverTemplateTable.type, coverTemplateTag.id))
+        .where(eq(CoverTemplateTable.typeId, coverTemplateTag.id))
         .then(res => res[0].count);
     }),
   );

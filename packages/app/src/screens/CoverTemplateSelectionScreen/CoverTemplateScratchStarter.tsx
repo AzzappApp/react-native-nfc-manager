@@ -11,9 +11,8 @@ import { colors } from '#theme';
 import Icon from '#ui/Icon';
 import PressableNative from '#ui/PressableNative';
 import Text from '#ui/Text';
-import type { ViewProps } from 'react-native';
 
-type CoverTemplateScratchStartersProps = ViewProps & {
+type CoverTemplateScratchStartersProps = {
   onColorSelect: (color: ColorPaletteColor) => void;
   cardColors: ColorPalette | null | undefined;
 };
@@ -21,10 +20,9 @@ type CoverTemplateScratchStartersProps = ViewProps & {
 const CoverTemplateScratchStarters = ({
   cardColors,
   onColorSelect,
-  ...props
 }: CoverTemplateScratchStartersProps) => {
   return (
-    <View {...props}>
+    <View style={styles.container}>
       <Text variant="smallbold" style={styles.label}>
         <FormattedMessage
           defaultMessage="Start from scratch"
@@ -57,13 +55,14 @@ const CoverTemplateScratchStarters = ({
 export default CoverTemplateScratchStarters;
 
 const styles = StyleSheet.create({
+  container: {
+    paddingLeft: 20,
+    paddingTop: 20,
+  },
   label: {
-    marginTop: 20,
-    marginLeft: 20,
     fontSize: 16,
   },
   scratchs: {
-    marginLeft: 20,
     paddingVertical: 10,
     display: 'flex',
     flexDirection: 'row',

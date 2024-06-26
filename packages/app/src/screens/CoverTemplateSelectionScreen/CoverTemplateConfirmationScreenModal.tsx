@@ -1,16 +1,18 @@
+import { ResizeMode, Video } from 'expo-av';
 import { Image } from 'expo-image';
 import { useIntl } from 'react-intl';
 import { StyleSheet, View } from 'react-native';
 import { COVER_RATIO } from '@azzapp/shared/coverHelpers';
 import { colors } from '#theme';
 import ScreenModal from '#components/ScreenModal';
+import useScreenInsets from '#hooks/useScreenInsets';
 import Button from '#ui/Button';
 import IconButton from '#ui/IconButton';
 import SafeAreaView from '#ui/SafeAreaView';
-import type { CoverTemplatePreviewItem } from './useCoverTemplates';
+import type { CoverTemplatePreview } from './useCoverTemplates';
 
 type CoverTemplateConfirmationScreenModalProps = {
-  template: CoverTemplatePreviewItem | null;
+  template: CoverTemplatePreview | null;
   onClose: () => void;
   onConfirm: () => void;
 };
@@ -22,6 +24,7 @@ const CoverTemplateConfirmationScreenModal = ({
 }: CoverTemplateConfirmationScreenModalProps) => {
   const intl = useIntl();
 
+  const { bottom } = useScreenInsets();
   return (
     <ScreenModal visible={!!template}>
       <SafeAreaView style={styles.container}>
@@ -34,22 +37,41 @@ const CoverTemplateConfirmationScreenModal = ({
           />
         </View>
         <View style={styles.content}>
-          {template && (
+          {template?.preview?.video?.uri ? (
+            //try to use MediaVideoRenderer here, but did not work and,
+            // having to pass requestedSize and id in source does not make sens has the uri is already optimized for a preview
+            // we can do it later, @Upmitt need this feature asap
+            <Video
+              source={{ uri: template.preview.video.uri }}
+              isMuted={false}
+              isLooping
+              style={styles.template}
+              resizeMode={ResizeMode.CONTAIN}
+              shouldPlay
+            />
+          ) : (
             <Image
-              source={{ uri: template?.media.uri }}
-              style={[styles.template, { aspectRatio: COVER_RATIO }]}
+              source={{
+                uri:
+                  template?.preview.video?.thumbnail ??
+                  template?.preview.image?.uri,
+              }}
+              style={styles.template}
             />
           )}
-          <Button
-            label={intl.formatMessage({
-              defaultMessage: 'Use this template',
-              description:
-                'CoverTemplateConfirmationScreenModal - confirmation button',
-            })}
-            variant="secondary"
-            style={styles.button}
-            onPress={onConfirm}
-          />
+          {/* //using margin on android  directly on the button create white area */}
+          <View style={{ marginBottom: bottom, marginTop: 40 }}>
+            <Button
+              label={intl.formatMessage({
+                defaultMessage: 'Use this template',
+                description:
+                  'CoverTemplateConfirmationScreenModal - confirmation button',
+              })}
+              variant="secondary"
+              style={styles.button}
+              onPress={onConfirm}
+            />
+          </View>
         </View>
       </SafeAreaView>
     </ScreenModal>
@@ -61,7 +83,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.black,
     paddingHorizontal: 20,
-    position: 'relative',
+    justifyContent: 'flex-start',
   },
   content: {
     flex: 1,
@@ -77,10 +99,10 @@ const styles = StyleSheet.create({
   template: {
     width: '100%',
     borderRadius: 40,
+    aspectRatio: COVER_RATIO,
   },
   button: {
     backgroundColor: colors.white,
-    marginTop: 40,
   },
 });
 

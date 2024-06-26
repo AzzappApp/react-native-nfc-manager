@@ -1,4 +1,4 @@
 <resources>
     <string name="app_name">Azzapp - Dev</string>
-    <string name="azzapp_domain">azzapp-dev.vercel.app</string>
+    <string name="azzapp_domain">dev.azzapp.com</string>
 </resources>

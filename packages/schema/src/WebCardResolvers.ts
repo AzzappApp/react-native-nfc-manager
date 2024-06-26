@@ -1,4 +1,9 @@
-import { connectionFromArraySlice, cursorToOffset } from 'graphql-relay';
+import {
+  connectionFromArray,
+  connectionFromArraySlice,
+  cursorToOffset,
+  offsetToCursor,
+} from 'graphql-relay';
 import {
   getCompanyActivitiesByWebCardCategory,
   getWebCardPosts,
@@ -13,13 +18,12 @@ import {
   getActivePaymentMeans,
   getWebCardPayments,
   getLastSubscription,
-  getCoverTemplatesWithType,
+  getCoverTemplatesByTypes,
 } from '@azzapp/data';
 import { webCardRequiresSubscription } from '@azzapp/shared/subscriptionHelpers';
 import {
   connectionFromDateSortedItems,
   cursorToDate,
-  emptyConnection,
 } from '#helpers/connectionsHelpers';
 import { maybeFromGlobalIdWithType } from '#helpers/relayIdHelpers';
 import { getLabel, idResolver } from './utils';
@@ -272,32 +276,35 @@ export const WebCard: WebCardResolvers = {
         }
       : null,
 
-  coverTemplates: async (webCard, { tagId, after, first }) => {
-    const limit = first ?? 100;
+  coverTemplates: async (webCard, { first, after, tagId }, context) => {
+    const limit = first ?? 10;
+    const cursor = after ? cursorToOffset(after) : 0;
 
-    const templatesWithType = await getCoverTemplatesWithType({
+    const templatesByType = await getCoverTemplatesByTypes({
       limit: limit + 1,
-      cursor: after ?? undefined,
+      cursor,
       tagId: tagId ?? undefined,
       companyActivityId: webCard.companyActivityId,
     });
 
-    if (templatesWithType.length === 0) return emptyConnection;
+    const res = await Promise.all(
+      templatesByType.map(async template => {
+        const filtered = {
+          ...template,
+          label:
+            (await getLabel({ labelKey: template.labelKey }, '', context)) ??
+            template.labelKey,
+        };
+        // @ts-expect-error no need to keep the labelKey in the response
+        delete filtered.labelKey;
+        return filtered;
+      }),
+    );
 
-    const sizedTemplateType = templatesWithType.slice(0, limit);
-
-    return {
-      edges: sizedTemplateType.map(templateType => ({
-        node: templateType,
-        cursor: templateType.cursor,
-      })),
-      pageInfo: {
-        hasNextPage: sizedTemplateType.length > limit,
-        hasPreviousPage: false,
-        startCursor: sizedTemplateType[0]?.cursor,
-        endCursor: sizedTemplateType[sizedTemplateType.length - 1].cursor,
-      },
-    };
+    return connectionFromArray(res, {
+      first,
+      after: offsetToCursor(cursor + limit),
+    });
   },
 };
 

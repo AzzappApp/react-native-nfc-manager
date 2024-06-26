@@ -6,7 +6,7 @@ import type { InferInsertModel, InferSelectModel } from 'drizzle-orm';
 export const CoverTemplatePreviewTable = cols.table(
   'CoverTemplatePreview',
   {
-    media: cols.mediaId('media').notNull(),
+    mediaId: cols.mediaId('mediaId').notNull(),
     coverTemplateId: cols.cuid('coverTemplateId').notNull(),
     companyActivityId: cols.cuid('companyActivityId').notNull(),
   },

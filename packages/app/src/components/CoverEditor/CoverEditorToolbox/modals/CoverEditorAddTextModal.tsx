@@ -24,6 +24,12 @@ const CoverEditorAddTextModal = (props: Props) => {
   const intl = useIntl();
 
   const [selectedTag, setSelectedTag] = useState<number>(0);
+  const updateSelectedTag = useCallback((tag: string | null) => {
+    if (tag) {
+      setSelectedTag(parseInt(tag, 10));
+    }
+  }, []);
+
   const { dispatch } = useCoverEditorContext();
 
   const itemsPerTag = useMemo(() => {
@@ -108,9 +114,8 @@ const CoverEditorAddTextModal = (props: Props) => {
                       key={label}
                       selected={index === selectedTag}
                       label={label}
-                      onPress={() => {
-                        setSelectedTag(index);
-                      }}
+                      id={`${index}`}
+                      onSelect={updateSelectedTag}
                     />
                   ))}
                 </View>

@@ -148,13 +148,13 @@ export const uploadPreview = async (prevState: unknown, formData: FormData) => {
       await updateCoverTemplatePreview(coverTemplateId, companyActivityId, {
         coverTemplateId,
         companyActivityId,
-        media,
+        mediaId: media,
       });
     } else {
       await createCoverTemplatePreview({
         coverTemplateId,
         companyActivityId,
-        media,
+        mediaId: media,
       });
     }
     revalidatePath(`/coverTemplates/[id]`, 'layout');

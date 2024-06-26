@@ -1,45 +1,52 @@
-import { StyleSheet } from 'react-native';
+import { memo, useCallback } from 'react';
 import { colors } from '#theme';
+import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import PressableNative from './PressableNative';
 import Text from './Text';
-import type { ReactNode } from 'react';
 
 type Props = {
-  icon?: ReactNode;
   selected?: boolean;
+  id: string | null;
   label: string;
-  onPress?: () => void;
+  onSelect?: (id: string | null) => void;
 };
 
 const RoundedMenuComponent = (props: Props) => {
-  const { icon, selected, label, onPress } = props;
+  const { selected, label, onSelect, id } = props;
+  const styles = useStyleSheet(styleSheet);
+
+  const onPress = useCallback(() => {
+    if (onSelect) {
+      onSelect(id);
+    }
+  }, [id, onSelect]);
 
   return (
     <PressableNative
       style={[styles.menu, selected && styles.menuSelected]}
       onPress={onPress}
     >
-      {icon}
       <Text variant="button">{label}</Text>
     </PressableNative>
   );
 };
+//using memo because part of a list
+export default memo(RoundedMenuComponent);
 
-export default RoundedMenuComponent;
-
-const styles = StyleSheet.create({
+const styleSheet = createStyleSheet(appearance => ({
   menu: {
-    borderRadius: 33,
+    height: 32,
+    borderRadius: 16,
     paddingVertical: 7,
     paddingHorizontal: 18,
     justifyContent: 'center',
     alignItems: 'center',
     gap: 10,
-    borderColor: colors.grey50,
+    borderColor: appearance === 'light' ? colors.grey50 : colors.grey900,
     borderWidth: 1,
     borderStyle: 'solid',
   },
   menuSelected: {
-    backgroundColor: colors.grey50,
+    backgroundColor: appearance === 'light' ? colors.grey50 : colors.grey900,
   },
-});
+}));

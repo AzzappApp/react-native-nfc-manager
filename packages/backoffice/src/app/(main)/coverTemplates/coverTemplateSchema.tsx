@@ -66,7 +66,7 @@ export const coverTemplateSchema = z.object({
   name: z.string(),
   order: z.number(),
   tags: z.string().array(),
-  type: z.string(),
+  typeId: z.string(),
   lottie: z.instanceof(File).optional(),
   lottieId: z.string().optional(),
   colorPaletteId: z.string(),

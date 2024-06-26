@@ -76,7 +76,7 @@ const CoverTemplatesParametersForm = ({
       lottieId: coverTemplate?.lottieId || '',
       order: coverTemplate?.order || 0,
       colorPaletteId: coverTemplate?.colorPaletteId || colorPalettes[0]?.id,
-      type: coverTemplate?.type || coverTemplateTypes[0]?.id,
+      typeId: coverTemplate?.typeId || coverTemplateTypes[0]?.id,
       tags: coverTemplate?.tags || [],
       enabled: coverTemplate ? `${coverTemplate.enabled}` : 'true',
       params: coverTemplate?.params || {
@@ -188,7 +188,7 @@ const CoverTemplatesParametersForm = ({
           <FormControl
             fullWidth
             required
-            error={!!fields.type.errors}
+            error={!!fields.typeId.errors}
             sx={{ flex: 1 }}
           >
             <InputLabel id="coverTemplateType-label">
@@ -197,7 +197,7 @@ const CoverTemplatesParametersForm = ({
             <Select
               labelId={'coverTemplateType-label'}
               label="Cover template type"
-              {...getSelectProps(fields.type)}
+              {...getSelectProps(fields.typeId)}
             >
               {coverTemplateTypes.map(coverTemplateType => (
                 <MenuItem
