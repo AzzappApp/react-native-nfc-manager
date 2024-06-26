@@ -8,11 +8,7 @@ export const animationSchema = z.object({
 });
 
 export const textSchema = z.object({
-  text: z.union([
-    z.literal('firstName'),
-    z.literal('mainName'),
-    z.literal('custom'),
-  ]),
+  text: z.enum(['firstName', 'mainName', 'custom']),
   customText: z.string().optional(),
   fontFamily: z.string(),
   color: colorValidatorWithPalette,

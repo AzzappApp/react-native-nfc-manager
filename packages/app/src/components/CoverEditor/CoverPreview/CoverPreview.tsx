@@ -57,6 +57,7 @@ import { DynamicLinkRenderer } from './DynamicLinkRenderer';
 import type { VideoCompositionRendererHandle } from '#components/VideoCompositionRenderer';
 import type { EditionParameters } from '#helpers/mediaEditions';
 import type { ResizeHandlePosition } from './BoundsEditor';
+import type { CoverEditorLinksLayerItem } from '../coverEditorTypes';
 import type { FrameDrawer } from '@azzapp/react-native-skia-video';
 import type { SkImage, SkRect } from '@shopify/react-native-skia';
 import type {
@@ -227,28 +228,10 @@ const CoverPreview = ({
       } else if (activeLayer.kind === 'links') {
         const layer = activeLayer.layer;
 
-        const gap =
-          (convertToBaseCanvasRatio(
-            Math.max(LINKS_GAP * (linksLayer.links.length - 1), 0),
-            viewWidth,
-          ) /
-            viewWidth) *
-          100;
-
-        const elWidth =
-          ((convertToBaseCanvasRatio(linksLayer.size, viewWidth) *
-            LINKS_ELEMENT_WRAPPER_MULTIPLER) /
-            viewWidth) *
-          100;
-
-        const width = elWidth * linksLayer.links.length + gap;
-
-        const height =
-          linksLayer.links.length > 0
-            ? (convertToBaseCanvasRatio(linksLayer.size, viewHeight) /
-                viewHeight) *
-              100
-            : 0;
+        const { width, height } = calculateLinksSize(layer, {
+          viewHeight,
+          viewWidth,
+        });
 
         activeLayerBounds.value = {
           bounds: {
@@ -1015,9 +998,17 @@ const CoverPreview = ({
       };
     }
 
+    const { height, width } = calculateLinksSize(linksLayer, {
+      viewHeight,
+      viewWidth,
+    });
+
+    const calculatedWith = (width * viewWidth) / 100;
+    const calculatedHeight = (height * viewHeight) / 100;
+
     return {
-      top: (linksLayer.position.y * viewHeight) / 100,
-      left: (linksLayer.position.x * viewWidth) / 100,
+      top: (linksLayer.position.y * viewHeight) / 100 - calculatedHeight / 2,
+      left: (linksLayer.position.x * viewWidth) / 100 - calculatedWith / 2,
     };
   });
 
@@ -1282,6 +1273,42 @@ const MAX_DISPLAY_DECODER_RESOLUTION = Math.min(
   (Dimensions.get('window').height / 2) * Math.min(PixelRatio.get(), 2),
   1920,
 );
+
+const calculateLinksSize = (
+  linksLayer: CoverEditorLinksLayerItem,
+  {
+    viewWidth,
+    viewHeight,
+  }: {
+    viewWidth: number;
+    viewHeight: number;
+  },
+) => {
+  'worklet';
+  const gap =
+    (convertToBaseCanvasRatio(
+      Math.max(LINKS_GAP * (linksLayer.links.length - 1), 0),
+      viewWidth,
+    ) /
+      viewWidth) *
+    100;
+
+  const elWidth =
+    ((convertToBaseCanvasRatio(linksLayer.size, viewWidth) *
+      LINKS_ELEMENT_WRAPPER_MULTIPLER) /
+      viewWidth) *
+    100;
+
+  const width = elWidth * linksLayer.links.length + gap;
+
+  const height =
+    linksLayer.links.length > 0
+      ? (convertToBaseCanvasRatio(linksLayer.size, viewHeight) / viewHeight) *
+        100
+      : 0;
+
+  return { width, height };
+};
 
 const CONTROLS_BUTTON_ICON_SIZE = 20;
 const CONTROLS_BUTTON_HEIGHT = 30;

@@ -1,3 +1,4 @@
+import { useAssets } from 'expo-asset';
 import {
   forwardRef,
   useCallback,
@@ -43,7 +44,13 @@ import type { CoverEditor_coverTemplate$key } from '#relayArtifacts/CoverEditor_
 import type { CoverEditor_profile$key } from '#relayArtifacts/CoverEditor_profile.graphql';
 import type { CoverEditorAction } from './coverEditorActions';
 import type { CoverEditorLinksToolActions } from './CoverEditorToolbox/tools/CoverEditorLinksTool';
-import type { CoverEditorState } from './coverEditorTypes';
+import type {
+  CoverEditorLinksLayerItem,
+  CoverEditorOverlayItem,
+  CoverEditorState,
+  CoverEditorTextLayerItem,
+} from './coverEditorTypes';
+import type { Asset } from 'expo-asset';
 import type { ForwardedRef, Reducer } from 'react';
 import type { LayoutChangeEvent, ViewProps } from 'react-native';
 
@@ -59,7 +66,42 @@ export type CoverEditorHandle = {
   save: () => Promise<void>;
 };
 
-const CoverEditor = (
+const CoverEditorWrapper = (
+  {
+    profile,
+    coverTemplate,
+    backgroundColor,
+    onCanSaveChange,
+    coverInitialSate,
+    style,
+    ...props
+  }: CoverEditorProps,
+  ref: ForwardedRef<CoverEditorHandle>,
+) => {
+  const [assets] = useAssets([
+    require('#assets/webcard/cover_overlay_placeholder_logo.png'),
+  ]);
+
+  const placeholder = assets?.[0];
+
+  return (
+    placeholder?.downloaded && (
+      <CoverEditor
+        profile={profile}
+        coverTemplate={coverTemplate}
+        backgroundColor={backgroundColor}
+        onCanSaveChange={onCanSaveChange}
+        coverInitialSate={coverInitialSate}
+        style={style}
+        placeholder={placeholder}
+        {...props}
+        ref={ref}
+      />
+    )
+  );
+};
+
+const CoverEditorCore = (
   {
     profile: profileKey,
     coverTemplate: coverTemplateKey,
@@ -67,8 +109,9 @@ const CoverEditor = (
     onCanSaveChange,
     coverInitialSate,
     style,
+    placeholder,
     ...props
-  }: CoverEditorProps,
+  }: CoverEditorProps & { placeholder: Asset },
   ref: ForwardedRef<CoverEditorHandle>,
 ) => {
   // #region Data
@@ -83,6 +126,9 @@ const CoverEditor = (
             dark
             otherColors
           }
+          firstName
+          lastName
+          companyName
         }
       }
     `,
@@ -94,6 +140,7 @@ const CoverEditor = (
       fragment CoverEditor_coverTemplate on CoverTemplate {
         id
         lottie
+        data
       }
     `,
     coverTemplateKey,
@@ -108,6 +155,77 @@ const CoverEditor = (
     Reducer<CoverEditorState, CoverEditorAction>,
     null
   >(coverEditorReducer, null, () => {
+    const data = coverTemplate?.data;
+
+    const dataLinks = data?.linksLayer as
+      | {
+          links?: string[];
+          color: string;
+        }
+      | undefined;
+
+    const linksLayer: CoverEditorLinksLayerItem = dataLinks
+      ? {
+          ...dataLinks,
+          position: {
+            x: 50,
+            y: 50,
+          },
+          size: 24,
+          links:
+            dataLinks.links?.map((link, index) => ({
+              socialId: link,
+              position: index,
+              link: '?',
+            })) ?? [],
+          rotation: 0,
+          shadow: false,
+        }
+      : {
+          links: [],
+          color: colors.black,
+          size: 24,
+          position: {
+            x: 50,
+            y: 50,
+          },
+          rotation: 0,
+          shadow: false,
+        };
+
+    const textLayers: CoverEditorTextLayerItem[] = data?.textLayers
+      ? (data.textLayers as any[]).map(textLayer => {
+          const text =
+            textLayer.text === 'mainName'
+              ? profile.webCard.companyName || profile.webCard.lastName
+              : textLayer.text === 'firstName'
+                ? profile.webCard.firstName ?? ''
+                : textLayer.text === 'custom'
+                  ? textLayer.customText ?? ''
+                  : '';
+          return {
+            ...textLayer,
+            text,
+            rotation: 0,
+          };
+        })
+      : [];
+
+    const overlayLayers = placeholder
+      ? (data?.overlayLayers as any)?.map(
+          (overlay: CoverEditorOverlayItem) => ({
+            ...overlay,
+            media: {
+              uri: placeholder.localUri,
+              type: 'image',
+              width: placeholder.width,
+              height: placeholder.height,
+            },
+            rotation: 0,
+          }),
+        ) ?? []
+      : [];
+
     return {
       lottie,
       cardColors: {
@@ -120,19 +238,9 @@ const CoverEditor = (
       medias: [],
       coverTransition: 'fade',
 
-      overlayLayers: [],
-      textLayers: [],
-      linksLayer: {
-        links: [],
-        color: colors.black,
-        size: 24,
-        position: {
-          x: 50,
-          y: 50,
-        },
-        rotation: 0,
-        shadow: false,
-      },
+      overlayLayers,
+      textLayers,
+      linksLayer,
 
       editionMode: 'none',
       selectedItemIndex: null,
@@ -465,7 +573,9 @@ const CoverEditor = (
   );
 };
 
-export default forwardRef(CoverEditor);
+const CoverEditor = forwardRef(CoverEditorCore);
+
+export default forwardRef(CoverEditorWrapper);
 
 const styles = StyleSheet.create({
   container: {

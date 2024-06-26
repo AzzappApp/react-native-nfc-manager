@@ -7,32 +7,13 @@ type CoverTemplate implements Node {
   """
   id: ID!
   order: Float!
-  # textLayers: [CoverTemplateTextLayer!]!
-  # overlay: CoverTemplateOverlay!
-  # mediaFilters: [CoverTemplateMediaFilter!]!
-  # links: [CoverTemplateLink!]!
+  data: JSON
   type: CoverTemplateType
   tags: [CoverTemplateTag!]!
   preview: Media!
   lottie: String!
   requiredMedias: Int!
 }
-
-# type CoverTemplateTextLayer {
-
-# }
-
-# type CoverTemplateOverlay {
-
-# }
-
-# type CoverTemplateMediaFilter {
-
-# }
-
-# type CoverTemplateLink {
-
-# }
 
 """
 A connection to a list of items.

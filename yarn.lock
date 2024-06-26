@@ -148,6 +148,7 @@ __metadata:
     chroma-js: ^2.4.2
     events: ^3.3.0
     expo: ^51.0.14
+    expo-asset: ^10.0.9
     expo-av: ^14.0.5
     expo-blur: ^13.0.2
     expo-clipboard: ~6.0.3
@@ -192,7 +193,7 @@ __metadata:
     react-native-quick-base64: ^2.1.2
     react-native-reanimated: ^3.13.0-rc.1
     react-native-safe-area-context: ^4.10.5
-    react-native-screens: ^3.31.1
+    react-native-screens: ^3.32.0
     react-native-share: ^10.2.1
     react-native-skottie-template-player: "workspace:^"
     react-native-svg: ^15.3.0
@@ -14700,6 +14701,19 @@ __metadata:
   languageName: node
   linkType: hard
 
+"expo-asset@npm:^10.0.9":
+  version: 10.0.10
+  resolution: "expo-asset@npm:10.0.10"
+  dependencies:
+    expo-constants: ~16.0.0
+    invariant: ^2.2.4
+    md5-file: ^3.2.3
+  peerDependencies:
+    expo: "*"
+  checksum: abf6afee29db1df356008b2260ecfd37eafdeeda989deeaf546d6c6857f82f71efe6d2f6e348d5bf0f077325f9ce2c8dad006ad5d8d2df35cdd9bf3dc15e714a
+  languageName: node
+  linkType: hard
+
 "expo-asset@npm:~10.0.9":
   version: 10.0.9
   resolution: "expo-asset@npm:10.0.9"
@@ -21489,29 +21503,29 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-native-screens@npm:3.31.1":
-  version: 3.31.1
-  resolution: "react-native-screens@npm:3.31.1"
+"react-native-screens@npm:3.32.0":
+  version: 3.32.0
+  resolution: "react-native-screens@npm:3.32.0"
   dependencies:
     react-freeze: ^1.0.0
     warn-once: ^0.1.0
   peerDependencies:
     react: "*"
     react-native: "*"
-  checksum: 1fc61cf7a223b3ef1c8000e74416c8953561c5fa0861557da43659db62a640e37fb51fbdc35dae810a665881a7aa9eeaf1873e90f67404b4dda53a672464a7fe
+  checksum: afcb93e9cd48d5071278213bbc4ddc18112dbdbd16c11e3c7129368614396d8aae13fd70bb299f3c84f52a28e34af06ccdc514de1e97a99f4197069301dab136
   languageName: node
   linkType: hard
 
-"react-native-screens@patch:react-native-screens@npm%3A3.31.1#./.yarn/patches/react-native-screens-npm-3.31.1-d5786be485_20240621181931.patch::locator=%40azzapp%2Fmonorepo%40workspace%3A.":
-  version: 3.31.1
-  resolution: "react-native-screens@patch:react-native-screens@npm%3A3.31.1#./.yarn/patches/react-native-screens-npm-3.31.1-d5786be485_20240621181931.patch::version=3.31.1&hash=a231dd&locator=%40azzapp%2Fmonorepo%40workspace%3A."
+"react-native-screens@patch:react-native-screens@npm%3A3.32.0#./.yarn/patches/react-native-screens-npm-3.32.0-a22eba53a2.patch::locator=%40azzapp%2Fmonorepo%40workspace%3A.":
+  version: 3.32.0
+  resolution: "react-native-screens@patch:react-native-screens@npm%3A3.32.0#./.yarn/patches/react-native-screens-npm-3.32.0-a22eba53a2.patch::version=3.32.0&hash=acaf8e&locator=%40azzapp%2Fmonorepo%40workspace%3A."
   dependencies:
     react-freeze: ^1.0.0
     warn-once: ^0.1.0
   peerDependencies:
     react: "*"
     react-native: "*"
-  checksum: 0583bc2026086aece7eb43ca31b54ee2c70dc2620a54d896a199af118378b9c834678f9ff2ab13241dffa16eb602506346fbb4db03d9399fd72f1a693b425f96
+  checksum: e2576b6a56ebdfa1918bed4a33bbc0889656b1fb564cafcc5aaba59a4c88764517d2099e6269cf808ba677a22b2c05241323994dde43e926201071c692e1dbdb
   languageName: node
   linkType: hard
 

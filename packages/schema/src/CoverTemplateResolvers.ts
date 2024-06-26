@@ -11,6 +11,7 @@ export const CoverTemplate: CoverTemplateResolvers = {
   type: async ({ typeId }, _, { loaders }) => {
     return loaders.CoverTemplateType.load(typeId);
   },
+  data: async ({ params }) => params,
   preview: async ({ previewId }) => {
     return {
       media: previewId,
