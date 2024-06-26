@@ -1,22 +1,20 @@
 import { interpolate } from '@shopify/react-native-skia';
+import { Easing } from 'react-native-reanimated';
 import fadeInOut from './fadeInOut';
-import type { MediaAnimation } from '#components/CoverEditor/coverEditorTypes';
+import type { OverlayAnimation } from '#components/CoverEditor/coverEditorTypes';
 
-const zoomOutOpacity: MediaAnimation = progress => {
+const zoomOutOpacity: OverlayAnimation = progress => {
   'worklet';
+  progress = Easing.inOut(Easing.ease)(progress);
   return {
-    imageTransform: ({ image, height, width, matrix }) => {
-      'worklet';
-      const scale = interpolate(progress, [-1, 0, 1, 2], [1.4, 1, 1, 0.6]);
-
-      //preTranslate  does not exist in react native
-      matrix.postTranslate(-width / 2, -height / 2);
-      matrix.postScale(scale, scale);
-      matrix.postTranslate(width / 2, height / 2);
-
-      return { image, matrix, width, height };
-    },
     ...fadeInOut(progress),
+    animateCanvas(canvas, rect) {
+      'worklet';
+      const scale = interpolate(progress, [0, 0.25, 0.75, 1], [1.4, 1, 1, 0.6]);
+      canvas.translate(rect.width / 2, rect.height / 2);
+      canvas.scale(scale, scale);
+      canvas.translate(-rect.width / 2, -rect.height / 2);
+    },
   };
 };
 export default zoomOutOpacity;

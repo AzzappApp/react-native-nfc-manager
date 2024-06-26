@@ -1,19 +1,17 @@
 import { interpolate } from '@shopify/react-native-skia';
-import type { MediaAnimation } from '#components/CoverEditor/coverEditorTypes';
+import { Easing } from 'react-native-reanimated';
+import type { OverlayAnimation } from '#components/CoverEditor/coverEditorTypes';
 
-const zoomInOut: MediaAnimation = progress => {
+const zoomInOut: OverlayAnimation = progress => {
   'worklet';
+  progress = Easing.inOut(Easing.ease)(progress);
   return {
-    imageTransform: ({ image, height, width, matrix }) => {
+    animateCanvas(canvas, rect) {
       'worklet';
-      const scale = interpolate(progress, [-1, 0, 1, 2], [0.6, 1, 1, 0.6]);
-
-      //preTranslate  does not exist in react native
-      matrix.postTranslate(-width / 2, -height / 2);
-      matrix.postScale(scale, scale);
-      matrix.postTranslate(width / 2, height / 2);
-
-      return { image, matrix, width, height };
+      const scale = interpolate(progress, [0, 0.25, 0.75, 1], [0, 1, 1, 0]);
+      canvas.translate(rect.width / 2, rect.height / 2);
+      canvas.scale(scale, scale);
+      canvas.translate(-rect.width / 2, -rect.height / 2);
     },
   };
 };

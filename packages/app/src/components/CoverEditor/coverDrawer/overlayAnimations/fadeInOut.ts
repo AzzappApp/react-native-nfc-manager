@@ -1,12 +1,12 @@
 import { interpolate } from 'react-native-reanimated';
-import type { MediaAnimation } from '#components/CoverEditor/coverEditorTypes';
+import type { OverlayAnimation } from '#components/CoverEditor/coverEditorTypes';
 
-const fadeInOut: MediaAnimation = progress => {
+const fadeInOut: OverlayAnimation = progress => {
   'worklet';
   return {
-    drawTransform: (canvas, paint) => {
+    animatePaint: paint => {
       'worklet';
-      const opacity = interpolate(progress, [-1, 0, 1, 2], [0, 1, 1, 0]);
+      const opacity = interpolate(progress, [0, 0.25, 0.75, 1], [0, 1, 1, 0]);
       paint.setAlphaf(opacity);
     },
   };

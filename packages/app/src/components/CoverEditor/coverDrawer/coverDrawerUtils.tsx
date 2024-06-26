@@ -1,16 +1,4 @@
-export const createRRect = (width: number, height: number, radius: number) => {
-  'worklet';
-  return {
-    rect: {
-      x: 0,
-      y: 0,
-      width,
-      height,
-    },
-    rx: (radius * width) / 200,
-    ry: (radius * width) / 200,
-  };
-};
+import type { SkRRect } from '@shopify/react-native-skia';
 
 export const convertToBaseCanvasRatio = (
   value: number,
@@ -18,4 +6,24 @@ export const convertToBaseCanvasRatio = (
 ) => {
   'worklet';
   return value * (canvasWidth / 300);
+};
+
+export const inflateRRect = (
+  rect: SkRRect,
+  dx: number,
+  dy: number,
+  tx = 0,
+  ty = 0,
+) => {
+  'worklet';
+  return {
+    rect: {
+      x: rect.rect.x - dx + tx,
+      y: rect.rect.y - dy + ty,
+      width: rect.rect.width + 2 * dx,
+      height: rect.rect.height + 2 * dy,
+    },
+    rx: rect.rx + dx,
+    ry: rect.ry + dy,
+  };
 };

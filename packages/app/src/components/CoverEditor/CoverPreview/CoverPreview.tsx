@@ -292,6 +292,9 @@ const CoverPreview = ({
                   ...overlayLayer,
                   bounds,
                   rotation,
+                  // We remove animation of overlay layer during edition
+                  // to make it visibile to the user
+                  animation: null,
                 };
               }
               return overlayLayer;
@@ -355,6 +358,7 @@ const CoverPreview = ({
     },
     [
       lutShaders,
+      lottieInfo,
       skottiePlayer,
       coverEditorState,
       activeLayerBounds,

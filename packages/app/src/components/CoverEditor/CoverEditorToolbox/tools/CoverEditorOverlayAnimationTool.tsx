@@ -170,6 +170,10 @@ const CoverEditorOverlayImageAnimationTool = () => {
     [activeOverlay, lutShader, skImage],
   );
 
+  const imageRatio = activeOverlay
+    ? (activeOverlay.bounds.width / activeOverlay.bounds.height) * COVER_RATIO
+    : 1;
+
   return (
     <>
       <ToolBoxSection
@@ -186,7 +190,7 @@ const CoverEditorOverlayImageAnimationTool = () => {
           lazy
           onRequestClose={toggleBottomSheet}
           visible={show}
-          height={210 + 80 / COVER_RATIO}
+          height={210 + 80 / imageRatio}
           headerTitle={
             <Text variant="large">
               <FormattedMessage
@@ -205,7 +209,7 @@ const CoverEditorOverlayImageAnimationTool = () => {
               keyExtractor={keyExtractor}
               accessibilityRole="list"
               onSelect={onSelect}
-              imageRatio={COVER_RATIO}
+              imageRatio={imageRatio}
               selectedItem={
                 animations.find(item => item.id === activeOverlay.animation) ??
                 null
@@ -228,7 +232,6 @@ const CoverEditorOverlayImageAnimationTool = () => {
 };
 
 export default memo(CoverEditorOverlayImageAnimationTool);
-const previewDuration = 2;
 const AnimationPreview = ({
   animationId,
   height,
@@ -251,8 +254,7 @@ const AnimationPreview = ({
   const animationStateSharedValue = useSharedValue(0);
 
   useFrameCallback(() => {
-    animationStateSharedValue.value =
-      ((Date.now() - startTime) / 1000) % previewDuration;
+    animationStateSharedValue.value = ((Date.now() - startTime) % 3000) / 3000;
   });
 
   const picture = useDerivedValue(() =>
@@ -267,15 +269,9 @@ const AnimationPreview = ({
           lutShader,
           editionParameters,
         });
-      const { imageTransform, shaderTransform, drawTransform } = animation(
+      const { animateCanvas, animatePaint } = animation(
         animationStateSharedValue.value,
       );
-      if (imageTransform) {
-        imageTransformations.push(imageTransform);
-      }
-      if (shaderTransform) {
-        shaderTransformations.push(shaderTransform);
-      }
       const { shader } = applyShaderTransformations(
         imageFrameToShaderFrame(
           applyImageFrameTransformations(
@@ -287,7 +283,9 @@ const AnimationPreview = ({
       );
       const paint = Skia.Paint();
       paint.setShader(shader);
-      drawTransform?.(canvas, paint);
+      const rect = { x: 0, y: 0, width, height };
+      animateCanvas?.(canvas, rect);
+      animatePaint?.(paint, rect);
       canvas.drawPaint(paint);
     }),
   );

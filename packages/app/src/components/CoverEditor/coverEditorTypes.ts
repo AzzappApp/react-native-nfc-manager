@@ -58,6 +58,11 @@ export type MediaInfoBase = {
   editionParameters: EditionParameters | null;
 };
 
+export type MediaAnimation = (progress: number) => {
+  imageTransform?: ImageFrameTransformation;
+  shaderTransform?: ShaderFrameTransformation;
+};
+
 export type MediaInfoVideo = MediaInfoBase & {
   media: MediaVideo;
   timeRange: TimeRange;
@@ -109,6 +114,15 @@ export type CoverEditorOverlayItem = {
   shadow: boolean;
 };
 
+export type PaintAnimation = (paint: SkPaint, rect: SkRect) => void;
+
+export type CanvasAnimation = (canvas: SkCanvas, rect: SkRect) => void;
+
+export type OverlayAnimation = (progress: number) => {
+  animatePaint?: PaintAnimation;
+  animateCanvas?: CanvasAnimation;
+};
+
 export type CoverEditorSocialLink = {
   link: string;
   position: number;
@@ -122,12 +136,4 @@ export type CoverEditorLinksLayerItem = {
   position: SkPoint;
   rotation: number;
   shadow: boolean;
-};
-
-export type DrawTransform = (canvas: SkCanvas, paint: SkPaint) => void;
-
-export type MediaAnimation = (progress: number) => {
-  imageTransform?: ImageFrameTransformation;
-  shaderTransform?: ShaderFrameTransformation;
-  drawTransform?: DrawTransform;
 };

@@ -1,5 +1,5 @@
 /* eslint-disable prefer-const */
-import { PaintStyle, Skia } from '@shopify/react-native-skia';
+import { BlurStyle, Skia } from '@shopify/react-native-skia';
 import { interpolate } from 'react-native-reanimated';
 import { swapColor } from '@azzapp/shared/cardHelpers';
 import {
@@ -12,10 +12,10 @@ import {
   imageFrameToShaderFrame,
 } from '#helpers/mediaEditions';
 import { percentRectToRect } from '../coverEditorHelpers';
-import { convertToBaseCanvasRatio, createRRect } from './coverDrawerUtils';
+import { convertToBaseCanvasRatio, inflateRRect } from './coverDrawerUtils';
 import overlayAnimations from './overlayAnimations';
 import type { CoverDrawerOptions } from './coverDrawerTypes';
-import type { DrawTransform } from '../coverEditorTypes';
+import type { CanvasAnimation, PaintAnimation } from '../coverEditorTypes';
 
 const coverOverlayDrawer = ({
   canvas,
@@ -48,6 +48,13 @@ const coverOverlayDrawer = ({
   } = overlayLayer;
   const image = createImageFromNativeBuffer(images[media.uri], true);
   if (!image) {
+    return;
+  }
+
+  if (
+    currentTime < startPercentageTotal * duration ||
+    currentTime > endPercentageTotal * duration
+  ) {
     return;
   }
   let {
@@ -93,28 +100,21 @@ const coverOverlayDrawer = ({
     ? overlayAnimations[overlayLayer.animation]
     : null;
 
-  let drawTransform: DrawTransform | null = null;
+  let animateCanvas: CanvasAnimation | undefined = undefined;
+  let animatePaint: PaintAnimation | undefined = undefined;
 
   if (animation) {
     const progress = interpolate(
       currentTime,
       [
-        0,
         startPercentageTotal * duration,
         endPercentageTotal * duration,
         duration,
       ],
-      [-1, 0, 1, 2],
+      [0, 1],
     );
     const transformations = animation(progress);
-    const { imageTransform, shaderTransform } = transformations;
-    drawTransform = transformations.drawTransform ?? null;
-    if (imageTransform) {
-      imageTransformations.push(imageTransform);
-    }
-    if (shaderTransform) {
-      shaderTransformations.push(shaderTransform);
-    }
+    ({ animateCanvas, animatePaint } = transformations);
   }
 
   const { shader } = applyShaderTransformations(
@@ -124,36 +124,66 @@ const coverOverlayDrawer = ({
     shaderTransformations,
   );
 
-  const paint = Skia.Paint();
-  paint.setShader(shader);
-
-  if (drawTransform) {
-    drawTransform(canvas, paint);
-  }
+  const overlayRect = {
+    x: 0,
+    y: 0,
+    height: imageHeight,
+    width: imageWidth,
+  };
+  const borderWidthPx = (borderWidth * imageWidth) / 100;
+  const outerRect = {
+    rect: overlayRect,
+    rx: (borderRadius * width) / 200,
+    ry: (borderRadius * width) / 200,
+  };
+  const innerRect = {
+    rect: {
+      x: borderWidthPx,
+      y: borderWidthPx,
+      width: imageWidth - 2 * borderWidthPx,
+      height: imageHeight - 2 * borderWidthPx,
+    },
+    rx: (borderRadius * width - borderWidthPx) / 200,
+    ry: (borderRadius * width - borderWidthPx) / 200,
+  };
+  animateCanvas?.(canvas, overlayRect);
 
   if (shadow) {
-    paint.setImageFilter(
-      Skia.ImageFilter.MakeDropShadow(
+    const shadowPaint = Skia.Paint();
+    shadowPaint.setColor(Skia.Color('#00000099'));
+    animatePaint?.(shadowPaint, overlayRect);
+    shadowPaint.setMaskFilter(
+      Skia.MaskFilter.MakeBlur(
+        BlurStyle.Normal,
+        convertToBaseCanvasRatio(8, width),
+        true,
+      ),
+    );
+    canvas.drawRRect(
+      inflateRRect(
+        outerRect,
+        convertToBaseCanvasRatio(4, width),
+        convertToBaseCanvasRatio(4, width),
         0,
         convertToBaseCanvasRatio(4, width),
-        convertToBaseCanvasRatio(8, width),
-        convertToBaseCanvasRatio(8, width),
-        Skia.Color('#00000099'),
-        null,
       ),
+      shadowPaint,
     );
   }
 
-  canvas.drawRRect(createRRect(imageWidth, imageHeight, borderRadius), paint);
+  const paint = Skia.Paint();
+  paint.setShader(shader);
+  animatePaint?.(paint, overlayRect);
+  canvas.drawRRect(innerRect, paint);
+
   if (borderWidth > 0) {
     const borderPaint = Skia.Paint();
     borderPaint.setColor(Skia.Color(swapColor(borderColor, cardColors)));
-    borderPaint.setStyle(PaintStyle.Stroke);
-    borderPaint.setStrokeWidth((borderWidth * imageWidth) / 100);
-    canvas.drawRRect(
-      createRRect(imageWidth, imageHeight, borderRadius),
-      borderPaint,
-    );
+    animatePaint?.(borderPaint, overlayRect);
+    // if (shadow) {
+    //   addShadow(paint, width);
+    // }
+    canvas.drawDRRect(outerRect, innerRect, borderPaint);
   }
   canvas.restore();
 };

@@ -2,7 +2,7 @@ import { useIntl } from 'react-intl';
 import fadeInOut from './fadeInOut';
 import zoomInOpacity from './zoomInOpacity';
 import zoomInOut from './zoomInOut';
-import zoomOutIn from './zoomOutIn';
+import zoomOutInOpacity from './zoomOutInOpacity';
 import zoomOutOpacity from './zoomOutOpacity';
 
 const overlayAnimations = {
@@ -10,7 +10,7 @@ const overlayAnimations = {
   zoomInOpacity,
   zoomOutOpacity,
   zoomInOut,
-  zoomOutIn,
+  zoomOutInOpacity,
 } as const;
 
 export type OverlayAnimations = keyof typeof overlayAnimations;
@@ -26,21 +26,21 @@ export const useOverlayAnimationList = (): OverlayAnimationListItem[] => {
     {
       id: 'fadeInOut',
       label: intl.formatMessage({
-        defaultMessage: 'Zoom In',
-        description: 'Cover Edition Overlay Animation - Fade In',
+        defaultMessage: 'Fade',
+        description: 'Cover Edition Overlay Animation - Fade',
       }),
     },
     {
       id: 'zoomInOpacity',
       label: intl.formatMessage({
-        defaultMessage: 'Zoom In with Opacity',
+        defaultMessage: 'Zoom In',
         description: 'Cover Edition Overlay Animation - Zoom In',
       }),
     },
     {
       id: 'zoomOutOpacity',
       label: intl.formatMessage({
-        defaultMessage: 'Zoom Out with Opacity',
+        defaultMessage: 'Zoom Out',
         description: 'Cover Edition Overlay Animation - Zoom Out',
       }),
     },
@@ -52,7 +52,7 @@ export const useOverlayAnimationList = (): OverlayAnimationListItem[] => {
       }),
     },
     {
-      id: 'zoomOutIn',
+      id: 'zoomOutInOpacity',
       label: intl.formatMessage({
         defaultMessage: 'Zoom Out and In',
         description: 'Cover Edition Overlay Animation - Zoom Out and In',
