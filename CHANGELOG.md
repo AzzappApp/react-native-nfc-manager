@@ -1,4 +1,4 @@
-## 0.5.19-canary.22
+## 0.5.19-canary.23
 
 * **fix:**  - links ([#3913](https://github.com/AzzappApp/azzapp/pull/3913))
 * **feat:**  - add paymentRedirectUrl field for waitingForPayment subscription ([#3912](https://github.com/AzzappApp/azzapp/pull/3912))
