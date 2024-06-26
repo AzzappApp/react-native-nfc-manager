@@ -51,6 +51,8 @@ type UserSubscription {
   paymentMean: PaymentMean
 
   status: SubscriptionStatus
+
+  paymentRedirectUrl: String
 }
 
 enum UserSubscriptionIssuer {

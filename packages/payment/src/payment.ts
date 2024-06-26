@@ -51,6 +51,27 @@ const findLocale = (locale: string): Locale => {
   return 'en';
 };
 
+export const getPaymentRequest = async (ulid: string) => {
+  const token = await login();
+
+  const result = await client.GET('/api/client-payment-requests/ulid/{ulid}', {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+    params: {
+      path: {
+        ulid,
+      },
+    },
+  });
+
+  if (!result.data) {
+    throw new Error('Payment request not found', { cause: result.error });
+  }
+
+  return result.data;
+};
+
 export const createPaymentRequest = async ({
   totalSeats,
   userId,
