@@ -27,6 +27,8 @@ import type {
   LayoutChangeEvent,
   TextInputEndEditingEventData,
   NativeSyntheticEvent,
+  StyleProp,
+  ViewStyle,
 } from 'react-native';
 import type { PanGesture } from 'react-native-gesture-handler';
 
@@ -43,6 +45,7 @@ type SocialLinksLinksEditionPanelProps = ViewProps & {
    * A callback called when the user update the links
    */
   onLinksChange: (links: Array<SocialLinkInput | null>) => void;
+  contentContainerStyle?: StyleProp<ViewStyle>;
 };
 
 /**
@@ -52,6 +55,7 @@ const SocialLinksLinksEditionPanel = ({
   links,
   onLinksChange,
   style,
+  contentContainerStyle,
   ...props
 }: SocialLinksLinksEditionPanelProps) => {
   const intl = useIntl();
@@ -208,13 +212,18 @@ const SocialLinksLinksEditionPanel = ({
         mask: string;
       }>
         items={data}
-        itemHeight={56}
+        itemHeight={SOCIAL_LINK_PANEL_ITEM_HEIGHT}
         renderItem={renderItem}
         visibleHeight={scrollHeight - BOTTOM_MENU_HEIGHT - insetBottom}
-        contentContainerStyle={{
-          height:
-            56 * SOCIAL_LINKS.length + BOTTOM_MENU_HEIGHT + insetBottom + 20,
-        }}
+        contentContainerStyle={
+          contentContainerStyle ?? {
+            height:
+              SOCIAL_LINK_PANEL_ITEM_HEIGHT * SOCIAL_LINKS.length +
+              insetBottom +
+              BOTTOM_MENU_HEIGHT +
+              20,
+          }
+        }
         onLayout={onLayout}
         onChangeOrder={onChangeOrder}
       />
@@ -379,3 +388,5 @@ const styles = StyleSheet.create({
 });
 
 const NO_POSITION_INDEX = 100;
+
+export const SOCIAL_LINK_PANEL_ITEM_HEIGHT = 56;

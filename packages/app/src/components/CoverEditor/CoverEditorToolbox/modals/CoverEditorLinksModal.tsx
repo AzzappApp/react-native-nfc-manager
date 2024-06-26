@@ -1,18 +1,25 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { StyleSheet, View } from 'react-native';
+import { KeyboardAvoidingView } from 'react-native-keyboard-controller';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
+import {
+  SOCIAL_LINKS,
+  type SocialLinkId,
+} from '@azzapp/shared/socialLinkHelpers';
 import { colors } from '#theme';
 import { useCoverEditorContext } from '#components/CoverEditor/CoverEditorContext';
 import ScreenModal from '#components/ScreenModal';
-import SocialLinksLinksEditionPanel from '#screens/SocialLinksEditionScreen/SocialLinksLinksEditionPanel';
+import useScreenInsets from '#hooks/useScreenInsets';
+import SocialLinksLinksEditionPanel, {
+  SOCIAL_LINK_PANEL_ITEM_HEIGHT,
+} from '#screens/SocialLinksEditionScreen/SocialLinksLinksEditionPanel';
 import Button from '#ui/Button';
 import Container from '#ui/Container';
 import Header from '#ui/Header';
 import { SocialIcon } from '#ui/Icon';
 import Text from '#ui/Text';
-import type { SocialLinkId } from '@azzapp/shared/socialLinkHelpers';
 
 type SocialLink = {
   link: string;
@@ -31,6 +38,8 @@ const CoverEditorLinksModal = ({ open, onClose }: Props) => {
     cover.linksLayer.links,
   );
   const intl = useIntl();
+  const inset = useScreenInsets();
+  const [linksHeight, setLinksHeight] = useState(0);
 
   const shownLinks = useMemo(() => {
     return convertToNonNullArray(links)
@@ -144,13 +153,29 @@ const CoverEditorLinksModal = ({ open, onClose }: Props) => {
                 </Text>
               )}
             </View>
-            <SocialLinksLinksEditionPanel
-              links={links}
-              onLinksChange={setLinks}
-              style={{
-                flex: 1,
-              }}
-            />
+            <KeyboardAvoidingView
+              style={styles.previews}
+              behavior="position"
+              onLayout={e => setLinksHeight(e.nativeEvent.layout.height)}
+              keyboardVerticalOffset={-inset.bottom - BOTTOM_MENU_HEIGHT}
+            >
+              <View>
+                <SocialLinksLinksEditionPanel
+                  links={links}
+                  onLinksChange={setLinks}
+                  style={{
+                    flex: 1,
+                    minHeight: linksHeight,
+                  }}
+                  contentContainerStyle={{
+                    height:
+                      SOCIAL_LINK_PANEL_ITEM_HEIGHT * SOCIAL_LINKS.length +
+                      inset.bottom +
+                      BOTTOM_MENU_HEIGHT,
+                  }}
+                />
+              </View>
+            </KeyboardAvoidingView>
           </SafeAreaView>
         </Container>
       )}
@@ -158,7 +183,7 @@ const CoverEditorLinksModal = ({ open, onClose }: Props) => {
   );
 };
 
-export const BOTTOM_MENU_HEIGHT = 70;
+const BOTTOM_MENU_HEIGHT = 80;
 
 const styles = StyleSheet.create({
   container: {
@@ -168,39 +193,10 @@ const styles = StyleSheet.create({
     maxWidth: '50%',
     textAlign: 'center',
   },
-  // styleItem: {
-  //   flex: 0.5,
-  // },
-  // styleItemContent: {
-  //   height: 172,
-  //   backgroundColor: colors.grey50,
-  //   borderRadius: 12,
-  //   justifyContent: 'center',
-  //   alignItems: 'center',
-  // },
-  // tagsContainer: {
-  //   width: '100%',
-  //   height: 33,
-  //   marginTop: 20,
-  // },
-  // tags: {
-  //   gap: 10,
-  //   flexDirection: 'row',
-  //   paddingHorizontal: 20,
-  // },
-  // styleItemsContainer: {
-  //   marginTop: 20,
-  //   flex: 1,
-  // },
-  // styleItems: {
-  //   gap: 10,
-  //   paddingHorizontal: 10,
-  //   paddingBottom: 50,
-  // },
-  // styleItemsColumn: {
-  //   gap: 10,
-  //   flex: 1,
-  // },
+  previews: {
+    flex: 1,
+    marginTop: 210,
+  },
 });
 
 export default CoverEditorLinksModal;

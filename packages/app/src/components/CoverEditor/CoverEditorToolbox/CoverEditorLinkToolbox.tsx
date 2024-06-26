@@ -1,3 +1,4 @@
+import { forwardRef } from 'react';
 import { useIntl } from 'react-intl';
 import { ScrollView, View } from 'react-native';
 import { colors } from '#theme';
@@ -11,8 +12,13 @@ import CoverEditorLinksTool from './tools/CoverEditorLinksTool';
 import CoverEditorShadowTool from './tools/CoverEditorShadowTool';
 import CoverEditorSizeTool from './tools/CoverEditorSizeTool';
 import { TOOLBOX_SECTION_HEIGHT } from './ui/ToolBoxSection';
+import type { CoverEditorLinksToolActions } from './tools/CoverEditorLinksTool';
+import type { ForwardedRef } from 'react';
 
-const CoverEditorLinksToolbox = () => {
+const CoverEditorLinksToolbox = (
+  _: any,
+  ref: ForwardedRef<CoverEditorLinksToolActions>,
+) => {
   const styles = useStyleSheet(styleSheet);
 
   const intl = useIntl();
@@ -38,7 +44,7 @@ const CoverEditorLinksToolbox = () => {
         contentContainerStyle={styles.scrollContentContainer}
         showsHorizontalScrollIndicator={false}
       >
-        <CoverEditorLinksTool />
+        <CoverEditorLinksTool ref={ref} />
         <CoverEditorColorTool
           title={intl.formatMessage({
             defaultMessage: 'Icon color',
@@ -94,4 +100,4 @@ const styleSheet = createStyleSheet(appearance => ({
   },
 }));
 
-export default CoverEditorLinksToolbox;
+export default forwardRef(CoverEditorLinksToolbox);

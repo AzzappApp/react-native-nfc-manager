@@ -46,7 +46,6 @@ import { convertToBaseCanvasRatio } from '../coverDrawer/coverDrawerUtils';
 import { createParagraph } from '../coverDrawer/coverTextDrawer';
 import { useCoverEditorContext, useCurrentLayer } from '../CoverEditorContext';
 import { mediaInfoIsImage, percentRectToRect } from '../coverEditorHelpers';
-import CoverEditorLinksModal from '../CoverEditorToolbox/modals/CoverEditorLinksModal';
 import {
   isCoverDynamic,
   createCoverSkottieWithColorReplacement,
@@ -83,6 +82,10 @@ type CoverPreviewProps = Exclude<ViewProps, 'children'> & {
    * @param translateY The translation to apply to the preview
    */
   onKeyboardTranslateWorklet: (translateY: number) => void;
+  /**
+   * A callback to open the links modal
+   */
+  onOpenLinksModal: () => void;
 };
 
 /**
@@ -94,6 +97,7 @@ const CoverPreview = ({
   height: viewHeight,
   style,
   onKeyboardTranslateWorklet,
+  onOpenLinksModal,
   ...props
 }: CoverPreviewProps) => {
   // #region Data and state
@@ -223,30 +227,35 @@ const CoverPreview = ({
       } else if (activeLayer.kind === 'links') {
         const layer = activeLayer.layer;
 
+        const gap =
+          (convertToBaseCanvasRatio(
+            Math.max(LINKS_GAP * (linksLayer.links.length - 1), 0),
+            viewWidth,
+          ) /
+            viewWidth) *
+          100;
+
+        const elWidth =
+          ((convertToBaseCanvasRatio(linksLayer.size, viewWidth) *
+            LINKS_ELEMENT_WRAPPER_MULTIPLER) /
+            viewWidth) *
+          100;
+
+        const width = elWidth * linksLayer.links.length + gap;
+
+        const height =
+          linksLayer.links.length > 0
+            ? (convertToBaseCanvasRatio(linksLayer.size, viewHeight) /
+                viewHeight) *
+              100
+            : 0;
+
         activeLayerBounds.value = {
           bounds: {
             x: layer.position.x,
             y: layer.position.y,
-            width:
-              convertToBaseCanvasRatio(
-                (linksLayer.size * LINKS_ELEMENT_WRAPPER_MULTIPLER +
-                  LINKS_BORDER_WIDTH) /
-                  viewWidth,
-                viewWidth,
-              ) *
-                linksLayer.links.length +
-              convertToBaseCanvasRatio(
-                Math.max(LINKS_GAP * (linksLayer.links.length - 1), 0) /
-                  viewWidth,
-                viewWidth,
-              ),
-            height:
-              linksLayer.links.length > 0
-                ? convertToBaseCanvasRatio(
-                    (linksLayer.size + LINKS_BORDER_WIDTH) / viewWidth,
-                    viewWidth,
-                  )
-                : 0,
+            width,
+            height,
           },
           rotation: layer.rotation,
         };
@@ -991,9 +1000,16 @@ const CoverPreview = ({
   const animatedLinksStyle = useAnimatedStyle(() => {
     if (activeLayerBounds.value && activeLayer.kind === 'links') {
       const { bounds, rotation } = activeLayerBounds.value;
+
+      const width = (bounds.width * viewWidth) / 100;
+      const height = (bounds.height * viewHeight) / 100;
+
+      const top = (bounds.y * viewHeight) / 100 - height / 2;
+      const left = (bounds.x * viewWidth) / 100 - width / 2;
+
       return {
-        top: (bounds.y * viewHeight) / 100,
-        left: (bounds.x * viewWidth) / 100,
+        top,
+        left,
         // width: bounds.width * viewWidth,
         transform: [{ rotate: `${rotation}rad` }],
       };
@@ -1004,8 +1020,6 @@ const CoverPreview = ({
       left: (linksLayer.position.x * viewWidth) / 100,
     };
   });
-
-  const [linksModalVisible, toggleLinksModalVisible] = useToggle();
 
   return (
     <>
@@ -1191,7 +1205,7 @@ const CoverPreview = ({
                             icon="edit"
                             style={[styles.controlsButton, controlsButtonStyle]}
                             iconStyle={styles.controlsButtonIcon}
-                            onPress={toggleLinksModalVisible}
+                            onPress={onOpenLinksModal}
                             iconSize={CONTROLS_BUTTON_ICON_SIZE}
                             size={CONTROLS_BUTTON_HEIGHT}
                           />
@@ -1258,10 +1272,6 @@ const CoverPreview = ({
           />
         </ScreenModal>
       )}
-      <CoverEditorLinksModal
-        open={linksModalVisible}
-        onClose={toggleLinksModalVisible}
-      />
     </>
   );
 };

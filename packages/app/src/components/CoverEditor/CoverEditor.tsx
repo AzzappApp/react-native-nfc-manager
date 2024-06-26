@@ -42,6 +42,7 @@ import type { Media } from '#helpers/mediaHelpers';
 import type { CoverEditor_coverTemplate$key } from '#relayArtifacts/CoverEditor_coverTemplate.graphql';
 import type { CoverEditor_profile$key } from '#relayArtifacts/CoverEditor_profile.graphql';
 import type { CoverEditorAction } from './coverEditorActions';
+import type { CoverEditorLinksToolActions } from './CoverEditorToolbox/tools/CoverEditorLinksTool';
 import type { CoverEditorState } from './coverEditorTypes';
 import type { ForwardedRef, Reducer } from 'react';
 import type { LayoutChangeEvent, ViewProps } from 'react-native';
@@ -126,8 +127,8 @@ const CoverEditor = (
         color: colors.black,
         size: 24,
         position: {
-          x: 20,
-          y: 80,
+          x: 50,
+          y: 50,
         },
         rotation: 0,
         shadow: false,
@@ -396,6 +397,12 @@ const CoverEditor = (
   });
   // #endregion
 
+  const toolbox = useRef<CoverEditorLinksToolActions>(null);
+
+  const onOpenLinksModal = useCallback(() => {
+    toolbox.current?.toggleLinksModal();
+  }, []);
+
   return (
     <>
       <CoverEditorContextProvider value={contextValue}>
@@ -416,11 +423,12 @@ const CoverEditor = (
                   height={contentSize.height}
                   style={styles.coverPreview}
                   onKeyboardTranslateWorklet={onKeyboardTranslateWorklet}
+                  onOpenLinksModal={onOpenLinksModal}
                 />
               )}
             </View>
             <View style={{ height: 50 }} />
-            <CoverEditorToolbox />
+            <CoverEditorToolbox ref={toolbox} />
           </Container>
         </Animated.View>
       </CoverEditorContextProvider>

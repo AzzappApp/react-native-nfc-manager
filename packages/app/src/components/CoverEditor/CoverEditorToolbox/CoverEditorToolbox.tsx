@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { forwardRef, useCallback } from 'react';
 import { useIntl } from 'react-intl';
 import { ScrollView, StyleSheet, View } from 'react-native';
 import ColorTriptychRenderer from '#components/ColorTriptychRenderer';
@@ -14,9 +14,14 @@ import CoverEditorAddTextModal from './modals/CoverEditorAddTextModal';
 import CoverEditorColorsManager from './tools/CoverEditorColorsManager';
 import ToolBarContainer from './ui/ToolBarTransitioner';
 import ToolBoxSection, { TOOLBOX_SECTION_HEIGHT } from './ui/ToolBoxSection';
+import type { CoverEditorLinksToolActions } from './tools/CoverEditorLinksTool';
 import type { CoverEditionMode } from '../coverEditorTypes';
+import type { ForwardedRef } from 'react';
 
-const CoverEditorToolbox = () => {
+const CoverEditorToolbox = (
+  _: any,
+  ref: ForwardedRef<CoverEditorLinksToolActions>,
+) => {
   const [textModalVisible, toggleTextModalVisible] = useToggle();
   const [colorPickerVisible, toggleColorPickerVisible] = useToggle();
   const [showOverlayImagePicker, toggleOverlayImagePicker] = useToggle(false);
@@ -107,7 +112,7 @@ const CoverEditorToolbox = () => {
       </ToolBarContainer>
 
       <ToolBarContainer destroyOnHide visible={editionMode === 'links'}>
-        <CoverEditorLinksToolbox />
+        <CoverEditorLinksToolbox ref={ref} />
       </ToolBarContainer>
 
       <ToolBarContainer destroyOnHide visible={editionMode === 'media'}>
@@ -148,4 +153,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default CoverEditorToolbox;
+export default forwardRef(CoverEditorToolbox);
