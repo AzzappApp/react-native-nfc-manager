@@ -28,8 +28,6 @@ export const textSchema = z.object({
 });
 
 export const coverOverlaySchema = z.object({
-  image: z.instanceof(File).optional(),
-
   media: z
     .object({
       id: z.string().optional(),
@@ -91,11 +89,7 @@ export const coverTemplateSchemaWithoutfile = coverTemplateSchema
       params: z.object({
         medias: mediasSchema.array(),
         textLayers: textSchema.array(),
-        overlayLayers: coverOverlaySchema
-          .omit({
-            image: true,
-          })
-          .array(),
+        overlayLayers: coverOverlaySchema.array(),
         linksLayer: socialLinksSchema,
       }),
     }),

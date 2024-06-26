@@ -42,10 +42,14 @@ const PreviewInput = ({ previewField, previewIdField }: Props) => {
       )}
 
       {previewIdField.initialValue && (
-        <input {...getInputProps(previewIdField, { type: 'hidden' })} />
+        <input
+          {...getInputProps(previewIdField, { type: 'hidden' })}
+          key={previewIdField.key}
+        />
       )}
       <input
         {...getInputProps(previewField, { type: 'file' })}
+        key={previewField.key}
         accept={'video/*'}
         style={{
           display: 'none',

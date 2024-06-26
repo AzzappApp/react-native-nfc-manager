@@ -52,7 +52,7 @@ const CoverTemplateForm = ({
           underline="hover"
           sx={{ display: 'flex', alignItems: 'center' }}
           color="inherit"
-          href="/cardTemplates"
+          href="/coverTemplates"
         >
           <StarsSharp sx={{ mr: 0.5 }} fontSize="inherit" />
           Cover templates

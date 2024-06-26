@@ -27,6 +27,7 @@ import {
 import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
 import { useFormState } from 'react-dom';
+import { uploadMedia } from '#helpers/mediaHelper';
 import CoverOverlayForm from './CoverOverlayForm';
 import { saveCoverTemplate } from './coverTemplatesActions';
 import { coverTemplateSchema } from './coverTemplateSchema';
@@ -120,8 +121,35 @@ const CoverTemplatesParametersForm = ({
     [tags],
   );
 
+  const handleAction = useCallback(
+    async (formData: FormData) => {
+      try {
+        const previewFile = formData.get('preview') as File;
+        if (previewFile?.size > 0) {
+          const { public_id } = await uploadMedia(previewFile, 'video');
+          formData.set(`previewId`, public_id);
+        }
+        formData.delete('preview');
+
+        const lottieField = formData.get('lottie') as File;
+        if (lottieField?.size > 0) {
+          const { public_id } = await uploadMedia(lottieField, 'raw');
+          formData.set(`lottieId`, public_id);
+        }
+        formData.delete('lottie');
+
+        await action(formData);
+        form.reset();
+      } catch (e) {
+        console.error(e);
+      } finally {
+        setIsSaving(false);
+      }
+    },
+    [action, form],
+  );
+
   useEffect(() => {
-    setIsSaving(false);
     if (lastResult?.status === 'success') {
       setDisplaySaveSuccess(true);
     } else if (lastResult?.status === 'error') {
@@ -149,9 +177,12 @@ const CoverTemplatesParametersForm = ({
         flexWrap="wrap"
         id={form.id}
         onSubmit={form.onSubmit}
-        action={action}
+        action={handleAction}
       >
-        <input {...getInputProps(fields.id, { type: 'hidden' })} />
+        <input
+          {...getInputProps(fields.id, { type: 'hidden' })}
+          key={fields.id.key}
+        />
         {tags.map((tag, i) => (
           <input
             {...getInputProps(fields.tags, { type: 'hidden' })}
@@ -183,6 +214,7 @@ const CoverTemplatesParametersForm = ({
             required
             error={!!fields.name.errors}
             {...getInputProps(fields.name, { type: 'text' })}
+            key={fields.name.key}
           />
 
           <FormControl
@@ -198,6 +230,7 @@ const CoverTemplatesParametersForm = ({
               labelId={'coverTemplateType-label'}
               label="Cover template type"
               {...getSelectProps(fields.typeId)}
+              key={fields.typeId.key}
             >
               {coverTemplateTypes.map(coverTemplateType => (
                 <MenuItem
@@ -221,6 +254,7 @@ const CoverTemplatesParametersForm = ({
               labelId={'order-label'}
               label="Cover template type"
               {...getSelectProps(fields.order)}
+              key={fields.order.key}
             >
               {[...Array(11).keys()].map(order => (
                 <MenuItem key={order} value={order}>
@@ -241,6 +275,7 @@ const CoverTemplatesParametersForm = ({
               labelId={'colorPalette-label'}
               label="Color Palette"
               {...getSelectProps(fields.colorPaletteId)}
+              key={fields.colorPaletteId.key}
             >
               {colorPalettes.map(colorPalette => (
                 <MenuItem key={colorPalette.id} value={colorPalette.id}>

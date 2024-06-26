@@ -10,7 +10,6 @@ import {
 } from '@mui/material';
 import { FILTERS } from '@azzapp/shared/filtersHelper';
 import ColorInput from './ColorInput';
-import ImageInput from './ImageInput';
 import RadianInput from './RadianInput';
 import type { CoverOverlaySchemaType } from './coverTemplateSchema';
 import type { FieldMetadata } from '@conform-to/react';
@@ -29,11 +28,6 @@ const CoverOverlayForm = ({ field }: Props) => {
           type: 'hidden',
         })}
         key={overlayFields.media.getFieldset().id.key}
-      />
-      <ImageInput
-        field={field.getFieldset().image}
-        imageId={overlayFields.media.getFieldset().id.initialValue}
-        buttonLabel={'add image'}
       />
       <Box display="flex" gap={2}>
         <FormControl

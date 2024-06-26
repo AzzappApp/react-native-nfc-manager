@@ -16,6 +16,7 @@ import {
   getVideoThumbnailURL,
 } from '@azzapp/shared/imagesHelpers';
 import DataGrid from '#components/DataGrid';
+import { uploadMedia } from '#helpers/mediaHelper';
 import { deletePreview, uploadPreview } from './coverTemplatesActions';
 import type { ActivityItem } from './[id]/page';
 import type { CoverTemplatePreview, CoverTemplate } from '@azzapp/data';
@@ -146,6 +147,26 @@ const CoverTemplatePreviews = ({
     }
   };
 
+  const handleAction = useCallback(
+    async (formData: FormData) => {
+      try {
+        const fileField = formData.get('file') as File;
+        if (fileField?.size > 0) {
+          const { public_id } = await uploadMedia(fileField, 'video');
+          formData.set(`previewId`, public_id);
+        }
+        formData.delete('file');
+
+        await action(formData);
+      } catch (e) {
+        console.error(e);
+      } finally {
+        startLoading(false);
+      }
+    },
+    [action],
+  );
+
   useEffect(() => {
     if (lastResult) {
       setDisplayResult(true);
@@ -155,7 +176,7 @@ const CoverTemplatePreviews = ({
   }, [lastResult]);
 
   return (
-    <form ref={form} action={action} style={{ height: '100%' }}>
+    <form ref={form} action={handleAction} style={{ height: '100%' }}>
       <input
         type="hidden"
         id="coverTemplateId"

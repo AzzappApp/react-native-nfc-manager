@@ -96,6 +96,7 @@ const LottieInput = ({ lottieField, mediaFields, lottieIdField }: Props) => {
           <Fragment key={id}>
             <input
               {...getInputProps(mediaFields, { type: 'hidden' })}
+              key={`media-${id}`}
               name={`${mediaFields.name}[${index}].id`}
               value={id}
             />
@@ -104,9 +105,9 @@ const LottieInput = ({ lottieField, mediaFields, lottieIdField }: Props) => {
                 Filter media {id}
               </InputLabel>
               <Select
+                {...getSelectProps(mediaFields)}
                 labelId={`filter-label-${id}`}
                 label={`Filter media ${id}`}
-                {...getSelectProps(mediaFields)}
                 name={`${mediaFields.name}[${index}].filter`}
                 defaultValue={filter}
               >
@@ -125,10 +126,14 @@ const LottieInput = ({ lottieField, mediaFields, lottieIdField }: Props) => {
       </Box>
 
       {lottieIdField.initialValue && !data && (
-        <input {...getInputProps(lottieIdField, { type: 'hidden' })} />
+        <input
+          {...getInputProps(lottieIdField, { type: 'hidden' })}
+          key={lottieIdField.key}
+        />
       )}
       <input
         {...getInputProps(lottieField, { type: 'file' })}
+        key={lottieField.key}
         accept={'.json'}
         style={{
           display: 'none',
