@@ -1,5 +1,6 @@
-## 0.5.19-canary.19
+## 0.5.19-canary.20
 
+* **feat:**  - add paymentRedirectUrl field for waitingForPayment subscription ([#3912](https://github.com/AzzappApp/azzapp/pull/3912))
 * **fix:**  - **home:** [#3682](https://github.com/AzzappApp/azzapp/pull/3682) manage case on deletion after creation ([#3909](https://github.com/AzzappApp/azzapp/pull/3909))
 * **fix:**  - **Cover:** change default color palette
 * **fix:**  - **CoverTemplate:** color replacement ([#3910](https://github.com/AzzappApp/azzapp/pull/3910))
