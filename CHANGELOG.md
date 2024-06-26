@@ -1,5 +1,6 @@
-## 0.5.19-canary.26
+## 0.5.19-canary.27
 
+* **feat:**  - add specific error when cover is missing on publication ([#3938](https://github.com/AzzappApp/azzapp/pull/3938))
 * **fix:**  - **CoverEditior:** overlay animation  @fdecampredon ([#3926](https://github.com/AzzappApp/azzapp/pull/3926))
 * **perf:**  - **android:** [#3866](https://github.com/AzzappApp/azzapp/pull/3866) avoid lots of rerenders on scroll ([#3928](https://github.com/AzzappApp/azzapp/pull/3928))
 * **fix:**  - add readable error message, avoid coverEditor to unmount while still having the error modal up causing instability ([#3932](https://github.com/AzzappApp/azzapp/pull/3932))
