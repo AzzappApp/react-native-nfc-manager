@@ -126,6 +126,10 @@ const ERRORS = {
    * The webCard userName is not valid
    */
   INVALID_WEBCARD_USERNAME: 'INVALID_WEBCARD_USERNAME',
+  /**
+   * The webCard cover media is missing
+   */
+  MISSING_COVER: 'MISSING_COVER',
 } as const;
 
 export default ERRORS;
