@@ -195,16 +195,25 @@ export const HomeScreenProvider = ({
     }
   }, [initialProfileIndex, onCurrentProfileIndexChange, user?.profiles]);
 
+  const value = useMemo(
+    () => ({
+      currentIndexSharedValue,
+      inputRange,
+      initialProfileIndex,
+      currentIndexProfile,
+      onCurrentProfileIndexChange,
+    }),
+    [
+      currentIndexProfile,
+      currentIndexSharedValue,
+      initialProfileIndex,
+      inputRange,
+      onCurrentProfileIndexChange,
+    ],
+  );
+
   return (
-    <HomeScreenContext.Provider
-      value={{
-        currentIndexSharedValue,
-        inputRange,
-        initialProfileIndex,
-        currentIndexProfile,
-        onCurrentProfileIndexChange,
-      }}
-    >
+    <HomeScreenContext.Provider value={value}>
       {children}
     </HomeScreenContext.Provider>
   );
