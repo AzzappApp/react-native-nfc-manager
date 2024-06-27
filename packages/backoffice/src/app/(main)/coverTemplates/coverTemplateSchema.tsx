@@ -21,6 +21,7 @@ export const textSchema = z.object({
   }),
   animation: animationSchema,
   textAlign: z.enum(['left', 'right', 'center']),
+  shadow: z.coerce.boolean(),
 });
 
 export const coverOverlaySchema = z.object({
@@ -41,6 +42,7 @@ export const coverOverlaySchema = z.object({
   filter: z.string(),
   rotation: z.number(),
   animation: animationSchema,
+  shadow: z.coerce.boolean(),
 });
 
 export const socialLinksSchema = z.object({

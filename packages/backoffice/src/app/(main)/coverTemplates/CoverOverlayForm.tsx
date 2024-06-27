@@ -1,19 +1,27 @@
-import { getInputProps, getSelectProps } from '@conform-to/react';
+import {
+  getInputProps,
+  getSelectProps,
+  useInputControl,
+} from '@conform-to/react';
 import {
   Box,
   FormControl,
+  FormControlLabel,
   InputLabel,
   MenuItem,
   Select,
+  Switch,
   TextField,
   Typography,
 } from '@mui/material';
+import { useCallback, useState } from 'react';
 import { FILTERS } from '@azzapp/shared/filtersHelper';
 import ColorInput from './ColorInput';
 import { textAnimations } from './constants';
 import RadianInput from './RadianInput';
 import type { CoverOverlaySchemaType } from './coverTemplateSchema';
 import type { FieldMetadata } from '@conform-to/react';
+import type { ChangeEvent } from 'react';
 
 type Props = {
   field: FieldMetadata<CoverOverlaySchemaType>;
@@ -21,6 +29,19 @@ type Props = {
 
 const CoverOverlayForm = ({ field }: Props) => {
   const overlayFields = field.getFieldset();
+  const [haveShadow, setShadow] = useState(
+    !!overlayFields.shadow.initialValue || false,
+  );
+
+  const shadowField = useInputControl(overlayFields.shadow);
+
+  const toggleShadow = useCallback(
+    (event: ChangeEvent<HTMLInputElement>) => {
+      setShadow(event.target.checked);
+      shadowField.change(event.target.checked ? 'true' : '');
+    },
+    [shadowField],
+  );
 
   return (
     <Box display="flex" flexDirection="column" gap={2} width="100%">
@@ -51,6 +72,10 @@ const CoverOverlayForm = ({ field }: Props) => {
             ))}
           </Select>
         </FormControl>
+        <FormControlLabel
+          control={<Switch checked={haveShadow} onChange={toggleShadow} />}
+          label="Shadow"
+        />
       </Box>
       <Box display="flex" gap={2}>
         <TextField

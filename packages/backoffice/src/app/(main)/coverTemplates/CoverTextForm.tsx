@@ -6,13 +6,15 @@ import {
 import {
   Box,
   FormControl,
+  FormControlLabel,
   InputLabel,
   MenuItem,
   Select,
+  Switch,
   TextField,
   Typography,
 } from '@mui/material';
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import {
   COVER_MAX_FONT_SIZE,
   COVER_MIN_FONT_SIZE,
@@ -32,9 +34,14 @@ type TextFormProps = {
 
 const CoverTextForm = ({ field }: TextFormProps) => {
   const textFields = field.getFieldset();
+  const [haveShadow, setShadow] = useState(
+    !!textFields.shadow.initialValue || false,
+  );
   const [text, setText] = useState<CoverTextType>(
     (textFields.text.value as CoverTextType) || 'mainName',
   );
+
+  const shadowField = useInputControl(textFields.shadow);
   const textField = useInputControl(textFields.text);
 
   const onChangeText = (event: ChangeEvent<HTMLInputElement>) => {
@@ -42,8 +49,30 @@ const CoverTextForm = ({ field }: TextFormProps) => {
     textField.change(event.target.value);
   };
 
+  const toggleShadow = useCallback(
+    (event: ChangeEvent<HTMLInputElement>) => {
+      setShadow(event.target.checked);
+      shadowField.change(event.target.checked ? 'true' : '');
+    },
+    [shadowField],
+  );
+
   return (
     <Box display="flex" flexDirection="column" gap={2}>
+      <Box>
+        <FormControlLabel
+          control={
+            <Switch
+              checked={haveShadow}
+              {...getInputProps(textFields.shadow, {
+                type: 'checkbox',
+              })}
+              onChange={toggleShadow}
+            />
+          }
+          label="Shadow"
+        />
+      </Box>
       <Box display="flex" gap={2}>
         <TextField
           label="Label"
