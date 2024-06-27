@@ -1,6 +1,6 @@
 import { fromGlobalId } from 'graphql-relay';
 import { useCallback, useState } from 'react';
-import { View, type ListRenderItemInfo } from 'react-native';
+import { View } from 'react-native';
 import { FlatList } from 'react-native-gesture-handler';
 import { graphql, useFragment } from 'react-relay';
 import useScreenInsets from '#hooks/useScreenInsets';
@@ -8,13 +8,12 @@ import CoverTemplateConfirmationScreenModal from './CoverTemplateConfirmationScr
 import CoverTemplateScratchStarters from './CoverTemplateScratchStarter';
 import CoverTemplateTagSelector from './CoverTemplateTagSelector';
 import CoverTemplateTypePreviews from './CoverTemplateTypePreviews';
-import { useCoverTemplates } from './useCoverTemplates';
+import { useCoverTemplateTypes } from './useCoverTemplateTypes';
 import type { CoverTemplateList_profile$key } from '#relayArtifacts/CoverTemplateList_profile.graphql';
-import type {
-  CoverTemplatePreview,
-  CoverTemplateTypeListItem,
-} from './useCoverTemplates';
+import type { CoverTemplate } from './CoverTemplateTypePreviews';
+import type { CoverTemplateType } from './useCoverTemplateTypes';
 import type { ColorPaletteColor } from '@azzapp/shared/cardHelpers';
+import type { ViewToken, ListRenderItemInfo } from 'react-native';
 
 export type CoverEditorProps = {
   profile: CoverTemplateList_profile$key;
@@ -29,7 +28,7 @@ const CoverTemplateList = ({
   const [tag, setTag] = useState<string | null>(null);
 
   const [selectedTemplate, setSelectedTemplate] =
-    useState<CoverTemplatePreview | null>(null);
+    useState<CoverTemplate | null>(null);
 
   const { coverTemplateTags, webCard } = useFragment(
     graphql`
@@ -43,7 +42,7 @@ const CoverTemplateList = ({
             dark
             primary
           }
-          ...useCoverTemplates_coverTemplates
+          ...useCoverTemplateTypes_coverTemplates
             @alias(as: "coverTemplatesFragment")
         }
       }
@@ -51,7 +50,7 @@ const CoverTemplateList = ({
     profileKey,
   );
 
-  const onTemplateSelect = useCallback((template: CoverTemplatePreview) => {
+  const onTemplateSelect = useCallback((template: CoverTemplate) => {
     setSelectedTemplate(template);
   }, []);
 
@@ -63,12 +62,12 @@ const CoverTemplateList = ({
   }, [onSelectTemplate, selectedTemplate]);
 
   const {
-    coverTemplateByType,
+    coverTemplateTypes,
     refetch,
     isLoadingPrevious,
     isLoadingNext,
     loadNext,
-  } = useCoverTemplates(webCard.coverTemplatesFragment);
+  } = useCoverTemplateTypes(webCard.coverTemplatesFragment);
 
   const onEndReached = useCallback(() => {
     if (!isLoadingNext) {
@@ -76,16 +75,26 @@ const CoverTemplateList = ({
     }
   }, [isLoadingNext, loadNext]);
 
+  const [viewableItems, setViewableItems] = useState<
+    Array<{
+      index: number;
+      itemsToPlay: number;
+    }>
+  >([]);
+
   const renderItem = useCallback(
-    ({ item }: ListRenderItemInfo<CoverTemplateTypeListItem>) => {
+    ({ item, index }: ListRenderItemInfo<CoverTemplateType>) => {
       return (
         <CoverTemplateTypePreviews
           template={item}
           onSelect={onTemplateSelect}
+          videoToPlay={
+            viewableItems.find(v => v.index === index)?.itemsToPlay ?? 0
+          }
         />
       );
     },
-    [onTemplateSelect],
+    [onTemplateSelect, viewableItems],
   );
 
   const onRefresh = useCallback(() => {
@@ -97,21 +106,45 @@ const CoverTemplateList = ({
   }, [refetch, tag]);
 
   const onSelect = useCallback(
-    (tag: string | null) => {
-      setTag(tag);
-      //calling refecth here will not work, having the previous state
+    (selectedTag: string | null) => {
+      setTag(selectedTag);
       refetch({
         after: null,
         first: 5,
-        tagId: tag ? fromGlobalId(tag).id : null,
+        tagId: selectedTag ? fromGlobalId(selectedTag).id : null,
       });
     },
     [refetch],
   );
   const { bottom } = useScreenInsets();
 
+  //# region viewable to handle video preview
+  const onViewableItemChanged = useCallback(
+    (info: { viewableItems: ViewToken[]; changed: ViewToken[] }) => {
+      //we can only have two Item
+      const viewableRows = info.viewableItems.filter(item => item.isViewable);
+
+      // Logic to determine which videos to play
+      // This is a basic implementation and might need adjustments
+
+      if (viewableRows.length >= 2) {
+        // If there are two or more viewable rows, select one video from each of the first two rows
+        setViewableItems([
+          { index: viewableRows[0].index!, itemsToPlay: 1 },
+          { index: viewableRows[1].index!, itemsToPlay: 1 },
+        ]);
+      } else if (viewableRows.length === 1) {
+        setViewableItems([{ index: viewableRows[0].index!, itemsToPlay: 2 }]);
+      } else {
+        setViewableItems([]);
+      }
+    },
+    [],
+  );
+
+  //# endregion
   return (
-    <View style={{ flex: 1 }}>
+    <View style={{ flex: 1, paddingTop: 20 }}>
       <CoverTemplateTagSelector
         tagsKey={coverTemplateTags}
         selected={tag}
@@ -126,8 +159,8 @@ const CoverTemplateList = ({
             />
           }
           accessibilityRole="list"
-          data={coverTemplateByType ?? []}
-          keyExtractor={sectionKeyExtractor}
+          data={coverTemplateTypes}
+          keyExtractor={keyExtractor}
           renderItem={renderItem}
           showsVerticalScrollIndicator={false}
           onEndReached={onEndReached}
@@ -136,6 +169,9 @@ const CoverTemplateList = ({
           contentContainerStyle={{ paddingBottom: 40 + bottom }}
           onEndReachedThreshold={0.5}
           keyboardShouldPersistTaps="always"
+          onViewableItemsChanged={onViewableItemChanged}
+          viewabilityConfig={viewabilityConfig}
+          extraData={viewableItems}
         />
       </View>
       <CoverTemplateConfirmationScreenModal
@@ -147,7 +183,12 @@ const CoverTemplateList = ({
   );
 };
 
+const viewabilityConfig = {
+  //TODO: improve this with review of tester
+  itemVisiblePercentThreshold: 87,
+};
+
 export default CoverTemplateList;
-const sectionKeyExtractor = (item: { id: string }) => {
+const keyExtractor = (item: { id: string }) => {
   return item.id;
 };

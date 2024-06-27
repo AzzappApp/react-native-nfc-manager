@@ -1,8 +1,13 @@
-import { eq } from 'drizzle-orm';
+import { and, eq, sql } from 'drizzle-orm';
+import { CoverTemplateTable } from '#coverTemplates';
 import db, { cols } from './db';
 import { createId } from './helpers/createId';
 
-import type { InferInsertModel, InferSelectModel } from 'drizzle-orm';
+import type {
+  InferInsertModel,
+  InferSelectModel,
+  SQLWrapper,
+} from 'drizzle-orm';
 
 export const CoverTemplateTypeTable = cols.table('CoverTemplateType', {
   id: cols.cuid('id').notNull().primaryKey().$defaultFn(createId),
@@ -38,6 +43,41 @@ export const getCoverTemplateTypes = async (onlyEnabled = false) => {
   if (onlyEnabled) {
     query.where(eq(CoverTemplateTypeTable.enabled, true));
   }
+
+  return query;
+};
+
+/**
+ * Retrieve CoverTemplateType
+ *
+ */
+export const getFilterCoverTemplateTypes = async (
+  limit: number,
+  offset: number,
+  tagId: string | null | undefined,
+) => {
+  const query = db
+    .selectDistinct({
+      id: CoverTemplateTypeTable.id,
+      labelKey: CoverTemplateTypeTable.labelKey,
+      order: CoverTemplateTypeTable.order,
+      enabled: CoverTemplateTypeTable.enabled,
+    })
+    .from(CoverTemplateTypeTable)
+    .where(eq(CoverTemplateTypeTable.enabled, true));
+
+  const filters: SQLWrapper[] = [];
+  const contains = `JSON_CONTAINS(tags, '"${tagId}"')`;
+  filters.push(sql.raw(contains));
+  query.innerJoin(
+    CoverTemplateTable,
+    and(
+      eq(CoverTemplateTypeTable.id, CoverTemplateTable.typeId),
+      eq(CoverTemplateTable.enabled, true),
+      tagId ? sql`${sql.join(filters, sql.raw(' AND '))}` : undefined,
+    ),
+  );
+  query.limit(limit).offset(offset).orderBy(CoverTemplateTypeTable.order);
 
   return query;
 };

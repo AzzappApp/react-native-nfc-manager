@@ -1,9 +1,6 @@
 import { and, eq, sql } from 'drizzle-orm';
 import { CoverTemplatePreviewTable } from '#coverTemplatePreview';
-import {
-  CoverTemplateTypeTable,
-  type CoverTemplateType,
-} from '#coverTemplateType';
+import { CoverTemplateTypeTable } from '#coverTemplateType';
 import db, { cols } from './db';
 import { createId } from './helpers/createId';
 import type {
@@ -103,11 +100,12 @@ export const getCoverTemplatesByTypeAndTag = async (
   typeId: string,
   tagId: string,
 ) => {
+  const tagIdJson = JSON.stringify([tagId]);
   const query = sql`
   SELECT *
   FROM CoverTemplate
-  WHERE type = ${typeId}
-  AND JSON_CONTAINS (tags, ${tagId})`;
+  WHERE typeId = ${typeId}
+  AND JSON_CONTAINS (tags, ${tagIdJson})`;
 
   const executed = await db.execute(query);
   return executed.rows as CoverTemplate[];
@@ -130,36 +128,6 @@ export const getCoverTemplatesByTypes = async ({
     const contains = `JSON_CONTAINS(tags, '"${tagId}"')`;
     filters.push(sql.raw(contains));
   }
-
-  //KEEP THE SQL command temporary until the feature is validated
-  // let query = sql`
-  // SELECT
-  //    t.id, t.name, t.tags, COALESCE(t.previewId, c.mediaId) AS previewId, t.typeId, t.order, t.colorPaletteId, t.lottieId, t.params, t.enabled, tt.order AS typeOrder, tt.labelKey
-  // FROM (
-  //   SELECT  ctt.*
-  //   FROM CoverTemplateType ctt
-  //   JOIN CoverTemplate ct ON ctt.id = ct.typeId
-  //   WHERE ctt.enabled = TRUE
-  //   GROUP BY ctt.id
-  //   ORDER BY ctt.order
-  //   LIMIT ${limit}
-  //   OFFSET ${cursor ?? 0}
-  // ) AS tt
-  // JOIN CoverTemplate AS t ON tt.id = t.typeId and t.enabled = TRUE
-  // LEFT JOIN CoverTemplatePreview AS c ON tt.id = c.coverTemplateId AND c.companyActivityId = ${companyActivityId}`;
-
-  // // Dynamically append filters if any
-  // if (filters.length > 0) {
-  //   query = sql`${query} WHERE ${sql.join(filters, sql.raw(' AND '))}`;
-  // }
-
-  // // Finalize the query with ordering
-  // query = sql`${query} ORDER BY tt.order, t.order`;
-  // const rows = (await db.execute(query)).rows as Array<
-  //   CoverTemplate & { typeOrder: number; labelKey: string }
-  // >;
-
-  //doing it with drizzle orm
 
   const coverTemplateTypeSubquery = db
     .select({
@@ -191,13 +159,14 @@ export const getCoverTemplatesByTypes = async ({
       lottieId: CoverTemplateTable.lottieId,
       params: CoverTemplateTable.params,
       enabled: CoverTemplateTable.enabled,
-      typeOrder: coverTemplateTypeSubquery.typeOrder,
-      labelKey: coverTemplateTypeSubquery.labelKey,
     })
     .from(CoverTemplateTable)
     .innerJoin(
       coverTemplateTypeSubquery,
-      eq(coverTemplateTypeSubquery.id, CoverTemplateTable.typeId),
+      and(
+        eq(coverTemplateTypeSubquery.id, CoverTemplateTable.typeId),
+        eq(CoverTemplateTable.enabled, true),
+      ),
     )
     .leftJoin(
       CoverTemplatePreviewTable,
@@ -222,48 +191,7 @@ export const getCoverTemplatesByTypes = async ({
   );
 
   const rows = await queryDrizzle.execute();
-
-  const groupedAndOrdered = rows.reduce(
-    (acc, curr) => {
-      // Initialize the group if it doesn't exist
-      if (!acc[curr.typeId]) {
-        acc[curr.typeId] = {
-          id: curr.typeId,
-          order: curr.typeOrder,
-          enabled: true,
-          labelKey: curr.labelKey,
-          data: [],
-        };
-      }
-
-      // Push the current template into the correct group
-      acc[curr.typeId].data.push({
-        id: curr.id,
-        name: curr.name,
-        tags: curr.tags,
-        previewId: curr.previewId as string,
-        order: curr.order,
-        colorPaletteId: curr.colorPaletteId,
-        lottieId: curr.lottieId,
-        params: curr.params,
-        enabled: curr.enabled,
-        typeId: curr.typeId,
-      });
-
-      return acc;
-    },
-    {} as Record<
-      string,
-      CoverTemplateType & { data: Array<CoverTemplate | null> }
-    >,
-  );
-
-  return Object.values(groupedAndOrdered).filter(a => a.data.length > 0);
-
-  // Optionally, sort templates within each group if needed
-  // return Object.values(groupedAndOrdered).forEach(group => {
-  //   group.templates.sort((a, b) => a.order - b.order);
-  // });
+  return rows;
 };
 
 /**

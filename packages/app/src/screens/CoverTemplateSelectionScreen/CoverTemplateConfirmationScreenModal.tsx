@@ -9,10 +9,9 @@ import useScreenInsets from '#hooks/useScreenInsets';
 import Button from '#ui/Button';
 import IconButton from '#ui/IconButton';
 import SafeAreaView from '#ui/SafeAreaView';
-import type { CoverTemplatePreview } from './useCoverTemplates';
-
+import type { CoverTemplate } from './CoverTemplateTypePreviews';
 type CoverTemplateConfirmationScreenModalProps = {
-  template: CoverTemplatePreview | null;
+  template: CoverTemplate | null;
   onClose: () => void;
   onConfirm: () => void;
 };

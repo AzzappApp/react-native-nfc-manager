@@ -66,8 +66,7 @@ export default CoverTemplateTagSelector;
 const styles = StyleSheet.create({
   contentContainerScrollView: {
     paddingHorizontal: 20,
-    paddingTop: 10,
     gap: 10,
   },
-  container: { height: 52 },
+  container: { height: 42 },
 });

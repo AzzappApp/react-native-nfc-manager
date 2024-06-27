@@ -1,9 +1,4 @@
-import {
-  connectionFromArray,
-  connectionFromArraySlice,
-  cursorToOffset,
-  offsetToCursor,
-} from 'graphql-relay';
+import { connectionFromArraySlice, cursorToOffset } from 'graphql-relay';
 import {
   getCompanyActivitiesByWebCardCategory,
   getWebCardPosts,
@@ -18,7 +13,7 @@ import {
   getActivePaymentMeans,
   getWebCardPayments,
   getLastSubscription,
-  getCoverTemplatesByTypes,
+  getFilterCoverTemplateTypes,
 } from '@azzapp/data';
 import { webCardRequiresSubscription } from '@azzapp/shared/subscriptionHelpers';
 import {
@@ -275,36 +270,24 @@ export const WebCard: WebCardResolvers = {
           assetKind: 'logo',
         }
       : null,
+  coverTemplateTypes: async (_full, args) => {
+    const limit = args.first ?? 10;
+    const offset = args.after ? cursorToOffset(args.after) : 0;
 
-  coverTemplates: async (webCard, { first, after, tagId }, context) => {
-    const limit = first ?? 10;
-    const cursor = after ? cursorToOffset(after) : 0;
-
-    const templatesByType = await getCoverTemplatesByTypes({
-      limit: limit + 1,
-      cursor,
-      tagId: tagId ?? undefined,
-      companyActivityId: webCard.companyActivityId,
-    });
-
-    const res = await Promise.all(
-      templatesByType.map(async template => {
-        const filtered = {
-          ...template,
-          label:
-            (await getLabel({ labelKey: template.labelKey }, '', context)) ??
-            template.labelKey,
-        };
-        // @ts-expect-error no need to keep the labelKey in the response
-        delete filtered.labelKey;
-        return filtered;
-      }),
+    const coverTemplates = await getFilterCoverTemplateTypes(
+      limit + 1,
+      offset,
+      args.tagId,
     );
 
-    return connectionFromArray(res, {
-      first,
-      after: offsetToCursor(cursor + limit),
-    });
+    return connectionFromArraySlice(
+      coverTemplates,
+      { after: args.after, first: args.first },
+      {
+        sliceStart: offset,
+        arrayLength: coverTemplates.length,
+      },
+    );
   },
 };
 

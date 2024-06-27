@@ -295,11 +295,11 @@ type WebCard implements Node {
   """
   Fetches cover template type
   """
-  coverTemplates(
+  coverTemplateTypes(
     tagId: ID
-    first: Int @max(value: 50)
+    first: Int
     after: String
-  ): CoverTemplateConnection!
+  ): CoverTemplateTypeConnection!
 }
 
 type WebCardStyle {
