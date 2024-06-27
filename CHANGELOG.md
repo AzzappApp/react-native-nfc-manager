@@ -1,5 +1,6 @@
-## 0.5.19-canary.28
+## 0.5.19-canary.29
 
+* **fix:**  - 🐛 always show focused field on cover links modal ([#3944](https://github.com/AzzappApp/azzapp/pull/3944))
 * **fix:**  - **mediaPicker:** [#3935](https://github.com/AzzappApp/azzapp/pull/3935) avoid race conditions with multiple useEffects ([#3937](https://github.com/AzzappApp/azzapp/pull/3937))
 * **feat:**  - add specific error when cover is missing on publication ([#3938](https://github.com/AzzappApp/azzapp/pull/3938))
 * **fix:**  - **CoverEditior:** overlay animation  @fdecampredon ([#3926](https://github.com/AzzappApp/azzapp/pull/3926))
