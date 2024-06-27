@@ -1,5 +1,7 @@
-## 0.5.19-canary.31
+## 0.5.19-canary.32
 
+* **feat:**  - 🎸 disallow selecting video when too short ([#3950](https://github.com/AzzappApp/azzapp/pull/3950))
+* **feat:**  - 🎸 display elements with right margin ([#3920](https://github.com/AzzappApp/azzapp/pull/3920))
 * **fix:**  - 🐛 prevent crash when invite user ([#3951](https://github.com/AzzappApp/azzapp/pull/3951))
 * **fix:**  - 🐛 always show focused field on cover links modal ([#3944](https://github.com/AzzappApp/azzapp/pull/3944))
 * **fix:**  - **mediaPicker:** [#3935](https://github.com/AzzappApp/azzapp/pull/3935) avoid race conditions with multiple useEffects ([#3937](https://github.com/AzzappApp/azzapp/pull/3937))
