@@ -411,7 +411,7 @@ const ItemList = ({ item }: { item: Profile }) => {
             {isCurrentUser && '(me)'}
           </Text>
           <Text style={styles.contact}>
-            {item.user.email ?? item.user.phoneNumber}
+            {item.user?.email ?? item.user?.phoneNumber}
           </Text>
         </View>
         {transferOwnerMode ? (
