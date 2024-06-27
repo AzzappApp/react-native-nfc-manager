@@ -5,8 +5,7 @@
  *
  * package is not maintained anymore so we internalized it
  */
-import { Animation, LayerType } from '@lottiefiles/lottie-js';
-import { AssetType } from '@lottiefiles/lottie-js';
+import { Animation, LayerType, AssetType } from '@lottiefiles/lottie-js';
 import cloneDeep from 'lodash/cloneDeep';
 import type {
   ImageAsset,

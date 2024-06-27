@@ -127,12 +127,13 @@ const useSaveCover = (
               dynamicLinks: coverEditorState.linksLayer,
             },
           },
-          onCompleted(response, error) {
+          updater(_store, response) {
             coverLocalStore.saveCover({
               ...coverEditorState,
-              coverId: response.saveCover?.webCard.coverId,
+              coverId: response?.saveCover?.webCard.coverId,
             });
-
+          },
+          onCompleted(_response, error) {
             if (error) {
               reject(error);
               return;
