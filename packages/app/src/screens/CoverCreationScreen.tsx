@@ -99,7 +99,9 @@ const CoverCreationScreen = ({
   const webCardKind = profile?.webCard?.webCardKind;
 
   return (
-    <Container style={{ flex: 1, paddingTop: insets.top }}>
+    <Container
+      style={{ flex: 1, paddingTop: insets.top, paddingBottom: insets.bottom }}
+    >
       <WizardPagerHeader
         title={
           webCardKind === 'personal' ? (

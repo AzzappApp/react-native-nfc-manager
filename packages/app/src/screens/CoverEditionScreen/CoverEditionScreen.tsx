@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { Alert, StyleSheet, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { graphql, usePreloadedQuery } from 'react-relay';
 import {
   CancelHeaderButton,
@@ -11,6 +10,7 @@ import CoverEditor from '#components/CoverEditor';
 import { useRouter } from '#components/NativeRouter';
 import relayScreen from '#helpers/relayScreen';
 import useLatestCallback from '#hooks/useLatestCallback';
+import useScreenInsets from '#hooks/useScreenInsets';
 import ActivityIndicator from '#ui/ActivityIndicator';
 import Button from '#ui/Button';
 import Container from '#ui/Container';
@@ -29,6 +29,7 @@ const CoverEditionScreen = ({
 
   const [canSave, setCanSave] = useState(false);
   const coverEditorRef = useRef<CoverEditorHandle | null>(null);
+  const inset = useScreenInsets();
 
   const { cover: savedCoverState, loading } = useLocalCover(
     profile?.webCard?.coverId ?? '',
@@ -101,51 +102,54 @@ const CoverEditionScreen = ({
   }
 
   return (
-    <Container style={styles.container}>
-      <SafeAreaView style={styles.container}>
-        <Header
-          middleElement={intl.formatMessage({
-            defaultMessage: 'Edit your cover',
-            description: 'CoverEditionScreen header title',
-          })}
-          leftElement={<CancelHeaderButton onPress={onCancel} />}
-          rightElement={
-            <SaveHeaderButton
-              disabled={!canSave}
-              onPress={onSave}
-              style={styles.saveButton}
-            />
-          }
-        />
-        {hasCover ? (
-          <View style={styles.container}>
-            <View style={styles.changeCover}>
-              <Button
-                variant="little_round"
-                onPress={onNewCover}
-                label={intl.formatMessage({
-                  defaultMessage: 'New cover',
-                  description: 'Button to create a new cover',
-                })}
-              />
-            </View>
-            <CoverEditor
-              ref={coverEditorRef}
-              profile={profile}
-              // template infos are saved in the cover state
-              coverInitialSate={savedCoverState}
-              coverTemplate={null}
-              onCanSaveChange={onCanSaveChange}
-              backgroundColor={profile.webCard.coverBackgroundColor}
-              style={styles.container}
+    <Container
+      style={[
+        styles.container,
+        { paddingBottom: inset.bottom, paddingTop: inset.top },
+      ]}
+    >
+      <Header
+        middleElement={intl.formatMessage({
+          defaultMessage: 'Edit your cover',
+          description: 'CoverEditionScreen header title',
+        })}
+        leftElement={<CancelHeaderButton onPress={onCancel} />}
+        rightElement={
+          <SaveHeaderButton
+            disabled={!canSave}
+            onPress={onSave}
+            style={styles.saveButton}
+          />
+        }
+      />
+      {hasCover ? (
+        <View style={styles.container}>
+          <View style={styles.changeCover}>
+            <Button
+              variant="little_round"
+              onPress={onNewCover}
+              label={intl.formatMessage({
+                defaultMessage: 'New cover',
+                description: 'Button to create a new cover',
+              })}
             />
           </View>
-        ) : (
-          <View style={styles.loaderContainer}>
-            <ActivityIndicator />
-          </View>
-        )}
-      </SafeAreaView>
+          <CoverEditor
+            ref={coverEditorRef}
+            profile={profile}
+            // template infos are saved in the cover state
+            coverInitialSate={savedCoverState}
+            coverTemplate={null}
+            onCanSaveChange={onCanSaveChange}
+            backgroundColor={profile.webCard.coverBackgroundColor}
+            style={styles.container}
+          />
+        </View>
+      ) : (
+        <View style={styles.loaderContainer}>
+          <ActivityIndicator />
+        </View>
+      )}
     </Container>
   );
 };

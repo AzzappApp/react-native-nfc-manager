@@ -53,10 +53,12 @@ const CoverEditorSizeTool = ({ title }: Props) => {
           description: 'Cover Edition - Toolbox sub-menu text - Size',
         })}
         icon={
-          <Text variant="button" style={{ fontSize: 18 }}>
-            {size}
+          <View style={{ flexDirection: 'row' }}>
+            <Text variant="button" style={styles.size}>
+              {size}
+            </Text>
             <Text variant="small">pt</Text>
-          </Text>
+          </View>
         }
         onPress={() => toggleBottomSheet()}
       />
@@ -109,6 +111,10 @@ const styles = StyleSheet.create({
   },
   slider: {
     marginTop: 15,
+  },
+  size: {
+    fontSize: 18,
+    lineHeight: 18,
   },
 });
 

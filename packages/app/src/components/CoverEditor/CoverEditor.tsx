@@ -25,7 +25,6 @@ import { colors } from '#theme';
 import ScreenModal from '#components/ScreenModal';
 import { NativeBufferLoader, loadAllLUTShaders } from '#helpers/mediaEditions';
 import { getVideoLocalPath } from '#helpers/mediaHelpers';
-import useScreenInsets from '#hooks/useScreenInsets';
 import useToggle from '#hooks/useToggle';
 import Button from '#ui/Button';
 import Container from '#ui/Container';
@@ -474,7 +473,6 @@ const CoverEditorCore = (
   );
 
   // #region Layout and styles
-  const { bottom } = useScreenInsets();
   const [contentSize, setContentSize] = useState<{
     width: number;
     height: number;
@@ -516,12 +514,7 @@ const CoverEditorCore = (
     <>
       <CoverEditorContextProvider value={contextValue}>
         <Animated.View
-          style={[
-            styles.container,
-            { marginBottom: bottom },
-            style,
-            animatedStyle,
-          ]}
+          style={[styles.container, style, animatedStyle]}
           {...props}
         >
           <Container style={styles.container}>

@@ -7,7 +7,14 @@ import {
   useState,
 } from 'react';
 import { useIntl } from 'react-intl';
-import { Keyboard, Modal, Platform, View } from 'react-native';
+import {
+  Dimensions,
+  Keyboard,
+  Modal,
+  Platform,
+  StatusBar,
+  View,
+} from 'react-native';
 import {
   Gesture,
   GestureDetector,
@@ -126,7 +133,7 @@ export const useBottomSheetModalContext = () => {
  * A simple bottom sheet component
  */
 const BottomSheetModal = ({
-  height = 200,
+  height: baseHeight = 200,
   visible,
   headerTitle,
   headerLeftButton,
@@ -146,6 +153,15 @@ const BottomSheetModal = ({
   const [isVisible, setIsVisible] = useState(false);
   const insets = useScreenInsets();
   const intl = useIntl();
+
+  const height = useMemo(() => {
+    const navbarHeight =
+      Dimensions.get('screen').height -
+      Dimensions.get('window').height -
+      (StatusBar.currentHeight || 0);
+
+    return baseHeight + navbarHeight;
+  }, [baseHeight]);
 
   if (variant === 'default' && headerRightButton === undefined) {
     headerRightButton = (

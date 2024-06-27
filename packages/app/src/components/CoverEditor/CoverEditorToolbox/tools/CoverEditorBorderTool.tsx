@@ -72,7 +72,7 @@ const CoverEditorBorderTool = () => {
             lazy
             onRequestClose={toggleBottomSheet}
             visible={showBottomSheet && !showColorPicker}
-            height={271}
+            height={BORDER_MODAL_HEIGHT}
             headerTitle={
               <Text variant="large">
                 <FormattedMessage
@@ -127,7 +127,7 @@ const CoverEditorBorderTool = () => {
           </BottomSheetModal>
           <CoverEditorColorPicker
             visible={showColorPicker}
-            height={250}
+            height={BORDER_MODAL_COLOR_PICKER_HEIGHT}
             title={intl.formatMessage({
               defaultMessage: 'Border Color',
               description: 'Border color Picker title in Cover Editor',
@@ -142,6 +142,9 @@ const CoverEditorBorderTool = () => {
     </>
   );
 };
+
+const BORDER_MODAL_HEIGHT = 250;
+const BORDER_MODAL_COLOR_PICKER_HEIGHT = 300;
 
 export default memo(CoverEditorBorderTool);
 
