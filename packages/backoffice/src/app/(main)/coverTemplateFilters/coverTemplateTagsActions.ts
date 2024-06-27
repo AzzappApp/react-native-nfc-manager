@@ -20,7 +20,12 @@ import type {
 
 export const saveCoverTemplateTag = async (
   data: Label & (CoverTemplateTag | NewCoverTemplateTag),
-) => {
+): Promise<{
+  success: boolean;
+  formErrors?: any;
+  message?: string;
+  coverTemplateTagId?: string;
+}> => {
   if (!(await currentUserHasRole(ADMIN))) {
     throw new Error('Unauthorized');
   }
@@ -82,10 +87,12 @@ export const saveCoverTemplateTag = async (
 
       return coverTemplateTagId;
     });
-  } catch (e) {
-    throw new Error('Error while saving cover template tag');
+    revalidatePath(`/coverTemplateFilters/[id]`, 'layout');
+    return { success: true, coverTemplateTagId } as const;
+  } catch (e: any) {
+    return {
+      success: false,
+      message: e.message || 'Error while saving Company Activities Type',
+    };
   }
-
-  revalidatePath(`/coverTemplateFilters/[id]`, 'layout');
-  return { success: true, coverTemplateTagId } as const;
 };

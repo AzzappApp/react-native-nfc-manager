@@ -68,7 +68,7 @@ const WebCardCategoryForm = ({
   const [saving, setIsSaving] = useState(false);
   const [displaySaveSuccess, setDisplaySaveSuccess] = useState(saved);
   const [uploading, setUploading] = useState(false);
-  const [error, setError] = useState<any>(null);
+  const [error, setError] = useState<string>();
   const [formErrors, setFormErrors] = useState<WebCardCategoryErrors | null>(
     null,
   );
@@ -134,8 +134,8 @@ const WebCardCategoryForm = ({
             );
           }),
         );
-      } catch (error) {
-        setError(error);
+      } catch (error: any) {
+        setError(error.message);
         setIsSaving(false);
         setUploading(false);
         return;
@@ -147,27 +147,23 @@ const WebCardCategoryForm = ({
       setUploading(false);
     }
 
-    try {
-      const result = await saveWebCardCategory({
-        ...data,
-        medias: mediasToSave,
-      } as any);
+    const result = await saveWebCardCategory({
+      ...data,
+      medias: mediasToSave,
+    } as any);
 
-      if (result.success) {
-        setFormErrors(null);
-        if (isCreation) {
-          router.replace(
-            `/webCardCategories/${result.webCardCategoryId}?saved=true`,
-          );
-        } else {
-          setDisplaySaveSuccess(true);
-        }
-      } else {
-        setFormErrors(result.formErrors);
-      }
-    } catch (error) {
+    if (result.success) {
       setFormErrors(null);
-      setError(error);
+      if (isCreation) {
+        router.replace(
+          `/webCardCategories/${result.webCardCategoryId}?saved=true`,
+        );
+      } else {
+        setDisplaySaveSuccess(true);
+      }
+    } else if (!result.success) {
+      setFormErrors(result.formErrors || null);
+      setError(result.message);
     }
     setIsSaving(false);
   };
@@ -296,7 +292,7 @@ const WebCardCategoryForm = ({
         </Box>
         {error && (
           <Typography variant="body1" color="error">
-            Something went wrong {error?.message}
+            {error}
           </Typography>
         )}
       </Box>

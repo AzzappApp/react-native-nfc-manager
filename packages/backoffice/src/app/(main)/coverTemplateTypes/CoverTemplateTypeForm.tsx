@@ -35,7 +35,7 @@ const CoverTemplateTypeForm = ({
 }: Props) => {
   const isCreation = !coverTemplateType;
   const [displaySaveSuccess, setDisplaySaveSuccess] = useState(saved);
-  const [error, setError] = useState<any>(null);
+  const [error, setError] = useState<string>();
   const [saving, startSaving] = useTransition();
   const [formErrors, setFormErrors] = useState<WebCardCategoryErrors | null>(
     null,
@@ -57,20 +57,18 @@ const CoverTemplateTypeForm = ({
   const handleSubmit = (event: FormEvent) => {
     event.preventDefault();
     startSaving(async () => {
-      try {
-        const result = await saveCoverTemplateType(data as FormValue);
+      const result = await saveCoverTemplateType(data as FormValue);
 
-        setFormErrors(null);
-        if (isCreation) {
-          router.replace(
-            `/coverTemplateTypes/${result.coverTemplateTypeId}?saved=true`,
-          );
-        } else {
-          setDisplaySaveSuccess(true);
-        }
-      } catch (error) {
-        setFormErrors(null);
-        setError(error);
+      setFormErrors(null);
+      if (result.success && isCreation) {
+        router.replace(
+          `/coverTemplateTypes/${result.coverTemplateTypeId}?saved=true`,
+        );
+      } else if (result.success) {
+        setDisplaySaveSuccess(true);
+      } else if (!result.success) {
+        setFormErrors(result.formErrors || null);
+        setError(result.message);
       }
     });
   };
@@ -161,7 +159,7 @@ const CoverTemplateTypeForm = ({
         </Box>
         {error && (
           <Typography variant="body1" color="error">
-            Something went wrong {error?.message}
+            {error}
           </Typography>
         )}
       </Box>

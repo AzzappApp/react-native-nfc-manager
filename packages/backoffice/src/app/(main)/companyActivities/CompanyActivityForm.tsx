@@ -51,7 +51,7 @@ const CompanyActivityForm = ({
   const isCreation = !companyActivity;
   const [saving, setIsSaving] = useState(false);
   const [displaySaveSuccess, setDisplaySaveSuccess] = useState(saved);
-  const [error, setError] = useState<any>(null);
+  const [error, setError] = useState<string>();
   const [formErrors, setFormErrors] = useState<CompanyActivityErrors | null>(
     null,
   );
@@ -79,23 +79,19 @@ const CompanyActivityForm = ({
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsSaving(true);
-    try {
-      const result = await saveCompanyActivity(data as CompanyActivity);
-      if (result.success) {
-        setFormErrors(null);
-        if (isCreation) {
-          router.replace(
-            `/companyActivities/${result.companyActivityId}?saved=true`,
-          );
-        } else {
-          setDisplaySaveSuccess(true);
-        }
-      } else {
-        setFormErrors(result.formErrors);
-      }
-    } catch (error) {
+    const result = await saveCompanyActivity(data as CompanyActivity);
+    if (result.success) {
       setFormErrors(null);
-      setError(error);
+      if (isCreation) {
+        router.replace(
+          `/companyActivities/${result.companyActivityId}?saved=true`,
+        );
+      } else {
+        setDisplaySaveSuccess(true);
+      }
+    } else if (!result.success) {
+      setFormErrors(result.formErrors || null);
+      setError(result.message);
     }
     setIsSaving(false);
   };
@@ -179,7 +175,7 @@ const CompanyActivityForm = ({
       </Button>
       {error && (
         <Typography variant="body1" color="error">
-          Something went wrong {error?.message}
+          {error}
         </Typography>
       )}
       <Snackbar

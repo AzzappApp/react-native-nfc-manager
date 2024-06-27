@@ -34,7 +34,12 @@ export const saveCompanyActivity = async (
     cardTemplateType?: { id: string };
     companyActivityType?: { id: string };
   } & (CompanyActivity | NewCompanyActivity),
-) => {
+): Promise<{
+  success: boolean;
+  formErrors?: any;
+  message?: string;
+  companyActivityId?: string;
+}> => {
   const validation = companyActivitySchema.safeParse(data);
   if (!validation.success) {
     return {
@@ -100,10 +105,13 @@ export const saveCompanyActivity = async (
 
       return companyActivityId;
     });
-  } catch (error) {
-    throw new Error('Error while saving Company Activity');
+    revalidatePath(`/companyActivities/[id]`);
+    return { success: true, companyActivityId } as const;
+  } catch (e: any) {
+    console.error(e);
+    return {
+      success: false,
+      message: e.message || 'Something went wrong',
+    };
   }
-
-  revalidatePath(`/companyActivities/[id]`);
-  return { success: true, companyActivityId } as const;
 };

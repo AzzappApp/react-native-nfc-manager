@@ -50,6 +50,7 @@ export type CoverOverlay = {
   };
   filter: string;
   rotation: number;
+  animation: CoverAnimation;
 };
 
 export type SocialLinks = {

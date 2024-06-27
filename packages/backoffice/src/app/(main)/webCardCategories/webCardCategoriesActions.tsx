@@ -31,7 +31,12 @@ export const saveWebCardCategory = async (
       | NewWebCardCategory
       | WebCardCategory
     ),
-) => {
+): Promise<{
+  success: boolean;
+  formErrors?: any;
+  message?: string;
+  webCardCategoryId?: string;
+}> => {
   if (!(await currentUserHasRole(ADMIN))) {
     throw new Error('Unauthorized');
   }
@@ -166,10 +171,12 @@ export const saveWebCardCategory = async (
       }
       return webCardCategoryId;
     });
-  } catch (e) {
-    throw new Error('Error while saving profile category');
+    revalidatePath(`/webCardCategories/[id]`);
+    return { success: true, webCardCategoryId } as const;
+  } catch (e: any) {
+    return {
+      success: false,
+      message: e.message || 'Error while saving profile category',
+    };
   }
-
-  revalidatePath(`/webCardCategories/[id]`);
-  return { success: true, webCardCategoryId } as const;
 };

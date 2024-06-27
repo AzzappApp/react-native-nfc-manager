@@ -10,6 +10,7 @@ import {
 } from '@mui/material';
 import { FILTERS } from '@azzapp/shared/filtersHelper';
 import ColorInput from './ColorInput';
+import { textAnimations } from './constants';
 import RadianInput from './RadianInput';
 import type { CoverOverlaySchemaType } from './coverTemplateSchema';
 import type { FieldMetadata } from '@conform-to/react';
@@ -60,7 +61,8 @@ const CoverOverlayForm = ({ field }: Props) => {
           inputProps={{
             min: '1',
             max: '100',
-            defaultValue: '1',
+            defaultValue:
+              overlayFields.bounds.getFieldset().height.initialValue || '1',
           }}
           {...getInputProps(overlayFields.bounds.getFieldset().height, {
             type: 'number',
@@ -74,7 +76,8 @@ const CoverOverlayForm = ({ field }: Props) => {
           inputProps={{
             min: '1',
             max: '100',
-            defaultValue: '1',
+            defaultValue:
+              overlayFields.bounds.getFieldset().width.initialValue || '1',
           }}
           error={!!overlayFields.bounds.getFieldset().width.errors}
           {...getInputProps(overlayFields.bounds.getFieldset().width, {
@@ -90,7 +93,8 @@ const CoverOverlayForm = ({ field }: Props) => {
           inputProps={{
             min: '0',
             max: '100',
-            defaultValue: '0',
+            defaultValue:
+              overlayFields.bounds.getFieldset().x.initialValue || '0',
           }}
           error={!!overlayFields.bounds.getFieldset().x.errors}
           {...getInputProps(overlayFields.bounds.getFieldset().x, {
@@ -105,7 +109,8 @@ const CoverOverlayForm = ({ field }: Props) => {
           inputProps={{
             min: '0',
             max: '100',
-            defaultValue: '0',
+            defaultValue:
+              overlayFields.bounds.getFieldset().y.initialValue || '0',
           }}
           error={!!overlayFields.bounds.getFieldset().y.errors}
           {...getInputProps(overlayFields.bounds.getFieldset().y, {
@@ -122,7 +127,7 @@ const CoverOverlayForm = ({ field }: Props) => {
           inputProps={{
             min: '0',
             max: '100',
-            defaultValue: '0',
+            defaultValue: overlayFields.borderWidth.initialValue || '0',
           }}
           error={!!overlayFields.borderWidth.errors}
           {...getInputProps(overlayFields.borderWidth, {
@@ -138,7 +143,7 @@ const CoverOverlayForm = ({ field }: Props) => {
           inputProps={{
             min: '0',
             max: '100',
-            defaultValue: '0',
+            defaultValue: overlayFields.borderRadius.initialValue || '0',
           }}
           error={!!overlayFields.borderRadius.errors}
           {...getInputProps(overlayFields.borderRadius, {
@@ -147,7 +152,7 @@ const CoverOverlayForm = ({ field }: Props) => {
           key={overlayFields.borderRadius.key}
         />
       </Box>
-      {/* <Box display="flex" gap={2}>
+      <Box display="flex" gap={2}>
         <FormControl
           fullWidth
           error={!!overlayFields.animation.errors}
@@ -157,7 +162,7 @@ const CoverOverlayForm = ({ field }: Props) => {
           <Select
             labelId={'animation-label'}
             label="Animation"
-            {...getSelectProps(overlayFields.animation)}
+            {...getSelectProps(overlayFields.animation.getFieldset().name)}
           >
             {textAnimations.map(animation => (
               <MenuItem key={animation} value={animation}>
@@ -169,18 +174,30 @@ const CoverOverlayForm = ({ field }: Props) => {
         <TextField
           label="Start"
           sx={{ flex: 1 }}
-          {...getInputProps(overlayFields.start, {
+          {...getInputProps(overlayFields.animation.getFieldset().start, {
             type: 'number',
           })}
+          inputProps={{
+            min: '0',
+            max: '100',
+            defaultValue:
+              overlayFields.animation.getFieldset().start.initialValue || '0',
+          }}
         />
         <TextField
           label="End"
           sx={{ flex: 1 }}
-          {...getInputProps(overlayFields.end, {
+          {...getInputProps(overlayFields.animation.getFieldset().end, {
             type: 'number',
           })}
+          inputProps={{
+            min: '0',
+            max: '100',
+            defaultValue:
+              overlayFields.animation.getFieldset().end.initialValue || '0',
+          }}
         />
-      </Box> */}
+      </Box>
     </Box>
   );
 };

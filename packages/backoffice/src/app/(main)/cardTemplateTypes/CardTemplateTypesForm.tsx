@@ -69,22 +69,19 @@ const CardTemplateTypeForm = ({
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsSaving(true);
-    try {
-      const result = await saveCardTemplateType(data as FormValue);
+    const result = await saveCardTemplateType(data as FormValue);
+    console.log(result);
 
-      if (result.success) {
-        setFormErrors(null);
-        if (isCreation) {
-          router.replace(`/cardTemplateTypes/${result.id}?saved=true`);
-        } else {
-          setDisplaySaveSuccess(true);
-        }
-      } else {
-        setFormErrors(result.formErrors);
-      }
-    } catch (error) {
+    if (result.success) {
       setFormErrors(null);
-      setError(error);
+      if (isCreation) {
+        router.replace(`/cardTemplateTypes/${result.id}?saved=true`);
+      } else {
+        setDisplaySaveSuccess(true);
+      }
+    } else if (!result.success) {
+      setFormErrors(result.formErrors || null);
+      setError(result.message);
     }
     setIsSaving(false);
   };
@@ -198,7 +195,7 @@ const CardTemplateTypeForm = ({
         </Button>
         {error && (
           <Typography variant="body1" color="error">
-            Something went wrong {error?.message}
+            {error}
           </Typography>
         )}
       </Box>

@@ -16,7 +16,12 @@ export const saveCompanyActivitiesType = async (
     | CompanyActivityType
     | NewCompanyActivityType
   ),
-) => {
+): Promise<{
+  success: boolean;
+  formErrors?: any;
+  message?: string;
+  companyActivityId?: string;
+}> => {
   const validation = companyActivitiesTypeSchema.safeParse(data);
   if (!validation.success) {
     return {
@@ -78,10 +83,15 @@ export const saveCompanyActivitiesType = async (
 
       return companyActivityTypesId;
     });
-  } catch (error) {
-    throw new Error('Error while saving Company Activities Type');
+    revalidatePath(`/companyActivitiesTypes/[id]`);
+    return {
+      success: true,
+      companyActivityId: companyActivitiesTypeId,
+    } as const;
+  } catch (e: any) {
+    return {
+      success: false,
+      message: e.message || 'Error while saving Company Activities Type',
+    };
   }
-
-  revalidatePath(`/companyActivitiesTypes/[id]`);
-  return { success: true, companyActivityId: companyActivitiesTypeId } as const;
 };

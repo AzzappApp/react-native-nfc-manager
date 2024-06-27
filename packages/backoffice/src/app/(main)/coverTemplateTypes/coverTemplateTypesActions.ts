@@ -20,7 +20,12 @@ import type {
 
 export const saveCoverTemplateType = async (
   data: Label & (CoverTemplateType | NewCoverTemplateType),
-) => {
+): Promise<{
+  success: boolean;
+  formErrors?: any;
+  message?: string;
+  coverTemplateTypeId?: string;
+}> => {
   if (!(await currentUserHasRole(ADMIN))) {
     throw new Error('Unauthorized');
   }
@@ -29,7 +34,7 @@ export const saveCoverTemplateType = async (
     return {
       success: false,
       formErrors: validationResult.error.formErrors,
-    } as const;
+    };
   }
   let coverTemplateTypeId: string;
 
@@ -84,10 +89,14 @@ export const saveCoverTemplateType = async (
 
       return coverTemplateTypeId;
     });
-  } catch (e) {
-    throw new Error('Error while saving cover template type');
-  }
 
-  revalidatePath(`/coverTemplateTypes/[id]`, 'layout');
-  return { success: true, coverTemplateTypeId } as const;
+    revalidatePath(`/coverTemplateTypes/[id]`, 'layout');
+    return { success: true, coverTemplateTypeId };
+  } catch (e: any) {
+    console.error(e);
+    return {
+      success: false,
+      message: e.message || 'Something went wrong',
+    };
+  }
 };

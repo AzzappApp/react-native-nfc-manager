@@ -40,7 +40,7 @@ export const coverOverlaySchema = z.object({
   }),
   filter: z.string(),
   rotation: z.number(),
-  // animation: animationSchema,
+  animation: animationSchema,
 });
 
 export const socialLinksSchema = z.object({

@@ -16,7 +16,12 @@ export const saveCardTemplateType = async (
     | CardTemplateType
     | NewCardTemplateType
   ),
-) => {
+): Promise<{
+  success: boolean;
+  formErrors?: any;
+  message?: string;
+  id?: string;
+}> => {
   const validation = cardTemplateTypeSchema.safeParse(data);
   if (!validation.success) {
     return {
@@ -27,7 +32,6 @@ export const saveCardTemplateType = async (
   let templateTypeId: string;
   try {
     //check if WebCard Template type exist
-
     if (data.id) {
       const id = data.id;
       await db.transaction(async trx => {
@@ -79,10 +83,13 @@ export const saveCardTemplateType = async (
         });
       });
     }
-  } catch (error) {
-    throw new Error('Error while saving Card Template Type');
+    revalidatePath(`/cardTemplateTypes/[id]`);
+    return { success: true, id: templateTypeId } as const;
+  } catch (e: any) {
+    console.log(e.message);
+    return {
+      success: false,
+      message: e.message || 'Something went wrong',
+    };
   }
-
-  revalidatePath(`/cardTemplateTypes/[id]`);
-  return { success: true, id: templateTypeId } as const;
 };

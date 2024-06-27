@@ -137,7 +137,7 @@ const CoverTextForm = ({ field }: TextFormProps) => {
           inputProps={{
             min: '1',
             max: '100',
-            defaultValue: '1',
+            defaultValue: textFields.width.initialValue || '1',
           }}
           error={!!textFields.width.errors}
           {...getInputProps(textFields.width, {
@@ -153,7 +153,8 @@ const CoverTextForm = ({ field }: TextFormProps) => {
           inputProps={{
             min: '0',
             max: '100',
-            defaultValue: '0',
+            defaultValue:
+              textFields.position.getFieldset().x.initialValue || '0',
           }}
           error={!!textFields.position.getFieldset().x.errors}
           {...getInputProps(textFields.position.getFieldset().x, {
@@ -168,7 +169,8 @@ const CoverTextForm = ({ field }: TextFormProps) => {
           inputProps={{
             min: '0',
             max: '100',
-            defaultValue: '0',
+            defaultValue:
+              textFields.position.getFieldset().y.initialValue || '0',
           }}
           error={!!textFields.position.getFieldset().y.errors}
           {...getInputProps(textFields.position.getFieldset().y, {
@@ -208,7 +210,8 @@ const CoverTextForm = ({ field }: TextFormProps) => {
           inputProps={{
             min: '0',
             max: '100',
-            defaultValue: '0',
+            defaultValue:
+              textFields.animation.getFieldset().start.initialValue || '0',
           }}
           {...getInputProps(textFields.animation.getFieldset().start, {
             type: 'number',
@@ -222,7 +225,8 @@ const CoverTextForm = ({ field }: TextFormProps) => {
           inputProps={{
             min: '0',
             max: '100',
-            defaultValue: '0',
+            defaultValue:
+              textFields.animation.getFieldset().end.initialValue || '0',
           }}
           error={!!textFields.animation.getFieldset().end.errors}
           {...getInputProps(textFields.animation.getFieldset().end, {
