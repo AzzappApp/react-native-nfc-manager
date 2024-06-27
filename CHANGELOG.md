@@ -1,5 +1,6 @@
-## 0.5.19-canary.38
+## 0.5.19-canary.39
 
+* **fix:**  - 🐛 remove toast when clicking on new template ([#3962](https://github.com/AzzappApp/azzapp/pull/3962))
 * **fix:**  - **cover:** [#3902](https://github.com/AzzappApp/azzapp/pull/3902) race conditions on store update ([#3965](https://github.com/AzzappApp/azzapp/pull/3965))
 * **fix:**  - revert change on screen modal - infinite loop ([#3963](https://github.com/AzzappApp/azzapp/pull/3963))
 * **fix:**  - **payment:** [#3946](https://github.com/AzzappApp/azzapp/pull/3946) rename field to match api ([#3947](https://github.com/AzzappApp/azzapp/pull/3947))
