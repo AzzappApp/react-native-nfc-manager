@@ -220,7 +220,7 @@ const UserPayWallScreen = () => {
       <View style={styles.content}>
         <View style={styles.contaienrLogo}>
           <Image
-            source={require('#assets/logo-full_dark.png')}
+            source={require('#assets/logo-full.png')}
             resizeMode="contain"
             style={styles.plusImage}
           />
@@ -407,7 +407,7 @@ const styles = StyleSheet.create({
     height: 34,
     marginBottom: 15,
   },
-  plusImage: { height: 34, marginRight: 4 },
+  plusImage: { height: 34 },
   containerPager: {
     flexDirection: 'row',
     justifyContent: 'center',
