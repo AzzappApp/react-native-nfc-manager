@@ -1,5 +1,6 @@
-## 0.5.19-canary.30
+## 0.5.19-canary.31
 
+* **fix:**  - 🐛 prevent crash when invite user ([#3951](https://github.com/AzzappApp/azzapp/pull/3951))
 * **fix:**  - 🐛 always show focused field on cover links modal ([#3944](https://github.com/AzzappApp/azzapp/pull/3944))
 * **fix:**  - **mediaPicker:** [#3935](https://github.com/AzzappApp/azzapp/pull/3935) avoid race conditions with multiple useEffects ([#3937](https://github.com/AzzappApp/azzapp/pull/3937))
 * **feat:**  - add specific error when cover is missing on publication ([#3938](https://github.com/AzzappApp/azzapp/pull/3938))
