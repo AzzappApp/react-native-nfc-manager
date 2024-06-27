@@ -245,7 +245,7 @@ const PostCreationScreen = ({
                 }),
               });
               addLocalCachedMediaFile(
-                `${kind.slice(0, 1)}:${public_id}`,
+                public_id,
                 kind === 'video' ? 'video' : 'image',
                 `file://${path}`,
               );

@@ -19,6 +19,7 @@ import {
   COVER_MEDIA_RESOLUTION,
 } from '@azzapp/shared/coverHelpers';
 import { createRandomFilePath, getFileName } from '#helpers/fileHelpers';
+import { addLocalCachedMediaFile } from '#helpers/mediaHelpers';
 import { uploadMedia, uploadSign } from '#helpers/MobileWebAPI';
 import coverDrawer from './coverDrawer';
 import { mediaInfoIsImage } from './coverEditorHelpers';
@@ -85,9 +86,10 @@ const useSaveCover = (
       target: 'cover',
     });
     const fileName = getFileName(path);
+    const uri = `file://${path}`;
     const file: any = {
       name: fileName,
-      uri: `file://${path}`,
+      uri,
       type:
         mime.lookup(fileName) ||
         (kind === 'image' ? 'image/jpeg' : 'video/mp4'),
@@ -104,6 +106,9 @@ const useSaveCover = (
       );
     });
     const { public_id } = await uploadPromise;
+
+    addLocalCachedMediaFile(public_id, kind, uri);
+
     setSavingStatus('saving');
 
     const texts = coverEditorState.textLayers.map(({ text }) => text);
