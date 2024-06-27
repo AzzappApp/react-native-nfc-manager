@@ -7,10 +7,7 @@ import React, {
 } from 'react';
 import { useDerivedValue, useSharedValue } from 'react-native-reanimated';
 import { graphql, useFragment } from 'react-relay';
-import {
-  useRouteWillChange,
-  useScreenHasFocus,
-} from '#components/NativeRouter';
+import { useOnFocus, useRouteWillChange } from '#components/NativeRouter';
 import {
   addAuthStateListener,
   getAuthState,
@@ -104,13 +101,8 @@ export const HomeScreenProvider = ({
   // we need to keep a ref to the profiles to avoid prefetching when the user `profiles` field changes
   const profilesRef = useRef(user.profiles);
 
-  const focus = useScreenHasFocus();
-
-  useEffect(() => {
-    //in case we are deleting a profile from another menu (cover edition for example,we should update profile even if not focus)
-    //if you still have issue, we can do it in the deleteWecard mutation
+  useOnFocus(() => {
     if (
-      focus &&
       user?.profiles &&
       profilesRef.current &&
       user?.profiles?.length < profilesRef.current.length
@@ -125,7 +117,7 @@ export const HomeScreenProvider = ({
       }
     }
     profilesRef.current = user.profiles;
-  }, [focus, user.profiles]);
+  });
 
   const profilesDisposables = useRef<Disposable[]>([]).current;
   useEffect(() => {
@@ -174,18 +166,14 @@ export const HomeScreenProvider = ({
       currentIndexSharedValue.value = index;
       const newProfile = user.profiles?.[index - 1];
       if (newProfile) {
-        if (focus) {
-          onChangeWebCard({
-            profileId: newProfile.id,
-            webCardId: newProfile.webCard.id,
-            profileRole: newProfile.invited
-              ? 'invited'
-              : newProfile.profileRole,
-          });
-        }
+        onChangeWebCard({
+          profileId: newProfile.id,
+          webCardId: newProfile.webCard.id,
+          profileRole: newProfile.invited ? 'invited' : newProfile.profileRole,
+        });
       }
     },
-    [currentIndexSharedValue, focus, user.profiles],
+    [currentIndexSharedValue, user.profiles],
   );
 
   //updating the initialProfileIndex to avoid warning(not sure needed in production)
@@ -193,7 +181,7 @@ export const HomeScreenProvider = ({
     if (user?.profiles && user?.profiles?.length > initialProfileIndex) {
       setInitialProfileIndex(1);
     }
-  }, [initialProfileIndex, onCurrentProfileIndexChange, user?.profiles]);
+  }, [initialProfileIndex, user?.profiles]);
 
   const value = useMemo(
     () => ({

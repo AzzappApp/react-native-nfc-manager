@@ -821,7 +821,7 @@ export const ScreensRenderer = ({
                     : 'slide_from_bottom'
               }
             >
-              <GestureHandlerRootView style={{ flex: 1 }}>
+              <GestureHandlerRootView style={styles.flex}>
                 {children}
               </GestureHandlerRootView>
             </Screen>
@@ -933,7 +933,7 @@ const ScreenDidAppearInner = ({
   if (!screenDidAppear) {
     throw promise;
   }
-  return <>{children}</>;
+  return children;
 };
 
 const StackRenderer = ({
@@ -955,9 +955,12 @@ const StackRenderer = ({
   onFinishTransitioning?: (e: NativeSyntheticEvent<TargetedEvent>) => void;
   onScreenDismissed?: (id: string) => void;
 }) => {
-  const childs: any[] = useMemo(
-    () =>
-      stack.map((routeInfo, index) => {
+  return (
+    <ScreenStack
+      style={styles.flex}
+      onFinishTransitioning={onFinishTransitioning}
+    >
+      {stack.map((routeInfo, index) => {
         const screenHasFocus = hasFocus && index === stack.length - 1;
         if (routeInfo.kind === 'tabs') {
           return (
@@ -988,29 +991,12 @@ const StackRenderer = ({
             {...routeInfo.state}
             defaultScreenOptions={defaultScreenOptions}
             screens={screens}
-            onDismissed={() => onScreenDismissed?.(routeInfo.id)}
+            onScreenDismissed={onScreenDismissed}
             hasFocus={screenHasFocus}
             isNativeStack
           />
         );
-      }),
-    [
-      defaultScreenOptions,
-      hasFocus,
-      onFinishTransitioning,
-      onScreenDismissed,
-      screens,
-      stack,
-      tabsRenderers,
-    ],
-  );
-
-  return (
-    <ScreenStack
-      style={{ flex: 1 }}
-      onFinishTransitioning={onFinishTransitioning}
-    >
-      {childs}
+      })}
       {children}
     </ScreenStack>
   );
@@ -1041,7 +1027,7 @@ const TabsRenderer = ({
 
   return (
     <>
-      <ScreenContainer style={{ flex: 1 }} hasTwoStates>
+      <ScreenContainer style={styles.flex} hasTwoStates>
         {tabs.map((routeInfo, index) => {
           const screenHasFocus = hasFocus && index === currentIndex;
           if (!visitedTabs.has(routeInfo.id)) {
@@ -1124,7 +1110,7 @@ type ScreenRendererProps = Route & {
   isNativeStack?: boolean;
   defaultScreenOptions?: ScreenOptions | null;
   hasFocus?: boolean;
-  onDismissed?: () => void;
+  onScreenDismissed?: (id: string) => void;
 };
 
 const ScreenRenderer = ({
@@ -1136,7 +1122,7 @@ const ScreenRenderer = ({
   defaultScreenOptions,
   hasFocus,
   isNativeStack,
-  onDismissed: onDismissedProp,
+  onScreenDismissed,
 }: ScreenRendererProps) => {
   const Component: any = screens[route];
 
@@ -1173,28 +1159,30 @@ const ScreenRenderer = ({
     [id, navigationEventEmitter, didAppear, hasFocus],
   );
 
-  const onAppear = () => {
+  const onAppear = useCallback(() => {
     navigationEventEmitter.emit('appear');
     setDidAppear(true);
-  };
+  }, [navigationEventEmitter]);
 
-  const onDismissed = () => {
+  const onDismissed = useCallback(() => {
     // TODO this event might be dispatched on tab switch which has no sense
     navigationEventEmitter.emit('dismissed');
-    onDismissedProp?.();
-  };
+    onScreenDismissed?.(id);
+  }, [id, navigationEventEmitter, onScreenDismissed]);
 
-  const screenView = useMemo(
-    () =>
-      Component ? (
-        <Component
-          screenId={id}
-          hasFocus={hasFocus}
-          route={{ route, params }}
-        />
-      ) : null,
-    [Component, id, hasFocus, route, params],
-  );
+  const onWillAppear = useCallback(() => {
+    navigationEventEmitter.emit('willAppear');
+  }, [navigationEventEmitter]);
+
+  const onWillDisappear = useCallback(() => {
+    navigationEventEmitter.emit('willDisappear');
+  }, [navigationEventEmitter]);
+
+  const onDisappear = useCallback(() => {
+    navigationEventEmitter.emit('disappear');
+  }, [navigationEventEmitter]);
+
+  const currentRoute = useMemo(() => ({ route, params }), [route, params]);
 
   if (!Component) {
     console.error(`Unknown component for route ${route}`);
@@ -1208,15 +1196,15 @@ const ScreenRenderer = ({
       activityState={activityState}
       isNativeStack={isNativeStack}
       onAppear={onAppear}
-      onWillAppear={() => navigationEventEmitter.emit('willAppear')}
-      onDisappear={() => navigationEventEmitter.emit('disappear')}
-      onWillDisappear={() => navigationEventEmitter.emit('willDisappear')}
+      onWillAppear={onWillAppear}
+      onDisappear={onDisappear}
+      onWillDisappear={onWillDisappear}
       onDismissed={onDismissed}
       style={StyleSheet.absoluteFill}
     >
-      <GestureHandlerRootView style={{ flex: 1 }}>
+      <GestureHandlerRootView style={styles.flex}>
         <ScreenRendererContext.Provider value={screenContextValue}>
-          {screenView}
+          <Component screenId={id} hasFocus={hasFocus} route={currentRoute} />
         </ScreenRendererContext.Provider>
       </GestureHandlerRootView>
     </Screen>
@@ -1308,3 +1296,7 @@ function dispatchToListeners<
 >(listeners: T[], ...args: U) {
   listeners.forEach(listener => listener(...(args as any)));
 }
+
+const styles = StyleSheet.create({
+  flex: { flex: 1 },
+});
