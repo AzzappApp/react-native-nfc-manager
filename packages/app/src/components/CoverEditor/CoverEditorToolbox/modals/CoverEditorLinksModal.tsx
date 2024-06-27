@@ -157,7 +157,6 @@ const CoverEditorLinksModal = ({ open, onClose }: Props) => {
               style={styles.previews}
               behavior="position"
               onLayout={e => setLinksHeight(e.nativeEvent.layout.height)}
-              keyboardVerticalOffset={-inset.bottom - BOTTOM_MENU_HEIGHT}
             >
               <View>
                 <SocialLinksLinksEditionPanel
@@ -195,7 +194,7 @@ const styles = StyleSheet.create({
   },
   previews: {
     flex: 1,
-    marginTop: 210,
+    marginTop: 320,
   },
 });
 
