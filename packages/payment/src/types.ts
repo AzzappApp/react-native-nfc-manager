@@ -7,5 +7,5 @@ export type Customer = {
   country: string;
   countryCode: string;
   vatNumber?: string | null;
-  phoneNumber?: string;
+  phone?: string;
 };

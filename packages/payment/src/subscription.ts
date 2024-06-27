@@ -536,7 +536,7 @@ export const updateCustomer = async (
   const updates = {
     subscriberName: customer.name,
     subscriberEmail: customer.email,
-    subscriberPhoneNumber: customer.phoneNumber ?? null,
+    subscriberPhoneNumber: customer.phone ?? null,
     subscriberAddress: customer.address,
     subscriberCity: customer.city,
     subscriberZip: customer.zip,
