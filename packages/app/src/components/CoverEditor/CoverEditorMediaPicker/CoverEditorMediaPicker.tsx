@@ -180,13 +180,13 @@ const CoverEditorMediaPicker = ({
         {
           defaultMessage: `{count, plural,
               =0 {No media selected}
-              =1 {1 media selected}
-              other {# medias selected.}
+              =1 {1/{max} (max) media selected}
+              other {#/{max} (max) medias selected}
             }`,
           description:
             'Medias selection label for free multi selection of media in cover edition',
         },
-        { count: selectedMedias.length },
+        { count: selectedMedias.length, max: COVER_MAX_MEDIA },
       );
 
   const { top, bottom } = useScreenInsets();
