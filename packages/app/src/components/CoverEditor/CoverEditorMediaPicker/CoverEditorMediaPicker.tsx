@@ -3,7 +3,11 @@ import { useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { View, Alert } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
-import { COVER_MAX_MEDIA } from '@azzapp/shared/coverHelpers';
+import Toast from 'react-native-toast-message';
+import {
+  COVER_IMAGE_DEFAULT_DURATION,
+  COVER_MAX_MEDIA,
+} from '@azzapp/shared/coverHelpers';
 import { colors, shadow } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import { duplicateMediaToFillSlots } from '#helpers/mediaHelpers';
@@ -57,6 +61,24 @@ const CoverEditorMediaPicker = ({
         return currentMedias;
       }
       if (currentMedias.length < maxMedias) {
+        const expectedDuration =
+          durations?.[currentMedias.length] ?? COVER_IMAGE_DEFAULT_DURATION;
+
+        if (media.kind === 'video' && media.duration < expectedDuration) {
+          Toast.show({
+            type: 'error',
+            text1: intl.formatMessage(
+              {
+                defaultMessage: 'Selected video should be at least {duration}s',
+                description:
+                  'Error message when selecting a video media that is too short',
+              },
+              { duration: expectedDuration },
+            ),
+          });
+          return currentMedias;
+        }
+
         const updatedMedias = [...currentMedias, media as Media];
         return updatedMedias;
       }
