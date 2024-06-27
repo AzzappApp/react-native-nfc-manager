@@ -61,15 +61,18 @@ const duplicateModule: MutationResolvers['duplicateModule'] = async (
 
   const webCard = await loaders.WebCard.load(webCardId);
 
-  if (webCard) {
-    cardUsernamesToRevalidate.add(webCard.userName);
+  if (!webCard) {
+    throw new GraphQLError(ERRORS.INTERNAL_SERVER_ERROR);
   }
+
+  cardUsernamesToRevalidate.add(webCard.userName);
 
   return {
     createdModules: modules.map((module, index) => ({
       originalModuleId: module.id,
       newModuleId: createdModuleIds[index],
     })),
+    webCard,
   };
 };
 

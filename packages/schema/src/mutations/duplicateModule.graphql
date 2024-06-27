@@ -8,6 +8,7 @@ input DuplicateModuleInput {
 
 type DuplicateModulePayload {
   createdModules: [CreatedModule!]!
+  webCard: WebCard!
 }
 
 type CreatedModule {

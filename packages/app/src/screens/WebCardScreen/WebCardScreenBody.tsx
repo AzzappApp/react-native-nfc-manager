@@ -191,6 +191,7 @@ const WebCardScreenBody = (
         deleteModules(webCardId: $webCardId, input: $input) {
           webCard {
             id
+            requiresSubscription
           }
         }
       }
@@ -206,6 +207,10 @@ const WebCardScreenBody = (
           createdModules {
             originalModuleId
             newModuleId
+          }
+          webCard {
+            id
+            requiresSubscription
           }
         }
       }
