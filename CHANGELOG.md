@@ -1,4 +1,4 @@
-## 0.5.19-canary.34
+## 0.5.19-canary.35
 
 * **fix:**  - **mediaPicker:** [#3935](https://github.com/AzzappApp/azzapp/pull/3935) simplify media loading ([#3955](https://github.com/AzzappApp/azzapp/pull/3955))
 * **feat:**  - 🎸 disallow selecting video when too short ([#3950](https://github.com/AzzappApp/azzapp/pull/3950))
