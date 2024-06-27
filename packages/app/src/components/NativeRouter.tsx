@@ -955,12 +955,9 @@ const StackRenderer = ({
   onFinishTransitioning?: (e: NativeSyntheticEvent<TargetedEvent>) => void;
   onScreenDismissed?: (id: string) => void;
 }) => {
-  return (
-    <ScreenStack
-      style={styles.flex}
-      onFinishTransitioning={onFinishTransitioning}
-    >
-      {stack.map((routeInfo, index) => {
+  const childs = useMemo(
+    () =>
+      stack.map((routeInfo, index) => {
         const screenHasFocus = hasFocus && index === stack.length - 1;
         if (routeInfo.kind === 'tabs') {
           return (
@@ -996,7 +993,24 @@ const StackRenderer = ({
             isNativeStack
           />
         );
-      })}
+      }),
+    [
+      stack,
+      hasFocus,
+      defaultScreenOptions,
+      screens,
+      onScreenDismissed,
+      tabsRenderers,
+      onFinishTransitioning,
+    ],
+  );
+
+  return (
+    <ScreenStack
+      style={styles.flex}
+      onFinishTransitioning={onFinishTransitioning}
+    >
+      {childs}
       {children}
     </ScreenStack>
   );
