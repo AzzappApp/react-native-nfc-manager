@@ -6,8 +6,13 @@
  * package is not maintained anymore so we internalized it
  */
 import { Animation, LayerType } from '@lottiefiles/lottie-js';
+import { AssetType } from '@lottiefiles/lottie-js';
 import cloneDeep from 'lodash/cloneDeep';
-import type { ImageAsset, ImageLayer } from '@lottiefiles/lottie-js';
+import type {
+  ImageAsset,
+  PrecompositionAsset,
+  ImageLayer,
+} from '@lottiefiles/lottie-js';
 
 export const replaceColors = (
   replacements: Array<{
@@ -136,9 +141,20 @@ export function extractLottieInfo(lottie: Record<string, any>): LottieInfo {
   const animation = new Animation();
   animation.fromJSON(lottie);
 
-  const imageLayers: ImageLayer[] = animation.layers.filter(
+  const imageLayers = animation.layers.filter(
     layer => layer.type === LayerType.IMAGE,
-  ) as ImageLayer[];
+  );
+
+  imageLayers.push(
+    ...animation.assets
+      .filter(
+        asset => 'type' in asset && asset.type === AssetType.PRECOMPOSITION,
+      )
+      .flatMap(asset => {
+        const precompAssets = asset as PrecompositionAsset;
+        return precompAssets.layers;
+      }),
+  );
 
   return {
     duration: animation.duration,
@@ -146,9 +162,11 @@ export function extractLottieInfo(lottie: Record<string, any>): LottieInfo {
       .filter(asset => 'path' in asset)
       .map(asset => {
         const imageAsset = asset as ImageAsset;
+
         const mediaLayers = imageLayers.filter(
-          layer => layer.refId === imageAsset.id,
-        );
+          layer => (layer as ImageLayer).refId === imageAsset.id,
+        ) as ImageLayer[];
+
         const startFrame = mediaLayers.reduce(
           (min, layer) => Math.min(min, layer.inPoint),
           Infinity,
