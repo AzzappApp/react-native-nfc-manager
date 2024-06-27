@@ -42,7 +42,13 @@ const WizardPagerHeader = ({
             />
           )}
         </View>
-        <View key={currentPage} style={styles.titleTextContainer}>
+        <View
+          key={currentPage}
+          style={[
+            styles.titleTextContainer,
+            !backIcon && { marginLeft: rightElementWidth },
+          ]}
+        >
           {typeof title === 'string' ? (
             <Text variant="large" style={styles.titleText}>
               {title}
