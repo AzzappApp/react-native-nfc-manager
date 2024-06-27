@@ -1,5 +1,6 @@
-## 0.5.19-canary.36
+## 0.5.19-canary.37
 
+* **fix:**  - revert change on screen modal - infinite loop ([#3963](https://github.com/AzzappApp/azzapp/pull/3963))
 * **fix:**  - **payment:** [#3946](https://github.com/AzzappApp/azzapp/pull/3946) rename field to match api ([#3947](https://github.com/AzzappApp/azzapp/pull/3947))
 * **perf:**  - **android:** [#3915](https://github.com/AzzappApp/azzapp/pull/3915) issues on home screen rerenders during navigation ([#3952](https://github.com/AzzappApp/azzapp/pull/3952))
 * **fix:**  - **webCard:** [#3954](https://github.com/AzzappApp/azzapp/pull/3954) update requiresSubscription cached value ([#3956](https://github.com/AzzappApp/azzapp/pull/3956))
