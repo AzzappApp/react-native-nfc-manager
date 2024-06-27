@@ -1,5 +1,9 @@
-## 0.5.19-canary.35
+## 0.5.19-canary.36
 
+* **fix:**  - **payment:** [#3946](https://github.com/AzzappApp/azzapp/pull/3946) rename field to match api ([#3947](https://github.com/AzzappApp/azzapp/pull/3947))
+* **perf:**  - **android:** [#3915](https://github.com/AzzappApp/azzapp/pull/3915) issues on home screen rerenders during navigation ([#3952](https://github.com/AzzappApp/azzapp/pull/3952))
+* **fix:**  - **webCard:** [#3954](https://github.com/AzzappApp/azzapp/pull/3954) update requiresSubscription cached value ([#3956](https://github.com/AzzappApp/azzapp/pull/3956))
+* **fix:**  - **coverTemplate:** [#3949](https://github.com/AzzappApp/azzapp/pull/3949) read in precomp layers ([#3960](https://github.com/AzzappApp/azzapp/pull/3960))
 * **fix:**  - **mediaPicker:** [#3935](https://github.com/AzzappApp/azzapp/pull/3935) simplify media loading ([#3955](https://github.com/AzzappApp/azzapp/pull/3955))
 * **feat:**  - 🎸 disallow selecting video when too short ([#3950](https://github.com/AzzappApp/azzapp/pull/3950))
 * **feat:**  - 🎸 display elements with right margin ([#3920](https://github.com/AzzappApp/azzapp/pull/3920))
