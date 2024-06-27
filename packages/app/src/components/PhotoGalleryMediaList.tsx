@@ -81,15 +81,23 @@ const PhotoGalleryMediaList = ({
   const [hasNext, setHasNext] = useState(false);
   const nextCursor = useRef<string | undefined>();
   const { mediaPermission } = usePermissionContext();
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+
+  const mediaLength = useRef(0);
 
   const load = useCallback(
     async (refreshing = false, updatePictures = false) => {
       if (!isLoading.current) {
         isLoading.current = true;
+        setIsLoadingMore(true);
 
         try {
           const result = await CameraRoll.getPhotos({
-            first: updatePictures ? medias.length || 16 : refreshing ? 16 : 48, //multiple of items per row
+            first: updatePictures
+              ? mediaLength.current || 16
+              : refreshing
+                ? 16
+                : 48, //multiple of items per row
             after: refreshing ? undefined : nextCursor.current,
             assetType:
               kind === 'mixed' ? 'All' : kind === 'image' ? 'Photos' : 'Videos',
@@ -102,9 +110,17 @@ const PhotoGalleryMediaList = ({
           const endCursor = result.page_info.end_cursor;
           const assets = result.edges;
 
-          setMedias(previous =>
-            refreshing ? assets : [...previous, ...assets],
-          );
+          if (refreshing) {
+            scrollViewRef.current?.scrollToIndex({ index: 0 });
+          }
+
+          setMedias(previous => {
+            const result = refreshing ? assets : [...previous, ...assets];
+            mediaLength.current = result.length;
+            return result;
+          });
+          setIsLoadingMore(false);
+
           nextCursor.current = endCursor;
           setHasNext(hasNextPage);
         } catch (e) {
@@ -115,21 +131,12 @@ const PhotoGalleryMediaList = ({
         }
       }
     },
-    [album?.title, album?.type, kind, medias.length],
+    [album?.title, album?.type, kind],
   );
 
   useEffect(() => {
-    //force preload more data and initial render,
-    if (medias.length === 16 && hasNext) {
-      void load();
-    }
-  }, [hasNext, load, medias.length]);
-
-  useEffect(() => {
-    if (!isLoading.current) {
-      void load(true);
-    }
-  }, [album, load]);
+    void load(true);
+  }, [load]);
 
   const [downloadingFiles, setDownloadingFiles] = useState<string[]>([]);
 
@@ -214,10 +221,10 @@ const PhotoGalleryMediaList = ({
   );
 
   const onEndReached = useCallback(() => {
-    if (hasNext && !isLoading.current) {
+    if (hasNext) {
       void load();
     }
-  }, [hasNext, isLoading, load]);
+  }, [hasNext, load]);
 
   const itemHeight =
     (useWindowDimensions().width - (numColumns - 1 * SEPARATOR_WIDTH)) /
@@ -257,7 +264,7 @@ const PhotoGalleryMediaList = ({
     const subscription = AppState.addEventListener(
       'change',
       async nextAppState => {
-        if (nextAppState === 'active' && !isLoading.current) {
+        if (nextAppState === 'active') {
           load(true, true);
         }
       },
@@ -313,6 +320,13 @@ const PhotoGalleryMediaList = ({
         estimatedItemSize={itemHeight}
         extraData={{ selectedMediasIds, selectedMediaId }}
         testID="photo-gallery-list"
+        ListFooterComponent={
+          isLoadingMore ? (
+            <View style={styles.loadingMore}>
+              <ActivityIndicator />
+            </View>
+          ) : null
+        }
         {...props}
       />
     </View>
@@ -423,6 +437,7 @@ const styleSheet = createStyleSheet(appearance => ({
     justifyContent: 'center',
     alignItems: 'center',
   },
+  loadingMore: { justifyContent: 'center', alignItems: 'center' },
 }));
 
 const SEPARATOR_WIDTH = 1;
