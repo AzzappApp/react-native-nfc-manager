@@ -4,7 +4,7 @@ import {
 } from '@react-native-camera-roll/camera-roll';
 import { FlashList } from '@shopify/flash-list';
 import { Image } from 'expo-image';
-import { memo, useCallback, useEffect, useRef, useState } from 'react';
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { AppState, Platform, View, useWindowDimensions } from 'react-native';
 import ReactNativeBlobUtil from 'react-native-blob-util';
@@ -77,8 +77,7 @@ const PhotoGalleryMediaList = ({
   const scrollViewRef = useRef<FlashList<PhotoIdentifier>>(null);
   const styles = useStyleSheet(styleSheet);
   const [medias, setMedias] = useState<PhotoIdentifier[]>([]);
-  const isLoading = useRef(false);
-  const [hasNext, setHasNext] = useState(false);
+  const [hasNext, setHasNext] = useState(true);
   const nextCursor = useRef<string | undefined>();
   const { mediaPermission } = usePermissionContext();
   const [isLoadingMore, setIsLoadingMore] = useState(false);
@@ -87,48 +86,40 @@ const PhotoGalleryMediaList = ({
 
   const load = useCallback(
     async (refreshing = false, updatePictures = false) => {
-      if (!isLoading.current) {
-        isLoading.current = true;
-        setIsLoadingMore(true);
+      setIsLoadingMore(true);
 
-        try {
-          const result = await CameraRoll.getPhotos({
-            first: updatePictures
-              ? mediaLength.current || 16
-              : refreshing
-                ? 16
-                : 48, //multiple of items per row
-            after: refreshing ? undefined : nextCursor.current,
-            assetType:
-              kind === 'mixed' ? 'All' : kind === 'image' ? 'Photos' : 'Videos',
-            groupTypes: album?.type,
-            groupName: album?.title,
-            include: ['playableDuration'],
-          });
+      try {
+        const result = await CameraRoll.getPhotos({
+          first: updatePictures ? mediaLength.current || 48 : 48, //multiple of items per row
+          after: refreshing ? undefined : nextCursor.current,
+          assetType:
+            kind === 'mixed' ? 'All' : kind === 'image' ? 'Photos' : 'Videos',
+          groupTypes: album?.type,
+          groupName: album?.title,
+          include: ['playableDuration'],
+        });
 
-          const hasNextPage = result.page_info.has_next_page;
-          const endCursor = result.page_info.end_cursor;
-          const assets = result.edges;
+        const hasNextPage = result.page_info.has_next_page;
+        const endCursor = result.page_info.end_cursor;
+        const assets = result.edges;
 
-          if (refreshing) {
-            scrollViewRef.current?.scrollToIndex({ index: 0 });
-          }
-
-          setMedias(previous => {
-            const result = refreshing ? assets : [...previous, ...assets];
-            mediaLength.current = result.length;
-            return result;
-          });
-          setIsLoadingMore(false);
-
-          nextCursor.current = endCursor;
-          setHasNext(hasNextPage);
-        } catch (e) {
-          console.log(e);
-          return;
-        } finally {
-          isLoading.current = false;
+        if (refreshing) {
+          scrollViewRef.current?.scrollToIndex({ index: 0 });
         }
+
+        setMedias(previous => {
+          const result = refreshing ? assets : [...previous, ...assets];
+          mediaLength.current = result.length;
+          return result;
+        });
+
+        nextCursor.current = endCursor;
+        setHasNext(hasNextPage);
+      } catch (e) {
+        console.log(e);
+        return;
+      } finally {
+        setIsLoadingMore(false);
       }
     },
     [album?.title, album?.type, kind],
@@ -221,10 +212,10 @@ const PhotoGalleryMediaList = ({
   );
 
   const onEndReached = useCallback(() => {
-    if (hasNext) {
+    if (hasNext && !isLoadingMore) {
       void load();
     }
-  }, [hasNext, load]);
+  }, [hasNext, isLoadingMore, load]);
 
   const itemHeight =
     (useWindowDimensions().width - (numColumns - 1 * SEPARATOR_WIDTH)) /
@@ -275,6 +266,11 @@ const PhotoGalleryMediaList = ({
     };
   }, [load]);
 
+  const extraData = useMemo(
+    () => ({ selectedMediasIds, selectedMediaId }),
+    [selectedMediasIds, selectedMediaId],
+  );
+
   const intl = useIntl();
 
   return (
@@ -318,7 +314,7 @@ const PhotoGalleryMediaList = ({
         contentContainerStyle={contentContainerStyle}
         ItemSeparatorComponent={ItemSeparatorComponent}
         estimatedItemSize={itemHeight}
-        extraData={{ selectedMediasIds, selectedMediaId }}
+        extraData={extraData}
         testID="photo-gallery-list"
         ListFooterComponent={
           isLoadingMore ? (
