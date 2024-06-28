@@ -143,6 +143,11 @@ const CoverEditorCore = (
         id
         lottie
         data
+        colorPalette {
+          primary
+          light
+          dark
+        }
       }
     `,
     coverTemplateKey,
@@ -237,6 +242,7 @@ const CoverEditorCore = (
         ...DEFAULT_COLOR_PALETTE,
         otherColors: [...DEFAULT_COLOR_LIST],
         ...profile.webCard.cardColors,
+        ...coverTemplate?.colorPalette,
       } as any, // typescript is not happy with readonly
       backgroundColor: backgroundColor ?? 'light',
 
