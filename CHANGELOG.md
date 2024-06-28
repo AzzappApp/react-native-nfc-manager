@@ -1,5 +1,6 @@
-## 0.5.19-canary.50
+## 0.5.19-canary.51
 
+* **fix:**  - **cover:** [#3976](https://github.com/AzzappApp/azzapp/pull/3976) add loader for first download ([#3991](https://github.com/AzzappApp/azzapp/pull/3991))
 * **fix:**  - **Cover:** properly handle image buffer cache
 * **fix:**  - **cover:** [#3727](https://github.com/AzzappApp/azzapp/pull/3727) preview are displayed before skImage is ready ([#3997](https://github.com/AzzappApp/azzapp/pull/3997))
 * **fix:**  - use WheelSelector ([#3996](https://github.com/AzzappApp/azzapp/pull/3996))
