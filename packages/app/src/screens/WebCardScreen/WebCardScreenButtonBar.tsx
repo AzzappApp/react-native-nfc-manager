@@ -299,7 +299,11 @@ const WebCardScreenButtonActionButton = ({
               defaultMessage="Build my WebCard{azzappA}"
               description="Build my webcard button label in Profile Screen Button Bar"
               values={{
-                azzappA: <Text variant="azzapp">a</Text>,
+                azzappA: (
+                  <Text variant="azzapp" style={styles.textButton}>
+                    a
+                  </Text>
+                ),
               }}
             />
           </Text>
