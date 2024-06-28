@@ -25,7 +25,7 @@ function ActivityIndicator({ style, color, video }: ActivityIndicatorProps) {
       autoPlay
       loop
       hardwareAccelerationAndroid
-      style={[style, { width: video ? 150 : 51, height: video ? 150 : 40 }]}
+      style={[{ width: video ? 150 : 51, height: video ? 150 : 40 }, style]}
     />
   );
 }

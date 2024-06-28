@@ -1,5 +1,5 @@
 import * as Sentry from '@sentry/react-native';
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import {
   View,
@@ -145,7 +145,10 @@ const WebCardModal = ({
     }
   };
 
+  const [coverVideoLoading, setCoverVideoLoading] = useState(false);
+
   const onShareCoverVideo = useCallback(async () => {
+    setCoverVideoLoading(true);
     if (!webCard.coverMedia?.uriDownload) {
       return null;
     }
@@ -154,7 +157,7 @@ const WebCardModal = ({
       const dirs = ReactNativeBlobUtil.fs.dirs;
       const localPath = await ReactNativeBlobUtil.config({
         fileCache: true,
-        path: `${dirs.CacheDir}/${webCard.userName}_{}.${webCard.coverMedia.__typename === 'MediaVideo' ? 'mp4' : 'png'}`,
+        path: `${dirs.CacheDir}/${webCard.userName}.${webCard.coverMedia.__typename === 'MediaVideo' ? 'mp4' : 'png'}`,
       }).fetch('GET', webCard.coverMedia.uriDownload);
 
       await ShareCommand.open({
@@ -167,8 +170,19 @@ const WebCardModal = ({
       });
     } catch (error: any) {
       Sentry.captureException(error);
+      Toast.show({
+        type: 'error',
+        text1: intl.formatMessage({
+          defaultMessage:
+            'Error while sharing the cover video, please try again.',
+          description: 'Error toast message when sharing cover video fails.',
+        }),
+      });
+    } finally {
+      setCoverVideoLoading(false);
     }
   }, [
+    intl,
     webCard.coverMedia?.__typename,
     webCard.coverMedia?.uriDownload,
     webCard.userName,
@@ -433,6 +447,7 @@ const WebCardModal = ({
             <PressableNative
               style={styles.bottomSheetOptionButton}
               onPress={onShareCoverVideo}
+              disabled={coverVideoLoading}
             >
               <View style={styles.bottomSheetOptionContainer}>
                 <View style={styles.bottomSheetOptionIconLabel}>
@@ -443,6 +458,9 @@ const WebCardModal = ({
                       description="Profile webcard modal - Share this video"
                     />
                   </Text>
+                  {coverVideoLoading && (
+                    <ActivityIndicator style={styles.loader} />
+                  )}
                 </View>
               </View>
             </PressableNative>
@@ -573,4 +591,5 @@ const stylesheet = createStyleSheet(appearance => ({
   coverStyle: {
     ...shadow(appearance, 'bottom'),
   },
+  loader: { height: 25 },
 }));
