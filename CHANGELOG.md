@@ -1,5 +1,7 @@
-## 0.5.19-canary.41
+## 0.5.19-canary.42
 
+* **fix:**  - **payment:** [#3865](https://github.com/AzzappApp/azzapp/pull/3865) don’t cancel payment on rebill error ([#3977](https://github.com/AzzappApp/azzapp/pull/3977))
+* **feat:**  - better feeling in playing video on template. avoid video not loading ([#3982](https://github.com/AzzappApp/azzapp/pull/3982))
 * **fix:**  - **webCard:** [#3934](https://github.com/AzzappApp/azzapp/pull/3934) set correct result on update ([#3972](https://github.com/AzzappApp/azzapp/pull/3972))
 * **fix:**  - 🐛 remove toast when clicking on new template ([#3962](https://github.com/AzzappApp/azzapp/pull/3962))
 * **fix:**  - **cover:** [#3902](https://github.com/AzzappApp/azzapp/pull/3902) race conditions on store update ([#3965](https://github.com/AzzappApp/azzapp/pull/3965))
