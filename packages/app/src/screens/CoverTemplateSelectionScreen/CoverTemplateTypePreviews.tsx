@@ -37,7 +37,7 @@ const CoverTemplateTypePreviews = ({
       )
       @relay(plural: true) {
         id
-        requiredMedias
+        mediaCount
         order
         preview {
           id
@@ -152,11 +152,11 @@ const ListItemComponent = ({
           style={styles.previewMedia}
         />
       )}
-      {coverTemplate.requiredMedias != null && (
+      {coverTemplate.mediaCount != null && (
         <View style={styles.badge}>
           <View style={styles.badgeElements}>
             <Icon size={16} icon="landscape" />
-            <Text variant="xsmall">{coverTemplate.requiredMedias}</Text>
+            <Text variant="xsmall">{coverTemplate.mediaCount}</Text>
           </View>
         </View>
       )}

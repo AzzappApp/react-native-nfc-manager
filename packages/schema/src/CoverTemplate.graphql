@@ -12,5 +12,5 @@ type CoverTemplate implements Node {
   tags: [CoverTemplateTag!]!
   preview: Media!
   lottie: String!
-  requiredMedias: Int!
+  mediaCount: Int!
 }

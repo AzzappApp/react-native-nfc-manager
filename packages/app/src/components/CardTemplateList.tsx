@@ -608,9 +608,10 @@ const CardTemplatePreviewModal = ({
     return null;
   }
   return (
-    <View
+    <Container
       style={[
         {
+          paddingTop: insets.top + (StatusBar.currentHeight ?? 0),
           position: 'absolute',
           top: 0,
           left: 0,
@@ -621,34 +622,32 @@ const CardTemplatePreviewModal = ({
         style,
       ]}
     >
-      <Container style={{ flex: 1, paddingTop: insets.top }}>
-        <Header
-          leftElement={<CancelHeaderButton onPress={onRequestClose} />}
-          middleElement={template?.label ?? ''}
-          rightElement={
-            <HeaderButton
-              onPress={onApply}
-              label={intl.formatMessage({
-                defaultMessage: 'Apply',
-                description: 'Apply button label in card template preview',
-              })}
-              loading={loading}
-            />
-          }
-        />
-        {template && webCard && (
-          <WebCardPreview
-            webCard={webCard}
-            height={previewHeight}
-            cardStyle={template.cardStyle}
-            cardColors={cardColors}
-            style={{ flex: 1 }}
-            cardModules={cardModules}
-            contentPaddingBottom={insets.bottom}
+      <Header
+        leftElement={<CancelHeaderButton onPress={onRequestClose} />}
+        middleElement={template?.label ?? ''}
+        rightElement={
+          <HeaderButton
+            onPress={onApply}
+            label={intl.formatMessage({
+              defaultMessage: 'Apply',
+              description: 'Apply button label in card template preview',
+            })}
+            loading={loading}
           />
-        )}
-      </Container>
-    </View>
+        }
+      />
+      {template && webCard && (
+        <WebCardPreview
+          webCard={webCard}
+          height={previewHeight}
+          cardStyle={template.cardStyle}
+          cardColors={cardColors}
+          style={{ flex: 1 }}
+          cardModules={cardModules}
+          contentPaddingBottom={insets.bottom}
+        />
+      )}
+    </Container>
   );
 };
 

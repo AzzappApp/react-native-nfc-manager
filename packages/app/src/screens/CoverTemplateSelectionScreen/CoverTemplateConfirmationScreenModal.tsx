@@ -47,13 +47,12 @@ const CoverTemplateConfirmationScreenModal = ({
               style={styles.template}
               resizeMode={ResizeMode.CONTAIN}
               shouldPlay
+              posterSource={{ uri: template.preview.video.thumbnail }}
             />
           ) : (
             <Image
               source={{
-                uri:
-                  template?.preview.video?.thumbnail ??
-                  template?.preview.image?.uri,
+                uri: template?.preview.image?.uri,
               }}
               style={styles.template}
             />
