@@ -1,5 +1,6 @@
-## 0.5.19-canary.49
+## 0.5.19-canary.50
 
+* **fix:**  - **Cover:** properly handle image buffer cache
 * **fix:**  - **cover:** [#3727](https://github.com/AzzappApp/azzapp/pull/3727) preview are displayed before skImage is ready ([#3997](https://github.com/AzzappApp/azzapp/pull/3997))
 * **fix:**  - use WheelSelector ([#3996](https://github.com/AzzappApp/azzapp/pull/3996))
 * **fix:**  - **multiUser:** [#3966](https://github.com/AzzappApp/azzapp/pull/3966) remove publish label ([#3992](https://github.com/AzzappApp/azzapp/pull/3992))
