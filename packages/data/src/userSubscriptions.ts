@@ -60,6 +60,7 @@ export const UserSubscriptionTable = mysqlTable(
     status: mysqlEnum('status', ['active', 'canceled', 'waiting_payment'])
       .notNull()
       .default('active'),
+    lastPaymentError: cols.boolean('lastPaymentError').default(false),
     canceledAt: cols.dateTime('canceledAt'),
   },
   table => {

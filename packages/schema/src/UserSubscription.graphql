@@ -53,6 +53,8 @@ type UserSubscription {
   status: SubscriptionStatus
 
   paymentRedirectUrl: String
+
+  lastPaymentError: Boolean!
 }
 
 enum UserSubscriptionIssuer {

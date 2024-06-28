@@ -211,6 +211,7 @@ export const rejectFirstPayment = async (
           .set({
             status: 'canceled',
             canceledAt: new Date(),
+            lastPaymentError: true,
           })
           .where(eq(UserSubscriptionTable.paymentMeanId, paymentMeanId));
       });
@@ -252,6 +253,7 @@ export const acknowledgeRecurringPayment = async (
 
       const updates: Partial<UserSubscription> = {
         endAt,
+        lastPaymentError: false,
       };
 
       await db.transaction(async tx => {
@@ -297,8 +299,8 @@ export const rejectRecurringPayment = async (
     const amount = subscription.amount;
     const taxes = subscription.taxes;
 
-    if (webCardId && subscription.subscriptionPlan && amount && taxes) {
-      await db.transaction(async tx => {
+    await db.transaction(async tx => {
+      if (webCardId && subscription.subscriptionPlan && amount && taxes) {
         await createPayment(
           {
             status: 'failed',
@@ -313,17 +315,16 @@ export const rejectRecurringPayment = async (
           },
           tx,
         );
-      });
-    }
+      }
 
-    if (!isRebillOn) {
-      await db
+      await tx
         .update(UserSubscriptionTable)
         .set({
-          status: 'canceled',
-          canceledAt: new Date(),
+          // status: isRebillOn ? 'active': 'canceled', // we don’t automatically cancel the subscription for the moment (we prefer manual cancellation through backoffice)
+          // canceledAt: isRebillOn? undefined: new Date(),
+          lastPaymentError: true,
         })
         .where(eq(UserSubscriptionTable.subscriptionId, subscriptionId));
-    }
+    });
   }
 };

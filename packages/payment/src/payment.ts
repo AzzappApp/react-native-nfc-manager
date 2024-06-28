@@ -323,6 +323,7 @@ export const createSubscriptionRequest = async ({
     status: 'active' as const,
     canceledAt: null,
     freeSeats: 0,
+    lastPaymentError: false,
   };
   const id = await db.transaction(async trx => {
     const id = await createSubscription(subscription, trx);
