@@ -31,6 +31,7 @@ const LottieInput = ({
   lottieIdField,
 }: Props) => {
   const lottieInput = useInputControl(lottieField as any);
+  const lottieIdInput = useInputControl(lottieIdField as any);
   const mediaCountInput = useInputControl(mediaCountField as any);
   const [src, setSrc] = useState<any>(
     lottieIdField.initialValue
@@ -47,6 +48,7 @@ const LottieInput = ({
       setError('');
       setSrc(undefined);
       setCount(0);
+      lottieIdInput.change(undefined);
       const file = event.target.files[0];
 
       const reader = new FileReader();
@@ -90,7 +92,7 @@ const LottieInput = ({
         {src && <Typography>Media count : {count}</Typography>}
       </Box>
 
-      {lottieIdField.initialValue && !src && (
+      {lottieIdField.value && (
         <input
           {...getInputProps(lottieIdField, { type: 'hidden' })}
           key={lottieIdField.key}

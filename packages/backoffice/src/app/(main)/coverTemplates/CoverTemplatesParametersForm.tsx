@@ -75,7 +75,7 @@ const CoverTemplatesParametersForm = ({
       name: coverTemplate?.name || '',
       previewId: coverTemplate?.previewId || '',
       lottieId: coverTemplate?.lottieId || '',
-      mediaCount: coverTemplate?.mediaCount || 0,
+      mediaCount: coverTemplate?.mediaCount,
       order: coverTemplate?.order || 0,
       colorPaletteId: coverTemplate?.colorPaletteId || colorPalettes[0]?.id,
       typeId: coverTemplate?.typeId || coverTemplateTypes[0]?.id,
@@ -138,16 +138,14 @@ const CoverTemplatesParametersForm = ({
           formData.set(`lottieId`, public_id);
         }
         formData.delete('lottie');
-
-        await action(formData);
-        form.reset();
+        action(formData);
       } catch (e) {
         console.error(e);
       } finally {
         setIsSaving(false);
       }
     },
-    [action, form],
+    [action],
   );
 
   useEffect(() => {
@@ -470,6 +468,7 @@ const CoverTemplatesParametersForm = ({
         open={displaySaveSuccess}
         onClose={() => {
           setDisplaySaveSuccess(false);
+          location.reload();
         }}
         autoHideDuration={6000}
         message="CoverTemplate saved"
