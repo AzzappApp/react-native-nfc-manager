@@ -149,7 +149,7 @@ __metadata:
     events: ^3.3.0
     expo: ^51.0.14
     expo-asset: ^10.0.9
-    expo-av: ^14.0.5
+    expo-av: ^14.0.6
     expo-blur: ^13.0.2
     expo-clipboard: ~6.0.3
     expo-contacts: ~13.0.3
@@ -14727,12 +14727,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"expo-av@npm:^14.0.5":
-  version: 14.0.5
-  resolution: "expo-av@npm:14.0.5"
+"expo-av@npm:^14.0.6":
+  version: 14.0.6
+  resolution: "expo-av@npm:14.0.6"
   peerDependencies:
     expo: "*"
-  checksum: a3fa71b301390e90bf8df99b9c9cebf3ac7a3c419021fc79351fb0c2ce9309438b5a1b90c17712488d8ee61c434e9e19ecb16ccae91089aaf5cf45942c98be08
+  checksum: 3f8c7525ef451b26b24bcfc59fceb66d490151d9c4a836e4a4141de739b89ee88fd2b78461f398aed15e26e0abb221f0b5ae5921ad2c801dc1ca564a31c2a8dc
   languageName: node
   linkType: hard
 

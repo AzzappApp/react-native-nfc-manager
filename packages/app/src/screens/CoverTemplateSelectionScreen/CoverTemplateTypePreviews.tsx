@@ -1,9 +1,10 @@
+import { FlashList } from '@shopify/flash-list';
 import { ResizeMode, Video } from 'expo-av';
 import { Image } from 'expo-image';
 import { memo, useCallback, useState } from 'react';
-import { FlatList, StyleSheet, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { graphql, useFragment } from 'react-relay';
-import { colors } from '@azzapp/shared/colorsHelpers';
+import { colors } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import Icon from '#ui/Icon';
 import PressableNative from '#ui/PressableNative';
@@ -12,7 +13,8 @@ import Text from '#ui/Text';
 import type { CoverTemplateTypePreviews_coverTemplate$data } from '#relayArtifacts/CoverTemplateTypePreviews_coverTemplate.graphql';
 import type { CoverTemplateType } from './useCoverTemplateTypes';
 import type { ArrayItemType } from '@azzapp/shared/arrayHelpers';
-import type { ListRenderItemInfo, ViewToken } from 'react-native';
+import type { ListRenderItemInfo } from '@shopify/flash-list';
+import type { ViewToken } from 'react-native';
 
 type CoverTemplateTypePreviewsProps = {
   template: CoverTemplateType;
@@ -60,7 +62,7 @@ const CoverTemplateTypePreviews = ({
   const onViewableItemChanged = useCallback(
     (info: { viewableItems: ViewToken[] }) => {
       // when scrolling the previous flatlist, (parent) it is not actualize because already render
-      //extract the list than calculate in the render item
+
       if (info.viewableItems) {
         setVideoIndexToPlay(info.viewableItems.map(item => item.index));
       } else {
@@ -87,19 +89,20 @@ const CoverTemplateTypePreviews = ({
       <View style={styles.section}>
         <Text variant="large">{template.label}</Text>
       </View>
-      <FlatList
+      <FlashList
         testID="cover-editor-template-list"
         accessibilityRole="list"
         data={coverTemplate}
         contentContainerStyle={styles.previews}
         keyExtractor={keyExtractor}
         renderItem={renderItem}
-        initialNumToRender={5}
         showsHorizontalScrollIndicator={false}
         horizontal
         ItemSeparatorComponent={Separator}
         viewabilityConfig={viewabilityConfig}
         onViewableItemsChanged={onViewableItemChanged}
+        estimatedItemSize={240}
+        extraData={videoIndexToPlay}
       />
     </View>
   );
@@ -130,21 +133,21 @@ const ListItemComponent = ({
 
   return (
     <PressableNative style={styles.preview} onPress={onPress}>
-      {shoudPlay && coverTemplate.preview.video ? (
+      {coverTemplate.preview.video ? (
         <Video
           source={{ uri: coverTemplate.preview.video.uri }}
           isMuted={false}
           isLooping
           style={styles.previewMedia}
           resizeMode={ResizeMode.CONTAIN}
-          shouldPlay
+          shouldPlay={shoudPlay}
+          posterSource={{ uri: coverTemplate.preview.video?.thumbnail }}
+          onError={console.error}
         />
       ) : (
         <Image
           source={{
-            uri:
-              coverTemplate.preview.video?.thumbnail ??
-              coverTemplate.preview.image?.uri,
+            uri: coverTemplate.preview.image?.uri,
           }}
           style={styles.previewMedia}
         />
@@ -184,6 +187,8 @@ const styleSheet = createStyleSheet(appearance => ({
     borderRadius: 24,
     height: 240,
     overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: appearance === 'light' ? colors.grey50 : colors.grey900,
   },
   previewMedia: {
     width: 150,

@@ -1,7 +1,7 @@
+import { FlashList } from '@shopify/flash-list';
 import { fromGlobalId } from 'graphql-relay';
 import { useCallback, useState } from 'react';
-import { View } from 'react-native';
-import { FlatList } from 'react-native-gesture-handler';
+import { View, StyleSheet } from 'react-native';
 import { graphql, useFragment } from 'react-relay';
 import useScreenInsets from '#hooks/useScreenInsets';
 import CoverTemplateConfirmationScreenModal from './CoverTemplateConfirmationScreenModal';
@@ -13,7 +13,8 @@ import type { CoverTemplateList_profile$key } from '#relayArtifacts/CoverTemplat
 import type { CoverTemplate } from './CoverTemplateTypePreviews';
 import type { CoverTemplateType } from './useCoverTemplateTypes';
 import type { ColorPaletteColor } from '@azzapp/shared/cardHelpers';
-import type { ViewToken, ListRenderItemInfo } from 'react-native';
+import type { ListRenderItemInfo } from '@shopify/flash-list';
+import type { ViewToken } from 'react-native';
 
 export type CoverEditorProps = {
   profile: CoverTemplateList_profile$key;
@@ -144,14 +145,14 @@ const CoverTemplateList = ({
 
   //# endregion
   return (
-    <View style={{ flex: 1, paddingTop: 20 }}>
+    <View style={styles.container}>
       <CoverTemplateTagSelector
         tagsKey={coverTemplateTags}
         selected={tag}
         onSelect={onSelect}
       />
       <View style={{ flex: 1 }}>
-        <FlatList
+        <FlashList
           ListHeaderComponent={
             <CoverTemplateScratchStarters
               onColorSelect={onSelectBackgroundColor}
@@ -172,6 +173,7 @@ const CoverTemplateList = ({
           onViewableItemsChanged={onViewableItemChanged}
           viewabilityConfig={viewabilityConfig}
           extraData={viewableItems}
+          estimatedItemSize={248}
         />
       </View>
       <CoverTemplateConfirmationScreenModal
@@ -185,10 +187,14 @@ const CoverTemplateList = ({
 
 const viewabilityConfig = {
   //TODO: improve this with review of tester
-  itemVisiblePercentThreshold: 87,
+  itemVisiblePercentThreshold: 83,
 };
 
 export default CoverTemplateList;
 const keyExtractor = (item: { id: string }) => {
   return item.id;
 };
+
+const styles = StyleSheet.create({
+  container: { flex: 1, paddingTop: 20 },
+});

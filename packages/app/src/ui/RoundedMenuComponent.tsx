@@ -3,16 +3,23 @@ import { colors } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import PressableNative from './PressableNative';
 import Text from './Text';
+import type { TextVariant } from './Text';
 
 type Props = {
   selected?: boolean;
   id: string | null;
   label: string;
   onSelect?: (id: string | null) => void;
+  textVariant?: TextVariant;
 };
 
-const RoundedMenuComponent = (props: Props) => {
-  const { selected, label, onSelect, id } = props;
+const RoundedMenuComponent = ({
+  selected,
+  label,
+  onSelect,
+  id,
+  textVariant = 'button',
+}: Props) => {
   const styles = useStyleSheet(styleSheet);
 
   const onPress = useCallback(() => {
@@ -26,7 +33,7 @@ const RoundedMenuComponent = (props: Props) => {
       style={[styles.menu, selected && styles.menuSelected]}
       onPress={onPress}
     >
-      <Text variant="button">{label}</Text>
+      <Text variant={textVariant}>{label}</Text>
     </PressableNative>
   );
 };
@@ -37,11 +44,9 @@ const styleSheet = createStyleSheet(appearance => ({
   menu: {
     height: 32,
     borderRadius: 16,
-    paddingVertical: 7,
-    paddingHorizontal: 18,
+    paddingHorizontal: 16,
     justifyContent: 'center',
     alignItems: 'center',
-    gap: 10,
     borderColor: appearance === 'light' ? colors.grey50 : colors.grey900,
     borderWidth: 1,
     borderStyle: 'solid',

@@ -8,20 +8,22 @@ import {
 import type { ColorSchemeName } from '#helpers/createStyles';
 import type { TextProps as NativeTextProps } from 'react-native';
 
+export type TextVariant =
+  | 'azzapp'
+  | 'button'
+  | 'error'
+  | 'hyperLink'
+  | 'large'
+  | 'medium'
+  | 'none'
+  | 'small'
+  | 'smallbold'
+  | 'textField'
+  | 'xlarge'
+  | 'xsmall';
+
 export type TextProps = NativeTextProps & {
-  variant?:
-    | 'azzapp'
-    | 'button'
-    | 'error'
-    | 'hyperLink'
-    | 'large'
-    | 'medium'
-    | 'none'
-    | 'small'
-    | 'smallbold'
-    | 'textField'
-    | 'xlarge'
-    | 'xsmall';
+  variant?: TextVariant;
   /**
    * Manually set the appearance of the component
    *
