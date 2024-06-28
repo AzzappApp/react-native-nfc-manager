@@ -1,5 +1,7 @@
-## 0.5.19-canary.44
+## 0.5.19-canary.45
 
+* **fix:**  - **payment:** [#3981](https://github.com/AzzappApp/azzapp/pull/3981) check subscription on update webcard ([#3989](https://github.com/AzzappApp/azzapp/pull/3989))
+* **feat:**  - **Cover:** text animations ([#3984](https://github.com/AzzappApp/azzapp/pull/3984))
 * **test:**  - migrate to rnvideo as expo-av in maintenance ([#3988](https://github.com/AzzappApp/azzapp/pull/3988))
 * **fix:**  - [#3973](https://github.com/AzzappApp/azzapp/pull/3973) ([#3983](https://github.com/AzzappApp/azzapp/pull/3983))
 * **fix:**  - **payment:** [#3865](https://github.com/AzzappApp/azzapp/pull/3865) don’t cancel payment on rebill error ([#3977](https://github.com/AzzappApp/azzapp/pull/3977))
