@@ -1,5 +1,6 @@
-## 0.5.19-canary.43
+## 0.5.19-canary.44
 
+* **test:**  - migrate to rnvideo as expo-av in maintenance ([#3988](https://github.com/AzzappApp/azzapp/pull/3988))
 * **fix:**  - [#3973](https://github.com/AzzappApp/azzapp/pull/3973) ([#3983](https://github.com/AzzappApp/azzapp/pull/3983))
 * **fix:**  - **payment:** [#3865](https://github.com/AzzappApp/azzapp/pull/3865) don’t cancel payment on rebill error ([#3977](https://github.com/AzzappApp/azzapp/pull/3977))
 * **feat:**  - better feeling in playing video on template. avoid video not loading ([#3982](https://github.com/AzzappApp/azzapp/pull/3982))
