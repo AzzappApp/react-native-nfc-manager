@@ -34,7 +34,16 @@ const updateWebCardMutation: MutationResolvers['updateWebCard'] = async (
   }
 
   await checkWebCardHasSubscription(
-    { webCard: { ...webCard, ...partialWebCard } },
+    {
+      webCard: {
+        ...webCard,
+        ...Object.fromEntries(
+          Object.entries(partialWebCard).filter(
+            ([_entry, value]) => value !== undefined,
+          ),
+        ),
+      },
+    },
     loaders,
   );
 

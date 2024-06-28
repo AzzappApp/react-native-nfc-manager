@@ -256,6 +256,7 @@ const WebCardParametersScreen = ({
             companyActivity {
               id
             }
+            requiresSubscription
           }
         }
       }
@@ -492,7 +493,7 @@ const WebCardParametersScreen = ({
               <Text variant="medium">
                 <FormattedMessage
                   defaultMessage="Publish"
-                  description="PostItem Modal - Likes switch Label"
+                  description="WebCard parameters Modal - Likes switch Label"
                 />
               </Text>
               <PremiumIndicator
