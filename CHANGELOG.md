@@ -1,5 +1,6 @@
-## 0.5.19-canary.40
+## 0.5.19-canary.41
 
+* **fix:**  - **webCard:** [#3934](https://github.com/AzzappApp/azzapp/pull/3934) set correct result on update ([#3972](https://github.com/AzzappApp/azzapp/pull/3972))
 * **fix:**  - 🐛 remove toast when clicking on new template ([#3962](https://github.com/AzzappApp/azzapp/pull/3962))
 * **fix:**  - **cover:** [#3902](https://github.com/AzzappApp/azzapp/pull/3902) race conditions on store update ([#3965](https://github.com/AzzappApp/azzapp/pull/3965))
 * **fix:**  - revert change on screen modal - infinite loop ([#3963](https://github.com/AzzappApp/azzapp/pull/3963))
