@@ -1,4 +1,4 @@
-## 0.5.19-canary.39
+## 0.5.19-canary.40
 
 * **fix:**  - 🐛 remove toast when clicking on new template ([#3962](https://github.com/AzzappApp/azzapp/pull/3962))
 * **fix:**  - **cover:** [#3902](https://github.com/AzzappApp/azzapp/pull/3902) race conditions on store update ([#3965](https://github.com/AzzappApp/azzapp/pull/3965))
