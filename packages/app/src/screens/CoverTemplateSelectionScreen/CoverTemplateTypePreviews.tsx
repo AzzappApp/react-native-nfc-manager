@@ -78,12 +78,13 @@ const CoverTemplateTypePreviews = ({
         <CoverTemplateTypePreview
           coverTemplate={item}
           onSelect={onSelect}
-          shoudPlay={videoIndexToPlay.slice(0, videoToPlay).includes(index)}
+          shouldPlay={videoIndexToPlay.slice(0, videoToPlay).includes(index)}
         />
       );
     },
     [onSelect, videoIndexToPlay, videoToPlay],
   );
+
   return (
     <View style={styles.container}>
       <View style={styles.section}>
@@ -102,7 +103,7 @@ const CoverTemplateTypePreviews = ({
         viewabilityConfig={viewabilityConfig}
         onViewableItemsChanged={onViewableItemChanged}
         estimatedItemSize={240}
-        extraData={videoIndexToPlay}
+        extraData={[videoIndexToPlay, videoToPlay]}
       />
     </View>
   );
@@ -110,20 +111,20 @@ const CoverTemplateTypePreviews = ({
 const Separator = () => <View style={styles.separator} />;
 const keyExtractor = (item: CoverTemplate) => item.id;
 const viewabilityConfig = {
-  itemVisiblePercentThreshold: 86,
+  itemVisiblePercentThreshold: 82,
 };
 export default memo(CoverTemplateTypePreviews);
 
 type ListItemComponentProps = {
   coverTemplate: CoverTemplate;
   onSelect: (item: CoverTemplate) => void;
-  shoudPlay: boolean;
+  shouldPlay: boolean;
 };
 
 const ListItemComponent = ({
   coverTemplate,
   onSelect,
-  shoudPlay,
+  shouldPlay,
 }: ListItemComponentProps) => {
   const styles = useStyleSheet(styleSheet);
   const onPress = useCallback(
@@ -138,9 +139,9 @@ const ListItemComponent = ({
           source={{ uri: coverTemplate.preview.video.uri }}
           muted={false}
           repeat
+          paused={!shouldPlay}
           style={styles.previewMedia}
           resizeMode="contain"
-          paused={!shoudPlay}
           poster={coverTemplate.preview.video?.thumbnail}
           disableFocus={true}
         />

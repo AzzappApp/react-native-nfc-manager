@@ -127,7 +127,6 @@ const CoverTemplateList = ({
 
       // Logic to determine which videos to play
       // This is a basic implementation and might need adjustments
-
       if (viewableRows.length >= 2) {
         // If there are two or more viewable rows, select one video from each of the first two rows
         setViewableItems([
@@ -173,7 +172,7 @@ const CoverTemplateList = ({
           onViewableItemsChanged={onViewableItemChanged}
           viewabilityConfig={viewabilityConfig}
           extraData={viewableItems}
-          estimatedItemSize={248}
+          estimatedItemSize={298}
         />
       </View>
       <CoverTemplateConfirmationScreenModal
@@ -187,7 +186,7 @@ const CoverTemplateList = ({
 
 const viewabilityConfig = {
   //TODO: improve this with review of tester
-  itemVisiblePercentThreshold: 82,
+  itemVisiblePercentThreshold: 88,
 };
 
 export default CoverTemplateList;

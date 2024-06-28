@@ -97,6 +97,7 @@ const styles = StyleSheet.create({
     width: '100%',
     borderRadius: 40,
     aspectRatio: COVER_RATIO,
+    overflow: 'hidden',
   },
   button: {
     backgroundColor: colors.white,
