@@ -1,5 +1,6 @@
-## 0.5.19-canary.48
+## 0.5.19-canary.49
 
+* **fix:**  - **cover:** [#3727](https://github.com/AzzappApp/azzapp/pull/3727) preview are displayed before skImage is ready ([#3997](https://github.com/AzzappApp/azzapp/pull/3997))
 * **fix:**  - use WheelSelector ([#3996](https://github.com/AzzappApp/azzapp/pull/3996))
 * **fix:**  - **multiUser:** [#3966](https://github.com/AzzappApp/azzapp/pull/3966) remove publish label ([#3992](https://github.com/AzzappApp/azzapp/pull/3992))
 * **fix:**  - **CoverEditor:** use color tryptich from template at cover creation ([#3993](https://github.com/AzzappApp/azzapp/pull/3993))
