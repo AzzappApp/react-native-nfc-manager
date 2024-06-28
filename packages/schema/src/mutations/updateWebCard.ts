@@ -68,8 +68,11 @@ const updateWebCardMutation: MutationResolvers['updateWebCard'] = async (
 
     await updateWebCard(webCardId, partialWebCard);
 
+    loaders.WebCard.clear(webCardId);
+    const result = await loaders.WebCard.load(webCardId);
+
     return {
-      webCard: { ...webCard, ...partialWebCard },
+      webCard: result,
     };
   } catch (error) {
     throw new GraphQLError(ERRORS.INTERNAL_SERVER_ERROR);
