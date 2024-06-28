@@ -1,10 +1,11 @@
-import { useCallback } from 'react';
+import { useCallback, useMemo } from 'react';
 import { useIntl } from 'react-intl';
 import { typedEntries } from '@azzapp/shared/objectHelpers';
 import { useFilterLabels } from '#helpers/mediaEditions';
 import BoxSelectionList from './BoxSelectionList';
 import TransformedImageRenderer from './TransformedImageRenderer';
 import type { CropData } from '#helpers/mediaEditions';
+import type { Media } from '#helpers/mediaHelpers';
 import type { BoxButtonItemInfo } from './BoxSelectionList';
 import type { Filter } from '@azzapp/shared/filtersHelper';
 import type { SkImage } from '@shopify/react-native-skia';
@@ -17,7 +18,9 @@ type FilterSelectionListProps = ViewProps & {
   selectedFilter: string | null;
   cropData?: CropData | null;
   cardRadius?: number;
+  media: Media | null;
   onChange(value: Filter | null): void;
+  isSkImageReady: boolean;
 };
 
 const FilterSelectionList = ({
@@ -26,13 +29,36 @@ const FilterSelectionList = ({
   selectedFilter,
   cropData,
   onChange,
+  media,
+  isSkImageReady,
   ...props
 }: FilterSelectionListProps) => {
   const filters = typedEntries(useFilterLabels());
 
+  const filterListerCropData = useMemo(() => {
+    let result = cropData;
+    if (
+      isSkImageReady &&
+      cropData &&
+      media &&
+      skImage.value &&
+      media.width !== skImage.value.width()
+    ) {
+      const scale = skImage.value.width() / media.width;
+      result = {
+        originX: cropData.originX * scale,
+        originY: cropData.originY * scale,
+        width: cropData.width * scale,
+        height: cropData.height * scale,
+      };
+    }
+    return result;
+  }, [cropData, isSkImageReady, media, skImage.value]);
+
   const renderItem = useCallback(
     ({ item, height, width }: BoxButtonItemInfo<[Filter, string] | null>) => {
       const filter = item?.[0];
+
       return (
         <TransformedImageRenderer
           image={skImage}
@@ -40,12 +66,12 @@ const FilterSelectionList = ({
           height={height}
           filter={filter}
           editionParameters={{
-            cropData,
+            cropData: filterListerCropData,
           }}
         />
       );
     },
-    [skImage, cropData],
+    [skImage, filterListerCropData],
   );
 
   const onSelect = useCallback(

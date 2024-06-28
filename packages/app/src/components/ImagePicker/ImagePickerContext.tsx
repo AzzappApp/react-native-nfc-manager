@@ -10,7 +10,12 @@ import {
   useRef,
   useState,
 } from 'react';
-import { useDerivedValue, type DerivedValue } from 'react-native-reanimated';
+import {
+  runOnJS,
+  useAnimatedReaction,
+  useDerivedValue,
+  type DerivedValue,
+} from 'react-native-reanimated';
 import {
   createImageFromNativeBuffer,
   useNativeBuffer,
@@ -51,6 +56,10 @@ export type ImagePickerState = {
    * The SkImage of the media
    */
   skImage: DerivedValue<SkImage | null>;
+  /**
+   * true if the SkImage is available
+   */
+  isSkImageReady: boolean;
   /**
    * the aspect ratio of the media
    */
@@ -296,6 +305,21 @@ const _ImagePickerContextProvider = (
     return createImageFromNativeBuffer(nativeBuffer, true);
   }, [nativeBuffer]);
 
+  const [isSkImageReady, setIsSkImageReady] = useState(false);
+
+  useAnimatedReaction(
+    () => skImage.value,
+    (previous, current) => {
+      if (previous !== current) {
+        if (skImage.value) {
+          runOnJS(setIsSkImageReady)(true);
+        } else {
+          runOnJS(setIsSkImageReady)(false);
+        }
+      }
+    },
+  );
+
   const pickerState = useMemo<ImagePickerState>(
     () => ({
       kind,
@@ -321,6 +345,7 @@ const _ImagePickerContextProvider = (
       forceCameraRatio,
       clearMedia,
       cameraButtonsLeftRightPosition,
+      isSkImageReady,
     }),
     [
       kind,
@@ -340,6 +365,7 @@ const _ImagePickerContextProvider = (
       forceCameraRatio,
       clearMedia,
       cameraButtonsLeftRightPosition,
+      isSkImageReady,
     ],
   );
 

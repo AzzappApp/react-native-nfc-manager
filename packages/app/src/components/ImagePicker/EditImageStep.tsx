@@ -60,6 +60,7 @@ const EditImageStep = ({
     onTimeRangeChange,
     onEditionParametersChange,
     onParameterValueChange,
+    isSkImageReady,
   } = useImagePickerState();
 
   const previousParameters = useRef(editionParameters);
@@ -170,25 +171,6 @@ const EditImageStep = ({
     return tabs;
   }, [currentTab, intl, media?.kind, showTabs]);
 
-  const filterListerCropData = useMemo(() => {
-    let cropData = editionParameters.cropData;
-    if (
-      cropData &&
-      media &&
-      skImage.value &&
-      media.width !== skImage.value.width()
-    ) {
-      const scale = skImage.value.width() / media.width;
-      cropData = {
-        originX: cropData.originX * scale,
-        originY: cropData.originY * scale,
-        width: cropData.width * scale,
-        height: cropData.height * scale,
-      };
-    }
-    return cropData;
-  }, [editionParameters.cropData, media, skImage]);
-
   return (
     <ImagePickerStep
       stepId={EditImageStep.STEP_ID}
@@ -283,9 +265,11 @@ const EditImageStep = ({
                   />
                   <View style={styles.contentContainer}>
                     <FilterSelectionList
+                      isSkImageReady={isSkImageReady}
                       skImage={skImage}
+                      media={media}
                       aspectRatio={aspectRatio}
-                      cropData={filterListerCropData}
+                      cropData={editionParameters.cropData}
                       selectedFilter={mediaFilter}
                       onChange={onMediaFilterChange}
                       style={styles.filterSelectionStyle}
