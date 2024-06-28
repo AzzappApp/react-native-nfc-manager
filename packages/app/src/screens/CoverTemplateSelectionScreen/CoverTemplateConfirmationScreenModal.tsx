@@ -1,7 +1,7 @@
-import { ResizeMode, Video } from 'expo-av';
 import { Image } from 'expo-image';
 import { useIntl } from 'react-intl';
 import { StyleSheet, View } from 'react-native';
+import Video from 'react-native-video';
 import { COVER_RATIO } from '@azzapp/shared/coverHelpers';
 import { colors } from '#theme';
 import ScreenModal from '#components/ScreenModal';
@@ -42,12 +42,11 @@ const CoverTemplateConfirmationScreenModal = ({
             // we can do it later, @Upmitt need this feature asap
             <Video
               source={{ uri: template.preview.video.uri }}
-              isMuted={false}
-              isLooping
+              muted={false}
+              repeat
               style={styles.template}
-              resizeMode={ResizeMode.CONTAIN}
-              shouldPlay
-              posterSource={{ uri: template.preview.video.thumbnail }}
+              resizeMode="contain"
+              poster={template.preview.video?.thumbnail}
             />
           ) : (
             <Image

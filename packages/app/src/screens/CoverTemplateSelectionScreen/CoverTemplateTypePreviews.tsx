@@ -1,8 +1,8 @@
 import { FlashList } from '@shopify/flash-list';
-import { ResizeMode, Video } from 'expo-av';
 import { Image } from 'expo-image';
 import { memo, useCallback, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
+import Video from 'react-native-video';
 import { graphql, useFragment } from 'react-relay';
 import { colors } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
@@ -110,7 +110,7 @@ const CoverTemplateTypePreviews = ({
 const Separator = () => <View style={styles.separator} />;
 const keyExtractor = (item: CoverTemplate) => item.id;
 const viewabilityConfig = {
-  itemVisiblePercentThreshold: 83,
+  itemVisiblePercentThreshold: 86,
 };
 export default memo(CoverTemplateTypePreviews);
 
@@ -136,13 +136,13 @@ const ListItemComponent = ({
       {coverTemplate.preview.video ? (
         <Video
           source={{ uri: coverTemplate.preview.video.uri }}
-          isMuted={false}
-          isLooping
+          muted={false}
+          repeat
           style={styles.previewMedia}
-          resizeMode={ResizeMode.CONTAIN}
-          shouldPlay={shoudPlay}
-          posterSource={{ uri: coverTemplate.preview.video?.thumbnail }}
-          onError={console.error}
+          resizeMode="contain"
+          paused={!shoudPlay}
+          poster={coverTemplate.preview.video?.thumbnail}
+          disableFocus={true}
         />
       ) : (
         <Image

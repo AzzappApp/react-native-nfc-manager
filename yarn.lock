@@ -199,6 +199,7 @@ __metadata:
     react-native-svg: ^15.3.0
     react-native-tab-view: ^3.5.2
     react-native-toast-message: ^2.2.0
+    react-native-video: ^6.3.0
     react-native-vision-camera: ^4.3.2
     react-relay: ^17.0.0
     react-test-renderer: ^18.3.1
@@ -21602,6 +21603,16 @@ __metadata:
   bin:
     react-native-version: cli.js
   checksum: 25c4d336bbd6fb7c688c6bd0e35490f4d9f485f831a91252a9f7f8ab0b87903cd1a58683464b063ac447514d792a21de3f07af243fce889ddf250d9e1d594a8f
+  languageName: node
+  linkType: hard
+
+"react-native-video@npm:^6.3.0":
+  version: 6.3.0
+  resolution: "react-native-video@npm:6.3.0"
+  peerDependencies:
+    react: "*"
+    react-native: "*"
+  checksum: fd3995eb14a64ff2848059baf1e6ad797fad10cec05a31c09d6eaf57433930411b7e6ae11a8d086f2ecc05b4434f884005c9425ac9b2e281406ca389ae366694
   languageName: node
   linkType: hard
 

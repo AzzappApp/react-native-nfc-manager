@@ -187,7 +187,7 @@ const CoverTemplateList = ({
 
 const viewabilityConfig = {
   //TODO: improve this with review of tester
-  itemVisiblePercentThreshold: 83,
+  itemVisiblePercentThreshold: 82,
 };
 
 export default CoverTemplateList;
