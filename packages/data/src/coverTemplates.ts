@@ -56,7 +56,6 @@ export type SocialLinks = {
 };
 
 export type CoverTemplateParams = {
-  medias: Array<{ id: string }> | null;
   textLayers: CoverText[];
   overlayLayers: CoverOverlay[];
   linksLayer: SocialLinks;
@@ -69,6 +68,7 @@ export const CoverTemplateTable = cols.table('CoverTemplate', {
   tags: cols.json('tags').$type<string[]>().notNull(),
   typeId: cols.cuid('typeId').notNull(),
   lottieId: cols.cuid('lottieId').notNull(),
+  mediaCount: cols.int('mediaCount').notNull(),
   previewId: cols.cuid('previewId').notNull(),
   colorPaletteId: cols.cuid('colorPaletteId').notNull(),
   enabled: cols.boolean('enabled').default(true).notNull(),
@@ -157,6 +157,7 @@ export const getCoverTemplatesByTypes = async ({
       order: CoverTemplateTable.order,
       colorPaletteId: CoverTemplateTable.colorPaletteId,
       lottieId: CoverTemplateTable.lottieId,
+      mediaCount: CoverTemplateTable.mediaCount,
       params: CoverTemplateTable.params,
       enabled: CoverTemplateTable.enabled,
     })

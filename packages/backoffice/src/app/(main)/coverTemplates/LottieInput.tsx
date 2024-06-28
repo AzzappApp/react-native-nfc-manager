@@ -1,27 +1,16 @@
 import {
   getInputProps,
-  getSelectProps,
   useInputControl,
   type FieldMetadata,
 } from '@conform-to/react';
-import {
-  Box,
-  Button,
-  FormControl,
-  InputLabel,
-  MenuItem,
-  Select,
-  Typography,
-} from '@mui/material';
-import { Fragment, useState, type ChangeEvent } from 'react';
-import { FILTERS } from '@azzapp/shared/filtersHelper';
+import { Box, Button, Typography } from '@mui/material';
+import { useState, type ChangeEvent } from 'react';
 import { getCloudinaryAssetURL } from '@azzapp/shared/imagesHelpers';
 import LottiePlayer from '#components/LottiePlayer';
-import type { MediasSchemaType } from './coverTemplateSchema';
 
 type Props = {
   lottieField: FieldMetadata<File | undefined>;
-  mediaFields: FieldMetadata<MediasSchemaType[]>;
+  mediaCountField: FieldMetadata<number>;
   lottieIdField: FieldMetadata<string>;
 };
 
@@ -36,30 +25,45 @@ type LottieData = {
 
 const checkLottieJson = (lottie: any) => !!lottie.layers && !!lottie.assets;
 
-const LottieInput = ({ lottieField, mediaFields, lottieIdField }: Props) => {
+const LottieInput = ({
+  lottieField,
+  mediaCountField,
+  lottieIdField,
+}: Props) => {
   const lottieInput = useInputControl(lottieField as any);
+  const mediaCountInput = useInputControl(mediaCountField as any);
   const [src, setSrc] = useState<any>(
     lottieIdField.initialValue
       ? getCloudinaryAssetURL(lottieIdField.initialValue, 'raw')
       : '',
   );
-  const [data, setData] = useState<LottieData>();
+  const [count, setCount] = useState<number>(
+    parseInt(mediaCountField.initialValue || '0', 10) || 0,
+  );
   const [error, setError] = useState('');
 
   const onLoadFile = (event: ChangeEvent<any>) => {
     if (event.target.files[0]) {
       setError('');
       setSrc(undefined);
-      setData(undefined);
+      setCount(0);
       const file = event.target.files[0];
 
       const reader = new FileReader();
       reader.onload = (event: any) => {
         const lottieString = event.target.result;
-        const lottieData = JSON.parse(lottieString);
+        const lottieData: LottieData = JSON.parse(lottieString);
         if (checkLottieJson(lottieData)) {
-          setData(lottieData);
+          const count =
+            lottieData?.assets
+              .filter(({ e }) => e === 0)
+              .map(({ id }) => ({
+                id,
+                filter: null,
+              })).length || 0;
+          setCount(count);
           lottieInput.change(file);
+          mediaCountInput.change(`${count}`);
           const src = URL.createObjectURL(file);
           setSrc(src);
         } else {
@@ -71,19 +75,6 @@ const LottieInput = ({ lottieField, mediaFields, lottieIdField }: Props) => {
     }
   };
 
-  const media =
-    data?.assets
-      .filter(({ e }) => e === 0)
-      .map(({ id }) => ({
-        id,
-        filter: null,
-      })) ||
-    mediaFields.getFieldList().map(media => ({
-      id: media.getFieldset().id.value,
-      filter: media.getFieldset().filter.value,
-    })) ||
-    [];
-
   return (
     <Box>
       {src && (
@@ -92,40 +83,14 @@ const LottieInput = ({ lottieField, mediaFields, lottieIdField }: Props) => {
         </Box>
       )}
       <Box display="flex" gap={2} sx={{ mb: 2 }} flexWrap="wrap">
-        {media.map(({ id, filter }, index) => (
-          <Fragment key={id}>
-            <input
-              {...getInputProps(mediaFields, { type: 'hidden' })}
-              key={`media-${id}`}
-              name={`${mediaFields.name}[${index}].id`}
-              value={id}
-            />
-            <FormControl fullWidth sx={{ width: 300 }}>
-              <InputLabel id={`filter-label-${id}`}>
-                Filter media {id}
-              </InputLabel>
-              <Select
-                {...getSelectProps(mediaFields)}
-                labelId={`filter-label-${id}`}
-                label={`Filter media ${id}`}
-                name={`${mediaFields.name}[${index}].filter`}
-                defaultValue={filter}
-              >
-                <MenuItem value="">
-                  <em>No filter</em>
-                </MenuItem>
-                {FILTERS.map(filter => (
-                  <MenuItem key={filter} value={filter}>
-                    <Typography>{filter}</Typography>
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-          </Fragment>
-        ))}
+        <input
+          {...getInputProps(mediaCountField, { type: 'hidden' })}
+          key={mediaCountField.key}
+        />
+        {src && <Typography>Media count : {count}</Typography>}
       </Box>
 
-      {lottieIdField.initialValue && !data && (
+      {lottieIdField.initialValue && !src && (
         <input
           {...getInputProps(lottieIdField, { type: 'hidden' })}
           key={lottieIdField.key}

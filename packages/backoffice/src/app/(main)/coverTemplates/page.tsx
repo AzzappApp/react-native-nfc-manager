@@ -13,6 +13,7 @@ export type CoverTemplateItem = {
   id: string;
   name: string;
   type: string;
+  mediaCount: number;
   status: boolean;
 };
 
@@ -52,6 +53,7 @@ const getQuery = (search: string | null, filters: Filters) => {
       id: CoverTemplateTable.id,
       name: CoverTemplateTable.name,
       type: LabelTable.baseLabelValue,
+      mediaCount: CoverTemplateTable.mediaCount,
       status: CoverTemplateTable.enabled,
     })
     .from(CoverTemplateTable)

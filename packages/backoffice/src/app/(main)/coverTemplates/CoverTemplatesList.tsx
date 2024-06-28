@@ -239,6 +239,11 @@ const columns: GridColDef[] = [
     flex: 1,
   },
   {
+    field: 'mediaCount',
+    headerName: 'Media',
+    width: 150,
+  },
+  {
     field: 'status',
     headerName: 'Status',
     type: 'boolean',

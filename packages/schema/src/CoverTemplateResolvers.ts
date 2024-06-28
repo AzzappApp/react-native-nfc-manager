@@ -19,7 +19,7 @@ export const CoverTemplate: CoverTemplateResolvers = {
     };
   },
   lottie: async ({ lottieId }) => getCloudinaryAssetURL(lottieId, 'raw'),
-  requiredMedias: async ({ params }) => {
-    return params?.medias?.length ?? 0;
+  requiredMedias: async ({ mediaCount }) => {
+    return mediaCount ?? 0;
   },
 };

@@ -75,6 +75,7 @@ const CoverTemplatesParametersForm = ({
       name: coverTemplate?.name || '',
       previewId: coverTemplate?.previewId || '',
       lottieId: coverTemplate?.lottieId || '',
+      mediaCount: coverTemplate?.mediaCount || 0,
       order: coverTemplate?.order || 0,
       colorPaletteId: coverTemplate?.colorPaletteId || colorPalettes[0]?.id,
       typeId: coverTemplate?.typeId || coverTemplateTypes[0]?.id,
@@ -324,7 +325,7 @@ const CoverTemplatesParametersForm = ({
 
         <LottieInput
           lottieField={fields.lottie}
-          mediaFields={fields.params.getFieldset().medias}
+          mediaCountField={fields.mediaCount}
           lottieIdField={fields.lottieId}
         />
 

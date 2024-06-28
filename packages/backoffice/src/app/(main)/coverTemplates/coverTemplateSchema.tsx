@@ -50,11 +50,6 @@ export const socialLinksSchema = z.object({
   color: colorValidatorWithPalette,
 });
 
-export const mediasSchema = z.object({
-  id: z.string(),
-  filter: z.string().optional(),
-});
-
 export const coverTemplateSchema = z.object({
   id: z.string().optional(),
   preview: z.instanceof(File).optional(),
@@ -64,11 +59,11 @@ export const coverTemplateSchema = z.object({
   tags: z.string().array(),
   typeId: z.string(),
   lottie: z.instanceof(File).optional(),
+  mediaCount: z.number(),
   lottieId: z.string().optional(),
   colorPaletteId: z.string(),
   enabled: z.string(),
   params: z.object({
-    medias: mediasSchema.array(),
     textLayers: textSchema.array(),
     overlayLayers: coverOverlaySchema.array(),
     linksLayer: socialLinksSchema,
@@ -85,7 +80,6 @@ export const coverTemplateSchemaWithoutfile = coverTemplateSchema
       lottieId: z.string(),
       previewId: z.string(),
       params: z.object({
-        medias: mediasSchema.array(),
         textLayers: textSchema.array(),
         overlayLayers: coverOverlaySchema.array(),
         linksLayer: socialLinksSchema,
@@ -97,7 +91,6 @@ export type CoverTemplateFormValue = z.infer<typeof coverTemplateSchema>;
 export type TextSchemaType = z.infer<typeof textSchema>;
 export type CoverOverlaySchemaType = z.infer<typeof coverOverlaySchema>;
 export type SocialLinksSchemaType = z.infer<typeof socialLinksSchema>;
-export type MediasSchemaType = z.infer<typeof mediasSchema>;
 
 export type CoverTemplateErrors = z.inferFlattenedErrors<
   typeof coverTemplateSchema
