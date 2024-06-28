@@ -410,19 +410,15 @@ const CoverEditorCore = (
     coverEditorState.overlayLayers,
   ]);
 
-  const prevImages = useRef(coverEditorState.images);
   useEffect(() => {
-    for (const uri in prevImages.current) {
-      if (!coverEditorState.images[uri]) {
+    Object.keys(coverEditorState.images).forEach(uri => {
+      NativeBufferLoader.ref(uri);
+    });
+    return () => {
+      Object.keys(coverEditorState.images).forEach(uri => {
         NativeBufferLoader.unref(uri);
-      }
-    }
-    for (const uri in coverEditorState.images) {
-      if (!prevImages.current[uri]) {
-        NativeBufferLoader.ref(uri);
-      }
-    }
-    prevImages.current = coverEditorState.images;
+      });
+    };
   }, [coverEditorState.images]);
 
   // #endregion
