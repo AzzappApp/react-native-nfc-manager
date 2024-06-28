@@ -20,21 +20,14 @@ const HomeCoverIcon = ({ webCardId }: HomeIconProps) => {
     {
       webCardId,
     },
-    { fetchPolicy: 'store-only' },
+    { fetchPolicy: 'store-and-network' }, //store only does not work when killing app on launch
   );
 
-  return (
-    <CoverRenderer
-      webCard={data.node}
-      width={COVER_WIDTH}
-      style={{ marginBottom: -1 }}
-    />
-  );
+  return <CoverRenderer webCard={data.node} width={COVER_WIDTH} />;
 };
 
 export const HomeIcon = () => {
   const { profileInfos } = useAuthState();
-
   if (!profileInfos?.webCardId) {
     return null;
   }
