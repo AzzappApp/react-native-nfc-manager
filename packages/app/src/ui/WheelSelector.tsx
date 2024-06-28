@@ -119,6 +119,7 @@ const WheelSelector = ({
     }),
     [itemWidth],
   );
+
   return (
     <View
       style={{

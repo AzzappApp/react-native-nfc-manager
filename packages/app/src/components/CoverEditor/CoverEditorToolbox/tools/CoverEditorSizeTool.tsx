@@ -7,7 +7,7 @@ import BottomSheetModal from '#ui/BottomSheetModal';
 import Button from '#ui/Button';
 import Container from '#ui/Container';
 import Header from '#ui/Header';
-import LabeledDashedSlider from '#ui/LabeledDashedSlider';
+import LabeledWheelSelector from '#ui/LabeledWheelSelector';
 import Text from '#ui/Text';
 import {
   useCoverEditorContext,
@@ -78,23 +78,16 @@ const CoverEditorSizeTool = ({ title }: Props) => {
               </View>
             }
           />
-          <LabeledDashedSlider
-            value={currentFontSize}
+          <LabeledWheelSelector
             min={COVER_MIN_FONT_SIZE}
             max={COVER_MAX_FONT_SIZE}
             step={1}
+            interval={10}
             onChange={onSizeChange}
-            formatValue={value => {
-              'worklet';
-              return `${value}pt`;
-            }}
-            accessibilityLabel={intl.formatMessage({
-              defaultMessage: 'Font size',
+            value={size}
+            label={intl.formatMessage({
+              defaultMessage: 'Font size: ',
               description: 'Label of the font size slider in cover edition',
-            })}
-            accessibilityHint={intl.formatMessage({
-              defaultMessage: 'Slide to change the font size',
-              description: 'Hint of the font size slider in cover edition',
             })}
             style={styles.slider}
           />
