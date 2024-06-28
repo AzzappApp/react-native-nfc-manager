@@ -15,7 +15,7 @@ import coverTransitions from './coverTransitions';
 import mediaAnimations from './mediaAnimations';
 import type { ImageFrame } from '#helpers/mediaEditions';
 import type { CoverDrawerOptions } from './coverDrawerTypes';
-import type { MediaAnimation } from '../coverEditorTypes';
+import type { MediaAnimation } from './mediaAnimations';
 
 const coverMediasDrawer = ({
   canvas,

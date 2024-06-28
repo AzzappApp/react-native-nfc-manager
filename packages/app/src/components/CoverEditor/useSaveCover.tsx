@@ -22,13 +22,13 @@ import { createRandomFilePath, getFileName } from '#helpers/fileHelpers';
 import { addLocalCachedMediaFile } from '#helpers/mediaHelpers';
 import { uploadMedia, uploadSign } from '#helpers/MobileWebAPI';
 import coverDrawer from './coverDrawer';
-import { mediaInfoIsImage } from './coverEditorHelpers';
 import {
+  mediaInfoIsImage,
   createCoverSkottieWithColorReplacement,
   createCoverVideoComposition,
   extractLottieInfoMemoized,
   isCoverDynamic,
-} from './coverEditorUtils';
+} from './coverEditorHelpers';
 import coverLocalStore from './coversLocalStore';
 import type { useSaveCoverMutation } from '#relayArtifacts/useSaveCoverMutation.graphql';
 import type { CoverEditorState } from './coverEditorTypes';

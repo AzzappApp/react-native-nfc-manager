@@ -30,12 +30,14 @@ import Button from '#ui/Button';
 import Container from '#ui/Container';
 import Text from '#ui/Text';
 import CoverEditorContextProvider from './CoverEditorContext';
-import { mediaInfoIsImage } from './coverEditorHelpers';
+import {
+  mediaInfoIsImage,
+  extractLottieInfoMemoized,
+} from './coverEditorHelpers';
 import CoverEditorMediaPicker from './CoverEditorMediaPicker';
 import { coverEditorReducer } from './coverEditorReducer';
 import CoverEditorSaveModal from './CoverEditorSaveModal';
 import CoverEditorToolbox from './CoverEditorToolbox';
-import { extractLottieInfoMemoized } from './coverEditorUtils';
 import CoverPreview from './CoverPreview';
 import useLottie from './useLottie';
 import useSaveCover from './useSaveCover';
@@ -194,16 +196,19 @@ const CoverEditorCore = (
         };
 
     const textLayers: CoverEditorTextLayerItem[] = data?.textLayers
-      ? (data.textLayers as any[]).map(textLayer => {
+      ? (data.textLayers as any[]).map(({ customText, ...textLayer }) => {
           const text =
             textLayer.text === 'mainName'
               ? profile.webCard.companyName || profile.webCard.lastName
               : textLayer.text === 'firstName'
                 ? profile.webCard.firstName ?? ''
                 : textLayer.text === 'custom'
-                  ? textLayer.customText ?? ''
+                  ? customText ?? ''
                   : '';
           return {
+            animation: null,
+            startPercentageTotal: 0,
+            endPercentageTotal: 1,
             ...textLayer,
             text,
             rotation: 0,

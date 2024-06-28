@@ -1,5 +1,5 @@
 import { Skia } from '@shopify/react-native-skia';
-import type { CoverTransition } from '../coverTransitions';
+import type { CoverTransition } from './coverTransitions';
 import type { SkRuntimeEffect } from '@shopify/react-native-skia';
 
 export const createTransition = (

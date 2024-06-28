@@ -87,3 +87,5 @@ jest.mock('react-native-purchases', () => ({
     restoreTransactions: jest.fn(),
   },
 }));
+
+jest.mock('#hooks/useApplicationFonts', () => ({}));

@@ -7,7 +7,7 @@ import {
 } from '@azzapp/shared/socialLinkHelpers';
 import { shadow } from '#theme';
 import { SocialIcon } from '#ui/Icon';
-import { convertToBaseCanvasRatio } from '../coverDrawer/coverDrawerUtils';
+import { convertToBaseCanvasRatio } from '../coverDrawer/coverDrawerHelpers';
 import type PressableNative from '#ui/PressableNative';
 import type {
   CardColors,

@@ -1,5 +1,4 @@
-import type { MediaAnimation } from '#components/CoverEditor/coverEditorTypes';
-
+import type { MediaAnimation } from './mediaAnimations';
 const jerkyOut: MediaAnimation = progress => {
   'worklet';
   return {

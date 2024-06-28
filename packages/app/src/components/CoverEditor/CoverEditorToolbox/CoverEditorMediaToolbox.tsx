@@ -9,8 +9,10 @@ import PressableNative from '#ui/PressableNative';
 import PressableOpacity from '#ui/PressableOpacity';
 import Text from '#ui/Text';
 import { useCoverEditorContext } from '../CoverEditorContext';
-import { mediaInfoIsImage } from '../coverEditorHelpers';
-import { extractLottieInfoMemoized } from '../coverEditorUtils';
+import {
+  mediaInfoIsImage,
+  extractLottieInfoMemoized,
+} from '../coverEditorHelpers';
 import CoverEditorMediaPickerFloatingTool from './tools/CoverEditorMediaPickerFloatingTool';
 import CoverEditorTransitionTool from './tools/CoverEditorTransitionTool';
 import { TOOLBOX_SECTION_HEIGHT } from './ui/ToolBoxSection';

@@ -1,10 +1,11 @@
 import { interpolate } from '@shopify/react-native-skia';
 import { Easing } from 'react-native-reanimated';
-import type { OverlayAnimation } from '#components/CoverEditor/coverEditorTypes';
+import { easeAppearDisappear } from '../coverDrawerHelpers';
+import type { OverlayAnimation } from './overlayAnimations';
 
 const zoomInOut: OverlayAnimation = progress => {
   'worklet';
-  progress = Easing.inOut(Easing.ease)(progress);
+  progress = easeAppearDisappear(progress, Easing.inOut(Easing.ease));
   return {
     animateCanvas(canvas, rect) {
       'worklet';

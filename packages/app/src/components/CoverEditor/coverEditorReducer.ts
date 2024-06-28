@@ -9,8 +9,10 @@ import {
 } from '@azzapp/shared/coverHelpers';
 import { colors } from '#theme';
 import { cropDataForAspectRatio } from '#helpers/mediaEditions';
-import { mediaInfoIsImage } from './coverEditorHelpers';
-import { extractLottieInfoMemoized } from './coverEditorUtils';
+import {
+  mediaInfoIsImage,
+  extractLottieInfoMemoized,
+} from './coverEditorHelpers';
 import type { CoverEditorAction } from './coverEditorActions';
 import type { CoverEditorState } from './coverEditorTypes';
 
@@ -466,6 +468,9 @@ export function coverEditorReducer(
             position: { x: 30, y: 50 },
             rotation: 0,
             shadow: false,
+            animation: null,
+            startPercentageTotal: 0,
+            endPercentageTotal: 1,
           },
         ],
         selectedItemIndex: state.textLayers.length,

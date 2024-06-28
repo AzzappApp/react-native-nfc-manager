@@ -12,6 +12,7 @@ import CoverEditorDuplicateTool from './tools/CoverEditorDuplicateTool';
 import CoverEditorFontFamilyTool from './tools/CoverEditorFontFamilyTool';
 import CoverEditorShadowTool from './tools/CoverEditorShadowTool';
 import CoverEditorSizeTool from './tools/CoverEditorSizeTool';
+import CoverEditorTextAnimationTool from './tools/CoverEditorTextAnimationTool';
 import { TOOLBOX_SECTION_HEIGHT } from './ui/ToolBoxSection';
 
 const CoverEditorTextToolbox = () => {
@@ -40,6 +41,7 @@ const CoverEditorTextToolbox = () => {
         contentContainerStyle={styles.scrollContentContainer}
         showsHorizontalScrollIndicator={false}
       >
+        <CoverEditorTextAnimationTool />
         <CoverEditorColorTool
           title={intl.formatMessage({
             defaultMessage: 'Text color',

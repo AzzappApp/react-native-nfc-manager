@@ -1,6 +1,5 @@
 import { interpolate } from '@shopify/react-native-skia';
-import type { MediaAnimation } from '#components/CoverEditor/coverEditorTypes';
-
+import type { MediaAnimation } from './mediaAnimations';
 const linearZoomOut: MediaAnimation = progress => {
   'worklet';
   return {

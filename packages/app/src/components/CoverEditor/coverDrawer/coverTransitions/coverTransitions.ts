@@ -1,28 +1,28 @@
 import { useIntl } from 'react-intl';
-import crossZoom from './transitions/crossZoom';
+import crossZoom from './crossZoom';
 import {
   directionalDown,
   directionalLeft,
   directionalRight,
   directionalUp,
-} from './transitions/directional';
-import directionalWipe from './transitions/directionalWipe';
-import dreamyZoom from './transitions/dreamyZoom';
-import fade from './transitions/fade';
-import glitchMemories from './transitions/glitchMemories';
-import hexagonalize from './transitions/hexagonalize';
-import linearBlur from './transitions/linearBlur';
-import pixelize from './transitions/pixelize';
-import rotateScaleFade from './transitions/rotateScaleFade';
-import simpleZoom from './transitions/simpleZoom';
-import squaresWire from './transitions/squaresWire';
-import wind from './transitions/wind';
-import windowBlinds from './transitions/windowBlinds';
-import windowsSliceEffect from './transitions/windowSlice';
-import wipeDown from './transitions/wipeDown';
-import wipeLeft from './transitions/wipeLeft';
-import wipeRight from './transitions/wipeRight';
-import wipeUp from './transitions/wipeUp';
+} from './directional';
+import directionalWipe from './directionalWipe';
+import dreamyZoom from './dreamyZoom';
+import fade from './fade';
+import glitchMemories from './glitchMemories';
+import hexagonalize from './hexagonalize';
+import linearBlur from './linearBlur';
+import pixelize from './pixelize';
+import rotateScaleFade from './rotateScaleFade';
+import simpleZoom from './simpleZoom';
+import squaresWire from './squaresWire';
+import wind from './wind';
+import windowBlinds from './windowBlinds';
+import windowsSliceEffect from './windowSlice';
+import wipeDown from './wipeDown';
+import wipeLeft from './wipeLeft';
+import wipeRight from './wipeRight';
+import wipeUp from './wipeUp';
 import type { SkShader, SkCanvas } from '@shopify/react-native-skia';
 
 export type CoverTransition = (args: {

@@ -7,6 +7,7 @@ const esModules = [
   'use-debounce',
   'expo(nent)?',
   '@expo(nent)?/.*',
+  '@expo-.*',
   '@shopify/react-native-skia',
 ];
 

@@ -423,6 +423,9 @@ const ColorLUTEffect = compileEffect(`
       fract(z)
     );
 
+    if (color.a == 0.0) {
+      return color;
+    }
     return float4(lutColor.rgb, color.a);
   }
 `);

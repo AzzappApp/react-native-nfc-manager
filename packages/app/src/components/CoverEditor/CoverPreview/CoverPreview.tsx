@@ -42,16 +42,17 @@ import ActivityIndicator from '#ui/ActivityIndicator';
 import Container from '#ui/Container';
 import IconButton from '#ui/IconButton';
 import coverDrawer from '../coverDrawer';
-import { convertToBaseCanvasRatio } from '../coverDrawer/coverDrawerUtils';
+import { convertToBaseCanvasRatio } from '../coverDrawer/coverDrawerHelpers';
 import { createParagraph } from '../coverDrawer/coverTextDrawer';
 import { useCoverEditorContext, useCurrentLayer } from '../CoverEditorContext';
-import { mediaInfoIsImage, percentRectToRect } from '../coverEditorHelpers';
 import {
+  mediaInfoIsImage,
+  percentRectToRect,
   isCoverDynamic,
   createCoverSkottieWithColorReplacement,
   createCoverVideoComposition,
   extractLottieInfoMemoized,
-} from '../coverEditorUtils';
+} from '../coverEditorHelpers';
 import { BoundsEditorGestureHandler, drawBoundsEditor } from './BoundsEditor';
 import { DynamicLinkRenderer } from './DynamicLinkRenderer';
 import type { VideoCompositionRendererHandle } from '#components/VideoCompositionRenderer';
@@ -317,6 +318,9 @@ const CoverPreview = ({
                   },
                   fontSize: editedTextFontSize.value ?? textLayer.fontSize,
                   rotation,
+                  // We remove animation of text layer during edition
+                  // to make it visibile to the user
+                  animation: null,
                 };
               }
               return textLayer;

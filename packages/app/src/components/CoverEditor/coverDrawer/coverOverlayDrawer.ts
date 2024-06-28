@@ -12,10 +12,10 @@ import {
   imageFrameToShaderFrame,
 } from '#helpers/mediaEditions';
 import { percentRectToRect } from '../coverEditorHelpers';
-import { convertToBaseCanvasRatio, inflateRRect } from './coverDrawerUtils';
+import { convertToBaseCanvasRatio, inflateRRect } from './coverDrawerHelpers';
 import overlayAnimations from './overlayAnimations';
 import type { CoverDrawerOptions } from './coverDrawerTypes';
-import type { CanvasAnimation, PaintAnimation } from '../coverEditorTypes';
+import type { CanvasAnimation, PaintAnimation } from './overlayAnimations';
 
 const coverOverlayDrawer = ({
   canvas,
@@ -148,7 +148,7 @@ const coverOverlayDrawer = ({
   };
   animateCanvas?.(canvas, overlayRect);
 
-  if (shadow) {
+  if (shadow && borderWidth > 0) {
     const shadowPaint = Skia.Paint();
     shadowPaint.setColor(Skia.Color('#00000099'));
     animatePaint?.(shadowPaint, overlayRect);
@@ -173,6 +173,18 @@ const coverOverlayDrawer = ({
 
   const paint = Skia.Paint();
   paint.setShader(shader);
+  if (shadow && borderWidth === 0) {
+    paint.setImageFilter(
+      Skia.ImageFilter.MakeDropShadow(
+        0,
+        convertToBaseCanvasRatio(4, width),
+        convertToBaseCanvasRatio(8, width),
+        convertToBaseCanvasRatio(8, width),
+        Skia.Color('#00000099'),
+        null,
+      ),
+    );
+  }
   animatePaint?.(paint, overlayRect);
   canvas.drawRRect(innerRect, paint);
 
@@ -180,9 +192,6 @@ const coverOverlayDrawer = ({
     const borderPaint = Skia.Paint();
     borderPaint.setColor(Skia.Color(swapColor(borderColor, cardColors)));
     animatePaint?.(borderPaint, overlayRect);
-    // if (shadow) {
-    //   addShadow(paint, width);
-    // }
     canvas.drawDRRect(outerRect, innerRect, borderPaint);
   }
   canvas.restore();

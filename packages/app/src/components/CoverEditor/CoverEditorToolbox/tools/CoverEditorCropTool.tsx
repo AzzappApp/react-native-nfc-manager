@@ -1,7 +1,7 @@
 import { useCallback } from 'react';
 import { useIntl } from 'react-intl';
 import { COVER_RATIO } from '@azzapp/shared/coverHelpers';
-import { extractLottieInfoMemoized } from '#components/CoverEditor/coverEditorUtils';
+import { extractLottieInfoMemoized } from '#components/CoverEditor/coverEditorHelpers';
 import ImagePicker, { EditImageStep } from '#components/ImagePicker';
 import ScreenModal from '#components/ScreenModal';
 import useToggle from '#hooks/useToggle';

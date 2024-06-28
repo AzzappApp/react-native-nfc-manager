@@ -1,21 +1,12 @@
-import type {
-  EditionParameters,
-  ImageFrameTransformation,
-  ShaderFrameTransformation,
-} from '#helpers/mediaEditions';
+import type { EditionParameters } from '#helpers/mediaEditions';
 import type { MediaVideo, MediaImage, TimeRange } from '#helpers/mediaHelpers';
+import type { CoverTextAnimations } from './coverDrawer/coverTextAnimations';
 import type { CoverTransitions } from './coverDrawer/coverTransitions';
 import type { MediaAnimations } from './coverDrawer/mediaAnimations';
 import type { OverlayAnimations } from './coverDrawer/overlayAnimations';
 import type { ColorPalette } from '@azzapp/shared/cardHelpers';
 import type { Filter } from '@azzapp/shared/filtersHelper';
-import type {
-  SkCanvas,
-  SkPaint,
-  SkPoint,
-  SkRect,
-  SkShader,
-} from '@shopify/react-native-skia';
+import type { SkPoint, SkRect, SkShader } from '@shopify/react-native-skia';
 
 export type CoverEditorState = {
   // Cover data
@@ -58,11 +49,6 @@ export type MediaInfoBase = {
   editionParameters: EditionParameters | null;
 };
 
-export type MediaAnimation = (progress: number) => {
-  imageTransform?: ImageFrameTransformation;
-  shaderTransform?: ShaderFrameTransformation;
-};
-
 export type MediaInfoVideo = MediaInfoBase & {
   media: MediaVideo;
   timeRange: TimeRange;
@@ -96,6 +82,9 @@ export type CoverEditorTextLayerItem = {
   width: number;
   rotation: number;
   shadow: boolean;
+  animation: CoverTextAnimations | null;
+  startPercentageTotal: number;
+  endPercentageTotal: number;
 };
 
 export type CoverEditorOverlayItem = {
@@ -112,15 +101,6 @@ export type CoverEditorOverlayItem = {
   bounds: SkRect;
   rotation: number;
   shadow: boolean;
-};
-
-export type PaintAnimation = (paint: SkPaint, rect: SkRect) => void;
-
-export type CanvasAnimation = (canvas: SkCanvas, rect: SkRect) => void;
-
-export type OverlayAnimation = (progress: number) => {
-  animatePaint?: PaintAnimation;
-  animateCanvas?: CanvasAnimation;
 };
 
 export type CoverEditorSocialLink = {

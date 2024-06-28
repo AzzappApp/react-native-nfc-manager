@@ -21,7 +21,7 @@ import { DoneHeaderButton } from '#components/commonsButtons';
 import overlayAnimations, {
   useOverlayAnimationList,
 } from '#components/CoverEditor/coverDrawer/overlayAnimations';
-import { mediaInfoIsImage } from '#components/CoverEditor/coverEditorHelpers';
+import { getCoverDuration } from '#components/CoverEditor/coverEditorHelpers';
 import TransformedImageRenderer from '#components/TransformedImageRenderer';
 import { keyExtractor } from '#helpers/idHelpers';
 import {
@@ -53,22 +53,14 @@ import type { EditionParameters } from '#helpers/mediaEditions';
 import type { SkImage, SkShader } from '@shopify/react-native-skia';
 import type { DerivedValue } from 'react-native-reanimated';
 
-const MIN_DURATION_ANIMATION = 0.5;
 const CoverEditorOverlayImageAnimationTool = () => {
-  const [show, toggleBottomSheet] = useToggle(false);
+  const { coverEditorState, dispatch } = useCoverEditorContext();
   const activeOverlay = useCoverEditorOverlayLayer();
-  const medias = useCoverEditorContext().coverEditorState.medias;
+  const totalDuration = getCoverDuration(coverEditorState);
 
-  const { dispatch } = useCoverEditorContext();
+  const [show, toggleBottomSheet] = useToggle(false);
+
   const animations = useOverlayAnimationList();
-
-  const totalDuration = medias.reduce((acc, media) => {
-    if (mediaInfoIsImage(media)) {
-      return acc + media.duration;
-    } else {
-      return acc + media.timeRange.duration;
-    }
-  }, 0);
 
   const onChangeAnimationDuration = useCallback(
     (value: number[], index: number) => {
@@ -151,7 +143,6 @@ const CoverEditorOverlayImageAnimationTool = () => {
             width={width}
             skImage={skImage}
             editionParameters={activeOverlay.editionParameters}
-            duration={4}
             lutShader={lutShader}
           />
         );
@@ -232,6 +223,9 @@ const CoverEditorOverlayImageAnimationTool = () => {
 };
 
 export default memo(CoverEditorOverlayImageAnimationTool);
+
+const MIN_DURATION_ANIMATION = 0.5;
+
 const AnimationPreview = ({
   animationId,
   height,
@@ -243,7 +237,6 @@ const AnimationPreview = ({
   animationId: OverlayAnimations;
   height: number;
   width: number;
-  duration: number;
   skImage: DerivedValue<SkImage | null> | null;
   editionParameters?: EditionParameters | null;
   lutShader?: SkShader | null;

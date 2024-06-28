@@ -1,7 +1,6 @@
 import { interpolate } from '@shopify/react-native-skia';
 import { Easing } from 'react-native-reanimated';
-import type { MediaAnimation } from '#components/CoverEditor/coverEditorTypes';
-
+import type { MediaAnimation } from './mediaAnimations';
 const smoothZoomIn: MediaAnimation = progress => {
   'worklet';
   return {

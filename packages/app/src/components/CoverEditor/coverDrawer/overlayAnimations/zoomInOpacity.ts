@@ -1,10 +1,12 @@
 import { Easing, interpolate } from 'react-native-reanimated';
+import { easeAppearDisappear } from '../coverDrawerHelpers';
 import fadeInOut from './fadeInOut';
-import type { OverlayAnimation } from '#components/CoverEditor/coverEditorTypes';
+import type { OverlayAnimation } from './overlayAnimations';
 
 const zoomInOpacity: OverlayAnimation = progress => {
   'worklet';
-  progress = Easing.inOut(Easing.ease)(progress);
+  progress = easeAppearDisappear(progress, Easing.inOut(Easing.ease));
+
   return {
     ...fadeInOut(progress),
     animateCanvas(canvas, rect) {

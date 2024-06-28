@@ -1,8 +1,10 @@
 import { Skia, TextAlign } from '@shopify/react-native-skia';
+import { interpolate } from 'react-native-reanimated';
 import { swapColor, type ColorPalette } from '@azzapp/shared/cardHelpers';
 import { skiaFontManager } from '#hooks/useApplicationFonts';
 import { percentRectToRect } from '../coverEditorHelpers';
-import { convertToBaseCanvasRatio } from './coverDrawerUtils';
+import { convertToBaseCanvasRatio } from './coverDrawerHelpers';
+import coverTextAnimations from './coverTextAnimations';
 import type { CoverDrawerOptions } from './coverDrawerTypes';
 import type { CoverEditorTextLayerItem } from '../coverEditorTypes';
 import type { SkParagraph } from '@shopify/react-native-skia';
@@ -66,10 +68,27 @@ const coverTextDrawer = ({
   index,
   width,
   height,
+  currentTime,
+  videoComposition: { duration },
 }: CoverDrawerOptions & { index: number }) => {
   'worklet';
   const layer = textLayers[index];
   if (!layer) {
+    return;
+  }
+  const {
+    rotation,
+    position,
+    width: layerWidth,
+    animation: animationName,
+    startPercentageTotal,
+    endPercentageTotal,
+  } = layer;
+
+  if (
+    currentTime < startPercentageTotal * duration ||
+    currentTime > endPercentageTotal * duration
+  ) {
     return;
   }
   const paragraph = createParagraph({
@@ -77,7 +96,6 @@ const coverTextDrawer = ({
     canvasWidth: width,
     cardColors,
   });
-  const { rotation, position, width: layerWidth } = layer;
   const {
     x,
     y,
@@ -97,7 +115,31 @@ const coverTextDrawer = ({
   if (rotation) {
     canvas.rotate((rotation * 180) / Math.PI, 0, 0);
   }
-  paragraph.paint(canvas, -textWidth / 2, -paragraph.getHeight() / 2);
+
+  const animation = animationName ? coverTextAnimations[animationName] : null;
+  if (animation) {
+    const progress = interpolate(
+      currentTime,
+      [
+        startPercentageTotal * duration,
+        endPercentageTotal * duration,
+        duration,
+      ],
+      [0, 1],
+    );
+    animation({
+      progress,
+      paragraph,
+      textLayer: layer,
+      canvas,
+      canvasWidth: width,
+      canvasHeight: height,
+      cardColors,
+    });
+  } else {
+    paragraph.paint(canvas, -textWidth / 2, -paragraph.getHeight() / 2);
+  }
+
   canvas.restore();
 };
 
