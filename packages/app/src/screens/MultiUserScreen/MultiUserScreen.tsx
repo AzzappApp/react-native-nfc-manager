@@ -339,17 +339,11 @@ const MultiUserScreen = ({
         </Text>
         {profile?.profileRole === 'owner' && !transferOwnerMode && (
           <View style={styles.switchSection}>
-            <Text variant="large">
-              <FormattedMessage
-                defaultMessage="Multi User"
-                description="Title for switch section in MultiUserScreen"
-              />
-            </Text>
             <View style={styles.proContainer}>
-              <Text variant="medium">
+              <Text variant="large">
                 <FormattedMessage
-                  defaultMessage="Publish"
-                  description="PostItem Modal - Likes switch Label"
+                  defaultMessage="Multi User"
+                  description="Title for switch section in MultiUserScreen"
                 />
               </Text>
               <PremiumIndicator
