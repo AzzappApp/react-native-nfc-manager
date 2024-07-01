@@ -41,11 +41,11 @@ const getActivitiesQuery = (search: string | null) => {
         .as('companyActivityTypeLabelKey'),
     })
     .from(CompanyActivityTable)
-    .innerJoin(
+    .leftJoin(
       CardTemplateTypeTable,
       eq(CardTemplateTypeTable.id, CompanyActivityTable.cardTemplateTypeId),
     )
-    .innerJoin(
+    .leftJoin(
       WebCardCategoryTable,
       eq(WebCardCategoryTable.id, CardTemplateTypeTable.webCardCategoryId),
     )
