@@ -1,5 +1,6 @@
-## 0.5.19-canary.53
+## 0.5.19-canary.54
 
+* **fix:**  - proper way to show template preview ([#4006](https://github.com/AzzappApp/azzapp/pull/4006))
 * **fix:**  - ceil the duration in message error of the minimum video duration ([#4007](https://github.com/AzzappApp/azzapp/pull/4007))
 * **fix:**  - **cover:** [#3976](https://github.com/AzzappApp/azzapp/pull/3976) add loader for first download ([#3991](https://github.com/AzzappApp/azzapp/pull/3991))
 * **fix:**  - **Cover:** properly handle image buffer cache
