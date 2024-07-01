@@ -64,7 +64,6 @@ type CardTemplateListProps = Omit<ViewProps, 'children'> & {
   children?: ReactNode;
   onPreviewModal?: () => void;
   onPreviewModalClose?: () => void;
-  previewModalStyle?: ViewProps['style'];
   onSelectTemplate?: (template: CardTemplateItem) => void;
 };
 
@@ -80,7 +79,6 @@ const CardTemplateList = (
     onSkip,
     loading,
     style,
-    previewModalStyle,
     onPreviewModal,
     onPreviewModalClose,
     onSelectTemplate,
@@ -520,7 +518,6 @@ const CardTemplateList = (
           webCard={profile?.webCard}
           cardColors={profile?.webCard?.cardColors ?? DEFAULT_COLOR_PALETTE}
           loading={loading}
-          style={previewModalStyle}
         />
       )}
     </>

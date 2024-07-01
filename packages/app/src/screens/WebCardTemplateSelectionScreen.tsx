@@ -177,9 +177,6 @@ const WebCardTemplateSelectionScreen = ({
             loading={inFlight}
             onPreviewModal={hideHeader}
             onPreviewModalClose={showHeader}
-            previewModalStyle={{
-              transform: [{ translateY: -insets.top }],
-            }}
             ref={cardTemplateListRef}
             onSelectTemplate={onSelectTemplate}
           />
