@@ -1,4 +1,4 @@
-## 0.5.19-canary.52
+## 0.5.19-canary.53
 
 * **fix:**  - ceil the duration in message error of the minimum video duration ([#4007](https://github.com/AzzappApp/azzapp/pull/4007))
 * **fix:**  - **cover:** [#3976](https://github.com/AzzappApp/azzapp/pull/3976) add loader for first download ([#3991](https://github.com/AzzappApp/azzapp/pull/3991))
