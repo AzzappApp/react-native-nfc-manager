@@ -1,5 +1,6 @@
-## 0.5.19-canary.56
+## 0.5.19-canary.57
 
+* **fix:**  - **multiUser:** [#2590](https://github.com/AzzappApp/azzapp/pull/2590) search by firstname and lastname ([#4018](https://github.com/AzzappApp/azzapp/pull/4018))
 * **fix:**  - 🐛 don't show bounds editor action when it has no position ([#4009](https://github.com/AzzappApp/azzapp/pull/4009))
 * **feat:**  - **web:** [#4004](https://github.com/AzzappApp/azzapp/pull/4004) add smooth scroll behavior ([#4015](https://github.com/AzzappApp/azzapp/pull/4015))
 * **fix:**  - proper way to show template preview ([#4006](https://github.com/AzzappApp/azzapp/pull/4006))
