@@ -73,7 +73,7 @@ const CoverEditorMediaPicker = ({
                 description:
                   'Error message when selecting a video media that is too short',
               },
-              { duration: expectedDuration },
+              { duration: Math.ceil(expectedDuration * 10) / 10 },
             ),
           });
           return currentMedias;
