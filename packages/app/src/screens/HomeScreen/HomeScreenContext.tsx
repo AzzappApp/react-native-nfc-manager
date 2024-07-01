@@ -178,7 +178,7 @@ export const HomeScreenProvider = ({
 
   //updating the initialProfileIndex to avoid warning(not sure needed in production)
   useEffect(() => {
-    if (user?.profiles && user?.profiles?.length > initialProfileIndex) {
+    if (user?.profiles && user?.profiles?.length < initialProfileIndex) {
       setInitialProfileIndex(1);
     }
   }, [initialProfileIndex, user?.profiles]);

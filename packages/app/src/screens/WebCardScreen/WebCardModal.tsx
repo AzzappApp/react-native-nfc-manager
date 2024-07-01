@@ -247,7 +247,7 @@ const WebCardModal = ({
     webCard.id,
     () => {
       close();
-      router.back();
+      router.backToTop();
     },
     e => {
       if (e.message === ERRORS.SUBSCRIPTION_IS_ACTIVE) {
