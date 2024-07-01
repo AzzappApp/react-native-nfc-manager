@@ -285,14 +285,15 @@ export const getWebCardProfiles = async (
     await tx.execute(
       sql`SELECT * 
           FROM Profile
+          INNER JOIN User ON Profile.userId = User.id
           WHERE webCardId = ${webCardId} 
           AND (
             ${search} IS NULL OR
-            JSON_EXTRACT(contactCard, '$.firstName') LIKE ${
-              '%' + search + '%'
-            } OR
-            JSON_EXTRACT(contactCard, '$.lastName') LIKE ${'%' + search + '%'}
-          )
+            JSON_EXTRACT(contactCard, '$.firstName') LIKE ${`%${search}%`}
+            OR JSON_EXTRACT(contactCard, '$.lastName') LIKE ${`%${search}%`}
+            OR User.email LIKE ${`%${search}%`}
+            OR User.phoneNumber LIKE ${`%${search}%`}
+          ) 
           ORDER BY 
             CASE 
                 WHEN profileRole = 'owner' THEN 1
