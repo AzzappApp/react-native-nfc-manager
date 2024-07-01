@@ -1,5 +1,6 @@
-## 0.5.19-canary.55
+## 0.5.19-canary.56
 
+* **fix:**  - 🐛 don't show bounds editor action when it has no position ([#4009](https://github.com/AzzappApp/azzapp/pull/4009))
 * **feat:**  - **web:** [#4004](https://github.com/AzzappApp/azzapp/pull/4004) add smooth scroll behavior ([#4015](https://github.com/AzzappApp/azzapp/pull/4015))
 * **fix:**  - proper way to show template preview ([#4006](https://github.com/AzzappApp/azzapp/pull/4006))
 * **fix:**  - ceil the duration in message error of the minimum video duration ([#4007](https://github.com/AzzappApp/azzapp/pull/4007))
