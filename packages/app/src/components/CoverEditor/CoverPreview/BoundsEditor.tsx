@@ -87,6 +87,13 @@ export const BoundsEditorGestureHandler = ({
     };
   });
 
+  const animatedOptionsStyle = useAnimatedStyle(() => {
+    return {
+      opacity: position.value ? 100 : 0,
+      flex: 1,
+    };
+  });
+
   return (
     <GestureDetector
       gesture={Gesture.Race(Gesture.Simultaneous(pinch, rotate), pan)}
@@ -109,7 +116,7 @@ export const BoundsEditorGestureHandler = ({
             onGestureEnd={onGestureEnd}
           />
         ))}
-        {children}
+        <Animated.View style={animatedOptionsStyle}>{children}</Animated.View>
       </Animated.View>
     </GestureDetector>
   );
