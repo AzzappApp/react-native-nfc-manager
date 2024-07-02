@@ -1,5 +1,8 @@
-## 0.5.19-canary.60
+## 0.5.19-canary.61
 
+* **fix:**  - add get for webhook ([#4040](https://github.com/AzzappApp/azzapp/pull/4040))
+* **perf:**  - **android:** [#3974](https://github.com/AzzappApp/azzapp/pull/3974) issue with optimistic updates and input ranges ([#4036](https://github.com/AzzappApp/azzapp/pull/4036))
+* **fix:**  - **android:** [#4012](https://github.com/AzzappApp/azzapp/pull/4012) wrong size returned on samsung ([#4039](https://github.com/AzzappApp/azzapp/pull/4039))
 * **fix:**  - **coverTemplate:** [#4010](https://github.com/AzzappApp/azzapp/pull/4010) sort media according to start time ([#4016](https://github.com/AzzappApp/azzapp/pull/4016))
 * **fix:**  - **multiUser:** [#4026](https://github.com/AzzappApp/azzapp/pull/4026), wrong id queried in profiles ([#4027](https://github.com/AzzappApp/azzapp/pull/4027))
 * **fix:**  - **android:** [#2950](https://github.com/AzzappApp/azzapp/pull/2950) enhance display on zoom in / out ([#4024](https://github.com/AzzappApp/azzapp/pull/4024))
