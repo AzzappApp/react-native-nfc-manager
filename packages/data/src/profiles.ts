@@ -283,7 +283,7 @@ export const getWebCardProfiles = async (
 ) =>
   (
     await tx.execute(
-      sql`SELECT * 
+      sql`SELECT Profile.* 
           FROM Profile
           INNER JOIN User ON Profile.userId = User.id
           WHERE webCardId = ${webCardId} 
