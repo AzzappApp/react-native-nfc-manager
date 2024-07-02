@@ -1,5 +1,6 @@
-## 0.5.19-canary.62
+## 0.5.19-canary.63
 
+* **fix:**  - 🐛 display and cut long video with right duration ([#4038](https://github.com/AzzappApp/azzapp/pull/4038))
 * **fix:**  - 🐛 restore links on preview ([#4043](https://github.com/AzzappApp/azzapp/pull/4043))
 * **fix:**  - add get for webhook ([#4040](https://github.com/AzzappApp/azzapp/pull/4040))
 * **perf:**  - **android:** [#3974](https://github.com/AzzappApp/azzapp/pull/3974) issue with optimistic updates and input ranges ([#4036](https://github.com/AzzappApp/azzapp/pull/4036))
