@@ -130,7 +130,8 @@ const coverOverlayDrawer = ({
     height: imageHeight,
     width: imageWidth,
   };
-  const borderWidthPx = (borderWidth * imageWidth) / 100;
+  const borderWidthPx = convertToBaseCanvasRatio(borderWidth, width);
+
   const outerRect = {
     rect: overlayRect,
     rx: (borderRadius * width) / 200,
