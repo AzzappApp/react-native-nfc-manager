@@ -203,10 +203,7 @@ const EditImageStep = ({
             <View style={styles.viewVideoDurationError}>
               {media.duration > maxVideoDuration && (
                 <View style={[styles.durationView, styles.viewIconDuration]}>
-                  <Text
-                    variant="xsmall"
-                    style={{ width: 25, fontSize: 10, color: 'white' }}
-                  >
+                  <Text variant="xsmall" style={styles.duration}>
                     {formatDuration(media.duration)}
                   </Text>
                 </View>
@@ -215,10 +212,7 @@ const EditImageStep = ({
                 timeRange?.duration < media.duration &&
                 !(media.duration > maxVideoDuration) && (
                   <View style={[styles.durationView]}>
-                    <Text
-                      variant="xsmall"
-                      style={{ width: 25, fontSize: 10, color: 'white' }}
-                    >
+                    <Text variant="xsmall" style={styles.duration}>
                       {formatDuration(media.duration)}
                     </Text>
                   </View>
@@ -231,10 +225,7 @@ const EditImageStep = ({
                 />
               )}
               <View style={styles.durationView}>
-                <Text
-                  variant="xsmall"
-                  style={{ width: 25, fontSize: 10, color: 'white' }}
-                >
+                <Text variant="xsmall" style={styles.duration}>
                   {formatDuration(timeRange?.duration ?? media.duration)}
                 </Text>
               </View>
@@ -434,4 +425,5 @@ const styles = StyleSheet.create({
     marginTop: 10,
     justifyContent: 'flex-start',
   },
+  duration: { fontSize: 10, color: colors.white },
 });
