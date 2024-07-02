@@ -13,9 +13,11 @@ import { colors, shadow } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import PressableNative from '#ui/PressableNative';
 import { convertToBaseCanvasRatio } from './CoverEditor/coverDrawer/coverDrawerHelpers';
+import { calculateLinksSize } from './CoverEditor/CoverPreview/CoverPreview';
 import { DynamicLinkRenderer } from './CoverEditor/CoverPreview/DynamicLinkRenderer';
 import { MediaImageRenderer, MediaVideoRenderer } from './medias';
 import type { CoverRenderer_webCard$key } from '#relayArtifacts/CoverRenderer_webCard.graphql';
+import type { CoverEditorLinksLayerItem } from './CoverEditor/coverEditorTypes';
 import type { ForwardedRef } from 'react';
 import type { StyleProp, ViewStyle } from 'react-native';
 
@@ -188,6 +190,27 @@ const CoverRenderer = (
   const showLinks =
     layout && coverDynamicLinks && coverDynamicLinks.links.length > 0;
 
+  const linksSize = useMemo(() => {
+    if (!layout)
+      return {
+        width: 0,
+        height: 0,
+      };
+
+    const linksSizePercent = calculateLinksSize(
+      coverDynamicLinks as CoverEditorLinksLayerItem,
+      {
+        viewHeight: layout.height,
+        viewWidth: layout.width,
+      },
+    );
+
+    return {
+      width: (linksSizePercent.width * layout.width) / 100,
+      height: (linksSizePercent.height * layout.height) / 100,
+    };
+  }, [coverDynamicLinks, layout]);
+
   return useMemo(
     () => (
       <View
@@ -242,8 +265,12 @@ const CoverRenderer = (
               position: 'absolute',
               transformOrigin: 'center',
               transform: [{ rotate: `${coverDynamicLinks.rotation}rad` }],
-              top: coverDynamicLinks.position.y * layout.height,
-              left: coverDynamicLinks.position.x * layout.width,
+              top:
+                (coverDynamicLinks.position.y * layout.height) / 100 -
+                linksSize.height / 2,
+              left:
+                (coverDynamicLinks.position.x * layout.width) / 100 -
+                linksSize.width / 2,
               gap: convertToBaseCanvasRatio(LINKS_GAP, layout.width),
             }}
           >
@@ -273,6 +300,7 @@ const CoverRenderer = (
       isSmallCover,
       isVideoMedia,
       layout,
+      linksSize,
       onError,
       onReadyForDisplay,
       showLinks,

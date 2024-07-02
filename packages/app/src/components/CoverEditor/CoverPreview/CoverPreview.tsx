@@ -1282,7 +1282,7 @@ const MAX_DISPLAY_DECODER_RESOLUTION = Math.min(
   1920,
 );
 
-const calculateLinksSize = (
+export const calculateLinksSize = (
   linksLayer: CoverEditorLinksLayerItem,
   {
     viewWidth,
