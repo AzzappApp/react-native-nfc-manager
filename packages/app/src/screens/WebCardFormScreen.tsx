@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, useMemo, useCallback } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { StatusBar, StyleSheet, View, useWindowDimensions } from 'react-native';
+import { StyleSheet, View, useWindowDimensions } from 'react-native';
 import { KeyboardAvoidingView } from 'react-native-keyboard-controller';
 import {
   fetchQuery,
@@ -546,12 +546,7 @@ const WebCardFormScreen = ({
                       sections={filteredCompanyActivities}
                       selectedItemKey={value}
                       keyExtractor={keyExtractor}
-                      bottomSheetHeight={
-                        windowHeight -
-                        90 -
-                        insets.top -
-                        (StatusBar.currentHeight ?? 0)
-                      }
+                      bottomSheetHeight={windowHeight - 90 - insets.top}
                       inputLabel={
                         value
                           ? companyActivities.find(

@@ -48,6 +48,7 @@ const TextInput = (
       }
       onFocus={onFocusInner}
       onBlur={onBlurInner}
+      allowFontScaling={false}
       style={[
         styles.input,
         isFocused && styles.focused,

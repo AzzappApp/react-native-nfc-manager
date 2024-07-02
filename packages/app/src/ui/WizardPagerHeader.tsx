@@ -1,4 +1,4 @@
-import { Platform, View } from 'react-native';
+import { View } from 'react-native';
 import { colors } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import IconButton from '#ui/IconButton';
@@ -102,7 +102,7 @@ export default WizardPagerHeader;
 
 const CIRCLE_SIZE = 5;
 
-export const PAGER_HEADER_HEIGHT = Platform.OS === 'android' ? 90 : 85;
+export const PAGER_HEADER_HEIGHT = 85;
 
 const styleSheet = createStyleSheet(appearance => ({
   root: {

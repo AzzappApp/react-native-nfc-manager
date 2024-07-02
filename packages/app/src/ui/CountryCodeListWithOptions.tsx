@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Dimensions, Image, StatusBar, View } from 'react-native';
+import { Dimensions, Image, View } from 'react-native';
 import { colors } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import BottomSheetModal from '#ui/BottomSheetModal';
@@ -32,7 +32,7 @@ type CountryCodeListWithOptionsProps<T extends string> = ViewProps & {
   onDismiss?: () => void;
 };
 
-const { height: windowHeight } = Dimensions.get('screen');
+const { height: windowHeight } = Dimensions.get('window');
 
 const CountryCodeListWithOptions = <T extends string>({
   phoneSectionTitle,
@@ -96,7 +96,7 @@ const CountryCodeListWithOptions = <T extends string>({
       </PressableNative>
       <BottomSheetModal
         visible={showDropdown}
-        height={windowHeight - (StatusBar.currentHeight ?? 0) - 120}
+        height={windowHeight - 120}
         contentContainerStyle={styles.bottomSheetContainer}
         nestedScroll
         onRequestClose={onRequestClose}

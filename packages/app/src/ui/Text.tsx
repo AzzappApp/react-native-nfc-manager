@@ -42,6 +42,7 @@ const Text = ({ variant = 'none', appearance, ...props }: TextProps) => {
     ...props,
     style: [styles.text, props.style],
     maxFontSizeMultiplier: 1,
+    allowFontScaling: false,
     accessible: true, // this is needed, accessible was lost with createElement
   });
 };

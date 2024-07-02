@@ -1,9 +1,9 @@
-import { Dimensions, Image, StatusBar, StyleSheet } from 'react-native';
+import { Dimensions, Image, StyleSheet } from 'react-native';
 import Animated, { Easing, FadeOut } from 'react-native-reanimated';
 import ActivityIndicator from '#ui/ActivityIndicator';
 import { ACTIVITY_INDICATOR_WIDTH } from '#ui/ActivityIndicator/ActivityIndicator';
 
-const { width: windowWidth, height: windowHeight } = Dimensions.get('screen');
+const { width: windowWidth, height: windowHeight } = Dimensions.get('window');
 
 const exiting = FadeOut.duration(500).easing(Easing.ease);
 
@@ -37,7 +37,7 @@ const styles = StyleSheet.create({
   },
   indicator: {
     position: 'absolute',
-    top: (windowHeight - (StatusBar.currentHeight ?? 0)) / 2 + 40,
+    top: windowHeight / 2 + 40,
     left: (windowWidth - ACTIVITY_INDICATOR_WIDTH) / 2,
   },
 });

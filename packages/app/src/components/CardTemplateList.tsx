@@ -581,7 +581,7 @@ type CoverTemplatePreviewModalProps = {
   onRequestClose: () => void;
 };
 
-const { height: windowHeight, width: windowWidth } = Dimensions.get('screen');
+const { height: windowHeight, width: windowWidth } = Dimensions.get('window');
 
 const CardTemplatePreviewModal = ({
   visible,

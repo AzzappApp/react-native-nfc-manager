@@ -1,4 +1,4 @@
-import { StatusBar, StyleSheet, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import Text from '#ui/Text';
 import Container from './Container';
 import type { ReactNode } from 'react';
@@ -64,7 +64,7 @@ export default Header;
  * The height of the header. Styling guide is defining 102 px height with 45 paddingTop margin.
  * All other part of figma does not use their template button
  */
-export const HEADER_HEIGHT = 47 + (StatusBar.currentHeight ?? 0);
+export const HEADER_HEIGHT = 47;
 
 const styles = StyleSheet.create({
   header: {

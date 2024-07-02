@@ -22,7 +22,7 @@ type HomeContactCardProps = {
   user: HomeContactCard_user$key;
   height: number;
 };
-const windowWidth = Dimensions.get('screen').width;
+const windowWidth = Dimensions.get('window').width;
 const HomeContactCard = ({ user, height }: HomeContactCardProps) => {
   const { profiles } = useFragment(
     graphql`

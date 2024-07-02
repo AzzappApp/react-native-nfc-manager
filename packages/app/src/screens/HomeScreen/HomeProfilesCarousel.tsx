@@ -416,7 +416,7 @@ const CreateItem = ({
 };
 
 const CreateItemMemo = memo(CreateItem);
-const windowWidth = Dimensions.get('screen').width;
+const windowWidth = Dimensions.get('window').width;
 
 const styles = StyleSheet.create({
   container: { flex: 1, marginVertical: 15 },

@@ -153,7 +153,7 @@ const HomeBottomPanel = ({ user: userKey }: HomeBottomPanelProps) => {
   );
 };
 
-const { width: windowWidth } = Dimensions.get('screen');
+const { width: windowWidth } = Dimensions.get('window');
 const PANEL_HEIGHT = (windowWidth - 40) / CONTACT_CARD_RATIO;
 
 const styles = StyleSheet.create({

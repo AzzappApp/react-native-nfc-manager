@@ -518,7 +518,7 @@ const animatedTransitionFactory = ({
   if (Platform.OS !== 'ios' || !fromRectangle || showPosts) {
     return { stackAnimation: 'slide_from_bottom', replaceAnimation: 'push' };
   }
-  const windowWidth = Dimensions.get('screen').width;
+  const windowWidth = Dimensions.get('window').width;
   return {
     stackAnimation: 'custom',
     stackAnimationOptions: {

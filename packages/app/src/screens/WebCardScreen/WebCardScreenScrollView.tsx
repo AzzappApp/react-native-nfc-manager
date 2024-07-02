@@ -38,7 +38,7 @@ export type WebCardScreenScrollViewProps = Omit<ScrollViewProps, 'hitSlop'> & {
   editFooterHeight: number;
 };
 
-const { height: windowHeight } = Dimensions.get('screen');
+const { height: windowHeight } = Dimensions.get('window');
 
 /**
  * A wrapper component for the webCard screen content. Handle the edit animation

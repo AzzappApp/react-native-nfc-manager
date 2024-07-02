@@ -14,7 +14,7 @@ const WebCardBackground = ({
 }: {
   colors: Color[] | SharedValue<ParsedColorArray[] | string[]>;
 }) => {
-  const { width, height } = Dimensions.get('screen');
+  const { width, height } = Dimensions.get('window');
 
   return (
     <View style={StyleSheet.absoluteFill}>

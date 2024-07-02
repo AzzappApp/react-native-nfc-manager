@@ -1,5 +1,5 @@
 import { Dimensions } from 'react-native';
 
 export const get = () => {
-  return Dimensions.get('screen').width;
+  return Dimensions.get('window').width;
 };
