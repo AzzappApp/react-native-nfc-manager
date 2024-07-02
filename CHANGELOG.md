@@ -1,5 +1,7 @@
-## 0.5.19-canary.64
+## 0.5.19-canary.65
 
+* **fix:**  - **android:** [#4002](https://github.com/AzzappApp/azzapp/pull/4002) on some android label is cut ([#4041](https://github.com/AzzappApp/azzapp/pull/4041))
+* **fix:**  - 🐛 clean size calculation ([#4048](https://github.com/AzzappApp/azzapp/pull/4048))
 * **fix:**  - 🐛 display and cut long video with right duration ([#4038](https://github.com/AzzappApp/azzapp/pull/4038))
 * **fix:**  - 🐛 restore links on preview ([#4043](https://github.com/AzzappApp/azzapp/pull/4043))
 * **fix:**  - add get for webhook ([#4040](https://github.com/AzzappApp/azzapp/pull/4040))
