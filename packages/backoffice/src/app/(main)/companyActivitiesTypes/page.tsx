@@ -1,20 +1,38 @@
 import { Box, TextField, Typography } from '@mui/material';
-import { asc, desc, like, or, sql } from 'drizzle-orm';
-import { CompanyActivityTypeTable, db } from '@azzapp/data';
+import { asc, desc, eq, like, or, sql } from 'drizzle-orm';
+import { CompanyActivityTypeTable, LabelTable, db } from '@azzapp/data';
 import CompanyActivitiesTypesList from './CompanyActivitiesTypesList';
 
+export type CompanyActivityTypeItem = {
+  id: string;
+  label: string | null;
+};
+
 const sortsColumns = {
-  labelKey: CompanyActivityTypeTable.labelKey,
+  label: LabelTable.baseLabelValue,
 };
 
 export type SortColumn = keyof typeof sortsColumns;
 
 const getActivitiesTypesQuery = (search: string | null) => {
-  let query = db.select().from(CompanyActivityTypeTable).$dynamic();
+  let query = db
+    .select({
+      id: CompanyActivityTypeTable.id,
+      label: LabelTable.baseLabelValue,
+    })
+    .from(CompanyActivityTypeTable)
+    .leftJoin(
+      LabelTable,
+      eq(CompanyActivityTypeTable.labelKey, LabelTable.labelKey),
+    )
+    .$dynamic();
 
   if (search) {
     query = query.where(
-      or(like(CompanyActivityTypeTable.labelKey, `%${search}%`)),
+      or(
+        like(CompanyActivityTypeTable.labelKey, `%${search}%`),
+        like(LabelTable.baseLabelValue, `%${search}%`),
+      ),
     );
   }
 
@@ -63,7 +81,7 @@ const CompanyActivitiesTypesPage = async ({ searchParams = {} }: Props) => {
 
   const sort = Object.keys(sortsColumns).includes(searchParams.sort as any)
     ? (searchParams.sort as any)
-    : 'labelKey';
+    : 'label';
 
   const order = searchParams.order === 'desc' ? 'desc' : 'asc';
   const search = searchParams.s ?? null;

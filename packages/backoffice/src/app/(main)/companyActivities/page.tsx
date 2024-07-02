@@ -4,6 +4,7 @@ import {
   CardTemplateTypeTable,
   CompanyActivityTable,
   CompanyActivityTypeTable,
+  LabelTable,
   WebCardCategoryTable,
   db,
 } from '@azzapp/data';
@@ -11,13 +12,13 @@ import CompanyActivitiesList from './CompanyActivitiesList';
 
 export type CompanyActivityItem = {
   id: string;
-  labelKey: string;
+  label: string | null;
   cardTemplateTypeLabelKey: string;
   webCardCategoryLabelKey: string;
 };
 
 const sortsColumns = {
-  labelKey: CompanyActivityTable.labelKey,
+  label: LabelTable.baseLabelValue,
   cardTemplateTypeLabelKey: CardTemplateTypeTable.labelKey,
   webCardCategoryLabelKey: WebCardCategoryTable.labelKey,
   companyActivityTypeLabelKey: CompanyActivityTypeTable.labelKey,
@@ -29,7 +30,7 @@ const getActivitiesQuery = (search: string | null) => {
   let query = db
     .select({
       id: CompanyActivityTable.id,
-      labelKey: CompanyActivityTable.labelKey,
+      label: LabelTable.baseLabelValue,
       cardTemplateTypeLabelKey: sql`${CardTemplateTypeTable.labelKey}`
         .mapWith(String)
         .as('cardTemplateTypeLabelKey'),
@@ -56,12 +57,16 @@ const getActivitiesQuery = (search: string | null) => {
         CompanyActivityTable.companyActivityTypeId,
       ),
     )
+    .leftJoin(
+      LabelTable,
+      eq(CompanyActivityTable.labelKey, LabelTable.labelKey),
+    )
     .$dynamic();
 
   if (search) {
     query = query.where(
       or(
-        like(CompanyActivityTable.labelKey, `%${search}%`),
+        like(LabelTable.baseLabelValue, `%${search}%`),
         like(CompanyActivityTypeTable.labelKey, `%${search}%`),
         like(CardTemplateTypeTable.labelKey, `%${search}%`),
         like(WebCardCategoryTable.labelKey, `%${search}%`),
@@ -114,7 +119,7 @@ const CompanyActivitiesPage = async ({ searchParams = {} }: Props) => {
 
   const sort = Object.keys(sortsColumns).includes(searchParams.sort as any)
     ? (searchParams.sort as any)
-    : 'labelKey';
+    : 'label';
 
   const order = searchParams.order === 'desc' ? 'desc' : 'asc';
   const search = searchParams.s ?? null;

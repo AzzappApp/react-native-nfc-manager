@@ -142,7 +142,7 @@ const CompanyActivitiesList = ({
 
 const columns: GridColDef[] = [
   {
-    field: 'labelKey',
+    field: 'label',
     headerName: 'Label',
     flex: 1,
   },

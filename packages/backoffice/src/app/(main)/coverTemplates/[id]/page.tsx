@@ -2,7 +2,7 @@ import { eq, sql } from 'drizzle-orm';
 import {
   CardTemplateTypeTable,
   CompanyActivityTable,
-  WebCardCategoryTable,
+  CompanyActivityTypeTable,
   db,
   getColorPalettes,
   getCoverTemplateById,
@@ -17,7 +17,7 @@ import CoverTemplateForm from '../CoverTemplatesForm';
 export type ActivityItem = {
   id: string;
   label: string;
-  categoryLabel: string;
+  activityTypeLabel: string;
 };
 
 const getActivitiesQuery = () => {
@@ -25,9 +25,9 @@ const getActivitiesQuery = () => {
     .select({
       id: CompanyActivityTable.id,
       labelKey: CompanyActivityTable.labelKey,
-      webCardCategoryLabelKey: sql`${WebCardCategoryTable.labelKey}`
+      CompanyActivityTypeLabelKey: sql`${CompanyActivityTypeTable.labelKey}`
         .mapWith(String)
-        .as('webCardCategoryLabelKey'),
+        .as('CompanyActivityTypeLabelKey'),
     })
     .from(CompanyActivityTable)
     .leftJoin(
@@ -35,8 +35,11 @@ const getActivitiesQuery = () => {
       eq(CardTemplateTypeTable.id, CompanyActivityTable.cardTemplateTypeId),
     )
     .leftJoin(
-      WebCardCategoryTable,
-      eq(WebCardCategoryTable.id, CardTemplateTypeTable.webCardCategoryId),
+      CompanyActivityTypeTable,
+      eq(
+        CompanyActivityTypeTable.id,
+        CompanyActivityTable.companyActivityTypeId,
+      ),
     );
 
   return query;
@@ -72,12 +75,14 @@ const CoverTemplatePage = async ({
   const activitiesWithLabel: ActivityItem[] = await Promise.all(
     activities.map(async activity => {
       const label = await getLabel(activity.labelKey);
-      const categoryLabel = await getLabel(activity.webCardCategoryLabelKey);
+      const activityTypeLabel = await getLabel(
+        activity.CompanyActivityTypeLabelKey,
+      );
 
       return {
         id: activity.id,
         label: label?.baseLabelValue || 'unknown',
-        categoryLabel: categoryLabel?.baseLabelValue || 'unknown',
+        activityTypeLabel: activityTypeLabel?.baseLabelValue || 'unknown',
       };
     }),
   );

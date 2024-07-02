@@ -68,8 +68,8 @@ const CoverTemplatePreviews = ({
       flex: 1,
     },
     {
-      field: 'categoryLabel',
-      headerName: 'Category',
+      field: 'activityTypeLabel',
+      headerName: 'Activity type',
       flex: 1,
     },
     {

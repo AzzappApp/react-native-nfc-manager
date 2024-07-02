@@ -11,8 +11,7 @@ import {
   useTransition,
 } from 'react';
 import DataGrid from '#components/DataGrid';
-import type { SortColumn } from './page';
-import type { CompanyActivityType } from '@azzapp/data';
+import type { CompanyActivityTypeItem, SortColumn } from './page';
 import type {
   GridColDef,
   GridPaginationModel,
@@ -20,7 +19,7 @@ import type {
 } from '@mui/x-data-grid';
 
 type CompanyActivitiesListProps = {
-  companyActivitiesTypes: CompanyActivityType[];
+  companyActivitiesTypes: CompanyActivityTypeItem[];
   count: number;
   page: number;
   pageSize: number;
@@ -143,7 +142,7 @@ const CompanyActivitiesTypesList = ({
 
 const columns: GridColDef[] = [
   {
-    field: 'labelKey',
+    field: 'label',
     headerName: 'Label',
     flex: 1,
   },

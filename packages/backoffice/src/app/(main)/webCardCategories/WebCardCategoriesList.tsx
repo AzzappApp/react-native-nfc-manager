@@ -20,8 +20,7 @@ import {
   useTransition,
 } from 'react';
 import DataGrid from '#components/DataGrid';
-import type { Filters } from './page';
-import type { WebCardCategory } from '@azzapp/data';
+import type { Filters, WebCardCategoryItem } from './page';
 import type { SelectChangeEvent } from '@mui/material';
 import type {
   GridColDef,
@@ -30,7 +29,7 @@ import type {
 } from '@mui/x-data-grid';
 
 type WebCardCategoriesListProps = {
-  webCardCategories: WebCardCategory[];
+  webCardCategories: WebCardCategoryItem[];
   count: number;
   page: number;
   pageSize: number;
@@ -219,7 +218,7 @@ const WebCardCategoriesList = ({
 
 const columns: GridColDef[] = [
   {
-    field: 'labelKey',
+    field: 'label',
     headerName: 'Label',
     flex: 1,
   },

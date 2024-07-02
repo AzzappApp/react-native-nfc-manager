@@ -1,11 +1,19 @@
 import { Box, TextField, Typography } from '@mui/material';
 import { asc, desc, eq, like, or, sql, and } from 'drizzle-orm';
-import { WebCardCategoryTable, db } from '@azzapp/data';
+import { LabelTable, WebCardCategoryTable, db } from '@azzapp/data';
 import WebCardCategoriesList from './WebCardCategoriesList';
 import type { SQLWrapper } from 'drizzle-orm';
 
+export type WebCardCategoryItem = {
+  id: string;
+  label: string | null;
+  webCardKind: 'business' | 'personal';
+  order: number;
+  enabled: boolean;
+};
+
 const sortsColumns = {
-  labelKey: WebCardCategoryTable.labelKey,
+  label: LabelTable.baseLabelValue,
   webCardKind: WebCardCategoryTable.webCardKind,
   order: WebCardCategoryTable.order,
   enabled: WebCardCategoryTable.enabled,
@@ -27,7 +35,7 @@ const getFilters = (filters: Filters): SQLWrapper[] => {
 const getSearch = (search: string | null) => {
   if (search) {
     return or(
-      like(WebCardCategoryTable.labelKey, `%${search}%`),
+      like(LabelTable.baseLabelValue, `%${search}%`),
       like(WebCardCategoryTable.webCardKind, `%${search}%`),
       like(WebCardCategoryTable.order, `%${search}%`),
     );
@@ -36,14 +44,24 @@ const getSearch = (search: string | null) => {
 
 const getCategories = (
   page: number,
-  sort: 'enabled' | 'labelKey' | 'order' | 'webCardKind',
+  sort: 'enabled' | 'label' | 'order' | 'webCardKind',
   order: 'asc' | 'desc',
   search: string | null,
   filters: Filters,
 ) => {
   const query = db
-    .select()
+    .select({
+      id: WebCardCategoryTable.id,
+      label: LabelTable.baseLabelValue,
+      webCardKind: WebCardCategoryTable.webCardKind,
+      order: WebCardCategoryTable.order,
+      enabled: WebCardCategoryTable.enabled,
+    })
     .from(WebCardCategoryTable)
+    .leftJoin(
+      LabelTable,
+      eq(WebCardCategoryTable.labelKey, LabelTable.labelKey),
+    )
     .orderBy(asc(WebCardCategoryTable.order))
     .where(and(getSearch(search), ...getFilters(filters)))
     .$dynamic();
