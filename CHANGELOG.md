@@ -1,5 +1,8 @@
-## 0.5.19-canary.57
+## 0.5.19-canary.58
 
+* **fix:**  - **multiUser:** [#4026](https://github.com/AzzappApp/azzapp/pull/4026), wrong id queried in profiles ([#4027](https://github.com/AzzappApp/azzapp/pull/4027))
+* **fix:**  - **android:** [#2950](https://github.com/AzzappApp/azzapp/pull/2950) enhance display on zoom in / out ([#4024](https://github.com/AzzappApp/azzapp/pull/4024))
+* **fix:**  - **webCard:** [#4020](https://github.com/AzzappApp/azzapp/pull/4020) don’t display toast on error ([#4028](https://github.com/AzzappApp/azzapp/pull/4028))
 * **fix:**  - **multiUser:** [#2590](https://github.com/AzzappApp/azzapp/pull/2590) search by firstname and lastname ([#4018](https://github.com/AzzappApp/azzapp/pull/4018))
 * **fix:**  - 🐛 don't show bounds editor action when it has no position ([#4009](https://github.com/AzzappApp/azzapp/pull/4009))
 * **feat:**  - **web:** [#4004](https://github.com/AzzappApp/azzapp/pull/4004) add smooth scroll behavior ([#4015](https://github.com/AzzappApp/azzapp/pull/4015))
