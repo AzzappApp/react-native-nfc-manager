@@ -83,7 +83,9 @@ export const matchUrlWithRoute = async (
       let signature: string;
       try {
         [contactData, signature] = JSON.parse(
-          decompressFromEncodedURIComponent(compressedContactCard),
+          //lz-string decompressFromEncodedURIComponent does not decode properly when space in the url is converted to %20? (happens with applink)
+          //we need to use decodeURI in order to decode the url properly
+          decompressFromEncodedURIComponent(decodeURI(compressedContactCard)),
         );
       } catch (error) {
         Sentry.captureException(error, {
