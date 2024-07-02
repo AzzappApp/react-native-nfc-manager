@@ -1,4 +1,4 @@
-## 0.5.19-canary.63
+## 0.5.19-canary.64
 
 * **fix:**  - 🐛 display and cut long video with right duration ([#4038](https://github.com/AzzappApp/azzapp/pull/4038))
 * **fix:**  - 🐛 restore links on preview ([#4043](https://github.com/AzzappApp/azzapp/pull/4043))
