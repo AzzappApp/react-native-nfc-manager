@@ -1,6 +1,11 @@
+import { useMemo } from 'react';
 import { useIntl } from 'react-intl';
-import { COVER_MAX_MEDIA_DURATION } from '@azzapp/shared/coverHelpers';
-import { mediaInfoIsImage } from '#components/CoverEditor/coverEditorHelpers';
+import { COVER_IMAGE_DEFAULT_DURATION } from '@azzapp/shared/coverHelpers';
+import {
+  extractLottieInfoMemoized,
+  getLottieMediasDurations,
+  mediaInfoIsImage,
+} from '#components/CoverEditor/coverEditorHelpers';
 import ImagePicker, { EditImageStep } from '#components/ImagePicker';
 import ScreenModal from '#components/ScreenModal';
 import useToggle from '#hooks/useToggle';
@@ -12,7 +17,7 @@ const CoverEditorCutTool = () => {
   const intl = useIntl();
   const [show, toggleScreenModal] = useToggle(false);
   const {
-    coverEditorState: { editionMode, medias, selectedItemIndex },
+    coverEditorState: { editionMode, medias, selectedItemIndex, lottie },
     dispatch,
   } = useCoverEditorContext();
 
@@ -29,8 +34,17 @@ const CoverEditorCutTool = () => {
     toggleScreenModal();
   };
 
+  const lottieInfo = extractLottieInfoMemoized(lottie);
+  const durations = lottieInfo ? getLottieMediasDurations(lottieInfo) : null;
+
   const cropData = mediaInfo?.editionParameters?.cropData;
   const aspectRatio = cropData ? cropData.width / cropData.height : undefined;
+
+  const expectedDuration = useMemo(() => {
+    if (selectedItemIndex == null || !durations)
+      return COVER_IMAGE_DEFAULT_DURATION;
+    return durations[selectedItemIndex] ?? COVER_IMAGE_DEFAULT_DURATION;
+  }, [durations, selectedItemIndex]);
 
   return (
     <>
@@ -58,7 +72,7 @@ const CoverEditorCutTool = () => {
               steps={[EditImageStep]}
               onCancel={toggleScreenModal}
               onFinished={onFinished}
-              maxVideoDuration={COVER_MAX_MEDIA_DURATION}
+              maxVideoDuration={expectedDuration}
             />
           )}
         </ScreenModal>

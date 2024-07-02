@@ -12,6 +12,7 @@ import { cropDataForAspectRatio } from '#helpers/mediaEditions';
 import {
   mediaInfoIsImage,
   extractLottieInfoMemoized,
+  getLottieMediasDurations,
 } from './coverEditorHelpers';
 import type { CoverEditorAction } from './coverEditorActions';
 import type { CoverEditorState } from './coverEditorTypes';
@@ -224,6 +225,12 @@ export function coverEditorReducer(
               duration: COVER_IMAGE_DEFAULT_DURATION,
             };
           } else {
+            const lottieInfo = extractLottieInfoMemoized(state.lottie);
+            const durations = lottieInfo
+              ? getLottieMediasDurations(lottieInfo)
+              : null;
+            const duration = durations ? durations[index] : null;
+
             return {
               media,
               filter: null,
@@ -231,10 +238,9 @@ export function coverEditorReducer(
               editionParameters: { cropData },
               timeRange: {
                 startTime: 0,
-                duration: Math.min(
-                  COVER_VIDEO_DEFAULT_DURATION,
-                  media.duration,
-                ),
+                duration:
+                  duration ??
+                  Math.min(COVER_VIDEO_DEFAULT_DURATION, media.duration),
               },
             };
           }

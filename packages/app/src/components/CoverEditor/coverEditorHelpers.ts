@@ -14,6 +14,7 @@ import type {
   CoverEditorState,
 } from './coverEditorTypes';
 import type { VideoCompositionItem } from '@azzapp/react-native-skia-video';
+import type { LottieInfo } from '@azzapp/shared/lottieHelpers';
 import type { SkRect } from '@shopify/react-native-skia';
 
 export const mediaInfoIsImage = (
@@ -189,4 +190,12 @@ export const getCoverDuration = (state: CoverEditorState) => {
         : 0)
     );
   }
+};
+
+export const getLottieMediasDurations = (lottie: LottieInfo) => {
+  return lottie
+    ? lottie.assetsInfos.map(
+        assetInfo => assetInfo.endTime - assetInfo.startTime,
+      )
+    : null;
 };
