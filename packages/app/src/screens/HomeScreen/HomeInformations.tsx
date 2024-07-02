@@ -105,12 +105,12 @@ const HomeInformations = ({ height, user }: HomeInformationsProps) => {
     nbPostsValue,
   ]);
 
-  const inputRange = useHomeScreenInputProfileRange();
+  const inputRange = useHomeScreenInputProfileRange(profiles ?? []);
 
   useAnimatedReaction(
     () => currentIndexSharedValue.value,
     actual => {
-      if (actual >= 0 && inputRange && inputRange?.length > 1) {
+      if (actual >= 0 && inputRange && inputRange.length > 1) {
         nbLikes.value = format(interpolate(actual, inputRange, nbLikesValue));
         nbPosts.value = format(interpolate(actual, inputRange, nbPostsValue));
         nbFollowers.value = format(
@@ -127,6 +127,7 @@ const HomeInformations = ({ height, user }: HomeInformationsProps) => {
       }
     },
   );
+
   const router = useRouter();
   const goToPosts = useCallback(() => {
     const currentProfile = profiles?.[currentIndexProfile.value - 1];

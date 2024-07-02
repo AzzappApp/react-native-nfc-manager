@@ -22,7 +22,6 @@ import type { Disposable } from 'react-relay';
 
 type HomeScreenContextType = {
   currentIndexSharedValue: SharedValue<number>;
-  inputRange: number[];
   currentIndexProfile: SharedValue<number>;
   onCurrentProfileIndexChange: (index: number) => void;
   initialProfileIndex: number;
@@ -70,11 +69,6 @@ export const HomeScreenProvider = ({
     return Math.round(currentIndexSharedValue.value);
   }, [currentIndexSharedValue.value]);
 
-  const inputRange = useMemo(
-    () => [0, ...(user?.profiles?.map((_, index) => index + 1) ?? [])],
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [user?.profiles?.length],
-  );
   //wondering if we really need this. Force to a fix number when HOME change
   useRouteWillChange('HOME', () => {
     if (currentIndexProfile.value !== currentIndexSharedValue.value)
@@ -186,7 +180,6 @@ export const HomeScreenProvider = ({
   const value = useMemo(
     () => ({
       currentIndexSharedValue,
-      inputRange,
       initialProfileIndex,
       currentIndexProfile,
       onCurrentProfileIndexChange,
@@ -195,7 +188,6 @@ export const HomeScreenProvider = ({
       currentIndexProfile,
       currentIndexSharedValue,
       initialProfileIndex,
-      inputRange,
       onCurrentProfileIndexChange,
     ],
   );
@@ -217,14 +209,15 @@ export const useHomeScreenContext = () => {
   return context;
 };
 
-export const useHomeScreenInputProfileRange = () => {
-  const context = React.useContext(HomeScreenContext);
-  if (context === undefined) {
-    throw new Error(
-      'useHomeScreenContext must be used within a HomeScreenProvider',
-    );
-  }
-  return context.inputRange;
+export const useHomeScreenInputProfileRange = (
+  profiles: readonly unknown[],
+) => {
+  const inputRange = useMemo(
+    () => Array.from({ length: (profiles?.length ?? 0) + 1 }, (_, i) => i),
+    [profiles],
+  );
+
+  return inputRange;
 };
 
 export const useHomeScreenCurrentIndex = () => {

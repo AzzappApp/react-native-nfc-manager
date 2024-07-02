@@ -7,7 +7,10 @@ import {
 import { graphql, useFragment } from 'react-relay';
 import { colors } from '#theme';
 import WebCardBackground from '#components/WebCardBackground';
-import { useHomeScreenContext } from './HomeScreenContext';
+import {
+  useHomeScreenContext,
+  useHomeScreenInputProfileRange,
+} from './HomeScreenContext';
 import type { HomeBackground_user$key } from '#relayArtifacts/HomeBackground_user.graphql';
 
 type HomeBackgroundProps = {
@@ -32,7 +35,8 @@ const HomeBackground = ({ user: userKey }: HomeBackgroundProps) => {
     userKey,
   );
 
-  const { inputRange, currentIndexSharedValue } = useHomeScreenContext();
+  const { currentIndexSharedValue } = useHomeScreenContext();
+  const inputRange = useHomeScreenInputProfileRange(user.profiles ?? []);
 
   const primaryColors = useMemo(
     () => [
@@ -80,7 +84,7 @@ const HomeBackground = ({ user: userKey }: HomeBackgroundProps) => {
       return [primaryColors[0], darkColors[0]];
     }
     return ['#45444b', '#45444b'];
-  }, [currentIndexSharedValue.value, primaryColors, inputRange, darkColors]);
+  });
 
   return <WebCardBackground colors={skiaGradient} />;
 };

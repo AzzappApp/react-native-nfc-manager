@@ -1,6 +1,6 @@
 import { useCallback, useMemo, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { Alert, View } from 'react-native';
+import { ActivityIndicator, Alert, View } from 'react-native';
 import Toast from 'react-native-toast-message';
 import {
   graphql,
@@ -665,36 +665,40 @@ const WebCardParametersScreen = ({
           </Text>
           <PressableNative
             onPress={handleConfirmationQuitWebCard}
-            style={[styles.deleteOptionButton]}
+            style={styles.deleteOptionButton}
             disabled={isLoadingQuitWebCard}
           >
-            <Text variant="error" style={textStyles.button}>
-              {isWebCardOwner ? (
-                <FormattedMessage
-                  defaultMessage="Delete this WebCard{azzappA}"
-                  description="label for button to delete a webcard"
-                  values={{
-                    azzappA: (
-                      <Text variant="azzapp" style={styles.deleteButton}>
-                        a
-                      </Text>
-                    ),
-                  }}
-                />
-              ) : (
-                <FormattedMessage
-                  defaultMessage="Quit this WebCard{azzappA}"
-                  description="Quit WebCard title"
-                  values={{
-                    azzappA: (
-                      <Text variant="azzapp" style={styles.deleteButton}>
-                        a
-                      </Text>
-                    ),
-                  }}
-                />
-              )}
-            </Text>
+            {isLoadingQuitWebCard ? (
+              <ActivityIndicator color={colors.red400} />
+            ) : (
+              <Text variant="error" style={textStyles.button}>
+                {isWebCardOwner ? (
+                  <FormattedMessage
+                    defaultMessage="Delete this WebCard{azzappA}"
+                    description="label for button to delete a webcard"
+                    values={{
+                      azzappA: (
+                        <Text variant="azzapp" style={styles.deleteButton}>
+                          a
+                        </Text>
+                      ),
+                    }}
+                  />
+                ) : (
+                  <FormattedMessage
+                    defaultMessage="Quit this WebCard{azzappA}"
+                    description="Quit WebCard title"
+                    values={{
+                      azzappA: (
+                        <Text variant="azzapp" style={styles.deleteButton}>
+                          a
+                        </Text>
+                      ),
+                    }}
+                  />
+                )}
+              </Text>
+            )}
           </PressableNative>
         </View>
         {webCard && (
