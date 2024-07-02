@@ -1,5 +1,6 @@
-## 0.5.19-canary.61
+## 0.5.19-canary.62
 
+* **fix:**  - 🐛 restore links on preview ([#4043](https://github.com/AzzappApp/azzapp/pull/4043))
 * **fix:**  - add get for webhook ([#4040](https://github.com/AzzappApp/azzapp/pull/4040))
 * **perf:**  - **android:** [#3974](https://github.com/AzzappApp/azzapp/pull/3974) issue with optimistic updates and input ranges ([#4036](https://github.com/AzzappApp/azzapp/pull/4036))
 * **fix:**  - **android:** [#4012](https://github.com/AzzappApp/azzapp/pull/4012) wrong size returned on samsung ([#4039](https://github.com/AzzappApp/azzapp/pull/4039))
