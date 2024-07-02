@@ -181,6 +181,7 @@ export function extractLottieInfo(lottie: Record<string, any>): LottieInfo {
           width: imageAsset.width,
           height: imageAsset.height,
         };
-      }),
+      })
+      .sort((a, b) => a.startTime - b.startTime),
   };
 }
