@@ -1,5 +1,7 @@
-## 0.5.19-canary.65
+## 0.5.19-canary.66
 
+* **fix:**  - use fixed borderWidth on coverEditor overlay ([#4051](https://github.com/AzzappApp/azzapp/pull/4051))
+* **fix:**  - **webCard:** navigation animation is broken on useless queried fields ([#4052](https://github.com/AzzappApp/azzapp/pull/4052))
 * **fix:**  - **android:** [#4002](https://github.com/AzzappApp/azzapp/pull/4002) on some android label is cut ([#4041](https://github.com/AzzappApp/azzapp/pull/4041))
 * **fix:**  - 🐛 clean size calculation ([#4048](https://github.com/AzzappApp/azzapp/pull/4048))
 * **fix:**  - 🐛 display and cut long video with right duration ([#4038](https://github.com/AzzappApp/azzapp/pull/4038))
