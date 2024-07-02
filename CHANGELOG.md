@@ -1,4 +1,4 @@
-## 0.5.19-canary.58
+## 0.5.19-canary.59
 
 * **fix:**  - **multiUser:** [#4026](https://github.com/AzzappApp/azzapp/pull/4026), wrong id queried in profiles ([#4027](https://github.com/AzzappApp/azzapp/pull/4027))
 * **fix:**  - **android:** [#2950](https://github.com/AzzappApp/azzapp/pull/2950) enhance display on zoom in / out ([#4024](https://github.com/AzzappApp/azzapp/pull/4024))
