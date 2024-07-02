@@ -42,7 +42,10 @@ import ActivityIndicator from '#ui/ActivityIndicator';
 import Container from '#ui/Container';
 import IconButton from '#ui/IconButton';
 import coverDrawer from '../coverDrawer';
-import { convertToBaseCanvasRatio } from '../coverDrawer/coverDrawerHelpers';
+import {
+  calculateLinksSize,
+  convertToBaseCanvasRatio,
+} from '../coverDrawer/coverDrawerHelpers';
 import { createParagraph } from '../coverDrawer/coverTextDrawer';
 import { useCoverEditorContext, useCurrentLayer } from '../CoverEditorContext';
 import {
@@ -58,7 +61,6 @@ import { DynamicLinkRenderer } from './DynamicLinkRenderer';
 import type { VideoCompositionRendererHandle } from '#components/VideoCompositionRenderer';
 import type { EditionParameters } from '#helpers/mediaEditions';
 import type { ResizeHandlePosition } from './BoundsEditor';
-import type { CoverEditorLinksLayerItem } from '../coverEditorTypes';
 import type { FrameDrawer } from '@azzapp/react-native-skia-video';
 import type { SkImage, SkRect } from '@shopify/react-native-skia';
 import type {
@@ -1285,42 +1287,6 @@ const MAX_DISPLAY_DECODER_RESOLUTION = Math.min(
   (Dimensions.get('window').height / 2) * Math.min(PixelRatio.get(), 2),
   1920,
 );
-
-export const calculateLinksSize = (
-  linksLayer: CoverEditorLinksLayerItem,
-  {
-    viewWidth,
-    viewHeight,
-  }: {
-    viewWidth: number;
-    viewHeight: number;
-  },
-) => {
-  'worklet';
-  const gap =
-    (convertToBaseCanvasRatio(
-      Math.max(LINKS_GAP * (linksLayer.links.length - 1), 0),
-      viewWidth,
-    ) /
-      viewWidth) *
-    100;
-
-  const elWidth =
-    ((convertToBaseCanvasRatio(linksLayer.size, viewWidth) *
-      LINKS_ELEMENT_WRAPPER_MULTIPLER) /
-      viewWidth) *
-    100;
-
-  const width = elWidth * linksLayer.links.length + gap;
-
-  const height =
-    linksLayer.links.length > 0
-      ? (convertToBaseCanvasRatio(linksLayer.size, viewHeight) / viewHeight) *
-        100
-      : 0;
-
-  return { width, height };
-};
 
 const CONTROLS_BUTTON_ICON_SIZE = 20;
 const CONTROLS_BUTTON_HEIGHT = 30;

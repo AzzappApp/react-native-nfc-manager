@@ -12,8 +12,10 @@ import {
 import { colors, shadow } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import PressableNative from '#ui/PressableNative';
-import { convertToBaseCanvasRatio } from './CoverEditor/coverDrawer/coverDrawerHelpers';
-import { calculateLinksSize } from './CoverEditor/CoverPreview/CoverPreview';
+import {
+  calculateLinksSize,
+  convertToBaseCanvasRatio,
+} from './CoverEditor/coverDrawer/coverDrawerHelpers';
 import { DynamicLinkRenderer } from './CoverEditor/CoverPreview/DynamicLinkRenderer';
 import { MediaImageRenderer, MediaVideoRenderer } from './medias';
 import type { CoverRenderer_webCard$key } from '#relayArtifacts/CoverRenderer_webCard.graphql';
@@ -191,7 +193,7 @@ const CoverRenderer = (
     layout && coverDynamicLinks && coverDynamicLinks.links.length > 0;
 
   const linksSize = useMemo(() => {
-    if (!layout)
+    if (!layout || !coverDynamicLinks)
       return {
         width: 0,
         height: 0,
