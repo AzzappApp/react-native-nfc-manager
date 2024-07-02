@@ -125,6 +125,8 @@ const WebCardTemplateSelectionScreen = ({
     >
       {headerVisible && (
         <WizardPagerHeader
+          backIcon="arrow_down"
+          onBack={router.backToTop}
           title={
             <View style={styles.middleContainer}>
               <Text variant="large">

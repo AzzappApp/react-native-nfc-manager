@@ -169,20 +169,11 @@ const WebCardModal = ({
         failOnCancel: true,
       });
     } catch (error: any) {
-      Sentry.captureException(error);
-      Toast.show({
-        type: 'error',
-        text1: intl.formatMessage({
-          defaultMessage:
-            'Error while sharing the cover video, please try again.',
-          description: 'Error toast message when sharing cover video fails.',
-        }),
-      });
+      console.error(error); //an error is thrown when the user cancels the share
     } finally {
       setCoverVideoLoading(false);
     }
   }, [
-    intl,
     webCard.coverMedia?.__typename,
     webCard.coverMedia?.uriDownload,
     webCard.userName,
