@@ -2,11 +2,16 @@ import ImageSize from 'react-native-image-size';
 
 /**
  * Returns the size of an image.
- * @see https://reactnative.dev/docs/image#getsizes
  * @param uri The URI of the image.
  * @returns A promise that resolves with the size of the image.
  */
-export const getImageSize = (uri: string) => ImageSize.getSize(uri);
+export const getImageSize = async (uri: string) => {
+  const { rotation, width, height } = await ImageSize.getSize(uri);
+  if (rotation === 90 || rotation === 270) {
+    return { width: height, height: width };
+  }
+  return { width, height };
+};
 
 /**
  * Format a number to a 2 digit string.
