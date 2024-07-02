@@ -465,7 +465,6 @@ const webCardScreenByIdQuery = graphql`
     webCard: node(id: $webCardId) {
       id
       ... on WebCard {
-        cardIsPublished
         userName
       }
       ...WebCardScreenContent_webCard
@@ -477,7 +476,6 @@ const webCardScreenByIdQuery = graphql`
     }
     node(id: $viewerWebCardId) {
       ... on WebCard @alias(as: "userWebCard") {
-        cardIsPublished
         ...WebCardScreenButtonBar_myWebCard
         ...PostList_webCard
       }
@@ -493,7 +491,6 @@ const webCardScreenByNameQuery = graphql`
     webCard(userName: $userName) {
       id
       userName
-      cardIsPublished
       ...WebCardScreenContent_webCard
       ...WebCardScreenButtonBar_webCard
         @arguments(viewerWebCardId: $viewerWebCardId)
@@ -503,7 +500,6 @@ const webCardScreenByNameQuery = graphql`
     }
     node(id: $viewerWebCardId) {
       ... on WebCard @alias(as: "userWebCard") {
-        cardIsPublished
         ...WebCardScreenButtonBar_myWebCard
         ...PostList_webCard
       }
