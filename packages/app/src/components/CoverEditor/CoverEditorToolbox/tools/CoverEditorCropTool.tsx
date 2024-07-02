@@ -3,7 +3,7 @@ import { useIntl } from 'react-intl';
 import { COVER_RATIO } from '@azzapp/shared/coverHelpers';
 import { extractLottieInfoMemoized } from '#components/CoverEditor/coverEditorHelpers';
 import ImagePicker, { EditImageStep } from '#components/ImagePicker';
-import ScreenModal from '#components/ScreenModal';
+import { ScreenModal } from '#components/NativeRouter';
 import useToggle from '#hooks/useToggle';
 import {
   useCoverEditorActiveMedia,
@@ -55,7 +55,11 @@ const CoverEditorCropTool = () => {
         onPress={toggleScreenModal}
       />
       {activeMedia != null && (
-        <ScreenModal visible={show} animationType="slide">
+        <ScreenModal
+          visible={show}
+          animationType="slide"
+          onRequestDismiss={toggleScreenModal}
+        >
           {show && (
             <ImagePicker
               initialData={activeMedia}

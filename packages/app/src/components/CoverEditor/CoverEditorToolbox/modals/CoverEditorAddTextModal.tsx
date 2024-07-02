@@ -4,7 +4,7 @@ import { FlatList, ScrollView, StyleSheet, View } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { colors } from '#theme';
 import { useCoverEditorContext } from '#components/CoverEditor/CoverEditorContext';
-import ScreenModal from '#components/ScreenModal';
+import { ScreenModal } from '#components/NativeRouter';
 import Button from '#ui/Button';
 import Container from '#ui/Container';
 import Header from '#ui/Header';
@@ -79,7 +79,11 @@ const CoverEditorAddTextModal = (props: Props) => {
   );
 
   return (
-    <ScreenModal visible={open} animationType="slide">
+    <ScreenModal
+      visible={open}
+      animationType="slide"
+      onRequestDismiss={onClose}
+    >
       {open && (
         <Container style={styles.container}>
           <SafeAreaView

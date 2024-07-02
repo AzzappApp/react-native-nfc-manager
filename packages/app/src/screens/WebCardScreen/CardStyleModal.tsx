@@ -16,7 +16,7 @@ import { DEFAULT_CARD_STYLE, type CardStyle } from '@azzapp/shared/cardHelpers';
 import { COVER_RATIO } from '@azzapp/shared/coverHelpers';
 import { colors } from '#theme';
 import { useModulesData } from '#components/cardModules/ModuleData';
-import ScreenModal from '#components/ScreenModal';
+import { ScreenModal } from '#components/NativeRouter';
 import WebCardPreview from '#components/WebCardPreview';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import { keyExtractor } from '#helpers/idHelpers';
@@ -29,6 +29,7 @@ import HeaderButton from '#ui/HeaderButton';
 import IconButton from '#ui/IconButton';
 import PressableNative from '#ui/PressableNative';
 import Text from '#ui/Text';
+import type { ModalDismissRequestEvent } from '#components/NativeRouter';
 import type { CardStyleModal_CardStyleList_profile$key } from '#relayArtifacts/CardStyleModal_CardStyleList_profile.graphql';
 import type { CardStyleModal_webCard$key } from '#relayArtifacts/CardStyleModal_webCard.graphql';
 import type { CardStyleModalMutation } from '#relayArtifacts/CardStyleModalMutation.graphql';
@@ -134,6 +135,17 @@ const CardStyleModal = ({ visible, onRequestClose }: CardStyleModalProps) => {
     }
   }, [isInFlight, onRequestClose]);
 
+  const onRequestDismiss = useCallback(
+    (event: ModalDismissRequestEvent) => {
+      if (isInFlight) {
+        event.preventModalDismiss();
+        return;
+      }
+      onRequestClose();
+    },
+    [isInFlight, onRequestClose],
+  );
+
   const applyCardStyle = useCallback(() => {
     commit({
       variables: {
@@ -182,7 +194,12 @@ const CardStyleModal = ({ visible, onRequestClose }: CardStyleModalProps) => {
     insets.bottom;
 
   return (
-    <ScreenModal visible={visible} animationType="slide">
+    <ScreenModal
+      visible={visible}
+      animationType="slide"
+      onRequestDismiss={onRequestDismiss}
+      gestureEnabled={!isInFlight}
+    >
       <Container
         style={[
           styles.root,

@@ -22,7 +22,7 @@ import {
 } from '@azzapp/shared/cardHelpers';
 import { COVER_RATIO } from '@azzapp/shared/coverHelpers';
 import { colors } from '#theme';
-import ScreenModal from '#components/ScreenModal';
+import { ScreenModal, preventModalDismiss } from '#components/NativeRouter';
 import { NativeBufferLoader, loadAllLUTShaders } from '#helpers/mediaEditions';
 import { getVideoLocalPath } from '#helpers/mediaHelpers';
 import useToggle from '#hooks/useToggle';
@@ -542,13 +542,17 @@ const CoverEditorCore = (
         </Animated.View>
       </CoverEditorContextProvider>
 
-      <ScreenModal visible={savingStatus != null}>
+      <ScreenModal
+        visible={savingStatus != null}
+        onRequestDismiss={preventModalDismiss}
+        gestureEnabled={false}
+      >
         <CoverEditorSaveModal
           status={savingStatus}
           progressIndicator={progressIndicator}
         />
       </ScreenModal>
-      <ScreenModal visible={error != null}>
+      <ScreenModal visible={error != null} onRequestDismiss={reset}>
         <Container
           style={{
             flex: 1,
@@ -567,7 +571,12 @@ const CoverEditorCore = (
           <Button onPress={reset} label="Ok" />
         </Container>
       </ScreenModal>
-      <ScreenModal visible={showImagePicker} animationType="slide">
+      <ScreenModal
+        visible={showImagePicker}
+        animationType="slide"
+        onRequestDismiss={preventModalDismiss}
+        gestureEnabled={false}
+      >
         <CoverEditorMediaPicker
           initialMedias={null}
           onFinished={onMediasPicked}

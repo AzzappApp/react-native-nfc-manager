@@ -17,8 +17,11 @@ import ImagePicker, {
   EditImageStep,
   SelectImageStep,
 } from '#components/ImagePicker';
-import { useRouter } from '#components/NativeRouter';
-import ScreenModal from '#components/ScreenModal';
+import {
+  useRouter,
+  ScreenModal,
+  preventModalDismiss,
+} from '#components/NativeRouter';
 import { getFileName } from '#helpers/fileHelpers';
 import { saveTransformedImageToFile } from '#helpers/mediaEditions';
 import { downScaleImage } from '#helpers/mediaHelpers';
@@ -559,7 +562,10 @@ const HorizontalPhotoEditionScreen = ({
           { bottom: insetBottom, width: windowWidth - 20 },
         ]}
       />
-      <ScreenModal visible={showImagePicker}>
+      <ScreenModal
+        visible={showImagePicker}
+        onRequestDismiss={onImagePickerCancel}
+      >
         <ImagePicker
           kind="image"
           onFinished={onMediaSelected}
@@ -567,7 +573,11 @@ const HorizontalPhotoEditionScreen = ({
           steps={steps}
         />
       </ScreenModal>
-      <ScreenModal visible={!!progressIndicator}>
+      <ScreenModal
+        visible={!!progressIndicator}
+        gestureEnabled={false}
+        onRequestDismiss={preventModalDismiss}
+      >
         {progressIndicator && (
           <UploadProgressModal progressIndicator={progressIndicator} />
         )}

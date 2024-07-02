@@ -45,7 +45,7 @@ export const waitTime = (time: number) =>
 /**
  * A deferred promise
  */
-type Deferred<T> = {
+export type Deferred<T> = {
   promise: Promise<T>;
   resolve(value: T): void;
   reject(error: Error): void;

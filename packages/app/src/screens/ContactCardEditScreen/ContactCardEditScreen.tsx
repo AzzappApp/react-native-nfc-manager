@@ -11,8 +11,11 @@ import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
 import { combineMultiUploadProgresses } from '@azzapp/shared/networkHelpers';
 import { colors } from '#theme';
 import { CancelHeaderButton } from '#components/commonsButtons';
-import { useRouter } from '#components/NativeRouter';
-import ScreenModal from '#components/ScreenModal';
+import {
+  preventModalDismiss,
+  useRouter,
+  ScreenModal,
+} from '#components/NativeRouter';
 import { getFileName } from '#helpers/fileHelpers';
 import { addLocalCachedMediaFile } from '#helpers/mediaHelpers';
 import { uploadMedia, uploadSign } from '#helpers/MobileWebAPI';
@@ -375,7 +378,11 @@ const ContactCardEditScreen = ({
         />
 
         {webCard && <ContactCardEditForm webCard={webCard} control={control} />}
-        <ScreenModal visible={!!progressIndicator}>
+        <ScreenModal
+          visible={!!progressIndicator}
+          gestureEnabled={false}
+          onRequestDismiss={preventModalDismiss}
+        >
           {progressIndicator && (
             <UploadProgressModal progressIndicator={progressIndicator} />
           )}

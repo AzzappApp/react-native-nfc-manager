@@ -7,7 +7,7 @@ import {
   mediaInfoIsImage,
 } from '#components/CoverEditor/coverEditorHelpers';
 import ImagePicker, { EditImageStep } from '#components/ImagePicker';
-import ScreenModal from '#components/ScreenModal';
+import { ScreenModal } from '#components/NativeRouter';
 import useToggle from '#hooks/useToggle';
 import { useCoverEditorContext } from '../../CoverEditorContext';
 import ToolBoxSection from '../ui/ToolBoxSection';
@@ -57,7 +57,11 @@ const CoverEditorCutTool = () => {
         onPress={toggleScreenModal}
       />
       {mediaInfo != null && !mediaInfoIsImage(mediaInfo) && (
-        <ScreenModal visible={show} animationType="slide">
+        <ScreenModal
+          visible={show}
+          animationType="slide"
+          onRequestDismiss={toggleScreenModal}
+        >
           {show && (
             <ImagePicker
               initialData={{

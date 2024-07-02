@@ -15,8 +15,11 @@ import { CancelHeaderButton } from '#components/commonsButtons';
 import ConditionalWrapper from '#components/ConditionalWrapper';
 import FormDeleteFieldOverlay from '#components/ContactCard/FormDeleteFieldOverlay';
 import ImagePicker, { SelectImageStep } from '#components/ImagePicker';
-import { useRouter } from '#components/NativeRouter';
-import ScreenModal from '#components/ScreenModal';
+import {
+  useRouter,
+  ScreenModal,
+  preventModalDismiss,
+} from '#components/NativeRouter';
 import { buildContactCardModalStyleSheet } from '#helpers/contactCardHelpers';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import { getFileName } from '#helpers/fileHelpers';
@@ -480,7 +483,10 @@ export const CommonInformationScreen = ({
           </View>
         </FormDeleteFieldOverlay>
       </ConditionalWrapper>
-      <ScreenModal visible={showImagePicker}>
+      <ScreenModal
+        visible={showImagePicker}
+        onRequestDismiss={() => setShowImagePicker(false)}
+      >
         <ImagePicker
           onFinished={onImagePickerFinished}
           onCancel={() => setShowImagePicker(false)}
@@ -488,7 +494,11 @@ export const CommonInformationScreen = ({
           kind="image"
         />
       </ScreenModal>
-      <ScreenModal visible={!!progressIndicator}>
+      <ScreenModal
+        visible={!!progressIndicator}
+        gestureEnabled={false}
+        onRequestDismiss={preventModalDismiss}
+      >
         {progressIndicator && (
           <UploadProgressModal progressIndicator={progressIndicator} />
         )}

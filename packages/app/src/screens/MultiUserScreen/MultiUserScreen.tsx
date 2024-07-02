@@ -15,9 +15,12 @@ import { isAdmin } from '@azzapp/shared/profileHelpers';
 import { colors } from '#theme';
 import { CancelHeaderButton } from '#components/commonsButtons';
 import CoverRenderer from '#components/CoverRenderer';
-import { useRouter } from '#components/NativeRouter';
+import {
+  useRouter,
+  ScreenModal,
+  preventModalDismiss,
+} from '#components/NativeRouter';
 import PremiumIndicator from '#components/PremiumIndicator';
-import ScreenModal from '#components/ScreenModal';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import relayScreen, { RelayScreenErrorBoundary } from '#helpers/relayScreen';
 import { useIsSubscriber } from '#helpers/SubscriptionContext';
@@ -481,7 +484,11 @@ const MultiUserScreen = ({
         </View>
       </SafeAreaView>
 
-      <ScreenModal visible={confirmDeletMultiUser}>
+      <ScreenModal
+        visible={confirmDeletMultiUser}
+        gestureEnabled={false}
+        onRequestDismiss={preventModalDismiss}
+      >
         <Container style={styles.confirmModalContainer}>
           <View style={styles.confirmModalContentContainer}>
             <Icon icon="warning" style={styles.confirmModalIcon} />

@@ -12,7 +12,7 @@ import {
   useState,
 } from 'react';
 import { FormattedMessage, IntlProvider, injectIntl } from 'react-intl';
-import { BackHandler, Platform, useColorScheme } from 'react-native';
+import { Platform, useColorScheme } from 'react-native';
 import { hide as hideSplashScreen } from 'react-native-bootsplash';
 import { KeyboardProvider } from 'react-native-keyboard-controller';
 import {
@@ -99,10 +99,10 @@ import WebCardTemplateSelectionScreen from '#screens/WebCardTemplateSelectionScr
 import Button from '#ui/Button';
 import Container from '#ui/Container';
 import Text from '#ui/Text';
-import type { NativeScreenProps } from '#components/NativeRouter';
+import type { ScreenMap } from '#components/NativeRouter';
 import type { ScreenPrefetchOptions } from '#helpers/ScreenPrefetcher';
 import type { ROUTES } from '#routes';
-import type { ComponentType, ReactNode } from 'react';
+import type { ReactNode } from 'react';
 import type { IntlShape } from 'react-intl';
 
 const routingInstrumentation = new Sentry.RoutingInstrumentation();
@@ -227,7 +227,7 @@ const screens = {
   WEBCARD_KIND_SELECTION: WebCardKindSelectionScreen,
   WEBCARD_FORM: WebCardFormScreen,
   WEBCARD_TEMPLATE_SELECTION: WebCardTemplateSelectionScreen,
-} satisfies Record<ROUTES, ComponentType<NativeScreenProps<any>>>;
+} satisfies ScreenMap;
 
 const tabs = {
   MAIN_TAB: MainTabBar,
@@ -272,22 +272,6 @@ const AppRouter = () => {
       }
     }
   }, [authenticated, profileInfos, router]);
-
-  useEffect(() => {
-    const subscription = BackHandler.addEventListener(
-      'hardwareBackPress',
-      () => {
-        if (router.canGoBack()) {
-          router.back();
-          return true;
-        }
-
-        return false;
-      },
-    );
-
-    return () => subscription.remove();
-  }, [router]);
   // #endregion
 
   // #region Sentry Routing Instrumentation
@@ -344,7 +328,7 @@ const AppRouter = () => {
     [],
   );
 
-  const screenIdToDispose = useRef<string[]>([]).current;
+  const screenIdsToDispose = useRef<string[]>([]).current;
 
   const screenPrefetcher = useMemo(
     () =>
@@ -355,27 +339,33 @@ const AppRouter = () => {
     [],
   );
 
+  const disposeScreens = useCallback(() => {
+    screenIdsToDispose.forEach(screen =>
+      RelayQueryManager.disposeQueryFor(screen),
+    );
+    screenIdsToDispose.length = 0;
+  }, [screenIdsToDispose]);
+
   useEffect(() => {
-    router.addScreenWillBePushedListener(({ id, route }) => {
-      const Component = screens[route.route];
-      if (isRelayScreen(Component)) {
-        RelayQueryManager.loadQueryFor(id, Component, route.params);
-      }
-    });
-    router.addScreenWillBeRemovedListener(({ id }) => {
-      screenIdToDispose.push(id);
-    });
-  }, [router, screenIdToDispose, screenPrefetcher]);
-
-  const onScreenDismissed = useCallback(
-    (id: string) => {
-      router.screenDismissed(id);
-
-      // TODO should we not handle this in the router?
-      RelayQueryManager.disposeQueryFor(id);
-    },
-    [router],
-  );
+    const screenWillBePushedSubscription = router.addScreenWillBePushedListener(
+      pushedScreens => {
+        pushedScreens.forEach(({ id, route }) => {
+          const Component = screens[route.route];
+          if (isRelayScreen(Component)) {
+            RelayQueryManager.loadQueryFor(id, Component, route.params);
+          }
+        });
+      },
+    );
+    const screenWillBeRemoveddSubscription =
+      router.addScreenWillBeRemovedListener(removedScreens => {
+        screenIdsToDispose.push(...removedScreens.map(screen => screen.id));
+      });
+    return () => {
+      screenWillBePushedSubscription.dispose();
+      screenWillBeRemoveddSubscription.dispose();
+    };
+  }, [disposeScreens, router, screenIdsToDispose, screenPrefetcher]);
 
   const splashScreenHidden = useRef(false);
   const onFinishTransitioning = useCallback(() => {
@@ -385,16 +375,13 @@ const AppRouter = () => {
       setEnvironment(getRelayEnvironment());
       environmentReset.current = false;
     }
-    screenIdToDispose.forEach(screen =>
-      RelayQueryManager.disposeQueryFor(screen),
-    );
-    screenIdToDispose.length = 0;
+    disposeScreens();
     if (!splashScreenHidden.current) {
       setTimeout(() => {
         hideSplashScreen({ fade: true });
       }, 200);
     }
-  }, [screenIdToDispose]);
+  }, [disposeScreens]);
   // #endregion
 
   // #region Loading Screen
@@ -447,8 +434,8 @@ const AppRouter = () => {
                 routerState={routerState}
                 screens={screens}
                 tabs={tabs}
-                onScreenDismissed={onScreenDismissed}
                 onFinishTransitioning={onFinishTransitioning}
+                onScreenHasBeenDismissed={disposeScreens}
               />
             </RouterProvider>
             <Toast />

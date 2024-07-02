@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import ScreenModal from '#components/ScreenModal';
+import { ScreenModal } from '#components/NativeRouter';
 import useToggle from '#hooks/useToggle';
 import IconButton from '#ui/IconButton';
 import { useCoverEditorContext } from '../../CoverEditorContext';
@@ -47,7 +47,11 @@ const CoverEditorMediaPickerFloatingTool = ({
         }}
         onPress={toggleShowImage}
       />
-      <ScreenModal visible={showImagePicker} animationType="slide">
+      <ScreenModal
+        visible={showImagePicker}
+        animationType="slide"
+        onRequestDismiss={toggleShowImage}
+      >
         {showImagePicker && (
           <CoverEditorMediaPicker
             initialMedias={cover.medias.map(({ media }) => media)}

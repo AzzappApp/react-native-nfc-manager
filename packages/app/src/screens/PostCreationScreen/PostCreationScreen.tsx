@@ -25,8 +25,11 @@ import ImagePicker, {
   SelectImageStep,
   EditImageStep,
 } from '#components/ImagePicker';
-import { useRouter } from '#components/NativeRouter';
-import ScreenModal from '#components/ScreenModal';
+import {
+  useRouter,
+  ScreenModal,
+  preventModalDismiss,
+} from '#components/NativeRouter';
 import { getFileName } from '#helpers/fileHelpers';
 import {
   saveTransformedImageToFile,
@@ -338,7 +341,11 @@ const PostCreationScreen = ({
         />
       </PostCreationScreenContext.Provider>
 
-      <ScreenModal visible={!!progressIndicator}>
+      <ScreenModal
+        visible={!!progressIndicator}
+        onRequestDismiss={preventModalDismiss}
+        gestureEnabled={false}
+      >
         {progressIndicator && (
           <UploadProgressModal progressIndicator={progressIndicator} />
         )}

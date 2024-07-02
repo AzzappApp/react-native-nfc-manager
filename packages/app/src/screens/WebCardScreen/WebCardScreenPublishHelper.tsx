@@ -5,12 +5,14 @@ import Toast from 'react-native-toast-message';
 import { graphql, useFragment, useMutation } from 'react-relay';
 import { buildUserUrl } from '@azzapp/shared/urlHelpers';
 import { colors } from '#theme';
-import { useRouter } from '#components/NativeRouter';
+import {
+  useRouter,
+  ScreenModal,
+  preventModalDismiss,
+} from '#components/NativeRouter';
 import PremiumIndicator from '#components/PremiumIndicator';
-import ScreenModal from '#components/ScreenModal';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import useScreenInsets from '#hooks/useScreenInsets';
-
 import { BOTTOM_MENU_HEIGHT } from '#ui/BottomMenu';
 import Button from '#ui/Button';
 import Container from '#ui/Container';
@@ -156,7 +158,12 @@ const WebCardScreenPublishHelper = ({
 
   const insets = useScreenInsets();
   return (
-    <ScreenModal animationType="fade" visible={showPublishModal}>
+    <ScreenModal
+      animationType="fade"
+      visible={showPublishModal}
+      onRequestDismiss={preventModalDismiss}
+      gestureEnabled={false}
+    >
       <Container
         style={[
           styles.container,

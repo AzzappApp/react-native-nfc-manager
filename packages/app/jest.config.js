@@ -29,4 +29,5 @@ module.exports = {
     '#(.*)': '<rootDir>/../packages/app/src/$1',
     '@azzapp/shared/(.*)': '<rootDir>/../packages/shared/src/$1',
   },
+  prettierPath: require.resolve('prettier-2'),
 };

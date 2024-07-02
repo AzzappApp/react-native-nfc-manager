@@ -1,6 +1,6 @@
 import { useCoverEditorContext } from '#components/CoverEditor/CoverEditorContext';
 import ImagePicker, { SelectImageStep } from '#components/ImagePicker';
-import ScreenModal from '#components/ScreenModal';
+import { ScreenModal } from '#components/NativeRouter';
 import type { ImagePickerResult } from '#components/ImagePicker';
 
 type Props = {
@@ -26,7 +26,11 @@ const CoverEditorAddOverlay = ({ open, onClose }: Props) => {
   };
 
   return (
-    <ScreenModal visible={open} animationType="slide">
+    <ScreenModal
+      visible={open}
+      animationType="slide"
+      onRequestDismiss={onClose}
+    >
       {open && (
         <ImagePicker
           kind="image"

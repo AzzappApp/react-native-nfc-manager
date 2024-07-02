@@ -4,7 +4,7 @@ import { Alert } from 'react-native';
 import { COVER_MAX_MEDIA_DURATION } from '@azzapp/shared/coverHelpers';
 
 import ImagePicker, { EditImageStep } from '#components/ImagePicker';
-import ScreenModal from '#components/ScreenModal';
+import { ScreenModal } from '#components/NativeRouter';
 import useToggle from '#hooks/useToggle';
 import {
   useCoverEditorContext,
@@ -107,7 +107,11 @@ const CoverEditorFiltersTool = () => {
         onPress={toggleScreenModal}
       />
       {mediaInfo != null && (
-        <ScreenModal visible={show} animationType="slide">
+        <ScreenModal
+          visible={show}
+          animationType="slide"
+          onRequestDismiss={toggleScreenModal}
+        >
           {show && (
             <ImagePicker
               initialData={activeMedia}

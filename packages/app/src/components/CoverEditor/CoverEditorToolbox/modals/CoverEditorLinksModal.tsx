@@ -10,7 +10,7 @@ import {
 } from '@azzapp/shared/socialLinkHelpers';
 import { colors } from '#theme';
 import { useCoverEditorContext } from '#components/CoverEditor/CoverEditorContext';
-import ScreenModal from '#components/ScreenModal';
+import { ScreenModal } from '#components/NativeRouter';
 import useScreenInsets from '#hooks/useScreenInsets';
 import SocialLinksLinksEditionPanel, {
   SOCIAL_LINK_PANEL_ITEM_HEIGHT,
@@ -61,7 +61,11 @@ const CoverEditorLinksModal = ({ open, onClose }: Props) => {
   }, [open]);
 
   return (
-    <ScreenModal visible={open} animationType="slide">
+    <ScreenModal
+      visible={open}
+      animationType="slide"
+      onRequestDismiss={onClose}
+    >
       {open && (
         <Container style={styles.container}>
           <SafeAreaView

@@ -34,8 +34,8 @@ import ImagePicker, { EditImageStep } from '#components/ImagePicker';
 import {
   useModalInterceptor,
   useScreenHasFocus,
+  ScreenModal,
 } from '#components/NativeRouter';
-import ScreenModal from '#components/ScreenModal';
 import VideoCompositionRenderer from '#components/VideoCompositionRenderer';
 import useToggle from '#hooks/useToggle';
 import ActivityIndicator from '#ui/ActivityIndicator';
@@ -1251,7 +1251,11 @@ const CoverPreview = ({
         </View>
       </View>
       {activeLayer.kind === 'overlay' && (
-        <ScreenModal visible={showOverlayCropper} animationType="slide">
+        <ScreenModal
+          visible={showOverlayCropper}
+          animationType="slide"
+          onRequestDismiss={toggleShowOverlayCropper}
+        >
           <ImagePicker
             initialData={activeLayer.layer}
             additionalData={{

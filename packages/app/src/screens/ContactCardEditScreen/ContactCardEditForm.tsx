@@ -14,7 +14,7 @@ import ImagePicker, {
   SelectImageStepWithFrontCameraByDefault,
 } from '#components/ImagePicker';
 import { MediaImageRenderer } from '#components/medias';
-import ScreenModal from '#components/ScreenModal';
+import { ScreenModal } from '#components/NativeRouter';
 
 import {
   MAX_FIELD_HEIGHT,
@@ -503,7 +503,11 @@ const ContactCardEditForm = ({
         {footer}
       </FormDeleteFieldOverlay>
 
-      <ScreenModal visible={imagePicker !== null} animationType="slide">
+      <ScreenModal
+        visible={imagePicker !== null}
+        animationType="slide"
+        onRequestDismiss={() => setImagePicker(null)}
+      >
         <ImagePicker
           kind="image"
           forceAspectRatio={imagePicker === 'avatar' ? 1 : undefined}

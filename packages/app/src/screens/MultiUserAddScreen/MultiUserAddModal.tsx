@@ -17,10 +17,9 @@ import {
 } from 'react-relay';
 import * as z from 'zod';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
-
 import ERRORS from '@azzapp/shared/errors';
 import { isValidEmail } from '@azzapp/shared/stringHelpers';
-import ScreenModal from '#components/ScreenModal';
+import { ScreenModal } from '#components/NativeRouter';
 import { CardPhoneLabels } from '#helpers/contactCardHelpers';
 import { getFileName } from '#helpers/fileHelpers';
 import { getLocales, useCurrentLocale } from '#helpers/localeHelpers';
@@ -549,7 +548,11 @@ const MultiUserAddModal = (
   );
 
   return (
-    <ScreenModal visible={visible} animationType="slide">
+    <ScreenModal
+      visible={visible}
+      animationType="slide"
+      onRequestDismiss={onClose}
+    >
       <Container style={{ flex: 1 }}>
         <SafeAreaView
           style={{ flex: 1 }}

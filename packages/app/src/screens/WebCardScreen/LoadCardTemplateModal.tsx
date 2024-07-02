@@ -9,9 +9,12 @@ import {
 } from '@azzapp/shared/subscriptionHelpers';
 import { colors } from '#theme';
 import CardTemplateList from '#components/CardTemplateList';
-import { useRouter } from '#components/NativeRouter';
+import {
+  useRouter,
+  ScreenModal,
+  preventModalDismiss,
+} from '#components/NativeRouter';
 import PremiumIndicator from '#components/PremiumIndicator';
-import ScreenModal from '#components/ScreenModal';
 import useAuthState from '#hooks/useAuthState';
 import useLoadCardTemplateMutation from '#hooks/useLoadCardTemplateMutation';
 import useScreenInsets from '#hooks/useScreenInsets';
@@ -27,6 +30,7 @@ import type {
   CardTemplateListHandle,
   CardTemplateItem,
 } from '#components/CardTemplateList';
+import type { ModalDismissRequestEvent } from '#components/NativeRouter';
 import type { LoadCardTemplateModal_webCard$key } from '#relayArtifacts/LoadCardTemplateModal_webCard.graphql';
 
 type LoadCardTemplateModalProps = {
@@ -156,13 +160,28 @@ const LoadCardTemplateModal = ({
     ],
   );
 
+  const onRequestDismiss = useCallback(
+    (event: ModalDismissRequestEvent) => {
+      if (inFlight) {
+        event.preventModalDismiss();
+      }
+    },
+    [inFlight],
+  );
+
   if (!profileId) {
     return null;
   }
 
   return (
     <>
-      <ScreenModal animationType="none" visible={visible}>
+      <ScreenModal
+        animationType="slide"
+        visible={visible}
+        // TODO do we really need this?
+        gestureEnabled={!inFlight}
+        onRequestDismiss={onRequestDismiss}
+      >
         <Container
           style={{
             flex: 1,
@@ -239,6 +258,8 @@ const LoadCardTemplateModal = ({
         visible={
           visible && !!cardTemplate && !loading && !inFlight && showWarning
         }
+        onRequestDismiss={preventModalDismiss}
+        gestureEnabled={false}
       >
         <Container style={styles.confirmation}>
           <Icon icon="warning" style={styles.icon} />

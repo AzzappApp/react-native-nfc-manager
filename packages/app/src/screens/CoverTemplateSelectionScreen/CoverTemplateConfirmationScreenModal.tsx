@@ -4,7 +4,7 @@ import { StyleSheet, View } from 'react-native';
 import Video from 'react-native-video';
 import { COVER_RATIO } from '@azzapp/shared/coverHelpers';
 import { colors } from '#theme';
-import ScreenModal from '#components/ScreenModal';
+import { ScreenModal } from '#components/NativeRouter';
 import useScreenInsets from '#hooks/useScreenInsets';
 import Button from '#ui/Button';
 import IconButton from '#ui/IconButton';
@@ -25,7 +25,7 @@ const CoverTemplateConfirmationScreenModal = ({
 
   const { bottom } = useScreenInsets();
   return (
-    <ScreenModal visible={!!template}>
+    <ScreenModal visible={!!template} onRequestDismiss={onClose}>
       <SafeAreaView style={styles.container}>
         <View style={styles.close}>
           <IconButton
