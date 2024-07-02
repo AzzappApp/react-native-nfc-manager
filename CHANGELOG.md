@@ -1,5 +1,6 @@
-## 0.5.19-canary.59
+## 0.5.19-canary.60
 
+* **fix:**  - **coverTemplate:** [#4010](https://github.com/AzzappApp/azzapp/pull/4010) sort media according to start time ([#4016](https://github.com/AzzappApp/azzapp/pull/4016))
 * **fix:**  - **multiUser:** [#4026](https://github.com/AzzappApp/azzapp/pull/4026), wrong id queried in profiles ([#4027](https://github.com/AzzappApp/azzapp/pull/4027))
 * **fix:**  - **android:** [#2950](https://github.com/AzzappApp/azzapp/pull/2950) enhance display on zoom in / out ([#4024](https://github.com/AzzappApp/azzapp/pull/4024))
 * **fix:**  - **webCard:** [#4020](https://github.com/AzzappApp/azzapp/pull/4020) don’t display toast on error ([#4028](https://github.com/AzzappApp/azzapp/pull/4028))
