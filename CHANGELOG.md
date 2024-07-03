@@ -1,5 +1,7 @@
-## 0.5.19-canary.67
+## 0.5.19-canary.68
 
+* **fix:**  - **coverTemplate:** [#4047](https://github.com/AzzappApp/azzapp/pull/4047) return previews of company activity ([#4050](https://github.com/AzzappApp/azzapp/pull/4050))
+* **feat:**  - add bottom sheet to better manage photo gallery option(like instagram) ([#4060](https://github.com/AzzappApp/azzapp/pull/4060))
 * **fix:**  - 🐛 display animation previews with right size ([#4055](https://github.com/AzzappApp/azzapp/pull/4055))
 * **fix:**  - limit resolution on low end devices ([#4057](https://github.com/AzzappApp/azzapp/pull/4057))
 * **fix:**  - use fixed borderWidth on coverEditor overlay ([#4051](https://github.com/AzzappApp/azzapp/pull/4051))
