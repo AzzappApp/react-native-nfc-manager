@@ -17,7 +17,7 @@ import {
 import { useCallback, useState } from 'react';
 import { FILTERS } from '@azzapp/shared/filtersHelper';
 import ColorInput from './ColorInput';
-import { textAnimations } from './constants';
+import { overlayAnimations } from './constants';
 import RadianInput from './RadianInput';
 import type { CoverOverlaySchemaType } from './coverTemplateSchema';
 import type { FieldMetadata } from '@conform-to/react';
@@ -189,7 +189,7 @@ const CoverOverlayForm = ({ field }: Props) => {
             label="Animation"
             {...getSelectProps(overlayFields.animation.getFieldset().name)}
           >
-            {textAnimations.map(animation => (
+            {overlayAnimations.map(animation => (
               <MenuItem key={animation} value={animation}>
                 <Typography>{animation}</Typography>
               </MenuItem>
