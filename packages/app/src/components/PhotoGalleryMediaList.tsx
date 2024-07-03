@@ -8,7 +8,7 @@ import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { AppState, Platform, View, useWindowDimensions } from 'react-native';
 import ReactNativeBlobUtil from 'react-native-blob-util';
-import { openPhotoPicker } from 'react-native-permissions';
+import { openPhotoPicker, openSettings } from 'react-native-permissions';
 import { colors } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import {
@@ -17,9 +17,12 @@ import {
   getVideoSize,
 } from '#helpers/mediaHelpers';
 import { usePermissionContext } from '#helpers/PermissionContext';
+import useToggle from '#hooks/useToggle';
 import ActivityIndicator from '#ui/ActivityIndicator';
+import BottomSheetModal from '#ui/BottomSheetModal';
 import Button from '#ui/Button';
 import PressableNative from '#ui/PressableNative';
+import PressableOpacity from '#ui/PressableOpacity';
 import Text from '#ui/Text';
 import type { Media } from '#helpers/mediaHelpers';
 import type {
@@ -271,6 +274,9 @@ const PhotoGalleryMediaList = ({
     [selectedMediasIds, selectedMediaId],
   );
 
+  const [manageAccessMediaVisible, toggleManageAccessMediaVisible] =
+    useToggle(false);
+
   const intl = useIntl();
 
   return (
@@ -291,7 +297,7 @@ const PhotoGalleryMediaList = ({
           </Text>
           <Button
             variant="little_round"
-            onPress={openPhotoPicker}
+            onPress={toggleManageAccessMediaVisible}
             label={intl.formatMessage({
               defaultMessage: 'Manage',
               description: 'Button to manage media permissions',
@@ -325,6 +331,54 @@ const PhotoGalleryMediaList = ({
         }
         {...props}
       />
+      <BottomSheetModal
+        lazy
+        showGestureIndicator={false}
+        height={200}
+        visible={manageAccessMediaVisible}
+        onRequestClose={toggleManageAccessMediaVisible}
+      >
+        <View style={styles.bottomContainer}>
+          <PressableOpacity>
+            <Text
+              variant="medium"
+              onPress={() => {
+                openPhotoPicker();
+                toggleManageAccessMediaVisible();
+              }}
+            >
+              <FormattedMessage
+                defaultMessage="Select more photos"
+                description="Imagepicker - modal manage more photo"
+              />
+            </Text>
+          </PressableOpacity>
+          <PressableOpacity
+            onPress={() => {
+              openSettings();
+              toggleManageAccessMediaVisible();
+            }}
+          >
+            <Text variant="medium">
+              <FormattedMessage
+                defaultMessage="Change settings"
+                description="Imagepicker - modal manage change settings"
+              />
+            </Text>
+          </PressableOpacity>
+          <PressableOpacity
+            onPress={toggleManageAccessMediaVisible}
+            style={styles.cancelMarginTop}
+          >
+            <Text style={styles.cancelButton}>
+              <FormattedMessage
+                defaultMessage="Cancel"
+                description="Imagepicker - modal manage Cancel"
+              />
+            </Text>
+          </PressableOpacity>
+        </View>
+      </BottomSheetModal>
     </View>
   );
 };
@@ -434,6 +488,16 @@ const styleSheet = createStyleSheet(appearance => ({
     alignItems: 'center',
   },
   loadingMore: { justifyContent: 'center', alignItems: 'center' },
+  cancelMarginTop: { marginTop: 30 },
+  bottomContainer: {
+    flex: 1,
+    alignItems: 'center',
+    rowGap: 30,
+    paddingTop: 20,
+  },
+  cancelButton: {
+    color: appearance === 'light' ? colors.grey400 : colors.grey600,
+  },
 }));
 
 const SEPARATOR_WIDTH = 1;
