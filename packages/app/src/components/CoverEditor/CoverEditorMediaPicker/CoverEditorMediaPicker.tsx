@@ -271,7 +271,6 @@ const stylesheet = createStyleSheet(appearance => ({
     flex: 1,
   },
   bottomBar: {
-    backgroundColor: colors.white,
     width: '100%',
     paddingVertical: 15,
     borderTopWidth: 1,
