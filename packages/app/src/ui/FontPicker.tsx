@@ -52,6 +52,7 @@ const FontPicker = ({
         renderItem={renderItem}
         keyExtractor={keyExtractor}
         getItemLayout={getItemLayout}
+        contentInset={{ bottom: 15 }}
       />
     </BottomSheetModal>
   );
