@@ -1,5 +1,7 @@
-## 0.5.19-canary.66
+## 0.5.19-canary.67
 
+* **fix:**  - 🐛 display animation previews with right size ([#4055](https://github.com/AzzappApp/azzapp/pull/4055))
+* **fix:**  - limit resolution on low end devices ([#4057](https://github.com/AzzappApp/azzapp/pull/4057))
 * **fix:**  - use fixed borderWidth on coverEditor overlay ([#4051](https://github.com/AzzappApp/azzapp/pull/4051))
 * **fix:**  - **webCard:** navigation animation is broken on useless queried fields ([#4052](https://github.com/AzzappApp/azzapp/pull/4052))
 * **fix:**  - **android:** [#4002](https://github.com/AzzappApp/azzapp/pull/4002) on some android label is cut ([#4041](https://github.com/AzzappApp/azzapp/pull/4041))
