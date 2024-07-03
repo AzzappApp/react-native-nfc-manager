@@ -1,6 +1,6 @@
 {
   "name": "@azzapp/payment",
-  "version": "0.5.19-canary.69",
+  "version": "0.5.19-canary.70",
   "private": true,
   "exports": {
     ".": {

@@ -1,5 +1,8 @@
-## 0.5.19-canary.69
+## 0.5.19-canary.70
 
+* **feat:**  - **backoffice:** update animation list text and overlay ([#4064](https://github.com/AzzappApp/azzapp/pull/4064))
+* **fix:**  - darkmode image picker ([#4063](https://github.com/AzzappApp/azzapp/pull/4063))
+* **fix:**  - small trick to for cover tempalte to autoplay in list ([#4072](https://github.com/AzzappApp/azzapp/pull/4072))
 * **fix:**  - **coverTemplate:** [#4047](https://github.com/AzzappApp/azzapp/pull/4047) return previews of company activity ([#4050](https://github.com/AzzappApp/azzapp/pull/4050))
 * **feat:**  - add bottom sheet to better manage photo gallery option(like instagram) ([#4060](https://github.com/AzzappApp/azzapp/pull/4060))
 * **fix:**  - 🐛 display animation previews with right size ([#4055](https://github.com/AzzappApp/azzapp/pull/4055))
