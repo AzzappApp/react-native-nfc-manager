@@ -1,4 +1,4 @@
-## 0.5.19-canary.68
+## 0.5.19-canary.69
 
 * **fix:**  - **coverTemplate:** [#4047](https://github.com/AzzappApp/azzapp/pull/4047) return previews of company activity ([#4050](https://github.com/AzzappApp/azzapp/pull/4050))
 * **feat:**  - add bottom sheet to better manage photo gallery option(like instagram) ([#4060](https://github.com/AzzappApp/azzapp/pull/4060))
