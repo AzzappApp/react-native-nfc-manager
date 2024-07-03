@@ -3,6 +3,7 @@ import {
   createPicture,
   drawAsImageFromPicture,
 } from '@shopify/react-native-skia';
+import * as Device from 'expo-device';
 import { useCallback, useState } from 'react';
 import { Platform, unstable_batchedUpdates } from 'react-native';
 import ReactNativeBlobUtil from 'react-native-blob-util';
@@ -306,4 +307,5 @@ const createCoverMedia = async (coverEditorState: CoverEditorState) => {
   return { path: outPath, kind: isDynamic ? 'video' : 'image' } as const;
 };
 
-const MAX_EXPORT_DECODER_RESOLUTION = 1920;
+const MAX_EXPORT_DECODER_RESOLUTION =
+  (Device.totalMemory ?? 0) / Math.pow(1024, 3) < 8 ? 1280 : 1920;
