@@ -176,10 +176,12 @@ const CardTemplateTypeForm = ({
             />
           )}
           renderOption={(props, option) => {
-            const label = option.labelKey;
+            const label = webCardCategoriesLabels.find(
+              item => item.labelKey === option.labelKey,
+            );
             return (
               <li {...props} key={option.id}>
-                {label}
+                {label?.baseLabelValue ?? option.labelKey}
               </li>
             );
           }}

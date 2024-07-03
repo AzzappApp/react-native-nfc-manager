@@ -1,19 +1,33 @@
 import { Box, TextField, Typography } from '@mui/material';
-import { like, or, asc, desc, sql } from 'drizzle-orm';
-import { CardStyleTable, db } from '@azzapp/data';
+import { like, or, asc, desc, sql, eq } from 'drizzle-orm';
+import { CardStyleTable, LabelTable, db } from '@azzapp/data';
 import CardStylesList from './CardStylesList';
 
-export type SortColumn = 'labelKey';
+export type CardStyleItem = {
+  id: string;
+  label: string | null;
+  enabled: boolean;
+};
+
+export type SortColumn = 'label';
 
 const sortsColumns = {
-  labelKey: CardStyleTable.labelKey,
+  label: LabelTable.baseLabelValue,
 };
 
 const getCardStylesQuery = (search: string | null) => {
-  let query = db.select().from(CardStyleTable).$dynamic();
+  let query = db
+    .select({
+      id: CardStyleTable.id,
+      label: LabelTable.baseLabelValue,
+      enabled: CardStyleTable.enabled,
+    })
+    .from(CardStyleTable)
+    .leftJoin(LabelTable, eq(CardStyleTable.labelKey, LabelTable.labelKey))
+    .$dynamic();
 
   if (search) {
-    query = query.where(or(like(CardStyleTable.labelKey, `%${search}%`)));
+    query = query.where(or(like(LabelTable.baseLabelValue, `%${search}%`)));
   }
 
   return query;
@@ -61,7 +75,7 @@ const CardStylesPage = async ({ searchParams = {} }: Props) => {
 
   const sort = Object.keys(sortsColumns).includes(searchParams.sort as any)
     ? (searchParams.sort as any)
-    : 'labelKey';
+    : 'label';
 
   const order = searchParams.order === 'desc' ? 'desc' : 'asc';
   const search = searchParams.s ?? null;

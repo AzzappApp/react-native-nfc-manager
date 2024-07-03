@@ -42,13 +42,7 @@ const getSearch = (search: string | null) => {
   }
 };
 
-const getCategories = (
-  page: number,
-  sort: 'enabled' | 'label' | 'order' | 'webCardKind',
-  order: 'asc' | 'desc',
-  search: string | null,
-  filters: Filters,
-) => {
+const getQuery = (search: string | null, filters: Filters) => {
   const query = db
     .select({
       id: WebCardCategoryTable.id,
@@ -66,6 +60,18 @@ const getCategories = (
     .where(and(getSearch(search), ...getFilters(filters)))
     .$dynamic();
 
+  return query;
+};
+
+const getCategories = (
+  page: number,
+  sort: 'enabled' | 'label' | 'order' | 'webCardKind',
+  order: 'asc' | 'desc',
+  search: string | null,
+  filters: Filters,
+) => {
+  const query = getQuery(search, filters);
+
   query
     .offset(page * PAGE_SIZE)
     .limit(PAGE_SIZE)
@@ -76,12 +82,11 @@ const getCategories = (
   return query;
 };
 
-const getCategoriesCount = async (search: string | null, filters: Filters) => {
+const getCount = async (search: string | null, filters: Filters) => {
+  const subQuery = getQuery(search, filters);
   const query = db
     .select({ count: sql`count(*)`.mapWith(Number) })
-    .from(WebCardCategoryTable)
-    .orderBy(asc(WebCardCategoryTable.order))
-    .where(and(getSearch(search), ...getFilters(filters)));
+    .from(subQuery.as('subQuery'));
 
   return query.then(rows => rows[0].count);
 };
@@ -117,7 +122,7 @@ const ProfileCategoriesPage = async ({ searchParams = {} }: Props) => {
     search,
     filters,
   );
-  const count = await getCategoriesCount(search, filters);
+  const count = await getCount(search, filters);
 
   return (
     <Box

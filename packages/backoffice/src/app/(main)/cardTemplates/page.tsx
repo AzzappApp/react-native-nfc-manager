@@ -1,12 +1,17 @@
 import { Box, TextField, Typography } from '@mui/material';
 import { eq, like, or, sql, and, asc, desc } from 'drizzle-orm';
-import { CardTemplateTable, CardTemplateTypeTable, db } from '@azzapp/data';
+import {
+  CardTemplateTable,
+  CardTemplateTypeTable,
+  LabelTable,
+  db,
+} from '@azzapp/data';
 import CardTemplatesList from './CardTemplatesList';
 import type { CardModuleTemplate } from '@azzapp/data';
 
 export type CardTemplateItem = {
   id: string;
-  labelKey: string;
+  label: string | null;
   type: string;
   modules: CardModuleTemplate[];
   personalEnabled: boolean;
@@ -35,16 +40,16 @@ const getFilters = (filters: Filters) => {
 const getSearch = (search: string | null) => {
   if (search) {
     return or(
-      like(CardTemplateTable.labelKey, `%${search}%`),
+      like(LabelTable.baseLabelValue, `%${search}%`),
       like(CardTemplateTypeTable.labelKey, `%${search}%`),
     );
   }
 };
 
-export type SortColumn = 'labelKey' | 'type';
+export type SortColumn = 'label' | 'type';
 
 const sortsColumns = {
-  labelKey: CardTemplateTable.labelKey,
+  label: LabelTable.baseLabelValue,
   type: sql`type`,
   personalEnabled: sql`personalEnabled`,
   businessEnabled: sql`businessEnabled`,
@@ -54,7 +59,7 @@ const getQuery = (search: string | null, filters: Filters) => {
   const query = db
     .select({
       id: CardTemplateTable.id,
-      labelKey: CardTemplateTable.labelKey,
+      label: LabelTable.baseLabelValue,
       type: sql`${CardTemplateTypeTable.labelKey}`.mapWith(String).as('type'),
       modules: CardTemplateTable.modules,
       personalEnabled: CardTemplateTable.personalEnabled,
@@ -65,6 +70,7 @@ const getQuery = (search: string | null, filters: Filters) => {
       CardTemplateTypeTable,
       eq(CardTemplateTable.cardTemplateTypeId, CardTemplateTypeTable.id),
     )
+    .leftJoin(LabelTable, eq(CardTemplateTable.labelKey, LabelTable.labelKey))
     .where(and(getSearch(search), ...getFilters(filters)))
     .$dynamic();
 
@@ -116,7 +122,7 @@ const CardTemplatesPage = async ({ searchParams = {} }: Props) => {
 
   const sort = Object.keys(sortsColumns).includes(searchParams.sort as any)
     ? (searchParams.sort as any)
-    : 'labelKey';
+    : 'label';
 
   const order = searchParams.order === 'desc' ? 'desc' : 'asc';
   const search = searchParams.s ?? null;

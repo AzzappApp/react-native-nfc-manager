@@ -1,15 +1,27 @@
 import { Box, TextField, Typography } from '@mui/material';
 import { and, asc, desc, eq, like, or, sql } from 'drizzle-orm';
-import { CoverTemplateTable, CoverTemplateTypeTable, db } from '@azzapp/data';
+import {
+  CoverTemplateTable,
+  CoverTemplateTypeTable,
+  LabelTable,
+  db,
+} from '@azzapp/data';
 import CoverTemplateTypesList from './CoverTemplateTypesList';
 import type { SQLWrapper } from 'drizzle-orm';
+
+export type CoverTemplateTypeItem = {
+  id: string;
+  label: string | null;
+  templates: number;
+  enabled: boolean;
+};
 
 export type Filters = {
   enabled?: string | null;
 };
 
 const sortsColumns = {
-  labelKey: CoverTemplateTypeTable.labelKey,
+  label: LabelTable.baseLabelValue,
   order: CoverTemplateTypeTable.order,
   enabled: CoverTemplateTypeTable.enabled,
 };
@@ -26,25 +38,39 @@ const getFilters = (filters: Filters): SQLWrapper[] => {
 const getSearch = (search: string | null) => {
   if (search) {
     return or(
-      like(CoverTemplateTypeTable.labelKey, `%${search}%`),
+      like(LabelTable.baseLabelValue, `%${search}%`),
       like(CoverTemplateTypeTable.order, `%${search}%`),
     );
   }
 };
 
+const getQuery = (search: string | null, filters: Filters) => {
+  const query = db
+    .select({
+      id: CoverTemplateTypeTable.id,
+      label: LabelTable.baseLabelValue,
+      enabled: CoverTemplateTypeTable.enabled,
+    })
+    .from(CoverTemplateTypeTable)
+    .leftJoin(
+      LabelTable,
+      eq(CoverTemplateTypeTable.labelKey, LabelTable.labelKey),
+    )
+    .orderBy(asc(CoverTemplateTypeTable.order))
+    .where(and(getSearch(search), ...getFilters(filters)))
+    .$dynamic();
+
+  return query;
+};
+
 const getCoverTemplateTypes = (
   page: number,
-  sort: 'enabled' | 'labelKey' | 'order',
+  sort: 'enabled' | 'label' | 'order',
   order: 'asc' | 'desc',
   search: string | null,
   filters: Filters,
 ) => {
-  const query = db
-    .select()
-    .from(CoverTemplateTypeTable)
-    .orderBy(asc(CoverTemplateTypeTable.order))
-    .where(and(getSearch(search), ...getFilters(filters)))
-    .$dynamic();
+  const query = getQuery(search, filters);
 
   query
     .offset(page * PAGE_SIZE)
@@ -56,15 +82,11 @@ const getCoverTemplateTypes = (
   return query;
 };
 
-const getCoverTemplateTypesCount = async (
-  search: string | null,
-  filters: Filters,
-) => {
+const getCount = async (search: string | null, filters: Filters) => {
+  const subQuery = getQuery(search, filters);
   const query = db
     .select({ count: sql`count(*)`.mapWith(Number) })
-    .from(CoverTemplateTypeTable)
-    .orderBy(asc(CoverTemplateTypeTable.order))
-    .where(and(getSearch(search), ...getFilters(filters)));
+    .from(subQuery.as('subQuery'));
 
   return query.then(rows => rows[0].count);
 };
@@ -111,7 +133,7 @@ const CoverTemplateTypesPage = async ({ searchParams = {} }: Props) => {
     }),
   );
 
-  const count = await getCoverTemplateTypesCount(search, filters);
+  const count = await getCount(search, filters);
 
   return (
     <Box

@@ -3,6 +3,7 @@ import { and, asc, desc, eq, like, or, sql } from 'drizzle-orm';
 import {
   CardTemplateTable,
   CardTemplateTypeTable,
+  LabelTable,
   WebCardCategoryTable,
   db,
 } from '@azzapp/data';
@@ -10,7 +11,7 @@ import CardTemplateTypesList from './CardTemplateTypesList';
 
 export type CardTemplateTypeItem = {
   id: string;
-  labelKey: string;
+  label: string | null;
   category: string;
   status: boolean;
   templates: number;
@@ -34,16 +35,16 @@ const getFilters = (filters: Filters) => {
 const getSearch = (search: string | null) => {
   if (search) {
     return or(
-      like(CardTemplateTypeTable.labelKey, `%${search}%`),
+      like(LabelTable.baseLabelValue, `%${search}%`),
       like(WebCardCategoryTable.labelKey, `%${search}%`),
     );
   }
 };
 
-export type SortColumn = 'category' | 'labelKey';
+export type SortColumn = 'category' | 'label';
 
 const sortsColumns = {
-  labelKey: CardTemplateTypeTable.labelKey,
+  label: LabelTable.baseLabelValue,
   category: sql`category`,
   status: CardTemplateTypeTable.enabled,
   templates: sql`templates`,
@@ -53,7 +54,7 @@ const getQuery = (search: string | null, filters: Filters) => {
   const query = db
     .select({
       id: CardTemplateTypeTable.id,
-      labelKey: CardTemplateTypeTable.labelKey,
+      label: LabelTable.baseLabelValue,
       category: sql`${WebCardCategoryTable.labelKey}`
         .mapWith(String)
         .as('category'),
@@ -61,6 +62,10 @@ const getQuery = (search: string | null, filters: Filters) => {
       templates: sql`count(*)`.mapWith(Number).as('templates'),
     })
     .from(CardTemplateTypeTable)
+    .leftJoin(
+      LabelTable,
+      eq(CardTemplateTypeTable.labelKey, LabelTable.labelKey),
+    )
     .leftJoin(
       WebCardCategoryTable,
       eq(CardTemplateTypeTable.webCardCategoryId, WebCardCategoryTable.id),
@@ -120,7 +125,7 @@ const CardTemplateTypesPage = async ({ searchParams = {} }: Props) => {
 
   const sort = Object.keys(sortsColumns).includes(searchParams.sort as any)
     ? (searchParams.sort as any)
-    : 'labelKey';
+    : 'label';
 
   const order = searchParams.order === 'desc' ? 'desc' : 'asc';
   const search = searchParams.s ?? null;

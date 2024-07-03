@@ -216,8 +216,8 @@ const CardTemplateTypesList = ({
 
 const columns: GridColDef[] = [
   {
-    field: 'labelKey',
-    headerName: 'Label Key',
+    field: 'label',
+    headerName: 'Label',
     flex: 2,
   },
   {

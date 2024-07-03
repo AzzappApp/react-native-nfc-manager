@@ -20,7 +20,7 @@ import {
   useState,
   useTransition,
 } from 'react';
-import type { CoverTemplateTag } from '@azzapp/data';
+import type { CoverTemplateTagItem } from './page';
 import type { SelectChangeEvent } from '@mui/material';
 import type {
   GridColDef,
@@ -31,7 +31,7 @@ import type {
 type Props = {
   search: string | null;
   count: number;
-  coverTemplateTags: Array<CoverTemplateTag & { templates: number }>;
+  coverTemplateTags: CoverTemplateTagItem[];
   page: number;
   pageSize: number;
   sortField: 'label' | 'status' | 'templates';
@@ -217,7 +217,7 @@ const CoverTemplateTagsList = ({
 
 const columns: GridColDef[] = [
   {
-    field: 'labelKey',
+    field: 'label',
     headerName: 'Label',
     flex: 1,
   },
