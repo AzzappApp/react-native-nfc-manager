@@ -1,5 +1,6 @@
-## 0.5.19-canary.70
+## 0.5.19-canary.71
 
+* **feat:**  - 🎸 add dynamic links to web cover ([#4070](https://github.com/AzzappApp/azzapp/pull/4070))
 * **feat:**  - **backoffice:** update animation list text and overlay ([#4064](https://github.com/AzzappApp/azzapp/pull/4064))
 * **fix:**  - darkmode image picker ([#4063](https://github.com/AzzappApp/azzapp/pull/4063))
 * **fix:**  - small trick to for cover tempalte to autoplay in list ([#4072](https://github.com/AzzappApp/azzapp/pull/4072))
