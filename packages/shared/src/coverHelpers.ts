@@ -92,3 +92,45 @@ export const LOTTIE_REPLACE_COLORS = {
 export const LINKS_GAP = 15;
 export const LINKS_BORDER_WIDTH = 2;
 export const LINKS_ELEMENT_WRAPPER_MULTIPLER = 1.5;
+export const COVER_LINK_SIZE_TO_BORDER_RATIO = 12;
+
+export const convertToBaseCanvasRatio = (
+  value: number,
+  canvasWidth: number,
+) => {
+  'worklet';
+  return value * (canvasWidth / 300);
+};
+
+export const calculateLinksSize = (
+  count: number,
+  size: number,
+  {
+    viewWidth,
+    viewHeight,
+  }: {
+    viewWidth: number;
+    viewHeight: number;
+  },
+) => {
+  'worklet';
+  const gap =
+    (convertToBaseCanvasRatio(Math.max(LINKS_GAP * (count - 1), 0), viewWidth) /
+      viewWidth) *
+    100;
+
+  const elWidth =
+    ((convertToBaseCanvasRatio(size, viewWidth) *
+      LINKS_ELEMENT_WRAPPER_MULTIPLER) /
+      viewWidth) *
+    100;
+
+  const width = elWidth * count + gap;
+
+  const height =
+    count > 0
+      ? (convertToBaseCanvasRatio(size, viewHeight) / viewHeight) * 100
+      : 0;
+
+  return { width, height };
+};

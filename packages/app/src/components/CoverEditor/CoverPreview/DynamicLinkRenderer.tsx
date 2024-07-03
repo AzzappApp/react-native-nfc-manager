@@ -1,13 +1,16 @@
 import { Linking, type View } from 'react-native';
 import { swapColor } from '@azzapp/shared/cardHelpers';
-import { LINKS_ELEMENT_WRAPPER_MULTIPLER } from '@azzapp/shared/coverHelpers';
+import {
+  COVER_LINK_SIZE_TO_BORDER_RATIO,
+  LINKS_ELEMENT_WRAPPER_MULTIPLER,
+  convertToBaseCanvasRatio,
+} from '@azzapp/shared/coverHelpers';
 import {
   generateSocialLink,
   type SocialLinkId,
 } from '@azzapp/shared/socialLinkHelpers';
 import { shadow } from '#theme';
 import { SocialIcon } from '#ui/Icon';
-import { convertToBaseCanvasRatio } from '../coverDrawer/coverDrawerHelpers';
 import type PressableNative from '#ui/PressableNative';
 import type {
   CardColors,
@@ -39,7 +42,7 @@ export const DynamicLinkRenderer = ({
     convertToBaseCanvasRatio(size, viewWidth) * LINKS_ELEMENT_WRAPPER_MULTIPLER;
 
   const borderWidth = convertToBaseCanvasRatio(
-    size / SIZE_TO_BORDER_RATIO,
+    size / COVER_LINK_SIZE_TO_BORDER_RATIO,
     viewWidth,
   );
 
@@ -83,5 +86,3 @@ export const DynamicLinkRenderer = ({
     </Component>
   );
 };
-
-const SIZE_TO_BORDER_RATIO = 12;

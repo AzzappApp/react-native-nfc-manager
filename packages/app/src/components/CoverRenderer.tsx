@@ -7,19 +7,16 @@ import {
   COVER_CARD_RADIUS,
   COVER_RATIO,
   LINKS_GAP,
+  calculateLinksSize,
+  convertToBaseCanvasRatio,
 } from '@azzapp/shared/coverHelpers';
 
 import { colors, shadow } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import PressableNative from '#ui/PressableNative';
-import {
-  calculateLinksSize,
-  convertToBaseCanvasRatio,
-} from './CoverEditor/coverDrawer/coverDrawerHelpers';
 import { DynamicLinkRenderer } from './CoverEditor/CoverPreview/DynamicLinkRenderer';
 import { MediaImageRenderer, MediaVideoRenderer } from './medias';
 import type { CoverRenderer_webCard$key } from '#relayArtifacts/CoverRenderer_webCard.graphql';
-import type { CoverEditorLinksLayerItem } from './CoverEditor/coverEditorTypes';
 import type { ForwardedRef } from 'react';
 import type { StyleProp, ViewStyle } from 'react-native';
 
@@ -200,7 +197,8 @@ const CoverRenderer = (
       };
 
     const linksSizePercent = calculateLinksSize(
-      coverDynamicLinks as CoverEditorLinksLayerItem,
+      coverDynamicLinks.links.length,
+      coverDynamicLinks.size,
       {
         viewHeight: layout.height,
         viewWidth: layout.width,

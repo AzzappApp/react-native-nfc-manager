@@ -28,6 +28,8 @@ import {
   LINKS_BORDER_WIDTH,
   LINKS_ELEMENT_WRAPPER_MULTIPLER,
   LINKS_GAP,
+  calculateLinksSize,
+  convertToBaseCanvasRatio,
 } from '@azzapp/shared/coverHelpers';
 import { colors, shadow } from '#theme';
 import ImagePicker, { EditImageStep } from '#components/ImagePicker';
@@ -42,10 +44,6 @@ import ActivityIndicator from '#ui/ActivityIndicator';
 import Container from '#ui/Container';
 import IconButton from '#ui/IconButton';
 import coverDrawer from '../coverDrawer';
-import {
-  calculateLinksSize,
-  convertToBaseCanvasRatio,
-} from '../coverDrawer/coverDrawerHelpers';
 import { createParagraph } from '../coverDrawer/coverTextDrawer';
 import { useCoverEditorContext, useCurrentLayer } from '../CoverEditorContext';
 import {
@@ -231,10 +229,14 @@ const CoverPreview = ({
       } else if (activeLayer.kind === 'links') {
         const layer = activeLayer.layer;
 
-        const { width, height } = calculateLinksSize(layer, {
-          viewHeight,
-          viewWidth,
-        });
+        const { width, height } = calculateLinksSize(
+          layer.links.length,
+          layer.size,
+          {
+            viewHeight,
+            viewWidth,
+          },
+        );
 
         activeLayerBounds.value = {
           bounds: {
@@ -1008,10 +1010,14 @@ const CoverPreview = ({
       };
     }
 
-    const { height, width } = calculateLinksSize(linksLayer, {
-      viewHeight,
-      viewWidth,
-    });
+    const { height, width } = calculateLinksSize(
+      linksLayer.links.length,
+      linksLayer.size,
+      {
+        viewHeight,
+        viewWidth,
+      },
+    );
 
     const calculatedWith = (width * viewWidth) / 100;
     const calculatedHeight = (height * viewHeight) / 100;

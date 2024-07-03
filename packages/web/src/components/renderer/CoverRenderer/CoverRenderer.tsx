@@ -1,9 +1,11 @@
 'use client';
 
+import { useEffect, useRef, useState } from 'react';
 import { swapColor, DEFAULT_COLOR_PALETTE } from '@azzapp/shared/cardHelpers';
 import { COVER_RATIO } from '@azzapp/shared/coverHelpers';
 import CloudinaryImage from '#ui/CloudinaryImage';
 import CloudinaryVideo from '#ui/CloudinaryVideo';
+import CoverLinksRenderer from './CoverLinksRenderer';
 import styles from './CoverRenderer.css';
 import type { Media, WebCard } from '@azzapp/data';
 
@@ -29,10 +31,37 @@ const CoverRenderer = ({
   priority,
   ...props
 }: CoverRendererProps) => {
-  const { cardColors, coverTexts, coverBackgroundColor } = webCard;
+  const { cardColors, coverTexts, coverBackgroundColor, coverDynamicLinks } =
+    webCard;
 
   const coverWidth = width ? width * 2 : DEFAULT_COVER_WIDTH * 2;
   const coverHeight = coverWidth / COVER_RATIO;
+
+  const [coverSize, setCoverSize] = useState<{
+    width: number;
+    height: number;
+  } | null>(null);
+
+  const cover = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const current = cover.current;
+
+    const onCoverSizeChange = () => {
+      if (cover.current) {
+        setCoverSize({
+          width: cover.current.clientWidth,
+          height: cover.current.clientHeight,
+        });
+      }
+    };
+
+    onCoverSizeChange();
+    current?.addEventListener('resize', onCoverSizeChange);
+    return () => {
+      current?.removeEventListener('resize', onCoverSizeChange);
+    };
+  }, []);
 
   return (
     <div
@@ -43,6 +72,7 @@ const CoverRenderer = ({
         borderRadius: width ? `${(35 / 300) * width}px` : undefined,
       }}
       className={styles.content}
+      ref={cover}
     >
       <div
         style={{
@@ -83,6 +113,13 @@ const CoverRenderer = ({
             playsInline
           />
         ))}
+      {coverSize && (
+        <CoverLinksRenderer
+          coverSize={coverSize}
+          links={coverDynamicLinks}
+          cardColors={cardColors}
+        />
+      )}
     </div>
   );
 };

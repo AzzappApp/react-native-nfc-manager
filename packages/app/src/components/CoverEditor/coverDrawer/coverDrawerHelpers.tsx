@@ -1,10 +1,6 @@
 import { FontWeight, Skia, FontSlant } from '@shopify/react-native-skia';
-import {
-  LINKS_ELEMENT_WRAPPER_MULTIPLER,
-  LINKS_GAP,
-} from '@azzapp/shared/coverHelpers';
+import { convertToBaseCanvasRatio } from '@azzapp/shared/coverHelpers';
 import { skiaFontManager } from '#hooks/useApplicationFonts';
-import type { CoverEditorLinksLayerItem } from '../coverEditorTypes';
 import type {
   SkRRect,
   SkFont,
@@ -13,14 +9,6 @@ import type {
   SkPaint,
 } from '@shopify/react-native-skia';
 import type { EasingFunction } from 'react-native-reanimated';
-
-export const convertToBaseCanvasRatio = (
-  value: number,
-  canvasWidth: number,
-) => {
-  'worklet';
-  return value * (canvasWidth / 300);
-};
 
 export const inflateRRect = (
   rect: SkRRect,
@@ -113,40 +101,4 @@ export const easeAppearDisappear = (
     progress = 0.75 + easing((progress - 0.75) * 4) / 4;
   }
   return progress;
-};
-
-export const calculateLinksSize = (
-  linksLayer: CoverEditorLinksLayerItem,
-  {
-    viewWidth,
-    viewHeight,
-  }: {
-    viewWidth: number;
-    viewHeight: number;
-  },
-) => {
-  'worklet';
-  const gap =
-    (convertToBaseCanvasRatio(
-      Math.max(LINKS_GAP * (linksLayer.links.length - 1), 0),
-      viewWidth,
-    ) /
-      viewWidth) *
-    100;
-
-  const elWidth =
-    ((convertToBaseCanvasRatio(linksLayer.size, viewWidth) *
-      LINKS_ELEMENT_WRAPPER_MULTIPLER) /
-      viewWidth) *
-    100;
-
-  const width = elWidth * linksLayer.links.length + gap;
-
-  const height =
-    linksLayer.links.length > 0
-      ? (convertToBaseCanvasRatio(linksLayer.size, viewHeight) / viewHeight) *
-        100
-      : 0;
-
-  return { width, height };
 };

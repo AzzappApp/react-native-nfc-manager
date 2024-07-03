@@ -2,6 +2,7 @@
 import { BlurStyle, Skia } from '@shopify/react-native-skia';
 import { interpolate } from 'react-native-reanimated';
 import { swapColor } from '@azzapp/shared/cardHelpers';
+import { convertToBaseCanvasRatio } from '@azzapp/shared/coverHelpers';
 import {
   applyImageFrameTransformations,
   applyShaderTransformations,
@@ -12,7 +13,7 @@ import {
   imageFrameToShaderFrame,
 } from '#helpers/mediaEditions';
 import { percentRectToRect } from '../coverEditorHelpers';
-import { convertToBaseCanvasRatio, inflateRRect } from './coverDrawerHelpers';
+import { inflateRRect } from './coverDrawerHelpers';
 import overlayAnimations from './overlayAnimations';
 import type { CoverDrawerOptions } from './coverDrawerTypes';
 import type { CanvasAnimation, PaintAnimation } from './overlayAnimations';
