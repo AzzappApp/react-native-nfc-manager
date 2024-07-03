@@ -43,7 +43,7 @@ export function useCoverTemplateTypes(
                 id
                 order
                 label
-                coverTemplates(tag: $tagId) {
+                coverTemplates {
                   ...CoverTemplateTypePreviews_coverTemplate
                 }
               }

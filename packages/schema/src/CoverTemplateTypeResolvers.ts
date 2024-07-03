@@ -1,7 +1,3 @@
-import {
-  getCoverTemplatesByType,
-  getCoverTemplatesByTypeAndTag,
-} from '@azzapp/data';
 import { getLabel, idResolver } from './utils';
 import type { CoverTemplateTypeResolvers } from './__generated__/types';
 
@@ -10,9 +6,5 @@ export const CoverTemplateType: CoverTemplateTypeResolvers = {
   label: async ({ labelKey }, _, context) => {
     const label = await getLabel({ labelKey }, _, context);
     return label;
-  },
-  coverTemplates: async ({ id }, { tag }) => {
-    if (!tag) return getCoverTemplatesByType(id);
-    return getCoverTemplatesByTypeAndTag(id, tag);
   },
 };

@@ -8,7 +8,7 @@ type CoverTemplateType implements Node {
   id: ID!
   label: String
   order: Float!
-  coverTemplates(tag: ID): [CoverTemplate!]!
+  coverTemplates: [CoverTemplate!]!
 }
 
 """

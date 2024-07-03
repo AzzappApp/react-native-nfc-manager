@@ -14,6 +14,7 @@ import {
   getWebCardPayments,
   getLastSubscription,
   getFilterCoverTemplateTypes,
+  getCoverTemplatesByTypesAndTag,
 } from '@azzapp/data';
 import { webCardRequiresSubscription } from '@azzapp/shared/subscriptionHelpers';
 import {
@@ -270,22 +271,33 @@ export const WebCard: WebCardResolvers = {
           assetKind: 'logo',
         }
       : null,
-  coverTemplateTypes: async (_full, args) => {
+  coverTemplateTypes: async (webCard, args) => {
     const limit = args.first ?? 10;
     const offset = args.after ? cursorToOffset(args.after) : 0;
 
-    const coverTemplates = await getFilterCoverTemplateTypes(
+    const coverTemplatesTypes = await getFilterCoverTemplateTypes(
       limit + 1,
       offset,
       args.tagId,
     );
 
+    const coverTemplates = await getCoverTemplatesByTypesAndTag(
+      coverTemplatesTypes.map(t => t.id),
+      args.tagId,
+      webCard.companyActivityId,
+    );
+
     return connectionFromArraySlice(
-      coverTemplates,
+      coverTemplatesTypes.map(type => ({
+        ...type,
+        coverTemplates: coverTemplates.filter(
+          template => template.typeId === type.id,
+        ),
+      })),
       { after: args.after, first: args.first },
       {
         sliceStart: offset,
-        arrayLength: coverTemplates.length,
+        arrayLength: coverTemplatesTypes.length,
       },
     );
   },
