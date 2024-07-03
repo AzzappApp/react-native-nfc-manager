@@ -6,7 +6,7 @@ import {
 } from '@shopify/react-native-skia';
 import { memo, useCallback, useMemo } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { View, StyleSheet } from 'react-native';
+import { View } from 'react-native';
 import {
   useSharedValue,
   useFrameCallback,
@@ -165,6 +165,19 @@ const CoverEditorOverlayImageAnimationTool = () => {
     ? (activeOverlay.bounds.width / activeOverlay.bounds.height) * COVER_RATIO
     : 1;
 
+  const limitedImageRatio = Math.min(
+    Math.max(imageRatio, SELECTION_MINIMUM_IMAGE_RATIO),
+    SELECTION_MAXIMUM_IMAGE_RATIO,
+  );
+
+  const selectionHeight = useMemo(() => {
+    return (
+      SELECTION_MAXIMUM_HEIGHT -
+      (limitedImageRatio - SELECTION_MINIMUM_IMAGE_RATIO) *
+        SELECTION_IMAGE_STEP_HEIGHT
+    );
+  }, [limitedImageRatio]);
+
   return (
     <>
       <ToolBoxSection
@@ -181,7 +194,7 @@ const CoverEditorOverlayImageAnimationTool = () => {
           lazy
           onRequestClose={toggleBottomSheet}
           visible={show}
-          height={210 + 80 / imageRatio}
+          height={selectionHeight + 110}
           headerTitle={
             <Text variant="large">
               <FormattedMessage
@@ -192,7 +205,7 @@ const CoverEditorOverlayImageAnimationTool = () => {
           }
           headerRightButton={<DoneHeaderButton onPress={toggleBottomSheet} />}
         >
-          <View style={styles.boxContainer}>
+          <View style={{ height: selectionHeight }}>
             <BoxSelectionList
               data={animations}
               renderItem={renderItem}
@@ -200,11 +213,12 @@ const CoverEditorOverlayImageAnimationTool = () => {
               keyExtractor={keyExtractor}
               accessibilityRole="list"
               onSelect={onSelect}
-              imageRatio={imageRatio}
+              imageRatio={limitedImageRatio}
               selectedItem={
                 animations.find(item => item.id === activeOverlay.animation) ??
                 null
               }
+              fixedItemWidth={80}
             />
           </View>
           <DoubleSlider
@@ -292,6 +306,7 @@ const AnimationPreview = ({
   );
 };
 
-const styles = StyleSheet.create({
-  boxContainer: { height: 80 / COVER_RATIO + 70 },
-});
+const SELECTION_MINIMUM_IMAGE_RATIO = 0.5;
+const SELECTION_MAXIMUM_IMAGE_RATIO = 2;
+const SELECTION_MAXIMUM_HEIGHT = 140;
+const SELECTION_IMAGE_STEP_HEIGHT = 26;
