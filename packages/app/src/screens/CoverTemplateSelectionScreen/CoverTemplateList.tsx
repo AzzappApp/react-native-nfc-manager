@@ -81,7 +81,7 @@ const CoverTemplateList = ({
       index: number;
       itemsToPlay: number;
     }>
-  >([]);
+  >([{ index: 0, itemsToPlay: 2 }]);
 
   const renderItem = useCallback(
     ({ item, index }: ListRenderItemInfo<CoverTemplateType>) => {
