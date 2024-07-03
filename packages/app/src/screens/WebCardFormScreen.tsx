@@ -388,15 +388,15 @@ const WebCardFormScreen = ({
         title={
           webCardKind === 'personal' ? (
             intl.formatMessage({
-              defaultMessage: 'Create your cover',
-              description: 'Cover creation screen title',
+              defaultMessage: 'Add WebCard details',
+              description: 'Add WebCard details screen title',
             })
           ) : (
             <View style={styles.headerTextContainer}>
               <Text variant="large">
                 <FormattedMessage
-                  defaultMessage="Create your cover"
-                  description="Cover creation screen title"
+                  defaultMessage="Add WebCard details"
+                  description="Add WebCard details screen title"
                 />
               </Text>
               <View style={styles.proContainer}>
