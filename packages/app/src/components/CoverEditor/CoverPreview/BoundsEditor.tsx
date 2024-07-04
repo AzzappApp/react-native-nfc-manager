@@ -30,7 +30,7 @@ export type BoundsEditorGestureHandlerProps = ViewProps & {
 
 const RESIZE_HANDLE_POSITIONS = ['top', 'bottom', 'left', 'right'] as const;
 
-const RESIZE_HANDLE_SIZE = { width: 36, height: 20 };
+export const RESIZE_HANDLE_SIZE = { width: 36, height: 20 };
 const RESIZE_HANDLE_RADIUS = 6;
 const DEBUG = false;
 

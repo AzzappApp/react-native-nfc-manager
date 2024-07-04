@@ -54,7 +54,11 @@ import {
   createCoverVideoComposition,
   extractLottieInfoMemoized,
 } from '../coverEditorHelpers';
-import { BoundsEditorGestureHandler, drawBoundsEditor } from './BoundsEditor';
+import {
+  BoundsEditorGestureHandler,
+  RESIZE_HANDLE_SIZE,
+  drawBoundsEditor,
+} from './BoundsEditor';
 import { DynamicLinkRenderer } from './DynamicLinkRenderer';
 import type { VideoCompositionRendererHandle } from '#components/VideoCompositionRenderer';
 import type { EditionParameters } from '#helpers/mediaEditions';
@@ -482,19 +486,24 @@ const CoverPreview = ({
       const canvasHeight = viewHeight;
       const { bounds, rotation } = activeLayerBounds.value;
       const { x: offsetX, y: offsetY } = gestureOffset.value.bounds;
+      const { width: resizeHandleSizeWidth } = RESIZE_HANDLE_SIZE;
+      const isLayerText = activeLayer.kind === 'text';
 
       const cos = Math.cos(rotation);
       const sin = Math.sin(rotation);
+
       const boundingBoxWidth =
         ((Math.abs(((bounds.width * canvasWidth) / 100) * cos) +
           Math.abs(((bounds.height * canvasHeight) / 100) * sin)) /
           canvasWidth) *
-        100;
+          100 +
+        (resizeHandleSizeWidth * 100) / canvasWidth / 2;
       const boundingBoxHeight =
         ((Math.abs(((bounds.height * canvasHeight) / 100) * cos) +
           Math.abs(((bounds.width * canvasWidth) / 100) * sin)) /
           canvasHeight) *
-        100;
+          100 +
+        (!isLayerText ? (resizeHandleSizeWidth * 100) / canvasHeight / 2 : 0);
       activeLayerBounds.value = {
         bounds: {
           x: clamp(
@@ -513,7 +522,13 @@ const CoverPreview = ({
         rotation,
       };
     },
-    [activeLayerBounds, gestureOffset.value, viewHeight, viewWidth],
+    [
+      activeLayer.kind,
+      activeLayerBounds,
+      gestureOffset.value,
+      viewHeight,
+      viewWidth,
+    ],
   );
 
   /**
