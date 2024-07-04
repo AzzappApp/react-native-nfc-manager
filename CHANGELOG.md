@@ -1,5 +1,9 @@
-## 0.5.19-canary.78
+## 0.5.19-canary.79
 
+* **fix:**  - **home:** [#4031](https://github.com/AzzappApp/azzapp/pull/4031) simplify bottom panel management ([#4081](https://github.com/AzzappApp/azzapp/pull/4081))
+* **fix:**  - **payment:** [#4080](https://github.com/AzzappApp/azzapp/pull/4080) update multiUser flag after first received payment ([#4082](https://github.com/AzzappApp/azzapp/pull/4082))
+* **fix:**  - **payment:** [#3946](https://github.com/AzzappApp/azzapp/pull/3946) add phone number in invoice ([#4085](https://github.com/AzzappApp/azzapp/pull/4085))
+* **fix:**  - **cover:** [#3669](https://github.com/AzzappApp/azzapp/pull/3669) specify video percentage as poster ([#4087](https://github.com/AzzappApp/azzapp/pull/4087))
 * **feat:**  - improve temaplte selection list perf ([#4086](https://github.com/AzzappApp/azzapp/pull/4086))
 * **fix:**  - **home:** [#4058](https://github.com/AzzappApp/azzapp/pull/4058) race issues between state and shared values ([#4084](https://github.com/AzzappApp/azzapp/pull/4084))
 * **fix:**  - 🐛 add option to block cut video size ([#4075](https://github.com/AzzappApp/azzapp/pull/4075))
