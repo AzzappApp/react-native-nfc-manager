@@ -481,6 +481,7 @@ export const generateInvoice = async (webCardId: string, paymentId: string) => {
         invoicedZip: subscription.subscriberZip ?? '',
         invoicedCountry: subscription.subscriberCountry ?? '',
         invoicedVat: subscription.subscriberVatNumber ?? '',
+        invoicedPhone: subscription.subscriberPhoneNumber ?? '',
       },
     },
   );
