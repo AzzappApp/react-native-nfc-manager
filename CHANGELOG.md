@@ -1,4 +1,4 @@
-## 0.5.19-canary.77
+## 0.5.19-canary.78
 
 * **feat:**  - improve temaplte selection list perf ([#4086](https://github.com/AzzappApp/azzapp/pull/4086))
 * **fix:**  - **home:** [#4058](https://github.com/AzzappApp/azzapp/pull/4058) race issues between state and shared values ([#4084](https://github.com/AzzappApp/azzapp/pull/4084))
