@@ -49,6 +49,7 @@ const EditImageStep = ({
   onEditionCancel: onEditionCancelProp,
 }: EditImageStepProps) => {
   const {
+    minVideoDuration,
     maxVideoDuration,
     media,
     aspectRatio,
@@ -305,6 +306,7 @@ const EditImageStep = ({
                         video={media}
                         aspectRatio={aspectRatio}
                         maxDuration={maxVideoDuration}
+                        minDuration={minVideoDuration}
                         onChange={onTimeRangeChange}
                         width={windowWidth - 30}
                         imagesHeight={50}

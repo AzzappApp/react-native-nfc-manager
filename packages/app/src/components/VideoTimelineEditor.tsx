@@ -133,6 +133,11 @@ const VideoTimelineEditor = ({
       onStart: (event, ctx) => {
         ctx.startX = leftPosition.value;
         ctx.endX = rightPosition.value;
+
+        if (minDuration === maxDuration) {
+          return;
+        }
+
         if (event.x < THUMB_WIDTH * 2) {
           ctx.left = true;
         } else if (

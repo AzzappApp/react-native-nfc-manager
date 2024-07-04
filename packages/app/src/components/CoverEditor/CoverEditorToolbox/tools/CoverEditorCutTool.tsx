@@ -77,6 +77,7 @@ const CoverEditorCutTool = () => {
               onCancel={toggleScreenModal}
               onFinished={onFinished}
               maxVideoDuration={expectedDuration}
+              minVideoDuration={expectedDuration}
             />
           )}
         </ScreenModal>

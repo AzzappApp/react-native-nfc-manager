@@ -66,6 +66,10 @@ export type ImagePickerResult = {
 
 export type ImagePickerProps = {
   /**
+   * The minimum allowed duration for a video
+   */
+  minVideoDuration?: number;
+  /**
    * The maximum allowed duration for a video
    */
   maxVideoDuration?: number;
@@ -146,6 +150,7 @@ export type ImagePickerProps = {
  */
 const ImagePicker = ({
   maxVideoDuration = 15,
+  minVideoDuration,
   forceAspectRatio,
   steps: propSteps = DEFAULT_STEPS,
   kind = 'mixed',
@@ -226,6 +231,7 @@ const ImagePicker = ({
       forceAspectRatio={forceAspectRatio}
       forceCameraRatio={forceCameraRatio}
       maxVideoDuration={maxVideoDuration}
+      minVideoDuration={minVideoDuration}
       exporting={exporting}
       kind={kind}
       onMediaChange={setMedia}

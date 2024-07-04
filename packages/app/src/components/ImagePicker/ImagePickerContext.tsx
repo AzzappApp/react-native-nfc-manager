@@ -45,6 +45,10 @@ export type ImagePickerState = {
    */
   maxVideoDuration: number;
   /**
+   * the minimum duration of a video to pick
+   */
+  minVideoDuration?: number;
+  /**
    * the kind of media to pick
    */
   kind: 'image' | 'mixed' | 'video';
@@ -141,6 +145,10 @@ export const useImagePickerState = () => {
 
 type ImagePickerContextProviderProps = {
   /**
+   * the minimum duration of a video
+   */
+  minVideoDuration?: number;
+  /**
    * the maximum duration of a video
    */
   maxVideoDuration: number;
@@ -186,6 +194,7 @@ const _ImagePickerContextProvider = (
   {
     kind,
     maxVideoDuration,
+    minVideoDuration,
     forceAspectRatio,
     exporting,
     children,
@@ -325,6 +334,7 @@ const _ImagePickerContextProvider = (
       kind,
       forceAspectRatio,
       maxVideoDuration,
+      minVideoDuration,
       media,
       skImage,
       aspectRatio:
@@ -350,6 +360,7 @@ const _ImagePickerContextProvider = (
     [
       kind,
       forceAspectRatio,
+      minVideoDuration,
       maxVideoDuration,
       media,
       skImage,
