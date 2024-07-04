@@ -60,6 +60,7 @@ const AnimatedText = ({
         underlineColorAndroid="transparent"
         editable={false}
         defaultValue={text.value}
+        allowFontScaling={false}
         style={[styles.text, { padding: 0 }, style]}
         pointerEvents="none"
         {...{ animatedProps }}
