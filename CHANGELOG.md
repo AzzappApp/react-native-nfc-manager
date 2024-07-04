@@ -1,5 +1,7 @@
-## 0.5.19-canary.74
+## 0.5.19-canary.75
 
+* **fix:**  - 🐛 add option to block cut video size ([#4075](https://github.com/AzzappApp/azzapp/pull/4075))
+* **fix:**  - font scaling on animated text input ([#4079](https://github.com/AzzappApp/azzapp/pull/4079))
 * **feat:**  - increase max size font cover ([#4076](https://github.com/AzzappApp/azzapp/pull/4076))
 * **fix:**  - **coverTemplate:** [#4047](https://github.com/AzzappApp/azzapp/pull/4047) don’t return specific preview when no activity ([#4074](https://github.com/AzzappApp/azzapp/pull/4074))
 * **feat:**  - 🎸 add dynamic links to web cover ([#4070](https://github.com/AzzappApp/azzapp/pull/4070))
