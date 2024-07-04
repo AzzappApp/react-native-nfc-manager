@@ -57,10 +57,10 @@ const HorizontalPhotoRenderer = async ({
         style={{
           maxWidth: marginHorizontal ? 800 : '100%',
           width: '100%',
-          marginRight: marginHorizontal,
-          marginLeft: marginHorizontal,
-          marginTop: marginVertical,
-          marginBottom: marginVertical,
+          paddingLeft: marginHorizontal,
+          paddingRight: marginHorizontal,
+          paddingTop: marginVertical,
+          paddingBottom: marginVertical,
         }}
       >
         <div
