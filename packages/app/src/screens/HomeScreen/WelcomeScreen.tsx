@@ -99,12 +99,7 @@ const WelcomeScreen = () => {
           />
         </Link>
       </View>
-      <HomeBottomSheetPanel
-        visible={showMenu}
-        close={toggleShowMenu}
-        withProfile={false}
-        profileRole={null}
-      />
+      <HomeBottomSheetPanel visible={showMenu} close={toggleShowMenu} />
     </Container>
   );
 };

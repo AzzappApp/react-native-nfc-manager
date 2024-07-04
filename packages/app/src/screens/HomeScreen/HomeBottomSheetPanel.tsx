@@ -37,16 +37,6 @@ type HomeBottomSheetPanelProps = {
    *
    */
   close: () => void;
-  /**
-   * User has a profile
-   */
-  withProfile: boolean;
-  /**
-   * The profile role of the active webCard / profile
-   *
-   * @type {(string | null)}
-   */
-  profileRole: string | null;
 
   profile?: HomeBottomSheetPanel_profile$key | null;
 };
@@ -54,8 +44,6 @@ type HomeBottomSheetPanelProps = {
 const HomeBottomSheetPanel = ({
   visible,
   close,
-  profileRole,
-  withProfile,
   profile: profileKey,
 }: HomeBottomSheetPanelProps) => {
   const profile = useFragment(
@@ -269,7 +257,7 @@ const HomeBottomSheetPanel = ({
           onPress: close,
         },
         { type: 'separator' },
-        withProfile && profileRole && isAdmin(profileRole) && !profile?.invited
+        isAdmin(profile?.profileRole) && !profile?.invited
           ? {
               type: 'row',
               icon: 'parameters',
@@ -287,10 +275,8 @@ const HomeBottomSheetPanel = ({
               onPress: close,
             }
           : null,
-        withProfile &&
-        profileRole &&
         !profile?.invited &&
-        isAdmin(profileRole) &&
+        isAdmin(profile?.profileRole) &&
         profile?.webCard.hasCover
           ? {
               type: 'row',
@@ -305,10 +291,7 @@ const HomeBottomSheetPanel = ({
               onPress: close,
             }
           : null,
-        withProfile &&
-        profile &&
-        profile?.webCard.cardIsPublished &&
-        !profile?.invited
+        profile && profile?.webCard.cardIsPublished && !profile?.invited
           ? {
               type: 'row',
               icon: 'share',
@@ -323,7 +306,7 @@ const HomeBottomSheetPanel = ({
             }
           : null,
         { type: 'separator' },
-        withProfile && !profile?.invited
+        !profile?.invited
           ? {
               type: 'row',
               icon: 'invite',
@@ -359,7 +342,7 @@ const HomeBottomSheetPanel = ({
           onPress: onLogout,
         },
       ]),
-    [close, intl, onLogout, onShare, profile, profileRole, withProfile],
+    [close, intl, onLogout, onShare, profile],
   );
 
   const modalHeight = useMemo(() => {

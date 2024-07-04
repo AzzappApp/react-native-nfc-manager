@@ -44,8 +44,7 @@ const HomeScreenContent = ({ user: userKey }: HomeScreenContentProps) => {
   const { bottom } = useScreenInsets();
   //#region profile switch
 
-  const { currentIndexProfile, currentIndexSharedValue } =
-    useHomeScreenContext();
+  const { currentIndexProfile } = useHomeScreenContext();
 
   const currentProfile = useMemo(
     () => user.profiles?.[currentIndexProfile.value - 1],
@@ -77,9 +76,7 @@ const HomeScreenContent = ({ user: userKey }: HomeScreenContentProps) => {
       <HomeBottomSheetPanel
         visible={showMenu}
         close={toggleShowMenu}
-        withProfile={currentIndexSharedValue.value >= 1}
         profile={currentProfile ?? null}
-        profileRole={currentProfile?.profileRole ?? null}
       />
     </View>
   );
