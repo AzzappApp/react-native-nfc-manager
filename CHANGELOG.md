@@ -1,4 +1,4 @@
-## 0.5.19-canary.72
+## 0.5.19-canary.73
 
 * **fix:**  - **coverTemplate:** [#4047](https://github.com/AzzappApp/azzapp/pull/4047) don’t return specific preview when no activity ([#4074](https://github.com/AzzappApp/azzapp/pull/4074))
 * **feat:**  - 🎸 add dynamic links to web cover ([#4070](https://github.com/AzzappApp/azzapp/pull/4070))
