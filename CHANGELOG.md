@@ -1,5 +1,6 @@
-## 0.5.19-canary.71
+## 0.5.19-canary.72
 
+* **fix:**  - **coverTemplate:** [#4047](https://github.com/AzzappApp/azzapp/pull/4047) don’t return specific preview when no activity ([#4074](https://github.com/AzzappApp/azzapp/pull/4074))
 * **feat:**  - 🎸 add dynamic links to web cover ([#4070](https://github.com/AzzappApp/azzapp/pull/4070))
 * **feat:**  - **backoffice:** update animation list text and overlay ([#4064](https://github.com/AzzappApp/azzapp/pull/4064))
 * **fix:**  - darkmode image picker ([#4063](https://github.com/AzzappApp/azzapp/pull/4063))
