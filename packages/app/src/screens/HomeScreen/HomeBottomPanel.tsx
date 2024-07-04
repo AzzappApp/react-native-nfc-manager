@@ -1,5 +1,5 @@
 import { useState, memo } from 'react';
-import { Dimensions, StyleSheet, View } from 'react-native';
+import { StyleSheet, useWindowDimensions, View } from 'react-native';
 import Animated, {
   interpolate,
   useAnimatedStyle,
@@ -70,6 +70,9 @@ const HomeBottomPanel = ({ user: userKey }: HomeBottomPanelProps) => {
   const inputRange = useHomeScreenInputProfileRange(profiles ?? []);
   //#endregion
 
+  const { width: windowWidth } = useWindowDimensions();
+  const panelHeight = (windowWidth - 40) / CONTACT_CARD_RATIO;
+
   const bottomPanelVisible = useDerivedValue(() => {
     const res =
       profiles?.map(profile => {
@@ -115,7 +118,11 @@ const HomeBottomPanel = ({ user: userKey }: HomeBottomPanelProps) => {
   //#endregion
 
   return (
-    <View style={styles.container}>
+    <View
+      style={{
+        height: panelHeight + HOME_MENU_HEIGHT,
+      }}
+    >
       <View style={styles.informationPanel}>
         <HomeBottomPanelMessage user={profiles!} />
       </View>
@@ -130,7 +137,7 @@ const HomeBottomPanel = ({ user: userKey }: HomeBottomPanelProps) => {
             display: selectedPanel === 'CONTACT_CARD' ? 'flex' : 'none',
           }}
         >
-          <HomeContactCard height={PANEL_HEIGHT} user={user} />
+          <HomeContactCard height={panelHeight} user={user} />
         </View>
 
         <View
@@ -139,7 +146,7 @@ const HomeBottomPanel = ({ user: userKey }: HomeBottomPanelProps) => {
             display: selectedPanel === 'STATS' ? 'flex' : 'none',
           }}
         >
-          <HomeStatistics user={profiles!} height={PANEL_HEIGHT} />
+          <HomeStatistics user={profiles!} height={panelHeight} />
         </View>
 
         <View
@@ -148,20 +155,14 @@ const HomeBottomPanel = ({ user: userKey }: HomeBottomPanelProps) => {
             display: selectedPanel === 'INFORMATION' ? 'flex' : 'none',
           }}
         >
-          <HomeInformations user={user} height={PANEL_HEIGHT} />
+          <HomeInformations user={user} height={panelHeight} />
         </View>
       </Animated.View>
     </View>
   );
 };
 
-const { width: windowWidth } = Dimensions.get('window');
-const PANEL_HEIGHT = (windowWidth - 40) / CONTACT_CARD_RATIO;
-
 const styles = StyleSheet.create({
-  container: {
-    height: PANEL_HEIGHT + HOME_MENU_HEIGHT,
-  },
   informationText: {
     textAlign: 'center',
     color: colors.white,

@@ -1,5 +1,5 @@
 import { memo, useCallback } from 'react';
-import { Dimensions, View } from 'react-native';
+import { useWindowDimensions, View } from 'react-native';
 import Animated, {
   useAnimatedStyle,
   useDerivedValue,
@@ -22,7 +22,7 @@ type HomeContactCardProps = {
   user: HomeContactCard_user$key;
   height: number;
 };
-const windowWidth = Dimensions.get('window').width;
+
 const HomeContactCard = ({ user, height }: HomeContactCardProps) => {
   const { profiles } = useFragment(
     graphql`
@@ -37,6 +37,8 @@ const HomeContactCard = ({ user, height }: HomeContactCardProps) => {
     `,
     user,
   );
+
+  const { width: windowWidth } = useWindowDimensions();
 
   return (
     <View
@@ -73,6 +75,8 @@ const ContactCardItemComponent = ({
 }: ContactCardItemProps) => {
   const styles = useStyleSheet(styleSheet);
   const currentIndexSharedValue = useHomeScreenCurrentIndex();
+
+  const { width: windowWidth } = useWindowDimensions();
 
   const translateX = useDerivedValue(() => {
     'worklet';

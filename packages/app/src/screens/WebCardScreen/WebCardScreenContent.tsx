@@ -1,5 +1,5 @@
 import { Suspense, memo, useCallback, useRef, useState } from 'react';
-import { Dimensions, View } from 'react-native';
+import { useWindowDimensions, View } from 'react-native';
 import Animated, { useAnimatedStyle } from 'react-native-reanimated';
 import Toast from 'react-native-toast-message';
 import { graphql, useFragment } from 'react-relay';
@@ -74,8 +74,6 @@ type WebCardScreenContentProps = {
    */
   onContentPositionChange?: (atTop: boolean) => void;
 };
-
-const { width: windowWidth, height: windowHeight } = Dimensions.get('window');
 
 /**
  * This component render the content of the Web card.
@@ -306,6 +304,8 @@ const WebCardScreenContent = ({
   }, []);
 
   const hasFocus = useScreenHasFocus();
+
+  const { width: windowWidth, height: windowHeight } = useWindowDimensions();
 
   return (
     <>

@@ -15,7 +15,6 @@ import {
   FlatList,
   useWindowDimensions,
   ScrollView,
-  Dimensions,
   StatusBar,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -437,6 +436,8 @@ const CardTemplateList = (
   }, [selectedCardTemplateType, templates]);
   // #endregion
 
+  const { height: windowHeight } = useWindowDimensions();
+
   return (
     <>
       <View style={[styles.root, style]} {...props}>
@@ -581,8 +582,6 @@ type CoverTemplatePreviewModalProps = {
   onRequestClose: () => void;
 };
 
-const { height: windowHeight, width: windowWidth } = Dimensions.get('window');
-
 const CardTemplatePreviewModal = ({
   visible,
   webCard,
@@ -598,6 +597,8 @@ const CardTemplatePreviewModal = ({
   const intl = useIntl();
 
   const insets = useScreenInsets();
+
+  const { height: windowHeight, width: windowWidth } = useWindowDimensions();
 
   const previewHeight = windowHeight - insets.top - HEADER_HEIGHT;
 

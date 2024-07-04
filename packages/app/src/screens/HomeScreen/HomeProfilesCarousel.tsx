@@ -7,7 +7,7 @@ import {
   Platform,
   Pressable,
   PixelRatio,
-  Dimensions,
+  useWindowDimensions,
 } from 'react-native';
 import { graphql, useFragment } from 'react-relay';
 import { COVER_CARD_RADIUS, COVER_RATIO } from '@azzapp/shared/coverHelpers';
@@ -158,6 +158,8 @@ const HomeProfilesCarousel = ({ user: userKey }: HomeProfilesCarouselProps) => {
     }
   });
 
+  const { width: windowWidth } = useWindowDimensions();
+
   if (profiles == null) {
     return null;
   }
@@ -174,7 +176,7 @@ const HomeProfilesCarousel = ({ user: userKey }: HomeProfilesCarouselProps) => {
           height={coverHeight}
           itemWidth={coverWidth}
           scaleRatio={SCALE_RATIO}
-          style={styles.carousel}
+          style={[styles.carousel, { width: windowWidth }]}
           itemContainerStyle={styles.carouselContentContainer}
           onSelectedIndexChange={onSelectedIndexChange}
           currentProfileIndexSharedValue={currentIndexSharedValue}
@@ -416,7 +418,6 @@ const CreateItem = ({
 };
 
 const CreateItemMemo = memo(CreateItem);
-const windowWidth = Dimensions.get('window').width;
 
 const styles = StyleSheet.create({
   container: { flex: 1, marginVertical: 15 },
@@ -424,7 +425,6 @@ const styles = StyleSheet.create({
     flexGrow: 0,
     overflow: 'visible',
     alignSelf: 'center',
-    width: windowWidth,
   },
   carouselContentContainer: {
     flexGrow: 0,
