@@ -291,6 +291,7 @@ const stylesheet = createStyleSheet(appearance => ({
     gap: 15,
     marginVertical: 20,
     paddingHorizontal: 20,
+    backgroundColor: appearance === 'light' ? colors.white : colors.black,
   },
   labelMediaSelected: {
     color: colors.grey400,
@@ -309,7 +310,7 @@ const stylesheet = createStyleSheet(appearance => ({
     position: 'absolute',
     top: -10,
     right: -10,
-    backgroundColor: colors.white,
+    backgroundColor: appearance === 'light' ? colors.white : colors.black,
     borderRadius: 12,
     borderColor: appearance === 'light' ? colors.grey100 : colors.grey1000,
   },

@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { StyleSheet, View } from 'react-native';
+import { View } from 'react-native';
 import { KeyboardAvoidingView } from 'react-native-keyboard-controller';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
@@ -11,6 +11,7 @@ import {
 import { colors } from '#theme';
 import { useCoverEditorContext } from '#components/CoverEditor/CoverEditorContext';
 import { ScreenModal } from '#components/NativeRouter';
+import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import useScreenInsets from '#hooks/useScreenInsets';
 import SocialLinksLinksEditionPanel, {
   SOCIAL_LINK_PANEL_ITEM_HEIGHT,
@@ -34,6 +35,7 @@ type Props = {
 
 const CoverEditorLinksModal = ({ open, onClose }: Props) => {
   const { coverEditorState: cover, dispatch } = useCoverEditorContext();
+  const styles = useStyleSheet(styleSheet);
   const [links, setLinks] = useState<Array<SocialLink | null>>(
     cover.linksLayer.links,
   );
@@ -117,19 +119,7 @@ const CoverEditorLinksModal = ({ open, onClose }: Props) => {
                 }}
               >
                 {shownLinks.map(link => (
-                  <View
-                    key={link.socialId}
-                    style={{
-                      borderWidth: 1,
-                      borderStyle: 'solid',
-                      borderColor: 'black',
-                      height: 50,
-                      width: 50,
-                      borderRadius: 40,
-                      justifyContent: 'center',
-                      alignItems: 'center',
-                    }}
-                  >
+                  <View key={link.socialId} style={styles.links}>
                     <SocialIcon
                       style={{
                         width: 30,
@@ -188,7 +178,7 @@ const CoverEditorLinksModal = ({ open, onClose }: Props) => {
 
 const BOTTOM_MENU_HEIGHT = 80;
 
-const styles = StyleSheet.create({
+const styleSheet = createStyleSheet(appearance => ({
   container: {
     flex: 1,
   },
@@ -200,6 +190,16 @@ const styles = StyleSheet.create({
     flex: 1,
     marginTop: 320,
   },
-});
+  links: {
+    borderWidth: 1,
+    borderStyle: 'solid',
+    borderColor: appearance === 'light' ? colors.black : colors.white,
+    height: 50,
+    width: 50,
+    borderRadius: 40,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+}));
 
 export default CoverEditorLinksModal;

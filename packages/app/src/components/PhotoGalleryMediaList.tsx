@@ -342,8 +342,9 @@ const PhotoGalleryMediaList = ({
           <PressableOpacity>
             <Text
               variant="medium"
-              onPress={() => {
-                openPhotoPicker();
+              onPress={async () => {
+                //it not waiting the modal ios will not be displayed
+                await openPhotoPicker();
                 toggleManageAccessMediaVisible();
               }}
             >

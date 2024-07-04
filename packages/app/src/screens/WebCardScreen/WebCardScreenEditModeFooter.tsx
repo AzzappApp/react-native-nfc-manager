@@ -1,8 +1,9 @@
 import { useCallback } from 'react';
 import { useIntl } from 'react-intl';
-import { View, StyleSheet } from 'react-native';
+import { View } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { colors } from '#theme';
+import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import Button from '#ui/Button';
 import Text from '#ui/Text';
 
@@ -18,6 +19,7 @@ const WebCardScreenEditModeFooter = ({
     setLoadTemplate(true);
   }, [setLoadTemplate]);
   const intl = useIntl();
+  const styles = useStyleSheet(styleSheet);
   return (
     <View style={styles.root}>
       <Text variant="small" style={styles.loadDescription}>
@@ -28,7 +30,11 @@ const WebCardScreenEditModeFooter = ({
             description: 'ProfileScreenBody description to load a new template',
           },
           {
-            azzappA: <Text variant="azzapp">a</Text>,
+            azzappA: (
+              <Text variant="azzapp" style={styles.azzapp}>
+                a
+              </Text>
+            ),
           },
         )}
       </Text>
@@ -53,7 +59,7 @@ const WebCardScreenEditModeFooter = ({
 
 export const WEBCARD_SCREEN_EDIT_MODE_FOOTER_HEIGHT = 110;
 
-const styles = StyleSheet.create({
+const styleSheet = createStyleSheet(appearance => ({
   root: {
     paddingTop: 30,
     display: 'flex',
@@ -67,6 +73,9 @@ const styles = StyleSheet.create({
     color: colors.grey700,
     marginHorizontal: 40,
   },
-});
+  azzapp: {
+    color: appearance === 'light' ? colors.black : colors.white,
+  },
+}));
 
 export default WebCardScreenEditModeFooter;

@@ -167,7 +167,7 @@ const styleSheet = createStyleSheet(appearance => ({
     height: TOOLBOX_SECTION_HEIGHT,
   },
   duration: {
-    backgroundColor: colors.white,
+    backgroundColor: appearance === 'light' ? colors.white : colors.black,
     borderRadius: 14,
     position: 'absolute',
     bottom: 5,

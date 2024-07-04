@@ -1,10 +1,11 @@
 import { useCallback, useMemo, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { FlatList, ScrollView, StyleSheet, View } from 'react-native';
+import { FlatList, ScrollView, View } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { colors } from '#theme';
 import { useCoverEditorContext } from '#components/CoverEditor/CoverEditorContext';
 import { ScreenModal } from '#components/NativeRouter';
+import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import Button from '#ui/Button';
 import Container from '#ui/Container';
 import Header from '#ui/Header';
@@ -22,6 +23,7 @@ type Props = {
 const CoverEditorAddTextModal = (props: Props) => {
   const { open, onClose } = props;
   const intl = useIntl();
+  const styles = useStyleSheet(styleSheet);
 
   const [selectedTag, setSelectedTag] = useState<number>(0);
   const updateSelectedTag = useCallback((tag: string | null) => {
@@ -154,6 +156,7 @@ const AddTextModalItem = ({
   onClose: () => void;
   dispatch: React.Dispatch<CoverEditorAction>;
 }) => {
+  const styles = useStyleSheet(styleSheet);
   const onPress = useCallback(() => {
     dispatch({
       type: 'ADD_TEXT_LAYER',
@@ -200,7 +203,7 @@ const simpleTextStyles: TextStyleItem[] = [];
 const staticTextStyles: TextStyleItem[] = [];
 const animatedTextStyles: TextStyleItem[] = [];
 
-const styles = StyleSheet.create({
+const styleSheet = createStyleSheet(appearance => ({
   container: {
     flex: 1,
   },
@@ -213,7 +216,7 @@ const styles = StyleSheet.create({
   },
   styleItemContent: {
     height: 172,
-    backgroundColor: colors.grey50,
+    backgroundColor: appearance === 'light' ? colors.grey50 : colors.grey900,
     borderRadius: 12,
     justifyContent: 'center',
     alignItems: 'center',
@@ -241,6 +244,6 @@ const styles = StyleSheet.create({
     gap: 10,
     flex: 1,
   },
-});
+}));
 
 export default CoverEditorAddTextModal;
