@@ -48,7 +48,7 @@ export const COVER_MIN_FONT_SIZE = 6;
 /**
  * The maximum font size for the cover title/subtitle
  */
-export const COVER_MAX_FONT_SIZE = 48;
+export const COVER_MAX_FONT_SIZE = 128;
 
 /**
  * the list of possible cover asset pre generated sizes

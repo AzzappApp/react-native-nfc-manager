@@ -112,6 +112,6 @@ const styles = StyleSheet.create({
 });
 
 const COVER_MIN_FONT_SIZE = 6;
-const COVER_MAX_FONT_SIZE = 48;
+const COVER_MAX_FONT_SIZE = 128;
 
 export default CoverEditorSizeTool;
