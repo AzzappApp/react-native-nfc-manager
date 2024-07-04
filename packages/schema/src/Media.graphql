@@ -25,7 +25,7 @@ type MediaVideo implements Media {
     pixelRatio: Float
     height: Float
     width: Float
-    time: Float
+    videoDurationPercentage: Int
   ): String!
 }
 

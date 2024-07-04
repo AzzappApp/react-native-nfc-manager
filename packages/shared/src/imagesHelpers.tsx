@@ -37,6 +37,7 @@ export type UrLForSizeParam = {
   pixelRatio?: number | null;
   pregeneratedSizes?: number[] | null;
   extension?: string | null;
+  videoDurationPercentage?: number | null;
 };
 
 /**
@@ -123,6 +124,7 @@ export const getVideoThumbnailURL = ({
   height,
   pixelRatio = 1,
   pregeneratedSizes,
+  videoDurationPercentage,
 }: UrLForSizeParam) => {
   assetNotRN('getVideoThumbnailURL');
   const transforms = resizeTransforms(
@@ -130,6 +132,7 @@ export const getVideoThumbnailURL = ({
     height,
     pixelRatio,
     pregeneratedSizes,
+    videoDurationPercentage,
   );
   return assembleCloudinaryUrl(id, 'video', transforms, 'webp');
 };
@@ -147,10 +150,17 @@ export const resizeTransforms = (
   height?: number | null,
   pixelRatio?: number | null,
   pregeneratedSizes?: number[] | null,
+  videoDurationPercentage?: number | null,
 ) => {
   pixelRatio = pixelRatio ?? 1;
+  let result = `q_auto:best`;
+
+  if (videoDurationPercentage) {
+    result += `,so_${videoDurationPercentage}p`;
+  }
+
   if (width == null) {
-    return `q_auto:best`;
+    return result;
   }
   width = Math.ceil(width * pixelRatio);
   if (pregeneratedSizes) {
@@ -158,16 +168,16 @@ export const resizeTransforms = (
     if (index === -1) {
       if (height != null) {
         const aspectRatio = Math.round((width * 1000) / height) / 1000;
-        return `c_fill,q_auto:best,ar_${aspectRatio}`;
+        return `c_fill,${result},ar_${aspectRatio}`;
       }
-      return `q_auto:best`;
+      return result;
     }
-    return `q_auto:best,w_${pregeneratedSizes[index]}`;
+    return `${result},w_${pregeneratedSizes[index]}`;
   }
   if (height != null) {
-    return `c_fill,q_auto:best,w_${width},h_${height}`;
+    return `c_fill,${result},w_${width},h_${height}`;
   } else {
-    return `q_auto:best,w_${width}`;
+    return `${result},w_${width}`;
   }
 };
 

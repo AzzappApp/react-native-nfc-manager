@@ -131,6 +131,7 @@ const uriResolver =
       raw,
       streaming = false,
       extension,
+      videoDurationPercentage,
     }: {
       width?: number | null;
       height?: number | null;
@@ -138,6 +139,7 @@ const uriResolver =
       raw?: boolean | null;
       streaming?: boolean | null;
       extension?: Extension | null;
+      videoDurationPercentage?: number | null;
     },
   ) => {
     const assetKind = getAssetKind(media);
@@ -171,6 +173,7 @@ const uriResolver =
       extension,
       // @ts-expect-error streaming is not in the getImageURLForSize signature
       streaming,
+      videoDurationPercentage,
     });
   };
 

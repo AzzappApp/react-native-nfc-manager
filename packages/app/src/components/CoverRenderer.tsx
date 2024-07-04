@@ -103,10 +103,15 @@ const CoverRenderer = (
                 pixelRatio: $pixelRatio
                 streaming: $isAndroid
               )
-              thumbnail(width: $screenWidth, pixelRatio: $pixelRatio)
+              thumbnail(
+                width: $screenWidth
+                pixelRatio: $pixelRatio
+                videoDurationPercentage: 17
+              )
               smallThumbnail: thumbnail(
                 width: 125
                 pixelRatio: $cappedPixelRatio
+                videoDurationPercentage: 17
               )
             }
           }
