@@ -5,6 +5,7 @@ import { StyleSheet, View } from 'react-native';
 import Video from 'react-native-video';
 import { graphql, useFragment } from 'react-relay';
 import { colors } from '#theme';
+import { useScreenHasFocus } from '#components/NativeRouter';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import Icon from '#ui/Icon';
 import PressableNative from '#ui/PressableNative';
@@ -111,7 +112,7 @@ const CoverTemplateTypePreviews = ({
 const Separator = () => <View style={styles.separator} />;
 const keyExtractor = (item: CoverTemplate) => item.id;
 const viewabilityConfig = {
-  itemVisiblePercentThreshold: 82,
+  itemVisiblePercentThreshold: 80,
 };
 export default memo(CoverTemplateTypePreviews);
 
@@ -132,14 +133,15 @@ const ListItemComponent = ({
     [coverTemplate, onSelect],
   );
 
+  const hasFocus = useScreenHasFocus();
   return (
     <PressableNative style={styles.preview} onPress={onPress}>
-      {coverTemplate.preview.video ? (
+      {coverTemplate.preview.video && shouldPlay ? (
         <Video
           source={{ uri: coverTemplate.preview.video.uri }}
           muted={false}
           repeat
-          paused={!shouldPlay}
+          paused={!shouldPlay || !hasFocus}
           style={styles.previewMedia}
           resizeMode="contain"
           poster={coverTemplate.preview.video?.thumbnail}
@@ -148,7 +150,9 @@ const ListItemComponent = ({
       ) : (
         <Image
           source={{
-            uri: coverTemplate.preview.image?.uri,
+            uri:
+              coverTemplate.preview.image?.uri ??
+              coverTemplate.preview.video?.thumbnail,
           }}
           style={styles.previewMedia}
         />

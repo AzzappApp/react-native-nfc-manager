@@ -81,7 +81,7 @@ const CoverTemplateList = ({
       index: number;
       itemsToPlay: number;
     }>
-  >([{ index: 0, itemsToPlay: 2 }]);
+  >([]);
 
   const renderItem = useCallback(
     ({ item, index }: ListRenderItemInfo<CoverTemplateType>) => {
@@ -127,13 +127,7 @@ const CoverTemplateList = ({
 
       // Logic to determine which videos to play
       // This is a basic implementation and might need adjustments
-      if (viewableRows.length >= 2) {
-        // If there are two or more viewable rows, select one video from each of the first two rows
-        setViewableItems([
-          { index: viewableRows[0].index!, itemsToPlay: 1 },
-          { index: viewableRows[1].index!, itemsToPlay: 1 },
-        ]);
-      } else if (viewableRows.length === 1) {
+      if (viewableRows.length >= 1) {
         setViewableItems([{ index: viewableRows[0].index!, itemsToPlay: 2 }]);
       } else {
         setViewableItems([]);
@@ -166,7 +160,7 @@ const CoverTemplateList = ({
           onEndReached={onEndReached}
           onRefresh={onRefresh}
           refreshing={isLoadingPrevious}
-          contentContainerStyle={{ paddingBottom: 40 + bottom }}
+          contentContainerStyle={{ paddingBottom: 200 + bottom }}
           onEndReachedThreshold={0.5}
           keyboardShouldPersistTaps="always"
           onViewableItemsChanged={onViewableItemChanged}
