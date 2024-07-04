@@ -89,6 +89,11 @@ const AccountDetailsPhoneNumberForm = ({
 
   const updatePhoneNumber = async (phoneNumber: string) => {
     try {
+      if (phoneNumber === currentUser.phoneNumber) {
+        toggleBottomSheet();
+        return;
+      }
+
       const { issuer } = await requestUpdateContact({
         locale: intl.locale,
         phoneNumber,

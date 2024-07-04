@@ -53,6 +53,11 @@ const AccountDetailsEmailForm = ({
 
   const updateEmail = async (email: string) => {
     try {
+      if (email === currentUser.email) {
+        toggleBottomSheet();
+        return;
+      }
+
       const { issuer } = await requestUpdateContact({
         locale: intl.locale,
         email,
