@@ -1,4 +1,4 @@
-import { and, eq, inArray, sql } from 'drizzle-orm';
+import { and, eq, inArray, isNull, sql } from 'drizzle-orm';
 import { CoverTemplatePreviewTable } from '#coverTemplatePreview';
 import db, { cols } from './db';
 import { createId } from './helpers/createId';
@@ -106,12 +106,13 @@ export const getCoverTemplatesByTypesAndTag = async (
         eq(CoverTemplateTable.id, CoverTemplatePreviewTable.coverTemplateId),
         companyActivityId
           ? eq(CoverTemplatePreviewTable.companyActivityId, companyActivityId)
-          : undefined,
+          : isNull(CoverTemplatePreviewTable.companyActivityId),
       ),
     )
     .where(
       and(
         inArray(CoverTemplateTable.typeId, typeIds),
+        eq(CoverTemplateTable.enabled, true),
         tagIdJson ? sql`JSON_CONTAINS(tags, ${tagIdJson})` : undefined,
       ),
     );
