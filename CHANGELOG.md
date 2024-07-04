@@ -1,5 +1,6 @@
-## 0.5.19-canary.75
+## 0.5.19-canary.76
 
+* **fix:**  - **home:** [#4058](https://github.com/AzzappApp/azzapp/pull/4058) race issues between state and shared values ([#4084](https://github.com/AzzappApp/azzapp/pull/4084))
 * **fix:**  - 🐛 add option to block cut video size ([#4075](https://github.com/AzzappApp/azzapp/pull/4075))
 * **fix:**  - font scaling on animated text input ([#4079](https://github.com/AzzappApp/azzapp/pull/4079))
 * **feat:**  - increase max size font cover ([#4076](https://github.com/AzzappApp/azzapp/pull/4076))
