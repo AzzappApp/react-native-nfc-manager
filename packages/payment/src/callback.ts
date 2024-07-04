@@ -1,5 +1,10 @@
 import { eq, and } from 'drizzle-orm';
-import { createPayment, db, UserSubscriptionTable } from '@azzapp/data';
+import {
+  createPayment,
+  db,
+  updateWebCard,
+  UserSubscriptionTable,
+} from '@azzapp/data';
 import { PaymentMeanTable } from '@azzapp/data/paymentMeans';
 import { login } from '#authent';
 import client from './client';
@@ -109,6 +114,8 @@ export const acknowledgeFirstPayment = async (
           .update(UserSubscriptionTable)
           .set(updates)
           .where(eq(UserSubscriptionTable.paymentMeanId, paymentMeanId));
+
+        await updateWebCard(webCardId, { isMultiUser: true }, tx);
 
         await createPayment(
           {

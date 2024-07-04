@@ -8,7 +8,6 @@ import {
   getPaymentById,
   getSubscriptionById,
   getUserSubscriptionForWebCard,
-  updateWebCard,
 } from '@azzapp/data';
 import { createId } from '@azzapp/data/helpers/createId';
 import { login } from '#authent';
@@ -217,8 +216,6 @@ export const createPaymentRequest = async ({
       },
       trx,
     );
-
-    await updateWebCard(webCardId, { isMultiUser: true });
   });
 
   return {
@@ -325,11 +322,8 @@ export const createSubscriptionRequest = async ({
     freeSeats: 0,
     lastPaymentError: false,
   };
-  const id = await db.transaction(async trx => {
-    const id = await createSubscription(subscription, trx);
-    await updateWebCard(webCardId, { isMultiUser: true });
-    return id;
-  });
+
+  const id = await createSubscription(subscription);
 
   return { ...subscription, id };
 };
