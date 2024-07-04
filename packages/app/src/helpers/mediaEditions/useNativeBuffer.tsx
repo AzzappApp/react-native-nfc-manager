@@ -5,14 +5,14 @@ import NativeBufferLoader from './NativeBufferLoader';
 const useNativeBuffer = ({
   uri,
   kind,
-  maxVideoThumbnailSize,
+  maxSize,
   time = 0,
   onLoad,
   onError,
 }: {
   uri: string | null | undefined;
   kind: 'image' | 'video' | null | undefined;
-  maxVideoThumbnailSize?: { width: number; height: number } | null | undefined;
+  maxSize?: { width: number; height: number } | null | undefined;
   time?: number | null | undefined;
   onLoad?: () => void;
   onError?: (error?: Error) => void;
@@ -27,12 +27,8 @@ const useNativeBuffer = ({
     if (uri && kind) {
       const { key, promise } =
         kind === 'image'
-          ? { key: uri, promise: NativeBufferLoader.loadImage(uri) }
-          : NativeBufferLoader.loadVideoThumbnail(
-              uri,
-              time ?? 0,
-              maxVideoThumbnailSize,
-            );
+          ? NativeBufferLoader.loadImage(uri, maxSize)
+          : NativeBufferLoader.loadVideoThumbnail(uri, time ?? 0, maxSize);
       promise.then(
         image => {
           if (canceled) {
@@ -57,7 +53,7 @@ const useNativeBuffer = ({
         NativeBufferLoader.unref(refKey);
       }
     };
-  }, [uri, kind, time, onLoadInner, onErrorInner, maxVideoThumbnailSize]);
+  }, [uri, kind, time, onLoadInner, onErrorInner, maxSize]);
 
   return image;
 };

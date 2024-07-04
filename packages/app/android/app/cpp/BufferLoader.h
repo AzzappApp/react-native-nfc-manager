@@ -20,7 +20,7 @@ public:
   static jni::local_ref<JBufferLoader> create(jlong bufferLoader);
   static void registerNatives();
 
-  std::string loadImage(std::string uri);
+  std::string loadImage(std::string uri, double width, double height);
   std::string loadVideoFrame(std::string uri, double width, double height, double time);
   void releaseBuffer(std::string bufferId);
 

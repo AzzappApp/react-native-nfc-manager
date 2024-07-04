@@ -1952,7 +1952,7 @@ SPEC CHECKSUMS:
   ExpoSensors: 3bc12e5186b94703464d1554ce5ebfff05f91093
   FBLazyVector: 7e977dd099937dc5458851233141583abba49ff2
   fmt: 4c2741a687cc09f0634a2e2c72a838b99f1ff120
-  glog: fdfdfe5479092de0c4bdbebedd9056951f092c4f
+  glog: c5d68082e772fa1c511173d6b30a9de2c05a69a2
   hermes-engine: 1f547997900dd0752dc0cc0ae6dd16173c49e09b
   libavif: 84bbb62fb232c3018d6f1bab79beea87e35de7b7
   libdav1d: 23581a4d8ec811ff171ed5e2e05cd27bad64c39f

@@ -276,6 +276,7 @@ const CoverEditorCore = (
   }, [coverEditorState, dispatch]);
   // #endregion
 
+  const imageRefKeys = useRef<Record<string, string>>({});
   // #region Resources loading
   useEffect(() => {
     let canceled = false;
@@ -339,17 +340,18 @@ const CoverEditorCore = (
     }
     if (imagesToLoad.length > 0) {
       promises.push(
-        ...imagesToLoad.map(uri =>
-          NativeBufferLoader.loadImage(uri).then(buffer => {
-            if (canceled) {
-              return;
-            }
-            images = {
-              ...images,
-              [uri]: buffer,
-            };
-          }),
-        ),
+        ...imagesToLoad.map(async uri => {
+          const { key, promise } = NativeBufferLoader.loadImage(uri);
+          const buffer = await promise;
+          if (canceled) {
+            return;
+          }
+          images = {
+            ...images,
+            [uri]: buffer,
+          };
+          imageRefKeys.current[uri] = key;
+        }),
       );
     }
     if (videoToLoad.length > 0) {
@@ -411,16 +413,16 @@ const CoverEditorCore = (
   ]);
 
   useEffect(() => {
+    const keys = imageRefKeys.current;
     Object.keys(coverEditorState.images).forEach(uri => {
-      NativeBufferLoader.ref(uri);
+      NativeBufferLoader.ref(keys[uri]);
     });
     return () => {
       Object.keys(coverEditorState.images).forEach(uri => {
-        NativeBufferLoader.unref(uri);
+        NativeBufferLoader.unref(keys[uri]);
       });
     };
   }, [coverEditorState.images]);
-
   // #endregion
 
   // #region Saving

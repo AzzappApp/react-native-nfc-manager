@@ -51,16 +51,23 @@ jsi::Value BufferLoaderHostObject::get(jsi::Runtime& runtime,
 
   if (propName == "loadImage") {
     return jsi::Function::createFromHostFunction(
-      runtime, jsi::PropNameID::forAscii(runtime, "loadImage"), 2,
+      runtime, jsi::PropNameID::forAscii(runtime, "loadImage"), 3,
       [this](jsi::Runtime &runtime, const jsi::Value &thisValue,
           const jsi::Value *arguments, size_t count) -> jsi::Value {
         NSString* url = [NSString stringWithUTF8String:arguments[0]
                                                       .asString(runtime)
                                                       .utf8(runtime)
                                                       .c_str()];
-        auto callback = std::make_shared<jsi::Function>(arguments[1].asObject(runtime).asFunction(runtime));
+        CGSize maxSize = CGSizeZero;
+        if (arguments[1].isObject()) {
+          auto size = arguments[1].asObject(runtime);
+          maxSize.width = size.getProperty(runtime, "width").asNumber();
+          maxSize.height = size.getProperty(runtime, "height").asNumber();
+        }
+        auto callback = std::make_shared<jsi::Function>(arguments[2].asObject(runtime).asFunction(runtime));
         [AZPCIImageLoader
           loadImageWithUrl:url
+          maxSize: maxSize
           onSuccess:^(CIImage* _Nonnull ciImage) {
               
             CVPixelBufferRef pixelBuffer;
@@ -99,7 +106,7 @@ jsi::Value BufferLoaderHostObject::get(jsi::Runtime& runtime,
                                                       .utf8(runtime)
                                                       .c_str()];
         double time = arguments[1].asNumber();
-        CGSize maxSize;
+        CGSize maxSize = CGSizeZero;
         if (arguments[2].isObject()) {
           auto size = arguments[2].asObject(runtime);
           maxSize.width = size.getProperty(runtime, "width").asNumber();

@@ -32,8 +32,8 @@ public class BufferLoader {
     this.bufferLoaderPtr = bufferLoaderPtr;
   }
 
-  public String loadImage(String uri) {
-    return enqueueTask(() ->
+  public String loadImage(String uri, double width, double height) {
+    return enqueueTask(width, height, () ->
       Glide
         .with(MainApplication.Companion.getMainApplicationContext())
         .asBitmap()
@@ -44,7 +44,7 @@ public class BufferLoader {
   }
 
   public String loadVideoFrame(String uriStr, double width, double height, double time) {
-    return enqueueTask(() -> {
+    return enqueueTask(width, height, () -> {
       Uri uri = Uri.parse(uriStr);
       if (uri == null) {
         throw new IOException("Invalid url");
@@ -56,15 +56,6 @@ public class BufferLoader {
         retriever.setDataSource(uri.toString(), new HashMap<>());
       }
       Bitmap bitmap = retriever.getFrameAtTime(Math.round(time * 1000000));
-      if (width != 0 && height != 0 && bitmap != null &&
-        (bitmap.getWidth() > width || bitmap.getHeight() > height)) {
-        double aspectRatio = (double) bitmap.getWidth() / bitmap.getHeight();
-        if (aspectRatio > width / height) {
-          bitmap = Bitmap.createScaledBitmap(bitmap, (int) width, (int) (width / aspectRatio), true);
-        } else {
-          bitmap = Bitmap.createScaledBitmap(bitmap, (int) (height * aspectRatio), (int) height, true);
-        }
-      }
       retriever.release();
       return bitmap;
     });
@@ -86,7 +77,7 @@ public class BufferLoader {
     bufferResources.remove(bufferId);
   }
 
-  private String enqueueTask(BitmapLoader loader) {
+  private String enqueueTask(double width, double height, BitmapLoader loader) {
     String taskId = UUID.randomUUID().toString();
     executorService.execute(() -> {
       Bitmap bitmap = null;
@@ -98,6 +89,15 @@ public class BufferLoader {
       if (bitmap == null) {
         postTaskResult(bufferLoaderPtr, taskId, null, "Failed to retrieve bitmap");
         return;
+      }
+      if (width != 0 && height != 0 && bitmap != null &&
+        (bitmap.getWidth() > width || bitmap.getHeight() > height)) {
+        double aspectRatio = (double) bitmap.getWidth() / bitmap.getHeight();
+        if (aspectRatio > width / height) {
+          bitmap = Bitmap.createScaledBitmap(bitmap, (int) width, (int) (width / aspectRatio), true);
+        } else {
+          bitmap = Bitmap.createScaledBitmap(bitmap, (int) (height * aspectRatio), (int) height, true);
+        }
       }
       ImageReader imageReader;
       if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {

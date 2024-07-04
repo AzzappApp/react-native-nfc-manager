@@ -304,7 +304,7 @@ const _ImagePickerContextProvider = (
     uri: media?.uri,
     kind: media?.kind,
     time: timeRange?.startTime,
-    maxVideoThumbnailSize: MAX_VIDEO_THUMBNAIL_SIZE,
+    maxSize: media?.kind === 'video' ? MAX_VIDEO_THUMBNAIL_SIZE : null,
   });
 
   const skImage = useDerivedValue(() => {

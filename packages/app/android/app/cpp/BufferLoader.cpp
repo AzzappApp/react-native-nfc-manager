@@ -17,10 +17,10 @@ void JBufferLoader::registerNatives() {
       {makeNativeMethod("postTaskResult", JBufferLoader::postTaskResult)});
 }
 
-std::string JBufferLoader::loadImage(std::string uri) {
+std::string JBufferLoader::loadImage(std::string uri, double width, double height) {
   static const auto loadImageMethod =
-      getClass()->getMethod<jstring (std::string)>("loadImage");
-  return loadImageMethod(self(), uri)->toStdString();
+      getClass()->getMethod<jstring (std::string, jdouble, jdouble)>("loadImage");
+  return loadImageMethod(self(), uri, width, height)->toStdString();
 }
 
 std::string JBufferLoader::loadVideoFrame(std::string uri, double width, double height, double time) {
@@ -70,12 +70,18 @@ jsi::Value BufferLoaderHostObject::get(jsi::Runtime& runtime,
         runtime, jsi::PropNameID::forAscii(runtime, "loadImage"), 2,
         [this](jsi::Runtime &runtime, const jsi::Value &thisValue,
                const jsi::Value *arguments, size_t count) -> jsi::Value {
-
           auto uri = arguments[0].asString(runtime).utf8(runtime);
+          double width = 0;
+          double height = 0;
+          if (arguments[1].isObject()) {
+            auto size = arguments[1].asObject(runtime);
+            width = size.getProperty(runtime, "width").asNumber();
+            height = size.getProperty(runtime, "height").asNumber();
+          }
           auto callback = std::make_shared<jsi::Function>(
-              arguments[1].asObject(runtime).asFunction(runtime));
+              arguments[2].asObject(runtime).asFunction(runtime));
 
-          auto taskId = jbufferLoader->loadImage(uri);
+          auto taskId = jbufferLoader->loadImage(uri, width, height);
           tasks[taskId] = callback;
 
           return jsi::Value::undefined();
@@ -96,7 +102,6 @@ jsi::Value BufferLoaderHostObject::get(jsi::Runtime& runtime,
           }
           auto callback = std::make_shared<jsi::Function>(
               arguments[3].asObject(runtime).asFunction(runtime));
-
 
           auto taskId = jbufferLoader->loadVideoFrame(uri, width, height, time);
           tasks[taskId] = callback;

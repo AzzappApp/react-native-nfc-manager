@@ -28,6 +28,12 @@ private:
 
 
 @interface AZPCIImageLoader : NSObject
-+ (void)loadImageWithUrl:(NSString * _Nonnull)url onSuccess:(void (^ _Nonnull)(CIImage * _Nonnull))onSuccess onError:(void (^ _Nonnull)(NSError * _Nullable))onError;
-+ (void)loadVideoThumbnailWithUrl:(NSString * _Nonnull)url time:(CMTime)time maxSize:(CGSize)size onSuccess:(void (^ _Nonnull)(CIImage * _Nonnull))onSuccess onError:(void (^ _Nonnull)(NSError * _Nullable))onError;
++ (void)loadImageWithUrl:(NSString * _Nonnull)url 
+  maxSize:(CGSize)size 
+  onSuccess:(void (^ _Nonnull)(CIImage * _Nonnull))onSuccess 
+  onError:(void (^ _Nonnull)(NSError * _Nullable))onError;
++ (void)loadVideoThumbnailWithUrl:(NSString * _Nonnull)url 
+  time:(CMTime)time maxSize:(CGSize)size 
+  onSuccess:(void (^ _Nonnull)(CIImage * _Nonnull))onSuccess 
+  onError:(void (^ _Nonnull)(NSError * _Nullable))onError;
 @end

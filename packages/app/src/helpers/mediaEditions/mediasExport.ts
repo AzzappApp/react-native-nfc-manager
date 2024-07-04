@@ -44,16 +44,14 @@ export const saveTransformedImageToFile = async ({
   filter?: Filter | null;
   editionParameters?: EditionParameters | null;
 }) => {
-  const sourceImage = createImageFromNativeBuffer(
-    await NativeBufferLoader.loadImage(uri),
-    true,
-  );
+  const { key, promise } = NativeBufferLoader.loadImage(uri);
+  const sourceImage = createImageFromNativeBuffer(await promise, true);
   if (!sourceImage) {
     throw new Error('Image not found');
   }
-  NativeBufferLoader.ref(uri);
+  NativeBufferLoader.ref(key);
   if (!sourceImage) {
-    NativeBufferLoader.unref(uri);
+    NativeBufferLoader.unref(key);
     throw new Error('Image not found');
   }
   const lutShader = filter ? await getLutShader(filter) : null;
