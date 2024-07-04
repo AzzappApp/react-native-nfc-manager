@@ -67,14 +67,14 @@ const HomeBackground = ({ user: userKey }: HomeBackgroundProps) => {
         convertToRGBA(
           interpolateColor(
             currentIndexSharedValue.value,
-            inputRange,
+            inputRange.value,
             primaryColors,
           ),
         ),
         convertToRGBA(
           interpolateColor(
             currentIndexSharedValue.value,
-            inputRange,
+            inputRange.value,
             darkColors,
           ),
         ),

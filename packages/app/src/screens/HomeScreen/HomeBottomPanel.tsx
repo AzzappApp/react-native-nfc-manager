@@ -1,4 +1,4 @@
-import { useState, useMemo, memo } from 'react';
+import { useState, memo } from 'react';
 import { Dimensions, StyleSheet, View } from 'react-native';
 import Animated, {
   interpolate,
@@ -70,8 +70,7 @@ const HomeBottomPanel = ({ user: userKey }: HomeBottomPanelProps) => {
   const inputRange = useHomeScreenInputProfileRange(profiles ?? []);
   //#endregion
 
-  const bottomPanelVisible = useMemo(() => {
-    'worklet';
+  const bottomPanelVisible = useDerivedValue(() => {
     const res =
       profiles?.map(profile => {
         if (!profile) return 0;
@@ -86,24 +85,23 @@ const HomeBottomPanel = ({ user: userKey }: HomeBottomPanelProps) => {
   }, [profiles]);
 
   const mainTabBarVisible = useDerivedValue(() => {
-    if (inputRange.length > 1) {
+    if (inputRange.value.length > 1) {
       return Math.pow(
         interpolate(
           currentIndexSharedValue.value,
-          inputRange,
-          bottomPanelVisible,
+          inputRange.value,
+          bottomPanelVisible.value,
         ),
         3,
       );
     } else {
       //use a fixed value is only one profile
-      return bottomPanelVisible[0];
+      return bottomPanelVisible.value[0];
     }
-  }, [bottomPanelVisible, currentIndexSharedValue.value, inputRange]);
+  });
 
   const bottomPanelStyle = useAnimatedStyle(() => {
-    'worklet';
-    if (inputRange.length === 0)
+    if (inputRange.value.length === 0)
       return { opacity: 1, pointerEvents: 'box-none' };
 
     return {

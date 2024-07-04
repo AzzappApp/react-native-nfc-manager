@@ -270,7 +270,7 @@ const CameraView = (
             photo={photo}
             video={video}
             audio={hasMicrophonePermission}
-            outputOrientation="portrait"
+            outputOrientation="preview"
             exposure={0}
             photoQualityBalance={
               Platform.OS === 'android' ? 'speed' : 'balanced'

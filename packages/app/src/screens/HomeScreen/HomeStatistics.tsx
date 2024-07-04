@@ -20,7 +20,10 @@ import {
 } from '#helpers/createStyles';
 import Text from '#ui/Text';
 import { format } from './HomeInformations';
-import { useHomeScreenCurrentIndex } from './HomeScreenContext';
+import {
+  useHomeScreenCurrentIndex,
+  useHomeScreenInputProfileRange,
+} from './HomeScreenContext';
 import HomeStatisticsChart from './HomeStatisticsChart';
 import type { HomeStatistics_profiles$key } from '#relayArtifacts/HomeStatistics_profiles.graphql';
 
@@ -72,12 +75,7 @@ const HomeStatistics = ({
     scrollIndexOffset.value = event.contentOffset.x / BOX_NUMBER_WIDTH;
   });
   // cant use the context until we are splitting this screen from the multiuser
-  // const inputRange = useHomeScreenInputProfileRange();
-  const inputRange = useMemo(
-    () => [0, ...(profiles?.map((_, index) => index + 1) ?? [])],
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [profiles?.length],
-  );
+  const inputRange = useHomeScreenInputProfileRange(profiles);
 
   const likes = useMemo(
     () => profiles?.map(profile => profile.webCard.nbLikes) ?? [],
@@ -112,19 +110,23 @@ const HomeStatistics = ({
     actual => {
       if (profiles && profiles?.length > 1 && actual >= 0) {
         totalLikes.value = format(
-          interpolate(currentProfileIndexSharedValue.value, inputRange, likes),
+          interpolate(
+            currentProfileIndexSharedValue.value,
+            inputRange.value,
+            likes,
+          ),
         );
         totalScans.value = format(
           interpolate(
             currentProfileIndexSharedValue.value,
-            inputRange,
+            inputRange.value,
             contactCardScans,
           ),
         );
         totalViews.value = format(
           interpolate(
             currentProfileIndexSharedValue.value,
-            inputRange,
+            inputRange.value,
             webCardViews,
           ),
         );

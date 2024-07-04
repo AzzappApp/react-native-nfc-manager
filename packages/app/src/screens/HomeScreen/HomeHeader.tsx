@@ -58,8 +58,12 @@ const HomeHeader = ({ openPanel, user: userKey }: HomeHeaderProps) => {
   );
   const colorValue = useDerivedValue<ColorValue>(() => {
     const currentProfileIndex = currentIndexSharedValue.value;
-    if (inputRange.length > 1) {
-      return interpolateColor(currentProfileIndex, inputRange, readableColors);
+    if (inputRange.value.length > 1) {
+      return interpolateColor(
+        currentProfileIndex,
+        inputRange.value,
+        readableColors,
+      );
     }
     if (readableColors.length > 0) {
       return readableColors[0];

@@ -110,14 +110,18 @@ const HomeInformations = ({ height, user }: HomeInformationsProps) => {
   useAnimatedReaction(
     () => currentIndexSharedValue.value,
     actual => {
-      if (actual >= 0 && inputRange && inputRange.length > 1) {
-        nbLikes.value = format(interpolate(actual, inputRange, nbLikesValue));
-        nbPosts.value = format(interpolate(actual, inputRange, nbPostsValue));
+      if (actual >= 0 && inputRange && inputRange.value.length > 1) {
+        nbLikes.value = format(
+          interpolate(actual, inputRange.value, nbLikesValue),
+        );
+        nbPosts.value = format(
+          interpolate(actual, inputRange.value, nbPostsValue),
+        );
         nbFollowers.value = format(
-          interpolate(actual, inputRange, nbFollowersValue),
+          interpolate(actual, inputRange.value, nbFollowersValue),
         );
         nbFollowings.value = format(
-          interpolate(actual, inputRange, nbFollowingsValue),
+          interpolate(actual, inputRange.value, nbFollowingsValue),
         );
       } else if (actual >= 0) {
         nbPosts.value = format(nbPostsValue[actual]);

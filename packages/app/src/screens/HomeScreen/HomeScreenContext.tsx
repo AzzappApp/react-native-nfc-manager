@@ -212,9 +212,9 @@ export const useHomeScreenContext = () => {
 export const useHomeScreenInputProfileRange = (
   profiles: readonly unknown[],
 ) => {
-  const inputRange = useMemo(
+  const inputRange = useDerivedValue(
     () => Array.from({ length: (profiles?.length ?? 0) + 1 }, (_, i) => i),
-    [profiles],
+    [profiles?.length],
   );
 
   return inputRange;
