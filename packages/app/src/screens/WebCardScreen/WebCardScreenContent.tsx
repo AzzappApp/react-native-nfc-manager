@@ -1,5 +1,5 @@
 import { Suspense, memo, useCallback, useRef, useState } from 'react';
-import { useWindowDimensions, View } from 'react-native';
+import { useWindowDimensions, View, StyleSheet } from 'react-native';
 import Animated, { useAnimatedStyle } from 'react-native-reanimated';
 import Toast from 'react-native-toast-message';
 import { graphql, useFragment } from 'react-relay';
@@ -309,7 +309,7 @@ const WebCardScreenContent = ({
 
   return (
     <>
-      <View style={{ flex: 1 }}>
+      <View style={styles.flex}>
         <WebCardScreenHeader
           editing={editing}
           nbSelectedModules={nbSelectedModules}
@@ -401,19 +401,7 @@ const WebCardScreenContent = ({
             onToggleVisibility={onToggleSelectedModulesVisibility}
           />
         </Suspense>
-        <Animated.View
-          style={[
-            {
-              position: 'absolute',
-              top: 0,
-              left: 0,
-              width: '100%',
-              height: '100%',
-              zIndex: -1,
-            },
-            backgroundStyle,
-          ]}
-        >
+        <Animated.View style={[styles.background, backgroundStyle]}>
           <Suspense
             fallback={
               <View
@@ -424,7 +412,7 @@ const WebCardScreenContent = ({
               />
             }
           >
-            <WebCardBackground webCard={webCard} style={{ flex: 1 }} />
+            <WebCardBackground webCard={webCard} style={styles.flex} />
           </Suspense>
         </Animated.View>
       </View>
@@ -463,5 +451,19 @@ const WebCardScreenContent = ({
     </>
   );
 };
+
+const styles = StyleSheet.create({
+  flex: {
+    flex: 1,
+  },
+  background: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    width: '100%',
+    height: '100%',
+    zIndex: -1,
+  },
+});
 
 export default memo(WebCardScreenContent);
