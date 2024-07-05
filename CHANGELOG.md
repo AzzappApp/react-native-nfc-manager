@@ -1,5 +1,6 @@
-## 0.5.19-canary.82
+## 0.5.19-canary.83
 
+* **fix:**  - subscription limit details ([#4095](https://github.com/AzzappApp/azzapp/pull/4095))
 * **fix:**  - **multiUser:** [#3703](https://github.com/AzzappApp/azzapp/pull/3703) allow users to switch off multi user flag ([#4098](https://github.com/AzzappApp/azzapp/pull/4098))
 * **fix:**  - **webCard:** [#3995](https://github.com/AzzappApp/azzapp/pull/3995) add loading indicator on cover ([#4017](https://github.com/AzzappApp/azzapp/pull/4017))
 * **fix:**  - **account:** [#3764](https://github.com/AzzappApp/azzapp/pull/3764) don’t validate when no change is made ([#4090](https://github.com/AzzappApp/azzapp/pull/4090))
