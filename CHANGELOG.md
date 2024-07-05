@@ -1,5 +1,6 @@
-## 0.5.19-canary.80
+## 0.5.19-canary.81
 
+* **fix:**  - **webCard:** [#3995](https://github.com/AzzappApp/azzapp/pull/3995) add loading indicator on cover ([#4017](https://github.com/AzzappApp/azzapp/pull/4017))
 * **fix:**  - **account:** [#3764](https://github.com/AzzappApp/azzapp/pull/3764) don’t validate when no change is made ([#4090](https://github.com/AzzappApp/azzapp/pull/4090))
 * **fix:**  - **android:** [#2950](https://github.com/AzzappApp/azzapp/pull/2950) useWindowDimension to have a better display on samsung with zoom ([#4093](https://github.com/AzzappApp/azzapp/pull/4093))
 * **fix:**  - **home:** [#4031](https://github.com/AzzappApp/azzapp/pull/4031) simplify bottom panel management ([#4081](https://github.com/AzzappApp/azzapp/pull/4081))
