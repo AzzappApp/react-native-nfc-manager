@@ -4,7 +4,6 @@ import {
   ProfileTable,
   db,
   getActiveUserSubscriptionForWebCard,
-  getActiveWebCardSubscription,
   updateWebCard,
 } from '@azzapp/data';
 import ERRORS from '@azzapp/shared/errors';
@@ -31,11 +30,6 @@ const updateMultiUser: MutationResolvers['updateMultiUser'] = async (
 
     if (!subscription) {
       throw new GraphQLError(ERRORS.SUBSCRIPTION_REQUIRED);
-    }
-  } else {
-    const subscription = await getActiveWebCardSubscription(webCardId);
-    if (!isMultiUser && subscription) {
-      throw new GraphQLError(ERRORS.SUBSCRIPTION_IS_ACTIVE);
     }
   }
 

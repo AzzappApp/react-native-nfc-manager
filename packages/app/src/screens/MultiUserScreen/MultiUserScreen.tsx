@@ -23,7 +23,6 @@ import {
 import PremiumIndicator from '#components/PremiumIndicator';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import relayScreen, { RelayScreenErrorBoundary } from '#helpers/relayScreen';
-import { useIsSubscriber } from '#helpers/SubscriptionContext';
 import useHandleProfileActionError from '#hooks/useHandleProfileError';
 import useToggle from '#hooks/useToggle';
 import Button from '#ui/Button';
@@ -79,31 +78,19 @@ const multiUserScreenQuery = graphql`
         }
       }
     }
-    currentUser {
-      userSubscription {
-        availableSeats
-        totalSeats
-        endAt
-      }
-    }
   }
 `;
 
 const MultiUserScreen = ({
   preloadedQuery,
 }: RelayScreenProps<MultiUserRoute, MultiUserScreenQuery>) => {
-  const { node, currentUser } = usePreloadedQuery(
-    multiUserScreenQuery,
-    preloadedQuery,
-  );
+  const { node } = usePreloadedQuery(multiUserScreenQuery, preloadedQuery);
   const profile = node?.profile;
 
   const intl = useIntl();
   const router = useRouter();
 
   const styles = useStyleSheet(styleSheet);
-  const isMultiUserSubscription = currentUser?.userSubscription != null;
-  const hasActiveSubscription = useIsSubscriber();
 
   useEffect(() => {
     // users that loose their admin role should not be able to access this screen
@@ -203,10 +190,10 @@ const MultiUserScreen = ({
   const toggleMultiUser = useCallback(
     (value: boolean) => {
       if (
-        !currentUser?.userSubscription &&
-        hasActiveSubscription &&
-        (node?.profile?.webCard.subscription?.status !== 'active' ||
-          node?.profile?.webCard.subscription?.endAt < new Date())
+        !profile?.webCard.isPremium &&
+        profile?.webCard.subscription &&
+        (profile?.webCard.subscription?.status !== 'active' ||
+          profile?.webCard.subscription?.endAt < new Date())
       ) {
         Toast.show({
           type: 'error',
@@ -222,7 +209,7 @@ const MultiUserScreen = ({
         });
         return;
       }
-      if (!isMultiUserSubscription && value) {
+      if (!profile?.webCard.isPremium && value) {
         router.push({ route: 'USER_PAY_WALL' });
         return;
       }
@@ -233,11 +220,8 @@ const MultiUserScreen = ({
       }
     },
     [
-      currentUser?.userSubscription,
-      hasActiveSubscription,
-      node?.profile?.webCard.subscription?.status,
-      node?.profile?.webCard.subscription?.endAt,
-      isMultiUserSubscription,
+      profile?.webCard.isPremium,
+      profile?.webCard.subscription,
       intl,
       router,
       setAllowMultiUser,
