@@ -354,6 +354,7 @@ export type GetActiveSubscriptionResult = {
         issuer: 'android' | 'ios' | 'web';
         startAt: Date;
         endAt: Date;
+        totalSeats: number;
       }
     | null
     | undefined;

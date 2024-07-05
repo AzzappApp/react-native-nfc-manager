@@ -34,4 +34,9 @@ export const User: UserResolvers = {
 
     return subscriptions.find(sub => sub.webCardId === null) ?? null;
   },
+  isPremium: async (user, _, { loaders }) => {
+    const subscription = await loaders.activeSubscriptionsLoader.load(user.id);
+
+    return !!subscription?.length;
+  },
 };

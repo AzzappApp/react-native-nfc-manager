@@ -11,7 +11,7 @@ import {
   SIMPLE_TEXT_STYLE_VALUES,
   SIMPLE_TITLE_STYLE_VALUES,
 } from '@azzapp/shared/cardModuleHelpers';
-import { addingModuleRequireSubscription } from '@azzapp/shared/subscriptionHelpers';
+import { changeModuleRequireSubscription } from '@azzapp/shared/subscriptionHelpers';
 import { useRouter } from '#components/NativeRouter';
 import useEditorLayout from '#hooks/useEditorLayout';
 import useHandleProfileActionError from '#hooks/useHandleProfileError';
@@ -294,9 +294,9 @@ const SimpleTextEditionScreen = ({
       return;
     }
 
-    const requireSubscription = addingModuleRequireSubscription(
+    const requireSubscription = changeModuleRequireSubscription(
       moduleKind,
-      cardModulesCount,
+      cardModulesCount + (moduleData?.id ? 0 : 1),
     );
 
     if (

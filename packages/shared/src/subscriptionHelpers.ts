@@ -23,12 +23,12 @@ export const webCardRequiresSubscription = (
   );
 };
 
-export const addingModuleRequireSubscription = (
+export const changeModuleRequireSubscription = (
   kind: string,
   currentModuleCount: number,
 ) => {
   return (
     isModuleKindSubscription(kind) ||
-    moduleCountRequiresSubscription(currentModuleCount + 1)
+    moduleCountRequiresSubscription(currentModuleCount)
   );
 };

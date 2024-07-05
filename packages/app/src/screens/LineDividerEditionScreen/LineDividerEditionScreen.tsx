@@ -4,7 +4,7 @@ import { StyleSheet } from 'react-native';
 import { useSharedValue } from 'react-native-reanimated';
 import { graphql, useFragment, useMutation } from 'react-relay';
 import { LINE_DIVIDER_DEFAULT_VALUES } from '@azzapp/shared/cardModuleHelpers';
-import { addingModuleRequireSubscription } from '@azzapp/shared/subscriptionHelpers';
+import { changeModuleRequireSubscription } from '@azzapp/shared/subscriptionHelpers';
 import { useRouter } from '#components/NativeRouter';
 import WebCardColorPicker from '#components/WebCardColorPicker';
 import useEditorLayout from '#hooks/useEditorLayout';
@@ -191,9 +191,9 @@ const LineDividerEditionScreen = ({
       return;
     }
 
-    const requireSubscription = addingModuleRequireSubscription(
+    const requireSubscription = changeModuleRequireSubscription(
       'lineDivider',
-      cardModulesCount,
+      cardModulesCount + (lineDivider?.id ? 0 : 1),
     );
 
     if (webCard.cardIsPublished && requireSubscription && !webCard.isPremium) {

@@ -10,7 +10,7 @@ import {
   SIMPLE_BUTTON_STYLE_VALUES,
 } from '@azzapp/shared/cardModuleHelpers';
 import { isValidUrl, isPhoneNumber } from '@azzapp/shared/stringHelpers';
-import { addingModuleRequireSubscription } from '@azzapp/shared/subscriptionHelpers';
+import { changeModuleRequireSubscription } from '@azzapp/shared/subscriptionHelpers';
 import { useRouter } from '#components/NativeRouter';
 import useEditorLayout from '#hooks/useEditorLayout';
 import useHandleProfileActionError from '#hooks/useHandleProfileError';
@@ -313,9 +313,9 @@ const SimpleButtonEditionScreen = ({
       return;
     }
 
-    const requireSubscription = addingModuleRequireSubscription(
+    const requireSubscription = changeModuleRequireSubscription(
       'simpleButton',
-      cardModulesCount,
+      cardModulesCount + (simpleButton?.id ? 0 : 1),
     );
 
     if (

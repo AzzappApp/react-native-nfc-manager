@@ -12,7 +12,7 @@ import {
   CAROUSEL_STYLE_VALUES,
 } from '@azzapp/shared/cardModuleHelpers';
 import { combineMultiUploadProgresses } from '@azzapp/shared/networkHelpers';
-import { addingModuleRequireSubscription } from '@azzapp/shared/subscriptionHelpers';
+import { changeModuleRequireSubscription } from '@azzapp/shared/subscriptionHelpers';
 import ImagePicker from '#components/ImagePicker';
 import {
   useRouter,
@@ -328,9 +328,9 @@ const CarouselEditionScreen = ({
       return;
     }
 
-    const requireSubscription = addingModuleRequireSubscription(
+    const requireSubscription = changeModuleRequireSubscription(
       'carousel',
-      cardModulesCount,
+      cardModulesCount + (carousel?.id ? 0 : 1),
     );
 
     if (

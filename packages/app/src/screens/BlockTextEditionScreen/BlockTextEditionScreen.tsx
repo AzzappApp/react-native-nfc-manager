@@ -10,7 +10,7 @@ import {
   BLOCK_TEXT_MAX_LENGTH,
   BLOCK_TEXT_STYLE_VALUES,
 } from '@azzapp/shared/cardModuleHelpers';
-import { addingModuleRequireSubscription } from '@azzapp/shared/subscriptionHelpers';
+import { changeModuleRequireSubscription } from '@azzapp/shared/subscriptionHelpers';
 import { useRouter } from '#components/NativeRouter';
 import useEditorLayout from '#hooks/useEditorLayout';
 import useHandleProfileActionError from '#hooks/useHandleProfileError';
@@ -281,9 +281,9 @@ const BlockTextEditionScreen = ({
       return;
     }
 
-    const requireSubscription = addingModuleRequireSubscription(
+    const requireSubscription = changeModuleRequireSubscription(
       'blockText',
-      cardModulesCount,
+      cardModulesCount + (blockText?.id ? 0 : 1),
     );
 
     if (

@@ -11,7 +11,7 @@ import {
   HORIZONTAL_PHOTO_STYLE_VALUES,
   MODULE_IMAGE_MAX_WIDTH,
 } from '@azzapp/shared/cardModuleHelpers';
-import { addingModuleRequireSubscription } from '@azzapp/shared/subscriptionHelpers';
+import { changeModuleRequireSubscription } from '@azzapp/shared/subscriptionHelpers';
 import { CameraButton } from '#components/commonsButtons';
 import ImagePicker, {
   EditImageStep,
@@ -300,9 +300,9 @@ const HorizontalPhotoEditionScreen = ({
       return;
     }
 
-    const requireSubscription = addingModuleRequireSubscription(
+    const requireSubscription = changeModuleRequireSubscription(
       'horizontalPhoto',
-      cardModulesCount,
+      cardModulesCount + (horizontalPhoto?.id ? 0 : 1),
     );
 
     if (

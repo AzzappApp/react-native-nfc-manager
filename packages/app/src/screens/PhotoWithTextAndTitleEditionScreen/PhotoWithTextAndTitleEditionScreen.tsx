@@ -13,7 +13,7 @@ import {
   PHOTO_WITH_TEXT_AND_TITLE_TEXT_MAX_LENGTH,
 } from '@azzapp/shared/cardModuleHelpers';
 import { isNotFalsyString } from '@azzapp/shared/stringHelpers';
-import { addingModuleRequireSubscription } from '@azzapp/shared/subscriptionHelpers';
+import { changeModuleRequireSubscription } from '@azzapp/shared/subscriptionHelpers';
 import { colors } from '#theme';
 import ImagePicker, {
   EditImageStep,
@@ -405,9 +405,9 @@ const PhotoWithTextAndTitleEditionScreen = ({
       return;
     }
 
-    const requireSubscription = addingModuleRequireSubscription(
+    const requireSubscription = changeModuleRequireSubscription(
       'photoWithTextAndTitle',
-      cardModulesCount,
+      cardModulesCount + (photoWithTextAndTitle?.id ? 0 : 1),
     );
 
     if (

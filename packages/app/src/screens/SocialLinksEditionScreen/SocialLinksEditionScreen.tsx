@@ -8,7 +8,7 @@ import { graphql, useFragment, useMutation } from 'react-relay';
 import * as z from 'zod';
 import { SOCIAL_LINKS_DEFAULT_VALUES } from '@azzapp/shared/cardModuleHelpers';
 import { isValidUrl } from '@azzapp/shared/stringHelpers';
-import { addingModuleRequireSubscription } from '@azzapp/shared/subscriptionHelpers';
+import { changeModuleRequireSubscription } from '@azzapp/shared/subscriptionHelpers';
 import { useRouter } from '#components/NativeRouter';
 import useEditorLayout from '#hooks/useEditorLayout';
 import useHandleProfileActionError from '#hooks/useHandleProfileError';
@@ -258,9 +258,9 @@ const SocialLinksEditionScreen = ({
       return;
     }
 
-    const requireSubscription = addingModuleRequireSubscription(
+    const requireSubscription = changeModuleRequireSubscription(
       'socialLinks',
-      cardModulesCount,
+      cardModulesCount + (socialLinks?.id ? 0 : 1),
     );
 
     if (

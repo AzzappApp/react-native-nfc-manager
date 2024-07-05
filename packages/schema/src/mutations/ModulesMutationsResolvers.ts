@@ -25,7 +25,7 @@ import {
   MODULE_KIND_SOCIAL_LINKS,
 } from '@azzapp/shared/cardModuleHelpers';
 import ERRORS from '@azzapp/shared/errors';
-import { addingModuleRequireSubscription } from '@azzapp/shared/subscriptionHelpers';
+import { changeModuleRequireSubscription } from '@azzapp/shared/subscriptionHelpers';
 import fromGlobalIdWithType from '#helpers/relayIdHelpers';
 import type { MutationResolvers } from '#/__generated__/types';
 import type { GraphQLContext } from '#index';
@@ -67,7 +67,7 @@ const createModuleSavingMutation =
     const owner = await loaders.webCardOwners.load(webCard.id);
 
     if (
-      addingModuleRequireSubscription(moduleKind, moduleCount) &&
+      changeModuleRequireSubscription(moduleKind, moduleCount) &&
       webCard.cardIsPublished
     ) {
       const subscription = owner
