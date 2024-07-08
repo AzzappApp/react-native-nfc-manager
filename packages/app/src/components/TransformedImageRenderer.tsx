@@ -1,9 +1,5 @@
-import {
-  Canvas,
-  createPicture,
-  Picture,
-  Skia,
-} from '@shopify/react-native-skia';
+import { createPicture, Skia } from '@shopify/react-native-skia';
+import { PixelRatio, type ViewProps } from 'react-native';
 import { useDerivedValue, type DerivedValue } from 'react-native-reanimated';
 import { colors } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
@@ -13,9 +9,9 @@ import {
   useLutShader,
   type EditionParameters,
 } from '#helpers/mediaEditions';
+import SkiaAnimatedPictureView from '#ui/SkiaAnimatedPictureView';
 import type { Filter } from '@azzapp/shared/filtersHelper';
 import type { SkImage } from '@shopify/react-native-skia';
-import type { ViewProps } from 'react-native';
 
 export type TransformedImageRendererProps = Exclude<ViewProps, 'children'> & {
   image: DerivedValue<SkImage | null>;
@@ -35,6 +31,7 @@ const TransformedImageRenderer = ({
 }: TransformedImageRendererProps) => {
   const lutShader = useLutShader(filter);
 
+  const pixelRatio = PixelRatio.get();
   const picture = useDerivedValue(
     () =>
       createPicture(canvas => {
@@ -45,8 +42,8 @@ const TransformedImageRenderer = ({
         paint.setShader(
           transformImage({
             imageFrame: imageFrameFromImage(image.value),
-            width,
-            height,
+            width: width * pixelRatio,
+            height: height * pixelRatio,
             editionParameters,
             lutShader,
           }),
@@ -59,9 +56,13 @@ const TransformedImageRenderer = ({
   const styles = useStyleSheet(styleSheet);
 
   return (
-    <Canvas style={[{ width, height }, styles.picture, props.style]} {...props}>
-      <Picture picture={picture} />
-    </Canvas>
+    <SkiaAnimatedPictureView
+      picture={picture}
+      width={width}
+      height={height}
+      style={[styles.picture, props.style]}
+      {...props}
+    />
   );
 };
 

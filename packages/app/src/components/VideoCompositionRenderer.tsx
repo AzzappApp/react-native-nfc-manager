@@ -1,14 +1,14 @@
-import { Canvas, Skia } from '@shopify/react-native-skia';
-import { SkiaViewApi } from '@shopify/react-native-skia/lib/module/views/api';
-import { forwardRef, useCallback, useEffect, useMemo } from 'react';
+import { createPicture, Skia } from '@shopify/react-native-skia';
+import { useEffect, useMemo } from 'react';
 import { PixelRatio, type ViewProps } from 'react-native';
 import { useFrameCallback, useSharedValue } from 'react-native-reanimated';
 import { __RNSkiaVideoPrivateAPI } from '@azzapp/react-native-skia-video';
+import SkiaAnimatedPictureView from '#ui/SkiaAnimatedPictureView';
 import type {
   FrameDrawer,
   VideoComposition,
 } from '@azzapp/react-native-skia-video';
-import type { SkCanvas, SkiaDomView } from '@shopify/react-native-skia';
+import type { SkCanvas, SkPicture } from '@shopify/react-native-skia';
 
 export type VideoCompositionRendererProps = Exclude<ViewProps, 'children'> & {
   composition: VideoComposition | null;
@@ -24,7 +24,6 @@ const VideoCompositionRenderer = ({
   drawFrame,
   width,
   height,
-  style,
   ...props
 }: VideoCompositionRendererProps) => {
   const framesExtractor = useMemo(() => {
@@ -55,55 +54,40 @@ const VideoCompositionRenderer = ({
     }
   }, [framesExtractor, pause]);
 
-  const nativeId = useSharedValue<number | null>(null);
-  const skiaViewRef = useCallback(
-    (ref: SkiaDomView) => {
-      nativeId.value = ref?.nativeId;
-    },
-    [nativeId],
-  );
+  const picture = useSharedValue<SkPicture | null>(null);
   const pixelRatio = PixelRatio.get();
 
   useFrameCallback(() => {
     'worklet';
-    if (!nativeId.value) {
-      return;
-    }
-
-    try {
-      SkiaViewApi.callJsiMethod(
-        nativeId.value,
-        'renderToCanvas',
-        (canvas: SkCanvas) => {
-          canvas.clear(Skia.Color('#00000000'));
-          if (!composition || !framesExtractor) {
-            return;
-          }
-          const currentTime = framesExtractor.currentTime;
-          const frames = framesExtractor.decodeCompositionFrames();
-          drawFrame({
-            canvas,
-            width: width * pixelRatio,
-            height: height * pixelRatio,
-            currentTime,
-            frames,
-            videoComposition: composition,
-          });
-        },
-      );
-    } catch {
-      // sometimes the canvas is not ready yet
-    }
+    picture.value = createPicture(
+      (canvas: SkCanvas) => {
+        canvas.clear(Skia.Color('#00000000'));
+        if (!composition || !framesExtractor) {
+          return;
+        }
+        const currentTime = framesExtractor.currentTime;
+        const frames = framesExtractor.decodeCompositionFrames();
+        drawFrame({
+          canvas,
+          width: width * pixelRatio,
+          height: height * pixelRatio,
+          currentTime,
+          frames,
+          videoComposition: composition,
+        });
+      },
+      { width, height },
+    );
   }, true);
 
   return (
-    <Canvas
-      //@ts-expect-error - `ref` is not a valid prop for Canvas
-      ref={skiaViewRef}
-      style={[{ width, height }, style]}
+    <SkiaAnimatedPictureView
+      width={width}
+      height={height}
+      picture={picture}
       {...props}
     />
   );
 };
 
-export default forwardRef(VideoCompositionRenderer);
+export default VideoCompositionRenderer;

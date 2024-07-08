@@ -138,7 +138,7 @@ __metadata:
     "@reeq/react-native-passkit": ^0.1.3
     "@sentry/react-native": ^5.24.1
     "@shopify/flash-list": ^1.7.0
-    "@shopify/react-native-skia": ^1.3.3
+    "@shopify/react-native-skia": ^1.3.8
     "@testing-library/react-native": ^12.5.1
     "@types/chroma-js": ^2.4.4
     "@types/react": ^18.3.3
@@ -9306,9 +9306,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@shopify/react-native-skia@npm:1.3.3":
-  version: 1.3.3
-  resolution: "@shopify/react-native-skia@npm:1.3.3"
+"@shopify/react-native-skia@npm:^1.3.8":
+  version: 1.3.8
+  resolution: "@shopify/react-native-skia@npm:1.3.8"
   dependencies:
     canvaskit-wasm: 0.39.1
     react-reconciler: 0.27.0
@@ -9323,28 +9323,7 @@ __metadata:
       optional: true
   bin:
     setup-skia-web: scripts/setup-canvaskit.js
-  checksum: 91d3153a1a39b7392b6469f47007ad5b0046c43a96144cbcd6f2773cbd048dba79d0d4148e25298c9e86be07e2c92793c477c56992010435e3256393d3330cff
-  languageName: node
-  linkType: hard
-
-"@shopify/react-native-skia@patch:@shopify/react-native-skia@npm%3A1.3.3#./.yarn/patches/@shopify-react-native-skia-npm-1.3.3-0b443706cc.patch::locator=%40azzapp%2Fmonorepo%40workspace%3A.":
-  version: 1.3.3
-  resolution: "@shopify/react-native-skia@patch:@shopify/react-native-skia@npm%3A1.3.3#./.yarn/patches/@shopify-react-native-skia-npm-1.3.3-0b443706cc.patch::version=1.3.3&hash=626a32&locator=%40azzapp%2Fmonorepo%40workspace%3A."
-  dependencies:
-    canvaskit-wasm: 0.39.1
-    react-reconciler: 0.27.0
-  peerDependencies:
-    react: ">=18.0"
-    react-native: ">=0.64"
-    react-native-reanimated: ">=2.0.0"
-  peerDependenciesMeta:
-    react-native:
-      optional: true
-    react-native-reanimated:
-      optional: true
-  bin:
-    setup-skia-web: scripts/setup-canvaskit.js
-  checksum: 768e6c25996790ff0ec286d81f5c1e5a9d54532f0fc17dabad629941c0cac9ca2524b63998b144a7f0e9e986c906215b013de33799cbdc9b5497b3835d550fb1
+  checksum: 7bcce08c9d15f59f5f401cf01d37060d67de1338795c21de45678bdf90528152efb6a8050455515400a3c1c4080189aff5e73e1374fd491e7661c87bc235f806
   languageName: node
   linkType: hard
 
