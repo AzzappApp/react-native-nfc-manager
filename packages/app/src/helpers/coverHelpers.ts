@@ -32,13 +32,6 @@ const MAX_VIDEO_SIZE = MEMORY_SIZE < 8 ? 1280 : 1920;
 const MAX_IMAGE_SIZE =
   MEMORY_SIZE < 6 ? 1280 : MEMORY_SIZE < 8 ? 1920 : undefined;
 
-export const MAX_MEDIA_IMAGE_SIZE = MAX_IMAGE_SIZE
-  ? {
-      width: MAX_IMAGE_SIZE,
-      height: MAX_IMAGE_SIZE,
-    }
-  : undefined;
-
 export const MAX_EXPORT_DECODER_RESOLUTION = MAX_VIDEO_SIZE;
 
 export const MAX_DISPLAY_DECODER_RESOLUTION = Math.min(

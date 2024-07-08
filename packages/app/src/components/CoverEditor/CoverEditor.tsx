@@ -23,10 +23,7 @@ import {
 import { COVER_RATIO } from '@azzapp/shared/coverHelpers';
 import { colors } from '#theme';
 import { ScreenModal, preventModalDismiss } from '#components/NativeRouter';
-import {
-  calculateImageScale,
-  MAX_MEDIA_IMAGE_SIZE,
-} from '#helpers/coverHelpers';
+import { calculateImageScale } from '#helpers/coverHelpers';
 import { NativeBufferLoader, loadAllLUTShaders } from '#helpers/mediaEditions';
 import { getVideoLocalPath } from '#helpers/mediaHelpers';
 import useToggle from '#hooks/useToggle';
@@ -45,7 +42,7 @@ import CoverEditorToolbox from './CoverEditorToolbox';
 import CoverPreview from './CoverPreview';
 import useLottie from './useLottie';
 import useSaveCover from './useSaveCover';
-import type { Media } from '#helpers/mediaHelpers';
+import type { Media, MediaImage } from '#helpers/mediaHelpers';
 import type { CoverEditor_coverTemplate$key } from '#relayArtifacts/CoverEditor_coverTemplate.graphql';
 import type { CoverEditor_profile$key } from '#relayArtifacts/CoverEditor_profile.graphql';
 import type { CoverEditorAction } from './coverEditorActions';
@@ -161,6 +158,9 @@ const CoverEditorCore = (
   // Suspend
   const lottie = useLottie(coverTemplate?.lottie);
 
+  console.log('template');
+  console.log(placeholder);
+  console.log(coverTemplate?.data?.overlayLayers);
   // #region Store
   const [coverEditorState, dispatch] = useReducer<
     Reducer<CoverEditorState, CoverEditorAction>,
@@ -306,7 +306,7 @@ const CoverEditorCore = (
   useEffect(() => {
     let canceled = false;
     const abortController = new AbortController();
-    const imagesToLoad: string[] = [];
+    const imagesToLoad: MediaImage[] = [];
     const videoToLoad: string[] = [];
     const fontsToLoad: string[] = [];
     for (const mediaInfo of coverEditorState.medias) {
@@ -315,18 +315,16 @@ const CoverEditorCore = (
       } = mediaInfo;
       if (mediaInfoIsImage(mediaInfo)) {
         if (!coverEditorState.images[uri]) {
-          imagesToLoad.push(uri);
+          imagesToLoad.push(mediaInfo.media);
         }
       } else if (!coverEditorState.videoPaths[uri]) {
         videoToLoad.push(uri);
       }
     }
     for (const overlayLayer of coverEditorState.overlayLayers) {
-      const {
-        media: { uri },
-      } = overlayLayer;
-      if (!coverEditorState.images[uri]) {
-        imagesToLoad.push(uri);
+      const { media } = overlayLayer;
+      if (!coverEditorState.images[media.uri]) {
+        imagesToLoad.push(media);
       }
     }
 
@@ -341,7 +339,7 @@ const CoverEditorCore = (
     }
 
     const loadingRemoteMedia =
-      imagesToLoad.some(uri => uri.startsWith('http')) ||
+      imagesToLoad.some(({ uri }) => uri.startsWith('http')) ||
       videoToLoad.some(uri => uri.startsWith('http'));
     dispatch({
       type: 'LOADING_START',
@@ -364,13 +362,16 @@ const CoverEditorCore = (
       );
     }
 
+    const { imagesScales } = coverEditorState;
+
     if (imagesToLoad.length > 0) {
       promises.push(
-        ...imagesToLoad.map(async uri => {
-          const { key, promise } = NativeBufferLoader.loadImage(
-            uri,
-            MAX_MEDIA_IMAGE_SIZE,
-          );
+        ...imagesToLoad.map(async media => {
+          const scale = imagesScales[media.uri] ?? 1;
+          const { key, promise } = NativeBufferLoader.loadImage(media.uri, {
+            width: media.width * scale,
+            height: media.height * scale,
+          });
 
           const buffer = await promise;
           if (canceled) {
@@ -378,9 +379,9 @@ const CoverEditorCore = (
           }
           images = {
             ...images,
-            [uri]: buffer,
+            [media.uri]: buffer,
           };
-          imageRefKeys.current[uri] = key;
+          imageRefKeys.current[media.uri] = key;
         }),
       );
     }

@@ -92,7 +92,5 @@ export const clearShapshot = async (id: string): Promise<void> => {
   return AZPSnapshotModule.clearSnapshot(id);
 };
 
-console.log(NativeModules);
-
 const NativeSnapshotView: React.ComponentType<SnapshotViewProps> =
   requireNativeComponent('AZPSnapshot');

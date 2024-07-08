@@ -989,9 +989,7 @@ const CoverPreview = ({
   const currentScreenShot = useRef<string | null>(null);
   useModalInterceptor(async () => {
     let screenShotId: string | null;
-    console.log('modal interceptor');
     if (!compositionContainerRef.current) {
-      console.log('no ref');
       return;
     }
     try {
