@@ -1,4 +1,4 @@
-## 0.5.19-canary.86
+## 0.5.19-canary.87
 
 * **fix:**  - **CoverEditor:** don't filter existing media when filtering
 * **build:**  - don’t change shell scripts
