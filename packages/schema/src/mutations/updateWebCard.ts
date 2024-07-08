@@ -64,6 +64,8 @@ const updateWebCardMutation: MutationResolvers['updateWebCard'] = async (
         'CompanyActivity',
       );
       partialWebCard.companyActivityId = companyActivityId;
+    } else if (graphqlCompanyActivityId === null) {
+      partialWebCard.companyActivityId = null;
     }
 
     if (webCard.companyActivityId !== partialWebCard.companyActivityId) {

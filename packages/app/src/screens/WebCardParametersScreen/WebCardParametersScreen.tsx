@@ -300,7 +300,7 @@ const WebCardParametersScreen = ({
           input: {
             webCardCategoryId: webCardCategory.id,
             webCardKind: webCardCategory.webCardKind,
-            companyActivityId: undefined,
+            companyActivityId: null,
           },
         },
         onError: error => {
