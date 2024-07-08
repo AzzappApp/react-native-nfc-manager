@@ -1,6 +1,6 @@
 import { forwardRef, useCallback } from 'react';
 import { useIntl } from 'react-intl';
-import { ScrollView, StyleSheet, View } from 'react-native';
+import { ScrollView, Share, StyleSheet, View } from 'react-native';
 import ColorTriptychRenderer from '#components/ColorTriptychRenderer';
 import useToggle from '#hooks/useToggle';
 import { useCoverEditorContext } from '../CoverEditorContext';
@@ -25,10 +25,9 @@ const CoverEditorToolbox = (
   const [textModalVisible, toggleTextModalVisible] = useToggle();
   const [colorPickerVisible, toggleColorPickerVisible] = useToggle();
   const [showOverlayImagePicker, toggleOverlayImagePicker] = useToggle(false);
-  const {
-    coverEditorState: { editionMode, cardColors },
-    dispatch,
-  } = useCoverEditorContext();
+  const { coverEditorState, dispatch } = useCoverEditorContext();
+
+  const { editionMode, cardColors } = coverEditorState;
 
   const setCurrentEditionMode = useCallback(
     (mode: CoverEditionMode) => {
@@ -42,6 +41,21 @@ const CoverEditorToolbox = (
     },
     [dispatch],
   );
+
+  let exportCover: (() => void) | undefined = undefined;
+  if (process.env.DEPLOYMENT_ENVIRONMENT !== 'production') {
+    exportCover = () => {
+      const { linksLayer, overlayLayers, textLayers } = coverEditorState;
+
+      const coverData = JSON.stringify({
+        linksLayer,
+        overlayLayers,
+        textLayers,
+      });
+
+      Share.share({ message: coverData });
+    };
+  }
 
   const intl = useIntl();
 
@@ -97,6 +111,13 @@ const CoverEditorToolbox = (
             }
             onPress={toggleColorPickerVisible}
           />
+          {process.env.DEPLOYMENT_ENVIRONMENT !== 'production' && (
+            <ToolBoxSection
+              label="Export"
+              icon="settings"
+              onPress={exportCover}
+            />
+          )}
         </ScrollView>
       </ToolBarContainer>
 

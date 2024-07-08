@@ -10,7 +10,7 @@ import type { ReactElement } from 'react';
 type Props = {
   label: string;
   icon: Icons | ReactElement;
-  onPress: () => void;
+  onPress: (() => void) | undefined;
 };
 
 const ToolBoxSection = ({ label, icon, onPress }: Props) => {
