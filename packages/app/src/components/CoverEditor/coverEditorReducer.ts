@@ -201,7 +201,8 @@ export function coverEditorReducer(
           info => info.media.uri === media.uri,
         );
         if (mediaInfo) {
-          return mediaInfo;
+          medias.push(mediaInfo);
+          return;
         }
         let aspectRatio = COVER_RATIO;
         if (state.lottie) {
