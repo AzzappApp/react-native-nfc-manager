@@ -156,13 +156,14 @@ export const createCoverSkottieWithColorReplacement = (
     : null;
 
 export const isCoverDynamic = (state: CoverEditorState) => {
-  const { lottie, medias, overlayLayers } = state;
+  const { lottie, medias, overlayLayers, textLayers } = state;
   return (
     !!lottie ||
     medias.some(
       mediaInfo => !mediaInfoIsImage(mediaInfo) || mediaInfo.animation != null,
     ) ||
     overlayLayers.some(overlayLayer => overlayLayer.animation != null) ||
+    textLayers.some(textLayer => textLayer.animation != null) ||
     medias.length > 1
   );
 };

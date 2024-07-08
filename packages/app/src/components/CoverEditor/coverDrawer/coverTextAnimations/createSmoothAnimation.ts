@@ -40,6 +40,7 @@ const createSmoothAnimation =
       interpolate(progress, [0, 0.25, 0.75, 1], [deltaX, 0, 0, 0]),
       interpolate(progress, [0, 0.25, 0.75, 1], [deltaY, 0, 0, 0]),
     );
+    canvas.restore();
   };
 
 export default createSmoothAnimation;

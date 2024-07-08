@@ -27,6 +27,7 @@ const neon: CoverTextAnimation = ({
   const paint = Skia.Paint();
   canvas.saveLayer(paint);
   paragraph.paint(canvas, -textWidth / 2, -paragraph.getHeight() / 2);
+  canvas.restore();
 };
 
 export default neon;
