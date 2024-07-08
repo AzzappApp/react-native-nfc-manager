@@ -7,7 +7,7 @@ This is the main repository of the Azzapp application source code.
 Developping and building the project requires **MacOS version 12+**.
 In addition developpers should install the followings dependencies:
 
-- [NodeJS](https://nodejs.org/en/) version **20** (recommended install through [nvm](https://github.com/nvm-sh/nvm))
+- [Node.js](https://nodejs.org/en/) version **20** (recommended install through [nvm](https://github.com/nvm-sh/nvm))
 - [yarn](https://yarnpkg.com/)
 - [XCode](https://apps.apple.com/fr/app/xcode/id497799835?mt=12) version **15+**
 - [Android Studio](https://developer.android.com/studio)
