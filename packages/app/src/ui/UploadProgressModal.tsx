@@ -1,6 +1,7 @@
-import { useEffect, useMemo, useState } from 'react';
+import LottieView from 'lottie-react-native';
+import { useEffect, useState } from 'react';
 import { useIntl } from 'react-intl';
-import { View, StyleSheet } from 'react-native';
+import { View, StyleSheet, useWindowDimensions } from 'react-native';
 import { colors } from '#theme';
 import Text from '#ui/Text';
 import ProgressBar from './ProgressBar';
@@ -8,134 +9,54 @@ import type { Subscription, Observable } from 'relay-runtime';
 
 const UploadProgressModal = ({
   progressIndicator,
+  text,
 }: {
-  progressIndicator: Observable<number>;
+  progressIndicator?: Observable<number> | null;
+  text?: string;
 }) => {
   const [progress, setProgress] = useState<number | null>(null);
 
   useEffect(() => {
-    let subscribtion: Subscription;
+    let subscription: Subscription;
     if (progressIndicator) {
       setProgress(0);
-      subscribtion = progressIndicator.subscribe({
+      subscription = progressIndicator.subscribe({
         next(value) {
           setProgress(value);
         },
       });
     }
     return () => {
-      subscribtion?.unsubscribe();
+      subscription?.unsubscribe();
       setProgress(null);
     };
   }, [progressIndicator]);
 
-  const intl = useIntl();
-  const messages = useMemo(() => {
-    return [
-      intl.formatMessage(
-        {
-          defaultMessage:
-            'Nothing better than a nice transition between the sections of your webcard{azzappA}',
-          description: 'Progress loading modal message 1',
-        },
-        {
-          azzappA: (
-            <Text style={styles.icon} variant="azzapp">
-              a
-            </Text>
-          ),
-        },
-      ),
-      intl.formatMessage({
-        defaultMessage: 'Did you know that videos are now supported for covers',
-        description: 'Progress loading modal message 2',
-      }),
-      intl.formatMessage(
-        {
-          defaultMessage:
-            'Did you know you can customize each section of your webcard{azzappA}? Make it a unique experience!',
-          description: 'Progress loading modal message 3',
-        },
-        {
-          azzappA: (
-            <Text style={styles.icon} variant="azzapp">
-              a
-            </Text>
-          ),
-        },
-      ),
-      intl.formatMessage(
-        {
-          defaultMessage:
-            "Your webcard{azzappA}, your style. Don't forget to explore all the customization options available.",
-          description: 'Progress loading modal message 4',
-        },
-        {
-          azzappA: (
-            <Text style={styles.icon} variant="azzapp">
-              a
-            </Text>
-          ),
-        },
-      ),
-      intl.formatMessage(
-        {
-          defaultMessage:
-            "Take a deep breath and envision your perfect webcard{azzappA}. It's coming soon!",
-          description: 'Progress loading modal message 5',
-        },
-        {
-          azzappA: (
-            <Text style={styles.icon} variant="azzapp">
-              a
-            </Text>
-          ),
-        },
-      ),
-      intl.formatMessage({
-        defaultMessage:
-          "A little secret: Bright colors and attractive fonts grab your visitors' attention. Give them a try!",
-        description: 'Progress loading modal message 6',
-      }),
-      intl.formatMessage(
-        {
-          defaultMessage:
-            'As the pixels come together, think about using transition effects to add dynamism to your webcard{azzappA}',
-          description: 'Progress loading modal message 7',
-        },
-        {
-          azzappA: (
-            <Text style={styles.icon} variant="azzapp">
-              a
-            </Text>
-          ),
-        },
-      ),
-      intl.formatMessage(
-        {
-          defaultMessage:
-            'The most beautiful things take time to come to life. Your webcard{azzappA} is taking shape.',
-          description: 'Progress loading modal message 8',
-        },
-        {
-          azzappA: (
-            <Text style={styles.icon} variant="azzapp">
-              a
-            </Text>
-          ),
-        },
-      ),
-    ];
-  }, [intl]);
+  const windowWidth = useWindowDimensions().width;
 
-  const text = useMemo(
-    () => messages[Math.floor(Math.random() * messages.length)],
-    [messages],
-  );
+  const intl = useIntl();
+  text =
+    text ??
+    intl.formatMessage({
+      defaultMessage: 'Saving...',
+      description:
+        'Default message displaying in upload modal when uploading a file',
+    });
 
   return (
     <View style={styles.container}>
-      <Text variant="xlarge" style={styles.text}>
+      <LottieView
+        source={require('../assets/loader.json')}
+        autoPlay
+        loop
+        hardwareAccelerationAndroid
+        style={{
+          width: windowWidth / 2,
+          height: windowWidth / 2,
+          marginTop: -100,
+        }}
+      />
+      <Text variant="button" style={styles.text}>
         {text}
       </Text>
       <ProgressBar
@@ -146,11 +67,6 @@ const UploadProgressModal = ({
   );
 };
 
-UploadProgressModal.options = () => ({
-  stackAnimation: 'fade',
-  animationDuration: 500,
-});
-
 export default UploadProgressModal;
 
 const styles = StyleSheet.create({
@@ -160,15 +76,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  progressBarWidth: { width: '75%' },
   text: {
     color: colors.white,
     width: '75%',
-    marginBottom: 40,
     textAlign: 'center',
     lineHeight: 36,
   },
-  icon: {
-    color: colors.white,
-  },
+  progressBarWidth: { width: '75%' },
 });
