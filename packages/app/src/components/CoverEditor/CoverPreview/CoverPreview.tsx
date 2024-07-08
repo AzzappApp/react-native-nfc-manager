@@ -1,4 +1,4 @@
-import { Canvas, Image, clamp } from '@shopify/react-native-skia';
+import { clamp } from '@shopify/react-native-skia';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   Dimensions,
@@ -38,6 +38,7 @@ import {
   useScreenHasFocus,
   ScreenModal,
 } from '#components/NativeRouter';
+import SnapshotView, { snapshotView } from '#components/SnapshotView';
 import VideoCompositionRenderer from '#components/VideoCompositionRenderer';
 import useToggle from '#hooks/useToggle';
 import ActivityIndicator from '#ui/ActivityIndicator';
@@ -60,17 +61,16 @@ import {
   drawBoundsEditor,
 } from './BoundsEditor';
 import { DynamicLinkRenderer } from './DynamicLinkRenderer';
-import type { VideoCompositionRendererHandle } from '#components/VideoCompositionRenderer';
 import type { EditionParameters } from '#helpers/mediaEditions';
 import type { ResizeHandlePosition } from './BoundsEditor';
 import type { FrameDrawer } from '@azzapp/react-native-skia-video';
-import type { SkImage, SkRect } from '@shopify/react-native-skia';
+import type { SkRect } from '@shopify/react-native-skia';
 import type {
   GestureResponderEvent,
   LayoutChangeEvent,
   LayoutRectangle,
+  ViewProps,
 } from 'react-native';
-import type { ViewProps } from 'react-native-svg/lib/typescript/fabric/utils';
 
 type CoverPreviewProps = Exclude<ViewProps, 'children'> & {
   /**
@@ -984,25 +984,30 @@ const CoverPreview = ({
 
   // #region Screen shot replacement
   const hasFocus = useScreenHasFocus();
-  const [screenShot, setScreenShot] = useState<SkImage | null>(null);
-  const compositionRendererRef = useRef<VideoCompositionRendererHandle | null>(
-    null,
-  );
+  const compositionContainerRef = useRef<View | null>(null);
+  const [snapshotId, setSnapshotId] = useState<string | null>(null);
+  const currentScreenShot = useRef<string | null>(null);
   useModalInterceptor(async () => {
-    let screenShot: SkImage | null = null;
-    try {
-      screenShot =
-        (await compositionRendererRef.current?.makeSnapshot()) ?? null;
-    } catch {
-      screenShot = null;
+    let screenShotId: string | null;
+    console.log('modal interceptor');
+    if (!compositionContainerRef.current) {
+      console.log('no ref');
+      return;
     }
-    setScreenShot(screenShot);
+    try {
+      screenShotId = await snapshotView(compositionContainerRef.current as any);
+    } catch (e) {
+      console.log('error', e);
+      screenShotId = null;
+    }
+    currentScreenShot.current = screenShotId;
+    setSnapshotId(screenShotId);
     await waitTime(10);
   });
 
   useEffect(() => {
     if (hasFocus) {
-      setScreenShot(null);
+      setSnapshotId(null);
     }
   }, [hasFocus]);
   // #endregion
@@ -1043,6 +1048,19 @@ const CoverPreview = ({
     };
   });
 
+  const [pauseComposition, setPauseComposition] = useState(false);
+
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      setPauseComposition(
+        editionMode === 'textEdit' ||
+          editionMode === 'text' ||
+          editionMode === 'overlay',
+      );
+    }, 10);
+    return () => clearTimeout(timeout);
+  }, [editionMode]);
+
   return (
     <>
       <View
@@ -1070,31 +1088,25 @@ const CoverPreview = ({
           {...props}
         >
           {/* Not rendering when modal are displayed reduce memory usage */}
-          {loadingRemoteMedia || (!hasFocus && !screenShot) ? (
+          {loadingRemoteMedia || (!hasFocus && !snapshotId) ? (
             <Container style={styles.loadingContainer}>
               <ActivityIndicator />
             </Container>
           ) : (
-            <View style={{ width: viewWidth, height: viewHeight }}>
-              {screenShot && (
-                <Canvas style={{ width: viewWidth, height: viewHeight }}>
-                  <Image
-                    image={screenShot}
-                    x={0}
-                    y={0}
-                    width={viewWidth}
-                    height={viewHeight}
-                  />
-                </Canvas>
+            <View
+              ref={compositionContainerRef}
+              style={{ width: viewWidth, height: viewHeight }}
+              collapsable={false}
+            >
+              {snapshotId && (
+                <SnapshotView
+                  snapshotID={snapshotId}
+                  style={{ width: viewWidth, height: viewHeight }}
+                />
               )}
               {hasFocus && (
                 <VideoCompositionRenderer
-                  ref={compositionRendererRef}
-                  pause={
-                    editionMode === 'textEdit' ||
-                    editionMode === 'text' ||
-                    editionMode === 'overlay'
-                  }
+                  pause={pauseComposition}
                   composition={composition}
                   width={viewWidth}
                   height={viewHeight}

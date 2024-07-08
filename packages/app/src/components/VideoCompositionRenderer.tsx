@@ -1,17 +1,6 @@
-import {
-  Canvas,
-  Skia,
-  createPicture,
-  drawAsImageFromPicture,
-} from '@shopify/react-native-skia';
+import { Canvas, Skia } from '@shopify/react-native-skia';
 import { SkiaViewApi } from '@shopify/react-native-skia/lib/module/views/api';
-import {
-  forwardRef,
-  useCallback,
-  useEffect,
-  useImperativeHandle,
-  useMemo,
-} from 'react';
+import { forwardRef, useCallback, useEffect, useMemo } from 'react';
 import { PixelRatio, type ViewProps } from 'react-native';
 import { useFrameCallback, useSharedValue } from 'react-native-reanimated';
 import { __RNSkiaVideoPrivateAPI } from '@azzapp/react-native-skia-video';
@@ -19,12 +8,7 @@ import type {
   FrameDrawer,
   VideoComposition,
 } from '@azzapp/react-native-skia-video';
-import type {
-  SkCanvas,
-  SkImage,
-  SkiaDomView,
-} from '@shopify/react-native-skia';
-import type { ForwardedRef } from 'react';
+import type { SkCanvas, SkiaDomView } from '@shopify/react-native-skia';
 
 export type VideoCompositionRendererProps = Exclude<ViewProps, 'children'> & {
   composition: VideoComposition | null;
@@ -34,22 +18,15 @@ export type VideoCompositionRendererProps = Exclude<ViewProps, 'children'> & {
   height: number;
 };
 
-export type VideoCompositionRendererHandle = {
-  makeSnapshot: () => Promise<SkImage | null>;
-};
-
-const VideoCompositionRenderer = (
-  {
-    composition,
-    pause = false,
-    drawFrame,
-    width,
-    height,
-    style,
-    ...props
-  }: VideoCompositionRendererProps,
-  forwardedRef: ForwardedRef<VideoCompositionRendererHandle>,
-) => {
+const VideoCompositionRenderer = ({
+  composition,
+  pause = false,
+  drawFrame,
+  width,
+  height,
+  style,
+  ...props
+}: VideoCompositionRendererProps) => {
   const framesExtractor = useMemo(() => {
     if (composition) {
       return __RNSkiaVideoPrivateAPI.createVideoCompositionFramesExtractor(
@@ -86,46 +63,6 @@ const VideoCompositionRenderer = (
     [nativeId],
   );
   const pixelRatio = PixelRatio.get();
-
-  useImperativeHandle(
-    forwardedRef,
-    () => ({
-      async makeSnapshot() {
-        if (!framesExtractor || !nativeId.value) {
-          return null;
-        }
-        const currentTime = framesExtractor.currentTime;
-        const frames = framesExtractor.decodeCompositionFrames();
-
-        return drawAsImageFromPicture(
-          createPicture((canvas: SkCanvas) => {
-            canvas.clear(Skia.Color('#00000000'));
-            if (!composition) {
-              return;
-            }
-            drawFrame({
-              canvas,
-              width: width * pixelRatio,
-              height: height * pixelRatio,
-              currentTime,
-              frames,
-              videoComposition: composition,
-            });
-          }),
-          { width: width * pixelRatio, height: height * pixelRatio },
-        );
-      },
-    }),
-    [
-      composition,
-      drawFrame,
-      framesExtractor,
-      height,
-      nativeId.value,
-      pixelRatio,
-      width,
-    ],
-  );
 
   useFrameCallback(() => {
     'worklet';
