@@ -30,10 +30,10 @@ export type CoverRendererProps = {
    */
   width?: number;
   /**
-   * if true, the cover will not have rounded corners
+   * if true, the cover will be displayed in large mode
    * @default false
    */
-  hideBorderRadius?: boolean;
+  large?: boolean;
   /**
    * if true, the cover will play the cover animations if any or the video if any
    * @default false
@@ -62,7 +62,7 @@ const CoverRenderer = (
   {
     webCard: coverKey,
     width = 125,
-    hideBorderRadius,
+    large,
     style,
     animationEnabled,
     onReadyForDisplay,
@@ -140,7 +140,7 @@ const CoverRenderer = (
   const isVideoMedia = __typename === 'MediaVideo';
 
   //#region Styles and media sources
-  const borderRadius: number = hideBorderRadius ? 0 : COVER_CARD_RADIUS * width;
+  const borderRadius: number = large ? 0 : COVER_CARD_RADIUS * width;
 
   const isSmallCover = width <= COVER_BASE_WIDTH;
 
@@ -172,18 +172,9 @@ const CoverRenderer = (
         width,
         backgroundColor: swapColor(coverBackgroundColor, cardColors) as any,
       },
-      styles.shadow,
       style,
     ],
-    [
-      styles.root,
-      styles.shadow,
-      borderRadius,
-      width,
-      coverBackgroundColor,
-      cardColors,
-      style,
-    ],
+    [styles.root, borderRadius, width, coverBackgroundColor, cardColors, style],
   );
 
   const [layout, setLayout] = useState<{
@@ -218,81 +209,83 @@ const CoverRenderer = (
 
   return useMemo(
     () => (
-      <View
-        ref={forwardRef}
-        style={containerStyle}
-        testID="cover-renderer"
-        onLayout={e => {
-          const { width, height } = e.nativeEvent.layout;
-          setLayout({
-            height,
-            width,
-          });
-        }}
-      >
-        {coverSource ? (
-          isVideoMedia ? (
-            <MediaVideoRenderer
-              testID="CoverRenderer_media"
-              source={coverSource}
-              thumbnailURI={isSmallCover ? smallThumbnail : thumbnail}
-              onReadyForDisplay={onReadyForDisplay}
-              videoEnabled={animationEnabled}
-              onError={onError}
-              style={styles.layer}
-              paused={!animationEnabled}
-            />
-          ) : (
-            <MediaImageRenderer
-              testID="CoverRenderer_media"
-              source={coverSource}
-              onReadyForDisplay={onReadyForDisplay}
-              onError={onError}
-              style={styles.layer}
-            />
-          )
-        ) : (
-          <View style={styles.coverPlaceHolder}>
-            <Image
-              source={require('#assets/webcard/logo-substract-full.png')}
-              style={{
-                width: width / 2,
-                height: width / 2,
-              }}
-              resizeMode="contain"
-            />
-          </View>
-        )}
-        {showLinks && (
-          <View
-            style={{
-              flexDirection: 'row',
-              position: 'absolute',
-              transformOrigin: 'center',
-              transform: [{ rotate: `${coverDynamicLinks.rotation}rad` }],
-              top:
-                (coverDynamicLinks.position.y * layout.height) / 100 -
-                linksSize.height / 2,
-              left:
-                (coverDynamicLinks.position.x * layout.width) / 100 -
-                linksSize.width / 2,
-              gap: convertToBaseCanvasRatio(LINKS_GAP, layout.width),
-            }}
-          >
-            {coverDynamicLinks.links.map(link => (
-              <DynamicLinkRenderer
-                key={link.socialId}
-                as={PressableNative}
-                cardColors={cardColors}
-                color={coverDynamicLinks.color}
-                link={link}
-                shadow={coverDynamicLinks.shadow}
-                size={coverDynamicLinks.size}
-                viewWidth={layout.width}
+      <View style={large ? undefined : styles.shadow}>
+        <View
+          ref={forwardRef}
+          style={containerStyle}
+          testID="cover-renderer"
+          onLayout={e => {
+            const { width, height } = e.nativeEvent.layout;
+            setLayout({
+              height,
+              width,
+            });
+          }}
+        >
+          {coverSource ? (
+            isVideoMedia ? (
+              <MediaVideoRenderer
+                testID="CoverRenderer_media"
+                source={coverSource}
+                thumbnailURI={isSmallCover ? smallThumbnail : thumbnail}
+                onReadyForDisplay={onReadyForDisplay}
+                videoEnabled={animationEnabled}
+                onError={onError}
+                style={styles.layer}
+                paused={!animationEnabled}
               />
-            ))}
-          </View>
-        )}
+            ) : (
+              <MediaImageRenderer
+                testID="CoverRenderer_media"
+                source={coverSource}
+                onReadyForDisplay={onReadyForDisplay}
+                onError={onError}
+                style={styles.layer}
+              />
+            )
+          ) : (
+            <View style={styles.coverPlaceHolder}>
+              <Image
+                source={require('#assets/webcard/logo-substract-full.png')}
+                style={{
+                  width: width / 2,
+                  height: width / 2,
+                }}
+                resizeMode="contain"
+              />
+            </View>
+          )}
+          {showLinks && (
+            <View
+              style={{
+                flexDirection: 'row',
+                position: 'absolute',
+                transformOrigin: 'center',
+                transform: [{ rotate: `${coverDynamicLinks.rotation}rad` }],
+                top:
+                  (coverDynamicLinks.position.y * layout.height) / 100 -
+                  linksSize.height / 2,
+                left:
+                  (coverDynamicLinks.position.x * layout.width) / 100 -
+                  linksSize.width / 2,
+                gap: convertToBaseCanvasRatio(LINKS_GAP, layout.width),
+              }}
+            >
+              {coverDynamicLinks.links.map(link => (
+                <DynamicLinkRenderer
+                  key={link.socialId}
+                  as={PressableNative}
+                  cardColors={cardColors}
+                  color={coverDynamicLinks.color}
+                  link={link}
+                  shadow={coverDynamicLinks.shadow}
+                  size={coverDynamicLinks.size}
+                  viewWidth={layout.width}
+                />
+              ))}
+            </View>
+          )}
+        </View>
       </View>
     ),
     [
@@ -304,14 +297,18 @@ const CoverRenderer = (
       forwardRef,
       isSmallCover,
       isVideoMedia,
-      layout,
-      linksSize,
+      large,
+      layout?.height,
+      layout?.width,
+      linksSize.height,
+      linksSize.width,
       onError,
       onReadyForDisplay,
       showLinks,
       smallThumbnail,
       styles.coverPlaceHolder,
       styles.layer,
+      styles.shadow,
       thumbnail,
       width,
     ],
@@ -327,7 +324,7 @@ const stylesheet = createStyleSheet(theme => ({
     borderCurve: 'continuous',
   },
   shadow: {
-    ...shadow(theme, 'center'),
+    ...shadow(theme, 'bottom'),
   },
   layer: {
     position: 'absolute',

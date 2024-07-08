@@ -344,7 +344,7 @@ const WebCardScreenContent = ({
               webCard={webCard}
               width={windowWidth}
               animationEnabled={ready && hasFocus}
-              hideBorderRadius
+              large
             />
           </WebCardBlockContainer>
           <Suspense

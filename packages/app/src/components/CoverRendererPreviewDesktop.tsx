@@ -87,7 +87,7 @@ const CoverRendererPreviewDesktop = ({
         style={styles.cover}
         webCard={coverKey}
         width={COVER_DESKTOP_WIDTH}
-        hideBorderRadius
+        large
         animationEnabled={videoEnabled}
       />
     </View>

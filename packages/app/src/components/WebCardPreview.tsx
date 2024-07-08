@@ -173,7 +173,7 @@ const WebCardPreview = (
               <CoverRenderer
                 webCard={webCard}
                 width={windowWidth}
-                hideBorderRadius
+                large
                 animationEnabled
               />
             )}
