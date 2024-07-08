@@ -1,5 +1,7 @@
-## 0.5.19-canary.87
+## 0.5.19-canary.88
 
+* **fix:**  - **CoverEditor:** image scale misscalculation
+* **fix:**  - 🐛 properly limit and display video change and cut ([#4122](https://github.com/AzzappApp/azzapp/pull/4122))
 * **fix:**  - **CoverEditor:** don't filter existing media when filtering
 * **build:**  - don’t change shell scripts
 * **docs:**  - Update README.md
