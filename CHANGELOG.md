@@ -1,5 +1,6 @@
-## 0.5.19-canary.85
+## 0.5.19-canary.86
 
+* **fix:**  - **CoverEditor:** don't filter existing media when filtering
 * **build:**  - don’t change shell scripts
 * **docs:**  - Update README.md
 * **build:**  - rollback update of react-native-skia
