@@ -139,7 +139,7 @@ const WebCardScreenButtonBar = ({
         iconSize={26}
         iconStyle={{ tintColor: colors.white }}
         variant="grey"
-        style={styles.userPostsButton}
+        style={styles.auxiliaryButton}
         onPress={onFlip}
       />
     </Animated.View>
@@ -312,6 +312,7 @@ const WebCardScreenButtonActionButton = ({
           icon="more"
           variant="grey"
           onPress={onShowWebcardModalCallback}
+          style={styles.auxiliaryButton}
           iconStyle={{ tintColor: colors.white }}
           accessibilityLabel={intl.formatMessage({
             defaultMessage: 'Tap to show the WebCard information',
@@ -368,6 +369,7 @@ const WebCardScreenButtonActionButton = ({
         variant="grey"
         onPress={onShowWebcardModalCallback}
         iconStyle={{ tintColor: colors.white }}
+        style={styles.auxiliaryButton}
         accessibilityLabel={intl.formatMessage({
           defaultMessage: 'Tap to show the webcard informations',
           description:
@@ -393,9 +395,8 @@ const styles = StyleSheet.create({
   mainButton: {
     flex: 1,
     marginLeft: 10,
-    marginRight: 10,
   },
-  userPostsButton: {
+  auxiliaryButton: {
     marginLeft: 10,
   },
 });
