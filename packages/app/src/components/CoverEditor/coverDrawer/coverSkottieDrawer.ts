@@ -15,7 +15,7 @@ const coverSkottieDrawer = ({
   canvas,
   width,
   height,
-  coverEditorState: { medias },
+  coverEditorState: { medias, imagesScales },
   images,
   frames,
   currentTime,
@@ -48,6 +48,7 @@ const coverSkottieDrawer = ({
         images[mediaInfo.media.uri],
         true,
       );
+      scale = imagesScales[mediaInfo.media.uri] ?? 1;
       imageFrame = image ? imageFrameFromImage(image) : null;
     } else {
       imageFrame = imageFrameFromVideoFrame(frames[asset.id]) ?? null;

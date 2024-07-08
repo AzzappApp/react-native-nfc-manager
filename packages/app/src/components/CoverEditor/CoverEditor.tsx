@@ -23,6 +23,10 @@ import {
 import { COVER_RATIO } from '@azzapp/shared/coverHelpers';
 import { colors } from '#theme';
 import { ScreenModal, preventModalDismiss } from '#components/NativeRouter';
+import {
+  calculateImageScale,
+  MAX_MEDIA_IMAGE_SIZE,
+} from '#helpers/coverHelpers';
 import { NativeBufferLoader, loadAllLUTShaders } from '#helpers/mediaEditions';
 import { getVideoLocalPath } from '#helpers/mediaHelpers';
 import useToggle from '#hooks/useToggle';
@@ -236,6 +240,26 @@ const CoverEditorCore = (
         ) ?? []
       : [];
 
+    let imagesScales =
+      coverInitialSate?.medias?.reduce((acc, mediaInfo) => {
+        if (mediaInfoIsImage(mediaInfo)) {
+          return {
+            ...acc,
+            [mediaInfo.media.uri]: calculateImageScale(mediaInfo.media),
+          };
+        }
+        return acc;
+      }, {}) ?? {};
+
+    if (coverInitialSate?.overlayLayers) {
+      imagesScales = coverInitialSate.overlayLayers.reduce((acc, overlay) => {
+        return {
+          ...acc,
+          [overlay.media.uri]: calculateImageScale(overlay.media),
+        };
+      }, imagesScales);
+    }
+
     return {
       lottie,
       cardColors: {
@@ -257,6 +281,7 @@ const CoverEditorCore = (
       selectedItemIndex: null,
 
       images: {},
+      imagesScales,
       videoPaths: {},
       lutShaders: {},
 
@@ -338,10 +363,15 @@ const CoverEditorCore = (
         }),
       );
     }
+
     if (imagesToLoad.length > 0) {
       promises.push(
         ...imagesToLoad.map(async uri => {
-          const { key, promise } = NativeBufferLoader.loadImage(uri);
+          const { key, promise } = NativeBufferLoader.loadImage(
+            uri,
+            MAX_MEDIA_IMAGE_SIZE,
+          );
+
           const buffer = await promise;
           if (canceled) {
             return;

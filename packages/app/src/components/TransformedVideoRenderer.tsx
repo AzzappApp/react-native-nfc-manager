@@ -1,7 +1,8 @@
 import { Skia } from '@shopify/react-native-skia';
 import { useCallback, useMemo } from 'react';
-import { Dimensions, PixelRatio, type ViewProps } from 'react-native';
+import { type ViewProps } from 'react-native';
 import { colors } from '#theme';
+import { MAX_DISPLAY_DECODER_RESOLUTION } from '#helpers/coverHelpers';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import {
   useLutShader,
@@ -38,11 +39,6 @@ export type TransformedVideoRendererProps = Exclude<ViewProps, 'children'> & {
   onLoad?: () => void;
   onError?: (error?: Error) => void;
 };
-
-const MAX_DISPLAY_DECODER_RESOLUTION = Math.min(
-  Dimensions.get('window').width * PixelRatio.get(),
-  1920,
-);
 
 const TransformedVideoRenderer = ({
   video,

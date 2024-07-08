@@ -11,6 +11,7 @@ import {
   getTransformsForEditionParameters,
   imageFrameFromImage,
   imageFrameToShaderFrame,
+  scaleCropData,
 } from '#helpers/mediaEditions';
 import { percentRectToRect } from '../coverEditorHelpers';
 import { inflateRRect } from './coverDrawerHelpers';
@@ -22,7 +23,7 @@ const coverOverlayDrawer = ({
   canvas,
   width,
   height,
-  coverEditorState: { overlayLayers, cardColors },
+  coverEditorState: { overlayLayers, cardColors, imagesScales },
   index,
   images,
   lutShaders,
@@ -91,7 +92,7 @@ const coverOverlayDrawer = ({
       height: imageHeight,
       editionParameters: {
         ...editionParameters,
-        cropData,
+        cropData: scaleCropData(cropData, imagesScales[media.uri] ?? 1),
         roll,
       },
       lutShader: filter ? lutShaders[filter] : null,

@@ -8,6 +8,7 @@ import {
   COVER_VIDEO_DEFAULT_DURATION,
 } from '@azzapp/shared/coverHelpers';
 import { colors } from '#theme';
+import { calculateImageScale } from '#helpers/coverHelpers';
 import { cropDataForAspectRatio } from '#helpers/mediaEditions';
 import {
   mediaInfoIsImage,
@@ -15,7 +16,7 @@ import {
   getLottieMediasDurations,
 } from './coverEditorHelpers';
 import type { CoverEditorAction } from './coverEditorActions';
-import type { CoverEditorState } from './coverEditorTypes';
+import type { CoverEditorState, MediaInfo } from './coverEditorTypes';
 
 export function coverEditorReducer(
   state: CoverEditorState,
@@ -192,59 +193,66 @@ export function coverEditorReducer(
 
     // #region Medias Actions
     case 'UPDATE_MEDIAS':
+      const medias: MediaInfo[] = [];
+      const imagesScales: Record<string, number> = {};
+
+      payload.forEach((media, index) => {
+        const mediaInfo = state.medias.find(
+          info => info.media.uri === media.uri,
+        );
+        if (mediaInfo) {
+          return mediaInfo;
+        }
+        let aspectRatio = COVER_RATIO;
+        if (state.lottie) {
+          const lottieInfo = extractLottieInfoMemoized(state.lottie);
+          const asset = lottieInfo?.assetsInfos[index];
+          if (!asset) {
+            console.error("Too many medias for the template's assets");
+          } else {
+            aspectRatio = asset.width / asset.height;
+          }
+        }
+        const cropData = cropDataForAspectRatio(
+          media.width,
+          media.height,
+          aspectRatio,
+        );
+        if (media.kind === 'image') {
+          imagesScales[media.uri] = calculateImageScale(media);
+          medias.push({
+            media,
+            filter: null,
+            animation: null,
+            editionParameters: { cropData },
+            duration: COVER_IMAGE_DEFAULT_DURATION,
+          });
+        } else {
+          const lottieInfo = extractLottieInfoMemoized(state.lottie);
+          const durations = lottieInfo
+            ? getLottieMediasDurations(lottieInfo)
+            : null;
+          const duration = durations ? durations[index] : null;
+
+          medias.push({
+            media,
+            filter: null,
+            animation: null,
+            editionParameters: { cropData },
+            timeRange: {
+              startTime: 0,
+              duration:
+                duration ??
+                Math.min(COVER_VIDEO_DEFAULT_DURATION, media.duration),
+            },
+          });
+        }
+      });
+
       return {
         ...state,
-        medias: payload.map((media, index) => {
-          const mediaInfo = state.medias.find(
-            info => info.media.uri === media.uri,
-          );
-          if (mediaInfo) {
-            return mediaInfo;
-          }
-          let aspectRatio = COVER_RATIO;
-          if (state.lottie) {
-            const lottieInfo = extractLottieInfoMemoized(state.lottie);
-            const asset = lottieInfo?.assetsInfos[index];
-            if (!asset) {
-              console.error("Too many medias for the template's assets");
-            } else {
-              aspectRatio = asset.width / asset.height;
-            }
-          }
-          const cropData = cropDataForAspectRatio(
-            media.width,
-            media.height,
-            aspectRatio,
-          );
-          if (media.kind === 'image') {
-            return {
-              media,
-              filter: null,
-              animation: null,
-              editionParameters: { cropData },
-              duration: COVER_IMAGE_DEFAULT_DURATION,
-            };
-          } else {
-            const lottieInfo = extractLottieInfoMemoized(state.lottie);
-            const durations = lottieInfo
-              ? getLottieMediasDurations(lottieInfo)
-              : null;
-            const duration = durations ? durations[index] : null;
-
-            return {
-              media,
-              filter: null,
-              animation: null,
-              editionParameters: { cropData },
-              timeRange: {
-                startTime: 0,
-                duration:
-                  duration ??
-                  Math.min(COVER_VIDEO_DEFAULT_DURATION, media.duration),
-              },
-            };
-          }
-        }),
+        medias,
+        imagesScales,
       };
     case 'UPDATE_MEDIA_IMAGE_DURATION': {
       if (
@@ -433,6 +441,13 @@ export function coverEditorReducer(
       ) {
         const medias = [...state.medias];
         medias[state.selectedItemIndex] = payload;
+
+        if (payload.media.kind === 'image') {
+          state.imagesScales[payload.media.uri] = calculateImageScale(
+            payload.media,
+          );
+        }
+
         return {
           ...state,
           medias,
@@ -513,6 +528,10 @@ export function coverEditorReducer(
           : { width: (50 * aspectRatio) / COVER_RATIO, height: 50 };
       return {
         ...state,
+        imagesScales: {
+          ...state.imagesScales,
+          [payload.uri]: calculateImageScale(payload),
+        },
         editionMode: 'overlay',
         selectedItemIndex: state.overlayLayers.length,
         overlayLayers: [

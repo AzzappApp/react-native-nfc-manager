@@ -3,7 +3,6 @@ import {
   createPicture,
   drawAsImageFromPicture,
 } from '@shopify/react-native-skia';
-import * as Device from 'expo-device';
 import { useCallback, useState } from 'react';
 import { Platform, unstable_batchedUpdates } from 'react-native';
 import ReactNativeBlobUtil from 'react-native-blob-util';
@@ -19,6 +18,7 @@ import {
   COVER_VIDEO_FRAME_RATE,
   COVER_MEDIA_RESOLUTION,
 } from '@azzapp/shared/coverHelpers';
+import { MAX_EXPORT_DECODER_RESOLUTION } from '#helpers/coverHelpers';
 import { createRandomFilePath, getFileName } from '#helpers/fileHelpers';
 import { addLocalCachedMediaFile } from '#helpers/mediaHelpers';
 import { uploadMedia, uploadSign } from '#helpers/MobileWebAPI';
@@ -209,7 +209,6 @@ const isCoverEditorStateValid = (coverEditorState: CoverEditorState) => {
 const createCoverMedia = async (coverEditorState: CoverEditorState) => {
   const {
     lottie,
-
     images,
     lutShaders,
     loadingLocalMedia,
@@ -306,6 +305,3 @@ const createCoverMedia = async (coverEditorState: CoverEditorState) => {
 
   return { path: outPath, kind: isDynamic ? 'video' : 'image' } as const;
 };
-
-const MAX_EXPORT_DECODER_RESOLUTION =
-  (Device.totalMemory ?? 0) / Math.pow(1024, 3) < 8 ? 1280 : 1920;

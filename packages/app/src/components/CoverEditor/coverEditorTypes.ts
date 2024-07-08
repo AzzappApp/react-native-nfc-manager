@@ -29,6 +29,7 @@ export type CoverEditorState = {
 
   // Resources used for displaying/updating the cover
   images: Record<string, bigint | null>;
+  imagesScales: Record<string, number>;
   videoPaths: Record<string, string>;
   lutShaders: Partial<Record<Filter, SkShader>>;
 

@@ -17,7 +17,7 @@ import {
   getDeviceMaxDecodingResolution,
   reduceVideoResolutionIfNecessary,
   scaleCropData,
-} from './mediaEdtionHelpers';
+} from './mediaEditionHelpers';
 import { imageFrameFromImage, transformImage } from './mediasTransformations';
 import NativeBufferLoader, {
   createImageFromNativeBuffer,

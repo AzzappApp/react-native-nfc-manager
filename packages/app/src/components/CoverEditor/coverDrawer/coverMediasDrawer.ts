@@ -21,7 +21,7 @@ const coverMediasDrawer = ({
   canvas,
   width,
   height,
-  coverEditorState: { coverTransition, medias },
+  coverEditorState: { coverTransition, medias, imagesScales },
   currentTime,
   images,
   lutShaders,
@@ -64,6 +64,7 @@ const coverMediasDrawer = ({
         if (!image) {
           continue;
         }
+        scale = imagesScales[media.uri] ?? 1;
         imageFrame = imageFrameFromImage(image);
         animation = mediaInfo.animation
           ? mediaAnimations[mediaInfo.animation]

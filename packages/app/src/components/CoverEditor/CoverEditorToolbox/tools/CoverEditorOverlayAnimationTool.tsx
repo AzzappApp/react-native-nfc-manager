@@ -23,6 +23,7 @@ import overlayAnimations, {
 } from '#components/CoverEditor/coverDrawer/overlayAnimations';
 import { getCoverDuration } from '#components/CoverEditor/coverEditorHelpers';
 import TransformedImageRenderer from '#components/TransformedImageRenderer';
+import { MAX_MEDIA_IMAGE_SIZE } from '#helpers/coverHelpers';
 import { keyExtractor } from '#helpers/idHelpers';
 import {
   applyImageFrameTransformations,
@@ -106,6 +107,7 @@ const CoverEditorOverlayImageAnimationTool = () => {
   const buffer = useNativeBuffer({
     uri: activeOverlay?.media?.uri,
     kind: activeOverlay?.media?.kind,
+    maxSize: MAX_MEDIA_IMAGE_SIZE,
   });
 
   const skImage = useDerivedValue(() => {
