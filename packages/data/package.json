@@ -47,6 +47,6 @@
     "drizzle-kit": "^0.22.7",
     "mysql2": "^3.9.7",
     "node-fetch": "^3",
-    "typescript": "^5.5.2"
+    "typescript": "^5.5.3"
   }
 }
