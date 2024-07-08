@@ -158,9 +158,6 @@ const CoverEditorCore = (
   // Suspend
   const lottie = useLottie(coverTemplate?.lottie);
 
-  console.log('template');
-  console.log(placeholder);
-  console.log(coverTemplate?.data?.overlayLayers);
   // #region Store
   const [coverEditorState, dispatch] = useReducer<
     Reducer<CoverEditorState, CoverEditorAction>,
