@@ -66,10 +66,13 @@ export const WebCard: WebCardResolvers = {
     const modules = await loaders.cardModuleByWebCardLoader.load(webCard.id);
     return modules.filter(module => module.visible || profile !== null);
   },
-  requiresSubscription: async (webCard, _, { loaders }) => {
+  requiresSubscription: async (webCard, { newWebCardKind }, { loaders }) => {
     const modules = await loaders.cardModuleByWebCardLoader.load(webCard.id);
 
-    return webCardRequiresSubscription(modules, webCard.webCardKind);
+    return webCardRequiresSubscription(
+      modules,
+      newWebCardKind ?? webCard.webCardKind,
+    );
   },
   isPremium: async (webCard, _, { loaders }) => {
     const owner = await loaders.webCardOwners.load(webCard.id);
