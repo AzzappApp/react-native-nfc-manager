@@ -1,5 +1,18 @@
-## 0.5.19-canary.84
+## 0.5.19-canary.85
 
+* **build:**  - don’t change shell scripts
+* **docs:**  - Update README.md
+* **build:**  - rollback update of react-native-skia
+* **feat:**  - add the ability to overwrite webCardKind ([#4118](https://github.com/AzzappApp/azzapp/pull/4118))
+* **build:**  - upgrade dependencies ([#4119](https://github.com/AzzappApp/azzapp/pull/4119))
+* **fix:**  - **cover:** reduce loaded image sizes ([#4117](https://github.com/AzzappApp/azzapp/pull/4117))
+* **fix:**  - **cover:** [#3202](https://github.com/AzzappApp/azzapp/pull/3202) make shadow on cover visible ([#4099](https://github.com/AzzappApp/azzapp/pull/4099))
+* **fix:**  - **webCard:** [#4047](https://github.com/AzzappApp/azzapp/pull/4047) remove activity in db when switching back to personal ([#4107](https://github.com/AzzappApp/azzapp/pull/4107))
+* **feat:**  - 🎸 increase bounds editor slop ([#4116](https://github.com/AzzappApp/azzapp/pull/4116))
+* **fix:**  - 🐛 properly manage text animations ([#4115](https://github.com/AzzappApp/azzapp/pull/4115))
+* **fix:**  - **CoverEditor:** Improve snapshot system when modal appear ([#4109](https://github.com/AzzappApp/azzapp/pull/4109))
+* **feat:**  - new loading screen ([#4112](https://github.com/AzzappApp/azzapp/pull/4112))
+* **feat:**  - **CoverEditor:** add a way to export cover layers from app ([#4111](https://github.com/AzzappApp/azzapp/pull/4111))
 * **fix:**  - **WebCardScreen:** webcard buttons layout ([#4054](https://github.com/AzzappApp/azzapp/pull/4054))
 * **fix:**  - subscription limit details ([#4095](https://github.com/AzzappApp/azzapp/pull/4095))
 * **fix:**  - **multiUser:** [#3703](https://github.com/AzzappApp/azzapp/pull/3703) allow users to switch off multi user flag ([#4098](https://github.com/AzzappApp/azzapp/pull/4098))
