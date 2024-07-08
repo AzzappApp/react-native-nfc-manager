@@ -1,9 +1,14 @@
+import { useMemo } from 'react';
 import { useIntl } from 'react-intl';
 import {
   COVER_MAX_MEDIA_DURATION,
+  COVER_MIN_MEDIA_DURATION,
   COVER_RATIO,
 } from '@azzapp/shared/coverHelpers';
-import { extractLottieInfoMemoized } from '#components/CoverEditor/coverEditorHelpers';
+import {
+  extractLottieInfoMemoized,
+  getLottieMediasDurations,
+} from '#components/CoverEditor/coverEditorHelpers';
 import ImagePicker, { SelectImageStep } from '#components/ImagePicker';
 import { ScreenModal } from '#components/NativeRouter';
 import useToggle from '#hooks/useToggle';
@@ -23,10 +28,23 @@ const CoverEditorMediaReplace = () => {
     dispatch,
   } = useCoverEditorContext();
 
+  const durations = useMemo(() => {
+    const lottieInfo = extractLottieInfoMemoized(lottie);
+    if (!lottieInfo) return null;
+
+    return getLottieMediasDurations(lottieInfo);
+  }, [lottie]);
+
   const asset =
     selectedItemIndex != null && editionMode === 'mediaEdit'
       ? extractLottieInfoMemoized(lottie)?.assetsInfos[selectedItemIndex]
       : null;
+
+  const duration =
+    durations && selectedItemIndex !== null
+      ? durations[selectedItemIndex]
+      : null;
+
   const activeMedia = useCoverEditorActiveMedia();
 
   const cropData = activeMedia?.editionParameters?.cropData;
@@ -115,6 +133,7 @@ const CoverEditorMediaReplace = () => {
               onCancel={toggleScreenModal}
               onFinished={onFinished}
               maxVideoDuration={COVER_MAX_MEDIA_DURATION}
+              minVideoDuration={duration ?? COVER_MIN_MEDIA_DURATION}
               additionalData={{
                 hideTabs: true,
               }}

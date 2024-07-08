@@ -3,6 +3,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { Alert, Platform, StyleSheet } from 'react-native';
 import { RESULTS, openPhotoPicker } from 'react-native-permissions';
+import Toast from 'react-native-toast-message';
 import { useDebouncedCallback } from 'use-debounce';
 import { cropDataForAspectRatio } from '#helpers/mediaEditions';
 import { getImageSize, getVideoSize } from '#helpers/mediaHelpers';
@@ -18,6 +19,7 @@ import PhotoGalleryMediaList from '../PhotoGalleryMediaList';
 import { useImagePickerState } from './ImagePickerContext';
 import ImagePickerMediaRenderer from './ImagePickerMediaRenderer';
 import { ImagePickerStep } from './ImagePickerWizardContainer';
+import type { Media } from '#helpers/mediaHelpers';
 import type { BottomMenuItem } from '#ui/BottomMenu';
 import type { CameraViewHandle } from '../CameraView';
 import type { Album } from '@react-native-camera-roll/camera-roll';
@@ -52,7 +54,33 @@ const SelectImageStep = ({
     onEditionParametersChange,
     clearMedia,
     cameraButtonsLeftRightPosition,
+    minVideoDuration,
   } = useImagePickerState();
+
+  const onGalleryMediaSelected = (
+    media: Media,
+    aspectRatio?: number | null | undefined,
+  ) => {
+    if (
+      minVideoDuration &&
+      media.kind === 'video' &&
+      media.duration < minVideoDuration
+    ) {
+      Toast.show({
+        type: 'error',
+        text1: intl.formatMessage(
+          {
+            defaultMessage: 'Selected video should be at least {duration}s',
+            description:
+              'Error message when selecting a video media that is too short',
+          },
+          { duration: Math.ceil(minVideoDuration * 10) / 10 },
+        ),
+      });
+      return;
+    }
+    onMediaChange(media, aspectRatio);
+  };
 
   const [pickerMode, setPickerMode] = useState<'gallery' | 'photo' | 'video'>(
     'gallery',
@@ -340,7 +368,7 @@ const SelectImageStep = ({
               <PhotoGalleryMediaList
                 selectedMediaId={media?.galleryUri}
                 album={selectedAlbum}
-                onMediaSelected={onMediaChange}
+                onMediaSelected={onGalleryMediaSelected}
                 kind={kind}
                 contentContainerStyle={galleryContainerStyle}
                 autoSelectFirstItem={media == null}

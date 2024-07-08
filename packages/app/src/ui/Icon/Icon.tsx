@@ -305,6 +305,9 @@ const icons = {
   get more() {
     return require('./assets/more.png');
   },
+  get move_segment() {
+    return require('./assets/move_segment.png');
+  },
   get multi_user() {
     return require('./assets/multi-user.png');
   },

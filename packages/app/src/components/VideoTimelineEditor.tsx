@@ -14,6 +14,7 @@ import { colors } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import { NativeBufferLoader } from '#helpers/mediaEditions';
 import BufferImage from '#ui/BufferImage';
+import Icon from '#ui/Icon';
 import Text from '#ui/Text';
 import type { ViewProps } from 'react-native';
 import type { PanGestureHandlerGestureEvent } from 'react-native-gesture-handler';
@@ -255,6 +256,9 @@ const VideoTimelineEditor = ({
           style={[styles.timeRange, animatedStyle]}
           hitSlop={{ left: 35, right: 35 }}
         >
+          <View style={styles.moveSegment}>
+            <Icon icon="move_segment" />
+          </View>
           <View style={[styles.thumb, styles.thumbStart]} />
           <View style={[styles.thumb, styles.thumbEnd]} />
         </Animated.View>
@@ -346,6 +350,14 @@ const styleSheet = createStyleSheet(appearance => ({
     position: 'absolute',
     height: 1,
     backgroundColor: colors.black,
+  },
+  moveSegment: {
+    position: 'absolute',
+    top: -25,
+    height: 24,
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: '100%',
   },
 }));
 
