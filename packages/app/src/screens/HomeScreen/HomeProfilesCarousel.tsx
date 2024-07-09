@@ -1,5 +1,5 @@
 import { BlurView } from 'expo-blur';
-import { memo, useCallback, useMemo, useRef, useState } from 'react';
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import {
   View,
@@ -86,23 +86,14 @@ const HomeProfilesCarousel = ({ user: userKey }: HomeProfilesCarouselProps) => {
     userKey,
   );
 
-  useOnFocus(() => {
-    const { profileInfos } = getAuthState();
-    const authProfileIndex = profiles?.findIndex(
-      profile => profile.id === profileInfos?.profileId,
-    );
+  const data = useMemo(
+    () => (profiles ? [null, ...profiles] : [null]),
+    [profiles],
+  );
 
-    if (
-      authProfileIndex !== undefined &&
-      authProfileIndex !== -1 &&
-      authProfileIndex + 1 !== currentIndexProfile.value
-    ) {
-      carouselRef.current?.scrollToIndex(authProfileIndex + 1, false);
-    }
-  });
+  const dataSize = useRef(profiles?.length ?? 0);
 
-  const carouselRef = useRef<CarouselSelectListHandle | null>(null);
-  const [selectedIndex, setSelectedIndex] = useState(initialProfileIndex);
+  const focus = useScreenHasFocus();
 
   const onSelectedIndexChange = useCallback(
     (index: number) => {
@@ -119,6 +110,34 @@ const HomeProfilesCarousel = ({ user: userKey }: HomeProfilesCarouselProps) => {
     },
     [onSelectedIndexChange],
   );
+
+  useOnFocus(() => {
+    const { profileInfos } = getAuthState();
+    const authProfileIndex = profiles?.findIndex(
+      profile => profile.id === profileInfos?.profileId,
+    );
+    if (
+      authProfileIndex !== undefined &&
+      authProfileIndex !== -1 &&
+      authProfileIndex + 1 !== currentIndexProfile.value
+    ) {
+      carouselRef.current?.scrollToIndex(authProfileIndex + 1, false);
+    }
+  });
+
+  useEffect(() => {
+    if (focus) {
+      if (dataSize.current > (profiles?.length ?? 0)) {
+        scrollToIndex(1, true);
+        dataSize.current = profiles?.length ?? 0;
+      } else if (dataSize.current !== profiles?.length) {
+        dataSize.current = profiles?.length ?? 0;
+      }
+    }
+  }, [focus, profiles?.length, currentIndexProfile, scrollToIndex]);
+
+  const carouselRef = useRef<CarouselSelectListHandle | null>(null);
+  const [selectedIndex, setSelectedIndex] = useState(initialProfileIndex);
 
   const renderItem = useCallback(
     ({ item, index }: ListRenderItemInfo<ProfileType | null>) => {
@@ -142,22 +161,6 @@ const HomeProfilesCarousel = ({ user: userKey }: HomeProfilesCarouselProps) => {
     [coverWidth, coverHeight, scrollToIndex, selectedIndex],
   );
 
-  const data = useMemo(
-    () => (profiles ? [null, ...profiles] : [null]),
-    [profiles],
-  );
-
-  const dataSize = useRef(data.length);
-
-  useOnFocus(() => {
-    if (dataSize.current > data.length) {
-      scrollToIndex(1, true);
-      dataSize.current = data.length;
-    } else if (dataSize.current !== data.length) {
-      dataSize.current = data.length;
-    }
-  });
-
   const { width: windowWidth } = useWindowDimensions();
 
   if (profiles == null) {
@@ -176,7 +179,7 @@ const HomeProfilesCarousel = ({ user: userKey }: HomeProfilesCarouselProps) => {
           height={coverHeight}
           itemWidth={coverWidth}
           scaleRatio={SCALE_RATIO}
-          style={[styles.carousel, { width: windowWidth }]}
+          style={styles.carousel}
           itemContainerStyle={styles.carouselContentContainer}
           onSelectedIndexChange={onSelectedIndexChange}
           currentProfileIndexSharedValue={currentIndexSharedValue}
@@ -192,7 +195,7 @@ const SCALE_RATIO = 108 / 291;
 const keyExtractor = (item: ProfileType | null, index: number) =>
   item?.webCard.id ?? `new_${index}`;
 
-export default memo(HomeProfilesCarousel);
+export default HomeProfilesCarousel;
 
 type ProfileType = ArrayItemType<HomeProfilesCarousel_user$data['profiles']>;
 

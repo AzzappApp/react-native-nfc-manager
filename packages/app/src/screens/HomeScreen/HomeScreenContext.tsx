@@ -7,7 +7,10 @@ import React, {
 } from 'react';
 import { useDerivedValue, useSharedValue } from 'react-native-reanimated';
 import { graphql, useFragment } from 'react-relay';
-import { useOnFocus, useRouteWillChange } from '#components/NativeRouter';
+import {
+  useRouteWillChange,
+  useScreenHasFocus,
+} from '#components/NativeRouter';
 import {
   addAuthStateListener,
   getAuthState,
@@ -25,6 +28,7 @@ type HomeScreenContextType = {
   currentIndexProfile: SharedValue<number>;
   onCurrentProfileIndexChange: (index: number) => void;
   initialProfileIndex: number;
+  inputRange: SharedValue<number[]>;
 };
 
 const HomeScreenContext = React.createContext<
@@ -95,8 +99,11 @@ export const HomeScreenProvider = ({
   // we need to keep a ref to the profiles to avoid prefetching when the user `profiles` field changes
   const profilesRef = useRef(user.profiles);
 
-  useOnFocus(() => {
+  const focus = useScreenHasFocus();
+
+  useEffect(() => {
     if (
+      focus &&
       user?.profiles &&
       profilesRef.current &&
       user?.profiles?.length < profilesRef.current.length
@@ -111,7 +118,7 @@ export const HomeScreenProvider = ({
       }
     }
     profilesRef.current = user.profiles;
-  });
+  }, [focus, user.profiles]);
 
   const profilesDisposables = useRef<Disposable[]>([]).current;
   useEffect(() => {
@@ -152,7 +159,7 @@ export const HomeScreenProvider = ({
     if (user.profiles?.length === 0) {
       onChangeWebCard({ profileId: '', webCardId: '', profileRole: '' });
     }
-  }, [user.profiles, user.profiles?.length]);
+  }, [user.profiles?.length]);
 
   const onCurrentProfileIndexChange = useCallback(
     (index: number) => {
@@ -177,18 +184,25 @@ export const HomeScreenProvider = ({
     }
   }, [initialProfileIndex, user?.profiles]);
 
+  const inputRange = useDerivedValue(
+    () => Array.from({ length: (user.profiles?.length ?? 0) + 1 }, (_, i) => i),
+    [user.profiles?.length],
+  );
+
   const value = useMemo(
     () => ({
       currentIndexSharedValue,
       initialProfileIndex,
       currentIndexProfile,
       onCurrentProfileIndexChange,
+      inputRange,
     }),
     [
       currentIndexProfile,
       currentIndexSharedValue,
       initialProfileIndex,
       onCurrentProfileIndexChange,
+      inputRange,
     ],
   );
 
@@ -209,15 +223,9 @@ export const useHomeScreenContext = () => {
   return context;
 };
 
-export const useHomeScreenInputProfileRange = (
-  profiles: readonly unknown[],
-) => {
-  const inputRange = useDerivedValue(
-    () => Array.from({ length: (profiles?.length ?? 0) + 1 }, (_, i) => i),
-    [profiles?.length],
-  );
-
-  return inputRange;
+export const useHomeScreenInputProfileRange = () => {
+  const context = useHomeScreenContext();
+  return context.inputRange;
 };
 
 export const useHomeScreenCurrentIndex = () => {

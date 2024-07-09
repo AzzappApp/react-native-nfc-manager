@@ -13,10 +13,7 @@ import HomeBottomPanelMessage from './HomeBottomPanelMessage';
 import HomeContactCard from './HomeContactCard';
 import HomeInformations from './HomeInformations';
 import HomeMenu, { HOME_MENU_HEIGHT } from './HomeMenu';
-import {
-  useHomeScreenContext,
-  useHomeScreenInputProfileRange,
-} from './HomeScreenContext';
+import { useHomeScreenContext } from './HomeScreenContext';
 import HomeStatistics from './HomeStatistics';
 import type { HomeBottomPanel_user$key } from '#relayArtifacts/HomeBottomPanel_user.graphql';
 
@@ -66,8 +63,7 @@ const HomeBottomPanel = ({ user: userKey }: HomeBottomPanelProps) => {
   );
   const { profiles } = user;
   const [selectedPanel, setSelectedPanel] = useState<HOME_TAB>('CONTACT_CARD');
-  const { currentIndexSharedValue } = useHomeScreenContext();
-  const inputRange = useHomeScreenInputProfileRange(profiles ?? []);
+  const { currentIndexSharedValue, inputRange } = useHomeScreenContext();
   //#endregion
 
   const { width: windowWidth } = useWindowDimensions();

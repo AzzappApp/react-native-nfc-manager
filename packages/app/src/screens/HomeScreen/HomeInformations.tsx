@@ -12,10 +12,7 @@ import AnimatedText from '#components/AnimatedText';
 import { useRouter } from '#components/NativeRouter';
 import PressableOpacity from '#ui/PressableOpacity';
 import Text from '#ui/Text';
-import {
-  useHomeScreenInputProfileRange,
-  useHomeScreenContext,
-} from './HomeScreenContext';
+import { useHomeScreenContext } from './HomeScreenContext';
 import type { HomeInformations_user$key } from '#relayArtifacts/HomeInformations_user.graphql';
 type HomeInformationsProps = {
   user: HomeInformations_user$key;
@@ -85,7 +82,7 @@ const HomeInformations = ({ height, user }: HomeInformationsProps) => {
   const nbFollowers = useSharedValue('-1');
   const nbFollowings = useSharedValue('-1');
 
-  const { currentIndexSharedValue, currentIndexProfile } =
+  const { currentIndexSharedValue, currentIndexProfile, inputRange } =
     useHomeScreenContext();
   //using profiles object directly in animatedReaction causes error animatedHost(seems to be the case for all relay query result)
   useEffect(() => {
@@ -104,8 +101,6 @@ const HomeInformations = ({ height, user }: HomeInformationsProps) => {
     nbPosts,
     nbPostsValue,
   ]);
-
-  const inputRange = useHomeScreenInputProfileRange(profiles ?? []);
 
   useAnimatedReaction(
     () => currentIndexSharedValue.value,

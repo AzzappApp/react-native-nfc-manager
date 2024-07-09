@@ -58,15 +58,18 @@ const HomeScreenContent = ({ user: userKey }: HomeScreenContentProps) => {
 
   // #endregion
 
+  const homeContentContainerStyle = useMemo(
+    () => [
+      styles.contentContainer,
+      { paddingBottom: bottom + BOTTOM_MENU_HEIGHT + 15 },
+    ],
+    [bottom],
+  );
+
   return (
     <View style={styles.container}>
       <HomeBackground user={user} />
-      <View
-        style={[
-          styles.contentContainer,
-          { paddingBottom: bottom + BOTTOM_MENU_HEIGHT + 15 },
-        ]}
-      >
+      <View style={homeContentContainerStyle}>
         <HomeHeader openPanel={toggleShowMenu} user={user} />
         <HomeProfileLink user={user} />
         <HomeProfilesCarousel user={user} />

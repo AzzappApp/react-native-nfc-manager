@@ -13,10 +13,7 @@ import { colors } from '#theme';
 import useScreenInsets from '#hooks/useScreenInsets';
 import Header from '#ui/Header';
 import IconButton from '#ui/IconButton';
-import {
-  useHomeScreenContext,
-  useHomeScreenInputProfileRange,
-} from './HomeScreenContext';
+import { useHomeScreenContext } from './HomeScreenContext';
 import type { HomeHeader_user$key } from '#relayArtifacts/HomeHeader_user.graphql';
 import type { ColorValue } from 'react-native';
 
@@ -43,8 +40,7 @@ const HomeHeader = ({ openPanel, user: userKey }: HomeHeaderProps) => {
   );
   const insets = useScreenInsets();
   const headerStyle = useMemo(() => ({ marginTop: insets.top }), [insets.top]);
-  const { currentIndexSharedValue } = useHomeScreenContext();
-  const inputRange = useHomeScreenInputProfileRange(profiles ?? []);
+  const { currentIndexSharedValue, inputRange } = useHomeScreenContext();
   const readableColors = useMemo(
     () => [
       colors.white,

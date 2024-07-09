@@ -7,10 +7,7 @@ import {
 import { graphql, useFragment } from 'react-relay';
 import { colors } from '#theme';
 import WebCardBackground from '#components/WebCardBackground';
-import {
-  useHomeScreenContext,
-  useHomeScreenInputProfileRange,
-} from './HomeScreenContext';
+import { useHomeScreenContext } from './HomeScreenContext';
 import type { HomeBackground_user$key } from '#relayArtifacts/HomeBackground_user.graphql';
 
 type HomeBackgroundProps = {
@@ -35,8 +32,7 @@ const HomeBackground = ({ user: userKey }: HomeBackgroundProps) => {
     userKey,
   );
 
-  const { currentIndexSharedValue } = useHomeScreenContext();
-  const inputRange = useHomeScreenInputProfileRange(user.profiles ?? []);
+  const { currentIndexSharedValue, inputRange } = useHomeScreenContext();
 
   const primaryColors = useMemo(
     () => [
