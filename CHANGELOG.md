@@ -1,5 +1,6 @@
-## 0.5.19-canary.92
+## 0.5.19-canary.93
 
+* **fix:**  - limit size of exported cover on low ends device ([#4141](https://github.com/AzzappApp/azzapp/pull/4141))
 * **fix:**  - **cover:** [#4126](https://github.com/AzzappApp/azzapp/pull/4126) missed imageScales updates ([#4138](https://github.com/AzzappApp/azzapp/pull/4138))
 * **fix:**  - **android:** [#4103](https://github.com/AzzappApp/azzapp/pull/4103) avoid multiple input ranges calculations ([#4121](https://github.com/AzzappApp/azzapp/pull/4121))
 * **fix:**  - **cover:** [#4127](https://github.com/AzzappApp/azzapp/pull/4127) ensure cover is not read while saving ([#4134](https://github.com/AzzappApp/azzapp/pull/4134))
