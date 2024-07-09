@@ -13,24 +13,6 @@ export const COVER_RATIO = 0.625;
 export const COVER_ANIMATION_DURATION = 5000;
 
 /**
- * The height of the
- */
-export const COVER_MEDIA_RESOLUTION = {
-  width: 1200,
-  height: 1920,
-};
-
-/**
- * Cover video bitrate
- */
-export const COVER_VIDEO_BITRATE = 10000000;
-
-/**
- * Cover video frame rate
- */
-export const COVER_VIDEO_FRAME_RATE = 60;
-
-/**
  * The border radius that should be used when a cover is not displayed full screen
  */
 export const COVER_CARD_RADIUS = 0.128;

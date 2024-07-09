@@ -13,12 +13,6 @@ import {
   getValidEncoderConfigurations,
 } from '@azzapp/react-native-skia-video';
 import { waitTime } from '@azzapp/shared/asyncHelpers';
-import {
-  COVER_VIDEO_BITRATE,
-  COVER_VIDEO_FRAME_RATE,
-  COVER_MEDIA_RESOLUTION,
-} from '@azzapp/shared/coverHelpers';
-import { MAX_EXPORT_DECODER_RESOLUTION } from '#helpers/coverHelpers';
 import { createRandomFilePath, getFileName } from '#helpers/fileHelpers';
 import { addLocalCachedMediaFile } from '#helpers/mediaHelpers';
 import { uploadMedia, uploadSign } from '#helpers/MobileWebAPI';
@@ -29,6 +23,10 @@ import {
   createCoverVideoComposition,
   extractLottieInfoMemoized,
   isCoverDynamic,
+  MAX_EXPORT_DECODER_RESOLUTION,
+  COVER_EXPORT_VIDEO_RESOLUTION,
+  COVER_VIDEO_BITRATE,
+  COVER_VIDEO_FRAME_RATE,
 } from './coverEditorHelpers';
 import coverLocalStore from './coversLocalStore';
 import type { useSaveCoverMutation } from '#relayArtifacts/useSaveCoverMutation.graphql';
@@ -228,7 +226,7 @@ const createCoverMedia = async (coverEditorState: CoverEditorState) => {
       createPicture(canvas => {
         coverDrawer({
           canvas,
-          ...COVER_MEDIA_RESOLUTION,
+          ...COVER_EXPORT_VIDEO_RESOLUTION,
           frames: {},
           currentTime: 0,
           videoScales: {},
@@ -239,7 +237,7 @@ const createCoverMedia = async (coverEditorState: CoverEditorState) => {
           videoComposition: { duration: 0, items: [] },
         });
       }),
-      COVER_MEDIA_RESOLUTION,
+      COVER_EXPORT_VIDEO_RESOLUTION,
     );
 
     const blob = await image.encodeToBase64(ImageFormat.JPEG, 95);
@@ -254,7 +252,7 @@ const createCoverMedia = async (coverEditorState: CoverEditorState) => {
     );
 
     const requestedConfigs = {
-      ...COVER_MEDIA_RESOLUTION,
+      ...COVER_EXPORT_VIDEO_RESOLUTION,
       bitRate: COVER_VIDEO_BITRATE,
       frameRate: COVER_VIDEO_FRAME_RATE,
     };

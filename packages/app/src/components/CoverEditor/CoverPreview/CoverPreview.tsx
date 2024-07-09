@@ -1,8 +1,6 @@
 import { clamp } from '@shopify/react-native-skia';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
-  Dimensions,
-  PixelRatio,
   Platform,
   Pressable,
   StyleSheet,
@@ -54,6 +52,7 @@ import {
   createCoverSkottieWithColorReplacement,
   createCoverVideoComposition,
   extractLottieInfoMemoized,
+  MAX_DISPLAY_DECODER_RESOLUTION,
 } from '../coverEditorHelpers';
 import {
   BoundsEditorGestureHandler,
@@ -1313,11 +1312,6 @@ const CoverPreview = ({
 };
 
 export default CoverPreview;
-
-const MAX_DISPLAY_DECODER_RESOLUTION = Math.min(
-  (Dimensions.get('window').height / 2) * Math.min(PixelRatio.get(), 2),
-  1920,
-);
 
 const CONTROLS_BUTTON_ICON_SIZE = 20;
 const CONTROLS_BUTTON_HEIGHT = 30;

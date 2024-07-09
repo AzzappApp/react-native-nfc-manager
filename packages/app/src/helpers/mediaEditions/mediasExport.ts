@@ -4,6 +4,7 @@ import {
   createPicture,
   drawAsImageFromPicture,
 } from '@shopify/react-native-skia';
+import * as Device from 'expo-device';
 import { Platform } from 'react-native';
 import ReactNativeBlobUtil from 'react-native-blob-util';
 import {
@@ -28,6 +29,7 @@ import {
 } from './singleVideoCompositions';
 import type { EditionParameters } from './EditionParameters';
 import type { Filter } from '@azzapp/shared/filtersHelper';
+const MEMORY_SIZE = (Device.totalMemory ?? 0) / Math.pow(1024, 3);
 
 export const saveTransformedImageToFile = async ({
   uri,
@@ -85,8 +87,7 @@ export const saveTransformedImageToFile = async ({
   return path;
 };
 
-// TODO differentiate by OS and models ? the resolution has great impact on the memory usage
-const MAX_EXPORT_DECODER_RESOLUTION = 1920;
+const MAX_EXPORT_DECODER_RESOLUTION = MEMORY_SIZE < 8 ? 1280 : 1920;
 
 export const saveTransformedVideoToFile = async ({
   video,

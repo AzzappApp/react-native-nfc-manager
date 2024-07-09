@@ -2,7 +2,6 @@ import { Skia } from '@shopify/react-native-skia';
 import { useCallback, useMemo } from 'react';
 import { type ViewProps } from 'react-native';
 import { colors } from '#theme';
-import { MAX_DISPLAY_DECODER_RESOLUTION } from '#helpers/coverHelpers';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import {
   useLutShader,
@@ -36,6 +35,7 @@ export type TransformedVideoRendererProps = Exclude<ViewProps, 'children'> & {
   duration: number;
   width: number;
   height: number;
+  maxResolution?: number;
   onLoad?: () => void;
   onError?: (error?: Error) => void;
 };
@@ -50,6 +50,7 @@ const TransformedVideoRenderer = ({
   onLoad,
   width,
   height,
+  maxResolution,
   ...props
 }: TransformedVideoRendererProps) => {
   const lutShader = useLutShader(filter);
@@ -70,7 +71,10 @@ const TransformedVideoRenderer = ({
       width,
       height,
       rotation,
-      getDeviceMaxDecodingResolution(videoPath, MAX_DISPLAY_DECODER_RESOLUTION),
+      getDeviceMaxDecodingResolution(
+        videoPath,
+        Math.min(maxResolution ?? 1920, 1920),
+      ),
     );
 
     return {
@@ -82,7 +86,7 @@ const TransformedVideoRenderer = ({
       ),
       videoScale,
     };
-  }, [videoPath, video, startTime, duration]);
+  }, [videoPath, video, maxResolution, startTime, duration]);
 
   const composition = infos?.composition ?? null;
   const videoScale = infos?.videoScale ?? 1;

@@ -8,12 +8,12 @@ import {
   COVER_VIDEO_DEFAULT_DURATION,
 } from '@azzapp/shared/coverHelpers';
 import { colors } from '#theme';
-import { calculateImageScale } from '#helpers/coverHelpers';
 import { cropDataForAspectRatio } from '#helpers/mediaEditions';
 import {
   mediaInfoIsImage,
   extractLottieInfoMemoized,
   getLottieMediasDurations,
+  calculateImageScale,
 } from './coverEditorHelpers';
 import type { CoverEditorAction } from './coverEditorActions';
 import type { CoverEditorState, MediaInfo } from './coverEditorTypes';

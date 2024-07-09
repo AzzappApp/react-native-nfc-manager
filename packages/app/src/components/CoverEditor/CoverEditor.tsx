@@ -23,7 +23,6 @@ import {
 import { COVER_RATIO } from '@azzapp/shared/coverHelpers';
 import { colors } from '#theme';
 import { ScreenModal, preventModalDismiss } from '#components/NativeRouter';
-import { calculateImageScale } from '#helpers/coverHelpers';
 import { NativeBufferLoader, loadAllLUTShaders } from '#helpers/mediaEditions';
 import { getVideoLocalPath } from '#helpers/mediaHelpers';
 import useToggle from '#hooks/useToggle';
@@ -34,6 +33,7 @@ import CoverEditorContextProvider from './CoverEditorContext';
 import {
   mediaInfoIsImage,
   extractLottieInfoMemoized,
+  calculateImageScale,
 } from './coverEditorHelpers';
 import CoverEditorMediaPicker from './CoverEditorMediaPicker';
 import { coverEditorReducer } from './coverEditorReducer';

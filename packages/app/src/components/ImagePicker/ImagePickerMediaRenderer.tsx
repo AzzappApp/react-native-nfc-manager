@@ -1,6 +1,6 @@
 import isEqual from 'lodash/isEqual';
 import { useCallback, useMemo, useState } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet, useWindowDimensions, View } from 'react-native';
 import { colors } from '#theme';
 import Cropper from '#components/Cropper';
 import TransformedImageRenderer from '#components/TransformedImageRenderer';
@@ -72,6 +72,8 @@ const ImagePickerMediaRenderer = ({
     return { ...imageDimensions, backgroundColor: 'black' };
   }, [imageDimensions]);
 
+  const { width: windowWidth } = useWindowDimensions();
+
   if (!media) {
     return null;
   }
@@ -110,6 +112,7 @@ const ImagePickerMediaRenderer = ({
                   editionParameters={{ ...editionParameters, cropData }}
                   startTime={timeRange?.startTime ?? 0}
                   duration={timeRange?.duration ?? 15}
+                  maxResolution={windowWidth * 2}
                 />
               )
             }
