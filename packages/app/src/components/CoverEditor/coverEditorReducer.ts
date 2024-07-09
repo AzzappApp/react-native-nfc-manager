@@ -194,7 +194,7 @@ export function coverEditorReducer(
     // #region Medias Actions
     case 'UPDATE_MEDIAS':
       const medias: MediaInfo[] = [];
-      const imagesScales: Record<string, number> = {};
+      const imagesScales = state.imagesScales;
 
       payload.forEach((media, index) => {
         const mediaInfo = state.medias.find(
