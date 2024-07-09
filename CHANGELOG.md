@@ -1,5 +1,6 @@
-## 0.5.19-canary.89
+## 0.5.19-canary.90
 
+* **fix:**  - **cover:** [#4127](https://github.com/AzzappApp/azzapp/pull/4127) ensure cover is not read while saving ([#4134](https://github.com/AzzappApp/azzapp/pull/4134))
 * **fix:**  - **cover:** [#4126](https://github.com/AzzappApp/azzapp/pull/4126) don’t overwrite existing scales ([#4132](https://github.com/AzzappApp/azzapp/pull/4132))
 * **fix:**  - **CoverEditor:** image scale misscalculation
 * **fix:**  - 🐛 properly limit and display video change and cut ([#4122](https://github.com/AzzappApp/azzapp/pull/4122))
