@@ -1,5 +1,6 @@
-## 0.5.19-canary.88
+## 0.5.19-canary.89
 
+* **fix:**  - **cover:** [#4126](https://github.com/AzzappApp/azzapp/pull/4126) don’t overwrite existing scales ([#4132](https://github.com/AzzappApp/azzapp/pull/4132))
 * **fix:**  - **CoverEditor:** image scale misscalculation
 * **fix:**  - 🐛 properly limit and display video change and cut ([#4122](https://github.com/AzzappApp/azzapp/pull/4122))
 * **fix:**  - **CoverEditor:** don't filter existing media when filtering
