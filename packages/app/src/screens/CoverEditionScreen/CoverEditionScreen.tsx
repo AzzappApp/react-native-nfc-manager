@@ -28,11 +28,13 @@ const CoverEditionScreen = ({
   const profile = data.node?.profile;
 
   const [canSave, setCanSave] = useState(false);
+  const [saving, setSaving] = useState(false);
   const coverEditorRef = useRef<CoverEditorHandle | null>(null);
   const inset = useScreenInsets();
 
   const { cover: savedCoverState, loading } = useLocalCover(
     profile?.webCard?.coverId ?? '',
+    saving,
   );
   const router = useRouter();
 
@@ -41,10 +43,18 @@ const CoverEditionScreen = ({
   }, [router]);
 
   const onSave = useCallback(() => {
-    if (canSave)
-      coverEditorRef.current?.save().then(() => {
-        router.back();
-      });
+    if (canSave) {
+      setSaving(true);
+      coverEditorRef.current
+        ?.save()
+        .then(() => {
+          setSaving(false);
+          router.back();
+        })
+        .finally(() => {
+          setSaving(false);
+        });
+    }
   }, [canSave, router]);
 
   const onNewCover = useCallback(() => {
