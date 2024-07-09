@@ -359,7 +359,7 @@ const CoverEditorCore = (
       );
     }
 
-    const { imagesScales } = coverEditorState;
+    const imagesScales = coverEditorState.imagesScales;
 
     if (imagesToLoad.length > 0) {
       promises.push(
@@ -438,6 +438,7 @@ const CoverEditorCore = (
     coverEditorState.images,
     coverEditorState.videoPaths,
     coverEditorState.overlayLayers,
+    coverEditorState.imagesScales,
   ]);
 
   useEffect(() => {

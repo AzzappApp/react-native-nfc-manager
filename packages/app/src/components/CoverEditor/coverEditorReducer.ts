@@ -194,7 +194,7 @@ export function coverEditorReducer(
     // #region Medias Actions
     case 'UPDATE_MEDIAS':
       const medias: MediaInfo[] = [];
-      const imagesScales = state.imagesScales;
+      let imagesScales = state.imagesScales;
 
       payload.forEach((media, index) => {
         const mediaInfo = state.medias.find(
@@ -220,7 +220,10 @@ export function coverEditorReducer(
           aspectRatio,
         );
         if (media.kind === 'image') {
-          imagesScales[media.uri] = calculateImageScale(media);
+          imagesScales = {
+            ...imagesScales,
+            [media.uri]: calculateImageScale(media),
+          };
           medias.push({
             media,
             filter: null,
