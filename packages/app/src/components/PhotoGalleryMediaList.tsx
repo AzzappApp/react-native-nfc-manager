@@ -270,8 +270,8 @@ const PhotoGalleryMediaList = ({
   }, [load]);
 
   const extraData = useMemo(
-    () => ({ selectedMediasIds, selectedMediaId }),
-    [selectedMediasIds, selectedMediaId],
+    () => ({ selectedMediasIds, selectedMediaId, downloadingFiles }),
+    [selectedMediasIds, selectedMediaId, downloadingFiles],
   );
 
   const [manageAccessMediaVisible, toggleManageAccessMediaVisible] =
