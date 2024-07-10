@@ -1,5 +1,9 @@
-## 0.5.19-canary.100
+## 0.5.19-canary.101
 
+* **fix:**  - **android:** [#4156](https://github.com/AzzappApp/azzapp/pull/4156) animation seems to break the carousel on android ([#4159](https://github.com/AzzappApp/azzapp/pull/4159))
+* **fix:**  - **mediaPicker:** [#4152](https://github.com/AzzappApp/azzapp/pull/4152) display loader on icloud files ([#4157](https://github.com/AzzappApp/azzapp/pull/4157))
+* **fix:**  - **android:** [#4154](https://github.com/AzzappApp/azzapp/pull/4154) missing shadow on cover ([#4166](https://github.com/AzzappApp/azzapp/pull/4166))
+* **fix:**  - **cover:** [#4131](https://github.com/AzzappApp/azzapp/pull/4131) use percentage (like other fields) ([#4167](https://github.com/AzzappApp/azzapp/pull/4167))
 * **fix:**  - 🐛 properly display filter preview ([#4168](https://github.com/AzzappApp/azzapp/pull/4168))
 * **feat:**  - paywall first lottie integration for validation ([#4165](https://github.com/AzzappApp/azzapp/pull/4165))
 * **fix:**  - **cover:** [#4127](https://github.com/AzzappApp/azzapp/pull/4127) wrong webCardId read on switching webCard ([#4164](https://github.com/AzzappApp/azzapp/pull/4164))
