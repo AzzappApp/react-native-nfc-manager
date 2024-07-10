@@ -1,4 +1,4 @@
-## 0.5.19-canary.94
+## 0.5.19-canary.95
 
 * **feat:**  - 🎸 configure links on backoffice and web ([#4148](https://github.com/AzzappApp/azzapp/pull/4148))
 * **fix:**  - limit size of exported cover on low ends device ([#4141](https://github.com/AzzappApp/azzapp/pull/4141))
