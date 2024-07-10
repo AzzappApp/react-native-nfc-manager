@@ -66,8 +66,8 @@ const CoverEditorTextImageAnimationTool = () => {
           }
         }
 
-        const startPercent = start / coverDuration;
-        const endPercent = end / coverDuration;
+        const startPercent = (start / coverDuration) * 100;
+        const endPercent = (end / coverDuration) * 100;
 
         dispatch({
           type: 'UPDATE_TEXT_LAYER',
@@ -172,8 +172,8 @@ const CoverEditorTextImageAnimationTool = () => {
             minimumValue={0}
             maximumValue={coverDuration}
             value={[
-              activeTextLayer.startPercentageTotal * coverDuration,
-              activeTextLayer.endPercentageTotal * coverDuration,
+              (activeTextLayer.startPercentageTotal * coverDuration) / 100,
+              (activeTextLayer.endPercentageTotal * coverDuration) / 100,
             ]}
             onValueChange={onChangeAnimationDuration}
           />

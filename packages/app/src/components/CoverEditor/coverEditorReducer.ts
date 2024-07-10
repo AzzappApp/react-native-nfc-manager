@@ -495,7 +495,7 @@ export function coverEditorReducer(
             shadow: false,
             animation: null,
             startPercentageTotal: 0,
-            endPercentageTotal: 1,
+            endPercentageTotal: 100,
           },
         ],
         selectedItemIndex: state.textLayers.length,
@@ -548,7 +548,7 @@ export function coverEditorReducer(
             elevation: 0,
             animation: null,
             startPercentageTotal: 0,
-            endPercentageTotal: 1,
+            endPercentageTotal: 100,
             bounds: {
               x: 50,
               y: 50,

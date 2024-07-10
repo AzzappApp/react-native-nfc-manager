@@ -78,8 +78,8 @@ const CoverEditorOverlayImageAnimationTool = () => {
           }
         }
 
-        const startPercent = start / totalDuration;
-        const endPercent = end / totalDuration;
+        const startPercent = (start / totalDuration) * 100;
+        const endPercent = (end / totalDuration) * 100;
 
         dispatch({
           type: 'UPDATE_OVERLAY_LAYER',
@@ -225,8 +225,8 @@ const CoverEditorOverlayImageAnimationTool = () => {
             minimumValue={0}
             maximumValue={totalDuration}
             value={[
-              activeOverlay.startPercentageTotal * totalDuration,
-              activeOverlay.endPercentageTotal * totalDuration,
+              (activeOverlay.startPercentageTotal * totalDuration) / 100,
+              (activeOverlay.endPercentageTotal * totalDuration) / 100,
             ]}
             onValueChange={onChangeAnimationDuration}
           />

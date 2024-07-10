@@ -217,12 +217,8 @@ const CoverEditorCore = (
                   ? customText ?? ''
                   : '';
           return {
-            animation: null,
-            startPercentageTotal: 0,
-            endPercentageTotal: 1,
             ...textLayer,
             text,
-            rotation: 0,
           };
         })
       : [];

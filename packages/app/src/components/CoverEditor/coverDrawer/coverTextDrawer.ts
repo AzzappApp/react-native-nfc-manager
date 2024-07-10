@@ -86,8 +86,8 @@ const coverTextDrawer = ({
   } = layer;
 
   if (
-    currentTime < startPercentageTotal * duration ||
-    currentTime > endPercentageTotal * duration
+    currentTime < (startPercentageTotal * duration) / 100 ||
+    currentTime > (endPercentageTotal * duration) / 100
   ) {
     return;
   }
@@ -121,8 +121,8 @@ const coverTextDrawer = ({
     const progress = interpolate(
       currentTime,
       [
-        startPercentageTotal * duration,
-        endPercentageTotal * duration,
+        (startPercentageTotal * duration) / 100,
+        (endPercentageTotal * duration) / 100,
         duration,
       ],
       [0, 1],
