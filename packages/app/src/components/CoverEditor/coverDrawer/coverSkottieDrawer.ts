@@ -1,3 +1,4 @@
+import { Platform } from 'react-native';
 import {
   applyImageFrameTransformations,
   createImageFromNativeBuffer,
@@ -10,6 +11,8 @@ import { mediaInfoIsImage } from '../coverEditorHelpers';
 import type { ImageFrame } from '#helpers/mediaEditions';
 import type { CoverDrawerOptions } from './coverDrawerTypes';
 import type { SkImage, SkMatrix } from '@shopify/react-native-skia';
+
+const isAndroid = Platform.OS === 'android';
 
 const coverSkottieDrawer = ({
   canvas,
@@ -46,7 +49,7 @@ const coverSkottieDrawer = ({
     if (mediaInfoIsImage(mediaInfo)) {
       const image = createImageFromNativeBuffer(
         images[mediaInfo.media.uri],
-        true,
+        !isAndroid,
       );
       scale = imagesScales[mediaInfo.media.uri] ?? 1;
       imageFrame = image ? imageFrameFromImage(image) : null;
