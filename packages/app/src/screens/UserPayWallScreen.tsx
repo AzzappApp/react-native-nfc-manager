@@ -44,6 +44,7 @@ const UserPayWallScreen = () => {
   const router = useRouter();
   const { width, height } = useWindowDimensions();
   const { bottom } = useScreenInsets();
+  const bottomHeight = height - width - bottom;
   const [period, setPeriod] = useState<'month' | 'year'>('year');
   const [selectedPurchasePackage, setSelectedPurchasePackage] =
     useState<PurchasesPackage | null>(null);
@@ -136,11 +137,9 @@ const UserPayWallScreen = () => {
     },
   });
 
-  const windowWidth = useWindowDimensions().width;
-
   return (
     <View style={styles.container}>
-      <View style={[{ width }, styles.featureContainer]}>
+      <View style={[{ width, height: width }, styles.featureContainer]}>
         <Animated.ScrollView
           horizontal
           snapToInterval={width}
@@ -155,18 +154,29 @@ const UserPayWallScreen = () => {
             key="subscription_page_1"
             style={[
               {
-                backgroundColor: 'red',
                 width,
+                height: width + 30,
               },
               styles.promoContainer,
             ]}
-            //missing content from design team
           >
+            <LottieView
+              source={require('../assets/paywall/paywall_azzapp_step1.json')}
+              autoPlay
+              loop
+              hardwareAccelerationAndroid
+              style={{
+                position: 'absolute',
+                width,
+                height: width,
+                backgroundColor: colors.black,
+              }}
+            />
             <LinearGradient
               colors={['transparent', 'rgba(0, 0, 0, 0.9)']}
               locations={[0, 1]}
               style={{
-                height: height - BOTTOM_HEIGHT + 130,
+                height: height - bottomHeight + 130,
                 width,
                 position: 'absolute',
               }}
@@ -194,7 +204,7 @@ const UserPayWallScreen = () => {
               colors={['transparent', 'rgba(0, 0, 0, 0.9)']}
               locations={[0, 1]}
               style={{
-                height: height - BOTTOM_HEIGHT + 130,
+                height: height - bottomHeight + 130,
                 width,
                 position: 'absolute',
               }}
@@ -211,7 +221,6 @@ const UserPayWallScreen = () => {
             key="subscription_page_3"
             style={[
               {
-                backgroundColor: 'blue',
                 width,
               },
               styles.promoContainer,
@@ -222,7 +231,7 @@ const UserPayWallScreen = () => {
               colors={['transparent', 'rgba(0, 0, 0, 0.9)']}
               locations={[0, 1]}
               style={{
-                height: height - BOTTOM_HEIGHT + 130,
+                height: height - bottomHeight + 130,
                 width,
                 position: 'absolute',
               }}
@@ -250,7 +259,7 @@ const UserPayWallScreen = () => {
               colors={['transparent', 'rgba(0, 0, 0, 0.9)']}
               locations={[0, 1]}
               style={{
-                height: height - BOTTOM_HEIGHT + 130,
+                height: height - bottomHeight + 130,
                 width,
                 position: 'absolute',
               }}
@@ -286,7 +295,7 @@ const UserPayWallScreen = () => {
         onPress={() => router.back()}
         size={50}
       />
-      <View style={styles.content}>
+      <View style={[styles.content]}>
         <View style={styles.contaienrLogo}>
           <Image
             source={require('#assets/logo-full.png')}
@@ -394,8 +403,8 @@ const UserPayWallScreen = () => {
             loop
             hardwareAccelerationAndroid
             style={{
-              width: windowWidth / 2,
-              height: windowWidth / 2,
+              width: width / 2,
+              height: width / 2,
               marginTop: -100,
             }}
           />
@@ -417,7 +426,6 @@ UserPayWallScreen.getScreenOptions = (): ScreenOptions => ({
 });
 
 const CIRCLE_SIZE = 5;
-const BOTTOM_HEIGHT = 414;
 
 export default UserPayWallScreen;
 
@@ -536,8 +544,8 @@ const styles = StyleSheet.create({
     bottom: 20,
     height: 30,
   },
-  featureContainer: { flex: 1, marginBottom: -20 },
-  container: { backgroundColor: colors.black, flex: 1 },
+  featureContainer: { flex: 1, marginBottom: -20, aspectRatio: 1 },
+  container: { flex: 1, backgroundColor: colors.black },
   priceItem: {
     flexDirection: 'row',
     height: 54,
@@ -569,7 +577,7 @@ const styles = StyleSheet.create({
   },
   scrollViewStyle: { width: '100%' },
   content: {
-    height: BOTTOM_HEIGHT,
+    flex: 1,
     justifyContent: 'flex-end',
     alignItems: 'center',
     backgroundColor: 'white',
