@@ -1,5 +1,6 @@
-## 0.5.19-canary.96
+## 0.5.19-canary.97
 
+* **fix:**  - **CoverEdition:** properly handle pause and android snapshot ([#4163](https://github.com/AzzappApp/azzapp/pull/4163))
 * **feat:**  - iOS IAP ([#4149](https://github.com/AzzappApp/azzapp/pull/4149))
 * **feat:**  - 🎸 configure links on backoffice and web ([#4148](https://github.com/AzzappApp/azzapp/pull/4148))
 * **fix:**  - limit size of exported cover on low ends device ([#4141](https://github.com/AzzappApp/azzapp/pull/4141))
