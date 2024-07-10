@@ -28,15 +28,12 @@ const getCoverStore = () => {
   return coverStore;
 };
 
-const getSavedCover = () => {
+const getSavedCover = (webCardId: string) => {
   const store = getCoverStore();
   if (!store) {
     return null;
   }
-  const webCardId = getAuthState().profileInfos?.webCardId;
-  if (!webCardId) {
-    return null;
-  }
+
   const storeString = store.getString(webCardId);
   if (!storeString) {
     return null;

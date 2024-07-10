@@ -3,7 +3,7 @@ import ReactNativeBlobUtil from 'react-native-blob-util';
 import coverLocalStore from '#components/CoverEditor/coversLocalStore';
 import type { CoverEditorState } from '#components/CoverEditor';
 
-const useLocalCover = (coverId: string, saving: boolean) => {
+const useLocalCover = (webCardId: string, coverId: string, saving: boolean) => {
   const [state, setState] = useState<{
     cover: Partial<CoverEditorState> | null;
     loading: boolean;
@@ -15,7 +15,7 @@ const useLocalCover = (coverId: string, saving: boolean) => {
   useEffect(() => {
     let cancelled = false;
     const loadCover = async () => {
-      const cover = coverLocalStore.getSavedCover();
+      const cover = coverLocalStore.getSavedCover(webCardId);
       if (!cover || cover.coverId !== coverId) {
         setState({
           cover: null,
@@ -56,7 +56,7 @@ const useLocalCover = (coverId: string, saving: boolean) => {
     return () => {
       cancelled = true;
     };
-  }, [coverId, saving]);
+  }, [coverId, saving, webCardId]);
 
   return state;
 };

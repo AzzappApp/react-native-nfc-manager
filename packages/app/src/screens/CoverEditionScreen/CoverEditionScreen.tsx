@@ -33,6 +33,7 @@ const CoverEditionScreen = ({
   const inset = useScreenInsets();
 
   const { cover: savedCoverState, loading } = useLocalCover(
+    profile?.webCard?.id ?? '',
     profile?.webCard?.coverId ?? '',
     saving,
   );
