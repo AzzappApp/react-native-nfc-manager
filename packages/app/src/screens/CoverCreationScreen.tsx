@@ -139,7 +139,7 @@ const CoverCreationScreen = ({
         rightElementWidth={80}
         backIcon="arrow_left"
         currentPage={fromCoverEdition ? 1 : 3}
-        nbPages={fromCoverEdition ? 2 : 5}
+        nbPages={fromCoverEdition ? 3 : 5}
         onBack={onBack}
       />
       <View style={{ flex: 1 }}>
