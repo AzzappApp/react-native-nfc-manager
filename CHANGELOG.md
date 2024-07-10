@@ -1,5 +1,6 @@
-## 0.5.19-canary.98
+## 0.5.19-canary.99
 
+* **feat:**  - paywall first lottie integration for validation ([#4165](https://github.com/AzzappApp/azzapp/pull/4165))
 * **fix:**  - **cover:** [#4127](https://github.com/AzzappApp/azzapp/pull/4127) wrong webCardId read on switching webCard ([#4164](https://github.com/AzzappApp/azzapp/pull/4164))
 * **fix:**  - **CoverEdition:** properly handle pause and android snapshot ([#4163](https://github.com/AzzappApp/azzapp/pull/4163))
 * **feat:**  - iOS IAP ([#4149](https://github.com/AzzappApp/azzapp/pull/4149))
