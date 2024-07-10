@@ -3,7 +3,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import { View } from 'react-native';
 import { graphql, usePreloadedQuery } from 'react-relay';
 import { colors } from '#theme';
-import { NextHeaderButton } from '#components/commonsButtons';
+import { SaveHeaderButton } from '#components/commonsButtons';
 import CoverEditor from '#components/CoverEditor';
 import { useRouter } from '#components/NativeRouter';
 import PremiumIndicator from '#components/PremiumIndicator';
@@ -130,7 +130,7 @@ const CoverCreationScreen = ({
           )
         }
         rightElement={
-          <NextHeaderButton
+          <SaveHeaderButton
             style={{ width: 70, marginRight: 10 }}
             onPress={onSaveCover}
             disabled={!canSave}
