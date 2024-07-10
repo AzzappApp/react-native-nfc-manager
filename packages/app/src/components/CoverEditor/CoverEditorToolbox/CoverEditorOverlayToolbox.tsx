@@ -51,11 +51,11 @@ const CoverEditorOverlayToolbox = () => {
         horizontal
         contentContainerStyle={styles.scrollContentContainer}
       >
-        <CoverEditorOverlayAnimationTool />
         <CoverEditorBorderTool />
+        <CoverEditorOverlayAnimationTool />
         <CoverEditorFiltersTool />
-        <CoverEditorShadowTool />
         <CoverEditorAdjustTool />
+        <CoverEditorShadowTool />
         <CoverEditorMediaReplace />
         <CoverEditorDelete />
       </ScrollView>
