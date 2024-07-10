@@ -1226,6 +1226,17 @@ const CoverPreview = ({
                     onLayout={handleTextInputLayout}
                     value={editedTextLayer.text ?? ''}
                     multiline
+                    blurOnSubmit
+                    returnKeyType="done"
+                    onSubmitEditing={() => {
+                      dispatch({
+                        type: 'SET_EDITION_MODE',
+                        payload: {
+                          editionMode: 'text',
+                          selectedItemIndex: selectedLayerIndex,
+                        },
+                      });
+                    }}
                     style={[
                       {
                         position: 'absolute',
