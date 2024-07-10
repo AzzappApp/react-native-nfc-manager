@@ -54,11 +54,7 @@ import {
   extractLottieInfoMemoized,
   MAX_DISPLAY_DECODER_RESOLUTION,
 } from '../coverEditorHelpers';
-import {
-  BoundsEditorGestureHandler,
-  RESIZE_HANDLE_SIZE,
-  drawBoundsEditor,
-} from './BoundsEditor';
+import { BoundsEditorGestureHandler, drawBoundsEditor } from './BoundsEditor';
 import { DynamicLinkRenderer } from './DynamicLinkRenderer';
 import type { EditionParameters } from '#helpers/mediaEditions';
 import type { ResizeHandlePosition } from './BoundsEditor';
@@ -485,9 +481,6 @@ const CoverPreview = ({
       const canvasHeight = viewHeight;
       const { bounds, rotation } = activeLayerBounds.value;
       const { x: offsetX, y: offsetY } = gestureOffset.value.bounds;
-      const { width: resizeHandleSizeWidth } = RESIZE_HANDLE_SIZE;
-      const isLayerText = activeLayer.kind === 'text';
-
       const cos = Math.cos(rotation);
       const sin = Math.sin(rotation);
 
@@ -495,14 +488,12 @@ const CoverPreview = ({
         ((Math.abs(((bounds.width * canvasWidth) / 100) * cos) +
           Math.abs(((bounds.height * canvasHeight) / 100) * sin)) /
           canvasWidth) *
-          100 +
-        (resizeHandleSizeWidth * 100) / canvasWidth / 2;
+        100;
       const boundingBoxHeight =
         ((Math.abs(((bounds.height * canvasHeight) / 100) * cos) +
           Math.abs(((bounds.width * canvasWidth) / 100) * sin)) /
           canvasHeight) *
-          100 +
-        (!isLayerText ? (resizeHandleSizeWidth * 100) / canvasHeight / 2 : 0);
+        100;
       activeLayerBounds.value = {
         bounds: {
           x: clamp(
@@ -521,13 +512,7 @@ const CoverPreview = ({
         rotation,
       };
     },
-    [
-      activeLayer.kind,
-      activeLayerBounds,
-      gestureOffset.value,
-      viewHeight,
-      viewWidth,
-    ],
+    [activeLayerBounds, gestureOffset.value, viewHeight, viewWidth],
   );
 
   /**
