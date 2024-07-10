@@ -495,7 +495,10 @@ const OfferItem = ({
     >
       <Text variant="button">
         <FormattedMessage
-          defaultMessage={'{qty} users'}
+          defaultMessage={`{qty, plural,
+            =1 {{qty} User}
+            other {{qty} Users}
+          }`}
           description="MultiUser Paywall Screen - number of seat offer"
           values={{
             qty: parseInt(offer.product.identifier.split('.').pop() ?? '0', 10),
