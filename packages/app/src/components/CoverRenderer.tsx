@@ -207,9 +207,14 @@ const CoverRenderer = (
     };
   }, [coverDynamicLinks, layout]);
 
+  const shadowStyle = useMemo(
+    () => [{ borderRadius }, styles.shadow],
+    [borderRadius, styles.shadow],
+  );
+
   return useMemo(
     () => (
-      <View style={large ? undefined : styles.shadow}>
+      <View style={large ? undefined : shadowStyle}>
         <View
           ref={forwardRef}
           style={containerStyle}
@@ -298,17 +303,16 @@ const CoverRenderer = (
       isSmallCover,
       isVideoMedia,
       large,
-      layout?.height,
-      layout?.width,
+      layout,
       linksSize.height,
       linksSize.width,
       onError,
       onReadyForDisplay,
+      shadowStyle,
       showLinks,
       smallThumbnail,
       styles.coverPlaceHolder,
       styles.layer,
-      styles.shadow,
       thumbnail,
       width,
     ],
@@ -325,6 +329,8 @@ const stylesheet = createStyleSheet(theme => ({
   },
   shadow: {
     ...shadow(theme, 'bottom'),
+    borderWidth: 1,
+    borderColor: 'transparent',
   },
   layer: {
     position: 'absolute',
