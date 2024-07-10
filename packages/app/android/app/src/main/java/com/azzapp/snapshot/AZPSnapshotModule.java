@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-public class AZPSnapshotModule extends ReactContextBaseJavaModule  {
+public class AZPSnapshotModule extends ReactContextBaseJavaModule {
 
 
   private static final String NAME = "AZPSnapshotModule";
@@ -38,7 +38,6 @@ public class AZPSnapshotModule extends ReactContextBaseJavaModule  {
   public String getName() {
     return NAME;
   }
-
 
 
   private static final Map<String, Bitmap> snapshotMap = new HashMap<>();
@@ -78,7 +77,7 @@ public class AZPSnapshotModule extends ReactContextBaseJavaModule  {
     }
   }
 
-  private Bitmap getBitmapFromView(View view) {
+  public static Bitmap getBitmapFromView(View view) {
     Bitmap bitmap = Bitmap.createBitmap(view.getWidth(), view.getHeight(), Bitmap.Config.ARGB_8888);
     Canvas canvas = new Canvas(bitmap);
     view.draw(canvas);
@@ -90,17 +89,17 @@ public class AZPSnapshotModule extends ReactContextBaseJavaModule  {
     paint.setDither(true);
 
     for (final View child : childrenList) {
-      // skip any child that we don't know how to process
+      // Skip any child that we don't know how to process
       if (child instanceof TextureView tvChild) {
         if (child.getVisibility() != View.VISIBLE) continue;
         tvChild.setOpaque(false);
         final Bitmap childBitmapBuffer = tvChild.getBitmap(
-          Bitmap.createBitmap(child.getWidth(), child.getHeight(),Bitmap.Config.ARGB_8888));
+          Bitmap.createBitmap(child.getWidth(), child.getHeight(), Bitmap.Config.ARGB_8888));
 
         final int countCanvasSave = canvas.save();
         applyTransformations(canvas, view, child);
 
-        // due to re-use of bitmaps for screenshot, we can get bitmap that is bigger in size than requested
+        // Due to re-use of bitmaps for screenshot, we can get bitmap that is bigger in size than requested
         canvas.drawBitmap(childBitmapBuffer, 0, 0, paint);
 
         canvas.restoreToCount(countCanvasSave);
@@ -111,7 +110,7 @@ public class AZPSnapshotModule extends ReactContextBaseJavaModule  {
   }
 
   @NonNull
-  private List<View> getAllChildren(@NonNull final View v) {
+  private static List<View> getAllChildren(@NonNull final View v) {
     if (!(v instanceof ViewGroup viewGroup)) {
       final ArrayList<View> viewArrayList = new ArrayList<>();
       viewArrayList.add(v);
@@ -124,7 +123,7 @@ public class AZPSnapshotModule extends ReactContextBaseJavaModule  {
     for (int i = 0; i < viewGroup.getChildCount(); i++) {
       View child = viewGroup.getChildAt(i);
 
-      //Do not add any parents, just add child elements
+      // Do not add any parents, just add child elements
       result.addAll(getAllChildren(child));
     }
 
@@ -136,11 +135,11 @@ public class AZPSnapshotModule extends ReactContextBaseJavaModule  {
    */
   @NonNull
   @SuppressWarnings("UnusedReturnValue")
-  private Matrix applyTransformations(final Canvas c, @NonNull final View root, @NonNull final View child) {
+  private static Matrix applyTransformations(final Canvas c, @NonNull final View root, @NonNull final View child) {
     final Matrix transform = new Matrix();
     final LinkedList<View> ms = new LinkedList<>();
 
-    // find all parents of the child view
+    // Find all parents of the child view
     View iterator = child;
     do {
       ms.add(iterator);
@@ -148,23 +147,21 @@ public class AZPSnapshotModule extends ReactContextBaseJavaModule  {
       iterator = (View) iterator.getParent();
     } while (iterator != root);
 
-    // apply transformations from parent --> child order
+    // Apply transformations from parent --> child order
     Collections.reverse(ms);
 
     for (final View v : ms) {
-      c.save();
-
-      // apply each view transformations, so each child will be affected by them
+      // Apply each view transformations, so each child will be affected by them
       final float dx = v.getLeft() + ((v != child) ? v.getPaddingLeft() : 0) + v.getTranslationX();
       final float dy = v.getTop() + ((v != child) ? v.getPaddingTop() : 0) + v.getTranslationY();
       c.translate(dx, dy);
-      c.rotate(v.getRotation(), v.getPivotX(), v.getPivotY());
-      c.scale(v.getScaleX(), v.getScaleY());
-
-      // compute the matrix just for any future use
       transform.postTranslate(dx, dy);
+
+      c.rotate(v.getRotation(), v.getPivotX(), v.getPivotY());
       transform.postRotate(v.getRotation(), v.getPivotX(), v.getPivotY());
-      transform.postScale(v.getScaleX(), v.getScaleY());
+
+      c.scale(v.getScaleX(), v.getScaleY(), v.getPivotX(), v.getPivotY());
+      transform.postScale(v.getScaleX(), v.getScaleY(), v.getPivotX(), v.getPivotY());
     }
 
     return transform;

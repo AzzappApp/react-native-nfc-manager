@@ -1030,19 +1030,6 @@ const CoverPreview = ({
     };
   });
 
-  const [pauseComposition, setPauseComposition] = useState(false);
-
-  useEffect(() => {
-    const timeout = setTimeout(() => {
-      setPauseComposition(
-        editionMode === 'textEdit' ||
-          editionMode === 'text' ||
-          editionMode === 'overlay',
-      );
-    }, 10);
-    return () => clearTimeout(timeout);
-  }, [editionMode]);
-
   return (
     <>
       <View
@@ -1088,7 +1075,11 @@ const CoverPreview = ({
               )}
               {hasFocus && (
                 <VideoCompositionRenderer
-                  pause={pauseComposition}
+                  pause={
+                    editionMode === 'textEdit' ||
+                    editionMode === 'text' ||
+                    editionMode === 'overlay'
+                  }
                   composition={composition}
                   width={viewWidth}
                   height={viewHeight}
