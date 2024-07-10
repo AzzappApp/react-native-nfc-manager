@@ -1,5 +1,6 @@
-## 0.5.19-canary.106
+## 0.5.19-canary.107
 
+* **fix:**  - **CoverEdition:** text selection mode by default on new text layer
 * **fix:**  - **NewWebcard:** CoverEdition step number
 * **fix:**  - **NewCover:** replace next button by save
 * **feat:**  - unpublished webcard is IAP subscription expired or cancelled ([#4178](https://github.com/AzzappApp/azzapp/pull/4178))
