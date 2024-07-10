@@ -33,6 +33,8 @@ const CoverTemplateConfirmationScreenModal = ({
             iconStyle={styles.closeIcon}
             variant="icon"
             onPress={onClose}
+            style={styles.closeIconContainer}
+            hitSlop={{ top: 12, left: 12, bottom: 12, right: 12 }}
           />
         </View>
         <View style={styles.content}>
@@ -88,10 +90,21 @@ const styles = StyleSheet.create({
   },
   closeIcon: {
     tintColor: colors.white,
-  },
-  close: {
     width: 24,
     height: 24,
+  },
+  closeIconContainer: {
+    width: 24,
+    height: 24,
+  },
+  close: {
+    width: 48,
+    height: 48,
+    justifyContent: 'center',
+    alignItems: 'center',
+    position: 'relative',
+    top: -12,
+    left: -12,
   },
   template: {
     width: '100%',
