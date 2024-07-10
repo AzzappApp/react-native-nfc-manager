@@ -1,5 +1,6 @@
 import { useCallback, useMemo } from 'react';
 import { useIntl } from 'react-intl';
+import { View, type ViewProps } from 'react-native';
 import { typedEntries } from '@azzapp/shared/objectHelpers';
 import { useFilterLabels } from '#helpers/mediaEditions';
 import BoxSelectionList from './BoxSelectionList';
@@ -9,7 +10,6 @@ import type { Media } from '#helpers/mediaHelpers';
 import type { BoxButtonItemInfo } from './BoxSelectionList';
 import type { Filter } from '@azzapp/shared/filtersHelper';
 import type { SkImage } from '@shopify/react-native-skia';
-import type { ViewProps } from 'react-native';
 import type { DerivedValue } from 'react-native-reanimated';
 
 type FilterSelectionListProps = ViewProps & {
@@ -97,21 +97,46 @@ const FilterSelectionList = ({
     [intl],
   );
 
+  const limitedImageRatio = Math.min(
+    Math.max(aspectRatio, SELECTION_MINIMUM_IMAGE_RATIO),
+    SELECTION_MAXIMUM_IMAGE_RATIO,
+  );
+
+  const selectionHeight = useMemo(() => {
+    return (
+      SELECTION_MAXIMUM_HEIGHT -
+      (limitedImageRatio - SELECTION_MINIMUM_IMAGE_RATIO) *
+        SELECTION_IMAGE_STEP_HEIGHT
+    );
+  }, [limitedImageRatio]);
+
   return (
-    <BoxSelectionList
-      data={filters}
-      renderItem={renderItem}
-      renderLabel={renderLabel}
-      keyExtractor={keyExtractor}
-      accessibilityRole="list"
-      onSelect={onSelect}
-      imageRatio={aspectRatio}
-      selectedItem={filters.find(item => item[0] === selectedFilter) ?? null}
-      {...props}
-    />
+    <View style={{ flex: 1, justifyContent: 'center' }}>
+      <View style={{ height: selectionHeight }}>
+        <BoxSelectionList
+          data={filters}
+          renderItem={renderItem}
+          renderLabel={renderLabel}
+          keyExtractor={keyExtractor}
+          accessibilityRole="list"
+          onSelect={onSelect}
+          imageRatio={limitedImageRatio}
+          selectedItem={
+            filters.find(item => item[0] === selectedFilter) ?? null
+          }
+          fixedItemWidth={140}
+          {...props}
+        />
+      </View>
+    </View>
   );
 };
 
 const keyExtractor = (item: [string, string]) => item[0];
+
+const SELECTION_MINIMUM_IMAGE_RATIO = 0.5;
+const SELECTION_MAXIMUM_IMAGE_RATIO = 2;
+const SELECTION_MAXIMUM_HEIGHT = 170;
+const SELECTION_IMAGE_STEP_HEIGHT = 26;
 
 export default FilterSelectionList;
