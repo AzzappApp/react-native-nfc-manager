@@ -1,5 +1,6 @@
-## 0.5.19-canary.93
+## 0.5.19-canary.94
 
+* **feat:**  - 🎸 configure links on backoffice and web ([#4148](https://github.com/AzzappApp/azzapp/pull/4148))
 * **fix:**  - limit size of exported cover on low ends device ([#4141](https://github.com/AzzappApp/azzapp/pull/4141))
 * **fix:**  - **cover:** [#4126](https://github.com/AzzappApp/azzapp/pull/4126) missed imageScales updates ([#4138](https://github.com/AzzappApp/azzapp/pull/4138))
 * **fix:**  - **android:** [#4103](https://github.com/AzzappApp/azzapp/pull/4103) avoid multiple input ranges calculations ([#4121](https://github.com/AzzappApp/azzapp/pull/4121))
