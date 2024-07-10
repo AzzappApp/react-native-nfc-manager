@@ -128,7 +128,7 @@ const HomeProfilesCarousel = ({ user: userKey }: HomeProfilesCarouselProps) => {
   useEffect(() => {
     if (focus) {
       if (dataSize.current > (profiles?.length ?? 0)) {
-        scrollToIndex(1, true);
+        scrollToIndex(1, false);
         dataSize.current = profiles?.length ?? 0;
       } else if (dataSize.current !== profiles?.length) {
         dataSize.current = profiles?.length ?? 0;
