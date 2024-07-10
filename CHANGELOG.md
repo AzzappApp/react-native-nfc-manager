@@ -1,5 +1,7 @@
-## 0.5.19-canary.105
+## 0.5.19-canary.106
 
+* **fix:**  - **NewWebcard:** CoverEdition step number
+* **fix:**  - **NewCover:** replace next button by save
 * **feat:**  - unpublished webcard is IAP subscription expired or cancelled ([#4178](https://github.com/AzzappApp/azzapp/pull/4178))
 * **fix:**  - **cover:** [#4173](https://github.com/AzzappApp/azzapp/pull/4173) blur on submit text layer ([#4176](https://github.com/AzzappApp/azzapp/pull/4176))
 * **fix:**  - plural translation for Subscription information ([#4181](https://github.com/AzzappApp/azzapp/pull/4181))
