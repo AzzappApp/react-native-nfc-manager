@@ -1,4 +1,4 @@
-## 0.5.19-canary.104
+## 0.5.19-canary.105
 
 * **feat:**  - unpublished webcard is IAP subscription expired or cancelled ([#4178](https://github.com/AzzappApp/azzapp/pull/4178))
 * **fix:**  - **cover:** [#4173](https://github.com/AzzappApp/azzapp/pull/4173) blur on submit text layer ([#4176](https://github.com/AzzappApp/azzapp/pull/4176))
