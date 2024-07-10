@@ -1,5 +1,7 @@
-## 0.5.19-canary.101
+## 0.5.19-canary.102
 
+* **fix:**  - 🐛 increase close touch area size ([#4171](https://github.com/AzzappApp/azzapp/pull/4171))
+* **fix:**  - 🐛 use complete links ([#4170](https://github.com/AzzappApp/azzapp/pull/4170))
 * **fix:**  - **android:** [#4156](https://github.com/AzzappApp/azzapp/pull/4156) animation seems to break the carousel on android ([#4159](https://github.com/AzzappApp/azzapp/pull/4159))
 * **fix:**  - **mediaPicker:** [#4152](https://github.com/AzzappApp/azzapp/pull/4152) display loader on icloud files ([#4157](https://github.com/AzzappApp/azzapp/pull/4157))
 * **fix:**  - **android:** [#4154](https://github.com/AzzappApp/azzapp/pull/4154) missing shadow on cover ([#4166](https://github.com/AzzappApp/azzapp/pull/4166))
