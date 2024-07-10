@@ -8,7 +8,7 @@ import {
   Select,
   Typography,
 } from '@mui/material';
-import { SOCIAL_NETWORK_LINKS } from '@azzapp/shared/socialLinkHelpers';
+import { SOCIAL_LINKS } from '@azzapp/shared/socialLinkHelpers';
 import ColorInput from './ColorInput';
 import PositionInput from './PositionInput';
 import SizeInput from './SizeInput';
@@ -52,7 +52,7 @@ const SocialLinksForm = ({ form, field }: Props) => {
                 <MenuItem value="">
                   <em>None</em>
                 </MenuItem>
-                {SOCIAL_NETWORK_LINKS.map(({ id }) => (
+                {SOCIAL_LINKS.map(({ id }) => (
                   <MenuItem key={id} value={id}>
                     <Typography
                       style={{
