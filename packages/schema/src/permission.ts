@@ -129,7 +129,6 @@ const ProtectedMutation: Record<
   acceptOwnership: isAnyRoleRule,
   saveCardStyle: isEditorRule,
   saveCommonInformation: isAdminRule,
-  saveSubscription: isAnyRoleRule,
   cancelTransferOwnership: isOwnerRule,
   saveContactCard: isAnyRoleRule,
   saveCover: isEditorRule,

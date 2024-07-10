@@ -94,15 +94,15 @@ export const createSubscription = async (
 export const updateActiveUserSubscription = async (
   userId: string,
   subscription: Partial<UserSubscription>,
+  trx: DbTransaction = db,
 ) => {
-  await db
+  await trx
     .update(UserSubscriptionTable)
     .set(subscription)
     .where(
       and(
         eq(UserSubscriptionTable.userId, userId),
         isNull(UserSubscriptionTable.webCardId),
-        ne(UserSubscriptionTable.status, 'canceled'),
       ),
     );
 };
@@ -228,7 +228,13 @@ export const getLastSubscription = async (
     .where(
       and(
         eq(UserSubscriptionTable.userId, userId),
-        eq(UserSubscriptionTable.webCardId, webCardId),
+        or(
+          eq(UserSubscriptionTable.webCardId, webCardId),
+          and(
+            isNull(UserSubscriptionTable.webCardId),
+            ne(UserSubscriptionTable.issuer, 'web'),
+          ),
+        ),
       ),
     )
     .orderBy(desc(UserSubscriptionTable.startAt))

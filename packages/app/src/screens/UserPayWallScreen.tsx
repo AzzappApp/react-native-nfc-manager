@@ -1,7 +1,9 @@
 import { LinearGradient } from 'expo-linear-gradient';
-import { useCallback, useEffect, useState } from 'react';
+import LottieView from 'lottie-react-native';
+import { memo, useCallback, useEffect, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import {
+  Alert,
   Image,
   Linking,
   ScrollView,
@@ -9,7 +11,7 @@ import {
   View,
   useWindowDimensions,
 } from 'react-native';
-import Purchases from 'react-native-purchases';
+import Purchases, { INTRO_ELIGIBILITY_STATUS } from 'react-native-purchases';
 import Animated, {
   interpolate,
   interpolateColor,
@@ -17,9 +19,12 @@ import Animated, {
   useAnimatedStyle,
   useSharedValue,
 } from 'react-native-reanimated';
+import { commitLocalUpdate } from 'react-relay';
 import { colors } from '#theme';
 import { useRouter } from '#components/NativeRouter';
 import PremiumIndicator from '#components/PremiumIndicator';
+import { getAuthState } from '#helpers/authStore';
+import { getRelayEnvironment } from '#helpers/relayEnvironment';
 import useScreenInsets from '#hooks/useScreenInsets';
 import { useUserSubscriptionOffer } from '#hooks/useSubscriptionOffer';
 import Button from '#ui/Button';
@@ -42,6 +47,7 @@ const UserPayWallScreen = () => {
   const [period, setPeriod] = useState<'month' | 'year'>('year');
   const [selectedPurchasePackage, setSelectedPurchasePackage] =
     useState<PurchasesPackage | null>(null);
+  const [processing, setProcessing] = useState(false);
 
   const subscriptions = useUserSubscriptionOffer(period);
 
@@ -51,14 +57,75 @@ const UserPayWallScreen = () => {
     }
   }, [subscriptions]);
 
-  const processOrder = useCallback(async () => {
+  const [labelPurchase, setLabelPurchase] = useState<string>(
+    intl.formatMessage({
+      defaultMessage: 'CONTINUE',
+      description: 'MultiUser subscription button label trial not available',
+    }),
+  );
+
+  useEffect(() => {
     if (selectedPurchasePackage) {
-      await Purchases.purchasePackage(selectedPurchasePackage!);
-      //TODO ??e have to update the local cache of relay
-      // once the server notification is received, the database will be updated , and ... we don't have realtime so the local cache update will required
-      //polling is not usable here, because it will refresh the pagination list of multiuser(will cause a bad UX experience)
+      Purchases.checkTrialOrIntroductoryPriceEligibility([
+        selectedPurchasePackage?.identifier,
+      ]).then(trial => {
+        if (
+          trial[selectedPurchasePackage.identifier].status ===
+          INTRO_ELIGIBILITY_STATUS.INTRO_ELIGIBILITY_STATUS_ELIGIBLE
+        ) {
+          setLabelPurchase(
+            intl.formatMessage({
+              defaultMessage: 'START MY 7-DAY TRIAL',
+              description:
+                'MultiUser subscription button label trial available',
+            }),
+          );
+        } else {
+          setLabelPurchase(
+            intl.formatMessage({
+              defaultMessage: 'CONTINUE',
+              description:
+                'MultiUser subscription button label trial not available',
+            }),
+          );
+        }
+      });
     }
-  }, [selectedPurchasePackage]);
+  }, [intl, selectedPurchasePackage]);
+
+  const processOrder = useCallback(async () => {
+    const { profileInfos } = getAuthState();
+    if (selectedPurchasePackage && profileInfos) {
+      try {
+        setProcessing(true);
+
+        const res = await Purchases.purchasePackage(selectedPurchasePackage!);
+
+        // Update Relay cache temporary
+        if (res.customerInfo.entitlements.active?.multiuser?.isActive) {
+          commitLocalUpdate(getRelayEnvironment(), store => {
+            store.get(profileInfos.webCardId)?.setValue(true, 'isPremium');
+          });
+        }
+        setProcessing(false);
+        router.back();
+      } catch (error) {
+        //display error message
+
+        Alert.alert(
+          intl.formatMessage({
+            defaultMessage: 'Error during processing payment',
+            description: 'Title of the payment process error alert',
+          }),
+          intl.formatMessage({
+            defaultMessage:
+              'There was an error during the payment process, please try again later.',
+            description: 'Description of the payment process error alert',
+          }),
+        );
+      }
+    }
+  }, [intl, router, selectedPurchasePackage]);
 
   //const [currentPage, setCurrentPage] = useState(2);
   const currentIndex = useSharedValue(0);
@@ -68,6 +135,8 @@ const UserPayWallScreen = () => {
       currentIndex.value = Math.max(Math.min(4, index), 0);
     },
   });
+
+  const windowWidth = useWindowDimensions().width;
 
   return (
     <View style={styles.container}>
@@ -244,39 +313,13 @@ const UserPayWallScreen = () => {
           >
             {subscriptions.map(offer => {
               return (
-                <PressableOpacity
+                <Offer
                   key={offer.identifier}
-                  onPress={() => setSelectedPurchasePackage(offer)}
-                  style={[
-                    styles.priceItem,
-                    { overflow: 'visible' },
-                    selectedPurchasePackage?.identifier ===
-                      offer.identifier && {
-                      borderColor: colors.red400,
-                    },
-                  ]}
-                >
-                  <Text variant="button">
-                    <FormattedMessage
-                      defaultMessage={'{qty} users'}
-                      description="MultiUser Paywall Screen - number of seat offer"
-                      values={{
-                        qty: parseInt(
-                          offer.identifier.split('_').pop() ?? '0',
-                          10,
-                        ),
-                      }}
-                    />
-                  </Text>
-                  <View>
-                    <Text variant="button">{offer.product.priceString}</Text>
-                    {period === 'year' && (
-                      <Text variant="smallbold" style={{ textAlign: 'right' }}>
-                        {(offer.product.price / 12).toFixed(2)}
-                      </Text>
-                    )}
-                  </View>
-                </PressableOpacity>
+                  offer={offer}
+                  period={period}
+                  selectedPurchasePackage={selectedPurchasePackage}
+                  setSelectedPurchasePackage={setSelectedPurchasePackage}
+                />
               );
             })}
           </ScrollView>
@@ -299,10 +342,7 @@ const UserPayWallScreen = () => {
         </View>
         <View style={[styles.bottomContainer, { paddingBottom: bottom }]}>
           <Button
-            label={intl.formatMessage({
-              defaultMessage: 'START MY 7-DAY TRIAL',
-              description: 'MultiUser subscription button label',
-            })}
+            label={labelPurchase}
             style={[styles.buttonSubscribe, { width: '100%' }]}
             onPress={processOrder}
           />
@@ -346,6 +386,27 @@ const UserPayWallScreen = () => {
           </View>
         </View>
       </View>
+      {processing && (
+        <View style={styles.loadingContainer}>
+          <LottieView
+            source={require('../assets/loader.json')}
+            autoPlay
+            loop
+            hardwareAccelerationAndroid
+            style={{
+              width: windowWidth / 2,
+              height: windowWidth / 2,
+              marginTop: -100,
+            }}
+          />
+          <Text variant="button" style={styles.text}>
+            <FormattedMessage
+              defaultMessage="Processing payment"
+              description="UserPayWall - Processing loading screen"
+            />
+          </Text>
+        </View>
+      )}
     </View>
   );
 };
@@ -390,11 +451,70 @@ const AnimatedTabIndex = ({ currentIndex, index }: AnimatedTabIndexProps) => {
   );
 };
 
+type OfferItemProps = {
+  offer: PurchasesPackage;
+  setSelectedPurchasePackage: (offer: PurchasesPackage) => void;
+  selectedPurchasePackage: PurchasesPackage | null;
+  period: 'month' | 'year';
+};
+
+const OfferItem = ({
+  offer,
+  setSelectedPurchasePackage,
+  selectedPurchasePackage,
+  period,
+}: OfferItemProps) => {
+  const selectOffer = useCallback(
+    () => setSelectedPurchasePackage(offer),
+    [offer, setSelectedPurchasePackage],
+  );
+
+  return (
+    <PressableOpacity
+      key={offer.identifier}
+      onPress={selectOffer}
+      style={[
+        styles.priceItem,
+        { overflow: 'visible' },
+        selectedPurchasePackage?.identifier === offer.identifier && {
+          borderColor: colors.red400,
+        },
+      ]}
+    >
+      <Text variant="button">
+        <FormattedMessage
+          defaultMessage={'{qty} users'}
+          description="MultiUser Paywall Screen - number of seat offer"
+          values={{
+            qty: parseInt(offer.identifier.split('_').pop() ?? '0', 10),
+          }}
+        />
+      </Text>
+      <View>
+        <Text variant="button">{offer.product.priceString}</Text>
+        {period === 'year' && (
+          <Text variant="smallbold" style={{ textAlign: 'right' }}>
+            {(offer.product.price / 12).toFixed(2)}
+          </Text>
+        )}
+      </View>
+    </PressableOpacity>
+  );
+};
+
+const Offer = memo(OfferItem);
+
 const styles = StyleSheet.create({
   promoContainer: {
     alignItems: 'flex-end',
     justifyContent: 'flex-end',
     paddingBottom: 47,
+  },
+  text: {
+    color: colors.white,
+    width: '75%',
+    textAlign: 'center',
+    lineHeight: 36,
   },
   textPromo: {
     color: colors.white,
@@ -489,5 +609,11 @@ const styles = StyleSheet.create({
     marginLeft: CIRCLE_SIZE / 2,
     marginRight: CIRCLE_SIZE / 2,
     backgroundColor: colors.grey200,
+  },
+  loadingContainer: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(0,0,0,0.9)',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 });

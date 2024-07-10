@@ -44,7 +44,6 @@ import saveCardStyle from './saveCardStyle';
 import saveCommonInformation from './saveCommonInformation';
 import saveContactCard from './saveContactCard';
 import saveCover from './saveCover';
-import saveSubscription from './saveSubscription';
 import sendInvitations from './sendInvitations';
 import sendReport from './sendReport';
 import toggleFollowing from './toggleFollowing';
@@ -93,7 +92,6 @@ export const Mutation: MutationResolvers = {
   updateModulesVisibility,
   acceptInvitation,
   saveCommonInformation,
-  saveSubscription,
   updateMultiUser,
   acceptOwnership,
   declineOwnership,

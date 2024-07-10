@@ -15,6 +15,7 @@ import { FormattedMessage, IntlProvider, injectIntl } from 'react-intl';
 import { Platform, useColorScheme } from 'react-native';
 import { hide as hideSplashScreen } from 'react-native-bootsplash';
 import { KeyboardProvider } from 'react-native-keyboard-controller';
+import Purchases from 'react-native-purchases';
 import {
   initialWindowMetrics,
   SafeAreaProvider,
@@ -51,7 +52,6 @@ import {
   ScreenPrefetcherProvider,
   createScreenPrefetcher,
 } from '#helpers/ScreenPrefetcher';
-import SubscriptionProvider from '#helpers/SubscriptionContext';
 import useApplicationFonts, {
   loadSkiaTypeFonts,
 } from '#hooks/useApplicationFonts';
@@ -118,6 +118,17 @@ Sentry.init({
     }),
   ],
 });
+
+//initializing RC sneed to be done early
+if (Platform.OS === 'ios') {
+  Purchases.configure({
+    apiKey: process.env.PURCHASE_IOS_KEY!,
+  });
+} else if (Platform.OS === 'android') {
+  Purchases.configure({
+    apiKey: process.env.PURCHASE_ANDROID_KEY!,
+  });
+}
 
 /**
  * Initialize the application
@@ -423,29 +434,27 @@ const AppRouter = () => {
 
   return (
     <RelayEnvironmentProvider environment={environment}>
-      <SubscriptionProvider>
-        <ScreenPrefetcherProvider value={screenPrefetcher}>
-          <SafeAreaProvider
-            initialMetrics={initialWindowMetrics}
-            style={safeAreaBackgroundStyle}
-          >
-            <RouterProvider value={router}>
-              <ScreensRenderer
-                routerState={routerState}
-                screens={screens}
-                tabs={tabs}
-                onFinishTransitioning={onFinishTransitioning}
-                onScreenHasBeenDismissed={disposeScreens}
-              />
-            </RouterProvider>
-            <Toast />
-            <Suspense>
-              <ShakeShare />
-            </Suspense>
-            {showLoadingScreen && <LoadingScreen />}
-          </SafeAreaProvider>
-        </ScreenPrefetcherProvider>
-      </SubscriptionProvider>
+      <ScreenPrefetcherProvider value={screenPrefetcher}>
+        <SafeAreaProvider
+          initialMetrics={initialWindowMetrics}
+          style={safeAreaBackgroundStyle}
+        >
+          <RouterProvider value={router}>
+            <ScreensRenderer
+              routerState={routerState}
+              screens={screens}
+              tabs={tabs}
+              onFinishTransitioning={onFinishTransitioning}
+              onScreenHasBeenDismissed={disposeScreens}
+            />
+          </RouterProvider>
+          <Toast />
+          <Suspense>
+            <ShakeShare />
+          </Suspense>
+          {showLoadingScreen && <LoadingScreen />}
+        </SafeAreaProvider>
+      </ScreenPrefetcherProvider>
     </RelayEnvironmentProvider>
   );
 };

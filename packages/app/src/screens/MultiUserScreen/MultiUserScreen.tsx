@@ -108,6 +108,7 @@ const MultiUserScreen = ({
         webCard {
           id
           isMultiUser
+          isPremium
         }
       }
     }
