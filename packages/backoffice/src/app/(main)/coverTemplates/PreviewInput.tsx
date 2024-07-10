@@ -4,7 +4,7 @@ import {
   type FieldMetadata,
 } from '@conform-to/react';
 import { Box, Button, CardMedia, Typography } from '@mui/material';
-import { useState, type ChangeEvent } from 'react';
+import { useRef, useState, type ChangeEvent } from 'react';
 import { getVideoURL } from '@azzapp/shared/imagesHelpers';
 
 type Props = {
@@ -13,6 +13,7 @@ type Props = {
 };
 
 const PreviewInput = ({ previewField, previewIdField }: Props) => {
+  const inputRef = useRef<HTMLInputElement>(null);
   const previewInput = useInputControl(previewField as any);
   const [src, setSrc] = useState<any>(
     previewIdField.initialValue ? getVideoURL(previewIdField.initialValue) : '',
@@ -48,11 +49,17 @@ const PreviewInput = ({ previewField, previewIdField }: Props) => {
         />
       )}
       <input
+        ref={inputRef}
         {...getInputProps(previewField, { type: 'file' })}
         key={previewField.key}
         accept={'video/*'}
         style={{
           display: 'none',
+        }}
+        onClick={() => {
+          if (inputRef.current) {
+            inputRef.current.value = '';
+          }
         }}
         onChange={onLoadFile}
       />

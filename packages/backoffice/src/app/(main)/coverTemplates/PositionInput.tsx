@@ -1,6 +1,6 @@
 'use client';
 
-import { useInputControl } from '@conform-to/react';
+import { getInputProps, useInputControl } from '@conform-to/react';
 import { MenuItem, TextField, Typography } from '@mui/material';
 import { useState } from 'react';
 import type { FieldMetadata } from '@conform-to/react';
@@ -13,11 +13,12 @@ type Props = {
 };
 
 const POSITIONS = new Array(101).fill(null).map((_, i) => i.toString());
+const DEFAULT = 50;
 
 const PositionInput = ({ field }: Props) => {
   const [position, setPosition] = useState<Position>({
-    x: field.value?.x ? parseInt(field.value.x, 10) : 50,
-    y: field.value?.y ? parseInt(field.value.y, 10) : 50,
+    x: field.value?.x ? parseInt(field.value.x, 10) : DEFAULT,
+    y: field.value?.y ? parseInt(field.value.y, 10) : DEFAULT,
   });
   const fields = field.getFieldset();
 
@@ -54,6 +55,8 @@ const PositionInput = ({ field }: Props) => {
         select
         required
         error={!!field.errors}
+        {...getInputProps(fields.x, { type: 'number' })}
+        key={fields.x.key}
         onChange={onChangePositionX}
         value={position.x}
       >
@@ -69,6 +72,8 @@ const PositionInput = ({ field }: Props) => {
         select
         required
         error={!!field.errors}
+        {...getInputProps(fields.y, { type: 'number' })}
+        key={fields.y.key}
         onChange={onChangePositionY}
         value={position.y}
       >

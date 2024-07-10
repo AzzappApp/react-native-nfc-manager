@@ -4,12 +4,6 @@ import db, { cols } from './db';
 import { createId } from './helpers/createId';
 import type { InferInsertModel, InferSelectModel } from 'drizzle-orm';
 
-export type CoverAnimation = {
-  name?: string;
-  start: number;
-  end: number;
-};
-
 export type CoverTextType = 'custom' | 'firstName' | 'mainName';
 
 export type CoverText = {
@@ -24,7 +18,9 @@ export type CoverText = {
     x: number;
     y: number;
   };
-  animation: CoverAnimation;
+  animation?: string;
+  startPercentageTotal: number;
+  endPercentageTotal: number;
 };
 
 export type CoverOverlay = {
@@ -32,7 +28,7 @@ export type CoverOverlay = {
     id?: string;
   };
   borderWidth: number;
-  borderColor: string;
+  borderColor?: string;
   borderRadius: number;
   bounds: {
     x: number;
@@ -40,9 +36,11 @@ export type CoverOverlay = {
     height: number;
     width: number;
   };
-  filter: string;
+  filter?: string;
   rotation: number;
-  animation: CoverAnimation;
+  animation?: string;
+  startPercentageTotal: number;
+  endPercentageTotal: number;
 };
 
 export type SocialLinks = {

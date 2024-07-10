@@ -25,7 +25,7 @@ import {
   CircularProgress,
 } from '@mui/material';
 import { useRouter } from 'next/navigation';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useFormState } from 'react-dom';
 import { uploadMedia } from '#helpers/mediaHelper';
 import CoverOverlayForm from './CoverOverlayForm';
@@ -39,6 +39,7 @@ import type { CoverTemplateFormValue } from './coverTemplateSchema';
 import type {
   ColorPalette,
   CoverTemplate,
+  CoverTemplateParams,
   CoverTemplateTag,
   CoverTemplateType,
 } from '@azzapp/data';
@@ -60,9 +61,10 @@ const CoverTemplatesParametersForm = ({
   saved = false,
 }: CoverTemplateFormProps) => {
   const router = useRouter();
+  const loadConfInputRef = useRef<HTMLInputElement>(null);
   const [saving, setIsSaving] = useState(false);
   const [displaySaveSuccess, setDisplaySaveSuccess] = useState(saved);
-  const [error, setError] = useState<any>(null);
+  const [error, setError] = useState<string>();
   const [tags, setTags] = useState<string[]>([...(coverTemplate?.tags || [])]);
   const [lastResult, action] = useFormState(saveCoverTemplate, undefined);
   const [enabled, setEnabled] = useState(
@@ -157,13 +159,66 @@ const CoverTemplatesParametersForm = ({
     if (lastResult?.status === 'success') {
       setDisplaySaveSuccess(true);
     } else if (lastResult?.status === 'error') {
-      setError(true);
+      setError('Something went wrong');
     }
 
     if (lastResult?.coverTemplateId) {
       router.push(lastResult.coverTemplateId);
     }
   }, [lastResult, router]);
+
+  useEffect(() => {
+    const input = loadConfInputRef.current;
+
+    const handleFileAsync = async (e: any) => {
+      try {
+        const file: File = e.target.files[0];
+        const reader = new FileReader();
+        reader.onload = (e: any) => {
+          const data: CoverTemplateParams = JSON.parse(e.target.result);
+          if (!data.linksLayer && !data.overlayLayers && !data.textLayers) {
+            setError('Bad file format');
+          } else {
+            form.update({
+              name: fields.params.name,
+              value: {
+                ...data,
+                linksLayer: {
+                  ...data.linksLayer,
+                  links: data.linksLayer.links.filter(link => !link),
+                },
+                textLayers: data.textLayers.map(layer => ({
+                  ...layer,
+                  text: 'custom',
+                  customText: layer.text,
+                })),
+              },
+            });
+          }
+        };
+        reader.readAsText(file);
+        if (loadConfInputRef.current) {
+          loadConfInputRef.current.value = '';
+        }
+      } catch (e) {
+        console.error(e);
+        setError('Something went wrong');
+      }
+    };
+
+    if (input) {
+      input.addEventListener('change', handleFileAsync, false);
+    }
+    return () => {
+      if (input) {
+        input.removeEventListener('change', handleFileAsync, false);
+      }
+    };
+  }, [fields.params.name, form]);
+
+  const onSelectFile = () => {
+    loadConfInputRef.current?.click();
+  };
 
   return (
     <>
@@ -317,6 +372,24 @@ const CoverTemplatesParametersForm = ({
           </FormControl>
         </Box>
 
+        <Typography variant="body1">
+          Load cover template configuration file
+        </Typography>
+
+        <input
+          ref={loadConfInputRef}
+          type="file"
+          accept="application/json"
+          style={{
+            visibility: 'hidden',
+            display: 'none',
+          }}
+        />
+
+        <Button variant="contained" sx={{ mt: 2 }} onClick={onSelectFile}>
+          Load config file
+        </Button>
+
         <Typography variant="body1">Preview</Typography>
 
         <PreviewInput
@@ -332,7 +405,7 @@ const CoverTemplatesParametersForm = ({
           lottieIdField={fields.lottieId}
         />
 
-        <Box>
+        <Box width="100%">
           {fields.params
             .getFieldset()
             .textLayers.getFieldList()
@@ -461,12 +534,12 @@ const CoverTemplatesParametersForm = ({
         </Button>
       </Box>
       <Snackbar
-        open={error}
+        open={!!error}
         onClose={() => {
           setError(undefined);
         }}
         autoHideDuration={6000}
-        message={`Something went wrong`}
+        message={error}
         anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
       />
       <Snackbar

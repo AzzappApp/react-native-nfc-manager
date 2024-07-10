@@ -15,14 +15,12 @@ import {
   Typography,
 } from '@mui/material';
 import { useCallback, useState } from 'react';
-import {
-  COVER_MAX_FONT_SIZE,
-  COVER_MIN_FONT_SIZE,
-} from '@azzapp/shared/coverHelpers';
 import { APPLICATIONS_FONTS } from '@azzapp/shared/fontHelpers';
 import ColorInput from './ColorInput';
 import { textAnimations } from './constants';
+import PositionInput from './PositionInput';
 import RadianInput from './RadianInput';
+import SizeInput from './SizeInput';
 import type { TextSchemaType } from './coverTemplateSchema';
 import type { CoverTextType } from '@azzapp/data/coverTemplates';
 import type { FieldMetadata } from '@conform-to/react';
@@ -58,7 +56,7 @@ const CoverTextForm = ({ field }: TextFormProps) => {
   );
 
   return (
-    <Box display="flex" flexDirection="column" gap={2}>
+    <Box display="flex" flexDirection="column" gap={2} width="100%">
       <Box>
         <FormControlLabel
           control={
@@ -67,6 +65,7 @@ const CoverTextForm = ({ field }: TextFormProps) => {
               {...getInputProps(textFields.shadow, {
                 type: 'checkbox',
               })}
+              key={textFields.shadow.key}
               onChange={toggleShadow}
             />
           }
@@ -137,28 +136,7 @@ const CoverTextForm = ({ field }: TextFormProps) => {
       </Box>
       <Box display="flex" gap={2}>
         <ColorInput field={textFields.color} label="Color" />
-        <FormControl
-          fullWidth
-          error={!!textFields.fontSize.errors}
-          required
-          sx={{ flex: 1 }}
-        >
-          <InputLabel id="size-label">Size</InputLabel>
-          <Select
-            labelId={'size-label'}
-            label="Size"
-            {...getSelectProps(textFields.fontSize)}
-            key={textFields.fontSize.key}
-          >
-            {[
-              ...Array(COVER_MAX_FONT_SIZE - COVER_MIN_FONT_SIZE + 1).keys(),
-            ].map(size => (
-              <MenuItem key={size} value={size + COVER_MIN_FONT_SIZE}>
-                <Typography>{size + COVER_MIN_FONT_SIZE}</Typography>
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
+        <SizeInput field={textFields.fontSize} />
         <TextField
           label="Width"
           sx={{ flex: 1 }}
@@ -175,51 +153,20 @@ const CoverTextForm = ({ field }: TextFormProps) => {
           key={textFields.width.key}
         />
         <RadianInput field={textFields.orientation} label="Orientation" />
-        <TextField
-          label="X"
-          sx={{ flex: 1 }}
-          required
-          inputProps={{
-            min: '0',
-            max: '100',
-            defaultValue:
-              textFields.position.getFieldset().x.initialValue || '0',
-          }}
-          error={!!textFields.position.getFieldset().x.errors}
-          {...getInputProps(textFields.position.getFieldset().x, {
-            type: 'number',
-          })}
-          key={textFields.position.key}
-        />
-        <TextField
-          label="Y"
-          sx={{ flex: 1 }}
-          required
-          inputProps={{
-            min: '0',
-            max: '100',
-            defaultValue:
-              textFields.position.getFieldset().y.initialValue || '0',
-          }}
-          error={!!textFields.position.getFieldset().y.errors}
-          {...getInputProps(textFields.position.getFieldset().y, {
-            type: 'number',
-          })}
-          key={textFields.position.getFieldset().y.key}
-        />
+        <PositionInput field={textFields.position} />
       </Box>
       <Box display="flex" gap={2}>
         <FormControl
           fullWidth
-          error={!!textFields.animation.getFieldset().name.errors}
+          error={!!textFields.animation.errors}
           sx={{ flex: 1 }}
         >
           <InputLabel id="animation-label">Animation</InputLabel>
           <Select
             labelId={'animation-label'}
             label="Animation"
-            {...getSelectProps(textFields.animation.getFieldset().name)}
-            key={textFields.animation.getFieldset().name.key}
+            {...getSelectProps(textFields.animation)}
+            key={textFields.animation.key}
           >
             <MenuItem key="AnimationNone" value="">
               <em>No Animation</em>
@@ -234,18 +181,17 @@ const CoverTextForm = ({ field }: TextFormProps) => {
         <TextField
           label="Start"
           sx={{ flex: 1 }}
-          error={!!textFields.animation.getFieldset().start.errors}
+          error={!!textFields.startPercentageTotal.errors}
           required
           inputProps={{
             min: '0',
             max: '100',
-            defaultValue:
-              textFields.animation.getFieldset().start.initialValue || '0',
+            defaultValue: textFields.startPercentageTotal.initialValue || '0',
           }}
-          {...getInputProps(textFields.animation.getFieldset().start, {
+          {...getInputProps(textFields.startPercentageTotal, {
             type: 'number',
           })}
-          key={textFields.animation.getFieldset().start.key}
+          key={textFields.startPercentageTotal.key}
         />
         <TextField
           label="End"
@@ -254,14 +200,13 @@ const CoverTextForm = ({ field }: TextFormProps) => {
           inputProps={{
             min: '0',
             max: '100',
-            defaultValue:
-              textFields.animation.getFieldset().end.initialValue || '0',
+            defaultValue: textFields.endPercentageTotal.initialValue || '100',
           }}
-          error={!!textFields.animation.getFieldset().end.errors}
-          {...getInputProps(textFields.animation.getFieldset().end, {
+          error={!!textFields.endPercentageTotal.errors}
+          {...getInputProps(textFields.endPercentageTotal, {
             type: 'number',
           })}
-          key={textFields.animation.getFieldset().end.key}
+          key={textFields.endPercentageTotal.key}
         />
         <TextField
           label="Text align"

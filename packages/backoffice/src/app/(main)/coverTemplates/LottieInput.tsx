@@ -4,7 +4,7 @@ import {
   type FieldMetadata,
 } from '@conform-to/react';
 import { Box, Button, Typography } from '@mui/material';
-import { useState, type ChangeEvent } from 'react';
+import { useRef, useState, type ChangeEvent } from 'react';
 import { getCloudinaryAssetURL } from '@azzapp/shared/imagesHelpers';
 import LottiePlayer from '#components/LottiePlayer';
 
@@ -30,6 +30,7 @@ const LottieInput = ({
   mediaCountField,
   lottieIdField,
 }: Props) => {
+  const inputRef = useRef<HTMLInputElement>(null);
   const lottieInput = useInputControl(lottieField as any);
   const lottieIdInput = useInputControl(lottieIdField as any);
   const mediaCountInput = useInputControl(mediaCountField as any);
@@ -99,11 +100,17 @@ const LottieInput = ({
         />
       )}
       <input
+        ref={inputRef}
         {...getInputProps(lottieField, { type: 'file' })}
         key={lottieField.key}
         accept={'.json'}
         style={{
           display: 'none',
+        }}
+        onClick={() => {
+          if (inputRef.current) {
+            inputRef.current.value = '';
+          }
         }}
         onChange={onLoadFile}
       />
@@ -112,7 +119,9 @@ const LottieInput = ({
           {error}
         </Typography>
       )}
-      {(lottieField.errors || lottieIdField.errors) && (
+      {(mediaCountField.errors ||
+        lottieField.errors ||
+        lottieIdField.errors) && (
         <Typography sx={{ mb: 2 }} variant="body1" color="error">
           Lottie is required
         </Typography>

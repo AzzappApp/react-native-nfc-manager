@@ -32,7 +32,7 @@ const SocialLinksForm = ({ form, field }: Props) => {
         Social links
       </Typography>
 
-      <Box display="flex" gap={2} width={'50%'}>
+      <Box display="flex" gap={2}>
         <ColorInput field={socialLinksFields.color} label="Color" />
         <PositionInput field={socialLinksFields.position} />
         <SizeInput field={socialLinksFields.size} />
@@ -47,6 +47,7 @@ const SocialLinksForm = ({ form, field }: Props) => {
                 labelId={linkField.id}
                 label={`Link ${index}`}
                 {...getSelectProps(linkField)}
+                key={linkField.key}
               >
                 <MenuItem value="">
                   <em>None</em>

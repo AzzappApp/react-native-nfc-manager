@@ -1,10 +1,9 @@
 import { z } from 'zod';
 import { colorValidatorWithPalette } from '#helpers/validationHelpers';
 
-export const animationSchema = z.object({
-  name: z.string().optional(),
-  start: z.number().min(0).max(100),
-  end: z.number().min(0).max(100),
+export const positionSchema = z.object({
+  x: z.number().min(0).max(100),
+  y: z.number().min(0).max(100),
 });
 
 export const textSchema = z.object({
@@ -15,43 +14,48 @@ export const textSchema = z.object({
   fontSize: z.number(),
   width: z.number().min(1).max(100),
   orientation: z.number(),
-  position: z.object({
-    x: z.number().min(0).max(100),
-    y: z.number().min(0).max(100),
-  }),
-  animation: animationSchema,
+  position: positionSchema,
   textAlign: z.enum(['left', 'right', 'center']),
   shadow: z.coerce.boolean(),
+  animation: z.string().optional(),
+  startPercentageTotal: z.number().min(0).max(100),
+  endPercentageTotal: z.number().min(0).max(100),
 });
 
-export const coverOverlaySchema = z.object({
-  media: z
-    .object({
-      id: z.string().optional(),
-    })
-    .optional(),
-  borderWidth: z.number().min(0).max(100),
-  borderColor: colorValidatorWithPalette,
-  borderRadius: z.number().min(0).max(100),
-  bounds: z.object({
-    x: z.number().min(0).max(100),
-    y: z.number().min(0).max(100),
-    width: z.number().min(1).max(100),
-    height: z.number().min(1).max(100),
-  }),
-  filter: z.string(),
-  rotation: z.number(),
-  animation: animationSchema,
-  shadow: z.coerce.boolean(),
-});
+export const coverOverlaySchema = z
+  .object({
+    media: z
+      .object({
+        id: z.string().optional(),
+      })
+      .optional(),
+    borderWidth: z.number().min(0).max(100),
+    borderColor: colorValidatorWithPalette.optional(),
+    borderRadius: z.number().min(0).max(100),
+    bounds: z.object({
+      x: z.number().min(0).max(100),
+      y: z.number().min(0).max(100),
+      width: z.number().min(1).max(100),
+      height: z.number().min(1).max(100),
+    }),
+    filter: z.string().optional(),
+    rotation: z.number(),
+    shadow: z.coerce.boolean(),
+    animation: z.string().optional(),
+    startPercentageTotal: z.number().min(0).max(100),
+    endPercentageTotal: z.number().min(0).max(100),
+  })
+  .refine(
+    ({ borderWidth, borderColor }) => (borderWidth > 0 ? !!borderColor : true),
+    () => ({
+      path: ['borderColor'],
+    }),
+  );
 
 export const socialLinksSchema = z.object({
   links: z.string().optional().array().max(4),
   color: colorValidatorWithPalette,
-  position: z.object({
-    x: z.number().min(0).max(100),
-    y: z.number().min(0).max(100),
-  }),
+  position: positionSchema,
   size: z.number().min(6).max(128),
 });
 

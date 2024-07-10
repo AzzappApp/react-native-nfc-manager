@@ -55,7 +55,6 @@ const CoverOverlayForm = ({ field }: Props) => {
         <FormControl
           fullWidth
           error={!!overlayFields.filter.errors}
-          required
           sx={{ width: 300 }}
         >
           <InputLabel id="filter-label">Filter</InputLabel>
@@ -65,6 +64,9 @@ const CoverOverlayForm = ({ field }: Props) => {
             {...getSelectProps(overlayFields.filter)}
             key={overlayFields.filter.key}
           >
+            <MenuItem key="FilterNone" value="">
+              <em>No Filter</em>
+            </MenuItem>
             {FILTERS.map(filter => (
               <MenuItem key={filter} value={filter}>
                 <Typography>{filter}</Typography>
@@ -187,8 +189,12 @@ const CoverOverlayForm = ({ field }: Props) => {
           <Select
             labelId={'animation-label'}
             label="Animation"
-            {...getSelectProps(overlayFields.animation.getFieldset().name)}
+            {...getSelectProps(overlayFields.animation)}
+            key={overlayFields.animation.key}
           >
+            <MenuItem key="AnimationNone" value="">
+              <em>No Animation</em>
+            </MenuItem>
             {overlayAnimations.map(animation => (
               <MenuItem key={animation} value={animation}>
                 <Typography>{animation}</Typography>
@@ -199,27 +205,29 @@ const CoverOverlayForm = ({ field }: Props) => {
         <TextField
           label="Start"
           sx={{ flex: 1 }}
-          {...getInputProps(overlayFields.animation.getFieldset().start, {
+          {...getInputProps(overlayFields.startPercentageTotal, {
             type: 'number',
           })}
+          key={overlayFields.startPercentageTotal.key}
           inputProps={{
             min: '0',
             max: '100',
             defaultValue:
-              overlayFields.animation.getFieldset().start.initialValue || '0',
+              overlayFields.startPercentageTotal.initialValue || '0',
           }}
         />
         <TextField
           label="End"
           sx={{ flex: 1 }}
-          {...getInputProps(overlayFields.animation.getFieldset().end, {
+          {...getInputProps(overlayFields.endPercentageTotal, {
             type: 'number',
           })}
+          key={overlayFields.endPercentageTotal.key}
           inputProps={{
             min: '0',
             max: '100',
             defaultValue:
-              overlayFields.animation.getFieldset().end.initialValue || '0',
+              overlayFields.endPercentageTotal.initialValue || '100',
           }}
         />
       </Box>
