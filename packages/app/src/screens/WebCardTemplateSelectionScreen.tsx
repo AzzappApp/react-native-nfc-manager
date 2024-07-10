@@ -6,7 +6,7 @@ import { graphql, usePreloadedQuery } from 'react-relay';
 import { moduleCountRequiresSubscription } from '@azzapp/shared/subscriptionHelpers';
 import { colors } from '#theme';
 import CardTemplateList from '#components/CardTemplateList';
-import { NextHeaderButton } from '#components/commonsButtons';
+import { ApplyHeaderButton } from '#components/commonsButtons';
 import { useRouter } from '#components/NativeRouter';
 import PremiumIndicator from '#components/PremiumIndicator';
 import relayScreen from '#helpers/relayScreen';
@@ -66,7 +66,7 @@ const WebCardTemplateSelectionScreen = ({
     });
   }, [profile, router]);
 
-  const onNext = useCallback(() => {
+  const onApply = useCallback(() => {
     cardTemplateListRef.current?.onSubmit();
   }, []);
 
@@ -153,9 +153,9 @@ const WebCardTemplateSelectionScreen = ({
             </View>
           }
           rightElement={
-            <NextHeaderButton
+            <ApplyHeaderButton
               style={{ width: 70, marginRight: 10 }}
-              onPress={onNext}
+              onPress={onApply}
             />
           }
           rightElementWidth={80}

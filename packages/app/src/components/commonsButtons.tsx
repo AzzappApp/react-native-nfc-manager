@@ -131,6 +131,20 @@ export const NextHeaderButton = (props: Omit<ButtonProps, 'label'>) => {
   );
 };
 
+export const ApplyHeaderButton = (props: Omit<ButtonProps, 'label'>) => {
+  const intl = useIntl();
+  return (
+    <HeaderButton
+      variant="primary"
+      label={intl.formatMessage({
+        defaultMessage: 'Apply',
+        description: 'Apply header button label',
+      })}
+      {...props}
+    />
+  );
+};
+
 export const ResetHeaderButton = (props: Omit<ButtonProps, 'label'>) => {
   const intl = useIntl();
   return (
