@@ -499,7 +499,7 @@ export function coverEditorReducer(
           },
         ],
         selectedItemIndex: state.textLayers.length,
-        editionMode: 'textEdit',
+        editionMode: 'text',
       };
     case 'UPDATE_TEXT_LAYER': {
       const { editionMode, selectedItemIndex, textLayers } = state;
