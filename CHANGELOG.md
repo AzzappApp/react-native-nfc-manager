@@ -1,5 +1,6 @@
-## 0.5.19-canary.95
+## 0.5.19-canary.96
 
+* **feat:**  - iOS IAP ([#4149](https://github.com/AzzappApp/azzapp/pull/4149))
 * **feat:**  - 🎸 configure links on backoffice and web ([#4148](https://github.com/AzzappApp/azzapp/pull/4148))
 * **fix:**  - limit size of exported cover on low ends device ([#4141](https://github.com/AzzappApp/azzapp/pull/4141))
 * **fix:**  - **cover:** [#4126](https://github.com/AzzappApp/azzapp/pull/4126) missed imageScales updates ([#4138](https://github.com/AzzappApp/azzapp/pull/4138))
