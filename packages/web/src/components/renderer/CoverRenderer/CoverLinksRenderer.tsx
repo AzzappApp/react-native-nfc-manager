@@ -1,3 +1,4 @@
+import cn from 'classnames';
 import { useMemo } from 'react';
 import { DEFAULT_COLOR_PALETTE, swapColor } from '@azzapp/shared/cardHelpers';
 import {
@@ -8,6 +9,7 @@ import {
   convertToBaseCanvasRatio,
 } from '@azzapp/shared/coverHelpers';
 import SocialLink from '../SocialLinksRenderer/SocialLink';
+import styles from './CoverRenderer.css';
 import type { CoverDynamicLinks, WebCard } from '@azzapp/data';
 import type { SocialLinkId } from '@azzapp/shared/socialLinkHelpers';
 
@@ -76,6 +78,7 @@ const CoverLinksRenderer = ({ coverSize, links, cardColors }: Props) => {
           )}
           borderWidth={borderWidth}
           iconSize={socialIconSize}
+          className={cn({ [styles.linkShadow]: links.shadow })}
         />
       ))}
     </div>

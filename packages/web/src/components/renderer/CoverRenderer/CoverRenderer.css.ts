@@ -53,11 +53,16 @@ const backgroundMedia = style({
   },
 });
 
+const linkShadow = style({
+  boxShadow: '0px 10px 20px 0px rgba(0, 0, 0, 0.20)',
+});
+
 const styles = {
   coverMedia,
   content,
   backgroundContent,
   backgroundMedia,
+  linkShadow,
 };
 
 export default styles;

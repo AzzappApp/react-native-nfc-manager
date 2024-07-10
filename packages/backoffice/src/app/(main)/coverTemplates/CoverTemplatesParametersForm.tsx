@@ -84,6 +84,11 @@ const CoverTemplatesParametersForm = ({
       params: coverTemplate?.params || {
         linksLayer: {
           color: 'light',
+          position: {
+            x: '50',
+            y: '50',
+          },
+          size: '24',
         },
       },
     },

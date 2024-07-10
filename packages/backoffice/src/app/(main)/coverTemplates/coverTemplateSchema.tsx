@@ -48,6 +48,11 @@ export const coverOverlaySchema = z.object({
 export const socialLinksSchema = z.object({
   links: z.string().optional().array().max(4),
   color: colorValidatorWithPalette,
+  position: z.object({
+    x: z.number().min(0).max(100),
+    y: z.number().min(0).max(100),
+  }),
+  size: z.number().min(6).max(128),
 });
 
 export const coverTemplateSchema = z.object({

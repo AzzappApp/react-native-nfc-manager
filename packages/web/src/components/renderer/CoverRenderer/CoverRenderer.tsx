@@ -48,7 +48,7 @@ const CoverRenderer = ({
     const current = cover.current;
 
     const onCoverSizeChange = () => {
-      if (cover.current) {
+      if (current) {
         setCoverSize({
           width: cover.current.clientWidth,
           height: cover.current.clientHeight,
@@ -57,9 +57,9 @@ const CoverRenderer = ({
     };
 
     onCoverSizeChange();
-    current?.addEventListener('resize', onCoverSizeChange);
+    window?.addEventListener('resize', onCoverSizeChange);
     return () => {
-      current?.removeEventListener('resize', onCoverSizeChange);
+      window?.removeEventListener('resize', onCoverSizeChange);
     };
   }, []);
 

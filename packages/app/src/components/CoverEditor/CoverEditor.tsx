@@ -169,17 +169,22 @@ const CoverEditorCore = (
       | {
           links?: string[];
           color: string;
+          position?: {
+            x: number;
+            y: number;
+          };
+          size?: number;
         }
       | undefined;
 
     const linksLayer: CoverEditorLinksLayerItem = dataLinks
       ? {
           ...dataLinks,
-          position: {
+          position: dataLinks.position ?? {
             x: 50,
             y: 50,
           },
-          size: 24,
+          size: dataLinks.size ?? 24,
           links:
             dataLinks.links?.map((link, index) => ({
               socialId: link,

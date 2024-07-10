@@ -10,6 +10,8 @@ import {
 } from '@mui/material';
 import { SOCIAL_NETWORK_LINKS } from '@azzapp/shared/socialLinkHelpers';
 import ColorInput from './ColorInput';
+import PositionInput from './PositionInput';
+import SizeInput from './SizeInput';
 import type {
   CoverTemplateFormValue,
   SocialLinksSchemaType,
@@ -32,6 +34,8 @@ const SocialLinksForm = ({ form, field }: Props) => {
 
       <Box display="flex" gap={2} width={'50%'}>
         <ColorInput field={socialLinksFields.color} label="Color" />
+        <PositionInput field={socialLinksFields.position} />
+        <SizeInput field={socialLinksFields.size} />
       </Box>
 
       <Box display="flex" flexDirection="column" gap={2}>

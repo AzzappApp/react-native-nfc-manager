@@ -48,6 +48,8 @@ export type CoverOverlay = {
 export type SocialLinks = {
   links: Array<string | undefined>;
   color: string;
+  position: { x: number; y: number };
+  size: number;
 };
 
 export type CoverTemplateParams = {

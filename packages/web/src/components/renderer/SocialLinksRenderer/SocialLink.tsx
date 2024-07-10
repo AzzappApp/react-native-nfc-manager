@@ -1,3 +1,4 @@
+import { LINKS_ELEMENT_WRAPPER_MULTIPLER } from '@azzapp/shared/coverHelpers';
 import { generateSocialLink } from '@azzapp/shared/socialLinkHelpers';
 import SocialIcon from '#ui/SocialIcons/SocialIcon';
 import type { SocialLinkId } from '@azzapp/shared/socialLinkHelpers';
@@ -7,10 +8,11 @@ type SocialLinkProps = {
   iconSize: number;
   borderWidth: number;
   iconColor: string;
+  className?: string;
 };
 
 const SocialLink = (props: SocialLinkProps) => {
-  const { link, iconSize, borderWidth, iconColor } = props;
+  const { link, iconSize, borderWidth, iconColor, className } = props;
 
   const id = link.socialId;
 
@@ -34,11 +36,12 @@ const SocialLink = (props: SocialLinkProps) => {
           justifyContent: 'center',
         }}
         aria-label={link.socialId}
+        className={className}
       >
         <SocialIcon
           icon={id}
-          width={iconSize - 22}
-          height={iconSize - 22}
+          width={iconSize / LINKS_ELEMENT_WRAPPER_MULTIPLER}
+          height={iconSize / LINKS_ELEMENT_WRAPPER_MULTIPLER}
           color={iconColor}
         />
       </a>
