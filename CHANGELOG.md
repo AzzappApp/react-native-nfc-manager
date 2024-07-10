@@ -1,4 +1,4 @@
-## 0.5.19-canary.102
+## 0.5.19-canary.103
 
 * **fix:**  - 🐛 increase close touch area size ([#4171](https://github.com/AzzappApp/azzapp/pull/4171))
 * **fix:**  - 🐛 use complete links ([#4170](https://github.com/AzzappApp/azzapp/pull/4170))
