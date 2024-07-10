@@ -4,6 +4,7 @@ import {
   activeUserSubscription,
   createSubscription,
   db,
+  unpublisheWebCardForUser,
   updateActiveUserSubscription,
 } from '@azzapp/data';
 import cors from '#helpers/cors';
@@ -51,10 +52,7 @@ const subscriptionWebHook = async (req: Request) => {
       });
       break;
     case 'CANCELLATION':
-    case 'SUBSCRIPTION_EXTENDED':
-    case 'UNCANCELLATION':
     case 'EXPIRATION':
-      //expiration at a expiration_reason if we need it to know the reason
       await updateActiveUserSubscription(userId, {
         subscriptionId,
         startAt: new Date(purchased_at_ms),
@@ -68,6 +66,24 @@ const subscriptionWebHook = async (req: Request) => {
               : 'web',
         totalSeats: extractSeatsFromSubscriptionId(subscriptionId),
         status: 'canceled',
+      });
+      await unpublisheWebCardForUser(userId);
+      break;
+    case 'SUBSCRIPTION_EXTENDED':
+    case 'UNCANCELLATION': //expiration at a expiration_reason if we need it to know the reason
+      await updateActiveUserSubscription(userId, {
+        subscriptionId,
+        startAt: new Date(purchased_at_ms),
+        endAt: new Date(expiration_at_ms),
+        revenueCatId: rcId,
+        issuer:
+          store === 'APP_STORE'
+            ? 'apple'
+            : store === 'PLAY_STORE'
+              ? 'google'
+              : 'web',
+        totalSeats: extractSeatsFromSubscriptionId(subscriptionId),
+        status: 'active',
       });
       //TODO : cancel multi user and unpublish the contact card
       break;

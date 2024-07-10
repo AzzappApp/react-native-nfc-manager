@@ -1,9 +1,11 @@
 import { eq, sql, lt, desc, and, ne, inArray } from 'drizzle-orm';
+import { webCardRequiresSubscription } from '@azzapp/shared/subscriptionHelpers';
+import { getCardModules } from '#cardModules';
 import { PostTable } from '#posts';
 import db, { DEFAULT_DATETIME_VALUE, cols } from './db';
 import { FollowTable } from './follows';
 import { createId } from './helpers/createId';
-import { ProfileTable } from './profiles';
+import { getProfilesOfUser, ProfileTable } from './profiles';
 import { RedirectWebCardTable } from './redirectWebCard';
 import { getUserById } from './users';
 import type { DbTransaction } from './db';
@@ -457,4 +459,27 @@ export const deleteWebCard = async (
         sql`(select followerId from Follow where followingId = ${webCardId})`,
       ),
     );
+};
+
+export const unpublisheWebCardForUser = async (userId: string) => {
+  try {
+    const profiles = await getProfilesOfUser(userId);
+    for (let index = 0; index < profiles.length; index++) {
+      const webCard = profiles[index].WebCard;
+      if (webCard && webCard.cardIsPublished) {
+        const modules = await getCardModules(webCard.id);
+        if (webCardRequiresSubscription(modules, webCard.webCardKind)) {
+          //unpublished webcard
+          const updates = {
+            cardIsPublished: false,
+            updatedAt: new Date(),
+            lastCardUpdate: new Date(),
+          };
+          await updateWebCard(webCard.id, updates);
+        }
+      }
+    }
+  } catch (error) {
+    console.error(error);
+  }
 };
