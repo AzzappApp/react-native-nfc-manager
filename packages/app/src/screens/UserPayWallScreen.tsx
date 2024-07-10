@@ -4,6 +4,7 @@ import { memo, useCallback, useEffect, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import {
   Alert,
+  Dimensions,
   Image,
   Linking,
   ScrollView,
@@ -38,13 +39,15 @@ import type { SharedValue } from 'react-native-reanimated';
 
 const TERMS_OF_SERVICE = process.env.TERMS_OF_SERVICE;
 const PRIVACY_POLICY = process.env.PRIVACY_POLICY;
+const width = Dimensions.get('screen').width;
 
 const UserPayWallScreen = () => {
   const intl = useIntl();
   const router = useRouter();
-  const { width, height } = useWindowDimensions();
+  const { height } = useWindowDimensions();
+
   const { bottom } = useScreenInsets();
-  const bottomHeight = height - width - bottom;
+  const lottieHeight = height - BOTTOM_HEIGHT + 20;
   const [period, setPeriod] = useState<'month' | 'year'>('year');
   const [selectedPurchasePackage, setSelectedPurchasePackage] =
     useState<PurchasesPackage | null>(null);
@@ -148,6 +151,7 @@ const UserPayWallScreen = () => {
           onScroll={onScroll}
           pagingEnabled
           scrollEnabled
+          style={{ width }}
           contentContainerStyle={{ width: 4 * width }}
         >
           <View
@@ -155,7 +159,7 @@ const UserPayWallScreen = () => {
             style={[
               {
                 width,
-                height: width + 30,
+                height: lottieHeight,
               },
               styles.promoContainer,
             ]}
@@ -168,15 +172,15 @@ const UserPayWallScreen = () => {
               style={{
                 position: 'absolute',
                 width,
-                height: width,
-                backgroundColor: colors.black,
+                height: lottieHeight,
               }}
+              resizeMode="cover"
             />
             <LinearGradient
               colors={['transparent', 'rgba(0, 0, 0, 0.9)']}
               locations={[0, 1]}
               style={{
-                height: height - bottomHeight + 130,
+                height: height - BOTTOM_HEIGHT + 130,
                 width,
                 position: 'absolute',
               }}
@@ -204,7 +208,7 @@ const UserPayWallScreen = () => {
               colors={['transparent', 'rgba(0, 0, 0, 0.9)']}
               locations={[0, 1]}
               style={{
-                height: height - bottomHeight + 130,
+                height: height - BOTTOM_HEIGHT + 130,
                 width,
                 position: 'absolute',
               }}
@@ -231,7 +235,7 @@ const UserPayWallScreen = () => {
               colors={['transparent', 'rgba(0, 0, 0, 0.9)']}
               locations={[0, 1]}
               style={{
-                height: height - bottomHeight + 130,
+                height: height - BOTTOM_HEIGHT + 130,
                 width,
                 position: 'absolute',
               }}
@@ -259,7 +263,7 @@ const UserPayWallScreen = () => {
               colors={['transparent', 'rgba(0, 0, 0, 0.9)']}
               locations={[0, 1]}
               style={{
-                height: height - bottomHeight + 130,
+                height: height - BOTTOM_HEIGHT + 130,
                 width,
                 position: 'absolute',
               }}
@@ -494,7 +498,7 @@ const OfferItem = ({
           defaultMessage={'{qty} users'}
           description="MultiUser Paywall Screen - number of seat offer"
           values={{
-            qty: parseInt(offer.identifier.split('_').pop() ?? '0', 10),
+            qty: parseInt(offer.product.identifier.split('.').pop() ?? '0', 10),
           }}
         />
       </Text>
@@ -511,7 +515,7 @@ const OfferItem = ({
 };
 
 const Offer = memo(OfferItem);
-
+const BOTTOM_HEIGHT = width;
 const styles = StyleSheet.create({
   promoContainer: {
     alignItems: 'flex-end',
@@ -545,7 +549,7 @@ const styles = StyleSheet.create({
     height: 30,
   },
   featureContainer: { flex: 1, marginBottom: -20, aspectRatio: 1 },
-  container: { flex: 1, backgroundColor: colors.black },
+  container: { flex: 1, backgroundColor: 'transparent' },
   priceItem: {
     flexDirection: 'row',
     height: 54,
@@ -577,7 +581,6 @@ const styles = StyleSheet.create({
   },
   scrollViewStyle: { width: '100%' },
   content: {
-    flex: 1,
     justifyContent: 'flex-end',
     alignItems: 'center',
     backgroundColor: 'white',
@@ -585,6 +588,8 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 24,
     overflow: 'visible',
     paddingTop: 20,
+    width,
+    height: BOTTOM_HEIGHT,
   },
   descriptionText: {
     color: colors.grey400,
