@@ -1,5 +1,6 @@
-## 0.5.19-canary.107
+## 0.5.19-canary.108
 
+* **feat:**  - more dark mode fix ([#4186](https://github.com/AzzappApp/azzapp/pull/4186))
 * **fix:**  - **CoverEdition:** text selection mode by default on new text layer
 * **fix:**  - **NewWebcard:** CoverEdition step number
 * **fix:**  - **NewCover:** replace next button by save
