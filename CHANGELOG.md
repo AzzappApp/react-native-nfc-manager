@@ -1,5 +1,6 @@
-## 0.5.19-canary.109
+## 0.5.19-canary.110
 
+* **fix:**  - **cover:** [#4127](https://github.com/AzzappApp/azzapp/pull/4127) new attempt to avoid missing cover with correct id ([#4191](https://github.com/AzzappApp/azzapp/pull/4191))
 * **fix:**  - **cover:** [#4127](https://github.com/AzzappApp/azzapp/pull/4127) new attempt to avoid missing cover ([#4190](https://github.com/AzzappApp/azzapp/pull/4190))
 * **feat:**  - more dark mode fix ([#4186](https://github.com/AzzappApp/azzapp/pull/4186))
 * **fix:**  - **CoverEdition:** text selection mode by default on new text layer
