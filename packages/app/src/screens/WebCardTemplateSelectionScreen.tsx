@@ -87,7 +87,7 @@ const WebCardTemplateSelectionScreen = ({
   const [commit, inFlight] = useLoadCardTemplateMutation();
   const onSubmit = (cardTemplate: CardTemplateItem) => {
     const webCardId = profile?.webCard?.id;
-    if (!webCardId) {
+    if (!webCardId || !cardTemplate?.id) {
       return;
     }
     commit({
