@@ -1,4 +1,4 @@
-## 0.5.19-canary.122
+## 0.5.19-canary.123
 
 * **fix:**  - **cover:** [#4174](https://github.com/AzzappApp/azzapp/pull/4174) local variable seems to empeach keyboard jump issue ([#4223](https://github.com/AzzappApp/azzapp/pull/4223))
 * **fix:**  - **android:** [#4156](https://github.com/AzzappApp/azzapp/pull/4156) memoization of bottom panel causes update issues ([#4222](https://github.com/AzzappApp/azzapp/pull/4222))
