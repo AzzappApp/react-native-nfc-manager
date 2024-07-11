@@ -6,7 +6,13 @@ import { FlashList } from '@shopify/flash-list';
 import { Image } from 'expo-image';
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { AppState, Platform, View, useWindowDimensions } from 'react-native';
+import {
+  AppState,
+  Platform,
+  View,
+  useWindowDimensions,
+  StyleSheet,
+} from 'react-native';
 import ReactNativeBlobUtil from 'react-native-blob-util';
 import { openPhotoPicker, openSettings } from 'react-native-permissions';
 import { colors } from '#theme';
@@ -143,7 +149,9 @@ const PhotoGalleryMediaList = ({
 
         if (event.progress === 1) {
           setDownloadingFiles(previous =>
-            previous.filter(id => id !== event.id),
+            previous.includes(event.id)
+              ? previous.filter(id => id !== event.id)
+              : previous,
           );
         } else {
           setDownloadingFiles(previous => {
@@ -167,6 +175,15 @@ const PhotoGalleryMediaList = ({
         asset.node.image.filepath ?? asset.node.image.uri;
 
       if (Platform.OS === 'ios') {
+        if (asset.node.sourceType === 'CloudShared') {
+          setDownloadingFiles(previous => {
+            if (!previous.includes(asset.node.id)) {
+              return [...previous, asset.node.id];
+            }
+            return previous;
+          });
+        }
+
         const fileData = await CameraRoll.iosGetImageDataById(
           asset.node.image.uri,
         );
@@ -279,6 +296,16 @@ const PhotoGalleryMediaList = ({
 
   const intl = useIntl();
 
+  const ListFooterComponent = useMemo(
+    () =>
+      isLoadingMore ? (
+        <View style={styles.loadingMore}>
+          <ActivityIndicator />
+        </View>
+      ) : null,
+    [isLoadingMore, styles.loadingMore],
+  );
+
   return (
     <View style={styles.container}>
       {Platform.OS === 'ios' && mediaPermission === 'limited' && (
@@ -322,13 +349,7 @@ const PhotoGalleryMediaList = ({
         estimatedItemSize={itemHeight}
         extraData={extraData}
         testID="photo-gallery-list"
-        ListFooterComponent={
-          isLoadingMore ? (
-            <View style={styles.loadingMore}>
-              <ActivityIndicator />
-            </View>
-          ) : null
-        }
+        ListFooterComponent={ListFooterComponent}
         {...props}
       />
       <BottomSheetModal
@@ -455,9 +476,7 @@ const PhotoGalleyMediaItem = ({
   );
 };
 
-const ItemSeparatorComponent = () => (
-  <View style={{ width: SEPARATOR_WIDTH, height: SEPARATOR_WIDTH }} />
-);
+const ItemSeparatorComponent = () => <View style={separatorStyles.separator} />;
 
 const MemoPhotoGalleyMediaItem = memo(PhotoGalleyMediaItem);
 
@@ -502,3 +521,7 @@ const styleSheet = createStyleSheet(appearance => ({
 }));
 
 const SEPARATOR_WIDTH = 1;
+
+const separatorStyles = StyleSheet.create({
+  separator: { width: SEPARATOR_WIDTH, height: SEPARATOR_WIDTH },
+});
