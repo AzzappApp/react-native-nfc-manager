@@ -1,5 +1,6 @@
-## 0.5.19-canary.111
+## 0.5.19-canary.112
 
+* **fix:**  - 🐛 set defautl duration + fix timeline editor ([#4194](https://github.com/AzzappApp/azzapp/pull/4194))
 * **fix:**  - **cover:** [#4127](https://github.com/AzzappApp/azzapp/pull/4127) new attempt to avoid missing cover with correct id ([#4191](https://github.com/AzzappApp/azzapp/pull/4191))
 * **fix:**  - **cover:** [#4127](https://github.com/AzzappApp/azzapp/pull/4127) new attempt to avoid missing cover ([#4190](https://github.com/AzzappApp/azzapp/pull/4190))
 * **feat:**  - more dark mode fix ([#4186](https://github.com/AzzappApp/azzapp/pull/4186))
