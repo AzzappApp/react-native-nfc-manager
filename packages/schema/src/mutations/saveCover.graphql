@@ -44,7 +44,7 @@ input DynamicLinksInput {
   color: String!
   size: Int!
   position: CoordinateInput!
-  rotation: Int!
+  rotation: Float!
   shadow: Boolean!
 }
 

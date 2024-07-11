@@ -62,6 +62,7 @@ const CoverLinksRenderer = ({ coverSize, links, cardColors }: Props) => {
         top: `calc(${links.position.y}% - ${linksSize.height / 2}px)`,
         left: `calc(${links.position.x}% - ${linksSize.width / 2}px)`,
         gap: convertToBaseCanvasRatio(LINKS_GAP, coverSize.width),
+        rotate: `${links.rotation}rad`,
       }}
     >
       {links.links.map((link, i) => (

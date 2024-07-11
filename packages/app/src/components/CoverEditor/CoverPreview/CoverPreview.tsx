@@ -23,8 +23,6 @@ import {
   COVER_CARD_RADIUS,
   COVER_IMAGE_DEFAULT_DURATION,
   COVER_RATIO,
-  LINKS_BORDER_WIDTH,
-  LINKS_ELEMENT_WRAPPER_MULTIPLER,
   LINKS_GAP,
   calculateLinksSize,
   convertToBaseCanvasRatio,
@@ -1104,20 +1102,6 @@ const CoverPreview = ({
                       left: (linksLayer.position.x * viewWidth) / 100,
                       display: 'flex',
                       flexDirection: 'row',
-                      width:
-                        convertToBaseCanvasRatio(
-                          linksLayer.size * LINKS_ELEMENT_WRAPPER_MULTIPLER +
-                            LINKS_BORDER_WIDTH,
-                          viewWidth,
-                        ) *
-                        linksLayer.links.length *
-                        100,
-                      height:
-                        convertToBaseCanvasRatio(
-                          linksLayer.size * LINKS_ELEMENT_WRAPPER_MULTIPLER +
-                            LINKS_BORDER_WIDTH,
-                          viewWidth,
-                        ) * 100,
                       gap: convertToBaseCanvasRatio(LINKS_GAP, viewWidth),
                     },
                     animatedLinksStyle,

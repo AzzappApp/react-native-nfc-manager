@@ -412,7 +412,7 @@ type DynamicLinks {
   color: String!
   size: Int!
   position: Coordinate!
-  rotation: Int!
+  rotation: Float!
   shadow: Boolean!
 }
 
