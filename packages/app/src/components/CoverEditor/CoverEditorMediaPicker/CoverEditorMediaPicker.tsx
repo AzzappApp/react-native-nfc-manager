@@ -321,7 +321,8 @@ const stylesheet = createStyleSheet(appearance => ({
     alignContent: 'center',
     justifyItems: 'center',
     gap: 15,
-    marginVertical: 20,
+    paddingTop: 20,
+    marginBottom: 20,
     paddingHorizontal: 20,
     backgroundColor: appearance === 'light' ? colors.white : colors.black,
   },
@@ -334,6 +335,7 @@ const stylesheet = createStyleSheet(appearance => ({
     height: 54,
     borderRadius: 12,
     backgroundColor: appearance === 'light' ? colors.grey50 : colors.grey1000,
+    overflow: 'visible',
   },
   mediaDeleteIcon: {
     tintColor: appearance === 'light' ? colors.black : colors.grey100,
@@ -358,7 +360,11 @@ const stylesheet = createStyleSheet(appearance => ({
     },
     shadow(appearance, 'center'),
   ],
-  mediaPicked: { flex: 1, overflow: 'hidden', borderRadius: 12 },
+  mediaPicked: {
+    flex: 1,
+    overflow: 'hidden',
+    borderRadius: 12,
+  },
   textDuration: {
     color: 'white',
   },
