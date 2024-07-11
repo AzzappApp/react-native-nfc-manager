@@ -1,5 +1,7 @@
-## 0.5.19-canary.116
+## 0.5.19-canary.117
 
+* **fix:**  - 🐛 use links rotation ([#4204](https://github.com/AzzappApp/azzapp/pull/4204))
+* **fix:**  - fix close button PermissionModal. ([#4201](https://github.com/AzzappApp/azzapp/pull/4201))
 * **fix:**  - 🐛 deny and show error on duplicate media too short ([#4200](https://github.com/AzzappApp/azzapp/pull/4200))
 * **fix:**  - reenable the old vide orendering system ([#4203](https://github.com/AzzappApp/azzapp/pull/4203))
 * **fix:**  - 🐛 set defautl duration + fix timeline editor ([#4194](https://github.com/AzzappApp/azzapp/pull/4194))
