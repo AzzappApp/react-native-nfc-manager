@@ -100,6 +100,7 @@ export type CoverTemplateFormValue = z.infer<typeof coverTemplateSchema>;
 export type TextSchemaType = z.infer<typeof textSchema>;
 export type CoverOverlaySchemaType = z.infer<typeof coverOverlaySchema>;
 export type SocialLinksSchemaType = z.infer<typeof socialLinksSchema>;
+export type PositionSchemaType = z.infer<typeof positionSchema>;
 
 export type CoverTemplateErrors = z.inferFlattenedErrors<
   typeof coverTemplateSchema

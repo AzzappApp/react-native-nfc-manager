@@ -546,7 +546,6 @@ const CoverTemplatesParametersForm = ({
         open={displaySaveSuccess}
         onClose={() => {
           setDisplaySaveSuccess(false);
-          location.reload();
         }}
         autoHideDuration={6000}
         message="CoverTemplate saved"
