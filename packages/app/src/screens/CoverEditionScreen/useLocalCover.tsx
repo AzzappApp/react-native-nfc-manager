@@ -19,8 +19,11 @@ const useLocalCover = (
   useEffect(() => {
     let cancelled = false;
 
-    const loadCover = async (webCardId: string, coverId: string) => {
-      const cover = coverLocalStore.getSavedCover(webCardId);
+    const loadCover = async (params: {
+      webCardId: string;
+      coverId: string;
+    }) => {
+      const cover = coverLocalStore.getSavedCover(params.webCardId);
       if (!cover || cover.coverId !== coverId) {
         setState({
           cover: null,
@@ -57,12 +60,15 @@ const useLocalCover = (
     };
 
     if (!saving && webCardId && coverId) {
-      loadCover(coverId, webCardId);
+      loadCover({
+        webCardId,
+        coverId,
+      });
     }
     return () => {
       cancelled = true;
     };
-  }, [coverId, saving, webCardId]);
+  }, [saving, webCardId, coverId]);
 
   return state;
 };

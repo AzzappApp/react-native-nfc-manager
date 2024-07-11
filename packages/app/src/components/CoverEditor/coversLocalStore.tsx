@@ -35,6 +35,7 @@ const getSavedCover = (webCardId: string) => {
   }
 
   const storeString = store.getString(webCardId);
+
   if (!storeString) {
     return null;
   }
@@ -45,12 +46,11 @@ const getSavedCover = (webCardId: string) => {
   }
 };
 
-const saveCover = (state: CoverEditorState) => {
+const saveCover = (webCardId: string, state: CoverEditorState) => {
   const store = getCoverStore();
   if (!store) {
     return;
   }
-  const webCardId = getAuthState().profileInfos?.webCardId;
   if (!webCardId) {
     return;
   }

@@ -52,6 +52,7 @@ const useSaveCover = (
     mutation useSaveCoverMutation($webCardId: ID!, $input: SaveCoverInput!) {
       saveCover(webCardId: $webCardId, input: $input) {
         webCard {
+          id
           hasCover
           coverId
           ...CoverRenderer_webCard
@@ -131,7 +132,7 @@ const useSaveCover = (
               reject(error);
               return;
             }
-            coverLocalStore.saveCover({
+            coverLocalStore.saveCover(webCardId, {
               ...coverEditorState,
               coverId: response?.saveCover?.webCard.coverId,
             });
