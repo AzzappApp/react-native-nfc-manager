@@ -155,8 +155,8 @@ const VideoTimelineEditor = ({
             leftPosition.value = leftPos;
             if (ctx.endX - leftPos <= minDurationPixel) {
               rightPosition.value = leftPos + minDurationPixel;
-            } else if (ctx.endX - leftPos > maxDuration * minDurationPixel) {
-              rightPosition.value = leftPos + maxDuration * minDurationPixel;
+            } else if (ctx.endX - leftPos > maxDuration * secondPixel) {
+              rightPosition.value = leftPos + maxDuration * secondPixel;
             }
           }
         } else if (ctx.right) {
@@ -164,9 +164,9 @@ const VideoTimelineEditor = ({
           if (rightPos >= minDurationPixel) {
             rightPosition.value = rightPos;
             if (rightPos - ctx.startX <= minDurationPixel) {
-              leftPosition.value = rightPos - secondPixel;
-            } else if (rightPos - ctx.startX > maxDuration * minDurationPixel) {
-              leftPosition.value = rightPos - maxDuration * minDurationPixel;
+              leftPosition.value = rightPos - minDurationPixel;
+            } else if (rightPos - ctx.startX > maxDuration * secondPixel) {
+              leftPosition.value = rightPos - maxDuration * secondPixel;
             }
           }
         } else if (

@@ -1,6 +1,9 @@
 import { useMemo } from 'react';
 import { useIntl } from 'react-intl';
-import { COVER_IMAGE_DEFAULT_DURATION } from '@azzapp/shared/coverHelpers';
+import {
+  COVER_IMAGE_DEFAULT_DURATION,
+  COVER_VIDEO_DEFAULT_DURATION,
+} from '@azzapp/shared/coverHelpers';
 import {
   extractLottieInfoMemoized,
   getLottieMediasDurations,
@@ -41,9 +44,8 @@ const CoverEditorCutTool = () => {
   const aspectRatio = cropData ? cropData.width / cropData.height : undefined;
 
   const expectedDuration = useMemo(() => {
-    if (selectedItemIndex == null || !durations)
-      return COVER_IMAGE_DEFAULT_DURATION;
-    return durations[selectedItemIndex] ?? COVER_IMAGE_DEFAULT_DURATION;
+    if (selectedItemIndex == null || !durations) return null;
+    return durations[selectedItemIndex];
   }, [durations, selectedItemIndex]);
 
   return (
@@ -76,8 +78,12 @@ const CoverEditorCutTool = () => {
               steps={[EditImageStep]}
               onCancel={toggleScreenModal}
               onFinished={onFinished}
-              maxVideoDuration={expectedDuration}
-              minVideoDuration={expectedDuration}
+              maxVideoDuration={
+                expectedDuration ?? COVER_VIDEO_DEFAULT_DURATION
+              }
+              minVideoDuration={
+                expectedDuration ?? COVER_IMAGE_DEFAULT_DURATION
+              }
             />
           )}
         </ScreenModal>
