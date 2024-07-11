@@ -85,10 +85,7 @@ const CoverEditorSizeTool = ({ title }: Props) => {
             interval={10}
             onChange={onSizeChange}
             value={size}
-            label={intl.formatMessage({
-              defaultMessage: 'Font size: ',
-              description: 'Label of the font size slider in cover edition',
-            })}
+            label={title}
             style={styles.slider}
           />
         </Container>

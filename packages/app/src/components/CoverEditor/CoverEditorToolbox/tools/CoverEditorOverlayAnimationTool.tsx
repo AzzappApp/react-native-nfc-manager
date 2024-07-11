@@ -225,8 +225,8 @@ const CoverEditorOverlayImageAnimationTool = () => {
             minimumValue={0}
             maximumValue={totalDuration}
             value={[
-              (activeOverlay.startPercentageTotal * totalDuration) / 100,
-              (activeOverlay.endPercentageTotal * totalDuration) / 100,
+              ((activeOverlay.startPercentageTotal ?? 0) * totalDuration) / 100,
+              ((activeOverlay.endPercentageTotal ?? 100) * totalDuration) / 100,
             ]}
             onValueChange={onChangeAnimationDuration}
           />

@@ -39,6 +39,7 @@ const CoverEditorAddOverlay = ({ open, onClose }: Props) => {
           onCancel={onClose}
           additionalData={{
             hideAspectRatio: true,
+            hideTabs: true,
           }}
         />
       )}

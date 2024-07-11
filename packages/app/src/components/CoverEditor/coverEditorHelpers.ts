@@ -167,8 +167,18 @@ export const isCoverDynamic = (state: CoverEditorState) => {
     medias.some(
       mediaInfo => !mediaInfoIsImage(mediaInfo) || mediaInfo.animation != null,
     ) ||
-    overlayLayers.some(overlayLayer => overlayLayer.animation != null) ||
-    textLayers.some(textLayer => textLayer.animation != null) ||
+    overlayLayers.some(
+      overlayLayer =>
+        overlayLayer.animation != null ||
+        overlayLayer.endPercentageTotal !== 100 ||
+        overlayLayer.startPercentageTotal !== 0,
+    ) ||
+    textLayers.some(
+      textLayer =>
+        textLayer.animation != null ||
+        textLayer.endPercentageTotal !== 100 ||
+        textLayer.startPercentageTotal !== 0,
+    ) ||
     medias.length > 1
   );
 };
