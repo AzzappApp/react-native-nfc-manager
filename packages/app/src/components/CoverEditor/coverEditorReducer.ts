@@ -446,14 +446,17 @@ export function coverEditorReducer(
         const medias = [...state.medias];
         medias[state.selectedItemIndex] = payload;
 
+        let imagesScales = state.imagesScales;
         if (payload.media.kind === 'image') {
-          state.imagesScales[payload.media.uri] = calculateImageScale(
-            payload.media,
-          );
+          imagesScales = {
+            ...state.imagesScales,
+            [payload.media.uri]: calculateImageScale(payload.media),
+          };
         }
 
         return {
           ...state,
+          imagesScales,
           medias,
         };
       } else if (
