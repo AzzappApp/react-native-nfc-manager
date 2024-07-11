@@ -1,5 +1,7 @@
-## 0.5.19-canary.117
+## 0.5.19-canary.118
 
+* **fix:**  - **cover:** [#4188](https://github.com/AzzappApp/azzapp/pull/4188) update imageScales object ([#4197](https://github.com/AzzappApp/azzapp/pull/4197))
+* **fix:**  - **Android:** snapshot cause crash when recycled
 * **fix:**  - 🐛 use links rotation ([#4204](https://github.com/AzzappApp/azzapp/pull/4204))
 * **fix:**  - fix close button PermissionModal. ([#4201](https://github.com/AzzappApp/azzapp/pull/4201))
 * **fix:**  - 🐛 deny and show error on duplicate media too short ([#4200](https://github.com/AzzappApp/azzapp/pull/4200))
