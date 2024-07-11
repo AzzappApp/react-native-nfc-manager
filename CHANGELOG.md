@@ -1,5 +1,6 @@
-## 0.5.19-canary.120
+## 0.5.19-canary.121
 
+* **fix:**  - **android:** [#4156](https://github.com/AzzappApp/azzapp/pull/4156) memoization of bottom panel causes update issues ([#4222](https://github.com/AzzappApp/azzapp/pull/4222))
 * **fix:**  - use padding instead margin to show the close icon properly(overflow visible does not work) ([#4211](https://github.com/AzzappApp/azzapp/pull/4211))
 * **fix:**  - bug when you can duplicate module wihtout to be premium ([#4213](https://github.com/AzzappApp/azzapp/pull/4213))
 * **perf:**  - **imagePicker:** [#4152](https://github.com/AzzappApp/azzapp/pull/4152) avoid rerenders + add white loading indicator + start sooner loading ([#4212](https://github.com/AzzappApp/azzapp/pull/4212))
