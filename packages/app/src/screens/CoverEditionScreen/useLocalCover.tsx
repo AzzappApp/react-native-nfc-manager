@@ -1,3 +1,4 @@
+import * as Sentry from '@sentry/react-native';
 import { useEffect, useState } from 'react';
 import ReactNativeBlobUtil from 'react-native-blob-util';
 import coverLocalStore from '#components/CoverEditor/coversLocalStore';
@@ -43,6 +44,11 @@ const useLocalCover = (
                 media.uri.replace('file://', ''),
               );
             } catch (e) {
+              Sentry.captureException(e, {
+                extra: {
+                  media,
+                },
+              });
               return false;
             }
           }),
