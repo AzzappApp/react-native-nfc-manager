@@ -1,6 +1,6 @@
 import { Canvas, Skia } from '@shopify/react-native-skia';
 import { SkiaViewApi } from '@shopify/react-native-skia/src/views/api';
-import { forwardRef, useCallback, useEffect, useMemo } from 'react';
+import { useCallback, useEffect, useMemo } from 'react';
 import { PixelRatio, type ViewProps } from 'react-native';
 import { useFrameCallback, useSharedValue } from 'react-native-reanimated';
 import { __RNSkiaVideoPrivateAPI } from '@azzapp/react-native-skia-video';
@@ -106,4 +106,4 @@ const VideoCompositionRenderer = ({
   );
 };
 
-export default forwardRef(VideoCompositionRenderer);
+export default VideoCompositionRenderer;
