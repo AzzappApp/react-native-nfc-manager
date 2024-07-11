@@ -1,5 +1,6 @@
-## 0.5.19-canary.118
+## 0.5.19-canary.119
 
+* **perf:**  - **imagePicker:** [#4152](https://github.com/AzzappApp/azzapp/pull/4152) avoid rerenders + add white loading indicator + start sooner loading ([#4212](https://github.com/AzzappApp/azzapp/pull/4212))
 * **fix:**  - **cover:** [#4188](https://github.com/AzzappApp/azzapp/pull/4188) update imageScales object ([#4197](https://github.com/AzzappApp/azzapp/pull/4197))
 * **fix:**  - **Android:** snapshot cause crash when recycled
 * **fix:**  - 🐛 use links rotation ([#4204](https://github.com/AzzappApp/azzapp/pull/4204))
