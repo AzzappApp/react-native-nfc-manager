@@ -1,5 +1,6 @@
-## 0.5.19-canary.115
+## 0.5.19-canary.116
 
+* **fix:**  - 🐛 deny and show error on duplicate media too short ([#4200](https://github.com/AzzappApp/azzapp/pull/4200))
 * **fix:**  - reenable the old vide orendering system ([#4203](https://github.com/AzzappApp/azzapp/pull/4203))
 * **fix:**  - 🐛 set defautl duration + fix timeline editor ([#4194](https://github.com/AzzappApp/azzapp/pull/4194))
 * **fix:**  - **cover:** [#4127](https://github.com/AzzappApp/azzapp/pull/4127) new attempt to avoid missing cover with correct id ([#4191](https://github.com/AzzappApp/azzapp/pull/4191))
