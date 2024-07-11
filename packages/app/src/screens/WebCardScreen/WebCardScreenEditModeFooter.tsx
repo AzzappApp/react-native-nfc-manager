@@ -1,9 +1,8 @@
 import { useCallback } from 'react';
 import { useIntl } from 'react-intl';
-import { View } from 'react-native';
+import { View, StyleSheet } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { colors } from '#theme';
-import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import Button from '#ui/Button';
 import Text from '#ui/Text';
 
@@ -19,7 +18,6 @@ const WebCardScreenEditModeFooter = ({
     setLoadTemplate(true);
   }, [setLoadTemplate]);
   const intl = useIntl();
-  const styles = useStyleSheet(styleSheet);
   return (
     <View style={styles.root}>
       <Text variant="small" style={styles.loadDescription}>
@@ -59,7 +57,7 @@ const WebCardScreenEditModeFooter = ({
 
 export const WEBCARD_SCREEN_EDIT_MODE_FOOTER_HEIGHT = 110;
 
-const styleSheet = createStyleSheet(appearance => ({
+const styles = StyleSheet.create({
   root: {
     paddingTop: 30,
     display: 'flex',
@@ -74,8 +72,8 @@ const styleSheet = createStyleSheet(appearance => ({
     marginHorizontal: 40,
   },
   azzapp: {
-    color: appearance === 'light' ? colors.black : colors.white,
+    color: colors.grey700,
   },
-}));
+});
 
 export default WebCardScreenEditModeFooter;

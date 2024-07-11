@@ -67,6 +67,7 @@ const CoverTemplateConfirmationScreenModal = ({
                   'CoverTemplateConfirmationScreenModal - confirmation button',
               })}
               variant="secondary"
+              appearance="light"
               style={styles.button}
               onPress={onConfirm}
             />
