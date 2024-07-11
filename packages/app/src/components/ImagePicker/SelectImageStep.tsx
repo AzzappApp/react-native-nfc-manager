@@ -5,6 +5,7 @@ import { Alert, Platform, StyleSheet } from 'react-native';
 import { RESULTS, openPhotoPicker } from 'react-native-permissions';
 import Toast from 'react-native-toast-message';
 import { useDebouncedCallback } from 'use-debounce';
+import { useRouter } from '#components/NativeRouter';
 import { cropDataForAspectRatio } from '#helpers/mediaEditions';
 import { getImageSize, getVideoSize } from '#helpers/mediaHelpers';
 import { usePermissionContext } from '#helpers/PermissionContext';
@@ -249,7 +250,7 @@ const SelectImageStep = ({
     return tabs;
   }, [intl, kind]);
   // #endregion
-
+  const router = useRouter();
   const onCameraPermissionModalClose = useCallback(() => {
     if (
       mediaPermission === RESULTS.GRANTED ||
@@ -258,9 +259,9 @@ const SelectImageStep = ({
       onChangePickerMode('gallery');
       setPickerMode('gallery');
     } else {
-      setPermissionModalRejected(true);
+      router.back();
     }
-  }, [mediaPermission, onChangePickerMode]);
+  }, [mediaPermission, onChangePickerMode, router]);
 
   const { insetBottom } = useEditorLayout();
 

@@ -4,6 +4,7 @@ import { Alert, Platform, StyleSheet, View } from 'react-native';
 import { RESULTS, openPhotoPicker } from 'react-native-permissions';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
 import AlbumPicker from '#components/AlbumPicker';
+import { useRouter } from '#components/NativeRouter';
 import PermissionModal from '#components/PermissionModal';
 import PhotoGalleryMediaList from '#components/PhotoGalleryMediaList';
 import { usePermissionContext } from '#helpers/PermissionContext';
@@ -67,6 +68,7 @@ const MultiMediasSelector = ({
       );
     }
   }, [intl]);
+  const router = useRouter();
 
   return (
     <>
@@ -96,7 +98,13 @@ const MultiMediasSelector = ({
           )}
         </View>
       </View>
-      <PermissionModal permissionsFor={'gallery'} autoFocus />
+      <PermissionModal
+        permissionsFor={'gallery'}
+        autoFocus
+        onRequestClose={() => {
+          router.pop(2);
+        }}
+      />
     </>
   );
 };

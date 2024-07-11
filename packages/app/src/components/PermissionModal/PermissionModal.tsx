@@ -1,10 +1,17 @@
 import { useMemo } from 'react';
 import { useIntl } from 'react-intl';
-import { StyleSheet, View, SafeAreaView, Linking, Modal } from 'react-native';
+import {
+  StyleSheet,
+  View,
+  SafeAreaView,
+  Linking,
+  useWindowDimensions,
+} from 'react-native';
 import { RESULTS } from 'react-native-permissions';
 
 import { colors } from '#theme';
 import { usePermissionContext } from '#helpers/PermissionContext';
+import BottomSheetModal from '#ui/BottomSheetModal';
 import Container from '#ui/Container';
 import Header from '#ui/Header';
 import IconButton from '#ui/IconButton';
@@ -38,7 +45,7 @@ type CameraModalProps = {
  */
 const PermissionModal = ({
   permissionsFor,
-  onRequestClose,
+  onRequestClose = () => {},
   autoFocus = true,
 }: CameraModalProps) => {
   const intl = useIntl();
@@ -107,11 +114,15 @@ const PermissionModal = ({
     }
   };
 
+  const { height } = useWindowDimensions();
+
   return (
-    <Modal
+    <BottomSheetModal
+      lazy
+      showGestureIndicator={false}
+      height={height}
       visible={showPermissionModal && autoFocus}
       onRequestClose={onRequestClose}
-      animationType="slide"
     >
       <Container style={styles.container}>
         <SafeAreaView style={styles.root}>
@@ -189,7 +200,7 @@ const PermissionModal = ({
           )}
         </SafeAreaView>
       </Container>
-    </Modal>
+    </BottomSheetModal>
   );
 };
 
@@ -200,7 +211,7 @@ const styles = StyleSheet.create({
   root: {
     flex: 1,
     marginBottom: 180,
-    marginTop: 30,
+    marginTop: 80,
   },
   content: {
     flex: 1,
