@@ -1,4 +1,4 @@
-import { useState, memo } from 'react';
+import { useState, useMemo } from 'react';
 import { StyleSheet, useWindowDimensions, View } from 'react-native';
 import Animated, {
   interpolate,
@@ -110,15 +110,18 @@ const HomeBottomPanel = ({ user: userKey }: HomeBottomPanelProps) => {
     };
   });
 
+  const containerHeight = useMemo(
+    () => ({
+      height: panelHeight + HOME_MENU_HEIGHT,
+    }),
+    [panelHeight],
+  );
+
   useMainTabBarVisibilityController(mainTabBarVisible);
   //#endregion
 
   return (
-    <View
-      style={{
-        height: panelHeight + HOME_MENU_HEIGHT,
-      }}
-    >
+    <View style={containerHeight}>
       <View style={styles.informationPanel}>
         <HomeBottomPanelMessage user={profiles!} />
       </View>
@@ -188,4 +191,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default memo(HomeBottomPanel);
+export default HomeBottomPanel;
