@@ -152,7 +152,7 @@ const CoverTextForm = ({ field }: TextFormProps) => {
           })}
           key={textFields.width.key}
         />
-        <RadianInput field={textFields.orientation} label="Orientation" />
+        <RadianInput field={textFields.rotation} label="Orientation" />
         <PositionInput field={textFields.position} />
       </Box>
       <Box display="flex" gap={2}>

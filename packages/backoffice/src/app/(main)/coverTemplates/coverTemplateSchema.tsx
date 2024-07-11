@@ -13,7 +13,7 @@ export const textSchema = z.object({
   color: colorValidatorWithPalette,
   fontSize: z.number(),
   width: z.number().min(1).max(100),
-  orientation: z.number(),
+  rotation: z.number(),
   position: positionSchema,
   textAlign: z.enum(['left', 'right', 'center']),
   shadow: z.coerce.boolean(),

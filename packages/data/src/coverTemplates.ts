@@ -13,7 +13,7 @@ export type CoverText = {
   color: string;
   fontSize: number;
   width: number;
-  orientation: number;
+  rotation: number;
   position: {
     x: number;
     y: number;
