@@ -948,18 +948,18 @@ const CoverPreview = ({
       }
       const { y, height } = inputSize;
       const editionInputCenter = pageY + y + height / 2;
-      return onKeyboardTranslateWorklet(
-        interpolate(
-          keyboardProgress,
-          [0, 1],
-          [
-            0,
-            (Platform.OS === 'android' ? keyboardHeight / 2 : keyboardHeight) +
-              windowHeight / 2 -
-              editionInputCenter,
-          ],
-        ),
+      //we need a local variable to avoid keyboard issue
+      const res = interpolate(
+        keyboardProgress,
+        [0, 1],
+        [
+          0,
+          (Platform.OS === 'android' ? keyboardHeight / 2 : keyboardHeight) +
+            windowHeight / 2 -
+            editionInputCenter,
+        ],
       );
+      return onKeyboardTranslateWorklet(res);
     },
   );
   // #endregion
