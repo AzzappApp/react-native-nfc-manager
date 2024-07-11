@@ -144,6 +144,7 @@ const CoverTextForm = ({ field }: TextFormProps) => {
           inputProps={{
             min: '1',
             max: '100',
+            step: 'any',
             defaultValue: textFields.width.initialValue || '1',
           }}
           error={!!textFields.width.errors}
@@ -186,6 +187,7 @@ const CoverTextForm = ({ field }: TextFormProps) => {
           inputProps={{
             min: '0',
             max: '100',
+            step: 'any',
             defaultValue: textFields.startPercentageTotal.initialValue || '0',
           }}
           {...getInputProps(textFields.startPercentageTotal, {
@@ -200,6 +202,7 @@ const CoverTextForm = ({ field }: TextFormProps) => {
           inputProps={{
             min: '0',
             max: '100',
+            step: 'any',
             defaultValue: textFields.endPercentageTotal.initialValue || '100',
           }}
           error={!!textFields.endPercentageTotal.errors}

@@ -88,6 +88,7 @@ const CoverOverlayForm = ({ field }: Props) => {
           inputProps={{
             min: '1',
             max: '100',
+            step: 'any',
             defaultValue:
               overlayFields.bounds.getFieldset().height.initialValue || '1',
           }}
@@ -103,6 +104,7 @@ const CoverOverlayForm = ({ field }: Props) => {
           inputProps={{
             min: '1',
             max: '100',
+            step: 'any',
             defaultValue:
               overlayFields.bounds.getFieldset().width.initialValue || '1',
           }}
@@ -120,6 +122,7 @@ const CoverOverlayForm = ({ field }: Props) => {
           inputProps={{
             min: '0',
             max: '100',
+            step: 'any',
             defaultValue:
               overlayFields.bounds.getFieldset().x.initialValue || '0',
           }}
@@ -136,6 +139,7 @@ const CoverOverlayForm = ({ field }: Props) => {
           inputProps={{
             min: '0',
             max: '100',
+            step: 'any',
             defaultValue:
               overlayFields.bounds.getFieldset().y.initialValue || '0',
           }}
@@ -154,6 +158,7 @@ const CoverOverlayForm = ({ field }: Props) => {
           inputProps={{
             min: '0',
             max: '100',
+            step: 'any',
             defaultValue: overlayFields.borderWidth.initialValue || '0',
           }}
           error={!!overlayFields.borderWidth.errors}
@@ -170,6 +175,7 @@ const CoverOverlayForm = ({ field }: Props) => {
           inputProps={{
             min: '0',
             max: '100',
+            step: 'any',
             defaultValue: overlayFields.borderRadius.initialValue || '0',
           }}
           error={!!overlayFields.borderRadius.errors}
@@ -212,6 +218,7 @@ const CoverOverlayForm = ({ field }: Props) => {
           inputProps={{
             min: '0',
             max: '100',
+            step: 'any',
             defaultValue:
               overlayFields.startPercentageTotal.initialValue || '0',
           }}
@@ -226,6 +233,7 @@ const CoverOverlayForm = ({ field }: Props) => {
           inputProps={{
             min: '0',
             max: '100',
+            step: 'any',
             defaultValue:
               overlayFields.endPercentageTotal.initialValue || '100',
           }}
