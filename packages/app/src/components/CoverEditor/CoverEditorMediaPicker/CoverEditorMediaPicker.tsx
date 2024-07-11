@@ -87,6 +87,38 @@ const CoverEditorMediaPicker = ({
   };
 
   const handleDuplicateMedia = () => {
+    if (
+      durations &&
+      selectedMedias.length > 0 &&
+      selectedMedias.length < durations.length
+    ) {
+      const lastSelectedIndex = selectedMedias.length - 1;
+      const lastSelected = selectedMedias[lastSelectedIndex];
+
+      if (lastSelected.kind === 'video') {
+        const longerDuration = durations.find(
+          (duration, i) =>
+            i > lastSelectedIndex && duration > lastSelected.duration,
+        );
+
+        if (longerDuration) {
+          Toast.show({
+            type: 'error',
+            text1: intl.formatMessage(
+              {
+                defaultMessage: 'Selected video should be at least {duration}s',
+                description:
+                  'Error message when duplicating a video media that is too short',
+              },
+              { duration: Math.ceil(longerDuration * 10) / 10 },
+            ),
+          });
+
+          return null;
+        }
+      }
+    }
+
     const duplicatedMedias = duplicateMediaToFillSlots(
       maxMedias,
       selectedMedias,
@@ -141,7 +173,7 @@ const CoverEditorMediaPicker = ({
             }),
             onPress: () => {
               const medias = handleDuplicateMedia();
-              onFinished(medias);
+              if (medias) onFinished(medias);
             },
           },
           {
