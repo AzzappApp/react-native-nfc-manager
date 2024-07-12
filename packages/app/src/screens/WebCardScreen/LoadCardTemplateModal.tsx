@@ -208,17 +208,18 @@ const LoadCardTemplateModal = ({
                 </Text>
 
                 {selectedTemplate &&
+                  !webCard.isPremium &&
                   moduleCountRequiresSubscription(
                     selectedTemplate.modules.length,
                   ) && (
                     <View style={styles.proContainer}>
                       <Text variant="medium" style={styles.proText}>
                         <FormattedMessage
-                          defaultMessage="3+ visible sections"
+                          defaultMessage="azzapp+ WebCard"
                           description="WebCard create pro description"
                         />
                       </Text>
-                      <PremiumIndicator isRequired={!webCard.isPremium} />
+                      <PremiumIndicator isRequired />
                     </View>
                   )}
               </View>

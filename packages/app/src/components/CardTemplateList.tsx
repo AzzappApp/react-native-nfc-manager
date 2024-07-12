@@ -29,13 +29,13 @@ import Button, { BUTTON_HEIGHT } from '#ui/Button';
 import Container from '#ui/Container';
 import Header, { HEADER_HEIGHT } from '#ui/Header';
 import HeaderButton from '#ui/HeaderButton';
-import Icon from '#ui/Icon';
 import PressableNative from '#ui/PressableNative';
 import SearchBarStatic from '#ui/SearchBarStatic';
 import SelectSection from '#ui/SelectSection';
 import Text from '#ui/Text';
 import { useModulesData } from './cardModules/ModuleData';
 import { CancelHeaderButton } from './commonsButtons';
+import PremiumIndicator from './PremiumIndicator';
 import WebCardPreview from './WebCardPreview';
 import type {
   CardTemplateList_cardTemplates$data,
@@ -109,6 +109,7 @@ const CardTemplateList = (
                 dark
                 light
               }
+              isPremium
             }
           }
         }
@@ -118,6 +119,7 @@ const CardTemplateList = (
   );
 
   const profile = node?.profile;
+  const isPremium = node?.profile?.webCard?.isPremium;
   const cardTemplateTypes = profile?.cardTemplateTypes;
 
   const { data, loadNext, hasNext, isLoadingNext, refetch } =
@@ -327,13 +329,11 @@ const CardTemplateList = (
                 )}
               </View>
             </ScrollView>
-            {item.modules.length > 3 && (
-              <Icon
-                icon="plus_white_border"
-                size={26}
-                style={{ position: 'absolute', right: 17, top: 9 }}
-              />
-            )}
+            <PremiumIndicator
+              isRequired={item.modules.length > 3 && !isPremium}
+              style={{ position: 'absolute', right: 17, top: 9 }}
+              size={26}
+            />
           </View>
         </View>
       );
@@ -344,6 +344,7 @@ const CardTemplateList = (
       styles.webCardContainer,
       styles.webCardContainerRadius,
       maxScrollViewHeight,
+      isPremium,
     ],
   );
 

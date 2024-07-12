@@ -1,6 +1,7 @@
 import { useCallback, useMemo } from 'react';
 import { useIntl } from 'react-intl';
 import { FlatList, StyleSheet, View } from 'react-native';
+import { graphql, useFragment } from 'react-relay';
 import { ScreenModal } from '#components/NativeRouter';
 import useScreenInsets from '#hooks/useScreenInsets';
 import Container from '#ui/Container';
@@ -8,6 +9,7 @@ import Header from '#ui/Header';
 import IconButton from '#ui/IconButton';
 import ModuleSelectionListModalItem from './ModuleSelectionListModalItem';
 import type { ScreenModalProps } from '#components/NativeRouter';
+import type { ModuleSelectionListModal_webCard$key } from '#relayArtifacts/ModuleSelectionListModal_webCard.graphql';
 import type { ModuleSelectionListItem } from './ModuleSelectionListModalItem';
 import type { ModuleKind } from '@azzapp/shared/cardModuleHelpers';
 import type { ListRenderItemInfo } from 'react-native';
@@ -18,11 +20,13 @@ type ModuleSelectionListModalProps = Omit<
 > & {
   onSelectModuleKind: (module: ModuleKind) => void;
   onRequestClose: () => void;
+  webCard: ModuleSelectionListModal_webCard$key;
 };
 
 const ModuleSelectionListModal = ({
   onSelectModuleKind,
   onRequestClose,
+  webCard: webCardKey,
   ...props
 }: ModuleSelectionListModalProps) => {
   const intl = useIntl();
@@ -171,6 +175,15 @@ const ModuleSelectionListModal = ({
     [intl],
   );
 
+  const webCard = useFragment(
+    graphql`
+      fragment ModuleSelectionListModal_webCard on WebCard {
+        isPremium
+      }
+    `,
+    webCardKey,
+  );
+
   const { top, bottom } = useScreenInsets();
   const renderItem = useCallback(
     ({ item }: ListRenderItemInfo<ModuleSelectionListItem | null>) =>
@@ -178,6 +191,7 @@ const ModuleSelectionListModal = ({
         <ModuleSelectionListModalItem
           module={item}
           key={item.moduleKind}
+          isPremium={webCard.isPremium}
           onSelect={onSelectModuleKind}
         />
       ) : (
@@ -190,7 +204,7 @@ const ModuleSelectionListModal = ({
         />
       ),
 
-    [onSelectModuleKind],
+    [onSelectModuleKind, webCard.isPremium],
   );
 
   const data = useMemo(

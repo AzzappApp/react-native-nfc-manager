@@ -1,13 +1,15 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { useIntl } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 import { Alert, StyleSheet, View } from 'react-native';
 import { graphql, usePreloadedQuery } from 'react-relay';
+import { colors } from '#theme';
 import {
   CancelHeaderButton,
   SaveHeaderButton,
 } from '#components/commonsButtons';
 import CoverEditor from '#components/CoverEditor';
 import { useRouter } from '#components/NativeRouter';
+import PremiumIndicator from '#components/PremiumIndicator';
 import relayScreen from '#helpers/relayScreen';
 import useLatestCallback from '#hooks/useLatestCallback';
 import useScreenInsets from '#hooks/useScreenInsets';
@@ -15,6 +17,7 @@ import ActivityIndicator from '#ui/ActivityIndicator';
 import Button from '#ui/Button';
 import Container from '#ui/Container';
 import Header from '#ui/Header';
+import Text from '#ui/Text';
 import useLocalCover from './useLocalCover';
 import type { CoverEditorHandle } from '#components/CoverEditor';
 import type { RelayScreenProps } from '#helpers/relayScreen';
@@ -26,6 +29,7 @@ const CoverEditionScreen = ({
 }: RelayScreenProps<CoverEditionRoute, CoverEditionScreenQuery>) => {
   const data = usePreloadedQuery(query, preloadedQuery);
   const profile = data.node?.profile;
+  const requiresSubscription = profile?.webCard?.requiresSubscription;
 
   const [canSave, setCanSave] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -112,6 +116,8 @@ const CoverEditionScreen = ({
     return null;
   }
 
+  const { isPremium } = profile.webCard;
+
   return (
     <Container
       style={[
@@ -120,10 +126,27 @@ const CoverEditionScreen = ({
       ]}
     >
       <Header
-        middleElement={intl.formatMessage({
-          defaultMessage: 'Edit your cover',
-          description: 'CoverEditionScreen header title',
-        })}
+        middleElement={
+          <View style={styles.headerTextContainer}>
+            <Text variant="large">
+              <FormattedMessage
+                defaultMessage="Edit your cover"
+                description="CoverEditionScreen header title"
+              />
+            </Text>
+            {requiresSubscription && !isPremium && (
+              <View style={styles.proContainer}>
+                <Text variant="medium" style={styles.proText}>
+                  <FormattedMessage
+                    description="NewWebCardScreen - Description for pro category"
+                    defaultMessage="azzapp+ WebCard"
+                  />
+                </Text>
+                <PremiumIndicator isRequired />
+              </View>
+            )}
+          </View>
+        }
         leftElement={<CancelHeaderButton onPress={onCancel} />}
         rightElement={
           <SaveHeaderButton
@@ -176,6 +199,8 @@ const query = graphql`
           coverBackgroundColor
           webCardKind
           coverId
+          requiresSubscription
+          isPremium
         }
       }
     }
@@ -200,4 +225,16 @@ const styles = StyleSheet.create({
   },
   changeCover: { paddingHorizontal: 50, paddingTop: 30 },
   saveButton: { width: 70, marginRight: 10 },
+  headerTextContainer: {
+    display: 'flex',
+    alignItems: 'center',
+  },
+  proText: {
+    color: colors.grey400,
+  },
+  proContainer: {
+    display: 'flex',
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
 });

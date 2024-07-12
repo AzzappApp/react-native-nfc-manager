@@ -3,6 +3,7 @@ import { FormattedMessage } from 'react-intl';
 import { Image, View, useColorScheme } from 'react-native';
 import { isModuleKindSubscription } from '@azzapp/shared/subscriptionHelpers';
 import { colors, shadow } from '#theme';
+import PremiumIndicator from '#components/PremiumIndicator';
 import { useStyleSheet, createStyleSheet } from '#helpers/createStyles';
 
 import Icon from '#ui/Icon';
@@ -31,11 +32,13 @@ type ModuleSelectionListModalItemProps = {
    *
    */
   onSelect: (moduleKind: ModuleKind) => void;
+  isPremium?: boolean;
 };
 
 const ModuleSelectionListModalItem = ({
   module,
   onSelect,
+  isPremium,
 }: ModuleSelectionListModalItemProps) => {
   const styles = useStyleSheet(styleSheet);
   const colorScheme = useColorScheme();
@@ -95,9 +98,12 @@ const ModuleSelectionListModalItem = ({
             <Icon icon="add" style={styles.addIconStyle} />
           </View>
         </View>
-        {isModuleKindSubscription(module.moduleKind) && (
-          <Icon icon="plus_white_border" size={30} style={styles.badge} />
-        )}
+
+        <PremiumIndicator
+          isRequired={isModuleKindSubscription(module.moduleKind) && !isPremium}
+          size={30}
+          style={styles.badge}
+        />
       </View>
     </PressableOpacity>
   );

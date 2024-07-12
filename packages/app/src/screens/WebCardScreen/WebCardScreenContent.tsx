@@ -101,6 +101,7 @@ const WebCardScreenContent = ({
         ...WebCardBackgroundPreview_webCard
         ...PreviewModal_webCard
         ...LoadCardTemplateModal_webCard
+        ...ModuleSelectionListModal_webCard
         coverBackgroundColor
         cardColors {
           primary
@@ -424,6 +425,7 @@ const WebCardScreenContent = ({
             onRequestClose={onCloseModulePicker}
             onSelectModuleKind={onSelectModuleKind}
             animationType="slide"
+            webCard={webCard}
           />
           <Suspense fallback={null}>
             <PreviewModal

@@ -403,7 +403,7 @@ const WebCardFormScreen = ({
                 <Text variant="medium" style={styles.proText}>
                   <FormattedMessage
                     description="NewWebCardScreen - Description for pro category"
-                    defaultMessage="Professional WebCard"
+                    defaultMessage="azzapp+ WebCard"
                   />
                 </Text>
                 <PremiumIndicator isRequired />

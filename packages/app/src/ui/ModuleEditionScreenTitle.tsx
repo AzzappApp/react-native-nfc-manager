@@ -10,24 +10,33 @@ type ModuleEditionScreenTitleProps = {
   label: string;
   kind: ModuleKind;
   moduleCount: number;
+  requiresSubscription?: boolean;
+  isPremium?: boolean;
 };
 const ModuleEditionScreenTitle = (props: ModuleEditionScreenTitleProps) => {
-  const { label, moduleCount } = props;
+  const {
+    label,
+    moduleCount,
+    requiresSubscription = false,
+    isPremium = false,
+  } = props;
 
   return (
     <View style={styles.container}>
       <Text variant="large">{label}</Text>
-      {moduleCountRequiresSubscription(moduleCount) && (
-        <View style={styles.pro}>
-          <Text variant="medium" style={styles.proText}>
-            <FormattedMessage
-              defaultMessage="3+ visible sections"
-              description="ModuleEditionScreenTitle - label for pro section"
-            />
-          </Text>
-          <PremiumIndicator isRequired />
-        </View>
-      )}
+      {!isPremium &&
+        (moduleCountRequiresSubscription(moduleCount) ||
+          requiresSubscription) && (
+          <View style={styles.pro}>
+            <Text variant="medium" style={styles.proText}>
+              <FormattedMessage
+                defaultMessage="azzapp+ WebCard"
+                description="ModuleEditionScreenTitle - label for pro section"
+              />
+            </Text>
+            <PremiumIndicator isRequired />
+          </View>
+        )}
     </View>
   );
 };
@@ -44,7 +53,6 @@ const styles = StyleSheet.create({
   },
   proText: {
     color: colors.grey400,
-    marginRight: 5,
   },
 });
 

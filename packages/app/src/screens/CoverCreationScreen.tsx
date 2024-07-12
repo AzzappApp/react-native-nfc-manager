@@ -29,6 +29,7 @@ const queryWithCoverTemplate = graphql`
       ... on Profile {
         webCard {
           webCardKind
+          isPremium
         }
       }
     }
@@ -49,6 +50,7 @@ const queryWithoutCoverTemplate = graphql`
       ... on Profile {
         webCard {
           webCardKind
+          isPremium
         }
       }
     }
@@ -97,6 +99,7 @@ const CoverCreationScreen = ({
 
   const { profile } = data;
   const webCardKind = profile?.webCard?.webCardKind;
+  const isPremium = profile?.webCard?.isPremium;
 
   return (
     <Container
@@ -117,15 +120,17 @@ const CoverCreationScreen = ({
                   description="Cover creation screen title"
                 />
               </Text>
-              <View style={styles.proContainer}>
-                <Text variant="medium" style={styles.proText}>
-                  <FormattedMessage
-                    description="NewWebCardScreen - Description for pro category"
-                    defaultMessage="Professional WebCard"
-                  />
-                </Text>
-                <PremiumIndicator isRequired />
-              </View>
+              {!isPremium && (
+                <View style={styles.proContainer}>
+                  <Text variant="medium" style={styles.proText}>
+                    <FormattedMessage
+                      description="NewWebCardScreen - Description for pro category"
+                      defaultMessage="azzapp+ WebCard"
+                    />
+                  </Text>
+                  <PremiumIndicator isRequired />
+                </View>
+              )}
             </View>
           )
         }

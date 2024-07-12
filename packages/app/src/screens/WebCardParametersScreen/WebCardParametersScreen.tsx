@@ -48,6 +48,9 @@ const webCardParametersScreenQuery = graphql`
   query WebCardParametersScreenQuery($webCardId: ID!) {
     webCard: node(id: $webCardId) {
       ...WebCardParametersScreen_webCard
+      ... on WebCard {
+        isPremium
+      }
     }
     webCardCategories {
       id
@@ -588,7 +591,10 @@ const WebCardParametersScreen = ({
                   <Text variant="button">{item.label}</Text>
                   <PremiumIndicator
                     size={24}
-                    isRequired={isWebCardKindSubscription(item.webCardKind)}
+                    isRequired={
+                      isWebCardKindSubscription(item.webCardKind) &&
+                      !webCard.isPremium
+                    }
                   />
                 </View>
               )}
