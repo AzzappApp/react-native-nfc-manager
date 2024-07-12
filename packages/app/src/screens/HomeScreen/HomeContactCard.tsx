@@ -68,11 +68,7 @@ type ContactCardItemProps = {
   index: number;
 };
 
-const ContactCardItemComponent = ({
-  height,
-  item,
-  index,
-}: ContactCardItemProps) => {
+const ContactCardItem = ({ height, item, index }: ContactCardItemProps) => {
   const styles = useStyleSheet(styleSheet);
   const currentIndexSharedValue = useHomeScreenCurrentIndex();
 
@@ -160,7 +156,6 @@ const ContactCardItemComponent = ({
     </Animated.View>
   );
 };
-const ContactCardItem = memo(ContactCardItemComponent);
 
 const styleSheet = createStyleSheet(appearance => ({
   itemContainer: {
