@@ -17,7 +17,7 @@
       },
       "android": {
         "image": "latest",
-        "resourceClass": "medium"
+        "resourceClass": "large"
       }
     },
     "development": {
