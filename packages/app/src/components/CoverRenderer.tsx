@@ -279,7 +279,7 @@ const CoverRenderer = (
               {coverDynamicLinks.links.map(link => (
                 <DynamicLinkRenderer
                   key={link.socialId}
-                  as={PressableNative}
+                  as={large ? PressableNative : View}
                   cardColors={cardColors}
                   color={coverDynamicLinks.color}
                   link={link}
