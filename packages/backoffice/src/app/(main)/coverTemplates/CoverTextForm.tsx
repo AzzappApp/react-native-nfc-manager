@@ -143,7 +143,7 @@ const CoverTextForm = ({ field }: TextFormProps) => {
           required
           inputProps={{
             min: '1',
-            max: '100',
+            max: '200',
             step: 'any',
             defaultValue: textFields.width.initialValue || '1',
           }}

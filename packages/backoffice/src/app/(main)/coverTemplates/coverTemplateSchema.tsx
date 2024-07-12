@@ -12,7 +12,7 @@ export const textSchema = z.object({
   fontFamily: z.string(),
   color: colorValidatorWithPalette,
   fontSize: z.number(),
-  width: z.number().min(1).max(100),
+  width: z.number().min(1).max(200),
   rotation: z.number(),
   position: positionSchema,
   textAlign: z.enum(['left', 'right', 'center']),
