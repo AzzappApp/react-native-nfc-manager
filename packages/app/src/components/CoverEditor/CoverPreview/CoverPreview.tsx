@@ -966,28 +966,7 @@ const CoverPreview = ({
   // #endregion
 
   // #region Screen shot replacement
-
   const hasFocus = useScreenHasFocus();
-  const [debouncedHasFocus, setDebouncedHasFocus] = useState(hasFocus);
-
-  useEffect(() => {
-    if (Platform.OS !== 'android') {
-      setDebouncedHasFocus(hasFocus);
-      return;
-    }
-    let timeout: any = null;
-    if (hasFocus && !debouncedHasFocus) {
-      timeout = setTimeout(() => {
-        setDebouncedHasFocus(true);
-      }, 200);
-    } else if (!hasFocus && debouncedHasFocus) {
-      setDebouncedHasFocus(false);
-    }
-    return () => {
-      clearTimeout(timeout);
-    };
-  }, [hasFocus, debouncedHasFocus]);
-
   const compositionContainerRef = useRef<View | null>(null);
   const [snapshotId, setSnapshotId] = useState<string | null>(null);
   const currentScreenShot = useRef<string | null>(null);
@@ -1008,10 +987,10 @@ const CoverPreview = ({
   });
 
   useEffect(() => {
-    if (debouncedHasFocus) {
+    if (hasFocus) {
       setSnapshotId(null);
     }
-  }, [debouncedHasFocus]);
+  }, [hasFocus]);
   // #endregion
 
   const animatedLinksStyle = useAnimatedStyle(() => {
@@ -1077,7 +1056,7 @@ const CoverPreview = ({
           {...props}
         >
           {/* Not rendering when modal are displayed reduce memory usage */}
-          {loadingRemoteMedia || (!debouncedHasFocus && !snapshotId) ? (
+          {loadingRemoteMedia || (!hasFocus && !snapshotId) ? (
             <Container style={styles.loadingContainer}>
               <ActivityIndicator />
             </Container>
@@ -1093,7 +1072,7 @@ const CoverPreview = ({
                   style={{ width: viewWidth, height: viewHeight }}
                 />
               )}
-              {debouncedHasFocus && (
+              {hasFocus && (
                 <VideoCompositionRenderer
                   pause={
                     editionMode === 'textEdit' ||
