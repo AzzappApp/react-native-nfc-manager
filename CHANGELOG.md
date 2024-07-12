@@ -1,5 +1,6 @@
-## 0.5.19-canary.123
+## 0.5.19-canary.124
 
+* **feat:**  - enable links cover only on large cover ([#4231](https://github.com/AzzappApp/azzapp/pull/4231))
 * **fix:**  - **cover:** [#4174](https://github.com/AzzappApp/azzapp/pull/4174) local variable seems to empeach keyboard jump issue ([#4223](https://github.com/AzzappApp/azzapp/pull/4223))
 * **fix:**  - **android:** [#4156](https://github.com/AzzappApp/azzapp/pull/4156) memoization of bottom panel causes update issues ([#4222](https://github.com/AzzappApp/azzapp/pull/4222))
 * **fix:**  - use padding instead margin to show the close icon properly(overflow visible does not work) ([#4211](https://github.com/AzzappApp/azzapp/pull/4211))
