@@ -433,7 +433,8 @@ const CoverPreview = ({
       if (
         editionMode === 'overlay' ||
         editionMode === 'textEdit' ||
-        editionMode === 'text'
+        editionMode === 'text' ||
+        editionMode === 'links'
       ) {
         dispatch({
           type: 'SET_EDITION_MODE',
