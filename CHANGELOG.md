@@ -1,4 +1,4 @@
-## 0.5.19-canary.130
+## 0.5.19-canary.131
 
 * **build:**  - try to update android resourceClass
 * **fix:**  - **Android:** cover overlay png
