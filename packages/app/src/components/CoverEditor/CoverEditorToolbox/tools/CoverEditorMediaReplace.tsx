@@ -132,7 +132,7 @@ const CoverEditorMediaReplace = () => {
               steps={[SelectImageStep]}
               onCancel={toggleScreenModal}
               onFinished={onFinished}
-              maxVideoDuration={COVER_MAX_MEDIA_DURATION}
+              maxVideoDuration={duration ?? COVER_MAX_MEDIA_DURATION}
               minVideoDuration={duration ?? COVER_MIN_MEDIA_DURATION}
               additionalData={{
                 hideTabs: true,

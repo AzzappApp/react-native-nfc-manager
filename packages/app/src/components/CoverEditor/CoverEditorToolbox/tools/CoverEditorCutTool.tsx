@@ -37,16 +37,16 @@ const CoverEditorCutTool = () => {
     toggleScreenModal();
   };
 
-  const lottieInfo = extractLottieInfoMemoized(lottie);
-  const durations = lottieInfo ? getLottieMediasDurations(lottieInfo) : null;
-
   const cropData = mediaInfo?.editionParameters?.cropData;
   const aspectRatio = cropData ? cropData.width / cropData.height : undefined;
 
   const expectedDuration = useMemo(() => {
+    const lottieInfo = extractLottieInfoMemoized(lottie);
+    if (!lottieInfo) return null;
+    const durations = getLottieMediasDurations(lottieInfo);
     if (selectedItemIndex == null || !durations) return null;
-    return durations[selectedItemIndex];
-  }, [durations, selectedItemIndex]);
+    return durations[selectedItemIndex] ?? null;
+  }, [lottie, selectedItemIndex]);
 
   return (
     <>
