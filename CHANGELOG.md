@@ -1,5 +1,6 @@
-## 0.5.19-canary.129
+## 0.5.19-canary.130
 
+* **build:**  - try to update android resourceClass
 * **fix:**  - **Android:** cover overlay png
 * **fix:**  - **home:** [#4156](https://github.com/AzzappApp/azzapp/pull/4156) try to remove memo on contact card item ([#4240](https://github.com/AzzappApp/azzapp/pull/4240))
 * **fix:**  - link deselection on vancas click ([#4230](https://github.com/AzzappApp/azzapp/pull/4230))
