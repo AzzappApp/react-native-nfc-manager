@@ -1,5 +1,6 @@
-## 0.5.19-canary.126
+## 0.5.19-canary.127
 
+* **fix:**  - **home:** [#4156](https://github.com/AzzappApp/azzapp/pull/4156) try to remove memo on contact card item ([#4240](https://github.com/AzzappApp/azzapp/pull/4240))
 * **fix:**  - link deselection on vancas click ([#4230](https://github.com/AzzappApp/azzapp/pull/4230))
 * **fix:**  - max video duration after switching from media video to image ([#4236](https://github.com/AzzappApp/azzapp/pull/4236))
 * **feat:**  - enable links cover only on large cover ([#4231](https://github.com/AzzappApp/azzapp/pull/4231))
