@@ -69,7 +69,6 @@ public class AZPSnapshotModule extends ReactContextBaseJavaModule {
   @ReactMethod
   public void clearSnapshot(String uuid) {
     if (uuid != null) {
-      Bitmap bitmap = snapshotMap.get(uuid);
       snapshotMap.remove(uuid);
     }
   }

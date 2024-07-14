@@ -51,6 +51,9 @@ include_directories(
 # Android Log lib
 find_library(LOG_LIB  log)
 
+add_definitions(-DGL_GLEXT_PROTOTYPES)
+add_definitions(-DEGL_EGLEXT_PROTOTYPES)
+
 # Link
 target_link_libraries(
         ${PACKAGE_NAME}
@@ -61,4 +64,7 @@ target_link_libraries(
         ${TURBOMODULES_LIB}
         -ljnigraphics
         -landroid
+        -llog
+        -lEGL 
+        -lGLESv2
 )
