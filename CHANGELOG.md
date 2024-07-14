@@ -1,5 +1,6 @@
-## 0.5.19-canary.134
+## 0.5.19-canary.135
 
+* **fix:**  - **Android:** handle bitmap creation crash
 * **fix:**  - **Android:** disable image cache
 * **build:**  - try to update android resourceClass
 * **fix:**  - **Android:** cover overlay png
