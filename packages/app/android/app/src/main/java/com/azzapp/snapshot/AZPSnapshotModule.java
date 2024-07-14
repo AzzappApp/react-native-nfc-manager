@@ -56,7 +56,13 @@ public class AZPSnapshotModule extends ReactContextBaseJavaModule {
     uiManager.addUIBlock(nativeViewHierarchyManager -> {
       View view = nativeViewHierarchyManager.resolveView(viewTag);
       if (view != null) {
-        Bitmap bitmap = getBitmapFromView(view);
+        Bitmap bitmap;
+        try {
+          bitmap = getBitmapFromView(view);
+        } catch (Throwable e) {
+          promise.reject("FAILED_TO_CREATE_BITMAP", e);
+          return;
+        }
         String uuid = UUID.randomUUID().toString();
         snapshotMap.put(uuid, bitmap);
         promise.resolve(uuid);
