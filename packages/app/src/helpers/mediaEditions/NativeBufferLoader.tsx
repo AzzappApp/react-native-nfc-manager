@@ -1,4 +1,5 @@
 import { Skia } from '@shopify/react-native-skia';
+import { Platform } from 'react-native';
 import { runOnUI } from 'react-native-reanimated';
 import { getJSIModule } from '#helpers/azzappJSIModules';
 import type { SkImage } from '@shopify/react-native-skia';
@@ -23,6 +24,7 @@ const getBufferLoader = () => getJSIModule('BufferLoader') as BufferLoader;
 // would be cool to have weak ref and finalization registry here to clean up images
 // we will do it manually for now waiting for react-native 0.75
 
+const isAndroid = Platform.OS === 'android';
 const loadImageTasks = new Map<string, Promise<bigint>>();
 const buffers = new Map<string, { buffer: bigint; refCount: number }>();
 
@@ -35,6 +37,9 @@ const scheduleCleanUp = () => {
         buffers.delete(key);
         getBufferLoader().unrefBuffer(ref.buffer);
       }
+    }
+    if (isAndroid) {
+      return;
     }
     const activeBuffers = [...buffers.values()].map(({ buffer }) => buffer);
     runOnUI(() => {
@@ -183,7 +188,7 @@ export const createImageFromNativeBuffer = (
   fromBufferLoader: boolean,
 ): SkImage | null => {
   'worklet';
-  if (!fromBufferLoader) {
+  if (!fromBufferLoader || isAndroid) {
     return createImageFromNativeBufferInner(buffer);
   }
   if (buffer == null) {
