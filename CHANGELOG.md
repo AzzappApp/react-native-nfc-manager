@@ -1,5 +1,6 @@
-## 0.5.19-canary.133
+## 0.5.19-canary.134
 
+* **fix:**  - **Android:** disable image cache
 * **build:**  - try to update android resourceClass
 * **fix:**  - **Android:** cover overlay png
 * **fix:**  - **home:** [#4156](https://github.com/AzzappApp/azzapp/pull/4156) try to remove memo on contact card item ([#4240](https://github.com/AzzappApp/azzapp/pull/4240))
