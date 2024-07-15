@@ -1,7 +1,5 @@
 import { getMediasByIds, type WebCard } from '@azzapp/data';
-
-const CLOUDINARY_CLOUDNAME = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME!;
-const CLOUDINARY_BASE_URL = `https://res.cloudinary.com/${CLOUDINARY_CLOUDNAME}`;
+import { CLOUDINARY_BASE_URL } from '@azzapp/shared/imagesHelpers';
 
 export const CROP = ['fit', 'lpad', 'fill'] as const;
 

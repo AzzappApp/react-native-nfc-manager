@@ -1,7 +1,7 @@
 import getRuntimeEnvironment from './getRuntimeEnvironment';
 
 const CLOUDINARY_CLOUDNAME = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME!;
-const CLOUDINARY_BASE_URL = `https://res.cloudinary.com/${CLOUDINARY_CLOUDNAME}`;
+export const CLOUDINARY_BASE_URL = `https://${process.env.NEXT_PUBLIC_CLOUDINARY_SECURE_DISTRIBUTION ?? 'res.cloudinary.com'}/${CLOUDINARY_CLOUDNAME}`;
 
 /**
  * Helpers used to create an asset url from a cloudinary id without any transformation
