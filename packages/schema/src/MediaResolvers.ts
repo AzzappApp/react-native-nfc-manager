@@ -129,7 +129,6 @@ const uriResolver =
       height,
       pixelRatio,
       raw,
-      streaming = false,
       extension,
       videoDurationPercentage,
     }: {
@@ -137,7 +136,6 @@ const uriResolver =
       height?: number | null;
       pixelRatio?: number | null;
       raw?: boolean | null;
-      streaming?: boolean | null;
       extension?: Extension | null;
       videoDurationPercentage?: number | null;
     },
@@ -171,8 +169,6 @@ const uriResolver =
       pixelRatio,
       pregeneratedSizes,
       extension,
-      // @ts-expect-error streaming is not in the getImageURLForSize signature
-      streaming,
       videoDurationPercentage,
     });
   };

@@ -19,7 +19,6 @@ export const presignMedia = async (kind: 'image' | 'raw' | 'video') => {
     kind,
     null,
     null,
-    false,
     `userId=${userId}|backoffice=true`,
   );
 

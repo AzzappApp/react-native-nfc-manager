@@ -20,7 +20,6 @@ export const getModuleBackgroundSignedUpload = async () => {
     'image',
     null,
     null,
-    false,
     `userId=${userId}|backoffice=true`,
   );
 };

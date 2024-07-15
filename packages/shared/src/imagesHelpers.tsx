@@ -94,12 +94,8 @@ export const getVideoUrlForSize = ({
   pixelRatio = 1,
   pregeneratedSizes,
   extension,
-  streaming = false,
-}: UrLForSizeParam & { streaming?: boolean }) => {
+}: UrLForSizeParam) => {
   assetNotRN('getVideoUrlForSize');
-  if (streaming) {
-    return assembleCloudinaryUrl(id, 'video', 'sp_auto', extension ?? 'm3u8');
-  }
   const transforms = resizeTransforms(
     width,
     height,

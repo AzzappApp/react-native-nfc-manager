@@ -20,7 +20,7 @@ type MediaVideo implements Media {
   aspectRatio: Float!
   width: Float!
   height: Float!
-  uri(pixelRatio: Float, height: Float, width: Float, raw: Boolean, extension: Extension, streaming: Boolean): String!
+  uri(pixelRatio: Float, height: Float, width: Float, raw: Boolean, extension: Extension): String!
   thumbnail(
     pixelRatio: Float
     height: Float

@@ -48,7 +48,7 @@ const uploadSignApi = async (req: Request) => {
   const body = await req.json();
   const input = UploadSignSchema.parse(body);
 
-  const { kind, target } = input;
+  const { kind } = input;
 
   const mediaId = encodeMediaId(createId(), kind);
   await createMedia({
@@ -63,7 +63,6 @@ const uploadSignApi = async (req: Request) => {
     kind,
     getAspectRatio(input),
     getPregeneratedSizes(input),
-    kind === 'video' && target === 'cover',
     `userId=${viewer.userId}`,
   );
   return NextResponse.json({ uploadURL, uploadParameters });
