@@ -1,16 +1,14 @@
 import { FlashList } from '@shopify/flash-list';
-import { Image } from 'expo-image';
 import { memo, useCallback, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
-import Video from 'react-native-video';
 import { graphql, useFragment } from 'react-relay';
 import { colors } from '#theme';
+import { MediaVideoRenderer } from '#components/medias';
 import { useScreenHasFocus } from '#components/NativeRouter';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import Icon from '#ui/Icon';
 import PressableNative from '#ui/PressableNative';
 import Text from '#ui/Text';
-
 import type { CoverTemplateTypePreviews_coverTemplate$data } from '#relayArtifacts/CoverTemplateTypePreviews_coverTemplate.graphql';
 import type { CoverTemplateType } from './useCoverTemplateTypes';
 import type { ArrayItemType } from '@azzapp/shared/arrayHelpers';
@@ -34,7 +32,10 @@ const CoverTemplateTypePreviews = ({
     graphql`
       fragment CoverTemplateTypePreviews_coverTemplate on CoverTemplate
       @argumentDefinitions(
-        pixelRatio: { type: "Float!", provider: "PixelRatio.relayprovider" }
+        pixelRatio: {
+          type: "Float!"
+          provider: "CappedPixelRatio.relayprovider"
+        }
       )
       @relay(plural: true) {
         id
@@ -42,12 +43,9 @@ const CoverTemplateTypePreviews = ({
         order
         preview {
           id
-          ... on MediaImage @alias(as: "image") {
+          ... on MediaVideo {
             uri(width: 512, pixelRatio: $pixelRatio)
-          }
-          ... on MediaVideo @alias(as: "video") {
-            uri(width: 512, pixelRatio: $pixelRatio)
-            thumbnail(width: 512)
+            thumbnail(width: 512, pixelRatio: $pixelRatio)
           }
         }
       }
@@ -73,17 +71,21 @@ const CoverTemplateTypePreviews = ({
     [],
   );
 
+  const hasFocus = useScreenHasFocus();
+
   const renderItem = useCallback(
     ({ item, index }: ListRenderItemInfo<CoverTemplate>) => {
       return (
         <CoverTemplateTypePreview
           coverTemplate={item}
           onSelect={onSelect}
-          shouldPlay={videoIndexToPlay.slice(0, videoToPlay).includes(index)}
+          shouldPlay={
+            !!hasFocus && videoIndexToPlay.slice(0, videoToPlay).includes(index)
+          }
         />
       );
     },
-    [onSelect, videoIndexToPlay, videoToPlay],
+    [onSelect, videoIndexToPlay, videoToPlay, hasFocus],
   );
 
   return (
@@ -111,9 +113,11 @@ const CoverTemplateTypePreviews = ({
 };
 const Separator = () => <View style={styles.separator} />;
 const keyExtractor = (item: CoverTemplate) => item.id;
+
 const viewabilityConfig = {
   itemVisiblePercentThreshold: 80,
 };
+
 export default memo(CoverTemplateTypePreviews);
 
 type ListItemComponentProps = {
@@ -133,30 +137,22 @@ const ListItemComponent = ({
     [coverTemplate, onSelect],
   );
 
-  const hasFocus = useScreenHasFocus();
+  if (!coverTemplate.preview.uri) {
+    return null;
+  }
   return (
     <PressableNative style={styles.preview} onPress={onPress}>
-      {coverTemplate.preview.video && shouldPlay ? (
-        <Video
-          source={{ uri: coverTemplate.preview.video.uri }}
-          muted={false}
-          repeat
-          paused={!shouldPlay || !hasFocus}
-          style={styles.previewMedia}
-          resizeMode="contain"
-          poster={coverTemplate.preview.video?.thumbnail}
-          disableFocus={true}
-        />
-      ) : (
-        <Image
-          source={{
-            uri:
-              coverTemplate.preview.image?.uri ??
-              coverTemplate.preview.video?.thumbnail,
-          }}
-          style={styles.previewMedia}
-        />
-      )}
+      <MediaVideoRenderer
+        source={{
+          mediaId: coverTemplate.preview.id,
+          uri: coverTemplate.preview.uri!,
+          requestedSize: 512,
+        }}
+        thumbnailURI={coverTemplate.preview.thumbnail}
+        muted
+        style={styles.previewMedia}
+        videoEnabled={shouldPlay}
+      />
       {coverTemplate.mediaCount != null && (
         <View style={styles.badge}>
           <View style={styles.badgeElements}>
@@ -198,6 +194,7 @@ const styleSheet = createStyleSheet(appearance => ({
   previewMedia: {
     width: 150,
     height: 240,
+    flexShrink: 0,
   },
   badge: {
     position: 'absolute',

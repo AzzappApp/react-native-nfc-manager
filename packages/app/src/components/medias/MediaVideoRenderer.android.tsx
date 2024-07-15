@@ -10,6 +10,7 @@ import { StyleSheet, View } from 'react-native';
 import Video from 'react-native-video';
 import { useLocalCachedMediaFile } from '#helpers/mediaHelpers/AndroidLocalMediaCache';
 import { DelayedActivityIndicator } from '#ui/ActivityIndicator/ActivityIndicator';
+import MediaImageRenderer from './MediaImageRenderer';
 import type {
   MediaVideoRendererHandle,
   MediaVideoRendererProps,
@@ -118,14 +119,24 @@ const MediaVideoRenderer = (
     [style],
   );
 
+  const thumbnailSource = useMemo(
+    () =>
+      thumbnailURI
+        ? {
+            uri: thumbnailURI,
+            mediaId: source.mediaId,
+            requestedSize: source.requestedSize,
+          }
+        : null,
+    [source.mediaId, source.requestedSize, thumbnailURI],
+  );
+
   return (
     <View style={containerStyle} ref={containerRef} {...props}>
       <View style={StyleSheet.absoluteFill}>
         <Video
           ref={videoRef}
           source={videoEnabled ? videoSource : undefined}
-          poster={thumbnailURI}
-          posterResizeMode="cover"
           muted={muted}
           paused={paused}
           disableFocus={true}
@@ -142,13 +153,24 @@ const MediaVideoRenderer = (
           hideShutterView
           shutterColor="transparent"
           onLoad={onLoadEnd}
+          renderLoader={
+            thumbnailSource && (
+              <MediaImageRenderer
+                testID="thumbnail"
+                source={thumbnailSource}
+                alt={alt}
+                onReadyForDisplay={dispatchReady}
+                style={StyleSheet.absoluteFill}
+              />
+            )
+          }
         />
         {loading && videoEnabled && (
           <View style={styles.loadingContainer}>
             <DelayedActivityIndicator
               color="white"
               variant="video"
-              delay={500}
+              delay={3000}
             />
           </View>
         )}

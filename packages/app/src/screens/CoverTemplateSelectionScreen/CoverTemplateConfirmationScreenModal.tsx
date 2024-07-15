@@ -1,9 +1,8 @@
-import { Image } from 'expo-image';
 import { useIntl } from 'react-intl';
 import { StyleSheet, View } from 'react-native';
-import Video from 'react-native-video';
 import { COVER_RATIO } from '@azzapp/shared/coverHelpers';
 import { colors } from '#theme';
+import { MediaVideoRenderer } from '#components/medias';
 import { ScreenModal } from '#components/NativeRouter';
 import useScreenInsets from '#hooks/useScreenInsets';
 import Button from '#ui/Button';
@@ -38,24 +37,17 @@ const CoverTemplateConfirmationScreenModal = ({
           />
         </View>
         <View style={styles.content}>
-          {template?.preview?.video?.uri ? (
-            //try to use MediaVideoRenderer here, but did not work and,
-            // having to pass requestedSize and id in source does not make sens has the uri is already optimized for a preview
-            // we can do it later, @Upmitt need this feature asap
-            <Video
-              source={{ uri: template.preview.video.uri }}
-              muted={false}
-              repeat
-              style={styles.template}
-              resizeMode="contain"
-              poster={template.preview.video?.thumbnail}
-            />
-          ) : (
-            <Image
+          {template?.preview.uri && (
+            <MediaVideoRenderer
               source={{
-                uri: template?.preview.image?.uri,
+                uri: template.preview.uri,
+                requestedSize: 512,
+                mediaId: template.preview.id,
               }}
+              videoEnabled
+              muted={false}
               style={styles.template}
+              thumbnailURI={template.preview?.thumbnail}
             />
           )}
           {/* //using margin on android  directly on the button create white area */}

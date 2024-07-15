@@ -21652,13 +21652,23 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-native-video@npm:^6.4.1":
+"react-native-video@npm:6.4.1":
   version: 6.4.1
   resolution: "react-native-video@npm:6.4.1"
   peerDependencies:
     react: "*"
     react-native: "*"
   checksum: a8532d2785f4c935dedb12d36604b851ca26eb0481f8e0a5a91ffd9e14a42d1f6a78a048ed6f9455726fe58b34be642f54554e26d16c05c32ba8f37e08f80baf
+  languageName: node
+  linkType: hard
+
+"react-native-video@patch:react-native-video@npm%3A6.4.1#./.yarn/patches/react-native-video-npm-6.4.1-bfaf0424e7.patch::locator=%40azzapp%2Fmonorepo%40workspace%3A.":
+  version: 6.4.1
+  resolution: "react-native-video@patch:react-native-video@npm%3A6.4.1#./.yarn/patches/react-native-video-npm-6.4.1-bfaf0424e7.patch::version=6.4.1&hash=ba2074&locator=%40azzapp%2Fmonorepo%40workspace%3A."
+  peerDependencies:
+    react: "*"
+    react-native: "*"
+  checksum: d5b02edc8a8383b6705edc989d7d39630e99de6dc011cb58f34f0a72af520495539ea5e175482ae5b4422b7fe86a6050fc53bbf1dd174c110a9d4cf6f6f51e6a
   languageName: node
   linkType: hard
 
