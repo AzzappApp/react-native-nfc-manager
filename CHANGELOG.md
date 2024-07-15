@@ -1,5 +1,6 @@
-## 0.5.19-canary.140
+## 0.5.19-canary.141
 
+* **build:**  - remove asyncstorage lib ([#4261](https://github.com/AzzappApp/azzapp/pull/4261))
 * **fix:**  - use mediaImageRenderer as poster for video ([#4257](https://github.com/AzzappApp/azzapp/pull/4257))
 * **feat:**  - **CoverEditor:** export progress ([#4260](https://github.com/AzzappApp/azzapp/pull/4260))
 * **fix:**  - 🐛 only show move segment with fixed duration ([#4256](https://github.com/AzzappApp/azzapp/pull/4256))
