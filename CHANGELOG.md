@@ -1,5 +1,6 @@
-## 0.5.19-canary.137
+## 0.5.19-canary.138
 
+* **feat:**  - **CoverEditor:** export progress ([#4260](https://github.com/AzzappApp/azzapp/pull/4260))
 * **fix:**  - 🐛 only show move segment with fixed duration ([#4256](https://github.com/AzzappApp/azzapp/pull/4256))
 * **fix:**  - 🐛 allow adding a third section ([#4254](https://github.com/AzzappApp/azzapp/pull/4254))
 * **fix:**  - 🐛 show free plan in account detail ([#4255](https://github.com/AzzappApp/azzapp/pull/4255))
