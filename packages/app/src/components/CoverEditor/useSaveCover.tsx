@@ -147,14 +147,14 @@ const useSaveCover = (
             },
           },
           onCompleted(response, error) {
-            if (error) {
-              reject(error);
-              return;
-            }
             coverLocalStore.saveCover(webCardId, {
               ...coverEditorState,
               coverId: response?.saveCover?.webCard.coverId,
             });
+            if (error) {
+              reject(error);
+              return;
+            }
             resolve();
           },
           onError(error) {
