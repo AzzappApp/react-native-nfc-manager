@@ -1,32 +1,37 @@
+import { useMemo } from 'react';
 import { useIntl } from 'react-intl';
 import UploadProgressModal from '#ui/UploadProgressModal';
-import type { SavingStatus } from './useSaveCover';
 import type { Observable } from 'relay-runtime';
 
 const CoverEditorSaveModal = ({
-  status,
-  progressIndicator,
+  exportProgressIndicator,
+  uploadProgressIndicator,
 }: {
-  status: SavingStatus | null;
-  progressIndicator: Observable<number> | null;
+  exportProgressIndicator: Observable<number> | null;
+  uploadProgressIndicator: Observable<number> | null;
 }) => {
   const intl = useIntl();
+  const progressIndicators = useMemo(
+    () => [exportProgressIndicator, uploadProgressIndicator],
+    [exportProgressIndicator, uploadProgressIndicator],
+  );
+  const texts = useMemo(
+    () => [
+      intl.formatMessage({
+        defaultMessage: 'Export',
+        description: 'Export phase title in cover editor save modal',
+      }),
+      intl.formatMessage({
+        defaultMessage: 'Upload',
+        description: 'Upload phase title in cover editor save modal',
+      }),
+    ],
+    [intl],
+  );
   return (
     <UploadProgressModal
-      progressIndicator={progressIndicator}
-      text={
-        status === 'exporting'
-          ? intl.formatMessage({
-              defaultMessage: 'Exporting',
-              description:
-                'Message displaying in upload modal when exporting a cover',
-            })
-          : intl.formatMessage({
-              defaultMessage: 'Uploading',
-              description:
-                'Message displaying in upload modal when uploading a cover',
-            })
-      }
+      progressIndicators={progressIndicators}
+      texts={texts}
     />
   );
 };

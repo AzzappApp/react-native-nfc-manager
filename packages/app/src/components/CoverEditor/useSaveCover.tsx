@@ -8,6 +8,7 @@ import { Platform, unstable_batchedUpdates } from 'react-native';
 import ReactNativeBlobUtil from 'react-native-blob-util';
 import * as mime from 'react-native-mime-types';
 import { graphql, useMutation } from 'react-relay';
+import { Observable } from 'relay-runtime';
 import {
   exportVideoComposition,
   getValidEncoderConfigurations,
@@ -31,7 +32,7 @@ import {
 import coverLocalStore from './coversLocalStore';
 import type { useSaveCoverMutation } from '#relayArtifacts/useSaveCoverMutation.graphql';
 import type { CoverEditorState } from './coverEditorTypes';
-import type { Observable } from 'relay-runtime';
+import type { Sink } from 'relay-runtime/lib/network/RelayObservable';
 
 export type SavingStatus =
   | 'complete'
@@ -40,13 +41,20 @@ export type SavingStatus =
   | 'saving'
   | 'uploading';
 
+type ProgressCallback = (progress: {
+  framesCompleted: number;
+  nbFrames: number;
+}) => void;
+
 const useSaveCover = (
   webCardId: string,
   coverEditorState: CoverEditorState,
 ) => {
   const [savingStatus, setSavingStatus] = useState<SavingStatus | null>(null);
   const [error, setError] = useState<any>(null);
-  const [progressIndicator, setProgressIndicator] =
+  const [exportProgressIndicator, setExportProgressIndicator] =
+    useState<Observable<number> | null>(null);
+  const [uploadProgressIndicator, setUploadProgressIndicator] =
     useState<Observable<number> | null>(null);
   const [commit] = useMutation<useSaveCoverMutation>(graphql`
     mutation useSaveCoverMutation($webCardId: ID!, $input: SaveCoverInput!) {
@@ -68,15 +76,26 @@ const useSaveCover = (
     // before we start exporting the cover
     await waitTime(Platform.OS === 'android' ? 1000 : 100);
 
+    let progressSink: Sink<number>;
+    const exportProgress: Observable<number> = Observable.create(sink => {
+      progressSink = sink;
+    });
+    setExportProgressIndicator(exportProgress);
     let path: string;
     let kind: 'image' | 'video';
     try {
-      ({ path, kind } = await createCoverMedia(coverEditorState));
+      ({ path, kind } = await createCoverMedia(
+        coverEditorState,
+        ({ framesCompleted, nbFrames }) => {
+          progressSink.next(framesCompleted / nbFrames);
+        },
+      ));
     } catch (error) {
       unstable_batchedUpdates(() => {
         setSavingStatus('error');
         setError(error);
-        setProgressIndicator(null);
+        setExportProgressIndicator(null);
+        setUploadProgressIndicator(null);
       });
       throw error;
     }
@@ -101,7 +120,7 @@ const useSaveCover = (
     );
     unstable_batchedUpdates(() => {
       setSavingStatus('uploading');
-      setProgressIndicator(
+      setUploadProgressIndicator(
         uploadProgress.map(({ loaded, total }) => loaded / total),
       );
     });
@@ -147,13 +166,15 @@ const useSaveCover = (
       unstable_batchedUpdates(() => {
         setSavingStatus('error');
         setError(error);
-        setProgressIndicator(null);
+        setExportProgressIndicator(null);
+        setUploadProgressIndicator(null);
       });
       throw error;
     }
     unstable_batchedUpdates(() => {
       setSavingStatus('complete');
-      setProgressIndicator(null);
+      setExportProgressIndicator(null);
+      setUploadProgressIndicator(null);
     });
   }, [commit, coverEditorState, webCardId]);
 
@@ -161,7 +182,8 @@ const useSaveCover = (
     unstable_batchedUpdates(() => {
       setSavingStatus(null);
       setError(null);
-      setProgressIndicator(null);
+      setExportProgressIndicator(null);
+      setUploadProgressIndicator(null);
     });
   }, []);
 
@@ -170,7 +192,8 @@ const useSaveCover = (
     reset,
     canSave: isCoverEditorStateValid(coverEditorState),
     savingStatus,
-    progressIndicator,
+    exportProgressIndicator,
+    uploadProgressIndicator,
     error,
   };
 };
@@ -203,7 +226,10 @@ const isCoverEditorStateValid = (coverEditorState: CoverEditorState) => {
   );
 };
 
-const createCoverMedia = async (coverEditorState: CoverEditorState) => {
+const createCoverMedia = async (
+  coverEditorState: CoverEditorState,
+  progressCallback: ProgressCallback,
+) => {
   const {
     lottie,
     images,
@@ -243,6 +269,10 @@ const createCoverMedia = async (coverEditorState: CoverEditorState) => {
 
     const blob = await image.encodeToBase64(ImageFormat.JPEG, 95);
 
+    progressCallback({
+      nbFrames: 1,
+      framesCompleted: 1,
+    });
     await ReactNativeBlobUtil.fs.writeFile(outPath, blob, 'base64');
   } else {
     outPath = createRandomFilePath('mp4');
@@ -295,6 +325,9 @@ const createCoverMedia = async (coverEditorState: CoverEditorState) => {
           skottiePlayer,
           lottieInfo,
         });
+      },
+      ({ framesCompleted, nbFrames }) => {
+        progressCallback({ framesCompleted, nbFrames });
       },
     );
     skottiePlayer?.dispose();

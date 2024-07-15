@@ -5,14 +5,80 @@ import { View, StyleSheet, useWindowDimensions } from 'react-native';
 import { colors } from '#theme';
 import Text from '#ui/Text';
 import ProgressBar from './ProgressBar';
+import type { ViewProps } from 'react-native-svg/lib/typescript/fabric/utils';
 import type { Subscription, Observable } from 'relay-runtime';
 
 const UploadProgressModal = ({
   progressIndicator,
+  progressIndicators,
   text,
+  texts,
 }: {
   progressIndicator?: Observable<number> | null;
+  progressIndicators?: Array<Observable<number> | null> | null;
   text?: string;
+  texts?: string[];
+}) => {
+  const windowWidth = useWindowDimensions().width;
+
+  const intl = useIntl();
+  text =
+    text ??
+    intl.formatMessage({
+      defaultMessage: 'Saving...',
+      description:
+        'Default message displaying in upload modal when uploading a file',
+    });
+
+  const nbProgressPars = progressIndicators?.length ?? 1;
+  const elementsWidth =
+    (windowWidth * 0.62 - (nbProgressPars - 1) * 2) / nbProgressPars;
+  return (
+    <View style={styles.container}>
+      <LottieView
+        source={require('../assets/loader.json')}
+        autoPlay
+        loop
+        hardwareAccelerationAndroid
+        style={{
+          width: windowWidth / 2,
+          height: windowWidth / 2,
+          marginTop: -100,
+        }}
+      />
+      <View style={styles.elementsContainer}>
+        {(texts ?? [text]).map((text, index) => (
+          <Text key={index} style={[styles.text, { width: elementsWidth }]}>
+            {text}
+          </Text>
+        ))}
+      </View>
+      <View style={styles.elementsContainer}>
+        {(progressIndicators ?? [progressIndicator]).map(
+          (progressIndicator, index, { length }) => (
+            <ObservableBoundProgressBar
+              key={index}
+              progressIndicator={progressIndicator}
+              hideWhenNull={length === 1}
+              style={{ width: elementsWidth }}
+            />
+          ),
+        )}
+      </View>
+    </View>
+  );
+};
+
+export default UploadProgressModal;
+
+const ObservableBoundProgressBar = ({
+  progressIndicator,
+  hideWhenNull = true,
+  style,
+  ...props
+}: ViewProps & {
+  hideWhenNull?: boolean;
+  progressIndicator: Observable<number> | null | undefined;
 }) => {
   const [progress, setProgress] = useState<number | null>(null);
 
@@ -32,42 +98,14 @@ const UploadProgressModal = ({
     };
   }, [progressIndicator]);
 
-  const windowWidth = useWindowDimensions().width;
-
-  const intl = useIntl();
-  text =
-    text ??
-    intl.formatMessage({
-      defaultMessage: 'Saving...',
-      description:
-        'Default message displaying in upload modal when uploading a file',
-    });
-
   return (
-    <View style={styles.container}>
-      <LottieView
-        source={require('../assets/loader.json')}
-        autoPlay
-        loop
-        hardwareAccelerationAndroid
-        style={{
-          width: windowWidth / 2,
-          height: windowWidth / 2,
-          marginTop: -100,
-        }}
-      />
-      <Text variant="button" style={styles.text}>
-        {text}
-      </Text>
-      <ProgressBar
-        progress={progress ?? 0}
-        style={[styles.progressBarWidth, progress === null && { opacity: 0 }]}
-      />
-    </View>
+    <ProgressBar
+      progress={progress ?? 0}
+      {...props}
+      style={[style, { opacity: progress === null && hideWhenNull ? 0 : 1 }]}
+    />
   );
 };
-
-export default UploadProgressModal;
 
 const styles = StyleSheet.create({
   container: {
@@ -76,11 +114,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  elementsContainer: {
+    flexDirection: 'row',
+    gap: 2,
+  },
   text: {
     color: colors.white,
-    width: '75%',
     textAlign: 'center',
     lineHeight: 36,
   },
-  progressBarWidth: { width: '75%' },
 });

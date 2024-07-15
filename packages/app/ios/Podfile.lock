@@ -1,5 +1,5 @@
 PODS:
-  - azzapp-react-native-skia-video (0.4.5):
+  - azzapp-react-native-skia-video (0.5.0):
     - DoubleConversion
     - glog
     - hermes-engine
@@ -1943,7 +1943,7 @@ EXTERNAL SOURCES:
     :path: "../../../node_modules/react-native/ReactCommon/yoga"
 
 SPEC CHECKSUMS:
-  azzapp-react-native-skia-video: 74ee67d16f816870ba41c5f8ce49e312228dc6f7
+  azzapp-react-native-skia-video: acc4e2dd2a11f105b8289c41c15d43b4100fdd7b
   boost: d3f49c53809116a5d38da093a8aa78bf551aed09
   DoubleConversion: 76ab83afb40bddeeee456813d9c04f67f78771b5
   DVAssetLoaderDelegate: 0caec20e4e08b8560b691131539e9180024d4bce
@@ -1964,7 +1964,7 @@ SPEC CHECKSUMS:
   ExpoSensors: 3bc12e5186b94703464d1554ce5ebfff05f91093
   FBLazyVector: 7e977dd099937dc5458851233141583abba49ff2
   fmt: 4c2741a687cc09f0634a2e2c72a838b99f1ff120
-  glog: fdfdfe5479092de0c4bdbebedd9056951f092c4f
+  glog: c5d68082e772fa1c511173d6b30a9de2c05a69a2
   hermes-engine: 1f547997900dd0752dc0cc0ae6dd16173c49e09b
   libavif: 84bbb62fb232c3018d6f1bab79beea87e35de7b7
   libdav1d: 23581a4d8ec811ff171ed5e2e05cd27bad64c39f
@@ -2009,7 +2009,7 @@ SPEC CHECKSUMS:
   react-native-quick-base64: a74c4b2607b9de016877a8edb776b6ac59785809
   react-native-safe-area-context: b7daa1a8df36095a032dff095a1ea8963cb48371
   react-native-skia: 929b6d19b41e3483a33a410f5c1efdf002929230
-  react-native-skottie-template-player: 1796ae03e1225d7c5fdaaeda5ce63792c3122e31
+  react-native-skottie-template-player: fe4f9b24aaf3dfde4f953ac6c40d64ec2712ffe0
   react-native-video: a55d154f26f929327cc99c1fac0ad02aca3b8520
   React-nativeconfig: fa5de9d8f4dbd5917358f8ad3ad1e08762f01dcb
   React-NativeModulesApple: 585d1b78e0597de364d259cb56007052d0bda5e5
@@ -2058,8 +2058,8 @@ SPEC CHECKSUMS:
   SocketRocket: abac6f5de4d4d62d24e11868d7a2f427e0ef940d
   SPTPersistentCache: df36ea46762d7cf026502bbb86a8b79d0080dff4
   VisionCamera: 4a00505ff543b8b6851967fb7aea28f1613da472
-  Yoga: 04f1db30bb810187397fa4c37dd1868a27af229c
+  Yoga: 88480008ccacea6301ff7bf58726e27a72931c8d
 
 PODFILE CHECKSUM: 95c1d4a87ad6776774c616633cba26a274637f51
 
-COCOAPODS: 1.15.2
+COCOAPODS: 1.14.3

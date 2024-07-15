@@ -456,8 +456,15 @@ const CoverEditorCore = (
   // #endregion
 
   // #region Saving
-  const { save, reset, savingStatus, progressIndicator, error, canSave } =
-    useSaveCover(profile.webCard.id, coverEditorState);
+  const {
+    save,
+    reset,
+    savingStatus,
+    exportProgressIndicator,
+    uploadProgressIndicator,
+    error,
+    canSave,
+  } = useSaveCover(profile.webCard.id, coverEditorState);
 
   useEffect(() => {
     if (error) {
@@ -580,8 +587,8 @@ const CoverEditorCore = (
         gestureEnabled={false}
       >
         <CoverEditorSaveModal
-          status={savingStatus}
-          progressIndicator={progressIndicator}
+          exportProgressIndicator={exportProgressIndicator}
+          uploadProgressIndicator={uploadProgressIndicator}
         />
       </ScreenModal>
       <ScreenModal visible={error != null} onRequestDismiss={reset}>
