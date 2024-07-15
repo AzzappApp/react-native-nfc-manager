@@ -1,4 +1,4 @@
-## 0.5.19-canary.138
+## 0.5.19-canary.139
 
 * **feat:**  - **CoverEditor:** export progress ([#4260](https://github.com/AzzappApp/azzapp/pull/4260))
 * **fix:**  - 🐛 only show move segment with fixed duration ([#4256](https://github.com/AzzappApp/azzapp/pull/4256))
