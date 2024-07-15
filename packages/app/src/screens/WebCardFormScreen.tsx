@@ -3,6 +3,7 @@ import { Controller, useForm } from 'react-hook-form';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { StyleSheet, View, useWindowDimensions } from 'react-native';
 import { KeyboardAvoidingView } from 'react-native-keyboard-controller';
+import Toast from 'react-native-toast-message';
 import {
   fetchQuery,
   graphql,
@@ -226,7 +227,7 @@ const WebCardFormScreen = ({
       },
     });
 
-  const [commit] = useMutation<WebCardFormScreenMutation>(graphql`
+  const [commit, saving] = useMutation<WebCardFormScreenMutation>(graphql`
     mutation WebCardFormScreenMutation($input: CreateWebCardInput!) {
       createWebCard(input: $input) {
         profile {
@@ -279,78 +280,73 @@ const WebCardFormScreen = ({
     const defaultActivity = companyActivities?.[0];
     const defaultActivityId = defaultActivity?.id;
 
-    return new Promise<void>((resolve, reject) => {
-      commit({
-        variables: {
-          input: {
-            ...data,
-            webCardCategoryId: webCardCategoryId!,
-            companyActivityId: data.companyActivityId || defaultActivityId,
-          },
+    commit({
+      variables: {
+        input: {
+          ...data,
+          webCardCategoryId: webCardCategoryId!,
+          companyActivityId: data.companyActivityId || defaultActivityId,
         },
-        updater: store => {
-          const root = store.getRoot();
-          const user = root.getLinkedRecord('currentUser');
-          const profiles = user?.getLinkedRecords('profiles');
-          if (!profiles) {
-            return;
-          }
+      },
+      updater: store => {
+        const root = store.getRoot();
+        const user = root.getLinkedRecord('currentUser');
+        const profiles = user?.getLinkedRecords('profiles');
+        if (!profiles) {
+          return;
+        }
 
-          const newProfile = store
-            .getRootField('createWebCard')
-            ?.getLinkedRecord('profile');
+        const newProfile = store
+          .getRootField('createWebCard')
+          ?.getLinkedRecord('profile');
 
-          if (!newProfile) {
-            return;
-          }
+        if (!newProfile) {
+          return;
+        }
 
-          user?.setLinkedRecords(
-            profiles?.concat(newProfile).sort((a, b) => {
-              const webCardA = a.getLinkedRecord('webCard');
-              const webCardB = b.getLinkedRecord('webCard');
+        user?.setLinkedRecords(
+          profiles?.concat(newProfile).sort((a, b) => {
+            const webCardA = a.getLinkedRecord('webCard');
+            const webCardB = b.getLinkedRecord('webCard');
 
-              return (
-                (webCardA?.getValue('userName') as string) ?? ''
-              ).localeCompare((webCardB?.getValue('userName') as string) ?? '');
-            }),
-            'profiles',
-          );
-          root.setLinkedRecord(user, 'currentUser');
-        },
-        onCompleted: (data, errors) => {
-          if (errors?.length) {
-            if (errors[0].message === ERRORS.USERNAME_ALREADY_EXISTS) {
-              setError('userName', {
-                type: 'validation',
-                message: userNameAlreadyExistsError,
-              });
-            }
-            // TODO
-            console.log(errors);
-            reject(errors);
-            return;
-          }
-
-          const {
-            id: profileId,
-            profileRole,
-            webCard,
-          } = data.createWebCard.profile;
-          onChangeWebCard({
-            profileId,
-            webCardId: webCard.id,
-            profileRole: profileRole!,
-          }).finally(() => {
-            onNext();
-            resolve();
+            return (
+              (webCardA?.getValue('userName') as string) ?? ''
+            ).localeCompare((webCardB?.getValue('userName') as string) ?? '');
+          }),
+          'profiles',
+        );
+        root.setLinkedRecord(user, 'currentUser');
+      },
+      onCompleted: data => {
+        const {
+          id: profileId,
+          profileRole,
+          webCard,
+        } = data.createWebCard.profile;
+        onChangeWebCard({
+          profileId,
+          webCardId: webCard.id,
+          profileRole: profileRole!,
+        }).finally(() => {
+          onNext();
+        });
+      },
+      onError: error => {
+        if (error.message === ERRORS.USERNAME_ALREADY_EXISTS) {
+          setError('userName', {
+            type: 'validation',
+            message: userNameAlreadyExistsError,
           });
-        },
-        onError: error => {
-          // TODO
-          console.log(error);
-          reject(error);
-        },
-      });
+        } else {
+          Toast.show({
+            type: 'error',
+            text1: intl.formatMessage({
+              defaultMessage: 'An error occurred',
+              description: 'Error toast message',
+            }),
+          });
+        }
+      },
     });
   });
 
@@ -415,6 +411,7 @@ const WebCardFormScreen = ({
           <NextHeaderButton
             style={{ width: 70, marginRight: 10 }}
             onPress={onSubmit}
+            disabled={saving}
           />
         }
         rightElementWidth={80}
