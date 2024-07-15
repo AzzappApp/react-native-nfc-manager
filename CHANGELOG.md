@@ -1,5 +1,10 @@
-## 0.5.19-canary.136
+## 0.5.19-canary.137
 
+* **fix:**  - 🐛 only show move segment with fixed duration ([#4256](https://github.com/AzzappApp/azzapp/pull/4256))
+* **fix:**  - 🐛 allow adding a third section ([#4254](https://github.com/AzzappApp/azzapp/pull/4254))
+* **fix:**  - 🐛 show free plan in account detail ([#4255](https://github.com/AzzappApp/azzapp/pull/4255))
+* **fix:**  - **webCard:** [#4227](https://github.com/AzzappApp/azzapp/pull/4227) handle correctly error on webCard creation ([#4247](https://github.com/AzzappApp/azzapp/pull/4247))
+* **fix:**  - **webCard:** [#4220](https://github.com/AzzappApp/azzapp/pull/4220) properly swap colors on first module ([#4238](https://github.com/AzzappApp/azzapp/pull/4238))
 * **fix:**  - **error:** [#4226](https://github.com/AzzappApp/azzapp/pull/4226) don’t throw network errors to sentry ([#4244](https://github.com/AzzappApp/azzapp/pull/4244))
 * **feat:**  - add env var to configure cloudinary domain ([#4251](https://github.com/AzzappApp/azzapp/pull/4251))
 * **fix:**  - **Android:** handle bitmap creation crash
