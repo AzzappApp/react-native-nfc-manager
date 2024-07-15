@@ -223,16 +223,16 @@ const AccountDetailsScreen = ({
             </Text>
             <Text variant="medium">••••••••••</Text>
           </PressableNative>
-          {currentUser?.isPremium && (
-            <View style={styles.sectionField}>
-              <Text variant="smallbold">
-                <FormattedMessage
-                  defaultMessage="Plan"
-                  description="Plan field in the account details screen"
-                />
-              </Text>
-              <Text variant="medium">
-                {currentUser?.userSubscription?.totalSeats ? (
+          <View style={styles.sectionField}>
+            <Text variant="smallbold">
+              <FormattedMessage
+                defaultMessage="Plan"
+                description="Plan field in the account details screen"
+              />
+            </Text>
+            <Text variant="medium">
+              {currentUser?.isPremium &&
+                currentUser?.userSubscription?.totalSeats && (
                   <FormattedMessage
                     defaultMessage="azzapp+ {seats} users"
                     description="Plan value in the account details screen with seats"
@@ -240,15 +240,22 @@ const AccountDetailsScreen = ({
                       seats: currentUser?.userSubscription?.totalSeats,
                     }}
                   />
-                ) : (
+                )}
+              {currentUser?.isPremium &&
+                !currentUser?.userSubscription?.totalSeats && (
                   <FormattedMessage
                     defaultMessage="azzapp+"
                     description="Plan value in the account details screen with no seats"
                   />
                 )}
-              </Text>
-            </View>
-          )}
+              {!currentUser?.isPremium && (
+                <FormattedMessage
+                  defaultMessage="Free"
+                  description="Plan value in the account details screen for Free"
+                />
+              )}
+            </Text>
+          </View>
         </View>
         <PressableNative
           onPress={deleteMyAccount}
