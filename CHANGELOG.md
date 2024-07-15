@@ -1,5 +1,6 @@
-## 0.5.19-canary.143
+## 0.5.19-canary.144
 
+* **fix:**  - proper currency formating ([#4266](https://github.com/AzzappApp/azzapp/pull/4266))
 * **fix:**  - try to save coverId in all cases ([#4267](https://github.com/AzzappApp/azzapp/pull/4267))
 * **fix:**  - **android:** [#3994](https://github.com/AzzappApp/azzapp/pull/3994) remove video streaming ([#4265](https://github.com/AzzappApp/azzapp/pull/4265))
 * **build:**  - remove asyncstorage lib ([#4261](https://github.com/AzzappApp/azzapp/pull/4261))
