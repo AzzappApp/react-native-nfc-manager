@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { FlatList, View } from 'react-native';
 import { isNotFalsyString } from '@azzapp/shared/stringHelpers';
@@ -12,7 +12,7 @@ import Text from '#ui/Text';
 type RecentSearchProps = {
   searchValue: string | null | undefined;
   recentSearch: string[];
-  removeSearch: (item: string) => Promise<void>;
+  removeSearch: (item: string) => void;
   search: (item: string) => void;
 };
 const RecentSearch = ({
@@ -82,7 +82,7 @@ const RecentSearch = ({
 
 type SearchRecentItemProps = {
   item: string;
-  removeItem: (item: string) => Promise<void>;
+  removeItem: (item: string) => void;
   search: (item: string) => void;
 };
 const SearchRecentItem = ({
@@ -92,13 +92,13 @@ const SearchRecentItem = ({
 }: SearchRecentItemProps) => {
   const intl = useIntl();
   const styles = useStyleSheet(styleSheet);
-  const onRemove = async () => {
-    await removeItem(item);
-  };
+  const onRemove = useCallback(() => {
+    removeItem(item);
+  }, [item, removeItem]);
 
-  const onSearch = () => {
+  const onSearch = useCallback(() => {
     search(item);
-  };
+  }, [item, search]);
 
   return (
     <PressableBackground

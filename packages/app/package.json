@@ -70,7 +70,6 @@
     "@hookform/resolvers": "^3.9.0",
     "@lottiefiles/lottie-js": "0.4.2",
     "@miblanchard/react-native-slider": "2.6.0",
-    "@react-native-async-storage/async-storage": "^1.23.1",
     "@react-native-camera-roll/camera-roll": "^7.8.1",
     "@react-native-community/datetimepicker": "^8.2.0",
     "@react-native-masked-view/masked-view": "^0.3.1",
@@ -130,7 +129,7 @@
     "react-native-tab-view": "^3.5.2",
     "react-native-toast-message": "^2.2.0",
     "react-native-video": "^6.4.1",
-    "react-native-vision-camera": "^4.4.2",
+    "react-native-vision-camera": "^4.5.0",
     "react-relay": "^17.0.0",
     "use-debounce": "^10.0.1",
     "zod": "^3.23.8"

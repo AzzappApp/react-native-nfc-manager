@@ -129,7 +129,6 @@ __metadata:
     "@hookform/resolvers": ^3.9.0
     "@lottiefiles/lottie-js": 0.4.2
     "@miblanchard/react-native-slider": 2.6.0
-    "@react-native-async-storage/async-storage": ^1.23.1
     "@react-native-camera-roll/camera-roll": ^7.8.1
     "@react-native-community/datetimepicker": ^8.2.0
     "@react-native-masked-view/masked-view": ^0.3.1
@@ -201,7 +200,7 @@ __metadata:
     react-native-tab-view: ^3.5.2
     react-native-toast-message: ^2.2.0
     react-native-video: ^6.4.1
-    react-native-vision-camera: ^4.4.2
+    react-native-vision-camera: ^4.5.0
     react-relay: ^17.0.0
     react-test-renderer: ^18.3.1
     relay-test-utils: ^17.0.0
@@ -8158,17 +8157,6 @@ __metadata:
   version: 1.5.1
   resolution: "@preact/signals-core@npm:1.5.1"
   checksum: 56eaadf5a70b8c0b8506645e39cb6866758c69c3f2708548b30bde9105eaba05bfc1b69ef60472389c453cfa8774dead93547a89358a0ff0df0918871e6a5222
-  languageName: node
-  linkType: hard
-
-"@react-native-async-storage/async-storage@npm:^1.23.1":
-  version: 1.23.1
-  resolution: "@react-native-async-storage/async-storage@npm:1.23.1"
-  dependencies:
-    merge-options: ^3.0.4
-  peerDependencies:
-    react-native: ^0.0.0-0 || >=0.60 <1.0
-  checksum: 7096546ed4a5faf1f6e0425e2e15713575f1a7493a04524da386ff35c3844b57b8fd20544fad4157b4a61e048b10235f2f06124f262da5b327edc74fbc31e02b
   languageName: node
   linkType: hard
 
@@ -16858,13 +16846,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"is-plain-obj@npm:^2.1.0":
-  version: 2.1.0
-  resolution: "is-plain-obj@npm:2.1.0"
-  checksum: cec9100678b0a9fe0248a81743041ed990c2d4c99f893d935545cfbc42876cbe86d207f3b895700c690ad2fa520e568c44afc1605044b535a7820c1d40e38daa
-  languageName: node
-  linkType: hard
-
 "is-plain-object@npm:^2.0.4":
   version: 2.0.4
   resolution: "is-plain-object@npm:2.0.4"
@@ -18976,15 +18957,6 @@ __metadata:
   version: 0.2.0
   resolution: "memory-cache@npm:0.2.0"
   checksum: 255c87fec360ce06818ca7aeb5850d798e14950a9fcea879d88e1f8d1f4a6cffb8ed16da54aa677f5ec8e47773fbe15775a1cdf837ac190e17e9fb4b71e87bee
-  languageName: node
-  linkType: hard
-
-"merge-options@npm:^3.0.4":
-  version: 3.0.4
-  resolution: "merge-options@npm:3.0.4"
-  dependencies:
-    is-plain-obj: ^2.1.0
-  checksum: d86ddb3dd6e85d558dbf25dc944f3527b6bacb944db3fdda6e84a3f59c4e4b85231095f58b835758b9a57708342dee0f8de0dffa352974a48221487fe9f4584f
   languageName: node
   linkType: hard
 
@@ -21672,9 +21644,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-native-vision-camera@npm:^4.4.2":
-  version: 4.4.2
-  resolution: "react-native-vision-camera@npm:4.4.2"
+"react-native-vision-camera@npm:^4.5.0":
+  version: 4.5.0
+  resolution: "react-native-vision-camera@npm:4.5.0"
   peerDependencies:
     "@shopify/react-native-skia": "*"
     react: "*"
@@ -21688,7 +21660,7 @@ __metadata:
       optional: true
     react-native-worklets-core:
       optional: true
-  checksum: 60a47a6f7c88fdca7e2178883c03289598bf4db9f058cb5a86be752c3d85cdab1823b6d4fe5fa85245675c4f4033f89867b9ee960d5d9e0ae2039e761e754201
+  checksum: 5301b9cb303d3ee7b9f4d4c0368ace06d62826c6c4deb92c744a3dfb8a4de30f2fd5d40374bd529a3e5647245a02736d45fb0a2c6f9bbb3350bc9cc9951e57a6
   languageName: node
   linkType: hard
 

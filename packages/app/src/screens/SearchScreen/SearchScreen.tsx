@@ -52,7 +52,7 @@ export const SearchScreen = ({ hasFocus = true }: { hasFocus: boolean }) => {
       setShowTabView(true);
       const searchTrimmed = search?.trim();
       setSearchValueSubmitted(searchTrimmed);
-      await addRecentSearchItem(searchTrimmed);
+      addRecentSearchItem(searchTrimmed);
       if (search !== searchValue) {
         // used in case the search value is press on recent search
         setSearchValue(search);
