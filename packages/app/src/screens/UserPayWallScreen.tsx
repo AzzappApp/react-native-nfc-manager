@@ -1,7 +1,7 @@
 import { LinearGradient } from 'expo-linear-gradient';
 import LottieView from 'lottie-react-native';
 import { memo, useCallback, useEffect, useState } from 'react';
-import { FormattedMessage, useIntl } from 'react-intl';
+import { FormattedMessage, FormattedNumber, useIntl } from 'react-intl';
 import {
   Alert,
   Dimensions,
@@ -480,7 +480,6 @@ const OfferItem = ({
     () => setSelectedPurchasePackage(offer),
     [offer, setSelectedPurchasePackage],
   );
-
   return (
     <PressableOpacity
       key={offer.identifier}
@@ -508,8 +507,16 @@ const OfferItem = ({
       <View>
         <Text variant="button">{offer.product.priceString}</Text>
         {period === 'year' && (
-          <Text variant="smallbold" style={{ textAlign: 'right' }}>
-            {(offer.product.price / 12).toFixed(2)}
+          <Text variant="smallbold" style={styles.monthlyPricing}>
+            <FormattedNumber
+              value={offer.product.price / 12}
+              style="currency"
+              currency={offer.product.currencyCode}
+            />
+            <FormattedMessage
+              defaultMessage={'/ month'}
+              description="MultiUser Paywall Screen - number of seat offer"
+            />
           </Text>
         )}
       </View>
@@ -520,6 +527,7 @@ const OfferItem = ({
 const Offer = memo(OfferItem);
 const BOTTOM_HEIGHT = width;
 const styles = StyleSheet.create({
+  monthlyPricing: { textAlign: 'right', color: colors.grey600 },
   promoContainer: {
     alignItems: 'flex-end',
     justifyContent: 'flex-end',

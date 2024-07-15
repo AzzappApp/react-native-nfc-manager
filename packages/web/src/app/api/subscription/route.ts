@@ -9,7 +9,7 @@ import {
 } from '@azzapp/data';
 import cors from '#helpers/cors';
 
-const BEARER_HEADER = 'DkAgYzjiRxns4ty'; //dev value test and release
+const BEARER_HEADER = process.env.IAP_REVENUECAT_NOTIFICATION_BEARER;
 const subscriptionWebHook = async (req: Request) => {
   const authorization = req.headers.get('Authorization');
   if (!authorization) {
