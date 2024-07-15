@@ -296,7 +296,7 @@ const SimpleTextEditionScreen = ({
 
     const requireSubscription = changeModuleRequireSubscription(
       moduleKind,
-      cardModulesCount + (moduleData?.id ? 0 : 1),
+      cardModulesCount,
     );
 
     if (

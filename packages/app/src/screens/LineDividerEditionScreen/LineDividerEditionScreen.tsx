@@ -193,7 +193,7 @@ const LineDividerEditionScreen = ({
 
     const requireSubscription = changeModuleRequireSubscription(
       'lineDivider',
-      cardModulesCount + (lineDivider?.id ? 0 : 1),
+      cardModulesCount,
     );
 
     if (webCard.cardIsPublished && requireSubscription && !webCard.isPremium) {

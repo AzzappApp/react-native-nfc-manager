@@ -407,7 +407,7 @@ const PhotoWithTextAndTitleEditionScreen = ({
 
     const requireSubscription = changeModuleRequireSubscription(
       'photoWithTextAndTitle',
-      cardModulesCount + (photoWithTextAndTitle?.id ? 0 : 1),
+      cardModulesCount,
     );
 
     if (

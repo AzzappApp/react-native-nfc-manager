@@ -302,7 +302,7 @@ const HorizontalPhotoEditionScreen = ({
 
     const requireSubscription = changeModuleRequireSubscription(
       'horizontalPhoto',
-      cardModulesCount + (horizontalPhoto?.id ? 0 : 1),
+      cardModulesCount,
     );
 
     if (

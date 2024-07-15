@@ -316,7 +316,7 @@ const SimpleButtonEditionScreen = ({
 
     const requireSubscription = changeModuleRequireSubscription(
       'simpleButton',
-      cardModulesCount + (simpleButton?.id ? 0 : 1),
+      cardModulesCount,
     );
 
     if (

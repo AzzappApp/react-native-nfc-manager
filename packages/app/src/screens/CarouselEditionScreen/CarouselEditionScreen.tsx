@@ -330,7 +330,7 @@ const CarouselEditionScreen = ({
 
     const requireSubscription = changeModuleRequireSubscription(
       'carousel',
-      cardModulesCount + (carousel?.id ? 0 : 1),
+      cardModulesCount,
     );
 
     if (

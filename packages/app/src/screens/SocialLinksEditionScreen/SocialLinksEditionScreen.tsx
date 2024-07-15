@@ -260,7 +260,7 @@ const SocialLinksEditionScreen = ({
 
     const requireSubscription = changeModuleRequireSubscription(
       'socialLinks',
-      cardModulesCount + (socialLinks?.id ? 0 : 1),
+      cardModulesCount,
     );
 
     if (

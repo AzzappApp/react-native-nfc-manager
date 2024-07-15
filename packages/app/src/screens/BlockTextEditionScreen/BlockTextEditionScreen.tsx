@@ -283,7 +283,7 @@ const BlockTextEditionScreen = ({
 
     const requireSubscription = changeModuleRequireSubscription(
       'blockText',
-      cardModulesCount + (blockText?.id ? 0 : 1),
+      cardModulesCount,
     );
 
     if (
