@@ -1,5 +1,6 @@
-## 0.5.19-canary.141
+## 0.5.19-canary.142
 
+* **fix:**  - **android:** [#3994](https://github.com/AzzappApp/azzapp/pull/3994) remove video streaming ([#4265](https://github.com/AzzappApp/azzapp/pull/4265))
 * **build:**  - remove asyncstorage lib ([#4261](https://github.com/AzzappApp/azzapp/pull/4261))
 * **fix:**  - use mediaImageRenderer as poster for video ([#4257](https://github.com/AzzappApp/azzapp/pull/4257))
 * **feat:**  - **CoverEditor:** export progress ([#4260](https://github.com/AzzappApp/azzapp/pull/4260))
