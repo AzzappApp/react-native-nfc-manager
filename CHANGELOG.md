@@ -1,5 +1,7 @@
-## 0.5.19-canary.135
+## 0.5.19-canary.136
 
+* **fix:**  - **error:** [#4226](https://github.com/AzzappApp/azzapp/pull/4226) don’t throw network errors to sentry ([#4244](https://github.com/AzzappApp/azzapp/pull/4244))
+* **feat:**  - add env var to configure cloudinary domain ([#4251](https://github.com/AzzappApp/azzapp/pull/4251))
 * **fix:**  - **Android:** handle bitmap creation crash
 * **fix:**  - **Android:** disable image cache
 * **build:**  - try to update android resourceClass
