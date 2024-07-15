@@ -256,9 +256,11 @@ const VideoTimelineEditor = ({
           style={[styles.timeRange, animatedStyle]}
           hitSlop={{ left: 35, right: 35 }}
         >
-          <View style={styles.moveSegment}>
-            <Icon icon="move_segment" />
-          </View>
+          {minDuration === maxDuration && (
+            <View style={styles.moveSegment}>
+              <Icon icon="move_segment" />
+            </View>
+          )}
           <View style={[styles.thumb, styles.thumbStart]} />
           <View style={[styles.thumb, styles.thumbEnd]} />
         </Animated.View>
