@@ -10,10 +10,7 @@ import {
 } from 'react-relay';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
 import ERRORS from '@azzapp/shared/errors';
-import {
-  FetchError,
-  TIMEOUT_ERROR_MESSAGE,
-} from '@azzapp/shared/networkHelpers';
+import { FetchError, isNetworkError } from '@azzapp/shared/networkHelpers';
 import {
   useRouter,
   type NativeScreenProps,
@@ -300,11 +297,7 @@ const isRelayNetworkError = (error: Error) => {
   if (error instanceof GraphQLError || error.name === 'GraphQLError') {
     return true;
   }
-  if (
-    error instanceof TypeError &&
-    (error.message === 'Network request failed' ||
-      error.message === TIMEOUT_ERROR_MESSAGE)
-  ) {
+  if (isNetworkError(error)) {
     return true;
   }
   return false;

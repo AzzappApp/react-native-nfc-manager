@@ -150,6 +150,17 @@ export const fetchWithTimeout = async (
 
 export const TIMEOUT_ERROR_MESSAGE = 'TIMEOUT';
 
+export const isNetworkError = (error: Error) => {
+  if (
+    error instanceof TypeError &&
+    (error.message === 'Network request failed' ||
+      error.message === TIMEOUT_ERROR_MESSAGE)
+  ) {
+    return true;
+  }
+  return false;
+};
+
 /**
  * A special error thrown by `fetchJSON`
  */

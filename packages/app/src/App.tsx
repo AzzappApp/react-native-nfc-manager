@@ -23,6 +23,7 @@ import {
 import { RelayEnvironmentProvider } from 'react-relay';
 import { DEFAULT_LOCALE } from '@azzapp/i18n';
 import ERRORS from '@azzapp/shared/errors';
+import { isNetworkError } from '@azzapp/shared/networkHelpers';
 import { mainRoutes, signInRoutes, signUpRoutes } from '#mobileRoutes';
 import { colors } from '#theme';
 import MainTabBar from '#components/MainTabBar';
@@ -496,7 +497,7 @@ class _AppErrorBoundary extends Component<{
   state = { error: null };
 
   componentDidCatch(error: Error) {
-    if (!__DEV__) {
+    if (!__DEV__ && !isNetworkError(error)) {
       Sentry.captureException(error);
     }
   }
