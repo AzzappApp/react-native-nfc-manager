@@ -90,7 +90,22 @@ const ProfilePage = async ({ params }: ProfilePageProps) => {
     );
   }
 
-  const colorPalette = webCard.cardColors ?? DEFAULT_COLOR_PALETTE;
+  const firstModule = modules[0];
+
+  let firstModuleBackgroundColor = cardBackgroundColor;
+  if (firstModule) {
+    const firstModuleData = getModuleDataValues({
+      data: firstModule.data as any,
+      cardStyle: webCard.cardStyle ?? DEFAULT_CARD_STYLE,
+      defaultValues: MODULES_DEFAULT_VALUES[firstModule.kind],
+      styleValuesMap: MODULES_STYLES_VALUES[firstModule.kind],
+    });
+
+    firstModuleBackgroundColor = swapColor(
+      firstModuleData.backgroundStyle?.backgroundColor ?? cardColors.light,
+      cardColors,
+    );
+  }
 
   return (
     <WebCardPageLayout
@@ -104,18 +119,7 @@ const ProfilePage = async ({ params }: ProfilePageProps) => {
             className={styles.coverContainer}
             style={{
               background: `linear-gradient(to bottom, transparent 0%, ${
-                modules.length
-                  ? swapColor(
-                      (
-                        modules[0].data as {
-                          backgroundStyle?: {
-                            backgroundColor?: string | null;
-                          } | null;
-                        }
-                      )?.backgroundStyle?.backgroundColor ?? '#FFF',
-                      colorPalette,
-                    ) ?? '#FFF'
-                  : '#FFF'
+                modules.length ? firstModuleBackgroundColor : '#FFF'
               } 95%)`,
             }}
           >
@@ -132,7 +136,7 @@ const ProfilePage = async ({ params }: ProfilePageProps) => {
           resizeModes={resizeModes}
           module={module}
           key={module.id}
-          colorPalette={colorPalette}
+          colorPalette={cardColors}
           cardStyle={webCard.cardStyle ?? DEFAULT_CARD_STYLE}
         />
       ))}
