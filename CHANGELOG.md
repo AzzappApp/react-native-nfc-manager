@@ -1,5 +1,6 @@
-## 0.5.19-canary.151
+## 0.5.19-canary.152
 
+* **fix:**  - user android_res
 * **fix:**  - **android:** in release mode, uri are asset identifier ([#4286](https://github.com/AzzappApp/azzapp/pull/4286))
 * **feat:**  - 🎸 add contact us section on main menu ([#4282](https://github.com/AzzappApp/azzapp/pull/4282))
 * **fix:**  - replace overlay ([#4281](https://github.com/AzzappApp/azzapp/pull/4281))
