@@ -82,7 +82,7 @@ const CoverEditorWrapper = (
   ref: ForwardedRef<CoverEditorHandle>,
 ) => {
   const [assets] = useAssets([
-    require('#assets/webcard/cover_overlay_placeholder_logo.png'),
+    require('#assets/webcard/cover_overlay_placeholder_logo.jpg'),
   ]);
 
   const placeholder = assets?.[0];
