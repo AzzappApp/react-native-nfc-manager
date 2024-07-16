@@ -15,12 +15,14 @@ import type { ViewProps } from 'react-native-svg/lib/typescript/fabric/utils';
 export type MultiMediasSelectorProps = ViewProps & {
   selectedMedias: Media[] | null;
   onMediaSelected: (media: Media) => void;
+  maxSelectableVideos?: number;
 };
 
 const MultiMediasSelector = ({
   selectedMedias,
   onMediaSelected,
   style,
+  maxSelectableVideos,
   ...props
 }: MultiMediasSelectorProps) => {
   const [selectedAlbum, setSelectedAlbum] = useState<Album | null>(null);
@@ -94,6 +96,7 @@ const MultiMediasSelector = ({
               kind="mixed"
               autoSelectFirstItem={false}
               onMediaSelected={onMediaSelected}
+              maxSelectableVideos={maxSelectableVideos}
             />
           )}
         </View>

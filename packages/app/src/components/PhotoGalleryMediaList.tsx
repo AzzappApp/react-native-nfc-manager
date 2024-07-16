@@ -66,6 +66,8 @@ type PhotoGalleryMediaListProps = Omit<
   onMediaSelected: (media: Media) => void;
   /**autoSelectFirstItem */
   autoSelectFirstItem?: boolean;
+
+  maxSelectableVideos?: number | null;
 };
 
 /**
@@ -81,6 +83,7 @@ const PhotoGalleryMediaList = ({
   autoSelectFirstItem = true,
   numColumns = 4,
   contentContainerStyle,
+  maxSelectableVideos = null,
   ...props
 }: PhotoGalleryMediaListProps) => {
   const scrollViewRef = useRef<FlashList<PhotoIdentifier>>(null);
@@ -201,7 +204,12 @@ const PhotoGalleryMediaList = ({
         return;
       }
       let { width, height, orientation: rotation } = asset.node.image;
-      if (asset.node.type.includes('video')) {
+      if (
+        asset.node.type.includes('video') &&
+        (!selectedMediasIds ||
+          !maxSelectableVideos ||
+          selectedMediasIds.length < maxSelectableVideos)
+      ) {
         if (width == null || height == null || rotation == null) {
           ({ width, height, rotation } = await getVideoSize(uri));
         }
@@ -228,7 +236,7 @@ const PhotoGalleryMediaList = ({
         });
       }
     },
-    [onMediaSelected],
+    [maxSelectableVideos, onMediaSelected, selectedMediasIds],
   );
 
   const onEndReached = useCallback(() => {
@@ -241,6 +249,11 @@ const PhotoGalleryMediaList = ({
     (useWindowDimensions().width - (numColumns - 1 * SEPARATOR_WIDTH)) /
     numColumns;
 
+  const maxVideosAreSelected =
+    maxSelectableVideos !== null &&
+    ((selectedMediasIds && selectedMediasIds.length >= maxSelectableVideos) ||
+      maxSelectableVideos === 0);
+
   const renderItem = useCallback(
     ({ item }: ListRenderItemInfo<PhotoIdentifier>) => (
       <MemoPhotoGalleyMediaItem
@@ -252,15 +265,17 @@ const PhotoGalleryMediaList = ({
         isLoading={downloadingFiles.includes(item.node.image.uri)}
         height={itemHeight}
         onMediaPress={onMediaPress}
+        disabled={item.node.type.includes('video') && maxVideosAreSelected}
       />
     ),
 
     [
-      itemHeight,
-      downloadingFiles,
-      onMediaPress,
       selectedMediaId,
       selectedMediasIds,
+      downloadingFiles,
+      itemHeight,
+      onMediaPress,
+      maxVideosAreSelected,
     ],
   );
 
@@ -415,6 +430,7 @@ type PhotoGalleyMediaItemProps = {
   selected: boolean;
   onMediaPress: (media: PhotoIdentifier) => void;
   isLoading: boolean;
+  disabled?: boolean;
 };
 
 const PhotoGalleyMediaItem = ({
@@ -423,6 +439,7 @@ const PhotoGalleyMediaItem = ({
   height,
   onMediaPress,
   isLoading,
+  disabled,
 }: PhotoGalleyMediaItemProps) => {
   const intl = useIntl();
   const styles = useStyleSheet(styleSheet);
@@ -446,6 +463,7 @@ const PhotoGalleyMediaItem = ({
       })}
       onPress={onPress}
       activeOpacity={0.7}
+      disabled={disabled}
     >
       <Image
         accessibilityRole="image"

@@ -127,6 +127,8 @@ export type ImagePickerState = {
   ): void;
 
   cameraButtonsLeftRightPosition?: number;
+
+  maxSelectableVideos?: number;
 };
 
 const ImagePickerContext = createContext<ImagePickerState | null>(null);
@@ -188,6 +190,8 @@ type ImagePickerContextProviderProps = {
     filter: Filter | null;
     timeRange?: TimeRange | null;
   } | null;
+
+  maxSelectableVideos?: number;
 };
 
 const _ImagePickerContextProvider = (
@@ -202,6 +206,7 @@ const _ImagePickerContextProvider = (
     onMediaChange: onMediaChangeProps,
     cameraButtonsLeftRightPosition,
     initialData,
+    maxSelectableVideos,
   }: ImagePickerContextProviderProps,
   forwardedRef: ForwardedRef<ImagePickerState>,
 ) => {
@@ -356,12 +361,13 @@ const _ImagePickerContextProvider = (
       clearMedia,
       cameraButtonsLeftRightPosition,
       isSkImageReady,
+      maxSelectableVideos,
     }),
     [
       kind,
       forceAspectRatio,
-      minVideoDuration,
       maxVideoDuration,
+      minVideoDuration,
       media,
       skImage,
       aspectRatio,
@@ -377,6 +383,7 @@ const _ImagePickerContextProvider = (
       clearMedia,
       cameraButtonsLeftRightPosition,
       isSkImageReady,
+      maxSelectableVideos,
     ],
   );
 

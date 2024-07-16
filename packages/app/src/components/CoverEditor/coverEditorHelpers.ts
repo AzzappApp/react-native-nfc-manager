@@ -269,3 +269,14 @@ export const MAX_DISPLAY_DECODER_RESOLUTION = Math.min(
   Dimensions.get('window').width * PixelRatio.get(),
   1920,
 );
+
+export const getMaxAllowedVideosPerCover = (hasLottie: boolean) =>
+  hasLottie
+    ? MEMORY_SIZE < 6
+      ? 1
+      : MEMORY_SIZE < 8
+        ? 2
+        : 3
+    : MEMORY_SIZE < 6
+      ? 2
+      : 3;

@@ -25,6 +25,7 @@ type CoverEditorMediaPickerProps = Omit<ViewProps, 'children'> & {
   durationsFixed?: boolean;
   initialMedias: Media[] | null;
   onFinished: (results: Media[]) => void;
+  maxSelectableVideos?: number;
 };
 
 const CoverEditorMediaPicker = ({
@@ -33,6 +34,7 @@ const CoverEditorMediaPicker = ({
   initialMedias,
   onFinished,
   style,
+  maxSelectableVideos,
   ...props
 }: CoverEditorMediaPickerProps) => {
   const [selectedMedias, setSelectedMedias] = useState<Media[]>(
@@ -231,6 +233,7 @@ const CoverEditorMediaPicker = ({
       <MultiMediasSelector
         selectedMedias={selectedMedias}
         onMediaSelected={handleMediaSelected}
+        maxSelectableVideos={maxSelectableVideos}
       />
       <View style={styles.bottomBar}>
         <View style={styles.selectionRow}>

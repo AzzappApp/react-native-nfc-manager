@@ -8,6 +8,7 @@ import {
 import {
   extractLottieInfoMemoized,
   getLottieMediasDurations,
+  getMaxAllowedVideosPerCover,
 } from '#components/CoverEditor/coverEditorHelpers';
 import ImagePicker, { SelectImageStep } from '#components/ImagePicker';
 import { ScreenModal } from '#components/NativeRouter';
@@ -24,7 +25,7 @@ const CoverEditorMediaReplace = () => {
   const intl = useIntl();
   const [show, toggleScreenModal] = useToggle(false);
   const {
-    coverEditorState: { lottie, selectedItemIndex, editionMode },
+    coverEditorState: { lottie, selectedItemIndex, editionMode, medias },
     dispatch,
   } = useCoverEditorContext();
 
@@ -137,6 +138,14 @@ const CoverEditorMediaReplace = () => {
               additionalData={{
                 hideTabs: true,
               }}
+              maxSelectableVideos={
+                activeMedia.media.kind === 'video'
+                  ? 1
+                  : getMaxAllowedVideosPerCover(!!lottie) >
+                      medias.filter(m => m.media.kind === 'video').length
+                    ? 1
+                    : 0
+              }
             />
           )}
         </ScreenModal>

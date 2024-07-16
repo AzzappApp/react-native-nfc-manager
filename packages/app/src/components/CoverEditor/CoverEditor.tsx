@@ -34,6 +34,7 @@ import {
   mediaInfoIsImage,
   extractLottieInfoMemoized,
   calculateImageScale,
+  getMaxAllowedVideosPerCover,
 } from './coverEditorHelpers';
 import CoverEditorMediaPicker from './CoverEditorMediaPicker';
 import { coverEditorReducer } from './coverEditorReducer';
@@ -628,6 +629,9 @@ const CoverEditorCore = (
           onFinished={onMediasPicked}
           durations={durations}
           durationsFixed={!!coverEditorState.lottie}
+          maxSelectableVideos={getMaxAllowedVideosPerCover(
+            !!coverEditorState.lottie,
+          )}
         />
       </ScreenModal>
     </>

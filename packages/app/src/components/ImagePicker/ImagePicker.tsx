@@ -142,6 +142,8 @@ export type ImagePickerProps = {
   additionalData?: {
     [key: string]: any;
   };
+
+  maxSelectableVideos?: number;
 };
 /**
  * A component used to select an image or a video and edit it
@@ -164,6 +166,7 @@ const ImagePicker = ({
   cameraButtonsLeftRightPosition,
   initialData,
   additionalData,
+  maxSelectableVideos,
 }: ImagePickerProps) => {
   const [stepIndex, setStepIndex] = useState(0);
   const [media, setMedia] = useState<Media | null>(null);
@@ -236,6 +239,7 @@ const ImagePicker = ({
       kind={kind}
       onMediaChange={setMedia}
       cameraButtonsLeftRightPosition={cameraButtonsLeftRightPosition}
+      maxSelectableVideos={maxSelectableVideos}
     >
       <ImagePickerWizardContainer
         onBack={onBack}
