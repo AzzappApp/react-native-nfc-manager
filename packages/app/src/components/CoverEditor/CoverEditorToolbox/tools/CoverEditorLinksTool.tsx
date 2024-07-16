@@ -40,7 +40,7 @@ const CoverEditorLinksTool = (
       />
 
       <CoverEditorLinksModal
-        open={linksModalVisible}
+        visible={linksModalVisible}
         onClose={toggleLinksModalVisible}
       />
     </>
