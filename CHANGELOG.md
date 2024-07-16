@@ -1,5 +1,6 @@
-## 0.5.19-canary.148
+## 0.5.19-canary.149
 
+* **fix:**  - replace overlay ([#4281](https://github.com/AzzappApp/azzapp/pull/4281))
 * **fix:**  - 🐛 show the right page on load template step ([#4258](https://github.com/AzzappApp/azzapp/pull/4258))
 * **feat:**  - implement IAP restore purchase ([#4275](https://github.com/AzzappApp/azzapp/pull/4275))
 * **fix:**  - improve cover editor link edition ([#4272](https://github.com/AzzappApp/azzapp/pull/4272))
