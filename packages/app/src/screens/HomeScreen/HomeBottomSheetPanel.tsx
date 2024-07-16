@@ -58,6 +58,7 @@ const HomeBottomSheetPanel = ({
           hasCover
           requiresSubscription
           isPremium
+          isWebSubscription
         }
         invited
       }
@@ -235,27 +236,21 @@ const HomeBottomSheetPanel = ({
           },
           onPress: close,
         },
-        {
-          type: 'row',
-          icon: Platform.OS === 'ios' ? 'app_store' : 'play_store',
-          text:
-            Platform.OS === 'ios'
-              ? intl.formatMessage({
-                  defaultMessage: 'Restore purchase',
-                  description:
-                    'Link to restore purchase (apple) form to change webcard parameters',
-                })
-              : intl.formatMessage({
-                  defaultMessage: 'Manage my subscription',
-                  description:
-                    'Link to manage my subscription(android) form to change webcard parameters',
-                }),
-          // linkProps: {
-          // TODO
-          //   route: 'WEBCARD_PARAMETERS',
-          // },
-          onPress: close,
-        },
+        profile?.webCard.isPremium && !profile?.webCard.isWebSubscription
+          ? {
+              type: 'row',
+              icon: Platform.OS === 'ios' ? 'app_store' : 'play_store',
+              text: intl.formatMessage({
+                defaultMessage: 'Manage my subscription',
+                description:
+                  'Link to manage my subscription form to change webcard parameters',
+              }),
+              linkProps: {
+                route: 'USER_PAY_WALL',
+              },
+              onPress: close,
+            }
+          : null,
         { type: 'separator' },
         isAdmin(profile?.profileRole) && !profile?.invited
           ? {

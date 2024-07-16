@@ -293,6 +293,10 @@ type WebCard implements Node {
   """
   isPremium: Boolean!
   """
+  The webCard premium account is from the web
+  """
+  isWebSubscription: Boolean!
+  """
   Fetches cover template type
   """
   coverTemplateTypes(

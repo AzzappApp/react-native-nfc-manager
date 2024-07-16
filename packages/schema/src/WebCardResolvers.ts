@@ -74,6 +74,17 @@ export const WebCard: WebCardResolvers = {
       newWebCardKind ?? webCard.webCardKind,
     );
   },
+  isWebSubscription: async (webCard, _, { loaders }) => {
+    const owner = await loaders.webCardOwners.load(webCard.id);
+    const subscriptions = owner
+      ? await loaders.activeSubscriptionsLoader.load(owner.id)
+      : null;
+    const isWebSubscription = subscriptions?.some(
+      subscription =>
+        subscription.issuer === 'web' && subscription.status === 'active',
+    );
+    return isWebSubscription ?? false;
+  },
   isPremium: async (webCard, _, { loaders }) => {
     const owner = await loaders.webCardOwners.load(webCard.id);
 
