@@ -234,7 +234,7 @@ const PostRendererActionBar = ({
       Toast.show({
         type: 'error',
         text1: intl.formatMessage({
-          defaultMessage: 'Only admins & editors can like a post',
+          defaultMessage: 'Your role does not permit this action',
           description:
             'Error message when trying to like a post without being an admin',
         }),

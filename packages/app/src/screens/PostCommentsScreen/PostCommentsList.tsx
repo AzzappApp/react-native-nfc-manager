@@ -242,7 +242,7 @@ const PostCommentsList = ({
         Toast.show({
           type: 'error',
           text1: intl.formatMessage({
-            defaultMessage: 'Only admins & editors can comment a post',
+            defaultMessage: 'Your role does not permit this action',
             description: 'Error message when trying to comment a post',
           }),
         });

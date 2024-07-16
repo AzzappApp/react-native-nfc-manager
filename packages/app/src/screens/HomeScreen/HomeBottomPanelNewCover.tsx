@@ -61,7 +61,7 @@ const HomeBottomPanelNewCover = ({
             Toast.show({
               type: 'error',
               text1: intl.formatMessage({
-                defaultMessage: 'Only admins & editors can create a WebCard',
+                defaultMessage: 'Your role does not permit this action',
                 description:
                   'Error message when trying to create a cover without the right permissions',
               }),
