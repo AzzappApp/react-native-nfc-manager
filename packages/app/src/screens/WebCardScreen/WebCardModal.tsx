@@ -1,5 +1,5 @@
 import * as Sentry from '@sentry/react-native';
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import {
   View,
@@ -25,6 +25,7 @@ import useAuthState from '#hooks/useAuthState';
 import useQuitWebCard from '#hooks/useQuitWebCard';
 import { useSendReport } from '#hooks/useSendReport';
 import ActivityIndicator from '#ui/ActivityIndicator';
+import { DelayedActivityIndicator } from '#ui/ActivityIndicator/ActivityIndicator';
 import BottomSheetModal from '#ui/BottomSheetModal';
 import Container from '#ui/Container';
 import Header from '#ui/Header';
@@ -89,7 +90,7 @@ const WebCardModal = ({
         cardIsPublished
         coverMedia {
           __typename
-          uriDownload: uri(width: 1080, pixelRatio: 1)
+          uriDownload: uri
         }
         webCardModal_isFollowing: isFollowing(webCardId: $viewerWebCardId)
         ...CoverRenderer_webCard
@@ -146,38 +147,76 @@ const WebCardModal = ({
   };
 
   const [coverVideoLoading, setCoverVideoLoading] = useState(false);
+  const cancelCoverVideoDownloadRef = useRef<(() => void) | null>(null);
 
   const onShareCoverVideo = useCallback(async () => {
-    setCoverVideoLoading(true);
-    if (!webCard.coverMedia?.uriDownload) {
-      return null;
+    if (!webCard.coverMedia?.uriDownload || coverVideoLoading) {
+      return;
     }
+    setCoverVideoLoading(true);
+    let localPath;
     try {
       //download the coverurl locally
       const dirs = ReactNativeBlobUtil.fs.dirs;
-      const localPath = await ReactNativeBlobUtil.config({
+
+      const stateFullPromise = ReactNativeBlobUtil.config({
         fileCache: true,
         path: `${dirs.CacheDir}/${webCard.userName}.${webCard.coverMedia.__typename === 'MediaVideo' ? 'mp4' : 'png'}`,
       }).fetch('GET', webCard.coverMedia.uriDownload);
+      cancelCoverVideoDownloadRef.current = () => {
+        stateFullPromise.cancel();
+      };
 
+      localPath = await stateFullPromise;
+    } catch (error) {
+      if (!(error instanceof ReactNativeBlobUtil.CanceledFetchError)) {
+        Toast.show({
+          type: 'error',
+          text1: intl.formatMessage({
+            defaultMessage: 'Error while downloading the media',
+            description:
+              'Error toast message when downloading the media fails during the video share',
+          }),
+        });
+      }
+      return;
+    } finally {
+      cancelCoverVideoDownloadRef.current = null;
+      setCoverVideoLoading(false);
+    }
+
+    try {
       await ShareCommand.open({
         url: `file://${localPath.path()}`,
         type:
           webCard.coverMedia.__typename === 'MediaVideo'
             ? 'video/mp4'
             : 'image/png',
-        failOnCancel: true,
+        failOnCancel: false,
       });
     } catch (error: any) {
-      console.error(error); //an error is thrown when the user cancels the share
-    } finally {
-      setCoverVideoLoading(false);
+      Toast.show({
+        type: 'error',
+        text1: intl.formatMessage({
+          defaultMessage: 'Error while sharing the media',
+          description:
+            'Error toast message when sharing the media fails during the video share',
+        }),
+      });
     }
   }, [
+    intl,
+    coverVideoLoading,
     webCard.coverMedia?.__typename,
     webCard.coverMedia?.uriDownload,
     webCard.userName,
   ]);
+
+  useEffect(() => {
+    if (!visible) {
+      cancelCoverVideoDownloadRef.current?.();
+    }
+  }, [visible]);
 
   const debouncedToggleFollowing = useDebouncedCallback(() => {
     onToggleFollow(webCard.id, webCard.userName, !isFollowing);
@@ -438,19 +477,28 @@ const WebCardModal = ({
             <PressableNative
               style={styles.bottomSheetOptionButton}
               onPress={onShareCoverVideo}
-              disabled={coverVideoLoading}
             >
               <View style={styles.bottomSheetOptionContainer}>
                 <View style={styles.bottomSheetOptionIconLabel}>
                   <Icon icon="video_film" />
                   <Text>
-                    <FormattedMessage
-                      defaultMessage="Share this cover video"
-                      description="Profile webcard modal - Share this video"
-                    />
+                    {webCard.coverMedia?.__typename === 'MediaVideo' ? (
+                      <FormattedMessage
+                        defaultMessage="Share this cover video"
+                        description="Profile webcard modal - Share this video"
+                      />
+                    ) : (
+                      <FormattedMessage
+                        defaultMessage="Share this cover image"
+                        description="Profile webcard modal - Share this image"
+                      />
+                    )}
                   </Text>
                   {coverVideoLoading && (
-                    <ActivityIndicator style={styles.loader} />
+                    <DelayedActivityIndicator
+                      delay={300}
+                      style={styles.loader}
+                    />
                   )}
                 </View>
               </View>
