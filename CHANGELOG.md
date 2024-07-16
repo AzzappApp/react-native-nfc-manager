@@ -1,5 +1,6 @@
-## 0.5.19-canary.152
+## 0.5.19-canary.153
 
+* **fix:**  - do not show applied to all media if there is only one media ([#4288](https://github.com/AzzappApp/azzapp/pull/4288))
 * **fix:**  - user android_res
 * **fix:**  - **android:** in release mode, uri are asset identifier ([#4286](https://github.com/AzzappApp/azzapp/pull/4286))
 * **feat:**  - 🎸 add contact us section on main menu ([#4282](https://github.com/AzzappApp/azzapp/pull/4282))
