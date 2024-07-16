@@ -1,4 +1,4 @@
-## 0.5.19-canary.144
+## 0.5.19-canary.145
 
 * **fix:**  - proper currency formating ([#4266](https://github.com/AzzappApp/azzapp/pull/4266))
 * **fix:**  - try to save coverId in all cases ([#4267](https://github.com/AzzappApp/azzapp/pull/4267))
