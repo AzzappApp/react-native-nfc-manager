@@ -17,7 +17,7 @@ const CoverEditorAdjustTool = () => {
   const intl = useIntl();
   const [show, toggleScreenModal] = useToggle(false);
   const {
-    coverEditorState: { editionMode },
+    coverEditorState: { editionMode, medias },
     dispatch,
   } = useCoverEditorContext();
 
@@ -44,6 +44,10 @@ const CoverEditorAdjustTool = () => {
   const onFinished = useCallback(
     (result: ImagePickerResult) => {
       if (editionMode !== 'media' && editionMode !== 'mediaEdit') {
+        applyToActiveMedia(result.editionParameters);
+        return;
+      }
+      if (medias.length === 1) {
         applyToActiveMedia(result.editionParameters);
         return;
       }

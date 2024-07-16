@@ -19,7 +19,7 @@ const CoverEditorFiltersTool = () => {
   const mediaInfo = useCoverEditorActiveMedia();
   const {
     dispatch,
-    coverEditorState: { editionMode },
+    coverEditorState: { editionMode, medias },
   } = useCoverEditorContext();
   const activeMedia = useCoverEditorActiveMedia();
   const cropData = activeMedia?.editionParameters?.cropData;
@@ -57,6 +57,10 @@ const CoverEditorFiltersTool = () => {
   const onFinished = useCallback(
     ({ filter }: ImagePickerResult) => {
       if (editionMode !== 'media' && editionMode !== 'mediaEdit') {
+        applyToActiveMedia(filter);
+        return;
+      }
+      if (medias.length === 1) {
         applyToActiveMedia(filter);
         return;
       }
