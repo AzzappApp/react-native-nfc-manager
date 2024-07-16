@@ -137,6 +137,9 @@ const icons = {
   get contact() {
     return require('./assets/contact.png');
   },
+  get contact_us() {
+    return require('./assets/contact_us.png');
+  },
   get contrast() {
     return require('./assets/contrast.png');
   },

@@ -1,7 +1,14 @@
 import * as Sentry from '@sentry/react-native';
 import { useCallback, useMemo } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { Platform, StyleSheet, View, Share, Alert } from 'react-native';
+import {
+  Platform,
+  StyleSheet,
+  View,
+  Share,
+  Alert,
+  Linking,
+} from 'react-native';
 import Toast from 'react-native-toast-message';
 import { graphql, useFragment } from 'react-relay';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
@@ -315,6 +322,17 @@ const HomeBottomSheetPanel = ({
               onPress: close,
             }
           : null,
+        {
+          type: 'row',
+          icon: 'contact_us',
+          text: intl.formatMessage({
+            defaultMessage: 'Contact us',
+            description: 'Contact us message in Home bottom sheet panel',
+          }),
+          onPress: () => {
+            Linking.openURL('mailto:support@azzapp.com');
+          },
+        },
         {
           type: 'row',
           icon: 'about',
