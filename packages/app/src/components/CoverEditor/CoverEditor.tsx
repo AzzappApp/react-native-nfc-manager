@@ -10,7 +10,7 @@ import {
   useState,
 } from 'react';
 import { FormattedMessage } from 'react-intl';
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet, View, Platform } from 'react-native';
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
@@ -103,6 +103,14 @@ const CoverEditorWrapper = (
     )
   );
 };
+
+const androidDrawableResPath = 'file:///android_asset/drawable';
+// require'd image returns resource identifier in uri on android
+// see react-native/Libraries/Image/AssetSourceResolver.js:80
+const getAndroidReleaseImageURI = (sourceURI: string) =>
+  `${androidDrawableResPath}/${sourceURI}`;
+
+const isAndroidRelease = Platform.OS === 'android' && !__DEV__;
 
 const CoverEditorCore = (
   {
@@ -224,17 +232,21 @@ const CoverEditorCore = (
       : [];
 
     const overlayLayers = placeholder
-      ? (data?.overlayLayers as any)?.map(
-          (overlay: CoverEditorOverlayItem) => ({
-            ...overlay,
-            media: {
-              uri: placeholder.localUri,
-              type: 'image',
-              width: placeholder.width,
-              height: placeholder.height,
-            },
-            rotation: 0,
-          }),
+      ? (data?.overlayLayers as any)?.map((overlay: CoverEditorOverlayItem) =>
+          placeholder.localUri
+            ? {
+                ...overlay,
+                media: {
+                  uri: isAndroidRelease
+                    ? getAndroidReleaseImageURI(placeholder.localUri)
+                    : placeholder.uri,
+                  type: 'image',
+                  width: placeholder.width,
+                  height: placeholder.height,
+                },
+                rotation: 0,
+              }
+            : overlay,
         ) ?? []
       : [];
 
