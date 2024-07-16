@@ -1,5 +1,7 @@
-## 0.5.19-canary.153
+## 0.5.19-canary.154
 
+* **fix:**  - **cover:** [#4249](https://github.com/AzzappApp/azzapp/pull/4249) limit the number of videos per cover ([#4283](https://github.com/AzzappApp/azzapp/pull/4283))
+* **fix:**  - **android:** push overlay in android assets ([#4289](https://github.com/AzzappApp/azzapp/pull/4289))
 * **fix:**  - do not show applied to all media if there is only one media ([#4288](https://github.com/AzzappApp/azzapp/pull/4288))
 * **fix:**  - user android_res
 * **fix:**  - **android:** in release mode, uri are asset identifier ([#4286](https://github.com/AzzappApp/azzapp/pull/4286))
