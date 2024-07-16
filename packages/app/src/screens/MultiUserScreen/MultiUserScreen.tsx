@@ -334,12 +334,7 @@ const MultiUserScreen = ({
                   description="Title for switch section in MultiUserScreen"
                 />
               </Text>
-              <PremiumIndicator
-                isRequired={
-                  profile?.webCard.requiresSubscription &&
-                  !profile?.webCard.isPremium
-                }
-              />
+              <PremiumIndicator isRequired={!profile?.webCard.isPremium} />
             </View>
             <Switch
               variant="large"
@@ -355,7 +350,6 @@ const MultiUserScreen = ({
     profile?.webCard.isMultiUser,
     profile?.webCard.isPremium,
     profile?.webCard?.nbProfiles,
-    profile?.webCard.requiresSubscription,
     styles.description,
     styles.price,
     styles.proContainer,
