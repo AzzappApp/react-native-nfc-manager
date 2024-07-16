@@ -104,7 +104,7 @@ const CoverEditorWrapper = (
   );
 };
 
-const androidDrawableResPath = 'file:///android_asset/drawable';
+const androidDrawableResPath = 'file:///android_res/drawable';
 // require'd image returns resource identifier in uri on android
 // see react-native/Libraries/Image/AssetSourceResolver.js:80
 const getAndroidReleaseImageURI = (sourceURI: string) =>
