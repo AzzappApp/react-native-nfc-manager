@@ -1,5 +1,7 @@
-## 0.5.19-canary.145
+## 0.5.19-canary.146
 
+* **feat:**  - improve loading of share video coder ([#4271](https://github.com/AzzappApp/azzapp/pull/4271))
+* **fix:**  - display azzapp+ only if the user is not premium ([#4273](https://github.com/AzzappApp/azzapp/pull/4273))
 * **fix:**  - proper currency formating ([#4266](https://github.com/AzzappApp/azzapp/pull/4266))
 * **fix:**  - try to save coverId in all cases ([#4267](https://github.com/AzzappApp/azzapp/pull/4267))
 * **fix:**  - **android:** [#3994](https://github.com/AzzappApp/azzapp/pull/3994) remove video streaming ([#4265](https://github.com/AzzappApp/azzapp/pull/4265))
