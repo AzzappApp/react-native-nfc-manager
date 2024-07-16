@@ -84,8 +84,7 @@ const HomeHeader = ({ openPanel, user: userKey }: HomeHeaderProps) => {
           <PremiumIndicator
             isRequired={currentWebCard?.isPremium}
             size={18}
-            color={colors.white}
-            style={styles.premiumIndicator}
+            style={[styles.premiumIndicator, iconStyles]}
           />
           <AnimatedSvg
             width={136}
