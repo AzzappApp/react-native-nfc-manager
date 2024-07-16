@@ -1,5 +1,7 @@
-## 0.5.19-canary.154
+## 0.5.19-canary.155
 
+* **fix:**  - loadmore template selection ([#4292](https://github.com/AzzappApp/azzapp/pull/4292))
+* **fix:**  - 🐛 use right icon color ([#4291](https://github.com/AzzappApp/azzapp/pull/4291))
 * **fix:**  - **cover:** [#4249](https://github.com/AzzappApp/azzapp/pull/4249) limit the number of videos per cover ([#4283](https://github.com/AzzappApp/azzapp/pull/4283))
 * **fix:**  - **android:** push overlay in android assets ([#4289](https://github.com/AzzappApp/azzapp/pull/4289))
 * **fix:**  - do not show applied to all media if there is only one media ([#4288](https://github.com/AzzappApp/azzapp/pull/4288))
