@@ -142,6 +142,17 @@ const UserPayWallScreen = () => {
     },
   });
 
+  const restorePurchase = useCallback(async () => {
+    const { profileInfos } = getAuthState();
+    const restore = await Purchases.restorePurchases();
+    if (restore.entitlements.active?.multiuser?.isActive) {
+      commitLocalUpdate(getRelayEnvironment(), store => {
+        if (profileInfos)
+          store.get(profileInfos.webCardId)?.setValue(true, 'isPremium');
+      });
+    }
+  }, []);
+
   return (
     <View style={styles.container}>
       <View style={[{ width, height: width }, styles.featureContainer]}>
@@ -362,9 +373,7 @@ const UserPayWallScreen = () => {
             onPress={processOrder}
           />
           <View style={styles.footer}>
-            <PressableOpacity
-              onPress={() => Linking.openURL(`${TERMS_OF_SERVICE}`)}
-            >
+            <PressableOpacity onPress={restorePurchase}>
               <Text variant="medium" style={styles.descriptionText}>
                 <FormattedMessage
                   defaultMessage="Restore Purchases"
