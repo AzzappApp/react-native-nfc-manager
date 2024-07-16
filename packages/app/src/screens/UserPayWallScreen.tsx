@@ -104,7 +104,6 @@ const UserPayWallScreen = () => {
         setProcessing(true);
 
         const res = await Purchases.purchasePackage(selectedPurchasePackage!);
-
         // Update Relay cache temporary
         if (res.customerInfo.entitlements.active?.multiuser?.isActive) {
           commitLocalUpdate(getRelayEnvironment(), store => {
@@ -115,18 +114,21 @@ const UserPayWallScreen = () => {
         router.back();
       } catch (error) {
         //display error message
-
-        Alert.alert(
-          intl.formatMessage({
-            defaultMessage: 'Error during processing payment',
-            description: 'Title of the payment process error alert',
-          }),
-          intl.formatMessage({
-            defaultMessage:
-              'There was an error during the payment process, please try again later.',
-            description: 'Description of the payment process error alert',
-          }),
-        );
+        setProcessing(false);
+        //@ts-expect-error error code is not in the type
+        if (error?.code !== '1') {
+          Alert.alert(
+            intl.formatMessage({
+              defaultMessage: 'Error during processing payment',
+              description: 'Title of the payment process error alert',
+            }),
+            intl.formatMessage({
+              defaultMessage:
+                'There was an error during the payment process, please try again later.',
+              description: 'Description of the payment process error alert',
+            }),
+          );
+        }
       }
     }
   }, [intl, router, selectedPurchasePackage]);
