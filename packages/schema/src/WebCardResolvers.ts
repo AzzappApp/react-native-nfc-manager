@@ -1,4 +1,8 @@
-import { connectionFromArraySlice, cursorToOffset } from 'graphql-relay';
+import {
+  connectionFromArray,
+  connectionFromArraySlice,
+  cursorToOffset,
+} from 'graphql-relay';
 import {
   getCompanyActivitiesByWebCardCategory,
   getWebCardPosts,
@@ -288,20 +292,18 @@ export const WebCard: WebCardResolvers = {
   coverTemplateTypes: async (webCard, args) => {
     const limit = args.first ?? 10;
     const offset = args.after ? cursorToOffset(args.after) : 0;
-
     const coverTemplatesTypes = await getFilterCoverTemplateTypes(
       limit + 1,
       offset,
       args.tagId,
     );
-
     const coverTemplates = await getCoverTemplatesByTypesAndTag(
       coverTemplatesTypes.map(t => t.id),
       args.tagId,
       webCard.companyActivityId,
     );
 
-    return connectionFromArraySlice(
+    return connectionFromArray(
       coverTemplatesTypes.map(type => ({
         ...type,
         coverTemplates: coverTemplates.filter(
@@ -309,10 +311,6 @@ export const WebCard: WebCardResolvers = {
         ),
       })),
       { after: args.after, first: args.first },
-      {
-        sliceStart: offset,
-        arrayLength: coverTemplatesTypes.length,
-      },
     );
   },
 };

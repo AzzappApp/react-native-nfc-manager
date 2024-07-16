@@ -1,4 +1,4 @@
-import { useCallback, useMemo } from 'react';
+import { useMemo } from 'react';
 import { graphql, usePaginationFragment } from 'react-relay';
 import {
   convertToNonNullArray,
@@ -54,17 +54,6 @@ export function useCoverTemplateTypes(
       key,
     );
 
-  const fetchWithoutCache = useCallback(
-    (args: {
-      first?: number | null;
-      after?: string | null;
-      tagId?: string | null;
-    }) => {
-      refetch(args, { fetchPolicy: 'store-and-network' });
-    },
-    [refetch],
-  );
-
   const templateTypes = useMemo(() => {
     if (data?.coverTemplateTypes?.edges) {
       return convertToNonNullArray(
@@ -77,7 +66,7 @@ export function useCoverTemplateTypes(
   }, [data?.coverTemplateTypes]);
   return {
     coverTemplateTypes: templateTypes,
-    refetch: fetchWithoutCache,
+    refetch,
     isLoadingPrevious,
     isLoadingNext,
     loadNext,
