@@ -1,5 +1,8 @@
-## 0.5.19-canary.146
+## 0.5.19-canary.147
 
+* **feat:**  - implement IAP restore purchase ([#4275](https://github.com/AzzappApp/azzapp/pull/4275))
+* **fix:**  - improve cover editor link edition ([#4272](https://github.com/AzzappApp/azzapp/pull/4272))
+* **fix:**  - add access paywall if user is pro from IAP ([#4274](https://github.com/AzzappApp/azzapp/pull/4274))
 * **feat:**  - improve loading of share video coder ([#4271](https://github.com/AzzappApp/azzapp/pull/4271))
 * **fix:**  - display azzapp+ only if the user is not premium ([#4273](https://github.com/AzzappApp/azzapp/pull/4273))
 * **fix:**  - proper currency formating ([#4266](https://github.com/AzzappApp/azzapp/pull/4266))
