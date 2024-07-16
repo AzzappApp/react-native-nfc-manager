@@ -82,7 +82,7 @@ const CoverEditorWrapper = (
   ref: ForwardedRef<CoverEditorHandle>,
 ) => {
   const [assets] = useAssets([
-    require('#assets/webcard/cover_overlay_placeholder_logo.jpg'),
+    require('#assets/webcard/cover_overlay_placeholder_logo.png'),
   ]);
 
   const placeholder = assets?.[0];
@@ -104,11 +104,8 @@ const CoverEditorWrapper = (
   );
 };
 
-const androidDrawableResPath = 'file:///android_res/drawable';
-// require'd image returns resource identifier in uri on android
-// see react-native/Libraries/Image/AssetSourceResolver.js:80
-const getAndroidReleaseImageURI = (sourceURI: string) =>
-  `${androidDrawableResPath}/${sourceURI}`;
+const ANDROID_ASSET_PATH =
+  'file:///android_asset/cover_overlay_placeholder_logo.png';
 
 const isAndroidRelease = Platform.OS === 'android' && !__DEV__;
 
@@ -237,9 +234,7 @@ const CoverEditorCore = (
             ? {
                 ...overlay,
                 media: {
-                  uri: isAndroidRelease
-                    ? getAndroidReleaseImageURI(placeholder.localUri)
-                    : placeholder.uri,
+                  uri: isAndroidRelease ? ANDROID_ASSET_PATH : placeholder.uri,
                   type: 'image',
                   width: placeholder.width,
                   height: placeholder.height,
