@@ -159,7 +159,7 @@ const WebCardTemplateSelectionScreen = ({
             />
           }
           rightElementWidth={80}
-          currentPage={1}
+          currentPage={4}
           nbPages={5}
         />
       )}
