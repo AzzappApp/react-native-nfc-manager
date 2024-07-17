@@ -1,5 +1,6 @@
-## 0.5.19-canary.160
+## 0.5.19-canary.161
 
+* **fix:**  - shuffle the textLabel on initial render only ([#4308](https://github.com/AzzappApp/azzapp/pull/4308))
 * **fix:**  - **cover:** [#4298](https://github.com/AzzappApp/azzapp/pull/4298) enhance video selection on cover ([#4303](https://github.com/AzzappApp/azzapp/pull/4303))
 * **fix:**  - **cover:** [#4306](https://github.com/AzzappApp/azzapp/pull/4306) crash on creating cover on existing webcard ([#4307](https://github.com/AzzappApp/azzapp/pull/4307))
 * **fix:**  - **multiUser:** [#4246](https://github.com/AzzappApp/azzapp/pull/4246) toggle on processed payment ([#4294](https://github.com/AzzappApp/azzapp/pull/4294))
