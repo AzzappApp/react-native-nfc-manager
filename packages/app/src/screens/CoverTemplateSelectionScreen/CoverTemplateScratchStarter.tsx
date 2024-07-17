@@ -23,7 +23,7 @@ const CoverTemplateScratchStarters = ({
 }: CoverTemplateScratchStartersProps) => {
   return (
     <View style={styles.container}>
-      <Text variant="smallbold" style={styles.label}>
+      <Text variant="large">
         <FormattedMessage
           defaultMessage="Start from scratch"
           description="CoverTemplateList - Start from scratch"
@@ -58,9 +58,6 @@ const styles = StyleSheet.create({
   container: {
     paddingLeft: 20,
     paddingTop: 20,
-  },
-  label: {
-    fontSize: 16,
   },
   scratchs: {
     paddingVertical: 10,

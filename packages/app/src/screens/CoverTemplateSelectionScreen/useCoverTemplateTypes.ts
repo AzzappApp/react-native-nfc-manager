@@ -31,7 +31,7 @@ export function useCoverTemplateTypes(
         @refetchable(queryName: "useCoverTemplates_coverTemplateTypes_Query")
         @argumentDefinitions(
           after: { type: String }
-          first: { type: Int, defaultValue: 5 }
+          first: { type: Int, defaultValue: 15 } #temporary fix for nico works
           tagId: { type: ID, defaultValue: null }
         ) {
           coverTemplateTypes(tagId: $tagId, first: $first, after: $after)
@@ -64,6 +64,7 @@ export function useCoverTemplateTypes(
     }
     return [];
   }, [data?.coverTemplateTypes]);
+
   return {
     coverTemplateTypes: templateTypes,
     refetch,
