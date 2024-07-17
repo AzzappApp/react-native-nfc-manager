@@ -1,5 +1,6 @@
-## 0.5.19-canary.162
+## 0.5.19-canary.163
 
+* **build:**  - add asset plugin
 * **build:**  - put back runtime version
 * **fix:**  - shuffle the textLabel on initial render only ([#4308](https://github.com/AzzappApp/azzapp/pull/4308))
 * **fix:**  - **cover:** [#4298](https://github.com/AzzappApp/azzapp/pull/4298) enhance video selection on cover ([#4303](https://github.com/AzzappApp/azzapp/pull/4303))
