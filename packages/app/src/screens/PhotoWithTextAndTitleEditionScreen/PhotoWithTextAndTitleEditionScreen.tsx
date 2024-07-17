@@ -719,6 +719,11 @@ const PhotoWithTextAndTitleEditionScreen = ({
         maxLength={PHOTO_WITH_TEXT_AND_TITLE_TEXT_MAX_LENGTH}
         onClose={onCloseContentModal}
         onChangeText={onContentChange}
+        onFocus={() => {
+          if (content === undefined) {
+            onContentChange('');
+          }
+        }}
         closeOnBlur={false}
         ItemTopComponent={
           <>
@@ -731,6 +736,11 @@ const PhotoWithTextAndTitleEditionScreen = ({
               })}
               value={title ?? ''}
               onChangeText={onTitleChange}
+              onFocus={() => {
+                if (title === undefined) {
+                  onTitleChange('');
+                }
+              }}
               maxLength={PHOTO_WITH_TEXT_AND_TITLE_TEXT_MAX_LENGTH}
               style={{ borderWidth: 0 }}
             />

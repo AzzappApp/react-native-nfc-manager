@@ -410,7 +410,7 @@ const CreateItem = ({
           },
         ]}
         accessibilityLabel={intl.formatMessage({
-          defaultMessage: 'Create a new profile',
+          defaultMessage: 'Create a new WebCard',
           description: 'Start new profile creation from account screen',
         })}
       >

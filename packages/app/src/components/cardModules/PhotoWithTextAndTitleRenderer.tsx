@@ -1,4 +1,5 @@
 import { useState, useCallback } from 'react';
+import { useIntl } from 'react-intl';
 import { Platform } from 'react-native';
 import Animated, {
   useAnimatedStyle,
@@ -11,6 +12,7 @@ import {
   PHOTO_WITH_TEXT_AND_TITLE_STYLE_VALUES,
   getModuleDataValues,
 } from '@azzapp/shared/cardModuleHelpers';
+import Text from '#ui/Text';
 import CardModuleBackground from './CardModuleBackground';
 import type {
   PhotoWithTextAndTitleRenderer_module$data,
@@ -350,6 +352,10 @@ const PhotoWithTextAndTitleRenderer = ({
     };
   });
 
+  const intl = useIntl();
+
+  const contentColor = swapColor(contentFontColor, colorPalette);
+
   return (
     <CardModuleBackground
       {...props}
@@ -375,7 +381,7 @@ const PhotoWithTextAndTitleRenderer = ({
         </Animated.View>
 
         <Animated.View style={textContainerStyle}>
-          {title && (
+          {title !== '' && (
             <Animated.Text
               style={[
                 titleStyle,
@@ -386,10 +392,15 @@ const PhotoWithTextAndTitleRenderer = ({
                 },
               ]}
             >
-              {title}
+              {title ??
+                intl.formatMessage({
+                  defaultMessage: 'Add section Title here',
+                  description: 'PhotoWithTextAndTitle default module title',
+                })}
             </Animated.Text>
           )}
-          {content && (
+
+          {content !== '' && (
             <Animated.Text
               style={[
                 contentStyle,
@@ -397,14 +408,25 @@ const PhotoWithTextAndTitleRenderer = ({
                   textAlign: contentTextAlign as TextStyle['textAlign'],
                   fontFamily: contentFontFamily,
                   marginTop: 7,
-                  color: swapColor(
-                    contentFontColor,
-                    colorPalette,
-                  ) as ColorValue,
+                  color: contentColor,
                 },
               ]}
             >
-              {content}
+              {content ??
+                intl.formatMessage(
+                  {
+                    defaultMessage:
+                      'Add section contents here. To edit the text, simply open the editor and start typing. You can also change the font style, size, color, and alignment using the editing tools provided. Adjust the margins and the background for this section to match the design and branding of your WebCard{azzappA}.',
+                    description: 'PhotoWithTextAndTitle default module text',
+                  },
+                  {
+                    azzappA: (
+                      <Text variant="azzapp" style={{ color: contentColor }}>
+                        a
+                      </Text>
+                    ),
+                  },
+                )}
             </Animated.Text>
           )}
         </Animated.View>
