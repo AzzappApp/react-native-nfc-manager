@@ -146,15 +146,15 @@ __metadata:
     "@types/relay-test-utils": ^14.1.4
     chroma-js: ^2.4.2
     events: ^3.3.0
-    expo: ^51.0.20
+    expo: ^51.0.21
     expo-asset: ^10.0.10
     expo-blur: ^13.0.2
     expo-clipboard: ~6.0.3
     expo-contacts: ~13.0.3
     expo-device: ^6.0.2
-    expo-font: ^12.0.8
+    expo-font: ^12.0.9
     expo-haptics: ~13.0.1
-    expo-image: ^1.12.12
+    expo-image: ^1.12.13
     expo-linear-gradient: ~13.0.2
     expo-sensors: ^13.0.9
     expo-status-bar: ^1.12.1
@@ -14841,14 +14841,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"expo-font@npm:^12.0.8, expo-font@npm:~12.0.8":
-  version: 12.0.8
-  resolution: "expo-font@npm:12.0.8"
+"expo-font@npm:^12.0.9, expo-font@npm:~12.0.9":
+  version: 12.0.9
+  resolution: "expo-font@npm:12.0.9"
   dependencies:
     fontfaceobserver: ^2.1.0
   peerDependencies:
     expo: "*"
-  checksum: 42968cceb60b9f5d1ef4fd29b243819e738588c8f51a8eb63750e21656f93be13d925982d8ef3b874da9145ebe4cd789da4d9d32bbd6577519ca0bfb214daa4b
+  checksum: adad225ed6002d5d527808b8f463bc59a1a1626fb2ff34918dcbd2172757977c056101f737ed9523f6d55e0aa88a64988002eb9b6d22f379d5956883f7451379
   languageName: node
   linkType: hard
 
@@ -14861,12 +14861,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"expo-image@npm:^1.12.12":
-  version: 1.12.12
-  resolution: "expo-image@npm:1.12.12"
+"expo-image@npm:^1.12.13":
+  version: 1.12.13
+  resolution: "expo-image@npm:1.12.13"
   peerDependencies:
     expo: "*"
-  checksum: 2792a2d7fab6c25aa9479b3e5d774496cd1f259e4ba787f069db6e76dac7265a0508748adb30473527b70977e66e47a70483da4bd085fa51e53915e1c0725c1d
+  checksum: bd1a204dcdbe1b82aea55f850b8d565ec33469d3c2f323f4e84a620a34ccc79ec59ef5ae4d1ae7d9e559f185b45695d1ed23e87c5e9253365fef5d0a886c8735
   languageName: node
   linkType: hard
 
@@ -14992,9 +14992,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"expo@npm:^51.0.20":
-  version: 51.0.20
-  resolution: "expo@npm:51.0.20"
+"expo@npm:^51.0.21":
+  version: 51.0.21
+  resolution: "expo@npm:51.0.21"
   dependencies:
     "@babel/runtime": ^7.20.0
     "@expo/cli": 0.18.25
@@ -15005,7 +15005,7 @@ __metadata:
     babel-preset-expo: ~11.0.12
     expo-asset: ~10.0.10
     expo-file-system: ~17.0.1
-    expo-font: ~12.0.8
+    expo-font: ~12.0.9
     expo-keep-awake: ~13.0.2
     expo-modules-autolinking: 1.11.1
     expo-modules-core: 1.12.19
@@ -15013,7 +15013,7 @@ __metadata:
     whatwg-url-without-unicode: 8.0.0-3
   bin:
     expo: bin/cli
-  checksum: 6951f2e9949db179d73ae03d22896ba60c71e1a7df72d7bdd5e21ed79ccd146b7b6e0f5a1127e2d6e9f4266e72ecf4a2cb378a31fea13d8e04bda6b254138987
+  checksum: dcd18974ae1b8a7d0a08252ad013c4d2ebf986e5e39b2ed2cefe521623c182bf6cba67bd05fe54bbf0586a9ac6559c872807ef6d4e829af3a314ed52e1434e4a
   languageName: node
   linkType: hard
 

@@ -1,4 +1,5 @@
 package com.azzapp
+import android.content.res.Configuration
 
 import android.app.Application
 import android.content.Context
@@ -58,6 +59,11 @@ class MainApplication : Application(), ReactApplication {
     }
 
   override val reactHost: ReactHost
-    get() =  getDefaultReactHost(applicationContext, ReactNativeHostWrapper(this, reactNativeHost))
+    get() =  ReactNativeHostWrapper.createReactHost(applicationContext, ReactNativeHostWrapper(this, reactNativeHost))
 
+
+  override fun onConfigurationChanged(newConfig: Configuration) {
+    super.onConfigurationChanged(newConfig)
+    ApplicationLifecycleDispatcher.onConfigurationChanged(this, newConfig)
+  }
 }
