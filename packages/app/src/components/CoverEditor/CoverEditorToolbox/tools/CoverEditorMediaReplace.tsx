@@ -16,8 +16,10 @@ import useToggle from '#hooks/useToggle';
 import {
   useCoverEditorActiveMedia,
   useCoverEditorContext,
+  useCoverEditorOverlayLayer,
 } from '../../CoverEditorContext';
 import ToolBoxSection from '../ui/ToolBoxSection';
+import type { MediaAnimations } from '#components/CoverEditor/coverDrawer/mediaAnimations';
 import type { MediaInfo } from '#components/CoverEditor/coverEditorTypes';
 import type { ImagePickerResult } from '#components/ImagePicker';
 
@@ -55,6 +57,8 @@ const CoverEditorMediaReplace = () => {
       ? asset.width / asset.height
       : COVER_RATIO;
 
+  const overlay = useCoverEditorOverlayLayer();
+
   const onFinished = ({
     kind,
     uri,
@@ -84,6 +88,8 @@ const CoverEditorMediaReplace = () => {
         timeRange: timeRange!,
       };
     } else {
+      const animation = (overlay ? overlay.animation : null) as MediaAnimations;
+
       mediaInfo = {
         media: {
           kind: 'image',
@@ -95,7 +101,7 @@ const CoverEditorMediaReplace = () => {
         editionParameters,
         filter,
         duration: COVER_MAX_MEDIA_DURATION,
-        animation: null,
+        animation,
       };
     }
     dispatch({
