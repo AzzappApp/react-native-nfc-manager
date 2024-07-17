@@ -1,5 +1,7 @@
-## 0.5.19-canary.155
+## 0.5.19-canary.156
 
+* **fix:**  - 🐛 make cover generating work on android ([#4295](https://github.com/AzzappApp/azzapp/pull/4295))
+* **fix:**  - 🐛 keep animation when replacing overlay ([#4293](https://github.com/AzzappApp/azzapp/pull/4293))
 * **fix:**  - loadmore template selection ([#4292](https://github.com/AzzappApp/azzapp/pull/4292))
 * **fix:**  - 🐛 use right icon color ([#4291](https://github.com/AzzappApp/azzapp/pull/4291))
 * **fix:**  - **cover:** [#4249](https://github.com/AzzappApp/azzapp/pull/4249) limit the number of videos per cover ([#4283](https://github.com/AzzappApp/azzapp/pull/4283))
