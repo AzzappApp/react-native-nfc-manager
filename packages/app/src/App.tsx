@@ -2,6 +2,11 @@ import { IntlErrorCode } from '@formatjs/intl';
 import * as Sentry from '@sentry/react-native';
 import { StatusBar } from 'expo-status-bar';
 import {
+  checkForUpdateAsync,
+  fetchUpdateAsync,
+  reloadAsync,
+} from 'expo-updates';
+import {
   Component,
   Fragment,
   Suspense,
@@ -140,6 +145,11 @@ const init = async () => {
   initLocaleHelpers();
   loadSkiaTypeFonts();
   RelayQueryManager.init();
+  const update = await checkForUpdateAsync();
+  if (update.isAvailable) {
+    await fetchUpdateAsync();
+    await reloadAsync();
+  }
 };
 
 const initPromise = init();
@@ -167,7 +177,6 @@ const App = () => {
       }),
     [],
   );
-
   if (!ready) {
     return null;
   }
