@@ -1,3 +1,4 @@
+import { shuffle } from 'lodash';
 import { useCallback, useMemo, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { FlatList, ScrollView, View } from 'react-native';
@@ -68,7 +69,7 @@ const CoverEditorAddTextModal = (props: Props) => {
   }, [intl]);
 
   const items = useMemo(() => {
-    return itemsPerTag[selectedTag].items;
+    return shuffle(itemsPerTag[selectedTag].items);
   }, [itemsPerTag, selectedTag]);
 
   const renderItem = useCallback(
