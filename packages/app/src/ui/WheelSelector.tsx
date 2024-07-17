@@ -89,7 +89,7 @@ const WheelSelector = ({
       if (lastIndexRef.current !== index) {
         lastIndexRef.current = index; // Update the ref with the current index
         onChange?.(steps[index]);
-        if (animatedValue) {
+        if (animatedValue && index < steps.length) {
           animatedValue.value = `${steps[index].toFixed(getPrecision(step))}`;
         }
         if (withHaptics) {

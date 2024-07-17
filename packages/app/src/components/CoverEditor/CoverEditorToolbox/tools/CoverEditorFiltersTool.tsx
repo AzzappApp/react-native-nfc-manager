@@ -97,7 +97,7 @@ const CoverEditorFiltersTool = () => {
         ],
       );
     },
-    [applyToActiveMedia, applyToAllMedias, editionMode, intl],
+    [applyToActiveMedia, applyToAllMedias, editionMode, intl, medias.length],
   );
 
   return (
