@@ -1,4 +1,5 @@
 import { useCallback } from 'react';
+import { getMaxAllowedVideosPerCover } from '#components/CoverEditor/coverEditorHelpers';
 import { ScreenModal } from '#components/NativeRouter';
 import useToggle from '#hooks/useToggle';
 import IconButton from '#ui/IconButton';
@@ -58,6 +59,7 @@ const CoverEditorMediaPickerFloatingTool = ({
             onFinished={onMediasPicked}
             durations={durations}
             durationsFixed={durationsFixed}
+            maxSelectableVideos={getMaxAllowedVideosPerCover(!!cover.lottie)}
           />
         )}
       </ScreenModal>

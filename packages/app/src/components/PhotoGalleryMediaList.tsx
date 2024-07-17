@@ -209,7 +209,10 @@ const PhotoGalleryMediaList = ({
       }
       let { width, height, orientation: rotation } = asset.node.image;
       if (asset.node.type.includes('video')) {
-        if (disableVideoSelection) {
+        if (
+          disableVideoSelection &&
+          !selectedMediasIds?.includes(asset.node.image.uri)
+        ) {
           Toast.show({
             type: 'error',
             text1: intl.formatMessage({
@@ -246,7 +249,7 @@ const PhotoGalleryMediaList = ({
         });
       }
     },
-    [disableVideoSelection, intl, onMediaSelected],
+    [disableVideoSelection, intl, onMediaSelected, selectedMediasIds],
   );
 
   const onEndReached = useCallback(() => {
