@@ -1,5 +1,6 @@
-## 0.5.19-canary.156
+## 0.5.19-canary.157
 
+* **feat:**  - initial EAS Update config ([#4302](https://github.com/AzzappApp/azzapp/pull/4302))
 * **fix:**  - 🐛 make cover generating work on android ([#4295](https://github.com/AzzappApp/azzapp/pull/4295))
 * **fix:**  - 🐛 keep animation when replacing overlay ([#4293](https://github.com/AzzappApp/azzapp/pull/4293))
 * **fix:**  - loadmore template selection ([#4292](https://github.com/AzzappApp/azzapp/pull/4292))

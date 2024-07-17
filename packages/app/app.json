@@ -17,9 +17,13 @@
       "enabled": true,
       "checkAutomatically": "ALWAYS"
     },
-    "android": {},
+    "android": {
+      "versionCode": 5019
+    },
     "ios": {
-      "bundleIdentifier": "com.azzapp.app"
-    }
+      "bundleIdentifier": "com.azzapp.app",
+      "buildNumber": "1"
+    },
+    "version": "0.5.19-canary.157"
   }
 }
