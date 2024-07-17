@@ -213,18 +213,22 @@ const CoverEditorCore = (
         };
 
     const textLayers: CoverEditorTextLayerItem[] = data?.textLayers
-      ? (data.textLayers as any[]).map(({ customText, ...textLayer }) => {
+      ? (
+          data.textLayers as Array<
+            CoverEditorTextLayerItem & { customText: string | null }
+          >
+        ).map(({ customText, ...textLayer }) => {
           const text =
             textLayer.text === 'mainName'
               ? profile.webCard.companyName || profile.webCard.lastName
               : textLayer.text === 'firstName'
-                ? profile.webCard.firstName ?? ''
+                ? profile.webCard.firstName
                 : textLayer.text === 'custom'
-                  ? customText ?? ''
-                  : '';
+                  ? customText
+                  : null;
           return {
             ...textLayer,
-            text,
+            text: text ?? '',
           };
         })
       : [];
