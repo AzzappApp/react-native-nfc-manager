@@ -1,5 +1,6 @@
-## 0.5.19-canary.163
+## 0.5.19-canary.164
 
+* **fix:**  - **cover:** [#4298](https://github.com/AzzappApp/azzapp/pull/4298) properly filter videos ([#4309](https://github.com/AzzappApp/azzapp/pull/4309))
 * **build:**  - add asset plugin
 * **build:**  - put back runtime version
 * **fix:**  - shuffle the textLabel on initial render only ([#4308](https://github.com/AzzappApp/azzapp/pull/4308))
