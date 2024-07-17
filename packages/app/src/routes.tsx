@@ -205,7 +205,9 @@ export type ConfirmChangeContactRoute = {
 
 export type UserPayWallRoute = {
   route: 'USER_PAY_WALL';
-  params?: never;
+  params?: {
+    activateFeature: 'MULTI_USER';
+  };
 };
 
 export type CommonInformationRoute = {

@@ -27,6 +27,7 @@ import { useRouter } from '#components/NativeRouter';
 import PremiumIndicator from '#components/PremiumIndicator';
 import { getAuthState } from '#helpers/authStore';
 import { getRelayEnvironment } from '#helpers/relayEnvironment';
+import { useMultiUserUpdate } from '#hooks/useMultiUserUpdate';
 import useScreenInsets from '#hooks/useScreenInsets';
 import { useUserSubscriptionOffer } from '#hooks/useSubscriptionOffer';
 import Button from '#ui/Button';
@@ -34,7 +35,11 @@ import IconButton from '#ui/IconButton';
 import PressableOpacity from '#ui/PressableOpacity';
 import SwitchLabel from '#ui/SwitchLabel';
 import Text from '#ui/Text';
-import type { ScreenOptions } from '#components/NativeRouter';
+import type {
+  NativeScreenProps,
+  ScreenOptions,
+} from '#components/NativeRouter';
+import type { UserPayWallRoute } from '#routes';
 import type { PurchasesPackage } from 'react-native-purchases';
 import type { SharedValue } from 'react-native-reanimated';
 
@@ -42,7 +47,7 @@ const TERMS_OF_SERVICE = process.env.TERMS_OF_SERVICE;
 const PRIVACY_POLICY = process.env.PRIVACY_POLICY;
 const width = Dimensions.get('screen').width;
 
-const UserPayWallScreen = () => {
+const UserPayWallScreen = ({ route }: NativeScreenProps<UserPayWallRoute>) => {
   const intl = useIntl();
   const router = useRouter();
   const { height } = useWindowDimensions();
@@ -55,6 +60,8 @@ const UserPayWallScreen = () => {
   const [processing, setProcessing] = useState(false);
 
   const subscriptions = useUserSubscriptionOffer(period);
+
+  const setAllowMultiUser = useMultiUserUpdate();
 
   useEffect(() => {
     if (subscriptions && subscriptions.length > 0) {
@@ -107,6 +114,9 @@ const UserPayWallScreen = () => {
         const res = await Purchases.purchasePackage(selectedPurchasePackage!);
         // Update Relay cache temporary
         if (res.customerInfo.entitlements.active?.multiuser?.isActive) {
+          if (route.params?.activateFeature === 'MULTI_USER') {
+            setAllowMultiUser(true);
+          }
           commitLocalUpdate(getRelayEnvironment(), store => {
             store.get(profileInfos.webCardId)?.setValue(true, 'isPremium');
           });
@@ -133,7 +143,13 @@ const UserPayWallScreen = () => {
         }
       }
     }
-  }, [intl, router, selectedPurchasePackage]);
+  }, [
+    intl,
+    route.params?.activateFeature,
+    router,
+    selectedPurchasePackage,
+    setAllowMultiUser,
+  ]);
 
   //const [currentPage, setCurrentPage] = useState(2);
   const currentIndex = useSharedValue(0);

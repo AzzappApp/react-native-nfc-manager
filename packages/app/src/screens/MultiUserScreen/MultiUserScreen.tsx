@@ -10,7 +10,6 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import { ActivityIndicator, View } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { graphql, useMutation, usePreloadedQuery } from 'react-relay';
-import ERRORS from '@azzapp/shared/errors';
 import { isAdmin } from '@azzapp/shared/profileHelpers';
 import { colors } from '#theme';
 import { CancelHeaderButton } from '#components/commonsButtons';
@@ -24,6 +23,7 @@ import PremiumIndicator from '#components/PremiumIndicator';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import relayScreen, { RelayScreenErrorBoundary } from '#helpers/relayScreen';
 import useHandleProfileActionError from '#hooks/useHandleProfileError';
+import { useMultiUserUpdate } from '#hooks/useMultiUserUpdate';
 import useToggle from '#hooks/useToggle';
 import Button from '#ui/Button';
 import Container from '#ui/Container';
@@ -38,7 +38,6 @@ import Text from '#ui/Text';
 import MultiUserScreenUserList from './MultiUserScreenUserList';
 import type { RelayScreenProps } from '#helpers/relayScreen';
 import type { MultiUserScreen_transferOwnershipMutation } from '#relayArtifacts/MultiUserScreen_transferOwnershipMutation.graphql';
-import type { MultiUserScreenMutation } from '#relayArtifacts/MultiUserScreenMutation.graphql';
 import type { MultiUserScreenQuery } from '#relayArtifacts/MultiUserScreenQuery.graphql';
 import type { MultiUserRoute } from '#routes';
 import type { ContactCard } from '@azzapp/shared/contactCardHelpers';
@@ -99,94 +98,13 @@ const MultiUserScreen = ({
     }
   }, [profile?.profileRole, router]);
 
-  const [commit] = useMutation<MultiUserScreenMutation>(graphql`
-    mutation MultiUserScreenMutation(
-      $webCardId: ID!
-      $input: UpdateMultiUserInput!
-    ) {
-      updateMultiUser(webCardId: $webCardId, input: $input) {
-        webCard {
-          id
-          isMultiUser
-          isPremium
-        }
-      }
-    }
-  `);
+  const [confirmDeleteMultiUser, setConfirmDeleteMultiUser] = useState(false);
 
-  const [confirmDeletMultiUser, setConfirmDeleteMultiUser] = useState(false);
+  const onCompleted = useCallback(() => {
+    setConfirmDeleteMultiUser(false);
+  }, []);
 
-  const setAllowMultiUser = useCallback(
-    (value: boolean) => {
-      if (profile?.webCard) {
-        commit({
-          variables: {
-            webCardId: profile?.webCard?.id,
-            input: { isMultiUser: value },
-          },
-          optimisticResponse: {
-            updateMultiUser: {
-              webCard: {
-                id: profile?.webCard?.id,
-                isMultiUser: value,
-              },
-            },
-          },
-          updater: store => {
-            if (!value && profile?.webCard?.id) {
-              const webCard = store.get(profile?.webCard?.id);
-              if (webCard) {
-                const profiles = webCard.getLinkedRecords('profiles');
-                webCard.setLinkedRecords(
-                  profiles?.filter(p => p.getDataID() === profile?.id) ?? [],
-                  'profiles',
-                );
-              }
-            }
-          },
-          onCompleted: () => {
-            setConfirmDeleteMultiUser(false);
-          },
-          onError: error => {
-            if (error.message === ERRORS.SUBSCRIPTION_IS_ACTIVE) {
-              Toast.show({
-                type: 'error',
-                text1: intl.formatMessage({
-                  defaultMessage:
-                    'You cannot deactivate multi user while you have an active subscription.',
-                  description:
-                    'Error toast message when trying to deactivate multi user while having an active subscription.',
-                }),
-              });
-              return;
-            } else if (error.message === ERRORS.SUBSCRIPTION_REQUIRED) {
-              Toast.show({
-                type: 'error',
-                text1: intl.formatMessage({
-                  defaultMessage:
-                    'You need a subscription to activate multi user.',
-                  description:
-                    'Error toast message when trying to activate multi user without a subscription.',
-                }),
-              });
-              return;
-            } else {
-              Toast.show({
-                type: 'error',
-                text1: intl.formatMessage({
-                  defaultMessage:
-                    'Error while updating your multi user settings.',
-                  description:
-                    'Error toast message when updating multi user fails',
-                }),
-              });
-            }
-          },
-        });
-      }
-    },
-    [commit, intl, profile?.id, profile?.webCard],
-  );
+  const setAllowMultiUser = useMultiUserUpdate(onCompleted);
 
   const toggleMultiUser = useCallback(
     (value: boolean) => {
@@ -211,7 +129,12 @@ const MultiUserScreen = ({
         return;
       }
       if (!profile?.webCard.isPremium && value) {
-        router.push({ route: 'USER_PAY_WALL' });
+        router.push({
+          route: 'USER_PAY_WALL',
+          params: {
+            activateFeature: 'MULTI_USER',
+          },
+        });
         return;
       }
       if (value) {
@@ -464,7 +387,7 @@ const MultiUserScreen = ({
       </SafeAreaView>
 
       <ScreenModal
-        visible={confirmDeletMultiUser}
+        visible={confirmDeleteMultiUser}
         gestureEnabled={false}
         onRequestDismiss={preventModalDismiss}
       >
