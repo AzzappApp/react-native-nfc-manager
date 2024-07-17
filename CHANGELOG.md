@@ -1,5 +1,8 @@
-## 0.5.19-canary.159
+## 0.5.19-canary.160
 
+* **fix:**  - **cover:** [#4298](https://github.com/AzzappApp/azzapp/pull/4298) enhance video selection on cover ([#4303](https://github.com/AzzappApp/azzapp/pull/4303))
+* **fix:**  - **cover:** [#4306](https://github.com/AzzappApp/azzapp/pull/4306) crash on creating cover on existing webcard ([#4307](https://github.com/AzzappApp/azzapp/pull/4307))
+* **fix:**  - **multiUser:** [#4246](https://github.com/AzzappApp/azzapp/pull/4246) toggle on processed payment ([#4294](https://github.com/AzzappApp/azzapp/pull/4294))
 * **fix:**  - [#2558](https://github.com/AzzappApp/azzapp/pull/2558) add last azzappIcon near webCard label ([#4300](https://github.com/AzzappApp/azzapp/pull/4300))
 * **fix:**  - Wheelselector : be sure index is not out of bound ([#4305](https://github.com/AzzappApp/azzapp/pull/4305))
 * **build:**  - fix app.json file
