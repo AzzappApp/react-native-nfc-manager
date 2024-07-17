@@ -87,7 +87,7 @@ const useSaveCover = (
       ({ path, kind } = await createCoverMedia(
         coverEditorState,
         ({ framesCompleted, nbFrames }) => {
-          progressSink.next(framesCompleted / nbFrames);
+          progressSink?.next(framesCompleted / nbFrames);
         },
       ));
     } catch (error) {
