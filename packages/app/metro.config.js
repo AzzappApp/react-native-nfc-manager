@@ -18,6 +18,7 @@ const androidAssetsResolutionFix = getMetroAndroidAssetsResolutionFix();
 module.exports = mergeConfig(getDefaultConfig(__dirname), {
   transformer: {
     publicPath: androidAssetsResolutionFix.publicPath,
+    assetPlugins: ['expo-asset/tools/hashAssetFiles'],
     getTransformOptions: async () => ({
       transform: {
         experimentalImportSupport: false,
