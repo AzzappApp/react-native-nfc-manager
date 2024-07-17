@@ -1,5 +1,6 @@
-## 0.5.19-canary.161
+## 0.5.19-canary.162
 
+* **build:**  - put back runtime version
 * **fix:**  - shuffle the textLabel on initial render only ([#4308](https://github.com/AzzappApp/azzapp/pull/4308))
 * **fix:**  - **cover:** [#4298](https://github.com/AzzappApp/azzapp/pull/4298) enhance video selection on cover ([#4303](https://github.com/AzzappApp/azzapp/pull/4303))
 * **fix:**  - **cover:** [#4306](https://github.com/AzzappApp/azzapp/pull/4306) crash on creating cover on existing webcard ([#4307](https://github.com/AzzappApp/azzapp/pull/4307))
