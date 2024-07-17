@@ -99,7 +99,7 @@ const MultiMediasSelector = ({
               disableVideoSelection={
                 maxSelectableVideos
                   ? maxSelectableVideos -
-                      (selectedMedias?.map(m => m.kind.includes('video'))
+                      (selectedMedias?.filter(m => m.kind.includes('video'))
                         .length ?? 0) ===
                     0
                   : false

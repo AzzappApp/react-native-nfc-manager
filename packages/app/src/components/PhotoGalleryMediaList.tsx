@@ -216,6 +216,7 @@ const PhotoGalleryMediaList = ({
               defaultMessage: 'Maximum number of videos reached',
               description: 'Error message when trying to add more videos',
             }),
+            visibilityTime: 2000,
           });
         } else {
           if (width == null || height == null || rotation == null) {

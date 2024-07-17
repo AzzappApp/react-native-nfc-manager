@@ -145,6 +145,7 @@ const CoverEditorMediaPicker = ({
           defaultMessage: 'Maximum number of videos reached',
           description: 'Error message when trying to add more videos',
         }),
+        visibilityTime: 2000,
       });
       return null;
     }
