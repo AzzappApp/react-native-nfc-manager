@@ -1,4 +1,4 @@
-## 0.5.19-canary.157
+## 0.5.19-canary.158
 
 * **feat:**  - initial EAS Update config ([#4302](https://github.com/AzzappApp/azzapp/pull/4302))
 * **fix:**  - 🐛 make cover generating work on android ([#4295](https://github.com/AzzappApp/azzapp/pull/4295))
