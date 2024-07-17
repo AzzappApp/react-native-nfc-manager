@@ -144,13 +144,13 @@ const CoverEditorMediaReplace = () => {
               additionalData={{
                 hideTabs: true,
               }}
-              maxSelectableVideos={
-                activeMedia.media.kind === 'video'
-                  ? 1
-                  : getMaxAllowedVideosPerCover(!!lottie) >
+              disableVideoSelection={
+                activeMedia.media.kind.includes('video')
+                  ? false
+                  : !(
+                      getMaxAllowedVideosPerCover(!!lottie) >
                       medias.filter(m => m.media.kind === 'video').length
-                    ? 1
-                    : 0
+                    )
               }
             />
           )}

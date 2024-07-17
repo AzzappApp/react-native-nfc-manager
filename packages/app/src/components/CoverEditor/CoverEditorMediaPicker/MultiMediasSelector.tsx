@@ -96,7 +96,14 @@ const MultiMediasSelector = ({
               kind="mixed"
               autoSelectFirstItem={false}
               onMediaSelected={onMediaSelected}
-              maxSelectableVideos={maxSelectableVideos}
+              disableVideoSelection={
+                maxSelectableVideos
+                  ? maxSelectableVideos -
+                      (selectedMedias?.map(m => m.kind.includes('video'))
+                        .length ?? 0) ===
+                    0
+                  : false
+              }
             />
           )}
         </View>

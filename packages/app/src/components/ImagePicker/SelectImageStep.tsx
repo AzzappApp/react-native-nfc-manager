@@ -56,7 +56,7 @@ const SelectImageStep = ({
     clearMedia,
     cameraButtonsLeftRightPosition,
     minVideoDuration,
-    maxSelectableVideos,
+    disableVideoSelection,
   } = useImagePickerState();
 
   const onGalleryMediaSelected = (
@@ -374,7 +374,7 @@ const SelectImageStep = ({
                 kind={kind}
                 contentContainerStyle={galleryContainerStyle}
                 autoSelectFirstItem={media == null}
-                maxSelectableVideos={maxSelectableVideos}
+                disableVideoSelection={disableVideoSelection}
               />
             ) : null
           ) : (

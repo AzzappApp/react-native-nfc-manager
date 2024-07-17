@@ -15,6 +15,7 @@ import {
 } from 'react-native';
 import ReactNativeBlobUtil from 'react-native-blob-util';
 import { openPhotoPicker, openSettings } from 'react-native-permissions';
+import Toast from 'react-native-toast-message';
 import { colors } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import {
@@ -37,6 +38,7 @@ import type {
 } from '@react-native-camera-roll/camera-roll';
 
 import type { FlashListProps, ListRenderItemInfo } from '@shopify/flash-list';
+
 type PhotoGalleryMediaListProps = Omit<
   FlashListProps<PhotoIdentifier>,
   'children' | 'data' | 'onEndReached' | 'renderItem'
@@ -67,7 +69,7 @@ type PhotoGalleryMediaListProps = Omit<
   /**autoSelectFirstItem */
   autoSelectFirstItem?: boolean;
 
-  maxSelectableVideos?: number | null;
+  disableVideoSelection?: boolean | null;
 };
 
 /**
@@ -83,7 +85,7 @@ const PhotoGalleryMediaList = ({
   autoSelectFirstItem = true,
   numColumns = 4,
   contentContainerStyle,
-  maxSelectableVideos = null,
+  disableVideoSelection = null,
   ...props
 }: PhotoGalleryMediaListProps) => {
   const scrollViewRef = useRef<FlashList<PhotoIdentifier>>(null);
@@ -172,6 +174,8 @@ const PhotoGalleryMediaList = ({
     };
   }, []);
 
+  const intl = useIntl();
+
   const onMediaPress = useCallback(
     async (asset: PhotoIdentifier) => {
       let uri: string | null =
@@ -204,25 +208,30 @@ const PhotoGalleryMediaList = ({
         return;
       }
       let { width, height, orientation: rotation } = asset.node.image;
-      if (
-        asset.node.type.includes('video') &&
-        (!selectedMediasIds ||
-          !maxSelectableVideos ||
-          selectedMediasIds.length < maxSelectableVideos)
-      ) {
-        if (width == null || height == null || rotation == null) {
-          ({ width, height, rotation } = await getVideoSize(uri));
-        }
+      if (asset.node.type.includes('video')) {
+        if (disableVideoSelection) {
+          Toast.show({
+            type: 'error',
+            text1: intl.formatMessage({
+              defaultMessage: 'Maximum number of videos reached',
+              description: 'Error message when trying to add more videos',
+            }),
+          });
+        } else {
+          if (width == null || height == null || rotation == null) {
+            ({ width, height, rotation } = await getVideoSize(uri));
+          }
 
-        onMediaSelected({
-          galleryUri: asset.node.image.uri,
-          kind: 'video',
-          uri,
-          width,
-          height,
-          rotation,
-          duration: asset.node.image.playableDuration,
-        });
+          onMediaSelected({
+            galleryUri: asset.node.image.uri,
+            kind: 'video',
+            uri,
+            width,
+            height,
+            rotation,
+            duration: asset.node.image.playableDuration,
+          });
+        }
       } else {
         if (width == null || height == null) {
           ({ width, height } = await getImageSize(uri));
@@ -236,7 +245,7 @@ const PhotoGalleryMediaList = ({
         });
       }
     },
-    [maxSelectableVideos, onMediaSelected, selectedMediasIds],
+    [disableVideoSelection, intl, onMediaSelected],
   );
 
   const onEndReached = useCallback(() => {
@@ -249,11 +258,6 @@ const PhotoGalleryMediaList = ({
     (useWindowDimensions().width - (numColumns - 1 * SEPARATOR_WIDTH)) /
     numColumns;
 
-  const maxVideosAreSelected =
-    maxSelectableVideos !== null &&
-    ((selectedMediasIds && selectedMediasIds.length >= maxSelectableVideos) ||
-      maxSelectableVideos === 0);
-
   const renderItem = useCallback(
     ({ item }: ListRenderItemInfo<PhotoIdentifier>) => (
       <MemoPhotoGalleyMediaItem
@@ -265,7 +269,6 @@ const PhotoGalleryMediaList = ({
         isLoading={downloadingFiles.includes(item.node.image.uri)}
         height={itemHeight}
         onMediaPress={onMediaPress}
-        disabled={item.node.type.includes('video') && maxVideosAreSelected}
       />
     ),
 
@@ -275,7 +278,6 @@ const PhotoGalleryMediaList = ({
       downloadingFiles,
       itemHeight,
       onMediaPress,
-      maxVideosAreSelected,
     ],
   );
 
@@ -308,8 +310,6 @@ const PhotoGalleryMediaList = ({
 
   const [manageAccessMediaVisible, toggleManageAccessMediaVisible] =
     useToggle(false);
-
-  const intl = useIntl();
 
   const ListFooterComponent = useMemo(
     () =>
