@@ -1,5 +1,8 @@
-## 0.5.19-canary.158
+## 0.5.19-canary.159
 
+* **fix:**  - [#2558](https://github.com/AzzappApp/azzapp/pull/2558) add last azzappIcon near webCard label ([#4300](https://github.com/AzzappApp/azzapp/pull/4300))
+* **fix:**  - Wheelselector : be sure index is not out of bound ([#4305](https://github.com/AzzappApp/azzapp/pull/4305))
+* **build:**  - fix app.json file
 * **feat:**  - initial EAS Update config ([#4302](https://github.com/AzzappApp/azzapp/pull/4302))
 * **fix:**  - 🐛 make cover generating work on android ([#4295](https://github.com/AzzappApp/azzapp/pull/4295))
 * **fix:**  - 🐛 keep animation when replacing overlay ([#4293](https://github.com/AzzappApp/azzapp/pull/4293))
