@@ -1,5 +1,6 @@
-## 0.5.19-canary.166
+## 0.5.19-canary.167
 
+* **fix:**  - font and number of covertempalte ([#4312](https://github.com/AzzappApp/azzapp/pull/4312))
 * **fix:**  - **cover:** [#4298](https://github.com/AzzappApp/azzapp/pull/4298) manage deselection ([#4311](https://github.com/AzzappApp/azzapp/pull/4311))
 * **build:**  - fix shellScript
 * **build:**  - review expo config to avoid crash on expo-updates on android ([#4310](https://github.com/AzzappApp/azzapp/pull/4310))
