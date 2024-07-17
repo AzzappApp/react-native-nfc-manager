@@ -10,20 +10,8 @@
   "ios": {
     "bundleIdentifier": "com.azzapp.app"
   },
-  "expo": {
-    "runtimeVersion": "1.0.0",
-    "updates": {
-      "url": "https://u.expo.dev/6f4f8646-b45c-4cc0-85ae-a5aa04a7bebb",
-      "enabled": true,
-      "checkAutomatically": "ALWAYS"
-    },
-    "android": {
-      "versionCode": 5019
-    },
-    "ios": {
-      "bundleIdentifier": "com.azzapp.app",
-      "buildNumber": "1"
-    },
-    "version": "0.5.19-canary.158"
+  "updates": {
+    "url": "https://u.expo.dev/6f4f8646-b45c-4cc0-85ae-a5aa04a7bebb",
+    "enabled": true
   }
 }
