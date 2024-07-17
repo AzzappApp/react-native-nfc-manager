@@ -89,7 +89,14 @@ const CoverEditorAdjustTool = () => {
         ],
       );
     },
-    [applyToActiveMedia, dispatch, editionMode, intl, toggleScreenModal],
+    [
+      applyToActiveMedia,
+      dispatch,
+      editionMode,
+      intl,
+      medias.length,
+      toggleScreenModal,
+    ],
   );
 
   return (

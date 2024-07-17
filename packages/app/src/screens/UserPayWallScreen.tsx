@@ -1,3 +1,4 @@
+import * as Sentry from '@sentry/react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import LottieView from 'lottie-react-native';
 import { memo, useCallback, useEffect, useState } from 'react';
@@ -128,6 +129,7 @@ const UserPayWallScreen = () => {
               description: 'Description of the payment process error alert',
             }),
           );
+          Sentry.captureException(error, { data: 'userPayWallScreen' });
         }
       }
     }
@@ -516,7 +518,13 @@ const OfferItem = ({
         />
       </Text>
       <View>
-        <Text variant="button">{offer.product.priceString}</Text>
+        <Text variant="button">
+          <FormattedNumber
+            value={offer.product.price}
+            style="currency"
+            currency={offer.product.currencyCode}
+          />
+        </Text>
         {period === 'year' && (
           <Text variant="smallbold" style={styles.monthlyPricing}>
             <FormattedNumber
@@ -525,7 +533,7 @@ const OfferItem = ({
               currency={offer.product.currencyCode}
             />
             <FormattedMessage
-              defaultMessage={'/ month'}
+              defaultMessage={' / month'}
               description="MultiUser Paywall Screen - number of seat offer"
             />
           </Text>

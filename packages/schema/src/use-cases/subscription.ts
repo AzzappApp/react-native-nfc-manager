@@ -49,8 +49,9 @@ export const checkSubscription = async (
     subscription => subscription.subscriptionPlan === 'web.yearly',
   );
 
-  const store = userSubscription.find(subscription => !subscription.webCardId);
-
+  const store = userSubscription.find(
+    subscription => subscription.issuer !== 'web',
+  );
   if (lifetime) {
     return true;
   }
