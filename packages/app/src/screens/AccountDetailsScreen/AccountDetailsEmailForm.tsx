@@ -24,6 +24,7 @@ const AccountDetailsEmailForm = ({
   visible: boolean;
   toggleBottomSheet: () => void;
   currentUser: {
+    id: string;
     email: string | null;
     phoneNumber: string | null;
   };
@@ -95,6 +96,7 @@ const AccountDetailsEmailForm = ({
       optimisticResponse: {
         updateUser: {
           user: {
+            id: currentUser?.id,
             email: null,
             phoneNumber: currentUser?.phoneNumber,
           },

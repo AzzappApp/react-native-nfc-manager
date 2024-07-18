@@ -27,6 +27,7 @@ import type { AccountDetailsRoute } from '#routes';
 const accountDetailsScreenQuery = graphql`
   query AccountDetailsScreenQuery {
     currentUser {
+      id
       email
       phoneNumber
       isPremium

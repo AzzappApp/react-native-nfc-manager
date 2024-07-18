@@ -20,6 +20,7 @@ describe('AccountDetailsPhoneNumberForm', () => {
       <RelayEnvironmentProvider environment={environment}>
         <AccountDetailsPhoneNumberForm
           currentUser={{
+            id: 'testid',
             email: '',
             phoneNumber,
           }}
