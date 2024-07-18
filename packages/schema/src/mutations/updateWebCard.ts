@@ -24,7 +24,6 @@ const updateWebCardMutation: MutationResolvers['updateWebCard'] = async (
 
   const partialWebCard: Partial<WebCard> = {
     ...profileUpdates,
-    webCardKind: profileUpdates.webCardKind ?? undefined,
   };
 
   const webCard = await loaders.WebCard.load(webCardId);
@@ -32,20 +31,6 @@ const updateWebCardMutation: MutationResolvers['updateWebCard'] = async (
   if (!webCard) {
     throw new GraphQLError(ERRORS.INVALID_REQUEST);
   }
-
-  await checkWebCardHasSubscription(
-    {
-      webCard: {
-        ...webCard,
-        ...Object.fromEntries(
-          Object.entries(partialWebCard).filter(
-            ([_entry, value]) => value !== undefined,
-          ),
-        ),
-      },
-    },
-    loaders,
-  );
 
   try {
     if (graphqlWebCardCategoryId) {
@@ -57,6 +42,11 @@ const updateWebCardMutation: MutationResolvers['updateWebCard'] = async (
       if (webCardCategoryId !== webCard.webCardCategoryId) {
         partialWebCard.companyActivityId = undefined;
       }
+
+      const webCardCategory =
+        await loaders.WebCardCategory.load(webCardCategoryId);
+
+      partialWebCard.webCardKind = webCardCategory?.webCardKind;
     }
     if (graphqlCompanyActivityId) {
       const companyActivityId = fromGlobalIdWithType(
@@ -67,6 +57,20 @@ const updateWebCardMutation: MutationResolvers['updateWebCard'] = async (
     } else if (graphqlCompanyActivityId === null) {
       partialWebCard.companyActivityId = null;
     }
+
+    await checkWebCardHasSubscription(
+      {
+        webCard: {
+          ...webCard,
+          ...Object.fromEntries(
+            Object.entries(partialWebCard).filter(
+              ([_entry, value]) => value !== undefined,
+            ),
+          ),
+        },
+      },
+      loaders,
+    );
 
     if (webCard.companyActivityId !== partialWebCard.companyActivityId) {
       const profile =
