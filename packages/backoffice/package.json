@@ -1,6 +1,6 @@
 {
   "name": "@azzapp/backoffice",
-  "version": "0.5.19-canary.168",
+  "version": "0.5.19-canary.169",
   "private": true,
   "scripts": {
     "dev": "next dev -p 3005",
