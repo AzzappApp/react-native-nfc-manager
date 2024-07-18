@@ -2,7 +2,11 @@ import { PaintStyle, Skia } from '@shopify/react-native-skia';
 import { PixelRatio, StyleSheet, View } from 'react-native';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import Animated, {
+  useAnimatedReaction,
   useAnimatedStyle,
+  useSharedValue,
+  withDelay,
+  withTiming,
   type DerivedValue,
 } from 'react-native-reanimated';
 
@@ -87,9 +91,25 @@ export const BoundsEditorGestureHandler = ({
     };
   });
 
+  const opacitySharedValue = useSharedValue(0);
+
+  useAnimatedReaction(
+    () => !!position.value,
+    (hasPosition: boolean) => {
+      opacitySharedValue.value = hasPosition
+        ? withDelay(
+            50,
+            withTiming(1, {
+              duration: 180,
+            }),
+          )
+        : 0;
+    },
+  );
+
   const animatedOptionsStyle = useAnimatedStyle(() => {
     return {
-      opacity: position.value ? 100 : 0,
+      opacity: opacitySharedValue.value,
       flex: 1,
     };
   });
