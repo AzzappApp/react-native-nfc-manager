@@ -240,7 +240,7 @@ const CoverEditorCore = (
                 ...overlay,
                 media: {
                   uri: isAndroidRelease ? ANDROID_ASSET_PATH : placeholder.uri,
-                  type: 'image',
+                  kind: 'image',
                   width: placeholder.width,
                   height: placeholder.height,
                 },
