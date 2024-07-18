@@ -1,5 +1,10 @@
-import { getLocalizationMessages } from '@azzapp/data';
-import { SUPPORTED_LOCALES } from '@azzapp/i18n';
+import { and, count, eq } from 'drizzle-orm';
+import {
+  db,
+  getLocalizationMessages,
+  LocalizationMessageTable,
+} from '@azzapp/data';
+import { ENTITY_TARGET, SUPPORTED_LOCALES } from '@azzapp/i18n';
 import TranslationsInfos from './TranslationsInfos';
 import { appMessages, langNames, webMessages } from './translationsPageHelpers';
 
@@ -19,12 +24,26 @@ const TranslationsPage = async () => {
 
   const nbAppMessages = Object.keys(appMessages).length;
   const nbWebMessages = Object.keys(webMessages).length;
+  const nbEntityMessages = await db
+    .select({ count: count() })
+    .from(LocalizationMessageTable)
+    .where(
+      and(
+        eq(LocalizationMessageTable.target, ENTITY_TARGET),
+        eq(LocalizationMessageTable.locale, 'en-US'),
+      ),
+    )
+    .then(([{ count }]) => count);
+
   const translationsInfos = SUPPORTED_LOCALES.map(locale => {
     const nbTranslatedAppMessages = Object.keys(
       messagesByLocaleAndTarget[locale]?.app || {},
     ).length;
     const nbTranslatedWebMessages = Object.keys(
       messagesByLocaleAndTarget[locale]?.web || {},
+    ).length;
+    const nbTranslatedEntityMessages = Object.keys(
+      messagesByLocaleAndTarget[locale]?.entity || {},
     ).length;
     return {
       locale,
@@ -36,6 +55,10 @@ const TranslationsPage = async () => {
       web: {
         translated: nbTranslatedWebMessages,
         total: nbWebMessages,
+      },
+      entity: {
+        translated: nbTranslatedEntityMessages,
+        total: nbEntityMessages,
       },
     };
   });

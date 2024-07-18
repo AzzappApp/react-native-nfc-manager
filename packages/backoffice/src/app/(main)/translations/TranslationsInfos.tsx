@@ -98,6 +98,13 @@ const columns: GridColDef[] = [
     valueFormatter: getPercentTranslated,
     flex: 1,
   },
+  {
+    field: 'entity',
+    headerName: 'Entity Status',
+    cellClassName: getPercentTranslatedColor,
+    valueFormatter: getPercentTranslated,
+    flex: 1,
+  },
 ];
 
 export default TranslationsInfos;
