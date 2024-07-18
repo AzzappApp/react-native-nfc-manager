@@ -1,6 +1,6 @@
 import { useCallback, useRef, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { View } from 'react-native';
+import { Alert, View } from 'react-native';
 import { graphql, usePreloadedQuery } from 'react-relay';
 import { colors } from '#theme';
 import { SaveHeaderButton } from '#components/commonsButtons';
@@ -97,6 +97,35 @@ const CoverCreationScreen = ({
   const insets = useScreenInsets();
   const intl = useIntl();
 
+  const onConfirm = useCallback(() => {
+    Alert.alert(
+      intl.formatMessage({
+        defaultMessage: 'Save this cover ?',
+        description: 'Cover creation confirm save title',
+      }),
+      intl.formatMessage({
+        defaultMessage: 'Do you want to save this cover now ?',
+        description: 'Cover creation confirm save subtitle',
+      }),
+      [
+        {
+          text: intl.formatMessage({
+            defaultMessage: 'Continue editing',
+            description: 'Cover creation cancel save button label',
+          }),
+        },
+        {
+          text: intl.formatMessage({
+            defaultMessage: 'Save now',
+            description: 'Cover creation confirm save button label',
+          }),
+          onPress: onSaveCover,
+          style: 'cancel',
+        },
+      ],
+    );
+  }, [intl, onSaveCover]);
+
   const { profile } = data;
   const webCardKind = profile?.webCard?.webCardKind;
   const isPremium = profile?.webCard?.isPremium;
@@ -137,7 +166,7 @@ const CoverCreationScreen = ({
         rightElement={
           <SaveHeaderButton
             style={{ width: 70, marginRight: 10 }}
-            onPress={onSaveCover}
+            onPress={onConfirm}
             disabled={!canSave}
           />
         }
