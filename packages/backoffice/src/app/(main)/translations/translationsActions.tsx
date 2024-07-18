@@ -10,7 +10,7 @@ import { currentUserHasRole } from '#helpers/roleHelpers';
 
 export const saveTranslationMessage = async (message: LocalizationMessage) => {
   if (
-    !(await currentUserHasRole(TRANSLATOR)) ||
+    !(await currentUserHasRole(TRANSLATOR)) &&
     !(await currentUserHasRole(ADMIN))
   ) {
     throw new Error('Unauthorized');
