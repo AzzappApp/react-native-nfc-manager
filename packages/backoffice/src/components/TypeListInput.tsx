@@ -9,7 +9,7 @@ import { useRef } from 'react';
 import type {
   CardTemplateType,
   CompanyActivityType,
-  Label,
+  LocalizationMessage,
 } from '@azzapp/data';
 import type { BoxProps } from '@mui/material';
 
@@ -23,7 +23,7 @@ type TypeListInput = Omit<BoxProps, 'onChange'> & {
   error?: boolean | null;
   helperText?: string | null;
   onChange: (value: Value) => void;
-  typesLabels: Label[];
+  typesLabels: LocalizationMessage[];
 };
 
 const TypeListInput = ({
@@ -60,8 +60,7 @@ const TypeListInput = ({
         getOptionLabel={option =>
           typeof option === 'string'
             ? option
-            : typesLabels.find(l => l.labelKey === option.labelKey)
-                ?.baseLabelValue ?? option.labelKey
+            : typesLabels.find(l => l.key === option.id)?.value ?? option.id
         }
         renderInput={params => (
           <TextField
@@ -77,8 +76,7 @@ const TypeListInput = ({
           const label =
             typeof option === 'string'
               ? option
-              : typesLabels.find(l => l.labelKey === option.labelKey)
-                  ?.baseLabelValue ?? option.labelKey;
+              : typesLabels.find(l => l.key === option.id)?.value ?? option.id;
           return (
             <li {...props} key={id}>
               {label}

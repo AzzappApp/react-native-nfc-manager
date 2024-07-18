@@ -2,20 +2,19 @@ import {
   CardTemplateTypeTable,
   CompanyActivityTable,
   db,
-  getLabels,
+  getLocalizationMessagesByLocaleAndTarget,
 } from '@azzapp/data';
+import { DEFAULT_LOCALE, ENTITY_TARGET } from '@azzapp/i18n';
 import WebCardCategoryForm from '../WebCardCategoryForm';
 
 const NewWebCardCategoryPage = async () => {
   const companyActivities = await db.select().from(CompanyActivityTable);
   const cardTemplateTypes = await db.select().from(CardTemplateTypeTable);
 
-  const labels = await getLabels(
-    cardTemplateTypes
-      .map(({ labelKey }) => labelKey)
-      .concat(companyActivities.map(({ labelKey }) => labelKey)),
+  const labels = await getLocalizationMessagesByLocaleAndTarget(
+    DEFAULT_LOCALE,
+    ENTITY_TARGET,
   );
-
   return (
     <WebCardCategoryForm
       companyActivities={companyActivities}

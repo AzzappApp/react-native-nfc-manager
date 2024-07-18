@@ -1,6 +1,11 @@
 import { Box, TextField, Typography } from '@mui/material';
 import { asc, desc, eq, like, or, sql, and } from 'drizzle-orm';
-import { LabelTable, WebCardCategoryTable, db } from '@azzapp/data';
+import {
+  LocalizationMessageTable,
+  WebCardCategoryTable,
+  db,
+} from '@azzapp/data';
+import { DEFAULT_LOCALE, ENTITY_TARGET } from '@azzapp/i18n';
 import WebCardCategoriesList from './WebCardCategoriesList';
 import type { SQLWrapper } from 'drizzle-orm';
 
@@ -13,7 +18,7 @@ export type WebCardCategoryItem = {
 };
 
 const sortsColumns = {
-  label: LabelTable.baseLabelValue,
+  label: LocalizationMessageTable.value,
   webCardKind: WebCardCategoryTable.webCardKind,
   order: WebCardCategoryTable.order,
   enabled: WebCardCategoryTable.enabled,
@@ -35,7 +40,7 @@ const getFilters = (filters: Filters): SQLWrapper[] => {
 const getSearch = (search: string | null) => {
   if (search) {
     return or(
-      like(LabelTable.baseLabelValue, `%${search}%`),
+      like(LocalizationMessageTable.value, `%${search}%`),
       like(WebCardCategoryTable.webCardKind, `%${search}%`),
       like(WebCardCategoryTable.order, `%${search}%`),
     );
@@ -46,15 +51,19 @@ const getQuery = (search: string | null, filters: Filters) => {
   const query = db
     .select({
       id: WebCardCategoryTable.id,
-      label: LabelTable.baseLabelValue,
+      label: LocalizationMessageTable.value,
       webCardKind: WebCardCategoryTable.webCardKind,
       order: WebCardCategoryTable.order,
       enabled: WebCardCategoryTable.enabled,
     })
     .from(WebCardCategoryTable)
     .leftJoin(
-      LabelTable,
-      eq(WebCardCategoryTable.labelKey, LabelTable.labelKey),
+      LocalizationMessageTable,
+      and(
+        eq(WebCardCategoryTable.id, LocalizationMessageTable.key),
+        eq(LocalizationMessageTable.target, ENTITY_TARGET),
+        eq(LocalizationMessageTable.locale, DEFAULT_LOCALE),
+      ),
     )
     .orderBy(asc(WebCardCategoryTable.order))
     .where(and(getSearch(search), ...getFilters(filters)))

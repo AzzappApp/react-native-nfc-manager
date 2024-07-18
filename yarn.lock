@@ -227,7 +227,7 @@ __metadata:
     "@emotion/cache": latest
     "@emotion/react": latest
     "@emotion/styled": latest
-    "@lokalise/node-api": ^12.5.0
+    "@formatjs/icu-messageformat-parser": ^2.7.8
     "@mui/icons-material": latest
     "@mui/material": latest
     "@mui/x-data-grid": latest
@@ -244,6 +244,7 @@ __metadata:
     next: ^14.2.3
     react: ^18.3.1
     react-dom: ^18.3.1
+    react-virtuoso: ^4.7.12
     use-debounce: ^10.0.1
     zod: ^3.23.8
   languageName: unknown
@@ -5645,7 +5646,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@formatjs/icu-messageformat-parser@npm:2.7.8":
+"@formatjs/icu-messageformat-parser@npm:2.7.8, @formatjs/icu-messageformat-parser@npm:^2.7.8":
   version: 2.7.8
   resolution: "@formatjs/icu-messageformat-parser@npm:2.7.8"
   dependencies:
@@ -7445,13 +7446,6 @@ __metadata:
   version: 1.1.4
   resolution: "@kamilkisiela/fast-url-parser@npm:1.1.4"
   checksum: 921d305eff1fce5c7c669aee5cfe39e50109968addb496c23f0a42253d030e3cd5865eb01b13245915923bee452db75ba8a8254e69b0d0575d3c168efce7091e
-  languageName: node
-  linkType: hard
-
-"@lokalise/node-api@npm:^12.5.0":
-  version: 12.5.0
-  resolution: "@lokalise/node-api@npm:12.5.0"
-  checksum: 2465a5041b43c573ae0c85254fce3590ed8d80d8b7d1f6c3a05e5ff4d9a27b4a1371e1c8cb330fe737cee28a17763cf0e0aa9fa690dd4a68cc0bbf52ac1feae2
   languageName: node
   linkType: hard
 
@@ -21903,6 +21897,16 @@ __metadata:
     react: ">=16.6.0"
     react-dom: ">=16.6.0"
   checksum: 75602840106aa9c6545149d6d7ae1502fb7b7abadcce70a6954c4b64a438ff1cd16fc77a0a1e5197cdd72da398f39eb929ea06f9005c45b132ed34e056ebdeb1
+  languageName: node
+  linkType: hard
+
+"react-virtuoso@npm:^4.7.12":
+  version: 4.7.12
+  resolution: "react-virtuoso@npm:4.7.12"
+  peerDependencies:
+    react: ">=16 || >=17 || >= 18"
+    react-dom: ">=16 || >=17 || >= 18"
+  checksum: 8fe4a5c2ec8629586a3a9afa93cf607e62cbb5b1c16283873991bbc31fea14eec131c2fc63cfe4b04f2588366e9cbc38179f6d698fce5581f3c71aefc6cdbad5
   languageName: node
   linkType: hard
 

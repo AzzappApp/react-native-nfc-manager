@@ -2,21 +2,16 @@
 import { revalidatePath } from 'next/cache';
 import {
   createCompanyActivitiesType,
-  createLabel,
   db,
-  updateCompanyActivityType,
-  type CompanyActivityType,
-  type NewCompanyActivityType,
+  saveLocalizationMessage,
 } from '@azzapp/data';
-import { saveLabelKey } from '#helpers/lokaliseHelpers';
+import { DEFAULT_LOCALE, ENTITY_TARGET } from '@azzapp/i18n';
 import { companyActivitiesTypeSchema } from './companyActivitiesTypeSchema';
 
-export const saveCompanyActivitiesType = async (
-  data: { cardTemplateType?: { id: string } } & (
-    | CompanyActivityType
-    | NewCompanyActivityType
-  ),
-): Promise<{
+export const saveCompanyActivitiesType = async (data: {
+  id?: string;
+  label: string;
+}): Promise<{
   success: boolean;
   formErrors?: any;
   message?: string;
@@ -38,49 +33,20 @@ export const saveCompanyActivitiesType = async (
       let companyActivityTypesId;
 
       if (data.id) {
-        await updateCompanyActivityType(
-          data.id,
-          {
-            labelKey: validation.data.labelKey,
-          },
-          trx,
-        );
-
-        await createLabel(
-          {
-            labelKey: validation.data.labelKey,
-            baseLabelValue: validation.data.baseLabelValue,
-            translations: {},
-          },
-          trx,
-        );
-
         companyActivityTypesId = data.id;
       } else {
-        const id = await createCompanyActivitiesType(
-          {
-            labelKey: data.labelKey,
-          },
-          trx,
-        );
-
-        await createLabel(
-          {
-            labelKey: validation.data.labelKey,
-            baseLabelValue: validation.data.baseLabelValue,
-            translations: {},
-          },
-          trx,
-        );
-
+        const id = await createCompanyActivitiesType(trx);
         companyActivityTypesId = id;
       }
-
-      await saveLabelKey({
-        labelKey: validation.data.labelKey,
-        baseLabelValue: validation.data.baseLabelValue,
-      });
-
+      await saveLocalizationMessage(
+        {
+          key: companyActivityTypesId,
+          value: validation.data.label,
+          locale: DEFAULT_LOCALE,
+          target: ENTITY_TARGET,
+        },
+        trx,
+      );
       return companyActivityTypesId;
     });
     revalidatePath(`/companyActivitiesTypes/[id]`);

@@ -1,12 +1,13 @@
 import { Box, TextField, Typography } from '@mui/material';
 import { and, asc, desc, eq, like, or, sql } from 'drizzle-orm';
+import { alias } from 'drizzle-orm/mysql-core';
 import {
   CardTemplateTable,
   CardTemplateTypeTable,
-  LabelTable,
-  WebCardCategoryTable,
+  LocalizationMessageTable,
   db,
 } from '@azzapp/data';
+import { DEFAULT_LOCALE, ENTITY_TARGET } from '@azzapp/i18n';
 import CardTemplateTypesList from './CardTemplateTypesList';
 
 export type CardTemplateTypeItem = {
@@ -23,6 +24,21 @@ export type Filters = {
   status?: Status | 'All';
 };
 
+const WebCardCategoryLocalizationMessage = alias(
+  LocalizationMessageTable,
+  'WebCardCategoryLocalizationMessage',
+);
+
+const getSearch = (search: string | null) => {
+  if (search) {
+    return or(
+      like(LocalizationMessageTable.value, `%${search}%`),
+      like(WebCardCategoryLocalizationMessage.value, `%${search}%`),
+    );
+  }
+  return undefined;
+};
+
 const getFilters = (filters: Filters) => {
   const f = [];
   if (filters.status && filters.status !== 'All') {
@@ -32,19 +48,10 @@ const getFilters = (filters: Filters) => {
   return f;
 };
 
-const getSearch = (search: string | null) => {
-  if (search) {
-    return or(
-      like(LabelTable.baseLabelValue, `%${search}%`),
-      like(WebCardCategoryTable.labelKey, `%${search}%`),
-    );
-  }
-};
-
 export type SortColumn = 'category' | 'label';
 
 const sortsColumns = {
-  label: LabelTable.baseLabelValue,
+  label: LocalizationMessageTable.value,
   category: sql`category`,
   status: CardTemplateTypeTable.enabled,
   templates: sql`templates`,
@@ -54,8 +61,8 @@ const getQuery = (search: string | null, filters: Filters) => {
   const query = db
     .select({
       id: CardTemplateTypeTable.id,
-      label: LabelTable.baseLabelValue,
-      category: sql`${WebCardCategoryTable.labelKey}`
+      label: LocalizationMessageTable.value,
+      category: sql`${WebCardCategoryLocalizationMessage.value}`
         .mapWith(String)
         .as('category'),
       status: CardTemplateTypeTable.enabled,
@@ -63,18 +70,34 @@ const getQuery = (search: string | null, filters: Filters) => {
     })
     .from(CardTemplateTypeTable)
     .leftJoin(
-      LabelTable,
-      eq(CardTemplateTypeTable.labelKey, LabelTable.labelKey),
+      LocalizationMessageTable,
+      and(
+        eq(CardTemplateTypeTable.id, LocalizationMessageTable.key),
+        eq(LocalizationMessageTable.target, ENTITY_TARGET),
+        eq(LocalizationMessageTable.locale, DEFAULT_LOCALE),
+      ),
     )
     .leftJoin(
-      WebCardCategoryTable,
-      eq(CardTemplateTypeTable.webCardCategoryId, WebCardCategoryTable.id),
+      WebCardCategoryLocalizationMessage,
+      and(
+        eq(
+          CardTemplateTypeTable.webCardCategoryId,
+          WebCardCategoryLocalizationMessage.key,
+        ),
+        eq(WebCardCategoryLocalizationMessage.target, ENTITY_TARGET),
+        eq(WebCardCategoryLocalizationMessage.locale, DEFAULT_LOCALE),
+      ),
     )
     .leftJoin(
       CardTemplateTable,
       eq(CardTemplateTable.cardTemplateTypeId, CardTemplateTypeTable.id),
     )
-    .groupBy(CardTemplateTypeTable.id, WebCardCategoryTable.labelKey)
+    .groupBy(
+      CardTemplateTypeTable.id,
+      LocalizationMessageTable.value,
+      WebCardCategoryLocalizationMessage.value,
+      CardTemplateTypeTable.enabled,
+    )
     .where(and(getSearch(search), ...getFilters(filters)))
     .$dynamic();
 

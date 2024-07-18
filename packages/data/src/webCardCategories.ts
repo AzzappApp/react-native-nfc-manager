@@ -7,7 +7,6 @@ export const WebCardCategoryTable = cols.table('WebCardCategory', {
   id: cols.cuid('id').primaryKey().notNull().$defaultFn(createId),
   webCardKind: cols.enum('webCardKind', ['personal', 'business']).notNull(),
   cardTemplateTypeId: cols.cuid('cardTemplateTypeId'),
-  labelKey: cols.defaultVarchar('labelKey').notNull().default(''),
   medias: cols.json('medias').$type<string[]>().notNull(),
   order: cols.int('order').notNull(),
   enabled: cols.boolean('enabled').default(true).notNull(),

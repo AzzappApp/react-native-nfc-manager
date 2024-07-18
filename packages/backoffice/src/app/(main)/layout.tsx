@@ -20,6 +20,7 @@ import { sql } from 'drizzle-orm';
 import { db, ReportTable } from '@azzapp/data';
 import CollapseListItem from '#components/CollapseListItem';
 import LogoutButton from '#components/LogoutButton';
+import SectionItem from '#components/SectionItem';
 import getCurrentUser from '#helpers/getCurrentUser';
 import backOfficeSections from '../../backOfficeSections';
 
@@ -37,16 +38,20 @@ const MainLayout = async ({ children }: { children: React.ReactNode }) => {
     .from(ReportTable)
     .groupBy(ReportTable.targetId, ReportTable.targetType);
 
-  const sections = backOfficeSections.map(section => ({
-    ...section,
-    subSections: section.subSections.map(subSection => ({
-      ...subSection,
-      badge:
-        subSection.id === 'moderations'
-          ? report.filter(({ status }) => status > 0).length
-          : 0,
-    })),
-  }));
+  const sections = backOfficeSections.map(section =>
+    'subSections' in section
+      ? {
+          ...section,
+          subSections: section.subSections.map(subSection => ({
+            ...subSection,
+            badge:
+              subSection.id === 'moderations'
+                ? report.filter(({ status }) => status > 0).length
+                : 0,
+          })),
+        }
+      : section,
+  );
 
   return (
     <>
@@ -78,15 +83,24 @@ const MainLayout = async ({ children }: { children: React.ReactNode }) => {
       >
         <Divider />
         <List style={{ paddingTop: 40, overflow: 'auto' }}>
-          {sections.map((section, i) => (
-            <CollapseListItem
-              key={section.text}
-              section={section}
-              user={user}
-              Icon={SectionIcons[section.id]}
-              isOpen={i === 0}
-            />
-          ))}
+          {sections.map((section, i) =>
+            'subSections' in section ? (
+              <CollapseListItem
+                key={section.text}
+                section={section}
+                user={user}
+                Icon={SectionIcons[section.id]}
+                isOpen={i === 0}
+              />
+            ) : (
+              <SectionItem
+                key={section.href}
+                href={section.href}
+                text={section.text}
+                Icon={SectionIcons[section.id]}
+              />
+            ),
+          )}
         </List>
         <Divider sx={{ mt: 'auto' }} />
         <List>
@@ -121,4 +135,5 @@ const SectionIcons: Record<string, React.ComponentType> = {
   webcards: PhoneIphone,
   covers: StarsSharp,
   sections: Layers,
+  translations: Layers,
 };

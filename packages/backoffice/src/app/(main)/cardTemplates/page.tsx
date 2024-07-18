@@ -1,18 +1,15 @@
 import { Box, TextField, Typography } from '@mui/material';
-import { eq, like, or, sql, and, asc, desc } from 'drizzle-orm';
-import {
-  CardTemplateTable,
-  CardTemplateTypeTable,
-  LabelTable,
-  db,
-} from '@azzapp/data';
+import { eq, like, sql, and, asc, desc, or } from 'drizzle-orm';
+import { alias } from 'drizzle-orm/mysql-core';
+import { CardTemplateTable, LocalizationMessageTable, db } from '@azzapp/data';
+import { DEFAULT_LOCALE, ENTITY_TARGET } from '@azzapp/i18n';
 import CardTemplatesList from './CardTemplatesList';
 import type { CardModuleTemplate } from '@azzapp/data';
 
 export type CardTemplateItem = {
   id: string;
   label: string | null;
-  type: string;
+  type: string | null;
   modules: CardModuleTemplate[];
   personalEnabled: boolean;
   businessEnabled: boolean;
@@ -24,6 +21,11 @@ export type Filters = {
   personalStatus?: Status | 'All';
   businessStatus?: Status | 'All';
 };
+
+const CardTemplateTypeLocalizationMessage = alias(
+  LocalizationMessageTable,
+  'CardTemplateTypeLocalizationMessage',
+);
 
 const getFilters = (filters: Filters) => {
   const f = [];
@@ -40,16 +42,17 @@ const getFilters = (filters: Filters) => {
 const getSearch = (search: string | null) => {
   if (search) {
     return or(
-      like(LabelTable.baseLabelValue, `%${search}%`),
-      like(CardTemplateTypeTable.labelKey, `%${search}%`),
+      like(LocalizationMessageTable.value, `%${search}%`),
+      like(CardTemplateTypeLocalizationMessage.value, `%${search}%`),
     );
   }
+  return undefined;
 };
 
 export type SortColumn = 'label' | 'type';
 
 const sortsColumns = {
-  label: LabelTable.baseLabelValue,
+  label: LocalizationMessageTable.value,
   type: sql`type`,
   personalEnabled: sql`personalEnabled`,
   businessEnabled: sql`businessEnabled`,
@@ -59,18 +62,34 @@ const getQuery = (search: string | null, filters: Filters) => {
   const query = db
     .select({
       id: CardTemplateTable.id,
-      label: LabelTable.baseLabelValue,
-      type: sql`${CardTemplateTypeTable.labelKey}`.mapWith(String).as('type'),
+      label: LocalizationMessageTable.value,
+      type: sql`${CardTemplateTypeLocalizationMessage.value}`
+        .mapWith(String)
+        .as('type'),
       modules: CardTemplateTable.modules,
       personalEnabled: CardTemplateTable.personalEnabled,
       businessEnabled: CardTemplateTable.businessEnabled,
     })
     .from(CardTemplateTable)
-    .innerJoin(
-      CardTemplateTypeTable,
-      eq(CardTemplateTable.cardTemplateTypeId, CardTemplateTypeTable.id),
+    .leftJoin(
+      LocalizationMessageTable,
+      and(
+        eq(CardTemplateTable.id, LocalizationMessageTable.key),
+        eq(LocalizationMessageTable.target, ENTITY_TARGET),
+        eq(LocalizationMessageTable.locale, DEFAULT_LOCALE),
+      ),
     )
-    .leftJoin(LabelTable, eq(CardTemplateTable.labelKey, LabelTable.labelKey))
+    .leftJoin(
+      CardTemplateTypeLocalizationMessage,
+      and(
+        eq(
+          CardTemplateTable.cardTemplateTypeId,
+          CardTemplateTypeLocalizationMessage.key,
+        ),
+        eq(CardTemplateTypeLocalizationMessage.target, ENTITY_TARGET),
+        eq(CardTemplateTypeLocalizationMessage.locale, DEFAULT_LOCALE),
+      ),
+    )
     .where(and(getSearch(search), ...getFilters(filters)))
     .$dynamic();
 

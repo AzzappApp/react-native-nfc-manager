@@ -6,14 +6,12 @@ import type { InferInsertModel, InferSelectModel } from 'drizzle-orm';
 
 export const CompanyActivityTable = cols.table('CompanyActivity', {
   id: cols.cuid('id').notNull().primaryKey().$defaultFn(createId),
-  labelKey: cols.defaultVarchar('labelKey').notNull().default(''),
   cardTemplateTypeId: cols.cuid('cardTemplateTypeId'),
   companyActivityTypeId: cols.cuid('companyActivityTypeId'),
 });
 
 export const CompanyActivityTypeTable = cols.table('CompanyActivityType', {
   id: cols.cuid('id').primaryKey().notNull().$defaultFn(createId),
-  labelKey: cols.defaultVarchar('labelKey').notNull().default(''),
 });
 
 export const WebCardCategoryCompanyActivityTable = cols.table(
@@ -37,9 +35,6 @@ export type CompanyActivityType = InferSelectModel<
   typeof CompanyActivityTypeTable
 >;
 export type NewCompanyActivity = InferInsertModel<typeof CompanyActivityTable>;
-export type NewCompanyActivityType = InferInsertModel<
-  typeof CompanyActivityTypeTable
->;
 
 /**
  * Retrieves a list of all company activities
@@ -135,11 +130,8 @@ export const createCompanyActivity = async (
   return id;
 };
 
-export const createCompanyActivitiesType = async (
-  newCardTemplate: NewCompanyActivityType,
-  tx: DbTransaction = db,
-) => {
+export const createCompanyActivitiesType = async (tx: DbTransaction = db) => {
   const id = createId();
-  await tx.insert(CompanyActivityTypeTable).values({ ...newCardTemplate, id });
+  await tx.insert(CompanyActivityTypeTable).values({ id });
   return id;
 };

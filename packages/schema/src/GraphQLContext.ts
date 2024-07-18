@@ -25,18 +25,18 @@ import {
   db,
   sortEntitiesByIds,
   WebCardTable,
-  getLabels,
   PaymentTable,
   PaymentMeanTable,
   CompanyActivityTypeTable,
   getCardModulesForWebCards,
   activeUserSubscription,
+  getLocalizationMessagesByKeys,
 } from '@azzapp/data';
-import { DEFAULT_LOCALE } from '@azzapp/i18n';
+import { DEFAULT_LOCALE, ENTITY_TARGET } from '@azzapp/i18n';
 import type {
   WebCard,
   CardModule,
-  Label,
+  LocalizationMessage,
   User,
   ProfileStatistic,
   Profile,
@@ -180,7 +180,7 @@ export type Loaders = {
   webCardStatistics: DataLoader<string, WebCardStatistic[]>;
   profileStatistics: DataLoader<string, ProfileStatistic[]>;
   webCardOwners: DataLoader<string, User | null>;
-  labels: DataLoader<string, Label | null>;
+  labels: DataLoader<[string, string], LocalizationMessage | null>;
   cardModuleByWebCardLoader: DataLoader<string, CardModule[]>;
   activeSubscriptionsLoader: DataLoader<string, UserSubscription[]>;
 };
@@ -298,11 +298,34 @@ const webCardOwnerLoader = () =>
     return keys.map(k => profiles.find(p => p.webCardId === k)?.user ?? null);
   }, dataLoadersOptions);
 
-const labelLoader = new DataLoader<string, Label | null>(
+const labelLoader = new DataLoader<
+  [string, string],
+  LocalizationMessage | null
+>(
   async keys => {
-    const labels = await getLabels(keys as string[]);
+    const labelsByLocale = keys.reduce(
+      (acc, [id, locale]) => {
+        if (!acc[locale]) {
+          acc[locale] = [];
+        }
+        acc[locale].push(id);
+        return acc;
+      },
+      {} as Record<string, string[]>,
+    );
+    const labelsWithLocale: Record<string, LocalizationMessage[]> =
+      Object.fromEntries(
+        await Promise.all(
+          Object.entries(labelsByLocale).map(async ([locale, keys]) => [
+            locale,
+            await getLocalizationMessagesByKeys(keys, locale, ENTITY_TARGET),
+          ]),
+        ),
+      );
 
-    return keys.map(k => labels.find(l => l.labelKey === k) ?? null);
+    return keys.map(([key, locale]) => {
+      return labelsWithLocale[locale].find(l => l.key === key) ?? null;
+    });
   },
   {
     ...dataLoadersOptions,

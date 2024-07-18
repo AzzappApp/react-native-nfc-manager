@@ -10,22 +10,22 @@ import {
   db,
   referencesMedias,
   checkMedias,
-  createLabel,
-  LabelTable,
+  LocalizationMessageTable,
+  saveLocalizationMessage,
 } from '@azzapp/data';
+import { DEFAULT_LOCALE, ENTITY_TARGET } from '@azzapp/i18n';
 import { ADMIN } from '#roles';
-import { saveLabelKey } from '#helpers/lokaliseHelpers';
 import { currentUserHasRole } from '#helpers/roleHelpers';
 import { webCardCategorySchema } from './webCardCategorySchema';
 import type {
   NewWebCardCategory,
   WebCardCategory,
   CompanyActivity,
-  Label,
 } from '@azzapp/data';
 
 export const saveWebCardCategory = async (
-  data: Label & {
+  data: {
+    label: string;
     cardTemplateType?: { id: string };
   } & { activities?: Array<string | { id: string }> } & (
       | NewWebCardCategory
@@ -59,7 +59,7 @@ export const saveWebCardCategory = async (
         id,
         activities,
         cardTemplateType,
-        baseLabelValue,
+        label,
         ...webCardCategoryData
       } = data;
 
@@ -79,15 +79,6 @@ export const saveWebCardCategory = async (
             cardTemplateTypeId: data.cardTemplateType?.id ?? null,
           })
           .where(eq(WebCardCategoryTable.id, id));
-
-        await createLabel(
-          {
-            labelKey: data.labelKey,
-            baseLabelValue: data.baseLabelValue,
-            translations: {},
-          },
-          trx,
-        );
       } else {
         webCardCategoryId = createId();
         await trx.insert(WebCardCategoryTable).values({
@@ -95,33 +86,29 @@ export const saveWebCardCategory = async (
           cardTemplateTypeId: data.cardTemplateType?.id ?? null,
           id: webCardCategoryId,
         });
-
-        await createLabel(
-          {
-            labelKey: data.labelKey,
-            baseLabelValue: data.baseLabelValue,
-            translations: {},
-          },
-          trx,
-        );
       }
 
-      await saveLabelKey({
-        labelKey: data.labelKey,
-        baseLabelValue: data.baseLabelValue,
-      });
-
+      await saveLocalizationMessage(
+        {
+          key: webCardCategoryId,
+          value: label,
+          locale: DEFAULT_LOCALE,
+          target: ENTITY_TARGET,
+        },
+        trx,
+      );
       await referencesMedias(webCardCategoryData.medias, previousMedias, trx);
 
       if (activities?.length) {
-        const activitiesToCreate: CompanyActivity[] = [];
+        const activitiesToCreate: Array<CompanyActivity & { label: string }> =
+          [];
         const categoriesToAssociate: string[] = [];
         activities.forEach(async activity => {
           if (typeof activity === 'string') {
             const id = createId();
             activitiesToCreate.push({
               id,
-              labelKey: activity,
+              label: activity,
               cardTemplateTypeId: data.cardTemplateType?.id ?? null,
               companyActivityTypeId: null,
             });
@@ -146,18 +133,12 @@ export const saveWebCardCategory = async (
         if (activitiesToCreate.length) {
           await trx.insert(CompanyActivityTable).values(activitiesToCreate);
           const labels = activitiesToCreate.map(activity => ({
-            labelKey: activity.labelKey,
-            baseLabelValue: activity.labelKey,
-            translations: {},
+            key: activity.id,
+            value: activity.label,
+            locale: DEFAULT_LOCALE,
+            target: ENTITY_TARGET,
           }));
-          await trx.insert(LabelTable).values(labels);
-
-          await saveLabelKey(
-            labels.map(label => ({
-              labelKey: label.labelKey,
-              baseLabelValue: label.baseLabelValue,
-            })),
-          );
+          await trx.insert(LocalizationMessageTable).values(labels);
         }
         if (categoriesToAssociate.length > 0) {
           await trx.insert(WebCardCategoryCompanyActivityTable).values(

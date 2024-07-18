@@ -1,6 +1,7 @@
 import { Box, TextField, Typography } from '@mui/material';
-import { like, or, asc, desc, sql, eq } from 'drizzle-orm';
-import { CardStyleTable, LabelTable, db } from '@azzapp/data';
+import { like, or, asc, desc, sql, eq, and } from 'drizzle-orm';
+import { CardStyleTable, LocalizationMessageTable, db } from '@azzapp/data';
+import { DEFAULT_LOCALE, ENTITY_TARGET } from '@azzapp/i18n';
 import CardStylesList from './CardStylesList';
 
 export type CardStyleItem = {
@@ -12,22 +13,31 @@ export type CardStyleItem = {
 export type SortColumn = 'label';
 
 const sortsColumns = {
-  label: LabelTable.baseLabelValue,
+  label: LocalizationMessageTable.value,
 };
 
 const getCardStylesQuery = (search: string | null) => {
   let query = db
     .select({
       id: CardStyleTable.id,
-      label: LabelTable.baseLabelValue,
+      label: LocalizationMessageTable.value,
       enabled: CardStyleTable.enabled,
     })
     .from(CardStyleTable)
-    .leftJoin(LabelTable, eq(CardStyleTable.labelKey, LabelTable.labelKey))
+    .leftJoin(
+      LocalizationMessageTable,
+      and(
+        eq(CardStyleTable.id, LocalizationMessageTable.key),
+        eq(LocalizationMessageTable.target, ENTITY_TARGET),
+        eq(LocalizationMessageTable.locale, DEFAULT_LOCALE),
+      ),
+    )
     .$dynamic();
 
   if (search) {
-    query = query.where(or(like(LabelTable.baseLabelValue, `%${search}%`)));
+    query = query.where(
+      or(like(LocalizationMessageTable.value, `%${search}%`)),
+    );
   }
 
   return query;

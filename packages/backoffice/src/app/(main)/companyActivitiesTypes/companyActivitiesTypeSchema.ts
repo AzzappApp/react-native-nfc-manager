@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 export const companyActivitiesTypeSchema = z.object({
-  labelKey: z.string().min(1),
+  label: z.string().min(1),
   baseLabelValue: z.string().min(1),
 });
 

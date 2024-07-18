@@ -1,5 +1,9 @@
 import { notFound } from 'next/navigation';
-import { getCoverTemplateTagById, getLabel } from '@azzapp/data';
+import {
+  getCoverTemplateTagById,
+  getLocalizationMessagesByKeys,
+} from '@azzapp/data';
+import { DEFAULT_LOCALE, ENTITY_TARGET } from '@azzapp/i18n';
 import CoverTemplateTagForm from '../CoverTemplateTagsForm';
 
 type CoverTemplateTagPageProps = {
@@ -20,12 +24,15 @@ const CoverTemplateTagPage = async ({
     return notFound();
   }
 
-  const label = await getLabel(coverTemplateTag.labelKey);
-
+  const [message] = await getLocalizationMessagesByKeys(
+    [coverTemplateTag.id],
+    DEFAULT_LOCALE,
+    ENTITY_TARGET,
+  );
   return (
     <CoverTemplateTagForm
       saved={!!searchParams?.saved}
-      label={label}
+      label={message?.value}
       coverTemplateTag={coverTemplateTag}
     />
   );

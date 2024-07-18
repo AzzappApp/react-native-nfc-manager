@@ -147,17 +147,17 @@ const columns: GridColDef[] = [
     flex: 1,
   },
   {
-    field: 'companyActivityTypeLabelKey',
+    field: 'companyActivityTypeLabel',
     headerName: 'Activity Type',
     flex: 1,
   },
   {
-    field: 'webCardCategoryLabelKey',
+    field: 'webCardCategoryLabel',
     headerName: 'Category',
     flex: 1,
   },
   {
-    field: 'cardTemplateTypeLabelKey',
+    field: 'cardTemplateTypeLabel',
     headerName: 'Webcard Template Type',
     flex: 1,
   },

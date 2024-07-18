@@ -1,10 +1,6 @@
 import { asc, like, or, sql, and, desc, eq } from 'drizzle-orm';
-import {
-  CoverTemplateTable,
-  CoverTemplateTypeTable,
-  LabelTable,
-  db,
-} from '@azzapp/data';
+import { CoverTemplateTable, LocalizationMessageTable, db } from '@azzapp/data';
+import { DEFAULT_LOCALE, ENTITY_TARGET } from '@azzapp/i18n';
 import CoverTemplatesList from './CoverTemplatesList';
 import type { SQL } from 'drizzle-orm';
 
@@ -35,7 +31,7 @@ const getSearch = (search: string | null) => {
   if (search) {
     return or(
       like(CoverTemplateTable.name, `%${search}%`),
-      like(LabelTable.baseLabelValue, `%${search}%`),
+      like(LocalizationMessageTable.value, `%${search}%`),
     );
   }
 };
@@ -44,7 +40,7 @@ export type SortColumn = 'name' | 'type';
 
 const sortsColumns = {
   name: CoverTemplateTable.name,
-  type: LabelTable.baseLabelValue,
+  type: LocalizationMessageTable.value,
 };
 
 const getQuery = (search: string | null, filters: Filters) => {
@@ -52,18 +48,18 @@ const getQuery = (search: string | null, filters: Filters) => {
     .select({
       id: CoverTemplateTable.id,
       name: CoverTemplateTable.name,
-      type: LabelTable.baseLabelValue,
+      type: LocalizationMessageTable.value,
       mediaCount: CoverTemplateTable.mediaCount,
       status: CoverTemplateTable.enabled,
     })
     .from(CoverTemplateTable)
     .innerJoin(
-      CoverTemplateTypeTable,
-      eq(CoverTemplateTypeTable.id, CoverTemplateTable.typeId),
-    )
-    .innerJoin(
-      LabelTable,
-      eq(CoverTemplateTypeTable.labelKey, LabelTable.labelKey),
+      LocalizationMessageTable,
+      and(
+        eq(CoverTemplateTable.typeId, LocalizationMessageTable.key),
+        eq(LocalizationMessageTable.target, ENTITY_TARGET),
+        eq(LocalizationMessageTable.locale, DEFAULT_LOCALE),
+      ),
     )
     .where(and(getSearch(search), ...getFilters(filters)))
     .$dynamic();

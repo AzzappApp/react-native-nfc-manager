@@ -17,16 +17,16 @@ import { useState, useTransition } from 'react';
 import { intParser, useForm } from '#helpers/formHelpers';
 import { saveCoverTemplateType } from './coverTemplateTypesActions';
 import type { WebCardCategoryErrors } from '../webCardCategories/webCardCategorySchema';
-import type { CoverTemplateType, Label } from '@azzapp/data';
+import type { CoverTemplateType } from '@azzapp/data';
 import type { FormEvent } from 'react';
 
 type Props = {
-  label?: Label | null;
+  label?: string;
   coverTemplateType: CoverTemplateType | null;
   saved?: boolean;
 };
 
-type FormValue = CoverTemplateType & Label;
+type FormValue = CoverTemplateType & { label: string };
 
 const CoverTemplateTypeForm = ({
   label,
@@ -47,7 +47,7 @@ const CoverTemplateTypeForm = ({
       coverTemplateType
         ? {
             ...coverTemplateType,
-            baseLabelValue: label?.baseLabelValue,
+            baseLabelValue: label,
           }
         : { enabled: true },
     formErrors?.fieldErrors,
@@ -87,7 +87,7 @@ const CoverTemplateTypeForm = ({
         </Link>
       </Breadcrumbs>
       <Typography variant="h4" component="h1">
-        {coverTemplateType ? label?.baseLabelValue : 'New Cover Template Type'}
+        {coverTemplateType ? label : 'New Cover Template Type'}
       </Typography>
       <Box
         sx={{
@@ -118,23 +118,13 @@ const CoverTemplateTypeForm = ({
         </Box>
         <Box display="flex" flexDirection="row" gap={1}>
           <TextField
-            name="labelKey"
-            label="Label key"
-            disabled={saving || !isCreation}
+            name="label"
+            label="Label (en-US)"
+            disabled={saving}
             required
             fullWidth
-            {...fieldProps('labelKey')}
+            {...fieldProps('label')}
           />
-          <Box display="flex" alignItems="center" gap={2} width="100%">
-            <TextField
-              name="baseLabelValue"
-              label="Label base value"
-              disabled={saving}
-              required
-              fullWidth
-              {...fieldProps('baseLabelValue')}
-            />
-          </Box>
           <Box display="flex" alignItems="center" gap={2} width="100%">
             <TextField
               name="fontSize"

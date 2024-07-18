@@ -3,10 +3,10 @@ import {
   db,
   CardTemplateTypeTable,
   getCompanyActivityById,
-  getLabels,
-  getLabel,
   CompanyActivityTypeTable,
+  getLocalizationMessagesByLocaleAndTarget,
 } from '@azzapp/data';
+import { DEFAULT_LOCALE, ENTITY_TARGET } from '@azzapp/i18n';
 import CompanyActivityForm from '../CompanyActivityForm';
 type CardTemplatePageProps = {
   params: {
@@ -24,30 +24,21 @@ const CardTemplatePage = async (props: CardTemplatePageProps) => {
     .select()
     .from(CompanyActivityTypeTable);
 
-  const labels = await getLabels(
-    cardTemplateTypes
-      .map(type => type.labelKey)
-      .concat(companyActivitiesTypes.map(type => type.labelKey)),
-  );
-
   if (!template) {
     return notFound();
   }
 
-  const label = await getLabel(template.labelKey);
+  const labels = await getLocalizationMessagesByLocaleAndTarget(
+    DEFAULT_LOCALE,
+    ENTITY_TARGET,
+  );
 
   return (
     <CompanyActivityForm
       companyActivity={template}
       cardTemplateTypes={cardTemplateTypes}
-      cardTemplateTypesLabels={labels.filter(label =>
-        cardTemplateTypes.some(type => type.labelKey === label.labelKey),
-      )}
-      companyActivityTypesLabels={labels.filter(label =>
-        companyActivitiesTypes.some(type => type.labelKey === label.labelKey),
-      )}
       companyActivitiesTypes={companyActivitiesTypes}
-      label={label}
+      labels={labels}
     />
   );
 };

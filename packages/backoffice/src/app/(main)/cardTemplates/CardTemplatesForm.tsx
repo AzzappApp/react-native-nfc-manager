@@ -20,7 +20,7 @@ import {
   Link,
 } from '@mui/material';
 import { omit } from 'lodash';
-import { useState, useTransition } from 'react';
+import { useMemo, useState, useTransition } from 'react';
 import { uploadMedia } from '@azzapp/shared/WebAPI';
 import { getSignedUpload } from '#app/mediaActions';
 import MediaInput from '#components/MediaInput';
@@ -35,25 +35,22 @@ import type {
   CardStyle,
   CardTemplate,
   CardTemplateType,
-  Label,
+  LocalizationMessage,
 } from '@azzapp/data';
 
 type CoverTemplateFormProps = {
   cardTemplate?: CardTemplate;
   cardTemplateTypes: CardTemplateType[];
   cardStyles: CardStyle[];
-  label?: Label | null;
-  labels: Label[];
+  labels: LocalizationMessage[];
 };
 
 const CardTemplateForm = ({
   cardStyles,
   cardTemplate,
   cardTemplateTypes,
-  label,
   labels,
 }: CoverTemplateFormProps) => {
-  const isCreation = !cardTemplate;
   const [saving, startSaving] = useTransition();
 
   const [webCardUserName, setWebCardUserName] = useState<string | null>(null);
@@ -69,12 +66,20 @@ const CardTemplateForm = ({
     previewMediaId: File | string | null;
     cardTemplateType: CardTemplateType | undefined;
   };
+
+  const label = useMemo(
+    () =>
+      cardTemplate
+        ? labels.find(label => label.key === cardTemplate?.id)?.value
+        : '',
+    [cardTemplate, labels],
+  );
+
   const { data, setData, fieldProps } = useForm<Data>(
     () => {
       if (cardTemplate) {
         return {
-          labelKey: label?.labelKey ?? '',
-          baseLabelValue: label?.baseLabelValue ?? '',
+          label,
           cardStyle: cardTemplate.cardStyleId!,
           modules: cardTemplate.modules,
           businessEnabled: cardTemplate.businessEnabled,
@@ -167,8 +172,7 @@ const CardTemplateForm = ({
   };
 
   const fields = {
-    labelKey: fieldProps('labelKey'),
-    baseLabelValue: fieldProps('baseLabelValue'),
+    label: fieldProps('label'),
     cardStyle: fieldProps('cardStyle'),
     businessEnabled: fieldProps('businessEnabled'),
     personalEnabled: fieldProps('personalEnabled'),
@@ -188,7 +192,7 @@ const CardTemplateForm = ({
         </Link>
       </Breadcrumbs>
       <Typography variant="h4" component="h1" sx={{ mb: 2 }}>
-        {cardTemplate ? label?.baseLabelValue : 'New CardTemplate'}
+        {cardTemplate ? label : 'New CardTemplate'}
       </Typography>
       <Box
         sx={{
@@ -283,19 +287,12 @@ const CardTemplateForm = ({
         </Typography>
         <Box display="flex" gap={2} flexWrap="wrap">
           <TextField
-            name="labelKey"
-            label="Label key"
-            disabled={saving || !isCreation}
+            name="label"
+            label="Label (en-US)"
+            disabled={saving}
             required
             sx={{ width: 250 }}
-            {...fields.labelKey}
-          />
-          <TextField
-            name="baseLabelValue"
-            label="Label default value"
-            required
-            sx={{ width: 250 }}
-            {...fields.baseLabelValue}
+            {...fields.label}
           />
           <TypeListInput
             label="Webcard template type"
@@ -330,8 +327,7 @@ const CardTemplateForm = ({
             >
               {cardStyles.map(cardStyle => (
                 <MenuItem key={cardStyle.id} value={cardStyle.id}>
-                  {labels.find(label => label.labelKey === cardStyle.labelKey)
-                    ?.baseLabelValue ?? cardStyle.labelKey}
+                  {labels.find(label => label.key === cardStyle.id)?.value}
                 </MenuItem>
               ))}
             </Select>

@@ -25,8 +25,8 @@ import {
   Paper,
 } from '@mui/material';
 import { uniqBy } from 'lodash';
-import { useRef, useState } from 'react';
-import type { CompanyActivity, Label } from '@azzapp/data';
+import { useMemo, useRef, useState } from 'react';
+import type { CompanyActivity, LocalizationMessage } from '@azzapp/data';
 import type { DragStartEvent, DragEndEvent } from '@dnd-kit/core';
 import type { BoxProps } from '@mui/material';
 
@@ -38,7 +38,7 @@ type ActivityListInputProps = Omit<BoxProps, 'onChange'> & {
   error?: boolean | null;
   helperText?: string | null;
   onChange: (value: Array<CompanyActivity | string>) => void;
-  activityLabels: Label[];
+  activityLabels: LocalizationMessage[];
 };
 
 const ActivityListInput = ({
@@ -103,6 +103,18 @@ const ActivityListInput = ({
     setActiveItem(null);
   }
 
+  const labelsMap = useMemo(
+    () =>
+      activityLabels.reduce(
+        (acc, label) => {
+          acc[label.key] = label.value;
+          return acc;
+        },
+        {} as Record<string, string>,
+      ),
+    [activityLabels],
+  );
+
   return (
     <Box {...props}>
       <Typography variant="h6">{label}</Typography>
@@ -111,7 +123,9 @@ const ActivityListInput = ({
         value={autoCompleteValue}
         options={options as Array<CompanyActivity | string>}
         getOptionLabel={option =>
-          typeof option === 'string' ? option : option.labelKey
+          typeof option === 'string'
+            ? option
+            : labelsMap[option.id] ?? option.id
         }
         renderInput={params => (
           <TextField {...params} inputRef={inputRef} label="Add an activity" />
@@ -119,7 +133,8 @@ const ActivityListInput = ({
         sx={{ width: 300, paddingBottom: 2 }}
         renderOption={(props, option) => {
           const id = typeof option === 'string' ? option : option.id;
-          const label = typeof option === 'string' ? option : option.labelKey;
+          const label =
+            typeof option === 'string' ? option : labelsMap[id] ?? id;
           return (
             <li {...props} key={id}>
               {label}
@@ -133,7 +148,7 @@ const ActivityListInput = ({
           // Suggest the creation of a new value
           const isExisting = options.some(
             option =>
-              typeof option === 'object' && inputValue === option.labelKey,
+              typeof option === 'object' && inputValue === labelsMap[option.id],
           );
           if (inputValue !== '' && !isExisting) {
             filtered.push(`${ADD_ACTIVITY_PREFIX}${inputValue}`);
@@ -169,7 +184,7 @@ const ActivityListInput = ({
                 key={getItemID(item)}
                 item={item}
                 onDelete={handleDelete}
-                activityLabels={activityLabels}
+                labelsMap={labelsMap}
               />
             ))}
           </SortableContext>
@@ -179,7 +194,7 @@ const ActivityListInput = ({
                 id={getItemID(activeItem)}
                 item={activeItem}
                 onDelete={handleDelete}
-                activityLabels={activityLabels}
+                labelsMap={labelsMap}
               />
             )}
           </DragOverlay>
@@ -195,14 +210,14 @@ type SortableItemProps = {
   id: string;
   item: CompanyActivity | string;
   onDelete?: (item: CompanyActivity | string) => void;
-  activityLabels: Label[];
+  labelsMap: Record<string, string>;
 };
 
 export const SortableItem: React.FC<SortableItemProps> = ({
   id,
   item,
   onDelete,
-  activityLabels,
+  labelsMap,
 }) => {
   const { attributes, listeners, setNodeRef, transform, transition } =
     useSortable({ id });
@@ -244,10 +259,7 @@ export const SortableItem: React.FC<SortableItemProps> = ({
       </Box>
 
       <Typography variant="body1" sx={{ flex: 1 }}>
-        {typeof item === 'string'
-          ? item
-          : activityLabels.find(a => a.labelKey === item.labelKey)
-              ?.baseLabelValue ?? item.labelKey}
+        {typeof item === 'string' ? item : labelsMap[item.id] ?? item.id}
       </Typography>
       <IconButton
         onClick={() => onDelete?.(item)}

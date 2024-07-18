@@ -1,5 +1,9 @@
 import { notFound } from 'next/navigation';
-import { getLabel, getCompanyActivityTypeById } from '@azzapp/data';
+import {
+  getCompanyActivityTypeById,
+  getLocalizationMessagesByKeys,
+} from '@azzapp/data';
+import { DEFAULT_LOCALE, ENTITY_TARGET } from '@azzapp/i18n';
 import CompanyActivitiesTypeForm from '../CompanyActivitiesTypeForm';
 type CompanyActivitiesTypePageProps = {
   params: {
@@ -16,12 +20,16 @@ const CardTemplatePage = async (props: CompanyActivitiesTypePageProps) => {
     return notFound();
   }
 
-  const label = await getLabel(companyActivitiesType.labelKey);
+  const [message] = await getLocalizationMessagesByKeys(
+    [companyActivitiesType.id],
+    DEFAULT_LOCALE,
+    ENTITY_TARGET,
+  );
 
   return (
     <CompanyActivitiesTypeForm
       companyActivitiesType={companyActivitiesType}
-      label={label}
+      label={message?.value}
     />
   );
 };

@@ -53,7 +53,7 @@ const CardTemplatesList = ({
   const router = useRouter();
   const [loading, startTransition] = useTransition();
   const [currentSearch, setCurrentSearch] = useState(search ?? '');
-  const defferedSearch = useDeferredValue(currentSearch);
+  const deferredSearch = useDeferredValue(currentSearch);
   const [personalStatusFilter, setPersonalStatusFilter] = useState(
     filters?.personalStatus || 'All',
   );
@@ -99,7 +99,7 @@ const CardTemplatesList = ({
     (model: GridSortModel) => {
       updateSearchParams(
         page,
-        model[0]?.field ?? 'labelKey',
+        model[0]?.field ?? 'label',
         model[0]?.sort ?? 'asc',
         search,
         {
@@ -118,16 +118,16 @@ const CardTemplatesList = ({
   );
 
   useEffect(() => {
-    if (search === defferedSearch) {
+    if (search === deferredSearch) {
       return;
     }
-    updateSearchParams(1, sortField, sortOrder, defferedSearch, {
+    updateSearchParams(1, sortField, sortOrder, deferredSearch, {
       businessStatus: businessStatusFilter,
       personalStatus: personalStatusFilter,
     });
   }, [
     businessStatusFilter,
-    defferedSearch,
+    deferredSearch,
     page,
     personalStatusFilter,
     search,

@@ -1,5 +1,6 @@
 import { notFound } from 'next/navigation';
-import { getCardStyleById, getLabel } from '@azzapp/data';
+import { getCardStyleById, getLocalizationMessagesByKeys } from '@azzapp/data';
+import { DEFAULT_LOCALE, ENTITY_TARGET } from '@azzapp/i18n';
 import CardStyleForm from '../CardStyleForm';
 
 type CardStylePageProps = {
@@ -20,13 +21,17 @@ const CardStylePage = async ({
   if (!cardStyle) {
     return notFound();
   }
-  const label = await getLabel(cardStyle.labelKey);
+  const [label] = await getLocalizationMessagesByKeys(
+    [id],
+    DEFAULT_LOCALE,
+    ENTITY_TARGET,
+  );
 
   return (
     <CardStyleForm
       cardStyle={cardStyle}
       saved={!!searchParams?.saved}
-      label={label}
+      label={label?.value}
     />
   );
 };

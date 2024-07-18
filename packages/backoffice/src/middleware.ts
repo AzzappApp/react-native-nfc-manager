@@ -30,8 +30,12 @@ export async function middleware(request: NextRequest) {
     return destroySession(redirectToLogin(nextUrl));
   }
   const section = backOfficeSections
-    .reduce((acc, { subSections }) => {
-      return [...acc, ...subSections];
+    .reduce((acc, section) => {
+      if ('subSections' in section) {
+        return [...acc, ...section.subSections];
+      } else {
+        return [...acc, section];
+      }
     }, [] as SubSection[])
     .find(section => nextUrl.pathname.startsWith(section.href));
 

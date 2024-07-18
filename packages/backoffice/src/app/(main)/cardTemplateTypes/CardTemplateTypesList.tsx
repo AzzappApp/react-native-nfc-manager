@@ -86,7 +86,7 @@ const CardTemplateTypesList = ({
     (model: GridSortModel) => {
       updateSearchParams(
         page,
-        model[0]?.field ?? 'labelKey',
+        model[0]?.field ?? 'label',
         model[0]?.sort ?? 'asc',
         search,
         {

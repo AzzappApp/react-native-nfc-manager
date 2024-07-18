@@ -1,4 +1,4 @@
-import { ADMIN } from '#roles';
+import { ADMIN, TRANSLATOR } from '#roles';
 
 export type SubSection = {
   id: string;
@@ -14,7 +14,7 @@ export type Section = {
   subSections: SubSection[];
 };
 
-const backOfficeSections: Section[] = [
+const backOfficeSections: Array<Section | SubSection> = [
   {
     id: 'userActivity',
     text: 'Users activity',
@@ -136,6 +136,12 @@ const backOfficeSections: Section[] = [
         roles: [ADMIN],
       },
     ],
+  },
+  {
+    id: 'translations',
+    text: 'Translations',
+    href: '/translations',
+    roles: [ADMIN, TRANSLATOR],
   },
 ];
 

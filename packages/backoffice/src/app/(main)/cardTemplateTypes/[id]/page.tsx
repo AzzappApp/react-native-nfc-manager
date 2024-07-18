@@ -1,10 +1,10 @@
 import {
   db,
   getCardTemplateTypeById,
-  getLabel,
-  getLabels,
+  getLocalizationMessagesByLocaleAndTarget,
   WebCardCategoryTable,
 } from '@azzapp/data';
+import { DEFAULT_LOCALE, ENTITY_TARGET } from '@azzapp/i18n';
 import CardTemplateTypesForm from '../CardTemplateTypesForm';
 type CardTemplatePageProps = {
   params: {
@@ -18,18 +18,16 @@ const CardTemplatePage = async (props: CardTemplatePageProps) => {
   const template = await getCardTemplateTypeById(params.id);
   const webCardCategories = await db.select().from(WebCardCategoryTable);
 
-  const webCardCategoriesLabels = await getLabels(
-    webCardCategories.map(webCardCategory => webCardCategory.labelKey),
+  const labels = await getLocalizationMessagesByLocaleAndTarget(
+    DEFAULT_LOCALE,
+    ENTITY_TARGET,
   );
-
-  const label = await getLabel(template.labelKey);
 
   return (
     <CardTemplateTypesForm
       cardTemplateType={template}
-      label={label}
       webCardCategories={webCardCategories}
-      webCardCategoriesLabels={webCardCategoriesLabels}
+      labels={labels}
     />
   );
 };

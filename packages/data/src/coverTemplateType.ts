@@ -11,7 +11,6 @@ import type {
 
 export const CoverTemplateTypeTable = cols.table('CoverTemplateType', {
   id: cols.cuid('id').notNull().primaryKey().$defaultFn(createId),
-  labelKey: cols.defaultVarchar('labelKey').notNull().default(''),
   order: cols.int('order').notNull().default(0),
   enabled: cols.boolean('enabled').default(true).notNull(),
 });
@@ -59,7 +58,6 @@ export const getFilterCoverTemplateTypes = async (
   const query = db
     .selectDistinct({
       id: CoverTemplateTypeTable.id,
-      labelKey: CoverTemplateTypeTable.labelKey,
       order: CoverTemplateTypeTable.order,
       enabled: CoverTemplateTypeTable.enabled,
     })

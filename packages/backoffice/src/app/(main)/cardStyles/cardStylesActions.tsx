@@ -3,17 +3,19 @@
 import { revalidatePath } from 'next/cache';
 import {
   createCardStyle,
-  createLabel,
+  saveLocalizationMessage,
   db,
   updateCardStyle,
 } from '@azzapp/data';
+import { DEFAULT_LOCALE, ENTITY_TARGET } from '@azzapp/i18n';
 import { ADMIN } from '#roles';
-import { saveLabelKey } from '#helpers/lokaliseHelpers';
 import { currentUserHasRole } from '#helpers/roleHelpers';
 import { cardStyleSchema } from './cardStyleSchema';
-import type { CardStyle, Label } from '@azzapp/data';
+import type { CardStyle } from '@azzapp/data';
 
-export const saveCardStyle = async (data: Partial<CardStyle & Label>) => {
+export const saveCardStyle = async (
+  data: Partial<CardStyle & { label: string }>,
+) => {
   if (!(await currentUserHasRole(ADMIN))) {
     throw new Error('Unauthorized');
   }
@@ -24,39 +26,34 @@ export const saveCardStyle = async (data: Partial<CardStyle & Label>) => {
       formErrors: validationResult.error.formErrors,
     } as const;
   }
-  let cardStyleId = data.id;
+  const cardStyleId = data.id;
+  const { label, ...updates } = validationResult.data;
   if (cardStyleId) {
     const id = cardStyleId;
-    const { baseLabelValue, ...updates } = validationResult.data;
     await db.transaction(async trx => {
       await updateCardStyle(id, updates, trx);
-      await createLabel(
-        { labelKey: updates.labelKey, baseLabelValue, translations: {} },
+      await saveLocalizationMessage(
+        {
+          key: id,
+          value: label,
+          locale: DEFAULT_LOCALE,
+          target: ENTITY_TARGET,
+        },
         trx,
       );
-
-      await saveLabelKey({
-        labelKey: validationResult.data.labelKey,
-        baseLabelValue: validationResult.data.baseLabelValue,
-      });
     });
   } else {
     await db.transaction(async trx => {
       const id = await createCardStyle(validationResult.data, trx);
-      await createLabel(
+      await saveLocalizationMessage(
         {
-          labelKey: validationResult.data.labelKey,
-          baseLabelValue: validationResult.data.baseLabelValue,
-          translations: {},
+          key: id,
+          value: label,
+          locale: DEFAULT_LOCALE,
+          target: ENTITY_TARGET,
         },
         trx,
       );
-      cardStyleId = id;
-
-      await saveLabelKey({
-        labelKey: validationResult.data.labelKey,
-        baseLabelValue: validationResult.data.baseLabelValue,
-      });
     });
   }
 

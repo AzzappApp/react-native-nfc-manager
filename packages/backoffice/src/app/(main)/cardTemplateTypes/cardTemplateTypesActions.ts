@@ -1,9 +1,13 @@
 'use server';
 import { eq } from 'drizzle-orm';
 import { revalidatePath } from 'next/cache';
-import { CardTemplateTypeTable, createLabel, db } from '@azzapp/data';
+import {
+  CardTemplateTypeTable,
+  db,
+  saveLocalizationMessage,
+} from '@azzapp/data';
 import { createId } from '@azzapp/data/helpers/createId';
-import { saveLabelKey } from '#helpers/lokaliseHelpers';
+import { DEFAULT_LOCALE, ENTITY_TARGET } from '@azzapp/i18n';
 import { cardTemplateTypeSchema } from './cardTemplateTypeSchema';
 import type {
   CardTemplateType,
@@ -38,24 +42,20 @@ export const saveCardTemplateType = async (
         await db
           .update(CardTemplateTypeTable)
           .set({
-            labelKey: validation.data.labelKey,
             webCardCategoryId: data.webCardCategory.id,
             enabled: data.enabled,
           })
           .where(eq(CardTemplateTypeTable.id, id));
 
-        await createLabel(
+        await saveLocalizationMessage(
           {
-            labelKey: validation.data.labelKey,
-            baseLabelValue: validation.data.baseLabelValue,
-            translations: {},
+            key: id,
+            value: validation.data.label,
+            locale: DEFAULT_LOCALE,
+            target: ENTITY_TARGET,
           },
           trx,
         );
-        await saveLabelKey({
-          labelKey: validation.data.labelKey,
-          baseLabelValue: validation.data.baseLabelValue,
-        });
       });
 
       templateTypeId = data.id;
@@ -64,23 +64,19 @@ export const saveCardTemplateType = async (
       await db.transaction(async trx => {
         await trx.insert(CardTemplateTypeTable).values({
           id: templateTypeId,
-          labelKey: data.labelKey,
           webCardCategoryId: data.webCardCategory.id,
           enabled: data.enabled,
         });
 
-        await createLabel(
+        await saveLocalizationMessage(
           {
-            labelKey: validation.data.labelKey,
-            baseLabelValue: validation.data.baseLabelValue,
-            translations: {},
+            key: templateTypeId,
+            value: validation.data.label,
+            locale: DEFAULT_LOCALE,
+            target: ENTITY_TARGET,
           },
           trx,
         );
-        await saveLabelKey({
-          labelKey: validation.data.labelKey,
-          baseLabelValue: validation.data.baseLabelValue,
-        });
       });
     }
     revalidatePath(`/cardTemplateTypes/[id]`);

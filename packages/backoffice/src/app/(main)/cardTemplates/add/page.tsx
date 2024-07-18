@@ -2,20 +2,18 @@ import {
   CardStyleTable,
   CardTemplateTypeTable,
   db,
-  getLabels,
+  getLocalizationMessagesByLocaleAndTarget,
 } from '@azzapp/data';
+import { DEFAULT_LOCALE, ENTITY_TARGET } from '@azzapp/i18n';
 import CardTemplatesForm from '../CardTemplatesForm';
 
 const NewCardTemplatePage = async () => {
   const cardStyles = await db.select().from(CardStyleTable);
   const cardTemplateTypes = await db.select().from(CardTemplateTypeTable);
 
-  const labels = await getLabels(
-    cardStyles
-      .map(cardStyle => cardStyle.labelKey)
-      .concat(
-        cardTemplateTypes.map(cardTemplateType => cardTemplateType.labelKey),
-      ),
+  const labels = await getLocalizationMessagesByLocaleAndTarget(
+    DEFAULT_LOCALE,
+    ENTITY_TARGET,
   );
 
   return (

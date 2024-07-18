@@ -15,15 +15,15 @@ import { useState } from 'react';
 import { useForm } from '#helpers/formHelpers';
 import { saveCompanyActivitiesType } from './companyActivitiesTypeActions';
 import type { CompanyActivitiesTypeErrors } from './companyActivitiesTypeSchema';
-import type { Label, CompanyActivityType } from '@azzapp/data';
+import type { CompanyActivityType } from '@azzapp/data';
 
 type CompanyActivityTypeFormProps = {
   companyActivitiesType?: CompanyActivityType | null;
   saved?: boolean;
-  label?: Label | null;
+  label?: string;
 };
 
-type FormValue = CompanyActivityType & Label;
+type FormValue = CompanyActivityType & { label: string };
 
 const CompanyActivitiesTypeForm = ({
   companyActivitiesType,
@@ -39,7 +39,7 @@ const CompanyActivitiesTypeForm = ({
 
   const { data, fieldProps } = useForm<FormValue>(
     () => ({
-      ...label,
+      label,
       ...companyActivitiesType,
     }),
     formErrors?.fieldErrors,
@@ -50,7 +50,10 @@ const CompanyActivitiesTypeForm = ({
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsSaving(true);
-    const result = await saveCompanyActivitiesType(data);
+    const result = await saveCompanyActivitiesType({
+      id: companyActivitiesType?.id,
+      label: data.label!,
+    });
     if (result.success) {
       setFormErrors(null);
       if (isCreation) {
@@ -91,7 +94,7 @@ const CompanyActivitiesTypeForm = ({
       </Breadcrumbs>
       <Typography variant="h4" component="h1" sx={{ mb: 2 }}>
         {companyActivitiesType
-          ? `Company activities type ${label?.baseLabelValue}`
+          ? `Company activities type ${label}`
           : 'New Company Activities type'}
       </Typography>
 
@@ -105,19 +108,12 @@ const CompanyActivitiesTypeForm = ({
         }}
       >
         <TextField
-          name="labelKey"
-          label="Label Key"
+          name="label"
+          label="Label (en-US)"
           disabled={saving || !isCreation}
           required
           sx={{ flex: 1, minWidth: 200 }}
-          {...fieldProps('labelKey')}
-        />
-        <TextField
-          name="baseLabelValue"
-          label="Label base value"
-          required
-          sx={{ flex: 1, minWidth: 200 }}
-          {...fieldProps('baseLabelValue')}
+          {...fieldProps('label')}
         />
       </Box>
       <Button

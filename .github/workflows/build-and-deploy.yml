@@ -62,21 +62,17 @@ jobs:
       #
       ############################################
       - name: Pull translations
-        if : github.ref_name == 'staging' || github.ref_name == 'stable'
-        run: yarn i18n:pull ${{ github.ref_name }}
+        run: yarn i18n:pull
         env:
-          LOKALISE_PROJECT_ID: ${{ vars.LOKALISE_PROJECT_ID }}
-          LOKALISE_TOKEN: ${{ secrets.LOKALISE_TOKEN }}
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
 
       - name: Extract translations keys
         run: yarn i18n:extract
 
-      - name: Push translations
-        if : github.ref_name == 'staging' || github.ref_name == 'stable'
-        run: yarn i18n:push ${{ github.ref_name }}
+      - name: Purge translations key that are not used
+        run: yarn i18n:purge
         env:
-          LOKALISE_PROJECT_ID: ${{ vars.LOKALISE_PROJECT_ID }}
-          LOKALISE_TOKEN: ${{ secrets.LOKALISE_TOKEN }}
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
 
       
       ############################################

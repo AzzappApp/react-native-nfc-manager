@@ -1,6 +1,11 @@
 import { Box, TextField, Typography } from '@mui/material';
-import { asc, desc, eq, like, or, sql } from 'drizzle-orm';
-import { CompanyActivityTypeTable, LabelTable, db } from '@azzapp/data';
+import { and, asc, desc, eq, like, or, sql } from 'drizzle-orm';
+import {
+  CompanyActivityTypeTable,
+  LocalizationMessageTable,
+  db,
+} from '@azzapp/data';
+import { DEFAULT_LOCALE, ENTITY_TARGET } from '@azzapp/i18n';
 import CompanyActivitiesTypesList from './CompanyActivitiesTypesList';
 
 export type CompanyActivityTypeItem = {
@@ -9,7 +14,7 @@ export type CompanyActivityTypeItem = {
 };
 
 const sortsColumns = {
-  label: LabelTable.baseLabelValue,
+  label: LocalizationMessageTable.value,
 };
 
 export type SortColumn = keyof typeof sortsColumns;
@@ -18,20 +23,24 @@ const getActivitiesTypesQuery = (search: string | null) => {
   let query = db
     .select({
       id: CompanyActivityTypeTable.id,
-      label: LabelTable.baseLabelValue,
+      label: LocalizationMessageTable.value,
     })
     .from(CompanyActivityTypeTable)
     .leftJoin(
-      LabelTable,
-      eq(CompanyActivityTypeTable.labelKey, LabelTable.labelKey),
+      LocalizationMessageTable,
+      and(
+        eq(CompanyActivityTypeTable.id, LocalizationMessageTable.key),
+        eq(LocalizationMessageTable.target, ENTITY_TARGET),
+        eq(LocalizationMessageTable.locale, DEFAULT_LOCALE),
+      ),
     )
     .$dynamic();
 
   if (search) {
     query = query.where(
       or(
-        like(CompanyActivityTypeTable.labelKey, `%${search}%`),
-        like(LabelTable.baseLabelValue, `%${search}%`),
+        like(LocalizationMessageTable.value, `%${search}%`),
+        like(LocalizationMessageTable.value, `%${search}%`),
       ),
     );
   }

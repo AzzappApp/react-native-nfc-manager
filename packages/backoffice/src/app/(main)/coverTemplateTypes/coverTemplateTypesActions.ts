@@ -3,23 +3,19 @@ import { eq } from 'drizzle-orm';
 import { revalidatePath } from 'next/cache';
 import {
   db,
-  createLabel,
   getCoverTemplateTypeById,
   CoverTemplateTypeTable,
+  saveLocalizationMessage,
 } from '@azzapp/data';
 import { createId } from '@azzapp/data/helpers/createId';
+import { DEFAULT_LOCALE, ENTITY_TARGET } from '@azzapp/i18n';
 import { ADMIN } from '#roles';
-import { saveLabelKey } from '#helpers/lokaliseHelpers';
 import { currentUserHasRole } from '#helpers/roleHelpers';
 import { coverTemplateTypesSchema } from './coverTemplateTypesSchema';
-import type {
-  Label,
-  CoverTemplateType,
-  NewCoverTemplateType,
-} from '@azzapp/data';
+import type { CoverTemplateType, NewCoverTemplateType } from '@azzapp/data';
 
 export const saveCoverTemplateType = async (
-  data: Label & (CoverTemplateType | NewCoverTemplateType),
+  data: { label: string } & (CoverTemplateType | NewCoverTemplateType),
 ): Promise<{
   success: boolean;
   formErrors?: any;
@@ -40,7 +36,7 @@ export const saveCoverTemplateType = async (
 
   try {
     coverTemplateTypeId = await db.transaction(async trx => {
-      const { id, baseLabelValue, ...webCardCategoryData } = data;
+      const { id, label, ...webCardCategoryData } = data;
 
       let coverTemplateTypeId: string;
       if (id) {
@@ -56,36 +52,23 @@ export const saveCoverTemplateType = async (
             ...webCardCategoryData,
           })
           .where(eq(CoverTemplateTypeTable.id, id));
-
-        await createLabel(
-          {
-            labelKey: data.labelKey,
-            baseLabelValue: data.baseLabelValue,
-            translations: {},
-          },
-          trx,
-        );
       } else {
         coverTemplateTypeId = createId();
         await trx.insert(CoverTemplateTypeTable).values({
           ...webCardCategoryData,
           id: coverTemplateTypeId,
         });
-
-        await createLabel(
-          {
-            labelKey: data.labelKey,
-            baseLabelValue: data.baseLabelValue,
-            translations: {},
-          },
-          trx,
-        );
       }
 
-      await saveLabelKey({
-        labelKey: data.labelKey,
-        baseLabelValue: data.baseLabelValue,
-      });
+      await saveLocalizationMessage(
+        {
+          key: coverTemplateTypeId,
+          value: label,
+          locale: DEFAULT_LOCALE,
+          target: ENTITY_TARGET,
+        },
+        trx,
+      );
 
       return coverTemplateTypeId;
     });

@@ -1,27 +1,43 @@
 import { Box, TextField, Typography } from '@mui/material';
-import { asc, desc, eq, like, or, sql } from 'drizzle-orm';
+import { and, asc, desc, eq, like, or, sql } from 'drizzle-orm';
+import { alias } from 'drizzle-orm/mysql-core';
 import {
   CardTemplateTypeTable,
   CompanyActivityTable,
-  CompanyActivityTypeTable,
-  LabelTable,
-  WebCardCategoryTable,
+  LocalizationMessageTable,
   db,
 } from '@azzapp/data';
+import { DEFAULT_LOCALE, ENTITY_TARGET } from '@azzapp/i18n';
 import CompanyActivitiesList from './CompanyActivitiesList';
 
 export type CompanyActivityItem = {
   id: string;
   label: string | null;
-  cardTemplateTypeLabelKey: string;
-  webCardCategoryLabelKey: string;
+  cardTemplateTypeLabel: string | null;
+  webCardCategoryLabel: string | null;
+  companyActivityTypeLabel: string | null;
 };
 
+const CardTemplateTypeMessage = alias(
+  LocalizationMessageTable,
+  'CardTemplateTypeMessage',
+);
+
+const WebCardCategoryMessage = alias(
+  LocalizationMessageTable,
+  'WebCardCategoryMessage',
+);
+
+const CompanyActivityTypeMessage = alias(
+  LocalizationMessageTable,
+  'CompanyActivityTypeMessage',
+);
+
 const sortsColumns = {
-  label: LabelTable.baseLabelValue,
-  cardTemplateTypeLabelKey: CardTemplateTypeTable.labelKey,
-  webCardCategoryLabelKey: WebCardCategoryTable.labelKey,
-  companyActivityTypeLabelKey: CompanyActivityTypeTable.labelKey,
+  label: LocalizationMessageTable.value,
+  cardTemplateTypeLabel: CardTemplateTypeMessage.value,
+  webCardCategoryLabel: WebCardCategoryMessage.value,
+  companyActivityTypeLabel: CompanyActivityTypeMessage.value,
 };
 
 export type SortColumn = keyof typeof sortsColumns;
@@ -30,46 +46,61 @@ const getActivitiesQuery = (search: string | null) => {
   let query = db
     .select({
       id: CompanyActivityTable.id,
-      label: LabelTable.baseLabelValue,
-      cardTemplateTypeLabelKey: sql`${CardTemplateTypeTable.labelKey}`
+      label: LocalizationMessageTable.value,
+      cardTemplateTypeLabel: sql`${CardTemplateTypeMessage.value}`
         .mapWith(String)
-        .as('cardTemplateTypeLabelKey'),
-      webCardCategoryLabelKey: sql`${WebCardCategoryTable.labelKey}`
+        .as('cardTemplateTypeLabel'),
+      webCardCategoryLabel: sql`${WebCardCategoryMessage.value}`
         .mapWith(String)
-        .as('webCardCategoryLabelKey'),
-      companyActivityTypeLabelKey: sql`${CompanyActivityTypeTable.labelKey}`
+        .as('webCardCategoryLabel'),
+      companyActivityTypeLabel: sql`${CompanyActivityTypeMessage.value}`
         .mapWith(String)
-        .as('companyActivityTypeLabelKey'),
+        .as('companyActivityTypeLabel'),
     })
     .from(CompanyActivityTable)
     .leftJoin(
-      CardTemplateTypeTable,
-      eq(CardTemplateTypeTable.id, CompanyActivityTable.cardTemplateTypeId),
+      LocalizationMessageTable,
+      eq(CompanyActivityTable.id, LocalizationMessageTable.key),
     )
     .leftJoin(
-      WebCardCategoryTable,
-      eq(WebCardCategoryTable.id, CardTemplateTypeTable.webCardCategoryId),
-    )
-    .leftJoin(
-      CompanyActivityTypeTable,
-      eq(
-        CompanyActivityTypeTable.id,
-        CompanyActivityTable.companyActivityTypeId,
+      CardTemplateTypeMessage,
+      and(
+        eq(
+          CompanyActivityTable.cardTemplateTypeId,
+          CardTemplateTypeMessage.key,
+        ),
+        eq(CardTemplateTypeMessage.target, ENTITY_TARGET),
+        eq(CardTemplateTypeMessage.locale, DEFAULT_LOCALE),
       ),
     )
     .leftJoin(
-      LabelTable,
-      eq(CompanyActivityTable.labelKey, LabelTable.labelKey),
+      WebCardCategoryMessage,
+      and(
+        eq(CardTemplateTypeTable.webCardCategoryId, WebCardCategoryMessage.key),
+        eq(WebCardCategoryMessage.target, ENTITY_TARGET),
+        eq(WebCardCategoryMessage.locale, DEFAULT_LOCALE),
+      ),
+    )
+    .leftJoin(
+      CompanyActivityTypeMessage,
+      and(
+        eq(
+          CompanyActivityTable.companyActivityTypeId,
+          CompanyActivityTypeMessage.key,
+        ),
+        eq(CompanyActivityTypeMessage.target, ENTITY_TARGET),
+        eq(CompanyActivityTypeMessage.locale, DEFAULT_LOCALE),
+      ),
     )
     .$dynamic();
 
   if (search) {
     query = query.where(
       or(
-        like(LabelTable.baseLabelValue, `%${search}%`),
-        like(CompanyActivityTypeTable.labelKey, `%${search}%`),
-        like(CardTemplateTypeTable.labelKey, `%${search}%`),
-        like(WebCardCategoryTable.labelKey, `%${search}%`),
+        like(LocalizationMessageTable.value, `%${search}%`),
+        like(CompanyActivityTypeMessage.value, `%${search}%`),
+        like(CardTemplateTypeMessage.value, `%${search}%`),
+        like(WebCardCategoryMessage.value, `%${search}%`),
       ),
     );
   }
