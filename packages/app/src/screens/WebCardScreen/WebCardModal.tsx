@@ -239,11 +239,16 @@ const WebCardModal = ({
       } else {
         Toast.show({
           type: 'info',
-          text1: intl.formatMessage({
-            defaultMessage: 'You already reported this webCard',
-            description:
-              'Info toast message when sending report on webCard is already done.',
-          }),
+          text1: intl.formatMessage(
+            {
+              defaultMessage: 'You have already reported this WebCard{azzappA}',
+              description:
+                'Info toast message when sending report on webCard is already done.',
+            },
+            {
+              azzappA: <Text variant="azzapp">a</Text>,
+            },
+          ) as string,
           onHide: close,
         });
       }
@@ -293,10 +298,16 @@ const WebCardModal = ({
       } else {
         Toast.show({
           type: 'error',
-          text1: intl.formatMessage({
-            defaultMessage: "Error, couldn't quit WebCard. Please try again.",
-            description: 'Error toast message when quitting WebCard',
-          }),
+          text1: intl.formatMessage(
+            {
+              defaultMessage:
+                'Oops, quitting this WebCard{azzappA} was not possible. Please try again later.',
+              description: 'Error toast message when quitting WebCard',
+            },
+            {
+              azzappA: <Text variant="azzapp">a</Text>,
+            },
+          ) as string,
         });
       }
     },
@@ -538,8 +549,15 @@ const WebCardModal = ({
               ) : (
                 <Text variant="error">
                   <FormattedMessage
-                    defaultMessage="Report this webCard"
+                    defaultMessage="Report this WebCard{azzappA}"
                     description="Label for the button to report a webCard"
+                    values={{
+                      azzappA: (
+                        <Text variant="azzapp" style={styles.deleteButton}>
+                          a
+                        </Text>
+                      ),
+                    }}
                   />
                 </Text>
               )}

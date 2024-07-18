@@ -214,7 +214,7 @@ const MultiUserAddForm = ({ contacts, control }: MultiUserAddFormProps) => {
         )}
         {field.value === 'admin' && (
           <FormattedMessage
-            defaultMessage="The admin has full control over the WebCard{azzappA}, including the ability to add and remove collaborators. "
+            defaultMessage="An 'admin' has a full control over the shared WebCard{azzappA}, including the ability to publish and unpublish it, to change the WebCard{azzappA} name, and to manage Multi-user collaborators. Also, ‘admin’ can manage payment details. However, an 'admin' cannot deactivate the Multi-user{azzappA} mode or delete the WebCard{azzappA}."
             description="MultiUserDetailModal - admin description"
             values={{
               azzappA: <Text variant="azzapp">a</Text>,

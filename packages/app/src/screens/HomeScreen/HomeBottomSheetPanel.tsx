@@ -82,10 +82,16 @@ const HomeBottomSheetPanel = ({
       console.error(e);
       Toast.show({
         type: 'error',
-        text1: intl.formatMessage({
-          defaultMessage: "Error, couldn't quit WebCard. Please try again.",
-          description: 'Error toast message when quitting WebCard',
-        }),
+        text1: intl.formatMessage(
+          {
+            defaultMessage:
+              'Oops, quitting this WebCard{azzappA} was not possible. Please try again later.',
+            description: 'Error toast message when quitting WebCard',
+          },
+          {
+            azzappA: <Text variant="azzapp">a</Text>,
+          },
+        ) as string,
       });
     },
   );
