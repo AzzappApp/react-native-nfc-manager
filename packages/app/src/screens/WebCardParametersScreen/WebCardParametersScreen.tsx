@@ -308,7 +308,6 @@ const WebCardParametersScreen = ({
           webCardId: webCard.id,
           input: {
             webCardCategoryId: webCardCategory.id,
-            webCardKind: webCardCategory.webCardKind,
             companyActivityId: null,
           },
         },
