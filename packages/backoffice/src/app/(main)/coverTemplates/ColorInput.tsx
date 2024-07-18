@@ -27,6 +27,8 @@ const ColorInput = ({ field, label }: Props) => {
     setBorderColor(color);
     if (color !== 'custom') {
       colorField.change(event.target.value);
+    } else {
+      colorField.change('');
     }
   };
 
