@@ -1,5 +1,6 @@
-## 0.5.19-canary.171
+## 0.5.19-canary.172
 
+* **fix:**  - **CoverEditor:** Invalid Media in template overlay
 * **fix:**  - CoverTEmplate pagination, use self pagnation helper ([#4322](https://github.com/AzzappApp/azzapp/pull/4322))
 * **fix:**  - missing max video message ([#4314](https://github.com/AzzappApp/azzapp/pull/4314))
 * **fix:**  - font and number of covertempalte ([#4312](https://github.com/AzzappApp/azzapp/pull/4312))
