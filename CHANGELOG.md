@@ -1,5 +1,7 @@
-## 0.5.19-canary.172
+## 0.5.19-canary.173
 
+* **fix:**  - **webCard:** [#3371](https://github.com/AzzappApp/azzapp/pull/3371) enhance azzapp premium indicators ([#4319](https://github.com/AzzappApp/azzapp/pull/4319))
+* **build:**  - remove temporary expo-updates ([#4326](https://github.com/AzzappApp/azzapp/pull/4326))
 * **fix:**  - **CoverEditor:** Invalid Media in template overlay
 * **fix:**  - CoverTEmplate pagination, use self pagnation helper ([#4322](https://github.com/AzzappApp/azzapp/pull/4322))
 * **fix:**  - missing max video message ([#4314](https://github.com/AzzappApp/azzapp/pull/4314))
