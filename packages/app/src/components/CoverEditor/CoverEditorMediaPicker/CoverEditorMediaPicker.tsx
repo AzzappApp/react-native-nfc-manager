@@ -379,6 +379,7 @@ const stylesheet = createStyleSheet(appearance => ({
     borderRadius: 12,
     backgroundColor: appearance === 'light' ? colors.grey50 : colors.grey1000,
     overflow: 'visible',
+    ...shadow(appearance, 'center'),
   },
   mediaDeleteIcon: {
     tintColor: appearance === 'light' ? colors.black : colors.grey100,

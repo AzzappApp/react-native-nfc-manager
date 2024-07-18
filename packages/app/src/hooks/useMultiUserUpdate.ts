@@ -28,7 +28,6 @@ export const useMultiUserUpdate = (onCompleted?: () => void) => {
 
   const setAllowMultiUser = useCallback(
     (value: boolean) => {
-      console.log({ value });
       commit({
         variables: {
           webCardId: profileInfos?.webCardId ?? '',
