@@ -102,7 +102,9 @@ const ProfilePage = async ({ params }: ProfilePageProps) => {
     });
 
     firstModuleBackgroundColor = swapColor(
-      firstModuleData.backgroundStyle?.backgroundColor ?? cardColors.light,
+      (firstModuleData.backgroundStyle?.backgroundColor ||
+        firstModuleData.colorTop) ??
+        cardColors.light,
       cardColors,
     );
   }

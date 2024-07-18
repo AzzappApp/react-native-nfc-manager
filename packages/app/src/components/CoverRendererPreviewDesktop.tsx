@@ -43,6 +43,12 @@ const CoverRendererPreviewDesktop = ({
   const moduleData = firstModule?.data
     ? getModuleDataValues({ data: firstModule.data })
     : null;
+  const backgroundStyle =
+    moduleData && 'backgroundStyle' in moduleData
+      ? moduleData?.backgroundStyle
+      : null;
+  const colorTop =
+    moduleData && 'colorTop' in moduleData ? moduleData?.colorTop : null;
 
   return (
     <View {...props} style={[style, styles.wrapper]}>
@@ -71,9 +77,9 @@ const CoverRendererPreviewDesktop = ({
       <LinearGradient
         colors={[
           'transparent',
-          moduleData && 'backgroundStyle' in moduleData
+          backgroundStyle || colorTop
             ? swapColor(
-                moduleData?.backgroundStyle?.backgroundColor ?? '#FFF',
+                (backgroundStyle?.backgroundColor || colorTop) ?? '#FFF',
                 cardColors,
               ) ?? '#FFF'
             : '#FFF',
