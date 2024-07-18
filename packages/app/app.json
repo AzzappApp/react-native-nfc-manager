@@ -10,10 +10,5 @@
   },
   "ios": {
     "bundleIdentifier": "com.azzapp.app"
-  },
-  "updates": {
-    "url": "https://u.expo.dev/6f4f8646-b45c-4cc0-85ae-a5aa04a7bebb",
-    "enabled": true,
-    "checkAutomatically": "ON_LOAD"
   }
 }

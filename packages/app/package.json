@@ -92,7 +92,6 @@
     "expo-linear-gradient": "~13.0.2",
     "expo-sensors": "^13.0.9",
     "expo-status-bar": "^1.12.1",
-    "expo-updates": "~0.25.20",
     "graphql": "^16.9.0",
     "graphql-relay": "^0.10.2",
     "i18n-iso-countries": "^7.11.2",
