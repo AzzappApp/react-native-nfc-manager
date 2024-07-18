@@ -1,5 +1,9 @@
-## 0.5.19-canary.175
+## 0.5.19-canary.176
 
+* **fix:**  - remove useless webCardKink param
+* **fix:**  - chagne iap transfert mode. Insure database row exist. better handle of event case ([#4328](https://github.com/AzzappApp/azzapp/pull/4328))
+* **fix:**  - **Backoffice:** add entity translation ([#4335](https://github.com/AzzappApp/azzapp/pull/4335))
+* **fix:**  - properly set webCard kind with category ([#4337](https://github.com/AzzappApp/azzapp/pull/4337))
 * **fix:**  - **CoverEditor:**  add a delay between apparition of actions button
 * **feat:**  - add shadow around mini image in picker ([#4333](https://github.com/AzzappApp/azzapp/pull/4333))
 * **fix:**  - Role management in translationsActions
