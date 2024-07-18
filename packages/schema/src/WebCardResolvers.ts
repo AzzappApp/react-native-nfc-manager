@@ -15,6 +15,7 @@ import {
   getLastSubscription,
   getFilterCoverTemplateTypes,
   getCoverTemplatesByTypesAndTag,
+  activeUserSubscription,
 } from '@azzapp/data';
 import { webCardRequiresSubscription } from '@azzapp/shared/subscriptionHelpers';
 import {
@@ -89,8 +90,10 @@ export const WebCard: WebCardResolvers = {
   isPremium: async (webCard, _, { loaders }) => {
     const owner = await loaders.webCardOwners.load(webCard.id);
 
+    //cannot use the loader here (when IAP sub), can't find a way to for revalidation in api route.
+    //Got a bug where the subscription is canceled however still active in the result set
     const subscription = owner
-      ? await loaders.activeSubscriptionsLoader.load(owner.id)
+      ? await activeUserSubscription([owner.id])
       : null;
 
     return !!subscription?.length;

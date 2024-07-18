@@ -1,3 +1,4 @@
+import * as Sentry from '@sentry/react-native';
 import { useEffect } from 'react';
 import Purchases from 'react-native-purchases';
 import { commitLocalUpdate } from 'react-relay';
@@ -10,10 +11,20 @@ export const useRevenueCat = () => {
   const { profileInfos } = useAuthState();
 
   useEffect(() => {
-    if (profileInfos?.userId) {
-      Purchases.logIn(profileInfos.userId);
+    async function login() {
+      try {
+        await Purchases.logIn(profileInfos!.userId);
+      } catch (error) {
+        Sentry.captureException(error);
+      }
     }
-  }, [profileInfos]);
+    if (profileInfos?.userId) {
+      login();
+    }
+    return () => {
+      Purchases.logOut();
+    };
+  }, [profileInfos, profileInfos?.userId]);
 
   useEffect(() => {
     const listenerRc = (customerInfo: CustomerInfo) => {

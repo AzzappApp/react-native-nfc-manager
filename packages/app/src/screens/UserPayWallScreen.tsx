@@ -127,7 +127,17 @@ const UserPayWallScreen = ({ route }: NativeScreenProps<UserPayWallRoute>) => {
         //display error message
         setProcessing(false);
         //@ts-expect-error error code is not in the type
-        if (error?.code !== '1') {
+        const errorCode = error?.code;
+        if (errorCode === '6') {
+          //This product is already active for the user
+          return;
+        }
+        if (errorCode === '1') {
+          //purchase was cancelled
+          return;
+        }
+        if (errorCode === '7') {
+          // There is already another active subscriber using the same receipt.
           Alert.alert(
             intl.formatMessage({
               defaultMessage: 'Error during processing payment',
@@ -135,12 +145,25 @@ const UserPayWallScreen = ({ route }: NativeScreenProps<UserPayWallRoute>) => {
             }),
             intl.formatMessage({
               defaultMessage:
-                'There was an error during the payment process, please try again later.',
+                'There is already a subscription from your Apple or Google account associated to another azzapp account. You need to cancel the subscription from the other account to proceed.',
               description: 'Description of the payment process error alert',
             }),
           );
-          Sentry.captureException(error, { data: 'userPayWallScreen' });
+          return;
         }
+
+        Alert.alert(
+          intl.formatMessage({
+            defaultMessage: 'Error during processing payment',
+            description: 'Title of the payment process error alert',
+          }),
+          intl.formatMessage({
+            defaultMessage:
+              'There was an error during the payment process, please try again later.',
+            description: 'Description of the payment process error alert',
+          }),
+        );
+        Sentry.captureException(error, { data: 'userPayWallScreen' });
       }
     }
   }, [

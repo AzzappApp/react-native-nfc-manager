@@ -2,7 +2,6 @@ import { eq, ne, and } from 'drizzle-orm';
 import { NextResponse } from 'next/server';
 import { withAxiom } from 'next-axiom';
 import {
-  activeUserSubscription,
   createSubscription,
   db,
   unpublisheWebCardForUser,
@@ -31,32 +30,63 @@ const subscriptionWebHook = async (req: Request) => {
       id: rcId,
       type,
       store,
+      grace_period_expiration_at_ms,
     },
   } = body;
   switch (type) {
     case 'INITIAL_PURCHASE': {
-      await createSubscription({
-        userId,
-        subscriptionId,
-        startAt: new Date(purchased_at_ms),
-        endAt: new Date(expiration_at_ms),
-        revenueCatId: rcId,
-        issuer:
-          store === 'APP_STORE'
-            ? 'apple'
-            : store === 'PLAY_STORE'
-              ? 'google'
-              : 'web',
-        totalSeats: extractSeatsFromSubscriptionId(subscriptionId),
-        freeSeats: 0,
-        status: 'active',
+      db.transaction(async trx => {
+        const sub = await trx
+          .select()
+          .from(UserSubscriptionTable)
+          .where(
+            and(
+              eq(UserSubscriptionTable.userId, userId),
+              ne(UserSubscriptionTable.issuer, 'web'),
+            ),
+          );
+        if (sub.length === 0) {
+          await createSubscription({
+            userId,
+            subscriptionId,
+            startAt: new Date(purchased_at_ms),
+            endAt: new Date(expiration_at_ms),
+            revenueCatId: rcId,
+            issuer:
+              store === 'APP_STORE'
+                ? 'apple'
+                : store === 'PLAY_STORE'
+                  ? 'google'
+                  : 'web',
+            totalSeats: extractSeatsFromSubscriptionId(subscriptionId),
+            freeSeats: 0,
+            status: 'active',
+          });
+        } else {
+          await updateActiveUserSubscription(userId, {
+            subscriptionId,
+            startAt: new Date(purchased_at_ms),
+            endAt: new Date(expiration_at_ms),
+            revenueCatId: rcId,
+            issuer:
+              store === 'APP_STORE'
+                ? 'apple'
+                : store === 'PLAY_STORE'
+                  ? 'google'
+                  : 'web',
+            totalSeats: extractSeatsFromSubscriptionId(subscriptionId),
+            freeSeats: 0,
+            status: 'active',
+          });
+        }
       });
       break;
     }
     case 'CANCELLATION':
+      // Use it for analytics. The flow will always return a expiration event at the end of the subscription
+      break;
     case 'EXPIRATION':
       db.transaction(async trx => {
-        //with the difference bteween azzapp Profile and ios/adnroid account, it can happen that a renewal is done on another profile if the uer created a new profile, initial purchase does not happen
         const sub = await trx
           .select()
           .from(UserSubscriptionTable)
@@ -86,16 +116,8 @@ const subscriptionWebHook = async (req: Request) => {
         } else {
           await updateActiveUserSubscription(userId, {
             subscriptionId,
-            startAt: new Date(purchased_at_ms),
             endAt: new Date(expiration_at_ms),
             revenueCatId: rcId,
-            issuer:
-              store === 'APP_STORE'
-                ? 'apple'
-                : store === 'PLAY_STORE'
-                  ? 'google'
-                  : 'web',
-            totalSeats: extractSeatsFromSubscriptionId(subscriptionId),
             status: 'canceled',
           });
           await unpublisheWebCardForUser(userId);
@@ -104,9 +126,8 @@ const subscriptionWebHook = async (req: Request) => {
 
       break;
     case 'SUBSCRIPTION_EXTENDED':
-    case 'UNCANCELLATION': //expiration at a expiration_reason if we need it to know the reason
+    case 'UNCANCELLATION':
       db.transaction(async trx => {
-        //with the difference bteween azzapp Profile and ios/adnroid account, it can happen that a renewal is done on another profile if the uer created a new profile, initial purchase does not happen
         const sub = await trx
           .select()
           .from(UserSubscriptionTable)
@@ -139,24 +160,14 @@ const subscriptionWebHook = async (req: Request) => {
             startAt: new Date(purchased_at_ms),
             endAt: new Date(expiration_at_ms),
             revenueCatId: rcId,
-            issuer:
-              store === 'APP_STORE'
-                ? 'apple'
-                : store === 'PLAY_STORE'
-                  ? 'google'
-                  : 'web',
-            totalSeats: extractSeatsFromSubscriptionId(subscriptionId),
             status: 'active',
           });
           await unpublisheWebCardForUser(userId);
         }
       });
-
-      //TODO : cancel multi user and unpublish the contact card
       break;
     case 'RENEWAL':
       db.transaction(async trx => {
-        //with the difference bteween azzapp Profile and ios/adnroid account, it can happen that a renewal is done on another profile if the uer created a new profile, initial purchase does not happen
         const sub = await trx
           .select()
           .from(UserSubscriptionTable)
@@ -185,19 +196,9 @@ const subscriptionWebHook = async (req: Request) => {
           });
         } else {
           await updateActiveUserSubscription(userId, {
-            userId,
-            subscriptionId,
             startAt: new Date(purchased_at_ms),
             endAt: new Date(expiration_at_ms),
             revenueCatId: rcId,
-            issuer:
-              store === 'APP_STORE'
-                ? 'apple'
-                : store === 'PLAY_STORE'
-                  ? 'google'
-                  : 'web',
-            totalSeats: extractSeatsFromSubscriptionId(subscriptionId),
-            freeSeats: 0,
             status: 'active',
           });
         }
@@ -205,40 +206,28 @@ const subscriptionWebHook = async (req: Request) => {
 
       break;
     case 'BILLING_ISSUE':
-      //in case of billing issue, look at the grace period and revoke access if the grace period is over
-      await updateActiveUserSubscription(userId, {
-        subscriptionId,
-        startAt: new Date(purchased_at_ms),
-        endAt: body.grace_period_expiration_at_ms
-          ? new Date(body.grace_period_expiration_at_ms)
-          : new Date(body.expiration_at_ms),
-        revenueCatId: rcId,
-        issuer:
-          store === 'APP_STORE'
-            ? 'apple'
-            : store === 'PLAY_STORE'
-              ? 'google'
-              : 'web',
-        totalSeats: extractSeatsFromSubscriptionId(subscriptionId),
-        status: 'active',
-      });
-      break;
-
-    case 'PRODUCT_CHANGE':
-      //we need to handle this not only for analytics but also for the number of seat
-      db.transaction(async trx => {
-        const subs = await activeUserSubscription(userId, trx);
-        //I need the subscription from apple or google
-        const activeSubscription = subs.find(
-          a => a.issuer === 'apple' || a.issuer === 'google',
-        );
-        if (activeSubscription) {
-          await updateActiveUserSubscription(
-            userId,
-            {
+      //in case of billing issue, look at the grace period for add extended time
+      //in any case,  a cancellation and expiration event will be sent after grace period
+      if (
+        grace_period_expiration_at_ms &&
+        new Date(grace_period_expiration_at_ms) > new Date()
+      ) {
+        db.transaction(async trx => {
+          const sub = await trx
+            .select()
+            .from(UserSubscriptionTable)
+            .where(
+              and(
+                eq(UserSubscriptionTable.userId, userId),
+                ne(UserSubscriptionTable.issuer, 'web'),
+              ),
+            );
+          if (sub.length === 0) {
+            await createSubscription({
+              userId,
               subscriptionId,
               startAt: new Date(purchased_at_ms),
-              endAt: new Date(expiration_at_ms),
+              endAt: new Date(grace_period_expiration_at_ms),
               revenueCatId: rcId,
               issuer:
                 store === 'APP_STORE'
@@ -246,22 +235,72 @@ const subscriptionWebHook = async (req: Request) => {
                   : store === 'PLAY_STORE'
                     ? 'google'
                     : 'web',
-              totalSeats: extractSeatsFromSubscriptionId(subscriptionId),
               freeSeats: 0,
               status: 'active',
-            },
-            trx,
+            });
+          } else {
+            await updateActiveUserSubscription(userId, {
+              endAt: new Date(grace_period_expiration_at_ms),
+              revenueCatId: rcId,
+            });
+          }
+        });
+      }
+
+      break;
+
+    case 'PRODUCT_CHANGE':
+      db.transaction(async trx => {
+        //with the difference bteween azzapp Profile and ios/adnroid account, it can happen that a renewal is done on another profile if the uer created a new profile, initial purchase does not happen
+        const sub = await trx
+          .select()
+          .from(UserSubscriptionTable)
+          .where(
+            and(
+              eq(UserSubscriptionTable.userId, userId),
+              ne(UserSubscriptionTable.issuer, 'web'),
+            ),
           );
+        if (sub.length === 0) {
+          await createSubscription({
+            userId,
+            subscriptionId,
+            startAt: new Date(purchased_at_ms),
+            endAt: new Date(expiration_at_ms),
+            revenueCatId: rcId,
+            issuer:
+              store === 'APP_STORE'
+                ? 'apple'
+                : store === 'PLAY_STORE'
+                  ? 'google'
+                  : 'web',
+            totalSeats: extractSeatsFromSubscriptionId(subscriptionId),
+            freeSeats: 0,
+            status: 'active',
+          });
+        } else {
+          await updateActiveUserSubscription(userId, {
+            subscriptionId,
+            startAt: new Date(purchased_at_ms),
+            endAt: new Date(grace_period_expiration_at_ms),
+            revenueCatId: rcId,
+            issuer:
+              store === 'APP_STORE'
+                ? 'apple'
+                : store === 'PLAY_STORE'
+                  ? 'google'
+                  : 'web',
+            totalSeats: extractSeatsFromSubscriptionId(subscriptionId),
+            status: 'active',
+          });
         }
       });
+
       break;
 
     case 'TRANSFER':
       break;
-    //TODO: discuss what to do when another azzapp user is logged with the same ios/apple account
-    //case 'SUBSCRIPTION_PAUSED': You should not revoke access when receiving a SUBSCRIPTION_PAUSED event, but only when receiving an EXPIRATION event (which will have the expiration reason SUBSCRIPTION_PAUSED)
-    default:
-      break;
+    //we are transfering only when the user sub is over, no work is required here
   }
 
   return NextResponse.json(null, { status: 200 });
