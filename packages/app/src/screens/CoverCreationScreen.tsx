@@ -24,12 +24,14 @@ const queryWithCoverTemplate = graphql`
     $profileId: ID!
     $coverTemplateId: ID!
   ) {
+    currentUser {
+      isPremium
+    }
     profile: node(id: $profileId) {
       ...CoverEditor_profile
       ... on Profile {
         webCard {
           webCardKind
-          isPremium
         }
       }
     }
@@ -45,12 +47,14 @@ const queryWithCoverTemplate = graphql`
 
 const queryWithoutCoverTemplate = graphql`
   query CoverCreationScreenQuery($profileId: ID!) {
+    currentUser {
+      isPremium
+    }
     profile: node(id: $profileId) {
       ...CoverEditor_profile
       ... on Profile {
         webCard {
           webCardKind
-          isPremium
         }
       }
     }
@@ -126,9 +130,9 @@ const CoverCreationScreen = ({
     );
   }, [intl, onSaveCover]);
 
-  const { profile } = data;
+  const { profile, currentUser } = data;
   const webCardKind = profile?.webCard?.webCardKind;
-  const isPremium = profile?.webCard?.isPremium;
+  const isPremium = currentUser?.isPremium;
 
   return (
     <Container
@@ -149,12 +153,13 @@ const CoverCreationScreen = ({
                   description="Cover creation screen title"
                 />
               </Text>
-              {!isPremium && (
+              {isPremium ? null : (
                 <View style={styles.proContainer}>
                   <Text variant="medium" style={styles.proText}>
                     <FormattedMessage
                       description="NewWebCardScreen - Description for pro category"
-                      defaultMessage="azzapp+ WebCard"
+                      defaultMessage="azzapp+ WebCard{azzappA}"
+                      values={{ azzappA: 'a' }}
                     />
                   </Text>
                   <PremiumIndicator isRequired />

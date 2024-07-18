@@ -3,12 +3,11 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import { StyleSheet, View, useWindowDimensions } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { graphql, usePreloadedQuery } from 'react-relay';
-import { moduleCountRequiresSubscription } from '@azzapp/shared/subscriptionHelpers';
 import { colors } from '#theme';
 import CardTemplateList from '#components/CardTemplateList';
 import { ApplyHeaderButton } from '#components/commonsButtons';
 import { useRouter } from '#components/NativeRouter';
-import PremiumIndicator from '#components/PremiumIndicator';
+import WebCardBuilderSubtitle from '#components/WebCardBuilderSubtitle';
 import relayScreen from '#helpers/relayScreen';
 import useLoadCardTemplateMutation from '#hooks/useLoadCardTemplateMutation';
 import useScreenInsets from '#hooks/useScreenInsets';
@@ -26,12 +25,17 @@ import type { WebCardTemplateSelectionRoute } from '#routes';
 
 const query = graphql`
   query WebCardTemplateSelectionScreenQuery($profileId: ID!) {
+    currentUser {
+      isPremium
+    }
     node(id: $profileId) {
       ... on Profile @alias(as: "profile") {
         id
         webCard {
           id
           userName
+          webCardKind
+          isPremium
         }
       }
     }
@@ -46,6 +50,7 @@ const WebCardTemplateSelectionScreen = ({
 >) => {
   const data = usePreloadedQuery(query, preloadedQuery);
   const profile = data.node?.profile;
+  const currentUser = data.currentUser;
 
   const [selectedTemplate, setSelectedTemplate] =
     useState<CardTemplateItem | null>(null);
@@ -137,18 +142,13 @@ const WebCardTemplateSelectionScreen = ({
               </Text>
 
               {selectedTemplate &&
-                moduleCountRequiresSubscription(
-                  selectedTemplate.modules.length,
-                ) && (
-                  <View style={styles.proContainer}>
-                    <Text variant="medium" style={styles.proText}>
-                      <FormattedMessage
-                        defaultMessage="azzapp+ WebCard"
-                        description="WebCard create pro description"
-                      />
-                    </Text>
-                    <PremiumIndicator isRequired />
-                  </View>
+                profile?.webCard &&
+                !profile?.webCard.isPremium &&
+                !currentUser?.isPremium && (
+                  <WebCardBuilderSubtitle
+                    modules={selectedTemplate.modules}
+                    webCard={profile.webCard}
+                  />
                 )}
             </View>
           }

@@ -40,6 +40,9 @@ import type { ListRenderItemInfo, LayoutChangeEvent } from 'react-native';
 
 const query = graphql`
   query WebCardKindSelectionScreenQuery($pixelRatio: Float!) {
+    currentUser {
+      isPremium
+    }
     webCardCategories {
       id
       medias {
@@ -58,7 +61,10 @@ const WebCardKindSelectionScreen = ({
   WebCardKindSelectionRoute,
   WebCardKindSelectionScreenQuery
 >) => {
-  const { webCardCategories } = usePreloadedQuery(query, preloadedQuery);
+  const { webCardCategories, currentUser } = usePreloadedQuery(
+    query,
+    preloadedQuery,
+  );
   const [webCardCategoryId, setWebCardCategoryId] = useState<string | null>(
     webCardCategories?.[0]?.id ?? null,
   );
@@ -157,12 +163,15 @@ const WebCardKindSelectionScreen = ({
         style={styles.webCardCategoryItem}
         rightElement={
           <PremiumIndicator
-            isRequired={isWebCardKindSubscription(item.webCardKind)}
+            isRequired={
+              !currentUser?.isPremium &&
+              isWebCardKindSubscription(item.webCardKind)
+            }
           />
         }
       />
     ),
-    [webCardCategoryId, styles.webCardCategoryItem],
+    [webCardCategoryId, styles.webCardCategoryItem, currentUser?.isPremium],
   );
 
   const getWebCardCategoryItemLayout = useCallback(

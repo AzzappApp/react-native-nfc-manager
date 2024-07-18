@@ -22,11 +22,15 @@ import type { CoverTemplateSelectionRoute } from '#routes';
 import type { ColorPaletteColor } from '@azzapp/shared/cardHelpers';
 const query = graphql`
   query CoverTemplateSelectionScreenQuery($profileId: ID!) {
+    currentUser {
+      isPremium
+    }
     profile: node(id: $profileId) {
       ...CoverTemplateList_profile
       ... on Profile {
         webCard {
           webCardKind
+          isPremium
         }
       }
     }
@@ -45,10 +49,8 @@ const CoverTemplateSelectionScreen = ({
     router.back();
   }, [router]);
 
-  const { profile } = usePreloadedQuery<CoverTemplateSelectionScreenQuery>(
-    query,
-    preloadedQuery,
-  );
+  const { profile, currentUser } =
+    usePreloadedQuery<CoverTemplateSelectionScreenQuery>(query, preloadedQuery);
 
   const webCardKind = profile?.webCard?.webCardKind;
 
@@ -102,15 +104,19 @@ const CoverTemplateSelectionScreen = ({
                     description: 'Cover creation screen title',
                   })}
                 </Text>
-                <View style={styles.proContainer}>
-                  <Text variant="medium" style={styles.proText}>
-                    <FormattedMessage
-                      defaultMessage="azzapp+ WebCard"
-                      description="Cover creation with pro template"
-                    />
-                  </Text>
-                  <PremiumIndicator isRequired />
-                </View>
+                {currentUser?.isPremium ||
+                profile?.webCard?.isPremium ? null : (
+                  <View style={styles.proContainer}>
+                    <Text variant="medium" style={styles.proText}>
+                      <FormattedMessage
+                        defaultMessage="azzapp+ WebCard{azzappA}"
+                        values={{ azzappA: <Text variant="azzapp">a</Text> }}
+                        description="Cover creation with pro template"
+                      />
+                    </Text>
+                    <PremiumIndicator isRequired />
+                  </View>
+                )}
               </View>
             )
           }

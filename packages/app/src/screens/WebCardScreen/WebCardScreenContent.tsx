@@ -95,13 +95,13 @@ const WebCardScreenContent = ({
         id
         userName
         ...CoverRenderer_webCard
+        ...WebCardScreenHeader_webCard
         ...WebCardScreenBody_webCard
         ...WebCardColorPicker_webCard
         ...WebCardBackground_webCard
         ...WebCardBackgroundPreview_webCard
         ...PreviewModal_webCard
         ...LoadCardTemplateModal_webCard
-        ...ModuleSelectionListModal_webCard
         coverBackgroundColor
         cardColors {
           primary
@@ -312,6 +312,7 @@ const WebCardScreenContent = ({
     <>
       <View style={styles.flex}>
         <WebCardScreenHeader
+          webCard={webCard}
           editing={editing}
           nbSelectedModules={nbSelectedModules}
           selectionMode={selectionMode}
@@ -425,7 +426,6 @@ const WebCardScreenContent = ({
             onRequestClose={onCloseModulePicker}
             onSelectModuleKind={onSelectModuleKind}
             animationType="slide"
-            webCard={webCard}
           />
           <Suspense fallback={null}>
             <PreviewModal

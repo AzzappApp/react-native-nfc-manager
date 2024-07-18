@@ -1,6 +1,10 @@
 import { FormattedMessage } from 'react-intl';
 import { StyleSheet, View } from 'react-native';
-import { moduleCountRequiresSubscription } from '@azzapp/shared/subscriptionHelpers';
+import {
+  isModuleKindSubscription,
+  MODULE_COUNT_LIMIT_FOR_SUBSCRIPTION,
+  moduleCountRequiresSubscription,
+} from '@azzapp/shared/subscriptionHelpers';
 import { colors } from '#theme';
 import PremiumIndicator from '#components/PremiumIndicator';
 import Text from './Text';
@@ -10,33 +14,39 @@ type ModuleEditionScreenTitleProps = {
   label: string;
   kind: ModuleKind;
   moduleCount: number;
-  requiresSubscription?: boolean;
   isPremium?: boolean;
 };
 const ModuleEditionScreenTitle = (props: ModuleEditionScreenTitleProps) => {
-  const {
-    label,
-    moduleCount,
-    requiresSubscription = false,
-    isPremium = false,
-  } = props;
+  const { label, moduleCount, kind, isPremium = false } = props;
+
+  const requiresSubscription = isModuleKindSubscription(kind);
 
   return (
     <View style={styles.container}>
       <Text variant="large">{label}</Text>
-      {!isPremium &&
-        (moduleCountRequiresSubscription(moduleCount) ||
-          requiresSubscription) && (
-          <View style={styles.pro}>
-            <Text variant="medium" style={styles.proText}>
-              <FormattedMessage
-                defaultMessage="azzapp+ WebCard"
-                description="ModuleEditionScreenTitle - label for pro section"
-              />
-            </Text>
-            <PremiumIndicator isRequired />
-          </View>
-        )}
+      {!isPremium ? (
+        moduleCountRequiresSubscription(moduleCount) ? (
+          <FormattedMessage
+            defaultMessage="{count}+ sections"
+            values={{
+              count: MODULE_COUNT_LIMIT_FOR_SUBSCRIPTION,
+            }}
+            description="ModuleEditionScreenTitle - label when module count requires subscription"
+          />
+        ) : (
+          requiresSubscription && (
+            <View style={styles.pro}>
+              <Text variant="medium" style={styles.proText}>
+                <FormattedMessage
+                  defaultMessage="azzapp+ section"
+                  description="ModuleEditionScreenTitle - label for premium section"
+                />
+              </Text>
+              <PremiumIndicator isRequired />
+            </View>
+          )
+        )
+      ) : null}
     </View>
   );
 };

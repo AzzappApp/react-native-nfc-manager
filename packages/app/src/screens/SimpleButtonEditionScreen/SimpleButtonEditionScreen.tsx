@@ -125,7 +125,6 @@ const SimpleButtonEditionScreen = ({
           id
           cardIsPublished
           isPremium
-          requiresSubscription
           cardColors {
             primary
             dark
@@ -399,7 +398,6 @@ const SimpleButtonEditionScreen = ({
             })}
             kind="simpleButton"
             moduleCount={cardModulesCount}
-            requiresSubscription={profile?.webCard.requiresSubscription}
           />
         }
         leftElement={

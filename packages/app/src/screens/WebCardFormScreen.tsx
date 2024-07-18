@@ -42,6 +42,9 @@ import type { TextInput as RNTextInput } from 'react-native';
 
 const query = graphql`
   query WebCardFormScreenQuery($webCardCategoryId: ID!) {
+    currentUser {
+      isPremium
+    }
     webCardCategory: node(id: $webCardCategoryId) {
       ... on WebCardCategory {
         id
@@ -62,7 +65,10 @@ const query = graphql`
 const WebCardFormScreen = ({
   preloadedQuery,
 }: RelayScreenProps<WebCardFormRoute, WebCardFormScreenQuery>) => {
-  const { webCardCategory } = usePreloadedQuery(query, preloadedQuery);
+  const { webCardCategory, currentUser } = usePreloadedQuery(
+    query,
+    preloadedQuery,
+  );
   const {
     id: webCardCategoryId,
     webCardKind,
@@ -395,15 +401,18 @@ const WebCardFormScreen = ({
                   description="Add WebCard details screen title"
                 />
               </Text>
-              <View style={styles.proContainer}>
-                <Text variant="medium" style={styles.proText}>
-                  <FormattedMessage
-                    description="NewWebCardScreen - Description for pro category"
-                    defaultMessage="azzapp+ WebCard"
-                  />
-                </Text>
-                <PremiumIndicator isRequired />
-              </View>
+              {currentUser?.isPremium ? null : (
+                <View style={styles.proContainer}>
+                  <Text variant="medium" style={styles.proText}>
+                    <FormattedMessage
+                      description="NewWebCardScreen - Description for pro category"
+                      defaultMessage="azzapp+ WebCard{azzappA}"
+                      values={{ azzappA: <Text variant="azzapp">a</Text> }}
+                    />
+                  </Text>
+                  <PremiumIndicator isRequired />
+                </View>
+              )}
             </View>
           )
         }

@@ -3,10 +3,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import { StyleSheet, View, useWindowDimensions } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { graphql, useFragment } from 'react-relay';
-import {
-  moduleCountRequiresSubscription,
-  webCardRequiresSubscription,
-} from '@azzapp/shared/subscriptionHelpers';
+import { webCardRequiresSubscription } from '@azzapp/shared/subscriptionHelpers';
 import { colors } from '#theme';
 import CardTemplateList from '#components/CardTemplateList';
 import {
@@ -14,7 +11,7 @@ import {
   ScreenModal,
   preventModalDismiss,
 } from '#components/NativeRouter';
-import PremiumIndicator from '#components/PremiumIndicator';
+import WebCardBuilderSubtitle from '#components/WebCardBuilderSubtitle';
 import useAuthState from '#hooks/useAuthState';
 import useLoadCardTemplateMutation from '#hooks/useLoadCardTemplateMutation';
 import useScreenInsets from '#hooks/useScreenInsets';
@@ -206,22 +203,12 @@ const LoadCardTemplateModal = ({
                     description="WebCard creation screen title"
                   />
                 </Text>
-
-                {selectedTemplate &&
-                  !webCard.isPremium &&
-                  moduleCountRequiresSubscription(
-                    selectedTemplate.modules.length,
-                  ) && (
-                    <View style={styles.proContainer}>
-                      <Text variant="medium" style={styles.proText}>
-                        <FormattedMessage
-                          defaultMessage="azzapp+ WebCard"
-                          description="WebCard create pro description"
-                        />
-                      </Text>
-                      <PremiumIndicator isRequired />
-                    </View>
-                  )}
+                {selectedTemplate && !webCard.isPremium && (
+                  <WebCardBuilderSubtitle
+                    modules={selectedTemplate.modules}
+                    webCard={webCard}
+                  />
+                )}
               </View>
             }
             rightElement={

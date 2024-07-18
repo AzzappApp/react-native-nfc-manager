@@ -1,15 +1,22 @@
 import { FormattedMessage, useIntl } from 'react-intl';
-import { StyleSheet } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import Animated, { useAnimatedStyle } from 'react-native-reanimated';
+import { graphql, useFragment } from 'react-relay';
 import { colors } from '#theme';
+import WebCardBuilderSubtitle from '#components/WebCardBuilderSubtitle';
 import useScreenInsets from '#hooks/useScreenInsets';
 import FloatingIconButton from '#ui/FloatingIconButton';
 import Header, { HEADER_HEIGHT } from '#ui/Header';
 import HeaderButton from '#ui/HeaderButton';
 import Text from '#ui/Text';
 import { useEditTransition } from './WebCardScreenTransitions';
+import type { WebCardScreenHeader_webCard$key } from '#relayArtifacts/WebCardScreenHeader_webCard.graphql';
 
 export type WebCardScreenHeaderProps = {
+  /**
+   * The webCard to display.
+   */
+  webCard: WebCardScreenHeader_webCard$key;
   /**
    * Whether the webCard is in edit mode
    */
@@ -61,7 +68,8 @@ export type WebCardScreenHeaderProps = {
  * in edit mode, it display a cancel and a save button
  * in view mode, it display a close button
  */
-const WebCardScrenHeader = ({
+const WebCardScreenHeader = ({
+  webCard: webCardKey,
   editing,
   selectionMode,
   nbSelectedModules,
@@ -88,30 +96,53 @@ const WebCardScrenHeader = ({
     opacity: 1 - (editTransition?.value ?? 0),
   }));
 
+  const webCard = useFragment(
+    graphql`
+      fragment WebCardScreenHeader_webCard on WebCard {
+        id
+        isPremium
+        webCardKind
+        cardModules {
+          id
+          kind
+        }
+      }
+    `,
+    webCardKey,
+  );
+
   return (
     <>
       <Animated.View style={editHeaderStyle}>
         <Header
           middleElement={
-            <Text variant="large">
-              {selectionMode ? (
-                <FormattedMessage
-                  defaultMessage="{nbSelectedModules} selected"
-                  description="Webcard builder header title in module edition mode"
-                  values={{
-                    nbSelectedModules,
-                  }}
-                />
-              ) : (
-                <FormattedMessage
-                  defaultMessage="Webcard{azzappA} builder"
-                  description="Webcard builder header title"
-                  values={{
-                    azzappA: <Text variant="azzapp">a</Text>,
-                  }}
+            <View>
+              <Text variant="large">
+                {selectionMode ? (
+                  <FormattedMessage
+                    defaultMessage="{nbSelectedModules} selected"
+                    description="Webcard builder header title in module edition mode"
+                    values={{
+                      nbSelectedModules,
+                    }}
+                  />
+                ) : (
+                  <FormattedMessage
+                    defaultMessage="Webcard{azzappA} builder"
+                    description="Webcard builder header title"
+                    values={{
+                      azzappA: <Text variant="azzapp">a</Text>,
+                    }}
+                  />
+                )}
+              </Text>
+              {webCard && !webCard.isPremium && (
+                <WebCardBuilderSubtitle
+                  modules={webCard.cardModules}
+                  webCard={webCard}
                 />
               )}
-            </Text>
+            </View>
           }
           leftElement={
             selectionMode ? (
@@ -193,7 +224,7 @@ const WebCardScrenHeader = ({
   );
 };
 
-export default WebCardScrenHeader;
+export default WebCardScreenHeader;
 
 const styles = StyleSheet.create({
   container: {
