@@ -224,7 +224,11 @@ const CoverEditorMediaPicker = ({
   const selectionLabel = durationsFixed
     ? intl.formatMessage(
         {
-          defaultMessage: `{count}/{max} medias selected.`,
+          defaultMessage: `{count, plural,
+              =0 {#/{max} media selected}
+              =1 {#/{max} media selected}
+              other {#/{max} media selected}
+            }`,
           description:
             'Medias selection label for fixed number multi selection of media in cover edition',
         },
@@ -235,7 +239,7 @@ const CoverEditorMediaPicker = ({
           defaultMessage: `{count, plural,
               =0 {No media selected}
               =1 {1/{max} (max) media selected}
-              other {#/{max} (max) medias selected}
+              other {#/{max} (max) media selected}
             }`,
           description:
             'Medias selection label for free multi selection of media in cover edition',
@@ -257,9 +261,23 @@ const CoverEditorMediaPicker = ({
       />
       <View style={styles.bottomBar}>
         <View style={styles.selectionRow}>
-          <Text variant="medium" style={styles.labelMediaSelected}>
-            {selectionLabel}
-          </Text>
+          <View style={styles.labelMediaContainer}>
+            <Text variant="medium" style={styles.labelMediaSelected}>
+              {selectionLabel}
+            </Text>
+            {maxSelectableVideos ? (
+              <Text variant="small" style={styles.labelMediaSelected}>
+                <FormattedMessage
+                  defaultMessage={`{max, plural,
+               =1 {{max} video max}
+               other {{max} videos max}
+             }`}
+                  values={{ max: maxSelectableVideos }}
+                  description="CoverEditorMediaPicker - max videos"
+                />
+              </Text>
+            ) : null}
+          </View>
           <Button label="Done" onPress={handleOnFinished} />
         </View>
         {!!mediaOrSlot.length && (
@@ -351,6 +369,8 @@ const stylesheet = createStyleSheet(appearance => ({
   },
   labelMediaSelected: {
     color: colors.grey400,
+  },
+  labelMediaContainer: {
     alignSelf: 'center',
   },
   media: {
