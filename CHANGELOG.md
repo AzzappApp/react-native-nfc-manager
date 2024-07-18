@@ -1,4 +1,4 @@
-## 0.5.19-canary.167
+## 0.5.19-canary.168
 
 * **fix:**  - font and number of covertempalte ([#4312](https://github.com/AzzappApp/azzapp/pull/4312))
 * **fix:**  - **cover:** [#4298](https://github.com/AzzappApp/azzapp/pull/4298) manage deselection ([#4311](https://github.com/AzzappApp/azzapp/pull/4311))
