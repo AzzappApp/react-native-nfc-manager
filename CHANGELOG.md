@@ -1,5 +1,6 @@
-## 0.5.19-canary.173
+## 0.5.19-canary.174
 
+* **fix:**  - Role management in translationsActions
 * **fix:**  - **webCard:** [#3371](https://github.com/AzzappApp/azzapp/pull/3371) enhance azzapp premium indicators ([#4319](https://github.com/AzzappApp/azzapp/pull/4319))
 * **build:**  - remove temporary expo-updates ([#4326](https://github.com/AzzappApp/azzapp/pull/4326))
 * **fix:**  - **CoverEditor:** Invalid Media in template overlay
