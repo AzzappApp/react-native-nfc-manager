@@ -26,13 +26,17 @@ const ModuleEditionScreenTitle = (props: ModuleEditionScreenTitleProps) => {
       <Text variant="large">{label}</Text>
       {!isPremium ? (
         moduleCountRequiresSubscription(moduleCount) ? (
-          <FormattedMessage
-            defaultMessage="{count}+ sections"
-            values={{
-              count: MODULE_COUNT_LIMIT_FOR_SUBSCRIPTION,
-            }}
-            description="ModuleEditionScreenTitle - label when module count requires subscription"
-          />
+          <View style={styles.pro}>
+            <Text variant="medium" style={styles.proText}>
+              <FormattedMessage
+                defaultMessage="{count}+ sections"
+                values={{
+                  count: MODULE_COUNT_LIMIT_FOR_SUBSCRIPTION,
+                }}
+                description="ModuleEditionScreenTitle - label when module count requires subscription"
+              />
+            </Text>
+          </View>
         ) : (
           requiresSubscription && (
             <View style={styles.pro}>
