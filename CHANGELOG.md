@@ -1,5 +1,6 @@
-## 0.5.19-canary.187
+## 0.5.19-canary.188
 
+* **fix:**  - **cover:** [#4296](https://github.com/AzzappApp/azzapp/pull/4296) add all fonts ([#4365](https://github.com/AzzappApp/azzapp/pull/4365))
 * **fix:**  - 🐛 add logo to common information count ([#4364](https://github.com/AzzappApp/azzapp/pull/4364))
 * **fix:**  - **webcard:** [#4359](https://github.com/AzzappApp/azzapp/pull/4359) avoid applying same template multiple times ([#4363](https://github.com/AzzappApp/azzapp/pull/4363))
 * **fix:**  - azzapp+ message
