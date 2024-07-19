@@ -163,7 +163,7 @@ const CoverPreview = ({
     if (!isDynamic) {
       // a fake composition with a duration of 5 seconds to display a static image
       return {
-        composition: { duration: COVER_IMAGE_DEFAULT_DURATION, items: [] },
+        composition: { duration: COVER_IMAGE_DEFAULT_DURATION - 1, items: [] },
         videoScales: {},
       };
     }
