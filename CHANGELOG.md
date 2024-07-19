@@ -1,5 +1,7 @@
-## 0.5.19-canary.178
+## 0.5.19-canary.179
 
+* **fix:**  - **CoverEditor:** disable font scaling on text input
+* **fix:**  - **images:** [#3633](https://github.com/AzzappApp/azzapp/pull/3633) limit number of generated assets ([#4332](https://github.com/AzzappApp/azzapp/pull/4332))
 * **fix:**  - missing text tag ([#4340](https://github.com/AzzappApp/azzapp/pull/4340))
 * **fix:**  - remove useless webCardKink param
 * **fix:**  - chagne iap transfert mode. Insure database row exist. better handle of event case ([#4328](https://github.com/AzzappApp/azzapp/pull/4328))
