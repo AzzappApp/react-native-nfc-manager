@@ -19,6 +19,7 @@ import type { HomeRoute } from '#routes';
 export const homeScreenQuery = graphql`
   query HomeScreenQuery {
     currentUser {
+      id
       profiles {
         id
       }
@@ -35,8 +36,9 @@ const HomeScreen = ({
   //we need to wait the initial screen to be load before doing any deep link
   useDeepLinkStoredRoute();
   useSetRevenueCatUserInfo();
-  useRevenueCat();
+
   const { currentUser } = usePreloadedQuery(homeScreenQuery, preloadedQuery);
+  useRevenueCat(currentUser?.id);
   const router = useRouter();
 
   useEffect(() => {

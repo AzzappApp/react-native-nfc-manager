@@ -4,27 +4,28 @@ import Purchases from 'react-native-purchases';
 import { commitLocalUpdate } from 'react-relay';
 import { getAuthState } from '#helpers/authStore';
 import { getRelayEnvironment } from '#helpers/relayEnvironment';
-import useAuthState from '#hooks/useAuthState';
 import type { CustomerInfo } from 'react-native-purchases';
 
-export const useRevenueCat = () => {
-  const { profileInfos } = useAuthState();
-
+export const useRevenueCat = (userId: string | null | undefined) => {
   useEffect(() => {
-    async function login() {
+    async function login(userId: string) {
       try {
-        await Purchases.logIn(profileInfos!.userId);
+        await Purchases.logIn(userId);
       } catch (error) {
         Sentry.captureException(error);
       }
     }
-    if (profileInfos?.userId) {
-      login();
+    if (userId) {
+      login(userId);
     }
     return () => {
-      Purchases.logOut();
+      Purchases.isAnonymous().then(isAnonymous => {
+        if (!isAnonymous) {
+          Purchases.logOut();
+        }
+      });
     };
-  }, [profileInfos, profileInfos?.userId]);
+  }, [userId]);
 
   useEffect(() => {
     const listenerRc = (customerInfo: CustomerInfo) => {

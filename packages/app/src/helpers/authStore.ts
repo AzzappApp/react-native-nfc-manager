@@ -105,6 +105,16 @@ export const init = async () => {
           MMKVS_PROFILE_INFOS,
           JSON.stringify({ ...profileInfos, email, phoneNumber, userId }),
         );
+      } else {
+        //with the email and phone number confirmation flow, SIGN_UP can be never called
+        storage.set(
+          MMKVS_PROFILE_INFOS,
+          JSON.stringify({
+            email,
+            phoneNumber,
+            userId,
+          }),
+        );
       }
       storage.set(MMKVS_HAS_BEEN_SIGNED_IN, true);
       await EncryptedStorage.setItem(
