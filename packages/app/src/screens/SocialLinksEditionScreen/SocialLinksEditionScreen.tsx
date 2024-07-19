@@ -1,7 +1,7 @@
 import { omit } from 'lodash';
 import { useCallback, useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
-import { Platform, StyleSheet } from 'react-native';
+import { StyleSheet } from 'react-native';
 import { KeyboardAvoidingView } from 'react-native-keyboard-controller';
 import { useSharedValue } from 'react-native-reanimated';
 import { graphql, useFragment, useMutation } from 'react-relay';
@@ -323,13 +323,8 @@ const SocialLinksEditionScreen = ({
 
   // #endregion
 
-  const {
-    bottomPanelHeight,
-    topPanelHeight,
-    insetBottom,
-    insetTop,
-    windowWidth,
-  } = useEditorLayout({ bottomPanelMinHeight: 400 });
+  const { bottomPanelHeight, insetBottom, insetTop, windowWidth } =
+    useEditorLayout({ bottomPanelMinHeight: 400 });
 
   return (
     <Container style={[styles.root, { paddingTop: insetTop }]}>
@@ -366,13 +361,13 @@ const SocialLinksEditionScreen = ({
         }
       />
       <KeyboardAvoidingView
-        style={{ flex: 1 }}
-        behavior="position"
+        style={{ flex: 1, justifyContent: 'flex-end' }}
+        behavior="padding"
         keyboardVerticalOffset={-insetBottom - BOTTOM_MENU_HEIGHT}
       >
         <SocialLinksPreview
           style={{
-            height: topPanelHeight - (Platform.OS === 'android' ? 80 : 20),
+            flex: 1,
             marginVertical: 10,
           }}
           colorPalette={profile.webCard.cardColors}
