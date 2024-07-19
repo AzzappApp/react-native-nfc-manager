@@ -486,7 +486,7 @@ const PhotoGalleyMediaItem = ({
       />
       {isLoading && (
         <View style={styles.loader}>
-          <ActivityIndicator />
+          <ActivityIndicator color="white" />
         </View>
       )}
       {item.node.type.includes('video') && (
