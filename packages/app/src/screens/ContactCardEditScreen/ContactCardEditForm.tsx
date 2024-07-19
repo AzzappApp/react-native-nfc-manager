@@ -1,8 +1,10 @@
 import { ImageFormat } from '@shopify/react-native-skia';
+import { Image } from 'expo-image';
 import { Fragment, useCallback, useEffect, useState } from 'react';
 import { Controller, useController } from 'react-hook-form';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { Pressable, View, Image } from 'react-native';
+import { Pressable, View } from 'react-native';
+import ImageSize from 'react-native-image-size';
 import * as mime from 'react-native-mime-types';
 import { AVATAR_MAX_WIDTH } from '@azzapp/shared/contactCardHelpers';
 import { colors, shadow } from '#theme';
@@ -78,7 +80,7 @@ const ContactCardEditForm = ({
 
   useEffect(() => {
     if (logoField.value?.uri) {
-      Image.getSize(logoField.value.uri, (width, height) => {
+      ImageSize.getSize(logoField.value.uri).then(({ width, height }) => {
         setSize(size => (size ? size : { width, height }));
       });
     }
@@ -146,7 +148,7 @@ const ContactCardEditForm = ({
 
   useEffect(() => {
     if (logo?.uri) {
-      Image.getSize(logo.uri, (width, height) => {
+      ImageSize.getSize(logo.uri).then(({ width, height }) => {
         setWebCardLogoSize({ width, height });
       });
     }
@@ -358,7 +360,7 @@ const ContactCardEditForm = ({
                             webCardLogoSize.width *
                             (55 / webCardLogoSize.height),
                         }}
-                        resizeMode="contain"
+                        contentFit="contain"
                       />
                     </View>
                   </View>
@@ -419,7 +421,7 @@ const ContactCardEditForm = ({
                               height: 55,
                               width: size.width * (55 / size.height),
                             }}
-                            resizeMode="contain"
+                            contentFit="contain"
                           />
                         </Pressable>
                       </View>
