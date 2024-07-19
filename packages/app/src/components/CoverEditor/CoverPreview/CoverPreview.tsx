@@ -171,6 +171,7 @@ const CoverPreview = ({
     return createCoverVideoComposition(
       coverEditorState,
       MAX_DISPLAY_DECODER_RESOLUTION,
+      true,
     );
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, compositionDependencies);

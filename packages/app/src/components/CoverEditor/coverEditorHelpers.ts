@@ -46,6 +46,7 @@ export const percentRectToRect = (
 export const createCoverVideoComposition = (
   state: CoverEditorState,
   maxDecoderResolution: number,
+  isPreview: boolean = false,
 ) => {
   const { medias, videoPaths, lottie, coverTransition } = state;
 
@@ -123,7 +124,7 @@ export const createCoverVideoComposition = (
 
   return {
     composition: {
-      duration,
+      duration: isPreview ? duration - 0.01 : duration,
       items,
     },
     videoScales,
