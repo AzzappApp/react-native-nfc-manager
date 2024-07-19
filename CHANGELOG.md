@@ -1,4 +1,4 @@
-## 0.5.19-canary.176
+## 0.5.19-canary.177
 
 * **fix:**  - remove useless webCardKink param
 * **fix:**  - chagne iap transfert mode. Insure database row exist. better handle of event case ([#4328](https://github.com/AzzappApp/azzapp/pull/4328))
