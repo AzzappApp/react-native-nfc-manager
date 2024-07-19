@@ -1,5 +1,6 @@
-## 0.5.19-canary.177
+## 0.5.19-canary.178
 
+* **fix:**  - missing text tag ([#4340](https://github.com/AzzappApp/azzapp/pull/4340))
 * **fix:**  - remove useless webCardKink param
 * **fix:**  - chagne iap transfert mode. Insure database row exist. better handle of event case ([#4328](https://github.com/AzzappApp/azzapp/pull/4328))
 * **fix:**  - **Backoffice:** add entity translation ([#4335](https://github.com/AzzappApp/azzapp/pull/4335))
