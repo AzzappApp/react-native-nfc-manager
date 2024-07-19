@@ -24,10 +24,6 @@ export type CloudinaryVideoProps = Omit<
   fluid?: boolean;
   width?: number;
   height?: number;
-  posterSize?: {
-    width: number;
-    height: number;
-  };
 };
 
 const CloudinaryVideo = (
@@ -39,7 +35,6 @@ const CloudinaryVideo = (
     width,
     style,
     fluid,
-    posterSize,
     ...props
   }: CloudinaryVideoProps,
   ref: ForwardedRef<HTMLVideoElement>,
@@ -63,8 +58,10 @@ const CloudinaryVideo = (
         src: media.id,
         assetType: 'video',
         format: 'auto',
-        width: posterSize?.width,
-        height: posterSize?.height,
+        quality: 'auto:best',
+        width: maxSize,
+        height: maxSize && media.height * (maxSize / media.width),
+        rawTransformations: ['so_17p'],
       })}
       src={getCldVideoUrl({
         src: media.id,

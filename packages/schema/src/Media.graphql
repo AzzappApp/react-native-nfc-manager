@@ -3,14 +3,9 @@ interface Media {
   aspectRatio: Float!
   width: Float!
   height: Float!
-  uri(pixelRatio: Float, height: Float, width: Float, raw: Boolean, extension: Extension): String!
+  uri(pixelRatio: Float, height: Float, width: Float, raw: Boolean): String!
 }
 
-enum Extension {
-  webp
-  jpg
-  png
-}
 
 """
 A video media
@@ -20,7 +15,7 @@ type MediaVideo implements Media {
   aspectRatio: Float!
   width: Float!
   height: Float!
-  uri(pixelRatio: Float, height: Float, width: Float, raw: Boolean, extension: Extension): String!
+  uri(pixelRatio: Float, height: Float, width: Float, raw: Boolean): String!
   thumbnail(
     pixelRatio: Float
     height: Float
@@ -37,7 +32,7 @@ type MediaImage implements Media {
   aspectRatio: Float!
   width: Float!
   height: Float!
-  uri(pixelRatio: Float, height: Float, width: Float, raw: Boolean, extension: Extension): String!
+  uri(pixelRatio: Float, height: Float, width: Float, raw: Boolean): String!
 }
 
 

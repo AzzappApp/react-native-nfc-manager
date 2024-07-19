@@ -115,6 +115,8 @@ const PhotoWithTextAndTitleRenderer = ({
                   borderRadius,
                 }}
                 className={styles.image}
+                format="auto"
+                quality="auto:best"
               />
             </div>
           </div>

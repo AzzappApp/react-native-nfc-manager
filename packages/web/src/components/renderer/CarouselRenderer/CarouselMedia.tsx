@@ -48,6 +48,8 @@ const CarouselMedia = (props: CarouselMediaProps) => {
           borderStyle: 'solid',
           objectFit: 'cover',
         }}
+        format="auto"
+        quality="auto:best"
       />
     </div>
   );

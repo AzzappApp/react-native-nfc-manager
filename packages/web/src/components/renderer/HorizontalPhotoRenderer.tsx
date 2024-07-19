@@ -84,6 +84,8 @@ const HorizontalPhotoRenderer = async ({
               style={{
                 objectFit: 'cover',
               }}
+              format="auto"
+              quality="auto:best"
             />
           )}
         </div>

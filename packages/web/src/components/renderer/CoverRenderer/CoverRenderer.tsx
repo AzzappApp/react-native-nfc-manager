@@ -95,6 +95,9 @@ const CoverRenderer = ({
             className={styles.coverMedia}
             fetchPriority={priority ? 'high' : 'low'}
             videoThumbnail={media.kind === 'video'}
+            format="auto"
+            quality="auto:best"
+            rawTransformations={staticCover ? ['so_17p'] : undefined}
           />
         ) : (
           <CloudinaryVideo
@@ -106,10 +109,6 @@ const CoverRenderer = ({
             className={styles.coverMedia}
             muted
             fluid
-            posterSize={{
-              width: coverWidth,
-              height: coverHeight,
-            }}
             playsInline
           />
         ))}

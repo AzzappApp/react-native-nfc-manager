@@ -1,6 +1,7 @@
 import getRuntimeEnvironment from './getRuntimeEnvironment';
 
-const CLOUDINARY_CLOUDNAME = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME!;
+export const CLOUDINARY_CLOUDNAME =
+  process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME!;
 export const CLOUDINARY_BASE_URL = `https://${process.env.NEXT_PUBLIC_CLOUDINARY_SECURE_DISTRIBUTION ?? 'res.cloudinary.com'}/${CLOUDINARY_CLOUDNAME}`;
 
 /**
@@ -12,11 +13,10 @@ export const CLOUDINARY_BASE_URL = `https://${process.env.NEXT_PUBLIC_CLOUDINARY
 export const getCloudinaryAssetURL = (
   id: string,
   kind: 'image' | 'raw' | 'video',
-  extension?: 'jpg' | 'mp4' | 'png' | 'svg' | 'webp',
+  format?: 'avif' | 'jpg' | 'mp4' | 'png' | 'svg' | 'webp',
 ) => {
   assetNotRN('getCloudinaryAssetURL');
-  const ext = extension ? `.${extension}` : '';
-  return `${CLOUDINARY_BASE_URL}/${kind}/upload/${id}${ext}`;
+  return `${CLOUDINARY_BASE_URL}/${kind}/upload${format ? `/f_${format}` : ''}${id}`;
 };
 
 /**
@@ -36,7 +36,7 @@ export type UrLForSizeParam = {
   height?: number | null;
   pixelRatio?: number | null;
   pregeneratedSizes?: number[] | null;
-  extension?: string | null;
+  format?: string | null;
   videoDurationPercentage?: number | null;
 };
 
@@ -55,7 +55,7 @@ export const getImageURLForSize = ({
   height,
   pixelRatio = 1,
   pregeneratedSizes,
-  extension,
+  format,
 }: UrLForSizeParam) => {
   assetNotRN('getImageURLForSize');
   const transforms = resizeTransforms(
@@ -64,7 +64,7 @@ export const getImageURLForSize = ({
     pixelRatio,
     pregeneratedSizes,
   );
-  return assembleCloudinaryUrl(id, 'image', transforms, extension ?? 'webp');
+  return assembleCloudinaryUrl(id, 'image', transforms, format ?? 'avif');
 };
 
 /**
@@ -93,7 +93,7 @@ export const getVideoUrlForSize = ({
   height,
   pixelRatio = 1,
   pregeneratedSizes,
-  extension,
+  format,
 }: UrLForSizeParam) => {
   assetNotRN('getVideoUrlForSize');
   const transforms = resizeTransforms(
@@ -102,7 +102,7 @@ export const getVideoUrlForSize = ({
     pixelRatio,
     pregeneratedSizes,
   );
-  return assembleCloudinaryUrl(id, 'video', transforms, extension ?? 'mp4');
+  return assembleCloudinaryUrl(id, 'video', transforms, format ?? 'mp4');
 };
 
 /**
@@ -128,9 +128,14 @@ export const getVideoThumbnailURL = ({
     height,
     pixelRatio,
     pregeneratedSizes,
+  );
+  return assembleCloudinaryUrl(
+    id,
+    'video',
+    transforms,
+    'avif',
     videoDurationPercentage,
   );
-  return assembleCloudinaryUrl(id, 'video', transforms, 'webp');
 };
 
 /**
@@ -146,17 +151,12 @@ export const resizeTransforms = (
   height?: number | null,
   pixelRatio?: number | null,
   pregeneratedSizes?: number[] | null,
-  videoDurationPercentage?: number | null,
 ) => {
   pixelRatio = pixelRatio ?? 1;
-  let result = `q_auto:best`;
-
-  if (videoDurationPercentage) {
-    result += `,so_${videoDurationPercentage}p`;
-  }
+  const result: string[] = [];
 
   if (width == null) {
-    return result;
+    return result.join(',');
   }
   width = Math.ceil(width * pixelRatio);
   if (pregeneratedSizes) {
@@ -164,16 +164,25 @@ export const resizeTransforms = (
     if (index === -1) {
       if (height != null) {
         const aspectRatio = Math.round((width * 1000) / height) / 1000;
-        return `c_fill,${result},ar_${aspectRatio}`;
+        result.push(`c_fill`);
+        result.push(`ar_${aspectRatio}`);
+        return result.join(',');
       }
-      return result;
+      return result.join(',');
     }
-    return `${result},w_${pregeneratedSizes[index]}`;
+    result.push(`c_limit`);
+    result.push(`w_${pregeneratedSizes[index]}`);
+    return result.join(',');
   }
   if (height != null) {
-    return `c_fill,${result},w_${width},h_${height}`;
+    result.push(`c_fill`);
+    result.push(`w_${width}`);
+    result.push(`h_${height}`);
+    return result.join(',');
   } else {
-    return `${result},w_${width}`;
+    result.push(`c_limit`);
+    result.push(`w_${width}`);
+    return result.join(',');
   }
 };
 
@@ -197,8 +206,9 @@ const assembleCloudinaryUrl = (
   id: string,
   kind: 'image' | 'video',
   transforms: string,
-  extension?: string,
+  format?: string,
+  videoPercentage?: number | null,
 ) => {
   // prettier-ignore
-  return `${CLOUDINARY_BASE_URL}/${kind}/upload/${transforms}/${id}${extension ? `.${extension}` : ''}`;
+  return `${CLOUDINARY_BASE_URL}/${kind}/upload${videoPercentage ? `/so_${videoPercentage}p`: ''}${transforms ? `/${transforms}`: ''}${format ? `/f_${format}`: ''}/q_auto:best/${id}`;
 };

@@ -91,7 +91,7 @@ const FullEmailSignature = ({
   }, [searchParams, webCard.userName]);
 
   const companyLogoUrl = companyLogo
-    ? getImageURLForSize({ id: companyLogo, height: 140, extension: 'png' })
+    ? getImageURLForSize({ id: companyLogo, height: 140, format: 'png' })
     : null;
   const handleCopySignature = async (mode: 'full' | 'simple') => {
     const compressedContactCard = searchParams.get('c') ?? '';

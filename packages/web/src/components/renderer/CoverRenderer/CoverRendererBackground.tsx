@@ -24,6 +24,7 @@ const CoverRendererBackground = ({ media }: CoverRendererBackgroundProps) => {
             width: BACKGROUND_IMAGE_SIZE,
             height: BACKGROUND_IMAGE_SIZE / COVER_RATIO,
             format: 'auto',
+            quality: 'auto:best',
           })})`,
         }}
       />

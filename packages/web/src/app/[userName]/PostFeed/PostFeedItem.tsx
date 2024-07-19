@@ -86,6 +86,7 @@ const PostFeedItem = (
                 style={{
                   objectFit: 'cover',
                 }}
+                format="auto"
               />
             )}
           </div>

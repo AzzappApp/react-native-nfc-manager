@@ -45,6 +45,7 @@ const CommentFeedMoreMedia = (props: CommentFeedMoreMediaProps) => {
           style={{
             objectFit: 'cover',
           }}
+          format="auto"
         />
       )}
     </Link>

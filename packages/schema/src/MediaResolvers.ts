@@ -12,7 +12,6 @@ import {
   POST_VIDEO_SIZES,
 } from '@azzapp/shared/postHelpers';
 import type {
-  Extension,
   MediaImageResolvers,
   MediaResolvers,
   MediaVideoResolvers,
@@ -129,14 +128,12 @@ const uriResolver =
       height,
       pixelRatio,
       raw,
-      extension,
       videoDurationPercentage,
     }: {
       width?: number | null;
       height?: number | null;
       pixelRatio?: number | null;
       raw?: boolean | null;
-      extension?: Extension | null;
       videoDurationPercentage?: number | null;
     },
   ) => {
@@ -147,7 +144,7 @@ const uriResolver =
       return getCloudinaryAssetURL(
         id,
         kind,
-        kind === 'video' ? 'mp4' : kind === 'image' ? 'webp' : undefined,
+        kind === 'video' ? 'mp4' : kind === 'image' ? 'avif' : undefined,
       );
     }
     const pregeneratedSizes =
@@ -168,7 +165,6 @@ const uriResolver =
       height,
       pixelRatio,
       pregeneratedSizes,
-      extension,
       videoDurationPercentage,
     });
   };
