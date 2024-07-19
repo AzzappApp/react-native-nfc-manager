@@ -47,7 +47,7 @@ const CoverTemplateTypeForm = ({
       coverTemplateType
         ? {
             ...coverTemplateType,
-            baseLabelValue: label,
+            label,
           }
         : { enabled: true },
     formErrors?.fieldErrors,

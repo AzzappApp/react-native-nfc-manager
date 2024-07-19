@@ -84,7 +84,7 @@ const WebCardCategoryForm = ({
       webCardCategory
         ? {
             ...webCardCategory,
-            baseLabelValue: label,
+            label,
             activities:
               categoryCompanyActivities?.map(
                 id =>
