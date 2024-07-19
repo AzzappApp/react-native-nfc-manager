@@ -2,7 +2,6 @@ import { z } from 'zod';
 
 export const companyActivitiesTypeSchema = z.object({
   label: z.string().min(1),
-  baseLabelValue: z.string().min(1),
 });
 
 export type CompanyActivitiesTypeFormValue = z.infer<
