@@ -76,6 +76,9 @@ const MultiUserScreenUserList = ({
             url
           }
         }
+        logo {
+          id
+        }
         ...MultiUserScreenUserList_profiles
         ...MultiUserPendingProfileOwner
       }
@@ -90,7 +93,8 @@ const MultiUserScreenUserList = ({
     (webCard.commonInformation?.emails?.some(a => a.address) ? 1 : 0) +
     (webCard.commonInformation?.phoneNumbers?.some(p => p.number) ? 1 : 0) +
     (webCard.commonInformation?.urls?.some(u => u.address) ? 1 : 0) +
-    (webCard.commonInformation?.socials?.some(s => s.url) ? 1 : 0);
+    (webCard.commonInformation?.socials?.some(s => s.url) ? 1 : 0) +
+    (webCard.logo ? 1 : 0);
 
   const onAddUsers = useCallback(() => {
     router.push({ route: 'MULTI_USER_ADD' });
