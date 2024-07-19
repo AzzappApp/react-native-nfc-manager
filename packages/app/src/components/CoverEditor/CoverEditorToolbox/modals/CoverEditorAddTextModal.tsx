@@ -2,6 +2,7 @@ import { useCallback, useMemo, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { FlatList, ScrollView, View } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
+import { APPLICATIONS_FONTS } from '@azzapp/shared/fontHelpers';
 import { colors } from '#theme';
 import { useCoverEditorContext } from '#components/CoverEditor/CoverEditorContext';
 import { ScreenModal } from '#components/NativeRouter';
@@ -186,18 +187,10 @@ const AddTextModalItem = ({
 
 type TextStyleItem = { fontFamily: string; fontSize: number };
 
-const titleTextStyles: TextStyleItem[] = [
-  { fontFamily: 'DMSerifDisplay_Regular', fontSize: 25 },
-  { fontFamily: 'Koulen_Regular', fontSize: 25 },
-  { fontFamily: 'Koulen_Regular', fontSize: 25 },
-  { fontFamily: 'DMSerifDisplay_Regular', fontSize: 25 },
-  { fontFamily: 'DMSerifDisplay_Regular', fontSize: 25 },
-  { fontFamily: 'Koulen_Regular', fontSize: 25 },
-  { fontFamily: 'Koulen_Regular', fontSize: 25 },
-  { fontFamily: 'DMSerifDisplay_Regular', fontSize: 25 },
-  { fontFamily: 'DMSerifDisplay_Regular', fontSize: 25 },
-  { fontFamily: 'Koulen_Regular', fontSize: 25 },
-];
+const titleTextStyles: TextStyleItem[] = APPLICATIONS_FONTS.map(font => ({
+  fontFamily: font,
+  fontSize: 25,
+}));
 
 const simpleTextStyles: TextStyleItem[] = [];
 const staticTextStyles: TextStyleItem[] = [];
