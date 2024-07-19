@@ -1,5 +1,6 @@
-## 0.5.19-canary.186
+## 0.5.19-canary.187
 
+* **fix:**  - 🐛 add logo to common information count ([#4364](https://github.com/AzzappApp/azzapp/pull/4364))
 * **fix:**  - **webcard:** [#4359](https://github.com/AzzappApp/azzapp/pull/4359) avoid applying same template multiple times ([#4363](https://github.com/AzzappApp/azzapp/pull/4363))
 * **fix:**  - azzapp+ message
 * **fix:**  - **contactCard:** [#4344](https://github.com/AzzappApp/azzapp/pull/4344) issue on size recuperation on android ([#4353](https://github.com/AzzappApp/azzapp/pull/4353))
