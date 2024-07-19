@@ -1,5 +1,6 @@
-## 0.5.19-canary.183
+## 0.5.19-canary.184
 
+* **fix:**  - azzapp+ message
 * **fix:**  - **contactCard:** [#4344](https://github.com/AzzappApp/azzapp/pull/4344) issue on size recuperation on android ([#4353](https://github.com/AzzappApp/azzapp/pull/4353))
 * **fix:**  - Blink at the end of the video
 * **fix:**  - blink on single image
