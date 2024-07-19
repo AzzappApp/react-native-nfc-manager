@@ -159,7 +159,7 @@ const CoverCreationScreen = ({
                     <FormattedMessage
                       description="NewWebCardScreen - Description for pro category"
                       defaultMessage="azzapp+ WebCard{azzappA}"
-                      values={{ azzappA: 'a' }}
+                      values={{ azzappA: <Text variant="azzapp">a</Text> }}
                     />
                   </Text>
                   <PremiumIndicator isRequired />
