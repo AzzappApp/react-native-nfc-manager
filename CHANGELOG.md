@@ -1,4 +1,4 @@
-## 0.5.19-canary.184
+## 0.5.19-canary.185
 
 * **fix:**  - azzapp+ message
 * **fix:**  - **contactCard:** [#4344](https://github.com/AzzappApp/azzapp/pull/4344) issue on size recuperation on android ([#4353](https://github.com/AzzappApp/azzapp/pull/4353))
