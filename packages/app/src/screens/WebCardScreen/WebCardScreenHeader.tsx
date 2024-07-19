@@ -145,7 +145,7 @@ const WebCardScreenHeader = ({
             </View>
           }
           leftElement={
-            selectionMode ? (
+            (selectionMode && (
               <HeaderButton
                 disabled={disabledButtons}
                 variant="secondary"
@@ -156,18 +156,20 @@ const WebCardScreenHeader = ({
                     'Cancel edit modules button label in webCard edition screen',
                 })}
               />
-            ) : (
+            )) ||
+            (webCard.cardModules.length > 0 && (
               <HeaderButton
                 disabled={disabledButtons}
                 variant="secondary"
                 onPress={onEditModules}
                 label={intl.formatMessage({
-                  defaultMessage: 'Edit',
+                  defaultMessage: 'Select',
                   description:
-                    'Edit modules button label in webCard edition screen',
+                    'Select modules button label in webCard edition screen',
                 })}
               />
-            )
+            )) ||
+            null
           }
           rightElement={
             selectionMode ? (
