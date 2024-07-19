@@ -1,5 +1,9 @@
-## 0.5.19-canary.180
+## 0.5.19-canary.181
 
+* **fix:**  - be sure userId is setup in profileInfo, use relay userId to initiate rc ([#4347](https://github.com/AzzappApp/azzapp/pull/4347))
+* **fix:**  - set indicator as white
+* **fix:**  - **web:** [#2740](https://github.com/AzzappApp/azzapp/pull/2740) separate android and ios links ([#4343](https://github.com/AzzappApp/azzapp/pull/4343))
+* **fix:**  - missing slash
 * **fix:**  - **SocialLinksSection:** fix layout ([#4341](https://github.com/AzzappApp/azzapp/pull/4341))
 * **fix:**  - **CoverEditor:** disable font scaling on text input
 * **fix:**  - **images:** [#3633](https://github.com/AzzappApp/azzapp/pull/3633) limit number of generated assets ([#4332](https://github.com/AzzappApp/azzapp/pull/4332))
