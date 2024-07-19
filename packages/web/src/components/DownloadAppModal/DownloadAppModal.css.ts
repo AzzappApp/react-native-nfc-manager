@@ -50,7 +50,15 @@ const footerTitle = style([
 
 const footerText = style([textMedium, { marginTop: '10px' }]);
 
-const footerButton = style({ marginTop: '20px', width: '100%' });
+const footerButton = style({ marginTop: '20px', width: '100%', height: 47 });
+
+const footerButtons = style({
+  display: 'flex',
+  flexDirection: 'row',
+  justifyContent: 'space-evenly',
+  width: '100%',
+  columnGap: 10,
+});
 
 const styles = {
   coverWrapper,
@@ -62,6 +70,7 @@ const styles = {
   footerTitle,
   footerText,
   footerButton,
+  footerButtons,
 };
 
 export default styles;

@@ -68,7 +68,7 @@ const RootLayout = async ({
         <meta name="smartbanner:button" content="VIEW" />
         <meta
           name="smartbanner:button-url-google"
-          content={process.env.NEXT_PUBLIC_DOWNLOAD_MOBILE_APP}
+          content={process.env.NEXT_PUBLIC_DOWNLOAD_ANDROID_APP}
         />
         <meta name="smartbanner:enabled-platforms" content="android" />
         <meta name="smartbanner:close-label" content="Close" />
