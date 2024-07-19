@@ -1,5 +1,7 @@
-## 0.5.19-canary.181
+## 0.5.19-canary.182
 
+* **fix:**  - Blink at the end of the video
+* **fix:**  - blink on single image
 * **fix:**  - be sure userId is setup in profileInfo, use relay userId to initiate rc ([#4347](https://github.com/AzzappApp/azzapp/pull/4347))
 * **fix:**  - set indicator as white
 * **fix:**  - **web:** [#2740](https://github.com/AzzappApp/azzapp/pull/2740) separate android and ios links ([#4343](https://github.com/AzzappApp/azzapp/pull/4343))
