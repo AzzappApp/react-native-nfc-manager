@@ -16,7 +16,7 @@ export const getCloudinaryAssetURL = (
   format?: 'avif' | 'jpg' | 'mp4' | 'png' | 'svg' | 'webp',
 ) => {
   assetNotRN('getCloudinaryAssetURL');
-  return `${CLOUDINARY_BASE_URL}/${kind}/upload${format ? `/f_${format}` : ''}${id}`;
+  return `${CLOUDINARY_BASE_URL}/${kind}/upload${format ? `/f_${format}` : '/'}${id}`;
 };
 
 /**
