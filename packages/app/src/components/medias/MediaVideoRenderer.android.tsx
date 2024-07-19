@@ -1,23 +1,26 @@
-import { ResizeMode, Video } from 'expo-av';
 import {
   forwardRef,
   useCallback,
-  useEffect,
   useImperativeHandle,
   useMemo,
   useRef,
   useState,
 } from 'react';
 import { StyleSheet, View } from 'react-native';
+import Video from 'react-native-video';
 import { useLocalCachedMediaFile } from '#helpers/mediaHelpers/AndroidLocalMediaCache';
-import ActivityIndicator from '#ui/ActivityIndicator';
+import { DelayedActivityIndicator } from '#ui/ActivityIndicator/ActivityIndicator';
 import MediaImageRenderer from './MediaImageRenderer';
 import type {
   MediaVideoRendererHandle,
   MediaVideoRendererProps,
 } from './mediasTypes';
-import type { AVPlaybackStatus } from 'expo-av';
 import type { ForwardedRef } from 'react';
+import type {
+  OnProgressData,
+  VideoRef,
+  ReactVideoProps,
+} from 'react-native-video';
 
 /**
  * A native component that allows to display a video.
@@ -43,7 +46,8 @@ const MediaVideoRenderer = (
   ref: ForwardedRef<MediaVideoRendererHandle>,
 ) => {
   const isReadyForDisplay = useRef(false);
-  const [videoReady, setVideoReady] = useState(false);
+
+  const [loading, setLoading] = useState(true);
 
   const dispatchReady = useCallback(() => {
     if (!isReadyForDisplay.current) {
@@ -53,7 +57,6 @@ const MediaVideoRenderer = (
   }, [onReadyForDisplay]);
 
   const onVideoReadyForDisplay = useCallback(() => {
-    setVideoReady(true);
     onVideoReady?.();
     dispatchReady();
   }, [dispatchReady, onVideoReady]);
@@ -62,12 +65,11 @@ const MediaVideoRenderer = (
   // we need to clean the state to start loading
   // the placeholder
   if (sourceRef.current !== source.mediaId) {
-    setVideoReady(false);
     sourceRef.current = source.mediaId;
     isReadyForDisplay.current = false;
   }
 
-  const videoRef = useRef<Video>(null);
+  const videoRef = useRef<VideoRef>(null);
   const containerRef = useRef<any>(null);
 
   useImperativeHandle(
@@ -75,8 +77,7 @@ const MediaVideoRenderer = (
     () => ({
       async getPlayerCurrentTime() {
         if (videoRef.current) {
-          const status = await videoRef.current.getStatusAsync();
-          return status.isLoaded === true ? status.positionMillis : null;
+          return videoRef.current.getCurrentPosition();
         }
         return null;
       },
@@ -89,12 +90,34 @@ const MediaVideoRenderer = (
 
   const localVideoFile = useLocalCachedMediaFile(source.mediaId, 'video');
 
-  const videoSource = useMemo(() => {
+  const videoSource: ReactVideoProps['source'] = useMemo(() => {
     if (localVideoFile) {
-      return { uri: localVideoFile };
+      return {
+        uri: localVideoFile,
+        startPosition: currentTime ?? undefined,
+      };
     }
-    return { uri: source.uri };
-  }, [localVideoFile, source]);
+    return { uri: source.uri, startPosition: currentTime ?? undefined };
+  }, [localVideoFile, source, currentTime]);
+
+  const onPlaybackStatusUpdate = useCallback(
+    (status: OnProgressData) => {
+      onProgress?.({
+        currentTime: status.currentTime,
+        duration: status.playableDuration,
+      });
+    },
+    [onProgress],
+  );
+
+  const onLoadEnd = useCallback(() => {
+    setLoading(false);
+  }, []);
+
+  const containerStyle = useMemo(
+    () => [style, { overflow: 'hidden' as const }],
+    [style],
+  );
 
   const thumbnailSource = useMemo(
     () =>
@@ -108,68 +131,50 @@ const MediaVideoRenderer = (
     [source.mediaId, source.requestedSize, thumbnailURI],
   );
 
-  useEffect(() => {
-    if (paused) {
-      videoRef.current?.pauseAsync();
-    } else if (videoReady) {
-      videoRef.current?.playAsync();
-    }
-  }, [paused, videoEnabled, videoReady]);
-
-  const onPlaybackStatusUpdate = useCallback(
-    (status: AVPlaybackStatus) => {
-      if (status.isLoaded && status.didJustFinish) {
-        onEnd?.();
-      }
-
-      if (status.isLoaded && status.durationMillis) {
-        onProgress?.({
-          currentTime: status.positionMillis / 1000,
-          duration: status.durationMillis / 1000,
-        });
-      }
-    },
-    [onEnd, onProgress],
-  );
-
-  const containerStyle = useMemo(
-    () => [style, { overflow: 'hidden' as const }],
-    [style],
-  );
-
   return (
     <View style={containerStyle} ref={containerRef} {...props}>
-      {thumbnailSource && !currentTime && (
-        <MediaImageRenderer
-          testID="thumbnail"
-          source={thumbnailSource}
-          alt={alt}
-          onReadyForDisplay={dispatchReady}
+      <View style={StyleSheet.absoluteFill}>
+        <Video
+          ref={videoRef}
+          source={videoEnabled ? videoSource : undefined}
+          muted={muted}
+          paused={paused}
+          disableFocus={true}
+          onProgress={onPlaybackStatusUpdate}
+          onEnd={onEnd}
+          accessibilityLabel={alt}
+          repeat
           style={StyleSheet.absoluteFill}
+          resizeMode="contain"
+          onReadyForDisplay={onVideoReadyForDisplay}
+          playInBackground={false}
+          onError={onError}
+          progressUpdateInterval={onProgress ? 50 : undefined}
+          hideShutterView
+          shutterColor="transparent"
+          onLoad={onLoadEnd}
+          renderLoader={
+            thumbnailSource && (
+              <MediaImageRenderer
+                testID="thumbnail"
+                source={thumbnailSource}
+                alt={alt}
+                onReadyForDisplay={dispatchReady}
+                style={StyleSheet.absoluteFill}
+              />
+            )
+          }
         />
-      )}
-      {videoEnabled && (
-        <View style={StyleSheet.absoluteFill}>
-          <Video
-            ref={videoRef}
-            source={videoSource}
-            isMuted={muted}
-            positionMillis={currentTime ?? undefined}
-            accessibilityLabel={alt}
-            isLooping
-            style={StyleSheet.absoluteFill}
-            resizeMode={ResizeMode.CONTAIN}
-            onReadyForDisplay={onVideoReadyForDisplay}
-            onPlaybackStatusUpdate={onPlaybackStatusUpdate}
-            onError={onError}
-            progressUpdateIntervalMillis={onProgress ? 50 : undefined}
-          >
-            <View style={styles.loadingContainer}>
-              <ActivityIndicator color="white" video />
-            </View>
-          </Video>
-        </View>
-      )}
+        {loading && videoEnabled && (
+          <View style={styles.loadingContainer}>
+            <DelayedActivityIndicator
+              color="white"
+              variant="video"
+              delay={3000}
+            />
+          </View>
+        )}
+      </View>
     </View>
   );
 };

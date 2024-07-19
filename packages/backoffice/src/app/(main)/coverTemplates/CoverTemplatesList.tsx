@@ -4,6 +4,7 @@ import { Search } from '@mui/icons-material';
 import {
   Box,
   Button,
+  // Button,
   Chip,
   FormControl,
   InputAdornment,
@@ -55,11 +56,8 @@ const CoverTemplatesList = ({
   const [loading, startTransition] = useTransition();
   const [currentSearch, setCurrentSearch] = useState(search ?? '');
   const defferedSearch = useDeferredValue(currentSearch);
-  const [personalStatusFilter, setPersonalStatusFilter] = useState(
-    filters?.personalStatus || 'All',
-  );
-  const [businessStatusFilter, setBusinessStatusFilter] = useState(
-    filters?.businessStatus || 'All',
+  const [statusFilter, setPersonalStatusFilter] = useState(
+    filters?.status || 'All',
   );
 
   const updateSearchParams = useCallback(
@@ -72,7 +70,7 @@ const CoverTemplatesList = ({
     ) => {
       startTransition(() => {
         router.replace(
-          `/coverTemplates?page=${page}&sort=${sort}&order=${order}&s=${search ?? ''}&ps=${filters.personalStatus ?? ''}&bs=${filters.businessStatus ?? ''}`,
+          `/coverTemplates?page=${page}&sort=${sort}&order=${order}&s=${search ?? ''}&st=${filters.status ?? ''}`,
         );
       });
     },
@@ -82,40 +80,25 @@ const CoverTemplatesList = ({
   const onPageChange = useCallback(
     (model: GridPaginationModel) => {
       updateSearchParams(model.page + 1, sortField, sortOrder, search, {
-        businessStatus: businessStatusFilter,
-        personalStatus: personalStatusFilter,
+        status: statusFilter,
       });
     },
-    [
-      businessStatusFilter,
-      personalStatusFilter,
-      search,
-      sortField,
-      sortOrder,
-      updateSearchParams,
-    ],
+    [statusFilter, search, sortField, sortOrder, updateSearchParams],
   );
 
   const onSortModelChange = useCallback(
     (model: GridSortModel) => {
       updateSearchParams(
         page,
-        model[0]?.field ?? 'labelKey',
+        model[0]?.field ?? 'label',
         model[0]?.sort ?? 'asc',
         search,
         {
-          businessStatus: businessStatusFilter,
-          personalStatus: personalStatusFilter,
+          status: statusFilter,
         },
       );
     },
-    [
-      businessStatusFilter,
-      page,
-      personalStatusFilter,
-      search,
-      updateSearchParams,
-    ],
+    [page, statusFilter, search, updateSearchParams],
   );
 
   useEffect(() => {
@@ -123,42 +106,27 @@ const CoverTemplatesList = ({
       return;
     }
     updateSearchParams(1, sortField, sortOrder, defferedSearch, {
-      businessStatus: businessStatusFilter,
-      personalStatus: personalStatusFilter,
+      status: statusFilter,
     });
   }, [
-    businessStatusFilter,
     defferedSearch,
     page,
-    personalStatusFilter,
+    statusFilter,
     search,
     sortField,
     sortOrder,
     updateSearchParams,
   ]);
 
-  const onPersonalStatusChange = useCallback(
+  const onStatusChange = useCallback(
     (event: SelectChangeEvent) => {
       const newStatus = event.target.value as Status;
       setPersonalStatusFilter(newStatus);
       updateSearchParams(1, sortField, sortOrder, search, {
-        businessStatus: businessStatusFilter,
-        personalStatus: newStatus,
+        status: newStatus,
       });
     },
-    [businessStatusFilter, search, sortField, sortOrder, updateSearchParams],
-  );
-
-  const onBusinessStatusChange = useCallback(
-    (event: SelectChangeEvent) => {
-      const newStatus = event.target.value as Status;
-      setBusinessStatusFilter(newStatus);
-      updateSearchParams(1, sortField, sortOrder, search, {
-        businessStatus: newStatus,
-        personalStatus: personalStatusFilter,
-      });
-    },
-    [personalStatusFilter, search, sortField, sortOrder, updateSearchParams],
+    [search, sortField, sortOrder, updateSearchParams],
   );
 
   return (
@@ -197,27 +165,13 @@ const CoverTemplatesList = ({
             }}
           />
           <FormControl sx={{ width: 130 }}>
-            <InputLabel id="businessStatus">Business status</InputLabel>
+            <InputLabel id="status">Status</InputLabel>
             <Select
-              labelId="businessStatus"
-              id="businessStatus"
-              value={businessStatusFilter}
-              label="Business status"
-              onChange={onBusinessStatusChange}
-            >
-              <MenuItem value={'All'}>All</MenuItem>
-              <MenuItem value={'Enabled'}>Enabled</MenuItem>
-              <MenuItem value={'Disabled'}>Disabled</MenuItem>
-            </Select>
-          </FormControl>
-          <FormControl sx={{ width: 130 }}>
-            <InputLabel id="personalStatus">Personal status</InputLabel>
-            <Select
-              labelId="personalStatus"
-              id="personalStatus"
-              value={personalStatusFilter}
+              labelId="status"
+              id="status"
+              value={statusFilter}
               label="Personal status"
-              onChange={onPersonalStatusChange}
+              onChange={onStatusChange}
             >
               <MenuItem value={'All'}>All</MenuItem>
               <MenuItem value={'Enabled'}>Enabled</MenuItem>
@@ -280,25 +234,18 @@ const columns: GridColDef[] = [
     flex: 1,
   },
   {
-    field: 'kind',
-    headerName: 'Profile Kind',
+    field: 'type',
+    headerName: 'Type',
     flex: 1,
   },
   {
-    field: 'businessEnabled',
-    headerName: 'Business',
-    type: 'boolean',
-    width: 100,
-    renderCell: params => (
-      <Chip
-        color={params.value ? 'warning' : 'default'}
-        label={params.value ? 'Enabled' : 'Disabled'}
-      />
-    ),
+    field: 'mediaCount',
+    headerName: 'Media',
+    width: 150,
   },
   {
-    field: 'personalEnabled',
-    headerName: 'Personal',
+    field: 'status',
+    headerName: 'Status',
     type: 'boolean',
     width: 100,
     renderCell: params => (

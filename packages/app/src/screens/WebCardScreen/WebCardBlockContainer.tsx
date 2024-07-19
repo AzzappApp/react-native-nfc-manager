@@ -528,12 +528,13 @@ const WebCardBlockContainer = ({
                 accessibilityHint={
                   visible
                     ? intl.formatMessage({
-                        defaultMessage: 'Hides the module in your webcard',
+                        defaultMessage:
+                          'This action hides a section of your WebCard.',
                         description:
                           'Accessibility hint for the hide button in the profile edition screen',
                       })
                     : intl.formatMessage({
-                        defaultMessage: 'Shows the module in your webcard',
+                        defaultMessage: 'Shows the section in your WebCard',
                         description:
                           'Accessibility hint for the show button in the profile edition screen',
                       })
@@ -553,7 +554,7 @@ const WebCardBlockContainer = ({
                     'Accessibility label for the duplicate button in the profile edition screen',
                 })}
                 accessibilityHint={intl.formatMessage({
-                  defaultMessage: 'Duplicates the module in your webcard',
+                  defaultMessage: 'This action duplicates a WebCard section.',
                   description:
                     'Accessibility hint for the duplicate button in the profile edition screen',
                 })}
@@ -618,7 +619,8 @@ const WebCardBlockContainer = ({
                     'Accessibility label for the delete button in the profile edition screen',
                 })}
                 accessibilityHint={intl.formatMessage({
-                  defaultMessage: 'Deletes the module from your webcard',
+                  defaultMessage:
+                    'This action deletes the section from your WebCard',
                   description:
                     'Accessibility hint for the delete button in the profile edition screen',
                 })}

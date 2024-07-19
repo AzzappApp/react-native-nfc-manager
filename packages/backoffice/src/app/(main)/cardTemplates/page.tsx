@@ -1,12 +1,15 @@
-import { eq, like, or, sql, and, asc, desc } from 'drizzle-orm';
-import { CardTemplateTable, CardTemplateTypeTable, db } from '@azzapp/data';
+import { Box, TextField, Typography } from '@mui/material';
+import { eq, like, sql, and, asc, desc, or } from 'drizzle-orm';
+import { alias } from 'drizzle-orm/mysql-core';
+import { CardTemplateTable, LocalizationMessageTable, db } from '@azzapp/data';
+import { DEFAULT_LOCALE, ENTITY_TARGET } from '@azzapp/i18n';
 import CardTemplatesList from './CardTemplatesList';
 import type { CardModuleTemplate } from '@azzapp/data';
 
 export type CardTemplateItem = {
   id: string;
-  labelKey: string;
-  type: string;
+  label: string | null;
+  type: string | null;
   modules: CardModuleTemplate[];
   personalEnabled: boolean;
   businessEnabled: boolean;
@@ -18,6 +21,11 @@ export type Filters = {
   personalStatus?: Status | 'All';
   businessStatus?: Status | 'All';
 };
+
+const CardTemplateTypeLocalizationMessage = alias(
+  LocalizationMessageTable,
+  'CardTemplateTypeLocalizationMessage',
+);
 
 const getFilters = (filters: Filters) => {
   const f = [];
@@ -34,16 +42,17 @@ const getFilters = (filters: Filters) => {
 const getSearch = (search: string | null) => {
   if (search) {
     return or(
-      like(CardTemplateTable.labelKey, `%${search}%`),
-      like(CardTemplateTypeTable.labelKey, `%${search}%`),
+      like(LocalizationMessageTable.value, `%${search}%`),
+      like(CardTemplateTypeLocalizationMessage.value, `%${search}%`),
     );
   }
+  return undefined;
 };
 
-export type SortColumn = 'labelKey' | 'type';
+export type SortColumn = 'label' | 'type';
 
 const sortsColumns = {
-  labelKey: CardTemplateTable.labelKey,
+  label: LocalizationMessageTable.value,
   type: sql`type`,
   personalEnabled: sql`personalEnabled`,
   businessEnabled: sql`businessEnabled`,
@@ -53,16 +62,33 @@ const getQuery = (search: string | null, filters: Filters) => {
   const query = db
     .select({
       id: CardTemplateTable.id,
-      labelKey: CardTemplateTable.labelKey,
-      type: sql`${CardTemplateTypeTable.labelKey}`.mapWith(String).as('type'),
+      label: LocalizationMessageTable.value,
+      type: sql`${CardTemplateTypeLocalizationMessage.value}`
+        .mapWith(String)
+        .as('type'),
       modules: CardTemplateTable.modules,
       personalEnabled: CardTemplateTable.personalEnabled,
       businessEnabled: CardTemplateTable.businessEnabled,
     })
     .from(CardTemplateTable)
-    .innerJoin(
-      CardTemplateTypeTable,
-      eq(CardTemplateTable.cardTemplateTypeId, CardTemplateTypeTable.id),
+    .leftJoin(
+      LocalizationMessageTable,
+      and(
+        eq(CardTemplateTable.id, LocalizationMessageTable.key),
+        eq(LocalizationMessageTable.target, ENTITY_TARGET),
+        eq(LocalizationMessageTable.locale, DEFAULT_LOCALE),
+      ),
+    )
+    .leftJoin(
+      CardTemplateTypeLocalizationMessage,
+      and(
+        eq(
+          CardTemplateTable.cardTemplateTypeId,
+          CardTemplateTypeLocalizationMessage.key,
+        ),
+        eq(CardTemplateTypeLocalizationMessage.target, ENTITY_TARGET),
+        eq(CardTemplateTypeLocalizationMessage.locale, DEFAULT_LOCALE),
+      ),
     )
     .where(and(getSearch(search), ...getFilters(filters)))
     .$dynamic();
@@ -115,7 +141,7 @@ const CardTemplatesPage = async ({ searchParams = {} }: Props) => {
 
   const sort = Object.keys(sortsColumns).includes(searchParams.sort as any)
     ? (searchParams.sort as any)
-    : 'labelKey';
+    : 'label';
 
   const order = searchParams.order === 'desc' ? 'desc' : 'asc';
   const search = searchParams.s ?? null;
@@ -133,16 +159,40 @@ const CardTemplatesPage = async ({ searchParams = {} }: Props) => {
   );
   const count = await getCount(search, filters);
   return (
-    <CardTemplatesList
-      cardTemplates={cardTemplates}
-      count={count}
-      page={page}
-      pageSize={PAGE_SIZE}
-      sortField={sort}
-      sortOrder={order}
-      search={search}
-      filters={filters}
-    />
+    <Box
+      sx={{
+        display: 'flex',
+        flexDirection: 'column',
+        height: '100%',
+      }}
+    >
+      <Typography variant="h4" component="h1" sx={{ mb: 2 }}>
+        WebCards templates
+      </Typography>
+      <TextField
+        id="note"
+        inputProps={{
+          readOnly: true,
+        }}
+        label="Note"
+        multiline
+        rows={1}
+        maxRows={3}
+        value={
+          'WebCard templates are associated to a template type, and displayed horizontally in the “load template” view'
+        }
+      />
+      <CardTemplatesList
+        cardTemplates={cardTemplates}
+        count={count}
+        page={page}
+        pageSize={PAGE_SIZE}
+        sortField={sort}
+        sortOrder={order}
+        search={search}
+        filters={filters}
+      />
+    </Box>
   );
 };
 

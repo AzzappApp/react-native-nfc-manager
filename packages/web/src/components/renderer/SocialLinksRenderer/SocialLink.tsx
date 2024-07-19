@@ -1,4 +1,5 @@
-import { SOCIAL_LINKS } from '@azzapp/shared/socialLinkHelpers';
+import { LINKS_ELEMENT_WRAPPER_MULTIPLER } from '@azzapp/shared/coverHelpers';
+import { generateSocialLink } from '@azzapp/shared/socialLinkHelpers';
 import SocialIcon from '#ui/SocialIcons/SocialIcon';
 import type { SocialLinkId } from '@azzapp/shared/socialLinkHelpers';
 
@@ -7,13 +8,13 @@ type SocialLinkProps = {
   iconSize: number;
   borderWidth: number;
   iconColor: string;
+  className?: string;
 };
 
 const SocialLink = (props: SocialLinkProps) => {
-  const { link, iconSize, borderWidth, iconColor } = props;
+  const { link, iconSize, borderWidth, iconColor, className } = props;
 
   const id = link.socialId;
-  const mask = SOCIAL_LINKS_URL_MAP.get(id)!;
 
   return (
     <div
@@ -22,7 +23,7 @@ const SocialLink = (props: SocialLinkProps) => {
       }}
     >
       <a
-        href={generateLink(mask, link.link, id)}
+        href={generateSocialLink(id, link.link)}
         style={{
           display: 'flex',
           width: iconSize,
@@ -35,11 +36,12 @@ const SocialLink = (props: SocialLinkProps) => {
           justifyContent: 'center',
         }}
         aria-label={link.socialId}
+        className={className}
       >
         <SocialIcon
           icon={id}
-          width={iconSize - 22}
-          height={iconSize - 22}
+          width={iconSize / LINKS_ELEMENT_WRAPPER_MULTIPLER}
+          height={iconSize / LINKS_ELEMENT_WRAPPER_MULTIPLER}
           color={iconColor}
         />
       </a>
@@ -52,20 +54,5 @@ export type SocialLinkType = {
   link: string;
   position: number;
 };
-
-const generateLink = (mask: string, content: string, type: string) => {
-  let link = 'https://';
-
-  if (type === 'phone') link = `tel:`;
-  if (type === 'sms') link = 'sms:';
-  if (type === 'mail') link = 'mailto:';
-  if (type === 'website') return content;
-
-  return `${link}${mask}${content}`;
-};
-
-const SOCIAL_LINKS_URL_MAP = new Map(
-  SOCIAL_LINKS.map(({ id, mask }) => [id, mask]),
-);
 
 export default SocialLink;

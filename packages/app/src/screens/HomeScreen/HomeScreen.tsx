@@ -6,10 +6,12 @@ import { useRouter } from '#components/NativeRouter';
 import { dispatchGlobalEvent } from '#helpers/globalEvents';
 import relayScreen from '#helpers/relayScreen';
 import { useDeepLinkStoredRoute } from '#hooks/useDeepLink';
+import { useRevenueCat } from '#hooks/useRevenueCat';
 import { useSetRevenueCatUserInfo } from '#hooks/useSetRevenueCatUserInfo';
 import ActivityIndicator from '#ui/ActivityIndicator';
 import Container from '#ui/Container';
 import HomeScreenContent from './HomeScreenContent';
+import { HomeScreenProvider } from './HomeScreenContext';
 import type { RelayScreenProps } from '#helpers/relayScreen';
 import type { HomeScreenQuery } from '#relayArtifacts/HomeScreenQuery.graphql';
 import type { HomeRoute } from '#routes';
@@ -17,10 +19,12 @@ import type { HomeRoute } from '#routes';
 export const homeScreenQuery = graphql`
   query HomeScreenQuery {
     currentUser {
+      id
       profiles {
         id
       }
       ...HomeScreenContent_user
+      ...HomeScreenContext_user
     }
   }
 `;
@@ -32,7 +36,9 @@ const HomeScreen = ({
   //we need to wait the initial screen to be load before doing any deep link
   useDeepLinkStoredRoute();
   useSetRevenueCatUserInfo();
+
   const { currentUser } = usePreloadedQuery(homeScreenQuery, preloadedQuery);
+  useRevenueCat(currentUser?.id);
   const router = useRouter();
 
   useEffect(() => {
@@ -60,7 +66,9 @@ const HomeScreen = ({
 
   return (
     <Suspense>
-      <HomeScreenContent user={currentUser} />
+      <HomeScreenProvider userKey={currentUser}>
+        <HomeScreenContent user={currentUser} />
+      </HomeScreenProvider>
     </Suspense>
   );
 };

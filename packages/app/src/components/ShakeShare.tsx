@@ -81,7 +81,7 @@ const ShakeShare = () => {
 
 export default ShakeShare;
 
-const { width } = Dimensions.get('screen');
+const { width } = Dimensions.get('window');
 
 const QR_CODE_WIDTH = Math.round(width * 0.6);
 

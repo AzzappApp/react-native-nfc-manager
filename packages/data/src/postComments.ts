@@ -92,9 +92,7 @@ export const getPostCommentsWithWebCard = async (
 
   const mediasMap = (
     await getMediasByIds(
-      convertToNonNullArray(
-        res.map(({ WebCard }) => WebCard.coverData?.mediaId),
-      ),
+      convertToNonNullArray(res.map(({ WebCard }) => WebCard.coverMediaId)),
     )
   ).reduce((acc, media) => {
     if (!media) return acc;
@@ -105,7 +103,7 @@ export const getPostCommentsWithWebCard = async (
   const result: PostCommentWithWebCard[] = [];
 
   for (const { PostComment, WebCard } of res) {
-    const media = mediasMap.get(WebCard.coverData?.mediaId ?? '');
+    const media = mediasMap.get(WebCard.coverMediaId ?? '');
     if (!media) continue;
     result.push({
       PostComment,

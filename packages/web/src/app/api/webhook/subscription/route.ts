@@ -2,6 +2,7 @@ import { withAxiom } from 'next-axiom';
 import * as z from 'zod';
 import {
   acknowledgeRecurringPayment,
+  checkSignature,
   rejectRecurringPayment,
 } from '@azzapp/payment';
 
@@ -17,6 +18,7 @@ const subscriptionPostSchema = z.object({
     rebill_manager_external_reference: z.string(),
     provider_response: z.string(),
     rebill_manager_state: z.string(),
+    HASH: z.string().optional(),
   }),
 });
 
@@ -24,6 +26,12 @@ export const POST = withAxiom(async (req: Request) => {
   const json = await req.json();
 
   const data = subscriptionPostSchema.parse(json);
+
+  if ('HASH' in data.json) {
+    if (!data.json.HASH || !(await checkSignature(data.json, data.json.HASH))) {
+      return new Response('hash mismatch', { status: 400 });
+    }
+  }
 
   if (data.json.status === 'OK') {
     await acknowledgeRecurringPayment(

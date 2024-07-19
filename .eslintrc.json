@@ -37,6 +37,7 @@
     "packages/schema/lib",
     "packages/payment/lib",
     "packages/web/.next",
+    "packages/web/public/smartbanner.*",
     "trash"
   ],
   "rules": {

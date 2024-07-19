@@ -1,15 +1,18 @@
+import { Box, TextField, Typography } from '@mui/material';
 import { and, asc, desc, eq, like, or, sql } from 'drizzle-orm';
+import { alias } from 'drizzle-orm/mysql-core';
 import {
   CardTemplateTable,
   CardTemplateTypeTable,
-  WebCardCategoryTable,
+  LocalizationMessageTable,
   db,
 } from '@azzapp/data';
+import { DEFAULT_LOCALE, ENTITY_TARGET } from '@azzapp/i18n';
 import CardTemplateTypesList from './CardTemplateTypesList';
 
 export type CardTemplateTypeItem = {
   id: string;
-  labelKey: string;
+  label: string | null;
   category: string;
   status: boolean;
   templates: number;
@@ -21,6 +24,21 @@ export type Filters = {
   status?: Status | 'All';
 };
 
+const WebCardCategoryLocalizationMessage = alias(
+  LocalizationMessageTable,
+  'WebCardCategoryLocalizationMessage',
+);
+
+const getSearch = (search: string | null) => {
+  if (search) {
+    return or(
+      like(LocalizationMessageTable.value, `%${search}%`),
+      like(WebCardCategoryLocalizationMessage.value, `%${search}%`),
+    );
+  }
+  return undefined;
+};
+
 const getFilters = (filters: Filters) => {
   const f = [];
   if (filters.status && filters.status !== 'All') {
@@ -30,19 +48,10 @@ const getFilters = (filters: Filters) => {
   return f;
 };
 
-const getSearch = (search: string | null) => {
-  if (search) {
-    return or(
-      like(CardTemplateTypeTable.labelKey, `%${search}%`),
-      like(WebCardCategoryTable.labelKey, `%${search}%`),
-    );
-  }
-};
-
-export type SortColumn = 'category' | 'labelKey';
+export type SortColumn = 'category' | 'label';
 
 const sortsColumns = {
-  labelKey: CardTemplateTypeTable.labelKey,
+  label: LocalizationMessageTable.value,
   category: sql`category`,
   status: CardTemplateTypeTable.enabled,
   templates: sql`templates`,
@@ -52,23 +61,43 @@ const getQuery = (search: string | null, filters: Filters) => {
   const query = db
     .select({
       id: CardTemplateTypeTable.id,
-      labelKey: CardTemplateTypeTable.labelKey,
-      category: sql`${WebCardCategoryTable.labelKey}`
+      label: LocalizationMessageTable.value,
+      category: sql`${WebCardCategoryLocalizationMessage.value}`
         .mapWith(String)
         .as('category'),
       status: CardTemplateTypeTable.enabled,
       templates: sql`count(*)`.mapWith(Number).as('templates'),
     })
     .from(CardTemplateTypeTable)
-    .innerJoin(
-      WebCardCategoryTable,
-      eq(CardTemplateTypeTable.webCardCategoryId, WebCardCategoryTable.id),
+    .leftJoin(
+      LocalizationMessageTable,
+      and(
+        eq(CardTemplateTypeTable.id, LocalizationMessageTable.key),
+        eq(LocalizationMessageTable.target, ENTITY_TARGET),
+        eq(LocalizationMessageTable.locale, DEFAULT_LOCALE),
+      ),
+    )
+    .leftJoin(
+      WebCardCategoryLocalizationMessage,
+      and(
+        eq(
+          CardTemplateTypeTable.webCardCategoryId,
+          WebCardCategoryLocalizationMessage.key,
+        ),
+        eq(WebCardCategoryLocalizationMessage.target, ENTITY_TARGET),
+        eq(WebCardCategoryLocalizationMessage.locale, DEFAULT_LOCALE),
+      ),
     )
     .leftJoin(
       CardTemplateTable,
       eq(CardTemplateTable.cardTemplateTypeId, CardTemplateTypeTable.id),
     )
-    .groupBy(CardTemplateTypeTable.id, WebCardCategoryTable.labelKey)
+    .groupBy(
+      CardTemplateTypeTable.id,
+      LocalizationMessageTable.value,
+      WebCardCategoryLocalizationMessage.value,
+      CardTemplateTypeTable.enabled,
+    )
     .where(and(getSearch(search), ...getFilters(filters)))
     .$dynamic();
 
@@ -119,7 +148,7 @@ const CardTemplateTypesPage = async ({ searchParams = {} }: Props) => {
 
   const sort = Object.keys(sortsColumns).includes(searchParams.sort as any)
     ? (searchParams.sort as any)
-    : 'labelKey';
+    : 'label';
 
   const order = searchParams.order === 'desc' ? 'desc' : 'asc';
   const search = searchParams.s ?? null;
@@ -136,16 +165,40 @@ const CardTemplateTypesPage = async ({ searchParams = {} }: Props) => {
   );
   const count = await getCount(search, filters);
   return (
-    <CardTemplateTypesList
-      cardTemplateTypes={cardTemplateTypes}
-      count={count}
-      page={page}
-      pageSize={PAGE_SIZE}
-      sortField={sort}
-      sortOrder={order}
-      search={search}
-      filters={filters}
-    />
+    <Box
+      sx={{
+        display: 'flex',
+        flexDirection: 'column',
+        height: '100%',
+      }}
+    >
+      <Typography variant="h4" component="h1" sx={{ mb: 2 }}>
+        WebCards templates types
+      </Typography>
+      <TextField
+        id="note"
+        inputProps={{
+          readOnly: true,
+        }}
+        label="Note"
+        multiline
+        rows={1}
+        maxRows={3}
+        value={
+          'WebCard templates types are the lowest level in the template list view'
+        }
+      />
+      <CardTemplateTypesList
+        cardTemplateTypes={cardTemplateTypes}
+        count={count}
+        page={page}
+        pageSize={PAGE_SIZE}
+        sortField={sort}
+        sortOrder={order}
+        search={search}
+        filters={filters}
+      />
+    </Box>
   );
 };
 

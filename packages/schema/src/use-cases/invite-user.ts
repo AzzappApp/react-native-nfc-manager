@@ -1,24 +1,18 @@
-import { createId } from '@paralleldrive/cuid2';
 import * as Sentry from '@sentry/nextjs';
 import {
   createProfile,
   createUser,
   db,
   getUserByEmailPhoneNumber,
-  getUserById,
-  getWebCardByProfileId,
   updateWebCard,
 } from '@azzapp/data';
+import { createId } from '@azzapp/data/helpers/createId';
 import { guessLocale } from '@azzapp/i18n';
 import { ProfileAlreadyExistsException } from './exceptions/profile-already-exists.exception';
-import {
-  ProfileDoesNotExistException,
-  UserDoesNotExistException,
-} from './exceptions/profile-does-not-exist.exception';
 import { InsufficientSubscriptionException } from './exceptions/subscription.exception';
 import { checkSubscription } from './subscription';
 import type { GraphQLContext } from '#GraphQLContext';
-import type { Profile, WebCard } from '@azzapp/data';
+import type { Profile, User, WebCard } from '@azzapp/data';
 import type { Locale } from '@azzapp/i18n';
 import type { ContactCard } from '@azzapp/shared/contactCardHelpers';
 
@@ -27,10 +21,6 @@ type Executable<Input, Output> = {
 };
 
 type Input = {
-  auth: {
-    userId: string;
-    profileId: string;
-  };
   invited: {
     contactCard?: ContactCard & {
       displayedOnWebCard?: boolean;
@@ -44,6 +34,9 @@ type Input = {
   };
   sendInvite: boolean;
   notifyUsers: GraphQLContext['notifyUsers'];
+  owner: User;
+  user: User;
+  webCard: WebCard;
 };
 
 type Output = Profile;
@@ -51,17 +44,10 @@ type Output = Profile;
 export type InviteUserUseCase = Executable<Input, Output>;
 
 export const inviteUser = async (input: Input) => {
-  const webCard = await getWebCardByProfileId(input.auth.profileId);
-
-  const user = await getUserById(input.auth.userId);
-
-  if (!webCard) throw new ProfileDoesNotExistException();
-  if (!user) throw new UserDoesNotExistException();
-
   const { profile: createdProfile, user: existingUser } =
     await db.transactionManager.startTransaction(async tx => {
-      if (!webCard.isMultiUser) {
-        await updateWebCard(webCard.id, { isMultiUser: true });
+      if (!input.webCard.isMultiUser) {
+        await updateWebCard(input.webCard.id, { isMultiUser: true });
       }
 
       const existingUser = await getUserByEmailPhoneNumber(
@@ -86,7 +72,7 @@ export const inviteUser = async (input: Input) => {
       try {
         profile = {
           id: createId(),
-          webCardId: webCard.id,
+          webCardId: input.webCard.id,
           userId,
           avatarId: avatarId ?? null,
           logoId: logoId ?? null,
@@ -114,8 +100,8 @@ export const inviteUser = async (input: Input) => {
       }
 
       const canBeAdded = await checkSubscription(
-        input.auth.userId,
-        webCard.id,
+        input.owner.id,
+        input.webCard.id,
         1,
       );
 
@@ -126,12 +112,12 @@ export const inviteUser = async (input: Input) => {
     });
 
   await notifyInvitedUser(
-    webCard,
+    input.webCard,
     input.sendInvite,
     input.invited.phoneNumber,
     input.invited.email,
     input.notifyUsers,
-    guessLocale(existingUser?.locale ?? user?.locale),
+    guessLocale(existingUser?.locale ?? input.user.locale),
   );
 
   return createdProfile;

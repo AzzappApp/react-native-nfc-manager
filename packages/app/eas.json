@@ -5,14 +5,21 @@
   "build": {
     "base": {
       "env": {
-        "SENTRY_DSN": "https://13a33b3788344ceea14cf298a220fead@o4505353883680768.ingest.sentry.io/4505358469038080"
+        "SENTRY_DSN": "https://13a33b3788344ceea14cf298a220fead@o4505353883680768.ingest.sentry.io/4505358469038080",
+        "TERMS_OF_SERVICE": "https://www.azzapp.com/legal/terms-of-service",
+        "PRIVACY_POLICY": "https://www.azzapp.com/legal/privacy",
+        "ABOUT": "https://www.azzapp.com/company/about_us",
+        "FAQ": "https://www.azzapp.com/company/faq"
       },
       "ios": {
-        "image": "latest"
+        "image": "latest",
+        "resourceClass": "large"
       },
       "android": {
-        "image": "latest"
-      }
+        "image": "latest",
+        "resourceClass": "large"
+      },
+      "channel": "base"
     },
     "development": {
       "extends": "base",
@@ -26,12 +33,14 @@
         "scheme": "azzapp-dev"
       },
       "env": {
-        "NEXT_PUBLIC_URL": "https://azzapp-dev.vercel.app/",
-        "NEXT_PUBLIC_API_ENDPOINT": "https://azzapp-dev.vercel.app/api",
+        "NEXT_PUBLIC_URL": "https://dev.azzapp.com/",
+        "NEXT_PUBLIC_API_ENDPOINT": "https://dev.azzapp.com/api",
         "DEPLOYMENT_ENVIRONMENT": "development",
-        "PURCHASE_IOS_KEY": "appl_XWlrdgSwpfsScIXTNWeFxtyCqzz",
-        "PURCHASE_ANDROID_KEY": "goog_oeNrOyuTiDWViuGRRPpDIGlVKMR"
-      }
+        "PURCHASE_ANDROID_KEY": "goog_vyxAfpVyZNmOdHVuuIQOBmjHevs",
+        "PURCHASE_IOS_KEY": "appl_lWmNaDeIzQcECQzHakHNyLaktch",
+        "NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME": "azzapp-dev"
+      },
+      "channel": "development"
     },
     "staging": {
       "extends": "base",
@@ -44,12 +53,14 @@
         "gradleCommand": ":app:assembleStagingRelease"
       },
       "env": {
-        "NEXT_PUBLIC_URL": "https://azzapp-staging.vercel.app/",
-        "NEXT_PUBLIC_API_ENDPOINT": "https://azzapp-staging.vercel.app/api",
+        "NEXT_PUBLIC_URL": "https://staging.azzapp.com/",
+        "NEXT_PUBLIC_API_ENDPOINT": "https://staging.azzapp.com/api",
         "DEPLOYMENT_ENVIRONMENT": "staging",
         "PURCHASE_IOS_KEY": "appl_XWlrdgSwpfsScIXTNWeFxtyCqzz",
-        "PURCHASE_ANDROID_KEY": "goog_oeNrOyuTiDWViuGRRPpDIGlVKMR"
-      }
+        "PURCHASE_ANDROID_KEY": "goog_oeNrOyuTiDWViuGRRPpDIGlVKMR",
+        "NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME": "azzapp-dev"
+      },
+      "channel": "staging"
     },
     "production": {
       "extends": "base",
@@ -61,10 +72,12 @@
         "gradleCommand": ":app:bundleProductionRelease"
       },
       "env": {
-        "NEXT_PUBLIC_URL": "https://azzapp.vercel.app/",
-        "NEXT_PUBLIC_API_ENDPOINT": "https://azzapp.vercel.app/api",
-        "DEPLOYMENT_ENVIRONMENT": "production"
-      }
+        "NEXT_PUBLIC_URL": "https://www.azzapp.com/",
+        "NEXT_PUBLIC_API_ENDPOINT": "https://www.azzapp.com/api",
+        "DEPLOYMENT_ENVIRONMENT": "production",
+        "NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME": "azzapp"
+      },
+      "channel": "production"
     }
   },
   "submit": {

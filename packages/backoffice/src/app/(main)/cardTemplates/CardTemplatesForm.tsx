@@ -20,13 +20,12 @@ import {
   Link,
 } from '@mui/material';
 import { omit } from 'lodash';
-import { useState, useTransition } from 'react';
-import { encodeMediaId } from '@azzapp/shared/imagesHelpers';
+import { useMemo, useState, useTransition } from 'react';
 import { uploadMedia } from '@azzapp/shared/WebAPI';
 import { getSignedUpload } from '#app/mediaActions';
 import MediaInput from '#components/MediaInput';
 import { useForm } from '#helpers/formHelpers';
-import WebCardTemplateTypeListInput from '../companyActivities/WebCardTemplateTypeListInput';
+import TypeListInput from '../../../components/TypeListInput';
 import { getModulesData, saveCardTemplate } from './cardTemplatesActions';
 import type {
   CardTemplateErrors,
@@ -36,31 +35,28 @@ import type {
   CardStyle,
   CardTemplate,
   CardTemplateType,
-  Label,
+  LocalizationMessage,
 } from '@azzapp/data';
 
 type CoverTemplateFormProps = {
   cardTemplate?: CardTemplate;
   cardTemplateTypes: CardTemplateType[];
   cardStyles: CardStyle[];
-  label?: Label | null;
-  labels: Label[];
+  labels: LocalizationMessage[];
 };
 
 const CardTemplateForm = ({
   cardStyles,
   cardTemplate,
   cardTemplateTypes,
-  label,
   labels,
 }: CoverTemplateFormProps) => {
-  const isCreation = !cardTemplate;
+  const [saving, startSaving] = useTransition();
 
   const [webCardUserName, setWebCardUserName] = useState<string | null>(null);
   const [modulesLoading, loadModules] = useTransition();
   const [modulesError, setModulesError] = useState<string | null>(null);
 
-  const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<any>(null);
   const [formErrors, setFormError] = useState<CardTemplateErrors | null>(null);
@@ -70,12 +66,20 @@ const CardTemplateForm = ({
     previewMediaId: File | string | null;
     cardTemplateType: CardTemplateType | undefined;
   };
+
+  const label = useMemo(
+    () =>
+      cardTemplate
+        ? labels.find(label => label.key === cardTemplate?.id)?.value
+        : '',
+    [cardTemplate, labels],
+  );
+
   const { data, setData, fieldProps } = useForm<Data>(
     () => {
       if (cardTemplate) {
         return {
-          labelKey: label?.labelKey ?? '',
-          baseLabelValue: label?.baseLabelValue ?? '',
+          label,
           cardStyle: cardTemplate.cardStyleId!,
           modules: cardTemplate.modules,
           businessEnabled: cardTemplate.businessEnabled,
@@ -119,61 +123,56 @@ const CardTemplateForm = ({
     });
   };
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    setSaving(true);
+    let public_id: string;
+    startSaving(async () => {
+      let previewMediaId: string;
+      if (data.previewMediaId instanceof File) {
+        const file = data.previewMediaId;
+        setUploading(true);
+        try {
+          const { uploadURL, uploadParameters } = await getSignedUpload(
+            'image',
+            'module',
+          );
+          ({ public_id } = await uploadMedia(file, uploadURL, uploadParameters)
+            .promise);
+          setUploading(false);
+        } catch (error) {
+          setError(error);
+          setUploading(false);
+        }
 
-    let previewMediaId: string;
-    if (data.previewMediaId instanceof File) {
-      const file = data.previewMediaId;
-      setUploading(true);
-      let public_id: string;
+        previewMediaId = public_id;
+      } else {
+        previewMediaId = data.previewMediaId as any;
+      }
+
+      setFormError(null);
+
       try {
-        const { uploadURL, uploadParameters } = await getSignedUpload(
-          'image',
-          'module',
+        const { success, formErrors } = await saveCardTemplate(
+          {
+            ...data,
+            previewMediaId,
+          },
+          cardTemplate?.id,
         );
-        ({ public_id } = await uploadMedia(file, uploadURL, uploadParameters)
-          .promise);
-        setUploading(false);
+        if (!success) {
+          setFormError(formErrors);
+        } else {
+          setDisplaySaveSuccess(true);
+        }
       } catch (error) {
         setError(error);
-        setSaving(false);
-        setUploading(false);
-        return;
       }
-
-      previewMediaId = encodeMediaId(public_id, 'image');
-    } else {
-      previewMediaId = data.previewMediaId as any;
-    }
-
-    setFormError(null);
-
-    try {
-      const { success, formErrors } = await saveCardTemplate(
-        {
-          ...data,
-          previewMediaId,
-        },
-        cardTemplate?.id,
-      );
-      if (!success) {
-        setFormError(formErrors);
-      } else {
-        setDisplaySaveSuccess(true);
-      }
-    } catch (error) {
-      setError(error);
-      setSaving(false);
-      return;
-    }
+    });
   };
 
   const fields = {
-    labelKey: fieldProps('labelKey'),
-    baseLabelValue: fieldProps('baseLabelValue'),
+    label: fieldProps('label'),
     cardStyle: fieldProps('cardStyle'),
     businessEnabled: fieldProps('businessEnabled'),
     personalEnabled: fieldProps('personalEnabled'),
@@ -193,7 +192,7 @@ const CardTemplateForm = ({
         </Link>
       </Breadcrumbs>
       <Typography variant="h4" component="h1" sx={{ mb: 2 }}>
-        {cardTemplate ? label?.baseLabelValue : 'New CardTemplate'}
+        {cardTemplate ? label : 'New CardTemplate'}
       </Typography>
       <Box
         sx={{
@@ -288,25 +287,18 @@ const CardTemplateForm = ({
         </Typography>
         <Box display="flex" gap={2} flexWrap="wrap">
           <TextField
-            name="labelKey"
-            label="Label key"
-            disabled={saving || !isCreation}
+            name="label"
+            label="Label (en-US)"
+            disabled={saving}
             required
             sx={{ width: 250 }}
-            {...fields.labelKey}
+            {...fields.label}
           />
-          <TextField
-            name="baseLabelValue"
-            label="Label default value"
-            required
-            sx={{ width: 250 }}
-            {...fields.baseLabelValue}
-          />
-          <WebCardTemplateTypeListInput
+          <TypeListInput
             label="Webcard template type"
             name="cardTemplateType"
             options={cardTemplateTypes}
-            cardTemplateTypesLabels={labels}
+            typesLabels={labels}
             sx={{ width: 250 }}
             {...fieldProps('cardTemplateType')}
           />
@@ -335,8 +327,7 @@ const CardTemplateForm = ({
             >
               {cardStyles.map(cardStyle => (
                 <MenuItem key={cardStyle.id} value={cardStyle.id}>
-                  {labels.find(label => label.labelKey === cardStyle.labelKey)
-                    ?.baseLabelValue ?? cardStyle.labelKey}
+                  {labels.find(label => label.key === cardStyle.id)?.value}
                 </MenuItem>
               ))}
             </Select>

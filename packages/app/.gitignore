@@ -79,3 +79,7 @@ lib/
 
 # relay
 src/relayArtifacts
+# Expo
+.expo
+dist/
+web-build/

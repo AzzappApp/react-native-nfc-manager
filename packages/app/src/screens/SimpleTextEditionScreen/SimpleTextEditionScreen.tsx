@@ -11,9 +11,8 @@ import {
   SIMPLE_TEXT_STYLE_VALUES,
   SIMPLE_TITLE_STYLE_VALUES,
 } from '@azzapp/shared/cardModuleHelpers';
-import { addingModuleRequireSubscription } from '@azzapp/shared/subscriptionHelpers';
+import { changeModuleRequireSubscription } from '@azzapp/shared/subscriptionHelpers';
 import { useRouter } from '#components/NativeRouter';
-import { useIsSubscriber } from '#helpers/SubscriptionContext';
 import useEditorLayout from '#hooks/useEditorLayout';
 import useHandleProfileActionError from '#hooks/useHandleProfileError';
 import useModuleDataEditor from '#hooks/useModuleDataEditor';
@@ -119,6 +118,7 @@ const SimpleTextEditionScreen = ({
         webCard {
           id
           cardIsPublished
+          isPremium
           cardStyle {
             borderColor
             borderRadius
@@ -230,6 +230,7 @@ const SimpleTextEditionScreen = ({
         saveSimpleTextModule(webCardId: $webCardId, input: $input) {
           webCard {
             id
+            requiresSubscription
             cardModules {
               visible
               ...SimpleTextEditionScreen_module
@@ -255,8 +256,6 @@ const SimpleTextEditionScreen = ({
   const intl = useIntl();
 
   const onCancel = router.back;
-
-  const isSubscriber = useIsSubscriber();
 
   const cardModulesCount =
     (profile.webCard.cardModules.length ?? 0) + (moduleData ? 0 : 1);
@@ -295,7 +294,7 @@ const SimpleTextEditionScreen = ({
       return;
     }
 
-    const requireSubscription = addingModuleRequireSubscription(
+    const requireSubscription = changeModuleRequireSubscription(
       moduleKind,
       cardModulesCount,
     );
@@ -303,7 +302,7 @@ const SimpleTextEditionScreen = ({
     if (
       profile.webCard.cardIsPublished &&
       requireSubscription &&
-      !isSubscriber
+      !profile.webCard.isPremium
     ) {
       router.push({ route: 'USER_PAY_WALL' });
       return;
@@ -336,7 +335,6 @@ const SimpleTextEditionScreen = ({
     profile.webCard,
     moduleKind,
     cardModulesCount,
-    isSubscriber,
     commit,
     value,
     fontSize.value,

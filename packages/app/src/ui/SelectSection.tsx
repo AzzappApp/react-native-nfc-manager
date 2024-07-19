@@ -7,99 +7,82 @@ import BottomSheetModal from './BottomSheetModal';
 import Icon from './Icon';
 import PressableNative from './PressableNative';
 import SelectSectionList from './SelectSectionList';
+import type { SelectSectionListProps } from './SelectSectionList';
 import type { ReactElement } from 'react';
 import type {
   SectionListData,
-  SectionListRenderItem,
   StyleProp,
   ViewStyle,
   ViewProps,
 } from 'react-native';
 
-type SelectProps<ItemT, SectionT> = Omit<ViewProps, 'children'> & {
-  ListHeaderComponent?:
-    | React.ComponentType<any>
-    | ReactElement
-    | null
-    | undefined;
+type SelectProps<ItemT, SectionT> = Omit<ViewProps, 'children'> &
+  SelectSectionListProps<ItemT, SectionT> & {
+    ListHeaderComponent?:
+      | React.ComponentType<any>
+      | ReactElement
+      | null
+      | undefined;
 
-  sections: Array<{ title: string; data: [{ id: string; title: string }] }>;
-  /**
-   * Used to extract a unique key for a given item at the specified index. Key is used for caching
-   * and as the react key to track item re-ordering. The default extractor checks `item.key`, then
-   * falls back to using the index, like React does.
-   */
-  keyExtractor: (item: ItemT, index: number) => string;
+    sections: Array<SectionListData<ItemT, SectionT>>;
 
-  /**
-   * The selected item key
-   */
-  selectedItemKey?: string | null;
+    /**
+     * Render the section header item in the dropdown list and the item in the input
+     */
+    renderHeaderSection?: (info: {
+      section: SectionListData<ItemT, SectionT>;
+    }) => React.ReactElement | null;
 
-  /**
-   * Callback called when an item is selected
-   */
-  onItemSelected: (item: ItemT) => void;
+    /**
+     * label field used for the default item renderer, default to 'label'
+     */
+    labelField?: keyof ItemT;
 
-  /**
-   * Render the item in the dropdown list and the item in the input
-   */
-  renderItem?: SectionListRenderItem<ItemT, SectionT> | undefined;
+    /**
+     * Label for the input
+     */
+    inputLabel?: string;
 
-  /**
-   * Render the section header item in the dropdown list and the item in the input
-   */
-  renderHeaderSection?: (info: {
-    section: SectionListData<ItemT, SectionT>;
-  }) => React.ReactElement | null;
+    /**
+     * Placeholder text
+     */
+    placeHolder?: string;
 
-  /**
-   * label field used for the default item renderer, default to 'label'
-   */
-  labelField?: keyof ItemT;
+    /**
+     * The height of the bottom sheet that will be displayed when the dropdown is opened
+     */
+    bottomSheetHeight?: number;
 
-  /**
-   * Label for the input
-   */
-  inputLabel?: string;
+    /**
+     * Title displayed in the bottom sheet header
+     */
+    bottomSheetTitle?: string;
 
-  /**
-   * Placeholder text
-   */
-  placeHolder?: string;
+    /**
+     * Whether the input is in error state
+     */
+    isErrored?: boolean;
 
-  /**
-   * The height of the bottom sheet that will be displayed when the dropdown is opened
-   */
-  bottomSheetHeight?: number;
+    /**
+     * Style of the item container in the dropdown list
+     */
+    itemContainerStyle?: StyleProp<ViewStyle>;
 
-  /**
-   * Title displayed in the bottom sheet header
-   */
-  bottomSheetTitle?: string;
+    /**
+     * Style of the item container when it is selected in the dropdown list
+     */
+    selectedItemContainerStyle?: StyleProp<ViewStyle>;
 
-  /**
-   * Whether the input is in error state
-   */
-  isErrored?: boolean;
+    avoidKeyboard?: boolean;
+  };
 
-  /**
-   * Style of the item container in the dropdown list
-   */
-  itemContainerStyle?: StyleProp<ViewStyle>;
-
-  /**
-   * Style of the item container when it is selected in the dropdown list
-   */
-  selectedItemContainerStyle?: StyleProp<ViewStyle>;
-};
 /**
  * A dropdown list component that display a list of items in a bottom sheet
  *
  */
 const SelectSection = <ItemT, SectionT>({
   sections,
-  labelField = 'title' as any,
+  labelField = 'title' as keyof ItemT,
   keyExtractor,
   renderItem,
   renderHeaderSection,
@@ -114,6 +97,7 @@ const SelectSection = <ItemT, SectionT>({
   isErrored,
   style,
   ListHeaderComponent,
+  avoidKeyboard,
   ...props
 }: SelectProps<ItemT, SectionT>) => {
   const [showDropDown, setShowDropDown] = useState(false);
@@ -161,12 +145,13 @@ const SelectSection = <ItemT, SectionT>({
         contentContainerStyle={styles.bottomSheetContentContainer}
         onRequestClose={() => setShowDropDown(false)}
         nestedScroll
+        avoidKeyboard={avoidKeyboard}
       >
         <SelectSectionList
-          sections={sections as any}
+          sections={sections}
           keyExtractor={keyExtractor}
           selectedItemKey={selectedItemKey}
-          renderItem={renderItem as any}
+          renderItem={renderItem}
           renderSectionHeader={renderHeaderSection}
           labelField={labelField}
           onItemSelected={onSelectListItemSelected}

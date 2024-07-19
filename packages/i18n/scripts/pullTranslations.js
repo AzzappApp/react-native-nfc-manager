@@ -1,31 +1,17 @@
 const fs = require('fs');
 const path = require('path');
+const mysql = require('mysql2');
 const { SUPPORTED_LOCALES } = require('../index');
-const { createFetchLokalise } = require('./fetchLokalise');
 
-const environment = process.argv[2];
+const { DATABASE_URL } = process.env;
+const pullTranslations = async (target, dir) => {
+  const connection = await mysql.createConnection({
+    uri: DATABASE_URL,
+  });
 
-const fetchLokalise = createFetchLokalise(environment);
-
-const pullTranslations = async (platform, dir) => {
-  let page = 1;
-  let remoteKeys = [];
-  // eslint-disable-next-line no-constant-condition
-  while (true) {
-    const resp = await fetchLokalise(
-      `/keys?filter_platforms=${platform}&include_translations=1&page=${page}&limit=500`,
-    );
-    if (resp.error) {
-      throw new Error(resp.error.message);
-    }
-    const { keys } = resp;
-    remoteKeys = remoteKeys.concat(keys);
-    if (keys.length < 500) {
-      break;
-    }
-    page++;
-  }
-  console.log(`Fetched ${remoteKeys.length} keys for ${platform}`);
+  const [messages] = await connection
+    .promise()
+    .query(`SELECT * FROM LocalizationMessage WHERE target = ?`, [target]);
 
   const table = SUPPORTED_LOCALES.reduce(
     (acc, locale) => ({
@@ -34,16 +20,11 @@ const pullTranslations = async (platform, dir) => {
     }),
     {},
   );
-  for (const key of remoteKeys) {
-    const { key_name, translations } = key;
-    for (const locale of SUPPORTED_LOCALES) {
-      const translation = translations.find(
-        ({ language_iso }) => language_iso === locale,
-      );
-      if (translation) {
-        table[locale][key_name[platform]] = translation.translation;
-      }
+  for (const { key, locale, value } of messages) {
+    if (!table[locale]) {
+      console.warn(`Unsupported locale: ${locale}`);
     }
+    table[locale][key] = value;
   }
   for (const locale of SUPPORTED_LOCALES) {
     fs.writeFileSync(
@@ -54,6 +35,7 @@ const pullTranslations = async (platform, dir) => {
 };
 
 (async () => {
-  await pullTranslations('ios', path.resolve(__dirname, '..', 'src', 'app'));
+  await pullTranslations('app', path.resolve(__dirname, '..', 'src', 'app'));
   await pullTranslations('web', path.resolve(__dirname, '..', 'src', 'web'));
+  process.exit(0);
 })();

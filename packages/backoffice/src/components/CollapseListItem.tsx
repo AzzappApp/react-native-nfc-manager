@@ -47,6 +47,10 @@ const CollapseListItem = ({
     setOpen(!open);
   };
 
+  if (pages.length === 0) {
+    return null;
+  }
+
   return (
     <>
       <ListItemButton onClick={handleClick}>

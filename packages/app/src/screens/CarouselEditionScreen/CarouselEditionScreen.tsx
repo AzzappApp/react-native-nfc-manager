@@ -1,3 +1,4 @@
+import { ImageFormat } from '@shopify/react-native-skia';
 import { useCallback, useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { StyleSheet } from 'react-native';
@@ -10,16 +11,17 @@ import {
   MODULE_IMAGE_MAX_WIDTH,
   CAROUSEL_STYLE_VALUES,
 } from '@azzapp/shared/cardModuleHelpers';
-import { encodeMediaId } from '@azzapp/shared/imagesHelpers';
 import { combineMultiUploadProgresses } from '@azzapp/shared/networkHelpers';
-import { addingModuleRequireSubscription } from '@azzapp/shared/subscriptionHelpers';
-import { exportLayersToImage, getFilterUri } from '#components/gpu';
+import { changeModuleRequireSubscription } from '@azzapp/shared/subscriptionHelpers';
 import ImagePicker from '#components/ImagePicker';
-import { useRouter } from '#components/NativeRouter';
-import ScreenModal from '#components/ScreenModal';
+import {
+  useRouter,
+  ScreenModal,
+  preventModalDismiss,
+} from '#components/NativeRouter';
 import { getFileName } from '#helpers/fileHelpers';
+import { saveTransformedImageToFile } from '#helpers/mediaEditions';
 import { uploadMedia, uploadSign } from '#helpers/MobileWebAPI';
-import { useIsSubscriber } from '#helpers/SubscriptionContext';
 import useEditorLayout from '#hooks/useEditorLayout';
 import useHandleProfileActionError from '#hooks/useHandleProfileError';
 import useModuleDataEditor from '#hooks/useModuleDataEditor';
@@ -103,6 +105,7 @@ const CarouselEditionScreen = ({
         webCard {
           id
           cardIsPublished
+          isPremium
           cardColors {
             primary
             light
@@ -189,6 +192,7 @@ const CarouselEditionScreen = ({
         saveCarouselModule(webCardId: $webCardId, input: $input) {
           webCard {
             id
+            requiresSubscription
             cardModules {
               kind
               visible
@@ -213,7 +217,6 @@ const CarouselEditionScreen = ({
   const intl = useIntl();
   const [progressIndicator, setProgressIndicator] =
     useState<Observable<number> | null>(null);
-  const isSubscriber = useIsSubscriber();
 
   const cardModulesCount =
     profile.webCard.cardModules.length + (carousel ? 0 : 1);
@@ -254,18 +257,13 @@ const CarouselEditionScreen = ({
     }: ImagePickerResult) => {
       const exportWidth = Math.min(MODULE_IMAGE_MAX_WIDTH, width);
       const exportHeight = exportWidth / aspectRatio;
-      const localPath = await exportLayersToImage({
-        size: { width: exportWidth, height: exportHeight },
+      const localPath = await saveTransformedImageToFile({
+        uri,
+        resolution: { width: exportWidth, height: exportHeight },
+        format: ImageFormat.JPEG,
         quality: 95,
-        format: 'auto',
-        layers: [
-          {
-            kind: 'image',
-            uri,
-            parameters: editionParameters,
-            lutFilterUri: getFilterUri(filter),
-          },
-        ],
+        filter,
+        editionParameters,
       });
 
       updateFields({
@@ -330,7 +328,7 @@ const CarouselEditionScreen = ({
       return;
     }
 
-    const requireSubscription = addingModuleRequireSubscription(
+    const requireSubscription = changeModuleRequireSubscription(
       'carousel',
       cardModulesCount,
     );
@@ -338,7 +336,7 @@ const CarouselEditionScreen = ({
     if (
       profile.webCard.cardIsPublished &&
       requireSubscription &&
-      !isSubscriber
+      !profile.webCard.isPremium
     ) {
       router.push({ route: 'USER_PAY_WALL' });
       return;
@@ -393,7 +391,7 @@ const CarouselEditionScreen = ({
         const medias = await Promise.all(
           uploads.map(({ promise, uri }) =>
             promise.then(uploadResult => ({
-              id: encodeMediaId(uploadResult.public_id as string, 'image'),
+              id: uploadResult.public_id,
               uri,
             })),
           ),
@@ -453,8 +451,8 @@ const CarouselEditionScreen = ({
     canSave,
     cardModulesCount,
     profile.webCard.cardIsPublished,
+    profile.webCard.isPremium,
     profile.webCard.id,
-    isSubscriber,
     value,
     commit,
     carousel?.id,
@@ -608,7 +606,10 @@ const CarouselEditionScreen = ({
           { bottom: insetBottom, width: windowWidth - 20 },
         ]}
       />
-      <ScreenModal visible={showImagePicker}>
+      <ScreenModal
+        visible={showImagePicker}
+        onRequestDismiss={onCloseImagePicker}
+      >
         <ImagePicker
           kind="image"
           onFinished={onImagePickerFinished}
@@ -616,7 +617,11 @@ const CarouselEditionScreen = ({
         />
       </ScreenModal>
 
-      <ScreenModal visible={!!progressIndicator}>
+      <ScreenModal
+        visible={!!progressIndicator}
+        gestureEnabled={false}
+        onRequestDismiss={preventModalDismiss}
+      >
         {progressIndicator && (
           <UploadProgressModal progressIndicator={progressIndicator} />
         )}

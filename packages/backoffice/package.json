@@ -1,14 +1,13 @@
 {
   "name": "@azzapp/backoffice",
-  "version": "0.5.14-rc.1",
+  "version": "0.5.20-rc.0",
   "private": true,
-  "packageManager": "yarn@3.6.4",
   "scripts": {
     "dev": "next dev -p 3005",
     "build": "next build",
     "start": "next start",
     "typecheck": "tsc -p tsconfig.next.json --noEmit",
-    "clean": "rm -rf lib && rm -f tsconfig.tsbuildinfo || true && rm -rf .next && rm -rf node_modules"
+    "clean": "rm -rf lib && rm -f tsconfig.next.tsbuildinfo || true && rm -rf .next && rm -rf node_modules"
   },
   "devScripts": [
     "dev"
@@ -16,6 +15,8 @@
   "dependencies": {
     "@azzapp/data": "workspace:^",
     "@azzapp/shared": "workspace:^",
+    "@conform-to/react": "^1.1.4",
+    "@conform-to/zod": "^1.1.4",
     "@dnd-kit/core": "^6.1.0",
     "@dnd-kit/sortable": "^8.0.0",
     "@dnd-kit/utilities": "^3.2.2",
@@ -23,24 +24,27 @@
     "@emotion/cache": "latest",
     "@emotion/react": "latest",
     "@emotion/styled": "latest",
-    "@lokalise/node-api": "^12.4.1",
+    "@formatjs/icu-messageformat-parser": "^2.7.8",
     "@mui/icons-material": "latest",
     "@mui/material": "latest",
     "@mui/x-data-grid": "latest",
     "@sentry/nextjs": "^7.113.0",
-    "@sentry/tracing": "^7.113.0",
+    "@sentry/tracing": "^7.114.0",
     "classnames": "^2.5.1",
-    "drizzle-orm": "^0.30.8",
+    "date-fns": "^3.6.0",
+    "drizzle-orm": "^0.31.2",
     "lodash": "^4.17.21",
     "lottie-web": "^5.12.2",
     "next": "^14.2.3",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
+    "react-virtuoso": "^4.7.12",
+    "use-debounce": "^10.0.1",
     "zod": "^3.23.8"
   },
   "devDependencies": {
-    "@types/node": "^20.12.10",
-    "@types/react": "^18.3.1",
+    "@types/node": "^20.12.13",
+    "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0"
   }
 }

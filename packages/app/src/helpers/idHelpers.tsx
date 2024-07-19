@@ -5,3 +5,6 @@
  * @returns the random id
  */
 export const createId = () => Math.random().toString(16).slice(2);
+
+export const keyExtractor = <ItemT extends { id: string }>(item: ItemT) =>
+  item.id;

@@ -12,9 +12,10 @@ import {
   useState,
 } from 'react';
 import { FormattedMessage, IntlProvider, injectIntl } from 'react-intl';
-import { BackHandler, Platform, useColorScheme } from 'react-native';
+import { Platform, useColorScheme } from 'react-native';
 import { hide as hideSplashScreen } from 'react-native-bootsplash';
 import { KeyboardProvider } from 'react-native-keyboard-controller';
+import Purchases from 'react-native-purchases';
 import {
   initialWindowMetrics,
   SafeAreaProvider,
@@ -22,6 +23,7 @@ import {
 import { RelayEnvironmentProvider } from 'react-relay';
 import { DEFAULT_LOCALE } from '@azzapp/i18n';
 import ERRORS from '@azzapp/shared/errors';
+import { isNetworkError } from '@azzapp/shared/networkHelpers';
 import { mainRoutes, signInRoutes, signUpRoutes } from '#mobileRoutes';
 import { colors } from '#theme';
 import MainTabBar from '#components/MainTabBar';
@@ -51,8 +53,9 @@ import {
   ScreenPrefetcherProvider,
   createScreenPrefetcher,
 } from '#helpers/ScreenPrefetcher';
-import SubscriptionProvider from '#helpers/SubscriptionContext';
-import useApplicationFonts from '#hooks/useApplicationFonts';
+import useApplicationFonts, {
+  loadSkiaTypeFonts,
+} from '#hooks/useApplicationFonts';
 import useAuthState from '#hooks/useAuthState';
 import { useDeepLink } from '#hooks/useDeepLink';
 import AboutScreen from '#screens/AboutScreen';
@@ -63,7 +66,9 @@ import ConfirmChangeContactScreen from '#screens/ConfirmChangeContactScreen';
 import ConfirmRegistrationScreen from '#screens/ConfirmRegistrationScreen';
 import ContactCardEditScreen from '#screens/ContactCardEditScreen';
 import ContactCardScreen from '#screens/ContactCardScreen';
+import CoverCreationScreen from '#screens/CoverCreationScreen';
 import CoverEditionScreen from '#screens/CoverEditionScreen';
+import CoverTemplateSelectionScreen from '#screens/CoverTemplateSelectionScreen';
 import FollowersScreen from '#screens/FollowersScreen';
 import FollowingsMosaicScreen from '#screens/FollowingsMosaicScreen';
 import FollowingsScreen from '#screens/FollowingsScreen';
@@ -76,8 +81,8 @@ import LikedPostsScreen from '#screens/LikedPostsScreen';
 import LoadingScreen from '#screens/LoadingScreen';
 import MediaScreen from '#screens/MediaScreen';
 import MultiUserAddScreen from '#screens/MultiUserAddScreen';
+import MultiUserDetailsScreen from '#screens/MultiUserDetailsScreen';
 import MultiUserScreen from '#screens/MultiUserScreen';
-import NewWebCardScreen from '#screens/NewWebCardScreen';
 import PostCommentsMobileScreen from '#screens/PostCommentsScreen';
 import PostCreationScreen from '#screens/PostCreationScreen';
 import PostScreen from '#screens/PostScreen';
@@ -87,11 +92,15 @@ import SignInScreen from '#screens/SignInScreen';
 import SignupScreen from '#screens/SignUpScreen';
 import UpdateApplicationScreen from '#screens/UpdateApplicationScreen';
 import UserPayWallScreen from '#screens/UserPayWallScreen';
+import WebCardFormScreen from '#screens/WebCardFormScreen';
+import WebCardKindSelectionScreen from '#screens/WebCardKindSelectionScreen';
 import WebCardParametersScreen from '#screens/WebCardParametersScreen';
 import WebCardScreen from '#screens/WebCardScreen';
+import WebCardTemplateSelectionScreen from '#screens/WebCardTemplateSelectionScreen';
 import Button from '#ui/Button';
 import Container from '#ui/Container';
 import Text from '#ui/Text';
+import type { ScreenMap } from '#components/NativeRouter';
 import type { ScreenPrefetchOptions } from '#helpers/ScreenPrefetcher';
 import type { ROUTES } from '#routes';
 import type { ReactNode } from 'react';
@@ -111,6 +120,17 @@ Sentry.init({
   ],
 });
 
+//initializing RC sneed to be done early
+if (Platform.OS === 'ios') {
+  Purchases.configure({
+    apiKey: process.env.PURCHASE_IOS_KEY!,
+  });
+} else if (Platform.OS === 'android') {
+  Purchases.configure({
+    apiKey: process.env.PURCHASE_ANDROID_KEY!,
+  });
+}
+
 /**
  * Initialize the application
  * called at first launch before rendering the App component
@@ -118,6 +138,7 @@ Sentry.init({
 const init = async () => {
   await initAuthStore();
   initLocaleHelpers();
+  loadSkiaTypeFonts();
   RelayQueryManager.init();
 };
 
@@ -146,7 +167,6 @@ const App = () => {
       }),
     [],
   );
-
   if (!ready) {
     return null;
   }
@@ -186,7 +206,11 @@ const screens = {
   CARD_MODULE_EDITION: CardModuleEditionScreen,
   CONTACT_CARD: ContactCardScreen,
   CONTACT_CARD_EDIT: ContactCardEditScreen,
+  CONFIRM_CHANGE_CONTACT: ConfirmChangeContactScreen,
+  COMMON_INFORMATION: CommonInformationScreen,
+  COVER_CREATION: CoverCreationScreen,
   COVER_EDITION: CoverEditionScreen,
+  COVER_TEMPLATE_SELECTION: CoverTemplateSelectionScreen,
   FOLLOWINGS: FollowingsScreen,
   FOLLOWINGS_MOSAIC: FollowingsMosaicScreen,
   FOLLOWERS: FollowersScreen,
@@ -197,10 +221,9 @@ const screens = {
   LIKED_POSTS: LikedPostsScreen,
   MULTI_USER: MultiUserScreen,
   MULTI_USER_ADD: MultiUserAddScreen,
-  USER_PAY_WALL: UserPayWallScreen,
+  MULTI_USER_DETAIL: MultiUserDetailsScreen,
   MEDIA: MediaScreen,
   NEW_POST: PostCreationScreen,
-  NEW_WEBCARD: NewWebCardScreen,
   ONBOARDING: WelcomeScreen,
   POST: PostScreen,
   POST_COMMENTS: PostCommentsMobileScreen,
@@ -209,11 +232,13 @@ const screens = {
   SIGN_UP: SignupScreen,
   CONFIRM_REGISTRATION: ConfirmRegistrationScreen,
   SEARCH: SearchScreen,
+  USER_PAY_WALL: UserPayWallScreen,
   WEBCARD: WebCardScreen,
   WEBCARD_PARAMETERS: WebCardParametersScreen,
-  CONFIRM_CHANGE_CONTACT: ConfirmChangeContactScreen,
-  COMMON_INFORMATION: CommonInformationScreen,
-};
+  WEBCARD_KIND_SELECTION: WebCardKindSelectionScreen,
+  WEBCARD_FORM: WebCardFormScreen,
+  WEBCARD_TEMPLATE_SELECTION: WebCardTemplateSelectionScreen,
+} satisfies ScreenMap;
 
 const tabs = {
   MAIN_TAB: MainTabBar,
@@ -258,22 +283,6 @@ const AppRouter = () => {
       }
     }
   }, [authenticated, profileInfos, router]);
-
-  useEffect(() => {
-    const subscription = BackHandler.addEventListener(
-      'hardwareBackPress',
-      () => {
-        if (router.canGoBack()) {
-          router.back();
-          return true;
-        }
-
-        return false;
-      },
-    );
-
-    return () => subscription.remove();
-  }, [router]);
   // #endregion
 
   // #region Sentry Routing Instrumentation
@@ -330,7 +339,7 @@ const AppRouter = () => {
     [],
   );
 
-  const screenIdToDispose = useRef<string[]>([]).current;
+  const screenIdsToDispose = useRef<string[]>([]).current;
 
   const screenPrefetcher = useMemo(
     () =>
@@ -341,27 +350,33 @@ const AppRouter = () => {
     [],
   );
 
+  const disposeScreens = useCallback(() => {
+    screenIdsToDispose.forEach(screen =>
+      RelayQueryManager.disposeQueryFor(screen),
+    );
+    screenIdsToDispose.length = 0;
+  }, [screenIdsToDispose]);
+
   useEffect(() => {
-    router.addScreenWillBePushedListener(({ id, route }) => {
-      const Component = screens[route.route];
-      if (isRelayScreen(Component)) {
-        RelayQueryManager.loadQueryFor(id, Component, route.params);
-      }
-    });
-    router.addScreenWillBeRemovedListener(({ id }) => {
-      screenIdToDispose.push(id);
-    });
-  }, [router, screenIdToDispose, screenPrefetcher]);
-
-  const onScreenDismissed = useCallback(
-    (id: string) => {
-      router.screenDismissed(id);
-
-      // TODO should we not handle this in the router?
-      RelayQueryManager.disposeQueryFor(id);
-    },
-    [router],
-  );
+    const screenWillBePushedSubscription = router.addScreenWillBePushedListener(
+      pushedScreens => {
+        pushedScreens.forEach(({ id, route }) => {
+          const Component = screens[route.route];
+          if (isRelayScreen(Component)) {
+            RelayQueryManager.loadQueryFor(id, Component, route.params);
+          }
+        });
+      },
+    );
+    const screenWillBeRemoveddSubscription =
+      router.addScreenWillBeRemovedListener(removedScreens => {
+        screenIdsToDispose.push(...removedScreens.map(screen => screen.id));
+      });
+    return () => {
+      screenWillBePushedSubscription.dispose();
+      screenWillBeRemoveddSubscription.dispose();
+    };
+  }, [disposeScreens, router, screenIdsToDispose, screenPrefetcher]);
 
   const splashScreenHidden = useRef(false);
   const onFinishTransitioning = useCallback(() => {
@@ -371,20 +386,17 @@ const AppRouter = () => {
       setEnvironment(getRelayEnvironment());
       environmentReset.current = false;
     }
-    screenIdToDispose.forEach(screen =>
-      RelayQueryManager.disposeQueryFor(screen),
-    );
-    screenIdToDispose.length = 0;
+    disposeScreens();
     if (!splashScreenHidden.current) {
       setTimeout(() => {
         hideSplashScreen({ fade: true });
       }, 200);
     }
-  }, [screenIdToDispose]);
+  }, [disposeScreens]);
   // #endregion
 
   // #region Loading Screen
-  const [showLoadingScreen, setShowLoadingScreen] = useState(true);
+  const [showLoadingScreen, setShowLoadingScreen] = useState(false);
 
   useEffect(
     () =>
@@ -422,29 +434,27 @@ const AppRouter = () => {
 
   return (
     <RelayEnvironmentProvider environment={environment}>
-      <SubscriptionProvider>
-        <ScreenPrefetcherProvider value={screenPrefetcher}>
-          <SafeAreaProvider
-            initialMetrics={initialWindowMetrics}
-            style={safeAreaBackgroundStyle}
-          >
-            <RouterProvider value={router}>
-              <ScreensRenderer
-                routerState={routerState}
-                screens={screens}
-                tabs={tabs}
-                onScreenDismissed={onScreenDismissed}
-                onFinishTransitioning={onFinishTransitioning}
-              />
-            </RouterProvider>
-            <Toast />
-            <Suspense>
-              <ShakeShare />
-            </Suspense>
-            {showLoadingScreen && <LoadingScreen />}
-          </SafeAreaProvider>
-        </ScreenPrefetcherProvider>
-      </SubscriptionProvider>
+      <ScreenPrefetcherProvider value={screenPrefetcher}>
+        <SafeAreaProvider
+          initialMetrics={initialWindowMetrics}
+          style={safeAreaBackgroundStyle}
+        >
+          <RouterProvider value={router}>
+            <ScreensRenderer
+              routerState={routerState}
+              screens={screens}
+              tabs={tabs}
+              onFinishTransitioning={onFinishTransitioning}
+              onScreenHasBeenDismissed={disposeScreens}
+            />
+          </RouterProvider>
+          <Toast />
+          <Suspense>
+            <ShakeShare />
+          </Suspense>
+          {showLoadingScreen && <LoadingScreen />}
+        </SafeAreaProvider>
+      </ScreenPrefetcherProvider>
     </RelayEnvironmentProvider>
   );
 };
@@ -486,7 +496,7 @@ class _AppErrorBoundary extends Component<{
   state = { error: null };
 
   componentDidCatch(error: Error) {
-    if (!__DEV__) {
+    if (!__DEV__ && !isNetworkError(error)) {
       Sentry.captureException(error);
     }
   }

@@ -6,64 +6,12 @@ type CoverTemplate implements Node {
   The ID of an object
   """
   id: ID!
-  kind: CoverTemplateKind!
-  previewMedia: Media!
-  data: CoverTemplateData!
-  colorPalette: ColorPalette!
-  colorPalettes(first: Int @max(value: 100), after: String): ColorPaletteConnection!
-}
-
-enum CoverTemplateKind {
-  people
-  video
-  others
-}
-
-"""
-Card cover display informations
-"""
-type CoverTemplateData {
-  titleStyle: CardCoverTextStyle!
-  subTitleStyle: CardCoverTextStyle!
-  textOrientation: CardCoverTextOrientation!
-  textPosition: CardCoverTextPosition!
-  textAnimation: String
-  background: StaticMedia
-  backgroundColor: String
-  backgroundPatternColor: String
-  foreground: StaticMedia
-  foregroundColor: String
-  mediaFilter: String
-  mediaParameters: MediaParameters
-  mediaAnimation: String
-}
-
-"""
-A connection to a list of items.
-"""
-type CoverTemplateConnection {
-  """
-  Information to aid in pagination.
-  """
-  pageInfo: PageInfo!
-
-  """
-  A list of edges.
-  """
-  edges: [CoverTemplateEdge]
-}
-
-"""
-An edge in a connection.
-"""
-type CoverTemplateEdge {
-  """
-  The item at the end of the edge
-  """
-  node: CoverTemplate
-
-  """
-  A cursor for use in pagination
-  """
-  cursor: String!
+  order: Float!
+  data: JSON
+  type: CoverTemplateType
+  tags: [CoverTemplateTag!]!
+  preview: Media!
+  lottie: String!
+  mediaCount: Int!
+  colorPalette: ColorPalette
 }

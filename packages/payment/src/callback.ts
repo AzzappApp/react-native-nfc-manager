@@ -1,5 +1,10 @@
 import { eq, and } from 'drizzle-orm';
-import { createPayment, db, UserSubscriptionTable } from '@azzapp/data';
+import {
+  createPayment,
+  db,
+  updateWebCard,
+  UserSubscriptionTable,
+} from '@azzapp/data';
 import { PaymentMeanTable } from '@azzapp/data/paymentMeans';
 import { login } from '#authent';
 import client from './client';
@@ -110,11 +115,13 @@ export const acknowledgeFirstPayment = async (
           .set(updates)
           .where(eq(UserSubscriptionTable.paymentMeanId, paymentMeanId));
 
+        await updateWebCard(webCardId, { isMultiUser: true }, tx);
+
         await createPayment(
           {
             status: 'paid',
             transactionId,
-            userId: subscription.userId,
+            subscriptionId: subscription.id,
             webCardId,
             amount,
             taxes,
@@ -182,7 +189,7 @@ export const rejectFirstPayment = async (
         await createPayment(
           {
             status: 'failed',
-            userId: subscriptions[0].userId,
+            subscriptionId: subscription.id,
             webCardId,
             amount,
             taxes,
@@ -211,6 +218,7 @@ export const rejectFirstPayment = async (
           .set({
             status: 'canceled',
             canceledAt: new Date(),
+            lastPaymentError: true,
           })
           .where(eq(UserSubscriptionTable.paymentMeanId, paymentMeanId));
       });
@@ -252,6 +260,7 @@ export const acknowledgeRecurringPayment = async (
 
       const updates: Partial<UserSubscription> = {
         endAt,
+        lastPaymentError: false,
       };
 
       await db.transaction(async tx => {
@@ -263,7 +272,7 @@ export const acknowledgeRecurringPayment = async (
         await createPayment(
           {
             status: 'paid',
-            userId: subscription.userId,
+            subscriptionId: subscription.id,
             webCardId,
             amount,
             taxes,
@@ -297,12 +306,12 @@ export const rejectRecurringPayment = async (
     const amount = subscription.amount;
     const taxes = subscription.taxes;
 
-    if (webCardId && subscription.subscriptionPlan && amount && taxes) {
-      await db.transaction(async tx => {
+    await db.transaction(async tx => {
+      if (webCardId && subscription.subscriptionPlan && amount && taxes) {
         await createPayment(
           {
             status: 'failed',
-            userId: subscriptions[0].userId,
+            subscriptionId: subscription.id,
             webCardId,
             amount,
             taxes,
@@ -313,17 +322,16 @@ export const rejectRecurringPayment = async (
           },
           tx,
         );
-      });
-    }
+      }
 
-    if (!isRebillOn) {
-      await db
+      await tx
         .update(UserSubscriptionTable)
         .set({
-          status: 'canceled',
-          canceledAt: new Date(),
+          // status: isRebillOn ? 'active': 'canceled', // we don’t automatically cancel the subscription for the moment (we prefer manual cancellation through backoffice)
+          // canceledAt: isRebillOn? undefined: new Date(),
+          lastPaymentError: true,
         })
         .where(eq(UserSubscriptionTable.subscriptionId, subscriptionId));
-    }
+    });
   }
 };

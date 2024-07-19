@@ -1,5 +1,5 @@
-import { asc, desc, like, or, sql, eq, and } from 'drizzle-orm';
-import { UserTable, db, ProfileTable } from '@azzapp/data';
+import { asc, desc, like, or, sql, eq, and, isNull } from 'drizzle-orm';
+import { UserTable, db, ProfileTable, WebCardTable } from '@azzapp/data';
 import UsersList from './UsersList';
 import type { SQLWrapper } from 'drizzle-orm';
 
@@ -39,6 +39,9 @@ const getSearch = (search: string | null) => {
     return or(
       like(UserTable.email, `%${search}%`),
       like(UserTable.phoneNumber, `%${search}%`),
+      like(UserTable.id, `%${search}%`),
+      like(WebCardTable.userName, `%${search}%`),
+      like(WebCardTable.companyName, `%${search}%`),
     );
   }
 };
@@ -49,20 +52,21 @@ const getQuery = (search: string | null, filters: Filters) => {
       id: UserTable.id,
       email: UserTable.email,
       phoneNumber: UserTable.phoneNumber,
-      webcardsCount: sql`count(*) as webcardsCount`.mapWith(Number),
+      webcardsCount: sql`count(webCardId) as webcardsCount`.mapWith(Number),
       createdAt: UserTable.createdAt,
       status: UserTable.deleted,
     })
-    .from(ProfileTable)
+    .from(UserTable)
+    .leftJoin(ProfileTable, eq(UserTable.id, ProfileTable.userId))
+    .leftJoin(WebCardTable, eq(WebCardTable.id, ProfileTable.webCardId))
     .where(
       and(
-        eq(ProfileTable.deleted, false),
+        or(isNull(ProfileTable.deleted), eq(ProfileTable.deleted, false)),
         getSearch(search),
         ...getFilters(filters),
       ),
     )
     .groupBy(UserTable.id)
-    .innerJoin(UserTable, eq(UserTable.id, ProfileTable.userId))
     .$dynamic();
 
   return query;

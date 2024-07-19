@@ -1,4 +1,5 @@
 import { MODULE_KINDS } from '@azzapp/shared/cardModuleHelpers';
+import type { GraphQLContext } from '#GraphQLContext';
 import type {
   CardModuleCarouselResolvers,
   CardModuleHorizontalPhotoResolvers,
@@ -32,16 +33,17 @@ export const CardModule: CardModuleResolvers = {
   },
 };
 
-const background = (cardModule: CardModuleModel) => {
+const background = async (
+  cardModule: CardModuleModel,
+  _: any,
+  { loaders }: GraphQLContext,
+) => {
   const { data } = cardModule;
   return typeof data === 'object' &&
     data &&
     'backgroundId' in data &&
     typeof data.backgroundId === 'string'
-    ? {
-        staticMedia: data.backgroundId,
-        assetKind: 'module' as const,
-      }
+    ? loaders.ModuleBackground.load(data.backgroundId)
     : null;
 };
 
@@ -189,11 +191,8 @@ export const CardModuleBlockText: CardModuleBlockTextResolvers = {
   backgroundStyle: module => module.data.backgroundStyle ?? null,
   textBackgroundStyle: module => module.data.textBackgroundStyle ?? null,
   background,
-  textBackground: module =>
+  textBackground: (module, _, { loaders }) =>
     module.data.textBackgroundId
-      ? {
-          staticMedia: module.data.textBackgroundId,
-          assetKind: 'module',
-        }
+      ? loaders.ModuleBackground.load(module.data.textBackgroundId)
       : null,
 };

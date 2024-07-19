@@ -21,21 +21,20 @@ import {
 } from '@mui/material';
 import { omit } from 'lodash';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
-import { encodeMediaId } from '@azzapp/shared/imagesHelpers';
 import { uploadMedia } from '@azzapp/shared/WebAPI';
 import { getSignedUpload } from '#app/mediaActions';
 import MediasListInput from '#components/MediasListInput';
 import { intParser, useForm } from '#helpers/formHelpers';
-import WebCardTemplateTypeListInput from '../companyActivities/WebCardTemplateTypeListInput';
+import TypeListInput from '../../../components/TypeListInput';
 import ActivityListInput from './ActivityListInput';
 import { saveWebCardCategory } from './webCardCategoriesActions';
 import type { WebCardCategoryErrors } from './webCardCategorySchema';
 import type {
   CardTemplateType,
   CompanyActivity,
-  Label,
+  LocalizationMessage,
   WebCardCategory,
 } from '@azzapp/data';
 
@@ -45,16 +44,15 @@ type WebCardCategoryFormProps = {
   cardTemplateTypes: CardTemplateType[];
   categoryCompanyActivities?: string[];
   saved?: boolean;
-  label?: Label | null;
-  labels: Label[];
+  labels: LocalizationMessage[];
 };
 
-type FormValue = Label &
-  Omit<WebCardCategory, 'medias'> & {
-    medias: Array<File | string>;
-    activities: Array<CompanyActivity | string>;
-    cardTemplateType: CardTemplateType | string;
-  };
+type FormValue = Omit<WebCardCategory, 'medias'> & {
+  label: string;
+  medias: Array<File | string>;
+  activities: Array<CompanyActivity | string>;
+  cardTemplateType: CardTemplateType | string;
+};
 
 const WebCardCategoryForm = ({
   webCardCategory,
@@ -62,23 +60,31 @@ const WebCardCategoryForm = ({
   cardTemplateTypes,
   categoryCompanyActivities,
   saved = false,
-  label,
   labels,
 }: WebCardCategoryFormProps) => {
   const isCreation = !webCardCategory;
   const [saving, setIsSaving] = useState(false);
   const [displaySaveSuccess, setDisplaySaveSuccess] = useState(saved);
   const [uploading, setUploading] = useState(false);
-  const [error, setError] = useState<any>(null);
+  const [error, setError] = useState<string>();
   const [formErrors, setFormErrors] = useState<WebCardCategoryErrors | null>(
     null,
   );
+
+  const label = useMemo(
+    () =>
+      webCardCategory
+        ? labels.find(label => label.key === webCardCategory?.id)?.value
+        : '',
+    [labels, webCardCategory],
+  );
+
   const { data, fieldProps } = useForm<FormValue>(
     () =>
       webCardCategory
         ? {
             ...webCardCategory,
-            baseLabelValue: label?.baseLabelValue,
+            baseLabelValue: label,
             activities:
               categoryCompanyActivities?.map(
                 id =>
@@ -129,14 +135,14 @@ const WebCardCategoryForm = ({
             const { uploadURL, uploadParameters } = uploadsInfos[index];
             return uploadMedia(file, uploadURL, uploadParameters).promise.then(
               ({ public_id }) => ({
-                id: encodeMediaId(public_id, 'image'),
+                id: public_id,
                 index: mediaIndex,
               }),
             );
           }),
         );
-      } catch (error) {
-        setError(error);
+      } catch (error: any) {
+        setError(error.message);
         setIsSaving(false);
         setUploading(false);
         return;
@@ -148,27 +154,23 @@ const WebCardCategoryForm = ({
       setUploading(false);
     }
 
-    try {
-      const result = await saveWebCardCategory({
-        ...data,
-        medias: mediasToSave,
-      } as any);
+    const result = await saveWebCardCategory({
+      ...data,
+      medias: mediasToSave,
+    } as any);
 
-      if (result.success) {
-        setFormErrors(null);
-        if (isCreation) {
-          router.replace(
-            `/webCardCategories/${result.webCardCategoryId}?saved=true`,
-          );
-        } else {
-          setDisplaySaveSuccess(true);
-        }
-      } else {
-        setFormErrors(result.formErrors);
-      }
-    } catch (error) {
+    if (result.success) {
       setFormErrors(null);
-      setError(error);
+      if (isCreation) {
+        router.replace(
+          `/webCardCategories/${result.webCardCategoryId}?saved=true`,
+        );
+      } else {
+        setDisplaySaveSuccess(true);
+      }
+    } else if (!result.success) {
+      setFormErrors(result.formErrors || null);
+      setError(result.message);
     }
     setIsSaving(false);
   };
@@ -189,7 +191,7 @@ const WebCardCategoryForm = ({
         </Link>
       </Breadcrumbs>
       <Typography variant="h4" component="h1">
-        {webCardCategory ? label?.baseLabelValue : 'New WebCardCategory'}
+        {webCardCategory ? label : 'New WebCardCategory'}
       </Typography>
       <Box
         sx={{
@@ -219,22 +221,14 @@ const WebCardCategoryForm = ({
           />
         </Box>
         <TextField
-          name="labelKey"
-          label="Label key"
-          disabled={saving || !isCreation}
+          name="label"
+          label="Label (en-US)"
+          disabled={saving}
           required
           fullWidth
-          {...fieldProps('labelKey')}
+          {...fieldProps('label')}
         />
         <Box display="flex" alignItems="center" gap={2} width="100%">
-          <TextField
-            name="baseLabelValue"
-            label="Label base value"
-            disabled={saving}
-            required
-            fullWidth
-            {...fieldProps('baseLabelValue')}
-          />
           <FormControl fullWidth error={webCardKindProps.error}>
             <InputLabel id="webCardKind-label">Profile Kind</InputLabel>
             <Select
@@ -261,11 +255,11 @@ const WebCardCategoryForm = ({
             fullWidth
             {...fieldProps('order', { parse: intParser })}
           />
-          <WebCardTemplateTypeListInput
+          <TypeListInput
             label="Webcard template type"
             name="cardTemplateType"
             options={cardTemplateTypes}
-            cardTemplateTypesLabels={labels}
+            typesLabels={labels}
             width="100%"
             {...fieldProps('cardTemplateType')}
           />
@@ -297,7 +291,7 @@ const WebCardCategoryForm = ({
         </Box>
         {error && (
           <Typography variant="body1" color="error">
-            Something went wrong {error?.message}
+            {error}
           </Typography>
         )}
       </Box>

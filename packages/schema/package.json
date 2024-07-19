@@ -1,6 +1,6 @@
 {
   "name": "@azzapp/schema",
-  "version": "0.5.14-rc.1",
+  "version": "0.5.20-rc.0",
   "private": true,
   "exports": {
     ".": {
@@ -51,6 +51,6 @@
   "devDependencies": {
     "@babel/cli": "7.24.1",
     "@types/lodash": "4.17.0",
-    "typescript": "^5.4.5"
+    "typescript": "^5.5.3"
   }
 }

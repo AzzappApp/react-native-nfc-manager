@@ -1,15 +1,14 @@
-import { memo, useCallback } from 'react';
+import { useCallback } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { StyleSheet } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { graphql, commitMutation } from 'react-relay';
 import { isAdmin } from '@azzapp/shared/profileHelpers';
-import { webcardRequiresSubscription } from '@azzapp/shared/subscriptionHelpers';
 import { colors } from '#theme';
 import { useRouter } from '#components/NativeRouter';
+import PremiumIndicator from '#components/PremiumIndicator';
 import { getAuthState } from '#helpers/authStore';
 import { getRelayEnvironment } from '#helpers/relayEnvironment';
-import { useIsSubscriber } from '#helpers/SubscriptionContext';
 import useHandleProfileActionError from '#hooks/useHandleProfileError';
 import Button from '#ui/Button';
 import Icon from '#ui/Icon';
@@ -39,7 +38,7 @@ const HomeBottomPanelPublish = ({ profile }: HomeBottomPanelPublishProps) => {
     ) as string,
   );
   const router = useRouter();
-  const isSubscriber = useIsSubscriber();
+
   const onPublish = useCallback(() => {
     if (!profile) {
       return;
@@ -54,12 +53,8 @@ const HomeBottomPanelPublish = ({ profile }: HomeBottomPanelPublishProps) => {
     if (!isAdmin(profile.profileRole)) {
       return;
     }
-    const requireSubscription = webcardRequiresSubscription(
-      profile.webCard.cardModules,
-      profile.webCard.webCardKind,
-    );
 
-    if (requireSubscription && !isSubscriber) {
+    if (profile.webCard.requiresSubscription && !profile.webCard.isPremium) {
       router.push({ route: 'USER_PAY_WALL' });
       return;
     }
@@ -119,7 +114,7 @@ const HomeBottomPanelPublish = ({ profile }: HomeBottomPanelPublishProps) => {
         handleProfileActionError(error);
       },
     });
-  }, [handleProfileActionError, intl, isSubscriber, profile, router]);
+  }, [handleProfileActionError, intl, profile, router]);
 
   return (
     <>
@@ -167,6 +162,14 @@ const HomeBottomPanelPublish = ({ profile }: HomeBottomPanelPublishProps) => {
               }}
             />
           }
+          rightElement={
+            <PremiumIndicator
+              isRequired={
+                profile?.webCard.requiresSubscription &&
+                !profile?.webCard.isPremium
+              }
+            />
+          }
           style={styles.button}
           onPress={onPublish}
         />
@@ -175,7 +178,7 @@ const HomeBottomPanelPublish = ({ profile }: HomeBottomPanelPublishProps) => {
   );
 };
 
-export default memo(HomeBottomPanelPublish);
+export default HomeBottomPanelPublish;
 
 const styles = StyleSheet.create({
   panel: {

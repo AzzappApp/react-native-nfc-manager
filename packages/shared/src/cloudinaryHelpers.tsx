@@ -174,7 +174,6 @@ export const createPresignedUpload = async (
   kind: 'image' | 'raw' | 'video',
   aspectRatio?: string | null,
   pregeneratedSizes?: number[] | null,
-  generateVideoStreaming?: boolean | null,
   context?: string | null,
 ) => {
   const uploadURL: string =
@@ -193,11 +192,6 @@ export const createPresignedUpload = async (
   if (pregeneratedSizes) {
     uploadParameters.eager = pregeneratedSizes
       .map(size => resizeTransforms(size))
-      .join('|');
-  }
-  if (generateVideoStreaming && kind === 'video') {
-    uploadParameters.eager = [uploadParameters.eager, 'sp_auto,f_m3u8']
-      .filter(val => !!val)
       .join('|');
   }
 

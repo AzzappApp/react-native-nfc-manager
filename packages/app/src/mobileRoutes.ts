@@ -1,10 +1,10 @@
-import type { NativeRouterInit } from '#components/NativeRouter';
+import type { RouterInit } from '#components/NativeRouter';
 
 /**
  * Main stack of the app
  */
-export const mainRoutes = (withOnboarding: boolean): NativeRouterInit => {
-  const stack: NativeRouterInit['stack'] = [];
+export const mainRoutes = (withOnboarding: boolean): RouterInit => {
+  const stack: RouterInit['stack'] = [];
 
   if (withOnboarding) {
     stack.push({
@@ -15,6 +15,7 @@ export const mainRoutes = (withOnboarding: boolean): NativeRouterInit => {
     stack.push({
       id: 'MAIN_TAB',
       currentIndex: 0,
+      lazy: true,
       tabs: [
         {
           id: 'HOME',
@@ -37,7 +38,7 @@ export const mainRoutes = (withOnboarding: boolean): NativeRouterInit => {
 /**
  * Sign in stack
  */
-export const signInRoutes: NativeRouterInit = {
+export const signInRoutes: RouterInit = {
   id: 'SIGN_IN_STACK',
   stack: [{ id: 'SIGN_IN', route: 'SIGN_IN' }],
 };
@@ -45,7 +46,7 @@ export const signInRoutes: NativeRouterInit = {
 /**
  * Sign up stack
  */
-export const signUpRoutes: NativeRouterInit = {
+export const signUpRoutes: RouterInit = {
   id: 'SIGN_UP_STACK',
   stack: [{ id: 'SIGN_UP', route: 'SIGN_UP' }],
 };

@@ -91,6 +91,7 @@ const ProtectedMutation: Record<
   Exclude<
     MutationMethod,
     | 'createWebCard'
+    | 'deleteUser'
     | 'estimateSubscriptionCost'
     | 'sendReport'
     | 'updateContactCardScans'
@@ -128,7 +129,6 @@ const ProtectedMutation: Record<
   acceptOwnership: isAnyRoleRule,
   saveCardStyle: isEditorRule,
   saveCommonInformation: isAdminRule,
-  saveSubscription: isAnyRoleRule,
   cancelTransferOwnership: isOwnerRule,
   saveContactCard: isAnyRoleRule,
   saveCover: isEditorRule,
@@ -149,12 +149,12 @@ const ProtectedMutation: Record<
   generatePaymentInvoice: isOwnerRule,
   upgradeSubscriptionPlan: isOwnerRule,
   endSubscription: isOwnerRule,
+  updateSubscriptionCustomer: isAdminRule,
 };
 
 const isCurrentUserRule = rule('sameUser', {
   cache: 'contextual',
 })(async (parent: User, _args, ctx: GraphQLContext) => {
-  console.log(ctx.auth.userId, parent.id);
   return ctx.auth.userId === parent.id;
 });
 
@@ -219,7 +219,10 @@ const permissions = shield(
       owner: isSameWebCard,
       userName: allow,
       cardIsPublished: allow,
-      cardCover: allow,
+      hasCover: allow,
+      coverMedia: allow,
+      coverTexts: allow,
+      coverBackgroundColor: allow,
       cardColors: allow,
       cardStyle: allow,
       cardModules: allow,
@@ -230,6 +233,9 @@ const permissions = shield(
       nbFollowings: allow,
       id: allow,
       webCardKind: allow,
+      coverDynamicLinks: allow,
+      isPremium: isSameWebCard,
+      requiresSubscription: isSameWebCard,
     },
   },
   {

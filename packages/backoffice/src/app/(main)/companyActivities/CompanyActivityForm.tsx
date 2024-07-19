@@ -11,51 +11,63 @@ import {
   Typography,
 } from '@mui/material';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useForm } from '#helpers/formHelpers';
+import TypeListInput from '../../../components/TypeListInput';
 import { saveCompanyActivity } from './companyActivityActions';
-import WebCardTemplateTypeListInput from './WebCardTemplateTypeListInput';
 import type { CompanyActivityErrors } from './companyActivitySchema';
-import type { CompanyActivity, CardTemplateType, Label } from '@azzapp/data';
+import type {
+  CompanyActivity,
+  CardTemplateType,
+  CompanyActivityType,
+  LocalizationMessage,
+} from '@azzapp/data';
 
 type CompanyActivityFormProps = {
   companyActivity?: CompanyActivity | null;
   cardTemplateTypes: CardTemplateType[];
+  companyActivitiesTypes: CompanyActivityType[];
   saved?: boolean;
-  label?: Label | null;
-  cardTemplateTypesLabels: Label[];
+  labels: LocalizationMessage[];
 };
 
-type FormValue = CompanyActivity &
-  Label & {
-    cardTemplateType: CardTemplateType | string;
-  };
+type FormValue = {
+  label: string;
+  cardTemplateTypeId: string | null;
+  companyActivityTypeId: string | null;
+};
 
 const CompanyActivityForm = ({
   companyActivity,
   saved = false,
   cardTemplateTypes,
-  label,
-  cardTemplateTypesLabels,
+  companyActivitiesTypes,
+  labels,
 }: CompanyActivityFormProps) => {
   const isCreation = !companyActivity;
   const [saving, setIsSaving] = useState(false);
   const [displaySaveSuccess, setDisplaySaveSuccess] = useState(saved);
-  const [error, setError] = useState<any>(null);
+  const [error, setError] = useState<string>();
   const [formErrors, setFormErrors] = useState<CompanyActivityErrors | null>(
     null,
   );
 
-  const { data, fieldProps } = useForm<FormValue>(
-    () => ({
-      ...label,
-      ...companyActivity,
-      cardTemplateType: companyActivity?.cardTemplateTypeId
-        ? cardTemplateTypes?.find(item => {
-            return item.id === companyActivity?.cardTemplateTypeId;
-          })
+  const label = useMemo(
+    () =>
+      companyActivity
+        ? labels.find(item => item.key === companyActivity.id)?.value
         : undefined,
-    }),
+    [companyActivity, labels],
+  );
+
+  const { data, fieldProps } = useForm<FormValue>(
+    () => {
+      return {
+        label: label || '',
+        cardTemplateTypeId: companyActivity?.cardTemplateTypeId ?? null,
+        companyActivityTypeId: companyActivity?.companyActivityTypeId ?? null,
+      };
+    },
     formErrors?.fieldErrors,
     [companyActivity],
   );
@@ -64,23 +76,26 @@ const CompanyActivityForm = ({
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsSaving(true);
-    try {
-      const result = await saveCompanyActivity(data as CompanyActivity);
-      if (result.success) {
-        setFormErrors(null);
-        if (isCreation) {
-          router.replace(
-            `/companyActivities/${result.companyActivityId}?s^aved=true`,
-          );
-        } else {
-          setDisplaySaveSuccess(true);
-        }
-      } else {
-        setFormErrors(result.formErrors);
-      }
-    } catch (error) {
+    const result = await saveCompanyActivity(
+      (isCreation
+        ? data
+        : {
+            id: companyActivity?.id,
+            ...data,
+          }) as FormValue,
+    );
+    if (result.success) {
       setFormErrors(null);
-      setError(error);
+      if (isCreation) {
+        router.replace(
+          `/companyActivities/${result.companyActivityId}?saved=true`,
+        );
+      } else {
+        setDisplaySaveSuccess(true);
+      }
+    } else if (!result.success) {
+      setFormErrors(result.formErrors || null);
+      setError(result.message);
     }
     setIsSaving(false);
   };
@@ -108,9 +123,7 @@ const CompanyActivityForm = ({
         </Link>
       </Breadcrumbs>
       <Typography variant="h4" component="h1" sx={{ mb: 2 }}>
-        {companyActivity
-          ? `Company activity ${label?.baseLabelValue}`
-          : 'New Company Activity'}
+        {companyActivity ? `Company activity ${label}` : 'New Company Activity'}
       </Typography>
 
       <Box
@@ -123,28 +136,43 @@ const CompanyActivityForm = ({
         }}
       >
         <TextField
-          name="labelKey"
-          label="Label Key"
-          disabled={saving || !isCreation}
+          name="label"
+          label="Label (en-US)"
+          disabled={saving}
           required
           sx={{ flex: 1, minWidth: 200 }}
-          {...fieldProps('labelKey')}
-        />
-        <TextField
-          name="baseLabelValue"
-          label="Label base value"
-          required
-          sx={{ flex: 1, minWidth: 200 }}
-          {...fieldProps('baseLabelValue')}
+          {...fieldProps('label')}
         />
       </Box>
-      <WebCardTemplateTypeListInput
+      {/* @ts-expect-error this component types are fucked */}
+      <TypeListInput
         label="Webcard template type"
         name="cardTemplateType"
         options={cardTemplateTypes}
-        cardTemplateTypesLabels={cardTemplateTypesLabels}
+        typesLabels={labels}
         sx={{ flex: 1, minWidth: 200 }}
-        {...fieldProps('cardTemplateType')}
+        {...fieldProps('cardTemplateTypeId', {
+          format: value =>
+            value ? cardTemplateTypes.find(t => t.id === value) ?? null : null,
+          parse: value =>
+            (typeof value === 'string' ? value : value?.id) ?? null,
+        })}
+      />
+      {/* @ts-expect-error this component types are fucked */}
+      <TypeListInput
+        label="Activity Type"
+        name="companyActivityType"
+        options={companyActivitiesTypes}
+        typesLabels={labels}
+        sx={{ flex: 1, minWidth: 200 }}
+        {...fieldProps('companyActivityTypeId', {
+          format: value =>
+            value
+              ? companyActivitiesTypes.find(t => t.id === value) ?? null
+              : null,
+          parse: value =>
+            (typeof value === 'string' ? value : value?.id) ?? null,
+        })}
       />
       <Button
         type="submit"
@@ -156,7 +184,7 @@ const CompanyActivityForm = ({
       </Button>
       {error && (
         <Typography variant="body1" color="error">
-          Something went wrong {error?.message}
+          {error}
         </Typography>
       )}
       <Snackbar

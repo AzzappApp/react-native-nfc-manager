@@ -1,7 +1,6 @@
 import cx from 'classnames';
 import { getCldImageUrl } from 'next-cloudinary';
 import { swapColor, type ColorPalette } from '@azzapp/shared/cardHelpers';
-import { decodeMediaId } from '@azzapp/shared/imagesHelpers';
 import { convertHexToRGBA } from '#helpers';
 import styles from './CardModuleBackground.css';
 
@@ -69,7 +68,7 @@ const CardModuleBackground = ({
               opacity,
             ),
             maskImage: `url(${getCldImageUrl({
-              src: decodeMediaId(backgroundId),
+              src: backgroundId,
               format: 'svg',
             })})`,
           }}

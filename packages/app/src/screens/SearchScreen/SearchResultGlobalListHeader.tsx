@@ -69,8 +69,11 @@ const SearchResultGlobalListHeader = ({
     <>
       <Text variant="button" style={styles.titleSection}>
         <FormattedMessage
-          defaultMessage="Webcards"
+          defaultMessage="Webcards{azzappA}"
           description="SearchPage - Result - Global search profiles title"
+          values={{
+            azzappA: <Text variant="azzapp">a</Text>,
+          }}
         />
       </Text>
       <View>

@@ -3,7 +3,7 @@ import { useIntl } from 'react-intl';
 import { Dimensions, StyleSheet, View } from 'react-native';
 import { graphql, useFragment } from 'react-relay';
 import { useModulesData } from '#components/cardModules/ModuleData';
-import ScreenModal from '#components/ScreenModal';
+import { ScreenModal } from '#components/NativeRouter';
 import WebCardPreview from '#components/WebCardPreview';
 import useScreenInsets from '#hooks/useScreenInsets';
 import ActivityIndicator from '#ui/ActivityIndicator';
@@ -24,7 +24,7 @@ type PreviewModalProps = {
   onRequestClose: () => void;
 };
 
-const { height: windowHeight } = Dimensions.get('screen');
+const { height: windowHeight } = Dimensions.get('window');
 
 /**
  * A modal that allows the user to preview his webcard.
@@ -77,7 +77,11 @@ const PreviewModal = ({
   const previewHeight = windowHeight - insets.top - HEADER_HEIGHT;
 
   return (
-    <ScreenModal visible={visible} animationType="slide">
+    <ScreenModal
+      visible={visible}
+      animationType="slide"
+      onRequestDismiss={onRequestClose}
+    >
       <Container style={{ flex: 1, paddingTop: insets.top }}>
         <Header
           leftElement={

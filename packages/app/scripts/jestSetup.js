@@ -9,7 +9,7 @@ require('@testing-library/jest-native/extend-expect');
 
 //#region Native Dependencies mock
 // Reanimated Mock
-require('react-native-reanimated/lib/module/reanimated2/jestUtils').setUpTests();
+require('react-native-reanimated').setUpTests();
 global.ReanimatedDataMock = {
   now: () => Date.now(),
 };
@@ -31,11 +31,6 @@ jest.mock(
   () => require('react-native-safe-area-context/jest/mock').default,
 );
 
-// React Native Async Storage Mock
-jest.mock('@react-native-async-storage/async-storage', () =>
-  require('@react-native-async-storage/async-storage/jest/async-storage-mock'),
-);
-
 // React Encrypted Storage Mock
 jest.mock('react-native-encrypted-storage');
 
@@ -54,12 +49,18 @@ jest.mock('#components/medias/NativeMediaImageRenderer');
 jest.mock('#components/medias/NativeMediaVideoRenderer');
 // we completely mock the medias module for problems related to querying the wrapper around the native module
 jest.mock('#components/medias');
-
-jest.mock('#components/gpu/GPUHelpers');
 //#endregion
 
 //#region flashlist
 require('@shopify/flash-list/jestSetup');
+//#endregion
+
+//#region ReactNativeBlobUtil
+jest.mock('react-native-blob-util', () => {});
+//#endregion
+
+//#region ReactNativeSkia video
+jest.mock('@azzapp/react-native-skia-video', () => {});
 //#endregion
 
 //#region Sentry
@@ -81,3 +82,5 @@ jest.mock('react-native-purchases', () => ({
     restoreTransactions: jest.fn(),
   },
 }));
+
+jest.mock('#hooks/useApplicationFonts', () => ({}));

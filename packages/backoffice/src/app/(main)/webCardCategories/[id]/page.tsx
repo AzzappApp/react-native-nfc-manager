@@ -4,10 +4,10 @@ import {
   CompanyActivityTable,
   db,
   getCompanyActivitiesByWebCardCategory,
-  getLabel,
-  getLabels,
+  getLocalizationMessagesByLocaleAndTarget,
   getWebCardCategoryById,
 } from '@azzapp/data';
+import { DEFAULT_LOCALE, ENTITY_TARGET } from '@azzapp/i18n';
 import WebCardCategoryForm from '../WebCardCategoryForm';
 
 type WebCardCategoryPageProps = {
@@ -29,16 +29,13 @@ const WebCardCategoryPage = async ({
   }
   const companyActivities = await db.select().from(CompanyActivityTable);
   const cardTemplateTypes = await db.select().from(CardTemplateTypeTable);
-  const labels = await getLabels(
-    cardTemplateTypes
-      .map(({ labelKey }) => labelKey)
-      .concat(companyActivities.map(({ labelKey }) => labelKey)),
+  const labels = await getLocalizationMessagesByLocaleAndTarget(
+    DEFAULT_LOCALE,
+    ENTITY_TARGET,
   );
   const categoryCompanyActivities = await getCompanyActivitiesByWebCardCategory(
     id,
   ).then(activities => activities.map(activity => activity.id));
-
-  const label = await getLabel(webCardCategory.labelKey);
 
   return (
     <WebCardCategoryForm
@@ -48,7 +45,6 @@ const WebCardCategoryPage = async ({
       cardTemplateTypes={cardTemplateTypes}
       labels={labels}
       saved={!!searchParams?.saved}
-      label={label}
     />
   );
 };

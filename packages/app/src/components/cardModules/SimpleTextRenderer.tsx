@@ -1,3 +1,4 @@
+import { useIntl } from 'react-intl';
 import Animated, {
   useAnimatedStyle,
   type SharedValue,
@@ -13,6 +14,7 @@ import {
   getModuleDataValues,
   textAlignmentOrDefault,
 } from '@azzapp/shared/cardModuleHelpers';
+import Text from '#ui/Text';
 import CardModuleBackground from './CardModuleBackground';
 import type {
   SimpleTextRenderer_simpleTextModule$data,
@@ -218,6 +220,10 @@ const SimpleTextRenderer = ({
     };
   });
 
+  const intl = useIntl();
+
+  const textColor = swapColor(fontColor, colorPalette);
+
   return (
     <CardModuleBackground
       {...props}
@@ -235,14 +241,43 @@ const SimpleTextRenderer = ({
         style={[
           {
             textAlign: textAlignmentOrDefault(textAlign),
-            color: swapColor(fontColor, colorPalette),
+            color: textColor,
             fontFamily,
           },
           textStyle,
           contentStyle,
         ]}
       >
-        {text}
+        {text ||
+          (data.kind === 'simpleTitle'
+            ? intl.formatMessage(
+                {
+                  defaultMessage:
+                    'Add section contents here. To edit the text, simply open the editor and start typing. You can also change the font style, size, color, and alignment using the editing tools provided. Adjust the margins and the background for this section to match the design and branding of your WebCard{azzappA}.',
+                  description: 'Default text for the simple title module',
+                },
+                {
+                  azzappA: (
+                    <Text variant="azzapp" style={{ color: textColor }}>
+                      a
+                    </Text>
+                  ),
+                },
+              )
+            : intl.formatMessage(
+                {
+                  defaultMessage:
+                    'Add section contents here. To edit the text, simply open the editor and start typing. You can also change the font style, size, color, and alignment using the editing tools provided. Adjust the margins and the background for this section to match the design and branding of your WebCard{azzappA}.',
+                  description: 'Default text for the simple text module',
+                },
+                {
+                  azzappA: (
+                    <Text variant="azzapp" style={{ color: textColor }}>
+                      a
+                    </Text>
+                  ),
+                },
+              ))}
       </Animated.Text>
     </CardModuleBackground>
   );

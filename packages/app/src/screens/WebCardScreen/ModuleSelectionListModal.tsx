@@ -1,20 +1,20 @@
 import { useCallback, useMemo } from 'react';
 import { useIntl } from 'react-intl';
 import { FlatList, StyleSheet, View } from 'react-native';
-import ScreenModal from '#components/ScreenModal';
+import { ScreenModal } from '#components/NativeRouter';
 import useScreenInsets from '#hooks/useScreenInsets';
 import Container from '#ui/Container';
 import Header from '#ui/Header';
 import IconButton from '#ui/IconButton';
 import ModuleSelectionListModalItem from './ModuleSelectionListModalItem';
-import type { ScreenModalProps } from '#components/ScreenModal';
+import type { ScreenModalProps } from '#components/NativeRouter';
 import type { ModuleSelectionListItem } from './ModuleSelectionListModalItem';
 import type { ModuleKind } from '@azzapp/shared/cardModuleHelpers';
 import type { ListRenderItemInfo } from 'react-native';
 
-type ModuleSelectionListModalProps = Exclude<
+type ModuleSelectionListModalProps = Omit<
   ScreenModalProps,
-  'onRequestClose'
+  'onRequestDismiss'
 > & {
   onSelectModuleKind: (module: ModuleKind) => void;
   onRequestClose: () => void;
@@ -199,7 +199,7 @@ const ModuleSelectionListModal = ({
   );
 
   return (
-    <ScreenModal {...props}>
+    <ScreenModal {...props} onRequestDismiss={onRequestClose}>
       <Container style={[styles.root, { paddingTop: top }]}>
         <Header
           leftElement={

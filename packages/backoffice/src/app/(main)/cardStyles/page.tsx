@@ -1,18 +1,43 @@
-import { like, or, asc, desc, sql } from 'drizzle-orm';
-import { CardStyleTable, db } from '@azzapp/data';
+import { Box, TextField, Typography } from '@mui/material';
+import { like, or, asc, desc, sql, eq, and } from 'drizzle-orm';
+import { CardStyleTable, LocalizationMessageTable, db } from '@azzapp/data';
+import { DEFAULT_LOCALE, ENTITY_TARGET } from '@azzapp/i18n';
 import CardStylesList from './CardStylesList';
 
-export type SortColumn = 'labelKey';
+export type CardStyleItem = {
+  id: string;
+  label: string | null;
+  enabled: boolean;
+};
+
+export type SortColumn = 'label';
 
 const sortsColumns = {
-  labelKey: CardStyleTable.labelKey,
+  label: LocalizationMessageTable.value,
 };
 
 const getCardStylesQuery = (search: string | null) => {
-  let query = db.select().from(CardStyleTable).$dynamic();
+  let query = db
+    .select({
+      id: CardStyleTable.id,
+      label: LocalizationMessageTable.value,
+      enabled: CardStyleTable.enabled,
+    })
+    .from(CardStyleTable)
+    .leftJoin(
+      LocalizationMessageTable,
+      and(
+        eq(CardStyleTable.id, LocalizationMessageTable.key),
+        eq(LocalizationMessageTable.target, ENTITY_TARGET),
+        eq(LocalizationMessageTable.locale, DEFAULT_LOCALE),
+      ),
+    )
+    .$dynamic();
 
   if (search) {
-    query = query.where(or(like(CardStyleTable.labelKey, `%${search}%`)));
+    query = query.where(
+      or(like(LocalizationMessageTable.value, `%${search}%`)),
+    );
   }
 
   return query;
@@ -60,7 +85,7 @@ const CardStylesPage = async ({ searchParams = {} }: Props) => {
 
   const sort = Object.keys(sortsColumns).includes(searchParams.sort as any)
     ? (searchParams.sort as any)
-    : 'labelKey';
+    : 'label';
 
   const order = searchParams.order === 'desc' ? 'desc' : 'asc';
   const search = searchParams.s ?? null;
@@ -68,15 +93,39 @@ const CardStylesPage = async ({ searchParams = {} }: Props) => {
   const count = await getCount(search);
 
   return (
-    <CardStylesList
-      cardStyles={cardStyles}
-      count={count}
-      page={page}
-      pageSize={PAGE_SIZE}
-      sortField={sort}
-      sortOrder={order}
-      search={search}
-    />
+    <Box
+      sx={{
+        display: 'flex',
+        flexDirection: 'column',
+        height: '100%',
+      }}
+    >
+      <Typography variant="h4" component="h1" sx={{ mb: 2 }}>
+        WebCards Styles
+      </Typography>
+      <TextField
+        id="note"
+        inputProps={{
+          readOnly: true,
+        }}
+        label="Note"
+        multiline
+        rows={1}
+        maxRows={3}
+        value={
+          'WebCard styles allows to set different parameters like border radius, title font etc... of all the WebCard'
+        }
+      />
+      <CardStylesList
+        cardStyles={cardStyles}
+        count={count}
+        page={page}
+        pageSize={PAGE_SIZE}
+        sortField={sort}
+        sortOrder={order}
+        search={search}
+      />
+    </Box>
   );
 };
 

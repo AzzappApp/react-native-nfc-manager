@@ -3,6 +3,7 @@ import { StyleSheet, View } from 'react-native';
 import Animated, {
   interpolate,
   useAnimatedStyle,
+  useDerivedValue,
 } from 'react-native-reanimated';
 import { graphql, useFragment } from 'react-relay';
 import HomeBottomPanelCreate from './HomeBottomPanelCreate';
@@ -10,12 +11,12 @@ import HomeBottomPanelInvitation from './HomeBottomPanelInvitation';
 import HomeBottomPanelNewCover from './HomeBottomPanelNewCover';
 import HomeBottomPanelPublish from './HomeBottomPanelPublish';
 import HomeBottomPanelTransfertOwner from './HomeBottomPanelTransfertOwner';
+import { useHomeScreenContext } from './HomeScreenContext';
 import type {
   HomeBottomPanelMessage_profiles$data,
   HomeBottomPanelMessage_profiles$key,
 } from '#relayArtifacts/HomeBottomPanelMessage_profiles.graphql';
 import type { ArrayItemType } from '@azzapp/shared/arrayHelpers';
-import type { SharedValue } from 'react-native-reanimated';
 
 export type MessageContentType =
   | 'cover'
@@ -24,13 +25,9 @@ export type MessageContentType =
   | 'transfert';
 
 type HomeBottomPanelMessageProps = {
-  currentProfileIndexSharedValue: SharedValue<number>;
   user: HomeBottomPanelMessage_profiles$key;
 };
-const HomeBottomPanelMessage = ({
-  currentProfileIndexSharedValue,
-  user,
-}: HomeBottomPanelMessageProps) => {
+const HomeBottomPanelMessage = ({ user }: HomeBottomPanelMessageProps) => {
   const profiles = useFragment(
     graphql`
       fragment HomeBottomPanelMessage_profiles on Profile @relay(plural: true) {
@@ -41,18 +38,13 @@ const HomeBottomPanelMessage = ({
         webCard {
           userName
           cardIsPublished
-          cardCover {
-            segmented #segmented is the only mandatory field in a card Cover
-          }
+          hasCover
           owner {
             email
             phoneNumber
           }
-          cardModules {
-            id
-            kind
-          }
-          webCardKind
+          requiresSubscription
+          isPremium
           id
         }
       }
@@ -67,7 +59,7 @@ const HomeBottomPanelMessage = ({
         return { type: 'transfert', profile };
       } else if (profile.invited) {
         return { type: 'invitation', profile };
-      } else if (!profile.webCard?.cardCover) {
+      } else if (!profile.webCard?.hasCover) {
         return { type: 'cover', profile };
       } else if (!profile.webCard?.cardIsPublished) {
         return { type: 'publish', profile };
@@ -81,14 +73,7 @@ const HomeBottomPanelMessage = ({
   return (
     <View style={styles.container}>
       {(bottomContent ?? []).map((content, index) => {
-        return (
-          <MessageItem
-            key={index}
-            content={content}
-            index={index}
-            currentIndex={currentProfileIndexSharedValue}
-          />
-        );
+        return <MessageItem key={index} content={content} index={index} />;
       })}
     </View>
   );
@@ -99,29 +84,30 @@ export default memo(HomeBottomPanelMessage);
 type MessageItemProps = {
   content: ArrayItemType<MessageArrayType>;
   index: number;
-  currentIndex: SharedValue<number>;
 };
 
-const MessageItem = ({ content, index, currentIndex }: MessageItemProps) => {
-  const animatedStyle = useAnimatedStyle(() => {
-    //math.pow is used to reduce the superposition of 2 view, the increase is not linear, going slowly at the beginning
-    const opacity = Math.pow(
+const MessageItemComponent = ({ content, index }: MessageItemProps) => {
+  const { currentIndexSharedValue } = useHomeScreenContext();
+
+  const opacity = useDerivedValue(() => {
+    return Math.pow(
       Math.max(
         0,
         interpolate(
-          currentIndex.value + 1,
+          currentIndexSharedValue.value,
           [index - 1, index, index + 1],
           [0, 1, 0],
         ),
       ),
       4,
     );
-
+  });
+  const animatedStyle = useAnimatedStyle(() => {
     return {
-      opacity,
-      pointerEvents: opacity > 0.5 ? 'box-none' : 'none',
+      opacity: opacity.value,
+      pointerEvents: opacity.value > 0.5 ? 'box-none' : 'none',
     };
-  }, [currentIndex]);
+  });
 
   return (
     <Animated.View
@@ -149,6 +135,8 @@ const MessageItem = ({ content, index, currentIndex }: MessageItemProps) => {
     </Animated.View>
   );
 };
+
+const MessageItem = memo(MessageItemComponent);
 type MessageArrayType = Array<{
   type: MessageContentType;
   profile: ArrayItemType<HomeBottomPanelMessage_profiles$data>;

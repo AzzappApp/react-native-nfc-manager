@@ -1,11 +1,21 @@
 import * as Sentry from '@sentry/react-native';
-import { memo, useCallback, useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { Platform, StyleSheet, View, Share } from 'react-native';
+import {
+  Platform,
+  StyleSheet,
+  View,
+  Share,
+  Alert,
+  Linking,
+} from 'react-native';
 import Toast from 'react-native-toast-message';
 import { graphql, useFragment } from 'react-relay';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
-import { isAdmin, isOwner } from '@azzapp/shared/profileHelpers';
+import {
+  isAdmin,
+  isOwner as isOwnerByProfileRole,
+} from '@azzapp/shared/profileHelpers';
 import { buildUserUrl } from '@azzapp/shared/urlHelpers';
 import { colors } from '#theme';
 import Link from '#components/Link';
@@ -34,16 +44,6 @@ type HomeBottomSheetPanelProps = {
    *
    */
   close: () => void;
-  /**
-   * User has a profile
-   */
-  withProfile: boolean;
-  /**
-   * The profile role of the active webCard / profile
-   *
-   * @type {(string | null)}
-   */
-  profileRole: string | null;
 
   profile?: HomeBottomSheetPanel_profile$key | null;
 };
@@ -51,8 +51,6 @@ type HomeBottomSheetPanelProps = {
 const HomeBottomSheetPanel = ({
   visible,
   close,
-  profileRole,
-  withProfile,
   profile: profileKey,
 }: HomeBottomSheetPanelProps) => {
   const profile = useFragment(
@@ -64,15 +62,18 @@ const HomeBottomSheetPanel = ({
           id
           userName
           cardIsPublished
-          cardCover {
-            segmented #segmented is the only mandatory field in a card Cover
-          }
+          hasCover
+          requiresSubscription
+          isPremium
+          isWebSubscription
         }
         invited
       }
     `,
     profileKey ?? null,
   );
+
+  const intl = useIntl();
 
   const [quitWebCard, isLoadingQuitWebCard] = useQuitWebCard(
     profile?.webCard.id ?? '',
@@ -81,13 +82,70 @@ const HomeBottomSheetPanel = ({
       console.error(e);
       Toast.show({
         type: 'error',
-        text1: intl.formatMessage({
-          defaultMessage: "Error, couldn't quit WebCard. Please try again.",
-          description: 'Error toast message when quitting WebCard',
-        }),
+        text1: intl.formatMessage(
+          {
+            defaultMessage:
+              'Oops, quitting this WebCard{azzappA} was not possible. Please try again later.',
+            description: 'Error toast message when quitting WebCard',
+          },
+          {
+            azzappA: <Text variant="azzapp">a</Text>,
+          },
+        ) as string,
       });
     },
   );
+
+  const handleConfirmationQuitWebCard = useCallback(() => {
+    const isOwner = isOwnerByProfileRole(profile?.profileRole);
+
+    const titleMsg = isOwner
+      ? intl.formatMessage({
+          defaultMessage: 'Delete this WebCard',
+          description: 'Delete WebCard title',
+        })
+      : intl.formatMessage({
+          defaultMessage: 'Quit this WebCard',
+          description: 'Quit WebCard title',
+        });
+
+    const descriptionMsg = isOwner
+      ? intl.formatMessage({
+          defaultMessage:
+            'Are you sure you want to delete this WebCard and all its contents? This action is irreversible.',
+          description: 'Delete WebCard confirmation message',
+        })
+      : intl.formatMessage({
+          defaultMessage:
+            'Are you sure you want to quit this WebCard? This action is irreversible.',
+          description: 'Quit WebCard confirmation message',
+        });
+
+    const labelConfirmation = isOwner
+      ? intl.formatMessage({
+          defaultMessage: 'Delete this WebCard',
+          description: 'Delete button label',
+        })
+      : intl.formatMessage({
+          defaultMessage: 'Quit this WebCard',
+          description: 'Quit button label',
+        });
+
+    Alert.alert(titleMsg, descriptionMsg, [
+      {
+        text: intl.formatMessage({
+          defaultMessage: 'Cancel',
+          description: 'Cancel button label',
+        }),
+        style: 'cancel',
+      },
+      {
+        text: labelConfirmation,
+        style: 'destructive',
+        onPress: quitWebCard,
+      },
+    ]);
+  }, [intl, profile?.profileRole, quitWebCard]);
 
   const { bottom } = useScreenInsets();
   const [requestedLogout, toggleRequestLogout] = useToggle(false);
@@ -110,7 +168,6 @@ const HomeBottomSheetPanel = ({
     }
   }, [close, toggleRequestLogout]);
 
-  const intl = useIntl();
   const onShare = useCallback(async () => {
     if (profile?.webCard.userName) {
       // a quick share method using the native share component. If we want to make a custom share (like tiktok for example, when they are recompressiong the media etc) we can use react-native-shares
@@ -156,6 +213,7 @@ const HomeBottomSheetPanel = ({
       }
     }
   }, [close, intl, profile?.webCard.userName]);
+
   //Restore purchase
   //Manage my subsciption
   const elements = useMemo<
@@ -163,6 +221,21 @@ const HomeBottomSheetPanel = ({
   >(
     () =>
       convertToNonNullArray([
+        !profile?.webCard.isPremium
+          ? {
+              type: 'row',
+              icon: 'plus',
+              text: intl.formatMessage({
+                defaultMessage: 'Upgrade to Azzapp PRO',
+                description:
+                  'Link to open upgrade to Azzapp PRO form to change webcard parameters',
+              }),
+              linkProps: {
+                route: 'USER_PAY_WALL',
+              },
+              onPress: close,
+            }
+          : null,
         {
           type: 'row',
           icon: 'information',
@@ -176,29 +249,23 @@ const HomeBottomSheetPanel = ({
           },
           onPress: close,
         },
-        {
-          type: 'row',
-          icon: Platform.OS === 'ios' ? 'app_store' : 'play_store',
-          text:
-            Platform.OS === 'ios'
-              ? intl.formatMessage({
-                  defaultMessage: 'Restore purchase',
-                  description:
-                    'Link to restore purchase (apple) form to change webcard parameters',
-                })
-              : intl.formatMessage({
-                  defaultMessage: 'Manage my subscription',
-                  description:
-                    'Link to manage my subscription(android) form to change webcard parameters',
-                }),
-          // linkProps: {
-          // TODO
-          //   route: 'WEBCARD_PARAMETERS',
-          // },
-          onPress: close,
-        },
+        profile?.webCard.isPremium && !profile?.webCard.isWebSubscription
+          ? {
+              type: 'row',
+              icon: Platform.OS === 'ios' ? 'app_store' : 'play_store',
+              text: intl.formatMessage({
+                defaultMessage: 'Manage my subscription',
+                description:
+                  'Link to manage my subscription form to change webcard parameters',
+              }),
+              linkProps: {
+                route: 'USER_PAY_WALL',
+              },
+              onPress: close,
+            }
+          : null,
         { type: 'separator' },
-        withProfile && profileRole && isAdmin(profileRole) && !profile?.invited
+        isAdmin(profile?.profileRole) && !profile?.invited
           ? {
               type: 'row',
               icon: 'parameters',
@@ -216,11 +283,9 @@ const HomeBottomSheetPanel = ({
               onPress: close,
             }
           : null,
-        withProfile &&
-        profileRole &&
         !profile?.invited &&
-        isAdmin(profileRole) &&
-        profile?.webCard.cardCover
+        isAdmin(profile?.profileRole) &&
+        profile?.webCard.hasCover
           ? {
               type: 'row',
               icon: 'shared_webcard',
@@ -234,10 +299,7 @@ const HomeBottomSheetPanel = ({
               onPress: close,
             }
           : null,
-        withProfile &&
-        profile &&
-        profile?.webCard.cardIsPublished &&
-        !profile?.invited
+        profile && profile?.webCard.cardIsPublished && !profile?.invited
           ? {
               type: 'row',
               icon: 'share',
@@ -252,7 +314,7 @@ const HomeBottomSheetPanel = ({
             }
           : null,
         { type: 'separator' },
-        withProfile && !profile?.invited
+        !profile?.invited
           ? {
               type: 'row',
               icon: 'invite',
@@ -266,6 +328,17 @@ const HomeBottomSheetPanel = ({
               onPress: close,
             }
           : null,
+        {
+          type: 'row',
+          icon: 'contact_us',
+          text: intl.formatMessage({
+            defaultMessage: 'Contact us',
+            description: 'Contact us message in Home bottom sheet panel',
+          }),
+          onPress: () => {
+            Linking.openURL('mailto:support@azzapp.com');
+          },
+        },
         {
           type: 'row',
           icon: 'about',
@@ -288,7 +361,7 @@ const HomeBottomSheetPanel = ({
           onPress: onLogout,
         },
       ]),
-    [close, intl, onLogout, onShare, profile, profileRole, withProfile],
+    [close, intl, onLogout, onShare, profile],
   );
 
   const modalHeight = useMemo(() => {
@@ -315,10 +388,10 @@ const HomeBottomSheetPanel = ({
           }
           return <HomeBottomSheetPanelOption key={index} {...element} />;
         })}
-        {profile && !isOwner(profile?.profileRole) && (
+        {profile && !isOwnerByProfileRole(profile?.profileRole) && (
           <PressableNative
             style={styles.removeButton}
-            onPress={quitWebCard}
+            onPress={handleConfirmationQuitWebCard}
             disabled={isLoadingQuitWebCard}
           >
             <Text variant="button" style={styles.removeText}>
@@ -421,4 +494,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default memo(HomeBottomSheetPanel);
+export default HomeBottomSheetPanel;

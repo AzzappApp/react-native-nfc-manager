@@ -1,157 +1,111 @@
-import { useEffect, useMemo, useState } from 'react';
+import LottieView from 'lottie-react-native';
+import { useEffect, useState } from 'react';
 import { useIntl } from 'react-intl';
-import { View, StyleSheet } from 'react-native';
+import { View, StyleSheet, useWindowDimensions } from 'react-native';
 import { colors } from '#theme';
 import Text from '#ui/Text';
 import ProgressBar from './ProgressBar';
+import type { ViewProps } from 'react-native-svg/lib/typescript/fabric/utils';
 import type { Subscription, Observable } from 'relay-runtime';
 
 const UploadProgressModal = ({
   progressIndicator,
+  progressIndicators,
+  text,
+  texts,
 }: {
-  progressIndicator: Observable<number>;
+  progressIndicator?: Observable<number> | null;
+  progressIndicators?: Array<Observable<number> | null> | null;
+  text?: string;
+  texts?: string[];
+}) => {
+  const windowWidth = useWindowDimensions().width;
+
+  const intl = useIntl();
+  text =
+    text ??
+    intl.formatMessage({
+      defaultMessage: 'Saving...',
+      description:
+        'Default message displaying in upload modal when uploading a file',
+    });
+
+  const nbProgressPars = progressIndicators?.length ?? 1;
+  const elementsWidth =
+    (windowWidth * 0.62 - (nbProgressPars - 1) * 2) / nbProgressPars;
+  return (
+    <View style={styles.container}>
+      <LottieView
+        source={require('../assets/loader.json')}
+        autoPlay
+        loop
+        hardwareAccelerationAndroid
+        style={{
+          width: windowWidth / 2,
+          height: windowWidth / 2,
+          marginTop: -100,
+        }}
+      />
+      <View style={styles.elementsContainer}>
+        {(texts ?? [text]).map((text, index) => (
+          <Text key={index} style={[styles.text, { width: elementsWidth }]}>
+            {text}
+          </Text>
+        ))}
+      </View>
+      <View style={styles.elementsContainer}>
+        {(progressIndicators ?? [progressIndicator]).map(
+          (progressIndicator, index, { length }) => (
+            <ObservableBoundProgressBar
+              key={index}
+              progressIndicator={progressIndicator}
+              hideWhenNull={length === 1}
+              style={{ width: elementsWidth }}
+            />
+          ),
+        )}
+      </View>
+    </View>
+  );
+};
+
+export default UploadProgressModal;
+
+const ObservableBoundProgressBar = ({
+  progressIndicator,
+  hideWhenNull = true,
+  style,
+  ...props
+}: ViewProps & {
+  hideWhenNull?: boolean;
+  progressIndicator: Observable<number> | null | undefined;
 }) => {
   const [progress, setProgress] = useState<number | null>(null);
 
   useEffect(() => {
-    let subscribtion: Subscription;
+    let subscription: Subscription;
     if (progressIndicator) {
       setProgress(0);
-      subscribtion = progressIndicator.subscribe({
+      subscription = progressIndicator.subscribe({
         next(value) {
           setProgress(value);
         },
       });
     }
     return () => {
-      subscribtion?.unsubscribe();
+      subscription?.unsubscribe();
       setProgress(null);
     };
   }, [progressIndicator]);
 
-  const intl = useIntl();
-  const messages = useMemo(() => {
-    return [
-      intl.formatMessage(
-        {
-          defaultMessage:
-            'Nothing better than a nice transition between the sections of your webcard{azzappA}',
-          description: 'Progress loading modal message 1',
-        },
-        {
-          azzappA: (
-            <Text style={styles.icon} variant="azzapp">
-              a
-            </Text>
-          ),
-        },
-      ),
-      intl.formatMessage({
-        defaultMessage: 'Did you know that videos are now supported for covers',
-        description: 'Progress loading modal message 2',
-      }),
-      intl.formatMessage(
-        {
-          defaultMessage:
-            'Did you know you can customize each section of your webcard{azzappA}? Make it a unique experience!',
-          description: 'Progress loading modal message 3',
-        },
-        {
-          azzappA: (
-            <Text style={styles.icon} variant="azzapp">
-              a
-            </Text>
-          ),
-        },
-      ),
-      intl.formatMessage(
-        {
-          defaultMessage:
-            "Your webcard{azzappA}, your style. Don't forget to explore all the customization options available.",
-          description: 'Progress loading modal message 4',
-        },
-        {
-          azzappA: (
-            <Text style={styles.icon} variant="azzapp">
-              a
-            </Text>
-          ),
-        },
-      ),
-      intl.formatMessage(
-        {
-          defaultMessage:
-            "Take a deep breath and envision your perfect webcard{azzappA}. It's coming soon!",
-          description: 'Progress loading modal message 5',
-        },
-        {
-          azzappA: (
-            <Text style={styles.icon} variant="azzapp">
-              a
-            </Text>
-          ),
-        },
-      ),
-      intl.formatMessage({
-        defaultMessage:
-          "A little secret: Bright colors and attractive fonts grab your visitors' attention. Give them a try!",
-        description: 'Progress loading modal message 6',
-      }),
-      intl.formatMessage(
-        {
-          defaultMessage:
-            'As the pixels come together, think about using transition effects to add dynamism to your webcard{azzappA}',
-          description: 'Progress loading modal message 7',
-        },
-        {
-          azzappA: (
-            <Text style={styles.icon} variant="azzapp">
-              a
-            </Text>
-          ),
-        },
-      ),
-      intl.formatMessage(
-        {
-          defaultMessage:
-            'The most beautiful things take time to come to life. Your webcard{azzappA} is taking shape.',
-          description: 'Progress loading modal message 8',
-        },
-        {
-          azzappA: (
-            <Text style={styles.icon} variant="azzapp">
-              a
-            </Text>
-          ),
-        },
-      ),
-    ];
-  }, [intl]);
-
-  const text = useMemo(
-    () => messages[Math.floor(Math.random() * messages.length)],
-    [messages],
-  );
-
   return (
-    <View style={styles.container}>
-      <Text variant="xlarge" style={styles.text}>
-        {text}
-      </Text>
-      <ProgressBar
-        progress={progress ?? 0}
-        style={[styles.progressBarWidth, progress === null && { opacity: 0 }]}
-      />
-    </View>
+    <ProgressBar
+      progress={progress ?? 0}
+      {...props}
+      style={[style, { opacity: progress === null && hideWhenNull ? 0 : 1 }]}
+    />
   );
 };
-
-UploadProgressModal.options = () => ({
-  stackAnimation: 'fade',
-  animationDuration: 500,
-});
-
-export default UploadProgressModal;
 
 const styles = StyleSheet.create({
   container: {
@@ -160,15 +114,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  progressBarWidth: { width: '75%' },
+  elementsContainer: {
+    flexDirection: 'row',
+    gap: 2,
+  },
   text: {
     color: colors.white,
-    width: '75%',
-    marginBottom: 40,
     textAlign: 'center',
     lineHeight: 36,
-  },
-  icon: {
-    color: colors.white,
   },
 });

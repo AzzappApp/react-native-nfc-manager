@@ -29,4 +29,8 @@ type User {
   Returns the active Subscription
   """
   userSubscription: UserSubscription
+  """
+  Returns the subscription state of the current user
+  """
+  isPremium: Boolean
 }

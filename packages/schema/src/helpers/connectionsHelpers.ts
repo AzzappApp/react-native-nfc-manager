@@ -1,4 +1,4 @@
-import type { Connection } from 'graphql-relay';
+import { offsetToCursor, type Connection } from 'graphql-relay';
 
 export const dateToCursor = (date: Date) =>
   Buffer.from(date.toISOString()).toString('base64');
@@ -40,4 +40,29 @@ export const emptyConnection = {
     startCursor: null,
     endCursor: null,
   },
+};
+
+export const connectionFromSortedArray = <Item>(
+  entities: Item[],
+  meta: {
+    offset: number;
+    hasNextPage: boolean;
+  },
+): Connection<Item> => {
+  const { hasNextPage, offset } = meta;
+
+  const edges = entities.map((entity, index) => ({
+    cursor: offsetToCursor(offset + index),
+    node: entity,
+  }));
+
+  return {
+    edges,
+    pageInfo: {
+      startCursor: edges[0]?.cursor ?? null,
+      endCursor: edges[edges.length - 1]?.cursor ?? null,
+      hasPreviousPage: offset != null && offset > 0,
+      hasNextPage,
+    },
+  };
 };

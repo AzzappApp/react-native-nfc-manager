@@ -52,7 +52,7 @@ export const SearchScreen = ({ hasFocus = true }: { hasFocus: boolean }) => {
       setShowTabView(true);
       const searchTrimmed = search?.trim();
       setSearchValueSubmitted(searchTrimmed);
-      await addRecentSearchItem(searchTrimmed);
+      addRecentSearchItem(searchTrimmed);
       if (search !== searchValue) {
         // used in case the search value is press on recent search
         setSearchValue(search);
@@ -87,7 +87,7 @@ export const SearchScreen = ({ hasFocus = true }: { hasFocus: boolean }) => {
         <View style={{ flex: 1 }}>
           <SearchBar
             placeholder={intl.formatMessage({
-              defaultMessage: 'Search for profiles, posts...',
+              defaultMessage: 'Search for WebCards, posts...',
               description: 'SearchScreen - search bar placeholder',
             })}
             onChangeText={onChangeText}

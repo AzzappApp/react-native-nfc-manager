@@ -73,8 +73,8 @@ const ShareModalContent = (props: ShareModalContentProps) => {
       link: (text: string) =>
         `mailto:?body=${intl.formatMessage(
           {
-            defaultMessage: `Hello, I thought you could be interested in this post on Azzapp: {text}`,
-            id: '8qc792',
+            defaultMessage: `Hello, I thought you could be interested in this on azzapp: {text}`,
+            id: 'iN8zSz',
             description: 'Email body for sharing',
           },
           { text },
@@ -90,8 +90,8 @@ const ShareModalContent = (props: ShareModalContentProps) => {
       link: (text: string) =>
         `sms:?body=${intl.formatMessage(
           {
-            defaultMessage: `Hello, I thought you could be interested in this post on Azzapp: {text}`,
-            id: 'IW1JD+',
+            defaultMessage: `Hello, I thought you could be interested in this on azzapp: {text}`,
+            id: 'ou+aBq',
             description: 'SMS body for sharing',
           },
           { text },

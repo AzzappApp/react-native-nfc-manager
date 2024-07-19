@@ -91,7 +91,7 @@ export const serializeContactCard = (
     webCardId,
     card?.firstName ?? '',
     card?.lastName ?? '',
-    commonInformation?.company ?? card?.company ?? '',
+    (commonInformation?.company || card?.company) ?? '',
     card?.title ?? '',
     (commonInformation?.phoneNumbers ?? [])
       .concat(card?.phoneNumbers?.filter(p => p.selected) ?? [])

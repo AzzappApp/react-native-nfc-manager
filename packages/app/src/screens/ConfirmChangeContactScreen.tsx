@@ -31,6 +31,7 @@ import type { ConfirmChangeContactRoute } from '#routes';
 export const confirmChangeContactQuery = graphql`
   query ConfirmChangeContactScreenQuery {
     currentUser {
+      id
       email
       phoneNumber
       ...HomeScreenContent_user
@@ -83,6 +84,7 @@ const ConfirmRegistrationScreen = ({
       optimisticResponse: {
         updateUser: {
           user: {
+            id: currentUser?.id,
             email: currentUser?.email,
             phoneNumber: currentUser?.phoneNumber,
             ...input,

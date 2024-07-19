@@ -1,4 +1,3 @@
-import { useCallback } from 'react';
 import { FormattedMessage } from 'react-intl';
 import { View } from 'react-native';
 import { graphql, useFragment } from 'react-relay';
@@ -75,19 +74,14 @@ const AuthorCartouche = ({
     authorKey,
   );
 
-  const onPressWebCard = useCallback(() => {
-    if (author?.cardIsPublished) {
-      onPress?.();
-    }
-  }, [author?.cardIsPublished, onPress]);
-
   const styles = useVariantStyleSheet(stylesheet, variant);
 
   if (onPress) {
     return (
       <PressableOpacity
         style={[styles.container, style]}
-        onPress={onPressWebCard}
+        onPress={onPress}
+        disabled={!author?.cardIsPublished}
         {...props}
       >
         <AuthorCartoucheContent
@@ -101,7 +95,11 @@ const AuthorCartouche = ({
 
   if (activeLink) {
     return (
-      <Link route="WEBCARD" params={{ userName: author.userName }}>
+      <Link
+        route="WEBCARD"
+        params={{ userName: author.userName }}
+        disabled={!author?.cardIsPublished}
+      >
         <PressableOpacity style={[styles.container, style]} {...props}>
           <AuthorCartoucheContent
             hideUserName={hideUserName}
@@ -149,6 +147,7 @@ const AuthorCartoucheContent = ({
             width={21}
             webCardId={author!.id}
             userName={author!.userName}
+            disabled={!author?.cardIsPublished}
           />
         ) : (
           <CoverRenderer width={styles.image.width} webCard={author} />

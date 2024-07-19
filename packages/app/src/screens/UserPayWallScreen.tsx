@@ -1,7 +1,11 @@
+import * as Sentry from '@sentry/react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { useCallback, useEffect, useState } from 'react';
-import { FormattedMessage, useIntl } from 'react-intl';
+import LottieView from 'lottie-react-native';
+import { memo, useCallback, useEffect, useState } from 'react';
+import { FormattedMessage, FormattedNumber, useIntl } from 'react-intl';
 import {
+  Alert,
+  Dimensions,
   Image,
   Linking,
   ScrollView,
@@ -9,7 +13,7 @@ import {
   View,
   useWindowDimensions,
 } from 'react-native';
-import Purchases from 'react-native-purchases';
+import Purchases, { INTRO_ELIGIBILITY_STATUS } from 'react-native-purchases';
 import Animated, {
   interpolate,
   interpolateColor,
@@ -17,30 +21,47 @@ import Animated, {
   useAnimatedStyle,
   useSharedValue,
 } from 'react-native-reanimated';
+import { commitLocalUpdate } from 'react-relay';
 import { colors } from '#theme';
 import { useRouter } from '#components/NativeRouter';
+import PremiumIndicator from '#components/PremiumIndicator';
+import { getAuthState } from '#helpers/authStore';
+import { getRelayEnvironment } from '#helpers/relayEnvironment';
+import { useMultiUserUpdate } from '#hooks/useMultiUserUpdate';
 import useScreenInsets from '#hooks/useScreenInsets';
 import { useUserSubscriptionOffer } from '#hooks/useSubscriptionOffer';
 import Button from '#ui/Button';
-import Icon from '#ui/Icon';
 import IconButton from '#ui/IconButton';
 import PressableOpacity from '#ui/PressableOpacity';
 import SwitchLabel from '#ui/SwitchLabel';
 import Text from '#ui/Text';
-import type { ScreenOptions } from '#components/NativeRouter';
+import type {
+  NativeScreenProps,
+  ScreenOptions,
+} from '#components/NativeRouter';
+import type { UserPayWallRoute } from '#routes';
 import type { PurchasesPackage } from 'react-native-purchases';
 import type { SharedValue } from 'react-native-reanimated';
 
-const UserPayWallScreen = () => {
+const TERMS_OF_SERVICE = process.env.TERMS_OF_SERVICE;
+const PRIVACY_POLICY = process.env.PRIVACY_POLICY;
+const width = Dimensions.get('screen').width;
+
+const UserPayWallScreen = ({ route }: NativeScreenProps<UserPayWallRoute>) => {
   const intl = useIntl();
   const router = useRouter();
-  const { width, height } = useWindowDimensions();
+  const { height } = useWindowDimensions();
+
   const { bottom } = useScreenInsets();
+  const lottieHeight = height - BOTTOM_HEIGHT + 20;
   const [period, setPeriod] = useState<'month' | 'year'>('year');
   const [selectedPurchasePackage, setSelectedPurchasePackage] =
     useState<PurchasesPackage | null>(null);
+  const [processing, setProcessing] = useState(false);
 
   const subscriptions = useUserSubscriptionOffer(period);
+
+  const setAllowMultiUser = useMultiUserUpdate();
 
   useEffect(() => {
     if (subscriptions && subscriptions.length > 0) {
@@ -48,14 +69,110 @@ const UserPayWallScreen = () => {
     }
   }, [subscriptions]);
 
-  const processOrder = useCallback(async () => {
+  const [labelPurchase, setLabelPurchase] = useState<string>(
+    intl.formatMessage({
+      defaultMessage: 'CONTINUE',
+      description: 'MultiUser subscription button label trial not available',
+    }),
+  );
+
+  useEffect(() => {
     if (selectedPurchasePackage) {
-      await Purchases.purchasePackage(selectedPurchasePackage!);
-      //TODO ??e have to update the local cache of relay
-      // once the server notification is received, the database will be updated , and ... we don't have realtime so the local cache update will required
-      //polling is not usable here, because it will refresh the pagination list of multiuser(will cause a bad UX experience)
+      Purchases.checkTrialOrIntroductoryPriceEligibility([
+        selectedPurchasePackage?.identifier,
+      ]).then(trial => {
+        if (
+          trial[selectedPurchasePackage.identifier].status ===
+          INTRO_ELIGIBILITY_STATUS.INTRO_ELIGIBILITY_STATUS_ELIGIBLE
+        ) {
+          setLabelPurchase(
+            intl.formatMessage({
+              defaultMessage: 'START MY 7-DAY TRIAL',
+              description:
+                'MultiUser subscription button label trial available',
+            }),
+          );
+        } else {
+          setLabelPurchase(
+            intl.formatMessage({
+              defaultMessage: 'CONTINUE',
+              description:
+                'MultiUser subscription button label trial not available',
+            }),
+          );
+        }
+      });
     }
-  }, [selectedPurchasePackage]);
+  }, [intl, selectedPurchasePackage]);
+
+  const processOrder = useCallback(async () => {
+    const { profileInfos } = getAuthState();
+    if (selectedPurchasePackage && profileInfos) {
+      try {
+        setProcessing(true);
+
+        const res = await Purchases.purchasePackage(selectedPurchasePackage!);
+        // Update Relay cache temporary
+        if (res.customerInfo.entitlements.active?.multiuser?.isActive) {
+          if (route.params?.activateFeature === 'MULTI_USER') {
+            setAllowMultiUser(true);
+          }
+          commitLocalUpdate(getRelayEnvironment(), store => {
+            store.get(profileInfos.webCardId)?.setValue(true, 'isPremium');
+          });
+        }
+        setProcessing(false);
+        router.back();
+      } catch (error) {
+        //display error message
+        setProcessing(false);
+        //@ts-expect-error error code is not in the type
+        const errorCode = error?.code;
+        if (errorCode === '6') {
+          //This product is already active for the user
+          return;
+        }
+        if (errorCode === '1') {
+          //purchase was cancelled
+          return;
+        }
+        if (errorCode === '7') {
+          // There is already another active subscriber using the same receipt.
+          Alert.alert(
+            intl.formatMessage({
+              defaultMessage: 'Error during processing payment',
+              description: 'Title of the payment process error alert',
+            }),
+            intl.formatMessage({
+              defaultMessage:
+                'There is already a subscription from your Apple or Google account associated to another azzapp account. You need to cancel the subscription from the other account to proceed.',
+              description: 'Description of the payment process error alert',
+            }),
+          );
+          return;
+        }
+
+        Alert.alert(
+          intl.formatMessage({
+            defaultMessage: 'Error during processing payment',
+            description: 'Title of the payment process error alert',
+          }),
+          intl.formatMessage({
+            defaultMessage:
+              'There was an error during the payment process, please try again later.',
+            description: 'Description of the payment process error alert',
+          }),
+        );
+        Sentry.captureException(error, { data: 'userPayWallScreen' });
+      }
+    }
+  }, [
+    intl,
+    route.params?.activateFeature,
+    router,
+    selectedPurchasePackage,
+    setAllowMultiUser,
+  ]);
 
   //const [currentPage, setCurrentPage] = useState(2);
   const currentIndex = useSharedValue(0);
@@ -66,9 +183,20 @@ const UserPayWallScreen = () => {
     },
   });
 
+  const restorePurchase = useCallback(async () => {
+    const { profileInfos } = getAuthState();
+    const restore = await Purchases.restorePurchases();
+    if (restore.entitlements.active?.multiuser?.isActive) {
+      commitLocalUpdate(getRelayEnvironment(), store => {
+        if (profileInfos)
+          store.get(profileInfos.webCardId)?.setValue(true, 'isPremium');
+      });
+    }
+  }, []);
+
   return (
     <View style={styles.container}>
-      <View style={[{ width }, styles.featureContainer]}>
+      <View style={[{ width, height: width }, styles.featureContainer]}>
         <Animated.ScrollView
           horizontal
           snapToInterval={width}
@@ -77,19 +205,31 @@ const UserPayWallScreen = () => {
           onScroll={onScroll}
           pagingEnabled
           scrollEnabled
+          style={{ width }}
           contentContainerStyle={{ width: 4 * width }}
         >
           <View
             key="subscription_page_1"
             style={[
               {
-                backgroundColor: 'red',
                 width,
+                height: lottieHeight,
               },
               styles.promoContainer,
             ]}
-            //missing content from design team
           >
+            <LottieView
+              source={require('../assets/paywall/paywall_azzapp_step1.json')}
+              autoPlay
+              loop
+              hardwareAccelerationAndroid
+              style={{
+                position: 'absolute',
+                width,
+                height: lottieHeight,
+              }}
+              resizeMode="cover"
+            />
             <LinearGradient
               colors={['transparent', 'rgba(0, 0, 0, 0.9)']}
               locations={[0, 1]}
@@ -139,7 +279,6 @@ const UserPayWallScreen = () => {
             key="subscription_page_3"
             style={[
               {
-                backgroundColor: 'blue',
                 width,
               },
               styles.promoContainer,
@@ -214,14 +353,14 @@ const UserPayWallScreen = () => {
         onPress={() => router.back()}
         size={50}
       />
-      <View style={styles.content}>
+      <View style={[styles.content]}>
         <View style={styles.contaienrLogo}>
           <Image
-            source={require('#assets/logo-full_dark.png')}
+            source={require('#assets/logo-full.png')}
             resizeMode="contain"
             style={styles.plusImage}
           />
-          <Icon icon="plus" size={17} />
+          <PremiumIndicator size={17} isRequired />
         </View>
         <SwitchLabel
           variant="small"
@@ -241,39 +380,13 @@ const UserPayWallScreen = () => {
           >
             {subscriptions.map(offer => {
               return (
-                <PressableOpacity
+                <Offer
                   key={offer.identifier}
-                  onPress={() => setSelectedPurchasePackage(offer)}
-                  style={[
-                    styles.priceItem,
-                    { overflow: 'visible' },
-                    selectedPurchasePackage?.identifier ===
-                      offer.identifier && {
-                      borderColor: colors.red400,
-                    },
-                  ]}
-                >
-                  <Text variant="button">
-                    <FormattedMessage
-                      defaultMessage={'{qty} users'}
-                      description="MultiUser Paywall Screen - number of seat offer"
-                      values={{
-                        qty: parseInt(
-                          offer.identifier.split('_').pop() ?? '0',
-                          10,
-                        ),
-                      }}
-                    />
-                  </Text>
-                  <View>
-                    <Text variant="button">{offer.product.priceString}</Text>
-                    {period === 'year' && (
-                      <Text variant="smallbold" style={{ textAlign: 'right' }}>
-                        {(offer.product.price / 12).toFixed(2)}
-                      </Text>
-                    )}
-                  </View>
-                </PressableOpacity>
+                  offer={offer}
+                  period={period}
+                  selectedPurchasePackage={selectedPurchasePackage}
+                  setSelectedPurchasePackage={setSelectedPurchasePackage}
+                />
               );
             })}
           </ScrollView>
@@ -296,17 +409,12 @@ const UserPayWallScreen = () => {
         </View>
         <View style={[styles.bottomContainer, { paddingBottom: bottom }]}>
           <Button
-            label={intl.formatMessage({
-              defaultMessage: 'START MY 7-DAY TRIAL',
-              description: 'MultiUser subscription button label',
-            })}
+            label={labelPurchase}
             style={[styles.buttonSubscribe, { width: '100%' }]}
             onPress={processOrder}
           />
           <View style={styles.footer}>
-            <PressableOpacity
-              onPress={() => Linking.openURL('http://www.azzapp.com/tos')}
-            >
+            <PressableOpacity onPress={restorePurchase}>
               <Text variant="medium" style={styles.descriptionText}>
                 <FormattedMessage
                   defaultMessage="Restore Purchases"
@@ -318,7 +426,7 @@ const UserPayWallScreen = () => {
               |
             </Text>
             <PressableOpacity
-              onPress={() => Linking.openURL('http://www.azzapp.com/tos')}
+              onPress={() => Linking.openURL(`${TERMS_OF_SERVICE}`)}
             >
               <Text variant="medium" style={styles.descriptionText}>
                 <FormattedMessage
@@ -331,7 +439,7 @@ const UserPayWallScreen = () => {
               |
             </Text>
             <PressableOpacity
-              onPress={() => Linking.openURL('http://www.azzapp.com/privacy')}
+              onPress={() => Linking.openURL(`${PRIVACY_POLICY}`)}
             >
               <Text variant="medium" style={styles.descriptionText}>
                 <FormattedMessage
@@ -343,6 +451,27 @@ const UserPayWallScreen = () => {
           </View>
         </View>
       </View>
+      {processing && (
+        <View style={styles.loadingContainer}>
+          <LottieView
+            source={require('../assets/loader.json')}
+            autoPlay
+            loop
+            hardwareAccelerationAndroid
+            style={{
+              width: width / 2,
+              height: width / 2,
+              marginTop: -100,
+            }}
+          />
+          <Text variant="button" style={styles.text}>
+            <FormattedMessage
+              defaultMessage="Processing payment"
+              description="UserPayWall - Processing loading screen"
+            />
+          </Text>
+        </View>
+      )}
     </View>
   );
 };
@@ -353,7 +482,6 @@ UserPayWallScreen.getScreenOptions = (): ScreenOptions => ({
 });
 
 const CIRCLE_SIZE = 5;
-const BOTTOM_HEIGHT = 414;
 
 export default UserPayWallScreen;
 
@@ -387,11 +515,87 @@ const AnimatedTabIndex = ({ currentIndex, index }: AnimatedTabIndexProps) => {
   );
 };
 
+type OfferItemProps = {
+  offer: PurchasesPackage;
+  setSelectedPurchasePackage: (offer: PurchasesPackage) => void;
+  selectedPurchasePackage: PurchasesPackage | null;
+  period: 'month' | 'year';
+};
+
+const OfferItem = ({
+  offer,
+  setSelectedPurchasePackage,
+  selectedPurchasePackage,
+  period,
+}: OfferItemProps) => {
+  const selectOffer = useCallback(
+    () => setSelectedPurchasePackage(offer),
+    [offer, setSelectedPurchasePackage],
+  );
+  return (
+    <PressableOpacity
+      key={offer.identifier}
+      onPress={selectOffer}
+      style={[
+        styles.priceItem,
+        { overflow: 'visible' },
+        selectedPurchasePackage?.identifier === offer.identifier && {
+          borderColor: colors.red400,
+        },
+      ]}
+    >
+      <Text variant="button">
+        <FormattedMessage
+          defaultMessage={`{qty, plural,
+            =1 {{qty} User}
+            other {{qty} Users}
+          }`}
+          description="MultiUser Paywall Screen - number of seat offer"
+          values={{
+            qty: parseInt(offer.product.identifier.split('.').pop() ?? '0', 10),
+          }}
+        />
+      </Text>
+      <View>
+        <Text variant="button">
+          <FormattedNumber
+            value={offer.product.price}
+            style="currency"
+            currency={offer.product.currencyCode}
+          />
+        </Text>
+        {period === 'year' && (
+          <Text variant="smallbold" style={styles.monthlyPricing}>
+            <FormattedNumber
+              value={offer.product.price / 12}
+              style="currency"
+              currency={offer.product.currencyCode}
+            />
+            <FormattedMessage
+              defaultMessage={' / month'}
+              description="MultiUser Paywall Screen - number of seat offer"
+            />
+          </Text>
+        )}
+      </View>
+    </PressableOpacity>
+  );
+};
+
+const Offer = memo(OfferItem);
+const BOTTOM_HEIGHT = width;
 const styles = StyleSheet.create({
+  monthlyPricing: { textAlign: 'right', color: colors.grey600 },
   promoContainer: {
     alignItems: 'flex-end',
     justifyContent: 'flex-end',
     paddingBottom: 47,
+  },
+  text: {
+    color: colors.white,
+    width: '75%',
+    textAlign: 'center',
+    lineHeight: 36,
   },
   textPromo: {
     color: colors.white,
@@ -404,7 +608,7 @@ const styles = StyleSheet.create({
     height: 34,
     marginBottom: 15,
   },
-  plusImage: { height: 34, marginRight: 4 },
+  plusImage: { height: 34 },
   containerPager: {
     flexDirection: 'row',
     justifyContent: 'center',
@@ -413,8 +617,8 @@ const styles = StyleSheet.create({
     bottom: 20,
     height: 30,
   },
-  featureContainer: { flex: 1, marginBottom: -20 },
-  container: { backgroundColor: colors.black, flex: 1 },
+  featureContainer: { flex: 1, marginBottom: -20, aspectRatio: 1 },
+  container: { flex: 1, backgroundColor: 'transparent' },
   priceItem: {
     flexDirection: 'row',
     height: 54,
@@ -446,7 +650,6 @@ const styles = StyleSheet.create({
   },
   scrollViewStyle: { width: '100%' },
   content: {
-    height: BOTTOM_HEIGHT,
     justifyContent: 'flex-end',
     alignItems: 'center',
     backgroundColor: 'white',
@@ -454,6 +657,8 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 24,
     overflow: 'visible',
     paddingTop: 20,
+    width,
+    height: BOTTOM_HEIGHT,
   },
   descriptionText: {
     color: colors.grey400,
@@ -486,5 +691,11 @@ const styles = StyleSheet.create({
     marginLeft: CIRCLE_SIZE / 2,
     marginRight: CIRCLE_SIZE / 2,
     backgroundColor: colors.grey200,
+  },
+  loadingContainer: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(0,0,0,0.9)',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 });

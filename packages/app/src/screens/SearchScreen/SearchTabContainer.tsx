@@ -22,6 +22,7 @@ import SearchResultProfiles, {
 import type { SearchResultGlobalQuery } from '#relayArtifacts/SearchResultGlobalQuery.graphql';
 import type { SearchResultPostsQuery } from '#relayArtifacts/SearchResultPostsQuery.graphql';
 import type { SearchResultProfilesQuery } from '#relayArtifacts/SearchResultProfilesQuery.graphql';
+import type { ReactNode } from 'react';
 import type {
   NavigationState,
   SceneRendererProps,
@@ -59,10 +60,13 @@ const SearchTabContainer = ({
       },
       {
         key: 'searchProfiles',
-        label: intl.formatMessage({
-          defaultMessage: 'Webcards',
-          description: 'Search screen tab label : webcard',
-        }),
+        label: intl.formatMessage(
+          {
+            defaultMessage: 'Webcards{azzappA}',
+            description: 'Search screen tab label : webcard',
+          },
+          { azzappA: <Text variant="azzapp">a</Text> },
+        ),
         query: searchResultProfilesQuery,
       },
       {
@@ -182,7 +186,7 @@ const TabBarSearch = (
   props: SceneRendererProps & {
     navigationState: NavigationState<{
       key: string;
-      label: string;
+      label: ReactNode;
     }>;
   },
 ) => {
@@ -198,7 +202,7 @@ const TabBarSearch = (
         gap: 10,
         paddingLeft: 10,
       }}
-      renderTabBarItem={({ route, labelStyle, getLabelText, onPress }) => {
+      renderTabBarItem={({ route, labelStyle, renderLabel, onPress }) => {
         return (
           <TabBarMenuItem
             selected={
@@ -209,12 +213,23 @@ const TabBarSearch = (
             labelStyle={labelStyle}
             style={styles.tabItemContainerStyle}
           >
-            {getLabelText({ route })}
-            {route.key === 'searchProfiles' && <Text variant="azzapp">a</Text>}
+            {renderLabel?.({
+              route,
+              focused:
+                props.navigationState.routes[props.navigationState.index]
+                  .key === route.key,
+              color: colors.black,
+            })}
           </TabBarMenuItem>
         );
       }}
-      getLabelText={({ route }) => route.label}
+      renderLabel={({ route }) =>
+        typeof route.label === 'string' ? (
+          <Text>{route.label}</Text>
+        ) : (
+          route.label
+        )
+      }
     />
   );
 };

@@ -24,19 +24,30 @@ export const POST = withAxiom(async (req: Request) => {
     const body = await req.json();
     const input = ValidateSchema.parse(body);
 
-    await twilioVerificationService().verificationChecks.create({
+    const result = await twilioVerificationService().verificationChecks.create({
       to: input.issuer,
       code: input.token,
     });
 
-    return NextResponse.json(
-      {
-        message: 'sent',
-      },
-      {
-        status: 200,
-      },
-    );
+    if (result.status === 'approved') {
+      return NextResponse.json(
+        {
+          message: 'sent',
+        },
+        {
+          status: 200,
+        },
+      );
+    } else {
+      return NextResponse.json(
+        {
+          message: 'invalid',
+        },
+        {
+          status: 400,
+        },
+      );
+    }
   } catch (e) {
     if ((e as Error).message === ERRORS.INVALID_TOKEN) {
       return NextResponse.json(

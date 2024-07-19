@@ -15,7 +15,6 @@ import {
   FlatList,
   useWindowDimensions,
   ScrollView,
-  Dimensions,
   StatusBar,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -24,30 +23,29 @@ import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
 import { DEFAULT_COLOR_PALETTE } from '@azzapp/shared/cardHelpers';
 import { colors, shadow } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
+import { keyExtractor } from '#helpers/idHelpers';
 import useScreenInsets from '#hooks/useScreenInsets';
 import Button, { BUTTON_HEIGHT } from '#ui/Button';
 import Container from '#ui/Container';
 import Header, { HEADER_HEIGHT } from '#ui/Header';
 import HeaderButton from '#ui/HeaderButton';
-import Icon from '#ui/Icon';
 import PressableNative from '#ui/PressableNative';
 import SearchBarStatic from '#ui/SearchBarStatic';
 import SelectSection from '#ui/SelectSection';
 import Text from '#ui/Text';
 import { useModulesData } from './cardModules/ModuleData';
 import { CancelHeaderButton } from './commonsButtons';
+import PremiumIndicator from './PremiumIndicator';
 import WebCardPreview from './WebCardPreview';
-import type { CardTemplateList_cardTemplates$key } from '#relayArtifacts/CardTemplateList_cardTemplates.graphql';
+import type {
+  CardTemplateList_cardTemplates$data,
+  CardTemplateList_cardTemplates$key,
+} from '#relayArtifacts/CardTemplateList_cardTemplates.graphql';
 import type { CardTemplateListQuery } from '#relayArtifacts/CardTemplateListQuery.graphql';
 import type { CoverRenderer_webCard$key } from '#relayArtifacts/CoverRenderer_webCard.graphql';
-import type { ModuleData_cardModules$key } from '#relayArtifacts/ModuleData_cardModules.graphql';
 import type { WebCardBackground_webCard$key } from '#relayArtifacts/WebCardBackground_webCard.graphql';
 import type { WebCardBackgroundPreview_webCard$key } from '#relayArtifacts/WebCardBackgroundPreview_webCard.graphql';
-import type {
-  CardStyle,
-  ColorPalette,
-  CardTemplateType,
-} from '@azzapp/shared/cardHelpers';
+import type { ColorPalette } from '@azzapp/shared/cardHelpers';
 import type { ForwardedRef, ReactNode } from 'react';
 import type {
   ListRenderItem,
@@ -59,13 +57,12 @@ import type { ViewProps } from 'react-native-svg/lib/typescript/fabric/utils';
 type CardTemplateListProps = Omit<ViewProps, 'children'> & {
   profileId: string;
   height: number;
-  onApplyTemplate: (cardTemplateId: string) => void;
+  onApplyTemplate: (cardTemplate: CardTemplateItem) => void;
   onSkip?: () => void;
   loading: boolean;
   children?: ReactNode;
   onPreviewModal?: () => void;
   onPreviewModalClose?: () => void;
-  previewModalStyle?: ViewProps['style'];
   onSelectTemplate?: (template: CardTemplateItem) => void;
 };
 
@@ -81,7 +78,6 @@ const CardTemplateList = (
     onSkip,
     loading,
     style,
-    previewModalStyle,
     onPreviewModal,
     onPreviewModalClose,
     onSelectTemplate,
@@ -113,6 +109,7 @@ const CardTemplateList = (
                 dark
                 light
               }
+              isPremium
             }
           }
         }
@@ -122,6 +119,7 @@ const CardTemplateList = (
   );
 
   const profile = node?.profile;
+  const isPremium = node?.profile?.webCard?.isPremium;
   const cardTemplateTypes = profile?.cardTemplateTypes;
 
   const { data, loadNext, hasNext, isLoadingNext, refetch } =
@@ -164,6 +162,7 @@ const CardTemplateList = (
                   label
                 }
                 modules {
+                  kind
                   ...ModuleData_cardModules
                 }
               }
@@ -235,7 +234,7 @@ const CardTemplateList = (
       if (!templates) {
         return;
       }
-      onApplyTemplate(templates[selectedIndexRef.current].id);
+      onApplyTemplate(templates[selectedIndexRef.current]);
     },
   }));
 
@@ -262,7 +261,7 @@ const CardTemplateList = (
     if (!previewTemplate) {
       return;
     }
-    onApplyTemplate(previewTemplate.id);
+    onApplyTemplate(previewTemplate);
   }, [onApplyTemplate, previewTemplate]);
 
   const styles = useStyleSheet(stylesheet);
@@ -330,13 +329,11 @@ const CardTemplateList = (
                 )}
               </View>
             </ScrollView>
-            {item.modules.length > 3 && (
-              <Icon
-                icon="plus_white_border"
-                size={26}
-                style={{ position: 'absolute', right: 17, top: 9 }}
-              />
-            )}
+            <PremiumIndicator
+              isRequired={item.modules.length > 3 && !isPremium}
+              style={{ position: 'absolute', right: 17, top: 9 }}
+              size={26}
+            />
           </View>
         </View>
       );
@@ -347,6 +344,7 @@ const CardTemplateList = (
       styles.webCardContainer,
       styles.webCardContainerRadius,
       maxScrollViewHeight,
+      isPremium,
     ],
   );
 
@@ -439,6 +437,8 @@ const CardTemplateList = (
   }, [selectedCardTemplateType, templates]);
   // #endregion
 
+  const { height: windowHeight } = useWindowDimensions();
+
   return (
     <>
       <View style={[styles.root, style]} {...props}>
@@ -520,7 +520,6 @@ const CardTemplateList = (
           webCard={profile?.webCard}
           cardColors={profile?.webCard?.cardColors ?? DEFAULT_COLOR_PALETTE}
           loading={loading}
-          style={previewModalStyle}
         />
       )}
     </>
@@ -561,14 +560,13 @@ const SearchHeader = ({
 
 export default forwardRef(CardTemplateList);
 
-export type CardTemplateItem = {
-  id: string;
-  previewMedia: { uri: string; aspectRatio: number } | null;
-  label: string | null;
-  cardStyle: CardStyle;
-  cardTemplateType: CardTemplateType;
-  modules: ModuleData_cardModules$key;
-};
+export type CardTemplateItem = NonNullable<
+  NonNullable<
+    NonNullable<
+      CardTemplateList_cardTemplates$data['cardTemplates']['edges']
+    >[number]
+  >['node']
+>;
 
 type CoverTemplatePreviewModalProps = {
   visible: boolean;
@@ -584,8 +582,6 @@ type CoverTemplatePreviewModalProps = {
   onApply: () => void;
   onRequestClose: () => void;
 };
-
-const { height: windowHeight, width: windowWidth } = Dimensions.get('screen');
 
 const CardTemplatePreviewModal = ({
   visible,
@@ -603,15 +599,18 @@ const CardTemplatePreviewModal = ({
 
   const insets = useScreenInsets();
 
+  const { height: windowHeight, width: windowWidth } = useWindowDimensions();
+
   const previewHeight = windowHeight - insets.top - HEADER_HEIGHT;
 
   if (!visible) {
     return null;
   }
   return (
-    <View
+    <Container
       style={[
         {
+          paddingTop: insets.top + (StatusBar.currentHeight ?? 0),
           position: 'absolute',
           top: 0,
           left: 0,
@@ -622,38 +621,34 @@ const CardTemplatePreviewModal = ({
         style,
       ]}
     >
-      <Container style={{ flex: 1, paddingTop: insets.top }}>
-        <Header
-          leftElement={<CancelHeaderButton onPress={onRequestClose} />}
-          middleElement={template?.label ?? ''}
-          rightElement={
-            <HeaderButton
-              onPress={onApply}
-              label={intl.formatMessage({
-                defaultMessage: 'Apply',
-                description: 'Apply button label in card template preview',
-              })}
-              loading={loading}
-            />
-          }
-        />
-        {template && webCard && (
-          <WebCardPreview
-            webCard={webCard}
-            height={previewHeight}
-            cardStyle={template.cardStyle}
-            cardColors={cardColors}
-            style={{ flex: 1 }}
-            cardModules={cardModules}
-            contentPaddingBottom={insets.bottom}
+      <Header
+        leftElement={<CancelHeaderButton onPress={onRequestClose} />}
+        middleElement={template?.label ?? ''}
+        rightElement={
+          <HeaderButton
+            onPress={onApply}
+            label={intl.formatMessage({
+              defaultMessage: 'Apply',
+              description: 'Apply button label in card template preview',
+            })}
+            loading={loading}
           />
-        )}
-      </Container>
-    </View>
+        }
+      />
+      {template && webCard && (
+        <WebCardPreview
+          webCard={webCard}
+          height={previewHeight}
+          cardStyle={template.cardStyle}
+          cardColors={cardColors}
+          style={{ flex: 1 }}
+          cardModules={cardModules}
+          contentPaddingBottom={insets.bottom}
+        />
+      )}
+    </Container>
   );
 };
-
-const keyExtractor = (item: { id: string }) => item.id;
 
 const GAP = 20;
 const ITEM_RADIUS = 20;

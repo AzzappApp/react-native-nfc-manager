@@ -1,6 +1,8 @@
 require File.join(File.dirname(`node --print "require.resolve('expo/package.json')"`), "scripts/autolinking")
 #require for mono repo
 # Resolve react_native_pods.rb with node to allow for hoisting
+# enable Video caching
+$RNVideoUseVideoCaching=true
 def node_require(script)
   # Resolve script with node to allow for hoisting
   require Pod::Executable.execute_command('node', ['-p',
@@ -37,6 +39,11 @@ abstract_target 'common' do
     rescue => e
       Pod::UI.warn e
     end
+    begin
+      expo_patch_react_imports!(installer)
+    rescue => e
+      Pod::UI.warn e
+    end
   end
   config = use_native_modules!
 
@@ -45,6 +52,10 @@ abstract_target 'common' do
     # An absolute path to your application root.
     :app_path => "#{Pod::Config.instance.installation_root}/.."
   )
+
+  ##recat native video auto cache (for play external only, our actual cache is not working on android)
+  pod 'SPTPersistentCache', :modular_headers => true
+  pod 'DVAssetLoaderDelegate', :modular_headers => true
 
   target 'azzappTests' do
     inherit! :complete

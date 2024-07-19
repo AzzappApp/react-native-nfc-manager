@@ -1,5 +1,5 @@
 import { useMemo, useRef, forwardRef } from 'react';
-import { Dimensions, useWindowDimensions } from 'react-native';
+import { useWindowDimensions } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import Animated, {
   FadeIn,
@@ -38,8 +38,6 @@ export type WebCardScreenScrollViewProps = Omit<ScrollViewProps, 'hitSlop'> & {
   editFooterHeight: number;
 };
 
-const { height: windowHeight } = Dimensions.get('screen');
-
 /**
  * A wrapper component for the webCard screen content. Handle the edit animation
  */
@@ -60,7 +58,7 @@ const WebCardScreenScrollView = (
 
   const scrollViewRef = useRef<ScrollView>(null);
 
-  const { width: windowWidth } = useWindowDimensions();
+  const { width: windowWidth, height: windowHeight } = useWindowDimensions();
   const insets = useScreenInsets();
   const containerStyle = useAnimatedStyle(() => {
     const editProgress = editTransition?.value ?? 0;

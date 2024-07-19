@@ -4,7 +4,7 @@ import {
   getCardModules,
   getMediasByIds,
   getProfilesPostsWithTopComment,
-  getStaticMediasByIds,
+  getModuleBackgroundsByIds,
 } from '@azzapp/data';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
 import {
@@ -17,9 +17,11 @@ import {
   MODULES_STYLES_VALUES,
   getModuleDataValues,
 } from '@azzapp/shared/cardModuleHelpers';
+import { COVER_RATIO } from '@azzapp/shared/coverHelpers';
 import CoverRenderer from '#components/renderer/CoverRenderer';
 import CoverRendererBackground from '#components/renderer/CoverRenderer/CoverRendererBackground';
 import ModuleRenderer from '#components/renderer/ModuleRenderer';
+import { buildCoverImageUrl } from '#helpers/cover';
 import { getMetaData } from '#helpers/seo';
 import { cachedGetWebCardByUserName } from './dataAccess';
 import styles from './WebCardPage.css';
@@ -43,8 +45,8 @@ const ProfilePage = async ({ params }: ProfilePageProps) => {
   const [posts, modules, media] = await Promise.all([
     getProfilesPostsWithTopComment(webCard.id, 5, 0),
     getCardModules(webCard.id),
-    webCard.coverData?.mediaId
-      ? getMediasByIds([webCard.coverData.mediaId]).then(([media]) => media)
+    webCard.coverMediaId
+      ? getMediasByIds([webCard.coverMediaId]).then(([media]) => media)
       : null,
   ]);
 
@@ -53,7 +55,7 @@ const ProfilePage = async ({ params }: ProfilePageProps) => {
   );
 
   const backgrounds = backgroundIds.length
-    ? await getStaticMediasByIds(backgroundIds)
+    ? await getModuleBackgroundsByIds(backgroundIds)
     : [];
 
   if (!media) {
@@ -67,7 +69,7 @@ const ProfilePage = async ({ params }: ProfilePageProps) => {
   const cardColors = webCard.cardColors ?? DEFAULT_COLOR_PALETTE;
 
   const cardBackgroundColor = swapColor(
-    webCard.coverData?.backgroundColor ?? cardColors.light,
+    webCard.coverBackgroundColor ?? cardColors.light,
     cardColors,
   );
   let lastModuleBackgroundColor = cardBackgroundColor;
@@ -88,7 +90,24 @@ const ProfilePage = async ({ params }: ProfilePageProps) => {
     );
   }
 
-  const colorPalette = webCard.cardColors ?? DEFAULT_COLOR_PALETTE;
+  const firstModule = modules[0];
+
+  let firstModuleBackgroundColor = cardBackgroundColor;
+  if (firstModule) {
+    const firstModuleData = getModuleDataValues({
+      data: firstModule.data as any,
+      cardStyle: webCard.cardStyle ?? DEFAULT_CARD_STYLE,
+      defaultValues: MODULES_DEFAULT_VALUES[firstModule.kind],
+      styleValuesMap: MODULES_STYLES_VALUES[firstModule.kind],
+    });
+
+    firstModuleBackgroundColor = swapColor(
+      (firstModuleData.backgroundStyle?.backgroundColor ||
+        firstModuleData.colorTop) ??
+        cardColors.light,
+      cardColors,
+    );
+  }
 
   return (
     <WebCardPageLayout
@@ -97,23 +116,12 @@ const ProfilePage = async ({ params }: ProfilePageProps) => {
       media={media}
       cover={
         <>
-          <CoverRendererBackground media={media} webCard={webCard} />
+          <CoverRendererBackground media={media} />
           <div
             className={styles.coverContainer}
             style={{
               background: `linear-gradient(to bottom, transparent 0%, ${
-                modules.length
-                  ? swapColor(
-                      (
-                        modules[0].data as {
-                          backgroundStyle?: {
-                            backgroundColor?: string | null;
-                          } | null;
-                        }
-                      )?.backgroundStyle?.backgroundColor ?? '#FFF',
-                      colorPalette,
-                    ) ?? '#FFF'
-                  : '#FFF'
+                modules.length ? firstModuleBackgroundColor : '#FFF'
               } 95%)`,
             }}
           >
@@ -130,7 +138,7 @@ const ProfilePage = async ({ params }: ProfilePageProps) => {
           resizeModes={resizeModes}
           module={module}
           key={module.id}
-          colorPalette={colorPalette}
+          colorPalette={cardColors}
           cardStyle={webCard.cardStyle ?? DEFAULT_CARD_STYLE}
         />
       ))}
@@ -142,29 +150,38 @@ export default ProfilePage;
 
 export const dynamic = 'force-static';
 
+const COVER_WIDTH = 630;
+
 export async function generateMetadata({
   params,
 }: ProfilePageProps): Promise<Metadata> {
   const userName = params.userName.toLowerCase();
   const webCard = await cachedGetWebCardByUserName(userName);
 
-  const imageUrl = `${process.env.NEXT_PUBLIC_URL}api/cover/${
-    params.userName
-  }?width=${630}&updatedAt=${webCard?.updatedAt.toISOString()}`;
-
-  const twitterCard = `${process.env.NEXT_PUBLIC_URL}api/cover/${
-    params.userName
-  }?width=${630}&height=${630}&updatedAt=${webCard?.updatedAt.toISOString()}`;
+  const [imageUrl, twitterCard] = webCard
+    ? await Promise.all([
+        buildCoverImageUrl(webCard, {
+          width: COVER_WIDTH,
+          height: COVER_WIDTH / COVER_RATIO,
+          crop: 'fit',
+        }),
+        buildCoverImageUrl(webCard, {
+          width: COVER_WIDTH,
+          height: COVER_WIDTH,
+          crop: 'fill',
+        }),
+      ])
+    : [null, null];
 
   const meta = getMetaData({
     url: params.userName,
     title: capitalize(params.userName),
-    ogImage: imageUrl,
+    ogImage: imageUrl ?? undefined,
     description: `${params.userName} | Azzapp WebCard`,
     other: {
       twitter: {
         card: 'summary_large_image',
-        images: twitterCard,
+        images: twitterCard ?? undefined,
       },
     },
   });

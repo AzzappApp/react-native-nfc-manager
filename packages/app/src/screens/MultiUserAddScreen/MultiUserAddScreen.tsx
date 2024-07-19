@@ -1,7 +1,7 @@
 import { useCallback, useRef, useState } from 'react';
 import { useIntl } from 'react-intl';
-import { StyleSheet, View } from 'react-native';
-import { graphql, usePreloadedQuery } from 'react-relay';
+import { Alert, StyleSheet, View } from 'react-native';
+import { graphql, useFragment, usePreloadedQuery } from 'react-relay';
 import { useRouter } from '#components/NativeRouter';
 import relayScreen from '#helpers/relayScreen';
 import Container from '#ui/Container';
@@ -13,6 +13,7 @@ import SearchBarStatic from '#ui/SearchBarStatic';
 import MultiUserAddList from './MultiUserAddList';
 import MultiUserAddModal from './MultiUserAddModal';
 import type { RelayScreenProps } from '#helpers/relayScreen';
+import type { MultiUserAddScreen_webCard$key } from '#relayArtifacts/MultiUserAddScreen_webCard.graphql';
 import type { MultiUserAddScreenQuery } from '#relayArtifacts/MultiUserAddScreenQuery.graphql';
 import type { MultiUserAddRoute } from '#routes';
 import type { MultiUserAddModalActions } from './MultiUserAddModal';
@@ -22,6 +23,7 @@ const multiUserAddScreenQuery = graphql`
   query MultiUserAddScreenQuery($webCardId: ID!) {
     webCard: node(id: $webCardId) {
       ...MultiUserAddModal_webCard
+      ...MultiUserAddScreen_webCard
     }
   }
 `;
@@ -39,15 +41,75 @@ const MultiUserAddScreen = ({
     preloadedQuery,
   );
 
+  const webCardData = useFragment(
+    graphql`
+      fragment MultiUserAddScreen_webCard on WebCard {
+        id
+        subscription {
+          issuer
+          availableSeats
+        }
+      }
+    `,
+    webCard as MultiUserAddScreen_webCard$key,
+  );
+
   const ref = useRef<MultiUserAddModalActions>(null);
 
-  const onAddSingleUser = (contact: Contacts.Contact) => {
-    ref.current?.open(contact);
-  };
-
-  const addNewUser = useCallback(() => {
-    ref.current?.open(searchValue ?? '');
-  }, [searchValue]);
+  const onAddUser = useCallback(
+    (contact?: Contacts.Contact) => {
+      if (
+        webCardData?.subscription?.issuer &&
+        webCardData.subscription.issuer !== 'web' &&
+        webCardData?.subscription?.availableSeats <= 0
+      ) {
+        Alert.alert(
+          intl.formatMessage({
+            defaultMessage: 'Not enough seats',
+            description:
+              'MultiUserAddScreen - Alert message title when not enough seats',
+          }),
+          intl.formatMessage({
+            defaultMessage:
+              "You don't have enough seat to invite more users. Please upgrade your subscription",
+            description:
+              'MultiUserAddScreen - Alert message content when not enough seats',
+          }),
+          [
+            {
+              text: intl.formatMessage({
+                defaultMessage: 'Cancel',
+                description:
+                  'Alert button to cancel upgrading a subscription to add a new user',
+              }),
+              style: 'cancel',
+              onPress: () => {
+                router.back();
+              },
+            },
+            {
+              text: intl.formatMessage({
+                defaultMessage: 'Upgrade',
+                description: 'MultiUserAddScreen - Upgrade bouton action',
+              }),
+              onPress: () => {
+                router.push({ route: 'USER_PAY_WALL' });
+              },
+            },
+          ],
+        );
+      } else {
+        ref.current?.open(contact ?? searchValue ?? '');
+      }
+    },
+    [
+      intl,
+      router,
+      searchValue,
+      webCardData.subscription?.availableSeats,
+      webCardData.subscription?.issuer,
+    ],
+  );
 
   return (
     <>
@@ -71,7 +133,7 @@ const MultiUserAddScreen = ({
             }
             rightElement={
               <HeaderButton
-                onPress={addNewUser}
+                onPress={() => onAddUser()}
                 label={intl.formatMessage({
                   defaultMessage: 'New',
                   description: 'New button label in Multi user add user title',
@@ -92,7 +154,7 @@ const MultiUserAddScreen = ({
             />
           </View>
           <MultiUserAddList
-            onAddSingleUser={onAddSingleUser}
+            onAddSingleUser={onAddUser}
             searchValue={searchValue}
           />
         </SafeAreaView>

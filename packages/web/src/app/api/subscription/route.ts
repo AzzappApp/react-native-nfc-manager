@@ -1,9 +1,16 @@
+import { eq, ne, and } from 'drizzle-orm';
 import { NextResponse } from 'next/server';
 import { withAxiom } from 'next-axiom';
-import { createSubscription, updateActiveUserSubscription } from '@azzapp/data';
+import {
+  createSubscription,
+  db,
+  unpublisheWebCardForUser,
+  updateActiveUserSubscription,
+  UserSubscriptionTable,
+} from '@azzapp/data';
 import cors from '#helpers/cors';
 
-const BEARER_HEADER = 'DkAgYzjiRxns4ty'; //dev value test and release
+const BEARER_HEADER = process.env.IAP_REVENUECAT_NOTIFICATION_BEARER;
 const subscriptionWebHook = async (req: Request) => {
   const authorization = req.headers.get('Authorization');
   if (!authorization) {
@@ -15,96 +22,285 @@ const subscriptionWebHook = async (req: Request) => {
   }
   const body = await req.json();
   const {
-    id: rcId,
-    app_user_id: userId,
-    expiration_at_ms,
-    product_id: subscriptionId,
-    purchased_at_ms,
-    type,
-    store,
+    event: {
+      app_user_id: userId,
+      expiration_at_ms,
+      product_id: subscriptionId,
+      purchased_at_ms,
+      id: rcId,
+      type,
+      store,
+      grace_period_expiration_at_ms,
+    },
   } = body;
-  // Add a control that env  is PRODUCTION
-  //TODO: implement all event(https://www.revenuecat.com/docs/sample-events)
-  //https://www.revenuecat.com/docs/event-types-and-fields
   switch (type) {
-    case 'INITIAL_PURCHASE':
-      await createSubscription({
-        userId,
-        subscriptionId,
-        startAt: new Date(purchased_at_ms),
-        endAt: new Date(expiration_at_ms),
-        revenueCatId: rcId,
-        issuer:
-          store === 'APP_STORE'
-            ? 'apple'
-            : store === 'PLAY_STORE'
-              ? 'google'
-              : 'web',
-        totalSeats: extractSeatsFromSubscriptionId(subscriptionId),
+    case 'INITIAL_PURCHASE': {
+      db.transaction(async trx => {
+        const sub = await trx
+          .select()
+          .from(UserSubscriptionTable)
+          .where(
+            and(
+              eq(UserSubscriptionTable.userId, userId),
+              ne(UserSubscriptionTable.issuer, 'web'),
+            ),
+          );
+        if (sub.length === 0) {
+          await createSubscription({
+            userId,
+            subscriptionId,
+            startAt: new Date(purchased_at_ms),
+            endAt: new Date(expiration_at_ms),
+            revenueCatId: rcId,
+            issuer:
+              store === 'APP_STORE'
+                ? 'apple'
+                : store === 'PLAY_STORE'
+                  ? 'google'
+                  : 'web',
+            totalSeats: extractSeatsFromSubscriptionId(subscriptionId),
+            freeSeats: 0,
+            status: 'active',
+          });
+        } else {
+          await updateActiveUserSubscription(userId, {
+            subscriptionId,
+            startAt: new Date(purchased_at_ms),
+            endAt: new Date(expiration_at_ms),
+            revenueCatId: rcId,
+            issuer:
+              store === 'APP_STORE'
+                ? 'apple'
+                : store === 'PLAY_STORE'
+                  ? 'google'
+                  : 'web',
+            totalSeats: extractSeatsFromSubscriptionId(subscriptionId),
+            freeSeats: 0,
+            status: 'active',
+          });
+        }
       });
       break;
+    }
     case 'CANCELLATION':
+      // Use it for analytics. The flow will always return a expiration event at the end of the subscription
+      break;
+    case 'EXPIRATION':
+      db.transaction(async trx => {
+        const sub = await trx
+          .select()
+          .from(UserSubscriptionTable)
+          .where(
+            and(
+              eq(UserSubscriptionTable.userId, userId),
+              ne(UserSubscriptionTable.issuer, 'web'),
+            ),
+          );
+        if (sub.length === 0) {
+          await createSubscription({
+            userId,
+            subscriptionId,
+            startAt: new Date(purchased_at_ms),
+            endAt: new Date(expiration_at_ms),
+            revenueCatId: rcId,
+            issuer:
+              store === 'APP_STORE'
+                ? 'apple'
+                : store === 'PLAY_STORE'
+                  ? 'google'
+                  : 'web',
+            totalSeats: extractSeatsFromSubscriptionId(subscriptionId),
+            freeSeats: 0,
+            status: 'canceled',
+          });
+        } else {
+          await updateActiveUserSubscription(userId, {
+            subscriptionId,
+            endAt: new Date(expiration_at_ms),
+            revenueCatId: rcId,
+            status: 'canceled',
+          });
+          await unpublisheWebCardForUser(userId);
+        }
+      });
+
+      break;
     case 'SUBSCRIPTION_EXTENDED':
     case 'UNCANCELLATION':
-    case 'EXPIRATION':
-      //expiration at a expiration_reason if we need it to know the reason
-      await updateActiveUserSubscription(userId, {
-        subscriptionId,
-        startAt: new Date(purchased_at_ms),
-        endAt: new Date(expiration_at_ms),
-        revenueCatId: rcId,
-        issuer:
-          store === 'APP_STORE'
-            ? 'apple'
-            : store === 'PLAY_STORE'
-              ? 'google'
-              : 'web',
-        totalSeats: extractSeatsFromSubscriptionId(subscriptionId),
+      db.transaction(async trx => {
+        const sub = await trx
+          .select()
+          .from(UserSubscriptionTable)
+          .where(
+            and(
+              eq(UserSubscriptionTable.userId, userId),
+              ne(UserSubscriptionTable.issuer, 'web'),
+            ),
+          );
+        if (sub.length === 0) {
+          await createSubscription({
+            userId,
+            subscriptionId,
+            startAt: new Date(purchased_at_ms),
+            endAt: new Date(expiration_at_ms),
+            revenueCatId: rcId,
+            issuer:
+              store === 'APP_STORE'
+                ? 'apple'
+                : store === 'PLAY_STORE'
+                  ? 'google'
+                  : 'web',
+            totalSeats: extractSeatsFromSubscriptionId(subscriptionId),
+            freeSeats: 0,
+            status: 'active',
+          });
+        } else {
+          await updateActiveUserSubscription(userId, {
+            subscriptionId,
+            startAt: new Date(purchased_at_ms),
+            endAt: new Date(expiration_at_ms),
+            revenueCatId: rcId,
+            status: 'active',
+          });
+          await unpublisheWebCardForUser(userId);
+        }
       });
       break;
     case 'RENEWAL':
-      await updateActiveUserSubscription(userId, {
-        userId,
-        subscriptionId,
-        startAt: new Date(purchased_at_ms),
-        endAt: new Date(expiration_at_ms),
-        revenueCatId: rcId,
-        issuer:
-          store === 'APP_STORE'
-            ? 'apple'
-            : store === 'PLAY_STORE'
-              ? 'google'
-              : 'web',
-        totalSeats: extractSeatsFromSubscriptionId(subscriptionId),
+      db.transaction(async trx => {
+        const sub = await trx
+          .select()
+          .from(UserSubscriptionTable)
+          .where(
+            and(
+              eq(UserSubscriptionTable.userId, userId),
+              ne(UserSubscriptionTable.issuer, 'web'),
+            ),
+          );
+        if (sub.length === 0) {
+          await createSubscription({
+            userId,
+            subscriptionId,
+            startAt: new Date(purchased_at_ms),
+            endAt: new Date(expiration_at_ms),
+            revenueCatId: rcId,
+            issuer:
+              store === 'APP_STORE'
+                ? 'apple'
+                : store === 'PLAY_STORE'
+                  ? 'google'
+                  : 'web',
+            totalSeats: extractSeatsFromSubscriptionId(subscriptionId),
+            freeSeats: 0,
+            status: 'active',
+          });
+        } else {
+          await updateActiveUserSubscription(userId, {
+            startAt: new Date(purchased_at_ms),
+            endAt: new Date(expiration_at_ms),
+            revenueCatId: rcId,
+            status: 'active',
+          });
+        }
       });
+
       break;
     case 'BILLING_ISSUE':
-      //in case of billing issue, look at the grace period and revoke access if the grace period is over
-      await updateActiveUserSubscription(userId, {
-        subscriptionId,
-        startAt: new Date(purchased_at_ms),
-        endAt: new Date(body.grace_period_expiration_at_ms),
-        revenueCatId: rcId,
-        issuer:
-          store === 'APP_STORE'
-            ? 'apple'
-            : store === 'PLAY_STORE'
-              ? 'google'
-              : 'web',
-        totalSeats: extractSeatsFromSubscriptionId(subscriptionId),
-      });
+      //in case of billing issue, look at the grace period for add extended time
+      //in any case,  a cancellation and expiration event will be sent after grace period
+      if (
+        grace_period_expiration_at_ms &&
+        new Date(grace_period_expiration_at_ms) > new Date()
+      ) {
+        db.transaction(async trx => {
+          const sub = await trx
+            .select()
+            .from(UserSubscriptionTable)
+            .where(
+              and(
+                eq(UserSubscriptionTable.userId, userId),
+                ne(UserSubscriptionTable.issuer, 'web'),
+              ),
+            );
+          if (sub.length === 0) {
+            await createSubscription({
+              userId,
+              subscriptionId,
+              startAt: new Date(purchased_at_ms),
+              endAt: new Date(grace_period_expiration_at_ms),
+              revenueCatId: rcId,
+              issuer:
+                store === 'APP_STORE'
+                  ? 'apple'
+                  : store === 'PLAY_STORE'
+                    ? 'google'
+                    : 'web',
+              freeSeats: 0,
+              status: 'active',
+            });
+          } else {
+            await updateActiveUserSubscription(userId, {
+              endAt: new Date(grace_period_expiration_at_ms),
+              revenueCatId: rcId,
+            });
+          }
+        });
+      }
+
       break;
 
     case 'PRODUCT_CHANGE':
-      //TODO: should we handle it for analytics ?
-      //The PRODUCT_CHANGE webhook should be considered informative, and does not mean that the product change has gone into effect. When the product change goes into effect you will receive a RENEWAL event on Apple and Stripe or a INITIAL_PURCHASE event on Google Play.
+      db.transaction(async trx => {
+        //with the difference bteween azzapp Profile and ios/adnroid account, it can happen that a renewal is done on another profile if the uer created a new profile, initial purchase does not happen
+        const sub = await trx
+          .select()
+          .from(UserSubscriptionTable)
+          .where(
+            and(
+              eq(UserSubscriptionTable.userId, userId),
+              ne(UserSubscriptionTable.issuer, 'web'),
+            ),
+          );
+        if (sub.length === 0) {
+          await createSubscription({
+            userId,
+            subscriptionId,
+            startAt: new Date(purchased_at_ms),
+            endAt: new Date(expiration_at_ms),
+            revenueCatId: rcId,
+            issuer:
+              store === 'APP_STORE'
+                ? 'apple'
+                : store === 'PLAY_STORE'
+                  ? 'google'
+                  : 'web',
+            totalSeats: extractSeatsFromSubscriptionId(subscriptionId),
+            freeSeats: 0,
+            status: 'active',
+          });
+        } else {
+          await updateActiveUserSubscription(userId, {
+            subscriptionId,
+            startAt: new Date(purchased_at_ms),
+            endAt: new Date(grace_period_expiration_at_ms),
+            revenueCatId: rcId,
+            issuer:
+              store === 'APP_STORE'
+                ? 'apple'
+                : store === 'PLAY_STORE'
+                  ? 'google'
+                  : 'web',
+            totalSeats: extractSeatsFromSubscriptionId(subscriptionId),
+            status: 'active',
+          });
+        }
+      });
+
       break;
 
     case 'TRANSFER':
       break;
-    //case 'SUBSCRIPTION_PAUSED': You should not revoke access when receiving a SUBSCRIPTION_PAUSED event, but only when receiving an EXPIRATION event (which will have the expiration reason SUBSCRIPTION_PAUSED)
-    default:
-      break;
+    //we are transfering only when the user sub is over, no work is required here
   }
 
   return NextResponse.json(null, { status: 200 });
@@ -138,6 +334,46 @@ function extractSeatsFromSubscriptionId(id: string) {
 
 // Billing issue
 // There has been a problem trying to charge the subscriber.
+
+//   {event: {
+//      event_timestamp_ms: 1720528317767,
+//      product_id: 'com.azzap.dev.monthly.1',
+//      period_type: 'NORMAL',
+//      purchased_at_ms: 1720527997000,
+//      expiration_at_ms: 1720528297000,
+//      environment: 'SANDBOX',
+//      entitlement_id: null,
+//      entitlement_ids: ['multiuser'],
+//      presented_offering_id: 'com.azzapp.multiuser',
+//      transaction_id: '2000000651473165',
+//      original_transaction_id: '2000000650231595',
+//      is_family_share: false,
+//      country_code: 'FR',
+//      app_user_id: 'dqwiewcdewkv',
+//      aliases: ['dqwiewcdewkv'],
+//      original_app_user_id: 'dqwiewcdewkv',
+//      grace_period_expiration_at_ms: null,
+//      currency: 'EUR',
+//      price: 0,
+//      price_in_purchased_currency: 0,
+//      subscriber_attributes: {
+//        $email: { value: 's5@g.com', updated_at_ms: 1720435833505 },
+//        $attConsentStatus: {
+//          value: 'denied',
+//          updated_at_ms: 1720435913492,
+//        },
+//      },
+//      store: 'APP_STORE',
+//      takehome_percentage: 0.85,
+//      offer_code: null,
+//      tax_percentage: 0.1757,
+//      commission_percentage: 0.1237,
+//      type: 'BILLING_ISSUE',
+//      id: '606A69A4-4F61-4C5D-9FEB-32787330D2D8',
+//      app_id: 'app0ba766d30f',
+//    },
+//    api_version: '1.0',
+//  };
 
 // Non renewing purchase
 // A customer has made a purchase that will not auto-renew.

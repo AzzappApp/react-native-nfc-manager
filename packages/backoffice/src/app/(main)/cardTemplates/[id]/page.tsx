@@ -3,9 +3,9 @@ import {
   CardTemplateTypeTable,
   db,
   getCardTemplateById,
-  getLabel,
-  getLabels,
+  getLocalizationMessagesByLocaleAndTarget,
 } from '@azzapp/data';
+import { DEFAULT_LOCALE, ENTITY_TARGET } from '@azzapp/i18n';
 import CardTemplatesForm from '../CardTemplatesForm';
 
 type CardTemplatePageProps = {
@@ -23,15 +23,10 @@ const CardTemplatePage = async (props: CardTemplatePageProps) => {
     db.select().from(CardTemplateTypeTable),
   ]);
 
-  const cardStylesLabelKeys = cardStyles.map(cardStyles => cardStyles.labelKey);
-
-  const labels = await getLabels(
-    cardStylesLabelKeys.concat(
-      cardTemplateTypes.map(cardTemplateType => cardTemplateType.labelKey),
-    ),
+  const labels = await getLocalizationMessagesByLocaleAndTarget(
+    DEFAULT_LOCALE,
+    ENTITY_TARGET,
   );
-
-  const label = await getLabel(template.labelKey);
 
   return (
     <CardTemplatesForm
@@ -39,7 +34,6 @@ const CardTemplatePage = async (props: CardTemplatePageProps) => {
       cardTemplate={template}
       cardTemplateTypes={cardTemplateTypes}
       labels={labels}
-      label={label}
     />
   );
 };

@@ -139,7 +139,7 @@ const WebCardScreenButtonBar = ({
         iconSize={26}
         iconStyle={{ tintColor: colors.white }}
         variant="grey"
-        style={styles.userPostsButton}
+        style={styles.auxiliaryButton}
         onPress={onFlip}
       />
     </Animated.View>
@@ -248,7 +248,7 @@ const WebCardScreenButtonActionButton = ({
       Toast.show({
         type: 'error',
         text1: intl.formatMessage({
-          defaultMessage: 'Only admins & editors can stop following a WebCard',
+          defaultMessage: 'Your role does not permit this action',
           description:
             'Error message when trying to unfollow a WebCard without being an admin',
         }),
@@ -257,7 +257,7 @@ const WebCardScreenButtonActionButton = ({
       Toast.show({
         type: 'error',
         text1: intl.formatMessage({
-          defaultMessage: 'Only admins & editors can follow a WebCard',
+          defaultMessage: 'Your role does not permit this action',
           description:
             'Error message when trying to follow a WebCard without being an admin',
         }),
@@ -272,7 +272,7 @@ const WebCardScreenButtonActionButton = ({
       Toast.show({
         type: 'error',
         text1: intl.formatMessage({
-          defaultMessage: 'Only admins & editors can create a post',
+          defaultMessage: 'Your role does not permit this action',
           description:
             'Error message when trying to create a post without being an admin',
         }),
@@ -295,8 +295,16 @@ const WebCardScreenButtonActionButton = ({
         >
           <Text variant="button" style={styles.textButton}>
             <FormattedMessage
-              defaultMessage="Build my webcard"
+              // eslint-disable-next-line formatjs/enforce-placeholders
+              defaultMessage="Build my WebCard{azzappA}"
               description="Build my webcard button label in Profile Screen Button Bar"
+              values={{
+                azzappA: (
+                  <Text variant="azzapp" style={styles.textButton}>
+                    a
+                  </Text>
+                ),
+              }}
             />
           </Text>
         </BlurredFloatingButton>
@@ -304,9 +312,10 @@ const WebCardScreenButtonActionButton = ({
           icon="more"
           variant="grey"
           onPress={onShowWebcardModalCallback}
+          style={styles.auxiliaryButton}
           iconStyle={{ tintColor: colors.white }}
           accessibilityLabel={intl.formatMessage({
-            defaultMessage: 'Tap to show the webcard informations',
+            defaultMessage: 'Tap to show the WebCard information',
             description:
               'ProfileScreenButtonBar show webcard informations button accessibility label',
           })}
@@ -318,7 +327,7 @@ const WebCardScreenButtonActionButton = ({
         onPress={onCreateNewPost}
         style={styles.mainButton}
         accessibilityLabel={intl.formatMessage({
-          defaultMessage: 'Tap to create a new post',
+          defaultMessage: 'Tap to edit your WebCard',
           description: 'ProfileScreenButtonBar edit button accessibility label',
         })}
       >
@@ -360,6 +369,7 @@ const WebCardScreenButtonActionButton = ({
         variant="grey"
         onPress={onShowWebcardModalCallback}
         iconStyle={{ tintColor: colors.white }}
+        style={styles.auxiliaryButton}
         accessibilityLabel={intl.formatMessage({
           defaultMessage: 'Tap to show the webcard informations',
           description:
@@ -385,9 +395,8 @@ const styles = StyleSheet.create({
   mainButton: {
     flex: 1,
     marginLeft: 10,
-    marginRight: 10,
   },
-  userPostsButton: {
+  auxiliaryButton: {
     marginLeft: 10,
   },
 });

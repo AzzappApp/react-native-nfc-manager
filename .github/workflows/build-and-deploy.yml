@@ -19,9 +19,7 @@ jobs:
       VERCEL_ORG_ID: "team_nigXfZEKLJrpoK0ZHytix9jX"
       TURBO_TOKEN: ${{ secrets.VERCEL_TOKEN }}
       TURBO_TEAM: "azzapp"
-      NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME: ${{ vars.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}}
       PHRASE_ACCESS_TOKEN: ${{ secrets.PHRASE_ACCESS_TOKEN }}
-      SENTRY_AUTH_TOKEN: ${{ vars.SENTRY_AUTH_TOKEN }}
       PAYMENT_API_URL: ${{ vars.PAYMENT_API_URL }}
     steps:
       ############################################
@@ -64,21 +62,17 @@ jobs:
       #
       ############################################
       - name: Pull translations
-        if : github.ref_name == 'staging' || github.ref_name == 'stable'
-        run: yarn i18n:pull ${{ github.ref_name }}
+        run: yarn i18n:pull
         env:
-          LOKALISE_PROJECT_ID: ${{ vars.LOKALISE_PROJECT_ID }}
-          LOKALISE_TOKEN: ${{ secrets.LOKALISE_TOKEN }}
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
 
       - name: Extract translations keys
         run: yarn i18n:extract
 
-      - name: Push translations
-        if : github.ref_name == 'staging' || github.ref_name == 'stable'
-        run: yarn i18n:push ${{ github.ref_name }}
+      - name: Purge translations key that are not used
+        run: yarn i18n:purge
         env:
-          LOKALISE_PROJECT_ID: ${{ vars.LOKALISE_PROJECT_ID }}
-          LOKALISE_TOKEN: ${{ secrets.LOKALISE_TOKEN }}
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
 
       
       ############################################
@@ -88,7 +82,7 @@ jobs:
       ############################################
    
       - name: JavaScript build
-        run: yarn build
+        run: yarn build-app-dependencies
 
       - name: Lint
         run: yarn lint
@@ -107,7 +101,14 @@ jobs:
       ############################################
       - name: Bump version
         run: |
-          yarn bump-version
+          NEXT_VERSION=""
+          if [ "$GITHUB_REF" == "refs/heads/staging" ]; then
+            NEXT_VERSION="rc"
+          elif [ "$GITHUB_REF" == "refs/heads/main" ]; then
+            NEXT_VERSION="canary"
+          fi
+
+          yarn bump-version $NEXT_VERSION
           if [ "$GITHUB_REF" == "refs/heads/main" ]; then
             yarn write-dev-changelog
           fi
@@ -252,17 +253,6 @@ jobs:
           fi
           vercel pull --yes --environment=$ENVIRONMENT --token=${{ secrets.VERCEL_TOKEN }} $ADDITIONAL_ARGS
 
-      - name: Azzapp Web - Vercel build
-        env:
-          VERCEL_PROJECT_ID: "azzapp"
-        run: |
-          ADDITIONAL_ARGS=""
-          GITHUB_REF="${{ github.ref }}"
-          if [ "$GITHUB_REF" == "refs/heads/stable" ]; then
-            ADDITIONAL_ARGS="--prod"
-          fi
-          vercel build --token=${{ secrets.VERCEL_TOKEN }} $ADDITIONAL_ARGS
-
       - name: Azzapp Web - Vercel deployment
         env:
           VERCEL_PROJECT_ID: "azzapp"
@@ -272,7 +262,7 @@ jobs:
           if [ "$GITHUB_REF" == "refs/heads/stable" ]; then
             ADDITIONAL_ARGS="--prod"
           fi
-          vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }} --meta githubCommitRef=${{ github.ref_name }} $ADDITIONAL_ARGS
+          vercel deploy --token=${{ secrets.VERCEL_TOKEN }} --meta githubCommitRef=${{ github.ref_name }} $ADDITIONAL_ARGS
 
       ############################################
       #
@@ -296,17 +286,6 @@ jobs:
           fi
           vercel pull --yes --environment=$ENVIRONMENT --token=${{ secrets.VERCEL_TOKEN }} $ADDITIONAL_ARGS
 
-      - name: Azzapp Backoffice - Vercel build
-        env:
-          VERCEL_PROJECT_ID: "azzapp-backoffice"
-        run: |
-          ADDITIONAL_ARGS=""
-          GITHUB_REF="${{ github.ref }}"
-          if [ "$GITHUB_REF" == "refs/heads/stable" ]; then
-            ADDITIONAL_ARGS="--prod"
-          fi
-          vercel build --token=${{ secrets.VERCEL_TOKEN }} $ADDITIONAL_ARGS
-
       - name: Azzapp Backoffice - Vercel deployment
         env:
           VERCEL_PROJECT_ID: "azzapp-backoffice"
@@ -317,7 +296,7 @@ jobs:
             ADDITIONAL_ARGS="--prod"
           fi
           rm -fr ./packages/web/.next
-          vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }} --meta githubCommitRef=${{ github.ref_name }} $ADDITIONAL_ARGS
+          vercel deploy --token=${{ secrets.VERCEL_TOKEN }} --meta githubCommitRef=${{ github.ref_name }} $ADDITIONAL_ARGS
       
       ############################################
       #

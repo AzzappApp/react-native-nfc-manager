@@ -6,8 +6,7 @@ import {
 } from '#helpers/validationHelpers';
 
 export const cardStyleSchema = z.object({
-  labelKey: z.string().min(1),
-  baseLabelValue: z.string().min(1),
+  label: z.string().min(1),
   fontFamily: defaultStringValidator,
   fontSize: fontSizeValidator,
   titleFontFamily: defaultStringValidator,

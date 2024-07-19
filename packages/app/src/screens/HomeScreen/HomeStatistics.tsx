@@ -1,5 +1,4 @@
-import _ from 'lodash';
-import { memo, useMemo } from 'react';
+import { useCallback } from 'react';
 import { useIntl } from 'react-intl';
 import { Pressable, ScrollView, View, useWindowDimensions } from 'react-native';
 import Animated, {
@@ -10,6 +9,7 @@ import Animated, {
   useAnimatedStyle,
   useAnimatedReaction,
   useAnimatedRef,
+  useDerivedValue,
 } from 'react-native-reanimated';
 import { useFragment, graphql } from 'react-relay';
 import { colors, fontFamilies } from '#theme';
@@ -20,6 +20,7 @@ import {
 } from '#helpers/createStyles';
 import Text from '#ui/Text';
 import { format } from './HomeInformations';
+import { useHomeScreenCurrentIndex } from './HomeScreenContext';
 import HomeStatisticsChart from './HomeStatisticsChart';
 import type { HomeStatistics_profiles$key } from '#relayArtifacts/HomeStatistics_profiles.graphql';
 
@@ -28,7 +29,6 @@ const AnimatedScrollView = Animated.createAnimatedComponent(ScrollView);
 type HomeInformationsProps = {
   user: HomeStatistics_profiles$key;
   height: number;
-  currentProfileIndexSharedValue: SharedValue<number>;
   variant?: 'dark' | 'light';
   mode?: 'compact' | 'full';
   initialStatsIndex?: number;
@@ -37,13 +37,10 @@ type HomeInformationsProps = {
 const HomeStatistics = ({
   user,
   height,
-  currentProfileIndexSharedValue,
   variant = 'dark',
   initialStatsIndex = 0,
   mode = 'full',
 }: HomeInformationsProps) => {
-  //TODO: backend part .
-
   const profiles = useFragment(
     graphql`
       fragment HomeStatistics_profiles on Profile @relay(plural: true) {
@@ -59,6 +56,7 @@ const HomeStatistics = ({
     `,
     user,
   );
+  const currentIndexSharedValue = useHomeScreenCurrentIndex();
 
   const styles = useVariantStyleSheet(stylesheet, variant);
 
@@ -69,73 +67,91 @@ const HomeStatistics = ({
   const scrollHandler = useAnimatedScrollHandler(event => {
     scrollIndexOffset.value = event.contentOffset.x / BOX_NUMBER_WIDTH;
   });
+  // cant use the context until we are splitting this screen from the multiuser
+  const inputRange = useDerivedValue(
+    () => Array.from({ length: (profiles?.length ?? 0) + 1 }, (_, i) => i),
+    [profiles?.length],
+  );
 
-  const inputRange = _.range(0, profiles?.length);
-
-  const likes = useMemo(
-    () => profiles?.map(profile => profile.webCard.nbLikes) ?? [],
+  const likes = useDerivedValue(
+    () => [0, ...(profiles?.map(profile => profile.webCard.nbLikes) ?? [])],
     [profiles],
   );
-  const contactCardScans = useMemo(
-    () => profiles?.map(profile => profile.nbContactCardScans ?? 0) ?? [],
+  const contactCardScans = useDerivedValue(
+    () => [
+      0,
+      ...(profiles?.map(profile => profile.nbContactCardScans ?? 0) ?? []),
+    ],
     [profiles],
   );
-  const webCardViews = useMemo(
-    () => profiles?.map(profile => profile.webCard.nbWebCardViews) ?? [],
+  const webCardViews = useDerivedValue(
+    () => [
+      0,
+      ...(profiles?.map(profile => profile.webCard.nbWebCardViews) ?? []),
+    ],
     [profiles],
   );
 
   const totalLikes = useSharedValue(
-    format(likes[Math.round(currentProfileIndexSharedValue.value)] ?? '-1'),
+    format(
+      likes.value[Math.round(currentIndexSharedValue?.value ?? 0)] ?? '-1',
+    ),
   );
   const totalScans = useSharedValue(
     format(
-      contactCardScans[Math.round(currentProfileIndexSharedValue.value)] ??
+      contactCardScans.value[Math.round(currentIndexSharedValue?.value ?? 0)] ??
         '-1',
     ),
   );
   const totalViews = useSharedValue(
     format(
-      webCardViews[Math.round(currentProfileIndexSharedValue.value)] ?? '-1',
+      webCardViews.value[Math.round(currentIndexSharedValue?.value ?? 0)] ??
+        '-1',
     ),
   );
 
   useAnimatedReaction(
-    () => currentProfileIndexSharedValue.value,
+    () => currentIndexSharedValue?.value ?? 0,
     actual => {
-      if (profiles && profiles?.length > 1 && actual >= 0) {
+      if (profiles?.length && actual >= 0) {
         totalLikes.value = format(
-          interpolate(currentProfileIndexSharedValue.value, inputRange, likes),
+          interpolate(
+            currentIndexSharedValue?.value ?? 0,
+            inputRange.value,
+            likes.value,
+          ),
         );
         totalScans.value = format(
           interpolate(
-            currentProfileIndexSharedValue.value,
-            inputRange,
-            contactCardScans,
+            currentIndexSharedValue?.value ?? 0,
+            inputRange.value,
+            contactCardScans.value,
           ),
         );
         totalViews.value = format(
           interpolate(
-            currentProfileIndexSharedValue.value,
-            inputRange,
-            webCardViews,
+            currentIndexSharedValue?.value ?? 0,
+            inputRange.value,
+            webCardViews.value,
           ),
         );
       } else if (actual >= 0) {
-        totalLikes.value = format(likes[actual]);
-        totalScans.value = format(contactCardScans[actual]);
-        totalViews.value = format(webCardViews[actual]);
+        totalLikes.value = format(likes.value[actual]);
+        totalScans.value = format(contactCardScans.value[actual]);
+        totalViews.value = format(webCardViews.value[actual]);
       }
     },
-
-    [currentProfileIndexSharedValue.value, profiles, inputRange],
+    [profiles?.length],
   );
 
   const scrollViewRef = useAnimatedRef<Animated.ScrollView>();
 
-  const onSelectStat = (index: number) => {
-    scrollViewRef?.current?.scrollTo({ x: index * BOX_NUMBER_WIDTH, y: 0 });
-  };
+  const onSelectStat = useCallback(
+    (index: number) => {
+      scrollViewRef?.current?.scrollTo({ x: index * BOX_NUMBER_WIDTH, y: 0 });
+    },
+    [scrollViewRef],
+  );
 
   //TODO: if performance issue, inquiry a more complex way to do the chart(skia, D3 etc). it is the simpler using only animated view.
   return (
@@ -144,7 +160,6 @@ const HomeStatistics = ({
         width={width - 2 * PADDING_HORIZONTAL}
         height={height - BOX_NUMBER_HEIGHT}
         statsScrollIndex={scrollIndexOffset}
-        currentProfileIndexSharedValue={currentProfileIndexSharedValue}
         user={profiles}
         variant={variant}
       />
@@ -265,7 +280,7 @@ const BOX_NUMBER_HEIGHT = 62.3;
 const PADDING_HORIZONTAL = 20;
 const BOX_NUMBER_WIDTH = 140;
 
-export default memo(HomeStatistics);
+export default HomeStatistics;
 
 type StatisticItemsProps = {
   value: SharedValue<string>;

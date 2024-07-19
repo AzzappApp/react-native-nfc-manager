@@ -1,16 +1,27 @@
 import { withAxiom } from 'next-axiom';
 import * as z from 'zod';
-import { acknowledgeFirstPayment, rejectFirstPayment } from '@azzapp/payment';
+import {
+  acknowledgeFirstPayment,
+  checkSignature,
+  rejectFirstPayment,
+} from '@azzapp/payment';
 
 const paymentCallbackBody = z.object({
   transaction_status: z.string(),
   client_reference: z.string(),
   transaction_id: z.string(),
   provider_response: z.string().optional(),
+  HASH: z.string().optional(),
 });
 
 export const POST = withAxiom(async (req: Request) => {
   const body = await req.json();
+
+  if ('HASH' in body) {
+    if (!body.HASH || !(await checkSignature(body, body.HASH))) {
+      return new Response('hash mismatch', { status: 400 });
+    }
+  }
 
   const data = paymentCallbackBody.parse(body);
 

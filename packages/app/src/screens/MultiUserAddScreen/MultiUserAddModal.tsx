@@ -17,11 +17,9 @@ import {
 } from 'react-relay';
 import * as z from 'zod';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
-
 import ERRORS from '@azzapp/shared/errors';
-import { encodeMediaId } from '@azzapp/shared/imagesHelpers';
 import { isValidEmail } from '@azzapp/shared/stringHelpers';
-import ScreenModal from '#components/ScreenModal';
+import { ScreenModal } from '#components/NativeRouter';
 import { CardPhoneLabels } from '#helpers/contactCardHelpers';
 import { getFileName } from '#helpers/fileHelpers';
 import { getLocales, useCurrentLocale } from '#helpers/localeHelpers';
@@ -315,8 +313,6 @@ const MultiUserAddModal = (
               firstName
               lastName
             }
-            ...MultiUserScreenUserListItem_Profile
-            ...MultiUserDetailModal_Profile
           }
         }
       }
@@ -370,7 +366,7 @@ const MultiUserAddModal = (
         const [uploadedAvatarId, uploadedLogoId] = await Promise.all(
           uploads.map(upload =>
             upload?.promise.then(({ public_id }) => {
-              return encodeMediaId(public_id, 'image');
+              return public_id;
             }),
           ),
         );
@@ -459,6 +455,16 @@ const MultiUserAddModal = (
                     'Error toast message when inviting user that is already a member from MultiUserAddModal',
                 }),
               });
+            } else if (e.message === ERRORS.SUBSCRIPTION_REQUIRED) {
+              Toast.show({
+                type: 'error',
+                text1: intl.formatMessage({
+                  defaultMessage:
+                    'Error, you don’t have a subscription or you don’t have enough seats in your subscription to invite this user',
+                  description:
+                    'Error toast message when inviting user without correct subscription from MultiUserAddModal',
+                }),
+              });
             } else {
               Toast.show({
                 type: 'error',
@@ -542,7 +548,11 @@ const MultiUserAddModal = (
   );
 
   return (
-    <ScreenModal visible={visible} animationType="slide">
+    <ScreenModal
+      visible={visible}
+      animationType="slide"
+      onRequestDismiss={onClose}
+    >
       <Container style={{ flex: 1 }}>
         <SafeAreaView
           style={{ flex: 1 }}

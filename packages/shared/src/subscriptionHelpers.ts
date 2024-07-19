@@ -8,11 +8,19 @@ export const isModuleKindSubscription = (_kind: string) => {
   return modulesKindsSubscription.includes(_kind);
 };
 
+export const MODULE_COUNT_LIMIT_FOR_SUBSCRIPTION = 4;
+
 export const moduleCountRequiresSubscription = (_moduleCount: number) => {
-  return _moduleCount > 3;
+  return _moduleCount >= MODULE_COUNT_LIMIT_FOR_SUBSCRIPTION;
 };
 
-export const webcardRequiresSubscription = (
+export const hasModuleKindSubscription = (
+  _modules: ReadonlyArray<{ readonly kind: string }>,
+) => {
+  return _modules.some(module => isModuleKindSubscription(module.kind));
+};
+
+export const webCardRequiresSubscription = (
   _modules: ReadonlyArray<{ readonly kind: string }>,
   _kind?: string | null,
 ) => {
@@ -23,12 +31,12 @@ export const webcardRequiresSubscription = (
   );
 };
 
-export const addingModuleRequireSubscription = (
+export const changeModuleRequireSubscription = (
   kind: string,
   currentModuleCount: number,
 ) => {
   return (
     isModuleKindSubscription(kind) ||
-    moduleCountRequiresSubscription(currentModuleCount + 1)
+    moduleCountRequiresSubscription(currentModuleCount)
   );
 };

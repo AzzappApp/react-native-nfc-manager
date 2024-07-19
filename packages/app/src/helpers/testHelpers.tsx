@@ -5,10 +5,10 @@ import { IntlProvider } from 'react-intl';
 import { Text } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { RouterProvider, useNativeRouter } from '#components/NativeRouter';
-import type { NativeRouterInit } from '#components/NativeRouter';
+import type { RouterInit } from '#components/NativeRouter';
 import type { RenderResult } from '@testing-library/react-native';
 import type { ReactElement } from 'react';
-const initialRoutes: NativeRouterInit = {
+const initialRoutes: RouterInit = {
   id: 'test',
   stack: [
     {

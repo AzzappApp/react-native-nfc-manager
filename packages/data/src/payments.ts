@@ -1,7 +1,7 @@
-import { createId } from '@paralleldrive/cuid2';
 import { eq, desc, count } from 'drizzle-orm';
 import { mysqlEnum, int, mysqlTable } from 'drizzle-orm/mysql-core';
 import db, { DEFAULT_DATETIME_VALUE, cols } from '#db';
+import { createId } from '#/helpers/createId';
 import type { DbTransaction } from '#db';
 import type { InferInsertModel, InferSelectModel } from 'drizzle-orm';
 
@@ -9,8 +9,6 @@ export const PaymentTable = mysqlTable(
   'Payment',
   {
     id: cols.cuid('id').primaryKey().notNull().$defaultFn(createId),
-    userId: cols.cuid('userId').notNull(),
-    webCardId: cols.cuid('webCardId').notNull(),
     amount: int('amount').notNull(),
     taxes: int('taxes').notNull(),
     currency: cols.defaultVarchar('currency').notNull().default('EUR'),
@@ -30,9 +28,14 @@ export const PaymentTable = mysqlTable(
       .$onUpdate(() => new Date()),
     invoiceId: cols.defaultVarchar('invoiceId'),
     invoicePdfUrl: cols.defaultVarchar('invoiceUrl'),
+    subscriptionId: cols.cuid('subscriptionId').notNull(),
+    webCardId: cols.cuid('webCardId').notNull(),
   },
   table => {
     return {
+      subscriptionIdIdx: cols
+        .index('subscriptionId_idx')
+        .on(table.subscriptionId),
       webCardIdIdx: cols.index('webCardId_idx').on(table.webCardId),
     };
   },

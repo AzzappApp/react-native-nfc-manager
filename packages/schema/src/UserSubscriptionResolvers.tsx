@@ -1,3 +1,5 @@
+import * as Sentry from '@sentry/nextjs';
+import { getPaymentRequest } from '@azzapp/payment';
 import { calculateAvailableSeats } from '#use-cases/subscription';
 import { idResolver } from './utils';
 import type { UserSubscriptionResolvers } from './__generated__/types';
@@ -30,5 +32,19 @@ export const UserSubscription: UserSubscriptionResolvers = {
     return userSubscription.paymentMeanId
       ? loaders.PaymentMean.load(userSubscription.paymentMeanId)
       : null;
+  },
+  paymentRedirectUrl: async (userSubscription, _) => {
+    if (
+      userSubscription.status === 'waiting_payment' &&
+      userSubscription.paymentMeanId
+    ) {
+      try {
+        const result = await getPaymentRequest(userSubscription.paymentMeanId);
+        return result.clientRedirectUrl ?? null;
+      } catch (err) {
+        Sentry.captureException(err);
+      }
+    }
+    return null;
   },
 };

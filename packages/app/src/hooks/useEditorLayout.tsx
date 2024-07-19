@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { Dimensions, StatusBar } from 'react-native';
+import { Dimensions } from 'react-native';
 import { HEADER_HEIGHT } from '#ui/Header';
 import useScreenInsets from './useScreenInsets';
 
@@ -30,7 +30,7 @@ type EditorLayoutConfig = {
   headerHeight?: number;
 };
 
-const { width: windowWidth, height: windowHeight } = Dimensions.get('screen');
+const { width: windowWidth, height: windowHeight } = Dimensions.get('window');
 
 const useEditorLayout = ({
   bottomPanelMinHeight = BOTTOM_PANEL_MIN_HEIGHT,
@@ -43,9 +43,7 @@ const useEditorLayout = ({
   const insetBottom = inset.bottom;
 
   const contentHeight = useMemo(() => {
-    return (
-      windowHeight - insetTop - headerHeight - (StatusBar.currentHeight ?? 0)
-    );
+    return windowHeight - insetTop - headerHeight;
   }, [headerHeight, insetTop]);
 
   const topPanelHeight = useMemo(() => {

@@ -1,4 +1,5 @@
 import { isEqual } from 'lodash';
+import type { ColorPaletteColor } from '@azzapp/shared/cardHelpers';
 import type { ModuleKind } from '@azzapp/shared/cardModuleHelpers';
 import type { ContactCard } from '@azzapp/shared/contactCardHelpers';
 import type { LayoutRectangle } from 'react-native';
@@ -52,11 +53,38 @@ export type ForgotPasswordConfirmationRoute = {
   };
 };
 
-export type NewWebCardRoute = {
-  route: 'NEW_WEBCARD';
-  params?: {
-    webCardId: string;
+export type WebCardKindSelectionRoute = {
+  route: 'WEBCARD_KIND_SELECTION';
+  params?: never;
+};
+
+export type WebCardFormRoute = {
+  route: 'WEBCARD_FORM';
+  params: {
+    webCardCategoryId: string;
   };
+};
+
+export type CoverTemplateSelectionRoute = {
+  route: 'COVER_TEMPLATE_SELECTION';
+  params?: {
+    fromCoverEdition?: boolean;
+    fromHome?: boolean;
+  };
+};
+
+export type CoverCreationRoute = {
+  route: 'COVER_CREATION';
+  params: {
+    fromCoverEdition?: boolean;
+    templateId?: string;
+    color?: ColorPaletteColor;
+  };
+};
+
+export type WebCardTemplateSelectionRoute = {
+  route: 'WEBCARD_TEMPLATE_SELECTION';
+  params?: never;
 };
 
 export type WebCardRoute = {
@@ -177,7 +205,9 @@ export type ConfirmChangeContactRoute = {
 
 export type UserPayWallRoute = {
   route: 'USER_PAY_WALL';
-  params?: never;
+  params?: {
+    activateFeature: 'MULTI_USER';
+  };
 };
 
 export type CommonInformationRoute = {
@@ -190,6 +220,13 @@ export type ContactCardEditRoute = {
   params?: never;
 };
 
+export type MultiUserDetailRoute = {
+  route: 'MULTI_USER_DETAIL';
+  params: {
+    profileId: string;
+  };
+};
+
 export type Route =
   | AboutRoute
   | AccountDetailsRoute
@@ -199,7 +236,9 @@ export type Route =
   | ConfirmRegistrationRoute
   | ContactCardEditRoute
   | ContactCardRoute
+  | CoverCreationRoute
   | CoverEditionRoute
+  | CoverTemplateSelectionRoute
   | FollowersRoute
   | FollowingsMosaicRoute
   | FollowingsRoute
@@ -210,9 +249,9 @@ export type Route =
   | LikedPostsRoute
   | MediaRoute
   | MultiUserAddRoute
+  | MultiUserDetailRoute
   | MultiUserRoute
   | NewPostRoute
-  | NewWebCardRoute
   | OnboardingRoute
   | PostCommentsRoute
   | PostRoute
@@ -221,8 +260,11 @@ export type Route =
   | SignInRoute
   | SignUpRoute
   | UserPayWallRoute
+  | WebCardFormRoute
+  | WebCardKindSelectionRoute
   | WebCardParametersRoute
-  | WebCardRoute;
+  | WebCardRoute
+  | WebCardTemplateSelectionRoute;
 
 export type ROUTES = Route['route'];
 

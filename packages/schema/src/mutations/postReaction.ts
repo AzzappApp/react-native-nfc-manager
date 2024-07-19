@@ -22,7 +22,7 @@ const togglePostReaction: MutationResolvers['togglePostReaction'] = async (
 
   const postId = fromGlobalIdWithType(gqlPostId, 'Post');
   const post = await loaders.Post.load(postId);
-  if (!post) {
+  if (!post || post.deleted) {
     throw new GraphQLError(ERRORS.INVALID_REQUEST);
   }
 

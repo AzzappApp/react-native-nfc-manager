@@ -10,9 +10,8 @@ import {
   BLOCK_TEXT_MAX_LENGTH,
   BLOCK_TEXT_STYLE_VALUES,
 } from '@azzapp/shared/cardModuleHelpers';
-import { addingModuleRequireSubscription } from '@azzapp/shared/subscriptionHelpers';
+import { changeModuleRequireSubscription } from '@azzapp/shared/subscriptionHelpers';
 import { useRouter } from '#components/NativeRouter';
-import { useIsSubscriber } from '#helpers/SubscriptionContext';
 import useEditorLayout from '#hooks/useEditorLayout';
 import useHandleProfileActionError from '#hooks/useHandleProfileError';
 import useModuleDataEditor from '#hooks/useModuleDataEditor';
@@ -104,6 +103,7 @@ const BlockTextEditionScreen = ({
         webCard {
           id
           cardIsPublished
+          isPremium
           cardColors {
             primary
             light
@@ -196,6 +196,7 @@ const BlockTextEditionScreen = ({
         saveBlockTextModule(webCardId: $webCardId, input: $input) {
           webCard {
             id
+            requiresSubscription
             cardModules {
               kind
               visible
@@ -218,7 +219,6 @@ const BlockTextEditionScreen = ({
   const router = useRouter();
 
   const intl = useIntl();
-  const isSubscriber = useIsSubscriber();
 
   const cardModulesCount =
     profile.webCard.cardModules.length + (blockText ? 0 : 1);
@@ -281,7 +281,7 @@ const BlockTextEditionScreen = ({
       return;
     }
 
-    const requireSubscription = addingModuleRequireSubscription(
+    const requireSubscription = changeModuleRequireSubscription(
       'blockText',
       cardModulesCount,
     );
@@ -289,7 +289,7 @@ const BlockTextEditionScreen = ({
     if (
       profile.webCard.cardIsPublished &&
       requireSubscription &&
-      !isSubscriber
+      !profile.webCard.isPremium
     ) {
       router.push({ route: 'USER_PAY_WALL' });
       return;
@@ -324,8 +324,8 @@ const BlockTextEditionScreen = ({
     canSave,
     cardModulesCount,
     profile.webCard.cardIsPublished,
+    profile.webCard.isPremium,
     profile.webCard.id,
-    isSubscriber,
     value,
     blockText?.id,
     textMarginHorizontal.value,

@@ -5,13 +5,12 @@ import {
   CardModuleTable,
   WebCardTable,
   createCompanyActivity,
-  createLabel,
   db,
+  saveLocalizationMessage,
   updateCompanyActivity,
 } from '@azzapp/data';
-import { saveLabelKey } from '#helpers/lokaliseHelperts';
+import { DEFAULT_LOCALE, ENTITY_TARGET } from '@azzapp/i18n';
 import { companyActivitySchema } from './companyActivitySchema';
-import type { CompanyActivity, NewCompanyActivity } from '@azzapp/data';
 
 export const getModulesData = async (profileUserName: string) => {
   const res = await db
@@ -29,12 +28,17 @@ export const getModulesData = async (profileUserName: string) => {
   }));
 };
 
-export const saveCompanyActivity = async (
-  data: { cardTemplateType?: { id: string } } & (
-    | CompanyActivity
-    | NewCompanyActivity
-  ),
-) => {
+export const saveCompanyActivity = async (data: {
+  id?: string;
+  label: string;
+  cardTemplateTypeId: string | null;
+  companyActivityTypeId: string | null;
+}): Promise<{
+  success: boolean;
+  formErrors?: any;
+  message?: string;
+  companyActivityId?: string;
+}> => {
   const validation = companyActivitySchema.safeParse(data);
   if (!validation.success) {
     return {
@@ -54,17 +58,18 @@ export const saveCompanyActivity = async (
         await updateCompanyActivity(
           data.id,
           {
-            labelKey: validation.data.labelKey,
-            cardTemplateTypeId: data.cardTemplateType?.id ?? null,
+            cardTemplateTypeId: data.cardTemplateTypeId ?? null,
+            companyActivityTypeId: data.companyActivityTypeId ?? null,
           },
           trx,
         );
 
-        await createLabel(
+        await saveLocalizationMessage(
           {
-            labelKey: validation.data.labelKey,
-            baseLabelValue: validation.data.baseLabelValue,
-            translations: {},
+            key: data.id,
+            value: validation.data.label,
+            locale: DEFAULT_LOCALE,
+            target: ENTITY_TARGET,
           },
           trx,
         );
@@ -73,17 +78,18 @@ export const saveCompanyActivity = async (
       } else {
         const id = await createCompanyActivity(
           {
-            labelKey: data.labelKey,
-            cardTemplateTypeId: data.cardTemplateType?.id ?? null,
+            cardTemplateTypeId: data.cardTemplateTypeId ?? null,
+            companyActivityTypeId: data.companyActivityTypeId ?? null,
           },
           trx,
         );
 
-        await createLabel(
+        await saveLocalizationMessage(
           {
-            labelKey: validation.data.labelKey,
-            baseLabelValue: validation.data.baseLabelValue,
-            translations: {},
+            key: id,
+            value: validation.data.label,
+            locale: DEFAULT_LOCALE,
+            target: ENTITY_TARGET,
           },
           trx,
         );
@@ -91,17 +97,15 @@ export const saveCompanyActivity = async (
         companyActivityId = id;
       }
 
-      await saveLabelKey({
-        labelKey: validation.data.labelKey,
-        baseLabelValue: validation.data.baseLabelValue,
-      });
-
       return companyActivityId;
     });
-  } catch (error) {
-    throw new Error('Error while saving Company Activity');
+    revalidatePath(`/companyActivities/[id]`);
+    return { success: true, companyActivityId } as const;
+  } catch (e: any) {
+    console.error(e);
+    return {
+      success: false,
+      message: e.message || 'Something went wrong',
+    };
   }
-
-  revalidatePath(`/companyActivities/[id]`);
-  return { success: true, companyActivityId } as const;
 };

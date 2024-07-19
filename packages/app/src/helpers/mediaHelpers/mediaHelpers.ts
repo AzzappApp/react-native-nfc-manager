@@ -2,11 +2,16 @@ import ImageSize from 'react-native-image-size';
 
 /**
  * Returns the size of an image.
- * @see https://reactnative.dev/docs/image#getsizes
  * @param uri The URI of the image.
  * @returns A promise that resolves with the size of the image.
  */
-export const getImageSize = (uri: string) => ImageSize.getSize(uri);
+export const getImageSize = async (uri: string) => {
+  const { rotation, width, height } = await ImageSize.getSize(uri);
+  if (rotation === 90 || rotation === 270) {
+    return { width: height, height: width };
+  }
+  return { width, height };
+};
 
 /**
  * Format a number to a 2 digit string.
@@ -55,3 +60,43 @@ export const downScaleImage = (
 };
 
 export const isPNG = (uri: string) => uri.toLowerCase().endsWith('.png');
+
+/**
+ * Duplicates selected media items to fill all the designated slots in a media template.
+ * This function ensures that the number of media items meets the required total number of slots
+ * by duplicating existing media items cyclically until the total slot count is reached.
+ *
+ * @param totalSlots The total number of media slots that need to be filled in the template.
+ * @param selectedMedias An array of media items (of generic type T) currently selected. These items can be of any type, typically strings, objects, etc.
+ * @returns An array of media items of type T, where the number of items is equal to `totalSlots`. If the initial number of selected media items is less than `totalSlots`, it duplicates items from the `selectedMedias` cyclically to fill the gap.
+ *
+ * @example
+ * Simple example:
+ * ```ts
+ * // Example of using duplicateMediaToFillSlots with strings as the media type.
+ * const totalMediaSlots = 5;
+ * const currentSelectedMedias = ['Media A', 'Media B', 'Media C'];
+ * const finalMediaList = duplicateMediaToFillSlots<string>(totalMediaSlots, currentSelectedMedias);
+ * console.log(finalMediaList); // Outputs: ['Media A', 'Media B', 'Media C', 'Media A', 'Media B']
+ * ```
+ */
+export const duplicateMediaToFillSlots = <T>(
+  totalSlots: number,
+  selectedMedias: T[],
+): T[] => {
+  if (selectedMedias.length >= totalSlots) {
+    return selectedMedias;
+  }
+
+  const filledMediaSlots: T[] = [...selectedMedias];
+
+  while (filledMediaSlots.length < totalSlots) {
+    // Add to the list the media to be duplicated.
+    // The media to be duplicated is from the initial list of selected medias, cycling through them.
+    filledMediaSlots.push(
+      filledMediaSlots[filledMediaSlots.length % selectedMedias.length],
+    );
+  }
+
+  return filledMediaSlots;
+};

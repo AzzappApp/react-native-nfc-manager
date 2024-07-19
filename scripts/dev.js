@@ -6,7 +6,7 @@ const glob = require('fast-glob');
 const ROOT_DIR = path.join(__dirname, '..');
 const MENU_SIZE = 30;
 const HELP_WIDTH = 30;
-const HELP_HEIGHT = 5;
+const HELP_HEIGHT = 8;
 
 let screen;
 let sideBar;
@@ -59,7 +59,7 @@ const showHelp = () => {
     padding: 1,
     tags: true,
     border: 'line',
-    content: 'ctrl-q: quit',
+    content: 'ctrl-q: quit\n↑/↓: navigate\nEnter: select\nescape: unfocus',
     hidden: false,
     style: {
       fg: 'default',
@@ -156,6 +156,16 @@ const scrollDown = terminal => {
   }
 };
 
+const selectCurrentTerminal = () => {
+  const term = terminals[displayedScreenID];
+  setTimeout(() => {
+    term.focus();
+    screen.program.disableMouse();
+    screen.render();
+    term.enableMouse();
+  }, 10);
+};
+
 const setupTerminal = (id, command, cwd) => {
   const term = new BlessedXTerm({
     left: MENU_SIZE,
@@ -185,10 +195,7 @@ const setupTerminal = (id, command, cwd) => {
   term.enableMouse();
 
   term.on('click', () => {
-    setTimeout(() => {
-      term.focus();
-      screen.render();
-    }, 10);
+    selectCurrentTerminal();
   });
 
   term.on('mouse', evt => {
@@ -198,6 +205,11 @@ const setupTerminal = (id, command, cwd) => {
       case 'wheelup':
         return scrollUp(term);
     }
+  });
+
+  term.key(['escape'], () => {
+    sideBar.focus();
+    screen.program.enableMouse();
   });
 
   term.on('beep', () => {
@@ -291,6 +303,10 @@ const setupSidebar = () => {
       }
       index = nextIndex;
     }
+  });
+
+  sideBar.key(['enter'], () => {
+    selectCurrentTerminal();
   });
 
   screen.append(sideBar);

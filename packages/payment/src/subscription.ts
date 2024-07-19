@@ -1,4 +1,4 @@
-import { eq, and } from 'drizzle-orm';
+import { eq } from 'drizzle-orm';
 import { UserSubscriptionTable, db, getSubscriptionById } from '@azzapp/data';
 import { createId } from '@azzapp/data/helpers/createId';
 import {
@@ -13,7 +13,9 @@ import {
   calculateTaxes,
   generateRebillFailRule,
 } from '#helpers';
+import type { Customer } from '#types';
 import type { UserSubscription } from '@azzapp/data';
+import type { DbTransaction } from '@azzapp/data/db';
 
 export const updateSubscriptionForWebCard = async ({
   subscriptionId,
@@ -47,15 +49,18 @@ export const updateSubscriptionForWebCard = async ({
   });
 };
 
-export const updateExistingSubscription = async ({
-  userSubscription: existingSubscription,
-  totalSeats,
-  paymentMeanId,
-}: {
-  userSubscription: UserSubscription;
-  totalSeats?: number | null;
-  paymentMeanId?: string | null;
-}) => {
+export const updateExistingSubscription = async (
+  {
+    userSubscription: existingSubscription,
+    totalSeats,
+    paymentMeanId,
+  }: {
+    userSubscription: UserSubscription;
+    totalSeats?: number | null;
+    paymentMeanId?: string | null;
+  },
+  trx: DbTransaction = db,
+) => {
   if (
     existingSubscription.subscriptionPlan !== 'web.monthly' &&
     existingSubscription.subscriptionPlan !== 'web.yearly'
@@ -190,7 +195,7 @@ export const updateExistingSubscription = async ({
 
       const newRebillManagerId = rebillManager.data.rebillManagerId;
 
-      await db
+      await trx
         .update(UserSubscriptionTable)
         .set({
           totalSeats: totalSeats ?? existingSubscription.totalSeats,
@@ -324,7 +329,7 @@ export const updateExistingSubscription = async ({
 
     const newRebillManagerId = rebillManager.data.rebillManagerId;
 
-    await db
+    await trx
       .update(UserSubscriptionTable)
       .set({
         totalSeats: totalSeats ?? existingSubscription.totalSeats,
@@ -342,7 +347,6 @@ export const updateExistingSubscription = async ({
 };
 
 export const upgradePlan = async (
-  userId: string,
   webCardId: string,
   subscriptionId: string,
 ) => {
@@ -431,21 +435,14 @@ export const upgradePlan = async (
         taxes,
         subscriptionId,
       })
-      .where(
-        and(
-          eq(UserSubscriptionTable.webCardId, webCardId),
-          eq(UserSubscriptionTable.userId, userId),
-        ),
-      );
-
-    return (await getSubscriptionById(subscriptionId))!;
+      .where(eq(UserSubscriptionTable.id, existingSubscription.id));
+    return (await getSubscriptionById(existingSubscription.id))!;
   } else {
     throw new Error('Cannot upgrade plan for yearly subscription');
   }
 };
 
 export const endSubscription = async (
-  userId: string,
   webCardId: string,
   subscriptionId: string,
 ) => {
@@ -464,8 +461,8 @@ export const endSubscription = async (
   const rebillManagerId = existingSubscription.rebillManagerId;
 
   if (rebillManagerId && existingSubscription.paymentMeanId) {
-    const result = await client.POST(
-      '/api/client-payment-requests/stop-rebill-manager',
+    const state = await client.POST(
+      `/api/client-payment-requests/check-rebill-manager`,
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -473,17 +470,40 @@ export const endSubscription = async (
         body: {
           rebillManagerId,
           clientPaymentRequestUlid: existingSubscription.paymentMeanId,
-          stopReason: 'End subscription',
         },
       },
     );
 
-    if (!result.data) {
-      throw new Error('Failed to stop rebill manager', { cause: result.error });
+    if (!state.data) {
+      throw new Error('Failed to check rebill manager', {
+        cause: state.error,
+      });
     }
 
-    if ((result.data.status as string) !== 'STOPPED') {
-      throw new Error(result.data.reason || 'Failed to stop rebill manager');
+    if (state.data.rebill_manager_state === 'ON') {
+      const result = await client.POST(
+        '/api/client-payment-requests/stop-rebill-manager',
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          body: {
+            rebillManagerId,
+            clientPaymentRequestUlid: existingSubscription.paymentMeanId,
+            stopReason: 'End subscription',
+          },
+        },
+      );
+
+      if (!result.data) {
+        throw new Error('Failed to stop rebill manager', {
+          cause: result.error,
+        });
+      }
+
+      if ((result.data.status as string) !== 'STOPPED') {
+        throw new Error(result.data.reason || 'Failed to stop rebill manager');
+      }
     }
 
     await db
@@ -492,8 +512,46 @@ export const endSubscription = async (
         canceledAt: new Date(),
         status: 'canceled',
       })
-      .where(eq(UserSubscriptionTable.id, subscriptionId));
+      .where(eq(UserSubscriptionTable.id, existingSubscription.id));
 
-    return (await getSubscriptionById(subscriptionId))!;
+    return (await getSubscriptionById(existingSubscription.id))!;
   }
+};
+
+export const updateCustomer = async (
+  webCardId: string,
+  subscriptionId: string,
+  customer: Customer,
+) => {
+  const subscription = await getSubscriptionById(subscriptionId);
+
+  if (!subscription) {
+    throw new Error('No subscription found');
+  }
+
+  if (subscription.webCardId !== webCardId) {
+    throw new Error('Web card id does not match');
+  }
+
+  const updates = {
+    subscriberName: customer.name,
+    subscriberEmail: customer.email,
+    subscriberPhoneNumber: customer.phone ?? null,
+    subscriberAddress: customer.address,
+    subscriberCity: customer.city,
+    subscriberZip: customer.zip,
+    subscriberCountry: customer.country,
+    subscriberCountryCode: customer.countryCode,
+    subscriberVatNumber: customer.vatNumber ?? null,
+  };
+
+  await db
+    .update(UserSubscriptionTable)
+    .set(updates)
+    .where(eq(UserSubscriptionTable.id, subscriptionId));
+
+  return {
+    ...subscription,
+    ...updates,
+  };
 };

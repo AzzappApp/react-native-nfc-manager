@@ -31,6 +31,7 @@ const AccountDetailsPhoneNumberForm = ({
   visible: boolean;
   toggleBottomSheet: () => void;
   currentUser: {
+    id: string;
     email: string | null;
     phoneNumber: string | null;
   };
@@ -89,6 +90,11 @@ const AccountDetailsPhoneNumberForm = ({
 
   const updatePhoneNumber = async (phoneNumber: string) => {
     try {
+      if (phoneNumber === currentUser.phoneNumber) {
+        toggleBottomSheet();
+        return;
+      }
+
       const { issuer } = await requestUpdateContact({
         locale: intl.locale,
         phoneNumber,
@@ -126,6 +132,7 @@ const AccountDetailsPhoneNumberForm = ({
       optimisticResponse: {
         updateUser: {
           user: {
+            id: currentUser?.id,
             email: currentUser?.email,
             phoneNumber: null,
           },

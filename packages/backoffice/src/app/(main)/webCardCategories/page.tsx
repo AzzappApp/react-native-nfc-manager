@@ -1,10 +1,24 @@
+import { Box, TextField, Typography } from '@mui/material';
 import { asc, desc, eq, like, or, sql, and } from 'drizzle-orm';
-import { WebCardCategoryTable, db } from '@azzapp/data';
+import {
+  LocalizationMessageTable,
+  WebCardCategoryTable,
+  db,
+} from '@azzapp/data';
+import { DEFAULT_LOCALE, ENTITY_TARGET } from '@azzapp/i18n';
 import WebCardCategoriesList from './WebCardCategoriesList';
 import type { SQLWrapper } from 'drizzle-orm';
 
+export type WebCardCategoryItem = {
+  id: string;
+  label: string | null;
+  webCardKind: 'business' | 'personal';
+  order: number;
+  enabled: boolean;
+};
+
 const sortsColumns = {
-  labelKey: WebCardCategoryTable.labelKey,
+  label: LocalizationMessageTable.value,
   webCardKind: WebCardCategoryTable.webCardKind,
   order: WebCardCategoryTable.order,
   enabled: WebCardCategoryTable.enabled,
@@ -26,26 +40,46 @@ const getFilters = (filters: Filters): SQLWrapper[] => {
 const getSearch = (search: string | null) => {
   if (search) {
     return or(
-      like(WebCardCategoryTable.labelKey, `%${search}%`),
+      like(LocalizationMessageTable.value, `%${search}%`),
       like(WebCardCategoryTable.webCardKind, `%${search}%`),
       like(WebCardCategoryTable.order, `%${search}%`),
     );
   }
 };
 
+const getQuery = (search: string | null, filters: Filters) => {
+  const query = db
+    .select({
+      id: WebCardCategoryTable.id,
+      label: LocalizationMessageTable.value,
+      webCardKind: WebCardCategoryTable.webCardKind,
+      order: WebCardCategoryTable.order,
+      enabled: WebCardCategoryTable.enabled,
+    })
+    .from(WebCardCategoryTable)
+    .leftJoin(
+      LocalizationMessageTable,
+      and(
+        eq(WebCardCategoryTable.id, LocalizationMessageTable.key),
+        eq(LocalizationMessageTable.target, ENTITY_TARGET),
+        eq(LocalizationMessageTable.locale, DEFAULT_LOCALE),
+      ),
+    )
+    .orderBy(asc(WebCardCategoryTable.order))
+    .where(and(getSearch(search), ...getFilters(filters)))
+    .$dynamic();
+
+  return query;
+};
+
 const getCategories = (
   page: number,
-  sort: 'enabled' | 'labelKey' | 'order' | 'webCardKind',
+  sort: 'enabled' | 'label' | 'order' | 'webCardKind',
   order: 'asc' | 'desc',
   search: string | null,
   filters: Filters,
 ) => {
-  const query = db
-    .select()
-    .from(WebCardCategoryTable)
-    .orderBy(asc(WebCardCategoryTable.order))
-    .where(and(getSearch(search), ...getFilters(filters)))
-    .$dynamic();
+  const query = getQuery(search, filters);
 
   query
     .offset(page * PAGE_SIZE)
@@ -57,12 +91,11 @@ const getCategories = (
   return query;
 };
 
-const getCategoriesCount = async (search: string | null, filters: Filters) => {
+const getCount = async (search: string | null, filters: Filters) => {
+  const subQuery = getQuery(search, filters);
   const query = db
     .select({ count: sql`count(*)`.mapWith(Number) })
-    .from(WebCardCategoryTable)
-    .orderBy(asc(WebCardCategoryTable.order))
-    .where(and(getSearch(search), ...getFilters(filters)));
+    .from(subQuery.as('subQuery'));
 
   return query.then(rows => rows[0].count);
 };
@@ -98,19 +131,43 @@ const ProfileCategoriesPage = async ({ searchParams = {} }: Props) => {
     search,
     filters,
   );
-  const count = await getCategoriesCount(search, filters);
+  const count = await getCount(search, filters);
 
   return (
-    <WebCardCategoriesList
-      webCardCategories={webCardCategories}
-      count={count}
-      page={page}
-      pageSize={PAGE_SIZE}
-      sortField={sort}
-      sortOrder={order}
-      search={search}
-      filters={filters}
-    />
+    <Box
+      sx={{
+        display: 'flex',
+        flexDirection: 'column',
+        height: '100%',
+      }}
+    >
+      <Typography variant="h4" component="h1" sx={{ mb: 2 }}>
+        Categories
+      </Typography>
+      <TextField
+        id="note"
+        inputProps={{
+          readOnly: true,
+        }}
+        label="Note"
+        multiline
+        rows={3}
+        maxRows={4}
+        value={
+          'Categories of the WebCard are at the top level, it defines the kind of WebCard users will create.\nCategories (even disabled) are also used in the WebCard template list view in order to group different Templates types together.'
+        }
+      />
+      <WebCardCategoriesList
+        webCardCategories={webCardCategories}
+        count={count}
+        page={page}
+        pageSize={PAGE_SIZE}
+        sortField={sort}
+        sortOrder={order}
+        search={search}
+        filters={filters}
+      />
+    </Box>
   );
 };
 

@@ -20,8 +20,10 @@ import {
   useRelayEnvironment,
 } from 'react-relay';
 import { swap } from '@azzapp/shared/arrayHelpers';
+import { moduleCountRequiresSubscription } from '@azzapp/shared/subscriptionHelpers';
 import CardModuleRenderer from '#components/cardModules/CardModuleRenderer';
 import { useModulesData } from '#components/cardModules/ModuleData';
+import { useRouter } from '#components/NativeRouter';
 import { createId } from '#helpers/idHelpers';
 import WebCardBlockContainer from './WebCardBlockContainer';
 import type { WebCardScreenBody_webCard$key } from '#relayArtifacts/WebCardScreenBody_webCard.graphql';
@@ -108,6 +110,8 @@ const WebCardScreenBody = (
     cardModules,
     cardColors,
     cardStyle,
+    cardIsPublished,
+    isPremium,
   } = useFragment(
     graphql`
       fragment WebCardScreenBody_webCard on WebCard {
@@ -134,6 +138,8 @@ const WebCardScreenBody = (
           titleFontFamily
           titleFontSize
         }
+        cardIsPublished
+        isPremium
       }
     `,
     webCard,
@@ -191,6 +197,7 @@ const WebCardScreenBody = (
         deleteModules(webCardId: $webCardId, input: $input) {
           webCard {
             id
+            requiresSubscription
           }
         }
       }
@@ -206,6 +213,10 @@ const WebCardScreenBody = (
           createdModules {
             originalModuleId
             newModuleId
+          }
+          webCard {
+            id
+            requiresSubscription
           }
         }
       }
@@ -526,12 +537,19 @@ const WebCardScreenBody = (
     },
     [canDuplicate, commitDuplicateModule, intl, webCardId],
   );
-
+  const router = useRouter();
   const onDuplicateModule = useCallback(
     (moduleId: string) => {
+      const requireSubscription = moduleCountRequiresSubscription(
+        cardModules.length + 1,
+      );
+      if (cardIsPublished && requireSubscription && !isPremium) {
+        router.push({ route: 'USER_PAY_WALL' });
+        return;
+      }
       duplicateModules([moduleId]);
     },
-    [duplicateModules],
+    [cardIsPublished, cardModules.length, duplicateModules, isPremium, router],
   );
   // #endregion
 

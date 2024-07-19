@@ -1,12 +1,21 @@
 import { useMemo } from 'react';
 import { useIntl } from 'react-intl';
-import { StyleSheet, View, SafeAreaView, Linking, Modal } from 'react-native';
+import {
+  StyleSheet,
+  View,
+  SafeAreaView,
+  Linking,
+  useWindowDimensions,
+} from 'react-native';
 import { RESULTS } from 'react-native-permissions';
 
+import { colors } from '#theme';
 import { usePermissionContext } from '#helpers/PermissionContext';
+import BottomSheetModal from '#ui/BottomSheetModal';
 import Container from '#ui/Container';
 import Header from '#ui/Header';
 import IconButton from '#ui/IconButton';
+import Text from '#ui/Text';
 import PermissionScreen from './PermissionScreen';
 
 type CameraModalProps = {
@@ -21,7 +30,7 @@ type CameraModalProps = {
   /**
    * @see https://reactnative.dev/docs/modal#onrequestclose
    */
-  onRequestClose(): void;
+  onRequestClose?: () => void;
   /**
    * allow the popup to auto focus based on condition
    *
@@ -36,7 +45,7 @@ type CameraModalProps = {
  */
 const PermissionModal = ({
   permissionsFor,
-  onRequestClose,
+  onRequestClose = () => {},
   autoFocus = true,
 }: CameraModalProps) => {
   const intl = useIntl();
@@ -105,11 +114,15 @@ const PermissionModal = ({
     }
   };
 
+  const { height } = useWindowDimensions();
+
   return (
-    <Modal
+    <BottomSheetModal
+      lazy
+      showGestureIndicator={false}
+      height={height}
       visible={showPermissionModal && autoFocus}
       onRequestClose={onRequestClose}
-      animationType="slide"
     >
       <Container style={styles.container}>
         <SafeAreaView style={styles.root}>
@@ -166,19 +179,28 @@ const PermissionModal = ({
                   description:
                     'Camera authorization screen title for photos permission',
                 })}
-                content={intl.formatMessage({
-                  defaultMessage:
-                    'Access to the photos allows you to create publications.',
-                  description:
-                    'Camera authorization screen content for photos permission',
-                })}
+                content={intl.formatMessage(
+                  {
+                    defaultMessage:
+                      'Access to the media library allows you to create posts, Covers{azzappA}, and to add images to your WebCard{azzappA}.',
+                    description:
+                      'Camera authorization screen content for photos permission',
+                  },
+                  {
+                    azzappA: (
+                      <Text variant="azzapp" style={{ color: colors.red400 }}>
+                        a
+                      </Text>
+                    ),
+                  },
+                )}
                 onNext={onAllowsGallery}
               />
             </View>
           )}
         </SafeAreaView>
       </Container>
-    </Modal>
+    </BottomSheetModal>
   );
 };
 
@@ -189,7 +211,7 @@ const styles = StyleSheet.create({
   root: {
     flex: 1,
     marginBottom: 180,
-    marginTop: 30,
+    marginTop: 80,
   },
   content: {
     flex: 1,

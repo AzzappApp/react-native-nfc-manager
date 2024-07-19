@@ -14,11 +14,16 @@ import { isAdmin } from '@azzapp/shared/profileHelpers';
 import { colors } from '#theme';
 import { CancelHeaderButton } from '#components/commonsButtons';
 import CoverRenderer from '#components/CoverRenderer';
-import { useRouter } from '#components/NativeRouter';
-import ScreenModal from '#components/ScreenModal';
+import {
+  useRouter,
+  ScreenModal,
+  preventModalDismiss,
+} from '#components/NativeRouter';
+import PremiumIndicator from '#components/PremiumIndicator';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import relayScreen, { RelayScreenErrorBoundary } from '#helpers/relayScreen';
 import useHandleProfileActionError from '#hooks/useHandleProfileError';
+import { useMultiUserUpdate } from '#hooks/useMultiUserUpdate';
 import useToggle from '#hooks/useToggle';
 import Button from '#ui/Button';
 import Container from '#ui/Container';
@@ -33,7 +38,6 @@ import Text from '#ui/Text';
 import MultiUserScreenUserList from './MultiUserScreenUserList';
 import type { RelayScreenProps } from '#helpers/relayScreen';
 import type { MultiUserScreen_transferOwnershipMutation } from '#relayArtifacts/MultiUserScreen_transferOwnershipMutation.graphql';
-import type { MultiUserScreenMutation } from '#relayArtifacts/MultiUserScreenMutation.graphql';
 import type { MultiUserScreenQuery } from '#relayArtifacts/MultiUserScreenQuery.graphql';
 import type { MultiUserRoute } from '#routes';
 import type { ContactCard } from '@azzapp/shared/contactCardHelpers';
@@ -63,14 +67,14 @@ const multiUserScreenQuery = graphql`
           ...CoverRenderer_webCard
           nbProfiles
           ...MultiUserScreenUserList_webCard
+          subscription {
+            id
+            endAt
+            status
+          }
+          requiresSubscription
+          isPremium
         }
-      }
-    }
-    currentUser {
-      userSubscription {
-        availableSeats
-        totalSeats
-        endAt
       }
     }
   }
@@ -79,17 +83,13 @@ const multiUserScreenQuery = graphql`
 const MultiUserScreen = ({
   preloadedQuery,
 }: RelayScreenProps<MultiUserRoute, MultiUserScreenQuery>) => {
-  const { node, currentUser } = usePreloadedQuery(
-    multiUserScreenQuery,
-    preloadedQuery,
-  );
+  const { node } = usePreloadedQuery(multiUserScreenQuery, preloadedQuery);
   const profile = node?.profile;
 
   const intl = useIntl();
   const router = useRouter();
 
   const styles = useStyleSheet(styleSheet);
-  const isMultiUserSubscription = currentUser?.userSubscription != null;
 
   useEffect(() => {
     // users that loose their admin role should not be able to access this screen
@@ -98,74 +98,43 @@ const MultiUserScreen = ({
     }
   }, [profile?.profileRole, router]);
 
-  const [commit] = useMutation<MultiUserScreenMutation>(graphql`
-    mutation MultiUserScreenMutation(
-      $webCardId: ID!
-      $input: UpdateMultiUserInput!
-    ) {
-      updateMultiUser(webCardId: $webCardId, input: $input) {
-        webCard {
-          id
-          isMultiUser
-        }
-      }
-    }
-  `);
+  const [confirmDeleteMultiUser, setConfirmDeleteMultiUser] = useState(false);
 
-  const [confirmDeletMultiUser, setConfirmDeleteMultiUser] = useState(false);
+  const onCompleted = useCallback(() => {
+    setConfirmDeleteMultiUser(false);
+  }, []);
 
-  const setAllowMultiUser = useCallback(
-    (value: boolean) => {
-      if (profile?.webCard) {
-        commit({
-          variables: {
-            webCardId: profile?.webCard?.id,
-            input: { isMultiUser: value },
-          },
-          optimisticResponse: {
-            updateMultiUser: {
-              webCard: {
-                id: profile?.webCard?.id,
-                isMultiUser: value,
-              },
-            },
-          },
-          updater: store => {
-            if (!value && profile?.webCard?.id) {
-              const webCard = store.get(profile?.webCard?.id);
-              if (webCard) {
-                const profiles = webCard.getLinkedRecords('profiles');
-                webCard.setLinkedRecords(
-                  profiles?.filter(p => p.getDataID() === profile?.id) ?? [],
-                  'profiles',
-                );
-              }
-            }
-          },
-          onCompleted: () => {
-            setConfirmDeleteMultiUser(false);
-          },
-          onError: () => {
-            Toast.show({
-              type: 'error',
-              text1: intl.formatMessage({
-                defaultMessage:
-                  'Error while updating your multi user settings.',
-                description:
-                  'Error toast message when updating multi user fails',
-              }),
-            });
-          },
-        });
-      }
-    },
-    [commit, intl, profile?.id, profile?.webCard],
-  );
+  const setAllowMultiUser = useMultiUserUpdate(onCompleted);
 
   const toggleMultiUser = useCallback(
     (value: boolean) => {
-      if (!isMultiUserSubscription) {
-        router.push({ route: 'USER_PAY_WALL' });
+      if (
+        !profile?.webCard.isPremium &&
+        profile?.webCard.subscription &&
+        (profile?.webCard.subscription?.status !== 'active' ||
+          profile?.webCard.subscription?.endAt < new Date())
+      ) {
+        Toast.show({
+          type: 'error',
+          text1: intl.formatMessage({
+            defaultMessage:
+              'Please log in to the WebApp to manage your azzapp+ subscription',
+            description:
+              'Error message when trying to activate multi-user on mobile when it is configured on the WebApp.',
+          }),
+          props: {
+            showClose: true,
+          },
+        });
+        return;
+      }
+      if (!profile?.webCard.isPremium && value) {
+        router.push({
+          route: 'USER_PAY_WALL',
+          params: {
+            activateFeature: 'MULTI_USER',
+          },
+        });
         return;
       }
       if (value) {
@@ -174,7 +143,13 @@ const MultiUserScreen = ({
         setConfirmDeleteMultiUser(true);
       }
     },
-    [isMultiUserSubscription, router, setAllowMultiUser],
+    [
+      profile?.webCard.isPremium,
+      profile?.webCard.subscription,
+      intl,
+      router,
+      setAllowMultiUser,
+    ],
   );
 
   //#region Transfert ownership
@@ -251,7 +226,7 @@ const MultiUserScreen = ({
             />
           ) : (
             <FormattedMessage
-              defaultMessage="Allow your team members to have their own personal Contact Cards{azzappA}, connected to the same company or organisation’s WebCard{azzappA}."
+              defaultMessage="Enhance teamwork: provide each member with a personalized ContactCard{azzappA}, seamlessly connected to the shared WebCard{azzappA}, fostering individual identity within a cohesive system."
               description="Description for MultiUserScreen"
               values={{
                 azzappA: <Text variant="azzapp">a</Text>,
@@ -275,12 +250,15 @@ const MultiUserScreen = ({
         </Text>
         {profile?.profileRole === 'owner' && !transferOwnerMode && (
           <View style={styles.switchSection}>
-            <Text variant="large">
-              <FormattedMessage
-                defaultMessage="Multi User"
-                description="Title for switch section in MultiUserScreen"
-              />
-            </Text>
+            <View style={styles.proContainer}>
+              <Text variant="large">
+                <FormattedMessage
+                  defaultMessage="Multi User"
+                  description="Title for switch section in MultiUserScreen"
+                />
+              </Text>
+              <PremiumIndicator isRequired={!profile?.webCard.isPremium} />
+            </View>
             <Switch
               variant="large"
               value={profile?.webCard.isMultiUser}
@@ -293,9 +271,11 @@ const MultiUserScreen = ({
   }, [
     profile?.profileRole,
     profile?.webCard.isMultiUser,
+    profile?.webCard.isPremium,
     profile?.webCard?.nbProfiles,
     styles.description,
     styles.price,
+    styles.proContainer,
     styles.sharedIcon,
     styles.switchSection,
     toggleMultiUser,
@@ -406,7 +386,11 @@ const MultiUserScreen = ({
         </View>
       </SafeAreaView>
 
-      <ScreenModal visible={confirmDeletMultiUser}>
+      <ScreenModal
+        visible={confirmDeleteMultiUser}
+        gestureEnabled={false}
+        onRequestDismiss={preventModalDismiss}
+      >
         <Container style={styles.confirmModalContainer}>
           <View style={styles.confirmModalContentContainer}>
             <Icon icon="warning" style={styles.confirmModalIcon} />
@@ -419,7 +403,7 @@ const MultiUserScreen = ({
               </Text>
               <Text variant="medium">
                 <FormattedMessage
-                  defaultMessage="By deactivating multi user, you will delete the Contact Cards{azzappA} of your team members."
+                  defaultMessage="If you deactivate the Multi-User, other collaborators will no longer be able to access this WebCard{azzappA} or their linked ContactCards{azzappA}. This action is irreversible."
                   description="Description for confirm delete multi user modal"
                   values={{
                     azzappA: <Text variant="azzapp">a</Text>,
@@ -496,6 +480,12 @@ const styleSheet = createStyleSheet(appearance => ({
     maxWidth: 295,
     marginTop: 10,
     alignItems: 'center',
+  },
+  proContainer: {
+    display: 'flex',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 }));
 

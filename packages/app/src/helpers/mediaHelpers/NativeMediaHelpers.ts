@@ -15,7 +15,8 @@ if (!AZPMediaHelpers) {
  */
 export const getVideoSize: (
   uri: string,
-) => Promise<{ width: number; height: number }> = AZPMediaHelpers.getVideoSize;
+) => Promise<{ width: number; height: number; rotation: number }> =
+  AZPMediaHelpers.getVideoSize;
 
 /**
  * Returns the real uri of a PHAsset.

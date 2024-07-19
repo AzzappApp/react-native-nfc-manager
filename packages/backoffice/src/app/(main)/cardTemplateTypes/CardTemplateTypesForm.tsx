@@ -15,31 +15,33 @@ import {
 } from '@mui/material';
 import { omit } from 'lodash';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useForm } from '#helpers/formHelpers';
 import { saveCardTemplateType } from './cardTemplateTypesActions';
 import type { CardTemplateTypeErrors } from './cardTemplateTypeSchema';
-import type { CardTemplateType, Label, WebCardCategory } from '@azzapp/data';
+import type {
+  CardTemplateType,
+  LocalizationMessage,
+  WebCardCategory,
+} from '@azzapp/data';
 
 type CardTemplateTypeFormProps = {
   cardTemplateType?: CardTemplateType | null;
   webCardCategories: WebCardCategory[];
   saved?: boolean;
-  label?: Label | null;
-  webCardCategoriesLabels: Label[];
+  labels: LocalizationMessage[];
 };
 
-type FormValue = CardTemplateType &
-  Label & {
-    webCardCategory: WebCardCategory;
-  };
+type FormValue = CardTemplateType & {
+  label: string;
+  webCardCategory: WebCardCategory;
+};
 
 const CardTemplateTypeForm = ({
   cardTemplateType,
   saved = false,
   webCardCategories,
-  label,
-  webCardCategoriesLabels,
+  labels,
 }: CardTemplateTypeFormProps) => {
   const isCreation = !cardTemplateType;
   const [saving, setIsSaving] = useState(false);
@@ -49,11 +51,18 @@ const CardTemplateTypeForm = ({
     null,
   );
 
+  const label = useMemo(
+    () =>
+      cardTemplateType
+        ? labels.find(item => item.key === cardTemplateType.id)?.value
+        : undefined,
+    [cardTemplateType, labels],
+  );
+
   const { data, fieldProps } = useForm<FormValue>(
     () => ({
       ...cardTemplateType,
-      labelKey: label?.labelKey || '',
-      baseLabelValue: label?.baseLabelValue || '',
+      label: label || '',
       enabled: cardTemplateType?.enabled || false,
       webCardCategory: cardTemplateType?.webCardCategoryId
         ? webCardCategories?.find(item => {
@@ -69,22 +78,19 @@ const CardTemplateTypeForm = ({
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsSaving(true);
-    try {
-      const result = await saveCardTemplateType(data as FormValue);
+    const result = await saveCardTemplateType(data as FormValue);
+    console.log(result);
 
-      if (result.success) {
-        setFormErrors(null);
-        if (isCreation) {
-          router.replace(`/cardTemplateTypes/${result.id}?saved=true`);
-        } else {
-          setDisplaySaveSuccess(true);
-        }
-      } else {
-        setFormErrors(result.formErrors);
-      }
-    } catch (error) {
+    if (result.success) {
       setFormErrors(null);
-      setError(error);
+      if (isCreation) {
+        router.replace(`/cardTemplateTypes/${result.id}?saved=true`);
+      } else {
+        setDisplaySaveSuccess(true);
+      }
+    } else if (!result.success) {
+      setFormErrors(result.formErrors || null);
+      setError(result.message);
     }
     setIsSaving(false);
   };
@@ -104,7 +110,7 @@ const CardTemplateTypeForm = ({
       </Breadcrumbs>
       <Typography variant="h4" component="h1" sx={{ mb: 4 }}>
         {cardTemplateType
-          ? `Card Template Type ${label?.baseLabelValue}`
+          ? `Card Template Type ${label}`
           : 'New Card Template Type'}
       </Typography>
 
@@ -140,19 +146,12 @@ const CardTemplateTypeForm = ({
 
         <Box display="flex" gap={2}>
           <TextField
-            name="labelKey"
-            label="Label Key"
-            disabled={saving || !isCreation}
+            name="label"
+            label="Label (en-US)"
+            disabled={saving}
             required
             sx={{ width: 300 }}
-            {...fieldProps('labelKey')}
-          />
-          <TextField
-            name="baseLabelValue"
-            label="Label default value"
-            required
-            sx={{ width: 300 }}
-            {...fieldProps('baseLabelValue')}
+            {...fieldProps('label')}
           />
         </Box>
         <Autocomplete
@@ -161,11 +160,8 @@ const CardTemplateTypeForm = ({
           id="profile-categories"
           options={webCardCategories}
           getOptionLabel={option => {
-            const label = webCardCategoriesLabels.find(
-              item => item.labelKey === option.labelKey,
-            );
-
-            return label?.baseLabelValue ?? option.labelKey;
+            const label = labels.find(item => item.key === option.id);
+            return label?.value ?? option.id;
           }}
           value={fieldProps('webCardCategory').value as WebCardCategory}
           onChange={(_, value) => {
@@ -179,10 +175,10 @@ const CardTemplateTypeForm = ({
             />
           )}
           renderOption={(props, option) => {
-            const label = option.labelKey;
+            const label = labels.find(item => item.key === option.id);
             return (
               <li {...props} key={option.id}>
-                {label}
+                {label?.value ?? option.id}
               </li>
             );
           }}
@@ -198,7 +194,7 @@ const CardTemplateTypeForm = ({
         </Button>
         {error && (
           <Typography variant="body1" color="error">
-            Something went wrong {error?.message}
+            {error}
           </Typography>
         )}
       </Box>

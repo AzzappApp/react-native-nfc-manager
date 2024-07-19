@@ -1,6 +1,7 @@
 import { useCallback } from 'react';
 import { useIntl } from 'react-intl';
 import { View, StyleSheet } from 'react-native';
+import Toast from 'react-native-toast-message';
 import { colors } from '#theme';
 import Button from '#ui/Button';
 import Text from '#ui/Text';
@@ -13,6 +14,7 @@ const WebCardScreenEditModeFooter = ({
   setLoadTemplate,
 }: WebCardScreenEditModeFooter) => {
   const onPress = useCallback(() => {
+    Toast.hide();
     setLoadTemplate(true);
   }, [setLoadTemplate]);
   const intl = useIntl();
@@ -26,7 +28,11 @@ const WebCardScreenEditModeFooter = ({
             description: 'ProfileScreenBody description to load a new template',
           },
           {
-            azzappA: <Text variant="azzapp">a</Text>,
+            azzappA: (
+              <Text variant="azzapp" style={styles.azzapp}>
+                a
+              </Text>
+            ),
           },
         )}
       </Text>
@@ -64,6 +70,9 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     color: colors.grey700,
     marginHorizontal: 40,
+  },
+  azzapp: {
+    color: colors.grey700,
   },
 });
 

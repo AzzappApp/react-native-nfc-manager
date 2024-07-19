@@ -17,7 +17,10 @@ import {
   isInternationalPhoneNumber,
 } from '@azzapp/shared/stringHelpers';
 import { handleSignInAuthMethod } from '#helpers/auth';
-import { twilioVerificationService } from '#helpers/twilioHelpers';
+import {
+  findTwilioLocale,
+  twilioVerificationService,
+} from '#helpers/twilioHelpers';
 import type { User } from '@azzapp/data';
 
 const SignupSchema = z
@@ -125,7 +128,7 @@ export const POST = withAxiom(async (req: Request) => {
       {
         to: issuer,
         channel: email ? 'email' : 'sms',
-        locale,
+        locale: locale ? findTwilioLocale(locale) : undefined,
       },
     );
 

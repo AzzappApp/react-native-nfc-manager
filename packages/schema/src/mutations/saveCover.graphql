@@ -7,93 +7,54 @@ extend type Mutation {
 
 input SaveCoverInput {
   """
-  The title of the card
-  """
-  title: String
-  """
-  The style of the title text
-  """
-  titleStyle: CardCoverTextStyleInput
-  """
-  The subtitle of the card
-  """
-  subTitle: String
-  """
-  The style of the subtitle text
-  """
-  subTitleStyle: CardCoverTextStyleInput
-  """
-  The position of the text in the card cover
-  """
-  textOrientation: CardCoverTextOrientation
-  """
-  The position of the text in the card cover
-  """
-  textPosition: CardCoverTextPosition 
-  """
-  The animation of the card cover
-  """
-  textAnimation: String
-  """
   The media of the card cover generated from the source media
   """
-  mediaId: ID
+  mediaId: ID!
   """
-  The source media of the cover, used to generate the media
+  The texts contained in the card cover
   """
-  sourceMediaId: ID
+  texts: [String!]!
   """
-  The mask media of the cover, used to generate the media
+  background color of the card cover
   """
-  maskMediaId: ID
+  backgroundColor: String!
   """
-  The filter applied to the source media to generate the media
+  The colors of the card cover
   """
-  mediaFilter: String
+  cardColors: CardColorsInput!
   """
-  The transform applied to the source media to generate the media
+  The links of the card cover
   """
-  mediaParameters: MediaParametersInput
-  """
-  The animation of the media
-  """
-  mediaAnimation: String
-  """
-  The background image of the card cover
-  """
-  backgroundId: ID
-  """
-  The background color of the card cover
-  """
-  backgroundColor: String
-  """
-  A color used to tint the background image
-  """
-  backgroundPatternColor: String
-  """
-  The foreground image of the card cover
-  """
-  foregroundId: ID
-  """
-  A color used to tint the foreground image
-  """
-  foregroundColor: String
-  """
-  if true, the card cover media use selfie segmentation
-  """
-  segmented: Boolean
-  """
-  updated user card colors
-  """
-  cardColors: SaveCardColorsInput
+  dynamicLinks: DynamicLinksInput
 }
 
-input CardCoverTextStyleInput {
-  color: String!
-  fontSize: Int!
-  fontFamily: String!
+input CardColorsInput {
+  primary: String!
+  light: String!
+  dark: String!
+  otherColors: [String!]!
 }
 
 type SaveCoverPayload {
   webCard: WebCard!
+}
+
+input DynamicLinksInput {
+  links: [LinkInput!]!
+  color: String!
+  size: Int!
+  position: CoordinateInput!
+  rotation: Float!
+  shadow: Boolean!
+}
+
+input LinkInput {
+  link: String!
+  position: Int!
+  socialId: String!
+}
+
+input CoordinateInput {
+  x: Float!
+  y: Float!
 }

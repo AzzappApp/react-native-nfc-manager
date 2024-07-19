@@ -1,4 +1,4 @@
-import { ADMIN } from '#roles';
+import { ADMIN, TRANSLATOR } from '#roles';
 
 export type SubSection = {
   id: string;
@@ -14,12 +14,18 @@ export type Section = {
   subSections: SubSection[];
 };
 
-const backOfficeSections: Section[] = [
+const backOfficeSections: Array<Section | SubSection> = [
   {
     id: 'userActivity',
     text: 'Users activity',
     subSections: [
       { id: 'account', text: 'Account', href: '/users', roles: [ADMIN] },
+      {
+        id: 'subscriptions',
+        text: 'Subscriptions',
+        href: '/subscriptions',
+        roles: [ADMIN],
+      },
       {
         id: 'moderations',
         text: 'Moderation',
@@ -48,6 +54,12 @@ const backOfficeSections: Section[] = [
         id: 'companyActivities',
         text: 'Activities',
         href: '/companyActivities',
+        roles: [ADMIN],
+      },
+      {
+        id: 'companyActivitiesTypes',
+        text: 'Activities Types',
+        href: '/companyActivitiesTypes',
         roles: [ADMIN],
       },
     ],
@@ -94,15 +106,9 @@ const backOfficeSections: Section[] = [
         roles: [ADMIN],
       },
       {
-        id: 'coverFilters',
-        text: 'Cover filters',
-        href: '/coverFilters',
-        roles: [ADMIN],
-      },
-      {
-        id: 'suggestedMedias',
-        text: 'Cover suggestions',
-        href: '/suggestedMedias',
+        id: 'coverTemplateFilters',
+        text: 'Cover template filters',
+        href: '/coverTemplateFilters',
         roles: [ADMIN],
       },
     ],
@@ -124,12 +130,18 @@ const backOfficeSections: Section[] = [
         roles: [ADMIN],
       },
       {
-        id: 'staticMedias',
-        text: 'Sections backgrounds',
-        href: '/staticMedias',
+        id: 'moduleBackgrounds',
+        text: 'Modules backgrounds',
+        href: '/moduleBackgrounds',
         roles: [ADMIN],
       },
     ],
+  },
+  {
+    id: 'translations',
+    text: 'Translations',
+    href: '/translations',
+    roles: [ADMIN, TRANSLATOR],
   },
 ];
 

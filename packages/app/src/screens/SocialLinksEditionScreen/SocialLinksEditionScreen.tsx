@@ -1,16 +1,15 @@
 import { omit } from 'lodash';
 import { useCallback, useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
-import { Platform, StyleSheet } from 'react-native';
+import { StyleSheet } from 'react-native';
 import { KeyboardAvoidingView } from 'react-native-keyboard-controller';
 import { useSharedValue } from 'react-native-reanimated';
 import { graphql, useFragment, useMutation } from 'react-relay';
 import * as z from 'zod';
 import { SOCIAL_LINKS_DEFAULT_VALUES } from '@azzapp/shared/cardModuleHelpers';
 import { isValidUrl } from '@azzapp/shared/stringHelpers';
-import { addingModuleRequireSubscription } from '@azzapp/shared/subscriptionHelpers';
+import { changeModuleRequireSubscription } from '@azzapp/shared/subscriptionHelpers';
 import { useRouter } from '#components/NativeRouter';
-import { useIsSubscriber } from '#helpers/SubscriptionContext';
 import useEditorLayout from '#hooks/useEditorLayout';
 import useHandleProfileActionError from '#hooks/useHandleProfileError';
 import useModuleDataEditor from '#hooks/useModuleDataEditor';
@@ -112,6 +111,7 @@ const SocialLinksEditionScreen = ({
         }
         webCard {
           id
+          isPremium
           cardIsPublished
           cardColors {
             primary
@@ -176,6 +176,7 @@ const SocialLinksEditionScreen = ({
         saveSocialLinksModule(webCardId: $webCardId, input: $input) {
           webCard {
             id
+            requiresSubscription
             cardModules {
               kind
               visible
@@ -198,7 +199,6 @@ const SocialLinksEditionScreen = ({
 
   const router = useRouter();
   const intl = useIntl();
-  const isSubscriber = useIsSubscriber();
 
   const cardModulesCount =
     profile.webCard.cardModules.length + (socialLinks ? 0 : 1);
@@ -258,7 +258,7 @@ const SocialLinksEditionScreen = ({
       return;
     }
 
-    const requireSubscription = addingModuleRequireSubscription(
+    const requireSubscription = changeModuleRequireSubscription(
       'socialLinks',
       cardModulesCount,
     );
@@ -266,7 +266,7 @@ const SocialLinksEditionScreen = ({
     if (
       profile.webCard.cardIsPublished &&
       requireSubscription &&
-      !isSubscriber
+      !profile.webCard.isPremium
     ) {
       router.push({ route: 'USER_PAY_WALL' });
       return;
@@ -300,8 +300,8 @@ const SocialLinksEditionScreen = ({
     canSave,
     cardModulesCount,
     profile.webCard.cardIsPublished,
+    profile.webCard.isPremium,
     profile.webCard.id,
-    isSubscriber,
     value,
     iconSize.value,
     borderWidth.value,
@@ -323,13 +323,8 @@ const SocialLinksEditionScreen = ({
 
   // #endregion
 
-  const {
-    bottomPanelHeight,
-    topPanelHeight,
-    insetBottom,
-    insetTop,
-    windowWidth,
-  } = useEditorLayout({ bottomPanelMinHeight: 400 });
+  const { bottomPanelHeight, insetBottom, insetTop, windowWidth } =
+    useEditorLayout({ bottomPanelMinHeight: 400 });
 
   return (
     <Container style={[styles.root, { paddingTop: insetTop }]}>
@@ -366,13 +361,13 @@ const SocialLinksEditionScreen = ({
         }
       />
       <KeyboardAvoidingView
-        style={{ flex: 1 }}
-        behavior="position"
+        style={{ flex: 1, justifyContent: 'flex-end' }}
+        behavior="padding"
         keyboardVerticalOffset={-insetBottom - BOTTOM_MENU_HEIGHT}
       >
         <SocialLinksPreview
           style={{
-            height: topPanelHeight - (Platform.OS === 'android' ? 80 : 20),
+            flex: 1,
             marginVertical: 10,
           }}
           colorPalette={profile.webCard.cardColors}
@@ -402,7 +397,6 @@ const SocialLinksEditionScreen = ({
                     flex: 1,
                     marginBottom: insetBottom + BOTTOM_MENU_HEIGHT,
                   }}
-                  bottomSheetHeight={bottomPanelHeight}
                 />
               ),
             },

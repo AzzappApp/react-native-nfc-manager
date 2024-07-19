@@ -1,5 +1,4 @@
-import _ from 'lodash';
-import { useMemo } from 'react';
+import { memo, useMemo } from 'react';
 import {
   interpolateColor,
   useDerivedValue,
@@ -8,18 +7,14 @@ import {
 import { graphql, useFragment } from 'react-relay';
 import { colors } from '#theme';
 import WebCardBackground from '#components/WebCardBackground';
+import { useHomeScreenContext } from './HomeScreenContext';
 import type { HomeBackground_user$key } from '#relayArtifacts/HomeBackground_user.graphql';
-import type { SharedValue } from 'react-native-reanimated';
 
 type HomeBackgroundProps = {
   user: HomeBackground_user$key;
-  currentProfileIndexSharedValue: SharedValue<number>;
 };
 
-const HomeBackground = ({
-  user: userKey,
-  currentProfileIndexSharedValue,
-}: HomeBackgroundProps) => {
+const HomeBackground = ({ user: userKey }: HomeBackgroundProps) => {
   const user = useFragment(
     graphql`
       fragment HomeBackground_user on User {
@@ -37,24 +32,28 @@ const HomeBackground = ({
     userKey,
   );
 
-  const inputRange = _.range(0, user.profiles?.length);
+  const { currentIndexSharedValue, inputRange } = useHomeScreenContext();
 
   const primaryColors = useMemo(
-    () =>
-      (user.profiles ?? []).map(({ webCard }) => {
+    () => [
+      colors.black,
+      ...(user.profiles ?? []).map(({ webCard }) => {
         if (webCard.cardColors?.primary) {
           return webCard.cardColors?.primary;
         }
         return '#45444b';
       }),
+    ],
     [user],
   );
 
   const darkColors = useMemo(
-    () =>
-      (user.profiles ?? []).map(
+    () => [
+      colors.black,
+      ...(user.profiles ?? []).map(
         ({ webCard }) => webCard.cardColors?.dark ?? colors.black,
       ),
+    ],
     [user],
   );
 
@@ -63,15 +62,15 @@ const HomeBackground = ({
       return [
         convertToRGBA(
           interpolateColor(
-            currentProfileIndexSharedValue.value,
-            inputRange,
+            currentIndexSharedValue.value,
+            inputRange.value,
             primaryColors,
           ),
         ),
         convertToRGBA(
           interpolateColor(
-            currentProfileIndexSharedValue.value,
-            inputRange,
+            currentIndexSharedValue.value,
+            inputRange.value,
             darkColors,
           ),
         ),
@@ -81,9 +80,9 @@ const HomeBackground = ({
       return [primaryColors[0], darkColors[0]];
     }
     return ['#45444b', '#45444b'];
-  }, [inputRange, primaryColors, darkColors]);
+  });
 
   return <WebCardBackground colors={skiaGradient} />;
 };
 
-export default HomeBackground;
+export default memo(HomeBackground);

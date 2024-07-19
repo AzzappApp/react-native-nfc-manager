@@ -1,9 +1,13 @@
 import { parsePhoneNumber } from 'libphonenumber-js';
-import { FormattedMessage } from 'react-intl';
-import { View } from 'react-native';
-import { graphql, usePreloadedQuery } from 'react-relay';
+import { useCallback } from 'react';
+import { FormattedMessage, useIntl } from 'react-intl';
+import { Alert, View } from 'react-native';
+import Toast from 'react-native-toast-message';
+import { graphql, useMutation, usePreloadedQuery } from 'react-relay';
+import ERRORS from '@azzapp/shared/errors';
 import { colors } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
+import { dispatchGlobalEvent } from '#helpers/globalEvents';
 import relayScreen from '#helpers/relayScreen';
 import useToggle from '#hooks/useToggle';
 import Container from '#ui/Container';
@@ -23,8 +27,13 @@ import type { AccountDetailsRoute } from '#routes';
 const accountDetailsScreenQuery = graphql`
   query AccountDetailsScreenQuery {
     currentUser {
+      id
       email
       phoneNumber
+      isPremium
+      userSubscription {
+        totalSeats
+      }
     }
   }
 `;
@@ -45,6 +54,79 @@ const AccountDetailsScreen = ({
   const [passwordVisible, togglePasswordVisible] = useToggle(false);
 
   const styles = useStyleSheet(styleSheet);
+
+  const intl = useIntl();
+
+  const [commit, isDeleting] = useMutation(graphql`
+    mutation AccountDetailsScreenDeleteUserMutation {
+      deleteUser {
+        id
+      }
+    }
+  `);
+
+  const deleteMyAccount = useCallback(() => {
+    Alert.alert(
+      intl.formatMessage({
+        defaultMessage: 'Delete account',
+        description: 'Title of the alert to delete the user account',
+      }),
+      intl.formatMessage({
+        defaultMessage:
+          'Are you sure you want to delete your account? This action is irreversible.',
+        description: 'Message of the alert to delete the user account',
+      }),
+      [
+        {
+          text: intl.formatMessage({
+            defaultMessage: 'Cancel',
+            description:
+              'Cancel button in the alert to delete the user account',
+          }),
+          style: 'cancel',
+          isPreferred: true,
+        },
+        {
+          text: intl.formatMessage({
+            defaultMessage: 'Delete',
+            description:
+              'Delete button in the alert to delete the user account',
+          }),
+          style: 'destructive',
+          onPress: () => {
+            commit({
+              variables: {},
+              onCompleted: () => {
+                void dispatchGlobalEvent({ type: 'SIGN_OUT' });
+              },
+              onError: (e: Error) => {
+                if (e.message === ERRORS.SUBSCRIPTION_IS_ACTIVE) {
+                  Toast.show({
+                    type: 'error',
+                    text1: intl.formatMessage({
+                      defaultMessage:
+                        "You have an active subscription on this account. You can't delete it.",
+                      description:
+                        'Error toast message when deleting an account with an active subscription',
+                    }),
+                  });
+                } else {
+                  Toast.show({
+                    type: 'error',
+                    text1: intl.formatMessage({
+                      defaultMessage:
+                        "Error, couldn't delete your account. Please try again.",
+                      description: 'Error toast message when deleting account',
+                    }),
+                  });
+                }
+              },
+            });
+          },
+        },
+      ],
+    );
+  }, [commit, intl]);
 
   if (!currentUser) {
     return null;
@@ -142,7 +224,52 @@ const AccountDetailsScreen = ({
             </Text>
             <Text variant="medium">••••••••••</Text>
           </PressableNative>
+          <View style={styles.sectionField}>
+            <Text variant="smallbold">
+              <FormattedMessage
+                defaultMessage="Plan"
+                description="Plan field in the account details screen"
+              />
+            </Text>
+            <Text variant="medium">
+              {currentUser?.isPremium &&
+                currentUser?.userSubscription?.totalSeats && (
+                  <FormattedMessage
+                    defaultMessage="azzapp+ {seats} users"
+                    description="Plan value in the account details screen with seats"
+                    values={{
+                      seats: currentUser?.userSubscription?.totalSeats,
+                    }}
+                  />
+                )}
+              {currentUser?.isPremium &&
+                !currentUser?.userSubscription?.totalSeats && (
+                  <FormattedMessage
+                    defaultMessage="azzapp+"
+                    description="Plan value in the account details screen with no seats"
+                  />
+                )}
+              {!currentUser?.isPremium && (
+                <FormattedMessage
+                  defaultMessage="Free"
+                  description="Plan value in the account details screen for Free"
+                />
+              )}
+            </Text>
+          </View>
         </View>
+        <PressableNative
+          onPress={deleteMyAccount}
+          style={styles.removeAccountButton}
+          disabled={isDeleting}
+        >
+          <Text variant="button" style={styles.removeAccountText}>
+            <FormattedMessage
+              defaultMessage="Delete my account"
+              description="Button to delete the user account"
+            />
+          </Text>
+        </PressableNative>
         <AccountDetailsEmailForm
           currentUser={currentUser}
           visible={emailsFormVisible}
@@ -186,6 +313,16 @@ const styleSheet = createStyleSheet(appearance => ({
   },
   icon: {
     textTransform: 'lowercase',
+  },
+  removeAccountText: {
+    color: colors.red400,
+    textAlign: 'center',
+  },
+  removeAccountButton: {
+    height: 32,
+    paddingHorizontal: 20,
+    justifyContent: 'center',
+    marginTop: 'auto',
   },
 }));
 

@@ -8,7 +8,6 @@ import {
   getWebCardById,
   getWebCardsPostsWithMedias,
 } from '@azzapp/data';
-import { decodeMediaId } from '@azzapp/shared/imagesHelpers';
 import { getMetaData } from '#helpers/seo';
 import CloudinaryImage from '#ui/CloudinaryImage';
 import CloudinaryVideoPlayer from '#ui/CloudinaryVideoPlayer';
@@ -46,8 +45,8 @@ const PostPage = async (props: PostPageProps) => {
     ? await getPostCommentsWithWebCard(post.id, 5)
     : [];
 
-  const [media] = author?.coverData?.mediaId
-    ? await getMediasByIds([author.coverData.mediaId])
+  const [media] = author?.coverMediaId
+    ? await getMediasByIds([author.coverMediaId])
     : [];
 
   if (post && author && author.userName !== userName) {
@@ -81,6 +80,7 @@ const PostPage = async (props: PostPageProps) => {
                     style={{
                       objectFit: 'contain',
                       width: '100%',
+                      maxHeight: '100%',
                     }}
                   />
                 </>
@@ -130,7 +130,7 @@ export async function generateMetadata({
 
   if (post?.medias && post.medias.length > 0) {
     metaData.ogImage = getCldOgImageUrl({
-      src: decodeMediaId(post.medias[0].id),
+      src: post.medias[0].id,
     });
   }
   return getMetaData(metaData);

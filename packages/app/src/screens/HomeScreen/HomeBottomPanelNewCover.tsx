@@ -1,8 +1,9 @@
-import { memo } from 'react';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 import { StyleSheet } from 'react-native';
+import Toast from 'react-native-toast-message';
+import { isAdmin } from '@azzapp/shared/profileHelpers';
 import { colors } from '#theme';
-import Link from '#components/Link';
+import { useRouter } from '#components/NativeRouter';
 import Button from '#ui/Button';
 import Icon from '#ui/Icon';
 import Text from '#ui/Text';
@@ -14,6 +15,9 @@ const HomeBottomPanelNewCover = ({
 }: {
   profile: ArrayItemType<HomeBottomPanelMessage_profiles$data>;
 }) => {
+  const intl = useIntl();
+  const router = useRouter();
+
   return (
     <>
       <Icon icon="warning" style={styles.warningIcon} />
@@ -43,36 +47,47 @@ const HomeBottomPanelNewCover = ({
           }}
         />
       </Text>
-      <Link
-        route="NEW_WEBCARD"
-        params={
-          profile?.webCard.id ? { webCardId: profile?.webCard.id } : undefined
-        }
-      >
-        <Button
-          variant="secondary"
-          appearance="dark"
-          label={
-            <FormattedMessage
-              defaultMessage="Create your WebCard{azzappA} cover"
-              description="Home Screen - Missing cover button"
-              values={{
-                azzappA: (
-                  <Text style={styles.icon} variant="azzapp">
-                    a
-                  </Text>
-                ),
-              }}
-            />
+
+      <Button
+        variant="secondary"
+        appearance="dark"
+        onPress={() => {
+          if (isAdmin(profile.profileRole)) {
+            router.push({
+              route: 'COVER_TEMPLATE_SELECTION',
+              params: { fromHome: true },
+            });
+          } else {
+            Toast.show({
+              type: 'error',
+              text1: intl.formatMessage({
+                defaultMessage: 'Your role does not permit this action',
+                description:
+                  'Error message when trying to create a cover without the right permissions',
+              }),
+            });
           }
-          style={styles.button}
-        />
-      </Link>
+        }}
+        label={
+          <FormattedMessage
+            defaultMessage="Create your WebCard{azzappA} cover{azzappA}"
+            description="Home Screen - Missing cover button"
+            values={{
+              azzappA: (
+                <Text style={styles.icon} variant="azzapp">
+                  a
+                </Text>
+              ),
+            }}
+          />
+        }
+        style={styles.button}
+      />
     </>
   );
 };
 
-export default memo(HomeBottomPanelNewCover);
+export default HomeBottomPanelNewCover;
 
 const styles = StyleSheet.create({
   text: {

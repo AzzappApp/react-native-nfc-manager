@@ -2,7 +2,10 @@ import { NextResponse } from 'next/server';
 import { withAxiom } from 'next-axiom';
 import cors from '#helpers/cors';
 import { getSessionData } from '#helpers/tokens';
-import { twilioVerificationService } from '#helpers/twilioHelpers';
+import {
+  findTwilioLocale,
+  twilioVerificationService,
+} from '#helpers/twilioHelpers';
 
 type RequestUpdateContact = {
   email?: string | null;
@@ -23,7 +26,7 @@ const requestUpdateContact = async (req: Request) => {
   const verification = await twilioVerificationService().verifications.create({
     to: issuer,
     channel: email ? 'email' : 'sms',
-    locale,
+    locale: locale ? findTwilioLocale(locale) : undefined,
   });
 
   if (verification && verification.status === 'canceled') {

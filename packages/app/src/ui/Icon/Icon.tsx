@@ -1,7 +1,8 @@
+import { memo } from 'react';
+import { type ImageProps } from 'react-native';
 import Animated from 'react-native-reanimated';
 import { colors } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
-import type { ImageProps } from 'react-native';
 
 const icons = {
   get missing() {
@@ -9,6 +10,9 @@ const icons = {
   },
   get about() {
     return require('./assets/about.png');
+  },
+  get add_media() {
+    return require('./assets/add_media.png');
   },
   get account() {
     return require('./assets/account.png');
@@ -30,6 +34,9 @@ const icons = {
   },
   get add() {
     return require('./assets/add.png');
+  },
+  get animate() {
+    return require('./assets/animate.png');
   },
   get azzapp() {
     return require('./assets/azzapp.png');
@@ -69,6 +76,9 @@ const icons = {
   },
   get bloc() {
     return require('./assets/bloc.png');
+  },
+  get bloc_text() {
+    return require('./assets/bloc_text.png');
   },
   get border() {
     return require('./assets/border.png');
@@ -127,6 +137,9 @@ const icons = {
   get contact() {
     return require('./assets/contact.png');
   },
+  get contact_us() {
+    return require('./assets/contact_us.png');
+  },
   get contrast() {
     return require('./assets/contrast.png');
   },
@@ -147,6 +160,9 @@ const icons = {
   },
   get down() {
     return require('./assets/down.png');
+  },
+  get duplicate() {
+    return require('./assets/duplicate.png');
   },
   get earth() {
     return require('./assets/earth.png');
@@ -189,6 +205,9 @@ const icons = {
   },
   get font() {
     return require('./assets/font.png');
+  },
+  get font_size() {
+    return require('./assets/font_size.png');
   },
   get foreground_text() {
     return require('./assets/foreground_text.png');
@@ -289,11 +308,17 @@ const icons = {
   get more() {
     return require('./assets/more.png');
   },
+  get move_segment() {
+    return require('./assets/move_segment.png');
+  },
   get multi_user() {
     return require('./assets/multi-user.png');
   },
   get notification() {
     return require('./assets/notification.png');
+  },
+  get overlay() {
+    return require('./assets/overlay.png');
   },
   get palette() {
     return require('./assets/palette.png');
@@ -358,6 +383,12 @@ const icons = {
   get shadow() {
     return require('./assets/shadow.png');
   },
+  get shadow_element() {
+    return require('./assets/shadow_element.png');
+  },
+  get shadow_element_off() {
+    return require('./assets/shadow_element_off.png');
+  },
   get share() {
     return require('./assets/share.png');
   },
@@ -376,15 +407,6 @@ const icons = {
   get stop() {
     return require('./assets/stop.png');
   },
-  get structure() {
-    return require('./assets/structure.png');
-  },
-  get suggested_photo() {
-    return require('./assets/suggested_photo.png');
-  },
-  get suggested_video() {
-    return require('./assets/suggested_video.png');
-  },
   get temperature() {
     return require('./assets/temperature.png');
   },
@@ -394,17 +416,23 @@ const icons = {
   get text() {
     return require('./assets/text.png');
   },
-  get tint() {
-    return require('./assets/tint.png');
-  },
   get tips() {
     return require('./assets/tips.png');
+  },
+  get transition() {
+    return require('./assets/transition.png');
+  },
+  get trash() {
+    return require('./assets/trash.png');
+  },
+  get trash_line() {
+    return require('./assets/trash_line.png');
   },
   get txt_align_center() {
     return require('./assets/txt_align_center.png');
   },
-  get txt_align_justif() {
-    return require('./assets/txt_align_justif.png');
+  get txt_align_justify() {
+    return require('./assets/txt_align_justify.png');
   },
   get txt_align_left() {
     return require('./assets/txt_align_left.png');
@@ -420,6 +448,9 @@ const icons = {
   },
   get video() {
     return require('./assets/video.png');
+  },
+  get video_film() {
+    return require('./assets/video_film.png');
   },
   get vignetting() {
     return require('./assets/vignetting.png');
@@ -439,8 +470,11 @@ const icons = {
   get width_limited() {
     return require('./assets/width-limited.png');
   },
-  get trash() {
-    return require('./assets/trash.png');
+  get font_color_letter() {
+    return require('./assets/font_color_letter.png');
+  },
+  get font_color_dash() {
+    return require('./assets/font_color_dash.png');
   },
 } as const;
 
@@ -457,7 +491,11 @@ const Icon = ({ icon, size = 24, ...props }: IconProps) => {
     <Animated.Image
       {...props}
       style={[
-        { resizeMode: 'contain', width: size, height: size },
+        {
+          resizeMode: 'contain',
+          width: size,
+          height: size,
+        },
         shouldTintColor(icon) && styles.tintColor,
         props.style,
       ]}
@@ -472,7 +510,7 @@ const styleSheet = createStyleSheet(appearance => ({
   },
 }));
 
-export default Icon;
+export default memo(Icon);
 
 const shouldTintColor = (icon: Icons) => {
   switch (icon) {
@@ -487,6 +525,8 @@ const shouldTintColor = (icon: Icons) => {
     case 'plus':
       return false;
     case 'plus_white_border':
+      return false;
+    case 'menu':
       return false;
     default:
       return true;

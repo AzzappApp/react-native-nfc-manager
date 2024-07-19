@@ -1,30 +1,29 @@
-import { memo } from 'react';
-import { View, useWindowDimensions } from 'react-native';
-import Animated, { useAnimatedStyle } from 'react-native-reanimated';
+import { memo, useCallback } from 'react';
+import { useWindowDimensions, View } from 'react-native';
+import Animated, {
+  useAnimatedStyle,
+  useDerivedValue,
+} from 'react-native-reanimated';
 import { useFragment, graphql } from 'react-relay';
 import { shadow } from '#theme';
 import ContactCard, {
   CONTACT_CARD_RADIUS_HEIGHT,
   CONTACT_CARD_RATIO,
 } from '#components/ContactCard/ContactCard';
-import Link from '#components/Link';
+import { useRouter } from '#components/NativeRouter';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
+import useAuthState from '#hooks/useAuthState';
 import PressableNative from '#ui/PressableNative';
+import { useHomeScreenCurrentIndex } from './HomeScreenContext';
 import type { HomeContactCard_profile$key } from '#relayArtifacts/HomeContactCard_profile.graphql';
 import type { HomeContactCard_user$key } from '#relayArtifacts/HomeContactCard_user.graphql';
-import type { SharedValue } from 'react-native-reanimated';
 
 type HomeContactCardProps = {
   user: HomeContactCard_user$key;
   height: number;
-  currentProfileIndexSharedValue: SharedValue<number>;
 };
 
-const HomeContactCard = ({
-  user,
-  height,
-  currentProfileIndexSharedValue,
-}: HomeContactCardProps) => {
+const HomeContactCard = ({ user, height }: HomeContactCardProps) => {
   const { profiles } = useFragment(
     graphql`
       fragment HomeContactCard_user on User {
@@ -50,12 +49,10 @@ const HomeContactCard = ({
       }}
     >
       {profiles?.map((item, index) => (
-        <MemoContactCardItem
+        <ContactCardItem
           key={item.webCard.id}
-          width={windowWidth}
           height={height}
           item={item}
-          currentProfileIndexSharedValue={currentProfileIndexSharedValue}
           index={index}
         />
       ))}
@@ -66,35 +63,36 @@ const HomeContactCard = ({
 export default memo(HomeContactCard);
 
 type ContactCardItemProps = {
-  width: number;
   height: number;
   item: HomeContactCard_profile$key;
   index: number;
-  currentProfileIndexSharedValue: SharedValue<number>;
 };
 
-const ContactCardItem = ({
-  width,
-  height,
-  item,
-  index,
-  currentProfileIndexSharedValue,
-}: ContactCardItemProps) => {
+const ContactCardItem = ({ height, item, index }: ContactCardItemProps) => {
   const styles = useStyleSheet(styleSheet);
+  const currentIndexSharedValue = useHomeScreenCurrentIndex();
 
-  const positionStyle = useAnimatedStyle(() => ({
-    transform: [
-      { translateX: (index - currentProfileIndexSharedValue.value) * width },
-    ],
-  }));
+  const { width: windowWidth } = useWindowDimensions();
 
-  const maxWidth = width - 40;
-  const maxHeight = maxWidth / CONTACT_CARD_RATIO;
+  const translateX = useDerivedValue(() => {
+    'worklet';
+    return (index - (currentIndexSharedValue?.value ?? 0) + 1) * windowWidth;
+  }, [index, windowWidth]);
+
+  const positionStyle = useAnimatedStyle(() => {
+    return {
+      //index start a 0 for the firstItem, so add +1 in thisd case
+      transform: [{ translateX: translateX.value }],
+    };
+  });
+
+  const maxHeight = (windowWidth - 40) / CONTACT_CARD_RATIO;
   const cardHeight = Math.min(height, maxHeight);
 
   const profile = useFragment(
     graphql`
       fragment HomeContactCard_profile on Profile {
+        id
         webCard {
           userName
           cardIsPublished
@@ -107,11 +105,23 @@ const ContactCardItem = ({
     item,
   );
 
+  const authState = useAuthState();
+  const router = useRouter();
+  const disabled = authState.profileInfos?.profileId !== profile.id;
+
+  const onPressContactCard = useCallback(() => {
+    if (!disabled) {
+      router.push({
+        route: 'CONTACT_CARD',
+      });
+    }
+  }, [disabled, router]);
+
   return (
     <Animated.View
       style={[
         {
-          width,
+          width: windowWidth,
           height,
         },
         styles.itemContainer,
@@ -127,27 +137,25 @@ const ContactCardItem = ({
               overflow: 'hidden',
             }}
           >
-            <Link route="CONTACT_CARD">
-              <PressableNative
-                ripple={{
-                  borderless: true,
-                  foreground: true,
-                  radius: cardHeight,
-                }}
-              >
-                <ContactCard
-                  profile={profile}
-                  height={Math.min(height, maxHeight)}
-                  style={styles.card}
-                />
-              </PressableNative>
-            </Link>
+            <PressableNative
+              ripple={{
+                borderless: true,
+                foreground: true,
+                radius: cardHeight,
+              }}
+              onPress={onPressContactCard}
+            >
+              <ContactCard
+                profile={profile}
+                height={Math.min(height, maxHeight)}
+                style={styles.card}
+              />
+            </PressableNative>
           </View>
         )}
     </Animated.View>
   );
 };
-const MemoContactCardItem = memo(ContactCardItem);
 
 const styleSheet = createStyleSheet(appearance => ({
   itemContainer: {

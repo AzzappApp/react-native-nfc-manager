@@ -24,14 +24,19 @@ export const User: UserResolvers = {
 
     return result.map(({ Profile }) => Profile);
   },
-  userSubscription: async (user, _args, { auth }) => {
+  userSubscription: async (user, _args, { auth, loaders }) => {
     if (!auth.userId || auth.userId !== user.id) {
       return null;
     }
-    const subscription = await activeUserSubscription(auth.userId);
-    if (!subscription || activeUserSubscription.length === 0) {
-      return null;
-    }
-    return subscription[0];
+    const subscriptions = await loaders.activeSubscriptionsLoader.load(
+      auth.userId,
+    );
+
+    return subscriptions.find(sub => sub.webCardId === null) ?? null;
+  },
+  isPremium: async user => {
+    const subscription = await activeUserSubscription([user.id]);
+
+    return !!subscription?.length;
   },
 };

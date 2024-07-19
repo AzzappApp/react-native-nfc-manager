@@ -3,7 +3,6 @@ import {
   getCompanyActivitiesByWebCardCategory,
   getWebCardPosts,
   isFollowing,
-  getCardModules,
   getLikedPosts,
   getFollowerProfiles,
   getFollowingsWebCard,
@@ -11,18 +10,24 @@ import {
   getWebCardProfiles,
   countWebCardProfiles,
   getWebCardPendingOwnerProfile,
-  getUserSubscriptionForWebCard,
   getActivePaymentMeans,
   getWebCardPayments,
+  getLastSubscription,
+  getFilterCoverTemplateTypes,
+  getCoverTemplatesByTypesAndTag,
+  activeUserSubscription,
 } from '@azzapp/data';
+import { webCardRequiresSubscription } from '@azzapp/shared/subscriptionHelpers';
 import {
   connectionFromDateSortedItems,
+  connectionFromSortedArray,
   cursorToDate,
 } from '#helpers/connectionsHelpers';
 import { maybeFromGlobalIdWithType } from '#helpers/relayIdHelpers';
 import { getLabel, idResolver } from './utils';
 import type {
   CompanyActivityResolvers,
+  CompanyActivityTypeResolvers,
   WebCardCategoryResolvers,
   WebCardResolvers,
 } from './__generated__/types';
@@ -39,12 +44,15 @@ export const WebCard: WebCardResolvers = {
       ? loaders.CompanyActivity.load(webCard.companyActivityId)
       : null;
   },
-  cardCover: async (webCard, _) => {
-    if (!webCard.coverData) {
-      return null;
-    }
-    return webCard;
+  coverMedia: async (webCard, _) => {
+    return webCard.coverMediaId
+      ? {
+          assetKind: 'cover',
+          media: webCard.coverMediaId,
+        }
+      : null;
   },
+  hasCover: webCard => !!webCard.coverMediaId,
   cardModules: async (webCard, _, { auth, loaders }) => {
     const profile = auth.userId
       ? await loaders.profileByWebCardIdAndUserId.load({
@@ -56,8 +64,39 @@ export const WebCard: WebCardResolvers = {
     if (!webCard.cardIsPublished && !profile) {
       return [];
     }
-    const modules = await getCardModules(webCard.id, profile !== null);
-    return modules;
+
+    const modules = await loaders.cardModuleByWebCardLoader.load(webCard.id);
+    return modules.filter(module => module.visible || profile !== null);
+  },
+  requiresSubscription: async (webCard, { newWebCardKind }, { loaders }) => {
+    const modules = await loaders.cardModuleByWebCardLoader.load(webCard.id);
+
+    return webCardRequiresSubscription(
+      modules,
+      newWebCardKind ?? webCard.webCardKind,
+    );
+  },
+  isWebSubscription: async (webCard, _, { loaders }) => {
+    const owner = await loaders.webCardOwners.load(webCard.id);
+    const subscriptions = owner
+      ? await loaders.activeSubscriptionsLoader.load(owner.id)
+      : null;
+    const isWebSubscription = subscriptions?.some(
+      subscription =>
+        subscription.issuer === 'web' && subscription.status === 'active',
+    );
+    return isWebSubscription ?? false;
+  },
+  isPremium: async (webCard, _, { loaders }) => {
+    const owner = await loaders.webCardOwners.load(webCard.id);
+
+    //cannot use the loader here (when IAP sub), can't find a way to for revalidation in api route.
+    //Got a bug where the subscription is canceled however still active in the result set
+    const subscription = owner
+      ? await activeUserSubscription([owner.id])
+      : null;
+
+    return !!subscription?.length;
   },
   isFollowing: async (webCard, { webCardId: gqlWebCardId }) => {
     if (!gqlWebCardId) {
@@ -216,10 +255,7 @@ export const WebCard: WebCardResolvers = {
       return null;
     }
 
-    const subscription = await getUserSubscriptionForWebCard(
-      auth.userId,
-      webCard.id,
-    );
+    const subscription = await getLastSubscription(auth.userId, webCard.id);
 
     return subscription ?? null;
   },
@@ -253,6 +289,35 @@ export const WebCard: WebCardResolvers = {
           assetKind: 'logo',
         }
       : null,
+  coverTemplateTypes: async (webCard, args) => {
+    const limit = args.first ?? 10;
+    const offset = args.after ? cursorToOffset(args.after) : 0;
+
+    const coverTemplatesTypes = await getFilterCoverTemplateTypes(
+      limit + 1,
+      offset,
+      args.tagId,
+    );
+
+    const coverTemplates = await getCoverTemplatesByTypesAndTag(
+      coverTemplatesTypes.map(t => t.id),
+      args.tagId,
+      webCard.companyActivityId,
+    );
+
+    return connectionFromSortedArray(
+      coverTemplatesTypes.map(type => ({
+        ...type,
+        coverTemplates: coverTemplates.filter(
+          template => template.typeId === type.id,
+        ),
+      })),
+      {
+        offset,
+        hasNextPage: coverTemplates.length > limit,
+      },
+    );
+  },
 };
 
 export const WebCardCategory: WebCardCategoryResolvers = {
@@ -266,6 +331,16 @@ export const WebCardCategory: WebCardCategoryResolvers = {
 
 export const CompanyActivity: CompanyActivityResolvers = {
   id: idResolver('CompanyActivity'),
+  label: getLabel,
+  companyActivityType: async (companyActivity, _, { loaders }) => {
+    return companyActivity.companyActivityTypeId
+      ? loaders.CompanyActivityType.load(companyActivity.companyActivityTypeId)
+      : null;
+  },
+};
+
+export const CompanyActivityType: CompanyActivityTypeResolvers = {
+  id: idResolver('CompanyActivityType'),
   label: getLabel,
 };
 

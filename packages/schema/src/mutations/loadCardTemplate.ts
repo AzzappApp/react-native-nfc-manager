@@ -14,6 +14,7 @@ import {
 import { DEFAULT_CARD_STYLE } from '@azzapp/shared/cardHelpers';
 import ERRORS from '@azzapp/shared/errors';
 import fromGlobalIdWithType from '#helpers/relayIdHelpers';
+import { checkWebCardHasSubscription } from '#use-cases/subscription';
 import { MODULES_SAVE_RULES } from './ModulesMutationsResolvers';
 import type { MutationResolvers } from '#/__generated__/types';
 
@@ -40,6 +41,17 @@ const loadCardTemplateMutation: MutationResolvers['loadCardTemplate'] = async (
   if (!cardTemplate) {
     throw new GraphQLError(ERRORS.INVALID_REQUEST);
   }
+
+  const webCard = await loaders.WebCard.load(profile.webCardId);
+
+  if (!webCard) {
+    throw new GraphQLError(ERRORS.INVALID_REQUEST);
+  }
+
+  await checkWebCardHasSubscription(
+    { webCard, appliedModules: cardTemplate.modules },
+    loaders,
+  );
 
   const cardStyle =
     (await getCardStyleById(cardTemplate.cardStyleId)) ?? DEFAULT_CARD_STYLE;
@@ -102,13 +114,15 @@ const loadCardTemplateMutation: MutationResolvers['loadCardTemplate'] = async (
     throw new GraphQLError(ERRORS.INTERNAL_SERVER_ERROR);
   }
 
-  const webCard = await loaders.WebCard.load(profile.webCardId);
-  if (!webCard) {
+  loaders.WebCard.clear(profile.webCardId);
+
+  const webCardAfterUpdate = await loaders.WebCard.load(profile.webCardId);
+  if (!webCardAfterUpdate) {
     throw new GraphQLError(ERRORS.INTERNAL_SERVER_ERROR);
   }
 
   cardUsernamesToRevalidate.add(webCard.userName);
-  return { webCard };
+  return { webCard: webCardAfterUpdate };
 };
 
 export default loadCardTemplateMutation;

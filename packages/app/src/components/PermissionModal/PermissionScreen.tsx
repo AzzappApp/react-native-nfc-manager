@@ -2,6 +2,7 @@ import { useIntl } from 'react-intl';
 import { StyleSheet } from 'react-native';
 import Button from '#ui/Button';
 import Text from '#ui/Text';
+import type { ReactNode } from 'react';
 
 const PermissionScreen = ({
   title,
@@ -9,7 +10,7 @@ const PermissionScreen = ({
   onNext,
 }: {
   title: string;
-  content: string;
+  content: ReactNode;
   onNext: () => void;
 }) => {
   const intl = useIntl();

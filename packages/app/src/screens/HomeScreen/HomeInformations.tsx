@@ -1,4 +1,3 @@
-import _ from 'lodash';
 import { memo, useCallback, useEffect, useMemo } from 'react';
 import { FormattedMessage } from 'react-intl';
 import { StyleSheet, View } from 'react-native';
@@ -13,12 +12,11 @@ import AnimatedText from '#components/AnimatedText';
 import { useRouter } from '#components/NativeRouter';
 import PressableOpacity from '#ui/PressableOpacity';
 import Text from '#ui/Text';
+import { useHomeScreenContext } from './HomeScreenContext';
 import type { HomeInformations_user$key } from '#relayArtifacts/HomeInformations_user.graphql';
-import type { SharedValue } from 'react-native-reanimated';
 type HomeInformationsProps = {
   user: HomeInformations_user$key;
   height: number;
-  currentProfileIndexSharedValue: SharedValue<number>;
 };
 /**
  *
@@ -29,11 +27,7 @@ type HomeInformationsProps = {
  * }
  * @return {*}
  */
-const HomeInformations = ({
-  height,
-  user,
-  currentProfileIndexSharedValue,
-}: HomeInformationsProps) => {
+const HomeInformations = ({ height, user }: HomeInformationsProps) => {
   const { profiles } = useFragment(
     graphql`
       fragment HomeInformations_user on User {
@@ -53,22 +47,33 @@ const HomeInformations = ({
     `,
     user,
   );
+
   const nbLikesValue = useMemo(
-    () => profiles?.map(({ webCard }) => webCard.nbPostsLiked) ?? [],
+    () =>
+      [0, ...(profiles?.map(({ webCard }) => webCard.nbPostsLiked) ?? [])] ?? [
+        0,
+      ],
     [profiles],
   );
   const nbFollowersValue = useMemo(
-    () => profiles?.map(({ webCard }) => webCard.nbFollowers) ?? [],
+    () =>
+      [0, ...(profiles?.map(({ webCard }) => webCard.nbFollowers) ?? [])] ?? [
+        0,
+      ],
     [profiles],
   );
 
   const nbFollowingsValue = useMemo(
-    () => profiles?.map(({ webCard }) => webCard.nbFollowings) ?? [],
+    () =>
+      [0, ...(profiles?.map(({ webCard }) => webCard.nbFollowings) ?? [])] ?? [
+        0,
+      ],
     [profiles],
   );
 
   const nbPostsValue = useMemo(
-    () => profiles?.map(({ webCard }) => webCard.nbPosts) ?? [],
+    () =>
+      [0, ...(profiles?.map(({ webCard }) => webCard.nbPosts) ?? [])] ?? [0],
     [profiles],
   );
 
@@ -77,24 +82,16 @@ const HomeInformations = ({
   const nbFollowers = useSharedValue('-1');
   const nbFollowings = useSharedValue('-1');
 
+  const { currentIndexSharedValue, currentIndexProfile, inputRange } =
+    useHomeScreenContext();
   //using profiles object directly in animatedReaction causes error animatedHost(seems to be the case for all relay query result)
-
   useEffect(() => {
-    const currentIndex = Math.round(currentProfileIndexSharedValue.value);
-    if (nbPosts.value === '-1') {
-      nbPosts.value = format(nbPostsValue[currentIndex]);
-    }
-    if (nbLikes.value === '-1') {
-      nbLikes.value = format(nbLikesValue[currentIndex]);
-    }
-    if (nbFollowings.value === '-1') {
-      nbFollowings.value = format(nbFollowingsValue[currentIndex]);
-    }
-    if (nbFollowers.value === '-1') {
-      nbFollowers.value = format(nbFollowersValue[currentIndex]);
-    }
+    nbPosts.value = format(nbPostsValue[currentIndexProfile.value]);
+    nbLikes.value = format(nbLikesValue[currentIndexProfile.value]);
+    nbFollowings.value = format(nbFollowingsValue[currentIndexProfile.value]);
+    nbFollowers.value = format(nbFollowersValue[currentIndexProfile.value]);
   }, [
-    currentProfileIndexSharedValue.value,
+    currentIndexProfile,
     nbFollowers,
     nbFollowersValue,
     nbFollowings,
@@ -105,22 +102,21 @@ const HomeInformations = ({
     nbPostsValue,
   ]);
 
-  const inputRange = useMemo(
-    () => _.range(0, profiles?.length),
-    [profiles?.length],
-  );
-
   useAnimatedReaction(
-    () => currentProfileIndexSharedValue.value,
+    () => currentIndexSharedValue.value,
     actual => {
-      if (actual >= 0 && inputRange && inputRange?.length > 1) {
-        nbLikes.value = format(interpolate(actual, inputRange, nbLikesValue));
-        nbPosts.value = format(interpolate(actual, inputRange, nbPostsValue));
+      if (actual >= 0 && inputRange && inputRange.value.length > 1) {
+        nbLikes.value = format(
+          interpolate(actual, inputRange.value, nbLikesValue),
+        );
+        nbPosts.value = format(
+          interpolate(actual, inputRange.value, nbPostsValue),
+        );
         nbFollowers.value = format(
-          interpolate(actual, inputRange, nbFollowersValue),
+          interpolate(actual, inputRange.value, nbFollowersValue),
         );
         nbFollowings.value = format(
-          interpolate(actual, inputRange, nbFollowingsValue),
+          interpolate(actual, inputRange.value, nbFollowingsValue),
         );
       } else if (actual >= 0) {
         nbPosts.value = format(nbPostsValue[actual]);
@@ -129,18 +125,11 @@ const HomeInformations = ({
         nbFollowings.value = format(nbFollowingsValue[actual]);
       }
     },
-    [
-      inputRange,
-      nbFollowersValue,
-      nbFollowingsValue,
-      nbLikesValue,
-      nbPostsValue,
-    ],
   );
+
   const router = useRouter();
   const goToPosts = useCallback(() => {
-    const currentProfile =
-      profiles?.[Math.round(currentProfileIndexSharedValue.value)];
+    const currentProfile = profiles?.[currentIndexProfile.value - 1];
     if (currentProfile?.webCard.userName) {
       router.push({
         route: 'WEBCARD',
@@ -151,7 +140,7 @@ const HomeInformations = ({
         },
       });
     }
-  }, [currentProfileIndexSharedValue.value, profiles, router]);
+  }, [currentIndexProfile.value, profiles, router]);
 
   const goToLikedPost = useCallback(() => {
     router.push({

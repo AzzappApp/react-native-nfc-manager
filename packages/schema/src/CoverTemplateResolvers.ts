@@ -1,50 +1,25 @@
-import { connectionFromArray } from 'graphql-relay';
-import { getColorPalettes } from '@azzapp/data';
-import { shuffle } from '@azzapp/shared/arrayHelpers';
+import { getCoverTemplateTagsIn } from '@azzapp/data';
+import { getCloudinaryAssetURL } from '@azzapp/shared/imagesHelpers';
 import { idResolver } from './utils';
-import type {
-  CoverTemplateDataResolvers,
-  CoverTemplateResolvers,
-} from './__generated__/types';
+import type { CoverTemplateResolvers } from './__generated__/types';
 
 export const CoverTemplate: CoverTemplateResolvers = {
   id: idResolver('CoverTemplate'),
-  previewMedia: ({ previewMediaId }) => ({
-    media: previewMediaId,
-    assetKind: 'cover',
-  }),
-  colorPalette: async ({ colorPaletteId }, _, { loaders }) =>
-    (await loaders.ColorPalette.load(colorPaletteId))!,
-  colorPalettes: async (
-    { colorPaletteId },
-    { first, after },
-    { auth, loaders, sessionMemoized },
-  ) => {
-    const mainColorPalette = await loaders.ColorPalette.load(colorPaletteId);
-    const colorPalettes = [
-      mainColorPalette,
-      ...shuffle(
-        await sessionMemoized(getColorPalettes),
-        auth.userId ?? '' + colorPaletteId,
-      ),
-    ];
-    return connectionFromArray(colorPalettes, { first, after });
+  tags: ({ tags }) => {
+    return getCoverTemplateTagsIn(tags);
   },
-};
-
-export const CoverTemplateData: CoverTemplateDataResolvers = {
-  background: ({ backgroundId }) =>
-    backgroundId
-      ? {
-          staticMedia: backgroundId,
-          assetKind: 'cover',
-        }
-      : null,
-  foreground: ({ foregroundId }) =>
-    foregroundId
-      ? {
-          staticMedia: foregroundId,
-          assetKind: 'cover',
-        }
-      : null,
+  type: async ({ typeId }, _, { loaders }) => {
+    return loaders.CoverTemplateType.load(typeId);
+  },
+  data: async ({ params }) => params,
+  preview: async ({ previewId }) => {
+    return {
+      media: previewId,
+      assetKind: 'coverPreview',
+    };
+  },
+  lottie: async ({ lottieId }) => getCloudinaryAssetURL(lottieId, 'raw'),
+  colorPalette: async ({ colorPaletteId }, _, { loaders }) => {
+    return colorPaletteId ? loaders.ColorPalette.load(colorPaletteId) : null;
+  },
 };

@@ -8,17 +8,20 @@ import Toast from 'react-native-toast-message';
 import { graphql, useMutation, usePreloadedQuery } from 'react-relay';
 import { Observable } from 'relay-runtime';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
-import { encodeMediaId } from '@azzapp/shared/imagesHelpers';
 import { combineMultiUploadProgresses } from '@azzapp/shared/networkHelpers';
 import { colors } from '#theme';
 import { CancelHeaderButton } from '#components/commonsButtons';
-import { useRouter } from '#components/NativeRouter';
-import ScreenModal from '#components/ScreenModal';
+import {
+  preventModalDismiss,
+  useRouter,
+  ScreenModal,
+} from '#components/NativeRouter';
 import { getFileName } from '#helpers/fileHelpers';
 import { addLocalCachedMediaFile } from '#helpers/mediaHelpers';
 import { uploadMedia, uploadSign } from '#helpers/MobileWebAPI';
 import relayScreen from '#helpers/relayScreen';
 import { get as CappedPixelRatio } from '#relayProviders/CappedPixelRatio.relayprovider';
+import { get as QRCodeWidth } from '#relayProviders/qrCodeWidth.relayprovider';
 import Button from '#ui/Button';
 import Container from '#ui/Container';
 import Header from '#ui/Header';
@@ -138,9 +141,11 @@ const ContactCardEditScreen = ({
       $profileId: ID!
       $contactCard: ContactCardInput!
       $pixelRatio: Float!
+      $width: Int!
     ) {
       saveContactCard(profileId: $profileId, contactCard: $contactCard) {
         profile {
+          id
           contactCard {
             firstName
             lastName
@@ -184,6 +189,7 @@ const ContactCardEditScreen = ({
             id
             uri: uri(width: 180, pixelRatio: $pixelRatio)
           }
+          contactCardQrCode(width: $width)
         }
       }
     }
@@ -268,7 +274,7 @@ const ContactCardEditScreen = ({
     const [uploadedAvatarId, uploadedLogoId] = await Promise.all(
       uploads.map(upload =>
         upload?.promise.then(({ public_id }) => {
-          return encodeMediaId(public_id, 'image');
+          return public_id;
         }),
       ),
     );
@@ -295,6 +301,7 @@ const ContactCardEditScreen = ({
           logoId,
         },
         pixelRatio: CappedPixelRatio(),
+        width: QRCodeWidth(),
       },
       onCompleted: () => {
         if (avatarId && avatar?.uri) {
@@ -371,7 +378,11 @@ const ContactCardEditScreen = ({
         />
 
         {webCard && <ContactCardEditForm webCard={webCard} control={control} />}
-        <ScreenModal visible={!!progressIndicator}>
+        <ScreenModal
+          visible={!!progressIndicator}
+          gestureEnabled={false}
+          onRequestDismiss={preventModalDismiss}
+        >
           {progressIndicator && (
             <UploadProgressModal progressIndicator={progressIndicator} />
           )}

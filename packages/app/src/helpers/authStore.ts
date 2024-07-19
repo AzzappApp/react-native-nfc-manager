@@ -105,6 +105,16 @@ export const init = async () => {
           MMKVS_PROFILE_INFOS,
           JSON.stringify({ ...profileInfos, email, phoneNumber, userId }),
         );
+      } else {
+        //with the email and phone number confirmation flow, SIGN_UP can be never called
+        storage.set(
+          MMKVS_PROFILE_INFOS,
+          JSON.stringify({
+            email,
+            phoneNumber,
+            userId,
+          }),
+        );
       }
       storage.set(MMKVS_HAS_BEEN_SIGNED_IN, true);
       await EncryptedStorage.setItem(
@@ -116,17 +126,30 @@ export const init = async () => {
     },
   );
 
-  addGlobalEventListener(
-    'WEBCARD_CHANGE',
-    async ({ payload: { profileId, webCardId, profileRole } }) => {
-      const profileInfos = getAuthState().profileInfos;
-      storage.set(
-        MMKVS_PROFILE_INFOS,
-        JSON.stringify({ ...profileInfos, profileId, webCardId, profileRole }),
-      );
-      emitAuthState();
-    },
-  );
+  //@deprecated don't really see the point to listen in one place the event.
+  // cause some discrepancy with the home (due to a small delay)
+  //will wait to evg test to validate
+  // addGlobalEventListener(
+  //   'WEBCARD_CHANGE',
+  //   async ({ payload: { profileId, webCardId, profileRole } }) => {
+  //     const profileInfos = getAuthState().profileInfos;
+  //     if (
+  //       profileInfos == null ||
+  //       (profileInfos && profileInfos.profileId !== profileId)
+  //     ) {
+  //       storage.set(
+  //         MMKVS_PROFILE_INFOS,
+  //         JSON.stringify({
+  //           ...profileInfos,
+  //           profileId,
+  //           webCardId,
+  //           profileRole,
+  //         }),
+  //       );
+  //       emitAuthState();
+  //     }
+  //   },
+  // );
 
   addGlobalEventListener(
     'PROFILE_ROLE_CHANGE',
@@ -220,3 +243,26 @@ export const getTokens = () => authTokens;
  */
 export const hasBeenSignedIn = () =>
   storage.getBoolean(MMKVS_HAS_BEEN_SIGNED_IN);
+
+export const onChangeWebCard = async ({
+  profileId,
+  webCardId,
+  profileRole,
+}: any) => {
+  const profileInfos = getAuthState().profileInfos;
+  if (
+    profileInfos == null ||
+    (profileInfos && profileInfos.profileId !== profileId)
+  ) {
+    storage.set(
+      MMKVS_PROFILE_INFOS,
+      JSON.stringify({
+        ...profileInfos,
+        profileId,
+        webCardId,
+        profileRole,
+      }),
+    );
+    emitAuthState();
+  }
+};

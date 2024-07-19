@@ -77,8 +77,3 @@ export const requestUpdateContact = withFetchFunction(
   WebAPI.requestUpdateContact,
   authenticatedFetchJSON,
 );
-
-export const getActiveSubscription = withFetchFunction(
-  WebAPI.getActiveSubscription,
-  authenticatedFetchJSON,
-);

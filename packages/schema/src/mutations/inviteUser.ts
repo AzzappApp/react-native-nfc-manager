@@ -8,16 +8,14 @@ import {
 import { inviteUser } from '#use-cases';
 import fromGlobalIdWithType from '#helpers/relayIdHelpers';
 import { ProfileAlreadyExistsException } from '#use-cases/exceptions/profile-already-exists.exception';
-import { ProfileDoesNotExistException } from '#use-cases/exceptions/profile-does-not-exist.exception';
 import { InsufficientSubscriptionException } from '#use-cases/exceptions/subscription.exception';
 import type { MutationResolvers } from '#__generated__/types';
 import type { GraphQLContext } from '#index';
 
-// @TODO do we verify given profileId belongs to the current user?
 const inviteUserMutation: MutationResolvers['inviteUser'] = async (
   _,
   { profileId: gqlProfileId, invited, sendInvite },
-  { notifyUsers, auth }: GraphQLContext,
+  { notifyUsers, auth, loaders }: GraphQLContext,
 ) => {
   const profileId = fromGlobalIdWithType(gqlProfileId, 'Profile');
 
@@ -47,16 +45,24 @@ const inviteUserMutation: MutationResolvers['inviteUser'] = async (
       }
     : undefined;
 
-  if (!auth.userId) {
-    throw new GraphQLError(ERRORS.UNAUTHORIZED);
+  const profile = await loaders.Profile.load(profileId);
+
+  if (!profile || profile.userId !== auth.userId) {
+    throw new GraphQLError(ERRORS.INVALID_REQUEST);
+  }
+
+  const owner = await loaders.webCardOwners.load(profile.webCardId);
+
+  const user = await loaders.User.load(auth.userId);
+
+  const webCard = await loaders.WebCard.load(profile.webCardId);
+
+  if (!owner || !user || !webCard) {
+    throw new GraphQLError(ERRORS.INVALID_REQUEST);
   }
 
   try {
     const profile = await inviteUser({
-      auth: {
-        profileId,
-        userId: auth.userId,
-      },
       invited: {
         profileRole: invited.profileRole,
         contactCard,
@@ -65,14 +71,13 @@ const inviteUserMutation: MutationResolvers['inviteUser'] = async (
       },
       sendInvite: sendInvite ?? false,
       notifyUsers,
+      user,
+      owner,
+      webCard,
     });
 
     return { profile };
   } catch (e) {
-    if (e instanceof ProfileDoesNotExistException) {
-      throw new GraphQLError(ERRORS.INVALID_REQUEST);
-    }
-
     if (e instanceof ProfileAlreadyExistsException) {
       throw new GraphQLError(ERRORS.PROFILE_ALREADY_EXISTS);
     }

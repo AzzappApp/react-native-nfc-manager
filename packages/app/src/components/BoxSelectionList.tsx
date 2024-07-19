@@ -28,6 +28,8 @@ export type BoxSelectionListProps<T> = Omit<ViewProps, 'hitSlop'> & {
   renderLabel?: (params: BoxButtonItemInfo<T>) => React.ReactNode;
   keyExtractor: (item: T) => string;
   onSelect: (item: T | null) => void;
+  onItemHeightChange?: (height: number) => void;
+  fixedItemWidth?: number;
 };
 
 const BoxSelectionList = <T,>({
@@ -39,6 +41,7 @@ const BoxSelectionList = <T,>({
   keyExtractor,
   onSelect,
   onLayout,
+  onItemHeightChange,
   ...props
 }: BoxSelectionListProps<T>) => {
   const styles = useStyleSheet(styleSheet);
@@ -50,11 +53,12 @@ const BoxSelectionList = <T,>({
       const { height } = event.nativeEvent.layout;
       setHeight(height);
       onLayout?.(event);
+      onItemHeightChange?.(height - VERTICAL_PADDING * 2);
     },
-    [onLayout],
+    [onItemHeightChange, onLayout],
   );
 
-  const renderbutton = useCallback(
+  const renderButton = useCallback(
     ({ item, index }: ListRenderItemInfo<T | null>) => {
       if (height === null) {
         return null;
@@ -99,7 +103,7 @@ const BoxSelectionList = <T,>({
     <FlatList
       {...props}
       data={innerData}
-      renderItem={renderbutton}
+      renderItem={renderButton}
       keyExtractor={innerKeyExtractor}
       horizontal
       showsHorizontalScrollIndicator={false}
@@ -120,6 +124,7 @@ type BoxButtonProps<T> = {
   height: number;
   imageRatio: number;
   onSelect: (item: T | null) => void;
+  fixedItemWidth?: number;
 };
 
 const BoxButton = <T,>({
@@ -131,6 +136,7 @@ const BoxButton = <T,>({
   imageRatio,
   onSelect,
   renderItem,
+  fixedItemWidth,
 }: BoxButtonProps<T>) => {
   const onPress = useCallback(() => {
     onSelect(item);
@@ -138,7 +144,7 @@ const BoxButton = <T,>({
 
   const itemHeight = height - 12 - (renderLabel ? 25 : 0);
   const itemWidth = itemHeight * imageRatio;
-  const width = itemWidth + 12;
+  const width = fixedItemWidth ?? itemWidth + 12;
   const borderRadius = itemWidth * COVER_CARD_RADIUS;
 
   const itemInfos = { item, index, width: itemWidth, height: itemHeight };
@@ -154,6 +160,8 @@ const BoxButton = <T,>({
             width: itemWidth,
             height: itemHeight,
             borderRadius,
+            top: 6,
+            left: (width - itemWidth) / 2,
           },
         ]}
         onPress={onPress}
@@ -181,6 +189,7 @@ const BoxButton = <T,>({
                 height: itemHeight + 12,
                 width: itemWidth + 12,
                 borderRadius: borderRadius + 6,
+                left: (width - itemWidth) / 2 - 6,
               },
             ]}
             pointerEvents="none"
@@ -192,6 +201,7 @@ const BoxButton = <T,>({
                 height: itemHeight + 4,
                 width: itemWidth + 4,
                 borderRadius: borderRadius + 2,
+                left: (width - itemWidth) / 2 - 2,
               },
             ]}
             pointerEvents="none"

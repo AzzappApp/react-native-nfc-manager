@@ -1,6 +1,5 @@
-import _ from 'lodash';
-import { useState, memo, useMemo } from 'react';
-import { Dimensions, StyleSheet, View } from 'react-native';
+import { useState, useMemo } from 'react';
+import { StyleSheet, useWindowDimensions, View } from 'react-native';
 import Animated, {
   interpolate,
   useAnimatedStyle,
@@ -14,28 +13,19 @@ import HomeBottomPanelMessage from './HomeBottomPanelMessage';
 import HomeContactCard from './HomeContactCard';
 import HomeInformations from './HomeInformations';
 import HomeMenu, { HOME_MENU_HEIGHT } from './HomeMenu';
+import { useHomeScreenContext } from './HomeScreenContext';
 import HomeStatistics from './HomeStatistics';
 import type { HomeBottomPanel_user$key } from '#relayArtifacts/HomeBottomPanel_user.graphql';
 
 import type { HOME_TAB } from './HomeMenu';
-import type { SharedValue } from 'react-native-reanimated';
 
 type HomeBottomPanelProps = {
   user: HomeBottomPanel_user$key;
-  /**
-   * current position of the scrolling profile (based on profile index and not scrollValue )
-   *
-   * @type {SharedValue<number>}
-   */
-  currentProfileIndexSharedValue: SharedValue<number>;
 };
 
 // TODO the way of we handle the mutations has been made when multi-actor environment was used, we should refactor that
 
-const HomeBottomPanel = ({
-  user: userKey,
-  currentProfileIndexSharedValue,
-}: HomeBottomPanelProps) => {
+const HomeBottomPanel = ({ user: userKey }: HomeBottomPanelProps) => {
   //#region data
   const user = useFragment(
     graphql`
@@ -51,9 +41,7 @@ const HomeBottomPanel = ({
             id
             userName
             cardIsPublished
-            cardCover {
-              title
-            }
+            hasCover
             webCardCategory {
               id
             }
@@ -75,13 +63,17 @@ const HomeBottomPanel = ({
   );
   const { profiles } = user;
   const [selectedPanel, setSelectedPanel] = useState<HOME_TAB>('CONTACT_CARD');
+  const { currentIndexSharedValue, inputRange } = useHomeScreenContext();
   //#endregion
 
-  const bottomPanelVisible = useMemo(() => {
+  const { width: windowWidth } = useWindowDimensions();
+  const panelHeight = (windowWidth - 40) / CONTACT_CARD_RATIO;
+
+  const bottomPanelVisible = useDerivedValue(() => {
     const res =
       profiles?.map(profile => {
         if (!profile) return 0;
-        return profile?.webCard?.cardCover != null &&
+        return profile?.webCard?.hasCover &&
           profile?.webCard?.cardIsPublished &&
           !profile?.invited &&
           !profile.promotedAsOwner
@@ -91,52 +83,52 @@ const HomeBottomPanel = ({
     return [0, ...res];
   }, [profiles]);
 
-  const inputRange = _.range(0, (profiles?.length ?? 0) + 1);
-
   const mainTabBarVisible = useDerivedValue(() => {
-    if (inputRange.length > 1) {
+    if (inputRange.value.length > 1) {
       return Math.pow(
         interpolate(
-          currentProfileIndexSharedValue.value + 1,
-          inputRange,
-          bottomPanelVisible,
+          currentIndexSharedValue.value,
+          inputRange.value,
+          bottomPanelVisible.value,
         ),
         3,
       );
     } else {
       //use a fixed value is only one profile
-      return bottomPanelVisible[0];
+      return bottomPanelVisible.value[0];
     }
-  }, [bottomPanelVisible, currentProfileIndexSharedValue.value, inputRange]);
+  });
 
   const bottomPanelStyle = useAnimatedStyle(() => {
-    const index = Math.round(currentProfileIndexSharedValue.value + 1);
-    const opacity =
-      inputRange.length > 1
-        ? interpolate(
-            currentProfileIndexSharedValue.value + 1,
-            inputRange,
-            bottomPanelVisible,
-          )
-        : 1;
+    if (inputRange.value.length === 0)
+      return { opacity: 1, pointerEvents: 'box-none' };
+
     return {
-      opacity: Math.pow(opacity, 3),
-      pointerEvents: bottomPanelVisible[index] === 1 ? 'box-none' : 'none',
+      opacity: mainTabBarVisible.value,
+      pointerEvents:
+        Math.round(mainTabBarVisible.value) === 1 ? 'auto' : 'none',
     };
-  }, [bottomPanelVisible, currentProfileIndexSharedValue.value, inputRange]);
+  });
+
+  const containerHeight = useMemo(
+    () => ({
+      height: panelHeight + HOME_MENU_HEIGHT,
+    }),
+    [panelHeight],
+  );
 
   useMainTabBarVisibilityController(mainTabBarVisible);
   //#endregion
 
   return (
-    <View style={styles.container}>
+    <View style={containerHeight}>
       <View style={styles.informationPanel}>
-        <HomeBottomPanelMessage
-          currentProfileIndexSharedValue={currentProfileIndexSharedValue}
-          user={profiles!}
-        />
+        <HomeBottomPanelMessage user={profiles!} />
       </View>
-      <Animated.View style={[styles.bottomPanel, bottomPanelStyle]}>
+      <Animated.View
+        style={[styles.bottomPanel, bottomPanelStyle]}
+        collapsable={false}
+      >
         <HomeMenu selected={selectedPanel} setSelected={setSelectedPanel} />
         <View
           style={{
@@ -144,11 +136,7 @@ const HomeBottomPanel = ({
             display: selectedPanel === 'CONTACT_CARD' ? 'flex' : 'none',
           }}
         >
-          <HomeContactCard
-            height={PANEL_HEIGHT}
-            user={user}
-            currentProfileIndexSharedValue={currentProfileIndexSharedValue}
-          />
+          <HomeContactCard height={panelHeight} user={user} />
         </View>
 
         <View
@@ -157,11 +145,7 @@ const HomeBottomPanel = ({
             display: selectedPanel === 'STATS' ? 'flex' : 'none',
           }}
         >
-          <HomeStatistics
-            user={profiles!}
-            height={PANEL_HEIGHT}
-            currentProfileIndexSharedValue={currentProfileIndexSharedValue}
-          />
+          <HomeStatistics user={profiles!} height={panelHeight} />
         </View>
 
         <View
@@ -170,24 +154,14 @@ const HomeBottomPanel = ({
             display: selectedPanel === 'INFORMATION' ? 'flex' : 'none',
           }}
         >
-          <HomeInformations
-            user={user}
-            height={PANEL_HEIGHT}
-            currentProfileIndexSharedValue={currentProfileIndexSharedValue}
-          />
+          <HomeInformations user={user} height={panelHeight} />
         </View>
       </Animated.View>
     </View>
   );
 };
 
-const { width: windowWidth } = Dimensions.get('screen');
-const PANEL_HEIGHT = (windowWidth - 40) / CONTACT_CARD_RATIO;
-
 const styles = StyleSheet.create({
-  container: {
-    height: PANEL_HEIGHT + HOME_MENU_HEIGHT,
-  },
   informationText: {
     textAlign: 'center',
     color: colors.white,
@@ -217,4 +191,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default memo(HomeBottomPanel);
+export default HomeBottomPanel;

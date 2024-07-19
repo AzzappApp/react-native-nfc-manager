@@ -6,6 +6,7 @@ import { useFormState, useFormStatus } from 'react-dom';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { SuccessIcon } from '#assets';
 import { processShareBackSubmission } from '#app/actions/shareBackAction';
+import Loader from '#components/Loader';
 import Button from '#ui/Button';
 import FormInput from '#ui/Form/FormInput';
 import { ShareBackFormSchema } from './shareBackFormSchema';
@@ -221,31 +222,37 @@ const ShareBackFormSubmitButton = ({
         !isSuccess ? styles.formButtonSuccess : '',
       )}
     >
-      <span
-        className={cx(
-          styles.formButtonLabel,
-          isSuccess ? styles.formButtonSuccess : '',
-        )}
-      >
-        <FormattedMessage
-          defaultMessage="Send"
-          id="Gm+qSm"
-          description="Share back - Send button label"
-        />
-      </span>
-      <div
-        className={cx(
-          styles.formButtonSuccessContainer,
-          isSuccess ? styles.formButtonSuccess : '',
-        )}
-      >
-        <SuccessIcon
-          className={cx(
-            styles.formButtonSuccessSvg,
-            isSuccess ? styles.formButtonSuccess : '',
-          )}
-        />
-      </div>
+      {pending ? (
+        <Loader />
+      ) : (
+        <>
+          <span
+            className={cx(
+              styles.formButtonLabel,
+              isSuccess ? styles.formButtonSuccess : '',
+            )}
+          >
+            <FormattedMessage
+              defaultMessage="Send"
+              id="Gm+qSm"
+              description="Share back - Send button label"
+            />
+          </span>
+          <div
+            className={cx(
+              styles.formButtonSuccessContainer,
+              isSuccess ? styles.formButtonSuccess : '',
+            )}
+          >
+            <SuccessIcon
+              className={cx(
+                styles.formButtonSuccessSvg,
+                isSuccess ? styles.formButtonSuccess : '',
+              )}
+            />
+          </div>
+        </>
+      )}
     </Button>
   );
 };

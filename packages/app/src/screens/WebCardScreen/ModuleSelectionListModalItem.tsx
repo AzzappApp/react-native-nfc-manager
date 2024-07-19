@@ -3,6 +3,7 @@ import { FormattedMessage } from 'react-intl';
 import { Image, View, useColorScheme } from 'react-native';
 import { isModuleKindSubscription } from '@azzapp/shared/subscriptionHelpers';
 import { colors, shadow } from '#theme';
+import PremiumIndicator from '#components/PremiumIndicator';
 import { useStyleSheet, createStyleSheet } from '#helpers/createStyles';
 
 import Icon from '#ui/Icon';
@@ -74,12 +75,24 @@ const ModuleSelectionListModalItem = ({
         >
           {module.ready ? (
             <View style={styles.freeTextView}>
-              <Text variant="xsmall">
-                <FormattedMessage
-                  defaultMessage="Free"
-                  description="Module Selection List - Free label for module"
-                />
-              </Text>
+              {isModuleKindSubscription(module.moduleKind) ? (
+                <>
+                  <Text variant="xsmall">
+                    <FormattedMessage
+                      defaultMessage="azzapp+"
+                      description="Module Selection List - azzapp+ label for module"
+                    />
+                  </Text>
+                  <PremiumIndicator isRequired size={18} style={styles.badge} />
+                </>
+              ) : (
+                <Text variant="xsmall" style={{ paddingRight: 5 }}>
+                  <FormattedMessage
+                    defaultMessage="Free"
+                    description="Module Selection List - Free label for module"
+                  />
+                </Text>
+              )}
             </View>
           ) : (
             <View style={styles.comingSoon}>
@@ -95,9 +108,6 @@ const ModuleSelectionListModalItem = ({
             <Icon icon="add" style={styles.addIconStyle} />
           </View>
         </View>
-        {isModuleKindSubscription(module.moduleKind) && (
-          <Icon icon="plus_white_border" size={30} style={styles.badge} />
-        )}
       </View>
     </PressableOpacity>
   );
@@ -130,7 +140,7 @@ const styleSheet = createStyleSheet(appearance => ({
     borderRadius: 10,
     height: 20,
     paddingLeft: 5,
-    paddingRight: 5,
+    flexDirection: 'row',
   },
   addIconButtonStyle: {
     backgroundColor: appearance === 'light' ? colors.black : colors.white,
@@ -155,8 +165,7 @@ const styleSheet = createStyleSheet(appearance => ({
     color: colors.white,
   },
   badge: {
-    position: 'absolute',
-    top: 1,
-    right: 9.5,
+    marginLeft: 3,
+    marginRight: 1,
   },
 }));

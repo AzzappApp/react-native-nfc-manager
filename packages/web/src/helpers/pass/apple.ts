@@ -12,43 +12,45 @@ import icon from '@azzapp/web/public/pass/ICON_PADDING_15.png';
 import icon2x from '@azzapp/web/public/pass/ICON_PADDING_15@2x.png';
 import logo from '@azzapp/web/public/pass/LOGO_PADDING_0-40.png';
 import logo2x from '@azzapp/web/public/pass/LOGO_PADDING_0-40@2x.png';
+import { buildCoverImageUrl } from '#helpers/cover';
 import { convertHexToRGBA } from '../color';
+import type { WebCard } from '@azzapp/data';
 
-const getCoverUrl = (userName: string, size: number, updatedAt: Date) =>
-  `${
-    process.env.NEXT_PUBLIC_URL
-  }api/cover/${userName}?width=${size}&height=${size}&crop=lpad&updatedAt=${updatedAt.toISOString()}`;
+const getCoverUrl = (webCard: WebCard, size: number) =>
+  buildCoverImageUrl(webCard, {
+    width: size,
+    height: size,
+    crop: 'lpad',
+  });
 
 export const buildApplePass = async (profileId: string, locale: string) => {
   const res = await getProfileWithWebCardById(profileId);
   if (res) {
-    const [media] = res.WebCard.coverData?.mediaId
-      ? await getMediasByIds([res.WebCard.coverData?.mediaId])
+    const [media] = res.WebCard.coverMediaId
+      ? await getMediasByIds([res.WebCard.coverMediaId])
       : [];
 
     const thumbnails: Record<string, Buffer> = {};
 
     if (media) {
-      const [thumbnailUrl, thumbnail2xUrl, thumbnail3xUrl] =
-        await Promise.allSettled([
-          fetch(
-            getCoverUrl(res.WebCard.userName, 90, res.WebCard.updatedAt),
-          ).then(res => res.arrayBuffer()),
-          fetch(
-            getCoverUrl(res.WebCard.userName, 90 * 2, res.WebCard.updatedAt),
-          ).then(res => res.arrayBuffer()),
-          fetch(
-            getCoverUrl(res.WebCard.userName, 90 * 3, res.WebCard.updatedAt),
-          ).then(res => res.arrayBuffer()),
-        ]);
+      const thumbnail = await getCoverUrl(res.WebCard, 90);
+      const thumbnail2x = await getCoverUrl(res.WebCard, 90 * 2);
+      const thumbnail3x = await getCoverUrl(res.WebCard, 90 * 3);
+      const [thumbnailUrl, thumbnail2xUrl, thumbnail3xUrl] = thumbnail
+        ? await Promise.allSettled([
+            fetch(thumbnail).then(res => res.arrayBuffer()),
+            fetch(thumbnail2x!).then(res => res.arrayBuffer()),
+            fetch(thumbnail3x!).then(res => res.arrayBuffer()),
+          ])
+        : [null, null, null];
 
-      if (thumbnailUrl.status === 'fulfilled') {
+      if (thumbnailUrl?.status === 'fulfilled') {
         thumbnails['thumbnail.png'] = Buffer.from(thumbnailUrl.value);
       }
-      if (thumbnail2xUrl.status === 'fulfilled') {
+      if (thumbnail2xUrl?.status === 'fulfilled') {
         thumbnails['thumbnail@2x.png'] = Buffer.from(thumbnail2xUrl.value);
       }
-      if (thumbnail3xUrl.status === 'fulfilled') {
+      if (thumbnail3xUrl?.status === 'fulfilled') {
         thumbnails['thumbnail@3x.png'] = Buffer.from(thumbnail3xUrl.value);
       }
     }
@@ -157,7 +159,8 @@ export const buildApplePass = async (profileId: string, locale: string) => {
     });
     pass.secondaryFields.push({
       key: 'company',
-      value: contactCard?.company ?? '',
+      value:
+        res.WebCard.commonInformation?.company ?? contactCard?.company ?? '',
       textAlignment: 'PKTextAlignmentLeft',
     });
 

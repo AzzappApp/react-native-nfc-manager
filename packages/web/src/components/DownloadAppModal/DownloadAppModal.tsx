@@ -1,5 +1,9 @@
+import Image from 'next/image';
 import { forwardRef } from 'react';
+import { FormattedMessage } from 'react-intl';
 import { Button, Modal, type ModalProps } from '#ui';
+import dlIos from '#assets/images/icon_iOS.png';
+import dlAndroid from '#assets/images/icon_Play_Store.png';
 import CoverRenderer from '#components/renderer/CoverRenderer';
 import styles from './DownloadAppModal.css';
 import type { ModalActions } from '#ui/Modal';
@@ -49,12 +53,30 @@ const DownloadAppModal = forwardRef(
           <span className={styles.footerText}>
             Access digital profile, albums, posts...
           </span>
-          <Button.Link
-            href={process.env.NEXT_PUBLIC_DOWNLOAD_MOBILE_APP}
-            className={styles.footerButton}
-          >
-            Get Azzapp Mobile Application
-          </Button.Link>
+          <div className={styles.footerButtons}>
+            <Button.Link
+              href={process.env.NEXT_PUBLIC_DOWNLOAD_IOS_APP}
+              className={styles.footerButton}
+            >
+              <Image src={dlIos} alt="ios logo" width={24} />
+              <FormattedMessage
+                defaultMessage="iOS"
+                id="IohNeB"
+                description="Download link for iOS"
+              />
+            </Button.Link>
+            <Button.Link
+              href={process.env.NEXT_PUBLIC_DOWNLOAD_ANDROID_APP}
+              className={styles.footerButton}
+            >
+              <Image src={dlAndroid} alt="android logo" width={24} />
+              <FormattedMessage
+                defaultMessage="Android"
+                id="iaXPLY"
+                description="Download link for android"
+              />
+            </Button.Link>
+          </div>
         </div>
       </Modal>
     );

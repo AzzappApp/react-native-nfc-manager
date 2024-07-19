@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { DEFAULT_VARCHAR_LENGTH } from '@azzapp/data/db';
+import { DEFAULT_VARCHAR_LENGTH } from '@azzapp/data/helpers/constants';
 
 export const colorValidator = z
   .string()

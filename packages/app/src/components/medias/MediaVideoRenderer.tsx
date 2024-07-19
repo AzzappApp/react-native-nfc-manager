@@ -4,8 +4,10 @@ import {
   useImperativeHandle,
   useMemo,
   useRef,
+  useState,
 } from 'react';
 import { findNodeHandle, NativeModules, StyleSheet, View } from 'react-native';
+import { DelayedActivityIndicator } from '#ui/ActivityIndicator/ActivityIndicator';
 import SnapshotView, { snapshotView } from '../SnapshotView';
 import MediaImageRenderer from './MediaImageRenderer';
 import NativeMediaVideoRenderer from './NativeMediaVideoRenderer';
@@ -52,10 +54,13 @@ const MediaVideoRenderer = (
     _videoSnapshots.delete(source.mediaId);
   }, [source.mediaId]);
 
+  const [loading, setLoading] = useState(videoEnabled);
+
   const onVideoReadyForDisplay = useCallback(() => {
     cleanSnapshots();
     dispatchReady();
     onVideoReady?.();
+    setLoading(false);
   }, [cleanSnapshots, dispatchReady, onVideoReady]);
 
   const onSeekComplete = useCallback(() => {
@@ -170,9 +175,27 @@ const MediaVideoRenderer = (
           />
         </View>
       ) : null}
+      {loading && (
+        <View style={styles.loadingContainer}>
+          <DelayedActivityIndicator
+            color="white"
+            variant="video"
+            delay={3000}
+          />
+        </View>
+      )}
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  loadingContainer: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'transparent', // without background color, the activity indicator is large
+    flex: 1,
+  },
+});
 
 export default forwardRef(MediaVideoRenderer);
 

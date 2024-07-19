@@ -55,7 +55,7 @@ const SimpleButtonBackgroundEditionPanel = ({
     graphql`
       fragment SimpleButtonBackgroundEditionPanel_profile on Profile {
         moduleBackgrounds {
-          ...StaticMediaList_staticMedias
+          ...ModuleBackgroundList_ModuleBackgrounds
         }
         webCard {
           ...WebCardBackground_webCard

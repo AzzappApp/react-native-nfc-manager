@@ -30,9 +30,6 @@ const SnapshotView = ({
   style,
   ...props
 }: SnapshotViewProps) => {
-  if (Platform.OS !== 'ios') {
-    throw new Error('Not Supported');
-  }
   const clearOnUnmountRef = useRef(clearOnUnmount);
   clearOnUnmountRef.current = clearOnUnmount;
   useEffect(
@@ -55,6 +52,11 @@ export default SnapshotView;
 
 const FAKE_SNAPSHOT_ID = 'FAKE_SNAPSHOT_ID';
 
+const AZPSnapshotModule =
+  Platform.OS === 'ios'
+    ? NativeModules.AZPSnapshotManager
+    : NativeModules.AZPSnapshotModule;
+
 /**
  * Snapshots a view and returns a promise that resolves to the snapshot ID.
  * This ID can be used to render the snapshot using the `SnapshotView` component.
@@ -66,9 +68,6 @@ const FAKE_SNAPSHOT_ID = 'FAKE_SNAPSHOT_ID';
 export const snapshotView = async (
   viewHandle: HostComponent<any> | number,
 ): Promise<string> => {
-  if (Platform.OS !== 'ios') {
-    throw new Error('Not supported');
-  }
   if (typeof viewHandle === 'object') {
     const nodeHandle = findNodeHandle(viewHandle);
     if (nodeHandle == null) {
@@ -77,7 +76,8 @@ export const snapshotView = async (
     }
     viewHandle = nodeHandle;
   }
-  return NativeModules.AZPSnapshotManager.snapshotView(viewHandle);
+
+  return AZPSnapshotModule.snapshotView(viewHandle);
 };
 
 /**
@@ -89,11 +89,8 @@ export const clearShapshot = async (id: string): Promise<void> => {
   if (id === FAKE_SNAPSHOT_ID) {
     return;
   }
-  return NativeModules.AZPSnapshotManager.clearSnapshot(id);
+  return AZPSnapshotModule.clearSnapshot(id);
 };
 
 const NativeSnapshotView: React.ComponentType<SnapshotViewProps> =
-  Platform.select({
-    ios: requireNativeComponent('AZPSnapshot'),
-    default: null as any,
-  });
+  requireNativeComponent('AZPSnapshot');

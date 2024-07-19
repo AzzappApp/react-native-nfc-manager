@@ -55,7 +55,7 @@ const SocialLinksBackgroundEditionPanel = ({
     graphql`
       fragment SocialLinksBackgroundEditionPanel_profile on Profile {
         moduleBackgrounds {
-          ...StaticMediaList_staticMedias
+          ...ModuleBackgroundList_ModuleBackgrounds
         }
         webCard {
           ...WebCardColorPicker_webCard

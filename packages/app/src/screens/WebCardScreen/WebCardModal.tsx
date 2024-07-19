@@ -1,8 +1,16 @@
 import * as Sentry from '@sentry/react-native';
-import { useCallback } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { View, useWindowDimensions, Share, Platform } from 'react-native';
+import {
+  View,
+  useWindowDimensions,
+  Share,
+  Platform,
+  Alert,
+} from 'react-native';
+import ReactNativeBlobUtil from 'react-native-blob-util';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import ShareCommand from 'react-native-share';
 import Toast from 'react-native-toast-message';
 import { graphql, useFragment } from 'react-relay';
 import { useDebouncedCallback } from 'use-debounce';
@@ -17,6 +25,7 @@ import useAuthState from '#hooks/useAuthState';
 import useQuitWebCard from '#hooks/useQuitWebCard';
 import { useSendReport } from '#hooks/useSendReport';
 import ActivityIndicator from '#ui/ActivityIndicator';
+import { DelayedActivityIndicator } from '#ui/ActivityIndicator/ActivityIndicator';
 import BottomSheetModal from '#ui/BottomSheetModal';
 import Container from '#ui/Container';
 import Header from '#ui/Header';
@@ -79,6 +88,10 @@ const WebCardModal = ({
         nbFollowers
         nbFollowings
         cardIsPublished
+        coverMedia {
+          __typename
+          uriDownload: uri
+        }
         webCardModal_isFollowing: isFollowing(webCardId: $viewerWebCardId)
         ...CoverRenderer_webCard
       }
@@ -128,11 +141,82 @@ const WebCardModal = ({
           }),
         },
       );
-      //TODO: handle result of the share when specified
     } catch (error: any) {
       Sentry.captureException(error);
     }
   };
+
+  const [coverVideoLoading, setCoverVideoLoading] = useState(false);
+  const cancelCoverVideoDownloadRef = useRef<(() => void) | null>(null);
+
+  const onShareCoverVideo = useCallback(async () => {
+    if (!webCard.coverMedia?.uriDownload || coverVideoLoading) {
+      return;
+    }
+    setCoverVideoLoading(true);
+    let localPath;
+    try {
+      //download the coverurl locally
+      const dirs = ReactNativeBlobUtil.fs.dirs;
+
+      const stateFullPromise = ReactNativeBlobUtil.config({
+        fileCache: true,
+        path: `${dirs.CacheDir}/${webCard.userName}.${webCard.coverMedia.__typename === 'MediaVideo' ? 'mp4' : 'png'}`,
+      }).fetch('GET', webCard.coverMedia.uriDownload);
+      cancelCoverVideoDownloadRef.current = () => {
+        stateFullPromise.cancel();
+      };
+
+      localPath = await stateFullPromise;
+    } catch (error) {
+      if (!(error instanceof ReactNativeBlobUtil.CanceledFetchError)) {
+        Toast.show({
+          type: 'error',
+          text1: intl.formatMessage({
+            defaultMessage: 'Error while downloading the media',
+            description:
+              'Error toast message when downloading the media fails during the video share',
+          }),
+        });
+      }
+      return;
+    } finally {
+      cancelCoverVideoDownloadRef.current = null;
+      setCoverVideoLoading(false);
+    }
+
+    try {
+      await ShareCommand.open({
+        url: `file://${localPath.path()}`,
+        type:
+          webCard.coverMedia.__typename === 'MediaVideo'
+            ? 'video/mp4'
+            : 'image/png',
+        failOnCancel: false,
+      });
+    } catch (error: any) {
+      Toast.show({
+        type: 'error',
+        text1: intl.formatMessage({
+          defaultMessage: 'Error while sharing the media',
+          description:
+            'Error toast message when sharing the media fails during the video share',
+        }),
+      });
+    }
+  }, [
+    intl,
+    coverVideoLoading,
+    webCard.coverMedia?.__typename,
+    webCard.coverMedia?.uriDownload,
+    webCard.userName,
+  ]);
+
+  useEffect(() => {
+    if (!visible) {
+      cancelCoverVideoDownloadRef.current?.();
+    }
+  }, [visible]);
 
   const debouncedToggleFollowing = useDebouncedCallback(() => {
     onToggleFollow(webCard.id, webCard.userName, !isFollowing);
@@ -155,11 +239,16 @@ const WebCardModal = ({
       } else {
         Toast.show({
           type: 'info',
-          text1: intl.formatMessage({
-            defaultMessage: 'You already reported this webCard',
-            description:
-              'Info toast message when sending report on webCard is already done.',
-          }),
+          text1: intl.formatMessage(
+            {
+              defaultMessage: 'You have already reported this WebCard{azzappA}',
+              description:
+                'Info toast message when sending report on webCard is already done.',
+            },
+            {
+              azzappA: <Text variant="azzapp">a</Text>,
+            },
+          ) as string,
           onHide: close,
         });
       }
@@ -193,7 +282,7 @@ const WebCardModal = ({
     webCard.id,
     () => {
       close();
-      router.back();
+      router.backToTop();
     },
     e => {
       if (e.message === ERRORS.SUBSCRIPTION_IS_ACTIVE) {
@@ -209,18 +298,73 @@ const WebCardModal = ({
       } else {
         Toast.show({
           type: 'error',
-          text1: intl.formatMessage({
-            defaultMessage: "Error, couldn't quit WebCard. Please try again.",
-            description: 'Error toast message when quitting WebCard',
-          }),
+          text1: intl.formatMessage(
+            {
+              defaultMessage:
+                'Oops, quitting this WebCard{azzappA} was not possible. Please try again later.',
+              description: 'Error toast message when quitting WebCard',
+            },
+            {
+              azzappA: <Text variant="azzapp">a</Text>,
+            },
+          ) as string,
         });
       }
     },
   );
 
+  const handleConfirmationQuitWebCard = useCallback(() => {
+    const titleMsg = isOwner
+      ? intl.formatMessage({
+          defaultMessage: 'Delete this WebCard',
+          description: 'Delete WebCard title',
+        })
+      : intl.formatMessage({
+          defaultMessage: 'Quit this WebCard',
+          description: 'Quit WebCard title',
+        });
+
+    const descriptionMsg = isOwner
+      ? intl.formatMessage({
+          defaultMessage:
+            'Are you sure you want to delete this WebCard and all its contents? This action is irreversible.',
+          description: 'Delete WebCard confirmation message',
+        })
+      : intl.formatMessage({
+          defaultMessage:
+            'Are you sure you want to quit this WebCard? This action is irreversible.',
+          description: 'Quit WebCard confirmation message',
+        });
+
+    const labelConfirmation = isOwner
+      ? intl.formatMessage({
+          defaultMessage: 'Delete this WebCard',
+          description: 'Delete button label',
+        })
+      : intl.formatMessage({
+          defaultMessage: 'Quit this WebCard',
+          description: 'Quit button label',
+        });
+
+    Alert.alert(titleMsg, descriptionMsg, [
+      {
+        text: intl.formatMessage({
+          defaultMessage: 'Cancel',
+          description: 'Cancel button label',
+        }),
+        style: 'cancel',
+      },
+      {
+        text: labelConfirmation,
+        style: 'destructive',
+        onPress: quitWebCard,
+      },
+    ]);
+  }, [intl, isOwner, quitWebCard]);
+
   return (
     <BottomSheetModal
-      height={Math.min(600, windowsHeight - top + 50)}
+      height={Math.min(650, windowsHeight - top + 50)}
       visible={visible}
       onRequestClose={close}
       contentContainerStyle={styles.bottomSheetContentContainer}
@@ -330,12 +474,43 @@ const WebCardModal = ({
                   <Text>
                     <FormattedMessage
                       defaultMessage="Share this Webcard{azzappA}"
-                      description="Profile webcard modal - Share thie Webcard"
+                      description="Profile webcard modal - Share this Webcard"
                       values={{
                         azzappA: <Text variant="azzapp">a</Text>,
                       }}
                     />
                   </Text>
+                </View>
+              </View>
+            </PressableNative>
+          )}
+          {isViewer && webCard.cardIsPublished && (
+            <PressableNative
+              style={styles.bottomSheetOptionButton}
+              onPress={onShareCoverVideo}
+            >
+              <View style={styles.bottomSheetOptionContainer}>
+                <View style={styles.bottomSheetOptionIconLabel}>
+                  <Icon icon="video_film" />
+                  <Text>
+                    {webCard.coverMedia?.__typename === 'MediaVideo' ? (
+                      <FormattedMessage
+                        defaultMessage="Share this cover video"
+                        description="Profile webcard modal - Share this video"
+                      />
+                    ) : (
+                      <FormattedMessage
+                        defaultMessage="Share this cover image"
+                        description="Profile webcard modal - Share this image"
+                      />
+                    )}
+                  </Text>
+                  {coverVideoLoading && (
+                    <DelayedActivityIndicator
+                      delay={300}
+                      style={styles.loader}
+                    />
+                  )}
                 </View>
               </View>
             </PressableNative>
@@ -374,8 +549,15 @@ const WebCardModal = ({
               ) : (
                 <Text variant="error">
                   <FormattedMessage
-                    defaultMessage="Report this webCard"
+                    defaultMessage="Report this WebCard{azzappA}"
                     description="Label for the button to report a webCard"
+                    values={{
+                      azzappA: (
+                        <Text variant="azzapp" style={styles.deleteButton}>
+                          a
+                        </Text>
+                      ),
+                    }}
                   />
                 </Text>
               )}
@@ -384,7 +566,7 @@ const WebCardModal = ({
         </View>
         {isViewer && (
           <PressableNative
-            onPress={quitWebCard}
+            onPress={handleConfirmationQuitWebCard}
             style={[styles.bottomSheetOptionButton, styles.report]}
             disabled={isLoadingQuitWebCard}
           >
@@ -466,4 +648,5 @@ const stylesheet = createStyleSheet(appearance => ({
   coverStyle: {
     ...shadow(appearance, 'bottom'),
   },
+  loader: { height: 25 },
 }));

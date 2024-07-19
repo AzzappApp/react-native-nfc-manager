@@ -11,7 +11,6 @@ import {
   MenuItem,
   Select,
   TextField,
-  Typography,
 } from '@mui/material';
 import { useRouter } from 'next/navigation';
 import {
@@ -54,7 +53,7 @@ const CardTemplatesList = ({
   const router = useRouter();
   const [loading, startTransition] = useTransition();
   const [currentSearch, setCurrentSearch] = useState(search ?? '');
-  const defferedSearch = useDeferredValue(currentSearch);
+  const deferredSearch = useDeferredValue(currentSearch);
   const [personalStatusFilter, setPersonalStatusFilter] = useState(
     filters?.personalStatus || 'All',
   );
@@ -100,7 +99,7 @@ const CardTemplatesList = ({
     (model: GridSortModel) => {
       updateSearchParams(
         page,
-        model[0]?.field ?? 'labelKey',
+        model[0]?.field ?? 'label',
         model[0]?.sort ?? 'asc',
         search,
         {
@@ -119,16 +118,16 @@ const CardTemplatesList = ({
   );
 
   useEffect(() => {
-    if (search === defferedSearch) {
+    if (search === deferredSearch) {
       return;
     }
-    updateSearchParams(1, sortField, sortOrder, defferedSearch, {
+    updateSearchParams(1, sortField, sortOrder, deferredSearch, {
       businessStatus: businessStatusFilter,
       personalStatus: personalStatusFilter,
     });
   }, [
     businessStatusFilter,
-    defferedSearch,
+    deferredSearch,
     page,
     personalStatusFilter,
     search,
@@ -162,16 +161,7 @@ const CardTemplatesList = ({
   );
 
   return (
-    <Box
-      sx={{
-        display: 'flex',
-        flexDirection: 'column',
-        height: '100%',
-      }}
-    >
-      <Typography variant="h4" component="h1" sx={{ mb: 2 }}>
-        WebCards templates
-      </Typography>
+    <>
       <Box
         sx={{
           display: 'flex',
@@ -269,14 +259,14 @@ const CardTemplatesList = ({
         rowSelection={false}
         sortingOrder={['asc', 'desc']}
       />
-    </Box>
+    </>
   );
 };
 
 const columns: GridColDef[] = [
   {
-    field: 'labelKey',
-    headerName: 'Label Key',
+    field: 'label',
+    headerName: 'Label',
     flex: 1,
   },
   {

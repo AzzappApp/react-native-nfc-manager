@@ -5,25 +5,83 @@
  *
  * package is not maintained anymore so we internalized it
  */
+import { Animation, LayerType, AssetType } from '@lottiefiles/lottie-js';
 import cloneDeep from 'lodash/cloneDeep';
+import type {
+  ImageAsset,
+  PrecompositionAsset,
+  ImageLayer,
+} from '@lottiefiles/lottie-js';
 
-export const colorify = (
-  destColors: Array<number[] | string | undefined> = [],
-  lottieObj: any,
+export const replaceColors = (
+  replacements: Array<{
+    sourceColor: number[] | string;
+    targetColor: number[] | string;
+  }>,
+  lottieObj?: any,
   immutable = true,
 ) => {
-  const modifiedColors = [];
-  for (const color of destColors) {
-    modifiedColors.push(convertColorToLottieColor(color));
-  }
+  function doReplace(
+    replacements: Array<{
+      sourceColor: number[];
+      targetColor: number[];
+    }>,
+    obj: any,
+  ) {
+    if (obj && obj.s && Array.isArray(obj.s) && obj.s.length === 4) {
+      const identifiedColorIndex = replacements.findIndex(
+        ({ sourceColor }) =>
+          sourceColor[0] === obj.s[0] &&
+          sourceColor[1] === obj.s[1] &&
+          sourceColor[2] === obj.s[2],
+      );
+      if (identifiedColorIndex !== -1) {
+        obj.s = [
+          ...replacements[identifiedColorIndex].targetColor,
+          obj.s[3] ?? 1,
+        ];
+      }
+    } else if (obj?.c?.k || obj?.g?.k?.k || obj?.v?.k) {
+      const array = obj?.c?.k ?? obj?.g?.k?.k ?? obj?.v?.k;
+      if (Array.isArray(array))
+        if (typeof array[0] !== 'number') {
+          doReplace(replacements, array);
+        } else {
+          replacements.forEach(({ sourceColor, targetColor }) => {
+            for (let i = 0; i < array.length; i += 1) {
+              if (
+                round(array[i]) === sourceColor[0] &&
+                round(array[i + 1]) === sourceColor[1] &&
+                round(array[i + 2]) === sourceColor[2]
+              ) {
+                array[i] = targetColor[0];
+                array[i + 1] = targetColor[1];
+                array[i + 2] = targetColor[2];
+                i += 2;
+              }
+            }
+          });
+        }
+    } else {
+      for (const key in obj) {
+        if (typeof obj[key] === 'object') {
+          doReplace(replacements, obj[key]);
+        }
+      }
+    }
 
-  const newLottie = modifyColors(
-    modifiedColors,
+    return obj;
+  }
+  return doReplace(
+    replacements
+      .map(({ sourceColor, targetColor }) => ({
+        sourceColor: convertColorToLottieColor(sourceColor)!,
+        targetColor: convertColorToLottieColor(targetColor)!,
+      }))
+      .filter(({ sourceColor, targetColor }) => sourceColor && targetColor),
     immutable ? cloneDeep(lottieObj) : lottieObj,
   );
-  return newLottie;
 };
-
 const shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
 const hexRegex = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i;
 
@@ -65,159 +123,65 @@ const convertColorToLottieColor = (_color: number[] | string | undefined) => {
 
 const round = (n: number) => Math.round(n * 1000) / 1000;
 
-export const replaceColor = (
-  sourceColor: number[] | string,
-  targetColor: number[] | string,
-  lottieObj: any,
-  immutable = true,
-) => {
-  const genSourceLottieColor = convertColorToLottieColor(sourceColor);
-  const genTargetLottieColor = convertColorToLottieColor(targetColor);
-  if (!genSourceLottieColor || !genTargetLottieColor) {
-    throw new Error('Proper colors must be used for both source and target');
-  }
-  function doReplace(
-    sourceLottieColor: number[],
-    targetLottieColor: number[],
-    obj: any,
-  ) {
-    if (obj.s && Array.isArray(obj.s) && obj.s.length === 4) {
-      if (
-        sourceLottieColor[0] === obj.s[0] &&
-        sourceLottieColor[1] === obj.s[1] &&
-        sourceLottieColor[2] === obj.s[2]
-      ) {
-        obj.s = [...targetLottieColor, 1];
-      }
-    } else if (obj.c && obj.c.k) {
-      if (Array.isArray(obj.c.k) && typeof obj.c.k[0] !== 'number') {
-        doReplace(sourceLottieColor, targetLottieColor, obj.c.k);
-      } else if (
-        sourceLottieColor[0] === round(obj.c.k[0]) &&
-        sourceLottieColor[1] === round(obj.c.k[1]) &&
-        sourceLottieColor[2] === round(obj.c.k[2])
-      ) {
-        obj.c.k = targetLottieColor;
-      }
-    } else {
-      for (const key in obj) {
-        if (typeof obj[key] === 'object') {
-          doReplace(sourceLottieColor, targetLottieColor, obj[key]);
-        }
-      }
-    }
+export type LottieInfo = {
+  duration: number;
+  assetsInfos: LottieAssetInfo[];
+};
 
-    return obj;
-  }
-  return doReplace(
-    genSourceLottieColor,
-    genTargetLottieColor,
-    immutable ? cloneDeep(lottieObj) : lottieObj,
+export type LottieAssetInfo = {
+  id: string;
+  startTime: number;
+  endTime: number;
+  width: number;
+  height: number;
+};
+
+export function extractLottieInfo(lottie: Record<string, any>): LottieInfo {
+  const animation = new Animation();
+  animation.fromJSON(lottie);
+
+  const imageLayers = animation.layers.filter(
+    layer => layer.type === LayerType.IMAGE,
   );
-};
 
-export const flatten = (
-  targetColor: number[] | string,
-  lottieObj: any,
-  immutable = true,
-) => {
-  const genTargetLottieColor = convertColorToLottieColor(targetColor);
-  if (!genTargetLottieColor) {
-    throw new Error('Proper colors must be used for target');
-  }
-  function doFlatten(targetLottieColor: number[], obj: any) {
-    if (obj.s && Array.isArray(obj.s) && obj.s.length === 4) {
-      obj.s = [...targetLottieColor, 1];
-    } else if (obj.c && obj.c.k) {
-      if (Array.isArray(obj.c.k) && typeof obj.c.k[0] !== 'number') {
-        doFlatten(targetLottieColor, obj.c.k);
-      } else {
-        obj.c.k = targetLottieColor;
-      }
-    } else {
-      for (const key in obj) {
-        if (typeof obj[key] === 'object') {
-          doFlatten(targetLottieColor, obj[key]);
-        }
-      }
-    }
-
-    return obj;
-  }
-  return doFlatten(
-    genTargetLottieColor,
-    immutable ? cloneDeep(lottieObj) : lottieObj,
+  imageLayers.push(
+    ...animation.assets
+      .filter(
+        asset => 'type' in asset && asset.type === AssetType.PRECOMPOSITION,
+      )
+      .flatMap(asset => {
+        const precompAssets = asset as PrecompositionAsset;
+        return precompAssets.layers;
+      }),
   );
-};
 
-const modifyColors = (colorsArray: any, lottieObj: any) => {
-  let i = 0;
-  function doModify(colors: any, obj: any) {
-    if (obj.s && Array.isArray(obj.s) && obj.s.length === 4) {
-      if (colors[i]) {
-        obj.s = [...colors[i], 1];
-      }
-      i++;
-    } else if (obj.c && obj.c.k) {
-      if (Array.isArray(obj.c.k) && typeof obj.c.k[0] !== 'number') {
-        doModify(colors, obj.c.k);
-      } else {
-        if (colors[i]) {
-          obj.c.k = colors[i];
-        }
-        i++;
-      }
-    }
+  return {
+    duration: animation.duration,
+    assetsInfos: animation.assets
+      .filter(asset => 'path' in asset)
+      .map(asset => {
+        const imageAsset = asset as ImageAsset;
 
-    for (const key in obj) {
-      if (typeof obj[key] === 'object') {
-        doModify(colors, obj[key]);
-      }
-    }
+        const mediaLayers = imageLayers.filter(
+          layer => (layer as ImageLayer).refId === imageAsset.id,
+        ) as ImageLayer[];
 
-    return obj;
-  }
-  return doModify(colorsArray, lottieObj);
-};
-
-const convertLottieColorToRgb = (lottieColor: number[]) => {
-  return [
-    Math.round(lottieColor[0] * 255),
-    Math.round(lottieColor[1] * 255),
-    Math.round(lottieColor[2] * 255),
-  ];
-};
-
-const convertLottieColorToRgba = (lottieColor: number[]) => {
-  return [
-    Math.round(lottieColor[0] * 255),
-    Math.round(lottieColor[1] * 255),
-    Math.round(lottieColor[2] * 255),
-    lottieColor[3],
-  ];
-};
-
-export const getColors = (lottieObj: any): any => {
-  const res: any = [];
-  function doGet(obj: any) {
-    if (obj.s && Array.isArray(obj.s) && obj.s.length === 4) {
-      res.push(convertLottieColorToRgba(obj.s));
-    } else if (obj.c && obj.c.k) {
-      if (Array.isArray(obj.c.k) && typeof obj.c.k[0] !== 'number') {
-        doGet(obj.c.k);
-      } else {
-        res.push(convertLottieColorToRgb(obj.c.k));
-      }
-    } else {
-      for (const key in obj) {
-        if (typeof obj[key] === 'object') {
-          doGet(obj[key]);
-        }
-      }
-    }
-
-    return res;
-  }
-  doGet(lottieObj);
-  return res;
-};
+        const startFrame = mediaLayers.reduce(
+          (min, layer) => Math.min(min, layer.inPoint),
+          Infinity,
+        );
+        const endFrame = mediaLayers.reduce(
+          (max, layer) => Math.max(max, layer.outPoint),
+          0,
+        );
+        return {
+          id: imageAsset.id!,
+          startTime: startFrame / animation.frameRate,
+          endTime: endFrame / animation.frameRate,
+          width: imageAsset.width,
+          height: imageAsset.height,
+        };
+      })
+      .sort((a, b) => a.startTime - b.startTime),
+  };
+}

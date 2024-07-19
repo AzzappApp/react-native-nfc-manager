@@ -1,20 +1,24 @@
 import sgMail from '@sendgrid/mail';
 import { NextResponse } from 'next/server';
 import { withAxiom } from 'next-axiom';
-import QRCode from 'qrcode';
 import { getProfileWithWebCardById, getUserById } from '@azzapp/data';
+import { getTextColor } from '@azzapp/shared/colorsHelpers';
+import { COVER_RATIO } from '@azzapp/shared/coverHelpers';
 import ERRORS from '@azzapp/shared/errors';
+import { getImageURLForSize } from '@azzapp/shared/imagesHelpers';
 import serializeAndSignContactCard from '@azzapp/shared/serializeAndSignContactCard';
 import serializeAndSignEmailSignature from '@azzapp/shared/serializeAndSignEmailSignature';
 import { formatDisplayName } from '@azzapp/shared/stringHelpers';
 import { buildEmailSignatureGenerationUrl } from '@azzapp/shared/urlHelpers';
 import { buildAvatarUrl } from '#helpers/avatar';
 import cors from '#helpers/cors';
+import { buildCoverImageUrl } from '#helpers/cover';
 import { getSessionData } from '#helpers/tokens';
 import type { NextRequest } from 'next/server';
 
+const COVER_WIDTH = 630;
+
 sgMail.setApiKey(process.env.SENDGRID_API_KEY!);
-const PUBLIC_URL = process.env.NEXT_PUBLIC_URL!; // replace with ngrok for dev
 const SENDGRIP_NOREPLY_SENDER = process.env.SENDGRIP_NOREPLY_SENDER!;
 const generateEmailSignature = async (req: NextRequest) => {
   try {
@@ -33,9 +37,12 @@ const generateEmailSignature = async (req: NextRequest) => {
       return new Response('Invalid request', { status: 400 });
     }
 
-    const webCardUrl = `${PUBLIC_URL}/api/cover/${
-      res.WebCard?.userName
-    }?width=${630}&updatedAt=${res.WebCard?.updatedAt.toISOString()}`;
+    const webCardUrl = await buildCoverImageUrl(res.WebCard, {
+      width: COVER_WIDTH,
+      height: COVER_WIDTH / COVER_RATIO,
+      crop: 'fit',
+    });
+
     const avatarUrl = await buildAvatarUrl(res.Profile, null);
     const { data, signature } = await serializeAndSignEmailSignature(
       res.WebCard.userName,
@@ -55,9 +62,10 @@ const generateEmailSignature = async (req: NextRequest) => {
         res.WebCard.commonInformation,
       );
 
-    const mailParam: Record<string, Array<{ number: string }> | string> = {
-      webCardUrl,
-      qrCode: await QRCode.toDataURL(`${PUBLIC_URL}/${res.WebCard?.userName}`), // qrCode is a simple to send to the profile page only (per spec)
+    const mailParam: Record<
+      string,
+      Array<{ mail: string }> | Array<{ number: string }> | string
+    > = {
       linkUrl: buildEmailSignatureGenerationUrl(
         res.WebCard.userName,
         data,
@@ -66,6 +74,11 @@ const generateEmailSignature = async (req: NextRequest) => {
         contactCardSignature,
       ),
     };
+
+    if (webCardUrl) {
+      mailParam.webCardUrl = webCardUrl;
+    }
+
     const displayName = formatDisplayName(
       res?.Profile?.contactCard?.firstName,
       res?.Profile?.contactCard?.lastName,
@@ -77,7 +90,7 @@ const generateEmailSignature = async (req: NextRequest) => {
       mailParam.title = res?.Profile?.contactCard?.title;
     }
     const comp =
-      res?.WebCard?.commonInformation?.company ??
+      res?.WebCard?.commonInformation?.company ||
       res?.Profile?.contactCard?.company;
     if (comp) {
       mailParam.company = comp;
@@ -91,9 +104,42 @@ const generateEmailSignature = async (req: NextRequest) => {
         number: item.number,
       }));
     }
+    //mails
+    const mails = (res?.WebCard?.commonInformation?.emails ?? []).concat(
+      res?.Profile?.contactCard?.emails?.filter(p => p.selected) ?? [],
+    );
+
+    if (mails && mails.length > 0) {
+      mailParam.mails = mails.map(item => ({
+        mail: item.address,
+      }));
+    }
     const formattedAvatarUrl = await buildAvatarUrl(res.Profile, null);
     if (formattedAvatarUrl) {
       mailParam.avatarUrl = formattedAvatarUrl;
+    }
+
+    // Readable Color
+    if (res.WebCard.cardColors?.primary) {
+      mailParam.readableColor = getTextColor(res.WebCard.cardColors.primary);
+    } else {
+      mailParam.readableColor = '#000000';
+    }
+
+    // Primary color
+    if (res.WebCard.cardColors?.primary) {
+      mailParam.primaryColor = res.WebCard.cardColors.primary;
+    } else {
+      mailParam.primaryColor = '#FFFFFF';
+    }
+
+    // Company Logo
+    if (res.WebCard.logoId != null || res.Profile.logoId != null) {
+      mailParam.companyUrl = getImageURLForSize({
+        id: res.WebCard.logoId ?? (res.Profile.logoId as string),
+        height: 140,
+        format: 'png',
+      });
     }
     const userEmail = await getUserById(userId);
 
@@ -104,7 +150,6 @@ const generateEmailSignature = async (req: NextRequest) => {
         templateId: 'd-4a7abf7cd3274be1b59bd825618b50c5',
         dynamic_template_data: mailParam,
       };
-
       await sgMail.send(msg);
 
       return NextResponse.json(

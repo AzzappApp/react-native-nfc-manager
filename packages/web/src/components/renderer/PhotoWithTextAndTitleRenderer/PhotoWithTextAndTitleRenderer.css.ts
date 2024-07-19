@@ -5,11 +5,6 @@ export const wrapperMarginTop = createVar();
 
 const wrapper = style({
   display: 'flex',
-  '@media': {
-    [MediaQuery.BelowSmallMobile]: {
-      marginTop: wrapperMarginTop,
-    },
-  },
 });
 
 const wrapperArrangmentTop = style({

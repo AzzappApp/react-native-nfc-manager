@@ -1,6 +1,6 @@
 import { LinearGradient } from 'expo-linear-gradient';
 import range from 'lodash/range';
-import { memo, useMemo } from 'react';
+import { memo, useMemo, useRef } from 'react';
 import { View, useColorScheme, useWindowDimensions } from 'react-native';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import Animated, {
@@ -52,19 +52,21 @@ const DashedSlider = ({
 
   const hasBeenTouched = useSharedValue(false);
 
-  const animationActive = useSharedValue(false);
+  const previousValue = useRef<number | null>(null);
 
   useInterval(() => {
-    if (!animationActive.value || !onChange) {
+    const nextValue = Math.round(pan.value / step) * step;
+    if (previousValue.current === nextValue || !onChange) {
       return;
     }
+
     onChange(Math.round(pan.value / step) * step);
+    previousValue.current = nextValue;
   }, 16);
 
   const panGesture = Gesture.Pan()
     .onBegin(() => {
       animationOffsetValue.value = pan.value;
-      animationActive.value = true;
       if (!hasBeenTouched.value) {
         hasBeenTouched.value = true;
         if (onTouched) {
@@ -83,16 +85,10 @@ const DashedSlider = ({
     })
     .onEnd(() => {
       const clamped = getClampedValue(pan.value, step, min, max);
-      pan.value = withTiming(
-        clamped,
-        {
-          duration: 50,
-          easing: Easing.out(Easing.exp),
-        },
-        () => {
-          animationActive.value = false;
-        },
-      );
+      pan.value = withTiming(clamped, {
+        duration: 50,
+        easing: Easing.out(Easing.exp),
+      });
     });
 
   const steps = range(min, max, step);

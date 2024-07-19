@@ -1,16 +1,28 @@
 {
   "$schema": "https://turbo.build/schema.json",
-  "extends": ["//"],
-  "pipeline": {
+  "extends": [
+    "//"
+  ],
+  "tasks": {
     "build": {
-      "inputs": ["src/**"],
-      "outputs": ["lib/**"]
+      "inputs": [
+        "src/**"
+      ],
+      "outputs": [
+        "lib/**"
+      ]
     },
     "typecheck": {
-      "inputs": ["src/**"]
+      "inputs": [
+        "src/**"
+      ]
     },
     "test": {
-      "inputs": ["src/**", "jest.config.js", "scripts/jestSetup.js"]
+      "inputs": [
+        "src/**",
+        "jest.config.js",
+        "scripts/jestSetup.js"
+      ]
     }
   }
 }

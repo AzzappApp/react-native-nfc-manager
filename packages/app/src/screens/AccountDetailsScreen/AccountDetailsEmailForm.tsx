@@ -24,6 +24,7 @@ const AccountDetailsEmailForm = ({
   visible: boolean;
   toggleBottomSheet: () => void;
   currentUser: {
+    id: string;
     email: string | null;
     phoneNumber: string | null;
   };
@@ -53,6 +54,11 @@ const AccountDetailsEmailForm = ({
 
   const updateEmail = async (email: string) => {
     try {
+      if (email === currentUser.email) {
+        toggleBottomSheet();
+        return;
+      }
+
       const { issuer } = await requestUpdateContact({
         locale: intl.locale,
         email,
@@ -90,6 +96,7 @@ const AccountDetailsEmailForm = ({
       optimisticResponse: {
         updateUser: {
           user: {
+            id: currentUser?.id,
             email: null,
             phoneNumber: currentUser?.phoneNumber,
           },

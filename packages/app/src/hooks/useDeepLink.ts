@@ -1,5 +1,6 @@
 import { useCallback, useEffect } from 'react';
-import { Linking } from 'react-native';
+import { useIntl } from 'react-intl';
+import { Alert, Linking } from 'react-native';
 import { MMKV } from 'react-native-mmkv';
 import { useRouter } from '#components/NativeRouter';
 import { matchUrlWithRoute } from '#helpers/deeplinkHelpers';
@@ -14,10 +15,25 @@ const ROUTE_KEY = '@azzapp/route';
 
 export const useDeepLink = (router: NativeRouter | null) => {
   const { authenticated } = useAuthState();
-
+  const intl = useIntl();
   const deeplinkHandler = useCallback(
     async (url: string) => {
-      const route = await matchUrlWithRoute(url);
+      const route = await matchUrlWithRoute(url, (route: string) => {
+        if (route === 'emailSignature') {
+          Alert.alert(
+            intl.formatMessage({
+              defaultMessage: 'Email Signature',
+              description: 'Email Signature alert title when opening on mobile',
+            }),
+            intl.formatMessage({
+              defaultMessage:
+                'Please open this link on a desktop to configure your email signature.',
+              description:
+                'Email Signature alert message when opening on mobile',
+            }),
+          );
+        }
+      });
       if (route) {
         if (authenticated) {
           router?.push(route);
@@ -26,7 +42,7 @@ export const useDeepLink = (router: NativeRouter | null) => {
         }
       }
     },
-    [authenticated, router],
+    [authenticated, intl, router],
   );
 
   useEffect(() => {

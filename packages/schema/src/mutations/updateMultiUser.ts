@@ -1,6 +1,11 @@
 import { and, eq, ne } from 'drizzle-orm';
 import { GraphQLError } from 'graphql';
-import { ProfileTable, db, updateWebCard } from '@azzapp/data';
+import {
+  ProfileTable,
+  db,
+  getActiveUserSubscriptionForWebCard,
+  updateWebCard,
+} from '@azzapp/data';
 import ERRORS from '@azzapp/shared/errors';
 import fromGlobalIdWithType from '#helpers/relayIdHelpers';
 import type { MutationResolvers } from '#/__generated__/types';
@@ -16,6 +21,17 @@ const updateMultiUser: MutationResolvers['updateMultiUser'] = async (
   const updates: Partial<WebCard> = {
     isMultiUser,
   };
+
+  if (isMultiUser) {
+    const owner = await loaders.webCardOwners.load(webCardId);
+    const subscription = owner
+      ? await getActiveUserSubscriptionForWebCard(owner?.id ?? '', webCardId)
+      : null;
+
+    if (!subscription) {
+      throw new GraphQLError(ERRORS.SUBSCRIPTION_REQUIRED);
+    }
+  }
 
   try {
     await db.transaction(async trx => {

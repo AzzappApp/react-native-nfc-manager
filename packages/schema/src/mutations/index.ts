@@ -8,6 +8,7 @@ import declineOwnership from './declineOwnership';
 import deleteModules from './deleteModules';
 import deletePost from './deletePost';
 import deletePostComment from './deletePostComment';
+import deleteUser from './deleteUser';
 import duplicateModule from './duplicateModule';
 import inviteUser from './inviteUser';
 import inviteUsersList from './inviteUsersList';
@@ -30,6 +31,7 @@ import {
   estimateSubscriptionCost,
   generatePaymentInvoice,
   updateSubscription,
+  updateSubscriptionCustomer,
   upgradeSubscriptionPlan,
 } from './payment';
 import togglePostReaction from './postReaction';
@@ -42,7 +44,6 @@ import saveCardStyle from './saveCardStyle';
 import saveCommonInformation from './saveCommonInformation';
 import saveContactCard from './saveContactCard';
 import saveCover from './saveCover';
-import saveSubscription from './saveSubscription';
 import sendInvitations from './sendInvitations';
 import sendReport from './sendReport';
 import toggleFollowing from './toggleFollowing';
@@ -91,7 +92,6 @@ export const Mutation: MutationResolvers = {
   updateModulesVisibility,
   acceptInvitation,
   saveCommonInformation,
-  saveSubscription,
   updateMultiUser,
   acceptOwnership,
   declineOwnership,
@@ -114,4 +114,6 @@ export const Mutation: MutationResolvers = {
   upgradeSubscriptionPlan,
   endSubscription,
   deletePost,
+  updateSubscriptionCustomer,
+  deleteUser,
 };

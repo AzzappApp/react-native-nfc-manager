@@ -1,4 +1,3 @@
-import { createId } from '@paralleldrive/cuid2';
 import * as Sentry from '@sentry/nextjs';
 import { and, eq, inArray } from 'drizzle-orm';
 import { GraphQLError } from 'graphql';
@@ -10,6 +9,7 @@ import {
   db,
   updateWebCard,
 } from '@azzapp/data';
+import { createId } from '@azzapp/data/helpers/createId';
 import { guessLocale } from '@azzapp/i18n';
 import ERRORS from '@azzapp/shared/errors';
 import { isValidEmail } from '@azzapp/shared/stringHelpers';
@@ -162,12 +162,14 @@ const inviteUsersListMutation: MutationResolvers['inviteUsersList'] = async (
       )
       .then(res => res);
 
-    if (!auth.userId) {
-      throw new GraphQLError(ERRORS.UNAUTHORIZED);
+    const owner = await loaders.webCardOwners.load(profile.webCardId);
+
+    if (!owner) {
+      throw new GraphQLError(ERRORS.INVALID_REQUEST);
     }
 
     const canBeAdded = await checkSubscription(
-      auth.userId,
+      owner.id,
       webCard.id,
       createdProfiles.length,
     );

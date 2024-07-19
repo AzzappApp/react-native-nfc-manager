@@ -10,9 +10,8 @@ import {
   SIMPLE_BUTTON_STYLE_VALUES,
 } from '@azzapp/shared/cardModuleHelpers';
 import { isValidUrl, isPhoneNumber } from '@azzapp/shared/stringHelpers';
-import { addingModuleRequireSubscription } from '@azzapp/shared/subscriptionHelpers';
+import { changeModuleRequireSubscription } from '@azzapp/shared/subscriptionHelpers';
 import { useRouter } from '#components/NativeRouter';
-import { useIsSubscriber } from '#helpers/SubscriptionContext';
 import useEditorLayout from '#hooks/useEditorLayout';
 import useHandleProfileActionError from '#hooks/useHandleProfileError';
 import useModuleDataEditor from '#hooks/useModuleDataEditor';
@@ -125,6 +124,7 @@ const SimpleButtonEditionScreen = ({
         webCard {
           id
           cardIsPublished
+          isPremium
           cardColors {
             primary
             dark
@@ -237,6 +237,7 @@ const SimpleButtonEditionScreen = ({
         saveSimpleButtonModule(webCardId: $webCardId, input: $input) {
           webCard {
             id
+            requiresSubscription
             cardModules {
               kind
               visible
@@ -258,7 +259,6 @@ const SimpleButtonEditionScreen = ({
 
   const router = useRouter();
   const intl = useIntl();
-  const isSubscriber = useIsSubscriber();
 
   const cardModulesCount =
     (profile.webCard.cardModules.length ?? 0) + (simpleButton ? 0 : 1);
@@ -313,7 +313,7 @@ const SimpleButtonEditionScreen = ({
       return;
     }
 
-    const requireSubscription = addingModuleRequireSubscription(
+    const requireSubscription = changeModuleRequireSubscription(
       'simpleButton',
       cardModulesCount,
     );
@@ -321,7 +321,7 @@ const SimpleButtonEditionScreen = ({
     if (
       profile.webCard.cardIsPublished &&
       requireSubscription &&
-      !isSubscriber
+      !profile.webCard.isPremium
     ) {
       router.push({ route: 'USER_PAY_WALL' });
       return;
@@ -359,7 +359,6 @@ const SimpleButtonEditionScreen = ({
     canSave,
     profile.webCard,
     cardModulesCount,
-    isSubscriber,
     value,
     simpleButton?.id,
     fontSize.value,

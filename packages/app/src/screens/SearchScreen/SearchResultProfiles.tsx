@@ -105,7 +105,7 @@ export const SearchResultProfilesPlaceHolder = () => {
   );
 };
 
-const COVER_WIDTH = (Dimensions.get('screen').width - 8 * 2) / 2;
+const COVER_WIDTH = (Dimensions.get('window').width - 8 * 2) / 2;
 
 const styles = StyleSheet.create({
   viewColumn: {

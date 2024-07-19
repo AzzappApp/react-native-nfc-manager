@@ -1,3 +1,4 @@
+import { ImageFormat } from '@shopify/react-native-skia';
 import { omit } from 'lodash';
 import { useCallback, useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
@@ -11,21 +12,22 @@ import {
   PHOTO_WITH_TEXT_AND_TITLE_STYLE_VALUES,
   PHOTO_WITH_TEXT_AND_TITLE_TEXT_MAX_LENGTH,
 } from '@azzapp/shared/cardModuleHelpers';
-import { encodeMediaId } from '@azzapp/shared/imagesHelpers';
 import { isNotFalsyString } from '@azzapp/shared/stringHelpers';
-import { addingModuleRequireSubscription } from '@azzapp/shared/subscriptionHelpers';
+import { changeModuleRequireSubscription } from '@azzapp/shared/subscriptionHelpers';
 import { colors } from '#theme';
-import { exportLayersToImage, getFilterUri } from '#components/gpu';
 import ImagePicker, {
   EditImageStep,
   SelectImageStep,
 } from '#components/ImagePicker';
-import { useRouter } from '#components/NativeRouter';
-import ScreenModal from '#components/ScreenModal';
+import {
+  useRouter,
+  ScreenModal,
+  preventModalDismiss,
+} from '#components/NativeRouter';
 import { getFileName } from '#helpers/fileHelpers';
+import { saveTransformedImageToFile } from '#helpers/mediaEditions';
 import { downScaleImage } from '#helpers/mediaHelpers';
 import { uploadMedia, uploadSign } from '#helpers/MobileWebAPI';
-import { useIsSubscriber } from '#helpers/SubscriptionContext';
 import useEditorLayout from '#hooks/useEditorLayout';
 import useHandleProfileActionError from '#hooks/useHandleProfileError';
 import useModuleDataEditor from '#hooks/useModuleDataEditor';
@@ -154,6 +156,7 @@ const PhotoWithTextAndTitleEditionScreen = ({
           cardModules {
             id
           }
+          isPremium
           ...PhotoWithTextAndTitleSettingsEditionPanel_webCard
         }
         ...PhotoWithTextAndTitleBackgroundEditionPanel_profile
@@ -239,6 +242,7 @@ const PhotoWithTextAndTitleEditionScreen = ({
         savePhotoWithTextAndTitleModule(webCardId: $webCardId, input: $input) {
           webCard {
             id
+            requiresSubscription
             cardModules {
               kind
               visible
@@ -263,7 +267,6 @@ const PhotoWithTextAndTitleEditionScreen = ({
   const intl = useIntl();
   const [progressIndicator, setProgressIndicator] =
     useState<Observable<number> | null>(null);
-  const isSubscriber = useIsSubscriber();
 
   const cardModulesCount =
     (profile.webCard.cardModules.length ?? 0) + (photoWithTextAndTitle ? 0 : 1);
@@ -296,22 +299,17 @@ const PhotoWithTextAndTitleEditionScreen = ({
     height,
   }: ImagePickerResult) => {
     const size = downScaleImage(width, height, MODULE_IMAGE_MAX_WIDTH);
-    const exportUri = await exportLayersToImage({
-      size,
+    const exportPath = await saveTransformedImageToFile({
+      uri,
+      resolution: size,
+      format: ImageFormat.JPEG,
       quality: 95,
-      format: 'auto',
-      layers: [
-        {
-          kind: 'image',
-          uri,
-          parameters: editionParameters,
-          lutFilterUri: getFilterUri(filter),
-        },
-      ],
+      filter,
+      editionParameters,
     });
     setShowImagePicker(false);
     onImageChange({
-      uri: exportUri.startsWith('file://') ? exportUri : `file://${exportUri}`,
+      uri: `file://${exportPath}`,
       width: size.width,
       height: size.height,
       kind: 'image',
@@ -407,7 +405,7 @@ const PhotoWithTextAndTitleEditionScreen = ({
       return;
     }
 
-    const requireSubscription = addingModuleRequireSubscription(
+    const requireSubscription = changeModuleRequireSubscription(
       'photoWithTextAndTitle',
       cardModulesCount,
     );
@@ -415,7 +413,7 @@ const PhotoWithTextAndTitleEditionScreen = ({
     if (
       profile.webCard.cardIsPublished &&
       requireSubscription &&
-      !isSubscriber
+      !profile.webCard.isPremium
     ) {
       router.push({ route: 'USER_PAY_WALL' });
       return;
@@ -447,7 +445,7 @@ const PhotoWithTextAndTitleEditionScreen = ({
       );
       try {
         const { public_id } = await uploadPromise;
-        mediaId = encodeMediaId(public_id, 'image');
+        mediaId = public_id;
       } catch (error) {
         Toast.show({
           type: 'error',
@@ -501,8 +499,8 @@ const PhotoWithTextAndTitleEditionScreen = ({
     canSave,
     cardModulesCount,
     profile.webCard.cardIsPublished,
+    profile.webCard.isPremium,
     profile.webCard.id,
-    isSubscriber,
     value,
     photoWithTextAndTitle?.id,
     titleFontSize.value,
@@ -721,6 +719,11 @@ const PhotoWithTextAndTitleEditionScreen = ({
         maxLength={PHOTO_WITH_TEXT_AND_TITLE_TEXT_MAX_LENGTH}
         onClose={onCloseContentModal}
         onChangeText={onContentChange}
+        onFocus={() => {
+          if (content === undefined) {
+            onContentChange('');
+          }
+        }}
         closeOnBlur={false}
         ItemTopComponent={
           <>
@@ -733,6 +736,11 @@ const PhotoWithTextAndTitleEditionScreen = ({
               })}
               value={title ?? ''}
               onChangeText={onTitleChange}
+              onFocus={() => {
+                if (title === undefined) {
+                  onTitleChange('');
+                }
+              }}
               maxLength={PHOTO_WITH_TEXT_AND_TITLE_TEXT_MAX_LENGTH}
               style={{ borderWidth: 0 }}
             />
@@ -759,7 +767,10 @@ const PhotoWithTextAndTitleEditionScreen = ({
           { bottom: insetBottom, width: windowWidth - 20 },
         ]}
       />
-      <ScreenModal visible={showImagePicker}>
+      <ScreenModal
+        visible={showImagePicker}
+        onRequestDismiss={onImagePickerCancel}
+      >
         <ImagePicker
           kind="image"
           onFinished={onMediaSelected}
@@ -767,7 +778,11 @@ const PhotoWithTextAndTitleEditionScreen = ({
           steps={steps}
         />
       </ScreenModal>
-      <ScreenModal visible={!!progressIndicator}>
+      <ScreenModal
+        visible={!!progressIndicator}
+        onRequestDismiss={preventModalDismiss}
+        gestureEnabled={false}
+      >
         {progressIndicator && (
           <UploadProgressModal progressIndicator={progressIndicator} />
         )}

@@ -3,7 +3,7 @@ import cx from 'classnames';
 import { decompressFromEncodedURIComponent } from 'lz-string';
 import dynamic from 'next/dynamic';
 import { useSearchParams } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { buildVCardFromSerializedContact } from '@azzapp/shared/vCardHelpers';
 import { CloseIcon } from '#assets';
@@ -33,6 +33,7 @@ const DownloadVCard = ({
   const [fileUrl, setFileUrl] = useState<string | undefined>();
 
   const [opened, setOpened] = useState(false);
+  const [closing, setClosing] = useState(true);
 
   const [contact, setContact] = useState<{
     firstName: string;
@@ -95,6 +96,7 @@ const DownloadVCard = ({
               const fileURL = URL.createObjectURL(file);
               setFileUrl(fileURL);
               setOpened(true);
+              setClosing(false);
               updateContactCardScanCounter(contact.profileId);
               setToken(additionalData.token);
             }
@@ -106,10 +108,17 @@ const DownloadVCard = ({
 
   const handleClose = () => {
     setOpened(false);
+
     if (onClose) {
       onClose({ token });
     }
   };
+
+  const handleAnimationEnd = useCallback(() => {
+    if (!opened) {
+      setClosing(true);
+    }
+  }, [opened]);
 
   const intl = useIntl();
 
@@ -117,7 +126,9 @@ const DownloadVCard = ({
     <AppIntlProvider>
       <div
         id="contactCard"
-        className={opened ? styles.openedOverlay : styles.overlay}
+        className={cx(styles.overlay, {
+          [styles.openedOverlay]: opened || !closing,
+        })}
         onClick={event => {
           if ('id' in event.target && event.target.id === 'contactCard') {
             handleClose();
@@ -126,7 +137,14 @@ const DownloadVCard = ({
         role="button"
       >
         <div
-          className={opened ? styles.openedDialog : styles.dialog}
+          className={cx(
+            styles.dialog,
+
+            {
+              [styles.closedDialog]: !opened,
+            },
+          )}
+          onTransitionEnd={handleAnimationEnd}
           role="dialog"
           aria-label={intl.formatMessage({
             defaultMessage: 'Modal with contact card download link',

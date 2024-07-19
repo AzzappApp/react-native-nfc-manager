@@ -50,6 +50,8 @@ export type TextAreaModalProps = Omit<
    * If true, the modal will close when the textInput onBlur is called
    */
   closeOnBlur?: boolean;
+
+  onFocus?: () => void;
 };
 
 /**
@@ -64,6 +66,7 @@ const TextAreaModal = ({
   onClose,
   ItemTopComponent,
   closeOnBlur = true,
+  onFocus,
   ...props
 }: TextAreaModalProps) => {
   const intl = useIntl();
@@ -141,6 +144,7 @@ const TextAreaModal = ({
             value={text}
             onChangeText={setText}
             autoFocus={Platform.OS === 'ios'}
+            onFocus={onFocus}
             maxLength={maxLength}
             onBlur={onBlur}
             style={styles.textInput}

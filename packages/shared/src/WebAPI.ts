@@ -235,7 +235,7 @@ export const refreshTokens: APIMethod<string, TokensResponse> = (
 export const uploadSign: APIMethod<
   {
     kind: 'image' | 'video';
-    target: 'avatar' | 'cover' | 'coverSource' | 'logo' | 'module' | 'post';
+    target: 'avatar' | 'cover' | 'logo' | 'module' | 'post' | 'rawCover';
   },
   { uploadURL: string; uploadParameters: Record<string, any> }
 > = async ({ kind, target }, init) =>
@@ -338,36 +338,4 @@ export const subscriptionWebHook: APIMethod<null, null> = (_, init) =>
   apiFetch(`${API_ENDPOINT}/subscription`, {
     ...init,
     method: 'POST',
-  });
-
-/**
- * Api call to get the active subscription.
- */
-/**
- * Parameters for the changePassword API call.
- */
-export type GetActiveSubscriptionResult = {
-  subscription:
-    | {
-        userId: string;
-        subscriptionId: string;
-        issuer: 'android' | 'ios' | 'web';
-        startAt: Date;
-        endAt: Date;
-      }
-    | null
-    | undefined;
-};
-
-export type GetActiveSubscriptionParam = null | undefined;
-
-export const getActiveSubscription: (
-  params?: GetActiveSubscriptionParam,
-  init?: RequestInit & {
-    fetchFunction: FetchFunction<GetActiveSubscriptionResult>;
-  },
-) => Promise<GetActiveSubscriptionResult> = (_, init) =>
-  apiFetch(`${API_ENDPOINT}/getActiveSubscription`, {
-    ...init,
-    method: 'GET',
   });

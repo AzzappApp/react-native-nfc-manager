@@ -1,39 +1,27 @@
-import { asc, eq, like, or, sql, and, desc } from 'drizzle-orm';
-import { CoverTemplateTable, db } from '@azzapp/data';
+import { asc, like, or, sql, and, desc, eq } from 'drizzle-orm';
+import { CoverTemplateTable, LocalizationMessageTable, db } from '@azzapp/data';
+import { DEFAULT_LOCALE, ENTITY_TARGET } from '@azzapp/i18n';
 import CoverTemplatesList from './CoverTemplatesList';
+import type { SQL } from 'drizzle-orm';
 
+export type Status = 'Disabled' | 'Enabled';
 export type CoverTemplateItem = {
   id: string;
   name: string;
-  kind: string;
-  personalEnabled: boolean;
-  businessEnabled: boolean;
+  type: string;
+  mediaCount: number;
+  status: boolean;
 };
 
-export type Status = 'Disabled' | 'Enabled';
-
 export type Filters = {
-  personalStatus?: Status | 'All';
-  businessStatus?: Status | 'All';
+  status?: Status | 'All';
 };
 
 const getFilters = (filters: Filters) => {
-  const f = [];
-  if (filters.personalStatus && filters.personalStatus !== 'All') {
-    f.push(
-      eq(
-        CoverTemplateTable.personalEnabled,
-        filters.personalStatus === 'Enabled',
-      ),
-    );
-  }
-  if (filters.businessStatus && filters.businessStatus !== 'All') {
-    f.push(
-      eq(
-        CoverTemplateTable.businessEnabled,
-        filters.businessStatus === 'Enabled',
-      ),
-    );
+  const f: Array<SQL<unknown>> = [];
+
+  if (filters.status && filters.status !== 'All') {
+    f.push(eq(CoverTemplateTable.enabled, filters.status === 'Enabled'));
   }
 
   return f;
@@ -43,16 +31,16 @@ const getSearch = (search: string | null) => {
   if (search) {
     return or(
       like(CoverTemplateTable.name, `%${search}%`),
-      like(CoverTemplateTable.kind, `%${search}%`),
+      like(LocalizationMessageTable.value, `%${search}%`),
     );
   }
 };
 
-export type SortColumn = 'kind' | 'name';
+export type SortColumn = 'name' | 'type';
 
 const sortsColumns = {
   name: CoverTemplateTable.name,
-  kind: CoverTemplateTable.kind,
+  type: LocalizationMessageTable.value,
 };
 
 const getQuery = (search: string | null, filters: Filters) => {
@@ -60,11 +48,19 @@ const getQuery = (search: string | null, filters: Filters) => {
     .select({
       id: CoverTemplateTable.id,
       name: CoverTemplateTable.name,
-      kind: CoverTemplateTable.kind,
-      personalEnabled: CoverTemplateTable.personalEnabled,
-      businessEnabled: CoverTemplateTable.businessEnabled,
+      type: LocalizationMessageTable.value,
+      mediaCount: CoverTemplateTable.mediaCount,
+      status: CoverTemplateTable.enabled,
     })
     .from(CoverTemplateTable)
+    .innerJoin(
+      LocalizationMessageTable,
+      and(
+        eq(CoverTemplateTable.typeId, LocalizationMessageTable.key),
+        eq(LocalizationMessageTable.target, ENTITY_TARGET),
+        eq(LocalizationMessageTable.locale, DEFAULT_LOCALE),
+      ),
+    )
     .where(and(getSearch(search), ...getFilters(filters)))
     .$dynamic();
 
@@ -105,8 +101,7 @@ type Props = {
     sort?: string;
     order?: string;
     s?: string;
-    ps?: string;
-    bs?: string;
+    st?: string;
   };
 };
 
@@ -121,8 +116,7 @@ const CoverTemplatesPage = async ({ searchParams = {} }: Props) => {
   const order = searchParams.order === 'desc' ? 'desc' : 'asc';
   const search = searchParams.s ?? null;
   const filters: Filters = {
-    personalStatus: (searchParams.ps as Status) || 'All',
-    businessStatus: (searchParams.bs as Status) || 'All',
+    status: (searchParams.st as Status) || 'All',
   };
 
   const CoverTemplates = await getCoverTemplates(

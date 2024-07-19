@@ -7,10 +7,24 @@ import {
   useEffect,
   useImperativeHandle,
   useMemo,
+  useRef,
   useState,
 } from 'react';
-import type { EditionParameters, ImageOrientation } from '#components/gpu';
-import type { Media, TimeRange } from './imagePickerTypes';
+import {
+  runOnJS,
+  useAnimatedReaction,
+  useDerivedValue,
+  type DerivedValue,
+} from 'react-native-reanimated';
+import {
+  createImageFromNativeBuffer,
+  useNativeBuffer,
+  type EditionParameters,
+  type ImageOrientation,
+} from '#helpers/mediaEditions';
+import type { Media, TimeRange } from '#helpers/mediaHelpers';
+import type { Filter } from '@azzapp/shared/filtersHelper';
+import type { SkImage } from '@shopify/react-native-skia';
 import type { ReactNode, ForwardedRef } from 'react';
 
 /**
@@ -31,6 +45,10 @@ export type ImagePickerState = {
    */
   maxVideoDuration: number;
   /**
+   * the minimum duration of a video to pick
+   */
+  minVideoDuration?: number;
+  /**
    * the kind of media to pick
    */
   kind: 'image' | 'mixed' | 'video';
@@ -38,6 +56,14 @@ export type ImagePickerState = {
    * the selected media
    */
   media: Media | null;
+  /**
+   * The SkImage of the media
+   */
+  skImage: DerivedValue<SkImage | null>;
+  /**
+   * true if the SkImage is available
+   */
+  isSkImageReady: boolean;
   /**
    * the aspect ratio of the media
    */
@@ -49,7 +75,7 @@ export type ImagePickerState = {
   /**
    * the filter applied to the media
    */
-  mediaFilter: string | null;
+  mediaFilter: Filter | null;
   /**
    * the time range of the video selected
    */
@@ -84,7 +110,7 @@ export type ImagePickerState = {
    * an event dispatched by picker step to change the filter applied to the media
    * @param filter the new filter
    */
-  onMediaFilterChange(filter: string | null): void;
+  onMediaFilterChange(filter: Filter | null): void;
   /**
    * an event dispatched by picker step to change the edition parameters applied to the media
    * @param editionParameters the new edition parameters
@@ -101,6 +127,8 @@ export type ImagePickerState = {
   ): void;
 
   cameraButtonsLeftRightPosition?: number;
+
+  disableVideoSelection?: boolean;
 };
 
 const ImagePickerContext = createContext<ImagePickerState | null>(null);
@@ -118,6 +146,10 @@ export const useImagePickerState = () => {
 };
 
 type ImagePickerContextProviderProps = {
+  /**
+   * the minimum duration of a video
+   */
+  minVideoDuration?: number;
   /**
    * the maximum duration of a video
    */
@@ -149,42 +181,64 @@ type ImagePickerContextProviderProps = {
   onMediaChange?(media: Media | null): void;
 
   cameraButtonsLeftRightPosition?: number;
+  /**
+   * Initial data for the picker
+   */
+  initialData?: {
+    media: Media;
+    editionParameters: EditionParameters | null;
+    filter: Filter | null;
+    timeRange?: TimeRange | null;
+  } | null;
+
+  disableVideoSelection?: boolean;
 };
 
 const _ImagePickerContextProvider = (
   {
     kind,
     maxVideoDuration,
+    minVideoDuration,
     forceAspectRatio,
     exporting,
     children,
     forceCameraRatio,
     onMediaChange: onMediaChangeProps,
     cameraButtonsLeftRightPosition,
+    initialData,
+    disableVideoSelection,
   }: ImagePickerContextProviderProps,
   forwardedRef: ForwardedRef<ImagePickerState>,
 ) => {
-  const [media, setMedia] = useState<Media | null>(null);
+  const [media, setMedia] = useState<Media | null>(initialData?.media ?? null);
   const [aspectRatio, setAspectRatio] = useState(
     typeof forceAspectRatio === 'number' ? forceAspectRatio : null,
   );
   const [editionParameters, setEditionParameters] = useState<EditionParameters>(
-    {},
+    initialData?.editionParameters ?? {},
   );
-  const [timeRange, setTimeRange] = useState<TimeRange | null>(null);
-  const [mediaFilter, setMediaFilter] = useState<string | null>(null);
+  const [timeRange, setTimeRange] = useState<TimeRange | null>(
+    initialData?.timeRange ?? null,
+  );
+  const [mediaFilter, setMediaFilter] = useState<Filter | null>(
+    initialData?.filter ?? null,
+  );
 
+  const previousMedia = useRef(media);
   useEffect(() => {
-    setEditionParameters({});
-    let initialTimeRange: TimeRange | null = null;
-    if (media?.kind === 'video') {
-      initialTimeRange = {
-        startTime: 0,
-        duration: Math.min(media.duration, maxVideoDuration),
-      };
+    if (previousMedia.current !== media) {
+      setEditionParameters({});
+      let initialTimeRange: TimeRange | null = null;
+      if (media?.kind === 'video') {
+        initialTimeRange = {
+          startTime: 0,
+          duration: Math.min(media.duration, maxVideoDuration),
+        };
+      }
+      setTimeRange(initialTimeRange);
+      setMediaFilter(null);
+      previousMedia.current = media;
     }
-    setTimeRange(initialTimeRange);
-    setMediaFilter(null);
   }, [maxVideoDuration, media]);
 
   const onMediaChange = useCallback(
@@ -251,12 +305,43 @@ const _ImagePickerContextProvider = (
     [],
   );
 
+  const nativeBuffer = useNativeBuffer({
+    uri: media?.uri,
+    kind: media?.kind,
+    time: timeRange?.startTime,
+    maxSize: media?.kind === 'video' ? MAX_VIDEO_THUMBNAIL_SIZE : null,
+  });
+
+  const skImage = useDerivedValue(() => {
+    if (!nativeBuffer) {
+      return null;
+    }
+    return createImageFromNativeBuffer(nativeBuffer, true);
+  }, [nativeBuffer]);
+
+  const [isSkImageReady, setIsSkImageReady] = useState(false);
+
+  useAnimatedReaction(
+    () => skImage.value,
+    (previous, current) => {
+      if (previous !== current) {
+        if (skImage.value) {
+          runOnJS(setIsSkImageReady)(true);
+        } else {
+          runOnJS(setIsSkImageReady)(false);
+        }
+      }
+    },
+  );
+
   const pickerState = useMemo<ImagePickerState>(
     () => ({
       kind,
       forceAspectRatio,
       maxVideoDuration,
+      minVideoDuration,
       media,
+      skImage,
       aspectRatio:
         aspectRatio ??
         (media != null
@@ -275,12 +360,16 @@ const _ImagePickerContextProvider = (
       forceCameraRatio,
       clearMedia,
       cameraButtonsLeftRightPosition,
+      isSkImageReady,
+      disableVideoSelection,
     }),
     [
       kind,
       forceAspectRatio,
       maxVideoDuration,
+      minVideoDuration,
       media,
+      skImage,
       aspectRatio,
       editionParameters,
       mediaFilter,
@@ -293,6 +382,8 @@ const _ImagePickerContextProvider = (
       forceCameraRatio,
       clearMedia,
       cameraButtonsLeftRightPosition,
+      isSkImageReady,
+      disableVideoSelection,
     ],
   );
 
@@ -303,6 +394,11 @@ const _ImagePickerContextProvider = (
       {children}
     </ImagePickerContext.Provider>
   );
+};
+
+export const MAX_VIDEO_THUMBNAIL_SIZE = {
+  width: 512,
+  height: 512,
 };
 
 /**
@@ -326,7 +422,7 @@ const getMediaAspectRatio = (
   );
 };
 
-const MAX_ASPECT_RATIO = 2;
+const MAX_ASPECT_RATIO = 3.5;
 const MIN_ASPECT_RATIO = 0.5;
 
 const clampAspectRatio = (aspectRatio: number) =>

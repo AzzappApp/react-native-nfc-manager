@@ -1,17 +1,18 @@
 'use server';
 import { asc, eq } from 'drizzle-orm';
+import { revalidatePath } from 'next/cache';
 import {
   CardModuleTable,
   WebCardTable,
   checkMedias,
   createCardTemplate,
-  createLabel,
   db,
   getCardTemplateById,
   referencesMedias,
+  saveLocalizationMessage,
   updateCardTemplate,
 } from '@azzapp/data';
-import { saveLabelKey } from '#helpers/lokaliseHelperts';
+import { DEFAULT_LOCALE, ENTITY_TARGET } from '@azzapp/i18n';
 import {
   cardTemplateSchema,
   type CardTemplateFormValue,
@@ -50,19 +51,12 @@ export const saveCardTemplate = async (
   }
 
   const template = {
-    labelKey: validation.data.labelKey,
     cardStyleId: validation.data.cardStyle,
     modules: validation.data.modules,
     previewMediaId: validation.data.previewMediaId,
     businessEnabled: validation.data.businessEnabled,
     personalEnabled: validation.data.personalEnabled,
     cardTemplateTypeId: cardTemplateType ? cardTemplateType.id : null,
-  };
-
-  const label = {
-    labelKey: validation.data.labelKey,
-    baseLabelValue: validation.data.baseLabelValue,
-    translations: {},
   };
 
   await checkMedias([validation.data.previewMediaId]);
@@ -76,24 +70,34 @@ export const saveCardTemplate = async (
 
       await db.transaction(async trx => {
         await updateCardTemplate(id, template, trx);
-        await createLabel(label, trx);
-        await saveLabelKey({
-          labelKey: validation.data.labelKey,
-          baseLabelValue: validation.data.baseLabelValue,
-        });
+        await saveLocalizationMessage(
+          {
+            key: id,
+            value: validation.data.label,
+            locale: DEFAULT_LOCALE,
+            target: ENTITY_TARGET,
+          },
+          trx,
+        );
       });
     } else {
       await db.transaction(async trx => {
-        await createCardTemplate(template, trx);
-        await createLabel(label, trx);
-        await saveLabelKey({
-          labelKey: validation.data.labelKey,
-          baseLabelValue: validation.data.baseLabelValue,
-        });
+        const id = await createCardTemplate(template, trx);
+        await saveLocalizationMessage(
+          {
+            key: id,
+            value: validation.data.label,
+            locale: DEFAULT_LOCALE,
+            target: ENTITY_TARGET,
+          },
+          trx,
+        );
       });
     }
     await referencesMedias([template.previewMediaId], [previousMediaId], trx);
   });
+
+  revalidatePath(`/cardTemplates/[id]`);
 
   return {
     success: true,

@@ -1,4 +1,3 @@
-import { assignInlineVars } from '@vanilla-extract/dynamic';
 import cn from 'classnames';
 import { swapColor } from '@azzapp/shared/cardHelpers';
 import {
@@ -9,7 +8,7 @@ import {
 import { fontsMap } from '#helpers/fonts';
 import CloudinaryImage from '#ui/CloudinaryImage';
 import CardModuleBackground from '../../CardModuleBackground';
-import styles, { wrapperMarginTop } from './PhotoWithTextAndTitleRenderer.css';
+import styles from './PhotoWithTextAndTitleRenderer.css';
 import type { ModuleRendererProps } from '../ModuleRenderer';
 import type { CardModulePhotoWithTextAndTitle } from '@azzapp/data';
 import type { CSSProperties } from 'react';
@@ -69,10 +68,15 @@ const PhotoWithTextAndTitleRenderer = ({
 
   return (
     <CardModuleBackground
+      {...props}
       backgroundId={backgroundId}
       backgroundStyle={backgroundStyle}
       colorPalette={colorPalette}
-      {...props}
+      containerStyle={{
+        display: 'flex',
+        flexDirection: 'row',
+        justifyContent: 'center',
+      }}
     >
       <div
         style={
@@ -82,8 +86,10 @@ const PhotoWithTextAndTitleRenderer = ({
             columnGap: gap,
             paddingLeft: imageMargin === 'width_full' ? 0 : marginHorizontal,
             paddingRight: imageMargin === 'width_full' ? 0 : marginHorizontal,
+            paddingTop: isImageFull ? 0 : marginVertical,
+            paddingBottom: isImageFull ? 0 : marginVertical,
             justifyContent: 'center',
-            ...assignInlineVars({ [wrapperMarginTop]: `${marginVertical}px` }),
+            width: isImageFull ? '100%' : 800,
           } as CSSProperties
         }
         className={classnames}
@@ -95,8 +101,6 @@ const PhotoWithTextAndTitleRenderer = ({
                 position: 'relative',
                 maxWidth: isImageFull ? '100%' : `calc(400px - ${gap / 2}px)`,
                 width: '100%',
-                marginTop: isImageFull ? 0 : marginVertical,
-                marginBottom: isImageFull ? 0 : marginVertical,
               }}
               className={styles.sectionImageInner}
             >
@@ -111,6 +115,8 @@ const PhotoWithTextAndTitleRenderer = ({
                   borderRadius,
                 }}
                 className={styles.image}
+                format="auto"
+                quality="auto:best"
               />
             </div>
           </div>
@@ -124,8 +130,6 @@ const PhotoWithTextAndTitleRenderer = ({
               paddingRight: imageMargin === 'width_full' ? marginHorizontal : 0,
               maxWidth: `calc(400px - ${gap / 2}px)`,
               width: '100%',
-              marginTop: marginVertical,
-              marginBottom: marginVertical,
             }}
             className={styles.text}
           >

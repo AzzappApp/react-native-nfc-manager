@@ -32,19 +32,24 @@ const Modal = forwardRef(
     const classnames = cn(className, styles.modal);
 
     const [open, setOpen] = useState(false);
-    const onClickOutside = useCallback(() => {
-      if (open) setOpen(false);
+    const [closing, setClosing] = useState(false);
+
+    const handleClose = useCallback(() => {
+      if (open) {
+        setClosing(true);
+        setOpen(false);
+      }
     }, [open]);
 
-    const window = useOnClickOutside<HTMLDivElement>(onClickOutside);
+    const window = useOnClickOutside<HTMLDivElement>(handleClose);
 
     useImperativeHandle(
       ref,
       () => ({
         open: () => setOpen(true),
-        close: () => setOpen(false),
+        close: handleClose,
       }),
-      [],
+      [handleClose],
     );
 
     useEffect(() => {
@@ -54,13 +59,26 @@ const Modal = forwardRef(
       };
     }, [open]);
 
-    if (!open) return null;
+    const handleAnimationEnd = useCallback(() => {
+      if (!open) {
+        setClosing(false);
+      }
+    }, [open]);
+
+    if (!open && !closing) return null;
 
     return createPortal(
-      <div className={styles.wrapper}>
-        <div {...others} className={classnames} ref={window}>
+      <div
+        className={cn(styles.wrapper, { [styles.wrapperClosing]: closing })}
+        onAnimationEnd={handleAnimationEnd}
+      >
+        <div
+          {...others}
+          className={cn(classnames, { [styles.modalClosing]: closing })}
+          ref={window}
+        >
           <ButtonIcon
-            onClick={() => setOpen(false)}
+            onClick={handleClose}
             size={30}
             Icon={CloseIcon}
             className={styles.close}

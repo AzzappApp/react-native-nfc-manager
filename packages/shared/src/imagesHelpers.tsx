@@ -1,7 +1,8 @@
 import getRuntimeEnvironment from './getRuntimeEnvironment';
 
-const CLOUDINARY_CLOUDNAME = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME!;
-const CLOUDINARY_BASE_URL = `https://res.cloudinary.com/${CLOUDINARY_CLOUDNAME}`;
+export const CLOUDINARY_CLOUDNAME =
+  process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME!;
+export const CLOUDINARY_BASE_URL = `https://${process.env.NEXT_PUBLIC_CLOUDINARY_SECURE_DISTRIBUTION ?? 'res.cloudinary.com'}/${CLOUDINARY_CLOUDNAME}`;
 
 /**
  * Helpers used to create an asset url from a cloudinary id without any transformation
@@ -12,11 +13,10 @@ const CLOUDINARY_BASE_URL = `https://res.cloudinary.com/${CLOUDINARY_CLOUDNAME}`
 export const getCloudinaryAssetURL = (
   id: string,
   kind: 'image' | 'raw' | 'video',
-  extension?: 'jpg' | 'mp4' | 'svg' | 'webp',
+  format?: 'avif' | 'jpg' | 'mp4' | 'png' | 'svg' | 'webp',
 ) => {
   assetNotRN('getCloudinaryAssetURL');
-  const ext = extension ? `.${extension}` : '';
-  return `${CLOUDINARY_BASE_URL}/${kind}/upload/${id}${ext}`;
+  return `${CLOUDINARY_BASE_URL}/${kind}/upload${format ? `/f_${format}` : '/'}${id}`;
 };
 
 /**
@@ -27,7 +27,17 @@ export const getCloudinaryAssetURL = (
  */
 export const getImageURL = (id: string) => {
   assetNotRN('getImageURL');
-  return assembleCloudinaryUrl(decodeMediaId(id), 'image', resizeTransforms());
+  return assembleCloudinaryUrl(id, 'image', resizeTransforms());
+};
+
+export type UrLForSizeParam = {
+  id: string;
+  width?: number | null;
+  height?: number | null;
+  pixelRatio?: number | null;
+  pregeneratedSizes?: number[] | null;
+  format?: string | null;
+  videoDurationPercentage?: number | null;
 };
 
 /**
@@ -39,23 +49,22 @@ export const getImageURL = (id: string) => {
  * @param pixelRatio the desired pixeld density - default 1
  * @returns the url of a transformed image
  */
-export const getImageURLForSize = (
-  id: string,
-  width?: number | null,
-  height?: number | null,
-  pixelRatio: number | null = 1,
-  pregeneratedSizes?: number[] | null,
-  extension?: string | null,
-) => {
+export const getImageURLForSize = ({
+  id,
+  width,
+  height,
+  pixelRatio = 1,
+  pregeneratedSizes,
+  format,
+}: UrLForSizeParam) => {
   assetNotRN('getImageURLForSize');
-  id = decodeMediaId(id);
   const transforms = resizeTransforms(
     width,
     height,
     pixelRatio,
     pregeneratedSizes,
   );
-  return assembleCloudinaryUrl(id, 'image', transforms, extension ?? 'webp');
+  return assembleCloudinaryUrl(id, 'image', transforms, format ?? 'avif');
 };
 
 /**
@@ -66,12 +75,7 @@ export const getImageURLForSize = (
  */
 export const getVideoURL = (id: string) => {
   assetNotRN('getVideoURL');
-  return assembleCloudinaryUrl(
-    decodeMediaId(id),
-    'video',
-    resizeTransforms(),
-    'mp4',
-  );
+  return assembleCloudinaryUrl(id, 'video', resizeTransforms(), 'mp4');
 };
 
 /**
@@ -83,27 +87,22 @@ export const getVideoURL = (id: string) => {
  * @param pixelRatio the desired pixeld density - default 1
  * @returns the url of a transformed video
  */
-export const getVideoUrlForSize = (
-  id: string,
-  width?: number | null,
-  height?: number | null,
-  pixelRatio?: number | null,
-  pregeneratedSizes?: number[] | null,
-  extension?: string | null,
-  streaming = false,
-) => {
+export const getVideoUrlForSize = ({
+  id,
+  width,
+  height,
+  pixelRatio = 1,
+  pregeneratedSizes,
+  format,
+}: UrLForSizeParam) => {
   assetNotRN('getVideoUrlForSize');
-  id = decodeMediaId(id);
-  if (streaming) {
-    return assembleCloudinaryUrl(id, 'video', 'sp_auto', extension ?? 'm3u8');
-  }
   const transforms = resizeTransforms(
     width,
     height,
     pixelRatio,
     pregeneratedSizes,
   );
-  return assembleCloudinaryUrl(id, 'video', transforms, extension ?? 'mp4');
+  return assembleCloudinaryUrl(id, 'video', transforms, format ?? 'mp4');
 };
 
 /**
@@ -115,30 +114,28 @@ export const getVideoUrlForSize = (
  * @param aspectRatio the desired height
  * @returns the url of a transformed imate
  */
-export const getVideoThumbnailURL = (
-  id: string,
-  width?: number | null,
-  height?: number | null,
-  pixelRatio: number | null = 1,
-  pregeneratedSizes?: number[] | null,
-) => {
+export const getVideoThumbnailURL = ({
+  id,
+  width,
+  height,
+  pixelRatio = 1,
+  pregeneratedSizes,
+  videoDurationPercentage,
+}: UrLForSizeParam) => {
   assetNotRN('getVideoThumbnailURL');
-  id = decodeMediaId(id);
   const transforms = resizeTransforms(
     width,
     height,
     pixelRatio,
     pregeneratedSizes,
   );
-  return assembleCloudinaryUrl(id, 'video', transforms, 'webp');
-};
-
-/**
- * Extract the media id from a database id
- */
-export const decodeMediaId = (dbId: string) => {
-  const segments = dbId.split(':');
-  return segments[segments.length - 1];
+  return assembleCloudinaryUrl(
+    id,
+    'video',
+    transforms,
+    'avif',
+    videoDurationPercentage,
+  );
 };
 
 /**
@@ -156,8 +153,10 @@ export const resizeTransforms = (
   pregeneratedSizes?: number[] | null,
 ) => {
   pixelRatio = pixelRatio ?? 1;
+  const result: string[] = [];
+
   if (width == null) {
-    return `q_auto:best`;
+    return result.join(',');
   }
   width = Math.ceil(width * pixelRatio);
   if (pregeneratedSizes) {
@@ -165,16 +164,25 @@ export const resizeTransforms = (
     if (index === -1) {
       if (height != null) {
         const aspectRatio = Math.round((width * 1000) / height) / 1000;
-        return `c_fill,q_auto:best,ar_${aspectRatio}`;
+        result.push(`c_fill`);
+        result.push(`ar_${aspectRatio}`);
+        return result.join(',');
       }
-      return `q_auto:best`;
+      return result.join(',');
     }
-    return `q_auto:best,w_${pregeneratedSizes[index]}`;
+    result.push(`c_limit`);
+    result.push(`w_${pregeneratedSizes[index]}`);
+    return result.join(',');
   }
   if (height != null) {
-    return `c_fill,q_auto:best,w_${width},h_${height}`;
+    result.push(`c_fill`);
+    result.push(`w_${width}`);
+    result.push(`h_${height}`);
+    return result.join(',');
   } else {
-    return `q_auto:best,w_${width}`;
+    result.push(`c_limit`);
+    result.push(`w_${width}`);
+    return result.join(',');
   }
 };
 
@@ -182,7 +190,7 @@ export const resizeTransforms = (
  * Create a database id from a media id
  */
 export const encodeMediaId = (mediaId: string, kind: string) => {
-  return `${kind.charAt(0)}:${mediaId}`;
+  return `${kind.charAt(0)}_${mediaId}`;
 };
 
 const assetNotRN = (funcName: string) => {
@@ -198,8 +206,9 @@ const assembleCloudinaryUrl = (
   id: string,
   kind: 'image' | 'video',
   transforms: string,
-  extension?: string,
+  format?: string,
+  videoPercentage?: number | null,
 ) => {
   // prettier-ignore
-  return `${CLOUDINARY_BASE_URL}/${kind}/upload/${transforms}/${id}${extension ? `.${extension}` : ''}`;
+  return `${CLOUDINARY_BASE_URL}/${kind}/upload${videoPercentage ? `/so_${videoPercentage}p`: ''}${transforms ? `/${transforms}`: ''}${format ? `/f_${format}`: ''}/q_auto:best/${id}`;
 };

@@ -1,6 +1,6 @@
 {
   "name": "@azzapp/data",
-  "version": "0.5.14-rc.1",
+  "version": "0.5.20-rc.0",
   "private": true,
   "exports": {
     ".": {
@@ -16,9 +16,9 @@
     "build": "yarn compile && yarn definition",
     "dev": "yarn compile:watch & yarn definition:watch",
     "typecheck": "yarn definition",
-    "generate-migration": "drizzle-kit generate:mysql --config ./src/drizzle.config.ts",
-    "push-migration": "drizzle-kit push:mysql --config ./src/drizzle.config.ts",
-    "introspect": "drizzle-kit introspect:mysql --config ./src/drizzle.config.ts",
+    "generate-migration": "drizzle-kit generate --config ./src/drizzle.config.ts",
+    "push-migration": "drizzle-kit push --config ./src/drizzle.config.ts",
+    "introspect": "drizzle-kit introspect --config ./src/drizzle.config.ts",
     "definition": "tsc -p tsconfig.build.json",
     "definition:watch": "yarn definition --watch",
     "compile": "babel src --config-file ./babel.config.js -d lib --extensions '.ts,.tsx,.js,.jsx,.json'",
@@ -34,7 +34,7 @@
     "@azzapp/shared": "workspace:^",
     "@paralleldrive/cuid2": "^2.2.2",
     "@planetscale/database": "^1.18.0",
-    "drizzle-orm": "^0.30.8",
+    "drizzle-orm": "^0.31.2",
     "lodash": "^4.17.21",
     "zod": "^3.23.8"
   },
@@ -44,9 +44,9 @@
     "@types/lodash": "4.17.1",
     "@types/node-fetch": "2.6.11",
     "better-sqlite3": "^9.6.0",
-    "drizzle-kit": "0.20.14",
+    "drizzle-kit": "^0.22.7",
     "mysql2": "^3.9.7",
     "node-fetch": "^3",
-    "typescript": "^5.4.5"
+    "typescript": "^5.5.3"
   }
 }

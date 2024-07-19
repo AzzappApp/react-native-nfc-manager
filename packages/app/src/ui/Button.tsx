@@ -18,6 +18,7 @@ export type ButtonProps = PressableProps & {
   appearance?: 'dark' | 'light';
   style?: StyleProp<ViewStyle>;
   loading?: boolean;
+  rightElement?: ReactNode;
 };
 
 const Button = (
@@ -28,6 +29,7 @@ const Button = (
     loading,
     disabled,
     style,
+    rightElement,
     ...props
   }: ButtonProps,
   forwardedRef: ForwardedRef<View>,
@@ -52,9 +54,12 @@ const Button = (
     children: loading ? (
       <ActivityIndicator color={appearance === 'light' ? 'white' : 'black'} />
     ) : (
-      <Text variant="button" style={variantStyles.label} numberOfLines={1}>
-        {label}
-      </Text>
+      <View style={variantStyles.labelContainer}>
+        <Text variant="button" style={variantStyles.label} numberOfLines={1}>
+          {label}
+        </Text>
+        {rightElement}
+      </View>
     ),
     accessibilityState: {
       disabled: disabled ?? false,
@@ -120,6 +125,11 @@ const computedStyles = createVariantsStyleSheet(appearance => ({
       borderRadius: 12,
       borderCurve: 'continuous',
       paddingHorizontal: 20,
+    },
+    labelContainer: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      columnGap: 5,
     },
     label: {
       flexWrap: 'nowrap',

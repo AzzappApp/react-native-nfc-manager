@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { FormattedMessage } from 'react-intl';
 import { View, StyleSheet } from 'react-native';
 import { colors } from '#theme';
@@ -66,7 +67,7 @@ const HomeMenu = ({ selected, setSelected }: HomeMenuProps) => {
 
 const HOME_MENU_PADDING = 10;
 export const HOME_MENU_HEIGHT = 32 + HOME_MENU_PADDING;
-export default HomeMenu;
+export default memo(HomeMenu);
 
 const CLEAR_GRADIENT_COLOR = 'rgba(255, 255, 255, 0)';
 const END_GRADIENT_COLOR = 'rgba(255, 255, 255, 0.3)';

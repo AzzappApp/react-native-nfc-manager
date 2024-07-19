@@ -29,85 +29,82 @@ const WebCardBackground = ({
   overrideLastModule,
   ...props
 }: WebCardBackgroundProps) => {
-  const { cardColors, cardStyle, cardCover, cardModules } = useFragment(
-    graphql`
-      fragment WebCardBackgroundPreview_webCard on WebCard {
-        id
-        cardColors {
-          dark
-          light
-          primary
-        }
-        cardStyle {
-          borderColor
-          borderRadius
-          buttonRadius
-          borderWidth
-          buttonColor
-          fontFamily
-          fontSize
-          gap
-          titleFontFamily
-          titleFontSize
-        }
-        cardCover {
-          backgroundColor
-        }
-        cardModules {
+  const { cardColors, cardStyle, coverBackgroundColor, cardModules } =
+    useFragment(
+      graphql`
+        fragment WebCardBackgroundPreview_webCard on WebCard {
           id
-          kind
-          ... on CardModuleBlockText {
-            backgroundStyle {
-              backgroundColor
+          cardColors {
+            dark
+            light
+            primary
+          }
+          cardStyle {
+            borderColor
+            borderRadius
+            buttonRadius
+            borderWidth
+            buttonColor
+            fontFamily
+            fontSize
+            gap
+            titleFontFamily
+            titleFontSize
+          }
+          coverBackgroundColor
+          cardModules {
+            id
+            kind
+            ... on CardModuleBlockText {
+              backgroundStyle {
+                backgroundColor
+              }
             }
-          }
-          ... on CardModuleCarousel {
-            backgroundStyle {
-              backgroundColor
+            ... on CardModuleCarousel {
+              backgroundStyle {
+                backgroundColor
+              }
             }
-          }
-          ... on CardModuleHorizontalPhoto {
-            backgroundStyle {
-              backgroundColor
+            ... on CardModuleHorizontalPhoto {
+              backgroundStyle {
+                backgroundColor
+              }
             }
-          }
-          ... on CardModuleLineDivider {
-            colorBottom
-          }
-          ... on CardModulePhotoWithTextAndTitle {
-            backgroundStyle {
-              backgroundColor
+            ... on CardModuleLineDivider {
+              colorBottom
             }
-          }
-          ... on CardModuleSimpleButton {
-            backgroundStyle {
-              backgroundColor
+            ... on CardModulePhotoWithTextAndTitle {
+              backgroundStyle {
+                backgroundColor
+              }
             }
-          }
-          ... on CardModuleSimpleText {
-            backgroundStyle {
-              backgroundColor
+            ... on CardModuleSimpleButton {
+              backgroundStyle {
+                backgroundColor
+              }
             }
-          }
-          ... on CardModuleSimpleTitle {
-            backgroundStyle {
-              backgroundColor
+            ... on CardModuleSimpleText {
+              backgroundStyle {
+                backgroundColor
+              }
             }
-          }
-          ... on CardModuleSocialLinks {
-            backgroundStyle {
-              backgroundColor
+            ... on CardModuleSimpleTitle {
+              backgroundStyle {
+                backgroundColor
+              }
+            }
+            ... on CardModuleSocialLinks {
+              backgroundStyle {
+                backgroundColor
+              }
             }
           }
         }
-      }
-    `,
-    webCard,
-  );
+      `,
+      webCard,
+    );
   const firstColor =
-    swapColor(cardCover?.backgroundColor, cardColors) ??
-    cardColors?.light ??
-    '#fff';
+    swapColor(coverBackgroundColor, cardColors) ?? cardColors?.light ?? '#fff';
   const lastModule = cardModules ? cardModules.at(-1) : undefined;
 
   let lastColor = firstColor;

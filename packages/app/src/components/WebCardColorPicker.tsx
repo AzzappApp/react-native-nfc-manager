@@ -12,7 +12,7 @@ import ColorPicker from '#ui/ColorPicker/ColorPicker';
 import type { WebCardColorPicker_webCard$key } from '#relayArtifacts/WebCardColorPicker_webCard.graphql';
 import type {
   WebCardColorPickerMutation,
-  SaveCardColorsInput,
+  CardColorsInput,
 } from '#relayArtifacts/WebCardColorPickerMutation.graphql';
 import type { ColorDropDownPickerProps } from '#ui/ColorDropDownPicker';
 import type { ColorPickerProps } from '#ui/ColorPicker';
@@ -79,7 +79,7 @@ export const useWebCardColorsFragment = (
   const mutation = useMutation<WebCardColorPickerMutation>(graphql`
     mutation WebCardColorPickerMutation(
       $webCardId: ID!
-      $input: SaveCardColorsInput!
+      $input: CardColorsInput!
     ) {
       saveCardColors(webCardId: $webCardId, input: $input) {
         webCard {
@@ -116,7 +116,7 @@ export const useWebCardColors = (
   const intl = useIntl();
 
   const updateCardColors = useCallback(
-    (updates: Partial<SaveCardColorsInput>) => {
+    (updates: Partial<CardColorsInput>) => {
       const webCardId = webCard?.id;
       if (!webCardId) {
         return;

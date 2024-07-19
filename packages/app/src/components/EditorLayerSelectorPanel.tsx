@@ -4,12 +4,12 @@ import { StyleSheet, View } from 'react-native';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
 import { swapColor } from '@azzapp/shared/cardHelpers';
 import { colors } from '#theme';
-import StaticMediaList from '#components/StaticMediaList';
+import ModuleBackgroundList from '#components/ModuleBackgroundList';
 import ColorPicker from '#ui/ColorPicker';
 import ColorPreview from '#ui/ColorPreview';
 import TabsBar from '#ui/TabsBar';
 import { useWebCardColors } from './WebCardColorPicker';
-import type { StaticMediaList_staticMedias$key } from '#relayArtifacts/StaticMediaList_staticMedias.graphql';
+import type { ModuleBackgroundList_ModuleBackgrounds$key } from '#relayArtifacts/ModuleBackgroundList_ModuleBackgrounds.graphql';
 import type { WebCardColorsBoundsComponentProps } from './WebCardColorPicker';
 import type { ColorPalette } from '@azzapp/shared/cardHelpers';
 import type { ViewProps } from 'react-native';
@@ -30,7 +30,7 @@ export type EditorLayerSelectorPanelProps = ViewProps & {
   /**
    * List of available medias.
    */
-  medias: StaticMediaList_staticMedias$key;
+  medias: ModuleBackgroundList_ModuleBackgrounds$key;
   /**
    * Currently selected media.
    */
@@ -188,7 +188,7 @@ const EditorLayerSelectorPanel = ({
   return (
     <View {...props}>
       <TabsBar currentTab={currentTab} onTabPress={setCurrentTab} tabs={tabs} />
-      <StaticMediaList
+      <ModuleBackgroundList
         medias={medias}
         selectedMedia={selectedMedia}
         backgroundColor={swapColor(

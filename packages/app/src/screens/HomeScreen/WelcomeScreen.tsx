@@ -81,7 +81,7 @@ const WelcomeScreen = () => {
             }}
           />
         </Text>
-        <Link route="NEW_WEBCARD" prefetch>
+        <Link route="WEBCARD_KIND_SELECTION" prefetch>
           <Button
             label={intl.formatMessage(
               {
@@ -99,12 +99,7 @@ const WelcomeScreen = () => {
           />
         </Link>
       </View>
-      <HomeBottomSheetPanel
-        visible={showMenu}
-        close={toggleShowMenu}
-        withProfile={false}
-        profileRole={null}
-      />
+      <HomeBottomSheetPanel visible={showMenu} close={toggleShowMenu} />
     </Container>
   );
 };

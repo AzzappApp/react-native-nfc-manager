@@ -10,10 +10,7 @@ import {
 } from 'react-relay';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
 import ERRORS from '@azzapp/shared/errors';
-import {
-  FetchError,
-  TIMEOUT_ERROR_MESSAGE,
-} from '@azzapp/shared/networkHelpers';
+import { FetchError, isNetworkError } from '@azzapp/shared/networkHelpers';
 import {
   useRouter,
   type NativeScreenProps,
@@ -31,6 +28,7 @@ import type { Route } from '#routes';
 import type { LoadQueryOptions } from './RelayQueryManager';
 import type { ScreenPrefetchOptions } from './ScreenPrefetcher';
 import type { ComponentType } from 'react';
+import type { EdgeInsets } from 'react-native-safe-area-context';
 import type { OperationType, Subscription } from 'relay-runtime';
 
 export type RelayScreenOptions<TRoute extends Route> = LoadQueryOptions<
@@ -109,7 +107,12 @@ function relayScreen<TRoute extends Route>(
     pollInterval,
     stopPollingWhenNotFocused = true,
     ...options
-  }: RelayScreenOptions<TRoute>,
+  }: RelayScreenOptions<TRoute> & {
+    getScreenOptions?: (
+      params: TRoute['params'],
+      safeArea: EdgeInsets,
+    ) => ScreenOptions;
+  },
 ): ComponentType<Omit<RelayScreenProps<TRoute, any>, 'preloadedQuery'>> &
   typeof options & {
     getScreenOptions?: () => ScreenOptions;
@@ -294,11 +297,7 @@ const isRelayNetworkError = (error: Error) => {
   if (error instanceof GraphQLError || error.name === 'GraphQLError') {
     return true;
   }
-  if (
-    error instanceof TypeError &&
-    (error.message === 'Network request failed' ||
-      error.message === TIMEOUT_ERROR_MESSAGE)
-  ) {
+  if (isNetworkError(error)) {
     return true;
   }
   return false;

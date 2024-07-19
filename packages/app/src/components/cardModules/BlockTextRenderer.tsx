@@ -1,9 +1,5 @@
-import {
-  type ViewProps,
-  type ColorValue,
-  type StyleProp,
-  type ViewStyle,
-} from 'react-native';
+import { useIntl } from 'react-intl';
+import { type ViewProps, type StyleProp, type ViewStyle } from 'react-native';
 import Animated, {
   useAnimatedStyle,
   type SharedValue,
@@ -16,6 +12,7 @@ import {
   getModuleDataValues,
   textAlignmentOrDefault,
 } from '@azzapp/shared/cardModuleHelpers';
+import Text from '#ui/Text';
 import CardModuleBackground from './CardModuleBackground';
 import type {
   BlockTextRenderer_module$data,
@@ -193,6 +190,10 @@ const BlockTextRenderer = ({
     };
   });
 
+  const intl = useIntl();
+
+  const textColor = swapColor(fontColor, colorPalette);
+
   return (
     <CardModuleBackground
       {...props}
@@ -222,13 +223,27 @@ const BlockTextRenderer = ({
             style={[
               {
                 textAlign: textAlignmentOrDefault(textAlign),
-                color: swapColor(fontColor, colorPalette) as ColorValue,
+                color: textColor,
                 fontFamily,
               },
               textStyle,
             ]}
           >
-            {text}
+            {text ||
+              intl.formatMessage(
+                {
+                  defaultMessage:
+                    'Add section contents here. To edit the text, simply open the editor and start typing. You can also change the font style, size, color, and alignment using the editing tools provided. Adjust the margins and the background for this section to match the design and branding of your WebCard{azzappA}.',
+                  description: 'Default text for the BlockText module',
+                },
+                {
+                  azzappA: (
+                    <Text variant="azzapp" style={{ color: textColor }}>
+                      a
+                    </Text>
+                  ),
+                },
+              )}
           </Animated.Text>
         </CardModuleBackground>
       </Animated.View>

@@ -1,0 +1,31 @@
+export const textAnimations = [
+  'fadeInOut',
+  'neon',
+  'slideUp',
+  'slideRight',
+  'slideDown',
+  'slideLeft',
+  'smoothUp',
+  'smoothRight',
+  'smoothDown',
+  'smoothLeft',
+  'letterAppearsAnimation',
+  'letterFadeAnimation',
+  'letterFadeAnimationRandom',
+  'letterSlideFromTop',
+  'letterSlideFromRight',
+  'letterSlideFromBottom',
+  'letterSlideFromLeft',
+  'letterSmoothFromTop',
+  'letterSmoothFromRight',
+  'letterSmoothFromBottom',
+  'letterSmoothFromLeft',
+];
+
+export const overlayAnimations = [
+  'fadeInOut',
+  'zoomInOpacity',
+  'zoomOutOpacity',
+  'zoomInOut',
+  'zoomOutInOpacity',
+];

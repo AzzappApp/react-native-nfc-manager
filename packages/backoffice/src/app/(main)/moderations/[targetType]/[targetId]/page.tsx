@@ -107,7 +107,7 @@ const getStatus = (reports: Report[]): ReportStatus => {
     -Infinity,
   );
 
-  return treated.treatedAt.getTime() < lastReportDate ? 'Opened' : 'Closed';
+  return treated.treatedAt.getTime() <= lastReportDate ? 'Opened' : 'Closed';
 };
 
 const ReportPage = async ({
@@ -216,7 +216,7 @@ const ReportPage = async ({
                     key={media}
                     component="img"
                     height={400}
-                    image={getImageURLForSize(media)}
+                    image={getImageURLForSize({ id: media })}
                   />
                 ),
               )}

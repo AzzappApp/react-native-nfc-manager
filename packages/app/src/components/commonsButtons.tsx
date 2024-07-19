@@ -89,6 +89,20 @@ export const CancelHeaderButton = (props: Omit<ButtonProps, 'label'>) => {
   );
 };
 
+export const DoneHeaderButton = (props: Omit<ButtonProps, 'label'>) => {
+  const intl = useIntl();
+  return (
+    <HeaderButton
+      variant="primary"
+      label={intl.formatMessage({
+        defaultMessage: 'Done',
+        description: 'Done header button label',
+      })}
+      {...props}
+    />
+  );
+};
+
 export const SaveHeaderButton = (props: Omit<ButtonProps, 'label'>) => {
   const intl = useIntl();
   return (
@@ -111,6 +125,34 @@ export const NextHeaderButton = (props: Omit<ButtonProps, 'label'>) => {
       label={intl.formatMessage({
         defaultMessage: 'Next',
         description: 'Next header button label',
+      })}
+      {...props}
+    />
+  );
+};
+
+export const ApplyHeaderButton = (props: Omit<ButtonProps, 'label'>) => {
+  const intl = useIntl();
+  return (
+    <HeaderButton
+      variant="primary"
+      label={intl.formatMessage({
+        defaultMessage: 'Apply',
+        description: 'Apply header button label',
+      })}
+      {...props}
+    />
+  );
+};
+
+export const ResetHeaderButton = (props: Omit<ButtonProps, 'label'>) => {
+  const intl = useIntl();
+  return (
+    <HeaderButton
+      variant="secondary"
+      label={intl.formatMessage({
+        defaultMessage: 'Reset',
+        description: 'Reset header button label',
       })}
       {...props}
     />

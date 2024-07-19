@@ -2,7 +2,6 @@ import { MODULE_IMAGES_SIZES } from '@azzapp/shared/cardModuleHelpers';
 import { CONTACTCARD_ASSET_SIZES } from '@azzapp/shared/contactCardHelpers';
 import { COVER_ASSET_SIZES } from '@azzapp/shared/coverHelpers';
 import {
-  decodeMediaId,
   getCloudinaryAssetURL,
   getImageURLForSize,
   getVideoThumbnailURL,
@@ -13,17 +12,12 @@ import {
   POST_VIDEO_SIZES,
 } from '@azzapp/shared/postHelpers';
 import type {
-  Extension,
   MediaImageResolvers,
   MediaResolvers,
   MediaVideoResolvers,
-  StaticMediaResolvers,
 } from './__generated__/types';
 import type { GraphQLContext } from './GraphQLContext';
-import type {
-  StaticMedia as StaticMediaModel,
-  Media as MediaModel,
-} from '@azzapp/data';
+import type { Media as MediaModel } from '@azzapp/data';
 import type DataLoader from 'dataloader';
 
 export type DeferredMedia = MediaModel | string;
@@ -33,10 +27,11 @@ export type MediaWithAssetKind = {
   assetKind:
     | 'contactCard'
     | 'cover'
-    | 'coverSource'
+    | 'coverPreview'
     | 'logo'
     | 'module'
-    | 'post';
+    | 'post'
+    | 'rawCover';
 };
 
 export type MediaResolverBaseType = DeferredMedia | MediaWithAssetKind;
@@ -133,29 +128,27 @@ const uriResolver =
       height,
       pixelRatio,
       raw,
-      streaming = false,
-      extension,
+      videoDurationPercentage,
     }: {
       width?: number | null;
       height?: number | null;
       pixelRatio?: number | null;
       raw?: boolean | null;
-      streaming?: boolean | null;
-      extension?: Extension | null;
+      videoDurationPercentage?: number | null;
     },
   ) => {
     const assetKind = getAssetKind(media);
     media = getDeferredMedia(media);
-    const id = decodeMediaId(typeof media === 'string' ? media : media.id);
-    if (assetKind === 'coverSource' || raw) {
+    const id = typeof media === 'string' ? media : media.id;
+    if (raw) {
       return getCloudinaryAssetURL(
         id,
         kind,
-        kind === 'video' ? 'mp4' : kind === 'image' ? 'webp' : undefined,
+        kind === 'video' ? 'mp4' : kind === 'image' ? 'avif' : undefined,
       );
     }
     const pregeneratedSizes =
-      assetKind === 'cover'
+      assetKind === 'cover' || assetKind === 'rawCover'
         ? COVER_ASSET_SIZES
         : assetKind === 'module'
           ? MODULE_IMAGES_SIZES
@@ -166,16 +159,14 @@ const uriResolver =
                 ? POST_IMAGES_SIZES
                 : POST_VIDEO_SIZES
               : null;
-    return uriGenerator(
+    return uriGenerator({
       id,
       width,
       height,
       pixelRatio,
       pregeneratedSizes,
-      extension,
-      // @ts-expect-error streaming is not in the getImageURLForSize signature
-      streaming,
-    );
+      videoDurationPercentage,
+    });
   };
 
 export const MediaImage: MediaImageResolvers = {
@@ -187,74 +178,4 @@ export const MediaVideo: MediaVideoResolvers = {
   uri: uriResolver('video', getVideoUrlForSize),
   thumbnail: uriResolver('image', getVideoThumbnailURL),
   ...MediaResolversBase,
-};
-
-export type StaticMediaResolverBaseType = {
-  staticMedia: StaticMediaModel | string;
-  assetKind: 'cover' | 'module';
-};
-
-const getActualStaticMedia = async (
-  staticMedia: StaticMediaResolverBaseType,
-  loader: DataLoader<string, StaticMediaModel | null>,
-) => {
-  const actualMedia = staticMedia.staticMedia;
-  if (typeof actualMedia === 'string') {
-    const dbMedia = await loader.load(actualMedia);
-    if (!dbMedia) {
-      console.warn(`StaticMedia ${actualMedia} not found`);
-    }
-    return dbMedia;
-  } else {
-    return actualMedia;
-  }
-};
-
-const getStaticMediaId = (staticMedia: StaticMediaResolverBaseType) => {
-  return typeof staticMedia.staticMedia === 'string'
-    ? staticMedia.staticMedia
-    : staticMedia.staticMedia.id;
-};
-
-const getStaticMediaKind = (staticMedia: StaticMediaResolverBaseType) => {
-  const id = getStaticMediaId(staticMedia);
-  if (id.startsWith('s:')) {
-    return 'svg';
-  } else if (id.startsWith('l:')) {
-    return 'lottie';
-  }
-  return 'png';
-};
-
-export const StaticMedia: StaticMediaResolvers = {
-  id: getStaticMediaId,
-  kind: getStaticMediaKind,
-  uri: (staticMedia, { width, pixelRatio }) => {
-    const cloudinaryId = decodeMediaId(getStaticMediaId(staticMedia));
-    const kind = getStaticMediaKind(staticMedia);
-    if (kind === 'png') {
-      return getImageURLForSize(
-        cloudinaryId,
-        width,
-        undefined,
-        pixelRatio,
-        staticMedia.assetKind === 'cover'
-          ? COVER_ASSET_SIZES
-          : MODULE_IMAGES_SIZES,
-        'png',
-      );
-    } else if (kind === 'svg') {
-      return getCloudinaryAssetURL(cloudinaryId, 'image', 'svg');
-    } else {
-      return getCloudinaryAssetURL(cloudinaryId, 'raw');
-    }
-  },
-  resizeMode: async (staticMedia, _, { loaders }) =>
-    getActualStaticMedia(staticMedia, loaders.StaticMedia).then(
-      staticMedia => staticMedia?.resizeMode ?? 'cover',
-    ),
-  usage: async (staticMedia, _, { loaders }) =>
-    getActualStaticMedia(staticMedia, loaders.StaticMedia).then(
-      staticMedia => staticMedia?.usage ?? 'moduleBackground',
-    ),
 };

@@ -1,8 +1,11 @@
-import { eq, sql, lt, desc, and, ne } from 'drizzle-orm';
+import { eq, sql, lt, desc, and, ne, inArray } from 'drizzle-orm';
+import { webCardRequiresSubscription } from '@azzapp/shared/subscriptionHelpers';
+import { getCardModules } from '#cardModules';
+import { PostTable } from '#posts';
 import db, { DEFAULT_DATETIME_VALUE, cols } from './db';
 import { FollowTable } from './follows';
 import { createId } from './helpers/createId';
-import { ProfileTable } from './profiles';
+import { getProfilesOfUser, ProfileTable } from './profiles';
 import { RedirectWebCardTable } from './redirectWebCard';
 import { getUserById } from './users';
 import type { DbTransaction } from './db';
@@ -11,11 +14,6 @@ import type {
   CommonInformation,
   ContactCard,
 } from '@azzapp/shared/contactCardHelpers';
-import type {
-  TextOrientation,
-  TextPosition,
-  TextStyle,
-} from '@azzapp/shared/coverHelpers';
 import type { InferInsertModel, InferSelectModel } from 'drizzle-orm';
 
 export const WebCardTable = cols.table(
@@ -67,35 +65,35 @@ export const WebCardTable = cols.table(
       .default(DEFAULT_DATETIME_VALUE),
 
     /* Covers infos */
-    coverTitle: cols.defaultVarchar('coverTitle'),
-    coverSubTitle: cols.defaultVarchar('coverSubTitle'),
-    coverData: cols.json('coverData').$type<{
-      kind: 'others' | 'people' | 'video' | null;
-      titleStyle: TextStyle;
-      subTitleStyle: TextStyle;
-      textOrientation: TextOrientation;
-      textPosition: TextPosition;
-      textAnimation?: string | null;
-      backgroundId?: string | null;
-      backgroundColor?: string | null;
-      backgroundPatternColor?: string | null;
-      foregroundId?: string | null;
-      foregroundColor?: string | null;
-      sourceMediaId: string | null;
-      maskMediaId?: string | null;
-      mediaFilter?: string | null;
-      mediaAnimation?: string | null;
-      mediaParameters?: Record<string, any> | null;
-      mediaId?: string | null;
-      segmented: boolean;
-    }>(),
+    coverId: cols.cuid('coverId').notNull().default(''), // this is used to identify that local cover is different from the last one
+    coverMediaId: cols.mediaId('coverMediaId'),
+    coverTexts: cols.json('coverTexts').$type<string[]>(),
+    coverBackgroundColor: cols.defaultVarchar('coverBackgroundColor'),
+    coverDynamicLinks: cols
+      .json('coverDynamicLinks')
+      .$type<CoverDynamicLinks>()
+      .notNull()
+      .default({
+        links: [],
+        color: '#000000',
+        size: 24,
+        position: {
+          x: 0,
+          y: 0,
+        },
+        rotation: 0,
+        shadow: false,
+      }),
 
+    /* Social medias infos */
     nbFollowers: cols.int('nbFollowers').default(0).notNull(),
     nbFollowings: cols.int('nbFollowings').default(0).notNull(),
     nbPosts: cols.int('nbPosts').default(0).notNull(),
     nbPostsLiked: cols.int('nbPostsLiked').default(0).notNull(), // this is the informations postLiked
     nbLikes: cols.int('nbLikes').default(0).notNull(), //this is the stats TotalLikes (number of likes received)
     nbWebCardViews: cols.int('nbWebCardViews').default(0).notNull(),
+
+    /* Deletion infos */
     deleted: cols.boolean('deleted').default(false).notNull(),
     deletedAt: cols.dateTime('deletedAt'),
     deletedBy: cols.cuid('deletedBy'),
@@ -110,6 +108,22 @@ export const WebCardTable = cols.table(
 
 export type WebCard = InferSelectModel<typeof WebCardTable>;
 export type NewWebCard = InferInsertModel<typeof WebCardTable>;
+
+export type CoverDynamicLinks = {
+  links: Array<{
+    link: string;
+    position: number;
+    socialId: string;
+  }>;
+  color: string;
+  size: number;
+  position: {
+    x: number;
+    y: number;
+  };
+  rotation: number;
+  shadow: boolean;
+};
 
 /**
  * Retrieves a webCard by its id
@@ -361,8 +375,11 @@ export const getWebCardByProfileId = (id: string): Promise<WebCard | null> => {
     });
 };
 
-export const getWebCardProfilesCount = async (webCardId: string) =>
-  db
+export const getWebCardProfilesCount = async (
+  webCardId: string,
+  trx: DbTransaction = db,
+) =>
+  trx
     .select({ count: sql`count(*)`.mapWith(Number) })
     .from(ProfileTable)
 
@@ -373,3 +390,96 @@ export const getWebCardProfilesCount = async (webCardId: string) =>
       ),
     )
     .then(res => res[0].count);
+
+export const deleteWebCard = async (
+  webCardId: string,
+  userId: string,
+  trx: DbTransaction,
+) => {
+  await trx
+    .update(WebCardTable)
+    .set({
+      deletedAt: new Date(),
+      deletedBy: userId,
+      deleted: true,
+      cardIsPublished: false,
+    })
+    .where(eq(WebCardTable.id, webCardId));
+
+  await trx
+    .update(ProfileTable)
+    .set({
+      deletedAt: new Date(),
+      deletedBy: userId,
+      deleted: true,
+    })
+    .where(eq(ProfileTable.webCardId, webCardId));
+
+  await trx
+    .update(PostTable)
+    .set({
+      deletedAt: new Date(),
+      deletedBy: userId,
+      deleted: true,
+    })
+    .where(eq(PostTable.webCardId, webCardId));
+
+  await trx
+    .update(WebCardTable)
+    .set({
+      nbPostsLiked: sql`GREATEST(nbPostsLiked - 1, 0)`,
+    })
+    .where(
+      inArray(
+        WebCardTable.id,
+        sql`(select r.webCardId from PostReaction r inner join Post p on p.id = r.postId where p.webCardId = ${webCardId})`,
+      ),
+    );
+
+  await trx
+    .update(WebCardTable)
+    .set({
+      nbFollowers: sql`GREATEST(nbFollowers - 1, 0)`,
+    })
+    .where(
+      inArray(
+        WebCardTable.id,
+        sql`(select followingId from Follow where followerId = ${webCardId})`,
+      ),
+    );
+
+  await trx
+    .update(WebCardTable)
+    .set({
+      nbFollowings: sql`GREATEST(nbFollowings - 1, 0)`,
+    })
+    .where(
+      inArray(
+        WebCardTable.id,
+        sql`(select followerId from Follow where followingId = ${webCardId})`,
+      ),
+    );
+};
+
+export const unpublisheWebCardForUser = async (userId: string) => {
+  try {
+    const profiles = await getProfilesOfUser(userId);
+    for (let index = 0; index < profiles.length; index++) {
+      const webCard = profiles[index].WebCard;
+      if (webCard && webCard.cardIsPublished) {
+        const modules = await getCardModules(webCard.id);
+        if (webCardRequiresSubscription(modules, webCard.webCardKind)) {
+          //unpublished webcard
+          const updates = {
+            cardIsPublished: false,
+            updatedAt: new Date(),
+            lastCardUpdate: new Date(),
+          };
+          await updateWebCard(webCard.id, updates);
+        }
+      }
+    }
+  } catch (error) {
+    console.error(error);
+  }
+};

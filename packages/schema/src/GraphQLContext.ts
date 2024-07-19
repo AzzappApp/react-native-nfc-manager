@@ -8,14 +8,16 @@ import {
   CardTemplateTypeTable,
   ColorPaletteTable,
   CompanyActivityTable,
+  CoverTemplatePreviewTable,
   CoverTemplateTable,
+  CoverTemplateTypeTable,
+  CoverTemplateTagTable,
   MediaTable,
-  MediaSuggestionTable,
   PostCommentTable,
   PostTable,
   WebCardCategoryTable,
   ProfileTable,
-  StaticMediaTable,
+  ModuleBackgroundTable,
   UserTable,
   getLastWebCardListStatisticsFor,
   getLastProfileListStatisticsFor,
@@ -23,26 +25,29 @@ import {
   db,
   sortEntitiesByIds,
   WebCardTable,
-  getLabels,
   PaymentTable,
   PaymentMeanTable,
+  CompanyActivityTypeTable,
+  getCardModulesForWebCards,
+  activeUserSubscription,
+  getLocalizationMessagesByKeys,
 } from '@azzapp/data';
-import { DEFAULT_LOCALE } from '@azzapp/i18n';
+import { DEFAULT_LOCALE, ENTITY_TARGET } from '@azzapp/i18n';
 import type {
   WebCard,
   CardModule,
-  Label,
+  LocalizationMessage,
   User,
   ProfileStatistic,
   Profile,
   WebCardStatistic,
-  StaticMedia,
   WebCardCategory,
   Post,
   PostComment,
-  MediaSuggestion,
   Media,
   CoverTemplate,
+  CoverTemplateType,
+  CoverTemplateTag,
   CompanyActivity,
   ColorPalette,
   CardTemplateType,
@@ -50,6 +55,9 @@ import type {
   CardStyle,
   PaymentMean,
   Payment,
+  CompanyActivityType,
+  UserSubscription,
+  ModuleBackground,
 } from '@azzapp/data';
 
 import type { Locale } from '@azzapp/i18n';
@@ -120,14 +128,16 @@ const entities = [
   'CardTemplateType',
   'ColorPalette',
   'CompanyActivity',
+  'CompanyActivityType',
   'CoverTemplate',
+  'CoverTemplateType',
+  'CoverTemplateTag',
   'Media',
-  'MediaSuggestion',
   'PostComment',
   'Post',
   'WebCardCategory',
   'Profile',
-  'StaticMedia',
+  'ModuleBackground',
   'User',
   'WebCard',
   'Payment',
@@ -143,15 +153,17 @@ type EntityToType<T extends Entity> = {
   CardTemplateType: CardTemplateType;
   ColorPalette: ColorPalette;
   CompanyActivity: CompanyActivity;
+  CompanyActivityType: CompanyActivityType;
   CoverTemplate: CoverTemplate;
+  CoverTemplateType: CoverTemplateType;
+  CoverTemplateTag: CoverTemplateTag;
   Media: Media;
-  MediaSuggestion: MediaSuggestion;
   PostComment: PostComment;
   Post: Post;
   WebCardCategory: WebCardCategory;
   Profile: Profile;
   WebCard: WebCard;
-  StaticMedia: StaticMedia;
+  ModuleBackground: ModuleBackground;
   User: User;
   Payment: Payment;
   PaymentMean: PaymentMean;
@@ -168,7 +180,9 @@ export type Loaders = {
   webCardStatistics: DataLoader<string, WebCardStatistic[]>;
   profileStatistics: DataLoader<string, ProfileStatistic[]>;
   webCardOwners: DataLoader<string, User | null>;
-  labels: DataLoader<string, Label | null>;
+  labels: DataLoader<[string, string], LocalizationMessage | null>;
+  cardModuleByWebCardLoader: DataLoader<string, CardModule[]>;
+  activeSubscriptionsLoader: DataLoader<string, UserSubscription[]>;
 };
 
 const entitiesTable = {
@@ -178,15 +192,18 @@ const entitiesTable = {
   CardTemplateType: CardTemplateTypeTable,
   ColorPalette: ColorPaletteTable,
   CompanyActivity: CompanyActivityTable,
+  CompanyActivityType: CompanyActivityTypeTable,
   CoverTemplate: CoverTemplateTable,
+  CoverTemplateType: CoverTemplateTypeTable,
+  CoverTemplatePreview: CoverTemplatePreviewTable,
+  CoverTemplateTag: CoverTemplateTagTable,
   Media: MediaTable,
-  MediaSuggestion: MediaSuggestionTable,
   PostComment: PostCommentTable,
   Post: PostTable,
   WebCardCategory: WebCardCategoryTable,
   Profile: ProfileTable,
   WebCard: WebCardTable,
-  StaticMedia: StaticMediaTable,
+  ModuleBackground: ModuleBackgroundTable,
   User: UserTable,
   Payment: PaymentTable,
   PaymentMean: PaymentMeanTable,
@@ -281,11 +298,34 @@ const webCardOwnerLoader = () =>
     return keys.map(k => profiles.find(p => p.webCardId === k)?.user ?? null);
   }, dataLoadersOptions);
 
-const labelLoader = new DataLoader<string, Label | null>(
+const labelLoader = new DataLoader<
+  [string, string],
+  LocalizationMessage | null
+>(
   async keys => {
-    const labels = await getLabels(keys as string[]);
+    const labelsByLocale = keys.reduce(
+      (acc, [id, locale]) => {
+        if (!acc[locale]) {
+          acc[locale] = [];
+        }
+        acc[locale].push(id);
+        return acc;
+      },
+      {} as Record<string, string[]>,
+    );
+    const labelsWithLocale: Record<string, LocalizationMessage[]> =
+      Object.fromEntries(
+        await Promise.all(
+          Object.entries(labelsByLocale).map(async ([locale, keys]) => [
+            locale,
+            await getLocalizationMessagesByKeys(keys, locale, ENTITY_TARGET),
+          ]),
+        ),
+      );
 
-    return keys.map(k => labels.find(l => l.labelKey === k) ?? null);
+    return keys.map(([key, locale]) => {
+      return labelsWithLocale[locale].find(l => l.key === key) ?? null;
+    });
   },
   {
     ...dataLoadersOptions,
@@ -293,12 +333,34 @@ const labelLoader = new DataLoader<string, Label | null>(
   },
 );
 
+const cardModuleByWebCardLoader = () =>
+  new DataLoader<string, CardModule[]>(async keys => {
+    if (keys.length === 0) {
+      return [];
+    }
+    const modules = await getCardModulesForWebCards(keys as string[]);
+
+    return keys.map(k => modules.filter(m => m.webCardId === k));
+  }, dataLoadersOptions);
+
+const activeSubscriptionsLoader = () =>
+  new DataLoader<string, UserSubscription[]>(async keys => {
+    if (keys.length === 0) {
+      return [];
+    }
+    const modules = await activeUserSubscription(keys as string[]);
+
+    return keys.map(k => modules.filter(m => m.userId === k));
+  }, dataLoadersOptions);
+
 export const createLoaders = (): Loaders =>
   new Proxy({} as Loaders, {
     get: (
       loaders: Loaders,
       entity:
         | Entity
+        | 'activeSubscriptionsLoader'
+        | 'cardModuleByWebCardLoader'
         | 'labels'
         | 'profileByWebCardIdAndUserId'
         | 'profileStatistics'
@@ -319,6 +381,14 @@ export const createLoaders = (): Loaders =>
 
       if (entity === 'labels') {
         return labelLoader;
+      }
+
+      if (entity === 'cardModuleByWebCardLoader') {
+        return cardModuleByWebCardLoader();
+      }
+
+      if (entity === 'activeSubscriptionsLoader') {
+        return activeSubscriptionsLoader();
       }
 
       if (!['profileByWebCardIdAndUserId', ...entities].includes(entity)) {

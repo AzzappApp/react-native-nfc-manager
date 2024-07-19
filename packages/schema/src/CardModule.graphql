@@ -66,9 +66,9 @@ type CardModuleBlockText implements CardModule {"""
   marginHorizontal: Int
   marginVertical: Int
   textBackgroundStyle: ModuleTextBackgroundStyle
-  textBackground: StaticMedia
+  textBackground: ModuleBackground
   backgroundStyle: ModuleBackgroundStyle
-  background: StaticMedia
+  background: ModuleBackground
 }
 
 """
@@ -96,7 +96,7 @@ type CardModuleCarousel implements CardModule {
   marginHorizontal: Int
   imageHeight: Int
   gap: Int
-  background: StaticMedia
+  background: ModuleBackground
   backgroundStyle: ModuleBackgroundStyle
 }
 
@@ -127,7 +127,7 @@ type CardModuleHorizontalPhoto implements CardModule {
   marginVertical: Int
   marginHorizontal: Int
   imageHeight: Int
-  background: StaticMedia
+  background: ModuleBackground
   backgroundStyle: ModuleBackgroundStyle
 }
 
@@ -262,7 +262,7 @@ type CardModuleSimpleButton implements CardModule {"""
   marginBottom: Int
   width: Int
   height: Int
-  background: StaticMedia
+  background: ModuleBackground
   backgroundStyle: ModuleBackgroundStyle
 }
 
@@ -289,7 +289,7 @@ type CardModuleSimpleText implements CardModule { """
   textAlign: TextAlignment
   marginHorizontal: Int
   marginVertical: Int
-  background: StaticMedia
+  background: ModuleBackground
   backgroundStyle: ModuleBackgroundStyle
 }
 
@@ -317,7 +317,7 @@ type CardModuleSimpleTitle implements CardModule {"""
   textAlign: TextAlignment
   marginHorizontal: Int
   marginVertical: Int
-  background: StaticMedia
+  background: ModuleBackground
   backgroundStyle: ModuleBackgroundStyle
 }
 
@@ -359,7 +359,7 @@ type CardModulePhotoWithTextAndTitle implements CardModule {
   marginHorizontal: Int
   marginVertical: Int
   aspectRatio: Float
-  background: StaticMedia
+  background: ModuleBackground
   backgroundStyle: ModuleBackgroundStyle
 }
 
@@ -388,7 +388,7 @@ type CardModuleSocialLinks implements CardModule {"""
   marginTop: Int
   marginBottom: Int
   marginHorizontal: Int
-  background: StaticMedia
+  background: ModuleBackground
   backgroundStyle: ModuleBackgroundStyle
 }
 

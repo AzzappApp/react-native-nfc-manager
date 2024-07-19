@@ -8,6 +8,7 @@ import {
   upgradePlan,
   endSubscription as endExistingSubscription,
   updateSubscriptionForWebCard,
+  updateCustomer,
 } from '@azzapp/payment';
 import ERRORS from '@azzapp/shared/errors';
 import fromGlobalIdWithType from '#helpers/relayIdHelpers';
@@ -64,7 +65,7 @@ export const createSubscriptionFromPaymentMean: MutationResolvers['createSubscri
 
 export const createPaymentMean: MutationResolvers['createPaymentMean'] = async (
   _,
-  { webCardId, locale, redirectUrl, customer },
+  { webCardId, locale, redirectUrlSuccess, redirectUrlCancel, customer },
   { auth },
 ) => {
   if (!auth.userId) {
@@ -76,7 +77,8 @@ export const createPaymentMean: MutationResolvers['createPaymentMean'] = async (
     userId: auth.userId,
     webCardId: fromGlobalIdWithType(webCardId, 'WebCard'),
     locale,
-    redirectUrl,
+    redirectUrlSuccess,
+    redirectUrlCancel,
   });
 
   if (!result) {
@@ -136,44 +138,27 @@ export const updateSubscription: MutationResolvers['updateSubscription'] =
   };
 
 export const upgradeSubscriptionPlan: MutationResolvers['upgradeSubscriptionPlan'] =
-  async (
-    _,
-    { webCardId: gqlWebCardId, subscriptionId: gqlSubscriptionId },
-    { auth },
-  ) => {
-    if (!auth.userId) {
-      throw new GraphQLError(ERRORS.UNAUTHORIZED);
-    }
-
+  async (_, { webCardId: gqlWebCardId, subscriptionId: gqlSubscriptionId }) => {
     const webCardId = fromGlobalIdWithType(gqlWebCardId, 'WebCard');
     const subscriptionId = fromGlobalIdWithType(
       gqlSubscriptionId,
       'UserSubscription',
     );
 
-    return upgradePlan(auth.userId, webCardId, subscriptionId);
+    return upgradePlan(webCardId, subscriptionId);
   };
 
 export const endSubscription: MutationResolvers['endSubscription'] = async (
   _,
   { webCardId: gqlWebCardId, subscriptionId: gqlSubscriptionId },
-  { auth },
 ) => {
-  if (!auth.userId) {
-    throw new GraphQLError(ERRORS.UNAUTHORIZED);
-  }
-
   const webCardId = fromGlobalIdWithType(gqlWebCardId, 'WebCard');
   const subscriptionId = fromGlobalIdWithType(
     gqlSubscriptionId,
     'UserSubscription',
   );
 
-  const subscription = await endExistingSubscription(
-    auth.userId,
-    webCardId,
-    subscriptionId,
-  );
+  const subscription = await endExistingSubscription(webCardId, subscriptionId);
 
   if (!subscription) {
     throw new GraphQLError(ERRORS.INTERNAL_SERVER_ERROR);
@@ -181,3 +166,17 @@ export const endSubscription: MutationResolvers['endSubscription'] = async (
 
   return subscription;
 };
+
+export const updateSubscriptionCustomer: MutationResolvers['updateSubscriptionCustomer'] =
+  (
+    _,
+    { webCardId: gqlWebCardId, subscriptionId: gqlSubscriptionId, customer },
+  ) => {
+    const subscriptionId = fromGlobalIdWithType(
+      gqlSubscriptionId,
+      'UserSubscription',
+    );
+    const webCardId = fromGlobalIdWithType(gqlWebCardId, 'WebCard');
+
+    return updateCustomer(webCardId, subscriptionId, customer);
+  };

@@ -39,7 +39,7 @@ const viewabilityConfig = {
   itemVisiblePercentThreshold: 60,
 };
 
-const { height: windowHeight, width: windowWidth } = Dimensions.get('screen');
+const { height: windowHeight, width: windowWidth } = Dimensions.get('window');
 // TODO docs and tests once this component is production ready
 const PostList = ({
   posts: postKey,

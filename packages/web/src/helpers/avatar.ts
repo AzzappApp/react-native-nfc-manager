@@ -1,5 +1,4 @@
 import { constructCloudinaryUrl } from '@cloudinary-util/url-loader';
-import { decodeMediaId } from '@azzapp/shared/imagesHelpers';
 import { buildCoverImageUrl } from './cover';
 import type { Profile, WebCard } from '@azzapp/data';
 
@@ -14,7 +13,7 @@ export const buildAvatarUrl = async (
   if (avatarId) {
     avatarUrl = constructCloudinaryUrl({
       options: {
-        src: decodeMediaId(avatarId),
+        src: avatarId,
         width: AVATAR_WIDTH,
         crop: 'fill',
         format: 'jpg',

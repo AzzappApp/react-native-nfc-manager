@@ -1,12 +1,14 @@
+import { ImageFormat } from '@shopify/react-native-skia';
+import { Image } from 'expo-image';
 import { Fragment, useCallback, useEffect, useState } from 'react';
 import { Controller, useController } from 'react-hook-form';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { Pressable, View, Image } from 'react-native';
+import { Pressable, View } from 'react-native';
+import ImageSize from 'react-native-image-size';
+import * as mime from 'react-native-mime-types';
 import { AVATAR_MAX_WIDTH } from '@azzapp/shared/contactCardHelpers';
 import { colors, shadow } from '#theme';
-import { MEDIA_WIDTH } from '#components/AuthorCartouche';
 import FormDeleteFieldOverlay from '#components/ContactCard/FormDeleteFieldOverlay';
-import { exportLayersToImage, getFilterUri } from '#components/gpu';
 import ImagePicker, {
   EditImageStep,
   ImagePickerContactCardMediaWrapper,
@@ -14,12 +16,15 @@ import ImagePicker, {
   SelectImageStepWithFrontCameraByDefault,
 } from '#components/ImagePicker';
 import { MediaImageRenderer } from '#components/medias';
-import ScreenModal from '#components/ScreenModal';
+import { ScreenModal } from '#components/NativeRouter';
+
 import {
   MAX_FIELD_HEIGHT,
   buildContactCardModalStyleSheet,
 } from '#helpers/contactCardHelpers';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
+import { saveTransformedImageToFile } from '#helpers/mediaEditions';
+import { AVATAR_WIDTH } from '#screens/MultiUserScreen/Avatar';
 import Icon from '#ui/Icon';
 import IconButton from '#ui/IconButton';
 import PressableNative from '#ui/PressableNative';
@@ -75,7 +80,7 @@ const ContactCardEditForm = ({
 
   useEffect(() => {
     if (logoField.value?.uri) {
-      Image.getSize(logoField.value.uri, (width, height) => {
+      ImageSize.getSize(logoField.value.uri).then(({ width, height }) => {
         setSize(size => (size ? size : { width, height }));
       });
     }
@@ -92,48 +97,36 @@ const ContactCardEditForm = ({
       if (imagePicker === 'avatar') {
         const exportWidth = Math.min(AVATAR_MAX_WIDTH, width);
         const exportHeight = exportWidth / aspectRatio;
-        const localPath = await exportLayersToImage({
-          size: { width: exportWidth, height: exportHeight },
+        const localPath = await saveTransformedImageToFile({
+          uri,
+          resolution: { width: exportWidth, height: exportHeight },
+          format: ImageFormat.JPEG,
           quality: 95,
-          format: 'auto',
-          layers: [
-            {
-              kind: 'image',
-              uri,
-              parameters: editionParameters,
-              lutFilterUri: getFilterUri(filter),
-            },
-          ],
+          filter,
+          editionParameters,
         });
         avatarField.onChange({
           local: true,
           id: localPath,
-          uri: localPath.startsWith('file://')
-            ? localPath
-            : `file://${localPath}`,
+          uri: `file://${localPath}`,
         });
       } else {
         const exportWidth = width;
         const exportHeight = exportWidth / aspectRatio;
-        const localPath = await exportLayersToImage({
-          size: { width: exportWidth, height: exportHeight },
-          quality: 100,
-          format: 'auto',
-          layers: [
-            {
-              kind: 'image',
-              uri,
-              parameters: editionParameters,
-              lutFilterUri: getFilterUri(filter),
-            },
-          ],
+        const mimeType =
+          mime.lookup(uri) === 'image/png' ? ImageFormat.PNG : ImageFormat.JPEG;
+        const localPath = await saveTransformedImageToFile({
+          uri,
+          resolution: { width: exportWidth, height: exportHeight },
+          format: mimeType,
+          quality: 95,
+          filter,
+          editionParameters,
         });
         logoField.onChange({
           local: true,
           id: localPath,
-          uri: localPath.startsWith('file://')
-            ? localPath
-            : `file://${localPath}`,
+          uri: `file://${localPath}`,
         });
         setSize({
           width: exportWidth,
@@ -155,7 +148,7 @@ const ContactCardEditForm = ({
 
   useEffect(() => {
     if (logo?.uri) {
-      Image.getSize(logo.uri, (width, height) => {
+      ImageSize.getSize(logo.uri).then(({ width, height }) => {
         setWebCardLogoSize({ width, height });
       });
     }
@@ -166,6 +159,7 @@ const ContactCardEditForm = ({
       <FormDeleteFieldOverlay>
         <View style={styles.sectionsContainer}>
           {children}
+
           {webCard.isMultiUser ? (
             <View style={styles.avatarSection}>
               <Controller
@@ -176,13 +170,16 @@ const ContactCardEditForm = ({
                     <View style={styles.avatarContainer}>
                       <PressableNative
                         onPress={() => setImagePicker('avatar')}
-                        android_ripple={{ borderless: true, foreground: true }}
+                        android_ripple={{
+                          borderless: true,
+                          foreground: true,
+                        }}
                       >
                         <MediaImageRenderer
                           source={{
                             uri: value.uri,
                             mediaId: value.id ?? '',
-                            requestedSize: MEDIA_WIDTH,
+                            requestedSize: AVATAR_WIDTH,
                           }}
                           style={styles.avatar}
                         />
@@ -199,7 +196,10 @@ const ContactCardEditForm = ({
                     <View style={styles.noAvatarContainer}>
                       <PressableNative
                         onPress={() => setImagePicker('avatar')}
-                        android_ripple={{ borderless: true, foreground: true }}
+                        android_ripple={{
+                          borderless: true,
+                          foreground: true,
+                        }}
                       >
                         <View style={styles.noAvatar}>
                           <Icon icon="add" />
@@ -360,7 +360,7 @@ const ContactCardEditForm = ({
                             webCardLogoSize.width *
                             (55 / webCardLogoSize.height),
                         }}
-                        resizeMode="contain"
+                        contentFit="contain"
                       />
                     </View>
                   </View>
@@ -421,7 +421,7 @@ const ContactCardEditForm = ({
                               height: 55,
                               width: size.width * (55 / size.height),
                             }}
-                            resizeMode="contain"
+                            contentFit="contain"
                           />
                         </Pressable>
                       </View>
@@ -505,7 +505,11 @@ const ContactCardEditForm = ({
         {footer}
       </FormDeleteFieldOverlay>
 
-      <ScreenModal visible={imagePicker !== null} animationType="slide">
+      <ScreenModal
+        visible={imagePicker !== null}
+        animationType="slide"
+        onRequestDismiss={() => setImagePicker(null)}
+      >
         <ImagePicker
           kind="image"
           forceAspectRatio={imagePicker === 'avatar' ? 1 : undefined}
@@ -568,7 +572,6 @@ const CommonInformationField = ({
   );
 };
 
-const AVATAR_WIDTH = 112;
 const ICON_WIDTH = 24;
 
 const styleSheet = createStyleSheet(appearance => ({

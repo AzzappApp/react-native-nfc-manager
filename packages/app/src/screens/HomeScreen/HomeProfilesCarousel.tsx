@@ -1,21 +1,13 @@
 import { BlurView } from 'expo-blur';
-import {
-  forwardRef,
-  memo,
-  useCallback,
-  useImperativeHandle,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import {
   View,
-  useWindowDimensions,
   StyleSheet,
   Platform,
   Pressable,
   PixelRatio,
+  useWindowDimensions,
 } from 'react-native';
 import { graphql, useFragment } from 'react-relay';
 import { COVER_CARD_RADIUS, COVER_RATIO } from '@azzapp/shared/coverHelpers';
@@ -26,11 +18,17 @@ import CoverLink from '#components/CoverLink';
 import CoverLoadingIndicator from '#components/CoverLoadingIndicator';
 import CoverRenderer from '#components/CoverRenderer';
 import Link from '#components/Link';
-import { useRouter, useScreenHasFocus } from '#components/NativeRouter';
+import {
+  useOnFocus,
+  useRouter,
+  useScreenHasFocus,
+} from '#components/NativeRouter';
+import { getAuthState } from '#helpers/authStore';
 import CarouselSelectList from '#ui/CarouselSelectList';
 import Icon from '#ui/Icon';
 import PressableNative from '#ui/PressableNative';
 import PressableOpacity from '#ui/PressableOpacity';
+import { useHomeScreenContext } from './HomeScreenContext';
 import type {
   HomeProfilesCarousel_user$key,
   HomeProfilesCarousel_user$data,
@@ -38,13 +36,11 @@ import type {
 import type { HomeProfilesCarouselItem_profile$key } from '#relayArtifacts/HomeProfilesCarouselItem_profile.graphql';
 import type { CarouselSelectListHandle } from '#ui/CarouselSelectList';
 import type { ArrayItemType } from '@azzapp/shared/arrayHelpers';
-import type { ForwardedRef } from 'react';
 import type {
   LayoutChangeEvent,
   ListRenderItemInfo,
   ViewStyle,
 } from 'react-native';
-import type { SharedValue } from 'react-native-reanimated';
 
 type HomeProfilesCarouselProps = {
   /**
@@ -55,31 +51,16 @@ type HomeProfilesCarouselProps = {
    * The initial profile index to display
    */
   initialProfileIndex?: number;
-  /**
-   * Callback when the user change the current profile
-   */
-  onCurrentProfileIndexChange: (index: number) => void;
-  /**
-   * Animated callback called during the profile switch, index is a floating number
-   * the callback passed should be a worklet
-   */
-  currentProfileIndexSharedValue: SharedValue<number>;
 };
 
-export type HomeProfilesCarouselHandle = {
-  scrollToProfileIndex: (index: number, animated?: boolean) => void;
-};
-
-const HomeProfilesCarousel = (
-  {
-    user: userKey,
-    onCurrentProfileIndexChange,
-    currentProfileIndexSharedValue,
-    initialProfileIndex = 0,
-  }: HomeProfilesCarouselProps,
-  ref: ForwardedRef<HomeProfilesCarouselHandle>,
-) => {
+const HomeProfilesCarousel = ({ user: userKey }: HomeProfilesCarouselProps) => {
   const [coverWidth, setCoverWidth] = useState(0);
+  const {
+    onCurrentProfileIndexChange,
+    currentIndexSharedValue,
+    currentIndexProfile,
+    initialProfileIndex,
+  } = useHomeScreenContext();
 
   const onLayout = useCallback(
     ({ nativeEvent: { layout } }: LayoutChangeEvent) => {
@@ -94,6 +75,7 @@ const HomeProfilesCarousel = (
     graphql`
       fragment HomeProfilesCarousel_user on User {
         profiles {
+          id
           webCard {
             id
           }
@@ -104,17 +86,19 @@ const HomeProfilesCarousel = (
     userKey,
   );
 
-  const { width: windowWidth } = useWindowDimensions();
-
-  const carouselRef = useRef<CarouselSelectListHandle | null>(null);
-  const [selectedIndex, setSelectedIndex] = useState(
-    profiles?.length ? initialProfileIndex + 1 : 0,
+  const data = useMemo(
+    () => (profiles ? [null, ...profiles] : [null]),
+    [profiles],
   );
+
+  const dataSize = useRef(profiles?.length ?? 0);
+
+  const focus = useScreenHasFocus();
 
   const onSelectedIndexChange = useCallback(
     (index: number) => {
       setSelectedIndex(index);
-      onCurrentProfileIndexChange(index - 1);
+      onCurrentProfileIndexChange(index);
     },
     [onCurrentProfileIndexChange],
   );
@@ -127,13 +111,33 @@ const HomeProfilesCarousel = (
     [onSelectedIndexChange],
   );
 
-  useImperativeHandle(
-    ref,
-    () => ({
-      scrollToProfileIndex: index => scrollToIndex(index + 1),
-    }),
-    [scrollToIndex],
-  );
+  useOnFocus(() => {
+    const { profileInfos } = getAuthState();
+    const authProfileIndex = profiles?.findIndex(
+      profile => profile.id === profileInfos?.profileId,
+    );
+    if (
+      authProfileIndex !== undefined &&
+      authProfileIndex !== -1 &&
+      authProfileIndex + 1 !== currentIndexProfile.value
+    ) {
+      carouselRef.current?.scrollToIndex(authProfileIndex + 1, false);
+    }
+  });
+
+  useEffect(() => {
+    if (focus) {
+      if (dataSize.current > (profiles?.length ?? 0)) {
+        scrollToIndex(1, false);
+        dataSize.current = profiles?.length ?? 0;
+      } else if (dataSize.current !== profiles?.length) {
+        dataSize.current = profiles?.length ?? 0;
+      }
+    }
+  }, [focus, profiles?.length, currentIndexProfile, scrollToIndex]);
+
+  const carouselRef = useRef<CarouselSelectListHandle | null>(null);
+  const [selectedIndex, setSelectedIndex] = useState(initialProfileIndex);
 
   const renderItem = useCallback(
     ({ item, index }: ListRenderItemInfo<ProfileType | null>) => {
@@ -157,20 +161,7 @@ const HomeProfilesCarousel = (
     [coverWidth, coverHeight, scrollToIndex, selectedIndex],
   );
 
-  const data = useMemo(
-    () => (profiles ? [null, ...profiles] : [null]),
-    [profiles],
-  );
-
-  const style = useMemo(
-    () => [
-      styles.carousel,
-      {
-        width: windowWidth,
-      },
-    ],
-    [windowWidth],
-  );
+  const { width: windowWidth } = useWindowDimensions();
 
   if (profiles == null) {
     return null;
@@ -188,13 +179,11 @@ const HomeProfilesCarousel = (
           height={coverHeight}
           itemWidth={coverWidth}
           scaleRatio={SCALE_RATIO}
-          style={style}
+          style={styles.carousel}
           itemContainerStyle={styles.carouselContentContainer}
           onSelectedIndexChange={onSelectedIndexChange}
-          currentProfileIndexSharedValue={currentProfileIndexSharedValue}
-          initialScrollIndex={
-            profiles.length ? initialProfileIndex + 1 : initialProfileIndex
-          }
+          currentProfileIndexSharedValue={currentIndexSharedValue}
+          initialScrollIndex={initialProfileIndex}
         />
       )}
     </View>
@@ -206,7 +195,7 @@ const SCALE_RATIO = 108 / 291;
 const keyExtractor = (item: ProfileType | null, index: number) =>
   item?.webCard.id ?? `new_${index}`;
 
-export default forwardRef(HomeProfilesCarousel);
+export default HomeProfilesCarousel;
 
 type ProfileType = ArrayItemType<HomeProfilesCarousel_user$data['profiles']>;
 
@@ -239,11 +228,7 @@ const ItemRenderComponent = ({
           id
           isMultiUser
           userName
-          cardCover {
-            media {
-              id
-            }
-          }
+          hasCover
           ...CoverLink_webCard
           ...CoverRenderer_webCard
         }
@@ -252,7 +237,7 @@ const ItemRenderComponent = ({
     item as HomeProfilesCarouselItem_profile$key,
   );
 
-  const [ready, setReady] = useState(!profile?.webCard?.cardCover);
+  const [ready, setReady] = useState(!profile?.webCard?.hasCover);
   const [loadingFailed, setLoadingFailed] = useState(false);
   const onReady = useCallback(() => {
     setReady(true);
@@ -346,7 +331,7 @@ const ItemRenderComponent = ({
             tintColor={colors.white}
           />
         </View>
-      ) : profile.webCard.cardCover?.media?.id != null ? (
+      ) : profile.webCard.hasCover ? (
         <View style={styles.coverLinkWrapper}>
           <CoverLink
             webCard={profile.webCard}
@@ -368,12 +353,7 @@ const ItemRenderComponent = ({
           )}
         </View>
       ) : (
-        <Link
-          route="NEW_WEBCARD"
-          params={{
-            webCardId: profile.webCard.id,
-          }}
-        >
+        <Link route="COVER_TEMPLATE_SELECTION" params={{ fromHome: true }}>
           <PressableOpacity
             style={[
               {
@@ -384,7 +364,7 @@ const ItemRenderComponent = ({
               },
             ]}
             accessibilityLabel={intl.formatMessage({
-              defaultMessage: 'Create a new profile',
+              defaultMessage: 'Create a new WebCard',
               description: 'Start new profile creation from account screen',
             })}
           >
@@ -418,7 +398,7 @@ const CreateItem = ({
 }) => {
   const intl = useIntl();
   return (
-    <Link route="NEW_WEBCARD">
+    <Link route="WEBCARD_KIND_SELECTION">
       <PressableOpacity
         style={[
           styles.newCover,
@@ -430,7 +410,7 @@ const CreateItem = ({
           },
         ]}
         accessibilityLabel={intl.formatMessage({
-          defaultMessage: 'Create a new profile',
+          defaultMessage: 'Create a new WebCard',
           description: 'Start new profile creation from account screen',
         })}
       >

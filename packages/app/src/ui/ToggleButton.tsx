@@ -5,8 +5,8 @@ import {
   createVariantsStyleSheet,
   useVariantStyleSheet,
 } from '#helpers/createStyles';
-import PressableBackground from '#ui/PressableBackground';
 import Text from '#ui/Text';
+import PressableNative from './PressableNative';
 import type { ReactNode } from 'react';
 
 type ToggleButtonProps = {
@@ -35,9 +35,8 @@ const ToggleButton = ({
   );
 
   return (
-    <PressableBackground
+    <PressableNative
       onPress={onPress}
-      highlightColor={colors.grey400}
       accessibilityRole="togglebutton"
       accessibilityState={{ checked: toggled }}
       style={[styles.container, toggled && styles.toggleContainer, style]}
@@ -54,7 +53,7 @@ const ToggleButton = ({
         {label}
       </Text>
       {rightElement}
-    </PressableBackground>
+    </PressableNative>
   );
 };
 

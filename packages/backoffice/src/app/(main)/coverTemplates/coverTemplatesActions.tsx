@@ -1,155 +1,106 @@
 'use server';
-import { createId } from '@paralleldrive/cuid2';
-import { eq } from 'drizzle-orm';
+
+import { parseWithZod } from '@conform-to/zod';
 
 import { revalidatePath } from 'next/cache';
 import {
-  CoverTemplateTable,
-  checkMedias,
-  db,
-  getColorPaletteByColors,
-  getCoverTemplateById,
-  getMediasByIds,
-  getWebCardByUserName,
-  referencesMedias,
+  createCoverTemplate,
+  createCoverTemplatePreview,
+  removeCoverTemplatePreviewById,
+  updateCoverTemplatePreview,
+  getCoverTemplatePreview,
 } from '@azzapp/data';
+import { updateCoverTemplate } from '@azzapp/data/coverTemplates';
+
 import { ADMIN } from '#roles';
 import { currentUserHasRole } from '#helpers/roleHelpers';
-import { coverTemplateSchema } from './coverTemplateSchema';
-import type { CoverTemplateFormValue } from './coverTemplateSchema';
-import type { NewCoverTemplate } from '@azzapp/data';
+import { coverTemplateSchemaWithoutfile } from './coverTemplateSchema';
+import type { SubmissionResult } from '@conform-to/react';
 
 export const saveCoverTemplate = async (
-  data: CoverTemplateFormValue & { id?: string },
-) => {
+  prevState: unknown,
+  formData: FormData,
+): Promise<SubmissionResult<string[]> & { coverTemplateId?: string }> => {
   if (!(await currentUserHasRole(ADMIN))) {
     throw new Error('Unauthorized');
   }
-  const validationResult = coverTemplateSchema.safeParse(data);
-  if (!validationResult.success) {
-    return {
-      success: false,
-      formErrors: validationResult.error.formErrors,
-    } as const;
-  }
 
-  await checkMedias([data.previewMedia.id]);
+  try {
+    const submission = parseWithZod(formData, {
+      schema: coverTemplateSchemaWithoutfile,
+    });
 
-  const coverTemplateId = await db.transaction(async trx => {
-    const coverTemplateData: NewCoverTemplate = {
-      name: data.name,
-      kind: data.kind,
-      previewMediaId: data.previewMedia.id,
-      colorPaletteId: data.colorPaletteId,
-      businessEnabled: data.businessEnabled,
-      personalEnabled: data.personalEnabled,
-      data: {
-        titleStyle: {
-          fontSize: data.titleFontSize,
-          fontFamily: data.titleFontFamily,
-          color: data.titleColor,
-        },
-        subTitleStyle: {
-          fontSize: data.subTitleFontSize,
-          fontFamily: data.subTitleFontFamily,
-          color: data.subTitleColor,
-        },
-        textOrientation: data.textOrientation,
-        textPosition: data.textPosition,
-        textAnimation: data.textAnimation,
-        backgroundId: data.backgroundId,
-        backgroundColor: data.backgroundColor,
-        backgroundPatternColor: data.backgroundPatternColor,
-        foregroundId: data.foregroundId,
-        foregroundColor: data.foregroundColor,
-        mediaFilter: data.mediaFilter,
-        mediaAnimation: data.mediaAnimation,
-        mediaParameters: data.mediaParameters as any,
-      },
-    };
-
-    let previousMediaId: string | null = null;
-    let coverTemplateId: string;
-    if (data.id) {
-      const coverTemplate = await getCoverTemplateById(data.id);
-
-      if (!coverTemplate) {
-        throw new Error('Cover template not found');
-      }
-
-      previousMediaId = coverTemplate.previewMediaId;
-      coverTemplateId = coverTemplate.id;
-
-      await trx
-        .update(CoverTemplateTable)
-        .set(coverTemplateData)
-        .where(eq(CoverTemplateTable.id, data.id));
-    } else {
-      coverTemplateId = createId();
-      await trx.insert(CoverTemplateTable).values({
-        id: coverTemplateId,
-        ...coverTemplateData,
-      });
+    if (submission.status !== 'success') {
+      return submission.reply();
     }
 
-    await referencesMedias([data.previewMedia.id], [previousMediaId], trx);
+    const data = {
+      ...submission.value,
+      enabled: submission.value.enabled === 'true',
+    };
 
-    return coverTemplateId;
-  });
+    let coverTemplateId = data.id;
+    if (coverTemplateId) {
+      await updateCoverTemplate(coverTemplateId, data);
+    } else {
+      coverTemplateId = await createCoverTemplate(data);
+    }
 
-  revalidatePath(`/coverTemplates/[id]`);
-  return { success: true, coverTemplateId } as const;
+    return {
+      ...submission.reply(),
+      coverTemplateId,
+    };
+  } catch (e) {
+    console.log(e);
+    return { status: 'error' };
+  }
 };
 
-export const getCoverData = async (username: string) => {
-  const webCard = await getWebCardByUserName(username);
-  if (!webCard) {
-    throw new Error('WebCard not found');
-  }
-  if (!webCard.coverData?.sourceMediaId) {
-    throw new Error('Cover data not found');
-  }
-  const [media] = await getMediasByIds([webCard.coverData.sourceMediaId]);
-  if (!media) {
-    throw new Error('Media not found');
-  }
+export const uploadPreview = async (prevState: unknown, formData: FormData) => {
+  try {
+    const coverTemplateId = formData.get('coverTemplateId') as string;
+    const companyActivityId = formData.get('activityId') as string;
+    const previewId = formData.get('previewId') as string;
 
-  const colorPalette =
-    webCard.cardColors &&
-    (await getColorPaletteByColors(
-      webCard.cardColors.primary,
-      webCard.cardColors.dark,
-      webCard.cardColors.light,
-    ));
+    if (!previewId) {
+      throw new Error('MISSING_PREVIEW_ID');
+    }
 
-  return {
-    kind: webCard.coverData.segmented
-      ? 'people'
-      : media.kind === 'image'
-        ? 'others'
-        : 'video',
+    const coverTemplatePreview = await getCoverTemplatePreview(
+      coverTemplateId,
+      companyActivityId,
+    );
+    if (coverTemplatePreview) {
+      await updateCoverTemplatePreview(coverTemplateId, companyActivityId, {
+        coverTemplateId,
+        companyActivityId,
+        mediaId: previewId,
+      });
+    } else {
+      await createCoverTemplatePreview({
+        coverTemplateId,
+        companyActivityId,
+        mediaId: previewId,
+      });
+    }
+    revalidatePath(`/coverTemplates/[id]`, 'layout');
 
-    previewMedia: {
-      id: media.id,
-      kind: media.kind,
-    },
-    colorPaletteId: colorPalette?.id,
-    titleFontSize: webCard.coverData.titleStyle?.fontSize,
-    titleFontFamily: webCard.coverData.titleStyle?.fontFamily,
-    titleColor: webCard.coverData.titleStyle?.color,
-    subTitleFontSize: webCard.coverData.subTitleStyle?.fontSize,
-    subTitleFontFamily: webCard.coverData.subTitleStyle?.fontFamily,
-    subTitleColor: webCard.coverData.subTitleStyle?.color,
-    textOrientation: webCard.coverData.textOrientation,
-    textPosition: webCard.coverData.textPosition,
-    textAnimation: webCard.coverData.textAnimation,
-    backgroundId: webCard.coverData.backgroundId,
-    backgroundColor: webCard.coverData.backgroundColor,
-    backgroundPatternColor: webCard.coverData.backgroundPatternColor,
-    foregroundId: webCard.coverData.foregroundId,
-    foregroundColor: webCard.coverData.foregroundColor,
-    mediaFilter: webCard.coverData.mediaFilter,
-    mediaAnimation: webCard.coverData.mediaAnimation,
-    mediaParameters: webCard.coverData.mediaParameters,
-  } as const;
+    return { status: 'success' };
+  } catch (e) {
+    console.log(e);
+    return { status: 'error' };
+  }
+};
+
+export const deletePreview = async (
+  coverTemplateId: string,
+  companyActivityId: string,
+) => {
+  try {
+    await removeCoverTemplatePreviewById(coverTemplateId, companyActivityId);
+    revalidatePath(`/coverTemplates/[id]`, 'layout');
+  } catch (e) {
+    console.error(e);
+    throw e;
+  }
 };

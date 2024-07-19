@@ -8,7 +8,6 @@ export type CardModuleTemplate = Pick<CardModule, 'data' | 'kind'>;
 
 export const CardTemplateTable = cols.table('CardTemplate', {
   id: cols.cuid('id').notNull().primaryKey().$defaultFn(createId),
-  labelKey: cols.defaultVarchar('labelKey').notNull().default(''),
   cardStyleId: cols.cuid('cardStyleId').notNull(),
   cardTemplateTypeId: cols.cuid('cardTemplateTypeId'),
   previewMediaId: cols.mediaId('previewMediaId'),

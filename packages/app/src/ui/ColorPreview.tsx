@@ -34,7 +34,18 @@ const ColorPreview = ({
 }: ColorPreviewProps) => {
   const styles = useStyleSheet(styleSheet);
   return (
-    <View style={[styles.colorPreviewContainer, style]} {...props}>
+    <View
+      style={[
+        styles.colorPreviewContainer,
+        {
+          height: colorSize * 1.4,
+          width: colorSize * 1.4,
+          borderRadius: colorSize * 0.7,
+        },
+        style,
+      ]}
+      {...props}
+    >
       <View
         style={{
           backgroundColor: color,
@@ -55,8 +66,5 @@ const styleSheet = createStyleSheet(appearance => ({
     borderWidth: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    height: 14,
-    width: 14,
-    borderRadius: 7,
   },
 }));

@@ -156,7 +156,7 @@
               "locale" : "en_US"
             }
           ],
-          "productID" : "com.azzapp.azzapp.multi.month.1",
+          "productID" : "com.azzap.dev.monthly.1",
           "recurringSubscriptionPeriod" : "P1M",
           "referenceName" : "Multi User - 1 seat",
           "subscriptionGroupID" : "7CC98143",
@@ -185,96 +185,9 @@
               "locale" : "en_US"
             }
           ],
-          "productID" : "com.azzapp.azzapp.multi.month.2",
+          "productID" : "com.azzapp.dev.monthly.2",
           "recurringSubscriptionPeriod" : "P1M",
           "referenceName" : "Multi User - 2 seats",
-          "subscriptionGroupID" : "7CC98143",
-          "type" : "RecurringSubscription"
-        },
-        {
-          "adHocOffers" : [
-
-          ],
-          "codeOffers" : [
-
-          ],
-          "displayPrice" : "2.99",
-          "familyShareable" : false,
-          "groupNumber" : 1,
-          "internalID" : "AEE41145",
-          "introductoryOffer" : {
-            "internalID" : "AA7FA552",
-            "paymentMode" : "free",
-            "subscriptionPeriod" : "P1W"
-          },
-          "localizations" : [
-            {
-              "description" : "",
-              "displayName" : "",
-              "locale" : "en_US"
-            }
-          ],
-          "productID" : "com.azzapp.azzapp.multi.month.3",
-          "recurringSubscriptionPeriod" : "P1M",
-          "referenceName" : "Multi User - 3 seats",
-          "subscriptionGroupID" : "7CC98143",
-          "type" : "RecurringSubscription"
-        },
-        {
-          "adHocOffers" : [
-
-          ],
-          "codeOffers" : [
-
-          ],
-          "displayPrice" : "3.99",
-          "familyShareable" : false,
-          "groupNumber" : 1,
-          "internalID" : "A57DB815",
-          "introductoryOffer" : {
-            "internalID" : "A51C27B3",
-            "paymentMode" : "free",
-            "subscriptionPeriod" : "P1W"
-          },
-          "localizations" : [
-            {
-              "description" : "",
-              "displayName" : "",
-              "locale" : "en_US"
-            }
-          ],
-          "productID" : "com.azzapp.azzapp.multi.month.4",
-          "recurringSubscriptionPeriod" : "P1M",
-          "referenceName" : "Multi User - 4 seats",
-          "subscriptionGroupID" : "7CC98143",
-          "type" : "RecurringSubscription"
-        },
-           {
-          "adHocOffers" : [
-
-          ],
-          "codeOffers" : [
-
-          ],
-          "displayPrice" : "4.99",
-          "familyShareable" : false,
-          "groupNumber" : 1,
-          "internalID" : "32891C9E",
-          "introductoryOffer" : {
-            "internalID" : "B0EC4042",
-            "paymentMode" : "free",
-            "subscriptionPeriod" : "P1W"
-          },
-          "localizations" : [
-            {
-              "description" : "",
-              "displayName" : "",
-              "locale" : "en_US"
-            }
-          ],
-          "productID" : "com.azzapp.azzapp.multi.month.5",
-          "recurringSubscriptionPeriod" : "P1M",
-          "referenceName" : "Multi User - 5 seats",
           "subscriptionGroupID" : "7CC98143",
           "type" : "RecurringSubscription"
         },
@@ -301,7 +214,7 @@
               "locale" : "en_US"
             }
           ],
-          "productID" : "com.azzapp.azzapp.multi.month.10",
+          "productID" : "com.azzapp.dev.monthly.10",
           "recurringSubscriptionPeriod" : "P1M",
           "referenceName" : "Multi User - 10 seats",
           "subscriptionGroupID" : "7CC98143",
@@ -330,7 +243,7 @@
               "locale" : "en_US"
             }
           ],
-          "productID" : "com.azzapp.azzapp.multi.year.1",
+          "productID" : "com.azzapp.dev.yearly.1",
           "recurringSubscriptionPeriod" : "P1Y",
           "referenceName" : "Multi User - 1 seat - yearly",
           "subscriptionGroupID" : "7CC98143",
@@ -359,96 +272,9 @@
               "locale" : "en_US"
             }
           ],
-          "productID" : "com.azzapp.azzapp.multi.year.2",
+          "productID" : "com.azzapp.dev.yearly.2",
           "recurringSubscriptionPeriod" : "P1Y",
           "referenceName" : "Multi User - 2 seats - yearly",
-          "subscriptionGroupID" : "7CC98143",
-          "type" : "RecurringSubscription"
-        },
-        {
-          "adHocOffers" : [
-
-          ],
-          "codeOffers" : [
-
-          ],
-          "displayPrice" : "33",
-          "familyShareable" : false,
-          "groupNumber" : 1,
-          "internalID" : "03C8D47A",
-          "introductoryOffer" : {
-            "internalID" : "994BF7E3",
-            "paymentMode" : "free",
-            "subscriptionPeriod" : "P1W"
-          },
-          "localizations" : [
-            {
-              "description" : "",
-              "displayName" : "",
-              "locale" : "en_US"
-            }
-          ],
-          "productID" : "com.azzapp.azzapp.multi.year.3",
-          "recurringSubscriptionPeriod" : "P1Y",
-          "referenceName" : "Multi User - 3 seats - yearly",
-          "subscriptionGroupID" : "7CC98143",
-          "type" : "RecurringSubscription"
-        },
-        {
-          "adHocOffers" : [
-
-          ],
-          "codeOffers" : [
-
-          ],
-          "displayPrice" : "44",
-          "familyShareable" : false,
-          "groupNumber" : 1,
-          "internalID" : "477A2AD7",
-          "introductoryOffer" : {
-            "internalID" : "73E98AA0",
-            "paymentMode" : "free",
-            "subscriptionPeriod" : "P1W"
-          },
-          "localizations" : [
-            {
-              "description" : "",
-              "displayName" : "",
-              "locale" : "en_US"
-            }
-          ],
-          "productID" : "com.azzapp.azzapp.multi.year.4",
-          "recurringSubscriptionPeriod" : "P1Y",
-          "referenceName" : "Multi User - 4 seats - yearly",
-          "subscriptionGroupID" : "7CC98143",
-          "type" : "RecurringSubscription"
-        },
-        {
-          "adHocOffers" : [
-
-          ],
-          "codeOffers" : [
-
-          ],
-          "displayPrice" : "55",
-          "familyShareable" : false,
-          "groupNumber" : 1,
-          "internalID" : "C4DC7346",
-          "introductoryOffer" : {
-            "internalID" : "DD528235",
-            "paymentMode" : "free",
-            "subscriptionPeriod" : "P1W"
-          },
-          "localizations" : [
-            {
-              "description" : "",
-              "displayName" : "",
-              "locale" : "en_US"
-            }
-          ],
-          "productID" : "com.azzapp.azzapp.multi.year.5",
-          "recurringSubscriptionPeriod" : "P1Y",
-          "referenceName" : "Multi User - 5 seats - yearly",
           "subscriptionGroupID" : "7CC98143",
           "type" : "RecurringSubscription"
         },
@@ -475,7 +301,7 @@
               "locale" : "en_US"
             }
           ],
-          "productID" : "com.azzapp.azzapp.multi.year.10",
+          "productID" : "com.azzapp.dev.yearly.10",
           "recurringSubscriptionPeriod" : "P1Y",
           "referenceName" : "Multi User - 10 seats - yearly",
           "subscriptionGroupID" : "7CC98143",
@@ -484,6 +310,10 @@
       ]
     }
   ],
+  "subscriptionOffersKeyPair" : {
+    "id" : "3C41CD94",
+    "privateKey" : "MIGTAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBHkwdwIBAQQgNFirOiyYW/CsYv+1xIbpNaQVb110OTIFnY00Bz34jbagCgYIKoZIzj0DAQehRANCAAQB4/A3rXFJPWAitZvPhUwhFJ8/j8YxpWWJawGHKliYQAisUjr0O7S5/c8fGWKD1vMoPU2opH4aIPK146PWz5dJ"
+  },
   "version" : {
     "major" : 3,
     "minor" : 0

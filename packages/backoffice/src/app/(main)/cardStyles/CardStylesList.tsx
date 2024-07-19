@@ -1,13 +1,6 @@
 'use client';
 import { Search } from '@mui/icons-material';
-import {
-  Box,
-  Button,
-  Chip,
-  InputAdornment,
-  TextField,
-  Typography,
-} from '@mui/material';
+import { Box, Button, Chip, InputAdornment, TextField } from '@mui/material';
 import { useRouter } from 'next/navigation';
 import {
   useCallback,
@@ -17,8 +10,7 @@ import {
   useTransition,
 } from 'react';
 import DataGrid from '#components/DataGrid';
-import type { SortColumn } from './page';
-import type { CardStyle } from '@azzapp/data';
+import type { CardStyleItem, SortColumn } from './page';
 import type {
   GridColDef,
   GridPaginationModel,
@@ -26,7 +18,7 @@ import type {
 } from '@mui/x-data-grid';
 
 type CardStylesListProps = {
-  cardStyles: CardStyle[];
+  cardStyles: CardStyleItem[];
   count: number;
   page: number;
   pageSize: number;
@@ -76,16 +68,7 @@ const CardStylesList = ({
   }, [defferedSearch, page, search, sortField, sortOrder, updateSearchParams]);
 
   return (
-    <Box
-      sx={{
-        display: 'flex',
-        flexDirection: 'column',
-        height: '100%',
-      }}
-    >
-      <Typography variant="h4" component="h1" sx={{ mb: 2 }}>
-        WebCards Styles
-      </Typography>
+    <>
       <Box
         sx={{
           display: 'flex',
@@ -152,14 +135,14 @@ const CardStylesList = ({
         rowSelection={false}
         sortingOrder={['asc', 'desc']}
       />
-    </Box>
+    </>
   );
 };
 
 const columns: GridColDef[] = [
   {
-    field: 'labelKey',
-    headerName: 'Label Key',
+    field: 'label',
+    headerName: 'Label',
     flex: 1,
   },
   {

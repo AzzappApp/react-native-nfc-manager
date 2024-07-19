@@ -4,6 +4,7 @@ import { toGlobalId } from 'graphql-relay';
 import { ProfileTable, db } from '@azzapp/data';
 import ERRORS from '@azzapp/shared/errors';
 import fromGlobalIdWithType from '#helpers/relayIdHelpers';
+import { updateMonthlySubscription } from '#use-cases/subscription';
 import type { MutationResolvers } from '#/__generated__/types';
 import type { Profile } from '@azzapp/data';
 
@@ -17,7 +18,8 @@ const removeUsersFromWebCard: MutationResolvers['removeUsersFromWebCard'] =
     },
     { loaders, auth },
   ) => {
-    if (!auth.userId) {
+    const { userId } = auth;
+    if (!userId) {
       throw new GraphQLError(ERRORS.UNAUTHORIZED);
     }
 
@@ -31,36 +33,42 @@ const removeUsersFromWebCard: MutationResolvers['removeUsersFromWebCard'] =
       ? null
       : gqlRemovedProfileIds?.map(id => fromGlobalIdWithType(id, 'Profile'));
 
-    const profileToDelete = allProfiles
-      ? await db
-          .select({ id: ProfileTable.id })
-          .from(ProfileTable)
-          .where(
-            and(
-              eq(ProfileTable.webCardId, webCardId),
-              ne(ProfileTable.profileRole, 'owner'),
-              ne(ProfileTable.userId, auth.userId),
-            ),
-          )
-          .then(profiles => profiles.map(profile => profile.id))
-      : removedProfileIds ?? [];
-
-    await db
-      .delete(ProfileTable)
-      .where(
-        removedProfileIds
-          ? and(
-              inArray(ProfileTable.id, removedProfileIds),
-              eq(ProfileTable.webCardId, webCardId),
-              ne(ProfileTable.profileRole, 'owner'),
-              ne(ProfileTable.userId, auth.userId),
+    const profileToDelete = await db.transaction(async trx => {
+      const profileToDelete = allProfiles
+        ? await trx
+            .select({ id: ProfileTable.id })
+            .from(ProfileTable)
+            .where(
+              and(
+                eq(ProfileTable.webCardId, webCardId),
+                ne(ProfileTable.profileRole, 'owner'),
+                ne(ProfileTable.userId, userId),
+              ),
             )
-          : and(
-              eq(ProfileTable.webCardId, webCardId),
-              ne(ProfileTable.profileRole, 'owner'),
-              ne(ProfileTable.userId, auth.userId),
-            ),
-      );
+            .then(profiles => profiles.map(profile => profile.id))
+        : removedProfileIds ?? [];
+
+      await trx
+        .delete(ProfileTable)
+        .where(
+          removedProfileIds
+            ? and(
+                inArray(ProfileTable.id, removedProfileIds),
+                eq(ProfileTable.webCardId, webCardId),
+                ne(ProfileTable.profileRole, 'owner'),
+                ne(ProfileTable.userId, userId),
+              )
+            : and(
+                eq(ProfileTable.webCardId, webCardId),
+                ne(ProfileTable.profileRole, 'owner'),
+                ne(ProfileTable.userId, userId),
+              ),
+        );
+
+      await updateMonthlySubscription(userId, webCardId, trx);
+
+      return profileToDelete;
+    });
 
     const notRemovedProfiles = await loaders.Profile.loadMany(profileToDelete);
 

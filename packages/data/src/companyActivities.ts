@@ -6,8 +6,12 @@ import type { InferInsertModel, InferSelectModel } from 'drizzle-orm';
 
 export const CompanyActivityTable = cols.table('CompanyActivity', {
   id: cols.cuid('id').notNull().primaryKey().$defaultFn(createId),
-  labelKey: cols.defaultVarchar('labelKey').notNull().default(''),
   cardTemplateTypeId: cols.cuid('cardTemplateTypeId'),
+  companyActivityTypeId: cols.cuid('companyActivityTypeId'),
+});
+
+export const CompanyActivityTypeTable = cols.table('CompanyActivityType', {
+  id: cols.cuid('id').primaryKey().notNull().$defaultFn(createId),
 });
 
 export const WebCardCategoryCompanyActivityTable = cols.table(
@@ -27,6 +31,9 @@ export const WebCardCategoryCompanyActivityTable = cols.table(
 );
 
 export type CompanyActivity = InferSelectModel<typeof CompanyActivityTable>;
+export type CompanyActivityType = InferSelectModel<
+  typeof CompanyActivityTypeTable
+>;
 export type NewCompanyActivity = InferInsertModel<typeof CompanyActivityTable>;
 
 /**
@@ -70,6 +77,14 @@ export const getCompanyActivityById = async (id: string) => {
     .then(res => res.pop() ?? null);
 };
 
+export const getCompanyActivityTypeById = async (id: string) => {
+  return db
+    .select()
+    .from(CompanyActivityTypeTable)
+    .where(eq(CompanyActivityTypeTable.id, id))
+    .then(res => res.pop() ?? null);
+};
+
 /**
  * Update a company Activity
  *
@@ -88,6 +103,17 @@ export const updateCompanyActivity = async (
     .where(eq(CompanyActivityTable.id, id));
 };
 
+export const updateCompanyActivityType = async (
+  id: string,
+  values: Partial<CompanyActivityType>,
+  tx: DbTransaction = db,
+) => {
+  await tx
+    .update(CompanyActivityTypeTable)
+    .set({ ...values })
+    .where(eq(CompanyActivityTypeTable.id, id));
+};
+
 /**
  * Create a cardTemplate.
  *
@@ -101,5 +127,11 @@ export const createCompanyActivity = async (
 ) => {
   const id = createId();
   await tx.insert(CompanyActivityTable).values({ ...newCardTemplate, id });
+  return id;
+};
+
+export const createCompanyActivitiesType = async (tx: DbTransaction = db) => {
+  const id = createId();
+  await tx.insert(CompanyActivityTypeTable).values({ id });
   return id;
 };

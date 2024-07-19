@@ -3,7 +3,6 @@ import { applyMiddleware } from 'graphql-middleware';
 import { applyDirectiveSchemaTransform, directivesTypeDefs } from '#directives';
 import permissions from '#permission';
 import { typeDefs } from '#/__generated__/types';
-import * as CardCoverResolvers from './CardCoverResolvers';
 import * as CardModuleResolvers from './CardModuleResolvers';
 import * as CardStyleResolvers from './CardStyleResolvers';
 import * as CardTemplateResolvers from './CardTemplateResolver';
@@ -11,8 +10,11 @@ import * as CardTemplateTypeResolvers from './CardTemplateTypeResolver';
 import * as ColorPaletteResolvers from './ColorPaletteResolvers';
 import * as ContactCardResolvers from './ContactCardResolvers';
 import * as CoverTemplateResolvers from './CoverTemplateResolvers';
+import * as CoverTemplateTagResolvers from './CoverTemplateTagResolvers';
+import * as CoverTemplateTypeResolvers from './CoverTemplateTypeResolvers';
 import { createGraphQLContext } from './GraphQLContext';
 import * as MediaResolvers from './MediaResolvers';
+import * as ModuleBagroundResolvers from './ModuleBagroundResolvers';
 import * as MutationResolvers from './mutations';
 import { Node } from './NodeResolvers';
 import * as PaymentResolvers from './PaymentResolvers';
@@ -27,13 +29,15 @@ import type { Resolvers } from './__generated__/types';
 import type { GraphQLContext, Loaders } from './GraphQLContext';
 
 const resolvers: Resolvers = {
-  ...CardCoverResolvers,
   ...CardModuleResolvers,
   ...CardStyleResolvers,
   ...ColorPaletteResolvers,
   ...ContactCardResolvers,
   ...CoverTemplateResolvers,
+  ...CoverTemplateTagResolvers,
+  ...CoverTemplateTypeResolvers,
   ...MediaResolvers,
+  ...ModuleBagroundResolvers,
   ...MutationResolvers,
   ...PostResolvers,
   ...ProfileResolvers,

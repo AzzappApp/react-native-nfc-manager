@@ -4,6 +4,7 @@ import { updateWebCard, type WebCard } from '@azzapp/data';
 import ERRORS from '@azzapp/shared/errors';
 import { isAdmin } from '@azzapp/shared/profileHelpers';
 import fromGlobalIdWithType from '#helpers/relayIdHelpers';
+import { checkWebCardHasSubscription } from '#use-cases/subscription';
 import type { MutationResolvers } from '#/__generated__/types';
 import type { GraphQLContext } from '#/GraphQLContext';
 
@@ -21,19 +22,17 @@ const updateWebCardMutation: MutationResolvers['updateWebCard'] = async (
     ...profileUpdates
   } = updates;
 
-  const partialWebCard: Partial<
-    Omit<WebCard, 'createdAt' | 'id' | 'updatedAt' | 'webCardKind'>
-  > = {
+  const partialWebCard: Partial<WebCard> = {
     ...profileUpdates,
   };
 
+  const webCard = await loaders.WebCard.load(webCardId);
+
+  if (!webCard) {
+    throw new GraphQLError(ERRORS.INVALID_REQUEST);
+  }
+
   try {
-    const webCard = await loaders.WebCard.load(webCardId);
-
-    if (!webCard) {
-      throw new GraphQLError(ERRORS.INVALID_REQUEST);
-    }
-
     if (graphqlWebCardCategoryId) {
       const webCardCategoryId = fromGlobalIdWithType(
         graphqlWebCardCategoryId,
@@ -43,6 +42,11 @@ const updateWebCardMutation: MutationResolvers['updateWebCard'] = async (
       if (webCardCategoryId !== webCard.webCardCategoryId) {
         partialWebCard.companyActivityId = undefined;
       }
+
+      const webCardCategory =
+        await loaders.WebCardCategory.load(webCardCategoryId);
+
+      partialWebCard.webCardKind = webCardCategory?.webCardKind;
     }
     if (graphqlCompanyActivityId) {
       const companyActivityId = fromGlobalIdWithType(
@@ -50,7 +54,23 @@ const updateWebCardMutation: MutationResolvers['updateWebCard'] = async (
         'CompanyActivity',
       );
       partialWebCard.companyActivityId = companyActivityId;
+    } else if (graphqlCompanyActivityId === null) {
+      partialWebCard.companyActivityId = null;
     }
+
+    await checkWebCardHasSubscription(
+      {
+        webCard: {
+          ...webCard,
+          ...Object.fromEntries(
+            Object.entries(partialWebCard).filter(
+              ([_entry, value]) => value !== undefined,
+            ),
+          ),
+        },
+      },
+      loaders,
+    );
 
     if (webCard.companyActivityId !== partialWebCard.companyActivityId) {
       const profile =
@@ -63,8 +83,11 @@ const updateWebCardMutation: MutationResolvers['updateWebCard'] = async (
 
     await updateWebCard(webCardId, partialWebCard);
 
+    loaders.WebCard.clear(webCardId);
+    const result = await loaders.WebCard.load(webCardId);
+
     return {
-      webCard: { ...webCard, ...partialWebCard },
+      webCard: result,
     };
   } catch (error) {
     throw new GraphQLError(ERRORS.INTERNAL_SERVER_ERROR);

@@ -3,8 +3,8 @@ import {
   type Props as LottiePlayerProps,
 } from '@dotlottie/react-player';
 import { useEffect, useMemo, useState } from 'react';
-import { COVER_FOREGROUND_BASE_COLOR } from '@azzapp/shared/coverHelpers';
-import { replaceColor } from '@azzapp/shared/lottieHelpers';
+import { LOTTIE_REPLACE_COLORS } from '@azzapp/shared/coverHelpers';
+import { replaceColors } from '@azzapp/shared/lottieHelpers';
 
 const LottiePlayer = ({
   tintColor,
@@ -39,7 +39,15 @@ const LottiePlayer = ({
     if (!tintColor || !lottieJSON) {
       return lottieJSON;
     }
-    return replaceColor(COVER_FOREGROUND_BASE_COLOR, tintColor, lottieJSON);
+    return replaceColors(
+      [
+        {
+          sourceColor: LOTTIE_REPLACE_COLORS.primary,
+          targetColor: tintColor,
+        },
+      ],
+      lottieJSON,
+    );
   }, [lottieJSON, tintColor]);
 
   return <DotLottiePlayer src={animationData} {...props} />;

@@ -87,7 +87,6 @@ const PostRendererMedia = (
           type: "Float!"
           provider: "VideoPixelRatio.relayprovider"
         }
-        isAndroid: { type: "Boolean!", provider: "isAndroid.relayprovider" }
       ) {
         media {
           __typename
@@ -106,11 +105,7 @@ const PostRendererMedia = (
               width: $postWith
               pixelRatio: $cappedPixelRatio
             )
-            largeURI: uri(
-              width: $screenWidth
-              pixelRatio: $videoPixelRatio
-              streaming: $isAndroid
-            )
+            largeURI: uri(width: $screenWidth, pixelRatio: $videoPixelRatio)
           }
         }
       }

@@ -67,8 +67,11 @@ import { SourceSansPro_400Regular } from '@expo-google-fonts/source-sans-pro';
 import { Ultra_400Regular } from '@expo-google-fonts/ultra';
 import { WaterBrush_400Regular } from '@expo-google-fonts/water-brush';
 import { YesevaOne_400Regular } from '@expo-google-fonts/yeseva-one';
+import { Skia } from '@shopify/react-native-skia';
 import { useFonts } from 'expo-font';
+import { Image } from 'react-native';
 import type { ApplicationFonts } from '@azzapp/shared/fontHelpers';
+import type { SkTypefaceFontProvider } from '@shopify/react-native-skia';
 
 const fontMap: Record<ApplicationFonts, any> = {
   AmaticSC_Bold: AmaticSC_700Bold,
@@ -128,6 +131,34 @@ const fontMap: Record<ApplicationFonts, any> = {
   Ultra_Regular: Ultra_400Regular,
   WaterBrush_Regular: WaterBrush_400Regular,
   YesevaOne_Regular: YesevaOne_400Regular,
+};
+
+export const skiaFontManager: SkTypefaceFontProvider =
+  Skia.TypefaceFontProvider.Make();
+
+let skiaFontManagerLoadingInitialized = false;
+export const loadSkiaTypeFonts = () => {
+  if (skiaFontManagerLoadingInitialized) {
+    return;
+  }
+  skiaFontManagerLoadingInitialized = true;
+  Object.entries(fontMap).map(([familyName, typefaceToLoad]) => {
+    const uri = Image.resolveAssetSource(typefaceToLoad).uri;
+    return Skia.Data.fromURI(uri).then(
+      data => {
+        const tf = Skia.Typeface.MakeFreeTypeFaceFromData(data);
+        if (tf === null) {
+          console.warn(`Couldn't create typeface for ${familyName}`);
+          return null;
+        }
+        skiaFontManager.registerFont(tf, familyName);
+      },
+      err => {
+        console.warn('Failed to load typeface', err);
+        return null;
+      },
+    );
+  });
 };
 
 const useApplicationFonts = () => {

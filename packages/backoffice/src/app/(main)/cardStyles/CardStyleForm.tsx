@@ -19,12 +19,12 @@ import FontSelect from '#components/FontSelect';
 import { intParser, useForm } from '#helpers/formHelpers';
 import { saveCardStyle } from './cardStylesActions';
 import type { CardStyleErrors } from './cardStyleSchema';
-import type { CardStyle, Label } from '@azzapp/data';
+import type { CardStyle } from '@azzapp/data';
 
 type CardStyleFormProps = {
   cardStyle?: CardStyle | null;
   saved?: boolean;
-  label?: Label | null;
+  label?: string | null;
 };
 
 const CardStyleForm = ({ cardStyle, saved, label }: CardStyleFormProps) => {
@@ -33,10 +33,10 @@ const CardStyleForm = ({ cardStyle, saved, label }: CardStyleFormProps) => {
   const [displaySaveSuccess, setDisplaySaveSuccess] = useState(saved);
   const [error, setError] = useState<any>(null);
   const [formErrors, setFormErrors] = useState<CardStyleErrors | null>(null);
-  const { data, fieldProps } = useForm<CardStyle & Label>(
+  const { data, fieldProps } = useForm<CardStyle & { label: string }>(
     () => ({
       ...(cardStyle ?? { enabled: true }),
-      ...label,
+      label: label ?? undefined,
     }),
     formErrors?.fieldErrors,
     [cardStyle],
@@ -92,7 +92,7 @@ const CardStyleForm = ({ cardStyle, saved, label }: CardStyleFormProps) => {
         </Link>
       </Breadcrumbs>
       <Typography variant="h4" component="h1" sx={{ mb: 2 }}>
-        {cardStyle ? `CardStyle ${label?.baseLabelValue}` : 'New CardStyle'}
+        {cardStyle ? `CardStyle ${label}` : 'New CardStyle'}
       </Typography>
       <FormControlLabel
         control={
@@ -116,20 +116,12 @@ const CardStyleForm = ({ cardStyle, saved, label }: CardStyleFormProps) => {
         maxWidth={600}
       >
         <TextField
-          name="labelKey"
-          label="Label Key"
-          disabled={saving || !isCreation}
-          required
-          sx={{ width: 250 }}
-          {...fieldProps('labelKey')}
-        />
-        <TextField
-          name="baseLabelValue"
-          label="Base Label Value"
+          name="label"
+          label="Label (en-US)"
           disabled={saving}
           required
           sx={{ width: 250 }}
-          {...fieldProps('baseLabelValue')}
+          {...fieldProps('label')}
         />
         <FontSelect
           name="fontFamily"

@@ -1,5 +1,6 @@
+import { Canvas } from '@shopify/react-native-skia';
 import range from 'lodash/range';
-import { useCallback } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { View } from 'react-native';
 import { PanGestureHandler } from 'react-native-gesture-handler';
 import Animated, {
@@ -11,9 +12,10 @@ import Animated, {
 import { formatDuration } from '@azzapp/shared/stringHelpers';
 import { colors } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
+import { NativeBufferLoader } from '#helpers/mediaEditions';
+import BufferImage from '#ui/BufferImage';
+import Icon from '#ui/Icon';
 import Text from '#ui/Text';
-import { GPUImageView, VideoFrame } from './gpu';
-import type { EditionParameters } from './gpu';
 import type { ViewProps } from 'react-native';
 import type { PanGestureHandlerGestureEvent } from 'react-native-gesture-handler';
 
@@ -44,12 +46,6 @@ type VideoTimelineEditorProps = ViewProps & {
    * @type {number}
    */
   aspectRatio: number;
-  /**
-   * edition parameters
-   *
-   * @type {EditionParameters}
-   */
-  editionParameters: EditionParameters;
   /**
    * maxDuration for the edited video
    *
@@ -90,7 +86,6 @@ type VideoTimelineEditorProps = ViewProps & {
 const VideoTimelineEditor = ({
   video,
   aspectRatio,
-  editionParameters,
   maxDuration,
   width,
   imagesHeight,
@@ -139,6 +134,11 @@ const VideoTimelineEditor = ({
       onStart: (event, ctx) => {
         ctx.startX = leftPosition.value;
         ctx.endX = rightPosition.value;
+
+        if (minDuration === maxDuration) {
+          return;
+        }
+
         if (event.x < THUMB_WIDTH * 2) {
           ctx.left = true;
         } else if (
@@ -155,8 +155,8 @@ const VideoTimelineEditor = ({
             leftPosition.value = leftPos;
             if (ctx.endX - leftPos <= minDurationPixel) {
               rightPosition.value = leftPos + minDurationPixel;
-            } else if (ctx.endX - leftPos > maxDuration * minDurationPixel) {
-              rightPosition.value = leftPos + maxDuration * minDurationPixel;
+            } else if (ctx.endX - leftPos > maxDuration * secondPixel) {
+              rightPosition.value = leftPos + maxDuration * secondPixel;
             }
           }
         } else if (ctx.right) {
@@ -164,9 +164,9 @@ const VideoTimelineEditor = ({
           if (rightPos >= minDurationPixel) {
             rightPosition.value = rightPos;
             if (rightPos - ctx.startX <= minDurationPixel) {
-              leftPosition.value = rightPos - secondPixel;
-            } else if (rightPos - ctx.startX > maxDuration * minDurationPixel) {
-              leftPosition.value = rightPos - maxDuration * minDurationPixel;
+              leftPosition.value = rightPos - minDurationPixel;
+            } else if (rightPos - ctx.startX > maxDuration * secondPixel) {
+              leftPosition.value = rightPos - maxDuration * secondPixel;
             }
           }
         } else if (
@@ -194,6 +194,37 @@ const VideoTimelineEditor = ({
     [leftPosition.value, rightPosition.value],
   );
 
+  const [buffers, setBuffers] = useState<bigint[]>([]);
+  useEffect(() => {
+    let canceled = false;
+    let keys: string[] = [];
+    const thumbnails = range(0, video.duration, video.duration / nbImage).map(
+      second =>
+        NativeBufferLoader.loadVideoThumbnail(video.uri, second, {
+          width: 256,
+          height: 256,
+        }),
+    );
+    Promise.all(thumbnails.map(video => video.promise))
+      .then(setBuffers)
+      .then(
+        () => {
+          if (canceled) {
+            return;
+          }
+          keys = thumbnails.map(video => video.key);
+          keys.forEach(NativeBufferLoader.ref);
+        },
+        () => {
+          console.warn('error loading images');
+        },
+      );
+    return () => {
+      canceled = true;
+      keys.forEach(NativeBufferLoader.unref);
+    };
+  }, [video.uri, video.duration, nbImage]);
+
   const formatDurationMarker = (index: number) => {
     const duration =
       (video.duration / (NUMBER_MAX_TICK - 1)) *
@@ -206,24 +237,30 @@ const VideoTimelineEditor = ({
   return (
     <View {...props}>
       <View style={styles.root}>
-        {range(0, video.duration, video.duration / nbImage).map(second => (
-          <GPUImageView
-            key={second}
-            style={{ height: imagesHeight, width: itemWidth }}
-          >
-            <VideoFrame
-              uri={video.uri}
-              parameters={editionParameters}
-              time={second}
+        <Canvas style={{ height: imagesHeight, width: sliderWidth }}>
+          {buffers.map((buffer, index) => (
+            <BufferImage
+              fit={'cover'}
+              key={index}
+              buffer={buffer}
+              y={0}
+              x={index * itemWidth}
+              width={itemWidth}
+              height={imagesHeight}
             />
-          </GPUImageView>
-        ))}
+          ))}
+        </Canvas>
       </View>
       <PanGestureHandler onGestureEvent={eventHandler}>
         <Animated.View
           style={[styles.timeRange, animatedStyle]}
           hitSlop={{ left: 35, right: 35 }}
         >
+          {minDuration === maxDuration && (
+            <View style={styles.moveSegment}>
+              <Icon icon="move_segment" />
+            </View>
+          )}
           <View style={[styles.thumb, styles.thumbStart]} />
           <View style={[styles.thumb, styles.thumbEnd]} />
         </Animated.View>
@@ -315,6 +352,14 @@ const styleSheet = createStyleSheet(appearance => ({
     position: 'absolute',
     height: 1,
     backgroundColor: colors.black,
+  },
+  moveSegment: {
+    position: 'absolute',
+    top: -25,
+    height: 24,
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: '100%',
   },
 }));
 

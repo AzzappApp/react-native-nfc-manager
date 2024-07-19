@@ -194,6 +194,16 @@ export const getCardModules = async (
     )
     .orderBy(asc(CardModuleTable.position));
 
+export const getCardModulesForWebCards = async (
+  webCardIds: string[],
+  trx: DbTransaction = db,
+): Promise<CardModule[]> =>
+  trx
+    .select()
+    .from(CardModuleTable)
+    .where(inArray(CardModuleTable.webCardId, webCardIds))
+    .orderBy(asc(CardModuleTable.position));
+
 /**
  * Create a cardmodule.
  *

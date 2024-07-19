@@ -95,7 +95,7 @@ const alignmentIcons: Record<TxtAlignment, Icons> = {
   left: 'txt_align_left',
   center: 'txt_align_center',
   right: 'txt_align_right',
-  justify: 'txt_align_justif',
+  justify: 'txt_align_justify',
 };
 
 const getAlignment = (str: string): TxtAlignment => {

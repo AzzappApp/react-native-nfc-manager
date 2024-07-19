@@ -9,13 +9,13 @@ import { Dimensions, StyleSheet, View } from 'react-native';
 import type { Color } from '@shopify/react-native-skia';
 import type { ParsedColorArray, SharedValue } from 'react-native-reanimated';
 
+const { width, height } = Dimensions.get('screen');
+
 const WebCardBackground = ({
   colors,
 }: {
   colors: Color[] | SharedValue<ParsedColorArray[] | string[]>;
 }) => {
-  const { width, height } = Dimensions.get('screen');
-
   return (
     <View style={StyleSheet.absoluteFill}>
       <Canvas style={{ flex: 1 }}>

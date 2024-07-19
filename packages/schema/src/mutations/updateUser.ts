@@ -37,7 +37,7 @@ const updateUserMutation: MutationResolvers['updateUser'] = async (
     try {
       await validateMailOrPhone('phone', phoneNumber, token);
     } catch (e) {
-      throw new GraphQLError(ERRORS.INVALID_TOKEN);
+      throw new GraphQLError(ERRORS.INVALID_REQUEST);
     }
   }
 
@@ -49,7 +49,7 @@ const updateUserMutation: MutationResolvers['updateUser'] = async (
     try {
       await validateMailOrPhone('email', email, token);
     } catch (e) {
-      throw new GraphQLError(ERRORS.INVALID_TOKEN);
+      throw new GraphQLError(ERRORS.INVALID_REQUEST);
     }
   }
 

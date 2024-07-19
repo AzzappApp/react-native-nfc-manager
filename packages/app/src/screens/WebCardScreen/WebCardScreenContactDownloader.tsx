@@ -146,6 +146,7 @@ const buildContact = async (
     title,
     phoneNumbers,
     emails,
+    birthday,
   } = parseContactCard(contactCardData);
 
   let image: Image | undefined = undefined;
@@ -156,16 +157,19 @@ const buildContact = async (
         additionalContactData.avatarUrl,
         FileSystem.cacheDirectory + 'avatar',
       );
-
-      image = {
-        width: 720,
-        height: 720,
-        uri: avatar.uri,
-      };
+      if (avatar.status >= 200 && avatar.status < 300) {
+        image = {
+          width: 720,
+          height: 720,
+          uri: avatar.uri,
+        };
+      }
     } catch (e) {
       Sentry.captureException(e);
     }
   }
+
+  const birthdayDate = birthday ? new Date(birthday) : undefined;
 
   const contact: Contact = {
     id: profileId,
@@ -193,11 +197,23 @@ const buildContact = async (
       isPrimary: email[0] === 'Main',
       id: `${profileId}-${email[1]}`,
     })),
+    dates: birthdayDate
+      ? [
+          {
+            label: 'birthday',
+            year: birthdayDate?.getFullYear(),
+            month: birthdayDate?.getMonth(),
+            day: birthdayDate?.getDate(),
+            id: `${profileId}-birthday`,
+          },
+        ]
+      : [],
     socialProfiles:
       additionalContactData?.socials?.map(social => ({
         label: social.label,
         url: social.url,
         id: `${profileId}-${social.label}`,
+        service: social.label,
       })) ?? [],
     urlAddresses: (userName
       ? [

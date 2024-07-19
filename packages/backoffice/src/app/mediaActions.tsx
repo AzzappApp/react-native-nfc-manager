@@ -35,7 +35,6 @@ export const getSignedUpload = async (
     kind,
     null,
     pregeneratedSizes,
-    false,
     `userId=${userId}|backoffice=true`,
   );
 };

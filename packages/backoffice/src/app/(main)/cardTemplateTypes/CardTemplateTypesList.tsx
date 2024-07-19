@@ -11,7 +11,6 @@ import {
   MenuItem,
   Select,
   TextField,
-  Typography,
 } from '@mui/material';
 import { useRouter } from 'next/navigation';
 import {
@@ -87,7 +86,7 @@ const CardTemplateTypesList = ({
     (model: GridSortModel) => {
       updateSearchParams(
         page,
-        model[0]?.field ?? 'labelKey',
+        model[0]?.field ?? 'label',
         model[0]?.sort ?? 'asc',
         search,
         {
@@ -127,16 +126,7 @@ const CardTemplateTypesList = ({
   );
 
   return (
-    <Box
-      sx={{
-        display: 'flex',
-        flexDirection: 'column',
-        height: '100%',
-      }}
-    >
-      <Typography variant="h4" component="h1" sx={{ mb: 2 }}>
-        WebCards templates types
-      </Typography>
+    <>
       <Box
         sx={{
           display: 'flex',
@@ -220,14 +210,14 @@ const CardTemplateTypesList = ({
         rowSelection={false}
         sortingOrder={['asc', 'desc']}
       />
-    </Box>
+    </>
   );
 };
 
 const columns: GridColDef[] = [
   {
-    field: 'labelKey',
-    headerName: 'Label Key',
+    field: 'label',
+    headerName: 'Label',
     flex: 2,
   },
   {

@@ -1,3 +1,4 @@
+import { ImageFormat } from '@shopify/react-native-skia';
 import { omit } from 'lodash';
 import { useCallback, useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
@@ -10,20 +11,21 @@ import {
   HORIZONTAL_PHOTO_STYLE_VALUES,
   MODULE_IMAGE_MAX_WIDTH,
 } from '@azzapp/shared/cardModuleHelpers';
-import { encodeMediaId } from '@azzapp/shared/imagesHelpers';
-import { addingModuleRequireSubscription } from '@azzapp/shared/subscriptionHelpers';
+import { changeModuleRequireSubscription } from '@azzapp/shared/subscriptionHelpers';
 import { CameraButton } from '#components/commonsButtons';
-import { exportLayersToImage, getFilterUri } from '#components/gpu';
 import ImagePicker, {
   EditImageStep,
   SelectImageStep,
 } from '#components/ImagePicker';
-import { useRouter } from '#components/NativeRouter';
-import ScreenModal from '#components/ScreenModal';
+import {
+  useRouter,
+  ScreenModal,
+  preventModalDismiss,
+} from '#components/NativeRouter';
 import { getFileName } from '#helpers/fileHelpers';
+import { saveTransformedImageToFile } from '#helpers/mediaEditions';
 import { downScaleImage } from '#helpers/mediaHelpers';
 import { uploadMedia, uploadSign } from '#helpers/MobileWebAPI';
-import { useIsSubscriber } from '#helpers/SubscriptionContext';
 import useEditorLayout from '#hooks/useEditorLayout';
 import useHandleProfileActionError from '#hooks/useHandleProfileError';
 import useModuleDataEditor from '#hooks/useModuleDataEditor';
@@ -133,6 +135,7 @@ const HorizontalPhotoEditionScreen = ({
             titleFontFamily
             titleFontSize
           }
+          isPremium
           cardModules {
             id
           }
@@ -186,6 +189,7 @@ const HorizontalPhotoEditionScreen = ({
         saveHorizontalPhotoModule(webCardId: $webCardId, input: $input) {
           webCard {
             id
+            requiresSubscription
             cardModules {
               kind
               visible
@@ -211,7 +215,6 @@ const HorizontalPhotoEditionScreen = ({
 
   const [progressIndicator, setProgressIndicator] =
     useState<Observable<number> | null>(null);
-  const isSubscriber = useIsSubscriber();
 
   const cardModulesCount =
     profile.webCard.cardModules.length + (horizontalPhoto ? 0 : 1);
@@ -243,22 +246,17 @@ const HorizontalPhotoEditionScreen = ({
     filter,
   }: ImagePickerResult) => {
     const size = downScaleImage(width, height, MODULE_IMAGE_MAX_WIDTH);
-    const exportUri = await exportLayersToImage({
-      size,
+    const exportPath = await saveTransformedImageToFile({
+      uri,
+      resolution: size,
+      format: ImageFormat.JPEG,
       quality: 95,
-      format: 'auto',
-      layers: [
-        {
-          kind: 'image',
-          uri,
-          parameters: editionParameters,
-          lutFilterUri: getFilterUri(filter),
-        },
-      ],
+      filter,
+      editionParameters,
     });
     setShowImagePicker(false);
     onImageChange({
-      uri: exportUri.startsWith('file://') ? exportUri : `file://${exportUri}`,
+      uri: `file://${exportPath}`,
       width: size.width,
       height: size.height,
       kind: 'image',
@@ -302,7 +300,7 @@ const HorizontalPhotoEditionScreen = ({
       return;
     }
 
-    const requireSubscription = addingModuleRequireSubscription(
+    const requireSubscription = changeModuleRequireSubscription(
       'horizontalPhoto',
       cardModulesCount,
     );
@@ -310,7 +308,7 @@ const HorizontalPhotoEditionScreen = ({
     if (
       profile.webCard.cardIsPublished &&
       requireSubscription &&
-      !isSubscriber
+      !profile.webCard.isPremium
     ) {
       router.push({ route: 'USER_PAY_WALL' });
       return;
@@ -343,7 +341,7 @@ const HorizontalPhotoEditionScreen = ({
       );
       try {
         const { public_id } = await uploadPromise;
-        mediaId = encodeMediaId(public_id, 'image');
+        mediaId = public_id;
       } catch (error) {
         console.error(error);
         Toast.show({
@@ -388,8 +386,8 @@ const HorizontalPhotoEditionScreen = ({
     canSave,
     cardModulesCount,
     profile.webCard.cardIsPublished,
+    profile.webCard.isPremium,
     profile.webCard.id,
-    isSubscriber,
     value,
     horizontalPhoto?.id,
     marginHorizontal.value,
@@ -564,7 +562,10 @@ const HorizontalPhotoEditionScreen = ({
           { bottom: insetBottom, width: windowWidth - 20 },
         ]}
       />
-      <ScreenModal visible={showImagePicker}>
+      <ScreenModal
+        visible={showImagePicker}
+        onRequestDismiss={onImagePickerCancel}
+      >
         <ImagePicker
           kind="image"
           onFinished={onMediaSelected}
@@ -572,7 +573,11 @@ const HorizontalPhotoEditionScreen = ({
           steps={steps}
         />
       </ScreenModal>
-      <ScreenModal visible={!!progressIndicator}>
+      <ScreenModal
+        visible={!!progressIndicator}
+        gestureEnabled={false}
+        onRequestDismiss={preventModalDismiss}
+      >
         {progressIndicator && (
           <UploadProgressModal progressIndicator={progressIndicator} />
         )}

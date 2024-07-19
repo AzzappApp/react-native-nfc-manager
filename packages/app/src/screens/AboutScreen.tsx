@@ -1,5 +1,5 @@
 import { FormattedMessage, useIntl } from 'react-intl';
-import { View, StyleSheet, Linking, Alert } from 'react-native';
+import { View, StyleSheet, Linking } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import AccountHeader from '#components/AccountHeader';
@@ -8,6 +8,11 @@ import Container from '#ui/Container';
 import Icon from '#ui/Icon';
 import PressableNative from '#ui/PressableNative';
 import Text from '#ui/Text';
+
+const TERMS_OF_SERVICE = process.env.TERMS_OF_SERVICE;
+const PRIVACY_POLICY = process.env.PRIVACY_POLICY;
+const ABOUT = process.env.ABOUT;
+const FAQ = process.env.FAQ;
 
 const AboutScreen = () => {
   const intl = useIntl();
@@ -38,7 +43,7 @@ const AboutScreen = () => {
         </View>
         <PressableNative
           style={styles.rowStyle}
-          onPress={() => Alert.alert('TODO')}
+          onPress={() => Linking.openURL(`${ABOUT}`)}
         >
           <Text variant="medium">
             <FormattedMessage
@@ -50,7 +55,7 @@ const AboutScreen = () => {
         </PressableNative>
         <PressableNative
           style={styles.rowStyle}
-          onPress={() => Linking.openURL('http://www.azzapp.com/tos')}
+          onPress={() => Linking.openURL(`${TERMS_OF_SERVICE}`)}
         >
           <Text variant="medium">
             <FormattedMessage
@@ -62,7 +67,7 @@ const AboutScreen = () => {
         </PressableNative>
         <PressableNative
           style={styles.rowStyle}
-          onPress={() => Linking.openURL('http://www.azzapp.com/privacy')}
+          onPress={() => Linking.openURL(`${PRIVACY_POLICY}`)}
         >
           <Text variant="medium">
             <FormattedMessage
@@ -74,7 +79,7 @@ const AboutScreen = () => {
         </PressableNative>
         <PressableNative
           style={styles.rowStyle}
-          onPress={() => Alert.alert('TODO')}
+          onPress={() => Linking.openURL(`${FAQ}`)}
         >
           <Text variant="medium">
             <FormattedMessage

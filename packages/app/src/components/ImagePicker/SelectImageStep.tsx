@@ -1,31 +1,35 @@
 import * as Sentry from '@sentry/react-native';
-import { presentPermissionsPickerAsync, type Album } from 'expo-media-library';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { Alert, Platform, StyleSheet } from 'react-native';
-import { RESULTS } from 'react-native-permissions';
+import { RESULTS, openPhotoPicker } from 'react-native-permissions';
+import Toast from 'react-native-toast-message';
 import { useDebouncedCallback } from 'use-debounce';
-import { cropDataForAspectRatio } from '#components/gpu';
+import { useRouter } from '#components/NativeRouter';
+import { cropDataForAspectRatio } from '#helpers/mediaEditions';
 import { getImageSize, getVideoSize } from '#helpers/mediaHelpers';
 import { usePermissionContext } from '#helpers/PermissionContext';
 import useEditorLayout from '#hooks/useEditorLayout';
-
 import { BOTTOM_MENU_HEIGHT } from '#ui/BottomMenu';
 import FloatingIconButton from '#ui/FloatingIconButton';
+import AlbumPicker from '../AlbumPicker';
 import CameraControlPanel from '../CameraControlPanel';
 import CameraView from '../CameraView';
 import PermissionModal from '../PermissionModal';
-import AlbumPicker from './AlbumPicker';
+import PhotoGalleryMediaList from '../PhotoGalleryMediaList';
 import { useImagePickerState } from './ImagePickerContext';
 import ImagePickerMediaRenderer from './ImagePickerMediaRenderer';
 import { ImagePickerStep } from './ImagePickerWizardContainer';
-import PhotoGalleryMediaList from './PhotoGalleryMediaList';
+import type { Media } from '#helpers/mediaHelpers';
 import type { BottomMenuItem } from '#ui/BottomMenu';
 import type { CameraViewHandle } from '../CameraView';
+import type { Album } from '@react-native-camera-roll/camera-roll';
 
 export type SelectImageStepProps = {
   onNext(): void;
   initialCameraPosition?: 'back' | 'front';
+  hideAspectRatio?: boolean;
+  hideTabs?: boolean;
 };
 
 /**
@@ -35,6 +39,8 @@ export type SelectImageStepProps = {
 const SelectImageStep = ({
   onNext,
   initialCameraPosition,
+  hideAspectRatio,
+  hideTabs,
 }: SelectImageStepProps) => {
   // #region State management
   const {
@@ -49,7 +55,34 @@ const SelectImageStep = ({
     onEditionParametersChange,
     clearMedia,
     cameraButtonsLeftRightPosition,
+    minVideoDuration,
+    disableVideoSelection,
   } = useImagePickerState();
+
+  const onGalleryMediaSelected = (
+    media: Media,
+    aspectRatio?: number | null | undefined,
+  ) => {
+    if (
+      minVideoDuration &&
+      media.kind === 'video' &&
+      media.duration < minVideoDuration
+    ) {
+      Toast.show({
+        type: 'error',
+        text1: intl.formatMessage(
+          {
+            defaultMessage: 'Selected video should be at least {duration}s',
+            description:
+              'Error message when selecting a video media that is too short',
+          },
+          { duration: Math.ceil(minVideoDuration * 10) / 10 },
+        ),
+      });
+      return;
+    }
+    onMediaChange(media, aspectRatio);
+  };
 
   const [pickerMode, setPickerMode] = useState<'gallery' | 'photo' | 'video'>(
     'gallery',
@@ -150,13 +183,14 @@ const SelectImageStep = ({
         if (duration) {
           const { uri: _uri } = result;
           const uri = _uri.startsWith('file://') ? _uri : `file://${_uri}`;
-          const { width, height } = await getVideoSize(_uri);
+          const { width, height, rotation } = await getVideoSize(uri);
           onMediaChange(
             {
               kind: 'video',
               uri,
               height,
               width,
+              rotation,
               duration: duration as number,
             },
             forceCameraRatio,
@@ -217,7 +251,7 @@ const SelectImageStep = ({
     return tabs;
   }, [intl, kind]);
   // #endregion
-
+  const router = useRouter();
   const onCameraPermissionModalClose = useCallback(() => {
     if (
       mediaPermission === RESULTS.GRANTED ||
@@ -226,9 +260,9 @@ const SelectImageStep = ({
       onChangePickerMode('gallery');
       setPickerMode('gallery');
     } else {
-      setPermissionModalRejected(true);
+      router.back();
     }
-  }, [mediaPermission, onChangePickerMode]);
+  }, [mediaPermission, onChangePickerMode, router]);
 
   const { insetBottom } = useEditorLayout();
 
@@ -262,7 +296,7 @@ const SelectImageStep = ({
               description:
                 'Button to open the permission picker in image picker wizard',
             }),
-            onPress: presentPermissionsPickerAsync,
+            onPress: openPhotoPicker,
           },
           {
             text: intl.formatMessage({
@@ -305,7 +339,7 @@ const SelectImageStep = ({
           pickerMode === 'gallery' ? (
             media != null ? (
               <ImagePickerMediaRenderer>
-                {forceAspectRatio == null && (
+                {!hideAspectRatio && forceAspectRatio == null && (
                   <FloatingIconButton
                     icon={aspectRatio === 1 ? 'reduce' : 'expand'}
                     style={styles.adjustButton}
@@ -334,12 +368,13 @@ const SelectImageStep = ({
             mediaPermission === RESULTS.GRANTED ||
             mediaPermission === RESULTS.LIMITED ? (
               <PhotoGalleryMediaList
-                selectedMediaID={media?.galleryUri}
+                selectedMediaId={media?.galleryUri}
                 album={selectedAlbum}
-                onMediaSelected={onMediaChange}
+                onMediaSelected={onGalleryMediaSelected}
                 kind={kind}
                 contentContainerStyle={galleryContainerStyle}
                 autoSelectFirstItem={media == null}
+                disableVideoSelection={disableVideoSelection}
               />
             ) : null
           ) : (
@@ -357,11 +392,15 @@ const SelectImageStep = ({
             />
           )
         }
-        menuBarProps={{
-          currentTab: pickerMode,
-          onItemPress: onChangePickerMode as any,
-          tabs,
-        }}
+        menuBarProps={
+          !hideTabs
+            ? {
+                currentTab: pickerMode,
+                onItemPress: onChangePickerMode as any,
+                tabs,
+              }
+            : null
+        }
       />
       <PermissionModal
         permissionsFor={pickerMode}

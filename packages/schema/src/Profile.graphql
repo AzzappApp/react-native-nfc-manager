@@ -50,11 +50,9 @@ type Profile implements Node {
 
   serializedContactCard: String!
 
-  contactCardQrCode(width: Int!) : String!
+  contactCardQrCode(width: Int!): String!
 
   contactCardUrl: String!
-
-
 
   webCard: WebCard!
 
@@ -161,28 +159,20 @@ type Profile implements Node {
   ): WebCardConnection!
 
   """
-  Return a list of cover backgrounds
-  """
-  coverBackgrounds: [StaticMedia!]!
-
-  """
-  Return a list of cover foregrounds
-  """
-  coverForegrounds: [StaticMedia!]!
-
-  """
   Return a list of module backgrounds
   """
-  moduleBackgrounds: [StaticMedia!]!
+  moduleBackgrounds: [ModuleBackground!]!
 
   """
-  Fetches cover templates for a given kind
+  Fetches cover template type
   """
-  coverTemplates(
-    kind: CoverTemplateKind!
-    first: Int @max(value: 50)
-    after: String
-  ): CoverTemplateConnection!
+  coverTemplateTags: [CoverTemplateTag!]!
+
+  """
+  Fetches cover template type
+  """
+  coverTemplateTypes: [CoverTemplateType!]!
+
 
   """
   Fetches card styles
@@ -203,13 +193,12 @@ type Profile implements Node {
   """
   cardTemplateTypes: [CardTemplateType]
   """
-  Fetches suggested medias
-  """
-  suggestedMedias(kind: MediaKind!, first: Int @max(value: 50), after: String): MediaConnection!
-  """
   Fetches color palettes
   """
-  colorPalettes(first: Int  @max(value: 100), after: String): ColorPaletteConnection!
+  colorPalettes(
+    first: Int @max(value: 100)
+    after: String
+  ): ColorPaletteConnection!
 }
 
 """

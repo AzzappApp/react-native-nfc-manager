@@ -1,38 +1,73 @@
-import { eq, sql } from 'drizzle-orm';
+import { and, eq, inArray, isNull, sql } from 'drizzle-orm';
+import { CoverTemplatePreviewTable } from '#coverTemplatePreview';
 import db, { cols } from './db';
 import { createId } from './helpers/createId';
-import type {
-  TextOrientation,
-  TextPosition,
-  TextStyle,
-} from '@azzapp/shared/coverHelpers';
 import type { InferInsertModel, InferSelectModel } from 'drizzle-orm';
 
-export type CoverTemplateData = {
-  titleStyle?: TextStyle | null;
-  subTitleStyle?: TextStyle | null;
-  textOrientation: TextOrientation;
-  textPosition: TextPosition;
-  textAnimation?: string | null;
-  backgroundId?: string | null;
-  backgroundColor?: string | null;
-  backgroundPatternColor?: string | null;
-  foregroundId?: string | null;
-  foregroundColor?: string | null;
-  mediaFilter?: string | null;
-  mediaParameters?: Record<string, any> | null;
-  mediaAnimation?: string | null;
+export type CoverTextType = 'custom' | 'firstName' | 'mainName';
+
+export type CoverText = {
+  text: CoverTextType;
+  customText?: string;
+  fontFamily: string;
+  color: string;
+  fontSize: number;
+  width: number;
+  rotation: number;
+  position: {
+    x: number;
+    y: number;
+  };
+  animation?: string;
+  startPercentageTotal: number;
+  endPercentageTotal: number;
+};
+
+export type CoverOverlay = {
+  media?: {
+    id?: string;
+  };
+  borderWidth: number;
+  borderColor?: string;
+  borderRadius: number;
+  bounds: {
+    x: number;
+    y: number;
+    height: number;
+    width: number;
+  };
+  filter?: string;
+  rotation: number;
+  animation?: string;
+  startPercentageTotal: number;
+  endPercentageTotal: number;
+};
+
+export type SocialLinks = {
+  links: Array<string | undefined>;
+  color: string;
+  position: { x: number; y: number };
+  size: number;
+};
+
+export type CoverTemplateParams = {
+  textLayers: CoverText[];
+  overlayLayers: CoverOverlay[];
+  linksLayer: SocialLinks;
 };
 
 export const CoverTemplateTable = cols.table('CoverTemplate', {
   id: cols.cuid('id').notNull().primaryKey().$defaultFn(createId),
   name: cols.defaultVarchar('name').notNull(),
-  kind: cols.enum('kind', ['people', 'video', 'others']).notNull(),
-  previewMediaId: cols.mediaId('previewMediaId').notNull(),
-  data: cols.json('data').$type<CoverTemplateData>().notNull(),
+  order: cols.int('order').notNull().default(1),
+  tags: cols.json('tags').$type<string[]>().notNull(),
+  typeId: cols.cuid('typeId').notNull(),
+  lottieId: cols.cuid('lottieId').notNull(),
+  mediaCount: cols.int('mediaCount').notNull(),
+  previewId: cols.cuid('previewId').notNull(),
   colorPaletteId: cols.cuid('colorPaletteId').notNull(),
-  businessEnabled: cols.boolean('businessEnabled').default(true).notNull(),
-  personalEnabled: cols.boolean('personalEnabled').default(true).notNull(),
+  enabled: cols.boolean('enabled').default(true).notNull(),
+  params: cols.json('params').$type<CoverTemplateParams>(),
 });
 
 export type CoverTemplate = InferSelectModel<typeof CoverTemplateTable>;
@@ -50,40 +85,66 @@ export const getCoverTemplateById = (id: string) =>
     .where(eq(CoverTemplateTable.id, id))
     .then(rows => rows[0] ?? null);
 
-/**
- * Return a list of cover templates. filtered by profile kind and template kind
- * @param webCardKind the webCard kind to filter by
- * @param templateKind the template kind to filter by
- * @param randomSeed the random seed to use for random ordering
- * @param offset the offset to use for pagination
- * @param limit the limit to use for pagination
- * @return {*}  {Promise<Array<CoverTemplate & { cursor: string }>>}
- */
-export const getCoverTemplates = async (
-  webCardKind: 'business' | 'personal',
-  templateKind: 'others' | 'people' | 'video',
-  randomSeed: string,
-  offset?: string | null,
-  limit?: number | null,
+export const getCoverTemplatesByTypesAndTag = async (
+  typeIds: string[],
+  tagId?: string | null,
+  companyActivityId?: string | null,
 ) => {
-  const query = sql`
-    SELECT *, RAND(${randomSeed}) as cursor
-    FROM CoverTemplate
-    WHERE ${
-      webCardKind === 'business'
-        ? CoverTemplateTable.businessEnabled
-        : CoverTemplateTable.personalEnabled
-    } = 1
-    AND ${CoverTemplateTable.kind} = ${templateKind}`;
-  if (offset) {
-    query.append(sql` HAVING cursor > ${offset} `);
-  }
-  query.append(sql` ORDER BY cursor `);
-  if (limit) {
-    query.append(sql` LIMIT ${limit} `);
-  }
+  const tagIdJson = tagId ? JSON.stringify([tagId]) : null;
 
-  return (await db.execute(query)).rows as Array<
-    CoverTemplate & { cursor: string }
-  >;
+  if (typeIds.length === 0) return [];
+
+  const query = db
+    .select({
+      previewId: sql`COALESCE(${CoverTemplatePreviewTable.mediaId}, ${CoverTemplateTable.previewId})`,
+      CoverTemplateTable,
+    })
+    .from(CoverTemplateTable)
+    .leftJoin(
+      CoverTemplatePreviewTable,
+      and(
+        eq(CoverTemplateTable.id, CoverTemplatePreviewTable.coverTemplateId),
+        companyActivityId
+          ? eq(CoverTemplatePreviewTable.companyActivityId, companyActivityId)
+          : isNull(CoverTemplatePreviewTable.companyActivityId),
+      ),
+    )
+    .where(
+      and(
+        inArray(CoverTemplateTable.typeId, typeIds),
+        eq(CoverTemplateTable.enabled, true),
+        tagIdJson ? sql`JSON_CONTAINS(tags, ${tagIdJson})` : undefined,
+      ),
+    );
+
+  return query.execute().then(rows =>
+    rows.map(row => ({
+      ...row.CoverTemplateTable,
+      previewId: row.previewId as string,
+    })),
+  );
+};
+
+/**
+ * Create a new cover template
+ * @param data - The user fields, excluding the id
+ * @returns The newly created user
+ */
+export const createCoverTemplate = async (data: NewCoverTemplate) => {
+  const id = data.id ?? createId();
+  await db
+    .client()
+    .insert(CoverTemplateTable)
+    .values({ ...data, id });
+  return id;
+};
+
+export const updateCoverTemplate = async (
+  coverTemplateId: string,
+  data: Partial<CoverTemplate>,
+): Promise<void> => {
+  await db
+    .update(CoverTemplateTable)
+    .set(data)
+    .where(eq(CoverTemplateTable.id, coverTemplateId));
 };

@@ -3,10 +3,15 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import { StyleSheet, View, useWindowDimensions } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { graphql, useFragment } from 'react-relay';
-import { moduleCountRequiresSubscription } from '@azzapp/shared/subscriptionHelpers';
+import { webCardRequiresSubscription } from '@azzapp/shared/subscriptionHelpers';
 import { colors } from '#theme';
 import CardTemplateList from '#components/CardTemplateList';
-import ScreenModal from '#components/ScreenModal';
+import {
+  useRouter,
+  ScreenModal,
+  preventModalDismiss,
+} from '#components/NativeRouter';
+import WebCardBuilderSubtitle from '#components/WebCardBuilderSubtitle';
 import useAuthState from '#hooks/useAuthState';
 import useLoadCardTemplateMutation from '#hooks/useLoadCardTemplateMutation';
 import useScreenInsets from '#hooks/useScreenInsets';
@@ -22,6 +27,7 @@ import type {
   CardTemplateListHandle,
   CardTemplateItem,
 } from '#components/CardTemplateList';
+import type { ModalDismissRequestEvent } from '#components/NativeRouter';
 import type { LoadCardTemplateModal_webCard$key } from '#relayArtifacts/LoadCardTemplateModal_webCard.graphql';
 
 type LoadCardTemplateModalProps = {
@@ -35,7 +41,9 @@ const LoadCardTemplateModal = ({
   visible,
   webCard: webCardKey,
 }: LoadCardTemplateModalProps) => {
-  const [cardTemplateId, setCardTemplateId] = useState<string | null>(null);
+  const [cardTemplate, setCardTemplate] = useState<CardTemplateItem | null>(
+    null,
+  );
   const [selectedTemplate, setSelectedTemplate] =
     useState<CardTemplateItem | null>(null);
 
@@ -43,6 +51,9 @@ const LoadCardTemplateModal = ({
     graphql`
       fragment LoadCardTemplateModal_webCard on WebCard {
         id
+        webCardKind
+        cardIsPublished
+        isPremium
         cardModules {
           id
           kind
@@ -59,17 +70,20 @@ const LoadCardTemplateModal = ({
   const height = windowHeight - insets.top - insets.bottom - HEADER_HEIGHT;
 
   const [commit, inFlight] = useLoadCardTemplateMutation();
+  const [loading, setIsLoading] = useState(false);
 
   const commitCardTemplate = useCallback(
     (id: string) => {
+      setIsLoading(true);
       commit({
         variables: {
           webCardId: webCard.id,
           cardTemplateId: id,
         },
         onCompleted: () => {
-          setCardTemplateId(null);
+          setCardTemplate(null);
           onClose(true);
+          setIsLoading(false);
         },
         onError: error => {
           console.error(error);
@@ -86,22 +100,70 @@ const LoadCardTemplateModal = ({
     [commit, intl, onClose, webCard.id],
   );
 
+  const router = useRouter();
+
   const cardTemplateHandle = useRef<CardTemplateListHandle>(null);
   const onSubmit = useCallback(() => {
-    if (!cardTemplateId) return;
-    commitCardTemplate(cardTemplateId);
-  }, [cardTemplateId, commitCardTemplate]);
+    if (!cardTemplate) return;
+    const requireSubscription = webCardRequiresSubscription(
+      cardTemplate.modules,
+      webCard.webCardKind,
+    );
+
+    if (webCard.cardIsPublished && requireSubscription && !webCard.isPremium) {
+      router.push({ route: 'USER_PAY_WALL' });
+      return;
+    }
+    commitCardTemplate(cardTemplate.id);
+  }, [
+    cardTemplate,
+    commitCardTemplate,
+    router,
+    webCard.cardIsPublished,
+    webCard.isPremium,
+    webCard.webCardKind,
+  ]);
 
   const showWarning = Boolean(webCard.cardModules?.length);
 
   const applyTemplate = useCallback(
-    (templateId: string) => {
-      setCardTemplateId(templateId);
+    (template: CardTemplateItem) => {
+      setCardTemplate(template);
       if (!showWarning) {
-        commitCardTemplate(templateId);
+        const requireSubscription = webCardRequiresSubscription(
+          template.modules,
+          webCard.webCardKind,
+        );
+
+        if (
+          webCard.cardIsPublished &&
+          requireSubscription &&
+          !webCard.isPremium
+        ) {
+          router.push({ route: 'USER_PAY_WALL' });
+          return;
+        }
+
+        commitCardTemplate(template.id);
       }
     },
-    [commitCardTemplate, showWarning],
+    [
+      commitCardTemplate,
+      router,
+      showWarning,
+      webCard.cardIsPublished,
+      webCard.isPremium,
+      webCard.webCardKind,
+    ],
+  );
+
+  const onRequestDismiss = useCallback(
+    (event: ModalDismissRequestEvent) => {
+      if (inFlight) {
+        event.preventModalDismiss();
+      }
+    },
+    [inFlight],
   );
 
   if (!profileId) {
@@ -110,7 +172,13 @@ const LoadCardTemplateModal = ({
 
   return (
     <>
-      <ScreenModal animationType="none" visible={visible}>
+      <ScreenModal
+        animationType="slide"
+        visible={visible}
+        // TODO do we really need this?
+        gestureEnabled={!inFlight}
+        onRequestDismiss={onRequestDismiss}
+      >
         <Container
           style={{
             flex: 1,
@@ -135,21 +203,12 @@ const LoadCardTemplateModal = ({
                     description="WebCard creation screen title"
                   />
                 </Text>
-
-                {selectedTemplate &&
-                  moduleCountRequiresSubscription(
-                    selectedTemplate.modules.length,
-                  ) && (
-                    <View style={styles.proContainer}>
-                      <Text variant="medium" style={styles.proText}>
-                        <FormattedMessage
-                          defaultMessage="3+ visible sections"
-                          description="WebCard create pro description"
-                        />
-                      </Text>
-                      <Icon icon="plus" size={15} style={styles.badge} />
-                    </View>
-                  )}
+                {selectedTemplate && !webCard.isPremium && (
+                  <WebCardBuilderSubtitle
+                    modules={selectedTemplate.modules}
+                    webCard={webCard}
+                  />
+                )}
               </View>
             }
             rightElement={
@@ -184,7 +243,11 @@ const LoadCardTemplateModal = ({
       </ScreenModal>
       <ScreenModal
         animationType="none"
-        visible={visible && !!cardTemplateId && !inFlight && showWarning}
+        visible={
+          visible && !!cardTemplate && !loading && !inFlight && showWarning
+        }
+        onRequestDismiss={preventModalDismiss}
+        gestureEnabled={false}
       >
         <Container style={styles.confirmation}>
           <Icon icon="warning" style={styles.icon} />
@@ -215,10 +278,20 @@ const LoadCardTemplateModal = ({
           <View style={styles.buttons}>
             <Button
               style={{ marginTop: 20, width: '100%' }}
-              label={intl.formatMessage({
-                defaultMessage: 'Remove current contents',
-                description: 'Confirmation button for load card template modal',
-              })}
+              label={intl.formatMessage(
+                {
+                  defaultMessage: 'Remove WebCard{azzappA} contents',
+                  description:
+                    'Confirmation button for load card template modal',
+                },
+                {
+                  azzappA: (
+                    <Text style={{ color: colors.white }} variant="azzapp">
+                      a
+                    </Text>
+                  ),
+                },
+              )}
               onPress={onSubmit}
             />
             <Button
@@ -228,7 +301,7 @@ const LoadCardTemplateModal = ({
                 defaultMessage: 'Cancel',
                 description: 'Cancel button for load card template modal',
               })}
-              onPress={() => setCardTemplateId(null)}
+              onPress={() => setCardTemplate(null)}
             />
           </View>
         </Container>

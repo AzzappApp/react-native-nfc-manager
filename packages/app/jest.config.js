@@ -7,6 +7,7 @@ const esModules = [
   'use-debounce',
   'expo(nent)?',
   '@expo(nent)?/.*',
+  '@expo-.*',
   '@shopify/react-native-skia',
 ];
 
@@ -28,4 +29,5 @@ module.exports = {
     '#(.*)': '<rootDir>/../packages/app/src/$1',
     '@azzapp/shared/(.*)': '<rootDir>/../packages/shared/src/$1',
   },
+  prettierPath: require.resolve('prettier-2'),
 };

@@ -13,16 +13,6 @@ export const COVER_RATIO = 0.625;
 export const COVER_ANIMATION_DURATION = 5000;
 
 /**
- * Cover video maxium duration in seconds
- */
-export const COVER_MAX_VIDEO_DURATION = 12;
-
-/**
- * Cover video maxium duration in seconds
- */
-export const COVER_VIDEO_BITRATE = 5000000;
-
-/**
  * The border radius that should be used when a cover is not displayed full screen
  */
 export const COVER_CARD_RADIUS = 0.128;
@@ -33,71 +23,6 @@ export const COVER_CARD_RADIUS = 0.128;
 export const COVER_BASE_WIDTH = 125;
 
 /**
- * The max width of user card media (image or video) in pixels
- */
-export const COVER_MAX_HEIGHT = 2048;
-
-/**
- * The max height of user card media (image or video) in pixels
- */
-export const COVER_MAX_WIDTH = COVER_MAX_HEIGHT * COVER_RATIO;
-
-/**
- * The max size of the cover image source file in pixels
- * @note this dimension applies to the width and height of the image
- */
-export const COVER_SOURCE_MAX_IMAGE_DIMENSION = 4096;
-
-/**
- * The max size of the cover video source file
- * @note this dimension applies to the width and height of the video
- */
-export const COVER_SOURCE_MAX_VIDEO_DIMENSION = 2048;
-
-/**
- * The default cover font family
- */
-export const DEFAULT_COVER_FONT_FAMILY = 'Poppins_Bold';
-
-/**
- * The default cover font size
- */
-export const DEFAULT_COVER_FONT_SIZE = 16;
-
-/**
- * The default cover text color
- */
-export const DEFAULT_COVER_TEXT_COLOR = '#FFF';
-
-/**
- * The default cover text color
- */
-export const DEFAULT_COVER_CONTENT_ORTIENTATION = 'horizontal' as const;
-
-/**
- * The default cover text color
- */
-export const DEFAULT_COVER_CONTENT_POSITION = 'middleCenter' as const;
-
-/**
- * The default cover text style
- */
-export const DEFAULT_COVER_TEXT_STYLE: TextStyle = {
-  color: DEFAULT_COVER_TEXT_COLOR,
-  fontSize: DEFAULT_COVER_FONT_SIZE,
-  fontFamily: DEFAULT_COVER_FONT_FAMILY,
-};
-
-/**
- * The default cover subtitle text style
- */
-export const DEFAULT_COVER_SUBTITLE_TEXT_STYLE: TextStyle = {
-  color: 'primary',
-  fontSize: 8,
-  fontFamily: DEFAULT_COVER_FONT_FAMILY,
-};
-
-/**
  * The minimum font size for the cover title/subtitle
  */
 export const COVER_MIN_FONT_SIZE = 6;
@@ -105,77 +30,89 @@ export const COVER_MIN_FONT_SIZE = 6;
 /**
  * The maximum font size for the cover title/subtitle
  */
-export const COVER_MAX_FONT_SIZE = 48;
+export const COVER_MAX_FONT_SIZE = 128;
 
-/**
- * list of possible cover title position
- */
-export const TEXT_POSITIONS = [
-  'topLeft',
-  'topCenter',
-  'topRight',
-  'middleLeft',
-  'middleCenter',
-  'middleRight',
-  'bottomLeft',
-  'bottomCenter',
-  'bottomRight',
-] as const;
-
-/**
- * list of possible text orientation
- */
-export const TEXT_ORIENTATIONS = [
-  'horizontal',
-  'topToBottom',
-  'bottomToTop',
-] as const;
-
-/**
- * An helper function that returns the given position if it is valid, otherwise it returns the default one
- */
-export const textPositionOrDefault = (
-  position: string | null | undefined,
-): TextPosition =>
-  TEXT_POSITIONS.includes(position as any)
-    ? (position as TextPosition)
-    : 'bottomLeft';
-
-/**
- * The enum of possible text position
- */
-export type TextPosition = (typeof TEXT_POSITIONS)[number];
-
-/**
- * The style type for the cover text
- */
-export type TextStyle = {
-  color: string;
-  fontSize: number;
-  fontFamily: string;
-};
-
-/**
- * The enum of possible text orientation
- */
-export type TextOrientation = (typeof TEXT_ORIENTATIONS)[number];
-
-/**
- * An helper function that returns the given orientation if it is valid, otherwise it returns the default one
- *
- */
-export const textOrientationOrDefault = (
-  orientation: string | null | undefined,
-): TextOrientation =>
-  TEXT_ORIENTATIONS.includes(orientation as any)
-    ? (orientation as TextOrientation)
-    : 'horizontal';
 /**
  * the list of possible cover asset pre generated sizes
  */
 export const COVER_ASSET_SIZES = [128, 256, 512, 1024];
 
 /**
- * The color to replace in foreground lottie animation
+ * Maximum number of media that can compose a cover
  */
-export const COVER_FOREGROUND_BASE_COLOR = '#010101';
+export const COVER_MAX_MEDIA = 5;
+
+/**
+ *  Maximum duration that a media can be displayed in a cover
+ */
+export const COVER_IMAGE_DEFAULT_DURATION = 2;
+
+/**
+ *  Maximum duration that a media can be displayed in a cover
+ */
+export const COVER_VIDEO_DEFAULT_DURATION = 4;
+
+/**
+ *  Maximum duration that a media can be displayed in a cover
+ */
+export const COVER_MAX_MEDIA_DURATION = 5;
+
+/**
+ *  Minimum duration that a media can be displayed in a cover
+ */
+export const COVER_MIN_MEDIA_DURATION = 1;
+
+/**
+ * A color that can be replaced in a lottie animation
+ */
+export const LOTTIE_REPLACE_COLORS = {
+  dark: '#010101',
+  primary: '#999999',
+  light: '#FEFEFE',
+};
+
+export const LINKS_GAP = 15;
+export const LINKS_BORDER_WIDTH = 2;
+export const LINKS_ELEMENT_WRAPPER_MULTIPLER = 1.5;
+export const COVER_LINK_SIZE_TO_BORDER_RATIO = 12;
+
+export const convertToBaseCanvasRatio = (
+  value: number,
+  canvasWidth: number,
+) => {
+  'worklet';
+  return value * (canvasWidth / 300);
+};
+
+export const calculateLinksSize = (
+  count: number,
+  size: number,
+  {
+    viewWidth,
+    viewHeight,
+  }: {
+    viewWidth: number;
+    viewHeight: number;
+  },
+) => {
+  'worklet';
+  const gap =
+    (convertToBaseCanvasRatio(Math.max(LINKS_GAP * (count - 1), 0), viewWidth) /
+      viewWidth) *
+    100;
+
+  const elWidth =
+    ((convertToBaseCanvasRatio(size, viewWidth) *
+      LINKS_ELEMENT_WRAPPER_MULTIPLER) /
+      viewWidth) *
+    100;
+
+  const width = elWidth * count + gap;
+
+  const height =
+    count > 0
+      ? (convertToBaseCanvasRatio(size, viewHeight) / viewHeight) * 100
+      : 0;
+
+  return { width, height };
+};

@@ -1,8 +1,7 @@
 import { z } from 'zod';
 
 export const cardTemplateSchema = z.object({
-  labelKey: z.string().min(1),
-  baseLabelValue: z.string().min(1),
+  label: z.string().min(1),
   cardStyle: z.string().min(1),
   modules: z.array(z.any()),
   previewMediaId: z.string().min(1),

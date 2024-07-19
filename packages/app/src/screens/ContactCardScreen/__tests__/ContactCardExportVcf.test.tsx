@@ -1,4 +1,3 @@
-import ReactNativeBlobUtil from 'react-native-blob-util';
 import ShareCommand from 'react-native-share';
 import {
   RelayEnvironmentProvider,
@@ -7,8 +6,6 @@ import {
 } from 'react-relay';
 import { MockPayloadGenerator } from 'relay-test-utils';
 import { createMockEnvironment } from 'relay-test-utils/lib/RelayModernMockEnvironment';
-import { serializeContactCard } from '@azzapp/shared/contactCardHelpers';
-import { buildVCardFromSerializedContact } from '@azzapp/shared/vCardHelpers';
 import { screen, render, fireEvent, act } from '#helpers/testHelpers';
 import ContactCardExportVcf from '../ContactCardExportVcf';
 import type { ContactCardExportVcfTestQuery } from '#relayArtifacts/ContactCardExportVcfTestQuery.graphql';
@@ -33,10 +30,6 @@ jest.mock('react-native-quick-base64', () => ({
 jest.mock('react-native-blob-jsi-helper', () => ({
   getArrayBufferForBlob: jest.fn(),
 }));
-
-const writeFileMock = ReactNativeBlobUtil.fs.writeFile as jest.MockedFunction<
-  typeof ReactNativeBlobUtil.fs.writeFile
->;
 
 const openMock = ShareCommand.open as jest.MockedFunction<
   typeof ShareCommand.open
@@ -94,26 +87,7 @@ describe('ContactCardExportVcf', () => {
         Profile() {
           return {
             contactCardUrl: 'contactCardUrl',
-            webCard: {
-              coverAvatarUrl: null,
-              commonInformation: {
-                socials: [],
-                urls: [
-                  {
-                    address: 'https://www.test.com',
-                  },
-                ],
-              },
-            },
             contactCard,
-            serializedContactCard: serializeContactCard(
-              'profileId',
-              'webCardId',
-              contactCard,
-            ),
-            avatar: {
-              exportUri: null,
-            },
           };
         },
       });
@@ -133,11 +107,7 @@ describe('ContactCardExportVcf', () => {
 
       return (
         data.profile && (
-          <ContactCardExportVcf
-            profile={data.profile}
-            userName="userNameTest"
-            {...props}
-          />
+          <ContactCardExportVcf profile={data.profile} {...props} />
         )
       );
     };
@@ -158,7 +128,6 @@ describe('ContactCardExportVcf', () => {
   test('Should share contact card', async () => {
     renderContactCardExportVcf();
 
-    writeFileMock.mockResolvedValueOnce();
     openMock.mockResolvedValueOnce({
       dismissedAction: false,
       success: true,
@@ -169,45 +138,11 @@ describe('ContactCardExportVcf', () => {
       fireEvent.press(screen.getByRole('button'));
     });
 
-    const { vCard } = await buildVCardFromSerializedContact(
-      'userNameTest',
-      serializeContactCard('profileId', 'webCardId', contactCard),
-      {
-        urls: [{ address: 'https://www.test.com' }, ...contactCard.urls],
-        socials: [...contactCard.socials],
-      },
-    );
-
-    expect(writeFileMock).toHaveBeenCalledWith(
-      `CacheDir/userNameTest-John-Doe.vcf`,
-      vCard.toString(),
-      'utf8',
-    );
-
-    await expect(writeFileMock).resolves;
-
     expect(openMock).toHaveBeenCalledWith({
-      url: `file://${'CacheDir/userNameTest-John-Doe.vcf'}`,
       title: 'John Doe',
-      type: 'text/vcard',
+      subject: 'John Doe',
       failOnCancel: false,
-      activityItemSources: [
-        {
-          item: {
-            copyToPasteBoard: {
-              content: 'contactCardUrl',
-              type: 'url',
-            },
-          },
-          placeholderItem: {
-            content: 'John Doe',
-            type: 'text',
-          },
-          subject: {
-            default: 'John Doe',
-          },
-        },
-      ],
+      message: 'contactCardUrl',
     });
   });
 });

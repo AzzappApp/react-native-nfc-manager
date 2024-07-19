@@ -1,6 +1,6 @@
 import { useCallback, useMemo, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { View } from 'react-native';
+import { ActivityIndicator, Alert, View } from 'react-native';
 import Toast from 'react-native-toast-message';
 import {
   graphql,
@@ -8,9 +8,17 @@ import {
   useMutation,
   usePreloadedQuery,
 } from 'react-relay';
-import { colors } from '#theme';
+import ERRORS from '@azzapp/shared/errors';
+import { isOwner } from '@azzapp/shared/profileHelpers';
+import { isWebCardKindSubscription } from '@azzapp/shared/subscriptionHelpers';
+import { colors, textStyles } from '#theme';
+import { useRouter } from '#components/NativeRouter';
+import PremiumIndicator from '#components/PremiumIndicator';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
+import { keyExtractor } from '#helpers/idHelpers';
 import relayScreen from '#helpers/relayScreen';
+import useAuthState from '#hooks/useAuthState';
+import useQuitWebCard from '#hooks/useQuitWebCard';
 import useToggle from '#hooks/useToggle';
 import Container from '#ui/Container';
 import Icon from '#ui/Icon';
@@ -18,6 +26,7 @@ import PressableNative from '#ui/PressableNative';
 import SafeAreaView from '#ui/SafeAreaView';
 import SearchBarStatic from '#ui/SearchBarStatic';
 import Select from '#ui/Select';
+import SelectSection from '#ui/SelectSection';
 import Switch from '#ui/Switch';
 import Text from '#ui/Text';
 import WebCardParametersHeader from './WebCardParametersHeader';
@@ -33,11 +42,15 @@ import type {
 import type { WebCardParametersScreenUnPublishMutation } from '#relayArtifacts/WebCardParametersScreenUnPublishMutation.graphql';
 import type { WebCardParametersRoute } from '#routes';
 import type { ArrayItemType } from '@azzapp/shared/arrayHelpers';
+import type { GraphQLError } from 'graphql';
 
 const webCardParametersScreenQuery = graphql`
   query WebCardParametersScreenQuery($webCardId: ID!) {
     webCard: node(id: $webCardId) {
       ...WebCardParametersScreen_webCard
+      ... on WebCard {
+        isPremium
+      }
     }
     webCardCategories {
       id
@@ -46,6 +59,10 @@ const webCardParametersScreenQuery = graphql`
       companyActivities {
         id
         label
+        companyActivityType {
+          id
+          label
+        }
       }
     }
     webCardParameters {
@@ -62,6 +79,13 @@ const WebCardParametersScreen = ({
     webCardCategories,
     webCardParameters: { userNameChangeFrequencyDay },
   } = usePreloadedQuery(webCardParametersScreenQuery, preloadedQuery);
+  const router = useRouter();
+
+  const { profileInfos } = useAuthState();
+  const isWebCardOwner = useMemo(
+    () => isOwner(profileInfos?.profileRole),
+    [profileInfos?.profileRole],
+  );
 
   const webCard = useFragment(
     graphql`
@@ -79,9 +103,9 @@ const WebCardParametersScreen = ({
         companyActivity {
           id
         }
-        cardCover {
-          segmented
-        }
+        hasCover
+        requiresSubscription
+        isPremium
         ...AccountHeader_webCard
       }
     `,
@@ -94,6 +118,11 @@ const WebCardParametersScreen = ({
 
   const [searchActivities, setSearchActivities] = useState('');
 
+  const otherActivityType = intl.formatMessage({
+    defaultMessage: 'Other',
+    description: 'Default activity type label',
+  });
+
   const activities = useMemo(
     () =>
       webCardCategories
@@ -104,8 +133,49 @@ const WebCardParametersScreen = ({
             activity.label
               ?.toLowerCase()
               .includes(searchActivities.toLowerCase().trim()),
-        ),
-    [searchActivities, webCard?.webCardCategory?.id, webCardCategories],
+        )
+        .reduce<
+          Array<{ title: string; data: [{ id: string; title: string }] }>
+        >((acc, activity) => {
+          const type = acc.find(
+            a =>
+              a.title ===
+              (activity.companyActivityType?.label ?? otherActivityType),
+          );
+
+          if (type) {
+            type.data.push({
+              id: activity.id,
+              title: activity.label ?? '',
+            });
+
+            type.data = type.data.sort((a, b) => {
+              return a.title.localeCompare(b.title);
+            });
+          } else {
+            acc.push({
+              title: activity.companyActivityType?.label ?? otherActivityType,
+              data: [
+                {
+                  id: activity.id,
+                  title: activity.label ?? '',
+                },
+              ],
+            });
+
+            acc = acc.sort((a, b) => {
+              return a.title.localeCompare(b.title);
+            });
+          }
+
+          return acc;
+        }, []),
+    [
+      otherActivityType,
+      searchActivities,
+      webCard?.webCardCategory?.id,
+      webCardCategories,
+    ],
   );
 
   const [commitToggleWebCardPublished] =
@@ -129,6 +199,11 @@ const WebCardParametersScreen = ({
       if (!webCard) {
         return;
       }
+
+      if (published && webCard.requiresSubscription && !webCard.isPremium) {
+        router.push({ route: 'USER_PAY_WALL' });
+        return;
+      }
       commitToggleWebCardPublished({
         variables: {
           webCardId: webCard.id,
@@ -150,16 +225,21 @@ const WebCardParametersScreen = ({
 
           Toast.show({
             type: 'error',
-            text1: intl.formatMessage({
-              defaultMessage:
-                'The webCard could not be updated. Please try again.',
-              description: 'Error toast message when saving webCard failed',
-            }),
+            text1: intl.formatMessage(
+              {
+                defaultMessage:
+                  'Oops, the WebCard{azzappA} could not be updated.',
+                description: 'Error toast message when saving webCard failed',
+              },
+              {
+                azzappA: <Text variant="azzapp">a</Text>,
+              },
+            ) as string,
           });
         },
       });
     },
-    [commitToggleWebCardPublished, intl, webCard],
+    [commitToggleWebCardPublished, intl, router, webCard],
   );
 
   const [commitUpdateWebCard] = useMutation<WebCardParametersScreenMutation>(
@@ -179,10 +259,43 @@ const WebCardParametersScreen = ({
             companyActivity {
               id
             }
+            requiresSubscription
           }
         }
       }
     `,
+  );
+
+  const [quitWebCard, isLoadingQuitWebCard] = useQuitWebCard(
+    webCard?.id ?? '',
+    router.back,
+    e => {
+      if (e.message === ERRORS.SUBSCRIPTION_IS_ACTIVE) {
+        Toast.show({
+          type: 'error',
+          text1: intl.formatMessage({
+            defaultMessage:
+              "You have an active subscription on this WebCard. You can't delete it.",
+            description:
+              'Error toast message when quitting WebCard with an active subscription',
+          }),
+        });
+      } else {
+        Toast.show({
+          type: 'error',
+          text1: intl.formatMessage(
+            {
+              defaultMessage:
+                'Oops, quitting this WebCard{azzappA} was not possible. Please try again later.',
+              description: 'Error toast message when quitting WebCard',
+            },
+            {
+              azzappA: <Text variant="azzapp">a</Text>,
+            },
+          ) as string,
+        });
+      }
+    },
   );
 
   const updateWebCardCategory = useCallback(
@@ -195,29 +308,45 @@ const WebCardParametersScreen = ({
           webCardId: webCard.id,
           input: {
             webCardCategoryId: webCardCategory.id,
-            webCardKind: webCardCategory.webCardKind,
-            companyActivityId: undefined,
+            companyActivityId: null,
           },
         },
         onError: error => {
           console.log(error);
 
-          Toast.show({
-            type: 'error',
-            text1: intl.formatMessage({
-              defaultMessage:
-                'The webCard could not be updated. Please try again.',
-              description: 'Error toast message when saving webCard failed',
-            }),
-          });
+          const response = (
+            'response' in error ? error.response : undefined
+          ) as { errors: GraphQLError[] } | undefined;
+          if (
+            response?.errors.some(
+              r => r.message === ERRORS.SUBSCRIPTION_REQUIRED,
+            )
+          ) {
+            router.push({ route: 'USER_PAY_WALL' });
+            return;
+          } else {
+            Toast.show({
+              type: 'error',
+              text1: intl.formatMessage(
+                {
+                  defaultMessage:
+                    'Oops, the WebCard{azzappA} could not be updated.',
+                  description: 'Error toast message when saving webCard failed',
+                },
+                {
+                  azzappA: <Text variant="azzapp">a</Text>,
+                },
+              ) as string,
+            });
+          }
         },
       });
     },
-    [commitUpdateWebCard, intl, webCard],
+    [commitUpdateWebCard, intl, router, webCard],
   );
 
   const updateProfileActivity = useCallback(
-    (activity: CompanyActivity) => {
+    (activity: { id: string }) => {
       if (!webCard) {
         return;
       }
@@ -231,11 +360,16 @@ const WebCardParametersScreen = ({
         onError: () => {
           Toast.show({
             type: 'error',
-            text1: intl.formatMessage({
-              defaultMessage:
-                'The webCard could not be updated. Please try again.',
-              description: 'Error toast message when saving webCard failed',
-            }),
+            text1: intl.formatMessage(
+              {
+                defaultMessage:
+                  'Oops, the WebCard{azzappA} could not be updated.',
+                description: 'Error toast message when saving webCard failed',
+              },
+              {
+                azzappA: <Text variant="azzapp">a</Text>,
+              },
+            ) as string,
           });
         },
       });
@@ -301,6 +435,54 @@ const WebCardParametersScreen = ({
     webCard?.nextChangeUsernameAllowedAt,
   ]);
 
+  const handleConfirmationQuitWebCard = useCallback(() => {
+    const titleMsg = isWebCardOwner
+      ? intl.formatMessage({
+          defaultMessage: 'Delete this WebCard',
+          description: 'Delete WebCard title',
+        })
+      : intl.formatMessage({
+          defaultMessage: 'Quit this WebCard',
+          description: 'Quit WebCard title',
+        });
+
+    const descriptionMsg = isWebCardOwner
+      ? intl.formatMessage({
+          defaultMessage:
+            'Are you sure you want to delete this WebCard and all its contents? This action is irreversible.',
+          description: 'Delete WebCard confirmation message',
+        })
+      : intl.formatMessage({
+          defaultMessage:
+            'Are you sure you want to quit this WebCard? This action is irreversible.',
+          description: 'Quit WebCard confirmation message',
+        });
+
+    const labelConfirmation = isWebCardOwner
+      ? intl.formatMessage({
+          defaultMessage: 'Delete this WebCard',
+          description: 'Delete button label',
+        })
+      : intl.formatMessage({
+          defaultMessage: 'Quit this WebCard',
+          description: 'Quit button label',
+        });
+    Alert.alert(titleMsg, descriptionMsg, [
+      {
+        text: intl.formatMessage({
+          defaultMessage: 'Cancel',
+          description: 'Cancel button label',
+        }),
+        style: 'cancel',
+      },
+      {
+        text: labelConfirmation,
+        style: 'destructive',
+        onPress: quitWebCard,
+      },
+    ]);
+  }, [intl, isWebCardOwner, quitWebCard]);
+
   if (!webCard) {
     return null;
   }
@@ -315,17 +497,22 @@ const WebCardParametersScreen = ({
           <WebCardParametersHeader webCard={webCard ?? null} />
           <Icon icon="parameters" style={styles.warningIcon} />
           <View style={styles.modalLine}>
-            <Text variant="medium">
-              <FormattedMessage
-                defaultMessage="Publish"
-                description="PostItem Modal - Likes switch Label"
+            <View style={[styles.publishTitle, styles.proContainer]}>
+              <Text variant="medium">
+                <FormattedMessage
+                  defaultMessage="Publish"
+                  description="WebCard parameters Modal - Likes switch Label"
+                />
+              </Text>
+              <PremiumIndicator
+                isRequired={webCard.requiresSubscription && !webCard.isPremium}
               />
-            </Text>
+            </View>
             <Switch
               variant="large"
               value={webCard?.cardIsPublished}
               onValueChange={onChangeIsPublished}
-              disabled={!webCard?.cardCover}
+              disabled={!webCard?.hasCover}
             />
           </View>
           <View style={styles.section}>
@@ -404,6 +591,18 @@ const WebCardParametersScreen = ({
                 paddingRight: 0,
               }}
               itemContainerStyle={styles.selectItemContainerStyle}
+              renderItem={({ item }) => (
+                <View style={styles.selectItem}>
+                  <Text variant="button">{item.label}</Text>
+                  <PremiumIndicator
+                    size={24}
+                    isRequired={
+                      isWebCardKindSubscription(item.webCardKind) &&
+                      !webCard.isPremium
+                    }
+                  />
+                </View>
+              )}
             />
           </View>
           {webCard.webCardKind !== 'personal' && (
@@ -414,7 +613,7 @@ const WebCardParametersScreen = ({
                   description="Activity field in the webcard parameters screen"
                 />
               </Text>
-              <Select
+              <SelectSection
                 nativeID="activities"
                 ListHeaderComponent={
                   <View style={styles.searchContainer}>
@@ -431,13 +630,13 @@ const WebCardParametersScreen = ({
                 }
                 avoidKeyboard
                 accessibilityLabelledBy="activitiesLabel"
-                data={activities ?? []}
+                sections={activities ?? []}
                 selectedItemKey={webCard.companyActivity?.id}
-                keyExtractor={keyExtractor}
                 bottomSheetHeight={Math.max(
                   Math.min((webCardCategories?.length ?? 0) * 50 + 80, 400),
                   300,
                 )}
+                keyExtractor={keyExtractor}
                 onItemSelected={updateProfileActivity}
                 bottomSheetTitle={intl.formatMessage({
                   defaultMessage: 'Select an activity',
@@ -449,6 +648,13 @@ const WebCardParametersScreen = ({
                   borderWidth: 0,
                   paddingRight: 0,
                 }}
+                inputLabel={
+                  webCardCategories
+                    ?.find(a => a.id === webCard?.webCardCategory?.id)
+                    ?.companyActivities.find(
+                      a => a.id === webCard?.companyActivity?.id,
+                    )?.label ?? undefined
+                }
                 itemContainerStyle={styles.selectItemContainerStyle}
                 placeHolder={intl.formatMessage({
                   defaultMessage: 'Select an activity',
@@ -468,6 +674,43 @@ const WebCardParametersScreen = ({
               }}
             />
           </Text>
+          <PressableNative
+            onPress={handleConfirmationQuitWebCard}
+            style={styles.deleteOptionButton}
+            disabled={isLoadingQuitWebCard}
+          >
+            {isLoadingQuitWebCard ? (
+              <ActivityIndicator color={colors.red400} />
+            ) : (
+              <Text variant="error" style={textStyles.button}>
+                {isWebCardOwner ? (
+                  <FormattedMessage
+                    defaultMessage="Delete this WebCard{azzappA}"
+                    description="label for button to delete a webcard"
+                    values={{
+                      azzappA: (
+                        <Text variant="azzapp" style={styles.deleteButton}>
+                          a
+                        </Text>
+                      ),
+                    }}
+                  />
+                ) : (
+                  <FormattedMessage
+                    defaultMessage="Quit this WebCard{azzappA}"
+                    description="Quit WebCard title"
+                    values={{
+                      azzappA: (
+                        <Text variant="azzapp" style={styles.deleteButton}>
+                          a
+                        </Text>
+                      ),
+                    }}
+                  />
+                )}
+              </Text>
+            )}
+          </PressableNative>
         </View>
         {webCard && (
           <WebCardParametersNameForm
@@ -481,8 +724,6 @@ const WebCardParametersScreen = ({
   );
 };
 
-const keyExtractor = (item: CompanyActivity | WebCardCategory) => item.id;
-
 const styleSheet = createStyleSheet(appearance => ({
   warningIcon: { width: 50, height: 50, alignSelf: 'center' },
   content: { rowGap: 15, paddingHorizontal: 10 },
@@ -495,6 +736,11 @@ const styleSheet = createStyleSheet(appearance => ({
   sectionTitle: {
     textAlign: 'center',
     textTransform: 'uppercase',
+  },
+  publishTitle: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    columnGap: 10,
   },
   sectionField: {
     flexDirection: 'row',
@@ -513,7 +759,27 @@ const styleSheet = createStyleSheet(appearance => ({
     marginBottom: 18,
     paddingHorizontal: 30,
   },
-  searchContainer: { paddingBottom: 20, paddingHorizontal: 20 },
+  searchContainer: { paddingBottom: 20 },
+  deleteOptionButton: {
+    height: 32,
+    marginVertical: 10,
+    alignSelf: 'center',
+    justifyContent: 'center',
+    fontWeight: 600,
+  },
+  deleteButton: { color: colors.red400 },
+  proContainer: {
+    display: 'flex',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  selectItem: {
+    paddingVertical: 10,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
 }));
 
 export default relayScreen(WebCardParametersScreen, {
@@ -528,4 +794,3 @@ export default relayScreen(WebCardParametersScreen, {
 type WebCardCategory = ArrayItemType<
   WebCardParametersScreenQuery$data['webCardCategories']
 >;
-type CompanyActivity = ArrayItemType<WebCardCategory['companyActivities']>;

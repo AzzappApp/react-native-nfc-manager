@@ -1,4 +1,3 @@
-import { createId } from '@paralleldrive/cuid2';
 import {
   and,
   eq,
@@ -9,6 +8,9 @@ import {
   ne,
   asc,
   isNull,
+  desc,
+  inArray,
+  lt,
 } from 'drizzle-orm';
 import {
   text,
@@ -17,6 +19,7 @@ import {
   int,
   index,
 } from 'drizzle-orm/mysql-core';
+import { createId } from '#/helpers/createId';
 import db, { cols } from './db';
 import type { DbTransaction } from './db';
 
@@ -33,6 +36,7 @@ export const UserSubscriptionTable = mysqlTable(
       'web.lifetime',
     ]),
     totalSeats: int('totalSeats').default(0).notNull(),
+    freeSeats: int('freeSeats').default(0).notNull(),
     revenueCatId: text('revenueCatId'),
     issuer: mysqlEnum('issuer', ['apple', 'google', 'web']).notNull(), //web should be user over revenue cat
     startAt: cols.dateTime('startAt').notNull(),
@@ -56,6 +60,7 @@ export const UserSubscriptionTable = mysqlTable(
     status: mysqlEnum('status', ['active', 'canceled', 'waiting_payment'])
       .notNull()
       .default('active'),
+    lastPaymentError: cols.boolean('lastPaymentError').default(false),
     canceledAt: cols.dateTime('canceledAt'),
   },
   table => {
@@ -63,6 +68,10 @@ export const UserSubscriptionTable = mysqlTable(
       userIdWebCardIDIdx: index('userId_webCardId_idx').on(
         table.userId,
         table.webCardId,
+      ),
+      statusExpirationDate: index('status_expiration_date').on(
+        table.status,
+        table.endAt,
       ),
     };
   },
@@ -85,39 +94,50 @@ export const createSubscription = async (
 export const updateActiveUserSubscription = async (
   userId: string,
   subscription: Partial<UserSubscription>,
+  trx: DbTransaction = db,
 ) => {
-  await db
+  await trx
     .update(UserSubscriptionTable)
     .set(subscription)
     .where(
       and(
         eq(UserSubscriptionTable.userId, userId),
         isNull(UserSubscriptionTable.webCardId),
-        ne(UserSubscriptionTable.status, 'canceled'),
       ),
     );
 };
 
+export const updateSubscriptionFreeSeats = async (
+  subscriptionId: string,
+  freeSeats: number,
+) => {
+  await db
+    .update(UserSubscriptionTable)
+    .set({ freeSeats })
+    .where(eq(UserSubscriptionTable.id, subscriptionId));
+};
+
 /**
-/**
- * Retrieve active subscription for given userId
- *
- * @param userId - The user id
+ * Retrieve active subscription for given userIds
+ * @param userIds - The user ids
+ * @param excludeWebCards - Exclude subscriptions with webCardId
  * @returns The subscription
  */
 export const activeUserSubscription = async (
-  userId: string,
+  userIds: string[],
   trx: DbTransaction = db,
-): Promise<UserSubscription[] | undefined> => {
+): Promise<UserSubscription[]> => {
   const currentDate = new Date();
   return trx
     .select()
     .from(UserSubscriptionTable)
     .where(
       and(
-        eq(UserSubscriptionTable.userId, userId),
-        eq(UserSubscriptionTable.status, 'active'),
-        gte(UserSubscriptionTable.endAt, currentDate),
+        inArray(UserSubscriptionTable.userId, userIds),
+        or(
+          eq(UserSubscriptionTable.status, 'active'),
+          gte(UserSubscriptionTable.endAt, currentDate),
+        ),
       ),
     );
 };
@@ -138,14 +158,16 @@ export const getActiveUserSubscriptionForWebCard = async (
           eq(UserSubscriptionTable.webCardId, webCardId),
           isNull(UserSubscriptionTable.webCardId),
         ),
-        eq(UserSubscriptionTable.status, 'active'),
-        gte(UserSubscriptionTable.endAt, currentDate),
+        or(
+          eq(UserSubscriptionTable.status, 'active'),
+          gte(UserSubscriptionTable.endAt, currentDate),
+        ),
       ),
-    );
+    )
+    .orderBy(asc(UserSubscriptionTable.status));
 };
 
 export const getActiveWebCardSubscription = async (
-  userId: string,
   webCardId: string,
   trx: DbTransaction = db,
 ) => {
@@ -155,10 +177,11 @@ export const getActiveWebCardSubscription = async (
     .from(UserSubscriptionTable)
     .where(
       and(
-        eq(UserSubscriptionTable.userId, userId),
         eq(UserSubscriptionTable.webCardId, webCardId),
-        eq(UserSubscriptionTable.status, 'active'),
-        gte(UserSubscriptionTable.endAt, currentDate),
+        or(
+          eq(UserSubscriptionTable.status, 'active'),
+          gte(UserSubscriptionTable.endAt, currentDate),
+        ),
       ),
     )
     .then(res => res[0]);
@@ -194,6 +217,30 @@ export const getUserSubscriptionForWebCard = async (
     .then(res => res[0]);
 };
 
+export const getLastSubscription = async (
+  userId: string,
+  webCardId: string,
+  trx: DbTransaction = db,
+) => {
+  return trx
+    .select()
+    .from(UserSubscriptionTable)
+    .where(
+      and(
+        eq(UserSubscriptionTable.userId, userId),
+        or(
+          eq(UserSubscriptionTable.webCardId, webCardId),
+          and(
+            isNull(UserSubscriptionTable.webCardId),
+            ne(UserSubscriptionTable.issuer, 'web'),
+          ),
+        ),
+      ),
+    )
+    .orderBy(desc(UserSubscriptionTable.startAt))
+    .then(res => res[0]);
+};
+
 export const getSubscriptionsOfUser = async (
   userId: string,
   trx: DbTransaction = db,
@@ -202,4 +249,20 @@ export const getSubscriptionsOfUser = async (
     .select()
     .from(UserSubscriptionTable)
     .where(eq(UserSubscriptionTable.userId, userId));
+};
+
+export const cancelExpiredSubscription = async (trx: DbTransaction = db) => {
+  const currentDate = new Date();
+  return trx
+    .update(UserSubscriptionTable)
+    .set({
+      status: 'canceled',
+      canceledAt: currentDate,
+    })
+    .where(
+      and(
+        eq(UserSubscriptionTable.status, 'waiting_payment'),
+        lt(UserSubscriptionTable.endAt, currentDate),
+      ),
+    );
 };

@@ -89,13 +89,6 @@ CREATE TABLE `Media` (
 	`createdAt` date DEFAULT current_timestamp NOT NULL
 );
 --> statement-breakpoint
-CREATE TABLE `MediaSuggestion` (
-	`id` text(24) PRIMARY KEY NOT NULL,
-	`mediaId` text(26) NOT NULL,
-	`webCardCategoryId` text(24),
-	`companyActivityId` text(24)
-);
---> statement-breakpoint
 CREATE TABLE `PostComment` (
 	`id` text(24) PRIMARY KEY NOT NULL,
 	`webCardId` text(24) NOT NULL,
@@ -168,9 +161,8 @@ CREATE TABLE `RedirectWebCard` (
 	`expiresAt` date DEFAULT current_timestamp NOT NULL
 );
 --> statement-breakpoint
-CREATE TABLE `StaticMedia` (
+CREATE TABLE `ModuleBackground` (
 	`id` text(191) PRIMARY KEY NOT NULL,
-	`usage` text NOT NULL,
 	`resizeMode` text DEFAULT 'cover',
 	`order` integer NOT NULL,
 	`enabled` boolean DEFAULT true NOT NULL
@@ -252,8 +244,6 @@ CREATE TABLE `Report` (
 --> statement-breakpoint
 CREATE INDEX `CardModule_webCardId_idx` ON `CardModule` (`webCardId`);--> statement-breakpoint
 CREATE INDEX `Follow_followingId_key` ON `Follow` (`followingId`);--> statement-breakpoint
-CREATE INDEX `MediaSuggestion_webCardCategoryId_key` ON `MediaSuggestion` (`webCardCategoryId`);--> statement-breakpoint
-CREATE INDEX `MediaSuggestion_companyActivityId_key` ON `MediaSuggestion` (`companyActivityId`);--> statement-breakpoint
 CREATE INDEX `PostComment_postId_idx` ON `PostComment` (`postId`);--> statement-breakpoint
 CREATE INDEX `PostReaction_webCardId_key` ON `PostReaction` (`webCardId`);--> statement-breakpoint
 CREATE INDEX `Post_webCardId_idx` ON `Post` (`webCardId`);--> statement-breakpoint

@@ -1,0 +1,14 @@
+{
+  "name": "react-native-skottie-template-player",
+  "version": "0.1.0",
+  "main": "src/index",
+  "description": "Efficient lottie animations in react native using Skia's Skottie module",
+  "author": "François de Campredon <francois@azzapp.com> (https://github.com/AzzappApp)",
+  "license": "private",
+  "homepage": "https://github.com/AzzappApp",
+  "peerDependencies": {
+    "@shopify/react-native-skia": ">=1.0.0",
+    "react": "*",
+    "react-native": ">=0.71.0"
+  }
+}

@@ -21,7 +21,7 @@ type WebCard implements Node {
   """
   The kind of the webCard (business, personal)
   """
-  webCardKind: WebCardKind
+  webCardKind: WebCardKind!
   """
   The webCard category
   """
@@ -47,9 +47,29 @@ type WebCard implements Node {
   """
   cardColors: CardColors
   """
-  The webCard cover
+  The webCard cover id
   """
-  cardCover: CardCover
+  coverId: ID!
+  """
+  Wether the WebCard has a cover
+  """
+  hasCover: Boolean!
+  """
+  The webCard cover media
+  """
+  coverMedia: Media
+  """
+  The webCard cover texts
+  """
+  coverTexts: [String!]
+  """
+  The webCard cover background color
+  """
+  coverBackgroundColor: String
+  """
+  The webCard cover links
+  """
+  coverDynamicLinks: DynamicLinks
   """
   the webCard style
   """
@@ -264,6 +284,26 @@ type WebCard implements Node {
   The webCard logo
   """
   logo: Media
+  """
+  The webCard requires subscription
+  """
+  requiresSubscription(newWebCardKind: WebCardKind): Boolean!
+  """
+  The webCard is premium
+  """
+  isPremium: Boolean!
+  """
+  The webCard premium account is from the web
+  """
+  isWebSubscription: Boolean!
+  """
+  Fetches cover template type
+  """
+  coverTemplateTypes(
+    tagId: ID
+    first: Int
+    after: String
+  ): CoverTemplateTypeConnection!
 }
 
 type WebCardStyle {
@@ -340,6 +380,16 @@ type CompanyActivity implements Node {
   """
   id: ID!
   label: String
+
+  companyActivityType: CompanyActivityType
+}
+
+type CompanyActivityType implements Node {
+  """
+  The ID of an object
+  """
+  id: ID!
+  label: String
 }
 
 """
@@ -361,3 +411,22 @@ type CommonInformation {
   addresses: [ContactCardAddress!]
 }
 
+type DynamicLinks {
+  links: [Link!]!
+  color: String!
+  size: Int!
+  position: Coordinate!
+  rotation: Float!
+  shadow: Boolean!
+}
+
+type Link {
+  link: String!
+  position: Int!
+  socialId: String!
+}
+
+type Coordinate {
+  x: Float!
+  y: Float!
+}

@@ -53,3 +53,18 @@ export const setLifetimeSubscription = async (
   });
   revalidatePath(`/users/${userId}`);
 };
+
+export const toggleSubscriptionStatusAction = async (
+  userId: string,
+  subscriptionId: string,
+  status: 'active' | 'canceled',
+) => {
+  await db
+    .update(UserSubscriptionTable)
+    .set({
+      status,
+      canceledAt: status === 'canceled' ? new Date() : null,
+    })
+    .where(eq(UserSubscriptionTable.id, subscriptionId));
+  revalidatePath(`/users/${userId}`);
+};

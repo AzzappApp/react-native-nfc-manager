@@ -1,5 +1,5 @@
 import { Suspense, memo, useCallback, useRef, useState } from 'react';
-import { Dimensions, StatusBar, View } from 'react-native';
+import { useWindowDimensions, View, StyleSheet } from 'react-native';
 import Animated, { useAnimatedStyle } from 'react-native-reanimated';
 import Toast from 'react-native-toast-message';
 import { graphql, useFragment } from 'react-relay';
@@ -20,7 +20,7 @@ import LoadCardTemplateModal from './LoadCardTemplateModal';
 import ModuleSelectionListModal from './ModuleSelectionListModal';
 import PreviewModal from './PreviewModal';
 import WebCardBlockContainer from './WebCardBlockContainer';
-import WebCardColorPicker from './WebCardColorPicker';
+import WebCardColorsManager from './WebCardColorsManager';
 import WebCardScreenBody from './WebCardScreenBody';
 import WebCardScreenEditModeFooter, {
   WEBCARD_SCREEN_EDIT_MODE_FOOTER_HEIGHT,
@@ -75,8 +75,6 @@ type WebCardScreenContentProps = {
   onContentPositionChange?: (atTop: boolean) => void;
 };
 
-const { width: windowWidth, height: windowHeight } = Dimensions.get('screen');
-
 /**
  * This component render the content of the Web card.
  */
@@ -97,15 +95,14 @@ const WebCardScreenContent = ({
         id
         userName
         ...CoverRenderer_webCard
+        ...WebCardScreenHeader_webCard
         ...WebCardScreenBody_webCard
         ...WebCardColorPicker_webCard
         ...WebCardBackground_webCard
         ...WebCardBackgroundPreview_webCard
         ...PreviewModal_webCard
         ...LoadCardTemplateModal_webCard
-        cardCover {
-          backgroundColor
-        }
+        coverBackgroundColor
         cardColors {
           primary
           dark
@@ -295,7 +292,7 @@ const WebCardScreenContent = ({
   );
 
   const coverBackgroundColor =
-    swapColor(webCard.cardCover?.backgroundColor, webCard.cardColors) ??
+    swapColor(webCard.coverBackgroundColor, webCard.cardColors) ??
     webCard.cardColors?.light ??
     colors.white;
 
@@ -309,10 +306,13 @@ const WebCardScreenContent = ({
 
   const hasFocus = useScreenHasFocus();
 
+  const { width: windowWidth, height: windowHeight } = useWindowDimensions();
+
   return (
     <>
-      <View style={{ flex: 1 }}>
+      <View style={styles.flex}>
         <WebCardScreenHeader
+          webCard={webCard}
           editing={editing}
           nbSelectedModules={nbSelectedModules}
           selectionMode={selectionMode}
@@ -346,7 +346,7 @@ const WebCardScreenContent = ({
               webCard={webCard}
               width={windowWidth}
               animationEnabled={ready && hasFocus}
-              hideBorderRadius
+              large
             />
           </WebCardBlockContainer>
           <Suspense
@@ -354,10 +354,7 @@ const WebCardScreenContent = ({
               <View
                 style={{
                   height: 60,
-                  maxHeight:
-                    windowHeight -
-                    (StatusBar.currentHeight ?? 0) -
-                    windowWidth / COVER_RATIO,
+                  maxHeight: windowHeight - windowWidth / COVER_RATIO,
                   justifyContent: 'center',
                   alignItems: 'center',
                 }}
@@ -406,19 +403,7 @@ const WebCardScreenContent = ({
             onToggleVisibility={onToggleSelectedModulesVisibility}
           />
         </Suspense>
-        <Animated.View
-          style={[
-            {
-              position: 'absolute',
-              top: 0,
-              left: 0,
-              width: '100%',
-              height: '100%',
-              zIndex: -1,
-            },
-            backgroundStyle,
-          ]}
-        >
+        <Animated.View style={[styles.background, backgroundStyle]}>
           <Suspense
             fallback={
               <View
@@ -429,7 +414,7 @@ const WebCardScreenContent = ({
               />
             }
           >
-            <WebCardBackground webCard={webCard} style={{ flex: 1 }} />
+            <WebCardBackground webCard={webCard} style={styles.flex} />
           </Suspense>
         </Animated.View>
       </View>
@@ -457,7 +442,7 @@ const WebCardScreenContent = ({
               visible={loadTemplate}
               webCard={webCard}
             />
-            <WebCardColorPicker
+            <WebCardColorsManager
               webCard={webCard}
               visible={showWebcardColorPicker}
               onRequestClose={onClosWebcardColorPicker}
@@ -468,5 +453,19 @@ const WebCardScreenContent = ({
     </>
   );
 };
+
+const styles = StyleSheet.create({
+  flex: {
+    flex: 1,
+  },
+  background: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    width: '100%',
+    height: '100%',
+    zIndex: -1,
+  },
+});
 
 export default memo(WebCardScreenContent);

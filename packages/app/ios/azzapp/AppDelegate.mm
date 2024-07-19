@@ -55,7 +55,7 @@ static void ClearKeychainIfNecessary() {
 - (NSURL *)bundleURL
 {
 #if DEBUG
-  return [[RCTBundleURLProvider sharedSettings] jsBundleURLForBundleRoot:@"index"];
+  return [[RCTBundleURLProvider sharedSettings] jsBundleURLForBundleRoot:@".expo/.virtual-metro-entry"];
 #else
   return [[NSBundle mainBundle] URLForResource:@"main" withExtension:@"jsbundle"];
 #endif
@@ -78,16 +78,8 @@ static void ClearKeychainIfNecessary() {
                     restorationHandler:restorationHandler];
 }
 
-- (UIView *)createRootViewWithBridge:(RCTBridge *)bridge
-                          moduleName:(NSString *)moduleName
-                           initProps:(NSDictionary *)initProps {
-  UIView *rootView = [super createRootViewWithBridge:bridge
-                                          moduleName:moduleName
-                                           initProps:initProps];
-
-  [RNBootSplash initWithStoryboard:@"BootSplash" rootView:rootView];
-
-  return rootView;
+- (void)customizeRootView:(RCTRootView *)rootView {
+  [RNBootSplash initWithStoryboard:@"BootSplash" rootView:rootView]; // ⬅️ initialize the splash screen
 }
 
 @end

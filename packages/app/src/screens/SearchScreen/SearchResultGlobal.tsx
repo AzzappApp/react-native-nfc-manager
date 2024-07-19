@@ -196,7 +196,7 @@ export const SearchResultGlobalPlaceHolder = () => {
     </View>
   );
 };
-const { width } = Dimensions.get('screen');
+const { width } = Dimensions.get('window');
 
 const WIDTH_POST = (width - 16) / 2;
 const styles = StyleSheet.create({

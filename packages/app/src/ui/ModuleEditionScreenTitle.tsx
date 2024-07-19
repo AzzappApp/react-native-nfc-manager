@@ -1,8 +1,12 @@
 import { FormattedMessage } from 'react-intl';
 import { StyleSheet, View } from 'react-native';
-import { moduleCountRequiresSubscription } from '@azzapp/shared/subscriptionHelpers';
+import {
+  isModuleKindSubscription,
+  MODULE_COUNT_LIMIT_FOR_SUBSCRIPTION,
+  moduleCountRequiresSubscription,
+} from '@azzapp/shared/subscriptionHelpers';
 import { colors } from '#theme';
-import Icon from './Icon';
+import PremiumIndicator from '#components/PremiumIndicator';
 import Text from './Text';
 import type { ModuleKind } from '@azzapp/shared/cardModuleHelpers';
 
@@ -10,24 +14,43 @@ type ModuleEditionScreenTitleProps = {
   label: string;
   kind: ModuleKind;
   moduleCount: number;
+  isPremium?: boolean;
 };
 const ModuleEditionScreenTitle = (props: ModuleEditionScreenTitleProps) => {
-  const { label, moduleCount } = props;
+  const { label, moduleCount, kind, isPremium = false } = props;
+
+  const requiresSubscription = isModuleKindSubscription(kind);
 
   return (
     <View style={styles.container}>
       <Text variant="large">{label}</Text>
-      {moduleCountRequiresSubscription(moduleCount) && (
-        <View style={styles.pro}>
-          <Text variant="medium" style={styles.proText}>
-            <FormattedMessage
-              defaultMessage="3+ visible sections"
-              description="ModuleEditionScreenTitle - label for pro section"
-            />
-          </Text>
-          <Icon icon="plus" size={15} />
-        </View>
-      )}
+      {!isPremium ? (
+        moduleCountRequiresSubscription(moduleCount) ? (
+          <View style={styles.pro}>
+            <Text variant="medium" style={styles.proText}>
+              <FormattedMessage
+                defaultMessage="{count}+ sections"
+                values={{
+                  count: MODULE_COUNT_LIMIT_FOR_SUBSCRIPTION,
+                }}
+                description="ModuleEditionScreenTitle - label when module count requires subscription"
+              />
+            </Text>
+          </View>
+        ) : (
+          requiresSubscription && (
+            <View style={styles.pro}>
+              <Text variant="medium" style={styles.proText}>
+                <FormattedMessage
+                  defaultMessage="azzapp+ section"
+                  description="ModuleEditionScreenTitle - label for premium section"
+                />
+              </Text>
+              <PremiumIndicator isRequired />
+            </View>
+          )
+        )
+      ) : null}
     </View>
   );
 };
@@ -44,7 +67,6 @@ const styles = StyleSheet.create({
   },
   proText: {
     color: colors.grey400,
-    marginRight: 5,
   },
 });
 

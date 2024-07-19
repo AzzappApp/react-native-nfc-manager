@@ -1,6 +1,7 @@
 export const POST_VIDEO_MAX_SIZE = 1440;
 export const POST_IMAGE_MAX_SIZE = 2048;
 export const POST_VIDEO_BIT_RATE = 4000000;
+export const POST_VIDEO_FRAME_RATE = 30;
 
 /**
  * the list of possible post images pregenerated sizes
