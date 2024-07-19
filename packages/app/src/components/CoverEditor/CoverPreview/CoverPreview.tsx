@@ -1247,6 +1247,7 @@ const CoverPreview = ({
                     ]}
                     onChangeText={handleChangeText}
                     scrollEnabled={false}
+                    allowFontScaling={false}
                   />
                 )}
               </Pressable>
