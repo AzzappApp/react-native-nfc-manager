@@ -1,5 +1,6 @@
-## 0.5.19-canary.179
+## 0.5.19-canary.180
 
+* **fix:**  - **SocialLinksSection:** fix layout ([#4341](https://github.com/AzzappApp/azzapp/pull/4341))
 * **fix:**  - **CoverEditor:** disable font scaling on text input
 * **fix:**  - **images:** [#3633](https://github.com/AzzappApp/azzapp/pull/3633) limit number of generated assets ([#4332](https://github.com/AzzappApp/azzapp/pull/4332))
 * **fix:**  - missing text tag ([#4340](https://github.com/AzzappApp/azzapp/pull/4340))
