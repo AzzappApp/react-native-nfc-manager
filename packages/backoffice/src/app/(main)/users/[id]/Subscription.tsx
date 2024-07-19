@@ -1,7 +1,9 @@
 'use client';
 
 import {
+  Backdrop,
   Box,
+  CircularProgress,
   FormControl,
   FormControlLabel,
   InputLabel,
@@ -11,9 +13,10 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState, useTransition } from 'react';
 import { useDebounce } from 'use-debounce';
 import { updateFreeSeatsAction } from './actions';
+import { toggleSubscriptionStatusAction } from './subscriptionActions';
 import type { SubscriptionWithProfilesCount } from './page';
 
 export const Subscription = ({
@@ -23,6 +26,24 @@ export const Subscription = ({
 }) => {
   const [freeSeats, setFreeSeats] = useState(userSubscription.freeSeats || 0);
   const [debouncedSeats] = useDebounce(freeSeats, 300);
+  const [pending, startTransition] = useTransition();
+
+  const toggleSubscriptionStatus = (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    const status = event.target.checked;
+    startTransition(async () => {
+      try {
+        await toggleSubscriptionStatusAction(
+          userSubscription.userId,
+          userSubscription.id,
+          status ? 'active' : 'canceled',
+        );
+      } catch (e) {
+        console.error(e);
+      }
+    });
+  };
 
   const updateFreeSeats = useCallback(async () => {
     try {
@@ -81,9 +102,13 @@ export const Subscription = ({
             <Switch
               checked={userSubscription.status === 'active'}
               color="success"
+              onChange={toggleSubscriptionStatus}
             />
           }
-          label="Active"
+          label={`${userSubscription.status.replace('_', ' ')}`}
+          style={{
+            textTransform: 'capitalize',
+          }}
         />
       </Box>
       <Box display="flex" gap={2}>
@@ -109,18 +134,38 @@ export const Subscription = ({
           disabled={userSubscription.subscriptionPlan === 'web.monthly'}
           onChange={onUpdateFreeSeats}
         />
-        <TextField
-          sx={{ width: 250 }}
-          value={userSubscription.endAt.toDateString()}
-          label="End at"
-          inputProps={{
-            readOnly: true,
-            style: {
-              color: new Date() > userSubscription.endAt ? 'red' : 'black',
-            },
-          }}
-        />
+        {userSubscription.canceledAt ? (
+          <TextField
+            sx={{ width: 250 }}
+            value={userSubscription.canceledAt.toDateString()}
+            label="Canceled at"
+            inputProps={{
+              readOnly: true,
+              style: {
+                color: 'red',
+              },
+            }}
+          />
+        ) : (
+          <TextField
+            sx={{ width: 250 }}
+            value={userSubscription.endAt.toDateString()}
+            label="End at"
+            inputProps={{
+              readOnly: true,
+              style: {
+                color: new Date() > userSubscription.endAt ? 'red' : 'black',
+              },
+            }}
+          />
+        )}
       </Box>
+      <Backdrop
+        sx={{ color: '#fff', zIndex: theme => theme.zIndex.drawer + 1 }}
+        open={pending}
+      >
+        <CircularProgress color="inherit" />
+      </Backdrop>
     </Box>
   );
 };
