@@ -90,31 +90,34 @@ const WebCardTemplateSelectionScreen = ({
   const intl = useIntl();
 
   const [commit, inFlight] = useLoadCardTemplateMutation();
-  const onSubmit = (cardTemplate: CardTemplateItem) => {
-    const webCardId = profile?.webCard?.id;
-    if (!webCardId || !cardTemplate?.id) {
-      return;
-    }
-    commit({
-      variables: {
-        cardTemplateId: cardTemplate.id,
-        webCardId,
-      },
-      onCompleted: () => {
-        onDone();
-      },
-      onError: error => {
-        console.error(error);
-        Toast.show({
-          type: 'error',
-          text1: intl.formatMessage({
-            defaultMessage: 'Error, could not load the template',
-            description: 'NewProfile - Card edition step error toast',
-          }),
-        });
-      },
-    });
-  };
+  const onSubmit = useCallback(
+    (cardTemplate: CardTemplateItem) => {
+      const webCardId = profile?.webCard?.id;
+      if (!webCardId || !cardTemplate?.id) {
+        return;
+      }
+      commit({
+        variables: {
+          cardTemplateId: cardTemplate.id,
+          webCardId,
+        },
+        onCompleted: () => {
+          onDone();
+        },
+        onError: error => {
+          console.error(error);
+          Toast.show({
+            type: 'error',
+            text1: intl.formatMessage({
+              defaultMessage: 'Error, could not load the template',
+              description: 'NewProfile - Card edition step error toast',
+            }),
+          });
+        },
+      });
+    },
+    [commit, intl, onDone, profile?.webCard?.id],
+  );
 
   const insets = useScreenInsets();
 
@@ -154,8 +157,9 @@ const WebCardTemplateSelectionScreen = ({
           }
           rightElement={
             <ApplyHeaderButton
-              style={{ width: 70, marginRight: 10 }}
+              style={styles.applyButton}
               onPress={onApply}
+              disabled={inFlight}
             />
           }
           rightElementWidth={80}
@@ -216,4 +220,5 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
   },
+  applyButton: { width: 70, marginRight: 10 },
 });
