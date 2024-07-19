@@ -130,11 +130,11 @@ const CoverTemplateTagsPage = async ({ searchParams = {} }: Props) => {
 
   const templatesCounts = await Promise.all(
     coverTemplateTags.map(coverTemplateTag => {
-      return db
+      const query = db
         .select({ count: sql`count(*)`.mapWith(Number) })
         .from(CoverTemplateTable)
-        .where(eq(CoverTemplateTable.typeId, coverTemplateTag.id))
-        .then(res => res[0].count);
+        .where(sql.raw(`JSON_CONTAINS(tags, '"${coverTemplateTag.id}"')`));
+      return query.then(res => res[0].count);
     }),
   );
 
