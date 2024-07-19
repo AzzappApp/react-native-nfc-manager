@@ -59,6 +59,10 @@ const getActivitiesQuery = (search: string | null) => {
     })
     .from(CompanyActivityTable)
     .leftJoin(
+      CardTemplateTypeTable,
+      eq(CardTemplateTypeTable.id, CompanyActivityTable.cardTemplateTypeId),
+    )
+    .leftJoin(
       LocalizationMessageTable,
       eq(CompanyActivityTable.id, LocalizationMessageTable.key),
     )
