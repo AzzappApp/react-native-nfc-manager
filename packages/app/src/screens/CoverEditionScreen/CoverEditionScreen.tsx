@@ -32,6 +32,7 @@ const CoverEditionScreen = ({
   const requiresSubscription = profile?.webCard?.requiresSubscription;
 
   const [canSave, setCanSave] = useState(false);
+  const [coverModified, setCoverModified] = useState(false);
   const [saving, setSaving] = useState(false);
   const coverEditorRef = useRef<CoverEditorHandle | null>(null);
   const inset = useScreenInsets();
@@ -73,6 +74,10 @@ const CoverEditionScreen = ({
 
   const onCanSaveChange = useCallback((value: boolean) => {
     setCanSave(value);
+  }, []);
+
+  const onCoverModified = useCallback(() => {
+    setCoverModified(true);
   }, []);
 
   const intl = useIntl();
@@ -151,7 +156,7 @@ const CoverEditionScreen = ({
         leftElement={<CancelHeaderButton onPress={onCancel} />}
         rightElement={
           <SaveHeaderButton
-            disabled={!canSave}
+            disabled={!canSave || !coverModified}
             onPress={onSave}
             style={styles.saveButton}
           />
@@ -176,6 +181,7 @@ const CoverEditionScreen = ({
             coverInitialSate={savedCoverState}
             coverTemplate={null}
             onCanSaveChange={onCanSaveChange}
+            onCoverModified={onCoverModified}
             backgroundColor={profile.webCard.coverBackgroundColor}
             style={styles.container}
           />

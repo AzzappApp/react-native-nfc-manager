@@ -24,6 +24,17 @@ export function coverEditorReducer(
 ): CoverEditorState {
   const { type, payload } = action;
 
+  if (
+    !action.type.startsWith?.('LOADING') &&
+    action.type !== 'SET_EDITION_MODE' &&
+    !state.isModified
+  ) {
+    state = {
+      ...state,
+      isModified: true,
+    };
+  }
+
   switch (type) {
     // #region Generic Layer Actions
     case 'SET_EDITION_MODE':

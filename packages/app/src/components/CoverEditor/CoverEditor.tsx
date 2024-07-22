@@ -64,6 +64,7 @@ export type CoverEditorProps = Omit<ViewProps, 'children'> & {
   backgroundColor: string | null;
   coverInitialSate?: Partial<CoverEditorState> | null;
   onCanSaveChange?: (canSave: boolean) => void;
+  onCoverModified?: () => void;
 };
 
 export type CoverEditorHandle = {
@@ -116,6 +117,7 @@ const CoverEditorCore = (
     coverTemplate: coverTemplateKey,
     backgroundColor,
     onCanSaveChange,
+    onCoverModified,
     coverInitialSate,
     style,
     placeholder,
@@ -271,6 +273,7 @@ const CoverEditorCore = (
     }
 
     return {
+      isModified: false,
       lottie,
       cardColors: {
         ...DEFAULT_COLOR_PALETTE,
@@ -302,6 +305,12 @@ const CoverEditorCore = (
       ...coverInitialSate,
     };
   });
+
+  useEffect(() => {
+    if (coverEditorState.isModified) {
+      onCoverModified?.();
+    }
+  }, [coverEditorState.isModified, onCoverModified]);
 
   const contextValue = useMemo(() => {
     return {

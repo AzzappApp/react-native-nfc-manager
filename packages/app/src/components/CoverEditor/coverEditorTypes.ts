@@ -10,6 +10,7 @@ import type { SkPoint, SkRect, SkShader } from '@shopify/react-native-skia';
 
 export type CoverEditorState = {
   // Cover data
+  isModified: boolean;
   coverId?: string;
   lottie: JSON | null;
   backgroundColor: string | null;
