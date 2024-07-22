@@ -1,5 +1,7 @@
-## 0.5.21-canary.11
+## 0.5.21-canary.12
 
+* **fix:**  - useDerivedValue instead memo for animation js thread issue ([#4377](https://github.com/AzzappApp/azzapp/pull/4377))
+* **fix:**  - 🐛 ensure selection frame size ([#4387](https://github.com/AzzappApp/azzapp/pull/4387))
 * **fix:**  - 🐛 also hide preview comment when disabled ([#4380](https://github.com/AzzappApp/azzapp/pull/4380))
 * **feat:**  - use free beta logo on home screen ([#4382](https://github.com/AzzappApp/azzapp/pull/4382))
 * **feat:**  - add replica configuration ([#4379](https://github.com/AzzappApp/azzapp/pull/4379))
