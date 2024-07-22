@@ -1,5 +1,7 @@
-## 0.5.21-canary.10
+## 0.5.21-canary.11
 
+* **fix:**  - 🐛 also hide preview comment when disabled ([#4380](https://github.com/AzzappApp/azzapp/pull/4380))
+* **feat:**  - use free beta logo on home screen ([#4382](https://github.com/AzzappApp/azzapp/pull/4382))
 * **feat:**  - add replica configuration ([#4379](https://github.com/AzzappApp/azzapp/pull/4379))
 * **fix:**  - fix typo ([#4378](https://github.com/AzzappApp/azzapp/pull/4378))
 * **fix:**  - contact card counter mutation ([#4375](https://github.com/AzzappApp/azzapp/pull/4375))
