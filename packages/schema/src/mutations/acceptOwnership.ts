@@ -1,16 +1,14 @@
-import * as Sentry from '@sentry/nextjs';
 import { eq, and } from 'drizzle-orm';
 import { GraphQLError } from 'graphql';
 import { fromGlobalId } from 'graphql-relay';
 import { ProfileTable, db } from '@azzapp/data';
-import { guessLocale } from '@azzapp/i18n';
 import ERRORS from '@azzapp/shared/errors';
 import type { MutationResolvers } from '#/__generated__/types';
 
 const acceptOwnership: MutationResolvers['acceptOwnership'] = async (
   _,
   { profileId: gqlProfileId },
-  { auth, loaders, notifyUsers },
+  { auth, loaders },
 ) => {
   const { userId } = auth;
   const profileId = fromGlobalId(gqlProfileId).id;
@@ -45,31 +43,6 @@ const acceptOwnership: MutationResolvers['acceptOwnership'] = async (
       .set({ profileRole: 'owner', promotedAsOwner: false, invited: false })
       .where(eq(ProfileTable.id, profileId));
   });
-
-  const { email, phoneNumber } = user;
-  try {
-    if (phoneNumber) {
-      await notifyUsers(
-        'phone',
-        [phoneNumber],
-        webCard,
-        'transferOwnership',
-        guessLocale(user.locale),
-      );
-    } else if (email) {
-      await notifyUsers(
-        'email',
-        [email],
-        webCard,
-        'transferOwnership',
-        guessLocale(user.locale),
-      );
-    }
-  } catch (e) {
-    Sentry.captureException(e);
-    console.error(e);
-    throw new GraphQLError(ERRORS.INTERNAL_SERVER_ERROR);
-  }
 
   return {
     profile: {
