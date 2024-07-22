@@ -292,7 +292,7 @@ const ReportPage = async ({
                 color="primary"
                 startIcon={<Check />}
                 type="submit"
-                disabled={deleted || status === 'Closed'}
+                disabled={status === 'Closed'}
               >
                 IGNORE
               </Button>
