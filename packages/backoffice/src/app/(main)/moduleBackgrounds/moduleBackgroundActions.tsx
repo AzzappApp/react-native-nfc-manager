@@ -2,7 +2,13 @@
 import { createId } from '@paralleldrive/cuid2';
 import { eq, sql } from 'drizzle-orm';
 import { revalidatePath } from 'next/cache';
-import { ModuleBackgroundTable, db } from '@azzapp/data';
+import {
+  ModuleBackgroundTable,
+  checkMedias,
+  createMedia,
+  db,
+  referencesMedias,
+} from '@azzapp/data';
 import { createPresignedUpload } from '@azzapp/shared/cloudinaryHelpers';
 import { ADMIN } from '#roles';
 import getCurrentUser from '#helpers/getCurrentUser';
@@ -14,6 +20,13 @@ export const getModuleBackgroundSignedUpload = async () => {
   }
   const userId = (await getCurrentUser())?.id;
   const mediaId = createId();
+
+  await createMedia({
+    id: mediaId,
+    kind: 'image',
+    height: 0,
+    width: 0,
+  });
 
   return createPresignedUpload(
     mediaId,
@@ -35,7 +48,11 @@ export const addModuleBackgrounds = async ({
     throw new Error('Unauthorized');
   }
 
+  await checkMedias(medias);
+
   return db.transaction(async trx => {
+    await referencesMedias(medias, null, trx);
+
     const maxOrder = await trx
       .select({
         order: sql`MAX(${ModuleBackgroundTable.order})`.mapWith(Number),

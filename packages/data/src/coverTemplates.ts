@@ -2,6 +2,7 @@ import { and, eq, inArray, isNull, sql } from 'drizzle-orm';
 import { CoverTemplatePreviewTable } from '#coverTemplatePreview';
 import db, { cols } from './db';
 import { createId } from './helpers/createId';
+import type { DbTransaction } from './db';
 import type { InferInsertModel, InferSelectModel } from 'drizzle-orm';
 
 export type CoverTextType = 'custom' | 'firstName' | 'mainName';
@@ -130,20 +131,21 @@ export const getCoverTemplatesByTypesAndTag = async (
  * @param data - The user fields, excluding the id
  * @returns The newly created user
  */
-export const createCoverTemplate = async (data: NewCoverTemplate) => {
+export const createCoverTemplate = async (
+  data: NewCoverTemplate,
+  tx: DbTransaction = db,
+) => {
   const id = data.id ?? createId();
-  await db
-    .client()
-    .insert(CoverTemplateTable)
-    .values({ ...data, id });
+  await tx.insert(CoverTemplateTable).values({ ...data, id });
   return id;
 };
 
 export const updateCoverTemplate = async (
   coverTemplateId: string,
   data: Partial<CoverTemplate>,
+  tx: DbTransaction = db,
 ): Promise<void> => {
-  await db
+  await tx
     .update(CoverTemplateTable)
     .set(data)
     .where(eq(CoverTemplateTable.id, coverTemplateId));

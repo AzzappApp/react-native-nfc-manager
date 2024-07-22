@@ -1,5 +1,6 @@
 'use server';
 
+import { createMedia } from '@azzapp/data';
 import { createId } from '@azzapp/data/helpers/createId';
 import { createPresignedUpload } from '@azzapp/shared/cloudinaryHelpers';
 import { encodeMediaId } from '@azzapp/shared/imagesHelpers';
@@ -13,6 +14,15 @@ export const presignMedia = async (kind: 'image' | 'raw' | 'video') => {
   }
   const userId = (await getCurrentUser())?.id;
   const mediaId = encodeMediaId(createId(), kind);
+
+  if (kind !== 'raw') {
+    await createMedia({
+      id: mediaId,
+      kind,
+      height: 0,
+      width: 0,
+    });
+  }
 
   const result = await createPresignedUpload(
     mediaId,
