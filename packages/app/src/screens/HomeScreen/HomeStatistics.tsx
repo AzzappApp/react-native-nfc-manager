@@ -219,8 +219,8 @@ const HomeStatistics = ({
             title={
               intl.formatMessage(
                 {
-                  defaultMessage: 'Contact card{azzappA} scans',
-                  description: 'Home statistics - Contact card scans label',
+                  defaultMessage: 'Contact card{azzappA} views',
+                  description: 'Home statistics - Contact card views label',
                 },
                 {
                   azzappA: <Text variant="azzapp">a</Text>,
