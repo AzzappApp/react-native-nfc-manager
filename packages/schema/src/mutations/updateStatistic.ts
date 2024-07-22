@@ -6,7 +6,9 @@ import {
   updateContactCardTotalScans,
 } from '@azzapp/data';
 import ERRORS from '@azzapp/shared/errors';
-import fromGlobalIdWithType from '#helpers/relayIdHelpers';
+import fromGlobalIdWithType, {
+  maybeFromGlobalIdWithType,
+} from '#helpers/relayIdHelpers';
 import type { MutationResolvers } from '#/__generated__/types';
 
 const updateWebCardViews: MutationResolvers['updateWebCardViews'] = async (
@@ -47,10 +49,9 @@ const updateContactCardScans: MutationResolvers['updateContactCardScans'] =
     },
     { loaders },
   ) => {
-    const scannedProfileId = fromGlobalIdWithType(
-      gqlScannedProfileId,
-      'Profile',
-    );
+    const scannedProfileId =
+      maybeFromGlobalIdWithType(gqlScannedProfileId, 'Profile') ??
+      gqlScannedProfileId;
     const profileId = gqlProfileId
       ? fromGlobalIdWithType(gqlProfileId, 'Profile')
       : null;

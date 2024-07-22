@@ -120,7 +120,7 @@ const WebCardScreen = ({
         commit({
           variables: {
             input: {
-              profileId: contactData.profileId,
+              scannedProfileId: contactData?.profileId,
             },
           },
         });
