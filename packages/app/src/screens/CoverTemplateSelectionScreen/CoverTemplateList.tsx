@@ -147,10 +147,12 @@ const CoverTemplateList = ({
       <View style={{ flex: 1 }}>
         <FlashList
           ListHeaderComponent={
-            <CoverTemplateScratchStarters
-              onColorSelect={onSelectBackgroundColor}
-              cardColors={webCard?.cardColors}
-            />
+            tag ? undefined : (
+              <CoverTemplateScratchStarters
+                onColorSelect={onSelectBackgroundColor}
+                cardColors={webCard?.cardColors}
+              />
+            )
           }
           accessibilityRole="list"
           data={coverTemplateTypes}
