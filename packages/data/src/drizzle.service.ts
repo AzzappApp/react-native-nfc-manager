@@ -2,6 +2,7 @@
 /* eslint-disable @typescript-eslint/prefer-ts-expect-error */
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import { Client } from '@planetscale/database';
+import { withReplicas } from 'drizzle-orm/mysql-core';
 import {
   drizzle,
   type PlanetScaleDatabase,
@@ -80,31 +81,54 @@ export type DrizzleService = {
   transactionManager: TransactionManager;
 };
 
+const databaseFetch = async (
+  input: RequestInfo | URL,
+  init: RequestInit | undefined,
+) => {
+  if (process.env.ENABLE_DATABASE_MONITORING === 'true') {
+    monitorRequest(init);
+  }
+  let response: Response;
+  try {
+    response = await fetchFunction(input, init);
+  } catch (e) {
+    throw e as any;
+  } finally {
+    if (process.env.ENABLE_DATABASE_MONITORING === 'true') {
+      monitorRequestEnd();
+    }
+  }
+  return response;
+};
+
 export const createDrizzleService = () => {
   // create the connection
   const connection = new Client({
     host: process.env.DATABASE_HOST,
     username: process.env.DATABASE_USERNAME,
     password: process.env.DATABASE_PASSWORD,
-    async fetch(input: RequestInfo | URL, init: RequestInit | undefined) {
-      if (process.env.ENABLE_DATABASE_MONITORING === 'true') {
-        monitorRequest(init);
-      }
-      let response: Response;
-      try {
-        response = await fetchFunction(input, init);
-      } catch (e) {
-        throw e as any;
-      } finally {
-        if (process.env.ENABLE_DATABASE_MONITORING === 'true') {
-          monitorRequestEnd();
-        }
-      }
-      return response;
-    },
+    fetch: databaseFetch,
   });
 
-  const database = drizzle(connection);
+  let replica: Client | null = null;
+  const replicaHost = process.env.REPLICA_DATABASE_HOST;
+  const replicaUsername = process.env.REPLICA_DATABASE_USERNAME;
+  const replicaPassword = process.env.REPLICA_DATABASE_PASSWORD;
+  if (replicaHost && replicaUsername && replicaPassword) {
+    replica = new Client({
+      host: replicaHost,
+      username: replicaUsername,
+      password: replicaPassword,
+      fetch: databaseFetch,
+    });
+  }
+
+  const primaryConnection = drizzle(connection);
+  const replicaConnection = replica ? drizzle(replica) : undefined;
+
+  const database = replicaConnection
+    ? withReplicas(primaryConnection, [replicaConnection])
+    : primaryConnection;
 
   const transactionManager = createDrizzleTransactionManager(database);
 
