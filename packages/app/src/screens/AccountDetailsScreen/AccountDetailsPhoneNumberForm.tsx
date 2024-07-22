@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { isValidPhoneNumber, parsePhoneNumber } from 'libphonenumber-js';
-import { useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { View, StyleSheet } from 'react-native';
@@ -22,6 +22,25 @@ import TextInput from '#ui/TextInput';
 import useUpdateUser from './useUpdateUser';
 import type { CountryCode } from 'libphonenumber-js';
 import type { TextInput as NativeTextInput } from 'react-native';
+
+const parseNumber = (
+  phoneNumber: string | null,
+  country: string,
+): {
+  phoneNumber: string;
+  countryCode: string;
+} => {
+  const parsedPhoneNumber =
+    phoneNumber && isValidPhoneNumber(phoneNumber)
+      ? parsePhoneNumber(phoneNumber)
+      : null;
+  return {
+    phoneNumber: parsedPhoneNumber?.formatNational() ?? '',
+    countryCode:
+      parsedPhoneNumber?.country ??
+      (country in COUNTRY_FLAG ? country : COUNTRY_FLAG.AC),
+  };
+};
 
 const AccountDetailsPhoneNumberForm = ({
   currentUser,
@@ -59,11 +78,6 @@ const AccountDetailsPhoneNumberForm = ({
       }),
     );
 
-  const parsedPhoneNumber =
-    currentUser.phoneNumber && isValidPhoneNumber(currentUser.phoneNumber)
-      ? parsePhoneNumber(currentUser.phoneNumber)
-      : null;
-
   const country = getCountry();
 
   const {
@@ -72,21 +86,23 @@ const AccountDetailsPhoneNumberForm = ({
     setError,
     clearErrors,
     formState: { isSubmitting, errors },
+    reset,
   } = useForm<z.infer<typeof phoneNumberFormSchema>>({
     resolver: (data, context, options) => {
       clearErrors();
       return zodResolver(phoneNumberFormSchema)(data, context, options);
     },
-    defaultValues: {
-      phoneNumber: parsedPhoneNumber?.formatNational() ?? '',
-      countryCode:
-        parsedPhoneNumber?.country ??
-        (country in COUNTRY_FLAG ? country : COUNTRY_FLAG.AC),
-    },
+    defaultValues: parseNumber(currentUser.phoneNumber, country),
     mode: 'onChange',
   });
 
   const intl = useIntl();
+
+  useEffect(() => {
+    if (visible) {
+      reset({ ...parseNumber(currentUser.phoneNumber, country) });
+    }
+  }, [country, currentUser.phoneNumber, reset, visible]);
 
   const updatePhoneNumber = async (phoneNumber: string) => {
     try {
