@@ -59,48 +59,54 @@ export const saveCardTemplate = async (
     cardTemplateTypeId: cardTemplateType ? cardTemplateType.id : null,
   };
 
-  await checkMedias([validation.data.previewMediaId]);
+  try {
+    await checkMedias([validation.data.previewMediaId]);
 
-  await db.transaction(async trx => {
-    let previousMediaId: string | null = null;
+    await db.transaction(async trx => {
+      let previousMediaId: string | null = null;
 
-    if (id) {
-      const cardTemplate = await getCardTemplateById(id);
-      previousMediaId = cardTemplate.previewMediaId;
+      if (id) {
+        const cardTemplate = await getCardTemplateById(id);
+        previousMediaId = cardTemplate.previewMediaId;
 
-      await db.transaction(async trx => {
-        await updateCardTemplate(id, template, trx);
-        await saveLocalizationMessage(
-          {
-            key: id,
-            value: validation.data.label,
-            locale: DEFAULT_LOCALE,
-            target: ENTITY_TARGET,
-          },
-          trx,
-        );
-      });
-    } else {
-      await db.transaction(async trx => {
-        const id = await createCardTemplate(template, trx);
-        await saveLocalizationMessage(
-          {
-            key: id,
-            value: validation.data.label,
-            locale: DEFAULT_LOCALE,
-            target: ENTITY_TARGET,
-          },
-          trx,
-        );
-      });
-    }
-    await referencesMedias([template.previewMediaId], [previousMediaId], trx);
-  });
+        await db.transaction(async trx => {
+          await updateCardTemplate(id, template, trx);
+          await saveLocalizationMessage(
+            {
+              key: id,
+              value: validation.data.label,
+              locale: DEFAULT_LOCALE,
+              target: ENTITY_TARGET,
+            },
+            trx,
+          );
+        });
+      } else {
+        await db.transaction(async trx => {
+          const id = await createCardTemplate(template, trx);
+          await saveLocalizationMessage(
+            {
+              key: id,
+              value: validation.data.label,
+              locale: DEFAULT_LOCALE,
+              target: ENTITY_TARGET,
+            },
+            trx,
+          );
+        });
+      }
+      await referencesMedias([template.previewMediaId], [previousMediaId], trx);
+    });
 
-  revalidatePath(`/cardTemplates/[id]`);
+    revalidatePath(`/cardTemplates/[id]`);
 
-  return {
-    success: true,
-    formErrors: null,
-  } as const;
+    return {
+      success: true,
+      formErrors: null,
+    } as const;
+  } catch (e) {
+    console.log(e);
+
+    throw e;
+  }
 };
