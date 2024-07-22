@@ -5,9 +5,9 @@ import {
   Modal,
   Platform,
   SafeAreaView, //we want to use this one here on purpose
-  StyleSheet,
 } from 'react-native';
 import { colors } from '#theme';
+import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import Header from './Header';
 import HeaderButton from './HeaderButton';
 import Text from './Text';
@@ -70,7 +70,7 @@ const TextAreaModal = ({
   ...props
 }: TextAreaModalProps) => {
   const intl = useIntl();
-
+  const styles = useStyleSheet(styleSheet);
   const [text, setText] = useState(value);
 
   const onCancel = useCallback(() => {
@@ -171,9 +171,10 @@ const TextAreaModal = ({
 
 export default TextAreaModal;
 
-const styles = StyleSheet.create({
+const styleSheet = createStyleSheet(appearance => ({
   modal: {
     flex: 1,
+    backgroundColor: appearance === 'light' ? colors.white : colors.black,
   },
   header: {
     marginBottom: 10,
@@ -195,4 +196,4 @@ const styles = StyleSheet.create({
     lineHeight: 24,
     verticalAlign: 'top',
   },
-});
+}));

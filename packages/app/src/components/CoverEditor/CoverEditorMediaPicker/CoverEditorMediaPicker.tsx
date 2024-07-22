@@ -284,6 +284,7 @@ const CoverEditorMediaPicker = ({
           <ScrollView
             horizontal
             contentContainerStyle={styles.selectedMediasList}
+            style={{ overflow: 'visible' }}
           >
             {mediaOrSlot.map((media, index) => {
               const duration = durationsFixed
@@ -363,9 +364,10 @@ const stylesheet = createStyleSheet(appearance => ({
     justifyItems: 'center',
     gap: 15,
     paddingTop: 20,
-    marginBottom: 20,
+    paddingBottom: 20,
     paddingHorizontal: 20,
     backgroundColor: appearance === 'light' ? colors.white : colors.black,
+    overflow: 'visible',
   },
   labelMediaSelected: {
     color: colors.grey400,
