@@ -1,6 +1,6 @@
 {
   "name": "@azzapp/payment",
-  "version": "0.5.20-rc.6",
+  "version": "0.5.20-rc.7",
   "private": true,
   "exports": {
     ".": {
