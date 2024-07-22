@@ -5,7 +5,7 @@ export default {
   dialect: 'mysql',
   schema: './src/*',
   dbCredentials: {
-    url: process.env.DATABASE_URL ?? '',
+    url: `mysql://${process.env.DATABASE_USERNAME}:${process.env.DATABASE_PASSWORD}@${process.env.DATABASE_HOST}/azzapp?ssl={"rejectUnauthorized":true}`,
   },
   tablesFilter: ['!_*'],
   out: './drizzle',
