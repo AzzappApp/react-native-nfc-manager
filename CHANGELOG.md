@@ -1,5 +1,8 @@
-## 0.5.21-canary.7
+## 0.5.21-canary.8
 
+* **fix:**  - contact card counter mutation ([#4375](https://github.com/AzzappApp/azzapp/pull/4375))
+* **build:**  - remove expo update from iOS build
+* **build:**  - remove expo update from iOS build
 * **fix:**  - revenue stating identifier ([#4370](https://github.com/AzzappApp/azzapp/pull/4370))
 * **fix:**  - revenue stating identifier ([#4370](https://github.com/AzzappApp/azzapp/pull/4370))
 * **fix:**  - 🐛 clean preview style ([#4369](https://github.com/AzzappApp/azzapp/pull/4369))
