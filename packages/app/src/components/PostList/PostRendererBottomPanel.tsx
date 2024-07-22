@@ -438,7 +438,7 @@ const PostRendererBottomPanel = ({
           />
         )}
         <PressableNative onPress={goToComments}>
-          {post.previewComment && (
+          {post.allowComments && post.previewComment && (
             <Text variant="small" numberOfLines={2} ellipsizeMode="tail">
               <Text variant="smallbold">
                 {post.previewComment.webCard.userName}{' '}
