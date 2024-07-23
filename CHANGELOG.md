@@ -1,5 +1,6 @@
-## 0.5.21-canary.14
+## 0.5.21-canary.15
 
+* **fix:**  - emialsigntaure - be sure the phone action is formatted as uri properly ([#4406](https://github.com/AzzappApp/azzapp/pull/4406))
 * **fix:**  - **android:** [#4385](https://github.com/AzzappApp/azzapp/pull/4385) use expo-image to display images in the app ([#4388](https://github.com/AzzappApp/azzapp/pull/4388))
 * **fix:**  - useDerivedValue instead memo for animation js thread issue ([#4377](https://github.com/AzzappApp/azzapp/pull/4377))
 * **fix:**  - 🐛 ensure selection frame size ([#4387](https://github.com/AzzappApp/azzapp/pull/4387))
