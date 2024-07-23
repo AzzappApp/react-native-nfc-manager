@@ -1,3 +1,4 @@
+import { Image } from 'expo-image';
 import { useState, useCallback } from 'react';
 import { useIntl } from 'react-intl';
 import { Platform } from 'react-native';
@@ -29,6 +30,8 @@ import type {
   ViewStyle,
 } from 'react-native';
 import type { SharedValue } from 'react-native-reanimated';
+
+const AnimatedImage = Animated.createAnimatedComponent(Image);
 
 const PhotoWithTextAndTitleRendererFragment = graphql`
   fragment PhotoWithTextAndTitleRenderer_module on CardModulePhotoWithTextAndTitle
@@ -372,10 +375,10 @@ const PhotoWithTextAndTitleRenderer = ({
       <Animated.View style={containerStyle}>
         <Animated.View style={[imageContainerStyle, { overflow: 'hidden' }]}>
           {image && (
-            <Animated.Image
+            <AnimatedImage
               source={{ uri: image.uri }}
               style={imageStyle}
-              resizeMode="cover"
+              contentFit="cover"
             />
           )}
         </Animated.View>

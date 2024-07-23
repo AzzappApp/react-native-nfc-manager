@@ -1,4 +1,4 @@
-import { Image } from 'react-native';
+import { Image } from 'expo-image';
 import Animated, {
   useAnimatedStyle,
   type SharedValue,
@@ -173,7 +173,7 @@ const HorizontalPhotoRenderer = ({
           <Image
             source={{ uri: image.uri }}
             style={{ flex: 1 }}
-            resizeMode="cover"
+            contentFit="cover"
           />
         </Animated.View>
       )}
