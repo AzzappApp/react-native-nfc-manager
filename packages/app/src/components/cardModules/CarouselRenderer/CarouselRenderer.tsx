@@ -1,4 +1,5 @@
 // import { useRef } from 'react';
+import { Image } from 'expo-image';
 import { ScrollView } from 'react-native-gesture-handler';
 import Animated, {
   type SharedValue,
@@ -64,6 +65,8 @@ const animatedProps = [
 ] as const;
 
 type AnimatedProps = (typeof animatedProps)[number];
+
+const AnimatedImage = Animated.createAnimatedComponent(Image);
 
 export const readCarouselData = (module: CarouselRenderer_module$key) =>
   readInlineData(CarouselRendererFragment, module);
@@ -248,7 +251,7 @@ const CarouselRenderer = ({
       >
         <Animated.View style={containerStyle}>
           {images?.map(image => (
-            <Animated.Image
+            <AnimatedImage
               key={image.id}
               source={{ uri: image.uri }}
               style={[

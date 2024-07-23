@@ -1,5 +1,6 @@
+import { Image } from 'expo-image';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { StyleSheet, View, ScrollView, Image } from 'react-native';
+import { StyleSheet, View, ScrollView } from 'react-native';
 import {
   CAROUSEL_MAX_IMAGE_HEIGHT,
   CAROUSEL_MIN_IMAGE_HEIGHT,
