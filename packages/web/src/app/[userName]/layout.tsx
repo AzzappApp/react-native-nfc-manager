@@ -122,7 +122,9 @@ const RootLayout = async ({
         <script src="/smartbanner.min.js" async />
         <Script id="smartbanner">
           {`
-            smartbanner.publish();
+            if(smartbanner && smartbanner.publish) {
+              smartbanner.publish();
+            }
          `}
         </Script>
       </body>
