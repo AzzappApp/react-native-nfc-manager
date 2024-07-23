@@ -1,4 +1,4 @@
-## 0.5.21-canary.16
+## 0.5.21-canary.17
 
 * **fix:**  - emialsigntaure - be sure the phone action is formatted as uri properly ([#4410](https://github.com/AzzappApp/azzapp/pull/4410))
 * **fix:**  - emialsigntaure - be sure the phone action is formatted as uri properly ([#4406](https://github.com/AzzappApp/azzapp/pull/4406))
