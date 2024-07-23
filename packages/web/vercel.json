@@ -19,6 +19,7 @@
       "schedule": "*/1 * * * *"
     }
   ],
+  "regions": ["fra1", "iad1", "pdx1", "gru1", "sin1"],
   "rewrites": [
     {
       "source": "/",
