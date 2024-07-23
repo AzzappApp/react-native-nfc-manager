@@ -7,7 +7,10 @@ import { colors, getTextColor } from '@azzapp/shared/colorsHelpers';
 import { COVER_RATIO } from '@azzapp/shared/coverHelpers';
 import { parseEmailSignature } from '@azzapp/shared/emailSignatureHelpers';
 import { getImageURLForSize } from '@azzapp/shared/imagesHelpers';
-import { formatDisplayName } from '@azzapp/shared/stringHelpers';
+import {
+  formatDisplayName,
+  formatPhoneNumberUri,
+} from '@azzapp/shared/stringHelpers';
 import { buildUserUrl } from '@azzapp/shared/urlHelpers';
 import mailLogo from '@azzapp/web/public/signature/mail.png';
 import phoneLogo from '@azzapp/web/public/signature/phone.png';
@@ -483,12 +486,15 @@ export function buildCardSignature(
 
   if (phones) {
     for (let index = 0; index < phones.length; index++) {
-      card += `<div style="height:20px; width:100%; display:inline-block; vertical-align: middle;">
+      const formattedPoneNumber = formatPhoneNumberUri(phones[index]);
+      if (formattedPoneNumber) {
+        card += `<div style="height:20px; width:100%; display:inline-block; vertical-align: middle;">
                   <img src="${process.env.NEXT_PUBLIC_URL}${phoneLogo.src}"  style="width: 14px; height: 14px;vertical-align: middle"/>
-                   <a href="tel:${phones[index]}" rel=“noopener” noreferrer target=“_blank”  style="text-decoration: unset !important;color:black;font-size: 12px;font-weight:400px; color: black">
+                   <a href="${formattedPoneNumber}" rel=“noopener” noreferrer target=“_blank”  style="text-decoration: unset !important;color:black;font-size: 12px;font-weight:400px; color: black">
                     ${phones[index]}
                   </span>
               </div>`;
+      }
     }
   }
   if (mails) {
