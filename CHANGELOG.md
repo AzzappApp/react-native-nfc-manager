@@ -1,5 +1,7 @@
-## 0.5.21-canary.21
+## 0.5.21-canary.22
 
+* **feat:**  - 🎸 load background color ([#4436](https://github.com/AzzappApp/azzapp/pull/4436))
+* **feat:**  - prellad username based on data ([#4425](https://github.com/AzzappApp/azzapp/pull/4425))
 * **fix:**  - SubscriptionApi - await transaction and add sentry report ([#4431](https://github.com/AzzappApp/azzapp/pull/4431))
 * **feat:**  - 🎸 add background on cover template ([#4417](https://github.com/AzzappApp/azzapp/pull/4417))
 * **fix:**  - **android:** [#4411](https://github.com/AzzappApp/azzapp/pull/4411) avoid overlap on videos ([#4424](https://github.com/AzzappApp/azzapp/pull/4424))
