@@ -70,7 +70,6 @@ const MediaVideoRenderer = (
   }
 
   const videoRef = useRef<VideoRef>(null);
-  const containerRef = useRef<any>(null);
 
   useImperativeHandle(
     ref,
@@ -132,7 +131,7 @@ const MediaVideoRenderer = (
   );
 
   return (
-    <View style={containerStyle} ref={containerRef} {...props}>
+    <View style={containerStyle} {...props}>
       <View style={StyleSheet.absoluteFill}>
         <Video
           ref={videoRef}
@@ -141,11 +140,13 @@ const MediaVideoRenderer = (
           paused={paused}
           disableFocus={true}
           onProgress={onPlaybackStatusUpdate}
+          preventsDisplaySleepDuringVideoPlayback={false}
           onEnd={onEnd}
           accessibilityLabel={alt}
           repeat
           style={StyleSheet.absoluteFill}
           resizeMode="contain"
+          useTextureView
           onReadyForDisplay={onVideoReadyForDisplay}
           playInBackground={false}
           onError={onError}
