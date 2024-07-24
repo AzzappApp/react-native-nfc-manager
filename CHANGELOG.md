@@ -1,5 +1,6 @@
-## 0.5.21-canary.20
+## 0.5.21-canary.21
 
+* **fix:**  - SubscriptionApi - await transaction and add sentry report ([#4431](https://github.com/AzzappApp/azzapp/pull/4431))
 * **feat:**  - 🎸 add background on cover template ([#4417](https://github.com/AzzappApp/azzapp/pull/4417))
 * **fix:**  - **android:** [#4411](https://github.com/AzzappApp/azzapp/pull/4411) avoid overlap on videos ([#4424](https://github.com/AzzappApp/azzapp/pull/4424))
 * **fix:**  - emialsigntaure - be sure the phone action is formatted as uri properly ([#4410](https://github.com/AzzappApp/azzapp/pull/4410))
