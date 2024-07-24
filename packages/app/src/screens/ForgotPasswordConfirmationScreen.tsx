@@ -109,6 +109,7 @@ const ForgotPasswordConfirmationScreen = ({
               keyboardType="number-pad"
               textContentType="oneTimeCode"
               autoComplete="sms-otp"
+              autoFocus
               renderCell={({ index, symbol, isFocused }) => (
                 <View
                   style={[styles.cell, isFocused && styles.focusCell]}
