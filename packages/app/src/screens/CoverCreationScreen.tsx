@@ -78,10 +78,40 @@ const CoverCreationScreen = ({
   const [canSave, setCanSave] = useState(false);
   const coverEditorRef = useRef<CoverEditorHandle | null>(null);
   const router = useRouter();
-
+  const intl = useIntl();
   const onBack = useCallback(() => {
-    router.back();
-  }, [router]);
+    Alert.alert(
+      intl.formatMessage({
+        defaultMessage: 'Discard changes?',
+        description: 'Edit cover discard alert title',
+      }),
+      intl.formatMessage({
+        defaultMessage:
+          'Are you sure you want to go back to select another Cover template? All unsaved changes will be lost.',
+        description: 'Edit cover discard alert message',
+      }),
+      [
+        {
+          text: intl.formatMessage({
+            defaultMessage: 'Continue editing',
+            description:
+              'Edit cover discard alert Continue editing button label',
+          }),
+          onPress: () => void 0,
+          style: 'cancel',
+        },
+        {
+          text: intl.formatMessage({
+            defaultMessage: 'Discard edits',
+            description: 'Edit cover discard alert Discard edits button label',
+          }),
+          onPress: () => {
+            router.back();
+          },
+        },
+      ],
+    );
+  }, [intl, router]);
 
   const onSaveCover = useCallback(() => {
     coverEditorRef.current?.save().then(() => {
@@ -99,7 +129,6 @@ const CoverCreationScreen = ({
 
   const styles = useStyleSheet(stylesheet);
   const insets = useScreenInsets();
-  const intl = useIntl();
 
   const onConfirm = useCallback(() => {
     Alert.alert(
