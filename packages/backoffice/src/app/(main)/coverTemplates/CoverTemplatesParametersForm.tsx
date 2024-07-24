@@ -93,7 +93,7 @@ const CoverTemplatesParametersForm = ({
           size: '24',
         },
       },
-      backgroundColor: null,
+      backgroundColor: coverTemplate?.backgroundColor ?? null,
     },
     lastResult,
     onSubmit() {
