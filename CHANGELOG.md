@@ -1,5 +1,7 @@
-## 0.5.21-canary.19
+## 0.5.21-canary.20
 
+* **feat:**  - 🎸 add background on cover template ([#4417](https://github.com/AzzappApp/azzapp/pull/4417))
+* **fix:**  - **android:** [#4411](https://github.com/AzzappApp/azzapp/pull/4411) avoid overlap on videos ([#4424](https://github.com/AzzappApp/azzapp/pull/4424))
 * **fix:**  - emialsigntaure - be sure the phone action is formatted as uri properly ([#4410](https://github.com/AzzappApp/azzapp/pull/4410))
 * **fix:**  - emialsigntaure - be sure the phone action is formatted as uri properly ([#4406](https://github.com/AzzappApp/azzapp/pull/4406))
 * **fix:**  - **android:** [#4385](https://github.com/AzzappApp/azzapp/pull/4385) use expo-image to display images in the app ([#4388](https://github.com/AzzappApp/azzapp/pull/4388))
