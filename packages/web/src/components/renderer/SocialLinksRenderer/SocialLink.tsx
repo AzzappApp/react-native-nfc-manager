@@ -37,6 +37,8 @@ const SocialLink = (props: SocialLinkProps) => {
         }}
         aria-label={link.socialId}
         className={className}
+        target="_blank"
+        rel="noopener noreferrer"
       >
         <SocialIcon
           icon={id}
