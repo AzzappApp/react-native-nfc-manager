@@ -64,6 +64,7 @@ const SignInScreen = () => {
     try {
       setIsSubmitting(true);
 
+      Keyboard.dismiss();
       const signedIn = await signin({
         credential: intlPhoneNumber ?? credential.value,
         password,
@@ -197,6 +198,7 @@ const SignInScreen = () => {
             returnKeyType="next"
             onSubmitEditing={() => passwordRef.current?.focus()}
             blurOnSubmit={false}
+            readOnly={isSubmitting}
           />
           <View>
             <SecuredTextInput
@@ -214,6 +216,7 @@ const SignInScreen = () => {
               })}
               returnKeyType="done"
               onSubmitEditing={onSubmit}
+              readOnly={isSubmitting}
             />
             <View style={styles.forgotPasswordContainer}>
               <Link route="FORGOT_PASSWORD">

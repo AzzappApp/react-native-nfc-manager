@@ -86,6 +86,7 @@ const SignupScreen = () => {
     canSignup &&= tosValid;
 
     if (canSignup) {
+      Keyboard.dismiss();
       let tokens: Awaited<ReturnType<typeof signup>>;
       try {
         setIsSubmitting(true);
@@ -226,6 +227,7 @@ const SignupScreen = () => {
             hasError={!!phoneOrEmailError}
             onSubmitEditing={() => passwordRef.current?.focus()}
             blurOnSubmit={false}
+            readOnly={isSubmitting}
           />
           <Text style={styles.error} variant="error">
             {phoneOrEmailError}
@@ -248,6 +250,7 @@ const SignupScreen = () => {
             returnKeyType="send"
             onSubmitEditing={onSubmit}
             isErrored={showPasswordError}
+            readOnly={isSubmitting}
           />
           <Text style={styles.error} variant="error">
             {showPasswordError && (
