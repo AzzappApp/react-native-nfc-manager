@@ -77,6 +77,7 @@ export const coverTemplateSchema = z.object({
     overlayLayers: coverOverlaySchema.array(),
     linksLayer: socialLinksSchema,
   }),
+  backgroundColor: z.string().optional(),
 });
 
 export const coverTemplateSchemaWithoutfile = coverTemplateSchema

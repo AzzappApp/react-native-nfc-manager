@@ -69,6 +69,7 @@ export const CoverTemplateTable = cols.table('CoverTemplate', {
   colorPaletteId: cols.cuid('colorPaletteId').notNull(),
   enabled: cols.boolean('enabled').default(true).notNull(),
   params: cols.json('params').$type<CoverTemplateParams>(),
+  backgroundColor: cols.defaultVarchar('backgroundColor'),
 });
 
 export type CoverTemplate = InferSelectModel<typeof CoverTemplateTable>;

@@ -55,12 +55,13 @@ const CoverTemplateSelectionScreen = ({
   const webCardKind = profile?.webCard?.webCardKind;
 
   const onSelectTemplate = useCallback(
-    (templateId: string) => {
+    (templateId: string, color?: ColorPaletteColor) => {
       router.push({
         route: 'COVER_CREATION',
         params: {
           templateId,
           fromCoverEdition: !!fromCoverEdition,
+          color,
         },
       });
     },
@@ -146,7 +147,7 @@ const CoverTemplateSelectionScreenInner = ({
 }: {
   profileData: CoverTemplateList_profile$key | null;
   onSelectBackgroundColor: (color: ColorPaletteColor) => void;
-  onSelectTemplate: (templateId: string) => void;
+  onSelectTemplate: (templateId: string, color?: ColorPaletteColor) => void;
 }) => {
   if (!profileData) {
     return null;

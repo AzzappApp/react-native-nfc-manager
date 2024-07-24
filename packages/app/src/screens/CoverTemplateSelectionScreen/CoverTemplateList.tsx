@@ -18,7 +18,7 @@ import type { ViewToken } from 'react-native';
 
 export type CoverEditorProps = {
   profile: CoverTemplateList_profile$key;
-  onSelectTemplate: (templateId: string) => void;
+  onSelectTemplate: (templateId: string, color?: ColorPaletteColor) => void;
   onSelectBackgroundColor: (color: ColorPaletteColor) => void;
 };
 const CoverTemplateList = ({
@@ -57,7 +57,10 @@ const CoverTemplateList = ({
 
   const onConfirmTemplate = useCallback(() => {
     if (selectedTemplate) {
-      onSelectTemplate(selectedTemplate.id);
+      onSelectTemplate(
+        selectedTemplate.id,
+        (selectedTemplate.backgroundColor as ColorPaletteColor) ?? undefined,
+      );
       setSelectedTemplate(null);
     }
   }, [onSelectTemplate, selectedTemplate]);
