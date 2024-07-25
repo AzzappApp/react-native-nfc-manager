@@ -218,6 +218,7 @@ const CoverCreationScreen = ({
             coverTemplate={'coverTemplate' in data ? data.coverTemplate : null}
             backgroundColor={color ?? null}
             onCanSaveChange={onCanSaveChange}
+            onCancel={onBack}
           />
         )}
       </View>

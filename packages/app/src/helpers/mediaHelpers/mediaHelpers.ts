@@ -1,4 +1,5 @@
 import ImageSize from 'react-native-image-size';
+import type { Media } from './mediaTypes';
 
 /**
  * Returns the size of an image.
@@ -100,3 +101,5 @@ export const duplicateMediaToFillSlots = <T>(
 
   return filledMediaSlots;
 };
+
+export const getMediaId = (media: Media) => media.galleryUri ?? media.uri;

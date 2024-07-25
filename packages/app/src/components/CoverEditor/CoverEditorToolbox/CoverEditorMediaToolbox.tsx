@@ -78,6 +78,10 @@ const CoverEditorMediaToolbox = () => {
         );
       }
 
+      const {
+        media: { galleryUri, uri, thumbnail },
+      } = media;
+
       return (
         <PressableNative
           key={`${media.media.uri}-${index}`}
@@ -92,7 +96,7 @@ const CoverEditorMediaToolbox = () => {
           }}
         >
           <Image
-            source={{ uri: media?.media.galleryUri ?? media?.media.uri }}
+            source={{ uri: galleryUri ?? thumbnail ?? uri }}
             style={styles.previewContent}
           />
           <View style={styles.duration}>

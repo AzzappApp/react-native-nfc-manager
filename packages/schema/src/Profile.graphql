@@ -199,6 +199,18 @@ type Profile implements Node {
     first: Int @max(value: 100)
     after: String
   ): ColorPaletteConnection!
+
+  searchStockPhotos(
+    search: String
+    first: Int @max(value: 100)
+    after: String
+  ): StockImageConnection!
+
+  searchStockVideos(
+    search: String
+    first: Int @max(value: 100)
+    after: String
+  ): StockVideoConnection!
 }
 
 """
@@ -213,6 +225,84 @@ enum ProfileRole {
 
 enum ProfileSortType {
   ROLE
+}
+
+
+interface StockMedia {
+  id: String!
+  width: Float!
+  height: Float!
+  url: String!
+  thumbnail: String!
+  author: String
+}
+
+type StockImage implements StockMedia {
+  id: String!
+  width: Float!
+  height: Float!
+  url: String!
+  thumbnail: String!
+  author: String
+}
+
+type StockVideo implements StockMedia {
+  id: String!
+  width: Float!
+  height: Float!
+  url: String!
+  thumbnail: String!
+  author: String
+  duration: Float!
+}
+
+
+type StockImageConnection {
+  """
+  Information to aid in pagination.
+  """
+  pageInfo: PageInfo!
+
+  """
+  A list of edges.
+  """
+  edges: [StockImageEdge]
+}
+
+type StockImageEdge {
+  """
+  The item at the end of the edge
+  """
+  node: StockImage
+
+  """
+  A cursor for use in pagination
+  """
+  cursor: String!
+}
+
+type StockVideoConnection {
+  """
+  Information to aid in pagination.
+  """
+  pageInfo: PageInfo!
+
+  """
+  A list of edges.
+  """
+  edges: [StockVideoEdge]
+}
+
+type StockVideoEdge {
+  """
+  The item at the end of the edge
+  """
+  node: StockVideo
+
+  """
+  A cursor for use in pagination
+  """
+  cursor: String!
 }
 
 """

@@ -37,13 +37,15 @@ const CoverEditorMediaEditToolbox = () => {
     });
   };
 
+  const { galleryUri, uri, thumbnail } = media ?? {};
+
   return (
     <View style={styles.container}>
       <PressableOpacity style={styles.previewButton} onPress={onClose}>
         <Icon icon="arrow_down" />
         {media ? (
           <Image
-            source={{ uri: media?.galleryUri ?? media?.uri }}
+            source={{ uri: galleryUri ?? thumbnail ?? uri }}
             style={styles.previewContent}
           />
         ) : (

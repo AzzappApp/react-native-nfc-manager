@@ -112,6 +112,14 @@ const CoverEditorMediaReplace = () => {
     toggleScreenModal();
   };
 
+  const disableVideoSelection =
+    activeMedia?.media.kind === 'video'
+      ? false
+      : !(
+          getMaxAllowedVideosPerCover(!!lottie) >
+          medias.filter(m => m.media.kind === 'video').length
+        );
+
   return (
     <>
       <ToolBoxSection
@@ -134,7 +142,11 @@ const CoverEditorMediaReplace = () => {
                 ...activeMedia,
                 filter: null,
               }}
-              kind={editionMode === 'overlay' ? 'image' : 'mixed'}
+              kind={
+                editionMode === 'overlay' || disableVideoSelection
+                  ? 'image'
+                  : 'mixed'
+              }
               forceAspectRatio={mediaAspectRatio}
               steps={[SelectImageStep]}
               onCancel={toggleScreenModal}
@@ -144,14 +156,6 @@ const CoverEditorMediaReplace = () => {
               additionalData={{
                 hideTabs: true,
               }}
-              disableVideoSelection={
-                activeMedia.media.kind.includes('video')
-                  ? false
-                  : !(
-                      getMaxAllowedVideosPerCover(!!lottie) >
-                      medias.filter(m => m.media.kind === 'video').length
-                    )
-              }
             />
           )}
         </ScreenModal>

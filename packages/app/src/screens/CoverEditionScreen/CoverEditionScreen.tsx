@@ -184,6 +184,7 @@ const CoverEditionScreen = ({
             onCoverModified={onCoverModified}
             backgroundColor={profile.webCard.coverBackgroundColor}
             style={styles.container}
+            onCancel={onCancel}
           />
         </View>
       ) : (

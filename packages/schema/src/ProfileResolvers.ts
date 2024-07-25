@@ -1,5 +1,9 @@
 import { and, desc, eq, like } from 'drizzle-orm';
-import { connectionFromArray } from 'graphql-relay';
+import {
+  connectionFromArray,
+  connectionFromArraySlice,
+  cursorToOffset,
+} from 'graphql-relay';
 import { toString } from 'qrcode';
 import {
   db,
@@ -21,8 +25,12 @@ import serializeAndSignContactCard from '@azzapp/shared/serializeAndSignContactC
 import { simpleHash } from '@azzapp/shared/stringHelpers';
 import { buildUserUrlWithContactCard } from '@azzapp/shared/urlHelpers';
 import { emptyConnection } from '#helpers/connectionsHelpers';
+import { searchPexelsPhotos, searchPexelsVideos } from '#helpers/pexelsClient';
 import { idResolver } from './utils';
+import type { Loaders } from '#GraphQLContext';
+import type { PexelsSearchResult } from '#helpers/pexelsClient';
 import type { ProfileResolvers } from './__generated__/types';
+import type { Photo, Video } from 'pexels';
 
 export const Profile: ProfileResolvers = {
   id: idResolver('Profile'),
@@ -310,4 +318,110 @@ export const Profile: ProfileResolvers = {
       first,
     });
   },
+
+  searchStockPhotos: async (
+    profile,
+    { search, after, first },
+    { auth: { userId }, loaders, locale },
+  ) => {
+    if (!profile || !userId || profile.userId !== userId) {
+      return emptyConnection;
+    }
+    first = first ?? 50;
+    const offset = after ? cursorToOffset(after) : 0;
+    let result: PexelsSearchResult<Photo>;
+    try {
+      result = await searchPexelsPhotos(
+        search ||
+          (await getActivityName(profile.webCardId, locale, loaders)) ||
+          null,
+        locale,
+        offset,
+        first,
+      );
+    } catch (error) {
+      console.warn('Error fetching photos from Pexels:', error);
+      return emptyConnection;
+    }
+    const { data, count } = result;
+    return connectionFromArraySlice(
+      data.map(photo => ({
+        id: `pexels_p_${photo.id}`,
+        width: photo.width,
+        height: photo.height,
+        url: photo.src.original,
+        author: photo.photographer,
+        thumbnail: photo.src.small,
+      })),
+      { after, first },
+      {
+        sliceStart: offset,
+        arrayLength: count ?? Infinity,
+      },
+    );
+  },
+
+  searchStockVideos: async (
+    profile,
+    { search, after, first },
+    { auth: { userId }, loaders, locale },
+  ) => {
+    if (!profile || !userId || profile.userId !== userId) {
+      return emptyConnection;
+    }
+    first = first ?? 50;
+    const offset = after ? cursorToOffset(after) : 0;
+    let result: PexelsSearchResult<Video>;
+    try {
+      result = await searchPexelsVideos(
+        search ||
+          (await getActivityName(profile.webCardId, locale, loaders)) ||
+          null,
+        locale,
+        offset,
+        first,
+      );
+    } catch (error) {
+      console.warn('Error fetching photos from Pexels:', error);
+      return emptyConnection;
+    }
+    const { data, count } = result;
+    return connectionFromArraySlice(
+      data.map(video => {
+        const videoFile = video.video_files.find(
+          ({ quality, width, height }) =>
+            quality === 'hd' && width != null && height != null,
+        );
+
+        return {
+          id: `pexels_v_${video.id}`,
+          width: videoFile ? videoFile.width! : video.width,
+          height: videoFile ? videoFile.height! : video.height,
+          url: videoFile ? videoFile.link : video.url,
+          duration: video.duration,
+          thumbnail: video.image,
+        };
+      }),
+      { after, first },
+      {
+        sliceStart: offset,
+        arrayLength: count ?? Infinity,
+      },
+    );
+  },
+};
+
+const getActivityName = async (
+  webCardId: string,
+  locale: string,
+  loaders: Loaders,
+) => {
+  const webcard = await loaders.WebCard.load(webCardId);
+  const activity = webcard?.companyActivityId
+    ? await loaders.CompanyActivity.load(webcard.companyActivityId)
+    : null;
+  const activityName = activity?.id
+    ? await loaders.labels.load([activity.id, locale])
+    : null;
+  return activityName?.value;
 };

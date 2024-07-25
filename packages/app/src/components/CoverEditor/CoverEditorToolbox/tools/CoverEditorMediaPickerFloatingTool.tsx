@@ -60,6 +60,7 @@ const CoverEditorMediaPickerFloatingTool = ({
             durations={durations}
             durationsFixed={durationsFixed}
             maxSelectableVideos={getMaxAllowedVideosPerCover(!!cover.lottie)}
+            onClose={toggleShowImage}
           />
         )}
       </ScreenModal>

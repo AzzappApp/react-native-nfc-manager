@@ -713,6 +713,8 @@ export function coverEditorReducer(
       return {
         ...state,
         loadingError: payload.error,
+        loadingLocalMedia: false,
+        loadingRemoteMedia: false,
       };
     case 'LOADING_SUCCESS':
       const { images, lutShaders, videoPaths } = payload;

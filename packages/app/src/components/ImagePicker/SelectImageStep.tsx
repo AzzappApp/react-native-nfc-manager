@@ -1,10 +1,11 @@
 import * as Sentry from '@sentry/react-native';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useMemo, useRef, useState } from 'react';
 import { useIntl } from 'react-intl';
-import { Alert, Platform, StyleSheet } from 'react-native';
-import { RESULTS, openPhotoPicker } from 'react-native-permissions';
+import { StyleSheet } from 'react-native';
+import { RESULTS } from 'react-native-permissions';
 import Toast from 'react-native-toast-message';
 import { useDebouncedCallback } from 'use-debounce';
+import useMediaLimitedSelectionAlert from '#components/CoverEditor/useMediaLimitedSelectionAlert';
 import { useRouter } from '#components/NativeRouter';
 import { cropDataForAspectRatio } from '#helpers/mediaEditions';
 import { getImageSize, getVideoSize } from '#helpers/mediaHelpers';
@@ -56,7 +57,6 @@ const SelectImageStep = ({
     clearMedia,
     cameraButtonsLeftRightPosition,
     minVideoDuration,
-    disableVideoSelection,
   } = useImagePickerState();
 
   const onGalleryMediaSelected = (
@@ -100,8 +100,7 @@ const SelectImageStep = ({
   const [selectedAlbum, setSelectedAlbum] = useState<Album | null>(null);
   const { mediaPermission, cameraPermission, audioPermission } =
     usePermissionContext();
-
-  const initialMediaPermission = useRef(mediaPermission);
+  useMediaLimitedSelectionAlert(mediaPermission);
 
   const onChangePickerMode = useCallback(
     (mode: 'gallery' | 'photo' | 'video') => {
@@ -273,45 +272,6 @@ const SelectImageStep = ({
     [insetBottom],
   );
 
-  useEffect(() => {
-    if (
-      initialMediaPermission.current === RESULTS.LIMITED &&
-      Platform.OS === 'ios'
-    ) {
-      Alert.alert(
-        intl.formatMessage({
-          defaultMessage: '"azzapp" Would Like to Access Your Photos',
-          description: 'Title of the permission picker in image picker wizard',
-        }),
-        intl.formatMessage({
-          defaultMessage:
-            'This lets you add photos and videos to your posts and profile.',
-          description:
-            'Description of the permission picker in image picker wizard',
-        }),
-        [
-          {
-            text: intl.formatMessage({
-              defaultMessage: 'Select More Photos ...',
-              description:
-                'Button to open the permission picker in image picker wizard',
-            }),
-            onPress: openPhotoPicker,
-          },
-          {
-            text: intl.formatMessage({
-              defaultMessage: 'Keep current selection',
-              description:
-                'Button to keep the current selection in image picker wizard',
-            }),
-            onPress: () => {},
-            isPreferred: true,
-          },
-        ],
-      );
-    }
-  }, [intl]);
-
   return (
     <>
       <ImagePickerStep
@@ -374,7 +334,6 @@ const SelectImageStep = ({
                 kind={kind}
                 contentContainerStyle={galleryContainerStyle}
                 autoSelectFirstItem={media == null}
-                disableVideoSelection={disableVideoSelection}
               />
             ) : null
           ) : (
