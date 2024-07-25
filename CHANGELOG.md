@@ -1,4 +1,4 @@
-## 0.5.21-canary.22
+## 0.5.21-canary.23
 
 * **feat:**  - 🎸 load background color ([#4436](https://github.com/AzzappApp/azzapp/pull/4436))
 * **feat:**  - prellad username based on data ([#4425](https://github.com/AzzappApp/azzapp/pull/4425))
