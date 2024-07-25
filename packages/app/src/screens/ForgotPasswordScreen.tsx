@@ -16,7 +16,6 @@ import { forgotPassword } from '#helpers/MobileWebAPI';
 import useScreenInsets from '#hooks/useScreenInsets';
 import Button from '#ui/Button';
 import Container from '#ui/Container';
-import Form, { Submit } from '#ui/Form/Form';
 import Icon from '#ui/Icon';
 import PressableNative from '#ui/PressableNative';
 import Text from '#ui/Text';
@@ -92,7 +91,7 @@ const ForgotPasswordScreen = () => {
         style={styles.flex}
       >
         <View onTouchStart={Keyboard.dismiss} style={styles.container}>
-          <Form style={styles.inner} onSubmit={onSubmit}>
+          <View style={styles.inner}>
             <View style={styles.logoContainer}>
               <Icon icon="unlock_line" style={styles.logo} />
             </View>
@@ -127,24 +126,22 @@ const ForgotPasswordScreen = () => {
                 })}
               </Text>
             )}
-            <Submit>
-              <Button
-                label={intl.formatMessage({
-                  defaultMessage: 'Reset password',
-                  description: 'ForgotpasswordScreen - Reset password',
-                })}
-                accessibilityLabel={intl.formatMessage({
-                  defaultMessage: 'Tap to reset your password',
-                  description:
-                    'ForgotPassword Screen - AccessibilityLabel Reset password button',
-                })}
-                style={styles.button}
-                onPress={onSubmit}
-                disabled={!isValidMailOrPhone}
-                loading={isSubmitted}
-              />
-            </Submit>
-          </Form>
+            <Button
+              label={intl.formatMessage({
+                defaultMessage: 'Reset password',
+                description: 'ForgotpasswordScreen - Reset password',
+              })}
+              accessibilityLabel={intl.formatMessage({
+                defaultMessage: 'Tap to reset your password',
+                description:
+                  'ForgotPassword Screen - AccessibilityLabel Reset password button',
+              })}
+              style={styles.button}
+              onPress={onSubmit}
+              disabled={!isValidMailOrPhone}
+              loading={isSubmitted}
+            />
+          </View>
         </View>
       </KeyboardAvoidingView>
       <View

@@ -183,6 +183,7 @@ __metadata:
     react-native-haptic-feedback: ^2.2.0
     react-native-image-size: ^1.1.6
     react-native-keyboard-controller: ^1.12.6
+    react-native-keychain: ^8.2.0
     react-native-localize: ^3.2.0
     react-native-mime-types: ^2.5.0
     react-native-mmkv: ^2.12.2
@@ -21411,6 +21412,13 @@ __metadata:
     react-native: "*"
     react-native-reanimated: ">=2.11.0"
   checksum: 7b2f94d81c7e2769203386745ccfbe9b1be8fa1a8872f70892a06d9e12602451ba35dd5d316ed73489da7c3d60ed7cb2316dc989413881120c0eb634abb3ba6e
+  languageName: node
+  linkType: hard
+
+"react-native-keychain@npm:^8.2.0":
+  version: 8.2.0
+  resolution: "react-native-keychain@npm:8.2.0"
+  checksum: 4c4d5331013b8ab17c21120a2388e1e82aa30586738c0a34ed9dcffb6ce12454125ddb690951cad5563c9290b060eb68ccffa9477650cc3a5ddc347696b5d4ef
   languageName: node
   linkType: hard
 

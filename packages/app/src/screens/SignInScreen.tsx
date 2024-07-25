@@ -1,8 +1,10 @@
 import { parsePhoneNumber } from 'libphonenumber-js';
 import { useCallback, useState, useRef } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { Image, View, Keyboard } from 'react-native';
-import Animated, { useAnimatedStyle } from 'react-native-reanimated';
+import { Image, View, Keyboard, Platform } from 'react-native';
+import { KeyboardAvoidingView } from 'react-native-keyboard-controller';
+import { setSharedWebCredentials } from 'react-native-keychain';
+import { waitTime } from '@azzapp/shared/asyncHelpers';
 import ERRORS from '@azzapp/shared/errors';
 import {
   isNotFalsyString,
@@ -11,19 +13,17 @@ import {
 } from '@azzapp/shared/stringHelpers';
 import { colors } from '#theme';
 import EmailOrPhoneInput from '#components/EmailOrPhoneInput';
-import Link from '#components/Link';
-import { useRouter } from '#components/NativeRouter';
+import { useNativeNavigationEvent, useRouter } from '#components/NativeRouter';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import { dispatchGlobalEvent } from '#helpers/globalEvents';
 import { signin } from '#helpers/MobileWebAPI';
-import useAnimatedKeyboardHeight from '#hooks/useAnimatedKeyboardHeight';
 import useScreenInsets from '#hooks/useScreenInsets';
 import Button from '#ui/Button';
-import Form, { Submit } from '#ui/Form/Form';
 import PressableOpacity from '#ui/PressableOpacity';
 import SecuredTextInput from '#ui/SecuredTextInput';
 import Text from '#ui/Text';
 import type { EmailPhoneInput } from '#components/EmailOrPhoneInput';
+import type { Route } from '#routes';
 import type { TextInput as NativeTextInput } from 'react-native';
 
 const SignInScreen = () => {
@@ -37,6 +37,7 @@ const SignInScreen = () => {
     'default' | 'forbidden' | undefined
   >(undefined);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [clearPassword, setClearPassword] = useState(false);
 
   const router = useRouter();
 
@@ -68,6 +69,13 @@ const SignInScreen = () => {
         credential: intlPhoneNumber ?? credential.value,
         password,
       });
+
+      await setSharedWebCredentials(
+        process.env.APP_WEBSHARED_CREDENTIALS!,
+        intlPhoneNumber ?? credential.value,
+        password,
+      ).catch(() => {});
+      setClearPassword(true);
 
       if (signedIn.issuer) {
         router.push({
@@ -120,16 +128,31 @@ const SignInScreen = () => {
 
   const styles = useStyleSheet(stylesheet);
 
-  const keyboardHeight = useAnimatedKeyboardHeight();
+  const navigateTo = useCallback(
+    async (route: Route, replace: boolean) => {
+      if (Platform.OS === 'ios') {
+        setClearPassword(true);
+        await waitTime(100);
+      }
+      if (replace) {
+        router.replace(route);
+      } else {
+        router.push(route);
+      }
+    },
+    [router],
+  );
 
-  const animatedStyle = useAnimatedStyle(() => {
-    return {
-      transform: [
-        {
-          translateY: -keyboardHeight.value,
-        },
-      ],
-    };
+  const onForgotLinkPasswordPress = useCallback(() => {
+    navigateTo({ route: 'FORGOT_PASSWORD' }, false);
+  }, [navigateTo]);
+
+  const onSignupLinkPress = useCallback(() => {
+    navigateTo({ route: 'SIGN_UP' }, true);
+  }, [navigateTo]);
+
+  useNativeNavigationEvent('appear', () => {
+    setClearPassword(false);
   });
 
   return (
@@ -148,7 +171,7 @@ const SignInScreen = () => {
           style={styles.logo}
         />
       </View>
-      <Animated.View style={[styles.content, animatedStyle]}>
+      <KeyboardAvoidingView behavior="padding" style={styles.content}>
         <View style={styles.header}>
           <Text variant="xlarge">
             <FormattedMessage
@@ -157,17 +180,9 @@ const SignInScreen = () => {
             />
           </Text>
         </View>
-        <Form
-          style={[styles.form, { marginBottom: insets.bottom }]}
-          onSubmit={onSubmit}
-        >
+        <View style={[styles.form, { marginBottom: insets.bottom }]}>
           <EmailOrPhoneInput
-            input={
-              credential || {
-                countryCodeOrEmail: 'email',
-                value: '',
-              }
-            }
+            input={credential ?? { countryCodeOrEmail: 'email', value: '' }}
             onChange={input => {
               if (!isSubmitting) setCredential(input);
             }}
@@ -197,6 +212,7 @@ const SignInScreen = () => {
             returnKeyType="next"
             onSubmitEditing={() => passwordRef.current?.focus()}
             blurOnSubmit={false}
+            readOnly={isSubmitting}
           />
           <View>
             <SecuredTextInput
@@ -206,6 +222,7 @@ const SignInScreen = () => {
                 defaultMessage: 'Password',
                 description: 'Password input placeholder',
               })}
+              value={clearPassword ? '' : password}
               onChangeText={isSubmitting ? undefined : setPassword}
               accessibilityLabel={intl.formatMessage({
                 defaultMessage: 'Enter your password',
@@ -214,40 +231,36 @@ const SignInScreen = () => {
               })}
               returnKeyType="done"
               onSubmitEditing={onSubmit}
+              readOnly={isSubmitting}
             />
             <View style={styles.forgotPasswordContainer}>
-              <Link route="FORGOT_PASSWORD">
-                <PressableOpacity>
-                  <Text style={styles.greyText} variant="small">
-                    <FormattedMessage
-                      defaultMessage="Forgot your password?"
-                      description="SigninScreen - Forgot your password?"
-                    />
-                  </Text>
-                </PressableOpacity>
-              </Link>
+              <PressableOpacity onPress={onForgotLinkPasswordPress}>
+                <Text style={styles.greyText} variant="small">
+                  <FormattedMessage
+                    defaultMessage="Forgot your password?"
+                    description="SigninScreen - Forgot your password?"
+                  />
+                </Text>
+              </PressableOpacity>
             </View>
           </View>
-          <Submit>
-            <Button
-              variant="primary"
-              testID="submitButton"
-              label={intl.formatMessage({
-                defaultMessage: 'Log In',
-                description: 'SigninScreen - Login Button Placeholder',
-              })}
-              accessibilityLabel={intl.formatMessage({
-                defaultMessage: 'Tap to sign in',
-                description:
-                  'SignIn Screen - AccessibilityLabel Sign In button',
-              })}
-              disabled={
-                !isNotFalsyString(credential.value) ||
-                !isNotFalsyString(password)
-              }
-              loading={isSubmitting}
-            />
-          </Submit>
+          <Button
+            variant="primary"
+            testID="submitButton"
+            label={intl.formatMessage({
+              defaultMessage: 'Log In',
+              description: 'SigninScreen - Login Button Placeholder',
+            })}
+            accessibilityLabel={intl.formatMessage({
+              defaultMessage: 'Tap to sign in',
+              description: 'SignIn Screen - AccessibilityLabel Sign In button',
+            })}
+            disabled={
+              !isNotFalsyString(credential.value) || !isNotFalsyString(password)
+            }
+            loading={isSubmitting}
+            onPress={onSubmit}
+          />
           <View
             style={{
               justifyContent: 'center',
@@ -283,17 +296,17 @@ const SignInScreen = () => {
                 description="SigninScreen - Don't have an account"
               />
             </Text>
-            <Link modal route="SIGN_UP" replace>
+            <PressableOpacity onPress={onSignupLinkPress}>
               <Text style={styles.linkLogout} variant="medium">
                 <FormattedMessage
                   defaultMessage="Sign Up"
                   description="SigninScreen - Sign Up"
                 />
               </Text>
-            </Link>
+            </PressableOpacity>
           </View>
-        </Form>
-      </Animated.View>
+        </View>
+      </KeyboardAvoidingView>
     </View>
   );
 };

@@ -99,6 +99,7 @@ export const ScreensRenderer = ({
                     ? 'none'
                     : 'slide_from_bottom'
               }
+              hideKeyboardOnSwipe
             >
               <GestureHandlerRootView style={styles.flex}>
                 {children}
@@ -152,6 +153,7 @@ const StackRenderer = ({
               enabled
               isNativeStack
               style={StyleSheet.absoluteFill}
+              hideKeyboardOnSwipe
             >
               <TabsRenderer
                 id={routeInfo.id}
@@ -256,6 +258,7 @@ const TabsRenderer = ({
                 activityState={isActive ? 2 : 0}
                 enabled
                 style={StyleSheet.absoluteFill}
+                hideKeyboardOnSwipe
               >
                 <StackRenderer
                   stack={routeInfo.state}
@@ -418,6 +421,7 @@ const ScreenRenderer = ({
       onWillDisappear={onWillDisappear}
       onDismissed={onDismissed}
       style={StyleSheet.absoluteFill}
+      hideKeyboardOnSwipe
     >
       <GestureHandlerRootView style={styles.flex}>
         <ScreenRendererContext.Provider value={screenContextValue}>
