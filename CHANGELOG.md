@@ -1,7 +1,18 @@
-## 0.5.21-canary.23
+## 0.5.21-canary.24
 
+* **fix:**  - 🐛 select template on webcard template category change ([#4453](https://github.com/AzzappApp/azzapp/pull/4453))
+* **fix:**  - **multiUser:** [#2294](https://github.com/AzzappApp/azzapp/pull/2294) manage subscription on ownership transfer ([#4407](https://github.com/AzzappApp/azzapp/pull/4407))
+* **feat:**  - 🎸 add options to edit first/last/company name ([#4432](https://github.com/AzzappApp/azzapp/pull/4432))
+* **fix:**  - add missing avatar & logo in media ([#4456](https://github.com/AzzappApp/azzapp/pull/4456))
+* **fix:**  - remove webcredentials to solve password prompt issue
+* **fix:**  - remove missed webcredentials
+* **fix:**  - **IOS:** disable webcredentials
+* **fix:**  - **authent:** [#4430](https://github.com/AzzappApp/azzapp/pull/4430) remove Form tag
+* **fix:**  - **authent:** [#4430](https://github.com/AzzappApp/azzapp/pull/4430) replace useAnimatedKeyboard
+* **fix:**  - **authent:** [#4430](https://github.com/AzzappApp/azzapp/pull/4430) try with autofocus
 * **feat:**  - 🎸 load background color ([#4436](https://github.com/AzzappApp/azzapp/pull/4436))
 * **feat:**  - prellad username based on data ([#4425](https://github.com/AzzappApp/azzapp/pull/4425))
+* **fix:**  - **authent:** [#4430](https://github.com/AzzappApp/azzapp/pull/4430) try to manually dismiss the keyboard
 * **fix:**  - SubscriptionApi - await transaction and add sentry report ([#4431](https://github.com/AzzappApp/azzapp/pull/4431))
 * **feat:**  - 🎸 add background on cover template ([#4417](https://github.com/AzzappApp/azzapp/pull/4417))
 * **fix:**  - **android:** [#4411](https://github.com/AzzappApp/azzapp/pull/4411) avoid overlap on videos ([#4424](https://github.com/AzzappApp/azzapp/pull/4424))
