@@ -4,7 +4,6 @@
 <dict>
 	<key>com.apple.developer.associated-domains</key>
 	<array>
-		<string>webcredentials:azzapp.com</string>
 		<string>applinks:azzapp.com</string>
 	</array>
 </dict>
