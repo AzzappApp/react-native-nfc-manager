@@ -439,6 +439,12 @@ const CardTemplateList = (
 
   const { height: windowHeight } = useWindowDimensions();
 
+  useEffect(() => {
+    if (templates.length > 0) {
+      onSelectTemplate?.(templates[0]);
+    }
+  }, [onSelectTemplate, templates]);
+
   return (
     <>
       <View style={[styles.root, style]} {...props}>
