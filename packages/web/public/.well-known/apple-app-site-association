@@ -25,5 +25,12 @@
         ]
       }
     ]
+  },
+  "webcredentials": {
+    "apps": [
+      "66D3U3GLN6.com.azzapp.app",
+      "66D3U3GLN6.com.azzapp.app-dev",
+      "66D3U3GLN6.com.azzapp.app-staging"
+    ]
   }
 }

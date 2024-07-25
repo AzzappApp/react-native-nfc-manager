@@ -38,7 +38,8 @@
         "DEPLOYMENT_ENVIRONMENT": "development",
         "PURCHASE_ANDROID_KEY": "goog_vyxAfpVyZNmOdHVuuIQOBmjHevs",
         "PURCHASE_IOS_KEY": "appl_lWmNaDeIzQcECQzHakHNyLaktch",
-        "NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME": "azzapp-dev"
+        "NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME": "azzapp-dev",
+        "APP_WEBSHARED_CREDENTIALS": "dev.azzapp.com"
       },
       "channel": "development"
     },
@@ -58,7 +59,8 @@
         "DEPLOYMENT_ENVIRONMENT": "staging",
         "PURCHASE_IOS_KEY": "appl_snKjYqjvdiQjvatKGCOHyHUwXMO",
         "PURCHASE_ANDROID_KEY": "TODO",
-        "NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME": "azzapp-dev"
+        "NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME": "azzapp-dev",
+        "APP_WEBSHARED_CREDENTIALS": "staging.azzapp.com"
       },
       "channel": "staging"
     },
@@ -77,7 +79,8 @@
         "DEPLOYMENT_ENVIRONMENT": "production",
         "NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME": "azzapp",
         "PURCHASE_IOS_KEY": "appl_XWlrdgSwpfsScIXTNWeFxtyCqzz",
-        "PURCHASE_ANDROID_KEY": "TODO"
+        "PURCHASE_ANDROID_KEY": "TODO",
+        "APP_WEBSHARED_CREDENTIALS": "azzapp.com"
       },
       "channel": "production"
     }

@@ -1,8 +1,10 @@
 import { parsePhoneNumber } from 'libphonenumber-js';
 import { useCallback, useState, useRef, memo } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { View, Image, Keyboard } from 'react-native';
+import { View, Image, Keyboard, Platform } from 'react-native';
 import { KeyboardAvoidingView } from 'react-native-keyboard-controller';
+import { setSharedWebCredentials } from 'react-native-keychain';
+import { waitTime } from '@azzapp/shared/asyncHelpers';
 import ERRORS from '@azzapp/shared/errors';
 import {
   isNotFalsyString,
@@ -12,8 +14,7 @@ import {
 } from '@azzapp/shared/stringHelpers';
 import { colors } from '#theme';
 import EmailOrPhoneInput from '#components/EmailOrPhoneInput';
-import Link from '#components/Link';
-import { useRouter } from '#components/NativeRouter';
+import { useNativeNavigationEvent, useRouter } from '#components/NativeRouter';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import { dispatchGlobalEvent } from '#helpers/globalEvents';
 import { getCurrentLocale } from '#helpers/localeHelpers';
@@ -22,9 +23,11 @@ import useScreenInsets from '#hooks/useScreenInsets';
 import Button from '#ui/Button';
 import CheckBox from '#ui/CheckBox';
 import HyperLink from '#ui/HyperLink';
+import PressableOpacity from '#ui/PressableOpacity';
 import SecuredTextInput from '#ui/SecuredTextInput';
 import Text from '#ui/Text';
 import type { EmailPhoneInput } from '#components/EmailOrPhoneInput';
+import type { Route } from '#routes';
 import type { CheckboxStatus } from '#ui/CheckBox';
 import type { TextInput as NativeTextInput } from 'react-native';
 
@@ -48,6 +51,7 @@ const SignupScreen = () => {
   const [showTOSError, setShowTOSError] = useState<boolean>(false);
 
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [clearPassword, setClearPassword] = useState(false);
 
   const intl = useIntl();
 
@@ -85,25 +89,36 @@ const SignupScreen = () => {
 
     if (canSignup) {
       let tokens: Awaited<ReturnType<typeof signup>>;
+      let username: string;
+
       try {
         setIsSubmitting(true);
         const locale = getCurrentLocale();
         if (contact.countryCodeOrEmail === 'email') {
+          username = contact.value;
           tokens = await signup({
-            email: contact.value,
+            email: username,
             password,
             locale,
           });
         } else {
+          username = parsePhoneNumber(
+            contact.value,
+            contact.countryCodeOrEmail,
+          ).formatInternational();
           tokens = await signup({
-            phoneNumber: parsePhoneNumber(
-              contact.value,
-              contact.countryCodeOrEmail,
-            ).formatInternational(),
+            phoneNumber: username,
             locale,
             password,
           });
         }
+        await setSharedWebCredentials(
+          process.env.APP_WEBSHARED_CREDENTIALS!,
+          username,
+          password,
+        ).catch(() => {});
+        setClearPassword(true);
+
         if (isNotFalsyString(tokens.userId)) {
           // Signin process
           const { profileInfos } = tokens;
@@ -168,6 +183,29 @@ const SignupScreen = () => {
 
   // #endregion
 
+  const navigateTo = useCallback(
+    async (route: Route, replace: boolean) => {
+      if (Platform.OS === 'ios') {
+        setClearPassword(true);
+        await waitTime(100);
+      }
+      if (replace) {
+        router.replace(route);
+      } else {
+        router.push(route);
+      }
+    },
+    [router],
+  );
+
+  const onSigninLinkPress = useCallback(() => {
+    navigateTo({ route: 'SIGN_IN' }, true);
+  }, [navigateTo]);
+
+  useNativeNavigationEvent('appear', () => {
+    setClearPassword(false);
+  });
+
   const insets = useScreenInsets();
   return (
     <View style={styles.root}>
@@ -217,6 +255,7 @@ const SignupScreen = () => {
 
           <SecuredTextInput
             nativeID="password"
+            value={clearPassword ? '' : password}
             ref={passwordRef}
             placeholder={intl.formatMessage({
               defaultMessage: 'Password',
@@ -326,14 +365,14 @@ const SignupScreen = () => {
                 description="Signup Screen - Already have an account?"
               />
             </Text>
-            <Link route="SIGN_IN" replace>
+            <PressableOpacity onPress={onSigninLinkPress}>
               <Text style={styles.linkLogin} variant="medium">
                 <FormattedMessage
                   defaultMessage="Log In"
                   description="Signup Screen - Login link bottom screen"
                 />
               </Text>
-            </Link>
+            </PressableOpacity>
           </View>
         </View>
       </KeyboardAvoidingView>

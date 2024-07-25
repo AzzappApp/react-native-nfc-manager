@@ -1529,6 +1529,8 @@ PODS:
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
     - Yoga
+  - RNKeychain (8.2.0):
+    - React-Core
   - RNLocalize (3.2.0):
     - React-Core
   - RNPermissions (4.1.5):
@@ -1704,6 +1706,7 @@ DEPENDENCIES:
   - "RNDateTimePicker (from `../../../node_modules/@react-native-community/datetimepicker`)"
   - "RNFlashList (from `../../../node_modules/@shopify/flash-list`)"
   - RNGestureHandler (from `../../../node_modules/react-native-gesture-handler`)
+  - RNKeychain (from `../../../node_modules/react-native-keychain`)
   - RNLocalize (from `../../../node_modules/react-native-localize`)
   - RNPermissions (from `../../../node_modules/react-native-permissions`)
   - RNPurchases (from `../../../node_modules/react-native-purchases`)
@@ -1914,6 +1917,8 @@ EXTERNAL SOURCES:
     :path: "../../../node_modules/@shopify/flash-list"
   RNGestureHandler:
     :path: "../../../node_modules/react-native-gesture-handler"
+  RNKeychain:
+    :path: "../../../node_modules/react-native-keychain"
   RNLocalize:
     :path: "../../../node_modules/react-native-localize"
   RNPermissions:
@@ -2035,6 +2040,7 @@ SPEC CHECKSUMS:
   RNDateTimePicker: 40ffda97d071a98a10fdca4fa97e3977102ccd14
   RNFlashList: e9b57a5553639f9b528cc50ab53f25831722ed62
   RNGestureHandler: 8dbcccada4a7e702e7dec9338c251b1cf393c960
+  RNKeychain: bfe3d12bf4620fe488771c414530bf16e88f3678
   RNLocalize: b77875884750cb6a58cd6865863fe2ba2729b72b
   RNPermissions: 515e6bdfab4f8648ad0b2e600374f65981c04dba
   RNPurchases: 4305de02b902d3c1e56a50295dc0a6e758b73095
