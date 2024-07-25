@@ -18,7 +18,6 @@ import { dispatchGlobalEvent } from '#helpers/globalEvents';
 import { signin } from '#helpers/MobileWebAPI';
 import useScreenInsets from '#hooks/useScreenInsets';
 import Button from '#ui/Button';
-import Form, { Submit } from '#ui/Form/Form';
 import PressableOpacity from '#ui/PressableOpacity';
 import SecuredTextInput from '#ui/SecuredTextInput';
 import Text from '#ui/Text';
@@ -144,10 +143,7 @@ const SignInScreen = () => {
             />
           </Text>
         </View>
-        <Form
-          style={[styles.form, { marginBottom: insets.bottom }]}
-          onSubmit={onSubmit}
-        >
+        <View style={[styles.form, { marginBottom: insets.bottom }]}>
           <EmailOrPhoneInput
             input={
               credential || {
@@ -217,26 +213,23 @@ const SignInScreen = () => {
               </Link>
             </View>
           </View>
-          <Submit>
-            <Button
-              variant="primary"
-              testID="submitButton"
-              label={intl.formatMessage({
-                defaultMessage: 'Log In',
-                description: 'SigninScreen - Login Button Placeholder',
-              })}
-              accessibilityLabel={intl.formatMessage({
-                defaultMessage: 'Tap to sign in',
-                description:
-                  'SignIn Screen - AccessibilityLabel Sign In button',
-              })}
-              disabled={
-                !isNotFalsyString(credential.value) ||
-                !isNotFalsyString(password)
-              }
-              loading={isSubmitting}
-            />
-          </Submit>
+          <Button
+            variant="primary"
+            testID="submitButton"
+            label={intl.formatMessage({
+              defaultMessage: 'Log In',
+              description: 'SigninScreen - Login Button Placeholder',
+            })}
+            accessibilityLabel={intl.formatMessage({
+              defaultMessage: 'Tap to sign in',
+              description: 'SignIn Screen - AccessibilityLabel Sign In button',
+            })}
+            disabled={
+              !isNotFalsyString(credential.value) || !isNotFalsyString(password)
+            }
+            loading={isSubmitting}
+            onPress={onSubmit}
+          />
           <View
             style={{
               justifyContent: 'center',
@@ -281,7 +274,7 @@ const SignInScreen = () => {
               </Text>
             </Link>
           </View>
-        </Form>
+        </View>
       </KeyboardAvoidingView>
     </View>
   );

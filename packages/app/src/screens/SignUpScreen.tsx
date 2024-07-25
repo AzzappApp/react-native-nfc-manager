@@ -21,7 +21,6 @@ import { signup } from '#helpers/MobileWebAPI';
 import useScreenInsets from '#hooks/useScreenInsets';
 import Button from '#ui/Button';
 import CheckBox from '#ui/CheckBox';
-import Form, { Submit } from '#ui/Form/Form';
 import HyperLink from '#ui/HyperLink';
 import SecuredTextInput from '#ui/SecuredTextInput';
 import Text from '#ui/Text';
@@ -187,10 +186,7 @@ const SignupScreen = () => {
         />
       </View>
       <KeyboardAvoidingView behavior="padding" style={styles.body}>
-        <Form
-          style={[styles.form, { marginBottom: insets.bottom }]}
-          onSubmit={onSubmit}
-        >
+        <View style={[styles.form, { marginBottom: insets.bottom }]}>
           <View style={styles.header}>
             <Text style={styles.title} variant="xlarge">
               <FormattedMessage
@@ -299,22 +295,22 @@ const SignupScreen = () => {
             />
           </View>
 
-          <Submit>
-            <Button
-              testID="submit"
-              label={intl.formatMessage({
-                defaultMessage: 'Sign Up',
-                description: 'Signup Screen - Sign Up button',
-              })}
-              accessibilityLabel={intl.formatMessage({
-                defaultMessage: 'Tap to sign up',
-                description: 'Signup Screen - Accessibility Sign Up button',
-              })}
-              style={styles.button}
-              disabled={!contact.value || !password}
-              loading={isSubmitting}
-            />
-          </Submit>
+          <Button
+            testID="submit"
+            label={intl.formatMessage({
+              defaultMessage: 'Sign Up',
+              description: 'Signup Screen - Sign Up button',
+            })}
+            accessibilityLabel={intl.formatMessage({
+              defaultMessage: 'Tap to sign up',
+              description: 'Signup Screen - Accessibility Sign Up button',
+            })}
+            style={styles.button}
+            disabled={!contact.value || !password}
+            loading={isSubmitting}
+            onPress={onSubmit}
+          />
+
           {showTOSError && (
             <Text style={styles.formError} variant="error">
               <FormattedMessage
@@ -339,7 +335,7 @@ const SignupScreen = () => {
               </Text>
             </Link>
           </View>
-        </Form>
+        </View>
       </KeyboardAvoidingView>
     </View>
   );
