@@ -142,6 +142,7 @@ export type ScreenOptions = Omit<
   | 'active'
   | 'activityState'
   | 'children'
+  | 'hideKeyboardOnSwipe'
   | 'onAppear'
   | 'onDisappear'
   | 'onDismissed'
