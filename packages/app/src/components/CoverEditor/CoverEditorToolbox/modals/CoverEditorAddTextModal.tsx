@@ -218,6 +218,7 @@ const styleSheet = createStyleSheet(appearance => ({
     width: '100%',
     height: 33,
     marginTop: 20,
+    display: 'none',
   },
   tags: {
     gap: 10,
