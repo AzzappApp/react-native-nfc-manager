@@ -1,4 +1,4 @@
-## 0.5.21-canary.24
+## 0.5.21-canary.25
 
 * **fix:**  - 🐛 select template on webcard template category change ([#4453](https://github.com/AzzappApp/azzapp/pull/4453))
 * **fix:**  - **multiUser:** [#2294](https://github.com/AzzappApp/azzapp/pull/2294) manage subscription on ownership transfer ([#4407](https://github.com/AzzappApp/azzapp/pull/4407))
