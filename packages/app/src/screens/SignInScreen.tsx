@@ -2,7 +2,7 @@ import { parsePhoneNumber } from 'libphonenumber-js';
 import { useCallback, useState, useRef } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { Image, View, Keyboard } from 'react-native';
-import Animated, { useAnimatedStyle } from 'react-native-reanimated';
+import { KeyboardAvoidingView } from 'react-native-keyboard-controller';
 import ERRORS from '@azzapp/shared/errors';
 import {
   isNotFalsyString,
@@ -16,7 +16,6 @@ import { useRouter } from '#components/NativeRouter';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import { dispatchGlobalEvent } from '#helpers/globalEvents';
 import { signin } from '#helpers/MobileWebAPI';
-import useAnimatedKeyboardHeight from '#hooks/useAnimatedKeyboardHeight';
 import useScreenInsets from '#hooks/useScreenInsets';
 import Button from '#ui/Button';
 import Form, { Submit } from '#ui/Form/Form';
@@ -64,7 +63,6 @@ const SignInScreen = () => {
     try {
       setIsSubmitting(true);
 
-      Keyboard.dismiss();
       const signedIn = await signin({
         credential: intlPhoneNumber ?? credential.value,
         password,
@@ -121,18 +119,6 @@ const SignInScreen = () => {
 
   const styles = useStyleSheet(stylesheet);
 
-  const keyboardHeight = useAnimatedKeyboardHeight();
-
-  const animatedStyle = useAnimatedStyle(() => {
-    return {
-      transform: [
-        {
-          translateY: -keyboardHeight.value,
-        },
-      ],
-    };
-  });
-
   return (
     <View style={styles.root}>
       <View style={styles.background}>
@@ -149,7 +135,7 @@ const SignInScreen = () => {
           style={styles.logo}
         />
       </View>
-      <Animated.View style={[styles.content, animatedStyle]}>
+      <KeyboardAvoidingView behavior="padding" style={styles.content}>
         <View style={styles.header}>
           <Text variant="xlarge">
             <FormattedMessage
@@ -296,7 +282,7 @@ const SignInScreen = () => {
             </Link>
           </View>
         </Form>
-      </Animated.View>
+      </KeyboardAvoidingView>
     </View>
   );
 };
