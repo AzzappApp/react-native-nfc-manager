@@ -1,5 +1,5 @@
 import { GraphQLError } from 'graphql';
-import { updateProfile } from '@azzapp/data';
+import { checkMedias, db, referencesMedias, updateProfile } from '@azzapp/data';
 import ERRORS from '@azzapp/shared/errors';
 import { isAdmin, isOwner } from '@azzapp/shared/profileHelpers';
 import fromGlobalIdWithType from '#helpers/relayIdHelpers';
@@ -53,15 +53,32 @@ const updateProfileMutation: MutationResolvers['updateProfile'] = async (
   }
 
   const { avatarId, logoId, ...restContactCard } = contactCard || {};
-
-  await updateProfile(targetProfileId, {
-    profileRole: profileRole ?? undefined,
-    contactCard: {
-      ...restContactCard,
-    },
-    logoId,
-    avatarId,
-  });
+  try {
+    const addedMedia = [avatarId, logoId].filter(
+      mediaId => mediaId,
+    ) as string[];
+    await checkMedias(addedMedia);
+    await db.transactionManager.startTransaction(async tx => {
+      await updateProfile(
+        targetProfileId,
+        {
+          profileRole: profileRole ?? undefined,
+          contactCard: {
+            ...restContactCard,
+          },
+          logoId,
+          avatarId,
+        },
+        tx,
+      );
+    });
+    await referencesMedias(addedMedia, [
+      targetProfile.avatarId,
+      targetProfile.logoId,
+    ]);
+  } catch (e) {
+    throw new GraphQLError(ERRORS.INTERNAL_SERVER_ERROR);
+  }
 
   const updatedProfile = { ...targetProfile };
   if (profileRole) {

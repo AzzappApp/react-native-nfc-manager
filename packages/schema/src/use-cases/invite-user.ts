@@ -1,9 +1,11 @@
 import * as Sentry from '@sentry/nextjs';
 import {
+  checkMedias,
   createProfile,
   createUser,
   db,
   getUserByEmailPhoneNumber,
+  referencesMedias,
   updateWebCard,
 } from '@azzapp/data';
 import { createId } from '@azzapp/data/helpers/createId';
@@ -70,6 +72,10 @@ export const inviteUser = async (input: Input) => {
         input.invited.contactCard ?? {};
       let profile: Profile;
       try {
+        const addedMedia = [avatarId, logoId].filter(
+          mediaId => mediaId,
+        ) as string[];
+        await checkMedias(addedMedia);
         profile = {
           id: createId(),
           webCardId: input.webCard.id,
@@ -95,6 +101,7 @@ export const inviteUser = async (input: Input) => {
         };
 
         await createProfile(profile, tx);
+        await referencesMedias(addedMedia, [], tx);
       } catch (e) {
         throw new ProfileAlreadyExistsException();
       }

@@ -1,5 +1,11 @@
 import { GraphQLError } from 'graphql';
-import { buildDefaultContactCard, updateProfile } from '@azzapp/data';
+import {
+  buildDefaultContactCard,
+  checkMedias,
+  db,
+  referencesMedias,
+  updateProfile,
+} from '@azzapp/data';
 import ERRORS from '@azzapp/shared/errors';
 import fromGlobalIdWithType from '#helpers/relayIdHelpers';
 import type { MutationResolvers } from '#/__generated__/types';
@@ -38,7 +44,19 @@ const saveContactCard: MutationResolvers['saveContactCard'] = async (
   updates.logoId = contactCard.logoId;
 
   try {
-    await updateProfile(profileId, updates);
+    const addedMedia = [contactCard.logoId, contactCard.avatarId].filter(
+      mediaId => mediaId,
+    ) as string[];
+    await checkMedias(addedMedia);
+    await db.transaction(async trx => {
+      await updateProfile(profileId, updates, trx);
+
+      await referencesMedias(
+        addedMedia,
+        [profile.logoId, profile.avatarId],
+        trx,
+      );
+    });
   } catch (e) {
     console.error(e);
     throw new GraphQLError(ERRORS.INTERNAL_SERVER_ERROR);

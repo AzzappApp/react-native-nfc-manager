@@ -1,6 +1,12 @@
 import { eq } from 'drizzle-orm';
 import { GraphQLError } from 'graphql';
-import { ProfileTable, db, updateWebCard } from '@azzapp/data';
+import {
+  ProfileTable,
+  checkMedias,
+  db,
+  referencesMedias,
+  updateWebCard,
+} from '@azzapp/data';
 import ERRORS from '@azzapp/shared/errors';
 import fromGlobalIdWithType from '#helpers/relayIdHelpers';
 import type { MutationResolvers } from '#/__generated__/types';
@@ -14,11 +20,20 @@ const saveCommonInformation: MutationResolvers['saveCommonInformation'] =
   ) => {
     const webCardId = fromGlobalIdWithType(gqlWebCardId, 'WebCard');
 
+    const webCard = await loaders.WebCard.load(webCardId);
+
+    if (!webCard) {
+      throw new GraphQLError(ERRORS.INVALID_REQUEST);
+    }
+
     const updates: Partial<WebCard> = {
       commonInformation: data,
       logoId,
     };
     try {
+      if (logoId) {
+        await checkMedias([logoId]);
+      }
       await db.transaction(async trx => {
         await updateWebCard(webCardId, updates, trx);
 
@@ -28,16 +43,12 @@ const saveCommonInformation: MutationResolvers['saveCommonInformation'] =
             lastContactCardUpdate: new Date(),
           })
           .where(eq(ProfileTable.webCardId, webCardId));
+
+        await referencesMedias(logoId ? [logoId] : [], [webCard.logoId], trx);
       });
     } catch (e) {
       console.error(e);
       throw new GraphQLError(ERRORS.INTERNAL_SERVER_ERROR);
-    }
-
-    const webCard = await loaders.WebCard.load(webCardId);
-
-    if (!webCard) {
-      throw new GraphQLError(ERRORS.INVALID_REQUEST);
     }
 
     return {
