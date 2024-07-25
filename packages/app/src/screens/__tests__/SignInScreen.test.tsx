@@ -7,6 +7,9 @@ import SignInScreen from '../SignInScreen';
 
 jest.mock('#helpers/MobileWebAPI');
 jest.mock('#helpers/globalEvents');
+jest.mock('react-native-keychain', () => ({
+  setSharedWebCredentials: jest.fn().mockResolvedValue(true),
+}));
 
 describe('Signin Screen', () => {
   const signinMock = jest.mocked(signin);
