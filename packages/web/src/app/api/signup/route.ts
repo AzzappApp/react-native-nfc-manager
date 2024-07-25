@@ -1,10 +1,13 @@
+import { createId } from '@paralleldrive/cuid2';
 import * as Sentry from '@sentry/nextjs';
 import * as bcrypt from 'bcrypt-ts';
 import { NextResponse } from 'next/server';
 import { withAxiom } from 'next-axiom';
 import * as z from 'zod';
 import {
+  createSubscription,
   createUser,
+  db,
   getProfilesOfUser,
   getUserByEmail,
   getUserByPhoneNumber,
@@ -77,6 +80,8 @@ const handleExistingUser = async (user: User, password: string) => {
   );
 };
 
+const FREE_BETA_DATE_LIMIT = process.env.FREE_BETA_DATE_LIMIT;
+
 export const POST = withAxiom(async (req: Request) => {
   const result = SignupSchema.safeParse(await req.json());
 
@@ -115,12 +120,37 @@ export const POST = withAxiom(async (req: Request) => {
     }
 
     const userPhoneNumber = phoneNumber ? formatPhoneNumber(phoneNumber) : null;
-    await createUser({
-      email: email ?? null,
-      phoneNumber: userPhoneNumber,
-      password: bcrypt.hashSync(password, 12),
-      locale: locale ?? null,
-      roles: null,
+    await db.transaction(async trx => {
+      const userId = await createUser(
+        {
+          email: email ?? null,
+          phoneNumber: userPhoneNumber,
+          password: bcrypt.hashSync(password, 12),
+          locale: locale ?? null,
+          roles: null,
+        },
+        trx,
+      );
+
+      if (
+        FREE_BETA_DATE_LIMIT &&
+        !isNaN(Date.parse(FREE_BETA_DATE_LIMIT)) &&
+        new Date() < new Date(FREE_BETA_DATE_LIMIT)
+      ) {
+        await createSubscription(
+          {
+            userId,
+            subscriptionPlan: 'web.lifetime',
+            subscriptionId: createId(),
+            startAt: new Date(),
+            endAt: new Date(FREE_BETA_DATE_LIMIT),
+            issuer: 'web',
+            totalSeats: 999999,
+            status: 'active',
+          },
+          trx,
+        );
+      }
     });
 
     const issuer = (email ?? userPhoneNumber) as string;

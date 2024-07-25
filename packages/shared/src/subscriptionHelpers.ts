@@ -2,7 +2,7 @@ export const isWebCardKindSubscription = (kind: string) => {
   return kind !== 'personal';
 };
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-const modulesKindsSubscription = ['simpleButton', 'parallax'];
+const modulesKindsSubscription = ['parallax'];
 
 export const isModuleKindSubscription = (_kind: string) => {
   return modulesKindsSubscription.includes(_kind);
