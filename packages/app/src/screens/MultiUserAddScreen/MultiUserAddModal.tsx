@@ -1,4 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod';
+import * as FileSystem from 'expo-file-system';
 import parsePhoneNumberFromString, {
   parsePhoneNumber,
 } from 'libphonenumber-js';
@@ -22,6 +23,7 @@ import { isValidEmail } from '@azzapp/shared/stringHelpers';
 import { ScreenModal } from '#components/NativeRouter';
 import { CardPhoneLabels } from '#helpers/contactCardHelpers';
 import { getFileName } from '#helpers/fileHelpers';
+import { createId } from '#helpers/idHelpers';
 import { getLocales, useCurrentLocale } from '#helpers/localeHelpers';
 import { addLocalCachedMediaFile } from '#helpers/mediaHelpers';
 import { uploadMedia, uploadSign } from '#helpers/MobileWebAPI';
@@ -263,15 +265,18 @@ const MultiUserAddModal = (
             title: contact.jobTitle,
             company: contact.company ?? undefined,
             urls: contact.urlAddresses?.map(a => ({ address: a.url })) ?? [],
-            birthday: contact.birthday
-              ? {
-                  birthday: new Date(
-                    contact.birthday.year!,
-                    contact.birthday.month!,
-                    contact.birthday.day!,
-                  ).toISOString(),
-                }
-              : undefined,
+            birthday:
+              contact.birthday?.day &&
+              contact.birthday.month &&
+              contact.birthday.year
+                ? {
+                    birthday: new Date(
+                      contact.birthday.year!,
+                      contact.birthday.month!,
+                      contact.birthday.day!,
+                    ).toISOString(),
+                  }
+                : undefined,
             avatar: contact?.image?.uri
               ? {
                   uri: contact?.image?.uri,
@@ -331,9 +336,19 @@ const MultiUserAddModal = (
 
         if (avatar?.local && avatar.uri) {
           const fileName = getFileName(avatar.uri);
+
+          let uri = avatar.uri;
+          if (avatar.uri.startsWith('content://')) {
+            uri = FileSystem.cacheDirectory + createId();
+            await FileSystem.copyAsync({
+              from: avatar.uri,
+              to: uri,
+            });
+          }
+
           const file: any = {
             name: fileName,
-            uri: avatar.uri,
+            uri,
             type: mime.lookup(fileName) || 'image/jpeg',
           };
 
@@ -362,56 +377,26 @@ const MultiUserAddModal = (
         } else {
           uploads.push(null);
         }
+        try {
+          const [uploadedAvatarId, uploadedLogoId] = await Promise.all(
+            uploads.map(upload =>
+              upload?.promise.then(({ public_id }) => {
+                return public_id;
+              }),
+            ),
+          );
 
-        const [uploadedAvatarId, uploadedLogoId] = await Promise.all(
-          uploads.map(upload =>
-            upload?.promise.then(({ public_id }) => {
-              return public_id;
-            }),
-          ),
-        );
+          const avatarId =
+            avatar === null
+              ? null
+              : avatar?.local
+                ? uploadedAvatarId
+                : avatar?.id;
+          const logoId =
+            logo === null ? null : logo?.local ? uploadedLogoId : null;
 
-        const avatarId =
-          avatar === null
-            ? null
-            : avatar?.local
-              ? uploadedAvatarId
-              : avatar?.id;
-        const logoId =
-          logo === null ? null : logo?.local ? uploadedLogoId : null;
-
-        const {
-          selectedContact,
-          firstName,
-          lastName,
-          phoneNumbers,
-          emails,
-          title,
-          company,
-          urls,
-          birthday,
-          socials,
-          addresses,
-        } = data;
-
-        const email =
-          selectedContact.countryCodeOrEmail === 'email'
-            ? selectedContact.value
-            : undefined;
-
-        const phoneNumber =
-          selectedContact.countryCodeOrEmail !== 'email'
-            ? parsePhoneNumber(
-                selectedContact.value,
-                selectedContact.countryCodeOrEmail,
-              ).formatInternational()
-            : undefined;
-
-        const invited = {
-          email,
-          phoneNumber,
-          profileRole: data.role,
-          contactCard: {
+          const {
+            selectedContact,
             firstName,
             lastName,
             phoneNumbers,
@@ -421,125 +406,169 @@ const MultiUserAddModal = (
             urls,
             birthday,
             socials,
-            avatarId,
-            logoId,
             addresses,
-          },
-        };
+          } = data;
 
-        commit({
-          variables: {
-            profileId: profileInfos.profileId,
-            invited,
-          },
-          onCompleted: () => {
-            if (avatarId && avatar?.uri) {
-              addLocalCachedMediaFile(
-                `${'image'.slice(0, 1)}:${avatarId}`,
-                'image',
-                avatar.uri,
-              );
-            }
+          const email =
+            selectedContact.countryCodeOrEmail === 'email'
+              ? selectedContact.value
+              : undefined;
 
-            beforeClose();
-            onClose();
-            onCompleted();
-          },
-          onError: e => {
-            if (e.message === ERRORS.PROFILE_ALREADY_EXISTS) {
-              Toast.show({
-                type: 'error',
-                text1: intl.formatMessage({
-                  defaultMessage: 'Error, this user is already invited',
-                  description:
-                    'Error toast message when inviting user that is already a member from MultiUserAddModal',
-                }),
-              });
-            } else if (e.message === ERRORS.SUBSCRIPTION_REQUIRED) {
-              Toast.show({
-                type: 'error',
-                text1: intl.formatMessage({
-                  defaultMessage:
-                    'Error, you don’t have a subscription or you don’t have enough seats in your subscription to invite this user',
-                  description:
-                    'Error toast message when inviting user without correct subscription from MultiUserAddModal',
-                }),
-              });
-            } else {
-              Toast.show({
-                type: 'error',
-                text1: intl.formatMessage({
-                  defaultMessage:
-                    'Error, could not invite user. Please try again.',
-                  description:
-                    'Error toast message when inviting user from MultiUserAddModal',
-                }),
-              });
-            }
-          },
-          updater: (store, data) => {
-            const invitedProfile = data?.inviteUser?.profile;
-            const webCard = store?.get(profileInfos.webCardId);
-            if (invitedProfile && webCard) {
-              const connection = ConnectionHandler.getConnection(
-                webCard,
-                'MultiUserScreenUserList_webCard_connection_profiles',
-              );
-              const newProfileRecord = store.get(invitedProfile.id);
-              if (connection && newProfileRecord) {
-                const edges = connection.getLinkedRecords('edges');
-                if (edges) {
-                  const invitedContactCard = {
-                    firstName: invitedProfile?.contactCard?.firstName,
-                    lastName: invitedProfile?.contactCard?.lastName,
-                  };
-                  let cursor: string | null = null;
-                  for (let index = 0; index < edges.length; index++) {
-                    const edge = edges[index];
-                    const dataId = edges[index]
-                      .getLinkedRecord('node')
-                      ?.getDataID();
-                    const profile = store.get(dataId!);
-                    const profileRole = profile?.getValue('profileRole');
-                    if (profileRole === invitedProfile.profileRole) {
-                      const contactCard = profile?.getLinkedRecord<{
-                        firstName: string;
-                        lastName: string;
-                      }>('contactCard');
-                      const firstName = contactCard?.getValue('firstName');
-                      const lastName = contactCard?.getValue('lastName');
+          const phoneNumber =
+            selectedContact.countryCodeOrEmail !== 'email'
+              ? parsePhoneNumber(
+                  selectedContact.value,
+                  selectedContact.countryCodeOrEmail,
+                ).formatInternational()
+              : undefined;
 
-                      if (
-                        isAfter(invitedContactCard, {
-                          firstName,
-                          lastName,
-                        })
-                      ) {
-                        cursor = edge.getValue('cursor') as string;
-                        break;
+          const invited = {
+            email,
+            phoneNumber,
+            profileRole: data.role,
+            contactCard: {
+              firstName,
+              lastName,
+              phoneNumbers,
+              emails,
+              title,
+              company,
+              urls,
+              birthday,
+              socials,
+              avatarId,
+              logoId,
+              addresses,
+            },
+          };
+
+          commit({
+            variables: {
+              profileId: profileInfos.profileId,
+              invited,
+            },
+            onCompleted: () => {
+              if (avatarId && avatar?.uri) {
+                addLocalCachedMediaFile(
+                  `${'image'.slice(0, 1)}:${avatarId}`,
+                  'image',
+                  avatar.uri,
+                );
+              }
+
+              beforeClose();
+              onClose();
+              onCompleted();
+            },
+            onError: e => {
+              if (e.message === ERRORS.PROFILE_ALREADY_EXISTS) {
+                Toast.show({
+                  type: 'error',
+                  text1: intl.formatMessage({
+                    defaultMessage: 'Error, this user is already invited',
+                    description:
+                      'Error toast message when inviting user that is already a member from MultiUserAddModal',
+                  }),
+                });
+              } else if (e.message === ERRORS.SUBSCRIPTION_REQUIRED) {
+                Toast.show({
+                  type: 'error',
+                  text1: intl.formatMessage({
+                    defaultMessage:
+                      'Error, you don’t have a subscription or you don’t have enough seats in your subscription to invite this user',
+                    description:
+                      'Error toast message when inviting user without correct subscription from MultiUserAddModal',
+                  }),
+                });
+              } else {
+                Toast.show({
+                  type: 'error',
+                  text1: intl.formatMessage({
+                    defaultMessage:
+                      'Error, could not invite user. Please try again.',
+                    description:
+                      'Error toast message when inviting user from MultiUserAddModal',
+                  }),
+                });
+              }
+            },
+            updater: (store, data) => {
+              const invitedProfile = data?.inviteUser?.profile;
+              const webCard = store?.get(profileInfos.webCardId);
+              if (invitedProfile && webCard) {
+                const connection = ConnectionHandler.getConnection(
+                  webCard,
+                  'MultiUserScreenUserList_webCard_connection_profiles',
+                );
+                const newProfileRecord = store.get(invitedProfile.id);
+                if (connection && newProfileRecord) {
+                  const edges = connection.getLinkedRecords('edges');
+                  if (edges) {
+                    const invitedContactCard = {
+                      firstName: invitedProfile?.contactCard?.firstName,
+                      lastName: invitedProfile?.contactCard?.lastName,
+                    };
+                    let cursor: string | null = null;
+                    for (let index = 0; index < edges.length; index++) {
+                      const edge = edges[index];
+                      const dataId = edges[index]
+                        .getLinkedRecord('node')
+                        ?.getDataID();
+                      const profile = store.get(dataId!);
+                      const profileRole = profile?.getValue('profileRole');
+                      if (profileRole === invitedProfile.profileRole) {
+                        const contactCard = profile?.getLinkedRecord<{
+                          firstName: string;
+                          lastName: string;
+                        }>('contactCard');
+                        const firstName = contactCard?.getValue('firstName');
+                        const lastName = contactCard?.getValue('lastName');
+
+                        if (
+                          isAfter(invitedContactCard, {
+                            firstName,
+                            lastName,
+                          })
+                        ) {
+                          cursor = edge.getValue('cursor') as string;
+                          break;
+                        }
                       }
                     }
-                  }
 
-                  const edge = ConnectionHandler.createEdge(
-                    store,
-                    connection,
-                    newProfileRecord,
-                    'WebCardEdge',
-                  );
-                  if (cursor) {
-                    ConnectionHandler.insertEdgeAfter(connection, edge, cursor);
-                  } else {
-                    ConnectionHandler.insertEdgeAfter(connection, edge);
+                    const edge = ConnectionHandler.createEdge(
+                      store,
+                      connection,
+                      newProfileRecord,
+                      'WebCardEdge',
+                    );
+                    if (cursor) {
+                      ConnectionHandler.insertEdgeAfter(
+                        connection,
+                        edge,
+                        cursor,
+                      );
+                    } else {
+                      ConnectionHandler.insertEdgeAfter(connection, edge);
+                    }
                   }
                 }
               }
-            }
-            //update the user counter profile?.webCard?.nbProfiles
-            const nbProfiles = webCard?.getValue('nbProfiles') as number;
-            webCard?.setValue(nbProfiles + 1, 'nbProfiles');
-          },
-        });
+              //update the user counter profile?.webCard?.nbProfiles
+              const nbProfiles = webCard?.getValue('nbProfiles') as number;
+              webCard?.setValue(nbProfiles + 1, 'nbProfiles');
+            },
+          });
+        } catch (e) {
+          Toast.show({
+            type: 'error',
+            text1: intl.formatMessage({
+              defaultMessage: 'Error, could not invite user. Please try again.',
+              description:
+                'Error toast message when inviting user from MultiUserAddModal',
+            }),
+          });
+        }
       }
     },
     error => {
