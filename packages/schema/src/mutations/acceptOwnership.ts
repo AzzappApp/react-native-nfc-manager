@@ -1,7 +1,7 @@
 import { eq, and } from 'drizzle-orm';
 import { GraphQLError } from 'graphql';
 import { fromGlobalId } from 'graphql-relay';
-import { ProfileTable, db } from '@azzapp/data';
+import { ProfileTable, UserSubscriptionTable, db } from '@azzapp/data';
 import ERRORS from '@azzapp/shared/errors';
 import type { MutationResolvers } from '#/__generated__/types';
 
@@ -27,6 +27,8 @@ const acceptOwnership: MutationResolvers['acceptOwnership'] = async (
     throw new GraphQLError(ERRORS.INVALID_REQUEST);
   }
 
+  const owner = await loaders.webCardOwners.load(webCard.id);
+
   await db.transaction(async trx => {
     await trx
       .update(ProfileTable)
@@ -37,6 +39,19 @@ const acceptOwnership: MutationResolvers['acceptOwnership'] = async (
           eq(ProfileTable.profileRole, 'owner'),
         ),
       );
+
+    if (owner) {
+      await trx
+        .update(UserSubscriptionTable)
+        .set({ status: 'canceled' })
+        .where(
+          and(
+            eq(UserSubscriptionTable.webCardId, profile.webCardId),
+            eq(UserSubscriptionTable.userId, owner.id),
+            eq(UserSubscriptionTable.status, 'active'),
+          ),
+        );
+    }
 
     await trx
       .update(ProfileTable)

@@ -33,8 +33,8 @@ export const checkSubscription = async (
   addedSeats: number,
 ) => {
   const userSubscription = await getActiveUserSubscriptionForWebCard(
-    userId,
-    webCardId,
+    [userId],
+    [webCardId],
   );
 
   const lifetime = userSubscription.find(
@@ -79,8 +79,8 @@ export const updateMonthlySubscription = async (
   trx: DbTransaction = db,
 ) => {
   const subs = await getActiveUserSubscriptionForWebCard(
-    userId,
-    webCardId,
+    [userId],
+    [webCardId],
     trx,
   );
 
@@ -120,9 +120,12 @@ export const checkWebCardHasSubscription = async (
     webCard.cardIsPublished
   ) {
     const subscription = owner
-      ? await loaders.activeSubscriptionsLoader.load(owner.id)
+      ? await loaders.activeSubscriptionsForWebCardLoader.load({
+          userId: owner.id,
+          webCardId: webCard.id,
+        })
       : [];
-    if (subscription.length === 0) {
+    if (!subscription) {
       throw new GraphQLError(ERRORS.SUBSCRIPTION_REQUIRED);
     }
   }

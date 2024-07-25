@@ -71,9 +71,12 @@ const createModuleSavingMutation =
       webCard.cardIsPublished
     ) {
       const subscription = owner
-        ? await loaders.activeSubscriptionsLoader.load(owner.id)
+        ? await loaders.activeSubscriptionsForWebCardLoader.load({
+            userId: owner.id,
+            webCardId: webCard.id,
+          })
         : null;
-      if (!subscription?.length) {
+      if (!subscription) {
         throw new GraphQLError(ERRORS.SUBSCRIPTION_REQUIRED);
       }
     }

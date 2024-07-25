@@ -29,8 +29,9 @@ import {
   PaymentMeanTable,
   CompanyActivityTypeTable,
   getCardModulesForWebCards,
-  activeUserSubscription,
   getLocalizationMessagesByKeys,
+  getActiveUserSubscriptionForWebCard,
+  activeUserSubscription,
 } from '@azzapp/data';
 import { DEFAULT_LOCALE, ENTITY_TARGET } from '@azzapp/i18n';
 import type {
@@ -183,6 +184,10 @@ export type Loaders = {
   labels: DataLoader<[string, string], LocalizationMessage | null>;
   cardModuleByWebCardLoader: DataLoader<string, CardModule[]>;
   activeSubscriptionsLoader: DataLoader<string, UserSubscription[]>;
+  activeSubscriptionsForWebCardLoader: DataLoader<
+    { userId: string; webCardId: string },
+    UserSubscription | null
+  >;
 };
 
 const entitiesTable = {
@@ -353,12 +358,39 @@ const activeSubscriptionsLoader = () =>
     return keys.map(k => modules.filter(m => m.userId === k));
   }, dataLoadersOptions);
 
+const activeSubscriptionsForWebCardLoader = () =>
+  new DataLoader<
+    { userId: string; webCardId: string },
+    UserSubscription | null
+  >(async keys => {
+    if (keys.length === 0) {
+      return [];
+    }
+    const webCardIds = keys.map(k => k.webCardId);
+    const userIds = keys.map(k => k.userId);
+
+    const userSubscriptions = await getActiveUserSubscriptionForWebCard(
+      userIds,
+      webCardIds,
+    );
+
+    return keys.map(
+      k =>
+        userSubscriptions.find(
+          u =>
+            (k.webCardId && u.webCardId === k.webCardId) ||
+            u.userId === k.userId,
+        ) ?? null,
+    );
+  }, dataLoadersOptions);
+
 export const createLoaders = (): Loaders =>
   new Proxy({} as Loaders, {
     get: (
       loaders: Loaders,
       entity:
         | Entity
+        | 'activeSubscriptionsForWebCardLoader'
         | 'activeSubscriptionsLoader'
         | 'cardModuleByWebCardLoader'
         | 'labels'
@@ -389,6 +421,10 @@ export const createLoaders = (): Loaders =>
 
       if (entity === 'activeSubscriptionsLoader') {
         return activeSubscriptionsLoader();
+      }
+
+      if (entity === 'activeSubscriptionsForWebCardLoader') {
+        return activeSubscriptionsForWebCardLoader();
       }
 
       if (!['profileByWebCardIdAndUserId', ...entities].includes(entity)) {

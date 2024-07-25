@@ -15,7 +15,6 @@ import {
   getLastSubscription,
   getFilterCoverTemplateTypes,
   getCoverTemplatesByTypesAndTag,
-  activeUserSubscription,
 } from '@azzapp/data';
 import { webCardRequiresSubscription } from '@azzapp/shared/subscriptionHelpers';
 import {
@@ -78,13 +77,15 @@ export const WebCard: WebCardResolvers = {
   },
   isWebSubscription: async (webCard, _, { loaders }) => {
     const owner = await loaders.webCardOwners.load(webCard.id);
-    const subscriptions = owner
-      ? await loaders.activeSubscriptionsLoader.load(owner.id)
+    const subscription = owner
+      ? await loaders.activeSubscriptionsForWebCardLoader.load({
+          userId: owner.id,
+          webCardId: webCard.id,
+        })
       : null;
-    const isWebSubscription = subscriptions?.some(
-      subscription =>
-        subscription.issuer === 'web' && subscription.status === 'active',
-    );
+    const isWebSubscription =
+      subscription?.issuer === 'web' && subscription.status === 'active';
+
     return isWebSubscription ?? false;
   },
   isPremium: async (webCard, _, { loaders }) => {
@@ -93,10 +94,13 @@ export const WebCard: WebCardResolvers = {
     //cannot use the loader here (when IAP sub), can't find a way to for revalidation in api route.
     //Got a bug where the subscription is canceled however still active in the result set
     const subscription = owner
-      ? await activeUserSubscription([owner.id])
+      ? await loaders.activeSubscriptionsForWebCardLoader.load({
+          userId: owner.id,
+          webCardId: webCard.id,
+        })
       : null;
 
-    return !!subscription?.length;
+    return !!subscription;
   },
   isFollowing: async (webCard, { webCardId: gqlWebCardId }) => {
     if (!gqlWebCardId) {

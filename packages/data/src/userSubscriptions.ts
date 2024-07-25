@@ -143,8 +143,8 @@ export const activeUserSubscription = async (
 };
 
 export const getActiveUserSubscriptionForWebCard = async (
-  userId: string,
-  webCardId: string,
+  userIds: string[],
+  webCardIds: string[],
   trx: DbTransaction = db,
 ) => {
   const currentDate = new Date();
@@ -153,18 +153,28 @@ export const getActiveUserSubscriptionForWebCard = async (
     .from(UserSubscriptionTable)
     .where(
       and(
-        eq(UserSubscriptionTable.userId, userId),
-        or(
-          eq(UserSubscriptionTable.webCardId, webCardId),
-          isNull(UserSubscriptionTable.webCardId),
-        ),
+        webCardIds.length
+          ? or(
+              and(
+                inArray(UserSubscriptionTable.userId, userIds),
+                isNull(UserSubscriptionTable.webCardId),
+              ),
+              inArray(UserSubscriptionTable.webCardId, webCardIds),
+            )
+          : and(
+              inArray(UserSubscriptionTable.userId, userIds),
+              isNull(UserSubscriptionTable.webCardId),
+            ),
         or(
           eq(UserSubscriptionTable.status, 'active'),
           gte(UserSubscriptionTable.endAt, currentDate),
         ),
       ),
     )
-    .orderBy(asc(UserSubscriptionTable.status));
+    .orderBy(
+      asc(UserSubscriptionTable.status),
+      desc(UserSubscriptionTable.webCardId),
+    );
 };
 
 export const getActiveWebCardSubscription = async (
@@ -222,12 +232,19 @@ export const getLastSubscription = async (
   webCardId: string,
   trx: DbTransaction = db,
 ) => {
+  const currentDate = new Date();
   return trx
     .select()
     .from(UserSubscriptionTable)
     .where(
       and(
-        eq(UserSubscriptionTable.userId, userId),
+        or(
+          eq(UserSubscriptionTable.userId, userId),
+          and(
+            eq(UserSubscriptionTable.webCardId, webCardId),
+            gte(UserSubscriptionTable.endAt, currentDate), // we take into account the subscriptions that are not yet expired of precedent owner
+          ),
+        ),
         or(
           eq(UserSubscriptionTable.webCardId, webCardId),
           and(
