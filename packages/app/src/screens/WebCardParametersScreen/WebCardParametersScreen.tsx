@@ -29,7 +29,10 @@ import Select from '#ui/Select';
 import SelectSection from '#ui/SelectSection';
 import Switch from '#ui/Switch';
 import Text from '#ui/Text';
+import WebcardParametersCompanyNameForm from './WebCardParametersCompanyNameForm';
+import WebcardParametersFirstNameForm from './WebCardParametersFirstNameForm';
 import WebCardParametersHeader from './WebCardParametersHeader';
+import WebcardParametersLastNameForm from './WebCardParametersLastNameForm';
 import WebCardParametersNameForm from './WebCardParametersNameForm';
 import WebCardParametersScreenFallback from './WebCardParametersScreenFallback';
 import type { RelayScreenProps } from '#helpers/relayScreen';
@@ -106,6 +109,9 @@ const WebCardParametersScreen = ({
         hasCover
         requiresSubscription
         isPremium
+        firstName
+        lastName
+        companyName
         ...AccountHeader_webCard
       }
     `,
@@ -115,6 +121,10 @@ const WebCardParametersScreen = ({
   const intl = useIntl();
   const styles = useStyleSheet(styleSheet);
   const [userNameFormVisible, toggleUserNameFormVisible] = useToggle(false);
+  const [firstNameFormVisible, toggleFirstNameFormVisible] = useToggle(false);
+  const [lastNameFormVisible, toggleLastNameFormVisible] = useToggle(false);
+  const [companyNameFormVisible, toggleCompanyNameFormVisible] =
+    useToggle(false);
 
   const [searchActivities, setSearchActivities] = useState('');
 
@@ -605,6 +615,34 @@ const WebCardParametersScreen = ({
               )}
             />
           </View>
+          {webCard.webCardKind === 'personal' && (
+            <PressableNative
+              style={styles.sectionField}
+              onPress={toggleFirstNameFormVisible}
+            >
+              <Text variant="smallbold">
+                <FormattedMessage
+                  defaultMessage="Firstname"
+                  description="firstname field in the webcard parameters screen"
+                />
+              </Text>
+              <Text variant="medium">{webCard.firstName}</Text>
+            </PressableNative>
+          )}
+          {webCard.webCardKind === 'personal' && (
+            <PressableNative
+              style={styles.sectionField}
+              onPress={toggleLastNameFormVisible}
+            >
+              <Text variant="smallbold">
+                <FormattedMessage
+                  defaultMessage="Lastname"
+                  description="lastname field in the webcard parameters screen"
+                />
+              </Text>
+              <Text variant="medium">{webCard.lastName}</Text>
+            </PressableNative>
+          )}
           {webCard.webCardKind !== 'personal' && (
             <View style={styles.sectionField}>
               <Text variant="smallbold">
@@ -664,6 +702,20 @@ const WebCardParametersScreen = ({
               />
             </View>
           )}
+          {webCard.webCardKind !== 'personal' && (
+            <PressableNative
+              style={styles.sectionField}
+              onPress={toggleCompanyNameFormVisible}
+            >
+              <Text variant="smallbold">
+                <FormattedMessage
+                  defaultMessage="Company name"
+                  description="company name field in the webcard parameters screen"
+                />
+              </Text>
+              <Text variant="medium">{webCard.companyName}</Text>
+            </PressableNative>
+          )}
 
           <Text variant="xsmall" style={styles.descriptionText}>
             <FormattedMessage
@@ -713,11 +765,28 @@ const WebCardParametersScreen = ({
           </PressableNative>
         </View>
         {webCard && (
-          <WebCardParametersNameForm
-            webCard={webCard}
-            visible={userNameFormVisible}
-            toggleBottomSheet={toggleUserNameFormVisible}
-          />
+          <>
+            <WebCardParametersNameForm
+              webCard={webCard}
+              visible={userNameFormVisible}
+              toggleBottomSheet={toggleUserNameFormVisible}
+            />
+            <WebcardParametersFirstNameForm
+              webCard={webCard}
+              visible={firstNameFormVisible}
+              toggleBottomSheet={toggleFirstNameFormVisible}
+            />
+            <WebcardParametersLastNameForm
+              webCard={webCard}
+              visible={lastNameFormVisible}
+              toggleBottomSheet={toggleLastNameFormVisible}
+            />
+            <WebcardParametersCompanyNameForm
+              webCard={webCard}
+              visible={companyNameFormVisible}
+              toggleBottomSheet={toggleCompanyNameFormVisible}
+            />
+          </>
         )}
       </SafeAreaView>
     </Container>
