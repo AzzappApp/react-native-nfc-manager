@@ -1,5 +1,9 @@
-## 0.5.21-canary.33
+## 0.5.21-canary.34
 
+* **build:**  - fix config file
+* **fix:**  - landscape android never work ([#4493](https://github.com/AzzappApp/azzapp/pull/4493))
+* **feat:**  - preview email signature ([#4486](https://github.com/AzzappApp/azzapp/pull/4486))
+* **fix:**  - **WebCard:** Module background image resolver
 * **fix:**  - allow user that have a free subscription to delete their account ([#4489](https://github.com/AzzappApp/azzapp/pull/4489))
 * **fix:**  - **android:** [#4344](https://github.com/AzzappApp/azzapp/pull/4344) get correctly sizes on android ([#4488](https://github.com/AzzappApp/azzapp/pull/4488))
 * **feat:**  - 🎸 use cover background color on empty web modules ([#4482](https://github.com/AzzappApp/azzapp/pull/4482))
