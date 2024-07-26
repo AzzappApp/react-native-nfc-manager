@@ -262,7 +262,7 @@ const columns: GridColDef[] = [
     field: 'subscriptionPlan',
     headerName: 'Type',
     width: 100,
-    valueGetter: ({ value }) => value.replace('web.', ''),
+    valueGetter: ({ value }) => value?.replace('web.', '') || '',
   },
   {
     field: 'userId',
