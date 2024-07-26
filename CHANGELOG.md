@@ -1,5 +1,10 @@
-## 0.5.21-canary.25
+## 0.5.21-canary.26
 
+* **fix:**  - **IOS:**  cover animation on media ([#4476](https://github.com/AzzappApp/azzapp/pull/4476))
+* **fix:**  - don’t display azzappPro on welcome screen ([#4474](https://github.com/AzzappApp/azzapp/pull/4474))
+* **fix:**  - **contactCard:** [#4344](https://github.com/AzzappApp/azzapp/pull/4344) issue on size recuperation on android ([#4353](https://github.com/AzzappApp/azzapp/pull/4353))
+* **fix:**  - **android:** [#4426](https://github.com/AzzappApp/azzapp/pull/4426) handle content file for avatar ([#4464](https://github.com/AzzappApp/azzapp/pull/4464))
+* **fix:**  - **CoverEditor:** hide tag selector in text modal
 * **fix:**  - 🐛 select template on webcard template category change ([#4453](https://github.com/AzzappApp/azzapp/pull/4453))
 * **fix:**  - **multiUser:** [#2294](https://github.com/AzzappApp/azzapp/pull/2294) manage subscription on ownership transfer ([#4407](https://github.com/AzzappApp/azzapp/pull/4407))
 * **feat:**  - 🎸 add options to edit first/last/company name ([#4432](https://github.com/AzzappApp/azzapp/pull/4432))
