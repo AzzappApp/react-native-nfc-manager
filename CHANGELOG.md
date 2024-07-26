@@ -1,5 +1,6 @@
-## 0.5.21-canary.36
+## 0.5.21-canary.37
 
+* **fix:**  - ex owner ([#4477](https://github.com/AzzappApp/azzapp/pull/4477))
 * **fix:**  - 🐛 configure fonts for android ([#4500](https://github.com/AzzappApp/azzapp/pull/4500))
 * **fix:**  - 🐛 complete phone number validator removal ([#4499](https://github.com/AzzappApp/azzapp/pull/4499))
 * **build:**  - fix config file
