@@ -13,10 +13,9 @@ export const CLOUDINARY_BASE_URL = `https://${process.env.NEXT_PUBLIC_CLOUDINARY
 export const getCloudinaryAssetURL = (
   id: string,
   kind: 'image' | 'raw' | 'video',
-  format?: 'avif' | 'jpg' | 'mp4' | 'png' | 'svg' | 'webp',
 ) => {
   assetNotRN('getCloudinaryAssetURL');
-  return `${CLOUDINARY_BASE_URL}/${kind}/upload${format ? `/f_${format}` : '/'}${id}`;
+  return `${CLOUDINARY_BASE_URL}/${kind}/upload/${id}`;
 };
 
 /**

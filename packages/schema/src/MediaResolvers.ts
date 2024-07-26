@@ -141,11 +141,7 @@ const uriResolver =
     media = getDeferredMedia(media);
     const id = typeof media === 'string' ? media : media.id;
     if (raw) {
-      return getCloudinaryAssetURL(
-        id,
-        kind,
-        kind === 'video' ? 'mp4' : kind === 'image' ? 'avif' : undefined,
-      );
+      return getCloudinaryAssetURL(id, kind);
     }
     const pregeneratedSizes =
       assetKind === 'cover' || assetKind === 'rawCover'

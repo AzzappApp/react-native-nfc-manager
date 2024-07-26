@@ -1,16 +1,17 @@
+import * as Sentry from '@sentry/react-native';
 import {
   Canvas,
   ImageSVG,
   rect,
   fitbox,
   Group,
-  useSVG,
   Paint,
   BlendColor,
-  useImage,
-  Image,
+  Skia,
 } from '@shopify/react-native-skia';
+import { useEffect, useState } from 'react';
 import { StyleSheet } from 'react-native';
+import type { SkSVG } from '@shopify/react-native-skia';
 import type { ColorValue } from 'react-native';
 
 type CardModuleBackgroundImageProps = {
@@ -22,60 +23,46 @@ type CardModuleBackgroundImageProps = {
 };
 
 const CardModuleBackgroundImage = (props: CardModuleBackgroundImageProps) => {
-  if (!props.backgroundUri) {
-    return null;
-  }
-  if (props.backgroundUri.endsWith('.svg')) {
-    return <CardModuleBackgroundSvgImage {...props} />;
-  } else {
-    return <CardModuleBackgroundImageInner {...props} />;
-  }
-};
-
-const CardModuleBackgroundImageInner = (
-  props: CardModuleBackgroundImageProps,
-) => {
-  const { layout, backgroundUri, resizeMode, patternColor, backgroundOpacity } =
-    props;
-  const image = useImage(backgroundUri);
-
-  if (image) {
-    return (
-      <Canvas style={styles.container}>
-        <Group
-          opacity={backgroundOpacity}
-          layer={
-            <Paint>
-              <BlendColor
-                color={patternColor?.toString() ?? 'black'}
-                mode="srcIn"
-              />
-            </Paint>
-          }
-        >
-          <Image
-            image={image}
-            fit={resizeMode === 'contain' ? 'contain' : 'fill'}
-            x={0}
-            y={0}
-            width={layout.width}
-            height={layout.height}
-          />
-        </Group>
-      </Canvas>
-    );
-  }
-
-  return null;
-};
-
-const CardModuleBackgroundSvgImage = (
-  props: CardModuleBackgroundImageProps,
-) => {
   const { layout, resizeMode, backgroundUri, patternColor, backgroundOpacity } =
     props;
 
-  const svg = useSVG(backgroundUri);
+  const [svg, setSVG] = useState<SkSVG | null>(null);
+
+  useEffect(() => {
+    let canceled = false;
+    const fetchSvg = async () => {
+      if (!backgroundUri) {
+        setSVG(null);
+        return;
+      }
+      try {
+        const resp = await fetch(backgroundUri);
+        if (canceled) {
+          return;
+        }
+        if (!resp.ok) {
+          throw new Error(`Failed to fetch ${backgroundUri}`);
+        }
+        const svgSrc = await resp.text();
+        if (canceled) {
+          return;
+        }
+        setSVG(Skia.SVG.MakeFromString(svgSrc));
+      } catch (e) {
+        if (canceled) {
+          return;
+        }
+        console.warn(`Failed to load SVG: ${backgroundUri}`, e);
+        Sentry.captureException(e);
+        setSVG(null);
+      }
+    };
+    fetchSvg();
+
+    return () => {
+      canceled = true;
+    };
+  }, [backgroundUri]);
 
   if (!svg) {
     return null;
