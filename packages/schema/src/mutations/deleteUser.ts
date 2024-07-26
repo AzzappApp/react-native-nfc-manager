@@ -27,7 +27,11 @@ const deleteUser: MutationResolvers['deleteUser'] = async (
     deleted: true,
   };
 
-  if ((await loaders.activeSubscriptionsLoader.load(userId)).length > 0) {
+  if (
+    (await loaders.activeSubscriptionsLoader.load(userId)).filter(
+      sub => sub.subscriptionPlan !== 'web.lifetime',
+    ).length > 0
+  ) {
     throw new GraphQLError(ERRORS.SUBSCRIPTION_IS_ACTIVE);
   }
 
