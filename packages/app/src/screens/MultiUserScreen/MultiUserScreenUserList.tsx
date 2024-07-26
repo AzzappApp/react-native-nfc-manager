@@ -207,18 +207,13 @@ const MultiUserScreenUserList = ({
 
   const { profileInfos } = useAuthState();
 
-  const isWebCardOwner = useMemo(
-    () => isOwner(profileInfos?.profileRole),
-    [profileInfos?.profileRole],
-  );
-
   const { transferOwnerMode } = useContext(MultiUserTransferOwnerContext);
 
   const [searching, setSearching] = useState(false);
 
   const renderListItem = useCallback<ListRenderItem<Profile>>(
     ({ item }) => {
-      if (isWebCardOwner && item.id === profileInfos?.profileId) {
+      if (item.id === profileInfos?.profileId && isOwner(item.profileRole)) {
         return (
           <View>
             <UserListItem item={item} />
@@ -228,7 +223,7 @@ const MultiUserScreenUserList = ({
       }
       return <UserListItem item={item} />;
     },
-    [isWebCardOwner, profileInfos?.profileId, searching, webCard],
+    [profileInfos?.profileId, searching, webCard],
   );
 
   //filter the sections without having to reparse all the data

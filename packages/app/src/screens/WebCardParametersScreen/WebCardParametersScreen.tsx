@@ -17,7 +17,6 @@ import PremiumIndicator from '#components/PremiumIndicator';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import { keyExtractor } from '#helpers/idHelpers';
 import relayScreen from '#helpers/relayScreen';
-import useAuthState from '#hooks/useAuthState';
 import useQuitWebCard from '#hooks/useQuitWebCard';
 import useToggle from '#hooks/useToggle';
 import Container from '#ui/Container';
@@ -48,11 +47,16 @@ import type { ArrayItemType } from '@azzapp/shared/arrayHelpers';
 import type { GraphQLError } from 'graphql';
 
 const webCardParametersScreenQuery = graphql`
-  query WebCardParametersScreenQuery($webCardId: ID!) {
+  query WebCardParametersScreenQuery($webCardId: ID!, $profileId: ID!) {
     webCard: node(id: $webCardId) {
       ...WebCardParametersScreen_webCard
       ... on WebCard {
         isPremium
+      }
+    }
+    profile: node(id: $profileId) {
+      ... on Profile {
+        profileRole
       }
     }
     webCardCategories {
@@ -79,16 +83,15 @@ const WebCardParametersScreen = ({
 }: RelayScreenProps<WebCardParametersRoute, WebCardParametersScreenQuery>) => {
   const {
     webCard: webCardKey,
+    profile,
     webCardCategories,
     webCardParameters: { userNameChangeFrequencyDay },
   } = usePreloadedQuery(webCardParametersScreenQuery, preloadedQuery);
   const router = useRouter();
 
-  const { profileInfos } = useAuthState();
-  const isWebCardOwner = useMemo(
-    () => isOwner(profileInfos?.profileRole),
-    [profileInfos?.profileRole],
-  );
+  const isWebCardOwner = useMemo(() => {
+    return isOwner(profile?.profileRole);
+  }, [profile?.profileRole]);
 
   const webCard = useFragment(
     graphql`
@@ -855,6 +858,7 @@ export default relayScreen(WebCardParametersScreen, {
   query: webCardParametersScreenQuery,
   getVariables: (_, profileInfos) => ({
     webCardId: profileInfos?.webCardId ?? '',
+    profileId: profileInfos?.profileId ?? '',
   }),
   fallback: WebCardParametersScreenFallback,
   fetchPolicy: 'store-and-network',
