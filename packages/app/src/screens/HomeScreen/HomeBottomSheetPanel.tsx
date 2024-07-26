@@ -364,7 +364,7 @@ const HomeBottomSheetPanel = ({
           onPress: onLogout,
         },
       ]),
-    [close, intl, onLogout, onShare, profile],
+    [close, intl, onLogout, onShare, profile, userIsPremium],
   );
 
   const modalHeight = useMemo(() => {
