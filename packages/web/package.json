@@ -1,6 +1,6 @@
 {
   "name": "@azzapp/web",
-  "version": "0.5.20-rc.27",
+  "version": "0.5.20-rc.28",
   "private": true,
   "scripts": {
     "dev": "next dev",
