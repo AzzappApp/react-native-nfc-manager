@@ -9,7 +9,7 @@ import Container from '#ui/Container';
 import Header from '#ui/Header';
 import IconButton from '#ui/IconButton';
 import SafeAreaView from '#ui/SafeAreaView';
-import type { PostList_webCard$key } from '#relayArtifacts/PostList_webCard.graphql';
+import type { PostList_viewerWebCard$key } from '#relayArtifacts/PostList_viewerWebCard.graphql';
 import type { WebCardPostsListQuery } from '#relayArtifacts/WebCardPostsListQuery.graphql';
 
 type WebCardPostsListProps = {
@@ -18,11 +18,11 @@ type WebCardPostsListProps = {
   hasFocus: boolean;
   userName: string;
   toggleFlip: () => void;
-  userWebCard: PostList_webCard$key;
+  viewerWebCard: PostList_viewerWebCard$key;
 };
 
 const WebCardPostsList = ({
-  userWebCard,
+  viewerWebCard,
   webCardId,
   isViewer,
   hasFocus,
@@ -88,7 +88,7 @@ const WebCardPostsList = ({
         {webCard && (
           <PostList
             webCard={webCard}
-            userWebCard={userWebCard}
+            viewerWebCard={viewerWebCard}
             canPlay={hasFocus}
             onPressAuthor={toggleFlip}
           />

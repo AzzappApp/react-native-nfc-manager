@@ -345,7 +345,7 @@ const WebCardScreen = ({
 
   // const viewerWebCardUnpublish =
   //   profileInfos?.webCardId !== data.webCard?.id &&
-  //   data.node?.userWebCard?.cardIsPublished === false;
+  //   data.node?.viewerWebCard?.cardIsPublished === false;
   // const displayAlertUnpublished = useCallback(() => {
   //   Alert.alert(
   //     intl.formatMessage({
@@ -374,7 +374,7 @@ const WebCardScreen = ({
   //   );
   // }, [intl, router]);
 
-  if (!data.webCard || !data.node?.userWebCard) {
+  if (!data.webCard || !data.node?.viewerWebCard) {
     return null;
   }
 
@@ -416,7 +416,7 @@ const WebCardScreen = ({
                   webCardId={data.webCard.id}
                   hasFocus={hasFocus && showPost && ready}
                   userName={data.webCard.userName!}
-                  userWebCard={data.node.userWebCard}
+                  viewerWebCard={data.node.viewerWebCard}
                 />
               </Suspense>
             </Animated.View>
@@ -424,7 +424,7 @@ const WebCardScreen = ({
         </GestureDetector>
         <WebCardScreenButtonBar
           webCard={data.webCard}
-          userWebCard={data.node.userWebCard}
+          viewerWebCard={data.node.viewerWebCard}
           isViewer={isViewer}
           editing={editing}
           onHome={router.backToTop}
@@ -474,9 +474,9 @@ const webCardScreenByIdQuery = graphql`
       ...WebCardModal_webCard @arguments(viewerWebCardId: $viewerWebCardId)
     }
     node(id: $viewerWebCardId) {
-      ... on WebCard @alias(as: "userWebCard") {
-        ...WebCardScreenButtonBar_myWebCard
-        ...PostList_webCard
+      ... on WebCard @alias(as: "viewerWebCard") {
+        ...WebCardScreenButtonBar_viewerWebCard
+        ...PostList_viewerWebCard
       }
     }
   }
@@ -498,9 +498,9 @@ const webCardScreenByNameQuery = graphql`
       ...WebCardModal_webCard @arguments(viewerWebCardId: $viewerWebCardId)
     }
     node(id: $viewerWebCardId) {
-      ... on WebCard @alias(as: "userWebCard") {
-        ...WebCardScreenButtonBar_myWebCard
-        ...PostList_webCard
+      ... on WebCard @alias(as: "viewerWebCard") {
+        ...WebCardScreenButtonBar_viewerWebCard
+        ...PostList_viewerWebCard
       }
     }
   }
