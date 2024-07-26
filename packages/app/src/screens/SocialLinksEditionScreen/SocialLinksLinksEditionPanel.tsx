@@ -268,8 +268,7 @@ const SocialInputComponent = ({
       setLocalValue(filterText);
       if (
         icon !== 'website' &&
-        icon !== 'mail' &&
-        icon !== 'phone' // phone number / email / website are validated on end editing
+        icon !== 'mail' // email / website are validated on end editing
       ) {
         debouncedChangeLink(icon, value);
       }
