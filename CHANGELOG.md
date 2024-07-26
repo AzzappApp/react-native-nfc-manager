@@ -1,5 +1,6 @@
-## 0.5.21-canary.29
+## 0.5.21-canary.30
 
+* **feat:**  - 🎸 use cover background color on empty web modules ([#4482](https://github.com/AzzappApp/azzapp/pull/4482))
 * **fix:**  - dependency of useMemo
 * **fix:**  - 🐛 allow change name uppercase ([#4478](https://github.com/AzzappApp/azzapp/pull/4478))
 * **fix:**  - **IOS:**  cover animation on media ([#4476](https://github.com/AzzappApp/azzapp/pull/4476))
