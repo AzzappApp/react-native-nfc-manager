@@ -1,4 +1,4 @@
-## 0.5.21-canary.26
+## 0.5.21-canary.27
 
 * **fix:**  - **IOS:**  cover animation on media ([#4476](https://github.com/AzzappApp/azzapp/pull/4476))
 * **fix:**  - don’t display azzappPro on welcome screen ([#4474](https://github.com/AzzappApp/azzapp/pull/4474))
