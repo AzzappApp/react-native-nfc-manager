@@ -1,5 +1,6 @@
-## 0.5.21-canary.27
+## 0.5.21-canary.28
 
+* **fix:**  - 🐛 allow change name uppercase ([#4478](https://github.com/AzzappApp/azzapp/pull/4478))
 * **fix:**  - **IOS:**  cover animation on media ([#4476](https://github.com/AzzappApp/azzapp/pull/4476))
 * **fix:**  - don’t display azzappPro on welcome screen ([#4474](https://github.com/AzzappApp/azzapp/pull/4474))
 * **fix:**  - **contactCard:** [#4344](https://github.com/AzzappApp/azzapp/pull/4344) issue on size recuperation on android ([#4353](https://github.com/AzzappApp/azzapp/pull/4353))
