@@ -1,4 +1,4 @@
-import { memo, useMemo } from 'react';
+import { useMemo } from 'react';
 import { StyleSheet, View } from 'react-native';
 import Animated, {
   interpolateColor,
@@ -183,7 +183,7 @@ const HomeHeader = ({ openPanel, user: userKey }: HomeHeaderProps) => {
   );
 };
 
-export default memo(HomeHeader);
+export default HomeHeader;
 export const HOME_HEADER_HEIGHT = 28;
 
 const styles = StyleSheet.create({
