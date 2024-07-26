@@ -1,5 +1,7 @@
-## 0.5.21-canary.30
+## 0.5.21-canary.31
 
+* **fix:**  - allow user that have a free subscription to delete their account ([#4489](https://github.com/AzzappApp/azzapp/pull/4489))
+* **fix:**  - **android:** [#4344](https://github.com/AzzappApp/azzapp/pull/4344) get correctly sizes on android ([#4488](https://github.com/AzzappApp/azzapp/pull/4488))
 * **feat:**  - 🎸 use cover background color on empty web modules ([#4482](https://github.com/AzzappApp/azzapp/pull/4482))
 * **fix:**  - dependency of useMemo
 * **fix:**  - 🐛 allow change name uppercase ([#4478](https://github.com/AzzappApp/azzapp/pull/4478))
