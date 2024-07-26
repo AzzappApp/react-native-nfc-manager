@@ -1,5 +1,6 @@
-## 0.5.21-canary.34
+## 0.5.21-canary.35
 
+* **fix:**  - 🐛 complete phone number validator removal ([#4499](https://github.com/AzzappApp/azzapp/pull/4499))
 * **build:**  - fix config file
 * **fix:**  - landscape android never work ([#4493](https://github.com/AzzappApp/azzapp/pull/4493))
 * **feat:**  - preview email signature ([#4486](https://github.com/AzzappApp/azzapp/pull/4486))
