@@ -121,7 +121,10 @@ const ProfilePage = async ({ params }: ProfilePageProps) => {
             className={styles.coverContainer}
             style={{
               background: `linear-gradient(to bottom, transparent 0%, ${
-                modules.length ? firstModuleBackgroundColor : '#FFF'
+                (modules.length
+                  ? firstModuleBackgroundColor
+                  : swapColor(webCard.coverBackgroundColor, cardColors)) ??
+                '#FFF'
               } 95%)`,
             }}
           >
