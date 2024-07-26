@@ -332,6 +332,9 @@ const icons = {
   get phone() {
     return require('./assets/phone.png');
   },
+  get phone_full() {
+    return require('./assets/phone_full.png');
+  },
   get reduce() {
     return require('./assets/reduce.png');
   },
@@ -379,6 +382,9 @@ const icons = {
   },
   get silhouette() {
     return require('./assets/silhouette.png');
+  },
+  get signature() {
+    return require('./assets/signature.png');
   },
   get shadow() {
     return require('./assets/shadow.png');

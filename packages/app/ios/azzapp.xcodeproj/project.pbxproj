@@ -8,14 +8,21 @@
 
 /* Begin PBXBuildFile section */
 		00E356F31AD99517003FC87E /* azzappTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 00E356F21AD99517003FC87E /* azzappTests.m */; };
+		03324426F1314697BD1C702D /* PlusJakartaSans-SemiBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 5477301FE9F94EAFA6F8AD80 /* PlusJakartaSans-SemiBold.ttf */; };
 		0C7911CEAB478AB790C006E0 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = D98307CB348705F89E1DE6DA /* PrivacyInfo.xcprivacy */; };
 		13B07FBC1A68108700A75B9A /* AppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB01A68108700A75B9A /* AppDelegate.mm */; };
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
+		24EF1F24C7124C24B202D8EA /* PlusJakartaSans-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = EB627C8EABFC4E8A9D4CB061 /* PlusJakartaSans-Bold.ttf */; };
+		320762CF3AB74C2CADA5CB9B /* PlusJakartaSans-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 01A80455EE3041AA8310DF23 /* PlusJakartaSans-Medium.ttf */; };
+		34F769AE3F0B4F0182EF92E5 /* PlusJakartaSans-ExtraBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 64C57ED191924F0A87B8A959 /* PlusJakartaSans-ExtraBold.ttf */; };
 		485B1058089E3E6317DED749 /* ExpoModulesProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A34F8DB70ED6E8D53AFD590 /* ExpoModulesProvider.swift */; };
+		517B22092158447DB4D9807E /* HelveticaNeue-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 9FE48A15437D4CFB8B1E8602 /* HelveticaNeue-Bold.ttf */; };
 		51C74448A13281FB32E24633 /* ExpoModulesProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0773611437B756D821550543 /* ExpoModulesProvider.swift */; };
 		5DF4288E8BFC4EE5E6E388C7 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = FB58ADB2576D4F2277CBDD50 /* PrivacyInfo.xcprivacy */; };
 		6865D47C1646DCCBEFD591EB /* libPods-common-azzapp-staging.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 2F1229D6A7B8B4A1C413C21A /* libPods-common-azzapp-staging.a */; };
+		798A0EA05AF6429FB2200885 /* PlusJakartaSans-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 105F1A61D58A41E9BA518C46 /* PlusJakartaSans-Regular.ttf */; };
+		8199A599EA5747DFA70B759D /* Azzapp.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 3D4F895EBE884458B0016262 /* Azzapp.ttf */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
 		92A812FC3DCC67A8944B9ED9 /* ExpoModulesProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E795AEC1BEAF4FE6C0E791F /* ExpoModulesProvider.swift */; };
 		96678DE229D5CFF80073D683 /* PlusJakartaSans-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 96678DDD29D5CFF80073D683 /* PlusJakartaSans-Bold.ttf */; };
@@ -23,15 +30,23 @@
 		96678DE429D5CFF80073D683 /* PlusJakartaSans-ExtraBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 96678DDF29D5CFF80073D683 /* PlusJakartaSans-ExtraBold.ttf */; };
 		96678DE529D5CFF80073D683 /* PlusJakartaSans-SemiBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 96678DE029D5CFF80073D683 /* PlusJakartaSans-SemiBold.ttf */; };
 		96678DE629D5CFF80073D683 /* PlusJakartaSans-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 96678DE129D5CFF80073D683 /* PlusJakartaSans-Medium.ttf */; };
+		96847F192C5248B20089A75C /* HelveticaNeue-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 96847F172C5248B20089A75C /* HelveticaNeue-Bold.ttf */; };
+		96847F1A2C5248B20089A75C /* HelveticaNeue-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 96847F172C5248B20089A75C /* HelveticaNeue-Bold.ttf */; };
+		96847F1B2C5248B20089A75C /* HelveticaNeue-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 96847F172C5248B20089A75C /* HelveticaNeue-Bold.ttf */; };
+		96847F1C2C5248B20089A75C /* HelveticaNeue.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 96847F182C5248B20089A75C /* HelveticaNeue.ttf */; };
+		96847F1D2C5248B20089A75C /* HelveticaNeue.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 96847F182C5248B20089A75C /* HelveticaNeue.ttf */; };
+		96847F1E2C5248B20089A75C /* HelveticaNeue.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 96847F182C5248B20089A75C /* HelveticaNeue.ttf */; };
 		96DD310B2B6C018000FB36A2 /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 96DD310A2B6C018000FB36A2 /* StoreKit.framework */; };
 		96DD310C2B6C018600FB36A2 /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 96DD310A2B6C018000FB36A2 /* StoreKit.framework */; };
 		96DD310D2B6C018C00FB36A2 /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 96DD310A2B6C018000FB36A2 /* StoreKit.framework */; };
 		BCEB3A042A74063A0010EEEE /* Azzapp.ttf in Resources */ = {isa = PBXBuildFile; fileRef = BCEB3A032A74063A0010EEEE /* Azzapp.ttf */; };
 		BF3ACC82966C507CA7D87A04 /* libPods-common-azzapp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = CA026B00F3848AA15FD79C9E /* libPods-common-azzapp.a */; };
+		C2D439B36EA94AC7B690F721 /* HelveticaNeue-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 1259B693B98B486E9E0394C7 /* HelveticaNeue-Medium.ttf */; };
 		CE3FB77EFA1BBCFCBA646C5A /* ExpoModulesProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = C59A4752184E6A4BC4A569FB /* ExpoModulesProvider.swift */; };
 		D12BE8C9C8CFB933AEF16748 /* ExpoModulesProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E2FBF335CCE7355AA69A1C1 /* ExpoModulesProvider.swift */; };
 		D722987D1E2ECC6A8620BB1B /* libPods-common-azzapp-dev.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A45AB622A60E4FA1225BE12C /* libPods-common-azzapp-dev.a */; };
 		E4476D644358FDE64775EC52 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = E39398FBB9147FF432195F49 /* PrivacyInfo.xcprivacy */; };
+		FA88BF592CEE4E398F7EC8AB /* HelveticaNeue.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 7BE94E630FD2409FA6CB5E21 /* HelveticaNeue.ttf */; };
 		FD1404312A0299BA00CCA6B9 /* MediaPipeline.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD1404302A0299BA00CCA6B9 /* MediaPipeline.swift */; };
 		FD1404322A0299BA00CCA6B9 /* MediaPipeline.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD1404302A0299BA00CCA6B9 /* MediaPipeline.swift */; };
 		FD1404342A02AE4B00CCA6B9 /* MediaVideoRendererManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD1404332A02AE4B00CCA6B9 /* MediaVideoRendererManager.swift */; };
@@ -197,7 +212,10 @@
 		00E356EE1AD99517003FC87E /* azzappTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = azzappTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		00E356F11AD99517003FC87E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		00E356F21AD99517003FC87E /* azzappTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = azzappTests.m; sourceTree = "<group>"; };
+		01A80455EE3041AA8310DF23 /* PlusJakartaSans-Medium.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = "PlusJakartaSans-Medium.ttf"; path = "../assets/fonts/PlusJakartaSans-Medium.ttf"; sourceTree = "<group>"; };
 		0773611437B756D821550543 /* ExpoModulesProvider.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ExpoModulesProvider.swift; path = "Pods/Target Support Files/Pods-common-azzapp-staging/ExpoModulesProvider.swift"; sourceTree = "<group>"; };
+		105F1A61D58A41E9BA518C46 /* PlusJakartaSans-Regular.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = "PlusJakartaSans-Regular.ttf"; path = "../assets/fonts/PlusJakartaSans-Regular.ttf"; sourceTree = "<group>"; };
+		1259B693B98B486E9E0394C7 /* HelveticaNeue-Medium.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = "HelveticaNeue-Medium.ttf"; path = "../assets/fonts/HelveticaNeue-Medium.ttf"; sourceTree = "<group>"; };
 		13B07F961A680F5B00A75B9A /* azzapp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = azzapp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		13B07FAF1A68108700A75B9A /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppDelegate.h; path = azzapp/AppDelegate.h; sourceTree = "<group>"; };
 		13B07FB01A68108700A75B9A /* AppDelegate.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = AppDelegate.mm; path = azzapp/AppDelegate.mm; sourceTree = "<group>"; };
@@ -206,12 +224,16 @@
 		13B07FB71A68108700A75B9A /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = azzapp/main.m; sourceTree = "<group>"; };
 		2BAB07D3BA3B901738A94C8A /* Pods-azzapp-azzappTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-azzapp-azzappTests.release.xcconfig"; path = "Target Support Files/Pods-azzapp-azzappTests/Pods-azzapp-azzappTests.release.xcconfig"; sourceTree = "<group>"; };
 		2F1229D6A7B8B4A1C413C21A /* libPods-common-azzapp-staging.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-common-azzapp-staging.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		3D4F895EBE884458B0016262 /* Azzapp.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = Azzapp.ttf; path = ../assets/fonts/Azzapp.ttf; sourceTree = "<group>"; };
 		3E2FBF335CCE7355AA69A1C1 /* ExpoModulesProvider.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ExpoModulesProvider.swift; path = "Pods/Target Support Files/Pods-common-azzapp-dev/ExpoModulesProvider.swift"; sourceTree = "<group>"; };
 		425368C2FA7176E725E2CD11 /* Pods-common-azzappTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-common-azzappTests.release.xcconfig"; path = "Target Support Files/Pods-common-azzappTests/Pods-common-azzappTests.release.xcconfig"; sourceTree = "<group>"; };
 		4A34F8DB70ED6E8D53AFD590 /* ExpoModulesProvider.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ExpoModulesProvider.swift; path = "Pods/Target Support Files/Pods-azzapp-azzappTests/ExpoModulesProvider.swift"; sourceTree = "<group>"; };
+		5477301FE9F94EAFA6F8AD80 /* PlusJakartaSans-SemiBold.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = "PlusJakartaSans-SemiBold.ttf"; path = "../assets/fonts/PlusJakartaSans-SemiBold.ttf"; sourceTree = "<group>"; };
 		5AC016089719FF6B889400DA /* Pods-common-azzapp-dev.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-common-azzapp-dev.debug.xcconfig"; path = "Target Support Files/Pods-common-azzapp-dev/Pods-common-azzapp-dev.debug.xcconfig"; sourceTree = "<group>"; };
 		5B1A2E182A7CD02EF5AD80C5 /* Pods-common-azzapp.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-common-azzapp.release.xcconfig"; path = "Target Support Files/Pods-common-azzapp/Pods-common-azzapp.release.xcconfig"; sourceTree = "<group>"; };
 		5E795AEC1BEAF4FE6C0E791F /* ExpoModulesProvider.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ExpoModulesProvider.swift; path = "Pods/Target Support Files/Pods-common-azzapp/ExpoModulesProvider.swift"; sourceTree = "<group>"; };
+		64C57ED191924F0A87B8A959 /* PlusJakartaSans-ExtraBold.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = "PlusJakartaSans-ExtraBold.ttf"; path = "../assets/fonts/PlusJakartaSans-ExtraBold.ttf"; sourceTree = "<group>"; };
+		7BE94E630FD2409FA6CB5E21 /* HelveticaNeue.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = HelveticaNeue.ttf; path = ../assets/fonts/HelveticaNeue.ttf; sourceTree = "<group>"; };
 		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = azzapp/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		9613FE732AFE7F410053AFD4 /* azzapp-devRelease.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "azzapp-devRelease.entitlements"; sourceTree = "<group>"; };
 		9613FE752B02242B0053AFD4 /* azzapp-stagingRelease.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "azzapp-stagingRelease.entitlements"; sourceTree = "<group>"; };
@@ -222,11 +244,14 @@
 		96678DDF29D5CFF80073D683 /* PlusJakartaSans-ExtraBold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "PlusJakartaSans-ExtraBold.ttf"; path = "../../assets/fonts/PlusJakartaSans-ExtraBold.ttf"; sourceTree = "<group>"; };
 		96678DE029D5CFF80073D683 /* PlusJakartaSans-SemiBold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "PlusJakartaSans-SemiBold.ttf"; path = "../../assets/fonts/PlusJakartaSans-SemiBold.ttf"; sourceTree = "<group>"; };
 		96678DE129D5CFF80073D683 /* PlusJakartaSans-Medium.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "PlusJakartaSans-Medium.ttf"; path = "../../assets/fonts/PlusJakartaSans-Medium.ttf"; sourceTree = "<group>"; };
+		96847F172C5248B20089A75C /* HelveticaNeue-Bold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "HelveticaNeue-Bold.ttf"; path = "../../assets/fonts/HelveticaNeue-Bold.ttf"; sourceTree = "<group>"; };
+		96847F182C5248B20089A75C /* HelveticaNeue.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = HelveticaNeue.ttf; path = ../../assets/fonts/HelveticaNeue.ttf; sourceTree = "<group>"; };
 		96DD310A2B6C018000FB36A2 /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
 		96DD310E2B6CEFB100FB36A2 /* IAPDevStorekit.storekit */ = {isa = PBXFileReference; lastKnownFileType = text; path = IAPDevStorekit.storekit; sourceTree = "<group>"; };
 		96DD310F2B6CF1FE00FB36A2 /* StoreKitTestCertificate.cer */ = {isa = PBXFileReference; lastKnownFileType = file; path = StoreKitTestCertificate.cer; sourceTree = "<group>"; };
 		9CF8C7BFE5E5D64C5E114A6E /* Pods-common-azzapp-staging.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-common-azzapp-staging.release.xcconfig"; path = "Target Support Files/Pods-common-azzapp-staging/Pods-common-azzapp-staging.release.xcconfig"; sourceTree = "<group>"; };
 		9FDF85EE8FA4A60E0B71F2A1 /* Pods-common-azzapp-dev.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-common-azzapp-dev.release.xcconfig"; path = "Target Support Files/Pods-common-azzapp-dev/Pods-common-azzapp-dev.release.xcconfig"; sourceTree = "<group>"; };
+		9FE48A15437D4CFB8B1E8602 /* HelveticaNeue-Bold.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = "HelveticaNeue-Bold.ttf"; path = "../assets/fonts/HelveticaNeue-Bold.ttf"; sourceTree = "<group>"; };
 		A05F2FC0F6978150EDB5CEDC /* Pods-azzapp-azzappTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-azzapp-azzappTests.debug.xcconfig"; path = "Target Support Files/Pods-azzapp-azzappTests/Pods-azzapp-azzappTests.debug.xcconfig"; sourceTree = "<group>"; };
 		A45AB622A60E4FA1225BE12C /* libPods-common-azzapp-dev.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-common-azzapp-dev.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		B6ADC0198955819309228FBD /* Pods-common-azzapp-staging.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-common-azzapp-staging.debug.xcconfig"; path = "Target Support Files/Pods-common-azzapp-staging/Pods-common-azzapp-staging.debug.xcconfig"; sourceTree = "<group>"; };
@@ -238,6 +263,7 @@
 		D98307CB348705F89E1DE6DA /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xml; name = PrivacyInfo.xcprivacy; path = azzapp/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		E39398FBB9147FF432195F49 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xml; name = PrivacyInfo.xcprivacy; path = azzapp/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		E3F48B659A3DD647D58E1E1E /* Pods-common-azzappTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-common-azzappTests.debug.xcconfig"; path = "Target Support Files/Pods-common-azzappTests/Pods-common-azzappTests.debug.xcconfig"; sourceTree = "<group>"; };
+		EB627C8EABFC4E8A9D4CB061 /* PlusJakartaSans-Bold.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = "PlusJakartaSans-Bold.ttf"; path = "../assets/fonts/PlusJakartaSans-Bold.ttf"; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 		FB58ADB2576D4F2277CBDD50 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xml; name = PrivacyInfo.xcprivacy; path = azzapp/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		FD1404302A0299BA00CCA6B9 /* MediaPipeline.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MediaPipeline.swift; sourceTree = "<group>"; };
@@ -429,6 +455,7 @@
 				E15DC6E9F29D960E2E3E9F74 /* ExpoModulesProviders */,
 				E39398FBB9147FF432195F49 /* PrivacyInfo.xcprivacy */,
 				D98307CB348705F89E1DE6DA /* PrivacyInfo.xcprivacy */,
+				D620DDDEAE3B4F7697FA5A18 /* Resources */,
 			);
 			indentWidth = 2;
 			sourceTree = "<group>";
@@ -470,6 +497,23 @@
 				C59A4752184E6A4BC4A569FB /* ExpoModulesProvider.swift */,
 			);
 			name = azzappTests;
+			sourceTree = "<group>";
+		};
+		D620DDDEAE3B4F7697FA5A18 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				3D4F895EBE884458B0016262 /* Azzapp.ttf */,
+				9FE48A15437D4CFB8B1E8602 /* HelveticaNeue-Bold.ttf */,
+				7BE94E630FD2409FA6CB5E21 /* HelveticaNeue.ttf */,
+				EB627C8EABFC4E8A9D4CB061 /* PlusJakartaSans-Bold.ttf */,
+				64C57ED191924F0A87B8A959 /* PlusJakartaSans-ExtraBold.ttf */,
+				01A80455EE3041AA8310DF23 /* PlusJakartaSans-Medium.ttf */,
+				105F1A61D58A41E9BA518C46 /* PlusJakartaSans-Regular.ttf */,
+				5477301FE9F94EAFA6F8AD80 /* PlusJakartaSans-SemiBold.ttf */,
+				1259B693B98B486E9E0394C7 /* HelveticaNeue-Medium.ttf */,
+			);
+			name = Resources;
+			path = "";
 			sourceTree = "<group>";
 		};
 		E15DC6E9F29D960E2E3E9F74 /* ExpoModulesProviders */ = {
@@ -544,6 +588,8 @@
 		FDFDBA6F2841006200621C0F /* resources */ = {
 			isa = PBXGroup;
 			children = (
+				96847F172C5248B20089A75C /* HelveticaNeue-Bold.ttf */,
+				96847F182C5248B20089A75C /* HelveticaNeue.ttf */,
 				BCEB3A032A74063A0010EEEE /* Azzapp.ttf */,
 				96678DDD29D5CFF80073D683 /* PlusJakartaSans-Bold.ttf */,
 				96678DDF29D5CFF80073D683 /* PlusJakartaSans-ExtraBold.ttf */,
@@ -708,6 +754,8 @@
 			files = (
 				96678DE429D5CFF80073D683 /* PlusJakartaSans-ExtraBold.ttf in Resources */,
 				96678DE229D5CFF80073D683 /* PlusJakartaSans-Bold.ttf in Resources */,
+				96847F192C5248B20089A75C /* HelveticaNeue-Bold.ttf in Resources */,
+				96847F1C2C5248B20089A75C /* HelveticaNeue.ttf in Resources */,
 				BCEB3A042A74063A0010EEEE /* Azzapp.ttf in Resources */,
 				FD4BD5462AA626F100DDDB54 /* BootSplash.storyboard in Resources */,
 				96678DE629D5CFF80073D683 /* PlusJakartaSans-Medium.ttf in Resources */,
@@ -716,6 +764,15 @@
 				96678DE329D5CFF80073D683 /* PlusJakartaSans-Regular.ttf in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
 				5DF4288E8BFC4EE5E6E388C7 /* PrivacyInfo.xcprivacy in Resources */,
+				8199A599EA5747DFA70B759D /* Azzapp.ttf in Resources */,
+				517B22092158447DB4D9807E /* HelveticaNeue-Bold.ttf in Resources */,
+				FA88BF592CEE4E398F7EC8AB /* HelveticaNeue.ttf in Resources */,
+				24EF1F24C7124C24B202D8EA /* PlusJakartaSans-Bold.ttf in Resources */,
+				34F769AE3F0B4F0182EF92E5 /* PlusJakartaSans-ExtraBold.ttf in Resources */,
+				320762CF3AB74C2CADA5CB9B /* PlusJakartaSans-Medium.ttf in Resources */,
+				798A0EA05AF6429FB2200885 /* PlusJakartaSans-Regular.ttf in Resources */,
+				03324426F1314697BD1C702D /* PlusJakartaSans-SemiBold.ttf in Resources */,
+				C2D439B36EA94AC7B690F721 /* HelveticaNeue-Medium.ttf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -725,6 +782,8 @@
 			files = (
 				FD292EAE2A94BDC300D880E8 /* Azzapp.ttf in Resources */,
 				FD39DAB92A52AB5F00C49A82 /* PlusJakartaSans-ExtraBold.ttf in Resources */,
+				96847F1A2C5248B20089A75C /* HelveticaNeue-Bold.ttf in Resources */,
+				96847F1D2C5248B20089A75C /* HelveticaNeue.ttf in Resources */,
 				FD39DABB2A52AB5F00C49A82 /* PlusJakartaSans-Bold.ttf in Resources */,
 				FD4BD5472AA626F100DDDB54 /* BootSplash.storyboard in Resources */,
 				FD39DABC2A52AB5F00C49A82 /* PlusJakartaSans-Medium.ttf in Resources */,
@@ -742,6 +801,8 @@
 			files = (
 				FD292EAF2A94BDC700D880E8 /* Azzapp.ttf in Resources */,
 				FD39DAF02A52AC2100C49A82 /* PlusJakartaSans-ExtraBold.ttf in Resources */,
+				96847F1B2C5248B20089A75C /* HelveticaNeue-Bold.ttf in Resources */,
+				96847F1E2C5248B20089A75C /* HelveticaNeue.ttf in Resources */,
 				FD39DAF22A52AC2100C49A82 /* PlusJakartaSans-Bold.ttf in Resources */,
 				FD4BD5482AA626F100DDDB54 /* BootSplash.storyboard in Resources */,
 				FD39DAF32A52AC2100C49A82 /* PlusJakartaSans-Medium.ttf in Resources */,
@@ -789,7 +850,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-common-azzapp/expo-configure-project.sh\"\n";
+			shellScript = "# This script configures Expo modules and generates the modules provider file.\nbash -l -c \"./Pods/Target\\ Support\\ Files/Pods-common-azzapp/expo-configure-project.sh\"\n";
 		};
 		0CF0FDAD64DB4AD1480B116A /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -869,7 +930,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-common-azzapp/expo-configure-project.sh\"\n";
+			shellScript = "# This script configures Expo modules and generates the modules provider file.\nbash -l -c \"./Pods/Target\\ Support\\ Files/Pods-common-azzapp-staging/expo-configure-project.sh\"\n";
 		};
 		5F06472D76E90B141A1DE7C5 /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -978,7 +1039,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-common-azzapp/expo-configure-project.sh\"\n";
+			shellScript = "# This script configures Expo modules and generates the modules provider file.\nbash -l -c \"./Pods/Target\\ Support\\ Files/Pods-common-azzapp-dev/expo-configure-project.sh\"\n";
 		};
 		B98CDACE60DE2789924723D0 /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -1045,7 +1106,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-common-azzapp/expo-configure-project.sh\"\n";
+			shellScript = "# This script configures Expo modules and generates the modules provider file.\nbash -l -c \"./Pods/Target\\ Support\\ Files/Pods-common-azzappTests/expo-configure-project.sh\"\n";
 		};
 		F536081CC5A29BABA1410187 /* [CP] Copy Pods Resources */ = {
 			isa = PBXShellScriptBuildPhase;
