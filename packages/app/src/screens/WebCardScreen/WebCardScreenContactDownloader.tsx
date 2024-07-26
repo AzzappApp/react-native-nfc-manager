@@ -12,6 +12,7 @@ import { useEffect } from 'react';
 import { useIntl } from 'react-intl';
 import { Alert, Platform } from 'react-native';
 import { MMKV } from 'react-native-mmkv';
+import Toast from 'react-native-toast-message';
 import { parseContactCard } from '@azzapp/shared/contactCardHelpers';
 import { buildUserUrl } from '@azzapp/shared/urlHelpers';
 import type { CommonInformation } from '@azzapp/shared/contactCardHelpers';
@@ -83,11 +84,11 @@ const WebCardScreenContactDownloader = ({
               },
             ),
             [
-              { text: 'Cancel', style: 'cancel' },
               {
                 text: 'OK',
                 onPress: async () => {
                   try {
+                    let messageToast = '';
                     const { status } = await requestPermissionsAsync();
                     if (status === 'granted') {
                       let foundContact: Contact | undefined = undefined;
@@ -107,18 +108,47 @@ const WebCardScreenContactDownloader = ({
                         } else {
                           await presentFormAsync(foundContact.id, contact);
                         }
+                        messageToast = intl.formatMessage({
+                          defaultMessage:
+                            'The contact was updated successfully.',
+                          description:
+                            'Toast message when a contact is updated successfully',
+                        });
                       } else {
                         const resultId = await addContactAsync(contact);
                         if (contact.id) {
                           storage.set(contact.id, resultId);
                         }
+                        messageToast = intl.formatMessage({
+                          defaultMessage:
+                            'The contact was created successfully.',
+                          description:
+                            'Toast message when a contact is created successfully',
+                        });
                       }
+
+                      Toast.show({
+                        type: 'success',
+                        text1: messageToast,
+                      });
                     }
                   } catch (e) {
                     console.error(e);
                   }
                 },
               },
+              {
+                text: intl.formatMessage({
+                  defaultMessage: 'View Contact',
+                  description: 'Button to view the contact',
+                }),
+                onPress: async () => {
+                  await presentFormAsync(null, contact, {
+                    isNew: true,
+                  });
+                },
+              },
+              { text: 'Cancel', style: 'cancel' },
             ],
           );
         }
