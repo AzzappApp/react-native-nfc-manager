@@ -190,6 +190,7 @@ const HomeStatistics = ({
           horizontal
           onScroll={scrollHandler}
           contentOffset={{ x: initialStatsIndex * BOX_NUMBER_WIDTH, y: 0 }}
+          overScrollMode="never"
         >
           <StatisticItems
             variant={variant}
@@ -371,6 +372,7 @@ const stylesheet = createVariantsStyleSheet(() => ({
       ...fontFamilies.extrabold,
       textAlign: 'center',
       fontSize: 40,
+      lineHeight: 40,
     },
     smallText: {
       textAlign: 'center',

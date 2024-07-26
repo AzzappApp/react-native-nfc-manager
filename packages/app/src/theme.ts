@@ -36,12 +36,12 @@ export const colors = {
   green: '#0FD59E',
 };
 export const fontFamilies = {
-  extrabold: { fontFamily: 'PlusJakartaSans-ExtraBold', fontWeight: '800' },
-  bold: { fontFamily: 'PlusJakartaSans-Bold', fontWeight: '700' },
-  semibold: { fontFamily: 'PlusJakartaSans-SemiBold', fontWeight: '600' },
-  medium: { fontFamily: 'PlusJakartaSans-Medium', fontWeight: '500' },
-  regular: { fontFamily: 'PlusJakartaSans-Regular', fontWeight: '400' },
-  azzapp: { fontFamily: 'Azzapp', fontWeight: '400' },
+  extrabold: { fontFamily: 'PlusJakartaSans-ExtraBold' },
+  bold: { fontFamily: 'PlusJakartaSans-Bold' },
+  semibold: { fontFamily: 'PlusJakartaSans-SemiBold' },
+  medium: { fontFamily: 'PlusJakartaSans-Medium' },
+  regular: { fontFamily: 'PlusJakartaSans-Regular' },
+  azzapp: { fontFamily: 'Azzapp' },
 } as const;
 
 export const textStyles = StyleSheet.create({
