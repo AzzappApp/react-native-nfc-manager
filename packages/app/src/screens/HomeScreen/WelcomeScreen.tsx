@@ -52,7 +52,7 @@ const WelcomeScreen = () => {
     <Container style={{ flex: 1 }}>
       <LinearGradient colors={['#FF688C', '#FFF']} style={styles.linear} />
       <Image
-        source={require('#assets/logo-full_white.png')}
+        source={require('#assets/logo_BETA_light.png')}
         style={styles.logo}
       />
       <View style={styles.imageContainer}>
