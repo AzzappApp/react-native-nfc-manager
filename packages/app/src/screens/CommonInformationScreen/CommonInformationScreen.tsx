@@ -1,9 +1,11 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { ImageFormat } from '@shopify/react-native-skia';
+import { Image } from 'expo-image';
 import { useCallback, useEffect, useState } from 'react';
 import { Controller, useController, useForm } from 'react-hook-form';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { Pressable, View, Image, Platform } from 'react-native';
+import { Pressable, View, Platform } from 'react-native';
+import ImageSize from 'react-native-image-size';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
 import * as mime from 'react-native-mime-types';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -291,11 +293,8 @@ export const CommonInformationScreen = ({
 
   useEffect(() => {
     if (logo?.uri) {
-      Image.getSize(logo.uri, (width, height) => {
-        setSize({
-          width,
-          height,
-        });
+      ImageSize.getSize(logo.uri).then(({ width, height }) => {
+        setSize(size => (size ? size : { width, height }));
       });
     }
   }, [logo?.uri]);
@@ -453,7 +452,7 @@ export const CommonInformationScreen = ({
                               height: 55,
                               width: size.width * (55 / size.height),
                             }}
-                            resizeMode="contain"
+                            contentFit="contain"
                           />
                         </Pressable>
                       </View>
