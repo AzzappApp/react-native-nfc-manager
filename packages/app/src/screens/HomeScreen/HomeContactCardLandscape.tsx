@@ -1,6 +1,11 @@
 import { DeviceMotionOrientation, DeviceMotion } from 'expo-sensors';
 import { useEffect, useRef, useState } from 'react';
-import { View, useColorScheme, useWindowDimensions } from 'react-native';
+import {
+  Platform,
+  View,
+  useColorScheme,
+  useWindowDimensions,
+} from 'react-native';
 import Animated, {
   useAnimatedStyle,
   useDerivedValue,
@@ -45,16 +50,29 @@ const HomeContactCardLandscape = ({
     [visibleSharedValue],
   );
   useEffect(() => {
-    const subscription = DeviceMotion.addListener(({ orientation }) => {
-      if (orientation !== orientationRef.current) {
-        const visible = Math.abs(orientation) === 90;
-        visibleSharedValue.value = withTiming(visible ? 1 : 0, {
-          duration: 120,
-        });
-        orientationRef.current = -orientation;
-        setOrientation(-orientation);
-      }
-    });
+    const subscription = DeviceMotion.addListener(
+      ({ orientation, rotation }) => {
+        let calculOrientation = orientation;
+
+        if (Platform.OS === 'android') {
+          //this is clearly and android hack, if app is lock in portrait mode, we can't get the orientation
+          //https://github.com/expo/expo/issues/2430
+          calculOrientation = orientationCalculation(
+            rotation.gamma,
+            rotation.beta,
+          );
+        }
+
+        if (calculOrientation !== orientationRef.current) {
+          const visible = Math.abs(calculOrientation) === 90;
+          visibleSharedValue.value = withTiming(visible ? 1 : 0, {
+            duration: 120,
+          });
+          orientationRef.current = -calculOrientation;
+          setOrientation(-calculOrientation);
+        }
+      },
+    );
 
     return () => subscription?.remove();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -108,3 +126,28 @@ const HomeContactCardLandscape = ({
 };
 
 export default HomeContactCardLandscape;
+
+function orientationCalculation(gamma: number, beta: number) {
+  const ABSOLUTE_GAMMA = Math.abs(gamma);
+  const ABSOLUTE_BETA = Math.abs(beta);
+  const isGammaNegative = Math.sign(gamma) === -1;
+  let orientation = 0;
+
+  if (ABSOLUTE_GAMMA <= 0.04 && ABSOLUTE_BETA <= 0.24) {
+    //Portrait mode, on a flat surface.
+    orientation = 0;
+  } else if (
+    (ABSOLUTE_GAMMA <= 1.0 || ABSOLUTE_GAMMA >= 2.3) &&
+    ABSOLUTE_BETA >= 0.5
+  ) {
+    //General Portrait mode, accounting for forward and back tilt on the top of the phone.
+    orientation = 0;
+  } else if (isGammaNegative) {
+    //Landscape mode with the top of the phone to the left.
+    orientation = -90;
+  } else {
+    //Landscape mode with the top of the phone to the right.
+    orientation = 90;
+  }
+  return orientation;
+}
