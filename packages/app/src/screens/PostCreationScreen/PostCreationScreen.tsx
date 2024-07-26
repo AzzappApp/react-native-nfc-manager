@@ -252,18 +252,17 @@ const PostCreationScreen = ({
                 kind === 'video' ? 'video' : 'image',
                 `file://${path}`,
               );
-              // TODO use fragment instead of response
-              // if (params?.fromProfile) {
-              router.back();
-              // } else {
-              //   router.replace({
-              //     route: 'PROFILE',
-              //     params: {
-              //       userName: response.createPost?.post?.author.userName as string,
-              //       showPosts: true,
-              //     },
-              //   });
-              // }
+
+              if (response.createPost.post?.id) {
+                router.replace({
+                  route: 'POST',
+                  params: {
+                    postId: response.createPost.post.id,
+                  },
+                });
+              } else {
+                router.back();
+              }
             }
           },
           onError(error) {
