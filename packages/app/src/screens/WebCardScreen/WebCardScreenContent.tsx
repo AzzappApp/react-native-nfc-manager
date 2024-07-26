@@ -311,20 +311,22 @@ const WebCardScreenContent = ({
   return (
     <>
       <View style={styles.flex}>
-        <WebCardScreenHeader
-          webCard={webCard}
-          editing={editing}
-          nbSelectedModules={nbSelectedModules}
-          selectionMode={selectionMode}
-          selectionContainsAllModules={selectionContainsAllModules}
-          onDone={onDone}
-          onClose={onClose}
-          onEditModules={onEditModules}
-          onCancelEditModules={onToggleSelectionMode}
-          onSelectAllModules={onSelectAllModules}
-          onUnSelectAllModules={onUnSelectAllModules}
-          disabledButtons={showWebcardColorPicker}
-        />
+        <Suspense>
+          <WebCardScreenHeader
+            webCard={webCard}
+            editing={editing}
+            nbSelectedModules={nbSelectedModules}
+            selectionMode={selectionMode}
+            selectionContainsAllModules={selectionContainsAllModules}
+            onDone={onDone}
+            onClose={onClose}
+            onEditModules={onEditModules}
+            onCancelEditModules={onToggleSelectionMode}
+            onSelectAllModules={onSelectAllModules}
+            onUnSelectAllModules={onUnSelectAllModules}
+            disabledButtons={showWebcardColorPicker}
+          />
+        </Suspense>
         <WebCardScreenScrollView
           editing={editing}
           ref={scrollViewRef}

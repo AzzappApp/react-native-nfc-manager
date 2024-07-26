@@ -15,7 +15,7 @@ import type {
   PostList_posts$data,
   PostList_posts$key,
 } from '#relayArtifacts/PostList_posts.graphql';
-import type { PostList_webCard$key } from '#relayArtifacts/PostList_webCard.graphql';
+import type { PostList_viewerWebCard$key } from '#relayArtifacts/PostList_viewerWebCard.graphql';
 import type { PostRendererFragment_author$key } from '#relayArtifacts/PostRendererFragment_author.graphql';
 import type { ArrayItemType } from '@azzapp/shared/arrayHelpers';
 import type { ContentStyle, ListRenderItemInfo } from '@shopify/flash-list';
@@ -23,7 +23,7 @@ import type { ViewProps, ViewToken } from 'react-native';
 type PostListProps = ViewProps & {
   posts: PostList_posts$key;
   author?: PostRendererFragment_author$key;
-  webCard?: PostList_webCard$key;
+  webCard?: PostList_viewerWebCard$key;
   canPlay?: boolean;
   onEndReached?: () => void;
   onRefresh?: () => void;
@@ -79,7 +79,7 @@ const PostList = ({
 
   const viewerWebCard = useFragment(
     graphql`
-      fragment PostList_webCard on WebCard {
+      fragment PostList_viewerWebCard on WebCard {
         id
         cardIsPublished
       }

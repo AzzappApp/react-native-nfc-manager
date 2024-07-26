@@ -20,7 +20,7 @@ import BlurredFloatingButton, {
 import FloatingButton from '#ui/FloatingButton';
 import Text from '#ui/Text';
 import { useEditTransition } from './WebCardScreenTransitions';
-import type { WebCardScreenButtonBar_myWebCard$key } from '#relayArtifacts/WebCardScreenButtonBar_myWebCard.graphql';
+import type { WebCardScreenButtonBar_viewerWebCard$key } from '#relayArtifacts/WebCardScreenButtonBar_viewerWebCard.graphql';
 import type { WebCardScreenButtonBar_webCard$key } from '#relayArtifacts/WebCardScreenButtonBar_webCard.graphql';
 import type { ViewProps } from 'react-native';
 
@@ -32,7 +32,7 @@ type WebCardScreenButtonBarProps = ViewProps & {
   /**
    * The current user  webCard
    */
-  userWebCard: WebCardScreenButtonBar_myWebCard$key;
+  viewerWebCard: WebCardScreenButtonBar_viewerWebCard$key;
   /**
    * true if the webCard is the current user
    */
@@ -78,7 +78,7 @@ type WebCardScreenButtonBarProps = ViewProps & {
  */
 const WebCardScreenButtonBar = ({
   webCard,
-  userWebCard,
+  viewerWebCard,
   editing,
   isViewer,
   onEdit,
@@ -126,7 +126,7 @@ const WebCardScreenButtonBar = ({
       >
         <WebCardScreenButtonActionButton
           webCard={webCard}
-          userWebCard={userWebCard}
+          viewerWebCard={viewerWebCard}
           isViewer={isViewer}
           onEdit={onEdit}
           isWebCardDisplayed={isWebCardDisplayed}
@@ -150,7 +150,7 @@ export default WebCardScreenButtonBar;
 
 type ProfileScreenButtonActionButtonProps = {
   webCard: WebCardScreenButtonBar_webCard$key;
-  userWebCard: WebCardScreenButtonBar_myWebCard$key;
+  viewerWebCard: WebCardScreenButtonBar_viewerWebCard$key;
   isViewer: boolean;
   isWebCardDisplayed: boolean;
   onEdit: () => void;
@@ -167,7 +167,7 @@ type ProfileScreenButtonActionButtonProps = {
 
 const WebCardScreenButtonActionButton = ({
   webCard: webCardKey,
-  userWebCard: userWebCardKey,
+  viewerWebCard: viewerWebCardKey,
   isViewer,
   isWebCardDisplayed,
   onEdit,
@@ -176,12 +176,12 @@ const WebCardScreenButtonActionButton = ({
 }: ProfileScreenButtonActionButtonProps) => {
   const { cardIsPublished } = useFragment(
     graphql`
-      fragment WebCardScreenButtonBar_myWebCard on WebCard {
+      fragment WebCardScreenButtonBar_viewerWebCard on WebCard {
         id
         cardIsPublished
       }
     `,
-    userWebCardKey,
+    viewerWebCardKey,
   );
 
   const webCard = useFragment(

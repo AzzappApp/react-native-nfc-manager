@@ -43,7 +43,7 @@ const postScreenQuery = graphql`
       ...PostScreenFragment_relatedPosts @arguments(viewerWebCardId: $webCardId)
     }
     webCard: node(id: $webCardId) {
-      ...PostList_webCard
+      ...PostList_viewerWebCard
     }
   }
 `;
