@@ -3,12 +3,14 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { useCallback, useEffect } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { Image, StyleSheet, View } from 'react-native';
+import { graphql, usePreloadedQuery } from 'react-relay';
 import { mainRoutes } from '#mobileRoutes';
 import { colors } from '#theme';
 import Link from '#components/Link';
 import { useMainTabBarVisibilityController } from '#components/MainTabBar';
 import { useRouter } from '#components/NativeRouter';
 import { dispatchGlobalEvent } from '#helpers/globalEvents';
+import relayScreen from '#helpers/relayScreen';
 import useAuthState from '#hooks/useAuthState';
 import { useFocusEffect } from '#hooks/useFocusEffect';
 import useToggle from '#hooks/useToggle';
@@ -19,8 +21,15 @@ import IconButton from '#ui/IconButton';
 import Text from '#ui/Text';
 import HomeBottomSheetPanel from './HomeBottomSheetPanel';
 import type { ScreenOptions } from '#components/NativeRouter';
+import type { RelayScreenProps } from '#helpers/relayScreen';
+import type { WelcomeScreenQuery } from '#relayArtifacts/WelcomeScreenQuery.graphql';
+import type { OnboardingRoute } from '#routes';
 
-const WelcomeScreen = () => {
+const WelcomeScreen = ({
+  preloadedQuery,
+}: RelayScreenProps<OnboardingRoute, WelcomeScreenQuery>) => {
+  const { currentUser } = usePreloadedQuery(welcomeScreenQuery, preloadedQuery);
+
   const intl = useIntl();
   useMainTabBarVisibilityController(false, true);
 
@@ -99,14 +108,36 @@ const WelcomeScreen = () => {
           />
         </Link>
       </View>
-      <HomeBottomSheetPanel visible={showMenu} close={toggleShowMenu} />
+      <HomeBottomSheetPanel
+        visible={showMenu}
+        close={toggleShowMenu}
+        userIsPremium={currentUser?.isPremium}
+      />
     </Container>
   );
 };
 
-WelcomeScreen.getScreenOptions = (): ScreenOptions => ({
+const welcomeScreenQuery = graphql`
+  query WelcomeScreenQuery {
+    currentUser {
+      id
+      isPremium
+    }
+  }
+`;
+
+const WelcomeRelayScreen = relayScreen(WelcomeScreen, {
+  query: welcomeScreenQuery,
+  profileBound: false,
+  canGoBack: false,
+  pollInterval: 30000,
+});
+
+WelcomeRelayScreen.getScreenOptions = (): ScreenOptions => ({
   stackAnimation: 'none',
 });
+
+export default WelcomeRelayScreen;
 
 const styles = StyleSheet.create({
   linear: {
@@ -153,5 +184,3 @@ const styles = StyleSheet.create({
     color: colors.white,
   },
 });
-
-export default WelcomeScreen;

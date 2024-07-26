@@ -46,12 +46,15 @@ type HomeBottomSheetPanelProps = {
   close: () => void;
 
   profile?: HomeBottomSheetPanel_profile$key | null;
+
+  userIsPremium?: boolean | null;
 };
 
 const HomeBottomSheetPanel = ({
   visible,
   close,
   profile: profileKey,
+  userIsPremium,
 }: HomeBottomSheetPanelProps) => {
   const profile = useFragment(
     graphql`
@@ -221,7 +224,7 @@ const HomeBottomSheetPanel = ({
   >(
     () =>
       convertToNonNullArray([
-        !profile?.webCard.isPremium
+        !userIsPremium && !profile?.webCard.isPremium
           ? {
               type: 'row',
               icon: 'plus',
