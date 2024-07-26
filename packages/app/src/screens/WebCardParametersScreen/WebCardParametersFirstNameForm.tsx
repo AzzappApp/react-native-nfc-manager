@@ -149,7 +149,7 @@ const WebcardParametersFirstNameForm = ({
                 })}
                 isErrored={!!firstNameError}
                 value={value}
-                onChangeText={text => onChange(text.toLowerCase())}
+                onChangeText={text => onChange(text)}
                 autoCapitalize="none"
                 autoComplete="off"
                 autoCorrect={false}
