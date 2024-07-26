@@ -256,7 +256,8 @@ const ImagePickerWizardRenderer = ({
           <BottomMenu
             {...menuBarProps}
             style={{
-              width: menuBarProps.tabs.length * 60 + 20,
+              width: menuBarProps.tabs.length * 60 + 40,
+              gap: 20,
             }}
           />
         </View>
