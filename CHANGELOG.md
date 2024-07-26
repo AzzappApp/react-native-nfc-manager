@@ -1,4 +1,4 @@
-## 0.5.21-canary.31
+## 0.5.21-canary.32
 
 * **fix:**  - allow user that have a free subscription to delete their account ([#4489](https://github.com/AzzappApp/azzapp/pull/4489))
 * **fix:**  - **android:** [#4344](https://github.com/AzzappApp/azzapp/pull/4344) get correctly sizes on android ([#4488](https://github.com/AzzappApp/azzapp/pull/4488))
