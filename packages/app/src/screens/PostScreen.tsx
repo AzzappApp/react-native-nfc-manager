@@ -165,7 +165,7 @@ const PostScreen = ({
       <PostList
         canPlay={ready && hasFocus}
         posts={posts}
-        webCard={webCard}
+        viewerWebCard={webCard}
         onEndReached={onEndReached}
         loading={loading}
       />

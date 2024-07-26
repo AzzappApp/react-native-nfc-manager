@@ -20,10 +20,11 @@ import type { PostRendererFragment_author$key } from '#relayArtifacts/PostRender
 import type { ArrayItemType } from '@azzapp/shared/arrayHelpers';
 import type { ContentStyle, ListRenderItemInfo } from '@shopify/flash-list';
 import type { ViewProps, ViewToken } from 'react-native';
+
 type PostListProps = ViewProps & {
   posts: PostList_posts$key;
   author?: PostRendererFragment_author$key;
-  webCard?: PostList_viewerWebCard$key;
+  viewerWebCard?: PostList_viewerWebCard$key;
   canPlay?: boolean;
   onEndReached?: () => void;
   onRefresh?: () => void;
@@ -44,7 +45,7 @@ const { height: windowHeight, width: windowWidth } = Dimensions.get('window');
 const PostList = ({
   posts: postKey,
   author,
-  webCard: webCardKey,
+  viewerWebCard: viewerWebCardKey,
   canPlay = true,
   refreshing = false,
   loading = false,
@@ -84,7 +85,7 @@ const PostList = ({
         cardIsPublished
       }
     `,
-    webCardKey ?? null,
+    viewerWebCardKey ?? null,
   );
 
   const postActionEnabled = useMemo(
