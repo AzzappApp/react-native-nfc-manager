@@ -1,5 +1,8 @@
-## 0.5.21-canary.37
+## 0.5.21-canary.38
 
+* **fix:**  - contactCardProps
+* **feat:**  - add edit button on hom contact card ([#4508](https://github.com/AzzappApp/azzapp/pull/4508))
+* **fix:**  - **contactCard:** wrong contactCard class for google wallet ([#4507](https://github.com/AzzappApp/azzapp/pull/4507))
 * **fix:**  - ex owner ([#4477](https://github.com/AzzappApp/azzapp/pull/4477))
 * **fix:**  - 🐛 configure fonts for android ([#4500](https://github.com/AzzappApp/azzapp/pull/4500))
 * **fix:**  - 🐛 complete phone number validator removal ([#4499](https://github.com/AzzappApp/azzapp/pull/4499))
