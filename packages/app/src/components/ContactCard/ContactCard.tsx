@@ -9,6 +9,7 @@ import {
   rect,
 } from '@shopify/react-native-skia';
 import { memo, useMemo } from 'react';
+import { FormattedMessage } from 'react-intl';
 import { Image, View } from 'react-native';
 import { useFragment, graphql } from 'react-relay';
 import { getTextColor } from '@azzapp/shared/colorsHelpers';
@@ -24,11 +25,13 @@ type ContactCardProps = {
   profile: ContactCard_profile$key;
   style?: StyleProp<ViewStyle>;
   height: number;
+  showEditButton: boolean;
 };
 const ContactCard = ({
   profile: profileKey,
   height,
   style,
+  showEditButton = false,
 }: ContactCardProps) => {
   const {
     contactCard,
@@ -130,12 +133,25 @@ const ContactCard = ({
         />
       </View>
       <View style={{ flex: 1 }}>
-        <View>
+        <View style={styles.firstLineView}>
           <Image
             source={require('#assets/logo-full_white.png')}
             resizeMode="contain"
-            style={{ width: 85, tintColor: readableColor }}
+            style={[styles.azzappImage, { tintColor: readableColor }]}
           />
+          {showEditButton && (
+            <View style={styles.editButtonContainer}>
+              <Text
+                variant="xsmall"
+                style={[styles.editButtonText, { color: readableColor }]}
+              >
+                <FormattedMessage
+                  defaultMessage="Edit"
+                  description="ContactCard - Edit button label"
+                />
+              </Text>
+            </View>
+          )}
         </View>
 
         <View style={styles.webCardContent}>
@@ -255,5 +271,33 @@ const stylesheet = createStyleSheet(appearance => ({
     justifyContent: 'center',
     alignItems: 'center',
     height: '100%',
+  },
+  editButtonText: {
+    fontSize: 14,
+    alignItems: 'center',
+    justifyContent: 'center',
+    lineHeight: 20,
+  },
+  editButtonContainer: {
+    height: 33,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#FFFFFF4D',
+    borderRadius: 78,
+    width: 70,
+    ...shadow('light', 'center'),
+    overflow: 'visible',
+  },
+  firstLineView: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    overflow: 'visible',
+  },
+  azzappImage: {
+    width: 85,
+
+    position: 'absolute',
+    left: 0,
+    top: 3,
   },
 }));
