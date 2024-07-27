@@ -57,7 +57,7 @@ const getGoogleWalletPass = async (
 
     const generic = new GenericClient(credentials);
 
-    const classPrefix = 'concatCard_class';
+    const classPrefix = 'contactCard_class';
 
     const classData: GenericClass = {
       // Define the class data
