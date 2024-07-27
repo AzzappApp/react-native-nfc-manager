@@ -25,7 +25,7 @@ type ContactCardProps = {
   profile: ContactCard_profile$key;
   style?: StyleProp<ViewStyle>;
   height: number;
-  showEditButton: boolean;
+  showEditButton?: boolean;
 };
 const ContactCard = ({
   profile: profileKey,
