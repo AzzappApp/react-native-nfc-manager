@@ -12,6 +12,7 @@ import {
   useState,
 } from 'react';
 import { useIntl } from 'react-intl';
+import { StyleSheet, View } from 'react-native';
 import Toast from 'react-native-toast-message';
 import {
   graphql,
@@ -21,10 +22,12 @@ import {
 } from 'react-relay';
 import { swap } from '@azzapp/shared/arrayHelpers';
 import { moduleCountRequiresSubscription } from '@azzapp/shared/subscriptionHelpers';
+import { colors } from '#theme';
 import CardModuleRenderer from '#components/cardModules/CardModuleRenderer';
 import { useModulesData } from '#components/cardModules/ModuleData';
 import { useRouter } from '#components/NativeRouter';
 import { createId } from '#helpers/idHelpers';
+import ActivityIndicator from '#ui/ActivityIndicator';
 import WebCardBlockContainer from './WebCardBlockContainer';
 import type { WebCardScreenBody_webCard$key } from '#relayArtifacts/WebCardScreenBody_webCard.graphql';
 import type { WebCardScreenBodyDeleteModuleMutation } from '#relayArtifacts/WebCardScreenBodyDeleteModuleMutation.graphql';
@@ -88,6 +91,8 @@ export type WebCardBodyHandle = {
   selectAllModules: () => void;
   unselectAllModules: () => void;
 };
+
+const TEMP_ID_PREFIX = 'temp';
 
 /**
  * The body of the webCard screen
@@ -433,8 +438,6 @@ const WebCardScreenBody = (
     !reorderModulesActive &&
     !updateModulesVisibilityActive;
 
-  const duplicatedBlocks = useRef<Record<string, string>>({});
-
   const duplicateModules = useCallback(
     (modulesIds: string[]) => {
       if (!canDuplicate) {
@@ -492,15 +495,8 @@ const WebCardScreenBody = (
 
       const optimisticModuleIds = modulesIds.map(mId => ({
         originalModuleId: mId,
-        newModuleId: `temp-${createId()}`,
+        newModuleId: `${TEMP_ID_PREFIX}-${createId()}`,
       }));
-      const duplicatedBlockTempIds = optimisticModuleIds.reduce(
-        (acc, { originalModuleId, newModuleId }) => {
-          acc[originalModuleId] = newModuleId;
-          return acc;
-        },
-        {} as Record<string, string>,
-      );
 
       commitDuplicateModule({
         variables: {
@@ -514,10 +510,6 @@ const WebCardScreenBody = (
           if (!createdModules) {
             return;
           }
-          createdModules.forEach(({ originalModuleId, newModuleId }) => {
-            duplicatedBlocks.current[newModuleId] =
-              duplicatedBlockTempIds[originalModuleId];
-          });
           updater(store, createdModules);
         },
         optimisticUpdater(store) {
@@ -648,8 +640,10 @@ const WebCardScreenBody = (
     () =>
       memoize((id: string, kind: ModuleKind) => ({
         onModulePress() {
-          Toast.hide();
-          onEditModule(kind, id);
+          if (!id.includes(TEMP_ID_PREFIX)) {
+            Toast.hide();
+            onEditModule(kind, id);
+          }
         },
         onDuplicate() {
           onDuplicateModule(id);
@@ -683,8 +677,8 @@ const WebCardScreenBody = (
   const modulesData = useModulesData(cardModules);
 
   return modulesData.map((module, index) => {
-    // prevent duplicated blocks from being re-rendered
-    const blockId = duplicatedBlocks.current[module.id] ?? module.id;
+    const blockId = module.id;
+
     return (
       <WebCardBlockContainerMemo
         key={blockId}
@@ -713,6 +707,11 @@ const WebCardScreenBody = (
           colorPalette={cardColors}
           cardStyle={cardStyle}
         />
+        {blockId.includes(TEMP_ID_PREFIX) && (
+          <View style={styles.loadingContainer}>
+            <ActivityIndicator color="white" style={styles.loading} />
+          </View>
+        )}
       </WebCardBlockContainerMemo>
     );
   });
@@ -724,4 +723,19 @@ export default memo(forwardRef(WebCardScreenBody));
 // so that it doesn't re-render unnecessarily
 const WebCardBlockContainerMemo = memo(WebCardBlockContainer, (prev, next) => {
   return isEqual(omit(prev, 'children'), omit(next, 'children'));
+});
+
+const styles = StyleSheet.create({
+  loadingContainer: {
+    position: 'absolute',
+    alignItems: 'center',
+    justifyContent: 'center',
+    height: '100%',
+    width: '100%',
+    backgroundColor: `${colors.grey400}4D`,
+  },
+  loading: {
+    width: 60,
+    height: 60,
+  },
 });
