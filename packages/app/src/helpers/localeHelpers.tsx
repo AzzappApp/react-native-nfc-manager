@@ -93,40 +93,41 @@ export const init = () => {
  * Returns the current locale used by the application.
  */
 export const messages: Record<Locale, Record<string, string>> = {
-  get da() {
-    return require('@azzapp/i18n/compiled/app/da.json');
-  },
   get 'en-US'() {
     return require('@azzapp/i18n/compiled/app/en-US.json');
   },
-  get 'en-GB'() {
-    return require('@azzapp/i18n/compiled/app/en-GB.json');
-  },
-  get es() {
-    return require('@azzapp/i18n/compiled/app/es.json');
-  },
-  get fr() {
-    return require('@azzapp/i18n/compiled/app/fr.json');
-  },
-  get it() {
-    return require('@azzapp/i18n/compiled/app/it.json');
-  },
-  get nl() {
-    return require('@azzapp/i18n/compiled/app/nl.json');
-  },
-  get no() {
-    return require('@azzapp/i18n/compiled/app/no.json');
-  },
-  get 'pt-BR'() {
-    return require('@azzapp/i18n/compiled/app/pt-BR.json');
-  },
-  get 'pt-PT'() {
-    return require('@azzapp/i18n/compiled/app/pt-PT.json');
-  },
-  get sv() {
-    return require('@azzapp/i18n/compiled/app/sv.json');
-  },
-  get de() {
-    return require('@azzapp/i18n/compiled/app/de.json');
-  },
+  // disabled for now
+  // get da() {
+  //   return require('@azzapp/i18n/compiled/app/da.json');
+  // },
+  // get 'en-GB'() {
+  //   return require('@azzapp/i18n/compiled/app/en-GB.json');
+  // },
+  // get es() {
+  //   return require('@azzapp/i18n/compiled/app/es.json');
+  // },
+  // get fr() {
+  //   return require('@azzapp/i18n/compiled/app/fr.json');
+  // },
+  // get it() {
+  //   return require('@azzapp/i18n/compiled/app/it.json');
+  // },
+  // get nl() {
+  //   return require('@azzapp/i18n/compiled/app/nl.json');
+  // },
+  // get no() {
+  //   return require('@azzapp/i18n/compiled/app/no.json');
+  // },
+  // get 'pt-BR'() {
+  //   return require('@azzapp/i18n/compiled/app/pt-BR.json');
+  // },
+  // get 'pt-PT'() {
+  //   return require('@azzapp/i18n/compiled/app/pt-PT.json');
+  // },
+  // get sv() {
+  //   return require('@azzapp/i18n/compiled/app/sv.json');
+  // },
+  // get de() {
+  //   return require('@azzapp/i18n/compiled/app/de.json');
+  // },
 };

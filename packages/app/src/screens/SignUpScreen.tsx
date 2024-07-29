@@ -4,6 +4,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import { View, Image, Keyboard, Platform } from 'react-native';
 import { KeyboardAvoidingView } from 'react-native-keyboard-controller';
 import { setSharedWebCredentials } from 'react-native-keychain';
+import { getLocales } from 'react-native-localize';
 import { waitTime } from '@azzapp/shared/asyncHelpers';
 import ERRORS from '@azzapp/shared/errors';
 import {
@@ -17,7 +18,6 @@ import EmailOrPhoneInput from '#components/EmailOrPhoneInput';
 import { useNativeNavigationEvent, useRouter } from '#components/NativeRouter';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import { dispatchGlobalEvent } from '#helpers/globalEvents';
-import { getCurrentLocale } from '#helpers/localeHelpers';
 import { signup } from '#helpers/MobileWebAPI';
 import useScreenInsets from '#hooks/useScreenInsets';
 import Button from '#ui/Button';
@@ -93,13 +93,13 @@ const SignupScreen = () => {
 
       try {
         setIsSubmitting(true);
-        const locale = getCurrentLocale();
+        const locale = getLocales()[0];
         if (contact.countryCodeOrEmail === 'email') {
           username = contact.value;
           tokens = await signup({
             email: username,
             password,
-            locale,
+            locale: locale.languageTag,
           });
         } else {
           username = parsePhoneNumber(
@@ -108,7 +108,7 @@ const SignupScreen = () => {
           ).formatInternational();
           tokens = await signup({
             phoneNumber: username,
-            locale,
+            locale: locale.languageTag,
             password,
           });
         }
