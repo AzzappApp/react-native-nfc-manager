@@ -80,7 +80,7 @@ describe('SignUpScreen', () => {
     expect(signupMock).toHaveBeenCalledWith({
       email: 'test@azzaap.com',
       password: 'AZEqsd81',
-      locale: 'en',
+      locale: 'en-US',
     });
     expect(submitButton).toHaveAccessibilityState({ busy: true });
 
@@ -122,7 +122,7 @@ describe('SignUpScreen', () => {
     expect(signupMock).toHaveBeenCalledWith({
       phoneNumber: '+1 212 688 0188',
       password: 'AZEqsd81',
-      locale: 'en',
+      locale: 'en-US',
     });
 
     expect(submitButton).toHaveAccessibilityState({ busy: true });
