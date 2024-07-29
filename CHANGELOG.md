@@ -1,5 +1,8 @@
-## 0.5.21-canary.39
+## 0.5.21-canary.40
 
+* **fix:**  - **webCard:** [#4509](https://github.com/AzzappApp/azzapp/pull/4509) don’t open optimistic duplicated module ([#4516](https://github.com/AzzappApp/azzapp/pull/4516))
+* **fix:**  - **CoverEditor:** improve handle touch
+* **fix:**  - 🐛 don't crash on empty post media ([#4515](https://github.com/AzzappApp/azzapp/pull/4515))
 * **fix:**  - **contactCard:** [#4503](https://github.com/AzzappApp/azzapp/pull/4503) update contactCardUrl in cache ([#4506](https://github.com/AzzappApp/azzapp/pull/4506))
 * **fix:**  - contactCardProps
 * **feat:**  - add edit button on hom contact card ([#4508](https://github.com/AzzappApp/azzapp/pull/4508))
