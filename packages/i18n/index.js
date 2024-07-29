@@ -1,16 +1,17 @@
 const SUPPORTED_LOCALES = [
   'en-US',
-  'en-GB',
-  'fr',
-  'da',
-  'nl',
-  'de',
-  'it',
-  'no',
-  'pt-PT',
-  'pt-BR',
-  'es',
-  'sv',
+  // disabled for now
+  // 'en-GB',
+  // 'fr',
+  // 'da',
+  // 'nl',
+  // 'de',
+  // 'it',
+  // 'no',
+  // 'pt-PT',
+  // 'pt-BR',
+  // 'es',
+  // 'sv',
 ];
 
 exports.SUPPORTED_LOCALES = SUPPORTED_LOCALES;

@@ -1,17 +1,20 @@
-export const SUPPORTED_LOCALES: Array<
-  | 'da'
-  | 'de'
-  | 'en-GB'
-  | 'en-US'
-  | 'es'
-  | 'fr'
-  | 'it'
-  | 'nl'
-  | 'no'
-  | 'pt-BR'
-  | 'pt-PT'
-  | 'sv'
->;
+export const SUPPORTED_LOCALES: Array<'en-US'>;
+
+// disabled for now
+// Array<
+//   | 'da'
+//   | 'de'
+//   | 'en-GB'
+//   | 'en-US'
+//   | 'es'
+//   | 'fr'
+//   | 'it'
+//   | 'nl'
+//   | 'no'
+//   | 'pt-BR'
+//   | 'pt-PT'
+//   | 'sv'
+// >;
 export const DEFAULT_LOCALE: Locale = 'en-US';
 
 export const TRANSLATION_TARGETS = ['app', 'web', 'entity'] as const;
