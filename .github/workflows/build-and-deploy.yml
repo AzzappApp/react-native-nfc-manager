@@ -163,7 +163,9 @@ jobs:
         id: planetscale_migration_needed
         working-directory: packages/data
         env:
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          DATABASE_HOST: ${{ vars.DATABASE_HOST }}
+          DATABASE_USERNAME: ${{ vars.DATABASE_USERNAME }}
+          DATABASE_PASSWORD: ${{ secrets.DATABASE_PASSWORD }}
         run: |
           yarn introspect
           yarn generate-migration
@@ -210,7 +212,9 @@ jobs:
         if: ${{ steps.planetscale_migration_needed.outputs.has_change == 'true'}}
         working-directory: packages/data
         run: |
-          export DATABASE_URL="mysql://${{ steps.create_password.outputs.username }}:${{ steps.create_password.outputs.password }}@${{ steps.create_password.outputs.hostname }}/azzapp?ssl={\"rejectUnauthorized\":true}"
+          export DATABASE_HOST=steps.create_password.outputs.hostname
+          export DATABASE_PASSWORD=steps.create_password.outputs.password
+          export DATABASE_USERNAME=steps.create_password.outputs.username
           yarn push-migration
             
 
