@@ -6,7 +6,7 @@ const { SUPPORTED_LOCALES } = require('../index');
 const { DATABASE_USERNAME, DATABASE_PASSWORD, DATABASE_HOST } = process.env;
 const pullTranslations = async (target, dir) => {
   const connection = await mysql.createConnection({
-    uri: `mysql://${DATABASE_USERNAME}:${DATABASE_PASSWORD}@${DATABASE_HOST}/azzapp?ssl={"rejectUnauthorized":true}`,,
+    uri: `mysql://${DATABASE_USERNAME}:${DATABASE_PASSWORD}@${DATABASE_HOST}/azzapp?ssl={"rejectUnauthorized":true}`,
   });
 
   const [messages] = await connection
