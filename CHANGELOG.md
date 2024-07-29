@@ -1,5 +1,6 @@
-## 0.5.21-canary.38
+## 0.5.21-canary.39
 
+* **fix:**  - **contactCard:** [#4503](https://github.com/AzzappApp/azzapp/pull/4503) update contactCardUrl in cache ([#4506](https://github.com/AzzappApp/azzapp/pull/4506))
 * **fix:**  - contactCardProps
 * **feat:**  - add edit button on hom contact card ([#4508](https://github.com/AzzappApp/azzapp/pull/4508))
 * **fix:**  - **contactCard:** wrong contactCard class for google wallet ([#4507](https://github.com/AzzappApp/azzapp/pull/4507))
