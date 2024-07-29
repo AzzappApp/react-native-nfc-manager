@@ -15,6 +15,7 @@ import type {
   PostList_posts$data,
   PostList_posts$key,
 } from '#relayArtifacts/PostList_posts.graphql';
+import type { PostList_viewerProfile$key } from '#relayArtifacts/PostList_viewerProfile.graphql';
 import type { PostList_viewerWebCard$key } from '#relayArtifacts/PostList_viewerWebCard.graphql';
 import type { PostRendererFragment_author$key } from '#relayArtifacts/PostRendererFragment_author.graphql';
 import type { ArrayItemType } from '@azzapp/shared/arrayHelpers';
@@ -25,6 +26,7 @@ type PostListProps = ViewProps & {
   posts: PostList_posts$key;
   author?: PostRendererFragment_author$key;
   viewerWebCard?: PostList_viewerWebCard$key;
+  profile?: PostList_viewerProfile$key;
   canPlay?: boolean;
   onEndReached?: () => void;
   onRefresh?: () => void;
@@ -46,6 +48,7 @@ const PostList = ({
   posts: postKey,
   author,
   viewerWebCard: viewerWebCardKey,
+  profile: profileKey,
   canPlay = true,
   refreshing = false,
   loading = false,
@@ -88,12 +91,31 @@ const PostList = ({
     viewerWebCardKey ?? null,
   );
 
+  const viewerProfile = useFragment(
+    graphql`
+      fragment PostList_viewerProfile on Profile {
+        id
+        invited
+      }
+    `,
+    profileKey ?? null,
+  );
+
   const postActionEnabled = useMemo(
     () =>
       viewerWebCard?.cardIsPublished != null
-        ? viewerWebCard?.cardIsPublished
-        : true,
-    [viewerWebCard?.cardIsPublished],
+        ? !viewerProfile?.invited
+          ? !!viewerWebCard?.cardIsPublished
+          : false
+        : false,
+    [viewerProfile?.invited, viewerWebCard?.cardIsPublished],
+  );
+
+  console.log(
+    viewerProfile?.id,
+    viewerProfile?.invited,
+    'post action enabe',
+    postActionEnabled,
   );
 
   const [visiblePostIds, setVisiblePostIds] = useState<{

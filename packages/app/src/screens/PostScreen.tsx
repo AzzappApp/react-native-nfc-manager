@@ -35,7 +35,7 @@ import type { ForwardedRef } from 'react';
 import type { EdgeInsets } from 'react-native-safe-area-context';
 
 const postScreenQuery = graphql`
-  query PostScreenQuery($postId: ID!, $webCardId: ID!) {
+  query PostScreenQuery($postId: ID!, $webCardId: ID!, $profileId: ID!) {
     post: node(id: $postId) {
       id
       ...PostList_posts
@@ -44,6 +44,9 @@ const postScreenQuery = graphql`
     }
     webCard: node(id: $webCardId) {
       ...PostList_viewerWebCard
+    }
+    profile: node(id: $profileId) {
+      ...PostList_viewerProfile
     }
   }
 `;
@@ -58,7 +61,10 @@ const PostScreen = ({
     router.back();
   };
 
-  const { post, webCard } = usePreloadedQuery(postScreenQuery, preloadedQuery);
+  const { post, webCard, profile } = usePreloadedQuery(
+    postScreenQuery,
+    preloadedQuery,
+  );
 
   const ready = useDidAppear();
 
@@ -142,7 +148,7 @@ const PostScreen = ({
       </SafeAreaView>
     );
   }
-  if (!webCard) {
+  if (!webCard || !profile) {
     return null;
   }
   return (
@@ -166,6 +172,7 @@ const PostScreen = ({
         canPlay={ready && hasFocus}
         posts={posts}
         viewerWebCard={webCard}
+        profile={profile}
         onEndReached={onEndReached}
         loading={loading}
       />
@@ -217,6 +224,7 @@ export default relayScreen(PostScreen, {
   getVariables: ({ postId }, profileInfos) => ({
     postId,
     webCardId: profileInfos?.webCardId ?? '',
+    profileId: profileInfos?.profileId ?? '',
   }),
 });
 
