@@ -1,5 +1,6 @@
-## 0.5.21-canary.40
+## 0.5.21-canary.41
 
+* **fix:**  - don't allow post action is webcard is sitll invited ([#4519](https://github.com/AzzappApp/azzapp/pull/4519))
 * **fix:**  - **webCard:** [#4509](https://github.com/AzzappApp/azzapp/pull/4509) don’t open optimistic duplicated module ([#4516](https://github.com/AzzappApp/azzapp/pull/4516))
 * **fix:**  - **CoverEditor:** improve handle touch
 * **fix:**  - 🐛 don't crash on empty post media ([#4515](https://github.com/AzzappApp/azzapp/pull/4515))
