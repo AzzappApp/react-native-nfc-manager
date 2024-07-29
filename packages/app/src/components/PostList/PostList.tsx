@@ -111,13 +111,6 @@ const PostList = ({
     [viewerProfile?.invited, viewerWebCard?.cardIsPublished],
   );
 
-  console.log(
-    viewerProfile?.id,
-    viewerProfile?.invited,
-    'post action enabe',
-    postActionEnabled,
-  );
-
   const [visiblePostIds, setVisiblePostIds] = useState<{
     played: string | null;
     paused: string[];
