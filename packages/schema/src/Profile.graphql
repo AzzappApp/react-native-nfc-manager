@@ -48,8 +48,6 @@ type Profile implements Node {
   """
   statsSummary: [ProfileStatistic!]
 
-  serializedContactCard: String!
-
   contactCardQrCode(width: Int!): String!
 
   contactCardUrl: String!

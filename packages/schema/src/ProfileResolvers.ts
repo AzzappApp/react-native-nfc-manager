@@ -19,7 +19,6 @@ import {
   getModuleBackgrounds,
 } from '@azzapp/data';
 import { shuffle } from '@azzapp/shared/arrayHelpers';
-import { serializeContactCard } from '@azzapp/shared/contactCardHelpers';
 import ERRORS from '@azzapp/shared/errors';
 import serializeAndSignContactCard from '@azzapp/shared/serializeAndSignContactCard';
 import { simpleHash } from '@azzapp/shared/stringHelpers';
@@ -57,15 +56,6 @@ export const Profile: ProfileResolvers = {
   statsSummary: async (profile, _args, { loaders }) => {
     //get data for the last 30 day
     return loaders.profileStatistics.load(profile.id);
-  },
-  serializedContactCard: async (profile, _, { loaders }) => {
-    const webCard = await loaders.WebCard.load(profile.webCardId);
-    return serializeContactCard(
-      profile.id,
-      profile.webCardId,
-      profile.contactCard ?? {},
-      webCard?.commonInformation,
-    );
   },
   contactCardUrl: async (profile, _, { loaders }) => {
     const webCard = await loaders.WebCard.load(profile.webCardId);
