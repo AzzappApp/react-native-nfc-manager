@@ -1,5 +1,6 @@
-import { memo, useMemo } from 'react';
+import { memo, useMemo, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
+import { runOnJS, useAnimatedReaction } from 'react-native-reanimated';
 import { graphql, useFragment } from 'react-relay';
 import useScreenInsets from '#hooks/useScreenInsets';
 import useToggle from '#hooks/useToggle';
@@ -27,6 +28,9 @@ const HomeScreenContent = ({ user: userKey }: HomeScreenContentProps) => {
           id
           profileRole
           invited
+          webCard {
+            cardIsPublished
+          }
           ...HomeContactCardLandscape_profile
           ...HomeBottomSheetPanel_profile
         }
@@ -46,9 +50,15 @@ const HomeScreenContent = ({ user: userKey }: HomeScreenContentProps) => {
 
   const { currentIndexProfile } = useHomeScreenContext();
 
-  const currentProfile = useMemo(
-    () => user.profiles?.[currentIndexProfile.value - 1],
-    [currentIndexProfile.value, user.profiles],
+  const [currentProfile, setCurrentProfile] = useState(
+    user.profiles?.[currentIndexProfile.value - 1],
+  );
+  useAnimatedReaction(
+    () => currentIndexProfile.value,
+    index => {
+      const cProfile = user.profiles?.[index - 1];
+      runOnJS(setCurrentProfile)(cProfile);
+    },
   );
 
   //#endregion

@@ -1,8 +1,10 @@
-import { memo, useMemo } from 'react';
+import { memo, useMemo, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import Animated, {
   interpolateColor,
+  runOnJS,
   useAnimatedProps,
+  useAnimatedReaction,
   useAnimatedStyle,
   useDerivedValue,
 } from 'react-native-reanimated';
@@ -42,7 +44,8 @@ const HomeHeader = ({ openPanel, user: userKey }: HomeHeaderProps) => {
   );
   const insets = useScreenInsets();
   const headerStyle = useMemo(() => ({ marginTop: insets.top }), [insets.top]);
-  const { currentIndexSharedValue, inputRange } = useHomeScreenContext();
+  const { currentIndexSharedValue, currentIndexProfile, inputRange } =
+    useHomeScreenContext();
   const readableColors = useMemo(
     () => [
       colors.white,
@@ -75,7 +78,16 @@ const HomeHeader = ({ openPanel, user: userKey }: HomeHeaderProps) => {
     tintColor: colorValue.value,
   }));
 
-  const currentWebCard = profiles?.[currentIndexSharedValue.value]?.webCard;
+  const [currentWebCard, setCurrentWebCard] = useState(
+    profiles?.[currentIndexProfile.value - 1]?.webCard,
+  );
+  useAnimatedReaction(
+    () => currentIndexProfile.value,
+    index => {
+      const cProfile = profiles?.[index - 1];
+      runOnJS(setCurrentWebCard)(cProfile?.webCard);
+    },
+  );
 
   return (
     <Header
@@ -204,6 +216,7 @@ const styles = StyleSheet.create({
 });
 
 const AnimatedSvg = Animated.createAnimatedComponent(Svg);
+
 //save version without beta
 //  <AnimatedSvg
 //             width={136}

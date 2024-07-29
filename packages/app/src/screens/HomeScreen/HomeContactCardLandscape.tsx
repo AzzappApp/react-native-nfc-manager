@@ -28,6 +28,7 @@ const HomeContactCardLandscape = ({
         ...ContactCard_profile
         id
         webCard {
+          id
           cardIsPublished
         }
       }
