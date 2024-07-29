@@ -64,7 +64,9 @@ jobs:
       - name: Pull translations
         run: yarn i18n:pull
         env:
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          DATABASE_HOST: ${{ vars.DATABASE_HOST }}
+          DATABASE_USERNAME: ${{ vars.DATABASE_USERNAME }}
+          DATABASE_PASSWORD: ${{ secrets.DATABASE_PASSWORD }}
 
       - name: Extract translations keys
         run: yarn i18n:extract
@@ -72,7 +74,9 @@ jobs:
       - name: Purge translations key that are not used
         run: yarn i18n:purge
         env:
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          DATABASE_HOST: ${{ vars.DATABASE_HOST }}
+          DATABASE_USERNAME: ${{ vars.DATABASE_USERNAME }}
+          DATABASE_PASSWORD: ${{ secrets.DATABASE_PASSWORD }}
 
       
       ############################################
