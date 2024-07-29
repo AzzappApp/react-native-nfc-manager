@@ -1,5 +1,15 @@
-## 0.5.21-canary.41
+## 0.5.21-canary.42
 
+* **fix:**  - unit tests
+* **fix:**  - SignUpScreen tests
+* **build:**  - replace DATABASE_URL
+* **fix:**  - don’t try to set unsupported locale
+* **build:**  - pass vars and secrets
+* **fix:**  - put back DATABASE_URL
+* **fix:**  - remove usless comma
+* **fix:**  - use DATABASE_USERNAME & DATABASE_PASSWORD to pull translations
+* **fix:**  - color choose, better placement of label ([#4525](https://github.com/AzzappApp/azzapp/pull/4525))
+* **fix:**  - store user primary locale instead of used one ([#4523](https://github.com/AzzappApp/azzapp/pull/4523))
 * **fix:**  - don't allow post action is webcard is sitll invited ([#4519](https://github.com/AzzappApp/azzapp/pull/4519))
 * **fix:**  - **webCard:** [#4509](https://github.com/AzzappApp/azzapp/pull/4509) don’t open optimistic duplicated module ([#4516](https://github.com/AzzappApp/azzapp/pull/4516))
 * **fix:**  - **CoverEditor:** improve handle touch
