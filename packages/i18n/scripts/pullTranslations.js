@@ -23,8 +23,9 @@ const pullTranslations = async (target, dir) => {
   for (const { key, locale, value } of messages) {
     if (!table[locale]) {
       console.warn(`Unsupported locale: ${locale}`);
+    } else {
+      table[locale][key] = value;
     }
-    table[locale][key] = value;
   }
   for (const locale of SUPPORTED_LOCALES) {
     fs.writeFileSync(
