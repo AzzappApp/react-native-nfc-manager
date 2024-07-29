@@ -182,12 +182,13 @@ const ResizeHandleGestureHandler = ({
 const pixelRatio = PixelRatio.get();
 
 const RESIZE_HANDLE_SIZE_WITH_HIT_SLOP = {
-  width: RESIZE_HANDLE_SIZE.width * 2,
+  width: RESIZE_HANDLE_SIZE.width * 3,
   height: RESIZE_HANDLE_SIZE.height * 2,
 };
 const styles = StyleSheet.create({
   resizeHandle: {
     position: 'absolute',
+    zIndex: 1,
   },
   resizeHandle_y: {
     width: RESIZE_HANDLE_SIZE_WITH_HIT_SLOP.width,
