@@ -123,7 +123,7 @@ const PostRendererMedia = (
       smallThumbnail,
       largeThumbnail,
     },
-  } = post;
+  } = post ?? { media: {} };
 
   const source = useMemo(
     () => ({
@@ -140,6 +140,10 @@ const PostRendererMedia = (
     }),
     [aspectRatio],
   );
+
+  if (!post) {
+    return null;
+  }
 
   return (
     <View {...props} style={styles.mediaContainer}>
