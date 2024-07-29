@@ -1,12 +1,12 @@
 const mysql = require('mysql2');
 
-const { DATABASE_URL } = process.env;
+const { DATABASE_USERNAME, DATABASE_PASSWORD, DATABASE_HOST } = process.env;
 
 (async () => {
   const appMessages = require('../src/appMessages.json');
   const webMessages = require('../src/webMessages.json');
   const connection = await mysql.createConnection({
-    uri: DATABASE_URL,
+    uri: `mysql://${DATABASE_USERNAME}:${DATABASE_PASSWORD}@${DATABASE_HOST}/azzapp?ssl={"rejectUnauthorized":true}`,
   });
 
   const [{ affectedRows: deletedAppMessages }] = await connection
