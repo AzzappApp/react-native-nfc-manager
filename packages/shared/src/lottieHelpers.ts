@@ -136,9 +136,18 @@ export type LottieAssetInfo = {
   height: number;
 };
 
+export type LottieAssetFilter = {
+  key: string;
+  value: number | string;
+};
+
 export function extractLottieInfo(lottie: Record<string, any>): LottieInfo {
+  const filteredLottie = applyLottieAssetFilters(lottie, [
+    keepNonEncodedLottieAssets,
+  ]);
+
   const animation = new Animation();
-  animation.fromJSON(lottie);
+  animation.fromJSON(filteredLottie);
 
   const imageLayers = animation.layers.filter(
     layer => layer.type === LayerType.IMAGE,
@@ -185,3 +194,27 @@ export function extractLottieInfo(lottie: Record<string, any>): LottieInfo {
       .sort((a, b) => a.startTime - b.startTime),
   };
 }
+
+function applyLottieAssetFilters(
+  lottie: Record<string, any>,
+  filters: LottieAssetFilter[],
+): Record<string, any> {
+  let filteredLottie = cloneDeep(lottie);
+
+  filters.forEach(filter => {
+    filteredLottie = {
+      ...filteredLottie,
+      assets: filteredLottie.assets.filter(
+        (asset: Record<string, any>) =>
+          filter.key in asset && asset[filter.key] === filter.value,
+      ),
+    };
+  });
+
+  return filteredLottie;
+}
+
+const keepNonEncodedLottieAssets: LottieAssetFilter = {
+  key: 'e',
+  value: 0,
+};
