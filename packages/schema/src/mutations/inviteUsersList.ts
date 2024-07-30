@@ -8,6 +8,7 @@ import {
   createUsers,
   db,
   updateWebCard,
+  createFreeSubscriptionForBetaPeriod,
 } from '@azzapp/data';
 import { createId } from '@azzapp/data/helpers/createId';
 import { guessLocale } from '@azzapp/i18n';
@@ -91,6 +92,11 @@ const inviteUsersListMutation: MutationResolvers['inviteUsersList'] = async (
         email: f.email,
         invited: true,
       })),
+      trx,
+    );
+
+    await createFreeSubscriptionForBetaPeriod(
+      filtered.map(f => f.id),
       trx,
     );
 

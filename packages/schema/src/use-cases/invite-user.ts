@@ -7,6 +7,7 @@ import {
   getUserByEmailPhoneNumber,
   referencesMedias,
   updateWebCard,
+  createFreeSubscriptionForBetaPeriod,
 } from '@azzapp/data';
 import { createId } from '@azzapp/data/helpers/createId';
 import { guessLocale } from '@azzapp/i18n';
@@ -66,6 +67,8 @@ export const inviteUser = async (input: Input) => {
           phoneNumber: input.invited.phoneNumber,
           invited: true,
         });
+
+        await createFreeSubscriptionForBetaPeriod([userId], tx);
       }
 
       const { displayedOnWebCard, isPrivate, avatarId, logoId, ...data } =

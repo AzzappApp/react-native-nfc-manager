@@ -266,3 +266,33 @@ export const cancelExpiredSubscription = async (trx: DbTransaction = db) => {
       ),
     );
 };
+
+const FREE_BETA_DATE_LIMIT = process.env.FREE_BETA_DATE_LIMIT;
+
+export const createFreeSubscriptionForBetaPeriod = async (
+  userId: string[],
+  trx: DbTransaction = db,
+) => {
+  if (
+    FREE_BETA_DATE_LIMIT &&
+    !isNaN(Date.parse(FREE_BETA_DATE_LIMIT)) &&
+    new Date() < new Date(FREE_BETA_DATE_LIMIT)
+  ) {
+    await trx.insert(UserSubscriptionTable).values(
+      userId.map(
+        userId =>
+          ({
+            id: createId(),
+            userId,
+            subscriptionPlan: 'web.lifetime',
+            subscriptionId: createId(),
+            startAt: new Date(),
+            endAt: new Date(FREE_BETA_DATE_LIMIT),
+            issuer: 'web',
+            totalSeats: 999999,
+            status: 'active',
+          }) as const,
+      ),
+    );
+  }
+};
