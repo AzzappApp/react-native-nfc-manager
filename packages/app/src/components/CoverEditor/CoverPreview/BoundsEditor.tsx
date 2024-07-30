@@ -111,7 +111,6 @@ export const BoundsEditorGestureHandler = ({
     return {
       opacity: opacitySharedValue.value,
       flex: 1,
-      zIndex: 2,
     };
   });
 

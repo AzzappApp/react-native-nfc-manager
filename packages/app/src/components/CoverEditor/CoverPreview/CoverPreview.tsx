@@ -1153,6 +1153,7 @@ const CoverPreview = ({
                             onPress={toggleShowOverlayCropper}
                             iconSize={20}
                             size={CONTROLS_BUTTON_HEIGHT}
+                            hitSlop={iconHitSlop}
                           />
                           <IconButton
                             icon="trash_line"
@@ -1161,6 +1162,7 @@ const CoverPreview = ({
                             onPress={handleDeleteCurrentLayer}
                             iconSize={CONTROLS_BUTTON_ICON_SIZE}
                             size={CONTROLS_BUTTON_HEIGHT}
+                            hitSlop={iconHitSlop}
                           />
                         </View>
                       )}
@@ -1173,6 +1175,7 @@ const CoverPreview = ({
                             onPress={handleDeleteCurrentLayer}
                             iconSize={CONTROLS_BUTTON_ICON_SIZE}
                             size={CONTROLS_BUTTON_HEIGHT}
+                            hitSlop={iconHitSlop}
                           />
                           <IconButton
                             icon="edit"
@@ -1181,6 +1184,7 @@ const CoverPreview = ({
                             onPress={handleTextLayerEdit}
                             iconSize={CONTROLS_BUTTON_ICON_SIZE}
                             size={CONTROLS_BUTTON_HEIGHT}
+                            hitSlop={iconHitSlop}
                           />
                         </View>
                       )}
@@ -1193,6 +1197,7 @@ const CoverPreview = ({
                             onPress={handleDeleteCurrentLayer}
                             iconSize={CONTROLS_BUTTON_ICON_SIZE}
                             size={CONTROLS_BUTTON_HEIGHT}
+                            hitSlop={iconHitSlop}
                           />
                           <IconButton
                             icon="edit"
@@ -1201,6 +1206,7 @@ const CoverPreview = ({
                             onPress={onOpenLinksModal}
                             iconSize={CONTROLS_BUTTON_ICON_SIZE}
                             size={CONTROLS_BUTTON_HEIGHT}
+                            hitSlop={iconHitSlop}
                           />
                         </View>
                       )}
@@ -1286,6 +1292,13 @@ const CoverPreview = ({
 };
 
 export default CoverPreview;
+
+const iconHitSlop = {
+  top: 3,
+  bottom: 3,
+  left: 3,
+  right: 3,
+};
 
 const CONTROLS_BUTTON_ICON_SIZE = 20;
 const CONTROLS_BUTTON_HEIGHT = 30;
