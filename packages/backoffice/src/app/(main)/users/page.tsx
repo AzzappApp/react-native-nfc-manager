@@ -1,4 +1,4 @@
-import { asc, desc, like, or, sql, eq, and, isNull } from 'drizzle-orm';
+import { asc, desc, or, sql, eq, and, isNull, like } from 'drizzle-orm';
 import { UserTable, db, ProfileTable, WebCardTable } from '@azzapp/data';
 import UsersList from './UsersList';
 import type { SQLWrapper } from 'drizzle-orm';
@@ -38,7 +38,7 @@ const getSearch = (search: string | null) => {
   if (search) {
     return or(
       like(UserTable.email, `%${search}%`),
-      like(UserTable.phoneNumber, `%${search}%`),
+      like(UserTable.phoneNumber, `%${search.trim()}%`),
       like(UserTable.id, `%${search}%`),
       like(WebCardTable.userName, `%${search}%`),
       like(WebCardTable.companyName, `%${search}%`),
@@ -61,7 +61,7 @@ const getQuery = (search: string | null, filters: Filters) => {
     .leftJoin(WebCardTable, eq(WebCardTable.id, ProfileTable.webCardId))
     .where(
       and(
-        or(isNull(ProfileTable.deleted), eq(ProfileTable.deleted, false)),
+        or(isNull(UserTable.deleted), eq(UserTable.deleted, false)),
         getSearch(search),
         ...getFilters(filters),
       ),
@@ -116,7 +116,6 @@ const UsersPage = async ({ searchParams = {} }: UsersPageProps) => {
   const sort = Object.keys(sortsColumns).includes(searchParams.sort as any)
     ? (searchParams.sort as any)
     : 'createdAt';
-
   const order = searchParams.order === 'asc' ? 'asc' : 'desc';
   const search = searchParams.s ?? null;
   const filters: Filters = {
