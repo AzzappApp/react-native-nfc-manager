@@ -62,7 +62,7 @@ export const createDrizzleTransactionManager = (
               resolve(r);
             })
             .catch(err => {
-              console.log(err);
+              console.error(err);
               reject(err);
             });
         });
