@@ -1,5 +1,6 @@
-## 0.5.21-canary.45
+## 0.5.21-canary.46
 
+* **fix:**  - put back field for backward compatibility ([#4543](https://github.com/AzzappApp/azzapp/pull/4543))
 * **fix:**  -  search user in backoffice ([#4537](https://github.com/AzzappApp/azzapp/pull/4537))
 * **fix:**  - remove google wallet button ([#4539](https://github.com/AzzappApp/azzapp/pull/4539))
 * **fix:**  - 🐛 change text as expected ([#4536](https://github.com/AzzappApp/azzapp/pull/4536))
