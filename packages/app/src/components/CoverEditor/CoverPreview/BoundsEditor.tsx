@@ -136,7 +136,9 @@ export const BoundsEditorGestureHandler = ({
             onGestureEnd={onGestureEnd}
           />
         ))}
-        <Animated.View style={animatedOptionsStyle}>{children}</Animated.View>
+        <Animated.View style={[animatedOptionsStyle, styles.innerContainer]}>
+          {children}
+        </Animated.View>
       </Animated.View>
     </GestureDetector>
   );
@@ -217,6 +219,10 @@ const styles = StyleSheet.create({
     right: -RESIZE_HANDLE_SIZE_WITH_HIT_SLOP.height / 2,
     top: '50%',
     marginTop: -RESIZE_HANDLE_SIZE_WITH_HIT_SLOP.width / 2,
+  },
+  innerContainer: {
+    pointerEvents: 'box-none',
+    zIndex: 2,
   },
 });
 

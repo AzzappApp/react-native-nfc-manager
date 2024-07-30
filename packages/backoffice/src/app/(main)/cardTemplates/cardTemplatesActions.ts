@@ -105,7 +105,7 @@ export const saveCardTemplate = async (
       formErrors: null,
     } as const;
   } catch (e) {
-    console.log(e);
+    console.error(e);
 
     throw e;
   }
