@@ -37,12 +37,13 @@ const CommonInformationUrls = ({
           keyboardType="url"
           placeholder={intl.formatMessage({
             defaultMessage: 'Enter a URL',
-            description: 'Placeholder for URL inside contact card',
+            description:
+              'CommonInformationUrls - Placeholder for URL inside contact card',
           })}
           errorMessage={intl.formatMessage({
             defaultMessage: 'Please enter a valid url',
             description:
-              'Edit Contact Card - Error message when a url is wrongly formatted',
+              'CommonInformationUrls - Error message when a url is wrongly formatted',
           })}
           trim
         />
@@ -58,7 +59,7 @@ const CommonInformationUrls = ({
           <Text variant="smallbold">
             <FormattedMessage
               defaultMessage="Add URL"
-              description="Add URL to the contact card"
+              description="CommonInformationUrls - Add URL to the contact card"
             />
           </Text>
         </PressableNative>

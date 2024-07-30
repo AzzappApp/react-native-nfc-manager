@@ -40,12 +40,13 @@ const ContactCardEditModalUrls = ({
             autoCapitalize="none"
             placeholder={intl.formatMessage({
               defaultMessage: 'Enter a URL',
-              description: 'Placeholder for URL inside contact card',
+              description:
+                'ContactCardEditModalUrls  - Placeholder for URL inside contact card',
             })}
             errorMessage={intl.formatMessage({
               defaultMessage: 'Please enter a valid url',
               description:
-                'Edit Contact Card - Error message when a url is wrongly formatted',
+                'ContactCardEditModalUrls - Error message when a url is wrongly formatted',
             })}
             trim
           />
@@ -63,7 +64,7 @@ const ContactCardEditModalUrls = ({
           <Text variant="smallbold">
             <FormattedMessage
               defaultMessage="Add URL"
-              description="Add URL to the contact card"
+              description="ContactCardEditModalUrls  - Add URL to the contact card"
             />
           </Text>
         </PressableNative>
