@@ -1,5 +1,6 @@
-## 0.5.21-canary.43
+## 0.5.21-canary.44
 
+* **fix:**  -  search user in backoffice ([#4537](https://github.com/AzzappApp/azzapp/pull/4537))
 * **fix:**  - 🐛 change text as expected ([#4536](https://github.com/AzzappApp/azzapp/pull/4536))
 * **fix:**  - unit tests
 * **fix:**  - SignUpScreen tests
