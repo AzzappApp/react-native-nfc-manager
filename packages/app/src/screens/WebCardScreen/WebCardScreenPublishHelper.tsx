@@ -208,15 +208,8 @@ const WebCardScreenPublishHelper = ({
             onPress={onPublish}
             label={
               <FormattedMessage
-                defaultMessage="Ok, publish my WebCard{azzappA}!"
+                defaultMessage="Ok!"
                 description="Publish modal publish button label"
-                values={{
-                  azzappA: (
-                    <Text style={styles.icon} variant="azzapp">
-                      a
-                    </Text>
-                  ),
-                }}
               />
             }
             rightElement={
