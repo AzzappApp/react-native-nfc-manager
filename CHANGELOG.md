@@ -1,5 +1,6 @@
-## 0.5.21-canary.42
+## 0.5.21-canary.43
 
+* **fix:**  - 🐛 change text as expected ([#4536](https://github.com/AzzappApp/azzapp/pull/4536))
 * **fix:**  - unit tests
 * **fix:**  - SignUpScreen tests
 * **build:**  - replace DATABASE_URL
