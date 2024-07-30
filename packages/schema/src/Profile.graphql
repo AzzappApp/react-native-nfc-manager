@@ -52,6 +52,8 @@ type Profile implements Node {
 
   contactCardUrl: String!
 
+  serializedContactCard: String! @deprecated(reason: "Use contactCardUrl instead")
+
   webCard: WebCard!
 
   """
