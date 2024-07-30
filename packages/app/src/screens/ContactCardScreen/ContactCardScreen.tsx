@@ -259,86 +259,88 @@ export const ContactCardScreen = ({
           </View>
 
           <View style={styles.buttons}>
-            <View style={styles.addToWalletContainer}>
-              <PressableNative
-                testID="add-to-wallet-button"
-                disabled={loadingPass}
-                ripple={{
-                  borderless: true,
-                  foreground: true,
-                  color:
-                    colorScheme === 'dark' ? colors.grey100 : colors.grey900,
-                }}
-                style={styles.addToWalletButton}
-                onPress={async () => {
-                  try {
-                    setLoadingPass(true);
-                    if (Platform.OS === 'ios') {
-                      const pass = await getAppleWalletPass({
-                        webCardId: fromGlobalId(webCard.id).id,
-                        locale: intl.locale,
+            {Platform.OS === 'ios' && (
+              <View style={styles.addToWalletContainer}>
+                <PressableNative
+                  testID="add-to-wallet-button"
+                  disabled={loadingPass}
+                  ripple={{
+                    borderless: true,
+                    foreground: true,
+                    color:
+                      colorScheme === 'dark' ? colors.grey100 : colors.grey900,
+                  }}
+                  style={styles.addToWalletButton}
+                  onPress={async () => {
+                    try {
+                      setLoadingPass(true);
+                      if (Platform.OS === 'ios') {
+                        const pass = await getAppleWalletPass({
+                          webCardId: fromGlobalId(webCard.id).id,
+                          locale: intl.locale,
+                        });
+
+                        const base64Pass = fromByteArray(
+                          getArrayBufferForBlob(pass),
+                        );
+
+                        await addPass(base64Pass);
+                      } else if (Platform.OS === 'android') {
+                        const pass = await getGoogleWalletPass({
+                          webCardId: fromGlobalId(webCard.id).id,
+                          locale: intl.locale,
+                        });
+
+                        await addPassJWT(pass.token);
+                      }
+                    } catch (e) {
+                      Toast.show({
+                        text1: intl.formatMessage({
+                          defaultMessage: 'Error',
+                          description: 'Error toast title',
+                        }),
+                        text2: intl.formatMessage(
+                          {
+                            defaultMessage:
+                              'Oops, ContactCard{azzappA} could not add pass to Apple Wallet',
+                            description: 'Error toast message',
+                          },
+                          { azzappA: <Text variant="azzapp">a</Text> },
+                        ) as string,
+                        type: 'error',
                       });
-
-                      const base64Pass = fromByteArray(
-                        getArrayBufferForBlob(pass),
-                      );
-
-                      await addPass(base64Pass);
-                    } else if (Platform.OS === 'android') {
-                      const pass = await getGoogleWalletPass({
-                        webCardId: fromGlobalId(webCard.id).id,
-                        locale: intl.locale,
-                      });
-
-                      await addPassJWT(pass.token);
+                    } finally {
+                      setLoadingPass(false);
                     }
-                  } catch (e) {
-                    Toast.show({
-                      text1: intl.formatMessage({
-                        defaultMessage: 'Error',
-                        description: 'Error toast title',
-                      }),
-                      text2: intl.formatMessage(
-                        {
-                          defaultMessage:
-                            'Oops, ContactCard{azzappA} could not add pass to Apple Wallet',
-                          description: 'Error toast message',
-                        },
-                        { azzappA: <Text variant="azzapp">a</Text> },
-                      ) as string,
-                      type: 'error',
-                    });
-                  } finally {
-                    setLoadingPass(false);
-                  }
-                }}
-              >
-                {loadingPass ? (
-                  <ActivityIndicator
-                    color={colorScheme === 'dark' ? 'black' : 'white'}
-                    style={styles.addToWalletIcon}
-                  />
-                ) : (
-                  <Image
-                    source={require('#assets/wallet.png')}
-                    style={styles.addToWalletIcon}
-                  />
-                )}
-                <Text variant="button" style={styles.addToWalletButtonText}>
-                  {Platform.OS === 'ios' ? (
-                    <FormattedMessage
-                      defaultMessage="Add to Apple Wallet"
-                      description="Add to Apple Wallet button label"
+                  }}
+                >
+                  {loadingPass ? (
+                    <ActivityIndicator
+                      color={colorScheme === 'dark' ? 'black' : 'white'}
+                      style={styles.addToWalletIcon}
                     />
                   ) : (
-                    <FormattedMessage
-                      defaultMessage="Add to Google Wallet"
-                      description="Add to Google Wallet button label"
+                    <Image
+                      source={require('#assets/wallet.png')}
+                      style={styles.addToWalletIcon}
                     />
                   )}
-                </Text>
-              </PressableNative>
-            </View>
+                  <Text variant="button" style={styles.addToWalletButtonText}>
+                    {Platform.OS === 'ios' ? (
+                      <FormattedMessage
+                        defaultMessage="Add to Apple Wallet"
+                        description="Add to Apple Wallet button label"
+                      />
+                    ) : (
+                      <FormattedMessage
+                        defaultMessage="Add to Google Wallet"
+                        description="Add to Google Wallet button label"
+                      />
+                    )}
+                  </Text>
+                </PressableNative>
+              </View>
+            )}
             {webCard && <ContactCardExportVcf profile={profile} />}
             <Button
               label={intl.formatMessage({
