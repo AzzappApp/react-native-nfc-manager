@@ -1,6 +1,11 @@
-## 0.5.23-canary.3
+## 0.5.26-canary.0
 
+* **fix:**  - remove non exempt encryption
+* **fix:**  - remove azzapp pro on new webCard
+* **fix:**  - update permissions
+* **fix:**  - remove temporary plan from account screen
 * **feat:**  - 🎸 remove smartbanner + add native app install ([#4554](https://github.com/AzzappApp/azzapp/pull/4554))
+* **fix:**  -  Link should not have resize, rotate,pinch. Separate boundEditor by type instead on condition in children. ([#4553](https://github.com/AzzappApp/azzapp/pull/4553))
 * **fix:**  - **multiUser:** [#4547](https://github.com/AzzappApp/azzapp/pull/4547) company is optional ([#4552](https://github.com/AzzappApp/azzapp/pull/4552))
 * **fix:**  - BoxSelection , set initial index only if width is fixed ([#4546](https://github.com/AzzappApp/azzapp/pull/4546))
 * **fix:**  - differentiate duplicate label description
