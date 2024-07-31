@@ -1,5 +1,6 @@
-## 0.5.21-canary.46
+## 0.5.21-canary.47
 
+* **fix:**  - BoxSelection , set initial index only if width is fixed ([#4546](https://github.com/AzzappApp/azzapp/pull/4546))
 * **fix:**  - put back field for backward compatibility ([#4543](https://github.com/AzzappApp/azzapp/pull/4543))
 * **fix:**  -  search user in backoffice ([#4537](https://github.com/AzzappApp/azzapp/pull/4537))
 * **fix:**  - remove google wallet button ([#4539](https://github.com/AzzappApp/azzapp/pull/4539))
