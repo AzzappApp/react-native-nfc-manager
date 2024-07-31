@@ -118,7 +118,7 @@ android {
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 5026
-        versionName "0.5.26-canary.2"
+        versionName "0.5.26-canary.3"
         
         externalNativeBuild {
             cmake {

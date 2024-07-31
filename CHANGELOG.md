@@ -1,5 +1,6 @@
-## 0.5.26-canary.2
+## 0.5.26-canary.3
 
+* **fix:**  - 🐛 correctly display title on desktop preview ([#4565](https://github.com/AzzappApp/azzapp/pull/4565))
 * **fix:**  - 🐛 avoid creating multiple section with save spam ([#4541](https://github.com/AzzappApp/azzapp/pull/4541))
 * **fix:**  - close album on selecting ([#4560](https://github.com/AzzappApp/azzapp/pull/4560))
 * **fix:**  - **cover:** [#4403](https://github.com/AzzappApp/azzapp/pull/4403) missing 17% on og image ([#4542](https://github.com/AzzappApp/azzapp/pull/4542))
