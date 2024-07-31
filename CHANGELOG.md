@@ -1,5 +1,6 @@
-## 0.5.23-canary.0
+## 0.5.23-canary.1
 
+* **feat:**  - 🎸 remove smartbanner + add native app install ([#4554](https://github.com/AzzappApp/azzapp/pull/4554))
 * **fix:**  - **multiUser:** [#4547](https://github.com/AzzappApp/azzapp/pull/4547) company is optional ([#4552](https://github.com/AzzappApp/azzapp/pull/4552))
 * **fix:**  - BoxSelection , set initial index only if width is fixed ([#4546](https://github.com/AzzappApp/azzapp/pull/4546))
 * **fix:**  - differentiate duplicate label description
