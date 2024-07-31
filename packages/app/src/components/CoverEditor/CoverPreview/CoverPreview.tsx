@@ -1125,10 +1125,7 @@ const CoverPreview = ({
                   ))}
                 </AnimatedPressable>
 
-                {(activeLayer.kind === 'overlay' ||
-                  activeLayer.kind === 'text' ||
-                  (activeLayer.kind === 'links' &&
-                    linksLayer.links.length > 0)) &&
+                {activeLayer.kind === 'overlay' &&
                   editionMode !== 'textEdit' && (
                     <BoundsEditorGestureHandler
                       position={gestureHandlerPosition}
@@ -1138,78 +1135,95 @@ const CoverPreview = ({
                       onPinch={handleLayerScale}
                       onRotate={handleLayerRotate}
                       onResize={handleLayerResize}
-                      handles={
-                        activeLayer.kind === 'overlay'
-                          ? ['top', 'bottom', 'left', 'right']
-                          : ['left', 'right']
-                      }
+                      handles={['top', 'bottom', 'left', 'right']}
                     >
-                      {activeLayer.kind === 'overlay' && (
-                        <View style={styles.overlayControls}>
-                          <IconButton
-                            icon="crop"
-                            style={[styles.controlsButton, controlsButtonStyle]}
-                            iconStyle={styles.controlsButtonIcon}
-                            onPress={toggleShowOverlayCropper}
-                            iconSize={20}
-                            size={CONTROLS_BUTTON_HEIGHT}
-                            hitSlop={iconHitSlop}
-                          />
-                          <IconButton
-                            icon="trash_line"
-                            style={[styles.controlsButton, controlsButtonStyle]}
-                            iconStyle={styles.controlsButtonIcon}
-                            onPress={handleDeleteCurrentLayer}
-                            iconSize={CONTROLS_BUTTON_ICON_SIZE}
-                            size={CONTROLS_BUTTON_HEIGHT}
-                            hitSlop={iconHitSlop}
-                          />
-                        </View>
-                      )}
-                      {activeLayer.kind === 'text' && (
-                        <View style={styles.textControls}>
-                          <IconButton
-                            icon="trash_line"
-                            style={[styles.controlsButton, controlsButtonStyle]}
-                            iconStyle={styles.controlsButtonIcon}
-                            onPress={handleDeleteCurrentLayer}
-                            iconSize={CONTROLS_BUTTON_ICON_SIZE}
-                            size={CONTROLS_BUTTON_HEIGHT}
-                            hitSlop={iconHitSlop}
-                          />
-                          <IconButton
-                            icon="edit"
-                            style={[styles.controlsButton, controlsButtonStyle]}
-                            iconStyle={styles.controlsButtonIcon}
-                            onPress={handleTextLayerEdit}
-                            iconSize={CONTROLS_BUTTON_ICON_SIZE}
-                            size={CONTROLS_BUTTON_HEIGHT}
-                            hitSlop={iconHitSlop}
-                          />
-                        </View>
-                      )}
-                      {activeLayer.kind === 'links' && (
-                        <View style={styles.linksControls}>
-                          <IconButton
-                            icon="trash_line"
-                            style={[styles.controlsButton, controlsButtonStyle]}
-                            iconStyle={styles.controlsButtonIcon}
-                            onPress={handleDeleteCurrentLayer}
-                            iconSize={CONTROLS_BUTTON_ICON_SIZE}
-                            size={CONTROLS_BUTTON_HEIGHT}
-                            hitSlop={iconHitSlop}
-                          />
-                          <IconButton
-                            icon="edit"
-                            style={[styles.controlsButton, controlsButtonStyle]}
-                            iconStyle={styles.controlsButtonIcon}
-                            onPress={onOpenLinksModal}
-                            iconSize={CONTROLS_BUTTON_ICON_SIZE}
-                            size={CONTROLS_BUTTON_HEIGHT}
-                            hitSlop={iconHitSlop}
-                          />
-                        </View>
-                      )}
+                      <View style={styles.overlayControls}>
+                        <IconButton
+                          icon="crop"
+                          style={[styles.controlsButton, controlsButtonStyle]}
+                          iconStyle={styles.controlsButtonIcon}
+                          onPress={toggleShowOverlayCropper}
+                          iconSize={20}
+                          size={CONTROLS_BUTTON_HEIGHT}
+                          hitSlop={iconHitSlop}
+                        />
+                        <IconButton
+                          icon="trash_line"
+                          style={[styles.controlsButton, controlsButtonStyle]}
+                          iconStyle={styles.controlsButtonIcon}
+                          onPress={handleDeleteCurrentLayer}
+                          iconSize={CONTROLS_BUTTON_ICON_SIZE}
+                          size={CONTROLS_BUTTON_HEIGHT}
+                          hitSlop={iconHitSlop}
+                        />
+                      </View>
+                    </BoundsEditorGestureHandler>
+                  )}
+
+                {activeLayer.kind === 'text' && editionMode !== 'textEdit' && (
+                  <BoundsEditorGestureHandler
+                    position={gestureHandlerPosition}
+                    onGestureStart={handleLayerGestureStart}
+                    onGestureEnd={handleLayerGestureEnd}
+                    onPan={handleLayerPan}
+                    onPinch={handleLayerScale}
+                    onRotate={handleLayerRotate}
+                    onResize={handleLayerResize}
+                    handles={['left', 'right']}
+                  >
+                    <View style={styles.textControls}>
+                      <IconButton
+                        icon="trash_line"
+                        style={[styles.controlsButton, controlsButtonStyle]}
+                        iconStyle={styles.controlsButtonIcon}
+                        onPress={handleDeleteCurrentLayer}
+                        iconSize={CONTROLS_BUTTON_ICON_SIZE}
+                        size={CONTROLS_BUTTON_HEIGHT}
+                        hitSlop={iconHitSlop}
+                      />
+                      <IconButton
+                        icon="edit"
+                        style={[styles.controlsButton, controlsButtonStyle]}
+                        iconStyle={styles.controlsButtonIcon}
+                        onPress={handleTextLayerEdit}
+                        iconSize={CONTROLS_BUTTON_ICON_SIZE}
+                        size={CONTROLS_BUTTON_HEIGHT}
+                        hitSlop={iconHitSlop}
+                      />
+                    </View>
+                  </BoundsEditorGestureHandler>
+                )}
+
+                {activeLayer.kind === 'links' &&
+                  linksLayer.links.length > 0 &&
+                  editionMode !== 'textEdit' && (
+                    <BoundsEditorGestureHandler
+                      position={gestureHandlerPosition}
+                      onGestureStart={handleLayerGestureStart}
+                      onGestureEnd={handleLayerGestureEnd}
+                      onPan={handleLayerPan}
+                      handles={[]}
+                    >
+                      <View style={styles.linksControls}>
+                        <IconButton
+                          icon="trash_line"
+                          style={[styles.controlsButton, controlsButtonStyle]}
+                          iconStyle={styles.controlsButtonIcon}
+                          onPress={handleDeleteCurrentLayer}
+                          iconSize={CONTROLS_BUTTON_ICON_SIZE}
+                          size={CONTROLS_BUTTON_HEIGHT}
+                          hitSlop={iconHitSlop}
+                        />
+                        <IconButton
+                          icon="edit"
+                          style={[styles.controlsButton, controlsButtonStyle]}
+                          iconStyle={styles.controlsButtonIcon}
+                          onPress={onOpenLinksModal}
+                          iconSize={CONTROLS_BUTTON_ICON_SIZE}
+                          size={CONTROLS_BUTTON_HEIGHT}
+                          hitSlop={iconHitSlop}
+                        />
+                      </View>
                     </BoundsEditorGestureHandler>
                   )}
                 {editedTextLayer && (
