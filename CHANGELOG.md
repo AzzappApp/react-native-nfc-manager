@@ -1,5 +1,6 @@
-## 0.5.26-canary.0
+## 0.5.26-canary.1
 
+* **fix:**  - **cover:** [#4403](https://github.com/AzzappApp/azzapp/pull/4403) missing 17% on og image ([#4542](https://github.com/AzzappApp/azzapp/pull/4542))
 * **fix:**  - remove non exempt encryption
 * **fix:**  - remove azzapp pro on new webCard
 * **fix:**  - update permissions
