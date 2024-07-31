@@ -21,6 +21,7 @@ import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import { duplicateMediaToFillSlots, getMediaId } from '#helpers/mediaHelpers';
 import { usePermissionContext } from '#helpers/PermissionContext';
 import useScreenInsets from '#hooks/useScreenInsets';
+import useToggle from '#hooks/useToggle';
 import Button from '#ui/Button';
 import Container from '#ui/Container';
 import Header from '#ui/Header';
@@ -59,7 +60,15 @@ const CoverEditorMediaPicker = ({
   );
   const [selectedTab, setSelectedTab] = useState('gallery');
   const [selectedAlbum, setSelectedAlbum] = useState<Album | null>(null);
-  const [showAlbumModal, setShowAlbumModal] = useState(false);
+  const [showAlbumModal, toggleShowAlbumModal] = useToggle(false);
+
+  const onSelectAlbum = useCallback(
+    (album: Album | null) => {
+      setSelectedAlbum(album);
+      toggleShowAlbumModal();
+    },
+    [toggleShowAlbumModal],
+  );
 
   const { mediaPermission } = usePermissionContext();
   useMediaLimitedSelectionAlert(mediaPermission);
@@ -67,12 +76,12 @@ const CoverEditorMediaPicker = ({
   const onTabPress = useCallback(
     (tab: string) => {
       if (tab === 'gallery' && selectedTab === 'gallery') {
-        setShowAlbumModal(true);
+        toggleShowAlbumModal();
       } else {
         setSelectedTab(tab);
       }
     },
-    [selectedTab],
+    [selectedTab, toggleShowAlbumModal],
   );
 
   const intl = useIntl();
@@ -497,12 +506,12 @@ const CoverEditorMediaPicker = ({
         mediaPermission === RESULTS.LIMITED) && (
         <Modal
           visible={showAlbumModal}
-          onRequestClose={() => setShowAlbumModal(false)}
+          onRequestClose={toggleShowAlbumModal}
           animationType="slide"
         >
           <AlbumPickerScreen
-            onSelectAlbum={setSelectedAlbum}
-            onClose={() => setShowAlbumModal(false)}
+            onSelectAlbum={onSelectAlbum}
+            onClose={toggleShowAlbumModal}
           />
         </Modal>
       )}
