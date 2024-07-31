@@ -1,3 +1,4 @@
+import { View } from 'react-native';
 import { type CardStyle, type ColorPalette } from '@azzapp/shared/cardHelpers';
 import {
   HORIZONTAL_PHOTO_DEFAULT_VALUES,
@@ -267,15 +268,19 @@ const MODULE_RENDERERS_DESKTOP = {
       }}
     />
   ),
-  [MODULE_KIND_SIMPLE_TITLE]: (props: SimpleTextRendererProps) => (
-    <SimpleTextRenderer
-      {...props}
-      contentStyle={{
-        maxWidth: DESKTOP_CONTENT_MAX_WIDTH,
-        alignSelf: 'center',
-      }}
-    />
-  ),
+  [MODULE_KIND_SIMPLE_TITLE]: (props: SimpleTextRendererProps) => {
+    return (
+      <View
+        style={{
+          width: '100%',
+          maxWidth: DESKTOP_CONTENT_MAX_WIDTH,
+          alignSelf: 'center',
+        }}
+      >
+        <SimpleTextRenderer {...props} />
+      </View>
+    );
+  },
   [MODULE_KIND_SOCIAL_LINKS]: (props: SocialLinksRendererProps) => (
     <SocialLinksRenderer
       {...props}
