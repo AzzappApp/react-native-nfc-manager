@@ -6,6 +6,7 @@ import { Platform, StyleSheet } from 'react-native';
 import { useSharedValue } from 'react-native-reanimated';
 import Toast from 'react-native-toast-message';
 import { graphql, useFragment, useMutation } from 'react-relay';
+import { Observable } from 'relay-runtime';
 import {
   MODULE_IMAGE_MAX_WIDTH,
   PHOTO_WITH_TEXT_AND_TITLE_DEFAULT_VALUES,
@@ -56,7 +57,6 @@ import type {
   SavePhotoWithTextAndTitleModuleInput,
 } from '#relayArtifacts/PhotoWithTextAndTitleEditionScreenUpdateModuleMutation.graphql';
 import type { ViewProps } from 'react-native';
-import type { Observable } from 'relay-runtime';
 
 export type PhotoWithTextAndTitleEditionScreenProps = ViewProps & {
   /**
@@ -259,14 +259,15 @@ const PhotoWithTextAndTitleEditionScreen = ({
     setTouched(true);
   }, []);
 
-  const isValid =
-    (isNotFalsyString(title) || isNotFalsyString(content)) && image;
-  const canSave = (dirty || touched) && isValid && !saving;
-
-  const router = useRouter();
-  const intl = useIntl();
   const [progressIndicator, setProgressIndicator] =
     useState<Observable<number> | null>(null);
+
+  const isValid =
+    (isNotFalsyString(title) || isNotFalsyString(content)) && image;
+  const canSave =
+    (dirty || touched) && isValid && !saving && !progressIndicator;
+  const router = useRouter();
+  const intl = useIntl();
 
   const cardModulesCount =
     (profile.webCard.cardModules.length ?? 0) + (photoWithTextAndTitle ? 0 : 1);
@@ -405,6 +406,8 @@ const PhotoWithTextAndTitleEditionScreen = ({
       return;
     }
 
+    setProgressIndicator(Observable.from(0));
+
     const requireSubscription = changeModuleRequireSubscription(
       'photoWithTextAndTitle',
       cardModulesCount,
@@ -423,27 +426,24 @@ const PhotoWithTextAndTitleEditionScreen = ({
     let mediaId = updateImage?.id;
 
     if (!mediaId && updateImage?.uri) {
-      //we need to save the media first
-      const { uploadURL, uploadParameters } = await uploadSign({
-        kind: 'image',
-        target: 'module',
-      });
-      const fileName = getFileName(updateImage.uri);
-      const file: any = {
-        name: fileName,
-        uri: `file://${updateImage.uri}`,
-        type: 'image/jpeg',
-      };
-
-      const { progress: uploadProgress, promise: uploadPromise } = uploadMedia(
-        file,
-        uploadURL,
-        uploadParameters,
-      );
-      setProgressIndicator(
-        uploadProgress.map(({ loaded, total }) => loaded / total),
-      );
       try {
+        //we need to save the media first
+        const { uploadURL, uploadParameters } = await uploadSign({
+          kind: 'image',
+          target: 'module',
+        });
+        const fileName = getFileName(updateImage.uri);
+        const file: any = {
+          name: fileName,
+          uri: `file://${updateImage.uri}`,
+          type: 'image/jpeg',
+        };
+
+        const { progress: uploadProgress, promise: uploadPromise } =
+          uploadMedia(file, uploadURL, uploadParameters);
+        setProgressIndicator(
+          uploadProgress.map(({ loaded, total }) => loaded / total),
+        );
         const { public_id } = await uploadPromise;
         mediaId = public_id;
       } catch (error) {
@@ -456,6 +456,8 @@ const PhotoWithTextAndTitleEditionScreen = ({
               'Error toast message when saving a photo with text and title failed because of a media upload error.',
           }),
         });
+        setProgressIndicator(null);
+        return;
       }
     }
 
@@ -495,6 +497,8 @@ const PhotoWithTextAndTitleEditionScreen = ({
         handleProfileActionError(e);
       },
     });
+
+    setProgressIndicator(null);
   }, [
     canSave,
     cardModulesCount,

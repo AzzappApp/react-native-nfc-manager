@@ -5,6 +5,7 @@ import { StyleSheet } from 'react-native';
 import { useSharedValue } from 'react-native-reanimated';
 import Toast from 'react-native-toast-message';
 import { graphql, useFragment, useMutation } from 'react-relay';
+import { Observable } from 'relay-runtime';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
 import {
   CAROUSEL_DEFAULT_VALUES,
@@ -43,7 +44,6 @@ import type { CarouselEditionScreen_module$key } from '#relayArtifacts/CarouselE
 import type { CarouselEditionScreen_profile$key } from '#relayArtifacts/CarouselEditionScreen_profile.graphql';
 import type { CarouselEditionScreenUpdateModuleMutation } from '#relayArtifacts/CarouselEditionScreenUpdateModuleMutation.graphql';
 import type { ViewProps } from 'react-native';
-import type { Observable } from 'relay-runtime';
 
 export type CarouselEditionScreenProps = ViewProps & {
   /**
@@ -211,12 +211,14 @@ const CarouselEditionScreen = ({
     setTouched(true);
   }, []);
 
-  const canSave = (dirty || touched) && isValid && !saving;
+  const [progressIndicator, setProgressIndicator] =
+    useState<Observable<number> | null>(null);
+
+  const canSave =
+    (dirty || touched) && isValid && !saving && !progressIndicator;
 
   const router = useRouter();
   const intl = useIntl();
-  const [progressIndicator, setProgressIndicator] =
-    useState<Observable<number> | null>(null);
 
   const cardModulesCount =
     profile.webCard.cardModules.length + (carousel ? 0 : 1);
@@ -327,6 +329,8 @@ const CarouselEditionScreen = ({
     if (!canSave) {
       return;
     }
+
+    setProgressIndicator(Observable.from(0));
 
     const requireSubscription = changeModuleRequireSubscription(
       'carousel',
@@ -447,6 +451,8 @@ const CarouselEditionScreen = ({
         handleProfileActionError(e);
       },
     });
+
+    setProgressIndicator(null);
   }, [
     canSave,
     cardModulesCount,

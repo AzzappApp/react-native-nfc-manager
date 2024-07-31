@@ -6,6 +6,7 @@ import { StyleSheet, View } from 'react-native';
 import { useSharedValue } from 'react-native-reanimated';
 import Toast from 'react-native-toast-message';
 import { graphql, useFragment, useMutation } from 'react-relay';
+import { Observable } from 'relay-runtime';
 import {
   HORIZONTAL_PHOTO_DEFAULT_VALUES,
   HORIZONTAL_PHOTO_STYLE_VALUES,
@@ -51,7 +52,6 @@ import type {
   SaveHorizontalPhotoModuleInput,
 } from '#relayArtifacts/HorizontalPhotoEditionScreenUpdateModuleMutation.graphql';
 import type { ViewProps } from 'react-native';
-import type { Observable } from 'relay-runtime';
 
 export type HorizontalPhotoEditionScreenProps = ViewProps & {
   /**
@@ -208,13 +208,14 @@ const HorizontalPhotoEditionScreen = ({
     setTouched(true);
   }, [setTouched]);
 
-  const canSave = (dirty || touched) && isValid && !saving;
+  const [progressIndicator, setProgressIndicator] =
+    useState<Observable<number> | null>(null);
+
+  const canSave =
+    (dirty || touched) && isValid && !saving && !progressIndicator;
 
   const router = useRouter();
   const intl = useIntl();
-
-  const [progressIndicator, setProgressIndicator] =
-    useState<Observable<number> | null>(null);
 
   const cardModulesCount =
     profile.webCard.cardModules.length + (horizontalPhoto ? 0 : 1);
@@ -300,6 +301,8 @@ const HorizontalPhotoEditionScreen = ({
       return;
     }
 
+    setProgressIndicator(Observable.from(0));
+
     const requireSubscription = changeModuleRequireSubscription(
       'horizontalPhoto',
       cardModulesCount,
@@ -318,28 +321,25 @@ const HorizontalPhotoEditionScreen = ({
 
     let mediaId = updateMedia?.id;
     if (!mediaId && updateMedia?.uri) {
-      //we need to save the media first
-      const { uploadURL, uploadParameters } = await uploadSign({
-        kind: 'image',
-        target: 'module',
-      });
-      const fileName = getFileName(updateMedia.uri);
-      const file: any = {
-        name: fileName,
-        uri: `file://${updateMedia.uri}`,
-        type: 'image/jpeg',
-      };
-
-      const { progress: uploadProgress, promise: uploadPromise } = uploadMedia(
-        file,
-        uploadURL,
-        uploadParameters,
-      );
-
-      setProgressIndicator(
-        uploadProgress.map(({ loaded, total }) => loaded / total),
-      );
       try {
+        //we need to save the media first
+        const { uploadURL, uploadParameters } = await uploadSign({
+          kind: 'image',
+          target: 'module',
+        });
+        const fileName = getFileName(updateMedia.uri);
+        const file: any = {
+          name: fileName,
+          uri: `file://${updateMedia.uri}`,
+          type: 'image/jpeg',
+        };
+
+        const { progress: uploadProgress, promise: uploadPromise } =
+          uploadMedia(file, uploadURL, uploadParameters);
+
+        setProgressIndicator(
+          uploadProgress.map(({ loaded, total }) => loaded / total),
+        );
         const { public_id } = await uploadPromise;
         mediaId = public_id;
       } catch (error) {
@@ -353,6 +353,8 @@ const HorizontalPhotoEditionScreen = ({
               'Error toast message when saving a horizontal photo module failed because medias upload failed.',
           }),
         });
+        setProgressIndicator(null);
+        return;
       }
     }
 
@@ -382,6 +384,8 @@ const HorizontalPhotoEditionScreen = ({
         handleProfileActionError(e);
       },
     });
+
+    setProgressIndicator(null);
   }, [
     canSave,
     cardModulesCount,
