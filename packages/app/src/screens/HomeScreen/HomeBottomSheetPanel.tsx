@@ -224,7 +224,7 @@ const HomeBottomSheetPanel = ({
   >(
     () =>
       convertToNonNullArray([
-        !userIsPremium && !profile?.webCard.isPremium
+        !userIsPremium && profile?.webCard && !profile.webCard.isPremium
           ? {
               type: 'row',
               icon: 'plus',
