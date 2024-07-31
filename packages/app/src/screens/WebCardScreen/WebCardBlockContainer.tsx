@@ -9,8 +9,6 @@ import {
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import Animated, {
   Easing,
-  FadeIn,
-  FadeOut,
   interpolate,
   runOnJS,
   useAnimatedReaction,
@@ -135,7 +133,6 @@ export type ProfileBlockContainerProps = {
  * it also handles the interaction with the modules in edit mode
  */
 const WebCardBlockContainer = ({
-  id,
   editing,
   visible = true,
   displayEditionButtons = true,
@@ -369,15 +366,7 @@ const WebCardBlockContainer = ({
   );
 
   return (
-    <Animated.View
-      entering={
-        id !== 'cover' ? FadeIn.duration(EDIT_TRANSITION_DURATION) : undefined
-      }
-      exiting={
-        id !== 'cover' ? FadeOut.duration(EDIT_TRANSITION_DURATION) : undefined
-      }
-      layout={layoutTransition}
-    >
+    <Animated.View layout={layoutTransition}>
       <Animated.View style={blockStyle}>
         <GestureDetector gesture={Gesture.Race(tapGesture, panGesture)}>
           <Animated.View

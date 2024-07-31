@@ -2,8 +2,6 @@ import { useMemo, useRef, forwardRef } from 'react';
 import { useWindowDimensions } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import Animated, {
-  FadeIn,
-  FadeOut,
   interpolate,
   useAnimatedStyle,
 } from 'react-native-reanimated';
@@ -11,10 +9,7 @@ import { mergeRefs } from '#helpers/mergeRefs';
 import useScreenInsets from '#hooks/useScreenInsets';
 import { BOTTOM_MENU_HEIGHT } from '#ui/BottomMenu';
 import { HEADER_HEIGHT } from '#ui/Header';
-import {
-  EDIT_TRANSITION_DURATION,
-  useWebCardEditScale,
-} from './webCardScreenHelpers';
+import { useWebCardEditScale } from './webCardScreenHelpers';
 import { useEditTransition } from './WebCardScreenTransitions';
 import type { ForwardedRef, ReactNode } from 'react';
 import type { ScrollViewProps } from 'react-native';
@@ -142,10 +137,7 @@ const WebCardScreenScrollView = (
         <Animated.View style={contentContainerStyle}>
           {children}
           {editing && (
-            <Animated.View
-              entering={FadeIn.duration(EDIT_TRANSITION_DURATION)}
-              exiting={FadeOut.duration(EDIT_TRANSITION_DURATION)}
-            >
+            <Animated.View>
               <Animated.View style={footerStyle}>{editFooter}</Animated.View>
             </Animated.View>
           )}
