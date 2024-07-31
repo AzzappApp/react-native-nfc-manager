@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { swapColor, DEFAULT_COLOR_PALETTE } from '@azzapp/shared/cardHelpers';
 import { COVER_RATIO } from '@azzapp/shared/coverHelpers';
+import { DEFAULT_VIDEO_PERCENTAGE_THUMBNAIL } from '@azzapp/shared/imagesHelpers';
 import CloudinaryImage from '#ui/CloudinaryImage';
 import CloudinaryVideo from '#ui/CloudinaryVideo';
 import CoverLinksRenderer from './CoverLinksRenderer';
@@ -97,7 +98,11 @@ const CoverRenderer = ({
             videoThumbnail={media.kind === 'video'}
             format="auto"
             quality="auto:best"
-            rawTransformations={staticCover ? ['so_17p'] : undefined}
+            rawTransformations={
+              staticCover
+                ? [`so_${DEFAULT_VIDEO_PERCENTAGE_THUMBNAIL}p`]
+                : undefined
+            }
           />
         ) : (
           <CloudinaryVideo

@@ -81,6 +81,10 @@ const CoverRenderer = (
             type: "Float!"
             provider: "CappedPixelRatio.relayprovider"
           }
+          videoDurationPercentage: {
+            type: "Int"
+            provider: "VideoDurationPercentage.relayprovider"
+          }
         ) {
           id
           cardColors {
@@ -101,12 +105,12 @@ const CoverRenderer = (
               thumbnail(
                 width: $screenWidth
                 pixelRatio: $pixelRatio
-                videoDurationPercentage: 17
+                videoDurationPercentage: $videoDurationPercentage
               )
               smallThumbnail: thumbnail(
                 width: 125
                 pixelRatio: $cappedPixelRatio
-                videoDurationPercentage: 17
+                videoDurationPercentage: $videoDurationPercentage
               )
             }
           }
