@@ -525,10 +525,18 @@ const CoverEditorCore = (
   // #region Initial Media picking
   const [showImagePicker, toggleImagePicker] = useToggle(false);
   useEffect(() => {
+    const lottieInfo = extractLottieInfoMemoized(coverEditorState.lottie);
+    if (lottieInfo && lottieInfo.assetsInfos.length === 0) {
+      return;
+    }
     if (coverEditorState.medias.length === 0) {
       toggleImagePicker();
     }
-  }, [coverEditorState.medias.length, toggleImagePicker]);
+  }, [
+    coverEditorState.lottie,
+    coverEditorState.medias.length,
+    toggleImagePicker,
+  ]);
 
   const durations = useMemo(() => {
     const lottieInfo = extractLottieInfoMemoized(coverEditorState.lottie);

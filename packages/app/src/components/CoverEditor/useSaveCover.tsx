@@ -207,9 +207,17 @@ const isCoverEditorStateValid = (coverEditorState: CoverEditorState) => {
     loadingLocalMedia,
     loadingRemoteMedia,
     images,
+    lottie,
     videoPaths,
   } = coverEditorState;
-
+  if (lottie) {
+    const extract = extractLottieInfoMemoized(lottie);
+    if (extract?.assetsInfos.length === 0) {
+      return overlayLayers.every(
+        overlayLayer => images[overlayLayer.media.uri] != null,
+      );
+    }
+  }
   // we'll see if we need to add more validation here
   return (
     medias.length > 0 &&
