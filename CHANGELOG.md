@@ -1,18 +1,11 @@
-## 0.5.26-canary.3
+## 0.5.30-canary.0
 
 * **fix:**  - 🐛 correctly display title on desktop preview ([#4565](https://github.com/AzzappApp/azzapp/pull/4565))
 * **fix:**  - 🐛 avoid creating multiple section with save spam ([#4541](https://github.com/AzzappApp/azzapp/pull/4541))
 * **fix:**  - close album on selecting ([#4560](https://github.com/AzzappApp/azzapp/pull/4560))
 * **fix:**  - **cover:** [#4403](https://github.com/AzzappApp/azzapp/pull/4403) missing 17% on og image ([#4542](https://github.com/AzzappApp/azzapp/pull/4542))
-* **fix:**  - remove non exempt encryption
-* **fix:**  - remove azzapp pro on new webCard
-* **fix:**  - update permissions
-* **fix:**  - remove temporary plan from account screen
 * **feat:**  - 🎸 remove smartbanner + add native app install ([#4554](https://github.com/AzzappApp/azzapp/pull/4554))
-* **fix:**  -  Link should not have resize, rotate,pinch. Separate boundEditor by type instead on condition in children. ([#4553](https://github.com/AzzappApp/azzapp/pull/4553))
-* **fix:**  - **multiUser:** [#4547](https://github.com/AzzappApp/azzapp/pull/4547) company is optional ([#4552](https://github.com/AzzappApp/azzapp/pull/4552))
 * **fix:**  - BoxSelection , set initial index only if width is fixed ([#4546](https://github.com/AzzappApp/azzapp/pull/4546))
-* **fix:**  - differentiate duplicate label description
 * **fix:**  - put back field for backward compatibility ([#4543](https://github.com/AzzappApp/azzapp/pull/4543))
 * **fix:**  -  search user in backoffice ([#4537](https://github.com/AzzappApp/azzapp/pull/4537))
 * **fix:**  - 🐛 change text as expected ([#4536](https://github.com/AzzappApp/azzapp/pull/4536))
