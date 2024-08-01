@@ -61,6 +61,9 @@ const postCreationScreenQuery = graphql`
   query PostCreationScreenQuery($webCardId: ID!) {
     webCard: node(id: $webCardId) {
       id
+      ... on WebCard {
+        userName
+      }
       ...AuthorCartoucheFragment_webCard
     }
   }
@@ -253,11 +256,12 @@ const PostCreationScreen = ({
                 `file://${path}`,
               );
 
-              if (response.createPost.post?.id) {
+              if (response.createPost.post?.id && webCard.userName) {
                 router.replace({
-                  route: 'POST',
+                  route: 'WEBCARD',
                   params: {
-                    postId: response.createPost.post.id,
+                    userName: webCard.userName,
+                    showPosts: true,
                   },
                 });
               } else {
