@@ -17,17 +17,22 @@ fastlane_require 'dotenv'
 
 default_platform(:ios)
 
+
+APP_IDENT = ENV['IOS_APP_IDENTIFIER']
+IOS_SCHEME = ENV["IOS_SCHEME"]
+EXPORT_METHOD = ENV['IOS_EXPORT_METHOD']
+P12_PASSWORD = ENV["IOS_CERTIFICATE_P12_PASSWORD"]
+PROFILE_ID = ENV["IOS_PROFILE_ID"]
+CODE_SIGNING_IDENTITY = ENV["IOS_CODE_SIGNING_IDENTITY"]
+TEAM_ID = "66D3U3GLN6"
+APP_STORE_CONNECT_API_KEY = ENV["APP_STORE_CONNECT_API_KEY"]
+
 platform :ios do
+  keychain_created = false
+
   desc 'Build IOS application.'
   lane :build do
-    APP_IDENT = ENV['IOS_APP_IDENTIFIER']
-    IOS_SCHEME = ENV["IOS_SCHEME"]
-    EXPORT_METHOD = ENV['EXPORT_METHOD']
-    P12_PASSWORD = ENV["IOS_CERTIFICATE_P12_PASSWORD"]
-    PROFILE_ID = ENV["IOS_PROFILE_ID"]
-    CODE_SIGNING_IDENTITY = ENV["IOS_CODE_SIGNING_IDENTITY"]
-    TEAM_ID = ENV["IOS_TEAM_ID"]
-
+    keychain_created = true
     create_keychain(
       name: "CI",
       password: "CI",
@@ -37,19 +42,20 @@ platform :ios do
       lock_when_sleeps: false
     )
 
-    # eCep certs
+    # Import certificate and provisioning profile
+    PROFILE_PATH = "./ios/certs/#{APP_IDENT}.mobileprovision"
+    CERTIFICATE_PATH = "./ios/certs/cerfiticate.p12"
+
     import_certificate(
       keychain_name: "CI",
       keychain_password: "CI",
-      certificate_path: "./ios/certs/#{APP_IDENT}.p12",
+      certificate_path: CERTIFICATE_PATH,
       certificate_password: P12_PASSWORD,
     )
 
-    PROFILE_PATH = "./ios/certs/#{APP_IDENT}.mobileprovision"
-    CERTIFICATE_PATH = "./ios/certs/#{APP_IDENT}.mobileprovision"
-
     install_provisioning_profile(path: PROFILE_PATH)
 
+    # Update code signing settings
     pbxprojPath = "ios/azzapp.xcodeproj/project.pbxproj"
 
     backup_file(path: pbxprojPath)
@@ -66,6 +72,7 @@ platform :ios do
       code_signing_identity: CODE_SIGNING_IDENTITY
     )
     
+    # Build the application
     gym(
       scheme: IOS_SCHEME, 
       workspace: "ios/azzapp.xcworkspace",
@@ -87,12 +94,33 @@ platform :ios do
     restore_file(path: pbxprojPath)
   end
 
+  lane :deploy do
+    api_key = app_store_connect_api_key(
+      key_id: "2FWWXZWMHY",
+      issuer_id: "913e1653-0bf1-4fd2-8c0d-0d93a6ff4418",
+      key_content: APP_STORE_CONNECT_API_KEY,
+      duration: 1200,
+      in_house: false
+    )
+
+    upload_to_testflight(
+      skip_waiting_for_build_processing: true, 
+      ipa: "./fastlane/builds/#{IOS_SCHEME}.ipa",
+      app_identifier: APP_IDENT,
+      submit_beta_review: false,
+      api_key: api_key
+    )
+  end
 
   after_all do |lane|
-    delete_keychain(name: "CI")	
+    if keychain_created
+      delete_keychain(name: "CI")	
+    end
   end	
 
   error do |lane, exception|
-    delete_keychain(name: "CI")	
+    if keychain_created
+      delete_keychain(name: "CI")	
+    end
   end
 end
