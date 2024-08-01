@@ -1,5 +1,4 @@
 import { FlashList } from '@shopify/flash-list';
-import { fromGlobalId } from 'graphql-relay';
 import { useCallback, useState } from 'react';
 import { View, StyleSheet } from 'react-native';
 import { graphql, useFragment } from 'react-relay';
