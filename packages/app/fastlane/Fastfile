@@ -99,6 +99,7 @@ platform :ios do
       key_id: "2FWWXZWMHY",
       issuer_id: "913e1653-0bf1-4fd2-8c0d-0d93a6ff4418",
       key_content: APP_STORE_CONNECT_API_KEY,
+      is_key_content_base64: true,
       duration: 1200,
       in_house: false
     )

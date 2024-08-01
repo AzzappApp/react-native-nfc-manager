@@ -368,7 +368,7 @@ jobs:
           name: ${{ vars.IOS_SCHEME }}.app.dSYM.zip
           path: packages/app/fastlane/builds/${{ vars.IOS_SCHEME }}.app.dSYM.zip 
       
-      - name: Build ios application
+      - name: Upload to TestFlight
         working-directory: packages/app
         run: bundle exec fastlane deploy
         env:
