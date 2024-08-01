@@ -2,7 +2,7 @@ import * as z from 'zod';
 import { isValidUrl } from '@azzapp/shared/stringHelpers';
 
 export const commonInformationSchema = z.object({
-  company: z.string().nullable(),
+  company: z.string().optional().nullable(),
   phoneNumbers: z.array(
     z.object({
       label: z.string(),

@@ -21,10 +21,10 @@ export type BoundsEditorGestureHandlerProps = ViewProps & {
   position: DerivedValue<{ bounds: SkRect; rotation: number } | null>;
   handles?: readonly ResizeHandlePosition[];
   onGestureStart: () => void;
-  onRotate: (angle: number) => void;
-  onPinch: (scale: number) => void;
+  onRotate?: (angle: number) => void;
+  onPinch?: (scale: number) => void;
   onPan: (x: number, y: number) => void;
-  onResize: (
+  onResize?: (
     position: ResizeHandlePosition,
     deltaX: number,
     deltaY: number,
@@ -62,14 +62,14 @@ export const BoundsEditorGestureHandler = ({
   const rotate = Gesture.Rotation()
     .onBegin(onGestureStart)
     .onChange(e => {
-      onRotate(e.rotation);
+      onRotate?.(e.rotation);
     })
     .onEnd(onGestureEnd);
 
   const pinch = Gesture.Pinch()
     .onBegin(onGestureStart)
     .onChange(e => {
-      onPinch(e.scale);
+      onPinch?.(e.scale);
     })
     .onEnd(onGestureEnd);
 
@@ -127,15 +127,16 @@ export const BoundsEditorGestureHandler = ({
         ]}
         {...props}
       >
-        {handles.map(position => (
-          <ResizeHandleGestureHandler
-            key={position}
-            position={position}
-            onGestureStart={onGestureStart}
-            onResize={onResize}
-            onGestureEnd={onGestureEnd}
-          />
-        ))}
+        {onResize &&
+          handles.map(position => (
+            <ResizeHandleGestureHandler
+              key={position}
+              position={position}
+              onGestureStart={onGestureStart}
+              onResize={onResize}
+              onGestureEnd={onGestureEnd}
+            />
+          ))}
         <Animated.View style={[animatedOptionsStyle, styles.innerContainer]}>
           {children}
         </Animated.View>
