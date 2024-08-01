@@ -1,5 +1,7 @@
-## 0.5.30-canary.1
+## 0.5.30-canary.2
 
+* **fix:**  - 🐛 correctly generate vcard address for android ([#4535](https://github.com/AzzappApp/azzapp/pull/4535))
+* **feat:**  - allow cover template with 0 media ([#4583](https://github.com/AzzappApp/azzapp/pull/4583))
 * **fix:**  - image attachement for GMAIL ...... ([#4580](https://github.com/AzzappApp/azzapp/pull/4580))
 * **fix:**  - **multiUser:** [#4564](https://github.com/AzzappApp/azzapp/pull/4564) prefer email than phoneNumber ([#4566](https://github.com/AzzappApp/azzapp/pull/4566))
 * **fix:**  - **post:** [#3407](https://github.com/AzzappApp/azzapp/pull/3407) redirect to my post (instead of related posts) ([#4577](https://github.com/AzzappApp/azzapp/pull/4577))
