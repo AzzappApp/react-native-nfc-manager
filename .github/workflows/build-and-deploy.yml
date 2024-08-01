@@ -171,14 +171,15 @@ jobs:
           key: ${{ runner.os }}-pods-${{ hashFiles('packages/app/ios/Podfile.lock') }}
 
 
-      - name: Pod  install
-        working-directory: packages/app
-        run: yarn pod-install
+      - name: Pod install
+        working-directory: packages/app/ios
+        run: bundle exec pod install
 
       - name: Setup Xcode env
         run: |
           echo "Setup node for xcode to $(command -v node)"
           echo "export NODE_BINARY=$(command -v node)" > ./packages/app/ios/.xcode.env
+          echo "export NODE_BINARY=$(command -v node)" > ./packages/app/ios/.xcode.env.local
 
       - name: Build ios application
         working-directory: packages/app
