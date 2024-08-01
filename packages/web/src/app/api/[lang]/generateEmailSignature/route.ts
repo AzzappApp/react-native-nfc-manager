@@ -12,6 +12,7 @@ import { buildAvatarUrl } from '#helpers/avatar';
 import cors from '#helpers/cors';
 import { buildCoverImageUrl } from '#helpers/cover';
 import { getSessionData } from '#helpers/tokens';
+import type { MailDataRequired } from '@sendgrid/mail';
 import type { NextRequest } from 'next/server';
 
 const COVER_WIDTH = 630;
@@ -78,7 +79,6 @@ const generateEmailSignature = async (req: NextRequest) => {
         contactCardSignature,
       ),
     };
-    mailParam.preview = preview;
     if (webCardUrl) {
       mailParam.webCardUrl = webCardUrl;
     }
@@ -86,12 +86,23 @@ const generateEmailSignature = async (req: NextRequest) => {
     const userEmail = await getUserById(userId);
 
     if (userEmail?.email) {
-      const msg = {
+      const msg: MailDataRequired = {
         to: userEmail.email,
         from: SENDGRIP_NOREPLY_SENDER,
         templateId: 'd-87dd47b327fa44b38f7bdbea5cb6daaf',
-        dynamic_template_data: mailParam,
+        dynamicTemplateData: mailParam,
+        attachments: [
+          {
+            filename: 'azzapp_contact.jpg',
+            content: preview,
+            type: 'image/jpeg',
+            //@ts-expect-error is mandatory to make if work, api issue (replacing   //contentId: 'contact',)
+            content_id: 'contact',
+            disposition: 'inline',
+          },
+        ],
       };
+
       await sgMail.send(msg);
 
       return NextResponse.json(
