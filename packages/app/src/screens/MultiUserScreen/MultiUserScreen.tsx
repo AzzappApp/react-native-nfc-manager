@@ -235,8 +235,7 @@ const MultiUserScreen = ({
           )}
         </Text>
 
-        {
-          /* <Text variant="smallbold" style={styles.price}>
+        {/* <Text variant="smallbold" style={styles.price}>
           <FormattedMessage
             defaultMessage="$0,99/user, billed monthly "
             description="Price for MultiUserScreen"
@@ -248,8 +247,7 @@ const MultiUserScreen = ({
               values={{ nbUsers: profile?.webCard?.nbProfiles }}
             />
           )}
-        </Text> */ e
-        }
+        </Text> */}
         {profile?.profileRole === 'owner' && !transferOwnerMode && (
           <View style={styles.switchSection}>
             <View style={styles.proContainer}>
@@ -274,9 +272,7 @@ const MultiUserScreen = ({
     profile?.profileRole,
     profile?.webCard.isMultiUser,
     profile?.webCard.isPremium,
-    profile?.webCard?.nbProfiles,
     styles.description,
-    styles.price,
     styles.proContainer,
     styles.sharedIcon,
     styles.switchSection,
