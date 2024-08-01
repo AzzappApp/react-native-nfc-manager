@@ -134,8 +134,8 @@ jobs:
         if: github.ref == 'refs/heads/staging' || github.ref == 'refs/heads/main' || github.ref == 'refs/heads/stable'
         run: yarn persist-queries
         # ADD this once we support multiple versions
-        #env:
-          # LAST_SUPPORTED_APP_VERSION: ${{ vars.LAST_SUPPORTED_APP_VERSION }}
+        env:
+          LAST_SUPPORTED_APP_VERSION: ${{ vars.LAST_SUPPORTED_APP_VERSION }}
 
       
       ############################################
