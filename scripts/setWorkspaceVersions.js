@@ -1,6 +1,12 @@
 const { execSync } = require('child_process');
 const fs = require('fs');
+const path = require('path');
+const stripIndents = require('common-tags/lib/stripIndents');
 const { glob } = require('glob');
+const beautify = require('js-beautify').html;
+const Xcode = require('pbxproj-dom/xcode').Xcode;
+const plist = require('plist');
+const RNVersion = require('react-native-version');
 
 module.exports = function setWorkspaceVersions(version) {
   if (!version || !version.match(/^\d+\.\d+\.\d+(-[a-z]+\.\d+)?$/)) {
@@ -26,6 +32,41 @@ module.exports = function setWorkspaceVersions(version) {
   execSync(
     `yarn react-native-version -A -r --generate-build --skip-tag packages/app`,
   );
+
+  let bundleVersion = 1;
+  const increment = parseInt(version.split('-')[1]?.split('.')[1], 10);
+  if (!isNaN(increment) && increment >= 0) {
+    //-beta.0 -> 1, -beta.1 -> 2, etc.
+    bundleVersion = increment + 1;
+  }
+
+  const xcode = Xcode.open(
+    './packages/app/ios/azzapp.xcodeproj/project.pbxproj',
+  );
+  RNVersion.getPlistFilenames(xcode).forEach(name => {
+    const file = path.join('./packages/app/ios', name);
+
+    const json = plist.parse(fs.readFileSync(file, 'utf8'));
+    const newContent = plist.build(
+      Object.assign({}, json, { CFBundleVersion: `${bundleVersion}` }),
+    );
+
+    fs.writeFileSync(
+      file,
+      stripIndents`
+      <?xml version="1.0" encoding="UTF-8"?>
+      <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+      <plist version="1.0">` +
+        '\n' +
+        beautify(
+          newContent.match(/<dict>[\s\S]*<\/dict>/)[0],
+          Object.assign({ end_with_newline: true, indent_with_tabs: true }),
+        ) +
+        stripIndents`
+      </plist>` +
+        '\n',
+    );
+  });
 
   console.log(`Updated packages to version ${version}`);
 };
