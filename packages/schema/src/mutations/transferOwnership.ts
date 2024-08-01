@@ -36,19 +36,18 @@ const transferOwnership: MutationResolvers['transferOwnership'] = async (
 
   try {
     const { phoneNumber, email } = targetUser;
-
-    if (phoneNumber) {
+    if (email) {
       await notifyUsers(
-        'phone',
-        [phoneNumber],
+        'email',
+        [email],
         webCard,
         'transferOwnership',
         guessLocale(targetUser.locale),
       );
-    } else if (email) {
+    } else if (phoneNumber) {
       await notifyUsers(
-        'email',
-        [email],
+        'phone',
+        [phoneNumber],
         webCard,
         'transferOwnership',
         guessLocale(targetUser.locale),
