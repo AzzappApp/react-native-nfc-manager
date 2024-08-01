@@ -1,0 +1,98 @@
+# This file contains the fastlane.tools configuration
+# You can find the documentation at https://docs.fastlane.tools
+#
+# For a list of all available actions, check out
+#
+#     https://docs.fastlane.tools/actions
+#
+# For a list of all available plugins, check out
+#
+#     https://docs.fastlane.tools/plugins/available-plugins
+#
+
+# Uncomment the line if you want fastlane to automatically update itself
+# update_fastlane
+
+fastlane_require 'dotenv'
+
+default_platform(:ios)
+
+platform :ios do
+  desc 'Build IOS application.'
+  lane :build do
+    APP_IDENT = ENV['IOS_APP_IDENTIFIER']
+    IOS_SCHEME = ENV["IOS_SCHEME"]
+    EXPORT_METHOD = ENV['EXPORT_METHOD']
+    P12_PASSWORD = ENV["IOS_CERTIFICATE_P12_PASSWORD"]
+    PROFILE_ID = ENV["IOS_PROFILE_ID"]
+    CODE_SIGNING_IDENTITY = ENV["IOS_CODE_SIGNING_IDENTITY"]
+    TEAM_ID = ENV["IOS_TEAM_ID"]
+
+    create_keychain(
+      name: "CI",
+      password: "CI",
+      default_keychain: true,
+      unlock: true,
+      timeout: 0,
+      lock_when_sleeps: false
+    )
+
+    # eCep certs
+    import_certificate(
+      keychain_name: "CI",
+      keychain_password: "CI",
+      certificate_path: "./ios/certs/#{APP_IDENT}.p12",
+      certificate_password: P12_PASSWORD,
+    )
+
+    PROFILE_PATH = "./ios/certs/#{APP_IDENT}.mobileprovision"
+    CERTIFICATE_PATH = "./ios/certs/#{APP_IDENT}.mobileprovision"
+
+    install_provisioning_profile(path: PROFILE_PATH)
+
+    pbxprojPath = "ios/azzapp.xcodeproj/project.pbxproj"
+
+    backup_file(path: pbxprojPath)
+
+    update_code_signing_settings(
+      use_automatic_signing: false,
+      path: "ios/azzapp.xcodeproj",
+    )
+
+    update_project_provisioning(
+      xcodeproj: "ios/azzapp.xcodeproj",
+      profile: PROFILE_PATH,
+      target_filter: IOS_SCHEME,
+      code_signing_identity: CODE_SIGNING_IDENTITY
+    )
+    
+    gym(
+      scheme: IOS_SCHEME, 
+      workspace: "ios/azzapp.xcworkspace",
+      configuration: "Release",
+      output_directory: "./fastlane/builds",
+      export_method: EXPORT_METHOD,
+      export_team_id: TEAM_ID,
+      codesigning_identity: CODE_SIGNING_IDENTITY,
+      export_options: {
+        method: EXPORT_METHOD,
+        signingStyle: "manual",
+        provisioningProfiles: { 
+          APP_IDENT => PROFILE_ID,
+        },
+        installerSigningCertificate: CODE_SIGNING_IDENTITY,
+      }
+    )
+    
+    restore_file(path: pbxprojPath)
+  end
+
+
+  after_all do |lane|
+    delete_keychain(name: "CI")	
+  end	
+
+  error do |lane, exception|
+    delete_keychain(name: "CI")	
+  end
+end

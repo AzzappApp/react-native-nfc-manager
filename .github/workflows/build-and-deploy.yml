@@ -14,7 +14,7 @@ jobs:
   build-and-deploy:
     environment: ${{(github.ref_name == 'stable' && 'Production') || (github.ref_name == 'staging' && 'Staging') || 'Development' }} 
     name: Build and Deploy Azzapp application
-    runs-on: ubuntu-latest
+    runs-on: macos-latest-xlarge
     env:
       VERCEL_ORG_ID: "team_nigXfZEKLJrpoK0ZHytix9jX"
       TURBO_TOKEN: ${{ secrets.VERCEL_TOKEN }}
@@ -308,7 +308,65 @@ jobs:
       
       ############################################
       #
-      # EAS Native application Build
+      # IOS Application build
+      #
+      ############################################
+      - uses: ruby/setup-ruby@v1
+        with:
+          working-directory: packages/app
+          bundler-cache: true
+
+      - name: Cache CocoaPods
+        uses: actions/cache@v3
+        with:
+          path: packages/app/ios/Pods
+          key: ${{ runner.os }}-pods-${{ hashFiles('packages/app/ios/Podfile.lock') }}
+
+
+      - name: Pod  install
+        working-directory: packages/app
+        run: yarn pod-install
+
+      - name: Setup Xcode env
+        run: |
+          echo "Setup node for xcode to $(command -v node)"
+          echo "export NODE_BINARY=$(command -v node)" > ./packages/app/ios/.xcode.env
+
+      - name: Build ios application
+        working-directory: packages/app
+        run: yarn build:ios
+        env:
+          NEXT_PUBLIC_URL: https://staging.azzapp.com/
+          NEXT_PUBLIC_API_ENDPOINT: https://staging.azzapp.com/api
+          DEPLOYMENT_ENVIRONMENT: staging
+          PURCHASE_IOS_KEY: appl_snKjYqjvdiQjvatKGCOHyHUwXMO
+          PURCHASE_ANDROID_KEY: TODO
+          NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME: azzapp-dev
+          APP_WEBSHARED_CREDENTIALS: staging.azzapp.com
+          IOS_APP_IDENTIFIER: com.azzapp.app-staging
+          IOS_CERTIFICATE_P12_PASSWORD: "Mgi4NvRLYMe6hU2eV093"
+          IOS_SCHEME: "azzapp-staging"
+          IOS_PROFILE_ID: "21ce0fd8-1935-459a-9d72-69714e831b25"
+          IOS_CODE_SIGNING_IDENTITY: "iPhone Distribution: APPCORP (66D3U3GLN6)"
+          IOS_TEAM_ID: "66D3U3GLN6"
+          EXPORT_METHOD: "ad-hoc"
+
+      - name: Upload ios artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: azzapp-staging.ipa
+          path: packages/app/fastlane/builds/azzapp-staging.ipa
+      
+      - name: Upload ios dSYM
+        uses: actions/upload-artifact@v4
+        with:
+          name: azzapp-staging.app.dSYM.zip
+          path: packages/app/fastlane/builds/azzapp-staging.app.dSYM.zip 
+
+        
+      ############################################
+      #
+      # EAS Android application Build
       #
       ############################################
       - name: Prepare Working Directory for EAS
@@ -331,4 +389,4 @@ jobs:
           elif [ "$GITHUB_REF" == "refs/heads/staging" ]; then
             PROFILE="staging"
           fi
-          eas build --platform all --profile $PROFILE --non-interactive --no-wait
+          eas build --platform android --profile $PROFILE --non-interactive --no-wait

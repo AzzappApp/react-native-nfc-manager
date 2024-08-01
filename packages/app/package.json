@@ -8,6 +8,7 @@
     "dev": "react-native start",
     "run:android": "react-native run-android --no-packager --mode developmentDebug --appId=com.azzapp.app_dev",
     "run:ios": "react-native run-ios --no-packager --scheme azzapp-dev",
+    "build:ios": "cd ios && bundle exec fastlane ios build",
     "pod-install": "cd ios && bundle exec pod install",
     "clean": "watchman watch-del-all && rm -Rf node_modules && rm -Rf ios/Pods && rm -Rf ios/build",
     "eas-build-post-install": "(cd ../.. && yarn build-app-dependencies)",
