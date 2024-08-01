@@ -59,7 +59,21 @@ export const buildVCardFromSerializedContact = async (
   });
 
   contactCard.addresses.forEach(address => {
-    vcard.addAddress(address[0], address[1].replace(/;/g, '\\;'));
+    let type = undefined;
+    if (address[0] === 'Home') type = 'HOME';
+    if (address[0] === 'Work') type = 'WORK';
+    if (address[0] === 'Main') type = 'PREF;Main';
+
+    vcard.addAddress(
+      address[0],
+      address[1].replace(/;/g, '\\;'),
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      type ?? address[0],
+    );
   });
 
   if (contactCard.birthday && !isNaN(Date.parse(contactCard.birthday)))
