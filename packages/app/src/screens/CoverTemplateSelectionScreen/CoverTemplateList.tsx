@@ -1,5 +1,4 @@
 import { FlashList } from '@shopify/flash-list';
-import { fromGlobalId } from 'graphql-relay';
 import { useCallback, useState } from 'react';
 import { View, StyleSheet } from 'react-native';
 import { graphql, useFragment } from 'react-relay';
@@ -102,21 +101,31 @@ const CoverTemplateList = ({
   );
 
   const onRefresh = useCallback(() => {
-    refetch({
-      after: null,
-      first: 5,
-      tagId: tag ? fromGlobalId(tag).id : null,
-    });
+    refetch(
+      {
+        after: null,
+        first: 5,
+        tagId: tag,
+      },
+      {
+        fetchPolicy: 'store-and-network',
+      },
+    );
   }, [refetch, tag]);
 
   const onSelect = useCallback(
     (selectedTag: string | null) => {
       setTag(selectedTag);
-      refetch({
-        after: null,
-        first: 5,
-        tagId: selectedTag ? fromGlobalId(selectedTag).id : null,
-      });
+      refetch(
+        {
+          after: null,
+          first: 5,
+          tagId: selectedTag,
+        },
+        {
+          fetchPolicy: 'store-and-network',
+        },
+      );
     },
     [refetch],
   );

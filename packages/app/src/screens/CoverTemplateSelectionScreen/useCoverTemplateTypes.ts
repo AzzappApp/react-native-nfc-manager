@@ -8,13 +8,15 @@ import type {
   useCoverTemplateTypes_coverTemplates$key,
   useCoverTemplateTypes_coverTemplates$data,
 } from '#relayArtifacts/useCoverTemplateTypes_coverTemplates.graphql';
+import type { RefetchFnDynamic } from 'react-relay';
+import type { OperationType } from 'relay-runtime';
+
 type UseCoverTemplatesReturnType = {
   coverTemplateTypes: CoverTemplateType[];
-  refetch: (args: {
-    first?: number | null;
-    after?: string | null;
-    tagId?: string | null;
-  }) => void;
+  refetch: RefetchFnDynamic<
+    OperationType,
+    useCoverTemplateTypes_coverTemplates$key
+  >;
   isLoadingPrevious: boolean;
   isLoadingNext: boolean;
   loadNext: (nbItems: number) => void;

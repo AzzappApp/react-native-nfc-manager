@@ -300,6 +300,7 @@ const WebCardFormScreen = ({
             nbLikes
             nbPostsLiked
             nbWebCardViews
+            isWebSubscription
             statsSummary {
               day
               webCardViews
