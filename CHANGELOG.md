@@ -1,5 +1,8 @@
-## 0.5.30-canary.0
+## 0.5.30-canary.1
 
+* **fix:**  - image attachement for GMAIL ...... ([#4580](https://github.com/AzzappApp/azzapp/pull/4580))
+* **fix:**  - **multiUser:** [#4564](https://github.com/AzzappApp/azzapp/pull/4564) prefer email than phoneNumber ([#4566](https://github.com/AzzappApp/azzapp/pull/4566))
+* **fix:**  - **post:** [#3407](https://github.com/AzzappApp/azzapp/pull/3407) redirect to my post (instead of related posts) ([#4577](https://github.com/AzzappApp/azzapp/pull/4577))
 * **fix:**  - 🐛 correctly display title on desktop preview ([#4565](https://github.com/AzzappApp/azzapp/pull/4565))
 * **fix:**  - 🐛 avoid creating multiple section with save spam ([#4541](https://github.com/AzzappApp/azzapp/pull/4541))
 * **fix:**  - close album on selecting ([#4560](https://github.com/AzzappApp/azzapp/pull/4560))
