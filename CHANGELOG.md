@@ -1,5 +1,7 @@
-## 0.5.34-canary.0
+## 0.5.34-canary.1
 
+* **feat:**  - **subscription:** [#3369](https://github.com/AzzappApp/azzapp/pull/3369) unpublish webCards with canceled and obsolete subscriptions ([#4593](https://github.com/AzzappApp/azzapp/pull/4593))
+* **fix:**  - **cover:** [#4567](https://github.com/AzzappApp/azzapp/pull/4567) handle maxSelectableVideos in media duplicate ([#4596](https://github.com/AzzappApp/azzapp/pull/4596))
 * **fix:**  - card counter mulit user screen ([#4599](https://github.com/AzzappApp/azzapp/pull/4599))
 * **fix:**  - try with relative path
 * **fix:**  - CoverEdition animation ([#4595](https://github.com/AzzappApp/azzapp/pull/4595))
