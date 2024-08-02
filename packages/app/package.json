@@ -1,6 +1,6 @@
 {
   "name": "@azzapp/app",
-  "version": "0.5.31-rc.1",
+  "version": "0.5.32",
   "scripts": {
     "test": "jest",
     "typecheck": "tsc --noEmit",
