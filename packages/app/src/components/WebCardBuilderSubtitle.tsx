@@ -16,10 +16,10 @@ const WebCardBuilderSubtitle = ({
   webCard,
 }: {
   modules: ReadonlyArray<{ readonly kind: string }>;
-  webCard: { webCardKind: string };
+  webCard: { webCardKind: string; isMultiUser: boolean };
 }) => {
   return (
-    webCardRequiresSubscription(modules, webCard.webCardKind) && (
+    webCardRequiresSubscription(modules, webCard) && (
       <View style={styles.proContainer}>
         <Text variant="medium" style={styles.proText}>
           {isWebCardKindSubscription(webCard.webCardKind) ? (

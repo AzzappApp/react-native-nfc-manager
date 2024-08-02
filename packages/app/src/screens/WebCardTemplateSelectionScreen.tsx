@@ -35,6 +35,7 @@ const query = graphql`
           id
           userName
           webCardKind
+          isMultiUser
           isPremium
         }
       }

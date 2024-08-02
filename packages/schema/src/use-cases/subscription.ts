@@ -116,7 +116,7 @@ export const checkWebCardHasSubscription = async (
   const owner = await loaders.webCardOwners.load(webCard.id);
 
   if (
-    webCardRequiresSubscription(modules, webCard.webCardKind) &&
+    webCardRequiresSubscription(modules, webCard) &&
     webCard.cardIsPublished
   ) {
     const subscription = owner

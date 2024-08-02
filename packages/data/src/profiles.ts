@@ -139,6 +139,32 @@ export const getProfilesOfUser = async (userId: string, limit?: number) => {
 };
 
 /**
+ * Retrieves a list of associated profiles to an user for selected role
+ * @param userId - The id of the user
+ * @param profileRole - The role of the user
+ * @returns The list of profile associated to the user
+ */
+export const getProfilesOfUserForRole = async (
+  userId: string,
+  profileRole: Profile['profileRole'],
+) => {
+  const query = db
+    .select()
+    .from(ProfileTable)
+    .innerJoin(WebCardTable, eq(WebCardTable.id, ProfileTable.webCardId))
+    .where(
+      and(
+        eq(ProfileTable.userId, userId),
+        eq(ProfileTable.deleted, false),
+        eq(ProfileTable.profileRole, profileRole),
+      ),
+    )
+    .orderBy(asc(WebCardTable.userName));
+
+  return query;
+};
+
+/**
  * Retrieves an associated profiles to an user for a webCard
  * @param userId - The id of the user
  * @param webCardId - The id of the webCard

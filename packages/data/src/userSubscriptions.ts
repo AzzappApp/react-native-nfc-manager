@@ -62,6 +62,7 @@ export const UserSubscriptionTable = mysqlTable(
       .default('active'),
     lastPaymentError: cols.boolean('lastPaymentError').default(false),
     canceledAt: cols.dateTime('canceledAt'),
+    invalidatedAt: cols.dateTime('invalidatedAt'),
   },
   table => {
     return {
@@ -72,6 +73,7 @@ export const UserSubscriptionTable = mysqlTable(
       statusExpirationDate: index('status_expiration_date').on(
         table.status,
         table.endAt,
+        table.invalidatedAt,
       ),
     };
   },
@@ -282,6 +284,22 @@ export const cancelExpiredSubscription = async (trx: DbTransaction = db) => {
         lt(UserSubscriptionTable.endAt, currentDate),
       ),
     );
+};
+
+export const getExpiredSubscription = async (limit: number) => {
+  const currentDate = new Date();
+
+  return db
+    .select()
+    .from(UserSubscriptionTable)
+    .where(
+      and(
+        lt(UserSubscriptionTable.endAt, currentDate),
+        eq(UserSubscriptionTable.status, 'canceled'),
+        isNull(UserSubscriptionTable.invalidatedAt),
+      ),
+    )
+    .limit(limit);
 };
 
 const FREE_BETA_DATE_LIMIT = process.env.FREE_BETA_DATE_LIMIT;

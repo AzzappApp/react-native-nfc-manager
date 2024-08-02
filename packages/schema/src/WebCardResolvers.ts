@@ -74,10 +74,10 @@ export const WebCard: WebCardResolvers = {
   requiresSubscription: async (webCard, { newWebCardKind }, { loaders }) => {
     const modules = await loaders.cardModuleByWebCardLoader.load(webCard.id);
 
-    return webCardRequiresSubscription(
-      modules,
-      newWebCardKind ?? webCard.webCardKind,
-    );
+    return webCardRequiresSubscription(modules, {
+      webCardKind: newWebCardKind ?? webCard.webCardKind,
+      isMultiUser: webCard.isMultiUser,
+    });
   },
   isWebSubscription: async (webCard, _, { loaders }) => {
     const owner = await loaders.webCardOwners.load(webCard.id);

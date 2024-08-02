@@ -321,6 +321,7 @@ export const createSubscriptionRequest = async ({
     canceledAt: null,
     freeSeats: 0,
     lastPaymentError: false,
+    invalidatedAt: null,
   };
 
   const id = await createSubscription(subscription);

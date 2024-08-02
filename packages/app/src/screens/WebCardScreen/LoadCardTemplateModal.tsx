@@ -54,6 +54,7 @@ const LoadCardTemplateModal = ({
         webCardKind
         cardIsPublished
         isPremium
+        isMultiUser
         cardModules {
           id
           kind
@@ -107,7 +108,7 @@ const LoadCardTemplateModal = ({
     if (!cardTemplate) return;
     const requireSubscription = webCardRequiresSubscription(
       cardTemplate.modules,
-      webCard.webCardKind,
+      webCard,
     );
 
     if (webCard.cardIsPublished && requireSubscription && !webCard.isPremium) {
@@ -115,14 +116,7 @@ const LoadCardTemplateModal = ({
       return;
     }
     commitCardTemplate(cardTemplate.id);
-  }, [
-    cardTemplate,
-    commitCardTemplate,
-    router,
-    webCard.cardIsPublished,
-    webCard.isPremium,
-    webCard.webCardKind,
-  ]);
+  }, [cardTemplate, commitCardTemplate, router, webCard]);
 
   const showWarning = Boolean(webCard.cardModules?.length);
 
@@ -132,7 +126,7 @@ const LoadCardTemplateModal = ({
       if (!showWarning) {
         const requireSubscription = webCardRequiresSubscription(
           template.modules,
-          webCard.webCardKind,
+          webCard,
         );
 
         if (
@@ -147,14 +141,7 @@ const LoadCardTemplateModal = ({
         commitCardTemplate(template.id);
       }
     },
-    [
-      commitCardTemplate,
-      router,
-      showWarning,
-      webCard.cardIsPublished,
-      webCard.isPremium,
-      webCard.webCardKind,
-    ],
+    [commitCardTemplate, router, showWarning, webCard],
   );
 
   const onRequestDismiss = useCallback(

@@ -5,11 +5,11 @@ import { withAxiom } from 'next-axiom';
 import {
   createSubscription,
   db,
-  unpublisheWebCardForUser,
   updateActiveUserSubscription,
   UserSubscriptionTable,
 } from '@azzapp/data';
 import cors from '#helpers/cors';
+import { unpublishWebCardForUser } from '#helpers/subscription';
 
 const BEARER_HEADER = process.env.IAP_REVENUECAT_NOTIFICATION_BEARER;
 const subscriptionWebHook = async (req: Request) => {
@@ -121,8 +121,10 @@ const subscriptionWebHook = async (req: Request) => {
               endAt: new Date(expiration_at_ms),
               revenueCatId: rcId,
               status: 'canceled',
+              invalidatedAt: new Date(),
             });
-            await unpublisheWebCardForUser(userId);
+
+            await unpublishWebCardForUser(userId);
           }
         });
 
@@ -164,7 +166,6 @@ const subscriptionWebHook = async (req: Request) => {
               revenueCatId: rcId,
               status: 'active',
             });
-            await unpublisheWebCardForUser(userId);
           }
         });
         break;
