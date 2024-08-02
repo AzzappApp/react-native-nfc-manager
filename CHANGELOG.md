@@ -1,5 +1,7 @@
-## 0.5.30-canary.3
+## 0.5.30-canary.4
 
+* **fix:**  - CoverEdition animation ([#4595](https://github.com/AzzappApp/azzapp/pull/4595))
+* **fix:**  - **multiUser:** [#4562](https://github.com/AzzappApp/azzapp/pull/4562) missing phone number ([#4594](https://github.com/AzzappApp/azzapp/pull/4594))
 * **fix:**  - test the lottie animation ([#4588](https://github.com/AzzappApp/azzapp/pull/4588))
 * **fix:**  - 🐛 correctly generate vcard address for android ([#4535](https://github.com/AzzappApp/azzapp/pull/4535))
 * **feat:**  - allow cover template with 0 media ([#4583](https://github.com/AzzappApp/azzapp/pull/4583))
