@@ -4,7 +4,6 @@ import {
   type SharedValue,
   withTiming,
 } from 'react-native-reanimated';
-import useAnimatedState from '#hooks/useAnimatedState';
 import { EDIT_TRANSITION_DURATION } from './webCardScreenHelpers';
 
 const EditTransitionContext = createContext<{
@@ -29,9 +28,19 @@ export const WebCardScreenTransitionsProvider = ({
   children,
 }: WebCardScreenEditTransitionProviderProps) => {
   const init = useRef(false);
-  const editTransition = useAnimatedState(editing ? 1 : 0, {
-    duration: init.current ? EDIT_TRANSITION_DURATION : 0,
-  });
+  const editTransition = useSharedValue(0);
+
+  useEffect(() => {
+    if (!init.current) {
+      init.current = true;
+      editTransition.value = editing ? 1 : 0;
+      return;
+    }
+
+    editTransition.value = withTiming(editing ? 1 : 0, {
+      duration: EDIT_TRANSITION_DURATION,
+    });
+  }, [editTransition, editing]);
 
   const selectionTransition = useSharedValue(0);
 
