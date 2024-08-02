@@ -215,21 +215,31 @@ const CoverEditorMediaPicker = ({
       }
     }
 
-    const videoMedia = selectedMedias.filter(media =>
-      media.kind.includes('video'),
-    );
+    const missingMedia =
+      maxMedias - selectedMedias.filter(m => m !== null).length;
 
-    const mediaToDuplicate =
-      maxSelectableVideos && videoMedia.length < maxSelectableVideos
-        ? selectedMedias
-        : selectedMedias.filter(media => media.kind.includes('image'));
-    if (mediaToDuplicate.length > 0) {
+    if (missingMedia > 0) {
+      const selected = selectedMedias.filter(
+        media => media !== null,
+      ) as Media[];
       const duplicatedMedias = duplicateMediaToFillSlots(
         maxMedias,
-        selectedMedias.filter(media => media !== null) as Media[],
+        selected,
+        maxSelectableVideos,
       );
-
       setSelectedMedias(duplicatedMedias);
+
+      if (duplicatedMedias.length < maxMedias) {
+        Toast.show({
+          type: 'error',
+          text1: intl.formatMessage({
+            defaultMessage: 'Maximum number of videos reached',
+            description: 'Error message when trying to add more videos',
+          }),
+          visibilityTime: 2000,
+        });
+        return null;
+      }
 
       return duplicatedMedias;
     } else {
