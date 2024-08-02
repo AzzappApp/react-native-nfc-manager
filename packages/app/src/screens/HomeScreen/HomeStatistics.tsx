@@ -111,29 +111,17 @@ const HomeStatistics = ({
   );
 
   useAnimatedReaction(
-    () => currentIndexSharedValue?.value ?? 0,
+    () => currentIndexSharedValue?.value ?? 1,
     actual => {
       if (profiles?.length && actual >= 0) {
         totalLikes.value = format(
-          interpolate(
-            currentIndexSharedValue?.value ?? 0,
-            inputRange.value,
-            likes.value,
-          ),
+          interpolate(actual ?? 0, inputRange.value, likes.value),
         );
         totalScans.value = format(
-          interpolate(
-            currentIndexSharedValue?.value ?? 0,
-            inputRange.value,
-            contactCardScans.value,
-          ),
+          interpolate(actual ?? 0, inputRange.value, contactCardScans.value),
         );
         totalViews.value = format(
-          interpolate(
-            currentIndexSharedValue?.value ?? 0,
-            inputRange.value,
-            webCardViews.value,
-          ),
+          interpolate(actual ?? 0, inputRange.value, webCardViews.value),
         );
       } else if (actual >= 0) {
         totalLikes.value = format(likes.value[actual]);
