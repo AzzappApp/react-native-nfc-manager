@@ -1,6 +1,6 @@
 {
   "name": "@azzapp/app",
-  "version": "0.5.30-canary.5",
+  "version": "0.5.33",
   "scripts": {
     "test": "jest",
     "typecheck": "tsc --noEmit",
@@ -8,6 +8,8 @@
     "dev": "react-native start",
     "run:android": "react-native run-android --no-packager --mode developmentDebug --appId=com.azzapp.app_dev",
     "run:ios": "react-native run-ios --no-packager --scheme azzapp-dev",
+    "build:ios": "bundle exec fastlane ios build",
+    "deploy:ios": "bundle exec fastlane ios deploy",
     "pod-install": "cd ios && bundle exec pod install",
     "clean": "watchman watch-del-all && rm -Rf node_modules && rm -Rf ios/Pods && rm -Rf ios/build",
     "eas-build-post-install": "(cd ../.. && yarn build-app-dependencies)",

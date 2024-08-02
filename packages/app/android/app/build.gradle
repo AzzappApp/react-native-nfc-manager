@@ -117,8 +117,8 @@ android {
         applicationId "com.azzapp"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 5030
-        versionName "0.5.30-canary.5"
+        versionCode 5033
+        versionName "0.5.33"
         
         externalNativeBuild {
             cmake {
