@@ -1,6 +1,7 @@
-## 0.5.30-canary.5
+## 0.5.34-canary.0
 
 * **fix:**  - card counter mulit user screen ([#4599](https://github.com/AzzappApp/azzapp/pull/4599))
+* **fix:**  - try with relative path
 * **fix:**  - CoverEdition animation ([#4595](https://github.com/AzzappApp/azzapp/pull/4595))
 * **fix:**  - **multiUser:** [#4562](https://github.com/AzzappApp/azzapp/pull/4562) missing phone number ([#4594](https://github.com/AzzappApp/azzapp/pull/4594))
 * **fix:**  - test the lottie animation ([#4588](https://github.com/AzzappApp/azzapp/pull/4588))
@@ -9,6 +10,7 @@
 * **fix:**  - image attachement for GMAIL ...... ([#4580](https://github.com/AzzappApp/azzapp/pull/4580))
 * **fix:**  - **multiUser:** [#4564](https://github.com/AzzappApp/azzapp/pull/4564) prefer email than phoneNumber ([#4566](https://github.com/AzzappApp/azzapp/pull/4566))
 * **fix:**  - **post:** [#3407](https://github.com/AzzappApp/azzapp/pull/3407) redirect to my post (instead of related posts) ([#4577](https://github.com/AzzappApp/azzapp/pull/4577))
+* **build:**  - set LAST_SUPPORTED_APP_VERSION to have backward compatibility ([#4578](https://github.com/AzzappApp/azzapp/pull/4578))
 * **fix:**  - 🐛 correctly display title on desktop preview ([#4565](https://github.com/AzzappApp/azzapp/pull/4565))
 * **fix:**  - 🐛 avoid creating multiple section with save spam ([#4541](https://github.com/AzzappApp/azzapp/pull/4541))
 * **fix:**  - close album on selecting ([#4560](https://github.com/AzzappApp/azzapp/pull/4560))
