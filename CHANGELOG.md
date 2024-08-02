@@ -1,5 +1,6 @@
-## 0.5.30-canary.4
+## 0.5.30-canary.5
 
+* **fix:**  - card counter mulit user screen ([#4599](https://github.com/AzzappApp/azzapp/pull/4599))
 * **fix:**  - CoverEdition animation ([#4595](https://github.com/AzzappApp/azzapp/pull/4595))
 * **fix:**  - **multiUser:** [#4562](https://github.com/AzzappApp/azzapp/pull/4562) missing phone number ([#4594](https://github.com/AzzappApp/azzapp/pull/4594))
 * **fix:**  - test the lottie animation ([#4588](https://github.com/AzzappApp/azzapp/pull/4588))
