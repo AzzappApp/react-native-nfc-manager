@@ -6,32 +6,30 @@
  */
 const path = require('path');
 const { mergeConfig } = require('@react-native/metro-config');
-const { getDefaultConfig } = require('@react-native/metro-config');
-const { withSentryConfig } = require('@sentry/react-native/metro');
+
+const { getSentryExpoConfig } = require('@sentry/react-native/metro');
 const {
   getMetroAndroidAssetsResolutionFix,
 } = require('react-native-monorepo-tools');
 
 const androidAssetsResolutionFix = getMetroAndroidAssetsResolutionFix();
 
-module.exports = withSentryConfig(
-  mergeConfig(getDefaultConfig(__dirname), {
-    transformer: {
-      publicPath: androidAssetsResolutionFix.publicPath,
-      assetPlugins: ['expo-asset/tools/hashAssetFiles'],
-      getTransformOptions: async () => ({
-        transform: {
-          experimentalImportSupport: false,
-          inlineRequires: true,
-        },
-      }),
-    },
-    server: {
-      // ...and to the server middleware.
-      enhanceMiddleware: middleware => {
-        return androidAssetsResolutionFix.applyMiddleware(middleware);
+module.exports = mergeConfig(getSentryExpoConfig(__dirname), {
+  transformer: {
+    publicPath: androidAssetsResolutionFix.publicPath,
+    assetPlugins: ['expo-asset/tools/hashAssetFiles'],
+    getTransformOptions: async () => ({
+      transform: {
+        experimentalImportSupport: false,
+        inlineRequires: true,
       },
+    }),
+  },
+  server: {
+    // ...and to the server middleware.
+    enhanceMiddleware: middleware => {
+      return androidAssetsResolutionFix.applyMiddleware(middleware);
     },
-    watchFolders: [path.resolve(__dirname, '../../')],
-  }),
-);
+  },
+  watchFolders: [path.resolve(__dirname, '../../')],
+});
