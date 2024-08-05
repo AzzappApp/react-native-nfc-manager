@@ -3,6 +3,7 @@ import { useCallback, useMemo, useState } from 'react';
 import { View, StyleSheet } from 'react-native';
 import { graphql, useFragment } from 'react-relay';
 import useScreenInsets from '#hooks/useScreenInsets';
+import ActivityIndicator from '#ui/ActivityIndicator';
 import CoverTemplateConfirmationScreenModal from './CoverTemplateConfirmationScreenModal';
 import CoverTemplateTypePreviews, {
   CoverTemplateTypePreviewFallback,
@@ -145,7 +146,16 @@ const CoverTemplateList = ({
       <View style={{ flex: 1 }}>
         <FlashList
           key={tag}
-          ListFooterComponent={hasNext ? null : ListFooterComponent}
+          ListFooterComponent={
+            <>
+              {hasNext ? null : ListFooterComponent}
+              {isLoadingNext ? (
+                <View style={styles.activityIndicatorContainer}>
+                  <ActivityIndicator />
+                </View>
+              ) : null}
+            </>
+          }
           accessibilityRole="list"
           data={coverTemplateTypes}
           keyExtractor={keyExtractor}
@@ -200,4 +210,9 @@ export const CoverTemplateListFallback = ({
 
 const styles = StyleSheet.create({
   container: { flex: 1, paddingTop: 20 },
+  activityIndicatorContainer: {
+    padding: 5,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
 });
