@@ -13,7 +13,7 @@
     }
   },
   "scripts": {
-    "build": "yarn compile && yarn definition",
+    "build": "yarn payment-api-client && yarn compile && yarn definition",
     "dev": "yarn compile:watch & yarn definition:watch",
     "typecheck": "yarn definition",
     "definition": "tsc -p tsconfig.build.json",
