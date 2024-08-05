@@ -3,6 +3,7 @@ import {
   createPicture,
   drawAsImageFromPicture,
 } from '@shopify/react-native-skia';
+import { FileSystemUploadType, UploadTask } from 'expo-file-system';
 import { useCallback, useState } from 'react';
 import { Platform, unstable_batchedUpdates } from 'react-native';
 import ReactNativeBlobUtil from 'react-native-blob-util';
@@ -16,7 +17,7 @@ import {
 import { waitTime } from '@azzapp/shared/asyncHelpers';
 import { createRandomFilePath, getFileName } from '#helpers/fileHelpers';
 import { addLocalCachedMediaFile } from '#helpers/mediaHelpers';
-import { uploadMedia, uploadSign } from '#helpers/MobileWebAPI';
+import { uploadSign } from '#helpers/MobileWebAPI';
 import coverDrawer from './coverDrawer';
 import {
   mediaInfoIsImage,
@@ -104,27 +105,43 @@ const useSaveCover = (
       kind: kind === 'video' ? 'video' : 'image',
       target: 'cover',
     });
-    const fileName = getFileName(path);
     const uri = `file://${path}`;
-    const file: any = {
-      name: fileName,
-      uri,
-      type:
-        mime.lookup(fileName) ||
-        (kind === 'image' ? 'image/jpeg' : 'video/mp4'),
-    };
-    const { progress: uploadProgress, promise: uploadPromise } = uploadMedia(
-      file,
+    let uploadProgressSink: Sink<number>;
+    const uploadProgress: Observable<number> = Observable.create(sink => {
+      uploadProgressSink = sink;
+    });
+
+    const uploadTask = new UploadTask(
       uploadURL,
-      uploadParameters,
+      uri,
+      {
+        uploadType: FileSystemUploadType.MULTIPART,
+        httpMethod: 'POST',
+        fieldName: 'file',
+        mimeType:
+          mime.lookup(getFileName(path)) ||
+          (kind === 'image' ? 'image/jpeg' : 'video/mp4'),
+        parameters: Object.fromEntries(
+          Object.entries(uploadParameters).map(([key, value]) => [
+            key,
+            value.toString(),
+          ]),
+        ),
+      },
+      ({ totalBytesSent, totalBytesExpectedToSend }) => {
+        uploadProgressSink?.next(totalBytesSent / totalBytesExpectedToSend);
+      },
     );
+
     unstable_batchedUpdates(() => {
       setSavingStatus('uploading');
-      setUploadProgressIndicator(
-        uploadProgress.map(({ loaded, total }) => loaded / total),
-      );
+      setUploadProgressIndicator(uploadProgress);
     });
-    const { public_id } = await uploadPromise;
+    const result = await uploadTask.uploadAsync();
+    if (!result) {
+      throw new Error('Error uploading media');
+    }
+    const { public_id } = JSON.parse(result.body);
 
     addLocalCachedMediaFile(public_id, kind, uri);
 
