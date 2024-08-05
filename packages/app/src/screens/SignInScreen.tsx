@@ -315,6 +315,7 @@ export default SignInScreen;
 
 SignInScreen.options = {
   replaceAnimation: 'push',
+  stackAnimation: 'fade',
 };
 
 function tryGetPhoneNumber(phoneNumber: string, countryCode?: string) {

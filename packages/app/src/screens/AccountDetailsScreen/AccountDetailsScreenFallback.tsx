@@ -1,4 +1,5 @@
-import { View, ActivityIndicator } from 'react-native';
+import { View } from 'react-native';
+import ActivityIndicator from '#ui/ActivityIndicator';
 import Container from '#ui/Container';
 import SafeAreaView from '#ui/SafeAreaView';
 import AccountDetailsHeader from './AccountDetailsHeader';

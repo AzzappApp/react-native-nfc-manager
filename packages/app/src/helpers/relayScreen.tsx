@@ -18,6 +18,8 @@ import {
   type ScreenOptions,
 } from '#components/NativeRouter';
 import useAuthState from '#hooks/useAuthState';
+import ActivityIndicator from '#ui/ActivityIndicator';
+import Container from '#ui/Container';
 import {
   disposeQueryFor,
   getLoadQueryInfo,
@@ -100,7 +102,7 @@ export const isRelayScreen = (
 function relayScreen<TRoute extends Route>(
   Component: ComponentType<RelayScreenProps<TRoute, any>>,
   {
-    fallback: Fallback,
+    fallback: Fallback = RelayScreenFallback,
     errorFallback: ErrorFallback,
     canGoBack = true,
     profileBound = true,
@@ -341,3 +343,13 @@ export class RelayScreenErrorBoundary extends React.Component<
     return children;
   }
 }
+
+export const RelayScreenFallback = () => {
+  return (
+    <Container
+      style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}
+    >
+      <ActivityIndicator />
+    </Container>
+  );
+};

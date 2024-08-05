@@ -8,6 +8,7 @@ import {
 } from '@azzapp/shared/cardHelpers';
 import { getTextColor } from '@azzapp/shared/colorsHelpers';
 import { colors } from '#theme';
+import Skeleton from '#components/Skeleton';
 import Icon from '#ui/Icon';
 import PressableNative from '#ui/PressableNative';
 import Text from '#ui/Text';
@@ -23,12 +24,7 @@ const CoverTemplateScratchStarters = ({
 }: CoverTemplateScratchStartersProps) => {
   return (
     <View style={styles.container}>
-      <Text variant="large">
-        <FormattedMessage
-          defaultMessage="Start from scratch"
-          description="CoverTemplateList - Start from scratch"
-        />
-      </Text>
+      {fromScratchText}
       <View style={styles.scratchs}>
         {COLOR_PALETTE_COLORS.map(colorName => {
           const color = swapColor(colorName, cardColors);
@@ -53,6 +49,28 @@ const CoverTemplateScratchStarters = ({
 };
 
 export default CoverTemplateScratchStarters;
+
+export const CoverTemplateScratchStartersFallback = () => {
+  return (
+    <View style={styles.container}>
+      {fromScratchText}
+      <View style={styles.scratchs}>
+        {COLOR_PALETTE_COLORS.map(colorName => (
+          <Skeleton key={colorName} style={styles.scratch} />
+        ))}
+      </View>
+    </View>
+  );
+};
+
+const fromScratchText = (
+  <Text variant="large">
+    <FormattedMessage
+      defaultMessage="Start from scratch"
+      description="CoverTemplateList - Start from scratch"
+    />
+  </Text>
+);
 
 const styles = StyleSheet.create({
   container: {

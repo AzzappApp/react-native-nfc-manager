@@ -2,17 +2,18 @@ import { useCallback } from 'react';
 import { useIntl } from 'react-intl';
 import { ScrollView, View, StyleSheet } from 'react-native';
 import { graphql, useFragment } from 'react-relay';
+import Skeleton from '#components/Skeleton';
 import RoundedMenuComponent from '#ui/RoundedMenuComponent';
 import type { CoverTemplateTagSelector_tags$key } from '#relayArtifacts/CoverTemplateTagSelector_tags.graphql';
 
 type Props = {
-  tagsKey: CoverTemplateTagSelector_tags$key;
+  tags: CoverTemplateTagSelector_tags$key;
   onSelect: (tagId: string | null) => void;
   selected: string | null;
 };
 
 const CoverTemplateTagSelector = (props: Props) => {
-  const { tagsKey, onSelect, selected } = props;
+  const { tags: tagsKey, onSelect, selected } = props;
 
   const intl = useIntl();
 
@@ -61,6 +62,22 @@ const CoverTemplateTagSelector = (props: Props) => {
   );
 };
 
+export const CoverTemplateTagSelectorFallback = () => {
+  return (
+    <View
+      style={[
+        styles.container,
+        styles.containerFallback,
+        styles.contentContainerScrollView,
+      ]}
+    >
+      {Array.from({ length: 5 }).map((_, index) => (
+        <Skeleton key={index} style={styles.skeltonTag} />
+      ))}
+    </View>
+  );
+};
+
 export default CoverTemplateTagSelector;
 
 const styles = StyleSheet.create({
@@ -69,4 +86,13 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   container: { height: 42 },
+  containerFallback: {
+    flexDirection: 'row',
+  },
+  skeltonTag: {
+    width: 100,
+    height: 32,
+    borderRadius: 16,
+    paddingHorizontal: 16,
+  },
 });

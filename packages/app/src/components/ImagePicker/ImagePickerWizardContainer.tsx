@@ -6,8 +6,9 @@ import {
   useState,
 } from 'react';
 import { useIntl } from 'react-intl';
-import { ActivityIndicator, StyleSheet, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import useEditorLayout from '#hooks/useEditorLayout';
+import ActivityIndicator from '#ui/ActivityIndicator';
 import BottomMenu from '#ui/BottomMenu';
 import Container from '#ui/Container';
 import Header from '#ui/Header';
