@@ -155,10 +155,7 @@ export const SimpleButtonRenderer = ({
         await Linking.openURL(`mailto:${actionLink}`);
       } else if (actionType) {
         await Linking.openURL(
-          `tel:${parsePhoneNumber(
-            actionLink,
-            actionType as CountryCode,
-          ).formatInternational()}`,
+          parsePhoneNumber(actionLink, actionType as CountryCode).getURI(),
         );
       }
     }
