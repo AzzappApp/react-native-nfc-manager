@@ -1,12 +1,12 @@
 import { addPass, addPassJWT } from '@reeq/react-native-passkit';
 import { ImageFormat, makeImageFromView } from '@shopify/react-native-skia';
+import { Image } from 'expo-image';
 import { fromGlobalId } from 'graphql-relay';
 import { useCallback, useRef, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import {
   View,
   useWindowDimensions,
-  Image,
   useColorScheme,
   Platform,
   ScrollView,
@@ -210,6 +210,49 @@ export const ContactCardScreen = ({
 
   const router = useRouter();
 
+  const generateLoadingPass = useCallback(async () => {
+    try {
+      setLoadingPass(true);
+      if (webCard?.id) {
+        if (Platform.OS === 'ios') {
+          const pass = await getAppleWalletPass({
+            webCardId: fromGlobalId(webCard.id).id,
+            locale: intl.locale,
+          });
+
+          const base64Pass = fromByteArray(getArrayBufferForBlob(pass));
+
+          await addPass(base64Pass);
+        } else if (Platform.OS === 'android') {
+          const pass = await getGoogleWalletPass({
+            webCardId: fromGlobalId(webCard.id).id,
+            locale: intl.locale,
+          });
+
+          await addPassJWT(pass.token);
+        }
+      }
+    } catch (e) {
+      Toast.show({
+        text1: intl.formatMessage({
+          defaultMessage: 'Error',
+          description: 'Error toast title',
+        }),
+        text2: intl.formatMessage(
+          {
+            defaultMessage:
+              'Oops, ContactCard{azzappA} could not add pass to Apple Wallet',
+            description: 'Error toast message',
+          },
+          { azzappA: <Text variant="azzapp">a</Text> },
+        ) as string,
+        type: 'error',
+      });
+    } finally {
+      setLoadingPass(false);
+    }
+  }, [webCard, intl]);
+
   if (!webCard) {
     return null;
   }
@@ -267,91 +310,69 @@ export const ContactCardScreen = ({
                 }}
               />
             </Text>
+            {Platform.OS === 'ios' && (
+              <View style={styles.addToWalletContainer}>
+                <PressableNative
+                  testID="add-to-wallet-button"
+                  disabled={loadingPass}
+                  ripple={{
+                    borderless: true,
+                    foreground: true,
+                    color:
+                      colorScheme === 'dark' ? colors.grey100 : colors.grey900,
+                  }}
+                  style={styles.addToWalletButton}
+                  onPress={generateLoadingPass}
+                >
+                  {loadingPass ? (
+                    <ActivityIndicator
+                      color={colorScheme === 'dark' ? 'black' : 'white'}
+                      style={styles.addToWalletIcon}
+                    />
+                  ) : (
+                    <Image
+                      source={require('#assets/wallet.png')}
+                      style={styles.addToWalletIcon}
+                    />
+                  )}
+                  <Text variant="button" style={styles.addToWalletButtonText}>
+                    <FormattedMessage
+                      defaultMessage="Add to Apple Wallet"
+                      description="Add to Apple Wallet button label"
+                    />
+                  </Text>
+                </PressableNative>
+              </View>
+            )}
+            {Platform.OS === 'android' && (
+              <View style={styles.googleWalletLogoContainer}>
+                <PressableNative
+                  testID="add-to-wallet-button"
+                  disabled={loadingPass}
+                  onPress={generateLoadingPass}
+                  ripple={{
+                    borderless: true,
+                    foreground: true,
+                    color:
+                      colorScheme === 'dark' ? colors.grey100 : colors.grey900,
+                  }}
+                >
+                  <Image
+                    source={require('#assets/google-wallet.svg')}
+                    style={styles.googleWalletLogo}
+                    contentFit="cover"
+                  />
+                </PressableNative>
+                {loadingPass && (
+                  <View style={styles.googleWalletLoadingContainer}>
+                    <ActivityIndicator
+                      color={colorScheme === 'dark' ? 'black' : 'white'}
+                    />
+                  </View>
+                )}
+              </View>
+            )}
             <View style={styles.buttons}>
-              {Platform.OS === 'ios' && (
-                <View style={styles.addToWalletContainer}>
-                  <PressableNative
-                    testID="add-to-wallet-button"
-                    disabled={loadingPass}
-                    ripple={{
-                      borderless: true,
-                      foreground: true,
-                      color:
-                        colorScheme === 'dark'
-                          ? colors.grey100
-                          : colors.grey900,
-                    }}
-                    style={styles.addToWalletButton}
-                    onPress={async () => {
-                      try {
-                        setLoadingPass(true);
-                        if (Platform.OS === 'ios') {
-                          const pass = await getAppleWalletPass({
-                            webCardId: fromGlobalId(webCard.id).id,
-                            locale: intl.locale,
-                          });
-
-                          const base64Pass = fromByteArray(
-                            getArrayBufferForBlob(pass),
-                          );
-
-                          await addPass(base64Pass);
-                        } else if (Platform.OS === 'android') {
-                          const pass = await getGoogleWalletPass({
-                            webCardId: fromGlobalId(webCard.id).id,
-                            locale: intl.locale,
-                          });
-
-                          await addPassJWT(pass.token);
-                        }
-                      } catch (e) {
-                        Toast.show({
-                          text1: intl.formatMessage({
-                            defaultMessage: 'Error',
-                            description: 'Error toast title',
-                          }),
-                          text2: intl.formatMessage(
-                            {
-                              defaultMessage:
-                                'Oops, ContactCard{azzappA} could not add pass to Apple Wallet',
-                              description: 'Error toast message',
-                            },
-                            { azzappA: <Text variant="azzapp">a</Text> },
-                          ) as string,
-                          type: 'error',
-                        });
-                      } finally {
-                        setLoadingPass(false);
-                      }
-                    }}
-                  >
-                    {loadingPass ? (
-                      <ActivityIndicator
-                        color={colorScheme === 'dark' ? 'black' : 'white'}
-                        style={styles.addToWalletIcon}
-                      />
-                    ) : (
-                      <Image
-                        source={require('#assets/wallet.png')}
-                        style={styles.addToWalletIcon}
-                      />
-                    )}
-                    <Text variant="button" style={styles.addToWalletButtonText}>
-                      {Platform.OS === 'ios' ? (
-                        <FormattedMessage
-                          defaultMessage="Add to Apple Wallet"
-                          description="Add to Apple Wallet button label"
-                        />
-                      ) : (
-                        <FormattedMessage
-                          defaultMessage="Add to Google Wallet"
-                          description="Add to Google Wallet button label"
-                        />
-                      )}
-                    </Text>
-                  </PressableNative>
-                </View>
-              )}
               {webCard && <ContactCardExportVcf profile={profile} />}
               <PressableNative
                 ripple={{
@@ -532,4 +553,21 @@ const styleSheet = createStyleSheet(appearance => ({
   },
   scrollViewStyle: { width: '100%' },
   viewShotBackgroundColor: { backgroundColor: 'white' },
+  googleWalletLogo: {
+    width: '100%',
+    height: 47,
+    overflow: 'visible',
+  },
+  googleWalletLogoContainer: {
+    marginBottom: 18,
+  },
+  googleWalletLoadingContainer: {
+    position: 'absolute',
+    left: 0,
+    top: 0,
+    right: 0,
+    bottom: 0,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
 }));
