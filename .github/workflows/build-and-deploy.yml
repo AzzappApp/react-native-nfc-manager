@@ -344,10 +344,10 @@ jobs:
           PURCHASE_ANDROID_KEY: ${{ vars.PURCHASE_ANDROID_KEY }}
           APP_WEBSHARED_CREDENTIALS: ${{ vars.APP_WEBSHARED_CREDENTIALS }}
           SENTRY_DSN: "https://13a33b3788344ceea14cf298a220fead@o4505353883680768.ingest.sentry.io/4505358469038080"
-          TERMS_OF_SERVICE: https://www.azzapp.com/legal/terms-of-service
-          PRIVACY_POLICY: https://www.azzapp.com/legal/privacy
-          ABOUT: https://www.azzapp.com/company/about_us
-          FAQ: https://www.azzapp.com/company/faq
+          TERMS_OF_SERVICE: https://web.azzapp.com/legal/terms-of-service
+          PRIVACY_POLICY: https://web.azzapp.com/legal/privacy
+          ABOUT: https://web.azzapp.com/company/about_us
+          FAQ: https://web.azzapp.com/company/faq
           IOS_APP_IDENTIFIER: ${{ vars.IOS_APP_IDENTIFIER }}
           IOS_SCHEME: ${{ vars.IOS_SCHEME }}
           IOS_PROFILE_ID: ${{ vars.IOS_PROFILE_ID }}

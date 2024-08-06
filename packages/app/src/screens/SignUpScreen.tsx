@@ -1,5 +1,5 @@
 import { parsePhoneNumber } from 'libphonenumber-js';
-import { useCallback, useState, useRef, memo } from 'react';
+import { useCallback, useState, useRef } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { View, Image, Keyboard, Platform } from 'react-native';
 import { KeyboardAvoidingView } from 'react-native-keyboard-controller';
@@ -380,7 +380,12 @@ const SignupScreen = () => {
   );
 };
 
-export default memo(SignupScreen);
+export default SignupScreen;
+
+SignupScreen.options = {
+  replaceAnimation: 'push',
+  stackAnimation: 'fade',
+};
 
 const styleSheet = createStyleSheet(appearance => ({
   flex: { flex: 1 },

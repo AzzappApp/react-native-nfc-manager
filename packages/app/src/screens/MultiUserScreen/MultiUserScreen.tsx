@@ -7,7 +7,7 @@ import {
   useState,
 } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { ActivityIndicator, View } from 'react-native';
+import { View } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { graphql, useMutation, usePreloadedQuery } from 'react-relay';
 import { isAdmin } from '@azzapp/shared/profileHelpers';
@@ -25,6 +25,7 @@ import relayScreen, { RelayScreenErrorBoundary } from '#helpers/relayScreen';
 import useHandleProfileActionError from '#hooks/useHandleProfileError';
 import { useMultiUserUpdate } from '#hooks/useMultiUserUpdate';
 import useToggle from '#hooks/useToggle';
+import ActivityIndicator from '#ui/ActivityIndicator';
 import Button from '#ui/Button';
 import Container from '#ui/Container';
 import Header from '#ui/Header';

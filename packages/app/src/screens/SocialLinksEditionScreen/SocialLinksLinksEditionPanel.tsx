@@ -265,16 +265,18 @@ const SocialInputComponent = ({
           filterText = filterText.substring(0, endIndex);
         }
       }
-      setLocalValue(filterText);
+
       if (
-        icon !== 'website' &&
-        icon !== 'mail' &&
-        icon !== 'phone' // phone number / email / website are validated on end editing
+        isNotFalsyString(filterText) &&
+        icon === 'website' &&
+        !localValue.includes('http')
       ) {
-        debouncedChangeLink(icon, value);
+        filterText = 'https://' + (filterText === 'h' ? '' : filterText);
       }
+      setLocalValue(filterText);
+      debouncedChangeLink(icon, filterText);
     },
-    [debouncedChangeLink, icon, mask],
+    [debouncedChangeLink, icon, localValue, mask],
   );
 
   const intl = useIntl();

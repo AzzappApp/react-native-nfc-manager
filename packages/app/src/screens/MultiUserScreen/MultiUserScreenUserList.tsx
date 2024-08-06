@@ -8,7 +8,7 @@ import {
   useState,
 } from 'react';
 import { useIntl } from 'react-intl';
-import { ActivityIndicator, SectionList, View } from 'react-native';
+import { SectionList, View } from 'react-native';
 import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { graphql, useFragment, usePaginationFragment } from 'react-relay';
@@ -24,6 +24,7 @@ import { useRouter } from '#components/NativeRouter';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import useAuthState from '#hooks/useAuthState';
 import { useFocusEffect } from '#hooks/useFocusEffect';
+import ActivityIndicator from '#ui/ActivityIndicator';
 import Button from '#ui/Button';
 import Container from '#ui/Container';
 import Icon from '#ui/Icon';

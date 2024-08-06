@@ -5,6 +5,7 @@ import { graphql, useFragment } from 'react-relay';
 import { colors } from '#theme';
 import { MediaVideoRenderer } from '#components/medias';
 import { useScreenHasFocus } from '#components/NativeRouter';
+import Skeleton from '#components/Skeleton';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import Icon from '#ui/Icon';
 import PressableNative from '#ui/PressableNative';
@@ -167,6 +168,30 @@ const ListItemComponent = ({
 
 const CoverTemplateTypePreview = memo(ListItemComponent);
 
+export const CoverTemplateTypePreviewFallback = () => {
+  const styles = useStyleSheet(styleSheet);
+  return (
+    <View style={styles.container}>
+      <View style={styles.section}>
+        <Skeleton style={{ width: 70, height: 20, borderRadius: 8 }} />
+      </View>
+      <View
+        style={[
+          styles.previews,
+          {
+            flexDirection: 'row',
+            gap: 10,
+          },
+        ]}
+      >
+        <Skeleton style={[styles.preview, { width: 150 }]} />
+        <Skeleton style={[styles.preview, { width: 150 }]} />
+        <Skeleton style={[styles.preview, { width: 150 }]} />
+      </View>
+    </View>
+  );
+};
+
 const styleSheet = createStyleSheet(appearance => ({
   section: {
     height: 53,
@@ -175,10 +200,6 @@ const styleSheet = createStyleSheet(appearance => ({
   },
   container: {
     height: 298,
-  },
-  content: {
-    paddingHorizontal: 20,
-    marginTop: 10,
   },
   previews: {
     paddingLeft: 20,

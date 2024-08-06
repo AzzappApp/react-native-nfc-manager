@@ -1,41 +1,41 @@
 import { FlashList } from '@shopify/flash-list';
-import { useCallback, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { View, StyleSheet } from 'react-native';
 import { graphql, useFragment } from 'react-relay';
 import useScreenInsets from '#hooks/useScreenInsets';
+import ActivityIndicator from '#ui/ActivityIndicator';
 import CoverTemplateConfirmationScreenModal from './CoverTemplateConfirmationScreenModal';
-import CoverTemplateScratchStarters from './CoverTemplateScratchStarter';
-import CoverTemplateTagSelector from './CoverTemplateTagSelector';
-import CoverTemplateTypePreviews from './CoverTemplateTypePreviews';
+import CoverTemplateTypePreviews, {
+  CoverTemplateTypePreviewFallback,
+} from './CoverTemplateTypePreviews';
 import { useCoverTemplateTypes } from './useCoverTemplateTypes';
 import type { CoverTemplateList_profile$key } from '#relayArtifacts/CoverTemplateList_profile.graphql';
 import type { CoverTemplate } from './CoverTemplateTypePreviews';
 import type { CoverTemplateType } from './useCoverTemplateTypes';
-import type { ColorPaletteColor } from '@azzapp/shared/cardHelpers';
 import type { ListRenderItemInfo } from '@shopify/flash-list';
+import type { ReactElement } from 'react';
 import type { ViewToken } from 'react-native';
 
 export type CoverEditorProps = {
   profile: CoverTemplateList_profile$key;
+  tag: string | null;
   onSelectTemplate: (templateId: string) => void;
-  onSelectBackgroundColor: (color: ColorPaletteColor) => void;
+  ListFooterComponent?: ReactElement;
 };
+
 const CoverTemplateList = ({
   profile: profileKey,
+  tag,
   onSelectTemplate,
-  onSelectBackgroundColor,
+  ListFooterComponent,
 }: CoverEditorProps) => {
-  const [tag, setTag] = useState<string | null>(null);
-
   const [selectedTemplate, setSelectedTemplate] =
     useState<CoverTemplate | null>(null);
 
-  const { coverTemplateTags, webCard } = useFragment(
+  const { webCard } = useFragment(
     graphql`
-      fragment CoverTemplateList_profile on Profile {
-        coverTemplateTags {
-          ...CoverTemplateTagSelector_tags
-        }
+      fragment CoverTemplateList_profile on Profile
+      @argumentDefinitions(tagId: { type: ID, defaultValue: null }) {
         webCard {
           cardColors {
             light
@@ -44,6 +44,7 @@ const CoverTemplateList = ({
           }
           ...useCoverTemplateTypes_coverTemplates
             @alias(as: "coverTemplatesFragment")
+            @arguments(tagId: $tagId)
         }
       }
     `,
@@ -66,14 +67,15 @@ const CoverTemplateList = ({
     refetch,
     isLoadingPrevious,
     isLoadingNext,
+    hasNext,
     loadNext,
   } = useCoverTemplateTypes(webCard.coverTemplatesFragment);
 
   const onEndReached = useCallback(() => {
-    if (!isLoadingNext) {
+    if (!isLoadingNext && hasNext) {
       loadNext(5);
     }
-  }, [isLoadingNext, loadNext]);
+  }, [isLoadingNext, hasNext, loadNext]);
 
   const [viewableItems, setViewableItems] = useState<
     Array<{
@@ -110,22 +112,6 @@ const CoverTemplateList = ({
     );
   }, [refetch, tag]);
 
-  const onSelect = useCallback(
-    (selectedTag: string | null) => {
-      setTag(selectedTag);
-      refetch(
-        {
-          after: null,
-          first: 5,
-          tagId: selectedTag,
-        },
-        {
-          fetchPolicy: 'store-and-network',
-        },
-      );
-    },
-    [refetch],
-  );
   const { bottom } = useScreenInsets();
 
   //# region viewable to handle video preview
@@ -146,20 +132,29 @@ const CoverTemplateList = ({
   );
 
   //# endregion
+
+  const extraData = useMemo(
+    () => ({
+      viewableItems,
+      hasNext,
+    }),
+    [viewableItems, hasNext],
+  );
+
   return (
     <View style={styles.container}>
-      <CoverTemplateTagSelector
-        tagsKey={coverTemplateTags}
-        selected={tag}
-        onSelect={onSelect}
-      />
       <View style={{ flex: 1 }}>
         <FlashList
-          ListHeaderComponent={
-            <CoverTemplateScratchStarters
-              onColorSelect={onSelectBackgroundColor}
-              cardColors={webCard?.cardColors}
-            />
+          key={tag}
+          ListFooterComponent={
+            <>
+              {hasNext ? null : ListFooterComponent}
+              {isLoadingNext ? (
+                <View style={styles.activityIndicatorContainer}>
+                  <ActivityIndicator />
+                </View>
+              ) : null}
+            </>
           }
           accessibilityRole="list"
           data={coverTemplateTypes}
@@ -174,7 +169,7 @@ const CoverTemplateList = ({
           keyboardShouldPersistTaps="always"
           onViewableItemsChanged={onViewableItemChanged}
           viewabilityConfig={viewabilityConfig}
-          extraData={viewableItems}
+          extraData={extraData}
           estimatedItemSize={298}
         />
       </View>
@@ -193,10 +188,31 @@ const viewabilityConfig = {
 };
 
 export default CoverTemplateList;
+
 const keyExtractor = (item: { id: string }) => {
   return item.id;
 };
 
+export const CoverTemplateListFallback = ({
+  ListFooterComponent,
+}: {
+  ListFooterComponent?: ReactElement;
+}) => {
+  return (
+    <View style={styles.container}>
+      {Array.from({ length: 5 }).map((_, index) => (
+        <CoverTemplateTypePreviewFallback key={index} />
+      ))}
+      {ListFooterComponent}
+    </View>
+  );
+};
+
 const styles = StyleSheet.create({
   container: { flex: 1, paddingTop: 20 },
+  activityIndicatorContainer: {
+    padding: 5,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
 });
