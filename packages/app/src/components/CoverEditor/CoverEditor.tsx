@@ -218,7 +218,7 @@ const CoverEditorCore = (
           shadow: false,
         };
 
-    const textLayers: CoverEditorTextLayerItem[] = data?.textLayers
+    let textLayers: CoverEditorTextLayerItem[] = data?.textLayers
       ? (
           data.textLayers as Array<
             CoverEditorTextLayerItem & { customText: string | null }
@@ -238,6 +238,8 @@ const CoverEditorCore = (
           };
         })
       : [];
+
+    textLayers = textLayers.filter(textLayer => !!textLayer.text);
 
     const overlayLayers = placeholder
       ? (data?.overlayLayers as any)?.map((overlay: CoverEditorOverlayItem) =>

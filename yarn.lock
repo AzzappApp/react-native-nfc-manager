@@ -135,7 +135,7 @@ __metadata:
     "@react-native/babel-preset": ^0.74.85
     "@react-native/metro-config": ^0.74.85
     "@reeq/react-native-passkit": ^0.1.3
-    "@sentry/react-native": ^5.25.0
+    "@sentry/react-native": ^5.26.0
     "@shopify/flash-list": ^1.7.0
     "@shopify/react-native-skia": 1.3.8
     "@testing-library/react-native": ^12.5.1
@@ -146,12 +146,13 @@ __metadata:
     "@types/relay-test-utils": ^14.1.4
     chroma-js: ^2.4.2
     events: ^3.3.0
-    expo: ^51.0.21
+    expo: ^51.0.24
     expo-asset: ^10.0.10
     expo-blur: ^13.0.2
     expo-clipboard: ~6.0.3
     expo-contacts: ~13.0.3
     expo-device: ^6.0.2
+    expo-file-system: ^17.0.1
     expo-font: ^12.0.9
     expo-haptics: ~13.0.1
     expo-image: ^1.12.13
@@ -171,7 +172,7 @@ __metadata:
     react: ^18.3.1
     react-hook-form: ^7.52.1
     react-intl: ^6.6.8
-    react-native: ^0.74.3
+    react-native: 0.74.3
     react-native-blob-jsi-helper: ^0.3.1
     react-native-blob-util: ^0.19.9
     react-native-bootsplash: ^5.5.3
@@ -4974,9 +4975,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@expo/cli@npm:0.18.25":
-  version: 0.18.25
-  resolution: "@expo/cli@npm:0.18.25"
+"@expo/cli@npm:0.18.26":
+  version: 0.18.26
+  resolution: "@expo/cli@npm:0.18.26"
   dependencies:
     "@babel/runtime": ^7.20.0
     "@expo/code-signing-certificates": 0.0.5
@@ -5057,7 +5058,7 @@ __metadata:
     ws: ^8.12.1
   bin:
     expo-internal: build/bin/cli
-  checksum: 79581f13b1afe4886a90d61952f865c7b0b622c497f38378a18991a7f8e3d54423e4eee3c9d634c630df61e2f8372e747ac00c0091c638cb38ac9c525e697263
+  checksum: be85e3ed9614d212ca4ffe49d482371e86fc0dc0df018c41dd1b8e26e61977afcc33391c86ccec9dc356240c5673e6723fd995318cf709d843a8d6f06061bed8
   languageName: node
   linkType: hard
 
@@ -5285,9 +5286,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@expo/metro-config@npm:0.18.8":
-  version: 0.18.8
-  resolution: "@expo/metro-config@npm:0.18.8"
+"@expo/metro-config@npm:0.18.10":
+  version: 0.18.10
+  resolution: "@expo/metro-config@npm:0.18.10"
   dependencies:
     "@babel/core": ^7.20.0
     "@babel/generator": ^7.20.5
@@ -5307,7 +5308,7 @@ __metadata:
     lightningcss: ~1.19.0
     postcss: ~8.4.32
     resolve-from: ^5.0.0
-  checksum: 04f45ee37878f137ff23a7f96950e7ac799dbd09b38d7e408345e4dae69611b14a418d0454f15006c1720516773ee1fa30832f9d8602261259296f41c2ebe1a1
+  checksum: d4292e925b58fd692477a122a6652e3f95eac8a7dca7319d7b14c03a6b3b7b6b7ebb26b263c31cdc085bc7f3460b7fa550538827915eab5ff0e60895e3527d73
   languageName: node
   linkType: hard
 
@@ -8898,6 +8899,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@sentry/babel-plugin-component-annotate@npm:2.20.1":
+  version: 2.20.1
+  resolution: "@sentry/babel-plugin-component-annotate@npm:2.20.1"
+  checksum: 5fecba8c7915693fec811bb06ff0441f28496f6b12e811337a08996a7aa13a13a069c9f9ed28bac95be89d03b422a68d7236ab3376c161edbe051cb0ad2a0193
+  languageName: node
+  linkType: hard
+
 "@sentry/browser@npm:7.113.0":
   version: 7.113.0
   resolution: "@sentry/browser@npm:7.113.0"
@@ -9138,10 +9146,11 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@sentry/react-native@npm:^5.25.0":
-  version: 5.25.0
-  resolution: "@sentry/react-native@npm:5.25.0"
+"@sentry/react-native@npm:^5.26.0":
+  version: 5.26.0
+  resolution: "@sentry/react-native@npm:5.26.0"
   dependencies:
+    "@sentry/babel-plugin-component-annotate": 2.20.1
     "@sentry/browser": 7.117.0
     "@sentry/cli": 2.31.2
     "@sentry/core": 7.117.0
@@ -9159,7 +9168,7 @@ __metadata:
       optional: true
   bin:
     sentry-expo-upload-sourcemaps: scripts/expo-upload-sourcemaps.js
-  checksum: eafbd3a11803cff52eb36a7d54552db82e4ab07f3812075ce8a74c49ee4cd94cb3fb003bc993c9e81f956a4e57367d4ae90fa018df8161a833ca41bd6abcafdf
+  checksum: d38837012987f93c1c32e94200b9965471794e2aa584f0d4bec8bc2ee54044abed2174570cb8b228e469f5cfeb8dae2933c785583d1d7307839f217f1cb6f7be
   languageName: node
   linkType: hard
 
@@ -14795,7 +14804,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"expo-file-system@npm:~17.0.1":
+"expo-file-system@npm:^17.0.1, expo-file-system@npm:~17.0.1":
   version: 17.0.1
   resolution: "expo-file-system@npm:17.0.1"
   peerDependencies:
@@ -14866,12 +14875,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"expo-modules-core@npm:1.12.19":
-  version: 1.12.19
-  resolution: "expo-modules-core@npm:1.12.19"
+"expo-modules-core@npm:1.12.20":
+  version: 1.12.20
+  resolution: "expo-modules-core@npm:1.12.20"
   dependencies:
     invariant: ^2.2.4
-  checksum: f634bafecc9cd3fa508ea5c6ae7b1dd19ee23471636a92f90c8cec009dabb60ed687811414112379f19033487e0d0990f88007d481cf9da178dcb5ac284c25e3
+  checksum: 1f48d4b89bb00463c622939f3ed272224011dc39917f9624c8476373e2d1e936667ca8e709a37dbafa51178dc073b1dfebd9b5e9b709335966f055e20c9710b1
   languageName: node
   linkType: hard
 
@@ -14893,15 +14902,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"expo@npm:^51.0.21":
-  version: 51.0.21
-  resolution: "expo@npm:51.0.21"
+"expo@npm:^51.0.24":
+  version: 51.0.24
+  resolution: "expo@npm:51.0.24"
   dependencies:
     "@babel/runtime": ^7.20.0
-    "@expo/cli": 0.18.25
+    "@expo/cli": 0.18.26
     "@expo/config": 9.0.3
     "@expo/config-plugins": 8.0.8
-    "@expo/metro-config": 0.18.8
+    "@expo/metro-config": 0.18.10
     "@expo/vector-icons": ^14.0.0
     babel-preset-expo: ~11.0.12
     expo-asset: ~10.0.10
@@ -14909,12 +14918,12 @@ __metadata:
     expo-font: ~12.0.9
     expo-keep-awake: ~13.0.2
     expo-modules-autolinking: 1.11.1
-    expo-modules-core: 1.12.19
+    expo-modules-core: 1.12.20
     fbemitter: ^3.0.0
     whatwg-url-without-unicode: 8.0.0-3
   bin:
     expo: bin/cli
-  checksum: dcd18974ae1b8a7d0a08252ad013c4d2ebf986e5e39b2ed2cefe521623c182bf6cba67bd05fe54bbf0586a9ac6559c872807ef6d4e829af3a314ed52e1434e4a
+  checksum: a368f0197177d3032a743b2c33917b84029be7767200b587324f0eb0b0576d9788bb45195961589d2f118032a44efe219fb161b2a257483134993bd058096e47
   languageName: node
   linkType: hard
 
@@ -21686,7 +21695,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-native@npm:^0.74.3":
+"react-native@npm:0.74.3":
   version: 0.74.3
   resolution: "react-native@npm:0.74.3"
   dependencies:

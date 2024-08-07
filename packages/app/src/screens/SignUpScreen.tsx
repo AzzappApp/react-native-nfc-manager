@@ -1,6 +1,6 @@
 import { parsePhoneNumber } from 'libphonenumber-js';
 import LottieView from 'lottie-react-native';
-import { useCallback, useState, useRef, memo } from 'react';
+import { useCallback, useState, useRef } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import {
   View,
@@ -410,7 +410,12 @@ const SignupScreen = () => {
   );
 };
 
-export default memo(SignupScreen);
+export default SignupScreen;
+
+SignupScreen.options = {
+  replaceAnimation: 'push',
+  stackAnimation: 'fade',
+};
 
 const styleSheet = createStyleSheet(appearance => ({
   flex: { flex: 1 },

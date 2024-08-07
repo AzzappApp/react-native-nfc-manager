@@ -2,15 +2,13 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useIntl } from 'react-intl';
-import { ActivityIndicator, StyleSheet, View } from 'react-native';
+import { StyleSheet } from 'react-native';
 import * as mime from 'react-native-mime-types';
 import Toast from 'react-native-toast-message';
 import { graphql, useMutation, usePreloadedQuery } from 'react-relay';
 import { Observable } from 'relay-runtime';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
 import { combineMultiUploadProgresses } from '@azzapp/shared/networkHelpers';
-import { colors } from '#theme';
-import { CancelHeaderButton } from '#components/commonsButtons';
 import {
   preventModalDismiss,
   useRouter,
@@ -398,30 +396,12 @@ const styles = StyleSheet.create({
   container: { flex: 1 },
 });
 
-const ContactCardEditScreenFallback = () => {
-  const router = useRouter();
-  return (
-    <Container style={{ flex: 1 }}>
-      <SafeAreaView style={{ flex: 1 }}>
-        <Header leftElement={<CancelHeaderButton onPress={router.back} />} />
-        <View style={{ aspectRatio: 1, backgroundColor: colors.grey100 }} />
-        <View
-          style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}
-        >
-          <ActivityIndicator />
-        </View>
-      </SafeAreaView>
-    </Container>
-  );
-};
-
 const contactCardEditScreen = relayScreen(ContactCardEditScreen, {
   query: contactCardEditScreenQuery,
   getVariables: (_, profileInfos) => ({
     profileId: profileInfos?.profileId ?? '',
     pixelRatio: CappedPixelRatio(),
   }),
-  fallback: ContactCardEditScreenFallback,
 });
 
 contactCardEditScreen.getScreenOptions = (): ScreenOptions => ({

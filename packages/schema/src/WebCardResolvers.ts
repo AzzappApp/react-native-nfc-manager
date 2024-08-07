@@ -324,7 +324,7 @@ export const WebCard: WebCardResolvers = {
       })),
       {
         offset,
-        hasNextPage: coverTemplates.length > limit,
+        hasNextPage: coverTemplatesTypes.length > limit,
       },
     );
   },

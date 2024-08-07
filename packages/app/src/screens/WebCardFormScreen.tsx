@@ -312,10 +312,12 @@ const WebCardFormScreen = ({
     }
   `);
 
+  const isSubmitting = useRef(false);
   const onSubmit = handleSubmit(data => {
-    if (!data.userName) {
+    if (!data.userName || isSubmitting.current) {
       return;
     }
+    isSubmitting.current = true;
 
     const defaultActivity = companyActivities?.[0];
     const defaultActivityId = defaultActivity?.id;
@@ -372,6 +374,7 @@ const WebCardFormScreen = ({
         });
       },
       onError: error => {
+        isSubmitting.current = false;
         if (error.message === ERRORS.USERNAME_ALREADY_EXISTS) {
           setError('userName', {
             type: 'validation',
@@ -454,7 +457,7 @@ const WebCardFormScreen = ({
           <NextHeaderButton
             style={{ width: 70, marginRight: 10 }}
             onPress={onSubmit}
-            disabled={saving}
+            loading={saving}
           />
         }
         rightElementWidth={80}

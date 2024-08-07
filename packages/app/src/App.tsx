@@ -116,6 +116,9 @@ Sentry.init({
   integrations: [
     new Sentry.ReactNativeTracing({
       routingInstrumentation,
+      // WARNING: This option interferes with reanimated and creates flickering in some animations
+      // do not enable it unless it has been fixed
+      enableStallTracking: false,
     }),
   ],
 });

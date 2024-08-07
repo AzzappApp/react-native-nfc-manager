@@ -23,37 +23,10 @@
       "schedule": "*/3 * * * *"
     }
   ],
-  "rewrites": [
-    {
-      "source": "/",
-      "destination": "https://storefront.azzapp.com/"
-    },
-    {
-      "source": "/plus/:match*",
-      "destination": "https://storefront.azzapp.com/plus/:match*"
-    },
-    {
-      "source": "/personal/:match*",
-      "destination": "https://storefront.azzapp.com/personal/:match*"
-    },
-    {
-      "source": "/pricing",
-      "destination": "https://storefront.azzapp.com/pricing"
-    },
-    {
-      "source": "/company/:match*",
-      "destination": "https://storefront.azzapp.com/company/:match*"
-    },
-    {
-      "source": "/legal/:match*",
-      "destination": "https://storefront.azzapp.com/legal/:match*"
-    }
-  ],
   "redirects": [
     {
-      "source": "/_framer/:match*",
-      "destination": "https://storefront.azzapp.com/_framer/:match*",
-      "permanent": true
+      "source": "/",
+      "destination": "https://web.azzapp.com/"
     }
   ]
 }

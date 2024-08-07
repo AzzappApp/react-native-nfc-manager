@@ -101,8 +101,7 @@ export const fetchWithRetries = async (
   return executeWithRetries(
     () => fetchWithTimeout(input, init),
     retries,
-    error =>
-      error instanceof TypeError && error.message === TIMEOUT_ERROR_MESSAGE,
+    error => error instanceof TypeError,
   );
 };
 
