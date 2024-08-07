@@ -15,7 +15,6 @@ import ImagePicker, {
   SelectImageStep,
   SelectImageStepWithFrontCameraByDefault,
 } from '#components/ImagePicker';
-import { MediaImageRenderer } from '#components/medias';
 import { ScreenModal } from '#components/NativeRouter';
 
 import {
@@ -175,14 +174,12 @@ const ContactCardEditForm = ({
                           foreground: true,
                         }}
                       >
-                        <MediaImageRenderer
-                          source={{
-                            uri: value.uri,
-                            mediaId: value.id ?? '',
-                            requestedSize: AVATAR_WIDTH,
-                          }}
-                          style={styles.avatar}
-                        />
+                        <View style={[styles.avatar, styles.avatarWrapper]}>
+                          <Image
+                            source={{ uri: value?.uri }}
+                            style={styles.avatar}
+                          />
+                        </View>
                       </PressableNative>
                       <IconButton
                         icon="delete_filled"
@@ -591,6 +588,11 @@ const styleSheet = createStyleSheet(appearance => ({
   noAvatarContainer: {
     overflow: 'hidden',
     borderRadius: AVATAR_WIDTH / 2,
+  },
+  avatarWrapper: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    overflow: 'hidden',
   },
   avatar: {
     width: AVATAR_WIDTH,
