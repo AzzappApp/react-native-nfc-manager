@@ -187,7 +187,7 @@ describe('networkHelpers', () => {
         () =>
           new Promise((resolve, reject) => {
             setTimeout(() => {
-              reject(new TypeError('other error'));
+              reject(new Error('other error'));
             }, 500);
           }),
       );
@@ -198,7 +198,7 @@ describe('networkHelpers', () => {
       });
       jest.runAllTimers();
       await flushPromises();
-      expect(error).toBeInstanceOf(TypeError);
+      expect(error).toBeInstanceOf(Error);
       expect(error.message).toBe('other error');
     });
 
