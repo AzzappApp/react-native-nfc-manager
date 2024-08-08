@@ -1,3 +1,4 @@
+import * as Sentry from '@sentry/react-native';
 import { Observable } from 'relay-runtime';
 import { executeWithRetries } from './asyncHelpers';
 import ERRORS from './errors';
@@ -35,27 +36,46 @@ export const fetchJSON = async <JSON>(
       ...init?.headers,
     },
   };
+  try {
+    const response = await fetchWithRetries(input, init);
 
-  const response = await fetchWithRetries(input, init);
-
-  if (response.ok) {
-    try {
-      return await response.json();
-    } catch {
-      throw new FetchError({
-        message: ERRORS.JSON_DECODING_ERROR,
-        response,
-        data: { error: ERRORS.JSON_DECODING_ERROR },
-      });
+    if (response.ok) {
+      try {
+        return await response.json();
+      } catch {
+        throw new FetchError({
+          message: ERRORS.JSON_DECODING_ERROR,
+          response,
+          data: { error: ERRORS.JSON_DECODING_ERROR },
+        });
+      }
     }
-  }
-  const data = await response.json().catch(() => ({}));
+    let data;
+    try {
+      data = await response.json();
+    } catch (error: any) {
+      Sentry.captureException(error, {
+        data: {
+          marker: 'fetchJSON-NOK',
+          status: response.statusText,
+        },
+      });
+      data = { error: ERRORS.JSON_DECODING_ERROR, details: error.message };
+    }
 
-  throw new FetchError({
-    message: data.message ?? response.statusText,
-    response,
-    data,
-  });
+    throw new FetchError({
+      message: data.message ?? response.statusText,
+      response,
+      data,
+    });
+  } catch (error: any) {
+    Sentry.captureException(error, {
+      data: {
+        marker: 'fetchJSON-exception',
+      },
+    });
+    throw new FetchError(error);
+  }
 };
 
 /**
@@ -82,7 +102,19 @@ export const fetchBlob = async (
       });
     }
   }
-  const data = await response.json().catch(() => ({}));
+
+  let data;
+  try {
+    data = await response.json();
+  } catch (error: any) {
+    Sentry.captureException(error, {
+      data: {
+        marker: '-NOK',
+        status: response.statusText,
+      },
+    });
+    data = { error: ERRORS.BLOB_DECODING_ERROR, details: error.message };
+  }
 
   throw new FetchError({
     message: data.message ?? response.statusText,

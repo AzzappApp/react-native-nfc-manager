@@ -215,6 +215,7 @@ function relayScreen<TRoute extends Route>(
 
     const onError = useCallback(
       (error: Error) => {
+        Sentry.captureException(error, { data: 'relayScreen' });
         if (isInErrorState.current) {
           return;
         }
@@ -256,7 +257,6 @@ function relayScreen<TRoute extends Route>(
             userInterfaceStyle: Appearance.getColorScheme() ?? 'light',
           },
         );
-        Sentry.captureException(error, { data: 'relayScreen' });
       },
       [intl, retry, router],
     );
