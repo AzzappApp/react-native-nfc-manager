@@ -1,5 +1,20 @@
-## 0.5.34-canary.1
+## 0.5.41-canary.0
 
+* **feat:**  - likes screens ([#4598](https://github.com/AzzappApp/azzapp/pull/4598))
+* **fix:**  - 🐛 correctly show avatar in multi user ([#4637](https://github.com/AzzappApp/azzapp/pull/4637))
+* **fix:**  - **WebcardFormScreen:** prevent double next
+* **feat:**  - **Android:** remove unused permissions
+* **fix:**  - card counter mulit user screen ([#4599](https://github.com/AzzappApp/azzapp/pull/4599)) ([#4623](https://github.com/AzzappApp/azzapp/pull/4623))
+* **fix:**  - use correct button for google wallet ([#4605](https://github.com/AzzappApp/azzapp/pull/4605))
+* **feat:**  - **CoverTemplateList:** activity indicator when loading more
+* **feat:**  - **CoverEdition:** background upload in cover ([#4609](https://github.com/AzzappApp/azzapp/pull/4609))
+* **feat:**  - improve screen fallbacks ([#4610](https://github.com/AzzappApp/azzapp/pull/4610))
+* **fix:**  - **CoverEdition:** remove empty text layer
+* **fix:**  - **IOS:** flickering on login and webcard animation
+* **fix:**  - rollback rn upgrade
+* **fix:**  - try with missing key
+* **fix:**  - put back original conf + try sentry / expo upgrade
+* **fix:**  - try alternate configuration for metro config
 * **feat:**  - **subscription:** [#3369](https://github.com/AzzappApp/azzapp/pull/3369) unpublish webCards with canceled and obsolete subscriptions ([#4593](https://github.com/AzzappApp/azzapp/pull/4593))
 * **fix:**  - **cover:** [#4567](https://github.com/AzzappApp/azzapp/pull/4567) handle maxSelectableVideos in media duplicate ([#4596](https://github.com/AzzappApp/azzapp/pull/4596))
 * **fix:**  - card counter mulit user screen ([#4599](https://github.com/AzzappApp/azzapp/pull/4599))
