@@ -104,7 +104,7 @@ const AccountDetailsEmailForm = ({
       },
       updater: store => {
         store.getRoot().getLinkedRecord('currentUser')?.setValue(null, 'email');
-      //  Purchases.setEmail(null);
+        //  Purchases.setEmail(null);
       },
       onCompleted: () => {
         toggleBottomSheet();

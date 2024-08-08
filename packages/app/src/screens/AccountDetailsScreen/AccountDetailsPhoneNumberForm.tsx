@@ -144,7 +144,7 @@ const AccountDetailsPhoneNumberForm = ({
           .getLinkedRecord('currentUser')
           ?.setValue(null, 'phoneNumber');
 
-      //  Purchases.setPhoneNumber(null);
+        //  Purchases.setPhoneNumber(null);
       },
       onCompleted: () => {
         toggleBottomSheet();
