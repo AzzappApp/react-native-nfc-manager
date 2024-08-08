@@ -85,6 +85,7 @@ import MultiUserDetailsScreen from '#screens/MultiUserDetailsScreen';
 import MultiUserScreen from '#screens/MultiUserScreen';
 import PostCommentsMobileScreen from '#screens/PostCommentsScreen';
 import PostCreationScreen from '#screens/PostCreationScreen';
+import PostLikesScreen from '#screens/PostLikesScreen/PostLikesScreen';
 import PostScreen from '#screens/PostScreen';
 import ResetPasswordScreen from '#screens/ResetPasswordScreen';
 import SearchScreen from '#screens/SearchScreen';
@@ -230,6 +231,7 @@ const screens = {
   ONBOARDING: WelcomeScreen,
   POST: PostScreen,
   POST_COMMENTS: PostCommentsMobileScreen,
+  POST_LIKES: PostLikesScreen,
   RESET_PASSWORD: ResetPasswordScreen,
   SIGN_IN: SignInScreen,
   SIGN_UP: SignupScreen,

@@ -1,4 +1,13 @@
-import { eq, desc, sql, and, lt, notInArray, inArray } from 'drizzle-orm';
+import {
+  eq,
+  desc,
+  sql,
+  and,
+  lt,
+  notInArray,
+  inArray,
+  count,
+} from 'drizzle-orm';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
 import db, { DEFAULT_DATETIME_VALUE, cols } from './db';
 import { FollowTable } from './follows';
@@ -376,4 +385,41 @@ export const deletePost = async (
   }
 
   return null;
+};
+
+export const getPostLikesWebcard = async (
+  postId: string,
+  options: { limit: number; offset: number },
+) => {
+  return db
+    .select()
+    .from(PostReactionTable)
+    .where(eq(PostReactionTable.postId, postId))
+    .innerJoin(
+      WebCardTable,
+      and(
+        eq(WebCardTable.id, PostReactionTable.webCardId),
+        eq(WebCardTable.cardIsPublished, true),
+        eq(WebCardTable.deleted, false),
+      ),
+    )
+    .offset(options.offset)
+    .limit(options.limit)
+    .then(res => res.map(({ WebCard }) => WebCard));
+};
+
+export const getPostLikesWebcardCount = async (postId: string) => {
+  return db
+    .select({ count: count() })
+    .from(PostReactionTable)
+    .where(eq(PostReactionTable.postId, postId))
+    .innerJoin(
+      WebCardTable,
+      and(
+        eq(WebCardTable.id, PostReactionTable.webCardId),
+        eq(WebCardTable.cardIsPublished, true),
+        eq(WebCardTable.deleted, false),
+      ),
+    )
+    .then(res => res[0].count);
 };

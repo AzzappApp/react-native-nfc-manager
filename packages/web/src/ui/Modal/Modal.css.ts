@@ -50,6 +50,7 @@ const modal = style({
   maxWidth: '100%',
   boxShadow: '0px 1px 25px 0px rgba(0, 0, 0, 0.45)',
   animation: `${slideUp} 0.3s ease-out`,
+  overflow: 'hidden',
 });
 
 const modalClosing = style({

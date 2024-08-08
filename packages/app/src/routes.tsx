@@ -114,6 +114,13 @@ export type PostCommentsRoute = {
   };
 };
 
+export type PostLikesRoute = {
+  route: 'POST_LIKES';
+  params: {
+    postId: string;
+  };
+};
+
 export type NewPostRoute = {
   route: 'NEW_POST';
   params?: { fromProfile: boolean };
@@ -254,6 +261,7 @@ export type Route =
   | NewPostRoute
   | OnboardingRoute
   | PostCommentsRoute
+  | PostLikesRoute
   | PostRoute
   | ResetPasswordRoute
   | SearchRoute

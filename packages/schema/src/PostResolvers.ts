@@ -1,8 +1,9 @@
 import { eq, and } from 'drizzle-orm';
-import { connectionFromArray } from 'graphql-relay';
+import { connectionFromArray, cursorToOffset } from 'graphql-relay';
 import {
   db,
   getPostCommentsByDate,
+  getPostLikesWebcard,
   getPostReaction,
   PostTable,
   WebCardTable,
@@ -11,6 +12,7 @@ import ERRORS from '@azzapp/shared/errors';
 import {
   cursorToDate,
   connectionFromDateSortedItems,
+  connectionFromSortedArray,
 } from '#helpers/connectionsHelpers';
 import { maybeFromGlobalIdWithType } from '#helpers/relayIdHelpers';
 import { idResolver } from './utils';
@@ -95,6 +97,20 @@ export const Post: PostResolvers = {
         .then(results => results.map(result => result.Post)),
       args,
     );
+  },
+  reactions: async (post, { first, after }) => {
+    const limit = first ?? 100;
+    const offset = after ? cursorToOffset(after) : 0;
+
+    const webcards = await getPostLikesWebcard(post.id, {
+      limit: limit + 1,
+      offset,
+    });
+
+    return connectionFromSortedArray(webcards.slice(0, limit), {
+      offset,
+      hasNextPage: webcards.length > limit,
+    });
   },
 };
 

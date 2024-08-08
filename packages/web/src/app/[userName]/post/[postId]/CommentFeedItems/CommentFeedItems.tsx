@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useState, useTransition } from 'react';
+import { FormattedMessage } from 'react-intl';
 import { CommentIcon } from '#assets';
 import { useScrollEnd } from '#hooks';
 import { Button } from '#ui';
@@ -99,7 +100,11 @@ const CommentFeedItems = (props: CommentFeedItemsProps) => {
             className={styles.button}
             onClick={() => fetchMoreComments()}
           >
-            See more comments
+            <FormattedMessage
+              defaultMessage="See more comments"
+              id="tTogKI"
+              description="See more comments button in comment feed"
+            />
           </Button.Empty>
         </div>
       )}

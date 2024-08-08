@@ -1,5 +1,6 @@
 'use client';
 import { useCallback, useEffect, useRef, useState, useTransition } from 'react';
+import { FormattedMessage } from 'react-intl';
 import { type Media, type PostWithMedias, type WebCard } from '@azzapp/data';
 import { Button } from '#ui';
 
@@ -79,12 +80,20 @@ const CommentFeedSeeMore = (props: CommentFeedSeeMoreProps) => {
       <div className={styles.seeMore}>
         <div className={styles.comment}>
           <Button size="small" onClick={() => download.current?.open()}>
-            Add a comment
+            <FormattedMessage
+              defaultMessage="Add a comment"
+              id="pjM5zZ"
+              description="Add a comment button in comment feed"
+            />
           </Button>
         </div>
         <div className={styles.publications}>
           <p className={styles.publicationsText}>
-            More publication from{' '}
+            <FormattedMessage
+              defaultMessage="More publication from "
+              id="M9CTDw"
+              description="More publications title in comment feed"
+            />
             <span className={styles.name}>{webCard.userName}</span>
           </p>
           <div className={styles.medias}>

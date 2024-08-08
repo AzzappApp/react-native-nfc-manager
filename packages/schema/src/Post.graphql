@@ -80,6 +80,21 @@ type Post implements Node {
     """
     first: Int
   ): PostConnection!
+
+  """
+  The profiles associated to the post reactions
+  """
+  reactions(
+    """
+    Returns the items in the list that come after the specified cursor.
+    """
+    after: String
+
+    """
+    Returns the first n items from the list.
+    """
+    first: Int @max(value: 50)
+  ): WebCardConnection!
 }
 
 enum ReactionKind {

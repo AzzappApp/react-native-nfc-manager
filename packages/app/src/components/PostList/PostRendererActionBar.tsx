@@ -13,6 +13,7 @@ import { useRouter } from '#components/NativeRouter';
 import useAuthState from '#hooks/useAuthState';
 import Icon from '#ui/Icon';
 import IconButton from '#ui/IconButton';
+import PressableNative from '#ui/PressableNative';
 import Text from '#ui/Text';
 import type {
   PostRendererActionBar_post$key,
@@ -256,6 +257,13 @@ const PostRendererActionBar = ({
     });
   };
 
+  const goToLikes = () => {
+    router.push({
+      route: 'POST_LIKES',
+      params: { postId },
+    });
+  };
+
   const onShare = async () => {
     if (!actionEnabled) {
       Alert.alert(
@@ -363,17 +371,19 @@ const PostRendererActionBar = ({
           />
         </View>
         {allowLikes && (
-          <Text variant="smallbold">
-            <FormattedMessage
-              defaultMessage="{countReactions, plural,
+          <PressableNative onPress={goToLikes}>
+            <Text variant="smallbold">
+              <FormattedMessage
+                defaultMessage="{countReactions, plural,
                                     =0 {0 like}
                                     one {1 like}
                                     other {# likes}
                                 }"
-              description="PastRendererActionBar - Like Counter"
-              values={{ countReactions }}
-            />
-          </Text>
+                description="PostRendererActionBar - Like Counter"
+                values={{ countReactions }}
+              />
+            </Text>
+          </PressableNative>
         )}
       </View>
     </>

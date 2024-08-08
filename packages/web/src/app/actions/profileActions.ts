@@ -9,7 +9,11 @@ import {
   getPostById,
   getWebCardById,
   getWebCardsPostsWithMedias,
+  getPostLikesWebcard,
+  getMediasByIds,
+  getPostLikesWebcardCount,
 } from '@azzapp/data';
+import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
 
 export const loadProfilePosts = async (
   profileId: string,
@@ -69,5 +73,28 @@ export const loadWebCardStats = async (webCardId: string) => {
     nbFollowers: webCard.nbFollowers,
     nbFollowings: webCard.nbFollowings,
     nbPosts: webCard.nbPosts,
+  };
+};
+
+export const loadMoreLikesWebcards = async (
+  postId: string,
+  limit: number,
+  offset = 0,
+) => {
+  const [webcards, count] = await Promise.all([
+    getPostLikesWebcard(postId, {
+      limit,
+      offset,
+    }),
+    getPostLikesWebcardCount(postId),
+  ]);
+
+  const medias = await getMediasByIds(
+    convertToNonNullArray(webcards.map(webcard => webcard.coverMediaId)),
+  );
+
+  return {
+    webcards: webcards.map((webcard, i) => ({ ...webcard, media: medias[i] })),
+    count,
   };
 };

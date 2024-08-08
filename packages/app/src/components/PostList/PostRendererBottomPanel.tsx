@@ -158,6 +158,14 @@ const PostRendererBottomPanel = ({
       params: { postId: post.id },
     });
   };
+
+  const goToLikes = () => {
+    router.push({
+      route: 'POST_LIKES',
+      params: { postId: post.id },
+    });
+  };
+
   const addComment = () => {
     goToComments();
     toggleModal();
@@ -447,24 +455,26 @@ const PostRendererBottomPanel = ({
             </Text>
           )}
           {post.allowComments && post.counterComments > 0 && (
-            <Text
-              variant="medium"
-              style={styles.textCommentCounter}
-              numberOfLines={3}
-              ellipsizeMode="tail"
-            >
-              <FormattedMessage
-                defaultMessage="See {counterComments, plural,
+            <PressableNative onPress={goToLikes}>
+              <Text
+                variant="medium"
+                style={styles.textCommentCounter}
+                numberOfLines={3}
+                ellipsizeMode="tail"
+              >
+                <FormattedMessage
+                  defaultMessage="See {counterComments, plural,
                                     =0 {0 comment}
                                     one {1 comment}
                                     other {# comments}
                                 }"
-                description="PostRendererBottomPanel - Comments Counter"
-                values={{
-                  counterComments: post.counterComments ?? 0,
-                }}
-              />
-            </Text>
+                  description="PostRendererBottomPanel - Comments Counter"
+                  values={{
+                    counterComments: post.counterComments ?? 0,
+                  }}
+                />
+              </Text>
+            </PressableNative>
           )}
         </PressableNative>
         <Text variant="small" style={styles.relativeTime}>

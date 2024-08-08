@@ -12,6 +12,7 @@ import { useCoverTemplateTypes } from './useCoverTemplateTypes';
 import type { CoverTemplateList_profile$key } from '#relayArtifacts/CoverTemplateList_profile.graphql';
 import type { CoverTemplate } from './CoverTemplateTypePreviews';
 import type { CoverTemplateType } from './useCoverTemplateTypes';
+import type { ColorPaletteColor } from '@azzapp/shared/cardHelpers';
 import type { ListRenderItemInfo } from '@shopify/flash-list';
 import type { ReactElement } from 'react';
 import type { ViewToken } from 'react-native';
