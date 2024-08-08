@@ -1,40 +1,41 @@
-import { useCallback, useMemo, useRef, useState } from 'react';
+import { MasonryFlashList } from '@shopify/flash-list';
+import { isEqual } from 'lodash';
+import { memo, useCallback, useMemo, useState } from 'react';
 import {
   Platform,
-  StyleSheet,
   useWindowDimensions,
-  View,
   RefreshControl,
-  ScrollView,
+  View,
 } from 'react-native';
 import { graphql, useFragment } from 'react-relay';
-import { colors } from '#theme';
 import PostLink from '#components/PostLink';
-import { createId } from '#helpers/idHelpers';
-import useScrollToTopInterceptor from '#hooks/useScrollToTopInterceptor/useScrollToTopInterceptor';
+import { keyExtractor } from '#helpers/idHelpers';
 import type {
   PostsGrid_posts$data,
   PostsGrid_posts$key,
 } from '#relayArtifacts/PostsGrid_posts.graphql';
 import type { ArrayItemType } from '@azzapp/shared/arrayHelpers';
-import type { ReactNode } from 'react';
-import type { StyleProp, ViewStyle, LayoutChangeEvent } from 'react-native';
+import type { ListRenderItemInfo } from '@shopify/flash-list';
+import type { ReactElement } from 'react';
+import type {
+  StyleProp,
+  ViewabilityConfig,
+  ViewStyle,
+  ViewToken,
+} from 'react-native';
 
 type PostsGrid = {
   posts: PostsGrid_posts$key;
   canPlay?: boolean;
   refreshing?: boolean;
   maxVideos?: number;
-  ListHeaderComponent?: ReactNode;
-  ListFooterComponent?: ReactNode;
-  stickyHeaderIndices?: number[] | undefined;
-  onReady?: () => void;
+  ListHeaderComponent?: ReactElement<any> | null;
+  ListFooterComponent?: ReactElement<any> | null;
   onRefresh?: () => void;
   onEndReached?: () => void;
-  onScroll?: (scrollPosition: number) => void;
   style?: StyleProp<ViewStyle>;
-  postsContainerStyle?: StyleProp<ViewStyle>;
   nestedScrollEnabled?: boolean;
+  extraData?: any;
 };
 
 // This is an attemps to Use recycling for post list with custom layout
@@ -49,13 +50,9 @@ const PostsGrid = ({
   maxVideos = Platform.select({ android: 2, default: 3 }),
   ListHeaderComponent,
   ListFooterComponent,
-  stickyHeaderIndices,
-  onReady,
   onRefresh,
   onEndReached,
-  onScroll: onScrollCallback,
   style,
-  postsContainerStyle,
   nestedScrollEnabled = false,
 }: PostsGrid) => {
   const posts = useFragment(
@@ -72,278 +69,36 @@ const PostsGrid = ({
     postsKey,
   );
 
-  const [layoutPosition, setLayoutPosition] = useState(0);
-  const [scrollViewHeight, setScrollViewHeight] = useState(0);
-  const [headerSize, setHeaderSize] = useState(0);
-  const [isScrollingToTop, setIsScrollingToTop] = useState(false);
-  const [isScrolling, setIsScrolling] = useState(false);
+  const [videoToPlays, setVideoToPlays] = useState<string[]>([]);
 
-  const { width: windowWidth } = useWindowDimensions();
-  const [contentHeight, postsMap] = useMemo(() => {
-    if (!scrollViewHeight) {
-      return [
-        0,
-        new Map<string, { item: Post; layout: ItemLayout; isVideo: boolean }>(),
-      ];
-    }
-    const { padding, paddingVertical, paddingTop, paddingBottom } =
-      StyleSheet.flatten(postsContainerStyle ?? {});
+  //# region viewable to handle video preview
+  const onViewableItemsChanged = useCallback(
+    (info: { viewableItems: Array<ViewToken<Post>>; changed: ViewToken[] }) => {
+      //we can only have two Item
+      const viewableRows = info.viewableItems.filter(item => item.isViewable);
+      const videoViewable = viewableRows
+        .filter(({ item }) => item.media.__typename === 'MediaVideo')
+        .map(({ item }) => item.id);
 
-    let offsetTop = paddingTop ?? paddingVertical ?? padding ?? 0;
-
-    let offsetBottom = paddingBottom ?? paddingVertical ?? padding ?? 0;
-    if (typeof offsetTop !== 'number' || typeof offsetBottom !== 'number') {
-      console.warn(
-        'PostGrid: percent padding are not supported in postsContainerStyle',
-      );
-      if (typeof offsetTop !== 'number') {
-        offsetTop = 0;
-      }
-      if (typeof offsetBottom !== 'number') {
-        offsetBottom = 0;
-      }
-    }
-
-    // window width - the 3 margin of 8px
-    const itemWidth = (windowWidth - 24) / 2;
-    const postsMap = new Map<
-      string,
-      { item: Post; layout: ItemLayout; isVideo: boolean }
-    >();
-
-    let currentPositionLeft = offsetTop;
-    let currentPositionRight = offsetTop;
-
-    const pageSize = 1.75 * scrollViewHeight;
-    const videosDistance = pageSize / maxVideos;
-
-    let lastVideoPosition = 0;
-
-    let videos: number[] = [];
-    for (const post of posts) {
-      videos = videos.sort((a, b) => a - b);
-
-      const isOnLeft = currentPositionLeft <= currentPositionRight;
-      const height = itemWidth / post.media.aspectRatio;
-
-      let isVideo = post.media.__typename === 'MediaVideo';
-
-      if (
-        isVideo &&
-        (videos.length < maxVideos ||
-          (currentPositionLeft - videos[0] > videosDistance &&
-            currentPositionRight - videos[0] > videosDistance))
-      ) {
-        lastVideoPosition =
-          (isOnLeft ? currentPositionLeft : currentPositionRight) + height;
-        if (videos.length === maxVideos) {
-          videos.shift();
-        }
-
-        videos.push(lastVideoPosition);
-      } else {
-        isVideo = false;
-      }
-
-      postsMap.set(post.id, {
-        item: post,
-        layout: {
-          left: isOnLeft ? 8 : itemWidth + 16,
-          top: isOnLeft ? currentPositionLeft : currentPositionRight,
-          width: itemWidth,
-          height,
-        },
-        isVideo,
-      });
-
-      if (isOnLeft) {
-        currentPositionLeft += height + 8;
-      } else {
-        currentPositionRight += height + 8;
-      }
-    }
-
-    const contentHeight =
-      Math.max(currentPositionLeft, currentPositionRight) + offsetBottom;
-
-    return [contentHeight, postsMap];
-  }, [scrollViewHeight, postsContainerStyle, windowWidth, posts, maxVideos]);
-
-  const onScrollStart = useCallback(() => {
-    clearTimeout(scrollEndTimeout.current);
-    scrollEndTimeout.current = null;
-    setIsScrolling(true);
-  }, []);
-
-  const scrollEndTimeout = useRef<any>(null);
-
-  const onScrollEnd = () => {
-    if (scrollEndTimeout.current != null) {
-      return;
-    }
-    scrollEndTimeout.current = setTimeout(() => {
-      setIsScrolling(false);
-    }, 500);
-  };
-
-  const onWillScrollToTop = () => {
-    // TODO we would like to use batched updates, but it doesn't work on web
-    setIsScrollingToTop(true);
-    onScrollStart();
-  };
-
-  const onScroll = (scrollPosition: number) => {
-    onScrollCallback?.(scrollPosition);
-    if (contentHeight - scrollPosition < scrollViewHeight * 2) {
-      onEndReached?.();
-    }
-    if (isScrollingToTop && scrollPosition === 0) {
-      setIsScrollingToTop(false);
-      onScrollEnd();
-    }
-
-    setLayoutPosition(
-      Math.floor(
-        (Math.max(scrollPosition - headerSize, 0) * BATCH_SIZE) /
-          scrollViewHeight,
-      ) / BATCH_SIZE,
-    );
-  };
-
-  const keys = useRef({
-    videos: new Map<string, string>(),
-    images: new Map<string, string>(),
-  });
-
-  const itemRefs = useRef<Array<[string, string]>>([]);
-  const items = useMemo(() => {
-    if (isScrollingToTop) {
-      return itemRefs.current;
-    }
-    const topLimit = (layoutPosition - 0.5) * scrollViewHeight;
-    const bottomLimit = (layoutPosition + 1.25) * scrollViewHeight;
-
-    const { videos: videosKeys, images: imagesKeys } = keys.current;
-
-    const freeImageKeysMap = new Map(imagesKeys);
-    const freeVideoKeysMap = new Map(videosKeys);
-
-    const items: Array<[string, string]> = [];
-
-    for (const post of posts) {
-      const data = postsMap.get(post.id);
-      if (!data) {
-        break;
-      }
-      const { item, layout, isVideo } = data;
-      if (layout.top >= topLimit && layout.top < bottomLimit) {
-        const freeKeys = isVideo ? freeVideoKeysMap : freeImageKeysMap;
-        const key = freeKeys.get(item.id);
-        if (key) {
-          freeKeys.delete(item.id);
-        }
-        items.push([item.id, key ?? '']);
-      }
-    }
-
-    const freeImageKeys = Array.from(freeImageKeysMap.entries());
-    const freeVideoKeys = Array.from(freeVideoKeysMap.entries());
-
-    for (let i = 0; i < items.length; i++) {
-      // eslint-disable-next-line prefer-const
-      let [id, key] = items[i];
-      const data = postsMap.get(id);
-      if (!data) {
-        break;
-      }
-      const { item, isVideo } = data;
-      if (!key) {
-        const freeKeys = isVideo ? freeVideoKeys : freeImageKeys;
-        const usedKeys = isVideo ? videosKeys : imagesKeys;
-        const entry = freeKeys.pop();
-        if (entry) {
-          key = entry[1];
-          usedKeys.delete(entry[0]);
-        } else {
-          key = createId();
-        }
-        usedKeys.set(item.id, key);
-        items[i][1] = key;
-      }
-    }
-
-    freeImageKeys.forEach(([id]) => imagesKeys.delete(id));
-    freeVideoKeys.forEach(([id]) => videosKeys.delete(id));
-    keys.current = {
-      images: new Map([...imagesKeys.entries(), ...freeImageKeys]),
-      videos: new Map([...videosKeys.entries(), ...freeVideoKeys]),
-    };
-    items.push(...freeImageKeys);
-    items.push(...freeVideoKeys);
-
-    return items;
-  }, [isScrollingToTop, layoutPosition, posts, postsMap, scrollViewHeight]);
-  itemRefs.current = items;
-
-  const placeHolders = useMemo(
-    () =>
-      posts.map(({ id }) => {
-        if (!postsMap.has(id)) {
-          return null;
-        }
-        const { item, layout } = postsMap.get(id)!;
-        return (
-          <View key={item.id} style={[layout, { position: 'absolute' }]}>
-            <View
-              style={{
-                width: layout.width,
-                height: layout.width / item.media.aspectRatio,
-                borderRadius: 16,
-                backgroundColor: colors.grey100,
-              }}
-            />
-          </View>
+      setVideoToPlays(videoToPlays => {
+        const newVideoToPlays = videoToPlays.filter(id =>
+          videoViewable.includes(id),
         );
-      }),
-    [posts, postsMap],
-  );
-
-  const readyDisplayed = useRef(false);
-  const nbPostReady = useRef(0);
-  const onPostReady = useCallback(() => {
-    if (readyDisplayed.current) {
-      return;
-    }
-    nbPostReady.current++;
-    if (nbPostReady.current >= itemRefs.current.length) {
-      readyDisplayed.current = true;
-      onReady?.();
-    }
-  }, [onReady]);
-
-  const scrollViewRef = useRef<ScrollView | null>(null);
-  const scrollToTopInterceptor = useScrollToTopInterceptor(() => {
-    if (scrollViewRef.current) {
-      onWillScrollToTop?.();
-      scrollViewRef.current.scrollTo({ y: 0, animated: true });
-    }
-  });
-
-  const scrollViewRefCallback = useCallback(
-    (ref: ScrollView | null) => {
-      scrollToTopInterceptor(ref);
-      scrollViewRef.current = ref;
+        let i = 0;
+        while (newVideoToPlays.length < maxVideos && i < videoViewable.length) {
+          const id = videoViewable[i];
+          if (!newVideoToPlays.includes(id)) {
+            newVideoToPlays.push(id);
+          }
+          i++;
+        }
+        return isEqual(newVideoToPlays, videoToPlays)
+          ? videoToPlays
+          : newVideoToPlays;
+      });
     },
-    [scrollToTopInterceptor],
+    [maxVideos],
   );
-
-  const onLayout = (e: LayoutChangeEvent) => {
-    setScrollViewHeight?.(e.nativeEvent.layout.height);
-  };
-
-  const onHeaderLayout = (e: LayoutChangeEvent) => {
-    setHeaderSize?.(e.nativeEvent.layout.height);
-  };
 
   const refreshControl = useMemo(() => {
     return (
@@ -351,106 +106,110 @@ const PostsGrid = ({
     );
   }, [refreshing, onRefresh]);
 
+  const { width: windowWidth } = useWindowDimensions();
+  const itemWidth = (windowWidth - 24) / 2;
+
+  const extraData = useMemo(
+    () => ({ itemWidth, videoToPlays, canPlay }),
+    [itemWidth, videoToPlays, canPlay],
+  );
+
   return (
-    <ScrollView
+    <MasonryFlashList
+      data={posts}
+      numColumns={2}
       accessibilityRole="list"
       testID="post-grid-container"
       nestedScrollEnabled={nestedScrollEnabled}
-      ref={scrollViewRefCallback}
       style={style}
-      stickyHeaderIndices={stickyHeaderIndices}
       showsVerticalScrollIndicator={false}
+      estimatedItemSize={itemWidth}
+      refreshing={refreshing}
       refreshControl={refreshControl}
-      scrollEventThrottle={16}
-      onScroll={e => onScroll?.(e.nativeEvent.contentOffset.y)}
-      onScrollBeginDrag={onScrollStart}
-      onMomentumScrollEnd={onScrollEnd}
-      onLayout={onLayout}
-    >
-      {ListHeaderComponent && (
-        <View onLayout={onHeaderLayout}>{ListHeaderComponent}</View>
-      )}
-      <View
-        style={[{ height: contentHeight, width: '100%' }, postsContainerStyle]}
-      >
-        <View style={StyleSheet.absoluteFill} />
-        <View
-          style={[
-            {
-              position: 'absolute',
-              width: '100%',
-              height: '100%',
-              opacity: isScrolling ? 1 : 0,
-            },
-          ]}
-        >
-          {placeHolders}
-        </View>
-        {items.map(([id, key]) => {
-          const data = postsMap.get(id);
-          if (!data) {
-            console.warn('null data for id ' + id);
-            return null;
-          }
-          return (
-            <MemoPostRenderer
-              key={key}
-              item={data.item}
-              videoDisabled={!data.isVideo || !canPlay}
-              windowWidth={windowWidth}
-              layout={data.layout}
-              paused={!canPlay}
-              onReady={onPostReady}
-            />
-          );
-        })}
-      </View>
-      {ListFooterComponent}
-    </ScrollView>
+      keyExtractor={keyExtractor}
+      renderItem={renderItem}
+      ListHeaderComponent={ListHeaderComponent}
+      ListFooterComponent={ListFooterComponent}
+      ItemSeparatorComponent={ItemSeparator}
+      contentContainerStyle={contentContainerStyle}
+      optimizeItemArrangement
+      overrideItemLayout={overrideItemLayout}
+      extraData={extraData}
+      viewabilityConfig={viewabilityConfig}
+      onViewableItemsChanged={onViewableItemsChanged}
+      onRefresh={onRefresh}
+      onEndReached={onEndReached}
+      getItemType={getItemType}
+    />
   );
+};
+
+const renderItem = ({
+  item,
+  extraData: { itemWidth, canPlay, videoToPlays },
+}: ListRenderItemInfo<Post>) => {
+  return (
+    <MemoPostRenderer
+      item={item}
+      width={itemWidth}
+      videoDisabled={!canPlay || !videoToPlays.includes(item.id)}
+    />
+  );
+};
+
+const viewabilityConfig: ViewabilityConfig = {
+  minimumViewTime: 500,
+  itemVisiblePercentThreshold: 100,
+  waitForInteraction: false,
+};
+
+const overrideItemLayout = (
+  layout: { span?: number; size?: number },
+  item: Post,
+  _index: number,
+  _maxColumns: number,
+  extraData?: any,
+) => {
+  const itemWidth = extraData.itemWidth;
+  const ratio = item.media?.aspectRatio ?? 1;
+  layout.size = itemWidth / ratio;
 };
 
 export default PostsGrid;
 
-type Post = ArrayItemType<PostsGrid_posts$data>;
-export type ItemLayout = {
-  top: number;
-  left: number;
-  width: number;
-  height: number;
+// allow to prevent blanking when scroll to top see: https://github.com/Shopify/flash-list/issues/76#issuecomment-1257642374
+const getItemType = (_: any, index: number) => {
+  if (Platform.OS === 'ios' && index < 10) {
+    return index + 1;
+  }
 };
 
-const MemoPostRenderer = ({
+const contentContainerStyle = { paddingHorizontal: 8 };
+
+const ItemSeparator = () => <View style={{ height: 8, width: 8 }} />;
+
+type Post = ArrayItemType<PostsGrid_posts$data>;
+
+const PostRenderer = ({
   item,
-  layout,
-  windowWidth,
-  paused,
+  width,
   videoDisabled,
-  onReady,
 }: {
   item: Post;
-  paused?: boolean;
   videoDisabled?: boolean;
-  windowWidth: number;
-  layout: ItemLayout;
-  onReady?: () => void;
-}) =>
-  useMemo(
-    () => (
-      <PostLink
-        postId={item.id}
-        paused={paused}
-        post={item}
-        width={layout.width}
-        videoDisabled={videoDisabled}
-        muted
-        style={[layout, { position: 'absolute' }]}
-        onReady={onReady}
-      />
-    ),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [item.id, paused, videoDisabled, windowWidth],
+  width: number;
+}) => {
+  const ratio = item.media?.aspectRatio ?? 1;
+  return (
+    <PostLink
+      postId={item.id}
+      post={item}
+      width={width}
+      style={{ width, aspectRatio: ratio }}
+      videoDisabled={videoDisabled}
+      muted
+    />
   );
+};
 
-// fraction of the scroll height that trigger a relayout
-const BATCH_SIZE = 4;
+const MemoPostRenderer = memo(PostRenderer);
