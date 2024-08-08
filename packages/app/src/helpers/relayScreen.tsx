@@ -1,3 +1,4 @@
+import * as Sentry from '@sentry/react-native';
 import { GraphQLError } from 'graphql';
 import { isEqual } from 'lodash';
 import React, { Suspense, useCallback, useEffect, useRef } from 'react';
@@ -212,48 +213,53 @@ function relayScreen<TRoute extends Route>(
       errorBoundaryRef.current?.reset();
     }, [params, screenId]);
 
-    const onError = useCallback(() => {
-      if (isInErrorState.current) {
-        return;
-      }
-      isInErrorState.current = true;
-      Alert.alert(
-        intl.formatMessage({
-          defaultMessage: 'Loading error',
-          description: 'Screen alert message loading error title',
-        }),
-        intl.formatMessage({
-          defaultMessage: 'Could not load the data',
-          description: 'Screen Alert message loading error',
-        }),
-        convertToNonNullArray([
-          canGoBack
-            ? {
-                text: intl.formatMessage({
-                  defaultMessage: 'Cancel',
-                  description:
-                    'Screen alert message loading error cancel button',
-                }),
-                onPress: () => {
-                  isInErrorState.current = false;
-                  router.back();
-                },
-                style: 'cancel',
-              }
-            : null,
+    const onError = useCallback(
+      (error: Error) => {
+        if (isInErrorState.current) {
+          return;
+        }
+
+        isInErrorState.current = true;
+        Alert.alert(
+          intl.formatMessage({
+            defaultMessage: 'Loading error',
+            description: 'Screen alert message loading error title',
+          }),
+          intl.formatMessage({
+            defaultMessage: 'Could not load the data',
+            description: 'Screen Alert message loading error',
+          }),
+          convertToNonNullArray([
+            canGoBack
+              ? {
+                  text: intl.formatMessage({
+                    defaultMessage: 'Cancel',
+                    description:
+                      'Screen alert message loading error cancel button',
+                  }),
+                  onPress: () => {
+                    isInErrorState.current = false;
+                    router.back();
+                  },
+                  style: 'cancel',
+                }
+              : null,
+            {
+              text: intl.formatMessage({
+                defaultMessage: 'Retry',
+                description: 'Screen alert message loading error retry button',
+              }),
+              onPress: () => retry(),
+            },
+          ]),
           {
-            text: intl.formatMessage({
-              defaultMessage: 'Retry',
-              description: 'Screen alert message loading error retry button',
-            }),
-            onPress: () => retry(),
+            userInterfaceStyle: Appearance.getColorScheme() ?? 'light',
           },
-        ]),
-        {
-          userInterfaceStyle: Appearance.getColorScheme() ?? 'light',
-        },
-      );
-    }, [intl, retry, router]);
+        );
+        Sentry.captureException(error, { data: 'relayScreen' });
+      },
+      [intl, retry, router],
+    );
 
     const inner = (
       <Suspense fallback={Fallback ? <Fallback {...props} /> : null}>
