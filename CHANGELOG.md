@@ -1,5 +1,6 @@
-## 0.5.41-canary.1
+## 0.5.41-canary.2
 
+* **fix:**  - progress indicator cover edition ([#4612](https://github.com/AzzappApp/azzapp/pull/4612))
 * **fix:**  - edit translation ([#4613](https://github.com/AzzappApp/azzapp/pull/4613))
 * **feat:**  - likes screens ([#4598](https://github.com/AzzappApp/azzapp/pull/4598))
 * **fix:**  - 🐛 correctly show avatar in multi user ([#4637](https://github.com/AzzappApp/azzapp/pull/4637))
