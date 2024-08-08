@@ -1,5 +1,6 @@
-import { Suspense } from 'react';
-import { graphql, useLazyLoadQuery } from 'react-relay';
+import { Suspense, useEffect, useState } from 'react';
+import { graphql, useClientQuery } from 'react-relay';
+import { addGlobalEventListener } from '#helpers/globalEvents';
 import useAuthState from '#hooks/useAuthState';
 import CoverRenderer from './CoverRenderer';
 import type { HomeIconQuery } from '#relayArtifacts/HomeIconQuery.graphql';
@@ -9,7 +10,7 @@ type HomeIconProps = {
 };
 
 const HomeCoverIcon = ({ webCardId }: HomeIconProps) => {
-  const data = useLazyLoadQuery<HomeIconQuery>(
+  const data = useClientQuery<HomeIconQuery>(
     graphql`
       query HomeIconQuery($webCardId: ID!) {
         node(id: $webCardId) {
@@ -20,7 +21,6 @@ const HomeCoverIcon = ({ webCardId }: HomeIconProps) => {
     {
       webCardId,
     },
-    { fetchPolicy: 'store-and-network' }, //store only does not work when killing app on launch
   );
 
   return <CoverRenderer webCard={data.node} width={COVER_WIDTH} />;
@@ -28,8 +28,16 @@ const HomeCoverIcon = ({ webCardId }: HomeIconProps) => {
 
 export const HomeIcon = () => {
   const { profileInfos } = useAuthState();
-  if (!profileInfos?.webCardId) {
-    return null;
+  const [ready, setReady] = useState(false);
+
+  useEffect(() => {
+    addGlobalEventListener('READY', () => {
+      setReady(true);
+    });
+  }, []);
+
+  if (!profileInfos?.webCardId || !ready) {
+    return <CoverRenderer width={COVER_WIDTH} webCard={null} />;
   }
 
   return (
