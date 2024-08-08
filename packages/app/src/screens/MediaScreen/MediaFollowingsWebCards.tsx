@@ -30,7 +30,7 @@ const MediaFollowingsWebCards = ({
         first: { type: Int, defaultValue: 6 }
       ) {
         followings(after: $after, first: $first)
-          @connection(key: "WebCars_followings") {
+          @connection(key: "WebCards_followings") {
           edges {
             node {
               ...CoverList_users

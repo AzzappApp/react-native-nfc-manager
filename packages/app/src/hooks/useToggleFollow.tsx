@@ -79,7 +79,7 @@ const updater = (
 
     const connectionRecordHome = ConnectionHandler.getConnection(
       currentWebCard,
-      'WebCard_followings',
+      'WebCards_followings',
     );
 
     if (connectionRecordHome) {
