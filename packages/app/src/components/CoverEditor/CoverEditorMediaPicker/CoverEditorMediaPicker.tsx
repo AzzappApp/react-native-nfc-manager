@@ -445,7 +445,13 @@ const CoverEditorMediaPicker = ({
                 </Text>
               ) : null}
             </View>
-            <Button label="Done" onPress={handleOnFinished} />
+            <Button
+              label={intl.formatMessage({
+                defaultMessage: 'Done',
+                description: 'Cover Editor Media Picker - Done button',
+              })}
+              onPress={handleOnFinished}
+            />
           </View>
           {!!mediasOrSlot.length && (
             <ScrollView
