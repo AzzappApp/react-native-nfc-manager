@@ -35,35 +35,32 @@ export const fetchJSON = async <JSON>(
       ...init?.headers,
     },
   };
-  try {
-    const response = await fetchWithRetries(input, init);
 
-    if (response.ok) {
-      try {
-        return await response.json();
-      } catch {
-        throw new FetchError({
-          message: ERRORS.JSON_DECODING_ERROR,
-          response,
-          data: { error: ERRORS.JSON_DECODING_ERROR },
-        });
-      }
-    }
-    let data;
+  const response = await fetchWithRetries(input, init);
+
+  if (response.ok) {
     try {
-      data = await response.json();
-    } catch (error: any) {
-      data = { error: ERRORS.JSON_DECODING_ERROR, details: error.message };
+      return await response.json();
+    } catch {
+      throw new FetchError({
+        message: ERRORS.JSON_DECODING_ERROR,
+        response,
+        data: { error: ERRORS.JSON_DECODING_ERROR },
+      });
     }
-
-    throw new FetchError({
-      message: data.message ?? response.statusText,
-      response,
-      data,
-    });
-  } catch (error: any) {
-    throw new FetchError(error);
   }
+  let data;
+  try {
+    data = await response.json();
+  } catch (error: any) {
+    data = { error: ERRORS.JSON_DECODING_ERROR, details: error.message };
+  }
+
+  throw new FetchError({
+    message: data.message ?? response.statusText,
+    response,
+    data,
+  });
 };
 
 /**
