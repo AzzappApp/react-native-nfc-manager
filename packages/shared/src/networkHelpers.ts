@@ -1,4 +1,3 @@
-import * as Sentry from '@sentry/react-native';
 import { Observable } from 'relay-runtime';
 import { executeWithRetries } from './asyncHelpers';
 import ERRORS from './errors';
@@ -54,12 +53,6 @@ export const fetchJSON = async <JSON>(
     try {
       data = await response.json();
     } catch (error: any) {
-      Sentry.captureException(error, {
-        data: {
-          marker: 'fetchJSON-NOK',
-          status: response.statusText,
-        },
-      });
       data = { error: ERRORS.JSON_DECODING_ERROR, details: error.message };
     }
 
@@ -69,11 +62,6 @@ export const fetchJSON = async <JSON>(
       data,
     });
   } catch (error: any) {
-    Sentry.captureException(error, {
-      data: {
-        marker: 'fetchJSON-exception',
-      },
-    });
     throw new FetchError(error);
   }
 };
@@ -107,18 +95,13 @@ export const fetchBlob = async (
   try {
     data = await response.json();
   } catch (error: any) {
-    Sentry.captureException(error, {
-      data: {
-        marker: '-NOK',
-        status: response.statusText,
-      },
-    });
     data = { error: ERRORS.BLOB_DECODING_ERROR, details: error.message };
   }
 
   throw new FetchError({
     message: data.message ?? response.statusText,
     response,
+    data,
   });
 };
 
