@@ -1,6 +1,6 @@
 import { MasonryFlashList } from '@shopify/flash-list';
 import { isEqual } from 'lodash';
-import { memo, useCallback, useMemo, useState } from 'react';
+import { memo, useCallback, useMemo, useRef, useState } from 'react';
 import {
   Platform,
   useWindowDimensions,
@@ -71,6 +71,7 @@ const PostsGrid = ({
 
   const [videoToPlays, setVideoToPlays] = useState<string[]>([]);
 
+  const videoToPlaysRef = useRef<string[]>([]);
   //# region viewable to handle video preview
   const onViewableItemsChanged = useCallback(
     (info: { viewableItems: Array<ViewToken<Post>>; changed: ViewToken[] }) => {
@@ -80,25 +81,28 @@ const PostsGrid = ({
         .filter(({ item }) => item.media.__typename === 'MediaVideo')
         .map(({ item }) => item.id);
 
-      setVideoToPlays(videoToPlays => {
-        const newVideoToPlays = videoToPlays.filter(id =>
-          videoViewable.includes(id),
-        );
-        let i = 0;
-        while (newVideoToPlays.length < maxVideos && i < videoViewable.length) {
-          const id = videoViewable[i];
-          if (!newVideoToPlays.includes(id)) {
-            newVideoToPlays.push(id);
-          }
-          i++;
+      const currentVideoToPlays = videoToPlaysRef.current;
+      const newVideoToPlays = currentVideoToPlays.filter(id =>
+        videoViewable.includes(id),
+      );
+      let i = 0;
+      while (newVideoToPlays.length < maxVideos && i < videoViewable.length) {
+        const id = videoViewable[i];
+        if (!newVideoToPlays.includes(id)) {
+          newVideoToPlays.push(id);
         }
-        return isEqual(newVideoToPlays, videoToPlays)
-          ? videoToPlays
-          : newVideoToPlays;
-      });
+        i++;
+      }
+      videoToPlaysRef.current = isEqual(newVideoToPlays, currentVideoToPlays)
+        ? currentVideoToPlays
+        : newVideoToPlays;
     },
     [maxVideos],
   );
+
+  const onMomentumScrollEnd = useCallback(() => {
+    setVideoToPlays(videoToPlaysRef.current);
+  }, []);
 
   const refreshControl = useMemo(() => {
     return (
@@ -136,6 +140,7 @@ const PostsGrid = ({
       overrideItemLayout={overrideItemLayout}
       extraData={extraData}
       viewabilityConfig={viewabilityConfig}
+      onMomentumScrollEnd={onMomentumScrollEnd}
       onViewableItemsChanged={onViewableItemsChanged}
       onRefresh={onRefresh}
       onEndReached={onEndReached}
