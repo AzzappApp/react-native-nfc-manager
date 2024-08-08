@@ -281,7 +281,6 @@ const webCardStatisticsLoader = () =>
 const profileStatisticsLoader = () =>
   new DataLoader<string, ProfileStatistic[]>(
     async keys => {
-      console.log('profileStatisticsLoader', keys);
       const stats = await getLastProfileListStatisticsFor(keys as string[], 30);
 
       return keys.map(key => stats.filter(stat => stat.profileId === key));
