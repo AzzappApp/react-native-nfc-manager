@@ -61,9 +61,9 @@ platform :ios do
     backup_file(path: pbxprojPath)
      
     entitlements_files = {
-      "azzapp-dev" => "ios/azzapp-devRelease.entitlements",
-      "azzapp-staging" => "ios/azzapp-stagingRelease.entitlements",
-      "azzapp" => "ios/azzapp/azzappRelease.entitlements"
+      "azzapp-dev" => "../ios/azzapp-devRelease.entitlements",
+      "azzapp-staging" => "../ios/azzapp-stagingRelease.entitlements",
+      "azzapp" => "../ios/azzapp/azzappRelease.entitlements"
     }
 
 
