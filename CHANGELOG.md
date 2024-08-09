@@ -1,5 +1,7 @@
-## 0.5.41-canary.2
+## 0.5.41-canary.3
 
+* **feat:**  - 🎸 use webcard colors when replacing cover with template ([#4648](https://github.com/AzzappApp/azzapp/pull/4648))
+* **fix:**  - 🐛 minor fixes on multi user ([#4646](https://github.com/AzzappApp/azzapp/pull/4646))
 * **fix:**  - progress indicator cover edition ([#4612](https://github.com/AzzappApp/azzapp/pull/4612))
 * **fix:**  - edit translation ([#4613](https://github.com/AzzappApp/azzapp/pull/4613))
 * **feat:**  - likes screens ([#4598](https://github.com/AzzappApp/azzapp/pull/4598))
