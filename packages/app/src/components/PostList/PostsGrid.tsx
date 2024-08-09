@@ -52,7 +52,6 @@ const PostsGrid = ({
   ListFooterComponent,
   onRefresh,
   onEndReached,
-  style,
   nestedScrollEnabled = false,
 }: PostsGrid) => {
   const posts = useFragment(
@@ -111,11 +110,11 @@ const PostsGrid = ({
   }, [refreshing, onRefresh]);
 
   const { width: windowWidth } = useWindowDimensions();
-  const itemWidth = (windowWidth - 24) / 2;
+
 
   const extraData = useMemo(
-    () => ({ itemWidth, videoToPlays, canPlay }),
-    [itemWidth, videoToPlays, canPlay],
+    () => ({ itemWidth: (windowWidth - 24) / 2, videoToPlays, canPlay }),
+    [windowWidth, videoToPlays, canPlay],
   );
 
   return (
@@ -125,9 +124,8 @@ const PostsGrid = ({
       accessibilityRole="list"
       testID="post-grid-container"
       nestedScrollEnabled={nestedScrollEnabled}
-      style={style}
       showsVerticalScrollIndicator={false}
-      estimatedItemSize={itemWidth}
+      estimatedItemSize={167}
       refreshing={!!refreshing}
       refreshControl={refreshControl}
       keyExtractor={keyExtractor}

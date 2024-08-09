@@ -27,7 +27,7 @@ const MediaSuggestionsScreen = ({
         @refetchable(queryName: "MediaSuggestionsScreenListQuery")
         @argumentDefinitions(
           after: { type: String }
-          first: { type: Int, defaultValue: 6 }
+          first: { type: Int, defaultValue: 15 }
         ) {
           trendingPosts(after: $after, first: $first)
             @connection(key: "Viewer_trendingPosts") {
