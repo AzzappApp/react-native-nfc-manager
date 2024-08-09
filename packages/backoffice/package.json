@@ -1,6 +1,6 @@
 {
   "name": "@azzapp/backoffice",
-  "version": "0.5.40-rc.20",
+  "version": "0.5.40-rc.21",
   "private": true,
   "scripts": {
     "dev": "next dev -p 3005",
