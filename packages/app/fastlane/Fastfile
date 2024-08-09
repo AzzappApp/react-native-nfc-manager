@@ -65,10 +65,29 @@ platform :ios do
       "azzapp-staging" => "ios/azzapp-stagingRelease.entitlements",
       "azzapp" => "ios/azzapp/azzappRelease.entitlements"
     }
+
+
+    # Convert relative paths to absolute paths
+    entitlements_files.each do |key, path|
+      entitlements_files[key] = File.expand_path(path, __dir__)
+    end
+
     # Determine the entitlements file based on the target
     entitlements_file = entitlements_files[IOS_SCHEME]
 
 
+
+    # Check if the entitlements file exists
+    if File.exist?(entitlements_file)
+      # Print the content of the entitlements file
+      puts "Entitlements file content:"
+      puts File.read(entitlements_file)
+    else
+      # Log an error if the file does not exist
+      puts "Error: Entitlements file not found at #{entitlements_file}"
+      exit 1
+    end
+    
     update_code_signing_settings(
       use_automatic_signing: false,
       path: "ios/azzapp.xcodeproj",
