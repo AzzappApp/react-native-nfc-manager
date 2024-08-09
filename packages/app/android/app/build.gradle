@@ -118,7 +118,7 @@ android {
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 5040
-        versionName "0.5.40-rc.17"
+        versionName "0.5.40-rc.18"
         
         externalNativeBuild {
             cmake {
