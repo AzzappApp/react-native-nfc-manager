@@ -71,6 +71,16 @@ platform :ios do
       target_filter: IOS_SCHEME,
       code_signing_identity: CODE_SIGNING_IDENTITY
     )
+
+     # Determine the entitlements file based on the target
+    entitlements_file = case IOS_SCHEME
+                        when "azzapp-dev"
+                          "ios/azzapp-devRelease.entitlements"
+                        when "azzapp-staging"
+                          "ios/azzapp-stagingRelease.entitlements"
+                        else
+                          "ios/azzapp/azzappRelease.entitlements"
+                        end
     
     # Build the application
     gym(
@@ -88,6 +98,7 @@ platform :ios do
           APP_IDENT => PROFILE_ID,
         },
         installerSigningCertificate: CODE_SIGNING_IDENTITY,
+        entitlements: entitlements_file
       }
     )
     
