@@ -278,14 +278,16 @@ const CoverEditorCore = (
       }, imagesScales);
     }
 
+    const cardColors =
+      profile.webCard.cardColors ?? coverTemplate?.colorPalette ?? {};
+
     return {
       isModified: false,
       lottie,
       cardColors: {
         ...DEFAULT_COLOR_PALETTE,
         otherColors: [...DEFAULT_COLOR_LIST],
-        ...profile.webCard.cardColors,
-        ...coverTemplate?.colorPalette,
+        ...cardColors,
       } as any, // typescript is not happy with readonly
       backgroundColor: backgroundColor ?? 'light',
 
