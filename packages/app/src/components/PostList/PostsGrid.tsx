@@ -111,7 +111,6 @@ const PostsGrid = ({
 
   const { width: windowWidth } = useWindowDimensions();
 
-
   const extraData = useMemo(
     () => ({ itemWidth: (windowWidth - 24) / 2, videoToPlays, canPlay }),
     [windowWidth, videoToPlays, canPlay],
