@@ -1,6 +1,6 @@
 {
   "name": "@azzapp/data",
-  "version": "0.5.40-rc.12",
+  "version": "0.5.40-rc.13",
   "private": true,
   "exports": {
     ".": {
