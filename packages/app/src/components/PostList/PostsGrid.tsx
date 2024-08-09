@@ -179,10 +179,15 @@ const overrideItemLayout = (
 
 export default PostsGrid;
 
-// allow to prevent blanking when scroll to top see: https://github.com/Shopify/flash-list/issues/76#issuecomment-1257642374
-const getItemType = (_: any, index: number) => {
+const getItemType = (post: Post, index: number) => {
+  // allow to prevent blanking when scroll to top see: https://github.com/Shopify/flash-list/issues/76#issuecomment-1257642374
   if (Platform.OS === 'ios' && index < 10) {
-    return index + 1;
+    return 'fixed';
+  }
+  if (post.media?.__typename === 'MediaVideo') {
+    return 'video';
+  } else {
+    return 'image';
   }
 };
 
