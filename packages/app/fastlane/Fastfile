@@ -75,13 +75,16 @@ platform :ios do
      # Determine the entitlements file based on the target
     entitlements_file = case IOS_SCHEME
                         when "azzapp-dev"
-                          "ios/azzapp-devRelease.entitlements"
+                          "./ios/azzapp-devRelease.entitlements"
                         when "azzapp-staging"
-                          "ios/azzapp-stagingRelease.entitlements"
+                          "./ios/azzapp-stagingRelease.entitlements"
                         else
-                          "ios/azzapp/azzappRelease.entitlements"
+                          "./ios/azzapp/azzappRelease.entitlements"
                         end
     
+                        # Print the content of the entitlements file
+    puts "Entitlements file content:"
+    puts File.read(entitlements_file)
     # Build the application
     gym(
       scheme: IOS_SCHEME, 
