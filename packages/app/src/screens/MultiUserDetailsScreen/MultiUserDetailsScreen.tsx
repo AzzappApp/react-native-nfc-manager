@@ -1,8 +1,9 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { parsePhoneNumber } from 'libphonenumber-js';
+import { useCallback, type ReactNode } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { StyleSheet, View, useColorScheme } from 'react-native';
+import { Alert, StyleSheet, View, useColorScheme } from 'react-native';
 import * as mime from 'react-native-mime-types';
 import Toast from 'react-native-toast-message';
 import {
@@ -43,7 +44,6 @@ import type { MultiUserDetailsScreenQuery } from '#relayArtifacts/MultiUserDetai
 import type { ProfileRole } from '#relayArtifacts/MultiUserScreenQuery.graphql';
 import type { MultiUserDetailRoute } from '#routes';
 import type { ContactCardEditFormValues } from '#screens/ContactCardEditScreen/ContactCardEditModalSchema';
-import type { ReactNode } from 'react';
 import type { Control } from 'react-hook-form';
 
 export type MultiUserDetailFormValues = ContactCardEditFormValues & {
@@ -318,7 +318,7 @@ const MultiUserDetailsScreen = ({
 
   const router = useRouter();
 
-  const onRemoveUser = () => {
+  const onRemoveUser = useCallback(() => {
     if (profileInfos?.webCardId == null || profile == null) return;
     commitDelete({
       variables: {
@@ -367,7 +367,38 @@ const MultiUserDetailsScreen = ({
         }
       },
     });
-  };
+  }, [commitDelete, intl, profile, profileInfos?.webCardId, router]);
+
+  const onConfirmRemoveUser = useCallback(() => {
+    Alert.alert(
+      intl.formatMessage({
+        defaultMessage: 'Removed user will loose access to this WebCard.',
+        description: 'Remove user from multi-user confirm title',
+      }),
+      intl.formatMessage({
+        defaultMessage:
+          'This action is irreversible, but you can always invite this user again.',
+        description: 'Remove user from multi-user confirm subtitle',
+      }),
+      [
+        {
+          text: intl.formatMessage({
+            defaultMessage: 'Cancel',
+            description: 'Remove user from multi-user cancel button label',
+          }),
+          style: 'cancel',
+        },
+        {
+          text: intl.formatMessage({
+            defaultMessage: 'Confirm',
+            description: 'Remove user from multi-user confirm button label',
+          }),
+          onPress: onRemoveUser,
+          style: 'destructive',
+        },
+      ],
+    );
+  }, [intl, onRemoveUser]);
 
   const colorScheme = useColorScheme();
 
@@ -414,7 +445,7 @@ const MultiUserDetailsScreen = ({
             role !== 'owner' && (
               <PressableNative
                 style={styles.removeButton}
-                onPress={onRemoveUser}
+                onPress={onConfirmRemoveUser}
                 disabled={deletionIsActive}
               >
                 <Text variant="button" style={styles.removeText}>

@@ -90,11 +90,11 @@ const MultiUserScreenUserList = ({
   // @TODO
   const nbCommonInformation =
     (webCard.commonInformation?.company ? 1 : 0) +
-    (webCard.commonInformation?.addresses?.some(a => a.address) ? 1 : 0) +
-    (webCard.commonInformation?.emails?.some(a => a.address) ? 1 : 0) +
-    (webCard.commonInformation?.phoneNumbers?.some(p => p.number) ? 1 : 0) +
-    (webCard.commonInformation?.urls?.some(u => u.address) ? 1 : 0) +
-    (webCard.commonInformation?.socials?.some(s => s.url) ? 1 : 0) +
+    (webCard.commonInformation?.addresses?.length ?? 0) +
+    (webCard.commonInformation?.emails?.length ?? 0) +
+    (webCard.commonInformation?.phoneNumbers?.length ?? 0) +
+    (webCard.commonInformation?.urls?.length ?? 0) +
+    (webCard.commonInformation?.socials?.length ?? 0) +
     (webCard.logo ? 1 : 0);
 
   const onAddUsers = useCallback(() => {
