@@ -1,3 +1,4 @@
+import { StyleSheet } from 'react-native';
 import PostRendererFeed from '#components/PostList/PostRendererFeed';
 import PressableScaleHighlight from '#ui/PressableScaleHighlight';
 import Link from '../Link';
@@ -15,9 +16,7 @@ const PostLink = ({
 }: PostLinkProps) => {
   return (
     <Link route="POST" params={{ postId }}>
-      <PressableScaleHighlight
-        style={[style, { borderRadius: 16, overflow: 'hidden' }]}
-      >
+      <PressableScaleHighlight style={[style, styles.pressableStyle]}>
         {({ pressed }) => (
           <PostRendererFeed
             {...props}
@@ -31,3 +30,7 @@ const PostLink = ({
 };
 
 export default PostLink;
+
+const styles = StyleSheet.create({
+  pressableStyle: { borderRadius: 16, overflow: 'hidden' },
+});

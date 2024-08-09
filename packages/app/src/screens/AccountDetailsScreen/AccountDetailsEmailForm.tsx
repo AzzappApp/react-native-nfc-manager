@@ -2,7 +2,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Controller, useForm } from 'react-hook-form';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { StyleSheet, View } from 'react-native';
-import Purchases from 'react-native-purchases';
+//import Purchases from 'react-native-purchases';
 import Toast from 'react-native-toast-message';
 import { z } from 'zod';
 import { isNotFalsyString } from '@azzapp/shared/stringHelpers';
@@ -104,7 +104,7 @@ const AccountDetailsEmailForm = ({
       },
       updater: store => {
         store.getRoot().getLinkedRecord('currentUser')?.setValue(null, 'email');
-        Purchases.setEmail(null);
+        //  Purchases.setEmail(null);
       },
       onCompleted: () => {
         toggleBottomSheet();

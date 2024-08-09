@@ -46,12 +46,9 @@
 		FD1EA61128B8D7F400916DBC /* MediaImageRendererManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD1EA60F28B8D7F400916DBC /* MediaImageRendererManager.swift */; };
 		FD1EA61328B920A700916DBC /* AZPMediaImageRendererManager.m in Sources */ = {isa = PBXBuildFile; fileRef = FD1EA61228B920A700916DBC /* AZPMediaImageRendererManager.m */; };
 		FD1EA61428B920A700916DBC /* AZPMediaImageRendererManager.m in Sources */ = {isa = PBXBuildFile; fileRef = FD1EA61228B920A700916DBC /* AZPMediaImageRendererManager.m */; };
-		FD1EA62928BBA1BE00916DBC /* AZPScrollToTopInterceptor.m in Sources */ = {isa = PBXBuildFile; fileRef = FD1EA62828BBA1BE00916DBC /* AZPScrollToTopInterceptor.m */; };
-		FD1EA62A28BBA1BE00916DBC /* AZPScrollToTopInterceptor.m in Sources */ = {isa = PBXBuildFile; fileRef = FD1EA62828BBA1BE00916DBC /* AZPScrollToTopInterceptor.m */; };
 		FD292EAE2A94BDC300D880E8 /* Azzapp.ttf in Resources */ = {isa = PBXBuildFile; fileRef = BCEB3A032A74063A0010EEEE /* Azzapp.ttf */; };
 		FD292EAF2A94BDC700D880E8 /* Azzapp.ttf in Resources */ = {isa = PBXBuildFile; fileRef = BCEB3A032A74063A0010EEEE /* Azzapp.ttf */; };
 		FD39DA982A52AB5F00C49A82 /* MediaImageRendererManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD1EA60F28B8D7F400916DBC /* MediaImageRendererManager.swift */; };
-		FD39DA992A52AB5F00C49A82 /* AZPScrollToTopInterceptor.m in Sources */ = {isa = PBXBuildFile; fileRef = FD1EA62828BBA1BE00916DBC /* AZPScrollToTopInterceptor.m */; };
 		FD39DA9A2A52AB5F00C49A82 /* AZPCustomReavealTransition.m in Sources */ = {isa = PBXBuildFile; fileRef = FD5BFC3628C8EF8D0010B34E /* AZPCustomReavealTransition.m */; };
 		FD39DA9D2A52AB5F00C49A82 /* MediaPipeline.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD1404302A0299BA00CCA6B9 /* MediaPipeline.swift */; };
 		FD39DA9F2A52AB5F00C49A82 /* ReactLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = FDA79D7729EE8AAC00E16407 /* ReactLogger.swift */; };
@@ -79,7 +76,6 @@
 		FD39DAC02A52AB5F00C49A82 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		FD39DAC52A52AB5F00C49A82 /* Nuke.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = FDA79D6D29EDA43C00E16407 /* Nuke.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		FD39DACF2A52AC2100C49A82 /* MediaImageRendererManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD1EA60F28B8D7F400916DBC /* MediaImageRendererManager.swift */; };
-		FD39DAD02A52AC2100C49A82 /* AZPScrollToTopInterceptor.m in Sources */ = {isa = PBXBuildFile; fileRef = FD1EA62828BBA1BE00916DBC /* AZPScrollToTopInterceptor.m */; };
 		FD39DAD12A52AC2100C49A82 /* AZPCustomReavealTransition.m in Sources */ = {isa = PBXBuildFile; fileRef = FD5BFC3628C8EF8D0010B34E /* AZPCustomReavealTransition.m */; };
 		FD39DAD42A52AC2100C49A82 /* MediaPipeline.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD1404302A0299BA00CCA6B9 /* MediaPipeline.swift */; };
 		FD39DAD62A52AC2100C49A82 /* ReactLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = FDA79D7729EE8AAC00E16407 /* ReactLogger.swift */; };
@@ -249,8 +245,6 @@
 		FD1EA60E28B8D7F300916DBC /* azzappTests-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "azzappTests-Bridging-Header.h"; sourceTree = "<group>"; };
 		FD1EA60F28B8D7F400916DBC /* MediaImageRendererManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MediaImageRendererManager.swift; sourceTree = "<group>"; };
 		FD1EA61228B920A700916DBC /* AZPMediaImageRendererManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AZPMediaImageRendererManager.m; sourceTree = "<group>"; };
-		FD1EA62728BBA1BE00916DBC /* AZPScrollToTopInterceptor.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = AZPScrollToTopInterceptor.h; path = azzapp/AZPScrollToTopInterceptor.h; sourceTree = "<group>"; };
-		FD1EA62828BBA1BE00916DBC /* AZPScrollToTopInterceptor.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = AZPScrollToTopInterceptor.m; path = azzapp/AZPScrollToTopInterceptor.m; sourceTree = "<group>"; };
 		FD39DAC92A52AB5F00C49A82 /* azzapp-dev.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "azzapp-dev.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		FD39DB002A52AC2100C49A82 /* azzapp-staging.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "azzapp-staging.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		FD4BD5452AA626F100DDDB54 /* BootSplash.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = BootSplash.storyboard; path = azzapp/BootSplash.storyboard; sourceTree = "<group>"; };
@@ -360,8 +354,6 @@
 				FD4EC42928A5503400DDC5C9 /* AZPSnapshot.m */,
 				FD1EA60D28B8D7F300916DBC /* azzapp-Bridging-Header.h */,
 				FD1EA60E28B8D7F300916DBC /* azzappTests-Bridging-Header.h */,
-				FD1EA62728BBA1BE00916DBC /* AZPScrollToTopInterceptor.h */,
-				FD1EA62828BBA1BE00916DBC /* AZPScrollToTopInterceptor.m */,
 				FD5BFC3528C8EF8D0010B34E /* AZPCustomReavealTransition.h */,
 				FD5BFC3628C8EF8D0010B34E /* AZPCustomReavealTransition.m */,
 				96DD310E2B6CEFB100FB36A2 /* IAPDevStorekit.storekit */,
@@ -1214,7 +1206,6 @@
 				FD1EA61428B920A700916DBC /* AZPMediaImageRendererManager.m in Sources */,
 				FD1EA61128B8D7F400916DBC /* MediaImageRendererManager.swift in Sources */,
 				FD1404552A0949C000CCA6B9 /* MediaURICache.swift in Sources */,
-				FD1EA62A28BBA1BE00916DBC /* AZPScrollToTopInterceptor.m in Sources */,
 				FDA79D8029EEA61A00E16407 /* FileUtils.swift in Sources */,
 				FDA79D6329E4891100E16407 /* UIColor.swift in Sources */,
 				FD1404322A0299BA00CCA6B9 /* MediaPipeline.swift in Sources */,
@@ -1240,7 +1231,6 @@
 			files = (
 				FD52718E2BF112BB00140A12 /* CIImageLoader.swift in Sources */,
 				FD1EA61028B8D7F400916DBC /* MediaImageRendererManager.swift in Sources */,
-				FD1EA62928BBA1BE00916DBC /* AZPScrollToTopInterceptor.m in Sources */,
 				FD7AA9DF2BF4DA1500BEC0E9 /* AZPJSIModulesInstaller.mm in Sources */,
 				FD5BFC3728C8EF8D0010B34E /* AZPCustomReavealTransition.m in Sources */,
 				FD1404312A0299BA00CCA6B9 /* MediaPipeline.swift in Sources */,
@@ -1273,7 +1263,6 @@
 				FD7BAE652C008D1C00427FE0 /* AZPJSIModulesInstaller.mm in Sources */,
 				FD7BAE642C008CE600427FE0 /* CIImageLoader.swift in Sources */,
 				FD39DA982A52AB5F00C49A82 /* MediaImageRendererManager.swift in Sources */,
-				FD39DA992A52AB5F00C49A82 /* AZPScrollToTopInterceptor.m in Sources */,
 				FD39DA9A2A52AB5F00C49A82 /* AZPCustomReavealTransition.m in Sources */,
 				FD39DA9D2A52AB5F00C49A82 /* MediaPipeline.swift in Sources */,
 				FD39DA9F2A52AB5F00C49A82 /* ReactLogger.swift in Sources */,
@@ -1304,7 +1293,6 @@
 				FD7BAE682C008D3800427FE0 /* BufferLoader.mm in Sources */,
 				FD7BAE672C008D3000427FE0 /* CIImageLoader.swift in Sources */,
 				FD39DACF2A52AC2100C49A82 /* MediaImageRendererManager.swift in Sources */,
-				FD39DAD02A52AC2100C49A82 /* AZPScrollToTopInterceptor.m in Sources */,
 				FD39DAD12A52AC2100C49A82 /* AZPCustomReavealTransition.m in Sources */,
 				FD39DAD42A52AC2100C49A82 /* MediaPipeline.swift in Sources */,
 				FD39DAD62A52AC2100C49A82 /* ReactLogger.swift in Sources */,

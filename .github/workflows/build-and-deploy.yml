@@ -6,13 +6,13 @@ on:
       - main
       - staging
       - stable
-      
+
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true  
+  cancel-in-progress: true
 jobs:
   build-and-deploy:
-    environment: ${{(github.ref_name == 'stable' && 'Production') || (github.ref_name == 'staging' && 'Staging') || 'Development' }} 
+    environment: ${{(github.ref_name == 'stable' && 'Production') || (github.ref_name == 'staging' && 'Staging') || 'Development' }}
     name: Build and Deploy Azzapp application
     runs-on: macos-latest-xlarge
     env:
@@ -35,12 +35,12 @@ jobs:
         run: corepack enable
       - uses: actions/setup-node@v3
         with:
-          node-version: '20'
+          node-version: "20"
 
       - name: Get yarn cache directory path
         id: yarn-cache-dir-path
-        run: echo "::set-output name=dir::$(yarn config get cacheFolder)"    
-        
+        run: echo "::set-output name=dir::$(yarn config get cacheFolder)"
+
       - name: Cache yarn
         uses: actions/cache@v3
         id: yarn-cache
@@ -52,7 +52,7 @@ jobs:
 
       - name: Install Vercel CLI
         run: npm i -g vercel@latest
-        
+
       - name: Install dependencies
         run: yarn install --immutable
 
@@ -78,25 +78,23 @@ jobs:
           DATABASE_USERNAME: ${{ vars.DATABASE_USERNAME }}
           DATABASE_PASSWORD: ${{ secrets.DATABASE_PASSWORD }}
 
-      
       ############################################
       #
       # JavaScript build and tests
       #
       ############################################
-   
+
       - name: JavaScript build
         run: yarn build-app-dependencies
 
       - name: Lint
         run: yarn lint
-      
+
       - name: Type check
         run: yarn typecheck
 
       - name: Test
         run: yarn test
-
 
       ############################################
       #
@@ -119,7 +117,6 @@ jobs:
         env:
           github_token: ${{ secrets.ADMIN_GITHUB_TOKEN }}
 
-      
       ############################################
       #
       # Precompiled Queries merging
@@ -137,7 +134,6 @@ jobs:
         env:
           LAST_SUPPORTED_APP_VERSION: ${{ vars.LAST_SUPPORTED_APP_VERSION }}
 
-      
       ############################################
       #
       # Commit changes
@@ -153,7 +149,7 @@ jobs:
           git commit -m "chore: bump version [skip ci]"
           git push origin $GITHUB_REF_NAME
           yarn install --immutable
-    
+
       ############################################
       #
       # PlanetScale schema migration
@@ -175,12 +171,12 @@ jobs:
               HAS_CHANGE="true"
           fi
           echo "has_change=$HAS_CHANGE" >> $GITHUB_OUTPUT
-         
+
       - name: PlanetScale - Extract branch name
         if: ${{ steps.planetscale_migration_needed.outputs.has_change == 'true'}}
         run: echo "branch=$(echo ci-${GITHUB_SHA})" >> $GITHUB_OUTPUT
         id: extract_branch
-        
+
       - name: PlanetScale - Create a branch
         if: ${{ steps.planetscale_migration_needed.outputs.has_change == 'true'}}
         uses: planetscale/create-branch-action@v1
@@ -194,7 +190,7 @@ jobs:
         env:
           PLANETSCALE_SERVICE_TOKEN_ID: ${{ secrets.PLANETSCALE_SERVICE_TOKEN_ID }}
           PLANETSCALE_SERVICE_TOKEN: ${{ secrets.PLANETSCALE_SERVICE_TOKEN }}
-      
+
       - name: PlanetScale - Create a password
         if: ${{ steps.planetscale_migration_needed.outputs.has_change == 'true'}}
         uses: planetscale/create-branch-password-action@v1
@@ -203,7 +199,7 @@ jobs:
           org_name: azzapp
           database_name: azzapp
           branch_name: ${{ steps.extract_branch.outputs.branch }}
-          name: 'pass-${{ steps.extract_branch.outputs.branch }}'
+          name: "pass-${{ steps.extract_branch.outputs.branch }}"
         env:
           PLANETSCALE_SERVICE_TOKEN_ID: ${{ secrets.PLANETSCALE_SERVICE_TOKEN_ID }}
           PLANETSCALE_SERVICE_TOKEN: ${{ secrets.PLANETSCALE_SERVICE_TOKEN }}
@@ -216,7 +212,6 @@ jobs:
           export DATABASE_PASSWORD=steps.create_password.outputs.password
           export DATABASE_USERNAME=steps.create_password.outputs.username
           yarn push-migration
-            
 
       - name: PlanetScale - Create a deploy request
         if: ${{ steps.planetscale_migration_needed.outputs.has_change == 'true'}}
@@ -229,7 +224,7 @@ jobs:
         env:
           PLANETSCALE_SERVICE_TOKEN_ID: ${{ secrets.PLANETSCALE_SERVICE_TOKEN_ID }}
           PLANETSCALE_SERVICE_TOKEN: ${{ secrets.PLANETSCALE_SERVICE_TOKEN }}
-            
+
       - name: PlanetScale - Deploy the changes
         if: ${{ steps.planetscale_migration_needed.outputs.has_change == 'true'}}
         uses: planetscale/deploy-deploy-request-action@v1
@@ -244,10 +239,10 @@ jobs:
 
       ############################################
       #
-      # Deploy the web app to Vercel 
+      # Deploy the web app to Vercel
       #
       ############################################
-      - name: Azzapp Web - Pull Vercel configuration 
+      - name: Azzapp Web - Pull Vercel configuration
         env:
           VERCEL_PROJECT_ID: "azzapp"
         run: |
@@ -274,13 +269,13 @@ jobs:
 
       ############################################
       #
-      # Deploy the backoffice to Vercel 
+      # Deploy the backoffice to Vercel
       #
       ############################################
 
       # Vercel already installed in web app deployment
 
-      - name: Azzapp Backoffice - Pull Vercel configuration 
+      - name: Azzapp Backoffice - Pull Vercel configuration
         env:
           VERCEL_PROJECT_ID: "azzapp-backoffice"
         run: |
@@ -322,7 +317,6 @@ jobs:
           path: packages/app/ios/Pods
           key: ${{ runner.os }}-pods-${{ hashFiles('packages/app/ios/Podfile.lock') }}
 
-
       - name: Pod install
         working-directory: packages/app/ios
         run: bundle exec pod install
@@ -351,7 +345,7 @@ jobs:
           IOS_APP_IDENTIFIER: ${{ vars.IOS_APP_IDENTIFIER }}
           IOS_SCHEME: ${{ vars.IOS_SCHEME }}
           IOS_PROFILE_ID: ${{ vars.IOS_PROFILE_ID }}
-          IOS_CODE_SIGNING_IDENTITY: ${{ vars.CODE_SIGNING_IDENTITY }}
+          IOS_CODE_SIGNING_IDENTITY: ${{ vars.IOS_CODE_SIGNING_IDENTITY }}
           IOS_EXPORT_METHOD: ${{ vars.IOS_EXPORT_METHOD }}
           IOS_CERTIFICATE_P12_PASSWORD: ${{ secrets.IOS_CERTIFICATE_P12_PASSWORD }}
           APP_STORE_CONNECT_API_KEY: ${{ secrets.APP_STORE_CONNECT_API_KEY }}
@@ -361,13 +355,13 @@ jobs:
         with:
           name: ${{ vars.IOS_SCHEME }}.ipa
           path: packages/app/fastlane/builds/${{ vars.IOS_SCHEME }}.ipa
-      
+
       - name: Upload ios dSYM
         uses: actions/upload-artifact@v4
         with:
           name: ${{ vars.IOS_SCHEME }}.app.dSYM.zip
-          path: packages/app/fastlane/builds/${{ vars.IOS_SCHEME }}.app.dSYM.zip 
-      
+          path: packages/app/fastlane/builds/${{ vars.IOS_SCHEME }}.app.dSYM.zip
+
       - name: Upload to TestFlight
         working-directory: packages/app
         run: bundle exec fastlane deploy
@@ -379,7 +373,7 @@ jobs:
           IOS_EXPORT_METHOD: ${{ vars.IOS_EXPORT_METHOD }}
           IOS_CERTIFICATE_P12_PASSWORD: ${{ secrets.IOS_CERTIFICATE_P12_PASSWORD }}
           APP_STORE_CONNECT_API_KEY: ${{ secrets.APP_STORE_CONNECT_API_KEY }}
-  
+
       ############################################
       #
       # EAS Android application Build
@@ -394,7 +388,7 @@ jobs:
         with:
           eas-version: latest
           token: ${{ secrets.EXPO_TOKEN }}
-          
+
       - name: Build on EAS
         working-directory: ./packages/app
         run: |

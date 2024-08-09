@@ -11,7 +11,7 @@ import type { PostsGrid_posts$key } from '#relayArtifacts/PostsGrid_posts.graphq
 type MediaSuggestionsScreenProps = {
   profile: MediaSuggestionsScreen_profile$key;
   canPlay: boolean;
-  ListHeaderComponent?: React.ReactNode;
+  ListHeaderComponent?: React.ReactElement<any> | null;
 };
 
 const MediaSuggestionsScreen = ({
@@ -27,7 +27,7 @@ const MediaSuggestionsScreen = ({
         @refetchable(queryName: "MediaSuggestionsScreenListQuery")
         @argumentDefinitions(
           after: { type: String }
-          first: { type: Int, defaultValue: 6 }
+          first: { type: Int, defaultValue: 15 }
         ) {
           trendingPosts(after: $after, first: $first)
             @connection(key: "Viewer_trendingPosts") {
