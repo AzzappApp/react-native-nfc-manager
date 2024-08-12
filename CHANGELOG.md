@@ -1,4 +1,4 @@
-## 0.6.0-canary.1
+## 0.6.0-canary.2
 
 * **fix:**  - restore vercell
 * **fix:**  - entitlements
