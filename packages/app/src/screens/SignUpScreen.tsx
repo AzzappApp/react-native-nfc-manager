@@ -230,7 +230,7 @@ const SignupScreen = () => {
     <View style={styles.root}>
       <View style={styles.background}>
         <LottieView
-          source={require('../assets/sign/test_3D.json')}
+          source={require('../assets/sign/login_sign_up_asset.json')}
           autoPlay
           loop
           hardwareAccelerationAndroid
