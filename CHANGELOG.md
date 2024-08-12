@@ -1,9 +1,28 @@
-## 0.5.41-canary.3
+## 0.6.0-canary.1
 
+* **fix:**  - restore vercell
+* **fix:**  - entitlements
 * **feat:**  - 🎸 use webcard colors when replacing cover with template ([#4648](https://github.com/AzzappApp/azzapp/pull/4648))
 * **fix:**  - 🐛 minor fixes on multi user ([#4646](https://github.com/AzzappApp/azzapp/pull/4646))
+* **fix:**  - try
+* **fix:**  - try to read the entitlement file properly
+* **fix:**  - entitlement try
+* **fux:**  - entitlement
+* **fix:**  - entittlement not founds
+* **fix:**  - check in the enttielment file is ok
+* **fix:**  - applink ios
+* **fix:**  - lint
+* **fix:**  - test release perf ([#4652](https://github.com/AzzappApp/azzapp/pull/4652))
+* **fix:**  - remove revenue cat config ([#4651](https://github.com/AzzappApp/azzapp/pull/4651))
+* **fix:**  - **Home:** prevent HomeCoverIcon from launching query
 * **fix:**  - progress indicator cover edition ([#4612](https://github.com/AzzappApp/azzapp/pull/4612))
+* **fix:**  - try applinks without redirect
+* **feat:**  - ios restrict domainName to only www.azzapp.Com
+* **fix:**  - domain name android
+* **fix:**  - remove sentry
+* **feat:**  - try to understand fetchError better ([#4644](https://github.com/AzzappApp/azzapp/pull/4644))
 * **fix:**  - edit translation ([#4613](https://github.com/AzzappApp/azzapp/pull/4613))
+* **feat:**  - Sentry capture of Loading error ([#4635](https://github.com/AzzappApp/azzapp/pull/4635))
 * **feat:**  - likes screens ([#4598](https://github.com/AzzappApp/azzapp/pull/4598))
 * **fix:**  - 🐛 correctly show avatar in multi user ([#4637](https://github.com/AzzappApp/azzapp/pull/4637))
 * **fix:**  - **WebcardFormScreen:** prevent double next
