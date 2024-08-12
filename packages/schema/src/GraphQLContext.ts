@@ -399,47 +399,33 @@ export const createLoaders = (): Loaders =>
         | 'webCardOwners'
         | 'webCardStatistics',
     ) => {
-      if (entity === 'webCardStatistics') {
-        return webCardStatisticsLoader();
-      }
-
-      if (entity === 'profileStatistics') {
-        return profileStatisticsLoader();
-      }
-
-      if (entity === 'webCardOwners') {
-        return webCardOwnerLoader();
-      }
-
-      if (entity === 'labels') {
-        return labelLoader;
-      }
-
-      if (entity === 'cardModuleByWebCardLoader') {
-        return cardModuleByWebCardLoader();
-      }
-
-      if (entity === 'activeSubscriptionsLoader') {
-        return activeSubscriptionsLoader();
-      }
-
-      if (entity === 'activeSubscriptionsForWebCardLoader') {
-        return activeSubscriptionsForWebCardLoader();
-      }
-
-      if (!['profileByWebCardIdAndUserId', ...entities].includes(entity)) {
-        throw new Error(`Unknown entity ${entity}`);
-      }
-
       if (!loaders[entity]) {
-        if (entity === 'profileByWebCardIdAndUserId') {
-          return createProfileByWebCardIdAndUserIdLoader();
+        if (entity === 'webCardStatistics') {
+          loaders.webCardStatistics = webCardStatisticsLoader();
+        } else if (entity === 'profileStatistics') {
+          loaders.profileStatistics = profileStatisticsLoader();
+        } else if (entity === 'webCardOwners') {
+          loaders.webCardOwners = webCardOwnerLoader();
+        } else if (entity === 'labels') {
+          loaders.labels = labelLoader;
+        } else if (entity === 'cardModuleByWebCardLoader') {
+          loaders.cardModuleByWebCardLoader = cardModuleByWebCardLoader();
+        } else if (entity === 'activeSubscriptionsLoader') {
+          loaders.activeSubscriptionsLoader = activeSubscriptionsLoader();
+        } else if (entity === 'activeSubscriptionsForWebCardLoader') {
+          loaders.activeSubscriptionsForWebCardLoader =
+            activeSubscriptionsForWebCardLoader();
+        } else if (entity === 'profileByWebCardIdAndUserId') {
+          loaders.profileByWebCardIdAndUserId =
+            createProfileByWebCardIdAndUserIdLoader();
+        } else if (entities.includes(entity)) {
+          loaders[entity] = new DataLoader<string, EntityToType<Entity> | null>(
+            ids => getEntitiesByIds(entity, ids),
+            dataLoadersOptions,
+          ) as any;
+        } else {
+          throw new Error(`Unknown entity: ${entity}`);
         }
-
-        loaders[entity] = new DataLoader<string, EntityToType<Entity> | null>(
-          ids => getEntitiesByIds(entity, ids),
-          dataLoadersOptions,
-        ) as any;
       }
       return loaders[entity];
     },

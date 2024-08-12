@@ -158,7 +158,7 @@ const WebCardScreenHeader = ({
                 })}
               />
             )) ||
-            (webCard.cardModules.length > 0 && (
+            (webCard.cardModules?.length > 0 && (
               <HeaderButton
                 disabled={disabledButtons}
                 variant="secondary"

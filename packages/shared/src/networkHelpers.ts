@@ -49,7 +49,12 @@ export const fetchJSON = async <JSON>(
       });
     }
   }
-  const data = await response.json().catch(() => ({}));
+  let data;
+  try {
+    data = await response.json();
+  } catch (error: any) {
+    data = { error: ERRORS.JSON_DECODING_ERROR, details: error.message };
+  }
 
   throw new FetchError({
     message: data.message ?? response.statusText,
@@ -82,11 +87,18 @@ export const fetchBlob = async (
       });
     }
   }
-  const data = await response.json().catch(() => ({}));
+
+  let data;
+  try {
+    data = await response.json();
+  } catch (error: any) {
+    data = { error: ERRORS.BLOB_DECODING_ERROR, details: error.message };
+  }
 
   throw new FetchError({
     message: data.message ?? response.statusText,
     response,
+    data,
   });
 };
 

@@ -59,10 +59,17 @@ platform :ios do
     pbxprojPath = "ios/azzapp.xcodeproj/project.pbxproj"
 
     backup_file(path: pbxprojPath)
-
+     
+    entitlements_files = {
+      "azzapp-dev" => "azzapp-devRelease.entitlements",
+      "azzapp-staging" => "azzapp-stagingRelease.entitlements",
+      "azzapp" => "azzapp/azzappRelease.entitlements"
+    }
+    # Determine the entitlements file based on the target
     update_code_signing_settings(
       use_automatic_signing: false,
       path: "ios/azzapp.xcodeproj",
+      entitlements_file_path: entitlements_files[IOS_SCHEME]
     )
 
     update_project_provisioning(
@@ -71,7 +78,10 @@ platform :ios do
       target_filter: IOS_SCHEME,
       code_signing_identity: CODE_SIGNING_IDENTITY
     )
-    
+
+     # Determine the entitlements file based on the target
+
+
     # Build the application
     gym(
       scheme: IOS_SCHEME, 
@@ -87,7 +97,7 @@ platform :ios do
         provisioningProfiles: { 
           APP_IDENT => PROFILE_ID,
         },
-        installerSigningCertificate: CODE_SIGNING_IDENTITY,
+        installerSigningCertificate: CODE_SIGNING_IDENTITY
       }
     )
     

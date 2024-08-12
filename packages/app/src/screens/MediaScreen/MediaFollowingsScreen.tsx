@@ -16,7 +16,7 @@ import type { PostsGrid_posts$key } from '#relayArtifacts/PostsGrid_posts.graphq
 type MediaFollowingsScreenScreenProps = {
   webCard: MediaFollowingsScreen_webCard$key;
   canPlay: boolean;
-  ListHeaderComponent?: React.ReactNode;
+  ListHeaderComponent?: React.ReactElement<any> | null;
 };
 
 const MediaFollowingsScreen = ({
