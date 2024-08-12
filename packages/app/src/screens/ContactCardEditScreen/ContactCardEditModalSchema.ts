@@ -16,7 +16,7 @@ export const contactCardEditSchema = z.object({
   emails: z.array(
     z.object({
       label: z.string(),
-      address: z.string().email(),
+      address: z.string(),
       selected: z.boolean().nullable().optional(),
     }),
   ),

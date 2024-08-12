@@ -52,7 +52,7 @@ const actionTypeSchema = z.intersection(
   z.union([
     z.object({
       actionType: z.literal('email'),
-      actionLink: z.string().email().min(1),
+      actionLink: z.string().min(1),
     }),
     z
       .object({
