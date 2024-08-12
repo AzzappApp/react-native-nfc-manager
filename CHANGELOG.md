@@ -1,5 +1,8 @@
-## 0.6.0-canary.2
+## 0.6.0-canary.3
 
+* **fix:**  - permission to show profile (isMultiUser) ([#4665](https://github.com/AzzappApp/azzapp/pull/4665))
+* **fix:**  - remove unwanted email control ([#4658](https://github.com/AzzappApp/azzapp/pull/4658))
+* **feat:**  - update lottie signin signup ([#4657](https://github.com/AzzappApp/azzapp/pull/4657))
 * **fix:**  - restore vercell
 * **fix:**  - entitlements
 * **feat:**  - 🎸 use webcard colors when replacing cover with template ([#4648](https://github.com/AzzappApp/azzapp/pull/4648))
