@@ -32,10 +32,6 @@ const togglePostReaction: MutationResolvers['togglePostReaction'] = async (
     throw new GraphQLError(ERRORS.INVALID_REQUEST);
   }
 
-  if (!webCard.cardIsPublished) {
-    throw new GraphQLError(ERRORS.UNPUBLISHED_WEB_CARD);
-  }
-
   try {
     const updatedPost = await db.transaction(async trx => {
       const reaction = await getPostReaction(webCardId, postId, trx);
@@ -43,6 +39,10 @@ const togglePostReaction: MutationResolvers['togglePostReaction'] = async (
       if (removeReaction) {
         await deletePostReaction(webCardId, postId, trx);
       } else {
+        if (!webCard.cardIsPublished) {
+          throw new GraphQLError(ERRORS.UNPUBLISHED_WEB_CARD);
+        }
+
         await insertPostReaction(webCardId, postId, reactionKind, trx);
       }
       await trx
@@ -78,6 +78,9 @@ const togglePostReaction: MutationResolvers['togglePostReaction'] = async (
     });
     return { post: updatedPost };
   } catch (e) {
+    if ((e as Error)?.message === ERRORS.UNPUBLISHED_WEB_CARD) {
+      throw e;
+    }
     console.error(e);
     throw new GraphQLError(ERRORS.INTERNAL_SERVER_ERROR);
   }
