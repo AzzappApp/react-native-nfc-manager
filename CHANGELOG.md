@@ -1,5 +1,6 @@
-## 0.6.0-canary.5
+## 0.6.0-canary.6
 
+* **fix:**  - 🐛 disallow access to comment from unpublished webcard ([#4684](https://github.com/AzzappApp/azzapp/pull/4684))
 * **fix:**  - 🐛 center small images in carousel ([#4671](https://github.com/AzzappApp/azzapp/pull/4671))
 * **fix:**  - 🐛 allow unlike post from unpublished webcard ([#4672](https://github.com/AzzappApp/azzapp/pull/4672))
 * **fix:**  - permission to show profile (isMultiUser) ([#4665](https://github.com/AzzappApp/azzapp/pull/4665))
