@@ -1,5 +1,6 @@
-## 0.6.0-canary.4
+## 0.6.0-canary.5
 
+* **fix:**  - 🐛 center small images in carousel ([#4671](https://github.com/AzzappApp/azzapp/pull/4671))
 * **fix:**  - 🐛 allow unlike post from unpublished webcard ([#4672](https://github.com/AzzappApp/azzapp/pull/4672))
 * **fix:**  - permission to show profile (isMultiUser) ([#4665](https://github.com/AzzappApp/azzapp/pull/4665))
 * **fix:**  - remove unwanted email control ([#4658](https://github.com/AzzappApp/azzapp/pull/4658))
