@@ -246,15 +246,16 @@ const CoverTemplateSelectionScreenBody = ({
 
   const styles = useStyleSheet(stylesheet);
 
-  const ListFooterComponent = useMemo(
-    () => (
+  const ListFooterComponent = useMemo(() => {
+    if (tag) return undefined;
+
+    return (
       <CoverTemplateScratchStarters
         onColorSelect={onSelectBackgroundColor}
         cardColors={profile.webCard?.cardColors}
       />
-    ),
-    [onSelectBackgroundColor, profile.webCard?.cardColors],
-  );
+    );
+  }, [onSelectBackgroundColor, profile.webCard?.cardColors, tag]);
 
   return (
     <View style={styles.body}>
