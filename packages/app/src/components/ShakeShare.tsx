@@ -1,3 +1,4 @@
+/* eslint-disable no-bitwise */
 import {
   BlendColor,
   Canvas,
@@ -53,7 +54,7 @@ const ShakeShare = () => {
 
   //Gesture to close on swipe
   const fling = Gesture.Fling()
-    .direction(Directions.DOWN)
+    .direction(Directions.DOWN | Directions.RIGHT)
     .runOnJS(true)
     .onEnd(dismount);
 

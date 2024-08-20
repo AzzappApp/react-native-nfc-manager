@@ -5,6 +5,7 @@ import {
   useMemo,
   memo,
   useRef,
+  useEffect,
 } from 'react';
 import Animated, {
   Extrapolation,
@@ -14,6 +15,7 @@ import Animated, {
   useDerivedValue,
   useSharedValue,
 } from 'react-native-reanimated';
+import useIsForeground from '#hooks/useIsForeground';
 import type { ForwardedRef, ReactElement, ReactNode, Ref } from 'react';
 import type {
   FlatList,
@@ -137,6 +139,27 @@ function CarouselSelectList<TItem = any>(
       });
     },
   }));
+
+  const isForeground = useIsForeground();
+  const prevIsForeground = useRef(isForeground);
+
+  useEffect(() => {
+    if (isForeground !== prevIsForeground.current) {
+      if (
+        !prevIsForeground.current &&
+        isForeground &&
+        scrollIndex.value !== Math.round(scrollIndex.value)
+      ) {
+        listRef.current?.scrollToOffset({
+          offset: Math.round(scrollIndex.value) * itemWidth,
+          animated: false,
+        });
+      }
+
+      prevIsForeground.current = isForeground;
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isForeground, itemWidth]);
 
   // Animation
   const scrollHandler = useAnimatedScrollHandler({

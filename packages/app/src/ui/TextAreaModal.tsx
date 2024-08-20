@@ -136,7 +136,7 @@ const TextAreaModal = ({
             />
           }
         />
-        <KeyboardAvoidingView behavior="height" style={styles.contentModal}>
+        <KeyboardAvoidingView behavior="padding" style={styles.contentModal}>
           {ItemTopComponent}
           <TextInput
             multiline
@@ -189,6 +189,7 @@ const styleSheet = createStyleSheet(appearance => ({
     marginTop: 5,
     marginLeft: 12,
     color: 'white',
+    paddingBottom: 10,
   },
   textInput: {
     borderWidth: 0,
