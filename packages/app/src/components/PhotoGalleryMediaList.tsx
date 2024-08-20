@@ -81,7 +81,9 @@ const PhotoGalleryMediaList = ({
   const styles = useStyleSheet(styleSheet);
   const [medias, setMedias] = useState<PhotoIdentifier[]>([]);
   const [hasNext, setHasNext] = useState(true);
-  const nextCursor = useRef<string | undefined>();
+  const [lastPhotoTimestamp, setLastPhotoTimestamp] = useState<
+    number | undefined
+  >(undefined);
   const { mediaPermission } = usePermissionContext();
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
@@ -98,7 +100,7 @@ const PhotoGalleryMediaList = ({
       try {
         const result = await CameraRoll.getPhotos({
           first: updatePictures ? mediaLength.current || 48 : 48, //multiple of items per row
-          after: refreshing ? undefined : nextCursor.current,
+          toTime: refreshing ? undefined : lastPhotoTimestamp,
           assetType:
             kind === 'mixed' ? 'All' : kind === 'image' ? 'Photos' : 'Videos',
           groupTypes: album?.type,
@@ -107,8 +109,8 @@ const PhotoGalleryMediaList = ({
         });
 
         const hasNextPage = result.page_info.has_next_page;
-        const endCursor = result.page_info.end_cursor;
         const assets = result.edges;
+        const endTimestamp = assets[assets.length - 1]?.node.timestamp;
 
         setMedias(previous => {
           const result = refreshing ? assets : [...previous, ...assets];
@@ -116,7 +118,9 @@ const PhotoGalleryMediaList = ({
           return result;
         });
 
-        nextCursor.current = endCursor;
+        if (endTimestamp) {
+          setLastPhotoTimestamp(Math.round(endTimestamp * 1000) - 1);
+        }
         setHasNext(hasNextPage);
       } catch (e) {
         console.log(e);
@@ -128,7 +132,7 @@ const PhotoGalleryMediaList = ({
         });
       }
     },
-    [album?.title, album?.type, kind],
+    [album?.title, album?.type, kind, lastPhotoTimestamp],
   );
 
   useEffect(() => {
