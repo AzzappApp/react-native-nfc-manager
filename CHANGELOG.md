@@ -1,5 +1,6 @@
-## 0.6.0-canary.8
+## 0.6.0-canary.9
 
+* **perf:**  - ⚡️ Replace after with toTime for perf on iOS ([#4695](https://github.com/AzzappApp/azzapp/pull/4695))
 * **feat:**  - 🎸 remove validation ([#4647](https://github.com/AzzappApp/azzapp/pull/4647))
 * **fix:**  - 🐛 hide templates from scratch on selected tag ([#4682](https://github.com/AzzappApp/azzapp/pull/4682))
 * **fix:**  - 🐛 disallow access to comment from unpublished webcard ([#4684](https://github.com/AzzappApp/azzapp/pull/4684))
