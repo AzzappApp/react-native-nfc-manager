@@ -1,5 +1,6 @@
-## 0.6.0-canary.7
+## 0.6.0-canary.8
 
+* **feat:**  - 🎸 remove validation ([#4647](https://github.com/AzzappApp/azzapp/pull/4647))
 * **fix:**  - 🐛 hide templates from scratch on selected tag ([#4682](https://github.com/AzzappApp/azzapp/pull/4682))
 * **fix:**  - 🐛 disallow access to comment from unpublished webcard ([#4684](https://github.com/AzzappApp/azzapp/pull/4684))
 * **fix:**  - 🐛 center small images in carousel ([#4671](https://github.com/AzzappApp/azzapp/pull/4671))
