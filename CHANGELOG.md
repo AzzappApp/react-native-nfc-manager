@@ -1,5 +1,6 @@
-## 0.6.0-canary.11
+## 0.6.0-canary.12
 
+* **fix:**  - 🐛 multiple fixes on web ([#4701](https://github.com/AzzappApp/azzapp/pull/4701))
 * **fix:**  - android minors ([#4679](https://github.com/AzzappApp/azzapp/pull/4679))
 * **perf:**  - ⚡️ Replace after with toTime for perf on iOS ([#4695](https://github.com/AzzappApp/azzapp/pull/4695))
 * **feat:**  - 🎸 remove validation ([#4647](https://github.com/AzzappApp/azzapp/pull/4647))
