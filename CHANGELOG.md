@@ -1,5 +1,6 @@
-## 0.6.0-canary.15
+## 0.6.0-canary.16
 
+* **fix:**  - ci syntax
 * **fix:**  - CI - migrating pscale command
 * **fix:**  - 🐛 multiple fixes on web ([#4701](https://github.com/AzzappApp/azzapp/pull/4701))
 * **fix:**  - android minors ([#4679](https://github.com/AzzappApp/azzapp/pull/4679))
