@@ -202,49 +202,54 @@ jobs:
 
       - name: PlanetScale - Create a password
         if: ${{ steps.planetscale_migration_needed.outputs.has_change == 'true'}}
-        uses: planetscale/create-branch-password-action@v1
-        id: create_password
-        with:
-          org_name: azzapp
-          database_name: azzapp
-          branch_name: ${{ steps.extract_branch.outputs.branch }}
-          name: "pass-${{ steps.extract_branch.outputs.branch }}"
         env:
           PLANETSCALE_SERVICE_TOKEN_ID: ${{ secrets.PLANETSCALE_SERVICE_TOKEN_ID }}
           PLANETSCALE_SERVICE_TOKEN: ${{ secrets.PLANETSCALE_SERVICE_TOKEN }}
+        run: |
+          response=$(pscale password create azzapp ${{ steps.extract_branch.outputs.branch }} -f json --org azzapp
+
+
+          id=$(echo "$response" | jq -r '.id')
+          host=$(echo "$response" | jq -r '.access_host_url')
+          username=$(echo "$response" | jq -r '.username')
+          password=$(echo "$response" | jq -r '.plain_text')
+          ssl_mode="verify_identity"  # Assuming a default value for ssl_mode
+          ssl_ca="/etc/ssl/certs/ca-certificates.crt"  # Assuming a default value for ssl_ca
+
+
+          # Set the password ID, allows us to later delete it if wanted.
+          echo "PASSWORD_ID=$id" >> $GITHUB_ENV
+
+
+          # Create the DATABASE_URL
+          echo "DATABASE_HOST=$host" >> $GITHUB_ENV
+          echo "DATABASE_PASSWORD=$password" >> $GITHUB_ENV
+          echo "DATABASE_USERNAME=$username" >> $GITHUB_ENV
 
       - name: PlanetScale - Apply drizzle changes
         if: ${{ steps.planetscale_migration_needed.outputs.has_change == 'true'}}
         working-directory: packages/data
         run: |
-          export DATABASE_HOST=steps.create_password.outputs.hostname
-          export DATABASE_PASSWORD=steps.create_password.outputs.password
-          export DATABASE_USERNAME=steps.create_password.outputs.username
+          export DATABASE_HOST=$DATABASE_HOST
+          export DATABASE_PASSWORD=$DATABASE_PASSWORD
+          export DATABASE_USERNAME=$DATABASE_USERNAME
           yarn push-migration
 
       - name: PlanetScale - Create a deploy request
         if: ${{ steps.planetscale_migration_needed.outputs.has_change == 'true'}}
-        uses: planetscale/create-deploy-request-action@v1
-        id: create_deploy_request
-        with:
-          org_name: azzapp
-          database_name: azzapp
-          branch_name: ${{ steps.extract_branch.outputs.branch }}
         env:
           PLANETSCALE_SERVICE_TOKEN_ID: ${{ secrets.PLANETSCALE_SERVICE_TOKEN_ID }}
           PLANETSCALE_SERVICE_TOKEN: ${{ secrets.PLANETSCALE_SERVICE_TOKEN }}
+        run: |
+          pscale deploy-request create azzapp ${{ steps.extract_branch.outputs.branch }}  --org azzapp --wait
 
       - name: PlanetScale - Deploy the changes
         if: ${{ steps.planetscale_migration_needed.outputs.has_change == 'true'}}
-        uses: planetscale/deploy-deploy-request-action@v1
-        with:
-          org_name: azzapp
-          database_name: azzapp
-          number: ${{ steps.create_deploy_request.outputs.number }}
-          wait: true
         env:
           PLANETSCALE_SERVICE_TOKEN_ID: ${{ secrets.PLANETSCALE_SERVICE_TOKEN_ID }}
           PLANETSCALE_SERVICE_TOKEN: ${{ secrets.PLANETSCALE_SERVICE_TOKEN }}
+        run: |
+          pscale deploy-request deploy azzapp ${{ steps.extract_branch.outputs.branch }} --org azzapp
 
       ############################################
       #
