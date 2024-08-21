@@ -38,33 +38,34 @@ const generateEmailSignature = async (req: NextRequest) => {
     if (!res) {
       return new Response('Invalid request', { status: 400 });
     }
-    if (!res.Profile?.contactCard) {
+    const { profile, webCard } = res;
+    if (!profile?.contactCard) {
       return new Response('Invalid request', { status: 400 });
     }
 
-    const webCardUrl = await buildCoverImageUrl(res.WebCard, {
+    const webCardUrl = await buildCoverImageUrl(webCard, {
       width: COVER_WIDTH,
       height: COVER_WIDTH / COVER_RATIO,
       crop: 'fit',
     });
 
-    const avatarUrl = await buildAvatarUrl(res.Profile, null);
+    const avatarUrl = await buildAvatarUrl(profile, null);
     const { data, signature } = await serializeAndSignEmailSignature(
-      res.WebCard.userName,
+      webCard.userName,
       profileId,
-      res.WebCard.id,
-      res.Profile.contactCard,
-      res.WebCard.commonInformation,
+      webCard.id,
+      profile.contactCard,
+      webCard.commonInformation,
       avatarUrl,
     );
 
     const { data: contactCardData, signature: contactCardSignature } =
       await serializeAndSignContactCard(
-        res.WebCard.userName,
+        webCard.userName,
         profileId,
-        res.WebCard.id,
-        res.Profile.contactCard,
-        res.WebCard.commonInformation,
+        webCard.id,
+        profile.contactCard,
+        webCard.commonInformation,
       );
 
     const mailParam: Record<
@@ -72,7 +73,7 @@ const generateEmailSignature = async (req: NextRequest) => {
       Array<{ mail: string }> | Array<{ number: string }> | string
     > = {
       linkUrl: buildEmailSignatureGenerationUrl(
-        res.WebCard.userName,
+        webCard.userName,
         data,
         signature,
         contactCardData,

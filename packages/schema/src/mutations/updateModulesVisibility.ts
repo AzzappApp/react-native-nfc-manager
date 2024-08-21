@@ -1,7 +1,6 @@
-import { inArray } from 'drizzle-orm';
 import { GraphQLError } from 'graphql';
 import { fromGlobalId } from 'graphql-relay';
-import { CardModuleTable, db, getCardModulesByIds } from '@azzapp/data';
+import { getCardModulesByIds, updateCardModules } from '@azzapp/data';
 import ERRORS from '@azzapp/shared/errors';
 import type { MutationResolvers } from '#/__generated__/types';
 
@@ -24,10 +23,7 @@ const updateModulesVisibility: MutationResolvers['updateModulesVisibility'] =
     }
 
     try {
-      await db
-        .update(CardModuleTable)
-        .set({ visible })
-        .where(inArray(CardModuleTable.id, modulesIds));
+      updateCardModules(modulesIds, { visible });
     } catch (e) {
       console.error(e);
       throw new GraphQLError(ERRORS.INTERNAL_SERVER_ERROR);

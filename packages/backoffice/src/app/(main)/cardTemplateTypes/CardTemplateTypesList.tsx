@@ -13,116 +13,38 @@ import {
   TextField,
 } from '@mui/material';
 import { useRouter } from 'next/navigation';
-import {
-  useCallback,
-  useDeferredValue,
-  useEffect,
-  useState,
-  useTransition,
-} from 'react';
+import { useCallback, useDeferredValue, useState } from 'react';
 import DataGrid from '#components/DataGrid';
-import type { CardTemplateTypeItem, Filters, SortColumn, Status } from './page';
+import type { CardTemplateTypeItem } from './page';
 import type { SelectChangeEvent } from '@mui/material';
-import type {
-  GridColDef,
-  GridPaginationModel,
-  GridSortModel,
-} from '@mui/x-data-grid';
+import type { GridColDef } from '@mui/x-data-grid';
 
 type CardTemplateTypesListProps = {
   cardTemplateTypes: CardTemplateTypeItem[];
-  count: number;
-  page: number;
-  pageSize: number;
-  sortField: SortColumn;
-  sortOrder: 'asc' | 'desc';
-  search: string | null;
-  filters: Filters;
 };
+
+type StatusFilter = 'All' | 'Disabled' | 'Enabled';
 
 const CardTemplateTypesList = ({
   cardTemplateTypes,
-  count,
-  page,
-  pageSize,
-  sortField,
-  sortOrder,
-  search,
-  filters,
 }: CardTemplateTypesListProps) => {
   const router = useRouter();
-  const [loading, startTransition] = useTransition();
-  const [currentSearch, setCurrentSearch] = useState(search ?? '');
-  const defferedSearch = useDeferredValue(currentSearch);
-  const [statusFilter, setStatusFilter] = useState(filters?.status || 'All');
+  const [currentSearch, setCurrentSearch] = useState<string | null>(null);
+  const deferredSearch = useDeferredValue(currentSearch);
+  const [statusFilter, setStatusFilter] = useState<StatusFilter>('All');
 
-  const updateSearchParams = useCallback(
-    (
-      page: number,
-      sort: string,
-      order: string,
-      search: string | null,
-      filters: Filters,
-    ) => {
-      startTransition(() => {
-        router.replace(
-          `/cardTemplateTypes?page=${page}&sort=${sort}&order=${order}&s=${search ?? ''}&status=${filters.status ?? ''}`,
-        );
-      });
-    },
-    [router, startTransition],
-  );
+  const onStatusChange = useCallback((event: SelectChangeEvent) => {
+    const newStatus = event.target.value as StatusFilter;
+    setStatusFilter(newStatus);
+  }, []);
 
-  const onPageChange = useCallback(
-    (model: GridPaginationModel) => {
-      updateSearchParams(model.page + 1, sortField, sortOrder, search, {
-        status: statusFilter,
-      });
-    },
-    [statusFilter, search, sortField, sortOrder, updateSearchParams],
-  );
-
-  const onSortModelChange = useCallback(
-    (model: GridSortModel) => {
-      updateSearchParams(
-        page,
-        model[0]?.field ?? 'label',
-        model[0]?.sort ?? 'asc',
-        search,
-        {
-          status: statusFilter,
-        },
-      );
-    },
-    [statusFilter, page, search, updateSearchParams],
-  );
-
-  useEffect(() => {
-    if (search === defferedSearch) {
-      return;
-    }
-    updateSearchParams(1, sortField, sortOrder, defferedSearch, {
-      status: statusFilter,
-    });
-  }, [
-    statusFilter,
-    defferedSearch,
-    page,
-    search,
-    sortField,
-    sortOrder,
-    updateSearchParams,
-  ]);
-
-  const onStatusChange = useCallback(
-    (event: SelectChangeEvent) => {
-      const newStatus = event.target.value as Status;
-      setStatusFilter(newStatus);
-      updateSearchParams(1, sortField, sortOrder, search, {
-        status: newStatus,
-      });
-    },
-    [search, sortField, sortOrder, updateSearchParams],
+  const filteredCardTemplateTypes = cardTemplateTypes.filter(
+    type =>
+      (statusFilter === 'All' ||
+        (type.status ? 'Enabled' : 'Disabled') === statusFilter) &&
+      (!deferredSearch ||
+        type.label?.toLowerCase().includes(deferredSearch.toLowerCase()) ||
+        type.category.toLowerCase().includes(deferredSearch.toLowerCase())),
   );
 
   return (
@@ -180,19 +102,7 @@ const CardTemplateTypesList = ({
 
       <DataGrid
         columns={columns}
-        rows={cardTemplateTypes}
-        rowCount={count}
-        initialState={{
-          pagination: {
-            paginationModel: { pageSize, page: page - 1 },
-          },
-        }}
-        sortModel={[
-          {
-            field: sortField,
-            sort: sortOrder,
-          },
-        ]}
+        rows={filteredCardTemplateTypes}
         onRowClick={params => {
           router.push(`/cardTemplateTypes/${params.id}`);
         }}
@@ -201,12 +111,7 @@ const CardTemplateTypesList = ({
             cursor: 'pointer',
           },
         }}
-        paginationMode="server"
-        sortingMode="server"
-        onPaginationModelChange={onPageChange}
-        onSortModelChange={onSortModelChange}
-        loading={loading}
-        pageSizeOptions={[pageSize]}
+        pageSizeOptions={[25]}
         rowSelection={false}
         sortingOrder={['asc', 'desc']}
       />
@@ -226,7 +131,7 @@ const columns: GridColDef[] = [
     flex: 2,
   },
   {
-    field: 'templates',
+    field: 'templatesCount',
     headerName: 'Templates',
     flex: 1,
   },

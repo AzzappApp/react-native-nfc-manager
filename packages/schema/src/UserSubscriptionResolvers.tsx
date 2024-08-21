@@ -1,6 +1,6 @@
 import * as Sentry from '@sentry/nextjs';
 import { getPaymentRequest } from '@azzapp/payment';
-import { calculateAvailableSeats } from '#use-cases/subscription';
+import { calculateAvailableSeats } from '#helpers/subscriptionHelpers';
 import { idResolver } from './utils';
 import type { UserSubscriptionResolvers } from './__generated__/types';
 

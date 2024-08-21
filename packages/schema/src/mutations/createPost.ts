@@ -1,11 +1,10 @@
-import { eq, sql } from 'drizzle-orm';
 import { GraphQLError } from 'graphql';
 import {
-  WebCardTable,
   checkMedias,
   createPost,
-  db,
+  incrementWebCardPosts,
   referencesMedias,
+  transaction,
 } from '@azzapp/data';
 import ERRORS from '@azzapp/shared/errors';
 import fromGlobalIdWithType from '#helpers/relayIdHelpers';
@@ -27,15 +26,9 @@ const createPostMutation: MutationResolvers['createPost'] = async (
 
   try {
     await checkMedias([mediaId]);
-    const post = await db.transaction(async trx => {
-      await referencesMedias([mediaId], null, trx);
-      await trx
-        .update(WebCardTable)
-        .set({
-          nbPosts: sql`nbPosts + 1`,
-        })
-        .where(eq(WebCardTable.id, webCardId));
 
+    const post = await transaction(async () => {
+      await referencesMedias([mediaId], null);
       const newPost = {
         webCardId,
         content,
@@ -46,7 +39,8 @@ const createPostMutation: MutationResolvers['createPost'] = async (
         counterComments: 0,
       };
 
-      const postId = await createPost(newPost, trx);
+      const postId = await createPost(newPost);
+      await incrementWebCardPosts(webCardId);
 
       return {
         ...newPost,
@@ -60,7 +54,6 @@ const createPostMutation: MutationResolvers['createPost'] = async (
     });
 
     const webCard = await loaders.WebCard.load(webCardId);
-
     if (webCard) {
       cardUsernamesToRevalidate.add(webCard.userName);
     }

@@ -1,17 +1,15 @@
 import {
-  CardTemplateTypeTable,
-  CompanyActivityTypeTable,
-  db,
+  getCardTemplateTypes,
+  getCompanyActivityTypes,
   getLocalizationMessagesByLocaleAndTarget,
 } from '@azzapp/data';
 import { DEFAULT_LOCALE, ENTITY_TARGET } from '@azzapp/i18n';
 import CompanyActivityForm from '../CompanyActivityForm';
 const NewCompanyActivityPage = async () => {
-  const cardTemplateTypes = await db.select().from(CardTemplateTypeTable);
-
-  const companyActivitiesTypes = await db
-    .select()
-    .from(CompanyActivityTypeTable);
+  const [cardTemplateTypes, companyActivitiesTypes] = await Promise.all([
+    getCardTemplateTypes(true),
+    getCompanyActivityTypes(),
+  ]);
 
   const labels = await getLocalizationMessagesByLocaleAndTarget(
     DEFAULT_LOCALE,

@@ -1,9 +1,9 @@
 import { GraphQLError } from 'graphql';
 import { fromGlobalId } from 'graphql-relay';
 import {
-  db,
   getCardModulesByIds,
   resetCardModulesPositions,
+  transaction,
   updateCardModule,
 } from '@azzapp/data';
 import ERRORS from '@azzapp/shared/errors';
@@ -27,12 +27,12 @@ const reorderModules: MutationResolvers['reorderModules'] = async (
   }
 
   try {
-    await db.transaction(async trx => {
+    transaction(async () => {
       for (let index = 0; index < modulesIds.length; index++) {
         const moduleId = modulesIds[index];
-        await updateCardModule(moduleId, { position: index }, trx);
+        await updateCardModule(moduleId, { position: index });
       }
-      await resetCardModulesPositions(webCardId, trx);
+      await resetCardModulesPositions(webCardId);
     });
   } catch (e) {
     console.error(e);

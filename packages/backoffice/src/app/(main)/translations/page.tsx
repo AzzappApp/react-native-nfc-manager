@@ -1,10 +1,8 @@
-import { and, count, eq } from 'drizzle-orm';
 import {
-  db,
   getLocalizationMessages,
-  LocalizationMessageTable,
+  getLocalizationMessagesByLocaleAndTarget,
 } from '@azzapp/data';
-import { ENTITY_TARGET, SUPPORTED_LOCALES } from '@azzapp/i18n';
+import { DEFAULT_LOCALE, ENTITY_TARGET, SUPPORTED_LOCALES } from '@azzapp/i18n';
 import TranslationsInfos from './TranslationsInfos';
 import { appMessages, langNames, webMessages } from './translationsPageHelpers';
 
@@ -24,16 +22,10 @@ const TranslationsPage = async () => {
 
   const nbAppMessages = Object.keys(appMessages).length;
   const nbWebMessages = Object.keys(webMessages).length;
-  const nbEntityMessages = await db
-    .select({ count: count() })
-    .from(LocalizationMessageTable)
-    .where(
-      and(
-        eq(LocalizationMessageTable.target, ENTITY_TARGET),
-        eq(LocalizationMessageTable.locale, 'en-US'),
-      ),
-    )
-    .then(([{ count }]) => count);
+  const nbEntityMessages = await getLocalizationMessagesByLocaleAndTarget(
+    DEFAULT_LOCALE,
+    ENTITY_TARGET,
+  ).then(messages => messages.length);
 
   const translationsInfos = SUPPORTED_LOCALES.map(locale => {
     const nbTranslatedAppMessages = Object.keys(

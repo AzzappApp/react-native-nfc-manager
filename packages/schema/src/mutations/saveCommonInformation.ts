@@ -1,11 +1,10 @@
-import { eq } from 'drizzle-orm';
 import { GraphQLError } from 'graphql';
 import {
-  ProfileTable,
   checkMedias,
-  db,
   referencesMedias,
+  transaction,
   updateWebCard,
+  updateWebCardProfiles,
 } from '@azzapp/data';
 import ERRORS from '@azzapp/shared/errors';
 import fromGlobalIdWithType from '#helpers/relayIdHelpers';
@@ -34,17 +33,14 @@ const saveCommonInformation: MutationResolvers['saveCommonInformation'] =
       if (logoId) {
         await checkMedias([logoId]);
       }
-      await db.transaction(async trx => {
-        await updateWebCard(webCardId, updates, trx);
+      await transaction(async () => {
+        await updateWebCard(webCardId, updates);
 
-        trx
-          .update(ProfileTable)
-          .set({
-            lastContactCardUpdate: new Date(),
-          })
-          .where(eq(ProfileTable.webCardId, webCardId));
+        await updateWebCardProfiles(webCardId, {
+          lastContactCardUpdate: new Date(),
+        });
 
-        await referencesMedias(logoId ? [logoId] : [], [webCard.logoId], trx);
+        await referencesMedias(logoId ? [logoId] : [], [webCard.logoId]);
       });
     } catch (e) {
       console.error(e);

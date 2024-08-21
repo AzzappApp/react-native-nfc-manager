@@ -239,13 +239,13 @@ __metadata:
     "@types/react-dom": ^18.3.0
     classnames: ^2.5.1
     date-fns: ^3.6.0
-    drizzle-orm: ^0.31.2
     lodash: ^4.17.21
     lottie-web: ^5.12.2
     next: ^14.2.3
     react: ^18.3.1
     react-dom: ^18.3.1
     react-virtuoso: ^4.7.12
+    typescript: ^5.5.3
     use-debounce: ^10.0.1
     zod: ^3.23.8
   languageName: unknown
@@ -255,6 +255,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@azzapp/data@workspace:packages/data"
   dependencies:
+    "@azzapp/i18n": "workspace:^"
     "@azzapp/shared": "workspace:^"
     "@babel/cli": 7.24.5
     "@paralleldrive/cuid2": ^2.2.2
@@ -263,11 +264,11 @@ __metadata:
     "@types/lodash": 4.17.1
     "@types/node-fetch": 2.6.11
     better-sqlite3: ^9.6.0
-    drizzle-kit: ^0.22.7
-    drizzle-orm: ^0.31.2
+    drizzle-kit: 0.22.7
+    drizzle-orm: ^0.33.0
     lodash: ^4.17.21
     mysql2: ^3.9.7
-    node-fetch: ^3
+    node-fetch: 2
     typescript: ^5.5.3
     zod: ^3.23.8
   languageName: unknown
@@ -336,7 +337,7 @@ __metadata:
     tagged-versions: ^1.3.0
     ts-jest: ^29.1.2
     turbo: latest
-    typescript: ^5.5.3
+    typescript: ^5.5.4
   languageName: unknown
   linkType: soft
 
@@ -12899,13 +12900,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"data-uri-to-buffer@npm:^4.0.0":
-  version: 4.0.1
-  resolution: "data-uri-to-buffer@npm:4.0.1"
-  checksum: 0d0790b67ffec5302f204c2ccca4494f70b4e2d940fea3d36b09f0bb2b8539c2e86690429eb1f1dc4bcc9e4df0644193073e63d9ee48ac9fce79ec1506e4aa4c
-  languageName: node
-  linkType: hard
-
 "data-urls@npm:^3.0.2":
   version: 3.0.2
   resolution: "data-urls@npm:3.0.2"
@@ -13443,22 +13437,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"drizzle-kit@patch:drizzle-kit@npm%3A0.22.7#./.yarn/patches/drizzle-kit-npm-0.22.7-19553a88f0.patch::locator=%40azzapp%2Fmonorepo%40workspace%3A.":
-  version: 0.22.7
-  resolution: "drizzle-kit@patch:drizzle-kit@npm%3A0.22.7#./.yarn/patches/drizzle-kit-npm-0.22.7-19553a88f0.patch::version=0.22.7&hash=4143d5&locator=%40azzapp%2Fmonorepo%40workspace%3A."
-  dependencies:
-    "@esbuild-kit/esm-loader": ^2.5.5
-    esbuild: ^0.19.7
-    esbuild-register: ^3.5.0
-  bin:
-    drizzle-kit: bin.cjs
-  checksum: 21b3e35fda9a8bcdef4f9525f684900acd95aa9bab0158a9e99090275a59d5c63d0b294e46dd53da42554bc4353925c89ccf7d5870c72a42dd9216bc5626f8ca
-  languageName: node
-  linkType: hard
-
-"drizzle-orm@npm:0.31.2":
-  version: 0.31.2
-  resolution: "drizzle-orm@npm:0.31.2"
+"drizzle-orm@npm:0.33.0":
+  version: 0.33.0
+  resolution: "drizzle-orm@npm:0.33.0"
   peerDependencies:
     "@aws-sdk/client-rds-data": ">=3"
     "@cloudflare/workers-types": ">=3"
@@ -13468,6 +13449,7 @@ __metadata:
     "@op-engineering/op-sqlite": ">=2"
     "@opentelemetry/api": ^1.4.1
     "@planetscale/database": ">=1"
+    "@prisma/client": "*"
     "@tidbcloud/serverless": "*"
     "@types/better-sqlite3": "*"
     "@types/pg": "*"
@@ -13503,6 +13485,8 @@ __metadata:
       optional: true
     "@planetscale/database":
       optional: true
+    "@prisma/client":
+      optional: true
     "@tidbcloud/serverless":
       optional: true
     "@types/better-sqlite3":
@@ -13533,19 +13517,21 @@ __metadata:
       optional: true
     postgres:
       optional: true
+    prisma:
+      optional: true
     react:
       optional: true
     sql.js:
       optional: true
     sqlite3:
       optional: true
-  checksum: af719eefd8ff80f065d18c62c06a1aa4708befc9b4054392f2dcd0f37ec159c9fcba783b56c3ee28be792eaf854c9043adaf6616eb9811d940b7ca49409e1d2c
+  checksum: f7e1d1a7d57f3f4e57be7d276e485f373c5f4fbf3432bc642d58912e2c7162c1f2d4615656e99d199189cdfce420029f8fbe45925b65263f99111855a64e3b46
   languageName: node
   linkType: hard
 
-"drizzle-orm@patch:drizzle-orm@npm%3A0.31.2#./.yarn/patches/drizzle-orm-npm-0.31.2-f0b4701b98.patch::locator=%40azzapp%2Fmonorepo%40workspace%3A.":
-  version: 0.31.2
-  resolution: "drizzle-orm@patch:drizzle-orm@npm%3A0.31.2#./.yarn/patches/drizzle-orm-npm-0.31.2-f0b4701b98.patch::version=0.31.2&hash=b3afb3&locator=%40azzapp%2Fmonorepo%40workspace%3A."
+"drizzle-orm@patch:drizzle-orm@npm%3A0.33.0#./.yarn/patches/drizzle-orm-npm-0.33.0-74d2936dbe.patch::locator=%40azzapp%2Fmonorepo%40workspace%3A.":
+  version: 0.33.0
+  resolution: "drizzle-orm@patch:drizzle-orm@npm%3A0.33.0#./.yarn/patches/drizzle-orm-npm-0.33.0-74d2936dbe.patch::version=0.33.0&hash=b3afb3&locator=%40azzapp%2Fmonorepo%40workspace%3A."
   peerDependencies:
     "@aws-sdk/client-rds-data": ">=3"
     "@cloudflare/workers-types": ">=3"
@@ -13555,6 +13541,7 @@ __metadata:
     "@op-engineering/op-sqlite": ">=2"
     "@opentelemetry/api": ^1.4.1
     "@planetscale/database": ">=1"
+    "@prisma/client": "*"
     "@tidbcloud/serverless": "*"
     "@types/better-sqlite3": "*"
     "@types/pg": "*"
@@ -13590,6 +13577,8 @@ __metadata:
       optional: true
     "@planetscale/database":
       optional: true
+    "@prisma/client":
+      optional: true
     "@tidbcloud/serverless":
       optional: true
     "@types/better-sqlite3":
@@ -13620,13 +13609,15 @@ __metadata:
       optional: true
     postgres:
       optional: true
+    prisma:
+      optional: true
     react:
       optional: true
     sql.js:
       optional: true
     sqlite3:
       optional: true
-  checksum: 172070cefe1583eb8d62667a1119f46121ebde480fb30da8efc0ee9ef5371850608450be5e43e1e909a6a78331be76f475c287b6c548030762425003822e45b2
+  checksum: 5427a0042e039b2f3eb8bd8fb63c0f4daeb81fd732853f55376e4fd3e38206c5391c9c101726447aef7c835facf94937a4e7c5a1a811792986fb7327a2b380f0
   languageName: node
   linkType: hard
 
@@ -15092,16 +15083,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"fetch-blob@npm:^3.1.2, fetch-blob@npm:^3.1.4":
-  version: 3.2.0
-  resolution: "fetch-blob@npm:3.2.0"
-  dependencies:
-    node-domexception: ^1.0.0
-    web-streams-polyfill: ^3.0.3
-  checksum: f19bc28a2a0b9626e69fd7cf3a05798706db7f6c7548da657cbf5026a570945f5eeaedff52007ea35c8bcd3d237c58a20bf1543bc568ab2422411d762dd3d5bf
-  languageName: node
-  linkType: hard
-
 "fetch-retry@npm:^4.1.1":
   version: 4.1.1
   resolution: "fetch-retry@npm:4.1.1"
@@ -15318,15 +15299,6 @@ __metadata:
     combined-stream: ^1.0.8
     mime-types: ^2.1.12
   checksum: 01135bf8675f9d5c61ff18e2e2932f719ca4de964e3be90ef4c36aacfc7b9cb2fceb5eca0b7e0190e3383fe51c5b37f4cb80b62ca06a99aaabfcfd6ac7c9328c
-  languageName: node
-  linkType: hard
-
-"formdata-polyfill@npm:^4.0.10":
-  version: 4.0.10
-  resolution: "formdata-polyfill@npm:4.0.10"
-  dependencies:
-    fetch-blob: ^3.1.2
-  checksum: 82a34df292afadd82b43d4a740ce387bc08541e0a534358425193017bf9fb3567875dc5f69564984b1da979979b70703aa73dee715a17b6c229752ae736dd9db
   languageName: node
   linkType: hard
 
@@ -19810,14 +19782,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"node-domexception@npm:^1.0.0":
-  version: 1.0.0
-  resolution: "node-domexception@npm:1.0.0"
-  checksum: ee1d37dd2a4eb26a8a92cd6b64dfc29caec72bff5e1ed9aba80c294f57a31ba4895a60fd48347cf17dd6e766da0ae87d75657dfd1f384ebfa60462c2283f5c7f
-  languageName: node
-  linkType: hard
-
-"node-fetch@npm:^2.2.0, node-fetch@npm:^2.6.0, node-fetch@npm:^2.6.1, node-fetch@npm:^2.6.12, node-fetch@npm:^2.6.7, node-fetch@npm:^2.6.9":
+"node-fetch@npm:2, node-fetch@npm:^2.2.0, node-fetch@npm:^2.6.0, node-fetch@npm:^2.6.1, node-fetch@npm:^2.6.12, node-fetch@npm:^2.6.7, node-fetch@npm:^2.6.9":
   version: 2.7.0
   resolution: "node-fetch@npm:2.7.0"
   dependencies:
@@ -19828,17 +19793,6 @@ __metadata:
     encoding:
       optional: true
   checksum: d76d2f5edb451a3f05b15115ec89fc6be39de37c6089f1b6368df03b91e1633fd379a7e01b7ab05089a25034b2023d959b47e59759cb38d88341b2459e89d6e5
-  languageName: node
-  linkType: hard
-
-"node-fetch@npm:^3":
-  version: 3.3.2
-  resolution: "node-fetch@npm:3.3.2"
-  dependencies:
-    data-uri-to-buffer: ^4.0.0
-    fetch-blob: ^3.1.4
-    formdata-polyfill: ^4.0.10
-  checksum: 06a04095a2ddf05b0830a0d5302699704d59bda3102894ea64c7b9d4c865ecdff2d90fd042df7f5bc40337266961cb6183dcc808ea4f3000d024f422b462da92
   languageName: node
   linkType: hard
 
@@ -24676,6 +24630,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"typescript@npm:^5.5.4":
+  version: 5.5.4
+  resolution: "typescript@npm:5.5.4"
+  bin:
+    tsc: bin/tsc
+    tsserver: bin/tsserver
+  checksum: b309040f3a1cd91c68a5a58af6b9fdd4e849b8c42d837b2c2e73f9a4f96a98c4f1ed398a9aab576ee0a4748f5690cf594e6b99dbe61de7839da748c41e6d6ca8
+  languageName: node
+  linkType: hard
+
 "typescript@patch:typescript@5#~builtin<compat/typescript>":
   version: 5.3.3
   resolution: "typescript@patch:typescript@npm%3A5.3.3#~builtin<compat/typescript>::version=5.3.3&hash=e012d7"
@@ -24693,6 +24657,16 @@ __metadata:
     tsc: bin/tsc
     tsserver: bin/tsserver
   checksum: 6853be4607706cc1ad2f16047cf1cd72d39f79acd5f9716e1d23bc0e462c7f59be7458fe58a21665e7657a05433d7ab8419d093a5a4bd5f3a33f879b35d2769b
+  languageName: node
+  linkType: hard
+
+"typescript@patch:typescript@^5.5.4#~builtin<compat/typescript>":
+  version: 5.5.4
+  resolution: "typescript@patch:typescript@npm%3A5.5.4#~builtin<compat/typescript>::version=5.5.4&hash=b45daf"
+  bin:
+    tsc: bin/tsc
+    tsserver: bin/tsserver
+  checksum: fc52962f31a5bcb716d4213bef516885e4f01f30cea797a831205fc9ef12b405a40561c40eae3127ab85ba1548e7df49df2bcdee6b84a94bfbe3a0d7eff16b14
   languageName: node
   linkType: hard
 
@@ -25250,7 +25224,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"web-streams-polyfill@npm:^3.0.3, web-streams-polyfill@npm:^3.2.1":
+"web-streams-polyfill@npm:^3.2.1":
   version: 3.3.2
   resolution: "web-streams-polyfill@npm:3.3.2"
   checksum: 0292f4113c1bda40d8e8ecebee39eb14cc2e2e560a65a6867980e394537a2645130e2c73f5ef6e641fd3697d2f71720ccf659aebaf69a9d5a773f653a0fdf39d

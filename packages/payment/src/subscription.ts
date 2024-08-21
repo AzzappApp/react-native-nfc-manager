@@ -1,6 +1,8 @@
-import { eq } from 'drizzle-orm';
-import { UserSubscriptionTable, db, getSubscriptionById } from '@azzapp/data';
-import { createId } from '@azzapp/data/helpers/createId';
+import {
+  getSubscriptionById,
+  updateSubscription,
+  createId,
+} from '@azzapp/data';
 import {
   dateDiffInMinutes,
   dateDiffInMonths,
@@ -15,7 +17,6 @@ import {
 } from '#helpers';
 import type { Customer } from '#types';
 import type { UserSubscription } from '@azzapp/data';
-import type { DbTransaction } from '@azzapp/data/db';
 
 export const updateSubscriptionForWebCard = async ({
   subscriptionId,
@@ -49,18 +50,15 @@ export const updateSubscriptionForWebCard = async ({
   });
 };
 
-export const updateExistingSubscription = async (
-  {
-    userSubscription: existingSubscription,
-    totalSeats,
-    paymentMeanId,
-  }: {
-    userSubscription: UserSubscription;
-    totalSeats?: number | null;
-    paymentMeanId?: string | null;
-  },
-  trx: DbTransaction = db,
-) => {
+export const updateExistingSubscription = async ({
+  userSubscription: existingSubscription,
+  totalSeats,
+  paymentMeanId,
+}: {
+  userSubscription: UserSubscription;
+  totalSeats?: number | null;
+  paymentMeanId?: string | null;
+}) => {
   if (
     existingSubscription.subscriptionPlan !== 'web.monthly' &&
     existingSubscription.subscriptionPlan !== 'web.yearly'
@@ -195,19 +193,16 @@ export const updateExistingSubscription = async (
 
       const newRebillManagerId = rebillManager.data.rebillManagerId;
 
-      await trx
-        .update(UserSubscriptionTable)
-        .set({
-          totalSeats: totalSeats ?? existingSubscription.totalSeats,
-          rebillManagerId: newRebillManagerId,
-          subscriptionId,
-          canceledAt: null,
-          status: 'active',
-          paymentMeanId: newPaymentMean,
-          amount,
-          taxes,
-        })
-        .where(eq(UserSubscriptionTable.id, existingSubscription.id));
+      await updateSubscription(existingSubscription.id, {
+        totalSeats: totalSeats ?? existingSubscription.totalSeats,
+        rebillManagerId: newRebillManagerId,
+        subscriptionId,
+        canceledAt: null,
+        status: 'active',
+        paymentMeanId: newPaymentMean,
+        amount,
+        taxes,
+      });
     } else {
       throw new Error('No payment mean found');
     }
@@ -329,18 +324,15 @@ export const updateExistingSubscription = async (
 
     const newRebillManagerId = rebillManager.data.rebillManagerId;
 
-    await trx
-      .update(UserSubscriptionTable)
-      .set({
-        totalSeats: totalSeats ?? existingSubscription.totalSeats,
-        amount,
-        taxes,
-        rebillManagerId: newRebillManagerId,
-        subscriptionId,
-        canceledAt: null,
-        status: 'active',
-      })
-      .where(eq(UserSubscriptionTable.id, existingSubscription.id));
+    await updateSubscription(existingSubscription.id, {
+      totalSeats: totalSeats ?? existingSubscription.totalSeats,
+      amount,
+      taxes,
+      rebillManagerId: newRebillManagerId,
+      subscriptionId,
+      canceledAt: null,
+      status: 'active',
+    });
   }
 
   return (await getSubscriptionById(existingSubscription.id))!;
@@ -424,18 +416,15 @@ export const upgradePlan = async (
       );
     }
 
-    await db
-      .update(UserSubscriptionTable)
-      .set({
-        canceledAt: null,
-        status: 'active',
-        subscriptionPlan: 'web.yearly',
-        rebillManagerId: rebillManager.data.rebillManagerId,
-        amount,
-        taxes,
-        subscriptionId,
-      })
-      .where(eq(UserSubscriptionTable.id, existingSubscription.id));
+    await updateSubscription(existingSubscription.id, {
+      canceledAt: null,
+      status: 'active',
+      subscriptionPlan: 'web.yearly',
+      rebillManagerId: rebillManager.data.rebillManagerId,
+      amount,
+      taxes,
+      subscriptionId,
+    });
     return (await getSubscriptionById(existingSubscription.id))!;
   } else {
     throw new Error('Cannot upgrade plan for yearly subscription');
@@ -506,14 +495,10 @@ export const endSubscription = async (
       }
     }
 
-    await db
-      .update(UserSubscriptionTable)
-      .set({
-        canceledAt: new Date(),
-        status: 'canceled',
-      })
-      .where(eq(UserSubscriptionTable.id, existingSubscription.id));
-
+    await updateSubscription(existingSubscription.id, {
+      canceledAt: new Date(),
+      status: 'canceled',
+    });
     return (await getSubscriptionById(existingSubscription.id))!;
   }
 };
@@ -545,11 +530,7 @@ export const updateCustomer = async (
     subscriberVatNumber: customer.vatNumber ?? null,
   };
 
-  await db
-    .update(UserSubscriptionTable)
-    .set(updates)
-    .where(eq(UserSubscriptionTable.id, subscriptionId));
-
+  await updateSubscription(subscriptionId, updates);
   return {
     ...subscription,
     ...updates,

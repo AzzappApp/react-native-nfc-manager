@@ -54,7 +54,7 @@ const config = {
     // ],
     // ],
   },
-  transpilePackages: ['@azzapp/shared/', '@azzapp/data'],
+  transpilePackages: ['@azzapp/shared', '@azzapp/data'],
 };
 
 module.exports = withAxiom(

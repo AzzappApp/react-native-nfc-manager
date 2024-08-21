@@ -9,9 +9,9 @@ import {
   getPostById,
   getWebCardById,
   getWebCardsPostsWithMedias,
-  getPostLikesWebcard,
   getMediasByIds,
-  getPostLikesWebcardCount,
+  getPostLikesWebCard,
+  getPostLikesWebCardCount,
 } from '@azzapp/data';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
 
@@ -69,6 +69,9 @@ export const loadWebCardStats = async (webCardId: string) => {
   // @TODO: make this function dynamic with a better mechanism than headers
   headers();
   const webCard = await getWebCardById(webCardId);
+  if (!webCard) {
+    return null;
+  }
   return {
     nbFollowers: webCard.nbFollowers,
     nbFollowings: webCard.nbFollowings,
@@ -82,11 +85,11 @@ export const loadMoreLikesWebcards = async (
   offset = 0,
 ) => {
   const [webcards, count] = await Promise.all([
-    getPostLikesWebcard(postId, {
+    getPostLikesWebCard(postId, {
       limit,
       offset,
     }),
-    getPostLikesWebcardCount(postId),
+    getPostLikesWebCardCount(postId),
   ]);
 
   const medias = await getMediasByIds(

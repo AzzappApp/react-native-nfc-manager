@@ -1,7 +1,10 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
-import { and, eq, lt } from 'drizzle-orm';
 import { GraphQLError } from 'graphql';
-import { db, updateWebCard, RedirectWebCardTable } from '@azzapp/data';
+import {
+  updateWebCard,
+  transaction,
+  createRedirectWebCard,
+} from '@azzapp/data';
 import ERRORS from '@azzapp/shared/errors';
 import { isValidUserName } from '@azzapp/shared/stringHelpers';
 import fromGlobalIdWithType from '#helpers/relayIdHelpers';
@@ -65,38 +68,34 @@ const updateWebCardUserNameMutation: MutationResolvers['updateWebCardUserName'] 
     );
 
     try {
-      await db.transaction(async trx => {
-        await updateWebCard(
-          webCard.id,
-          { userName, lastUserNameUpdate: now },
-          trx,
-        );
+      await transaction(async () => {
+        await updateWebCard(webCard.id, { userName, lastUserNameUpdate: now });
         if (webCard.alreadyPublished) {
-          await trx.insert(RedirectWebCardTable).values({
+          await createRedirectWebCard({
             fromUserName: webCard.userName,
             toUserName: userName,
             expiresAt,
           });
-          //remove or udpate prevous redirection. As the specification are not fully detailled
-          // and we can have different option for premium or not,  try to handle different case
-          // existing profile with expiresAt date not expired
-          const currentDate = new Date();
-          //create a redirection only if it was published
 
-          await trx
-            .delete(RedirectWebCardTable)
-            .where(
-              and(
-                eq(RedirectWebCardTable.toUserName, userName),
-                lt(RedirectWebCardTable.expiresAt, currentDate),
-              ),
-            );
+          // TODO I feels this was a mistake, let's see later
+          // // remove or udpate prevous redirection. As the specification are not fully detailled
+          // // and we can have different option for premium or not,  try to handle different case
+          // // existing profile with expiresAt date not expired
+          // const currentDate = new Date();
+          // await trx
+          //   .delete(RedirectWebCardTable)
+          //   .where(
+          //     and(
+          //       eq(RedirectWebCardTable.toUserName, userName),
+          //       lt(RedirectWebCardTable.expiresAt, currentDate),
+          //     ),
+          //   );
 
-          // existing profile with expiresAt date expired
-          await trx
-            .update(RedirectWebCardTable)
-            .set({ toUserName: userName })
-            .where(eq(RedirectWebCardTable.toUserName, webCard.userName));
+          // // existing profile with expiresAt date expired
+          // await trx
+          //   .update(RedirectWebCardTable)
+          //   .set({ toUserName: userName })
+          //   .where(eq(RedirectWebCardTable.toUserName, webCard.userName));
         }
       });
     } catch (error) {

@@ -2,8 +2,7 @@ import { SignJWT } from 'jose';
 
 import { NextResponse } from 'next/server';
 import { withAxiom } from 'next-axiom';
-import { getProfileById, getWebCardById } from '@azzapp/data';
-import { createId } from '@azzapp/data/helpers/createId';
+import { getProfileById, getWebCardById, createId } from '@azzapp/data';
 import { parseContactCard } from '@azzapp/shared/contactCardHelpers';
 import { verifyHmacWithPassword } from '@azzapp/shared/crypto';
 import ERRORS from '@azzapp/shared/errors';

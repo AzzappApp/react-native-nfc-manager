@@ -1,5 +1,9 @@
 import { GraphQLError } from 'graphql';
-import { db, updateProfiles, updateWebCard } from '@azzapp/data';
+import {
+  updateWebCardProfiles,
+  updateWebCard,
+  transaction,
+} from '@azzapp/data';
 import ERRORS from '@azzapp/shared/errors';
 import fromGlobalIdWithType from '#helpers/relayIdHelpers';
 import type { MutationResolvers } from '#/__generated__/types';
@@ -17,13 +21,12 @@ const saveCardColors: MutationResolvers['saveCardColors'] = async (
     lastCardUpdate: new Date(),
   };
   try {
-    await db.transaction(async trx => {
-      await updateWebCard(webCardId, updates, trx);
-      await updateProfiles(
+    await transaction(async () => {
+      await updateWebCard(webCardId, updates);
+      await updateWebCardProfiles(
         webCardId,
         { lastContactCardUpdate: new Date() },
         undefined,
-        trx,
       );
     });
   } catch (e) {

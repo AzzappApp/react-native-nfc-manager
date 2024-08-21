@@ -1,1 +1,0 @@
-export const DEFAULT_VARCHAR_LENGTH = 191;

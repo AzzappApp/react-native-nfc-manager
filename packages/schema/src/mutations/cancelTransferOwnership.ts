@@ -1,24 +1,24 @@
-import { eq } from 'drizzle-orm';
-import { ProfileTable, db, getWebCardPendingOwnerProfile } from '@azzapp/data';
+import { GraphQLError } from 'graphql';
+import { getWebCardPendingOwnerProfile, updateProfile } from '@azzapp/data';
+import ERRORS from '@azzapp/shared/errors';
 import fromGlobalIdWithType from '#helpers/relayIdHelpers';
 import type { MutationResolvers } from '#/__generated__/types';
 
 const cancelTransferOwnership: MutationResolvers['cancelTransferOwnership'] =
-  async (_, { webCardId: gqlWebCardId }) => {
+  async (_, { webCardId: gqlWebCardId }, { loaders }) => {
     const webCardId = fromGlobalIdWithType(gqlWebCardId, 'WebCard');
 
-    const [targetProfile] = await getWebCardPendingOwnerProfile(webCardId);
+    const targetProfile = await getWebCardPendingOwnerProfile(webCardId);
 
-    await db
-      .update(ProfileTable)
-      .set({ promotedAsOwner: false })
-      .where(eq(ProfileTable.id, targetProfile.id));
+    if (!targetProfile) {
+      throw new GraphQLError(ERRORS.INVALID_REQUEST);
+    }
+    await updateProfile(targetProfile.id, { promotedAsOwner: false });
+    const updatedProfile = { ...targetProfile, promotedAsOwner: false };
+    loaders.Profile.prime(targetProfile.id, updatedProfile);
 
     return {
-      profile: {
-        ...targetProfile,
-        promotedAsOwner: false,
-      },
+      profile: updatedProfile,
     };
   };
 

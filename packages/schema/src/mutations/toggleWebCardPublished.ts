@@ -2,7 +2,7 @@ import { GraphQLError } from 'graphql';
 import { getWebCardPosts, updateWebCard } from '@azzapp/data';
 import ERRORS from '@azzapp/shared/errors';
 import fromGlobalIdWithType from '#helpers/relayIdHelpers';
-import { checkWebCardHasSubscription } from '#use-cases/subscription';
+import { checkWebCardHasSubscription } from '#helpers/subscriptionHelpers';
 import type { MutationResolvers } from '#/__generated__/types';
 
 const toggleWebCardPublished: MutationResolvers['toggleWebCardPublished'] =

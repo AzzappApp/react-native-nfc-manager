@@ -1,4 +1,7 @@
-import { activeUserSubscription, getProfilesOfUser } from '@azzapp/data';
+import {
+  activeUserSubscription,
+  getUserProfilesWithWebCard,
+} from '@azzapp/data';
 import type { UserResolvers } from './__generated__/types';
 export const User: UserResolvers = {
   profiles: async (user, _args, { auth, loaders }) => {
@@ -6,23 +9,22 @@ export const User: UserResolvers = {
       return null;
     }
 
-    const result = await getProfilesOfUser(auth.userId);
+    const result = await getUserProfilesWithWebCard(auth.userId);
 
-    result.forEach(({ Profile, WebCard }) => {
+    result.forEach(({ profile, webCard }) => {
       loaders.profileByWebCardIdAndUserId.prime(
-        { userId: auth.userId!, webCardId: Profile.webCardId },
-        Profile,
+        { userId: auth.userId!, webCardId: profile.webCardId },
+        profile,
       );
-      loaders.Profile.prime(Profile.id, Profile);
+      loaders.Profile.prime(profile.id, profile);
 
-      if (Profile.profileRole === 'owner') {
-        loaders.webCardOwners.prime(Profile.webCardId, user);
+      if (profile.profileRole === 'owner') {
+        loaders.webCardOwners.prime(profile.webCardId, user);
       }
-
-      loaders.WebCard.prime(WebCard.id, WebCard);
+      loaders.WebCard.prime(webCard.id, webCard);
     });
 
-    return result.map(({ Profile }) => Profile);
+    return result.map(({ profile }) => profile);
   },
   userSubscription: async (user, _args, { auth, loaders }) => {
     if (!auth.userId || auth.userId !== user.id) {

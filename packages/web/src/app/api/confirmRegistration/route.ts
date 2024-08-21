@@ -2,10 +2,10 @@ import * as Sentry from '@sentry/nextjs';
 import { NextResponse } from 'next/server';
 import { withAxiom } from 'next-axiom';
 import {
-  getProfilesOfUser,
   getUserByEmail,
   getUserByPhoneNumber,
   updateUser,
+  getProfilesByUser,
 } from '@azzapp/data';
 import ERRORS from '@azzapp/shared/errors';
 import { isValidEmail } from '@azzapp/shared/stringHelpers';
@@ -55,8 +55,8 @@ export const POST = withAxiom(async (req: Request) => {
       await updateUser(user.id, update);
 
       // if we found a user by email or phonenumber, we look for the profile
-      const profiles = await getProfilesOfUser(user.id, 1);
-      const profile = profiles[0]?.Profile;
+      const profiles = await getProfilesByUser(user.id);
+      const profile = profiles[0];
 
       return handleSignInAuthMethod({ ...user, ...update }, profile);
     }

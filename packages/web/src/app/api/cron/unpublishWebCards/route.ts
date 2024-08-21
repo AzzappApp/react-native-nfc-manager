@@ -1,9 +1,9 @@
 import * as Sentry from '@sentry/nextjs';
 import { waitUntil } from '@vercel/functions';
 import {
-  db,
   getExpiredSubscription,
-  UserSubscriptionTable,
+  transaction,
+  updateSubscription,
 } from '@azzapp/data';
 import { unpublishWebCardForUser } from '#helpers/subscription';
 import type { NextRequest } from 'next/server';
@@ -28,14 +28,13 @@ const unpublishedWebCards = async () => {
 
   const result = await Promise.allSettled(
     expiredSubscriptions.map(async expiredSubscriptions => {
-      await db.transaction(async trx => {
+      await transaction(async () => {
         await unpublishWebCardForUser(
           expiredSubscriptions.userId,
           expiredSubscriptions,
-          trx,
         );
 
-        await trx.update(UserSubscriptionTable).set({
+        await updateSubscription(expiredSubscriptions.userId, {
           invalidatedAt: new Date(),
         });
       });

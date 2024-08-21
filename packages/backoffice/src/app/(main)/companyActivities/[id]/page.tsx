@@ -1,10 +1,9 @@
 import { notFound } from 'next/navigation';
 import {
-  db,
-  CardTemplateTypeTable,
   getCompanyActivityById,
-  CompanyActivityTypeTable,
   getLocalizationMessagesByLocaleAndTarget,
+  getCardTemplateTypes,
+  getCompanyActivityTypes,
 } from '@azzapp/data';
 import { DEFAULT_LOCALE, ENTITY_TARGET } from '@azzapp/i18n';
 import CompanyActivityForm from '../CompanyActivityForm';
@@ -17,16 +16,20 @@ type CardTemplatePageProps = {
 const CardTemplatePage = async (props: CardTemplatePageProps) => {
   const { params } = props;
 
-  const template = await getCompanyActivityById(params.id);
-  const cardTemplateTypes = await db.select().from(CardTemplateTypeTable);
-
-  const companyActivitiesTypes = await db
-    .select()
-    .from(CompanyActivityTypeTable);
+  const [template, allCardTemplateTypes, companyActivitiesTypes] =
+    await Promise.all([
+      getCompanyActivityById(params.id),
+      getCardTemplateTypes(false),
+      getCompanyActivityTypes(),
+    ]);
 
   if (!template) {
     return notFound();
   }
+
+  const cardTemplateTypes = allCardTemplateTypes.filter(
+    type => type.enabled || type.id === template.cardTemplateTypeId,
+  );
 
   const labels = await getLocalizationMessagesByLocaleAndTarget(
     DEFAULT_LOCALE,

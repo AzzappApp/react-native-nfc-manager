@@ -5,7 +5,7 @@ import ERRORS from '@azzapp/shared/errors';
 import fromGlobalIdWithType from '#helpers/relayIdHelpers';
 import type { MutationResolvers } from '#/__generated__/types';
 import type { GraphQLContext } from '#/GraphQLContext';
-import type { NewPost } from '@azzapp/data';
+import type { Post } from '@azzapp/data';
 
 const updatePostMutation: MutationResolvers['updatePost'] = async (
   _,
@@ -26,11 +26,11 @@ const updatePostMutation: MutationResolvers['updatePost'] = async (
     throw new GraphQLError(ERRORS.UNAUTHORIZED);
   }
 
-  const partialPost: Partial<NewPost> = {
+  const partialPost = {
     content: content ?? post.content,
     allowComments: allowComments ?? post.allowComments,
     allowLikes: allowLikes ?? post.allowLikes,
-  };
+  } satisfies Partial<Post>;
 
   try {
     await updatePost(post.id, partialPost);

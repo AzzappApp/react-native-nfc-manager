@@ -3,11 +3,11 @@ import { GraphQLError } from 'graphql';
 import { fromGlobalId } from 'graphql-relay';
 import {
   createWebCard,
-  db,
   getCompanyActivitiesByWebCardCategory,
   buildDefaultContactCard,
   createProfile,
   getWebCardByUserNameWithRedirection,
+  transaction,
 } from '@azzapp/data';
 import ERRORS from '@azzapp/shared/errors';
 import { isValidUserName } from '@azzapp/shared/stringHelpers';
@@ -89,17 +89,14 @@ const createWebCardMutation: MutationResolvers['createWebCard'] = async (
   try {
     let profileId: string | null = null;
 
-    await db.transaction(async trx => {
-      const webCardId = await createWebCard({ ...inputWebCard }, trx);
-      profileId = await createProfile(
-        {
-          webCardId,
-          userId,
-          contactCard,
-          lastContactCardUpdate: new Date(),
-        },
-        trx,
-      );
+    await transaction(async () => {
+      const webCardId = await createWebCard(inputWebCard);
+      profileId = await createProfile({
+        webCardId,
+        userId,
+        contactCard,
+        lastContactCardUpdate: new Date(),
+      });
     });
 
     if (!profileId) {

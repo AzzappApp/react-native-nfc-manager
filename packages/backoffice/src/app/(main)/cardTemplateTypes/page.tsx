@@ -1,11 +1,7 @@
 import { Box, TextField, Typography } from '@mui/material';
-import { and, asc, desc, eq, like, or, sql } from 'drizzle-orm';
-import { alias } from 'drizzle-orm/mysql-core';
 import {
-  CardTemplateTable,
-  CardTemplateTypeTable,
-  LocalizationMessageTable,
-  db,
+  getCardTemplateTypesWithTemplatesCount,
+  getLocalizationMessagesByLocaleAndTarget,
 } from '@azzapp/data';
 import { DEFAULT_LOCALE, ENTITY_TARGET } from '@azzapp/i18n';
 import CardTemplateTypesList from './CardTemplateTypesList';
@@ -15,155 +11,28 @@ export type CardTemplateTypeItem = {
   label: string | null;
   category: string;
   status: boolean;
-  templates: number;
+  templatesCount: number;
 };
 
-export type Status = 'Disabled' | 'Enabled';
+const CardTemplateTypesPage = async () => {
+  const [cardTemplateTypes, labels] = await Promise.all([
+    getCardTemplateTypesWithTemplatesCount(),
+    getLocalizationMessagesByLocaleAndTarget(DEFAULT_LOCALE, ENTITY_TARGET),
+  ]);
 
-export type Filters = {
-  status?: Status | 'All';
-};
-
-const WebCardCategoryLocalizationMessage = alias(
-  LocalizationMessageTable,
-  'WebCardCategoryLocalizationMessage',
-);
-
-const getSearch = (search: string | null) => {
-  if (search) {
-    return or(
-      like(LocalizationMessageTable.value, `%${search}%`),
-      like(WebCardCategoryLocalizationMessage.value, `%${search}%`),
-    );
-  }
-  return undefined;
-};
-
-const getFilters = (filters: Filters) => {
-  const f = [];
-  if (filters.status && filters.status !== 'All') {
-    f.push(eq(CardTemplateTypeTable.enabled, filters.status === 'Enabled'));
-  }
-
-  return f;
-};
-
-export type SortColumn = 'category' | 'label';
-
-const sortsColumns = {
-  label: LocalizationMessageTable.value,
-  category: sql`category`,
-  status: CardTemplateTypeTable.enabled,
-  templates: sql`templates`,
-};
-
-const getQuery = (search: string | null, filters: Filters) => {
-  const query = db
-    .select({
-      id: CardTemplateTypeTable.id,
-      label: LocalizationMessageTable.value,
-      category: sql`${WebCardCategoryLocalizationMessage.value}`
-        .mapWith(String)
-        .as('category'),
-      status: CardTemplateTypeTable.enabled,
-      templates: sql`count(*)`.mapWith(Number).as('templates'),
-    })
-    .from(CardTemplateTypeTable)
-    .leftJoin(
-      LocalizationMessageTable,
-      and(
-        eq(CardTemplateTypeTable.id, LocalizationMessageTable.key),
-        eq(LocalizationMessageTable.target, ENTITY_TARGET),
-        eq(LocalizationMessageTable.locale, DEFAULT_LOCALE),
-      ),
-    )
-    .leftJoin(
-      WebCardCategoryLocalizationMessage,
-      and(
-        eq(
-          CardTemplateTypeTable.webCardCategoryId,
-          WebCardCategoryLocalizationMessage.key,
-        ),
-        eq(WebCardCategoryLocalizationMessage.target, ENTITY_TARGET),
-        eq(WebCardCategoryLocalizationMessage.locale, DEFAULT_LOCALE),
-      ),
-    )
-    .leftJoin(
-      CardTemplateTable,
-      eq(CardTemplateTable.cardTemplateTypeId, CardTemplateTypeTable.id),
-    )
-    .groupBy(
-      CardTemplateTypeTable.id,
-      LocalizationMessageTable.value,
-      WebCardCategoryLocalizationMessage.value,
-      CardTemplateTypeTable.enabled,
-    )
-    .where(and(getSearch(search), ...getFilters(filters)))
-    .$dynamic();
-
-  return query;
-};
-
-const getCardTemplateTypes = (
-  page: number,
-  sort: SortColumn,
-  order: 'asc' | 'desc',
-  search: string | null,
-  filters: Filters,
-) => {
-  const query = getQuery(search, filters);
-
-  query
-    .offset(page * PAGE_SIZE)
-    .limit(PAGE_SIZE)
-    .orderBy(
-      order === 'asc' ? asc(sortsColumns[sort]) : desc(sortsColumns[sort]),
-    );
-
-  return query;
-};
-
-const getCount = async (search: string | null, filters: Filters) => {
-  const subQuery = getQuery(search, filters);
-  const query = db
-    .select({ count: sql`count(*)`.mapWith(Number) })
-    .from(subQuery.as('subQuery'));
-
-  return query.then(rows => rows[0].count);
-};
-
-type Props = {
-  searchParams?: {
-    page?: string;
-    sort?: string;
-    order?: string;
-    s?: string;
-    status?: string;
-  };
-};
-
-const CardTemplateTypesPage = async ({ searchParams = {} }: Props) => {
-  let page = searchParams.page ? parseInt(searchParams.page, 10) : 1;
-  page = Math.max(isNaN(page) ? 1 : page, 1);
-
-  const sort = Object.keys(sortsColumns).includes(searchParams.sort as any)
-    ? (searchParams.sort as any)
-    : 'label';
-
-  const order = searchParams.order === 'desc' ? 'desc' : 'asc';
-  const search = searchParams.s ?? null;
-  const filters: Filters = {
-    status: (searchParams.status as Status) || 'All',
-  };
-
-  const cardTemplateTypes = await getCardTemplateTypes(
-    page - 1,
-    sort,
-    order,
-    search,
-    filters,
+  const labelsMap = new Map(labels.map(({ key, value }) => [key, value]));
+  const items = cardTemplateTypes.map(
+    ({ cardTemplateType, templatesCount }) => ({
+      id: cardTemplateType.id,
+      label: labelsMap.get(cardTemplateType.id) || null,
+      category:
+        labelsMap.get(cardTemplateType.webCardCategoryId) ??
+        cardTemplateType.webCardCategoryId,
+      status: cardTemplateType.enabled,
+      templatesCount,
+    }),
   );
-  const count = await getCount(search, filters);
+
   return (
     <Box
       sx={{
@@ -188,20 +57,9 @@ const CardTemplateTypesPage = async ({ searchParams = {} }: Props) => {
           'WebCard templates types are the lowest level in the template list view'
         }
       />
-      <CardTemplateTypesList
-        cardTemplateTypes={cardTemplateTypes}
-        count={count}
-        page={page}
-        pageSize={PAGE_SIZE}
-        sortField={sort}
-        sortOrder={order}
-        search={search}
-        filters={filters}
-      />
+      <CardTemplateTypesList cardTemplateTypes={items} />
     </Box>
   );
 };
 
 export default CardTemplateTypesPage;
-
-const PAGE_SIZE = 25;

@@ -1,5 +1,5 @@
 import Image from 'next/image';
-import { getMediasByIds, getProfileByUserName } from '@azzapp/data';
+import { getMediasByIds, getOwnerProfileByUserName } from '@azzapp/data';
 import azzappFull from '#assets/images/azzapp-full.png';
 import dlAndroid from '#assets/images/download_android.png';
 import dlIos from '#assets/images/download_ios.png';
@@ -25,7 +25,7 @@ const EmailSignature = async ({ params }: EmailSignatureProps) => {
     ? getMediasByIds([webCard.coverMediaId]).then(([media]) => media)
     : null);
 
-  const profile = await getProfileByUserName(userName);
+  const profile = await getOwnerProfileByUserName(userName);
 
   if (!profile) {
     return notFound();

@@ -1,11 +1,10 @@
-import { sql, and, gt, eq, notInArray } from 'drizzle-orm';
 import { GraphQLError } from 'graphql';
 import omit from 'lodash/omit';
 import {
-  db,
-  getCardModulesSortedByPosition,
   createCardModules,
-  CardModuleTable,
+  getCardModulesByIds,
+  transaction,
+  updateCardModulesPosition,
 } from '@azzapp/data';
 import ERRORS from '@azzapp/shared/errors';
 import fromGlobalIdWithType from '#helpers/relayIdHelpers';
@@ -16,7 +15,9 @@ const duplicateModule: MutationResolvers['duplicateModule'] = async (
   { webCardId: gqlWebCardId, input: { modulesIds } },
   { cardUsernamesToRevalidate, loaders },
 ) => {
-  const modules = await getCardModulesSortedByPosition(modulesIds);
+  const modules = (await getCardModulesByIds(modulesIds))
+    .filter(module => module != null)
+    .sort((a, b) => a.position - b.position);
   if (modulesIds.length === 0) {
     throw new GraphQLError(ERRORS.INVALID_REQUEST);
   }
@@ -30,29 +31,18 @@ const duplicateModule: MutationResolvers['duplicateModule'] = async (
 
   let createdModuleIds: string[] = [];
   try {
-    await db.transaction(async trx => {
+    await transaction(async () => {
       createdModuleIds = await createCardModules(
-        modules.map(
-          (module, index) => ({
-            ...omit(module, 'id'),
-            position: modules[modules.length - 1].position + index + 1,
-          }),
-          trx,
-        ),
+        modules.map((module, index) => ({
+          ...omit(module, 'id'),
+          position: modules[modules.length - 1].position + index + 1,
+        })),
       );
 
-      await trx
-        .update(CardModuleTable)
-        .set({
-          position: sql`${CardModuleTable.position} + ${modules.length}`,
-        })
-        .where(
-          and(
-            gt(CardModuleTable.position, modules[modules.length - 1].position),
-            eq(CardModuleTable.webCardId, webCardId),
-            notInArray(CardModuleTable.id, createdModuleIds),
-          ),
-        );
+      await updateCardModulesPosition(
+        modules.map(module => module.id),
+        modules.length,
+      );
     });
   } catch (e) {
     console.error(e);

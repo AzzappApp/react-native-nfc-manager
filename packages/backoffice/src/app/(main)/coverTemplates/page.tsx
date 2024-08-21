@@ -1,10 +1,6 @@
-import { asc, like, or, sql, and, desc, eq } from 'drizzle-orm';
-import { CoverTemplateTable, LocalizationMessageTable, db } from '@azzapp/data';
-import { DEFAULT_LOCALE, ENTITY_TARGET } from '@azzapp/i18n';
+import { getCoverTemplatesWithTypeLabel } from '@azzapp/data';
 import CoverTemplatesList from './CoverTemplatesList';
-import type { SQL } from 'drizzle-orm';
 
-export type Status = 'Disabled' | 'Enabled';
 export type CoverTemplateItem = {
   id: string;
   name: string;
@@ -13,89 +9,10 @@ export type CoverTemplateItem = {
   status: boolean;
 };
 
-export type Filters = {
-  status?: Status | 'All';
-};
-
-const getFilters = (filters: Filters) => {
-  const f: Array<SQL<unknown>> = [];
-
-  if (filters.status && filters.status !== 'All') {
-    f.push(eq(CoverTemplateTable.enabled, filters.status === 'Enabled'));
-  }
-
-  return f;
-};
-
-const getSearch = (search: string | null) => {
-  if (search) {
-    return or(
-      like(CoverTemplateTable.name, `%${search}%`),
-      like(LocalizationMessageTable.value, `%${search}%`),
-    );
-  }
-};
-
 export type SortColumn = 'name' | 'type';
+export type StatusFilter = 'All' | 'Disabled' | 'Enabled';
 
-const sortsColumns = {
-  name: CoverTemplateTable.name,
-  type: LocalizationMessageTable.value,
-};
-
-const getQuery = (search: string | null, filters: Filters) => {
-  const query = db
-    .select({
-      id: CoverTemplateTable.id,
-      name: CoverTemplateTable.name,
-      type: LocalizationMessageTable.value,
-      mediaCount: CoverTemplateTable.mediaCount,
-      status: CoverTemplateTable.enabled,
-    })
-    .from(CoverTemplateTable)
-    .innerJoin(
-      LocalizationMessageTable,
-      and(
-        eq(CoverTemplateTable.typeId, LocalizationMessageTable.key),
-        eq(LocalizationMessageTable.target, ENTITY_TARGET),
-        eq(LocalizationMessageTable.locale, DEFAULT_LOCALE),
-      ),
-    )
-    .where(and(getSearch(search), ...getFilters(filters)))
-    .$dynamic();
-
-  return query;
-};
-
-const getCoverTemplates = (
-  page: number,
-  sort: SortColumn,
-  order: 'asc' | 'desc',
-  search: string | null,
-  filters: Filters,
-) => {
-  const query = getQuery(search, filters);
-
-  query
-    .offset(page * PAGE_SIZE)
-    .limit(PAGE_SIZE)
-    .orderBy(
-      order === 'asc' ? asc(sortsColumns[sort]) : desc(sortsColumns[sort]),
-    );
-
-  return query;
-};
-
-const getCount = async (search: string | null, filters: Filters) => {
-  const subQuery = getQuery(search, filters);
-  const query = db
-    .select({ count: sql`count(*)`.mapWith(Number) })
-    .from(subQuery.as('subQuery'));
-
-  return query.then(rows => rows[0].count);
-};
-
-type Props = {
+type CoverTemplatesPageProps = {
   searchParams?: {
     page?: string;
     sort?: string;
@@ -105,38 +22,48 @@ type Props = {
   };
 };
 
-const CoverTemplatesPage = async ({ searchParams = {} }: Props) => {
+const CoverTemplatesPage = async ({
+  searchParams = {},
+}: CoverTemplatesPageProps) => {
   let page = searchParams.page ? parseInt(searchParams.page, 10) : 1;
   page = Math.max(isNaN(page) ? 1 : page, 1);
 
-  const sort = Object.keys(sortsColumns).includes(searchParams.sort as any)
-    ? (searchParams.sort as any)
-    : 'name';
+  const sortField = searchParams.sort === 'type' ? 'type' : 'name';
 
-  const order = searchParams.order === 'desc' ? 'desc' : 'asc';
+  const sortOrder = searchParams.order === 'desc' ? 'desc' : 'asc';
   const search = searchParams.s ?? null;
-  const filters: Filters = {
-    status: (searchParams.st as Status) || 'All',
-  };
+  const statusFilter =
+    searchParams.st && ['Disabled', 'Enabled', 'All'].includes(searchParams.st)
+      ? (searchParams.st as StatusFilter)
+      : 'All';
 
-  const CoverTemplates = await getCoverTemplates(
-    page - 1,
-    sort,
-    order,
+  const { items, count } = await getCoverTemplatesWithTypeLabel({
+    offset: (page - 1) * PAGE_SIZE,
+    limit: PAGE_SIZE,
+    sortField,
+    sortOrder,
     search,
-    filters,
-  );
-  const count = await getCount(search, filters);
+    enabled: statusFilter === 'All' ? undefined : statusFilter === 'Enabled',
+  });
+
+  const coverTemplates = items.map(({ coverTemplate, typeLabel }) => ({
+    id: coverTemplate.id,
+    name: coverTemplate.name,
+    type: typeLabel,
+    mediaCount: coverTemplate.mediaCount,
+    status: coverTemplate.enabled,
+  }));
+
   return (
     <CoverTemplatesList
-      coverTemplates={CoverTemplates}
+      coverTemplates={coverTemplates}
       count={count}
       page={page}
       pageSize={PAGE_SIZE}
-      sortField={sort}
-      sortOrder={order}
+      sortField={sortField}
+      sortOrder={sortOrder}
       search={search}
-      filters={filters}
+      statusFilter={statusFilter}
     />
   );
 };

@@ -1,21 +1,20 @@
 import * as Sentry from '@sentry/nextjs';
-import { and, eq, inArray } from 'drizzle-orm';
 import { GraphQLError } from 'graphql';
 import {
-  ProfileTable,
-  UserTable,
   createProfiles,
   createUsers,
-  db,
   updateWebCard,
   createFreeSubscriptionForBetaPeriod,
+  transaction,
+  getUsersByEmail,
+  getProfilesByIds,
+  createId,
 } from '@azzapp/data';
-import { createId } from '@azzapp/data/helpers/createId';
 import { guessLocale } from '@azzapp/i18n';
 import ERRORS from '@azzapp/shared/errors';
 import { isValidEmail } from '@azzapp/shared/stringHelpers';
 import fromGlobalIdWithType from '#helpers/relayIdHelpers';
-import { checkSubscription } from '#use-cases/subscription';
+import { checkSubscription } from '#helpers/subscriptionHelpers';
 import type {
   InviteUserEmailInput,
   InviteUserRejected,
@@ -79,9 +78,9 @@ const inviteUsersListMutation: MutationResolvers['inviteUsersList'] = async (
     throw new GraphQLError(ERRORS.INVALID_REQUEST);
   }
 
-  const { users, createdProfiles } = await db.transaction(async trx => {
+  const { users, createdProfiles } = await transaction(async () => {
     if (!webCard.isMultiUser) {
-      await updateWebCard(webCard.id, { isMultiUser: true }, trx);
+      await updateWebCard(webCard.id, { isMultiUser: true });
     }
 
     let userId;
@@ -92,25 +91,13 @@ const inviteUsersListMutation: MutationResolvers['inviteUsersList'] = async (
         email: f.email,
         invited: true,
       })),
-      trx,
     );
 
-    await createFreeSubscriptionForBetaPeriod(
-      filtered.map(f => f.id),
-      trx,
-    );
+    await createFreeSubscriptionForBetaPeriod(filtered.map(f => f.id));
 
-    const users = filtered.length
-      ? await trx
-          .select()
-          .from(UserTable)
-          .where(
-            inArray(
-              UserTable.email,
-              filtered.map(f => f.email),
-            ),
-          )
-      : [];
+    const users = (await getUsersByEmail(filtered.map(f => f.email))).filter(
+      user => !!user,
+    );
 
     const profileToCreate: NewProfile[] = [];
 
@@ -153,20 +140,14 @@ const inviteUsersListMutation: MutationResolvers['inviteUsersList'] = async (
       profileToCreate.push(payload);
     }
 
+    let createdProfileIds: string[] = [];
     if (profileToCreate.length) {
-      await createProfiles(profileToCreate, trx);
+      createdProfileIds = await createProfiles(profileToCreate);
     }
 
-    const createdProfiles = await trx
-      .select()
-      .from(ProfileTable)
-      .where(
-        and(
-          eq(ProfileTable.webCardId, profile.webCardId),
-          eq(ProfileTable.createdAt, createdAt),
-        ),
-      )
-      .then(res => res);
+    const createdProfiles = (await getProfilesByIds(createdProfileIds)).filter(
+      profile => !!profile,
+    );
 
     const owner = await loaders.webCardOwners.load(profile.webCardId);
 

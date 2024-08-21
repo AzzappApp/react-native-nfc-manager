@@ -6,8 +6,7 @@
     "baseUrl": "./src",
     "outDir": "./lib",
     "paths": {
-      "#*": ["./*"],
-      "@azzapp/data/*": ["../data/src/*"]
+      "#*": ["./*"]
     }
   },
   "exclude": [

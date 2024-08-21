@@ -1,15 +1,14 @@
 import {
-  CardStyleTable,
-  CardTemplateTable,
-  CardTemplateTypeTable,
-  CompanyActivityTable,
-  CompanyActivityTypeTable,
-  CoverTemplateTagTable,
-  CoverTemplateTypeTable,
-  db,
+  getAllCardStyles,
+  getAllCardTemplates,
+  getCardTemplateTypes,
+  getCompanyActivities,
+  getCompanyActivityTypes,
+  getCoverTemplateTags,
+  getCoverTemplateTypes,
   getLocalizationMessagesByLocale,
   getLocalizationMessagesByLocaleAndTarget,
-  WebCardCategoryTable,
+  getWebCardCategories,
 } from '@azzapp/data';
 import { DEFAULT_LOCALE, ENTITY_TARGET } from '@azzapp/i18n';
 import {
@@ -53,66 +52,42 @@ const TranslationLocalePage = async ({
 
   const entityIdsWithKind = await Promise.all([
     // CardStyleTable
-    db
-      .select({ id: CardStyleTable.id })
-      .from(CardStyleTable)
-      .then(cardStyles =>
-        cardStyles.map(({ id }) => ({ id, kind: 'CardStyle' }) as const),
+    getAllCardStyles().then(cardStyles =>
+      cardStyles.map(({ id }) => ({ id, kind: 'CardStyle' }) as const),
+    ),
+    getAllCardTemplates().then(cardTemplates =>
+      cardTemplates.map(({ id }) => ({ id, kind: 'CardTemplate' }) as const),
+    ),
+    getCardTemplateTypes().then(cardTemplateTypes =>
+      cardTemplateTypes.map(
+        ({ id }) => ({ id, kind: 'CardTemplateType' }) as const,
       ),
-    db
-      .select({ id: CardTemplateTable.id })
-      .from(CardTemplateTable)
-      .then(cardTemplates =>
-        cardTemplates.map(({ id }) => ({ id, kind: 'CardTemplate' }) as const),
+    ),
+    getCompanyActivities().then(companyActivity =>
+      companyActivity.map(
+        ({ id }) => ({ id, kind: 'CompanyActivity' }) as const,
       ),
-    db
-      .select({ id: CardTemplateTypeTable.id })
-      .from(CardTemplateTypeTable)
-      .then(cardTemplateTypes =>
-        cardTemplateTypes.map(
-          ({ id }) => ({ id, kind: 'CardTemplateType' }) as const,
-        ),
+    ),
+    getCompanyActivityTypes().then(companyActivityTypes =>
+      companyActivityTypes.map(
+        ({ id }) => ({ id, kind: 'CompanyActivityType' }) as const,
       ),
-    db
-      .select({ id: CompanyActivityTable.id })
-      .from(CompanyActivityTable)
-      .then(cardTemplates =>
-        cardTemplates.map(
-          ({ id }) => ({ id, kind: 'CardTemplateTag' }) as const,
-        ),
+    ),
+    getCoverTemplateTags().then(coverTemplateTags =>
+      coverTemplateTags.map(
+        ({ id }) => ({ id, kind: 'CoverTemplateTag' }) as const,
       ),
-    db
-      .select({ id: CompanyActivityTypeTable.id })
-      .from(CompanyActivityTypeTable)
-      .then(cardTemplates =>
-        cardTemplates.map(
-          ({ id }) => ({ id, kind: 'CardTemplateTag' }) as const,
-        ),
+    ),
+    getCoverTemplateTypes().then(coverTemplateTypes =>
+      coverTemplateTypes.map(
+        ({ id }) => ({ id, kind: 'CoverTemplateType' }) as const,
       ),
-    db
-      .select({ id: CoverTemplateTagTable.id })
-      .from(CoverTemplateTagTable)
-      .then(cardTemplates =>
-        cardTemplates.map(
-          ({ id }) => ({ id, kind: 'CardTemplateTag' }) as const,
-        ),
+    ),
+    getWebCardCategories().then(cardCategories =>
+      cardCategories.map(
+        ({ id }) => ({ id, kind: 'WebCardCategory' }) as const,
       ),
-    db
-      .select({ id: CoverTemplateTypeTable.id })
-      .from(CoverTemplateTypeTable)
-      .then(cardTemplates =>
-        cardTemplates.map(
-          ({ id }) => ({ id, kind: 'CardTemplateType' }) as const,
-        ),
-      ),
-    db
-      .select({ id: WebCardCategoryTable.id })
-      .from(WebCardCategoryTable)
-      .then(cardTemplates =>
-        cardTemplates.map(
-          ({ id }) => ({ id, kind: 'WebCardCategory' }) as const,
-        ),
-      ),
+    ),
   ]);
 
   const entityMessages = entityIdsWithKind.flat().reduce(

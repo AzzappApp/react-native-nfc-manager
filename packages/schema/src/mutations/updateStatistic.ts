@@ -2,8 +2,8 @@ import { GraphQLError } from 'graphql';
 import {
   incrementWebCardViews,
   incrementContactCardScans,
-  db,
-  updateContactCardTotalScans,
+  incrementContactCardTotalScans,
+  transaction,
 } from '@azzapp/data';
 import ERRORS from '@azzapp/shared/errors';
 import fromGlobalIdWithType, {
@@ -64,9 +64,9 @@ const updateContactCardScans: MutationResolvers['updateContactCardScans'] =
 
     try {
       if (scannedProfileId !== profileId) {
-        await db.transaction(async tx => {
-          await updateContactCardTotalScans(scannedProfileId, tx);
-          await incrementContactCardScans(scannedProfileId, true, tx);
+        await transaction(async () => {
+          await incrementContactCardTotalScans(scannedProfileId);
+          await incrementContactCardScans(scannedProfileId, true);
         });
       }
 

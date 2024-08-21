@@ -1,37 +1,16 @@
 import DataLoader from 'dataloader';
-import { and, eq, inArray } from 'drizzle-orm';
 import ExpiryMap from 'expiry-map';
 import {
-  CardModuleTable,
-  CardStyleTable,
-  CardTemplateTable,
-  CardTemplateTypeTable,
-  ColorPaletteTable,
-  CompanyActivityTable,
-  CoverTemplatePreviewTable,
-  CoverTemplateTable,
-  CoverTemplateTypeTable,
-  CoverTemplateTagTable,
-  MediaTable,
-  PostCommentTable,
-  PostTable,
-  WebCardCategoryTable,
-  ProfileTable,
-  ModuleBackgroundTable,
-  UserTable,
+  getProfileByUserAndWebCard,
   getLastWebCardListStatisticsFor,
   getLastProfileListStatisticsFor,
-  getOwners,
-  db,
-  sortEntitiesByIds,
-  WebCardTable,
-  PaymentTable,
-  PaymentMeanTable,
-  CompanyActivityTypeTable,
-  getCardModulesForWebCards,
+  getWebCardsOwnerUsers,
   getLocalizationMessagesByKeys,
-  getActiveUserSubscriptionForWebCard,
+  getCardModulesByWebCards,
   activeUserSubscription,
+  getActiveUserSubscriptionForWebCard,
+  getEntitiesByIds,
+  ENTITIES,
 } from '@azzapp/data';
 import { DEFAULT_LOCALE, ENTITY_TARGET } from '@azzapp/i18n';
 import type {
@@ -42,34 +21,12 @@ import type {
   ProfileStatistic,
   Profile,
   WebCardStatistic,
-  WebCardCategory,
-  Post,
-  PostComment,
-  Media,
-  CoverTemplate,
-  CoverTemplateType,
-  CoverTemplateTag,
-  CompanyActivity,
-  ColorPalette,
-  CardTemplateType,
-  CardTemplate,
-  CardStyle,
-  PaymentMean,
-  Payment,
-  CompanyActivityType,
   UserSubscription,
-  ModuleBackground,
+  EntityToType,
+  Entity,
 } from '@azzapp/data';
 
 import type { Locale } from '@azzapp/i18n';
-
-/*
-  WebCardTable,
-  sortEntitiesByIds,
-  getLabels,
-} from '@azzapp/data';
-import { DEFAULT_LOCALE } from '@azzapp/i18n';
-*/
 
 export type GraphQLContext = {
   cardUsernamesToRevalidate: Set<string>;
@@ -122,54 +79,6 @@ export const createGraphQLContext = (
   };
 };
 
-const entities = [
-  'CardModule',
-  'CardStyle',
-  'CardTemplate',
-  'CardTemplateType',
-  'ColorPalette',
-  'CompanyActivity',
-  'CompanyActivityType',
-  'CoverTemplate',
-  'CoverTemplateType',
-  'CoverTemplateTag',
-  'Media',
-  'PostComment',
-  'Post',
-  'WebCardCategory',
-  'Profile',
-  'ModuleBackground',
-  'User',
-  'WebCard',
-  'Payment',
-  'PaymentMean',
-] as const;
-
-type Entity = (typeof entities)[number];
-
-type EntityToType<T extends Entity> = {
-  CardModule: CardModule;
-  CardStyle: CardStyle;
-  CardTemplate: CardTemplate;
-  CardTemplateType: CardTemplateType;
-  ColorPalette: ColorPalette;
-  CompanyActivity: CompanyActivity;
-  CompanyActivityType: CompanyActivityType;
-  CoverTemplate: CoverTemplate;
-  CoverTemplateType: CoverTemplateType;
-  CoverTemplateTag: CoverTemplateTag;
-  Media: Media;
-  PostComment: PostComment;
-  Post: Post;
-  WebCardCategory: WebCardCategory;
-  Profile: Profile;
-  WebCard: WebCard;
-  ModuleBackground: ModuleBackground;
-  User: User;
-  Payment: Payment;
-  PaymentMean: PaymentMean;
-}[T];
-
 export type Loaders = {
   [T in Entity]: DataLoader<string, EntityToType<T> | null>;
 } & {
@@ -190,80 +99,16 @@ export type Loaders = {
   >;
 };
 
-const entitiesTable = {
-  CardModule: CardModuleTable,
-  CardStyle: CardStyleTable,
-  CardTemplate: CardTemplateTable,
-  CardTemplateType: CardTemplateTypeTable,
-  ColorPalette: ColorPaletteTable,
-  CompanyActivity: CompanyActivityTable,
-  CompanyActivityType: CompanyActivityTypeTable,
-  CoverTemplate: CoverTemplateTable,
-  CoverTemplateType: CoverTemplateTypeTable,
-  CoverTemplatePreview: CoverTemplatePreviewTable,
-  CoverTemplateTag: CoverTemplateTagTable,
-  Media: MediaTable,
-  PostComment: PostCommentTable,
-  Post: PostTable,
-  WebCardCategory: WebCardCategoryTable,
-  Profile: ProfileTable,
-  WebCard: WebCardTable,
-  ModuleBackground: ModuleBackgroundTable,
-  User: UserTable,
-  Payment: PaymentTable,
-  PaymentMean: PaymentMeanTable,
-} as const;
-
-const getEntitiesByIds = async (
-  entity: Entity,
-  ids: readonly string[],
-): Promise<Array<EntityToType<Entity> | null>> => {
-  if (ids.length === 0) {
-    return [];
-  }
-  if (ids.length === 1) {
-    const entityById = await db
-      .client()
-      .select()
-      .from(entitiesTable[entity])
-      .where(eq(entitiesTable[entity].id, ids[0]));
-    return [(entityById[0] as any) ?? null];
-  }
-  return sortEntitiesByIds(
-    ids,
-    (await db
-      .client()
-      .select()
-      .from(entitiesTable[entity])
-      .where(inArray(entitiesTable[entity].id, ids as string[]))) as Array<
-      EntityToType<Entity>
-    >,
-  );
-};
-
 const dataLoadersOptions = {
   batchScheduleFn: setTimeout,
 };
 
 const createProfileByWebCardIdAndUserIdLoader = () =>
   new DataLoader<{ userId: string; webCardId: string }, Profile | null, string>(
-    async keys => {
-      return Promise.all(
-        keys.map(key => {
-          return db
-            .client()
-            .select()
-            .from(ProfileTable)
-            .where(
-              and(
-                eq(ProfileTable.userId, key.userId),
-                eq(ProfileTable.webCardId, key.webCardId),
-              ),
-            )
-            .then(res => res.pop() || null);
-        }),
-      );
-    },
+    async keys =>
+      Promise.all(
+        keys.map(key => getProfileByUserAndWebCard(key.userId, key.webCardId)),
+      ),
     {
       ...dataLoadersOptions,
       cacheKeyFn: key => `${key.userId}-${key.webCardId}`,
@@ -274,34 +119,25 @@ const webCardStatisticsLoader = () =>
   new DataLoader<string, WebCardStatistic[]>(
     async keys => {
       const stats = await getLastWebCardListStatisticsFor(keys as string[], 30);
-
-      return keys.map(key => stats.filter(stat => stat.webCardId === key));
+      return keys.map(key => stats[key] ?? []);
     },
-    {
-      ...dataLoadersOptions,
-      cacheKeyFn: key => `${key}`,
-    },
+    { ...dataLoadersOptions },
   );
 
 const profileStatisticsLoader = () =>
   new DataLoader<string, ProfileStatistic[]>(
     async keys => {
       const stats = await getLastProfileListStatisticsFor(keys as string[], 30);
-
-      return keys.map(key => stats.filter(stat => stat.profileId === key));
+      return keys.map(key => stats[key] ?? []);
     },
-    {
-      ...dataLoadersOptions,
-      cacheKeyFn: key => `${key}`,
-    },
+    { ...dataLoadersOptions },
   );
 
 const webCardOwnerLoader = () =>
-  new DataLoader<string, User | null>(async keys => {
-    const profiles = await getOwners(keys as string[]);
-
-    return keys.map(k => profiles.find(p => p.webCardId === k)?.user ?? null);
-  }, dataLoadersOptions);
+  new DataLoader<string, User | null>(
+    getWebCardsOwnerUsers,
+    dataLoadersOptions,
+  );
 
 const labelLoader = new DataLoader<
   [string, string],
@@ -343,9 +179,9 @@ const cardModuleByWebCardLoader = () =>
     if (keys.length === 0) {
       return [];
     }
-    const modules = await getCardModulesForWebCards(keys as string[]);
+    const modules = await getCardModulesByWebCards(keys as string[]);
 
-    return keys.map(k => modules.filter(m => m.webCardId === k));
+    return keys.map(key => modules[key] ?? []);
   }, dataLoadersOptions);
 
 const activeSubscriptionsLoader = () =>
@@ -353,9 +189,13 @@ const activeSubscriptionsLoader = () =>
     if (keys.length === 0) {
       return [];
     }
-    const modules = await activeUserSubscription(keys as string[]);
+    const subscriptions = (
+      await activeUserSubscription(keys as string[])
+    ).filter(subscription => !!subscription);
 
-    return keys.map(k => modules.filter(m => m.userId === k));
+    return keys.map(k =>
+      subscriptions.filter(subscription => subscription.userId === k),
+    );
   }, dataLoadersOptions);
 
 const activeSubscriptionsForWebCardLoader = () =>
@@ -418,7 +258,7 @@ export const createLoaders = (): Loaders =>
         } else if (entity === 'profileByWebCardIdAndUserId') {
           loaders.profileByWebCardIdAndUserId =
             createProfileByWebCardIdAndUserIdLoader();
-        } else if (entities.includes(entity)) {
+        } else if (ENTITIES.includes(entity)) {
           loaders[entity] = new DataLoader<string, EntityToType<Entity> | null>(
             ids => getEntitiesByIds(entity, ids),
             dataLoadersOptions,

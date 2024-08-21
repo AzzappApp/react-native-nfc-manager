@@ -22,7 +22,7 @@ import PositionInput from './PositionInput';
 import RadianInput from './RadianInput';
 import SizeInput from './SizeInput';
 import type { TextSchemaType } from './coverTemplateSchema';
-import type { CoverTextType } from '@azzapp/data/coverTemplates';
+import type { CoverTextType } from '@azzapp/data';
 import type { FieldMetadata } from '@conform-to/react';
 import type { ChangeEvent } from 'react';
 

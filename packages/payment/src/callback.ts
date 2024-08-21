@@ -1,11 +1,13 @@
-import { eq, and } from 'drizzle-orm';
 import {
   createPayment,
-  db,
   updateWebCard,
-  UserSubscriptionTable,
+  getSubscriptionByPaymentMeanId,
+  transaction,
+  updatePaymentMean,
+  updateSubscription,
+  updateSubscriptionByPaymentMeanId,
+  getSubscriptionById,
 } from '@azzapp/data';
-import { PaymentMeanTable } from '@azzapp/data/paymentMeans';
 import { login } from '#authent';
 import client from './client';
 import {
@@ -20,17 +22,12 @@ export const acknowledgeFirstPayment = async (
   transactionId: string,
   paymentProviderResponse?: string,
 ) => {
-  const subscriptions = await db
-    .select()
-    .from(UserSubscriptionTable)
-    .where(eq(UserSubscriptionTable.paymentMeanId, paymentMeanId))
-    .limit(1);
+  const subscription = await getSubscriptionByPaymentMeanId(paymentMeanId);
 
   const token = await login();
 
-  if (subscriptions.length) {
+  if (subscription) {
     // If the subscription is found, we have to update the subscription and the payment mean to start billing
-    const subscription = subscriptions[0];
     const webCardId = subscription.webCardId;
     const amount = subscription.amount;
     const taxes = subscription.taxes;
@@ -101,36 +98,27 @@ export const acknowledgeFirstPayment = async (
         updates.endAt = getNextPaymentDate(subscription.subscriptionPlan);
       }
 
-      await db.transaction(async tx => {
-        await tx
-          .update(PaymentMeanTable)
-          .set({
-            maskedCard,
-            status: 'active',
-          })
-          .where(eq(PaymentMeanTable.id, paymentMeanId));
+      await transaction(async () => {
+        updatePaymentMean(paymentMeanId, {
+          status: 'active',
+          maskedCard,
+        });
 
-        await tx
-          .update(UserSubscriptionTable)
-          .set(updates)
-          .where(eq(UserSubscriptionTable.paymentMeanId, paymentMeanId));
+        await updateSubscriptionByPaymentMeanId(paymentMeanId, updates);
 
-        await updateWebCard(webCardId, { isMultiUser: true }, tx);
+        await updateWebCard(webCardId, { isMultiUser: true });
 
-        await createPayment(
-          {
-            status: 'paid',
-            transactionId,
-            subscriptionId: subscription.id,
-            webCardId,
-            amount,
-            taxes,
-            paymentMeanId,
-            paymentProviderResponse,
-            rebillManagerId: rebillManager.data?.rebillManagerId,
-          },
-          tx,
-        );
+        await createPayment({
+          status: 'paid',
+          transactionId,
+          subscriptionId: subscription.id,
+          webCardId,
+          amount,
+          taxes,
+          paymentMeanId,
+          paymentProviderResponse,
+          rebillManagerId: rebillManager.data?.rebillManagerId,
+        });
       });
 
       if (!rebillManager.data) {
@@ -156,13 +144,10 @@ export const acknowledgeFirstPayment = async (
     if (paymentInfo.data) {
       const maskedCard = paymentInfo.data.maskedCard || '';
 
-      await db
-        .update(PaymentMeanTable)
-        .set({
-          status: 'active',
-          maskedCard,
-        })
-        .where(eq(PaymentMeanTable.id, paymentMeanId));
+      await updatePaymentMean(paymentMeanId, {
+        status: 'active',
+        maskedCard,
+      });
     }
   }
 };
@@ -172,68 +157,41 @@ export const rejectFirstPayment = async (
   transactionId?: string,
   paymentProviderResponse?: string,
 ) => {
-  const subscriptions = await db
-    .select()
-    .from(UserSubscriptionTable)
-    .where(eq(UserSubscriptionTable.paymentMeanId, paymentMeanId))
-    .limit(1);
+  const subscription = await getSubscriptionByPaymentMeanId(paymentMeanId);
 
-  if (subscriptions.length) {
-    const subscription = subscriptions[0];
+  if (subscription) {
     const webCardId = subscription.webCardId;
     const amount = subscription.amount;
     const taxes = subscription.taxes;
 
     if (webCardId && subscription.subscriptionPlan && amount && taxes) {
-      await db.transaction(async tx => {
-        await createPayment(
-          {
-            status: 'failed',
-            subscriptionId: subscription.id,
-            webCardId,
-            amount,
-            taxes,
-            paymentMeanId,
-            transactionId,
-            paymentProviderResponse,
-            rebillManagerId: subscription.rebillManagerId,
-          },
-          tx,
-        );
+      await transaction(async () => {
+        await createPayment({
+          status: 'failed',
+          subscriptionId: subscription.id,
+          webCardId,
+          amount,
+          taxes,
+          paymentMeanId,
+          transactionId,
+          paymentProviderResponse,
+          rebillManagerId: subscription.rebillManagerId,
+        });
 
-        await tx
-          .update(PaymentMeanTable)
-          .set({
-            status: 'inactive',
-          })
-          .where(
-            and(
-              eq(PaymentMeanTable.id, paymentMeanId),
-              eq(PaymentMeanTable.status, 'pending'),
-            ),
-          );
+        await updatePaymentMean(paymentMeanId, {
+          status: 'inactive',
+        });
 
-        await tx
-          .update(UserSubscriptionTable)
-          .set({
-            status: 'canceled',
-            canceledAt: new Date(),
-            lastPaymentError: true,
-          })
-          .where(eq(UserSubscriptionTable.paymentMeanId, paymentMeanId));
+        await updateSubscriptionByPaymentMeanId(paymentMeanId, {
+          status: 'canceled',
+          canceledAt: new Date(),
+          lastPaymentError: true,
+        });
       });
     } else {
-      await db
-        .update(PaymentMeanTable)
-        .set({
-          status: 'inactive',
-        })
-        .where(
-          and(
-            eq(PaymentMeanTable.id, paymentMeanId),
-            eq(PaymentMeanTable.status, 'pending'),
-          ),
-        );
+      await updatePaymentMean(paymentMeanId, {
+        status: 'inactive',
+      });
     }
   }
 };
@@ -243,14 +201,9 @@ export const acknowledgeRecurringPayment = async (
   transactionId: string,
   paymentProviderResponse?: string,
 ) => {
-  const subscriptions = await db
-    .select()
-    .from(UserSubscriptionTable)
-    .where(eq(UserSubscriptionTable.subscriptionId, subscriptionId))
-    .limit(1);
+  const subscription = await getSubscriptionById(subscriptionId);
 
-  if (subscriptions.length) {
-    const subscription = subscriptions[0];
+  if (subscription) {
     const webCardId = subscription.webCardId;
     const amount = subscription.amount;
     const taxes = subscription.taxes;
@@ -263,26 +216,20 @@ export const acknowledgeRecurringPayment = async (
         lastPaymentError: false,
       };
 
-      await db.transaction(async tx => {
-        await tx
-          .update(UserSubscriptionTable)
-          .set(updates)
-          .where(eq(UserSubscriptionTable.subscriptionId, subscriptionId));
+      await transaction(async () => {
+        await updateSubscription(subscriptionId, updates);
 
-        await createPayment(
-          {
-            status: 'paid',
-            subscriptionId: subscription.id,
-            webCardId,
-            amount,
-            taxes,
-            paymentMeanId: subscription.paymentMeanId ?? '',
-            transactionId,
-            paymentProviderResponse,
-            rebillManagerId: subscription.rebillManagerId,
-          },
-          tx,
-        );
+        await createPayment({
+          status: 'paid',
+          subscriptionId: subscription.id,
+          webCardId,
+          amount,
+          taxes,
+          paymentMeanId: subscription.paymentMeanId ?? '',
+          transactionId,
+          paymentProviderResponse,
+          rebillManagerId: subscription.rebillManagerId,
+        });
       });
     }
   }
@@ -294,44 +241,33 @@ export const rejectRecurringPayment = async (
   transactionId?: string,
   paymentProviderResponse?: string,
 ) => {
-  const subscriptions = await db
-    .select()
-    .from(UserSubscriptionTable)
-    .where(eq(UserSubscriptionTable.subscriptionId, subscriptionId))
-    .limit(1);
+  const subscription = await getSubscriptionById(subscriptionId);
 
-  if (subscriptions.length) {
-    const subscription = subscriptions[0];
+  if (subscription) {
     const webCardId = subscription.webCardId;
     const amount = subscription.amount;
     const taxes = subscription.taxes;
 
-    await db.transaction(async tx => {
+    await transaction(async () => {
       if (webCardId && subscription.subscriptionPlan && amount && taxes) {
-        await createPayment(
-          {
-            status: 'failed',
-            subscriptionId: subscription.id,
-            webCardId,
-            amount,
-            taxes,
-            paymentMeanId: subscription.paymentMeanId ?? '',
-            transactionId,
-            paymentProviderResponse,
-            rebillManagerId: subscription.rebillManagerId,
-          },
-          tx,
-        );
+        await createPayment({
+          status: 'failed',
+          subscriptionId: subscription.id,
+          webCardId,
+          amount,
+          taxes,
+          paymentMeanId: subscription.paymentMeanId ?? '',
+          transactionId,
+          paymentProviderResponse,
+          rebillManagerId: subscription.rebillManagerId,
+        });
       }
 
-      await tx
-        .update(UserSubscriptionTable)
-        .set({
-          // status: isRebillOn ? 'active': 'canceled', // we don’t automatically cancel the subscription for the moment (we prefer manual cancellation through backoffice)
-          // canceledAt: isRebillOn? undefined: new Date(),
-          lastPaymentError: true,
-        })
-        .where(eq(UserSubscriptionTable.subscriptionId, subscriptionId));
+      await updateSubscription(subscriptionId, {
+        // status: isRebillOn ? 'active': 'canceled', // we don’t automatically cancel the subscription for the moment (we prefer manual cancellation through backoffice)
+        // canceledAt: isRebillOn? undefined: new Date(),
+        lastPaymentError: true,
+      });
     });
   }
 };

@@ -1,7 +1,5 @@
 import { Box, TextField, Typography } from '@mui/material';
-import { like, or, asc, desc, sql, eq, and } from 'drizzle-orm';
-import { CardStyleTable, LocalizationMessageTable, db } from '@azzapp/data';
-import { DEFAULT_LOCALE, ENTITY_TARGET } from '@azzapp/i18n';
+import { getCardStylesWithLabel } from '@azzapp/data';
 import CardStylesList from './CardStylesList';
 
 export type CardStyleItem = {
@@ -12,65 +10,7 @@ export type CardStyleItem = {
 
 export type SortColumn = 'label';
 
-const sortsColumns = {
-  label: LocalizationMessageTable.value,
-};
-
-const getCardStylesQuery = (search: string | null) => {
-  let query = db
-    .select({
-      id: CardStyleTable.id,
-      label: LocalizationMessageTable.value,
-      enabled: CardStyleTable.enabled,
-    })
-    .from(CardStyleTable)
-    .leftJoin(
-      LocalizationMessageTable,
-      and(
-        eq(CardStyleTable.id, LocalizationMessageTable.key),
-        eq(LocalizationMessageTable.target, ENTITY_TARGET),
-        eq(LocalizationMessageTable.locale, DEFAULT_LOCALE),
-      ),
-    )
-    .$dynamic();
-
-  if (search) {
-    query = query.where(
-      or(like(LocalizationMessageTable.value, `%${search}%`)),
-    );
-  }
-
-  return query;
-};
-
-const getCardStyles = (
-  page: number,
-  sort: SortColumn,
-  order: 'asc' | 'desc',
-  search: string | null,
-) => {
-  const query = getCardStylesQuery(search);
-
-  query
-    .offset(page * PAGE_SIZE)
-    .limit(PAGE_SIZE)
-    .orderBy(
-      order === 'asc' ? asc(sortsColumns[sort]) : desc(sortsColumns[sort]),
-    );
-
-  return query;
-};
-
-const getCount = async (search: string | null) => {
-  const subQuery = getCardStylesQuery(search);
-  const query = db
-    .select({ count: sql`count(*)`.mapWith(Number) })
-    .from(subQuery.as('Subquery'));
-
-  return query.then(rows => rows[0].count);
-};
-
-type Props = {
+type CardStylesPageProps = {
   searchParams?: {
     page?: string;
     sort?: string;
@@ -79,19 +19,18 @@ type Props = {
   };
 };
 
-const CardStylesPage = async ({ searchParams = {} }: Props) => {
+const CardStylesPage = async ({ searchParams = {} }: CardStylesPageProps) => {
   let page = searchParams.page ? parseInt(searchParams.page, 10) : 0;
   page = Math.max(isNaN(page) ? 1 : page, 1);
 
-  const sort = Object.keys(sortsColumns).includes(searchParams.sort as any)
-    ? (searchParams.sort as any)
-    : 'label';
-
   const order = searchParams.order === 'desc' ? 'desc' : 'asc';
   const search = searchParams.s ?? null;
-  const cardStyles = await getCardStyles(page - 1, sort, order, search);
-  const count = await getCount(search);
-
+  const { cardStyles, count } = await getCardStylesWithLabel({
+    offset: (page - 1) * PAGE_SIZE,
+    limit: PAGE_SIZE,
+    sortOrder: order,
+    search,
+  });
   return (
     <Box
       sx={{
@@ -117,11 +56,15 @@ const CardStylesPage = async ({ searchParams = {} }: Props) => {
         }
       />
       <CardStylesList
-        cardStyles={cardStyles}
+        cardStyles={cardStyles.map(({ cardStyle, label }) => ({
+          id: cardStyle.id,
+          label: label ?? cardStyle.id,
+          enabled: cardStyle.enabled,
+        }))}
         count={count}
         page={page}
         pageSize={PAGE_SIZE}
-        sortField={sort}
+        sortField="label"
         sortOrder={order}
         search={search}
       />

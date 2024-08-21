@@ -1,12 +1,9 @@
-import { eq, and } from 'drizzle-orm';
 import { connectionFromArray, cursorToOffset } from 'graphql-relay';
 import {
-  db,
   getPostCommentsByDate,
-  getPostLikesWebcard,
+  getPostLikesWebCard,
   getPostReaction,
-  PostTable,
-  WebCardTable,
+  getWebCardPosts,
 } from '@azzapp/data';
 import ERRORS from '@azzapp/shared/errors';
 import {
@@ -43,7 +40,7 @@ export const Post: PostResolvers = {
     }
     const webCardId = maybeFromGlobalIdWithType(gqlWebCardId, 'WebCard');
     const reaction = webCardId
-      ? await getPostReaction(webCardId, post.id)
+      ? await getPostReaction(webCardId, post.id, 'like')
       : null;
     if (reaction) {
       return reaction.reactionKind;
@@ -81,32 +78,20 @@ export const Post: PostResolvers = {
     }
     return connectionFromArray([], args);
   },
-  relatedPosts: async (_post, args) => {
+  relatedPosts: async (post, args) => {
     // TODO dummy implementation just to test frontend
-    return connectionFromArray(
-      await db
-        .select()
-        .from(PostTable)
-        .innerJoin(WebCardTable, eq(WebCardTable.id, PostTable.webCardId))
-        .where(
-          and(
-            eq(WebCardTable.cardIsPublished, true),
-            eq(PostTable.deleted, false),
-          ),
-        )
-        .then(results => results.map(result => result.Post)),
-      args,
+    const posts = await getWebCardPosts(post.webCardId).then(posts =>
+      posts.filter(p => p.id !== post.id),
     );
+    return connectionFromArray(posts, args);
   },
   reactions: async (post, { first, after }) => {
     const limit = first ?? 100;
     const offset = after ? cursorToOffset(after) : 0;
-
-    const webcards = await getPostLikesWebcard(post.id, {
+    const webcards = await getPostLikesWebCard(post.id, {
       limit: limit + 1,
       offset,
     });
-
     return connectionFromSortedArray(webcards.slice(0, limit), {
       offset,
       hasNextPage: webcards.length > limit,

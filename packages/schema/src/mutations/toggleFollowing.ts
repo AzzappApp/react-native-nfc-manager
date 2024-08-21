@@ -1,12 +1,5 @@
-import { eq, sql } from 'drizzle-orm';
 import { GraphQLError } from 'graphql';
-import {
-  WebCardTable,
-  db,
-  follows,
-  isFollowing,
-  unfollows,
-} from '@azzapp/data';
+import { follows, unfollows } from '@azzapp/data';
 import ERRORS from '@azzapp/shared/errors';
 import fromGlobalIdWithType from '#helpers/relayIdHelpers';
 import type { MutationResolvers } from '#/__generated__/types';
@@ -38,38 +31,11 @@ const toggleFollowing: MutationResolvers['toggleFollowing'] = async (
   }
 
   try {
-    await db.transaction(async trx => {
-      // fix: https://github.com/AzzappApp/azzapp/issues/1931 && https://github.com/AzzappApp/azzapp/issues/1930
-      // if the frontend allows spamming add or remove, this will cause the nbFollowers and nbFollowings to be negative (or opposite)
-      // is checking the actual status not enough, we can imaging splitting the function in 2 add/remove
-      const currentlyFollowing = await isFollowing(webCardId, targetId);
-      if (follow && currentlyFollowing) {
-        return;
-      }
-      if (!follow && !currentlyFollowing) {
-        return;
-      }
-      await trx
-        .update(WebCardTable)
-        .set({
-          nbFollowers: follow
-            ? sql`nbFollowers + 1`
-            : sql`GREATEST(nbFollowers - 1, 0)`,
-        })
-        .where(eq(WebCardTable.id, targetId));
-
-      await trx
-        .update(WebCardTable)
-        .set({
-          nbFollowings: follow
-            ? sql`nbFollowings + 1`
-            : sql`GREATEST(nbFollowings - 1, 0)`,
-        })
-        .where(eq(WebCardTable.id, webCardId));
-
-      if (follow) await follows(webCardId, targetId, trx);
-      else await unfollows(webCardId, targetId, trx);
-    });
+    if (follow) {
+      await follows(webCardId, targetId);
+    } else {
+      await unfollows(webCardId, targetId);
+    }
   } catch (e) {
     throw new GraphQLError(ERRORS.INTERNAL_SERVER_ERROR);
   }

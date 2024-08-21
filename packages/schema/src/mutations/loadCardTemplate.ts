@@ -1,20 +1,20 @@
-import { inArray } from 'drizzle-orm';
 import { GraphQLError } from 'graphql';
 import { omit } from 'lodash';
 import {
-  CardModuleTable,
-  db,
-  getCardModules,
+  createCardModules,
+  getCardModulesByWebCard,
   getCardStyleById,
   getCardTemplateById,
   referencesMedias,
+  removeCardModules,
+  transaction,
   updateProfile,
   updateWebCard,
 } from '@azzapp/data';
 import { DEFAULT_CARD_STYLE } from '@azzapp/shared/cardHelpers';
 import ERRORS from '@azzapp/shared/errors';
 import fromGlobalIdWithType from '#helpers/relayIdHelpers';
-import { checkWebCardHasSubscription } from '#use-cases/subscription';
+import { checkWebCardHasSubscription } from '#helpers/subscriptionHelpers';
 import { MODULES_SAVE_RULES } from './ModulesMutationsResolvers';
 import type { MutationResolvers } from '#/__generated__/types';
 
@@ -57,8 +57,11 @@ const loadCardTemplateMutation: MutationResolvers['loadCardTemplate'] = async (
     (await getCardStyleById(cardTemplate.cardStyleId)) ?? DEFAULT_CARD_STYLE;
 
   try {
-    await db.transaction(async trx => {
-      const currentModules = await getCardModules(profile.webCardId, true, trx);
+    await transaction(async () => {
+      const currentModules = await getCardModulesByWebCard(
+        profile.webCardId,
+        true,
+      );
 
       const currentMedias = currentModules.flatMap(m => {
         const saveRules = MODULES_SAVE_RULES[m.kind];
@@ -76,18 +79,13 @@ const loadCardTemplateMutation: MutationResolvers['loadCardTemplate'] = async (
         return [];
       });
 
-      await referencesMedias(newMedias, currentMedias, trx);
+      await referencesMedias(newMedias, currentMedias);
 
       if (currentModules.length > 0) {
-        await trx.delete(CardModuleTable).where(
-          inArray(
-            CardModuleTable.id,
-            currentModules.map(m => m.id),
-          ),
-        );
+        await removeCardModules(currentModules.map(m => m.id));
       }
 
-      await trx.insert(CardModuleTable).values(
+      await createCardModules(
         cardTemplate.modules.map(({ kind, data }, index) => ({
           kind,
           data,
@@ -96,18 +94,15 @@ const loadCardTemplateMutation: MutationResolvers['loadCardTemplate'] = async (
         })),
       );
 
-      const webCardUpdates = {
+      await updateWebCard(profile.webCardId, {
         cardStyle: omit(cardStyle, 'id', 'labels', 'enabled'),
         updatedAt: new Date(),
         lastCardUpdate: new Date(),
-      };
+      });
 
-      const userProfileUpdates = {
+      await updateProfile(profile.id, {
         lastContactCardUpdate: new Date(),
-      };
-
-      await updateWebCard(profile.webCardId, webCardUpdates, trx);
-      await updateProfile(profile.id, userProfileUpdates, trx);
+      });
     });
   } catch (e) {
     console.error(e);

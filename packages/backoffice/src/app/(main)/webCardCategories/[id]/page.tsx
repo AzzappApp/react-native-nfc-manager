@@ -1,8 +1,7 @@
 import { notFound } from 'next/navigation';
 import {
-  CardTemplateTypeTable,
-  CompanyActivityTable,
-  db,
+  getCardTemplateTypes,
+  getCompanyActivities,
   getCompanyActivitiesByWebCardCategory,
   getLocalizationMessagesByLocaleAndTarget,
   getWebCardCategoryById,
@@ -27,15 +26,23 @@ const WebCardCategoryPage = async ({
   if (!webCardCategory) {
     return notFound();
   }
-  const companyActivities = await db.select().from(CompanyActivityTable);
-  const cardTemplateTypes = await db.select().from(CardTemplateTypeTable);
-  const labels = await getLocalizationMessagesByLocaleAndTarget(
-    DEFAULT_LOCALE,
-    ENTITY_TARGET,
-  );
-  const categoryCompanyActivities = await getCompanyActivitiesByWebCardCategory(
-    id,
-  ).then(activities => activities.map(activity => activity.id));
+  const [
+    companyActivities,
+    cardTemplateTypes,
+    categoryCompanyActivities,
+    labels,
+  ] = await Promise.all([
+    getCompanyActivities(),
+    getCardTemplateTypes(false).then(types =>
+      types.filter(
+        type => type.enabled || type.id === webCardCategory.cardTemplateTypeId,
+      ),
+    ),
+    getCompanyActivitiesByWebCardCategory(id).then(activities =>
+      activities.map(activity => activity.id),
+    ),
+    getLocalizationMessagesByLocaleAndTarget(DEFAULT_LOCALE, ENTITY_TARGET),
+  ]);
 
   return (
     <WebCardCategoryForm

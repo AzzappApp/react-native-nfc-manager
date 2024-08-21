@@ -1,7 +1,7 @@
 import { capitalize } from 'lodash';
 import { notFound } from 'next/navigation';
 import {
-  getCardModules,
+  getCardModulesByWebCard,
   getMediasByIds,
   getProfilesPostsWithTopComment,
   getModuleBackgroundsByIds,
@@ -44,7 +44,7 @@ const ProfilePage = async ({ params }: ProfilePageProps) => {
 
   const [posts, modules, media] = await Promise.all([
     getProfilesPostsWithTopComment(webCard.id, 5, 0),
-    getCardModules(webCard.id),
+    getCardModulesByWebCard(webCard.id),
     webCard.coverMediaId
       ? getMediasByIds([webCard.coverMediaId]).then(([media]) => media)
       : null,

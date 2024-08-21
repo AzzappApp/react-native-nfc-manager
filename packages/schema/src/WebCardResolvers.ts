@@ -217,10 +217,8 @@ export const WebCard: WebCardResolvers = {
     const count = await countWebCardProfiles(webCard.id);
     return count;
   },
-  profilePendingOwner: async webCard => {
-    const pendingUser = await getWebCardPendingOwnerProfile(webCard.id);
-    return pendingUser.length > 0 ? pendingUser[0] : null;
-  },
+  profilePendingOwner: async webCard =>
+    getWebCardPendingOwnerProfile(webCard.id),
   profiles: async (webCard, { first, after, search }) => {
     const limit = first ?? 100;
     const offset = after ? cursorToOffset(after) : 0;

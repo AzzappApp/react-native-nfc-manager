@@ -1,12 +1,11 @@
 import * as Sentry from '@sentry/nextjs';
-import { eq, ne, and } from 'drizzle-orm';
 import { NextResponse } from 'next/server';
 import { withAxiom } from 'next-axiom';
 import {
   createSubscription,
-  db,
+  getUserSubscriptions,
+  transaction,
   updateActiveUserSubscription,
-  UserSubscriptionTable,
 } from '@azzapp/data';
 import cors from '#helpers/cors';
 import { unpublishWebCardForUser } from '#helpers/subscription';
@@ -37,16 +36,10 @@ const subscriptionWebHook = async (req: Request) => {
   try {
     switch (type) {
       case 'INITIAL_PURCHASE': {
-        await db.transaction(async trx => {
-          const sub = await trx
-            .select()
-            .from(UserSubscriptionTable)
-            .where(
-              and(
-                eq(UserSubscriptionTable.userId, userId),
-                ne(UserSubscriptionTable.issuer, 'web'),
-              ),
-            );
+        await transaction(async () => {
+          const sub = (await getUserSubscriptions(userId)).filter(
+            s => s.issuer !== 'web',
+          );
           if (sub.length === 0) {
             await createSubscription({
               userId,
@@ -88,16 +81,10 @@ const subscriptionWebHook = async (req: Request) => {
         // Use it for analytics. The flow will always return a expiration event at the end of the subscription
         break;
       case 'EXPIRATION':
-        await db.transaction(async trx => {
-          const sub = await trx
-            .select()
-            .from(UserSubscriptionTable)
-            .where(
-              and(
-                eq(UserSubscriptionTable.userId, userId),
-                ne(UserSubscriptionTable.issuer, 'web'),
-              ),
-            );
+        await await transaction(async () => {
+          const sub = (await getUserSubscriptions(userId)).filter(
+            s => s.issuer !== 'web',
+          );
           if (sub.length === 0) {
             await createSubscription({
               userId,
@@ -131,16 +118,10 @@ const subscriptionWebHook = async (req: Request) => {
         break;
       case 'SUBSCRIPTION_EXTENDED':
       case 'UNCANCELLATION':
-        await db.transaction(async trx => {
-          const sub = await trx
-            .select()
-            .from(UserSubscriptionTable)
-            .where(
-              and(
-                eq(UserSubscriptionTable.userId, userId),
-                ne(UserSubscriptionTable.issuer, 'web'),
-              ),
-            );
+        await await transaction(async () => {
+          const sub = (await getUserSubscriptions(userId)).filter(
+            s => s.issuer !== 'web',
+          );
           if (sub.length === 0) {
             await createSubscription({
               userId,
@@ -170,16 +151,10 @@ const subscriptionWebHook = async (req: Request) => {
         });
         break;
       case 'RENEWAL':
-        await db.transaction(async trx => {
-          const sub = await trx
-            .select()
-            .from(UserSubscriptionTable)
-            .where(
-              and(
-                eq(UserSubscriptionTable.userId, userId),
-                ne(UserSubscriptionTable.issuer, 'web'),
-              ),
-            );
+        await await transaction(async () => {
+          const sub = (await getUserSubscriptions(userId)).filter(
+            s => s.issuer !== 'web',
+          );
           if (sub.length === 0) {
             await createSubscription({
               userId,
@@ -215,16 +190,10 @@ const subscriptionWebHook = async (req: Request) => {
           grace_period_expiration_at_ms &&
           new Date(grace_period_expiration_at_ms) > new Date()
         ) {
-          await db.transaction(async trx => {
-            const sub = await trx
-              .select()
-              .from(UserSubscriptionTable)
-              .where(
-                and(
-                  eq(UserSubscriptionTable.userId, userId),
-                  ne(UserSubscriptionTable.issuer, 'web'),
-                ),
-              );
+          await await transaction(async () => {
+            const sub = (await getUserSubscriptions(userId)).filter(
+              s => s.issuer !== 'web',
+            );
             if (sub.length === 0) {
               await createSubscription({
                 userId,
@@ -253,17 +222,11 @@ const subscriptionWebHook = async (req: Request) => {
         break;
 
       case 'PRODUCT_CHANGE':
-        await db.transaction(async trx => {
+        await await transaction(async () => {
           //with the difference bteween azzapp Profile and ios/adnroid account, it can happen that a renewal is done on another profile if the uer created a new profile, initial purchase does not happen
-          const sub = await trx
-            .select()
-            .from(UserSubscriptionTable)
-            .where(
-              and(
-                eq(UserSubscriptionTable.userId, userId),
-                ne(UserSubscriptionTable.issuer, 'web'),
-              ),
-            );
+          const sub = (await getUserSubscriptions(userId)).filter(
+            s => s.issuer !== 'web',
+          );
           if (sub.length === 0) {
             await createSubscription({
               userId,

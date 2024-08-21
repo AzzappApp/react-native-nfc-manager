@@ -1,13 +1,13 @@
 import { GraphQLError } from 'graphql';
 import {
-  db,
-  deleteWebCard,
+  markWebCardAsDeleted,
   getActiveWebCardSubscription,
-  removeProfileById,
+  removeProfile,
+  transaction,
 } from '@azzapp/data';
 import ERRORS from '@azzapp/shared/errors';
 import fromGlobalIdWithType from '#helpers/relayIdHelpers';
-import { updateMonthlySubscription } from '#use-cases/subscription';
+import { updateMonthlySubscription } from '#helpers/subscriptionHelpers';
 import type { MutationResolvers } from '#/__generated__/types';
 
 type Mutation = MutationResolvers['quitWebCard'];
@@ -36,23 +36,24 @@ const quitWebCard: Mutation = async (
   }
 
   if (profile?.profileRole === 'owner') {
-    const subscription = await getActiveWebCardSubscription(profile.webCardId);
+    await transaction(async () => {
+      const subscription = await getActiveWebCardSubscription(
+        profile.webCardId,
+      );
 
-    if (subscription) {
-      throw new GraphQLError(ERRORS.SUBSCRIPTION_IS_ACTIVE);
-    }
+      if (subscription) {
+        throw new GraphQLError(ERRORS.SUBSCRIPTION_IS_ACTIVE);
+      }
 
-    await db.transaction(async trx => {
-      await deleteWebCard(profile.webCardId, auth.userId ?? '', trx);
+      await markWebCardAsDeleted(profile.webCardId, auth.userId ?? '');
     });
-
     if (webCard) {
       cardUsernamesToRevalidate.add(webCard.userName);
     }
   } else {
-    await db.transaction(async trx => {
-      await removeProfileById(profile.id, trx);
-      await updateMonthlySubscription(userId, profile.webCardId, trx);
+    await transaction(async () => {
+      await removeProfile(profile.id);
+      await updateMonthlySubscription(userId, profile.webCardId);
     });
   }
 

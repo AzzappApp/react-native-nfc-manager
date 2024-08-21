@@ -1,7 +1,6 @@
-import { eq, and } from 'drizzle-orm';
 import { GraphQLError } from 'graphql';
 import { fromGlobalId } from 'graphql-relay';
-import { ProfileTable, UserSubscriptionTable, db } from '@azzapp/data';
+import { cancelSubscription, transaction, updateProfile } from '@azzapp/data';
 import ERRORS from '@azzapp/shared/errors';
 import type { MutationResolvers } from '#/__generated__/types';
 
@@ -28,44 +27,29 @@ const acceptOwnership: MutationResolvers['acceptOwnership'] = async (
   }
 
   const owner = await loaders.webCardOwners.load(webCard.id);
-
-  await db.transaction(async trx => {
-    await trx
-      .update(ProfileTable)
-      .set({ profileRole: 'admin' })
-      .where(
-        and(
-          eq(ProfileTable.webCardId, profile.webCardId),
-          eq(ProfileTable.profileRole, 'owner'),
-        ),
-      );
-
+  const updatedProfile = await transaction(async () => {
     if (owner) {
-      await trx
-        .update(UserSubscriptionTable)
-        .set({ status: 'canceled' })
-        .where(
-          and(
-            eq(UserSubscriptionTable.webCardId, profile.webCardId),
-            eq(UserSubscriptionTable.userId, owner.id),
-            eq(UserSubscriptionTable.status, 'active'),
-          ),
-        );
+      await updateProfile(owner.id, { profileRole: 'admin' });
+      await cancelSubscription(owner.id, profile.webCardId);
     }
+    await updateProfile(profileId, {
+      profileRole: 'owner',
+      promotedAsOwner: false,
+      invited: false,
+    });
 
-    await trx
-      .update(ProfileTable)
-      .set({ profileRole: 'owner', promotedAsOwner: false, invited: false })
-      .where(eq(ProfileTable.id, profileId));
-  });
-
-  return {
-    profile: {
+    return {
       ...profile,
       profileRole: 'owner',
       promotedAsOwner: false,
       invited: false,
-    },
+    } as const;
+  });
+
+  loaders.Profile.prime(profileId, updatedProfile);
+
+  return {
+    profile: updatedProfile,
   };
 };
 

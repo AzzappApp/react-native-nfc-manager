@@ -1,14 +1,24 @@
 import { GraphQLError } from 'graphql';
+import {
+  checkMedias,
+  createFreeSubscriptionForBetaPeriod,
+  createProfile,
+  createUser,
+  getProfileByUserAndWebCard,
+  getUserByEmailPhoneNumber,
+  referencesMedias,
+  transaction,
+  updateWebCard,
+} from '@azzapp/data';
+import { guessLocale } from '@azzapp/i18n';
 import ERRORS from '@azzapp/shared/errors';
 import {
   formatPhoneNumber,
   isInternationalPhoneNumber,
   isValidEmail,
 } from '@azzapp/shared/stringHelpers';
-import { inviteUser } from '#use-cases';
 import fromGlobalIdWithType from '#helpers/relayIdHelpers';
-import { ProfileAlreadyExistsException } from '#use-cases/exceptions/profile-already-exists.exception';
-import { InsufficientSubscriptionException } from '#use-cases/exceptions/subscription.exception';
+import { checkSubscription } from '#helpers/subscriptionHelpers';
 import type { MutationResolvers } from '#__generated__/types';
 import type { GraphQLContext } from '#index';
 
@@ -35,16 +45,6 @@ const inviteUserMutation: MutationResolvers['inviteUser'] = async (
 
   if (!email && !phoneNumber) throw new GraphQLError(ERRORS.INVALID_REQUEST);
 
-  const contactCard = invited.contactCard
-    ? {
-        ...invited.contactCard,
-        displayedOnWebCard: invited.contactCard.displayedOnWebCard ?? undefined,
-        isPrivate: invited.contactCard.isPrivate ?? undefined,
-        avatarId: invited.contactCard.avatarId ?? undefined,
-        logoId: invited.contactCard.logoId ?? undefined,
-      }
-    : undefined;
-
   const profile = await loaders.Profile.load(profileId);
 
   if (!profile || profile.userId !== auth.userId) {
@@ -61,31 +61,103 @@ const inviteUserMutation: MutationResolvers['inviteUser'] = async (
     throw new GraphQLError(ERRORS.INVALID_REQUEST);
   }
 
+  if (!(await checkSubscription(owner.id, webCard.id, 1))) {
+    throw new GraphQLError(ERRORS.SUBSCRIPTION_REQUIRED);
+  }
+
   try {
-    const profile = await inviteUser({
-      invited: {
+    const { avatarId, logoId } = invited.contactCard ?? {};
+    const addedMedia = [avatarId, logoId].filter(mediaId => mediaId != null);
+    await checkMedias(addedMedia);
+
+    const { profile, existingUser } = await transaction(async () => {
+      if (!webCard.isMultiUser) {
+        await updateWebCard(webCard.id, { isMultiUser: true });
+      }
+
+      const existingUser = await getUserByEmailPhoneNumber(
+        invited.email ?? undefined,
+        invited.phoneNumber ?? undefined,
+      );
+
+      let userId: string;
+
+      if (!existingUser) {
+        userId = await createUser({
+          email: invited.email,
+          phoneNumber: invited.phoneNumber,
+          invited: true,
+        });
+        await createFreeSubscriptionForBetaPeriod([userId]);
+      } else {
+        const existingProfile = await getProfileByUserAndWebCard(
+          existingUser.id,
+          webCard.id,
+        );
+        if (existingProfile) {
+          throw new GraphQLError(ERRORS.PROFILE_ALREADY_EXISTS);
+        }
+        userId = existingUser.id;
+      }
+
+      const { displayedOnWebCard, isPrivate, avatarId, logoId, ...data } =
+        invited.contactCard ?? {};
+
+      const profileData = {
+        webCardId: webCard.id,
+        userId,
+        avatarId: avatarId ?? null,
+        logoId: logoId ?? null,
+        invited: true,
+        contactCard: {
+          ...data,
+          birthday: undefined,
+        },
+        contactCardDisplayedOnWebCard: displayedOnWebCard ?? true,
+        contactCardIsPrivate: displayedOnWebCard ?? false,
         profileRole: invited.profileRole,
-        contactCard,
-        email: invited.email ?? undefined,
-        phoneNumber,
-      },
-      sendInvite: sendInvite ?? false,
-      notifyUsers,
-      user,
-      owner,
-      webCard,
+        lastContactCardUpdate: new Date(),
+        nbContactCardScans: 0,
+        promotedAsOwner: false,
+        createdAt: new Date(),
+        inviteSent: !!sendInvite,
+        deleted: false,
+        deletedAt: null,
+        deletedBy: null,
+      };
+      const profileId = await createProfile(profileData);
+      await referencesMedias(addedMedia, []);
+
+      return {
+        profile: {
+          ...profileData,
+          id: profileId,
+        },
+        existingUser,
+      };
     });
+
+    if (sendInvite) {
+      const locale = guessLocale(existingUser?.locale ?? user.locale);
+      if (phoneNumber) {
+        await notifyUsers(
+          'phone',
+          [phoneNumber],
+          webCard,
+          'invitation',
+          locale,
+        );
+      } else if (email) {
+        await notifyUsers('email', [email], webCard, 'invitation', locale);
+      }
+    }
 
     return { profile };
   } catch (e) {
-    if (e instanceof ProfileAlreadyExistsException) {
-      throw new GraphQLError(ERRORS.PROFILE_ALREADY_EXISTS);
+    if (e instanceof GraphQLError) {
+      throw e;
     }
-
-    if (e instanceof InsufficientSubscriptionException) {
-      throw new GraphQLError(ERRORS.SUBSCRIPTION_REQUIRED);
-    }
-
+    console.error(e);
     throw new GraphQLError(ERRORS.INTERNAL_SERVER_ERROR);
   }
 };

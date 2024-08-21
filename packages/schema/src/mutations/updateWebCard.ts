@@ -4,7 +4,7 @@ import { updateWebCard, type WebCard } from '@azzapp/data';
 import ERRORS from '@azzapp/shared/errors';
 import { isAdmin } from '@azzapp/shared/profileHelpers';
 import fromGlobalIdWithType from '#helpers/relayIdHelpers';
-import { checkWebCardHasSubscription } from '#use-cases/subscription';
+import { checkWebCardHasSubscription } from '#helpers/subscriptionHelpers';
 import type { MutationResolvers } from '#/__generated__/types';
 import type { GraphQLContext } from '#/GraphQLContext';
 

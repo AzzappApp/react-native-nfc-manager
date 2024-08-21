@@ -5,13 +5,13 @@ import {
   getCardModulesByIds,
   type CardModule,
   checkMedias,
-  db,
   referencesMedias,
   updateCardModule,
   createCardModule,
+  getProfileByUserAndWebCard,
+  getCardModulesByWebCard,
+  transaction,
   getCardModuleNextPosition,
-  getUserProfileWithWebCardId,
-  getCardModules,
 } from '@azzapp/data';
 import {
   MODULE_KIND_BLOCK_TEXT,
@@ -50,7 +50,7 @@ const createModuleSavingMutation =
     const webCardId = fromGlobalIdWithType(gqlWebCardId, 'WebCard');
 
     const profile =
-      userId && (await getUserProfileWithWebCardId(userId, webCardId));
+      userId && (await getProfileByUserAndWebCard(userId, webCardId));
 
     if (!profile) {
       throw new GraphQLError(ERRORS.INVALID_REQUEST);
@@ -61,7 +61,7 @@ const createModuleSavingMutation =
       throw new GraphQLError(ERRORS.INTERNAL_SERVER_ERROR);
     }
 
-    const modules = await getCardModules(profile.webCardId);
+    const modules = await getCardModulesByWebCard(profile.webCardId);
     const moduleCount = modules.length + (moduleId ? 0 : 1);
 
     const owner = await loaders.webCardOwners.load(webCard.id);
@@ -114,23 +114,20 @@ const createModuleSavingMutation =
       if (newMedias?.length) {
         await checkMedias(newMedias);
       }
-      await db.transaction(async trx => {
+      await transaction(async () => {
         if (newMedias && !isEqual(newMedias, previousMedias)) {
-          await referencesMedias(newMedias, previousMedias, trx);
+          await referencesMedias(newMedias, previousMedias);
         }
         if (module) {
-          await updateCardModule(module.id, { data }, trx);
+          await updateCardModule(module.id, { data });
         } else {
-          await createCardModule(
-            {
-              webCardId,
-              kind: moduleKind,
-              position: await getCardModuleNextPosition(webCardId),
-              data,
-              visible: true,
-            },
-            trx,
-          );
+          await createCardModule({
+            webCardId,
+            kind: moduleKind,
+            position: await getCardModuleNextPosition(webCardId),
+            data,
+            visible: true,
+          });
         }
       });
     } catch (e) {

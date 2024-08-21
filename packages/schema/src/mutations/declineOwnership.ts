@@ -1,7 +1,6 @@
-import { eq } from 'drizzle-orm';
 import { GraphQLError } from 'graphql';
 import { fromGlobalId } from 'graphql-relay';
-import { ProfileTable, db } from '@azzapp/data';
+import { updateProfile } from '@azzapp/data';
 import ERRORS from '@azzapp/shared/errors';
 import type { MutationResolvers } from '#/__generated__/types';
 
@@ -18,11 +17,7 @@ const declineOwnershipMutation: MutationResolvers['declineOwnership'] = async (
     throw new GraphQLError(ERRORS.INVALID_REQUEST);
   }
 
-  await db
-    .update(ProfileTable)
-    .set({ promotedAsOwner: false })
-    .where(eq(ProfileTable.id, profileId));
-
+  await updateProfile(profileId, { promotedAsOwner: false });
   return { profile: { ...profile, promotedAsOwner: false } };
 };
 

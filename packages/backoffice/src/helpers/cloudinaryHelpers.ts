@@ -1,7 +1,6 @@
 'use server';
 
-import { createMedia } from '@azzapp/data';
-import { createId } from '@azzapp/data/helpers/createId';
+import { createMedia, createId } from '@azzapp/data';
 import { createPresignedUpload } from '@azzapp/shared/cloudinaryHelpers';
 import { encodeMediaId } from '@azzapp/shared/imagesHelpers';
 import { ADMIN } from '#roles';

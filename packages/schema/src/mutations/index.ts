@@ -2,7 +2,7 @@ import acceptInvitation from './acceptInvitation';
 import acceptOwnership from './acceptOwnership';
 import cancelTransferOwnership from './cancelTransferOwnership';
 import createPost from './createPost';
-import createPostComment from './createPostComment';
+import createPostCommentMutation from './createPostComment';
 import createWebCard from './createWebCard';
 import declineOwnership from './declineOwnership';
 import deleteModules from './deleteModules';
@@ -62,7 +62,7 @@ import type { MutationResolvers } from '#/__generated__/types';
 export const Mutation: MutationResolvers = {
   createPost,
   createWebCard,
-  createPostComment,
+  createPostComment: createPostCommentMutation,
   deleteModules,
   deletePostComment,
   duplicateModule,

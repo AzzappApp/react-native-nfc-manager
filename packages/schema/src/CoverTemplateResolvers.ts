@@ -1,13 +1,12 @@
-import { getCoverTemplateTagsIn } from '@azzapp/data';
+import { getCoverTemplateTagsByIds } from '@azzapp/data';
 import { getCloudinaryAssetURL } from '@azzapp/shared/imagesHelpers';
 import { idResolver } from './utils';
 import type { CoverTemplateResolvers } from './__generated__/types';
 
 export const CoverTemplate: CoverTemplateResolvers = {
   id: idResolver('CoverTemplate'),
-  tags: ({ tags }) => {
-    return getCoverTemplateTagsIn(tags);
-  },
+  tags: ({ tags }) =>
+    getCoverTemplateTagsByIds(tags).then(tags => tags.filter(tag => !!tag)),
   type: async ({ typeId }, _, { loaders }) => {
     return loaders.CoverTemplateType.load(typeId);
   },

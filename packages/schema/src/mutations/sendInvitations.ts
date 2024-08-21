@@ -1,7 +1,7 @@
 import * as Sentry from '@sentry/nextjs';
 import { GraphQLError } from 'graphql';
 import { toGlobalId } from 'graphql-relay';
-import { getUsersFromWebCardId, updateProfiles } from '@azzapp/data';
+import { getUsersFromWebCard, updateWebCardProfiles } from '@azzapp/data';
 import { guessLocale } from '@azzapp/i18n';
 import ERRORS from '@azzapp/shared/errors';
 import fromGlobalIdWithType from '#helpers/relayIdHelpers';
@@ -21,7 +21,7 @@ const sendInvitations: MutationResolvers['sendInvitations'] = async (
     throw new GraphQLError(ERRORS.INVALID_REQUEST);
   }
 
-  const users = await getUsersFromWebCardId(
+  const users = await getUsersFromWebCard(
     webCardId,
     allProfiles
       ? undefined
@@ -44,11 +44,11 @@ const sendInvitations: MutationResolvers['sendInvitations'] = async (
     withEmail: typeof users;
     withPhoneNumbers: typeof users;
   }>(
-    (acc, user) => {
+    (acc, { user, profileId }) => {
       if (user.email) {
-        acc.withEmail.push(user);
+        acc.withEmail.push({ user, profileId });
       } else if (user.phoneNumber) {
-        acc.withPhoneNumbers.push(user);
+        acc.withPhoneNumbers.push({ user, profileId });
       }
       return acc;
     },
@@ -61,7 +61,7 @@ const sendInvitations: MutationResolvers['sendInvitations'] = async (
 
   try {
     if (withPhoneNumbers.length > 0 || withEmail.length > 0) {
-      await updateProfiles(
+      await updateWebCardProfiles(
         webCardId,
         { inviteSent: true },
         withPhoneNumbers
@@ -73,7 +73,7 @@ const sendInvitations: MutationResolvers['sendInvitations'] = async (
     if (withEmail.length > 0) {
       await notifyUsers(
         'email',
-        withEmail.map(({ email }) => email!),
+        withEmail.map(({ user: { email } }) => email!),
         webCard,
         'invitation',
         guessLocale(user?.locale),
@@ -83,7 +83,7 @@ const sendInvitations: MutationResolvers['sendInvitations'] = async (
     if (withPhoneNumbers.length > 0) {
       await notifyUsers(
         'phone',
-        withPhoneNumbers.map(({ phoneNumber }) => phoneNumber!),
+        withPhoneNumbers.map(({ user: { phoneNumber } }) => phoneNumber!),
         webCard,
         'invitation',
         guessLocale(user?.locale),

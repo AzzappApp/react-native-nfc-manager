@@ -21,9 +21,7 @@
     "definition:watch": "yarn definition --watch",
     "compile": "babel src --config-file ./babel.config.js -d lib --extensions '.ts,.tsx,.js,.jsx,.json'",
     "compile:watch": "yarn compile --watch",
-    "clean": "rm -rf lib && rm -f tsconfig.build.tsbuildinfo && rm -rf node_modules",
-    "test": "NODE_OPTIONS=--experimental-vm-modules jest",
-    "test:e2e": "NODE_OPTIONS=--experimental-vm-modules jest -c ./jest-e2e.config.js"
+    "clean": "rm -rf lib && rm -f tsconfig.build.tsbuildinfo && rm -rf node_modules"
   },
   "devScripts": [
     "compile:watch",

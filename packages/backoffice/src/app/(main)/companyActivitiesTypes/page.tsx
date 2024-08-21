@@ -1,9 +1,7 @@
 import { Box, TextField, Typography } from '@mui/material';
-import { and, asc, desc, eq, like, or, sql } from 'drizzle-orm';
 import {
-  CompanyActivityTypeTable,
-  LocalizationMessageTable,
-  db,
+  getCompanyActivityTypes,
+  getLocalizationMessagesByKeys,
 } from '@azzapp/data';
 import { DEFAULT_LOCALE, ENTITY_TARGET } from '@azzapp/i18n';
 import CompanyActivitiesTypesList from './CompanyActivitiesTypesList';
@@ -13,94 +11,28 @@ export type CompanyActivityTypeItem = {
   label: string | null;
 };
 
-const sortsColumns = {
-  label: LocalizationMessageTable.value,
-};
-
-export type SortColumn = keyof typeof sortsColumns;
-
-const getActivitiesTypesQuery = (search: string | null) => {
-  let query = db
-    .select({
-      id: CompanyActivityTypeTable.id,
-      label: LocalizationMessageTable.value,
-    })
-    .from(CompanyActivityTypeTable)
-    .leftJoin(
-      LocalizationMessageTable,
-      and(
-        eq(CompanyActivityTypeTable.id, LocalizationMessageTable.key),
-        eq(LocalizationMessageTable.target, ENTITY_TARGET),
-        eq(LocalizationMessageTable.locale, DEFAULT_LOCALE),
-      ),
-    )
-    .$dynamic();
-
-  if (search) {
-    query = query.where(
-      or(
-        like(LocalizationMessageTable.value, `%${search}%`),
-        like(LocalizationMessageTable.value, `%${search}%`),
-      ),
-    );
-  }
-
-  return query;
-};
-
-const getActivitiesTypes = (
-  page: number,
-  sort: SortColumn,
-  order: 'asc' | 'desc',
-  search: string | null,
-) => {
-  const query = getActivitiesTypesQuery(search);
-
-  query
-    .offset(page * PAGE_SIZE)
-    .limit(PAGE_SIZE)
-    .orderBy(
-      order === 'asc' ? asc(sortsColumns[sort]) : desc(sortsColumns[sort]),
-    );
-
-  return query;
-};
-
-const countActivitiesTypes = async (search: string | null) => {
-  const subQuery = getActivitiesTypesQuery(search);
-  const query = db
-    .select({ count: sql`count(*)`.mapWith(Number) })
-    .from(subQuery.as('ActivitiesTypes'));
-
-  return query.then(rows => rows[0].count);
-};
-
-type Props = {
-  searchParams?: {
-    page?: string;
-    sort?: string;
-    order?: string;
-    s?: string;
-  };
-};
-
-const CompanyActivitiesTypesPage = async ({ searchParams = {} }: Props) => {
-  let page = searchParams.page ? parseInt(searchParams.page, 10) : 0;
-  page = Math.max(isNaN(page) ? 1 : page, 1);
-
-  const sort = Object.keys(sortsColumns).includes(searchParams.sort as any)
-    ? (searchParams.sort as any)
-    : 'label';
-
-  const order = searchParams.order === 'desc' ? 'desc' : 'asc';
-  const search = searchParams.s ?? null;
-  const companyActivitiesTypes = await getActivitiesTypes(
-    page - 1,
-    sort,
-    order,
-    search,
+const CompanyActivitiesTypesPage = async () => {
+  const companyActivitiesTypes = await getCompanyActivityTypes();
+  const labels = await getLocalizationMessagesByKeys(
+    companyActivitiesTypes.map(cat => cat.id),
+    DEFAULT_LOCALE,
+    ENTITY_TARGET,
   );
-  const count = await countActivitiesTypes(search);
+
+  const labelsMap = labels.reduce(
+    (acc, label) => {
+      if (label) {
+        acc[label.key] = label.value;
+      }
+      return acc;
+    },
+    {} as Record<string, string>,
+  );
+
+  const items = companyActivitiesTypes.map(cat => ({
+    id: cat.id,
+    label: labelsMap[cat.id] || cat.id,
+  }));
 
   return (
     <Box
@@ -126,19 +58,9 @@ const CompanyActivitiesTypesPage = async ({ searchParams = {} }: Props) => {
           'Activities types are used to group different activities in the activity list view'
         }
       />
-      <CompanyActivitiesTypesList
-        companyActivitiesTypes={companyActivitiesTypes}
-        count={count}
-        page={page}
-        pageSize={PAGE_SIZE}
-        sortField={sort}
-        sortOrder={order}
-        search={search}
-      />
+      <CompanyActivitiesTypesList companyActivitiesTypes={items} />
     </Box>
   );
 };
 
 export default CompanyActivitiesTypesPage;
-
-const PAGE_SIZE = 25;

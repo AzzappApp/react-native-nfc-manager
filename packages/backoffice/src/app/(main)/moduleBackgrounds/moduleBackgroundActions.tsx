@@ -1,13 +1,13 @@
 'use server';
 import { createId } from '@paralleldrive/cuid2';
-import { eq, sql } from 'drizzle-orm';
 import { revalidatePath } from 'next/cache';
 import {
-  ModuleBackgroundTable,
   checkMedias,
   createMedia,
-  db,
+  createModuleBackgrounds,
+  getModuleBackgrounds,
   referencesMedias,
+  transaction,
 } from '@azzapp/data';
 import { createPresignedUpload } from '@azzapp/shared/cloudinaryHelpers';
 import { ADMIN } from '#roles';
@@ -50,15 +50,13 @@ export const addModuleBackgrounds = async ({
 
   await checkMedias(medias);
 
-  return db.transaction(async trx => {
-    await referencesMedias(medias, null, trx);
+  return transaction(async () => {
+    await referencesMedias(medias, null);
 
-    const maxOrder = await trx
-      .select({
-        order: sql`MAX(${ModuleBackgroundTable.order})`.mapWith(Number),
-      })
-      .from(ModuleBackgroundTable)
-      .then(rows => rows[0].order);
+    const maxOrder = (await getModuleBackgrounds()).reduce(
+      (max, { order }) => Math.max(max, order),
+      0,
+    );
 
     const moduleBackgrounds = medias.map(
       (mediaId, index) =>
@@ -69,21 +67,14 @@ export const addModuleBackgrounds = async ({
           enabled: true,
         }) as const,
     );
-    await trx.insert(ModuleBackgroundTable).values(moduleBackgrounds);
+    await createModuleBackgrounds(moduleBackgrounds);
     revalidatePath(`/moduleBackgrounds`);
     return { success: true, moduleBackgrounds } as const;
   });
 };
 
 export const reorderModuleBackgrounds = async (medias: string[]) => {
-  await Promise.all(
-    medias.map((mediaId, index) => {
-      return db
-        .update(ModuleBackgroundTable)
-        .set({ order: index })
-        .where(eq(ModuleBackgroundTable.id, mediaId));
-    }),
-  );
+  await reorderModuleBackgrounds(medias);
   revalidatePath(`/moduleBackgrounds`);
   return { success: true };
 };
@@ -92,11 +83,7 @@ export const setModuleBackgroundEnabled = async (
   id: string,
   enabled: boolean,
 ) => {
-  await db
-    .update(ModuleBackgroundTable)
-    .set({ enabled })
-    .where(eq(ModuleBackgroundTable.id, id));
-
+  await setModuleBackgroundEnabled(id, enabled);
   revalidatePath(`/moduleBackgrounds`);
   return { success: true };
 };

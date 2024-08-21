@@ -1,12 +1,11 @@
 'use server';
-import { eq } from 'drizzle-orm';
 import { revalidatePath } from 'next/cache';
 import {
-  CardTemplateTypeTable,
-  db,
+  createCardTemplateType,
   saveLocalizationMessage,
+  transaction,
+  updateCardTemplateType,
 } from '@azzapp/data';
-import { createId } from '@azzapp/data/helpers/createId';
 import { DEFAULT_LOCALE, ENTITY_TARGET } from '@azzapp/i18n';
 import { cardTemplateTypeSchema } from './cardTemplateTypeSchema';
 import type {
@@ -38,45 +37,36 @@ export const saveCardTemplateType = async (
     //check if WebCard Template type exist
     if (data.id) {
       const id = data.id;
-      await db.transaction(async trx => {
-        await db
-          .update(CardTemplateTypeTable)
-          .set({
-            webCardCategoryId: data.webCardCategory.id,
-            enabled: data.enabled,
-          })
-          .where(eq(CardTemplateTypeTable.id, id));
+      await transaction(async () => {
+        await updateCardTemplateType(id, {
+          webCardCategoryId: data.webCardCategory.id,
+          enabled: data.enabled,
+        });
 
-        await saveLocalizationMessage(
-          {
-            key: id,
-            value: validation.data.label,
-            locale: DEFAULT_LOCALE,
-            target: ENTITY_TARGET,
-          },
-          trx,
-        );
+        await saveLocalizationMessage({
+          key: id,
+          value: validation.data.label,
+          locale: DEFAULT_LOCALE,
+          target: ENTITY_TARGET,
+        });
       });
 
       templateTypeId = data.id;
     } else {
-      templateTypeId = createId();
-      await db.transaction(async trx => {
-        await trx.insert(CardTemplateTypeTable).values({
+      templateTypeId = await transaction(async () => {
+        const id = await createCardTemplateType({
           id: templateTypeId,
           webCardCategoryId: data.webCardCategory.id,
           enabled: data.enabled,
         });
 
-        await saveLocalizationMessage(
-          {
-            key: templateTypeId,
-            value: validation.data.label,
-            locale: DEFAULT_LOCALE,
-            target: ENTITY_TARGET,
-          },
-          trx,
-        );
+        await saveLocalizationMessage({
+          key: id,
+          value: validation.data.label,
+          locale: DEFAULT_LOCALE,
+          target: ENTITY_TARGET,
+        });
+        return id;
       });
     }
     revalidatePath(`/cardTemplateTypes/[id]`);

@@ -1,4 +1,3 @@
-import { and, desc, eq, like } from 'drizzle-orm';
 import {
   connectionFromArray,
   connectionFromArraySlice,
@@ -6,17 +5,16 @@ import {
 } from 'graphql-relay';
 import { toString } from 'qrcode';
 import {
-  db,
-  PostTable,
-  getCardTemplates,
   getColorPalettes,
   getCardTemplateTypes,
   getRecommendedWebCards,
-  WebCardTable,
-  getCardStyles,
+  getCardStylesRandomOrder,
   getCoverTemplateTags,
   getCoverTemplateTypes,
   getModuleBackgrounds,
+  searchPosts,
+  searchWebCards,
+  getCardTemplatesForWebCardKind,
 } from '@azzapp/data';
 import { shuffle } from '@azzapp/shared/arrayHelpers';
 import { serializeContactCard } from '@azzapp/shared/contactCardHelpers';
@@ -24,7 +22,11 @@ import ERRORS from '@azzapp/shared/errors';
 import serializeAndSignContactCard from '@azzapp/shared/serializeAndSignContactCard';
 import { simpleHash } from '@azzapp/shared/stringHelpers';
 import { buildUserUrlWithContactCard } from '@azzapp/shared/urlHelpers';
-import { emptyConnection } from '#helpers/connectionsHelpers';
+import {
+  connectionFromDateSortedItems,
+  cursorToDate,
+  emptyConnection,
+} from '#helpers/connectionsHelpers';
 import { searchPexelsPhotos, searchPexelsVideos } from '#helpers/pexelsClient';
 import { idResolver } from './utils';
 import type { Loaders } from '#GraphQLContext';
@@ -126,38 +128,31 @@ export const Profile: ProfileResolvers = {
   },
   trendingWebCards: async (_, args) => {
     // TODO dummy implementation just to test frontend
-    return connectionFromArray(
-      await db
-        .select()
-        .from(WebCardTable)
-        .where(
-          and(
-            eq(WebCardTable.cardIsPublished, true),
-            eq(WebCardTable.deleted, false),
-          ),
-        )
-        .orderBy(desc(WebCardTable.createdAt)),
-      args,
-    );
+    const first = args.first ?? 50;
+    const offset = args.after ? cursorToDate(args.after) : null;
+    const webCards = await searchWebCards({
+      limit: first + 1,
+      after: offset,
+    });
+    return connectionFromDateSortedItems(webCards, {
+      getDate: card => card.createdAt,
+      hasNextPage: webCards.length > first,
+      hasPreviousPage: offset !== null,
+    });
   },
   trendingPosts: async (_, args) => {
     // TODO dummy implementation just to test frontend
-    return connectionFromArray(
-      await db
-        .select()
-        .from(PostTable)
-        .innerJoin(
-          WebCardTable,
-          and(
-            eq(PostTable.webCardId, WebCardTable.id),
-            eq(WebCardTable.cardIsPublished, true),
-            eq(PostTable.deleted, false),
-          ),
-        )
-        .orderBy(desc(PostTable.createdAt))
-        .then(res => res.map(({ Post }) => Post)),
-      args,
-    );
+    const first = args.first ?? 50;
+    const offset = args.after ? cursorToDate(args.after) : null;
+    const webCards = await searchPosts({
+      limit: first + 1,
+      after: offset,
+    });
+    return connectionFromDateSortedItems(webCards, {
+      getDate: card => card.createdAt,
+      hasNextPage: webCards.length > first,
+      hasPreviousPage: offset !== null,
+    });
   },
   recommendedWebCards: async (
     profile,
@@ -176,43 +171,33 @@ export const Profile: ProfileResolvers = {
 
     return connectionFromArray(recommendedWebCards, args);
   },
-  searchPosts: async (_, args, { loaders }) => {
-    const posts = await db
-      .select()
-      .from(PostTable)
-      .innerJoin(WebCardTable, eq(PostTable.webCardId, WebCardTable.id))
-      .where(
-        and(
-          like(PostTable.content, `%${args.search}%`),
-          eq(WebCardTable.cardIsPublished, true),
-          eq(PostTable.deleted, false),
-        ),
-      );
-
-    posts.forEach(({ WebCard }) => {
-      loaders.WebCard.prime(WebCard.id, WebCard);
+  searchPosts: async (_, { first, after, search }) => {
+    first = first ?? 50;
+    const offset = after ? cursorToDate(after) : null;
+    const posts = await searchPosts({
+      limit: first + 1,
+      after: offset,
+      search,
     });
-
-    return connectionFromArray(
-      posts.map(({ Post }) => Post),
-      args,
-    );
+    return connectionFromDateSortedItems(posts, {
+      getDate: card => card.createdAt,
+      hasNextPage: posts.length > first,
+      hasPreviousPage: offset !== null,
+    });
   },
-  searchWebCards: async (_, args) => {
-    // TODO dummy implementation just to test frontend
-    return connectionFromArray(
-      await db
-        .select()
-        .from(WebCardTable)
-        .where(
-          and(
-            eq(WebCardTable.cardIsPublished, true),
-            eq(WebCardTable.deleted, false),
-            like(WebCardTable.userName, `%${args.search}%`),
-          ),
-        ),
-      args,
-    );
+  searchWebCards: async (_, { first, after, search }) => {
+    first = first ?? 50;
+    const offset = after ? cursorToDate(after) : null;
+    const webCards = await searchWebCards({
+      limit: first + 1,
+      after: offset,
+      search,
+    });
+    return connectionFromDateSortedItems(webCards, {
+      getDate: card => card.createdAt,
+      hasNextPage: webCards.length > first,
+      hasPreviousPage: offset !== null,
+    });
   },
   moduleBackgrounds: async () => getModuleBackgrounds(),
   coverTemplateTags: () => {
@@ -254,7 +239,7 @@ export const Profile: ProfileResolvers = {
       }
     }
     const limit = first ?? 20;
-    const cardTemplates = await getCardTemplates(
+    const cardTemplates = await getCardTemplatesForWebCardKind(
       webCard?.webCardKind ?? 'business',
       typeId,
       profile.webCardId,
@@ -284,7 +269,11 @@ export const Profile: ProfileResolvers = {
       return emptyConnection;
     }
     const limit = first ?? 100;
-    const cardStyles = await getCardStyles(profile.id, after, limit + 1);
+    const cardStyles = await getCardStylesRandomOrder(
+      profile.id,
+      after,
+      limit + 1,
+    );
     const sizedCardStyles = cardStyles.slice(0, limit);
     return {
       edges: sizedCardStyles.map(style => ({

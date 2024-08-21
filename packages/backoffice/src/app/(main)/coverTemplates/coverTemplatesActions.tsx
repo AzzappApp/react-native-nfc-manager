@@ -9,11 +9,11 @@ import {
   removeCoverTemplatePreviewById,
   updateCoverTemplatePreview,
   getCoverTemplatePreview,
+  updateCoverTemplate,
   checkMedias,
-  db,
   referencesMedias,
+  transaction,
 } from '@azzapp/data';
-import { updateCoverTemplate } from '@azzapp/data/coverTemplates';
 
 import { ADMIN } from '#roles';
 import { currentUserHasRole } from '#helpers/roleHelpers';
@@ -39,7 +39,7 @@ export const saveCoverTemplate = async (
   try {
     await checkMedias([submission.value.previewId]);
 
-    const result = await db.transaction(async trx => {
+    const result = await transaction(async () => {
       const data = {
         ...submission.value,
         enabled: submission.value.enabled === 'true',
@@ -48,12 +48,12 @@ export const saveCoverTemplate = async (
 
       let coverTemplateId = data.id;
       if (coverTemplateId) {
-        await updateCoverTemplate(coverTemplateId, data, trx);
+        await updateCoverTemplate(coverTemplateId, data);
       } else {
-        coverTemplateId = await createCoverTemplate(data, trx);
+        coverTemplateId = await createCoverTemplate(data);
       }
 
-      await referencesMedias([data.previewId], [previousPreviewId], trx);
+      await referencesMedias([data.previewId], [previousPreviewId]);
 
       return {
         ...submission.reply(),
@@ -79,7 +79,7 @@ export const uploadPreview = async (prevState: unknown, formData: FormData) => {
     }
     await checkMedias([previewId]);
 
-    await db.transaction(async trx => {
+    await transaction(async () => {
       const coverTemplatePreview = await getCoverTemplatePreview(
         coverTemplateId,
         companyActivityId,
@@ -87,8 +87,6 @@ export const uploadPreview = async (prevState: unknown, formData: FormData) => {
 
       if (coverTemplatePreview) {
         await updateCoverTemplatePreview(coverTemplateId, companyActivityId, {
-          coverTemplateId,
-          companyActivityId,
           mediaId: previewId,
         });
       } else {
@@ -99,7 +97,7 @@ export const uploadPreview = async (prevState: unknown, formData: FormData) => {
         });
       }
 
-      await referencesMedias([previewId], [coverTemplatePreview?.mediaId], trx);
+      await referencesMedias([previewId], [coverTemplatePreview?.mediaId]);
 
       revalidatePath(`/coverTemplates/[id]`, 'layout');
     });

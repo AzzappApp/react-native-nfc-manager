@@ -1,10 +1,9 @@
-import { inArray } from 'drizzle-orm';
 import { GraphQLError } from 'graphql';
 import {
-  CardModuleTable,
-  db,
   getCardModulesByIds,
+  removeCardModules,
   resetCardModulesPositions,
+  transaction,
 } from '@azzapp/data';
 import ERRORS from '@azzapp/shared/errors';
 import fromGlobalIdWithType from '#helpers/relayIdHelpers';
@@ -28,11 +27,9 @@ const deleteModules: MutationResolvers['deleteModules'] = async (
   }
 
   try {
-    await db.transaction(async trx => {
-      await db
-        .delete(CardModuleTable)
-        .where(inArray(CardModuleTable.id, modulesIds));
-      await resetCardModulesPositions(webCardId, trx);
+    await transaction(async () => {
+      await removeCardModules(modulesIds);
+      await resetCardModulesPositions(webCardId);
     });
   } catch (e) {
     console.error(e);

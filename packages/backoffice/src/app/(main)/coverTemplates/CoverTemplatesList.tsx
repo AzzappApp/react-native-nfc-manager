@@ -23,7 +23,7 @@ import {
   useTransition,
 } from 'react';
 import DataGrid from '#components/DataGrid';
-import type { CoverTemplateItem, Filters, SortColumn, Status } from './page';
+import type { CoverTemplateItem, SortColumn, StatusFilter } from './page';
 import type { SelectChangeEvent } from '@mui/material';
 import type {
   GridColDef,
@@ -39,7 +39,7 @@ type CoverTemplatesListProps = {
   sortField: SortColumn;
   sortOrder: 'asc' | 'desc';
   search: string | null;
-  filters: Filters;
+  statusFilter: StatusFilter;
 };
 
 const CoverTemplatesList = ({
@@ -50,14 +50,14 @@ const CoverTemplatesList = ({
   sortField,
   sortOrder,
   search,
-  filters,
+  statusFilter: statusFilterProp,
 }: CoverTemplatesListProps) => {
   const router = useRouter();
   const [loading, startTransition] = useTransition();
   const [currentSearch, setCurrentSearch] = useState(search ?? '');
-  const defferedSearch = useDeferredValue(currentSearch);
-  const [statusFilter, setPersonalStatusFilter] = useState(
-    filters?.status || 'All',
+  const deferredSearch = useDeferredValue(currentSearch);
+  const [statusFilter, setPersonalStatusFilter] = useState<StatusFilter>(
+    statusFilterProp || 'All',
   );
 
   const updateSearchParams = useCallback(
@@ -66,11 +66,11 @@ const CoverTemplatesList = ({
       sort: string,
       order: string,
       search: string | null,
-      filters: Filters,
+      statusFilter: StatusFilter,
     ) => {
       startTransition(() => {
         router.replace(
-          `/coverTemplates?page=${page}&sort=${sort}&order=${order}&s=${search ?? ''}&st=${filters.status ?? ''}`,
+          `/coverTemplates?page=${page}&sort=${sort}&order=${order}&s=${search ?? ''}&st=${statusFilter ?? ''}`,
         );
       });
     },
@@ -79,9 +79,13 @@ const CoverTemplatesList = ({
 
   const onPageChange = useCallback(
     (model: GridPaginationModel) => {
-      updateSearchParams(model.page + 1, sortField, sortOrder, search, {
-        status: statusFilter,
-      });
+      updateSearchParams(
+        model.page + 1,
+        sortField,
+        sortOrder,
+        search,
+        statusFilter,
+      );
     },
     [statusFilter, search, sortField, sortOrder, updateSearchParams],
   );
@@ -93,23 +97,19 @@ const CoverTemplatesList = ({
         model[0]?.field ?? 'label',
         model[0]?.sort ?? 'asc',
         search,
-        {
-          status: statusFilter,
-        },
+        statusFilter,
       );
     },
     [page, statusFilter, search, updateSearchParams],
   );
 
   useEffect(() => {
-    if (search === defferedSearch) {
+    if (search === deferredSearch) {
       return;
     }
-    updateSearchParams(1, sortField, sortOrder, defferedSearch, {
-      status: statusFilter,
-    });
+    updateSearchParams(1, sortField, sortOrder, deferredSearch, statusFilter);
   }, [
-    defferedSearch,
+    deferredSearch,
     page,
     statusFilter,
     search,
@@ -120,11 +120,9 @@ const CoverTemplatesList = ({
 
   const onStatusChange = useCallback(
     (event: SelectChangeEvent) => {
-      const newStatus = event.target.value as Status;
+      const newStatus = event.target.value as StatusFilter;
       setPersonalStatusFilter(newStatus);
-      updateSearchParams(1, sortField, sortOrder, search, {
-        status: newStatus,
-      });
+      updateSearchParams(1, sortField, sortOrder, search, newStatus);
     },
     [search, sortField, sortOrder, updateSearchParams],
   );

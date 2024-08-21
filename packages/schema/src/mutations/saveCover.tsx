@@ -1,12 +1,12 @@
 import { GraphQLError } from 'graphql';
 import {
   checkMedias,
-  db,
   getWebCardPosts,
   referencesMedias,
+  transaction,
   updateWebCard,
+  createId,
 } from '@azzapp/data';
-import { createId } from '@azzapp/data/helpers/createId';
 import ERRORS from '@azzapp/shared/errors';
 import fromGlobalIdWithType from '#helpers/relayIdHelpers';
 import type { MutationResolvers } from '#/__generated__/types';
@@ -37,11 +37,10 @@ const saveCover: MutationResolvers['saveCover'] = async (
   };
   try {
     await checkMedias([mediaId]);
-    await db.transaction(async trx => {
+    await transaction(async () => {
       await referencesMedias(
         [mediaId],
         webCard.coverMediaId ? [webCard.coverMediaId] : null,
-        trx,
       );
       const updates: Partial<WebCard> = {
         lastCardUpdate: new Date(),
@@ -52,7 +51,7 @@ const saveCover: MutationResolvers['saveCover'] = async (
         coverDynamicLinks: dynamicLinks ?? undefined,
         coverId: createId(),
       };
-      await updateWebCard(webCard.id, updates, trx);
+      await updateWebCard(webCard.id, updates);
       updatedWebCard = { ...updatedWebCard, ...updates };
     });
 

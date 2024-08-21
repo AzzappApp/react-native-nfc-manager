@@ -12,7 +12,13 @@ import {
 import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useState, useTransition } from 'react';
 import DataGrid from '#components/DataGrid';
-import type { Filters, ModerationItem, ReportKind, ReportStatus } from './page';
+import type {
+  Filters,
+  ModerationItem,
+  ReportKind,
+  ReportStatus,
+  SortFields,
+} from './page';
 import type { SelectChangeEvent } from '@mui/material';
 import type {
   GridColDef,
@@ -25,7 +31,7 @@ type ModerationListProps = {
   count: number;
   page: number;
   pageSize: number;
-  sortField: 'targetId' | 'targetType';
+  sortField: SortFields;
   sortOrder: 'asc' | 'desc';
   filters: Filters;
 };
@@ -131,8 +137,8 @@ const ModerationsList = ({
             onChange={onStatusChange}
           >
             <MenuItem value={'all'}>All</MenuItem>
-            <MenuItem value={'Opened'}>Opened</MenuItem>
-            <MenuItem value={'Closed'}>Closed</MenuItem>
+            <MenuItem value={'open'}>Opened</MenuItem>
+            <MenuItem value={'closed'}>Closed</MenuItem>
           </Select>
         </FormControl>
         <FormControl sx={{ width: 130 }}>

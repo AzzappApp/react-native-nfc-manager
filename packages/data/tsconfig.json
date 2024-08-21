@@ -3,8 +3,7 @@
   "compilerOptions": {
     "noEmit": true,
     "paths": {
-      "@azzapp/shared/*": ["../shared/src/*"],
-      "#*": ["./src/*"]
+      "@azzapp/shared/*": ["../shared/src/*"]
     }
   },
   "include": ["**/*.ts", "**/*.tsx", "**/*.js", "**/*.jsx", "**/*.json"],
@@ -13,6 +12,9 @@
     "node_modules",
     "package.json",
     "tsconfig.json",
-    "./drizzle/*"
+    "./drizzle/*",
+    "babel.config.js",
+    "jest.config.js",
+    "jest-e2e.config.js"
   ]
 }

@@ -2,8 +2,8 @@ import { GraphQLError } from 'graphql';
 import {
   buildDefaultContactCard,
   checkMedias,
-  db,
   referencesMedias,
+  transaction,
   updateProfile,
 } from '@azzapp/data';
 import ERRORS from '@azzapp/shared/errors';
@@ -48,14 +48,9 @@ const saveContactCard: MutationResolvers['saveContactCard'] = async (
       mediaId => mediaId,
     ) as string[];
     await checkMedias(addedMedia);
-    await db.transaction(async trx => {
-      await updateProfile(profileId, updates, trx);
-
-      await referencesMedias(
-        addedMedia,
-        [profile.logoId, profile.avatarId],
-        trx,
-      );
+    await transaction(async () => {
+      await updateProfile(profileId, updates);
+      await referencesMedias(addedMedia, [profile.logoId, profile.avatarId]);
     });
   } catch (e) {
     console.error(e);

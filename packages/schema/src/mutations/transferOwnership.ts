@@ -1,7 +1,6 @@
 import * as Sentry from '@sentry/nextjs';
-import { eq } from 'drizzle-orm';
 import { GraphQLError } from 'graphql';
-import { ProfileTable, db } from '@azzapp/data';
+import { updateProfile } from '@azzapp/data';
 import { guessLocale } from '@azzapp/i18n';
 import ERRORS from '@azzapp/shared/errors';
 import fromGlobalIdWithType from '#helpers/relayIdHelpers';
@@ -29,10 +28,7 @@ const transferOwnership: MutationResolvers['transferOwnership'] = async (
     throw new GraphQLError(ERRORS.INVALID_REQUEST);
   }
 
-  await db
-    .update(ProfileTable)
-    .set({ promotedAsOwner: true })
-    .where(eq(ProfileTable.id, targetProfileId));
+  await updateProfile(targetProfileId, { promotedAsOwner: true });
 
   try {
     const { phoneNumber, email } = targetUser;

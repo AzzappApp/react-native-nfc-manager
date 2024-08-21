@@ -4,8 +4,8 @@ import { revalidatePath } from 'next/cache';
 import {
   createCardStyle,
   saveLocalizationMessage,
-  db,
   updateCardStyle,
+  transaction,
 } from '@azzapp/data';
 import { DEFAULT_LOCALE, ENTITY_TARGET } from '@azzapp/i18n';
 import { ADMIN } from '#roles';
@@ -30,30 +30,24 @@ export const saveCardStyle = async (
   const { label, ...updates } = validationResult.data;
   if (cardStyleId) {
     const id = cardStyleId;
-    await db.transaction(async trx => {
-      await updateCardStyle(id, updates, trx);
-      await saveLocalizationMessage(
-        {
-          key: id,
-          value: label,
-          locale: DEFAULT_LOCALE,
-          target: ENTITY_TARGET,
-        },
-        trx,
-      );
+    await transaction(async () => {
+      await updateCardStyle(id, updates);
+      await saveLocalizationMessage({
+        key: id,
+        value: label,
+        locale: DEFAULT_LOCALE,
+        target: ENTITY_TARGET,
+      });
     });
   } else {
-    await db.transaction(async trx => {
-      const id = await createCardStyle(validationResult.data, trx);
-      await saveLocalizationMessage(
-        {
-          key: id,
-          value: label,
-          locale: DEFAULT_LOCALE,
-          target: ENTITY_TARGET,
-        },
-        trx,
-      );
+    await transaction(async () => {
+      const id = await createCardStyle(validationResult.data);
+      await saveLocalizationMessage({
+        key: id,
+        value: label,
+        locale: DEFAULT_LOCALE,
+        target: ENTITY_TARGET,
+      });
     });
   }
 
