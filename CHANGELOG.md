@@ -1,4 +1,4 @@
-## 0.6.0-canary.12
+## 0.6.0-canary.13
 
 * **fix:**  - 🐛 multiple fixes on web ([#4701](https://github.com/AzzappApp/azzapp/pull/4701))
 * **fix:**  - android minors ([#4679](https://github.com/AzzappApp/azzapp/pull/4679))
