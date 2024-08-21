@@ -155,6 +155,9 @@ jobs:
       # PlanetScale schema migration
       #
       ############################################
+      - name: Setup pscale
+        uses: planetscale/setup-pscale-action@v1
+
       - name: PlanetScale - Check if migration is needed
         id: planetscale_migration_needed
         working-directory: packages/data
@@ -179,17 +182,23 @@ jobs:
 
       - name: PlanetScale - Create a branch
         if: ${{ steps.planetscale_migration_needed.outputs.has_change == 'true'}}
-        uses: planetscale/create-branch-action@v1
         id: create_branch
-        with:
-          org_name: azzapp
-          database_name: azzapp
-          branch_name: ${{ steps.extract_branch.outputs.branch }}
-          from: ${{ github.ref_name }}
-          wait: true
         env:
           PLANETSCALE_SERVICE_TOKEN_ID: ${{ secrets.PLANETSCALE_SERVICE_TOKEN_ID }}
           PLANETSCALE_SERVICE_TOKEN: ${{ secrets.PLANETSCALE_SERVICE_TOKEN }}
+        run: |
+          set +e
+          pscale branch show azzapp ${{ steps.extract_branch.outputs.branch }} --org azzapp
+          exit_code=$?
+          set -e
+
+
+          if [ $exit_code -eq 0 ]; then
+            echo "Branch exists. Skipping branch creation."
+          else
+            echo "Branch does not exist. Creating."
+            pscale branch create azzapp ${{ steps.extract_branch.outputs.branch }} --from ${{ github.ref_name }}  --wait --org azzapp
+          fi
 
       - name: PlanetScale - Create a password
         if: ${{ steps.planetscale_migration_needed.outputs.has_change == 'true'}}
