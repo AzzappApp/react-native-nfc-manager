@@ -1,4 +1,4 @@
-## 0.6.0-canary.10
+## 0.6.0-canary.11
 
 * **fix:**  - android minors ([#4679](https://github.com/AzzappApp/azzapp/pull/4679))
 * **perf:**  - ⚡️ Replace after with toTime for perf on iOS ([#4695](https://github.com/AzzappApp/azzapp/pull/4695))
