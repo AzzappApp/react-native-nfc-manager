@@ -12,7 +12,7 @@ import type { WebCard } from '@azzapp/data';
 const updateMultiUser: MutationResolvers['updateMultiUser'] = async (
   _,
   { webCardId: gqlWebCardId, input: { isMultiUser } },
-  { loaders },
+  { loaders, cardUsernamesToRevalidate },
 ) => {
   const webCardId = fromGlobalIdWithType(gqlWebCardId, 'WebCard');
 
@@ -49,6 +49,8 @@ const updateMultiUser: MutationResolvers['updateMultiUser'] = async (
   if (!webCard) {
     throw new GraphQLError(ERRORS.INTERNAL_SERVER_ERROR);
   }
+
+  cardUsernamesToRevalidate.add(webCard.userName);
 
   return {
     webCard,

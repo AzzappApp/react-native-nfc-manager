@@ -30,6 +30,10 @@ const postAuthorCover = style({
   position: 'relative',
 });
 
+const postAuthorUsername = style({
+  color: vars.color.black,
+});
+
 const postMedias = style({
   position: 'relative',
   width: '100%',
@@ -94,6 +98,7 @@ const styles = {
   postSeeMore,
   postElapsedTime,
   postAuthorCover,
+  postAuthorUsername,
 };
 
 export default styles;

@@ -12,16 +12,6 @@ const slideDown = keyframes({
   '100%': { transform: 'translateY(100%)' },
 });
 
-const fadeIn = keyframes({
-  '0%': { opacity: 0 },
-  '100%': { opacity: 1 },
-});
-
-const fadeOut = keyframes({
-  '0%': { opacity: 1 },
-  '100%': { opacity: 0 },
-});
-
 const wrapper = style({
   position: 'fixed',
   top: 0,
@@ -33,11 +23,13 @@ const wrapper = style({
   alignItems: 'center',
   justifyContent: 'center',
   padding: '20px',
-  animation: `${fadeIn} 0.3s ease-out`,
+  transition: `opacity 0.3s ease-out`,
+  opacity: 1,
 });
 
 const wrapperClosing = style({
-  animation: `${fadeOut} 0.3s ease-in`,
+  transition: `opacity 0.3s ease-in`,
+  opacity: 0,
 });
 
 const modal = style({

@@ -50,7 +50,7 @@ const PostFeedItem = (
               />
             </div>
           )}
-          <span>{webCard.userName}</span>
+          <span className={styles.postAuthorUsername}>{webCard.userName}</span>
         </button>
         {postMedia && (
           <div
