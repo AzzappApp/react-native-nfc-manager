@@ -9,7 +9,6 @@ import {
   rect,
 } from '@shopify/react-native-skia';
 import { memo, useMemo } from 'react';
-import { FormattedMessage } from 'react-intl';
 import { Image, View } from 'react-native';
 import { useFragment, graphql } from 'react-relay';
 import { getTextColor } from '@azzapp/shared/colorsHelpers';
@@ -25,13 +24,11 @@ type ContactCardProps = {
   profile: ContactCard_profile$key;
   style?: StyleProp<ViewStyle>;
   height: number;
-  showEditButton?: boolean;
 };
 const ContactCard = ({
   profile: profileKey,
   height,
   style,
-  showEditButton = false,
 }: ContactCardProps) => {
   const {
     contactCard,
@@ -139,19 +136,6 @@ const ContactCard = ({
             resizeMode="contain"
             style={[styles.azzappImage, { tintColor: readableColor }]}
           />
-          {showEditButton && (
-            <View style={styles.editButtonContainer}>
-              <Text
-                variant="xsmall"
-                style={[styles.editButtonText, { color: readableColor }]}
-              >
-                <FormattedMessage
-                  defaultMessage="Edit"
-                  description="ContactCard - Edit button label"
-                />
-              </Text>
-            </View>
-          )}
         </View>
 
         <View style={styles.webCardContent}>

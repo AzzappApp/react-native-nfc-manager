@@ -149,7 +149,6 @@ const ContactCardItem = ({ height, item, index }: ContactCardItemProps) => {
                 profile={profile}
                 height={Math.min(height, maxHeight)}
                 style={styles.card}
-                showEditButton
               />
             </PressableNative>
           </View>
