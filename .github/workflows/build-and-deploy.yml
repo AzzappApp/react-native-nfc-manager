@@ -243,6 +243,27 @@ jobs:
         run: |
           pscale deploy-request create azzapp ${{ steps.extract_branch.outputs.branch }}  --org azzapp
 
+      - name: Check deployment state
+        id: check-state
+        env:
+          PLANETSCALE_SERVICE_TOKEN_ID: ${{ secrets.PLANETSCALE_SERVICE_TOKEN_ID }}
+          PLANETSCALE_SERVICE_TOKEN: ${{ secrets.PLANETSCALE_SERVICE_TOKEN }}
+        run: |
+          for i in {1..10}; do
+            deployment_state=$(pscale deploy-request show azzapp ${{ steps.extract_branch.outputs.branch }} --org azzapp --format json | jq -r '.deployment_state')
+            echo "Deployment State: $deployment_state"
+
+
+            if [ "$deployment_state" = "ready" ]; then
+              echo "Deployment state is ready. Continuing."
+              break
+            fi
+
+
+            echo "Deployment state is not ready. Waiting 2 seconds before checking again."
+            sleep 2
+          done
+
       - name: PlanetScale - Deploy the changes
         if: ${{ steps.planetscale_migration_needed.outputs.has_change == 'true'}}
         env:
