@@ -201,7 +201,7 @@ const SimpleTextRenderer = ({
       if ('fontSize' in rest) {
         return {
           lineHeight:
-            rest.fontSize && rest.verticalSpacing
+            rest.fontSize && rest.verticalSpacing != null
               ? rest.fontSize * 1.2 + rest.verticalSpacing
               : undefined,
           fontSize: rest.fontSize ?? undefined,
@@ -212,7 +212,8 @@ const SimpleTextRenderer = ({
 
     return {
       lineHeight:
-        animatedData.fontSize.value && animatedData.verticalSpacing.value
+        animatedData.fontSize.value &&
+        animatedData.verticalSpacing.value != null
           ? animatedData.fontSize.value * 1.2 +
             animatedData.verticalSpacing.value
           : undefined,
