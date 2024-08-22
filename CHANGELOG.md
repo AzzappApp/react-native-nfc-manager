@@ -1,5 +1,6 @@
-## 0.6.0-canary.16
+## 0.6.0-canary.17
 
+* **fix:**  - create password
 * **fix:**  - ci syntax
 * **fix:**  - CI - migrating pscale command
 * **fix:**  - 🐛 multiple fixes on web ([#4701](https://github.com/AzzappApp/azzapp/pull/4701))
