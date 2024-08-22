@@ -1,5 +1,6 @@
-## 0.6.0-canary.17
+## 0.6.0-canary.18
 
+* **fix:**  - deploy request wrong argument
 * **fix:**  - create password
 * **fix:**  - ci syntax
 * **fix:**  - CI - migrating pscale command
