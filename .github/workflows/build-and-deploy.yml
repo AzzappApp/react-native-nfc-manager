@@ -206,7 +206,7 @@ jobs:
           PLANETSCALE_SERVICE_TOKEN_ID: ${{ secrets.PLANETSCALE_SERVICE_TOKEN_ID }}
           PLANETSCALE_SERVICE_TOKEN: ${{ secrets.PLANETSCALE_SERVICE_TOKEN }}
         run: |
-          response=$(pscale password create azzapp ${{ steps.extract_branch.outputs.branch }} -f json --org azzapp)
+          response=$(pscale password create azzapp ${{ steps.extract_branch.outputs.branch }} ${{ steps.extract_branch.outputs.branch }} -f json --org azzapp)
 
 
           id=$(echo "$response" | jq -r '.id')
