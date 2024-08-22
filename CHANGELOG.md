@@ -1,5 +1,8 @@
-## 0.6.0-canary.21
+## 0.6.0-canary.22
 
+* **fix:**  - **CI:** Deploy PS change
+* **fix:**  - remove edit button on ContactCard ([#4704](https://github.com/AzzappApp/azzapp/pull/4704))
+* **feat:**  - update congratz screen ([#4705](https://github.com/AzzappApp/azzapp/pull/4705))
 * **Feat:**  - Pexel on overlay and replace ([#4697](https://github.com/AzzappApp/azzapp/pull/4697))
 * **fix:**  - condition on verticalSpacing === 0 ([#4689](https://github.com/AzzappApp/azzapp/pull/4689))
 * **fix:**  - proper check of whatsapp (for android) ([#4669](https://github.com/AzzappApp/azzapp/pull/4669))
