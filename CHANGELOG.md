@@ -1,5 +1,8 @@
-## 0.6.0-canary.20
+## 0.6.0-canary.21
 
+* **Feat:**  - Pexel on overlay and replace ([#4697](https://github.com/AzzappApp/azzapp/pull/4697))
+* **fix:**  - condition on verticalSpacing === 0 ([#4689](https://github.com/AzzappApp/azzapp/pull/4689))
+* **fix:**  - proper check of whatsapp (for android) ([#4669](https://github.com/AzzappApp/azzapp/pull/4669))
 * **fix:**  - add a wait deploy request ready to deploy
 * **fix:**  - wait for deploy request
 * **fix:**  - deploy request wrong argument
