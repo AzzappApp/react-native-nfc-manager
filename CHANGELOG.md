@@ -1,5 +1,6 @@
-## 0.6.0-canary.22
+## 0.6.0-canary.23
 
+* **feat:**  - deactivation of drizzle and planetscale
 * **fix:**  - **CI:** Deploy PS change
 * **fix:**  - remove edit button on ContactCard ([#4704](https://github.com/AzzappApp/azzapp/pull/4704))
 * **feat:**  - update congratz screen ([#4705](https://github.com/AzzappApp/azzapp/pull/4705))
