@@ -241,7 +241,7 @@ jobs:
           PLANETSCALE_SERVICE_TOKEN_ID: ${{ secrets.PLANETSCALE_SERVICE_TOKEN_ID }}
           PLANETSCALE_SERVICE_TOKEN: ${{ secrets.PLANETSCALE_SERVICE_TOKEN }}
         run: |
-          pscale deploy-request create azzapp ${{ steps.extract_branch.outputs.branch }}  --org azzapp --wait
+          pscale deploy-request create azzapp ${{ steps.extract_branch.outputs.branch }}  --org azzapp
 
       - name: PlanetScale - Deploy the changes
         if: ${{ steps.planetscale_migration_needed.outputs.has_change == 'true'}}
