@@ -1,5 +1,6 @@
-## 0.6.0-canary.18
+## 0.6.0-canary.19
 
+* **fix:**  - wait for deploy request
 * **fix:**  - deploy request wrong argument
 * **fix:**  - create password
 * **fix:**  - ci syntax
