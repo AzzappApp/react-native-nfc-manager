@@ -58,7 +58,7 @@ const InviteFriendsScreen = ({
 
   useEffect(() => {
     Linking.canOpenURL(whatsappMessage)
-      .then(() => setHasWhatsapp(true))
+      .then(setHasWhatsapp)
       .catch(() => setHasWhatsapp(false));
   }, [whatsappMessage]);
 
