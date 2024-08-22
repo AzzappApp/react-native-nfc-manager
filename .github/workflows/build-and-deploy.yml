@@ -249,7 +249,7 @@ jobs:
           PLANETSCALE_SERVICE_TOKEN_ID: ${{ secrets.PLANETSCALE_SERVICE_TOKEN_ID }}
           PLANETSCALE_SERVICE_TOKEN: ${{ secrets.PLANETSCALE_SERVICE_TOKEN }}
         run: |
-          pscale deploy-request deploy azzapp ${{ steps.extract_branch.outputs.branch }} --org azzapp
+          pscale deploy-request deploy azzapp ${{ steps.extract_branch.outputs.branch }} --org azzapp --wait
 
       ############################################
       #
