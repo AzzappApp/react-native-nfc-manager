@@ -243,7 +243,8 @@ jobs:
         run: |
           pscale deploy-request create azzapp ${{ steps.extract_branch.outputs.branch }}  --org azzapp
 
-      - name: Check deployment state
+      - name: PlanetScale - Check deployment state
+        if: ${{ steps.planetscale_migration_needed.outputs.has_change == 'true'}}
         id: check-state
         env:
           PLANETSCALE_SERVICE_TOKEN_ID: ${{ secrets.PLANETSCALE_SERVICE_TOKEN_ID }}
