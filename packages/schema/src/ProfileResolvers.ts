@@ -344,7 +344,7 @@ export const Profile: ProfileResolvers = {
       })),
       { after, first },
       {
-        sliceStart: offset,
+        sliceStart: offset + 1,
         arrayLength: count ?? Infinity,
       },
     );
@@ -393,7 +393,7 @@ export const Profile: ProfileResolvers = {
       }),
       { after, first },
       {
-        sliceStart: offset,
+        sliceStart: offset + 1,
         arrayLength: count ?? Infinity,
       },
     );
