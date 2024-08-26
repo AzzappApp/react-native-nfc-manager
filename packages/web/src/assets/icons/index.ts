@@ -1,6 +1,9 @@
 export { default as CloseIcon } from './close.svg';
 export { default as CommentIcon } from './comment.svg';
+export { default as CommentFilledIcon } from './comment_filled.svg';
+export { default as ExpandIcon } from './expand.svg';
 export { default as HearthIcon } from './hearth.svg';
+export { default as HearthFilledIcon } from './hearth_filled.svg';
 export { default as ShareIcon } from './share.svg';
 export { default as ShareBackIcon } from './share-back.svg';
 export { default as FlipIcon } from './flip.svg';

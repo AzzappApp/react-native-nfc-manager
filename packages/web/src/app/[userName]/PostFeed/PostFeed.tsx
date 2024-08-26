@@ -19,10 +19,12 @@ type PostFeedProps = {
   media: Media;
   onClose: () => void;
   onPressAuthor: () => void;
+  background?: string;
 };
 
 const PostFeed = (props: PostFeedProps) => {
-  const { webCard, defaultPosts, postsCount, media, onClose } = props;
+  const { webCard, defaultPosts, postsCount, media, onClose, background } =
+    props;
 
   const share = useRef<ModalActions>(null);
   const download = useRef<ModalActions>(null);
@@ -89,6 +91,7 @@ const PostFeed = (props: PostFeedProps) => {
           postsCount={postsCount}
           media={media}
           onClose={onClose}
+          background={background}
         />
         {posts.map((post, i) => (
           <PostFeedItem

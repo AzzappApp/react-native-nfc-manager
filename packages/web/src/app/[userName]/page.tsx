@@ -109,6 +109,10 @@ const ProfilePage = async ({ params }: ProfilePageProps) => {
     );
   }
 
+  const linearGradientEndColor = modules.length
+    ? firstModuleBackgroundColor
+    : swapColor(webCard.coverBackgroundColor, cardColors);
+
   return (
     <WebCardPageLayout
       webCard={webCard}
@@ -121,13 +125,18 @@ const ProfilePage = async ({ params }: ProfilePageProps) => {
             className={styles.coverContainer}
             style={{
               background: `linear-gradient(to bottom, transparent 0%, ${
-                (modules.length
-                  ? firstModuleBackgroundColor
-                  : swapColor(webCard.coverBackgroundColor, cardColors)) ??
-                '#FFF'
+                linearGradientEndColor ?? '#FFF'
               } 95%)`,
             }}
           >
+            <div
+              style={{
+                flex: 1,
+                background: `linear-gradient(to left, transparent 0%, ${
+                  linearGradientEndColor ?? '#FFF'
+                } 95%)`,
+              }}
+            />
             <CoverRenderer webCard={webCard} media={media} priority />
           </div>
         </>
@@ -135,6 +144,7 @@ const ProfilePage = async ({ params }: ProfilePageProps) => {
       cardBackgroundColor={cardBackgroundColor}
       lastModuleBackgroundColor={lastModuleBackgroundColor}
       userName={params.userName}
+      color={linearGradientEndColor}
     >
       {modules.map(module => (
         <ModuleRenderer

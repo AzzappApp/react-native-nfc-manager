@@ -3,6 +3,7 @@ import * as Sentry from '@sentry/nextjs';
 import cn from 'classnames';
 import { jwtDecode } from 'jwt-decode';
 import { useEffect, useRef, useState } from 'react';
+import { colors } from '@azzapp/shared/colorsHelpers';
 import { FlipIcon } from '#assets';
 import { ButtonIcon } from '#ui';
 import { updateWebCardViewsCounter } from '#app/actions/statisticsAction';
@@ -24,6 +25,7 @@ type ProfilePageLayoutProps = PropsWithChildren<{
   cardBackgroundColor: string;
   lastModuleBackgroundColor: string;
   userName: string;
+  color: string | null;
 }>;
 
 const WebCardPageLayout = (props: ProfilePageLayoutProps) => {
@@ -35,6 +37,7 @@ const WebCardPageLayout = (props: ProfilePageLayoutProps) => {
     media,
     cardBackgroundColor,
     lastModuleBackgroundColor,
+    color,
   } = props;
   const [display, setDisplay] = useState<'card' | 'posts'>('card');
   const [postsOpen, setPostsOpen] = useState(false);
@@ -134,7 +137,11 @@ const WebCardPageLayout = (props: ProfilePageLayoutProps) => {
         >
           {cover}
           <div
-            style={{ display: 'flex', flexDirection: 'column', width: '100%' }}
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              width: '100%',
+            }}
           >
             {children}
           </div>
@@ -146,17 +153,31 @@ const WebCardPageLayout = (props: ProfilePageLayoutProps) => {
               [styles.postsClosed]: !postsOpen,
             })}
           >
-            <PostFeed
-              postsCount={webCard.nbPosts}
-              defaultPosts={posts}
-              media={media}
-              webCard={webCard}
-              onPressAuthor={() => {
-                setDisplay('card');
-                setPostsOpen(false);
+            <div
+              style={{
+                width: '50px',
+                background: `linear-gradient(to right, transparent 0%, ${color} 100%)`,
               }}
-              onClose={() => setPostsOpen(false)}
             />
+            <div
+              className={styles.postsContent}
+              style={{
+                backgroundColor: color ?? colors.white,
+              }}
+            >
+              <PostFeed
+                postsCount={webCard.nbPosts}
+                defaultPosts={posts}
+                media={media}
+                webCard={webCard}
+                onPressAuthor={() => {
+                  setDisplay('card');
+                  setPostsOpen(false);
+                }}
+                background={color ?? undefined}
+                onClose={() => setPostsOpen(false)}
+              />
+            </div>
           </aside>
         )}
 

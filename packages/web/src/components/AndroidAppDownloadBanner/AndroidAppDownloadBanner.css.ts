@@ -11,6 +11,7 @@ const container = style({
   padding: '0 10px 0 10px',
   transition: 'height 0.25s ease-in',
   backgroundColor: 'white',
+  overflow: 'hidden',
 });
 
 const containerHidden = style({

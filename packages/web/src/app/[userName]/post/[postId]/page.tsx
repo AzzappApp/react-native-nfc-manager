@@ -83,6 +83,7 @@ const PostPage = async (props: PostPageProps) => {
                       width: '100%',
                       maxHeight: '100%',
                     }}
+                    mutable
                   />
                 </>
               ) : (

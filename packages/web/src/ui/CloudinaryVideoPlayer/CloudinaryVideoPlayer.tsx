@@ -16,13 +16,14 @@ import type { ForwardedRef } from 'react';
 
 type CloudinaryVideoPlayerProps = CloudinaryVideoProps & {
   onMuteChanged?: (muted: boolean) => void;
+  mutable?: boolean;
 };
 
 const CloudinaryVideoPlayer = (
   props: CloudinaryVideoPlayerProps,
   ref: ForwardedRef<CloudinaryVideoPlayerActions>,
 ) => {
-  const { autoPlay = true, onMuteChanged, ...others } = props;
+  const { autoPlay = true, mutable, onMuteChanged, ...others } = props;
   const video = useRef<HTMLVideoElement>(null);
   const [muted, setMuted] = useState(true);
   const [playing, setPlaying] = useState(autoPlay);
@@ -86,7 +87,9 @@ const CloudinaryVideoPlayer = (
         aria-label={muted ? 'Unmute' : 'Mute'}
         width={28}
         height={28}
-        className={styles.sound}
+        className={cn(styles.sound, {
+          [styles.soundOpen]: mutable,
+        })}
         onClick={toggleMuted}
       />
       {!playing && (
