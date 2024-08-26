@@ -96,6 +96,7 @@ const HomeBottomPanelInvitation = ({
           description="Home bottom panel invitation"
           values={{
             contact:
+              profile?.invitedBy?.user?.email ||
               profile?.webCard?.owner?.email ||
               profile?.webCard?.owner?.phoneNumber ||
               '',

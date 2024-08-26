@@ -124,6 +124,7 @@ const inviteUsersListMutation: MutationResolvers['inviteUsersList'] = async (
         userId,
         avatarId,
         invited: true,
+        invitedBy: profileId,
         inviteSent: sendInvite ?? false,
         contactCard: {
           ...data,

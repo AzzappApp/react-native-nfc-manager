@@ -611,6 +611,7 @@ export const ProfileTable = cols.table(
       .notNull()
       .default('owner'),
     invited: cols.boolean('invited').default(false).notNull(),
+    invitedBy: cols.cuid('invitedBy'),
     inviteSent: cols.boolean('inviteSent').default(false).notNull(),
     promotedAsOwner: cols.boolean('promotedAsOwner').default(false).notNull(),
     avatarId: cols.mediaId('avatarId'),

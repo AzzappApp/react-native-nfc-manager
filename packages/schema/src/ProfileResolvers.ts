@@ -60,6 +60,10 @@ export const Profile: ProfileResolvers = {
     //get data for the last 30 day
     return loaders.profileStatistics.load(profile.id);
   },
+  invitedBy: async (profile, _args, { loaders }) => {
+    if (!profile.invitedBy) return null;
+    return loaders.Profile.load(profile.invitedBy);
+  },
   serializedContactCard: async (profile, _, { loaders }) => {
     const webCard = await loaders.WebCard.load(profile.webCardId);
     return serializeContactCard(

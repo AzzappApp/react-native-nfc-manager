@@ -36,6 +36,10 @@ type Profile implements Node {
   """
   invited: Boolean!
   """
+  The profile that sent the invitation if user has been invited
+  """
+  invitedBy: Profile
+  """
   True if user has received an invite
   """
   inviteSent: Boolean!
@@ -52,7 +56,8 @@ type Profile implements Node {
 
   contactCardUrl: String!
 
-  serializedContactCard: String! @deprecated(reason: "Use contactCardUrl instead")
+  serializedContactCard: String!
+    @deprecated(reason: "Use contactCardUrl instead")
 
   webCard: WebCard!
 
@@ -173,7 +178,6 @@ type Profile implements Node {
   """
   coverTemplateTypes: [CoverTemplateType!]!
 
-
   """
   Fetches card styles
   """
@@ -227,7 +231,6 @@ enum ProfileSortType {
   ROLE
 }
 
-
 interface StockMedia {
   id: String!
   width: Float!
@@ -255,7 +258,6 @@ type StockVideo implements StockMedia {
   author: String
   duration: Float!
 }
-
 
 type StockImageConnection {
   """

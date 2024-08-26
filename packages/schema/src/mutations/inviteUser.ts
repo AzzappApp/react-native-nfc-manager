@@ -109,6 +109,7 @@ const inviteUserMutation: MutationResolvers['inviteUser'] = async (
         avatarId: avatarId ?? null,
         logoId: logoId ?? null,
         invited: true,
+        invitedBy: profileId,
         contactCard: {
           ...data,
           birthday: undefined,
@@ -125,13 +126,13 @@ const inviteUserMutation: MutationResolvers['inviteUser'] = async (
         deletedAt: null,
         deletedBy: null,
       };
-      const profileId = await createProfile(profileData);
+      const createdProfileId = await createProfile(profileData);
       await referencesMedias(addedMedia, []);
 
       return {
         profile: {
           ...profileData,
-          id: profileId,
+          id: createdProfileId,
         },
         existingUser,
       };
