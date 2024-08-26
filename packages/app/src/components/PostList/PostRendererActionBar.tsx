@@ -7,7 +7,7 @@ import Toast from 'react-native-toast-message';
 import { useMutation, graphql, useFragment } from 'react-relay';
 import { useDebouncedCallback } from 'use-debounce';
 import ERRORS from '@azzapp/shared/errors';
-import { isEditor } from '@azzapp/shared/profileHelpers';
+import { profileHasEditorRight } from '@azzapp/shared/profileHelpers';
 import { buildPostUrl } from '@azzapp/shared/urlHelpers';
 import { useRouter } from '#components/NativeRouter';
 import useAuthState from '#hooks/useAuthState';
@@ -195,7 +195,7 @@ const PostRendererActionBar = ({
 
   // toggle the value locally
   const toggleReaction = useCallback(() => {
-    if (isEditor(profileInfos?.profileRole)) {
+    if (profileHasEditorRight(profileInfos?.profileRole)) {
       if (reaction) {
         setCountReactions(countReactions - 1);
         setReaction(null);

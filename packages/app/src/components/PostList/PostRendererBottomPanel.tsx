@@ -7,7 +7,7 @@ import { FormattedMessage, FormattedRelativeTime, useIntl } from 'react-intl';
 import { View, StyleSheet, Share, Platform } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { graphql, useFragment, useMutation } from 'react-relay';
-import { isEditor } from '@azzapp/shared/profileHelpers';
+import { profileHasEditorRight } from '@azzapp/shared/profileHelpers';
 import { buildPostUrl } from '@azzapp/shared/urlHelpers';
 import { colors } from '#theme';
 import { useRouter } from '#components/NativeRouter';
@@ -326,7 +326,7 @@ const PostRendererBottomPanel = ({
   const toggleFollow = useToggleFollow();
 
   const onToggleFollow = () => {
-    if (isEditor(profileInfos?.profileRole)) {
+    if (profileHasEditorRight(profileInfos?.profileRole)) {
       toggleFollow(
         post.webCard.id,
         post.webCard.userName,
@@ -366,7 +366,10 @@ const PostRendererBottomPanel = ({
     `);
 
   const deletePost = useCallback(() => {
-    if (isEditor(profileInfos?.profileRole) && profileInfos?.webCardId) {
+    if (
+      profileHasEditorRight(profileInfos?.profileRole) &&
+      profileInfos?.webCardId
+    ) {
       commit({
         variables: {
           webCardId: profileInfos?.webCardId,

@@ -113,10 +113,10 @@ const ShakeShareDisplay = ({ onClose }: { onClose: () => void }) => {
   const profile = node?.profile;
 
   useEffect(() => {
-    if (!profile?.webCard.cardIsPublished) {
+    if (!profile?.webCard?.cardIsPublished) {
       onClose();
     }
-  }, [onClose, profile?.webCard.cardIsPublished]);
+  }, [onClose, profile?.webCard?.cardIsPublished]);
 
   const svg = profile?.contactCardQrCode
     ? Skia.SVG.MakeFromString(profile?.contactCardQrCode)
@@ -125,7 +125,7 @@ const ShakeShareDisplay = ({ onClose }: { onClose: () => void }) => {
   const src = rect(0, 0, svg?.width() ?? 0, svg?.height() ?? 0);
   const dst = rect(0, 0, QR_CODE_WIDTH, QR_CODE_WIDTH);
 
-  if (!profile?.webCard.cardIsPublished) {
+  if (!profile?.webCard?.cardIsPublished) {
     return null;
   }
 

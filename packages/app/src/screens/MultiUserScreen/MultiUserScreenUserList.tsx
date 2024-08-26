@@ -17,7 +17,7 @@ import {
   convertToNonNullArray,
   type ArrayItemType,
 } from '@azzapp/shared/arrayHelpers';
-import { isOwner } from '@azzapp/shared/profileHelpers';
+import { profileIsOwner } from '@azzapp/shared/profileHelpers';
 import { colors } from '#theme';
 import { MediaImageRenderer } from '#components/medias';
 import { useRouter } from '#components/NativeRouter';
@@ -214,7 +214,10 @@ const MultiUserScreenUserList = ({
 
   const renderListItem = useCallback<ListRenderItem<Profile>>(
     ({ item }) => {
-      if (item.id === profileInfos?.profileId && isOwner(item.profileRole)) {
+      if (
+        item.id === profileInfos?.profileId &&
+        profileIsOwner(item.profileRole)
+      ) {
         return (
           <View>
             <UserListItem item={item} />

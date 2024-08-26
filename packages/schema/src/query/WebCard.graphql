@@ -1,0 +1,432 @@
+"""
+Represent an Azzapp WebCard
+"""
+type WebCard implements Node {
+  """
+  The ID of an object
+  """
+  id: ID!
+  """
+  True is the webCard is multi user
+  """
+  isMultiUser: Boolean!
+  """
+  The user name of the webCard
+  """
+  userName: String!
+  """
+  The user name of the profile
+  """
+  lastUserNameUpdate: DateTime!
+  """
+  The kind of the webCard (business, personal)
+  """
+  webCardKind: WebCardKind!
+  """
+  The webCard category
+  """
+  webCardCategory: WebCardCategory
+  """
+  The first name of the webCard, will only be set for personal webCard
+  """
+  firstName: String
+  """
+  The last name of the webCard, will only be set for personal webCard
+  """
+  lastName: String
+  """
+  The company name of the webCard, will only be set for business webCard
+  """
+  companyName: String
+  """
+  The company activity of the webCard, will only be set for business webCard
+  """
+  companyActivity: CompanyActivity
+  """
+  The colors used by the webcard and the contact card of the webCard
+  """
+  cardColors: CardColors
+  """
+  The webCard cover id
+  """
+  coverId: ID
+  """
+  Wether the WebCard has a cover
+  """
+  hasCover: Boolean!
+  """
+  The webCard cover media
+  """
+  coverMedia: Media
+  """
+  The webCard cover texts
+  """
+  coverTexts: [String!]
+  """
+  The webCard cover background color
+  """
+  coverBackgroundColor: String
+  """
+  The webCard cover links
+  """
+  coverDynamicLinks: DynamicLinks
+  """
+  the webCard style
+  """
+  cardStyle: WebCardStyle
+  """
+  the WebCard modules
+  """
+  cardModules: [CardModule!]!
+  """
+  Is the webCard published
+  """
+  cardIsPublished: Boolean!
+  """
+  Is the webCard private
+  """
+  cardIsPrivate: Boolean!
+  """
+  Is the webcard was already published
+  """
+  alreadyPublished: Boolean!
+  """
+  The webCard common information for contact cards
+  """
+  commonInformation: CommonInformation
+  """
+  True if the current viewer is following this webCard
+  """
+  isFollowing(webCardId: ID): Boolean!
+  """
+  the number of post the webCard like
+  """
+  nbPostsLiked: Int!
+  """
+  the number of likes received by the webCard posts
+  """
+  nbLikes: Int!
+  """
+  the number of webCard followed by this webCard
+  """
+  nbFollowings: Int!
+  """
+  the number of followers of the webCard
+  """
+  nbFollowers: Int!
+  """
+  the number of posts of the webCard
+  """
+  nbPosts: Int!
+  """
+  the number of total time the webcards was viewed
+  """
+  nbWebCardViews: Int!
+  """
+  return the list of the webCard posts
+  """
+  posts(
+    """
+    Returns the items in the list that come after the specified cursor.
+    """
+    after: String
+    """
+    Returns the first n items from the list.
+    """
+    first: Int @max(value: 50)
+  ): PostConnection
+  """
+  Returns summary of statistics
+  """
+  statsSummary: [WebCardStatistic!]
+  """
+  Returns a list of posts that user like
+  """
+  likedPosts(
+    """
+    Returns the items in the list that come after the specified cursor.
+    """
+    after: String
+
+    """
+    Returns the first n items from the list.
+    """
+    first: Int @max(value: 50)
+  ): PostConnection!
+
+  """
+  The webCard owner User
+  """
+  owner: User
+
+  """
+  The locale of the WebCard
+  """
+  locale: String
+
+  """
+  The number of profiles associated to the webCard
+  """
+  nbProfiles: Int!
+  """
+  The associated profiles to the WebCard
+  """
+  profiles(
+    """
+    The search query
+    """
+    search: String
+    """
+    Returns the items in the list that come after the specified cursor.
+    """
+    after: String
+
+    """
+    Returns the first n items from the list.
+    """
+    first: Int @max(value: 50)
+  ): ProfileConnection!
+
+  """
+  The pending change ownership user if exist
+  """
+  profilePendingOwner: Profile
+
+  """
+  Return a list of WebCards that the current user is following
+  """
+  followings(
+    """
+    Returns the items in the list that come after the specified cursor.
+    """
+    after: String
+
+    """
+    Returns the first n items from the list.
+    """
+    first: Int @max(value: 50)
+
+    """
+    Filter by userName
+    """
+    userName: String
+  ): WebCardConnection!
+
+  """
+  Return a list of WebCards that follow the current user
+  """
+  followers(
+    """
+    Returns the items in the list that come after the specified cursor.
+    """
+    after: String
+
+    """
+    Returns the first n items from the list.
+    """
+    first: Int @max(value: 50)
+
+    """
+    Filter by userName
+    """
+    userName: String
+  ): WebCardConnection!
+
+  """
+  Return a list of Post that the current user is following author
+  """
+  followingsPosts(
+    """
+    Returns the items in the list that come after the specified cursor.
+    """
+    after: String
+
+    """
+    Returns the first n items from the list.
+    """
+    first: Int @max(value: 50)
+  ): PostConnection!
+  """
+  Return the datetime when the webCard can change its username
+  """
+  nextChangeUsernameAllowedAt: DateTime
+
+  """
+  Return a default avatar based on cover
+  """
+  coverAvatarUrl: String
+  """
+  Return the webCard updated at
+  """
+  updatedAt: String!
+  """
+  Return the subscription of the webCard
+  """
+  subscription: UserSubscription
+  """
+  Returns the active payment means for the webCard
+  """
+  paymentMeans: [PaymentMean!]
+  """
+  Returns the executed payment
+  """
+  payments(
+    """
+    Returns the items in the list that come after the specified cursor.
+    """
+    after: String
+    """
+    Returns the first n items from the list.
+    """
+    first: Int @max(value: 50)
+  ): PaymentConnection!
+  """
+  The webCard logo
+  """
+  logo: Media
+  """
+  The webCard requires subscription
+  """
+  requiresSubscription(newWebCardKind: WebCardKind): Boolean!
+  """
+  The webCard is premium
+  """
+  isPremium: Boolean!
+  """
+  The webCard premium account is from the web
+  """
+  isWebSubscription: Boolean!
+  """
+  Fetches cover template type
+  """
+  coverTemplateTypes(
+    tagId: ID
+    first: Int
+    after: String
+  ): CoverTemplateTypeConnection!
+}
+
+type WebCardStyle {
+  fontFamily: String!
+  fontSize: Int!
+  titleFontFamily: String!
+  titleFontSize: Int!
+  buttonRadius: Int!
+  borderRadius: Int!
+  borderWidth: Int!
+  borderColor: String!
+  buttonColor: String!
+  gap: Int!
+}
+
+"""
+A connection to a list of items.
+"""
+type WebCardConnection {
+  """
+  Information to aid in pagination.
+  """
+  pageInfo: PageInfo!
+
+  """
+  A list of edges.
+  """
+  edges: [WebCardEdge]
+}
+
+"""
+An edge in a connection.
+"""
+type WebCardEdge {
+  """
+  The item at the end of the edge
+  """
+  node: WebCard
+
+  """
+  A cursor for use in pagination
+  """
+  cursor: String!
+}
+
+"""
+Represent a Profile Kind
+"""
+enum WebCardKind {
+  business
+  personal
+}
+
+"""
+Represent a Profile Category
+"""
+type WebCardCategory implements Node {
+  """
+  The ID of an object
+  """
+  id: ID!
+  webCardKind: WebCardKind!
+  label: String
+  medias: [MediaImage!]
+  companyActivities: [CompanyActivity!]!
+}
+
+"""
+Represent a Company Activity
+"""
+type CompanyActivity implements Node {
+  """
+  The ID of an object
+  """
+  id: ID!
+  label: String
+
+  companyActivityType: CompanyActivityType
+}
+
+type CompanyActivityType implements Node {
+  """
+  The ID of an object
+  """
+  id: ID!
+  label: String
+}
+
+"""
+A set of colors used by the webcard and the contact card of attached webCards
+"""
+type CardColors {
+  primary: String!
+  light: String!
+  dark: String!
+  otherColors: [String!]!
+}
+
+type CommonInformation {
+  company: String
+  emails: [ContactCardEmail!]
+  phoneNumbers: [ContactCardPhoneNumber!]
+  urls: [ContactCardUrl!]
+  socials: [ContactCardSocial!]
+  addresses: [ContactCardAddress!]
+}
+
+type DynamicLinks {
+  links: [Link!]!
+  color: String!
+  size: Int!
+  position: Coordinate!
+  rotation: Float!
+  shadow: Boolean!
+}
+
+type Link {
+  link: String!
+  position: Int!
+  socialId: String!
+}
+
+type Coordinate {
+  x: Float!
+  y: Float!
+}

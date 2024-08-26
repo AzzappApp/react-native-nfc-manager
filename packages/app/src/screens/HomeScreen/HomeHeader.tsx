@@ -50,7 +50,7 @@ const HomeHeader = ({ openPanel, user: userKey }: HomeHeaderProps) => {
     () => [
       colors.white,
       ...(profiles?.map(profile => {
-        return profile?.webCard.cardColors?.primary
+        return profile?.webCard?.cardColors?.primary
           ? getTextColor(profile?.webCard.cardColors?.primary)
           : colors.white;
       }) ?? []),

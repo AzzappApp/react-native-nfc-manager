@@ -16,7 +16,7 @@ import Animated, {
   useAnimatedStyle,
 } from 'react-native-reanimated';
 import Toast from 'react-native-toast-message';
-import { isEditor } from '@azzapp/shared/profileHelpers';
+import { profileHasEditorRight } from '@azzapp/shared/profileHelpers';
 import { createId } from '#helpers/idHelpers';
 import useAuthState from '#hooks/useAuthState';
 import useScreenInsets from '#hooks/useScreenInsets';
@@ -132,7 +132,10 @@ const MainTabBar = ({
 
       if (!hasFinishedTransition) return;
 
-      if (key !== 'NEW_POST' || isEditor(profileInfos?.profileRole)) {
+      if (
+        key !== 'NEW_POST' ||
+        profileHasEditorRight(profileInfos?.profileRole)
+      ) {
         router.push({ route: key as any });
       } else {
         Toast.show({

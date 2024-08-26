@@ -159,7 +159,7 @@ const ContactCardEditForm = ({
         <View style={styles.sectionsContainer}>
           {children}
 
-          {webCard.isMultiUser ? (
+          {webCard?.isMultiUser ? (
             <View style={styles.avatarSection}>
               <Controller
                 control={control}
@@ -291,7 +291,7 @@ const ContactCardEditForm = ({
             )}
           />
           <Separation />
-          {webCard.isMultiUser && commonInformation?.company ? (
+          {webCard?.isMultiUser && commonInformation?.company ? (
             <View style={styles.fieldCommon}>
               <View style={styles.fieldTitleWithLock}>
                 <Icon icon="locked" />
@@ -333,7 +333,7 @@ const ContactCardEditForm = ({
               )}
             />
           )}
-          {webCard.isMultiUser && logo ? (
+          {webCard?.isMultiUser && logo ? (
             <View style={styles.logoField}>
               <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                 <View style={styles.logoButton}>
@@ -438,7 +438,7 @@ const ContactCardEditForm = ({
           )}
 
           <Separation />
-          {webCard.isMultiUser &&
+          {webCard?.isMultiUser &&
             commonInformation?.phoneNumbers?.map((phoneNumber, index) => (
               <Fragment key={index}>
                 <CommonInformationField
@@ -451,7 +451,7 @@ const ContactCardEditForm = ({
             ))}
           <ContactCardEditModalPhones control={control} />
           <Separation />
-          {webCard.isMultiUser &&
+          {webCard?.isMultiUser &&
             commonInformation?.emails?.map((email, index) => (
               <Fragment key={index}>
                 <CommonInformationField
@@ -464,7 +464,7 @@ const ContactCardEditForm = ({
             ))}
           <ContactCardEditModalEmails control={control} />
           <Separation />
-          {webCard.isMultiUser &&
+          {webCard?.isMultiUser &&
             commonInformation?.urls?.map((url, index) => (
               <Fragment key={index}>
                 <CommonInformationField value={url.address} labelMargin={18} />
@@ -473,7 +473,7 @@ const ContactCardEditForm = ({
             ))}
           <ContactCardEditModalUrls control={control} />
           <Separation />
-          {webCard.isMultiUser &&
+          {webCard?.isMultiUser &&
             commonInformation?.addresses?.map((address, index) => (
               <CommonInformationField
                 key={index}
@@ -486,7 +486,7 @@ const ContactCardEditForm = ({
           <Separation />
           <ContactCardEditModalBirthdays control={control} />
           <Separation />
-          {webCard.isMultiUser &&
+          {webCard?.isMultiUser &&
             commonInformation?.socials?.map((social, index) => (
               <Fragment key={index}>
                 <CommonInformationField

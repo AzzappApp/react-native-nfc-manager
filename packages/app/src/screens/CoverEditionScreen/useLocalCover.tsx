@@ -7,7 +7,7 @@ import type { CoverEditorState } from '#components/CoverEditor';
 const useLocalCover = (
   saving: boolean,
   webCardId?: string,
-  coverId?: string,
+  coverId?: string | null,
 ) => {
   const [state, setState] = useState<{
     cover: Partial<CoverEditorState> | null;

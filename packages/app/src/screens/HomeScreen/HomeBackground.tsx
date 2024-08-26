@@ -38,8 +38,8 @@ const HomeBackground = ({ user: userKey }: HomeBackgroundProps) => {
     () => [
       colors.black,
       ...(user.profiles ?? []).map(({ webCard }) => {
-        if (webCard.cardColors?.primary) {
-          return webCard.cardColors?.primary;
+        if (webCard?.cardColors?.primary) {
+          return webCard?.cardColors?.primary;
         }
         return '#45444b';
       }),
@@ -51,7 +51,7 @@ const HomeBackground = ({ user: userKey }: HomeBackgroundProps) => {
     () => [
       colors.black,
       ...(user.profiles ?? []).map(
-        ({ webCard }) => webCard.cardColors?.dark ?? colors.black,
+        ({ webCard }) => webCard?.cardColors?.dark ?? colors.black,
       ),
     ],
     [user],

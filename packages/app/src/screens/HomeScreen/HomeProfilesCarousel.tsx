@@ -11,7 +11,7 @@ import {
 } from 'react-native';
 import { graphql, useFragment } from 'react-relay';
 import { COVER_CARD_RADIUS, COVER_RATIO } from '@azzapp/shared/coverHelpers';
-import { isAdmin } from '@azzapp/shared/profileHelpers';
+import { profileHasAdminRight } from '@azzapp/shared/profileHelpers';
 import { colors, shadow } from '#theme';
 import CoverErrorRenderer from '#components/CoverErrorRenderer';
 import CoverLink from '#components/CoverLink';
@@ -193,7 +193,7 @@ const HomeProfilesCarousel = ({ user: userKey }: HomeProfilesCarouselProps) => {
 const SCALE_RATIO = 108 / 291;
 
 const keyExtractor = (item: ProfileType | null, index: number) =>
-  item?.webCard.id ?? `new_${index}`;
+  item?.webCard?.id ?? `new_${index}`;
 
 export default HomeProfilesCarousel;
 
@@ -256,11 +256,11 @@ const ItemRenderComponent = ({
   const router = useRouter();
 
   const onPressMultiUser = useCallback(() => {
-    if (isAdmin(profile.profileRole)) {
+    if (profileHasAdminRight(profile.profileRole)) {
       router.push({
         route: 'MULTI_USER',
       });
-    } else {
+    } else if (profile.webCard) {
       router.push({
         route: 'WEBCARD',
         params: {
@@ -269,12 +269,7 @@ const ItemRenderComponent = ({
         },
       });
     }
-  }, [
-    router,
-    profile.profileRole,
-    profile.webCard.id,
-    profile.webCard.userName,
-  ]);
+  }, [router, profile.profileRole, profile.webCard]);
 
   const hasFocus = useScreenHasFocus();
 
@@ -331,7 +326,7 @@ const ItemRenderComponent = ({
             tintColor={colors.white}
           />
         </View>
-      ) : profile.webCard.hasCover ? (
+      ) : profile.webCard?.hasCover ? (
         <View style={styles.coverLinkWrapper}>
           <CoverLink
             webCard={profile.webCard}

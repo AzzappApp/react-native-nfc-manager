@@ -201,7 +201,7 @@ const SocialLinksEditionScreen = ({
   const intl = useIntl();
 
   const cardModulesCount =
-    profile.webCard.cardModules.length + (socialLinks ? 0 : 1);
+    (profile.webCard?.cardModules.length ?? 0) + (socialLinks ? 0 : 1);
 
   const onCancel = router.back;
 
@@ -254,7 +254,7 @@ const SocialLinksEditionScreen = ({
   const onBackgroundStyleChange = fieldUpdateHandler('backgroundStyle');
 
   const onSave = useCallback(async () => {
-    if (!canSave) {
+    if (!canSave || !profile.webCard) {
       return;
     }
 
@@ -264,9 +264,9 @@ const SocialLinksEditionScreen = ({
     );
 
     if (
-      profile.webCard.cardIsPublished &&
+      profile.webCard?.cardIsPublished &&
       requireSubscription &&
-      !profile.webCard.isPremium
+      !profile.webCard?.isPremium
     ) {
       router.push({ route: 'USER_PAY_WALL' });
       return;
@@ -299,9 +299,7 @@ const SocialLinksEditionScreen = ({
   }, [
     canSave,
     cardModulesCount,
-    profile.webCard.cardIsPublished,
-    profile.webCard.isPremium,
-    profile.webCard.id,
+    profile.webCard,
     value,
     iconSize.value,
     borderWidth.value,
@@ -370,7 +368,7 @@ const SocialLinksEditionScreen = ({
             flex: 1,
             marginVertical: 10,
           }}
-          colorPalette={profile.webCard.cardColors}
+          colorPalette={profile.webCard?.cardColors}
           cardStyle={null}
           animatedData={{
             iconSize,

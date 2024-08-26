@@ -165,7 +165,7 @@ const HorizontalPhotoEditionScreen = ({
 
   const { data, value, fieldUpdateHandler, dirty } = useModuleDataEditor({
     initialValue,
-    cardStyle: profile?.webCard.cardStyle,
+    cardStyle: profile?.webCard?.cardStyle,
     styleValuesMap: HORIZONTAL_PHOTO_STYLE_VALUES,
     defaultValues: HORIZONTAL_PHOTO_DEFAULT_VALUES,
   });
@@ -218,7 +218,7 @@ const HorizontalPhotoEditionScreen = ({
   const intl = useIntl();
 
   const cardModulesCount =
-    profile.webCard.cardModules.length + (horizontalPhoto ? 0 : 1);
+    (profile.webCard?.cardModules.length ?? 0) + (horizontalPhoto ? 0 : 1);
 
   const onCancel = router.back;
 
@@ -297,7 +297,7 @@ const HorizontalPhotoEditionScreen = ({
   const onImageChange = fieldUpdateHandler('image');
 
   const onSave = useCallback(async () => {
-    if (!canSave) {
+    if (!canSave || !profile.webCard) {
       return;
     }
 
@@ -309,9 +309,9 @@ const HorizontalPhotoEditionScreen = ({
     );
 
     if (
-      profile.webCard.cardIsPublished &&
+      profile.webCard?.cardIsPublished &&
       requireSubscription &&
-      !profile.webCard.isPremium
+      !profile.webCard?.isPremium
     ) {
       router.push({ route: 'USER_PAY_WALL' });
       return;
@@ -389,9 +389,7 @@ const HorizontalPhotoEditionScreen = ({
   }, [
     canSave,
     cardModulesCount,
-    profile.webCard.cardIsPublished,
-    profile.webCard.isPremium,
-    profile.webCard.id,
+    profile.webCard,
     value,
     horizontalPhoto?.id,
     marginHorizontal.value,
@@ -474,8 +472,8 @@ const HorizontalPhotoEditionScreen = ({
             marginVertical,
             imageHeight,
           }}
-          colorPalette={profile?.webCard.cardColors}
-          cardStyle={profile?.webCard.cardStyle}
+          colorPalette={profile?.webCard?.cardColors}
+          cardStyle={profile?.webCard?.cardStyle}
         />
       </PressableOpacity>
       <View

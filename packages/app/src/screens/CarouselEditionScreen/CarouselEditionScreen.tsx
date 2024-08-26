@@ -166,7 +166,7 @@ const CarouselEditionScreen = ({
   const { data, value, updateFields, fieldUpdateHandler, dirty } =
     useModuleDataEditor({
       initialValue,
-      cardStyle: profile?.webCard.cardStyle,
+      cardStyle: profile?.webCard?.cardStyle,
       styleValuesMap: CAROUSEL_STYLE_VALUES,
       defaultValues: CAROUSEL_DEFAULT_VALUES,
     });
@@ -221,7 +221,7 @@ const CarouselEditionScreen = ({
   const intl = useIntl();
 
   const cardModulesCount =
-    profile.webCard.cardModules.length + (carousel ? 0 : 1);
+    (profile.webCard?.cardModules.length ?? 0) + (carousel ? 0 : 1);
 
   const onCancel = router.back;
 
@@ -326,7 +326,7 @@ const CarouselEditionScreen = ({
   const onBackgroundStyleChange = fieldUpdateHandler('backgroundStyle');
 
   const onSave = useCallback(async () => {
-    if (!canSave) {
+    if (!canSave || !profile.webCard?.id) {
       return;
     }
 
@@ -338,7 +338,7 @@ const CarouselEditionScreen = ({
     );
 
     if (
-      profile.webCard.cardIsPublished &&
+      profile.webCard?.cardIsPublished &&
       requireSubscription &&
       !profile.webCard.isPremium
     ) {
@@ -456,9 +456,9 @@ const CarouselEditionScreen = ({
   }, [
     canSave,
     cardModulesCount,
-    profile.webCard.cardIsPublished,
-    profile.webCard.isPremium,
-    profile.webCard.id,
+    profile.webCard?.cardIsPublished,
+    profile.webCard?.isPremium,
+    profile.webCard?.id,
     value,
     commit,
     carousel?.id,
@@ -527,8 +527,8 @@ const CarouselEditionScreen = ({
           gap,
         }}
         style={{ height: topPanelHeight - 40, marginVertical: 20 }}
-        colorPalette={profile?.webCard.cardColors}
-        cardStyle={profile?.webCard.cardStyle}
+        colorPalette={profile?.webCard?.cardColors}
+        cardStyle={profile?.webCard?.cardStyle}
       />
       <TabView
         style={{ height: bottomPanelHeight }}

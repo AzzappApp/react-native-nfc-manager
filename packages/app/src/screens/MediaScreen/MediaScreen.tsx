@@ -65,7 +65,7 @@ const MediaScreen = ({
   }, [profile?.invited, router]);
 
   // viewer might be briefly null when the user logs out or by switching accounts
-  if (!profile) {
+  if (!profile || !profile.webCard) {
     return null;
   }
 
@@ -92,7 +92,7 @@ const MediaScreen = ({
                 }
                 coverListStyle={styles.coverList}
                 profile={profile}
-                webcard={node?.profile.webCard}
+                webcard={profile.webCard}
                 isCurrentTab={tab === 'SUGGESTIONS'}
               />
               <Text style={styles.postsTitleStyle} variant="large">

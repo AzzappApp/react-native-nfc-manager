@@ -11,7 +11,10 @@ import {
 import { updateExistingSubscription } from '@azzapp/payment';
 import ERRORS from '@azzapp/shared/errors';
 import { webCardRequiresSubscription } from '@azzapp/shared/subscriptionHelpers';
-import type { GraphQLContext } from '#GraphQLContext';
+import {
+  activeSubscriptionsForWebCardLoader,
+  webCardOwnerLoader,
+} from '#loaders';
 
 export const calculateAvailableSeats = async (
   userSubscription: UserSubscription,
@@ -91,26 +94,23 @@ export const updateMonthlySubscription = async (
   }
 };
 
-export const checkWebCardHasSubscription = async (
-  {
-    webCard,
-    appliedModules,
-  }: {
-    webCard: WebCard;
-    appliedModules?: CardModuleTemplate[];
-  },
-  loaders: GraphQLContext['loaders'],
-) => {
+export const checkWebCardHasSubscription = async ({
+  webCard,
+  appliedModules,
+}: {
+  webCard: WebCard;
+  appliedModules?: CardModuleTemplate[];
+}) => {
   const modules = appliedModules ?? (await getCardModulesByWebCard(webCard.id));
 
-  const owner = await loaders.webCardOwners.load(webCard.id);
+  const owner = await webCardOwnerLoader.load(webCard.id);
 
   if (
     webCardRequiresSubscription(modules, webCard) &&
     webCard.cardIsPublished
   ) {
     const subscription = owner
-      ? await loaders.activeSubscriptionsForWebCardLoader.load({
+      ? await activeSubscriptionsForWebCardLoader.load({
           userId: owner.id,
           webCardId: webCard.id,
         })

@@ -9,7 +9,7 @@ import {
   usePreloadedQuery,
 } from 'react-relay';
 import ERRORS from '@azzapp/shared/errors';
-import { isOwner } from '@azzapp/shared/profileHelpers';
+import { profileIsOwner } from '@azzapp/shared/profileHelpers';
 import { isWebCardKindSubscription } from '@azzapp/shared/subscriptionHelpers';
 import { colors, textStyles } from '#theme';
 import { useRouter } from '#components/NativeRouter';
@@ -90,7 +90,7 @@ const WebCardParametersScreen = ({
   const router = useRouter();
 
   const isWebCardOwner = useMemo(() => {
-    return isOwner(profile?.profileRole);
+    return profileIsOwner(profile?.profileRole);
   }, [profile?.profileRole]);
 
   const webCard = useFragment(

@@ -102,8 +102,8 @@ const MultiUserPendingProfileOwner = ({
         MultiUserScreenUserList - Text for ownership transfer pending"
           values={{
             contact:
-              profilePendingOwner.user.email ??
-              profilePendingOwner.user.phoneNumber,
+              profilePendingOwner.user?.email ??
+              profilePendingOwner.user?.phoneNumber,
           }}
         />
       </Text>

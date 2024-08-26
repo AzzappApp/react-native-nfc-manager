@@ -38,7 +38,7 @@ const HomeProfileLink = ({ user: userKey }: HomeProfileLinkProps) => {
     useHomeScreenContext();
 
   const userNames = useDerivedValue(
-    () => profiles?.map(p => p.webCard.userName) ?? [],
+    () => profiles?.map(p => p.webCard?.userName) ?? [],
     [profiles],
   );
 

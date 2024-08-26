@@ -50,7 +50,7 @@ const HomeContactCard = ({ user, height }: HomeContactCardProps) => {
     >
       {profiles?.map((item, index) => (
         <ContactCardItem
-          key={item.webCard.id}
+          key={item.webCard?.id}
           height={height}
           item={item}
           index={index}
@@ -128,7 +128,7 @@ const ContactCardItem = ({ height, item, index }: ContactCardItemProps) => {
         positionStyle,
       ]}
     >
-      {profile.webCard.cardIsPublished &&
+      {profile.webCard?.cardIsPublished &&
         !profile.invited &&
         !profile.promotedAsOwner && (
           <View

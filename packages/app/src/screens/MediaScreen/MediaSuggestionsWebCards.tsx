@@ -12,7 +12,7 @@ import Animated, { FadeOut } from 'react-native-reanimated';
 import Toast from 'react-native-toast-message';
 import { graphql, useFragment, usePaginationFragment } from 'react-relay';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
-import { isEditor } from '@azzapp/shared/profileHelpers';
+import { profileHasEditorRight } from '@azzapp/shared/profileHelpers';
 import { colors, shadow } from '#theme';
 import CoverLink from '#components/CoverLink';
 import CoverList from '#components/CoverList';
@@ -217,7 +217,7 @@ const CoverLinkWithOptions = ({
               return;
             }
 
-            if (isEditor(profileInfos?.profileRole)) {
+            if (profileHasEditorRight(profileInfos?.profileRole)) {
               startTransition(() => {
                 toggleFollow(props.webCardId, userName, !isFollowing);
               });

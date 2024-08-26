@@ -66,7 +66,7 @@ const MultiUserDetailsScreen = ({
   const profile = node?.profile;
 
   const phoneNumber =
-    profile?.user.phoneNumber && parsePhoneNumber(profile.user.phoneNumber);
+    profile?.user?.phoneNumber && parsePhoneNumber(profile.user.phoneNumber);
 
   const {
     control,
@@ -91,7 +91,7 @@ const MultiUserDetailsScreen = ({
       socials: profile?.contactCard?.socials?.slice() ?? [],
       addresses: profile?.contactCard?.addresses?.slice() ?? [],
       avatar: profile?.avatar,
-      selectedContact: profile?.user.email
+      selectedContact: profile?.user?.email
         ? {
             countryCodeOrEmail: 'email',
             value: profile.user.email,
@@ -352,18 +352,20 @@ const MultiUserDetailsScreen = ({
           return;
         }
 
-        const webCardRecord = store.get(profile.webCard.id);
-        if (webCardRecord) {
-          const connection = ConnectionHandler.getConnection(
-            webCardRecord,
-            'MultiUserScreenUserList_webCard_connection_profiles',
-          );
-          if (connection) {
-            ConnectionHandler.deleteNode(connection, profile.id);
+        if (profile.webCard) {
+          const webCardRecord = store.get(profile.webCard.id);
+          if (webCardRecord) {
+            const connection = ConnectionHandler.getConnection(
+              webCardRecord,
+              'MultiUserScreenUserList_webCard_connection_profiles',
+            );
+            if (connection) {
+              ConnectionHandler.deleteNode(connection, profile.id);
+            }
+            //update the user counter profile?.webCard?.nbProfiles
+            const nbProfiles = webCardRecord?.getValue('nbProfiles') as number;
+            webCardRecord?.setValue(nbProfiles - 1, 'nbProfiles');
           }
-          //update the user counter profile?.webCard?.nbProfiles
-          const nbProfiles = webCardRecord?.getValue('nbProfiles') as number;
-          webCardRecord?.setValue(nbProfiles - 1, 'nbProfiles');
         }
       },
     });
@@ -530,7 +532,7 @@ const MultiUserDetailsScreen = ({
               )}
             />
 
-            {!profile.webCard.profilePendingOwner && (
+            {!profile.webCard?.profilePendingOwner && (
               <Text variant="xsmall" style={styles.description}>
                 {role === 'user' && (
                   <FormattedMessage
@@ -570,7 +572,7 @@ const MultiUserDetailsScreen = ({
                 )}
               </Text>
             )}
-            {profile.webCard.profilePendingOwner && (
+            {profile.webCard?.profilePendingOwner && (
               <Text variant="xsmall" style={styles.description}>
                 <FormattedMessage
                   defaultMessage="An ownership request has been sent. Ownership will be transfered as soon as the request is accepted."

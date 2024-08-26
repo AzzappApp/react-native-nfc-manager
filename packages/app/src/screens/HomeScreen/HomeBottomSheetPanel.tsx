@@ -13,8 +13,8 @@ import Toast from 'react-native-toast-message';
 import { graphql, useFragment } from 'react-relay';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
 import {
-  isAdmin,
-  isOwner as isOwnerByProfileRole,
+  profileHasAdminRight,
+  profileIsOwner,
 } from '@azzapp/shared/profileHelpers';
 import { buildUserUrl } from '@azzapp/shared/urlHelpers';
 import { colors } from '#theme';
@@ -79,7 +79,7 @@ const HomeBottomSheetPanel = ({
   const intl = useIntl();
 
   const [quitWebCard, isLoadingQuitWebCard] = useQuitWebCard(
-    profile?.webCard.id ?? '',
+    profile?.webCard?.id,
     close,
     e => {
       console.error(e);
@@ -100,7 +100,7 @@ const HomeBottomSheetPanel = ({
   );
 
   const handleConfirmationQuitWebCard = useCallback(() => {
-    const isOwner = isOwnerByProfileRole(profile?.profileRole);
+    const isOwner = profileIsOwner(profile?.profileRole);
 
     const titleMsg = isOwner
       ? intl.formatMessage({
@@ -172,7 +172,7 @@ const HomeBottomSheetPanel = ({
   }, [close, toggleRequestLogout]);
 
   const onShare = useCallback(async () => {
-    if (profile?.webCard.userName) {
+    if (profile?.webCard?.userName) {
       // a quick share method using the native share component. If we want to make a custom share (like tiktok for example, when they are recompressiong the media etc) we can use react-native-shares
       const url = buildUserUrl(profile?.webCard.userName);
       let message = intl.formatMessage({
@@ -215,7 +215,7 @@ const HomeBottomSheetPanel = ({
         Sentry.captureException(error);
       }
     }
-  }, [close, intl, profile?.webCard.userName]);
+  }, [close, intl, profile?.webCard?.userName]);
 
   //Restore purchase
   //Manage my subsciption
@@ -252,7 +252,7 @@ const HomeBottomSheetPanel = ({
           },
           onPress: close,
         },
-        profile?.webCard.isPremium && !profile?.webCard.isWebSubscription
+        profile?.webCard?.isPremium && !profile?.webCard.isWebSubscription
           ? {
               type: 'row',
               icon: Platform.OS === 'ios' ? 'app_store' : 'play_store',
@@ -268,7 +268,7 @@ const HomeBottomSheetPanel = ({
             }
           : null,
         { type: 'separator' },
-        isAdmin(profile?.profileRole) && !profile?.invited
+        profileHasAdminRight(profile?.profileRole) && !profile?.invited
           ? {
               type: 'row',
               icon: 'parameters',
@@ -287,8 +287,8 @@ const HomeBottomSheetPanel = ({
             }
           : null,
         !profile?.invited &&
-        isAdmin(profile?.profileRole) &&
-        profile?.webCard.hasCover
+        profileHasAdminRight(profile?.profileRole) &&
+        profile?.webCard?.hasCover
           ? {
               type: 'row',
               icon: 'shared_webcard',
@@ -302,7 +302,7 @@ const HomeBottomSheetPanel = ({
               onPress: close,
             }
           : null,
-        profile && profile?.webCard.cardIsPublished && !profile?.invited
+        profile && profile?.webCard?.cardIsPublished && !profile?.invited
           ? {
               type: 'row',
               icon: 'share',
@@ -391,7 +391,7 @@ const HomeBottomSheetPanel = ({
           }
           return <HomeBottomSheetPanelOption key={index} {...element} />;
         })}
-        {profile && !isOwnerByProfileRole(profile?.profileRole) && (
+        {profile && !profileIsOwner(profile?.profileRole) && (
           <PressableNative
             style={styles.removeButton}
             onPress={handleConfirmationQuitWebCard}

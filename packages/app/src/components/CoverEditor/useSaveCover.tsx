@@ -48,7 +48,7 @@ type ProgressCallback = (progress: {
 }) => void;
 
 const useSaveCover = (
-  webCardId: string,
+  webCardId: string | null,
   coverEditorState: CoverEditorState,
 ) => {
   const [savingStatus, setSavingStatus] = useState<SavingStatus | null>(null);
@@ -71,6 +71,9 @@ const useSaveCover = (
   `);
 
   const save = useCallback(async () => {
+    if (!webCardId) {
+      throw new Error('Cannot save cover without a webCardId');
+    }
     setSavingStatus('exporting');
 
     // we need to be sure that the cover rendering is stopped
@@ -166,7 +169,7 @@ const useSaveCover = (
           onCompleted(response, error) {
             coverLocalStore.saveCover(webCardId, {
               ...coverEditorState,
-              coverId: response?.saveCover?.webCard.coverId,
+              coverId: response?.saveCover?.webCard.coverId ?? undefined,
             });
             if (error) {
               reject(error);

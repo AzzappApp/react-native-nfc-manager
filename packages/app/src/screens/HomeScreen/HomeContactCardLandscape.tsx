@@ -94,7 +94,7 @@ const HomeContactCardLandscape = ({
   const appearance = useColorScheme();
 
   const { width: windowWidth, height: windowHeight } = useWindowDimensions();
-  if (!profile || !profile.webCard.cardIsPublished) {
+  if (!profile || !profile.webCard?.cardIsPublished) {
     return null;
   }
 

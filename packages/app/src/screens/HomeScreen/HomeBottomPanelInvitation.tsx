@@ -67,7 +67,7 @@ const HomeBottomPanelInvitation = ({
   const intl = useIntl();
 
   const [quitWebCard, isLoadingQuitWebCard] = useQuitWebCard(
-    profile.webCard.id,
+    profile.webCard?.id,
     undefined,
     e => {
       console.error(e);

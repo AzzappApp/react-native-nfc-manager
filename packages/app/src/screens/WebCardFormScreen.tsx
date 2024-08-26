@@ -365,6 +365,9 @@ const WebCardFormScreen = ({
           profileRole,
           webCard,
         } = data.createWebCard.profile;
+        if (!webCard) {
+          throw new Error('WebCard not created');
+        }
         onChangeWebCard({
           profileId,
           webCardId: webCard.id,

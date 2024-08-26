@@ -2,7 +2,7 @@ import { useIntl } from 'react-intl';
 import { View, StyleSheet } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { graphql, useFragment, useMutation } from 'react-relay';
-import { isEditor } from '@azzapp/shared/profileHelpers';
+import { profileHasEditorRight } from '@azzapp/shared/profileHelpers';
 import { colors } from '#theme';
 import useAuthState from '#hooks/useAuthState';
 import Icon from '#ui/Icon';
@@ -53,7 +53,10 @@ const DeletableCommentItem = (props: DeletableCommentItemProps) => {
     const intl = useIntl();
 
     const onDelete = () => {
-      if (isEditor(profileInfos?.profileRole) && profileInfos?.webCardId) {
+      if (
+        profileHasEditorRight(profileInfos?.profileRole) &&
+        profileInfos?.webCardId
+      ) {
         commit({
           variables: {
             webCardId: profileInfos?.webCardId,

@@ -1,7 +1,7 @@
 import { FormattedMessage, useIntl } from 'react-intl';
 import { StyleSheet } from 'react-native';
 import Toast from 'react-native-toast-message';
-import { isAdmin } from '@azzapp/shared/profileHelpers';
+import { profileHasAdminRight } from '@azzapp/shared/profileHelpers';
 import { colors } from '#theme';
 import { useRouter } from '#components/NativeRouter';
 import Button from '#ui/Button';
@@ -52,7 +52,7 @@ const HomeBottomPanelNewCover = ({
         variant="secondary"
         appearance="dark"
         onPress={() => {
-          if (isAdmin(profile.profileRole)) {
+          if (profileHasAdminRight(profile.profileRole)) {
             router.push({
               route: 'COVER_TEMPLATE_SELECTION',
               params: { fromHome: true },

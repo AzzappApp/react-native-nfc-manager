@@ -201,7 +201,7 @@ const PhotoWithTextAndTitleEditionScreen = ({
   const { data, value, fieldUpdateHandler, updateFields, dirty } =
     useModuleDataEditor({
       initialValue,
-      cardStyle: profile?.webCard.cardStyle,
+      cardStyle: profile?.webCard?.cardStyle,
       styleValuesMap: PHOTO_WITH_TEXT_AND_TITLE_STYLE_VALUES,
       defaultValues: PHOTO_WITH_TEXT_AND_TITLE_DEFAULT_VALUES,
     });
@@ -270,7 +270,8 @@ const PhotoWithTextAndTitleEditionScreen = ({
   const intl = useIntl();
 
   const cardModulesCount =
-    (profile.webCard.cardModules.length ?? 0) + (photoWithTextAndTitle ? 0 : 1);
+    (profile.webCard?.cardModules.length ?? 0) +
+    (photoWithTextAndTitle ? 0 : 1);
 
   const onCancel = router.back;
 
@@ -402,7 +403,7 @@ const PhotoWithTextAndTitleEditionScreen = ({
   const onBackgroundStyleChange = fieldUpdateHandler('backgroundStyle');
 
   const onSave = useCallback(async () => {
-    if (!canSave) {
+    if (!canSave || !profile.webCard) {
       return;
     }
 
@@ -414,9 +415,9 @@ const PhotoWithTextAndTitleEditionScreen = ({
     );
 
     if (
-      profile.webCard.cardIsPublished &&
+      profile.webCard?.cardIsPublished &&
       requireSubscription &&
-      !profile.webCard.isPremium
+      !profile.webCard?.isPremium
     ) {
       router.push({ route: 'USER_PAY_WALL' });
       return;
@@ -502,9 +503,7 @@ const PhotoWithTextAndTitleEditionScreen = ({
   }, [
     canSave,
     cardModulesCount,
-    profile.webCard.cardIsPublished,
-    profile.webCard.isPremium,
-    profile.webCard.id,
+    profile.webCard,
     value,
     photoWithTextAndTitle?.id,
     titleFontSize.value,
@@ -605,8 +604,8 @@ const PhotoWithTextAndTitleEditionScreen = ({
             contentFontSize,
             contentVerticalSpacing,
           }}
-          colorPalette={profile?.webCard.cardColors}
-          cardStyle={profile?.webCard.cardStyle}
+          colorPalette={profile?.webCard?.cardColors}
+          cardStyle={profile?.webCard?.cardStyle}
         />
       </PressableOpacity>
       <TabView

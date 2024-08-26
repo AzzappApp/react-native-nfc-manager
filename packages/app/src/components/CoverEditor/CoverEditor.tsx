@@ -226,9 +226,9 @@ const CoverEditorCore = (
         ).map(({ customText, ...textLayer }) => {
           const text =
             textLayer.text === 'mainName'
-              ? profile.webCard.companyName || profile.webCard.lastName
+              ? profile.webCard?.companyName || profile.webCard?.lastName
               : textLayer.text === 'firstName'
-                ? profile.webCard.firstName
+                ? profile.webCard?.firstName
                 : textLayer.text === 'custom'
                   ? customText
                   : null;
@@ -279,7 +279,7 @@ const CoverEditorCore = (
     }
 
     const cardColors =
-      profile.webCard.cardColors ?? coverTemplate?.colorPalette ?? {};
+      profile.webCard?.cardColors ?? coverTemplate?.colorPalette ?? {};
 
     return {
       isModified: false,
@@ -500,7 +500,7 @@ const CoverEditorCore = (
     uploadProgressIndicator,
     error,
     canSave,
-  } = useSaveCover(profile.webCard.id, coverEditorState);
+  } = useSaveCover(profile.webCard?.id ?? null, coverEditorState);
 
   useEffect(() => {
     if (error) {

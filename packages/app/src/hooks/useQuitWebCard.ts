@@ -24,7 +24,7 @@ const updater = (
 };
 
 const useQuitWebCard = (
-  webCardId: string,
+  webCardId?: string,
   onCompleted?: () => void,
   onError?: (error: Error) => void,
 ) => {
@@ -38,23 +38,24 @@ const useQuitWebCard = (
 
   const [commitMutationFn, isLoading] = useMutation(quitWebCardMutation);
 
-  const quitWebCard = useCallback(
-    () =>
-      commitMutationFn({
-        variables: {
+  const quitWebCard = useCallback(() => {
+    if (!webCardId) {
+      return;
+    }
+    return commitMutationFn({
+      variables: {
+        webCardId,
+      },
+      optimisticResponse: {
+        quitWebCard: {
           webCardId,
         },
-        optimisticResponse: {
-          quitWebCard: {
-            webCardId,
-          },
-        },
-        updater: store => updater(store, webCardId),
-        onCompleted,
-        onError,
-      }),
-    [commitMutationFn, onCompleted, onError, webCardId],
-  );
+      },
+      updater: store => updater(store, webCardId),
+      onCompleted,
+      onError,
+    });
+  }, [commitMutationFn, onCompleted, onError, webCardId]);
 
   return [quitWebCard, isLoading] as const;
 };

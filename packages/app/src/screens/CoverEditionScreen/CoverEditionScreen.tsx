@@ -121,7 +121,7 @@ const CoverEditionScreen = ({
     return null;
   }
 
-  const { isPremium } = profile.webCard;
+  const { isPremium } = profile.webCard ?? {};
 
   return (
     <Container
@@ -182,7 +182,7 @@ const CoverEditionScreen = ({
             coverTemplate={null}
             onCanSaveChange={onCanSaveChange}
             onCoverModified={onCoverModified}
-            backgroundColor={profile.webCard.coverBackgroundColor}
+            backgroundColor={profile.webCard?.coverBackgroundColor ?? null}
             style={styles.container}
             onCancel={onCancel}
           />

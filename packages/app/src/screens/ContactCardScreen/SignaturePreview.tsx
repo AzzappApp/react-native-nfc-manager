@@ -88,7 +88,7 @@ const SignaturePreview = ({ profile: profileKey }: SignaturePreviewProps) => {
 
   const company = webCard?.commonInformation?.company || contactCard?.company;
 
-  const logo = webCard.logo ?? profileLogo;
+  const logo = webCard?.logo ?? profileLogo;
 
   return (
     <>
@@ -116,7 +116,7 @@ const SignaturePreview = ({ profile: profileKey }: SignaturePreviewProps) => {
             <Text
               style={[
                 styles.titleText,
-                { color: webCard.cardColors?.primary ?? colors.black },
+                { color: webCard?.cardColors?.primary ?? colors.black },
               ]}
               allowFontScaling
               adjustsFontSizeToFit
@@ -130,7 +130,7 @@ const SignaturePreview = ({ profile: profileKey }: SignaturePreviewProps) => {
             style={[
               styles.saveButton,
               {
-                backgroundColor: webCard.cardColors?.primary ?? colors.white,
+                backgroundColor: webCard?.cardColors?.primary ?? colors.white,
               },
             ]}
           >
@@ -139,7 +139,7 @@ const SignaturePreview = ({ profile: profileKey }: SignaturePreviewProps) => {
                 styles.saveButtonFont,
                 {
                   color: getTextColor(
-                    webCard.cardColors?.primary ?? colors.white,
+                    webCard?.cardColors?.primary ?? colors.white,
                   ),
                 },
               ]}

@@ -1,4 +1,5 @@
 import { and, asc, eq, inArray, ne, sql } from 'drizzle-orm';
+import { alias } from 'drizzle-orm/mysql-core';
 import { db } from '../database';
 import { ProfileTable, WebCardTable } from '../schema';
 import { getEntitiesByIds } from './entitiesQueries';
@@ -359,6 +360,48 @@ export const removeWebCardNonOwnerProfiles = async (webCardId: string) => {
       and(
         eq(ProfileTable.webCardId, webCardId),
         ne(ProfileTable.profileRole, 'owner'),
+      ),
+    );
+};
+
+/**
+ * Retrieves for a user the profiles that have a common web card with the targeted users
+ *
+ * @param userId - The id of the user
+ * @param targetUserIds - The list of targeted users
+ * @returns a record with as key the target user id and as value the profile of the user
+ */
+export const getCommonWebCardProfiles = async (
+  userId: string,
+  targetUserIds: readonly string[],
+): Promise<Record<string, Profile[]>> => {
+  const TargetProfileTable = alias(ProfileTable, 'TargetProfileTable');
+  return db()
+    .select({
+      profile: ProfileTable,
+      targetUserId: TargetProfileTable.userId,
+    })
+    .from(ProfileTable)
+    .innerJoin(
+      TargetProfileTable,
+      eq(ProfileTable.webCardId, TargetProfileTable.webCardId),
+    )
+    .where(
+      and(
+        eq(ProfileTable.userId, userId),
+        inArray(TargetProfileTable.userId, targetUserIds as string[]),
+      ),
+    )
+    .then(res =>
+      res.reduce(
+        (acc, { profile, targetUserId }) => {
+          if (!acc[targetUserId]) {
+            acc[targetUserId] = [];
+          }
+          acc[targetUserId].push(profile);
+          return acc;
+        },
+        {} as Record<string, Profile[]>,
       ),
     );
 };

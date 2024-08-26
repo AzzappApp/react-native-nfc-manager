@@ -73,7 +73,7 @@ const CoverTemplateList = ({
     isLoadingNext,
     hasNext,
     loadNext,
-  } = useCoverTemplateTypes(webCard.coverTemplatesFragment);
+  } = useCoverTemplateTypes(webCard?.coverTemplatesFragment ?? null);
 
   const onEndReached = useCallback(() => {
     if (!isLoadingNext && hasNext) {

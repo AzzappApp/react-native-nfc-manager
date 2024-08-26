@@ -13,7 +13,7 @@ import { useIntl } from 'react-intl';
 import { Alert, View } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { graphql, useFragment } from 'react-relay';
-import { isEditor } from '@azzapp/shared/profileHelpers';
+import { profileHasEditorRight } from '@azzapp/shared/profileHelpers';
 import { colors } from '#theme';
 import AuthorCartouche from '#components/AuthorCartouche';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
@@ -167,7 +167,7 @@ const PostRenderer = (
   const intl = useIntl();
 
   const openModal = useCallback(() => {
-    if (isEditor(profileInfos?.profileRole)) {
+    if (profileHasEditorRight(profileInfos?.profileRole)) {
       toggleModal();
     } else {
       Toast.show({

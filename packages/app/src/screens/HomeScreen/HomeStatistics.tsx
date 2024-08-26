@@ -74,7 +74,10 @@ const HomeStatistics = ({
   );
 
   const likes = useDerivedValue(
-    () => [0, ...(profiles?.map(profile => profile.webCard.nbLikes) ?? [])],
+    () => [
+      0,
+      ...(profiles?.map(profile => profile.webCard?.nbLikes ?? 0) ?? []),
+    ],
     [profiles],
   );
   const contactCardScans = useDerivedValue(
@@ -87,7 +90,7 @@ const HomeStatistics = ({
   const webCardViews = useDerivedValue(
     () => [
       0,
-      ...(profiles?.map(profile => profile.webCard.nbWebCardViews) ?? []),
+      ...(profiles?.map(profile => profile.webCard?.nbWebCardViews ?? 0) ?? []),
     ],
     [profiles],
   );
