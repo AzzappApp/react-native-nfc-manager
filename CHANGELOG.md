@@ -1,5 +1,8 @@
-## 0.6.0-canary.23
+## 0.6.0-canary.24
 
+* **fix:**  - 🐛 only display cc on rotate with invitation accepted ([#4718](https://github.com/AzzappApp/azzapp/pull/4718))
+* **fix:**  - 🐛 improve gesture on hue picker ([#4713](https://github.com/AzzappApp/azzapp/pull/4713))
+* **feat:**  - 🎸 complete feed redesign implementation ([#4632](https://github.com/AzzappApp/azzapp/pull/4632))
 * **feat:**  - deactivation of drizzle and planetscale
 * **fix:**  - **CI:** Deploy PS change
 * **fix:**  - remove edit button on ContactCard ([#4704](https://github.com/AzzappApp/azzapp/pull/4704))
