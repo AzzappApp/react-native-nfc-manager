@@ -1,4 +1,4 @@
-## 0.6.0-canary.25
+## 0.6.0-canary.26
 
 * **fix:**  - 🐛 specify who sent an invitation ([#4738](https://github.com/AzzappApp/azzapp/pull/4738))
 * **fix:**  - 🐛 only display cc on rotate with invitation accepted ([#4718](https://github.com/AzzappApp/azzapp/pull/4718))
