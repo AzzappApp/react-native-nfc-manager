@@ -1,14 +1,10 @@
 import chroma from 'chroma-js';
 import { LinearGradient } from 'expo-linear-gradient';
-import clamp from 'lodash/clamp';
-import { useCallback, useRef, useState } from 'react';
-import { View, PanResponder, StyleSheet } from 'react-native';
-import type {
-  StyleProp,
-  ViewStyle,
-  GestureResponderEvent,
-  LayoutChangeEvent,
-} from 'react-native';
+import { useMemo, useRef, useState } from 'react';
+import { View, StyleSheet } from 'react-native';
+import { Gesture, GestureDetector } from 'react-native-gesture-handler';
+import { clamp, runOnJS } from 'react-native-reanimated';
+import type { StyleProp, ViewStyle, LayoutChangeEvent } from 'react-native';
 
 type HuePickerProps = {
   value: number;
@@ -19,36 +15,35 @@ type HuePickerProps = {
 const HuePicker = ({ value, onChange, style }: HuePickerProps) => {
   const [width, setWidth] = useState<number | null>(null);
 
-  const widthRef = useRef(width);
   const onChangeRef = useRef(onChange);
   onChangeRef.current = onChange;
 
   const onLayout = (e: LayoutChangeEvent) => {
     const { width } = e.nativeEvent.layout;
     setWidth(width);
-    widthRef.current = width;
   };
 
-  const handleGestureEvent = useCallback((event: GestureResponderEvent) => {
-    const { locationX } = event.nativeEvent;
-    if (!widthRef.current) {
-      return null;
-    }
-    onChangeRef.current(clamp(locationX / widthRef.current, 0, 1) * 360);
-  }, []);
+  const panGesture = useMemo(
+    () =>
+      Gesture.Pan()
+        .onBegin(e => {
+          const { x } = e;
+          if (!width) {
+            return null;
+          }
 
-  const pan = useRef(
-    PanResponder.create({
-      onStartShouldSetPanResponder: () => true,
-      onStartShouldSetPanResponderCapture: () => true,
-      onMoveShouldSetPanResponder: () => true,
-      onMoveShouldSetPanResponderCapture: () => true,
-      onPanResponderGrant: handleGestureEvent,
-      onPanResponderMove: handleGestureEvent,
-      onPanResponderRelease: handleGestureEvent,
-      onPanResponderTerminate: handleGestureEvent,
-    }),
-  ).current;
+          runOnJS(onChange)(clamp(x / width, 0, 1) * 360);
+        })
+        .onChange(e => {
+          const { x } = e;
+          if (!width) {
+            return null;
+          }
+
+          runOnJS(onChange)(clamp(x / width, 0, 1) * 360);
+        }),
+    [onChange, width],
+  );
 
   let { borderRadius } = StyleSheet.flatten(style);
 
@@ -56,14 +51,15 @@ const HuePicker = ({ value, onChange, style }: HuePickerProps) => {
 
   return (
     <View style={[styles.container, style]} onLayout={onLayout}>
-      <LinearGradient
-        style={[styles.innerGradient, { borderRadius }]}
-        colors={HUE_COLORS}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 0 }}
-        {...pan.panHandlers}
-        hitSlop={{ left: 8, right: 8, top: 10, bottom: 10 }}
-      />
+      <GestureDetector gesture={panGesture}>
+        <LinearGradient
+          style={[styles.innerGradient, { borderRadius }]}
+          colors={HUE_COLORS}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 0 }}
+          hitSlop={{ left: 8, right: 8, top: 10, bottom: 10 }}
+        />
+      </GestureDetector>
       {width && (
         <View
           style={[
