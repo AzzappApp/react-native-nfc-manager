@@ -36,6 +36,7 @@ const HomeContactCardLandscape = ({
           id
           cardIsPublished
         }
+        invited
       }
     `,
     profileKey,
@@ -79,9 +80,12 @@ const HomeContactCardLandscape = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const animatedStyle = useAnimatedStyle(() => ({
-    opacity: visibleSharedValue.value,
-  }));
+  const animatedStyle = useAnimatedStyle(
+    () => ({
+      opacity: profile?.invited ? 0 : visibleSharedValue.value,
+    }),
+    [profile?.invited],
+  );
 
   useMainTabBarVisibilityController(
     tabBarVisibleSharedValue,
