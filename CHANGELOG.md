@@ -1,5 +1,6 @@
-## 0.6.0-canary.26
+## 0.6.0-canary.27
 
+* **build:**  - upgrade to rn 0.75 ([#4762](https://github.com/AzzappApp/azzapp/pull/4762))
 * **fix:**  - 🐛 specify who sent an invitation ([#4738](https://github.com/AzzappApp/azzapp/pull/4738))
 * **fix:**  - 🐛 only display cc on rotate with invitation accepted ([#4718](https://github.com/AzzappApp/azzapp/pull/4718))
 * **fix:**  - 🐛 improve gesture on hue picker ([#4713](https://github.com/AzzappApp/azzapp/pull/4713))
