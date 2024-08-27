@@ -1,5 +1,7 @@
-## 0.6.0-canary.28
+## 0.6.0-canary.29
 
+* **build:**  - update gems
+* **build:**  - update podfile
 * **build:**  - try without cache
 * **build:**  - upgrade to rn 0.75 ([#4762](https://github.com/AzzappApp/azzapp/pull/4762))
 * **fix:**  - 🐛 specify who sent an invitation ([#4738](https://github.com/AzzappApp/azzapp/pull/4738))
