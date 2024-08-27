@@ -1,0 +1,13 @@
+diff --git a/android/build.gradle b/android/build.gradle
+index bae680f80699c5b63054af29129d3a713190dfb6..ae3871f4fc905f3f6a90d2a56d72d123abb45aef 100644
+--- a/android/build.gradle
++++ b/android/build.gradle
+@@ -5,7 +5,7 @@ buildscript {
+     }
+ 
+     dependencies {
+-        classpath 'com.android.tools.build:gradle:2.3.3'
++        classpath 'com.android.tools.build:gradle:2.3.0'
+     }
+ }
+ 
