@@ -21827,10 +21827,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-native-image-size@npm:^1.1.6":
+"react-native-image-size@npm:1.1.6":
   version: 1.1.6
   resolution: "react-native-image-size@npm:1.1.6"
   checksum: 5d30aecddecec4b77b07bc3d29a857e06e704887b077aef33e4511330df678a71a214cc3e625a13c0f4faf40b91bfab6bf10815cc9b7bc430711368e20458ddf
+  languageName: node
+  linkType: hard
+
+"react-native-image-size@patch:react-native-image-size@npm%3A1.1.6#./.yarn/patches/react-native-image-size-npm-1.1.6-38755aad48.patch::locator=%40azzapp%2Fmonorepo%40workspace%3A.":
+  version: 1.1.6
+  resolution: "react-native-image-size@patch:react-native-image-size@npm%3A1.1.6#./.yarn/patches/react-native-image-size-npm-1.1.6-38755aad48.patch::version=1.1.6&hash=d615f5&locator=%40azzapp%2Fmonorepo%40workspace%3A."
+  checksum: d37e9bd19d276bc22c6d31c7fa21a0d0475fcd2d9aa400ee793d23e2e25736fe2aae02bd532749ed9ff3995ea2820f585a6e096afa7f8278166d87cb0ba72b46
   languageName: node
   linkType: hard
 
