@@ -1,4 +1,3 @@
-import sgMail from '@sendgrid/mail';
 import { NextResponse } from 'next/server';
 import { withAxiom } from 'next-axiom';
 import * as z from 'zod';
@@ -11,8 +10,8 @@ import { buildEmailSignatureGenerationUrl } from '@azzapp/shared/urlHelpers';
 import { buildAvatarUrl } from '#helpers/avatar';
 import cors from '#helpers/cors';
 import { buildCoverImageUrl } from '#helpers/cover';
+import { sendTemplateEmail } from '#helpers/emailHelpers';
 import { getSessionData } from '#helpers/tokens';
-import type { MailDataRequired } from '@sendgrid/mail';
 import type { NextRequest } from 'next/server';
 
 const COVER_WIDTH = 630;
@@ -22,8 +21,6 @@ const EmailSignatureSignSchema = z.object({
   preview: z.string(),
 });
 
-sgMail.setApiKey(process.env.SENDGRID_API_KEY!);
-const SENDGRIP_NOREPLY_SENDER = process.env.SENDGRIP_NOREPLY_SENDER!;
 const generateEmailSignature = async (req: NextRequest) => {
   try {
     const { userId } = (await getSessionData()) ?? {};
@@ -87,9 +84,8 @@ const generateEmailSignature = async (req: NextRequest) => {
     const userEmail = await getUserById(userId);
 
     if (userEmail?.email) {
-      const msg: MailDataRequired = {
+      await sendTemplateEmail({
         to: userEmail.email,
-        from: SENDGRIP_NOREPLY_SENDER,
         templateId: 'd-87dd47b327fa44b38f7bdbea5cb6daaf',
         dynamicTemplateData: mailParam,
         attachments: [
@@ -97,14 +93,11 @@ const generateEmailSignature = async (req: NextRequest) => {
             filename: 'azzapp_contact.jpg',
             content: preview,
             type: 'image/jpeg',
-            //@ts-expect-error is mandatory to make if work, api issue (replacing   //contentId: 'contact',)
-            content_id: 'contact',
+            contentId: 'contact',
             disposition: 'inline',
           },
         ],
-      };
-
-      await sgMail.send(msg);
+      });
 
       return NextResponse.json(
         {
@@ -137,5 +130,3 @@ const generateEmailSignature = async (req: NextRequest) => {
 export const { POST, OPTIONS } = cors({
   POST: withAxiom(generateEmailSignature),
 });
-
-export const runtime = 'nodejs';

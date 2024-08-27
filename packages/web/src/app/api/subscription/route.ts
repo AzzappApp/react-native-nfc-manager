@@ -279,8 +279,6 @@ const subscriptionWebHook = async (req: Request) => {
 
 export const { POST, OPTIONS } = cors({ POST: withAxiom(subscriptionWebHook) });
 
-export const runtime = 'edge';
-
 function extractSeatsFromSubscriptionId(id: string) {
   const parts = id.split('.');
   const number = parts.pop();

@@ -54,5 +54,3 @@ const createPass = async (
 };
 
 export const { GET } = { GET: createPass };
-
-export const runtime = 'edge';

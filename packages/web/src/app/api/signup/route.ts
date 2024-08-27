@@ -19,10 +19,7 @@ import {
   isInternationalPhoneNumber,
 } from '@azzapp/shared/stringHelpers';
 import { handleSignInAuthMethod } from '#helpers/auth';
-import {
-  findTwilioLocale,
-  twilioVerificationService,
-} from '#helpers/twilioHelpers';
+import { sendTwilioVerificationCode } from '#helpers/twilioHelpers';
 import type { User } from '@azzapp/data';
 
 const SignupSchema = z
@@ -130,12 +127,10 @@ export const POST = withAxiom(async (req: Request) => {
     });
 
     const issuer = (email ?? userPhoneNumber) as string;
-    const verification = await twilioVerificationService().verifications.create(
-      {
-        to: issuer,
-        channel: email ? 'email' : 'sms',
-        locale: locale ? findTwilioLocale(locale) : undefined,
-      },
+    const verification = await sendTwilioVerificationCode(
+      issuer,
+      email ? 'email' : 'sms',
+      locale,
     );
 
     if (verification && verification.status === 'canceled') {
@@ -154,5 +149,3 @@ export const POST = withAxiom(async (req: Request) => {
     );
   }
 });
-
-export const runtime = 'nodejs';

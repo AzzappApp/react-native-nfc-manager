@@ -8,17 +8,18 @@ import { headers } from 'next/headers';
 import { getUserById } from '@azzapp/data';
 import { buildVCardFromShareBackContact } from '@azzapp/shared/vCardHelpers';
 import { ShareBackFormSchema } from '#components/ShareBackModal/shareBackFormSchema';
-import { sendSMS, sendEmail } from '#helpers/contactHelpers';
 import {
   CONTACT_METHODS,
   getPreferredContactMethod,
 } from '#helpers/contactMethodsHelpers';
+import { sendEmail } from '#helpers/emailHelpers';
 import { getServerIntl } from '#helpers/i18nHelpers';
 import {
   getValuesFromSubmitData,
   shareBackSignature,
 } from '#helpers/shareBackHelper';
-import type { EmailAttachment } from '#helpers/contactHelpers';
+import { sendTwilioSMS } from '#helpers/twilioHelpers';
+import type { EmailAttachment } from '#helpers/emailHelpers';
 import type { SubmissionResult } from '@conform-to/react';
 import type { JwtPayload } from 'jwt-decode';
 
@@ -118,14 +119,11 @@ export const processShareBackSubmission = async (
       );
 
       const shareBackContactVCardUrl = `${process.env.NEXT_PUBLIC_API_ENDPOINT}/shareBackVCard?c=${shareBackContactCompressedData}`;
-
-      await sendSMS([
-        {
-          phoneNumber: user.phoneNumber as string,
-          body: shareBackBody,
-          mediaUrl: [shareBackContactVCardUrl],
-        },
-      ]);
+      await sendTwilioSMS({
+        body: shareBackBody,
+        to: user.phoneNumber as string,
+        mediaUrl: shareBackContactVCardUrl,
+      });
     } else {
       const buildVCardContact = buildVCardFromShareBackContact(
         submission.payload,
@@ -139,19 +137,17 @@ export const processShareBackSubmission = async (
       } as EmailAttachment;
 
       // @todo: wording for title email share back
-      await sendEmail([
-        {
-          email: user.email as string,
-          subject: intl.formatMessage({
-            id: 'ivEKQ2',
-            defaultMessage: 'New Contact ShareBack Received',
-            description: 'Email subject for new contact share back received',
-          }),
-          text: shareBackBody,
-          html: shareBackBody,
-          attachments: [shareBackContactVCardAttachment],
-        },
-      ]);
+      await sendEmail({
+        to: user.email as string,
+        subject: intl.formatMessage({
+          id: 'ivEKQ2',
+          defaultMessage: 'New Contact ShareBack Received',
+          description: 'Email subject for new contact share back received',
+        }),
+        text: shareBackBody,
+        html: shareBackBody,
+        attachments: [shareBackContactVCardAttachment],
+      });
     }
 
     return submission.reply({

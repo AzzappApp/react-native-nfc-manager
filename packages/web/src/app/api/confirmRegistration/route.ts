@@ -10,7 +10,7 @@ import {
 import ERRORS from '@azzapp/shared/errors';
 import { isValidEmail } from '@azzapp/shared/stringHelpers';
 import { handleSignInAuthMethod } from '#helpers/auth';
-import { twilioVerificationService } from '#helpers/twilioHelpers';
+import { checkTwilioVerificationCode } from '#helpers/twilioHelpers';
 
 type ConfirmRegistrationBody = {
   token?: string;
@@ -35,11 +35,10 @@ export const POST = withAxiom(async (req: Request) => {
       : await getUserByPhoneNumber(issuer);
 
     if (user) {
-      const verificationCheck =
-        await twilioVerificationService().verificationChecks.create({
-          to: issuer,
-          code: token,
-        });
+      const verificationCheck = await checkTwilioVerificationCode(
+        issuer,
+        token,
+      );
 
       if (verificationCheck.status !== 'approved') {
         return NextResponse.json(
@@ -74,5 +73,3 @@ export const POST = withAxiom(async (req: Request) => {
     { status: 400 },
   );
 });
-
-export const runtime = 'nodejs';

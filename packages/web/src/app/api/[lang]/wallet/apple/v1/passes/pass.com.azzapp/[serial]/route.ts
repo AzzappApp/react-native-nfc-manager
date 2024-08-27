@@ -59,5 +59,3 @@ const updatePass = async (
 };
 
 export const { GET } = { GET: updatePass };
-
-export const runtime = 'edge';

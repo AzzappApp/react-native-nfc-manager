@@ -77,5 +77,3 @@ const shareBackVCard = async (req: NextRequest) => {
 };
 
 export const { GET } = { GET: withAxiom(shareBackVCard) };
-
-export const runtime = 'edge';

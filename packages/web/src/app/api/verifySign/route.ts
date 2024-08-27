@@ -78,5 +78,3 @@ const verifySignApi = async (req: Request) => {
 };
 
 export const { POST, OPTIONS } = cors({ POST: withAxiom(verifySignApi) });
-
-export const runtime = 'edge';

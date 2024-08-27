@@ -83,5 +83,3 @@ const signin = async (req: Request) => {
 };
 
 export const { POST, OPTIONS } = cors({ POST: withAxiom(signin) });
-
-export const runtime = 'nodejs';

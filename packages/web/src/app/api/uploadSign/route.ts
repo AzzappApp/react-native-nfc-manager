@@ -92,5 +92,3 @@ const getPregeneratedSizes = (body: uploadSignParams) => {
 };
 
 export const { POST, OPTIONS } = cors({ POST: withAxiom(uploadSignApi) });
-
-export const runtime = 'edge';
