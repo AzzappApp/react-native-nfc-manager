@@ -16,9 +16,7 @@
       "cache": false
     },
     "typecheck": {
-      "dependsOn": [
-        "^build"
-      ],
+      "dependsOn": ["payment-api-client", "^build"],
       "inputs": [
         "src/**"
       ]
