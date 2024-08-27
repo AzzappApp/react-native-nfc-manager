@@ -1,5 +1,6 @@
-## 0.6.0-canary.29
+## 0.6.0-canary.30
 
+* **build:**  - fix android build ([#4772](https://github.com/AzzappApp/azzapp/pull/4772))
 * **build:**  - update gems
 * **build:**  - update podfile
 * **build:**  - try without cache
