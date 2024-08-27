@@ -429,6 +429,7 @@ const styleSheet = createStyleSheet(appearance => ({
     backgroundColor: 'black',
     alignItems: 'center',
     justifyContent: 'center',
+    height: '100%',
   },
   content: {
     flex: 1,

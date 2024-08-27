@@ -3,6 +3,7 @@ import { FormattedMessage } from 'react-intl';
 import { StyleSheet, View } from 'react-native';
 import { graphql, usePreloadedQuery } from 'react-relay';
 import Link from '#components/Link';
+import { useMainTabBarVisibilityController } from '#components/MainTabBar';
 import { useRouter } from '#components/NativeRouter';
 import ProfilePostsList from '#components/WebCardPostsList';
 import relayScreen from '#helpers/relayScreen';
@@ -35,6 +36,7 @@ const mediaScreenQuery = graphql`
         webCard {
           id
           userName
+          cardIsPublished
           ...WebCardPostsList_webCard
             @arguments(viewerWebCardId: $viewerWebCardId)
           ...PostRendererFragment_author
@@ -58,11 +60,13 @@ const MediaScreen = ({
 
   const router = useRouter();
 
+  useMainTabBarVisibilityController(true);
+
   useEffect(() => {
-    if (profile?.invited) {
+    if (profile?.invited || !profile?.webCard?.cardIsPublished) {
       router.replace({ route: 'HOME' });
     }
-  }, [profile?.invited, router]);
+  }, [profile?.invited, profile?.webCard?.cardIsPublished, router]);
 
   // viewer might be briefly null when the user logs out or by switching accounts
   if (!profile || !profile.webCard) {

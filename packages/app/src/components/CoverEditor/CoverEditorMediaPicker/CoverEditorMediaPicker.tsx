@@ -516,48 +516,50 @@ const CoverEditorMediaPicker = ({
                     ? durations?.[index] ?? null
                     : null;
                   return (
-                    <View key={index} style={styles.media}>
-                      {media && (
-                        <>
-                          <View
-                            style={styles.mediaPicked}
-                            testID="image-picker-Media-image"
-                          >
-                            <Image
-                              source={{
-                                uri:
-                                  media?.galleryUri ??
-                                  media.thumbnail ??
-                                  media.uri,
-                              }}
-                              style={{
-                                width: '100%',
-                                height: '100%',
-                              }}
+                    <View style={styles.mediaContainer} key={index}>
+                      <View style={styles.media}>
+                        {media && (
+                          <>
+                            <View
+                              style={styles.mediaPicked}
+                              testID="image-picker-Media-image"
+                            >
+                              <Image
+                                source={{
+                                  uri:
+                                    media?.galleryUri ??
+                                    media.thumbnail ??
+                                    media.uri,
+                                }}
+                                style={{
+                                  width: '100%',
+                                  height: '100%',
+                                }}
+                              />
+                            </View>
+                            <IconButton
+                              icon="close"
+                              size={24}
+                              onPress={() => handleRemoveMedia(index)}
+                              iconStyle={styles.mediaDeleteIcon}
+                              style={styles.mediaDeleteButton}
                             />
+                          </>
+                        )}
+                        {duration != null && (
+                          <View style={styles.mediaDuration}>
+                            <Text variant="button" style={styles.textDuration}>
+                              <FormattedMessage
+                                defaultMessage="{duration}s"
+                                description="CoverEditorMediaPicker - duration in seconds"
+                                values={{
+                                  duration: Math.round(duration * 10) / 10,
+                                }}
+                              />
+                            </Text>
                           </View>
-                          <IconButton
-                            icon="close"
-                            size={24}
-                            onPress={() => handleRemoveMedia(index)}
-                            iconStyle={styles.mediaDeleteIcon}
-                            style={styles.mediaDeleteButton}
-                          />
-                        </>
-                      )}
-                      {duration != null && (
-                        <View style={styles.mediaDuration}>
-                          <Text variant="button" style={styles.textDuration}>
-                            <FormattedMessage
-                              defaultMessage="{duration}s"
-                              description="CoverEditorMediaPicker - duration in seconds"
-                              values={{
-                                duration: Math.round(duration * 10) / 10,
-                              }}
-                            />
-                          </Text>
-                        </View>
-                      )}
+                        )}
+                      </View>
                     </View>
                   );
                 })}
@@ -596,7 +598,7 @@ const stylesheet = createStyleSheet(appearance => ({
   },
   bottomBar: {
     width: '100%',
-    paddingVertical: 15,
+    paddingTop: 15,
     borderTopWidth: 1,
     borderColor: appearance === 'light' ? colors.grey100 : colors.grey1000,
   },
@@ -632,6 +634,9 @@ const stylesheet = createStyleSheet(appearance => ({
     backgroundColor: appearance === 'light' ? colors.grey50 : colors.grey1000,
     overflow: 'visible',
     ...shadow(appearance, 'center'),
+  },
+  mediaContainer: {
+    paddingBottom: 15,
   },
   mediaDeleteIcon: {
     tintColor: appearance === 'light' ? colors.black : colors.grey100,

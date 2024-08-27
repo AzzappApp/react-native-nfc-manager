@@ -265,7 +265,11 @@ const CoverRenderer = (
                 flexDirection: 'row',
                 position: 'absolute',
                 transformOrigin: 'center',
-                transform: [{ rotate: `${coverDynamicLinks.rotation}rad` }],
+                transform: [
+                  { rotate: `${coverDynamicLinks.rotation}rad` },
+                  // Fixes https://github.com/AzzappApp/azzapp/issues/4423 (When a parent element has a rotateY with a value of 0, it creates this bug on Android)
+                  { rotateY: '0.1deg' },
+                ],
                 top:
                   (coverDynamicLinks.position.y * layout.height) / 100 -
                   linksSize.height / 2,

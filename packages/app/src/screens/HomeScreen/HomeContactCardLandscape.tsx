@@ -18,6 +18,7 @@ import ContactCard, {
   CONTACT_CARD_RATIO,
 } from '#components/ContactCard/ContactCard';
 import { useMainTabBarVisibilityController } from '#components/MainTabBar';
+import { useCurrentRoute } from '#components/NativeRouter';
 import type { HomeContactCardLandscape_profile$key } from '#relayArtifacts/HomeContactCardLandscape_profile.graphql';
 
 type HomeContactCardLandscapeProps = {
@@ -41,6 +42,8 @@ const HomeContactCardLandscape = ({
     `,
     profileKey,
   );
+
+  const currentRoute = useCurrentRoute();
 
   const [orientation, setOrientation] = useState(
     DeviceMotionOrientation.Portrait,
@@ -89,7 +92,7 @@ const HomeContactCardLandscape = ({
 
   useMainTabBarVisibilityController(
     tabBarVisibleSharedValue,
-    Math.abs(orientation) === 90,
+    Math.abs(orientation) === 90 && currentRoute?.route === 'HOME',
   );
   const appearance = useColorScheme();
 

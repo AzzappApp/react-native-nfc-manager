@@ -1,5 +1,5 @@
 import { ImageFormat } from '@shopify/react-native-skia';
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { View } from 'react-native';
 import * as mime from 'react-native-mime-types';
@@ -63,6 +63,7 @@ const postCreationScreenQuery = graphql`
       id
       ... on WebCard {
         userName
+        cardIsPublished
       }
       ...AuthorCartoucheFragment_webCard
     }
@@ -96,6 +97,12 @@ const PostCreationScreen = ({
     );
 
   const router = useRouter();
+
+  useEffect(() => {
+    if (!webCard?.cardIsPublished) {
+      router.replace({ route: 'HOME' });
+    }
+  }, [webCard?.cardIsPublished, router]);
 
   const [commit] = useMutation<PostCreationScreenMutation>(graphql`
     mutation PostCreationScreenMutation(

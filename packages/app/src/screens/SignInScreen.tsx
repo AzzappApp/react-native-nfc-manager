@@ -373,6 +373,7 @@ const stylesheet = createStyleSheet(appearance => ({
     position: 'absolute',
     top: 0,
     backgroundColor: 'black',
+    height: '100%',
   },
   logoContainer: {
     flex: 1,
