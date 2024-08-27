@@ -24,10 +24,10 @@ index ff2560b3a31eac74b4f5f41bab274416360b4975..de6371983b6687e2af066b66a5a3e9e2
  
  typedef NS_ENUM(NSInteger, RNSScreenReplaceAnimation) {
 diff --git a/ios/RNSScreen.h b/ios/RNSScreen.h
-index bbdedcdb9a4579377545cf011fa8f5d87d0ec05f..b582d4fa34a91f0303d358b938d71e43f5961607 100644
+index 28202a81d27069e76a7919102ddc931c76ee09ce..739af007a0210747c56db7aed322e7d64af17643 100644
 --- a/ios/RNSScreen.h
 +++ b/ios/RNSScreen.h
-@@ -63,6 +63,7 @@ namespace react = facebook::react;
+@@ -64,6 +64,7 @@ namespace react = facebook::react;
  @property (nonatomic) BOOL hasHomeIndicatorHiddenSet;
  @property (nonatomic) BOOL hasOrientationSet;
  @property (nonatomic) RNSScreenStackAnimation stackAnimation;
@@ -36,10 +36,10 @@ index bbdedcdb9a4579377545cf011fa8f5d87d0ec05f..b582d4fa34a91f0303d358b938d71e43
  @property (nonatomic) RNSScreenSwipeDirection swipeDirection;
  @property (nonatomic) RNSScreenReplaceAnimation replaceAnimation;
 diff --git a/ios/RNSScreen.mm b/ios/RNSScreen.mm
-index ff804e07726dcaf3dddac0134c9863844fd4da58..eda0188dc29b53a599521ee4b615a86e866f69b3 100644
+index b673407e311c639bb84b2e1a915168bbdfe26090..4674e07deb04fccd4623df1a505b30b4ac7e61a9 100644
 --- a/ios/RNSScreen.mm
 +++ b/ios/RNSScreen.mm
-@@ -198,6 +198,7 @@ - (void)setStackAnimation:(RNSScreenStackAnimation)stackAnimation
+@@ -200,6 +200,7 @@ - (void)setStackAnimation:(RNSScreenStackAnimation)stackAnimation
      case RNSScreenStackAnimationSlideFromBottom:
      case RNSScreenStackAnimationFadeFromBottom:
      case RNSScreenStackAnimationSlideFromLeft:
@@ -47,7 +47,7 @@ index ff804e07726dcaf3dddac0134c9863844fd4da58..eda0188dc29b53a599521ee4b615a86e
        // Default
        break;
    }
-@@ -1440,6 +1441,7 @@ @implementation RNSScreenManager
+@@ -1448,6 +1449,7 @@ @implementation RNSScreenManager
  RCT_EXPORT_VIEW_PROPERTY(preventNativeDismiss, BOOL)
  RCT_EXPORT_VIEW_PROPERTY(replaceAnimation, RNSScreenReplaceAnimation)
  RCT_EXPORT_VIEW_PROPERTY(stackPresentation, RNSScreenStackPresentation)
@@ -55,7 +55,7 @@ index ff804e07726dcaf3dddac0134c9863844fd4da58..eda0188dc29b53a599521ee4b615a86e
  RCT_EXPORT_VIEW_PROPERTY(stackAnimation, RNSScreenStackAnimation)
  RCT_EXPORT_VIEW_PROPERTY(swipeDirection, RNSScreenSwipeDirection)
  RCT_EXPORT_VIEW_PROPERTY(transitionDuration, NSNumber)
-@@ -1537,6 +1539,7 @@ @implementation RCTConvert (RNSScreen)
+@@ -1545,6 +1547,7 @@ @implementation RCTConvert (RNSScreen)
        @"slide_from_bottom" : @(RNSScreenStackAnimationSlideFromBottom),
        @"slide_from_right" : @(RNSScreenStackAnimationDefault),
        @"slide_from_left" : @(RNSScreenStackAnimationSlideFromLeft),
@@ -64,10 +64,10 @@ index ff804e07726dcaf3dddac0134c9863844fd4da58..eda0188dc29b53a599521ee4b615a86e
      }),
      RNSScreenStackAnimationDefault,
 diff --git a/ios/RNSScreenStackAnimator.h b/ios/RNSScreenStackAnimator.h
-index f96eae77566c46367b3d8323669d2295f85f3dbf..415b0d1a471e208c21cba5ea6e0043d9f2452b1c 100644
+index f96eae77566c46367b3d8323669d2295f85f3dbf..547e89862e37e70e7c7c0737bbd51f78f8bf68ff 100644
 --- a/ios/RNSScreenStackAnimator.h
 +++ b/ios/RNSScreenStackAnimator.h
-@@ -1,8 +1,20 @@
+@@ -1,8 +1,19 @@
  #import "RNSScreen.h"
  
 +@protocol RNSScreenCustomStackAnimator <NSObject>
@@ -85,14 +85,14 @@ index f96eae77566c46367b3d8323669d2295f85f3dbf..415b0d1a471e208c21cba5ea6e0043d9
  
  - (instancetype)initWithOperation:(UINavigationControllerOperation)operation;
  + (BOOL)isCustomAnimation:(RNSScreenStackAnimation)animation;
+-
 ++ (void)registerCustomAnimator:(id<RNSScreenCustomStackAnimator>)animator forName:(NSString *)name;
- 
  @end
 diff --git a/ios/RNSScreenStackAnimator.mm b/ios/RNSScreenStackAnimator.mm
-index e31d20d4eaa6aa4627cc95e1d0e83c90ab460620..2908555847a728e2e8383ca747209dbfdb903aa2 100644
+index abb2cf69fd063b709a8e073af2642f8298641b76..92f8be7123ca25c7174fffc173decc18d6d94b23 100644
 --- a/ios/RNSScreenStackAnimator.mm
 +++ b/ios/RNSScreenStackAnimator.mm
-@@ -400,9 +400,57 @@ - (void)animateTransitionWithStackAnimation:(RNSScreenStackAnimation)animation
+@@ -437,9 +437,58 @@ - (void)animateTransitionWithStackAnimation:(RNSScreenStackAnimation)animation
    } else if (animation == RNSScreenStackAnimationFadeFromBottom) {
      [self animateFadeFromBottomWithTransitionContext:transitionContext toVC:toVC fromVC:fromVC];
      return;
@@ -100,10 +100,12 @@ index e31d20d4eaa6aa4627cc95e1d0e83c90ab460620..2908555847a728e2e8383ca747209dbf
 +    [self animateCustomWithTransitionContext:transitionContext toVC:toVC fromVC:fromVC];
 +    return;
    }
++
    // simple_push is the default custom animation
-   [self animateSimplePushWithTransitionContext:transitionContext toVC:toVC fromVC:fromVC];
+   [self animateSimplePushWithShadowEnabled:shadowEnabled transitionContext:transitionContext toVC:toVC fromVC:fromVC];
  }
  
++
 +static NSMutableDictionary<NSString *, id<RNSScreenCustomStackAnimator>> *customAnimators;
 ++ (void)registerCustomAnimator:(id<RNSScreenCustomStackAnimator>)animator forName:(NSString *)name {
 +  if (customAnimators == nil) {
@@ -123,7 +125,8 @@ index e31d20d4eaa6aa4627cc95e1d0e83c90ab460620..2908555847a728e2e8383ca747209dbf
 +    screen = ((RNSScreen *)fromViewController).screenView;
 +  }
 +  if (screen == nil || screen.stackAnimationOptions == nil) {
-+    [self animateSimplePushWithTransitionContext:transitionContext
++    [self animateSimplePushWithShadowEnabled:false
++                                            transitionContext:transitionContext
 +                                            toVC:toViewController
 +                                          fromVC:fromViewController];
 +    return;
@@ -132,7 +135,8 @@ index e31d20d4eaa6aa4627cc95e1d0e83c90ab460620..2908555847a728e2e8383ca747209dbf
 +  NSString *animatorName = options[@"animator"];
 +  id<RNSScreenCustomStackAnimator> animator = customAnimators[animatorName];
 +  if (animator == nil) {
-+    [self animateSimplePushWithTransitionContext:transitionContext
++    [self animateSimplePushWithShadowEnabled:false
++                                            transitionContext:transitionContext
 +                                            toVC:toViewController
 +                                          fromVC:fromViewController];
 +    return;
@@ -146,12 +150,9 @@ index e31d20d4eaa6aa4627cc95e1d0e83c90ab460620..2908555847a728e2e8383ca747209dbf
 +}
 +
 +
-+
-+
-+
  @end
 diff --git a/lib/typescript/fabric/ScreenNativeComponent.d.ts b/lib/typescript/fabric/ScreenNativeComponent.d.ts
-index 17d90bea851f506b340d2feb40243b9a040667db..0a58d0db29f8fef0bdedf61ee2460793731705d8 100644
+index 92874bd38375dbade1e0a45f9062b4adc766836e..e57165098d6175cd11f50429535cbaebe47380ec 100644
 --- a/lib/typescript/fabric/ScreenNativeComponent.d.ts
 +++ b/lib/typescript/fabric/ScreenNativeComponent.d.ts
 @@ -20,7 +20,7 @@ type GestureResponseDistanceType = Readonly<{
@@ -164,7 +165,7 @@ index 17d90bea851f506b340d2feb40243b9a040667db..0a58d0db29f8fef0bdedf61ee2460793
  type ReplaceAnimation = 'pop' | 'push';
  type SheetDetentTypes = 'large' | 'medium' | 'all';
 diff --git a/lib/typescript/types.d.ts b/lib/typescript/types.d.ts
-index 40a25429bfd3715c28a70ee4358d257d468c2d97..f6979095a0cd01ffc42d3877f4f0d2f85d9d2576 100644
+index e6a12da18097d8d6d81ce07ef655191482850a44..1a986ffc4dea9c85c4f2815648b87b333af30839 100644
 --- a/lib/typescript/types.d.ts
 +++ b/lib/typescript/types.d.ts
 @@ -11,7 +11,7 @@ export type SearchBarCommands = {
@@ -176,7 +177,7 @@ index 40a25429bfd3715c28a70ee4358d257d468c2d97..f6979095a0cd01ffc42d3877f4f0d2f8
  export type BlurEffectTypes = 'extraLight' | 'light' | 'dark' | 'regular' | 'prominent' | 'systemUltraThinMaterial' | 'systemThinMaterial' | 'systemMaterial' | 'systemThickMaterial' | 'systemChromeMaterial' | 'systemUltraThinMaterialLight' | 'systemThinMaterialLight' | 'systemMaterialLight' | 'systemThickMaterialLight' | 'systemChromeMaterialLight' | 'systemUltraThinMaterialDark' | 'systemThinMaterialDark' | 'systemMaterialDark' | 'systemThickMaterialDark' | 'systemChromeMaterialDark';
  export type ScreenReplaceTypes = 'push' | 'pop';
  export type SwipeDirectionTypes = 'vertical' | 'horizontal';
-@@ -267,6 +267,10 @@ export interface ScreenProps extends ViewProps {
+@@ -277,6 +277,10 @@ export interface ScreenProps extends ViewProps {
       * - "none" – the screen appears/dissapears without an animation
       */
      stackAnimation?: StackAnimationTypes;
@@ -188,7 +189,7 @@ index 40a25429bfd3715c28a70ee4358d257d468c2d97..f6979095a0cd01ffc42d3877f4f0d2f8
       * How should the screen be presented.
       * The following values are currently supported:
 diff --git a/src/types.tsx b/src/types.tsx
-index 84cb6670b9ea143ebffe5f48e82111accf32ec77..f10b1f712fac677291908e9d756e60e7ce1bfe9a 100644
+index f83ad569bd79d242ed2fb8cf18700aecc7ca2d0e..81e30cd692580f8a0104ad403a49064419ca1290 100644
 --- a/src/types.tsx
 +++ b/src/types.tsx
 @@ -38,7 +38,8 @@ export type StackAnimationTypes =
