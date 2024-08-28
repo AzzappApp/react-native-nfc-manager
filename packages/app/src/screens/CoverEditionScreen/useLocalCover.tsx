@@ -39,6 +39,9 @@ const useLocalCover = (
       const fileExists = (
         await Promise.all(
           medias.map(async media => {
+            if (media.uri.startsWith('http')) {
+              return true;
+            }
             try {
               return ReactNativeBlobUtil.fs.exists(
                 media.uri.replace('file://', ''),
