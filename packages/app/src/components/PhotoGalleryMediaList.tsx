@@ -81,9 +81,8 @@ const PhotoGalleryMediaList = ({
   const styles = useStyleSheet(styleSheet);
   const [medias, setMedias] = useState<PhotoIdentifier[]>([]);
   const [hasNext, setHasNext] = useState(true);
-  const [lastPhotoTimestamp, setLastPhotoTimestamp] = useState<
-    number | undefined
-  >(undefined);
+  const lastPhotoTimestamp = useRef<number | undefined>(undefined);
+
   const { mediaPermission } = usePermissionContext();
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
@@ -100,7 +99,7 @@ const PhotoGalleryMediaList = ({
       try {
         const result = await CameraRoll.getPhotos({
           first: updatePictures ? mediaLength.current || 48 : 48, //multiple of items per row
-          toTime: refreshing ? undefined : lastPhotoTimestamp,
+          toTime: refreshing ? undefined : lastPhotoTimestamp.current,
           assetType:
             kind === 'mixed' ? 'All' : kind === 'image' ? 'Photos' : 'Videos',
           groupTypes: album?.type,
@@ -119,7 +118,7 @@ const PhotoGalleryMediaList = ({
         });
 
         if (endTimestamp) {
-          setLastPhotoTimestamp(Math.round(endTimestamp * 1000) - 1);
+          lastPhotoTimestamp.current = Math.round(endTimestamp * 1000) - 1;
         }
         setHasNext(hasNextPage);
       } catch (e) {
