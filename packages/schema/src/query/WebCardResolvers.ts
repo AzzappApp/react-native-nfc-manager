@@ -66,12 +66,7 @@ export const WebCard: ProtectedResolver<WebCardResolvers> = {
     }
     return webCard.cardIsPrivate;
   },
-  cardIsPublished: async webCard => {
-    if (!(await hasWebCardProfileRight(webCard.id))) {
-      return false;
-    }
-    return webCard.cardIsPublished;
-  },
+  cardIsPublished: async webCard => webCard.cardIsPublished,
   cardStyle: webCard => webCard.cardStyle,
   commonInformation: async webCard => {
     if (!(await hasWebCardProfileRight(webCard.id))) {
