@@ -920,7 +920,7 @@ export const WebCardTable = cols.table(
       .notNull()
       .default({
         links: [],
-        color: '../000000',
+        color: '#000000',
         size: 24,
         position: {
           x: 0,

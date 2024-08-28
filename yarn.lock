@@ -264,7 +264,7 @@ __metadata:
     "@types/lodash": 4.17.1
     "@types/node-fetch": 2.6.11
     better-sqlite3: ^9.6.0
-    drizzle-kit: 0.22.7
+    drizzle-kit: ^0.24.2
     drizzle-orm: ^0.33.0
     lodash: ^4.17.21
     mysql2: ^3.9.7
@@ -4004,6 +4004,13 @@ __metadata:
   peerDependencies:
     react: ^16.8.0 || ^17.0.0 || ^18.0.0
   checksum: 2b5dcd6f836490c466f2410a80a6a1d6ae550ab046ecdae9e2d9063e48bf8c27ead725a74dd6868a562d19c39ec239911b60d84a88f0a57f3a5ec6e12249a44f
+  languageName: node
+  linkType: hard
+
+"@drizzle-team/brocli@npm:^0.10.1":
+  version: 0.10.1
+  resolution: "@drizzle-team/brocli@npm:0.10.1"
+  checksum: 588d2fd24bc379bb45e0a71080c22143e6a32f14155533070d9ba440d6a9a1329f004db0809e40b301660ef8ad9ddd6d1af1b1959759bbfa0827aa74dbdcd48c
   languageName: node
   linkType: hard
 
@@ -13724,16 +13731,31 @@ __metadata:
   languageName: node
   linkType: hard
 
-"drizzle-kit@npm:0.22.7":
-  version: 0.22.7
-  resolution: "drizzle-kit@npm:0.22.7"
+"drizzle-kit@npm:0.24.2":
+  version: 0.24.2
+  resolution: "drizzle-kit@npm:0.24.2"
   dependencies:
+    "@drizzle-team/brocli": ^0.10.1
     "@esbuild-kit/esm-loader": ^2.5.5
     esbuild: ^0.19.7
     esbuild-register: ^3.5.0
   bin:
     drizzle-kit: bin.cjs
-  checksum: 9d875697f27f8f67084c2c9e65cae1343d6492c243068312e02592a5af069bb0eb9b392f39672299ea1bd4890836520c16a86ad28aa617bcd62588b87d6f030e
+  checksum: f7638edda2701675310c78b035ef2cb2f311c2a9397892ef49c0f1924328c41f68bc4cd630b75ac41dc2666292aea6de3a449bea677f2d17453515711f4d661d
+  languageName: node
+  linkType: hard
+
+"drizzle-kit@patch:drizzle-kit@npm%3A0.24.2#./.yarn/patches/drizzle-kit-npm-0.24.2-ed6f619edc.patch::locator=%40azzapp%2Fmonorepo%40workspace%3A.":
+  version: 0.24.2
+  resolution: "drizzle-kit@patch:drizzle-kit@npm%3A0.24.2#./.yarn/patches/drizzle-kit-npm-0.24.2-ed6f619edc.patch::version=0.24.2&hash=17fd49&locator=%40azzapp%2Fmonorepo%40workspace%3A."
+  dependencies:
+    "@drizzle-team/brocli": ^0.10.1
+    "@esbuild-kit/esm-loader": ^2.5.5
+    esbuild: ^0.19.7
+    esbuild-register: ^3.5.0
+  bin:
+    drizzle-kit: bin.cjs
+  checksum: f2bc53dcb97d855ebf2dc28fc1990632756988c375c3e26bef12dd0d267b227ddd9d85980004c7983164f878667136aab29da3f81e19c1ccea9636a03129c61f
   languageName: node
   linkType: hard
 

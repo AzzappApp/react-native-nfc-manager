@@ -1,8 +1,8 @@
 diff --git a/bin.cjs b/bin.cjs
-index 03f8f91c39812ccbe439d02d020e73ef760e6f40..371ea12c4a5c051678ba4fd2df970e77765116c4 100755
+index 57fc644d790960dcd33f72f183358722ea155b26..eb6d1e3e482337920426e427299b28df9fa87aa0 100755
 --- a/bin.cjs
 +++ b/bin.cjs
-@@ -8454,6 +8454,7 @@ var init_mysqlSchema = __esm({
+@@ -5431,6 +5431,7 @@ var init_mysqlSchema = __esm({
        name: stringType(),
        columns: stringType().array(),
        isUnique: booleanType(),
@@ -10,7 +10,7 @@ index 03f8f91c39812ccbe439d02d020e73ef760e6f40..371ea12c4a5c051678ba4fd2df970e77
        using: enumType(["btree", "hash"]).optional(),
        algorithm: enumType(["default", "inplace", "copy"]).optional(),
        lock: enumType(["default", "none", "shared", "exclusive"]).optional()
-@@ -8596,14 +8597,15 @@ var init_mysqlSchema = __esm({
+@@ -5577,14 +5578,15 @@ var init_mysqlSchema = __esm({
      MySqlSquasher = {
        squashIdx: (idx) => {
          index.parse(idx);
@@ -28,7 +28,7 @@ index 03f8f91c39812ccbe439d02d020e73ef760e6f40..371ea12c4a5c051678ba4fd2df970e77
            using: using ? using : void 0,
            algorithm: algorithm ? algorithm : void 0,
            lock: lock ? lock : void 0
-@@ -20878,6 +20880,7 @@ We have encountered a collision between the index name on columns ${source_defau
+@@ -18050,6 +18052,7 @@ We have encountered a collision between the index name on columns ${source_defau
              name,
              columns: indexColumns,
              isUnique: value.config.unique ?? false,
@@ -36,8 +36,8 @@ index 03f8f91c39812ccbe439d02d020e73ef760e6f40..371ea12c4a5c051678ba4fd2df970e77
              using: value.config.using,
              algorithm: value.config.algorythm,
              lock: value.config.lock
-@@ -21016,7 +21019,7 @@ We have encountered a collision between the index name on columns ${source_defau
-       const tablePks = await db2.query(
+@@ -18193,7 +18196,7 @@ We have encountered a collision between the index name on columns ${source_defau
+       const tablePks = await db.query(
          `SELECT table_name, column_name, ordinal_position
    FROM information_schema.table_constraints t
 -  LEFT JOIN information_schema.key_column_usage k
@@ -45,7 +45,7 @@ index 03f8f91c39812ccbe439d02d020e73ef760e6f40..371ea12c4a5c051678ba4fd2df970e77
    USING(constraint_name,table_schema,table_name)
    WHERE t.constraint_type='PRIMARY KEY'
        and table_name != '__drizzle_migrations'
-@@ -21122,6 +21125,7 @@ We have encountered a collision between the index name on columns ${source_defau
+@@ -18299,6 +18302,7 @@ We have encountered a collision between the index name on columns ${source_defau
          const constraintName = idxRow["INDEX_NAME"];
          const columnName = idxRow["COLUMN_NAME"];
          const isUnique = idxRow["NON_UNIQUE"] === 0;
@@ -53,7 +53,7 @@ index 03f8f91c39812ccbe439d02d020e73ef760e6f40..371ea12c4a5c051678ba4fd2df970e77
          const tableInResult = result[tableName];
          if (typeof tableInResult === "undefined")
            continue;
-@@ -21148,7 +21152,8 @@ We have encountered a collision between the index name on columns ${source_defau
+@@ -18325,7 +18329,8 @@ We have encountered a collision between the index name on columns ${source_defau
                tableInResult.indexes[constraintName] = {
                  name: constraintName,
                  columns: [columnName],
@@ -63,9 +63,9 @@ index 03f8f91c39812ccbe439d02d020e73ef760e6f40..371ea12c4a5c051678ba4fd2df970e77
                };
              }
            }
-@@ -22397,9 +22402,9 @@ The unique constraint ${source_default.underline.blue(
+@@ -19797,9 +19802,9 @@ The unique constraint ${source_default.underline.blue(
+       for (const [key, value] of Object.entries(tableToPk)) {
          if (value.length > 1) {
-           value.sort();
            result[key].compositePrimaryKeys = {
 -            [`${key}_${value.join("_")}_pk`]: {
 +            [`${key}_${value.join("_")}`]: {
@@ -75,16 +75,16 @@ index 03f8f91c39812ccbe439d02d020e73ef760e6f40..371ea12c4a5c051678ba4fd2df970e77
              }
            };
          } else if (value.length === 1) {
-@@ -22778,7 +22783,7 @@ var init_sqlgenerator = __esm({
+@@ -22993,7 +22998,7 @@ var init_sqlgenerator = __esm({
            const defaultStatement = column7.default !== void 0 ? ` DEFAULT ${column7.default}` : "";
            const uniqueConstraint4 = column7.isUnique ? ` CONSTRAINT "${column7.uniqueName}" UNIQUE${column7.nullsNotDistinct ? " NULLS NOT DISTINCT" : ""}` : "";
            const schemaPrefix = column7.typeSchema && column7.typeSchema !== "public" ? `"${column7.typeSchema}".` : "";
 -          const type = isPgNativeType(column7.type) ? column7.type : `${schemaPrefix}"${column7.type}"`;
 +          const type = isPgNativeType(alter_table_alter_column_set_type) ? column7.type : `"${column7.type}"`;
-           statement += `	"${column7.name}" ${type}${primaryKeyStatement}${defaultStatement}${notNullStatement}${uniqueConstraint4}`;
-           statement += i2 === columns.length - 1 ? "" : ",\n";
-         }
-@@ -23765,10 +23770,10 @@ ${BREAKPOINT}ALTER TABLE ${tableNameWithSchema} ADD CONSTRAINT ${statement.newCo
+           const generated = column7.generated;
+           const generatedStatement = generated ? ` GENERATED ALWAYS AS (${generated == null ? void 0 : generated.as}) STORED` : "";
+           const unsquashedIdentity = column7.identity ? PgSquasher.unsquashIdentity(column7.identity) : void 0;
+@@ -24440,10 +24445,10 @@ ${BREAKPOINT}ALTER TABLE ${tableNameWithSchema} ADD CONSTRAINT ${statement.newCo
          return statement.type === "create_index" && dialect7 === "mysql";
        }
        convert(statement) {
@@ -97,7 +97,7 @@ index 03f8f91c39812ccbe439d02d020e73ef760e6f40..371ea12c4a5c051678ba4fd2df970e77
          const uniqueString = columns.map((it) => {
            var _a, _b, _c, _d;
            return ((_a = statement.internal) == null ? void 0 : _a.indexes) ? ((_d = (_c = (_b = statement.internal) == null ? void 0 : _b.indexes[name]) == null ? void 0 : _c.columns[it]) == null ? void 0 : _d.isExpression) ? it : `\`${it}\`` : `\`${it}\``;
-@@ -26986,7 +26991,7 @@ var init_jsonStatements = __esm({
+@@ -24994,7 +24999,7 @@ var init_jsonStatements = __esm({
              schema: schema5
            });
          }
@@ -106,7 +106,7 @@ index 03f8f91c39812ccbe439d02d020e73ef760e6f40..371ea12c4a5c051678ba4fd2df970e77
            statements.push({
              type: "alter_table_alter_column_set_type",
              tableName,
-@@ -27024,7 +27029,7 @@ var init_jsonStatements = __esm({
+@@ -25033,7 +25038,7 @@ var init_jsonStatements = __esm({
              columnPk
            });
          }
