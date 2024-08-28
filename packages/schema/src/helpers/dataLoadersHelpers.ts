@@ -40,8 +40,22 @@ export const createSessionDataLoader = <K, V, C = K>(
       createDataLoader(batchLoadFn, options),
     );
 
-  return new Proxy(
-    {},
-    { get: (_, prop: keyof DataLoader<K, V, C>) => getLoader()[prop] },
-  ) as DataLoader<K, V, C>;
+  return {
+    name: key,
+    load(key: K): Promise<V> {
+      return getLoader().load(key);
+    },
+    loadMany(keys) {
+      return getLoader().loadMany(keys);
+    },
+    prime(key, value) {
+      return getLoader().prime(key, value);
+    },
+    clear(key) {
+      return getLoader().clear(key);
+    },
+    clearAll() {
+      return getLoader().clearAll();
+    },
+  };
 };
