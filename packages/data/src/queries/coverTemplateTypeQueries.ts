@@ -75,14 +75,14 @@ export const getCoverTemplateTypes = async (
  *
  * @param limit - The number of cover template types to retrieve
  * @param offset - The number of cover template types to skip
- * @param typeId - The id of the type to filter the list of cover template types by
+ * @param tagId - The id of the type to filter the list of cover template types by
  *
  * @returns a list of cover template types
  */
 export const getFilterCoverTemplateTypes = async (
   limit: number,
   offset: number,
-  typeId: string | null | undefined,
+  tagId: string | null | undefined,
 ): Promise<CoverTemplateType[]> => {
   let query = db()
     .selectDistinct({
@@ -95,14 +95,14 @@ export const getFilterCoverTemplateTypes = async (
     .$dynamic();
 
   const filters: SQLWrapper[] = [];
-  const contains = `JSON_CONTAINS(types, '"${typeId}"')`;
+  const contains = `JSON_CONTAINS(tags, '"${tagId}"')`;
   filters.push(sql.raw(contains));
   query = query.innerJoin(
     CoverTemplateTable,
     and(
       eq(CoverTemplateTypeTable.id, CoverTemplateTable.typeId),
       eq(CoverTemplateTable.enabled, true),
-      typeId ? sql`${sql.join(filters, sql.raw(' AND '))}` : undefined,
+      tagId ? sql`${sql.join(filters, sql.raw(' AND '))}` : undefined,
     ),
   );
 

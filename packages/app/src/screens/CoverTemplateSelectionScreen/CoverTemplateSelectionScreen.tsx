@@ -239,7 +239,7 @@ const CoverTemplateSelectionScreenBody = ({
   const onSelectTag = useCallback(
     (tagId: string | null) => {
       setTag(tagId);
-      refetch({ tagId });
+      refetch({ tagId }, { fetchPolicy: 'store-and-network' });
     },
     [refetch],
   );
