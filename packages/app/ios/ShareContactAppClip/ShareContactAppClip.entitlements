@@ -2,11 +2,9 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>com.apple.developer.associated-domains</key>
+	<key>com.apple.developer.parent-application-identifiers</key>
 	<array>
-		<string>webcredentials:staging.azzapp.com</string>
-		<string>applinks:staging.azzapp.com</string>
-		<string>appclips:staging.azzapp.com</string>
+		<string>$(AppIdentifierPrefix)com.azzapp.app</string>
 	</array>
 </dict>
 </plist>

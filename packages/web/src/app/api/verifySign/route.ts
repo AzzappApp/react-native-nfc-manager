@@ -12,12 +12,8 @@ import cors from '#helpers/cors';
 const JWT_SECRET = process.env.JWT_SECRET as string;
 
 const verifySignApi = async (req: Request) => {
-  const { signature, data, salt } =
-    ((await req.json()) as {
-      signature?: string;
-      data?: string;
-      salt?: string;
-    }) || {};
+  const request = await req.json();
+  const { signature, data, salt } = request;
 
   if (!signature || !data || !salt) {
     return new Response('Invalid request', { status: 400 });
