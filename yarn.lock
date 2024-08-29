@@ -8538,13 +8538,23 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@react-native-masked-view/masked-view@npm:^0.3.1":
+"@react-native-masked-view/masked-view@npm:0.3.1":
   version: 0.3.1
   resolution: "@react-native-masked-view/masked-view@npm:0.3.1"
   peerDependencies:
     react: ">=16"
     react-native: ">=0.57"
   checksum: 880059020709ce856c448657c2d67a905f2ebcd3f42c1c4d344d732761cb2de98efb600172df5591d943f562393dbca42802e8a903b974aa2b038b441c5718fb
+  languageName: node
+  linkType: hard
+
+"@react-native-masked-view/masked-view@patch:@react-native-masked-view/masked-view@npm%3A0.3.1#./.yarn/patches/@react-native-masked-view-masked-view-npm-0.3.1-f7d31a3f3a.patch::locator=%40azzapp%2Fmonorepo%40workspace%3A.":
+  version: 0.3.1
+  resolution: "@react-native-masked-view/masked-view@patch:@react-native-masked-view/masked-view@npm%3A0.3.1#./.yarn/patches/@react-native-masked-view-masked-view-npm-0.3.1-f7d31a3f3a.patch::version=0.3.1&hash=23a7c6&locator=%40azzapp%2Fmonorepo%40workspace%3A."
+  peerDependencies:
+    react: ">=16"
+    react-native: ">=0.57"
+  checksum: 0e0b63507d37382340b333f4609e28c1a50caf6d129e98ae16bca43daafdcd42c46a844a977a01520dbc51b55f537afe10f1c9bf917f97cfdba25b41717a88d2
   languageName: node
   linkType: hard
 
@@ -9190,66 +9200,66 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@sentry/cli-darwin@npm:2.31.2":
-  version: 2.31.2
-  resolution: "@sentry/cli-darwin@npm:2.31.2"
+"@sentry/cli-darwin@npm:2.34.0":
+  version: 2.34.0
+  resolution: "@sentry/cli-darwin@npm:2.34.0"
   conditions: os=darwin
   languageName: node
   linkType: hard
 
-"@sentry/cli-linux-arm64@npm:2.31.2":
-  version: 2.31.2
-  resolution: "@sentry/cli-linux-arm64@npm:2.31.2"
+"@sentry/cli-linux-arm64@npm:2.34.0":
+  version: 2.34.0
+  resolution: "@sentry/cli-linux-arm64@npm:2.34.0"
   conditions: (os=linux | os=freebsd) & cpu=arm64
   languageName: node
   linkType: hard
 
-"@sentry/cli-linux-arm@npm:2.31.2":
-  version: 2.31.2
-  resolution: "@sentry/cli-linux-arm@npm:2.31.2"
+"@sentry/cli-linux-arm@npm:2.34.0":
+  version: 2.34.0
+  resolution: "@sentry/cli-linux-arm@npm:2.34.0"
   conditions: (os=linux | os=freebsd) & cpu=arm
   languageName: node
   linkType: hard
 
-"@sentry/cli-linux-i686@npm:2.31.2":
-  version: 2.31.2
-  resolution: "@sentry/cli-linux-i686@npm:2.31.2"
+"@sentry/cli-linux-i686@npm:2.34.0":
+  version: 2.34.0
+  resolution: "@sentry/cli-linux-i686@npm:2.34.0"
   conditions: (os=linux | os=freebsd) & (cpu=x86 | cpu=ia32)
   languageName: node
   linkType: hard
 
-"@sentry/cli-linux-x64@npm:2.31.2":
-  version: 2.31.2
-  resolution: "@sentry/cli-linux-x64@npm:2.31.2"
+"@sentry/cli-linux-x64@npm:2.34.0":
+  version: 2.34.0
+  resolution: "@sentry/cli-linux-x64@npm:2.34.0"
   conditions: (os=linux | os=freebsd) & cpu=x64
   languageName: node
   linkType: hard
 
-"@sentry/cli-win32-i686@npm:2.31.2":
-  version: 2.31.2
-  resolution: "@sentry/cli-win32-i686@npm:2.31.2"
+"@sentry/cli-win32-i686@npm:2.34.0":
+  version: 2.34.0
+  resolution: "@sentry/cli-win32-i686@npm:2.34.0"
   conditions: os=win32 & (cpu=x86 | cpu=ia32)
   languageName: node
   linkType: hard
 
-"@sentry/cli-win32-x64@npm:2.31.2":
-  version: 2.31.2
-  resolution: "@sentry/cli-win32-x64@npm:2.31.2"
+"@sentry/cli-win32-x64@npm:2.34.0":
+  version: 2.34.0
+  resolution: "@sentry/cli-win32-x64@npm:2.34.0"
   conditions: os=win32 & cpu=x64
   languageName: node
   linkType: hard
 
-"@sentry/cli@npm:2.31.2":
-  version: 2.31.2
-  resolution: "@sentry/cli@npm:2.31.2"
+"@sentry/cli@npm:2.34.0":
+  version: 2.34.0
+  resolution: "@sentry/cli@npm:2.34.0"
   dependencies:
-    "@sentry/cli-darwin": 2.31.2
-    "@sentry/cli-linux-arm": 2.31.2
-    "@sentry/cli-linux-arm64": 2.31.2
-    "@sentry/cli-linux-i686": 2.31.2
-    "@sentry/cli-linux-x64": 2.31.2
-    "@sentry/cli-win32-i686": 2.31.2
-    "@sentry/cli-win32-x64": 2.31.2
+    "@sentry/cli-darwin": 2.34.0
+    "@sentry/cli-linux-arm": 2.34.0
+    "@sentry/cli-linux-arm64": 2.34.0
+    "@sentry/cli-linux-i686": 2.34.0
+    "@sentry/cli-linux-x64": 2.34.0
+    "@sentry/cli-win32-i686": 2.34.0
+    "@sentry/cli-win32-x64": 2.34.0
     https-proxy-agent: ^5.0.0
     node-fetch: ^2.6.7
     progress: ^2.0.3
@@ -9272,7 +9282,7 @@ __metadata:
       optional: true
   bin:
     sentry-cli: bin/sentry-cli
-  checksum: a03c8ea742ebb7a56e331632e94ada55cd9b761b98c1e48a1e6ed91db8671f21428a900cb02ffa803841a3b6004adef58b0185af88b25ff01f85eed47c779af7
+  checksum: c01c3711475af2d264bab49d2ca584e68b73cf780b1e2ca74c3bc57d5c84534afe540c3f4c830053874916976c03e25be346258af5318acba8a4bc2bbd705040
   languageName: node
   linkType: hard
 
@@ -9399,12 +9409,12 @@ __metadata:
   linkType: hard
 
 "@sentry/react-native@npm:^5.30.0":
-  version: 5.30.0
-  resolution: "@sentry/react-native@npm:5.30.0"
+  version: 5.31.1
+  resolution: "@sentry/react-native@npm:5.31.1"
   dependencies:
     "@sentry/babel-plugin-component-annotate": 2.20.1
     "@sentry/browser": 7.119.0
-    "@sentry/cli": 2.31.2
+    "@sentry/cli": 2.34.0
     "@sentry/core": 7.119.0
     "@sentry/hub": 7.119.0
     "@sentry/integrations": 7.119.0
@@ -9420,7 +9430,7 @@ __metadata:
       optional: true
   bin:
     sentry-expo-upload-sourcemaps: scripts/expo-upload-sourcemaps.js
-  checksum: c5d4461c27b4c52632c0c9d15f45a57adaf2b0fa6c5c07eb939d90ad9e8350cf38235f0e674fab72c049a561ac8190e155096b58f3a794625616eaa41d1470b5
+  checksum: c00ab7ff747fbde8a5ddf59f725f8af3600efa6b3d59759e862939905b12f894a617f2aeff34c3b6cdefa27e60ed6f20a1b3970b00d28a85630060e12195d96f
   languageName: node
   linkType: hard
 
@@ -21880,12 +21890,12 @@ __metadata:
   linkType: hard
 
 "react-native-pager-view@npm:^6.4.0":
-  version: 6.4.0
-  resolution: "react-native-pager-view@npm:6.4.0"
+  version: 6.4.1
+  resolution: "react-native-pager-view@npm:6.4.1"
   peerDependencies:
     react: "*"
     react-native: "*"
-  checksum: 161172189e78333f8862a4751d628f24309ce4dc0ce6599a9554f6fcce543e1a3671905b76a91a3f29f09259620f181c2d03e8b3486de9d6bd927d978063eef4
+  checksum: 558f08efccf748eed91a2a88be4f90e49e2b63a28c1b9db5de9711eb324a75e9565a3dbf92c523a623a2c7d5a7e0d8a0db88599bc85d33158544a7d0e724319e
   languageName: node
   linkType: hard
 
@@ -21928,8 +21938,8 @@ __metadata:
   linkType: hard
 
 "react-native-reanimated@npm:^3.15.0":
-  version: 3.15.0
-  resolution: "react-native-reanimated@npm:3.15.0"
+  version: 3.15.1
+  resolution: "react-native-reanimated@npm:3.15.1"
   dependencies:
     "@babel/plugin-transform-arrow-functions": ^7.0.0-0
     "@babel/plugin-transform-class-properties": ^7.0.0-0
@@ -21946,7 +21956,7 @@ __metadata:
     "@babel/core": ^7.0.0-0
     react: "*"
     react-native: "*"
-  checksum: fad4f54d7f005f4fb3d90d983bedcf1ec7de936259b8e286feb35edaa9d1ac16d8b927fcd59eeea7f91446310432b342fd9785301a304955844785fef52a3e31
+  checksum: e520ba51a56075a3a0358f966ea6a44b41fa59ed1d0470b9c537dfeb224032066cd197955e18e96af5da22a51ad31c4d8b2422f511d96b8d1dd2ef5fc11a7d1a
   languageName: node
   linkType: hard
 
