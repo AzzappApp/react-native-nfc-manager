@@ -59,7 +59,8 @@ const HomeContactCardLandscape = ({
       ({ orientation, rotation }) => {
         let calculOrientation = orientation;
 
-        if (Platform.OS === 'android') {
+        // rotation may be null on startup
+        if (Platform.OS === 'android' && rotation) {
           //this is clearly and android hack, if app is lock in portrait mode, we can't get the orientation
           //https://github.com/expo/expo/issues/2430
           calculOrientation = orientationCalculation(
