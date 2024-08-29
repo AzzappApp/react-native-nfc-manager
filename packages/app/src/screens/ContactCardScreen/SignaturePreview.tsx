@@ -23,7 +23,10 @@ const SignaturePreview = ({ profile: profileKey }: SignaturePreviewProps) => {
     graphql`
       fragment SignaturePreview_profile on Profile
       @argumentDefinitions(
-        pixelRatio: { type: "Float!", provider: "PixelRatio.relayprovider" }
+        pixelRatio: {
+          type: "Float!"
+          provider: "CappedPixelRatio.relayprovider"
+        }
       ) {
         webCard {
           id
@@ -44,9 +47,7 @@ const SignaturePreview = ({ profile: profileKey }: SignaturePreviewProps) => {
           }
           logo {
             id
-            height
-            width
-            uri: uri(width: 140, pixelRatio: $pixelRatio)
+            uri: uri(width: 180, pixelRatio: $pixelRatio)
           }
         }
         contactCard {
@@ -69,9 +70,7 @@ const SignaturePreview = ({ profile: profileKey }: SignaturePreviewProps) => {
         }
         logo {
           id
-          height
-          width
-          uri: uri(width: 140, pixelRatio: $pixelRatio)
+          uri: uri(width: 180, pixelRatio: $pixelRatio)
         }
       }
     `,
