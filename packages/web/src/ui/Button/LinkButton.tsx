@@ -1,4 +1,5 @@
 'use client';
+
 import cn from 'classnames';
 import styles from './Button.css';
 
@@ -14,6 +15,8 @@ const LinkButton = (props: ButtonProps) => {
     type = 'primary',
     size = 'medium',
     disabled,
+    download,
+    href,
     ...others
   } = props;
 

@@ -438,6 +438,7 @@ __metadata:
     "@paralleldrive/cuid2": ^2.2.2
     "@sentry/nextjs": ^7.113.0
     "@sentry/tracing": ^7.114.0
+    "@types/file-saver": ^2.0.7
     "@types/jsonwebtoken": ^9.0.6
     "@types/node": ^20.12.13
     "@types/qrcode": ^1.5.5
@@ -453,6 +454,7 @@ __metadata:
     bcrypt-ts: ^5.0.2
     classnames: ^2.5.1
     encoding: ^0.1.13
+    file-saver: ^2.0.5
     google-wallet: ^1.0.18
     graphql-yoga: ^5.3.1
     jose: ^5.3.0
@@ -9995,6 +9997,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/file-saver@npm:^2.0.7":
+  version: 2.0.7
+  resolution: "@types/file-saver@npm:2.0.7"
+  checksum: c3d1cd80eab1214767922cabac97681f3fb688e82b74890450d70deaca49537949bbc96d80d363d91e8f0a4752c7164909cc8902d9721c5c4809baafc42a3801
+  languageName: node
+  linkType: hard
+
 "@types/fs-extra@npm:^9.0.1":
   version: 9.0.13
   resolution: "@types/fs-extra@npm:9.0.13"
@@ -15450,6 +15459,13 @@ __metadata:
   dependencies:
     flat-cache: ^3.0.4
   checksum: f49701feaa6314c8127c3c2f6173cfefff17612f5ed2daaafc6da13b5c91fd43e3b2a58fd0d63f9f94478a501b167615931e7200e31485e320f74a33885a9c74
+  languageName: node
+  linkType: hard
+
+"file-saver@npm:^2.0.5":
+  version: 2.0.5
+  resolution: "file-saver@npm:2.0.5"
+  checksum: c62d96e5cebc58b4bdf3ae8a60d5cf9607ad82f75f798c33a4ee63435ac2203002584d5256a2a780eda7feb5e19dc3b6351c2212e58b3f529e63d265a7cc79f7
   languageName: node
   linkType: hard
 
@@ -25479,10 +25495,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"vcard-creator@npm:^0.7.0":
+"vcard-creator@npm:0.7.0":
   version: 0.7.0
   resolution: "vcard-creator@npm:0.7.0"
   checksum: b43b0652430307a034f386f82384e80bb652fc9d2ade6cbaee7f896e23b5f9e848c7f577de3acc92a08d58490e5639c556d926d379c1ef7281e6df95b0ceb292
+  languageName: node
+  linkType: hard
+
+"vcard-creator@patch:vcard-creator@npm%3A0.7.0#./.yarn/patches/vcard-creator-npm-0.7.0-a36000c711.patch::locator=%40azzapp%2Fmonorepo%40workspace%3A.":
+  version: 0.7.0
+  resolution: "vcard-creator@patch:vcard-creator@npm%3A0.7.0#./.yarn/patches/vcard-creator-npm-0.7.0-a36000c711.patch::version=0.7.0&hash=c89a50&locator=%40azzapp%2Fmonorepo%40workspace%3A."
+  checksum: 6a05521cb15decc85a285d0c68d221e1a44926316a87ef95dc6df9430065eb44588a40e8c774f2e2e27d08eea434e845975ec62104bffd15e7bd553cb68e30b7
   languageName: node
   linkType: hard
 

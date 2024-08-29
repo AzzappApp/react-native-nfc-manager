@@ -30,18 +30,6 @@
     {
       "splitTerminals": [
         {
-          "name": "data compile",
-          "commands": ["cd packages/data", "yarn compile:watch"]
-        },
-        {
-          "name": "data definition",
-          "commands": ["cd packages/data", "yarn definition:watch"]
-        }
-      ]
-    },
-    {
-      "splitTerminals": [
-        {
           "name": "relay watch",
           "commands": [
             "yarn relay:prepare && yarn update-graphql-schema &&  yarn relay:build --repersist && yarn relay:watch"
