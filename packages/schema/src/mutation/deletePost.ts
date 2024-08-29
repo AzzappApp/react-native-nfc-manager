@@ -3,7 +3,7 @@ import { markPostAsDeleted } from '@azzapp/data';
 import ERRORS from '@azzapp/shared/errors';
 import { invalidatePost, invalidateWebCard } from '#externals';
 import { getSessionInfos } from '#GraphQLContext';
-import { postCommentLoader, webCardLoader } from '#loaders';
+import { postLoader, webCardLoader } from '#loaders';
 import { hasWebCardProfileEditorRight } from '#helpers/permissionsHelpers';
 import fromGlobalIdWithType from '#helpers/relayIdHelpers';
 import type { MutationResolvers } from '#__generated__/types';
@@ -18,7 +18,7 @@ const deletePostMutation: MutationResolvers['deletePost'] = async (
   }
 
   const postId = fromGlobalIdWithType(gqlPostId, 'Post');
-  const post = await postCommentLoader.load(postId);
+  const post = await postLoader.load(postId);
   if (!post) {
     throw new GraphQLError(ERRORS.INVALID_REQUEST);
   }
