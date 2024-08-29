@@ -143,6 +143,23 @@ const WebCardScreenContactDownloader = ({
                   description: 'Button to view the contact',
                 }),
                 onPress: async () => {
+                  if (Platform.OS === 'android') {
+                    const readContactPermission =
+                      await requestPermissionsAsync();
+                    if (readContactPermission.status !== 'granted') {
+                      Toast.show({
+                        type: 'error',
+                        text1: intl.formatMessage({
+                          defaultMessage:
+                            'You have to grant the permission to view the contact',
+                          description:
+                            'WebCard screen - Error message when trying to view a contact',
+                        }),
+                      });
+                      return;
+                    }
+                  }
+
                   await presentFormAsync(null, contact, {
                     isNew: true,
                   });

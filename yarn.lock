@@ -150,7 +150,7 @@ __metadata:
     expo-asset: ^10.0.10
     expo-blur: ^13.0.2
     expo-clipboard: ~6.0.3
-    expo-contacts: ~13.0.3
+    expo-contacts: ^13.0.5
     expo-device: ^6.0.2
     expo-file-system: ^17.0.1
     expo-font: ^12.0.9
@@ -15111,21 +15111,21 @@ __metadata:
   languageName: node
   linkType: hard
 
-"expo-contacts@npm:13.0.3":
-  version: 13.0.3
-  resolution: "expo-contacts@npm:13.0.3"
+"expo-contacts@npm:13.0.5":
+  version: 13.0.5
+  resolution: "expo-contacts@npm:13.0.5"
   peerDependencies:
     expo: "*"
-  checksum: a8dcfb2b5e778aeec606b0a53a22bb00a16b7f978ac59c6a53070a2278a334576479eaec14d4dc17b92b1e92e58d98e6d925bb2837c1705ff5de562d30ed41b1
+  checksum: 46429a34f6d43af201de271d592605ded44a66a4a40e88df1e22c1d46a749cfd839d2d54f7b5e267af2838cb08bb9938919ce2cb6f49afc545518200fdfc018e
   languageName: node
   linkType: hard
 
-"expo-contacts@patch:expo-contacts@npm%3A13.0.3#./.yarn/patches/expo-contacts-npm-13.0.3-c6435ab472.patch::locator=%40azzapp%2Fmonorepo%40workspace%3A.":
-  version: 13.0.3
-  resolution: "expo-contacts@patch:expo-contacts@npm%3A13.0.3#./.yarn/patches/expo-contacts-npm-13.0.3-c6435ab472.patch::version=13.0.3&hash=450d65&locator=%40azzapp%2Fmonorepo%40workspace%3A."
+"expo-contacts@patch:expo-contacts@npm%3A13.0.5#./.yarn/patches/expo-contacts-npm-13.0.5-ee92319df7.patch::locator=%40azzapp%2Fmonorepo%40workspace%3A.":
+  version: 13.0.5
+  resolution: "expo-contacts@patch:expo-contacts@npm%3A13.0.5#./.yarn/patches/expo-contacts-npm-13.0.5-ee92319df7.patch::version=13.0.5&hash=530717&locator=%40azzapp%2Fmonorepo%40workspace%3A."
   peerDependencies:
     expo: "*"
-  checksum: ff99baeb8e9ed46de1e3208085fe9ea81a5c17c5b3ccc43a4677520f8bc87ed7a3c431e07fd481f16fb363e6d4f8dd9503d88a0377fff1bba6ef4020765abd92
+  checksum: 9803bbb7fa92ef511aa893c0a3ce16bf07b91fe10a8babea83e1d76f29dd721ad1e4b18465ef795ca258bd32c4fe72bc420ebc29df6f5606dc1e26407277caa9
   languageName: node
   linkType: hard
 
