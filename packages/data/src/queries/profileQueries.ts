@@ -223,6 +223,22 @@ export const updateProfile = async (
     .where(eq(ProfileTable.id, profileId));
 };
 
+export const updateProfileForUserAndWebCard = async (
+  userId: string,
+  webCardId: string,
+  updates: Partial<Omit<Profile, 'id'>>,
+) => {
+  await db()
+    .update(ProfileTable)
+    .set(updates)
+    .where(
+      and(
+        eq(ProfileTable.userId, userId),
+        eq(ProfileTable.webCardId, webCardId),
+      ),
+    );
+};
+
 /**
  * Increment the number of contact card scans for a profile
  *

@@ -1,6 +1,11 @@
 import { GraphQLError } from 'graphql';
 import { fromGlobalId } from 'graphql-relay';
-import { cancelSubscription, transaction, updateProfile } from '@azzapp/data';
+import {
+  cancelSubscription,
+  transaction,
+  updateProfile,
+  updateProfileForUserAndWebCard,
+} from '@azzapp/data';
 import ERRORS from '@azzapp/shared/errors';
 import { getSessionInfos } from '#GraphQLContext';
 import {
@@ -42,7 +47,9 @@ const acceptOwnership: MutationResolvers['acceptOwnership'] = async (
   const owner = await webCardOwnerLoader.load(webCard.id);
   const updatedProfile = await transaction(async () => {
     if (owner) {
-      await updateProfile(owner.id, { profileRole: 'admin' });
+      await updateProfileForUserAndWebCard(owner.id, profile.webCardId, {
+        profileRole: 'admin',
+      });
       await cancelSubscription(owner.id, profile.webCardId);
     }
     await updateProfile(profileId, {
