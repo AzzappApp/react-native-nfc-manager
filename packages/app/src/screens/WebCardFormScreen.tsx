@@ -601,6 +601,7 @@ const WebCardFormScreen = ({
                       sections={filteredCompanyActivities}
                       selectedItemKey={value}
                       keyExtractor={keyExtractor}
+                      avoidKeyboard
                       bottomSheetHeight={windowHeight - 90 - insets.top}
                       inputLabel={
                         value

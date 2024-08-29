@@ -1,5 +1,6 @@
 import { useCallback, useState } from 'react';
 import { View } from 'react-native';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
 import { colors } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import Text from '#ui/Text';
@@ -111,7 +112,6 @@ const SelectSection = <ItemT, SectionT>({
     },
     [onItemSelected],
   );
-
   return (
     <>
       <PressableNative
@@ -145,10 +145,12 @@ const SelectSection = <ItemT, SectionT>({
         contentContainerStyle={styles.bottomSheetContentContainer}
         onRequestClose={() => setShowDropDown(false)}
         nestedScroll
-        avoidKeyboard={avoidKeyboard}
       >
         <SelectSectionList
           sections={sections}
+          renderScrollComponent={props => (
+            <KeyboardAwareScrollView enabled={avoidKeyboard} {...props} />
+          )}
           keyExtractor={keyExtractor}
           selectedItemKey={selectedItemKey}
           renderItem={renderItem}
