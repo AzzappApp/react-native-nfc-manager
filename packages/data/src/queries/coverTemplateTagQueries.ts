@@ -1,4 +1,4 @@
-import { count, eq, sql } from 'drizzle-orm';
+import { asc, count, eq, sql } from 'drizzle-orm';
 import { db } from '../database';
 import { CoverTemplateTable, CoverTemplateTagTable } from '../schema';
 import { getEntitiesByIds } from './entitiesQueries';
@@ -46,6 +46,7 @@ export const getCoverTemplateTags = async (
   if (enabledOnly) {
     query = query.where(eq(CoverTemplateTagTable.enabled, true));
   }
+  query.orderBy(asc(CoverTemplateTagTable.order));
   return query;
 };
 

@@ -340,7 +340,7 @@ const ProfileResolverImpl: ProtectedResolver<ProfileResolvers> = {
     if (!profileIsAssociatedToCurrentUser(profile)) {
       return [];
     }
-    return getCoverTemplateTags();
+    return getCoverTemplateTags(true);
   },
   coverTemplateTypes: profile => {
     if (!profileIsAssociatedToCurrentUser(profile)) {
