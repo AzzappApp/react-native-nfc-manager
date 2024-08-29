@@ -123,7 +123,11 @@ export function formatPhoneNumber(phoneNumber: string) {
  * @return {*}
  */
 export function formatPhoneNumberUri(phoneNumber: string) {
-  return parsePhoneNumber(phoneNumber).getURI();
+  try {
+    return parsePhoneNumber(phoneNumber).getURI();
+  } catch {
+    return `tel:${phoneNumber}`;
+  }
 }
 
 /**
