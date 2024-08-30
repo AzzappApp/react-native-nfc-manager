@@ -159,13 +159,6 @@ const PostRendererBottomPanel = ({
     });
   };
 
-  const goToLikes = () => {
-    router.push({
-      route: 'POST_LIKES',
-      params: { postId: post.id },
-    });
-  };
-
   const addComment = () => {
     goToComments();
     toggleModal();
@@ -458,7 +451,7 @@ const PostRendererBottomPanel = ({
             </Text>
           )}
           {post.allowComments && post.counterComments > 0 && (
-            <PressableNative onPress={goToLikes}>
+            <PressableNative onPress={goToComments}>
               <Text
                 variant="medium"
                 style={styles.textCommentCounter}
