@@ -195,6 +195,33 @@ const PostRendererActionBar = ({
 
   // toggle the value locally
   const toggleReaction = useCallback(() => {
+    if (!actionEnabled) {
+      Alert.alert(
+        intl.formatMessage({
+          defaultMessage: 'Unpublished WebCard.',
+          description:
+            'PostRendererActionBar - Alert Message title when the user is viewing a post (from deeplinking) with an unpublished WebCard',
+        }),
+        intl.formatMessage({
+          defaultMessage:
+            'This action can only be done from a published WebCard.',
+          description:
+            'PostRendererActionBar - AlertMessage when the user is viewing a post (from deeplinking) with an unpublished WebCard',
+        }),
+        [
+          {
+            text: intl.formatMessage({
+              defaultMessage: 'Ok',
+              description:
+                'PostRendererActionBar - Alert button when the user is viewing a post (from deeplinking) with an unpublished WebCard',
+            }),
+          },
+        ],
+      );
+
+      return;
+    }
+
     if (profileHasEditorRight(profileInfos?.profileRole)) {
       if (reaction) {
         setCountReactions(countReactions - 1);
@@ -215,6 +242,7 @@ const PostRendererActionBar = ({
       });
     }
   }, [
+    actionEnabled,
     countReactions,
     debouncedCommit,
     intl,
