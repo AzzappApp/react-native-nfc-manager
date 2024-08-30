@@ -87,7 +87,7 @@ const inviteUserMutation: MutationResolvers['inviteUser'] = async (
 
       const existingUser = await getUserByEmailPhoneNumber(
         invited.email ?? undefined,
-        invited.phoneNumber ?? undefined,
+        phoneNumber ?? undefined,
       );
 
       let userId: string;

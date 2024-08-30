@@ -1,7 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { fromGlobalId } from 'graphql-relay';
 import { parsePhoneNumber } from 'libphonenumber-js';
-import { useCallback, type ReactNode } from 'react';
+import { useCallback, useEffect, type ReactNode } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { Alert, StyleSheet, View, useColorScheme } from 'react-native';
@@ -318,6 +318,12 @@ const MultiUserDetailsScreen = ({
     `);
 
   const router = useRouter();
+
+  useEffect(() => {
+    if (!node) {
+      router.back();
+    }
+  }, [node, router]);
 
   const onRemoveUser = useCallback(() => {
     if (profileInfos?.webCardId == null || profile == null) return;
