@@ -407,8 +407,6 @@ const PhotoWithTextAndTitleEditionScreen = ({
       return;
     }
 
-    setProgressIndicator(Observable.from(0));
-
     const requireSubscription = changeModuleRequireSubscription(
       'photoWithTextAndTitle',
       cardModulesCount,
@@ -422,6 +420,8 @@ const PhotoWithTextAndTitleEditionScreen = ({
       router.push({ route: 'USER_PAY_WALL' });
       return;
     }
+
+    setProgressIndicator(Observable.from(0));
 
     const { image: updateImage, ...rest } = value;
     let mediaId = updateImage?.id;

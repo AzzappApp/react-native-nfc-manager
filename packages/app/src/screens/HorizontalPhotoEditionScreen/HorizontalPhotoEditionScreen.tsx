@@ -301,8 +301,6 @@ const HorizontalPhotoEditionScreen = ({
       return;
     }
 
-    setProgressIndicator(Observable.from(0));
-
     const requireSubscription = changeModuleRequireSubscription(
       'horizontalPhoto',
       cardModulesCount,
@@ -316,6 +314,8 @@ const HorizontalPhotoEditionScreen = ({
       router.push({ route: 'USER_PAY_WALL' });
       return;
     }
+
+    setProgressIndicator(Observable.from(0));
 
     const { image: updateMedia, ...rest } = value;
 
