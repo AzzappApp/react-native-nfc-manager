@@ -315,12 +315,6 @@ export const ContactCardScreen = ({
                 <PressableNative
                   testID="add-to-wallet-button"
                   disabled={loadingPass}
-                  ripple={{
-                    borderless: true,
-                    foreground: true,
-                    color:
-                      colorScheme === 'dark' ? colors.grey100 : colors.grey900,
-                  }}
                   style={styles.addToWalletButton}
                   onPress={generateLoadingPass}
                 >
@@ -516,8 +510,10 @@ const styleSheet = createStyleSheet(appearance => ({
   },
   buttons: { rowGap: 10, width: '100%' },
   addToWalletIcon: {
+    width: 38,
+    height: 37,
     position: 'absolute',
-    left: 4,
+    left: 10,
     marginVertical: 'auto',
   },
   sharedIcon: {
