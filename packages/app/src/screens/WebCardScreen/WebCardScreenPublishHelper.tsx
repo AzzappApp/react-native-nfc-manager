@@ -173,7 +173,7 @@ const WebCardScreenPublishHelper = ({
         style={[
           styles.container,
           {
-            paddingTop: insets.top,
+            paddingTop: insets.top + 20,
             paddingBottom: insets.bottom,
           },
         ]}
@@ -204,12 +204,12 @@ const WebCardScreenPublishHelper = ({
               }}
             />
           </Text>
-          <View style={styles.urlContainer}>
+          <Container style={styles.urlContainer}>
             <Icon icon="earth" style={styles.iconLink} />
             <Text variant="button" numberOfLines={1} style={styles.url}>
               {url.replace('https://', '')}
             </Text>
-          </View>
+          </Container>
           <View style={{ flex: 1, justifyContent: 'center' }}>
             <Button
               onPress={onPublish}
@@ -281,6 +281,7 @@ const stylesheet = createStyleSheet(appearance => ({
     alignItems: 'center',
     flexDirection: 'row',
     alignSelf: 'center',
+    overflow: 'visible',
     ...shadow(appearance, 'bottom'),
   },
   url: {
