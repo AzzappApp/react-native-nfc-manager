@@ -2,19 +2,15 @@ import { NextResponse } from 'next/server';
 import { withAxiom } from 'next-axiom';
 import * as z from 'zod';
 import { getProfileWithWebCardById, getUserById } from '@azzapp/data';
-import { COVER_RATIO } from '@azzapp/shared/coverHelpers';
 import ERRORS from '@azzapp/shared/errors';
 import serializeAndSignContactCard from '@azzapp/shared/serializeAndSignContactCard';
 import serializeAndSignEmailSignature from '@azzapp/shared/serializeAndSignEmailSignature';
 import { buildEmailSignatureGenerationUrl } from '@azzapp/shared/urlHelpers';
 import { buildAvatarUrl } from '#helpers/avatar';
 import cors from '#helpers/cors';
-import { buildCoverImageUrl } from '#helpers/cover';
 import { sendTemplateEmail } from '#helpers/emailHelpers';
 import { getSessionData } from '#helpers/tokens';
 import type { NextRequest } from 'next/server';
-
-const COVER_WIDTH = 630;
 
 const EmailSignatureSignSchema = z.object({
   profileId: z.string(),
@@ -39,12 +35,6 @@ const generateEmailSignature = async (req: NextRequest) => {
     if (!profile?.contactCard) {
       return new Response('Invalid request', { status: 400 });
     }
-
-    const webCardUrl = await buildCoverImageUrl(webCard, {
-      width: COVER_WIDTH,
-      height: COVER_WIDTH / COVER_RATIO,
-      crop: 'fit',
-    });
 
     const avatarUrl = await buildAvatarUrl(profile, null);
     const { data, signature } = await serializeAndSignEmailSignature(
@@ -77,9 +67,6 @@ const generateEmailSignature = async (req: NextRequest) => {
         contactCardSignature,
       ),
     };
-    if (webCardUrl) {
-      mailParam.webCardUrl = webCardUrl;
-    }
 
     const userEmail = await getUserById(userId);
 
