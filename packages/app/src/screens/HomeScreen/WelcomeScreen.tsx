@@ -1,14 +1,16 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 import { LinearGradient } from 'expo-linear-gradient';
+import LottieView from 'lottie-react-native';
 import { useCallback, useEffect } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { Image, StyleSheet, View } from 'react-native';
+import { Image, useColorScheme, useWindowDimensions, View } from 'react-native';
 import { graphql, usePreloadedQuery } from 'react-relay';
 import { mainRoutes } from '#mobileRoutes';
 import { colors } from '#theme';
 import Link from '#components/Link';
 import { useMainTabBarVisibilityController } from '#components/MainTabBar';
 import { useRouter } from '#components/NativeRouter';
+import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import { dispatchGlobalEvent } from '#helpers/globalEvents';
 import relayScreen from '#helpers/relayScreen';
 import useAuthState from '#hooks/useAuthState';
@@ -50,7 +52,9 @@ const WelcomeScreen = ({
   }, [profileInfos, router]);
 
   useFocusEffect(goBackToHome);
-
+  const colorScheme = useColorScheme();
+  const { height } = useWindowDimensions();
+  const styles = useStyleSheet(styleSheet);
   return profileInfos?.profileId ? (
     <Container
       style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}
@@ -58,20 +62,42 @@ const WelcomeScreen = ({
       <ActivityIndicator />
     </Container>
   ) : (
-    <Container style={{ flex: 1 }}>
-      <LinearGradient colors={['#FF688C', '#FFF']} style={styles.linear} />
-      <Image
-        source={require('#assets/logo-full_white.png')}
-        style={styles.logo}
+    <Container style={{ flex: 1, justifyContent: 'space-between' }}>
+      <LottieView
+        source={require('../../assets/sign/login_sign_up_asset.json')}
+        autoPlay
+        loop
+        hardwareAccelerationAndroid
+        style={{
+          width: '100%',
+          height: height - BOTTOM_HEIGHT,
+
+          position: 'absolute',
+          top: 0,
+        }}
+        resizeMode="cover"
       />
-      <View style={styles.imageContainer}>
-        <Image source={require('#assets/welcome.png')} style={styles.image} />
+      <View style={styles.header}>
+        <Image
+          source={require('#assets/logo-full_white.png')}
+          style={styles.logo}
+        />
+        <IconButton
+          icon="menu"
+          style={styles.menu}
+          iconStyle={{ tintColor: 'white' }}
+          onPress={toggleShowMenu}
+        />
       </View>
-      <IconButton
-        icon="menu"
-        style={styles.menu}
-        iconStyle={{ tintColor: 'white' }}
-        onPress={toggleShowMenu}
+      <LinearGradient
+        colors={[
+          'rgba(0, 0, 0, 1)',
+          'rgba(0, 0, 0, 0)',
+          colorScheme === 'light'
+            ? 'rgba(255, 255, 255, 1)'
+            : 'rgba(0, 0, 0, 1)',
+        ]}
+        style={[styles.linear, { height: height - BOTTOM_HEIGHT - 100 }]}
       />
 
       <View style={styles.content}>
@@ -94,7 +120,7 @@ const WelcomeScreen = ({
           <Button
             label={intl.formatMessage(
               {
-                defaultMessage: 'Create my first webcard{azzappA}',
+                defaultMessage: 'Create my first WebCard{azzappA}',
                 description: 'Button label for welcome screen',
               },
               {
@@ -138,18 +164,18 @@ WelcomeRelayScreen.getScreenOptions = (): ScreenOptions => ({
 });
 
 export default WelcomeRelayScreen;
-
-const styles = StyleSheet.create({
+const BOTTOM_HEIGHT = 280;
+const styleSheet = createStyleSheet(appearance => ({
   linear: {
-    height: '50%',
     position: 'absolute',
-    top: 0,
+    top: 100,
     left: 0,
     width: '100%',
+    pointerEvents: 'none',
   },
   logo: {
     marginHorizontal: 120,
-    top: 50,
+    top: 60,
     position: 'absolute',
   },
   imageContainer: {
@@ -162,9 +188,11 @@ const styles = StyleSheet.create({
     resizeMode: 'cover',
   },
   content: {
-    flex: 1,
-    justifyContent: 'center',
+    justifyContent: 'flex-end',
     alignItems: 'center',
+    backgroundColor: appearance === 'light' ? colors.white : 'black',
+    height: BOTTOM_HEIGHT,
+    paddingBottom: 100,
   },
   title: {
     marginBottom: 14,
@@ -176,11 +204,12 @@ const styles = StyleSheet.create({
   },
   menu: {
     position: 'absolute',
-    top: 39,
+    top: 49,
     right: 25,
     borderWidth: 0,
   },
   icon: {
     color: colors.white,
   },
-});
+  header: { backgroundColor: 'black', height: 100 },
+}));
