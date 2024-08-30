@@ -176,12 +176,7 @@ const DownloadVCard = ({
               )
             ) : null}
           </div>
-          <span
-            className={cx(
-              styles.message,
-              webCard.isMultiUser ? styles.messageContainsAvatars : '',
-            )}
-          >
+          <span className={cx(styles.message)}>
             <FormattedMessage
               defaultMessage="Add {userName} to your contacts"
               id="5AubE3"

@@ -45,14 +45,21 @@ const PostFeedMediaPlayer = (
         />
       )}
       {media.kind === 'image' && (
-        <CloudinaryImage
-          mediaId={media.id}
-          alt="cover"
-          fill
-          sizes="100vw"
-          className={cn(styles.postMedia)}
-          format="auto"
-        />
+        <div
+          style={{
+            width: '100%',
+            aspectRatio: `${media.width / media.height}`,
+          }}
+        >
+          <CloudinaryImage
+            mediaId={media.id}
+            alt="cover"
+            fill
+            sizes="100vw"
+            className={cn(styles.postMedia)}
+            format="auto"
+          />
+        </div>
       )}
       <ButtonIcon
         Icon={ExpandIcon}

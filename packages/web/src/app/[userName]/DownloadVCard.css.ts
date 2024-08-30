@@ -44,18 +44,11 @@ const closedDialog = style([
   },
 ]);
 
-const messageContainsAvatars = style({});
 const message = style(
   {
     textAlign: 'center',
     maxWidth: '335px',
     marginTop: `${AVATAR_CONTAINER_TOP_POSITION}px`,
-
-    selectors: {
-      [`&:not(${messageContainsAvatars})`]: {
-        marginTop: 0,
-      },
-    },
   },
   textLargeSemiBold,
 );
@@ -83,7 +76,6 @@ const styles = {
   openedOverlay,
   closedDialog,
   avatarContainer,
-  messageContainsAvatars,
 };
 
 export default styles;
