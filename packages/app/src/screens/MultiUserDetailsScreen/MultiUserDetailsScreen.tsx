@@ -1,4 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod';
+import { fromGlobalId } from 'graphql-relay';
 import { parsePhoneNumber } from 'libphonenumber-js';
 import { useCallback, type ReactNode } from 'react';
 import { Controller, useForm } from 'react-hook-form';
@@ -340,7 +341,11 @@ const MultiUserDetailsScreen = ({
         });
       },
       updater: (store, response) => {
-        if (!response?.removeUsersFromWebCard?.includes(profile.id)) {
+        if (
+          !response?.removeUsersFromWebCard?.includes(
+            fromGlobalId(profile.id).id,
+          )
+        ) {
           Toast.show({
             type: 'error',
             text1: intl.formatMessage({

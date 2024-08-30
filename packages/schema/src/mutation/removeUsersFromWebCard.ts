@@ -39,27 +39,22 @@ const removeUsersFromWebCard: MutationResolvers['removeUsersFromWebCard'] =
       ? null
       : gqlRemovedProfileIds?.map(id => fromGlobalIdWithType(id, 'Profile'));
 
-    await transaction(async () => {
-      const profilesToDelete = (
-        allProfiles
-          ? await getProfilesByWebCard(webCardId)
-          : await getProfilesByIds(profileToRemoveIds ?? [])
-      )
-        .filter(profile => !!profile)
-        .filter(
-          profile =>
-            profile.profileRole !== 'owner' && profile.userId !== userId,
-        );
+    const profilesToDelete = (
+      allProfiles
+        ? await getProfilesByWebCard(webCardId)
+        : await getProfilesByIds(profileToRemoveIds ?? [])
+    )
+      .filter(profile => !!profile)
+      .filter(
+        profile => profile.profileRole !== 'owner' && profile.userId !== userId,
+      );
 
+    await transaction(async () => {
       await removeProfiles(profilesToDelete.map(profile => profile.id));
       await updateMonthlySubscription(userId, webCardId);
     });
 
-    return allProfiles
-      ? []
-      : (await getProfilesByIds(profileToRemoveIds ?? []))
-          .filter(profile => !!profile)
-          .map(profile => profile.id);
+    return allProfiles ? [] : profilesToDelete.map(profile => profile.id);
   };
 
 export default removeUsersFromWebCard;
