@@ -114,7 +114,7 @@ const getGoogleWalletPass = async (
               }`.trim() ||
                 webCard?.commonInformation?.company ||
                 contactCard?.company) ??
-              '',
+              webCard?.userName, // empty string is not allowed
           },
         },
         genericType: GenericTypeEnum.GENERIC_OTHER,

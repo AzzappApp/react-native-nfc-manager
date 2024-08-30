@@ -238,14 +238,24 @@ export const ContactCardScreen = ({
           defaultMessage: 'Error',
           description: 'Error toast title',
         }),
-        text2: intl.formatMessage(
-          {
-            defaultMessage:
-              'Oops, ContactCard{azzappA} could not add pass to Apple Wallet',
-            description: 'Error toast message',
-          },
-          { azzappA: <Text variant="azzapp">a</Text> },
-        ) as string,
+        text2: Platform.select({
+          ios: intl.formatMessage(
+            {
+              defaultMessage:
+                'Oops, ContactCard{azzappA} could not add pass to Apple Wallet',
+              description: 'Error toast message',
+            },
+            { azzappA: <Text variant="azzapp">a</Text> },
+          ) as string,
+          android: intl.formatMessage(
+            {
+              defaultMessage:
+                'Oops, ContactCard{azzappA} could not add pass to Google Wallet',
+              description: 'Error toast message',
+            },
+            { azzappA: <Text variant="azzapp">a</Text> },
+          ),
+        }) as string,
         type: 'error',
       });
     } finally {
@@ -339,22 +349,23 @@ export const ContactCardScreen = ({
               </View>
             )}
             {Platform.OS === 'android' && (
-              <View style={styles.googleWalletLogoContainer}>
+              <View>
                 <PressableNative
                   testID="add-to-wallet-button"
                   disabled={loadingPass}
                   onPress={generateLoadingPass}
                   ripple={{
-                    borderless: true,
                     foreground: true,
+                    borderless: false,
                     color:
                       colorScheme === 'dark' ? colors.grey100 : colors.grey900,
                   }}
+                  style={styles.googleWalletButton}
                 >
                   <Image
                     source={require('#assets/google-wallet.svg')}
                     style={styles.googleWalletLogo}
-                    contentFit="cover"
+                    contentFit="contain"
                   />
                 </PressableNative>
                 {loadingPass && (
@@ -370,7 +381,6 @@ export const ContactCardScreen = ({
               {webCard && <ContactCardExportVcf profile={profile} />}
               <PressableNative
                 ripple={{
-                  borderless: true,
                   foreground: true,
                   color:
                     colorScheme === 'dark' ? colors.grey100 : colors.grey900,
@@ -550,12 +560,13 @@ const styleSheet = createStyleSheet(appearance => ({
   scrollViewStyle: { width: '100%' },
   viewShotBackgroundColor: { backgroundColor: 'white' },
   googleWalletLogo: {
-    width: '100%',
     height: 47,
     overflow: 'visible',
   },
-  googleWalletLogoContainer: {
-    marginBottom: 18,
+  googleWalletButton: {
+    aspectRatio: 283 / 50, // derived from google wallet logo svg
+    height: 47,
+    alignSelf: 'center',
   },
   googleWalletLoadingContainer: {
     position: 'absolute',

@@ -340,6 +340,10 @@ const ItemRenderComponent = ({
             <PressableNative
               style={styles.multiUserContainer}
               onPress={onPressMultiUser}
+              android_ripple={{
+                borderless: true,
+                foreground: true,
+              }}
             >
               <BlurView style={styles.multiUserIconContainer}>
                 <Icon icon="shared_webcard" style={styles.multiUserIcon} />

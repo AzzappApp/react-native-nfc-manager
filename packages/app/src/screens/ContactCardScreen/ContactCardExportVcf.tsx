@@ -38,7 +38,6 @@ const ContactCardExportVcf = ({
   return (
     <PressableNative
       ripple={{
-        borderless: true,
         foreground: true,
         color: colorScheme === 'dark' ? colors.grey100 : colors.grey900,
       }}
