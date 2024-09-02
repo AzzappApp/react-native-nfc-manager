@@ -75,6 +75,14 @@ platform :ios do
       use_automatic_signing: false,
       path: "ios/azzapp.xcodeproj",
       entitlements_file_path: entitlements_files[IOS_SCHEME],
+      targets: [IOS_SCHEME, IOS_APPCLIP_SCHEME]
+    )
+
+    # Determine the entitlements file based on the target
+    update_code_signing_settings(
+      use_automatic_signing: false,
+      path: "ios/azzapp.xcodeproj",
+      entitlements_file_path: entitlements_files[IOS_SCHEME],
       targets: {
         IOS_SCHEME => {
           code_sign_identity: "iPhone Distribution"
