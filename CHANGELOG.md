@@ -1,4 +1,4 @@
-## 0.6.0-canary.48
+## 0.6.0-canary.49
 
 * **fastlane:**  - clip building
 * **fix:**  - code signin
