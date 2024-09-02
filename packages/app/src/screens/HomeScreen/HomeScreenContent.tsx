@@ -67,13 +67,16 @@ const HomeScreenContent = ({ user: userKey }: HomeScreenContentProps) => {
   const [showMenu, toggleShowMenu] = useToggle(false);
 
   // #endregion
-
+  const insets = useScreenInsets();
   const homeContentContainerStyle = useMemo(
     () => [
       styles.contentContainer,
-      { paddingBottom: bottom + BOTTOM_MENU_HEIGHT + 15 },
+      {
+        paddingBottom: bottom + BOTTOM_MENU_HEIGHT + 15,
+        paddingTop: insets.top + 15,
+      },
     ],
-    [bottom],
+    [bottom, insets.top],
   );
 
   return (

@@ -13,7 +13,6 @@ import { graphql, useFragment } from 'react-relay';
 import { getTextColor } from '@azzapp/shared/colorsHelpers';
 import { colors } from '#theme';
 import PremiumIndicator from '#components/PremiumIndicator';
-import useScreenInsets from '#hooks/useScreenInsets';
 import Header from '#ui/Header';
 import IconButton from '#ui/IconButton';
 import { useHomeScreenContext } from './HomeScreenContext';
@@ -42,8 +41,7 @@ const HomeHeader = ({ openPanel, user: userKey }: HomeHeaderProps) => {
     `,
     userKey,
   );
-  const insets = useScreenInsets();
-  const headerStyle = useMemo(() => ({ marginTop: insets.top }), [insets.top]);
+
   const { currentIndexSharedValue, currentIndexProfile, inputRange } =
     useHomeScreenContext();
   const readableColors = useMemo(
@@ -127,7 +125,7 @@ const HomeHeader = ({ openPanel, user: userKey }: HomeHeaderProps) => {
           />
         </View>
       }
-      style={[styles.header, headerStyle]}
+      style={styles.header}
     />
   );
 };

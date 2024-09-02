@@ -62,13 +62,20 @@ const HomeProfilesCarousel = ({ user: userKey }: HomeProfilesCarouselProps) => {
     initialProfileIndex,
   } = useHomeScreenContext();
 
+  const { width: windowWidth } = useWindowDimensions();
+
   const onLayout = useCallback(
     ({ nativeEvent: { layout } }: LayoutChangeEvent) => {
       setCoverWidth(
-        Math.trunc(PixelRatio.roundToNearestPixel(layout.height * COVER_RATIO)),
+        Math.min(
+          windowWidth / 2,
+          Math.trunc(
+            PixelRatio.roundToNearestPixel(layout.height * COVER_RATIO),
+          ),
+        ),
       );
     },
-    [],
+    [windowWidth],
   );
   const coverHeight = useMemo(() => coverWidth / COVER_RATIO, [coverWidth]);
   const { profiles } = useFragment(
@@ -160,8 +167,6 @@ const HomeProfilesCarousel = ({ user: userKey }: HomeProfilesCarouselProps) => {
     },
     [coverWidth, coverHeight, scrollToIndex, selectedIndex],
   );
-
-  const { width: windowWidth } = useWindowDimensions();
 
   if (profiles == null) {
     return null;
@@ -422,7 +427,12 @@ const CreateItem = ({
 const CreateItemMemo = memo(CreateItem);
 
 const styles = StyleSheet.create({
-  container: { flex: 1, marginVertical: 15 },
+  container: {
+    flex: 1,
+    marginVertical: 15,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   carousel: {
     flexGrow: 0,
     overflow: 'visible',
