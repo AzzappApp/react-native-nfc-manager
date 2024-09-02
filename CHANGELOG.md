@@ -1,5 +1,7 @@
-## 0.6.0-canary.32
+## 0.6.0-canary.33
 
+* **build:**  - rollback react types changes
+* **build:**  - upgrade dependencies ([#4837](https://github.com/AzzappApp/azzapp/pull/4837))
 * **fix:**  - CI build ([#4834](https://github.com/AzzappApp/azzapp/pull/4834))
 * **fix:**  - homeCarrousel - limit the width (layout issue on android) - ([#4828](https://github.com/AzzappApp/azzapp/pull/4828))
 * **feat:**  - media screen improvements ([#4829](https://github.com/AzzappApp/azzapp/pull/4829))
