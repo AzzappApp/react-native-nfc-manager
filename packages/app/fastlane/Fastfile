@@ -26,7 +26,8 @@ EXPORT_METHOD = ENV['IOS_EXPORT_METHOD']
 P12_PASSWORD = ENV["IOS_CERTIFICATE_P12_PASSWORD"]
 PROFILE_ID = ENV["IOS_PROFILE_ID"]
 PROFILECLIP_ID = ENV["IOS_PROFILECLIP_ID"]
-CODE_SIGNING_IDENTITY = ENV["IOS_CODE_SIGNING_IDENTITY"]
+##CODE_SIGNING_IDENTITY = ENV["IOS_CODE_SIGNING_IDENTITY"]
+CODE_SIGNING_IDENTITY = "iPhone Distribution: APPCORP (66D3U3GLN6)"
 APP_STORE_CONNECT_API_KEY = ENV["APP_STORE_CONNECT_API_KEY"]
 TEAM_ID = "66D3U3GLN6"
 
@@ -83,6 +84,7 @@ platform :ios do
       path: "ios/azzapp.xcodeproj",
       entitlements_file_path: entitlements_files[IOS_SCHEME],
       targets: [IOS_SCHEME]
+      code_signing_identity: CODE_SIGNING_IDENTITY
     )
 
     update_code_signing_settings(
@@ -90,20 +92,23 @@ platform :ios do
       path: "ios/azzapp.xcodeproj",
       entitlements_file_path: clip_entitlements_files[IOS_APPCLIP_SCHEME],
       targets: [IOS_APPCLIP_SCHEME]
+      code_signing_identity: CODE_SIGNING_IDENTITY
     )
 
     update_project_provisioning(
       xcodeproj: "ios/azzapp.xcodeproj",
       profile: PROFILE_PATH,
       target_filter: IOS_SCHEME,
-      code_signing_identity: "iPhone Distribution"
+      code_signing_identity: CODE_SIGNING_IDENTITY
+      build_configuration: "Release"
     )
 
     update_project_provisioning(
       xcodeproj: "ios/azzapp.xcodeproj",
       profile: PROFILE_CLIP_PATH,
-      code_signing_identity: "iPhone Distribution",
+      code_signing_identity: CODE_SIGNING_IDENTITY,
       target_filter: IOS_APPCLIP_SCHEME,
+      build_configuration: "Release"
     )
 
     # Build the application
@@ -121,7 +126,8 @@ platform :ios do
           APP_IDENT => PROFILE_ID,
           APPCLIP_IDENT => PROFILECLIP_ID,
         },
-        installerSigningCertificate: "Apple Distribution: Your Company (#{TEAM_ID})",
+        installerSigningCertificate: CODE_SIGNING_IDENTITY,
+        distributionBundleIdentifier: APP_IDENT,
       }
     )
     
