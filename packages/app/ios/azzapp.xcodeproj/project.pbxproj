@@ -38,6 +38,7 @@
 		96847F1C2C5248B20089A75C /* HelveticaNeue.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 96847F182C5248B20089A75C /* HelveticaNeue.ttf */; };
 		96847F1D2C5248B20089A75C /* HelveticaNeue.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 96847F182C5248B20089A75C /* HelveticaNeue.ttf */; };
 		96847F1E2C5248B20089A75C /* HelveticaNeue.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 96847F182C5248B20089A75C /* HelveticaNeue.ttf */; };
+		9689E6A72C86078A000E6F84 /* ShareContactAppClip-dev.app in Embed App Clips */ = {isa = PBXBuildFile; fileRef = 96A9AE432C7F56CD009380FE /* ShareContactAppClip-dev.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		96A9AE2D2C7F56BE009380FE /* LzString.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96BAAEAD2C6262D7002902A2 /* LzString.swift */; };
 		96A9AE2E2C7F56BE009380FE /* ShareContactAppClipApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96DD48BD2C5D42FA00620722 /* ShareContactAppClipApp.swift */; };
 		96A9AE312C7F56BE009380FE /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 96DD48C42C5D42FB00620722 /* Preview Assets.xcassets */; };
@@ -53,7 +54,6 @@
 		96DD48BE2C5D42FA00620722 /* ShareContactAppClipApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96DD48BD2C5D42FA00620722 /* ShareContactAppClipApp.swift */; };
 		96DD48C22C5D42FB00620722 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 96DD48C12C5D42FB00620722 /* Assets.xcassets */; };
 		96DD48C52C5D42FB00620722 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 96DD48C42C5D42FB00620722 /* Preview Assets.xcassets */; };
-		96DD48CA2C5D42FB00620722 /* ShareContactAppClip.app in Embed App Clips */ = {isa = PBXBuildFile; fileRef = 96DD48BB2C5D42F900620722 /* ShareContactAppClip.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		BCEB3A042A74063A0010EEEE /* Azzapp.ttf in Resources */ = {isa = PBXBuildFile; fileRef = BCEB3A032A74063A0010EEEE /* Azzapp.ttf */; };
 		C2D439B36EA94AC7B690F721 /* HelveticaNeue-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 1259B693B98B486E9E0394C7 /* HelveticaNeue-Medium.ttf */; };
 		CE3FB77EFA1BBCFCBA646C5A /* ExpoModulesProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = C59A4752184E6A4BC4A569FB /* ExpoModulesProvider.swift */; };
@@ -182,7 +182,7 @@
 			dstPath = "$(CONTENTS_FOLDER_PATH)/AppClips";
 			dstSubfolderSpec = 16;
 			files = (
-				96DD48CA2C5D42FB00620722 /* ShareContactAppClip.app in Embed App Clips */,
+				9689E6A72C86078A000E6F84 /* ShareContactAppClip-dev.app in Embed App Clips */,
 			);
 			name = "Embed App Clips";
 			runOnlyForDeploymentPostprocessing = 0;
