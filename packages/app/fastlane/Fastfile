@@ -20,9 +20,11 @@ default_platform(:ios)
 
 APP_IDENT = ENV['IOS_APP_IDENTIFIER']
 IOS_SCHEME = ENV["IOS_SCHEME"]
+IOS_APPCLIP_SCHEME = ENV["IOS_APPCLIP_SCHEME"]
 EXPORT_METHOD = ENV['IOS_EXPORT_METHOD']
 P12_PASSWORD = ENV["IOS_CERTIFICATE_P12_PASSWORD"]
 PROFILE_ID = ENV["IOS_PROFILE_ID"]
+PROFILECLIP_ID = ENV["IOS_PROFILECLIP_ID"]
 CODE_SIGNING_IDENTITY = ENV["IOS_CODE_SIGNING_IDENTITY"]
 APP_STORE_CONNECT_API_KEY = ENV["APP_STORE_CONNECT_API_KEY"]
 TEAM_ID = "66D3U3GLN6"
@@ -44,6 +46,7 @@ platform :ios do
 
     # Import certificate and provisioning profile
     PROFILE_PATH = "./ios/certs/#{APP_IDENT}.mobileprovision"
+    PROFILE_CLIP_PATH = "./ios/certs/#{APP_IDENT}.Clip.mobileprovision"
     CERTIFICATE_PATH = "./ios/certs/cerfiticate.p12"
 
     import_certificate(
@@ -54,6 +57,7 @@ platform :ios do
     )
 
     install_provisioning_profile(path: PROFILE_PATH)
+    install_provisioning_profile(path: PROFILE_CLIP_PATH)
 
     # Update code signing settings
     pbxprojPath = "ios/azzapp.xcodeproj/project.pbxproj"
@@ -65,18 +69,32 @@ platform :ios do
       "azzapp-staging" => "azzapp-stagingRelease.entitlements",
       "azzapp" => "azzapp/azzappRelease.entitlements"
     }
+
     # Determine the entitlements file based on the target
     update_code_signing_settings(
       use_automatic_signing: false,
       path: "ios/azzapp.xcodeproj",
       entitlements_file_path: entitlements_files[IOS_SCHEME]
+      targets: {
+        IOS_SCHEME => {
+          code_sign_identity: "iPhone Distribution"
+        },
+        IOS_APPCLIP_SCHEME => {
+          code_sign_identity: "iPhone Distribution"
+        }
+      }
     )
 
     update_project_provisioning(
       xcodeproj: "ios/azzapp.xcodeproj",
       profile: PROFILE_PATH,
       target_filter: IOS_SCHEME,
-      code_signing_identity: CODE_SIGNING_IDENTITY
+    )
+
+    update_project_provisioning(
+      xcodeproj: "ios/azzapp.xcodeproj",
+      profile: PROFILE_CLIP_PATH,
+      target_filter: IOS_APPCLIP_SCHEME,
     )
 
      # Determine the entitlements file based on the target
@@ -90,12 +108,12 @@ platform :ios do
       output_directory: "./fastlane/builds",
       export_method: EXPORT_METHOD,
       export_team_id: TEAM_ID,
-      codesigning_identity: CODE_SIGNING_IDENTITY,
       export_options: {
         method: EXPORT_METHOD,
         signingStyle: "manual",
         provisioningProfiles: { 
           APP_IDENT => PROFILE_ID,
+          "#{APP_IDENT}.Clip" => PROFILECLIP_ID,
         },
         installerSigningCertificate: CODE_SIGNING_IDENTITY
       }
