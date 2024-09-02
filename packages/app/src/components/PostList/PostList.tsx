@@ -35,6 +35,7 @@ type PostListProps = ViewProps & {
   contentContainerStyle?: ContentStyle;
   onPressAuthor?: () => void;
   showUnpublished?: boolean;
+  firstItemVideoTime?: number | null;
 };
 
 const viewabilityConfig = {
@@ -56,6 +57,7 @@ const PostList = ({
   onRefresh,
   onPressAuthor,
   showUnpublished = false,
+  firstItemVideoTime,
   ...props
 }: PostListProps) => {
   const posts = useFragment(
@@ -186,7 +188,7 @@ const PostList = ({
   );
 
   const renderItem = useCallback(
-    ({ item, extraData }: ListRenderItemInfo<Post>) => {
+    ({ item, extraData, index }: ListRenderItemInfo<Post>) => {
       return item ? (
         <PostRenderer
           post={item}
@@ -196,6 +198,8 @@ const PostList = ({
           author={item.webCard ?? extraData.author!}
           actionEnabled={extraData.postActionEnabled}
           showUnpublished={extraData.showUnpublished}
+          useAnimationSnapshot={index === 0}
+          initialTime={index === 0 ? extraData.firstItemVideoTime : undefined}
         />
       ) : null;
     },
@@ -203,8 +207,14 @@ const PostList = ({
   );
 
   const extraData = useMemo(
-    () => ({ canPlay, author, postActionEnabled, showUnpublished }),
-    [canPlay, author, postActionEnabled, showUnpublished],
+    () => ({
+      canPlay,
+      author,
+      firstItemVideoTime,
+      postActionEnabled,
+      showUnpublished,
+    }),
+    [canPlay, author, postActionEnabled, firstItemVideoTime, showUnpublished],
   );
 
   const ListFooterComponent = useMemo(

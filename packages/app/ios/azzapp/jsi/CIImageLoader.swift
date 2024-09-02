@@ -16,45 +16,57 @@ class CIImageLoader: NSObject {
     url: NSString,
     maxSize: CGSize,
     onSuccess: @escaping (_ image: CIImage) -> Void,
-    onError: @escaping (_ error: NSError?
-  ) -> Void) {
-    let url = URL(string: url as String)
+    onError: @escaping (_ error: NSError?) -> Void
+  ) {
+    guard let url = URL(string: url as String) else {
+      let error = NSError(domain: "com.azzapp.app", code: 0, userInfo: [
+        NSLocalizedDescriptionKey: "Failed to parse url",
+      ])
+      onError(error)
+      return
+    }
+
     Task.detached {
-      guard let url = url else {
-        let error = NSError(domain: "com.azzapp.app", code: 0, userInfo: [
-          NSLocalizedDescriptionKey: "Failed to parse url",
-        ]);
-        onError(error);
-        return;
-      }
       do {
-        let image = try await MediaPipeline.pipeline.image(for: url);
-        guard var ciImage = CIImage(image: image)?.oriented(CGImagePropertyOrientation(image.imageOrientation)) else {
+        let data = try Data(contentsOf: url)
+        
+        guard let uiImage = UIImage(data: data) else {
           let error = NSError(domain: "com.azzapp.app", code: 0, userInfo: [
             NSLocalizedDescriptionKey: "Failed to handle image",
-          ]);
-          onError(error);
-          return;
+          ])
+          onError(error)
+          return
         }
-        if (!CGSizeEqualToSize(maxSize, CGSizeZero)) {
+        
+        guard var ciImage = CIImage(image: uiImage)?.oriented(CGImagePropertyOrientation(uiImage.imageOrientation)) else {
+          let error = NSError(domain: "com.azzapp.app", code: 0, userInfo: [
+            NSLocalizedDescriptionKey: "Failed to create CIImage",
+          ])
+          onError(error)
+          return
+        }
+
+        if !CGSizeEqualToSize(maxSize, CGSize.zero) {
           let aspectRatio = ciImage.extent.width / ciImage.extent.height
-          if (aspectRatio > 1) {
-            ciImage = ciImage
-              .transformed(by: CGAffineTransform(
-                scaleX: maxSize.width / ciImage.extent.width,
-                y: maxSize.width / ciImage.extent.width))
+          if aspectRatio > 1 {
+            ciImage = ciImage.transformed(by: CGAffineTransform(
+              scaleX: maxSize.width / ciImage.extent.width,
+              y: maxSize.width / ciImage.extent.width))
           } else {
             ciImage = ciImage.transformed(by: CGAffineTransform(
               scaleX: maxSize.height / ciImage.extent.height,
               y: maxSize.height / ciImage.extent.height))
           }
         }
+
         onSuccess(ciImage)
+
       } catch {
-        let nsError = NSError(domain: "com.azzapp.app", code: 0, userInfo: [
-          NSLocalizedDescriptionKey: error.localizedDescription,
-        ]);
-        onError(nsError);
+        let error = NSError(domain: "com.azzapp.app", code: 0, userInfo: [
+          NSLocalizedDescriptionKey: "Failed to load image data",
+          NSUnderlyingErrorKey: error
+        ])
+        onError(error)
       }
     }
   }

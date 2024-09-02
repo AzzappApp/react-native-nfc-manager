@@ -393,7 +393,7 @@ const WebCardModal = ({
             <CoverRenderer
               webCard={webCard}
               width={windowsWith / 3}
-              animationEnabled={false}
+              canPlay={false}
             />
           </View>
         </View>

@@ -1,6 +1,5 @@
 /**
  * A cache for local media files
- * only used for android
  */
 
 import { useEffect, useState } from 'react';

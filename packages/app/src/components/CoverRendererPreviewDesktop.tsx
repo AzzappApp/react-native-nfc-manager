@@ -94,7 +94,7 @@ const CoverRendererPreviewDesktop = ({
         webCard={coverKey}
         width={COVER_DESKTOP_WIDTH}
         large
-        animationEnabled={videoEnabled}
+        canPlay={videoEnabled}
       />
     </View>
   );

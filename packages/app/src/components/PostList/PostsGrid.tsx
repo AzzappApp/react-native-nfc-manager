@@ -9,13 +9,15 @@ import {
 } from 'react-native';
 import { graphql, useFragment } from 'react-relay';
 import PostLink from '#components/PostLink';
+import Skeleton from '#components/Skeleton';
 import { keyExtractor } from '#helpers/idHelpers';
+import { POST_RENDERER_RADIUS } from './PostRendererFeed';
 import type {
   PostsGrid_posts$data,
   PostsGrid_posts$key,
 } from '#relayArtifacts/PostsGrid_posts.graphql';
 import type { ArrayItemType } from '@azzapp/shared/arrayHelpers';
-import type { ListRenderItemInfo } from '@shopify/flash-list';
+import type { MasonryListRenderItemInfo } from '@shopify/flash-list';
 import type { ReactElement } from 'react';
 import type {
   StyleProp,
@@ -131,8 +133,6 @@ const PostsGrid = ({
       renderItem={renderItem}
       ListHeaderComponent={ListHeaderComponent}
       ListFooterComponent={ListFooterComponent}
-      ItemSeparatorComponent={ItemSeparator}
-      contentContainerStyle={contentContainerStyle}
       optimizeItemArrangement
       overrideItemLayout={overrideItemLayout}
       extraData={extraData}
@@ -148,14 +148,24 @@ const PostsGrid = ({
 
 const renderItem = ({
   item,
+  columnIndex,
   extraData: { itemWidth, canPlay, videoToPlays },
-}: ListRenderItemInfo<Post>) => {
+}: MasonryListRenderItemInfo<Post>) => {
   return (
-    <MemoPostRenderer
-      item={item}
-      width={itemWidth}
-      videoDisabled={!canPlay || !videoToPlays.includes(item.id)}
-    />
+    <View
+      style={[
+        columnIndex === 0
+          ? { paddingLeft: 8, paddingRight: 4 }
+          : { paddingLeft: 4, paddingRight: 8 },
+        { paddingBottom: 8 },
+      ]}
+    >
+      <MemoPostRenderer
+        item={item}
+        width={itemWidth}
+        videoDisabled={!canPlay || !videoToPlays.includes(item.id)}
+      />
+    </View>
   );
 };
 
@@ -174,7 +184,7 @@ const overrideItemLayout = (
 ) => {
   const itemWidth = extraData.itemWidth;
   const ratio = item.media?.aspectRatio ?? 1;
-  layout.size = itemWidth / ratio;
+  layout.size = itemWidth / ratio + 8;
 };
 
 export default PostsGrid;
@@ -190,10 +200,6 @@ const getItemType = (post: Post, index: number) => {
     return 'image';
   }
 };
-
-const contentContainerStyle = { paddingHorizontal: 8 };
-
-const ItemSeparator = () => <View style={{ height: 8, width: 8 }} />;
 
 type Post = ArrayItemType<PostsGrid_posts$data>;
 
@@ -212,7 +218,10 @@ const PostRenderer = ({
       postId={item.id}
       post={item}
       width={width}
-      style={{ width, aspectRatio: ratio }}
+      style={{
+        width,
+        aspectRatio: ratio,
+      }}
       videoDisabled={videoDisabled}
       muted
     />
@@ -220,3 +229,34 @@ const PostRenderer = ({
 };
 
 const MemoPostRenderer = memo(PostRenderer);
+
+export const PostGridFallback = () => {
+  const itemsLeft = [1.5, 0.4, 1, 2, 0.625, 0.7];
+  const itemsRight = [0.8, 1.2, 1.6, 0.3, 1.1, 2];
+  return (
+    <View style={{ flexDirection: 'row', paddingHorizontal: 8, gap: 8 }}>
+      <View style={{ gap: 8, flex: 1 }}>
+        {itemsLeft.map((ratio, index) => (
+          <Skeleton
+            key={index}
+            style={{
+              aspectRatio: ratio,
+              borderRadius: POST_RENDERER_RADIUS,
+            }}
+          />
+        ))}
+      </View>
+      <View style={{ gap: 8, flex: 1 }}>
+        {itemsRight.map((ratio, index) => (
+          <Skeleton
+            key={index}
+            style={{
+              aspectRatio: ratio,
+              borderRadius: POST_RENDERER_RADIUS,
+            }}
+          />
+        ))}
+      </View>
+    </View>
+  );
+};

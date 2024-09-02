@@ -1,6 +1,6 @@
 import { NativeModules, Platform } from 'react-native';
-import * as AndroidLocalMediaCache from './AndroidLocalMediaCache';
-import { createExpoImagePrefetcher, createPrefetcher } from './MediaPrefetcher';
+import * as LocalMediaCache from './LocalMediaCache';
+import { createExpoImagePrefetcher } from './MediaPrefetcher';
 
 const { AZPMediaHelpers } = NativeModules;
 
@@ -32,38 +32,11 @@ export const getPHAssetPath: (uri: string) => Promise<string | null> =
   });
 
 /**
- * Computes a mask for an image based on selfie segmentation.
- *
- * @param uri The URI of the image.
- * @returns A promise that resolves with the path of the mask.
- */
-export const segmentImage: (uri: string) => Promise<string | null> =
-  AZPMediaHelpers.segmentImage;
-
-/**
  * Prefetches an image.
  * returns an observable that will complete when the prefetch is done.
  * If the observable is unsubscribed before the prefetch is done, the prefetch will be cancelled.
  */
-export const prefetchImage = Platform.select({
-  default: createPrefetcher(
-    AZPMediaHelpers.prefetchImage,
-    AZPMediaHelpers.observeImagePrefetchResult,
-    AZPMediaHelpers.cancelImagePrefetch,
-  ),
-  android: createExpoImagePrefetcher(),
-});
-
-/**
- * Prefetches an video.
- * returns an observable that will complete when the prefetch is done.
- * If the observable is unsubscribed before the prefetch is done, the prefetch will be cancelled.
- */
-export const prefetchVideo = createPrefetcher(
-  AZPMediaHelpers.prefetchVideo,
-  AZPMediaHelpers.observeVideoPrefetchResult,
-  AZPMediaHelpers.cancelVideoPrefetch,
-);
+export const prefetchImage = createExpoImagePrefetcher();
 
 /**
  * Adds a local cached media file to the cache.
@@ -78,11 +51,5 @@ export const addLocalCachedMediaFile = (
   kind: 'image' | 'video',
   localURI: string,
 ) => {
-  if (Platform.OS === 'android') {
-    AndroidLocalMediaCache.addLocalCachedMediaFile(mediaId, kind, localURI);
-  } else if (kind === 'video') {
-    AZPMediaHelpers.addLocalCachedVideo(mediaId, localURI);
-  } else {
-    AZPMediaHelpers.addLocalCachedImage(mediaId, localURI);
-  }
+  LocalMediaCache.addLocalCachedMediaFile(mediaId, kind, localURI);
 };

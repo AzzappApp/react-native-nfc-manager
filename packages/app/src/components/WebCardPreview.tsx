@@ -177,7 +177,7 @@ const WebCardPreview = (
                 webCard={webCard}
                 width={windowWidth}
                 large
-                animationEnabled
+                canPlay
               />
             )}
             {cardModules.map((module, index) => (

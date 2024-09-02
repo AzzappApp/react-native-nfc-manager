@@ -45,8 +45,6 @@ jest.mock('react-native-keyboard-controller', () =>
 //#region AZP Modules Mock
 jest.mock('#helpers/mediaHelpers/NativeMediaHelpers');
 
-jest.mock('#components/medias/NativeMediaImageRenderer');
-jest.mock('#components/medias/NativeMediaVideoRenderer');
 // we completely mock the medias module for problems related to querying the wrapper around the native module
 jest.mock('#components/medias');
 //#endregion

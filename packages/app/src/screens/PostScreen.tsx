@@ -54,6 +54,9 @@ const postScreenQuery = graphql`
 const PostScreen = ({
   preloadedQuery,
   hasFocus,
+  route: {
+    params: { videoTime },
+  },
 }: RelayScreenProps<PostRoute, PostScreenQuery>) => {
   const router = useRouter();
   const intl = useIntl();
@@ -175,6 +178,7 @@ const PostScreen = ({
         profile={profile}
         onEndReached={onEndReached}
         loading={loading}
+        firstItemVideoTime={videoTime}
       />
       <Suspense>
         <RelatedPostLoader

@@ -103,6 +103,7 @@ export type PostRoute = {
   route: 'POST';
   params: {
     postId: string;
+    videoTime?: number | null;
     fromRectangle?: LayoutRectangle;
   };
 };

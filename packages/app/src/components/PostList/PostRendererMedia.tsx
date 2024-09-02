@@ -4,10 +4,13 @@ import { graphql, useFragment } from 'react-relay';
 import { colors } from '#theme';
 import { MediaImageRenderer, MediaVideoRenderer } from '#components/medias';
 import Icon from '#ui/Icon';
-import type { MediaVideoRendererHandle } from '#components/medias';
+import type {
+  MediaVideoRendererHandle,
+  MediaImageRendererHandle,
+} from '#components/medias';
 import type { PostRendererMediaFragment_post$key } from '#relayArtifacts/PostRendererMediaFragment_post.graphql';
 import type { ForwardedRef } from 'react';
-import type { ViewProps, HostComponent } from 'react-native';
+import type { ViewProps } from 'react-native';
 
 export type PostRendererMediaProps = ViewProps & {
   /**
@@ -52,6 +55,12 @@ export type PostRendererMediaProps = ViewProps & {
    */
   initialTime?: number | null;
   /**
+   * If true, and if a snapshot of the post media exists, it will be while loading the media
+   *
+   * @type {boolean}
+   */
+  useAnimationSnapshot?: boolean;
+  /**
    * A callback that is called once the media is ready to be displayed.
    */
   onReady?: () => void;
@@ -67,10 +76,13 @@ const PostRendererMedia = (
     videoDisabled = false,
     paused = false,
     initialTime,
+    useAnimationSnapshot,
     onReady,
     ...props
   }: PostRendererMediaProps,
-  forwardedRef: ForwardedRef<HostComponent<any> | MediaVideoRendererHandle>,
+  forwardedRef: ForwardedRef<
+    MediaImageRendererHandle | MediaVideoRendererHandle
+  >,
 ) => {
   const post = useFragment(
     graphql`
@@ -162,6 +174,7 @@ const PostRendererMedia = (
             onReadyForDisplay={onReady}
             testID="PostRendererMedia_media"
             videoEnabled={!videoDisabled}
+            useAnimationSnapshot={useAnimationSnapshot}
           />
           {videoDisabled ? <Icon icon="play" style={styles.playIcon} /> : null}
         </>
@@ -174,6 +187,7 @@ const PostRendererMedia = (
           style={style}
           onReadyForDisplay={onReady}
           testID="PostRendererMedia_media"
+          useAnimationSnapshot={useAnimationSnapshot}
         />
       )}
     </View>

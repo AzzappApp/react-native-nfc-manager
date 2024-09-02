@@ -136,7 +136,7 @@ const ShakeShareDisplay = ({ onClose }: { onClose: () => void }) => {
           width={width}
           webCard={profile?.webCard}
           style={styles.coverStyle}
-          animationEnabled={true}
+          canPlay={true}
         />
         <LinearGradient
           colors={['rgba(14, 18, 22,0)', 'rgba(0, 0, 0, 1)']}

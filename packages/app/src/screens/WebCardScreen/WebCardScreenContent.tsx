@@ -347,8 +347,9 @@ const WebCardScreenContent = ({
             <CoverRenderer
               webCard={webCard}
               width={windowWidth}
-              animationEnabled={ready && hasFocus}
+              canPlay={ready && hasFocus}
               large
+              useAnimationSnapshot
             />
           </WebCardBlockContainer>
           <Suspense

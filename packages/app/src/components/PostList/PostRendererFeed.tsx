@@ -6,9 +6,10 @@ import AuthorCartouche from '#components/AuthorCartouche';
 
 import PostRendererMedia from './PostRendererMedia';
 import type { MediaVideoRendererHandle } from '#components/medias';
+import type { MediaImageRendererHandle } from '#components/medias/MediaImageRenderer';
 import type { PostRendererFeedFragment_post$key } from '#relayArtifacts/PostRendererFeedFragment_post.graphql';
 import type { ForwardedRef } from 'react';
-import type { ViewProps, HostComponent } from 'react-native';
+import type { ViewProps } from 'react-native';
 
 export type PostRendererFeedProps = ViewProps & {
   /**
@@ -83,9 +84,9 @@ const PostRendererFeed = (
     postKey,
   );
 
-  const mediaRef = useRef<HostComponent<any> | MediaVideoRendererHandle | null>(
-    null,
-  );
+  const mediaRef = useRef<
+    MediaImageRendererHandle | MediaVideoRendererHandle | null
+  >(null);
 
   useImperativeHandle(
     forwardedRef,
@@ -97,7 +98,7 @@ const PostRendererFeed = (
         return null;
       },
       async snapshot() {
-        if (mediaRef.current && 'snapshot' in mediaRef.current) {
+        if (mediaRef.current) {
           await mediaRef.current.snapshot();
         }
       },
@@ -129,11 +130,13 @@ const PostRendererFeed = (
 
 export default forwardRef(PostRendererFeed);
 
+export const POST_RENDERER_RADIUS = 16;
+
 const styles = StyleSheet.create({
   mediaContainer: {
     backgroundColor: colors.grey100,
     overflow: 'hidden',
-    borderRadius: 16,
+    borderRadius: POST_RENDERER_RADIUS,
   },
   playIcon: {
     position: 'absolute',

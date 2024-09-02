@@ -27,13 +27,6 @@ The typescript source code has the following directory structure :
 The native routing application is based [`react-native-screens`](https://github.com/software-mansion/react-native-screens) but unlike most RN applications we use a custom router instead of [React Navigation](https://reactnavigation.org/). It has been made to improove the integration with [React Relay](https://relay.dev/) and to improve the way azzapp aplication specific use case are implemented.
 The custom router can be found in `lib/components/NativeRouter.tsx`.
 
-# Native Code
-
-Native code is used to : 
-- Image/Video edition 
-- Fast media rendering based on [Nuke](https://github.com/kean/Nuke) and [AVFoundation](https://developer.apple.com/av-foundation/) on IOS
-- Custom Screen transitions (react-native-screens has been patched with [`patch-package`](https://www.npmjs.com/package/patch-package)) for this use case).
-
 
 # Development environment
 

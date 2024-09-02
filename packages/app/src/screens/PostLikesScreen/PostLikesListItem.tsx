@@ -50,7 +50,7 @@ const PostLikesListItem = ({ webcard: webcardKey }: Props) => {
               width={COVER_WIDTH}
               webCardId={webCard.id}
               userName={webCard.userName}
-              animationEnabled={false}
+              canPlay={false}
             />
             <View>
               <Text variant="large" numberOfLines={1}>

@@ -332,7 +332,7 @@ const ItemRenderComponent = ({
             webCard={profile.webCard}
             width={coverWidth}
             webCardId={profile.webCard.id}
-            animationEnabled={isCurrent && hasFocus}
+            canPlay={isCurrent && hasFocus}
             onReadyForDisplay={onReady}
             onError={onError}
           />
