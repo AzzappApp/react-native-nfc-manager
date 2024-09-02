@@ -102,6 +102,7 @@ platform :ios do
       xcodeproj: "ios/azzapp.xcodeproj",
       profile: PROFILE_CLIP_PATH,
       code_signing_identity: CODE_SIGNING_IDENTITY
+      target_filter: IOS_APPCLIP_SCHEME,
     )
 
     # Build the application
@@ -120,6 +121,7 @@ platform :ios do
           "#{APP_IDENT}.Clip" => PROFILECLIP_ID,
         },
         installerSigningCertificate: CODE_SIGNING_IDENTITY
+        distributionBundleIdentifier: APP_IDENT
       }
     )
     
