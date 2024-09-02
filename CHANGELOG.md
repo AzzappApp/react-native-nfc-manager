@@ -1,4 +1,4 @@
-## 0.6.0-canary.42
+## 0.6.0-canary.43
 
 * **fix:**  - code signin
 * **fix:**  - CodeSignin identiy is missing in github var
