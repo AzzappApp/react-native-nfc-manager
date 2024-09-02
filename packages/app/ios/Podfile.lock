@@ -1392,7 +1392,7 @@ PODS:
     - Yoga
   - react-native-encrypted-storage (4.0.3):
     - React-Core
-  - react-native-keyboard-controller (1.13.2):
+  - react-native-keyboard-controller (1.13.3):
     - DoubleConversion
     - glog
     - hermes-engine
@@ -1435,7 +1435,7 @@ PODS:
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
     - Yoga
-  - react-native-pager-view (6.4.0):
+  - react-native-pager-view (6.4.1):
     - DoubleConversion
     - glog
     - hermes-engine
@@ -1892,7 +1892,7 @@ PODS:
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
     - Yoga
-  - RNReanimated (3.15.0):
+  - RNReanimated (3.15.1):
     - DoubleConversion
     - glog
     - hermes-engine
@@ -1912,10 +1912,10 @@ PODS:
     - ReactCodegen
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
-    - RNReanimated/reanimated (= 3.15.0)
-    - RNReanimated/worklets (= 3.15.0)
+    - RNReanimated/reanimated (= 3.15.1)
+    - RNReanimated/worklets (= 3.15.1)
     - Yoga
-  - RNReanimated/reanimated (3.15.0):
+  - RNReanimated/reanimated (3.15.1):
     - DoubleConversion
     - glog
     - hermes-engine
@@ -1936,7 +1936,7 @@ PODS:
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
     - Yoga
-  - RNReanimated/worklets (3.15.0):
+  - RNReanimated/worklets (3.15.1):
     - DoubleConversion
     - glog
     - hermes-engine
@@ -1979,11 +1979,29 @@ PODS:
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
     - Yoga
-  - RNSentry (5.30.0):
+  - RNSentry (5.31.1):
+    - DoubleConversion
+    - glog
     - hermes-engine
+    - RCT-Folly (= 2024.01.01.00)
+    - RCTRequired
+    - RCTTypeSafety
     - React-Core
+    - React-debug
+    - React-Fabric
+    - React-featureflags
+    - React-graphics
     - React-hermes
-    - Sentry/HybridSDK (= 8.34.0)
+    - React-ImageManager
+    - React-NativeModulesApple
+    - React-RCTFabric
+    - React-rendererdebug
+    - React-utils
+    - ReactCodegen
+    - ReactCommon/turbomodule/bridging
+    - ReactCommon/turbomodule/core
+    - Sentry/HybridSDK (= 8.36.0)
+    - Yoga
   - RNShare (10.2.1):
     - React-Core
   - RNSVG (15.6.0):
@@ -1999,7 +2017,7 @@ PODS:
   - SDWebImageWebPCoder (0.14.6):
     - libwebp (~> 1.0)
     - SDWebImage/Core (~> 5.17)
-  - Sentry/HybridSDK (8.34.0)
+  - Sentry/HybridSDK (8.36.0)
   - SocketRocket (0.7.0)
   - SPTPersistentCache (1.1.0)
   - VisionCamera (4.5.2):
@@ -2363,7 +2381,7 @@ EXTERNAL SOURCES:
     :path: "../../../node_modules/react-native/ReactCommon/yoga"
 
 SPEC CHECKSUMS:
-  azzapp-react-native-skia-video: 2f2b48ef7ec5dddaa0de1325386f96161cbcc091
+  azzapp-react-native-skia-video: 81bd4b0f431c4cf8840d2e520358f45753967c9e
   boost: 4cb898d0bf20404aab1850c656dcea009429d6c1
   DoubleConversion: 76ab83afb40bddeeee456813d9c04f67f78771b5
   DVAssetLoaderDelegate: 0caec20e4e08b8560b691131539e9180024d4bce
@@ -2427,14 +2445,14 @@ SPEC CHECKSUMS:
   react-native-blob-util: 39a20f2ef11556d958dc4beb0aa07d1ef2690745
   react-native-cameraroll: b3395629565d1663b4f340c7314e7c04e88c9b3c
   react-native-encrypted-storage: db300a3f2f0aba1e818417c1c0a6be549038deb7
-  react-native-keyboard-controller: 73ad012b45e30fad665246c7edffa08cfd3461b2
+  react-native-keyboard-controller: 22c73eb1e346b62a978f4c100ddfd003201a931c
   react-native-mmkv: 7d0b6c2a79e73100b933f2947a9c8741d664e18b
-  react-native-pager-view: 2aef9f11fb8f436a68e0c58f7658cad8736d1121
+  react-native-pager-view: c476f76d54f946df5147645e902d3d7173688187
   react-native-passkit: aaf4f946eb981b872104192aadaa7d6c94011f86
   react-native-quick-base64: f98f17faf04c9779faf726921a2b389d4775e8b6
   react-native-safe-area-context: ab8f4a3d8180913bd78ae75dd599c94cce3d5e9a
   react-native-skia: 68be40d53b1957f6c276cec19bcd50d293173868
-  react-native-skottie-template-player: fe4f9b24aaf3dfde4f953ac6c40d64ec2712ffe0
+  react-native-skottie-template-player: 1796ae03e1225d7c5fdaaeda5ce63792c3122e31
   react-native-video: dcd57883426b589e765be43107ffd7e0ecb78291
   React-nativeconfig: 57781b79e11d5af7573e6f77cbf1143b71802a6d
   React-NativeModulesApple: 7ff2e2cfb2e5fa5bdedcecf28ce37e696c6ef1e1
@@ -2473,20 +2491,20 @@ SPEC CHECKSUMS:
   RNPermissions: 515e6bdfab4f8648ad0b2e600374f65981c04dba
   RNPurchases: 4305de02b902d3c1e56a50295dc0a6e758b73095
   RNReactNativeHapticFeedback: 2bdbd63bcdbb52c4ae81a7b0c48ab1f00c06980a
-  RNReanimated: fcf3bcecd669832b71f2a4cad6e9ac881d34eced
+  RNReanimated: 190c12cb20dfa828353e99775beaa1bdf36e7ed9
   RNScreens: 19719a9c326e925498ac3b2d35c4e50fe87afc06
-  RNSentry: 038afe562a53fa0ec791e1cd9fb66239c77a2818
+  RNSentry: b2e710a717d9d10301046849d75f637c2b83e871
   RNShare: 0fad69ae2d71de9d1f7b9a43acf876886a6cb99c
   RNSVG: 5da7a24f31968ec74f0b091e3440080f347e279b
   SDWebImage: 8a6b7b160b4d710e2a22b6900e25301075c34cb3
   SDWebImageAVIFCoder: 00310d246aab3232ce77f1d8f0076f8c4b021d90
   SDWebImageSVGCoder: 15a300a97ec1c8ac958f009c02220ac0402e936c
   SDWebImageWebPCoder: e38c0a70396191361d60c092933e22c20d5b1380
-  Sentry: 1183df2306eea74ff0564c4bb1c2577ccd15d054
+  Sentry: f8374b5415bc38dfb5645941b3ae31230fbeae57
   SocketRocket: abac6f5de4d4d62d24e11868d7a2f427e0ef940d
   SPTPersistentCache: df36ea46762d7cf026502bbb86a8b79d0080dff4
   VisionCamera: b08345ad559243834112380d3fd2a839de794215
-  Yoga: 2a45d7e59592db061217551fd3bbe2dd993817ae
+  Yoga: a1d7895431387402a674fd0d1c04ec85e87909b8
 
 PODFILE CHECKSUM: dccce42ac5fed7af50c15ced342246e481e433f0
 
