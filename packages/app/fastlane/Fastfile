@@ -19,6 +19,7 @@ default_platform(:ios)
 
 
 APP_IDENT = ENV['IOS_APP_IDENTIFIER']
+APPCLIP_IDENT = ENV['IOS_APP_IDENTIFIER']
 IOS_SCHEME = ENV["IOS_SCHEME"]
 IOS_APPCLIP_SCHEME = ENV["IOS_APPCLIP_SCHEME"]
 EXPORT_METHOD = ENV['IOS_EXPORT_METHOD']
@@ -46,7 +47,7 @@ platform :ios do
 
     # Import certificate and provisioning profile
     PROFILE_PATH = "./ios/certs/#{APP_IDENT}.mobileprovision"
-    PROFILE_CLIP_PATH = "./ios/certs/#{APP_IDENT}.Clip.mobileprovision"
+    PROFILE_CLIP_PATH = "./ios/certs/#{APPCLIP_IDENT}.mobileprovision"
     CERTIFICATE_PATH = "./ios/certs/cerfiticate.p12"
 
     import_certificate(
@@ -118,10 +119,9 @@ platform :ios do
         signingStyle: "manual",
         provisioningProfiles: { 
           APP_IDENT => PROFILE_ID,
-          "#{APP_IDENT}.Clip" => PROFILECLIP_ID,
+          APPCLIP_IDENT => PROFILECLIP_ID,
         },
         installerSigningCertificate: CODE_SIGNING_IDENTITY,
-        distributionBundleIdentifier: APP_IDENT
       }
     )
     

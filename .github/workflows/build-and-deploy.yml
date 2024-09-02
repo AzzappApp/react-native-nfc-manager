@@ -373,6 +373,7 @@ jobs:
           ABOUT: https://web.azzapp.com/company/about_us
           FAQ: https://web.azzapp.com/company/faq
           IOS_APP_IDENTIFIER: ${{ vars.IOS_APP_IDENTIFIER }}
+          IOS_APPCLIP_IDENTIFIER: ${{ vars.IOS_APPCLIP_IDENTIFIER }}
           IOS_SCHEME: ${{ vars.IOS_SCHEME }}
           IOS_PROFILE_ID: ${{ vars.IOS_PROFILE_ID }}
           IOS_PROFILECLIP_ID: ${{ vars.IOS_PROFILECLIP_ID }}
