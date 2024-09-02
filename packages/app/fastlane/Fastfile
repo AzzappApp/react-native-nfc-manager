@@ -84,7 +84,7 @@ platform :ios do
       path: "ios/azzapp.xcodeproj",
       entitlements_file_path: entitlements_files[IOS_SCHEME],
       targets: [IOS_SCHEME],
-      code_signing_identity: CODE_SIGNING_IDENTITY,
+      code_sign_identity: CODE_SIGNING_IDENTITY,
     )
 
     update_code_signing_settings(
@@ -92,7 +92,7 @@ platform :ios do
       path: "ios/azzapp.xcodeproj",
       entitlements_file_path: clip_entitlements_files[IOS_APPCLIP_SCHEME],
       targets: [IOS_APPCLIP_SCHEME],
-      code_signing_identity: CODE_SIGNING_IDENTITY,
+      code_sign_identity: CODE_SIGNING_IDENTITY,
     )
 
     update_project_provisioning(
