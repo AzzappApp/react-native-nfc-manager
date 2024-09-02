@@ -71,7 +71,15 @@ platform :ios do
     update_project_version(
       xcodeproj: "../ios/azzapp.xcodeproj",
       target: IOS_APPCLIP_SCHEME,
-      version: version_number
+      version: version_number,
+       value: 'CURRENT_PROJECT_VERSION'
+    )
+   
+    update_project_version(
+      xcodeproj: "../ios/azzapp.xcodeproj",
+      target: IOS_APPCLIP_SCHEME,
+      version: build_version,
+      value: 'MARKETING_VERSION'
     )
         
     keychain_created = true
@@ -245,7 +253,7 @@ platform :android do
    end
 end
 
-def update_project_version(xcodeproj:, target:, version:)
+def update_project_version(xcodeproj:, target:, version:, value:)
   require 'xcodeproj'
 
   project_path = xcodeproj
@@ -254,7 +262,7 @@ def update_project_version(xcodeproj:, target:, version:)
   project.targets.each do |proj_target|
     if proj_target.name == target
       proj_target.build_configurations.each do |config|
-        config.build_settings['CURRENT_PROJECT_VERSION'] = version
+        config.build_settings[value] = version
       end
     end
   end
