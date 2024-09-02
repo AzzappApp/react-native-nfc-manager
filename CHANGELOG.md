@@ -1,5 +1,7 @@
-## 0.6.0-canary.41
+## 0.6.0-canary.42
 
+* **fix:**  - code signin
+* **fix:**  - CodeSignin identiy is missing in github var
 * **fix:**  - code signing mulitple target
 * **fix:**  - ios uild
 * **fix:**  - syntax error fastfile
