@@ -101,7 +101,7 @@ platform :ios do
     update_project_provisioning(
       xcodeproj: "ios/azzapp.xcodeproj",
       profile: PROFILE_CLIP_PATH,
-      code_signing_identity: CODE_SIGNING_IDENTITY
+      code_signing_identity: CODE_SIGNING_IDENTITY,
       target_filter: IOS_APPCLIP_SCHEME,
     )
 
@@ -120,7 +120,7 @@ platform :ios do
           APP_IDENT => PROFILE_ID,
           "#{APP_IDENT}.Clip" => PROFILECLIP_ID,
         },
-        installerSigningCertificate: CODE_SIGNING_IDENTITY
+        installerSigningCertificate: CODE_SIGNING_IDENTITY,
         distributionBundleIdentifier: APP_IDENT
       }
     )
