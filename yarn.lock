@@ -203,6 +203,7 @@ __metadata:
     react-native-toast-message: ^2.2.0
     react-native-video: ^6.4.5
     react-native-vision-camera: ^4.5.2
+    react-native-webview: ^13.12.1
     react-relay: ^17.0.0
     react-test-renderer: ^18.3.1
     relay-test-utils: ^17.0.0
@@ -16878,7 +16879,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"invariant@npm:^2.2.4":
+"invariant@npm:2.2.4, invariant@npm:^2.2.4":
   version: 2.2.4
   resolution: "invariant@npm:2.2.4"
   dependencies:
@@ -22100,6 +22101,19 @@ __metadata:
     react-native-worklets-core:
       optional: true
   checksum: 19ee9f5a4105c47b6abfd8e4cf7558634e60f7d68ce6d9cc4a2c5b2b359d921c1121978637a2a4d571a75204a39141159438aac84f679c5ab33469052da8b671
+  languageName: node
+  linkType: hard
+
+"react-native-webview@npm:^13.12.1":
+  version: 13.12.1
+  resolution: "react-native-webview@npm:13.12.1"
+  dependencies:
+    escape-string-regexp: ^4.0.0
+    invariant: 2.2.4
+  peerDependencies:
+    react: "*"
+    react-native: "*"
+  checksum: 7433a1e15b9ba677f86652f0429cc4f2430cc3e5fc26bac22d358b19d2a66317b6a651a4980567bcd6b83f5bcc8850f5ef099371e4872665f8ebe13ef2507338
   languageName: node
   linkType: hard
 

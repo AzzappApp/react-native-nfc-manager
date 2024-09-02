@@ -235,6 +235,15 @@ export type MultiUserDetailRoute = {
   };
 };
 
+export type EmailSignatureRoute = {
+  route: 'EMAIL_SIGNATURE';
+  params: {
+    userName: string;
+    mode: string;
+    compressedContactCard: string;
+  };
+};
+
 export type Route =
   | AboutRoute
   | AccountDetailsRoute
@@ -247,6 +256,7 @@ export type Route =
   | CoverCreationRoute
   | CoverEditionRoute
   | CoverTemplateSelectionRoute
+  | EmailSignatureRoute
   | FollowersRoute
   | FollowingsMosaicRoute
   | FollowingsRoute

@@ -69,6 +69,7 @@ import ContactCardScreen from '#screens/ContactCardScreen';
 import CoverCreationScreen from '#screens/CoverCreationScreen';
 import CoverEditionScreen from '#screens/CoverEditionScreen';
 import CoverTemplateSelectionScreen from '#screens/CoverTemplateSelectionScreen';
+import EmailSignatureScreen from '#screens/EmailSignatureScreen';
 import FollowersScreen from '#screens/FollowersScreen';
 import FollowingsMosaicScreen from '#screens/FollowingsMosaicScreen';
 import FollowingsScreen from '#screens/FollowingsScreen';
@@ -215,6 +216,7 @@ const screens = {
   COVER_CREATION: CoverCreationScreen,
   COVER_EDITION: CoverEditionScreen,
   COVER_TEMPLATE_SELECTION: CoverTemplateSelectionScreen,
+  EMAIL_SIGNATURE: EmailSignatureScreen,
   FOLLOWINGS: FollowingsScreen,
   FOLLOWINGS_MOSAIC: FollowingsMosaicScreen,
   FOLLOWERS: FollowersScreen,

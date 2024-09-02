@@ -29,7 +29,6 @@ const prefixes = [
 
 export const matchUrlWithRoute = async (
   url: string,
-  onOpeningRoute: (route: string) => void,
 ): Promise<Route | undefined> => {
   const prefix = prefixes.find(prefix => prefix && url.startsWith(prefix));
   if (!prefix) {
@@ -75,13 +74,20 @@ export const matchUrlWithRoute = async (
           },
         };
       }
-    } else if (route === 'emailSignature') {
-      //this should not happen only if the user uf the open on azzap smart banner (or on android)
-      onOpeningRoute('emailSignature');
+    } else if (route === 'emailsignature') {
+      const mode = getSearchParamFromURL(url, 'mode');
+      const compressedContactCard = getSearchParamFromURL(url, 'e');
+      if (!mode || !compressedContactCard) {
+        return {
+          route: 'HOME',
+        };
+      }
       return {
-        route: 'WEBCARD',
+        route: 'EMAIL_SIGNATURE',
         params: {
           userName: username,
+          mode,
+          compressedContactCard,
         },
       };
     }
