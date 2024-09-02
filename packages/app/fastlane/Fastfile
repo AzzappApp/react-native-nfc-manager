@@ -53,6 +53,13 @@ platform :ios do
       key: "CFBundleVersion",
       value: version_number
     )
+
+    # Update the CURRENT_PROJECT_VERSION for the App Clip scheme in the project.pbxproj file (this is required for the App Clip to build)
+    update_project_version(
+      xcodeproj: "ios/azzapp.xcodeproj",
+      target: IOS_APPCLIP_SCHEME,
+      version: version_number
+    )
         
     keychain_created = true
     create_keychain(
@@ -223,4 +230,21 @@ platform :android do
       track: "internal",
     )
    end
+end
+
+def update_project_version(xcodeproj:, target:, version:)
+  require 'xcodeproj'
+
+  project_path = xcodeproj
+  project = Xcodeproj::Project.open(project_path)
+
+  project.targets.each do |proj_target|
+    if proj_target.name == target
+      proj_target.build_configurations.each do |config|
+        config.build_settings['CURRENT_PROJECT_VERSION'] = version
+      end
+    end
+  end
+
+  project.save
 end
