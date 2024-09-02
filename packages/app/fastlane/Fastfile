@@ -36,6 +36,24 @@ platform :ios do
 
   desc 'Build IOS application.'
   lane :build do
+    #force appclip bundle version to app bundle version (they must be the same)
+    # Define paths to Info.plist files
+    main_app_plist = "ios/azzapp/Info.plist"
+    app_clip_plist = "ios/ShareContactAppClip/Info.plist"
+
+    # Get the version number from the main app's Info.plist
+    version_number = get_info_plist_value(
+      path: main_app_plist,
+      key: "CFBundleVersion"
+    )
+
+    # Set the same version number for the App Clip's Info.plist
+    set_info_plist_value(
+      path: app_clip_plist,
+      key: "CFBundleVersion",
+      value: version_number
+    )
+        
     keychain_created = true
     create_keychain(
       name: "CI",
