@@ -111,7 +111,7 @@ const CoverTemplateSelectionScreen = ({
               <Text variant="large" style={styles.titleText}>
                 {intl.formatMessage({
                   defaultMessage: 'Create your Cover',
-                  description: 'Cover creation screen title',
+                  description: 'Cover Template Selection Screen - screen title',
                 })}
               </Text>
               <CoverTemplateSelectionScreenPremiumIndicator

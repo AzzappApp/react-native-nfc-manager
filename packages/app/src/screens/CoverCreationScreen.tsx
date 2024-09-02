@@ -179,7 +179,7 @@ const CoverCreationScreen = ({
               <Text variant="large">
                 <FormattedMessage
                   defaultMessage="Create your cover"
-                  description="Cover creation screen title"
+                  description="Cover creation Screen - screen title"
                 />
               </Text>
               {isPremium ? null : (
