@@ -83,24 +83,24 @@ platform :ios do
       use_automatic_signing: false,
       path: "ios/azzapp.xcodeproj",
       entitlements_file_path: entitlements_files[IOS_SCHEME],
-      targets: [IOS_SCHEME]
-      code_signing_identity: CODE_SIGNING_IDENTITY
+      targets: [IOS_SCHEME],
+      code_signing_identity: CODE_SIGNING_IDENTITY,
     )
 
     update_code_signing_settings(
       use_automatic_signing: false,
       path: "ios/azzapp.xcodeproj",
       entitlements_file_path: clip_entitlements_files[IOS_APPCLIP_SCHEME],
-      targets: [IOS_APPCLIP_SCHEME]
-      code_signing_identity: CODE_SIGNING_IDENTITY
+      targets: [IOS_APPCLIP_SCHEME],
+      code_signing_identity: CODE_SIGNING_IDENTITY,
     )
 
     update_project_provisioning(
       xcodeproj: "ios/azzapp.xcodeproj",
       profile: PROFILE_PATH,
       target_filter: IOS_SCHEME,
-      code_signing_identity: CODE_SIGNING_IDENTITY
-      build_configuration: "Release"
+      code_signing_identity: CODE_SIGNING_IDENTITY,
+      build_configuration: "Release",
     )
 
     update_project_provisioning(
@@ -108,7 +108,7 @@ platform :ios do
       profile: PROFILE_CLIP_PATH,
       code_signing_identity: CODE_SIGNING_IDENTITY,
       target_filter: IOS_APPCLIP_SCHEME,
-      build_configuration: "Release"
+      build_configuration: "Release",
     )
 
     # Build the application
