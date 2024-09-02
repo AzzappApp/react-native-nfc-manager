@@ -1,5 +1,6 @@
-## 0.6.0-canary.55
+## 0.6.0-canary.56
 
+* **typo:**  - param name
 * **fastlane:**  - clip building
 * **fix:**  - code signin
 * **fix:**  - CodeSignin identiy is missing in github var
