@@ -39,6 +39,8 @@
 		96847F1D2C5248B20089A75C /* HelveticaNeue.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 96847F182C5248B20089A75C /* HelveticaNeue.ttf */; };
 		96847F1E2C5248B20089A75C /* HelveticaNeue.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 96847F182C5248B20089A75C /* HelveticaNeue.ttf */; };
 		9689E6A72C86078A000E6F84 /* ShareContactAppClip-dev.app in Embed App Clips */ = {isa = PBXBuildFile; fileRef = 96A9AE432C7F56CD009380FE /* ShareContactAppClip-dev.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		9689E6A92C8607F5000E6F84 /* ShareContactAppClip.app in Embed AppClip */ = {isa = PBXBuildFile; fileRef = 96DD48BB2C5D42F900620722 /* ShareContactAppClip.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		9689E6AC2C860814000E6F84 /* ShareContactAppClip-staging.app in Embed App Clips */ = {isa = PBXBuildFile; fileRef = 96A9AE362C7F56BE009380FE /* ShareContactAppClip-staging.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		96A9AE2D2C7F56BE009380FE /* LzString.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96BAAEAD2C6262D7002902A2 /* LzString.swift */; };
 		96A9AE2E2C7F56BE009380FE /* ShareContactAppClipApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96DD48BD2C5D42FA00620722 /* ShareContactAppClipApp.swift */; };
 		96A9AE312C7F56BE009380FE /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 96DD48C42C5D42FB00620722 /* Preview Assets.xcassets */; };
@@ -176,6 +178,28 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
+		9689E6A82C8607D0000E6F84 /* Embed AppClip */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "$(CONTENTS_FOLDER_PATH)/AppClips";
+			dstSubfolderSpec = 16;
+			files = (
+				9689E6A92C8607F5000E6F84 /* ShareContactAppClip.app in Embed AppClip */,
+			);
+			name = "Embed AppClip";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		9689E6AB2C860807000E6F84 /* Embed App Clips */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "$(CONTENTS_FOLDER_PATH)/AppClips";
+			dstSubfolderSpec = 16;
+			files = (
+				9689E6AC2C860814000E6F84 /* ShareContactAppClip-staging.app in Embed App Clips */,
+			);
+			name = "Embed App Clips";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		96DD48CB2C5D42FB00620722 /* Embed App Clips */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
@@ -683,6 +707,7 @@
 				00DD1BFF1BD5951E006B06BC /* Bundle React Native code and images */,
 				FDA79D7229EDA47700E16407 /* Embed Frameworks */,
 				B9E8C17894C84F10A27B8BAD /* Upload Debug Symbols to Sentry */,
+				9689E6A82C8607D0000E6F84 /* Embed AppClip */,
 				355241B54A76788E06605077 /* [CP] Embed Pods Frameworks */,
 				042AF6C7FA6CB55FDA81A235 /* [CP] Copy Pods Resources */,
 			);
@@ -787,6 +812,7 @@
 				FD39DAF82A52AC2100C49A82 /* Bundle React Native code and images */,
 				FD39DAFB2A52AC2100C49A82 /* Embed Frameworks */,
 				FD292EAD2A94BA3700D880E8 /* Upload Debug Symbols to Sentry */,
+				9689E6AB2C860807000E6F84 /* Embed App Clips */,
 				88D5BF7996D48261F83C1188 /* [CP] Embed Pods Frameworks */,
 				49DB3617F8C176E2E1FAAAC2 /* [CP] Copy Pods Resources */,
 			);
