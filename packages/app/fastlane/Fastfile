@@ -96,13 +96,13 @@ platform :ios do
       xcodeproj: "ios/azzapp.xcodeproj",
       profile: PROFILE_PATH,
       target_filter: IOS_SCHEME,
-      code_signing_identity: CODE_SIGNING_IDENTITY
+      code_signing_identity: "iPhone Distribution"
     )
 
     update_project_provisioning(
       xcodeproj: "ios/azzapp.xcodeproj",
       profile: PROFILE_CLIP_PATH,
-      code_signing_identity: CODE_SIGNING_IDENTITY,
+      code_signing_identity: "iPhone Distribution",
       target_filter: IOS_APPCLIP_SCHEME,
     )
 
@@ -121,7 +121,7 @@ platform :ios do
           APP_IDENT => PROFILE_ID,
           APPCLIP_IDENT => PROFILECLIP_ID,
         },
-        installerSigningCertificate: CODE_SIGNING_IDENTITY,
+        installerSigningCertificate: "Apple Distribution: Your Company (#{TEAM_ID})",
       }
     )
     
