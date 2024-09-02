@@ -135,3 +135,44 @@ platform :ios do
     end
   end
 end
+
+platform :android do
+  APP_IDENT_ANDROID = ENV['ANDROID_APP_IDENTIFIER']
+  KEYSTORE_PATH = ENV['ANDROID_KEYSTORE_PATH']
+  KEYSTORE_PASSWORD = ENV['ANDROID_KEYSTORE_PASSWORD']
+  KEY_ALIAS = ENV['ANDROID_KEY_ALIAS']
+  KEY_PASSWORD = ENV['ANDROID_KEY_PASSWORD']
+  PLAY_CONFIG_PATH = ENV['PLAY_CONFIG_PATH']
+  ANDROID_APP_IDENTIFIER = ENV['ANDROID_APP_IDENTIFIER']
+  ANDROID_BUILD_TASK = ENV['ANDROID_BUILD_TASK']
+
+ 
+  desc 'Build Android application based on ANDROID_TARGET environment variable.'
+  lane :build do
+    android_target = capitalize_first_letter(ANDROID_BUILD_TASK)
+    gradle(
+      task: ":app:bundle#{android_target}",
+      build_type: "Release",
+      project_dir: "./android",
+      properties: {
+        "android.injected.signing.store.file" => PLAY_CONFIG_PATH,
+        "android.injected.signing.store.password" => ANDROID_KEYSTORE_PASSWORD,
+        "android.injected.signing.key.alias" => KEY_ALIAS,
+        "android.injected.signing.key.password" => KEY_PASSWORD,
+      }
+    )
+  end
+
+   lane: deploy do   
+    supply(
+      json_key: PLAY_CONFIG_PATH,
+      package_name: ANDROID_APP_IDENTIFIER,
+      aab: "./app/build/output/bundle/#{ANDROID_BUILD_TASK}Release/app-#{ANDROID_BUILD_TASK}-release.aab",
+      skip_upload_metadata: true,
+      skip_upload_images: true,
+      skip_upload_screenshots: true,
+      skip_upload_apk: true,
+      track: "internal",
+    )
+   end
+end

@@ -16,9 +16,9 @@ jobs:
     name: Build and Deploy Azzapp application
     runs-on: macos-latest-xlarge
     env:
-      VERCEL_ORG_ID: "team_nigXfZEKLJrpoK0ZHytix9jX"
+      VERCEL_ORG_ID: 'team_nigXfZEKLJrpoK0ZHytix9jX'
       TURBO_TOKEN: ${{ secrets.VERCEL_TOKEN }}
-      TURBO_TEAM: "azzapp"
+      TURBO_TEAM: 'azzapp'
       PHRASE_ACCESS_TOKEN: ${{ secrets.PHRASE_ACCESS_TOKEN }}
       PAYMENT_API_URL: ${{ vars.PAYMENT_API_URL }}
     steps:
@@ -35,7 +35,7 @@ jobs:
         run: corepack enable
       - uses: actions/setup-node@v3
         with:
-          node-version: "20"
+          node-version: '20'
 
       - name: Get yarn cache directory path
         id: yarn-cache-dir-path
@@ -274,7 +274,7 @@ jobs:
       ############################################
       - name: Azzapp Web - Pull Vercel configuration
         env:
-          VERCEL_PROJECT_ID: "azzapp"
+          VERCEL_PROJECT_ID: 'azzapp'
         run: |
           ENVIRONMENT="preview"
           ADDITIONAL_ARGS=""
@@ -288,7 +288,7 @@ jobs:
 
       - name: Azzapp Web - Vercel deployment
         env:
-          VERCEL_PROJECT_ID: "azzapp"
+          VERCEL_PROJECT_ID: 'azzapp'
         run: |
           ADDITIONAL_ARGS=""
           GITHUB_REF="${{ github.ref }}"
@@ -307,7 +307,7 @@ jobs:
 
       - name: Azzapp Backoffice - Pull Vercel configuration
         env:
-          VERCEL_PROJECT_ID: "azzapp-backoffice"
+          VERCEL_PROJECT_ID: 'azzapp-backoffice'
         run: |
           ENVIRONMENT="preview"
           ADDITIONAL_ARGS=""
@@ -321,7 +321,7 @@ jobs:
 
       - name: Azzapp Backoffice - Vercel deployment
         env:
-          VERCEL_PROJECT_ID: "azzapp-backoffice"
+          VERCEL_PROJECT_ID: 'azzapp-backoffice'
         run: |
           ADDITIONAL_ARGS=""
           GITHUB_REF="${{ github.ref }}"
@@ -367,7 +367,7 @@ jobs:
           PURCHASE_IOS_KEY: ${{ vars.PURCHASE_IOS_KEY }}
           PURCHASE_ANDROID_KEY: ${{ vars.PURCHASE_ANDROID_KEY }}
           APP_WEBSHARED_CREDENTIALS: ${{ vars.APP_WEBSHARED_CREDENTIALS }}
-          SENTRY_DSN: "https://13a33b3788344ceea14cf298a220fead@o4505353883680768.ingest.sentry.io/4505358469038080"
+          SENTRY_DSN: 'https://13a33b3788344ceea14cf298a220fead@o4505353883680768.ingest.sentry.io/4505358469038080'
           TERMS_OF_SERVICE: https://web.azzapp.com/legal/terms-of-service
           PRIVACY_POLICY: https://web.azzapp.com/legal/privacy
           ABOUT: https://web.azzapp.com/company/about_us
@@ -409,24 +409,64 @@ jobs:
       # EAS Android application Build
       #
       ############################################
-      - name: Prepare Working Directory for EAS
-        working-directory: ./packages/i18n
-        run: rm .gitignore
-
-      - name: Setup Expo and EAS
-        uses: expo/expo-github-action@v8
-        with:
-          eas-version: latest
-          token: ${{ secrets.EXPO_TOKEN }}
-
-      - name: Build on EAS
-        working-directory: ./packages/app
+      - name: Configure Keystore
         run: |
-          PROFILE="development"
-          GITHUB_REF="${{ github.ref }}"
-          if [ "$GITHUB_REF" == "refs/heads/stable" ]; then
-            PROFILE="production"
-          elif [ "$GITHUB_REF" == "refs/heads/staging" ]; then
-            PROFILE="staging"
-          fi
-          eas build --platform android --profile $PROFILE --non-interactive --no-wait
+          echo "$ANDROID_KEYSTORE_FILE" > keystore.jks.b64
+          base64 -d -i keystore.jks.b64 > app/keystore.jks
+          echo "storeFile=keystore.jks" >> keystore.properties
+          echo "keyAlias=$KEYSTORE_KEY_ALIAS" >> keystore.properties
+          echo "storePassword=$KEYSTORE_STORE_PASSWORD" >> keystore.properties
+          echo "keyPassword=$KEYSTORE_KEY_PASSWORD" >> keystore.properties
+        env:
+          ANDROID_KEYSTORE_FILE: ${{ secrets.ANDROID_KEYSTORE_FILE }}
+          KEYSTORE_KEY_ALIAS: ${{ secrets.KEYSTORE_KEY_ALIAS }}
+          KEYSTORE_KEY_PASSWORD: ${{ secrets.KEYSTORE_KEY_PASSWORD }}
+          KEYSTORE_STORE_PASSWORD: ${{ secrets.KEYSTORE_STORE_PASSWORD }}
+
+      - name: Create Google Play Config file
+        run: |
+          echo "$PLAYSTORE_SERVICE_SECRET" > play_config.json.b64
+          base64 -d -i play_config.json.b64 > play_config.json
+        env:
+          PLAYSTORE_SERVICE_SECRET: ${{ secrets.PLAYSTORE_SERVICE_SECRET }}
+
+      - name: Build android application
+        working-directory: packages/app
+        run: yarn build:android
+        env:
+          NEXT_PUBLIC_URL: ${{ vars.NEXT_PUBLIC_URL }}
+          NEXT_PUBLIC_API_ENDPOINT: ${{ vars.NEXT_PUBLIC_API_ENDPOINT }}
+          DEPLOYMENT_ENVIRONMENT: ${{ vars.NEXT_PUBLIC_PLATFORM }}
+          PURCHASE_ANDROID_KEY: ${{ vars.PURCHASE_ANDROID_KEY }}
+          APP_WEBSHARED_CREDENTIALS: ${{ vars.APP_WEBSHARED_CREDENTIALS }}
+          SENTRY_DSN: 'https://13a33b3788344ceea14cf298a220fead@o4505353883680768.ingest.sentry.io/4505358469038080'
+          TERMS_OF_SERVICE: https://web.azzapp.com/legal/terms-of-service
+          PRIVACY_POLICY: https://web.azzapp.com/legal/privacy
+          ABOUT: https://web.azzapp.com/company/about_us
+          FAQ: https://web.azzapp.com/company/faq
+          ANDROID_APP_IDENTIFIER: ${{ vars.ANDROID_APP_IDENTIFIER }}
+          ANDROID_BUILD_TASK: ${{ vars.ANDROID_BUILD_TASK }}
+          ANDROID_KEYSTORE_PATH: ${{ github.workspace }}/keystore.jks
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+          PLAY_CONFIG_PATH: ${{ github.workspace }}/play_config.json
+
+      - name: Upload android artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-${{ vars.ANDROID_BUILD_TASK }}-release.aab
+          path: packages/app/build/output/bundle/${{ vars.ANDROID_BUILD_TASK }}Release
+
+      - name: Deploy android application
+        working-directory: packages/app
+        run: bundle exec fastlane android deploy
+        env:
+          DEPLOYMENT_ENVIRONMENT: ${{ vars.NEXT_PUBLIC_PLATFORM }}
+          ANDROID_APP_IDENTIFIER: ${{ vars.ANDROID_APP_IDENTIFIER }}
+          ANDROID_BUILD_TASK: ${{ vars.ANDROID_BUILD_TASK }}
+          ANDROID_KEYSTORE_PATH: ${{ github.workspace }}/keystore.jks
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+          PLAY_CONFIG_PATH: ${{ github.workspace }}/play_config.json
