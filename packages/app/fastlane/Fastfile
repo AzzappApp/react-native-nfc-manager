@@ -70,12 +70,25 @@ platform :ios do
       "azzapp" => "azzapp/azzappRelease.entitlements"
     }
 
+    clip_entitlements_files = {
+      "azzapp-dev" => "ShareContactAppClip/ShareContactAppClip-dev.entitlements",
+      "azzapp-staging" => "ShareContactAppClip/ShareContactAppClip-staging.entitlements",
+      "azzapp" => "ShareContactAppClip/ShareContactAppClip.entitlements"
+    }
+
     # Determine the entitlements file based on the target
     update_code_signing_settings(
       use_automatic_signing: false,
       path: "ios/azzapp.xcodeproj",
       entitlements_file_path: entitlements_files[IOS_SCHEME],
       targets: [IOS_SCHEME]
+    )
+
+    update_code_signing_settings(
+      use_automatic_signing: false,
+      path: "ios/azzapp.xcodeproj",
+      entitlements_file_path: clip_entitlements_files[IOS_APPCLIP_SCHEME],
+      targets: [IOS_APPCLIP_SCHEME]
     )
 
     update_project_provisioning(
