@@ -199,7 +199,7 @@ export const getReportsByTarget = async ({
     .$dynamic();
 
   if (status !== 'all') {
-    query = query.where(eq(sql`status`, status === 'open' ? 1 : 0));
+    query = query.having(eq(sql`status`, status === 'open' ? 1 : 0));
   }
   if (targetType !== 'all') {
     query = query.where(eq(sql`targetType`, targetType));
