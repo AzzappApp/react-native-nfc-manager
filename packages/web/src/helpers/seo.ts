@@ -21,10 +21,9 @@ export function getMetaData({
   other,
 }: SocialMetas): Metadata {
   const basePath = process.env.NEXT_PUBLIC_URL ?? 'http://localhost:3000';
-
   const url = path.startsWith('http')
     ? path
-    : `${basePath}/${stripPreSlash(path)}`;
+    : `${basePath}${stripPreSlash(path)}`;
 
   return {
     ...other,
