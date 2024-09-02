@@ -74,29 +74,7 @@ platform :ios do
     update_code_signing_settings(
       use_automatic_signing: false,
       path: "ios/azzapp.xcodeproj",
-      entitlements_file_path: entitlements_files[IOS_SCHEME],
-      target_filter: IOS_SCHEME
-    )
-
-    update_code_signing_settings(
-      use_automatic_signing: false,
-      path: "ios/azzapp.xcodeproj",
-      target_filter: IOS_APPCLIP_SCHEME
-    )
-
-    # Determine the entitlements file based on the target
-    update_code_signing_settings(
-      use_automatic_signing: false,
-      path: "ios/azzapp.xcodeproj",
-      entitlements_file_path: entitlements_files[IOS_SCHEME],
-      targets: {
-        IOS_SCHEME => {
-          code_sign_identity: "iPhone Distribution"
-        },
-        IOS_APPCLIP_SCHEME => {
-          code_sign_identity: "iPhone Distribution"
-        }
-      }
+      entitlements_file_path: entitlements_files[IOS_SCHEME]
     )
 
     update_project_provisioning(
@@ -110,9 +88,6 @@ platform :ios do
       profile: PROFILE_CLIP_PATH,
       target_filter: IOS_APPCLIP_SCHEME,
     )
-
-     # Determine the entitlements file based on the target
-
 
     # Build the application
     gym(
