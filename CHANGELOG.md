@@ -1,4 +1,4 @@
-## 0.6.0-canary.35
+## 0.6.0-canary.36
 
 * **fix:**  - ios uild
 * **fix:**  - syntax error fastfile
