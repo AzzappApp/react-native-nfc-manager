@@ -15,6 +15,7 @@ import {
   getDatabaseConnectionsInfos,
   startDatabaseConnectionMonitoring,
 } from '@azzapp/data';
+import { DEFAULT_LOCALE, type Locale } from '@azzapp/i18n';
 import { schema, type GraphQLContext } from '@azzapp/schema';
 import ERRORS from '@azzapp/shared/errors';
 import { AZZAPP_SERVER_HEADER } from '@azzapp/shared/urlHelpers';
@@ -23,7 +24,6 @@ import { buildCoverAvatarUrl } from '#helpers/avatar';
 import { notifyUsers } from '#helpers/sendMessages';
 import { getSessionData } from '#helpers/tokens';
 import packageJSON from '../../../../package.json';
-import type { Locale } from '@azzapp/i18n';
 import type { GraphQLError } from 'graphql';
 import type { LogLevel, Plugin as YogaPlugin } from 'graphql-yoga';
 
@@ -145,7 +145,7 @@ const { handleRequest } = createYoga({
   > => {
     const locale = request.headers.get('azzapp-locale') as Locale;
     return {
-      locale,
+      locale: locale ?? DEFAULT_LOCALE,
       notifyUsers,
       validateMailOrPhone,
       buildCoverAvatarUrl,
