@@ -50,8 +50,8 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-yarn-
 
-      - name: Install Vercel CLI
-        run: npm i -g vercel@latest
+      # - name: Install Vercel CLI
+      #   run: npm i -g vercel@latest
 
       - name: Install dependencies
         run: yarn install --immutable
