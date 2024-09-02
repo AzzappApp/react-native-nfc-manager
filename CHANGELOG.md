@@ -1,4 +1,4 @@
-## 0.6.0-canary.38
+## 0.6.0-canary.39
 
 * **fix:**  - code signing mulitple target
 * **fix:**  - ios uild
