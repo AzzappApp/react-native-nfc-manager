@@ -1,4 +1,4 @@
-## 0.6.0-canary.58
+## 0.6.0-canary.59
 
 * **typo:**  - param name
 * **fastlane:**  - clip building
