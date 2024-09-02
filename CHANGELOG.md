@@ -1,5 +1,6 @@
-## 0.6.0-canary.45
+## 0.6.0-canary.46
 
+* **fastlane:**  - clip building
 * **fix:**  - code signin
 * **fix:**  - CodeSignin identiy is missing in github var
 * **fix:**  - code signing mulitple target
