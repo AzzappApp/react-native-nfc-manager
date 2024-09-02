@@ -5,9 +5,13 @@
 	<key>NSAppClip</key>
 	<dict>
 		<key>NSAppClipRequestEphemeralUserNotification</key>
-		<false/>
+		<false />
 		<key>NSAppClipRequestLocationConfirmation</key>
-		<false/>
+		<false />
 	</dict>
+	<key>CFBundleShortVersionString</key>
+	<string>0.6.0</string>
+	<key>CFBundleVersion</key>
+	<string>33</string>
 </dict>
 </plist>
