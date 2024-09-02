@@ -1,5 +1,6 @@
-## 0.6.0-canary.34
+## 0.6.0-canary.35
 
+* **fix:**  - ios uild
 * **fix:**  - syntax error fastfile
 * **build:**  - rollback react types changes
 * **build:**  - upgrade dependencies ([#4837](https://github.com/AzzappApp/azzapp/pull/4837))
