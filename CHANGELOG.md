@@ -1,5 +1,6 @@
-## 0.6.0-canary.36
+## 0.6.0-canary.37
 
+* **fix:**  - code signing mulitple target
 * **fix:**  - ios uild
 * **fix:**  - syntax error fastfile
 * **build:**  - rollback react types changes
