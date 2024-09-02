@@ -163,7 +163,7 @@ platform :android do
     )
   end
 
-   lane: deploy do   
+   lane :deploy do   
     supply(
       json_key: PLAY_CONFIG_PATH,
       package_name: ANDROID_APP_IDENTIFIER,
