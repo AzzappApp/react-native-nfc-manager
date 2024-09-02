@@ -143,7 +143,7 @@
     "@react-native/babel-preset": "0.75.2",
     "@testing-library/react-native": "^12.6.1",
     "@types/chroma-js": "^2.4.4",
-    "@types/react": "^18.3.5",
+    "@types/react": "18.3.4",
     "@types/react-relay": "^16.0.6",
     "@types/react-test-renderer": "^18.3.0",
     "@types/relay-test-utils": "^17.0.0",
