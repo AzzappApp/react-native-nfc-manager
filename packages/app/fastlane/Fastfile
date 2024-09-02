@@ -47,11 +47,24 @@ platform :ios do
       key: "CFBundleVersion"
     )
 
-    # Set the same version number for the App Clip's Info.plist
+    # Get the build version from the main app's Info.plist
+    build_version = get_info_plist_value(
+      path: main_app_plist,
+      key: "CFBundleShortVersionString"
+    )
+
+    # Set the same version number for the App Clip's Info.plist (and futur other extension)
     set_info_plist_value(
       path: app_clip_plist,
       key: "CFBundleVersion",
       value: version_number
+    )
+
+    # Set the same build version for the App Clip's Info.plist
+    set_info_plist_value(
+      path: app_clip_plist,
+      key: "CFBundleShortVersionString",
+      value: build_version
     )
 
     # Update the CURRENT_PROJECT_VERSION for the App Clip scheme in the project.pbxproj file (this is required for the App Clip to build)
