@@ -74,7 +74,7 @@ platform :ios do
     update_code_signing_settings(
       use_automatic_signing: false,
       path: "ios/azzapp.xcodeproj",
-      entitlements_file_path: entitlements_files[IOS_SCHEME]
+      entitlements_file_path: entitlements_files[IOS_SCHEME],
       targets: [IOS_SCHEME]
     )
 
