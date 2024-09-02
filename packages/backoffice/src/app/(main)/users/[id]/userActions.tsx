@@ -11,6 +11,7 @@ import {
   updateProfile,
   getUserProfilesWithWebCard,
   markUserAsDeleted,
+  markUserAsActive,
 } from '@azzapp/data';
 import { AZZAPP_SERVER_HEADER } from '@azzapp/shared/urlHelpers';
 import { ADMIN } from '#roles';
@@ -74,9 +75,13 @@ export const toggleUserActive = async (userId: string) => {
         profiles.filter(({ profile }) => profile.profileRole === 'owner'),
     );
 
-    await markUserAsDeleted(userId, session.userId);
-
     try {
+      if (!user.deleted) {
+        await markUserAsDeleted(userId, session.userId);
+      } else {
+        await markUserAsActive(userId);
+      }
+
       const res = await fetch(
         `${process.env.NEXT_PUBLIC_API_ENDPOINT}/revalidate`,
         {

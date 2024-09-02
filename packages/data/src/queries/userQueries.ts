@@ -138,20 +138,45 @@ export const updateUser = async (
  * @param userId - the id of the user to delete
  * @param deletedBy - the id of the user who deleted the user
  */
-export const markUserAsDeleted = async (
+export const markUserAsDeleted = (userId: string, deletedBy: string) => {
+  updateUserActiveStatus(userId, {
+    deletedAt: new Date(),
+    deletedBy,
+    deleted: true,
+  });
+};
+
+/**
+ * Mark an user as active, and update all the related profiles/webcards
+ *
+ * @param userId - the id of the user to active
+ */
+export const markUserAsActive = (userId: string) => {
+  updateUserActiveStatus(userId, {
+    deletedAt: undefined,
+    deletedBy: undefined,
+    deleted: false,
+  });
+};
+
+/**
+ * Toggle an user as deleted/Active, and update all the related profiles/webcards
+ *
+ * @param userId - the id of the user to delete
+ * @param updates - updates deleted values
+ */
+const updateUserActiveStatus = async (
   userId: string,
-  deletedBy: string,
+  updates: {
+    deletedAt: Date | undefined;
+    deletedBy: string | undefined;
+    deleted: boolean;
+  },
 ): Promise<void> =>
   transaction(async () => {
-    const updates = {
-      deletedAt: new Date(),
-      deletedBy,
-      deleted: true,
-    };
-
     await updateUser(userId, updates);
     const userProfiles = (await getProfilesByUser(userId)).filter(
-      profile => profile.deleted === false,
+      profile => profile.deleted === !updates.deleted,
     );
     await db()
       .update(ProfileTable)

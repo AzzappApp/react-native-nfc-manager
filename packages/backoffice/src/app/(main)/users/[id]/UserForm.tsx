@@ -13,6 +13,7 @@ import * as Sentry from '@sentry/nextjs';
 import { useEffect, useState, useTransition } from 'react';
 import { useDebounce } from 'use-debounce';
 import * as ROLES from '#roles';
+import ConfirmDialog from '#components/ConfirmDialog';
 import {
   toggleRole,
   removeWebcard,
@@ -32,6 +33,7 @@ const UserForm = ({ user, webCards }: UserFormProps) => {
   const [loading, startTransition] = useTransition();
   const [currentNote, setCurrentNote] = useState(user.note ?? '');
   const [debouncedNote] = useDebounce(currentNote, 300);
+  const [confirm, setConfirm] = useState(false);
 
   const onToggleRole = (role: string) => {
     startTransition(async () => {
@@ -43,6 +45,7 @@ const UserForm = ({ user, webCards }: UserFormProps) => {
 
   const onToggleUserActive = async () => {
     startTransition(async () => {
+      setConfirm(false);
       await toggleUserActive(user.id);
     });
   };
@@ -69,7 +72,9 @@ const UserForm = ({ user, webCards }: UserFormProps) => {
           <Switch
             name="active"
             checked={!user.deleted}
-            onChange={onToggleUserActive}
+            onChange={() => {
+              setConfirm(true);
+            }}
           />
         }
         label="Active"
@@ -149,6 +154,13 @@ const UserForm = ({ user, webCards }: UserFormProps) => {
           disabled={loading}
         />
       ))}
+      <ConfirmDialog
+        open={confirm}
+        onClose={() => {
+          setConfirm(false);
+        }}
+        onConfirm={onToggleUserActive}
+      />
     </Box>
   );
 };
