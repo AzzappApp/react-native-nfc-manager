@@ -74,7 +74,7 @@ type Profile implements Node {
     Returns the first n items from the list.
     """
     first: Int
-  ): WebCardConnection!
+  ): WebCardConnection! @deprecated(reason: "No longer used")
 
   """
   Return a list of web cards that the current viewer can be interested in for a given profile

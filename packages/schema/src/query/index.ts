@@ -8,7 +8,7 @@ import * as CoverTemplateResolvers from './CoverTemplateResolvers';
 import * as CoverTemplateTagResolvers from './CoverTemplateTagResolvers';
 import * as CoverTemplateTypeResolvers from './CoverTemplateTypeResolvers';
 import * as MediaResolvers from './MediaResolvers';
-import * as ModuleBagroundResolvers from './ModuleBagroundResolvers';
+import * as ModuleBackgroundResolvers from './ModuleBackgroundResolvers';
 import { Node } from './NodeResolvers';
 import * as PaymentResolvers from './PaymentResolvers';
 import * as PostResolvers from './PostResolvers';
@@ -28,7 +28,7 @@ const resolvers = {
   ...CoverTemplateTagResolvers,
   ...CoverTemplateTypeResolvers,
   ...MediaResolvers,
-  ...ModuleBagroundResolvers,
+  ...ModuleBackgroundResolvers,
   ...PostResolvers,
   ...ProfileResolvers,
   ...WebCardResolvers,

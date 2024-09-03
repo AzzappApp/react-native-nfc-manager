@@ -182,7 +182,6 @@ const ProfileResolverImpl: ProtectedResolver<ProfileResolvers> = {
         }
       : null;
   },
-
   statsSummary: async profile => {
     if (
       !profileIsAssociatedToCurrentUser(profile) &&

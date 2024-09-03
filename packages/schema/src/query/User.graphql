@@ -24,7 +24,7 @@ type User {
   """
   Returns a list of published WebCards of the user
   """
-  publishedWebCards: [WebCard!]
+  publishedWebCards: [WebCard!] @deprecated(reason: "Use profiles instead")
   """
   Returns the active Subscription
   """
