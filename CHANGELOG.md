@@ -1,4 +1,4 @@
-## 0.6.0-canary.75
+## 0.6.0-canary.76
 
 * **feat:**  - add a new lottie and design for welcomescreen ([#4851](https://github.com/AzzappApp/azzapp/pull/4851))
 * **fix:**  - **web:** [#4838](https://github.com/AzzappApp/azzapp/pull/4838) increase jwt timeout + error messages ([#4848](https://github.com/AzzappApp/azzapp/pull/4848))
