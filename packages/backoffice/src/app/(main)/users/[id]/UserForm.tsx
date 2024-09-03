@@ -21,15 +21,18 @@ import {
   updateNote,
 } from './userActions';
 import WebcardCover from './WebcardCover';
-import type { User, WebCard } from '@azzapp/data';
+import type { User, Profile, WebCard } from '@azzapp/data';
 import type { ChangeEvent } from 'react';
 
 type UserFormProps = {
   user: User;
-  webCards: WebCard[];
+  profiles: Array<{
+    profile: Profile;
+    webCard: WebCard;
+  }>;
 };
 
-const UserForm = ({ user, webCards }: UserFormProps) => {
+const UserForm = ({ user, profiles }: UserFormProps) => {
   const [loading, startTransition] = useTransition();
   const [currentNote, setCurrentNote] = useState(user.note ?? '');
   const [debouncedNote] = useDebounce(currentNote, 300);
@@ -80,9 +83,11 @@ const UserForm = ({ user, webCards }: UserFormProps) => {
         label="Active"
         disabled={loading}
       />
+
       <Typography variant="h5" sx={{ mb: 5, mt: 5 }}>
-        Webcards: {webCards.length}
+        {`Webcards: ${profiles.filter(({ profile: { invited } }) => !invited).length} / ${profiles.filter(({ profile: { invited } }) => invited).length} (invited)`}
       </Typography>
+
       <Card
         sx={{
           display: 'flex',
@@ -93,10 +98,11 @@ const UserForm = ({ user, webCards }: UserFormProps) => {
           overflow: 'auto',
         }}
       >
-        {webCards.map(webCard => (
+        {profiles.map(({ webCard, profile: { profileRole } }) => (
           <WebcardCover
             key={webCard.id}
             webcard={webCard}
+            role={profileRole}
             onRemoveWebcard={(webCardId: string) =>
               removeWebcard(user.id, webCardId)
             }

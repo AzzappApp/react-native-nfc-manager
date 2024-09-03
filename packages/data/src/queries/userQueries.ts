@@ -133,50 +133,38 @@ export const updateUser = async (
 };
 
 /**
+ * Mark an user as active
+ *
+ * @param userId - the id of the user to active
+ */
+export const markUserAsActive = (userId: string) =>
+  transaction(async () => {
+    await updateUser(userId, {
+      deletedAt: undefined,
+      deletedBy: undefined,
+      deleted: false,
+    });
+  });
+
+/**
  * Mark an user as deleted, and update all the related profiles/webcards
  *
  * @param userId - the id of the user to delete
  * @param deletedBy - the id of the user who deleted the user
  */
-export const markUserAsDeleted = (userId: string, deletedBy: string) => {
-  updateUserActiveStatus(userId, {
-    deletedAt: new Date(),
-    deletedBy,
-    deleted: true,
-  });
-};
-
-/**
- * Mark an user as active, and update all the related profiles/webcards
- *
- * @param userId - the id of the user to active
- */
-export const markUserAsActive = (userId: string) => {
-  updateUserActiveStatus(userId, {
-    deletedAt: undefined,
-    deletedBy: undefined,
-    deleted: false,
-  });
-};
-
-/**
- * Toggle an user as deleted/Active, and update all the related profiles/webcards
- *
- * @param userId - the id of the user to delete
- * @param updates - updates deleted values
- */
-const updateUserActiveStatus = async (
+export const markUserAsDeleted = async (
   userId: string,
-  updates: {
-    deletedAt: Date | undefined;
-    deletedBy: string | undefined;
-    deleted: boolean;
-  },
+  deletedBy: string,
 ): Promise<void> =>
   transaction(async () => {
+    const updates = {
+      deletedAt: new Date(),
+      deletedBy,
+      deleted: true,
+    };
     await updateUser(userId, updates);
     const userProfiles = (await getProfilesByUser(userId)).filter(
-      profile => profile.deleted === !updates.deleted,
+      profile => profile.deleted === false,
     );
     await db()
       .update(ProfileTable)
@@ -428,23 +416,30 @@ export const getUsersInfos = async ({
     .orderBy(sortFunc(sql.raw(sortField)))
     .groupBy(UserTable.id)
     .$dynamic();
+
+  const filters = [];
+
   if (enabled != null) {
-    const filter = enabled
-      ? or(isNull(UserTable.deleted), eq(UserTable.deleted, false))
-      : eq(UserTable.deleted, true);
-    query = query.where(filter);
-  }
-  if (search) {
-    const filter = or(
-      like(UserTable.email, `%${search}%`),
-      like(UserTable.phoneNumber, `%${search.trim()}%`),
-      like(UserTable.id, `%${search}%`),
-      like(WebCardTable.userName, `%${search}%`),
-      like(WebCardTable.companyName, `%${search}%`),
+    filters.push(
+      enabled
+        ? or(isNull(UserTable.deleted), eq(UserTable.deleted, false))
+        : eq(UserTable.deleted, true),
     );
-    query = query.where(filter);
   }
 
+  if (search) {
+    filters.push(
+      or(
+        like(UserTable.email, `%${search}%`),
+        like(UserTable.phoneNumber, `%${search.trim()}%`),
+        like(UserTable.id, `%${search}%`),
+        like(WebCardTable.userName, `%${search}%`),
+        like(WebCardTable.companyName, `%${search}%`),
+      ),
+    );
+  }
+
+  query = query.where(and(...filters));
   const countQuery = db().select({ count: count() }).from(query.as('SubQuery'));
 
   const [users, nbUsers] = await Promise.all([

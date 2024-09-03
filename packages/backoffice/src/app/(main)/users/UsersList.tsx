@@ -139,6 +139,19 @@ const UsersList = ({
       <Typography variant="h4" component="h1" sx={{ mb: 2 }}>
         Users
       </Typography>
+      <TextField
+        id="note"
+        inputProps={{
+          readOnly: true,
+        }}
+        label="Note"
+        multiline
+        rows={1}
+        maxRows={3}
+        value={
+          'The number of WebCards in this table may be affected by the current search. Open the account details to view the total number of WebCards.'
+        }
+      />
       <Box display="flex" gap={2} alignItems="center">
         <TextField
           margin="normal"

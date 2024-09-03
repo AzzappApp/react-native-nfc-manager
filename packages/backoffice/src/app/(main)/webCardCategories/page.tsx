@@ -7,7 +7,7 @@ import { DEFAULT_LOCALE, ENTITY_TARGET } from '@azzapp/i18n';
 import WebCardCategoriesList from './WebCardCategoriesList';
 
 const WebCardCategoriesPage = async () => {
-  const webCardCategories = await getWebCardCategories();
+  const webCardCategories = await getWebCardCategories(false);
   const labels = await getLocalizationMessagesByKeys(
     webCardCategories.map(c => c.id),
     DEFAULT_LOCALE,

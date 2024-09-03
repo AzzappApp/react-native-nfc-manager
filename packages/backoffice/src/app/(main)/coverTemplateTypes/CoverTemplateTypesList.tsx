@@ -83,9 +83,9 @@ const CoverTemplateTypesList = ({ coverTemplateTypes }: Props) => {
               label="Status"
               onChange={onStatusChange}
             >
-              <MenuItem value={'all'}>All</MenuItem>
-              <MenuItem value={'true'}>Enabled</MenuItem>
-              <MenuItem value={'false'}>Disabled</MenuItem>
+              <MenuItem value={'All'}>All</MenuItem>
+              <MenuItem value={'Enabled'}>Enabled</MenuItem>
+              <MenuItem value={'Disabled'}>Disabled</MenuItem>
             </Select>
           </FormControl>
         </Box>

@@ -26,14 +26,13 @@ export const saveCardStyle = async (
       formErrors: validationResult.error.formErrors,
     } as const;
   }
-  const cardStyleId = data.id;
+  let cardStyleId = data.id;
   const { label, ...updates } = validationResult.data;
   if (cardStyleId) {
-    const id = cardStyleId;
     await transaction(async () => {
-      await updateCardStyle(id, updates);
+      await updateCardStyle(cardStyleId as string, updates);
       await saveLocalizationMessage({
-        key: id,
+        key: cardStyleId as string,
         value: label,
         locale: DEFAULT_LOCALE,
         target: ENTITY_TARGET,
@@ -41,9 +40,9 @@ export const saveCardStyle = async (
     });
   } else {
     await transaction(async () => {
-      const id = await createCardStyle(validationResult.data);
+      cardStyleId = await createCardStyle(validationResult.data);
       await saveLocalizationMessage({
-        key: id,
+        key: cardStyleId as string,
         value: label,
         locale: DEFAULT_LOCALE,
         target: ENTITY_TARGET,

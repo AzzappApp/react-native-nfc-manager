@@ -86,7 +86,7 @@ const ColorPalettesList = ({ colorPalettes }: ColorPalettesListProps) => {
               label="Status"
               onChange={onStatusChange}
             >
-              <MenuItem value={'all'}>All</MenuItem>
+              <MenuItem value={'All'}>All</MenuItem>
               <MenuItem value={'Enabled'}>Enabled</MenuItem>
               <MenuItem value={'Disabled'}>Disabled</MenuItem>
             </Select>

@@ -407,25 +407,29 @@ export const getSubscriptionsPaged = async ({
     .from(UserSubscriptionTable)
     .$dynamic();
 
+  const filters: any = [];
+
   if (search) {
-    const filter = or(
-      like(UserSubscriptionTable.userId, `%${search}%`),
-      like(UserSubscriptionTable.webCardId, `%${search}%`),
-      like(UserSubscriptionTable.issuer, `%${search}%`),
+    filters.push(
+      or(
+        like(UserSubscriptionTable.userId, `%${search}%`),
+        like(UserSubscriptionTable.webCardId, `%${search}%`),
+        like(UserSubscriptionTable.issuer, `%${search}%`),
+      ),
     );
-    query = query.where(filter);
-    countQuery = countQuery.where(filter);
   }
+
   if (statusFilter !== 'all') {
-    const filter = eq(UserSubscriptionTable.status, statusFilter);
-    query = query.where(filter);
-    countQuery = countQuery.where(filter);
+    filters.push(eq(UserSubscriptionTable.status, statusFilter));
   }
+
   if (typeFilter !== 'all') {
-    const filter = eq(UserSubscriptionTable.subscriptionPlan, typeFilter);
-    query = query.where(filter);
-    countQuery = countQuery.where(filter);
+    filters.push(eq(UserSubscriptionTable.subscriptionPlan, typeFilter));
   }
+
+  query = query.where(and(...filters));
+  countQuery = countQuery.where(and(...filters));
+
   const sortFunc = sortOrder === 'asc' ? asc : desc;
   query = query.orderBy(sortFunc(UserSubscriptionTable[sortField]));
 

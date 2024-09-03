@@ -76,10 +76,16 @@ const CardTemplatesPage = async ({ searchParams = {} }: Props) => {
       businessEnabled: cardTemplate.businessEnabled,
     }))
     .filter(item => {
-      if (filters.personalStatus !== 'All' && !item.personalEnabled) {
+      if (
+        (filters.personalStatus === 'Disabled' && item.personalEnabled) ||
+        (filters.personalStatus === 'Enabled' && !item.personalEnabled)
+      ) {
         return false;
       }
-      if (filters.businessStatus !== 'All' && !item.businessEnabled) {
+      if (
+        (filters.businessStatus === 'Disabled' && item.businessEnabled) ||
+        (filters.businessStatus === 'Enabled' && !item.businessEnabled)
+      ) {
         return false;
       }
       if (search) {

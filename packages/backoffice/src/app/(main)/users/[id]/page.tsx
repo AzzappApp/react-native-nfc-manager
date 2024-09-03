@@ -50,7 +50,7 @@ const UserPage = async ({ params: { id } }: UserPageProps) => {
           Users
         </Link>
       </Breadcrumbs>
-      <UserForm user={user} webCards={profiles.map(({ webCard }) => webCard)} />
+      <UserForm user={user} profiles={profiles} />
 
       <Subscriptions
         user={user}
