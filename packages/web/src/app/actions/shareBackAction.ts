@@ -52,13 +52,27 @@ export const processShareBackSubmission = async (
     // verify expiration date
     if (!decodedToken.exp || decodedToken.exp < Date.now() / 1000) {
       return submission.reply({
-        formErrors: ['Token expired, please refresh and try sharing again'],
+        formErrors: [
+          intl.formatMessage({
+            defaultMessage:
+              'Oops, something went wrong, please refresh the page.',
+            id: 'l3KPmc',
+            description: 'ShareBack - Error message for expired token',
+          }),
+        ],
       });
     }
 
     if (submission.status !== 'success') {
       return submission.reply({
-        formErrors: ['Share back form is not valid'],
+        formErrors: [
+          intl.formatMessage({
+            defaultMessage:
+              'Your submission has errors, please check the form and try again.',
+            id: 'heLjo+',
+            description: 'ShareBack - Error message for invalid submission',
+          }),
+        ],
       });
     }
     // get user data from userId

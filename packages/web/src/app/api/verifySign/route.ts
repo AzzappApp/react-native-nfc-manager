@@ -46,7 +46,7 @@ const verifySignApi = async (req: Request) => {
       .setIssuer('azzapp')
       .setSubject('contact-card')
       .setIssuedAt()
-      .setExpirationTime('10m')
+      .setExpirationTime('20m')
       .setProtectedHeader({ alg: 'HS256' })
       .sign(new TextEncoder().encode(JWT_SECRET));
 
