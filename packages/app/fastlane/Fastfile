@@ -237,19 +237,15 @@ platform :android do
         "android.injected.signing.key.password" => KEY_PASSWORD,
       }
     )
-    # Print the contents of the build output directory
-    
-    sh("ls -la ./android/app/build/outputs/bundle")
-    # Print the contents of the build output directory
-    sh("ls -la ./android/app/build/outputs/bundle/#{ANDROID_BUILD_TASK}Release")
   end
 
 
    lane :deploy do   
+    AAB_PATH = ENV['AAB_PATH']
     supply(
       json_key: PLAY_CONFIG_PATH,
       package_name: ANDROID_APP_IDENTIFIER,
-      aab: "./app/build/output/bundle/#{ANDROID_BUILD_TASK}Release/app-#{ANDROID_BUILD_TASK}-release.aab",
+      aab: AAB_PATH,
       skip_upload_metadata: true,
       skip_upload_images: true,
       skip_upload_screenshots: true,
