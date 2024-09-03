@@ -1,4 +1,4 @@
-## 0.6.0-canary.73
+## 0.6.0-canary.74
 
 * **fix:**  - 🐛 avoid overflow modal height by default ([#4849](https://github.com/AzzappApp/azzapp/pull/4849))
 * **fix:**  - android
