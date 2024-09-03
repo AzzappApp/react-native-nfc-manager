@@ -120,10 +120,7 @@ const inviteUserMutation: MutationResolvers['inviteUser'] = async (
         logoId: logoId ?? null,
         invited: true,
         invitedBy: profileId,
-        contactCard: {
-          ...data,
-          birthday: undefined,
-        },
+        contactCard: data,
         contactCardDisplayedOnWebCard: displayedOnWebCard ?? true,
         contactCardIsPrivate: displayedOnWebCard ?? false,
         profileRole: invited.profileRole,
