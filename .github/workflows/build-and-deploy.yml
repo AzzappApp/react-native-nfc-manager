@@ -450,9 +450,9 @@ jobs:
           ANDROID_APP_IDENTIFIER: ${{ vars.ANDROID_APP_IDENTIFIER }}
           ANDROID_BUILD_TASK: ${{ vars.ANDROID_BUILD_TASK }}
           ANDROID_KEYSTORE_PATH: ${{ github.workspace }}/keystore.jks
-          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
-          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
-          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_STORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.KEYSTORE_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.KEYSTORE_KEY_PASSWORD }}
           PLAY_CONFIG_PATH: ${{ github.workspace }}/play_config.json
 
       - name: Upload android artifact
