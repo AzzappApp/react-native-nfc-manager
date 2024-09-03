@@ -156,4 +156,12 @@ describe('deeplinkHelpers', () => {
       },
     });
   });
+
+  test('invite should redirect to home', async () => {
+    const res = await matchUrlWithRoute('https://fake-azzapp.com/123/invite');
+
+    expect(res).toEqual({
+      route: 'HOME',
+    });
+  });
 });

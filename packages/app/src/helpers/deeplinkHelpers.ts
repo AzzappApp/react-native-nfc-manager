@@ -90,6 +90,10 @@ export const matchUrlWithRoute = async (
           compressedContactCard,
         },
       };
+    } else if (route === 'invite') {
+      return {
+        route: 'HOME',
+      };
     }
     //this is a webCard and maybe container a download liink
     const compressedContactCard = getSearchParamFromURL(url, 'c');

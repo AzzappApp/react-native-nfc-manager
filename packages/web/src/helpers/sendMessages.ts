@@ -1,4 +1,5 @@
 import sanitizeHTML from 'sanitize-html';
+import { buildInviteUrl } from '@azzapp/shared/urlHelpers';
 import { sendEmail } from './emailHelpers';
 import { getServerIntl } from './i18nHelpers';
 import { sendTwilioSMS } from './twilioHelpers';
@@ -31,20 +32,21 @@ export const notifyUsers = async (
             ),
             text: intl.formatMessage(
               {
-                id: 'GJ+mGa',
+                id: 'p3Wm44',
                 defaultMessage:
-                  'You have been invited to join {userName} on Azzapp! Download the app and sign up with this email to join: {email}',
+                  'You have been invited to join {userName} on Azzapp! Download the app {url} and sign up with this email to join: {email}',
                 description: 'Email body for invitation',
               },
               {
                 userName: webCard.userName,
                 email: receivers.join(', '),
+                url: buildInviteUrl(webCard.userName),
               },
             ),
             html: intl.formatMessage(
               {
-                id: '7atUAM',
-                defaultMessage: `<div>You have been invited to join {userName} on Azzapp! Download the app and sign up with this email to join: {email}</div>`,
+                id: 'x4Spsz',
+                defaultMessage: `<div>You have been invited to join {userName} on Azzapp! <a>Download</a> the app and sign up with this email to join: {email}</div>`,
                 description: 'Email body for invitation',
               },
               {
@@ -52,6 +54,10 @@ export const notifyUsers = async (
                   sanitizeHTML(`<div>${chunks.join('')}</div>`),
                 userName: webCard.userName,
                 email: receivers.join(', '),
+                a: (...chunks) =>
+                  sanitizeHTML(
+                    `<a href="${buildInviteUrl(webCard.userName)}">${chunks.join('')}</a>`,
+                  ),
               },
             ),
           });
@@ -63,13 +69,14 @@ export const notifyUsers = async (
                 to: receiver,
                 body: intl.formatMessage(
                   {
-                    id: 'hDxoUl',
-                    defaultMessage: `You have been invited to join {userName} on Azzapp! Download the app and sign up with this phone number to join: {phoneNumber}`,
+                    id: 'poAqAV',
+                    defaultMessage: `You have been invited to join {userName} on Azzapp! Download the app {url} and sign up with this phone number to join: {phoneNumber}`,
                     description: 'SMS body for invitation',
                   },
                   {
                     userName: webCard.userName,
                     phoneNumber: receiver,
+                    url: buildInviteUrl(webCard.userName),
                   },
                 ),
               }).catch(error => {
