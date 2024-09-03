@@ -1,5 +1,6 @@
-## 0.6.0-canary.67
+## 0.6.0-canary.68
 
+* **fix:**  - android
 * **fix:**  - fastlane capitalize
 * **fix:**  - android keystore creation
 * **feat:**  - **EmailSignature:** handle in app page email signature  ([#4840](https://github.com/AzzappApp/azzapp/pull/4840))
