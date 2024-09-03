@@ -1,5 +1,7 @@
-## 0.6.0-canary.69
+## 0.6.0-canary.70
 
+* **fix:**  - android
+* **fix:**  - android UI ([#4844](https://github.com/AzzappApp/azzapp/pull/4844))
 * **fix:**  - android keystore path
 * **fix:**  - android
 * **fix:**  - fastlane capitalize
