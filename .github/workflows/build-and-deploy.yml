@@ -413,7 +413,6 @@ jobs:
       #
       ############################################
       - name: Configure Keystore
-        working-directory: packages/app
         run: |
           echo "$ANDROID_KEYSTORE_FILE" > keystore.jks.b64
           base64 -d -i keystore.jks.b64 > keystore.jks

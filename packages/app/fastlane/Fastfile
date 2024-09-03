@@ -226,6 +226,16 @@ platform :android do
   desc 'Build Android application based on ANDROID_TARGET environment variable.'
   lane :build do
     android_target = capitalize_first_letter(ANDROID_BUILD_TASK)
+    # Print the values of the variables
+  puts "APP_IDENT_ANDROID: #{APP_IDENT_ANDROID}"
+  puts "KEYSTORE_PATH: #{KEYSTORE_PATH}"
+  puts "KEYSTORE_PASSWORD: #{KEYSTORE_PASSWORD}"
+  puts "KEY_ALIAS: #{KEY_ALIAS}"
+  puts "KEY_PASSWORD: #{KEY_PASSWORD}"
+  puts "PLAY_CONFIG_PATH: #{PLAY_CONFIG_PATH}"
+  puts "ANDROID_APP_IDENTIFIER: #{ANDROID_APP_IDENTIFIER}"
+  puts "ANDROID_BUILD_TASK: #{ANDROID_BUILD_TASK}"
+  puts "ANDROID_TARGET: #{android_target}"
     gradle(
       task: ":app:bundle#{android_target}",
       build_type: "Release",
