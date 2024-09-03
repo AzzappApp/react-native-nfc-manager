@@ -1,5 +1,6 @@
-## 0.6.0-canary.72
+## 0.6.0-canary.73
 
+* **fix:**  - 🐛 avoid overflow modal height by default ([#4849](https://github.com/AzzappApp/azzapp/pull/4849))
 * **fix:**  - android
 * **fix:**  - android UI ([#4844](https://github.com/AzzappApp/azzapp/pull/4844))
 * **fix:**  - android keystore path
