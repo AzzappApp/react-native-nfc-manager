@@ -1,7 +1,12 @@
-import { DeviceMotionOrientation, DeviceMotion } from 'expo-sensors';
+import {
+  DeviceMotionOrientation,
+  DeviceMotion,
+  Accelerometer,
+} from 'expo-sensors';
 import { useEffect, useRef, useState } from 'react';
 import {
   Platform,
+  StatusBar,
   View,
   useColorScheme,
   useWindowDimensions,
@@ -54,35 +59,50 @@ const HomeContactCardLandscape = ({
     () => 1 - visibleSharedValue.value,
     [visibleSharedValue],
   );
+
   useEffect(() => {
-    const subscription = DeviceMotion.addListener(
-      ({ orientation, rotation }) => {
-        let calculOrientation = orientation;
+    if (Platform.OS === 'android') {
+      Accelerometer.setUpdateInterval(1000);
+    }
+    const subscription =
+      Platform.OS === 'android'
+        ? Accelerometer.addListener(accelerometerData => {
+            const { x, y, z } = accelerometerData;
+            let orientation = DeviceMotionOrientation.Portrait;
+            if (z < 1) {
+              if (Math.abs(x) > Math.abs(y)) {
+                if (x > 0) {
+                  orientation = DeviceMotionOrientation.RightLandscape;
+                } else {
+                  orientation = DeviceMotionOrientation.LeftLandscape;
+                }
+              } else if (y > 0) {
+                orientation = DeviceMotionOrientation.UpsideDown;
+              } else {
+                orientation = DeviceMotionOrientation.Portrait;
+              }
+            }
 
-        // rotation may be null on startup
-        if (Platform.OS === 'android' && rotation) {
-          //this is clearly and android hack, if app is lock in portrait mode, we can't get the orientation
-          //https://github.com/expo/expo/issues/2430
-          calculOrientation = orientationCalculation(
-            rotation.gamma,
-            rotation.beta,
-          );
-        }
+            const visible = Math.abs(orientation) === 90;
+            visibleSharedValue.value = withTiming(visible ? 1 : 0, {
+              duration: 120,
+            });
 
-        if (calculOrientation !== orientationRef.current) {
-          const visible = Math.abs(calculOrientation) === 90;
-          visibleSharedValue.value = withTiming(visible ? 1 : 0, {
-            duration: 120,
+            setOrientation(orientation);
+          })
+        : DeviceMotion.addListener(({ orientation }) => {
+            if (orientation !== orientationRef.current) {
+              const visible = Math.abs(orientation) === 90;
+              visibleSharedValue.value = withTiming(visible ? 1 : 0, {
+                duration: 120,
+              });
+              orientationRef.current = -orientation;
+              setOrientation(-orientation);
+            }
           });
-          orientationRef.current = -calculOrientation;
-          setOrientation(-calculOrientation);
-        }
-      },
-    );
 
-    return () => subscription?.remove();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    return () => subscription.remove();
+  }, [visibleSharedValue]);
 
   const animatedStyle = useAnimatedStyle(
     () => ({
@@ -102,6 +122,8 @@ const HomeContactCardLandscape = ({
     return null;
   }
 
+  const targetHeight = windowHeight + (StatusBar.currentHeight ?? 0);
+
   const smallContactCardHeight = (windowWidth - 40) / CONTACT_CARD_RATIO;
   const scale = (windowWidth - 40) / smallContactCardHeight;
 
@@ -110,12 +132,12 @@ const HomeContactCardLandscape = ({
       style={[
         {
           position: 'absolute',
-          top: (windowHeight - windowWidth) / 2,
-          left: (windowWidth - windowHeight) / 2,
+          top: (targetHeight - windowWidth) / 2,
+          left: (windowWidth - targetHeight) / 2,
           backgroundColor: appearance === 'dark' ? colors.black : colors.white,
           transform: [{ rotate: `${orientation}deg` }],
           height: windowWidth,
-          width: windowHeight,
+          width: targetHeight,
           alignItems: 'center',
           justifyContent: 'center',
         },
@@ -135,28 +157,3 @@ const HomeContactCardLandscape = ({
 };
 
 export default HomeContactCardLandscape;
-
-function orientationCalculation(gamma: number, beta: number) {
-  const ABSOLUTE_GAMMA = Math.abs(gamma);
-  const ABSOLUTE_BETA = Math.abs(beta);
-  const isGammaNegative = Math.sign(gamma) === -1;
-  let orientation = 0;
-
-  if (ABSOLUTE_GAMMA <= 0.04 && ABSOLUTE_BETA <= 0.24) {
-    //Portrait mode, on a flat surface.
-    orientation = 0;
-  } else if (
-    (ABSOLUTE_GAMMA <= 1.0 || ABSOLUTE_GAMMA >= 2.3) &&
-    ABSOLUTE_BETA >= 0.5
-  ) {
-    //General Portrait mode, accounting for forward and back tilt on the top of the phone.
-    orientation = 0;
-  } else if (isGammaNegative) {
-    //Landscape mode with the top of the phone to the left.
-    orientation = -90;
-  } else {
-    //Landscape mode with the top of the phone to the right.
-    orientation = 90;
-  }
-  return orientation;
-}
