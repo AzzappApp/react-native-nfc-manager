@@ -721,7 +721,10 @@ const PhotoWithTextAndTitleEditionScreen = ({
         })}
         maxLength={PHOTO_WITH_TEXT_AND_TITLE_TEXT_MAX_LENGTH}
         onClose={onCloseContentModal}
-        onChangeText={onContentChange}
+        onChangeText={text => {
+          onContentChange(text);
+          onCloseContentModal();
+        }}
         onFocus={() => {
           if (content === undefined) {
             onContentChange('');

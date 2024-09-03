@@ -533,7 +533,10 @@ const BlockTextEditionScreen = ({
         })}
         maxLength={BLOCK_TEXT_MAX_LENGTH}
         onClose={onCloseContentModal}
-        onChangeText={onTextChange}
+        onChangeText={text => {
+          onTextChange(text);
+          onCloseContentModal();
+        }}
       />
     </Container>
   );

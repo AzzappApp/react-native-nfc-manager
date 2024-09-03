@@ -15,7 +15,7 @@ import { relativeDateMinute } from '#helpers/dateHelpers';
 import useAuthState from '#hooks/useAuthState';
 import { useSendReport } from '#hooks/useSendReport';
 import useToggleFollow from '#hooks/useToggleFollow';
-import { POST_MAX_CONTENT_LENGHT } from '#screens/PostCreationScreen/PostContentPanel';
+import { POST_MAX_CONTENT_LENGTH } from '#screens/PostCreationScreen/PostContentPanel';
 import ActivityIndicator from '#ui/ActivityIndicator';
 import BottomSheetModal from '#ui/BottomSheetModal';
 import ExpendableText from '#ui/ExpendableText';
@@ -194,7 +194,7 @@ const PostRendererBottomPanel = ({
       }
     `);
 
-  const [commitUpdatePostContent] =
+  const [commitUpdatePostContent, isLoadingUpdatePostContent] =
     useMutation<PostRendererBottomPanelUpdateContentPostMutation>(graphql`
       mutation PostRendererBottomPanelUpdateContentPostMutation(
         $webCardId: ID!
@@ -220,7 +220,6 @@ const PostRendererBottomPanel = ({
 
   const editPostContent = useCallback(
     (text: string) => {
-      onCloseEditContent();
       commitUpdatePostContent({
         variables: {
           webCardId: post.webCard.id,
@@ -237,6 +236,7 @@ const PostRendererBottomPanel = ({
             },
           },
         },
+        onCompleted: onCloseEditContent,
         onError: error => {
           Sentry.captureException(error);
           Toast.show({
@@ -625,9 +625,11 @@ const PostRendererBottomPanel = ({
             description:
               'Placeholder for text area in post content edition screen',
           })}
-          maxLength={POST_MAX_CONTENT_LENGHT}
+          maxLength={POST_MAX_CONTENT_LENGTH}
           onClose={onCloseEditContent}
+          closeOnBlur={false}
           onChangeText={editPostContent}
+          loading={isLoadingUpdatePostContent}
         />
       </BottomSheetModal>
     </>

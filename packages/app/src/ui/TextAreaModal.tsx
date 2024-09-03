@@ -52,6 +52,8 @@ export type TextAreaModalProps = Omit<
   closeOnBlur?: boolean;
 
   onFocus?: () => void;
+
+  loading?: boolean;
 };
 
 /**
@@ -67,6 +69,7 @@ const TextAreaModal = ({
   ItemTopComponent,
   closeOnBlur = true,
   onFocus,
+  loading,
   ...props
 }: TextAreaModalProps) => {
   const intl = useIntl();
@@ -114,6 +117,7 @@ const TextAreaModal = ({
               })}
               variant="secondary"
               onPress={onCancel}
+              disabled={loading}
             />
           }
           middleElement={
@@ -129,9 +133,9 @@ const TextAreaModal = ({
                 defaultMessage: 'Ok',
                 description: 'Ok button label in text edition modal',
               })}
+              loading={loading}
               onPress={() => {
                 onChangeText(text);
-                onClose();
               }}
             />
           }
@@ -149,6 +153,7 @@ const TextAreaModal = ({
             onBlur={onBlur}
             style={styles.textInput}
             ref={textInputRef}
+            readOnly={loading}
           />
           {maxLength != null && (
             <Text
