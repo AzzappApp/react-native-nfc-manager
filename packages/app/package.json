@@ -1,6 +1,6 @@
 {
   "name": "@azzapp/app",
-  "version": "0.6.0-canary.77",
+  "version": "0.6.0-canary.78",
   "scripts": {
     "test": "jest",
     "typecheck": "tsc --noEmit",
