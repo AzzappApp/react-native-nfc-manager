@@ -91,7 +91,7 @@ import PostScreen from '#screens/PostScreen';
 import ResetPasswordScreen from '#screens/ResetPasswordScreen';
 import SearchScreen from '#screens/SearchScreen';
 import SignInScreen from '#screens/SignInScreen';
-import SignupScreen from '#screens/SignUpScreen';
+import SignUpScreen from '#screens/SignUpScreen';
 import UpdateApplicationScreen from '#screens/UpdateApplicationScreen';
 import UserPayWallScreen from '#screens/UserPayWallScreen';
 import WebCardFormScreen from '#screens/WebCardFormScreen';
@@ -236,7 +236,7 @@ const screens = {
   POST_LIKES: PostLikesScreen,
   RESET_PASSWORD: ResetPasswordScreen,
   SIGN_IN: SignInScreen,
-  SIGN_UP: SignupScreen,
+  SIGN_UP: SignUpScreen,
   CONFIRM_REGISTRATION: ConfirmRegistrationScreen,
   SEARCH: SearchScreen,
   USER_PAY_WALL: UserPayWallScreen,

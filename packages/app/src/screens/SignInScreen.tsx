@@ -8,6 +8,7 @@ import {
   Keyboard,
   Platform,
   useWindowDimensions,
+  StyleSheet,
 } from 'react-native';
 import { KeyboardAvoidingView } from 'react-native-keyboard-controller';
 import { setSharedWebCredentials } from 'react-native-keychain';
@@ -367,14 +368,7 @@ const stylesheet = createStyleSheet(appearance => ({
   root: {
     flex: 1,
   },
-  background: {
-    width: '100%',
-    alignItems: 'center',
-    position: 'absolute',
-    top: 0,
-    backgroundColor: 'black',
-    height: '100%',
-  },
+  background: [StyleSheet.absoluteFill, { backgroundColor: 'black' }],
   logoContainer: {
     flex: 1,
     alignItems: 'center',

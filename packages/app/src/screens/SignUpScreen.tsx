@@ -8,6 +8,7 @@ import {
   Keyboard,
   Platform,
   useWindowDimensions,
+  StyleSheet,
 } from 'react-native';
 import { KeyboardAvoidingView } from 'react-native-keyboard-controller';
 import { setSharedWebCredentials } from 'react-native-keychain';
@@ -44,7 +45,7 @@ import type {
 const TERMS_OF_SERVICE = process.env.TERMS_OF_SERVICE;
 const PRIVACY_POLICY = process.env.PRIVACY_POLICY;
 
-const SignupScreen = () => {
+const SignUpScreen = () => {
   const router = useRouter();
   const [contact, setContact] = useState<EmailPhoneInput>({
     countryCodeOrEmail: 'email',
@@ -410,9 +411,9 @@ const SignupScreen = () => {
   );
 };
 
-export default SignupScreen;
+export default SignUpScreen;
 
-SignupScreen.options = {
+SignUpScreen.options = {
   replaceAnimation: 'push',
   stackAnimation: 'fade',
 };
@@ -422,15 +423,7 @@ const styleSheet = createStyleSheet(appearance => ({
   root: {
     flex: 1,
   },
-  background: {
-    width: '100%',
-    position: 'absolute',
-    top: 0,
-    backgroundColor: 'black',
-    alignItems: 'center',
-    justifyContent: 'center',
-    height: '100%',
-  },
+  background: [StyleSheet.absoluteFill, { backgroundColor: 'black' }],
   content: {
     flex: 1,
   },
