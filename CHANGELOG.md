@@ -1,4 +1,4 @@
-## 0.6.0-canary.70
+## 0.6.0-canary.71
 
 * **fix:**  - android
 * **fix:**  - android UI ([#4844](https://github.com/AzzappApp/azzapp/pull/4844))
