@@ -1,5 +1,10 @@
-## 0.6.0-canary.83
+## 0.6.0-canary.84
 
+* **fix:**  - **api:** deprecate useless fields ([#4862](https://github.com/AzzappApp/azzapp/pull/4862))
+* **feat:**  - **multiUser:** [#4825](https://github.com/AzzappApp/azzapp/pull/4825) add invite url with redirection to appropriate store ([#4855](https://github.com/AzzappApp/azzapp/pull/4855))
+* **fix:**  - **android:** [#4318](https://github.com/AzzappApp/azzapp/pull/4318) labels were ignore on contact creation ([#4839](https://github.com/AzzappApp/azzapp/pull/4839))
+* **fix:**  - **post:** [#4728](https://github.com/AzzappApp/azzapp/pull/4728) wait for update before closing textareamodal ([#4843](https://github.com/AzzappApp/azzapp/pull/4843))
+* **fix:**  - **i18n:** [#4859](https://github.com/AzzappApp/azzapp/pull/4859) put back fr ([#4860](https://github.com/AzzappApp/azzapp/pull/4860))
 * **feat:**  - add a new lottie and design for welcomescreen ([#4851](https://github.com/AzzappApp/azzapp/pull/4851))
 * **fix:**  - **web:** [#4838](https://github.com/AzzappApp/azzapp/pull/4838) increase jwt timeout + error messages ([#4848](https://github.com/AzzappApp/azzapp/pull/4848))
 * **fix:**  - **android:** [#4512](https://github.com/AzzappApp/azzapp/pull/4512) use accelerometer on android to detect orientation ([#4852](https://github.com/AzzappApp/azzapp/pull/4852))
