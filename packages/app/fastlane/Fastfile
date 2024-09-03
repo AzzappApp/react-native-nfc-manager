@@ -230,6 +230,8 @@ platform :android do
       task: ":app:bundle#{android_target}",
       build_type: "Release",
       project_dir: "./android",
+      print_command_output: true,
+      print_command: true,
       properties: {
         "android.injected.signing.store.file" => KEYSTORE_PATH,
         "android.injected.signing.store.password" => KEYSTORE_PASSWORD,

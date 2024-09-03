@@ -439,7 +439,6 @@ jobs:
           jq . ${{ github.workspace }}/play_config.json
 
       - name: Build android application
-        working-directory: packages/app
         run: yarn build:android
         env:
           NEXT_PUBLIC_URL: ${{ vars.NEXT_PUBLIC_URL }}
@@ -464,10 +463,9 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: app-${{ vars.ANDROID_BUILD_TASK }}-release.aab
-          path: ${{ github.workspace }}/packages/app/build/output/bundle/${{ vars.ANDROID_BUILD_TASK }}Release/app-${{ vars.ANDROID_BUILD_TASK }}-release.aab
+          path: ${{ github.workspace }}/packages/app/android/build/output/bundle/${{ vars.ANDROID_BUILD_TASK }}Release/app-${{ vars.ANDROID_BUILD_TASK }}-release.aab
 
       - name: Deploy android application
-        working-directory: packages/app
         run: bundle exec fastlane android deploy
         env:
           DEPLOYMENT_ENVIRONMENT: ${{ vars.NEXT_PUBLIC_PLATFORM }}
@@ -478,4 +476,4 @@ jobs:
           ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
           ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
           PLAY_CONFIG_PATH: ${{ github.workspace }}/play_config.json
-          AAB_PATH: ${{ github.workspace }}/packages/app/build/output/bundle/${{ vars.ANDROID_BUILD_TASK }}Release/app-${{ vars.ANDROID_BUILD_TASK }}-release.aab
+          AAB_PATH: ${{ github.workspace }}/packages/app/android/build/output/bundle/${{ vars.ANDROID_BUILD_TASK }}Release/app-${{ vars.ANDROID_BUILD_TASK }}-release.aab
