@@ -7,6 +7,9 @@ const webMessages: Record<Locale, Record<string, string>> = {
   get 'en-US'() {
     return require('@azzapp/i18n/compiled/web/en-US.json');
   },
+  get fr() {
+    return require('@azzapp/i18n/compiled/web/fr.json');
+  },
   // disabled for now
   // get da() {
   //   return require('@azzapp/i18n/compiled/web/da.json');

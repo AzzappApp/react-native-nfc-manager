@@ -96,6 +96,9 @@ export const messages: Record<Locale, Record<string, string>> = {
   get 'en-US'() {
     return require('@azzapp/i18n/compiled/app/en-US.json');
   },
+  get fr() {
+    return require('@azzapp/i18n/compiled/app/fr.json');
+  },
   // disabled for now
   // get da() {
   //   return require('@azzapp/i18n/compiled/app/da.json');

@@ -16,6 +16,6 @@
     "clean": "rm -rf node_modules && rm -rf compiled"
   },
   "dependencies": {
-    "@formatjs/cli": "^6.2.10"
+    "@formatjs/cli": "^6.2.12"
   }
 }

@@ -279,7 +279,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@azzapp/i18n@workspace:packages/i18n"
   dependencies:
-    "@formatjs/cli": ^6.2.10
+    "@formatjs/cli": ^6.2.12
   languageName: unknown
   linkType: soft
 
@@ -5699,14 +5699,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@formatjs/cli@npm:^6.2.10":
-  version: 6.2.10
-  resolution: "@formatjs/cli@npm:6.2.10"
+"@formatjs/cli@npm:^6.2.12":
+  version: 6.2.12
+  resolution: "@formatjs/cli@npm:6.2.12"
   peerDependencies:
     "@glimmer/env": ^0.1.7
-    "@glimmer/reference": ^0.91.1
-    "@glimmer/syntax": ^0.91.1
-    "@glimmer/validator": ^0.91.1
+    "@glimmer/reference": ^0.91.1 || ^0.92.0
+    "@glimmer/syntax": ^0.92.0
+    "@glimmer/validator": ^0.92.0
     "@vue/compiler-core": ^3.4.0
     content-tag: ^2.0.1
     ember-template-recast: ^6.1.4
@@ -5730,7 +5730,7 @@ __metadata:
       optional: true
   bin:
     formatjs: bin/formatjs
-  checksum: 8862c8b0cab99e8705500e9fc1caef8cce7b6ad988c65863d8d48c58c314a65f9bed12d3db1cf9c81f8237066978c555464d5391371bf67b5dd1bc32f76037cd
+  checksum: f523dc51102e5f3cc7e26b99cf9e30c3a445e95131929f1278249c27d67f8f6beef2f466a08623be5839c87cc32847f1e624a35efab376180e7199372ee18158
   languageName: node
   linkType: hard
 

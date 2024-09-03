@@ -39,7 +39,7 @@ describe('localeHelpers', () => {
 
       init();
 
-      expect(getCurrentLocale()).toBe('en-US');
+      expect(getCurrentLocale()).toBe('fr');
     });
 
     test('should set the best locale close to current locale', () => {
@@ -103,7 +103,7 @@ describe('localeHelpers', () => {
         ]);
 
       init();
-      expect(getCurrentLocale()).toBe('en-US');
+      expect(getCurrentLocale()).toBe('fr');
       expect(spy).toHaveBeenCalledTimes(1);
 
       mockListener!('background');
@@ -140,7 +140,7 @@ describe('localeHelpers', () => {
         .spyOn(console, 'warn')
         .mockImplementationOnce(() => void 0);
       init();
-      expect(getCurrentLocale()).toBe('en-US');
+      expect(getCurrentLocale()).toBe('fr');
       expect(consoleWarn).not.toHaveBeenCalled();
       consoleWarn.mockRestore();
     });
@@ -163,7 +163,7 @@ describe('localeHelpers', () => {
       const { result } = renderHook(() =>
         localHelpersModule.useCurrentLocale(),
       );
-      expect(result.current).toBe('en-US');
+      expect(result.current).toBe('fr');
     });
     test('should change when the currentLocale change', () => {
       const { result } = renderHook(() =>
@@ -181,7 +181,7 @@ describe('localeHelpers', () => {
         mockListener?.('inactive');
         mockListener?.('active');
       });
-      expect(result.current).toBe('en-US');
+      expect(result.current).toBe('fr');
       mock.mockReturnValueOnce([
         {
           languageCode: 'es',
@@ -223,7 +223,7 @@ describe('localeHelpers', () => {
         .spyOn(console, 'warn')
         .mockImplementationOnce(() => void 0);
       init();
-      expect(getCurrentLocale()).toBe('en-US');
+      expect(getCurrentLocale()).toBe('fr');
       expect(consoleWarn).not.toHaveBeenCalled();
       consoleWarn.mockRestore();
     });
@@ -245,7 +245,7 @@ describe('localeHelpers', () => {
       const { result } = renderHook(() =>
         localHelpersModule.useCurrentLocale(),
       );
-      expect(result.current).toBe('en-US');
+      expect(result.current).toBe('fr');
     });
     test('should change when the currentLocale change', () => {
       const { result } = renderHook(() =>
@@ -263,7 +263,7 @@ describe('localeHelpers', () => {
         mockListener?.('inactive');
         mockListener?.('active');
       });
-      expect(result.current).toBe('en-US');
+      expect(result.current).toBe('fr');
       mock.mockReturnValueOnce([
         {
           languageCode: 'es',
