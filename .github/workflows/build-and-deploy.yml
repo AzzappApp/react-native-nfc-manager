@@ -464,7 +464,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: app-${{ vars.ANDROID_BUILD_TASK }}-release.aab
-          path: ${{ github.workspace }}/packages/app/android/app/build/output/bundle/${{ vars.ANDROID_BUILD_TASK }}Release/app-${{ vars.ANDROID_BUILD_TASK }}-release.aab
+          path: ${{ github.workspace }}/packages/app/android/app/build/outputs/bundle/${{ vars.ANDROID_BUILD_TASK }}Release/app-${{ vars.ANDROID_BUILD_TASK }}-release.aab
 
       - name: Deploy android application
         run: bundle exec fastlane android deploy
@@ -478,4 +478,4 @@ jobs:
           ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
           ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
           PLAY_CONFIG_PATH: ${{ github.workspace }}/play_config.json
-          AAB_PATH: ${{ github.workspace }}/packages/app/android/app/build/output/bundle/${{ vars.ANDROID_BUILD_TASK }}Release/app-${{ vars.ANDROID_BUILD_TASK }}-release.aab
+          AAB_PATH: ${{ github.workspace }}/packages/app/android/app/build/outputs/bundle/${{ vars.ANDROID_BUILD_TASK }}Release/app-${{ vars.ANDROID_BUILD_TASK }}-release.aab
