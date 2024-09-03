@@ -440,6 +440,7 @@ jobs:
 
       - name: Build android application
         run: yarn build:android
+        working-directory: packages/app
         env:
           NEXT_PUBLIC_URL: ${{ vars.NEXT_PUBLIC_URL }}
           NEXT_PUBLIC_API_ENDPOINT: ${{ vars.NEXT_PUBLIC_API_ENDPOINT }}
@@ -467,6 +468,7 @@ jobs:
 
       - name: Deploy android application
         run: bundle exec fastlane android deploy
+        working-directory: packages/app
         env:
           DEPLOYMENT_ENVIRONMENT: ${{ vars.NEXT_PUBLIC_PLATFORM }}
           ANDROID_APP_IDENTIFIER: ${{ vars.ANDROID_APP_IDENTIFIER }}
