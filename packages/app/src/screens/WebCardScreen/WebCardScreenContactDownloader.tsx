@@ -233,13 +233,21 @@ const buildContact = async (
       id: `${profileId}-${address[1]}`,
     })),
     phoneNumbers: phoneNumbers.map(phone => ({
-      label: phone[0],
+      label:
+        Platform.OS === 'android' && phone[0] !== 'Main'
+          ? phone[0] === 'Fax'
+            ? 'workFax'
+            : phone[0].toLowerCase()
+          : phone[0],
       number: phone[1],
       isPrimary: phone[0] === 'Main',
       id: `${profileId}-${phone[1]}`,
     })),
     emails: emails.map(email => ({
-      label: email[0],
+      label:
+        Platform.OS === 'android' && email[0] !== 'Main'
+          ? email[0].toLowerCase()
+          : email[0],
       email: email[1],
       isPrimary: email[0] === 'Main',
       id: `${profileId}-${email[1]}`,

@@ -1,5 +1,5 @@
 diff --git a/android/src/main/java/expo/modules/contacts/ContactsModule.kt b/android/src/main/java/expo/modules/contacts/ContactsModule.kt
-index 77266bbdc437dc3bda9fb1552db4afc82ff303fb..f06d9078576b1fbac77ac6b7ffd9a79034b1347e 100644
+index 77266bbdc437dc3bda9fb1552db4afc82ff303fb..d5b10a3f58a3309ec274c215c1655950e9766ef8 100644
 --- a/android/src/main/java/expo/modules/contacts/ContactsModule.kt
 +++ b/android/src/main/java/expo/modules/contacts/ContactsModule.kt
 @@ -67,6 +67,7 @@ private val defaultFields = setOf(
@@ -66,31 +66,84 @@ index 77266bbdc437dc3bda9fb1552db4afc82ff303fb..f06d9078576b1fbac77ac6b7ffd9a790
    }
  
    private fun presentEditForm(contact: Contact, promise: Promise) {
+diff --git a/android/src/main/java/expo/modules/contacts/models/BaseModel.kt b/android/src/main/java/expo/modules/contacts/models/BaseModel.kt
+index 7cede315fb2d316e94bea65e14088ee87f897e78..9ca92a40d6f655e0b3b7db3791412fadd18a29ce 100644
+--- a/android/src/main/java/expo/modules/contacts/models/BaseModel.kt
++++ b/android/src/main/java/expo/modules/contacts/models/BaseModel.kt
+@@ -73,7 +73,7 @@ abstract class BaseModel : CommonProvider {
+     get() = getString(typeAlias)
+ 
+   private val isPrimary: Int
+-    get() = if (map.containsKey(isPrimaryAlias)) map.getInt(isPrimaryAlias) else 0
++    get() = if (map.containsKey(isPrimaryAlias)) if(map.getBoolean(isPrimaryAlias)) 1 else 0 else 0
+ 
+   fun getString(key: String?): String? {
+     return if (map.containsKey(key)) map.getString(key) else null
+@@ -118,7 +118,7 @@ abstract class BaseModel : CommonProvider {
+       return ContentValues().apply {
+         put(Columns.MIMETYPE, contentType)
+         put(Columns.DATA, data)
+-        put(Columns.TYPE, type)
++        put(Columns.TYPE, mapStringToType(label))
+         put(Columns.LABEL, label)
+         put(Columns.ID, id)
+         put(Columns.IS_PRIMARY, isPrimary)
 diff --git a/android/src/main/java/expo/modules/contacts/models/DateModel.kt b/android/src/main/java/expo/modules/contacts/models/DateModel.kt
-index 9ff83690ab4d7ceec1e8e0142b5f08fd3101fc5d..c8ff38d88b777b2a198329966e0995042397da2a 100644
+index 9ff83690ab4d7ceec1e8e0142b5f08fd3101fc5d..f8fd8bdb98bfdc5920dd7e66c902fff18470f418 100644
 --- a/android/src/main/java/expo/modules/contacts/models/DateModel.kt
 +++ b/android/src/main/java/expo/modules/contacts/models/DateModel.kt
-@@ -1,7 +1,10 @@
+@@ -1,10 +1,10 @@
  package expo.modules.contacts.models
  
 +import android.content.ContentProviderOperation
  import android.database.Cursor
 +import android.provider.ContactsContract
  import android.provider.ContactsContract.CommonDataKinds
-+import android.util.Log
  import expo.modules.contacts.Columns
- import java.text.SimpleDateFormat
- import java.util.Calendar
-@@ -22,7 +25,7 @@ class DateModel : BaseModel() {
+-import java.text.SimpleDateFormat
+-import java.util.Calendar
+ import java.util.Locale
+ 
+ class DateModel : BaseModel() {
+@@ -22,25 +22,20 @@ class DateModel : BaseModel() {
  
    override fun fromMap(readableMap: Map<String, Any?>) {
      super.fromMap(readableMap)
 -    val dateString = readableMap["date"] as String?
-+    val dateString = parseDateFromMap(readableMap) as String?
-     val hasYear = !dateString!!.startsWith("--")
-     val calendar = Calendar.getInstance()
-     val datePattern = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
-@@ -53,4 +56,49 @@ class DateModel : BaseModel() {
+-    val hasYear = !dateString!!.startsWith("--")
+-    val calendar = Calendar.getInstance()
+-    val datePattern = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+-    val noYearPattern = SimpleDateFormat("--MM-dd", Locale.getDefault())
+-    try {
+-      if (hasYear) {
+-        calendar.time = datePattern.parse(dateString)!!
+-      } else {
+-        calendar.time = noYearPattern.parse(dateString)!!
+-      }
+-    } catch (e: Exception) {
+-      // TODO: ??
++
++    val year = (readableMap["year"] as? Double)?.toInt()
++    val month = (readableMap["month"] as? Double)?.toInt()
++    val day = (readableMap["day"] as? Double)?.toInt()
++
++    if (year != null) {
++      map.putInt("year", year)
++    }
++    if (month != null) {
++      map.putInt("month", month + 1)
+     }
+-    if (hasYear) {
+-      map.putInt("year", calendar[Calendar.YEAR])
++    if (day != null) {
++      map.putInt("day", day)
+     }
+-    map.putInt("month", calendar[Calendar.MONTH] + 1)
+-    map.putInt("day", calendar[Calendar.DAY_OF_MONTH])
+   }
+ 
+   override fun getLabelFromCursor(cursor: Cursor): String {
+@@ -53,4 +48,35 @@ class DateModel : BaseModel() {
          else -> "unknown"
        }
    }
@@ -104,39 +157,117 @@ index 9ff83690ab4d7ceec1e8e0142b5f08fd3101fc5d..c8ff38d88b777b2a198329966e099504
 +    }
 +
 +    return op.withValue(Columns.MIMETYPE, contentType)
-+            .withValue(ContactsContract.CommonDataKinds.Event.TYPE, mapStringToType(label))
-+            .withValue(ContactsContract.CommonDataKinds.Event.START_DATE, formatDateString())
-+            .withValue(ContactsContract.CommonDataKinds.Event.LABEL, label)
-+            .build()
-+  }
-+
-+  private fun parseDateFromMap(dateMap: Map<String, Any?>): String? {
-+    val year = (dateMap["year"] as? Double)?.toInt()
-+    val month = (dateMap["month"] as? Double)?.toInt()
-+    val day = (dateMap["day"] as? Double)?.toInt()
-+
-+    return if (year != null && month != null && day != null) {
-+      val calendar = Calendar.getInstance()
-+      calendar.set(Calendar.YEAR, year)
-+      calendar.set(Calendar.MONTH, month) 
-+      calendar.set(Calendar.DAY_OF_MONTH, day)
-+
-+      val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
-+      dateFormat.format(calendar.time)
-+    } else {
-+      null
-+    }
++      .withValue(ContactsContract.CommonDataKinds.Event.TYPE, mapStringToType(label))
++      .withValue(ContactsContract.CommonDataKinds.Event.START_DATE, formatDateString())
++      .withValue(ContactsContract.CommonDataKinds.Event.LABEL, label)
++      .build()
 +  }
 +
 +  private fun formatDateString(): String? {
-+    val year = map.getInt("year", -1)
-+    val month = map.getInt("month", -1)
-+    val day = map.getInt("day", -1)
++    val year = map.getInt("year", -1).takeIf { it > 0 }
++    val month = map.getInt("month", -1).takeIf { it > 0 }
++    val day = map.getInt("day", -1).takeIf { it > 0 }
 +
-+    return if (year > 0 && month > 0 && day > 0) {
-+      String.format(Locale.getDefault(), "%04d-%02d-%02d", year, month, day)
-+    } else {
-+      null
++    return when {
++      year != null && month != null && day != null ->
++        String.format(Locale.getDefault(), "%04d-%02d-%02d", year, month, day)
++
++      month != null && day != null ->
++        String.format(Locale.getDefault(), "--%02d-%02d", month, day)
++
++      else -> null
 +    }
 +  }
  }
+\ No newline at end of file
+diff --git a/android/src/main/java/expo/modules/contacts/models/EmailModel.kt b/android/src/main/java/expo/modules/contacts/models/EmailModel.kt
+index 74ce36a325d5a39f5ee6d77650f61c0cf77b8ca3..5d74ec068c1dad7800d3242354615203e9398d4e 100644
+--- a/android/src/main/java/expo/modules/contacts/models/EmailModel.kt
++++ b/android/src/main/java/expo/modules/contacts/models/EmailModel.kt
+@@ -1,21 +1,32 @@
+ package expo.modules.contacts.models
+ 
+ import android.database.Cursor
+-import android.provider.ContactsContract
++import android.provider.ContactsContract.CommonDataKinds
+ import expo.modules.contacts.Columns
+ 
+ class EmailModel : BaseModel() {
+-  override val contentType: String = ContactsContract.CommonDataKinds.Email.CONTENT_ITEM_TYPE
++  override val contentType: String = CommonDataKinds.Email.CONTENT_ITEM_TYPE
+   override val dataAlias: String = "email"
+ 
++  override fun mapStringToType(label: String?): Int {
++    val mailType = when (label) {
++      "home" -> CommonDataKinds.Phone.TYPE_HOME
++      "mobile" -> CommonDataKinds.Phone.TYPE_MOBILE
++      "work" -> CommonDataKinds.Phone.TYPE_WORK
++      "other" -> CommonDataKinds.Phone.TYPE_OTHER
++      else -> Columns.TYPE_CUSTOM
++    }
++    return mailType
++  }
++
+   override fun getLabelFromCursor(cursor: Cursor): String {
+     val label = super.getLabelFromCursor(cursor)
+     return label
+       ?: when (cursor.getInt(cursor.getColumnIndexOrThrow(Columns.TYPE))) {
+-        ContactsContract.CommonDataKinds.Email.TYPE_HOME -> "home"
+-        ContactsContract.CommonDataKinds.Email.TYPE_WORK -> "work"
+-        ContactsContract.CommonDataKinds.Email.TYPE_MOBILE -> "mobile"
+-        ContactsContract.CommonDataKinds.Email.TYPE_OTHER -> "other"
++        CommonDataKinds.Email.TYPE_HOME -> "home"
++        CommonDataKinds.Email.TYPE_WORK -> "work"
++        CommonDataKinds.Email.TYPE_MOBILE -> "mobile"
++        CommonDataKinds.Email.TYPE_OTHER -> "other"
+         else -> "unknown"
+       }
+   }
+diff --git a/android/src/main/java/expo/modules/contacts/models/PhoneNumberModel.kt b/android/src/main/java/expo/modules/contacts/models/PhoneNumberModel.kt
+index 7bef73cf3b8943ba4fc231856ef2975b9f4a2e41..132ae7287daa8c221c4b1f1fae2f6a13ccc77a4f 100644
+--- a/android/src/main/java/expo/modules/contacts/models/PhoneNumberModel.kt
++++ b/android/src/main/java/expo/modules/contacts/models/PhoneNumberModel.kt
+@@ -41,13 +41,30 @@ class PhoneNumberModel : BaseModel() {
+     return phoneType
+   }
+ 
+-  override fun getLabelFromCursor(cursor: Cursor): String {
++ override fun getLabelFromCursor(cursor: Cursor): String {
+     val label = super.getLabelFromCursor(cursor)
++
+     return label
+       ?: when (cursor.getInt(cursor.getColumnIndexOrThrow(Columns.TYPE))) {
+         CommonDataKinds.Phone.TYPE_HOME -> "home"
+         CommonDataKinds.Phone.TYPE_WORK -> "work"
+         CommonDataKinds.Phone.TYPE_MOBILE -> "mobile"
++        CommonDataKinds.Phone.TYPE_FAX_WORK -> "faxWork"
++        CommonDataKinds.Phone.TYPE_FAX_HOME -> "faxHome"
++        CommonDataKinds.Phone.TYPE_PAGER -> "pager"
++        CommonDataKinds.Phone.TYPE_CALLBACK -> "callback"
++        CommonDataKinds.Phone.TYPE_CAR -> "car"
++        CommonDataKinds.Phone.TYPE_COMPANY_MAIN -> "companyMain"
++        CommonDataKinds.Phone.TYPE_ISDN -> "isdn"
++        CommonDataKinds.Phone.TYPE_MAIN -> "main"
++        CommonDataKinds.Phone.TYPE_OTHER_FAX -> "otherFax"
++        CommonDataKinds.Phone.TYPE_RADIO -> "radio"
++        CommonDataKinds.Phone.TYPE_TELEX -> "telex"
++        CommonDataKinds.Phone.TYPE_TTY_TDD -> "ttyTdd"
++        CommonDataKinds.Phone.TYPE_WORK_MOBILE -> "workMobile"
++        CommonDataKinds.Phone.TYPE_WORK_PAGER -> "workPager"
++        CommonDataKinds.Phone.TYPE_ASSISTANT -> "assistant"
++        CommonDataKinds.Phone.TYPE_MMS -> "mms"
+         CommonDataKinds.Phone.TYPE_OTHER -> "other"
+         else -> "unknown"
+       }
+diff --git a/android/src/main/java/expo/modules/contacts/models/PostalAddressModel.kt b/android/src/main/java/expo/modules/contacts/models/PostalAddressModel.kt
+index fb43686cb6de23dff42c0774f1210558c69f4adc..9bfed69e26bccd4eeaecffba2df50e03318938cd 100644
+--- a/android/src/main/java/expo/modules/contacts/models/PostalAddressModel.kt
++++ b/android/src/main/java/expo/modules/contacts/models/PostalAddressModel.kt
+@@ -14,6 +14,7 @@ class PostalAddressModel : BaseModel() {
+     val postalAddressType = when (label) {
+       "home" -> ContactsContract.CommonDataKinds.StructuredPostal.TYPE_HOME
+       "work" -> ContactsContract.CommonDataKinds.StructuredPostal.TYPE_WORK
++      "other" -> ContactsContract.CommonDataKinds.StructuredPostal.TYPE_OTHER
+       else -> ContactsContract.CommonDataKinds.StructuredPostal.TYPE_OTHER
+     }
+     return postalAddressType
