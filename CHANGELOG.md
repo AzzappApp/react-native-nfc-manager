@@ -1,4 +1,4 @@
-## 0.6.0-canary.66
+## 0.6.0-canary.67
 
 * **fix:**  - fastlane capitalize
 * **fix:**  - android keystore creation
