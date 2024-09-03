@@ -87,14 +87,14 @@ jobs:
       - name: JavaScript build
         run: yarn build-app-dependencies
 
-      # - name: Lint
-      #   run: yarn lint
+      - name: Lint
+        run: yarn lint
 
-      # - name: Type check
-      #   run: yarn typecheck
+      - name: Type check
+        run: yarn typecheck
 
-      # - name: Test
-      #   run: yarn test
+      - name: Test
+        run: yarn test
 
       ############################################
       #
@@ -272,30 +272,30 @@ jobs:
       # Deploy the web app to Vercel
       #
       ############################################
-      # - name: Azzapp Web - Pull Vercel configuration
-      #   env:
-      #     VERCEL_PROJECT_ID: 'azzapp'
-      #   run: |
-      #     ENVIRONMENT="preview"
-      #     ADDITIONAL_ARGS=""
-      #     GITHUB_REF="${{ github.ref }}"
-      #     if [ "$GITHUB_REF" == "refs/heads/stable" ]; then
-      #       ENVIRONMENT="production"
-      #     elif [ "$GITHUB_REF" == "refs/heads/main" ]; then
-      #       ADDITIONAL_ARGS="--git-branch=main"
-      #     fi
-      #     vercel pull --yes --environment=$ENVIRONMENT --token=${{ secrets.VERCEL_TOKEN }} $ADDITIONAL_ARGS
+      - name: Azzapp Web - Pull Vercel configuration
+        env:
+          VERCEL_PROJECT_ID: 'azzapp'
+        run: |
+          ENVIRONMENT="preview"
+          ADDITIONAL_ARGS=""
+          GITHUB_REF="${{ github.ref }}"
+          if [ "$GITHUB_REF" == "refs/heads/stable" ]; then
+            ENVIRONMENT="production"
+          elif [ "$GITHUB_REF" == "refs/heads/main" ]; then
+            ADDITIONAL_ARGS="--git-branch=main"
+          fi
+          vercel pull --yes --environment=$ENVIRONMENT --token=${{ secrets.VERCEL_TOKEN }} $ADDITIONAL_ARGS
 
-      # - name: Azzapp Web - Vercel deployment
-      #   env:
-      #     VERCEL_PROJECT_ID: 'azzapp'
-      #   run: |
-      #     ADDITIONAL_ARGS=""
-      #     GITHUB_REF="${{ github.ref }}"
-      #     if [ "$GITHUB_REF" == "refs/heads/stable" ]; then
-      #       ADDITIONAL_ARGS="--prod"
-      #     fi
-      #     vercel deploy --token=${{ secrets.VERCEL_TOKEN }} --meta githubCommitRef=${{ github.ref_name }} $ADDITIONAL_ARGS
+      - name: Azzapp Web - Vercel deployment
+        env:
+          VERCEL_PROJECT_ID: 'azzapp'
+        run: |
+          ADDITIONAL_ARGS=""
+          GITHUB_REF="${{ github.ref }}"
+          if [ "$GITHUB_REF" == "refs/heads/stable" ]; then
+            ADDITIONAL_ARGS="--prod"
+          fi
+          vercel deploy --token=${{ secrets.VERCEL_TOKEN }} --meta githubCommitRef=${{ github.ref_name }} $ADDITIONAL_ARGS
 
       ############################################
       #
@@ -305,31 +305,31 @@ jobs:
 
       # Vercel already installed in web app deployment
 
-      # - name: Azzapp Backoffice - Pull Vercel configuration
-      #   env:
-      #     VERCEL_PROJECT_ID: 'azzapp-backoffice'
-      #   run: |
-      #     ENVIRONMENT="preview"
-      #     ADDITIONAL_ARGS=""
-      #     GITHUB_REF="${{ github.ref }}"
-      #     if [ "$GITHUB_REF" == "refs/heads/stable" ]; then
-      #       ENVIRONMENT="production"
-      #     elif [ "$GITHUB_REF" == "refs/heads/main" ]; then
-      #       ADDITIONAL_ARGS="--git-branch=main"
-      #     fi
-      #     vercel pull --yes --environment=$ENVIRONMENT --token=${{ secrets.VERCEL_TOKEN }} $ADDITIONAL_ARGS
+      - name: Azzapp Backoffice - Pull Vercel configuration
+        env:
+          VERCEL_PROJECT_ID: 'azzapp-backoffice'
+        run: |
+          ENVIRONMENT="preview"
+          ADDITIONAL_ARGS=""
+          GITHUB_REF="${{ github.ref }}"
+          if [ "$GITHUB_REF" == "refs/heads/stable" ]; then
+            ENVIRONMENT="production"
+          elif [ "$GITHUB_REF" == "refs/heads/main" ]; then
+            ADDITIONAL_ARGS="--git-branch=main"
+          fi
+          vercel pull --yes --environment=$ENVIRONMENT --token=${{ secrets.VERCEL_TOKEN }} $ADDITIONAL_ARGS
 
-      # - name: Azzapp Backoffice - Vercel deployment
-      #   env:
-      #     VERCEL_PROJECT_ID: 'azzapp-backoffice'
-      #   run: |
-      #     ADDITIONAL_ARGS=""
-      #     GITHUB_REF="${{ github.ref }}"
-      #     if [ "$GITHUB_REF" == "refs/heads/stable" ]; then
-      #       ADDITIONAL_ARGS="--prod"
-      #     fi
-      #     rm -fr ./packages/web/.next
-      #     vercel deploy --token=${{ secrets.VERCEL_TOKEN }} --meta githubCommitRef=${{ github.ref_name }} $ADDITIONAL_ARGS
+      - name: Azzapp Backoffice - Vercel deployment
+        env:
+          VERCEL_PROJECT_ID: 'azzapp-backoffice'
+        run: |
+          ADDITIONAL_ARGS=""
+          GITHUB_REF="${{ github.ref }}"
+          if [ "$GITHUB_REF" == "refs/heads/stable" ]; then
+            ADDITIONAL_ARGS="--prod"
+          fi
+          rm -fr ./packages/web/.next
+          vercel deploy --token=${{ secrets.VERCEL_TOKEN }} --meta githubCommitRef=${{ github.ref_name }} $ADDITIONAL_ARGS
 
       ############################################
       #
@@ -341,71 +341,71 @@ jobs:
           working-directory: packages/app
           bundler-cache: true
 
-      # - name: Cache CocoaPods
-      #   uses: actions/cache@v3
-      #   with:
-      #     path: packages/app/ios/Pods
-      #     key: ${{ runner.os }}-pods-${{ hashFiles('packages/app/ios/Podfile.lock') }}
+      - name: Cache CocoaPods
+        uses: actions/cache@v3
+        with:
+          path: packages/app/ios/Pods
+          key: ${{ runner.os }}-pods-${{ hashFiles('packages/app/ios/Podfile.lock') }}
 
-      # - name: Pod install
-      #   working-directory: packages/app/ios
-      #   run: bundle exec pod install
+      - name: Pod install
+        working-directory: packages/app/ios
+        run: bundle exec pod install
 
-      # - name: Setup Xcode env
-      #   run: |
-      #     echo "Setup node for xcode to $(command -v node)"
-      #     echo "export NODE_BINARY=$(command -v node)" > ./packages/app/ios/.xcode.env
-      #     echo "export NODE_BINARY=$(command -v node)" > ./packages/app/ios/.xcode.env.local
+      - name: Setup Xcode env
+        run: |
+          echo "Setup node for xcode to $(command -v node)"
+          echo "export NODE_BINARY=$(command -v node)" > ./packages/app/ios/.xcode.env
+          echo "export NODE_BINARY=$(command -v node)" > ./packages/app/ios/.xcode.env.local
 
-      # - name: Build ios application
-      #   working-directory: packages/app
-      #   run: yarn build:ios
-      #   env:
-      #     NEXT_PUBLIC_URL: ${{ vars.NEXT_PUBLIC_URL }}
-      #     NEXT_PUBLIC_API_ENDPOINT: ${{ vars.NEXT_PUBLIC_API_ENDPOINT }}
-      #     DEPLOYMENT_ENVIRONMENT: ${{ vars.NEXT_PUBLIC_PLATFORM }}
-      #     PURCHASE_IOS_KEY: ${{ vars.PURCHASE_IOS_KEY }}
-      #     PURCHASE_ANDROID_KEY: ${{ vars.PURCHASE_ANDROID_KEY }}
-      #     APP_WEBSHARED_CREDENTIALS: ${{ vars.APP_WEBSHARED_CREDENTIALS }}
-      #     SENTRY_DSN: 'https://13a33b3788344ceea14cf298a220fead@o4505353883680768.ingest.sentry.io/4505358469038080'
-      #     TERMS_OF_SERVICE: https://web.azzapp.com/legal/terms-of-service
-      #     PRIVACY_POLICY: https://web.azzapp.com/legal/privacy
-      #     ABOUT: https://web.azzapp.com/company/about_us
-      #     FAQ: https://web.azzapp.com/company/faq
-      #     IOS_APP_IDENTIFIER: ${{ vars.IOS_APP_IDENTIFIER }}
-      #     IOS_APPCLIP_IDENTIFIER: ${{ vars.IOS_APPCLIP_IDENTIFIER }}
-      #     IOS_SCHEME: ${{ vars.IOS_SCHEME }}
-      #     IOS_PROFILE_ID: ${{ vars.IOS_PROFILE_ID }}
-      #     IOS_PROFILECLIP_ID: ${{ vars.IOS_PROFILECLIP_ID }}
-      #     IOS_APPCLIP_SCHEME: ${{ vars.IOS_APPCLIP_SCHEME }}
-      #     IOS_CODE_SIGNING_IDENTITY: ${{ vars.IOS_CODE_SIGNING_IDENTITY }}
-      #     IOS_EXPORT_METHOD: ${{ vars.IOS_EXPORT_METHOD }}
-      #     IOS_CERTIFICATE_P12_PASSWORD: ${{ secrets.IOS_CERTIFICATE_P12_PASSWORD }}
-      #     APP_STORE_CONNECT_API_KEY: ${{ secrets.APP_STORE_CONNECT_API_KEY }}
+      - name: Build ios application
+        working-directory: packages/app
+        run: yarn build:ios
+        env:
+          NEXT_PUBLIC_URL: ${{ vars.NEXT_PUBLIC_URL }}
+          NEXT_PUBLIC_API_ENDPOINT: ${{ vars.NEXT_PUBLIC_API_ENDPOINT }}
+          DEPLOYMENT_ENVIRONMENT: ${{ vars.NEXT_PUBLIC_PLATFORM }}
+          PURCHASE_IOS_KEY: ${{ vars.PURCHASE_IOS_KEY }}
+          PURCHASE_ANDROID_KEY: ${{ vars.PURCHASE_ANDROID_KEY }}
+          APP_WEBSHARED_CREDENTIALS: ${{ vars.APP_WEBSHARED_CREDENTIALS }}
+          SENTRY_DSN: 'https://13a33b3788344ceea14cf298a220fead@o4505353883680768.ingest.sentry.io/4505358469038080'
+          TERMS_OF_SERVICE: https://web.azzapp.com/legal/terms-of-service
+          PRIVACY_POLICY: https://web.azzapp.com/legal/privacy
+          ABOUT: https://web.azzapp.com/company/about_us
+          FAQ: https://web.azzapp.com/company/faq
+          IOS_APP_IDENTIFIER: ${{ vars.IOS_APP_IDENTIFIER }}
+          IOS_APPCLIP_IDENTIFIER: ${{ vars.IOS_APPCLIP_IDENTIFIER }}
+          IOS_SCHEME: ${{ vars.IOS_SCHEME }}
+          IOS_PROFILE_ID: ${{ vars.IOS_PROFILE_ID }}
+          IOS_PROFILECLIP_ID: ${{ vars.IOS_PROFILECLIP_ID }}
+          IOS_APPCLIP_SCHEME: ${{ vars.IOS_APPCLIP_SCHEME }}
+          IOS_CODE_SIGNING_IDENTITY: ${{ vars.IOS_CODE_SIGNING_IDENTITY }}
+          IOS_EXPORT_METHOD: ${{ vars.IOS_EXPORT_METHOD }}
+          IOS_CERTIFICATE_P12_PASSWORD: ${{ secrets.IOS_CERTIFICATE_P12_PASSWORD }}
+          APP_STORE_CONNECT_API_KEY: ${{ secrets.APP_STORE_CONNECT_API_KEY }}
 
-      # - name: Upload ios artifact
-      #   uses: actions/upload-artifact@v4
-      #   with:
-      #     name: ${{ vars.IOS_SCHEME }}.ipa
-      #     path: packages/app/fastlane/builds/${{ vars.IOS_SCHEME }}.ipa
+      - name: Upload ios artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ vars.IOS_SCHEME }}.ipa
+          path: packages/app/fastlane/builds/${{ vars.IOS_SCHEME }}.ipa
 
-      # - name: Upload ios dSYM
-      #   uses: actions/upload-artifact@v4
-      #   with:
-      #     name: ${{ vars.IOS_SCHEME }}.app.dSYM.zip
-      #     path: packages/app/fastlane/builds/${{ vars.IOS_SCHEME }}.app.dSYM.zip
+      - name: Upload ios dSYM
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ vars.IOS_SCHEME }}.app.dSYM.zip
+          path: packages/app/fastlane/builds/${{ vars.IOS_SCHEME }}.app.dSYM.zip
 
-      # - name: Upload to TestFlight
-      #   working-directory: packages/app
-      #   run: bundle exec fastlane deploy
-      #   env:
-      #     IOS_APP_IDENTIFIER: ${{ vars.IOS_APP_IDENTIFIER }}
-      #     IOS_SCHEME: ${{ vars.IOS_SCHEME }}
-      #     IOS_PROFILE_ID: ${{ vars.IOS_PROFILE_ID }}
-      #     IOS_CODE_SIGNING_IDENTITY: ${{ vars.CODE_SIGNING_IDENTITY }}
-      #     IOS_EXPORT_METHOD: ${{ vars.IOS_EXPORT_METHOD }}
-      #     IOS_CERTIFICATE_P12_PASSWORD: ${{ secrets.IOS_CERTIFICATE_P12_PASSWORD }}
-      #     APP_STORE_CONNECT_API_KEY: ${{ secrets.APP_STORE_CONNECT_API_KEY }}
+      - name: Upload to TestFlight
+        working-directory: packages/app
+        run: bundle exec fastlane deploy
+        env:
+          IOS_APP_IDENTIFIER: ${{ vars.IOS_APP_IDENTIFIER }}
+          IOS_SCHEME: ${{ vars.IOS_SCHEME }}
+          IOS_PROFILE_ID: ${{ vars.IOS_PROFILE_ID }}
+          IOS_CODE_SIGNING_IDENTITY: ${{ vars.CODE_SIGNING_IDENTITY }}
+          IOS_EXPORT_METHOD: ${{ vars.IOS_EXPORT_METHOD }}
+          IOS_CERTIFICATE_P12_PASSWORD: ${{ secrets.IOS_CERTIFICATE_P12_PASSWORD }}
+          APP_STORE_CONNECT_API_KEY: ${{ secrets.APP_STORE_CONNECT_API_KEY }}
 
       ############################################
       #
@@ -464,7 +464,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: app-${{ vars.ANDROID_BUILD_TASK }}-release.aab
-          path: ${{ github.workspace }}/packages/app/android/build/output/bundle/${{ vars.ANDROID_BUILD_TASK }}Release/app-${{ vars.ANDROID_BUILD_TASK }}-release.aab
+          path: ${{ github.workspace }}/packages/app/android/app/build/output/bundle/${{ vars.ANDROID_BUILD_TASK }}Release/app-${{ vars.ANDROID_BUILD_TASK }}-release.aab
 
       - name: Deploy android application
         run: bundle exec fastlane android deploy
@@ -478,4 +478,4 @@ jobs:
           ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
           ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
           PLAY_CONFIG_PATH: ${{ github.workspace }}/play_config.json
-          AAB_PATH: ${{ github.workspace }}/packages/app/android/build/output/bundle/${{ vars.ANDROID_BUILD_TASK }}Release/app-${{ vars.ANDROID_BUILD_TASK }}-release.aab
+          AAB_PATH: ${{ github.workspace }}/packages/app/android/app/build/output/bundle/${{ vars.ANDROID_BUILD_TASK }}Release/app-${{ vars.ANDROID_BUILD_TASK }}-release.aab
