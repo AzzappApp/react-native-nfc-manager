@@ -226,9 +226,7 @@ platform :android do
   desc 'Build Android application based on ANDROID_TARGET environment variable.'
   lane :build do
     android_target = capitalize_first_letter(ANDROID_BUILD_TASK)
-    apk_path = Actions.lane_context[SharedValues::GRADLE_AAB_OUTPUT_PATH]
-
-    puts “APK path: #{apk_path}”
+   
     gradle(
       task: ":app:bundle#{android_target}",
       build_type: "Release",
@@ -242,16 +240,22 @@ platform :android do
         "android.injected.signing.key.password" => KEY_PASSWORD,
       }
     )
-    apk_pathafter = Actions.lane_context[SharedValues::GRADLE_AAB_OUTPUT_PATH]
-
+    puts "Test"
+    puts Actions.lane_context[SharedValues::GRADLE_AAB_OUTPUT_PATH]
+    puts Actions.lane_context[SharedValues::GRADLE_ALL_AAB_OUTPUT_PATHS]
+    puts Actions.lane_context[SharedValues::GRADLE_APK_OUTPUT_PATH]
+    puts Actions.lane_context[SharedValues::GRADLE_ALL_APK_OUTPUT_PATHS]
    
   end
 
 
    lane :deploy do   
     AAB_PATH = ENV['AAB_PATH']
-    apk_pathafter = Actions.lane_context[SharedValues::GRADLE_AAB_OUTPUT_PATH]
-    puts “APK path: #{apk_pathafter}”
+    puts "deploy"
+    puts Actions.lane_context[SharedValues::GRADLE_AAB_OUTPUT_PATH]
+    puts Actions.lane_context[SharedValues::GRADLE_ALL_AAB_OUTPUT_PATHS]
+    puts Actions.lane_context[SharedValues::GRADLE_APK_OUTPUT_PATH]
+    puts Actions.lane_context[SharedValues::GRADLE_ALL_APK_OUTPUT_PATHS]
     supply(
       json_key: PLAY_CONFIG_PATH,
       package_name: ANDROID_APP_IDENTIFIER,
@@ -262,6 +266,7 @@ platform :android do
       skip_upload_apk: true,
       track: "internal",
     )
+
    end
 end
 
