@@ -1,5 +1,9 @@
-## 0.6.0-canary.74
+## 0.6.0-canary.75
 
+* **feat:**  - add a new lottie and design for welcomescreen ([#4851](https://github.com/AzzappApp/azzapp/pull/4851))
+* **fix:**  - **web:** [#4838](https://github.com/AzzappApp/azzapp/pull/4838) increase jwt timeout + error messages ([#4848](https://github.com/AzzappApp/azzapp/pull/4848))
+* **fix:**  - **android:** [#4512](https://github.com/AzzappApp/azzapp/pull/4512) use accelerometer on android to detect orientation ([#4852](https://github.com/AzzappApp/azzapp/pull/4852))
+* **fix:**  - multi user ([#4833](https://github.com/AzzappApp/azzapp/pull/4833))
 * **fix:**  - 🐛 avoid overflow modal height by default ([#4849](https://github.com/AzzappApp/azzapp/pull/4849))
 * **fix:**  - android
 * **fix:**  - android UI ([#4844](https://github.com/AzzappApp/azzapp/pull/4844))
