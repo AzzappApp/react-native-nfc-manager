@@ -269,3 +269,7 @@ def update_project_version(xcodeproj:, target:, version:, value:)
 
   project.save
 end
+
+def capitalize_first_letter(string)
+  string[0].upcase + string[1..-1]
+end
