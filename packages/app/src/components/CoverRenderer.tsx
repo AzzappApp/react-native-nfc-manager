@@ -296,6 +296,7 @@ const CoverRenderer = (
                   (coverDynamicLinks.position.x * layout.width) / 100 -
                   linksSize.width / 2,
                 gap: convertToBaseCanvasRatio(LINKS_GAP, layout.width),
+                zIndex: 1,
               }}
             >
               {coverDynamicLinks.links.map(link => (
