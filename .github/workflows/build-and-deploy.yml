@@ -7,7 +7,6 @@ on:
       - staging
       - stable
 
-
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
@@ -20,7 +19,7 @@ env:
 jobs:
   test-and-update-app:
     environment: ${{(github.ref_name == 'stable' && 'Production') || (github.ref_name == 'staging' && 'Staging') || 'Development' }}
-    name: Build and Deploy Azzapp application
+    name: Build, Test and update Azzapp application version, translations and persisted queries
     runs-on: ubuntu-latest
     steps: 
       - name: Checkout
@@ -31,6 +30,10 @@ jobs:
  
       - name: Pull translations
         uses: ./.github/actions/i18n-pull
+        with:
+          database-host: ${{ vars.DATABASE_HOST }}
+          database-username: ${{ vars.DATABASE_USERNAME }}
+          database-password: ${{ secrets.DATABASE_PASSWORD }}
 
       - name: Purge translations key that are not used
         run: yarn i18n:purge
@@ -91,7 +94,7 @@ jobs:
           yarn install --immutable
   deploy-to-vercel:
     environment: ${{(github.ref_name == 'stable' && 'Production') || (github.ref_name == 'staging' && 'Staging') || 'Development' }}
-    name: Build and Deploy Azzapp application
+    name: Deploy Azzapp web services to Vercel
     runs-on: ubuntu-latest
     needs: test-and-update-app
     steps:
@@ -103,15 +106,14 @@ jobs:
  
       - name: Pull translations
         uses: ./.github/actions/i18n-pull
+        with:
+          database-host: ${{ vars.DATABASE_HOST }}
+          database-username: ${{ vars.DATABASE_USERNAME }}
+          database-password: ${{ secrets.DATABASE_PASSWORD }}
 
       - name: Install Vercel CLI
         run: npm i -g vercel@latest
       
-      ############################################
-      #
-      # Deploy the web app to Vercel
-      #
-      ############################################
       - name: Azzapp Web - Pull Vercel configuration
         env:
           VERCEL_PROJECT_ID: "azzapp"
@@ -164,7 +166,7 @@ jobs:
           vercel deploy --token=${{ secrets.VERCEL_TOKEN }} --meta githubCommitRef=${{ github.ref_name }} $ADDITIONAL_ARGS
   buid-ios:
     environment: ${{(github.ref_name == 'stable' && 'Production') || (github.ref_name == 'staging' && 'Staging') || 'Development' }}
-    name: Build and Deploy Azzapp application
+    name: Build native iOS application
     runs-on: macos-latest-xlarge
     needs: 
       - test-and-update-app
@@ -178,6 +180,11 @@ jobs:
  
       - name: Pull translations
         uses: ./.github/actions/i18n-pull
+        with:
+          database-host: ${{ vars.DATABASE_HOST }}
+          database-username: ${{ vars.DATABASE_USERNAME }}
+          database-password: ${{ secrets.DATABASE_PASSWORD }}
+
 
       - name: JavaScript build
         run: yarn build-app-dependencies
@@ -254,7 +261,7 @@ jobs:
           APP_STORE_CONNECT_API_KEY: ${{ secrets.APP_STORE_CONNECT_API_KEY }}
   buid-android:
     environment: ${{(github.ref_name == 'stable' && 'Production') || (github.ref_name == 'staging' && 'Staging') || 'Development' }}
-    name: Build and Deploy Azzapp application
+    name: Build native Android application
     runs-on: ubuntu-latest
     needs: 
       - test-and-update-app
@@ -268,6 +275,11 @@ jobs:
   
       - name: Pull translations
         uses: ./.github/actions/i18n-pull
+        with:
+          database-host: ${{ vars.DATABASE_HOST }}
+          database-username: ${{ vars.DATABASE_USERNAME }}
+          database-password: ${{ secrets.DATABASE_PASSWORD }}
+
 
       - name: JavaScript build
         run: yarn build-app-dependencies
