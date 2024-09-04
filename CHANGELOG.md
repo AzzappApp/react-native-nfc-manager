@@ -1,4 +1,4 @@
-## 0.6.0-canary.88
+## 0.6.0-canary.89
 
 * **fix:**  - web display ([#4867](https://github.com/AzzappApp/azzapp/pull/4867))
 * **build:**  - fix bumpVersion script
