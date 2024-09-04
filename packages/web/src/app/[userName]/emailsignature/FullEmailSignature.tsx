@@ -199,7 +199,7 @@ const FullEmailSignature = ({
             </tr>
           )}
           <tr>
-            <td height="100%" valign="top" width="100%">
+            <td height="100%" valign="top" width="50%">
               <div>
                 <div>
                   <div
@@ -277,7 +277,7 @@ const FullEmailSignature = ({
               valign="top"
               style={{
                 width: '50%',
-                paddingLeft: '30px',
+                paddingLeft: '15px',
                 borderLeft: '1px solid  #E2E1E3',
               }}
             >
@@ -446,7 +446,7 @@ export function buildCardSignature(
   readableColor: string,
 ) {
   let card = `
-  <table  border="0" cellpadding="0" cellspacing="0" style="width:450px; text-decoration: unset !important;">
+  <table  border="0" cellpadding="0" cellspacing="0" style="width:550px; text-decoration: unset !important;">
     <tbody>`;
   if (avatarUrl) {
     card += `<tr>
@@ -470,12 +470,12 @@ export function buildCardSignature(
   }
   card += `<tr>
             <td>
-              <a href="${url}" rel=“noopener” noreferrer target=“_blank”  style="text-decoration: unset !important;">
+              <a href="${url}" rel=“noopener” noreferrer target=“_blank”  style="text-decoration: none !important;">
                 <table style="background-color: ${primaryColor};height:34px;width:125px;padding-left: 10px;padding-right: 10px;border-radius:48px;font-size:12px;margin-top:12px">
                 <tbody> 
                   <tr>
                     <td style="vertical-align: middle; text-align: center;color: ${readableColor}; font-size: 12px; font-family: Helvetica; font-weight: 700">
-                      Save my contact
+                      <span style="text-decoration: unset !important;color: ${readableColor};">Save my contact</span>
                     </td>
                   </tr>
                 </tbody>
@@ -487,17 +487,17 @@ export function buildCardSignature(
   card += `</tbody>
           </table>
           </td>
-          <td  height="100%" valign="top" style="padding-left: 30px; border-left: 1px solid  #E2E1E3">
-            <table style="max-width:195px; width 100%">`;
+          <td  height="100%" valign="top" style="padding-left: 15px; width:300px, border-left: 1px solid  #E2E1E3">
+            <table style="width:300px; width 100%">`;
   if (phones) {
     for (let index = 0; index < phones.length; index++) {
       const formattedPoneNumber = formatPhoneNumberUri(phones[index]);
       if (formattedPoneNumber) {
         card += `<tr>
                     <td style="height:20px; width:100%; display:inline-block; vertical-align: middle;">
-                       <a href="${formattedPoneNumber}" rel=“noopener” noreferrer target=“_blank”  style="text-decoration: unset !important;>
-                           <img src="https://ci3.googleusercontent.com/meips/ADKq_NaOvdMqejCV6cb10oZSiO3mzUvTB0nwQlCibTWP2CMFNyq073QclnjgRJzHqrT-CelfgDv36PedH2VBRRdS4FQVgOLL0NXBtOnvSePFUli5vLM=s0-d-e1-ft#https://www.azzapp.com//_next/static/media/mail.a185d108.png" height="14px" width="14px" style="width: 14px; height: 14px;vertical-align: middle"/>
-                         <span style="text-decoration: unset !important;color:black;font-size: 12px;font-weight:400px; color: black"">${phones[index]}</span>
+                       <a href="${formattedPoneNumber}" rel=“noopener” noreferrer target=“_blank” style="text-decoration: unset !important;color:black;font-size: 12px;font-weight:400px; color: black">
+                           <img src="${process.env.NEXT_PUBLIC_URL}${phoneLogo.src}"   height="14px" width="14px" style="width: 14px; height: 14px;vertical-align: middle"/>
+                         <span style="text-decoration: unset !important;color:black;font-size: 12px;font-weight:400px; color: black">${phones[index]}</span>
                       </a>
                     </td>
                   </tr>`;
@@ -510,7 +510,7 @@ export function buildCardSignature(
              <td style="height:20px; width:100%; display:inline-block; vertical-align: middle;">
                  
                    <a href="mailto:${mails[index]}" rel=“noopener” noreferrer target=“_blank”  style="text-decoration: unset !important;color:black;font-size: 12px;font-weight:400px; color: black">
-                    <img src="${process.env.NEXT_PUBLIC_URL}${mailLogo.src}"  height="14px" width="14px" style="width: 14px; height: 14px;vertical-align: middle"/>
+                      <img src="${process.env.NEXT_PUBLIC_URL}${mailLogo.src}"   height="14px" width="14px" style="width: 14px; height: 14px;vertical-align: middle"/>
                    <span style="text-decoration: unset !important;color:black;font-size: 12px;font-weight:400px; color: black;text-decoration: unset !important;">${mails[index]}</span>
                   </a>
                 </td>

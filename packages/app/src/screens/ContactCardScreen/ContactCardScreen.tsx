@@ -304,11 +304,10 @@ export const ContactCardScreen = ({
             }}
           />
           <ScrollView
-            style={styles.scrollViewStyle}
+            style={[styles.scrollViewStyle, { height: height - 247 }]}
             showsVerticalScrollIndicator={false}
             contentContainerStyle={{
               gap: 20,
-              height,
             }}
           >
             <Text variant="xsmall" style={styles.contactCardDescriptionText}>
@@ -554,11 +553,11 @@ const styleSheet = createStyleSheet(appearance => ({
     backgroundColor: 'white',
     padding: 15,
     borderRadius: 16,
-    transform: [{ scale: 0.8 }, { translateY: -20 }],
+    transform: [{ scale: 0.85 }, { translateY: -20 }],
     ...shadow('light', 'bottom'),
   },
   scrollViewStyle: { width: '100%' },
-  viewShotBackgroundColor: { backgroundColor: 'white' },
+  viewShotBackgroundColor: { backgroundColor: 'white', paddingBottom: 5 },
   googleWalletLogo: {
     height: 47,
     overflow: 'visible',

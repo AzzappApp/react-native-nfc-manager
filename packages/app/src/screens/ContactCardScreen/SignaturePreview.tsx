@@ -142,6 +142,7 @@ const SignaturePreview = ({ profile: profileKey }: SignaturePreviewProps) => {
                   ),
                 },
               ]}
+              numberOfLines={1}
             >
               Save my contact
             </Text>
@@ -219,7 +220,9 @@ const styles = StyleSheet.create({
     borderRadius: 30 * SCALE_RATIO,
   },
   displayNameText: {
+    color: colors.black,
     fontFamily: 'Helvetica Neue Medium',
+    fontWeight: '700',
     fontSize: 16 * SCALE_RATIO,
     lineHeight: 20 * SCALE_RATIO,
     marginBottom: 5 * SCALE_RATIO,
@@ -237,6 +240,7 @@ const styles = StyleSheet.create({
     marginBottom: 5 * SCALE_RATIO,
   },
   phoneMail: {
+    color: colors.black,
     fontFamily: 'Helvetica Neue',
     fontSize: 12 * SCALE_RATIO,
     textAlign: 'center',
