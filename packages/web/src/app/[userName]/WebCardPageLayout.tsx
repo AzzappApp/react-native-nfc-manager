@@ -53,6 +53,11 @@ const WebCardPageLayout = (props: ProfilePageLayoutProps) => {
   } = props;
   const [display, setDisplay] = useState<'card' | 'posts'>('card');
   const [postsOpen, setPostsOpen] = useState(false);
+  const [appClipIsSupported, setAppClipIsSupported] = useState(false);
+
+  useEffect(() => {
+    setAppClipIsSupported(isAppClipSupported());
+  }, []);
 
   const [contactDataVCard, setContactDataVCard] = useState({
     userId: '',
@@ -109,8 +114,6 @@ const WebCardPageLayout = (props: ProfilePageLayoutProps) => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  const appClipIsSupported = isAppClipSupported();
 
   return (
     <>
