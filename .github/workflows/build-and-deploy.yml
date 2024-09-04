@@ -336,10 +336,10 @@ jobs:
       # IOS Application build
       #
       ############################################
-      # - uses: ruby/setup-ruby@v1
-      #   with:
-      #     working-directory: packages/app
-      #     bundler-cache: true
+      - uses: ruby/setup-ruby@v1
+        with:
+          working-directory: packages/app
+          bundler-cache: true
 
       # - name: Cache CocoaPods
       #   uses: actions/cache@v3
