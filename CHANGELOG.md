@@ -1,5 +1,6 @@
-## 0.6.0-canary.93
+## 0.6.0-canary.94
 
+* **feat:**  - HomeScreen loader ([#4871](https://github.com/AzzappApp/azzapp/pull/4871))
 * **fix:**  - 🐛 always show all links ([#4870](https://github.com/AzzappApp/azzapp/pull/4870))
 * **fix:**  - **user:** [#4606](https://github.com/AzzappApp/azzapp/pull/4606) remove never used accounts ([#4869](https://github.com/AzzappApp/azzapp/pull/4869))
 * **fix:**  - use appclip on client side only
