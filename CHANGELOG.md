@@ -1,5 +1,6 @@
-## 0.6.0-canary.86
+## 0.6.0-canary.87
 
+* **fix:**  - web display ([#4867](https://github.com/AzzappApp/azzapp/pull/4867))
 * **build:**  - fix bumpVersion script
 * **build:**  - put back web deployment
 * **fix:**  - add invite url when inviting via app
