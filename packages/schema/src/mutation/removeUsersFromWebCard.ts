@@ -1,5 +1,6 @@
 import { GraphQLError } from 'graphql';
 import {
+  deleteUnusedAccounts,
   getProfilesByIds,
   getProfilesByWebCard,
   removeProfiles,
@@ -50,6 +51,7 @@ const removeUsersFromWebCard: MutationResolvers['removeUsersFromWebCard'] =
       );
 
     await transaction(async () => {
+      await deleteUnusedAccounts(profilesToDelete.map(profile => profile.id));
       await removeProfiles(profilesToDelete.map(profile => profile.id));
       await updateMonthlySubscription(userId, webCardId);
     });

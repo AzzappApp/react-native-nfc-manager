@@ -9,6 +9,9 @@ import {
   like,
   asc,
   desc,
+  exists,
+  notInArray,
+  notExists,
 } from 'drizzle-orm';
 import { db, transaction } from '../database';
 import {
@@ -366,6 +369,40 @@ export const getUsersFromWebCard = async (
           )
         : eq(ProfileTable.webCardId, webCardId),
     );
+
+export const deleteUnusedAccounts = async (
+  profileIdsToDelete: string[],
+): Promise<void> => {
+  await db()
+    .delete(UserTable)
+    .where(
+      and(
+        exists(
+          db()
+            .select({ userId: ProfileTable.userId })
+            .from(ProfileTable)
+            .where(
+              and(
+                eq(ProfileTable.userId, UserTable.id),
+                inArray(ProfileTable.id, profileIdsToDelete),
+              ),
+            ),
+        ),
+        notExists(
+          db()
+            .select({ userId: ProfileTable.userId })
+            .from(ProfileTable)
+            .where(
+              and(
+                eq(ProfileTable.userId, UserTable.id),
+                notInArray(ProfileTable.id, profileIdsToDelete),
+              ),
+            ),
+        ),
+        eq(UserTable.invited, true),
+      ),
+    );
+};
 
 /**
  * Retrieves the list of users in the database matching the provided filters
