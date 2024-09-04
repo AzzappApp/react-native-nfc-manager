@@ -1,5 +1,6 @@
-## 0.6.0-canary.84
+## 0.6.0-canary.85
 
+* **fix:**  - add invite url when inviting via app
 * **fix:**  - **api:** deprecate useless fields ([#4862](https://github.com/AzzappApp/azzapp/pull/4862))
 * **feat:**  - **multiUser:** [#4825](https://github.com/AzzappApp/azzapp/pull/4825) add invite url with redirection to appropriate store ([#4855](https://github.com/AzzappApp/azzapp/pull/4855))
 * **fix:**  - **android:** [#4318](https://github.com/AzzappApp/azzapp/pull/4318) labels were ignore on contact creation ([#4839](https://github.com/AzzappApp/azzapp/pull/4839))
