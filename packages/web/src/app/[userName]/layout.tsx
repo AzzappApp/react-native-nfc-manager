@@ -38,7 +38,6 @@ const RootLayout = async ({
   const currentLocale = isSupportedLocale(locale) ? locale : DEFAULT_LOCALE;
 
   const messages = getTranslationMessages(currentLocale);
-
   return (
     <html
       lang={currentLocale}
@@ -79,7 +78,10 @@ const RootLayout = async ({
         />
         <link rel="manifest" href="/site.webmanifest" />
         <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#ef3962" />
-        <meta name="apple-itunes-app" content="app-id=6502694267" />
+        <meta
+          name="apple-itunes-app"
+          content={`${process.env.NEXT_APPLE_ITUNES_APP_META}`}
+        />
       </head>
       <body>
         <ClientWrapper locale={locale} messages={messages}>
