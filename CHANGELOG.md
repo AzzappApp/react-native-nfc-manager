@@ -1,5 +1,6 @@
-## 0.6.0-canary.89
+## 0.6.0-canary.90
 
+* **feat:**  - Appclip web ([#4865](https://github.com/AzzappApp/azzapp/pull/4865))
 * **fix:**  - web display ([#4867](https://github.com/AzzappApp/azzapp/pull/4867))
 * **build:**  - fix bumpVersion script
 * **build:**  - put back web deployment
