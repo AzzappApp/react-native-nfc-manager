@@ -29,6 +29,17 @@ type ProfilePageLayoutProps = PropsWithChildren<{
   color: string | null;
 }>;
 
+const isAppClipSupported = () => {
+  if (!process.env.NEXT_APPLE_APP_ENABLED) {
+    return false;
+  }
+  const userAgent = navigator.userAgent.toLowerCase();
+  const isIOS = /iphone|ipad/.test(userAgent);
+  const iosVersionMatch = userAgent.match(/os (\d+)_/);
+  const iosVersion = iosVersionMatch ? parseInt(iosVersionMatch[1], 10) : 0;
+  return isIOS && iosVersion > 16.4; //opening appclip from link only supported after 16.4 (FYI: appclip is supported since 14.3)
+};
+
 const WebCardPageLayout = (props: ProfilePageLayoutProps) => {
   const {
     webCard,
@@ -42,17 +53,6 @@ const WebCardPageLayout = (props: ProfilePageLayoutProps) => {
   } = props;
   const [display, setDisplay] = useState<'card' | 'posts'>('card');
   const [postsOpen, setPostsOpen] = useState(false);
-
-  const isAppClipSupported = () => {
-    if (!process.env.NEXT_APPLE_APP_ENABLED) {
-      return false;
-    }
-    const userAgent = navigator.userAgent.toLowerCase();
-    const isIOS = /iphone|ipad/.test(userAgent);
-    const iosVersionMatch = userAgent.match(/os (\d+)_/);
-    const iosVersion = iosVersionMatch ? parseInt(iosVersionMatch[1], 10) : 0;
-    return isIOS && iosVersion > 16.4; //opening appclip from link only supported after 16.4 (FYI: appclip is supported since 14.3)
-  };
 
   const [contactDataVCard, setContactDataVCard] = useState({
     userId: '',
@@ -109,6 +109,8 @@ const WebCardPageLayout = (props: ProfilePageLayoutProps) => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  const appClipIsSupported = isAppClipSupported();
 
   return (
     <>
@@ -210,7 +212,7 @@ const WebCardPageLayout = (props: ProfilePageLayoutProps) => {
             }}
           />
         )}
-        {isAppClipSupported() ? (
+        {appClipIsSupported ? (
           <AppClipLoadButton />
         ) : (
           <DownloadVCard webCard={webCard} onClose={handleCloseDownloadVCard} />
