@@ -1,5 +1,6 @@
-## 0.6.0-canary.95
+## 0.6.0-canary.96
 
+* **fix:**  - **shareBack:** [#3284](https://github.com/AzzappApp/azzapp/pull/3284) wrong shareback url breaking sms + email/phone … ([#4875](https://github.com/AzzappApp/azzapp/pull/4875))
 * **fix:**  - **graphql:** case when no translation is found for locale ([#4873](https://github.com/AzzappApp/azzapp/pull/4873))
 * **feat:**  - HomeScreen loader ([#4871](https://github.com/AzzappApp/azzapp/pull/4871))
 * **fix:**  - 🐛 always show all links ([#4870](https://github.com/AzzappApp/azzapp/pull/4870))
