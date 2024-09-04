@@ -54,12 +54,7 @@ const PostFeedItem = (
           <span className={styles.postAuthorUsername}>{webCard.userName}</span>
         </button>
         {postMedia && (
-          <div
-            className={styles.postMedias}
-            style={{
-              aspectRatio: `${postMedia.width / postMedia.height}`,
-            }}
-          >
+          <div className={styles.postMedias}>
             <PostFeedMediaPlayer
               ref={ref}
               media={postMedia}

@@ -93,21 +93,23 @@ const PostFeed = (props: PostFeedProps) => {
           onClose={onClose}
           background={background}
         />
-        {posts.map((post, i) => (
-          <PostFeedItem
-            ref={e => {
-              videos.current[i] = e;
-            }}
-            key={`${post.id}-${i}`}
-            media={media}
-            webCard={webCard}
-            post={post}
-            onDownload={() => download.current?.open()}
-            onPlay={() => onVideoPlay(i)}
-            onMuteChanged={muted => onMuteChanged(muted)}
-            onPressAuthor={props.onPressAuthor}
-          />
-        ))}
+        <div className={styles.posts}>
+          {posts.map((post, i) => (
+            <PostFeedItem
+              ref={e => {
+                videos.current[i] = e;
+              }}
+              key={`${post.id}-${i}`}
+              media={media}
+              webCard={webCard}
+              post={post}
+              onDownload={() => download.current?.open()}
+              onPlay={() => onVideoPlay(i)}
+              onMuteChanged={muted => onMuteChanged(muted)}
+              onPressAuthor={props.onPressAuthor}
+            />
+          ))}
+        </div>
       </div>
       <DownloadAppModal ref={download} webCard={webCard} media={media} />
       <ShareModal

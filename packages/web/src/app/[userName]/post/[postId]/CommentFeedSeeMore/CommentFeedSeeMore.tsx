@@ -90,11 +90,11 @@ const CommentFeedSeeMore = (props: CommentFeedSeeMoreProps) => {
         <div className={styles.publications}>
           <p className={styles.publicationsText}>
             <FormattedMessage
-              defaultMessage="More publication from "
-              id="M9CTDw"
+              defaultMessage="More publication from"
+              id="QFG2HO"
               description="More publications title in comment feed"
             />
-            <span className={styles.name}>{webCard.userName}</span>
+            <span className={styles.name}> {webCard.userName}</span>
           </p>
           <div className={styles.medias}>
             {postsList.map(post => (

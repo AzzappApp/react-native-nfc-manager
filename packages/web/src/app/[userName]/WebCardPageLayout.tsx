@@ -155,7 +155,7 @@ const WebCardPageLayout = (props: ProfilePageLayoutProps) => {
           >
             <div
               style={{
-                width: '50px',
+                width: '100px',
                 background: `linear-gradient(to right, transparent 0%, ${color} 100%)`,
               }}
             />

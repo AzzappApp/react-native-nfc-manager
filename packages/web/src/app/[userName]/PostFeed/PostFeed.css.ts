@@ -75,6 +75,17 @@ const headerButtonLight = style({
   borderStyle: 'solid',
 });
 
+const posts = style({
+  display: 'flex',
+  flexDirection: 'column',
+  flex: 1,
+  '@media': {
+    [MediaQuery.Desktop]: {
+      gap: '20px',
+    },
+  },
+});
+
 const styles = {
   wrapper,
   header,
@@ -85,6 +96,7 @@ const styles = {
   headerPostsCount,
   headerButton,
   headerButtonLight,
+  posts,
 };
 
 export default styles;

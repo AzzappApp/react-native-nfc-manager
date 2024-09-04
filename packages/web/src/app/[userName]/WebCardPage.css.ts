@@ -45,7 +45,7 @@ const posts = style({
       display: 'flex',
       flexDirection: 'row',
       transition: 'width 0.3s',
-      width: '350px',
+      width: '400px',
       position: 'fixed',
       right: 0,
     },
