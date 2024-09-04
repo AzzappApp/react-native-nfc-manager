@@ -18,11 +18,9 @@ let androidVersionCode = 0;
 
 if (preReleaseKind) {
   const paddedPatch = patch.padStart(2, '0');
-  const nextPreReleaseNumber = (Number(preReleaseNumber) + 1)
-    .toString()
-    .padStart(3, '0');
+  const nextPreReleaseNumber = (Number(preReleaseNumber) + 1).toString();
   nextVersion = `${major}.${minor}.${patch}-${preReleaseKind}.${nextPreReleaseNumber}`;
-  androidVersionCode = `${major}${paddedMinor}${paddedPatch}${nextPreReleaseNumber}`;
+  androidVersionCode = `${major}${paddedMinor}${paddedPatch}${nextPreReleaseNumber.padStart(3, '0')}`;
 } else {
   const newPatch = Number(patch) + 1;
   nextVersion = `${major}.${minor}.${newPatch}`;
