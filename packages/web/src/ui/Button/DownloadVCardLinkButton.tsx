@@ -57,7 +57,7 @@ const DownloadVCardLinkButton = (props: ButtonProps) => {
       }
 
       saveAs(
-        `${process.env.NEXT_PUBLIC_API_ENDPOINT}/shareBackVCard?c=${compressedContactCard}.vcf&u=${userName}`,
+        `${process.env.NEXT_PUBLIC_API_ENDPOINT}/downloadVCard?c=${compressedContactCard}.vcf&u=${userName}`,
         download ?? 'azzapp-contact.vcf',
       );
     },

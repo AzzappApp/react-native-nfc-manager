@@ -2,27 +2,24 @@ import * as Sentry from '@sentry/nextjs';
 import { decompressFromEncodedURIComponent } from 'lz-string';
 import { NextResponse } from 'next/server';
 import { withAxiom } from 'next-axiom';
-import { getProfileById, getWebCardById } from '@azzapp/data';
-import { parseContactCard } from '@azzapp/shared/contactCardHelpers';
 import { verifyHmacWithPassword } from '@azzapp/shared/crypto';
-import { buildVCardFromSerializedContact } from '@azzapp/shared/vCardHelpers';
+import { buildVCardFromShareBackContact } from '@azzapp/shared/vCardHelpers';
 
-import { buildAvatarUrl } from '#helpers/avatar';
-import cors from '#helpers/cors';
+import { generateSaltFromValues } from '#helpers/shareBackHelper';
+import type { ShareBackContact } from '@azzapp/shared/vCardHelpers';
 import type { NextRequest } from 'next/server';
 
 const shareBackVCard = async (req: NextRequest) => {
   const { searchParams } = req.nextUrl;
   const c = searchParams.get('c');
-  const username = searchParams.get('u');
 
-  if (!c || !username) {
+  if (!c) {
     return new NextResponse(null, {
       status: 400,
     });
   }
 
-  let contactData: string;
+  let contactData: Record<string, string>;
   let signature: string;
   try {
     [contactData, signature] = JSON.parse(
@@ -32,7 +29,6 @@ const shareBackVCard = async (req: NextRequest) => {
     Sentry.captureException(
       `ShareBack Invalid request - unable to parse contact data and signature from query string ${c}`,
     );
-
     return new NextResponse(null, {
       status: 400,
     });
@@ -42,17 +38,20 @@ const shareBackVCard = async (req: NextRequest) => {
     Sentry.captureException(
       `ShareBack Invalid request - contact data or signature missing from query string ${c}`,
     );
-
     return new NextResponse(null, {
       status: 400,
     });
   }
 
+  const shareBackContactValues = generateSaltFromValues(
+    contactData as ShareBackContact,
+  );
+
   const isValid = await verifyHmacWithPassword(
     process.env.CONTACT_CARD_SIGNATURE_SECRET ?? '',
     signature,
-    decodeURIComponent(contactData),
-    { salt: username },
+    JSON.stringify(contactData, null, 2),
+    { salt: shareBackContactValues },
   );
 
   if (!isValid) {
@@ -63,53 +62,16 @@ const shareBackVCard = async (req: NextRequest) => {
       status: 400,
     });
   }
-
-  const buildVCardContact = parseContactCard(decodeURIComponent(contactData));
-
-  const [storedProfile, webCard] = await Promise.all([
-    getProfileById(buildVCardContact.profileId),
-    getWebCardById(buildVCardContact.webCardId),
-  ]);
-
-  const avatarUrl =
-    storedProfile && (await buildAvatarUrl(storedProfile, webCard));
-
-  const additionalData = {
-    urls: (webCard?.commonInformation?.urls ?? []).concat(
-      storedProfile?.contactCard?.urls?.filter(url => url.selected) ?? [],
-    ),
-    socials: (webCard?.commonInformation?.socials ?? []).concat(
-      storedProfile?.contactCard?.socials?.filter(social => social.selected) ??
-        [],
-    ),
-    avatarUrl,
-    avatar: undefined as { type: string; base64: string } | undefined,
-  };
-
-  if (additionalData.avatarUrl) {
-    const data = await fetch(additionalData.avatarUrl);
-    const blob = await data.arrayBuffer();
-    const base64 = Buffer.from(blob).toString('base64');
-
-    additionalData.avatar = {
-      type: data.headers.get('content-type')?.split('/')[1] ?? 'png',
-      base64,
-    };
-  }
-
-  const { vCard } = await buildVCardFromSerializedContact(
-    webCard?.userName ?? '',
-    contactData,
-    additionalData,
+  const buildVCardContact = buildVCardFromShareBackContact(
+    contactData as ShareBackContact,
   );
+  const vCardContactString = buildVCardContact.toString();
 
-  const vCardContactString = vCard.toString();
-  let vCardFileName = `${buildVCardContact?.firstName?.trim() ? `-${buildVCardContact.firstName.trim()}` : ''}${buildVCardContact?.lastName?.trim() ? `-${buildVCardContact.lastName.trim()}` : ''}`;
+  let vCardFileName = `${contactData?.firstName?.trim() ? `-${contactData.firstName.trim()}` : ''}${contactData?.lastName?.trim() ? `-${contactData.lastName.trim()}` : ''}`;
   if (!vCardFileName) {
     vCardFileName = 'azzapp-contact';
   }
 
-  // @todo: wording for filename vcf
   return new Response(vCardContactString, {
     headers: {
       'Content-Disposition': `attachment; filename="${vCardFileName}.vcf"`,
@@ -118,4 +80,4 @@ const shareBackVCard = async (req: NextRequest) => {
   });
 };
 
-export const { GET, OPTIONS } = cors({ GET: withAxiom(shareBackVCard) });
+export const { GET } = { GET: withAxiom(shareBackVCard) };

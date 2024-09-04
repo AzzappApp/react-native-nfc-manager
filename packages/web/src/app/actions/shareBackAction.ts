@@ -17,6 +17,7 @@ import { getServerIntl } from '#helpers/i18nHelpers';
 import {
   getValuesFromSubmitData,
   shareBackSignature,
+  shareBackVCardFilename,
 } from '#helpers/shareBackHelper';
 import { sendTwilioSMS } from '#helpers/twilioHelpers';
 import type { EmailAttachment } from '#helpers/emailHelpers';
@@ -143,10 +144,11 @@ export const processShareBackSubmission = async (
         submission.payload,
       );
 
-      // @todo: wording for filename vcf
+      const vCardFileName = shareBackVCardFilename(submission.value);
+
       const shareBackContactVCardAttachment = {
         content: Buffer.from(buildVCardContact.toString()).toString('base64'),
-        filename: 'azzapp-contact.vcf',
+        filename: vCardFileName,
         disposition: 'attachment',
       } as EmailAttachment;
 
