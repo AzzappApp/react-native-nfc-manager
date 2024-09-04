@@ -1,5 +1,7 @@
-## 0.6.0-canary.92
+## 0.6.0-canary.93
 
+* **fix:**  - 🐛 always show all links ([#4870](https://github.com/AzzappApp/azzapp/pull/4870))
+* **fix:**  - **user:** [#4606](https://github.com/AzzappApp/azzapp/pull/4606) remove never used accounts ([#4869](https://github.com/AzzappApp/azzapp/pull/4869))
 * **fix:**  - use appclip on client side only
 * **fix:**  - extract method
 * **feat:**  - Appclip web ([#4865](https://github.com/AzzappApp/azzapp/pull/4865))

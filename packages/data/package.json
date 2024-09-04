@@ -1,6 +1,6 @@
 {
   "name": "@azzapp/data",
-  "version": "0.6.0-canary.92",
+  "version": "0.6.0-canary.93",
   "private": true,
   "main": "src/index.ts",
   "scripts": {
