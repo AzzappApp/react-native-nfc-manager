@@ -182,18 +182,20 @@ export const labelLoader = createDataLoader<
       },
       {} as Record<string, string[]>,
     );
-    const labelsWithLocale: Record<string, LocalizationMessage[]> =
-      Object.fromEntries(
-        await Promise.all(
-          Object.entries(labelsByLocale).map(async ([locale, keys]) => [
-            locale,
-            await getLocalizationMessagesByKeys(keys, locale, ENTITY_TARGET),
-          ]),
-        ),
-      );
+    const labelsWithLocale: Record<
+      string,
+      Array<LocalizationMessage | null>
+    > = Object.fromEntries(
+      await Promise.all(
+        Object.entries(labelsByLocale).map(async ([locale, keys]) => [
+          locale,
+          await getLocalizationMessagesByKeys(keys, locale, ENTITY_TARGET),
+        ]),
+      ),
+    );
 
     return keys.map(([key, locale]) => {
-      return labelsWithLocale[locale].find(l => l.key === key) ?? null;
+      return labelsWithLocale[locale].find(l => l?.key === key) ?? null;
     });
   },
   {
