@@ -21,6 +21,8 @@ import type {
   GenericObject,
 } from 'google-wallet/lib/cjs/generic';
 
+export const maxDuration = 30; //30 seconds
+
 const getGoogleWalletPass = async (
   req: Request,
   {
