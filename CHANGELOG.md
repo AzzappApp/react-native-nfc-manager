@@ -1,5 +1,6 @@
-## 0.6.0-canary.103
+## 0.6.0-canary.104
 
+* **fix:**  - **cover:** [#4659](https://github.com/AzzappApp/azzapp/pull/4659) wrong cover text height ([#4893](https://github.com/AzzappApp/azzapp/pull/4893))
 * **build:**  - use sdk 17
 * **fix:**  - android build bundle
 * **fix:**  - **android:** [#4435](https://github.com/AzzappApp/azzapp/pull/4435) try to increase maxDuration of google wallet endpoint ([#4882](https://github.com/AzzappApp/azzapp/pull/4882))
