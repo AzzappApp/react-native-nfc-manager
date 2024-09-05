@@ -1,5 +1,9 @@
-## 0.6.0-canary.96
+## 0.6.0-canary.97
 
+* **fix:**  - **android:** [#4435](https://github.com/AzzappApp/azzapp/pull/4435) try to increase maxDuration of google wallet endpoint ([#4882](https://github.com/AzzappApp/azzapp/pull/4882))
+* **fix:**  - **webCard:** [#4880](https://github.com/AzzappApp/azzapp/pull/4880) adapt webcard activity bottom sheet ([#4883](https://github.com/AzzappApp/azzapp/pull/4883))
+* **fix:**  - **webCard:** [#4878](https://github.com/AzzappApp/azzapp/pull/4878) close modal on submission ([#4879](https://github.com/AzzappApp/azzapp/pull/4879))
+* **fix:**  - **api:** [#4664](https://github.com/AzzappApp/azzapp/pull/4664) increase rate limit to avoid too many requests issues during tests ([#4884](https://github.com/AzzappApp/azzapp/pull/4884))
 * **fix:**  - **shareBack:** [#3284](https://github.com/AzzappApp/azzapp/pull/3284) wrong shareback url breaking sms + email/phone … ([#4875](https://github.com/AzzappApp/azzapp/pull/4875))
 * **fix:**  - **graphql:** case when no translation is found for locale ([#4873](https://github.com/AzzappApp/azzapp/pull/4873))
 * **feat:**  - HomeScreen loader ([#4871](https://github.com/AzzappApp/azzapp/pull/4871))
