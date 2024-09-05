@@ -94,7 +94,7 @@ jobs:
           git add .
           git commit -m "chore: bump version [skip ci]"
           git push origin $GITHUB_REF_NAME
-          
+
   deploy-to-vercel:
     environment: ${{(github.ref_name == 'stable' && 'Production') || (github.ref_name == 'staging' && 'Staging') || 'Development' }}
     name: Deploy Azzapp web services to Vercel
@@ -282,11 +282,15 @@ jobs:
 
       - name: JavaScript build
         run: yarn build-app-dependencies
-      
+
       - uses: ruby/setup-ruby@v1
         with:
           working-directory: packages/app
-          bundler-cache: true  
+          bundler-cache: true
+
+      - name: force Install fastlane
+        run: |
+          bundle install
 
       - name: Configure Keystore
         run: |
