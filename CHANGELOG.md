@@ -1,5 +1,6 @@
-## 0.6.0-canary.104
+## 0.6.0-canary.105
 
+* **fix:**  - avoid infinite loading in coverId is missing ([#4894](https://github.com/AzzappApp/azzapp/pull/4894))
 * **fix:**  - **cover:** [#4659](https://github.com/AzzappApp/azzapp/pull/4659) wrong cover text height ([#4893](https://github.com/AzzappApp/azzapp/pull/4893))
 * **build:**  - use sdk 17
 * **fix:**  - android build bundle
