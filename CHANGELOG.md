@@ -1,5 +1,6 @@
-## 0.6.0-canary.101
+## 0.6.0-canary.102
 
+* **build:**  - use sdk 17
 * **fix:**  - android build bundle
 * **fix:**  - **android:** [#4435](https://github.com/AzzappApp/azzapp/pull/4435) try to increase maxDuration of google wallet endpoint ([#4882](https://github.com/AzzappApp/azzapp/pull/4882))
 * **fix:**  - **webCard:** [#4880](https://github.com/AzzappApp/azzapp/pull/4880) adapt webcard activity bottom sheet ([#4883](https://github.com/AzzappApp/azzapp/pull/4883))
