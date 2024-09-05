@@ -73,6 +73,11 @@ const useLocalCover = (
         webCardId,
         coverId,
       });
+    } else if (!saving && !(webCardId && coverId)) {
+      setState({
+        cover: null,
+        loading: false,
+      });
     }
     return () => {
       cancelled = true;
