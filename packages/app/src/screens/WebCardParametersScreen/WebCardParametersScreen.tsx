@@ -1,6 +1,11 @@
 import { useCallback, useMemo, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { ActivityIndicator, Alert, View } from 'react-native';
+import {
+  ActivityIndicator,
+  Alert,
+  useWindowDimensions,
+  View,
+} from 'react-native';
 import Toast from 'react-native-toast-message';
 import {
   graphql,
@@ -18,6 +23,7 @@ import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import { keyExtractor } from '#helpers/idHelpers';
 import relayScreen from '#helpers/relayScreen';
 import useQuitWebCard from '#hooks/useQuitWebCard';
+import useScreenInsets from '#hooks/useScreenInsets';
 import useToggle from '#hooks/useToggle';
 import Container from '#ui/Container';
 import Icon from '#ui/Icon';
@@ -136,11 +142,17 @@ const WebCardParametersScreen = ({
     description: 'Default activity type label',
   });
 
+  const categoryActivities = useMemo(
+    () =>
+      webCardCategories?.find(a => a.id === webCard?.webCardCategory?.id)
+        ?.companyActivities,
+    [webCardCategories, webCard?.webCardCategory?.id],
+  );
+
   const activities = useMemo(
     () =>
-      webCardCategories
-        ?.find(a => a.id === webCard?.webCardCategory?.id)
-        ?.companyActivities.filter(
+      categoryActivities
+        ?.filter(
           activity =>
             !searchActivities.trim() ||
             activity.label
@@ -183,12 +195,7 @@ const WebCardParametersScreen = ({
 
           return acc;
         }, []),
-    [
-      otherActivityType,
-      searchActivities,
-      webCard?.webCardCategory?.id,
-      webCardCategories,
-    ],
+    [categoryActivities, otherActivityType, searchActivities],
   );
 
   const [commitToggleWebCardPublished] =
@@ -496,9 +503,15 @@ const WebCardParametersScreen = ({
     ]);
   }, [intl, isWebCardOwner, quitWebCard]);
 
+  const { height: windowHeight } = useWindowDimensions();
+  const insets = useScreenInsets();
+
+  const bottomSheetMaxHeight = windowHeight - 90 - insets.top;
+
   if (!webCard) {
     return null;
   }
+
   return (
     <Container style={{ flex: 1 }}>
       <SafeAreaView
@@ -587,8 +600,8 @@ const WebCardParametersScreen = ({
               selectedItemKey={webCard.webCardCategory?.id}
               keyExtractor={keyExtractor}
               bottomSheetHeight={Math.min(
-                (webCardCategories?.length ?? 0) * 50 + 80,
-                500,
+                (webCardCategories.length ?? 0) * 50 + 80,
+                bottomSheetMaxHeight,
               )}
               onItemSelected={updateWebCardCategory}
               bottomSheetTitle={
@@ -674,8 +687,11 @@ const WebCardParametersScreen = ({
                 sections={activities ?? []}
                 selectedItemKey={webCard.companyActivity?.id}
                 bottomSheetHeight={Math.max(
-                  Math.min((webCardCategories?.length ?? 0) * 50 + 80, 400),
-                  300,
+                  Math.min(
+                    (categoryActivities?.length ?? 0) * 50 + 200,
+                    bottomSheetMaxHeight,
+                  ),
+                  600,
                 )}
                 keyExtractor={keyExtractor}
                 onItemSelected={updateProfileActivity}
