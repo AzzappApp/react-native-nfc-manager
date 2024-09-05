@@ -264,6 +264,8 @@ jobs:
     environment: ${{(github.ref_name == 'stable' && 'Production') || (github.ref_name == 'staging' && 'Staging') || 'Development' }}
     name: Build native Android application
     runs-on: ubuntu-latest
+    env:
+      RUBYOPT: -rostruct
     needs:
       - test-and-update-app
     steps:
@@ -285,12 +287,13 @@ jobs:
 
       - uses: ruby/setup-ruby@v1
         with:
+          ruby-version: '2.7.6' #hot fix for android fastlane ubuntu
           working-directory: packages/app
           bundler-cache: true
 
       - name: force Install fastlane
         run: |
-          cd packages/app && bundle install
+          cd packages/app && bundle install --jobs 4 --retry 3
 
       - name: Configure Keystore
         run: |
