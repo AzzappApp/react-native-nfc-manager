@@ -316,6 +316,11 @@ jobs:
         env:
           PLAYSTORE_SERVICE_SECRET: ${{ secrets.PLAYSTORE_SERVICE_SECRET }}
 
+      - uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu' 
+          java-version: '17'
+
       - name: Build android application
         run: yarn build:android
         working-directory: packages/app
