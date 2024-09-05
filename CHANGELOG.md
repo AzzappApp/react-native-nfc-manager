@@ -1,4 +1,4 @@
-## 0.6.0-canary.102
+## 0.6.0-canary.103
 
 * **build:**  - use sdk 17
 * **fix:**  - android build bundle
