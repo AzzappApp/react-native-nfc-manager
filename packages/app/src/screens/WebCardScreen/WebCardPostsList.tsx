@@ -91,7 +91,6 @@ const WebCardPostsList = ({
             viewerWebCard={viewerWebCard}
             canPlay={hasFocus}
             onPressAuthor={toggleFlip}
-            
           />
         )}
       </SafeAreaView>
