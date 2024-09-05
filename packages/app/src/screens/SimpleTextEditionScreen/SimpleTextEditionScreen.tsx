@@ -517,7 +517,10 @@ const SimpleTextEditionScreen = ({
             : SIMPLE_TITLE_MAX_LENGTH
         }
         onClose={onCloseContentModal}
-        onChangeText={onTextChange}
+        onChangeText={text => {
+          onTextChange(text);
+          onCloseContentModal();
+        }}
       />
       <SimpleTextEditionBottomMenu
         currentTab={currentTab}

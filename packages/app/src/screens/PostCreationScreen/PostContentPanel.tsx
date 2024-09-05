@@ -97,7 +97,10 @@ const PostContentPanel = ({
         placeholder={textAraPlaceHolder}
         maxLength={POST_MAX_CONTENT_LENGTH}
         onClose={onModalClose}
-        onChangeText={setContent}
+        onChangeText={text => {
+          setContent(text);
+          onModalClose();
+        }}
       />
     </>
   );
