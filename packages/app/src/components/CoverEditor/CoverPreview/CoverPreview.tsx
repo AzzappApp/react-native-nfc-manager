@@ -1263,14 +1263,6 @@ const CoverPreview = ({
                         top: (editedTextLayer.position.y * viewHeight) / 100,
                         left: (editedTextLayer.position.x * viewWidth) / 100,
                         width: (editedTextLayer.width * viewWidth) / 100,
-                        height: convertToBaseCanvasRatio(
-                          editedTextLayer.fontSize,
-                          viewWidth,
-                        ),
-                        lineHeight: convertToBaseCanvasRatio(
-                          editedTextLayer.fontSize,
-                          viewWidth,
-                        ),
                       },
                       animatedTextInputStyle,
                     ]}
