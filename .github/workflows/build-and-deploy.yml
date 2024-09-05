@@ -290,7 +290,7 @@ jobs:
 
       - name: force Install fastlane
         run: |
-          bundle install
+          cd packages/app && bundle install
 
       - name: Configure Keystore
         run: |
