@@ -1,4 +1,4 @@
-## 0.6.0-canary.100
+## 0.6.0-canary.101
 
 * **fix:**  - android build bundle
 * **fix:**  - **android:** [#4435](https://github.com/AzzappApp/azzapp/pull/4435) try to increase maxDuration of google wallet endpoint ([#4882](https://github.com/AzzappApp/azzapp/pull/4882))
